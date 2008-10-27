@@ -78,6 +78,12 @@ public:
     typedef std::vector<swf_event*> SWFEventsVector;
 
 
+    /// Construct a MovieClip instance
+    //
+    /// @param def
+    ///     Pointer to the movie_definition this object is an
+    ///     instance of (may be a top-level movie or a sprite).
+    ///
     /// @param root
     /// The "relative" _root of this sprite, which is the 
     /// instance of top-level sprite defined by the same
@@ -86,6 +92,15 @@ public:
     /// movie accessible trought the VM, in case this sprite
     /// was defined in an externally loaded movie.
     ///
+    /// @param parent
+    ///     Parent of the created instance in the display list.
+    ///     May be 0 for top-level movies (_level#).
+    ///
+    /// @param id
+    ///     Identifier of the character definition this is an instance
+    ///     of. This is required by character class, but probably
+    ///     to be deprecated if every instance has a reference to its
+    ///     definition, which should know its id...
     ///
     MovieClip(movie_definition* def,
         movie_instance* root, character* parent, int id);
@@ -354,19 +369,28 @@ public:
     /// Otherwise, a new character will be created and onload handler will be triggerred.
     ///
     /// @param tag
-    /// A swf defined placement tag(PlaceObject, or PlaceObject2, or PlaceObject3)
-    /// No ownership transfer, the tag is still owned by the movie_definition class.
+    ///     A swf defined placement tag (PlaceObject, or PlaceObject2,
+    ///     or PlaceObject3).
+    ///     No ownership transfer, the tag is still owned by the
+    ///     movie_definition class.
+    ///
+    /// @param dlist
+    ///     The display list to add the character to.
     ///
     /// @return
     ///     A pointer to the character being added or NULL
     ///
     character* add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+
     /// Proxy of DisplayList::move_character()
     void move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+
     /// Proxy of DisplayList::replace_character()
     void replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+
     /// Proxy of DisplayList::remove_character()
     void remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+
     /// Proxy of DisplayList::remove_character()
     ///
     /// @param ch
@@ -375,11 +399,11 @@ public:
     /// @param depth
     /// depth at which the old character is to be replaced.
     ///
-    /// @use_old_cxform
+    /// @param use_old_cxform
     /// if true, the cxform of the new character will be set to the old one.
     /// if false, the cxform of the new character will be untouched.
     ///
-    /// @use_old_matrix
+    /// @param use_old_matrix
     /// if true, the transformation SWFMatrix of the new character will be set to the old one.
     /// if false, the transformation SWFMatrix of the new character will be untouched.
     ///
@@ -560,8 +584,14 @@ public:
     ///        replaced by the new character
     /// NOTE3: event handlers will also be copied
     ///
+    /// @param newname
+    ///     Name for the copy
+    ///
+    /// @param newdepth
+    ///     Depth for the copy
+    ///
     /// @param init_object
-    /// If not null, will be used to copy properties over.
+    ///     If not null, will be used to copy properties over.
     ///
     boost::intrusive_ptr<MovieClip> duplicateMovieClip(
         const std::string& newname,
@@ -646,7 +676,8 @@ public:
     ///
     void removeMovieClip();
 
-    /// @{ Drawing API
+    /// @name Drawing API
+    /// @{ 
     
     void lineStyle(boost::uint16_t thickness, const rgba& color,
         bool vScale=true, bool hScale=true,
@@ -937,13 +968,16 @@ protected:
     }
 
     /// Execute the tags associated with the specified frame.
-    ///
+    //
     /// @param frame
-    /// Frame number. 0-based
+    ///     Frame number. 0-based
+    ///
+    /// @param dlist
+    ///     The display list to have control tags act upon.
     ///
     /// @param typeflags
     ///     Which kind of control tags we want to execute. 
-    /// See control_tag_type enum.
+    ///     See control_tag_type enum. TODO: *take* a control_tag_type ?
     ///
     void execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags=TAG_DLIST|TAG_ACTION);
 
