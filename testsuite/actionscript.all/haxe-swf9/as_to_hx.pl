@@ -240,6 +240,16 @@ while(<STDIN>){
 	#Subtract the number of skipped tests from the total passed to Dejagnu.totals().
 	$_ =~ s/Dejagnu.totals\(\s*(\w+)\s*,(.+)/Dejagnu.totals($1-$skipped_tests,$2/g;
 
+	#Skip calls to String.lastIndexOf that have a more than two arguments, or have a string as
+	#the second argument.
+	if($_ =~ /lastIndexOf\((.+?)\)/){
+		print "//$1\n";
+		if ($1 =~ /.+?,\s*"/ || ($1  =~ tr/,//) >= 2){
+			skip_line();
+			next;
+		}
+	}
+
 	#Print the converted line of code.
 	print $_;
 }
