@@ -234,6 +234,15 @@ public:
     /// @return A reference to a Buffer.
     Buffer &operator+=(bool);
     
+    /// \brief Find a set of bytes in the buffer
+    ///
+    /// @param byte The bytes to find in the buffer.
+    ///
+    /// @param size The size of the bytes being searched for.
+    ///
+    /// @return A real pointer to the address of the byte in the buffer.
+    gnash::Network::byte_t *find(gnash::Network::byte_t *byte, size_t size);
+    
     /// \brief Drop a byte without resizing.
     ///		This will remove the byte from the Buffer, and then
     ///		move the remaining data to be in the correct

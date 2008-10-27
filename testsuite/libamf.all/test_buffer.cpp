@@ -329,7 +329,7 @@ test_find()
     delete[] data;
     
     // See if we can find a character
-    Network::byte_t *fptr = buf1.find('c');
+    Network::byte_t *fptr = std::find(buf1.begin(), buf1.end(), 'c'); 
     if (fptr == (ptr1 + 2)) {
          runtest.pass ("Buffer::find(Network::byte_t)");
     } else {
