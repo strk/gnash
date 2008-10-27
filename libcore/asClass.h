@@ -21,6 +21,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <iostream>
 #include "string_table.h"
 #include "as_value.h"
 #include "CodeStream.h"
@@ -497,17 +498,9 @@ public:
 	/// function but not actually have it yet.
 	as_function* getImplementation() { return mImplementation; }
 
-	void print_body(){
-		boost::uint8_t opcode;
-		printf("Method Body: ");
-		boost::uint32_t i;
-		for(i=0;i<mBodyLength;i++){
-			opcode = mBody->read_as3op();
-			printf("0x%X ",opcode);
-		}
-		printf("\n");
-		mBody->seekTo(0);
-	}
+	/// \brief
+	/// Print the opcodes that define a method using log_parse.
+	void print_body();
 
 	void print_static_constructor(){
 

@@ -38,6 +38,23 @@ asMethod::asMethod():mBody()
 }
 
 void
+asMethod::print_body()
+{
+		boost::uint8_t opcode;
+		std::stringstream ss;
+		ss << "Method Body: ";
+//		ss.setf(std::ios::hex, std::ios::basefield);
+//		ss.setf (std::ios::showbase);
+		boost::uint32_t i;
+		for(i=0;i<mBodyLength;i++){
+			opcode = mBody->read_as3op();
+			ss << "0x" << std::uppercase << std::hex << (opcode | 0x0) << " ";
+		}
+		mBody->seekTo(0);
+		log_parse("%s",ss.str());
+}
+
+void
 asMethod::setOwner(asClass *pOwner)
 {
 	log_debug("asMethod::setOwner");

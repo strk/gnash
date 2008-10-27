@@ -708,23 +708,23 @@ abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
 bool
 abc_block::read_method_infos()
 {
-	log_debug("Begin read_method_infos.\n");
+	LOG_DEBUG_ABC("Begin read_method_infos.\n");
 
 	boost::uint32_t count = mS->read_V32();
-    log_debug("Method count: %u", count);
+    LOG_DEBUG_ABC("Method count: %u", count);
 
 	mMethods.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		log_debug(" Reading method %u",i);
+		LOG_DEBUG_ABC(" Reading method %u",i);
 		asMethod *pMethod = mCH->newMethod();
 		pMethod->mMethodID = i;
-//		log_debug("Min arg count: %d max: %d",pMethod->minArgumentCount(),pMethod->maxArgumentCount());
+//		LOG_DEBUG_ABC("Min arg count: %d max: %d",pMethod->minArgumentCount(),pMethod->maxArgumentCount());
 		mMethods[i] = pMethod;
 		boost::uint32_t param_count = mS->read_V32();
 		boost::uint32_t return_type = mS->read_V32();
 
-		log_debug("  Param count: %u return type(index): %s(%u)",param_count,mStringPool[mMultinamePool[return_type].getABCName()],return_type);
+		LOG_DEBUG_ABC("  Param count: %u return type(index): %s(%u)",param_count,mStringPool[mMultinamePool[return_type].getABCName()],return_type);
 		pMethod->setMinArgumentCount(param_count);
 		pMethod->setMaxArgumentCount(param_count);
 
@@ -744,55 +744,55 @@ abc_block::read_method_infos()
 
 		for (unsigned int j = 0; j < param_count; ++j)
 		{
-			log_debug("  Reading parameter %u",j);
+			LOG_DEBUG_ABC("  Reading parameter %u",j);
 			// The parameter type.
 			boost::uint32_t ptype = mS->read_V32();
-			log_debug("   Parameter type(index): %s(%u)",mStringPool[mMultinamePool[ptype].getABCName()],ptype);
+			LOG_DEBUG_ABC("   Parameter type(index): %s(%u)",mStringPool[mMultinamePool[ptype].getABCName()],ptype);
 			if (ptype >= mMultinamePool.size())
 			{
 				ERR((_("ABC: Out of bounds parameter type in method.\n")));
 				return false;
 			}
 			asClass *param_type = locateClass(mMultinamePool[ptype]);
-//			log_debug("Done creating asClass object.\n");
+//			LOG_DEBUG_ABC("Done creating asClass object.\n");
 			if (!param_type)
 			{
 				ERR((_("ABC: Unknown parameter type.\n")));
 				return false;
 			}
-//			log_debug("Trying to add argument to method.\n");
+//			LOG_DEBUG_ABC("Trying to add argument to method.\n");
 			pMethod->pushArgument(param_type);
-//			log_debug("Done adding argument to method object.");
+//			LOG_DEBUG_ABC("Done adding argument to method object.");
 		}
-//		log_debug("End loop j.\n");
+//		LOG_DEBUG_ABC("End loop j.\n");
 		// A skippable name index.
 //		mS->skip_V32();
 		boost::uint32_t method_name = mS->read_V32();
-		log_debug(  "Method name=%s %d",mStringPool[method_name],method_name);
+		LOG_DEBUG_ABC(  "Method name=%s %d",mStringPool[method_name],method_name);
 		boost::uint8_t flags = mS->read_u8();
-		log_debug("  Flags: %X",flags | 0x0);
-//		log_debug("Check if flags and optional args.");
+		LOG_DEBUG_ABC("  Flags: %X",flags | 0x0);
+//		LOG_DEBUG_ABC("Check if flags and optional args.");
 		// If there are default parameters, read them now.
 		// Runtime will do validation of whether or not these can actually
 		// be assigned to the corresponding parameters.
 		if (flags & METHOD_OPTIONAL_ARGS)
 		{
-//			log_debug("We have flags and optional args.");
+//			LOG_DEBUG_ABC("We have flags and optional args.");
 			boost::uint32_t ocount = mS->read_V32();
-			log_debug("  Optional args: %u",ocount);
+			LOG_DEBUG_ABC("  Optional args: %u",ocount);
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
 			for (unsigned int j = 0; j < ocount; ++j)
 			{
-				log_debug("  Reading optional arg: %u",j);
+				LOG_DEBUG_ABC("  Reading optional arg: %u",j);
 				boost::uint32_t index = mS->read_V32();
 				boost::uint8_t kindof = mS->read_u8();
-				log_debug("   Index: %u Kindof: %u",index,kindof);
+				LOG_DEBUG_ABC("   Index: %u Kindof: %u",index,kindof);
 				as_value v;
 				if (!pool_value(index, kindof, v))
 					return false; // message done by pool_value
 				pMethod->pushOptional(v);
 			}
-			log_debug("Done handling optional args.");
+			LOG_DEBUG_ABC("Done handling optional args.");
 		}
 
 		// If there are names present for the parameters, skip them.
@@ -966,7 +966,7 @@ abc_block::read_instances()
 		// TODO: What does this mean exactly? How does it differ from the one in
 		// the class info block?
 		boost::uint32_t moffset = mS->read_V32();
-		log_debug("Moffset: %u",moffset);
+		LOG_DEBUG_ABC("Moffset: %u",moffset);
 		if (moffset >= mMethods.size())
 		{
 			ERR((_("ABC: Out of bounds method for initializer.\n")));
@@ -982,7 +982,7 @@ abc_block::read_instances()
 
 		// Next come the 'traits' of the instance. (The members.)
 		boost::uint32_t tcount = mS->read_V32();
-		log_debug("Trait count: %u",tcount);
+		LOG_DEBUG_ABC("Trait count: %u",tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
@@ -1181,7 +1181,7 @@ abc_block::read_method_bodies()
 			aTrait.set_target(mMethods[moffset]);
 			if (!aTrait.read(mS, this)) // TODO: 'method body activation traits'
 				return false;
-			log_debug("Trait: %u name: %s kind: %u value: %s ",j,mStringPool[aTrait.mName],aTrait.mKind,aTrait.mValue.to_string());
+			LOG_DEBUG_ABC("Trait: %u name: %s kind: %u value: %s ",j,mStringPool[aTrait.mName],aTrait.mKind,aTrait.mValue.to_string());
 		}
 	} // end of bodies loop
 	return true;
@@ -1197,33 +1197,33 @@ abc_block::read(SWFStream& in)
 	if (!read_version()) return false;
 	if (!read_integer_constants()) return false;
 	if (!read_unsigned_integer_constants()) return false;
-	log_debug("Done reading unsigned integer constants.\n");
+	LOG_DEBUG_ABC("Done reading unsigned integer constants.\n");
 	if (!read_double_constants()) return false;
-	log_debug("Done reading double constants.\n");
+	LOG_DEBUG_ABC("Done reading double constants.\n");
 	if (!read_string_constants()) return false;
 	LOG_DEBUG_ABC("Done reading string constants.\n");
 	if (!read_namespaces()) return false;
-	log_debug("Done reading namespaces.\n");
+	LOG_DEBUG_ABC("Done reading namespaces.\n");
 	if (!read_namespace_sets()) return false;
-	log_debug("Done reading namespace sets.\n");
+	LOG_DEBUG_ABC("Done reading namespace sets.\n");
 	if (!read_multinames()) return false;
-	log_debug("Done reading multinames.\n");
+	LOG_DEBUG_ABC("Done reading multinames.\n");
 	if (!read_method_infos()) return false;
-	log_debug("Done reading method infos.\n");
+	LOG_DEBUG_ABC("Done reading method infos.\n");
 	if (!skip_metadata()) return false;
-	log_debug("Done reading metadata.\n");
+	LOG_DEBUG_ABC("Done reading metadata.\n");
 	if (!read_instances()) return false;
-	log_debug("Done reading instances.\n");
+	LOG_DEBUG_ABC("Done reading instances.\n");
 	if (!read_classes()) return false;
-	log_debug("Done reading classes.\n");
+	LOG_DEBUG_ABC("Done reading classes.\n");
 	if (!read_scripts()) return false;
-	log_debug("Done reading scripts.\n");
+	LOG_DEBUG_ABC("Done reading scripts.\n");
 	if (!read_method_bodies()) return false;
-	log_debug("Done reading stuff.\n");
+	LOG_DEBUG_ABC("Done reading stuff.\n");
 
 	for(unsigned int i=0;i<mMethods.size();i++){
 		LOG_DEBUG_ABC("Method %d body:",i);
-		mMethods[i]->print_body();
+		IF_VERBOSE_PARSE(mMethods[i]->print_body());
 	}
 /*	The loop below causes a segmentation fault, because it tries to modify 
 	asMethod.mPrototype, which is never initialized.  The parser seems 
