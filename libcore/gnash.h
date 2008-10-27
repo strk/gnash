@@ -39,6 +39,7 @@ namespace gnash {
 }
 
 
+/// Freedom bites
 namespace gnash {
 
 
