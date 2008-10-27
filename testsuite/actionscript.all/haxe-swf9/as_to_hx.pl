@@ -151,8 +151,14 @@ while(<STDIN>){
 	#Replace String() with new String("")
 	$_ =~ s/(\W)String\(\)/$1new String("")/g;
 	
+	#Skip references to __proto__ Haxe does not handle __proto__ very well.
+	if($_ =~ /__proto__/ ){
+		skip_line();
+		next;
+	}
+	
 	#Replace Class.prototype with Reflect.field(Class,'prototype')
-	$_ =~ s/(\w+)\.(prototype|__proto__)/Reflect.field($1,'$2')/g;
+	$_ =~ s/(\w+)\.(prototype)/Reflect.field($1,'$2')/g;
 
 	#There is no Function class in haxe, so we need someway of converting this to haxe:
 	#Function.prototype
