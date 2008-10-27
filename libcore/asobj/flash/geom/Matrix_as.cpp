@@ -33,33 +33,33 @@
 #include <boost/numeric/ublas/io.hpp>
 #include <sstream>
 
-/// According to senocular, Flash docs get this wrong (b and c swapped).
-///
+// According to senocular, Flash docs get this wrong (b and c swapped).
+//
 // A transformation matrix for affine transformations:
 //    a  c  tx
 //    b  d  ty
 //    u  v  w
 // The matrix can only operate in 2d space. The bottom row is immutable
 // as 0  0  1.
-/// Most transformations only apply to a subset of the elements
-/// (partly because the bottom line is immutable), so it's unnecessary to
-/// use a full 3x3 matrix for every operation: particularly for invert(),
-/// where boost::ublas is overcomplicated and can easily fail its own
-/// consistency checks. For simpler multiplication, boost::ublas is very
-/// helpful for keep the code clear and tidy.
+// Most transformations only apply to a subset of the elements
+// (partly because the bottom line is immutable), so it's unnecessary to
+// use a full 3x3 matrix for every operation: particularly for invert(),
+// where boost::ublas is overcomplicated and can easily fail its own
+// consistency checks. For simpler multiplication, boost::ublas is very
+// helpful for keep the code clear and tidy.
 //
-/// Most of the methods can be faked: that is, applied to non-Matrices by
-/// setting an object's method to the corresponding Matrix prototype method.
-/// The following code successfully inverts o as if it were a Matrix:
+// Most of the methods can be faked: that is, applied to non-Matrices by
+// setting an object's method to the corresponding Matrix prototype method.
+// The following code successfully inverts o as if it were a Matrix:
 //
-/// o = { a:3, b: 0, c: 1, d: 4, tx: 4, ty: 6};
-/// o.invert = flash.geom.Matrix.prototype.invert;
-/// o.invert();
+// o = { a:3, b: 0, c: 1, d: 4, tx: 4, ty: 6};
+// o.invert = flash.geom.Matrix.prototype.invert;
+// o.invert();
 //
-/// Methods that apparently only work on Matrices are rotate, scale and
-/// createGradientBox. The method createBox fills in two values, which
-/// suggests how the PP implements it.
-///
+// Methods that apparently only work on Matrices are rotate, scale and
+// createGradientBox. The method createBox fills in two values, which
+// suggests how the PP implements it.
+//
 // Define this to get verbose debugging messages for matrix calculations
 //#define GNASH_DEBUG_GEOM_MATRIX 1
 
