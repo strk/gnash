@@ -38,7 +38,7 @@
 
 #include <boost/scoped_ptr.hpp>
 
-/// Forward declarations
+// Forward declarations
 namespace gnash {
 	class CharacterProxy;
 	namespace media {

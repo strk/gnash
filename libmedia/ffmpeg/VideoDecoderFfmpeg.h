@@ -37,7 +37,7 @@ namespace media {
 namespace ffmpeg {
 
 
-/// Forward declarations
+// Forward declarations
 class CodecContextWrapper;
 #ifdef HAVE_SWSCALE_H
 class SwsContextWrapper;
