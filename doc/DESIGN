@@ -22,9 +22,9 @@ Components
 ----------
 
      [gnash_core] -- Gnash core lib (swf parser, VM, builtin objects)
-  [sound_handler] -- Sound mixer, can be modular (gst/ffmpeg/mad/whatever)
- [render_handler] -- Renderer, can be modular (agg/ogl/cairo/whatever)
-   [MediaHandler] -- Factory for media parsers and decoders, can be modular (gst/ffmpeg/whatever)
+  [sound_handler] -- Sound mixer, can be modular (only SDL currently available)
+ [render_handler] -- Renderer, can be modular (available: agg/ogl/cairo)
+   [MediaHandler] -- Factory for media parsers and decoders, can be modular (agailable: gst/ffmpeg)
 
 Component connectors 
 --------------------
