@@ -507,42 +507,6 @@ Buffer::operator==(Buffer &buf)
      return false;
 }
 
-/// \brief Find a byte in the buffer
-///
-/// @param byte The bytes to find in the buffer.
-///
-/// @param size The size of the bytes being searched for.
-///
-/// @return A real pointer to the address of the byte in the buffer.
-Network::byte_t *
-Buffer::find(Network::byte_t *b, size_t size)
-{
-//    GNASH_REPORT_FUNCTION;
-    for (size_t i=0; i< _nbytes; i++) {
-	if (memcmp((_data.get() + i), b, size) == 0) {
-	    return _data.get() + i;
-	}
-    }
-    return 0;
-}
-
-/// \brief Find a byte in the buffer
-///
-/// @param byte The byte to find in the buffer.
-///
-/// @return A pointer to the address of the byte in the buffer.
-Network::byte_t *
-Buffer::find(Network::byte_t c)
-{
-//    GNASH_REPORT_FUNCTION;
-    for (size_t i=0; i< _nbytes; i++) {
-	if (*(_data.get() + i) == c) {
-	    return _data.get() + i;
-	}
-    }
-    return 0;
-}
-
 /// \brief Drop a byte without resizing.
 ///		This will remove the byte from the Buffer, and then
 ///		move the remaining data to be in the correct
@@ -555,7 +519,7 @@ Network::byte_t *
 Buffer::remove(Network::byte_t c)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *start = find(c);
+    Network::byte_t *start = std::find(begin(), end(), c);
 
 //    log_debug("Byte is at %x", (void *)start);
     
