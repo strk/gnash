@@ -152,6 +152,9 @@ public:
 
 	void set_indexed(unsigned int index, const as_value &v);
 
+	/// @param separator
+    ///     String to use as separator between elements
+    ///
 	/// @param env
 	///	If not-null will be used to properl invoke the toString()
 	///	method against member values.

@@ -108,8 +108,9 @@ public:
 	/// @return The assigned key
 	key insert(const std::string& to_insert);
 
-	/// \brief
-	/// Insert a group of strings with their ids preset. This allows
+	/// Insert a group of strings with their ids preset.
+    //
+    /// This allows
 	/// for switches and enums and such, but be careful you don't set two
 	/// strings with the same id, as this does not check for such occurrences.
 	/// Converts the strings to lower case if mSetToLower is true.
@@ -118,6 +119,10 @@ public:
 	/// @param pList
 	/// An array of svt objects, these should be fully constructed, including
 	/// their ids.
+    ///
+	/// @param size
+    /// Number of elements in the svt objects array
+    ///
 	void insert_group(svt* pList, std::size_t size);
 
 	/// \brief
@@ -125,8 +130,11 @@ public:
 	/// be set to lower_case before addition.
 	void lower_next_group() { mSetToLower = true; }
 
-	/// \brief
 	/// Insert a string when you will handle the locking yourself.
+    //
+	/// @param to_insert
+    /// String to insert
+    ///
 	/// @param lock
 	/// Use lock_mutex to obtain the correct mutex to use for this -- using
 	/// a different mutex will not be thread safe.
