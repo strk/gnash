@@ -201,35 +201,6 @@ private:
 
 
 
-class raw_mediadata_t
-{
-public:
-        DSOEXPORT raw_mediadata_t()
-		:
-	        m_stream_index(-1),
-        	m_size(0),
-        	m_data(NULL),
-        	m_ptr(NULL),
-        	m_pts(0)
-	{}
-
-        DSOEXPORT ~raw_mediadata_t()
-	{
-		delete [] m_data;
-	}
-	
-
-        int m_stream_index;
-        boost::uint32_t m_size;
-        boost::uint8_t* m_data;
-        boost::uint8_t* m_ptr;
-        boost::uint32_t m_pts;  // presentation timestamp in millisec
-};
-
-
-
-
-
 /// NetStream_as ActionScript class
 //
 /// This class is responsible for handlign external
@@ -360,8 +331,6 @@ protected:
 public:
 
 
-typedef std::deque<raw_mediadata_t*> AudioQueue;
-
 	enum PauseMode {
 	  pauseModeToggle = -1,
 	  pauseModePause = 0,
@@ -394,9 +363,9 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 
 	/// Seek in the media played by the current instance
 	//
-	/// @param position
-	///	Defines in seconds where to seek to
-	///	TODO: take milliseconds !!
+	/// @param pos
+	///	    Defines in seconds where to seek to
+	///     @todo take milliseconds !!
 	///
 	void seek(boost::uint32_t pos);
 
@@ -417,7 +386,8 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 
 	/// Sets the NetConnection needed to access external files
 	//
-	/// @param netconnection
+	/// @param nc
+    ///     The NetConnection object to use for network access
 	///
 	void setNetCon(boost::intrusive_ptr<NetConnection> nc)
 	{
@@ -490,7 +460,39 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 
 private:
 
+    /// A memory buffer with a cursor state
+    class CursoredBuffer
+    {
+    public:
+        DSOEXPORT CursoredBuffer()
+            :
+            m_size(0),
+            m_data(NULL),
+            m_ptr(NULL)
+        {}
 
+        DSOEXPORT ~CursoredBuffer()
+        {
+            delete [] m_data;
+        }
+
+        /// Number of bytes left in buffer starting from cursor
+        boost::uint32_t m_size;
+
+        /// Actual data
+        //
+        /// The data must be allocated with new []
+        /// as will be delete []'d by the dtor
+        boost::uint8_t* m_data;
+
+        /// Cursor into the data
+        boost::uint8_t* m_ptr;
+    };
+
+    typedef std::deque<CursoredBuffer*> AudioQueue;
+
+    // Delete all samples in the audio queue.
+    void cleanAudioQueue();
 
 	enum PlaybackState {
 		PLAY_NONE,
@@ -578,7 +580,7 @@ private:
 	//
 	/// @return 0 on EOF or error, a decoded audio frame otherwise
 	///
-	raw_mediadata_t* decodeNextAudioFrame();
+	CursoredBuffer* decodeNextAudioFrame();
 
 	/// \brief
 	/// Decode input audio frames with timestamp <= ts
