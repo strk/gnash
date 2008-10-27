@@ -138,9 +138,15 @@ while(<STDIN>){
 	#Replace things like String.charCodeAt with Reflect.field(String,'charCodeAt').
 	$_ =~ s/([a-zA-Z]+)\.([a-zA-Z]+)\s*([\.\)])/Reflect.field($1,'$2')$3/g;
 
-	#Replace typeof:
 	#TODO: Handle typeof and typeOf differently?
-	$_ =~ s/type[Oo]f\(\s*(\S+)\s*\)/Type.typeof($1)/g;
+	#Doing this: $_ =~ s/type[Oo]f\(\s*(\S+)\s*\)/Type.typeof($1)/g;
+	#causes tests to fail, calling Type.typeof returns 'TFunction' instead of 'function'
+	#'TObject' instead of 'object' and 'TNull' instead of 'null'
+	#in order to convert theses test cases, we also need to change the expected value.
+	if($_ =~ /type[Oo]f/){
+		skip_line();
+		next;
+	}
 
 	#Replace String() with new String("")
 	$_ =~ s/(\W)String\(\)/$1new String("")/g;
@@ -148,9 +154,14 @@ while(<STDIN>){
 	#Replace Class.prototype with Reflect.field(Class,'prototype')
 	$_ =~ s/(\w+)\.(prototype|__proto__)/Reflect.field($1,'$2')/g;
 
-	#There is no Function class in haxe, so we if we are trying access a property of Function
-	#Like this: Function.prototype we need to replace Function with Type.getClass(function(){})
-	$_ =~ s/Function/Type.getClass(function(){})/g;
+	#There is no Function class in haxe, so we need someway of converting this to haxe:
+	#Function.prototype
+	#NOTE: $_ =~ s/Function/Type.getClass(function(){})/g; will cause TypeError: Error #1009
+
+	if($_ =~ /Function/ ){
+		skip_line();
+		next;
+	}
 
 	#Replace isNan(number) with Math.isNan(number)
 	$_ =~ s/isNaN/Math.isNaN/g;
