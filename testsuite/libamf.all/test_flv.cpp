@@ -142,7 +142,7 @@ test_headers()
         runtest.untested("Decoded FLV header");
     } else {
         boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(head->head_size));
-        if ((memcmp(head->sig, "FLV", 0) == 0)
+        if ((memcmp(head->sig, "FLV", 3) == 0)
             && (head->version == 1)
             && (size == 9)) {
             runtest.pass("Decoded FLV header");
