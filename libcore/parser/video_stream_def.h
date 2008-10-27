@@ -32,7 +32,7 @@
 #include "VideoDecoder.h"
 #include "MediaParser.h" // for videoFrameType and videoCodecType enums
 
-#include "image.h"
+#include "GnashImage.h"
 
 #include <boost/shared_array.hpp>
 #include <boost/shared_ptr.hpp>

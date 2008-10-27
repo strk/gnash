@@ -291,7 +291,7 @@ protected:
 	boost::mutex image_mutex;
 
 	// The image/videoframe which is given to the renderer
-	std::auto_ptr<image::ImageBase> m_imageframe;
+	std::auto_ptr<GnashImage> m_imageframe;
 
 	// The video URL
 	std::string url;
@@ -436,7 +436,7 @@ public:
 	//
 	/// @return a image containing the video frame, a NULL auto_ptr if none were ready
 	///
-	std::auto_ptr<image::ImageBase> get_video();
+	std::auto_ptr<GnashImage> get_video();
 	
 	/// Register the character to invalidate on video updates
 	void setInvalidatedVideo(character* ch)
@@ -574,7 +574,7 @@ private:
 	//
 	/// @return 0 on EOF or error, a decoded video otherwise
 	///
-	std::auto_ptr<image::ImageBase> decodeNextVideoFrame();
+	std::auto_ptr<GnashImage> decodeNextVideoFrame();
 
 	/// Decode next audio frame fetching it MediaParser cursor
 	//
@@ -597,7 +597,7 @@ private:
 	///	3. next element in cursor has timestamp > tx
 	///	4. there was an error decoding
 	///
-	std::auto_ptr<image::ImageBase> getDecodedVideoFrame(boost::uint32_t ts);
+	std::auto_ptr<GnashImage> getDecodedVideoFrame(boost::uint32_t ts);
 
 	DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 

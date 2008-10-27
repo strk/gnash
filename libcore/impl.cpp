@@ -25,7 +25,7 @@
 #include "font.h"
 #include "fontlib.h"
 #include "log.h"
-#include "image.h"
+#include "GnashImage.h"
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
 #include "swf.h"
@@ -259,7 +259,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 
     try
     {
-        std::auto_ptr<image::ImageBase> im(image::readImageData(imageData, type));
+        std::auto_ptr<GnashImage> im(ImageInput::readImageData(imageData, type));
         if (!im.get())
         {
             log_error(_("Can't read image file from %s"), url);

@@ -22,12 +22,6 @@
 #include "ref_counted.h" // for inheritance
 #include "dsodefs.h"
 
-// Forward declarations
-namespace image {
-	class ImageBase;
-}
-
-
 namespace gnash {
 
 /// Your render_handler creates bitmap_info's for gnash.  You
@@ -37,8 +31,6 @@ namespace gnash {
 class DSOEXPORT bitmap_info : public ref_counted
 {
 public:
-//	virtual void layout_image(image::ImageBase* /*im*/) { };
-//	image::ImageBase*  m_suspended_image;
 
 	unsigned int	m_texture_id;		// nuke?
 	int		m_original_width;	// nuke?

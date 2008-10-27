@@ -16,6 +16,9 @@
 
 #include "AudioDecoder.h"
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h"
+#endif
 #include <speex/speex.h> 
 
 #ifdef RESAMPLING_SPEEX

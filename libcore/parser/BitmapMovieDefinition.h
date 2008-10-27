@@ -24,7 +24,7 @@
 #include "BitmapMovieInstance.h" // for create_movie_instance
 #include "bitmap_character_def.h" // for destructor visibility by intrusive_ptr
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
-#include "image.h"
+#include "GnashImage.h"
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -49,7 +49,7 @@ class BitmapMovieDefinition : public movie_definition
 	float _framerate;
 	std::string _url;
 
-	std::auto_ptr<image::ImageBase> _image;
+	std::auto_ptr<GnashImage> _image;
 
 	boost::intrusive_ptr<bitmap_character_def> _bitmap;
 
@@ -89,7 +89,7 @@ public:
 	///  - image->size() bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - provided url
 	///
-	BitmapMovieDefinition(std::auto_ptr<image::ImageBase> image, const std::string& url);
+	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, const std::string& url);
 
 	// Discard id, always return the only shape character we have 
 	virtual character_def* get_character_def(int /*id*/)

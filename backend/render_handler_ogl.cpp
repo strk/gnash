@@ -27,11 +27,11 @@
 
 #include "gnash.h"
 #include "RGBA.h"
-#include "image.h"
+#include "GnashImage.h"
 #include "utility.h"
 #include "log.h"
 
-#include "image.h"
+#include "GnashImage.h"
 #include "utility.h"
 #include "Range2d.h"
 
@@ -412,7 +412,7 @@ bool isEven(const size_t& n)
 
 // Use the image class copy constructor; it's not important any more
 // what kind of image it is.
-bitmap_info_ogl::bitmap_info_ogl(image::ImageBase* image, GLenum pixelformat,
+bitmap_info_ogl::bitmap_info_ogl(GnashImage* image, GLenum pixelformat,
                                  bool ogl_accessible)
 :
   _img(image->clone()),
@@ -641,12 +641,12 @@ public:
 #endif
   }    
 
-  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im)
+  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im)
   {
     return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im)
+  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im)
   {
     return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
   }
@@ -656,7 +656,7 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* m, const rect* bounds)
+  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m, const rect* bounds)
   {
     GLint index;
 
@@ -687,7 +687,7 @@ public:
     _render_indices.push_back(index);
   }
   
-  virtual void reallyDrawVideoFrame(image::ImageBase* frame, const SWFMatrix* m, const rect* bounds)
+  virtual void reallyDrawVideoFrame(GnashImage* frame, const SWFMatrix* m, const rect* bounds)
   {
   
     if (frame->type() == GNASH_IMAGE_RGBA)

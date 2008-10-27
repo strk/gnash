@@ -99,8 +99,8 @@ endif
 
 libgnashbase_la_SOURCES = \
 	extension.cpp \
-	image.cpp \
 	$(MALLOC) \
+	GnashImage.cpp \
 	GnashImageJpeg.cpp \
 	log.cpp	\
 	memory.cpp \
@@ -136,7 +136,6 @@ noinst_HEADERS = \
 	extension.h \
 	GnashException.h \
 	gettext.h \
-	image.h	\
 	jemtree.h \
 	GnashImage.h \
 	GnashImageJpeg.h \

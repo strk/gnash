@@ -148,7 +148,7 @@ private:
 class bitmap_info_ogl : public bitmap_info
 {
   public:
-    bitmap_info_ogl(image::ImageBase* image, GLenum pixelformat,
+    bitmap_info_ogl(GnashImage* image, GLenum pixelformat,
                     bool ogl_accessible);
     ~bitmap_info_ogl();
 
@@ -159,7 +159,7 @@ class bitmap_info_ogl : public bitmap_info
     void setup();    
     void upload(boost::uint8_t* data, size_t width, size_t height);
     
-    std::auto_ptr<image::ImageBase> _img;
+    std::auto_ptr<GnashImage> _img;
     GLenum _pixel_format;
     GLenum _ogl_img_type;
     bool _ogl_accessible;  

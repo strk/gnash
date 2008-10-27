@@ -98,7 +98,7 @@ enum videoCodecType
 	//       also add them to the output operator!
 };
 
-std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
+DSOEXPORT std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
 
 /// Audio codec ids as defined in flash
 enum audioCodecType
@@ -131,7 +131,7 @@ enum audioCodecType
 	//       also add them to the output operator!
 };
 
-std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
+DSOEXPORT std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
 
 /// Information about an audio stream 
 //

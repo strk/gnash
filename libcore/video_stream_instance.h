@@ -97,7 +97,7 @@ private:
 	void initializeDecoder();
 
 	/// Get video frame to be displayed
-	image::ImageBase* getVideoFrame();
+	GnashImage* getVideoFrame();
 
 	// m_video_source - A Camera object that is capturing video data or a NetStream object.
 	// To drop the connection to the Video object, pass null for source.
@@ -114,7 +114,7 @@ private:
 	boost::int32_t _lastDecodedVideoFrameNum;
 
 	/// Last decoded frame 
-	std::auto_ptr<image::ImageBase> _lastDecodedVideoFrame;
+	std::auto_ptr<GnashImage> _lastDecodedVideoFrame;
 
 	/// The decoder used to decode the video frames
 	std::auto_ptr<media::VideoDecoder> _decoder;

@@ -20,7 +20,7 @@
 #ifndef GNASH_VIDEODECODER_H
 #define GNASH_VIDEODECODER_H
 
-#include "image.h"
+#include "GnashImage.h"
 
 #include <boost/noncopyable.hpp>
 
@@ -59,7 +59,7 @@ public:
   //
   /// @return The decoded video frame, or a NULL-containing auto_ptr if an
   ///         error occurred.
-  virtual std::auto_ptr<image::ImageBase> pop() = 0;
+  virtual std::auto_ptr<GnashImage> pop() = 0;
   
   /// \brief
   /// Check whether a decoded frame is ready to be popped.

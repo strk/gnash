@@ -28,7 +28,7 @@
 #include "AudioDecoder.h"
 
 #include <gst/gst.h>
-#include "image.h"
+#include "GnashImage.h"
 
 #include "swfdec_codec_gst.h"
 

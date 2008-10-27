@@ -39,7 +39,7 @@
 #include "SWFStream.h"
 #include "styles.h"
 #include "timers.h"
-#include "image.h"
+#include "GnashImage.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"
 #include "MovieClip.h"
@@ -287,22 +287,24 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m)
     if ( ! j_in )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITS: No jpeg loader registered in movie definition - discarding bitmap character %d"), character_id);
+        log_swferror(_("DEFINEBITS: No jpeg loader registered in movie "
+                "definition - discarding bitmap character %d"), character_id);
         );
         return;
     }
 
     j_in->discardPartialBuffer();
     
-    std::auto_ptr<image::ImageBase> im;
+    std::auto_ptr<GnashImage> im;
     try
     {
-        im = image::readSWFJpeg2WithTables(*j_in);
+        im = JpegImageInput::readSWFJpeg2WithTables(*j_in);
     }
     catch (std::exception& e)
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("Error reading jpeg2 with headers for character id %d: %s", character_id, e.what());
+        log_swferror("Error reading jpeg2 with headers for character "
+            "id %d: %s", character_id, e.what());
         );
         return;
     }
@@ -313,7 +315,8 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m)
     if ( m.get_bitmap_character_def(character_id) )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character - discarding it"), character_id);
+        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character "
+                "- discarding it"), character_id);
         );
     }
     else
@@ -341,16 +344,20 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition& m)
     if ( m.get_bitmap_character_def(character_id) )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap character - discarding it"), character_id);
+        log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap "
+                "character - discarding it"), character_id);
         );
     }
     else
     {
-        boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in, in.get_tag_end_position()).release() );
+        boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in,
+                    in.get_tag_end_position()).release() );
 
-        std::auto_ptr<image::ImageBase> im (image::readImageData(ad, GNASH_FILETYPE_JPEG));
+        std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad,
+                    GNASH_FILETYPE_JPEG));
 
-        boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
+        boost::intrusive_ptr<bitmap_character_def> ch =
+            new bitmap_character_def(im);
         m.add_bitmap_character_def(character_id, ch.get());
     }
 }
@@ -469,8 +476,9 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition& m)
     //
 
     // Read rgb data.
-    boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in, alpha_position).release() );
-    std::auto_ptr<image::ImageRGBA> im = image::readSWFJpeg3(ad);
+    boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in,
+                alpha_position).release() );
+    std::auto_ptr<ImageRGBA> im = ImageInput::readSWFJpeg3(ad);
     
     /// Failure to read the jpeg.
     if (!im.get()) return;
@@ -493,7 +501,7 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition& m)
 
     // Create bitmap character.
     boost::intrusive_ptr<bitmap_character_def> ch =
-            new bitmap_character_def(static_cast<std::auto_ptr<image::ImageBase> >(im));
+            new bitmap_character_def(static_cast<std::auto_ptr<GnashImage> >(im));
 
     m.add_bitmap_character_def(character_id, ch.get());
 #endif
@@ -539,7 +547,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m)
     {
 
         // RGB image data.
-        std::auto_ptr<image::ImageBase> image (new image::ImageRGB(width, height));
+        std::auto_ptr<GnashImage> image (new ImageRGB(width, height));
 
         if (bitmap_format == 3)
         {
@@ -655,7 +663,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m)
         // RGBA image data.
         assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-        std::auto_ptr<image::ImageBase> image(new image::ImageRGBA(width, height));
+        std::auto_ptr<GnashImage> image(new ImageRGBA(width, height));
 
         if (bitmap_format == 3)
         {

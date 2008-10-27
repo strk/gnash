@@ -25,7 +25,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "image.h"
+#include "GnashImage.h"
 #include "log.h"
 #include "VideoDecoder.h"
 #include "dsodefs.h"
@@ -41,8 +41,8 @@ namespace gnash {
 namespace media {
 namespace gst {
 
-/// Convenience wrapper for GstBuffer. Intended to be wrapped in an auto_ptr.
-class gnashGstBuffer : public image::ImageRGB
+// Convenience wrapper for GstBuffer. Intended to be wrapped in an auto_ptr.
+class gnashGstBuffer : public ImageRGB
 {
 public:
   gnashGstBuffer(GstBuffer* buf, int width, int height)
@@ -64,9 +64,9 @@ public:
   {
     return GST_BUFFER_DATA(_buffer);
   }
-  std::auto_ptr<image::ImageBase> clone() const
+  std::auto_ptr<GnashImage> clone() const
   {
-    return std::auto_ptr<ImageBase>(new ImageRGB(*this));
+    return std::auto_ptr<GnashImage>(new ImageRGB(*this));
   }
 
 private:
@@ -85,7 +85,7 @@ public:
 
     void push(const EncodedVideoFrame& buffer);
 
-    std::auto_ptr<image::ImageBase> pop();
+    std::auto_ptr<GnashImage> pop();
   
     bool peek();
 
