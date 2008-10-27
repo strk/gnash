@@ -16,7 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/// \page
+/// \page wall_clock_time Wall clock time
+///
 /// Gnash has three time implementations: one using boost::date_time,
 /// which handles portability itself, one for POSIX systems and one for 
 /// Win32.
@@ -30,6 +31,8 @@
 /// as well as being able to handle a much larger range of true dates. Its
 /// disadvantage is that date_time requires not only header files, but also
 /// a run-time library, and thus increases the requirements.
+///
+/// @todo review this page, some bits seem obsoleted
 
 #include <boost/cstdint.hpp>
 #include "ClockTime.h"
