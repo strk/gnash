@@ -279,6 +279,7 @@ Flv::convert24(boost::uint8_t *num)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t bodysize = 0;
+
 #ifdef BOOST_BIG_ENDIAN
     bodysize = *(reinterpret_cast<boost::uint32_t *>(num)) >> 8;
 #else
@@ -291,11 +292,13 @@ Flv::convert24(boost::uint8_t *num)
 
 // Decode the tag header
 boost::shared_ptr<Flv::flv_tag_t>
-Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> buf)
+Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> &buf)
 {
 //    GNASH_REPORT_FUNCTION;
+    flv_tag_t *data = reinterpret_cast<flv_tag_t *>(buf->reference());
     boost::shared_ptr<flv_tag_t> tag(new flv_tag_t);
-    memcpy(tag.get(), buf->reference(), sizeof(flv_tag_t));
+    memcpy(tag.get(), data, sizeof(flv_tag_t));
+
 //    std::copy(buf->begin(), buf->end(), tag);
 
     // These fields are all 24 bit, big endian integers

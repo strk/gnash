@@ -211,7 +211,7 @@ class DSOEXPORT Flv {
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
-    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<amf::Buffer> buf);
+    boost::shared_ptr<flv_tag_t> decodeTagHeader(boost::shared_ptr<amf::Buffer> &buf);
 
     /// \brief Find the named property for this Object.
     ///
