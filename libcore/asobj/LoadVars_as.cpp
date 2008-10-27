@@ -286,7 +286,8 @@ loadvars_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&loadvars_ctor, LoadVars_as::getLoadVarsInterface());
+		cl=new builtin_function(&loadvars_ctor,
+                LoadVars_as::getLoadVarsInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		LoadVars_as::attachLoadVarsInterface(*cl);

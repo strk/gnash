@@ -2049,12 +2049,17 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 }
 
 void
-movie_root::getURL(const URL& url, const std::string& target,
-        const std::string* postdata)
+movie_root::getURL(const std::string& urlstr, const std::string& target,
+        const std::string& data, MovieClip::VariablesMethod method)
 {
 
     if (_hostfd == -1)
     {
+        /// If there is no hosting application, call the URL launcher. For
+        /// safety, we resolve the URL against the base URL for this run.
+        /// The data is not sent at all.
+        URL url(urlstr, get_base_url());
+
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();
 
@@ -2096,52 +2101,88 @@ movie_root::getURL(const URL& url, const std::string& target,
 
         log_debug (_("Launching URL: %s"), command);
         std::system(command.c_str());
+        return;
     }
-    else
+
+    /// This is when there is a hosting application.
+    std::ostringstream request;
+    std::string querystring;
+    switch (method)
     {
-        std::ostringstream request;
-        if (postdata)
-        {
-            request << "POST " << target << ":" << 
-                *postdata << "$" << url << std::endl;
-        }
-        else
-        {
-            // use the original url, non parsed (the browser will know better
-            // how to resolve relative urls and handle actionscript)
-            request << "GET " << target << ":" << url << std::endl;
-        }
+        case MovieClip::METHOD_POST:
+             request << "POST " << target << ":" << 
+                data << "$" << urlstr << std::endl;
+             break;
 
-        std::string requestString = request.str();
-        size_t len = requestString.length();
-        // TODO: should mutex-protect this ?
-        // NOTE: we are assuming the hostfd is set in blocking mode here..
-        log_debug(_("Attempt to write geturl requests fd %d"), _hostfd);
+        // METHOD_GET and METHOD_NONE are the same, except that
+        // for METHOD_GET we append the variables to the query
+        // string.
+        case MovieClip::METHOD_GET:
+            // Append vars to URL query string
+            if (urlstr.find("?") == std::string::npos) {
+                querystring = "?";
+            }
+            else querystring = "&";
+            querystring.append(data);
 
-        int ret = write(_hostfd, requestString.c_str(), len);
-        if (ret == -1)
-        {
-            log_error(_("Could not write to user-provided host requests "
-                        "fd %d: %s"), _hostfd, std::strerror(errno));
-        }
-        if (static_cast<size_t>(ret) < len)
-        {
-            log_error(_("Could only write %d bytes over %d required to "
-                        "user-provided host requests fd %d"),
-                        ret, len, _hostfd);
-        }
-
-        // The request string ends with newline, and we don't want to log that
-        requestString.resize(requestString.size() - 1);
-        log_debug(_("Sent request '%s' to host fd %d"), requestString, _hostfd);
+        case MovieClip::METHOD_NONE:
+            // use the original url, non parsed (the browser will know
+            // better how to resolve relative urls and handle
+            // javascript)
+            request << "GET " << target << ":" << urlstr << std::endl;
+            break;
     }
+
+    std::string requestString = request.str();
+    size_t len = requestString.length();
+    // TODO: should mutex-protect this ?
+    // NOTE: we are assuming the hostfd is set in blocking mode here..
+    log_debug(_("Attempt to write geturl requests fd %d"), _hostfd);
+
+    int ret = write(_hostfd, requestString.c_str(), len);
+    if (ret == -1)
+    {
+        log_error(_("Could not write to user-provided host requests "
+                    "fd %d: %s"), _hostfd, std::strerror(errno));
+    }
+    if (static_cast<size_t>(ret) < len)
+    {
+        log_error(_("Could only write %d bytes over %d required to "
+                    "user-provided host requests fd %d"),
+                    ret, len, _hostfd);
+    }
+
+    // The request string ends with newline, and we don't want to log that
+    requestString.resize(requestString.size() - 1);
+    log_debug(_("Sent request '%s' to host fd %d"), requestString, _hostfd);
 
 }
 
 void
-movie_root::loadMovie(const URL& url, const std::string& target, const std::string* postdata)
+movie_root::loadMovie(const std::string& urlstr, const std::string& target,
+        const std::string& data, MovieClip::VariablesMethod method)
 {
+
+    /// Where is the security checked?
+    URL url(urlstr, get_base_url());
+
+    /// If the method is MovieClip::METHOD_NONE, we send no data.
+    if (method == MovieClip::METHOD_GET)
+    {
+        std::string varsToSend(urlstr);
+        /// GET: append data to query string.
+        std::string qs = url.querystring();
+        if ( qs.empty() ) varsToSend.insert(0, 1, '?');
+        else varsToSend.insert(0, 1, '&');
+        url.set_querystring(qs + varsToSend);
+    }
+
     log_debug("movie_root::loadMovie(%s, %s)", url.str(), target);
+
+    const std::string* postdata = NULL;
+
+    /// POST: send variables using the POST method.
+    if (method == MovieClip::METHOD_POST) postdata = &data;
     _loadMovieRequests.push_front(LoadMovieRequest(url, target, postdata));
 }
 

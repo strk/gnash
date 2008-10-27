@@ -18,8 +18,8 @@
 
 // Stateful live Sprite instance
 
-#ifndef GNASH_SPRITE_INSTANCE_H
-#define GNASH_SPRITE_INSTANCE_H
+#ifndef GNASH_MOVIECLIP_H
+#define GNASH_MOVIECLIP_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
@@ -30,7 +30,6 @@
 #include "log.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
-//#include "LoadVariablesThread.h" // for composition
 #include "Range2d.h"
 #include "dsodefs.h" // for DSOEXPORT
 
@@ -51,7 +50,7 @@ namespace gnash {
     class LoadVariablesThread;
     class gradient_record;
     class edit_text_character;
-    namespace SWF{
+    namespace SWF {
         class PlaceObject2Tag;
     }
 }
@@ -124,13 +123,6 @@ public:
 
         /// DisplayList tag
         TAG_DLIST  = 1<<1
-    };
-
-    enum MovieClipMethod
-    {
-        METHOD_NONE = 0,
-        METHOD_GET,
-        METHOD_POST
     };
 
     // Overridden to use the m_root member
@@ -515,6 +507,16 @@ public:
 
     MovieClip* to_movie () { return this; }
 
+    /// The various methods for sending data in requests.
+    //
+    /// Used in loadMovie, getURL, loadVariables etc.
+    enum VariablesMethod
+    {
+        METHOD_NONE = 0,
+        METHOD_GET,
+        METHOD_POST
+    };
+
     /// Load a movie in this sprite, replacing it
     //
     /// @param url
@@ -531,24 +533,20 @@ public:
     /// Load url-encoded variables from the given url, optionally
     /// sending variables from this timeline too.
     //
-    ///
     /// A LoadVariablesThread will be started to load and parse variables
     /// and added to the _loadVariableRequests. Then, at every ::advance_sprite
     /// any completed threads will be processed
     /// (see processCompletedLoadVariableRequests)
     ///
-    /// NOTE: the given url will be securit-checked
+    /// NOTE: the given url will be security-checked
     ///
-    /// @param url
-    /// The url to load variables from. It is expected that
-    /// the caller already checked host security.
+    /// @param urlstr: The url to load variables from.
     ///
-    /// @param sendVarsMethod
-    /// If 0 (the default) no variables will be sent.
-    /// If 1, GET will be used.
-    /// If 2, POST will be used.
+    /// @param sendVarsMethod: The VariablesMethod to use. If METHOD_NONE,
+    ///                        no data will be sent.
     ///
-    void loadVariables(URL url, MovieClipMethod sendVarsMethod);
+    void loadVariables(const std::string& urlstr,
+            VariablesMethod sendVarsMethod);
 
     //
     // ActionScript support

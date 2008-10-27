@@ -73,11 +73,11 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
-#include "movie_instance.h" // for inlines
 #include "asobj/Key_as.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
+#include "movie_instance.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -104,6 +104,7 @@ namespace gnash {
     class Stage_as;
     class URL;
     class Timer;
+    class MovieClip;
 }
 
 namespace gnash
@@ -308,7 +309,7 @@ public:
     /// @return the originating root movie (not necessarely _level0)
     movie_instance* getRootMovie() const
     {
-	return _rootMovie.get();
+	    return _rootMovie.get();
     }
 
     void stop_drag()
@@ -352,7 +353,7 @@ public:
     ///
     size_t get_current_frame() const
     {
-	return getRootMovie()->get_current_frame();
+	    return getRootMovie()->get_current_frame();
     }
 
     void set_background_color(const rgba& color);
@@ -398,7 +399,7 @@ public:
     ///
     void set_play_state(MovieClip::play_state s)
     {
-	getRootMovie()->set_play_state(s);
+	    getRootMovie()->set_play_state(s);
     }
 
 	/// Notify still loaded character listeners for key events
@@ -651,36 +652,35 @@ public:
 
     /// Queue a request for loading a movie
     //
-    /// @param url
-    ///		The url to load.
-    ///
-    /// @param target
-    ///	    Target to load into.
-    ///
-    /// @param postdata
-    ///     If not null, the data to POST in an HTTP request.
-    ///     Tests show that if you queue a load request for a target which
-    ///     is unloaded at time of processing, you still get the original
-    ///     target variables posted, not the new ones !
-    ///	    See http://savannah.gnu.org/bugs/index.php?22257
-    ///
-    void loadMovie(const URL& url, const std::string& target,
-            const std::string* postdata = NULL);
-
+    /// This function constructs the URL and, if required, the postdata
+    /// from the arguments. The variables to send should *not* be appended
+    /// to @param urlstr before calling this function.
+    //
+    /// @param urlstr   The url exactly as requested. This may already
+    ///                 contain a query string.
+    /// @param target   Target for request.
+    /// @param data     The variables data to send, URL encoded in
+    ///                 key/value pairs
+    /// @param method   The VariablesMethod to use for sending the data. If
+    ///                 MovieClip::METHOD_NONE, no data will be sent.
+    void loadMovie(const std::string& url, const std::string& target,
+            const std::string& data, MovieClip::VariablesMethod method);
 
     /// Send a request to the hosting application (e.g. browser).
     //
-    /// @param url
-    ///		The url to request.
-    ///
-    /// @param target
-    ///	    Target for request.
-    ///
-    /// @param postdata
-    ///     If not null, the data to POST in an HTTP request.
-    ///
-    void getURL(const URL& url, const std::string& target,
-            const std::string* postdata = NULL);
+    /// This function constructs the URL and, if required, the postdata
+    /// from the arguments. The variables to send should *not* be appended
+    /// to @param urlstr before calling this function.
+    //
+    /// @param urlstr   The url exactly as requested. This may already
+    ///                 contain a query string.
+    /// @param target   Target for request.
+    /// @param data     The variables data to send, URL encoded in
+    ///                 key/value pairs
+    /// @param method   The VariablesMethod to use for sending the data. If
+    ///                 MovieClip::METHOD_NONE, no data will be sent.
+    void getURL(const std::string& urlstr, const std::string& target,
+            const std::string& data, MovieClip::VariablesMethod method);
 
 
     /// Return true if the given string can be interpreted as a _level name

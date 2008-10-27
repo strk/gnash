@@ -67,7 +67,6 @@ LoadableObject::send(const std::string& urlstr, const std::string& target,
         bool post)
 {
     movie_root& m = _vm.getRoot();
-    URL url(urlstr);
 
     // Encode the object for HTTP. If post is true,
     // XML should not be encoded. LoadVars is always
@@ -76,19 +75,11 @@ LoadableObject::send(const std::string& urlstr, const std::string& target,
     std::ostringstream data;
     toString(data, !post);
 
-    const std::string& datastring = data.str();
+    // Only GET and POST are possible here.
+    MovieClip::VariablesMethod method = post ? MovieClip::METHOD_POST :
+                                               MovieClip::METHOD_GET;
 
-    if (post)
-    {
-        m.getURL(url, target, &datastring);
-        return;
-    }
-
-    // GET
-    std::string qs = url.querystring();
-    if (qs.empty()) url.set_querystring(datastring);
-    else url.set_querystring(qs + "&" + datastring);
-    m.getURL(url, target);
+    m.getURL(urlstr, target, data.str(), method);
 
 }
 
