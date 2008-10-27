@@ -25,14 +25,16 @@
 #define __STDC_CONSTANT_MACROS
 #endif
 
-#include "log.h"
-#include "AudioDecoder.h"
-#include "ffmpegNetStreamUtil.h"
 #include "ffmpegHeaders.h"
+
+#include "log.h"
+#include "AudioDecoder.h" // for inheritance
+#include "AudioResamplerFfmpeg.h" // for composition
 
 namespace gnash {
 namespace media {
 
+/// FFMPEG based AudioDecoder
 class AudioDecoderFfmpeg : public AudioDecoder {
 	
 public:
@@ -65,7 +67,7 @@ private:
 	AVCodecParserContext* _parser;
 
 	// Use for resampling audio
-	AudioResampler _resampler;
+	AudioResamplerFfmpeg _resampler;
 };
 	
 } // gnash.media namespace 

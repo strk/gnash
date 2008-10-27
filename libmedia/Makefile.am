@@ -132,7 +132,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/MediaParserFfmpeg.cpp \
 		ffmpeg/AudioDecoderFfmpeg.cpp \
 		ffmpeg/VideoDecoderFfmpeg.cpp \
-		ffmpeg/ffmpegNetStreamUtil.cpp \
+		ffmpeg/AudioResamplerFfmpeg.cpp \
 		$(NULL)
 
    noinst_HEADERS += \
@@ -140,7 +140,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/MediaParserFfmpeg.h \
 		ffmpeg/AudioDecoderFfmpeg.h \
 		ffmpeg/VideoDecoderFfmpeg.h \
-		ffmpeg/ffmpegNetStreamUtil.h \
+		ffmpeg/AudioResamplerFfmpeg.h \
 		ffmpeg/ffmpegHeaders.h \
 		$(NULL)
 
