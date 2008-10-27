@@ -31,6 +31,14 @@
 #include "AudioDecoder.h" // for inheritance
 #include "AudioResamplerFfmpeg.h" // for composition
 
+// Forward declarations
+namespace gnash {
+    namespace media {
+        class SoundInfo;
+        class AudioInfo;
+    }
+}
+
 namespace gnash {
 namespace media {
 namespace ffmpeg {

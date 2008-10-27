@@ -47,10 +47,13 @@
  */
 
 #include "AudioDecoderNellymoser.h"
-#include "utility.h"
+#include "SoundInfo.h"
+#include "log.h"
+
+#include "VM.h" // for randonNumberGenerator
+
 #include <ctime>
 #include <cmath>
-#include "VM.h"
 
 namespace gnash {
 namespace media {

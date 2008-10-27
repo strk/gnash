@@ -21,6 +21,8 @@
 #include "AudioDecoderFfmpeg.h"
 #include "MediaParserFfmpeg.h" // for ExtraAudioInfoFfmpeg
 #include "FLVParser.h"
+#include "SoundInfo.h"
+#include "MediaParser.h" // for AudioInfo
 
 #include <cmath> // for std::ceil
 #include <algorithm> // for std::copy, std::max

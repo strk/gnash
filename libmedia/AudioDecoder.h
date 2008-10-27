@@ -20,13 +20,12 @@
 #ifndef GNASH_AUDIODECODER_H
 #define GNASH_AUDIODECODER_H
 
-#include "SoundInfo.h"
-#include "Util.h"
+#include <boost/cstdint.hpp> // for C99 int types
 
 // Forward declarations
 namespace gnash {
 	namespace media {
-		class AudioInfo;
+		class EncodedAudioFrame;
 	}
 }
 

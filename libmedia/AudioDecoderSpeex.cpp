@@ -15,10 +15,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "AudioDecoderSpeex.h"
+#include "AudioResampler.h"
+#include "GnashException.h" // for MediaException
+#include "MediaParser.h" // for EncodedAudioFrame
 #include "log.h"
 
 #include <boost/bind.hpp>
 #include <boost/checked_delete.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/cstdint.hpp> // For C99 int types
 
 #ifdef RESAMPLING_SPEEX
 # include <boost/rational.hpp>
@@ -140,7 +145,7 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
         conv_size *= sizeof(boost::int16_t);
 #else
         int outsize = 0;
-        Util::convert_raw_data(&conv_data, &outsize, output.get(), 
+        AudioResampler::convert_raw_data(&conv_data, &outsize, output.get(), 
             _speex_framesize /* sample count*/, 2 /* sample size */,
             16000, false /* stereo */, 44100 /* new rate */,
             true /* convert to stereo */);

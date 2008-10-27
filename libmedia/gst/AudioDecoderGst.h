@@ -32,6 +32,14 @@
 
 #include "swfdec_codec_gst.h"
 
+// Forward declarations
+namespace gnash {
+    namespace media {
+        class AudioInfo;
+        class SoundInfo;
+    }
+}
+
 namespace gnash {
 namespace media {
 namespace gst {

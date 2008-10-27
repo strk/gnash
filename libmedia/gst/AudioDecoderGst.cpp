@@ -23,10 +23,11 @@
 
 
 #include "AudioDecoderGst.h"
-#include "MediaParser.h"
+#include "MediaParser.h" // for AudioInfo
 #include "MediaParserGst.h"
 #include "GstUtil.h"
-#include "FLVParser.h"
+#include "FLVParser.h" // for ExtraAudioInfoFlv
+#include "SoundInfo.h"
 
 namespace gnash {
 namespace media {

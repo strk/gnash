@@ -78,7 +78,7 @@ libgnashmedia_la_SOURCES = \
 	AudioDecoderSimple.cpp \
 	MediaParser.cpp \
 	FLVParser.cpp \
-	Util.cpp \
+	AudioResampler.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -90,7 +90,7 @@ noinst_HEADERS = \
 	AudioDecoderNellymoser.h \
 	AudioDecoderSimple.h \
 	SoundInfo.h \
-	Util.h \
+	AudioResampler.h \
 	$(NULL)
 
 

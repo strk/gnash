@@ -19,8 +19,13 @@
 
 
 #include "AudioDecoderSimple.h"
-#include "utility.h"
+#include "AudioResampler.h"
 #include "BitsReader.h"
+#include "SoundInfo.h"
+#include "MediaParser.h" // for AudioInfo definition..
+#include "utility.h" // for clamp
+
+#include "log.h"
 
 #include <boost/scoped_array.hpp>
 #include <algorithm> // for std::swap
@@ -417,7 +422,7 @@ boost::uint8_t* AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_
 		int sample_count = outsize / (_stereo ? 4 : 2); // samples are of size 2
 
 		// Convert to needed samplerate - this converter only support standard flash samplerates
-		Util::convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
+		AudioResampler::convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
 				_sampleRate, _stereo,
 				44100,  true /* stereo */);
 

@@ -1,4 +1,4 @@
-// utility.cpp --	Various little utility functions, macros & typedefs.
+// AudioResampler.cpp -- custom audio resampler
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -20,24 +20,21 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Util.h"
+#include "AudioResampler.h"
 
 #include <cstring>
+#include <cassert>
 
 namespace gnash {
-
 namespace media {
 
-// VERY crude sample-rate conversion.
-// Converts input data to output format.
-// sample_size
 void 
-Util::convert_raw_data(
+AudioResampler::convert_raw_data(
     boost::int16_t** adjusted_data,
     int* adjusted_size,
     void* data,
     int sample_count,	// A stereo pair counts as one
-    int /*sample_size*/,	// Should now always == 2
+    int sample_size,	// Should now always == 2
     // sample_rate and stereo are those of the incoming sample
     int sample_rate, 
     bool stereo,
@@ -45,6 +42,9 @@ Util::convert_raw_data(
     int m_sample_rate,
     bool m_stereo)
 {
+
+    assert(sample_size); // at least it seems the code relies on this...
+
     // simple hack to handle dup'ing mono to stereo
     if ( !stereo && m_stereo)
     {

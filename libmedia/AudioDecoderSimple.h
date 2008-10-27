@@ -20,11 +20,15 @@
 #ifndef GNASH_AUDIODECODERSIMPLE_H
 #define GNASH_AUDIODECODERSIMPLE_H
 
-#include "log.h"
-#include "AudioDecoder.h"
+#include "AudioDecoder.h" // for inheritance
+#include "MediaParser.h" // for audioCodecType enum (composition)
 
+// Forward declarations
 namespace gnash {
-	class SoundInfo;
+    namespace media {
+        class SoundInfo;
+        class AudioInfo;
+    }
 }
 
 namespace gnash {

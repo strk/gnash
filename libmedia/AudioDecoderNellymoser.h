@@ -47,8 +47,7 @@
 #ifndef GNASH_AUDIODECODERNELLYMOSER_H
 #define GNASH_AUDIODECODERNELLYMOSER_H
 
-#include "log.h"
-#include "AudioDecoder.h"
+#include "AudioDecoder.h" // for inheritance
 
 #define NELLY_BLOCK_LEN 64
 #define NELLY_HEADER_BITS 116
@@ -63,6 +62,7 @@
 namespace gnash {
     namespace media {
         class AudioInfo;
+        class SoundInfo;
     }
 }
 
