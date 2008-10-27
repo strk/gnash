@@ -31,9 +31,11 @@ namespace SWF {
 /// scriptlimits setting, so this is kept in movie_root rather than the
 /// immutable movie_definition. Whenever this tag is parsed, the value in
 /// movie_root is overridden.
-namespace ScriptLimitsTag
+class ScriptLimitsTag
 {
-    void loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
+public:
+
+    static void loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
     {
 
         assert(VM::isInitialized());
@@ -54,7 +56,7 @@ namespace ScriptLimitsTag
 
         r.setScriptLimits(recursionLimit, timeoutLimit);
     }
-}
+};
 
 } // namespace gnash::SWF
 } // namespace gnash
