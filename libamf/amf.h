@@ -125,13 +125,16 @@ public:
     /// Delete the allocated AMF object
     ~AMF();
 
-    /// @remarks 
+    /// @name Encoding methods
+    ///
     ///		Methods for encoding data into big endian formatted
     ///		raw AMF data. Note that while we could have had a
     ///		single overloaded encode method, this is more
     ///		explicit, which when it comes to manipulating binary
     ///		protocols make the code much more readable.
-    
+    ///
+    /// @{
+
     /// Encode a string object to its serialized representation.
     // 
     /// @param str a string value
@@ -318,9 +321,13 @@ public:
     ///
     boost::shared_ptr<Buffer> encodeProperty(boost::shared_ptr<amf::Element> el);
 
-    //
-    // Methods for extracting data from big endian formatted raw AMF data.
-    //
+    /// @} end of encoding methods 
+
+    /// @name Decoding methods
+    ///
+    ///		Methods for extracting data from big endian formatted raw AMF data.
+    ///
+    /// @{
 
     /// Extract the AMF0 object type from the header.
     //
@@ -386,6 +393,8 @@ public:
     /// @remarks May throw a ParserException
     ///
     boost::shared_ptr<amf::Element> extractProperty(boost::shared_ptr<Buffer> buf);
+
+    /// @} end of decoding methods 
 
     /// Get the total number of allocated bytes used when serializing.
     //
