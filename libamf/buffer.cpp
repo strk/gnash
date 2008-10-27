@@ -76,7 +76,6 @@ Buffer::hex2mem(const string &str)
 
     init(size);
     
-    int j = 0;
     for (size_t i=0; ptr<end; i++) {
         if (*ptr == ' ') {      // skip spaces.
             ptr++;
@@ -85,7 +84,7 @@ Buffer::hex2mem(const string &str)
         ch = hex2digit(*ptr++) << 4;
         ch |= hex2digit(*ptr++);
         *this += ch;
-	i++;
+	    i++;
     }
     resize(size);
     
@@ -234,7 +233,7 @@ Buffer::operator+=(amf::Element::amf0_type_e type)
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t nb = static_cast<Network::byte_t>(type);
     
-    return operator+=(type);
+    return operator+=(nb);
 }
 
 /// \brief Append a byte to existing data in the buffer.
