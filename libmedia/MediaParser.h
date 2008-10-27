@@ -133,15 +133,50 @@ enum audioCodecType
 
 std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
 
-/// \brief
-/// The AudioInfo class contains information about the audiostream
-/// in the file being parsed. The information stored is codec-id,
+/// Information about an audio stream 
+//
+/// The information stored is codec-id,
 /// samplerate, samplesize, stereo, duration and codec-type.
+///
+/// Additionally, an abstract ExtraInfo can be hold.
+///
 class AudioInfo
 {
+
 public:
-	AudioInfo(int codeci, boost::uint16_t sampleRatei, boost::uint16_t sampleSizei, bool stereoi, boost::uint64_t durationi, codecType typei)
-		: codec(codeci),
+
+    /// Construct an AudioInfo object
+    //
+    /// @param codeci
+    ///     Audio codec id.
+    ///     To be interpreted as a media::audioCodecType if the typei
+    ///     parameter is FLASH; otherwise it's an opaque number to use
+    ///     for codec information transfer between a MediaParser and a
+    ///     AudioDecoder from the same %media handler module.
+    ///
+    /// @param sampleRatei
+    ///     Nominal sample rate.
+    ///     @todo document units.
+    ///
+    /// @param sampleSizei
+    ///     Sample size, in bytes.
+    ///
+    /// @param stereoi
+    ///     Sample type (stereo if true, mono otherwise).
+    ///     @todo document if and how intepretation of sampleSizei changes
+    ///
+    /// @param durationi
+    ///     Nominal audio stream duration.
+    ///     @todo check if still needed, if so document units!
+    ///
+    /// @param typei
+    ///     Changes interpretation of the codeci parameter.
+    ///
+	AudioInfo(int codeci, boost::uint16_t sampleRatei,
+            boost::uint16_t sampleSizei, bool stereoi,
+            boost::uint64_t durationi, codecType typei)
+		:
+        codec(codeci),
 		sampleRate(sampleRatei),
 		sampleSize(sampleSizei),
 		stereo(stereoi),
@@ -169,27 +204,66 @@ public:
 
 	codecType type;
 
-	/// An abstract class to hold any additional info
-	/// required for proper decoder initialization
+	/// Extra info about an audio stream
+    //
+	/// Abstract class to hold any additional info
+	/// when required for proper decoder initialization.
+    ///
 	class ExtraInfo {
 	public:
 		virtual ~ExtraInfo() {}
 	};
 
 	/// Extra info about audio stream, if when needed
+    //
+    /// Could be ExtraVideoInfoFlv or a media-handler specific info
+    ///
 	std::auto_ptr<ExtraInfo> extra;
 };
 
-/// \brief
-/// The VideoInfo class contains information about the videostream
-/// in the file being parsed. The information stored is codec-id,
-/// width, height, framerate, duration and codec-type.
-/// timestamp,
+/// Information about a video stream 
+//
+/// The information stored is codec-id, width, height, framerate and duration.
+///
+/// Additionally, an abstract ExtraInfo can be hold.
+///
 class VideoInfo
 {
 public:
-	VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi, codecType typei)
-		: codec(codeci),
+
+    /// Construct a VideoInfo object
+    //
+    /// @param codeci
+    ///     Video codec id.
+    ///     To be interpreted as a media::videoCodecType if the typei
+    ///     parameter is FLASH; otherwise it's an opaque number to use
+    ///     for codec information transfer between a MediaParser and a
+    ///     VideoDecoder from the same %media handler module.
+    ///
+    /// @param widthi
+    ///     Video frame width.
+    ///     @todo check if still needed.
+    ///
+    /// @param heighti
+    ///     Video frame height.
+    ///     @todo check if still needed.
+    ///
+    /// @param frameRatei
+    ///     Nominal video frame rate.
+    ///     @todo document units.
+    ///
+    /// @param durationi
+    ///     Nominal video duration.
+    ///     @todo check if still needed, if so document units!
+    ///
+    /// @param typei
+    ///     Changes interpretation of the codeci parameter.
+    ///     
+	VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti,
+            boost::uint16_t frameRatei, boost::uint64_t durationi,
+            codecType typei)
+		:
+        codec(codeci),
 		width(widthi),
 		height(heighti),
 		frameRate(frameRatei),
@@ -205,14 +279,20 @@ public:
 	boost::uint64_t duration;
 	codecType type;
 
-	/// An abstract class to hold any additional info
-	/// required for proper decoder initialization
+	/// Extra info about a video stream
+    //
+	/// Abstract class to hold any additional info
+	/// when required for proper decoder initialization
+    ///
 	class ExtraInfo {
 	public:
 		virtual ~ExtraInfo() {}
 	};
 
-	/// Extra info about audio stream, if when needed
+	/// Extra info about video stream, if when needed
+    //
+    /// Could be ExtraAudioInfoFlv or a media-handler specific info
+    ///
 	std::auto_ptr<ExtraInfo> extra;
 };
 

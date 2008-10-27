@@ -43,30 +43,68 @@ namespace gnash {
 namespace media {
 
 
+/// Extra video info found in some FLV embedded streams
+//
+/// This is basically composed by an header for the audio stream
+///
 class ExtraVideoInfoFlv : public VideoInfo::ExtraInfo
 {
 public:
-        ExtraVideoInfoFlv(boost::uint8_t* extradata, size_t datasize)
-                :
-                data(extradata),
-                size(datasize)
-        {
-        }
-        boost::scoped_array<boost::uint8_t> data;
-        size_t size;
+
+    /// Construct an ExtraVideoInfoFlv
+    //
+    /// @param extradata
+    ///     Video header data. Ownership transferred.
+    ///
+    /// @param datasize
+    ///     Video header data size
+    ///
+    /// @todo take a SimpleBuffer by auto_ptr
+    ///
+    ExtraVideoInfoFlv(boost::uint8_t* extradata, size_t datasize)
+        :
+        data(extradata),
+        size(datasize)
+    {
+    }
+
+    /// Video stream header
+    boost::scoped_array<boost::uint8_t> data;
+
+    /// Video stream header size
+    size_t size;
 };
 
+/// Extra audoi info found in some FLV embedded streams
+//
+/// This is basically composed by an header for the audio stream
+///
 class ExtraAudioInfoFlv : public AudioInfo::ExtraInfo
 {
 public:
-        ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
+
+    /// Construct an ExtraAudioInfoFlv
+    //
+    /// @param extradata
+    ///     Audio header data. Ownership transferred.
+    ///
+    /// @param datasize
+    ///     Audio header data size
+    ///
+    /// @todo take a SimpleBuffer by auto_ptr
+    ///
+    ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
                 :
                 data(extradata),
                 size(datasize)
         {
         }
-        boost::scoped_array<boost::uint8_t> data;
-        size_t size;
+
+    /// Audio stream header
+    boost::scoped_array<boost::uint8_t> data;
+
+    /// Audio stream header size
+    size_t size;
 };
 
 /// The FLVParser class parses FLV streams
