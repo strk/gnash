@@ -324,7 +324,7 @@ AudioDecoderSimple::setup(SoundInfo& info)
         default:
             boost::format err = boost::format(
                 _("AudioDecoderSimple: unsupported flash codec %d (%s)"))
-                % (int)codec % codec;
+                % (int)_codec % _codec;
             throw MediaException(err.str());
 	}
 }
@@ -349,14 +349,14 @@ AudioDecoderSimple::setup(AudioInfo& info)
             _sampleRate = info.sampleRate;
             _stereo = info.stereo;
             _is16bit = (info.sampleSize==2); // check this!
-            if ( into.sampleSize > 2 ) // troubles...
+            if ( info.sampleSize > 2 ) // troubles...
                 log_unimpl("Sample size > 2 in %s sound!", _codec);
             break;
 
         default:
             boost::format err = boost::format(
                 _("AudioDecoderSimple: unsupported flash codec %d (%s)"))
-                % (int)codec % codec;
+                % (int)_codec % _codec;
             throw MediaException(err.str());
 	}
 }
