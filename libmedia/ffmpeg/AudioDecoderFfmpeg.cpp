@@ -201,9 +201,17 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	// Init the parser
 	_parser = av_parser_init(codec_id);
 	if (!_parser) {	
-		boost::format err = boost::format(
-			_("AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s")) %
-				codec_id;
+		boost::format err;
+        if ( info.type == FLASH )
+        {
+            err = boost::format(
+                _("AudioDecoderFfmpeg: could not initialize a parser for flash codec id %d (%s)")) %
+                    info.codec % (audioCodecType)info.codec;
+        } else {
+            err = boost::format(
+                _("AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s")) %
+                    codec_id;
+        }
 		throw MediaException(err.str());
 	}
 
