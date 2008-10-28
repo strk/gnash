@@ -288,7 +288,7 @@ AudioDecoderSimple::AudioDecoderSimple(AudioInfo& info)
 	_stereo(false),
 	_is16bit(true)
 {
-    if (!setup(info)) throw MediaException("Failed to setup decoder");
+    setup(info);
 }
 
 AudioDecoderSimple::AudioDecoderSimple(SoundInfo& info)
@@ -298,7 +298,7 @@ AudioDecoderSimple::AudioDecoderSimple(SoundInfo& info)
 	_stereo(false),
 	_is16bit(true)
 {
-    if (!setup(info)) throw MediaException("Failed to setup decoder");
+    setup(info);
 }
 
 
@@ -306,34 +306,65 @@ AudioDecoderSimple::~AudioDecoderSimple()
 {
 }
 
-bool AudioDecoderSimple::setup(SoundInfo& info)
+void
+AudioDecoderSimple::setup(SoundInfo& info)
 {
+	_codec = info.getFormat();
+    switch (_codec)
+    {
+        case AUDIO_CODEC_ADPCM:
+        case AUDIO_CODEC_RAW:
+        case AUDIO_CODEC_UNCOMPRESSED:
+		    _sampleRate = info.getSampleRate();
+		    _sampleCount = info.getSampleCount();
+		    _stereo = info.isStereo();
+		    _is16bit = info.is16bit();
+            break;
 
-	if (info.getFormat() == AUDIO_CODEC_ADPCM || info.getFormat() == AUDIO_CODEC_RAW || info.getFormat() == AUDIO_CODEC_UNCOMPRESSED) {
-		_codec = info.getFormat();
-		_sampleRate = info.getSampleRate();
-		_sampleCount = info.getSampleCount();
-		_stereo = info.isStereo();
-		_is16bit = info.is16bit();
-		return true;
-	}
-	return false;
-}
-
-bool AudioDecoderSimple::setup(AudioInfo& info)
-{
-	if (info.type == FLASH && (info.codec == AUDIO_CODEC_ADPCM || info.codec == AUDIO_CODEC_RAW || info.codec == AUDIO_CODEC_UNCOMPRESSED)) {
-		_codec = static_cast<audioCodecType>(info.codec);
-		_sampleRate = info.sampleRate;
-		_stereo = info.stereo;
-		_is16bit = true; // Fix this?
-		return true;
-	} else {
-		return false;
+        default:
+            boost::format err = boost::format(
+                _("AudioDecoderSimple: unsupported flash codec %d (%s)"))
+                % (int)codec % codec;
+            throw MediaException(err.str());
 	}
 }
 
-boost::uint8_t* AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool /*parse*/)
+void
+AudioDecoderSimple::setup(AudioInfo& info)
+{
+	if (info.type != FLASH)
+    {
+        boost::format err = boost::format(
+            _("AudioDecoderSimple: unable to intepret custom audio codec id %s"))
+            % info.codec;
+        throw MediaException(err.str());
+    }
+
+    _codec = static_cast<audioCodecType>(info.codec);
+    switch (_codec)
+    {
+        case AUDIO_CODEC_ADPCM:
+        case AUDIO_CODEC_RAW:
+        case AUDIO_CODEC_UNCOMPRESSED:
+            _sampleRate = info.sampleRate;
+            _stereo = info.stereo;
+            _is16bit = (info.sampleSize==2); // check this!
+            if ( into.sampleSize > 2 ) // troubles...
+                log_unimpl("Sample size > 2 in %s sound!", _codec);
+            break;
+
+        default:
+            boost::format err = boost::format(
+                _("AudioDecoderSimple: unsupported flash codec %d (%s)"))
+                % (int)codec % codec;
+            throw MediaException(err.str());
+	}
+}
+
+boost::uint8_t*
+AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_t inputSize,
+        boost::uint32_t& outputSize, boost::uint32_t& decodedBytes,
+        bool /*parse*/)
 {
 
 	unsigned char* decodedData = NULL;

@@ -43,12 +43,18 @@ public:
 	/// 	AudioInfo class with all the info needed to decode
 	///     the sound correctly. Throws a MediaException on fatal
 	///     error.
+    ///
+    /// @throws MediaException on failure
+    ///
 	AudioDecoderSimple(AudioInfo& info);
 	
 	/// @param info
 	/// 	SoundInfo class with all the info needed to decode
 	///     the sound correctly. Throws a MediaException on fatal
 	///     error.	
+    ///
+    /// @throws MediaException on failure
+    ///
 	AudioDecoderSimple(SoundInfo& info);
 
 	~AudioDecoderSimple();
@@ -57,9 +63,11 @@ public:
 
 private:
 
-	bool setup(AudioInfo& info);
+    // throws MediaException on failure
+	void setup(AudioInfo& info);
 
-	bool setup(SoundInfo& info);
+    // throws MediaException on failure
+	void setup(SoundInfo& info);
 
 	// codec
 	audioCodecType _codec;
