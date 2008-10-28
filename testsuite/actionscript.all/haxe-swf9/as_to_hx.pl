@@ -256,6 +256,14 @@ while(<STDIN>){
 		}
 	}
 
+	#The way Haxe compiles string.length = 5 causes
+	#ReferenceError: Error #1074: Illegal write to read-only property length on String.
+	#So we need to skip attempts to set a string's length property.
+	if($_ =~ /\.length\s*=/){
+		skip_line();
+		next;
+	}
+
 	#Print the converted line of code.
 	print $_;
 }
