@@ -25,25 +25,53 @@
 
 #include <string>
 #include <vector>
+#include <iostream> // for output operator
 
 #include "rc.h"
 
+/// \namespace cygnal
+///
+/// This namespace is for all the Cygnal specific classes not used by
+/// anything else in Gnash.
 namespace cygnal {
-  
+
+/// \class cygnal::CRcInitFile
+///	This class handles reading values from the Cygnal
+///	configuration file, .cygnalrc, and into a form we can use in
+///	Cygnal.
 class DSOEXPORT CRcInitFile : public gnash::RcInitFile
 {
 public:
-
-    bool loadFiles();
-    bool parseFile(const std::string& filespec);
-
-    // Return the default instance of RC file,
+    /// \brief Return the default instance of RC file,
     static CRcInitFile& getDefaultInstance();
-    void dump();
+    
+    /// \brief Load all the configuration files.
+    ///		This includes parsing the default .gnashrc file for
+    ///		Gnash settings that control the swf parser and virtual
+    ///		machine. These setting can be overridden in the
+    ///		.cygnalrc file, plus the Cygnal specific file has
+    ///		options only used by Cygnal.
+    bool loadFiles();
+
+    /// \brief Parse and load configuration file
+    bool parseFile(const std::string& filespec);
 
     int getPortOffset() { return _port_offset; };
     void setPortOffset(int x) { _port_offset = x; };
+
+    int getTestingFlag() { return _testing; };
+    void setTestingFlag(bool x) { _testing = x; };
     
+    int getThreadingFlag() { return _threading; };
+    void setThreadingFlag(bool x) { _threading = x; };
+    
+    ///  \brief Dump the internal data of this class in a human readable form.
+    /// @remarks This should only be used for debugging purposes.
+    void dump() const { dump(std::cerr); }
+
+    /// \overload dump(std::ostream& os) const
+    void dump(std::ostream& os) const;
+
 private:
     /// Construct only by getDefaultInstance()
     CRcInitFile();
@@ -51,9 +79,16 @@ private:
     ~CRcInitFile();
 
     int _port_offset;
+    bool _testing;
+    bool _threading;
 };
 
-//extern DSOEXPORT CRcInitFile crcfile;
+/// \brief Dump to the specified output stream.
+inline std::ostream& operator << (std::ostream& os, const CRcInitFile& crcini)
+{
+	crcini.dump(os);
+	return os;
+}
 
 // End of gnash namespace 
 }

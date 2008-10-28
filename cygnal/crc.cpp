@@ -55,7 +55,10 @@ CRcInitFile::getDefaultInstance()
 	return crcfile;
 }
 
-CRcInitFile::CRcInitFile() : _port_offset(0)
+CRcInitFile::CRcInitFile()
+    : _port_offset(0),
+      _testing(false),
+      _threading(false)
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
@@ -170,14 +173,21 @@ CRcInitFile::parseFile(const std::string& filespec)
             }
 
             bool test;
+            bool threads;
             uint32_t num;
 
+            // Get the standard options inherited froom Gnash's config file
             if ( extractSetting(test, "actionDump", variable, value) )
                 useParserDump(test);
             else if ( extractSetting(test, "parserDump", variable, value) )
                 useActionDump(test);
             else if ( extractNumber(num, "verbosity", variable, value) )
                 verbosityLevel(num);
+            // Get the options specific to Cygnal's config file.
+            else if ( extractSetting(test, "testing", variable, value) )
+                setTestingFlag(test);
+            else if ( extractSetting(threads, "threading", variable, value) )
+                setThreadingFlag(threads);
             else extractNumber((uint32_t&)_port_offset, "portOffset", variable, value);
 
         } while (!in.eof());
@@ -197,12 +207,21 @@ CRcInitFile::parseFile(const std::string& filespec)
 }
 
 void
-CRcInitFile::dump()
+CRcInitFile::dump(std::ostream& os) const
 {
     cerr << endl << "Dump CRcInitFile:" << endl;
+    cerr << "\tVerbosity Level: " << _verbosity << endl;
+    cerr << "\tDump ActionScript processing: "
+         << ((_actionDump)?"enabled":"disabled") << endl;
+    cerr << "\tDump parser info: "
+         << ((_parserDump)?"enabled":"disabled") << endl;
+    cerr << "\tActionScript coding errors verbosity: "
+         << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
     cerr << "\tPort Offset: " << _port_offset << endl;
+    cerr << "\tSpecial Testing output for Gnash: "
+         << ((_testing)?"enabled":"disabled") << endl;
 
-    RcInitFile::dump();
+//    RcInitFile::dump();
 }
 
 } // end of namespace cygnal
