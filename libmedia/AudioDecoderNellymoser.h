@@ -93,7 +93,7 @@ public:
     ///
     /// @throws MediaException on failure
     ///
-    AudioDecoderNellymoser(AudioInfo& info);
+    AudioDecoderNellymoser(const AudioInfo& info);
 
     /// @param info
     ///     SoundInfo class with all the info needed to decode
@@ -104,7 +104,7 @@ public:
     ///
     /// @throws MediaException on failure
     ///
-    AudioDecoderNellymoser(SoundInfo& info);
+    AudioDecoderNellymoser(const SoundInfo& info);
 
     ~AudioDecoderNellymoser();
 
@@ -120,8 +120,8 @@ private:
             boost::uint32_t* outputSize);
 
 
-    void setup(AudioInfo& info);
-    void setup(SoundInfo& info);
+    void setup(const AudioInfo& info);
+    void setup(const SoundInfo& info);
 
     // The handle used by the decoder
     nelly_handle* _nh;

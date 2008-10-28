@@ -72,27 +72,27 @@ public:
 	/// Returns the current format of the sound
 	///
 	/// @return the current format of the sound
-	audioCodecType getFormat() { return _format; }
+	audioCodecType getFormat() const { return _format; }
 
 	/// Returns the stereo status of the sound
 	///
 	/// @return the stereo status of the sound
-	bool isStereo() { return _stereo; }
+	bool isStereo() const { return _stereo; }
 
 	/// Returns the samplerate of the sound
 	///
 	/// @return the samplerate of the sound
-	unsigned long getSampleRate() { return _sampleRate; }
+	unsigned long getSampleRate() const { return _sampleRate; }
 
 	/// Returns the samplecount of the sound
 	///
 	/// @return the samplecount of the sound
-	unsigned long getSampleCount() { return _sampleCount; }
+	unsigned long getSampleCount() const { return _sampleCount; }
 
 	/// Returns the 16bit status of the sound
 	///
 	/// @return the 16bit status of the sound
-	bool is16bit() { return _is16bit; }
+	bool is16bit() const { return _is16bit; }
 
 private:
 	/// Current format of the sound (MP3, raw, etc).

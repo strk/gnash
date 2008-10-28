@@ -753,7 +753,7 @@ AudioDecoderNellymoser::AudioDecoderNellymoser()
 }
 
 	
-AudioDecoderNellymoser::AudioDecoderNellymoser(AudioInfo& info)
+AudioDecoderNellymoser::AudioDecoderNellymoser(const AudioInfo& info)
 	:
 	_sampleRate(0),
 	_stereo(false)
@@ -768,7 +768,7 @@ AudioDecoderNellymoser::AudioDecoderNellymoser(AudioInfo& info)
 }
 
 
-AudioDecoderNellymoser::AudioDecoderNellymoser(SoundInfo& info)
+AudioDecoderNellymoser::AudioDecoderNellymoser(const SoundInfo& info)
 	:
 	_sampleRate(0),
 	_stereo(false)
@@ -788,7 +788,7 @@ AudioDecoderNellymoser::~AudioDecoderNellymoser()
 }
 
 void
-AudioDecoderNellymoser::setup(SoundInfo& info)
+AudioDecoderNellymoser::setup(const SoundInfo& info)
 {
 	audioCodecType codec = info.getFormat();
     switch (codec)
@@ -807,7 +807,7 @@ AudioDecoderNellymoser::setup(SoundInfo& info)
 	}
 }
 
-void AudioDecoderNellymoser::setup(AudioInfo& info)
+void AudioDecoderNellymoser::setup(const AudioInfo& info)
 {
 	if (info.type != FLASH)
     {
