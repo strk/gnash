@@ -382,7 +382,8 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
 }
 
 movie_definition*
-create_movie(const URL& url, const char* reset_url, bool startLoaderThread, const std::string* postdata)
+create_movie(const URL& url, const char* reset_url, bool startLoaderThread,
+        const std::string* postdata)
 {
 
   std::auto_ptr<IOChannel> in;

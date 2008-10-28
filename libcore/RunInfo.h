@@ -44,8 +44,8 @@ public:
 
     /// Constructs a RunInfo instance with an immutable base URL.
     //
-    /// @param md       The movie_definition of the original movie_root
-    ///                 This is used for storing the original URL.
+    /// @param baseURL  The base URL for the run. This cannot be changed after
+    ///                 construction.
     RunInfo(const std::string& baseURL)
         :
         _baseURL(baseURL),
@@ -67,6 +67,9 @@ public:
     //
     /// @param s    A pointer to the sound::sound_handler for use
     ///             by Gnash core. This may also be NULL.
+    //
+    /// This is cached in various places, so changing it during a run will
+    /// lead to unexpected behaviour.
     void setSoundHandler(sound::sound_handler* s) {
         _soundHandler = s;
     } 
