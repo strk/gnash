@@ -47,7 +47,6 @@
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
-#include "sound_handler.h" // for get_sound_handler
 #ifdef GNASH_USE_GC
 #include "GC.h"
 #endif
@@ -61,26 +60,6 @@ namespace gnash
 {
 
 static void clear_library();
-
-/// Namespace for global data (will likely turn into a class)
-namespace globals { // gnash::globals
-
-  /// global StreamProvider
-  StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-
-  // global Sound handler stuff. Should this be moved to the VM class ?
-  static sound::sound_handler* soundHandler = 0;
-
-} // namespace gnash::globals
-
-
-void  set_sound_handler(sound::sound_handler* s) {
-    globals::soundHandler = s;
-}
-
-sound::sound_handler* get_sound_handler() {
-    return globals::soundHandler;
-}
 
 // Associate the specified tag type with the given tag loader
 // function.
@@ -407,8 +386,11 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread, cons
 {
 
   std::auto_ptr<IOChannel> in;
-  if ( postdata ) in = globals::streamProvider.getStream(url, *postdata);
-  else in = globals::streamProvider.getStream(url);
+
+  StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
+
+  if ( postdata ) in = streamProvider.getStream(url, *postdata);
+  else in = streamProvider.getStream(url);
   if ( ! in.get() )
   {
       log_error(_("failed to open '%s'; can't create movie"), url);
@@ -420,7 +402,8 @@ create_movie(const URL& url, const char* reset_url, bool startLoaderThread, cons
       return NULL;
   }
 
-  const char* movie_url = reset_url ? reset_url : url.str().c_str();
+  std::string urlstr = url.str();
+  const char* movie_url = reset_url ? reset_url : urlstr.c_str();
   movie_definition* ret = create_movie(in, movie_url, startLoaderThread);
 
   return ret;
@@ -460,10 +443,6 @@ void  clear()
 
     GC::cleanup();
 #endif
-
-    // By setting the soundhandler to NULL we avoid it being used
-    // after it's been de-referenced
-    set_sound_handler(NULL);
 
     // By setting the render handler to NULL we avoid it being used
     // after it's been de-referenced (fixes bug #21310)

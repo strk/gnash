@@ -113,7 +113,10 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
 
-	_movie_root = new movie_root(*_movie_def, _clock, url);
+    _runInfo.reset(new RunInfo(url));
+    _runInfo->setSoundHandler(_sound_handler.get());
+
+	_movie_root = new movie_root(*_movie_def, _clock, *_runInfo);
 
 	// Initialize viewport size with the one advertised in the header
 	_width = unsigned(_movie_def->get_width_pixels());
@@ -554,7 +557,6 @@ MovieTester::initTestingSoundHandlers()
 	//exit(1);
 #endif
 
-	gnash::set_sound_handler(_sound_handler.get());
 }
 
 void

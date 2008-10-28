@@ -28,6 +28,7 @@
 #include "smart_ptr.h"
 #include "as_prop_flags.h"
 #include "ManualClock.h"
+#include "RunInfo.h"
 
 #include <iostream>
 #include <sstream>
@@ -59,8 +60,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	ManualClock clock;
 
-	VM& vm = VM::init(*md5, clock);
-    	vm.getRoot().setRootMovie( md5->create_movie_instance() );
+    // We don't care about the base URL.
+    RunInfo runInfo("");
+    movie_root root(*md5, clock, runInfo);
+
+    root.setRootMovie( md5->create_movie_instance() );
+
+    VM& vm = VM::get();
 
 	log_debug("VM version %d", vm.getSWFVersion());
 

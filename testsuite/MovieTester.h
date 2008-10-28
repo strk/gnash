@@ -31,6 +31,7 @@
 #include "render_handler.h" // for dtor visibility by auto_ptr
 #include "movie_instance.h" 
 #include "ManualClock.h" // for composition
+#include "RunInfo.h" // For initialization.
 
 #include <memory> // for auto_ptr
 #include <string> 
@@ -320,6 +321,7 @@ private:
 
 	std::auto_ptr<sound::sound_handler> _sound_handler;
 
+    std::auto_ptr<RunInfo> _runInfo;
 	/// Current pointer position - X ordinate
 	int _x;
 

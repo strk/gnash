@@ -88,7 +88,7 @@ NetConnection::validateURL(const std::string& url)
 	}
 
     const movie_root& mr = _vm.getRoot();
-	URL uri(completeUrl, mr.getBaseURL());
+	URL uri(completeUrl, mr.runInfo().baseURL());
 
 	std::string uriStr(uri.str());
 	assert(uriStr.find("://") != std::string::npos);

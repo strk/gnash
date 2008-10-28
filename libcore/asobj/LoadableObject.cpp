@@ -93,7 +93,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     target.set_member(NSV::PROP_LOADED, false);
 
     const movie_root& mr = _vm.getRoot();
-	URL url(urlstr, mr.getBaseURL());
+	URL url(urlstr, mr.runInfo().baseURL());
 
 	std::auto_ptr<IOChannel> str;
 	if (post)
@@ -191,7 +191,7 @@ LoadableObject::load(const std::string& urlstr)
 	set_member(NSV::PROP_LOADED, false);
 
     const movie_root& mr = _vm.getRoot();
-	URL url(urlstr, mr.getBaseURL());
+	URL url(urlstr, mr.runInfo().baseURL());
 
     // Checks whether access is allowed.
     std::auto_ptr<IOChannel> str(StreamProvider::getDefaultInstance().getStream(url));

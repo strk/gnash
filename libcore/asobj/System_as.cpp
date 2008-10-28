@@ -153,11 +153,11 @@ getSystemCapabilitiesInterface(as_object& o)
     screenColor = m.callInterface("System.capabilities.screenColor", "");
 
     //
-	// Media
-	//
-		
-	// Is audio available?
-	const bool hasAudio = (get_sound_handler() != NULL);
+    // Media
+    //
+        
+    // Is audio available?
+    const bool hasAudio = (vm.getRoot().runInfo().soundHandler() != NULL);
 
     // FIXME: these need to be implemented properly. They are mostly
     // self-explanatory.

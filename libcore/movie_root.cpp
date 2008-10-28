@@ -90,9 +90,9 @@ movie_root::testInvariant() const
 
 
 movie_root::movie_root(const movie_definition& def,
-        VirtualClock& clock, const std::string& baseURL)
+        VirtualClock& clock, const RunInfo& runInfo)
 	:
-    _baseURL(baseURL),
+    _runInfo(runInfo),
     _originalURL(def.get_url()),
     _vm(VM::init(def.get_version(), *this, clock)),
 	_interfaceHandler(0),
@@ -102,7 +102,7 @@ movie_root::movie_root(const movie_definition& def,
 	m_viewport_width(1),
 	m_viewport_height(1),
 	m_background_color(255, 255, 255, 255),
-        m_background_color_set(false),
+    m_background_color_set(false),
 	m_timer(0.0f),
 	m_mouse_x(0),
 	m_mouse_y(0),
@@ -448,7 +448,7 @@ movie_root::getLevel(unsigned int num) const
 void
 movie_root::reset()
 {
-	sound::sound_handler* sh = get_sound_handler();
+	sound::sound_handler* sh = _runInfo.soundHandler();
 	if ( sh ) sh->reset();
 	clear();
 	_disableScripts = false;

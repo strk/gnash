@@ -108,7 +108,7 @@ struct movie_data
 };
 
 static boost::intrusive_ptr<gnash::movie_definition> play_movie(
-        const std::string& filename);
+        const std::string& filename, const RunInfo& runInfo);
 
 static bool s_do_output = false;
 static bool s_stop_on_errors = true;
@@ -354,8 +354,7 @@ main(int argc, char *argv[])
 
     std::auto_ptr<sound::sound_handler> soundHandler(
             new sound::NullSoundHandler());
-    gnash::set_sound_handler(soundHandler.get());
-        
+
     std::vector<movie_data>	data;
 
     // Play through all the movies.
@@ -363,7 +362,11 @@ main(int argc, char *argv[])
             e = infiles.end(); i != e; ++i)
     {
 
-	    boost::intrusive_ptr<gnash::movie_definition> m = play_movie(*i);
+        RunInfo runInfo(*i);
+        runInfo.setSoundHandler(soundHandler.get());
+
+	    boost::intrusive_ptr<gnash::movie_definition> m =
+            play_movie(*i, runInfo);
 	    if (!m) {
 	        if (s_stop_on_errors) {
 		    // Fail.
@@ -392,7 +395,7 @@ main(int argc, char *argv[])
 //
 // Return the movie definition.
 boost::intrusive_ptr<gnash::movie_definition>
-play_movie(const std::string& filename)
+play_movie(const std::string& filename, const RunInfo& runInfo)
 {
     boost::intrusive_ptr<gnash::movie_definition> md;
 
@@ -442,9 +445,10 @@ play_movie(const std::string& filename)
     log_debug("Will sleep %ld microseconds between iterations - "
             "fps is %g, clockAdvance is %lu", localDelay, fps, clockAdvance);
 
+
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
-    gnash::movie_root m(*md, cl, url.str());
+    gnash::movie_root m(*md, cl, runInfo);
     
     // Register processor to receive ActionScript events (Mouse, Stage
     // System etc).

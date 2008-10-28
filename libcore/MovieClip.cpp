@@ -48,7 +48,6 @@
 #include "StreamProvider.h"
 #include "LoadVariablesThread.h" 
 #include "ExecutableCode.h" // for inheritance of ConstructEvent
-#include "gnash.h" // for get_sound_handler
 #include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
@@ -4899,7 +4898,7 @@ MovieClip::loadVariables(const std::string& urlstr,
     // (down by getStream, that is)
     
     const movie_root& mr = _vm.getRoot();
-    URL url(urlstr, mr.getBaseURL());
+    URL url(urlstr, mr.runInfo().baseURL());
 
     std::string postdata;
     
@@ -5265,7 +5264,7 @@ MovieClip::stopStreamSound()
 {
     if ( m_sound_stream_id == -1 ) return; // nothing to do
 
-    sound::sound_handler* handler = get_sound_handler(); // TODO: cache ?
+    sound::sound_handler* handler = _vm.getRoot().runInfo().soundHandler();
     if (handler)
     {
         handler->stop_sound(m_sound_stream_id);

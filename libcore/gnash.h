@@ -33,9 +33,6 @@ namespace gnash {
 	class movie_definition; // for create_movie
 	class render_handler; // for set_render_handler 
 	class URL; // for set_base_url
- 	namespace sound {
- 		class sound_handler; // for set_sound_handler
- 	}
 }
 
 
@@ -54,19 +51,6 @@ enum FileType {
 };
 
 // Sound callbacks stuff
-
-/// \brief
-/// Pass in a sound handler, so you can handle audio on behalf of
-/// gnash.  This is optional; if you don't set a handler, or set
-/// NULL, then sounds won't be played.
-///
-/// If you want sound support, you should set this at startup,
-/// before loading or playing any movies!
-///
-DSOEXPORT void  set_sound_handler(sound::sound_handler* s);
-
-/// Get currently registered sound handler
-DSOEXPORT sound::sound_handler* get_sound_handler();
 
 /// Set the render handler.  This is one of the first
 /// things you should do to initialise the player (assuming you

@@ -68,7 +68,7 @@ Sound::Sound()
 	soundId(-1),
 	externalSound(false),
 	isStreaming(false),
-	_soundHandler(get_sound_handler()),
+	_soundHandler(_vm.getRoot().runInfo().soundHandler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_startTime(0),
 	_leftOverData(),
@@ -201,7 +201,7 @@ Sound::loadSound(const std::string& file, bool streaming)
 	_startTime=0;
 
     const movie_root& mr = _vm.getRoot();
-	URL url(file, mr.getBaseURL());
+	URL url(file, mr.runInfo().baseURL());
 
 	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
 	std::auto_ptr<IOChannel> inputStream( streamProvider.getStream( url ) );

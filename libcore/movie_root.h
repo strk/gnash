@@ -78,6 +78,7 @@
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
 #include "movie_instance.h"
+#include "RunInfo.h" // for initialization
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -139,7 +140,7 @@ public:
     /// before using any of this class methods !
     ///
     movie_root(const movie_definition& def, VirtualClock& clock,
-            const std::string& baseURL);
+            const RunInfo& runInfo);
 
     ~movie_root();
 
@@ -796,24 +797,17 @@ public:
     void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif
 
-    /// Get the immutable base URL for this run.
-    //
-    /// @return The base URL set when movie_root was constructed.
-    const std::string& getBaseURL() const { return _baseURL; }
-
 	/// Get URL of the SWF movie used to initialize this VM
 	//
 	/// This information will be used for security checks
 	///
 	const std::string& getOriginalURL() const { return _originalURL; }
 
+    const RunInfo& runInfo() const { return _runInfo; }
+
 private:
 
-    /// The base URL for this movie, which may be specified by the caller.
-    //
-    /// This is a runtime constant because it must not change during a 
-    /// run.
-    const std::string _baseURL;
+    const RunInfo& _runInfo; 
 
     /// The URL of the original root movie.
     //

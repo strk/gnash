@@ -30,6 +30,7 @@
 #include "movie_definition.h" // for visibility of movie_definition destructor
 #include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
 #include "movie_root.h" // for Abstract callbacks
+#include "RunInfo.h" // for passing handlers and other data to the core.
 
 #include <string>
 #include <map>
@@ -227,7 +228,9 @@ private:
 
 	std::auto_ptr<Gui> _gui;
 
-	std::auto_ptr<sound::sound_handler> _soundHandler;
+    std::auto_ptr<RunInfo> _runInfo;
+
+    std::auto_ptr<sound::sound_handler> _soundHandler;
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
 

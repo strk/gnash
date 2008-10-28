@@ -96,7 +96,7 @@ NetStream_as::NetStream_as()
 	_playbackClock(new InterruptableVirtualClock(new SystemClock)),
 	_playHead(_playbackClock.get()), 
 
-	_soundHandler(get_sound_handler()),
+	_soundHandler(_vm.getRoot().runInfo().soundHandler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_audioQueueSize(0),
 	_auxStreamerAttached(false),

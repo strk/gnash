@@ -31,7 +31,6 @@
 #include "gui.h"
 #include "rc.h"
 #include "sound_handler.h"
-#include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
 #include "VM.h"
 #include "GnashSleep.h"
