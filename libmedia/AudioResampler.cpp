@@ -43,7 +43,7 @@ AudioResampler::convert_raw_data(
     bool m_stereo)
 {
 
-    assert(sample_size); // at least it seems the code relies on this...
+    assert(sample_size == 2); // at least it seems the code relies on this...
 
     // simple hack to handle dup'ing mono to stereo
     if ( !stereo && m_stereo)
