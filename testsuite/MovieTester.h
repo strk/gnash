@@ -318,7 +318,7 @@ private:
 
 	gnash::movie_instance* _movie;
 
-	std::auto_ptr<media::sound_handler> _sound_handler;
+	std::auto_ptr<sound::sound_handler> _sound_handler;
 
 	/// Current pointer position - X ordinate
 	int _x;

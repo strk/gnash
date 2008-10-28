@@ -34,7 +34,7 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     assert(tag == SWF::STARTSOUND); // 15 
 
     // Make static ?
-    media::sound_handler* handler = get_sound_handler();
+    sound::sound_handler* handler = get_sound_handler();
 
     in.ensureBytes(2); // sound_id
 
@@ -132,7 +132,7 @@ StartSoundTag::execute(MovieClip* /* m */, DisplayList& /* dlist */) const
     //GNASH_REPORT_FUNCTION;
 
     // Make static ?
-    media::sound_handler* handler = get_sound_handler();   
+    sound::sound_handler* handler = get_sound_handler();   
 
     if (handler)
     {

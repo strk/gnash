@@ -529,14 +529,18 @@ SWFHandlers::ActionToggleQuality(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionStopSounds(ActionExec& thread)
+SWFHandlers::ActionStopSounds(ActionExec&
+#if GNASH_PARANOIA_LEVEL > 1
+    thread
+#endif
+)
 {
 
 #if GNASH_PARANOIA_LEVEL > 1
     assert(thread.atActionTag(SWF::ACTION_STOPSOUNDS));
 #endif
 
-    media::sound_handler* s = get_sound_handler();
+    sound::sound_handler* s = get_sound_handler();
     if (s != NULL)
     {
         s->stop_all_sounds();

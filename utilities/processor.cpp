@@ -339,7 +339,7 @@ main(int argc, char *argv[])
 #endif
     gnash::media::MediaHandler::set(handler);
 
-    std::auto_ptr<media::sound_handler> soundHandler(new media::NullSoundHandler());
+    std::auto_ptr<sound::sound_handler> soundHandler(new sound::NullSoundHandler());
     gnash::set_sound_handler(soundHandler.get());
         
     std::vector<movie_data>	data;

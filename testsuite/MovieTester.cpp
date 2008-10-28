@@ -548,10 +548,10 @@ MovieTester::initTestingSoundHandlers()
 
 #ifdef SOUND_SDL
 	std::cout << "Creating SDL sound handler" << std::endl;
-        _sound_handler.reset( gnash::media::create_sound_handler_sdl() );
+        _sound_handler.reset( sound::create_sound_handler_sdl() );
 #elif defined(SOUND_GST)
 	std::cout << "Creating GST sound handler" << std::endl;
-        _sound_handler.reset( gnash::media::create_sound_handler_gst() );
+        _sound_handler.reset( media::create_sound_handler_gst() );
 #else
 	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
 	return;

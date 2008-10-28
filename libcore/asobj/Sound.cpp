@@ -24,6 +24,7 @@
 #include "Sound.h"
 #include "log.h"
 #include "sound_handler.h"
+#include "MediaHandler.h"
 #include "sound_definition.h" // for sound_sample
 #include "movie_definition.h"
 #include "fn_call.h"

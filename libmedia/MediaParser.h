@@ -66,11 +66,8 @@ enum codecType
 	/// The internal flash codec ids
 	FLASH,
 
-	/// Ffmpegs codecs ids
-	//
-	/// TODO: make this media-handler agnostic
-	///
-	FFMPEG
+	/// Custom codecs ids
+	CUSTOM
 };
 
 /// Video codec ids as defined in flash

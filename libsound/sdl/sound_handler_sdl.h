@@ -38,7 +38,7 @@
 
 
 namespace gnash {
-namespace media {
+namespace sound {
 
 class active_sound;
 
@@ -61,12 +61,12 @@ public:
     ///
     /// @pararm nVolume initial volume (0..100). Optional, defaults to 100.
     ///
-	sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> info, int nVolume=100);
+	sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> info, int nVolume=100);
 
 	~sound_data();
 
 	/// Object holding information about the sound
-	std::auto_ptr<SoundInfo> soundinfo;
+	std::auto_ptr<media::SoundInfo> soundinfo;
 
 	std::map<boost::uint32_t,boost::uint32_t> m_frames_size;
 
@@ -167,7 +167,7 @@ public:
 	}
 
 	/// The decoder object used to convert the data into the playable format
-	std::auto_ptr<AudioDecoder> decoder;
+	std::auto_ptr<media::AudioDecoder> decoder;
 
 	/// Current decoding position in the encoded stream
 	unsigned long decodingPosition;
@@ -305,7 +305,6 @@ private:
 	//
 	/// Elemenst of the vector are owned by this class
 	///
-
 	Sounds	m_sound_data;
 
 	/// Is sound device opened?
@@ -338,61 +337,6 @@ private:
 
 	void mixActiveSound(active_sound& sound, sound_data& sounddata, Uint8* stream, unsigned int buffer_length);
 
-public:
-	SDL_sound_handler();
-	SDL_sound_handler(const std::string& wave_file);
-	~SDL_sound_handler();
-
-	// see dox in sound_handler.h
-	virtual int	create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> sinfo);
-
-	/// this gets called when a stream gets more data
-	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes,
-					 unsigned int sample_count, int handle_id);
-
-	/// Play the index'd sample.
-	virtual void	play_sound(int sound_handle, int loopCount, int offset,
-				   long start_position, const std::vector<sound_envelope>* envelopes);
-
-	/// Stop the index'd sample.
-	virtual void	stop_sound(int sound_handle);
-
-	/// This gets called when it's done with a sample.
-	virtual void	delete_sound(int sound_handle);
-
-	// See dox in sound_handler.h
-	virtual void reset();
-
-	/// This will stop all sounds playing.
-	virtual void	stop_all_sounds();
-
-	/// Returns the sound volume level as an integer from 0 to 100. AS-script only.
-	virtual int	get_volume(int sound_handle);
-
-	/// Sets the sound volume level as an integer from 0 to 100. AS-script only.
-	virtual void	set_volume(int sound_handle, int volume);
-		
-	/// Gnash uses this to get info about a sound. Used when a stream needs more data.
-	virtual SoundInfo* get_sound_info(int sound_handle);
-
-	/// Gnash calls this to mute audio.
-	virtual void	mute();
-
-	/// Gnash calls this to unmute audio.
-	virtual void	unmute();
-
-	/// Gnash calls this to get the mute state.
-	virtual bool	is_muted();
-
-	/// Gets the duration in milliseconds of an event sound connected to an AS Sound obejct.
-	virtual unsigned int get_duration(int sound_handle);
-
-	/// Gets the playhead position in milliseconds of an event sound connected to an AS Soound obejct.
-	virtual unsigned int tell(int sound_handle);
-	
-	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
-	virtual void	detach_aux_streamer(void* owner);	//vv
-
 	/// Callback invoked by the SDL audio thread.
 	//
 	/// Refills the output stream/buffer with data.
@@ -420,9 +364,71 @@ public:
 	///	(negative is probably an SDL bug, zero dunno yet).
 	///
 	static void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in);
+
+public:
+
+	SDL_sound_handler();
+
+	SDL_sound_handler(const std::string& wave_file);
+
+	~SDL_sound_handler();
+
+	// See dox in sound_handler.h
+	virtual int	create_sound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> sinfo);
+
+	// see dox in sound_handler.h
+	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes,
+					 unsigned int sample_count, int handle_id);
+
+	// See dox in sound_handler.h
+	virtual void	play_sound(int sound_handle, int loopCount, int offset,
+				   long start_position, const std::vector<sound_envelope>* envelopes);
+
+	// See dox in sound_handler.h
+	virtual void	stop_sound(int sound_handle);
+
+	// See dox in sound_handler.h
+	virtual void	delete_sound(int sound_handle);
+
+	// See dox in sound_handler.h
+	virtual void reset();
+
+	// See dox in sound_handler.h
+	virtual void	stop_all_sounds();
+
+	// See dox in sound_handler.h
+	virtual int	get_volume(int sound_handle);
+
+	// See dox in sound_handler.h
+	virtual void	set_volume(int sound_handle, int volume);
+		
+	// See dox in sound_handler.h
+	virtual media::SoundInfo* get_sound_info(int sound_handle);
+
+	// See dox in sound_handler.h
+	virtual void	mute();
+
+	// See dox in sound_handler.h
+	virtual void	unmute();
+
+	// See dox in sound_handler.h
+	virtual bool	is_muted();
+
+	// See dox in sound_handler.h
+	virtual unsigned int get_duration(int sound_handle);
+
+	// See dox in sound_handler.h
+	virtual unsigned int tell(int sound_handle);
+	
+	// See dox in sound_handler.h
+	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);
+
+	// See dox in sound_handler.h
+	virtual void	detach_aux_streamer(void* owner);
+
 };
 
-} // gnash.media namespace 
+} // gnash.sound namespace 
 } // namespace gnash
 
 #endif // SOUND_HANDLER_SDL_H

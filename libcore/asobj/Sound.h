@@ -32,17 +32,19 @@
 #include "as_object.h" // for inheritance
 #include "NetConnection.h"
 
-#include "MediaHandler.h"
-#include "MediaParser.h"
-#include "AudioDecoder.h"
+#include "MediaParser.h" // is this really needed for scoped_ptr ?
+#include "AudioDecoder.h" // is this really needed for scoped_ptr ?
 
 #include <boost/scoped_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
 	class CharacterProxy;
-	namespace media {
+	namespace sound {
 		class sound_handler;
+	}
+	namespace media {
+		class MediaHandler;
 	}
 }
 
@@ -123,7 +125,7 @@ private:
 	std::string externalURL;
 	bool isStreaming;
 
-	media::sound_handler* _soundHandler;
+	sound::sound_handler* _soundHandler;
 
 	media::MediaHandler* _mediaHandler;
 

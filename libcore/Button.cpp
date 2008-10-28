@@ -518,7 +518,7 @@ Button::on_button_event(const event_id& event)
 	if (_def.m_sound != NULL)
 	{
 		int bi; // button sound array index [0..3]
-		media::sound_handler* s = get_sound_handler();
+		sound::sound_handler* s = get_sound_handler();
 
 		// Check if there is a sound handler
 		if (s != NULL) {

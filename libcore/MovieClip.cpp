@@ -5264,7 +5264,7 @@ MovieClip::stopStreamSound()
 {
     if ( m_sound_stream_id == -1 ) return; // nothing to do
 
-    media::sound_handler* handler = get_sound_handler(); // TODO: cache ?
+    sound::sound_handler* handler = get_sound_handler(); // TODO: cache ?
     if (handler)
     {
         handler->stop_sound(m_sound_stream_id);

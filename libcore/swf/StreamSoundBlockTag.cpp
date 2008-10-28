@@ -32,7 +32,7 @@ namespace SWF {
 void
 StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 {
-	media::sound_handler* handler = get_sound_handler();
+	sound::sound_handler* handler = get_sound_handler(); // TODO: get this passed as arg!
 	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.
@@ -47,7 +47,7 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-    media::sound_handler* handler = get_sound_handler();
+    sound::sound_handler* handler = get_sound_handler(); // TODO: get this passed as arg
 
     // If we don't have a sound_handler registered stop here
     if (!handler)

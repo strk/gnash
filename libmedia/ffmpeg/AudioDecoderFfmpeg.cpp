@@ -138,7 +138,7 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 	enum CodecID codec_id = CODEC_ID_NONE;
 
-	if (info.type == FFMPEG)
+	if (info.type == CUSTOM)
 	{
 		codec_id = static_cast<CodecID>(info.codec);
 	}

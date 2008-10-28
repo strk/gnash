@@ -25,6 +25,7 @@
 #endif
 
 #include "sound_handler.h" // for inheritance
+#include "SoundInfo.h" 
 #include "dsodefs.h" // for DSOEXPORT
 
 #include <vector>
@@ -33,8 +34,7 @@
 #include <cstring>
 
 namespace gnash {
-
-namespace media {
+namespace sound {
 
 /// Null Sound handler, for testing 
 class DSOEXPORT NullSoundHandler : public sound_handler
@@ -44,7 +44,7 @@ public:
 	// See dox in sound_handler.h 
 	virtual int	create_sound(
 		std::auto_ptr<SimpleBuffer> /*data*/,
-		std::auto_ptr<SoundInfo> /*sinfo*/
+		std::auto_ptr<media::SoundInfo> /*sinfo*/
 		)
 	{
 		return 0;
@@ -58,7 +58,7 @@ public:
 	}
 
 	// See dox in sound_handler.h 
-	virtual SoundInfo* get_sound_info(int /*sound_handle*/) { return 0; }
+	virtual media::SoundInfo* get_sound_info(int /*sound_handle*/) { return 0; }
 
 	// See dox in sound_handler.h 
 	virtual void play_sound(int /*sound_handle*/, int /*loop_count*/, int /*secondOffset*/, long /*start*/,
@@ -111,8 +111,8 @@ public:
 
 };
 	
-} // gnash.media namespace 
-}	// namespace gnash
+} // gnash.sound namespace 
+} // namespace gnash
 
 #endif // NULL_SOUND_HANDLER_H
 

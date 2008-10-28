@@ -445,7 +445,7 @@ movie_root::getLevel(unsigned int num) const
 void
 movie_root::reset()
 {
-	media::sound_handler* sh = get_sound_handler();
+	sound::sound_handler* sh = get_sound_handler();
 	if ( sh ) sh->reset();
 	clear();
 	_disableScripts = false;

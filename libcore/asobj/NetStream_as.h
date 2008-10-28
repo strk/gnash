@@ -50,8 +50,10 @@ namespace gnash {
 	class CharacterProxy;
 	class IOChannel;
 	namespace media {
-		class sound_handler;
 		class MediaHandler;
+	}
+	namespace sound {
+		class sound_handler;
 	}
 }
 
@@ -620,7 +622,7 @@ private:
 	PlayHead _playHead;
 
 	// Current sound handler
-	media::sound_handler* _soundHandler;
+	sound::sound_handler* _soundHandler;
 
 	// Current media handler
 	media::MediaHandler* _mediaHandler;

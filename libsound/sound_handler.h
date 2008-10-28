@@ -29,8 +29,6 @@
 #endif
 
 #include "dsodefs.h" // for DSOEXPORT
-#include "SoundInfo.h"
-#include "SimpleBuffer.h"
 #include "MediaHandler.h" // for inlined ctor
 
 #include <vector>
@@ -39,11 +37,19 @@
 #include <cstring>
 
 namespace gnash {
-//	class SoundInfo;
+    namespace media {
+	    class SoundInfo;
+    }
+	class SimpleBuffer;
 }
 
 namespace gnash {
-namespace media {
+
+/// Gnash %sound handling subsystem (libsound)
+//
+/// This subsystem takes care of sending audio to the system mixer
+///
+namespace sound {
 
 /// Sound handler.
 //
@@ -100,7 +106,7 @@ public:
 	///
 	virtual int	create_sound(
 		std::auto_ptr<SimpleBuffer> data,
-		std::auto_ptr<SoundInfo> sinfo
+		std::auto_ptr<media::SoundInfo> sinfo
 		) = 0;
 
 	/// Append data to an existing sound buffer slot.
@@ -136,7 +142,7 @@ public:
 	///
 	/// @return a pointer to the SoundInfo object for the sound with the given id.
 	///
-	virtual SoundInfo* get_sound_info(int sound_handle) = 0;
+	virtual media::SoundInfo* get_sound_info(int sound_handle) = 0;
 
 	/// Schedule playing of a sound buffer slot
 	//
@@ -331,7 +337,7 @@ protected:
 		_soundsStarted(0),
 		_soundsStopped(0),
 		_paused(false),
-		_mediaHandler(MediaHandler::get()),
+		_mediaHandler(media::MediaHandler::get()),
 		_volume(100)
 	{
 		assert(_mediaHandler); // for now, we rely on this being always available
@@ -347,7 +353,7 @@ protected:
 	bool _paused;
 
 	/// The registered MediaHandler at construction time
-	MediaHandler* _mediaHandler;
+	media::MediaHandler* _mediaHandler;
 
 private:
 
@@ -362,8 +368,8 @@ DSOEXPORT sound_handler*	create_sound_handler_sdl(const std::string& wave_file);
 DSOEXPORT sound_handler*	create_sound_handler_gst();
 	
 
-} // gnash.media namespace 
-}	// namespace gnash
+} // gnash.sound namespace 
+} // namespace gnash
 
 #endif // SOUND_HANDLER_H
 

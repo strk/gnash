@@ -227,7 +227,7 @@ private:
 
 	std::auto_ptr<Gui> _gui;
 
-	std::auto_ptr<media::sound_handler> _soundHandler;
+	std::auto_ptr<sound::sound_handler> _soundHandler;
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
 

@@ -82,7 +82,7 @@ class StartSoundTag : public ControlTag
 	//
 	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_envelope
 	///
-	std::vector<media::sound_handler::sound_envelope> m_envelopes;
+	std::vector<sound::sound_handler::sound_envelope> m_envelopes;
 
 	/// Initialize this StartSoundTag from the SWFStream  
 	//

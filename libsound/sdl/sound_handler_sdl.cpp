@@ -29,6 +29,7 @@
 #include "utility.h" // for convert_raw_data
 #include "AudioDecoderSimple.h"
 #include "AudioDecoderNellymoser.h"
+#include "SoundInfo.h"
 
 #include "MediaHandler.h"
 
@@ -71,7 +72,7 @@ typedef struct{
 } // end of anonymous namespace
 
 namespace gnash {
-namespace media {
+namespace sound {
 
 
 void
@@ -164,7 +165,7 @@ SDL_sound_handler::~SDL_sound_handler()
 
 int	SDL_sound_handler::create_sound(
 	std::auto_ptr<SimpleBuffer> data,
-	std::auto_ptr<SoundInfo> sinfo)
+	std::auto_ptr<media::SoundInfo> sinfo)
 {
 
 	assert(sinfo.get());
@@ -201,7 +202,7 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 	sound_data* sounddata = m_sound_data[handle_id];
 
 	// If doing ADPCM, knowing the framesize is needed to decode!
-	if (sounddata->soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
+	if (sounddata->soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM) {
 		sounddata->m_frames_size[sounddata->size()] = data_bytes;
 	}
 
@@ -264,15 +265,15 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long 
 	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
 	sound->loopCount = loopCount;
 
-	SoundInfo& si = *(sounddata->soundinfo);
+	media::SoundInfo& si = *(sounddata->soundinfo);
 	log_debug("play_sound %d called, SoundInfo format is %s", sound_handle, si.getFormat());
-	AudioInfo info(
+	media::AudioInfo info(
 		(int)si.getFormat(), // codeci
 		si.getSampleRate(), // sampleRatei
 		si.is16bit() ? 2 : 1, // sampleSizei
 		si.isStereo(), // stereoi
 		0, // duration unknown, does it matter ?
-		FLASH);
+		media::FLASH);
 
     try {
         sound->decoder = _mediaHandler->createAudioDecoder(info);
@@ -287,7 +288,7 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long 
 		        sound->decoder = new AudioDecoderNellymoser(*(sounddata->soundinfo));
 		        break;
 	        case AUDIO_CODEC_MP3:
-                SoundInfo* si=sounddata->soundinfo;
+                media::SoundInfo* si=sounddata->soundinfo;
 #ifdef USE_FFMPEG
 		        sound->decoder = new AudioDecoderFfmpeg(*(si));
 		        break;
@@ -442,7 +443,9 @@ void	SDL_sound_handler::set_volume(int sound_handle, int volume) {
 
 }
 	
-SoundInfo* SDL_sound_handler::get_sound_info(int sound_handle) {
+media::SoundInfo*
+SDL_sound_handler::get_sound_info(int sound_handle)
+{
 
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -864,7 +867,8 @@ sound_data::append(boost::uint8_t* data, unsigned int size)
 	delete [] data;
 }
 
-sound_data::sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> info, int nVolume)
+sound_data::sound_data(std::auto_ptr<SimpleBuffer> data,
+        std::auto_ptr<media::SoundInfo> info, int nVolume)
     :
     _buf(data),
     soundinfo(info),
@@ -962,7 +966,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
 
 			boost::uint32_t inputSize = 0;
 			bool parse = true;
-			if (sounddata.soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
+			if (sounddata.soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM) {
 				parse = false;
 				if (sounddata.m_frames_size.size() > 0) {
 					inputSize = sounddata.m_frames_size[sound.decodingPosition];
@@ -1069,7 +1073,7 @@ SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned i
 	}
 }
 
-} // gnash.media namespace 
+} // gnash.sound namespace 
 } // namespace gnash
 
 // Local Variables:

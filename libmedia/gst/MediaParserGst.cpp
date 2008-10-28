@@ -433,7 +433,7 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         
         g_object_set_data (G_OBJECT (parser->_audiosink), "mediaparser-obj", parser);
         
-        AudioInfo* audioinfo = new AudioInfo(0, 0, 0, false, 0, FFMPEG);
+        AudioInfo* audioinfo = new AudioInfo(0, 0, 0, false, 0, CUSTOM);
         audioinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_audioInfo.reset(audioinfo);
@@ -450,7 +450,7 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         
         g_object_set_data (G_OBJECT (parser->_videosink), "mediaparser-obj", parser);
 
-        VideoInfo* videoinfo = new VideoInfo(0, 0, 0, false, 0, FFMPEG);
+        VideoInfo* videoinfo = new VideoInfo(0, 0, 0, false, 0, CUSTOM);
         videoinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_videoInfo.reset(videoinfo);

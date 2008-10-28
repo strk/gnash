@@ -76,12 +76,19 @@ namespace globals { // gnash::globals
   ///
   static std::auto_ptr<URL> baseurl;
 
-} // namespace gnash::global
+  // global Sound handler stuff. Should this be moved to the VM class ?
+  static sound::sound_handler* soundHandler = 0;
 
-// global Sound handler stuff. Should this be moved to the VM class ?
-static media::sound_handler* _sound_handler = 0;
-void  set_sound_handler(media::sound_handler* s) { _sound_handler = s; }
-media::sound_handler* get_sound_handler() { return _sound_handler; }
+} // namespace gnash::globals
+
+
+void  set_sound_handler(sound::sound_handler* s) {
+    globals::soundHandler = s;
+}
+
+sound::sound_handler* get_sound_handler() {
+    return globals::soundHandler;
+}
 
 void
 set_base_url(const URL& url)

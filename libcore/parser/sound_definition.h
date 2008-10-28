@@ -20,7 +20,6 @@
 
 
 #include "resource.h" // for sound_sample inheritance
-#include "sound_handler.h"
 #include "ControlTag.h" // for sound tags inheritance
 
 // Forward declarations
@@ -31,9 +30,8 @@ namespace gnash {
 
 namespace gnash {
 
-/// This class is simply an identifier for a sound sample managed
-/// by a sound_handler, so should likely be defined in sound_handler.h
-///
+/// An identifier for a sound sample managed by a sound_handler
+//
 /// Definition tags will maintain a mapping between SWF-defined id
 /// of the sound and these identifiers.
 ///
@@ -45,11 +43,12 @@ namespace gnash {
 /// of the identified sound_sample. This *might* be the reason why
 /// it is a ref-counted thing (hard to belive...).
 ///
-//
+///
 /// QUESTION: why is this a resource ?
 ///           does it really need to be ref-counted ?
 ///
-/// TODO: move definition to sound_handler.h and possibly nest inside sound_handler itself ?
+/// @todo move definition to sound_handler.h and possibly nest inside sound_handler itself ?
+///
 ///
 class sound_sample: public resource
 {

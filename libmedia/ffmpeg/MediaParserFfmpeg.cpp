@@ -393,7 +393,7 @@ MediaParserFfmpeg::initializeParser()
 #else
 		boost::uint64_t duration = _videoStream->duration;
 #endif
-		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, FFMPEG /*codec type*/) );
+		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, CUSTOM /*codec type*/) );
 		
 		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
 			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0
@@ -415,7 +415,7 @@ MediaParserFfmpeg::initializeParser()
 #else
 		boost::uint64_t duration = _audioStream->duration;
 #endif
-		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, FFMPEG /*codec type*/) );
+		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, CUSTOM /*codec type*/) );
 
 		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(
 			// NOTE: AVCodecContext.extradata : void* for 51.11.0, uint8_t* for 51.38.0

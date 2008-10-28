@@ -59,6 +59,7 @@
 #include "SoundInfo.h"
 #include "gnash.h" // FileType enum
 #include "MediaHandler.h"
+#include "SimpleBuffer.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -1189,7 +1190,7 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::DEFINESOUND); // 14
 
-    media::sound_handler* handler = get_sound_handler();
+    sound::sound_handler* handler = get_sound_handler();
 
     in.ensureBytes(2+4+1+4); // character id + flags + sample count
 
@@ -1296,7 +1297,7 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
 void
 sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
-    media::sound_handler* handler = get_sound_handler();
+    sound::sound_handler* handler = get_sound_handler();
 
     // 18 || 45
     assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
