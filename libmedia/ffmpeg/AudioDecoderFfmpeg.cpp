@@ -199,6 +199,9 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 				codec_id = CODEC_ID_AAC;
                 _needsParsing=true;
 				break;
+
+// As of Lavc1d.51.38.0, CODEC_ID_NELLYMOSER isn't available
+// since which version is it available ? 
 #if 0
             // Enable this to use ffmpeg for nellymoser
             // decoding (fails in decodeFrame, but probably not Ffmpeg's
@@ -210,9 +213,9 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 			default:
 			    boost::format err = boost::format(
-			        _("Unsupported audio codec %d")) %
-			        static_cast<int>(info.codec);
-				throw MediaException(err.str());
+			        _("AudioDecoderFfmpeg: unsupported FLASH audio codec %d (%s)")) %
+			        info.codec % (audioCodecType)info.codec;
+			    throw MediaException(err.str());
 		}
 	}
 	else
