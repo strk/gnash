@@ -21,6 +21,9 @@
 #include "MediaHandler.h"
 #include "FLVParser.h"
 #include "IOChannel.h"
+#include "AudioDecoderSimple.h"
+#include "AudioDecoderNellymoser.h"
+#include "AudioDecoderSpeex.h"
 #include "log.h"
 
 namespace gnash {
@@ -63,6 +66,46 @@ MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
 
 	return parser;
 }
+
+std::auto_ptr<AudioDecoder>
+MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
+{
+    assert ( info.type == FLASH );
+
+    audioCodecType codec = static_cast<audioCodecType>(info.codec);
+    switch (codec)
+    {
+        case AUDIO_CODEC_NELLYMOSER:
+        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+        {
+            std::auto_ptr<AudioDecoder> ret(new AudioDecoderNellymoser(info));
+            return ret;
+        }
+
+        case media::AUDIO_CODEC_ADPCM:
+        case media::AUDIO_CODEC_RAW:
+        {
+            std::auto_ptr<AudioDecoder> ret(new AudioDecoderSimple(info));
+            return ret;
+        }
+
+        case AUDIO_CODEC_SPEEX:
+        {
+            std::auto_ptr<AudioDecoder> ret(new AudioDecoderSpeex);
+            return ret;
+        }
+
+        default:
+        {
+            boost::format err = boost::format(
+                _("MediaHandler::createFlashAudioDecoder:"
+                  " no available FLASH decoders for codec %d (%s)")) %
+                (int)codec % codec;
+            throw MediaException(err.str());
+        }
+    }
+}
+
 
 } // end of gnash::media namespace
 } // end of gnash namespace

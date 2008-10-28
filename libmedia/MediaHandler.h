@@ -114,6 +114,21 @@ public:
 
 protected:
 
+    /// Create an AudioDecoder for FLASH codecs 
+    //
+    /// This method is attempted as a fallback in case
+    /// a mediahandler-specific audio decoder couldn't be created
+    /// for a FLASH codec.
+    /// 
+    /// @throws a MediaException if it can't create a decoder
+    ///
+    /// @param info
+    ///     Informations about the audio. It is *required*
+    ///     for info.type to be media::FLASH (caller should check
+    ///     that before calling this).
+    ///
+    std::auto_ptr<AudioDecoder> createFlashAudioDecoder(const AudioInfo& info);
+
 	/// Return true if input stream is an FLV
 	bool isFLV(IOChannel& stream);
 
