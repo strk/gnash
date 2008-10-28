@@ -760,6 +760,11 @@ AudioDecoderNellymoser::AudioDecoderNellymoser(AudioInfo& info)
 {
     setup(info);
 	_nh = nelly_get_handle();
+
+    assert(info.type == FLASH); // or we'd have thrown an exception
+    audioCodecType codec = (audioCodecType)info.codec;
+  	log_debug(_("AudioDecoderNellymoser: initialized FLASH codec %s (%d)"),
+		(int)codec, codec);
 }
 
 
@@ -770,6 +775,10 @@ AudioDecoderNellymoser::AudioDecoderNellymoser(SoundInfo& info)
 {
     setup(info);
 	_nh = nelly_get_handle();
+
+    audioCodecType codec = info.getFormat();
+  	log_debug(_("AudioDecoderNellymoser: initialized FLASH codec %s (%d)"),
+		(int)codec, codec);
 }
 
 
@@ -778,30 +787,51 @@ AudioDecoderNellymoser::~AudioDecoderNellymoser()
 	nelly_free_handle(_nh);
 }
 
-void AudioDecoderNellymoser::setup(SoundInfo& info)
+void
+AudioDecoderNellymoser::setup(SoundInfo& info)
 {
+	audioCodecType codec = info.getFormat();
+    switch (codec)
+    {
+        case AUDIO_CODEC_NELLYMOSER:
+        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+            _sampleRate = info.getSampleRate();
+            _stereo = info.isStereo();
+            break;
 
-	if (info.getFormat() == AUDIO_CODEC_NELLYMOSER ||
-	    info.getFormat() == AUDIO_CODEC_NELLYMOSER_8HZ_MONO) {
-		_sampleRate = info.getSampleRate();
-		_stereo = info.isStereo();
-		return;
-	} 
-	throw MediaException("AudioDecoderNellymoser: attempt to use with "
-		                "non-nellymoser codec");
+        default:
+            boost::format err = boost::format(
+                _("AudioDecoderNellymoser: attempt to use with flash codec %d (%s)"))
+                % (int)codec % codec;
+            throw MediaException(err.str());
+	}
 }
 
 void AudioDecoderNellymoser::setup(AudioInfo& info)
 {
-	if (info.type == FLASH && (info.codec == AUDIO_CODEC_NELLYMOSER ||
-	        info.codec == AUDIO_CODEC_NELLYMOSER_8HZ_MONO)) {
-		_sampleRate = info.sampleRate;
-		_stereo = info.stereo;
-		return;
-	}
+	if (info.type != FLASH)
+    {
+        boost::format err = boost::format(
+            _("AudioDecoderNellymoser: unable to intepret custom audio codec id %s"))
+            % info.codec;
+        throw MediaException(err.str());
+    }
 
-	throw MediaException("AudioDecoderNellymoser: attempt to use with "
-		                "non-nellymoser codec");
+	audioCodecType codec = static_cast<audioCodecType>(info.codec);
+    switch (codec)
+    {
+        case AUDIO_CODEC_NELLYMOSER:
+        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
+            _sampleRate = info.sampleRate;
+            _stereo = info.stereo;
+            break;
+
+        default:
+            boost::format err = boost::format(
+                _("AudioDecoderNellymoser: attempt to use with flash codec %d (%s)"))
+                % (int)codec % codec;
+            throw MediaException(err.str());
+	}
 }
 
 float*

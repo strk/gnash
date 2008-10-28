@@ -90,6 +90,9 @@ public:
     ///     AudioInfo class with all the info needed to decode
     ///     the sound correctly. Throws a MediaException on fatal
     ///     error.
+    ///
+    /// @throws MediaException on failure
+    ///
     AudioDecoderNellymoser(AudioInfo& info);
 
     /// @param info
@@ -98,6 +101,8 @@ public:
     ///      error.
     /// 
     /// @deprecated use the AudioInfo based constructor
+    ///
+    /// @throws MediaException on failure
     ///
     AudioDecoderNellymoser(SoundInfo& info);
 
