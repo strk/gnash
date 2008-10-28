@@ -173,7 +173,8 @@ public:
 
 
 // Silently ignore the contents of this tag.
-void null_loader(SWFStream& /*in*/, tag_type /*tag*/, movie_definition& /*m*/)
+void null_loader(SWFStream& /*in*/, tag_type /*tag*/, movie_definition& /*m*/,
+        const RunInfo& /*r*/)
 {
 }
 
@@ -764,7 +765,8 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m, 
 
 // This is like null_loader except it prints a message to nag us to fix it.
 void
-fixme_loader(SWFStream& /*in*/, tag_type tag, movie_definition& /*m*/)
+fixme_loader(SWFStream& /*in*/, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& /*r*/)
 {
     static std::map<tag_type, bool> warned;
     if ( ! warned[tag] )
@@ -1190,8 +1192,7 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m, const RunI
 {
     assert(tag == SWF::DEFINESOUND); // 14
 
-    const movie_root& mr = VM::get().getRoot();
-    sound::sound_handler* handler = mr.runInfo().soundHandler();
+    sound::sound_handler* handler = r.soundHandler();
 
     in.ensureBytes(2+4+1+4); // character id + flags + sample count
 
@@ -1303,8 +1304,7 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m, const
     // 18 || 45
     assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
 
-    const movie_root& mr = VM::get().getRoot();
-    sound::sound_handler* handler = mr.runInfo().soundHandler();
+    sound::sound_handler* handler = r.soundHandler();
 
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
@@ -1480,7 +1480,8 @@ video_loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r)
 }
 
 void
-file_attributes_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
+file_attributes_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& r)
 {
     assert(tag == SWF::FILEATTRIBUTES); // 69
 
@@ -1566,7 +1567,8 @@ metadata_loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo&
 }
 
 void
-serialnumber_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
+serialnumber_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/, 
+        const RunInfo& r)
 {
     assert(tag == SWF::SERIALNUMBER); // 41
 
@@ -1597,7 +1599,8 @@ serialnumber_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
 }
 
 void
-reflex_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
+reflex_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& r)
 {
     assert(tag == SWF::REFLEX); // 777
 
@@ -1615,7 +1618,8 @@ reflex_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
 }
 
 void
-abc_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
+abc_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& r)
 {
     assert(tag == SWF::DOABC
         || tag == SWF::DOABCDEFINE); // 72 or 82
@@ -1638,7 +1642,7 @@ abc_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
 }
 
 void
-define_scene_frame_label_loader(SWFStream& /*in*/, tag_type tag, movie_definition& /*m*/)
+define_scene_frame_label_loader(SWFStream& /*in*/, tag_type tag, movie_definition& /*m*/, const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
 

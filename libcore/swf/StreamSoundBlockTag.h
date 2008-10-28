@@ -32,6 +32,7 @@
 namespace gnash {
 	class SWFStream;
 	class movie_definition;
+	class RunInfo;
 }
 
 namespace gnash {

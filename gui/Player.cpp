@@ -258,8 +258,9 @@ Player::load_movie()
     try {
         if ( _infile == "-" )
         {
-            std::auto_ptr<IOChannel> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
-            md = gnash::create_movie(in, _url, false);
+            std::auto_ptr<IOChannel> in (
+                    noseek_fd_adapter::make_stream(fileno(stdin)));
+            md = gnash::create_movie(in, _url, *_runInfo, false);
         }
         else
         {
@@ -279,7 +280,8 @@ Player::load_movie()
             }
 
             // _url should be always set at this point...
-            md = gnash::create_library_movie(url, _url.c_str(), false);
+            md = gnash::create_library_movie(url, *_runInfo, _url.c_str(),
+                    false);
         }
     } catch (const GnashException& er) {
         std::cerr << er.what() << std::endl;

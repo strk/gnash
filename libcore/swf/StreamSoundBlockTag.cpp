@@ -1,4 +1,3 @@
-// StreamSoundBlockTag.cpp:  for Gnash.
 //
 //   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
@@ -17,14 +16,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "VM.h" // TODO: drop.
 #include "StreamSoundBlockTag.h"
 #include "sound_handler.h" 
 #include "movie_definition.h" // for addControlTag
 #include "MovieClip.h" // for execute
 #include "SoundInfo.h" // for loader
 #include "SWFStream.h"
-#include "log.h" 
+#include "log.h"
+#include "RunInfo.h"
+#include "VM.h" // For getting movie_root. TODO: drop
 
 namespace gnash {
 namespace SWF {
@@ -33,9 +33,8 @@ void
 StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 {
 
-    const movie_root& mr = VM::get().getRoot();
+    const movie_root& mr = m->getVM().getRoot();
 
-    // TODO: get this passed as arg!
 	sound::sound_handler* handler = mr.runInfo().soundHandler(); 
 	if (handler)
 	{
@@ -51,10 +50,7 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m, co
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-    const movie_root& mr = VM::get().getRoot();
-
-    // TODO: get this passed as arg!
-	sound::sound_handler* handler = mr.runInfo().soundHandler(); 
+    sound::sound_handler* handler = r.soundHandler(); 
 
     // If we don't have a sound_handler registered stop here
     if (!handler)
