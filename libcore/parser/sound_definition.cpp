@@ -7,18 +7,19 @@
 
 
 #include "sound_definition.h"
-#include "gnash.h" // for get_sound_handler
 #include "sound_handler.h" // for use
+#include "VM.h"
 
 namespace gnash {
 
 
 sound_sample::~sound_sample()
 {
-	sound::sound_handler* handler = get_sound_handler();
-	if (handler)
+    sound::sound_handler* s = VM::get().getRoot().runInfo().soundHandler();
+	
+	if (s)
 	{
-		handler->delete_sound(m_sound_handler_id);
+		s->delete_sound(m_sound_handler_id);
 	}
 }
 

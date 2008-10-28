@@ -1062,7 +1062,7 @@ void import_loader(SWFStream& in, tag_type tag, movie_definition& m)
     in.read_string(source_url);
 
     // Resolve relative urls against baseurl
-    URL abs_url(source_url, get_base_url());
+    URL abs_url(source_url, VM::get().getRoot().runInfo().baseURL());
 
     unsigned char import_version = 0;
 
@@ -1190,13 +1190,15 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::DEFINESOUND); // 14
 
-    sound::sound_handler* handler = get_sound_handler();
+    const movie_root& mr = VM::get().getRoot();
+    sound::sound_handler* handler = mr.runInfo().soundHandler();
 
     in.ensureBytes(2+4+1+4); // character id + flags + sample count
 
     boost::uint16_t    character_id = in.read_u16();
 
-    media::audioCodecType    format = static_cast<media::audioCodecType>(in.read_uint(4));
+    media::audioCodecType format = static_cast<media::audioCodecType>(
+            in.read_uint(4));
     unsigned sample_rate_in = in.read_uint(2); // see s_sample_rate_table
     if ( sample_rate_in >= s_sample_rate_table_len ) 
     {
@@ -1297,10 +1299,12 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m)
 void
 sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
-    sound::sound_handler* handler = get_sound_handler();
 
     // 18 || 45
     assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
+
+    const movie_root& mr = VM::get().getRoot();
+    sound::sound_handler* handler = mr.runInfo().soundHandler();
 
     // If we don't have a sound_handler registered stop here
     if (!handler) return;

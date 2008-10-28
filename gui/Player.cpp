@@ -169,9 +169,10 @@ Player::silentStream(void* /*udata*/, boost::uint8_t* stream, int len)
 void
 Player::init_sound()
 {
+
     if (_doSound) {
 #ifdef SOUND_SDL
-        _soundHandler.reset( sound::create_sound_handler_sdl(_audioDump) );
+        _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
         if (! _audioDump.empty()) {
             // add a silent stream to the audio pool so that our output file
             // is homogenous;  we actually want silent wave data when no sounds
@@ -179,13 +180,11 @@ Player::init_sound()
             _soundHandler->attach_aux_streamer(silentStream, (void*) this);
         }
 #elif defined(SOUND_GST)
-        _soundHandler.reset( media::create_sound_handler_gst() );
+        _soundHandler.reset(media::create_sound_handler_gst());
 #else
         log_error(_("Sound requested but no sound support compiled in"));
         return;
 #endif
-        
-        gnash::set_sound_handler(_soundHandler.get());
     }
 }
 
@@ -310,7 +309,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     _infile = infile;
 
-    // Set base url
+    // Work out base url
     if ( _baseurl.empty() )
     {
         if (! url.empty() ) _baseurl = url;
@@ -363,9 +362,8 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
         }
     }
 
-    // Set base url for this movie (needed before parsing)
-    if ( hasOverriddenBaseUrl ) gnash::set_base_url(URL(overriddenBaseUrl, URL(_baseurl)));
-    else gnash::set_base_url(URL(_baseurl));
+    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
+                                       : URL(_baseurl);
 
     // Load the actual movie.
     _movieDef = load_movie();
@@ -398,8 +396,12 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height);
 
+    _runInfo.reset(new RunInfo(baseURL.str()));
+        
+    _runInfo->setSoundHandler(_soundHandler.get());
+
     SystemClock clock; // use system clock here...
-    movie_root& root = VM::init(*_movieDef, clock).getRoot();
+    movie_root root(*_movieDef, clock, *_runInfo);
 
     _callbacksHandler.reset(new CallbacksHandler(_gui.get())); 
     

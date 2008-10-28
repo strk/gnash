@@ -78,6 +78,7 @@
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
 #include "movie_instance.h"
+#include "RunInfo.h" // for initialization
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -105,6 +106,7 @@ namespace gnash {
     class URL;
     class Timer;
     class MovieClip;
+    class VirtualClock;
 }
 
 namespace gnash
@@ -137,7 +139,8 @@ public:
     /// Make sure to call setRootMovie() 
     /// before using any of this class methods !
     ///
-    movie_root(VM& vm);
+    movie_root(const movie_definition& def, VirtualClock& clock,
+            const RunInfo& runInfo);
 
     ~movie_root();
 
@@ -195,38 +198,35 @@ public:
     /// Character's depths are updated.
     ///
     /// @param sp
-    ///		The level to change depth/level of. A pointer to it is expected
-    ///		to be found in the _level# container, or an error will be printed
-    ///		and the call would result in a no-op.
+    ///        The level to change depth/level of. A pointer to it is expected
+    ///        to be found in the _level# container, or an error will be printed
+    ///        and the call would result in a no-op.
     ///
     /// @param depth
-    ///		New depth to assign to the character. If another level exists at 
-    ///		the target depth the latter is moved in place of the former, with
-    ///		its depth also updated.
+    ///        New depth to assign to the character. If another level exists at 
+    ///        the target depth the latter is moved in place of the former, with
+    ///        its depth also updated.
     ///
     void swapLevels(boost::intrusive_ptr<MovieClip> sp, int depth);
 
     /// Drop level at given depth.
     //
     /// @param depth
-    ///   Depth of the level to drop. Note that this is -character::staticDepthOffset for
-    ///   the root movie. Must be >=0 and <= 1048575 or an assertion will fail.
-    ///   Note that if the depth evaluates to the original root movie nothing happens
-    ///   (not allowed to remove that). It is not tested if it's allowed to remove 
-    ///   _level0 after loading into it.
-    ///
+    ///   Depth of the level to drop. Note that this is 
+    ///   -character::staticDepthOffset for the root movie. Must be >=0 and
+    ///   <= 1048575 or an assertion will fail. Note that if the depth
+    ///   evaluates to the original root movie nothing happens (not allowed
+    ///   to remove that). It is not tested if it's allowed to remove _level0
+    ///   after loading into it.
     void dropLevel(int depth);
 
     /// @@ should this delegate to _level0?  probably !
-    void set_member(
-        const std::string& /*name*/,
-        const as_value& /*val*/)
+    void set_member(const std::string& /*name*/, const as_value& /*val*/)
     {
     }
 
     /// @@ should this delegate to _level0?  probably !
-    bool get_member(const std::string& /*name*/,
-            as_value* /*val*/)
+    bool get_member(const std::string& /*name*/, as_value* /*val*/)
     {
         return false;
     }
@@ -280,10 +280,6 @@ public:
     ///
     bool notify_mouse_clicked(bool mouse_pressed, int mask);
 
-    /// The host app can use this to tell the movie where the
-    /// user's mouse pointer is.
-    //void notify_mouse_state(int x, int y, int buttons);
-
     /// \brief
     /// The host app can use this to tell the movie when
     /// user pressed or released a key.
@@ -309,7 +305,7 @@ public:
     /// @return the originating root movie (not necessarely _level0)
     movie_instance* getRootMovie() const
     {
-	    return _rootMovie.get();
+        return _rootMovie.get();
     }
 
     void stop_drag()
@@ -323,7 +319,7 @@ public:
     ///
     movie_definition* get_movie_definition() const
     {
-	return getRootMovie()->get_movie_definition();
+        return getRootMovie()->get_movie_definition();
     }
 
     /// Add an interval timer
@@ -338,7 +334,8 @@ public:
     ///         for subsequent call to clear_interval_timer.
     ///         It will NEVER be zero.
     ///
-    unsigned int add_interval_timer(std::auto_ptr<Timer> timer, bool internal=false);
+    unsigned int add_interval_timer(std::auto_ptr<Timer> timer,
+            bool internal = false);
 
     /// Remove timer identified by given integer
     //
@@ -353,7 +350,7 @@ public:
     ///
     size_t get_current_frame() const
     {
-	    return getRootMovie()->get_current_frame();
+        return getRootMovie()->get_current_frame();
     }
 
     void set_background_color(const rgba& color);
@@ -379,16 +376,14 @@ public:
     ///     - Process all queued actions
     ///     - Remove unloaded characters from the advanceable characters list.
     ///     - Run the GC collector
-    ///
     void advanceMovie();
 
     /// 0-based!! delegates to originating root movie
     //
     /// TODO: drop this method. currently used by gprocessor.
-    ///
     void goto_frame(size_t target_frame_number)
     {
-	getRootMovie()->goto_frame(target_frame_number);
+        getRootMovie()->goto_frame(target_frame_number);
     }
 
     void display();
@@ -396,38 +391,37 @@ public:
     /// Delegate to originating root movie
     //
     /// TODO: drop ?
-    ///
     void set_play_state(MovieClip::play_state s)
     {
-	    getRootMovie()->set_play_state(s);
+        getRootMovie()->set_play_state(s);
     }
 
-	/// Notify still loaded character listeners for key events
-	DSOEXPORT void notify_key_listeners(key::code k, bool down);
+    /// Notify still loaded character listeners for key events
+    DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
-	/// Push a new character listener for key events
-	void add_key_listener(character* listener)
+    /// Push a new character listener for key events
+    void add_key_listener(character* listener)
     {
         add_listener(m_key_listeners, listener);
     }
 
-	/// Remove a character listener for key events
-	void remove_key_listener(character* listener)
+    /// Remove a character listener for key events
+    void remove_key_listener(character* listener)
     {
         remove_listener(m_key_listeners, listener);
     }
 
-	/// Notify still loaded character listeners for mouse events
-	DSOEXPORT void notify_mouse_listeners(const event_id& event);
+    /// Notify still loaded character listeners for mouse events
+    DSOEXPORT void notify_mouse_listeners(const event_id& event);
 
-	/// Push a new character listener for mouse events
-	void add_mouse_listener(character* listener)
+    /// Push a new character listener for mouse events
+    void add_mouse_listener(character* listener)
     {
         add_listener(m_mouse_listeners, listener);
     }
 
-	/// Remove a character listener for mouse events
-	void remove_mouse_listener(character* listener)
+    /// Remove a character listener for mouse events
+    void remove_mouse_listener(character* listener)
     {
         remove_listener(m_mouse_listeners, listener);
     }
@@ -448,7 +442,8 @@ public:
     ///
     void setFocus(character* ch);
     
-    DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
+    DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges,
+            bool force);
     
     void dump_character_tree() const;
 
@@ -460,7 +455,6 @@ public:
     /// currently implmented).
     ///
     /// @return the topmost active entity under pointer or NULL if none.
-    ///
     character* getActiveEntityUnderPointer() const;
 
     /// Return the topmost non-dragging entity under the pointer
@@ -468,7 +462,6 @@ public:
     /// This method triggers a displaylist scan
     ///
     /// @return the topmost non-dragging entity under pointer or NULL if none
-    ///
     const character* getEntityUnderPointer() const;
 
     /// Return the character currently being dragged, if any
@@ -479,13 +472,13 @@ public:
 
     bool testInvariant() const;
 
-    /// enum for the values of Stage.displayState
+    /// The possible values of Stage.displayState
     enum DisplayState {
-		normal,
-		fullScreen
-	};
+        normal,
+        fullScreen
+    };
 
-    /// enum for the values of Stage.scaleMode
+    /// The possibile values of Stage.scaleMode
     enum ScaleMode {
         showAll,
         noScale,
@@ -493,20 +486,21 @@ public:
         noBorder
     };
 
-    /// enum for horizonal position of the Stage
+    /// The possible horizonal positions of the Stage
     enum StageHorizontalAlign {
         STAGE_H_ALIGN_C,
         STAGE_H_ALIGN_L,
         STAGE_H_ALIGN_R,
     };
 
-    /// enum for vertical position of the Stages
+    /// The possible vertical position of the Stage
     enum StageVerticalAlign {
         STAGE_V_ALIGN_C,
         STAGE_V_ALIGN_T,       
         STAGE_V_ALIGN_B
     };
 
+    /// The possible elements of a Stage.alignMode.
     enum AlignMode {
         STAGE_ALIGN_L,
         STAGE_ALIGN_T,
@@ -563,10 +557,12 @@ public:
     void pushAction(std::auto_ptr<ExecutableCode> code, int lvl=apDOACTION);
 
     /// Push an executable code to the ActionQueue
-    void pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target, int lvl=apDOACTION);
+    void pushAction(const action_buffer& buf,
+            boost::intrusive_ptr<character> target, int lvl=apDOACTION);
 
     /// Push a function code to the ActionQueue
-    void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target, int lvl=apDOACTION);
+    void pushAction(boost::intrusive_ptr<as_function> func,
+            boost::intrusive_ptr<character> target, int lvl=apDOACTION);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
@@ -597,9 +593,10 @@ public:
     ///
     void addLiveChar(boost::intrusive_ptr<character> ch)
     {
-	// Don't register the object in the list twice 
+        // Don't register the object in the list twice 
 #if GNASH_PARANOIA_LEVEL > 1
-	assert(std::find(_liveChars.begin(), _liveChars.end(), ch) == _liveChars.end());
+        assert(std::find(_liveChars.begin(), _liveChars.end(), ch) ==
+            _liveChars.end());
 #endif
         _liveChars.push_front(ch);
     }
@@ -611,8 +608,7 @@ public:
     ///
     void clear();
 
-    /// Reset stage to it's initial state
-    //
+    /// Reset stage to its initial state
     void reset();
 
     /// Call this method for disabling run of actions
@@ -642,13 +638,6 @@ public:
     void flushHigherPriorityActionQueues();
 
     character* findCharacterByTarget(const std::string& tgtstr) const;
-
-    /// URL access methods
-    enum LoadMethod {
-        NONE=0,
-        GET=1,
-        POST=2
-    };
 
     /// Queue a request for loading a movie
     //
@@ -690,8 +679,8 @@ public:
     ///   Will be considered case-insensitive if VM version is < 7.
     ///
     /// @param levelno
-    ///   Output parameter, will be set to the level number, if true is returned
-    ///
+    ///   Output parameter, will be set to the level number, if true is
+    ///   returned
     bool isLevelTarget(const std::string& name, unsigned int& levelno);
 
 
@@ -728,7 +717,6 @@ public:
     /// The handler gets the MovieClip* that the script is
     /// embedded in, and the two string arguments passed by the
     /// script to fscommand().
-    ///
     DSOEXPORT void registerFSCommandCallback(AbstractFsCallback* handler)
     {
         _fsCommandHandler = handler;
@@ -762,7 +750,6 @@ public:
     /// information, for instance).
     ///
     /// See callInterface method
-    ///
     DSOEXPORT void registerEventCallback(AbstractIfaceCallback* handler)
     {
         _interfaceHandler = handler;
@@ -771,8 +758,8 @@ public:
     /// Call into the hosting application
     ///
     /// Will use callback set with registerEventCallback
-    ///
-    DSOEXPORT std::string callInterface(const std::string& cmd, const std::string& arg) const;
+    DSOEXPORT std::string callInterface(const std::string& cmd,
+            const std::string& arg) const;
 
     /// Called from the ScriptLimits tag parser to set the
     /// global script limits. It is expected behaviour that
@@ -810,8 +797,26 @@ public:
     void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif
 
+	/// Get URL of the SWF movie used to initialize this VM
+	//
+	/// This information will be used for security checks
+	///
+	const std::string& getOriginalURL() const { return _originalURL; }
+
+    const RunInfo& runInfo() const { return _runInfo; }
+
 private:
 
+    const RunInfo& _runInfo; 
+
+    /// The URL of the original root movie.
+    //
+    /// This is a runtime constant because it must not change during a 
+    /// run.
+    const std::string _originalURL;
+
+    /// This initializes a SharedObjectLibrary, which requires 
+    /// _originalURL, so that must be initialized first.
     VM& _vm;
 
     /// Registered Interface command handler, if any
@@ -823,21 +828,22 @@ private:
     /// A load movie request
     class LoadMovieRequest {
     public:
-	/// @param postdata
-	///   If not null POST method will be used for HTTP.
-	///
-        LoadMovieRequest(const URL& u, const std::string& t, const std::string* postdata)
-            :
-            _target(t),
-            _url(u),
-	    _usePost(false)
+        /// @param postdata
+        ///   If not null POST method will be used for HTTP.
+        ///
+        LoadMovieRequest(const URL& u, const std::string& t,
+                const std::string* postdata)
+                :
+                _target(t),
+                _url(u),
+                _usePost(false)
         {
-		if ( postdata )
-		{
-			_postData = *postdata;
-			_usePost = true;
-		}
-	}
+            if ( postdata )
+            {
+                _postData = *postdata;
+                _usePost = true;
+            }
+        }
 
         const std::string& getTarget() const { return _target; }
         const URL& getURL() const { return _url; }
@@ -848,7 +854,7 @@ private:
         std::string _target;
         URL _url;
         bool _usePost;
-	std::string _postData;
+        std::string _postData;
     };
 
     /// Load movie requests
@@ -868,7 +874,6 @@ private:
     typedef CharacterList KeyListeners;
     typedef CharacterList MouseListeners;
 
-
     /// Take care of dragging, if needed
     void doMouseDrag();
 
@@ -887,7 +892,6 @@ private:
     /// ::advance of each element to insert new characters before
     /// the start w/out invalidating iterators scanning the
     /// list forward for proper movie advancement
-    ///
     typedef std::list<AdvanceableCharacter> LiveChars;
 
     /// The list of advanceable character, in placement order
@@ -912,7 +916,8 @@ private:
     /// Cleanup references to unloaded characters and run the garbage collector.
     void cleanupAndCollect();
 
-    /// Push a character listener to the front of given container, if not already present
+    /// Push a character listener to the front of given container, if not
+    /// already present
     static void add_listener(CharacterList& ll, character* elem);
 
     /// Remove a listener from the list
@@ -922,7 +927,6 @@ private:
     //
     /// Can return NULL if it's been deleted or not
     /// yet initialized.
-    ///
     boost::intrusive_ptr<Stage_as> getStageObject();
 
     typedef std::list<ExecutableCode*> ActionQueue;
@@ -933,16 +937,16 @@ private:
     void processActionQueue();
 
     // TODO: use Range2d<int> ?
-    int         m_viewport_x0, m_viewport_y0;
+    int m_viewport_x0, m_viewport_y0;
 
     /// Width and height of viewport, in pixels
-    int         m_viewport_width, m_viewport_height;
+    int m_viewport_width, m_viewport_height;
 
-    rgba        m_background_color;
-    bool	m_background_color_set;
+    rgba m_background_color;
+    bool m_background_color_set;
 
-    float       m_timer;
-    int         m_mouse_x, m_mouse_y, m_mouse_buttons;
+    float m_timer;
+    int m_mouse_x, m_mouse_y, m_mouse_buttons;
 
     MouseButtonState  m_mouse_button_state;
 
@@ -961,34 +965,30 @@ private:
     /// Objects listening for mouse events (down,up,move)
     MouseListeners m_mouse_listeners;
 
-    character*              m_active_input_text;
-    float                   m_time_remainder;
+    character*  m_active_input_text;
+    float m_time_remainder;
 
-    /// @@ fold this into m_mouse_button_state?
+    /// @todo fold this into m_mouse_button_state?
     drag_state m_drag_state;
+
+    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
+    typedef std::map<int, LevelMovie> Levels;
 
     /// The movie instance wrapped by this movie_root
     //
     /// We keep a pointer to the base MovieClip class
     /// to avoid having to replicate all of the base class
     /// interface to the movie_instance class definition
-    ///
-    /// TODO: use a different container, to allow for _level0 and _level100
-    ///       to exist while just taking 2 elements in the container.
-    ///       Appropriate container could be list, set or map (order is important)
-    ///
-    typedef boost::intrusive_ptr<MovieClip> LevelMovie;
-    typedef std::map<int, LevelMovie> Levels;
     Levels _movies;
 
     /// The root movie. This is initially the same as getLevel(0) but might
-    /// change during the run. It will be used to setup and retrive initial stage size
+    /// change during the run. It will be used to setup and retrive initial
+    /// stage size
     boost::intrusive_ptr<movie_instance> _rootMovie;
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
-    ///
     bool fire_mouse_event();
 
     bool generate_mouse_button_events();
@@ -1029,9 +1029,8 @@ private:
     /// @param movie
     /// The movie_instance to store at the given level.
     /// Will be stored in an intrusive_ptr.
-    /// It's depth will be set to <num>+character::staticDepthOffset and it's name to
-    /// _level<num>
-    ///
+    /// Its depth will be set to <num>+character::staticDepthOffset and
+    /// its name to _level<num>
     void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
 
     /// Return the global Key object 
@@ -1042,20 +1041,20 @@ private:
 
     /// Return the global Mouse object 
     //
-    /// TODO: expose the mouse_as_object directly for faster calls ?
+    /// TODO: expose the Mouse as_object directly for faster calls ?
     ///
     boost::intrusive_ptr<as_object> getMouseObject();
 
     /// Boundaries of the Stage are always world boundaries
     /// and are only invalidated by changes in the background
     /// color.
-    void setInvalidated() { _invalidated=true; }
+    void setInvalidated() { _invalidated = true; }
 
     /// Every ::display call clears the invalidated flag
     //
     /// See setInvalidated();
     ///
-    void clearInvalidated() { _invalidated=false; }
+    void clearInvalidated() { _invalidated = false; }
 
     /// An invalidated stage will trigger complete redraw
     //
@@ -1092,15 +1091,15 @@ private:
         return (_processingActionLevel < apSIZE);
     }
 
-    const character* findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const;
+    const character* findDropTarget(boost::int32_t x, boost::int32_t y,
+            character* dragging) const;
 
     /// filedescriptor to write to for host application requests
     //
     /// -1 if none
-    ///
     int _hostfd;
     
-    std::bitset<4> _alignMode;
+    std::bitset<4u> _alignMode;
     
     ScaleMode _scaleMode;
     
@@ -1122,7 +1121,6 @@ private:
     // time of last movie advancement, in milliseconds
     unsigned int _lastMovieAdvancement;
 };
-
 
 } // namespace gnash
 

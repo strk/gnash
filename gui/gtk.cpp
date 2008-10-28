@@ -28,7 +28,6 @@
 #include "rc.h"
 #include "gtksup.h"
 #include "sound_handler.h"
-#include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
 #include "VM.h"
 #include "lirc.h"
@@ -609,22 +608,15 @@ GtkGui::createMenu()
     gtk_widget_show (separator1);
     gtk_container_add (GTK_CONTAINER (_popup_menu), separator1);
 
-    if (/*media::sound_handler *s = */ get_sound_handler()) {
-        GtkCheckMenuItem *menuitem_sound =
-            GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
-        // Set toggle inactive if an active sound handler is muted at start (can't
-        // happen at the moment, but might in the future).
-        
-        // The is_muted() function appears to have changed, and this doesn't work at the
-        // moment:
-        // gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), (!s->is_muted()) );
-        
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
-        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
-        gtk_widget_show(GTK_WIDGET(menuitem_sound));
-        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
-                         G_CALLBACK(&menuitem_sound_callback), this);
-    }
+    /// The sound handler is initialized after the Gui is created, and
+    /// may be disabled or enabled dynamically.
+    GtkCheckMenuItem *menuitem_sound =
+        GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
+    gtk_widget_show(GTK_WIDGET(menuitem_sound));
+    g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
+                     G_CALLBACK(&menuitem_sound_callback), this);
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));

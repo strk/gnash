@@ -26,7 +26,6 @@
 #include "builtin_function.h" // need builtin_function
 #include "as_function.h" // for calling event handlers
 #include "as_value.h" // for setting up a fn_call
-#include "gnash.h" // for get_base_url
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"

@@ -17,12 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "gnash.h" // get_sound_handler
 #include "StartSoundTag.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "log.h" // for log_parse
 #include "sound_definition.h" // for sound_sample
+#include "VM.h" // for getRoot()
 
 namespace gnash {
 namespace SWF {
@@ -33,8 +33,8 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
 {
     assert(tag == SWF::STARTSOUND); // 15 
 
-    // Make static ?
-    sound::sound_handler* handler = get_sound_handler();
+    const movie_root& mr = VM::get().getRoot();
+    sound::sound_handler* handler = mr.runInfo().soundHandler();
 
     in.ensureBytes(2); // sound_id
 
@@ -47,7 +47,8 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
             // if there's no sound_handler we might have simply skipped
             // the definition of sound sample...
             if (handler) {
-              log_swferror(_("start_sound_loader: sound_id %d is not defined"), sound_id);
+              log_swferror(_("start_sound_loader: sound_id %d is not "
+                      "defined"), sound_id);
             }
         );
         return;
@@ -131,8 +132,8 @@ StartSoundTag::execute(MovieClip* /* m */, DisplayList& /* dlist */) const
 {
     //GNASH_REPORT_FUNCTION;
 
-    // Make static ?
-    sound::sound_handler* handler = get_sound_handler();   
+    const movie_root& mr = VM::get().getRoot();
+    sound::sound_handler* handler = mr.runInfo().soundHandler();
 
     if (handler)
     {
