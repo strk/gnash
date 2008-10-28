@@ -77,6 +77,30 @@ private:
 
 	// Use for resampling audio
 	AudioResamplerFfmpeg _resampler;
+
+    /// True if a parser is required to decode the format
+    bool _needsParsing;
+
+    /// Parse input
+    //
+    /// @param input
+    ///     Pointer to frame we want to start parsing at.
+    ///
+    /// @param inputSize
+    ///     Number of bytes available in input
+    ///
+    /// @param outFrame
+    ///     Output parameter, will be set to the start
+    ///     of first frame found in input.
+    ///
+    /// @param outFrameSize
+    ///     Output parameter, will be set to size in bytes
+    ///     of the first frame found.
+    ///
+    /// @return number of input bytes parsed, or -1 on error
+    ///
+    int parseInput(boost::uint8_t* input, boost::uint32_t inputSize,
+            boost::uint8_t** outFrame, int* outFrameSize);
 };
 	
 } // gnash.media.ffmpeg namespace 
