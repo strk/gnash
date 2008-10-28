@@ -120,6 +120,7 @@ noinst_HEADERS = \
 	VirtualClock.h \
 	SystemClock.h \
 	ManualClock.h \
+	RunInfo.h \
 	array.h	\
 	as_environment.h \
 	as_function.h \
