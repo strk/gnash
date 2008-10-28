@@ -455,7 +455,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
     m.registerEventCallback(&eventCallback);
     m.registerFSCommandCallback(&execFsCommand);
 
-    md->completeLoad();
+    md->completeLoad(runInfo);
 
     std::auto_ptr<movie_instance> mi ( md->create_movie_instance() );
 

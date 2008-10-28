@@ -134,7 +134,7 @@ MovieLoader::start(const RunInfo& ri)
 {
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
     std::abort();
-#else
+#endif
 	// don't start MovieLoader thread() which rely
 	// on boost::thread() returning before they are executed. Therefore,
 	// we must employ locking.
@@ -145,8 +145,8 @@ MovieLoader::start(const RunInfo& ri)
                     execute, boost::ref(*this), &_movie_def, ri)));
 
 	_barrier.wait(); // let execution start befor returning
-#endif
-	return true;
+
+    return true;
 }
 
 //

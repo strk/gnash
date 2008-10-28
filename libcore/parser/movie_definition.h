@@ -465,7 +465,7 @@ public:
 
 	// Start the loader thread. By default no loader thread is engaged
 	// so this function is a no-op.
-	virtual bool completeLoad() {
+	virtual bool completeLoad(const RunInfo& /*r*/) {
 		return true;
 	}
 
