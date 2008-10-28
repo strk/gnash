@@ -18,13 +18,20 @@
 //
 
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "MediaHandler.h"
 #include "FLVParser.h"
 #include "IOChannel.h"
 #include "AudioDecoderSimple.h"
 #include "AudioDecoderNellymoser.h"
-#include "AudioDecoderSpeex.h"
 #include "log.h"
+
+#ifdef DECODING_SPEEX
+# include "AudioDecoderSpeex.h"
+#endif
 
 namespace gnash {
 namespace media {
@@ -89,11 +96,13 @@ MediaHandler::createFlashAudioDecoder(const AudioInfo& info)
             return ret;
         }
 
+#ifdef DECODING_SPEEX
         case AUDIO_CODEC_SPEEX:
         {
             std::auto_ptr<AudioDecoder> ret(new AudioDecoderSpeex);
             return ret;
         }
+#endif
 
         default:
         {
