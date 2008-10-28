@@ -34,6 +34,7 @@ namespace gnash {
 	class swf_event;
 	class movie_definition;
 	class DisplayList;
+    class RunInfo;
 }
 
 namespace gnash {
@@ -61,7 +62,8 @@ public:
 	/// Remove object at specified depth from MovieClip DisplayList.
 	void execute(MovieClip* m, DisplayList& dlist) const;
 
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
 
 private:
 

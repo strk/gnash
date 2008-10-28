@@ -38,6 +38,7 @@ namespace gnash {
     class action_buffer;
     class movie_definition;
 	class DisplayList;
+    class RunInfo;
 }
 
 namespace gnash {
@@ -114,7 +115,8 @@ public:
     /// Place/move/whatever our object in the given movie.
     void execute(MovieClip* m, DisplayList& dlist) const;
 
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m);
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
 
     int getPlaceType() const { return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK); } 
     int getRatio()     const { return m_ratio; }

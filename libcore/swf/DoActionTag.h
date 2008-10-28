@@ -63,7 +63,8 @@ public:
 	    return true;
 	}
 
-	static void doActionLoader(SWFStream& in, tag_type tag, movie_definition& m)
+	static void doActionLoader(SWFStream& in, tag_type tag,
+            movie_definition& m, const RunInfo& /*r*/)
 	{
 		DoActionTag* da = new DoActionTag(m);
 		da->read(in);

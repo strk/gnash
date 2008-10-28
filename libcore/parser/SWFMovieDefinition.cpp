@@ -548,49 +548,9 @@ CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c
 	_map[id] = c;
 }
 
-// Load next chunk of this sprite frames.
-// This is possibly better defined in movie_definition
-void
-SWFMovieDefinition::load_next_frame_chunk()
-{
-
-	size_t framecount = get_frame_count();
-	size_t lastloaded = get_loading_frame();
-
-	// nothing to do
-	if ( lastloaded == framecount ) return;
-
-	size_t nextframe = lastloaded+1;
-
-#if FRAMELOAD_CHUNK
-	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames
-	if ( nextframe > framecount ) nextframe = framecount;
-#endif
-	//log_debug(_("Framecount: %u, Lastloaded: %u"), framecount, lastloaded);
-	if ( nextframe <= framecount )
-	{
-#ifdef DEBUG_FRAMES_LOAD // debugging
-		log_debug(_("Ensure load of frame %u/%u (last loaded is: %u)"),
-			nextframe, framecount, lastloaded);
-#endif
-		if ( ! ensure_frame_loaded(nextframe) )
-		{
-			log_error(_("Could not advance to frame %d"),
-				nextframe);
-			// these kind of errors should be handled by callers
-			abort();
-		}
-	}
-#ifdef DEBUG_FRAMES_LOAD
-	else
-	{
-		log_debug(_("No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u"), framecount, lastloaded, nextframe);
-	}
-#endif
-}
 
 void
-SWFMovieDefinition::read_all_swf(const RunInfo& ri)
+SWFMovieDefinition::read_all_swf(const RunInfo& runInfo)
 {
 	assert(_str.get() != NULL);
 
@@ -668,7 +628,7 @@ parse_tag:
                 {
 			// call the tag loader.  The tag loader should add
 			// characters or tags to the movie data structure.
-			(*lf)(str, tag_type, *this);
+			(*lf)(str, tag_type, *this, runInfo);
 		}
 		else
 		{

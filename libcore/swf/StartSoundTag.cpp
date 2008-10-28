@@ -22,19 +22,20 @@
 #include "movie_definition.h"
 #include "log.h" // for log_parse
 #include "sound_definition.h" // for sound_sample
-#include "VM.h" // for getRoot()
+#include "RunInfo.h"
+#include "MovieClip.h"
 
 namespace gnash {
 namespace SWF {
 
 /* public static */
 void
-StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
+StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& r)
 {
     assert(tag == SWF::STARTSOUND); // 15 
 
-    const movie_root& mr = VM::get().getRoot();
-    sound::sound_handler* handler = mr.runInfo().soundHandler();
+    sound::sound_handler* handler = r.soundHandler();
 
     in.ensureBytes(2); // sound_id
 
@@ -128,12 +129,12 @@ StartSoundTag::read(SWFStream& in)
 }
 
 void
-StartSoundTag::execute(MovieClip* /* m */, DisplayList& /* dlist */) const
+StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 {
     //GNASH_REPORT_FUNCTION;
 
-    const movie_root& mr = VM::get().getRoot();
-    sound::sound_handler* handler = mr.runInfo().soundHandler();
+    sound::sound_handler* handler = 
+        m->getVM().getRoot().runInfo().soundHandler();
 
     if (handler)
     {
@@ -145,7 +146,8 @@ StartSoundTag::execute(MovieClip* /* m */, DisplayList& /* dlist */) const
         else
         {
             //log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
-            handler->play_sound(m_handler_id, m_loop_count, 0, 0, (m_envelopes.empty() ? NULL : &m_envelopes));
+            handler->play_sound(m_handler_id, m_loop_count, 0, 0,
+                    (m_envelopes.empty() ? NULL : &m_envelopes));
         }
     }
 }

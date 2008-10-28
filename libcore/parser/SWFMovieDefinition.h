@@ -385,8 +385,6 @@ public:
 	///
 	void read_all_swf(const RunInfo& ri);
 
-	virtual void load_next_frame_chunk();
-
 	/// Create an instance of this movie.
 	//
 	/// TOCHECK:

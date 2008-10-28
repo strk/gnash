@@ -24,6 +24,7 @@
 
 #include "ControlTag.h" // for inheritance
 #include "sound_handler.h" // for sound_envelope (composition)
+#include "VM.h" // We only need this to get movie_root
 #include "swf.h" // for tag_type definition
 
 #include <vector> // for composition
@@ -35,6 +36,7 @@ namespace gnash {
 	class SWFStream;
 	class movie_definition;
 	class sound_sample;
+    class RunInfo;
 }
 
 namespace gnash {
@@ -110,7 +112,7 @@ public:
 	void	execute(MovieClip* /* m */, DisplayList& /* dlist */) const;
 
 	/// Load a SWF::STARTSOUND tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r);
 
 };
 
