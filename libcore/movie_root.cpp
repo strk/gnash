@@ -2061,7 +2061,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
-        URL url(urlstr, _baseURL);
+        URL url(urlstr, _runInfo.baseURL());
 
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();
@@ -2168,7 +2168,7 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
 
     /// URL security is checked in StreamProvider::getStream() down the
     /// chain.
-    URL url(urlstr, _baseURL);
+    URL url(urlstr, _runInfo.baseURL());
 
     /// If the method is MovieClip::METHOD_NONE, we send no data.
     if (method == MovieClip::METHOD_GET)
