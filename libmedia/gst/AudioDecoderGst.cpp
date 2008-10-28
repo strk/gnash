@@ -101,13 +101,21 @@ AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
 
 
     if (info.type == FLASH) {
-        throw MediaException("AudioDecoderGst: cannot handle this codec!");
+		boost::format err = boost::format(
+                _("AudioDecoderGst: cannot handle codec %d (%s)")) %
+                info.codec %
+                (audioCodecType)info.codec;
+        throw MediaException(err.str());
     }
 
     ExtraInfoGst* extraaudioinfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
 
     if (!extraaudioinfo) {
-        throw MediaException("AudioDecoderGst: cannot handle this codec!");
+		boost::format err = boost::format(
+                _("AudioDecoderGst: cannot handle codec %d "
+                  "(no ExtraInfoGst attached)")) %
+                info.codec;
+        throw MediaException(err.str());
     }
 
     setup(extraaudioinfo->caps);
