@@ -265,6 +265,13 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       AC_DEFINE(FFMPEG_VP6A, 1, [Define if ffmpeg can play VP6A.])
     fi
 
+    if test -z "$ffmpeg_num_version" -o "$ffmpeg_num_version" -lt 514600; then
+      dnl 51.46.0 (r10741) or higher required for CODEC_ID_NELLYMOSER
+      AC_MSG_WARN([This version of ffmpeg/libavcodec ($ffmpeg_version) is not able to decode NELLYMOSER encoded audio: 51.46.0 (r10741) or higher required!])
+    else
+      AC_DEFINE(FFMPEG_NELLYMOSER, 1, [Define if ffmpeg can decode NELLYMOSER audio.])
+    fi
+
   else
     AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
     ffmpeg_version_check=ok # trust the user-specified dir
