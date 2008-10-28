@@ -159,7 +159,7 @@ LocalConnection::domain(int version)
         return _name;
     }
     
-    URL url(getVM().getSWFUrl());
+    URL url(_vm.getRoot().getOriginalURL());
 //    log_debug(_("ORIG URL=%s (%s)"), url.str(), url.hostname());
     if (url.hostname().empty()) {
         _name = "localhost";

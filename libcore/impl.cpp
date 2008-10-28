@@ -68,14 +68,6 @@ namespace globals { // gnash::globals
   /// global StreamProvider
   StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
 
-  /// Base url (for relative urls resolution)
-  //
-  /// we need an auto_ptr becase the URL class
-  /// is an immutable one and needs to be set 
-  /// at construction time..
-  ///
-  static std::auto_ptr<URL> baseurl;
-
   // global Sound handler stuff. Should this be moved to the VM class ?
   static sound::sound_handler* soundHandler = 0;
 
@@ -89,24 +81,6 @@ void  set_sound_handler(sound::sound_handler* s) {
 sound::sound_handler* get_sound_handler() {
     return globals::soundHandler;
 }
-
-void
-set_base_url(const URL& url)
-{
-  // can call this only once during a single run
-  assert(!globals::baseurl.get());
-  globals::baseurl.reset(new URL(url));
-  log_debug(_("Base url set to: %s"), globals::baseurl->str());
-}
-
-const URL&
-get_base_url()
-{
-  // Don't call me if you haven't set me !
-  assert(globals::baseurl.get());
-  return *globals::baseurl;
-}
-
 
 // Associate the specified tag type with the given tag loader
 // function.
@@ -432,23 +406,21 @@ movie_definition*
 create_movie(const URL& url, const char* reset_url, bool startLoaderThread, const std::string* postdata)
 {
 
-  const std::string swfurl = url.str();
-
   std::auto_ptr<IOChannel> in;
   if ( postdata ) in = globals::streamProvider.getStream(url, *postdata);
   else in = globals::streamProvider.getStream(url);
   if ( ! in.get() )
   {
-      log_error(_("failed to open '%s'; can't create movie"), swfurl);
+      log_error(_("failed to open '%s'; can't create movie"), url);
       return NULL;
   }
   else if ( in->get_error() )
   {
-      log_error(_("streamProvider opener can't open '%s'"), swfurl);
+      log_error(_("streamProvider opener can't open '%s'"), url);
       return NULL;
   }
 
-  const char* movie_url = reset_url ? reset_url : swfurl.c_str();
+  const char* movie_url = reset_url ? reset_url : url.str().c_str();
   movie_definition* ret = create_movie(in, movie_url, startLoaderThread);
 
   return ret;
@@ -479,15 +451,9 @@ void  clear()
     // See task task #6959 and depending items
     //
     log_debug("Any segfault past this message is likely due to improper threads cleanup.");
-    //exit(EXIT_SUCCESS);
 
     clear_library();
     fontlib::clear();
-
-    if ( VM::isInitialized() )
-    {
-        VM::get().getRoot().clear();
-    }
 
 #ifdef GNASH_USE_GC 
     GC::get().collect();

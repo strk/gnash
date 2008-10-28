@@ -363,9 +363,8 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
         }
     }
 
-    // Set base url for this movie (needed before parsing)
-    if ( hasOverriddenBaseUrl ) gnash::set_base_url(URL(overriddenBaseUrl, URL(_baseurl)));
-    else gnash::set_base_url(URL(_baseurl));
+    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
+                                       : URL(_baseurl);
 
     // Load the actual movie.
     _movieDef = load_movie();
@@ -399,7 +398,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     _gui->createWindow(_url.c_str(), _width, _height);
 
     SystemClock clock; // use system clock here...
-    movie_root& root = VM::init(*_movieDef, clock).getRoot();
+    movie_root root(*_movieDef, clock, baseURL.str());
 
     _callbacksHandler.reset(new CallbacksHandler(_gui.get())); 
     

@@ -1062,7 +1062,7 @@ void import_loader(SWFStream& in, tag_type tag, movie_definition& m)
     in.read_string(source_url);
 
     // Resolve relative urls against baseurl
-    URL abs_url(source_url, get_base_url());
+    URL abs_url(source_url, VM::get().getRoot().getBaseURL());
 
     unsigned char import_version = 0;
 

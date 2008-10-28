@@ -73,12 +73,6 @@ DSOEXPORT sound::sound_handler* get_sound_handler();
 /// want to display anything).
 DSOEXPORT void set_render_handler(render_handler* s);
 
-/// Set the base url against which to resolve relative urls
-DSOEXPORT void set_base_url(const URL& url);
-
-/// Return base url
-DSOEXPORT const gnash::URL& get_base_url();
-
 // Some helpers that may or may not be compiled into your
 // version of the library, depending on platform etc.
 DSOEXPORT render_handler*   create_render_handler_xbox();

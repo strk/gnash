@@ -191,8 +191,10 @@ MovieClipLoader::~MovieClipLoader()
 bool
 MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 {
+    
+    movie_root& mr = _vm.getRoot();
 
-	URL url(url_str.c_str(), get_base_url());
+	URL url(url_str.c_str(), mr.getBaseURL());
 	
 #if GNASH_DEBUG
 	log_debug(_(" resolved url: %s"), url.str());

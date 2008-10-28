@@ -74,10 +74,6 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize gnash code lib
 	gnashInit();
 
-	// Set base url *before* calling create_movie
-	// TODO: use PWD if url == '-'
-	set_base_url(url);
-
 	if ( url == "-" )
 	{
 		std::auto_ptr<IOChannel> in (
@@ -117,7 +113,7 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize the sound handler(s)
 	initTestingSoundHandlers();
 
-	_movie_root = &(VM::init(*_movie_def, _clock).getRoot());
+	_movie_root = new movie_root(*_movie_def, _clock, url);
 
 	// Initialize viewport size with the one advertised in the header
 	_width = unsigned(_movie_def->get_width_pixels());

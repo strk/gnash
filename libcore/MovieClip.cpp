@@ -4898,7 +4898,8 @@ MovieClip::loadVariables(const std::string& urlstr,
     // Host security check will be will be done by LoadVariablesThread
     // (down by getStream, that is)
     
-    URL url(urlstr, get_base_url());
+    const movie_root& mr = _vm.getRoot();
+    URL url(urlstr, mr.getBaseURL());
 
     std::string postdata;
     

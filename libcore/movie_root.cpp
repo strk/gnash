@@ -89,9 +89,12 @@ movie_root::testInvariant() const
 }
 
 
-movie_root::movie_root(VM& vm)
+movie_root::movie_root(const movie_definition& def,
+        VirtualClock& clock, const std::string& baseURL)
 	:
-    _vm(vm),
+    _baseURL(baseURL),
+    _originalURL(def.get_url()),
+    _vm(VM::init(def.get_version(), *this, clock)),
 	_interfaceHandler(0),
 	_fsCommandHandler(0),
 	m_viewport_x0(0),
@@ -2058,7 +2061,7 @@ movie_root::getURL(const std::string& urlstr, const std::string& target,
         /// If there is no hosting application, call the URL launcher. For
         /// safety, we resolve the URL against the base URL for this run.
         /// The data is not sent at all.
-        URL url(urlstr, get_base_url());
+        URL url(urlstr, _baseURL);
 
         gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
         std::string command = rcfile.getURLOpenerFormat();
@@ -2163,8 +2166,9 @@ movie_root::loadMovie(const std::string& urlstr, const std::string& target,
         const std::string& data, MovieClip::VariablesMethod method)
 {
 
-    /// Where is the security checked?
-    URL url(urlstr, get_base_url());
+    /// URL security is checked in StreamProvider::getStream() down the
+    /// chain.
+    URL url(urlstr, _baseURL);
 
     /// If the method is MovieClip::METHOD_NONE, we send no data.
     if (method == MovieClip::METHOD_GET)

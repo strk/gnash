@@ -200,7 +200,8 @@ Sound::loadSound(const std::string& file, bool streaming)
 	/// changed that.
 	_startTime=0;
 
-	URL url(file, get_base_url());
+    const movie_root& mr = _vm.getRoot();
+	URL url(file, mr.getBaseURL());
 
 	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
 	std::auto_ptr<IOChannel> inputStream( streamProvider.getStream( url ) );

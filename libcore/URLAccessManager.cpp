@@ -23,7 +23,6 @@
 #include "URL.h"
 #include "log.h"
 #include "StringPredicates.h" // for case-insensitive host match
-//#include "gnash.h" // for get_base_url
 #include "VM.h" // for getRoot().getRootMovie()
 
 #include "rc.h" // for rcfile
@@ -160,7 +159,7 @@ local_check(const std::string& path)
     // Don't allow local access if starting movie is a network resource.
     if ( VM::isInitialized() )
     {
-       URL baseUrl(VM::get().getSWFUrl());
+       URL baseUrl(VM::get().getRoot().getOriginalURL());
        if ( baseUrl.protocol() != "file" )
        {
           log_security(_("Load of file %s forbidden"
