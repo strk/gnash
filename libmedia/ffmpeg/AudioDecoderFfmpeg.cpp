@@ -200,15 +200,14 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
                 _needsParsing=true;
 				break;
 
-// As of Lavc1d.51.38.0, CODEC_ID_NELLYMOSER isn't available
-// since which version is it available ? 
-#if 0
-            // Enable this to use ffmpeg for nellymoser
-            // decoding (fails in decodeFrame, but probably not Ffmpeg's
-            // fault.
-		    case AUDIO_CODEC_NELLYMOSER:
+#ifdef FFMPEG_NELLYMOSER
+			// NOTE: bjacques found this failing in decodeFrame
+			//       (but probably not Ffmpeg's fault, he said)
+			//       I'd like to take a look at the testcase --strk
+			case AUDIO_CODEC_NELLYMOSER:
 		        codec_id = CODEC_ID_NELLYMOSER;
-		        break;
+				// needs parsing ?
+				break;
 #endif
 
 			default:
