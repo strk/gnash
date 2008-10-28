@@ -407,7 +407,7 @@ nsPluginInstance::threadMain(void)
     DBG("Gnash logging initialized: %s\n", logfilename.c_str());
 
     // Init sound.
-    _sound_handler.reset(gnash::media::create_sound_handler_sdl());
+    _sound_handler.reset(gnash::sound::create_sound_handler_sdl());
     gnash::set_sound_handler(_sound_handler.get());
     DBG("Gnash sound initialized.\n");
 
