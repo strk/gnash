@@ -152,11 +152,12 @@ metadata_loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo&
 
 /// Load a SWF::SERIALNUMBER tag.
 void
-serialnumber_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/);
+serialnumber_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& /*r*/);
 
 /// Load a SWF::DEFINESCENEANDFRAMELABELDATA tag.
 void
-define_scene_frame_label_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/);
+define_scene_frame_label_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/, const RunInfo& /*r*/);
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
