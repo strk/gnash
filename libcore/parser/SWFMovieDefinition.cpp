@@ -29,7 +29,7 @@
 #include "IOChannel.h" // for use
 #include "SWFStream.h"
 #include "GnashImageJpeg.h"
-//#include "fontlib.h"
+#include "RunInfo.h"
 #include "font.h"
 #include "log.h"
 #include "MovieClip.h"
@@ -123,29 +123,29 @@ MovieLoader::isSelfThread() const
 
 // static..
 void
-MovieLoader::execute(MovieLoader& ml, SWFMovieDefinition* md)
+MovieLoader::execute(MovieLoader& ml, SWFMovieDefinition* md, const RunInfo& ri)
 {
 	ml._barrier.wait(); // let _thread assignment happen before going on
-	md->read_all_swf();
+	md->read_all_swf(ri);
 }
 
 bool
-MovieLoader::start()
+MovieLoader::start(const RunInfo& ri)
 {
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	// don't start MovieLoader thread !
-	abort();
-#endif
-	// We have two sanity checks, started() and isSelfThread() which rely
+    std::abort();
+#else
+	// don't start MovieLoader thread() which rely
 	// on boost::thread() returning before they are executed. Therefore,
 	// we must employ locking.
 	// Those tests do seem a bit redundant, though...
 	boost::mutex::scoped_lock lock(_mutex);
 
-	_thread.reset( new boost::thread(boost::bind(execute, boost::ref(*this), &_movie_def)) );
+	_thread.reset(new boost::thread(boost::bind(
+                    execute, boost::ref(*this), &_movie_def, ri)));
 
 	_barrier.wait(); // let execution start befor returning
-
+#endif
 	return true;
 }
 
@@ -439,7 +439,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& u
 
 // Fire up the loading thread
 bool
-SWFMovieDefinition::completeLoad()
+SWFMovieDefinition::completeLoad(const RunInfo& ri)
 {
 
 	// should call this only once
@@ -455,7 +455,7 @@ SWFMovieDefinition::completeLoad()
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
 	// Start the loading frame
-	if ( ! _loader.start() )
+	if ( ! _loader.start(ri) )
 	{
 		log_error(_("Could not start loading thread"));
 		return false;
@@ -471,20 +471,10 @@ SWFMovieDefinition::completeLoad()
 
 #else // undef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
-	read_all_swf();
+	read_all_swf(ri);
 #endif
 
 	return true;
-}
-
-// Read a .SWF movie.
-bool
-SWFMovieDefinition::read(std::auto_ptr<IOChannel> in, const std::string& url)
-{
-
-	if ( ! readHeader(in, url) ) return false;
-
-	return completeLoad();
 }
 
 
@@ -600,7 +590,7 @@ SWFMovieDefinition::load_next_frame_chunk()
 }
 
 void
-SWFMovieDefinition::read_all_swf()
+SWFMovieDefinition::read_all_swf(const RunInfo& ri)
 {
 	assert(_str.get() != NULL);
 

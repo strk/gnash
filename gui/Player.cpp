@@ -237,6 +237,10 @@ Player::init_gui()
 boost::intrusive_ptr<movie_definition>
 Player::load_movie()
 {
+    /// The RunInfo must be initialized by this point to provide resources
+    /// for parsing.
+    assert(_runInfo.get());
+
     boost::intrusive_ptr<gnash::movie_definition> md;
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -365,6 +369,10 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
                                        : URL(_baseurl);
 
+    /// The RunInfo should be populated before parsing.
+    _runInfo.reset(new RunInfo(baseURL.str()));
+    _runInfo->setSoundHandler(_soundHandler.get());
+
     // Load the actual movie.
     _movieDef = load_movie();
     if ( ! _movieDef )
@@ -395,10 +403,6 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height);
-
-    _runInfo.reset(new RunInfo(baseURL.str()));
-        
-    _runInfo->setSoundHandler(_soundHandler.get());
 
     SystemClock clock; // use system clock here...
     movie_root root(*_movieDef, clock, *_runInfo);

@@ -57,6 +57,7 @@ namespace gnash {
 	namespace SWF {
 		class TagLoadersTable;
 	}
+    class RunInfo;
 }
 
 namespace gnash
@@ -80,7 +81,7 @@ public:
 	/// is expected to have already read the SWF
 	/// header and applied a zlib adapter if needed.
 	///
-	bool start();
+	bool start(const RunInfo& ri);
 
 	/// Return true if the MovieLoader thread was started
 	bool started() const;
@@ -101,7 +102,8 @@ private:
 	boost::barrier _barrier;
 
 	/// Entry point for the actual thread
-	static void execute(MovieLoader& ml, SWFMovieDefinition* md);
+	static void execute(MovieLoader& ml, SWFMovieDefinition* md,
+            const RunInfo& ri);
 };
 
 /// The Characters dictionary associated with each SWF file.
@@ -250,9 +252,11 @@ public:
 	/// @return NULL if the label doesn't correspond to an exported
 	///         resource, or if a timeout occurs while scanning the movie.
 	///
-	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& symbol);
+	virtual boost::intrusive_ptr<resource> get_exported_resource(
+            const std::string& symbol);
 
-	virtual void importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports);
+	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
+            Imports& imports);
 
 	void add_character(int character_id, character_def* c);
 
@@ -343,14 +347,6 @@ public:
 		else return &(it->second);
 	}
 
-	/// Calls readHeader() and completeLoad() in sequence.
-	//
-	/// @return false on failure
-	/// 	see description of readHeader() and completeLoad()
-	///	for possible reasons of failures
-	///
-	bool read(std::auto_ptr<IOChannel> in, const std::string& url);
-
 	/// Read the header of the SWF file
 	//
 	/// This function only reads the header of the SWF
@@ -372,7 +368,7 @@ public:
 	///
 	/// @return false if the loading thread could not be started.
 	///
-	bool completeLoad();
+	bool completeLoad(const RunInfo& ri);
 
 	/// \brief
 	/// Ensure that frame number 'framenum' (1-based offset)
@@ -387,7 +383,7 @@ public:
 	/// Currently the TagLoadersTable in use is the
 	/// TagLoadersTable singleton.
 	///
-	void read_all_swf();
+	void read_all_swf(const RunInfo& ri);
 
 	virtual void load_next_frame_chunk();
 
