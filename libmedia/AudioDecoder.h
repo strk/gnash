@@ -90,11 +90,11 @@ public:
 inline boost::uint8_t*
 AudioDecoder::decode(boost::uint8_t*, boost::uint32_t, boost::uint32_t&,
         boost::uint32_t&, bool)
-{ return NULL; }
+{ return 0; }
 
 inline boost::uint8_t*
 AudioDecoder::decode(const EncodedAudioFrame&, boost::uint32_t&)
-{ return NULL; }
+{ return 0; }
 	
 } // gnash.media namespace 
 } // gnash namespace
