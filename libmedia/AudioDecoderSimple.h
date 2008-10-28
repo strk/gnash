@@ -46,7 +46,7 @@ public:
     ///
     /// @throws MediaException on failure
     ///
-	AudioDecoderSimple(AudioInfo& info);
+	AudioDecoderSimple(const AudioInfo& info);
 	
 	/// @param info
 	/// 	SoundInfo class with all the info needed to decode
@@ -55,7 +55,7 @@ public:
     ///
     /// @throws MediaException on failure
     ///
-	AudioDecoderSimple(SoundInfo& info);
+	AudioDecoderSimple(const SoundInfo& info);
 
 	~AudioDecoderSimple();
 
@@ -64,10 +64,10 @@ public:
 private:
 
     // throws MediaException on failure
-	void setup(AudioInfo& info);
+	void setup(const AudioInfo& info);
 
     // throws MediaException on failure
-	void setup(SoundInfo& info);
+	void setup(const SoundInfo& info);
 
 	// codec
 	audioCodecType _codec;

@@ -281,7 +281,7 @@ static void u8_expand(
 }
 
 
-AudioDecoderSimple::AudioDecoderSimple(AudioInfo& info)
+AudioDecoderSimple::AudioDecoderSimple(const AudioInfo& info)
 	:
 	_sampleRate(0),
 	_sampleCount(0),
@@ -294,7 +294,7 @@ AudioDecoderSimple::AudioDecoderSimple(AudioInfo& info)
 		(int)_codec, _codec);
 }
 
-AudioDecoderSimple::AudioDecoderSimple(SoundInfo& info)
+AudioDecoderSimple::AudioDecoderSimple(const SoundInfo& info)
 	:
 	_sampleRate(0),
 	_sampleCount(0),
@@ -313,7 +313,7 @@ AudioDecoderSimple::~AudioDecoderSimple()
 }
 
 void
-AudioDecoderSimple::setup(SoundInfo& info)
+AudioDecoderSimple::setup(const SoundInfo& info)
 {
 	_codec = info.getFormat();
     switch (_codec)
@@ -336,7 +336,7 @@ AudioDecoderSimple::setup(SoundInfo& info)
 }
 
 void
-AudioDecoderSimple::setup(AudioInfo& info)
+AudioDecoderSimple::setup(const AudioInfo& info)
 {
 	if (info.type != FLASH)
     {
