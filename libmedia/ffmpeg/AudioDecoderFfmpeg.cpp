@@ -47,6 +47,15 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
     _needsParsing(false)
 {
     setup(info);
+
+    if ( info.type == CUSTOM ) {
+        log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s)"),
+            _audioCodec->id, _audioCodec->name);
+    } else {
+        log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s) for FLASH codec %d (%s)"),
+            _audioCodec->id, _audioCodec->name,
+            info.codec, (audioCodecType)info.codec);
+    }
 }
 
 AudioDecoderFfmpeg::AudioDecoderFfmpeg(SoundInfo& info)
@@ -56,6 +65,9 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg(SoundInfo& info)
 	_parser(NULL)
 {
     setup(info);
+
+  	log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %s (%d)"),
+		_audioCodec->name, _audioCodec->id);
 }
 
 AudioDecoderFfmpeg::~AudioDecoderFfmpeg()
@@ -150,7 +162,6 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
                 _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; // ?! arbitrary ?
                 break;
 	}
-
 }
 
 void AudioDecoderFfmpeg::setup(const AudioInfo& info)
@@ -312,8 +323,6 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 		throw MediaException(err.str());
 	}
 
-  	log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %s (%d)"),
-		_audioCodec->name, (int)codec_id);
 }
 
 boost::uint8_t*

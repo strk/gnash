@@ -289,6 +289,9 @@ AudioDecoderSimple::AudioDecoderSimple(AudioInfo& info)
 	_is16bit(true)
 {
     setup(info);
+
+  	log_debug(_("AudioDecoderSimple: initialized FLASH codec %s (%d)"),
+		(int)_codec, _codec);
 }
 
 AudioDecoderSimple::AudioDecoderSimple(SoundInfo& info)
@@ -299,6 +302,9 @@ AudioDecoderSimple::AudioDecoderSimple(SoundInfo& info)
 	_is16bit(true)
 {
     setup(info);
+
+  	log_debug(_("AudioDecoderSimple: initialized FLASH codec %s (%d)"),
+		(int)_codec, _codec);
 }
 
 
