@@ -341,7 +341,8 @@ MediaParserFfmpeg::initializeParser()
 		throw IOException("MediaParserFfmpeg couldn't open input stream");
 	}
 
-	log_debug("Parsing FFMPEG media file: %d streams", _formatCtx->nb_streams);
+	log_debug("Parsing FFMPEG media file: format:%s; nstreams:%d", _inputFmt->name, _formatCtx->nb_streams);
+
 	if ( _formatCtx->title[0] )     log_debug(_("  Title:'%s'"), _formatCtx->title);
 	if ( _formatCtx->author[0] )    log_debug(_("  Author:'%s'"), _formatCtx->author);
 	if ( _formatCtx->copyright[0] ) log_debug(_("  Copyright:'%s'"), _formatCtx->copyright);
@@ -351,7 +352,19 @@ MediaParserFfmpeg::initializeParser()
 	// Find first audio and video stream
 	for (unsigned int i = 0; i < (unsigned)_formatCtx->nb_streams; i++)
 	{
-		AVCodecContext* enc = _formatCtx->streams[i]->codec; 
+		AVStream* stream = _formatCtx->streams[i];
+		if ( ! stream ) 
+		{
+			log_debug("Stream %d of FFMPEG media file is null ?", i);
+			continue;
+		}
+
+		AVCodecContext* enc = stream->codec; 
+		if ( ! enc ) 
+		{
+			log_debug("Stream %d of FFMPEG media file has no codec info", i);
+			continue;
+		}
 
 		switch (enc->codec_type)
 		{
