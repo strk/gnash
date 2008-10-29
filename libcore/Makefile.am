@@ -233,7 +233,9 @@ if WIN32
   libgnashcore_la_LIBADD += \
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaParser.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
-	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo
+	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderNellymoser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo 
 else
   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
   	$(top_builddir)/libsound/libgnashsound.la
