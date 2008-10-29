@@ -30,7 +30,6 @@
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
 #include "sound_handler.h" // for creating the "test" sound handlers
-#include "render.h" // for get_render_handler
 #include "RGBA.h" // for rgba class
 #include "FuzzyPixel.h"
 #include "render.h"
