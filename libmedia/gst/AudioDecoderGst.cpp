@@ -165,7 +165,8 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
     bool success = GstUtil::check_missing_plugins(srccaps);
     if (!success) {
         gst_caps_unref(srccaps);
-        throw MediaException(_("Couldn't find a plugin for video type ..."));
+	/// @todo print *which* codec 
+        throw MediaException(_("AudioDecoderGst: couldn't find a plugin for audio type ..."));
     }
 
 
@@ -178,6 +179,7 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
 
     success = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", resampler.c_str(), NULL);
     if (!success) {
+	/// @todo print more about why, and for which codec ...
         throw MediaException(_("AudioDecoderGst: initialisation failed."));      
     }
 
