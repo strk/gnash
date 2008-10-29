@@ -24,6 +24,17 @@
 rcsid="$Id: Sound.as,v 1.1 2008/06/17 12:42:22 strk Exp $";
 #include "check.as"
 
+endOfTest = function()
+{
+#if OUTPUT_VERSION > 5
+    check_totals(95);
+#else
+    check_totals(94);
+#endif
+    play();
+};
+
+
 // test Sound class and interface availability
 
 check_equals(typeof(Sound), 'function');
@@ -225,7 +236,42 @@ c1.removeMovieClip(); // there's an unload handler now
 //       - ...
 
 //-----------------------------------------
+// Test loadSound  (SWF6+ only)
+//----------------------------------------- 
+
+#if OUTPUT_VERSION > 5
+
+s = new Sound();
+s.onSoundComplete = function()
+{
+    clearInterval(intval);
+    pass("onSoundComplete called");
+    endOfTest();
+};
+
+stop();
+
+// streaming sound doesn't need .start() to play...
+s.loadSound(MEDIA(sound1.mp3), true); 
+//s.loadSound(MEDIA(brokenchord.wav), true); 
+
+onSoundCompleteFailed = function()
+{
+    clearInterval(intval);
+    fail("no onSoundComplete arrived after 3 seconds");
+    endOfTest();
+};
+
+note("Waiting 3 seconds for onSoundComplete to be called");
+intval = setInterval(onSoundCompleteFailed, 3000);
+
+#else // OUTPUT_VERSION < 6
+
+endOfTest();
+
+#endif // OUTPUT_VERSION < 6
+
+//-----------------------------------------
 // END OF TEST
 //-----------------------------------------
 
-check_totals(94);
