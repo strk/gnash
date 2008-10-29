@@ -98,21 +98,53 @@ enum videoCodecType
 DSOEXPORT std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
 
 /// Audio codec ids as defined in flash
+//
+/// For some encodings, audio data is organized
+/// in logical frames. The structure of such frames
+/// (header/payload) is codec dependent.
+/// The actual size of each frame may not be known
+/// w/out parsing the encoded stream, as it
+/// might be specified in the header of each frame.
+///
+/// Other encodings are loosier on frames. For these
+/// you can define a frame any way you want, as long
+/// as a frame doesn't contain partial samples.
+///
+/// For FFMPEG, you can NOT construct a parser for the
+/// loosy-framed codecs.
+///
+/// Parser-needing codecs will be documented as such.
+///
 enum audioCodecType
 {
-	/// "Raw" format: linear PCM.
+	/// Linear PCM, unspecified byte order 
+   	//
+   	/// Use of this codec is deprecated (but still supported) due to
+   	/// the unspecified byte order (you can only play >8bit samples
+   	/// in a sane way when the endiannes of encoding and decoding
+   	/// hosts match).
+   	///
+   	/// 90% of the times the actual encoder did run on windows, so
+   	/// it is a good bet to guess for little-endian.
+   	/// 
 	AUDIO_CODEC_RAW = 0,	
 
 	/// ADPCM format, flash's ADPCM is a bit different for normal ADPCM
+	//
+	/// Audio encoded in this format needs non-trivial parsing.
+	///
 	AUDIO_CODEC_ADPCM = 1,
 
 	/// Mp3 format
+   	//
+   	/// Audio encoded in this format needs non-trivial parsing.
+   	///
 	AUDIO_CODEC_MP3 = 2,
 
-	/// 16 bits/sample, little-endian
+	/// Linear PCM, strictly little-endian
 	AUDIO_CODEC_UNCOMPRESSED = 3,
 
-	/// Proprietary simple format
+	/// Proprietary simple format. Always 5Khz mono ?
 	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,
 
 	/// Proprietary simple format
