@@ -56,21 +56,28 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     fi
   ])
 
-  if test x${cross_compiling} = xno; then
+  dnl Try to find avcodec.h ourselves, if not cross compiling {
+  if test x$top_incl_dir = x -a x${cross_compiling} = xno; then
+
     AC_MSG_CHECKING([location of avcodec.h])
-    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
-      if $PKG_CONFIG --exists libavcodec; then
+
+    dnl
+    dnl Try PKG_CONFIG if available
+    dnl
+    if test x"$PKG_CONFIG" != x; then dnl {
+      if $PKG_CONFIG --exists libavcodec; then dnl {
+
         # Some systems return /usr/include/ffmpeg, others /usr/include.
         # We use #include <ffmpeg/avcodec.h> everywhere so weed out funny
         # values into the short form.
 
         # Here pkg-config outputs two spaces on the end, so match those too!
-        ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec | sed 's:/ffmpeg *$::'`
+        ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags-only-I libavcodec | sed 's:/ffmpeg *$::'`
         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
 
         # ac_cv_path_ffmpeg_incl might include several paths (e.g. pointers to
         # external libraries used by ffmpeg). Let's find the right one.
-        for i in `$PKG_CONFIG --cflags-only-I libavcodec |sed -e 's:-I::g'`; do
+        for i in `echo ${ac_cv_path_ffmpeg_incl} | sed -e 's:-I::g'`; do
           if test -e "$i"/avcodec.h -o \
                   -e "$i"/ffmpeg/avcodec.h -o \
                   -e "$i"/libavcodec/avcodec.h; then
@@ -78,32 +85,44 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
             break
           fi
         done
-      else
-        # Let's see if ffmpeg is installed without using pkgconfig...
+
+      fi dnl }
+    fi dnl }
+
+    dnl
+    dnl Try manual scan if PKG_CONFIG wasn't available or could figure
+    dnl
+    if test x$top_incl_dir = x; then dnl {
         for i in /usr/include /usr/local/include /opt/ffmpeg/include; do
-          if test -e "$i"/ffmpeg/avcodec.h -o \
+          if test -e "$i"/avcodec.h -o \
+                  -e "$i"/ffmpeg/avcodec.h -o \
                   -e "$i"/libavcodec/avcodec.h; then
             top_incl_dir="$i"
             break
           fi
         done
-      fi
-      # Again adjust for ffmpeg/ foolery
-      top_incl_dir=`echo "$top_incl_dir" | sed 's:/ffmpeg *$::'`
-      # Gets "" if not installed
-      if test x"$top_incl_dir" != x; then
-        if test -e "$top_incl_dir/ffmpeg/avcodec.h"; then
+    fi dnl }
+
+    dnl
+    dnl See what we got
+    dnl
+    if test x"$top_incl_dir" != x; then dnl {
+        if test -e "$top_incl_dir/avcodec.h"; then
+          avcodec_h="$top_incl_dir/avcodec.h"
+        elif test -e "$top_incl_dir/ffmpeg/avcodec.h"; then
           avcodec_h="$top_incl_dir/ffmpeg/avcodec.h"
-        else
+        elif test -e "$top_incl_dir/libavcodec/avcodec.h"; then
           avcodec_h="$top_incl_dir/libavcodec/avcodec.h"
         fi
-      fi
-    fi
+    fi dnl }
+
     AC_MSG_RESULT($avcodec_h)
+
   fi
+  dnl End of attempt at finding avcodec.h }
 
   dnl incllist is inherited from configure.ac.
-  if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
+  if test x"${top_incl_dir}" = x ; then
     AC_MSG_CHECKING([location of avcodec.h using incllist])
     for i in $incllist; do
       if test -f $i/ffmpeg/avcodec.h; then
@@ -128,7 +147,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     AC_MSG_NOTICE([ffmpeg top include dir is $top_incl_dir])
   fi
 
-  if test x"${ac_cv_path_ffmpeg_incl}" = x; then
+  if test x"${avcodec_h}" = x; then
      dnl We want to bail out all at the end, so it comes with tips about how to fix etc.etc.
      AC_MSG_WARN([Cannot find ffmpeg/avcodec.h.  Use --with-ffmpeg-incl= to specify the location of the *directory* holding avcodec.h])
   else
@@ -287,8 +306,10 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     fi
 
   else
+
     AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
-    ffmpeg_version_check=ok # trust the user-specified dir
+    # ffmpeg_version_check=ok # this is NOT ok, why would it be ?! 
+
   fi
 
   # Eliminate the pointless -I/usr/include, which can happen
