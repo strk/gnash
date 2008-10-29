@@ -260,9 +260,9 @@ int ADPCMDecoder::s_stepsize[STEPSIZE_CT] = {
 // u8_expand allocates the memory for its "data" pointer.
 //
 
-static void u8_expand(
-	unsigned char * &data,
-	unsigned char* input,
+static void
+u8_expand(unsigned char * &data,
+	const unsigned char* input,
 	boost::uint32_t input_size) // This is also the number of u8bit samples
 {
 	boost::scoped_array<boost::uint8_t> in_data ( new boost::uint8_t[input_size] );
@@ -368,7 +368,7 @@ AudioDecoderSimple::setup(const AudioInfo& info)
 }
 
 boost::uint8_t*
-AudioDecoderSimple::decode(boost::uint8_t* input, boost::uint32_t inputSize,
+AudioDecoderSimple::decode(const boost::uint8_t* input, boost::uint32_t inputSize,
         boost::uint32_t& outputSize, boost::uint32_t& decodedBytes,
         bool /*parse*/)
 {

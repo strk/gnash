@@ -65,7 +65,7 @@ public:
 	///
 	/// @todo return a SimpleBuffer by auto_ptr
 	///
-	virtual boost::uint8_t* decode(boost::uint8_t* input,
+	virtual boost::uint8_t* decode(const boost::uint8_t* input,
         boost::uint32_t inputSize, boost::uint32_t& outputSize,
         boost::uint32_t& decodedData, bool parse);
 
@@ -88,7 +88,7 @@ public:
 };
 
 inline boost::uint8_t*
-AudioDecoder::decode(boost::uint8_t*, boost::uint32_t, boost::uint32_t&,
+AudioDecoder::decode(const boost::uint8_t*, boost::uint32_t, boost::uint32_t&,
         boost::uint32_t&, bool)
 { return 0; }
 

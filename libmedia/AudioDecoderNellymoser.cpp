@@ -626,7 +626,8 @@ static void get_sample_bits(float *buf, int *bits)
 	}
 }
 
-static unsigned char get_bits(unsigned char block[NELLY_BLOCK_LEN], int *off, int n)
+static unsigned
+char get_bits(const unsigned char block[NELLY_BLOCK_LEN], int *off, int n)
 {
 	char ret;
 	int boff = *off/8, bitpos = *off%8, mask = (1<<n)-1;
@@ -655,7 +656,8 @@ gimme_random()
 	return uni();
 }
 
-static void nelly_decode_block(nelly_handle* nh, unsigned char block[NELLY_BLOCK_LEN], float audio[256])
+static void
+nelly_decode_block(nelly_handle* nh, const unsigned char block[NELLY_BLOCK_LEN], float audio[256])
 {
 	int i,j;
 	float buf[NELLY_BUF_LEN], pows[NELLY_BUF_LEN];
@@ -835,12 +837,12 @@ void AudioDecoderNellymoser::setup(const AudioInfo& info)
 }
 
 float*
-AudioDecoderNellymoser::decode(boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize)
+AudioDecoderNellymoser::decode(const boost::uint8_t* in_buf, boost::uint32_t inputSize, boost::uint32_t* outputSize)
 {
-        size_t out_buf_size = (inputSize / NELLY_BLOCK_LEN) * 256;
+    size_t out_buf_size = (inputSize / NELLY_BLOCK_LEN) * 256;
 	float* out_buf = new float[out_buf_size];
 	
-	boost::uint8_t* input_ptr = in_buf;
+	const boost::uint8_t* input_ptr = in_buf;
 	float* output_ptr = out_buf;
 
 	while (inputSize > 0) {
@@ -856,7 +858,7 @@ AudioDecoderNellymoser::decode(boost::uint8_t* in_buf, boost::uint32_t inputSize
 }
 
 boost::uint8_t*
-AudioDecoderNellymoser::decode(boost::uint8_t* input,
+AudioDecoderNellymoser::decode(const boost::uint8_t* input,
         boost::uint32_t inputSize, boost::uint32_t& outputSize,
         boost::uint32_t& decodedBytes, bool /*parse*/)
 {

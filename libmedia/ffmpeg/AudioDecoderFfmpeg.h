@@ -60,7 +60,8 @@ public:
 	AudioDecoderFfmpeg(SoundInfo& info);
 	~AudioDecoderFfmpeg();
 
-	boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
+    // See dox in AudioDecoder.h
+	boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse);
 
 	boost::uint8_t* decode(const EncodedAudioFrame& af, boost::uint32_t& outputSize);
 
@@ -69,7 +70,7 @@ private:
 	void setup(const AudioInfo& info);
 	void setup(SoundInfo& info);
 
-	boost::uint8_t* decodeFrame(boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
+	boost::uint8_t* decodeFrame(const boost::uint8_t* input, boost::uint32_t inputSize, boost::uint32_t& outputSize);
 
 	AVCodec* _audioCodec;
 	AVCodecContext* _audioCodecCtx;
@@ -99,8 +100,8 @@ private:
     ///
     /// @return number of input bytes parsed, or -1 on error
     ///
-    int parseInput(boost::uint8_t* input, boost::uint32_t inputSize,
-            boost::uint8_t** outFrame, int* outFrameSize);
+    int parseInput(const boost::uint8_t* input, boost::uint32_t inputSize,
+            boost::uint8_t const ** outFrame, int* outFrameSize);
 };
 	
 } // gnash.media.ffmpeg namespace 

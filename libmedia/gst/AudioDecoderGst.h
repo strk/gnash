@@ -53,7 +53,7 @@ public:
 
     ~AudioDecoderGst();
 
-    boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize,
+    boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize,
                            boost::uint32_t& outputSize, boost::uint32_t& decodedData,
                            bool /*parse*/);
     boost::uint8_t* decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize);

@@ -328,8 +328,10 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 }
 
 boost::uint8_t*
-AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize,
-        boost::uint32_t& outputSize, boost::uint32_t& decodedBytes, bool parse)
+AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
+        boost::uint32_t inputSize, boost::uint32_t&
+        outputSize, boost::uint32_t& decodedBytes,
+        bool parse)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -362,7 +364,7 @@ AudioDecoderFfmpeg::decode(boost::uint8_t* input, boost::uint32_t inputSize,
 	decodedBytes = 0; // nothing decoded yet
 	while (decodedBytes < inputSize)
 	{
-		boost::uint8_t* frame=0; // parsed frame (pointer into input)
+		const boost::uint8_t* frame=0; // parsed frame (pointer into input)
 		int framesize; // parsed frame size
 
 		int consumed = parseInput(input+decodedBytes,
@@ -455,7 +457,7 @@ AudioDecoderFfmpeg::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputS
 }
 
 boost::uint8_t*
-AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input,
+AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         boost::uint32_t inputSize, boost::uint32_t& outputSize)
 {
 	//GNASH_REPORT_FUNCTION;
@@ -477,7 +479,10 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input,
         inputSize, _audioCodecCtx->channels, _audioCodecCtx->frame_size);
 #endif
 
-	int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize, input, inputSize);
+	int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize,
+                                   // older ffmpeg versions didn't accept a const input..
+                                   const_cast<boost::uint8_t*>(input),
+                                   inputSize);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
 	log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) returned %d; set frame_size=%d",
@@ -574,13 +579,17 @@ AudioDecoderFfmpeg::decodeFrame(boost::uint8_t* input,
 }
 
 int
-AudioDecoderFfmpeg::parseInput(boost::uint8_t* input, boost::uint32_t inputSize,
-        boost::uint8_t** outFrame, int* outFrameSize)
+AudioDecoderFfmpeg::parseInput(const boost::uint8_t* input,
+        boost::uint32_t inputSize,
+        boost::uint8_t const ** outFrame, int* outFrameSize)
 {
     if ( _needsParsing )
     {
         return av_parser_parse(_parser, _audioCodecCtx,
-                    outFrame, outFrameSize,
+                    // as of 2008-10-28 SVN, ffmpeg doesn't
+                    // accept a pointer to pointer to const..
+                    const_cast<boost::uint8_t**>(outFrame),
+                    outFrameSize,
                     input, inputSize,
                     0, 0); // pts & dts
     }
