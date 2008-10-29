@@ -34,10 +34,12 @@ namespace sound {
 //
 /// This holds the following resources:
 ///     - sound::sound_handler
-///     - StreamProvider (currently unused)
-///
+///     - StreamProvider
 /// In addition, it stores the constant base URL for the run.
-/// @todo   Add render_handler, MediaHandler(?).
+/// This must be kept alive for the entire duration of a run (presently
+/// until the last SWFMovieDefinition has been destroyed).
+/// @todo Check the lifetime and update documentation if it changes.
+/// @todo   Add render_handler, MediaHandler.
 class RunInfo
 {
 public:

@@ -232,7 +232,12 @@ private:
     /// some sound_samples are destroyed in the dtor of SWFMovieDefinition,
     /// which is called by the Gui's dtor. This means that the RunInfo
     /// and sound::sound_handler must still be alive. Initializing them
-    /// later ensures that this is the case.
+    /// later ensures that this is the case. It is still a good idea to
+    /// initialize _gui after _runInfo.
+    //
+    /// Moreover, _movieDef (the SWFMovieDefinition) would also prevent
+    /// destruction of a SWFMovieDefinition if it is not initialized after
+    /// _gui, and probably result in a segfault.
     //
     /// @todo   This is hairy, and the core should be sorted out so that
     ///         sound_sample knows about its sound::sound_handler without
@@ -241,9 +246,13 @@ private:
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
 
+    /// Handlers (for sound etc) for a libcore run.
+    //
+    /// This must be kept alive for the entire lifetime of the movie_root
+    /// (currently: of the Gui).
     std::auto_ptr<RunInfo> _runInfo;
 
-    /// This must be initialized after _runInfo.
+    /// This must be initialized after _runInfo
 	std::auto_ptr<Gui> _gui;
 
     std::string _url;
