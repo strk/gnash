@@ -235,7 +235,12 @@ if WIN32
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderNellymoser.lo \
-	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo 
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioResampler.lo 
+if HAVE_SPEEX
+  libgnashcore_la_LIBADD += \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSpeex.lo
+endif
 else
   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
   	$(top_builddir)/libsound/libgnashsound.la
