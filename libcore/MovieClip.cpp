@@ -4823,8 +4823,10 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
             log_debug(_("Posting data '%s' to url '%s'"), postdata, url.str());
         }
         
+        const movie_root& mr = _vm.getRoot();
+
         boost::intrusive_ptr<movie_definition> md (
-                create_library_movie(url, NULL, true, postdata) );
+                create_library_movie(url, mr.runInfo(), NULL, true, postdata));
 
         if (!md)
         {

@@ -237,6 +237,10 @@ Player::init_gui()
 boost::intrusive_ptr<movie_definition>
 Player::load_movie()
 {
+    /// The RunInfo must be initialized by this point to provide resources
+    /// for parsing.
+    assert(_runInfo.get());
+
     boost::intrusive_ptr<gnash::movie_definition> md;
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -254,8 +258,9 @@ Player::load_movie()
     try {
         if ( _infile == "-" )
         {
-            std::auto_ptr<IOChannel> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
-            md = gnash::create_movie(in, _url, false);
+            std::auto_ptr<IOChannel> in (
+                    noseek_fd_adapter::make_stream(fileno(stdin)));
+            md = gnash::create_movie(in, _url, *_runInfo, false);
         }
         else
         {
@@ -275,7 +280,8 @@ Player::load_movie()
             }
 
             // _url should be always set at this point...
-            md = gnash::create_library_movie(url, _url.c_str(), false);
+            md = gnash::create_library_movie(url, *_runInfo, _url.c_str(),
+                    false);
         }
     } catch (const GnashException& er) {
         std::cerr << er.what() << std::endl;
@@ -365,6 +371,10 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
                                        : URL(_baseurl);
 
+    /// The RunInfo should be populated before parsing.
+    _runInfo.reset(new RunInfo(baseURL.str()));
+    _runInfo->setSoundHandler(_soundHandler.get());
+
     // Load the actual movie.
     _movieDef = load_movie();
     if ( ! _movieDef )
@@ -395,10 +405,6 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height);
-
-    _runInfo.reset(new RunInfo(baseURL.str()));
-        
-    _runInfo->setSoundHandler(_soundHandler.get());
 
     SystemClock clock; // use system clock here...
     movie_root root(*_movieDef, clock, *_runInfo);
@@ -694,6 +700,7 @@ Player::~Player()
 {
     if (_movieDef.get())
     {
-            log_debug("~Player - _movieDef refcount: %d (1 will be dropped now)", _movieDef->get_ref_count());
+        log_debug("~Player - _movieDef refcount: %d (1 will be dropped "
+                "now)", _movieDef->get_ref_count());
     }
 }

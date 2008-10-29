@@ -54,7 +54,8 @@ RemoveObjectTag::execute(MovieClip* m, DisplayList& dlist) const
 
 /* public static */
 void
-RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
+RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& /*r*/)
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 

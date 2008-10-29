@@ -63,7 +63,8 @@ public:
 	///	The stream associated with the sprite. It is assumed
 	///	to be already positioned right before the frame count
 	///
-	sprite_definition(movie_definition& m, SWFStream& in);
+	sprite_definition(movie_definition& m, SWFStream& in,
+            const RunInfo& runInfo);
 
 	/// \brief
 	/// Create an empty sprite
@@ -248,7 +249,7 @@ public:
 
 private:
 
-	void read(SWFStream& in);
+	void read(SWFStream& in, const RunInfo& runInfo);
 
 	/// Tags loader table.
 	//
@@ -320,12 +321,6 @@ private:
 			return false;
 		}
 		return true;
-	}
-
-	virtual void load_next_frame_chunk()
-	{
-		/// We load full sprite definitions at once, so
-		/// this function is a no-op.
 	}
 
 	const rect&	get_bound() const {

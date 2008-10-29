@@ -405,8 +405,9 @@ movie_root::dropLevel(int depth)
 bool
 movie_root::loadLevel(unsigned int num, const URL& url)
 {
-	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
-	if (md == NULL)
+	boost::intrusive_ptr<movie_definition> md (
+            create_library_movie(url, _runInfo));
+	if (!md)
 	{
 		log_error(_("can't create movie_definition for %s"),
 			url.str());

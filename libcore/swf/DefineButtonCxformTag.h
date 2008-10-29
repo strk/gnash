@@ -36,7 +36,8 @@ namespace SWF {
 class DefineButtonCxformTag
 {
 public:
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m)
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& /*r*/)
     {
 
         assert(tag == SWF::DEFINEBUTTONCXFORM);

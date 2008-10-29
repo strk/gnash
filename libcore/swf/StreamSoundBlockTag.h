@@ -32,6 +32,7 @@
 namespace gnash {
 	class SWFStream;
 	class movie_definition;
+	class RunInfo;
 }
 
 namespace gnash {
@@ -81,7 +82,7 @@ public:
 	void execute(MovieClip* m, DisplayList& /*dlist*/) const;
 
 	/// Load an SWF::SOUNDSTREAMBLOCK (19) tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r);
 
 	/// Not a "state" (DisplayList?) tag, do doesn't need to provide execute_state
 	//void execute_state(MovieClip* m) const {}

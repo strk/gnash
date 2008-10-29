@@ -203,8 +203,8 @@ Sound::loadSound(const std::string& file, bool streaming)
     const movie_root& mr = _vm.getRoot();
 	URL url(file, mr.runInfo().baseURL());
 
-	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-	std::auto_ptr<IOChannel> inputStream( streamProvider.getStream( url ) );
+	StreamProvider& streamProvider = mr.runInfo().streamProvider();
+	std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url));
 	if ( ! inputStream.get() )
 	{
 		log_error( _("Gnash could not open this url: %s"), url );

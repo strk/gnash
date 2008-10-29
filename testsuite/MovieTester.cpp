@@ -30,7 +30,6 @@
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
 #include "sound_handler.h" // for creating the "test" sound handlers
-#include "render.h" // for get_render_handler
 #include "RGBA.h" // for rgba class
 #include "FuzzyPixel.h"
 #include "render.h"
@@ -74,12 +73,21 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize gnash code lib
 	gnashInit();
 
+	// Initialize the testing media handlers
+	initTestingMediaHandlers();
+
+	// Initialize the sound handler(s)
+	initTestingSoundHandlers();
+
+    _runInfo.reset(new RunInfo(url));
+    _runInfo->setSoundHandler(_sound_handler.get());
+
 	if ( url == "-" )
 	{
 		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
-		_movie_def = gnash::create_movie(in, url, false);
+		_movie_def = gnash::create_movie(in, url, *_runInfo, false);
 	}
 	else
 	{
@@ -99,22 +107,14 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 		}
 		// _url should be always set at this point...
-		_movie_def = gnash::create_library_movie(urlObj, NULL, false);
+		_movie_def = gnash::create_library_movie(urlObj, *_runInfo,
+                NULL, false);
 	}
 
 	if ( ! _movie_def )
 	{
 		throw GnashException("Could not load movie from "+url);
 	}
-
-	// Initialize the testing media handlers
-	initTestingMediaHandlers();
-
-	// Initialize the sound handler(s)
-	initTestingSoundHandlers();
-
-    _runInfo.reset(new RunInfo(url));
-    _runInfo->setSoundHandler(_sound_handler.get());
 
 	_movie_root = new movie_root(*_movie_def, _clock, *_runInfo);
 

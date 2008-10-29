@@ -34,22 +34,25 @@ namespace sound {
 //
 /// This holds the following resources:
 ///     - sound::sound_handler
-///     - StreamProvider (currently unused)
-///
+///     - StreamProvider
 /// In addition, it stores the constant base URL for the run.
-/// @todo   Add render_handler, MediaHandler(?).
+/// This must be kept alive for the entire duration of a run (presently
+/// until the last SWFMovieDefinition has been destroyed).
+/// @todo Check the lifetime and update documentation if it changes.
+/// @todo   Add render_handler, MediaHandler.
 class RunInfo
 {
 public:
 
     /// Constructs a RunInfo instance with an immutable base URL.
     //
-    /// @param md       The movie_definition of the original movie_root
-    ///                 This is used for storing the original URL.
+    /// @param baseURL  The base URL for the run. This cannot be changed after
+    ///                 construction.
     RunInfo(const std::string& baseURL)
         :
         _baseURL(baseURL),
-        _streamProvider(StreamProvider::getDefaultInstance())
+        _streamProvider(StreamProvider::getDefaultInstance()),
+        _soundHandler(0)
     {
     }
 
@@ -60,13 +63,19 @@ public:
 
     /// Get a StreamProvider instance.
     //
-    /// @return     The default StreamProvider.
+    /// This isn't optional. It must always be available, or nothing
+    /// can be loaded.
+    //
+    /// @return     A StreamProvider (presently a global singleton).
     StreamProvider& streamProvider() const { return _streamProvider; }
 
     /// Set the sound::sound_handler.
     //
     /// @param s    A pointer to the sound::sound_handler for use
     ///             by Gnash core. This may also be NULL.
+    //
+    /// This is cached in various places, so changing it during a run will
+    /// lead to unexpected behaviour.
     void setSoundHandler(sound::sound_handler* s) {
         _soundHandler = s;
     } 

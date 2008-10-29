@@ -92,8 +92,8 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-    const movie_root& mr = _vm.getRoot();
-	URL url(urlstr, mr.runInfo().baseURL());
+    const RunInfo& ri = _vm.getRoot().runInfo();
+	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
 	if (post)
@@ -154,8 +154,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
         toString(data, false);
 
         /// It doesn't matter if there are no request headers.
-        str = StreamProvider::getDefaultInstance().getStream(url,
-                                                    data.str(), headers);
+        str = ri.streamProvider().getStream(url, data.str(), headers);
     }
 	else
     {
@@ -166,7 +165,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
 
     	std::string getURL = urlstr + "?" + data.str();
         log_debug("Using GET method for sendAndLoad: %s", getURL);
-        str = StreamProvider::getDefaultInstance().getStream(getURL);
+        str = ri.streamProvider().getStream(getURL);
     }
 
 	if (!str.get()) 
@@ -190,11 +189,11 @@ LoadableObject::load(const std::string& urlstr)
     // when loading is complete.
 	set_member(NSV::PROP_LOADED, false);
 
-    const movie_root& mr = _vm.getRoot();
-	URL url(urlstr, mr.runInfo().baseURL());
+    const RunInfo& ri = _vm.getRoot().runInfo();
+	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
-    std::auto_ptr<IOChannel> str(StreamProvider::getDefaultInstance().getStream(url));
+    std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
 
 	if (!str.get()) 
 	{

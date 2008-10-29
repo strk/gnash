@@ -485,15 +485,6 @@ public:
 		return true;
 	}
 
-	/// \brief
-	/// Load next chunk of this movie/sprite frames if available.
-	//
-	/// The default implementation is a no-op
-	///
-	virtual void load_next_frame_chunk() 
-	{
-	}
-
 #ifdef USE_SWFTREE
 
 	// These methods attach the contents of the METADATA tag
