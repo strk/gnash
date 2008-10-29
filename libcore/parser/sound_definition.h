@@ -21,6 +21,7 @@
 
 #include "resource.h" // for sound_sample inheritance
 #include "ControlTag.h" // for sound tags inheritance
+#include "RunInfo.h" // TODO: drop.
 
 // Forward declarations
 namespace gnash {
@@ -47,23 +48,32 @@ namespace gnash {
 /// QUESTION: why is this a resource ?
 ///           does it really need to be ref-counted ?
 ///
-/// @todo move definition to sound_handler.h and possibly nest inside sound_handler itself ?
-///
-///
+/// @todo move definition to sound_handler.h and possibly nest
+/// inside sound_handler itself ?
+/// @todo   work out why this is a resource, what a resource is useful for,
+///         and if it really needs access to a sound_handler rather than
+///         belonging to it.
 class sound_sample: public resource
 {
 public:
 	int	m_sound_handler_id;
 
-	sound_sample(int id)
+	sound_sample(int id, const RunInfo& r)
 		:
-		m_sound_handler_id(id)
+		m_sound_handler_id(id),
+        _runInfo(r)
 	{
 	}
 
 	/// delete the actual sound sample from the currently registered
 	/// sound handler.
 	~sound_sample();
+
+    /// This is necessary because at least some sound_samples are
+    /// destroyed after the movie_root has been destroyed, so that
+    /// access through the VM (which assumes movie_root exists) causes
+    /// a segfault.
+    const RunInfo& _runInfo;
 
 	sound_sample* cast_to_sound_sample() { return this; }
 };

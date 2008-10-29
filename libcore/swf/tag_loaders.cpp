@@ -1224,7 +1224,8 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m,
     if ( sample_rate_in >= s_sample_rate_table_len ) 
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINESOUNDLOADER: sound sample rate %d (expected 0 to %u"), 
+        log_swferror(_("DEFINESOUNDLOADER: sound sample rate %d (expected "
+                "0 to %u"), 
             sample_rate_in, s_sample_rate_table_len);
         );
         sample_rate_in = 0;
@@ -1283,17 +1284,21 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m,
         std::auto_ptr<SimpleBuffer> data( new SimpleBuffer(allocSize) );
 
         // dataLength is already calculated from the end of the tag, which
-        // should be inside the end of the file. TODO: check that this is the case.
-        const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data->data()), dataLength);
+        // should be inside the end of the file. TODO: check that this is 
+        // the case.
+        const unsigned int bytesRead = in.read(
+                reinterpret_cast<char*>(data->data()), dataLength);
         data->resize(bytesRead); // in case it's shorter...
         if (bytesRead < dataLength)
         {
-            throw ParserException(_("Tag boundary reported past end of SWFStream!"));
+            throw ParserException(_("Tag boundary reported past end of "
+                        "SWFStream!"));
         }
 
         // Store all the data in a SoundInfo object
         std::auto_ptr<media::SoundInfo> sinfo;
-        sinfo.reset(new media::SoundInfo(format, stereo, sample_rate, sample_count, sample_16bit));
+        sinfo.reset(new media::SoundInfo(format, stereo, sample_rate,
+                    sample_count, sample_16bit));
 
         // Stores the sounddata in the soundhandler, and the ID returned
         // can be used to starting, stopping and deleting that sound
@@ -1301,7 +1306,7 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
         if (handler_id >= 0)
         {
-        sound_sample* sam = new sound_sample(handler_id);
+        sound_sample* sam = new sound_sample(handler_id, r);
         m.add_sound_sample(character_id, sam);
         }
 

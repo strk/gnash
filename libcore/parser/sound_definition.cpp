@@ -15,7 +15,7 @@ namespace gnash {
 
 sound_sample::~sound_sample()
 {
-    sound::sound_handler* s = VM::get().getRoot().runInfo().soundHandler();
+    sound::sound_handler* s = _runInfo.soundHandler();
 	
 	if (s)
 	{

@@ -700,6 +700,7 @@ Player::~Player()
 {
     if (_movieDef.get())
     {
-            log_debug("~Player - _movieDef refcount: %d (1 will be dropped now)", _movieDef->get_ref_count());
+        log_debug("~Player - _movieDef refcount: %d (1 will be dropped "
+                "now)", _movieDef->get_ref_count());
     }
 }

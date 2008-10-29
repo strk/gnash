@@ -226,15 +226,27 @@ private:
 
 	std::string _baseurl;
 
-	std::auto_ptr<Gui> _gui;
 
-    std::auto_ptr<RunInfo> _runInfo;
-
+    /// Initialization / destruction order is important here.
+    //
+    /// some sound_samples are destroyed in the dtor of SWFMovieDefinition,
+    /// which is called by the Gui's dtor. This means that the RunInfo
+    /// and sound::sound_handler must still be alive. Initializing them
+    /// later ensures that this is the case.
+    //
+    /// @todo   This is hairy, and the core should be sorted out so that
+    ///         sound_sample knows about its sound::sound_handler without
+    ///         needing a RunInfo.
     std::auto_ptr<sound::sound_handler> _soundHandler;
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
 
-	std::string _url;
+    std::auto_ptr<RunInfo> _runInfo;
+
+    /// This must be initialized after _runInfo.
+	std::auto_ptr<Gui> _gui;
+
+    std::string _url;
 
 	std::string _infile;
 

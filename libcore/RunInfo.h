@@ -60,7 +60,10 @@ public:
 
     /// Get a StreamProvider instance.
     //
-    /// @return     The default StreamProvider.
+    /// This isn't optional. It must always be available, or nothing
+    /// can be loaded.
+    //
+    /// @return     A StreamProvider (presently a global singleton).
     StreamProvider& streamProvider() const { return _streamProvider; }
 
     /// Set the sound::sound_handler.
