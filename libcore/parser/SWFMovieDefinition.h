@@ -81,7 +81,7 @@ public:
 	/// is expected to have already read the SWF
 	/// header and applied a zlib adapter if needed.
 	///
-	bool start(const RunInfo& ri);
+	bool start();
 
 	/// Return true if the MovieLoader thread was started
 	bool started() const;
@@ -102,8 +102,8 @@ private:
 	boost::barrier _barrier;
 
 	/// Entry point for the actual thread
-	static void execute(MovieLoader& ml, SWFMovieDefinition* md,
-            const RunInfo& ri);
+	static void execute(MovieLoader& ml, SWFMovieDefinition* md);
+
 };
 
 /// The Characters dictionary associated with each SWF file.
@@ -119,7 +119,8 @@ public:
 	//
 	/// It contains pairs of 'int' and 'boost::intrusive_ptr<character_def>'
 	///
-	typedef std::map< int, boost::intrusive_ptr<character_def> > CharacterContainer;
+	typedef std::map<int, boost::intrusive_ptr<character_def> >
+        CharacterContainer;
 
 	typedef CharacterContainer::iterator CharacterIterator;
 
@@ -169,7 +170,7 @@ private:
 };
 
 
-/// Immutable definition of a movie's contents.
+/// Immutable definition of a SWF movie's contents.
 //
 /// It cannot be played directly, and does not hold
 /// current state; for that you need to call create_movie_instance()
@@ -179,7 +180,11 @@ class SWFMovieDefinition : public movie_definition
 {
 public:
 
-	SWFMovieDefinition();
+    /// Construct a SWF movie.
+    //
+    /// @param runInfo      A RunInfo containing information used for
+    ///                     parsing.
+	SWFMovieDefinition(const RunInfo& runInfo);
 
 	~SWFMovieDefinition();
 
@@ -368,7 +373,7 @@ public:
 	///
 	/// @return false if the loading thread could not be started.
 	///
-	bool completeLoad(const RunInfo& ri);
+	bool completeLoad();
 
 	/// \brief
 	/// Ensure that frame number 'framenum' (1-based offset)
@@ -383,7 +388,7 @@ public:
 	/// Currently the TagLoadersTable in use is the
 	/// TagLoadersTable singleton.
 	///
-	void read_all_swf(const RunInfo& ri);
+	void read_all_swf();
 
 	/// Create an instance of this movie.
 	//
@@ -445,7 +450,8 @@ private:
 	typedef std::map<int, boost::intrusive_ptr<font> > FontMap;
 	FontMap m_fonts;
 
-	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> > BitmapMap;
+	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> >
+        BitmapMap;
 	BitmapMap m_bitmap_characters;
 
 	typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;
@@ -463,7 +469,8 @@ private:
 	// Mutex protecting access to _namedFrames
 	mutable boost::mutex _namedFramesMutex;
 
-	typedef std::map<std::string, boost::intrusive_ptr<resource>, StringNoCaseLessThen > ExportMap;
+	typedef std::map<std::string, boost::intrusive_ptr<resource>,
+            StringNoCaseLessThen > ExportMap;
 	ExportMap _exportedResources;
 
 	// Mutex protecting access to _exportedResources
@@ -515,8 +522,6 @@ private:
 	/// thread will read it.
 	///
 	mutable boost::mutex _bytes_loaded_mutex;
-
-
 
 	int	m_loading_sound_stream;
 	boost::uint32_t	m_file_length;
@@ -570,7 +575,8 @@ protected:
 	/// Reachable resources are:
 	///	- fonts (m_fonts)
 	///	- bitmap characters (m_bitmap_characters)
-	///	- bitmaps (m_bitmap_list) [ what's the difference with bitmap chracters ?? ]
+	///	- bitmaps (m_bitmap_list) [ what's the difference with bitmap
+    ///   characters ?? ]
 	///	- sound samples (m_sound_samples)
 	///	- exports (m_exports)
 	///	- imported movies (m_import_source_movies)
@@ -580,6 +586,16 @@ protected:
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
+
+private:
+
+    /// Used to retrieve the sound::sound_handler and other resources
+    /// for parsing.
+    //
+    /// @todo   Add to base class? This would make it available for other
+    ///         kinds of movies (e.g. FLV) and make it easier to initialize
+    ///         movie_root with the same RunInfo as its first definition.
+    const RunInfo& _runInfo;
 
 };
 

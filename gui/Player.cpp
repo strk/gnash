@@ -431,7 +431,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     //       keeping it alive, as Gui might as well, but why relying
     //       on luck ? So we made sure to keep _movieDef by 
     //       intrusive_ptr...
-    _movieDef->completeLoad(*_runInfo);
+    _movieDef->completeLoad();
 
     _gui->setMovieDefinition(_movieDef.get());
 

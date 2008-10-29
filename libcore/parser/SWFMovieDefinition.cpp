@@ -123,14 +123,14 @@ MovieLoader::isSelfThread() const
 
 // static..
 void
-MovieLoader::execute(MovieLoader& ml, SWFMovieDefinition* md, const RunInfo& ri)
+MovieLoader::execute(MovieLoader& ml, SWFMovieDefinition* md)
 {
 	ml._barrier.wait(); // let _thread assignment happen before going on
-	md->read_all_swf(ri);
+	md->read_all_swf();
 }
 
 bool
-MovieLoader::start(const RunInfo& ri)
+MovieLoader::start()
 {
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
     std::abort();
@@ -142,7 +142,7 @@ MovieLoader::start(const RunInfo& ri)
 	boost::mutex::scoped_lock lock(_mutex);
 
 	_thread.reset(new boost::thread(boost::bind(
-                    execute, boost::ref(*this), &_movie_def, ri)));
+                    execute, boost::ref(*this), &_movie_def)));
 
 	_barrier.wait(); // let execution start befor returning
 
@@ -191,7 +191,7 @@ static void	dumpTagBytes(SWFStream& in, std::ostream& os)
 // SWFMovieDefinition
 //
 
-SWFMovieDefinition::SWFMovieDefinition()
+SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
 	:
 	// FIXME: use a class-static TagLoadersTable for SWFMovieDefinition
 #ifdef USE_SWFTREE
@@ -209,7 +209,8 @@ SWFMovieDefinition::SWFMovieDefinition()
 	m_file_length(0),
 	m_jpeg_in(0),
 	_loader(*this),
-	_loadingCanceled(false)
+	_loadingCanceled(false),
+    _runInfo(runInfo)
 {
 }
 
@@ -220,15 +221,16 @@ SWFMovieDefinition::~SWFMovieDefinition()
 	_loadingCanceled = true;
 
 	// Release frame tags
-	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end(); i!=e; ++i)
+	for (PlayListMap::iterator i = m_playlist.begin(),
+            e = m_playlist.end(); i != e; ++i)
 	{
 		PlayList& pl = i->second;
 
-		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
+		for (PlayList::iterator j = pl.begin(), je = pl.end(); j!=je; ++j)
 		{
-                    delete *j;
-                }
+            delete *j;
         }
+    }
 
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
@@ -248,7 +250,8 @@ SWFMovieDefinition::get_character_def(int character_id)
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 
-	boost::intrusive_ptr<character_def> ch = _dictionary.get_character(character_id);
+	boost::intrusive_ptr<character_def> ch = 
+        _dictionary.get_character(character_id);
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
 #endif // ndef GNASH_USE_GC
@@ -439,7 +442,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& u
 
 // Fire up the loading thread
 bool
-SWFMovieDefinition::completeLoad(const RunInfo& ri)
+SWFMovieDefinition::completeLoad()
 {
 
 	// should call this only once
@@ -455,7 +458,7 @@ SWFMovieDefinition::completeLoad(const RunInfo& ri)
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
 	// Start the loading frame
-	if ( ! _loader.start(ri) )
+	if ( ! _loader.start() )
 	{
 		log_error(_("Could not start loading thread"));
 		return false;
@@ -471,7 +474,7 @@ SWFMovieDefinition::completeLoad(const RunInfo& ri)
 
 #else // undef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
-	read_all_swf(ri);
+	read_all_swf();
 #endif
 
 	return true;
@@ -550,9 +553,9 @@ CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c
 
 
 void
-SWFMovieDefinition::read_all_swf(const RunInfo& runInfo)
+SWFMovieDefinition::read_all_swf()
 {
-	assert(_str.get() != NULL);
+	assert(_str.get());
 
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	assert( _loader.isSelfThread() );
@@ -628,7 +631,7 @@ parse_tag:
                 {
 			// call the tag loader.  The tag loader should add
 			// characters or tags to the movie data structure.
-			(*lf)(str, tag_type, *this, runInfo);
+			(*lf)(str, tag_type, *this, _runInfo);
 		}
 		else
 		{

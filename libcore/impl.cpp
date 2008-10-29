@@ -326,20 +326,12 @@ create_swf_movie(std::auto_ptr<IOChannel> in, const std::string& url,
         const RunInfo& runInfo, bool startLoaderThread)
 {
 
-  // Avoid leaks on error 
-  std::auto_ptr<SWFMovieDefinition> m ( new SWFMovieDefinition() );
+    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
 
-  if ( ! m->readHeader(in, url) )
-  {
-    return NULL;
-  }
+    if (!m->readHeader(in, url)) return 0;
+    if (startLoaderThread && !m->completeLoad()) return 0;
 
-  if ( startLoaderThread && ! m->completeLoad(runInfo) )
-  {
-    return NULL;
-  }
-
-  return m.release();
+    return m.release();
 }
 
 movie_definition*
@@ -391,7 +383,7 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
 
   std::auto_ptr<IOChannel> in;
 
-  StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
+  StreamProvider& streamProvider = runInfo.streamProvider();
 
   if ( postdata ) in = streamProvider.getStream(url, *postdata);
   else in = streamProvider.getStream(url);
@@ -624,18 +616,10 @@ movie_definition* create_library_movie(const URL& url, const RunInfo& runInfo,
                     "a POST)"), cache_label, mov->get_version());
     }
 
-    // Now complete the load if the movie is an SWF movie
+    /// Now complete the load if the movie is an SWF movie
     // 
-    // FIXME: add completeLoad() to movie_definition class
-    //        to allow loads of JPEG to use a loader thread
-    //        too...
-    if ( startLoaderThread )
-    {
-        SWFMovieDefinition* mdi = dynamic_cast<SWFMovieDefinition*>(mov);
-        if ( mdi ) {
-            mdi->completeLoad(runInfo);
-        }
-    }
+    /// This is a no-op except for SWF movies.
+    if (startLoaderThread) mov->completeLoad();
 
     return mov;
 }
