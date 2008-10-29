@@ -36,6 +36,7 @@
 #include "AudioDecoder.h" // is this really needed for scoped_ptr ?
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -174,6 +175,13 @@ private:
     static as_value probeAudioWrapper(const fn_call&);
 
     int _probeTimer;
+
+    bool _soundCompleted;
+
+    boost::mutex _soundCompletedMutex;
+
+    /// Thread-safe setter for _soundCompleted
+    void markSoundCompleted(bool completed);
 };
 
 void sound_class_init(as_object& global);

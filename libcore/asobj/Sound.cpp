@@ -33,12 +33,17 @@
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "timers.h" // for registering the probe timer
+#include "namedStrings.h"
 
 #include "StreamProvider.h"
 
 
 #include "Sound.h"
 #include <string>
+
+// Define the macro below to get some more DEBUG
+// lines while Sound is at work
+//#define GNASH_DEBUG_SOUND_AS
 
 namespace gnash {
 
@@ -76,7 +81,8 @@ Sound::Sound()
 	_leftOverSize(0),
 	isAttached(false),
 	remainingLoops(0),
-    _probeTimer(0)
+    _probeTimer(0),
+    _soundCompleted(false)
 {
 }
 
@@ -226,7 +232,12 @@ Sound::loadSound(const std::string& file, bool streaming)
 	if ( isStreaming )
 	{
 		startProbeTimer();
-	} // if not streaming, we'll probe on .start()
+	}
+    else
+    {
+        LOG_ONCE(log_unimpl("Non-streaming Sound.loadSound: will behave as a streaming one"));
+        // if not streaming, we'll probe on .start()
+    }
 }
 
 int
@@ -239,9 +250,10 @@ Sound::attachAuxStreamerIfNeeded()
 	_audioDecoder.reset(_mediaHandler->createAudioDecoder(*audioInfo).release());
 
 	// start playing ASAP, a call to ::start will just change _startTime
+#ifdef GNASH_DEBUG_SOUND_AS
 	log_debug("Attaching the aux streamer");
+#endif
 	_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
-	isAttached = true;
     return 1;
 }
 
@@ -460,6 +472,8 @@ Sound::getAudio(boost::uint8_t* stream, int len)
 				// or detach and stop here...
 				// (should really honour loopings if any, but that should be only done for non-streaming sound!)
 				//log_debug("Parsing complete and no more audio frames in input, detaching");
+
+                markSoundCompleted(true);
 				return false; // will detach us (we should change isAttached, but need thread safety!)
 			}
 
@@ -938,7 +952,7 @@ Sound::startProbeTimer()
 	boost::intrusive_ptr<builtin_function> cb = \
 		new builtin_function(&Sound::probeAudioWrapper);
 	std::auto_ptr<Timer> timer(new Timer);
-	unsigned long delayMS = 83; // 12 times each second...
+	unsigned long delayMS = 500; // 2 times each second (83 would be 12 times each second)
 	timer->setInterval(*cb, delayMS, this);
 	_probeTimer = getVM().getRoot().add_interval_timer(timer, true);
 }
@@ -947,7 +961,7 @@ Sound::startProbeTimer()
 as_value
 Sound::probeAudioWrapper(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<Sound> ptr = ensureType<Sound>(fn.this_ptr);
     ptr->probeAudio();
@@ -958,7 +972,10 @@ Sound::probeAudioWrapper(const fn_call& fn)
 void
 Sound::stopProbeTimer()
 {
+#ifdef GNASH_DEBUG_SOUND_AS
     log_debug("stopProbeTimer called");
+#endif
+
 	if ( _probeTimer )
 	{
 		VM& vm = getVM();
@@ -972,42 +989,62 @@ Sound::stopProbeTimer()
 void
 Sound::probeAudio()
 {
-    log_debug("Probing audio");
-
-    bool parsingCompleted = _mediaParser->parsingCompleted();
-    int attached=0;
-
-    try {
-        attached = attachAuxStreamerIfNeeded();
-    } catch (MediaException& e) {
-        assert(!_audioDecoder.get());
-		log_error(_("Could not create audio decoder: %s"), e.what());
-        _mediaParser.reset(); // no use for this anymore...
-        stopProbeTimer();
-        return;
-    }
-
-    if ( ! attached )
+    if ( isAttached )
     {
-        if ( parsingCompleted )
+#ifdef GNASH_DEBUG_SOUND_AS
+        log_debug("Probing audio for end");
+#endif
+
+        boost::mutex::scoped_lock lock(_soundCompletedMutex);
+        if (_soundCompleted)
         {
-            log_debug("No audio in Sound input.");
-            stopProbeTimer();
+            // when _soundCompleted is true we're
+            // NOT attached !
             _mediaParser.reset(); // no use for this anymore...
-        }
-        else
-        {
-            // keep probing
+            isAttached=false;
+            _soundCompleted=false;
+            stopProbeTimer();
+
+            // dispatch onSoundComplete 
+	        callMethod(NSV::PROP_ON_SOUND_COMPLETE);
         }
     }
     else
     {
-        // An audio decoder was constructed, good!
-        assert(_audioDecoder.get());
+#ifdef GNASH_DEBUG_SOUND_AS
+        log_debug("Probing audio for start");
+#endif
 
-        // TODO: reuse the probe timer to detect
-        //       end of sound for running onSoundCompleted()
-        stopProbeTimer();
+        bool parsingCompleted = _mediaParser->parsingCompleted();
+        try {
+            isAttached = attachAuxStreamerIfNeeded();
+        } catch (MediaException& e) {
+            assert(!isAttached);
+            assert(!_audioDecoder.get());
+            log_error(_("Could not create audio decoder: %s"), e.what());
+            _mediaParser.reset(); // no use for this anymore...
+            stopProbeTimer();
+            return;
+        }
+
+        if ( ! isAttached )
+        {
+            if ( parsingCompleted )
+            {
+                log_debug("No audio in Sound input.");
+                stopProbeTimer();
+                _mediaParser.reset(); // no use for this anymore...
+            }
+            else
+            {
+                // keep probing
+            }
+        }
+        else
+        {
+            // An audio decoder was constructed, good!
+            assert(_audioDecoder.get());
+        }
     }
 }
 
@@ -1020,5 +1057,12 @@ Sound::markReachableResources() const
 	markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
+
+void
+Sound::markSoundCompleted(bool completed)
+{
+    boost::mutex::scoped_lock lock(_soundCompletedMutex);
+    _soundCompleted=completed;
+}
 
 } // end of gnash namespace
