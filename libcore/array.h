@@ -71,9 +71,6 @@ public:
 
 	typedef std::list<as_value> ValueList;
 
-
-	enum { itemBlank, itemValue };
-
 	/// Visit all elements 
 	//
 	/// The visitor class will have to expose a visit(as_value&) method

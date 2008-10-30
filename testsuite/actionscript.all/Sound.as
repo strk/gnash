@@ -27,7 +27,7 @@ rcsid="$Id: Sound.as,v 1.1 2008/06/17 12:42:22 strk Exp $";
 endOfTest = function()
 {
 #if OUTPUT_VERSION > 5
-    check_totals(95);
+    check_totals(105);
 #else
     check_totals(94);
 #endif
@@ -251,8 +251,22 @@ s.onSoundComplete = function()
 
 stop();
 
+check_equals(typeof(s.getBytesLoaded()), "undefined");
+check_equals(typeof(s.getBytesTotal()), "undefined");
+xcheck_equals(typeof(s.duration), "undefined");
+check_equals(typeof(s.getPosition()), "undefined");
+check_equals(typeof(s.getDuration()), "undefined");
+
 // streaming sound doesn't need .start() to play...
 s.loadSound(MEDIA(sound1.mp3), true); 
+
+
+xcheck_equals(typeof(s.getBytesTotal()), "number");
+xcheck_equals(typeof(s.getBytesLoaded()), "number");
+xcheck_equals(typeof(s.getPosition()), "number");
+check_equals(typeof(s.duration), "number");
+xcheck_equals(typeof(s.getDuration()), "number");
+
 //s.loadSound(MEDIA(brokenchord.wav), true); 
 
 onSoundCompleteFailed = function()
