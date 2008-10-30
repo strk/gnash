@@ -27,10 +27,10 @@
 namespace gnash {
 namespace media {
 
-/// Class containing information about a sound.
+/// Class containing information about an embedded sound character.
 //
 /// Is created by the parser while
-/// parsing, and ownership is then transfered to sound_data. When the parser is
+/// parsing, and ownership is then transfered to EmbeddedSound. When the parser is
 /// parsing streams, it will ask the soundhandler for this to know what properties
 /// the stream has.
 ///

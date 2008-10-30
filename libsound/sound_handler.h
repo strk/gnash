@@ -47,7 +47,8 @@ namespace gnash {
 
 /// Gnash %sound handling subsystem (libsound)
 //
-/// This subsystem takes care of sending audio to the system mixer
+/// This subsystem takes care of mixing audio
+/// and communicating to the system mixer.
 ///
 namespace sound {
 
