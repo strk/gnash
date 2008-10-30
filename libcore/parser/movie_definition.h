@@ -53,13 +53,11 @@
 
 #include "character_def.h" // for inheritance
 #include "GnashImageJpeg.h"
-#include "swf/ControlTag.h"
 
 #include <string>
 #include <memory> // for auto_ptr
 #include <vector> // for PlayList typedef
 #include <set> 
-#include <boost/ptr_container/ptr_vector.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -67,6 +65,7 @@ namespace gnash {
 	class bitmap_info;
 	class movie_instance;
 	class MovieClip;
+	class ControlTag;
     class font;
     class ExportableResource;
     class sound_sample;
@@ -98,10 +97,7 @@ namespace gnash
 class movie_definition : public character_def
 {
 public:
-
-    /// This container owns the ControlTags and deletes them on
-    /// destruction.
-	typedef boost::ptr_vector<ControlTag> PlayList;
+	typedef std::vector<ControlTag*> PlayList;
 
 	virtual int	get_version() const = 0;
 	virtual float	get_width_pixels() const = 0;
@@ -178,7 +174,7 @@ public:
 
 
 	typedef std::pair<int, std::string> ImportSpec;
-	typedef std::vector<ImportSpec> Imports;
+	typedef std::vector< ImportSpec > Imports;
 
 	/// Import resources 
 	//
@@ -188,9 +184,7 @@ public:
 	/// @param imports
 	///	Resources to import, each with the id to use in our dictionary
 	///
-	virtual void importResources(
-            boost::intrusive_ptr<movie_definition> /*source*/,
-            Imports& /*imports*/)
+	virtual void importResources(boost::intrusive_ptr<movie_definition> /*source*/, Imports& /*imports*/)
 	{
 	}
 
@@ -206,7 +200,7 @@ public:
 	/// @return NULL if no character with the given ID is found
 	///         (this is the default)
 	///
-	virtual character_def* get_character_def(int /*id*/)
+	virtual character_def*	get_character_def(int /*id*/)
 	{
 		return NULL;
 	}
@@ -226,8 +220,7 @@ public:
 	///
 	/// @return true if a frame with that label was found, false otherwise
 	///
-	virtual bool get_labeled_frame(const std::string& /*label*/,
-            size_t& /*frame_number*/)
+	virtual bool get_labeled_frame(const std::string& /*label*/, size_t& /*frame_number*/)
 	{
 		return false;
 	}
@@ -276,16 +269,19 @@ public:
 		return 0;
 	}
 
-	/// Add a ControlTag to this movie_definition's playlist
+	/// Add an ControlTag to this movie_definition's playlist
 	//
-	/// The movie_definition (or its implementation) owns the ControlTag.
-    /// The default implementation is a no-op.
+	/// The default implementation is a no-op.
 	///
 	/// @param tag
 	/// 	The tag to add in the list of executable tags for
 	/// 	the frame currently being loaded. Ownership is transferred
-	/// 	to the movie_definition (SWFMovieDefinition or sprite_definition).
-	virtual void addControlTag(std::auto_ptr<ControlTag> /*c*/)
+	/// 	to the SWFMovieDefinition.
+	///
+	/// TODO: take an auto_ptr.
+	/// NOTE: the default implementation just let the ControlTag leak.
+	///
+	virtual void	addControlTag(ControlTag* /*c*/)
 	{
 	}
 
@@ -428,6 +424,8 @@ public:
 	virtual void add_bitmap_info(bitmap_info* /*ch*/)
 	{
 	}
+
+	// ...
 
 	/// \brief
 	/// Return the URL of the SWF stream this definition has been read

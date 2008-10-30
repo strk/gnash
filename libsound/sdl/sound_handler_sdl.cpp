@@ -257,7 +257,7 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset,
 
 	// If this is called from a streamsoundblocktag, we only start if this
 	// sound isn't already playing.
-	if (start_position && ! sounddata->_soundInstances.empty()) {
+	if (start_position > 0 && ! sounddata->_soundInstances.empty()) {
 		return;
 	}
 

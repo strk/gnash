@@ -64,12 +64,13 @@ RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     int depth = t->getDepth();
 
-    IF_VERBOSE_PARSE(
-        log_parse(_("  remove_object_2(%d)"), depth);
+    IF_VERBOSE_PARSE
+    (
+	log_parse(_("  remove_object_2(%d)"), depth);
     );
 
     // Ownership transferred to movie_definition
-    m.addControlTag(static_cast<std::auto_ptr<ControlTag> >(t));
+    m.addControlTag(t.release());
 }
 
 } // namespace gnash::SWF

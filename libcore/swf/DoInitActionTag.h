@@ -69,7 +69,7 @@ public:
     {
         in.ensureBytes(2);
         int cid = in.read_u16();
-        std::auto_ptr<ControlTag> da(new DoInitActionTag(in, m, cid));
+        DoInitActionTag* da = new DoInitActionTag(in, m, cid);
 
         IF_VERBOSE_PARSE (
         log_parse(_("  tag %d: do_init_action_loader"), tag);

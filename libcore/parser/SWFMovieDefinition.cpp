@@ -213,6 +213,18 @@ SWFMovieDefinition::~SWFMovieDefinition()
 	// Request cancelation of the loading thread
 	_loadingCanceled = true;
 
+	// Release frame tags
+	for (PlayListMap::iterator i = m_playlist.begin(),
+            e = m_playlist.end(); i != e; ++i)
+	{
+		PlayList& pl = i->second;
+
+		for (PlayList::iterator j = pl.begin(), je = pl.end(); j!=je; ++j)
+		{
+            delete *j;
+        }
+    }
+
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
 	//assert(m_jpeg_in->get() == NULL);

@@ -301,14 +301,10 @@ public:
 	// See dox in movie_definition.h
 	int get_loading_sound_stream_id() { return m_loading_sound_stream; }
 
-    /// Transfer a ControlTag to the SWFMovieDefinition.
-    //
-    /// @param tag  A ControlTag to add to the PlayList m_playlist.
-    ///             The PlayList owns the control tag and is responsible for
-    ///             deleting it.
-	void addControlTag(std::auto_ptr<ControlTag> tag)
+	// See dox in movie_definition.h
+	void	addControlTag(ControlTag* tag)
 	{
-	    assert(tag.get());
+	    assert(tag);
 	    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 	    m_playlist[_frames_loaded].push_back(tag);
 	}

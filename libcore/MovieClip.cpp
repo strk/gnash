@@ -2972,20 +2972,19 @@ void MovieClip::call_frame_actions(const as_value& frame_spec)
     // We set _callingFrameActions to true so that add_action_buffer
     // will execute immediately instead of queuing them.
     // NOTE: in case gotoFrame is executed by code in the called frame
-    //             we'll temporarily clear the _callingFrameActions flag
+    //             we'll temporarly clear the _callingFrameActions flag
     //             to properly queue actions back on the global queue.
     //
     _callingFrameActions=true;
     const PlayList* playlist = m_def->getPlaylist(frame_number);
     if ( playlist )
     {
-        PlayList::const_iterator it = playlist->begin();
+    PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
-        for(; it != e; it++)
-        {
-            it->execute_action(this, m_display_list);
-        }
-
+    for(; it != e; it++)
+    {
+        (*it)->execute_action(this, m_display_list);
+    }
     }
     _callingFrameActions=false;
 
@@ -3524,14 +3523,14 @@ MovieClip::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
         {
             for( ; it != e; it++)
             {
-                it->execute(this, dlist);
+                (*it)->execute(this, dlist);
             }
         }
         else if ( typeflags & TAG_DLIST )
         {
             for( ; it != e; it++)
             {
-                it->execute_state(this, dlist);
+                (*it)->execute_state(this, dlist);
             }
         }
         else
@@ -3539,7 +3538,7 @@ MovieClip::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
             assert(typeflags & TAG_ACTION);
             for( ; it != e; it++)
             {
-                it->execute_action(this, dlist);
+                (*it)->execute_action(this, dlist);
             }
         }
     }

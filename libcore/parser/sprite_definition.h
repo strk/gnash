@@ -275,14 +275,11 @@ private:
 	// Number of frames completely parsed 
 	size_t m_loading_frame;
 
-    /// Transfer a ControlTag to the sprite_definition.
-    //
-    /// @param tag  A ControlTag to add to the PlayList m_playlist.
-    ///             The PlayList owns the control tag and is responsible for
-    ///             deleting it.
-	virtual void addControlTag(std::auto_ptr<ControlTag> tag)
+
+	// See dox in movie_definition.h
+	virtual void	addControlTag(ControlTag* c)
 	{
-		m_playlist[m_loading_frame].push_back(tag);
+		m_playlist[m_loading_frame].push_back(c);
 	}
 
 	// See dox in movie_definition.h
