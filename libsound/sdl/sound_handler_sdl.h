@@ -40,10 +40,10 @@
 namespace gnash {
 namespace sound {
 
-class active_sound;
+class EmbeddedSoundInstance;
 
 /// Used to hold the sounddata when doing on-demand-decoding
-class sound_data
+class EmbeddedSound
 {
 	/// The undecoded data
 	std::auto_ptr<SimpleBuffer> _buf;
@@ -61,9 +61,9 @@ public:
     ///
     /// @pararm nVolume initial volume (0..100). Optional, defaults to 100.
     ///
-	sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> info, int nVolume=100);
+	EmbeddedSound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> info, int nVolume=100);
 
-	~sound_data();
+	~EmbeddedSound();
 
 	/// Object holding information about the sound
 	std::auto_ptr<media::SoundInfo> soundinfo;
@@ -127,9 +127,9 @@ public:
 	//
 	/// NOTE: This class *owns* all active sounds
 	///
-	typedef std::list<active_sound*> ActiveSounds;
+	typedef std::list<EmbeddedSoundInstance*> ActiveSounds;
 
-	ActiveSounds m_active_sounds;
+	ActiveSounds _soundInstances;
 
 	/// Drop all active sounds
 	void clearActiveSounds();
@@ -141,18 +141,18 @@ public:
 	ActiveSounds::iterator eraseActiveSound(ActiveSounds::iterator i);
 };
 
-/// Playing instance of a defined sound (sound_data)
+/// Playing instance of a defined sound (EmbeddedSound)
 //
-/// This class contains a pointer to the sound_data used for playing
+/// This class contains a pointer to the EmbeddedSound used for playing
 /// and an optional SimpleBuffer to use when decoding is needed.
 ///
-/// When the SimpleBuffer is NULL we'll play the sound_data bytes directly
+/// When the SimpleBuffer is NULL we'll play the EmbeddedSound bytes directly
 /// (we assume they are decoded already)
 ///
-class active_sound
+class EmbeddedSoundInstance
 {
 public:
-	active_sound(const sound_data& soundData)
+	EmbeddedSoundInstance(const EmbeddedSound& soundData)
 		:
 		decoder(0),
 		decodingPosition(0),
@@ -164,7 +164,7 @@ public:
 		_encodedData(soundData)
 	{}
 
-	~active_sound()
+	~EmbeddedSoundInstance()
 	{
 		deleteDecodedData();
 	}
@@ -196,21 +196,16 @@ public:
 	unsigned long samples_played;
 
 	/// Get the sound definition this object is an instance of
-	const sound_data& getSoundData() {    
+	const EmbeddedSound& getSoundData() {    
         return _encodedData;
     }
 
-	/// Returns the data pointer in the encoded datastream
-	/// for the given position. Boundaries are checked.
-	const boost::uint8_t* getEncodedData(unsigned long int pos);
-
-	/// Returns the data pointer in the decoded datastream
-	/// for the given position. Boundaries are checked.
-	boost::uint8_t* getDecodedData(unsigned long int pos);
+    // See dox in sound_handler.h (InputStream)
+    void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 
 	/// Release resources associated with decoded data, if any.
 	//
-	/// After this call, the active_sound will have no decoded data
+	/// After this call, the EmbeddedSoundInstance will have no decoded data
 	/// buffer, thus any pointer to the decoded data will be fetched
 	/// from the undecoded one.
 	///
@@ -268,11 +263,42 @@ public:
 	{
 		return _encodedData.size();
 	}
+
+    /// Apply envelope-volume adjustments
+    //
+    /// @param length Amount of bytes to envelope-adjust
+    ///        @todo take samples
+    ///
+    /// @todo make private, have it called from fetchSamples
+    ///
+    /// @todo document where does the envelope application 
+    ///       start from!
+    ///
+    void useEnvelopes(unsigned int length);
+
+	/// Returns the data pointer in the encoded datastream
+	/// for the given position. Boundaries are checked.
+    //
+    /// @todo make private
+    ///
+	const boost::uint8_t* getEncodedData(unsigned long int pos);
   
 private:
 
+    /// \brief
+	/// Returns the data pointer in the decoded datastream
+	/// for the given byte-offset.
+    //
+    /// Boundaries are checked.
+    ///
+    /// @param pos offsets in bytes. This should usually be
+    ///        a multiple of two, since decoded data is
+    ///        composed of signed 16bit PCM samples..
+    ///
+	boost::int16_t* getDecodedData(unsigned long int pos);
+
 	/// The encoded data
-	const sound_data& _encodedData;
+	const EmbeddedSound& _encodedData;
 
 	/// The decoded buffer
 	//
@@ -283,8 +309,8 @@ private:
 
 };
 
-// This is here as it needs definition of active_sound
-sound_data::~sound_data()
+// This is here as it needs definition of EmbeddedSoundInstance
+EmbeddedSound::~EmbeddedSound()
 {
 	clearActiveSounds();
 }
@@ -294,7 +320,7 @@ class SDL_sound_handler : public sound_handler
 {
 public:
 
-	typedef std::vector<sound_data*> Sounds;
+	typedef std::vector<EmbeddedSound*> Sounds;
 
 private:
 	/// AS classes (NetStream, Sound) audio callbacks
@@ -303,9 +329,9 @@ private:
 
 	/// Vector containing all sounds.
 	//
-	/// Elemenst of the vector are owned by this class
+	/// Elements of the vector are owned by this class
 	///
-	Sounds	m_sound_data;
+	Sounds	_sounds;
 
 	/// Is sound device opened?
 	bool soundOpened;
@@ -333,7 +359,7 @@ private:
 	// write a .WAV file header
 	void write_wave_header(std::ofstream& outfile);
 
-	void mixSoundData(sound_data& sounddata, Uint8* stream, unsigned int buffer_length);
+	void mixSoundData(EmbeddedSound& sounddata, Uint8* stream, unsigned int buffer_length);
 
 	/// @param sound
 	///     The active sound to mix in
@@ -344,7 +370,7 @@ private:
 	/// @param mixLen
 	///     The amount of bytes to mix in
 	///
-	void mixActiveSound(active_sound& sound, Uint8* mixTo, unsigned int mixLen);
+	void mixActiveSound(EmbeddedSoundInstance& sound, Uint8* mixTo, unsigned int mixLen);
 
 	/// Callback invoked by the SDL audio thread.
 	//
