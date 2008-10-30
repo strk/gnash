@@ -213,7 +213,10 @@ public:
 	///
 	/// @param start
 	/// 	When starting a soundstream from a random frame, this tells where in the
-	/// 	data the decoding should start, in samples.
+	/// 	data the decoding should start, in bytes.
+	///     If non-zero, the sound will only start when no other instances of it
+	///     are already playing.
+	///     @todo use unsigned
 	///
 	/// @param envelopes
 	/// 	Some eventsounds have some volume control mechanism called envelopes.
