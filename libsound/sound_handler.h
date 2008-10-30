@@ -51,7 +51,7 @@ namespace gnash {
 ///
 namespace sound {
 
-/// Sound handler.
+/// Sound mixer.
 //
 /// Stores the audio found by the parser and plays on demand.
 /// Can also play sound from AS classes NetStream and Sound using callbacks
@@ -70,13 +70,56 @@ namespace sound {
 /// For GST, I have no idea..
 /// TODO: clean this up.
 ///
+/// @todo rename to gnash::sound::Mixer
+///
 class DSOEXPORT sound_handler
 {
 public:
 
-	// See attach_aux_streamer
-	// TODO: change third parameter type to unsigned
-	typedef bool (*aux_streamer_ptr)(void *udata, boost::uint8_t *stream, int len);
+    /// A %sound input stream
+    //
+    /// Instance of this class are sounds you can
+    /// pull samples from.
+    ///
+    /// The format of the samples you pull is expected to
+    /// be PCM samples as signed 16bit values
+    /// in system-endian format.
+    ///
+    /// It is expected that consecutive samples fetched 
+    /// are one for left and one for right stereo channel,
+    /// in that order (even indexes for left channel, odd
+    /// indexes for right channel).
+    ///
+    /// Instances of this class would be the input 
+    /// for the gnash Mixer (currently sound_handler)
+    /// instance.
+    ///
+    class InputStream {
+
+    public:
+
+        /// Fetch the given amount of samples
+        //
+        /// @param to
+        ///     Output buffer, must be at least nSamples*bytes.
+        ///     (or nSamples items sized, being a container of 16bit values).
+        ///
+        /// @param nSamples
+        ///     Number of samples to fetch.
+        ///     It is expected that the fetcher fetches samples in multiples
+        ///     of 2, being each couple composed by a sample for the left
+        ///     channel and a sample for the right channel, in that order.
+        ///
+        virtual void fetchSamples(boost::int16_t* to, unsigned int nSamples)=0;
+
+        virtual ~InputStream() {}
+    };
+
+	/// @see attach_aux_streamer
+	/// @todo change third parameter type to unsigned
+	/// @todo change second parameter type to boost::uint16_t*
+	/// @todo actually, drop this in favor of a SoundInputChannel !
+	typedef bool (*aux_streamer_ptr)(void *udata, boost::uint8_t* stream, int len);
 
 	/// Used to control volume for event sounds. It basically tells that from
 	/// sample X the volume for left out is Y and for right out is Z. Several
