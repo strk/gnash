@@ -25,7 +25,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 
-#include "resource.h" // for inheritance of font
+#include "ExportableResource.h" 
 #include "swf.h" // for tag_type definition
 #include "bitmap_info.h" // for dtor visibility by smart pointer
 #include "FreetypeGlyphsProvider.h" // for device fonts support
@@ -60,7 +60,7 @@ public:
 };
 
 // for use in standard algorithms
-inline bool operator < (const kerning_pair& p1, const kerning_pair& p2)
+inline bool operator< (const kerning_pair& p1, const kerning_pair& p2)
 {
 	if ( p1.m_char0 < p2.m_char0 )
 	{
@@ -103,7 +103,7 @@ struct GlyphInfo
 /// SWF::DefineFont2 or SWF::DefineFont3 tags.
 /// Includes definitions from SWF::DefineFontInfo tags
 ///
-class font : public resource
+class font : public ExportableResource
 {
 public:
 	font();
@@ -122,9 +122,6 @@ public:
 	font(const std::string& name, bool bold=false, bool italic=false);
 
 	~font();
-
-	// override from resource.
-	font*	cast_to_font() { return this; }
 
 	/// Return true if this font matches given name and flags
 	//

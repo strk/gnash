@@ -42,22 +42,15 @@
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
 #include "GnashSleep.h"
+#include "ExportableResource.h"
+
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
-
 #include <iomanip>
 #include <memory>
 #include <string>
 #include <algorithm> // std::make_pair
 #include <unistd.h>
-
-
-// Increment this when the cache data format changes.
-#define CACHE_FILE_VERSION 4
-
-// If != 0 this is the number of frames to load at each iteration
-// of the main loop. Loading in chunks greatly speeds the process up
-#define FRAMELOAD_CHUNK 0
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD
@@ -729,7 +722,8 @@ SWFMovieDefinition::incrementLoadedFrames()
 }
 
 void
-SWFMovieDefinition::export_resource(const std::string& symbol, resource* res)
+SWFMovieDefinition::export_resource(const std::string& symbol,
+        ExportableResource* res)
 {
 	// _exportedResources access should be protected by a mutex
 	boost::mutex::scoped_lock lock(_exportedResourcesMutex);
@@ -739,7 +733,7 @@ SWFMovieDefinition::export_resource(const std::string& symbol, resource* res)
 }
 
 
-boost::intrusive_ptr<resource>
+boost::intrusive_ptr<ExportableResource>
 SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 {
 #ifdef DEBUG_EXPORTS
@@ -853,7 +847,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 			symbol, _url, loading_frame, m_frame_count);
 	}
 
-	return boost::intrusive_ptr<resource>(0); // 0
+	return boost::intrusive_ptr<ExportableResource>(0); // 0
 
 }
 
@@ -903,13 +897,15 @@ SWFMovieDefinition::markReachableResources() const
 	// TODO: turn this into a markExportedResources()
 	{
 		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-		for (ExportMap::const_iterator i=_exportedResources.begin(), e=_exportedResources.end(); i!=e; ++i)
+		for (ExportMap::const_iterator i=_exportedResources.begin(),
+                e=_exportedResources.end(); i!=e; ++i)
 		{
 			i->second->setReachable();
 		}
 	}
 
-	for (ImportVect::const_iterator i=m_import_source_movies.begin(), e=m_import_source_movies.end(); i!=e; ++i)
+	for (ImportVect::const_iterator i=m_import_source_movies.begin(),
+            e=m_import_source_movies.end(); i!=e; ++i)
 	{
 		(*i)->setReachable();
 	}
@@ -921,7 +917,8 @@ SWFMovieDefinition::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-SWFMovieDefinition::importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports)
+SWFMovieDefinition::importResources(
+        boost::intrusive_ptr<movie_definition> source, Imports& imports)
 {
 	size_t importedSyms=0;
 	for (Imports::iterator i=imports.begin(), e=imports.end(); i!=e; ++i)
@@ -929,30 +926,33 @@ SWFMovieDefinition::importResources(boost::intrusive_ptr<movie_definition> sourc
 		int id = i->first;
 		const std::string& symbolName = i->second;
 
-	        boost::intrusive_ptr<resource> res = source->get_exported_resource(symbolName);
-	        if (!res)
-	        {
-			log_error(_("import error: could not find resource '%s' in movie '%s'"),
-				symbolName, source->get_url());
+        boost::intrusive_ptr<ExportableResource> res =
+            source->get_exported_resource(symbolName);
+
+        if (!res)
+        {
+			log_error(_("import error: could not find resource '%s' in "
+                        "movie '%s'"), symbolName, source->get_url());
 			continue;
-	        }
-	        else if (font* f = res->cast_to_font())
+        }
+        else if (font* f = dynamic_cast<font*>(res.get()))
 		{
 			// Add this shared font to the currently-loading movie.
 			add_font(id, f);
 			++importedSyms;
-	        }
-	        else if (character_def* ch = res->cast_to_character_def())
-	        {
-			// Add this character to the loading movie.
-			add_character(id, ch);
-			++importedSyms;
-	        }
-	        else
-	        {
-			log_error(_("importResources error: unsupported import of '%s' from movie '%s' has unknown type"),
-				symbolName, source->get_url());
-	        }
+        }
+        else if (character_def* ch = dynamic_cast<character_def*>(res.get()))
+        {
+            // Add this character to the loading movie.
+            add_character(id, ch);
+            ++importedSyms;
+        }
+        else
+        {
+            log_error(_("importResources error: unsupported import of '%s' "
+                "from movie '%s' has unknown type"),
+                symbolName, source->get_url());
+        }
 	}
 
 	if ( importedSyms )

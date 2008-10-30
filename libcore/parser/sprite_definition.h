@@ -204,13 +204,14 @@ public:
 
 	/// Delegate call to associated root movie
 	virtual void export_resource(const std::string& sym,
-			resource* res)
+			ExportableResource* res)
 	{
 		m_movie_def.export_resource(sym, res);
 	}
 
 	/// Delegate call to associated root movie
-	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& sym)
+	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
+            const std::string& sym)
 	{
 		return m_movie_def.get_exported_resource(sym);
 	}

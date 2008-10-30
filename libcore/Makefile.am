@@ -166,7 +166,7 @@ noinst_HEADERS = \
 	namedStrings.h \
 	rect.h \
 	render.h \
-	resource.h \
+	ExportableResource.h \
 	shape.h	\
 	MovieClip.h \
 	SWFStream.h \

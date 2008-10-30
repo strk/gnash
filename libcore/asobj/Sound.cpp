@@ -34,7 +34,7 @@
 #include "VM.h"
 #include "timers.h" // for registering the probe timer
 #include "namedStrings.h"
-
+#include "ExportableResource.h"
 #include "StreamProvider.h"
 
 
@@ -612,17 +612,19 @@ sound_stop(const fn_call& fn)
 		// check the import.
 		movie_definition* def = so->getVM().getRoot().get_movie_definition();
 		assert(def);
-		boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
-		if (res == NULL)
+		boost::intrusive_ptr<ExportableResource> res = 
+            def->get_exported_resource(name);
+
+        if (!res)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror(_("import error: resource '%s' is not exported"), name.c_str());
+                log_swferror(_("import error: resource '%s' is not exported"),
+                    name);
 		    	);
 		    return as_value();
 		}
 
-		// FIXME: shouldn't we use dynamic_cast here (or rely on sound_sample interface) ?
-		sound_sample* ss = res->cast_to_sound_sample();
+		sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
 
 		if (ss != NULL)
 		{
@@ -666,19 +668,21 @@ sound_attachsound(const fn_call& fn)
 	// check the import.
 	movie_definition* def = so->getVM().getRoot().get_movie_definition();
 	assert(def);
-	boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
-	if (res == NULL)
+	boost::intrusive_ptr<ExportableResource> res = 
+        def->get_exported_resource(name);
+	if (!res)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("import error: resource '%s' is not exported"), name.c_str());
-			);
+            log_swferror(_("import error: resource '%s' is not exported"),
+                name);
+        );
 		return as_value();
 	}
 
 	int si = 0;
-	sound_sample* ss = res->cast_to_sound_sample();
+	sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
 
-	if (ss != NULL)
+	if (ss)
 	{
 		si = ss->m_sound_handler_id;
 	}
@@ -793,7 +797,8 @@ sound_loadsound(const fn_call& fn)
 		if ( fn.nargs > 2 )
 		{
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror(_("Sound.loadSound(%s): arguments after first 2 discarded"), ss.str());
+			log_aserror(_("Sound.loadSound(%s): arguments after first 2 "
+                    "discarded"), ss.str());
 		}
 		);
 	}
@@ -852,7 +857,7 @@ checkPolicyFile_getset(const fn_call& /*fn*/)
 as_value
 sound_areSoundsInaccessible(const fn_call& /*fn*/)
 {
-	// TODO: I guess this would have to do with premissions (crossdomain stuff)
+	// TODO: I guess this would have to do with permissions (crossdomain stuff)
 	// more then capability.
 	// See http://www.actionscript.org/forums/showthread.php3?t=160028
 	// 
@@ -876,13 +881,16 @@ attachSoundInterface(as_object& o)
 
 	int fl_hpc = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly;
 
-	o.init_member("attachSound", new builtin_function(sound_attachsound), fl_hpc);
+	o.init_member("attachSound", new builtin_function(sound_attachsound),
+            fl_hpc);
 	o.init_member("getPan", new builtin_function(sound_getpan), fl_hpc);
 	o.init_member("setPan", new builtin_function(sound_setpan), fl_hpc);
 	o.init_member("start", new builtin_function(sound_start), fl_hpc);
 	o.init_member("stop", new builtin_function(sound_stop), fl_hpc);
-	o.init_member("getTransform", new builtin_function(sound_gettransform), fl_hpc);
-	o.init_member("setTransform", new builtin_function(sound_settransform), fl_hpc);
+	o.init_member("getTransform", new builtin_function(sound_gettransform),
+            fl_hpc);
+	o.init_member("setTransform", new builtin_function(sound_settransform),
+            fl_hpc);
 	o.init_member("getVolume", new builtin_function(sound_getvolume), fl_hpc);
 	o.init_member("setVolume", new builtin_function(sound_setvolume), fl_hpc);
 

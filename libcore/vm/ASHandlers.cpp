@@ -188,7 +188,7 @@ SWFHandlers::SWFHandlers()
     property_names.push_back("_highquality"); // 16
     property_names.push_back("_focusrect"); // 17
     property_names.push_back("_soundbuftime"); // 18
-    property_names.push_back("@@ mystery quality member"); // 19 - quality: what the quality is (0, 1 or 2)
+    property_names.push_back("_quality"); // 19 - quality: what the quality is (0, 1 or 2)
     property_names.push_back("_xmouse"); // 20
     property_names.push_back("_ymouse"); // 21
 
@@ -960,7 +960,6 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-    
 
     as_value& top_value = env.top(0);
     std::string var_string = top_value.to_string();
@@ -1011,11 +1010,12 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    // we don't ues the target sprite directly, instead we fetch the _target(string type)
-    // of that sprite first and then search the final target(might be a different one).
-    // see tests in opcode_guard_test2.sc
+    // we don't ues the target sprite directly, instead we fetch the
+    // _target(string type) of that sprite first and then search the
+    // final target(might be a different one). See tests in
+    // opcode_guard_test2.sc
     //
-    // for _versioned, see swfdec's settarget2-tostring.as (swf 7 and 8)
+    // For _versioned, see swfdec's settarget2-tostring.as (swf 7 and 8)
     // 
     std::string target_name = env.top(0).to_string_versioned(env.get_version());
 
@@ -1049,19 +1049,23 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
     {
         as_object* obj = thread.getTarget();
 
-        //log_debug(_("ActionGetProperty(<empty>) called, target is %p"), (void*)obj);
-
         target = dynamic_cast<character*>(obj);
         if ( ! target )
         {
-            log_error(_("ActionGetProperty(<empty>) called, but current target is not a character"));
+            log_error(_("ActionGetProperty(<empty>) called, but current "
+                        "target is not a character"));
         }
     }
     else
     {
         target = env.find_target(tgt_str);
     }
-    unsigned int prop_number = static_cast<unsigned int>(env.top(0).to_number());
+ 
+    // FIXME: what happens when it's an invalid number? This will cause
+    // undefined behaviour on overflow.
+    unsigned int prop_number =
+        static_cast<unsigned int>(env.top(0).to_number());
+
     if (target)
     {
         if ( prop_number < get_property_names().size() )
@@ -1101,6 +1105,8 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     as_environment& env = thread.env;
 
     character *target = env.find_target(env.top(2).to_string());
+    // FIXME: what happens when it's an invalid number? This will cause
+    // undefined behaviour on overflow.
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
     as_value prop_val = env.top(0);
 
@@ -3098,7 +3104,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
                target, (void*)obj.get());
     );
 
-        if ( ! thread.getObjectMember(*obj, member_name.to_string(), env.top(1)) )
+    if (!thread.getObjectMember(*obj, member_name.to_string(), env.top(1)))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("Reference to undefined member %s of object %s",

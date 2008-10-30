@@ -25,7 +25,6 @@
 #include "action.h" // for call_method_parsed (call_method_args)
 #include "MovieClip.h"
 #include "movie_definition.h"
-#include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_value.h"
 #include "as_function.h"
 #include "edit_text_character.h" // for registered variables
@@ -56,6 +55,7 @@
 #include "PlaceObject2Tag.h" 
 #include "NetStream_as.h"
 #include "flash/geom/Matrix_as.h"
+#include "ExportableResource.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -310,7 +310,7 @@ movieclip_attach_movie(const fn_call& fn)
     // Get exported resource 
     const std::string& id_name = fn.arg(0).to_string();
 
-    boost::intrusive_ptr<resource> exported = 
+    boost::intrusive_ptr<ExportableResource> exported = 
         movieclip->get_movie_definition()->get_exported_resource(id_name);
 
     if (!exported)

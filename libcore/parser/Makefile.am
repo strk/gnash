@@ -62,7 +62,6 @@ libgnashparser_la_SOURCES = \
 	video_stream_def.cpp
 
 noinst_HEADERS = \
-	Timeline.h	\
 	abc_block.h \
 	action_buffer.h \
 	button_character_def.h \

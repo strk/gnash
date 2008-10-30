@@ -24,10 +24,10 @@
 #include "SWFStream.h"
 #include "log.h"
 #include "movie_definition.h" // for m_root_def use
-
 #include "edit_text_character_def.h"
 #include "edit_text_character.h"
 #include "font.h" // for setReachable call, ctor and dtor
+#include "fontlib.h"
 
 namespace gnash {
 

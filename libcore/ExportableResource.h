@@ -27,25 +27,16 @@
 
 namespace gnash {
 
-class as_object;
-class fn_call;
-class swf_function;
-class movie;
-class font;
-class character_def;
-class sound_sample;
-
-
-/// An interface for casting to different types of resources.
-class resource : public ref_counted
+/// A class for SWF resources that may be exported
+//
+/// They are: character_def, sound_sample, and font.
+/// These may be held in the export map of a SWFMovieDefinition.
+class ExportableResource : public ref_counted
 {
-public:
-	virtual ~resource() {}
+protected:
+    ExportableResource() {}
+	virtual ~ExportableResource() {}
 	
-	// Override in derived classes that implement corresponding interfaces.
-	virtual font*	cast_to_font() { return 0; }
-	virtual character_def*	cast_to_character_def() { return 0; }
-	virtual sound_sample*	cast_to_sound_sample() { return 0; }
 };
 
 

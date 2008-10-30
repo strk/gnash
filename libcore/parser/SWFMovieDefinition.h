@@ -34,7 +34,6 @@
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
 #include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
-#include "resource.h" // for boost::intrusive_ptr visibility of dtor
 #include "SWFStream.h" // for get_bytes_loaded and visitbility of dtor (composition)
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 #include "utility.h" // for TWIPS_TO_PIXELS 
@@ -250,14 +249,14 @@ public:
 
 	// See docs in movie_definition.h
 	virtual void export_resource(const std::string& symbol,
-			resource* res);
+            ExportableResource* res);
 
 	/// Get the named exported resource, if we expose it.
 	//
 	/// @return NULL if the label doesn't correspond to an exported
 	///         resource, or if a timeout occurs while scanning the movie.
 	///
-	virtual boost::intrusive_ptr<resource> get_exported_resource(
+	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
             const std::string& symbol);
 
 	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
@@ -469,7 +468,7 @@ private:
 	// Mutex protecting access to _namedFrames
 	mutable boost::mutex _namedFramesMutex;
 
-	typedef std::map<std::string, boost::intrusive_ptr<resource>,
+	typedef std::map<std::string, boost::intrusive_ptr<ExportableResource>,
             StringNoCaseLessThen > ExportMap;
 	ExportMap _exportedResources;
 

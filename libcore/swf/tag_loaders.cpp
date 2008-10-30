@@ -818,7 +818,7 @@ void define_shape_morph_loader(SWFStream& in, tag_type tag, movie_definition& m,
     );
 
     morph2_character_def* morph = new morph2_character_def;
-    morph->read(in, tag, true, m);
+    morph->read(in, tag, m);
     m.add_character(character_id, morph);
 }
 

@@ -52,7 +52,6 @@
 #endif
 
 #include "character_def.h" // for inheritance
-#include "fontlib.h"
 #include "GnashImageJpeg.h"
 
 #include <string>
@@ -67,6 +66,9 @@ namespace gnash {
 	class movie_instance;
 	class MovieClip;
 	class ControlTag;
+    class font;
+    class ExportableResource;
+    class sound_sample;
 }
 
 namespace gnash
@@ -137,46 +139,9 @@ public:
 	}
 	
 
-	//
-	// (optional) API to support host-driven creation of textures.
-	//
-	// Create the movie using gnash::create_movie_no_recurse(..., DO_NOT_LOAD_BITMAPS),
-	// and then initialize each bitmap info via get_bitmap_info_count(), get_bitmap_info(),
-	// and bitmap_info::init_*_image() or your own subclassed API.
-	//
-	// E.g.:
-	//
-	// // During preprocessing:
-	// // This will create bitmap_info's using the rgba, rgb, alpha contructors.
-	// my_def = gnash::create_movie_no_recurse("myfile.swf", DO_LOAD_BITMAPS);
-	// int ct = my_def->get_bitmap_info_count();
-	// for (int i = 0; i < ct; i++)
-	// {
-	//	my_bitmap_info_subclass*	bi = NULL;
-	//	my_def->get_bitmap_info(i, (bitmap_info**) &bi);
-	//	my_precomputed_textures.push_back(bi->m_my_internal_texture_reference);
-	// }
-	// // Save out my internal data.
-	// my_precomputed_textures->write_into_some_cache_stream(...);
-	//
-	// // Later, during run-time loading:
-	// my_precomputed_textures->read_from_some_cache_stream(...);
-	// // This will create blank bitmap_info's.
-	// my_def = gnash::create_movie_no_recurse("myfile.swf", DO_NOT_LOAD_BITMAPS);
-	// 
-	// // Push cached texture info into the movie's bitmap_info structs.
-	// int	ct = my_def->get_bitmap_info_count();
-	// for (int i = 0; i < ct; i++)
-	// {
-	//	my_bitmap_info_subclass*	bi = (my_bitmap_info_subclass*) my_def->get_bitmap_info(i);
-	//	bi->set_internal_texture_reference(my_precomputed_textures[i]);
-	// }
-	//
 	virtual int	get_bitmap_info_count() const { return 0; }
 
-	virtual bitmap_info*	get_bitmap_info(int /*i*/) const { return NULL; }
-
-	// From movie_definition_sub
+	virtual bitmap_info* get_bitmap_info(int /*i*/) const { return NULL; }
 
 	/// Return the list of execute tags for given frame number
 	//
@@ -184,7 +149,8 @@ public:
 	///	 Frame number, 0-based (ie: first frame is 0)
 	///
 	/// @return NULL if no execute tags are defined for the given frame number
-	///	    (the default implementation) or a pointer to the vector of them (PlayList)
+	///	    (the default implementation) or a pointer to the vector of them
+    ///     (PlayList)
 	///
 	virtual const PlayList* getPlaylist(size_t /*frame_number*/) const
 	{
@@ -194,12 +160,14 @@ public:
 	/// Get the named exported resource, if we expose it.
 	//
 	/// @param symbol
-	///	The symbol name. Matching should be case-insensitive for all SWF versions.
+	///	The symbol name. Matching should be case-insensitive for all
+    /// SWF versions.
 	///
 	/// @return NULL if the label doesn't correspond to an exported
 	///         resource. This is the default behaviour.
 	///
-	virtual boost::intrusive_ptr<resource>	get_exported_resource(const std::string& /*symbol*/)
+	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
+            const std::string& /*symbol*/)
 	{
 		return NULL;
 	}
@@ -295,7 +263,8 @@ public:
 	}
 
 	/// Find a font from the movie (not shared) lib
-	virtual font* get_font(const std::string& /*name*/, bool /*bold*/, bool /*italic*/) const
+	virtual font* get_font(const std::string& /*name*/, 
+            bool /*bold*/, bool /*italic*/) const
 	{
 		return 0;
 	}
@@ -437,7 +406,7 @@ public:
 	/// The default implementation is a no-op
 	///
 	virtual void export_resource(const std::string& /*symbol*/,
-			resource* /*res*/)
+			ExportableResource* /*res*/)
 	{
 	}
 

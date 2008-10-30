@@ -212,7 +212,6 @@ private:
 	rgba sample_gradient(boost::uint8_t ratio) const;
 
 	friend class morph2_character_def;
-	friend class triangulating_render_handler;
 	
 	/// Fill type, see SWF::fill_style_type
 	int	m_type;

@@ -19,7 +19,7 @@
 #define GNASH_SOUND_H
 
 
-#include "resource.h" // for sound_sample inheritance
+#include "ExportableResource.h"
 #include "ControlTag.h" // for sound tags inheritance
 #include "RunInfo.h" // TODO: drop.
 
@@ -53,7 +53,7 @@ namespace gnash {
 /// @todo   work out why this is a resource, what a resource is useful for,
 ///         and if it really needs access to a sound_handler rather than
 ///         belonging to it.
-class sound_sample: public resource
+class sound_sample: public ExportableResource
 {
 public:
 	int	m_sound_handler_id;
@@ -75,7 +75,6 @@ public:
     /// a segfault.
     const RunInfo& _runInfo;
 
-	sound_sample* cast_to_sound_sample() { return this; }
 };
 
 } // namespace gnash
