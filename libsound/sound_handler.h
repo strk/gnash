@@ -111,6 +111,10 @@ public:
         ///     of 2, being each couple composed by a sample for the left
         ///     channel and a sample for the right channel, in that order.
         ///
+        /// @throws a SoundException (to be better defined a set of them)
+        ///     if unable to process this and further requests due to internal
+        ///     errors (not if it just happens to complete its source)
+        ///
         virtual void fetchSamples(boost::int16_t* to, unsigned int nSamples)=0;
 
         virtual ~InputStream() {}
