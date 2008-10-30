@@ -71,7 +71,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "dsodefs.h" // DSOEXPORT
-#include "mouse_button_state.h" // for composition
+#include "MouseButtonState.h" // for composition
 #include "drag_state.h" // for composition
 #include "asobj/Key_as.h"
 #include "smart_ptr.h" // for memory management

@@ -160,7 +160,7 @@ noinst_HEADERS = \
 	impl.h \
 	LoadVariablesThread.h \
 	SWFMatrix.h \
-	mouse_button_state.h \
+	MouseButtonState.h \
 	movie_instance.h \
 	movie_root.h \
 	namedStrings.h \

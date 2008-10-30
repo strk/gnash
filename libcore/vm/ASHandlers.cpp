@@ -40,7 +40,7 @@
 #include "as_object.h"
 #include "Object.h"
 #include "String_as.h" // for automatic as_value::STRING => String as object
-#include "Number.h" // for automatic as_value::NUMBER => Number as object
+#include "Number_as.h" // for automatic as_value::NUMBER => Number as object
 #include "drag_state.h"
 #include "VM.h" // for getting the root
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)

@@ -41,7 +41,7 @@
 #include "LoadVars_as.h"
 #include "LocalConnection.h"
 #include "Microphone.h"
-#include "Number.h"
+#include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
 #include "XML_as.h"
