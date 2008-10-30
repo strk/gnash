@@ -58,7 +58,8 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
     // NOTE: sound_id is the SWF-defined id,
     //       sam->m_sound_handler_id is the sound_handler-provided id
     //
-    StartSoundTag*  sst = new StartSoundTag(sam->m_sound_handler_id);
+    std::auto_ptr<StartSoundTag> sst(
+            new StartSoundTag(sam->m_sound_handler_id));
     sst->read(in);
 
     IF_VERBOSE_PARSE (
@@ -66,7 +67,7 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
               sound_id, int(sst->m_stop_playback), sst->m_loop_count);
     );
 
-    m.addControlTag(sst); // takes ownership
+    m.addControlTag(static_cast<std::auto_ptr<ControlTag> >(sst));
 }
 
 /* private */

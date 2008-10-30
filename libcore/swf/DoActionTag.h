@@ -66,7 +66,7 @@ public:
 	static void doActionLoader(SWFStream& in, tag_type tag,
             movie_definition& m, const RunInfo& /*r*/)
 	{
-		DoActionTag* da = new DoActionTag(m);
+        std::auto_ptr<DoActionTag> da(new DoActionTag(m));
 		da->read(in);
 
 		IF_VERBOSE_PARSE (
@@ -74,7 +74,7 @@ public:
 		log_parse(_("-- actions in frame %d"), m.get_loading_frame());
 		);
 
-		m.addControlTag(da); // ownership transferred
+		m.addControlTag(static_cast<std::auto_ptr<ControlTag> >(da));
 	}
 
 private:

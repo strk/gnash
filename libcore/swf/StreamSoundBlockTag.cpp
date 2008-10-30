@@ -118,8 +118,8 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m, co
 
     // TODO: log_parse ?
 
-    StreamSoundBlockTag* ssst = new StreamSoundBlockTag(handle_id, start);
-    m.addControlTag(ssst); // ownership is transferred to movie_definition
+    std::auto_ptr<ControlTag> ct(new StreamSoundBlockTag(handle_id, start));
+    m.addControlTag(ct); // ownership is transferred to movie_definition
 }
 
 } // namespace gnash::SWF

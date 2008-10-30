@@ -102,7 +102,7 @@ public:
 		assert(tag == SWF::SETBACKGROUNDCOLOR); // 9
 
 		// this one may throw, we'll let caller catch it
-		SetBackgroundColorTag* t = new SetBackgroundColorTag(in);
+        std::auto_ptr<ControlTag> t(new SetBackgroundColorTag(in));
 		m.addControlTag(t); // takes ownership
 	}
 };

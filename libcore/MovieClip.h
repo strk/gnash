@@ -71,8 +71,7 @@ public:
 
     typedef std::list<const action_buffer*> ActionList;
 
-    // definition must match movie_definition::PlayList
-    typedef std::vector<ControlTag*> PlayList;
+    typedef movie_definition::PlayList PlayList;
 
     typedef std::vector<swf_event*> SWFEventsVector;
 

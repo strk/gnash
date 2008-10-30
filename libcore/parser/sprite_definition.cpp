@@ -52,16 +52,6 @@ sprite_definition::create_character_instance(character* parent,
 
 sprite_definition::~sprite_definition()
 {
-	// Release our playlist data.
-	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end(); i!=e; ++i)
-	{
-		PlayList& pl = i->second;
-
-		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
-		{
-            delete *j;
-        }
-    }
 }
 
 /*private*/
