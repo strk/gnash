@@ -186,12 +186,15 @@ int	SDL_sound_handler::create_sound(
 
 }
 
-// this gets called when a stream gets more data
-long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int /*sample_count*/, int handle_id)
-
+// This gets called when an SWF embedded sound stream gets more data
+long
+SDL_sound_handler::fill_stream_data(unsigned char* data,
+        unsigned int data_bytes, unsigned int /*sample_count*/,
+        int handle_id)
 {
 
 	boost::mutex::scoped_lock lock(_mutex);
+
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
 	if (handle_id < 0 || (unsigned int) handle_id+1 > m_sound_data.size())
@@ -199,10 +202,12 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 		delete [] data;
 		return -1;
 	}
+
 	sound_data* sounddata = m_sound_data[handle_id];
 
 	// If doing ADPCM, knowing the framesize is needed to decode!
-	if (sounddata->soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM) {
+	if (sounddata->soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM)
+    {
 		sounddata->m_frames_size[sounddata->size()] = data_bytes;
 	}
 
@@ -216,7 +221,8 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 
 // Play the index'd sample.
 void
-SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
+SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset,
+        long start_position, const std::vector<sound_envelope>* envelopes)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -248,10 +254,7 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long 
 
 	// Make a "active_sound" for this sound which is later placed
     // on the vector of instances of this sound being played
-	std::auto_ptr<active_sound> sound ( new active_sound() );
-
-	// Set source data to the active_sound
-	sound->set_data(sounddata);
+	std::auto_ptr<active_sound> sound ( new active_sound(*sounddata) );
 
 	// Set the given options of the sound
 	if (start_position < 0) sound->decodingPosition = 0;
@@ -609,16 +612,10 @@ active_sound::getDecodedData(unsigned long int pos)
 	else return 0;
 }
 
-boost::uint8_t*
+const boost::uint8_t*
 active_sound::getEncodedData(unsigned long int pos)
 {
-	assert(_encodedData);
-	return _encodedData->data(pos);
-}
-
-void active_sound::set_data(sound_data* idata)
-{
-	_encodedData = idata;
+	return _encodedData.data(pos);
 }
 
 void active_sound::deleteDecodedData()
@@ -693,25 +690,53 @@ use_envelopes(active_sound& sound, unsigned int length)
 }
 
 
-// Prepare for mixing/adding (volume adjustments) and mix/add.
+/// Prepare for mixing/adding (volume adjustments) and mix/add.
+//
+/// @param mixTo
+///     The buffer to mix to
+///
+/// @param sound
+///     The active_sound to mix in.
+///     Note that decoded data in the active_sound will
+///     be modified (volumes and envelope adjustments).
+///
+/// @param mixLen
+///     The amount of data to mix in
+///
+/// @param volume
+///     The volume to use for this mix-in.
+///     100 is full volume. 
+///
+///
 static void
-do_mixing(Uint8* stream, active_sound& sound, Uint8* data, unsigned int mix_length, unsigned int volume)
+do_mixing(Uint8* mixTo, active_sound& sound, unsigned int mixLen, unsigned int volume)
 {
+    Uint8* data = sound.getDecodedData(sound.playbackPosition);
+
 	// If the volume needs adjustments we call a function to do that (why are we doing this manually ?)
-	if (volume != 100) {
-		adjust_volume(reinterpret_cast<boost::int16_t*>(data), mix_length, volume);
-	} else if (sound.envelopes != NULL) {
-		use_envelopes(sound, mix_length);
+	if (volume != 100)
+    {
+        /// Why are we changing intepretation of the data here ?
+        /// Guess we're just assuming that the active_sound data
+        /// is composed by 16bit samples ?
+		adjust_volume(reinterpret_cast<boost::int16_t*>(data), mixLen, volume);
+	}
+
+    /// @todo is use of envelopes really mutually exclusive with
+    ///       setting the volume ??
+    else if (sound.envelopes)
+    {
+		use_envelopes(sound, mixLen);
 	}
 
 	// Mix the raw data
-	SDL_MixAudio(static_cast<Uint8*>(stream),static_cast<const Uint8*>(data), mix_length, SDL_MIX_MAXVOLUME);
+	SDL_MixAudio(mixTo, data, mixLen, SDL_MIX_MAXVOLUME);
 
 	// Update sound info
-	sound.playbackPosition += mix_length;
+	sound.playbackPosition += mixLen;
 
-	// Sample size is always 2
-	sound.samples_played += mix_length / 2;
+	// Sample size is always 2 (change this!)
+	sound.samples_played += mixLen / 2;
 }
 
 
@@ -752,35 +777,18 @@ void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
  
 }
 
-// Callback invoked by the SDL audio thread.
-void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
+void
+SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_length)
 {
-	if ( buffer_length_in < 0 )
-	{
-		log_error(_("Negative buffer length in sdl_audio_callback (%d)"), buffer_length_in);
-		return;
-	}
+	boost::mutex::scoped_lock lock(_mutex);
 
-	if ( buffer_length_in == 0 )
-	{
-		log_error(_("Zero buffer length in sdl_audio_callback"));
-		return;
-	}
+	if ( isPaused() ) return;
 
-	unsigned int buffer_length = static_cast<unsigned int>(buffer_length_in);
-
-	// Get the soundhandler
-	SDL_sound_handler* handler = static_cast<SDL_sound_handler*>(udata);
-
-	boost::mutex::scoped_lock lock(handler->_mutex);
-
-	if ( handler->isPaused() ) return;
-
-	int finalVolume = int(128*handler->getFinalVolume()/100.0);
+	int finalVolume = int( SDL_MIX_MAXVOLUME * (getFinalVolume()/100.0) );
 
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
-	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.empty()) {
+	if (soundsPlaying == 0 && m_aux_streamer.empty()) {
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
 		log_debug("Pausing SDL Audio...");
 #endif
@@ -793,13 +801,13 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	memset(buffer, 0, buffer_length);
 
 	// call NetStream or Sound audio callbacks
-	if ( !handler->m_aux_streamer.empty() )
+	if ( !m_aux_streamer.empty() )
 	{
 		boost::scoped_array<boost::uint8_t> buf ( new boost::uint8_t[buffer_length] );
 
 		// Loop through the attached sounds
-		CallbacksMap::iterator it = handler->m_aux_streamer.begin();
-		CallbacksMap::iterator end = handler->m_aux_streamer.end();
+		CallbacksMap::iterator it = m_aux_streamer.begin();
+		CallbacksMap::iterator end = m_aux_streamer.end();
 		while (it != end) {
 			memset(buf.get(), 0, buffer_length);
 
@@ -811,10 +819,10 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 			if (!ret) {
 				CallbacksMap::iterator it2=it;
 				++it2; // before we erase it
-				handler->m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
+				m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
 				it = it2;
 				// Decrement callback clients count 
-				handler->soundsPlaying--;
+				soundsPlaying--;
 			} else {
 				++it;
 			}
@@ -823,7 +831,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		}
 	}
 
-    const SDL_sound_handler::Sounds& soundData = handler->m_sound_data;
+    const SDL_sound_handler::Sounds& soundData = m_sound_data;
 
 	// Run through all the sounds. TODO: don't call .size() at every iteration !
 	for (SDL_sound_handler::Sounds::const_iterator i = soundData.begin(),
@@ -831,27 +839,48 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	{
 	    // Check whether sound has been deleted first.
         if (!*i) continue;
-		handler->mixSoundData(**i, buffer, buffer_length);
+		mixSoundData(**i, buffer, buffer_length);
 	}
 
 	// 
 	// WRITE CONTENTS OF stream TO FILE
 	//
-	if (handler->file_stream) {
-            handler->file_stream.write((char*) stream, buffer_length_in);
+	if (file_stream) {
+            file_stream.write((char*) stream, buffer_length);
             // now, mute all audio
-            memset ((void*) stream, 0, buffer_length_in);
+            memset ((void*) stream, 0, buffer_length);
 	}
 
 	// Now, after having "consumed" all sounds, blank out
 	// the buffer if muted..
-	if ( handler->muted )
+	if ( muted )
 	{
-		memset ((void*) stream, 0, buffer_length_in);
+		memset ((void*) stream, 0, buffer_length);
+	}
+}
+
+// Callback invoked by the SDL audio thread.
+void
+SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *buf, int bufLenIn)
+{
+	if ( bufLenIn < 0 )
+	{
+		log_error(_("Negative buffer length in sdl_audio_callback (%d)"), bufLenIn);
+		return;
 	}
 
+	if ( bufLenIn == 0 )
+	{
+		log_error(_("Zero buffer length in sdl_audio_callback"));
+		return;
+	}
 
+	unsigned int bufLen = static_cast<unsigned int>(bufLenIn);
 
+	// Get the soundhandler
+	SDL_sound_handler* handler = static_cast<SDL_sound_handler*>(udata);
+
+    handler->fetchSamples(buf, bufLen);
 }
 
 void
@@ -910,21 +939,28 @@ sound_data::eraseActiveSound(ActiveSounds::iterator i)
 
 /*private*/
 void
-SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
-        Uint8* buffer, unsigned int buffer_length)
+SDL_sound_handler::mixActiveSound(active_sound& sound, Uint8* buffer,
+        unsigned int mixLen)
 {
 	// If there exist no decoder, then we can't decode!
-	if (!sound.decoder.get()) return;
+    // TODO: isn't it documented that an active_sound w/out a decoder
+    //       means that the sound_data data is already decoded ?
+	if (!sound.decoder.get())
+    {
+        return;
+    }
+
+    const sound_data& sndData = sound.getSoundData();
 
     // concatenate global volume
-	int volume = int(sounddata.volume*getFinalVolume()/100.0);
+	int volume = int(sndData.volume*getFinalVolume()/100.0);
 
 	// When the current sound don't have enough decoded data to fill the buffer, 
 	// we first mix what is already decoded, then decode some more data, and
 	// mix some more until the buffer is full. If a sound loops the magic
 	// happens here ;)
 	//
-	if (sound.decodedDataSize() - sound.playbackPosition < buffer_length 
+	if (sound.decodedDataSize() - sound.playbackPosition < mixLen 
 		&& (sound.decodingPosition < sound.encodedDataSize() || sound.loopCount != 0))
 	{
 		// First we mix what is decoded
@@ -933,8 +969,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
 		{
 			index = sound.decodedDataSize() - sound.playbackPosition;
 
-			do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition),
-				index, volume);
+			do_mixing(buffer, sound, index, volume);
 
 		}
 
@@ -946,7 +981,7 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
 		// Delete any previous raw_data
 		sound.deleteDecodedData();
 
-		while(decoded_size < buffer_length)
+		while(decoded_size < mixLen)
 		{
 
 			// If we need to loop, we reset the data pointer
@@ -966,15 +1001,31 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
 
 			boost::uint32_t inputSize = 0;
 			bool parse = true;
-			if (sounddata.soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM) {
+			if (sndData.soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM)
+            {
 				parse = false;
-				if (sounddata.m_frames_size.size() > 0) {
-					inputSize = sounddata.m_frames_size[sound.decodingPosition];
+				if (!sndData.m_frames_size.empty())
+                {
+                    const sound_data::FrameSizeMap& m = sndData.m_frames_size;
+                    sound_data::FrameSizeMap::const_iterator it =
+                            m.find(sound.decodingPosition);
+                    if ( it == m.end() )
+                    {
+                        log_error("Unknown size of ADPCM frame starting at offset %d", sound.decodingPosition);
+					    inputSize = sound.encodedDataSize() - sound.decodingPosition;
+                    }
+                    else
+                    {
+					    inputSize = it->second; 
+                    }
 				}
-				else {
+				else
+                {
 					inputSize = sound.encodedDataSize() - sound.decodingPosition;
 				}
-			} else {
+			}
+            else
+            {
 				inputSize = sound.encodedDataSize() - sound.decodingPosition;
 			}
 
@@ -1002,8 +1053,8 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
 
 		// Determine how much should be mixed
 		unsigned int mix_length = 0;
-		if (decoded_size >= buffer_length - index) {
-			mix_length = buffer_length - index;
+		if (decoded_size >= mixLen - index) {
+			mix_length = mixLen - index;
 		} else { 
 			mix_length = decoded_size;
 		}
@@ -1012,29 +1063,27 @@ SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
 			log_error("Something went terribly wrong during mixing of an active sound");
 			return; // something went terrible wrong
 		}
-		do_mixing(buffer+index, sound, sound.getDecodedData(0), mix_length, volume);
+		do_mixing(buffer+index, sound, mix_length, volume);
 
 	}
 
 	// When the current sound has enough decoded data to fill 
 	// the buffer, we do just that.
-	else if (sound.decodedDataSize() > sound.playbackPosition && sound.decodedDataSize() - sound.playbackPosition > buffer_length )
+	else if (sound.decodedDataSize() > sound.playbackPosition && sound.decodedDataSize() - sound.playbackPosition > mixLen )
 	{
 
-		do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition), 
-			buffer_length, volume);
+		do_mixing(buffer, sound, mixLen, volume);
 
 	}
 
 	// When the current sound doesn't have anymore data to decode,
 	// and doesn't loop (anymore), but still got unplayed data,
 	// we put the last data on the stream
-	else if (sound.decodedDataSize() - sound.playbackPosition <= buffer_length && sound.decodedDataSize() > sound.playbackPosition+1)
+	else if (sound.decodedDataSize() - sound.playbackPosition <= mixLen && sound.decodedDataSize() > sound.playbackPosition+1)
 	{
 	
 
-		do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition), 
-			sound.decodedDataSize() - sound.playbackPosition, volume);
+		do_mixing(buffer, sound, sound.decodedDataSize() - sound.playbackPosition, volume);
 
 		sound.playbackPosition = sound.decodedDataSize();
 	} 
@@ -1053,7 +1102,7 @@ SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned i
 		// Temp variables to make the code simpler and easier to read
 		active_sound* sound = *i; 
 
-		mixActiveSound(*sound, sounddata, buffer, buffer_length);
+		mixActiveSound(*sound, buffer, buffer_length);
 
 		// Sound is done, remove it from the active list
 		if (sound->decodingPosition == sound->encodedDataSize() && sound->playbackPosition == sound->decodedDataSize() && sound->loopCount == 0)

@@ -68,7 +68,10 @@ public:
 	/// Object holding information about the sound
 	std::auto_ptr<media::SoundInfo> soundinfo;
 
-	std::map<boost::uint32_t,boost::uint32_t> m_frames_size;
+	typedef std::map<boost::uint32_t,boost::uint32_t> FrameSizeMap;
+
+	/// Maps frame sizes to start-of-frame offsets
+	FrameSizeMap m_frames_size;
 
 	/// Append size bytes to this sound
 	//
@@ -138,7 +141,7 @@ public:
 	ActiveSounds::iterator eraseActiveSound(ActiveSounds::iterator i);
 };
 
-/// Used to hold the info about active sounds
+/// Playing instance of a defined sound (sound_data)
 //
 /// This class contains a pointer to the sound_data used for playing
 /// and an optional SimpleBuffer to use when decoding is needed.
@@ -149,7 +152,7 @@ public:
 class active_sound
 {
 public:
-	active_sound()
+	active_sound(const sound_data& soundData)
 		:
 		decoder(0),
 		decodingPosition(0),
@@ -158,7 +161,7 @@ public:
 		offset(0),
 		current_env(0),
 		samples_played(0),
-		_encodedData(0)
+		_encodedData(soundData)
 	{}
 
 	~active_sound()
@@ -183,7 +186,7 @@ public:
 	unsigned int offset;
 
 	/// Sound envelopes for the current sound, which determine the volume level
-	/// from a given position. Only used with sound events.
+	/// from a given position. Only used with event sounds.
 	const std::vector<sound_handler::sound_envelope>* envelopes;
 
 	/// Index of current envelope.
@@ -192,17 +195,14 @@ public:
 	/// Number of samples played so far.
 	unsigned long samples_played;
 
-	/// Set the undecoded data pointer
-	//
-	/// @param newUndecodedData
-	///	Pointer to a sound_data being the undecoded data
-	/// 	Ownership will NOT be transferred.
-	///
-	void set_data(sound_data* newUndecodedData);
+	/// Get the sound definition this object is an instance of
+	const sound_data& getSoundData() {    
+        return _encodedData;
+    }
 
 	/// Returns the data pointer in the encoded datastream
 	/// for the given position. Boundaries are checked.
-	boost::uint8_t* getEncodedData(unsigned long int pos);
+	const boost::uint8_t* getEncodedData(unsigned long int pos);
 
 	/// Returns the data pointer in the decoded datastream
 	/// for the given position. Boundaries are checked.
@@ -266,13 +266,13 @@ public:
   
 	size_t encodedDataSize() const
 	{
-		return _encodedData ? _encodedData->size() : 0;
+		return _encodedData.size();
 	}
   
 private:
 
 	/// The encoded data
-	sound_data* _encodedData;
+	const sound_data& _encodedData;
 
 	/// The decoded buffer
 	//
@@ -335,33 +335,32 @@ private:
 
 	void mixSoundData(sound_data& sounddata, Uint8* stream, unsigned int buffer_length);
 
-	void mixActiveSound(active_sound& sound, sound_data& sounddata, Uint8* stream, unsigned int buffer_length);
+	/// @param sound
+	///     The active sound to mix in
+	//
+	/// @param mixTo
+	///     The buffer to mix sound into
+	///
+	/// @param mixLen
+	///     The amount of bytes to mix in
+	///
+	void mixActiveSound(active_sound& sound, Uint8* mixTo, unsigned int mixLen);
 
 	/// Callback invoked by the SDL audio thread.
 	//
-	/// Refills the output stream/buffer with data.
-	///
-	/// We run trough all the attached auxiliary streamers fetching decoded
-	/// audio blocks and mixing them into the given output stream.
-	///
-	/// If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
-	/// and resampled if needed. When the buffer has been sampled, another
-	/// frame is decoded until all frames has been decoded.
-	/// If a sound is looping it will be decoded from the beginning again.
-	///
-	/// TODO: make a static method of the SDL_sound_handler class
+	/// This is basically a wrapper around fetchSamples
 	///
 	/// @param udata
-	///	User data pointer (SDL_sound_handler instance in our case).
-	///	We'll lock the SDL_sound_handler::_mutex during operations.
+	///	    User data pointer (SDL_sound_handler instance in our case).
+	///	    We'll lock the SDL_sound_handler::_mutex during operations.
 	///
 	/// @param stream
 	/// 	The output stream/buffer to fill
 	///
 	/// @param buffer_length_in
-	///	Length of the buffer.
-	///	If zero or negative we log an error and return
-	///	(negative is probably an SDL bug, zero dunno yet).
+	///	    Length of the buffer.
+	///	    If zero or negative we log an error and return
+	///	    (negative is probably an SDL bug, zero dunno yet).
 	///
 	static void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in);
 
@@ -426,6 +425,25 @@ public:
 	// See dox in sound_handler.h
 	virtual void	detach_aux_streamer(void* owner);
 
+	/// Refills the output buffer with data.
+	//
+	/// We run trough all the attached auxiliary streamers fetching decoded
+	/// audio blocks and mixing them into the given output stream.
+	///
+	/// If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
+	/// and resampled if needed. When the buffer has been sampled, another
+	/// frame is decoded until all frames has been decoded.
+	/// If a sound is looping it will be decoded from the beginning again.
+	///
+	/// @param to
+	///     The buffer to refill
+	///
+	/// @param nBytes
+	///     The amount of bytes the output buffer holds
+	///
+	/// @todo make this a virtual method in the base class
+	///
+	void fetchSamples(boost::uint8_t* to, unsigned int nBytes);
 };
 
 } // gnash.sound namespace 
