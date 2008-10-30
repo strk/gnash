@@ -44,6 +44,12 @@
 // Define this to get debugging call about pausing/unpausing audio
 //#define GNASH_DEBUG_SDL_AUDIO_PAUSING
 
+// Mixing and decoding debugging
+//#define GNASH_DEBUG_MIXING
+
+// Debug create_sound/delete_sound/play_sound/stop_sound
+//#define GNASH_DEBUG_SOUNDS_MANAGEMENT
+
 namespace { // anonymous
 
 // Header of a wave file
@@ -189,7 +195,9 @@ int	SDL_sound_handler::create_sound(
 
 	int sound_id = _sounds.size()-1;
 
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
 	log_debug("create_sound: sound %d, format %d", sound_id, _sounds.back()->soundinfo->getFormat());
+#endif
 
 	return sound_id;
 
@@ -278,7 +286,9 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset,
 	sound->loopCount = loopCount;
 
 	media::SoundInfo& si = *(sounddata->soundinfo);
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
 	log_debug("play_sound %d called, SoundInfo format is %s", sound_handle, si.getFormat());
+#endif
 	media::AudioInfo info(
 		(int)si.getFormat(), // codeci
 		si.getSampleRate(), // sampleRatei
@@ -381,7 +391,9 @@ void	SDL_sound_handler::delete_sound(int sound_handle)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug ("deleting sound :%d", sound_handle);
+#endif
 
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
 	{
@@ -621,10 +633,26 @@ EmbeddedSoundInstance::getDecodedData(unsigned long int pos)
 	else return 0;
 }
 
-void
+unsigned int 
 EmbeddedSoundInstance::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
     boost::int16_t* data = getDecodedData(playbackPosition);
+    unsigned int availableSamples = decodedSamplesAhead();
+
+    if ( availableSamples < nSamples )
+    {
+        log_error("EmbeddedSoundInstance::fetchSamples: "
+            "requested to fetch %s samples, "
+            "but only %d decoded samples available "
+            "(decoding completed: %d)",
+            nSamples, availableSamples, decodingCompleted());
+
+        // pad the leftover part with zeroes
+        std::fill(to+availableSamples, to+nSamples, 0);
+        //memset(to+availableSamples, 0, (nSamples-availableSamples)*2);
+
+        nSamples = availableSamples;
+    }
 
 	// Update playback position (samples are 16bit)
 	playbackPosition += nSamples*2;
@@ -632,7 +660,10 @@ EmbeddedSoundInstance::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 	// update samples played
 	samples_played += nSamples;
 
+    // copy the actual data to output buffer
     std::copy(data, data+nSamples, to);
+
+    return nSamples;
 }
 
 const boost::uint8_t*
@@ -649,6 +680,8 @@ void EmbeddedSoundInstance::deleteDecodedData()
 // AS-volume adjustment
 void adjust_volume(boost::int16_t* data, int size, int volume)
 {
+    //log_error("skipping volume adjustment (intentionally)"); return;
+
     if ( size%2 != 0 )
     {
         log_error("adjust_volume called for a buffer of an odd number of bytes!"
@@ -663,6 +696,8 @@ void adjust_volume(boost::int16_t* data, int size, int volume)
 void
 EmbeddedSoundInstance::useEnvelopes(unsigned int length)
 {
+    //log_error("skipping envelopes (intentionally)"); return;
+
 	// Check if this is the time to use envelopes yet
 	if (current_env == 0 && (*envelopes)[0].m_mark44 > samples_played+length/2)
 	{
@@ -747,26 +782,37 @@ do_mixing(Uint8* mixTo, EmbeddedSoundInstance& sound, unsigned int mixLen, unsig
     assert ( !(mixLen%2) );
 
     unsigned int nSamples=mixLen/2;
-    if ( ! nSamples ) return;
+    if ( ! nSamples )
+    {
+        log_debug("do_mixing: %d bytes are 0 samples, nothing to do");
+        return;
+    }
 
     boost::scoped_array<boost::int16_t> data(new boost::int16_t[nSamples]);
 
-    sound.fetchSamples(data.get(), nSamples);
+    unsigned int wroteSamples = sound.fetchSamples(data.get(), nSamples);
+    if ( wroteSamples < nSamples )
+    {
+        log_debug("do_mixing: less samples fetched (%d) then I requested (%d)", wroteSamples, nSamples);
+    }
 
 	// If the volume needs adjustments we call a function to do that (why are we doing this manually ?)
 	if (volume != 100)
     {
-		adjust_volume(data.get(), mixLen, volume);
+		adjust_volume(data.get(), wroteSamples*2, volume);
 	}
 
     /// @todo is use of envelopes really mutually exclusive with
     ///       setting the volume ??
     else if (sound.envelopes)
     {
-		sound.useEnvelopes(mixLen);
+		sound.useEnvelopes(wroteSamples*2);
 	}
 
 	// Mix the raw data
+#ifdef GNASH_DEBUG_MIXING
+    log_debug("do_mixing: calling SDL_MixAudio with %d bytes of samples", mixLen);
+#endif
 	SDL_MixAudio(mixTo, reinterpret_cast<const Uint8*>(data.get()), mixLen, SDL_MIX_MAXVOLUME);
 }
 
@@ -981,6 +1027,15 @@ SDL_sound_handler::mixActiveSound(EmbeddedSoundInstance& sound, Uint8* buffer,
         return;
     }
 
+    assert(!(mixLen%2));
+
+    unsigned int mixSamples = mixLen/2;
+
+#ifdef GNASH_DEBUG_MIXING
+    log_debug("Asked to mix-in %d samples (%d bytes) of this sound",
+        mixSamples, mixLen);
+#endif
+
     const EmbeddedSound& sndData = sound.getSoundData();
 
     // concatenate global volume
@@ -991,17 +1046,27 @@ SDL_sound_handler::mixActiveSound(EmbeddedSoundInstance& sound, Uint8* buffer,
 	// mix some more until the buffer is full. If a sound loops the magic
 	// happens here ;)
 	//
-	if (sound.decodedDataSize() - sound.playbackPosition < mixLen 
-		&& (sound.decodingPosition < sound.encodedDataSize() || sound.loopCount != 0))
+	if (sound.decodedSamplesAhead() < mixSamples
+		&& ( !sound.decodingCompleted() || sound.loopCount != 0) )
 	{
+#ifdef GNASH_DEBUG_MIXING
+        log_debug("There are %d decoded samples available "
+            "(less then the %d requested); "
+            "decoding completed:%d; "
+            "loopCount:%d",
+            sound.decodedSamplesAhead(), mixSamples,
+            sound.decodingCompleted(), sound.loopCount);
+#endif
+
 		// First we mix what is decoded
 		unsigned int index = 0;
-		if (sound.decodedDataSize() - sound.playbackPosition > 0)
+		if (sound.decodedSamplesAhead())
 		{
-			index = sound.decodedDataSize() - sound.playbackPosition;
-
+			index = sound.decodedSamplesAhead()*2; // each sample is 2 bytes
+#ifdef GNASH_DEBUG_MIXING
+            log_debug(" mixing %d bytes of available data in...", index);
+#endif
 			do_mixing(buffer, sound, index, volume);
-
 		}
 
 		// Then we decode some data
@@ -1010,20 +1075,30 @@ SDL_sound_handler::mixActiveSound(EmbeddedSoundInstance& sound, Uint8* buffer,
 		unsigned int decoded_size = 0;
 
 		// Delete any previous raw_data
+        // @@ Why is this !?!?
 		sound.deleteDecodedData();
 
+        /// @todo REWRITE THIS CRAP !!
 		while(decoded_size < mixLen)
 		{
 
+#ifdef GNASH_DEBUG_MIXING
+            log_debug(" decoded_size:%d, mixLen:%d ... we'll want more ...", decoded_size, mixLen);
+#endif
+
 			// If we need to loop, we reset the data pointer
-			if (sound.encodedDataSize() == sound.decodingPosition && sound.loopCount != 0) {
+			if (sound.decodingCompleted() && sound.loopCount != 0)
+            {
+#ifdef GNASH_DEBUG_MIXING
+                log_debug(" decoding was completed, so we decrement loop count and reset decoding position to 0");
+#endif
 				sound.loopCount--;
 				sound.decodingPosition = 0;
 				sound.samples_played = 0;
 			}
 
 			// Test if we will get problems... Should not happen...
-			assert(sound.encodedDataSize() > sound.decodingPosition);
+			assert(!sound.decodingCompleted());
 			
 			// temp raw buffer
 			Uint8* tmp_raw_buffer=0;
@@ -1034,6 +1109,10 @@ SDL_sound_handler::mixActiveSound(EmbeddedSoundInstance& sound, Uint8* buffer,
 			bool parse = true;
 			if (sndData.soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM)
             {
+#ifdef GNASH_DEBUG_MIXING
+                log_debug(" sound format is ADPCM");
+#endif
+
 				parse = false;
 				if (!sndData.m_frames_size.empty())
                 {
@@ -1042,29 +1121,51 @@ SDL_sound_handler::mixActiveSound(EmbeddedSoundInstance& sound, Uint8* buffer,
                             m.find(sound.decodingPosition);
                     if ( it == m.end() )
                     {
-                        log_error("Unknown size of ADPCM frame starting at offset %d", sound.decodingPosition);
+#ifdef GNASH_DEBUG_MIXING
+                        log_debug("Unknown size of ADPCM frame starting at offset %d", sound.decodingPosition);
+#endif
 					    inputSize = sound.encodedDataSize() - sound.decodingPosition;
                     }
                     else
                     {
 					    inputSize = it->second; 
+#ifdef GNASH_DEBUG_MIXING
+                        log_debug(" frame size for frame starting at offset %d is %d",
+                            sound.decodingPosition, inputSize);
+#endif
                     }
 				}
 				else
                 {
 					inputSize = sound.encodedDataSize() - sound.decodingPosition;
+#ifdef GNASH_DEBUG_MIXING
+                    log_debug(" frame size for frame starting at offset %d is unknown, "
+                        "using the whole still encoded data (%d bytes)",
+                        sound.decodingPosition, inputSize);
+#endif
 				}
 			}
             else
             {
 				inputSize = sound.encodedDataSize() - sound.decodingPosition;
+#ifdef GNASH_DEBUG_MIXING
+                log_debug(" frame size of non-ADPCM frame starting at offset %d is unknown, "
+                        "using the whole still encoded data (%d bytes)",
+                        sound.decodingPosition, inputSize);
+#endif
 			}
 
-			log_debug("Decoding %d bytes", inputSize);
+#ifdef GNASH_DEBUG_MIXING
+			log_debug("  decoding %d bytes", inputSize);
+#endif
 			tmp_raw_buffer = sound.decoder->decode(sound.getEncodedData(sound.decodingPosition), 
 					inputSize, tmp_raw_buffer_size, decodedBytes, parse);
 
 			sound.decodingPosition += decodedBytes;
+
+#ifdef GNASH_DEBUG_MIXING
+			log_debug("  appending %d bytes to decoded buffer", tmp_raw_buffer_size);
+#endif
 
 			// tmp_raw_buffer ownership transferred here
 			sound.appendDecodedData(tmp_raw_buffer, tmp_raw_buffer_size);
@@ -1072,8 +1173,18 @@ SDL_sound_handler::mixActiveSound(EmbeddedSoundInstance& sound, Uint8* buffer,
 			decoded_size += tmp_raw_buffer_size;
 
 			// no more to decode from this sound, so we break the loop
-			if ((sound.encodedDataSize() <= sound.decodingPosition && sound.loopCount == 0)
-                    || (tmp_raw_buffer_size == 0 && decodedBytes == 0)) {
+			if ((sound.encodedDataSize() <= sound.decodingPosition && !sound.loopCount)
+                    || (!tmp_raw_buffer_size && decodedBytes == 0))
+            {
+#ifdef GNASH_DEBUG_MIXING
+			    log_debug("  no more to decode from this sound"
+                          "(encodedDataSize:%d, decodingPosition:%d, loopCount:%d) "
+                          "(tmp_raw_buffer_size:%d, decodedBytes:%d)"
+                          ", breaking the decoding loop",
+                          sound.encodedDataSize(), sound.decodingPosition,
+                          sound.loopCount, tmp_raw_buffer_size, decodedBytes);
+#endif
+
 				sound.decodingPosition = sound.encodedDataSize();
 				break;
 			}
@@ -1089,35 +1200,58 @@ SDL_sound_handler::mixActiveSound(EmbeddedSoundInstance& sound, Uint8* buffer,
 		} else { 
 			mix_length = decoded_size;
 		}
-		if (sound.decodedDataSize() < 2)
+
+		if (!sound.decodedSamplesAhead())
 		{
 			log_error("Something went terribly wrong during mixing of an active sound");
 			return; // something went terrible wrong
 		}
+
 		do_mixing(buffer+index, sound, mix_length, volume);
 
 	}
 
 	// When the current sound has enough decoded data to fill 
 	// the buffer, we do just that.
-	else if (sound.decodedDataSize() > sound.playbackPosition && sound.decodedDataSize() - sound.playbackPosition > mixLen )
+	else if ( sound.decodedSamplesAhead() && sound.decodedSamplesAhead() >= mixSamples )
 	{
+#ifdef GNASH_DEBUG_MIXING
+        log_debug("There are %d decoded samples available "
+            "(enough for the %d requested); "
+            "decoding completed:%d; Mixing in %d bytes",
+            sound.decodedSamplesAhead(), mixSamples,
+            sound.decodingCompleted(), mixLen);
+#endif
 
 		do_mixing(buffer, sound, mixLen, volume);
-
 	}
 
 	// When the current sound doesn't have anymore data to decode,
 	// and doesn't loop (anymore), but still got unplayed data,
 	// we put the last data on the stream
-	else if (sound.decodedDataSize() - sound.playbackPosition <= mixLen && sound.decodedDataSize() > sound.playbackPosition+1)
+	else if (sound.decodedSamplesAhead() <= mixSamples && sound.decodedSamplesAhead())
 	{
-	
+#ifdef GNASH_DEBUG_MIXING
+        log_debug("There are %d decoded samples available "
+            "(better then nothing for the %d requested); "
+            "decoding completed:%d; Mixing in %d bytes",
+            sound.decodedSamplesAhead(), mixSamples,
+            sound.decodingCompleted(), sound.decodedSamplesAhead()*2);
+#endif
 
-		do_mixing(buffer, sound, sound.decodedDataSize() - sound.playbackPosition, volume);
-
-		sound.playbackPosition = sound.decodedDataSize();
+		do_mixing(buffer, sound, sound.decodedSamplesAhead()*2, volume);
 	} 
+
+    else
+    {
+#ifdef GNASH_DEBUG_MIXING
+        log_debug(" None of the conditions verified where met !!!!!!-----------");
+        log_debug(
+            "decodedSamplesAhead:%d, decodingCompleted:%d, loopCount:%d",
+            sound.decodedSamplesAhead(), sound.decodingCompleted(),
+            sound.loopCount);
+#endif
+    }
 }
 
 /*private*/
@@ -1131,12 +1265,13 @@ SDL_sound_handler::mixSoundData(EmbeddedSound& sounddata, Uint8* buffer, unsigne
 	{
 
 		// Temp variables to make the code simpler and easier to read
-		EmbeddedSoundInstance* sound = *i; 
+		EmbeddedSoundInstance& sound = *(*i); 
 
-		mixActiveSound(*sound, buffer, buffer_length);
+		mixActiveSound(sound, buffer, buffer_length);
 
 		// Sound is done, remove it from the active list
-		if (sound->decodingPosition == sound->encodedDataSize() && sound->playbackPosition == sound->decodedDataSize() && sound->loopCount == 0)
+
+		if ( sound.decodingCompleted() && !sound.decodedSamplesAhead() && !sound.loopCount)
 		{
 			i = sounddata.eraseActiveSound(i);
 

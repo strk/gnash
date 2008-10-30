@@ -201,7 +201,7 @@ public:
     }
 
     // See dox in sound_handler.h (InputStream)
-    void fetchSamples(boost::int16_t* to, unsigned int nSamples);
+    unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples);
 
 	/// Release resources associated with decoded data, if any.
 	//
@@ -250,15 +250,6 @@ public:
 		delete [] data; // ownership transferred...
 	}
 
-	size_t decodedDataSize() const
-	{
-		if ( _decodedData.get() )
-		{
-			return _decodedData->size();
-		}
-		else return 0;
-	}
-  
 	size_t encodedDataSize() const
 	{
 		return _encodedData.size();
@@ -282,8 +273,38 @@ public:
     /// @todo make private
     ///
 	const boost::uint8_t* getEncodedData(unsigned long int pos);
+
+    /// Return number of already-decoded samples available
+    /// from playback position on
+    unsigned int decodedSamplesAhead()
+    {
+        unsigned int bytesAhead = decodedDataSize() - playbackPosition;
+        assert(!(bytesAhead%2));
+
+        unsigned int samplesAhead = bytesAhead/2;
+        return samplesAhead;
+    }
+
+    /// Return true if there's nothing more to decode
+    bool decodingCompleted() const
+    {
+        // example: 10 bytes of encoded data, decodingPosition 8 : more to decode
+        // example: 10 bytes of encoded data, decodingPosition 10 : nothing more to decode
+
+        return ( decodingPosition >= encodedDataSize() );
+    }
   
 private:
+
+    /// Return full size of the decoded data buffer
+	size_t decodedDataSize() const
+	{
+		if ( _decodedData.get() )
+		{
+			return _decodedData->size();
+		}
+		else return 0;
+	}
 
     /// \brief
 	/// Returns the data pointer in the decoded datastream
