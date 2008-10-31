@@ -117,6 +117,7 @@ boolean-properties-5.swf:d955b32271cf8a073de42566eb13a5d8
 boolean-properties-6.swf:606b0b8883de19dce98bbeb9c91e0215
 boolean-properties-7.swf:f01da3f46a6a70f22682ad6655e1be6a
 boolean-properties-8.swf:bcb5f70be1ae877fb31c198925ba1375
+builtin-construction-5.swf:c3bcb8608999fa7a42a04b22e9e4929a
 call-arguments-5.swf:422c391a2abd3e864eb8ed8a1e05ad31
 callfunction-stack.swf:21d0c957f4caf0eb0ccd0dcadaf17500
 case1-6.swf:ba805f628a3a2d1bbd292ec1e56d1708
@@ -179,6 +180,7 @@ constructor-madness-6.swf:85b10c1724ac5a083a3f40cb8322011d
 constructor-madness-7.swf:616b5b2cfbed3f3703e1b774974d7f48
 constructor-madness-8.swf:5357273baf6b66f6af0223cb1d13b144
 constructor-prototype.swf:22505f0f8dd8440972a298110d697e3b
+constructor-relay-5.swf:2d1a814c37f55485d66624cb97c58e03
 convolution-filter-properties-5.swf:96e15de475e31c328e201c152ffd2f42
 convolution-filter-properties-5.swf:db6e2ddcbee195363a53c276bfc460d7
 countdown.swf:db94f8e7bb5a46cbf210c94a19fa068d
@@ -631,6 +633,7 @@ object-isprototypeof-propflags-9.swf:03d8c864e892083523ce19f764f21497
 object-math-5.swf:2d509f7b6e94776a2208fcbec80b7a67
 object-math-6.swf:bdf73b4bfb144113a80ff78a282558d7
 object-math-7.swf:15d6cb896cc58fe289ed0e6de39b3347
+object-resolve-propflags-9.swf:db769008cba912cd906834a4722fdb95
 object-valueof-5.swf:2520f058ac5a1af3db81ba9b3002e6ab
 object-valueof-6.swf:68d80a5ba580357d1dfeb3b515691e7e
 object-valueof-7.swf:9b4f95998e0bd9a950062362e3cf1487
