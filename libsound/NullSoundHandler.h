@@ -58,7 +58,7 @@ public:
 	}
 
 	// See dox in sound_handler.h 
-	virtual media::SoundInfo* get_sound_info(int soundHandle) { return 0; }
+	virtual media::SoundInfo* get_sound_info(int) { return 0; }
 
 	// See dox in sound_handler.h 
 	virtual void play_sound(int /*sound_handle*/, int /*loop_count*/, int /*secondOffset*/, long /*start*/,
