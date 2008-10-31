@@ -844,11 +844,42 @@ check_equals ("string + " + nothing, "string + undefined");
 nothing2.valueOf = function() { return "valueOf"; };
 check_equals ("string + " + nothing2, "string + valueOf");
 
+/// Test __resolve property
+
+o = {};
+check_equals(o.a, undefined);
+check_equals(o.b, undefined);
+
+resolveCalled = 0;
+
+delete result;
+
+o.__resolve = function(arg) {
+    result = arg;
+    resolveCalled++;
+    return "passed";
+};
+
+check_equals(o.a, "passed");
+check_equals(typeof(result), "string");
+check_equals(resolveCalled, 1);
+check_equals(result, "a");
+
+check_equals(o.b, "passed");
+check_equals(typeof(result), "string");
+check_equals(resolveCalled, 2);
+check_equals(result, "b");
+
+check_equals(o.quibbleDibblePropertyWithASillyName, "passed");
+check_equals(typeof(result), "string");
+check_equals(resolveCalled, 3);
+check_equals(result, "quibbleDibblePropertyWithASillyName");
+
 #if OUTPUT_VERSION <= 5
-totals(83);
+totals(97);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(262);
+totals(276);
 #endif
 

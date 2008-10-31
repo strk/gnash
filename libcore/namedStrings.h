@@ -205,6 +205,7 @@ enum NamedStrings {
 		PROP_uTOTALFRAMES,
 		PROP_uuCONSTRUCTORuu,
 		PROP_uuPROTOuu,
+        PROP_uuRESOLVE,
 		PROP_uURL,
 		PROP_uVISIBLE,
 		PROP_uWIDTH,

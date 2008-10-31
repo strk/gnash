@@ -117,6 +117,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "__proto__", NSV::PROP_uuPROTOuu ),
 	string_table::svt( "prototype", NSV::PROP_PROTOTYPE ),
 	string_table::svt( "push", NSV::PROP_PUSH ),
+	string_table::svt( "__resolve", NSV::PROP_uuRESOLVE ),
 	string_table::svt( "r", NSV::PROP_R ),
 	string_table::svt( "removeListener", NSV::PROP_REMOVE_LISTENER ),
 	string_table::svt( "rightMargin", NSV::PROP_RIGHT_MARGIN ),
