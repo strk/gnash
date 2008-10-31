@@ -121,6 +121,7 @@ protected:
 	///
 	character_def(const character_def& o)
 		:
+        ExportableResource(),
 		m_id(o.m_id),
 		m_render_cache(NULL)
 	{}
