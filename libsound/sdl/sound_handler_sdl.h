@@ -40,10 +40,10 @@
 namespace gnash {
 namespace sound {
 
-class EmbeddedSoundInstance;
+class EmbedSoundInst;
 
 /// Used to hold the sounddata when doing on-demand-decoding
-class EmbeddedSound
+class EmbedSound
 {
 	/// The undecoded data
 	std::auto_ptr<SimpleBuffer> _buf;
@@ -61,9 +61,9 @@ public:
     ///
     /// @pararm nVolume initial volume (0..100). Optional, defaults to 100.
     ///
-	EmbeddedSound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> info, int nVolume=100);
+	EmbedSound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> info, int nVolume=100);
 
-	~EmbeddedSound();
+	~EmbedSound();
 
 	/// Object holding information about the sound
 	std::auto_ptr<media::SoundInfo> soundinfo;
@@ -87,6 +87,12 @@ public:
 	size_t size() const 
 	{
 		return _buf->size();
+	}
+
+	/// Is the data buffer empty ?
+	bool empty() const 
+	{
+		return _buf->empty();
 	}
 
 	/// Return a pointer to the underlying buffer
@@ -119,6 +125,17 @@ public:
 		return _buf->data()+pos;
 	}
 
+    /// Are there known playing instances of this sound ?
+    bool isPlaying() const {
+        return !_soundInstances.empty();
+    }
+
+    /// Create an instance of this sound
+    //
+    /// The returned instance is owned by this class
+    ///
+	EmbedSoundInst* createInstance(media::MediaHandler& mh);
+
 	/// Volume for AS-sounds, range: 0-100.
 	/// It's the SWF range that is represented here.
 	int volume;
@@ -127,47 +144,33 @@ public:
 	//
 	/// NOTE: This class *owns* all active sounds
 	///
-	typedef std::list<EmbeddedSoundInstance*> ActiveSounds;
+	typedef std::list<EmbedSoundInst*> Instances;
 
-	ActiveSounds _soundInstances;
+	Instances _soundInstances;
 
 	/// Drop all active sounds
-	void clearActiveSounds();
+	void clearInstances();
 
 	/// Drop an active sound (by iterator)
 	//
 	/// @return iterator after the one being erased
 	///
-	ActiveSounds::iterator eraseActiveSound(ActiveSounds::iterator i);
+	Instances::iterator eraseActiveSound(Instances::iterator i);
 };
 
-/// Playing instance of a defined sound (EmbeddedSound)
+/// Playing instance of a defined sound (EmbedSound)
 //
-/// This class contains a pointer to the EmbeddedSound used for playing
+/// This class contains a pointer to the EmbedSound used for playing
 /// and an optional SimpleBuffer to use when decoding is needed.
 ///
-/// When the SimpleBuffer is NULL we'll play the EmbeddedSound bytes directly
+/// When the SimpleBuffer is NULL we'll play the EmbedSound bytes directly
 /// (we assume they are decoded already)
 ///
-class EmbeddedSoundInstance
+class EmbedSoundInst : public sound_handler::InputStream
 {
 public:
-	EmbeddedSoundInstance(const EmbeddedSound& soundData)
-		:
-		decoder(0),
-		decodingPosition(0),
-		playbackPosition(0),
-		loopCount(0),
-		offset(0),
-		current_env(0),
-		samples_played(0),
-		_encodedData(soundData)
-	{}
 
-	~EmbeddedSoundInstance()
-	{
-		deleteDecodedData();
-	}
+	EmbedSoundInst(const EmbedSound& soundData, media::MediaHandler& mh);
 
 	/// The decoder object used to convert the data into the playable format
 	std::auto_ptr<media::AudioDecoder> decoder;
@@ -182,8 +185,11 @@ public:
 	/// For every loop completed, it is decremented.
 	long loopCount;
 
-	/// Offset to make playback start in-sync, only used with mp3 streams.
-	unsigned int offset;
+	/// Offset in seconds to make playback start in-sync
+    //
+    /// only used with mp3 streams.
+    ///
+	unsigned int offSecs;
 
 	/// Sound envelopes for the current sound, which determine the volume level
 	/// from a given position. Only used with event sounds.
@@ -196,7 +202,7 @@ public:
 	unsigned long samples_played;
 
 	/// Get the sound definition this object is an instance of
-	const EmbeddedSound& getSoundData() {    
+	const EmbedSound& getSoundData() {    
         return _encodedData;
     }
 
@@ -205,7 +211,7 @@ public:
 
 	/// Release resources associated with decoded data, if any.
 	//
-	/// After this call, the EmbeddedSoundInstance will have no decoded data
+	/// After this call, the EmbedSoundInst will have no decoded data
 	/// buffer, thus any pointer to the decoded data will be fetched
 	/// from the undecoded one.
 	///
@@ -319,7 +325,7 @@ private:
 	boost::int16_t* getDecodedData(unsigned long int pos);
 
 	/// The encoded data
-	const EmbeddedSound& _encodedData;
+	const EmbedSound& _encodedData;
 
 	/// The decoded buffer
 	//
@@ -330,10 +336,10 @@ private:
 
 };
 
-// This is here as it needs definition of EmbeddedSoundInstance
-EmbeddedSound::~EmbeddedSound()
+// This is here as it needs definition of EmbedSoundInst
+EmbedSound::~EmbedSound()
 {
-	clearActiveSounds();
+	clearInstances();
 }
 
 // Use SDL and ffmpeg/mad/nothing to handle sounds.
@@ -341,7 +347,7 @@ class SDL_sound_handler : public sound_handler
 {
 public:
 
-	typedef std::vector<EmbeddedSound*> Sounds;
+	typedef std::vector<EmbedSound*> Sounds;
 
 private:
 	/// AS classes (NetStream, Sound) audio callbacks
@@ -380,7 +386,7 @@ private:
 	// write a .WAV file header
 	void write_wave_header(std::ofstream& outfile);
 
-	void mixSoundData(EmbeddedSound& sounddata, Uint8* stream, unsigned int buffer_length);
+	void mixSoundData(EmbedSound& sounddata, Uint8* stream, unsigned int buffer_length);
 
 	/// @param sound
 	///     The active sound to mix in
@@ -391,7 +397,7 @@ private:
 	/// @param mixLen
 	///     The amount of bytes to mix in
 	///
-	void mixActiveSound(EmbeddedSoundInstance& sound, Uint8* mixTo, unsigned int mixLen);
+	void mixActiveSound(EmbedSoundInst& sound, Uint8* mixTo, unsigned int mixLen);
 
 	/// Callback invoked by the SDL audio thread.
 	//

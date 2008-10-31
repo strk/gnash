@@ -209,7 +209,8 @@ public:
 	/// @param secondOffset
 	/// 	When starting event sounds there sometimes is a offset to make the sound
 	/// 	start at the exact right moment. Gnash supports this troough 'Sound' AS
-	///	class only, not from the actual control tag (StartSound).
+	///     class only, not from the actual control tag (StartSound). Units given in 
+    ///     seconds.
 	///
 	/// @param start
 	/// 	When starting a soundstream from a random frame, this tells where in the
