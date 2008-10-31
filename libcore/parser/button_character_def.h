@@ -191,7 +191,7 @@ public:
 		boost::uint32_t m_in_point;
 		boost::uint32_t m_out_point;
 		boost::uint16_t m_loop_count;
-		std::vector<sound::sound_handler::sound_envelope> m_envelopes;
+		sound::SoundEnvelopes m_envelopes;
 	};
 
 	struct button_sound_info

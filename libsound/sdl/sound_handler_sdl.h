@@ -59,7 +59,7 @@ public:
     ///
     /// @param info encoding info
     ///
-    /// @pararm nVolume initial volume (0..100). Optional, defaults to 100.
+    /// @param nVolume initial volume (0..100). Optional, defaults to 100.
     ///
 	EmbedSound(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<media::SoundInfo> info, int nVolume=100);
 
@@ -134,7 +134,35 @@ public:
     //
     /// The returned instance is owned by this class
     ///
-	EmbedSoundInst* createInstance(media::MediaHandler& mh);
+    /// @param mh
+    ///     The MediaHandler to use for on-demand decoding
+    ///
+    /// @param blockOffset
+    ///     Byte offset in the immutable (encoded) data this
+    ///     instance should start decoding.
+    ///     This is currently used for streaming embedded sounds
+    ///     to refer to a specific StreamSoundBlock.
+    ///     @see gnash::swf::StreamSoundBlockTag
+    ///
+    /// @param secsOffset
+    ///     Offset, in seconds, this instance should start playing
+    ///     from. @todo take samples (for easier implementation of
+    ///     seekSamples in streaming sound).
+    ///
+    /// @param envelopes
+    ///     SoundEnvelopes to apply to this sound. May be 0 for none.
+    ///
+    /// @param loopCount
+    ///     Number of times this instance should loop over the defined sound.
+    ///     @todo document if every loop starts at secsOffset !
+    ///
+    /// @todo split this in createEventSoundInstance
+    ///                 and createStreamingSoundInstance
+    ///
+	EmbedSoundInst* createInstance(media::MediaHandler& mh,
+            unsigned long blockOffset, unsigned int secsOffset,
+            const SoundEnvelopes* envelopes,
+            unsigned int loopCount);
 
 	/// Volume for AS-sounds, range: 0-100.
 	/// It's the SWF range that is represented here.
@@ -158,7 +186,7 @@ public:
 	Instances::iterator eraseActiveSound(Instances::iterator i);
 };
 
-/// Playing instance of a defined sound (EmbedSound)
+/// Playing instance of a defined %sound (EmbedSound)
 //
 /// This class contains a pointer to the EmbedSound used for playing
 /// and an optional SimpleBuffer to use when decoding is needed.
@@ -170,10 +198,45 @@ class EmbedSoundInst : public sound_handler::InputStream
 {
 public:
 
-	EmbedSoundInst(const EmbedSound& soundData, media::MediaHandler& mh);
+    /// Create an embedded %sound instance
+    //
+    /// @param def
+    ///     The definition of this sound (where immutable data is kept)
+    ///
+    /// @param mh
+    ///     The MediaHandler to use for on-demand decoding
+    ///
+    /// @param blockOffset
+    ///     Byte offset in the immutable (encoded) data this
+    ///     instance should start decoding.
+    ///     This is currently used for streaming embedded sounds
+    ///     to refer to a specific StreamSoundBlock.
+    ///     @see gnash::swf::StreamSoundBlockTag
+    ///
+    /// @param secsOffset
+    ///     Offset, in seconds, this instance should start playing
+    ///     from. @todo take samples (for easier implementation of
+    ///     seekSamples in streaming sound).
+    ///
+    /// @param envelopes
+    ///     SoundEnvelopes to apply to this sound. May be 0 for none.
+    ///
+    /// @param loopCount
+    ///     Number of times this instance should loop over the defined sound.
+    ///     @todo document if every loop starts at secsOffset !
+    ///
+	EmbedSoundInst(const EmbedSound& def, media::MediaHandler& mh,
+            unsigned long blockOffset, unsigned int secsOffset,
+            const SoundEnvelopes* envelopes,
+            unsigned int loopCount);
 
-	/// The decoder object used to convert the data into the playable format
-	std::auto_ptr<media::AudioDecoder> decoder;
+    // See dox in sound_handler.h (InputStream)
+    unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples);
+
+    // See dox in sound_handler.h (InputStream)
+    unsigned int samplesFetched() const;
+
+private:
 
 	/// Current decoding position in the encoded stream
 	unsigned long decodingPosition;
@@ -193,29 +256,18 @@ public:
 
 	/// Sound envelopes for the current sound, which determine the volume level
 	/// from a given position. Only used with event sounds.
-	const std::vector<sound_handler::sound_envelope>* envelopes;
+	const SoundEnvelopes* envelopes;
 
 	/// Index of current envelope.
 	boost::uint32_t current_env;
 
-	/// Number of samples played so far.
-	unsigned long samples_played;
+	/// Number of samples fetched so far.
+	unsigned long _samplesFetched;
 
 	/// Get the sound definition this object is an instance of
 	const EmbedSound& getSoundData() {    
-        return _encodedData;
+        return _soundDef;
     }
-
-    // See dox in sound_handler.h (InputStream)
-    unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples);
-
-	/// Release resources associated with decoded data, if any.
-	//
-	/// After this call, the EmbedSoundInst will have no decoded data
-	/// buffer, thus any pointer to the decoded data will be fetched
-	/// from the undecoded one.
-	///
-	void deleteDecodedData();
 
 	/// Append size bytes to this raw data 
 	//
@@ -258,24 +310,53 @@ public:
 
 	size_t encodedDataSize() const
 	{
-		return _encodedData.size();
+		return _soundDef.size();
 	}
 
     /// Apply envelope-volume adjustments
     //
-    /// @param length Amount of bytes to envelope-adjust
-    ///        @todo take samples
     ///
-    /// @todo make private, have it called from fetchSamples
+    /// Modified envelopes cursor (current_env)
     ///
-    /// @todo document where does the envelope application 
-    ///       start from!
+    /// @param samples
+    ///     The samples to apply envelopes to
     ///
-    void useEnvelopes(unsigned int length);
+    /// @param nSamples
+    ///     Number of samples in the samples array.
+    ///     (nSamples*2 bytes).
+    ///
+    /// @param firstSampleNum
+    ///     Logical position of first sample in the array.
+    ///     This number gives the sample position referred to
+    ///     by SoundEnvelope objects.
+    ///
+    /// @param env
+    ///     SoundEnvelopes to apply.
+    ///
+    ///
+    void applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
+            unsigned int firstSampleNum,
+            const SoundEnvelopes& env);
+
+    /// AS-volume adjustment
+    //
+    /// @param samples
+    ///     The 16bit samples to adjust volume of
+    ///
+    /// @param nSamples
+    ///     Number of samples in the array
+    ///
+    /// @param volume
+    ///     Volume factor
+    ///
+    static void adjustVolume(boost::int16_t* samples,
+            unsigned int nSamples, float volume);
 
 	/// Returns the data pointer in the encoded datastream
 	/// for the given position. Boundaries are checked.
     //
+    /// Uses _samplesFetched and playbackPosition
+    ///
     /// @todo make private
     ///
 	const boost::uint8_t* getEncodedData(unsigned long int pos);
@@ -300,7 +381,16 @@ public:
         return ( decodingPosition >= encodedDataSize() );
     }
   
-private:
+
+	/// The decoder object used to convert the data into the playable format
+	std::auto_ptr<media::AudioDecoder> _decoder;
+
+    /// Create a decoder for this instance
+    //
+    /// If decoder creation fails an error will
+    /// be logged, and _decoder won't be set
+    /// 
+    void createDecoder(media::MediaHandler& mediaHandler);
 
     /// Return full size of the decoded data buffer
 	size_t decodedDataSize() const
@@ -325,15 +415,20 @@ private:
 	boost::int16_t* getDecodedData(unsigned long int pos);
 
 	/// The encoded data
-	const EmbedSound& _encodedData;
+	const EmbedSound& _soundDef;
 
 	/// The decoded buffer
 	//
-	/// If NULL, the _encodedData will be considered
+	/// If NULL, the _soundDef will be considered
 	/// decoded instead
 	///
 	std::auto_ptr<SimpleBuffer> _decodedData;
 
+    /// Decode next input block
+    //
+    /// It's assumed !decodingCompleted()
+    ///
+    void decodeNextBlock();
 };
 
 // This is here as it needs definition of EmbedSoundInst
@@ -342,7 +437,7 @@ EmbedSound::~EmbedSound()
 	clearInstances();
 }
 
-// Use SDL and ffmpeg/mad/nothing to handle sounds.
+/// SDL-based sound_handler
 class SDL_sound_handler : public sound_handler
 {
 public:
@@ -394,10 +489,13 @@ private:
 	/// @param mixTo
 	///     The buffer to mix sound into
 	///
-	/// @param mixLen
-	///     The amount of bytes to mix in
+	/// @param nSamples
+	///     The number of samples to mix in
+    ///
+    /// @return the number of samples mixed in. 
+    ///         If < nSamples we reached EOF of the EmbedSoundInst
 	///
-	void mixActiveSound(EmbedSoundInst& sound, Uint8* mixTo, unsigned int mixLen);
+	unsigned int mixActiveSound(EmbedSoundInst& sound, Uint8* mixTo, unsigned int nSamples);
 
 	/// Callback invoked by the SDL audio thread.
 	//
@@ -434,7 +532,7 @@ public:
 
 	// See dox in sound_handler.h
 	virtual void	play_sound(int sound_handle, int loopCount, int offset,
-				   long start_position, const std::vector<sound_envelope>* envelopes);
+				   long start_position, const SoundEnvelopes* envelopes);
 
 	// See dox in sound_handler.h
 	virtual void	stop_sound(int sound_handle);
@@ -455,7 +553,7 @@ public:
 	virtual void	set_volume(int sound_handle, int volume);
 		
 	// See dox in sound_handler.h
-	virtual media::SoundInfo* get_sound_info(int sound_handle);
+	virtual media::SoundInfo* get_sound_info(int soundHandle);
 
 	// See dox in sound_handler.h
 	virtual void	mute();

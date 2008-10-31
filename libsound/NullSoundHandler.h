@@ -36,7 +36,7 @@
 namespace gnash {
 namespace sound {
 
-/// Null Sound handler, for testing 
+/// Null sound_handler, for testing 
 class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
@@ -58,11 +58,11 @@ public:
 	}
 
 	// See dox in sound_handler.h 
-	virtual media::SoundInfo* get_sound_info(int /*sound_handle*/) { return 0; }
+	virtual media::SoundInfo* get_sound_info(int soundHandle) { return 0; }
 
 	// See dox in sound_handler.h 
 	virtual void play_sound(int /*sound_handle*/, int /*loop_count*/, int /*secondOffset*/, long /*start*/,
-		const std::vector<sound_envelope>* /*envelopes*/)
+		const SoundEnvelopes* /*envelopes*/)
 	{
 	}
 
