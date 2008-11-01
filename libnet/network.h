@@ -26,6 +26,14 @@
 # include <sys/types.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
+# include <sys/select.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#else 
+# ifdef HAVE_EPOLL
+#  include <epoll.h>
+# endif
+#endif
 #else
 # include <winsock2.h>
 # include <windows.h>
@@ -35,9 +43,22 @@
 #endif
 
 #include "dsodefs.h" //For DSOEXPORT.
+#include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>
+#include <vector>
 #include <cassert>
 #include <string>
+
+// /// \struct pollfd
+// ///
+// /// We use the system call poll()s data structure for passing
+// #ifndef HAVE_POLL
+// struct pollfd {
+//     int fd;        // the relevant file descriptor
+//     short events;  // events we are interested in
+//     short revents; // events which occur will be marked here
+// };
+// #endif
 
 namespace amf {
 class Buffer;
@@ -111,7 +132,13 @@ public:
 //    int writeNet(int fd, const byte_t *buffer);
     int writeNet(int fd, const byte_t *buffer, int nbytes);
     int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
-    
+
+#ifdef HAVE_POLL
+    boost::shared_ptr<std::vector<int> > waitForNetData(int limit, struct pollfd *fds);
+#endif
+    fd_set waitForNetData(int limit, fd_set data);
+    fd_set waitForNetData(std::vector<int> &data);
+	
     // Close the connection
     bool closeNet();
     bool closeNet(int fd);

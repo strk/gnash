@@ -21,7 +21,8 @@
 #endif
 
 #include <boost/thread/mutex.hpp>
-
+#include <boost/shared_ptr.hpp>
+#include <vector>
 
 #include "utility.h"
 #include "log.h"
@@ -49,6 +50,13 @@
 # include <netdb.h>
 # include <sys/param.h>
 # include <sys/select.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#else 
+# ifdef HAVE_EPOLL
+#  include <epoll.h>
+# endif
+#endif
 #endif
 
 #include "buffer.h"
@@ -939,6 +947,91 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
     return ret;
 }
 
+//boost::shared_ptr<vector<int> >
+boost::shared_ptr<std::vector<int> >
+Network::waitForNetData(int limit, struct pollfd *fds)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    boost::shared_ptr<vector<int> > hits(new vector<int>);
+
+    int ret = poll(fds, limit, _timeout);
+    
+    for (int i = 0; i<limit; i++) {
+	if (fds[i].revents == POLLIN) {
+	    hits->push_back(i);
+	    // If we got as many matches as were seen by poll(), then
+	    // stop searching the rest of the items in the array.
+	    if (hits->size() == ret) {
+		break;
+	    }
+	}
+    }
+
+    return hits;
+}
+
+fd_set
+Network::waitForNetData(vector<int> &data)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    fd_set fdset;
+    FD_ZERO(&fdset);
+    
+    for (size_t i = 0; i<data.size(); i++) {
+	FD_SET(data[i], &fdset);
+    }
+
+    return waitForNetData(data.size(), fdset);
+}
+
+fd_set
+//boost::shared_ptr<vector<int> >
+Network::waitForNetData(int limit, fd_set files)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    // select modifies this the set of file descriptors, and we don't
+    // want to modify the one passed as an argument, so we make a copy.
+    fd_set fdset = files;
+    
+    // Reset the timeout value, since select modifies it on return
+    int timeout = _timeout;
+    if (timeout <= 0) {
+	timeout = 5;
+    }
+#if 0
+    struct timespec tval;
+    sigset_t sigmask;
+    sigprocmask(SIG_BLOCK, &sigmask, NULL);
+
+    tval.tv_sec = timeout;
+    tval.tv_nsec = 0;
+    int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
+#else
+    struct timeval        tval;
+    tval.tv_sec = timeout;
+    tval.tv_usec = 0;
+    int ret = select(limit+1, &fdset, NULL, NULL, &tval);
+#endif
+    // If interupted by a system call, try again
+    if (ret == -1 && errno == EINTR) {
+	log_error (_("Waiting for data for fdset %d was interupted by a system call"), reinterpret_cast<int>(fdset.fds_bits));
+    }
+    
+    if (ret == -1) {
+	log_error (_("Waiting for data for fdset  %d was never available for reading"), reinterpret_cast<int>(fdset.fds_bits));
+    }
+    
+    if (ret == 0) {
+	log_debug (_("Waiting for data for fdset  %d timed out waiting for data"), reinterpret_cast<int>(fdset.fds_bits));
+	FD_ZERO(&fdset);
+    }
+
+    return fdset;
+}
+
 void
 Network::toggleDebug(bool val)
 {
@@ -946,10 +1039,8 @@ Network::toggleDebug(bool val)
     _debug = val;
 
     // Turn on debugging for the utility methods
-		// recursive on all control paths,
-		// function will cause runtime stack overflow
-
-		// toggleDebug(true);
+    // recursive on all control paths,
+    // toggleDebug(true);
 }
 
 
