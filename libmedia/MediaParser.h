@@ -126,28 +126,54 @@ enum audioCodecType
    	///
    	/// 90% of the times the actual encoder did run on windows, so
    	/// it is a good bet to guess for little-endian.
-   	/// 
+   	/// SampleSize may be 8 or 16 bits.
+    ///
 	AUDIO_CODEC_RAW = 0,	
 
-	/// ADPCM format, flash's ADPCM is a bit different for normal ADPCM
-	//
-	/// Audio encoded in this format needs non-trivial parsing.
-	///
+	/// ADPCM format
+    //
+	/// SWF support 2, 3, 4, and 5 bits / sample.
+	/// ADPCM "frames" consits of 4096 ADPCM codes per channel.
+	/// 
+	/// For streaming there is no concept of "seekSamples" like
+	/// MP3 streaming implements. Thus ADPCM ist suboptimal for
+	/// streaming as it is difficult to match sound frames with
+	/// movie frames.
+   	/// Uncompressed SampleSize is always 16 bit.
+    ///
 	AUDIO_CODEC_ADPCM = 1,
 
-	/// Mp3 format
+	/// MP3 format
    	//
-   	/// Audio encoded in this format needs non-trivial parsing.
+   	/// MP3 is supported for SWF4 and later. 
+   	/// MP3 sound is structured in frames consiting of  a fixed sized 
+   	/// header (32Bit) and compressed sound data. Compressed sound
+   	/// data always contains a fixed number of sound samples (576 or 1152).
+   	/// For streaming sound an additional field is necessary (seekSamples)
+   	/// to keep track of samples exceeding movie frame border.
    	///
+   	/// MP3 header contains all necessary information to decode a single
+   	/// frame. From this information one can derive the number of samples 
+   	/// and the frame's size.
+   	/// Uncompressed SampleSize is always 16 bit.
+    ///
 	AUDIO_CODEC_MP3 = 2,
 
 	/// Linear PCM, strictly little-endian
 	AUDIO_CODEC_UNCOMPRESSED = 3,
 
 	/// Proprietary simple format. Always 5Khz mono ?
+    //
+	/// SWF6 and later.
+	/// Data is organized in frames of 256 samples.
+    ///
 	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,
 
 	/// Proprietary simple format
+    //
+	/// SWF6 and later.
+	/// Data is organized in frames of 256 samples.
+    ///
 	AUDIO_CODEC_NELLYMOSER = 6,
 
 	/// Advanced Audio Coding
