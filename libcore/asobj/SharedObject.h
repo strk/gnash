@@ -78,3 +78,7 @@ void sharedobject_class_init(as_object& global);
 // __GNASH_ASOBJ_SHAREDOBJECT_H__
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

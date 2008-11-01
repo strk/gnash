@@ -225,3 +225,9 @@ CRcInitFile::dump(std::ostream& os) const
 }
 
 } // end of namespace cygnal
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+
