@@ -70,6 +70,8 @@ public:
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
     boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin);
+
+    boost::shared_ptr<amf::Buffer> operator[] (int index) { return _que[index]; };
     
     // Dump the data to the terminal
     void dump();
@@ -89,7 +91,7 @@ private:
     // This is the mutex used by the condition variable. It needs to be separate from the
     // one used to lock access to the que.
     boost::mutex	_cond_mutex;
-    // This is the mutex that control access to the que.
+    // This is the mutex that controls access to the que.
     boost::mutex	_mutex;
 #ifdef USE_STATS_QUEUE
     que_stats_t		_stats;
