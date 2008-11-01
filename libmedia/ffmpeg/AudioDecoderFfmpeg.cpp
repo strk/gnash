@@ -420,9 +420,10 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
             //       or FLV AudioTag not containing full audio frames)
             //
 
-            log_error("AudioDecoderFfmpeg::decode: "
-                      "last %d bytes of input didn't form a 'frame'"
-                      " (need to send more data in?)",
+            log_error("AudioDecoderFfmpeg: "
+                      "could not find a complete frame in "
+                      "the last %d bytes of input"
+                      " (malformed SWF or FLV?)",
                       consumed);
             //abort();
             continue;
