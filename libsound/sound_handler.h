@@ -30,6 +30,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 #include "MediaHandler.h" // for inlined ctor
+#include "SoundEnvelope.h" // for SoundEnvelopes typedef
 
 #include <vector>
 #include <memory>
@@ -51,38 +52,6 @@ namespace gnash {
 /// and communicating to the system mixer.
 ///
 namespace sound {
-
-/// A %sound envelope
-//
-/// Used to control volume for event sounds. It basically tells that from
-/// sample X the volume for left out is Y and for right out is Z. Several
-/// envelopes can be assigned to a sound to make a fade out or similar stuff.
-//
-/// See http://www.m2osw.com/en/swf_alexref.html#swf_envelope
-///
-class SoundEnvelope
-{
-public:
-
-    /// Byte offset this envelope applies to
-    //
-    /// The offset is always given as if the sample data
-    /// was defined with a rate of 44100 bytes per seconds.
-    /// For instance, the sample number 1 in a sound effect
-    /// with a sample rate of 5.5K is given as position 8 in
-    /// the envelope. 
-    ///
-    boost::uint32_t m_mark44;
-
-    /// Volume for the left channel (0..32768)
-    boost::uint16_t m_level0;
-
-    /// Volume for the right channel (0..32768)
-    boost::uint16_t m_level1;
-};
-
-/// A vector of SoundEnvelope objects
-typedef std::vector<SoundEnvelope> SoundEnvelopes;
 
 /// %Sound mixer.
 //
@@ -108,62 +77,6 @@ typedef std::vector<SoundEnvelope> SoundEnvelopes;
 class DSOEXPORT sound_handler
 {
 public:
-
-    /// A %sound input stream
-    //
-    /// Instance of this class are sounds you can
-    /// pull samples from.
-    ///
-    /// The format of the samples you pull is expected to
-    /// be PCM samples as signed 16bit values
-    /// in system-endian format.
-    ///
-    /// It is expected that consecutive samples fetched 
-    /// are one for left and one for right stereo channel,
-    /// in that order (even indexes for left channel, odd
-    /// indexes for right channel).
-    ///
-    /// Instances of this class would be the input 
-    /// for the gnash Mixer (currently sound_handler)
-    /// instance.
-    ///
-    class InputStream {
-
-    public:
-
-        /// Fetch the given amount of samples
-        //
-        /// @param to
-        ///     Output buffer, must be at least nSamples*bytes.
-        ///     (or nSamples items sized, being a container of 16bit values).
-        ///
-        /// @param nSamples
-        ///     Number of samples to fetch.
-        ///     It is expected that the fetcher fetches samples in multiples
-        ///     of 2, being each couple composed by a sample for the left
-        ///     channel and a sample for the right channel, in that order.
-        /// 
-        /// @return number of samples actually sent to the output buffer.
-        ///          if < nSamples this InputStream is out of data, and can be
-        ///          unplugged.
-        ///
-        /// @throws a SoundException (to be better defined a set of them)
-        ///     if unable to process this and further requests due to internal
-        ///     errors (not if it just happens to complete its source)
-        ///
-        virtual unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples)=0;
-
-        /// Return number of samples fetched from this stream
-        //
-        /// It is expected for the return to be always a multiple
-        /// of 2, being each stereo sample unit composed by a sample
-        /// for the left channel and a sample for the right channel,
-        /// in that order.
-        ///
-        virtual unsigned int samplesFetched() const=0;
-
-        virtual ~InputStream() {}
-    };
 
 	/// @see attach_aux_streamer
 	/// @todo change third parameter type to unsigned
