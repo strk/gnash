@@ -16,18 +16,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __STREAM_H__
-#define __STREAM_H__
+#ifndef __DISKSTREAM_H__
+#define __DISKSTREAM_H__
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
+//#ifdef HAVE_AIO_H
+
+#include <aio.h>
+#include <string>
+
+#include "cque.h"
 #include "statistics.h"
 
 namespace cygnal {
 
-class Stream {
+class DiskStream {
 public:
     typedef enum {
         NO_STATE,
@@ -41,43 +47,61 @@ public:
         MULTICAST,
         DONE
     } state_e;  
-    Stream();
-    ~Stream();
-    bool open(const char *filespec);
-    bool open(const char *filespec, int netfd);
-    bool open(const char *filespec, int netfd, Statistics  *statistics);
+    DiskStream();
+    DiskStream(const std::string &filespec);
+    DiskStream(const std::string &filespec, int netfd);
+    ~DiskStream();
+    
+    bool open(const std::string &filespec);
+    bool open(const std::string &filespec, int netfd);
+    bool open(const std::string &filespec, int netfd, gnash::Statistics  &statistics);
+    
     // Stream the movie
     bool play();
     bool play(int netfd);
+    
     // Stream a preview, instead of the full movie.
-    bool preview(const char *filespec, int frames);
+    bool preview(const std::string &filespec, int frames);
+    
     // Stream a series of thumbnails
-    bool thumbnail(const char *filespec, int quantity);
+    bool thumbnail(const std::string &filespec, int quantity);
+    
     // Pause the stream
     bool pause(int frame);
+    
     // Seek within the stream
     bool seek(int frame);
+    
     // Upload a stream into a sandbox
-    bool upload(const char *filespec);
+    bool upload(const std::string &filespec);
+    
     // Stream a single "real-time" source.
-    bool multicast(const char *filespec);
+    bool multicast(const std::string &filespec);
 
+    // Load a chunk of the file into memory
+    size_t loadChunk(size_t size);
+    size_t loadChunk() { return loadChunk(_chunksize); };
+    
 private:
     state_e     _state;
     int         _bytes;
     int         _filefd;
     int         _netfd;
-    char        *_filespec;
-    Statistics  *_statistics;
-    unsigned char *_dataptr;
-    unsigned char *_seekptr;
-    int          _filesize;
+    std::string _filespec;
+    gnash::Statistics  _statistics;
+//     unsigned char *_dataptr;
+//     unsigned char *_seekptr;
+    size_t	_filesize;
+    size_t	_chunksize;
+    struct aiocb _aio_control_block;
+    gnash::CQue _que;
 };
  
 } // end of cygnal namespace
 
+//#endif	// HAVE_AIO_H
 
-#endif // __STREAM_H__
+#endif // __DISKSTREAM_H__
 
 // local Variables:
 // mode: C++

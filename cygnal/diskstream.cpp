@@ -25,15 +25,16 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <iostream>
+#include <string>
 #include <cerrno>
 #include <sys/mman.h>
 #include <unistd.h>
 
-#include "stream.h"
 #include "network.h"
-#include "amf.h"
-#include "rtmp.h"
+#include "buffer.h"
 #include "log.h"
+#include "cque.h"
+#include "diskstream.h"
 
 #include <boost/thread/mutex.hpp>
 static boost::mutex io_mutex;
@@ -41,102 +42,105 @@ static boost::mutex io_mutex;
 using namespace gnash;
 using namespace std;
 
+// namespace {
+// gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+// }
+
 namespace cygnal {
 
-namespace {
-//gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
-
-#if 0
-static void
-sendfile_thread()
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    struct stat stats;
-    struct filedes loadfile;
-    int fd;
-    char *fdptr;
-    
-    memcpy(&loadfile, arg, sizeof(struct filedes));
-    
-    // Get the file stats
-    if (stat(loadfile.filespec, &stats) == 0) {
-
-	fd = open(loadfile.filespec, O_RDONLY);
-// 	log_debug ("File %s is %lld bytes in size",
-//		 loadfile.filespec, (long long int)(stats.st_size));
-	if (fd) {
-	    fdptr = static_cast<char *>(mmap(0, stats.st_size,
-		   PROT_READ, MAP_SHARED, fd, 0));
-	} else {
-	    log_error (_("Couldn't load file %s"), loadfile.filespec);
-// FIXME: now handle the error!
-	}
-	
-	if (fdptr == MAP_FAILED) {
-	    log_error (_("Couldn't map file %s into memory: %s"),
-		       loadfile.filespec, strerror(errno));
-	} else {	    
-	    log_debug (_("File %s mapped to: %p"), loadfile.filespec,
-		       (void *)fdptr);
-	}
-
-	printf("FIXME: st_dev is: %d\n", stats.st_dev);
-    
-// 	if (stats.st_size > 1024*8) {
-// 	}
-	
-// 	if (stats.st_blksize > 10) {
-// 	}
-
-// 	if (stats.st_blocks > 10) {
-// 	}
-    } else {
-	log_error (_("File %s doesn't exist"), loadfile.filespec);
-    }
-
-    int filesize = stats.st_size;
-    int blocksize = 8192;
-    char *tmpptr = fdptr;
-    int nbytes = 0;
-    Network net;
-    while ((_seekptr - _dataptr) <= RTMP_BODY_SIZE) {
-	if (filesize < RTMP_BODY_SIZE) {
-	    nbytes = net.writeNet(loadfile.fd, tmpptr, filesize);
-	    filesize = 0;
-	} else {
-	    nbytes = net.writeNet(loadfile.fd, tmpptr, blocksize);
-	    filesize -= blocksize;
-	    tmpptr += blocksize;
-	}
-	
-	if (nbytes <= 0) {
-	    log_debug (_("Done..."));
-	    return &nbytes;
-	}
-    }
-	   
-    close(fd);
-    munmap(fdptr, stats.st_size);
-}
-#endif
-
-Stream::Stream()
+DiskStream::DiskStream()
     : _bytes(0),
       _filefd(0),
       _netfd(0),
-      _filespec(0),
-      _statistics(0),
-      _dataptr(0),
-      _seekptr(0),
-      _filesize(0)
+      _filesize(0),
+      _chunksize(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    
 }
 
-Stream::~Stream() {
+DiskStream::DiskStream(const string &str)
+    : _bytes(0),
+      _filefd(0),
+      _netfd(0),
+      _filesize(0),
+      _chunksize(0)
+{
+//    GNASH_REPORT_FUNCTION;
+    _filespec = str;
+}
+
+DiskStream::DiskStream(const string &str, int netfd)
+    : _bytes(0),
+      _filefd(0),
+      _filespec(0),
+      _filesize(0),
+      _chunksize(0)
+{
+//    GNASH_REPORT_FUNCTION;
+    _netfd = netfd;
+    _filespec = str;
+}
+
+#if 0
+
+// Load a chunk of the file into memory
+size_t
+DiskStream::loadChunk(size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+
+#ifdef HAVE_SYSCONF
+    long pageSize = sysconf(_SC_PAGESIZE);
+    if (size % pageSize) {
+        size += pageSize - size % pageSize;
+//      log_debug("Adjusting segment size to %d to be page aligned.\n", _size);
+    }
+#endif
+
+#if 1
+    
+    if (_filefd) {
+	_dataptr = static_cast<unsigned char *>(mmap(0, _chunksize,
+						     PROT_READ, MAP_SHARED, _filefd, 0));
+    } else {
+	log_error (_("Couldn't load file %s"), filespec);
+	return false;
+    }
+    
+    if (_seekptr == MAP_FAILED) {
+	log_error (_("Couldn't map file %s into memory: %s"),
+		   filespec, strerror(errno));
+	return false;
+    } else {	    
+	log_debug (_("File %s mapped to: %p"), filespec,
+		   (void *)_dataptr);
+	_seekptr = _dataptr;
+	_state = OPEN;
+	return true;
+    }
+#else
+    do {
+	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+	ret = read(filefd, buf->reference(), buf->size());
+	if (ret == 0) { // the file is done
+	    break;
+	}
+	if (ret != buf->size()) {
+	    buf->resize(ret);
+	    log_debug("Got last data block from disk file, size %d", buf->size());
+	}
+	log_debug("Read %d bytes from %s.", ret, filespec);
+	hand->pushout(buf);
+	hand->notifyout();
+    } while(ret > 0);
+    log_debug("Done transferring %s to net fd #%d",
+	      filespec, args->netfd);
+    ::close(filefd); // close the disk file
+    
+#endif
+}
+
+DiskStream::~DiskStream() {
 //    GNASH_REPORT_FUNCTION;
     if (_filefd) {
         close(_filefd);
@@ -147,14 +151,14 @@ Stream::~Stream() {
 }
 
 bool
-Stream::open(const char *filespec) {
+DiskStream::open(const string &filespec) {
 //    GNASH_REPORT_FUNCTION;
     
     return open(filespec, _netfd);
 }
 
 bool
-Stream::open(const char *filespec, int /*netfd*/)
+DiskStream::open(const string &filespec, int /*netfd*/)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -164,7 +168,7 @@ Stream::open(const char *filespec, int /*netfd*/)
 }
 
 bool
-Stream::open(const char *filespec, int netfd, Statistics *statistics) {
+DiskStream::open(const string &filespec, int netfd, Statistics &statistics) {
     GNASH_REPORT_FUNCTION;
 
     struct stat st;
@@ -174,40 +178,12 @@ Stream::open(const char *filespec, int netfd, Statistics *statistics) {
 
     log_debug("Trying to open %s", filespec);
 
-    if (stat(filespec, &st) == 0) {
+    if (stat(filespec.c_str(), &st) == 0) {
 	_filesize = st.st_size;
 	boost::mutex::scoped_lock lock(io_mutex);
-	_filefd = ::open(filespec, O_RDONLY);
+	_filefd = ::open(filespec.c_str(), O_RDONLY);
 	log_debug (_("File %s is %lld bytes in size."), filespec,
 		 (long long int) _filesize);
-	if (_filefd) {
-	    _dataptr = static_cast<unsigned char *>(mmap(0, _filesize,
-				 PROT_READ, MAP_SHARED, _filefd, 0));
-	} else {
-	    log_error (_("Couldn't load file %s"), filespec);
-	    return false;
-	}
-	
-	if (_seekptr == MAP_FAILED) {
-	    log_error (_("Couldn't map file %s into memory: %s"),
-		       filespec, strerror(errno));
-	    return false;
-	} else {	    
-	    log_debug (_("File %s mapped to: %p"), filespec,
-		     (void *)_dataptr);
-	    _seekptr = _dataptr;
-	    _state = OPEN;
-	    return true;
-	}	
-	::close(_filefd);
-// 	if (stats.st_size > 1024*8) {
-// 	}
-	
-// 	if (stats.st_blksize > 10) {
-// 	}
-	    
-// 	if (stats.st_blocks > 10) {
-// 	}
     } else {
 	log_error (_("File %s doesn't exist"), filespec);
     }
@@ -215,16 +191,16 @@ Stream::open(const char *filespec, int netfd, Statistics *statistics) {
     return true;
 }
 
-// Stream the movie
+// Stream the file
 bool
-Stream::play() {
+DiskStream::play() {
 //    GNASH_REPORT_FUNCTION;
 
     return play(_netfd);
 }
 
 bool
-Stream::play(int netfd) {
+DiskStream::play(int netfd) {
 //    GNASH_REPORT_FUNCTION;
 
     _netfd = netfd;
@@ -262,10 +238,12 @@ Stream::play(int netfd) {
 //    if (nbytes <= 0) {
 //        break;
 //    }
+#ifdef USE_STATS_FILE
     _statistics->addBytes(nbytes);
     _bytes += nbytes;
     _seekptr += nbytes;
-	
+#endif
+    
     log_debug("Done...");
 	   
     munmap(_dataptr, _filesize);
@@ -276,7 +254,7 @@ Stream::play(int netfd) {
 
 // Stream a preview, instead of the full movie.
 bool
-Stream::preview(const char* /*filespec*/, int /*frames*/) {
+DiskStream::preview(const string & /*filespec*/, int /*frames*/) {
 //    GNASH_REPORT_FUNCTION;
 
     _state = PREVIEW;
@@ -285,7 +263,7 @@ Stream::preview(const char* /*filespec*/, int /*frames*/) {
 
 // Stream a series of thumbnails
 bool
-Stream::thumbnail(const char* /*filespec*/, int /*quantity*/) {
+DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/) {
 //    GNASH_REPORT_FUNCTION;
     
     _state = THUMBNAIL;
@@ -294,7 +272,7 @@ Stream::thumbnail(const char* /*filespec*/, int /*quantity*/) {
 
 // Pause the stream
 bool
-Stream::pause(int /*frame*/) {
+DiskStream::pause(int /*frame*/) {
 //    GNASH_REPORT_FUNCTION;
     
     _state = PAUSE;
@@ -303,7 +281,7 @@ Stream::pause(int /*frame*/) {
 
 // Seek within the stream
 bool
-Stream::seek(int /*frame*/) {
+DiskStream::seek(int /*frame*/) {
 //    GNASH_REPORT_FUNCTION;
     
     _state = SEEK;
@@ -312,7 +290,7 @@ Stream::seek(int /*frame*/) {
 
 // Upload a stream into a sandbox
 bool
-Stream::upload(const char* /*filespec*/) {
+DiskStream::upload(const string & /*filespec*/) {
 //    GNASH_REPORT_FUNCTION;
     
     _state = UPLOAD;
@@ -320,12 +298,14 @@ Stream::upload(const char* /*filespec*/) {
 }
 
 // Stream a single "real-time" source.
-bool Stream::multicast(const char* /*filespec*/) {
+bool DiskStream::multicast(const string & /*filespec*/) {
 //    GNASH_REPORT_FUNCTION;
     
     _state = MULTICAST;
     return true; // Default to true    
 }
+
+#endif
 
 } // end of cygnal namespace
 
