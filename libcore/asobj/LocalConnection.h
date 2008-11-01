@@ -61,3 +61,7 @@ as_value localconnection_send(const fn_call& fn);
 // __LOCALCONNECTION_H__
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
