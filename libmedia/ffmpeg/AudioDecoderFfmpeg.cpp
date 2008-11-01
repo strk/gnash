@@ -381,25 +381,52 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
             break;
         }
 
+#ifdef GNASH_DEBUG_AUDIO_DECODING
+		log_debug("   parsed frame is %d bytes (consumed +%d = %d/%d)", framesize, consumed, decodedBytes+consumed, inputSize);
+#endif // GNASH_DEBUG_AUDIO_DECODING
+
 #if GNASH_PARANOIA_LEVEL > 1
-		// the returned frame pointer is inside the input buffer
-		assert(frame >= input+decodedBytes && frame < input+inputSize);
-		// the returned frame size is within the input size
-		assert(framesize <= inputSize);
-		assert(frame+framesize <= input+inputSize);
-		// the number of bytes skipped to get to the frame
-		// is the offset to the parsed frame
-		assert(consumed == framesize);
-		assert(input+decodedBytes == frame);
+		if ( frame )
+		{
+			// the returned frame pointer is inside the input buffer
+			assert(frame == input+decodedBytes);
+			// the returned frame size is within the input size
+			assert(framesize <= inputSize);
+		}
 #endif
 
 		// all good so far, keep going..
 		// (we might do this immediately, as we'll override decodedBytes on error anyway)
 		decodedBytes += consumed;
 
-#ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("   parsed frame is %d bytes (consumed %d/%d)", framesize, decodedBytes, inputSize);
-#endif // GNASH_DEBUG_AUDIO_DECODING
+        if ( ! framesize )
+        {
+            assert(decodedBytes == inputSize);
+
+            // NOTE: If this happens the caller sent us
+            //       a block of data which is not composed
+            //       by complete audio frames.
+            //       Could be due to an error in the caller
+            //       code, or to a malformed SWF...
+            //       At time of writing this (2008-11-01)
+            //       it is most likely an error in caller
+            //       code (streaming sound/event sound)
+            //       so we log an ERROR rather then a
+            //       MALFORMED input. You can uncomment the
+            //       abort below to check who is the caller 
+            //       with gdb. When callers are checked,
+            //       we may turn this into a MALFORMED
+            //       kind of error (DEFINESOUND, SOUNDSTREAMBLOCK
+            //       or FLV AudioTag not containing full audio frames)
+            //
+
+            log_error("AudioDecoderFfmpeg::decode: "
+                      "last %d bytes of input didn't form a 'frame'"
+                      " (need to send more data in?)",
+                      consumed);
+            //abort();
+            continue;
+        }
 
 
 		// Now, decode the frame. We use the ::decodeFrame specialized function
@@ -461,6 +488,8 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         boost::uint32_t inputSize, boost::uint32_t& outputSize)
 {
 	//GNASH_REPORT_FUNCTION;
+
+    assert(inputSize);
 
     //static const unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
     static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
