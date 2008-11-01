@@ -22,12 +22,14 @@
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <algorithm>
 #include <string>
 #include <deque>
 #include <list>
 #include <map>
+#include <vector>
 
 #include "log.h"
 #include "network.h"
@@ -217,15 +219,17 @@ Handler::start(thread_params_t *args)
     log_debug(_("Starting Handlers for port %d, tid %ld"),
 	      args->port, get_thread_id());
 
-    if (args->port == 4080) {			// FIXME: hack alert!
-	boost::thread handler(boost::bind(&httphandler, args));
+//     boost::thread outport(boost::bind(&netout_handler, args));
+    boost::thread inport(boost::bind(&netin_handler, args));
+
+#if 0
+    if (args->port == 4080) {	// FIXME: hack alert!
+	boost::thread handler(boost::bind(&http_handler, args));
     }
     if (args->port == RTMP_PORT) {
 	boost::thread handler(boost::bind(&rtmp_handler, args));
     }
-    
-//     boost::thread outport(boost::bind(&netout_handler, args));
-//     boost::thread inport(boost::bind(&netin_handler, args));
+#endif
 
 // We don't want to wait for the threads to complete, we
 // want to return to the main program so it can spawn another
@@ -239,20 +243,21 @@ Handler::start(thread_params_t *args)
     return true;
 }
 
-#if 0
 extern "C" {
 void
 netin_handler(Handler::thread_params_t *args)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     Handler *hand = reinterpret_cast<Handler *>(args->handle);
 
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
     
     do {
-	boost::shared_ptr<amf::Buffer> buf = new amf::Buffer;
+	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
 	size_t ret = hand->readNet(args->netfd, buf->reference(), buf->size(), 1);
+
+//	cerr << (char *)buf->reference() << endl;
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
 	    log_debug("no data yet for fd #%d, continuing...", args->netfd);
@@ -266,9 +271,10 @@ netin_handler(Handler::thread_params_t *args)
 	}
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
-	    if (ret < NETBUFSIZE) {
-		buf->resize(ret);
-	    }
+//	    cerr << "XXXXX" << (char *)buf->reference() << endl;
+// 	    if (ret < NETBUFSIZE) {
+// 		buf->resize(ret);
+// 	    }
 	    hand->push(buf);
 	    hand->notify();
 	} else {
@@ -284,6 +290,7 @@ netin_handler(Handler::thread_params_t *args)
 //    hand->dump();
 }
 
+#if 0
 void
 netout_handler(Handler::thread_params_t *args)
 {
@@ -308,7 +315,6 @@ netout_handler(Handler::thread_params_t *args)
 // 			log_debug("Got smaller packet, size %d", buf->size());		
 // 	    }
 	    ret = hand->writeNet(args->netfd, buf);
-	    delete buf;
 	}
     } while (ret > 0);
     hand->die();
@@ -325,9 +331,9 @@ netout_handler(Handler::thread_params_t *args)
     delete hand;
 #endif
 }
+#endif
 
 } // end of extern C
-#endif
 
 } // end of gnash namespace
 

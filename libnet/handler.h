@@ -129,15 +129,27 @@ public:
     // start the two thread handlers for the queues
     bool DSOEXPORT start(thread_params_t *args);
 
-    // Take a buffer and write it to the network
-    int  DSOEXPORT writeNet(int fd, boost::shared_ptr<amf::Buffer> buf)
+    /// \brief Write a Buffer the network connection.
+    ///
+    /// @param fd The file descriptor to write the data too.
+    ///
+    /// @param buf A smart pointer to a Buffer class.
+    ///
+    /// @return The number of bytes sent
+    int  DSOEXPORT writeNet(int fd, boost::shared_ptr<amf::Buffer> &buf)
     	{ return Network::writeNet(fd, buf->reference(), buf->size()); };
     
-    int  DSOEXPORT writeNet(boost::shared_ptr<amf::Buffer> buf)
+    /// \brief Write a Buffer the network connection.
+    ///
+    /// @param buf A smart pointer to a Buffer class.
+    ///
+    /// @return The number of bytes sent
+    int  DSOEXPORT writeNet(boost::shared_ptr<amf::Buffer> &buf)
     	{ return Network::writeNet(buf->reference(), buf->size()); };
     
     // Dump internal data.
     void dump();
+    
 #ifdef USE_STATS_QUEUE
     CQue::que_stats_t *statsin()  { return _incoming.stats(); };
     CQue::que_stats_t *statsout() { return _outgoing.stats(); };

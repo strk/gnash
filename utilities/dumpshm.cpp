@@ -354,7 +354,6 @@ void dump_ctrl(void *inmem)
     cerr << _("\tTotal # of bytes: ") << ptr->getSize() << endl;
 }
 
-
 // Local Variables:
 // mode: C++
 // indent-tabs-mode: t
