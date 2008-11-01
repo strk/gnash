@@ -16,6 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <boost/cstdint.hpp>
 #include <iostream>
 
@@ -655,7 +659,7 @@ Buffer::resize()
 Buffer &
 Buffer::resize(size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     boost::scoped_array<gnash::Network::byte_t> tmp;
     
     if (_nbytes == 0) {
@@ -672,15 +676,16 @@ Buffer::resize(size_t size)
 	// Copy the existing data into the new block of memory. The data
 	// held currently is moved to the temporary array, and then gets
 	// deleted when this method returns.
-	tmp.swap(_data);
+//	tmp.swap(_data);
 	
 	// We loose data if we resize smaller than the data currently held.
 	if (size < used) {
 	    log_error("Truncating data (%d bytes) while resizing!", used - size);
 	    used = size;
 	}
-	_data.reset(new Network::byte_t[size]);
-	std::copy(tmp.get(), tmp.get() + used, _data.get());
+	Network::byte_t *newptr = new Network::byte_t[size];
+	std::copy(_data.get(), _data.get() + used, newptr);
+	_data.reset(newptr);
 	
 	// Make the seekptr point into the new space with the correct offset
 	_seekptr = _data.get() + used;
