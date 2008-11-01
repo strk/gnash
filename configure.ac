@@ -2029,6 +2029,7 @@ if test x"$BOOST_LIBS" != x; then
   fi
 fi
 
+CYGNAL_PATHS
 
 SUPPORTED_GUIS=
 if test x$build_qtopia = xyes; then
