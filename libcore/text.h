@@ -22,6 +22,7 @@
 #define GNASH_TEXT_H
 
 #include "styles.h" 
+#include "font.h"
 
 namespace gnash {
 

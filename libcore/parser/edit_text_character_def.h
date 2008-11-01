@@ -45,7 +45,6 @@ public:
 		ALIGN_LEFT = 0,
 		ALIGN_RIGHT,
 		ALIGN_CENTER,
-		/// probably don't need to implement...
 		ALIGN_JUSTIFY
 	};
 
@@ -273,7 +272,7 @@ private:
 	///
 	/// Also known as USE_GLYPH (from Ming)
 	///
-	bool	m_use_outlines;
+	bool m_use_outlines;
 
 	int	m_font_id;
 	boost::intrusive_ptr<font> m_font;

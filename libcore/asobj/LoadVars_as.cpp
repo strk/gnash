@@ -26,7 +26,6 @@
 #include "builtin_function.h" // need builtin_function
 #include "as_function.h" // for calling event handlers
 #include "as_value.h" // for setting up a fn_call
-#include "gnash.h" // for get_base_url
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
@@ -286,7 +285,8 @@ loadvars_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&loadvars_ctor, LoadVars_as::getLoadVarsInterface());
+		cl=new builtin_function(&loadvars_ctor,
+                LoadVars_as::getLoadVarsInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		LoadVars_as::attachLoadVarsInterface(*cl);

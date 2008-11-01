@@ -970,16 +970,6 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                  (!even_odd && (counter != 0)) );
     }
 
-    float shape_character_def::get_height_local() const
-    {
-        return m_bound.height();
-    }
-
-    float shape_character_def::get_width_local() const
-    {
-        return m_bound.width();
-    }
-
     // Find the bounds of this shape, and store them in the given rectangle.
     void  shape_character_def::compute_bound(rect* r, int swfVersion) const
     {

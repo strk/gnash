@@ -37,7 +37,7 @@
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
 #include "render_handler.h"
-#include "image.h"
+#include "GnashImage.h"
 #include <cmath>
 #include "PathParser.h"
 
@@ -47,7 +47,7 @@ namespace gnash {
 
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::ImageRGB* im)
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const ImageRGB* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -62,7 +62,7 @@ rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::ImageRGB* im)
 
 // Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
 static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const image::ImageRGBA* im)
+rgba_to_cairo_argb(boost::uint8_t* dst, const ImageRGBA* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -419,7 +419,7 @@ public:
   {
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im) 
+  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im) 
   {
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
@@ -430,7 +430,7 @@ public:
                                  CAIRO_FORMAT_RGB24);
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im)
+  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im)
   {        
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
@@ -441,7 +441,7 @@ public:
                                  CAIRO_FORMAT_ARGB32);
   }
 
-  virtual void drawVideoFrame(image::ImageBase* baseframe, const SWFMatrix* m, const rect* bounds)
+  virtual void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m, const rect* bounds)
   {
 
     if (baseframe->type() == GNASH_IMAGE_RGBA)
@@ -450,7 +450,7 @@ public:
         return;
     }
 
-    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+    ImageRGB* frame = dynamic_cast<ImageRGB*>(baseframe);
 
     assert(frame);
 

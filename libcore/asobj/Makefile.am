@@ -61,7 +61,7 @@ libgnashasobjs_la_SOURCES = \
 	Mouse.cpp \
 	NetConnection.cpp \
 	NetStream_as.cpp \
-	Number.cpp \
+	Number_as.cpp \
 	Object.cpp \
 	Selection.cpp \
 	SharedObject.cpp\
@@ -127,7 +127,7 @@ noinst_HEADERS = \
 	MovieClipLoader.h \
 	NetConnection.h	\
 	NetStream_as.h \
-	Number.h \
+	Number_as.h \
 	Object.h \
 	prophelper.h \
 	Selection.h \

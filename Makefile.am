@@ -373,8 +373,12 @@ endif
 	mudflap-check \
 	install-plugins \
 	uninstall-plugins \
-	install-plugin
+	install-plugin \
+	apidoc
 
 install-plugins install-plugin uninstall-plugins:
 	$(MAKE) -C plugin $@
+
+apidoc:
+	$(MAKE) -C doc $@
 

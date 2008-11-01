@@ -225,7 +225,7 @@ video_stream_instance::display()
 	SWFMatrix m = getWorldMatrix();
 	const rect& bounds = m_def->get_bound();
 
-	image::ImageBase* img = getVideoFrame();
+	GnashImage* img = getVideoFrame();
 	if (img)
 	{
 		gnash::render::drawVideoFrame(img, &m, &bounds);
@@ -234,7 +234,7 @@ video_stream_instance::display()
 	clear_invalidated();
 }
 
-image::ImageBase*
+GnashImage*
 video_stream_instance::getVideoFrame()
 {
 
@@ -242,7 +242,7 @@ video_stream_instance::getVideoFrame()
 	// If this is a video from a NetStream_as object, retrieve a video frame from there.
 	if (_ns)
 	{
-		std::auto_ptr<image::ImageBase> tmp = _ns->get_video();
+		std::auto_ptr<GnashImage> tmp = _ns->get_video();
 		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
 	}
 

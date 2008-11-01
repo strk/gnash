@@ -38,6 +38,7 @@
 
 namespace gnash {
 namespace media {
+namespace gst {
 
 GstElement* GstUtil::get_audiosink_element()
 {   
@@ -143,7 +144,7 @@ GstUtil::check_missing_plugins(GstCaps* caps)
     return false;
 }
 
-
+} // gnash.media.gst namespace
 } // gnash.media namespace 
 } // namespace gnash
 

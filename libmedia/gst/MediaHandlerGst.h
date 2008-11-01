@@ -32,6 +32,18 @@
 namespace gnash {
 namespace media {
 
+/// Gstreamer-based media handler module
+namespace gst {
+
+/// GST based MediaHandler
+//
+/// The module implements the MediaHandler factory as required
+/// by Gnash core for a loadable media handler module.
+///
+/// It uses gstreamer: http://gstreamer.freedesktop.org/
+///
+/// Starting point is MediaHandlerGst.
+/// 
 class DSOEXPORT MediaHandlerGst : public MediaHandler
 {
 public:
@@ -44,6 +56,7 @@ public:
 };
 
 
+} // gnash.media.gst namespace
 } // gnash.media namespace 
 } // namespace gnash
 

@@ -41,9 +41,7 @@
 #include "element.h"
 #include "dsodefs.h"
 
-/// \namespace amf
-///
-/// This namespace is for all the AMF specific classes in libamf.
+/// Action Message Format specific classes of libamf.
 namespace amf 
 {
 
@@ -79,16 +77,16 @@ const gnash::Network::byte_t TERMINATOR = 0x09;
 /// it makes sense to make this an adjustable thing.
 const int SANE_STR_SIZE = 1024;
 
-/// \class AMF
+/// Binary representation of an ActionScript object.
+//
+/// AMF is used to send objects, wheather to a SharedObject .sol file,
+/// a memory based LocalConnection segment, or over an RTMP connection
+/// for streaming.
 ///
-//// An AMF object is the binary representation of an ActionScript object. AMF
-/// is used to send objects, wheather to a SharedObject .sol file, a memory based
-/// LocalConnection segment, or over an RTMP connection for streaming.
 class DSOEXPORT AMF {
 public:
-    /// \enum AMF::shared_obj_types_e
-    ///		This is the types of SharedObjects that can be
-    ///		serialized or deserialized.
+
+    ///	Types of SharedObjects that can be serialized or deserialized.
     typedef enum {
         CONNECT = 0x01,
         DISCONNECT = 0x02,
@@ -102,8 +100,8 @@ public:
         DELETE_ATTRIBYTE = 0x0a,
         INITIAL_DATA = 0x0b
     } shared_obj_types_e;
-    /// \enum AMF::filetype_e
-    ///		This is the type of file being streamed.
+
+    ///	Type of file being streamed.
     typedef enum {
 	FILETYPE_ERROR = -1,
 	FILETYPE_NONE = 0,
@@ -116,196 +114,233 @@ public:
 	FILETYPE_OSCP
     } filetype_e;
 
-    /// \brief Create a new AMF class.
-    ///		As most of the methods in the AMF class a static, this
-    ///		is primarily only used when encoding complex objects
-    ///		where the byte count is accumulated.
+    /// Create a new AMF object.
+    //
+    ///	As most of the methods in the AMF class a static, this
+    ///	is primarily only used when encoding complex objects
+    ///	where the byte count is accumulated.
+    ///
     AMF();
-    /// Delete the alloczted AMF class
+
+    /// Delete the allocated AMF object
     ~AMF();
 
-    /// @remarks 
+    /// @name Encoding methods
+    ///
     ///		Methods for encoding data into big endian formatted
     ///		raw AMF data. Note that while we could have had a
     ///		single overloaded encode method, this is more
     ///		explicit, which when it comes to manipulating binary
     ///		protocols make the code much more readable.
-    
-    /// \brief Encode a string object to it's serialized representation.
-    /// 
+    ///
+    /// @{
+
+    /// Encode a string object to its serialized representation.
+    // 
     /// @param str a string value
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeString(const std::string &str);
     
-    /// \brief Encode an array of ASCII bytes to it's serialized representation.
-    /// 
+    /// Encode an array of ASCII bytes to its serialized representation.
+    // 
     /// @param data The data to serialize into big endian format
     /// 
     /// @param size The size of the data in bytes
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeString(gnash::Network::byte_t *data, size_t size);
 
-    /// \brief Encode a String object to it's serialized representation.
-    ///		A NULL String is a string with no associated data.
+    /// Encode a String object to its serialized representation.
+    //
+    ///	A NULL String is a string with no associated data.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeNullString();
 
-    /// \brief Encode a Boolean object to it's serialized representation.
-    ///
+    /// Encode a Boolean object to its serialized representation.
+    //
     /// @param flag The boolean value to serialize.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeBoolean(bool flag);
 
-    /// \brief Encode an "Undefined" object to it's serialized representation.
-    ///
+    /// Encode an "Undefined" object to its serialized representation.
+    //
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeUndefined();
 
-    /// \brief Encode a NULL object to it's serialized representation.
-    ///		A NULL object is often used as a placeholder in RTMP.
+    /// Encode a NULL object to its serialized representation.
+    //
+    ///	A NULL object is often used as a placeholder in RTMP.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeNull();
 
-    /// \brief Encode a "Unsupported" object to it's serialized representation.
-    ///
+    /// Encode a "Unsupported" object to its serialized representation.
+    //
     /// @return a binary AMF packet in big endian format
+    ///
     static  boost::shared_ptr<Buffer> encodeUnsupported();
 
-    /// \brief Encode an XML object to it's serialized representation.
-    ///
+    /// Encode an XML object to its serialized representation.
+    //
     /// @param data A pointer to the raw bytes that becomes the XML data.
     /// 
     /// @param nbytes The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format
-    static boost::shared_ptr<Buffer> encodeXMLObject(gnash::Network::byte_t *data, size_t size);
-
-    /// \brief Encode a Typed Object to it's serialized representation.
     ///
+    static boost::shared_ptr<Buffer> encodeXMLObject(gnash::Network::byte_t *data, size_t nbytes);
+
+    /// Encode a Typed Object to its serialized representation.
+    //
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @param size The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeTypedObject(gnash::Network::byte_t *data, size_t size);
 
-    /// \brief Encode a Reference to an object to it's serialized representation.
-    ///
+    /// Encode a Reference to an object to its serialized representation.
+    //
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @param size The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format (header,data)
+    ///
     static boost::shared_ptr<Buffer> encodeReference(gnash::Network::byte_t *data, size_t size);
 
-    /// \brief Encode a Movie Clip (swf data) to it's serialized representation.
-    ///
+    /// Encode a Movie Clip (swf data) to its serialized representation.
+    //
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @param size The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format (header,data)
+    ///
     static boost::shared_ptr<Buffer> encodeMovieClip(gnash::Network::byte_t *data, size_t size);
 
-    /// \brief Encode an ECMA Array to it's serialized representation.
-    ///		An ECMA Array, also called a Mixed Array, contains any
-    ///		AMF data type as an item in the array.
+    /// Encode an ECMA Array to its serialized representation.
+    //
+    ///	An ECMA Array, also called a Mixed Array, contains any
+    ///	AMF data type as an item in the array.
     ///
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @param size The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeECMAArray(gnash::Network::byte_t *data, size_t size);
 
-    /// \brief Encode a Long String to it's serialized representation.
-    ///
+    /// Encode a Long String to its serialized representation.
+    //
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @param size The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeLongString(gnash::Network::byte_t *data, size_t size);
 
-    /// \brief Encode a Record Set to it's serialized representation.
-    ///
+    /// Encode a Record Set to its serialized representation.
+    //
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @param size The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeRecordSet(gnash::Network::byte_t *data, size_t size);
 
-    /// \brief Encode a Date to it's serialized representation.
-    ///
+    /// Encode a Date to its serialized representation.
+    //
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeDate(gnash::Network::byte_t *data);
 
-    /// \brief Encode a Strict Array to it's serialized representation.
-    ///		A Strict Array is one where all the items are the same
-    ///		data type, commonly either a number or a string.
+    /// Encode a Strict Array to its serialized representation.
+    //
+    ///	A Strict Array is one where all the items are the same
+    ///	data type, commonly either a number or a string.
     ///
     /// @param data A pointer to the raw bytes that becomes the data.
     /// 
     /// @param size The number of bytes to serialize.
     ///
     /// @return a binary AMF packet in big endian format (header,data)
+    ///
     static boost::shared_ptr<Buffer> encodeStrictArray(gnash::Network::byte_t *data, size_t size);
     
-    /// \brief Encode an object to it's serialized representation.
-    ///
+    /// Encode an object to its serialized representation.
+    //
     /// @param el A smart pointer to an Element class.
     /// 
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeObject(boost::shared_ptr<amf::Element> el);
 
-    /// \brief Encode the end of an object to it's serialized representation.
-    ///
+    /// Encode the end of an object to its serialized representation.
+    //
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeObjectEnd();
 
-    /// \brief Encode a 64 bit number to it's serialized representation.
-    ///
+    /// Encode a 64 bit number to its serialized representation.
+    //
     /// @param num A double value to serialize.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeNumber(double num);
 
-    /// \brief Encode an Element to it's serialized representation.
-    ///
+    /// Encode an Element to its serialized representation.
+    //
     /// @param el A smart pointer to the Element to encode.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     static boost::shared_ptr<Buffer> encodeElement(boost::shared_ptr<amf::Element> el);
 
-    /// Encode a variable to it's serialized representation.
-    ///
+    /// Encode a variable to its serialized representation.
+    //
     /// @param el A smart pointer to the Element to encode.
     ///
     /// @return a binary AMF packet in big endian format
+    ///
     boost::shared_ptr<Buffer> encodeProperty(boost::shared_ptr<amf::Element> el);
 
-    //
-    // Methods for extracting data from big endian formatted raw AMF data.
-    //
+    /// @} end of encoding methods 
 
-    /// \brief Extract the AMF0 object type from the header.
+    /// @name Decoding methods
     ///
+    ///		Methods for extracting data from big endian formatted raw AMF data.
+    ///
+    /// @{
+
+    /// Extract the AMF0 object type from the header.
+    //
     /// @param in The raw data to extract values from.
     ///
     /// @return The data type from the header
+    ///
     static Element::amf0_type_e extractElementHeader(gnash::Network::byte_t *in)
                          { return *(reinterpret_cast<Element::amf0_type_e *>(in)); };
 
-    /// \brief Extract an AMF object from an array of raw bytes.
-    ///		An AMF object is one of the support data types.
+    /// Extract an AMF object from an array of raw bytes.
+    //
+    ///	An AMF object is one of the support data types.
     ///
     /// @param in A real pointer to the raw data to start parsing from.
     ///
@@ -315,18 +350,21 @@ public:
     /// @return A smart ptr to an Element.
     ///
     /// @remarks May throw a ParserException
+    ///
     boost::shared_ptr<amf::Element> extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
 
-    /// \brief Extract an AMF object from an array of raw bytes.
-    ///
+    /// Extract an AMF object from an array of raw bytes.
+    //
     /// @param buf A smart pointer to a Buffer to parse the data from.
     ///
     /// @return A smart ptr to an Element.
     ///
     /// @remarks May throw a ParserException
+    ///
     boost::shared_ptr<amf::Element> extractAMF(boost::shared_ptr<Buffer> buf);
     
-    /// \brief Extract a Property.
+    /// Extract a Property.
+    //
     ///		A Property is a standard AMF object preceeded by a
     ///		length and an ASCII name field. These are only used
     ///		with higher level ActionScript objects.
@@ -339,9 +377,11 @@ public:
     /// @return A smart ptr to an Element.
     ///
     /// @remarks May throw a ParserException
+    ///
     boost::shared_ptr<amf::Element> extractProperty(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
 
-    /// \brief Extract a Property.
+    /// Extract a Property.
+    //
     ///		A Property is a standard AMF object preceeded by a
     ///		length and an ASCII name field. These are only used
     ///		with higher level ActionScript objects.
@@ -351,21 +391,26 @@ public:
     /// @return A smart ptr to an Element.
     ///
     /// @remarks May throw a ParserException
+    ///
     boost::shared_ptr<amf::Element> extractProperty(boost::shared_ptr<Buffer> buf);
 
-    /// \brief Get the total number of allocated bytes used when serializing.
-    ///
+    /// @} end of decoding methods 
+
+    /// Get the total number of allocated bytes used when serializing.
+    //
     /// @return The total allocated bytes.
+    ///
     size_t totalsize() { return _totalsize; }
     
 private:
-    /// \var _totalsize
-    ///
+
     /// The total number of bytes in serialized ActionScript object.
     size_t _totalsize;
+
 };
 
-/// \brief Swap bytes in raw data.
+/// Swap bytes in raw data.
+//
 ///	This only swaps bytes if the host byte order is little endian.
 ///
 /// @param word The address of the data to byte swap.
@@ -373,6 +418,7 @@ private:
 /// @param size The number of bytes in the data.
 ///
 /// @return A pointer to the raw data.
+///
 DSOEXPORT void *swapBytes(void *word, size_t size);
 
 

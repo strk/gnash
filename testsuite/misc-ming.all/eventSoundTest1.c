@@ -75,7 +75,7 @@ void setupMovie(SWFMovie mo, const char* srcdir)
   dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 800, 400);
   it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFDisplayItem_setDepth(it, 200); 
-  SWFDisplayItem_move(it, 200, 0); 
+  //SWFDisplayItem_move(it, 0, 0); 
 
 }
 
@@ -125,10 +125,11 @@ runMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
     int i;
 
     SWFMovie_nextFrame(mo);
-    add_actions(mo, "note('Multiple Sound Test.\nThe notes should start "
-              "exactly at the beginning "
-              "of a frame (to coincide with the appearance of the description "
-              "text). Test should start in two seconds.');");
+    add_actions(mo,
+              "note('Multiple Sound Test.\n"
+              "The notes should start exactly at the beginning of a frame "
+              "(to coincide with the appearance of the description text).\n"
+              "Test should start in two seconds.');");
 
     /* This is what is supposed to happen in each frame */
     frameDesc[0] = "Two notes (C, E)";
@@ -234,9 +235,10 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  add_actions(mo, "note('You will hear several short tests with a succession\n"
-		  "of sounds. Each frame is two seconds long. The movie will describe\n"
-		  " what you should hear at the beginning of the frame.');"
+  add_actions(mo,
+          "note('You will hear several short tests with a succession of sounds.\n"
+		  "Each frame is two seconds long.\n"
+          "The movie will describe what you should hear at the beginning of the frame.');"
 		  );
 		  
   frame = 0;

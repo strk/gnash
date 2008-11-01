@@ -33,44 +33,47 @@ namespace SWF {
 /// scriptlimits setting, so this is kept in movie_root rather than the
 /// immutable movie_definition. Whenever this tag is parsed, the value in
 /// movie_root is overridden.
-namespace DefineButtonCxformTag
+class DefineButtonCxformTag
 {
-
-void loader(SWFStream& in, tag_type tag, movie_definition& m)
-{
-
-    assert(tag == SWF::DEFINEBUTTONCXFORM);
-
-    in.ensureBytes(2);
-    const boost::uint16_t buttonID = in.read_u16();
-
-    IF_VERBOSE_PARSE (
-        log_debug("DefineButtonCxformTag: ButtonId=%d", buttonID);
-    );
-    
-    character_def* chdef = m.get_character_def(buttonID);
-    if ( ! chdef )
+public:
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& /*r*/)
     {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DefineButtonCxform refers to an unknown character %d"), buttonID);
-        );
-        return;
-    }
 
-    button_character_definition* ch = dynamic_cast<button_character_definition*> (chdef);
-    if ( ! ch )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DefineButtonCxform refers to character ID %d (%s)."
-                  " Expected a button definition"),
-                  buttonID, typeName(*chdef));
+        assert(tag == SWF::DEFINEBUTTONCXFORM);
+
+        in.ensureBytes(2);
+        const boost::uint16_t buttonID = in.read_u16();
+
+        IF_VERBOSE_PARSE (
+            log_debug("DefineButtonCxformTag: ButtonId=%d", buttonID);
         );
-        return;
-    }
+        
+        character_def* chdef = m.get_character_def(buttonID);
+        if ( ! chdef )
+        {
+            IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("DefineButtonCxform refers to an unknown "
+                    "character %d"), buttonID);
+            );
+            return;
+        }
+
+        button_character_definition* ch = 
+            dynamic_cast<button_character_definition*> (chdef);
+        if ( ! ch )
+        {
+            IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("DefineButtonCxform refers to character ID %d (%s)."
+                      " Expected a button definition"),
+                      buttonID, typeName(*chdef));
+            );
+            return;
+        }
 
     ch->readDefineButtonCxform(in, m);
     }
-}
+};
 
 } // namespace gnash::SWF
 } // namespace gnash

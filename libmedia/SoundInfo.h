@@ -27,9 +27,10 @@
 namespace gnash {
 namespace media {
 
-///
-/// Class containing information about a sound. Is created by the parser while
-/// parsing, and ownership is then transfered to sound_data. When the parser is
+/// Class containing information about an embedded sound definition
+//
+/// Is created by the parser while
+/// parsing, and ownership is then transfered to EmbeddedSound. When the parser is
 /// parsing streams, it will ask the soundhandler for this to know what properties
 /// the stream has.
 ///
@@ -38,23 +39,27 @@ public:
 	/// Constructor
 	//
 	/// @param format
-	/// The format of the sound. Can be MP3, ADPCM, uncompressed or Nellymoser
+	///     The encoding/format of this sound. 
 	///
-	/// @param stero
-	/// Defines whether the sound is in stereo.
+	/// @param stereo
+	///     Defines whether the sound is in stereo.
 	///
 	/// @param sampleRate
-	/// The sample rate of the sound.
+	///     The sample rate of the sound.
 	///
 	/// @param sampleCount
-	/// The sample count in the sound. In soundstreams this is an average for each frame.
+	///     The sample count in the sound.
+    ///     In soundstreams this is an average for each frame.
 	///
 	/// @param is16bit
-	/// Defines whether the sound is in 16bit format (samplesize == 2)? else it 
-	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
+	///     If true, the sound is in 16bit format (samplesize == 2)
+    ///     else it is 8bit (samplesize == 1).
+    ///     Used for streams when decoding adpcm.
 	///
-	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate, boost::uint32_t sampleCount, bool is16bit)
-	:	_format(format),
+	SoundInfo(audioCodecType format, bool stereo, boost::uint32_t sampleRate,
+            boost::uint32_t sampleCount, bool is16bit)
+	    :
+        _format(format),
 		_stereo(stereo),
 		_sampleRate(sampleRate),
 		_sampleCount(sampleCount),
@@ -62,30 +67,34 @@ public:
 	{
 	}
 
-	/// Returns the current format of the sound
-	///
-	/// @return the current format of the sound
-	audioCodecType getFormat() { return _format; }
+	/// Returns the format of the sound
+	//
+	/// @return the format of the sound
+	audioCodecType getFormat() const { return _format; }
 
 	/// Returns the stereo status of the sound
-	///
+	//
 	/// @return the stereo status of the sound
-	bool isStereo() { return _stereo; }
+	bool isStereo() const { return _stereo; }
 
 	/// Returns the samplerate of the sound
-	///
+	//
 	/// @return the samplerate of the sound
-	unsigned long getSampleRate() { return _sampleRate; }
+	unsigned long getSampleRate() const { return _sampleRate; }
 
 	/// Returns the samplecount of the sound
+	//
+	/// This is the amount of samples you'd get after
+	/// successfully decoding the sound.
 	///
 	/// @return the samplecount of the sound
-	unsigned long getSampleCount() { return _sampleCount; }
+	///
+	unsigned long getSampleCount() const { return _sampleCount; }
 
 	/// Returns the 16bit status of the sound
-	///
+	//
 	/// @return the 16bit status of the sound
-	bool is16bit() { return _is16bit; }
+	bool is16bit() const { return _is16bit; }
 
 private:
 	/// Current format of the sound (MP3, raw, etc).

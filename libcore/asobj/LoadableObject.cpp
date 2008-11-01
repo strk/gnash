@@ -67,7 +67,6 @@ LoadableObject::send(const std::string& urlstr, const std::string& target,
         bool post)
 {
     movie_root& m = _vm.getRoot();
-    URL url(urlstr);
 
     // Encode the object for HTTP. If post is true,
     // XML should not be encoded. LoadVars is always
@@ -76,19 +75,11 @@ LoadableObject::send(const std::string& urlstr, const std::string& target,
     std::ostringstream data;
     toString(data, !post);
 
-    const std::string& datastring = data.str();
+    // Only GET and POST are possible here.
+    MovieClip::VariablesMethod method = post ? MovieClip::METHOD_POST :
+                                               MovieClip::METHOD_GET;
 
-    if (post)
-    {
-        m.getURL(url, target, &datastring);
-        return;
-    }
-
-    // GET
-    std::string qs = url.querystring();
-    if (qs.empty()) url.set_querystring(datastring);
-    else url.set_querystring(qs + "&" + datastring);
-    m.getURL(url, target);
+    m.getURL(urlstr, target, data.str(), method);
 
 }
 
@@ -101,7 +92,8 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-	URL url(urlstr, get_base_url());
+    const RunInfo& ri = _vm.getRoot().runInfo();
+	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
 	if (post)
@@ -162,8 +154,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
         toString(data, false);
 
         /// It doesn't matter if there are no request headers.
-        str = StreamProvider::getDefaultInstance().getStream(url,
-                                                    data.str(), headers);
+        str = ri.streamProvider().getStream(url, data.str(), headers);
     }
 	else
     {
@@ -174,7 +165,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
 
     	std::string getURL = urlstr + "?" + data.str();
         log_debug("Using GET method for sendAndLoad: %s", getURL);
-        str = StreamProvider::getDefaultInstance().getStream(getURL);
+        str = ri.streamProvider().getStream(getURL);
     }
 
 	if (!str.get()) 
@@ -198,10 +189,11 @@ LoadableObject::load(const std::string& urlstr)
     // when loading is complete.
 	set_member(NSV::PROP_LOADED, false);
 
-	URL url(urlstr, get_base_url());
+    const RunInfo& ri = _vm.getRoot().runInfo();
+	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
-    std::auto_ptr<IOChannel> str(StreamProvider::getDefaultInstance().getStream(url));
+    std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
 
 	if (!str.get()) 
 	{

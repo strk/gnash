@@ -120,6 +120,7 @@ noinst_HEADERS = \
 	VirtualClock.h \
 	SystemClock.h \
 	ManualClock.h \
+	RunInfo.h \
 	array.h	\
 	as_environment.h \
 	as_function.h \
@@ -159,13 +160,13 @@ noinst_HEADERS = \
 	impl.h \
 	LoadVariablesThread.h \
 	SWFMatrix.h \
-	mouse_button_state.h \
+	MouseButtonState.h \
 	movie_instance.h \
 	movie_root.h \
 	namedStrings.h \
 	rect.h \
 	render.h \
-	resource.h \
+	ExportableResource.h \
 	shape.h	\
 	MovieClip.h \
 	SWFStream.h \
@@ -232,7 +233,14 @@ if WIN32
   libgnashcore_la_LIBADD += \
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaParser.lo \
 	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
-	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo
+	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderNellymoser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioResampler.lo 
+if HAVE_SPEEX
+  libgnashcore_la_LIBADD += \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSpeex.lo
+endif
 else
   libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
   	$(top_builddir)/libsound/libgnashsound.la

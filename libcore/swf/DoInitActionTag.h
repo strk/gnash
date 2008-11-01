@@ -64,7 +64,8 @@ public:
         return true;
     }
 
-    static void doInitActionLoader(SWFStream& in, tag_type tag, movie_definition& m)
+    static void doInitActionLoader(SWFStream& in, tag_type tag,
+            movie_definition& m, const RunInfo& /*r*/)
     {
         in.ensureBytes(2);
         int cid = in.read_u16();

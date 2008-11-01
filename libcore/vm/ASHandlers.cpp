@@ -36,12 +36,11 @@
 #include "MovieClip.h"
 #include "as_environment.h"
 #include "URL.h"
-#include "URLAccessManager.h" // for GetUrl actions
 #include "action_buffer.h"
 #include "as_object.h"
 #include "Object.h"
 #include "String_as.h" // for automatic as_value::STRING => String as object
-#include "Number.h" // for automatic as_value::NUMBER => Number as object
+#include "Number_as.h" // for automatic as_value::NUMBER => Number as object
 #include "drag_state.h"
 #include "VM.h" // for getting the root
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
@@ -189,7 +188,7 @@ SWFHandlers::SWFHandlers()
     property_names.push_back("_highquality"); // 16
     property_names.push_back("_focusrect"); // 17
     property_names.push_back("_soundbuftime"); // 18
-    property_names.push_back("@@ mystery quality member"); // 19 - quality: what the quality is (0, 1 or 2)
+    property_names.push_back("_quality"); // 19 - quality: what the quality is (0, 1 or 2)
     property_names.push_back("_xmouse"); // 20
     property_names.push_back("_ymouse"); // 21
 
@@ -537,8 +536,9 @@ SWFHandlers::ActionStopSounds(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STOPSOUNDS));
 #endif
 
-    media::sound_handler* s = get_sound_handler();
-    if (s != NULL)
+    VM& vm = thread.env.getVM();
+    sound::sound_handler* s = vm.getRoot().runInfo().soundHandler();
+    if (s)
     {
         s->stop_all_sounds();
     }
@@ -960,7 +960,6 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
-    
 
     as_value& top_value = env.top(0);
     std::string var_string = top_value.to_string();
@@ -1011,11 +1010,12 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    // we don't ues the target sprite directly, instead we fetch the _target(string type)
-    // of that sprite first and then search the final target(might be a different one).
-    // see tests in opcode_guard_test2.sc
+    // we don't ues the target sprite directly, instead we fetch the
+    // _target(string type) of that sprite first and then search the
+    // final target(might be a different one). See tests in
+    // opcode_guard_test2.sc
     //
-    // for _versioned, see swfdec's settarget2-tostring.as (swf 7 and 8)
+    // For _versioned, see swfdec's settarget2-tostring.as (swf 7 and 8)
     // 
     std::string target_name = env.top(0).to_string_versioned(env.get_version());
 
@@ -1049,19 +1049,23 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
     {
         as_object* obj = thread.getTarget();
 
-        //log_debug(_("ActionGetProperty(<empty>) called, target is %p"), (void*)obj);
-
         target = dynamic_cast<character*>(obj);
         if ( ! target )
         {
-            log_error(_("ActionGetProperty(<empty>) called, but current target is not a character"));
+            log_error(_("ActionGetProperty(<empty>) called, but current "
+                        "target is not a character"));
         }
     }
     else
     {
         target = env.find_target(tgt_str);
     }
-    unsigned int prop_number = static_cast<unsigned int>(env.top(0).to_number());
+ 
+    // FIXME: what happens when it's an invalid number? This will cause
+    // undefined behaviour on overflow.
+    unsigned int prop_number =
+        static_cast<unsigned int>(env.top(0).to_number());
+
     if (target)
     {
         if ( prop_number < get_property_names().size() )
@@ -1101,6 +1105,8 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     as_environment& env = thread.env;
 
     character *target = env.find_target(env.top(2).to_string());
+    // FIXME: what happens when it's an invalid number? This will cause
+    // undefined behaviour on overflow.
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
     as_value prop_val = env.top(0);
 
@@ -2146,10 +2152,10 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 void
 SWFHandlers::CommonGetUrl(as_environment& env,
         as_value target, // the target window, or _level1..10
-        const std::string& urlTarget, boost::uint8_t method)
+        const std::string& url, boost::uint8_t method)
 {
 
-    if (urlTarget.empty())
+    if (url.empty())
     {
         log_error(_("Bogus empty GetUrl url in SWF file, skipping"));
         return;
@@ -2159,17 +2165,17 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     bool loadTargetFlag    = method & 64;
     bool loadVariableFlag  = method & 128;
 
-    MovieClip::MovieClipMethod sendVarsMethod;
+    MovieClip::VariablesMethod sendVarsMethod;
 
     // handle malformed sendVarsMethod
     if ((method & 3) == 3)
     {
         log_error(_("Bogus GetUrl2 send vars method "
-            " in SWF file (both GET and POST requested), use GET"));
+            " in SWF file (both GET and POST requested). Using GET"));
         sendVarsMethod = MovieClip::METHOD_GET;
     }
     else sendVarsMethod =
-        static_cast<MovieClip::MovieClipMethod>(method & 3);
+        static_cast<MovieClip::VariablesMethod>(method & 3);
 
     std::string target_string;
     if ( ! target.is_undefined() && ! target.is_null() )
@@ -2183,15 +2189,15 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     // If the url starts with "FSCommand:", then this is
     // a message for the host app.
     StringNoCaseEqual noCaseCompare;
-    if (noCaseCompare(urlTarget.substr(0, 10), "FSCommand:"))
+    if (noCaseCompare(url.substr(0, 10), "FSCommand:"))
     {
-        m.handleFsCommand(urlTarget.substr(10), target_string);
+        m.handleFsCommand(url.substr(10), target_string);
         return;
     }
 
     // If the url starts with "print:", then this is
     // a print request.
-    if (noCaseCompare(urlTarget.substr(0, 6), "print:"))
+    if (noCaseCompare(url.substr(0, 6), "print:"))
     {
         log_unimpl("print: URL");
         return;
@@ -2213,20 +2219,36 @@ SWFHandlers::CommonGetUrl(as_environment& env,
     // The base url must be set with the set_base_url() command.
     //
 
-    const URL& baseurl = get_base_url();
-    URL url(urlTarget, baseurl);
-
-    log_debug(_("get url: target=%s, url=%s (%s), method=%x "
+    log_debug(_("get url: target=%s, url=%s, method=%x "
                 "(sendVars:%X, loadTarget:%d, loadVariable:%d)"),
-            target_string, url.str(), urlTarget, static_cast<int>(method),
+            target_string, url, static_cast<int>(method),
             sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
-    if ( ! URLAccessManager::allow(url) )
+    character* target_ch = env.find_target(target.to_string());
+    MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
+
+    if (loadVariableFlag)
     {
+        log_debug(_("getURL2 loadVariable"));
+
+        if (!target_ch)
+        {
+            log_error(_("getURL: target %s not found"), target_string);
+            // might want to invoke the external url opener here...
+            return;
+        }
+
+        if (!target_movie)
+        {
+            log_error(_("getURL: target %s is not a sprite"), target_string);
+            // might want to invoke the external url opener here...
+            return;
+        }
+
+        target_movie->loadVariables(url, sendVarsMethod);
+
         return;
     }
-
-    bool post = (sendVarsMethod == MovieClip::METHOD_POST);
 
     std::string varsToSend;
     if (sendVarsMethod != MovieClip::METHOD_NONE)
@@ -2243,62 +2265,21 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             return;
         }
         curtgt->getURLEncodedVars(varsToSend);
-        if (!post)
-        {
-            // we're using GET
-            std::string qs = url.querystring();
-            if ( qs.empty() ) varsToSend.insert(0, 1, '?');
-            else varsToSend.insert(0, 1, '&');
-            url.set_querystring(qs+varsToSend);
-        }
     }
 
-    character* target_ch = env.find_target(target.to_string());
-    MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
-
-    if (loadVariableFlag)
-    {
-        log_debug(_("getURL2 loadVariable"));
-
-        if ( ! target_ch )
-        {
-            log_error(_("getURL: target %s not found"),
-                target_string);
-            // might want to invoke the external url opener here...
-            return;
-        }
-
-        if ( ! target_movie )
-        {
-            log_error(_("getURL: target %s is not a sprite"),
-                target_string);
-            // might want to invoke the external url opener here...
-            return;
-        }
-
-        if (post)
-        {
-            log_unimpl(_("POST with loadVariables ignored"));
-        }
-        target_movie->loadVariables(url,
-                static_cast<MovieClip::MovieClipMethod>(sendVarsMethod));
-
-        return;
-    }
 
     if ( loadTargetFlag )
     {
         log_debug(_("getURL2 target load"));
 
-        if ( ! target_ch )
+        if (!target_ch)
         {
             unsigned int levelno;
-            if ( m.isLevelTarget(target_string, levelno) )
+            if (m.isLevelTarget(target_string, levelno))
             {
                 log_debug(_("Testing _level loading (level %u)"), levelno);
  
-                if (post) m.loadMovie(url, target_string, &varsToSend);
-                else m.loadMovie(url, target_string); // using GET
+                m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
                 return;
             }
 
@@ -2318,38 +2299,37 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 
         if (!target_movie)
         {
-            log_error(_("get url: target %s is not a sprite"),
-                target_string);
+            log_error(_("get url: target %s is not a sprite"), target_string);
             return;
         }
 
         std::string s = target_movie->getTarget(); // or getOrigTarget ?
-        if ( s != target_movie->getOrigTarget() )
+        if (s != target_movie->getOrigTarget())
         {
             log_debug(_("TESTME: target of a loadMovie changed its target "
                         "path"));
         }
+        
         // TODO: try to trigger this !
         assert(m.findCharacterByTarget(s) == target_movie );
 
-        if (post) m.loadMovie(url, s, &varsToSend); 
-        else m.loadMovie(url, s);
+        m.loadMovie(url, s, varsToSend, sendVarsMethod); 
         return;
     }
 
     unsigned int levelno;
-    if ( m.isLevelTarget(target_string, levelno) )
+    if (m.isLevelTarget(target_string, levelno))
     {
         log_debug(_("Testing _level loading (level %u)"), levelno);
-
-        if (post) m.loadMovie(url, target_string, &varsToSend);
-        else m.loadMovie(url, target_string); 
+        m.loadMovie(url, target_string, varsToSend, sendVarsMethod);
         return;
     }
 
     // Just plain getURL
-    if (post) m.getURL(url, target_string, &varsToSend);
-    else m.getURL(url, target_string);
+    // This should be the original URL string, as the hosting application
+    // will decide how to resolve the URL. If there is no hosting
+    // application, movie_root::getURL will resolve the URL.
+    m.getURL(url, target_string, varsToSend, sendVarsMethod);
 
 }
 
@@ -3124,7 +3104,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
                target, (void*)obj.get());
     );
 
-        if ( ! thread.getObjectMember(*obj, member_name.to_string(), env.top(1)) )
+    if (!thread.getObjectMember(*obj, member_name.to_string(), env.top(1)))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("Reference to undefined member %s of object %s",

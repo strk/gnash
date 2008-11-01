@@ -142,7 +142,7 @@ test_headers()
         runtest.untested("Decoded FLV header");
     } else {
         boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(head->head_size));
-        if ((memcmp(head->sig, "FLV", 0) == 0)
+        if ((memcmp(head->sig, "FLV", 3) == 0)
             && (head->version == 1)
             && (size == 9)) {
             runtest.pass("Decoded FLV header");
@@ -174,12 +174,13 @@ test_headers()
     }
     
     boost::shared_ptr<amf::Buffer> hex3(new Buffer("12 00 00 a4 00 00 00 00 00 00 00"));
+
     boost::shared_ptr<Flv::flv_tag_t> tag3 = flv.decodeTagHeader(hex3);
     if ((tag3->type == Flv::TAG_METADATA)
-        && (flv.convert24(tag3->bodysize) == 164)) {
-        runtest.pass("Decoded FLV MetaData header");
+        && (flv.convert24(tag3->bodysize) == 0xa40000)) {
+        runtest.pass("Decoded FLV MetaData Tag header");
     } else {
-        runtest.fail("Decoded FLV MetaData header");
+        runtest.fail("Decoded FLV MetaData Tag header");
     }
 }
 

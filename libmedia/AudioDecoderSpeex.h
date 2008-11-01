@@ -16,6 +16,9 @@
 
 #include "AudioDecoder.h"
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h"
+#endif
 #include <speex/speex.h> 
 
 #ifdef RESAMPLING_SPEEX
@@ -28,6 +31,10 @@
 namespace gnash {
 namespace media {
 
+/// Audio decoder for the speex codec 
+//
+/// This class will use the speex resampler if available
+///
 class AudioDecoderSpeex : public AudioDecoder
 {
 public:

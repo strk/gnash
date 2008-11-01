@@ -835,6 +835,7 @@ Element::makeObject(std::vector<boost::shared_ptr<Element> > &data)
 	addProperty(el);
 //	el->dump(os);
     }
+    return *this;
 }
 
 /// \brief Make this Element as an XML Object data type.

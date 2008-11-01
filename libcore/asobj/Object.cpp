@@ -22,8 +22,8 @@
 #include "fn_call.h"
 #include "as_object.h" // for inheritance
 #include "builtin_function.h" // need builtin_function
-#include "movie_definition.h" // for Object.registerClass (get_exported_resource)
-#include "sprite_definition.h" // for Object.registerClass  (get_movie_definition)
+#include "movie_definition.h" // for get_exported_resource
+#include "sprite_definition.h" // for get_movie_definition()
 #include "VM.h" // for SWF version (attachObjectInterface)
 #include "namedStrings.h" // for NSV::PROP_TO_STRING
 
@@ -323,7 +323,8 @@ object_registerClass(const fn_call& fn)
 	assert(relRoot);
 	movie_definition* def = relRoot->get_movie_definition();
 #endif
-	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid);
+	boost::intrusive_ptr<ExportableResource> exp_res =
+        def->get_exported_resource(symbolid);
 	if ( ! exp_res )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

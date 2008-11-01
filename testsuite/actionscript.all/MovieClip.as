@@ -111,19 +111,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(304); // SWF5
+	check_totals(321); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(783); // SWF6
+	check_totals(800); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(800); // SWF7
+	check_totals(817); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(872); // SWF8+
+	check_totals(889); // SWF8+
 #endif
 
 	play();
@@ -461,6 +461,47 @@ xcheck(!mc.hasOwnProperty("_framesloaded"));
 check(!mc.hasOwnProperty("_lockroot"));
 xcheck(!mc.hasOwnProperty("_highquality"));
 #endif //if OUTPUT_VERSION >= 6
+
+//----------------------------------------------
+// Test _soundbuftime
+//----------------------------------------------
+
+check_equals(mc._soundbuftime, _soundbuftime);
+xcheck_equals(mc._soundbuftime, 5);
+xcheck_equals(_soundbuftime, 5);
+
+mc._soundbuftime = 20;
+xcheck_equals(mc._soundbuftime, 20);
+xcheck_equals(_soundbuftime, 20);
+
+mc._soundbuftime = -20;
+xcheck_equals(mc._soundbuftime, -20);
+xcheck_equals(_soundbuftime, -20);
+
+mc._soundbuftime = 0;
+check_equals(mc._soundbuftime, 0);
+check_equals(_soundbuftime, 0);
+
+mc._soundbuftime = 1.5;
+xcheck_equals(mc._soundbuftime, 1);
+xcheck_equals(_soundbuftime, 1);
+
+o = {};
+
+mc._soundbuftime = o;
+xcheck_equals(mc._soundbuftime, 1);
+xcheck_equals(_soundbuftime, 1);
+
+o.valueOf = function() { return 4; };
+
+mc._soundbuftime = o;
+xcheck_equals(mc._soundbuftime, 4);
+xcheck_equals(_soundbuftime, 4);
+
+mc._soundbuftime = "string";
+xcheck_equals(mc._soundbuftime, 4);
+xcheck_equals(_soundbuftime, 4);
+
 
 //----------------------------------------------
 // Test createEmptyMovieClip

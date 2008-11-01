@@ -74,7 +74,8 @@ public:
 	// Reset target to its original value
 	void reset_target() { m_target = _original_target; }
 
-	/// @{ Stack access/manipulation
+	/// @name Stack access/manipulation 
+	/// @{
 
 	/// Push a value on the stack
 	void	push(const as_value& val)
@@ -155,8 +156,7 @@ public:
 
 	size_t stack_size() const { return _stack.size(); }
 
-	/// @}  stack access/manipulation
-	///
+	/// @}  end of stack access/manipulation 
 
 	/// \brief
 	/// Return the (possibly UNDEFINED) value of the named variable

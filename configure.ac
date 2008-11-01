@@ -2863,7 +2863,7 @@ if test x$cross_compiling = xno; then
     echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://haxe.org" >&4
-    echo "                 or .deb users: apt-get install haxe (version 2 or later required)" >&4
+    echo "                 or .deb users: apt-get install haxe" >&4
   fi
 
   if test x"$SWFMILL" != x; then

@@ -305,7 +305,7 @@ JpegImageInput::readHeader(unsigned int maxHeaderBytes)
 
 
 void
-JpegImageInput::startImage()
+JpegImageInput::read()
 {
 	assert(!_compressorOpened);
 
@@ -399,7 +399,7 @@ JpegImageInput::getWidth() const
 }
 
 
-int
+size_t
 JpegImageInput::getComponents() const
 {
 	assert(_compressorOpened);
@@ -444,6 +444,28 @@ JpegImageInput::errorOccurred(const char* msg)
     if (_compressorOpened) _compressorOpened = false;
 	std::longjmp(_jmpBuf, 1);
 }
+
+std::auto_ptr<GnashImage>
+JpegImageInput::readSWFJpeg2WithTables(JpegImageInput& loader)
+// Create and read a new image, using a input object that
+// already has tables loaded.  The IJG documentation describes
+// this as "abbreviated" format.
+{
+
+    loader.read();
+
+    std::auto_ptr<GnashImage> im(
+            new ImageRGB(loader.getWidth(), loader.getHeight()));
+
+    for (size_t y = 0, height = loader.getHeight(); y < height; y++) {
+        loader.readScanline(im->scanline(y));
+    }
+
+    loader.finishImage();
+
+    return im;
+}
+
 
 
 // A jpeglib destination manager that writes to a IOChannel.
@@ -574,15 +596,17 @@ JpegImageOutput::~JpegImageOutput()
 
 
 void
-JpegImageOutput::writeImageRGB(unsigned char* rgbData)
+JpegImageOutput::writeImageRGB(const unsigned char* rgbData)
 {
     // RGB...
     const size_t components = 3;
 
     for (size_t y = 0; y < _height; ++y)
     {
-        unsigned char* ypos = &rgbData[y * _width * components];
-        jpeg_write_scanlines(&m_cinfo, &ypos, 1);
+        const unsigned char* ypos = &rgbData[y * _width * components];
+
+        // JPEG needs non-const data.
+        jpeg_write_scanlines(&m_cinfo, const_cast<unsigned char**>(&ypos), 1);
     }
 }
 

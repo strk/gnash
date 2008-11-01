@@ -26,7 +26,6 @@
 #include "render.h"  // debug
 #include "render_handler.h"
 #include "sound_handler.h"
-#include "gnash.h" // for get_sound_handler
 #include "movie_root.h"
 #include "VM.h"
 
@@ -446,7 +445,9 @@ void
 Gui::toggleSound()
 {
 
-    media::sound_handler* s = get_sound_handler();
+    // @todo since we registered the sound handler, shouldn't we know
+    //       already what it is ?!
+    sound::sound_handler* s = _stage->runInfo().soundHandler();
 
     if (!s)
        return;
@@ -837,7 +838,9 @@ Gui::play()
     if ( ! _started ) start();
     else
     {
-        media::sound_handler* s = get_sound_handler();
+        // @todo since we registered the sound handler, shouldn't we know
+        //       already what it is ?!
+        sound::sound_handler* s = _stage->runInfo().soundHandler();
         if ( s ) s->unpause();
     }
 
@@ -852,7 +855,9 @@ Gui::stop()
 
     _stopped = true;
 
-    media::sound_handler* s = get_sound_handler();
+    // @todo since we registered the sound handler, shouldn't we know
+    //       already what it is ?!
+    sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->pause();
 
     stopHook();
@@ -867,7 +872,9 @@ Gui::pause()
     }
     else
     {
-    	media::sound_handler* s = get_sound_handler();
+        // @todo since we registered the sound handler, shouldn't we know
+        //       already what it is ?!
+    	sound::sound_handler* s = _stage->runInfo().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
     }
@@ -892,7 +899,9 @@ Gui::start()
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
 
-    media::sound_handler* s = get_sound_handler();
+    // @todo since we registered the sound handler, shouldn't we know
+    //       already what it is ?!
+    sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->unpause();
     _started = true;
 }

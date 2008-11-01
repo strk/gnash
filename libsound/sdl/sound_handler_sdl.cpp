@@ -29,6 +29,7 @@
 #include "utility.h" // for convert_raw_data
 #include "AudioDecoderSimple.h"
 #include "AudioDecoderNellymoser.h"
+#include "SoundInfo.h"
 
 #include "MediaHandler.h"
 
@@ -42,6 +43,15 @@
 
 // Define this to get debugging call about pausing/unpausing audio
 //#define GNASH_DEBUG_SDL_AUDIO_PAUSING
+
+// Mixing and decoding debugging
+//#define GNASH_DEBUG_MIXING
+
+// Debug create_sound/delete_sound/play_sound/stop_sound, loops
+#define GNASH_DEBUG_SOUNDS_MANAGEMENT
+
+// Debug sound decoding
+#define GNASH_DEBUG_SOUNDS_DECODING
 
 namespace { // anonymous
 
@@ -71,7 +81,7 @@ typedef struct{
 } // end of anonymous namespace
 
 namespace gnash {
-namespace media {
+namespace sound {
 
 
 void
@@ -79,11 +89,20 @@ SDL_sound_handler::initAudioSpec()
 {
 	// This is our sound settings
 	audioSpec.freq = 44100;
-	audioSpec.format = AUDIO_S16SYS; // AUDIO_S8 AUDIO_U8;
+
+    // Each sample is a signed 16-bit audio in system-endian format
+	audioSpec.format = AUDIO_S16SYS; 
+
+    // We want to be pulling samples for 2 channels:
+    // {left,right},{left,right},...
 	audioSpec.channels = 2;
+
 	audioSpec.callback = SDL_sound_handler::sdl_audio_callback;
+
 	audioSpec.userdata = this;
-	audioSpec.samples = 2048;		//512 - not enough for  videostream
+
+    //512 - not enough for  videostream
+	audioSpec.samples = 2048;	
 }
 
 
@@ -133,24 +152,24 @@ SDL_sound_handler::delete_all_sounds()
 
 	boost::mutex::scoped_lock lock(_mutex);
 
-	for (Sounds::iterator i = m_sound_data.begin(),
-	                      e = m_sound_data.end(); i != e; ++i)
+	for (Sounds::iterator i = _sounds.begin(),
+	                      e = _sounds.end(); i != e; ++i)
 	{
-		sound_data* sounddata = *i;
+		EmbedSound* sounddata = *i;
         // The sound may have been deleted already.
         if (!sounddata) continue;
 
-		size_t nActiveSounds = sounddata->m_active_sounds.size();
+		size_t nInstances = sounddata->_soundInstances.size();
 
 		// Decrement callback clients count 
-		soundsPlaying -= nActiveSounds;
+		soundsPlaying -= nInstances;
 
         // Increment number of sound stop request for the testing framework
-		_soundsStopped += nActiveSounds;
+		_soundsStopped += nInstances;
 
 		delete sounddata;
 	}
-	m_sound_data.clear();
+	_sounds.clear();
 }
 
 SDL_sound_handler::~SDL_sound_handler()
@@ -164,46 +183,52 @@ SDL_sound_handler::~SDL_sound_handler()
 
 int	SDL_sound_handler::create_sound(
 	std::auto_ptr<SimpleBuffer> data,
-	std::auto_ptr<SoundInfo> sinfo)
+	std::auto_ptr<media::SoundInfo> sinfo)
 {
 
 	assert(sinfo.get());
 
-	std::auto_ptr<sound_data> sounddata ( new sound_data(data, sinfo) );
+	std::auto_ptr<EmbedSound> sounddata ( new EmbedSound(data, sinfo) );
 
-	// Make sure we're the only thread accessing m_sound_data here
+	// Make sure we're the only thread accessing _sounds here
 	boost::mutex::scoped_lock lock(_mutex);
 
+	int sound_id = _sounds.size();
+
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+	log_debug("create_sound: sound %d, format %s %s %dHz, %d samples (%d bytes)",
+        sound_id, sounddata->soundinfo->getFormat(),
+        sounddata->soundinfo->isStereo() ? "stereo" : "mono",
+        sounddata->soundinfo->getSampleRate(),
+        sounddata->soundinfo->getSampleCount(),
+        sounddata->size());
+#endif
+
 	// the vector takes ownership
-	m_sound_data.push_back(sounddata.release());
-
-	int sound_id = m_sound_data.size()-1;
-
-	log_debug("create_sound: sound %d, format %d", sound_id, m_sound_data.back()->soundinfo->getFormat());
+	_sounds.push_back(sounddata.release());
 
 	return sound_id;
 
 }
 
-// this gets called when a stream gets more data
-long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int /*sample_count*/, int handle_id)
-
+// This gets called when an SWF embedded sound stream gets more data
+long
+SDL_sound_handler::fill_stream_data(unsigned char* data,
+        unsigned int data_bytes, unsigned int /*sample_count*/,
+        int handle_id)
 {
 
 	boost::mutex::scoped_lock lock(_mutex);
+
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
-	if (handle_id < 0 || (unsigned int) handle_id+1 > m_sound_data.size())
+	if (handle_id < 0 || (unsigned int) handle_id+1 > _sounds.size())
 	{
 		delete [] data;
 		return -1;
 	}
-	sound_data* sounddata = m_sound_data[handle_id];
 
-	// If doing ADPCM, knowing the framesize is needed to decode!
-	if (sounddata->soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
-		sounddata->m_frames_size[sounddata->size()] = data_bytes;
-	}
+	EmbedSound* sounddata = _sounds[handle_id];
 
 	// Handling of the sound data
 	size_t start_size = sounddata->size();
@@ -215,104 +240,98 @@ long	SDL_sound_handler::fill_stream_data(unsigned char* data, unsigned int data_
 
 // Play the index'd sample.
 void
-SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
+SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
+        long start_position, const SoundEnvelopes* envelopes)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Increment number of sound start request for the testing framework
 	++_soundsStarted;
 
-	// Check if the sound exists, or if audio is muted
-	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size() || muted)
+    // Check if audio is muted
+    if (muted)
 	{
-		// Invalid handle or muted
 		return;
 	}
 
-	sound_data* sounddata = m_sound_data[sound_handle];
+	// Check if the sound exists
+	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
+	{
+        log_error("Invalid (%d) sound_handle passed to play_sound, "
+                  "doing nothing", sound_handle);
+		return;
+	}
 
-	// If this is called from a streamsoundblocktag, we only start if this
-	// sound isn't already playing.
-	if (start_position > 0 && ! sounddata->m_active_sounds.empty()) {
+    // parameter checking
+	if (start_position < 0)
+    {
+        log_error("Negative (%d) start_position passed to play_sound, "
+                  "taking as zero ", start_position);
+        start_position=0;
+    }
+
+    // parameter checking
+	if (offSecs < 0)
+    {
+        log_error("Negative (%d) seconds offset passed to play_sound, "
+                  "taking as zero ", offSecs);
+        offSecs = 0;
+    }
+
+	EmbedSound& sounddata = *(_sounds[sound_handle]);
+
+	// When this is called from a StreamSoundBlockTag,
+    // we only start if this sound isn't already playing.
+	if ( start_position && sounddata.isPlaying() )
+    {
+        // log_debug("Stream sound block play request, "
+        //           "but an instance of the stream is "
+        //           "already playing, so we do nothing");
 		return;
 	}
 
 	// Make sure sound actually got some data
-	if (sounddata->size() < 1) {
+	if ( sounddata.empty() )
+    {
+        // @@ should this be a log_error ? or even an assert ?
 		IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Trying to play sound with size 0"));
 		);
 		return;
 	}
 
-	// Make a "active_sound" for this sound which is later placed
-    // on the vector of instances of this sound being played
-	std::auto_ptr<active_sound> sound ( new active_sound() );
-
-	// Set source data to the active_sound
-	sound->set_data(sounddata);
-
-	// Set the given options of the sound
-	if (start_position < 0) sound->decodingPosition = 0;
-	else sound->decodingPosition = start_position;
-
-	if (offset < 0) sound->offset = 0;
-	else sound->offset = (sounddata->soundinfo->isStereo() ? offset : offset*2); // offset is stored as stereo
-
-	sound->envelopes = envelopes;
-
-	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
-	sound->loopCount = loopCount;
-
-	SoundInfo& si = *(sounddata->soundinfo);
-	log_debug("play_sound %d called, SoundInfo format is %s", sound_handle, si.getFormat());
-	AudioInfo info(
-		(int)si.getFormat(), // codeci
-		si.getSampleRate(), // sampleRatei
-		si.is16bit() ? 2 : 1, // sampleSizei
-		si.isStereo(), // stereoi
-		0, // duration unknown, does it matter ?
-		FLASH);
-
-    try {
-        sound->decoder = _mediaHandler->createAudioDecoder(info);
-
-#ifdef MEDIA_HANDLERS_DO_NOT_SUPPORT_CORNER_CASES
-        // It should be the MediaHandler's duty to check
-        // for nellymoser, ADPCM, etc
-
-	    switch (sounddata->soundinfo->getFormat()) {
-	        case AUDIO_CODEC_NELLYMOSER:
-	        case AUDIO_CODEC_NELLYMOSER_8HZ_MONO:
-		        sound->decoder = new AudioDecoderNellymoser(*(sounddata->soundinfo));
-		        break;
-	        case AUDIO_CODEC_MP3:
-                SoundInfo* si=sounddata->soundinfo;
-#ifdef USE_FFMPEG
-		        sound->decoder = new AudioDecoderFfmpeg(*(si));
-		        break;
-#elif defined(USE_GST)
-		        sound->decoder = new AudioDecoderGst(*(si));
-		        break;
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+	log_debug("play_sound %d called, SoundInfo format is %s", sound_handle, sounddata.soundinfo->getFormat());
 #endif
 
-	        case AUDIO_CODEC_ADPCM:
-	        default:
-                sound->decoder = new AudioDecoderSimple(*(sounddata->soundinfo));
-                break;
-	    }
-#endif // MEDIA_HANDLERS_DO_NOT_SUPPORT_CORNER_CASES
-	}
-	catch (MediaException& e)
-	{
-	    log_error("AudioDecoder initialization failed: %s", e.what());
-	}
 
-    // Push the sound onto the playing sounds container.
-    // We want to do this even on audio failures so count
-    // of started and stopped sound reflects expectances
-    // for testing framework.
-	sounddata->m_active_sounds.push_back(sound.release());
+    // Make a "EmbedSoundInst" for this sound which is later placed
+    // on the vector of instances of this sound being played
+    //
+    // @todo: plug the returned EmbedSoundInst to the set
+    //        of InputStream channels !
+    //
+    /*InputStream* sound =*/ sounddata.createInstance(
+
+            // MediaHandler to use for decoding
+            *_mediaHandler,
+
+            // Byte offset position to start decoding from
+            // (would be offset to streaming sound block)
+            start_position, // or blockOffset
+
+            // Seconds offset
+            // WARNING: this is wrong, offset is passed as seconds !!
+            // (currently unused anyway)
+	        (sounddata.soundinfo->isStereo() ? offSecs : offSecs*2),
+
+            // Volume envelopes to use for this instance
+            envelopes,
+
+            // Loop count
+            loopCount
+
+    );
 
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
@@ -341,24 +360,24 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
-	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
 	{
 		// Invalid handle.
 		return;
 	}
 
 	
-	sound_data* sounddata = m_sound_data[sound_handle];
+	EmbedSound* sounddata = _sounds[sound_handle];
 
-	size_t nActiveSounds = sounddata->m_active_sounds.size();
+	size_t nInstances = sounddata->_soundInstances.size();
 
 	// Decrement callback clients count 
-	soundsPlaying -= nActiveSounds;
+	soundsPlaying -= nInstances;
 
     // Increment number of sound stop request for the testing framework
-	_soundsStopped += nActiveSounds;
+	_soundsStopped += nInstances;
 
-	sounddata->clearActiveSounds();
+	sounddata->clearInstances();
 
 }
 
@@ -368,12 +387,14 @@ void	SDL_sound_handler::delete_sound(int sound_handle)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug ("deleting sound :%d", sound_handle);
+#endif
 
-	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
+	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
 	{
-		delete m_sound_data[sound_handle];
-		m_sound_data[sound_handle] = NULL;
+		delete _sounds[sound_handle];
+		_sounds[sound_handle] = NULL;
 	}
 
 }
@@ -385,22 +406,22 @@ void	SDL_sound_handler::stop_all_sounds()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
-	for (Sounds::iterator i = m_sound_data.begin(),
-	                      e = m_sound_data.end(); i != e; ++i)
+	for (Sounds::iterator i = _sounds.begin(),
+	                      e = _sounds.end(); i != e; ++i)
 	{
-		sound_data* sounddata = *i;
+		EmbedSound* sounddata = *i;
 
         // The sound may have been deleted already.		
 		if (!sounddata) continue;
-		size_t nActiveSounds = sounddata->m_active_sounds.size();
+		size_t nInstances = sounddata->_soundInstances.size();
 
 		// Decrement callback clients count 
-		soundsPlaying -= nActiveSounds;
+		soundsPlaying -= nInstances;
 
         // Increment number of sound stop request for the testing framework
-		_soundsStopped += nActiveSounds;
+		_soundsStopped += nInstances;
 
-		sounddata->clearActiveSounds();
+		sounddata->clearInstances();
 	}
 }
 
@@ -413,9 +434,9 @@ int	SDL_sound_handler::get_volume(int sound_handle) {
 
 	int ret;
 	// Check if the sound exists.
-	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
+	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
 	{
-		ret = m_sound_data[sound_handle]->volume;
+		ret = _sounds[sound_handle]->volume;
 	} else {
 		ret = 0; // Invalid handle
 	}
@@ -430,26 +451,28 @@ void	SDL_sound_handler::set_volume(int sound_handle, int volume) {
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
-	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size())
+	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
 	{
 		// Invalid handle.
 	} else {
 
 		// Set volume for this sound. Should this only apply to the active sounds?
-		m_sound_data[sound_handle]->volume = volume;
+		_sounds[sound_handle]->volume = volume;
 	}
 
 
 }
 	
-SoundInfo* SDL_sound_handler::get_sound_info(int sound_handle) {
+media::SoundInfo*
+SDL_sound_handler::get_sound_info(int sound_handle)
+{
 
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
-	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
+	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
 	{
-		return m_sound_data[sound_handle]->soundinfo.get();
+		return _sounds[sound_handle]->soundinfo.get();
 	} else {
 		return NULL;
 	}
@@ -531,20 +554,20 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
-	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
 	{
 		// Invalid handle.
 		return 0;
 	}
 
-	sound_data* sounddata = m_sound_data[sound_handle];
+	EmbedSound* sounddata = _sounds[sound_handle];
 
 	boost::uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
 	boost::uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
 
 	// Return the sound duration in milliseconds
 	if (sampleCount > 0 && sampleRate > 0) {
-        // TODO: should we cache this in the sound_data object ?
+        // TODO: should we cache this in the EmbedSound object ?
 		unsigned int ret = sampleCount / sampleRate * 1000;
 		ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
 		//if (sounddata->soundinfo->isStereo()) ret = ret / 2;
@@ -554,28 +577,31 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 	}
 }
 
-unsigned int SDL_sound_handler::tell(int sound_handle)
+unsigned int
+SDL_sound_handler::tell(int sound_handle)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
-	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
 	{
 		// Invalid handle.
 		return 0;
 	}
 
-	sound_data* sounddata = m_sound_data[sound_handle];
+	EmbedSound* sounddata = _sounds[sound_handle];
 
 	// If there is no active sounds, return 0
-	if (sounddata->m_active_sounds.empty()) return 0;
+	if (sounddata->_soundInstances.empty()) return 0;
 
 	// We use the first active sound of this.
-	active_sound* asound = sounddata->m_active_sounds.front();
+	//EmbedSoundInst* asound = sounddata->_soundInstances.front();
+	InputStream* asound = sounddata->_soundInstances.front();
 
 	// Return the playhead position in milliseconds
-	unsigned int ret = asound->samples_played / audioSpec.freq * 1000;
-	ret += ((asound->samples_played % audioSpec.freq) * 1000) / audioSpec.freq;
+    unsigned int samplesPlayed = asound->samplesFetched();
+	unsigned int ret = samplesPlayed / audioSpec.freq * 1000;
+	ret += ((samplesPlayed % audioSpec.freq) * 1000) / audioSpec.freq;
 	if (audioSpec.channels > 1) ret = ret / audioSpec.channels;
 	return ret;
 }
@@ -594,121 +620,411 @@ create_sound_handler_sdl(const std::string& wave_file)
 	return new SDL_sound_handler(wave_file);
 }
 
+unsigned int
+EmbedSoundInst::samplesFetched() const
+{
+    return _samplesFetched;
+}
+
+EmbedSoundInst::EmbedSoundInst(const EmbedSound& soundData,
+            media::MediaHandler& mediaHandler,
+            unsigned long blockOffset, unsigned int secsOffset,
+            const SoundEnvelopes* env,
+            unsigned int loopCount)
+		:
+
+        // should store blockOffset somewhere else too, for resetting
+		decodingPosition(blockOffset),
+
+        // should change based on offSecs I guess ?
+		playbackPosition(0),
+
+		loopCount(loopCount),
+		offSecs(secsOffset),
+        envelopes(env),
+		current_env(0),
+		_samplesFetched(0),
+
+		_decoder(0),
+		_soundDef(soundData),
+        _decodedData(0)
+{
+    createDecoder(mediaHandler);
+}
+
+/*private*/
+void
+EmbedSoundInst::createDecoder(media::MediaHandler& mediaHandler)
+{
+	media::SoundInfo& si = *(_soundDef.soundinfo);
+
+	media::AudioInfo info(
+		(int)si.getFormat(), // codeci
+		si.getSampleRate(), // sampleRatei
+		si.is16bit() ? 2 : 1, // sampleSizei
+		si.isStereo(), // stereoi
+		0, // duration unknown, does it matter ?
+		media::FLASH);
+
+    try
+    {
+        _decoder = mediaHandler.createAudioDecoder(info);
+	}
+	catch (MediaException& e)
+	{
+	    log_error("AudioDecoder initialization failed: %s", e.what());
+	}
+}
+
 // Pointer handling and checking functions
-boost::uint8_t*
-active_sound::getDecodedData(unsigned long int pos)
+boost::int16_t*
+EmbedSoundInst::getDecodedData(unsigned long int pos)
 {
 	if ( _decodedData.get() )
 	{
 		assert(pos < _decodedData->size());
-		return _decodedData->data()+pos;
+		return reinterpret_cast<boost::int16_t*>(_decodedData->data()+pos);
 	}
 	else return 0;
 }
 
-boost::uint8_t*
-active_sound::getEncodedData(unsigned long int pos)
+unsigned int 
+EmbedSoundInst::fetchSamples(boost::int16_t* to, unsigned int nSamples)
 {
-	assert(_encodedData);
-	return _encodedData->data(pos);
+	// If there exist no decoder, then we can't decode!
+    // TODO: isn't it documented that an EmbedSoundInst w/out a decoder
+    //       means that the EmbedSound data is already decoded ?
+	if (!_decoder.get())
+    {
+        return 0;
+    }
+
+    unsigned int fetchedSamples=0;
+
+    while ( nSamples )
+    {
+        unsigned int availableSamples = decodedSamplesAhead();
+        if ( availableSamples )
+        {
+            boost::int16_t* data = getDecodedData(playbackPosition);
+            if ( availableSamples >= nSamples )
+            {
+                std::copy(data, data+nSamples, to);
+                fetchedSamples += nSamples;
+                break; // fetched all
+            }
+            else
+            {
+                // not enough decoded samples available:
+                // copy what we have and go on
+                std::copy(data, data+availableSamples, to);
+                fetchedSamples += availableSamples;
+                to+=availableSamples;
+                nSamples-=availableSamples;
+                assert ( nSamples );
+            }
+        }
+
+        // We haven't finished fetching yet, so see if we
+        // have more to decode or not
+
+        if ( decodingCompleted() )
+        {
+            // No more to decode, see if we want to loop...
+
+            if ( loopCount )
+            {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+                log_debug("Loops left: %d", loopCount);
+#endif
+
+                // loops ahead, reset playbackPosition to the starting 
+                // position and keep looping
+                --loopCount;
+
+                // @todo playbackPosition is not necessarely 0
+                //       if we were asked to start somewhere after that!!
+                playbackPosition=0;
+
+                continue;
+            }
+
+            log_debug("Decoding completed and no looping, sound is over");
+            break; // fetched what possible, filled with silence the rest
+        }
+
+        // More to decode, then decode it
+        decodeNextBlock();
+    }
+
+	// Update playback position (samples are 16bit)
+	playbackPosition += fetchedSamples*2;
+
+	// update samples played
+	_samplesFetched += fetchedSamples;
+
+    return fetchedSamples;
 }
 
-void active_sound::set_data(sound_data* idata)
+/*private*/
+void
+EmbedSoundInst::decodeNextBlock()
 {
-	_encodedData = idata;
+    assert(!decodingCompleted());
+
+    // Should only be called when no more decoded data
+    // are available for fetching.
+    // Doing so we know what's the sample number
+    // of the first sample in the newly decoded block.
+    //
+    assert(playbackPosition >= decodedDataSize() );
+
+    boost::uint32_t inputSize = 0; // or blockSize
+    bool parse = true; // need to parse ?
+
+    // this block figures inputSize (blockSize) and need to parse (parse)
+    // @todo: turn into a private function
+    {
+        const EmbedSound& sndData = _soundDef;
+
+        // Figure the need to parse..
+	    switch (sndData.soundinfo->getFormat())
+        {
+            case media::AUDIO_CODEC_ADPCM:
+#ifdef GNASH_DEBUG_SOUNDS_DECODING
+                log_debug(" sound format is ADPCM");
+#endif
+                parse = false;
+                break;
+            default:
+                break;
+        }
+
+        // Figure the frame size ...
+        inputSize = encodedDataSize() - decodingPosition;
+        if (!sndData.m_frames_size.empty())
+        {
+            const EmbedSound::FrameSizeMap& m = sndData.m_frames_size;
+            EmbedSound::FrameSizeMap::const_iterator it =
+                        m.find(decodingPosition);
+            if ( it != m.end() )
+            {
+                inputSize = it->second; 
+#ifdef GNASH_DEBUG_SOUNDS_DECODING
+                log_debug(" frame size for frame starting at offset %d is %d",
+                    decodingPosition, inputSize);
+#endif
+            }
+            else
+            {
+                // this should never happen, as we keep track of 
+                // sizes for each audio block in input
+                log_error("Unknown size of audio block starting at offset %d",
+                    " (should never happen)",
+                    decodingPosition);
+            }
+        }
+    }
+
+#ifdef GNASH_DEBUG_SOUNDS_DECODING
+    log_debug("  decoding %d bytes, parse:%d", inputSize, parse);
+#endif
+
+    assert(inputSize);
+    const boost::uint8_t* input = getEncodedData(decodingPosition);
+
+    boost::uint32_t consumed = 0;
+    boost::uint32_t decodedDataSize = 0;
+    boost::uint8_t* decodedData = _decoder->decode(
+                                      input, 
+                                      inputSize,
+                                      decodedDataSize,
+                                      consumed,
+                                      parse);
+
+    decodingPosition += consumed;
+
+    assert(!(decodedDataSize%2));
+
+    // @todo I hope there are no alignment issues in this cast from int8_t* to int16_t* !
+    boost::int16_t* samples = reinterpret_cast<boost::int16_t*>(decodedData);
+    unsigned int nSamples = decodedDataSize/2;
+
+#ifdef GNASH_DEBUG_MIXING
+    log_debug("  applying volume/envelope to %d bytes (%d samples)"
+            "of decoded data", decodedDataSize, nSamples);
+#endif
+
+	// If the volume needs adjustments we call a function to do that (why are we doing this manually ?)
+	if (_soundDef.volume != 100) // volume is a private member
+    {
+        // TODO: have adjust_volume take samples, not bytes
+		adjustVolume(samples, nSamples, _soundDef.volume/100.0);
+	}
+
+    /// @todo is use of envelopes really mutually exclusive with
+    ///       setting the volume ??
+    else if (envelopes) // envelopes are a private member
+    {
+        unsigned int firstSample = playbackPosition/2;
+
+        // TODO: have applyEnvelopes take samples, not bytes
+		applyEnvelopes(samples, nSamples, firstSample, *envelopes);
+	}
+
+#ifdef GNASH_DEBUG_MIXING
+    log_debug("  appending %d bytes to decoded buffer", decodedDataSize);
+#endif
+
+
+    // decodedData ownership transferred here
+    appendDecodedData(decodedData, decodedDataSize);
 }
 
-void active_sound::deleteDecodedData()
+
+const boost::uint8_t*
+EmbedSoundInst::getEncodedData(unsigned long int pos)
 {
-	_decodedData.reset();
+	return _soundDef.data(pos);
 }
 
-// AS-volume adjustment
-void adjust_volume(boost::int16_t* data, int size, int volume)
+/* static private */
+void
+EmbedSoundInst::adjustVolume(boost::int16_t* data, unsigned int nSamples, float volume)
 {
-	for (int i=0; i < size*0.5; i++) {
-		data[i] = data[i] * volume/100;
+    //log_error("skipping volume adjustment (intentionally)"); return;
+
+	for (unsigned int i=0; i<nSamples; ++i)
+    {
+		data[i] = data[i] * volume;
 	}
 }
 
-// envelope-volume adjustment
-static void
-use_envelopes(active_sound& sound, unsigned int length)
+/* private */
+void
+EmbedSoundInst::applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
+        unsigned int firstSampleOffset, const SoundEnvelopes& env)
 {
-	// Check if this is the time to use envelopes yet
-	if (sound.current_env == 0 && (*sound.envelopes)[0].m_mark44 > sound.samples_played+length/2)
+    //log_error("skipping envelopes (intentionally)"); return;
+
+    // Number of envelopes defined
+	size_t numEnvs = env.size();
+
+    // Nothing to do if we applied all envelopes already
+	if ( numEnvs <= current_env)
+    {
+        return;
+    }
+
+	// Not yet time to use the current envelope
+	if (env[current_env].m_mark44 >= firstSampleOffset+nSamples)
 	{
 		return;
-
-	}
-	// switch to the next envelope if needed and possible
-	else if (sound.current_env < sound.envelopes->size()-1 && (*sound.envelopes)[sound.current_env+1].m_mark44 >= sound.samples_played)
-	{
-		sound.current_env++;
 	}
 
-	// Current envelope position
-	boost::int32_t cur_env_pos = sound.envelopes->operator[](sound.current_env).m_mark44;
+    assert(env[current_env].m_mark44 < firstSampleOffset+nSamples);
 
-	// Next envelope position
+	// Get next envelope position (absolute samples offset)
 	boost::uint32_t next_env_pos = 0;
-	if (sound.current_env == (sound.envelopes->size()-1)) {
+	if (current_env == (env.size()-1)) {
 		// If there is no "next envelope" then set the next envelope start point to be unreachable
-		next_env_pos = cur_env_pos + length;
+		next_env_pos = env[current_env].m_mark44 + nSamples + 1;
 	} else {
-		next_env_pos = (*sound.envelopes)[sound.current_env+1].m_mark44;
+		next_env_pos = env[current_env+1].m_mark44;
 	}
 
-	unsigned int startpos = 0;
-	// Make sure we start adjusting at the right sample
-	if (sound.current_env == 0 && (*sound.envelopes)[sound.current_env].m_mark44 > sound.samples_played) {
-		startpos = sound.playbackPosition + ((*sound.envelopes)[sound.current_env].m_mark44 - sound.samples_played)*2;
-	} else {
-		startpos = sound.playbackPosition;
-	}
+    // Scan all samples in the block, applying the envelope
+    // which is in effect in each subportion
+	for (unsigned int i=0; i<nSamples/2; i+=2)
+    {
+        // @todo cache these left/right floats (in the SoundEnvelope class?)
+		float left = env[current_env].m_level0 / 32768.0;
+		float right = env[current_env].m_level1 / 32768.0;
 
-	boost::int16_t* data = reinterpret_cast<boost::int16_t*>(sound.getDecodedData(startpos));
+		samples[i] = samples[i] * left; // Left
+		samples[i+1] = samples[i+1] * right; // Right
 
-	for (unsigned int i=0; i < length/2; i+=2) {
-		float left = static_cast<float>((*sound.envelopes)[sound.current_env].m_level0 / 32768.0);
-		float right = static_cast<float>((*sound.envelopes)[sound.current_env].m_level1 / 32768.0);
+        // TODO: continue from here (what is the code below doing ??
 
-		data[i] = static_cast<boost::int16_t>(data[i] * left); // Left
-		data[i+1] = static_cast<boost::int16_t>(data[i+1] * right); // Right
+        // if we encounter the offset of next envelope,
+        // switch to it !
+		if ( (firstSampleOffset+nSamples-i) >= next_env_pos )
+        {
+            if ( numEnvs <= ++current_env )
+            {
+                // no more envelopes to apply
+                return;
+            }
 
-		if ((sound.samples_played+(length/2-i)) >= next_env_pos && sound.current_env != (sound.envelopes->size()-1)) {
-			sound.current_env++;
-			// Next envelope position
-			if (sound.current_env == (sound.envelopes->size()-1)) {
-				// If there is no "next envelope" then set the next envelope start point to be unreachable
-				next_env_pos = cur_env_pos + length;
-			} else {
-				next_env_pos = (*sound.envelopes)[sound.current_env+1].m_mark44;
-			}
+	        // Get next envelope position (absolute samples offset)
+            if (current_env == (env.size()-1)) {
+                // If there is no "next envelope" then set the next envelope start point to be unreachable
+		        next_env_pos = env[current_env].m_mark44 + nSamples + 1;
+            } else {
+                next_env_pos = env[current_env+1].m_mark44;
+            }
 		}
 	}
 }
 
 
-// Prepare for mixing/adding (volume adjustments) and mix/add.
-static void
-do_mixing(Uint8* stream, active_sound& sound, Uint8* data, unsigned int mix_length, unsigned int volume)
+/// Prepare for mixing/adding (volume adjustments) and mix/add.
+//
+/// @param mixTo
+///     The buffer to mix to
+///
+/// @param sound
+///     The EmbedSoundInst to mix in.
+///     Note that decoded data in the EmbedSoundInst will
+///     be modified (volumes and envelope adjustments).
+///
+/// @param mixLen
+///     The amount of bytes to mix in. Must be a multiple of 2 !!
+///
+/// @param volume
+///     The volume to use for this mix-in.
+///     100 is full volume. 
+///
+/// @return the number of samples actually wrote out.
+///         If < nSamples we reached end of the EmbedSoundInst
+///
+static unsigned int
+do_mixing(Uint8* mixTo, EmbedSoundInst& sound, unsigned int nSamples, unsigned int volume)
 {
-	// If the volume needs adjustments we call a function to do that (why are we doing this manually ?)
-	if (volume != 100) {
-		adjust_volume(reinterpret_cast<boost::int16_t*>(data), mix_length, volume);
-	} else if (sound.envelopes != NULL) {
-		use_envelopes(sound, mix_length);
-	}
+    if ( ! nSamples )
+    {
+        log_debug("do_mixing: %d bytes are 0 samples, nothing to do");
+        return 0;
+    }
+
+    boost::scoped_array<boost::int16_t> data(new boost::int16_t[nSamples]);
+
+    unsigned int wroteSamples = sound.fetchSamples(data.get(), nSamples);
+    if ( wroteSamples < nSamples )
+    {
+        // @todo would it be fine to skip the filling if
+        //       we pass just the actual wrote samples to
+        //       SDL_MixAudio below ?
+
+        log_debug("do_mixing: less samples fetched (%d) then I requested (%d)."
+            " Filling the rest with silence",
+            wroteSamples, nSamples);
+
+        std::fill(data.get()+wroteSamples, data.get()+nSamples, 0);
+    }
 
 	// Mix the raw data
-	SDL_MixAudio(static_cast<Uint8*>(stream),static_cast<const Uint8*>(data), mix_length, SDL_MIX_MAXVOLUME);
+#ifdef GNASH_DEBUG_MIXING
+    log_debug("do_mixing: calling SDL_MixAudio with %d bytes of samples", mixLen);
+#endif
 
-	// Update sound info
-	sound.playbackPosition += mix_length;
+	int finalVolume = int( SDL_MIX_MAXVOLUME * (volume/100.0) );
 
-	// Sample size is always 2
-	sound.samples_played += mix_length / 2;
+    // @todo would it be fine to mix only wroteSamples*2 here ?
+    //       there would be no need to fill with zeros in that case ?
+	SDL_MixAudio(mixTo, reinterpret_cast<const Uint8*>(data.get()), nSamples*2, finalVolume);
+
+    return wroteSamples;
 }
 
 
@@ -749,35 +1065,18 @@ void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
  
 }
 
-// Callback invoked by the SDL audio thread.
-void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
+void
+SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_length)
 {
-	if ( buffer_length_in < 0 )
-	{
-		log_error(_("Negative buffer length in sdl_audio_callback (%d)"), buffer_length_in);
-		return;
-	}
+	boost::mutex::scoped_lock lock(_mutex);
 
-	if ( buffer_length_in == 0 )
-	{
-		log_error(_("Zero buffer length in sdl_audio_callback"));
-		return;
-	}
+	if ( isPaused() ) return;
 
-	unsigned int buffer_length = static_cast<unsigned int>(buffer_length_in);
-
-	// Get the soundhandler
-	SDL_sound_handler* handler = static_cast<SDL_sound_handler*>(udata);
-
-	boost::mutex::scoped_lock lock(handler->_mutex);
-
-	if ( handler->isPaused() ) return;
-
-	int finalVolume = int(128*handler->getFinalVolume()/100.0);
+	int finalVolume = int( SDL_MIX_MAXVOLUME * (getFinalVolume()/100.0) );
 
 	// If nothing to play there is no reason to play
 	// Is this a potential deadlock problem?
-	if (handler->soundsPlaying == 0 && handler->m_aux_streamer.empty()) {
+	if (soundsPlaying == 0 && m_aux_streamer.empty()) {
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
 		log_debug("Pausing SDL Audio...");
 #endif
@@ -790,13 +1089,13 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	memset(buffer, 0, buffer_length);
 
 	// call NetStream or Sound audio callbacks
-	if ( !handler->m_aux_streamer.empty() )
+	if ( !m_aux_streamer.empty() )
 	{
 		boost::scoped_array<boost::uint8_t> buf ( new boost::uint8_t[buffer_length] );
 
 		// Loop through the attached sounds
-		CallbacksMap::iterator it = handler->m_aux_streamer.begin();
-		CallbacksMap::iterator end = handler->m_aux_streamer.end();
+		CallbacksMap::iterator it = m_aux_streamer.begin();
+		CallbacksMap::iterator end = m_aux_streamer.end();
 		while (it != end) {
 			memset(buf.get(), 0, buffer_length);
 
@@ -808,10 +1107,10 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 			if (!ret) {
 				CallbacksMap::iterator it2=it;
 				++it2; // before we erase it
-				handler->m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
+				m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
 				it = it2;
 				// Decrement callback clients count 
-				handler->soundsPlaying--;
+				soundsPlaying--;
 			} else {
 				++it;
 			}
@@ -820,7 +1119,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		}
 	}
 
-    const SDL_sound_handler::Sounds& soundData = handler->m_sound_data;
+    const SDL_sound_handler::Sounds& soundData = _sounds;
 
 	// Run through all the sounds. TODO: don't call .size() at every iteration !
 	for (SDL_sound_handler::Sounds::const_iterator i = soundData.begin(),
@@ -828,32 +1127,62 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	{
 	    // Check whether sound has been deleted first.
         if (!*i) continue;
-		handler->mixSoundData(**i, buffer, buffer_length);
+		mixSoundData(**i, buffer, buffer_length);
 	}
 
 	// 
 	// WRITE CONTENTS OF stream TO FILE
 	//
-	if (handler->file_stream) {
-            handler->file_stream.write((char*) stream, buffer_length_in);
+	if (file_stream) {
+            file_stream.write((char*) stream, buffer_length);
             // now, mute all audio
-            memset ((void*) stream, 0, buffer_length_in);
+            memset ((void*) stream, 0, buffer_length);
 	}
 
 	// Now, after having "consumed" all sounds, blank out
 	// the buffer if muted..
-	if ( handler->muted )
+	if ( muted )
 	{
-		memset ((void*) stream, 0, buffer_length_in);
+		memset ((void*) stream, 0, buffer_length);
+	}
+}
+
+// Callback invoked by the SDL audio thread.
+void
+SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *buf, int bufLenIn)
+{
+	if ( bufLenIn < 0 )
+	{
+		log_error(_("Negative buffer length in sdl_audio_callback (%d)"), bufLenIn);
+		return;
 	}
 
+	if ( bufLenIn == 0 )
+	{
+		log_error(_("Zero buffer length in sdl_audio_callback"));
+		return;
+	}
 
+	unsigned int bufLen = static_cast<unsigned int>(bufLenIn);
 
+	// Get the soundhandler
+	SDL_sound_handler* handler = static_cast<SDL_sound_handler*>(udata);
+
+    handler->fetchSamples(buf, bufLen);
 }
 
 void
-sound_data::append(boost::uint8_t* data, unsigned int size)
+EmbedSound::append(boost::uint8_t* data, unsigned int size)
 {
+    /// @todo, rather then copying the data over,
+    ///        keep it in its original form (multi-buffer)
+    ///        This way we avoid memory copies and we'd
+    ///        have no need for the additional m_frames_sizes
+    ///        map..
+
+    // Remember size of this block, indexing by offset
+    m_frames_size[_buf->size()] = size;
+
     // Make sure we're always appropriately padded...
     media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
     const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
@@ -864,7 +1193,8 @@ sound_data::append(boost::uint8_t* data, unsigned int size)
 	delete [] data;
 }
 
-sound_data::sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo> info, int nVolume)
+EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
+        std::auto_ptr<media::SoundInfo> info, int nVolume)
     :
     _buf(data),
     soundinfo(info),
@@ -876,7 +1206,7 @@ sound_data::sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo
         media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
         const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
         if ( _buf->capacity() - _buf->size() < paddingBytes ) {
-            log_error("sound_data creator didn't appropriately pad sound data. "
+            log_error("EmbedSound creator didn't appropriately pad sound data. "
                 "We'll do now, but will cost memory copies.");
             _buf->reserve(_buf->size()+paddingBytes);
         }
@@ -888,172 +1218,77 @@ sound_data::sound_data(std::auto_ptr<SimpleBuffer> data, std::auto_ptr<SoundInfo
 }
 
 void
-sound_data::clearActiveSounds()
+EmbedSound::clearInstances()
 {
-	for (ActiveSounds::iterator i=m_active_sounds.begin(), e=m_active_sounds.end(); i!=e; ++i)
+	for (Instances::iterator i=_soundInstances.begin(), e=_soundInstances.end(); i!=e; ++i)
 	{
 		delete *i;
 	}
-	m_active_sounds.clear();
+	_soundInstances.clear();
 }
 
-sound_data::ActiveSounds::iterator
-sound_data::eraseActiveSound(ActiveSounds::iterator i)
+EmbedSound::Instances::iterator
+EmbedSound::eraseActiveSound(Instances::iterator i)
 {
 	delete *i;
-	return m_active_sounds.erase(i);
+	return _soundInstances.erase(i);
+}
+
+EmbedSoundInst*
+EmbedSound::createInstance(media::MediaHandler& mh,
+            unsigned long blockOffset, unsigned int secsOffset,
+            const SoundEnvelopes* envelopes,
+            unsigned int loopCount)
+{
+    EmbedSoundInst* ret = new EmbedSoundInst(*this,
+                                mh, blockOffset,
+                                secsOffset, envelopes,
+                                loopCount);
+
+    // Push the sound onto the playing sounds container.
+	_soundInstances.push_back(ret);
+
+    return ret;
+}
+
+/*private*/
+unsigned int
+SDL_sound_handler::mixActiveSound(EmbedSoundInst& sound, Uint8* buffer,
+        unsigned int mixSamples)
+{
+
+#ifdef GNASH_DEBUG_MIXING
+    log_debug("Asked to mix-in %d samples of this sound", mixSamples);
+#endif
+
+    // Use global volume (sound-specific volume will be used before)
+    unsigned int wroteSamples = do_mixing(buffer, sound, mixSamples, getFinalVolume());
+
+    return wroteSamples;
 }
 
 /*private*/
 void
-SDL_sound_handler::mixActiveSound(active_sound& sound, sound_data& sounddata,
-        Uint8* buffer, unsigned int buffer_length)
+SDL_sound_handler::mixSoundData(EmbedSound& sounddata, Uint8* buffer, unsigned int buffer_length)
 {
-	// If there exist no decoder, then we can't decode!
-	if (!sound.decoder.get()) return;
+    assert(!(buffer_length%2));
+    unsigned int nSamples = buffer_length/2;
 
-    // concatenate global volume
-	int volume = int(sounddata.volume*getFinalVolume()/100.0);
-
-	// When the current sound don't have enough decoded data to fill the buffer, 
-	// we first mix what is already decoded, then decode some more data, and
-	// mix some more until the buffer is full. If a sound loops the magic
-	// happens here ;)
-	//
-	if (sound.decodedDataSize() - sound.playbackPosition < buffer_length 
-		&& (sound.decodingPosition < sound.encodedDataSize() || sound.loopCount != 0))
-	{
-		// First we mix what is decoded
-		unsigned int index = 0;
-		if (sound.decodedDataSize() - sound.playbackPosition > 0)
-		{
-			index = sound.decodedDataSize() - sound.playbackPosition;
-
-			do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition),
-				index, volume);
-
-		}
-
-		// Then we decode some data
-		// We loop until the size of the decoded sound is greater than the buffer size,
-		// or there is no more to decode.
-		unsigned int decoded_size = 0;
-
-		// Delete any previous raw_data
-		sound.deleteDecodedData();
-
-		while(decoded_size < buffer_length)
-		{
-
-			// If we need to loop, we reset the data pointer
-			if (sound.encodedDataSize() == sound.decodingPosition && sound.loopCount != 0) {
-				sound.loopCount--;
-				sound.decodingPosition = 0;
-				sound.samples_played = 0;
-			}
-
-			// Test if we will get problems... Should not happen...
-			assert(sound.encodedDataSize() > sound.decodingPosition);
-			
-			// temp raw buffer
-			Uint8* tmp_raw_buffer=0;
-			boost::uint32_t tmp_raw_buffer_size = 0;
-			boost::uint32_t decodedBytes = 0;
-
-			boost::uint32_t inputSize = 0;
-			bool parse = true;
-			if (sounddata.soundinfo->getFormat() == AUDIO_CODEC_ADPCM) {
-				parse = false;
-				if (sounddata.m_frames_size.size() > 0) {
-					inputSize = sounddata.m_frames_size[sound.decodingPosition];
-				}
-				else {
-					inputSize = sound.encodedDataSize() - sound.decodingPosition;
-				}
-			} else {
-				inputSize = sound.encodedDataSize() - sound.decodingPosition;
-			}
-
-			log_debug("Decoding %d bytes", inputSize);
-			tmp_raw_buffer = sound.decoder->decode(sound.getEncodedData(sound.decodingPosition), 
-					inputSize, tmp_raw_buffer_size, decodedBytes, parse);
-
-			sound.decodingPosition += decodedBytes;
-
-			// tmp_raw_buffer ownership transferred here
-			sound.appendDecodedData(tmp_raw_buffer, tmp_raw_buffer_size);
-
-			decoded_size += tmp_raw_buffer_size;
-
-			// no more to decode from this sound, so we break the loop
-			if ((sound.encodedDataSize() <= sound.decodingPosition && sound.loopCount == 0)
-                    || (tmp_raw_buffer_size == 0 && decodedBytes == 0)) {
-				sound.decodingPosition = sound.encodedDataSize();
-				break;
-			}
-
-		} // end of "decode min. bufferlength data" while loop
-
-		sound.playbackPosition = 0;
-
-		// Determine how much should be mixed
-		unsigned int mix_length = 0;
-		if (decoded_size >= buffer_length - index) {
-			mix_length = buffer_length - index;
-		} else { 
-			mix_length = decoded_size;
-		}
-		if (sound.decodedDataSize() < 2)
-		{
-			log_error("Something went terribly wrong during mixing of an active sound");
-			return; // something went terrible wrong
-		}
-		do_mixing(buffer+index, sound, sound.getDecodedData(0), mix_length, volume);
-
-	}
-
-	// When the current sound has enough decoded data to fill 
-	// the buffer, we do just that.
-	else if (sound.decodedDataSize() > sound.playbackPosition && sound.decodedDataSize() - sound.playbackPosition > buffer_length )
-	{
-
-		do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition), 
-			buffer_length, volume);
-
-	}
-
-	// When the current sound doesn't have anymore data to decode,
-	// and doesn't loop (anymore), but still got unplayed data,
-	// we put the last data on the stream
-	else if (sound.decodedDataSize() - sound.playbackPosition <= buffer_length && sound.decodedDataSize() > sound.playbackPosition+1)
-	{
-	
-
-		do_mixing(buffer, sound, sound.getDecodedData(sound.playbackPosition), 
-			sound.decodedDataSize() - sound.playbackPosition, volume);
-
-		sound.playbackPosition = sound.decodedDataSize();
-	} 
-}
-
-/*private*/
-void
-SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned int buffer_length)
-{
-	for (sound_data::ActiveSounds::iterator
-		 i=sounddata.m_active_sounds.begin();
-		 i != sounddata.m_active_sounds.end(); // don't cache .end(), isn't necessarely safe on erase
+	for (EmbedSound::Instances::iterator
+		 i=sounddata._soundInstances.begin();
+		 i != sounddata._soundInstances.end(); // don't cache .end(), isn't necessarely safe on erase
 	    )
 	{
 
 		// Temp variables to make the code simpler and easier to read
-		active_sound* sound = *i; 
+		EmbedSoundInst& sound = *(*i); 
 
-		mixActiveSound(*sound, sounddata, buffer, buffer_length);
-
-		// Sound is done, remove it from the active list
-		if (sound->decodingPosition == sound->encodedDataSize() && sound->playbackPosition == sound->decodedDataSize() && sound->loopCount == 0)
+		unsigned int mixed = mixActiveSound(sound, buffer, nSamples);
+		if ( mixed < nSamples )
 		{
+		    // Sound is done, remove it from the active list
+
+            // WARNING: can't use 'sound' anymore from now on!
 			i = sounddata.eraseActiveSound(i);
 
 			// Decrement callback clients count 
@@ -1069,7 +1304,7 @@ SDL_sound_handler::mixSoundData(sound_data& sounddata, Uint8* buffer, unsigned i
 	}
 }
 
-} // gnash.media namespace 
+} // gnash.sound namespace 
 } // namespace gnash
 
 // Local Variables:

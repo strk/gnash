@@ -29,7 +29,7 @@
 #include "IOChannel.h" // for use
 #include "SWFStream.h"
 #include "GnashImageJpeg.h"
-//#include "fontlib.h"
+#include "RunInfo.h"
 #include "font.h"
 #include "log.h"
 #include "MovieClip.h"
@@ -42,22 +42,15 @@
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
 #include "GnashSleep.h"
+#include "ExportableResource.h"
+
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
-
 #include <iomanip>
 #include <memory>
 #include <string>
 #include <algorithm> // std::make_pair
 #include <unistd.h>
-
-
-// Increment this when the cache data format changes.
-#define CACHE_FILE_VERSION 4
-
-// If != 0 this is the number of frames to load at each iteration
-// of the main loop. Loading in chunks greatly speeds the process up
-#define FRAMELOAD_CHUNK 0
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD
@@ -133,20 +126,20 @@ bool
 MovieLoader::start()
 {
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	// don't start MovieLoader thread !
-	abort();
+    std::abort();
 #endif
-	// We have two sanity checks, started() and isSelfThread() which rely
+	// don't start MovieLoader thread() which rely
 	// on boost::thread() returning before they are executed. Therefore,
 	// we must employ locking.
 	// Those tests do seem a bit redundant, though...
 	boost::mutex::scoped_lock lock(_mutex);
 
-	_thread.reset( new boost::thread(boost::bind(execute, boost::ref(*this), &_movie_def)) );
+	_thread.reset(new boost::thread(boost::bind(
+                    execute, boost::ref(*this), &_movie_def)));
 
 	_barrier.wait(); // let execution start befor returning
 
-	return true;
+    return true;
 }
 
 //
@@ -191,7 +184,7 @@ static void	dumpTagBytes(SWFStream& in, std::ostream& os)
 // SWFMovieDefinition
 //
 
-SWFMovieDefinition::SWFMovieDefinition()
+SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
 	:
 	// FIXME: use a class-static TagLoadersTable for SWFMovieDefinition
 #ifdef USE_SWFTREE
@@ -209,7 +202,8 @@ SWFMovieDefinition::SWFMovieDefinition()
 	m_file_length(0),
 	m_jpeg_in(0),
 	_loader(*this),
-	_loadingCanceled(false)
+	_loadingCanceled(false),
+    _runInfo(runInfo)
 {
 }
 
@@ -220,15 +214,16 @@ SWFMovieDefinition::~SWFMovieDefinition()
 	_loadingCanceled = true;
 
 	// Release frame tags
-	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end(); i!=e; ++i)
+	for (PlayListMap::iterator i = m_playlist.begin(),
+            e = m_playlist.end(); i != e; ++i)
 	{
 		PlayList& pl = i->second;
 
-		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
+		for (PlayList::iterator j = pl.begin(), je = pl.end(); j!=je; ++j)
 		{
-                    delete *j;
-                }
+            delete *j;
         }
+    }
 
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
@@ -248,7 +243,8 @@ SWFMovieDefinition::get_character_def(int character_id)
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 
-	boost::intrusive_ptr<character_def> ch = _dictionary.get_character(character_id);
+	boost::intrusive_ptr<character_def> ch = 
+        _dictionary.get_character(character_id);
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
 #endif // ndef GNASH_USE_GC
@@ -477,16 +473,6 @@ SWFMovieDefinition::completeLoad()
 	return true;
 }
 
-// Read a .SWF movie.
-bool
-SWFMovieDefinition::read(std::auto_ptr<IOChannel> in, const std::string& url)
-{
-
-	if ( ! readHeader(in, url) ) return false;
-
-	return completeLoad();
-}
-
 
 // 1-based frame number
 bool
@@ -558,51 +544,11 @@ CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c
 	_map[id] = c;
 }
 
-// Load next chunk of this sprite frames.
-// This is possibly better defined in movie_definition
-void
-SWFMovieDefinition::load_next_frame_chunk()
-{
-
-	size_t framecount = get_frame_count();
-	size_t lastloaded = get_loading_frame();
-
-	// nothing to do
-	if ( lastloaded == framecount ) return;
-
-	size_t nextframe = lastloaded+1;
-
-#if FRAMELOAD_CHUNK
-	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames
-	if ( nextframe > framecount ) nextframe = framecount;
-#endif
-	//log_debug(_("Framecount: %u, Lastloaded: %u"), framecount, lastloaded);
-	if ( nextframe <= framecount )
-	{
-#ifdef DEBUG_FRAMES_LOAD // debugging
-		log_debug(_("Ensure load of frame %u/%u (last loaded is: %u)"),
-			nextframe, framecount, lastloaded);
-#endif
-		if ( ! ensure_frame_loaded(nextframe) )
-		{
-			log_error(_("Could not advance to frame %d"),
-				nextframe);
-			// these kind of errors should be handled by callers
-			abort();
-		}
-	}
-#ifdef DEBUG_FRAMES_LOAD
-	else
-	{
-		log_debug(_("No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u"), framecount, lastloaded, nextframe);
-	}
-#endif
-}
 
 void
 SWFMovieDefinition::read_all_swf()
 {
-	assert(_str.get() != NULL);
+	assert(_str.get());
 
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	assert( _loader.isSelfThread() );
@@ -678,7 +624,7 @@ parse_tag:
                 {
 			// call the tag loader.  The tag loader should add
 			// characters or tags to the movie data structure.
-			(*lf)(str, tag_type, *this);
+			(*lf)(str, tag_type, *this, _runInfo);
 		}
 		else
 		{
@@ -776,7 +722,8 @@ SWFMovieDefinition::incrementLoadedFrames()
 }
 
 void
-SWFMovieDefinition::export_resource(const std::string& symbol, resource* res)
+SWFMovieDefinition::export_resource(const std::string& symbol,
+        ExportableResource* res)
 {
 	// _exportedResources access should be protected by a mutex
 	boost::mutex::scoped_lock lock(_exportedResourcesMutex);
@@ -786,7 +733,7 @@ SWFMovieDefinition::export_resource(const std::string& symbol, resource* res)
 }
 
 
-boost::intrusive_ptr<resource>
+boost::intrusive_ptr<ExportableResource>
 SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 {
 #ifdef DEBUG_EXPORTS
@@ -900,7 +847,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 			symbol, _url, loading_frame, m_frame_count);
 	}
 
-	return boost::intrusive_ptr<resource>(0); // 0
+	return boost::intrusive_ptr<ExportableResource>(0); // 0
 
 }
 
@@ -950,13 +897,15 @@ SWFMovieDefinition::markReachableResources() const
 	// TODO: turn this into a markExportedResources()
 	{
 		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-		for (ExportMap::const_iterator i=_exportedResources.begin(), e=_exportedResources.end(); i!=e; ++i)
+		for (ExportMap::const_iterator i=_exportedResources.begin(),
+                e=_exportedResources.end(); i!=e; ++i)
 		{
 			i->second->setReachable();
 		}
 	}
 
-	for (ImportVect::const_iterator i=m_import_source_movies.begin(), e=m_import_source_movies.end(); i!=e; ++i)
+	for (ImportVect::const_iterator i=m_import_source_movies.begin(),
+            e=m_import_source_movies.end(); i!=e; ++i)
 	{
 		(*i)->setReachable();
 	}
@@ -968,7 +917,8 @@ SWFMovieDefinition::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-SWFMovieDefinition::importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports)
+SWFMovieDefinition::importResources(
+        boost::intrusive_ptr<movie_definition> source, Imports& imports)
 {
 	size_t importedSyms=0;
 	for (Imports::iterator i=imports.begin(), e=imports.end(); i!=e; ++i)
@@ -976,30 +926,33 @@ SWFMovieDefinition::importResources(boost::intrusive_ptr<movie_definition> sourc
 		int id = i->first;
 		const std::string& symbolName = i->second;
 
-	        boost::intrusive_ptr<resource> res = source->get_exported_resource(symbolName);
-	        if (!res)
-	        {
-			log_error(_("import error: could not find resource '%s' in movie '%s'"),
-				symbolName, source->get_url());
+        boost::intrusive_ptr<ExportableResource> res =
+            source->get_exported_resource(symbolName);
+
+        if (!res)
+        {
+			log_error(_("import error: could not find resource '%s' in "
+                        "movie '%s'"), symbolName, source->get_url());
 			continue;
-	        }
-	        else if (font* f = res->cast_to_font())
+        }
+        else if (font* f = dynamic_cast<font*>(res.get()))
 		{
 			// Add this shared font to the currently-loading movie.
 			add_font(id, f);
 			++importedSyms;
-	        }
-	        else if (character_def* ch = res->cast_to_character_def())
-	        {
-			// Add this character to the loading movie.
-			add_character(id, ch);
-			++importedSyms;
-	        }
-	        else
-	        {
-			log_error(_("importResources error: unsupported import of '%s' from movie '%s' has unknown type"),
-				symbolName, source->get_url());
-	        }
+        }
+        else if (character_def* ch = dynamic_cast<character_def*>(res.get()))
+        {
+            // Add this character to the loading movie.
+            add_character(id, ch);
+            ++importedSyms;
+        }
+        else
+        {
+            log_error(_("importResources error: unsupported import of '%s' "
+                "from movie '%s' has unknown type"),
+                symbolName, source->get_url());
+        }
 	}
 
 	if ( importedSyms )

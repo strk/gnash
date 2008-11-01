@@ -22,7 +22,7 @@
 
 #include "FreetypeGlyphsProvider.h"
 #include "smart_ptr.h" // for intrusive_ptr
-#include "image.h" // for create_alpha
+#include "GnashImage.h" // for create_alpha
 #include "GnashException.h"
 #include "render.h"
 #include "DynamicShape.h"

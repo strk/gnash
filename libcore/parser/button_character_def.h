@@ -30,6 +30,7 @@
 #include "cxform.h" // for composition
 #include "action_buffer.h" // for composition of button_action
 #include "filter_factory.h" // for Filters (composition of button_record)
+#include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
@@ -190,7 +191,7 @@ public:
 		boost::uint32_t m_in_point;
 		boost::uint32_t m_out_point;
 		boost::uint16_t m_loop_count;
-		std::vector<media::sound_handler::sound_envelope> m_envelopes;
+		sound::SoundEnvelopes m_envelopes;
 	};
 
 	struct button_sound_info

@@ -37,11 +37,6 @@
 namespace gnash {
 	class bitmap_info;
 	class shape_character_def;
-
-    namespace image {
-	    class alpha;
-    }
-
 }
 
 

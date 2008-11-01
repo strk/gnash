@@ -288,6 +288,7 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 			_videoInfo->extra.reset( 
 				new ExtraVideoInfoFlv(newbuf, frame->dataSize())
 			);
+
 			// Don't bother emitting the header buffer.
 			frame.reset();
 		}

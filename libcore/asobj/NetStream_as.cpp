@@ -96,7 +96,7 @@ NetStream_as::NetStream_as()
 	_playbackClock(new InterruptableVirtualClock(new SystemClock)),
 	_playHead(_playbackClock.get()), 
 
-	_soundHandler(get_sound_handler()),
+	_soundHandler(_vm.getRoot().runInfo().soundHandler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_audioQueueSize(0),
 	_auxStreamerAttached(false),
@@ -549,7 +549,7 @@ NetStream_as::newFrameReady()
 	}
 }
 
-std::auto_ptr<image::ImageBase>
+std::auto_ptr<GnashImage>
 NetStream_as::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
@@ -780,17 +780,6 @@ NetStream_as::startAdvanceTimer()
 }
 
 
-
-
-
-
-
-static void
-cleanQueue(NetStream_as::AudioQueue::value_type data)
-{
-    delete data;
-}
-
 // AS-volume adjustment
 void adjust_volume(boost::int16_t* data, int size, int volume)
 {
@@ -832,10 +821,7 @@ void NetStream_as::close()
 	GNASH_REPORT_FUNCTION;
 
     // Delete any samples in the audio queue.
-	{
-		boost::mutex::scoped_lock lock(_audioQueueMutex);
-		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
-    }
+    cleanAudioQueue();
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -862,7 +848,8 @@ NetStream_as::play(const std::string& c_url)
 	if ( ! _netCon )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("No NetConnection associated with this NetStream, won't play"));
+		log_aserror(_("No NetConnection associated with this NetStream, "
+                "won't play"));
 		);
 		return;
 	}
@@ -885,7 +872,9 @@ NetStream_as::play(const std::string& c_url)
 
 	log_security( _("Connecting to movie: %s"), url );
 
-	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
+    const movie_root& mr = _vm.getRoot();
+
+	StreamProvider& streamProvider = mr.runInfo().streamProvider();
 	_inputStream = streamProvider.getStream(url);
 
 	if ( ! _inputStream.get() )
@@ -1029,7 +1018,7 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 			break;
 		}
 
-    		raw_mediadata_t* samples = ns->_audioQueue.front();
+		CursoredBuffer* samples = ns->_audioQueue.front();
 
 		int n = std::min<int>(samples->m_size, len);
 		memcpy(stream, samples->m_ptr, n);
@@ -1051,12 +1040,12 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 	return true;
 }
 
-std::auto_ptr<image::ImageBase> 
+std::auto_ptr<GnashImage> 
 NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 {
 	assert(_videoDecoder.get()); // caller should check this
 
-	std::auto_ptr<image::ImageBase> video;
+	std::auto_ptr<GnashImage> video;
 
 	assert(m_parser.get());
 	if ( ! m_parser.get() )
@@ -1134,10 +1123,10 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 	return video;
 }
 
-std::auto_ptr<image::ImageBase> 
+std::auto_ptr<GnashImage> 
 NetStream_as::decodeNextVideoFrame()
 {
-	std::auto_ptr<image::ImageBase> video;
+	std::auto_ptr<GnashImage> video;
 
 	if ( ! m_parser.get() )
 	{
@@ -1182,7 +1171,7 @@ NetStream_as::decodeNextVideoFrame()
 	return video;
 }
 
-raw_mediadata_t*
+NetStream_as::CursoredBuffer*
 NetStream_as::decodeNextAudioFrame()
 {
 	assert ( m_parser.get() );
@@ -1198,7 +1187,7 @@ NetStream_as::decodeNextAudioFrame()
 		return 0;
 	}
 
-    	raw_mediadata_t* raw = new raw_mediadata_t();
+	CursoredBuffer* raw = new CursoredBuffer();
 	raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
 
 	if ( _audioController ) // TODO: let the sound_handler do this .. sounds cleaner
@@ -1225,8 +1214,7 @@ NetStream_as::decodeNextAudioFrame()
 		raw->m_size);
 #endif // GNASH_DEBUG_DECODING
 
-	raw->m_ptr = raw->m_data; // no idea what this is needed for
-	raw->m_pts = frame->timestamp;
+	raw->m_ptr = raw->m_data;
 
 	return raw;
 }
@@ -1273,11 +1261,8 @@ NetStream_as::seek(boost::uint32_t posSeconds)
 	}
 	log_debug("m_parser->seek(%d) returned %d", pos, newpos);
 
-	{ // cleanup audio queue, so won't be consumed while seeking
-		boost::mutex::scoped_lock lock(_audioQueueMutex);
-		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
-		_audioQueue.clear();
-	}
+    // cleanup audio queue, so won't be consumed while seeking
+    cleanAudioQueue();
 	
 	// 'newpos' will always be on a keyframe (supposedly)
 	_playHead.seekTo(newpos);
@@ -1529,7 +1514,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 			if ( nextTimestamp > ts+msecsPerAdvance ) break; // next frame is in the future
 		}
 
-		raw_mediadata_t* audio = decodeNextAudioFrame();
+		CursoredBuffer* audio = decodeNextAudioFrame();
 		if ( ! audio )
 		{
 			// Well, it *could* happen, why not ?
@@ -1680,7 +1665,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #endif // GNASH_DEBUG_DECODING
 
 	// Get next decoded video frame from parser, will have the lowest timestamp
-	std::auto_ptr<image::ImageBase> video = getDecodedVideoFrame(curPos);
+	std::auto_ptr<GnashImage> video = getDecodedVideoFrame(curPos);
 
 	// to be decoded or we're out of data
 	if (!video.get())
@@ -1936,6 +1921,16 @@ NetStream_as::detachAuxStreamer()
 }
 
 
+void
+NetStream_as::cleanAudioQueue()
+{
+    boost::mutex::scoped_lock lock(_audioQueueMutex);
+    for (AudioQueue::iterator i=_audioQueue.begin(), e=_audioQueue.end(); i!=e; ++i)
+    {
+        delete *i;
+    }
+    _audioQueue.clear();
+}
 
 
 

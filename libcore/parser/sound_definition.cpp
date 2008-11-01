@@ -7,21 +7,19 @@
 
 
 #include "sound_definition.h"
-#include "SWFStream.h"
-#include "impl.h"
-//#include "ControlTag.h" // for start_sound_tag inheritance
-#include "movie_definition.h"
-#include "MovieClip.h"
+#include "sound_handler.h" // for use
+#include "VM.h"
 
 namespace gnash {
 
 
 sound_sample::~sound_sample()
 {
-	media::sound_handler* handler = get_sound_handler();
-	if (handler)
+    sound::sound_handler* s = _runInfo.soundHandler();
+	
+	if (s)
 	{
-		handler->delete_sound(m_sound_handler_id);
+		s->delete_sound(m_sound_handler_id);
 	}
 }
 

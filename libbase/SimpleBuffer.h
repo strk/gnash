@@ -140,7 +140,7 @@ public:
 	/// The buffer will be appropriately resized to have space for
 	/// the incoming data. The data will be copied.
 	///
-	/// @param newData
+	/// @param inData
 	///	Data to append. Will be copied.
 	///
 	/// @param size
@@ -205,7 +205,7 @@ public:
 	/// The buffer will be appropriately resized to have space for
 	/// the incoming data. The data will be copied.
 	///
-	/// @param newData
+	/// @param buf
 	///	SimpleBuffer containing data to append
 	///
 	void append(const SimpleBuffer& buf)

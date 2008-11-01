@@ -1,4 +1,3 @@
-// StreamSoundBlockTag.cpp:  for Gnash.
 //
 //   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
@@ -17,14 +16,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #include "StreamSoundBlockTag.h"
 #include "sound_handler.h" 
 #include "movie_definition.h" // for addControlTag
 #include "MovieClip.h" // for execute
 #include "SoundInfo.h" // for loader
 #include "SWFStream.h"
-#include "log.h" 
+#include "log.h"
+#include "RunInfo.h"
+#include "VM.h" // For getting movie_root. TODO: drop
 
 namespace gnash {
 namespace SWF {
@@ -32,7 +32,10 @@ namespace SWF {
 void
 StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 {
-	media::sound_handler* handler = get_sound_handler();
+
+    const movie_root& mr = m->getVM().getRoot();
+
+	sound::sound_handler* handler = mr.runInfo().soundHandler(); 
 	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.
@@ -43,11 +46,11 @@ StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 
 /* public static */
 void
-StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
+StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-    media::sound_handler* handler = get_sound_handler();
+    sound::sound_handler* handler = r.soundHandler(); 
 
     // If we don't have a sound_handler registered stop here
     if (!handler)

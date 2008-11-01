@@ -327,12 +327,13 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // loaded SWF, so that in the A loads B scenario above the
     // domain would be the one of A, not B.
     //
-    // NOTE: using the base url (get_base_url) would mean
+    // NOTE: using the base url RunInfo::baseURL() would mean
     // blindly trusting the SWF publisher as base url is changed
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
     //
-    const std::string& swfURL = _vm.getSWFUrl();
+    const movie_root& mr = _vm.getRoot();
+    const std::string& swfURL = mr.getOriginalURL();
 
     // Get the domain part, or take as 'localhost' if none
     // (loaded from filesystem)

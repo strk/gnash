@@ -25,7 +25,6 @@
 #include "action.h" // for call_method_parsed (call_method_args)
 #include "MovieClip.h"
 #include "movie_definition.h"
-#include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_value.h"
 #include "as_function.h"
 #include "edit_text_character.h" // for registered variables
@@ -46,10 +45,8 @@
 #include "URL.h"
 #include "sound_handler.h"
 #include "StreamProvider.h"
-#include "URLAccessManager.h" // for loadVariables
 #include "LoadVariablesThread.h" 
 #include "ExecutableCode.h" // for inheritance of ConstructEvent
-#include "gnash.h" // for get_sound_handler
 #include "Object.h" // for getObjectInterface
 #include "DynamicShape.h" // for composition
 #include "namedStrings.h"
@@ -58,6 +55,7 @@
 #include "PlaceObject2Tag.h" 
 #include "NetStream_as.h"
 #include "flash/geom/Matrix_as.h"
+#include "ExportableResource.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -312,7 +310,7 @@ movieclip_attach_movie(const fn_call& fn)
     // Get exported resource 
     const std::string& id_name = fn.arg(0).to_string();
 
-    boost::intrusive_ptr<resource> exported = 
+    boost::intrusive_ptr<ExportableResource> exported = 
         movieclip->get_movie_definition()->get_exported_resource(id_name);
 
     if (!exported)
@@ -806,8 +804,9 @@ movieclip_get_bytes_total(const fn_call& fn)
     return as_value(movieclip->get_bytes_total());
 }
 
-// my_mc.loadMovie(url:String [,variables:String]).
+// MovieClip.loadMovie(url:String [,variables:String]).
 //
+// Returns 1 for "get", 2 for "post", and otherwise 0. Case-insensitive.
 // This *always* calls MovieClip.meth.
 static as_value
 movieclip_loadMovie(const fn_call& fn)
@@ -844,42 +843,25 @@ movieclip_loadMovie(const fn_call& fn)
         );
         return as_value();
     }
-    const URL& baseurl = get_base_url();
-    URL url(urlstr, baseurl);
 
     movie_root& mr = movieclip->getVM().getRoot();
     std::string target = movieclip->getTarget();
 
     // TODO: if GET/POST should send variables of *this* movie,
     // no matter if the target will be replaced by another movie !!
-    const MovieClip::MovieClipMethod method =
-        static_cast<MovieClip::MovieClipMethod>(val.to_int());
+    const MovieClip::VariablesMethod method =
+        static_cast<MovieClip::VariablesMethod>(val.to_int());
 
-    if (method == MovieClip::METHOD_NONE)
+    std::string data;
+
+    // This is just an optimization if we aren't going
+    // to send the data anyway. It might be wrong, though.
+    if (method != MovieClip::METHOD_NONE)
     {
-        mr.loadMovie(url, target); 
-    }
-    else
-    {
-        std::string data;
         movieclip->getURLEncodedVars(data);
- 
-        if (method == MovieClip::METHOD_POST)
-        {
-            log_debug(_("POSTING: %s"), data);
-            mr.loadMovie(url, target, &data);
-        }
-        else
-        {
-            // GET method
-            std::string qs = url.querystring();
-            if ( qs.empty() ) data.insert(0, 1, '?');
-            else data.insert(0, 1, '&');
-            url.set_querystring(qs + data);
-            log_debug(_("GETTING: %s"), url.str());
-            mr.loadMovie(url, target); 
-        }
     }
+ 
+    mr.loadMovie(urlstr, target, data, method);
 
     return as_value();
 }
@@ -922,14 +904,12 @@ movieclip_load_variables(const fn_call& fn)
         );
         return as_value();
     }
-    const URL& baseurl = get_base_url();
-    URL url(urlstr, baseurl);
 
-    const MovieClip::MovieClipMethod method =
-        static_cast<MovieClip::MovieClipMethod>(val.to_int());
+    const MovieClip::VariablesMethod method =
+        static_cast<MovieClip::VariablesMethod>(val.to_int());
 
-    movieclip->loadVariables(url, method);
-    log_debug("MovieClip.loadVariables(%s) - TESTING ", url.str());
+    movieclip->loadVariables(urlstr, method);
+    log_debug("MovieClip.loadVariables(%s) - TESTING ", urlstr);
 
     return as_value();
 }
@@ -1107,7 +1087,7 @@ movieclip_getURL(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip = 
             ensureType<MovieClip>(fn.this_ptr);
 
-    std::string urlstring;
+    std::string urlstr;
     std::string target;
 
     as_value val;
@@ -1140,13 +1120,13 @@ movieclip_getURL(const fn_call& fn)
         case 2:
              target = fn.arg(1).to_string();
         case 1:
-             urlstring = fn.arg(0).to_string();
+             urlstr = fn.arg(0).to_string();
              break;
     }
 
 
-    MovieClip::MovieClipMethod method =
-        static_cast<MovieClip::MovieClipMethod>(val.to_int());
+    MovieClip::VariablesMethod method =
+        static_cast<MovieClip::VariablesMethod>(val.to_int());
 
     std::string vars;
 
@@ -1158,23 +1138,7 @@ movieclip_getURL(const fn_call& fn)
 
     movie_root& m = movieclip->getVM().getRoot();
     
-    URL url(urlstring, get_base_url());
-
-    switch (method)
-    {
-        case MovieClip::METHOD_POST:
-            m.getURL(url, target, &vars);
-            break;
-        case MovieClip::METHOD_GET:
-        {
-            std::string qs = url.querystring();
-            if ( qs.empty() ) vars.insert(0, 1, '?');
-            else vars.insert(0, 1, '&');
-            url.set_querystring(qs + vars);
-        }
-        case MovieClip::METHOD_NONE:
-            m.getURL(url, target);
-    }
+    m.getURL(urlstr, target, vars, method);
 
     return as_value();
 }
@@ -3400,7 +3364,7 @@ MovieClip::advance_sprite()
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
     queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
-    //queueEvent(event_id::ENTER_FRAME, movie_root::apENTERFRAME);
+    //queueEvent(event_id::ENTER_FRAME, apENTERFRAME);
 
     // Update current and next frames.
     if (m_play_state == PLAY)
@@ -4852,15 +4816,17 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
 {
     // Get a pointer to our own parent 
     character* parent = get_parent();
-    if ( parent )
+    if (parent)
     {
         if (postdata)
         {
             log_debug(_("Posting data '%s' to url '%s'"), postdata, url.str());
         }
         
+        const movie_root& mr = _vm.getRoot();
+
         boost::intrusive_ptr<movie_definition> md (
-                create_library_movie(url, NULL, true, postdata) );
+                create_library_movie(url, mr.runInfo(), NULL, true, postdata));
 
         if (!md)
         {
@@ -4927,18 +4893,19 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
 }
 
 void 
-MovieClip::loadVariables(URL url, MovieClipMethod sendVarsMethod)
+MovieClip::loadVariables(const std::string& urlstr, 
+        VariablesMethod sendVarsMethod)
 {
-    // Check host security
-    // will be done by LoadVariablesThread (down by getStream, that is)
-    //if ( ! URLAccessManager::allow(url) ) return;
+    // Host security check will be will be done by LoadVariablesThread
+    // (down by getStream, that is)
     
+    const movie_root& mr = _vm.getRoot();
+    URL url(urlstr, mr.runInfo().baseURL());
+
     std::string postdata;
     
-    if ( sendVarsMethod != METHOD_NONE)
-    {
-        getURLEncodedVars(postdata);
-    }
+    // Encode our vars for sending.
+    if (sendVarsMethod != METHOD_NONE) getURLEncodedVars(postdata);
 
     try 
     {
@@ -5299,7 +5266,7 @@ MovieClip::stopStreamSound()
 {
     if ( m_sound_stream_id == -1 ) return; // nothing to do
 
-    media::sound_handler* handler = get_sound_handler(); // TODO: cache ?
+    sound::sound_handler* handler = _vm.getRoot().runInfo().soundHandler();
     if (handler)
     {
         handler->stop_sound(m_sound_stream_id);

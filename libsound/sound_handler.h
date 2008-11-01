@@ -29,8 +29,6 @@
 #endif
 
 #include "dsodefs.h" // for DSOEXPORT
-#include "SoundInfo.h"
-#include "SimpleBuffer.h"
 #include "MediaHandler.h" // for inlined ctor
 
 #include <vector>
@@ -39,18 +37,54 @@
 #include <cstring>
 
 namespace gnash {
-//	class SoundInfo;
+    namespace media {
+	    class SoundInfo;
+    }
+	class SimpleBuffer;
 }
 
 namespace gnash {
 
-/// Gnash media subsystem (libmedia)
+/// Gnash %sound handling subsystem (libsound)
 //
-/// See http://wiki.gnashdev.org/wiki/index.php/Libmedia
+/// This subsystem takes care of mixing audio
+/// and communicating to the system mixer.
 ///
-namespace media {
+namespace sound {
 
-/// Sound handler.
+/// A %sound envelope
+//
+/// Used to control volume for event sounds. It basically tells that from
+/// sample X the volume for left out is Y and for right out is Z. Several
+/// envelopes can be assigned to a sound to make a fade out or similar stuff.
+//
+/// See http://www.m2osw.com/en/swf_alexref.html#swf_envelope
+///
+class SoundEnvelope
+{
+public:
+
+    /// Byte offset this envelope applies to
+    //
+    /// The offset is always given as if the sample data
+    /// was defined with a rate of 44100 bytes per seconds.
+    /// For instance, the sample number 1 in a sound effect
+    /// with a sample rate of 5.5K is given as position 8 in
+    /// the envelope. 
+    ///
+    boost::uint32_t m_mark44;
+
+    /// Volume for the left channel (0..32768)
+    boost::uint16_t m_level0;
+
+    /// Volume for the right channel (0..32768)
+    boost::uint16_t m_level1;
+};
+
+/// A vector of SoundEnvelope objects
+typedef std::vector<SoundEnvelope> SoundEnvelopes;
+
+/// %Sound mixer.
 //
 /// Stores the audio found by the parser and plays on demand.
 /// Can also play sound from AS classes NetStream and Sound using callbacks
@@ -69,23 +103,73 @@ namespace media {
 /// For GST, I have no idea..
 /// TODO: clean this up.
 ///
+/// @todo rename to gnash::sound::Mixer
+///
 class DSOEXPORT sound_handler
 {
 public:
 
-	// See attach_aux_streamer
-	// TODO: change third parameter type to unsigned
-	typedef bool (*aux_streamer_ptr)(void *udata, boost::uint8_t *stream, int len);
+    /// A %sound input stream
+    //
+    /// Instance of this class are sounds you can
+    /// pull samples from.
+    ///
+    /// The format of the samples you pull is expected to
+    /// be PCM samples as signed 16bit values
+    /// in system-endian format.
+    ///
+    /// It is expected that consecutive samples fetched 
+    /// are one for left and one for right stereo channel,
+    /// in that order (even indexes for left channel, odd
+    /// indexes for right channel).
+    ///
+    /// Instances of this class would be the input 
+    /// for the gnash Mixer (currently sound_handler)
+    /// instance.
+    ///
+    class InputStream {
 
-	/// Used to control volume for event sounds. It basically tells that from
-	/// sample X the volume for left out is Y and for right out is Z. Several
-	/// envelopes can be assigned to a sound to make a fade out or similar stuff.
-	struct sound_envelope
-	{
-		boost::uint32_t m_mark44;
-		boost::uint16_t m_level0;
-		boost::uint16_t m_level1;
-	};
+    public:
+
+        /// Fetch the given amount of samples
+        //
+        /// @param to
+        ///     Output buffer, must be at least nSamples*bytes.
+        ///     (or nSamples items sized, being a container of 16bit values).
+        ///
+        /// @param nSamples
+        ///     Number of samples to fetch.
+        ///     It is expected that the fetcher fetches samples in multiples
+        ///     of 2, being each couple composed by a sample for the left
+        ///     channel and a sample for the right channel, in that order.
+        /// 
+        /// @return number of samples actually sent to the output buffer.
+        ///          if < nSamples this InputStream is out of data, and can be
+        ///          unplugged.
+        ///
+        /// @throws a SoundException (to be better defined a set of them)
+        ///     if unable to process this and further requests due to internal
+        ///     errors (not if it just happens to complete its source)
+        ///
+        virtual unsigned int fetchSamples(boost::int16_t* to, unsigned int nSamples)=0;
+
+        /// Return number of samples fetched from this stream
+        //
+        /// It is expected for the return to be always a multiple
+        /// of 2, being each stereo sample unit composed by a sample
+        /// for the left channel and a sample for the right channel,
+        /// in that order.
+        ///
+        virtual unsigned int samplesFetched() const=0;
+
+        virtual ~InputStream() {}
+    };
+
+	/// @see attach_aux_streamer
+	/// @todo change third parameter type to unsigned
+	/// @todo change second parameter type to boost::uint16_t*
+	/// @todo actually, drop this in favor of a SoundInputChannel !
+	typedef bool (*aux_streamer_ptr)(void *udata, boost::uint8_t* stream, int len);
 
 	// If stereo is true, samples are interleaved w/ left sample first.
 	
@@ -105,7 +189,7 @@ public:
 	///
 	virtual int	create_sound(
 		std::auto_ptr<SimpleBuffer> data,
-		std::auto_ptr<SoundInfo> sinfo
+		std::auto_ptr<media::SoundInfo> sinfo
 		) = 0;
 
 	/// Append data to an existing sound buffer slot.
@@ -134,14 +218,15 @@ public:
 	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int sample_count, int handle_id) = 0;
 
 	/// Returns a pointer to the SoundInfo object for the sound with the given id.
+    //
 	/// The SoundInfo object is still owned by the soundhandler.
-	//
-	/// @param soundhandle
+	///
+	/// @param soundHandle
 	/// The soundhandlers id of the sound we want some info about.
 	///
 	/// @return a pointer to the SoundInfo object for the sound with the given id.
 	///
-	virtual SoundInfo* get_sound_info(int sound_handle) = 0;
+	virtual media::SoundInfo* get_sound_info(int soundHandle) = 0;
 
 	/// Schedule playing of a sound buffer slot
 	//
@@ -156,11 +241,15 @@ public:
 	/// @param secondOffset
 	/// 	When starting event sounds there sometimes is a offset to make the sound
 	/// 	start at the exact right moment. Gnash supports this troough 'Sound' AS
-	///	class only, not from the actual control tag (StartSound).
+	///     class only, not from the actual control tag (StartSound). Units given in 
+    ///     seconds.
 	///
 	/// @param start
 	/// 	When starting a soundstream from a random frame, this tells where in the
-	/// 	data the decoding should start, in samples.
+	/// 	data the decoding should start, in bytes.
+	///     If non-zero, the sound will only start when no other instances of it
+	///     are already playing.
+	///     @todo use unsigned
 	///
 	/// @param envelopes
 	/// 	Some eventsounds have some volume control mechanism called envelopes.
@@ -169,7 +258,7 @@ public:
 	/// TODO: add out_point parameter (when to stop playing the sound)
 	///
 	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset,
-					long start, const std::vector<sound_envelope>* envelopes) = 0;
+					long start, const SoundEnvelopes* envelopes) = 0;
 
 	/// Remove all scheduled request for playback of sound buffer slots
 	virtual void	stop_all_sounds() = 0;
@@ -265,9 +354,11 @@ public:
 	/// gnash calls this to unpause audio
 	bool isPaused() const { return _paused; }
 
+    /// Plug an external InputStream into the mixer
+    //
 	/// This is called by AS classes NetStream or Sound to attach callback, so
 	/// that audio from the classes will be played through the soundhandler.
-	//
+	///
 	/// This is actually only used by the SDL sound_handler. It uses these "auxiliary"
 	/// streamers to fetch decoded audio data to mix and send to the output channel.
 	///
@@ -285,10 +376,15 @@ public:
 	/// 	WARNING: this is currently also used to *identify* the callback for later
 	///	removal, see detach_aux_streamer. TODO: stop using the data pointer for 
 	///	identification purposes and use the callback pointer directly instead.
+    ///
+    /// @todo change to plugInputStream(InputStream* str),
+    ///       implement in base class
 	///
-	virtual void	attach_aux_streamer(aux_streamer_ptr /*ptr*/,
-            void* /*owner*/){} // FIXME
+	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* udata)
+    { ptr=ptr; /*unused*/ udata=udata; /*unused*/ } 
 
+    /// Unplug an external InputStream from the mixer
+    //
 	/// This is called by AS classes NetStream or Sound to dettach callback, so
 	/// that audio from the classes no longer will be played through the 
 	/// soundhandler.
@@ -298,7 +394,11 @@ public:
 	/// 	WARNING: this need currently be the 'udata' pointer passed to attach_aux_streamer.
 	///	TODO: get the aux_streamer_ptr as key !!
 	///
-	virtual void	detach_aux_streamer(void* /*udata*/) {} // FIXME
+    /// @todo change to unplugInputStream(InputStream* str),
+    ///       implement in base class
+	///
+	virtual void	detach_aux_streamer(void* udata)
+    { udata=udata; /*unused*/ } 
 
 	virtual ~sound_handler() {};
 	
@@ -336,7 +436,7 @@ protected:
 		_soundsStarted(0),
 		_soundsStopped(0),
 		_paused(false),
-		_mediaHandler(MediaHandler::get()),
+		_mediaHandler(media::MediaHandler::get()),
 		_volume(100)
 	{
 		assert(_mediaHandler); // for now, we rely on this being always available
@@ -352,7 +452,7 @@ protected:
 	bool _paused;
 
 	/// The registered MediaHandler at construction time
-	MediaHandler* _mediaHandler;
+	media::MediaHandler* _mediaHandler;
 
 private:
 
@@ -367,8 +467,8 @@ DSOEXPORT sound_handler*	create_sound_handler_sdl(const std::string& wave_file);
 DSOEXPORT sound_handler*	create_sound_handler_gst();
 	
 
-} // gnash.media namespace 
-}	// namespace gnash
+} // gnash.sound namespace 
+} // namespace gnash
 
 #endif // SOUND_HANDLER_H
 

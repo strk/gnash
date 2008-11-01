@@ -17,24 +17,25 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "gnash.h" // get_sound_handler
 #include "StartSoundTag.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "log.h" // for log_parse
 #include "sound_definition.h" // for sound_sample
+#include "RunInfo.h"
+#include "MovieClip.h"
 
 namespace gnash {
 namespace SWF {
 
 /* public static */
 void
-StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
+StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& r)
 {
     assert(tag == SWF::STARTSOUND); // 15 
 
-    // Make static ?
-    media::sound_handler* handler = get_sound_handler();
+    sound::sound_handler* handler = r.soundHandler();
 
     in.ensureBytes(2); // sound_id
 
@@ -47,7 +48,8 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
             // if there's no sound_handler we might have simply skipped
             // the definition of sound sample...
             if (handler) {
-              log_swferror(_("start_sound_loader: sound_id %d is not defined"), sound_id);
+              log_swferror(_("start_sound_loader: sound_id %d is not "
+                      "defined"), sound_id);
             }
         );
         return;
@@ -127,12 +129,12 @@ StartSoundTag::read(SWFStream& in)
 }
 
 void
-StartSoundTag::execute(MovieClip* /* m */, DisplayList& /* dlist */) const
+StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 {
     //GNASH_REPORT_FUNCTION;
 
-    // Make static ?
-    media::sound_handler* handler = get_sound_handler();   
+    sound::sound_handler* handler = 
+        m->getVM().getRoot().runInfo().soundHandler();
 
     if (handler)
     {
@@ -144,7 +146,8 @@ StartSoundTag::execute(MovieClip* /* m */, DisplayList& /* dlist */) const
         else
         {
             //log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
-            handler->play_sound(m_handler_id, m_loop_count, 0, 0, (m_envelopes.empty() ? NULL : &m_envelopes));
+            handler->play_sound(m_handler_id, m_loop_count, 0, 0,
+                    (m_envelopes.empty() ? NULL : &m_envelopes));
         }
     }
 }

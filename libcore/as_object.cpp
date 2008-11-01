@@ -309,7 +309,20 @@ as_object::get_member(string_table::key name, as_value* val,
 
 	Property* prop = findProperty(name, nsname);
 	if (!prop)
-		return false;
+    {
+        /// If the property isn't found, try the __resolve property.
+        prop = findProperty(NSV::PROP_uuRESOLVE, nsname);
+        if (!prop) return false;
+
+        /// If __resolve exists, call it with the name of the undefined
+        /// property.
+        string_table& st = _vm.getStringTable();
+        const std::string& undefinedName = st.value(name);
+        log_debug("__resolve exists, calling with '%s'", undefinedName);
+
+        *val = callMethod(NSV::PROP_uuRESOLVE, undefinedName);
+        return true;
+    }
 
 	try 
 	{
@@ -526,7 +539,8 @@ as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 {
 	static string_table::key key = NSV::PROP_uuPROTOuu;
 
-	// TODO: check what happens if __proto__ is set as a user-defined getter/setter
+	// TODO: check what happens if __proto__ is set as a user-defined 
+    // getter/setter
 	// TODO: check triggers !!
 	_members.setValue(key, as_value(proto.get()), *this, 0, flags);
 }

@@ -24,6 +24,7 @@
 #include "Sound.h"
 #include "log.h"
 #include "sound_handler.h"
+#include "MediaHandler.h"
 #include "sound_definition.h" // for sound_sample
 #include "movie_definition.h"
 #include "fn_call.h"
@@ -32,12 +33,17 @@
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "timers.h" // for registering the probe timer
-
+#include "namedStrings.h"
+#include "ExportableResource.h"
 #include "StreamProvider.h"
 
 
 #include "Sound.h"
 #include <string>
+
+// Define the macro below to get some more DEBUG
+// lines while Sound is at work
+//#define GNASH_DEBUG_SOUND_AS
 
 namespace gnash {
 
@@ -67,7 +73,7 @@ Sound::Sound()
 	soundId(-1),
 	externalSound(false),
 	isStreaming(false),
-	_soundHandler(get_sound_handler()),
+	_soundHandler(_vm.getRoot().runInfo().soundHandler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_startTime(0),
 	_leftOverData(),
@@ -75,7 +81,8 @@ Sound::Sound()
 	_leftOverSize(0),
 	isAttached(false),
 	remainingLoops(0),
-    _probeTimer(0)
+    _probeTimer(0),
+    _soundCompleted(false)
 {
 }
 
@@ -199,10 +206,11 @@ Sound::loadSound(const std::string& file, bool streaming)
 	/// changed that.
 	_startTime=0;
 
-	URL url(file, get_base_url());
+    const movie_root& mr = _vm.getRoot();
+	URL url(file, mr.runInfo().baseURL());
 
-	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-	std::auto_ptr<IOChannel> inputStream( streamProvider.getStream( url ) );
+	StreamProvider& streamProvider = mr.runInfo().streamProvider();
+	std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url));
 	if ( ! inputStream.get() )
 	{
 		log_error( _("Gnash could not open this url: %s"), url );
@@ -224,7 +232,12 @@ Sound::loadSound(const std::string& file, bool streaming)
 	if ( isStreaming )
 	{
 		startProbeTimer();
-	} // if not streaming, we'll probe on .start()
+	}
+    else
+    {
+        LOG_ONCE(log_unimpl("Non-streaming Sound.loadSound: will behave as a streaming one"));
+        // if not streaming, we'll probe on .start()
+    }
 }
 
 int
@@ -237,9 +250,10 @@ Sound::attachAuxStreamerIfNeeded()
 	_audioDecoder.reset(_mediaHandler->createAudioDecoder(*audioInfo).release());
 
 	// start playing ASAP, a call to ::start will just change _startTime
+#ifdef GNASH_DEBUG_SOUND_AS
 	log_debug("Attaching the aux streamer");
+#endif
 	_soundHandler->attach_aux_streamer(getAudioWrapper, (void*) this);
-	isAttached = true;
     return 1;
 }
 
@@ -458,6 +472,8 @@ Sound::getAudio(boost::uint8_t* stream, int len)
 				// or detach and stop here...
 				// (should really honour loopings if any, but that should be only done for non-streaming sound!)
 				//log_debug("Parsing complete and no more audio frames in input, detaching");
+
+                markSoundCompleted(true);
 				return false; // will detach us (we should change isAttached, but need thread safety!)
 			}
 
@@ -596,17 +612,19 @@ sound_stop(const fn_call& fn)
 		// check the import.
 		movie_definition* def = so->getVM().getRoot().get_movie_definition();
 		assert(def);
-		boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
-		if (res == NULL)
+		boost::intrusive_ptr<ExportableResource> res = 
+            def->get_exported_resource(name);
+
+        if (!res)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror(_("import error: resource '%s' is not exported"), name.c_str());
+                log_swferror(_("import error: resource '%s' is not exported"),
+                    name);
 		    	);
 		    return as_value();
 		}
 
-		// FIXME: shouldn't we use dynamic_cast here (or rely on sound_sample interface) ?
-		sound_sample* ss = res->cast_to_sound_sample();
+		sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
 
 		if (ss != NULL)
 		{
@@ -650,19 +668,21 @@ sound_attachsound(const fn_call& fn)
 	// check the import.
 	movie_definition* def = so->getVM().getRoot().get_movie_definition();
 	assert(def);
-	boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
-	if (res == NULL)
+	boost::intrusive_ptr<ExportableResource> res = 
+        def->get_exported_resource(name);
+	if (!res)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("import error: resource '%s' is not exported"), name.c_str());
-			);
+            log_swferror(_("import error: resource '%s' is not exported"),
+                name);
+        );
 		return as_value();
 	}
 
 	int si = 0;
-	sound_sample* ss = res->cast_to_sound_sample();
+	sound_sample* ss = dynamic_cast<sound_sample*>(res.get());
 
-	if (ss != NULL)
+	if (ss)
 	{
 		si = ss->m_sound_handler_id;
 	}
@@ -777,7 +797,8 @@ sound_loadsound(const fn_call& fn)
 		if ( fn.nargs > 2 )
 		{
 			std::stringstream ss; fn.dump_args(ss);
-			log_aserror(_("Sound.loadSound(%s): arguments after first 2 discarded"), ss.str());
+			log_aserror(_("Sound.loadSound(%s): arguments after first 2 "
+                    "discarded"), ss.str());
 		}
 		);
 	}
@@ -836,7 +857,7 @@ checkPolicyFile_getset(const fn_call& /*fn*/)
 as_value
 sound_areSoundsInaccessible(const fn_call& /*fn*/)
 {
-	// TODO: I guess this would have to do with premissions (crossdomain stuff)
+	// TODO: I guess this would have to do with permissions (crossdomain stuff)
 	// more then capability.
 	// See http://www.actionscript.org/forums/showthread.php3?t=160028
 	// 
@@ -860,13 +881,16 @@ attachSoundInterface(as_object& o)
 
 	int fl_hpc = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly;
 
-	o.init_member("attachSound", new builtin_function(sound_attachsound), fl_hpc);
+	o.init_member("attachSound", new builtin_function(sound_attachsound),
+            fl_hpc);
 	o.init_member("getPan", new builtin_function(sound_getpan), fl_hpc);
 	o.init_member("setPan", new builtin_function(sound_setpan), fl_hpc);
 	o.init_member("start", new builtin_function(sound_start), fl_hpc);
 	o.init_member("stop", new builtin_function(sound_stop), fl_hpc);
-	o.init_member("getTransform", new builtin_function(sound_gettransform), fl_hpc);
-	o.init_member("setTransform", new builtin_function(sound_settransform), fl_hpc);
+	o.init_member("getTransform", new builtin_function(sound_gettransform),
+            fl_hpc);
+	o.init_member("setTransform", new builtin_function(sound_settransform),
+            fl_hpc);
 	o.init_member("getVolume", new builtin_function(sound_getvolume), fl_hpc);
 	o.init_member("setVolume", new builtin_function(sound_setvolume), fl_hpc);
 
@@ -936,7 +960,7 @@ Sound::startProbeTimer()
 	boost::intrusive_ptr<builtin_function> cb = \
 		new builtin_function(&Sound::probeAudioWrapper);
 	std::auto_ptr<Timer> timer(new Timer);
-	unsigned long delayMS = 83; // 12 times each second...
+	unsigned long delayMS = 500; // 2 times each second (83 would be 12 times each second)
 	timer->setInterval(*cb, delayMS, this);
 	_probeTimer = getVM().getRoot().add_interval_timer(timer, true);
 }
@@ -945,7 +969,7 @@ Sound::startProbeTimer()
 as_value
 Sound::probeAudioWrapper(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<Sound> ptr = ensureType<Sound>(fn.this_ptr);
     ptr->probeAudio();
@@ -956,7 +980,10 @@ Sound::probeAudioWrapper(const fn_call& fn)
 void
 Sound::stopProbeTimer()
 {
+#ifdef GNASH_DEBUG_SOUND_AS
     log_debug("stopProbeTimer called");
+#endif
+
 	if ( _probeTimer )
 	{
 		VM& vm = getVM();
@@ -970,42 +997,62 @@ Sound::stopProbeTimer()
 void
 Sound::probeAudio()
 {
-    log_debug("Probing audio");
-
-    bool parsingCompleted = _mediaParser->parsingCompleted();
-    int attached=0;
-
-    try {
-        attached = attachAuxStreamerIfNeeded();
-    } catch (MediaException& e) {
-        assert(!_audioDecoder.get());
-		log_error(_("Could not create audio decoder: %s"), e.what());
-        _mediaParser.reset(); // no use for this anymore...
-        stopProbeTimer();
-        return;
-    }
-
-    if ( ! attached )
+    if ( isAttached )
     {
-        if ( parsingCompleted )
+#ifdef GNASH_DEBUG_SOUND_AS
+        log_debug("Probing audio for end");
+#endif
+
+        boost::mutex::scoped_lock lock(_soundCompletedMutex);
+        if (_soundCompleted)
         {
-            log_debug("No audio in Sound input.");
-            stopProbeTimer();
+            // when _soundCompleted is true we're
+            // NOT attached !
             _mediaParser.reset(); // no use for this anymore...
-        }
-        else
-        {
-            // keep probing
+            isAttached=false;
+            _soundCompleted=false;
+            stopProbeTimer();
+
+            // dispatch onSoundComplete 
+	        callMethod(NSV::PROP_ON_SOUND_COMPLETE);
         }
     }
     else
     {
-        // An audio decoder was constructed, good!
-        assert(_audioDecoder.get());
+#ifdef GNASH_DEBUG_SOUND_AS
+        log_debug("Probing audio for start");
+#endif
 
-        // TODO: reuse the probe timer to detect
-        //       end of sound for running onSoundCompleted()
-        stopProbeTimer();
+        bool parsingCompleted = _mediaParser->parsingCompleted();
+        try {
+            isAttached = attachAuxStreamerIfNeeded();
+        } catch (MediaException& e) {
+            assert(!isAttached);
+            assert(!_audioDecoder.get());
+            log_error(_("Could not create audio decoder: %s"), e.what());
+            _mediaParser.reset(); // no use for this anymore...
+            stopProbeTimer();
+            return;
+        }
+
+        if ( ! isAttached )
+        {
+            if ( parsingCompleted )
+            {
+                log_debug("No audio in Sound input.");
+                stopProbeTimer();
+                _mediaParser.reset(); // no use for this anymore...
+            }
+            else
+            {
+                // keep probing
+            }
+        }
+        else
+        {
+            // An audio decoder was constructed, good!
+            assert(_audioDecoder.get());
+        }
     }
 }
 
@@ -1018,5 +1065,12 @@ Sound::markReachableResources() const
 	markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
+
+void
+Sound::markSoundCompleted(bool completed)
+{
+    boost::mutex::scoped_lock lock(_soundCompletedMutex);
+    _soundCompleted=completed;
+}
 
 } // end of gnash namespace

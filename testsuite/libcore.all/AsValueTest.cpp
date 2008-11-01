@@ -107,10 +107,12 @@ main(int argc, char *argv[])
     // Create a bogus movie with swf version 7 support
     boost::intrusive_ptr<movie_definition> md ( new DummyMovieDefinition(7) );
     ManualClock clock;
-    VM& vm = VM::init(*md, clock);
-    
+
+    RunInfo runInfo("");
+    movie_root stage(*md, clock, runInfo);
+
     movie_instance* root = md->create_movie_instance();
-    vm.getRoot().setRootMovie(root);
+    stage.setRootMovie(root);
 
     // run the tests
     test_isnan();

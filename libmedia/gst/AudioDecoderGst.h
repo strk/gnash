@@ -28,14 +28,23 @@
 #include "AudioDecoder.h"
 
 #include <gst/gst.h>
-#include "image.h"
+#include "GnashImage.h"
 
 #include "swfdec_codec_gst.h"
 
+// Forward declarations
+namespace gnash {
+    namespace media {
+        class AudioInfo;
+        class SoundInfo;
+    }
+}
+
 namespace gnash {
 namespace media {
+namespace gst {
 
-/// Video decoding using Gstreamer.
+/// GST based AudioDecoder
 class DSOEXPORT AudioDecoderGst : public AudioDecoder {
 	
 public:
@@ -44,7 +53,7 @@ public:
 
     ~AudioDecoderGst();
 
-    boost::uint8_t* decode(boost::uint8_t* input, boost::uint32_t inputSize,
+    boost::uint8_t* decode(const boost::uint8_t* input, boost::uint32_t inputSize,
                            boost::uint32_t& outputSize, boost::uint32_t& decodedData,
                            bool /*parse*/);
     boost::uint8_t* decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize);
@@ -59,6 +68,7 @@ private:
 
 };
 
+} // gnash.media.gst namespace
 } // media namespace
 } // gnash namespace
 

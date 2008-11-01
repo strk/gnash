@@ -29,9 +29,7 @@
 // Forward declarations
 namespace gnash {
     class rgba;
-    namespace image {
-        class ImageBase;
-    }
+    class GnashImage;
 }
 
 namespace gnash {
@@ -56,10 +54,10 @@ namespace gnash {
 	namespace render
 	{
 		/// See render_handler::create_bitmap_info_rgb (in backend/render_handler.h)
-		bitmap_info* createBitmapInfo(std::auto_ptr<image::ImageBase> im);
+		bitmap_info* createBitmapInfo(std::auto_ptr<GnashImage> im);
 
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
-		void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* mat, const rect* bounds);
+		void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds);
 
 		/// See render_handler::begin_display (in backend/render_handler.h)
 		void	begin_display(

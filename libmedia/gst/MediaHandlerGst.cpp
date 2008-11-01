@@ -36,6 +36,7 @@
 
 namespace gnash { 
 namespace media {
+namespace gst {
 
 std::auto_ptr<MediaParser>
 MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
@@ -109,5 +110,6 @@ MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 	return std::auto_ptr<AudioDecoder>(decoder);
 }
 
+} // gnash.media.gst namespace
 } // gnash.media namespace 
 } // gnash namespace

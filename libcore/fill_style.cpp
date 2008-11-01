@@ -63,7 +63,7 @@ void
 fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
     fill_style *pOther)
 {
-    const bool is_morph = pOther != NULL;
+    const bool is_morph = (pOther != NULL);
 
     in.ensureBytes(1);
     m_type = in.read_u8();
@@ -88,7 +88,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         else 
         {
             // For DefineMorphShape tags we should use morph_fill_style 
-            assert( tag_type == SWF::DEFINESHAPE || tag_type == SWF::DEFINESHAPE2 );
+            assert( tag_type == SWF::DEFINESHAPE ||
+                    tag_type == SWF::DEFINESHAPE2 );
             m_color.read_rgb(in);
         }
 
@@ -171,9 +172,10 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
                     m_interpolation = SWF::GRADIENT_INTERPOL_LINEAR;
                     break;
                 default:
-                IF_VERBOSE_MALFORMED_SWF(
-                    log_swferror("Illegal interpolation mode in gradient definition.");
-                );
+                    IF_VERBOSE_MALFORMED_SWF(
+                        log_swferror("Illegal interpolation mode in gradient "
+                            "definition.");
+                    );
             }
         }
     
@@ -191,8 +193,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         {
            // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
             IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("Unexpected num gradients (%d), expected 1 to 8"),
-                        num_gradients);
+                log_swferror(_("Unexpected num gradients (%d), "
+                        "expected 1 to 8"), static_cast<int>(num_gradients));
             );
         }
     
@@ -200,7 +202,6 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
             pOther->m_gradients.resize(num_gradients);
         }
                 
-    
         m_gradients.resize(num_gradients);
         for (unsigned int i = 0; i < num_gradients; i++) {
             m_gradients[i].read(in, tag_type);
@@ -214,10 +215,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         {
            in.ensureBytes(2);
            m_focal_point = in.read_short_sfixed();
-           if (m_focal_point < -1.0f)
-               m_focal_point = -1.0f;
-           else if (m_focal_point > 1.0f)
-               m_focal_point = 1.0f;
+           if (m_focal_point < -1.0f) m_focal_point = -1.0f;
+           else if (m_focal_point > 1.0f) m_focal_point = 1.0f;
         }
     
         if (is_morph) {
@@ -225,10 +224,11 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         }
     
         IF_VERBOSE_PARSE (
-           log_parse("  gradients: num_gradients = %d", num_gradients);
+           log_parse("  gradients: num_gradients = %d",
+               static_cast<int>(num_gradients));
         );
     
-        // @@ hack.
+        // @@ hack. What is it supposed to do?
         if (num_gradients > 0) {
             m_color = m_gradients[0].m_color;
             if (is_morph)
@@ -242,7 +242,7 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
                 pOther->need_gradient_bitmap();
             md.add_bitmap_info(pOther->m_gradient_bitmap_info.get());
         }
-            // Make sure our SWFMovieDefinition knows about this bitmap.
+        // Make sure our SWFMovieDefinition knows about this bitmap.
         md.add_bitmap_info(m_gradient_bitmap_info.get());
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
@@ -265,11 +265,9 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         // Look up the bitmap character.
         m_bitmap_character = md.get_bitmap_character_def(bitmap_char_id);
         IF_VERBOSE_MALFORMED_SWF(
-            if ( m_bitmap_character == NULL )
+            if (!m_bitmap_character)
             {
-                static bool warned_about_invalid_char=false;
-                if ( ! warned_about_invalid_char )
-                {
+                LOG_ONCE(
                     log_swferror(_("Bitmap fill specifies '%d' as associated"
                         " bitmap character id,"
                         " but that character is not found"
@@ -277,8 +275,7 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
                         " It seems common to find such "
                         " malformed SWF, so we'll only warn once "
                         "about this."), bitmap_char_id);
-                    warned_about_invalid_char=true;
-                }
+                );
             }
         );
 
@@ -313,28 +310,28 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
 bitmap_info* 
 fill_style::get_bitmap_info() const 
 {    
-  assert(m_type != SWF::FILL_SOLID);
-  
-  if (m_type == SWF::FILL_TILED_BITMAP
-   || m_type == SWF::FILL_CLIPPED_BITMAP
-   || m_type == SWF::FILL_TILED_BITMAP_HARD
-   || m_type == SWF::FILL_CLIPPED_BITMAP_HARD) {
+    assert(m_type != SWF::FILL_SOLID);
 
-   if (m_bitmap_character!=NULL)
-     return m_bitmap_character->get_bitmap_info();
-   else
-     return NULL;
+    switch (m_type)
+    {
+        case SWF::FILL_TILED_BITMAP:
+        case SWF::FILL_CLIPPED_BITMAP:
+        case SWF::FILL_TILED_BITMAP_HARD:
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+            if (m_bitmap_character)
+            {
+                return m_bitmap_character->get_bitmap_info();
+            }
+            return NULL;
    
-  } else
-  if (m_type == SWF::FILL_LINEAR_GRADIENT
-   || m_type == SWF::FILL_RADIAL_GRADIENT) {
-   
-   return need_gradient_bitmap();
-   
-  } else {
-    log_error(_("Unknown fill style %d"), m_type);
-    abort();
-  }  
+        case SWF::FILL_LINEAR_GRADIENT:
+        case SWF::FILL_RADIAL_GRADIENT:
+            return need_gradient_bitmap();
+        default:
+            log_error(_("Unknown fill style %d"), m_type);
+            // Seems a bit drastic...
+            std::abort();
+    }
 }
 
 SWFMatrix
@@ -376,7 +373,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
                     "have position==%d (expected 0)."
                     " This seems to be common, so will"
                     " warn only once."),
-                    (int)m_gradients[0].m_ratio)
+                    static_cast<int>(m_gradients[0].m_ratio));
             );
         );
         return m_gradients[0].m_color;
@@ -413,7 +410,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
             );
         }
 
-        rgba    result;
+        rgba result;
         result.set_lerp(gr0.m_color, gr1.m_color, f);
         return result;
     }
@@ -429,64 +426,68 @@ fill_style::create_gradient_bitmap() const
         || m_type == SWF::FILL_RADIAL_GRADIENT
         || m_type == SWF::FILL_FOCAL_GRADIENT);
 
-    std::auto_ptr<image::ImageRGBA> im(NULL);
+    std::auto_ptr<ImageRGBA> im;
 
-    if (m_type == SWF::FILL_LINEAR_GRADIENT)
+    switch (m_type)
     {
-        // Linear gradient.
-        im.reset(new image::ImageRGBA(256, 1));
+        case SWF::FILL_LINEAR_GRADIENT:
+            // Linear gradient.
+            im.reset(new ImageRGBA(256, 1));
 
-        for (size_t i = 0; i < im->width(); i++)
-    {
-            rgba    sample = sample_gradient(i);
-            im->setPixel(i, 0, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
-        }
-    }
-    else if (m_type == SWF::FILL_RADIAL_GRADIENT)
-    {
-        // Radial gradient.
-        im.reset(new image::ImageRGBA(64, 64));
-
-        for (size_t j = 0; j < im->height(); j++) {
-            for (size_t i = 0; i < im->width(); i++) {
-                float   radius = (im->height() - 1) / 2.0f;
-                float   y = (j - radius) / radius;
-                float   x = (i - radius) / radius;
-                int ratio = static_cast<int>(std::floor(255.5f * std::sqrt(x * x + y * y)));
-                if (ratio > 255) {
-                    ratio = 255;
-                }
-                rgba    sample = sample_gradient( ratio );
-                im->setPixel(i, j, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
-            }
-        }
-    }
-    else if (m_type == SWF::FILL_FOCAL_GRADIENT)
-    {
-        // Focal gradient.
-        im.reset(new image::ImageRGBA(64, 64));
-
-        for (size_t j = 0; j < im->height(); j++)
-        {
             for (size_t i = 0; i < im->width(); i++)
             {
-                float radiusy = (im->height() - 1) / 2.0f;
-                float radiusx = radiusy + std::abs(radiusy * m_focal_point);
-                float y = (j - radiusy) / radiusy;
-                float x = (i - radiusx) / radiusx;
-                int ratio = static_cast<int>(std::floor(255.5f * std::sqrt(x*x + y*y)));
-                if (ratio > 255)
-                {
-                    ratio = 255;
-                }
-                rgba sample = sample_gradient(ratio);
-                im->setPixel(i, j, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
+                rgba sample = sample_gradient(i);
+                im->setPixel(i, 0, sample.m_r, sample.m_g,
+                        sample.m_b, sample.m_a);
             }
-        }
+            break;
+        case SWF::FILL_RADIAL_GRADIENT:
+            // Radial gradient.
+            im.reset(new ImageRGBA(64, 64));
+
+            for (size_t j = 0; j < im->height(); j++) {
+                for (size_t i = 0; i < im->width(); i++) {
+                    float   radius = (im->height() - 1) / 2.0f;
+                    float   y = (j - radius) / radius;
+                    float   x = (i - radius) / radius;
+                    int ratio = static_cast<int>(
+                            std::floor(255.5f * std::sqrt(x * x + y * y)));
+                    if (ratio > 255) {
+                        ratio = 255;
+                    }
+                    rgba sample = sample_gradient(ratio);
+                    im->setPixel(i, j, sample.m_r, sample.m_g,
+                            sample.m_b, sample.m_a);
+                }
+            }
+            break;
+        case SWF::FILL_FOCAL_GRADIENT:
+            // Focal gradient.
+            im.reset(new ImageRGBA(64, 64));
+
+            for (size_t j = 0; j < im->height(); j++)
+            {
+                for (size_t i = 0; i < im->width(); i++)
+                {
+                    float radiusy = (im->height() - 1) / 2.0f;
+                    float radiusx = radiusy + std::abs(radiusy * m_focal_point);
+                    float y = (j - radiusy) / radiusy;
+                    float x = (i - radiusx) / radiusx;
+                    int ratio = static_cast<int>(std::floor(255.5f *
+                                std::sqrt(x*x + y*y)));
+                    
+                    if (ratio > 255) ratio = 255;
+
+                    rgba sample = sample_gradient(ratio);
+                    im->setPixel(i, j, sample.m_r, sample.m_g,
+                            sample.m_b, sample.m_a);
+                }
+            }
+            break;
     }
-        
+
     bitmap_info* bi = render::createBitmapInfo(
-                    static_cast<std::auto_ptr<image::ImageBase> >(im));
+                    static_cast<std::auto_ptr<GnashImage> >(im));
 
     return bi;
 }
@@ -496,7 +497,7 @@ gnash::bitmap_info*
 fill_style::need_gradient_bitmap() const 
 {
 
-  if (m_gradient_bitmap_info==NULL) {
+  if (!m_gradient_bitmap_info) {
     fill_style* this_non_const = const_cast<fill_style*>(this);
     this_non_const->m_gradient_bitmap_info = create_gradient_bitmap();
   }
@@ -506,9 +507,9 @@ fill_style::need_gradient_bitmap() const
 }
 
 
+// Sets this style to a blend of a and b.  t = [0,1]
 void
 fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
-    // Sets this style to a blend of a and b.  t = [0,1]
 {
     assert(t >= 0 && t <= 1);
 
@@ -533,9 +534,11 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     {
         m_gradients[j].m_ratio =
             (boost::uint8_t) utility::frnd(
-                utility::flerp(a.m_gradients[j].m_ratio, b.m_gradients[j].m_ratio, t)
+                utility::flerp(a.m_gradients[j].m_ratio,
+                    b.m_gradients[j].m_ratio, t)
                 );
-        m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color, b.m_gradients[j].m_color, t);
+        m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color,
+                b.m_gradients[j].m_color, t);
     }
     m_gradient_bitmap_info = NULL;
 
@@ -576,7 +579,8 @@ fill_style::setSolid(const rgba& color)
 }
 
 void
-fill_style::setLinearGradient(const std::vector<gradient_record>& gradients, const SWFMatrix& mat)
+fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
+        const SWFMatrix& mat)
 {
     m_type = SWF::FILL_LINEAR_GRADIENT;
     m_gradients = gradients;
@@ -585,7 +589,8 @@ fill_style::setLinearGradient(const std::vector<gradient_record>& gradients, con
 }
 
 void
-fill_style::setRadialGradient(const std::vector<gradient_record>& gradients, const SWFMatrix& mat)
+fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
+        const SWFMatrix& mat)
 {
     m_type = SWF::FILL_RADIAL_GRADIENT;
     m_gradients = gradients;
