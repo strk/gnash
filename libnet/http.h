@@ -22,9 +22,13 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/scoped_array.hpp>
 #include <sstream>
 
 #include "amf.h"
+#include "cque.h"
 #include "rtmp.h"
 #include "handler.h"
 #include "network.h"
@@ -113,12 +117,18 @@ public:
     HTTP();
     HTTP(Handler *hand);
     ~HTTP();
-    bool waitForGetRequest();
-    bool waitForGetRequest(gnash::Network &net);
+
+    // These are for the protocol itself
+    bool processClientRequest();
+    bool processGetRequest();
+    bool processPostRequest();
+//    bool processPostRequest(gnash::Network &net);
     
     // Handle the GET request response
-    bool sendGetReply(http_status_e code);
-    bool sendPostReply(rtmpt_cmd_e code);
+    boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
+    const std::stringstream &formatGetReply(http_status_e code);
+    
+    const std::stringstream &formatPostReply(rtmpt_cmd_e code);
 //    bool sendGetReply(Network &net);
 
     // Make copies of ourself
@@ -175,38 +185,64 @@ public:
     std::string &extractAgent(boost::shared_ptr<amf::Buffer> data)
 	{ return extractAgent(data->reference()); };
 
-    // These methods add data to the fields in the HTTP header.
-    // These return true if OK, false if error.
+    /// @note These methods add data to the fields in the HTTP header.
+    /// \brief clear the data in the stored header
     bool clearHeader();
-    bool formatHeader(int filesize, http_status_e type);
-    bool formatHeader(http_status_e type);
-    bool formatRequest(const std::string &url, http_method_e req);
-    bool formatMethod(const std::string &data);
-    bool formatDate();
-    bool formatServer();
-    bool formatServer(const std::string &data);
-    bool formatReferer(const std::string &data);
-    bool formatConnection(const std::string &data);
-    bool formatKeepAlive(const std::string &data);
-    bool formatContentLength();
-    bool formatContentLength(int filesize);
-    bool formatContentType();
-    bool formatContentType(amf::AMF::filetype_e type);
-    bool formatHost(const std::string &data);
-    bool formatAgent(const std::string &data);
-    bool formatAcceptRanges(const std::string &data);
-    bool formatLastModified();
-    bool formatLastModified(const std::string &data);
-    bool formatEtag(const std::string &data);
-    bool formatLanguage(const std::string &data);
-    bool formatCharset(const std::string &data);
-    bool formatEncoding(const std::string &data);
-    bool formatTE(const std::string &data);
 
-    bool formatErrorResponse(http_status_e err);
+    /// \brief Start constructing a new HTTP header.
+    ///		As it's hard to predict how much storage to allocate,
+    ///		all of these methods for formatting  HTTP header
+    ///		fields store the header while adding data to it. It
+    ///		requires another function to actually send the data.
+    bool startHeader();
     
+    /// \brief Format the common header fields that need no other processing.
+    ///		Most of these fields are purely ASCII based, and so
+    ///		chare a common constructor. A few require formatting
+    ///		of numerical data into string data, so they can't use
+    ///		the common form.
+    const std::stringstream &formatCommon(const std::string &data);
+    const std::stringstream &formatHeader(int filesize, http_status_e type);
+    const std::stringstream &formatHeader(http_status_e type);
+    const std::stringstream &formatRequest(const std::string &url, http_method_e req);
+    const std::stringstream &formatMethod(const std::string &data)
+ 	{return formatCommon("Method: " + data); };
+    const std::stringstream &formatDate();
+    const std::stringstream &formatServer();
+    const std::stringstream &formatServer(const std::string &data);
+    const std::stringstream &formatReferer(const std::string &data)
+ 	{return formatCommon("Referer: " + data); };
+    const std::stringstream &formatConnection(const std::string &data)
+ 	{return formatCommon("Connection: " + data); };
+    const std::stringstream &formatKeepAlive(const std::string &data)
+ 	{return formatCommon("Keep-Alive: " + data); };
+    const std::stringstream &formatContentLength();
+    const std::stringstream &formatContentLength(int filesize);
+    const std::stringstream &formatContentType();
+    const std::stringstream &formatContentType(amf::AMF::filetype_e type);
+    const std::stringstream &formatHost(const std::string &data)
+ 	{return formatCommon("Host: " + data); };
+    const std::stringstream &formatAgent(const std::string &data)
+ 	{return formatCommon("User-Agent: " + data); };
+    const std::stringstream &formatAcceptRanges(const std::string &data)
+ 	{return formatCommon("Accept-Ranges: " + data); };
+    const std::stringstream &formatLastModified();
+    const std::stringstream &formatLastModified(const std::string &data)
+ 	{return formatCommon("Last-Modified: " + data); }
+    const std::stringstream &formatEtag(const std::string &data)
+ 	{return formatCommon("Etag: " + data); };
+    const std::stringstream &formatLanguage(const std::string &data)
+ 	{return formatCommon("Accept-Language: " + data); };
+    const std::stringstream &formatCharset(const std::string &data)
+ 	{return formatCommon("Accept-Charset: " + data); };
+    const std::stringstream &formatEncoding(const std::string &data)
+ 	{return formatCommon("Accept-Encoding: " + data); };
+    const std::stringstream &formatTE(const std::string &data)
+ 	{return formatCommon("TE: " + data); };
     // All HTTP messages are terminated with a blank line
-    void terminateHeader() { _header << "\r\n"; };
+    void terminateHeader() { formatCommon("\r\n"); };    
+    
+    const std::stringstream &formatErrorResponse(http_status_e err);
     
     // Return the header that's been built up.
     std::string getHeader() { return _header.str(); };
@@ -220,6 +256,31 @@ public:
     amf::AMF::filetype_e getFileStats(std::string &filespec);
     void dump();
 
+    /// \brief Receive a message from the other end of the network connection.
+    ///
+    /// @param fd The file descriptor to read from
+    ///
+    /// @return The number of bytes sent
+    int DSOEXPORT recvMsg(int fd);
+
+    /// \brief Send a message to the other end of the network connection.
+    ///
+    /// @param data A real pointer to the data.
+    /// @param size The number of bytes of data stored.
+    /// @param buf A smart pointer to a Buffer class.
+    /// @param sstr A smart pointer to a Buffer class.
+    /// @param fd The file descriptor to use for writing to the network.
+    /// @param void Send the contents of the _header and _body.
+    ///
+    /// @return The number of bytes sent
+    int DSOEXPORT sendMsg();
+    int DSOEXPORT sendMsg(int fd);
+    int DSOEXPORT sendMsg(const Network::byte_t *data, size_t size);
+    int DSOEXPORT sendMsg(boost::shared_ptr<amf::Buffer> &buf)
+	{ return sendMsg(buf->reference(), buf->size()); };
+    int DSOEXPORT sendMsg(std::stringstream &sstr)
+	{ return sendMsg(reinterpret_cast<const Network::byte_t *>(sstr.str().c_str()), sstr.str().size()); };
+    
     // These accessors are used mostly just for debugging.
     bool keepAlive() { return _keepalive; }
     int getFileSize() { return _filesize; }
@@ -242,22 +303,25 @@ public:
     std::string getUserAgent() { return _agent; }
 
     void setHandler(Handler *hand) { _handler = hand; };
+    
 private:
-    std::stringstream _header;
-    std::stringstream _body;
-    std::string _command;
+    CQue		_que;
+    std::stringstream	_header;
+    std::stringstream	_body;
+    std::string		 _command;
     amf::AMF::filetype_e  _filetype;
-    std::string _filespec;
-    int         _filesize;
-    std::string _url;
+    std::string		_filespec;
+    int			_filesize;
+    std::string		_url;
     std::map<int, struct status_codes *> _status_codes;
-    std::string _version;
-    std::string _method;
-    std::string _referer;
-    std::string _host;
-    int         _port;
-    std::string _agent;
-    std::string _acceptranges;
+//    std::map<std::string, std::string> DSOEXPORT _datafields;  
+    std::string		_version;
+    std::string		_method;
+    std::string		_referer;
+    std::string		_host;
+    int			_port;
+    std::string		_agent;
+    std::string		_acceptranges;
     std::vector<std::string> _connections;
     std::vector<std::string> _language;
     std::vector<std::string> _charset;
@@ -265,6 +329,7 @@ private:
     std::vector<std::string> _te;
     std::vector<std::string> _accept;
     std::vector<std::string> _kalive;
+    
     // Connection parameters we care about
     bool	_keepalive;
     Handler     *_handler;
@@ -276,7 +341,7 @@ private:
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    void httphandler(Handler::thread_params_t *args);
+    void http_handler(Handler::thread_params_t *args);
 }
 
 

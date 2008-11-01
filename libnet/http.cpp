@@ -22,6 +22,9 @@
 #endif
 
 #include <boost/thread/mutex.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/scoped_array.hpp>
 //#include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -32,12 +35,14 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <sstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <algorithm>
 #include <unistd.h>
 
 #include "amf.h"
+#include "cque.h"
 #include "http.h"
 #include "log.h"
 #include "network.h"
@@ -117,14 +122,7 @@ HTTP::operator = (HTTP& /*obj*/)
 }
 
 bool
-HTTP::waitForGetRequest(Network& /*net*/)
-{
-    GNASH_REPORT_FUNCTION;
-    return false;		// FIXME: this should be finished
-}
-
-bool
-HTTP::waitForGetRequest()
+HTTP::processGetRequest()
 {
     GNASH_REPORT_FUNCTION;
 
@@ -133,8 +131,18 @@ HTTP::waitForGetRequest()
 //     memset(buffer, 0, readsize+1);
     
 //    _handler->wait();
-    boost::shared_ptr<amf::Buffer> buf = _handler->pop();
+//    _handler->dump();
 
+    cerr << "QUE = " << _que.size() << endl;
+
+    if (_que.size() == 0) {
+	return false;
+    }
+    
+    boost::shared_ptr<amf::Buffer> buf(_que.pop());
+//    cerr << "YYYYYYY: " << (char *)buf->reference() << endl;
+//    cerr << hexify(buf->reference(), buf->size(), false) << endl;
+    
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
 	return false;
@@ -163,16 +171,34 @@ HTTP::waitForGetRequest()
 }
 
 bool
+HTTP::startHeader()
+{
+//    GNASH_REPORT_FUNCTION;
+
+    clearHeader();
+    
+    return true;
+}
+
+const stringstream &
 HTTP::formatHeader(http_status_e type)
 {
 //    GNASH_REPORT_FUNCTION;
 
     formatHeader(_filesize, type);
-    return true;
+    return _header;
 }
 
 
-bool
+const stringstream &
+HTTP::formatCommon(const string &data)
+{
+    _header << data;
+
+    return _header;
+}
+
+const stringstream &
 HTTP::formatHeader(int filesize, http_status_e /* type */)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -193,10 +219,11 @@ HTTP::formatHeader(int filesize, http_status_e /* type */)
     formatContentType(amf::AMF::FILETYPE_HTML);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatErrorResponse(http_status_e code)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -221,10 +248,11 @@ HTTP::formatErrorResponse(http_status_e code)
     formatContentLength(_filesize);
     formatConnection("close");
     formatContentType(amf::AMF::FILETYPE_HTML);
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatDate()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -250,64 +278,174 @@ HTTP::formatDate()
     _header << " "  << d.year();
     _header << " "  << now.time_of_day();
     _header << " GMT" << "\r\n";
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatServer()
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Server: Cygnal (GNU/Linux)" << "\r\n";
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatServer(const string &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Server: " << data << "\r\n";
-    return true;
+
+    return _header;
 }
 
-bool
+#if 0
+const stringstream &
 HTTP::formatMethod(const string &data)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Method: " << data << "\r\n";
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatReferer(const string &refer)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Referer: " << refer << "\r\n";
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatConnection(const string &options)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Connection: " << options << "\r\n";
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatKeepAlive(const string &options)
 {
 //    GNASH_REPORT_FUNCTION;
     _header << "Keep-Alive: " << options << "\r\n";
-    return true;
+
+    return _header;
 }
 
-bool
+const stringstream &
+HTTP::formatHost(const string &host)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Host: " << host << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatAgent(const string &agent)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "User-Agent: " << agent << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatAcceptRanges(const string &range)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Accept-Ranges: " << range << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatEtag(const string &tag)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Etag: " << tag << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatLastModified(const string &date)
+{
+    _header << "Last-Modified: " << date << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatLanguage(const string &lang)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    // For some browsers this appears to also be Content-Language
+    _header << "Accept-Language: " << lang << "\r\n";
+    return _header;
+}
+
+const stringstream &
+HTTP::formatCharset(const string &set)
+{
+//    GNASH_REPORT_FUNCTION;
+    // For some browsers this appears to also be Content-Charset
+    _header << "Accept-Charset: " << set << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatEncoding(const string &code)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Accept-Encoding: " << code << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatTE(const string &te)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "TE: " << te << "\r\n";
+
+    return _header;
+}
+
+#endif
+
+const stringstream &
+HTTP::formatContentLength()
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Content-Length: " << _filesize << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
+HTTP::formatContentLength(int filesize)
+{
+//    GNASH_REPORT_FUNCTION;
+    _header << "Content-Length: " << filesize << "\r\n";
+
+    return _header;
+}
+
+const stringstream &
 HTTP::formatContentType()
 {
     return formatContentType(_filetype);
 }
 
-bool
+const stringstream &
 HTTP::formatContentType(amf::AMF::filetype_e filetype)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -334,65 +472,11 @@ HTTP::formatContentType(amf::AMF::filetype_e filetype)
 	  _header << "Content-Type: text/html" << "\r\n";
 //	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
     }
-    return true;
+
+    return _header;
 }
 
-bool
-HTTP::formatContentLength()
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Content-Length: " << _filesize << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatContentLength(int filesize)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Content-Length: " << filesize << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatHost(const string &host)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Host: " << host << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatAgent(const string &agent)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "User-Agent: " << agent << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatAcceptRanges(const string &range)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Accept-Ranges: " << range << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatEtag(const string &tag)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Etag: " << tag << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatLastModified(const string &date)
-{
-    _header << "Last-Modified: " << date << "\r\n";
-    return true;
-}
-
-bool
+const stringstream &
 HTTP::formatLastModified()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -411,70 +495,31 @@ HTTP::formatLastModified()
     return formatLastModified(date.str());
 }
 
-bool
-HTTP::formatLanguage(const string &lang)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    // For some browsers this appears to also be Content-Language
-    _header << "Accept-Language: " << lang << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatCharset(const string &set)
-{
-//    GNASH_REPORT_FUNCTION;
-    // For some browsers this appears to also be Content-Charset
-    _header << "Accept-Charset: " << set << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatEncoding(const string &code)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Accept-Encoding: " << code << "\r\n";
-    return true;
-}
-
-bool
-HTTP::formatTE(const string &te)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "TE: " << te << "\r\n";
-    return true;
-}
-
-bool
-HTTP::sendGetReply(http_status_e code)
+const stringstream &
+HTTP::formatGetReply(http_status_e code)
 {
     GNASH_REPORT_FUNCTION;
     
     formatHeader(_filesize, code);
-//    int ret = Network::writeNet(_header.str());
-    boost::scoped_ptr<amf::Buffer> buf(new amf::Buffer);
+    
+//    int ret = Network::writeNet(_header.str());    
 //    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
 //     buf->copy(ptr, _body.str().size());
 //    _handler->dump();
+
     if (_header.str().size()) {
-	buf->resize(_header.str().size());
-	string str = _header.str();
-	*buf = str;
-//	_handler->pushout(buf); FIXME:
-	_handler->notifyout();
         log_debug (_("Sent GET Reply"));
-	return true; // Default to true
+	return _header;
     } else {
 	clearHeader();
 	log_debug (_("Couldn't send GET Reply, no header data"));
-    }
-    
-    return false;
+    }    
+
+    return _header;
 }
 
-bool
-HTTP::sendPostReply(rtmpt_cmd_e /* code */)
+const stringstream &
+HTTP::formatPostReply(rtmpt_cmd_e /* code */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -484,7 +529,7 @@ HTTP::sendPostReply(rtmpt_cmd_e /* code */)
     formatContentType(amf::AMF::FILETYPE_FCS);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
-    return true;
+    return _header;
 
 #if 0
     formatHeader(_filesize, code);
@@ -502,10 +547,11 @@ HTTP::sendPostReply(rtmpt_cmd_e /* code */)
 	log_debug (_("Couldn't send POST Reply, no header data"));
     }
 #endif
-    return false;
+
+    return _header;
 }
 
-bool
+const stringstream &
 HTTP::formatRequest(const string &url, http_method_e req)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -524,7 +570,8 @@ HTTP::formatRequest(const string &url, http_method_e req)
 
     _header << "Connection: Keep-Alive, TE" << "\r\n";
     _header << "TE: deflate, gzip, chunked, identity, trailers" << "\r\n";
-    return true;
+
+    return _header;
 }
 // bool
 // HTTP::sendGetReply(Network &net)
@@ -1145,6 +1192,98 @@ HTTP::getFileStats(std::string &filespec)
     return _filetype;
 }
 
+/// \brief Send a message to the other end of the network connection.
+///`	Sends the contents of the _header and _body private data to
+///	the already opened network connection.
+///
+/// @return The number of bytes sent
+int DSOEXPORT
+HTTP::sendMsg()
+{
+    GNASH_REPORT_FUNCTION;
+    
+}
+
+/// \brief Send a message to the other end of the network connection.
+///`	Sends the contents of the _header and _body private data to
+///	the already opened network connection.
+///
+/// @param fd The file descriptor to use for writing to the network.
+///
+/// @return The number of bytes sent
+int DSOEXPORT
+HTTP::sendMsg(int fd)
+{
+    GNASH_REPORT_FUNCTION;
+    
+}
+
+/// \brief Send a message to the other end of the network connection.
+///`	Sends the contents of the _header and _body private data to
+///	the already opened network connection.
+///
+/// @param data A real pointer to the data.
+/// @param size The number of bytes of data stored.
+///
+/// @return The number of bytes sent
+int DSOEXPORT
+HTTP::sendMsg(const Network::byte_t *, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+//    _header
+
+//    return Network::writeNet(buf->reference(), buf->size());
+}
+
+int
+HTTP::recvMsg(int fd)
+{
+    GNASH_REPORT_FUNCTION;
+    int ret = 0;
+    
+    log_debug("Starting to wait for data in net for fd #%d", fd);
+    Network net;
+
+    do {
+	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);	
+	size_t ret = net.readNet(fd, buf->reference(), buf->size(), 1);
+
+	cerr << __PRETTY_FUNCTION__ << ": " << (char *)buf->reference() << endl;
+	
+	// the read timed out as there was no data, but the socket is still open.
+ 	if (ret == 0) {
+	    log_debug("no data yet for fd #%d, continuing...", fd);
+ 	    continue;
+ 	}
+	// ret is "no position" when the socket is closed from the other end of the connection,
+	// so we're done.
+	if ((ret == string::npos) || (ret == 0xffffffff)) {
+	    log_debug("socket for fd #%d was closed...", fd);
+	    break;
+	}
+	// We got data. Resize the buffer if necessary.
+	if (ret > 0) {
+//	    cerr << "XXXXX: " << (char *)buf->reference() << endl;
+ 	    if (ret < NETBUFSIZE) {
+// 		buf->resize(ret);	FIXME: why does this corrupt
+// 		the buffer ?
+		_que.push(buf);
+		break;
+ 	    } else {
+		_que.push(buf);
+	    }
+	} else {
+	    log_debug("no more data for fd #%d, exiting...", fd);
+	    break;
+	}
+    } while (ret);
+    
+    // We're done. Notify the other threads the socket is closed, and tell them to die.
+    log_debug("Handler done for fd #%d...", fd);
+
+    return _que.size();
+}
+
 void
 HTTP::dump() {
 //    GNASH_REPORT_FUNCTION;
@@ -1185,156 +1324,6 @@ HTTP::dump() {
     log_debug("RTMPT optional client ID is: ", _clientid);
     log_debug (_("==== ==== ===="));
 }
-
-extern "C" {
-void
-httphandler(Handler::thread_params_t *args)
-{
-    GNASH_REPORT_FUNCTION;
-//    struct thread_params thread_data;
-    string url, filespec, parameters;
-    string::size_type pos;
-    Handler *hand = reinterpret_cast<Handler *>(args->handle);
-    HTTP www;
-    www.setHandler(hand);
-
-    log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
-	      args->netfd, get_thread_id());
-    
-    string docroot = args->filespec;
-    
-    log_debug("Starting to wait for data in net for fd #%d", args->netfd);
-
-    // Wait for data, and when we get it, process it.
-    do {
-	hand->readPacket(args->netfd);
-#if 0
-	hand->wait();
-	if (hand->timetodie()) {
-	    log_debug("Not waiting no more, no more for more HTTP data for fd #%d...", args->netfd);
-	    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
-	    if ((*hit).second) {
-		log_debug("Removing handle %x for HTTP on fd #%d",
-			  (void *)hand, args->netfd);
-		handlers.erase(args->netfd);
-		delete (*hit).second;
-	    }
-	    return;
-	}
-#endif
-#ifdef USE_STATISTICS
-	struct timespec start;
-	clock_gettime (CLOCK_REALTIME, &start);
-#endif
-	
-// 	conndata->statistics->setFileType(NetStats::RTMPT);
-// 	conndata->statistics->startClock();
-//	args->netfd = www.getFileFd();
-	if (!www.waitForGetRequest()) {
-	    hand->clearout();	// remove all data from the outgoing que
-	    hand->die();	// tell all the threads for this connection to die
-	    hand->notifyin();
-	    log_debug("Net HTTP done for fd #%d...", args->netfd);
-// 	    hand->closeNet(args->netfd);
-	    return;
-	}
-	url = docroot;
-	url += www.getURL();
-	pos = url.find("?");
-	filespec = url.substr(0, pos);
-	parameters = url.substr(pos + 1, url.size());
-	// Get the file size for the HTTP header
-	
-	if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
-	    www.formatErrorResponse(HTTP::NOT_FOUND);
-	}
-	www.sendGetReply(HTTP::LIFE_IS_GOOD);
-//	strcpy(thread_data.filespec, filespec.c_str());
-//	thread_data.statistics = conndata->statistics;
-	
-	// Keep track of the network statistics
-//	conndata->statistics->stopClock();
-// 	log_debug (_("Bytes read: %d"), www.getBytesIn());
-// 	log_debug (_("Bytes written: %d"), www.getBytesOut());
-//	st.setBytes(www.getBytesIn() + www.getBytesOut());
-//	conndata->statistics->addStats();
-	
-	if (filespec[filespec.size()-1] == '/') {
-	    filespec += "/index.html";
-	}
-	if (url != docroot) {
-	    log_debug (_("File to load is: %s"), filespec.c_str());
-	    log_debug (_("Parameters are: %s"), parameters.c_str());
-	    struct stat st;
-	    int filefd;
-	    size_t ret;
-#ifdef USE_STATISTICS
-	    struct timespec start;
-	    clock_gettime (CLOCK_REALTIME, &start);
-#endif
-	    if (stat(filespec.c_str(), &st) == 0) {
-		filefd = ::open(filespec.c_str(), O_RDONLY);
-		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
-			   st.st_size, filefd);
-		do {
-		    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-		    ret = read(filefd, buf->reference(), buf->size());
-		    if (ret == 0) { // the file is done
-			break;
-		    }
-		    if (ret != buf->size()) {
-			buf->resize(ret);
-//			log_debug("Got last data block from disk file, size %d", buf->size());
-		    }
-//		    log_debug("Read %d bytes from %s.", ret, filespec);
-#if 1
-		    hand->pushout(buf);
-		    hand->notifyout();
-#else
-		    // Don't bother with the outgoing que
-		    if (ret > 0) {
-			ret = hand->writeNet(buf);
-		    }
-		    delete buf;
-#endif
-		} while(ret > 0);
-		log_debug("Done transferring %s to net fd #%d",
-			  filespec, args->netfd);
-		::close(filefd); // close the disk file
-		// See if this is a persistant connection
-// 		if (!www.keepAlive()) {
-// 		    log_debug("Keep-Alive is off", www.keepAlive());
-// // 		    hand->closeConnection();
-//  		}
-#ifdef USE_STATISTICS
-		struct timespec end;
-		clock_gettime (CLOCK_REALTIME, &end);
-		log_debug("Read %d bytes from \"%s\" in %f seconds",
-			  st.st_size, filespec,
-			  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
-#endif
-	    }
-
-// 	    memset(args->filespec, 0, 256);
-// 	    memcpy(->filespec, filespec.c_str(), filespec.size());
-// 	    boost::thread sendthr(boost::bind(&stream_thread, args));
-// 	    sendthr.join();
-	}
-#ifdef USE_STATISTICS
-	struct timespec end;
-	clock_gettime (CLOCK_REALTIME, &end);
-	log_debug("Processing time for GET request was %f seconds",
-		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
-#endif
-//	conndata->statistics->dump();
-//    }
-    } while(!hand->timetodie());
-    
-    log_debug("httphandler all done now finally...");
-    
-} // end of httphandler
-    
-} // end of extern C
 
 } // end of gnash namespace
 
