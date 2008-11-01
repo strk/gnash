@@ -48,10 +48,10 @@
 //#define GNASH_DEBUG_MIXING
 
 // Debug create_sound/delete_sound/play_sound/stop_sound, loops
-//#define GNASH_DEBUG_SOUNDS_MANAGEMENT
+#define GNASH_DEBUG_SOUNDS_MANAGEMENT
 
 // Debug sound decoding
-//#define GNASH_DEBUG_SOUNDS_DECODING
+#define GNASH_DEBUG_SOUNDS_DECODING
 
 namespace { // anonymous
 
@@ -193,14 +193,19 @@ int	SDL_sound_handler::create_sound(
 	// Make sure we're the only thread accessing _sounds here
 	boost::mutex::scoped_lock lock(_mutex);
 
-	// the vector takes ownership
-	_sounds.push_back(sounddata.release());
-
-	int sound_id = _sounds.size()-1;
+	int sound_id = _sounds.size();
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-	log_debug("create_sound: sound %d, format %d", sound_id, _sounds.back()->soundinfo->getFormat());
+	log_debug("create_sound: sound %d, format %s %s %dHz, %d samples (%d bytes)",
+        sound_id, sounddata->soundinfo->getFormat(),
+        sounddata->soundinfo->isStereo() ? "stereo" : "mono",
+        sounddata->soundinfo->getSampleRate(),
+        sounddata->soundinfo->getSampleCount(),
+        sounddata->size());
 #endif
+
+	// the vector takes ownership
+	_sounds.push_back(sounddata.release());
 
 	return sound_id;
 
@@ -224,12 +229,6 @@ SDL_sound_handler::fill_stream_data(unsigned char* data,
 	}
 
 	EmbedSound* sounddata = _sounds[handle_id];
-
-	// If doing ADPCM, knowing the framesize is needed to decode!
-	if (sounddata->soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM)
-    {
-		sounddata->m_frames_size[sounddata->size()] = data_bytes;
-	}
 
 	// Handling of the sound data
 	size_t start_size = sounddata->size();
@@ -780,12 +779,6 @@ EmbedSoundInst::decodeNextBlock()
     //
     assert(playbackPosition >= decodedDataSize() );
 
-    // TODO: IMPLEMENT THIS !!
-    // SHOUD:
-    //   - decode
-    //   - increment decodingPosition
-    //   - appendDecodedData 
-
     boost::uint32_t inputSize = 0; // or blockSize
     bool parse = true; // need to parse ?
 
@@ -793,63 +786,57 @@ EmbedSoundInst::decodeNextBlock()
     // @todo: turn into a private function
     {
         const EmbedSound& sndData = _soundDef;
-        if (sndData.soundinfo->getFormat() == media::AUDIO_CODEC_ADPCM)
-        {
-#ifdef GNASH_DEBUG_MIXING
-            log_debug(" sound format is ADPCM");
-#endif
 
-            parse = false;
-            if (!sndData.m_frames_size.empty())
-            {
-                const EmbedSound::FrameSizeMap& m = sndData.m_frames_size;
-                EmbedSound::FrameSizeMap::const_iterator it =
+        // Figure the need to parse..
+	    switch (sndData.soundinfo->getFormat())
+        {
+            case media::AUDIO_CODEC_ADPCM:
+#ifdef GNASH_DEBUG_SOUNDS_DECODING
+                log_debug(" sound format is ADPCM");
+#endif
+                parse = false;
+                break;
+            default:
+                break;
+        }
+
+        // Figure the frame size ...
+        inputSize = encodedDataSize() - decodingPosition;
+        if (!sndData.m_frames_size.empty())
+        {
+            const EmbedSound::FrameSizeMap& m = sndData.m_frames_size;
+            EmbedSound::FrameSizeMap::const_iterator it =
                         m.find(decodingPosition);
-                if ( it == m.end() )
-                {
-#ifdef GNASH_DEBUG_MIXING
-                    log_debug("Unknown size of ADPCM frame starting at offset %d", decodingPosition);
+            if ( it != m.end() )
+            {
+                inputSize = it->second; 
+#ifdef GNASH_DEBUG_SOUNDS_DECODING
+                log_debug(" frame size for frame starting at offset %d is %d",
+                    decodingPosition, inputSize);
 #endif
-                    inputSize = encodedDataSize() - decodingPosition;
-                }
-                else
-                {
-                    inputSize = it->second; 
-#ifdef GNASH_DEBUG_MIXING
-                    log_debug(" frame size for frame starting at offset %d is %d",
-                        decodingPosition, inputSize);
-#endif
-                }
             }
             else
             {
-                inputSize = encodedDataSize() - decodingPosition;
-#ifdef GNASH_DEBUG_MIXING
-                log_debug(" frame size for frame starting at offset %d is unknown, "
-                    "using the whole still encoded data (%d bytes)",
-                    decodingPosition, inputSize);
-#endif
+                // this should never happen, as we keep track of 
+                // sizes for each audio block in input
+                log_error("Unknown size of audio block starting at offset %d",
+                    " (should never happen)",
+                    decodingPosition);
             }
-        }
-        else
-        {
-            inputSize = encodedDataSize() - decodingPosition;
-#ifdef GNASH_DEBUG_MIXING
-            log_debug(" frame size of non-ADPCM frame starting at offset %d is unknown, "
-                    "using the whole still encoded data (%d bytes)",
-                    decodingPosition, inputSize);
-#endif
         }
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_DECODING
-    log_debug("  decoding %d bytes", inputSize);
+    log_debug("  decoding %d bytes, parse:%d", inputSize, parse);
 #endif
+
+    assert(inputSize);
+    const boost::uint8_t* input = getEncodedData(decodingPosition);
 
     boost::uint32_t consumed = 0;
     boost::uint32_t decodedDataSize = 0;
     boost::uint8_t* decodedData = _decoder->decode(
-                                      getEncodedData(decodingPosition), 
+                                      input, 
                                       inputSize,
                                       decodedDataSize,
                                       consumed,
@@ -1187,6 +1174,15 @@ SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *buf, int bufLenIn)
 void
 EmbedSound::append(boost::uint8_t* data, unsigned int size)
 {
+    /// @todo, rather then copying the data over,
+    ///        keep it in its original form (multi-buffer)
+    ///        This way we avoid memory copies and we'd
+    ///        have no need for the additional m_frames_sizes
+    ///        map..
+
+    // Remember size of this block, indexing by offset
+    m_frames_size[_buf->size()] = size;
+
     // Make sure we're always appropriately padded...
     media::MediaHandler* mh = media::MediaHandler::get(); // TODO: don't use this static !
     const size_t paddingBytes = mh ? mh->getInputPaddingSize() : 0;
