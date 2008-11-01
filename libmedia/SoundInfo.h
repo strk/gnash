@@ -27,14 +27,12 @@
 namespace gnash {
 namespace media {
 
-/// Class containing information about an embedded sound character.
+/// Class containing information about an embedded sound definition
 //
 /// Is created by the parser while
 /// parsing, and ownership is then transfered to EmbeddedSound. When the parser is
 /// parsing streams, it will ask the soundhandler for this to know what properties
 /// the stream has.
-///
-/// @deprecated AudioInfo should replace this
 ///
 class SoundInfo {
 public:
@@ -69,28 +67,32 @@ public:
 	{
 	}
 
-	/// Returns the current format of the sound
-	///
-	/// @return the current format of the sound
+	/// Returns the format of the sound
+	//
+	/// @return the format of the sound
 	audioCodecType getFormat() const { return _format; }
 
 	/// Returns the stereo status of the sound
-	///
+	//
 	/// @return the stereo status of the sound
 	bool isStereo() const { return _stereo; }
 
 	/// Returns the samplerate of the sound
-	///
+	//
 	/// @return the samplerate of the sound
 	unsigned long getSampleRate() const { return _sampleRate; }
 
 	/// Returns the samplecount of the sound
+	//
+	/// This is the amount of samples you'd get after
+	/// successfully decoding the sound.
 	///
 	/// @return the samplecount of the sound
+	///
 	unsigned long getSampleCount() const { return _sampleCount; }
 
 	/// Returns the 16bit status of the sound
-	///
+	//
 	/// @return the 16bit status of the sound
 	bool is16bit() const { return _is16bit; }
 
