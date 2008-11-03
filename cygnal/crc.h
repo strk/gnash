@@ -93,7 +93,7 @@ public:
     /// \brief Set the  flag for whether to enable the administration thread.
     void setAdminFlag(bool x) { _admin = x; }
 
-    ///  \brief Dump the internal data of this class in a human readable form.
+    /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
     

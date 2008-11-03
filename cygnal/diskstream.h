@@ -166,7 +166,6 @@ public:
     void setPagesize(size_t size) { _pagesize = size; };
     
     ///  \brief Dump the internal data of this class in a human readable form.
-    ///
     /// @remarks This should only be used for debugging purposes.
      void dump();
 //    friend std::ostream& operator<< (std::ostream &os, const DiskStream &ds);

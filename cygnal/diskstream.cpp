@@ -46,6 +46,8 @@ using namespace std;
 // gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 // }
 
+/// \namespace cygnal
+///	This namespace is for all the Cygnal specific classes.
 namespace cygnal {
 
 /// \def _SC_PAGESIZE
@@ -105,7 +107,7 @@ DiskStream::~DiskStream()
     }
 }
 
-    /// \brief close the open disk file and stream.
+/// \brief Close the open disk file and it's associated stream.
 void
 DiskStream::close()
 {
@@ -119,6 +121,8 @@ DiskStream::close()
     _filespec.clear();
 }
 
+///  \brief Dump the internal data of this class in a human readable form.
+/// @remarks This should only be used for debugging purposes.
 void
 DiskStream::dump()
 {
@@ -141,7 +145,12 @@ DiskStream::dump()
 ///	This loads a pagesize of the disk file into memory. We read
 ///	the file this way as it is faster and takes less resources
 ///	than read(), which add buffering we don't need.
+///	This offset must be a multipe of the pagesize.
 ///
+/// @param size The location in bytes in the file of the desired data.
+///
+/// @return A real pointer to the location of the data at the
+///	location pointed to by the offset.
 boost::uint8_t *
 DiskStream::loadChunk(off_t offset)
 {
@@ -226,6 +235,12 @@ DiskStream::loadChunk(off_t offset)
 #endif
 }
 
+/// \brief Open a file to be streamed.
+///
+/// @param filespec The full path and file name for the data to be
+///	read.
+///
+/// @return True if the file was opened sucessfully, false if not.
 bool
 DiskStream::open(const string &filespec)
 {
@@ -234,6 +249,14 @@ DiskStream::open(const string &filespec)
     return open(filespec, _netfd);
 }
 
+/// \brief Open a file to be streamed.
+///
+/// @param filespec The full path and file name for the data to be
+///	read.
+///
+/// @param netfd An optional file descriptor to read data from
+///
+/// @return True if the file was opened sucessfully, false if not.
 bool
 DiskStream::open(const string &filespec, int /*netfd*/)
 {
@@ -244,6 +267,17 @@ DiskStream::open(const string &filespec, int /*netfd*/)
     return open(filespec, _netfd, _statistics);
 }
 
+/// \brief Open a file to be streamed.
+///
+/// @param filespec The full path and file name for the data to be
+///	read.
+///
+/// @param netfd An optional file descriptor to read data from
+///
+/// @param statistics The optional data structure to use for
+///	collecting statistics on this stream.
+///
+/// @return True if the file was opened sucessfully, false if not.
 bool
 DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 {
@@ -283,7 +317,9 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
     return true;
 }
 
-// Stream the file
+/// \brief Stream the file that has been loaded,
+///
+/// @return True if the data was streamed sucessfully, false if not.
 bool
 DiskStream::play()
 {
@@ -292,6 +328,11 @@ DiskStream::play()
     return play(_netfd);
 }
 
+/// \brief Stream the file that has been loaded,
+///
+/// @param netfd An optional file descriptor to read data from
+///
+/// @return True if the data was streamed sucessfully, false if not.
 bool
 DiskStream::play(int netfd)
 {
@@ -347,7 +388,17 @@ DiskStream::play(int netfd)
     return true;
 }
 
-// Stream a preview, instead of the full movie.
+/// \brief Stream a preview of the file.
+///	A preview is a series of video frames from
+///	the video file. Each video frame is taken by sampling
+///	the file at a set interval.
+///
+/// @param filespec The full path and file name for the data to be
+///	read.
+///
+/// @param quantity The number of frames to stream..
+///
+/// @return True if the thumbnails were streamed sucessfully, false if not.
 bool
 DiskStream::preview(const string & /*filespec*/, int /*frames*/)
 {
@@ -358,7 +409,17 @@ DiskStream::preview(const string & /*filespec*/, int /*frames*/)
     return true; // Default to true    
 }
 
-// Stream a series of thumbnails
+/// \brief Stream a series of thumbnails.
+///	A thumbnail is a series of jpg images of frames from
+///	the video file instead of video frames. Each thumbnail
+///	is taken by sampling the file at a set interval.
+///
+/// @param filespec The full path and file name for the data to be
+///	read.
+///
+/// @param quantity The number of thumbnails to stream..
+///
+/// @return True if the thumbnails were streamed sucessfully, false if not.
 bool
 DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/)
 {
@@ -369,7 +430,9 @@ DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/)
     return true; // Default to true
 }
 
-// Pause the stream
+/// \brief Pause the stream currently being played.
+///
+/// @return True if the stream was paused sucessfully, false if not.
 bool
 DiskStream::pause()
 {
@@ -380,7 +443,12 @@ DiskStream::pause()
     return true; // Default to true
 }
 
-// Seek within the stream
+/// \brief Seek within the stream.
+///
+/// @param the offset in bytes to the location within the file to
+///	seek to.
+///
+/// @return A real pointer to the location of the data seeked to.
 boost::uint8_t *
 DiskStream::seek(off_t offset)
 {
@@ -390,7 +458,15 @@ DiskStream::seek(off_t offset)
     return loadChunk(offset);    
 }
 
-// Upload a stream into a sandbox
+/// \brief Upload a file into a sandbox.
+///	The sandbox is an area where uploaded files can get
+///	written to safely. For SWF content, the file name also
+///	includes a few optional paths used to seperate
+///	applications from each other.
+///
+/// @param filespec The file name for the data to be written.
+///
+/// @return True if the file was uploaded sucessfully, false if not.
 bool
 DiskStream::upload(const string & /*filespec*/)
 {
