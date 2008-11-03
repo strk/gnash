@@ -132,13 +132,18 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); // 1st frame 
 
-  // checks before placing any swf defined TextField
-  // Note: the dejagnuclip already placed some texts, so the following 
-  // does not work.
-  //check(mo, "!TextField.prototype.hasOwnProperty('background')");
-  //check(mo, "!TextField.prototype.hasOwnProperty('backgroundColor')");
-  //check(mo, "!TextField.prototype.hasOwnProperty('text')");
-  //check(mo, "!TextField.prototype.hasOwnProperty('textColor')");
+  // Check that the dejagnu clip is really a TextField.
+  check_equals(mo, "_root.getInstanceAtDepth(-16383)",
+          "_level0.instance1");
+  check(mo, "_level0.instance1._xtrace_win "
+          "instanceof TextField");
+
+  // Note: the dejagnuclip already placed some texts, so the following
+  // should be true.
+  check(mo, "TextField.prototype.hasOwnProperty('background')");
+  check(mo, "TextField.prototype.hasOwnProperty('backgroundColor')");
+  xcheck(mo, "TextField.prototype.hasOwnProperty('text')");
+  check(mo, "TextField.prototype.hasOwnProperty('textColor')");
 
   /*********************************************
    *
@@ -172,9 +177,13 @@ main(int argc, char** argv)
 
   check_equals(mo, "dtext1.embedFonts", "false");
   check_equals(mo, "etext1.embedFonts", "true");
+  check_equals(mo, "etext1.hasOwnProperty('embedFonts')", "false");
+
+  add_actions(mo, "createTextField('dynamictext1', 99, 10, 10, 10, 10);");
 
   check_equals(mo, "dtext1.__proto__", "TextField.prototype");
   check_equals(mo, "etext1.__proto__", "TextField.prototype");
+  check_equals(mo, "etext1.__proto__", "dynamictext1.__proto__");
 
   // checks after placing some swf defined TextField
   check(mo, "TextField.prototype.hasOwnProperty('background')");

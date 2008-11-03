@@ -35,7 +35,31 @@ printBounds = function(b)
 
 TextField.prototype.getBounds = MovieClip.prototype.getBounds;
 
-#if OUTPUT_VERSION > 5
+
+// check that the dejagnu clip is *not* a TextField, which is why the
+// following prototype properties are not yet initialized.
+#if OUTPUT_VERSION > 6
+ check_equals(_root.getInstanceAtDepth(-16383), _level0.__shared_assets);
+ xcheck(!_level0.__shared_assets.instance1._xtrace_win instanceof TextField);
+ xcheck_equals(typeof(_level0.__shared_assets.instance1._xtrace_win),
+            "movieclip");
+ note(_level0.__shared_assets.instance1._xtrace_win.toString());
+#endif
+
+#if OUTPUT_VERSION < 6
+
+    check_equals(typeof(TextField), 'function');
+    check_equals(TextField.prototype, undefined);
+    createTextField("tf", 50, 10, 10, 10, 10);
+    xcheck_equals(typeof(tf), "movieclip");
+    xcheck_equals(tf.__proto__.toString(), "[object Object]");
+    check(!tf instanceOf TextField);
+
+    tf = new TextField();
+    xcheck(tf instanceOf TextField);
+    totals();
+
+#else
 
 check_equals(typeof(TextField), 'function');
 check_equals(typeof(TextField.prototype), 'object');
@@ -127,6 +151,7 @@ check_equals(typeof(ret), 'object');
 check_equals(ret, _root.tf);
 #endif
 
+check(tf instanceof TextField);
 check_equals(typeof(tf), 'object');
 check(tf.hasOwnProperty('_listeners'));
 check_equals(tf._listeners.length, 1); // adds self to the listeners
@@ -152,7 +177,7 @@ xcheck( TextField.prototype.hasOwnProperty('maxhscroll') );
 xcheck( TextField.prototype.hasOwnProperty('maxscroll') );
 xcheck( TextField.prototype.hasOwnProperty('multiline') );
 xcheck( TextField.prototype.hasOwnProperty('password') );
-xcheck( TextField.prototype.hasOwnProperty('restrict') );
+cxheck( TextField.prototype.hasOwnProperty('restrict') );
 xcheck( TextField.prototype.hasOwnProperty('scroll') );
 check( TextField.prototype.hasOwnProperty('selectable') );
 xcheck( TextField.prototype.hasOwnProperty('text') );
@@ -349,6 +374,14 @@ check_equals(tf.maxChars, 5);
 tf.text = "0123456789";
 // no effect (maybe only limits user input)
 check_equals(tf.text, "0123456789");
+tf.maxChars = "string";
+xcheck_equals(typeof(tf.maxChars), "null");
+tf.maxChars = -6;
+check_equals(typeof(tf.maxChars), "number");
+check_equals(tf.maxChars, -6);
+tf.maxChars = 0;
+xcheck_equals(typeof(tf.maxChars), "null");
+
 tf.maxChars = null;
 
 // Check TextField.maxhscroll
@@ -370,6 +403,7 @@ xcheck_equals(tf.maxscroll, 1); // read-only
 // Check TextField.multiline
 
 xcheck_equals(typeof(tf.multiline), 'boolean');
+xcheck_equals(tf.multiline, false);
 check(!tf.hasOwnProperty('multiline'));
 xcheck_equals(tf.multiline, false);
 tf.multiline = true;
@@ -420,11 +454,32 @@ tf._parent = bk;
 // Check TextField.password
 //-------------------------------------------------------------------------
 
+// This verifies it really uses to_bool.
+
 xcheck_equals(typeof(tf.password), 'boolean');
+xcheck_equals(tf.password, false);
 check(!tf.hasOwnProperty('password'));
 xcheck_equals(tf.password, false);
 tf.password = true;
 check_equals(tf.password, true);
+tf.password = 7;
+xcheck_equals(tf.password, true);
+tf.password = "string";
+#if OUTPUT_VERSION > 6
+xcheck_equals(tf.password, true);
+#else
+xcheck_equals(tf.password, false);
+#endif
+tf.password = 0;
+check_equals(tf.password, false);
+tf.password = "a string";
+#if OUTPUT_VERSION > 6
+xcheck_equals(tf.password, true);
+#else
+xcheck_equals(tf.password, false);
+#endif
+tf.password = undefined;
+xcheck_equals(tf.password, false);
 // TODO: check effects of setting to 'password' (should hide characters)
 tf.password = false;
 
@@ -948,14 +1003,12 @@ _root._xscale = _root._yscale = 100;
 // END OF TESTS
 //------------------------------------------------------------
 
-#if OUTPUT_VERSION < 8
- check_totals(426);
-#else
- check_totals(427);
+#if OUTPUT_VERSION == 6
+ check_totals(437);
+#elif OUTPUT_VERSION == 7
+ check_totals(440);
+#elif OUTPUT_VERSION == 8
+ check_totals(441);
 #endif
-
-#else // OUTPUT_VERSION <= 5
-
- totals();
 
 #endif
