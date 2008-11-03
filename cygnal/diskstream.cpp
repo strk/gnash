@@ -280,8 +280,6 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics) {
     return true;
 }
 
-#if 0
-
 // Stream the file
 bool
 DiskStream::play() {
@@ -322,8 +320,7 @@ DiskStream::play(int netfd) {
     }
 
     //int blocksize = 8192;
-    int nbytes = 0;
-    Network net;
+//    Network net;
 //    while ((_seekptr - _dataptr) >= 0) {
 ////    nbytes = net.writeNet(_netfd, (char *)_seekptr, _filesize);
 //    if (nbytes <= 0) {
@@ -363,7 +360,7 @@ DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/) {
 
 // Pause the stream
 bool
-DiskStream::pause(int /*frame*/) {
+DiskStream::pause() {
 //    GNASH_REPORT_FUNCTION;
     
     _state = PAUSE;
@@ -372,10 +369,11 @@ DiskStream::pause(int /*frame*/) {
 
 // Seek within the stream
 bool
-DiskStream::seek(int /*frame*/) {
+DiskStream::seek(off_t offset) {
 //    GNASH_REPORT_FUNCTION;
     
     _state = SEEK;
+    loadChunk(offset);
     return true; // Default to true    
 }
 
@@ -395,8 +393,6 @@ bool DiskStream::multicast(const string & /*filespec*/) {
     _state = MULTICAST;
     return true; // Default to true    
 }
-
-#endif
 
 } // end of cygnal namespace
 

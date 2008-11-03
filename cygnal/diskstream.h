@@ -33,10 +33,19 @@
 #include "cque.h"
 #include "statistics.h"
 
+/// \namespace cygnal
+///	This namespace is for all the Cygnal specific classes.
 namespace cygnal {
 
+/// \class DiskStream
+///	This class handles the loading of files into memory. Instead
+///	of using read() from the standard library, this uses mmap() to
+///	map the file into memory in chunks of the memory pagesize,
+///	which is much faster and less resource intensive.
 class DiskStream {
 public:
+    /// \enum DiskStream::state_e
+    ///		This represents the state of the current stream.
     typedef enum {
         NO_STATE,
         OPEN,
@@ -48,36 +57,87 @@ public:
         UPLOAD,
         MULTICAST,
         DONE
-    } state_e;  
+    } state_e;
+    
     DiskStream();
     DiskStream(const std::string &filespec);
     DiskStream(const std::string &filespec, int netfd);
     ~DiskStream();
 
-    /// \brief close the open disk file and stream.
+    /// \brief Close the open disk file and it's associated stream.
     void close();
-    
+
+    /// \brief Open a file to be streamed.
+    ///
+    /// @param filespec The full path and file name for the data to be
+    ///		read.
+    ///
+    /// @param netfd An optional file descriptor to read data from
+    ///
+    /// @param statistics The optional data structure to use for
+    ///		collecting statistics on this stream.
+    ///
+    /// @return True if the file was opened sucessfully, false if not.
     bool open(const std::string &filespec);
     bool open(const std::string &filespec, int netfd);
     bool open(const std::string &filespec, int netfd, gnash::Statistics  &statistics);
     
-    // Stream the movie
+    /// \brief Stream the file that has been loaded,
+    ///
+    /// @param netfd An optional file descriptor to read data from
+    ///
+    /// @return True if the data was streamed sucessfully, false if not.
     bool play();
     bool play(int netfd);
     
-    // Stream a preview, instead of the full movie.
+    /// \brief Stream a preview of the file.
+    ///		A preview is a series of video frames from
+    ///		the video file. Each video frame is taken by sampling
+    ///		the file at a set interval.
+    ///
+    /// @param filespec The full path and file name for the data to be
+    ///		read.
+    ///
+    /// @param quantity The number of frames to stream..
+    ///
+    /// @return True if the thumbnails were streamed sucessfully, false if not.
     bool preview(const std::string &filespec, int frames);
     
-    // Stream a series of thumbnails
+    /// \brief Stream a series of thumbnails.
+    ///		A thumbnail is a series of jpg images of frames from
+    ///		the video file instead of video frames. Each thumbnail
+    ///		is taken by sampling the file at a set interval.
+    ///
+    /// @param filespec The full path and file name for the data to be
+    ///		read.
+    ///
+    /// @param quantity The number of thumbnails to stream..
+    ///
+    /// @return True if the thumbnails were streamed sucessfully, false if not.
     bool thumbnail(const std::string &filespec, int quantity);
     
-    // Pause the stream
-    bool pause(int frame);
+    /// \brief Pause the stream currently being played.
+    ///
+    /// @return True if the stream was paused sucessfully, false if not.
+    bool pause();
     
-    // Seek within the stream
-    bool seek(int frame);
+    /// \brief Seek within the stream.
+    ///
+    /// @param the offset in bytes to the location within the file to
+    ///		seek to.
+    ///
+    /// @return True if the stream was paused sucessfully, false if not.
+    bool seek(off_t offset);
     
-    // Upload a stream into a sandbox
+    /// \bried Upload a file into a sandbox.
+    ///		The sandbox is an area where uploaded files can get
+    ///		written to safely. For SWF content, the file name also
+    ///		includes a few optional paths used to seperate
+    ///		applications from each other.
+    ///
+    /// @param filespec The file name for the data to be written.
+    ///
+    /// @return True if the file was uploaded sucessfully, false if not.
     bool upload(const std::string &filespec);
     
     // Stream a single "real-time" source.
@@ -85,13 +145,34 @@ public:
 
     /// \brief Load a chunk of the file into memory
     ///		This offset must be a multipe of the pagesize.
+    ///
+    /// @param size The location in bytes in the file of the desired data.
+    ///
+    /// @return A real pointer to the location of the data at the
+    ///		location pointed to by the offset.
     boost::uint8_t *loadChunk(off_t size);
     boost::uint8_t *loadChunk() { return loadChunk(_offset); };
 
+    /// \brief Get the memory page size
+    ///		This is a cached value of the system configuration
+    ///		value for the default size in bytes of a memory page.
+    ///
+    /// @return the currently cached memory page size.
     size_t getPagesize() { return _pagesize; };
+    
+    /// \brief Set the memory page size
+    ///		This is a cached value of the system configuration
+    ///		value for the default size in bytes of a memory page.
+    ///
+    /// @param size The size of a page of memory to cache.
+    ///
+    /// @return nothing.
     void setPagesize(size_t size) { _pagesize = size; };
     
-    void dump();
+    ///  \brief Dump the internal data of this class in a human readable form.
+    ///
+    /// @remarks This should only be used for debugging purposes.
+     void dump();
 //    friend std::ostream& operator<< (std::ostream &os, const DiskStream &ds);
 
     boost::uint8_t *get() { return _dataptr; };
