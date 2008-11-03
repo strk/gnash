@@ -210,13 +210,6 @@ Player::init_gui()
     if ( _doRender )
     {
         _gui = getGui(); 
-
-        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-        if ( rcfile.startStopped() )
-        {
-            _gui->stop();
-        }
-
     }
     else
     {
@@ -422,6 +415,18 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
 
     _gui->setStage(&root);
+
+    // When startStopped is true, stop here after the stage has been 
+    // registered, but before the movie has started. Initial loading
+    // and VM initialization have been done by this stage, but not
+    // the complete parsing of the SWF. This is important because
+    // the Gui accesses movie_root to get the sound_handler, but
+    // also because the 
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    if ( rcfile.startStopped() )
+    {
+        _gui->stop();
+    }
 
     // Start loader thread
     // NOTE: the loader thread might (in IMPORT tag parsing)

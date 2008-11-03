@@ -226,7 +226,7 @@ GtkGui::init(int argc, char **argv[])
 
     // The first time stop() was called, stopHook() might not have had a chance
     // to do anything, because GTK+ wasn't garanteed to be initialised.
-    if (isStopped()) stopHook();
+    //if (isStopped()) stopHook();
 
     return true;
 }

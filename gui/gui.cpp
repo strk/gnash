@@ -444,19 +444,15 @@ Gui::menu_jump_backward()
 void
 Gui::toggleSound()
 {
-
+    assert (_stage);
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!
     sound::sound_handler* s = _stage->runInfo().soundHandler();
 
-    if (!s)
-       return;
+    if (!s) return;
 
-    if (s->is_muted()) {
-       s->unmute();
-    } else {
-       s->mute();
-    }
+    if (s->is_muted()) s->unmute();
+    else s->mute();
 }
 
 
@@ -838,6 +834,7 @@ Gui::play()
     if ( ! _started ) start();
     else
     {
+        assert (_stage);
         // @todo since we registered the sound handler, shouldn't we know
         //       already what it is ?!
         sound::sound_handler* s = _stage->runInfo().soundHandler();
@@ -850,6 +847,9 @@ Gui::play()
 void
 Gui::stop()
 {
+    // _stage must be registered before this is called.
+    assert(_stage);
+
     if ( _stopped ) return;
     if ( isFullscreen() ) unsetFullscreen();
 
