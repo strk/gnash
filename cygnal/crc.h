@@ -54,24 +54,43 @@ public:
     bool loadFiles();
     
     /// \brief Parse and load configuration file
+    ///
+    /// @param filespec The path and file name of the disk file to parse.
+    ///
+    /// @return True if the file was parsed sucessfully, false if not.
     bool parseFile(const std::string& filespec);
-    
+
+    /// Accessors
+
+    /// \brief Get the port offset.
     int getPortOffset() { return _port_offset; };
+
+    // \brief Set the port offset
     void setPortOffset(int x) { _port_offset = x; };
 
+    /// \brief Get the number of file descriptors per thread.
     int getFDThread() { return _fdthread; };
+    /// \brief Set the number of file descriptors per thread.
     void setFDThread(int x) { _fdthread = x; };
 
+    /// \brief Get the special testing output option.
     bool getTestingFlag() { return _testing; };
+    /// \brief Set the special testing output option.
     void setTestingFlag(bool x) { _testing = x; };
-    
+
+    /// \brief Get the flag for whether to enable threading.
     bool getThreadingFlag() { return _threading; };
+    /// \brief Set the flag for whether to enable threading.
     void setThreadingFlag(bool x) { _threading = x; };
 
+    /// \brief Get the flag for whether to enable internal debugging messages.
     bool getNetDebugFlag() const { return _netdebug; }
+    /// \brief Set the flag for whether to enable internal debugging messages.
     void setNetDebugFlag(bool x) { _netdebug = x; }    
 
+    /// \brief Get the flag for whether to enable the administration thread.
     bool getAdminFlag() const { return _admin; }
+    /// \brief Set the  flag for whether to enable the administration thread.
     void setAdminFlag(bool x) { _admin = x; }
 
     ///  \brief Dump the internal data of this class in a human readable form.
