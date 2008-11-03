@@ -175,7 +175,20 @@ test()
             runtest.fail("loadChunk(6789)");
         }
     }
-    
+
+    // test seeking in data files.
+    ptr = ds.seek(5100);
+    if ((ds.get() == MAP_FAILED) || (ds.get() == 0)) {
+        runtest.unresolved("seek(5100)");
+    } else {
+        if ((memcmp(ds.get(), buf+4, range-4) == 0)
+            && (memcmp(ptr, buf+78, range-78) == 0)
+            && (dsptr == ds.get())) {
+            runtest.pass("seek(5100)");
+        } else {
+            runtest.fail("seek(5100)");
+        }
+    }
 //    ds.dump();
 
     delete[] buf;
@@ -203,7 +216,8 @@ create_file(const std::string &filespec, size_t size)
     for (int j=0; j<range; j++) {
         buf[j] = '!' + j;
     }
-    
+
+    // Write the false data to disk
     int total = 0;
     int ret = 0;
     for (size_t i=0; i<size; i+=range) {
@@ -215,6 +229,7 @@ create_file(const std::string &filespec, size_t size)
         total += ret;
      }
 
+    // cleanup
     delete[] buf;
     close(fd);
 }
