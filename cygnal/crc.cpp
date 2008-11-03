@@ -44,8 +44,11 @@
 using namespace std;
 using namespace gnash;
 
+/// \namespace cygnal
+///	This namespace is for all the Cygnal specific classes.
 namespace cygnal {
 
+/// \brief Return the default instance of RC file,
 CRcInitFile&
 CRcInitFile::getDefaultInstance()
 {
@@ -73,7 +76,12 @@ CRcInitFile::~CRcInitFile()
 //    GNASH_REPORT_FUNCTION;    
 }
 
-// Look for a config file in the likely places.
+/// \brief Load all the configuration files.
+///	This includes parsing the default .gnashrc file for
+///	Gnash settings that control the swf parser and virtual
+///	machine. These setting can be overridden in the
+///	.cygnalrc file, plus the Cygnal specific file has
+///	options only used by Cygnal.
 bool
 CRcInitFile::loadFiles()
 {
@@ -105,8 +113,11 @@ CRcInitFile::loadFiles()
     return false;
 }
 
-
-// Parse the config file and set the variables.
+/// \brief Parse and load configuration file
+///
+/// @param filespec The path and file name of the disk file to parse.
+///
+/// @return True if the file was parsed sucessfully, false if not.
 bool
 CRcInitFile::parseFile(const std::string& filespec)
 {
@@ -219,6 +230,8 @@ CRcInitFile::parseFile(const std::string& filespec)
     return true;
 }
 
+/// \brief Dump the internal data of this class in a human readable form.
+/// @remarks This should only be used for debugging purposes.
 void
 CRcInitFile::dump(std::ostream& os) const
 {
