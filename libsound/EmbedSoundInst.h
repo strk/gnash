@@ -93,6 +93,9 @@ public:
     // See dox in sound_handler.h (InputStream)
     unsigned int samplesFetched() const;
 
+    // See dox in sound_handler.h (InputStream)
+    bool eof() const;
+
 private:
 
     /// Current decoding position in the encoded stream
@@ -220,7 +223,7 @@ private:
 
     /// Return number of already-decoded samples available
     /// from playback position on
-    unsigned int decodedSamplesAhead()
+    unsigned int decodedSamplesAhead() const
     {
         unsigned int bytesAhead = decodedDataSize() - playbackPosition;
         assert(!(bytesAhead%2));

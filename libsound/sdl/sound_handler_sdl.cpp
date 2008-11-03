@@ -856,9 +856,12 @@ SDL_sound_handler::mixSoundData(EmbedSound& sounddata, Uint8* buffer, unsigned i
 		// Temp variables to make the code simpler and easier to read
 		InputStream& sound = *(*i); 
 
-		unsigned int mixed = mixIn(sound, buffer, nSamples);
-		if ( mixed < nSamples )
+		/* unsigned int mixed = */ mixIn(sound, buffer, nSamples);
+		if ( sound.eof() ) // unplug an InputStream run out of data
 		{
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+            log_debug("Instance of sound reached eof, unplugging");
+#endif
 		    // Sound is done, remove it from the active list
 
             // WARNING: can't use 'sound' anymore from now on!

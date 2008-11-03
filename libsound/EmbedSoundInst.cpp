@@ -391,6 +391,14 @@ EmbedSoundInst::applyEnvelopes(boost::int16_t* samples, unsigned int nSamples,
     }
 }
 
+bool
+EmbedSoundInst::eof() const
+{
+    // it isn't threaded, but just in case, we call decodingCompleted first
+    // and we also check loopCount... (over paranoid?)
+    return ( decodingCompleted() && !loopCount && !decodedSamplesAhead() );
+}
+
 } // gnash.sound namespace 
 } // namespace gnash
 

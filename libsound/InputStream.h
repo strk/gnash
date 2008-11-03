@@ -47,7 +47,7 @@ class InputStream {
 
 public:
 
-    /// Fetch the given amount of samples
+    /// Fetch the given amount of samples, non-blocking and thread-safe.
     //
     /// @param to
     ///     Output buffer, must be at least nSamples*bytes.
@@ -59,9 +59,9 @@ public:
     ///     of 2, being each couple composed by a sample for the left
     ///     channel and a sample for the right channel, in that order.
     /// 
-    /// @return number of samples actually sent to the output buffer.
-    ///          if < nSamples this InputStream is out of data, and can be
-    ///          unplugged.
+    /// @return number of samples actually written to the output buffer.
+    ///         If < nSamples this InputStream ran out of data, either
+    ///         temporarly or permanently. Use eof() to tell.
     ///
     /// @throws a SoundException (to be better defined a set of them)
     ///     if unable to process this and further requests due to internal
@@ -77,6 +77,9 @@ public:
     /// in that order.
     ///
     virtual unsigned int samplesFetched() const=0;
+
+    /// Return true if there'll be no more data to fetch.
+    virtual bool eof() const=0;
 
     virtual ~InputStream() {}
 
