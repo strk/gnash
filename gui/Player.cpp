@@ -420,8 +420,8 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // registered, but before the movie has started. Initial loading
     // and VM initialization have been done by this stage, but not
     // the complete parsing of the SWF. This is important because
-    // the Gui accesses movie_root to get the sound_handler, but
-    // also because the 
+    // the Gui accesses movie_root to get the sound_handler, but also
+    // because the gui window should be properly set up by this point.
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     if ( rcfile.startStopped() )
     {
