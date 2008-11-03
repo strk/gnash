@@ -58,7 +58,10 @@ CRcInitFile::getDefaultInstance()
 CRcInitFile::CRcInitFile()
     : _port_offset(0),
       _testing(false),
-      _threading(false)
+      _threading(false),
+      _fdthread(100),
+      _netdebug(false),
+      _admin(false)
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
@@ -174,6 +177,8 @@ CRcInitFile::parseFile(const std::string& filespec)
 
             bool test;
             bool threads;
+	    bool netdebug;
+	    bool admin;
             uint32_t num;
 
             // Get the standard options inherited froom Gnash's config file
@@ -183,12 +188,20 @@ CRcInitFile::parseFile(const std::string& filespec)
                 useActionDump(test);
             else if ( extractNumber(num, "verbosity", variable, value) )
                 verbosityLevel(num);
+
             // Get the options specific to Cygnal's config file.
+            else if ( extractSetting(admin, "admin", variable, value) )
+                setAdminFlag(admin);
+            else if ( extractSetting(netdebug, "netdebug", variable, value) )
+                setNetDebugFlag(netdebug);
             else if ( extractSetting(test, "testing", variable, value) )
                 setTestingFlag(test);
             else if ( extractSetting(threads, "threading", variable, value) )
                 setThreadingFlag(threads);
-            else extractNumber((uint32_t&)_port_offset, "portOffset", variable, value);
+	    else if (extractNumber(num, "fdThread", variable, value) )
+		setFDThread(num);
+            else if (extractNumber(num, "portOffset", variable, value) )
+		setPortOffset(num);;
 
         } while (!in.eof());
 

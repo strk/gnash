@@ -34,7 +34,7 @@
 /// This namespace is for all the Cygnal specific classes not used by
 /// anything else in Gnash.
 namespace cygnal {
-
+    
 /// \class cygnal::CRcInitFile
 ///	This class handles reading values from the Cygnal
 ///	configuration file, .cygnalrc, and into a form we can use in
@@ -52,35 +52,75 @@ public:
     ///		.cygnalrc file, plus the Cygnal specific file has
     ///		options only used by Cygnal.
     bool loadFiles();
-
+    
     /// \brief Parse and load configuration file
     bool parseFile(const std::string& filespec);
-
+    
     int getPortOffset() { return _port_offset; };
     void setPortOffset(int x) { _port_offset = x; };
 
-    int getTestingFlag() { return _testing; };
+    int getFDThread() { return _fdthread; };
+    void setFDThread(int x) { _fdthread = x; };
+
+    bool getTestingFlag() { return _testing; };
     void setTestingFlag(bool x) { _testing = x; };
     
-    int getThreadingFlag() { return _threading; };
+    bool getThreadingFlag() { return _threading; };
     void setThreadingFlag(bool x) { _threading = x; };
-    
+
+    bool getNetDebugFlag() const { return _netdebug; }
+    void setNetDebugFlag(bool x) { _netdebug = x; }    
+
+    bool getAdminFlag() const { return _admin; }
+    void setAdminFlag(bool x) { _admin = x; }
+
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
-
+    
     /// \overload dump(std::ostream& os) const
     void dump(std::ostream& os) const;
-
-private:
+    
+  private:
     /// Construct only by getDefaultInstance()
     CRcInitFile();
     /// Never destroy (TODO: add a destroyDefaultInstance)
     ~CRcInitFile();
-
+    
+    /// \var _port_offset
+    ///		This is an offset applied to all priviledged tcp/ip
+    ///		ports. This enables the port number to be shifted into
+    ///		the unpriviledged range (anything about 1024) so one
+    ///		doesn't have to be root.
     int _port_offset;
+
+    /// \var _testing
+    ///		Turn on special output format to support Gnash
+    ///		testing.
     bool _testing;
+
+    /// \var _threading
+    ///		Disable threading in the server I/O as much as
+    ///		possible to make debugging easier. This is to only be
+    ///		used by developers
     bool _threading;
+
+    /// \var _fdthread
+    ///		The number of file descriptors to be watched by each
+    ///		dispatch thread. When threading is disabled, this is
+    ///		also disabled, as all the file descriptors are watched
+    ///		by one one thread as an aid to debugging.
+    size_t _fdthread;
+    
+    /// \var _netdebug
+    ///	Toggles very verbose debugging info from the network Network
+    ///	class.
+    bool _netdebug;
+
+    /// \var _admin
+    ///		This toggles whether the admin thread is started or
+    ///		not, also to reduce complecity when debugging.
+    bool _admin;
 };
 
 /// \brief Dump to the specified output stream.

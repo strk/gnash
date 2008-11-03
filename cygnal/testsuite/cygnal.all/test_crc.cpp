@@ -97,6 +97,30 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("getPortOffset");
     }
 
+    if (crc.getAdminFlag() == false) {
+        runtest.pass ("getAdminFlag");
+    } else {
+        runtest.fail ("getAdminFlag");
+    }
+
+    if (crc.getTestingFlag() == false) {
+        runtest.pass ("getTestingFlag");
+    } else {
+        runtest.fail ("getTestingFlag");
+    }
+
+    if (crc.getNetDebugFlag() == false) {
+        runtest.pass ("getNetDebugFlag");
+    } else {
+        runtest.fail ("getNetDebugFlag");
+    }
+
+    if (crc.getFDThread() == 10) {
+        runtest.pass ("getFDThread");
+    } else {
+        runtest.fail ("getFDThread");
+    }
+
     crc.dump();
 }
 
