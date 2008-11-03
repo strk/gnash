@@ -122,10 +122,10 @@ public:
     /// @param the offset in bytes to the location within the file to
     ///		seek to.
     ///
-    /// @return True if the stream was paused sucessfully, false if not.
+    /// @return A real pointer to the location of the data seeked to.
     boost::uint8_t * seek(off_t offset);
     
-    /// \bried Upload a file into a sandbox.
+    /// \brief Upload a file into a sandbox.
     ///		The sandbox is an area where uploaded files can get
     ///		written to safely. For SWF content, the file name also
     ///		includes a few optional paths used to seperate
