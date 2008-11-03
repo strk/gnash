@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,10 +22,6 @@
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
-
-//#ifdef HAVE_AIO_H
-//#include <aio.h>
-//#endif
 
 #include <string>
 #include <iostream> 
@@ -127,7 +123,7 @@ public:
     ///		seek to.
     ///
     /// @return True if the stream was paused sucessfully, false if not.
-    bool seek(off_t offset);
+    boost::uint8_t * seek(off_t offset);
     
     /// \bried Upload a file into a sandbox.
     ///		The sandbox is an area where uploaded files can get
@@ -175,26 +171,59 @@ public:
      void dump();
 //    friend std::ostream& operator<< (std::ostream &os, const DiskStream &ds);
 
+    /// \brief Get the base address for the memory page.
+    ///
+    /// @return A real pointer to the base address.
     boost::uint8_t *get() { return _dataptr; };
+    
 private:
+    /// \var DiskStream::_state
+    ///		The current status of the stream while streaming.
     state_e     _state;
     int         _bytes;
+    
+    /// \var DiskStream::_filefd
+    ///		The file descriptor of the disk file.
     int         _filefd;
+    
+    /// \var DiskStream::_netfd
+    ///		The file descriptor of the network connection.
     int         _netfd;
+
+    /// \var DiskStream::_filespec
+    ///		The path and file name of the disk file to stream.
     std::string _filespec;
+
+    /// \var DiskStream::_statistics
+    ///		The data structure for collecting statistical
+    ///		information.
     gnash::Statistics  _statistics;
+
+    /// \var DiskStream::_dataptr
+    ///		The base address of the memory page.
     boost::uint8_t *_dataptr;
+
+    /// \var DiskStream::_seekptr
+    ///		The current location within the current memory page.
     boost::uint8_t *_seekptr;
+
+    /// \var DiskStream::_filesize
+    ///		The size of the disk file to stream.
     size_t	_filesize;
+
+    /// \var DiskStream::_pagesize
+    ///		The memory page size.
     size_t	_pagesize;
+
+    /// \var DiskStream::_offset
+    ///		The offset within the file of the current memory
+    ///		page.
     off_t	_offset;
-//    struct aiocb _aio_control_block;
+    
     gnash::CQue _que;
 };
  
 } // end of cygnal namespace
-
-//#endif	// HAVE_AIO_H
 
 #endif // __DISKSTREAM_H__
 
