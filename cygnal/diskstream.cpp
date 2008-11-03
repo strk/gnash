@@ -94,7 +94,8 @@ DiskStream::DiskStream(const string &str, int netfd)
     _filespec = str;
 }
 
-DiskStream::~DiskStream() {
+DiskStream::~DiskStream()
+{
 //    GNASH_REPORT_FUNCTION;
     if (_filefd) {
         ::close(_filefd);
@@ -226,7 +227,8 @@ DiskStream::loadChunk(off_t offset)
 }
 
 bool
-DiskStream::open(const string &filespec) {
+DiskStream::open(const string &filespec)
+{
 //    GNASH_REPORT_FUNCTION;
     
     return open(filespec, _netfd);
@@ -243,7 +245,8 @@ DiskStream::open(const string &filespec, int /*netfd*/)
 }
 
 bool
-DiskStream::open(const string &filespec, int netfd, Statistics &statistics) {
+DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
+{
 //    GNASH_REPORT_FUNCTION;
 
     struct stat st;
@@ -282,19 +285,23 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics) {
 
 // Stream the file
 bool
-DiskStream::play() {
+DiskStream::play()
+{
 //    GNASH_REPORT_FUNCTION;
 
     return play(_netfd);
 }
 
 bool
-DiskStream::play(int netfd) {
+DiskStream::play(int netfd)
+{
 //    GNASH_REPORT_FUNCTION;
 
     _netfd = netfd;
     _state = PLAY;
 
+    log_unimpl("%s", __PRETTY_FUNCTION__);
+    
     while (_state != DONE) {
         switch (_state) {
           case PLAY:
@@ -342,55 +349,65 @@ DiskStream::play(int netfd) {
 
 // Stream a preview, instead of the full movie.
 bool
-DiskStream::preview(const string & /*filespec*/, int /*frames*/) {
+DiskStream::preview(const string & /*filespec*/, int /*frames*/)
+{
 //    GNASH_REPORT_FUNCTION;
 
     _state = PREVIEW;
+    log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true    
 }
 
 // Stream a series of thumbnails
 bool
-DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/) {
+DiskStream::thumbnail(const string & /*filespec*/, int /*quantity*/)
+{
 //    GNASH_REPORT_FUNCTION;
     
     _state = THUMBNAIL;
+    log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true
 }
 
 // Pause the stream
 bool
-DiskStream::pause() {
+DiskStream::pause()
+{
 //    GNASH_REPORT_FUNCTION;
     
     _state = PAUSE;
+    log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true
 }
 
 // Seek within the stream
-bool
-DiskStream::seek(off_t offset) {
+boost::uint8_t *
+DiskStream::seek(off_t offset)
+{
 //    GNASH_REPORT_FUNCTION;
     
     _state = SEEK;
-    loadChunk(offset);
-    return true; // Default to true    
+    return loadChunk(offset);    
 }
 
 // Upload a stream into a sandbox
 bool
-DiskStream::upload(const string & /*filespec*/) {
+DiskStream::upload(const string & /*filespec*/)
+{
 //    GNASH_REPORT_FUNCTION;
     
     _state = UPLOAD;
+    log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true
 }
 
 // Stream a single "real-time" source.
-bool DiskStream::multicast(const string & /*filespec*/) {
+bool DiskStream::multicast(const string & /*filespec*/)
+{
 //    GNASH_REPORT_FUNCTION;
     
     _state = MULTICAST;
+    log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true    
 }
 
