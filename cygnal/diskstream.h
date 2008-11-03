@@ -24,9 +24,11 @@
 #endif
 
 //#ifdef HAVE_AIO_H
+//#include <aio.h>
+//#endif
 
-#include <aio.h>
 #include <string>
+#include <iostream> 
 
 #include "cque.h"
 #include "statistics.h"
@@ -51,6 +53,9 @@ public:
     DiskStream(const std::string &filespec);
     DiskStream(const std::string &filespec, int netfd);
     ~DiskStream();
+
+    /// \brief close the open disk file and stream.
+    void close();
     
     bool open(const std::string &filespec);
     bool open(const std::string &filespec, int netfd);
@@ -78,10 +83,18 @@ public:
     // Stream a single "real-time" source.
     bool multicast(const std::string &filespec);
 
-    // Load a chunk of the file into memory
-    size_t loadChunk(size_t size);
-    size_t loadChunk() { return loadChunk(_chunksize); };
+    /// \brief Load a chunk of the file into memory
+    ///		This offset must be a multipe of the pagesize.
+    boost::uint8_t *loadChunk(off_t size);
+    boost::uint8_t *loadChunk() { return loadChunk(_offset); };
+
+    size_t getPagesize() { return _pagesize; };
+    void setPagesize(size_t size) { _pagesize = size; };
     
+    void dump();
+//    friend std::ostream& operator<< (std::ostream &os, const DiskStream &ds);
+
+    boost::uint8_t *get() { return _dataptr; };
 private:
     state_e     _state;
     int         _bytes;
@@ -89,11 +102,12 @@ private:
     int         _netfd;
     std::string _filespec;
     gnash::Statistics  _statistics;
-//     unsigned char *_dataptr;
-//     unsigned char *_seekptr;
+    boost::uint8_t *_dataptr;
+    boost::uint8_t *_seekptr;
     size_t	_filesize;
-    size_t	_chunksize;
-    struct aiocb _aio_control_block;
+    size_t	_pagesize;
+    off_t	_offset;
+//    struct aiocb _aio_control_block;
     gnash::CQue _que;
 };
  

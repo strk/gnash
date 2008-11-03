@@ -48,12 +48,21 @@ using namespace std;
 
 namespace cygnal {
 
+/// \def _SC_PAGESIZE
+///	This isn't set on all systems, but is used to get the page
+///	size used for memory allocations.
+#ifndef _SC_PAGESIZE
+#define _SC_PAGESIZE 8
+#endif
+
 DiskStream::DiskStream()
     : _bytes(0),
       _filefd(0),
       _netfd(0),
+      _dataptr(0),
       _filesize(0),
-      _chunksize(0)
+      _pagesize(0),
+      _offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -62,8 +71,10 @@ DiskStream::DiskStream(const string &str)
     : _bytes(0),
       _filefd(0),
       _netfd(0),
+      _dataptr(0),
       _filesize(0),
-      _chunksize(0)
+      _pagesize(0),
+      _offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
     _filespec = str;
@@ -73,52 +84,126 @@ DiskStream::DiskStream(const string &str, int netfd)
     : _bytes(0),
       _filefd(0),
       _filespec(0),
+      _dataptr(0),
       _filesize(0),
-      _chunksize(0)
+      _pagesize(0),
+      _offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
     _netfd = netfd;
     _filespec = str;
 }
 
-#if 0
+DiskStream::~DiskStream() {
+//    GNASH_REPORT_FUNCTION;
+    if (_filefd) {
+        ::close(_filefd);
+    }
+    if (_netfd) {
+	::close(_netfd);
+    }
+}
 
-// Load a chunk of the file into memory
-size_t
-DiskStream::loadChunk(size_t size)
+    /// \brief close the open disk file and stream.
+void
+DiskStream::close()
+{
+//    GNASH_REPORT_FUNCTION;
+    _filesize = 0;
+    _offset = 0;
+    if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
+	munmap(_dataptr, _pagesize);
+    }
+    _dataptr = 0;
+    _filespec.clear();
+}
+
+void
+DiskStream::dump()
+{
+//    GNASH_REPORT_FUNCTION;
+    //state_e     _state;
+    cerr << "Bytes read is is " << _bytes << endl;
+    cerr << "Disk file descriptor is " << _filefd << endl;
+    cerr << "Network file descritor is " << _netfd << endl;
+    cerr << "Filespec is " << _filespec << endl;
+//    gnash::Statistics  _statistics;
+//     unsigned char *_dataptr;
+//     unsigned char *_seekptr;
+    cerr << "File size is " <<  _filesize << endl;
+    cerr << "Memory Page size is " << _pagesize << endl;
+
+    _que.dump();
+}
+
+/// \brief Load a chunk (pagesize) of the file into memory.
+///	This loads a pagesize of the disk file into memory. We read
+///	the file this way as it is faster and takes less resources
+///	than read(), which add buffering we don't need.
+///
+boost::uint8_t *
+DiskStream::loadChunk(off_t offset)
 {
 //    GNASH_REPORT_FUNCTION;
 
-#ifdef HAVE_SYSCONF
-    long pageSize = sysconf(_SC_PAGESIZE);
-    if (size % pageSize) {
-        size += pageSize - size % pageSize;
-//      log_debug("Adjusting segment size to %d to be page aligned.\n", _size);
+    /// If the data pointer is left from a failed mmap, don't do
+    /// anything.
+    if (_dataptr ==  MAP_FAILED) {
+	log_error("Bad pointer to memory for file %s!", _filespec);
+	return 0;
     }
-#endif
 
-#if 1
+    /// We only map pages of pagesize, so if the offset is smaller
+    /// than that, don't use it.
+    if (static_cast<size_t>(offset) < _pagesize) {
+	_offset = 0;
+//	log_debug("Loading first segment");
+    } else {
+	if (offset % _pagesize) {
+	    // calculate the number of pages
+	    int pages = ((offset - (offset % _pagesize)) / _pagesize);
+	    _offset = pages * _pagesize;
+// 	    log_debug("Adjusting offset from %d to %d so it's page aligned.",
+// 		      offset, _offset);
+	}
+    }
     
     if (_filefd) {
-	_dataptr = static_cast<unsigned char *>(mmap(0, _chunksize,
-						     PROT_READ, MAP_SHARED, _filefd, 0));
+    /// If the data pointer is legit, then we need to unmap that page
+    /// to mmap() a new one. If we're still in the current mapped
+    /// page, then just return the existing data pointer.
+    if (_dataptr != 0) {
+	// If the offset is less than what we already mmapped, we
+	boost::uint32_t diff = reinterpret_cast<boost::uint32_t>(_dataptr + _offset);
+	if (diff < _pagesize) {
+	    return _dataptr + _offset;
+	    // unmap the old data before allocating a new chunk
+	} else {
+	    munmap(_dataptr, _pagesize);
+	    _dataptr = 0;
+	}
+    }
+
+	_dataptr = static_cast<unsigned char *>(mmap(0, _pagesize,
+					PROT_READ, MAP_SHARED, _filefd, _offset));
+	offset = (offset % _pagesize);
     } else {
-	log_error (_("Couldn't load file %s"), filespec);
-	return false;
+	log_error (_("Couldn't load file %s"), _filespec);
+	return 0;
     }
     
-    if (_seekptr == MAP_FAILED) {
+    if (_dataptr == MAP_FAILED) {
 	log_error (_("Couldn't map file %s into memory: %s"),
-		   filespec, strerror(errno));
-	return false;
-    } else {	    
-	log_debug (_("File %s mapped to: %p"), filespec,
-		   (void *)_dataptr);
-	_seekptr = _dataptr;
+		   _filespec, strerror(errno));
+	return 0;
+    } else {
+//	log_debug (_("File %s mapped to: %p"), _filespec, (void *)_dataptr);
+	_seekptr = _dataptr + offset;
 	_state = OPEN;
-	return true;
     }
-#else
+    
+    return _seekptr;
+#if 0
     do {
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
 	ret = read(filefd, buf->reference(), buf->size());
@@ -140,16 +225,6 @@ DiskStream::loadChunk(size_t size)
 #endif
 }
 
-DiskStream::~DiskStream() {
-//    GNASH_REPORT_FUNCTION;
-    if (_filefd) {
-        close(_filefd);
-    }
-    if (_netfd) {
-	::close(_netfd);
-    }
-}
-
 bool
 DiskStream::open(const string &filespec) {
 //    GNASH_REPORT_FUNCTION;
@@ -169,15 +244,16 @@ DiskStream::open(const string &filespec, int /*netfd*/)
 
 bool
 DiskStream::open(const string &filespec, int netfd, Statistics &statistics) {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct stat st;
     
     _netfd = netfd;
     _statistics = statistics;
+    _filespec = filespec;
 
     log_debug("Trying to open %s", filespec);
-
+    
     if (stat(filespec.c_str(), &st) == 0) {
 	_filesize = st.st_size;
 	boost::mutex::scoped_lock lock(io_mutex);
@@ -187,9 +263,24 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics) {
     } else {
 	log_error (_("File %s doesn't exist"), filespec);
     }
+
+    /// \brief get the pagesize and cache the value
+#ifdef HAVE_SYSCONF
+    _pagesize = sysconf(_SC_PAGESIZE);
+#else
+#error "Need to define the memory page size without sysconf()!"
+#endif
+
+//     // The pagesize is how much of the file to load. As all memory is
+//     // only mapped in multiples of pages, we use that for the default size.
+//     if (_pagesize == 0) {
+// 	_pagesize = pageSize;
+//     }
     
     return true;
 }
+
+#if 0
 
 // Stream the file
 bool
