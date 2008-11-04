@@ -499,13 +499,15 @@ SDL_sound_handler::unmute()
 	muted = false;
 }
 
-bool SDL_sound_handler::is_muted()
+bool
+SDL_sound_handler::is_muted()
 {
 	boost::mutex::scoped_lock lock(_mutex);
 	return muted;
 }
 
-void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
+void
+SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 	assert(owner);
@@ -538,7 +540,8 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 }
 
-void	SDL_sound_handler::detach_aux_streamer(void* owner)
+void
+SDL_sound_handler::detach_aux_streamer(void* owner)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -552,7 +555,8 @@ void	SDL_sound_handler::detach_aux_streamer(void* owner)
 	}
 }
 
-unsigned int SDL_sound_handler::get_duration(int sound_handle)
+unsigned int
+SDL_sound_handler::get_duration(int sound_handle)
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
@@ -683,7 +687,8 @@ do_mixing(Uint8* mixTo, InputStream& sound, unsigned int nSamples, unsigned int 
 
 
 // write a wave header, using the current audioSpec settings
-void SDL_sound_handler::write_wave_header(std::ofstream& outfile)
+void
+SDL_sound_handler::write_wave_header(std::ofstream& outfile)
 {
  
   // allocate wav header
@@ -740,40 +745,52 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
 
 	// Mixed sounddata buffer
 	Uint8* buffer = stream;
-	memset(buffer, 0, buffer_length);
+	std::fill(buffer, buffer+buffer_length, 0);
 
 	// call NetStream or Sound audio callbacks
 	if ( !m_aux_streamer.empty() )
 	{
-		boost::scoped_array<boost::uint8_t> buf ( new boost::uint8_t[buffer_length] );
+		assert(!(buffer_length%2));
+		unsigned int nSamples = buffer_length/2;
+		boost::scoped_array<boost::int16_t> buf ( new boost::int16_t[nSamples] );
 
 		// Loop through the attached sounds
 		CallbacksMap::iterator it = m_aux_streamer.begin();
 		CallbacksMap::iterator end = m_aux_streamer.end();
-		while (it != end) {
-			memset(buf.get(), 0, buffer_length);
-
+		while (it != end)
+		{
 			SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; 
 			void* owner = it->first;
 
-			// If false is returned the sound doesn't want to be attached anymore
-			bool ret = (aux_streamer)(owner, buf.get(), buffer_length);
-			if (!ret) {
+			bool atEOF=false;
+			unsigned int wrote = (aux_streamer)(owner, buf.get(), nSamples, atEOF);
+			if ( wrote < nSamples )
+			{
+				// fill what wasn't written
+				std::fill(buf.get()+wrote, buf.get()+nSamples, 0);
+			}
+
+			// On EOF, detach
+			if (atEOF)
+            		{
+				// InputStream EOF, detach
 				CallbacksMap::iterator it2=it;
 				++it2; // before we erase it
-				m_aux_streamer.erase(it); // FIXME: isn't this terribly wrong ?
+				m_aux_streamer.erase(it);
 				it = it2;
 				// Decrement callback clients count 
 				soundsPlaying--;
-			} else {
+			}
+			else
+			{
 				++it;
 			}
-			SDL_MixAudio(stream, buf.get(), buffer_length, finalVolume);
+			SDL_MixAudio(stream, reinterpret_cast<Uint8*>(buf.get()), buffer_length, finalVolume);
 
 		}
 	}
 
-    const SDL_sound_handler::Sounds& soundData = _sounds;
+	const SDL_sound_handler::Sounds& soundData = _sounds;
 
 	// Run through all the sounds. TODO: don't call .size() at every iteration !
 	for (SDL_sound_handler::Sounds::const_iterator i = soundData.begin(),
@@ -787,17 +804,18 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
 	// 
 	// WRITE CONTENTS OF stream TO FILE
 	//
-	if (file_stream) {
+	if (file_stream)
+    {
             file_stream.write((char*) stream, buffer_length);
             // now, mute all audio
-            memset ((void*) stream, 0, buffer_length);
+            std::fill(stream, stream+buffer_length, 0);
 	}
 
 	// Now, after having "consumed" all sounds, blank out
 	// the buffer if muted..
 	if ( muted )
 	{
-		memset ((void*) stream, 0, buffer_length);
+        std::fill(stream, stream+buffer_length, 0);
 	}
 }
 

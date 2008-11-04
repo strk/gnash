@@ -79,10 +79,7 @@ class DSOEXPORT sound_handler
 public:
 
 	/// @see attach_aux_streamer
-	/// @todo change third parameter type to unsigned
-	/// @todo change second parameter type to boost::uint16_t*
-	/// @todo actually, drop this in favor of a SoundInputChannel !
-	typedef bool (*aux_streamer_ptr)(void *udata, boost::uint8_t* stream, int len);
+	typedef unsigned int (*aux_streamer_ptr)(void *udata, boost::int16_t* samples, unsigned int nSamples, bool& eof);
 
 	// If stereo is true, samples are interleaved w/ left sample first.
 	
@@ -267,8 +264,8 @@ public:
 	/// gnash calls this to unpause audio
 	bool isPaused() const { return _paused; }
 
-    /// Plug an external InputStream into the mixer
-    //
+	/// Plug an external InputStream into the mixer
+	//
 	/// This is called by AS classes NetStream or Sound to attach callback, so
 	/// that audio from the classes will be played through the soundhandler.
 	///
@@ -276,28 +273,30 @@ public:
 	/// streamers to fetch decoded audio data to mix and send to the output channel.
 	///
 	/// The "aux streamer" will be called with the 'udata' pointer as first argument,
-	/// then will be passed a buffer pointer as second argument and it's length
-	/// as third. The callbacks should fill the given buffer if possible.
-	/// The callback should return true if wants to remain attached, false if wants
-	/// to be detached. 
+	/// then will be passed a pointer to buffer of samples as second argument and the 
+	///  number of samples to fetch as third.
+	///
+	/// The callbacks should fill the given buffer if possible, and return the number
+	/// of samples actually fetched and an eof flag (last argument).
+	/// The callback will be detached if it sets the 'eof' output parameter to true.
 	///
 	/// @param ptr
-	///	The pointer to the callback function
+	///	    The pointer to the callback function
 	///
 	/// @param udata
-	///	User data pointer, passed as first argument to the registered callback.
+	///	    User data pointer, passed as first argument to the registered callback.
 	/// 	WARNING: this is currently also used to *identify* the callback for later
-	///	removal, see detach_aux_streamer. TODO: stop using the data pointer for 
-	///	identification purposes and use the callback pointer directly instead.
-    ///
-    /// @todo change to plugInputStream(InputStream* str),
-    ///       implement in base class
+	///	    removal, see detach_aux_streamer. TODO: stop using the data pointer for 
+	///	    identification purposes and use the callback pointer directly instead.
+	///
+	/// @todo change to plugInputStream(InputStream* str),
+	///       implement in base class
 	///
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* udata)
-    { ptr=ptr; /*unused*/ udata=udata; /*unused*/ } 
+	{ ptr=ptr; /*unused*/ udata=udata; /*unused*/ } 
 
-    /// Unplug an external InputStream from the mixer
-    //
+	/// Unplug an external InputStream from the mixer
+	//
 	/// This is called by AS classes NetStream or Sound to dettach callback, so
 	/// that audio from the classes no longer will be played through the 
 	/// soundhandler.
@@ -307,11 +306,11 @@ public:
 	/// 	WARNING: this need currently be the 'udata' pointer passed to attach_aux_streamer.
 	///	TODO: get the aux_streamer_ptr as key !!
 	///
-    /// @todo change to unplugInputStream(InputStream* str),
-    ///       implement in base class
+	/// @todo change to unplugInputStream(InputStream* str),
+	///       implement in base class
 	///
 	virtual void	detach_aux_streamer(void* udata)
-    { udata=udata; /*unused*/ } 
+	{ udata=udata; /*unused*/ } 
 
 	virtual ~sound_handler() {};
 	

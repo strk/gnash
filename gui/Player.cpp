@@ -159,11 +159,12 @@ Player::init_logfile()
 
 }
 
-bool
-Player::silentStream(void* /*udata*/, boost::uint8_t* stream, int len)
+unsigned int
+Player::silentStream(void* /*udata*/, boost::int16_t* stream, unsigned int len, bool& atEOF)
 {
-    memset((void*)stream, 0, len);
-    return true;
+    std::fill(stream, stream+len, 0);
+    atEOF=false;
+    return len;
 }
 
 void

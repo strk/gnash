@@ -178,11 +178,17 @@ private:
 	/// @param udata
 	///     Pointer to user-specific data
 	/// @param stream
-	///     Buffer into which method will put data
+	///     Buffer into which method will put samples
 	/// @param len
-	///     Requested amount of data to put
-	/// @return success
-	static bool silentStream(void* udata, boost::uint8_t* stream, int len);
+	///     Requested amount of samples to put
+	/// @param atEOF
+	///     Will always set to false, silent stream never ends ..
+    /// 
+	/// @return always the len parameter value (silent stream never ends 
+    ///         and is always available)
+    ///
+	static unsigned int silentStream(void* udata, boost::int16_t* stream,
+                unsigned int len, bool& atEOF);
         
 	void init_sound();
 

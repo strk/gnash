@@ -143,9 +143,10 @@ private:
 	boost::uint8_t* _leftOverPtr;
 	boost::uint32_t _leftOverSize;
 
-	static bool getAudioWrapper(void *owner, boost::uint8_t *stream, int len);
+	/// This is a sound_handler::aux_streamer_ptr type.
+	static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& etEOF);
 
-	bool getAudio(boost::uint8_t *stream, int len);
+	unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF);
 
 	// Are this sound attached to the soundhandler?
 	bool isAttached;

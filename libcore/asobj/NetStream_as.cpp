@@ -994,10 +994,14 @@ NetStream_as::startPlayback()
 }
 
 
-// audio callback is running in sound handler thread
-bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
+// audio callback, possibly running in a separate thread
+unsigned int
+NetStream_as::audio_streamer(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& eof)
 {
 	//GNASH_REPORT_FUNCTION;
+
+	boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
+	int len = nSamples*2;
 
 	NetStream_as* ns = static_cast<NetStream_as*>(owner);
 
@@ -1010,9 +1014,8 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 #endif
 
 
-	while (len > 0)
+	while (len)
 	{
-
 		if ( ns->_audioQueue.empty() )
 		{
 			break;
@@ -1020,8 +1023,10 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 
 		CursoredBuffer* samples = ns->_audioQueue.front();
 
+		assert( ! (samples->m_size%2) ); 
 		int n = std::min<int>(samples->m_size, len);
-		memcpy(stream, samples->m_ptr, n);
+		std::copy(samples->m_ptr, samples->m_ptr+n, stream);
+		//memcpy(stream, samples->m_ptr, n);
 		stream += n;
 		samples->m_ptr += n;
 		samples->m_size -= n;
@@ -1037,7 +1042,11 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 
 	}
 
-	return true;
+	assert( ! (len%2) ); 
+
+	// currently never signalling EOF
+	eof=false;
+	return nSamples-(len/2);
 }
 
 std::auto_ptr<GnashImage> 

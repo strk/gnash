@@ -452,9 +452,9 @@ public:
 	//
 	/// This is a sound_handler::aux_streamer_ptr type.
 	///
-	/// It will be invoked by a separate thread (neither main, nor decoder thread).
+	/// It might be invoked by a separate thread (neither main, nor decoder thread).
 	///
-	static bool audio_streamer(void *udata, boost::uint8_t *stream, int len);
+	static unsigned int audio_streamer(void *udata, boost::int16_t* samples, unsigned int nSamples, bool& eof);
 
 
 
@@ -462,7 +462,7 @@ public:
 
 private:
 
-    /// A memory buffer with a cursor state
+    /// A buffer with a cursor state
     class CursoredBuffer
     {
     public:
@@ -478,7 +478,7 @@ private:
             delete [] m_data;
         }
 
-        /// Number of bytes left in buffer starting from cursor
+        /// Number of samples left in buffer starting from cursor
         boost::uint32_t m_size;
 
         /// Actual data

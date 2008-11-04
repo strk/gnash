@@ -449,12 +449,15 @@ Sound::getPosition()
 }
 
 
-bool
-Sound::getAudio(boost::uint8_t* stream, int len)
+unsigned int
+Sound::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
 {
+	boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
+	int len = nSamples*2;
+
 	//GNASH_REPORT_FUNCTION;
 
-	while (len > 0)
+	while (len)
 	{
 		if ( ! _leftOverData )
 		{
@@ -473,8 +476,10 @@ Sound::getAudio(boost::uint8_t* stream, int len)
 				// (should really honour loopings if any, but that should be only done for non-streaming sound!)
 				//log_debug("Parsing complete and no more audio frames in input, detaching");
 
-                markSoundCompleted(true);
-				return false; // will detach us (we should change isAttached, but need thread safety!)
+				markSoundCompleted(true);
+
+				atEOF=true; // will detach us (we should change isAttached, but need thread safety!)
+				return nSamples-(len/2);
 			}
 
 			// if we've been asked to start at a specific time, skip
@@ -496,10 +501,14 @@ Sound::getAudio(boost::uint8_t* stream, int len)
 			//log_debug(" decoded %d bytes of audio", _leftOverSize);
 		}
 
+		assert( !(_leftOverSize%2) );
+
 		int n = std::min<int>(_leftOverSize, len);
 		//log_debug(" consuming %d bytes of decoded audio", n);
 
-		memcpy(stream, _leftOverPtr, n);
+		std::copy(_leftOverPtr, _leftOverPtr+n, stream);
+		//memcpy(stream, _leftOverPtr, n);
+
 		stream += n;
 		_leftOverPtr += n;
 		_leftOverSize -= n;
@@ -516,15 +525,17 @@ Sound::getAudio(boost::uint8_t* stream, int len)
 	// drop any queued video frame
 	while (_mediaParser->nextVideoFrame().get()) {};
 
-	return true;
+	atEOF=false;
+	return nSamples-(len/2);
 }
 
 // audio callback is running in sound handler thread
-bool
-Sound::getAudioWrapper(void* owner, boost::uint8_t* stream, int len)
+unsigned int
+Sound::getAudioWrapper(void* owner, boost::int16_t* samples,
+		unsigned int nSamples, bool& atEOF)
 {
 	Sound* so = static_cast<Sound*>(owner);
-	return so->getAudio(stream, len);
+	return so->getAudio(samples, nSamples, atEOF);
 }
 
 
