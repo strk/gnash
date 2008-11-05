@@ -1004,11 +1004,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
- check_totals(437);
+ check_totals(438);
 #elif OUTPUT_VERSION == 7
- check_totals(440);
-#elif OUTPUT_VERSION == 8
  check_totals(441);
+#elif OUTPUT_VERSION == 8
+ check_totals(442);
 #endif
 
 #endif
