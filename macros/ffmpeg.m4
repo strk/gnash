@@ -22,140 +22,93 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   backupLIBS="$LIBS"
   backupCFLAGS="$CFLAGS"
 
-  dnl ---------------------------------
+  dnl If the user specify an path to include headers from, we assume it's the full
+  dnl path to the header file, and not the top level path without the 'ffmpeg' node
+  dnl of the path. This is made more fun my the way ffmpeg changes directory layout
+  dnl reasonably often.
   dnl
-  dnl FFMPEG headers checking
-  dnl
-  dnl ---------------------------------
-
-  top_incl_dir=""
-
-
-  dnl Did they tell us where the headers are ?
+  dnl ffmpeg_top_level - the top level directory without the ffmpeg specific part.
+  dnl           ie... /usr/local/include/ffmpeg becomes /usr/local/include, and
+  dnl           /usr/local/include/ffmpeg/libavcodec becomes /usr/local/include/ffmpeg.
+  dnl avcode_h - stores the path and file name for avcodec.h, which is used later on
+  dnl           in this macro to extract the version number of ffmpeg we're using.
   AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where ffmpeg headers are]), with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
     if test x"${with_ffmpeg_incl}" != x ; then
-      avcodec_h=""
-      if test -f ${with_ffmpeg_incl}/ffmpeg/avcodec.h ; then
+      dnl top level path for include files minus the last directory from the user
+      dnl specified path.
+      ffmpeg_top_incl=`dirname ${with_ffmpeg_incl}`
+      if test -f ${with_ffmpeg_incl}/avcodec.h \
+          -o -f${with_ffmpeg_incl}/ffmpeg/avcodec.h \
+          -o -f ${with_ffmpeg_incl}/libavcodec/avcodec.h; then
         ac_cv_path_ffmpeg_incl="-I`(cd ${with_ffmpeg_incl}; pwd)`"
-        avcodec_h="${with_ffmpeg_incl}/ffmpeg/avcodec.h"
-      fi
-      if test -f ${with_ffmpeg_incl}/libavcodec/avcodec.h ; then
-        ac_cv_path_ffmpeg_incl="-I`(cd ${with_ffmpeg_incl}; pwd)`"
-        if test x$avcodec_h != x; then
-          AC_MSG_ERROR([${with_ffmpeg_incl} directory contains both the ffmpeg/avcodec.h and libavcodec/avcodec.h headers])
-        fi
-        avcodec_h="${with_ffmpeg_incl}/libavcodec/avcodec.h"
-      fi
-      if test x$avcodec_h != x; then
-        CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
       else
-        AC_MSG_ERROR([${with_ffmpeg_incl} directory contains neither the ffmpeg/avcodec.h nor libavcodec/avcodec.h header])
+        AC_MSG_ERROR([${with_ffmpeg_incl} directory does not contain the avcodec.h header])
       fi
-      top_incl_dir=${with_ffmpeg_incl}
     fi
   ])
 
-  dnl Try to find avcodec.h ourselves, if not cross compiling {
-  if test x$top_incl_dir = x -a x${cross_compiling} = xno; then
-
+  dnl Try to find avcodec.h ourselves
+  if test x${ffmpeg_top_incl} = x; then
+    avcodec_h=""
     AC_MSG_CHECKING([location of avcodec.h])
-
-    dnl
     dnl Try PKG_CONFIG if available
-    dnl
     if test x"$PKG_CONFIG" != x; then dnl {
       if $PKG_CONFIG --exists libavcodec; then dnl {
-
-        # Some systems return /usr/include/ffmpeg, others /usr/include.
-        # We use #include <ffmpeg/avcodec.h> everywhere so weed out funny
-        # values into the short form.
-
-        # Here pkg-config outputs two spaces on the end, so match those too!
-        ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags-only-I libavcodec | sed 's:/ffmpeg *$::'`
-        CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
-
-        # ac_cv_path_ffmpeg_incl might include several paths (e.g. pointers to
-        # external libraries used by ffmpeg). Let's find the right one.
-        for i in `echo ${ac_cv_path_ffmpeg_incl} | sed -e 's:-I::g'`; do
-          if test -e "$i"/avcodec.h -o \
-                  -e "$i"/ffmpeg/avcodec.h -o \
-                  -e "$i"/libavcodec/avcodec.h; then
-            top_incl_dir="$i"
-            break
-          fi
-        done
-
-      fi dnl }
-    fi dnl }
-
-    dnl
-    dnl Try manual scan if PKG_CONFIG wasn't available or could figure
-    dnl
-    if test x$top_incl_dir = x; then dnl {
-        for i in /usr/include /usr/local/include /opt/ffmpeg/include; do
-          if test -e "$i"/avcodec.h -o \
-                  -e "$i"/ffmpeg/avcodec.h -o \
-                  -e "$i"/libavcodec/avcodec.h; then
-            top_incl_dir="$i"
-            break
-          fi
-        done
-    fi dnl }
-
-    dnl
-    dnl See what we got
-    dnl
-    if test x"$top_incl_dir" != x; then dnl {
-        if test -e "$top_incl_dir/avcodec.h"; then
-          avcodec_h="$top_incl_dir/avcodec.h"
-        elif test -e "$top_incl_dir/ffmpeg/avcodec.h"; then
-          avcodec_h="$top_incl_dir/ffmpeg/avcodec.h"
-        elif test -e "$top_incl_dir/libavcodec/avcodec.h"; then
-          avcodec_h="$top_incl_dir/libavcodec/avcodec.h"
+        dnl Some systems return /usr/include/ffmpeg, others /usr/include.
+        dnl We use #include <ffmpeg/avcodec.h> everywhere so weed out funny
+        dnl values into the short form.
+        ffmpeg_pkg=`$PKG_CONFIG --cflags-only-I libavcodec`
+        ffmpeg_top_incl=`echo ${ffmpeg_pkg} | sed  -e 's:-I::'`
+        dnl Make sure a header file really exists in the given path.
+        dnl Ubuntu like the headers here in the top level ffmpeg directory.
+        if test -f ${ffmpeg_top_incl}/avcodec.h; then
+          dnl make an absolute path from a possible relative one.
+          ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}; pwd)`"
+          avcodec_h=${ffmpeg_top_incl}/avcodec.h
+          AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
         fi
-    fi dnl }
-
-    AC_MSG_RESULT($avcodec_h)
-
+        dnl Older versions of ffmpeg install there headers in a
+        dnl $prefix/ffmepg directory.
+        if test -f ${ffmpeg_top_incl}/ffmpeg/avcodec.h; then
+          dnl make an absolute path from a possible relative one.
+          ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}; pwd)`"
+          avcodec_h=${ffmpeg_top_incl}/ffmpeg/avcodec.h
+          AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
+        fi
+        dnl Newer versions of ffmpeg install the headers in new subdirectories.
+        if test -f ${ffmpeg_top_incl}/libavcodec/avcodec.h; then
+          dnl make an absolute path from a possible relative one.
+          ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}; pwd)`"
+          avcodec_h=${ffmpeg_top_incl}/libavcodec/avcodec.h
+          AC_DEFINE(HAVE_LIBAVCODEC_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
+        fi       
+      fi
+    fi
   fi
-  dnl End of attempt at finding avcodec.h }
 
-  dnl incllist is inherited from configure.ac.
-  if test x"${top_incl_dir}" = x ; then
-    AC_MSG_CHECKING([location of avcodec.h using incllist])
-    for i in $incllist; do
-      if test -f $i/ffmpeg/avcodec.h; then
-        ac_cv_path_ffmpeg_incl="-I$i"
-        CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
-        top_incl_dir=$i
-        avcodec_h="$i/ffmpeg/avcodec.h"
+  dnl if pkg-config doesn't have the values we want, or they're plain wrong, look
+  dnl in several common places ourselves. Note that the variable ffmpeg_top_incl
+  dnl contains the value of the top level path that has been found.
+  if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
+    for ffmpeg_top_incl in $incllist; do
+      if test -f ${ffmpeg_top_incl}/ffmpeg/avcodec.h -o -f ${ffmpeg_top_incl}/avcodec.h; then
+        ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}; pwd)`"
+        AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
         break
       fi
-      if test -f $i/libavcodec/avcodec.h; then
-        ac_cv_path_ffmpeg_incl="-I$i"
-        CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
-        top_incl_dir=$i
-        avcodec_h="$i/libavcodec/avcodec.h"
+      if test -f ${ffmpeg_top_incl}/ffmpeg/libavcodec/avcodec.h; then
+        ac_cv_path_ffmpeg_incl="-I`(cd ${ffmpeg_top_incl}/ffmpeg; pwd)`"
+        AC_DEFINE(HAVE_LIBAVCODEC_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
         break
       fi
     done
-    AC_MSG_RESULT($avcodec_h)
   fi
 
-  if test x$top_incl_dir != x; then
-    AC_MSG_NOTICE([ffmpeg top include dir is $top_incl_dir])
-  fi
-
-  if test x"${avcodec_h}" = x; then
-     dnl We want to bail out all at the end, so it comes with tips about how to fix etc.etc.
-     AC_MSG_WARN([Cannot find ffmpeg/avcodec.h.  Use --with-ffmpeg-incl= to specify the location of the *directory* holding avcodec.h])
+  if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
+    AC_MSG_RESULT(none found)
   else
-    if echo $avcodec_h | grep -q ffmpeg/avcodec.h; then
-      AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
-    else
-      AC_DEFINE(HAVE_LIBAVCODEC_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
-    fi
+    AC_MSG_RESULT(${ac_cv_path_ffmpeg_incl})
   fi
 
   dnl Find and check libavcodec version number to make sure we have a usable
@@ -304,30 +257,22 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     else
       AC_DEFINE(FFMPEG_NELLYMOSER, 1, [Define if ffmpeg can decode NELLYMOSER audio.])
     fi
-
   else
-
     AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
     # ffmpeg_version_check=ok # this is NOT ok, why would it be ?! 
-
   fi
 
-  # Eliminate the pointless -I/usr/include, which can happen
-  if test x"${ac_cv_path_ffmpeg_incl}" != x \
-       -a x"${ac_cv_path_ffmpeg_incl}" != x-I/usr/include ; then
-    FFMPEG_CFLAGS="${ac_cv_path_ffmpeg_incl}"
-  else
-    FFMPEG_CFLAGS=""
-  fi
+  LIBAVCODEC_IDENT=${ffmpeg_version}
+  FFMPEG_CFLAGS="${ac_cv_path_ffmpeg_incl}"
 
   AC_MSG_CHECKING([for avformat.h])
-  if test -f "${top_incl_dir}/ffmpeg/avformat.h"; then
+  if test -f "${ffmpeg_top_incl}/avformat.h"; then
     AC_DEFINE(HAVE_FFMPEG_AVFORMAT_H, 1, [Define if avformat.h is found])
-    avformat_h="${top_incl_dir}/ffmpeg/avformat.h"
+    avformat_h="${ffmpeg_top_incl}/avformat.h"
   else
-    if test -f "${top_incl_dir}/libavformat/avformat.h"; then
+    if test -f "${ffmpeg_top_incl}/libavformat/avformat.h"; then
       AC_DEFINE(HAVE_LIBAVFORMAT_AVFORMAT_H, 1, [Define if avformat.h is found])
-      avformat_h="${top_incl_dir}/libavformat/avformat.h"
+      avformat_h="${ffmpeg_top_incl}/libavformat/avformat.h"
     else
       avformat_h=""
     fi
@@ -335,17 +280,13 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   AC_MSG_RESULT($avformat_h)
 
   have_ffmpeg_swscale=no
-
-  dnl look for swscale.h, but ignore versions older than 51.40.3
-  if test $ffmpeg_num_version -gt 514003; then
-    if test -f "${top_incl_dir}/ffmpeg/swscale.h"; then
-      have_ffmpeg_swscale=yes
-      AC_DEFINE(HAVE_FFMPEG_SWSCALE_H, 1, [Define if swscale.h is found])
-    fi
-    if test -f "${top_incl_dir}/libswscale/swscale.h"; then
-      have_ffmpeg_swscale=yes
-      AC_DEFINE(HAVE_LIBSWSCALE_SWSCALE_H, 1, [Define if swscale.h is found])
-    fi
+  if test -f "${ffmpeg_top_incl}/ffmpeg/swscale.h"; then
+    have_ffmpeg_swscale=yes
+    AC_DEFINE(HAVE_FFMPEG_SWSCALE_H, 1, [Define if swscale.h is found])
+  fi
+  if test -f "${ffmpeg_top_incl}/libswscale/swscale.h"; then
+    have_ffmpeg_swscale=yes
+    AC_DEFINE(HAVE_LIBSWSCALE_SWSCALE_H, 1, [Define if swscale.h is found])
   fi
 
   if test x"$have_ffmpeg_swscale" = "xno" -a $ffmpeg_num_version -ge 520000; then
@@ -661,6 +602,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     FFMPEG_LIBS=""
   fi
 
+  AC_SUBST(LIBAVCODEC_IDENT)
   AC_SUBST(FFMPEG_CFLAGS)  
   AC_SUBST(FFMPEG_LIBS)
 
