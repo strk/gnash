@@ -289,11 +289,11 @@ check(typeof(text1) == "object");
   check_equals(typeof(text1.toString), "function");
   check_equals(typeof(text1.__proto__.toString), "function");
 #else
-  xcheck_equals(typeof(text1.toString), "undefined");
-  xcheck_equals(typeof(text1.valueOf), "undefined");
+  check_equals(typeof(text1.toString), "undefined");
+  check_equals(typeof(text1.valueOf), "undefined");
   check_equals(typeof(text1.__proto__), 'object');
-  xcheck_equals(typeof(text1.__proto__.toString), "undefined"); 
-  xcheck_equals(typeof(text1.__proto__.valueOf), "undefined"); 
+  check_equals(typeof(text1.__proto__.toString), "undefined"); 
+  check_equals(typeof(text1.__proto__.valueOf), "undefined"); 
 #endif
 
 x = text1.toString();
@@ -305,11 +305,11 @@ y = text1.valueOf();
   check(y.toString() == "[object Object]"); 
   check(typeof(y.valueOf()) == "object"); 
 #else
-  xcheck_equals(typeof(x), "undefined");   
-  xcheck_equals(typeof(y), "undefined");  
-  xcheck_equals(x, undefined); 
-  xcheck_equals(y.toString(), undefined); 
-  xcheck_equals(typeof(y.valueOf()),  "undefined"); 
+  check_equals(typeof(x), "undefined");   
+  check_equals(typeof(y), "undefined");  
+  check_equals(x, undefined); 
+  check_equals(y.toString(), undefined); 
+  check_equals(typeof(y.valueOf()),  "undefined"); 
 #endif 
 check_equals(y, text1);
 
@@ -319,7 +319,7 @@ a = "prefix_"+text1;
 #if OUTPUT_VERSION > 5
  check_equals(a, "prefix_A STRING");
 #else
- xcheck_equals(a, "prefix_");
+ check_equals(a, "prefix_");
 #endif
 
 //
