@@ -25,7 +25,7 @@
 #include "log.h"
 #include "movie_definition.h" // for m_root_def use
 #include "edit_text_character_def.h"
-#include "edit_text_character.h"
+#include "TextField.h"
 #include "font.h" // for setReachable call, ctor and dtor
 #include "fontlib.h"
 
@@ -130,10 +130,7 @@ edit_text_character_def::read(SWFStream& in, int tag_type,
 			" text = ``%s''\n"
 			" font_id: %d\n"
 			" text_height: %d",
-			m_variable_name.c_str(),
-			m_default_text.c_str(),
-			m_font_id,
-			m_text_height);
+			m_variable_name, m_default_text, m_font_id, m_text_height);
 	);
 }
 
@@ -153,7 +150,7 @@ edit_text_character_def::create_character_instance(character* parent,
 {
 	// Resolve the font, if possible
 	get_font();
-	edit_text_character* ch = new edit_text_character(parent, this, id);
+	TextField* ch = new TextField(parent, this, id);
 
 	// This gives an "instance name" to the TextField, but
 	// it is not really what we need.

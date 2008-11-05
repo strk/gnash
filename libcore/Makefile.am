@@ -64,7 +64,7 @@ libgnashcore_la_SOURCES = \
 	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
-	edit_text_character.cpp \
+	TextField.cpp \
         BlurFilter.cpp \
         GlowFilter.cpp \
         DropShadowFilter.cpp \
@@ -139,7 +139,7 @@ noinst_HEADERS = \
 	DynamicShape.h	\
 	DisplayList.h	\
 	drag_state.h \
-	edit_text_character.h \
+	TextField.h \
 	event_id.h \
 	fill_style.h \
         BitmapFilter.h \

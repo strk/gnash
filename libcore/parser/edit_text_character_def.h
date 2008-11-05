@@ -159,6 +159,18 @@ public:
 		return m_leading;
 	}
 
+    bool multiline() const {
+        return m_multiline;
+    }
+
+    bool password() const {
+        return m_password;
+    }
+
+    boost::int32_t maxChars() const {
+        return m_max_length;
+    }
+
 	/// Get text alignment
 	alignment get_alignment() const {
 		return m_alignment;

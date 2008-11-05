@@ -49,7 +49,7 @@ namespace gnash {
     class drag_state;
     class LoadVariablesThread;
     class gradient_record;
-    class edit_text_character;
+    class TextField;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -609,8 +609,7 @@ public:
     /// A TextField variable is a variable that acts
     /// as a setter/getter for a TextField 'text' member.
     ///
-    void set_textfield_variable(const std::string& name,
-            edit_text_character* ch);
+    void set_textfield_variable(const std::string& name, TextField* ch);
 
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
@@ -919,8 +918,8 @@ private:
     /// Increment m_current_frame, and take care of looping.
     void increment_frame_and_check_for_loop();
 
-    typedef boost::intrusive_ptr< edit_text_character > TextFieldPtr;
-    typedef std::vector< TextFieldPtr > TextFieldPtrVect;
+    typedef boost::intrusive_ptr<TextField> TextFieldPtr;
+    typedef std::vector<TextFieldPtr> TextFieldPtrVect;
 
     /// A container for textfields, indexed by their variable name
     typedef std::map< std::string, TextFieldPtrVect > TextFieldMap;
