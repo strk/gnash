@@ -1745,12 +1745,13 @@ if test x"$media_handler" = x"gst"; then
   CFLAGS=$GSTREAMER_CFLAGS
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_async],
     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-    has_modern_gstpbutils='no')
+    has_gst_install_plugins_async='no')
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_supported],
     AC_DEFINE([HAVE_GST_INSTALL_PLUGINS_SUPPORTED], [], [GStreamer provides the gst_install_plugins_supported function]),
     has_gst_install_plugins_supported='no')
   CFLAGS=$save_cflags
-  if test x$has_modern_gstpbutils = xno; then
+  if test x$has_gst_install_plugins_async = xno || test x$has_gst_install_plugins_supported = xno; then
+    has_modern_gstpbutils='no'
     AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
   else
     AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
@@ -2526,7 +2527,7 @@ if test "$media_handler" = "gst"; then
     if test x"$has_modern_gstpbutils" = "xno"; then
       echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&4
       echo "                     Gstreamer can pop up a message prompting them to." >&4
-      echo "                     Install gstpbutils from http://www.gstreamer.net for that to be enabled" >&4
+      echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&4
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
     fi
   else
