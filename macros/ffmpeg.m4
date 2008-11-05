@@ -42,6 +42,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
           -o -f${with_ffmpeg_incl}/ffmpeg/avcodec.h \
           -o -f ${with_ffmpeg_incl}/libavcodec/avcodec.h; then
         ac_cv_path_ffmpeg_incl="-I`(cd ${with_ffmpeg_incl}; pwd)`"
+        avcodec_h=${with_ffmpeg_incl}/avcodec.h
       else
         AC_MSG_ERROR([${with_ffmpeg_incl} directory does not contain the avcodec.h header])
       fi

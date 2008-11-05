@@ -58,7 +58,7 @@
 #include "timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
-#include "edit_text_character.h"
+#include "TextField.h"
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
 #include "builtin_function.h"

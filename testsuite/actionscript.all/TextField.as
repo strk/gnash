@@ -89,19 +89,19 @@ xcheck( !TextField.prototype.hasOwnProperty('backgroundColor'));
 xcheck( !TextField.prototype.hasOwnProperty('autoSize') );
 xcheck( !TextField.prototype.hasOwnProperty('border') );
 xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
-check( !TextField.prototype.hasOwnProperty('bottomScroll') );
+xcheck( !TextField.prototype.hasOwnProperty('bottomScroll') );
 xcheck( !TextField.prototype.hasOwnProperty('embedFonts') );
-check( !TextField.prototype.hasOwnProperty('hscroll') );
+xcheck( !TextField.prototype.hasOwnProperty('hscroll') );
 xcheck( !TextField.prototype.hasOwnProperty('html') );
-check( !TextField.prototype.hasOwnProperty('htmlText') );
+xcheck( !TextField.prototype.hasOwnProperty('htmlText') );
 xcheck( !TextField.prototype.hasOwnProperty('length') );
-check( !TextField.prototype.hasOwnProperty('maxChars') );
-check( !TextField.prototype.hasOwnProperty('maxhscroll') );
-check( !TextField.prototype.hasOwnProperty('maxscroll') );
-check( !TextField.prototype.hasOwnProperty('multiline') );
-check( !TextField.prototype.hasOwnProperty('password') );
-check( !TextField.prototype.hasOwnProperty('restrict') );
-check( !TextField.prototype.hasOwnProperty('scroll') );
+xcheck( !TextField.prototype.hasOwnProperty('maxChars') );
+xcheck( !TextField.prototype.hasOwnProperty('maxhscroll') );
+xcheck( !TextField.prototype.hasOwnProperty('maxscroll') );
+xcheck( !TextField.prototype.hasOwnProperty('multiline') );
+xcheck( !TextField.prototype.hasOwnProperty('password') );
+xcheck( !TextField.prototype.hasOwnProperty('restrict') );
+xcheck( !TextField.prototype.hasOwnProperty('scroll') );
 xcheck( !TextField.prototype.hasOwnProperty('selectable') );
 check( !TextField.prototype.hasOwnProperty('text') );
 xcheck( !TextField.prototype.hasOwnProperty('textColor') );
@@ -166,19 +166,19 @@ check( TextField.prototype.hasOwnProperty('backgroundColor'));
 check( TextField.prototype.hasOwnProperty('autoSize') );
 check( TextField.prototype.hasOwnProperty('border') );
 check( TextField.prototype.hasOwnProperty('borderColor') );
-xcheck( TextField.prototype.hasOwnProperty('bottomScroll') );
+check( TextField.prototype.hasOwnProperty('bottomScroll') );
 check( TextField.prototype.hasOwnProperty('embedFonts') );
-xcheck( TextField.prototype.hasOwnProperty('hscroll') );
+check( TextField.prototype.hasOwnProperty('hscroll') );
 check( TextField.prototype.hasOwnProperty('html') );
-xcheck( TextField.prototype.hasOwnProperty('htmlText') );
+check( TextField.prototype.hasOwnProperty('htmlText') );
 check( TextField.prototype.hasOwnProperty('length') );
-xcheck( TextField.prototype.hasOwnProperty('maxChars') );
-xcheck( TextField.prototype.hasOwnProperty('maxhscroll') );
-xcheck( TextField.prototype.hasOwnProperty('maxscroll') );
-xcheck( TextField.prototype.hasOwnProperty('multiline') );
-xcheck( TextField.prototype.hasOwnProperty('password') );
-cxheck( TextField.prototype.hasOwnProperty('restrict') );
-xcheck( TextField.prototype.hasOwnProperty('scroll') );
+check( TextField.prototype.hasOwnProperty('maxChars') );
+check( TextField.prototype.hasOwnProperty('maxhscroll') );
+check( TextField.prototype.hasOwnProperty('maxscroll') );
+check( TextField.prototype.hasOwnProperty('multiline') );
+check( TextField.prototype.hasOwnProperty('password') );
+check( TextField.prototype.hasOwnProperty('restrict') );
+check( TextField.prototype.hasOwnProperty('scroll') );
 check( TextField.prototype.hasOwnProperty('selectable') );
 xcheck( TextField.prototype.hasOwnProperty('text') );
 check( TextField.prototype.hasOwnProperty('textColor') );
@@ -367,7 +367,7 @@ check_equals(tf.length, 18); // the tags are also counted
 
 // Check TextField.maxChars
 
-xcheck_equals(typeof(tf.maxChars), 'null');
+check_equals(typeof(tf.maxChars), 'null');
 check(!tf.hasOwnProperty('maxChars'));
 tf.maxChars = 5;
 check_equals(tf.maxChars, 5);
@@ -375,12 +375,12 @@ tf.text = "0123456789";
 // no effect (maybe only limits user input)
 check_equals(tf.text, "0123456789");
 tf.maxChars = "string";
-xcheck_equals(typeof(tf.maxChars), "null");
+check_equals(typeof(tf.maxChars), "null");
 tf.maxChars = -6;
 check_equals(typeof(tf.maxChars), "number");
 check_equals(tf.maxChars, -6);
 tf.maxChars = 0;
-xcheck_equals(typeof(tf.maxChars), "null");
+check_equals(typeof(tf.maxChars), "null");
 
 tf.maxChars = null;
 
@@ -402,10 +402,10 @@ xcheck_equals(tf.maxscroll, 1); // read-only
 
 // Check TextField.multiline
 
-xcheck_equals(typeof(tf.multiline), 'boolean');
-xcheck_equals(tf.multiline, false);
+check_equals(typeof(tf.multiline), 'boolean');
+check_equals(tf.multiline, false);
 check(!tf.hasOwnProperty('multiline'));
-xcheck_equals(tf.multiline, false);
+check_equals(tf.multiline, false);
 tf.multiline = true;
 check_equals(tf.multiline, true);
 tf.multiline = false;
@@ -456,30 +456,30 @@ tf._parent = bk;
 
 // This verifies it really uses to_bool.
 
-xcheck_equals(typeof(tf.password), 'boolean');
-xcheck_equals(tf.password, false);
+check_equals(typeof(tf.password), 'boolean');
+check_equals(tf.password, false);
 check(!tf.hasOwnProperty('password'));
-xcheck_equals(tf.password, false);
+check_equals(tf.password, false);
 tf.password = true;
 check_equals(tf.password, true);
 tf.password = 7;
-xcheck_equals(tf.password, true);
+check_equals(tf.password, true);
 tf.password = "string";
 #if OUTPUT_VERSION > 6
-xcheck_equals(tf.password, true);
+check_equals(tf.password, true);
 #else
-xcheck_equals(tf.password, false);
+check_equals(tf.password, false);
 #endif
 tf.password = 0;
 check_equals(tf.password, false);
 tf.password = "a string";
 #if OUTPUT_VERSION > 6
-xcheck_equals(tf.password, true);
+check_equals(tf.password, true);
 #else
-xcheck_equals(tf.password, false);
+check_equals(tf.password, false);
 #endif
 tf.password = undefined;
-xcheck_equals(tf.password, false);
+check_equals(tf.password, false);
 // TODO: check effects of setting to 'password' (should hide characters)
 tf.password = false;
 
@@ -1004,11 +1004,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
- check_totals(437);
+ check_totals(438);
 #elif OUTPUT_VERSION == 7
- check_totals(440);
-#elif OUTPUT_VERSION == 8
  check_totals(441);
+#elif OUTPUT_VERSION == 8
+ check_totals(442);
 #endif
 
 #endif

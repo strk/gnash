@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_EDIT_TEXT_CHARACTER_H
-#define GNASH_EDIT_TEXT_CHARACTER_H
+#ifndef GNASH_TEXTFIELD_H
+#define GNASH_TEXTFIELD_H
 
 #include "character.h" // for inheritance
 #include "edit_text_character_def.h" // for inlines and typedefs
@@ -36,7 +36,7 @@ namespace gnash {
 namespace gnash {
 
 /// An instance of an edit_text_character_def 
-class edit_text_character : public character
+class TextField : public character
 {
 
 public:
@@ -71,12 +71,12 @@ public:
 		typeInput
 	};
 
-	edit_text_character(
+	TextField(
 			character* parent,
 			edit_text_character_def* def,
 			int id);
 
-	~edit_text_character();
+	~TextField();
 
 	// TODO: should this return isSelectable() ?
 	bool can_handle_mouse_event() const { return true; }
@@ -103,10 +103,12 @@ public:
 	/// 
 	void set_variable_name(const std::string& newname);
 	
-	/// Set our text to the given string by effect of an update of a registered variable name
+	/// \brief Set our text to the given string by effect of an update of a
+    /// registered variable name
 	//
-	/// This cal only updates the text and is only meant to be called by ourselves
-	/// or by MovieClip when a registered TextVariable is updated.
+	/// This call only updates the text and is only meant to be called
+    /// by ourselves or by MovieClip when a registered TextVariable is
+    /// updated.
 	void updateText(const std::string& s);
 
  	/// Return value of our text.
@@ -137,7 +139,7 @@ public:
 
 	/// See dox in character::unload (character.h)
 	//
-	/// NOTE: edit_text_character (TextField) never has
+	/// NOTE: TextField (TextField) never has
 	///       an onUnload event, so we always return false
 	///	  here. (TODO: verify this)
 	///
@@ -189,6 +191,35 @@ public:
 		return _embedFonts;
 	}
 
+    /// Get the current maxChars setting of the TextField
+    boost::int32_t maxChars() const {
+        return _maxChars;
+    }
+
+    /// Set the current maxChars setting of the TextField
+    void maxChars(boost::int32_t max) {
+        _maxChars = max;
+    }
+
+    /// Get the current multiline setting of the TextField
+    bool multiline() const {
+        return _multiline;
+    }
+
+    /// Set the current multiline setting of the TextField
+    void multiline(bool b) {
+        _multiline = b;
+    }
+
+    /// Get the current password setting of the TextField
+    bool password() const {
+        return _password;
+    }
+
+    /// Set the current password setting of the TextField
+    void password(bool b) {
+        _password = b;
+    }
 	/// \brief
 	/// Set whether this TextField should use embedded font glyphs,
 	/// or use device font glyphs
@@ -230,6 +261,13 @@ public:
 	///	The returns is *never* NULL.
 	///
 	static const char* autoSizeValueName(AutoSizeValue val);
+
+    /// Attaches more properties to the prototype on first instantiation.
+    //
+    /// @param proto    The prototype of the TextField object.
+    //
+    /// This is used when constructing non-AS textfields.
+    static void attachTextFieldInstanceProperties(as_object& proto);
 
 	/// Set type (input or dynamic)
 	//
@@ -405,11 +443,12 @@ private:
 	///
 	void setTextValue(const std::wstring& wstr);
 
-	/// Set our text to the given string by effect of an update of a registered variable name
+	/// \brief Set our text to the given string by effect of an update of a
+    /// registered variable name
 	//
-	/// This cal only updates the text and is only meant to be called by ourselves
-	/// or by MovieClip when a registered TextVariable is updated.
-	///
+	/// This call only updates the text and is only meant to be called
+    /// by ourselves or by MovieClip when a registered TextVariable is
+    /// updated.
 	void updateText(const std::wstring& s);
 
 	/// Set focus 
@@ -427,9 +466,12 @@ private:
 	/// Call this function when willing to invoke the onKillFocus event handler
 	void onKillFocus();
 
-	/// The actual text. Because we have to deal with non-ascii characters (129-255)
-	/// this is a wide string; the cursor position and the position within the string
-	/// are then the same, which makes manipulating the string much easier.
+	/// The actual text.
+    //
+    /// Because we have to deal with non-ascii characters (129-255), this
+    /// is a wide string; the cursor position and the position within the
+    /// string are then the same, which makes manipulating the string much
+    /// easier.
 	std::wstring _text;
 
 	/// This flag will be true as soon as the TextField
@@ -447,7 +489,7 @@ private:
 	rect m_text_bounding_box;
 
 	/// Reset our text bounding box to the given point.
-	void	reset_bounding_box(boost::int32_t x, boost::int32_t y)
+	void reset_bounding_box(boost::int32_t x, boost::int32_t y)
 	{
 		m_text_bounding_box.set_to_point(x, y);
 	}
@@ -462,7 +504,7 @@ private:
 
 	/// Convert the characters in _text into a series of
 	/// text_glyph_records to be rendered.
-	void	format_text();
+	void format_text();
 	
 	/// Extracts an HTML tag.
 	///
@@ -508,6 +550,15 @@ private:
 	void show_cursor(const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
+
+    /// Corresponds to the multiline property.
+    bool _multiline;
+
+    /// Corresponds to the password property.
+    bool _password;
+
+    /// Corresponds to the maxChars property.
+    boost::int32_t _maxChars;
 
 	/// Associate a variable to the text of this character
 	//

@@ -27,7 +27,7 @@
 #include "movie_definition.h"
 #include "as_value.h"
 #include "as_function.h"
-#include "edit_text_character.h" // for registered variables
+#include "TextField.h" // for registered variables
 #include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
 #include "ControlTag.h"
 #include "fn_call.h"
@@ -3013,7 +3013,9 @@ boost::intrusive_ptr<character>
 MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float width, float height)
 {
     // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
-    boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def();
+    
+    boost::intrusive_ptr<edit_text_character_def> txt =
+        new edit_text_character_def();
 
     // Set textfield bounds
     txt->set_bounds(rect(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height)));
@@ -4469,7 +4471,7 @@ MovieClip::set_background_color(const rgba& color)
     _vm.getRoot().set_background_color(color);
 }
 
-static bool isTextFieldUnloaded(boost::intrusive_ptr< edit_text_character >& p)
+static bool isTextFieldUnloaded(boost::intrusive_ptr<TextField>& p)
 {
     return p->isUnloaded();
 }
@@ -4500,8 +4502,7 @@ MovieClip::cleanup_textfield_variables()
 
 /* public */
 void
-MovieClip::set_textfield_variable(const std::string& name,
-        edit_text_character* ch)
+MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
 {
     assert(ch);
 
@@ -5150,8 +5151,8 @@ MovieClip::markReachableResources() const
                     // although we're a 'const' method...
                     // Yet another approach would be for TextField::unload
                     // to unregister self from our map, but TextField 
-                    // (edit_text_character) doesn't really store a pointer
-                    // to the movieclip it's registered against.
+                    // doesn't really store a pointer to the movieclip
+                    // it's registered against.
                     //
                     //log_debug("Unloaded TextField in registered textfield "
                     //"variables container on ::markReachableResources");
