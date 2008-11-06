@@ -80,7 +80,7 @@ RTMPServer::handShakeWait()
     boost::shared_ptr<amf::Buffer> buf = _handler->pop();
 
     if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
+	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }    
 
@@ -143,7 +143,7 @@ RTMPServer::serverFinish()
     boost::shared_ptr<amf::Buffer> obj = buf;
     
     if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
+	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }
     
@@ -506,7 +506,7 @@ void
 rtmp_handler(Handler::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
-    Handler *hand = reinterpret_cast<Handler *>(args->handle);
+    Handler *hand = reinterpret_cast<Handler *>(args->handler);
     RTMPServer rtmp;
 
     rtmp.setHandler(hand);
