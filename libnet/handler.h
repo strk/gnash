@@ -177,11 +177,19 @@ public:
     void die() { _die = true; _outgoing.notify(); };
     bool timetodie() { return _die; };
 
+    // The pollfd are an array of data structures used by the poll()
+    // system call. We have to keep track of these as network
+    // connections get added and disconnected.
     void addPollFD(struct pollfd &fd, entry_t *ptr);
     void addPollFD(struct pollfd &fd);
-    struct pollfd &getPollFD(int index);
+    void erasePollFD(std::vector<struct pollfd>::iterator &itt);
+    struct pollfd &getPollFD(int fd);
     struct pollfd *getPollFDPtr();
+    size_t getPollFDSize() { return _pollfds.size(); };
+    void clearPollFD() { _pollfds.clear(); };
 
+    // The entry point is an function pointer, which is the event
+    // handler when there is data on a file descriptor.
     void addEntry(int fd, entry_t *func);
     entry_t *getEntry(int fd);
     

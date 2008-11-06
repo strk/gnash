@@ -189,9 +189,33 @@ Handler::getPollFDPtr()
 };
 
 void
+Handler::erasePollFD(vector<struct pollfd>::iterator &itt)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+//    struct pollfd fff = _pollfds.at(fd);
+#if 1
+    if (_pollfds.size() <= 1) {
+	_pollfds.clear();
+    } else {
+	_pollfds.erase(itt);
+    }
+#else
+    vector<struct pollfd>::iterator it;
+    for (it=_pollfds.begin(); it<_pollfds.end(); it++) {
+	if ((*it).fd == fd) {
+	    _pollfds.erase(it);
+	}
+    }
+#endif
+    
+//    _handlers[fd] = 0;
+}
+
+void
 Handler::addEntry(int fd, Handler::entry_t *func)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     _handlers[fd] = func;
 }
@@ -199,7 +223,7 @@ Handler::addEntry(int fd, Handler::entry_t *func)
 Handler::entry_t *
 Handler::getEntry(int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     return _handlers[fd];
 };
@@ -268,7 +292,7 @@ Handler::start(thread_params_t *args)
     struct pollfd *fds;
     int nfds = 1;
     Network net;
-    boost::shared_ptr<vector<int> > hits = net.waitForNetData(nfds, fds);
+    boost::shared_ptr<vector<struct pollfd> > hits = net.waitForNetData(nfds, fds);
     vector<int>::const_iterator it;
 #if 0
     for (it = _pollfds.begin(); it != _pollfds.end(); it++) {
