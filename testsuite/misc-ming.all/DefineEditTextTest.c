@@ -142,7 +142,7 @@ main(int argc, char** argv)
   // should be true.
   check(mo, "TextField.prototype.hasOwnProperty('background')");
   check(mo, "TextField.prototype.hasOwnProperty('backgroundColor')");
-  xcheck(mo, "TextField.prototype.hasOwnProperty('text')");
+  check(mo, "TextField.prototype.hasOwnProperty('text')");
   check(mo, "TextField.prototype.hasOwnProperty('textColor')");
 
   /*********************************************
@@ -188,7 +188,7 @@ main(int argc, char** argv)
   // checks after placing some swf defined TextField
   check(mo, "TextField.prototype.hasOwnProperty('background')");
   check(mo, "TextField.prototype.hasOwnProperty('backgroundColor')");
-  xcheck(mo, "TextField.prototype.hasOwnProperty('text')");
+  check(mo, "TextField.prototype.hasOwnProperty('text')");
   check(mo, "TextField.prototype.hasOwnProperty('textColor')");
   xcheck(mo, "!TextField.prototype.hasOwnProperty('_parent')");
   xcheck(mo, "!TextField.prototype.hasOwnProperty('_xmouse')");
@@ -227,7 +227,7 @@ main(int argc, char** argv)
   check(mo, "!etext1.hasOwnProperty('_xscale')");
   check(mo, "!etext1.hasOwnProperty('_yscale')");
   
-  xcheck(mo, "dtext1.__proto__.hasOwnProperty('text')");
+  check(mo, "dtext1.__proto__.hasOwnProperty('text')");
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('textColor')", "true");
