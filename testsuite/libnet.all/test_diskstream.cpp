@@ -64,7 +64,8 @@ static bool dump = false;
 
 int
 main(int argc, char *argv[])
-{    const Arg_parser::Option opts[] =
+{
+    const Arg_parser::Option opts[] =
         {
             { 'h', "help",          Arg_parser::no  },
             { 'v', "verbose",       Arg_parser::no  },
