@@ -29,9 +29,9 @@
 #include "cque.h"
 #include "statistics.h"
 
-/// \namespace cygnal
-///	This namespace is for all the Cygnal specific classes.
-namespace cygnal {
+/// \namespace gnash
+///	This is the main namespace for Gnash and it's libraries.
+namespace gnash {
 
 /// \class DiskStream
 ///	This class handles the loading of files into memory. Instead
@@ -174,6 +174,11 @@ public:
     ///
     /// @return A real pointer to the base address.
     boost::uint8_t *get() { return _dataptr; };
+
+    /// \brief Get the size of the file.
+    ///
+    /// @return A value that is the size of the file in bytes.
+    size_t getFileSize() { return _filesize; };
     
 private:
     /// \var DiskStream::_state

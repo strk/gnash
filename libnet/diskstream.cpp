@@ -46,9 +46,9 @@ using namespace std;
 // gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 // }
 
-/// \namespace cygnal
-///	This namespace is for all the Cygnal specific classes.
-namespace cygnal {
+/// \namespace gnash
+///	This is the main namespace for Gnash and it's libraries.
+namespace gnash {
 
 /// \def _SC_PAGESIZE
 ///	This isn't set on all systems, but is used to get the page
