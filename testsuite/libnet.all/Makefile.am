@@ -47,12 +47,17 @@ INCLUDES = \
 check_PROGRAMS = \
 	test_cque \
 	test_handler \
-	test_http
+	test_http \
+	test_diskstream
 #	test_rtmp 
 
 test_http_SOURCES = test_http.cpp
 test_http_LDADD = $(AM_LDFLAGS) 
 test_http_DEPENDENCIES = site-update
+
+test_diskstream_SOURCES = test_diskstream.cpp
+test_diskstream_LDADD = $(AM_LDFLAGS) 
+test_diskstream_DEPENDENCIES = site-update
 
 #test_rtmp_SOURCES = test_rtmp.cpp
 #test_rtmp_LDADD = $(AM_LDFLAGS) 

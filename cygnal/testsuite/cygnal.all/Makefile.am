@@ -22,8 +22,7 @@ AUTOMAKE_OPTIONS = dejagnu
 
 noinst_LTLIBRARIES = libcygnal.la
 libcygnal_la_SOURCES = \
-	$(top_builddir)/cygnal/crc.cpp \
-	$(top_builddir)/cygnal/diskstream.cpp
+	$(top_builddir)/cygnal/crc.cpp
 
 libcygnal_la_LDFLAGS = \
 	$(top_builddir)/libamf/libgnashamf.la
@@ -52,16 +51,11 @@ INCLUDES = \
 		$(PTHREAD_CFLAGS)
 
 check_PROGRAMS = \
-	test_crc \
-	test_diskstream
+	test_crc
 
 test_crc_SOURCES = test_crc.cpp
 test_crc_LDADD = $(AM_LDFLAGS) 
 test_crc_DEPENDENCIES = site-update
-
-test_diskstream_SOURCES = test_diskstream.cpp
-test_diskstream_LDADD = $(AM_LDFLAGS) 
-test_diskstream_DEPENDENCIES = site-update
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
