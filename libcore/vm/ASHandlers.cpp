@@ -2543,14 +2543,48 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_DELETE)); // 0x3A
 #endif
 
-    // TODO: some parameter checking ?
-    const std::string& propname = env.top(0).to_string();
-    boost::intrusive_ptr<as_object> obj = env.top(1).to_object();
+    // Stack                    Result
+    // 'a'      |               nothing
+    // 'a.b'    |               a.b deleted.
+    // 'b'      | a [obj]       a.b deleted (normal use).
+    // 'a.b'    | a [obj]       nothing.
+    // 'a.b'    | 'string'      nothing.
+    // 'c'      | a.b [obj]     a.b.c deleted (normal use).
+    // 'a.b.c'  |               a.b.c deleted
+    // 'b.c'    | a [obj]       nothing
+    // 'a.b.c'  | string        nothing
 
-    if ( ! obj )
+    const size_t stackSize = env.stack_size();
+
+    std::string propertyname = env.top(0).to_string();
+
+    boost::intrusive_ptr<as_object> obj;
+
+    // If there is only one item on the stack, it should be parsed to see
+    // if it's a path, then we try to delete it. If there are two or more
+    // items on the stack, they have to be property and object.
+    if (stackSize < 2)
+    {
+        std::string path, var;
+        if (!as_environment::parse_path(propertyname, path, var))
+        {
+            // If it's not a path, assume it's a variable and try to delete.
+            env.top(1).set_bool(false);
+            env.drop(1);
+            return;
+        }
+        else {
+            as_value target = thread.getVariable(path);
+            obj = target.to_object();
+            propertyname = var;
+        }
+    }
+    else obj = env.top(1).to_object();
+
+    if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("delete %s.%s : first element is not an object"),
+            log_aserror(_("delete %s.%s: no object found to delete"),
                         env.top(1), env.top(0));
         );
         env.top(1).set_bool(false);
@@ -2558,7 +2592,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
         return;
     }
 
-    env.top(1).set_bool(thread.delObjectMember(*obj, propname));
+    env.top(1).set_bool(thread.delObjectMember(*obj, propertyname));
 
     env.drop(1);
 
@@ -2575,8 +2609,33 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_DELETE2)); // 0x3B
 #endif
 
-    // See bug #18482, this works fine now (assuming the bug report is correct)
-    env.top(0) = thread.delVariable(env.top(0).to_string());
+    const std::string& propertyname = env.top(0).to_string();
+
+    // If it's not a path, delete it as a variable.
+    std::string path, var;
+    if (!as_environment::parse_path(propertyname, path, var)) {
+        // See bug #18482, this works fine now (assuming the bug
+        // report is correct)
+        env.top(0) = thread.delVariable(propertyname);
+        return;
+    }
+    
+    // Otherwise see if it's an object and delete it.
+    as_value target = thread.getVariable(path);
+    boost::intrusive_ptr<as_object> obj = target.to_object();
+
+    if (!obj)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("delete2 called with a path that does not resolve "
+                    "to an object"), env.top(1), env.top(0));
+        );
+        env.top(1).set_bool(false);
+        env.drop(1);
+        return;
+    }
+
+    env.top(1).set_bool(thread.delObjectMember(*obj, var));
 }
 
 void

@@ -176,7 +176,7 @@ public:
 	/// a ScopeStack.
 	//
 	/// @param varname 
-	///	Variable name. Can not contain path elements.
+	///	Variable name. Must not contain path elements.
 	///	TODO: should be case-insensitive up to SWF6.
 	///	NOTE: no case conversion is performed currently,
 	///	      so make sure you do it yourself. Note that
@@ -186,8 +186,8 @@ public:
 	/// @param scopeStack
 	///	The Scope stack to use for lookups.
 	///
-	bool del_variable_raw(const std::string& varname,
-			const ScopeStack& scopeStack);
+	bool delVariableRaw(const std::string& varname,
+            const ScopeStack& scopeStack);
 
 	/// Return the (possibly UNDEFINED) value of the named var.
 	//
@@ -463,7 +463,8 @@ public:
 	///
 	/// If no colon or dot, returns false and leaves *path & *var alone.
 	///
-	/// TODO: return an integer: 0 not a path, 1 a slash-based path, 2 a dot-based path
+	/// TODO: return an integer: 0 not a path, 1 a slash-based path, 2 a
+    /// dot-based path
 	///
 	static bool parse_path(const std::string& var_path, std::string& path,
 			std::string& var);

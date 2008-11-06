@@ -31,7 +31,6 @@
 #include "as_function.h" 
 #include "CallStack.h"
 
-#include <cstring> // std::strpbrk
 #include <string>
 #include <utility> // for std::pair
 #include <boost/algorithm/string/case_conv.hpp>
@@ -227,15 +226,14 @@ as_environment::get_variable_raw(
 }
 
 bool
-as_environment::del_variable_raw(
-    const std::string& varname,
-    const ScopeStack& scopeStack) 
-    // varname must be a plain variable name; no path parsing.
+as_environment::delVariableRaw(const std::string& varname,
+        const ScopeStack& scopeStack) 
 {
-	assert( ! std::strpbrk(varname.c_str(), ":/.") );
+    // varname must be a plain variable name; no path parsing.
+    assert(varname.find_first_of(":/.") == std::string::npos);
 
 	string_table::key varkey = _vm.getStringTable().find(varname);
-	as_value	val;
+	as_value val;
 
 	// Check the with-stack.
 	for (size_t i = scopeStack.size(); i > 0; --i)
