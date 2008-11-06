@@ -73,8 +73,7 @@
 namespace gnash {
 
 // Forward declarations
-static as_value textfield_get_variable(const fn_call& fn);
-static as_value textfield_set_variable(const fn_call& fn);
+static as_value textfield_variable(const fn_call& fn);
 static as_value textfield_setTextFormat(const fn_call& fn);
 static as_value textfield_getTextFormat(const fn_call& fn);
 static as_value textfield_setNewTextFormat(const fn_call& fn);
@@ -92,6 +91,7 @@ static as_value textfield_background(const fn_call& fn);
 static as_value textfield_border(const fn_call& fn);
 static as_value textfield_backgroundColor(const fn_call& fn);
 static as_value textfield_borderColor(const fn_call& fn);
+static as_value textfield_text(const fn_call& fn);
 static as_value textfield_textColor(const fn_call& fn);
 static as_value textfield_embedFonts(const fn_call& fn);
 static as_value textfield_autoSize(const fn_call& fn);
@@ -109,26 +109,34 @@ static as_value textfield_textHeight(const fn_call& fn);
 //
 
 static as_value
-textfield_get_variable(const fn_call& fn)
+textfield_variable(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    return as_value(text->getVariableName());
+    if (!fn.nargs)
+    {
+        // Getter
+        const std::string& varName = text->getVariableName();
+        // An empty variable name returns null.
+        if (varName.empty()) {
+            as_value null;
+            null.set_null();
+            return null;
+        }
+        return as_value(varName);
+    }
 
-}
-
-static as_value
-textfield_set_variable(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    assert ( fn.nargs > 0 );
-    const std::string& newname = fn.arg(0).to_string();
-
-    text->set_variable_name(newname);
+    // Setter
+    const as_value& varName = fn.arg(0);
+    if (varName.is_undefined() || varName.is_null()) {
+        text->set_variable_name("");
+    }
+    else text->set_variable_name(varName.to_string());
 
     return as_value();
+
 }
+
 
 static as_value
 textfield_getDepth(const fn_call& fn)
@@ -570,13 +578,12 @@ TextField::attachTextFieldInstanceProperties(as_object& o)
     o.init_property(NSV::PROP_TEXT_HEIGHT,
             textfield_textHeight, textfield_textHeight);
 
-    boost::intrusive_ptr<builtin_function> variable_getter(
-            new builtin_function(&textfield_get_variable, NULL));
-    boost::intrusive_ptr<builtin_function> variable_setter(
-            new builtin_function(&textfield_set_variable, NULL));
-    o.init_property("variable", *variable_getter, *variable_setter, swf6Flags);
+    getset = new builtin_function(textfield_variable);
+    o.init_property("variable", *getset, *getset, swf6Flags);
     getset = new builtin_function(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_text);
+    o.init_property("text", *getset, *getset, swf6Flags);
     getset = new builtin_function(textfield_backgroundColor);
     o.init_property("backgroundColor", *getset, *getset, swf6Flags);
     getset = new builtin_function(textfield_border);
@@ -672,8 +679,8 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
         int id)
     :
     character(parent, id),
+    _tag(&def),
     _text(L""),
-    _defaultText(def.defaultText()),
     _textDefined(def.hasText()),
     _underlined(false),
     _leading(def.leading()),
@@ -692,7 +699,7 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
     _password(def.password()),
     _maxChars(def.maxChars()),
     _text_variable_registered(false),
-    _variable_name(def.name()),
+    _variable_name(def.variableName()),
     _drawBackground(def.border()),
     _backgroundColor(255,255,255,255),
     _drawBorder(def.border()),
@@ -706,48 +713,27 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
     _type(def.readOnly() ? typeDynamic : typeInput),
     _bounds(def.get_bound())
 {
-    assert(parent);
-
-    as_object* proto = getTextFieldInterface(_vm);
- 
-    // This is an instantiation, so attach properties to the
-    // prototype.
-    // TODO: is it correct to do it here, or can some TextFields
-    // be constructed without attaching these?
-    attachTextFieldInstanceProperties(*proto);
-
-    set_prototype(proto);
-
-    Array_as* ar = new Array_as();
-    ar->push(this);
-    set_member(NSV::PROP_uLISTENERS, ar);
 
     // WARNING! remember to set the font *before* setting text value!
     boost::intrusive_ptr<const font> f = def.getFont();
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
-    // set default text *before* calling registerTextVariable
-    // (if the textvariable already exist and has a value
-    //  the text will be replaced with it)
-
     int version = parent->getVM().getSWFVersion();
     
+    // set default text *before* calling registerTextVariable
+    // (if the textvariable already exist and has a value
+    // the text will be replaced with it)
     if (_textDefined) 
     {
-        setTextValue(utf8::decodeCanonicalString(
-                    def.defaultText(), version));
+        setTextValue(utf8::decodeCanonicalString(def.defaultText(), version));
     }
 
-    registerTextVariable();
-
-    m_dummy_style.push_back(fill_style());
-
-    reset_bounding_box(0, 0);
+    init();
 
 }
 
-TextField::TextField(character* parent, const rect& bounds, int textHeight)
+TextField::TextField(character* parent, const rect& bounds)
     :
     character(parent, 0),
     _text(L""),
@@ -759,7 +745,7 @@ TextField::TextField(character* parent, const rect& bounds, int textHeight)
     _blockIndent(0),
     _leftMargin(0), 
     _rightMargin(0), 
-    _fontHeight(textHeight), 
+    _fontHeight(12 * 20), 
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
@@ -783,7 +769,17 @@ TextField::TextField(character* parent, const rect& bounds, int textHeight)
     _type(typeDynamic),
     _bounds(bounds)
 {
-    assert(parent);
+    // Use the default font (Times New Roman for Windows, Times for Mac
+    // according to docs. They don't say what it is for Linux.
+    boost::intrusive_ptr<const font> f = fontlib::get_default_font(); 
+    setFont(f);
+
+    init();
+}
+
+void
+TextField::init()
+{
 
     as_object* proto = getTextFieldInterface(_vm);
  
@@ -798,22 +794,14 @@ TextField::TextField(character* parent, const rect& bounds, int textHeight)
     Array_as* ar = new Array_as();
     ar->push(this);
     set_member(NSV::PROP_uLISTENERS, ar);
-
-    // WARNING! remember to set the font *before* setting text value!
-    boost::intrusive_ptr<const font> f = fontlib::get_default_font(); 
-    setFont(f);
-
-    // set default text *before* calling registerTextVariable
-    // (if the textvariable already exist and has a value
-    //  the text will be replaced with it)
     
     registerTextVariable();
 
     m_dummy_style.push_back(fill_style());
 
     reset_bounding_box(0, 0);
-
 }
+
 
 TextField::~TextField()
 {
@@ -1693,7 +1681,8 @@ TextField::format_text()
         // would ever happen, but UTF-8 conversion code can deal with codes
         // up to 2^32; if they are valid, the code table will have to be
         // enlarged.
-        int index = _font->get_glyph_index(static_cast<boost::uint16_t>(code), _embedFonts);
+        int index = _font->get_glyph_index(
+                static_cast<boost::uint16_t>(code), _embedFonts);
 
         IF_VERBOSE_MALFORMED_SWF (
             if (index == -1)
@@ -1895,12 +1884,8 @@ TextField::parseTextVariableRef(const std::string& variableName) const
     VariableRef ret;
     ret.first = 0;
 
-    std::string var_str = PROPNAME(variableName);
-
-    const char* varname = var_str.c_str();
-
 #ifdef DEBUG_DYNTEXT_VARIABLES
-    log_debug(_("VariableName: %s"), var_str);
+    log_debug(_("VariableName: %s"), variableName);
 #endif
 
     /// Why isn't get_environment const again ?
@@ -1913,16 +1898,17 @@ TextField::parseTextVariableRef(const std::string& variableName) const
             log_swferror(_("Current environment has no target, "
                 "can't bind VariableName (%s) associated to "
                 "text field. Gnash will try to register "
-                "again on next access."), var_str);
+                "again on next access."), variableName);
         );
         return ret;
     }
 
     // If the variable string contains a path, we extract
     // the appropriate target from it and update the variable
-    // name
+    // name. We copy the string so we can assign to it if necessary.
+    std::string parsedName = variableName;
     std::string path, var;
-    if ( as_environment::parse_path(varname, path, var) )
+    if (as_environment::parse_path(variableName, path, var))
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("Variable text Path: %s, Var: %s"), path, var);
@@ -1931,20 +1917,23 @@ TextField::parseTextVariableRef(const std::string& variableName) const
         // we use our parent's environment for this
         target = env.find_object(path);
 
-        // update varname (with path component stripped)
-        varname = var.c_str();
+        parsedName = var;
     }
 
     if ( ! target )
     {
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream. Gnash will try to register again on next access."), path);
+            log_swferror(_("VariableName associated to text field refers "
+                    "to an unknown target (%s). It is possible that the "
+                    "character will be instantiated later in the SWF "
+                    "stream. Gnash will try to register again on next "
+                    "access."), path);
         );
         return ret;
     }
 
     ret.first = target;
-    ret.second = _vm.getStringTable().find(varname);
+    ret.second = _vm.getStringTable().find(parsedName);
 
     return ret;
 }
@@ -1979,9 +1968,11 @@ TextField::registerTextVariable()
     as_object* target = varRef.first;
     if ( ! target )
     {
-        log_debug(_("VariableName associated to text field (%s) refer to an unknown target. "
-                "It is possible that the character will be instantiated later in the SWF stream. "
-                "Gnash will try to register again on next access."), _variable_name);
+        log_debug(_("VariableName associated to text field (%s) refer to "
+                    "an unknown target. It is possible that the character "
+                    "will be instantiated later in the SWF stream. "
+                    "Gnash will try to register again on next access."),
+                _variable_name);
         return;
     }
 
@@ -2007,17 +1998,20 @@ TextField::registerTextVariable()
     {
         as_value newVal = as_value(utf8::encodeCanonicalString(_text, version));
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("target sprite (%s @ %p) does NOT have a member named %s (no problem, we'll add it with value %s)"),
-            typeName(*target), (void*)target, _vm.getStringTable().value(key),
-            newVal);
+        log_debug(_("target sprite (%s @ %p) does NOT have a member "
+                    "named %s (no problem, we'll add it with value %s)"),
+                    typeName(*target), (void*)target,
+                    _vm.getStringTable().value(key), newVal);
 #endif
         target->set_member(key, newVal);
     }
     else
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug(_("target sprite (%s @ %p) does NOT have a member named %s, and we don't have text defined"),
-            typeName(*target), (void*)target, _vm.getStringTable().value(key));
+        log_debug(_("target sprite (%s @ %p) does NOT have a member "
+                    "named %s, and we don't have text defined"),
+                    typeName(*target), (void*)target,
+                    _vm.getStringTable().value(key));
 #endif
     }
 
@@ -2028,7 +2022,8 @@ TextField::registerTextVariable()
         // add the textfield variable to the target sprite
         // TODO: have set_textfield_variable take a string_table::key instead ?
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug("Calling set_textfield_variable(%s) against sprite %s", _vm.getStringTable().value(key), sprite->getTarget());
+        log_debug("Calling set_textfield_variable(%s) against sprite %s",
+                _vm.getStringTable().value(key), sprite->getTarget());
 #endif
         sprite->set_textfield_variable(_vm.getStringTable().value(key), this);
 
@@ -2076,16 +2071,25 @@ TextField::set_variable_name(const std::string& newname)
     if ( newname != _variable_name )
     {
         _variable_name = newname;
+
+        // The name was empty or undefined, so there's nothing more to do.
+        if (_variable_name.empty()) return;
+
         _text_variable_registered = false;
+
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling updateText after change of variable name");
 #endif
-        updateText(_defaultText);
+
+        // Use the original definition text if this isn't dynamically
+        // created.
+        if (_tag) updateText(_tag->defaultText());
+
 #ifdef DEBUG_DYNTEXT_VARIABLES
-        log_debug("Calling registerTextVariable after change of variable name and updateText call");
+        log_debug("Calling registerTextVariable after change of variable "
+                "name and updateText call");
 #endif
         registerTextVariable();
-        //reset_bounding_box(0, 0); // does this make sense ? it's called in the constructor...
     }
 }
 
@@ -2422,20 +2426,41 @@ textfield_borderColor(const fn_call& fn)
 }
 
 static as_value
+textfield_text(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+    if (!fn.nargs)
+    {
+        // Getter
+        //
+        // TODO: should return text without HTML tags.
+        log_unimpl("TextField.text");
+        return as_value();
+    }
+
+    // Setter
+    int version = ptr->getVM().getSWFVersion();
+    ptr->setTextValue(
+            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
+
+    return as_value();
+}
+    
+static as_value
 textfield_textColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
+    if (!fn.nargs)
     {
+        // Getter
         return as_value(ptr->getTextColor().toRGB());
     }
-    else // setter
-    {
-        rgba newColor;
-        newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
-        ptr->setTextColor(newColor);
-    }
+
+    // Setter
+    rgba newColor;
+    newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
+    ptr->setTextColor(newColor);
 
     return as_value();
 }
@@ -2445,15 +2470,14 @@ textfield_embedFonts(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
+    if (!fn.nargs)
     {
+        // Getter
         return as_value(ptr->getEmbedFonts());
     }
-    else // setter
-    {
-        ptr->setEmbedFonts( fn.arg(0).to_bool() );
-    }
 
+    // Setter
+    ptr->setEmbedFonts( fn.arg(0).to_bool() );
     return as_value();
 }
 
@@ -2801,7 +2825,9 @@ void
 TextField::markReachableResources() const
 {
 
-    if ( _font ) _font->setReachable();
+    if (_tag) _tag->setReachable();
+
+    if (_font) _font->setReachable();
 
     // recurse to parent...
     markCharacterReachable();

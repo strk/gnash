@@ -48,7 +48,7 @@ DefineEditTextTag::create_character_instance(character* parent, int id)
 	// This gives an "instance name" to the TextField, but
 	// it is not really what we need.
 	//
-	// First of all the VariableName ("_name") is
+	// First of all the VariableName ("_variableName") is
 	// NOT the default name of an instance, rather it is
 	// a variable associated with it and can contain path
 	// information (ie. we can associate a variable in a different
@@ -159,7 +159,7 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 		_leading = in.read_s16();
 	}
 
-	in.read_string(_name);
+	in.read_string(_variableName);
 
 	if (_hasText)
 	{
@@ -172,7 +172,7 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 			" text = \"%s\"\n"
 			" font_id: %d\n"
 			" text_height: %d",
-			_name, _defaultText, _fontID, _textHeight);
+			_variableName, _defaultText, _fontID, _textHeight);
 	);
 }
 

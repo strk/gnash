@@ -82,7 +82,7 @@ public:
 
 	TextField(character* parent, const SWF::DefineEditTextTag& def, int id);
 
-    TextField(character* parent, const rect& bounds, int textHeight);
+    TextField(character* parent, const rect& bounds);
 
 	~TextField();
 
@@ -443,13 +443,21 @@ public:
 		return m_text_bounding_box;
 	}
 
-private:
-
 	/// Set our text to the given string.
 	//
 	/// This function will also update any registered variable
 	///
 	void setTextValue(const std::wstring& wstr);
+
+
+private:
+
+    void init();
+
+    /// The immutable definition of our TextField
+    //
+    /// This is NULL for dynamic TextFields.
+    boost::intrusive_ptr<const SWF::DefineEditTextTag> _tag;
 
 	/// \brief Set our text to the given string by effect of an update of a
     /// registered variable name
@@ -481,8 +489,6 @@ private:
     /// string are then the same, which makes manipulating the string much
     /// easier.
 	std::wstring _text;
-
-    std::string _defaultText;
 
 	/// This flag will be true as soon as the TextField
 	/// is assigned a text value. Only way to be false is

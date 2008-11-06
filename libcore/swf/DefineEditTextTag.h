@@ -91,8 +91,8 @@ public:
 	/// is allowed to contain path information and should
 	/// be used to provide an 'alias' to the 'text' member
 	/// of instances.
-	const std::string& name() const {
-		return _name;
+	const std::string& variableName() const {
+		return _variableName;
 	}
 
 	/// Return the maximum length of text this widget can hold.
@@ -229,7 +229,7 @@ private:
     void read(SWFStream& in, movie_definition& m);
 
 	rect _rect;
-	std::string _name;
+	std::string _variableName;
 
     // For an SWF-defined textfield we'll read
     // this from the tag. Dynamic textfields should

@@ -3016,13 +3016,8 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
     // Set textfield bounds
     rect bounds(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height));
 
-    // Set font height (shouldn't be dependent on font ?)
-    // TODO: 10 pixels is an arbitrary number here...
-    const int textHeight = 10 * 20;
-
-
     // Create an instance
-    boost::intrusive_ptr<character> txt_char = new TextField(this, bounds, textHeight);
+    boost::intrusive_ptr<character> txt_char = new TextField(this, bounds);
 
     // Give name and mark as dynamic
     txt_char->set_name(name);
