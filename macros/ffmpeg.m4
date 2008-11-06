@@ -34,7 +34,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   dnl           /usr/local/include/ffmpeg/libavcodec becomes /usr/local/include/ffmpeg.
   dnl avcode_h - stores the path and file name for avcodec.h, which is used later on
   dnl           in this macro to extract the version number of ffmpeg we're using.
-  AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where ffmpeg headers are]), with_ffmpeg_incl=${withval})
+  AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where avcodec.h is]), with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
     if test x"${with_ffmpeg_incl}" != x ; then
       dnl top level path for include files minus the last directory from the user
