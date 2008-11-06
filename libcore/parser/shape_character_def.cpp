@@ -38,12 +38,6 @@
 // and compare them with the bounds encoded in the SWF
 //#define GNASH_DEBUG_SHAPE_BOUNDS 1
 
-//#define DEBUG_DISPLAY_SHAPE_PATHS    // won't probably work anymore (Udo)
-#ifdef DEBUG_DISPLAY_SHAPE_PATHS
-// For debugging only!
-bool  gnash_debug_show_paths = false;
-#endif                                            // DEBUG_DISPLAY_SHAPE_PATHS
-
 namespace gnash
 {
 
@@ -174,7 +168,8 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
     int num_line_bits = (num_bits & 0x0F);
     
     IF_VERBOSE_PARSE(
-        log_parse(_("  shape_character_def read: nfillbits = %d, nlinebits = %d"), num_fill_bits, num_line_bits);
+        log_parse(_("  shape_character_def read: nfillbits = %d, "
+                "nlinebits = %d"), num_fill_bits, num_line_bits);
     );
     
     if ( !num_fill_bits && !num_line_bits )
@@ -193,9 +188,11 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
         /// Pretty ugly... till next bug report.
         ///
         ///
-        if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 || tag_type == SWF::DEFINEFONT3)
+        if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 || 
+                tag_type == SWF::DEFINEFONT3)
         {
-            log_debug("Skipping glyph read, being fill and line bits zero. SWF tag is %d.", tag_type);
+            log_debug("Skipping glyph read, being fill and line bits zero. "
+                    "SWF tag is %d.", tag_type);
             return;
         }
     }
@@ -255,11 +252,11 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                 current_path.ap.x = x;
                 current_path.ap.y = y;
     
-    #if SHAPE_LOG
+#if SHAPE_LOG
                 IF_VERBOSE_PARSE(
                     log_parse(_("  shape_character read: moveto %d %d"), x, y);
                 );
-    #endif
+#endif
             }
             if ((flags & flagFillStyle0Change) && num_fill_bits > 0)
             {
@@ -278,12 +275,14 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     style += fill_base;
                 }
     
-                if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+                if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2)
                 {
                     if ( style > 1 )          // 0:hide 1:renderer
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in fillStyle0Change record for font tag (0 or 1 valid). Set to 0."), style);
+                             log_swferror(_("Invalid fill style %d in "
+                                     "fillStyle0Change record for font tag "
+                                     "(0 or 1 valid). Set to 0."), style);
                         );
                         style = 0;
                     }
@@ -294,18 +293,21 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     if ( style > m_fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in fillStyle0Change record - %d defined. Set to 0."), style, m_fill_styles.size());
-                         );
+                             log_swferror(_("Invalid fill style %d in "
+                                     "fillStyle0Change record - %d defined. "
+                                     "Set to 0."), style, m_fill_styles.size());
+                        );
                         style = 0;
                     }
                 }
     
                 current_path.setLeftFill(style);
-    #if SHAPE_LOG
+#if SHAPE_LOG
                 IF_VERBOSE_PARSE(
-                     log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
+                     log_parse(_("  shape_character read: fill0 (left) = %d"),
+                         current_path.getLeftFill());
                 );
-    #endif
+#endif
             }
             if ((flags & flagFillStyle1Change) && num_fill_bits > 0)
             {
@@ -324,12 +326,15 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     style += fill_base;
                 }
     
-                if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+                if ( tag_type == SWF::DEFINEFONT ||
+                        tag_type == SWF::DEFINEFONT2 )
                 {
                     if ( style > 1 )          // 0:hide 1:renderer
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                             log_swferror(_("Invalid fill style %d in fillStyle1Change record for font tag (0 or 1 valid). Set to 0."), style);
+                             log_swferror(_("Invalid fill style %d in "
+                                     "fillStyle1Change record for font tag "
+                                     "(0 or 1 valid). Set to 0."), style);
                         );
                         style = 0;
                     }
@@ -340,17 +345,20 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     if ( style > m_fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in fillStyle1Change record - %d defined. Set to 0."), style, m_fill_styles.size());
+                            log_swferror(_("Invalid fill style %d in "
+                                    "fillStyle1Change record - %d defined. "
+                                    "Set to 0."), style, m_fill_styles.size());
                         );
                         style = 0;
                     }
                 }
                 current_path.setRightFill(style);
-    #if SHAPE_LOG
+#if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
+                    log_parse(_("  shape_character read: fill1 (right) = %d"),
+                        current_path.getRightFill());
                 );
-    #endif
+#endif
             }
             if ((flags & flagLineStyleChange) && num_line_bits > 0)
             {
@@ -368,12 +376,14 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                 {
                     style += line_base;
                 }
-                if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+                if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2)
                 {
                     if ( style > 1 )          // 0:hide 1:renderer
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid line style %d in lineStyleChange record for font tag (0 or 1 valid). Set to 0."), style);
+                            log_swferror(_("Invalid line style %d in "
+                                    "lineStyleChange record for font tag "
+                                    "(0 or 1 valid). Set to 0."), style);
                         );
                         style = 0;
                     }
@@ -384,24 +394,28 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     if ( style > m_line_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
-                            log_swferror(_("Invalid fill style %d in lineStyleChange record - %d defined. Set to 0."), style, m_line_styles.size());
+                            log_swferror(_("Invalid fill style %d in "
+                                    "lineStyleChange record - %d defined. "
+                                    "Set to 0."), style, m_line_styles.size());
                         );
                         style = 0;
                     }
                 }
                 current_path.setLineStyle(style);
-    #if SHAPE_LOG
-                IF_VERBOSE_PARSE (
-                    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
+#if SHAPE_LOG
+                IF_VERBOSE_PARSE(
+                    log_parse(_("  shape_character_read: line = %d"), 
+                        current_path.getLineStyle());
                 )
-    #endif
+#endif
             }
             if (flags & flagHasNewStyles)
             {
                 if (!with_style)
                 {
                     IF_VERBOSE_MALFORMED_SWF(
-                         log_swferror("Unexpected HasNewStyle flag in tag %d shape record", tag_type);
+                         log_swferror("Unexpected HasNewStyle flag in tag "
+                             "%d shape record", tag_type);
                     );
                     continue;
                 }
@@ -448,11 +462,12 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                 int ax = cx + in.read_sint(num_bits);
                 int ay = cy + in.read_sint(num_bits);
     
-    #if SHAPE_LOG
+#if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                    log_parse(_("  shape_character read: curved edge   = %d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
+                    log_parse(_("  shape_character read: curved edge   = "
+                            "%d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
                 );
-    #endif
+#endif
                 current_path.m_edges.push_back(edge(cx, cy, ax, ay));
                 x = ax;
                 y = ay;
@@ -489,12 +504,14 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     }
                 }
     
-    #if SHAPE_LOG
+#if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                     log_parse(_("  shape_character_read: straight edge = %d %d - %d %d"), x, y, x + dx, y + dy);
+                     log_parse(_("  shape_character_read: straight edge = "
+                             "%d %d - %d %d"), x, y, x + dx, y + dy);
                 );
-    #endif
-                current_path.m_edges.push_back(edge(x + dx, y + dy, x + dx, y + dy));
+#endif
+                current_path.m_edges.push_back(edge(x + dx, y + dy,
+                            x + dx, y + dy));
                 x += dx;
                 y += dy;
             }
@@ -507,527 +524,386 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
         //       the bounds as edges are parsed.
         compute_bound(&m_bound, m.get_version());
     }
-    #ifdef GNASH_DEBUG_SHAPE_BOUNDS
+#ifdef GNASH_DEBUG_SHAPE_BOUNDS
     else
     {
         rect computedBounds;
         compute_bound(&computedBounds, m->get_version());
         if ( computedBounds != m_bounds )
         {
-            log_debug("Shape character read for tag %d contained embedded bounds %s, while we computed bounds %s",
-                      tag_type, m_bound.toString().c_str(), computedBounds.toString().c_str());
+            log_debug("Shape character read for tag %d contained embedded "
+                    "bounds %s, while we computed bounds %s",
+                    tag_type, m_bound, computedBounds);
         }
     }
-    #endif                                    // GNASH_DEBUG_SHAPE_BOUNDS
+#endif
 }
 
-    void  shape_character_def::display(character* inst)
+void  shape_character_def::display(character* inst)
+{
     // Draw the shape using our own inherent styles.
+    gnash::render::draw_shape_character(this, inst);
+}
+
+void  shape_character_def::display(const SWFMatrix& mat, const cxform& cx,
+    const std::vector<fill_style>& fill_styles,
+    const std::vector<line_style>& line_styles) const
+{
+    shape_character_def* this_non_const =
+        const_cast<shape_character_def*>(this);
+
+    render_handler* renderer = get_render_handler();
+
+    renderer->draw_shape_character(this_non_const, mat, cx, fill_styles,
+                                   line_styles);
+}
+
+// TODO: this should be moved to libgeometry or something
+// Finds the quadratic bezier curve crossings with the line Y.
+// The function can have zero, one or two solutions (cross1, cross2). The
+// return value of the function is the number of solutions.
+// x0, y0 = start point of the curve
+// x1, y1 = end point of the curve (anchor, aka ax|ay)
+// cx, cy = control point of the curve
+// If there are two crossings, cross1 is the nearest to x0|y0 on the curve.
+int curve_x_crossings(float x0, float y0, float x1, float y1,
+    float cx, float cy, float y, float &cross1, float &cross2)
+{
+    int count=0;
+
+    // check if any crossings possible
+    if ( ((y0 < y) && (y1 < y) && (cy < y))
+        || ((y0 > y) && (y1 > y) && (cy > y)) )
     {
-        gnash::render::draw_shape_character(this, inst);
+        // all above or below -- no possibility of crossing
+        return 0;
     }
 
-#ifdef DEBUG_DISPLAY_SHAPE_PATHS
+    // Quadratic bezier is:
+    //
+    // p = (1-t)^2 * a0 + 2t(1-t) * c + t^2 * a1
+    //
+    // We need to solve for x at y.
 
-#include "ogl.h"
+    // Use the quadratic formula.
 
-    static void point_normalize(point* p)
+    // Numerical Recipes suggests this variation:
+    // q = -0.5 [b +sgn(b) sqrt(b^2 - 4ac)]
+    // x1 = q/a;  x2 = c/q;
+
+    float A = y1 + y0 - 2 * cy;
+    float B = 2 * (cy - y0);
+    float C = y0 - y;
+
+    float rad = B * B - 4 * A * C;
+
+    if (rad < 0)
     {
-        float mag2 = p->x * p->x + p->y * p->y;
-        if (mag2 < 1e-9f)
-        {
-            p->x = 1;
-            p->y = 0;
-        }
-
-        float inv_mag = 1.0f / sqrtf(mag2);
-        p->x *= inv_mag;
-        p->y *= inv_mag;
+        return 0;
     }
-
-    static void show_fill_number(const point& p, int fill_number)
+    else
     {
-        // We're inside a glBegin(GL_LINES)
-
-        // Eh, let's do it in binary, least sig four bits...
-        float x = p.x;
-        float y = p.y;
-
-        int mask = 8;
-        while (mask)
+        float q;
+        float sqrt_rad = sqrtf(rad);
+        if (B < 0)
         {
-            if (mask & fill_number)
-            {
-                // Vert line --> 1.
-                glVertex2f(x, y - 40.0f);
-                glVertex2f(x, y + 40.0f);
-            }
-            else
-            {
-                // Rectangle --> 0.
-                glVertex2f(x - 10.0f, y - 40.0f);
-                glVertex2f(x + 10.0f, y - 40.0f);
-
-                glVertex2f(x + 10.0f, y - 40.0f);
-                glVertex2f(x + 10.0f, y + 40.0f);
-
-                glVertex2f(x - 10.0f, y + 40.0f);
-                glVertex2f(x + 10.0f, y + 40.0f);
-
-                glVertex2f(x - 10.0f, y - 40.0f);
-                glVertex2f(x - 10.0f, y + 40.0f);
-            }
-            x += 40.0f;
-            mask >>= 1;
-        }
-    }
-
-    static void debug_display_shape_paths(
-        const SWFMatrix& mat,
-        float /* object_space_max_error */,
-        const std::vector<path>& paths,
-        const std::vector<fill_style>& /* fill_styles */,
-        const std::vector<line_style>& /* line_styles */)
-    {
-        for (unsigned int i = 0; i < paths.size(); i++)
-        {
-            const path& p = paths[i];
-
-            if (p.getLeftFill() == 0 && p.getRightFill() == 0)
-            {
-                continue;
-            }
-
-            gnash::render::setMatrix(mat);
-
-            // Color the line according to which side has
-            // fills.
-            if (p.getLeftFill() == 0) glColor4f(1, 0, 0, 0.5);
-            else if (p.getRightFill() == 0) glColor4f(0, 1, 0, 0.5);
-            else glColor4f(0, 0, 1, 0.5);
-
-            // Offset according to which loop we are.
-            float offset_x = (i & 1) * 80.0f;
-            float offset_y = ((i & 2) >> 1) * 80.0f;
-            glMatrixMode(GL_MODELVIEW);
-            glPushMatrix();
-            glTranslatef(offset_x, offset_y, 0.f);
-
-            point pt;
-
-            glBegin(GL_LINE_STRIP);
-
-            mat.transform(&pt, point(p.ap.x, p.ap.y));
-            glVertex2f(pt.x, pt.y);
-
-            for (unsigned int j = 0; j < p.m_edges.size(); j++)
-            {
-                mat.transform(&pt, point(p.m_edges[j].cp.x, p.m_edges[j].cp.y));
-                glVertex2f(pt.x, pt.y);
-                mat.transform(&pt, point(p.m_edges[j].ap.x, p.m_edges[j].ap.y));
-                glVertex2f(pt.x, pt.y);
-            }
-
-            glEnd();
-
-            // Draw arrowheads.
-            point dir, right, p0, p1;
-            glBegin(GL_LINES);
-            {
-                for (unsigned int j = 0; j < p.m_edges.size(); j++)
-                {
-                    mat.transform(&p0, point(p.m_edges[j].cp.x, p.m_edges[j].cp.y));
-                    mat.transform(&p1, point(p.m_edges[j].ap.x, p.m_edges[j].ap.y));
-                    dir = point(p1.x - p0.x, p1.y - p0.y);
-                    point_normalize(&dir);
-                    right = point(-dir.y, dir.x); // perpendicular
-
-                    const float ARROW_MAG = 60.f; // TWIPS?
-                    if (p.getLeftFill() != 0)
-                    {
-                        glColor4f(0, 1, 0, 0.5);
-                        glVertex2f(p0.x,
-                            p0.y);
-                        glVertex2f(p0.x - dir.x * ARROW_MAG - right.x * ARROW_MAG,
-                            p0.y - dir.y * ARROW_MAG - right.y * ARROW_MAG);
-
-                        show_fill_number(point(p0.x - right.x * ARROW_MAG * 4,
-                            p0.y - right.y * ARROW_MAG * 4),
-                            p.getLeftFill());
-                    }
-                    if (p.getRightFill() != 0)
-                    {
-                        glColor4f(1, 0, 0, 0.5);
-                        glVertex2f(p0.x,
-                            p0.y);
-                        glVertex2f(p0.x - dir.x * ARROW_MAG + right.x * ARROW_MAG,
-                            p0.y - dir.y * ARROW_MAG + right.y * ARROW_MAG);
-
-                        show_fill_number(point(p0.x + right.x * ARROW_MAG * 4,
-                            p0.y + right.y * ARROW_MAG * 4),
-                            p.getRightFill());
-                    }
-                }
-            }
-            glEnd();
-
-            glPopMatrix();
-        }
-    }
-#endif  // DEBUG_DISPLAY_SHAPE_PATHS
-
-    void  shape_character_def::display(
-        const SWFMatrix& mat,
-        const cxform& cx,
-        const std::vector<fill_style>& fill_styles,
-        const std::vector<line_style>& line_styles) const
-    {
-        shape_character_def* this_non_const = const_cast<shape_character_def*>(this);
-
-        render_handler* renderer = get_render_handler();
-
-        renderer->draw_shape_character(this_non_const, mat, cx, fill_styles,
-                                       line_styles);
-    }
-
-    // TODO: this should be moved to libgeometry or something
-    int curve_x_crossings(float x0, float y0, float x1, float y1,
-        float cx, float cy, float y, float &cross1, float &cross2)
-    // Finds the quadratic bezier curve crossings with the line Y.
-    // The function can have zero, one or two solutions (cross1, cross2). The
-    // return value of the function is the number of solutions.
-    // x0, y0 = start point of the curve
-    // x1, y1 = end point of the curve (anchor, aka ax|ay)
-    // cx, cy = control point of the curve
-    // If there are two crossings, cross1 is the nearest to x0|y0 on the curve.
-    {
-        int count=0;
-
-        // check if any crossings possible
-        if ( ((y0 < y) && (y1 < y) && (cy < y))
-            || ((y0 > y) && (y1 > y) && (cy > y)) )
-        {
-            // all above or below -- no possibility of crossing
-            return 0;
-        }
-
-        // Quadratic bezier is:
-        //
-        // p = (1-t)^2 * a0 + 2t(1-t) * c + t^2 * a1
-        //
-        // We need to solve for x at y.
-
-        // Use the quadratic formula.
-
-        // Numerical Recipes suggests this variation:
-        // q = -0.5 [b +sgn(b) sqrt(b^2 - 4ac)]
-        // x1 = q/a;  x2 = c/q;
-
-        float A = y1 + y0 - 2 * cy;
-        float B = 2 * (cy - y0);
-        float C = y0 - y;
-
-        float rad = B * B - 4 * A * C;
-
-        if (rad < 0)
-        {
-            return 0;
+            q = -0.5f * (B - sqrt_rad);
         }
         else
         {
-            float q;
-            float sqrt_rad = sqrtf(rad);
-            if (B < 0)
-            {
-                q = -0.5f * (B - sqrt_rad);
-            }
-            else
-            {
-                q = -0.5f * (B + sqrt_rad);
-            }
-
-            // The old-school way.
-            // float t0 = (-B + sqrt_rad) / (2 * A);
-            // float t1 = (-B - sqrt_rad) / (2 * A);
-
-            if (q != 0)
-            {
-                float t1 = C / q;
-                if (t1 >= 0 && t1 < 1)
-                {
-                    float x_at_t1 =
-                        x0 + 2 * (cx - x0) * t1 + (x1 + x0 - 2 * cx) * t1 * t1;
-
-                    count++;
-                    assert(count==1);
-                    cross1 = x_at_t1;             // order is important!
-                }
-            }
-
-            if (A != 0)
-            {
-                float t0 = q / A;
-                if (t0 >= 0 && t0 < 1)
-                {
-                    float x_at_t0 =
-                        x0 + 2 * (cx - x0) * t0 + (x1 + x0 - 2 * cx) * t0 * t0;
-
-                    count++;
-                    if (count==2)
-                        cross2 = x_at_t0;         // order is important!
-                    else
-                        cross1 = x_at_t0;
-                }
-            }
-
+            q = -0.5f * (B + sqrt_rad);
         }
 
-        return count;
+        // The old-school way.
+        // float t0 = (-B + sqrt_rad) / (2 * A);
+        // float t1 = (-B - sqrt_rad) / (2 * A);
+
+        if (q != 0)
+        {
+            float t1 = C / q;
+            if (t1 >= 0 && t1 < 1)
+            {
+                float x_at_t1 =
+                    x0 + 2 * (cx - x0) * t1 + (x1 + x0 - 2 * cx) * t1 * t1;
+
+                count++;
+                assert(count==1);
+                cross1 = x_at_t1;             // order is important!
+            }
+        }
+
+        if (A != 0)
+        {
+            float t0 = q / A;
+            if (t0 >= 0 && t0 < 1)
+            {
+                float x_at_t0 =
+                    x0 + 2 * (cx - x0) * t0 + (x1 + x0 - 2 * cx) * t0 * t0;
+
+                count++;
+                // order is important!
+                if (count == 2) cross2 = x_at_t0;
+                else cross1 = x_at_t0;
+            }
+        }
+
     }
 
-    bool  shape_character_def::point_test_local(boost::int32_t x, boost::int32_t y, SWFMatrix& wm)
+    return count;
+}
+
+bool  shape_character_def::point_test_local(boost::int32_t x,
+        boost::int32_t y, SWFMatrix& wm)
+{
+    /*
+    Principle:
+    For the fill of the shape, we project a ray from the test point to the left
+    side of the shape counting all crossings. When a line or curve segment is
+    crossed we add 1 if the left fill style is set. Regardless of the left fill
+    style we subtract 1 from the counter then the right fill style is set.
+    This is true when the line goes in downward direction. If it goes upward,
+    the fill styles are reversed.
+
+    The final counter value reveals if the point is inside the shape (and
+    depends on filling rule, see below).
+    This method should not depend on subshapes and work for some malformed
+    shapes situations:
+    - wrong fill side (eg. left side set for a clockwise drawen rectangle)
+    - intersecting paths
+    */
+    point pt(x, y);
+
+    // later we will need non-zero for glyphs... (TODO)
+    bool even_odd = true;  
+
+    // FIXME: if the shape contains non-scaled strokes
+    //        we can't rely on boundary itself for a quick
+    //        way out. Bounds supposedly already include
+    //        thickness, so we might keep a flag telling us
+    //        whether *non_scaled* strokes are present
+    //        and if not still use the boundary check.
+    // NOTE: just skipping this test breaks a corner-case
+    //       in DrawingApiTest (kind of a fill-leakage making
+    //       the collision detection find you inside a self-crossing
+    //       shape).
+    //
+    if (m_bound.point_test(x, y) == false)
     {
-        /*
-        Principle:
-        For the fill of the shape, we project a ray from the test point to the left
-        side of the shape counting all crossings. When a line or curve segment is
-        crossed we add 1 if the left fill style is set. Regardless of the left fill
-        style we subtract 1 from the counter then the right fill style is set.
-        This is true when the line goes in downward direction. If it goes upward,
-        the fill styles are reversed.
+        return false;
+    }
 
-        The final counter value reveals if the point is inside the shape (and depends
-        on filling rule, see below).
-        This method should not depend on subshapes and work for some malformed
-        shapes situations:
-        - wrong fill side (eg. left side set for a clockwise drawen rectangle)
-        - intersecting paths
-        */
-        point pt(x, y);
+    unsigned npaths = m_paths.size();
+    int counter = 0;
 
-        bool even_odd = true;  // later we will need non-zero for glyphs... (TODO)
+    // browse all paths
+    for (unsigned pno=0; pno<npaths; pno++)
+    {
+        const path& pth = m_paths[pno];
+        unsigned nedges = pth.m_edges.size();
 
-        // FIXME: if the shape contains non-scaled strokes
-        //        we can't rely on boundary itself for a quick
-        //        way out. Bounds supposedly already include
-        //        thickness, so we might keep a flag telling us
-        //        whether *non_scaled* strokes are present
-        //        and if not still use the boundary check.
-        // NOTE: just skipping this test breaks a corner-case
-        //       in DrawingApiTest (kind of a fill-leakage making
-        //       the collision detection find you inside a self-crossing
-        //       shape).
-        //
-        if (m_bound.point_test(x, y) == false)
+        float next_pen_x = pth.ap.x;
+        float next_pen_y = pth.ap.y;
+        float pen_x, pen_y;
+
+        if (pth.m_new_shape)
         {
-            return false;
+            if ( ( even_odd && (counter % 2) != 0) ||
+                 (!even_odd && (counter != 0)) )
+            {
+                // the point is inside the previous subshape, so exit now
+                return true;
+            }
+
+            counter=0;
+        }
+        if (pth.empty()) continue;
+
+        // If the path has a line style, check for strokes there
+        if (pth.m_line != 0 )
+        {
+            assert(m_line_styles.size() >= pth.m_line);
+            line_style& ls = m_line_styles[pth.m_line-1];
+            double thickness = ls.getThickness();
+            if (! thickness )
+            {
+                thickness = 20; // at least ONE PIXEL thick.
+            }
+            else if ((!ls.scaleThicknessVertically()) &&
+                    (!ls.scaleThicknessHorizontally()) )
+            {
+                // TODO: pass the SWFMatrix to withinSquareDistance instead ?
+                double xScale = wm.get_x_scale();
+                double yScale = wm.get_y_scale();
+        //log_debug("thickness:%d, xScale:%g, yScale:%g", thickness, xScale, yScale);
+                thickness *= std::max(xScale, yScale);
+        //log_debug("after scaling, thickness:%d", thickness);
+            }
+            else if (ls.scaleThicknessVertically() != 
+                    ls.scaleThicknessHorizontally())
+            {
+                LOG_ONCE( log_unimpl("Collision detection for "
+                            "unidirectionally scaled strokes") );
+            }
+
+            double dist = thickness / 2.0;
+            double sqdist = dist * dist;
+            if (pth.withinSquareDistance(pt, sqdist))
+                return true;
         }
 
-        unsigned npaths = m_paths.size();
-        int counter = 0;
-
-        // browse all paths
-        for (unsigned pno=0; pno<npaths; pno++)
+        // browse all edges of the path
+        for (unsigned eno=0; eno<nedges; eno++)
         {
-            const path& pth = m_paths[pno];
-            unsigned nedges = pth.m_edges.size();
+            const edge& edg = pth.m_edges[eno];
+            pen_x = next_pen_x;
+            pen_y = next_pen_y;
+            next_pen_x = edg.ap.x;
+            next_pen_y = edg.ap.y;
 
-            float  next_pen_x = pth.ap.x;
-            float  next_pen_y = pth.ap.y;
-            float  pen_x, pen_y;
+            float cross1, cross2;
+            int dir1, dir2 = 0; // +1 = downward, -1 = upward
+            int crosscount = 0;
 
-            if (pth.m_new_shape)
+            if (edg.is_straight())
             {
-                if ( ( even_odd && (counter % 2) != 0) ||
-                     (!even_odd && (counter != 0)) )
-                {
-                    // the point is inside the previous subshape, so exit now
-                    return true;
-                }
-
-                counter=0;
-            }
-            if (pth.empty())
-                continue;
-
-            // If the path has a line style, check for strokes there
-            if (pth.m_line != 0 )
-            {
-                assert(m_line_styles.size() >= pth.m_line);
-                line_style& ls = m_line_styles[pth.m_line-1];
-                double thickness = ls.getThickness();
-                if (! thickness )
-                {
-                    thickness = 20; // at least ONE PIXEL thick.
-                }
-                else if ( (!ls.scaleThicknessVertically()) && (!ls.scaleThicknessHorizontally()) )
-                {
-                    // TODO: pass the SWFMatrix to withinSquareDistance instead ?
-                    double xScale = wm.get_x_scale();
-                    double yScale = wm.get_y_scale();
-			//log_debug("thickness:%d, xScale:%g, yScale:%g", thickness, xScale, yScale);
-                    thickness *= std::max(xScale, yScale);
-			//log_debug("after scaling, thickness:%d", thickness);
-                }
-                else if ( ls.scaleThicknessVertically() != ls.scaleThicknessHorizontally() )
-                {
-                    LOG_ONCE( log_unimpl("Collision detection for unidirectionally scaled strokes") );
-                }
-
-                double dist = thickness / 2.0;
-                double sqdist = dist * dist;
-                if (pth.withinSquareDistance(pt, sqdist))
-                    return true;
-            }
-
-            // browse all edges of the path
-            for (unsigned eno=0; eno<nedges; eno++)
-            {
-                const edge& edg = pth.m_edges[eno];
-                pen_x = next_pen_x;
-                pen_y = next_pen_y;
-                next_pen_x = edg.ap.x;
-                next_pen_y = edg.ap.y;
-
-                float cross1, cross2;
-                int dir1, dir2 = 0; // +1 = downward, -1 = upward
-                int crosscount = 0;
-
-                if (edg.is_straight())
-                {
-                    // ignore horizontal lines
-                    if (edg.ap.y == pen_y)  // TODO: better check for small difference?
-                    {
-                        continue;
-                    }
-                    // does this line cross the Y coordinate?
-                    if ( ((pen_y <= y) && (edg.ap.y >= y))
-                        || ((pen_y >= y) && (edg.ap.y <= y)) )
-                    {
-
-                        // calculate X crossing
-                        cross1 = pen_x + (edg.ap.x - pen_x) *
-                            (y - pen_y) / (edg.ap.y - pen_y);
-
-                        if (pen_y > edg.ap.y)
-                            dir1 = -1;  // upward
-                        else
-                            dir1 = +1;  // downward
-
-                        crosscount = 1;
-                    }
-                    else
-                    {
-                        // no crossing found
-                        crosscount = 0;
-                    }
-                }
-                else
-                {
-                    // ==> curve case
-                    crosscount = curve_x_crossings(pen_x, pen_y, edg.ap.x, edg.ap.y,
-                        edg.cp.x, edg.cp.y, y, cross1, cross2);
-                    dir1 = pen_y > y ? -1 : +1;
-                    dir2 = dir1 * (-1); // second crossing always in opposite dir.
-                } // curve
-
-                // ==> we have now:
-                //  - one (cross1) or two (cross1, cross2) ray crossings (X coordinate)
-                //  - dir1/dir2 tells the direction of the crossing
-                //    (+1 = downward, -1 = upward)
-                //  - crosscount tells the number of crossings
-
-                // need at least one crossing
-                if (crosscount == 0)
+                // ignore horizontal lines
+                // TODO: better check for small difference?
+                if (edg.ap.y == pen_y)  
                 {
                     continue;
                 }
-
-                bool touched=false;
-
-                // check first crossing
-                if (cross1 <= x)
+                // does this line cross the Y coordinate?
+                if ( ((pen_y <= y) && (edg.ap.y >= y))
+                    || ((pen_y >= y) && (edg.ap.y <= y)) )
                 {
-                    if (pth.m_fill0 > 0) counter += dir1;
-                    if (pth.m_fill1 > 0) counter -= dir1;
 
-                    touched = true;
-                }
+                    // calculate X crossing
+                    cross1 = pen_x + (edg.ap.x - pen_x) *
+                        (y - pen_y) / (edg.ap.y - pen_y);
 
-                // check optional second crossing (only possible with curves)
-                if ( (crosscount > 1) && (cross2 <= x) )
-                {
-                    if (pth.m_fill0 > 0) counter += dir2;
-                    if (pth.m_fill1 > 0) counter -= dir2;
+                    if (pen_y > edg.ap.y)
+                        dir1 = -1;  // upward
+                    else
+                        dir1 = +1;  // downward
 
-                    touched = true;
-                }
-
-            }// for edge
-        } // for path
-
-        return ( (even_odd && (counter % 2) != 0) ||
-                 (!even_odd && (counter != 0)) );
-    }
-
-    // Find the bounds of this shape, and store them in the given rectangle.
-    void  shape_character_def::compute_bound(rect* r, int swfVersion) const
-    {
-        r->set_null();
-
-        for (unsigned int i = 0; i < m_paths.size(); i++)
-        {
-            const path& p = m_paths[i];
-
-            unsigned thickness = 0;
-            if ( p.m_line )
-            {
-                // For glyph shapes m_line is allowed to be 1
-                // while no defined line styles are allowed.
-                if ( m_line_styles.empty() )
-                {
-                    // This is either a Glyph, for which m_line==1 is valid
-                    // or a bug in the parser, which we have no way to
-                    // check at this time
-                    assert(p.m_line == 1);
+                    crosscount = 1;
                 }
                 else
                 {
-                    thickness = m_line_styles[p.m_line-1].getThickness();
+                    // no crossing found
+                    crosscount = 0;
                 }
             }
-            p.expandBounds(*r, thickness, swfVersion);
+            else
+            {
+                // ==> curve case
+                crosscount = curve_x_crossings(pen_x, pen_y, edg.ap.x, edg.ap.y,
+                    edg.cp.x, edg.cp.y, y, cross1, cross2);
+                dir1 = pen_y > y ? -1 : +1;
+                dir2 = dir1 * (-1); // second crossing always in opposite dir.
+            } // curve
+
+            // ==> we have now:
+            //  - one (cross1) or two (cross1, cross2) ray crossings (X
+            //    coordinate)
+            //  - dir1/dir2 tells the direction of the crossing
+            //    (+1 = downward, -1 = upward)
+            //  - crosscount tells the number of crossings
+
+            // need at least one crossing
+            if (crosscount == 0)
+            {
+                continue;
+            }
+
+            bool touched = false;
+
+            // check first crossing
+            if (cross1 <= x)
+            {
+                if (pth.m_fill0 > 0) counter += dir1;
+                if (pth.m_fill1 > 0) counter -= dir1;
+
+                touched = true;
+            }
+
+            // check optional second crossing (only possible with curves)
+            if ( (crosscount > 1) && (cross2 <= x) )
+            {
+                if (pth.m_fill0 > 0) counter += dir2;
+                if (pth.m_fill1 > 0) counter -= dir2;
+
+                touched = true;
+            }
+
+        }// for edge
+    } // for path
+
+    return ( (even_odd && (counter % 2) != 0) ||
+             (!even_odd && (counter != 0)) );
+}
+
+// Find the bounds of this shape, and store them in the given rectangle.
+void
+shape_character_def::compute_bound(rect* r, int swfVersion) const
+{
+    r->set_null();
+
+    for (unsigned int i = 0; i < m_paths.size(); i++)
+    {
+        const path& p = m_paths[i];
+
+        unsigned thickness = 0;
+        if ( p.m_line )
+        {
+            // For glyph shapes m_line is allowed to be 1
+            // while no defined line styles are allowed.
+            if ( m_line_styles.empty() )
+            {
+                // This is either a Glyph, for which m_line==1 is valid
+                // or a bug in the parser, which we have no way to
+                // check at this time
+                assert(p.m_line == 1);
+            }
+            else
+            {
+                thickness = m_line_styles[p.m_line-1].getThickness();
+            }
         }
+        p.expandBounds(*r, thickness, swfVersion);
     }
+}
 
 #ifdef GNASH_USE_GC
-    void  shape_character_def::markReachableResources() const
+void  shape_character_def::markReachableResources() const
+{
+    assert(isReachable());
+    for (FillStyleVect::const_iterator i=m_fill_styles.begin(),
+            e=m_fill_styles.end(); i != e; ++i)
     {
-        assert(isReachable());
-        for (FillStyleVect::const_iterator i=m_fill_styles.begin(), e=m_fill_styles.end();
-            i != e; ++i)
-        {
-            i->markReachableResources();
-        }
+        i->markReachableResources();
     }
-#endif                                        // GNASH_USE_GC
+}
+#endif
 
-    size_t  shape_character_def::numPaths() const
+size_t shape_character_def::numPaths() const
+{
+    return m_paths.size();
+}
+
+size_t
+shape_character_def::numEdges() const
+{
+    typedef std::vector<path> PathList;
+
+    size_t count = 0;
+    for (PathList::const_iterator i=m_paths.begin(), ie=m_paths.end();
+            i!=ie; ++i)
     {
-        return m_paths.size();
+        count += i->size();
     }
-
-    size_t  shape_character_def::numEdges() const
-    {
-        typedef std::vector<path> PathList;
-
-        size_t count = 0;
-        for  (PathList::const_iterator i=m_paths.begin(), ie=m_paths.end(); i!=ie; ++i)
-        {
-            count += i->size();
-        }
-        return count;
-    }
+    return count;
+}
 
 } // end namespace gnash
 
