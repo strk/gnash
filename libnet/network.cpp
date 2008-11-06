@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
+//xs
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -60,6 +60,7 @@
 #endif
 
 #include "buffer.h"
+#include "GnashException.h"
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
@@ -67,6 +68,8 @@
 
 using namespace std;
 
+/// \namespace gnash
+///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
 
 static const char *DEFAULTPROTO = "tcp";
@@ -602,7 +605,7 @@ Network::createClient(const string &hostname, short port)
 bool
 Network::closeNet()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if ((_sockfd > 0) && (_connected)) {
         closeNet(_sockfd);
@@ -616,7 +619,7 @@ Network::closeNet()
 bool
 Network::closeNet(int sockfd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int retries = 0;
 
@@ -682,7 +685,7 @@ Network::closeConnection(void)
 bool
 Network::closeConnection(int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (fd > 0) {
         ::close(fd);
@@ -947,34 +950,65 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
     return ret;
 }
 
-//boost::shared_ptr<vector<int> >
-boost::shared_ptr<std::vector<int> >
+boost::shared_ptr<std::vector<struct pollfd> >
 Network::waitForNetData(int limit, struct pollfd *fds)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
-    boost::shared_ptr<vector<int> > hits(new vector<int>);
+    boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
 
     int ret = poll(fds, limit, _timeout);
-    
-    for (int i = 0; i<limit; i++) {
-	if (fds[i].revents == POLLIN) {
-	    hits->push_back(i);
-	    // If we got as many matches as were seen by poll(), then
-	    // stop searching the rest of the items in the array.
-	    if (hits->size() == ret) {
-		break;
+
+    log_debug("Poll returned: %d, timeout is: %d", ret, _timeout);
+
+    while (ret--) {
+	for (int i = 0; i<limit; i++) {
+	    // If we get this event, the other end of the connection has been shut down
+#if 0
+	    if (fds[i].revents & POLLERR) {
+		log_debug("Revents has a  set %d", fds[i].revents);
 	    }
+	    if (fds[i].revents & POLLHUP) {
+		log_debug("Revents has a POLLHUP set %d", fds[i].revents);
+	    }
+	    if (fds[i].revents & POLLNVAL) {
+		log_debug("Revents has a POLLNVAL set %d", fds[i].revents);
+//		throw GnashException("Polling an invalid file descritor");
+	    }
+	    if (fds[i].revents & POLLIN) {
+		log_debug("Revents has a POLLIN set %d", fds[i].revents);
+	    }
+	    if (fds[i].revents & POLLMSG) {
+		log_debug("Revents has a POLLMSG set %d", fds[i].revents);
+	    }
+	    if (fds[i].revents & POLLREMOVE) {
+		log_debug("Revents has a POLLREMOVE set %d", fds[i].revents);
+	    }
+	    if (fds[i].revents & POLLRDHUP) {
+		log_debug("Revents has a POLLRDHUP set %d", fds[i].revents);
+//		throw GnashException("Connection dropped from client side.");
+	    }
+#endif    
+// 	    if ((fds[i].revents & POLLIN) || (fds[i].revents & POLLRDHUP))  {
+		hits->push_back(fds[i]);
+// 		// If we got as many matches as were seen by poll(), then
+// 		// stop searching the rest of the items in the array.
+// 		if (hits->size() == ret) {
+// 		    break;
+// 		}
+// 	    } else {
+// 		log_debug("No data on fd #%d, revents is %d", fds[i].fd, fds[i].revents);
+// 	    }
 	}
     }
-
+    
     return hits;
 }
 
 fd_set
 Network::waitForNetData(vector<int> &data)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     fd_set fdset;
     FD_ZERO(&fdset);
@@ -987,10 +1021,9 @@ Network::waitForNetData(vector<int> &data)
 }
 
 fd_set
-//boost::shared_ptr<vector<int> >
 Network::waitForNetData(int limit, fd_set files)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     // select modifies this the set of file descriptors, and we don't
     // want to modify the one passed as an argument, so we make a copy.
@@ -1030,6 +1063,26 @@ Network::waitForNetData(int limit, fd_set files)
     }
 
     return fdset;
+}
+
+Network &
+Network::operator = (Network &net)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    // the file descriptor used for reading and writing
+    _sockfd= net.getFileFd();
+    // the file descriptor used to listen for new connections
+    _listenfd = net.getListenFd();
+    _port = net.getPort();
+    _portstr = net.getPortStr();
+    _url = net.getURL();
+    _protocol = net.getProtocol();
+    _host = net.getHost();
+    _path = net.getPath();
+    _connected = net.connected();
+    _debug = net.netDebug();
+    _timeout = net.getTimeout();
 }
 
 void

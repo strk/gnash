@@ -48,22 +48,14 @@
 #include <vector>
 #include <cassert>
 #include <string>
-
-// /// \struct pollfd
-// ///
-// /// We use the system call poll()s data structure for passing
-// #ifndef HAVE_POLL
-// struct pollfd {
-//     int fd;        // the relevant file descriptor
-//     short events;  // events we are interested in
-//     short revents; // events which occur will be marked here
-// };
-// #endif
+#include <map>
 
 namespace amf {
 class Buffer;
 }
 
+/// \namespace gnash
+///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
 
 // Define the ports for the RTMP protocols
@@ -89,6 +81,10 @@ const short RTMPTS_PORT = 443;
 const size_t NETBUFSIZE = 1448;	// 1500 appears to be the default size as used by FMS
 //const size_t NETBUFSIZE = 1357*2;	// 1500 appears to be the default size as used by FMS
 
+/// \class Network
+///	This is a low level network class for Gnash and Cygnal. This
+///	handles the grunt work on both the client side and the server
+///	side of a network connection.
 class DSOEXPORT Network {
 public:
     typedef boost::uint8_t byte_t;
@@ -96,27 +92,62 @@ public:
     Network();
     ~Network();
     
-    // Create a new server. After creating it, then you have to wait
-    // for an incoming connection.
+    /// \brief Create a new server.
+    ///		After creating it, then you have to wait for an
+    ///		incoming connection.
+    ///
+    /// @param port The optional port number to wait on for
+    ///		connections.
+    ///
+    /// @return The file descritor to wait for connections on.
     int createServer(void);
     int createServer(short port);
     
-    // Accept a client connection for the current server.
+    /// \brief Accept a client connection for the current server.
+    ///
+    /// @param fd The optional file descriptor to wait on for
+    ///		connections.
+    ///
+    /// @param block True if this should be a blocking wait.
+    ///
+    /// @return The file descriptor of the new connection.
     int newConnection(void);
     int newConnection(int fd);
     int newConnection(bool block, int fd);
     int newConnection(bool block);
 
-    // Connect to a named pipe
+    /// \brief Connect to a named pipe
+    ///
+    ///
+    /// @param sock The name of the named pipe to connect to.
+    ///
+    /// @return True if the connect suceeded, false if it failed.
     bool connectSocket(const std::string &sock);
 
-    // Create a client connection to a tcp/ip server
+    /// \brief Create a client connection to a tcp/ip server.
+    ///
+    /// @param port The tcp/ip port to use for contacting the server.
+    ///
+    /// @param hostname The name of the host to connect to. The
+    ///		default is localhost.
+    ///
+    /// @return True if the connect suceeded, false if it failed.
     bool createClient(void);
     bool createClient(short port);
     bool createClient(const std::string &hostname);
     bool createClient(const std::string &hostname, short port);
 
-    // Read from the connection
+    /// \brief Read from the opened connection.
+    ///
+    /// @param buffer A Buffer class to hold the data.
+    ///
+    /// @param timeout An optional timeout value for reading data.
+    ///
+    /// @param fd The optional file descriptor to read data from.
+    ///
+    /// @param nbytes The number of bytes to try to read.
+    ///
+    /// @return The number of bytes read.
     amf::Buffer *readNet();
     int readNet(amf::Buffer *buffer);
     int readNet(amf::Buffer *buffer, int timeout);
@@ -125,7 +156,17 @@ public:
     int readNet(int fd, byte_t *buffer, int nbytes);
     int readNet(int fd, byte_t *buffer, int nbytes, int timeout);
     
-    // Write to the connection
+    /// \brief Write to the opened connection.
+    ///
+    /// @param buffer A Buffer class holding the data.
+    ///
+    /// @param timeout An optional timeout value for writing data.
+    ///
+    /// @param fd The optional file descriptor to write data to from.
+    ///
+    /// @param nbytes The number of bytes to try to write..
+    ///
+    /// @return The number of bytes read.
     int writeNet(amf::Buffer *buffer);
     int writeNet(const std::string &buffer);
     int writeNet(const byte_t *buffer, int nbytes);
@@ -134,12 +175,16 @@ public:
     int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
 
 #ifdef HAVE_POLL
-    boost::shared_ptr<std::vector<int> > waitForNetData(int limit, struct pollfd *fds);
+    boost::shared_ptr<std::vector<struct pollfd> > waitForNetData(int limit, struct pollfd *fds);
 #endif
     fd_set waitForNetData(int limit, fd_set data);
     fd_set waitForNetData(std::vector<int> &data);
 	
-    // Close the connection
+    /// \brief Close the connection
+    ///
+    /// @param fd The file descritor of the open connection to close.
+    ///
+    /// @return True if the connection was closed, false if it failed.
     bool closeNet();
     bool closeNet(int fd);
     bool closeConnection();
@@ -169,10 +214,10 @@ public:
     const std::string& getHost() const { return _host; }
     const std::string& getPortStr() const { return _portstr; }
     const std::string& getPath() const { return _path; }
+    void setTimeout(int x) { _timeout = x; }
     int getTimeout() const { return _timeout; }
 
-    // Network is not copiable !
-    //Network &operator = (Network &net) {}
+    Network &operator = (Network &net);
 
  protected:
     in_addr_t   _ipaddr;
