@@ -37,7 +37,7 @@
 namespace gnash
 {
     
-class HTTP
+class HTTP : public gnash::Network
 {
 public:
 // as defined by the W3: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
@@ -240,7 +240,7 @@ public:
     const std::stringstream &formatTE(const std::string &data)
  	{return formatCommon("TE: " + data); };
     // All HTTP messages are terminated with a blank line
-    void terminateHeader() { formatCommon("\r\n"); };    
+    void terminateHeader() { formatCommon(""); };    
     
     const std::stringstream &formatErrorResponse(http_status_e err);
     

@@ -49,6 +49,7 @@
 #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
+#include "diskstream.h"
 
 using namespace gnash;
 using namespace std;
@@ -144,7 +145,7 @@ HTTP::processGetRequest()
 //    cerr << hexify(buf->reference(), buf->size(), false) << endl;
     
     if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
+	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }
     
@@ -189,11 +190,10 @@ HTTP::formatHeader(http_status_e type)
     return _header;
 }
 
-
 const stringstream &
 HTTP::formatCommon(const string &data)
 {
-    _header << data;
+    _header << data << "\r\n";
 
     return _header;
 }
@@ -1324,6 +1324,184 @@ HTTP::dump() {
     log_debug("RTMPT optional client ID is: ", _clientid);
     log_debug (_("==== ==== ===="));
 }
+
+extern "C" {
+void
+http_handler(Handler::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+//    struct thread_params thread_data;
+    string url, filespec, parameters;
+    string::size_type pos;
+    Network *net = reinterpret_cast<Network *>(args->handler);
+    HTTP www;
+//    www.setHandler(net);
+
+    log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
+	      args->netfd, get_thread_id());
+    
+    string docroot = args->filespec;
+    
+    log_debug("Starting to wait for data in net for fd #%d", args->netfd);
+
+    // Wait for data, and when we get it, process it.
+    do {
+#ifdef THREADED_IO
+	hand->wait();
+	if (hand->timetodie()) {
+	    log_debug("Not waiting no more, no more for more HTTP data for fd #%d...", args->netfd);
+	    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
+	    if ((*hit).second) {
+		log_debug("Removing handle %x for HTTP on fd #%d",
+			  (void *)hand, args->netfd);
+		handlers.erase(args->netfd);
+		delete (*hit).second;
+	    }
+	    return;
+	}
+#endif
+	
+#ifdef USE_STATISTICS
+	struct timespec start;
+	clock_gettime (CLOCK_REALTIME, &start);
+#endif
+	
+// 	conndata->statistics->setFileType(NetStats::RTMPT);
+// 	conndata->statistics->startClock();
+//	args->netfd = www.getFileFd();
+//	www.recvMsg(5);
+	www.recvMsg(args->netfd);
+	
+	if (!www.processGetRequest()) {
+//	    hand->die();	// tell all the threads for this connection to die
+//	    hand->notifyin();
+	    log_debug("Net HTTP done for fd #%d...", args->netfd);
+// 	    hand->closeNet(args->netfd);
+	    return;
+	}
+	url = docroot;
+	url += www.getURL();
+	pos = url.find("?");
+	filespec = url.substr(0, pos);
+	parameters = url.substr(pos + 1, url.size());
+	// Get the file size for the HTTP header
+	
+	if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
+	    www.formatErrorResponse(HTTP::NOT_FOUND);
+	}
+	// Send the reply
+//	www.formatGetReply(HTTP::LIFE_IS_GOOD);
+//	cerr << "Size = " << www.getHeader().size() << "	" << www.getHeader() << endl;
+	
+//	www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
+//	hand->writeNet(args->netfd, www.getHeader(), www.getHeader().size());
+//	strcpy(thread_data.filespec, filespec.c_str());
+//	thread_data.statistics = conndata->statistics;
+	
+	// Keep track of the network statistics
+//	conndata->statistics->stopClock();
+// 	log_debug (_("Bytes read: %d"), www.getBytesIn());
+// 	log_debug (_("Bytes written: %d"), www.getBytesOut());
+//	st.setBytes(www.getBytesIn() + www.getBytesOut());
+//	conndata->statistics->addStats();
+
+	if (filespec[filespec.size()-1] == '/') {
+	    filespec += "index.html";
+	}
+
+ 	DiskStream filestream;
+ 	filestream.open(filespec);
+	boost::uint8_t *ptr = filestream.loadChunk();
+	www.clearHeader();
+	const stringstream &ss = www.formatHeader(filestream.getFileSize(), HTTP::LIFE_IS_GOOD);
+// 	cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;	
+// 	string body = ss.str();
+// 	cerr << "Body Size = " << body.size() << endl;
+// 	body.insert(ss.str().size(), (char *)filestream.get(), filestream.getFileSize());
+// 	cerr << "Body Size = " << body.size() << endl
+// 	     << body << endl;
+// 	// 	cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;
+// 	www.writeNet(args->netfd, (boost::uint8_t *)body.c_str(), body.size());
+ 	www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
+	www.writeNet(args->netfd, filestream.get(), filestream.getFileSize());
+	log_debug("http_handler all done now finally...");
+	return;
+#if 0
+	if (url != docroot) {
+	    log_debug (_("File to load is: %s"), filespec.c_str());
+	    log_debug (_("Parameters are: %s"), parameters.c_str());
+	    struct stat st;
+	    int filefd;
+	    size_t ret;
+#ifdef USE_STATISTICS
+	    struct timespec start;
+	    clock_gettime (CLOCK_REALTIME, &start);
+#endif
+	    if (stat(filespec.c_str(), &st) == 0) {
+		filefd = ::open(filespec.c_str(), O_RDONLY);
+		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
+			   st.st_size, filefd);
+		do {
+		    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+		    ret = read(filefd, buf->reference(), buf->size());
+		    if (ret == 0) { // the file is done
+			break;
+		    }
+		    if (ret != buf->size()) {
+			buf->resize(ret);
+			log_debug("Got last data block from disk file, size %d", buf->size());
+		    }
+		    log_debug("Read %d bytes from %s.", ret, filespec);
+#if 0
+		    hand->pushout(buf);
+		    hand->notifyout();
+#else
+		    // Don't bother with the outgoing que
+		    if (ret > 0) {
+			ret = hand->writeNet(buf);
+		    }
+#endif
+		} while(ret > 0);
+		log_debug("Done transferring %s to net fd #%d",
+			  filespec, args->netfd);
+		::close(filefd); // close the disk file
+		// See if this is a persistant connection
+// 		if (!www.keepAlive()) {
+// 		    log_debug("Keep-Alive is off", www.keepAlive());
+// // 		    hand->closeConnection();
+//  		}
+#ifdef USE_STATISTICS
+		struct timespec end;
+		clock_gettime (CLOCK_REALTIME, &end);
+		log_debug("Read %d bytes from \"%s\" in %f seconds",
+			  st.st_size, filespec,
+			  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
+#endif
+	    }
+
+// 	    memset(args->filespec, 0, 256);
+// 	    memcpy(->filespec, filespec.c_str(), filespec.size());
+// 	    boost::thread sendthr(boost::bind(&stream_thread, args));
+// 	    sendthr.join();
+	}
+#endif
+	
+#ifdef USE_STATISTICS
+	struct timespec end;
+	clock_gettime (CLOCK_REALTIME, &end);
+	log_debug("Processing time for GET request was %f seconds",
+		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
+#endif
+//	conndata->statistics->dump();
+//    }
+//    } while(!hand->timetodie());
+    } while(true);
+    
+    log_debug("httphandler all done now finally...");
+    
+} // end of httphandler
+    
+} // end of extern C
 
 } // end of gnash namespace
 
