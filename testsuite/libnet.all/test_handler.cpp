@@ -142,7 +142,7 @@ test_pollfds()
     fds2.events = POLLIN |  POLLRDHUP;
 
     hand.addPollFD(fds2, test2);
-    if (hand.getPollFD(1).fd == 4) {
+    if ((hand.getPollFD(1).fd == 4)&& (hand.getEntry(4) == func2)) {
         runtest.pass ("Handler::addPollFD(1)");
     } else {
         runtest.fail ("Handler::addPollFD(1)");
