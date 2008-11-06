@@ -66,12 +66,11 @@ INCLUDES = -I.. \
 	$(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
-	crc.h \
-	diskstream.h
+	crc.h
 
 bin_PROGRAMS = cygnal
 
-cygnal_SOURCES = cygnal.cpp crc.cpp cvm.cpp diskstream.cpp
+cygnal_SOURCES = cygnal.cpp crc.cpp cvm.cpp
 cygnal_LDADD = $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support
