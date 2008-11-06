@@ -97,8 +97,11 @@ asm {
    delete
    pop
 };
-
-check_equals(o, 5);
+#if OUTPUT_VERSION < 7
+ check_equals(o, undefined)
+#else
+ check_equals(o, 5);
+#endif
 
 o = 5;
 asm {
@@ -117,8 +120,11 @@ asm {
    delete
    pop
 };
-
-check_equals(o.b, 5);
+#if OUTPUT_VERSION < 7
+ check_equals(o.b, undefined)
+#else
+ check_equals(o.b, 5);
+#endif
 
 o = {};
 o.b = 5;
@@ -237,5 +243,5 @@ asm {
 check_equals(o.b.c, 5);
 
 
-totals();
+totals(41);
 

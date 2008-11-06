@@ -2555,23 +2555,34 @@ SWFHandlers::ActionDelete(ActionExec& thread)
     // 'a.b.c'  | string        nothing
 
     const size_t stackSize = env.stack_size();
+    const int version = env.getVM().getSWFVersion();
 
     std::string propertyname = env.top(0).to_string();
 
     boost::intrusive_ptr<as_object> obj;
 
-    // If there is only one item on the stack, it should be parsed to see
-    // if it's a path, then we try to delete it. If there are two or more
-    // items on the stack, they have to be property and object.
+    // Behaviour is different according to version. For SWF7 and above,
+    // the delete fails if there aren't two items on the stack. For SWF6
+    // and below, a single item should be parsed to see if it's a path,
+    // then we try to delete it. If it's not a path, we try to delete it as
+    // a variable.
+    //
+    // In both cases, if there are two or more items on the stack, they
+    // have to be property and object.
     if (stackSize < 2)
     {
-        std::string path, var;
-        if (!as_environment::parse_path(propertyname, path, var))
-        {
-            // If it's not a path, assume it's a variable and try to delete.
+        if (version > 6) {
             env.top(1).set_bool(false);
             env.drop(1);
             return;
+        }
+
+        std::string path, var;
+        if (!as_environment::parse_path(propertyname, path, var))
+        {
+            // It's not a path. For SWF 7 and above, don't delete. Otherwise
+            // assume it's a variable and try to delete.
+            env.top(1).set_bool(thread.delVariable(propertyname));
         }
         else {
             as_value target = thread.getVariable(path);
@@ -2601,7 +2612,6 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 void
 SWFHandlers::ActionDelete2(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
 
     as_environment& env = thread.env;
 
