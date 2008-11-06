@@ -103,16 +103,16 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("getAdminFlag");
     }
 
-    if (crc.getTestingFlag() == false) {
+    if (crc.getTestingFlag() == true) {
         runtest.pass ("getTestingFlag");
     } else {
         runtest.fail ("getTestingFlag");
     }
 
-    if (crc.getNetDebugFlag() == false) {
-        runtest.pass ("getNetDebugFlag");
+    if (crc.getThreadingFlag() == true) {
+        runtest.pass ("getThreadingFlag");
     } else {
-        runtest.fail ("getNetDebugFlag");
+        runtest.fail ("getThreadingFlag");
     }
 
     if (crc.getFDThread() == 10) {
