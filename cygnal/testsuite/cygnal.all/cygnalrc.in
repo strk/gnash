@@ -22,6 +22,9 @@ set admin no
 # Do use a fully threaded server
 set threading yes
 
+# Do use a fully threaded server
+set testing yes
+
 # When running in threaded mode, this is the number of file descritors
 # watched by each thread
 set fdThread 10
