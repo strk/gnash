@@ -1750,7 +1750,7 @@ if test x"$media_handler" = x"gst"; then
     AC_DEFINE([HAVE_GST_INSTALL_PLUGINS_SUPPORTED], [], [GStreamer provides the gst_install_plugins_supported function]),
     has_gst_install_plugins_supported='no')
   CFLAGS=$save_cflags
-  if test x$has_gst_install_plugins_async = xno || test x$has_gst_install_plugins_supported = xno; then
+  if test x$has_gst_install_plugins_async = xno -o x$has_gst_install_plugins_supported = xno; then
     has_modern_gstpbutils='no'
     AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
   else
