@@ -59,7 +59,7 @@ Handler::Handler()
 Handler::~Handler()
 {
 //    GNASH_REPORT_FUNCTION;
-    closeConnection();
+//    closeConnection();
     _die = true;
     notifyout();
     notifyin();
@@ -160,6 +160,26 @@ Handler::clear(fifo_e direction)
     }    
 }
 
+void
+Handler::addPollFD(struct pollfd &fd)
+{
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return _pollfds.push_back(fd);
+}
+
+struct pollfd
+&Handler::getPollFD(int index)
+{
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return _pollfds[index];
+}
+struct pollfd *
+Handler::getPollFDPtr()
+{
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return &_pollfds[0];
+};
+
 // Dump internal data.
 void
 Handler::dump()
@@ -169,6 +189,7 @@ Handler::dump()
     _outgoing.dump();    
 }
 
+#if 0
 size_t
 Handler::readPacket(int fd)
 {
@@ -205,6 +226,7 @@ Handler::readPacket(int fd)
     }
     return ret;
 }
+#endif
 
 // start the two thread handlers for the queues
 bool
@@ -219,8 +241,28 @@ Handler::start(thread_params_t *args)
     log_debug(_("Starting Handlers for port %d, tid %ld"),
 	      args->port, get_thread_id());
 
+    struct pollfd *fds;
+    int nfds = 1;
+    Network net;
+    boost::shared_ptr<vector<int> > hits = net.waitForNetData(nfds, fds);
+    vector<int>::const_iterator it;
+#if 0
+    for (it = _pollfds.begin(); it != _pollfds.end(); it++) {
+//	Buffer buf;
+//	net.readNet(*it, buf.reference(), buf.size());
+	args->netfd = *it;
+	if (crcfile.getThreadingFlag()) {
+	    if (args->port == port_offset + gnash::RTMPT_PORT) {
+		boost::thread handler(boost::bind(&http_handler, args));
+	    }
+	} else {
+	    callback[*it](args);
+	}
+    }    
+#endif
+    
 //     boost::thread outport(boost::bind(&netout_handler, args));
-    boost::thread inport(boost::bind(&netin_handler, args));
+//    boost::thread inport(boost::bind(&netin_handler, args));
 
 #if 0
     if (args->port == 4080) {	// FIXME: hack alert!
@@ -231,15 +273,6 @@ Handler::start(thread_params_t *args)
     }
 #endif
 
-// We don't want to wait for the threads to complete, we
-// want to return to the main program so it can spawn another
-// thread for the next incoming connection.    
-// 	inport.join();    
-// 	outport.join();
-// 	handler.join();
-//     if (_die) {
-// 	log_debug("Handler done...");
-//     }
     return true;
 }
 
@@ -249,13 +282,14 @@ netin_handler(Handler::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 
-    Handler *hand = reinterpret_cast<Handler *>(args->handle);
+    Network *net = reinterpret_cast<Network *>(args->handler);
+    size_t ret;
 
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
     
     do {
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-	size_t ret = hand->readNet(args->netfd, buf->reference(), buf->size(), 1);
+//	ret = hand->readNet(args->netfd, buf->reference(), buf->size(), 1);
 
 //	cerr << (char *)buf->reference() << endl;
 	// the read timed out as there was no data, but the socket is still open.
@@ -275,18 +309,19 @@ netin_handler(Handler::thread_params_t *args)
 // 	    if (ret < NETBUFSIZE) {
 // 		buf->resize(ret);
 // 	    }
-	    hand->push(buf);
-	    hand->notify();
+//	    hand->push(buf);
+//	    hand->notify();
 	} else {
 	    log_debug("no more data for fd #%d, exiting...", args->netfd);
-	    hand->die();
+//	    hand->die();
 	    break;
 	}
-    } while (!hand->timetodie());
+//    } while (!hand->timetodie());
+    } while (ret > 0);
     // We're done. Notify the other threads the socket is closed, and tell them to die.
     log_debug("Net In handler done for fd #%d...", args->netfd);
-    hand->notify();
-    hand->closeNet(args->netfd);
+//    hand->notify();
+//    hand->closeNet(args->netfd);
 //    hand->dump();
 }
 

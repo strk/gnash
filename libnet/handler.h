@@ -19,10 +19,24 @@
 #ifndef __HANDLER_H__
 #define __HANDLER_H__ 1
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <boost/cstdint.hpp>
+#include <boost/thread/mutex.hpp>
 //#include <boost/thread/condition.hpp>
 #include <string>
 #include <deque>
+#include <map>
+
+#ifdef HAVE_POLL
+# include <sys/poll.h>
+#else 
+# ifdef HAVE_EPOLL
+#  include <sys/epoll.h>
+# endif
+#endif
 
 #include "log.h"
 #include "network.h"
@@ -35,9 +49,11 @@
 namespace gnash
 {
 
-class Handler : public gnash::Network
+
+class Handler
 {
 public:
+    
      DSOEXPORT Handler();
     ~Handler();
 
@@ -53,10 +69,12 @@ public:
     typedef struct {
 	int netfd;
 	int port;
-	void *handle;
+	void *handler;
 	std::string filespec;
     } thread_params_t ;
     
+    typedef void entry_t (thread_params_t *);
+
     // Specify which queue should be used
     typedef enum { INCOMING, OUTGOING } fifo_e;
     
@@ -124,11 +142,12 @@ public:
     void waitin() { _incoming.wait(); };
     void waitout() { _outgoing.wait(); };
 
-    size_t readPacket(int fd);
+//    size_t readPacket(int fd);
     
     // start the two thread handlers for the queues
     bool DSOEXPORT start(thread_params_t *args);
 
+#if 0
     /// \brief Write a Buffer the network connection.
     ///
     /// @param fd The file descriptor to write the data too.
@@ -146,7 +165,8 @@ public:
     /// @return The number of bytes sent
     int  DSOEXPORT writeNet(boost::shared_ptr<amf::Buffer> &buf)
     	{ return Network::writeNet(buf->reference(), buf->size()); };
-    
+#endif
+
     // Dump internal data.
     void dump();
     
@@ -156,12 +176,24 @@ public:
 #endif
     void die() { _die = true; _outgoing.notify(); };
     bool timetodie() { return _die; };
+
+    void addPollFD(struct pollfd &fd);
+    struct pollfd &getPollFD(int index);
+    struct pollfd *getPollFDPtr();
     
 private:
-    bool _die;
-    int _netfd;
-    CQue _incoming;
-    CQue _outgoing;
+    bool	_die;
+    int		_netfd;
+    CQue	_incoming;
+    CQue	_outgoing;
+    /// \var Handler::_handlers
+    ///		Keep a list of all active network connections
+    std::map<int, entry_t *> _handlers;
+#ifdef HAVE_POLL
+    // This is the mutex that controls access to the que.
+    std::vector<struct pollfd> _pollfds;
+    boost::mutex	_poll_mutex;
+#endif
 };
 
 // This is the thread for all incoming network connections, which
