@@ -395,12 +395,39 @@ textfield_maxChars(const fn_call& fn)
 }
 
 static as_value
+textfield_text(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+    if (!fn.nargs)
+    {
+        // Getter
+        //
+        // FIXME: should return text without HTML tags.
+        return as_value(ptr->get_text_value());
+    }
+
+    // Setter
+    int version = ptr->getVM().getSWFVersion();
+    ptr->setTextValue(
+            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
+
+    return as_value();
+}
+
+static as_value
 textfield_htmlText(const fn_call& fn)
 {
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(ptr->get_text_value());
+    }
 
-    LOG_ONCE (log_unimpl("TextField.htmlText"));
+    // Setter
+    int version = ptr->getVM().getSWFVersion();
+    ptr->setTextValue(
+            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
 
     return as_value();
 }
@@ -1144,21 +1171,6 @@ TextField::set_member(string_table::key name,
     {
     default:
         break;
-    case NSV::PROP_TEXT:
-    {
-        int version = get_parent()->get_movie_definition()->get_version();
-        setTextValue(utf8::decodeCanonicalString(
-                    val.to_string_versioned(version), version));
-        return true;
-    }
-    case NSV::PROP_HTML_TEXT:
-    {
-        int version = get_parent()->get_movie_definition()->get_version();
-        setTextValue(utf8::decodeCanonicalString(
-                    val.to_string_versioned(version), version));
-        format_text();
-        return true;
-    }
     case NSV::PROP_uX:
     {
         SWFMatrix    m = getMatrix();
@@ -1331,16 +1343,6 @@ TextField::get_member(string_table::key name, as_value* val,
     {
     default:
         break;
-    case NSV::PROP_TEXT:
-    {
-        val->set_string(get_text_value());
-        return true;
-    }
-    case NSV::PROP_HTML_TEXT:
-    {
-        val->set_string(get_text_value());
-        return true;
-    }
     case NSV::PROP_uVISIBLE:
     {
         val->set_bool(get_visible());
@@ -2425,26 +2427,6 @@ textfield_borderColor(const fn_call& fn)
     return as_value();
 }
 
-static as_value
-textfield_text(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        //
-        // TODO: should return text without HTML tags.
-        log_unimpl("TextField.text");
-        return as_value();
-    }
-
-    // Setter
-    int version = ptr->getVM().getSWFVersion();
-    ptr->setTextValue(
-            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
-
-    return as_value();
-}
     
 static as_value
 textfield_textColor(const fn_call& fn)
