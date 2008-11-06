@@ -17,40 +17,38 @@
 
 // 
 
-#ifndef GNASH_VIDEO_STREAM_DEF_H
-#define GNASH_VIDEO_STREAM_DEF_H
+#ifndef GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
+#define GNASH_SWF_DEFINEVIDEOSTREAMTAG_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
 #include "character_def.h"
-#include "movie_definition.h"
 #include "swf.h"
 #include "rect.h" // for composition
-#include "ControlTag.h"
-#include "VideoDecoder.h"
 #include "MediaParser.h" // for videoFrameType and videoCodecType enums
 
-#include "GnashImage.h"
-
 #include <boost/shared_array.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
 #include <memory> // for auto_ptr
 
-namespace gnash {
-
 // Forward declarations
-class SWFStream;
+namespace gnash {
+    class movie_definition;
+    class SWFStream;
+    class RunInfo;
+}
 
+namespace gnash {
 
 /// Class used to store data for the undecoded embedded video frames.
 /// Contains the data, the data size and the type of the frame
 class VideoData {
 public:
-	VideoData(boost::shared_array<boost::uint8_t> data, boost::uint32_t size, media::videoFrameType ft)
+	VideoData(boost::shared_array<boost::uint8_t> data, boost::uint32_t size,
+            media::videoFrameType ft)
 		:
 		videoData(data),
 		dataSize(size),
@@ -67,20 +65,21 @@ public:
 	media::videoFrameType frameType;
 };
 
-class video_stream_definition : public character_def
+namespace SWF {
+
+class DefineVideoStreamTag : public character_def
 {
 public:
 
 	/// Construct a video stream definition with given ID
 	//
-	/// NOTE: for dynamically created definitions (ActionScript Video class instances)
-	///       you can use an id of -1. See character_def constructor, as that's the
-	///	  one which will eventually get passed the id.
-	///
-	video_stream_definition(boost::uint16_t char_id);
+	/// NOTE: for dynamically created definitions (ActionScript Video class
+    ///       instances) you can use an id of -1. See character_def
+    ///       constructor, as that's the one which will eventually get passed
+    ///       the id.
+	DefineVideoStreamTag(SWFStream& in, boost::uint16_t id);
 
-	~video_stream_definition();
-
+	~DefineVideoStreamTag();
 
 	character* create_character_instance(character* parent, int id);
 
@@ -91,17 +90,19 @@ public:
 	/// This function is allowed to be called only *once* for each
 	/// instance of this class.
 	///
-	void readDefineVideoStream(SWFStream& in, SWF::tag_type tag, movie_definition& m);
+	static void loader(SWFStream& in, SWF::tag_type tag, movie_definition& m,
+            const RunInfo& r);
+
 
 	/// Read tag SWF::VIDEOFRAME
 	//
-	/// The character_id (used to find this instance in the character's dictionary)
-	/// is assumed to have been already read.
+	/// The character_id (used to find this instance in the character's
+    /// dictionary) is assumed to have been already read.
 	///
 	/// This function is allowed to be called zero or more times, as long
 	/// as readDefineVideoStream was read before.
-	///
-	void readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, movie_definition& m);
+	void readDefineVideoFrame(SWFStream& in, SWF::tag_type tag,
+            movie_definition& m);
 
 	/// Return local video bounds in twips
 	const rect&	get_bound() const
@@ -135,8 +136,12 @@ public:
 	void getEncodedFrameSlice(boost::uint32_t from, boost::uint32_t to,
 		std::vector<media::EncodedVideoFrame*>& ret);
 
+    
+    void addVideoFrameTag(std::auto_ptr<media::EncodedVideoFrame> frame);
 
 private:
+
+	void read(SWFStream& in);
 
 	/// Id of this character definition, set by constructor.
 	///
@@ -175,17 +180,17 @@ private:
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
 	rect m_bound;
 
-	/// The undecoded video frames and its size, using the swf-frame number as key
+	/// The undecoded video frames and its size, using the swf-frame number
+    /// as key
 	//
 	/// Elements of this vector are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-	typedef std::vector<media::EncodedVideoFrame*> EmbedFrameVec;
+	typedef std::vector<media::EncodedVideoFrame*> EmbeddedFrames;
 	
 	boost::mutex _video_mutex;
 	
-
-	EmbedFrameVec _video_frames;
+	EmbeddedFrames _video_frames;
 
 	/// Width of the video
 	boost::uint32_t _width;
@@ -195,13 +200,14 @@ private:
 
 	/// Info about embedded video
 	//
-	/// TODO: drop _width/_height/m_codec_id leaving all in this member instead ?
-	///
+	/// TODO: drop _width/_height/m_codec_id leaving all in this member
+    /// instead ?
 	std::auto_ptr<media::VideoInfo> _videoInfo;
 
 };
 
-}	// end namespace gnash
+} // namespace SWF
+} // namespace gnash
 
 
 #endif // GNASH_VIDEO_STREAM_DEF_H

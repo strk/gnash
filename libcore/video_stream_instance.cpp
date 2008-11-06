@@ -20,7 +20,7 @@
 
 #include "MovieClip.h"
 #include "video_stream_instance.h"
-#include "video_stream_def.h"
+#include "DefineVideoStreamTag.h"
 #include "fn_call.h"
 #include "as_value.h"
 #include "NetStream_as.h"
@@ -188,7 +188,7 @@ video_stream_instance::initializeDecoder()
 	}
 }
 
-video_stream_instance::video_stream_instance(video_stream_definition* def,
+video_stream_instance::video_stream_instance(SWF::DefineVideoStreamTag* def,
 		character* parent, int id)
 	:
 	character(parent, id),

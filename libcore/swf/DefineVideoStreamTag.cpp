@@ -17,29 +17,26 @@
 
 // 
 
-#include "video_stream_def.h"
+#include "DefineVideoStreamTag.h"
 #include "video_stream_instance.h"
-#include "render.h"
-#include "BitsReader.h"
-//#include "MediaHandler.h"
 #include "MediaParser.h" // for VideoInfo
 #include "VideoDecoder.h"
 #include "SWFStream.h" // for read()
-
-#include <boost/bind.hpp>
-
+#include "movie_definition.h"
 
 namespace gnash {
+namespace SWF {
 
-video_stream_definition::video_stream_definition(boost::uint16_t char_id)
+DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t char_id)
 	:
 	m_char_id(char_id),
 	_width(0),
 	_height(0)
 {
+    read(in);
 }
 
-video_stream_definition::~video_stream_definition()
+DefineVideoStreamTag::~DefineVideoStreamTag()
 {
 	std::for_each(_video_frames.begin(), _video_frames.end(),
 		      boost::checked_deleter<media::EncodedVideoFrame>());
@@ -47,11 +44,24 @@ video_stream_definition::~video_stream_definition()
 
 
 void
-video_stream_definition::readDefineVideoStream(SWFStream& in, SWF::tag_type tag, movie_definition& /*m*/)
+DefineVideoStreamTag::loader(SWFStream& in, SWF::tag_type tag,
+        movie_definition& m, const RunInfo& /*r*/)
 {
-	// Character ID has been read already, and was loaded in the constructor
+    assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
+    
+    in.ensureBytes(2);
+    boost::uint16_t id = in.read_u16();
 
-	assert(tag == SWF::DEFINEVIDEOSTREAM);
+    std::auto_ptr<DefineVideoStreamTag> vs(new DefineVideoStreamTag(in, id));
+
+    m.add_character(id, vs.release());
+
+}
+
+void
+DefineVideoStreamTag::read(SWFStream& in)
+{
+
 	assert(!_videoInfo.get()); // allowed to be called only once
 
 	//m_start_frame = m->get_loading_frame();
@@ -83,48 +93,21 @@ video_stream_definition::readDefineVideoStream(SWFStream& in, SWF::tag_type tag,
 		return;
 	}
 
-	_videoInfo.reset( new media::VideoInfo(m_codec_id, _width, _height, 0 /*framerate*/, 0 /*duration*/, media::FLASH /*typei*/) );
+	_videoInfo.reset(new media::VideoInfo(m_codec_id, _width, _height,
+                0 /*framerate*/, 0 /*duration*/, media::FLASH /*typei*/));
 }
 
 void
-video_stream_definition::readDefineVideoFrame(SWFStream& in, SWF::tag_type tag, movie_definition& /*m*/)
+DefineVideoStreamTag::addVideoFrameTag(
+        std::auto_ptr<media::EncodedVideoFrame> frame)
 {
-	// Character ID has been read already, and was loaded in the constructor
-
-	assert(tag == SWF::VIDEOFRAME);
-
-	// TODO: skip if there's no MediaHandler registered ?
-
-	in.ensureBytes(2);
-	unsigned int frameNum = in.read_u16(); 
-
-	const unsigned int dataLength = in.get_tag_end_position() - in.tell();
-	
-	boost::uint8_t* buffer = new uint8_t[dataLength + 8]; // FIXME: catch bad_alloc
-
-	const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer), dataLength);
-
-    if (bytesRead < dataLength)
-    {
-        throw ParserException(_("Could not read enough bytes when parsing "
-                                "VideoFrame tag. Perhaps we reached the "
-                                "end of the stream!"));
-    }	
-	
-	memset(buffer + bytesRead, 0, 8);
-
-	using namespace media;
-
-	EncodedVideoFrame* frame = new EncodedVideoFrame(buffer, dataLength, frameNum);
-
 	boost::mutex::scoped_lock lock(_video_mutex);
 
-	_video_frames.push_back(frame);
+    _video_frames.push_back(frame.release());
 }
 
-
 character*
-video_stream_definition::create_character_instance(character* parent, int id)
+DefineVideoStreamTag::create_character_instance(character* parent, int id)
 {
 	character* ch = new video_stream_instance(this, parent, id);
 	return ch;
@@ -137,13 +120,14 @@ has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
 }
 
 void
-video_stream_definition::getEncodedFrameSlice(boost::uint32_t from, boost::uint32_t to, EmbedFrameVec& ret)
+DefineVideoStreamTag::getEncodedFrameSlice(boost::uint32_t from,
+        boost::uint32_t to, EmbeddedFrames& ret)
 {
 	assert(from<=to);
 
 	boost::mutex::scoped_lock lock(_video_mutex);
 
-	EmbedFrameVec::iterator it=_video_frames.begin(), itEnd=_video_frames.end();
+	EmbeddedFrames::iterator it=_video_frames.begin(), itEnd=_video_frames.end();
 	for (; it!=itEnd; ++it)
 	{
 		media::EncodedVideoFrame* frame = *it;
@@ -165,6 +149,6 @@ video_stream_definition::getEncodedFrameSlice(boost::uint32_t from, boost::uint3
 
 }
 
-
+} // namespace SWF
 } // namespace gnash
 

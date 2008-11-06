@@ -21,12 +21,17 @@
 #define GNASH_VIDEO_STREAM_INSTANCE_H
 
 #include "character.h" // for inheritance
-#include "video_stream_def.h"
-#include "snappingrange.h"
 
 // Forward declarations
 namespace gnash {
 	class NetStream_as;
+    class GnashImage;
+    namespace SWF {
+        class DefineVideoStreamTag;
+    }
+    namespace media {
+        class VideoDecoder;
+    }
 }
 
 namespace gnash {
@@ -42,10 +47,10 @@ class video_stream_instance : public character
 
 public:
 
-	boost::intrusive_ptr<video_stream_definition>	m_def;
+	boost::intrusive_ptr<SWF::DefineVideoStreamTag> m_def;
 	
-	video_stream_instance(video_stream_definition* def,
-			character* parent, int id);
+	video_stream_instance(SWF::DefineVideoStreamTag* def, character* parent,
+            int id);
 
 	~video_stream_instance();
 

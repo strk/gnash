@@ -47,6 +47,8 @@
 #include "SetBackgroundColorTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
+#include "DefineVideoStreamTag.h"
+#include "VideoFrameTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
 #include "RunInfo.h"
 #ifdef GNASH_USE_GC
@@ -166,8 +168,10 @@ static void ensure_loaders_registered()
 
     register_tag_loader(SWF::INITACTION, DoInitActionTag::doInitActionLoader);  // 59  
 
-    register_tag_loader(SWF::DEFINEVIDEOSTREAM, define_video_loader); // 60
-    register_tag_loader(SWF::VIDEOFRAME, video_loader); // 61
+    // 60
+    register_tag_loader(SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader);
+    // 61
+    register_tag_loader(SWF::VIDEOFRAME, VideoFrameTag::loader);
 
     // 62, DEFINEFONTINFO2 is done above.
     // We're not an authoring tool.

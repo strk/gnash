@@ -72,10 +72,10 @@ read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
     }
 }
 
+// Read line styles and push them onto the back of the given array.
 static void
 read_line_styles(std::vector<line_style>& styles, SWFStream& in, int tag_type,
                  movie_definition& md)
-// Read line styles and push them onto the back of the given array.
 {
     in.ensureBytes(1);
     int line_style_count = in.read_u8();
@@ -326,8 +326,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     style += fill_base;
                 }
     
-                if ( tag_type == SWF::DEFINEFONT ||
-                        tag_type == SWF::DEFINEFONT2 )
+                if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2)
                 {
                     if ( style > 1 )          // 0:hide 1:renderer
                     {
@@ -885,25 +884,6 @@ void  shape_character_def::markReachableResources() const
     }
 }
 #endif
-
-size_t shape_character_def::numPaths() const
-{
-    return m_paths.size();
-}
-
-size_t
-shape_character_def::numEdges() const
-{
-    typedef std::vector<path> PathList;
-
-    size_t count = 0;
-    for (PathList::const_iterator i=m_paths.begin(), ie=m_paths.end();
-            i!=ie; ++i)
-    {
-        count += i->size();
-    }
-    return count;
-}
 
 } // end namespace gnash
 
