@@ -23,6 +23,8 @@
 #include "movie_definition.h"
 #include "utility.h"
 
+#include <algorithm>
+
 namespace gnash {
 namespace SWF {
 
@@ -76,12 +78,12 @@ VideoFrameTag::loader(SWFStream& in, SWF::tag_type tag, movie_definition& m,
                                 "end of the stream!"));
     }	
 	
-	memset(buffer + bytesRead, 0, 8);
+    std::fill_n(buffer + bytesRead, 8, 0);
 
 	using namespace media;
 
-    std::auto_ptr<EncodedVideoFrame> frame(new EncodedVideoFrame(buffer, dataLength,
-            frameNum));
+    std::auto_ptr<EncodedVideoFrame> frame(
+            new EncodedVideoFrame(buffer, dataLength, frameNum));
 
 	vs->addVideoFrameTag(frame);
 }
