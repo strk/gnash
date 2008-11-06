@@ -88,20 +88,20 @@ static as_value textfield_replaceText(const fn_call& fn);
 
 static as_object* getTextFieldInterface(VM& vm);
 
-static as_value textfield_background_getset(const fn_call& fn);
-static as_value textfield_border_getset(const fn_call& fn);
-static as_value textfield_backgroundColor_getset(const fn_call& fn);
-static as_value textfield_borderColor_getset(const fn_call& fn);
-static as_value textfield_textColor_getset(const fn_call& fn);
-static as_value textfield_embedFonts_getset(const fn_call& fn);
-static as_value textfield_autoSize_getset(const fn_call& fn);
-static as_value textfield_type_getset(const fn_call& fn);
-static as_value textfield_wordWrap_getset(const fn_call& fn);
-static as_value textfield_html_getset(const fn_call& fn);
-static as_value textfield_selectable_getset(const fn_call& fn);
-static as_value textfield_length_getset(const fn_call& fn);
-static as_value textfield_textWidth_getset(const fn_call& fn);
-static as_value textfield_textHeight_getset(const fn_call& fn);
+static as_value textfield_background(const fn_call& fn);
+static as_value textfield_border(const fn_call& fn);
+static as_value textfield_backgroundColor(const fn_call& fn);
+static as_value textfield_borderColor(const fn_call& fn);
+static as_value textfield_textColor(const fn_call& fn);
+static as_value textfield_embedFonts(const fn_call& fn);
+static as_value textfield_autoSize(const fn_call& fn);
+static as_value textfield_type(const fn_call& fn);
+static as_value textfield_wordWrap(const fn_call& fn);
+static as_value textfield_html(const fn_call& fn);
+static as_value textfield_selectable(const fn_call& fn);
+static as_value textfield_length(const fn_call& fn);
+static as_value textfield_textWidth(const fn_call& fn);
+static as_value textfield_textHeight(const fn_call& fn);
 
 
 //
@@ -357,6 +357,11 @@ textfield_maxhscroll(const fn_call& fn)
     return as_value();
 }
 
+/// TextField.maxChars().
+//
+/// This does not limit the length of the text, but rather the
+/// number of characters that can be entered in the TextField.
+//
 /// Returns null when the value is 0.
 static as_value
 textfield_maxChars(const fn_call& fn)
@@ -561,38 +566,38 @@ TextField::attachTextFieldInstanceProperties(as_object& o)
     // The following properties should only be attached to the prototype
     // on first textfield creation.
     o.init_property(NSV::PROP_TEXT_WIDTH,
-            textfield_textWidth_getset, textfield_textWidth_getset);
+            textfield_textWidth, textfield_textWidth);
     o.init_property(NSV::PROP_TEXT_HEIGHT,
-            textfield_textHeight_getset, textfield_textHeight_getset);
+            textfield_textHeight, textfield_textHeight);
 
     boost::intrusive_ptr<builtin_function> variable_getter(
             new builtin_function(&textfield_get_variable, NULL));
     boost::intrusive_ptr<builtin_function> variable_setter(
             new builtin_function(&textfield_set_variable, NULL));
     o.init_property("variable", *variable_getter, *variable_setter, swf6Flags);
-    getset = new builtin_function(textfield_background_getset);
+    getset = new builtin_function(textfield_background);
     o.init_property("background", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_backgroundColor_getset);
+    getset = new builtin_function(textfield_backgroundColor);
     o.init_property("backgroundColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_border_getset);
+    getset = new builtin_function(textfield_border);
     o.init_property("border", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_borderColor_getset);
+    getset = new builtin_function(textfield_borderColor);
     o.init_property("borderColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_textColor_getset);
+    getset = new builtin_function(textfield_textColor);
     o.init_property("textColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_embedFonts_getset);
+    getset = new builtin_function(textfield_embedFonts);
     o.init_property("embedFonts", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_autoSize_getset);
+    getset = new builtin_function(textfield_autoSize);
     o.init_property("autoSize", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_type_getset);
+    getset = new builtin_function(textfield_type);
     o.init_property("type", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_wordWrap_getset);
+    getset = new builtin_function(textfield_wordWrap);
     o.init_property("wordWrap", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_html_getset);
+    getset = new builtin_function(textfield_html);
     o.init_property("html", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_selectable_getset);
+    getset = new builtin_function(textfield_selectable);
     o.init_property("selectable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_length_getset);
+    getset = new builtin_function(textfield_length);
     o.init_property("length", *getset, *getset, swf6Flags);
     getset = new builtin_function(textfield_maxscroll);
     o.init_property("maxscroll", *getset, *getset, swf6Flags);
@@ -668,6 +673,7 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
     :
     character(parent, id),
     _text(L""),
+    _defaultText(def.defaultText()),
     _textDefined(def.hasText()),
     _underlined(false),
     _leading(def.leading()),
@@ -1084,16 +1090,11 @@ TextField::updateText(const std::wstring& wstr)
 {
     _textDefined = true;
 
-    unsigned int maxLen = _maxChars;
-
-    std::wstring newText = wstr; // copy needed for eventual resize
-    if (maxLen && newText.length() > maxLen) newText.resize(maxLen);
-
-    if (_text == newText) return;
+    if (_text == wstr) return;
 
     set_invalidated();
 
-    _text = newText;
+    _text = wstr;
     format_text();
 }
 
@@ -2079,7 +2080,7 @@ TextField::set_variable_name(const std::string& newname)
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling updateText after change of variable name");
 #endif
-        //updateText(_text);
+        updateText(_defaultText);
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling registerTextVariable after change of variable name and updateText call");
 #endif
@@ -2349,7 +2350,7 @@ TextField::setFontHeight(boost::uint16_t h)
 }
 
 static as_value
-textfield_background_getset(const fn_call& fn)
+textfield_background(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2366,7 +2367,7 @@ textfield_background_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_border_getset(const fn_call& fn)
+textfield_border(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2383,7 +2384,7 @@ textfield_border_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_backgroundColor_getset(const fn_call& fn)
+textfield_backgroundColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2402,7 +2403,7 @@ textfield_backgroundColor_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_borderColor_getset(const fn_call& fn)
+textfield_borderColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2421,7 +2422,7 @@ textfield_borderColor_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_textColor_getset(const fn_call& fn)
+textfield_textColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2440,7 +2441,7 @@ textfield_textColor_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_embedFonts_getset(const fn_call& fn)
+textfield_embedFonts(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2457,7 +2458,7 @@ textfield_embedFonts_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_wordWrap_getset(const fn_call& fn)
+textfield_wordWrap(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2474,7 +2475,7 @@ textfield_wordWrap_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_html_getset(const fn_call& fn)
+textfield_html(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2491,7 +2492,7 @@ textfield_html_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_selectable_getset(const fn_call& fn)
+textfield_selectable(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2508,7 +2509,7 @@ textfield_selectable_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_length_getset(const fn_call& fn)
+textfield_length(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2529,7 +2530,7 @@ textfield_length_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_textHeight_getset(const fn_call& fn)
+textfield_textHeight(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2555,7 +2556,7 @@ textfield_textHeight_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_textWidth_getset(const fn_call& fn)
+textfield_textWidth(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2581,7 +2582,7 @@ textfield_textWidth_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_autoSize_getset(const fn_call& fn)
+textfield_autoSize(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
@@ -2616,7 +2617,7 @@ textfield_autoSize_getset(const fn_call& fn)
 }
 
 static as_value
-textfield_type_getset(const fn_call& fn)
+textfield_type(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 

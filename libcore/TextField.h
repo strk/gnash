@@ -482,6 +482,8 @@ private:
     /// easier.
 	std::wstring _text;
 
+    std::string _defaultText;
+
 	/// This flag will be true as soon as the TextField
 	/// is assigned a text value. Only way to be false is
 	/// when definition has the hasText flag set to false
