@@ -78,6 +78,8 @@ check(!delete unexistent.a);
 // Check malformed delete calls. Most of these work anyway.
 // --------------------------------------------------------
 
+#if MING_VERSION_CODE >= 00040300
+
 /* Check normal deletes. The first probably uses delete, the second
    probably delete2 */
 o = 5;
@@ -244,4 +246,6 @@ check_equals(o.b.c, 5);
 
 
 totals(41);
-
+#else
+totals()
+#endif
