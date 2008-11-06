@@ -177,9 +177,15 @@ public:
     void die() { _die = true; _outgoing.notify(); };
     bool timetodie() { return _die; };
 
+    void addPollFD(struct pollfd &fd, entry_t *ptr);
     void addPollFD(struct pollfd &fd);
     struct pollfd &getPollFD(int index);
     struct pollfd *getPollFDPtr();
+
+    void addEntry(int fd, entry_t *func);
+    entry_t *getEntry(int fd);
+    
+//    void executePollFD(int index) { _handler[index](); ];
     
 private:
     bool	_die;

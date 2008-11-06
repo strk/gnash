@@ -67,10 +67,14 @@ using namespace amf;
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 static bool dump = false;
+static const char *result;
 
 static void usage (void);
 static void test_pollfds();
 static void test_que();
+
+void test1(Handler::thread_params_t *args);
+void test2(Handler::thread_params_t *args);
 
 int
 main (int argc, char* argv[]) {
@@ -121,21 +125,23 @@ test_pollfds()
 {
     Handler hand;
     struct pollfd fds1;
+    Handler::entry_t *func1 = test1;
     fds1.fd = 3;
     fds1.events = POLLIN |  POLLRDHUP;
 
-    hand.addPollFD(fds1);
-    if (hand.getPollFD(0).fd == 3) {
+    hand.addPollFD(fds1, test1);
+    if ((hand.getPollFD(0).fd == 3) && (hand.getEntry(3) == func1)) {
         runtest.pass ("Handler::addPollFD(0)");
     } else {
         runtest.fail ("Handler::addPollFD(0)");
     }
 
     struct pollfd fds2;
+    Handler::entry_t *func2 = test2;
     fds2.fd = 4;
     fds2.events = POLLIN |  POLLRDHUP;
 
-    hand.addPollFD(fds2);
+    hand.addPollFD(fds2, test2);
     if (hand.getPollFD(1).fd == 4) {
         runtest.pass ("Handler::addPollFD(1)");
     } else {
@@ -148,6 +154,32 @@ test_pollfds()
     } else {
         runtest.fail ("Handler::getPollFDPtr()");
     }
+    
+    Handler::thread_params_t args;
+    Handler::entry_t *ptr1 = hand.getEntry(3);
+    if (ptr1) {
+        ptr1(&args);
+        if (strcmp(result, "test1") == 0) {
+            runtest.pass ("test1()");
+        } else {
+            runtest.fail ("test1()");
+        }
+    } else {
+        runtest.unresolved ("test1()");
+    }
+
+    Handler::entry_t *ptr2 = hand.getEntry(4);
+    if (ptr2) {
+        ptr2(&args);
+        if (strcmp(result, "test2") == 0) {
+            runtest.pass ("test2()");
+        } else {
+            runtest.fail ("test2()");
+        }
+    } else {
+        runtest.unresolved ("test2()");
+    }
+    
 }
 
 void
@@ -220,6 +252,19 @@ test_que()
      
 //     que.dump();
 }
+
+void
+test1(Handler::thread_params_t *args)
+{
+    result = "test1";
+}
+
+void
+test2(Handler::thread_params_t *args)
+{
+    result = "test2";
+}
+
 
 static void
 usage (void)
