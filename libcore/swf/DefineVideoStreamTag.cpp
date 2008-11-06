@@ -18,7 +18,7 @@
 // 
 
 #include "DefineVideoStreamTag.h"
-#include "video_stream_instance.h"
+#include "Video.h"
 #include "MediaParser.h" // for VideoInfo
 #include "VideoDecoder.h"
 #include "SWFStream.h" // for read()
@@ -109,7 +109,7 @@ DefineVideoStreamTag::addVideoFrameTag(
 character*
 DefineVideoStreamTag::create_character_instance(character* parent, int id)
 {
-	character* ch = new video_stream_instance(this, parent, id);
+	character* ch = new Video(this, parent, id);
 	return ch;
 }
 

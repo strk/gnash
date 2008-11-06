@@ -93,7 +93,7 @@ libgnashcore_la_SOURCES = \
 	swf/StartSoundTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
 	swf_function.cpp \
-	video_stream_instance.cpp \
+	Video.cpp \
 	StreamProvider.cpp \
 	array.cpp \
 	Button.cpp \
@@ -198,7 +198,7 @@ noinst_HEADERS = \
 	text.h \
 	timers.h \
 	RGBA.h	\
-	video_stream_instance.h \
+	Video.h \
 	$(NULL)
 
 libgnashcore_la_LIBADD = \

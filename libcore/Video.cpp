@@ -1,4 +1,4 @@
-// video_stream_instance.cpp:  Draw individual video frames, for Gnash.
+// Video.cpp:  Draw individual video frames, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -19,7 +19,7 @@
 
 
 #include "MovieClip.h"
-#include "video_stream_instance.h"
+#include "Video.h"
 #include "DefineVideoStreamTag.h"
 #include "fn_call.h"
 #include "as_value.h"
@@ -114,7 +114,7 @@ static void attachVideoProperties(as_object& o)
 static as_value
 video_attach(const fn_call& fn)
 {
-	boost::intrusive_ptr<video_stream_instance> video = ensureType<video_stream_instance>(fn.this_ptr);
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -153,14 +153,14 @@ video_ctor(const fn_call& /* fn */)
 
 	// I'm not sure We can rely on the def and parent values being accepted  as NULL
 	// Not till we add some testing...
-	boost::intrusive_ptr<character> obj = new video_stream_instance(NULL, NULL, -1);
+	boost::intrusive_ptr<character> obj = new Video(NULL, NULL, -1);
 	obj->setDynamic();
 	return as_value(obj.get()); // will keep alive
 }
 
 /*private*/
 void
-video_stream_instance::initializeDecoder()
+Video::initializeDecoder()
 {
 
 	media::MediaHandler* mh = media::MediaHandler::get();
@@ -188,7 +188,7 @@ video_stream_instance::initializeDecoder()
 	}
 }
 
-video_stream_instance::video_stream_instance(SWF::DefineVideoStreamTag* def,
+Video::Video(SWF::DefineVideoStreamTag* def,
 		character* parent, int id)
 	:
 	character(parent, id),
@@ -199,7 +199,7 @@ video_stream_instance::video_stream_instance(SWF::DefineVideoStreamTag* def,
 	_lastDecodedVideoFrameNum(-1),
 	_lastDecodedVideoFrame()
 {
-	//log_debug("video_stream_instance %p ctor", (void*)this);
+	//log_debug("Video %p ctor", (void*)this);
 
 	if ( m_def )
 	{
@@ -211,12 +211,12 @@ video_stream_instance::video_stream_instance(SWF::DefineVideoStreamTag* def,
 	set_prototype(getVideoInterface(*this));
 }
 
-video_stream_instance::~video_stream_instance()
+Video::~Video()
 {
 }
 
 void
-video_stream_instance::display()
+Video::display()
 {
 	// if m_def is NULL we've been constructed by 'new Video', in this
 	// case I think display() would never be invoked on us...
@@ -235,7 +235,7 @@ video_stream_instance::display()
 }
 
 GnashImage*
-video_stream_instance::getVideoFrame()
+Video::getVideoFrame()
 {
 
 
@@ -323,7 +323,7 @@ video_stream_instance::getVideoFrame()
 }
 
 void
-video_stream_instance::stagePlacementCallback()
+Video::stagePlacementCallback()
 {
     saveOriginalTarget(); // for softref
 
@@ -333,7 +333,7 @@ video_stream_instance::stagePlacementCallback()
 
 
 void
-video_stream_instance::advance()
+Video::advance()
 {
 	if (_ns) {
 		//_ns->advance();
@@ -342,7 +342,7 @@ video_stream_instance::advance()
 }
 
 void
-video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
+Video::add_invalidated_bounds(InvalidatedRanges& ranges, 
 	bool force)
 {	
 	if (!force && !m_invalidated) return; // no need to redraw
@@ -362,7 +362,7 @@ video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 void
-video_stream_instance::setStream(boost::intrusive_ptr<NetStream_as> ns)
+Video::setStream(boost::intrusive_ptr<NetStream_as> ns)
 {
 	_ns = ns;
 	_ns->setInvalidatedVideo(this);
@@ -389,7 +389,7 @@ void video_class_init(as_object& global)
 }
 
 rect
-video_stream_instance::getBounds() const
+Video::getBounds() const
 {
 	if (_embeddedStream) return m_def->get_bound();
 
@@ -400,7 +400,7 @@ video_stream_instance::getBounds() const
 
 #ifdef GNASH_USE_GC
 void
-video_stream_instance::markReachableResources() const
+Video::markReachableResources() const
 {
 	if ( _ns ) _ns->setReachable();
 

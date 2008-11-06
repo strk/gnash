@@ -42,17 +42,17 @@ namespace gnash {
 /// embedded into the SWF itself or loaded from the
 /// network using an associated NetStream object.
 ///
-class video_stream_instance : public character
+class Video : public character
 {
 
 public:
 
 	boost::intrusive_ptr<SWF::DefineVideoStreamTag> m_def;
 	
-	video_stream_instance(SWF::DefineVideoStreamTag* def, character* parent,
+	Video(SWF::DefineVideoStreamTag* def, character* parent,
             int id);
 
-	~video_stream_instance();
+	~Video();
 
 	virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const
 	{

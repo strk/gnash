@@ -29,7 +29,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
-#include "video_stream_instance.h"
 #include "NetConnection.h"
 #include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
