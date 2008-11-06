@@ -38,12 +38,21 @@
 #include <vector>
 #include <boost/cstdint.hpp>
 
+#ifdef HAVE_POLL
+# include <sys/poll.h>
+#else 
+# ifdef HAVE_EPOLL
+#  include <sys/epoll.h>
+# endif
+#endif
+
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
 #else
 #include "check.h"
 #endif
 
+#include "arg_parser.h"
 #include "log.h"
 #include "buffer.h"
 #include "handler.h"
@@ -57,12 +66,93 @@ using namespace amf;
 
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
+static bool dump = false;
+
+static void usage (void);
+static void test_pollfds();
+static void test_que();
 
 int
-main (int /*argc*/, char** /*argv*/) {
-    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-    dbglogfile.setVerbosity();
+main (int argc, char* argv[]) {
+    const Arg_parser::Option opts[] =
+        {
+            { 'h', "help",          Arg_parser::no  },
+            { 'v', "verbose",       Arg_parser::no  },
+            { 'd', "dump",          Arg_parser::no  },
+        };
+    
+    Arg_parser parser(argc, argv, opts);
+    if( ! parser.error().empty() ) {
+        cout << parser.error() << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    for( int i = 0; i < parser.arguments(); ++i ) {
+        const int code = parser.code(i);
+        try {
+            switch( code ) {
+              case 'h':
+                  usage ();
+                  exit(EXIT_SUCCESS);
+              case 'v':
+                  dbglogfile.setVerbosity();
+                  // This happens once per 'v' flag 
+                  log_debug(_("Verbose output turned on"));
+                  break;
+              case 'd':
+                  dump= true;
+                  break;
+	    }
+        }
+        
+        catch (Arg_parser::ArgParserException &e) {
+            cerr << _("Error parsing command line options: ") << e.what() << endl;
+            cerr << _("This is a Gnash bug.") << endl;
+        }
+    }
 
+    // run the tests
+    test_que();
+    test_pollfds();
+}
+
+void
+test_pollfds()
+{
+    Handler hand;
+    struct pollfd fds1;
+    fds1.fd = 3;
+    fds1.events = POLLIN |  POLLRDHUP;
+
+    hand.addPollFD(fds1);
+    if (hand.getPollFD(0).fd == 3) {
+        runtest.pass ("Handler::addPollFD(0)");
+    } else {
+        runtest.fail ("Handler::addPollFD(0)");
+    }
+
+    struct pollfd fds2;
+    fds2.fd = 4;
+    fds2.events = POLLIN |  POLLRDHUP;
+
+    hand.addPollFD(fds2);
+    if (hand.getPollFD(1).fd == 4) {
+        runtest.pass ("Handler::addPollFD(1)");
+    } else {
+        runtest.fail ("Handler::addPollFD(1)");
+    }
+
+    struct pollfd *fdsptr = hand.getPollFDPtr();
+    if ((fdsptr[0].fd == 3) && (fdsptr[1].fd == 4)) {
+        runtest.pass ("Handler::getPollFDPtr()");
+    } else {
+        runtest.fail ("Handler::getPollFDPtr()");
+    }
+}
+
+void
+test_que()
+{
     Handler que;
 
     boost::shared_ptr<amf::Buffer> buf(new Buffer);
@@ -129,5 +219,17 @@ main (int /*argc*/, char** /*argv*/) {
      }
      
 //     que.dump();
+}
+
+static void
+usage (void)
+{
+    cerr << "This program tests diskstream support in the cygnal library." << endl
+         << endl
+         << _("Usage: test_diskstream [options...]") << endl
+         << _("  -h,  --help          Print this help and exit") << endl
+         << _("  -v,  --verbose       Output verbose debug info") << endl
+         << _("  -d,  --dump          Dump data structures") << endl
+         << endl;
 }
 
