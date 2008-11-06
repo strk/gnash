@@ -50,7 +50,6 @@
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
 #include "text_character_def.h"
-#include "edit_text_character_def.h"
 #include "URL.h"
 #include "GnashException.h"
 #include "video_stream_def.h"
@@ -1148,23 +1147,6 @@ void import_loader(SWFStream& in, tag_type tag, movie_definition& m,
     m.importResources(source_movie, imports);
 }
 
-// Read a DefineText tag.
-void define_edit_text_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEEDITTEXT); // 37
-
-    in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
-
-    edit_text_character_def* ch = new edit_text_character_def();
-    IF_VERBOSE_PARSE(
-        log_parse(_("edit_text_char, id = %d"), character_id);
-    );
-    ch->read(in, tag, m);
-
-    m.add_character(character_id, ch);
-}
 
 // See description in header
 void

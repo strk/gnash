@@ -266,6 +266,18 @@ crash-0.8.0-huffmann-table-5.swf:6819164ec8cc6299bbd6d0d05a7428d8
 crash-0.8.0-huffmann-table-6.swf:a269bc06dd35de125087b2444622f130
 crash-0.8.0-huffmann-table-7.swf:2134c93509e1fc5d2eff527e79e1ea60
 crash-0.8.0-huffmann-table-8.swf:4548f1e9d10a5cd70852c367c8f39af6
+crash-0.8.2-gotoAndPlay-5.swf:8b4ebc57963ce4c0b8c80a1ba79a2ed0
+crash-0.8.2-gotoAndPlay-6.swf:808289d1821d14debfaea5aca5f14273
+crash-0.8.2-gotoAndPlay-7.swf:434c0a520e86655e14ac3767cb745dbc
+crash-0.8.2-gotoAndPlay-8.swf:26aa36651e9882257c65bf70abd79bca
+crash-0.8.2-sendAndLoad-without-target-5.swf:d2a5093d2d9094c89e9ba1b1956e566d
+crash-0.8.2-sendAndLoad-without-target-6.swf:91e40b45f08ecae5582af816dd2f4f99
+crash-0.8.2-sendAndLoad-without-target-7.swf:e9284acf35bc444e2600721b4f2b8067
+crash-0.8.2-sendAndLoad-without-target-8.swf:7fb6a52bbb2d9e9896fdb4e0d3602c36
+crash-0.9.1-getvariable-shapes-5.swf:5d55b2511943ac08b0565d8e84447b4a
+crash-0.9.1-getvariable-shapes-6.swf:45e434a401447915500c275c238b8ac0
+crash-0.9.1-getvariable-shapes-7.swf:49f7609f50e4099528b3477b7124834c
+crash-0.9.1-getvariable-shapes-8.swf:9827e209d6bf155d49fcdb4e15cf0442
 createTextField-returnvalue-6.swf:876f64cb4349313be58d1b9de5ca2ff4
 createTextField-returnvalue-7.swf:397473c78af05cbb9e7e394ec4ce1a07
 createTextField-returnvalue-8.swf:398e15cdabb4c9f9bdb56ee5b07e5126
@@ -569,6 +581,8 @@ movieclip-lockroot-loadmovie-6.swf:679b3cea0d9643744aa29c88ae9908e1
 movieclip-lockroot-loadmovie-7.swf:84ad9218797251db3ee79f9241f27b67
 movieclip-lockroot-loadmovie-8.swf:3ac7430bf84185e34aee32b2d2394600
 movieclip-property-priorities-5.swf:21ffe3baf551c2dea5d2e04db214ff7f
+movieclip-references-5.swf:1a9faa42d479cff63da56135c1b298aa
+movieclip-references-6.swf:d3cc27ec41e9368c21f27fee48027b89
 movieclip-set-prototype-5.swf:99235a738d69d9c78fa2bc5d355c6dae
 movieclip-set-prototype-6.swf:bae79ccbb89bb7c11cd1961d2c473022
 movieclip-set-prototype-7.swf:f147fff166cc46cdcda77d5012faddb0
@@ -1072,6 +1086,9 @@ text-field-get-text-format-5.swf:1e3a1b39de01a627e3d9cf327b6fcefa
 text-field-hscroll-5.swf:f0b6b2bdc087164334da9fad1ca0140a
 text-field-init-5.swf:f9c095838e41c5b00de362cef6c20167
 text-field-init-native-5.swf:881f1f6314617bd2d789fa99f9765e60
+text-field-init-native-6.swf:39c6fb4139696e3334b64fb4e48376e1
+text-field-init-native-7.swf:167277605ec309a453caa1b713afbc45
+text-field-init-native-8.swf:86e8f2d4419f1747735f180d22030701
 text-field-replace-text-5.swf:571ec2f1d311c65f98e5e7f76392cb9e
 text-field-replace-text-5.swf:e89d3694aef9f668e714916e8db3195f
 text-field-set-text-format-5.swf:f576da900f9e9b8d911f6791d4114983

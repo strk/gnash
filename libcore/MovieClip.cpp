@@ -28,7 +28,6 @@
 #include "as_value.h"
 #include "as_function.h"
 #include "TextField.h" // for registered variables
-#include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
 #include "ControlTag.h"
 #include "fn_call.h"
 #include "Key_as.h"
@@ -3014,19 +3013,11 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
 {
     // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
     
-    boost::intrusive_ptr<edit_text_character_def> txt =
-        new edit_text_character_def();
-
     // Set textfield bounds
-    txt->set_bounds(rect(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height)));
-
-    // Set font height (shouldn't be dependent on font ?)
-    // TODO: 10 pixels is an arbitrary number here...
-    txt->set_font_height(10*20);
-
+    rect bounds(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height));
 
     // Create an instance
-    boost::intrusive_ptr<character> txt_char = txt->create_character_instance(this, 0);
+    boost::intrusive_ptr<character> txt_char = new TextField(this, bounds);
 
     // Give name and mark as dynamic
     txt_char->set_name(name);

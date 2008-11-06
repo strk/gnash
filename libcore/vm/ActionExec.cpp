@@ -671,7 +671,7 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 bool
 ActionExec::delVariable(const std::string& name)
 {
-    return env.del_variable_raw(PROPNAME(name), getScopeStack());
+    return env.delVariableRaw(name, getScopeStack());
 }
 
 bool

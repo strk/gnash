@@ -103,7 +103,7 @@ xcheck( !TextField.prototype.hasOwnProperty('password') );
 xcheck( !TextField.prototype.hasOwnProperty('restrict') );
 xcheck( !TextField.prototype.hasOwnProperty('scroll') );
 xcheck( !TextField.prototype.hasOwnProperty('selectable') );
-check( !TextField.prototype.hasOwnProperty('text') );
+xcheck( !TextField.prototype.hasOwnProperty('text') );
 xcheck( !TextField.prototype.hasOwnProperty('textColor') );
 xcheck( !TextField.prototype.hasOwnProperty('textHeight') ); // should be available on first instantiation
 xcheck( !TextField.prototype.hasOwnProperty('textWidth') ); // should be available on first instantiation
@@ -180,7 +180,7 @@ check( TextField.prototype.hasOwnProperty('password') );
 check( TextField.prototype.hasOwnProperty('restrict') );
 check( TextField.prototype.hasOwnProperty('scroll') );
 check( TextField.prototype.hasOwnProperty('selectable') );
-xcheck( TextField.prototype.hasOwnProperty('text') );
+check( TextField.prototype.hasOwnProperty('text') );
 check( TextField.prototype.hasOwnProperty('textColor') );
 check( TextField.prototype.hasOwnProperty('textHeight') );
 check( TextField.prototype.hasOwnProperty('textWidth') );
@@ -648,22 +648,22 @@ xcheck_equals(tf._url, _root._url); // read-only
 //
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf.variable), 'null');
+check_equals(typeof(tf.variable), 'null');
 check( ! tf.hasOwnProperty('variable') ); 
 tf.variable = _level0.inputVar;
-xcheck_equals(typeof(tf.variable), 'null'); // _level0.inputVar doesn't exist !
+check_equals(typeof(tf.variable), 'null'); // _level0.inputVar doesn't exist !
 tf.variable = 2;
 check_equals(typeof(tf.variable), 'string'); 
 check_equals(tf.variable, '2'); 
 tf.variable = undefined;
-xcheck_equals(typeof(tf.variable), 'null'); 
+check_equals(typeof(tf.variable), 'null'); 
 tf.variable = 2;
 tf.variable = null;
-xcheck_equals(typeof(tf.variable), 'null'); 
+check_equals(typeof(tf.variable), 'null'); 
 tf.variable = "_level0.inputVar";
 check_equals(tf.variable, '_level0.inputVar'); 
 xcheck_equals(typeof(_level0.inputVar), 'undefined');
-xcheck_equals(tf.text, "hello world");  // as _level0.inputVar is unexistent
+check_equals(tf.text, "hello world");  // as _level0.inputVar is unexistent
 xcheck(!_level0.hasOwnProperty('inputVar'));
 _level0.inputVar = "dynamic variable";
 check_equals(tf.text, "dynamic variable");
@@ -671,9 +671,9 @@ tf.text = "back-propagated";
 check_equals(_level0.inputVar, "back-propagated");
 o = new Object();
 tf.variable = "_level0.o.t"; // non-existent member (yet)
-xcheck_equals(tf.text, "back-propagated");  // _level0.o.t doesn't exist yet
+check_equals(tf.text, "back-propagated");  // _level0.o.t doesn't exist yet
 o.t = "from object"; // here we create _level0.o.t
-xcheck_equals(tf.text, "back-propagated"); // but creating _level0.o.t doesn't trigger textfield text update
+check_equals(tf.text, "back-propagated"); // but creating _level0.o.t doesn't trigger textfield text update
 tf.text = "back-to-object"; // instead, assigning to TextField.text updates the object
 check_equals(o.t, "back-to-object");  
 o.t = "from object again"; // but updates to the object still don't update the TextField
