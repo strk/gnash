@@ -86,7 +86,7 @@ TextFormat::TextFormat()
 	_bold(false),
 	_italic(false),
 	_bullet(false),
-	_align(edit_text_character_def::ALIGN_LEFT),
+	_align(TextField::ALIGN_LEFT),
 	_blockIndent(-1),
 	_color(),
 	_indent(-1),
@@ -507,33 +507,33 @@ void textformat_class_init(as_object& global)
 
 }
 
-edit_text_character_def::alignment
+TextField::TextAlignment
 TextFormat::parseAlignString(const std::string& align)
 {
 	StringNoCaseEqual cmp;
-	if ( cmp(align, "left") ) return edit_text_character_def::ALIGN_LEFT;
-	else if ( cmp(align, "center") ) return edit_text_character_def::ALIGN_CENTER;
-	else if ( cmp(align, "right") ) return edit_text_character_def::ALIGN_RIGHT;
-	else if ( cmp(align, "justify") ) return edit_text_character_def::ALIGN_JUSTIFY;
+	if ( cmp(align, "left") ) return TextField::ALIGN_LEFT;
+	else if ( cmp(align, "center") ) return TextField::ALIGN_CENTER;
+	else if ( cmp(align, "right") ) return TextField::ALIGN_RIGHT;
+	else if ( cmp(align, "justify") ) return TextField::ALIGN_JUSTIFY;
 	else
 	{
 		log_debug("Invalid align string %s, take as left", align);
-		return edit_text_character_def::ALIGN_LEFT;
+		return TextField::ALIGN_LEFT;
 	}
 }
 
 const char* 
-TextFormat::getAlignString(edit_text_character_def::alignment a)
+TextFormat::getAlignString(TextField::TextAlignment a)
 {
 	switch (a)
 	{
-		case edit_text_character_def::ALIGN_LEFT:
+		case TextField::ALIGN_LEFT:
 			return "left";
-		case edit_text_character_def::ALIGN_CENTER:
+		case TextField::ALIGN_CENTER:
 			return "center";
-		case edit_text_character_def::ALIGN_RIGHT:
+		case TextField::ALIGN_RIGHT:
 			return "right";
-		case edit_text_character_def::ALIGN_JUSTIFY:
+		case TextField::ALIGN_JUSTIFY:
 			return "justify";
 		default:
 			log_error("Uknown alignment value: %d, take as left", a);

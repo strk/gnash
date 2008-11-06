@@ -99,10 +99,6 @@ void define_font_name_loader(SWFStream&, tag_type, movie_definition&,
 void define_text_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
-/// Read an SWF::DEFINEEDITTEXT tag.
-void define_edit_text_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
 void place_object_2_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 

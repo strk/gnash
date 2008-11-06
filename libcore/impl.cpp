@@ -43,6 +43,7 @@
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
 #include "DoInitActionTag.h"
+#include "DefineEditTextTag.h"
 #include "SetBackgroundColorTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
@@ -131,7 +132,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEBUTTON2, button_character_loader);
     register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);
     register_tag_loader(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader);
-    register_tag_loader(SWF::DEFINEEDITTEXT, define_edit_text_loader);
+    register_tag_loader(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader);
     register_tag_loader(SWF::DEFINEVIDEO, fixme_loader); // 38
     register_tag_loader(SWF::DEFINESPRITE,  sprite_loader);
     register_tag_loader(SWF::NAMECHARACTER, fixme_loader); // 40

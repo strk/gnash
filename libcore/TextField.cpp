@@ -23,6 +23,7 @@
 
 #include "utf8.h"
 #include "log.h"
+#include "swf/DefineEditTextTag.h"
 #include "render.h" // for display()
 #include "movie_definition.h" // to extract version info
 #include "MovieClip.h"
@@ -112,7 +113,7 @@ textfield_get_variable(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    return as_value(text->get_variable_name());
+    return as_value(text->getVariableName());
 
 }
 
@@ -662,46 +663,44 @@ getTextFieldInterface(VM& vm)
 // TextField class
 //
 
-TextField::TextField(character* parent,
-        edit_text_character_def* def, int id)
+TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
+        int id)
     :
     character(parent, id),
     _text(L""),
-    _textDefined(def->has_text()),
-    m_def(def),
+    _textDefined(def.hasText()),
     _underlined(false),
-    _leading(m_def->get_leading()),
-    _alignment(def->get_alignment()),
-    _indent(def->get_indent()), 
+    _leading(def.leading()),
+    _alignment(def.alignment()),
+    _indent(def.indent()), 
     _blockIndent(0),
-    _leftMargin(def->get_left_margin()), 
-    _rightMargin(def->get_right_margin()), 
-    _fontHeight(def->get_font_height()), 
+    _leftMargin(def.leftMargin()), 
+    _rightMargin(def.rightMargin()), 
+    _fontHeight(def.textHeight()), 
     _font(0),
     m_has_focus(false),
     m_cursor(0u),
     m_xcursor(0.0f),
     m_ycursor(0.0f),
-    _multiline(def->multiline()),
-    _password(def->password()),
-    _maxChars(def->maxChars()),
+    _multiline(def.multiline()),
+    _password(def.password()),
+    _maxChars(def.maxChars()),
     _text_variable_registered(false),
-    _variable_name(m_def->get_variable_name()),
-    _drawBackground(m_def->has_border()),
+    _variable_name(def.name()),
+    _drawBackground(def.border()),
     _backgroundColor(255,255,255,255),
-    _drawBorder(m_def->has_border()),
+    _drawBorder(def.border()),
     _borderColor(0,0,0,255),
-    _textColor(m_def->get_text_color()),
-    _embedFonts(m_def->getUseEmbeddedGlyphs()),
-    _wordWrap(m_def->do_word_wrap()),
-    _html(m_def->htmlAllowed()),
-    _selectable(!m_def->get_no_select()),
+    _textColor(def.color()),
+    _embedFonts(def.getUseEmbeddedGlyphs()),
+    _wordWrap(def.wordWrap()),
+    _html(def.html()),
+    _selectable(!def.noSelect()),
     _autoSize(autoSizeNone),
-    _type(m_def->get_readonly() ? typeDynamic : typeInput),
-    _bounds(m_def->get_bounds())
+    _type(def.readOnly() ? typeDynamic : typeInput),
+    _bounds(def.get_bound())
 {
     assert(parent);
-    assert(m_def);
 
     as_object* proto = getTextFieldInterface(_vm);
  
@@ -718,7 +717,9 @@ TextField::TextField(character* parent,
     set_member(NSV::PROP_uLISTENERS, ar);
 
     // WARNING! remember to set the font *before* setting text value!
-    setFont( m_def->get_font() );
+    boost::intrusive_ptr<const font> f = def.getFont();
+    if (!f) f = fontlib::get_default_font(); 
+    setFont(f);
 
     // set default text *before* calling registerTextVariable
     // (if the textvariable already exist and has a value
@@ -729,9 +730,77 @@ TextField::TextField(character* parent,
     if (_textDefined) 
     {
         setTextValue(utf8::decodeCanonicalString(
-                    m_def->get_default_text(), version));
+                    def.defaultText(), version));
     }
 
+    registerTextVariable();
+
+    m_dummy_style.push_back(fill_style());
+
+    reset_bounding_box(0, 0);
+
+}
+
+TextField::TextField(character* parent, const rect& bounds, int textHeight)
+    :
+    character(parent, 0),
+    _text(L""),
+    _textDefined(false),
+    _underlined(false),
+    _leading(0),
+    _alignment(ALIGN_LEFT),
+    _indent(0), 
+    _blockIndent(0),
+    _leftMargin(0), 
+    _rightMargin(0), 
+    _fontHeight(textHeight), 
+    _font(0),
+    m_has_focus(false),
+    m_cursor(0u),
+    m_xcursor(0.0f),
+    m_ycursor(0.0f),
+    _multiline(false),
+    _password(false),
+    _maxChars(0),
+    _text_variable_registered(false),
+    _variable_name(), //?
+    _drawBackground(false),
+    _backgroundColor(255,255,255,255),
+    _drawBorder(false),
+    _borderColor(0, 0, 0, 255),
+    _textColor(0, 0, 0, 255),
+    _embedFonts(false), // ?
+    _wordWrap(false),
+    _html(false),
+    _selectable(true),
+    _autoSize(autoSizeNone),
+    _type(typeDynamic),
+    _bounds(bounds)
+{
+    assert(parent);
+
+    as_object* proto = getTextFieldInterface(_vm);
+ 
+    // This is an instantiation, so attach properties to the
+    // prototype.
+    // TODO: is it correct to do it here, or can some TextFields
+    // be constructed without attaching these?
+    attachTextFieldInstanceProperties(*proto);
+
+    set_prototype(proto);
+
+    Array_as* ar = new Array_as();
+    ar->push(this);
+    set_member(NSV::PROP_uLISTENERS, ar);
+
+    // WARNING! remember to set the font *before* setting text value!
+    boost::intrusive_ptr<const font> f = fontlib::get_default_font(); 
+    setFont(f);
+
+    // set default text *before* calling registerTextVariable
+    // (if the textvariable already exist and has a value
+    //  the text will be replaced with it)
+    
     registerTextVariable();
 
     m_dummy_style.push_back(fill_style());
@@ -1015,7 +1084,7 @@ TextField::updateText(const std::wstring& wstr)
 {
     _textDefined = true;
 
-    unsigned int maxLen = m_def->get_max_length();
+    unsigned int maxLen = _maxChars;
 
     std::wstring newText = wstr; // copy needed for eventual resize
     if (maxLen && newText.length() > maxLen) newText.resize(maxLen);
@@ -1331,17 +1400,14 @@ TextField::get_member(string_table::key name, as_value* val,
     
 
 float
-TextField::align_line(
-        edit_text_character_def::alignment align,
+TextField::align_line(TextAlignment align,
         int last_line_start_record, float x)
 {
-    //GNASH_REPORT_FUNCTION;
-    assert(m_def);
 
-    float width = _bounds.width(); // m_def->width()
+    float width = _bounds.width(); 
     float right_margin = getRightMargin();
 
-    float    extra_space = (width - right_margin) - x - PADDING_TWIPS;
+    float extra_space = (width - right_margin) - x - PADDING_TWIPS;
 
     //assert(extra_space >= 0.0f);
     if (extra_space <= 0.0f)
@@ -1354,19 +1420,19 @@ TextField::align_line(
         return 0.0f;
     }
 
-    float    shift_right = 0.0f;
+    float shift_right = 0.0f;
 
-    if (align == edit_text_character_def::ALIGN_LEFT)
+    if (align == ALIGN_LEFT)
     {
         // Nothing to do; already aligned left.
         return 0.0f;
     }
-    else if (align == edit_text_character_def::ALIGN_CENTER)
+    else if (align == ALIGN_CENTER)
     {
         // Distribute the space evenly on both sides.
         shift_right = extra_space / 2;
     }
-    else if (align == edit_text_character_def::ALIGN_RIGHT)
+    else if (align == ALIGN_RIGHT)
     {
         // Shift all the way to the right.
         shift_right = extra_space;
@@ -1412,7 +1478,7 @@ TextField::format_text()
     }
 
     // See bug #24266
-    const rect& defBounds = _bounds; // m_def->get_bounds();
+    const rect& defBounds = _bounds;
 
     AutoSizeValue autoSize = getAutoSize();
     if ( autoSize != autoSizeNone )
@@ -1429,7 +1495,7 @@ TextField::format_text()
     }
 
     // Should get info from autoSize too maybe ?
-    edit_text_character_def::alignment textAlignment = getTextAlignment();
+    TextAlignment textAlignment = getTextAlignment();
 
     // FIXME: I don't think we should query the definition
     // to find the appropriate font to use, as ActionScript
@@ -2013,7 +2079,7 @@ TextField::set_variable_name(const std::string& newname)
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling updateText after change of variable name");
 #endif
-        updateText(m_def->get_default_text());
+        //updateText(_text);
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug("Calling registerTextVariable after change of variable name and updateText call");
 #endif
@@ -2217,7 +2283,7 @@ TextField::setUnderlined(bool v)
 }
 
 void
-TextField::setAlignment(edit_text_character_def::alignment h)
+TextField::setAlignment(TextAlignment h)
 {
     if ( _alignment != h )
     {
@@ -2664,16 +2730,13 @@ TextField::setAutoSize(AutoSizeValue val)
     format_text();
 }
 
-edit_text_character_def::alignment
+TextField::TextAlignment
 TextField::getTextAlignment()
 {
-    // TODO: use a _textAlignment private member to reduce lookups ?
-    // The member would be initialized to m_def->get_alignment and then update
-    // when _autoSize is updated.
-    edit_text_character_def::alignment textAlignment = getAlignment(); 
-    if ( _autoSize == autoSizeCenter ) textAlignment = edit_text_character_def::ALIGN_CENTER;
-    else if ( _autoSize == autoSizeLeft ) textAlignment = edit_text_character_def::ALIGN_LEFT;
-    else if ( _autoSize == autoSizeRight ) textAlignment = edit_text_character_def::ALIGN_RIGHT;
+    TextAlignment textAlignment = getAlignment(); 
+    if ( _autoSize == autoSizeCenter ) textAlignment = ALIGN_CENTER;
+    else if ( _autoSize == autoSizeLeft ) textAlignment = ALIGN_LEFT;
+    else if ( _autoSize == autoSizeRight ) textAlignment = ALIGN_RIGHT;
     return textAlignment;
 }
 
@@ -2736,7 +2799,6 @@ TextField::killFocus()
 void
 TextField::markReachableResources() const
 {
-    if ( m_def.get() ) m_def->setReachable();
 
     if ( _font ) _font->setReachable();
 

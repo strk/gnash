@@ -19,7 +19,6 @@
 #define GNASH_TEXTFIELD_H
 
 #include "character.h" // for inheritance
-#include "edit_text_character_def.h" // for inlines and typedefs
 #include "styles.h" // for fill_style and line_style
 #include "text.h" // for text_glyph_record
 #include "Range2d.h"
@@ -28,18 +27,28 @@
 
 // Forward declarations
 namespace gnash {
-	class text_character_def; 
 	class text_glyph_record; 
-	//class MovieClip;
+    namespace SWF {
+        class DefineEditTextTag;
+    }
 }
 
 namespace gnash {
 
-/// An instance of an edit_text_character_def 
+/// An instance of a DefineEditTextTag 
 class TextField : public character
 {
 
 public:
+
+    /// Text alignment values
+	enum TextAlignment
+	{
+		ALIGN_LEFT = 0,
+		ALIGN_RIGHT,
+		ALIGN_CENTER,
+		ALIGN_JUSTIFY
+	};
 
 	/// Possible autoSize values
 	enum AutoSizeValue {
@@ -71,10 +80,9 @@ public:
 		typeInput
 	};
 
-	TextField(
-			character* parent,
-			edit_text_character_def* def,
-			int id);
+	TextField(character* parent, const SWF::DefineEditTextTag& def, int id);
+
+    TextField(character* parent, const rect& bounds, int textHeight);
 
 	~TextField();
 
@@ -82,7 +90,7 @@ public:
 	bool can_handle_mouse_event() const { return true; }
 
 	character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
-	
+
 	bool wantsInstanceName() const
 	{
 		return true; // text fields can be referenced 
@@ -90,9 +98,9 @@ public:
 		
 	bool on_event(const event_id& id);	
 
-	const char* get_variable_name() const
+	const std::string& getVariableName() const
 	{
-		return _variable_name.c_str();
+		return _variable_name;
 	}
 
 	/// Set the name of a variable associated to this
@@ -233,8 +241,8 @@ public:
 		return _autoSize;
 	}
 
-	/// Return text alignment
-	edit_text_character_def::alignment getTextAlignment();
+	/// Return text TextAlignment
+    TextAlignment getTextAlignment();
 
 	/// Set autoSize value 
 	//
@@ -409,12 +417,12 @@ public:
 
 	void setBlockIndent(boost::uint16_t h);
 
-	edit_text_character_def::alignment getAlignment() const
+	TextAlignment getAlignment() const
 	{
 		return _alignment;
 	}
 
-	void setAlignment(edit_text_character_def::alignment h);
+	void setAlignment(TextAlignment h);
 
 	boost::uint16_t getLeading() const
 	{
@@ -480,11 +488,6 @@ private:
 	/// and no actionscript added text.
 	bool _textDefined;
 
-	/// immutable definition of this object, as read
-	/// from the SWF stream. Assured to be not-NULL
-	/// by constructor. This might change in the future
-	boost::intrusive_ptr<edit_text_character_def> m_def;
-
 	/// bounds of dynamic text, as laid out
 	rect m_text_bounding_box;
 
@@ -522,14 +525,13 @@ private:
 	/// m_text_glyph_records[], starting with
 	/// last_line_start_record and going through the end of
 	/// m_text_glyph_records.
-	float align_line(edit_text_character_def::alignment align,
-			int last_line_start_record, float x);
+	float align_line(TextAlignment align, int last_line_start_record, float x);
 
 	bool _underlined;
 
 	boost::uint16_t _leading;
 
-	edit_text_character_def::alignment _alignment;
+	TextAlignment _alignment;
 
 	boost::uint16_t _indent;
 

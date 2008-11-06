@@ -18,23 +18,18 @@
 // 
 //
 
-#ifndef __TEXTFORMAT_H__
-#define __TEXTFORMAT_H__
+#ifndef GNASH_TEXTFORMAT_H
+#define GNASH_TEXTFORMAT_H
 
 #include "as_object.h" // for inheritance of TextFormat
-#include "edit_text_character_def.h" // for edit_text_character_def::alignment enum
+#include "TextField.h" // for TextAlignment enum
 #include "RGBA.h" // for rgba
 #include <boost/cstdint.hpp> // for boost::uint32_t
 #include <string>
 
-// Forward declarations
-namespace gnash {  
-	//class as_object;
-}
-
 namespace gnash {  
 
-class DSOEXPORT TextFormat : public as_object
+class TextFormat : public as_object
 {
 public:
   
@@ -67,7 +62,7 @@ public:
 	bool indentDefined() const { return _flags&DEFindent; }
 
 	/// Return the alignment of the paragraph.
-	edit_text_character_def::alignment align() const { return _align; }
+	TextField::TextAlignment align() const { return _align; }
 	bool alignDefined() const { return _flags&DEFalign; }
 
 	/// Return the name of a font for text as a string.
@@ -116,12 +111,12 @@ public:
 	void colorSet(const rgba& x)      { _color = x; _flags |= DEFcolor; }
 	void indentSet(boost::uint16_t x)      { _indent = x; _flags |= DEFindent; }
 	void fontSet(const std::string& font) { _font=font; _flags |= DEFfont; }
-	void alignSet(edit_text_character_def::alignment x)  { _align = x; _flags |= DEFalign; }
+	void alignSet(TextField::TextAlignment x)  { _align = x; _flags |= DEFalign; }
 
-	static edit_text_character_def::alignment parseAlignString(const std::string& align);
+	static TextField::TextAlignment parseAlignString(const std::string& align);
 
 	/// Return the text representation of alignment value.
-	static const char* getAlignString(edit_text_character_def::alignment a);
+	static const char* getAlignString(TextField::TextAlignment a);
 
 	void alignSet(const std::string& align) { alignSet(parseAlignString(align)); }
 
@@ -195,7 +190,7 @@ private:
 	/// paragraph is centered. If "right", the paragraph is
 	/// right-aligned. If "justify", the paragraph is justified.
 	///
-	edit_text_character_def::alignment _align;
+	TextField::TextAlignment _align;
 
 	// 
 	boost::uint16_t		_blockIndent;

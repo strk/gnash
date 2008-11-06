@@ -52,7 +52,6 @@ libgnashparser_la_SOURCES = \
 	BitmapMovieDefinition.cpp \
 	button_character_def.cpp \
 	character_def.cpp \
-	edit_text_character_def.cpp \
 	text_character_def.cpp \
 	SWFMovieDefinition.cpp \
         morph2_character_def.cpp \
@@ -68,7 +67,6 @@ noinst_HEADERS = \
 	character_def.h	\
 	bitmap_character_def.h \
 	BitmapMovieDefinition.h \
-	edit_text_character_def.h \
 	text_character_def.h \
 	morph2_character_def.h \
 	movie_definition.h \
