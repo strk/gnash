@@ -244,6 +244,8 @@ CRcInitFile::dump(std::ostream& os) const
     cerr << "\tActionScript coding errors verbosity: "
          << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
     cerr << "\tPort Offset: " << _port_offset << endl;
+    cerr << "\tThreading support: "
+         << ((_threading)?"enabled":"disabled") << endl;
     cerr << "\tSpecial Testing output for Gnash: "
          << ((_testing)?"enabled":"disabled") << endl;
 
