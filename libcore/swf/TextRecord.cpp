@@ -119,11 +119,11 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         GlyphEntry ge;
         ge.index = in.read_uint(glyphBits);
         ge.advance = static_cast<float>(in.read_sint(advanceBits));
-
-        log_parse(_("   glyph%d: index=%d, advance=%g"), i,
-            ge.index, ge.advance);
-
         _glyphs.push_back(ge);
+        IF_VERBOSE_PARSE(
+            log_parse(_("   glyph%d: index=%d, advance=%g"), i,
+                ge.index, ge.advance);
+        );
     }
 
     // Continue parsing more records.

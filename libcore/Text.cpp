@@ -55,8 +55,8 @@ namespace gnash {
 	void display_glyph_records(const SWFMatrix& this_mat, character* inst,
 		const std::vector<SWF::TextRecord>& records, bool useEmbeddedGlyphs)
 	{
-		
-		static std::vector<fill_style>	s_dummy_style;	// used to pass a color on to shape_character::display()
+	    // used to pass a color on to shape_character::display()	
+		static std::vector<fill_style>	s_dummy_style;	
 		static std::vector<line_style>	s_dummy_line_style;
 		s_dummy_style.resize(1);
 
@@ -69,17 +69,19 @@ namespace gnash {
         float x = 0.0f;
         float y = 0.0f;
 
-		for (unsigned int i = 0; i < records.size(); i++)
+		for (std::vector<SWF::TextRecord>::const_iterator i = records.begin(),
+                e = records.end(); i != e; ++i)
 		{
 			// Draw the characters within the current record; i.e. consecutive
 			// chars that share a particular style.
-			const SWF::TextRecord& rec = records[i];
+			const SWF::TextRecord& rec = *i;
 
 			const font*	fnt = rec.getFont();
 			if (!fnt)
 			{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-				log_debug("No font in style of record %u", i);
+				log_debug("No font in style of record %u", 
+                        i - records.begin());
 #endif
 				continue;
 			}
@@ -90,7 +92,8 @@ namespace gnash {
 			float scale = rec.textHeight() / unitsPerEM;
 
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-			log_debug("font for record %u == %p", i, (const void*)fnt);
+			log_debug("font for record %u == %p", i - records.begin(),
+                    static_cast<void*>(fnt));
 #endif
 
 			if (rec.hasXOffset()) x = rec.xOffset();
@@ -102,11 +105,12 @@ namespace gnash {
 
 			rgba transformed_color = cx.transform(rec.color());
 
-			unsigned int nglyphs = rec.glyphs().size();
-			for (unsigned int j = 0; j < nglyphs; ++j)
+            typedef SWF::TextRecord::Glyphs Glyphs;
+			for (Glyphs::const_iterator j = rec.glyphs().begin(),
+                    je = rec.glyphs().end(); j != je; ++j)
 			{
 				// the glyph entry
-				const SWF::TextRecord::GlyphEntry& ge = rec.glyphs()[j];
+				const SWF::TextRecord::GlyphEntry& ge = *j;
 
 				int	index = ge.index;
 					
@@ -160,11 +164,9 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 					}
 				}
 				x += ge.advance;
-                log_debug("x: %d", x);
 			}
 
-			bool underline = rec.underline(); 
-			if ( nglyphs && underline )
+			if (rec.underline())
 			{
 				// Underline should end where last displayed glyphs
 				// does. 'x' here is where next glyph would be displayed
@@ -187,7 +189,8 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 					startX,   posY,
 					  endX,   posY,
 				};
-				render::draw_line_strip(underline, 2, transformed_color, base_matrix);
+				render::draw_line_strip(underline, 2, transformed_color,
+                        base_matrix);
 			}
 		}
 	}
