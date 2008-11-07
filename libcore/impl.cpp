@@ -39,6 +39,7 @@
 #include "DefineFontAlignZonesTag.h"
 #include "DefineButtonCxformTag.h"
 #include "CSMTextSettingsTag.h"
+#include "DefineButtonTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
@@ -100,19 +101,21 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::PLACEOBJECT, PlaceObject2Tag::loader);
     register_tag_loader(SWF::REMOVEOBJECT,  RemoveObjectTag::loader); // 05
     register_tag_loader(SWF::DEFINEBITS,  define_bits_jpeg_loader);
-    register_tag_loader(SWF::DEFINEBUTTON,  button_character_loader);
-    register_tag_loader(SWF::JPEGTABLES,  jpeg_tables_loader);
+    register_tag_loader(SWF::DEFINEBUTTON, DefineButtonTag::loader);
+    register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
     register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
     register_tag_loader(SWF::DEFINEFONT,  define_font_loader);
     register_tag_loader(SWF::DEFINETEXT,  define_text_loader);
     register_tag_loader(SWF::DOACTION,  DoActionTag::doActionLoader);
     register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
-    register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader); // 62
+    // 62
+    register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader);
     register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
     register_tag_loader(SWF::STARTSOUND, StartSoundTag::loader);
+    // 89
     register_tag_loader(SWF::STARTSOUND2, StartSound2Tag::loader);
 
-    register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16 
+    register_tag_loader(SWF::STOPSOUND, fixme_loader); // 16 
 
     // 17
     register_tag_loader(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader);
@@ -136,7 +139,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::FREEALL, fixme_loader); // 31
     register_tag_loader(SWF::DEFINESHAPE3,  define_shape_loader);
     register_tag_loader(SWF::DEFINETEXT2, define_text_loader);
-    register_tag_loader(SWF::DEFINEBUTTON2, button_character_loader);
+    // 37
+    register_tag_loader(SWF::DEFINEBUTTON2, DefineButton2Tag::loader);
     register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);
     register_tag_loader(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader);
     register_tag_loader(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader);

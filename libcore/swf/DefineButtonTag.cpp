@@ -1,4 +1,4 @@
-// button_character_def.cpp:  Mouse-sensitive SWF buttons, for Gnash.
+// DefineButtonTag.cpp:  Mouse-sensitive SWF buttons, for Gnash.
 //
 //   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -21,7 +21,7 @@
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "button_character_def.h"
+#include "DefineButtonTag.h"
 #include "Button.h" // for create_character_instance()
 #include "DefineButtonCxformTag.h"
 
@@ -32,13 +32,14 @@
 #include "GnashKey.h" // for gnash::key::codeMap
 
 namespace gnash {
-
+namespace SWF {
 //
 // ButtonAction
 //
 
 
-ButtonAction::ButtonAction(SWFStream& in, int tag_type, unsigned long endPos, movie_definition& mdef)
+ButtonAction::ButtonAction(SWFStream& in, int tag_type, unsigned long endPos,
+        movie_definition& mdef)
 	:
 	m_actions(mdef)
 {
@@ -216,21 +217,65 @@ ButtonRecord::read(SWFStream& in, int tag_type,
 	return true;
 }
 
+void
+DefineButtonTag::loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& /*r*/)
+{
+    assert(tag == DEFINEBUTTON);
+    in.ensureBytes(2);
+    int id = in.read_u16();
+
+    IF_VERBOSE_PARSE(
+        log_parse(_("  DefineButton loader: chararacter id = %d"), id);
+    );
+
+    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
+
+    m.add_character(id, bt.release());
+}
+
+void
+DefineButton2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& /*r*/)
+{
+    assert(tag == DEFINEBUTTON2);
+    in.ensureBytes(2);
+    int id = in.read_u16();
+
+    IF_VERBOSE_PARSE(
+        log_parse(_("  DefineButton2 loader: chararacter id = %d"), id);
+    );
+
+    std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
+
+    m.add_character(id, bt.release());
+}
 
 //
-// button_character_definition
+// DefineButtonTag
 //
 
-button_character_definition::button_character_definition(movie_definition& m)
+DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
+        tag_type tag)
 	:
 	_soundTag(0),
 	_movieDef(m)
-
-// Constructor.
 {
+    switch (tag)
+    {
+        default:
+            std::abort();
+            break;
+        case DEFINEBUTTON:
+            readDefineButtonTag(in, m);
+            break;
+        case DEFINEBUTTON2:
+            readDefineButton2Tag(in, m);
+            break;
+    }
 }
 
-button_character_definition::~button_character_definition()
+DefineButtonTag::~DefineButtonTag()
 {
 	for (ButtonActions::iterator i = _buttonActions.begin(),
 			ie = _buttonActions.end();
@@ -242,7 +287,7 @@ button_character_definition::~button_character_definition()
 
 
 void
-button_character_definition::readDefineButton(SWFStream& in, movie_definition& m)
+DefineButtonTag::readDefineButtonTag(SWFStream& in, movie_definition& m)
 {
 
 	// Character ID has been read already
@@ -283,7 +328,7 @@ button_character_definition::readDefineButton(SWFStream& in, movie_definition& m
 }
 
 void
-button_character_definition::readDefineButton2(SWFStream& in, movie_definition& m)
+DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 {
 	// Character ID has been read already
 
@@ -372,42 +417,21 @@ button_character_definition::readDefineButton2(SWFStream& in, movie_definition& 
 }
 
 
-
-void
-button_character_definition::read(SWFStream& in, int tag_type, movie_definition& m)
-{
-	// Character ID has been read already
-
-	switch (tag_type)
-	{
-		case SWF::DEFINEBUTTON:
-			readDefineButton(in, m);
-			break;
-		case SWF::DEFINEBUTTON2:
-			readDefineButton2(in, m);
-			break;
-		default:
-			abort();
-	}
-}
-
-
 character*
-button_character_definition::create_character_instance(
-		character* parent, int id)
+DefineButtonTag::create_character_instance(character* parent, int id)
 {
 	character* ch = new Button(*this, parent, id);
 	return ch;
 }
 
 int
-button_character_definition::getSWFVersion() const
+DefineButtonTag::getSWFVersion() const
 {
 	return _movieDef.get_version();
 }
 
 bool
-button_character_definition::hasKeyPressHandler() const
+DefineButtonTag::hasKeyPressHandler() const
 {
 	for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
 	{
@@ -417,6 +441,7 @@ button_character_definition::hasKeyPressHandler() const
 	return false;
 }
 
+} // namespace SWF
 } // namespace gnash
 
 // Local Variables:

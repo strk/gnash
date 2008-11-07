@@ -50,7 +50,6 @@ libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
 	bitmap_character_def.cpp \
 	BitmapMovieDefinition.cpp \
-	button_character_def.cpp \
 	character_def.cpp \
 	text_character_def.cpp \
 	SWFMovieDefinition.cpp \
@@ -62,7 +61,6 @@ libgnashparser_la_SOURCES = \
 noinst_HEADERS = \
 	abc_block.h \
 	action_buffer.h \
-	button_character_def.h \
 	character_def.h	\
 	bitmap_character_def.h \
 	BitmapMovieDefinition.h \

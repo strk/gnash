@@ -30,7 +30,6 @@
 #include "utility.h"
 #include "action.h"
 #include "action_buffer.h"
-#include "button_character_def.h"
 #include "font.h"
 #include "fontlib.h"
 #include "log.h"
@@ -59,6 +58,7 @@
 #include "gnash.h" // FileType enum
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
+#include "sound_handler.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -943,26 +943,6 @@ sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,
 //
 
 // end_tag doesn't actually need to exist.
-
-
-void button_character_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    // 7 || 34
-    assert(tag == SWF::DEFINEBUTTON || tag == SWF::DEFINEBUTTON2);
-
-    in.ensureBytes(2);
-    int    character_id = in.read_u16();
-
-    IF_VERBOSE_PARSE(
-        log_parse(_("  button character loader: char_id = %d"), character_id);
-    );
-
-    button_character_definition* ch = new button_character_definition(m);
-    ch->read(in, tag, m);
-
-    m.add_character(character_id, ch);
-}
 
 
 //

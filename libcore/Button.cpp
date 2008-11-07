@@ -23,7 +23,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "Button.h"
-#include "button_character_def.h"
+#include "DefineButtonTag.h"
 #include "as_value.h"
 
 #include "ActionExec.h"
@@ -290,9 +290,7 @@ attachButtonInterface(as_object& o)
 
 }
 
-Button::Button(
-		button_character_definition& def,
-		character* parent, int id)
+Button::Button(SWF::DefineButtonTag& def, character* parent, int id)
 	:
 	character(parent, id),
 	m_last_mouse_flags(IDLE),
@@ -542,7 +540,8 @@ Button::on_button_event(const event_id& event)
 			}
 			if (bi >= 0)
 			{
-				const SWF::DefineButtonSoundTag::ButtonSound& bs = _def.buttonSound(bi);
+				const SWF::DefineButtonSoundTag::ButtonSound& bs = 
+                    _def.buttonSound(bi);
 				// character zero is considered as null character
 				if (bs.soundID > 0)
 				{
@@ -591,7 +590,8 @@ Button::on_button_event(const event_id& event)
 	//else log_debug(_("No statically-defined handler for event: %s"), event);
 
 	// Call conventional attached method.
-	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_key());
+	boost::intrusive_ptr<as_function> method =
+        getUserDefinedEventHandler(event.get_function_key());
 	if ( method )
 	{
 		//log_debug(_("Got user-defined handler for event: %s"), event);
@@ -637,10 +637,11 @@ Button::get_active_records(RecSet& list, MouseState state)
 {
 	list.clear();
 	
-    const button_character_definition::ButtonRecords& br = _def.buttonRecords();
+    using namespace SWF;
+    const DefineButtonTag::ButtonRecords& br = _def.buttonRecords();
     size_t index = 0;
 
-	for (button_character_definition::ButtonRecords::const_iterator i = br.begin(),
+	for (DefineButtonTag::ButtonRecords::const_iterator i = br.begin(),
             e = br.end(); i != e; ++i, ++index)
 	{
 		const ButtonRecord& rec =*i;
@@ -743,14 +744,16 @@ Button::set_current_state(MouseState new_state)
 			if ( ! oldch )
 			{
 				// Not there, instantiate
-				ButtonRecord& bdef = _def.buttonRecords()[i];
+                SWF::ButtonRecord& bdef = _def.buttonRecords()[i];
 
-				const SWFMatrix&	mat = bdef.m_button_matrix;
-				const cxform&	cx = bdef.m_button_cxform;
-				int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
+				const SWFMatrix& mat = bdef.m_button_matrix;
+				const cxform& cx = bdef.m_button_cxform;
+				int ch_depth = bdef.m_button_layer + 
+                    character::staticDepthOffset + 1;
 				int ch_id = bdef.m_character_id;
 
-				character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+				character* ch = bdef.m_character_def->create_character_instance(
+                        this, ch_id);
 				ch->setMatrix(mat, true); // update caches
 				ch->set_cxform(cx); 
 				ch->set_depth(ch_depth); 
@@ -896,7 +899,7 @@ Button::stagePlacementCallback()
 	get_active_records(hitChars, HIT);
 	for (RecSet::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
 	{
-		ButtonRecord& bdef = _def.buttonRecords()[*i];
+        SWF::ButtonRecord& bdef = _def.buttonRecords()[*i];
 
 		const SWFMatrix& mat = bdef.m_button_matrix;
 		const cxform& cx = bdef.m_button_cxform;
@@ -927,14 +930,15 @@ Button::stagePlacementCallback()
 	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
 	{
 		int rno = *i;
-		ButtonRecord& bdef = _def.buttonRecords()[rno];
+        SWF::ButtonRecord& bdef = _def.buttonRecords()[rno];
 
-		const SWFMatrix&	mat = bdef.m_button_matrix;
-		const cxform&	cx = bdef.m_button_cxform;
+		const SWFMatrix& mat = bdef.m_button_matrix;
+		const cxform& cx = bdef.m_button_cxform;
 		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;
 
-		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+		character* ch = bdef.m_character_def->create_character_instance(
+                this, ch_id);
 		ch->setMatrix(mat, true);  // update caches
 		ch->set_cxform(cx); 
 		ch->set_depth(ch_depth); 

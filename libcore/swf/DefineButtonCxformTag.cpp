@@ -19,7 +19,7 @@
 #include "swf.h" // for tag_type definition
 #include "SWFStream.h" // for inlines
 #include "movie_definition.h"
-#include "button_character_def.h"
+#include "DefineButtonTag.h"
 #include "DefineButtonCxformTag.h"
 
 namespace gnash {
@@ -49,8 +49,8 @@ DefineButtonCxformTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
         return;
     }
 
-    button_character_definition* ch = 
-        dynamic_cast<button_character_definition*> (chdef);
+    DefineButtonTag* ch = 
+        dynamic_cast<DefineButtonTag*> (chdef);
     if (!ch)
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -61,8 +61,8 @@ DefineButtonCxformTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
         return;
     }
     
-    button_character_definition::ButtonRecords& br = ch->buttonRecords();
-    for (button_character_definition::ButtonRecords::iterator i = br.begin(),
+    DefineButtonTag::ButtonRecords& br = ch->buttonRecords();
+    for (DefineButtonTag::ButtonRecords::iterator i = br.begin(),
             e = br.end(); i != e; ++i)
     {
         // This will throw a parser exception if not enough bytes are

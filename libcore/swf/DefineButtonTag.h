@@ -17,9 +17,8 @@
 //
 
 
-
-#ifndef GNASH_BUTTON_CHARACTER_DEF_H
-#define GNASH_BUTTON_CHARACTER_DEF_H
+#ifndef GNASH_SWF_DEFINEBUTTONTAG_H
+#define GNASH_SWF_DEFINEBUTTONTAG_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character_def.h"
@@ -45,7 +44,10 @@ namespace gnash {
 }
 
 namespace gnash {
+namespace SWF {
 
+
+/// A class for parsing ButtonRecord, used by DefineButton and DefineButton2
 class ButtonRecord
 {
 
@@ -120,6 +122,7 @@ public:
 
 };
 	
+/// A class for parsing an ActionRecord, used by lots of tags!
 class ButtonAction
 {
 public:
@@ -174,43 +177,33 @@ private:
 
 };
 
-
-class button_character_definition : public character_def
+/// A class for parsing DefineButton and DefineButton2 tags.
+class DefineButtonTag : public character_def
 {
 public:
+
+    /// Load a DefineButtonTag.
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& r);
 
 	typedef std::vector<ButtonRecord> ButtonRecords; 
 	typedef std::vector<ButtonAction*> ButtonActions;
 
-	/// \brief
-	/// Construct a character definition as read from
-	/// the given movie_definition (SWF)
-	button_character_definition(movie_definition& m);
+	/// Construct a DefineButtonTag (DefinitionTag) (SWF)
+	DefineButtonTag(SWFStream& in, movie_definition& m, tag_type tag);
 
-	virtual ~button_character_definition();
+	virtual ~DefineButtonTag();
 
 	/// Create a mutable instance of our definition.
 	character* create_character_instance(character* parent, int id);
 
-	/// Read a SWF::DEFINEBUTTON, SWF::DEFINEBUTTONSOUND or SWF::DEFINEBUTTON2
-	void	read(SWFStream& in, int tag_type, movie_definition& m);
-
-	/// Read a SWF::DEFINEBUTTON tag
-	void	readDefineButton(SWFStream& in, movie_definition& m);
-
-	/// Read a SWF::DEFINEBUTTON2 tag
-	void	readDefineButton2(SWFStream& in, movie_definition& m);
-
-	/// Read a SWF::DEFINEBUTTONCXFORM tag
-	void readDefineButtonCxform(SWFStream& in, movie_definition& m);
-	
 	const rect&	get_bound() const {
-		// It is required that get_bound() is implemented in character definition
-		// classes. However, button character definitions do not have shape 
-		// definitions themselves. Instead, they hold a list of shape_character_def.
-		// get_bound() is currently only used by generic_character which normally
-		// is used only shape character definitions. See character_def.h to learn
-		// why it is virtual anyway.
+		// It is required that get_bound() is implemented in character
+        // definition classes. However, button character definitions do
+        // not have shape definitions themselves. Instead, they hold a list
+        // of shape_character_def. get_bound() is currently only used
+        // by generic_character which normally is used only shape character
+        // definitions. See character_def.h to learn why it is virtual anyway.
 		// get_button_bound() is used for buttons.
 		abort(); // should not be called  
 		static rect unused;
@@ -236,7 +229,7 @@ public:
     //
     /// @param index    The sound index (0-3) to get.
     /// Do not call this function without checking hasSound() first.
-    const SWF::DefineButtonSoundTag::ButtonSound& buttonSound(size_t index) const {
+    const DefineButtonSoundTag::ButtonSound& buttonSound(size_t index) const {
         assert(_soundTag.get());
         return _soundTag->getSound(index);
     }
@@ -288,7 +281,13 @@ protected:
 
 private:
 
-	boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
+	/// Read a DEFINEBUTTON tag
+	void readDefineButtonTag(SWFStream& in, movie_definition& m);
+
+	/// Read a DEFINEBUTTON2 tag
+	void readDefineButton2Tag(SWFStream& in, movie_definition& m);
+
+    boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
 
 	ButtonRecords _buttonRecords;
 	ButtonActions _buttonActions;
@@ -300,6 +299,19 @@ private:
 	movie_definition& _movieDef;
 };
 
+/// A class for parsing a DefineButton2 tag.
+//
+/// This only contains a loader because a DefineButton2Tag uses the same
+/// code as DefineButtonTag with minor modifications. 
+class DefineButton2Tag
+{
+public:
+    /// Load a DefineButton2 tag.
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& r);
+};
+
+}
 }	// end namespace gnash
 
 
