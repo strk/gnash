@@ -94,13 +94,13 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 }
 
 void
-StartSoundTag2::loader(SWFStream& in, tag_type tag, movie_definition& m,
-        const RunInfo& r)
+StartSound2Tag::loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& /*r*/)
 {
     assert(tag == STARTSOUND2);
 
     std::string className;
-    in.read_stream(className);
+    in.read_string(className);
     log_unimpl(_("STARTSOUND2 tag not parsed and not used"));
 
     // We should probably then use StartSoundTag to parse the
