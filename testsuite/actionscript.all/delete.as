@@ -245,7 +245,10 @@ asm {
 check_equals(o.b.c, 5);
 
 
-totals(41);
+totals(27+14);
+
 #else
-totals()
+
+totals(27);
+
 #endif
