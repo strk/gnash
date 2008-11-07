@@ -28,16 +28,15 @@
 #include <vector>
 #include <set>
 
+// Forward declarations.
 namespace gnash {
-
-// Forward declarations
 	class MovieClip;
-	class button_character_definition;
+    namespace SWF {
+        class DefineButtonTag;
+    }
+}
 
-//
-// button characters
-//
-
+namespace gnash {
 //
 // Button
 //
@@ -74,8 +73,7 @@ public:
 
 	MouseState m_mouse_state;
 
-	Button(button_character_definition& def,
-			character* parent, int id);
+	Button(SWF::DefineButtonTag& def, character* parent, int id);
 
 	~Button();
 
@@ -163,7 +161,7 @@ protected:
 
 private:
 
-	button_character_definition& _def;
+    SWF::DefineButtonTag& _def;
 
 	CharsVect _stateCharacters;
 

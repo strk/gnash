@@ -22,7 +22,7 @@
 #include "movie_definition.h"
 #include "SoundInfoRecord.h"
 #include "SWFStream.h"
-#include "button_character_def.h"
+#include "DefineButtonTag.h"
 
 namespace gnash {
 namespace SWF {
@@ -52,8 +52,7 @@ DefineButtonSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
         return;
     }
 
-    button_character_definition* button = 
-        dynamic_cast<button_character_definition*> (chdef);
+    DefineButtonTag* button = dynamic_cast<DefineButtonTag*> (chdef);
 
     if (!button)
     {

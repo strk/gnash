@@ -124,9 +124,6 @@ void remove_object_2_loader(SWFStream&, tag_type, movie_definition&,
 
 void do_action_loader(SWFStream&, tag_type, movie_definition&, const RunInfo&);
 
-void button_character_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
 /// Label the current frame  (SWF::FRAMELABEL)
 void frame_label_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);

@@ -83,7 +83,7 @@ public:
     /// Mark all reachable resources (for GC)
     //
     /// Reachable resources are:
-    ///  - button sound infos (m_button_sounds)
+    ///  - button sound infos (_sounds)
     ///
     void markReachableResources() const
     {
