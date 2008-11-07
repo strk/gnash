@@ -26,6 +26,7 @@
 #include "sound_handler.h" // for sound_envelope (composition)
 #include "VM.h" // We only need this to get movie_root
 #include "swf.h" // for tag_type definition
+#include "SoundInfoRecord.h"
 
 #include <vector> // for composition
 #include <boost/cstdint.hpp> // for boost::uint16_t and friends
@@ -58,61 +59,31 @@ class StartSoundTag : public ControlTag
 	///
 	boost::uint16_t	m_handler_id;
 
-	/// Number of loops started by an execution of this tag 
-	// 
-	/// This number is 0 if the sound must be played only once,
-	/// 1 to play twice and so on...
-	///
-	/// It is not known whether a value exists to specify "loop forever"
-	///
-	int	m_loop_count;
-
-	/// If true this tag actually *stops* the sound rather then playing it.
-	//
-	/// In a well-formed SWF when this flag is on all others should be off
-	/// (no loops, no envelopes, no in/out points).
-	///
-	bool	m_stop_playback;
-
-	/// In/Out points, currently unsupported
-	//
-	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_soundinfo
-	// unsigned long m_in_point;
-	// unsigned long m_out_point;
-
-	/// Sound effects (envelopes) for this start of the sound
-	//
-	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_envelope
-	///
-	sound::SoundEnvelopes m_envelopes;
-
-	/// Initialize this StartSoundTag from the SWFStream  
+	/// Create a StartSoundTag for starting the given sound sample
 	//
 	/// The stream is assumed to be positioned right after the
 	/// sound_id field of the tag structure.
 	///
-	void read(SWFStream& in);
-
-
-	/// Create a StartSoundTag for starting the given sound sample
-	//
+    /// @param in   The SWFStream to initialize the tag from.
 	/// @param sound_handler_id
 	/// Sound sample identifier as provided by sound_handler (sic!)
 	///
-	StartSoundTag(int sound_id)
+	StartSoundTag(SWFStream& in, int sound_id)
 		:
-		m_handler_id(sound_id),
-		m_loop_count(0),
-		m_stop_playback(false)
+		m_handler_id(sound_id)
 	{
+        _soundInfo.read(in);
 	}
+
+    SoundInfo _soundInfo;
 
 public:
 
-	void	execute(MovieClip* /* m */, DisplayList& /* dlist */) const;
+	void execute(MovieClip* /* m */, DisplayList& /* dlist */) const;
 
 	/// Load a SWF::STARTSOUND tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
 
 };
 

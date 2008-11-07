@@ -548,16 +548,16 @@ Button::on_button_event(const event_id& event)
 				{
 					if (bs.sample)
 					{
-						if (bs.soundInfo.m_stop_playback)
+						if (bs.soundInfo.stopPlayback)
 						{
 							s->stop_sound(bs.sample->m_sound_handler_id);
 						}
 						else
 						{
 							s->play_sound(bs.sample->m_sound_handler_id,
-                                    bs.soundInfo.m_loop_count, 0, 0, 
-                                    (bs.soundInfo.m_envelopes.empty() ? NULL :
-                                                    &bs.soundInfo.m_envelopes));
+                                    bs.soundInfo.loopCount, 0, 0, 
+                                    (bs.soundInfo.envelopes.empty() ? NULL :
+                                                    &bs.soundInfo.envelopes));
 						}
 					}
 				}

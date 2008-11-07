@@ -26,64 +26,66 @@
 namespace gnash {
 namespace SWF {
 
+
 void
 SoundInfo::read(SWFStream& in)
 {
 	in.ensureBytes(1);
-	m_in_point = m_out_point = m_loop_count = 0;
     
     // highest 2 bits are reserved(unused).
     int flags = in.read_u8();
-	m_stop_playback = flags & (1 << 5); 
-	m_no_multiple   = flags & (1 << 4); 
-	m_has_envelope  = flags & (1 << 3); 
-	m_has_loops     = flags & (1 << 2);  
-	m_has_out_point = flags & (1 << 1); 
-	m_has_in_point  = flags & (1 << 0);  
+	stopPlayback = flags & (1 << 5); 
+	noMultiple   = flags & (1 << 4); 
+	hasEnvelope  = flags & (1 << 3); 
+	hasLoops     = flags & (1 << 2);  
+	hasOutPoint = flags & (1 << 1); 
+	hasInPoint  = flags & (1 << 0);  
     
-	if (m_has_in_point)
-	{
-		in.ensureBytes(4);
-		m_in_point = in.read_u32();
+    if (noMultiple) {
+        LOG_ONCE(log_unimpl("syncNoMultiple flag in SoundInfo record"));
+    }
+
+    in.ensureBytes(hasInPoint * 4 + hasOutPoint * 4 + hasLoops * 2);
+
+	if (hasInPoint) {
+		log_unimpl(_("SoundInfo record with in point"));
+		inPoint = in.read_u32();
 	}
-	if (m_has_out_point)
-	{
-		in.ensureBytes(4);
-		m_out_point = in.read_u32();
+
+	if (hasOutPoint) {
+		log_unimpl(_("SoundInfo record with out point"));
+		outPoint = in.read_u32();
 	}
-	if (m_has_loops)
-	{
-		in.ensureBytes(2);
-		m_loop_count = in.read_u16();
+
+	if (hasLoops) {
+		loopCount = in.read_u16();
 	}
-	if (m_has_envelope)
-	{
+
+	if (hasEnvelope) {
 		in.ensureBytes(1);
 		int nPoints = in.read_u8();
-		m_envelopes.resize(nPoints);
+		envelopes.resize(nPoints);
 		in.ensureBytes(8 * nPoints);
 		for (int i=0; i < nPoints; i++)
 		{
-			m_envelopes[i].m_mark44 = in.read_u32();
-			m_envelopes[i].m_level0 = in.read_u16();
-			m_envelopes[i].m_level1 = in.read_u16();
+			envelopes[i].m_mark44 = in.read_u32();
+			envelopes[i].m_level0 = in.read_u16();
+			envelopes[i].m_level1 = in.read_u16();
 		}
 	}
-	else
-	{
-		m_envelopes.resize(0);
+	else {
+		envelopes.clear();
 	}
 
-
 	IF_VERBOSE_PARSE(
-	log_parse("	has_envelope = %d", m_has_envelope);
-	log_parse("	has_loops = %d", m_has_loops);
-	log_parse("	has_out_point = %d", m_has_out_point);
-	log_parse("	has_in_point = %d", m_has_in_point);
-	log_parse("	in_point = %d", m_in_point);
-	log_parse("	out_point = %d", m_out_point);
-	log_parse("	loop_count = %d", m_loop_count);
-	log_parse("	envelope size = %d", m_envelopes.size());
+        log_parse("	hasEnvelope = %d", hasEnvelope);
+        log_parse("	hasLoops = %d", hasLoops);
+        log_parse("	hasOutPoint = %d", hasOutPoint);
+        log_parse("	hasInPoint = %d", hasInPoint);
+        log_parse("	inPoint = %d", inPoint);
+        log_parse("	outPoint = %d", outPoint);
+        log_parse("	loopCount = %d", loopCount);
+        log_parse("	envelope size = %d", envelopes.size());
 	);
 }
 

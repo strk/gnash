@@ -31,18 +31,52 @@ namespace SWF {
 
 struct SoundInfo
 {
+    /// Construct a SoundInfo record object
+    //
+    /// This SoundInfo is not valid until read() has been called.
+    SoundInfo()
+        :
+        loopCount(0),
+        inPoint(0),
+        outPoint(0)
+    {}
+
+    bool noMultiple;
+    bool hasEnvelope;
+    bool hasLoops;
+    bool hasOutPoint;
+    bool hasInPoint;
+
+	/// Number of loops started by an execution of this tag 
+	// 
+	/// This number is 0 if the sound must be played only once,
+	/// 1 to play twice and so on...
+	///
+	/// It is not known whether a value exists to specify "loop forever"
+	///
+	int	loopCount;
+
+	/// If true this tag actually *stops* the sound rather then playing it.
+	//
+	/// In a well-formed SWF when this flag is on all others should be off
+	/// (no loops, no envelopes, no in/out points).
+	///
+	bool stopPlayback;
+
+	/// In/Out points, currently unsupported
+	//
+	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_soundinfo
+    boost::uint32_t inPoint;
+    boost::uint32_t outPoint;
+
+	/// Sound effects (envelopes) for this start of the sound
+	//
+	/// See http://sswf.sourceforge.net/SWFalexref.html#swf_envelope
+	///
+	sound::SoundEnvelopes envelopes;
+
     void read(SWFStream& in);
 
-    bool m_no_multiple;
-    bool m_stop_playback;
-    bool m_has_envelope;
-    bool m_has_loops;
-    bool m_has_out_point;
-    bool m_has_in_point;
-    boost::uint32_t m_in_point;
-    boost::uint32_t m_out_point;
-    boost::uint16_t m_loop_count;
-    sound::SoundEnvelopes m_envelopes;
 };
 
 }
