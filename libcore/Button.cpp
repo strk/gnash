@@ -637,20 +637,20 @@ Button::get_active_records(RecSet& list, MouseState state)
 {
 	list.clear();
 	
-	size_t nrecs = _def.m_button_records.size();
+    const button_character_definition::ButtonRecords& br = _def.buttonRecords();
+    size_t index = 0;
 
-	//log_debug("%s.get_active_records(%s) - def has %d records", getTarget(), mouseStateName(state), _def.m_button_records.size());
-	for (size_t i=0; i<nrecs; ++i)
+	for (button_character_definition::ButtonRecords::const_iterator i = br.begin(),
+            e = br.end(); i != e; ++i, ++index)
 	{
-		button_record& rec = _def.m_button_records[i];
-		//log_debug(" rec %d has hit:%d down:%d over:%d up:%d", i, rec.m_hit_test, rec.m_down, rec.m_over, rec.m_up);
+		const ButtonRecord& rec =*i;
 
 		if ((state == UP && rec.m_up)
 		    || (state == DOWN && rec.m_down)
 		    || (state == OVER && rec.m_over)
 		    || (state == HIT && rec.m_hit_test))
 		{
-			list.insert(i);
+			list.insert(index);
 		}
 	}
 }
@@ -743,7 +743,7 @@ Button::set_current_state(MouseState new_state)
 			if ( ! oldch )
 			{
 				// Not there, instantiate
-				button_record& bdef = _def.m_button_records[i];
+				ButtonRecord& bdef = _def.buttonRecords()[i];
 
 				const SWFMatrix&	mat = bdef.m_button_matrix;
 				const cxform&	cx = bdef.m_button_cxform;
@@ -896,7 +896,7 @@ Button::stagePlacementCallback()
 	get_active_records(hitChars, HIT);
 	for (RecSet::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
 	{
-		button_record& bdef = _def.m_button_records[*i];
+		ButtonRecord& bdef = _def.buttonRecords()[*i];
 
 		const SWFMatrix& mat = bdef.m_button_matrix;
 		const cxform& cx = bdef.m_button_cxform;
@@ -918,7 +918,7 @@ Button::stagePlacementCallback()
 	// Some slots will probably be never used (consider HIT-only records)
 	// but for now this direct corrispondence between record number
 	// and active character will be handy.
-	_stateCharacters.resize(_def.m_button_records.size());
+	_stateCharacters.resize(_def.buttonRecords().size());
 
 	// Instantiate the default state characters 
 	RecSet upChars;
@@ -927,7 +927,7 @@ Button::stagePlacementCallback()
 	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
 	{
 		int rno = *i;
-		button_record& bdef = _def.m_button_records[rno];
+		ButtonRecord& bdef = _def.buttonRecords()[rno];
 
 		const SWFMatrix&	mat = bdef.m_button_matrix;
 		const cxform&	cx = bdef.m_button_cxform;

@@ -23,6 +23,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "button_character_def.h"
 #include "Button.h" // for create_character_instance()
+#include "DefineButtonCxformTag.h"
 
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
@@ -92,11 +93,11 @@ button_action::triggeredBy(const event_id& ev) const
 }
 
 //
-// button_record
+// ButtonRecord
 //
 
 bool
-button_record::is_valid()
+ButtonRecord::is_valid()
 {
 	return (m_character_def != NULL);
 }
@@ -113,7 +114,7 @@ computeButtonStatesString(int flags)
 }
 
 bool
-button_record::read(SWFStream& in, int tag_type,
+ButtonRecord::read(SWFStream& in, int tag_type,
 		movie_definition& m, unsigned long endPos)
 {
 	// caller should check this
@@ -229,7 +230,7 @@ button_character_definition::button_character_definition(movie_definition& m)
 
 button_character_definition::~button_character_definition()
 {
-	for (ButtonActVect::iterator i=m_button_actions.begin(),
+	for (ButtonActions::iterator i=m_button_actions.begin(),
 			ie=m_button_actions.end();
 			i != ie; ++i )
 	{
@@ -251,7 +252,7 @@ button_character_definition::readDefineButton(SWFStream& in, movie_definition& m
 	// Read button character records.
 	for (;;)
 	{
-		button_record r;
+		ButtonRecord r;
 		if (r.read(in, SWF::DEFINEBUTTON, m, endTagPos) == false)
 		{
 			// Null record; marks the end of button records.
@@ -259,10 +260,10 @@ button_character_definition::readDefineButton(SWFStream& in, movie_definition& m
 		}
 
 		// SAFETY CHECK:
-		// if the button_record is corrupted, discard it
+		// if the ButtonRecord is corrupted, discard it
 		if ( r.is_valid() )
 		{
-			m_button_records.push_back(r);
+			_buttonRecords.push_back(r);
 		}
 	}
 
@@ -277,20 +278,6 @@ button_character_definition::readDefineButton(SWFStream& in, movie_definition& m
 	// Read actions.
 	m_button_actions.push_back(new button_action(in, SWF::DEFINEBUTTON, endTagPos, m));
 
-}
-
-void
-button_character_definition::readDefineButtonCxform(SWFStream& in, movie_definition& /*m*/)
-{
-    // A simple rgb cxform for SWF2 buttons, superseded by DefineButton2.
-    for (ButtonRecVect::iterator i = m_button_records.begin(), e = m_button_records.end();
-            i != e; ++i)
-    {
-        (*i).m_button_cxform.read_rgb(in);
-        IF_VERBOSE_PARSE(
-            log_parse("Read DefineButtonCxform: %s", (*i).m_button_cxform);
-        );
-    }
 }
 
 void
@@ -328,7 +315,7 @@ button_character_definition::readDefineButton2(SWFStream& in, movie_definition& 
 	// we don't attempt to parse at all unless we have at least 1 byte left
 	while ( in.tell() < endOfButtonRecords )
 	{
-		button_record	r;
+		ButtonRecord r;
 		if (r.read(in, SWF::DEFINEBUTTON2, m, endOfButtonRecords) == false)
 		{
 			// Null record; marks the end of button records.
@@ -336,10 +323,10 @@ button_character_definition::readDefineButton2(SWFStream& in, movie_definition& 
 		}
 
 		// SAFETY CHECK:
-		// if the button_record is corrupted, discard it
+		// if the ButtonRecord is corrupted, discard it
 		if ( r.is_valid() )
 		{
-			m_button_records.push_back(r);
+			_buttonRecords.push_back(r);
 		}
 	}
 

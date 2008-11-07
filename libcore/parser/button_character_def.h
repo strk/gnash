@@ -46,7 +46,7 @@ namespace gnash {
 
 namespace gnash {
 
-class button_record
+class ButtonRecord
 {
 
 private:
@@ -84,7 +84,7 @@ public:
 
 public:
 
-	button_record()
+	ButtonRecord()
 		:
 		m_character_def(0)
 	{
@@ -179,6 +179,8 @@ class button_character_definition : public character_def
 {
 public:
 
+	typedef std::vector<ButtonRecord> ButtonRecords; 
+	typedef std::vector<button_action*> ButtonActions;
 
 	/// \brief
 	/// Construct a character definition as read from
@@ -215,11 +217,18 @@ public:
 		return unused;
 	}
   
+    /// Access the ButtonRecords directly. Used for modifying the
+    /// Cxform by a DefineButtonCxform tag.
+    ButtonRecords& buttonRecords() { return _buttonRecords; }
 
     /// Does this button have an associated DefineButtonSoundTag?
     bool hasSound() const { return (_soundTag.get()); }
 
+    /// Add a DefineButtonSoundTag to the button. This should not be
+    /// done twice, so check hasSound() first.
     void addSoundTag(std::auto_ptr<SWF::DefineButtonSoundTag> soundTag) {
+        // Do not replace a sound tag.
+        assert(!_soundTag.get());
         _soundTag.reset(soundTag.release());
     }
 
@@ -266,8 +275,8 @@ protected:
 	void markReachableResources() const
 	{
 		assert(isReachable());
-		for (ButtonRecVect::const_iterator i=m_button_records.begin(),
-                e=m_button_records.end(); i!=e; ++i)
+		for (ButtonRecords::const_iterator i = _buttonRecords.begin(),
+                e = _buttonRecords.end(); i!=e; ++i)
 		{
 			i->markReachableResources();
 		}
@@ -276,17 +285,13 @@ protected:
 	}
 #endif // GNASH_USE_GC
 
-public: // TODO: make private
-
-	typedef std::vector<button_record> ButtonRecVect; 
-	ButtonRecVect m_button_records;
-
-	boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
 
 private:
 
-	typedef std::vector<button_action*> ButtonActVect;
-	ButtonActVect m_button_actions;
+	boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
+
+	ButtonRecords _buttonRecords;
+	ButtonActions m_button_actions;
 
 	/// Currently set but unused (and also unaccessible)
 	bool m_menu;

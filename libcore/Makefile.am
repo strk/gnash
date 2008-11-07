@@ -84,6 +84,7 @@ libgnashcore_la_SOURCES = \
 	swf/TagLoadersTable.cpp	\
 	swf/DefineVideoStreamTag.cpp \
 	swf/DefineButtonSoundTag.cpp \
+	swf/DefineButtonCxformTag.cpp \
 	swf/VideoFrameTag.cpp \
 	swf/SoundInfoRecord.cpp \
 	swf/tag_loaders.cpp \
