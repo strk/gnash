@@ -43,6 +43,7 @@
 #include "StringPredicates.h"
 #include "TextFormat.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
+#include "Text.h"
 
 #include <algorithm> // std::min
 #include <string>

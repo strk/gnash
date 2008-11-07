@@ -19,7 +19,7 @@
 #define GNASH_SWF_DEFINETEXTTAG_H
 
 #include "character_def.h" // for inheritance
-#include "text.h" // for text_glyph_record
+#include "Text.h" // for text_glyph_record TODO: move this to its own file.
 #include "styles.h" 
 #include "rect.h" // for composition
 #include "swf.h"

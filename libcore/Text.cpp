@@ -36,7 +36,7 @@
 #include "font.h"
 #include "fontlib.h"
 #include "render.h"
-#include "text.h"
+#include "Text.h"
 #include "movie_definition.h"
 
 // Define the following macro to get debugging messages

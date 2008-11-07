@@ -112,7 +112,7 @@ libgnashcore_la_SOURCES = \
 	shape.cpp \
 	SWFStream.cpp \
 	styles.cpp \
-	text.cpp \
+	Text.cpp \
 	timers.cpp \
 	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
@@ -204,7 +204,7 @@ noinst_HEADERS = \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
-	text.h \
+	Text.h \
 	timers.h \
 	RGBA.h	\
 	Video.h \

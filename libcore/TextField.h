@@ -20,7 +20,6 @@
 
 #include "character.h" // for inheritance
 #include "styles.h" // for fill_style and line_style
-#include "text.h" // for text_glyph_record
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "font.h" // for visibility of font add_ref/drop_ref
