@@ -22,11 +22,10 @@
 
 #include "smart_ptr.h"
 #include "swf.h"
-#include "sound_handler.h"
 #include "sound_definition.h" // For sound_sample. Ugh.
+#include "SoundInfoRecord.h" 
 
 #include <vector>
-
 
 namespace gnash {
     class SWFStream;
@@ -41,24 +40,6 @@ class DefineButtonSoundTag
 {
 
 public:
-
-    // TODO: put this somewhere where it can be used for other things
-    // and reduce duplication.
-	struct SoundInfo
-	{
-		void read(SWFStream& in);
-
-		bool m_no_multiple;
-		bool m_stop_playback;
-		bool m_has_envelope;
-		bool m_has_loops;
-		bool m_has_out_point;
-		bool m_has_in_point;
-		boost::uint32_t m_in_point;
-		boost::uint32_t m_out_point;
-		boost::uint16_t m_loop_count;
-		sound::SoundEnvelopes m_envelopes;
-	};
 
 	struct ButtonSound
 	{
