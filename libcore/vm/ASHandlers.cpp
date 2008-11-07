@@ -518,7 +518,11 @@ SWFHandlers::ActionStop(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionToggleQuality(ActionExec& thread)
+SWFHandlers::ActionToggleQuality(ActionExec&
+#if GNASH_PARANOIA_LEVEL > 1
+    thread
+#endif
+)
 {
 
 #if GNASH_PARANOIA_LEVEL > 1
