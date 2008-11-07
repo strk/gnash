@@ -96,10 +96,17 @@ public:
     // Should this be verified?
     void set_bound(const rect& r) { m_bound = r; }
 
+    // Morph uses this.
+    void addFillStyle(const fill_style& fs) {
+        m_fill_styles.push_back(fs);
+    }
+
+    void addLineStyle(const line_style& fs) {
+        m_line_styles.push_back(fs);
+    }
 
 protected:
 
-    friend class morph2_character_def;
 #ifdef GNASH_USE_GC
     /// Mark reachable resources (for the GC)
     //
