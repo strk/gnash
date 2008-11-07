@@ -944,37 +944,6 @@ sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 // end_tag doesn't actually need to exist.
 
-void button_sound_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEBUTTONSOUND); // 17
-
-    in.ensureBytes(2);
-    int    button_character_id = in.read_u16();
-    character_def* chdef = m.get_character_def(button_character_id);
-    if ( ! chdef )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBUTTONSOUND refers to an unknown character def %d"), button_character_id);
-        );
-        return;
-    }
-
-    button_character_definition* ch = dynamic_cast<button_character_definition*> (chdef);
-    if ( ! ch )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBUTTONSOUND refers to character id %d, "
-            "being a %s (expected a button definition)"),
-            button_character_id,
-            typeName(*chdef));
-        );
-        return;
-    }
-
-    ch->read(in, tag, m);
-}
-
 
 void button_character_loader(SWFStream& in, tag_type tag, movie_definition& m,
 		const RunInfo& /*r*/)

@@ -83,6 +83,7 @@ libgnashcore_la_SOURCES = \
 	MovieClip.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/DefineVideoStreamTag.cpp \
+	swf/DefineButtonSoundTag.cpp \
 	swf/VideoFrameTag.cpp \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
@@ -182,6 +183,7 @@ noinst_HEADERS = \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
+	swf/DefineButtonSoundTag.h \
 	swf/DefineEditTextTag.h \
 	swf/DefineButtonCxformTag.h \
 	swf/PlaceObject2Tag.h \
