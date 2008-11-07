@@ -34,11 +34,11 @@
 namespace gnash {
 
 //
-// button_action
+// ButtonAction
 //
 
 
-button_action::button_action(SWFStream& in, int tag_type, unsigned long endPos, movie_definition& mdef)
+ButtonAction::ButtonAction(SWFStream& in, int tag_type, unsigned long endPos, movie_definition& mdef)
 	:
 	m_actions(mdef)
 {
@@ -63,7 +63,8 @@ button_action::button_action(SWFStream& in, int tag_type, unsigned long endPos, 
 	}
 
 	IF_VERBOSE_PARSE (
-	log_parse(_("   button actions for conditions 0x%x"), m_conditions); // @@ need more info about which actions
+	    log_parse(_("   button actions for conditions 0x%x"),
+            m_conditions); // @@ need more info about which actions
 	);
 
 	// Read actions.
@@ -71,7 +72,7 @@ button_action::button_action(SWFStream& in, int tag_type, unsigned long endPos, 
 }
 
 bool
-button_action::triggeredBy(const event_id& ev) const
+ButtonAction::triggeredBy(const event_id& ev) const
 {
 	switch ( ev.id() )
 	{
@@ -121,7 +122,8 @@ ButtonRecord::read(SWFStream& in, int tag_type,
 	if (in.tell()+1 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("   premature end of button record input stream, can't read flags"));
+		log_swferror(_("   premature end of button record input stream, "
+                "can't read flags"));
 		);
 		return false;
 	}
@@ -158,7 +160,7 @@ ButtonRecord::read(SWFStream& in, int tag_type,
 
 	// If no character with given ID is found in the movie
 	// definition, we print an error, but keep parsing.
-	if ( ! m_character_def )
+	if (!m_character_def)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   button record for states [%s] refer to "
@@ -170,8 +172,8 @@ ButtonRecord::read(SWFStream& in, int tag_type,
 	{
 		IF_VERBOSE_PARSE(
 		log_parse(_("   button record for states [%s] contain "
-			"character %d (%s)"), computeButtonStatesString(flags), m_character_id,
-		        typeName(*m_character_def));
+			"character %d (%s)"), computeButtonStatesString(flags),
+            m_character_id, typeName(*m_character_def));
 		);
 	}
 
@@ -202,7 +204,7 @@ ButtonRecord::read(SWFStream& in, int tag_type,
 		);
 	}
 
-	if ( buttonHasBlendMode )
+	if (buttonHasBlendMode)
 	{
 		in.ensureBytes(1);
         _blendMode = in.read_u8();
@@ -230,8 +232,8 @@ button_character_definition::button_character_definition(movie_definition& m)
 
 button_character_definition::~button_character_definition()
 {
-	for (ButtonActions::iterator i=m_button_actions.begin(),
-			ie=m_button_actions.end();
+	for (ButtonActions::iterator i = _buttonActions.begin(),
+			ie = _buttonActions.end();
 			i != ie; ++i )
 	{
 		delete *i;
@@ -276,7 +278,7 @@ button_character_definition::readDefineButton(SWFStream& in, movie_definition& m
 	}
 
 	// Read actions.
-	m_button_actions.push_back(new button_action(in, SWF::DEFINEBUTTON, endTagPos, m));
+	_buttonActions.push_back(new ButtonAction(in, SWF::DEFINEBUTTON, endTagPos, m));
 
 }
 
@@ -355,7 +357,7 @@ button_character_definition::readDefineButton2(SWFStream& in, movie_definition& 
 
 			unsigned long endActionPos = next_action_offset ? next_action_pos : tagEndPosition;
 
-			m_button_actions.push_back(new button_action(in, SWF::DEFINEBUTTON2, endActionPos, m));
+			_buttonActions.push_back(new ButtonAction(in, SWF::DEFINEBUTTON2, endActionPos, m));
 
 			if (next_action_offset == 0 )
 			{
@@ -407,9 +409,9 @@ button_character_definition::getSWFVersion() const
 bool
 button_character_definition::hasKeyPressHandler() const
 {
-	for (size_t i = 0, e = m_button_actions.size(); i < e; ++i)
+	for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
 	{
-		const button_action& ba = *(m_button_actions[i]);
+		const ButtonAction& ba = *(_buttonActions[i]);
 		if ( ba.triggeredByKeyPress() ) return true;
 	}
 	return false;

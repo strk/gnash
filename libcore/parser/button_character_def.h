@@ -27,7 +27,7 @@
 #include "rect.h" // for get_bound
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
-#include "action_buffer.h" // for composition of button_action
+#include "action_buffer.h" // for composition of ButtonAction
 #include "filter_factory.h" // for Filters (composition of button_record)
 #include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
 #include "DefineButtonSoundTag.h"
@@ -120,7 +120,7 @@ public:
 
 };
 	
-class button_action
+class ButtonAction
 {
 public:
 
@@ -134,7 +134,7 @@ public:
 	///	The movie_definition this button action was read from
 	///
 	///
-	button_action(SWFStream& in, int tag_type, unsigned long endPos,
+	ButtonAction(SWFStream& in, int tag_type, unsigned long endPos,
             movie_definition& mdef);
 
 	/// Return true if this action should be triggered by the given event.
@@ -180,7 +180,7 @@ class button_character_definition : public character_def
 public:
 
 	typedef std::vector<ButtonRecord> ButtonRecords; 
-	typedef std::vector<button_action*> ButtonActions;
+	typedef std::vector<ButtonAction*> ButtonActions;
 
 	/// \brief
 	/// Construct a character definition as read from
@@ -256,9 +256,9 @@ public:
 	template <class E>
 	void forEachTrigger(const event_id& ev, E& f) const
 	{
-		for (size_t i = 0, e = m_button_actions.size(); i < e; ++i)
+		for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
 		{
-			const button_action& ba = *(m_button_actions[i]);
+			const ButtonAction& ba = *(_buttonActions[i]);
 			if ( ba.triggeredBy(ev) ) f(ba.m_actions);
 		}
 	}
@@ -291,7 +291,7 @@ private:
 	boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
 
 	ButtonRecords _buttonRecords;
-	ButtonActions m_button_actions;
+	ButtonActions _buttonActions;
 
 	/// Currently set but unused (and also unaccessible)
 	bool m_menu;
