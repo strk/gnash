@@ -55,7 +55,8 @@ ButtonAction::ButtonAction(SWFStream& in, int tag_type, unsigned long endPos,
 		if ( in.tell()+2 > endPos ) 
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("Premature end of button action input: can't read conditions"));
+			log_swferror(_("Premature end of button action input: "
+                    "can't read conditions"));
 			);
 			return;
 		}

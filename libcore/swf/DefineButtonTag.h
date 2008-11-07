@@ -122,7 +122,7 @@ public:
 
 };
 	
-/// A class for parsing an ActionRecord, used by lots of tags!
+/// A class for parsing an ActionRecord.
 class ButtonAction
 {
 public:
@@ -146,7 +146,7 @@ public:
 	/// Return true if this action is triggered by a keypress
 	bool triggeredByKeyPress() const
 	{
-		return m_conditions&KEYPRESS;
+		return (m_conditions & KEYPRESS);
 	}
 
 private:
@@ -157,7 +157,7 @@ private:
 	///
 	int getKeyCode() const
 	{
-		return (m_conditions&KEYPRESS) >> 9;
+		return (m_conditions & KEYPRESS) >> 9;
 	}
 
 	enum condition
