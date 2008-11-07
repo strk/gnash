@@ -66,6 +66,9 @@ namespace gnash {
 		cxform	cx = inst->get_world_cxform();
 		SWFMatrix	base_matrix = mat;
 
+        float x = 0.0f;
+        float y = 0.0f;
+
 		for (unsigned int i = 0; i < records.size(); i++)
 		{
 			// Draw the characters within the current record; i.e. consecutive
@@ -90,8 +93,8 @@ namespace gnash {
 			log_debug("font for record %u == %p", i, (const void*)fnt);
 #endif
 
-			float x = rec.xOffset();
-			float y = rec.yOffset();
+			if (rec.hasXOffset()) x = rec.xOffset();
+			if (rec.hasYOffset()) y = rec.yOffset();
 
 			boost::int16_t startX = x; // for the underline, if any
 
@@ -135,13 +138,15 @@ log_error(_("invalid glyph (-1)"));
 						 32, -656,
 						 32,   32
 					};
-					render::draw_line_strip(s_empty_char_box, 5, transformed_color, mat);  
+					render::draw_line_strip(s_empty_char_box, 5,
+                            transformed_color, mat);  
 #endif
 
 				}
 				else
 				{
-					shape_character_def*	glyph = fnt->get_glyph(index, useEmbeddedGlyphs);
+					shape_character_def* glyph =
+                        fnt->get_glyph(index, useEmbeddedGlyphs);
 
 					// Draw the character using the filled outline.
 					if (glyph)
@@ -150,10 +155,12 @@ log_error(_("invalid glyph (-1)"));
 log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 #endif
 
-						gnash::render::draw_glyph(glyph, mat, transformed_color);
+						gnash::render::draw_glyph(glyph, mat,
+                                transformed_color);
 					}
 				}
 				x += ge.advance;
+                log_debug("x: %d", x);
 			}
 
 			bool underline = rec.underline(); 

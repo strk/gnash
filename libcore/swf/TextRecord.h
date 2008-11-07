@@ -51,6 +51,8 @@ public:
         :
         _color(0, 0, 0, 255),
         _textHeight(1.0f),
+        _hasXOffset(false),
+        _hasYOffset(false),
         _xOffset(0.0f),
         _yOffset(0.0f),
         _font(0),
@@ -94,7 +96,12 @@ public:
         return _textHeight;
     }
 
+    bool hasXOffset() const {
+        return _hasXOffset;
+    }
+
     void setXOffset(float x) {
+        _hasXOffset = true;
         _xOffset = x;
     }
 
@@ -102,7 +109,12 @@ public:
         return _xOffset;
     }
 
+    bool hasYOffset() const {
+        return _hasYOffset;
+    }
+
     void setYOffset(float y) {
+        _hasYOffset = true;
         _yOffset = y;
     }
 
@@ -129,6 +141,8 @@ public:
 private:
     rgba _color;
     float _textHeight;
+    bool _hasXOffset;
+    bool _hasYOffset;
     float _xOffset;
     float _yOffset;
     const font* _font;

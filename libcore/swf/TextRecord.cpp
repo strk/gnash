@@ -43,8 +43,8 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 
     bool hasFont = (flags >> 3) & 1;
     bool hasColor = (flags >> 2) & 1;
-    bool hasYOffset = (flags >> 1) & 1;
-    bool hasXOffset = (flags >> 0) & 1;
+    _hasYOffset = (flags >> 1) & 1;
+    _hasXOffset = (flags >> 0) & 1;
 
     if (hasFont)
     {
@@ -78,7 +78,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         );
     } 
 
-    if (hasXOffset)
+    if (_hasXOffset)
     {
         in.ensureBytes(2);
         _xOffset = in.read_s16();
@@ -87,7 +87,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         );
     }
 
-    if (hasYOffset)
+    if (_hasYOffset)
     {
         in.ensureBytes(2);
         _yOffset = in.read_s16();
