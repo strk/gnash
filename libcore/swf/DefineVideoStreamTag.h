@@ -32,7 +32,8 @@
 #include <boost/shared_array.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <memory> // for auto_ptr
+#include <memory> // for composition (auto_ptr)
+#include <vector> // for composition
 
 // Forward declarations
 namespace gnash {
