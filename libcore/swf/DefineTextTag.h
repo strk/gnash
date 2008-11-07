@@ -15,54 +15,72 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-// Code for the text tags.
-
-
-#ifndef GNASH_PARSER_TEXT_CHARACTER_DEF_H
-#define GNASH_PARSER_TEXT_CHARACTER_DEF_H
+#ifndef GNASH_SWF_DEFINETEXTTAG_H
+#define GNASH_SWF_DEFINETEXTTAG_H
 
 #include "character_def.h" // for inheritance
 #include "text.h" // for text_glyph_record
 #include "styles.h" 
 #include "rect.h" // for composition
+#include "swf.h"
+#include "movie_definition.h"
 
 namespace gnash {
+    class movie_definition;
+    class SWFStream;
+    class RunInfo;
+}
 
-class movie_definition; // for read signature
-class SWFStream; // for read signature
+
+namespace gnash {
+namespace SWF {
 
 /// Text character 
 //
 /// This is either read from SWF stream 
 /// or (hopefully) created with scripting
 ///
-class text_character_def : public character_def
+class DefineTextTag : public character_def
 {
 public:
-	rect	m_rect;
-	SWFMatrix	m_matrix;
-	std::vector<text_glyph_record>	m_text_glyph_records;
 
-	text_character_def() {}
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& r);
 
-	void read(SWFStream& in, int tag_type, movie_definition& m);
+	rect m_rect;
+	SWFMatrix m_matrix;
+	std::vector<text_glyph_record> m_text_glyph_records;
+
+	DefineTextTag(SWFStream& in, movie_definition& m, tag_type tag)
+    {
+        read(in, m, tag);
+    }
 
 	/// Draw the string.
 	void display(character* inst);
 	
 	const rect&	get_bound() const {
-    // TODO: There is a m_matrix field in the definition(!) that's currently 
-    // ignored. Don't know if it needs to be transformed... 
-    return m_rect; 
-  }
+        // TODO: There is a m_matrix field in the definition(!) that's
+        // currently ignored. Don't know if it needs to be transformed... 
+        return m_rect; 
+    }
+
+private:
+	void read(SWFStream& in, movie_definition& m, tag_type tag);
 	
 };
 
+/// Parse a DefineText2Tag.
+//
+/// This creates a DefineTextTag, as there are only minor differences.
+class DefineText2Tag
+{
+public:
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& r);
+};
 
+} // namespace SWF
 } // namespace gnash
 
-#endif // GNASH_PARSER_TEXT_CHARACTER_DEF_H
+#endif 

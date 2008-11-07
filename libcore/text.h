@@ -25,15 +25,11 @@
 #include "font.h"
 
 namespace gnash {
-
-	// Forward declarations
-	class text_character_def; 
 	class text_glyph_record; 
 	class text_style; 
 	class SWFStream;
 
 	// Helper class.
-	// @@ text_character_def friend ?
 	class text_style
 	{
 	public:

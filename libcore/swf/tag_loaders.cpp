@@ -48,7 +48,6 @@
 #include "SWFMovieDefinition.h"
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
-#include "text_character_def.h"
 #include "URL.h"
 #include "GnashException.h"
 #include "swf/DefineVideoStreamTag.h"
@@ -1096,25 +1095,6 @@ void import_loader(SWFStream& in, tag_type tag, movie_definition& m,
     m.importResources(source_movie, imports);
 }
 
-
-// See description in header
-void
-define_text_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINETEXT || tag == SWF::DEFINETEXT2);
-
-    in.ensureBytes(2);
-    boost::uint16_t    character_id = in.read_u16();
-
-    text_character_def* ch = new text_character_def();
-    IF_VERBOSE_PARSE(
-        log_parse(_("text_character, id = %d"), character_id);
-    );
-    ch->read(in, tag, m);
-
-    m.add_character(character_id, ch);
-}
 
 //
 // Sound

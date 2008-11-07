@@ -292,7 +292,7 @@ private:
 	/// height of font text, in twips
     // TODO: initialize to a meaningful value (see MovieClip::add_textfield)
     //       and make sure get_font_height is not called for rendering purposes
-    //       (instead call a method of edit_text_character_def)
+    //       (instead call a method of TextField) (?)
 	boost::uint16_t _textHeight;
 
 	/// Text color

@@ -1,4 +1,4 @@
-// text_character_def.cpp:  Read text character definitions, for Gnash.
+// DefineTextTag.cpp:  Read text character definitions, for Gnash.
 
 // Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -7,17 +7,52 @@
 
 // Code for the text tags.
 
+#include "DefineTextTag.h"
 #include "SWFStream.h"
 #include "log.h"
-#include "text_character_def.h"
 #include "swf.h"
 
 namespace gnash {
+namespace SWF {
 
-void text_character_def::read(SWFStream& in, int tag_type,
-		movie_definition& m)
+void
+DefineTextTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& /*r*/)
 {
-	assert(tag_type == SWF::DEFINETEXT || tag_type == SWF::DEFINETEXT2);
+    assert(tag == DEFINETEXT);
+
+    in.ensureBytes(2);
+    boost::uint16_t id = in.read_u16();
+
+    std::auto_ptr<DefineTextTag> t(new DefineTextTag(in, m, tag));
+    IF_VERBOSE_PARSE(
+        log_parse(_("Text character, id = %d"), id);
+    );
+
+    m.add_character(id, t.release());
+}
+
+void
+DefineText2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& /*r*/)
+{
+    assert(tag == DEFINETEXT2);
+
+    in.ensureBytes(2);
+    boost::uint16_t id = in.read_u16();
+
+    std::auto_ptr<DefineTextTag> t(new DefineTextTag(in, m, tag));
+    IF_VERBOSE_PARSE(
+        log_parse(_("Text character, id = %d"), id);
+    );
+
+    m.add_character(id, t.release());
+}
+
+
+void DefineTextTag::read(SWFStream& in, movie_definition& m, tag_type tag)
+{
+	assert(tag == DEFINETEXT || tag == DEFINETEXT2);
 
 	m_rect.read(in);
 	m_matrix.read(in);
@@ -27,7 +62,7 @@ void text_character_def::read(SWFStream& in, int tag_type,
 	int advance_bits = in.read_u8();
 
 	IF_VERBOSE_PARSE(
-	log_parse(_("begin text records for text_character_def %p"), (void*)this);
+	log_parse(_("begin text records for DefineTextTag %p"), (void*)this);
 	);
 
 	bool last_record_was_style_change = false;
@@ -61,7 +96,7 @@ void text_character_def::read(SWFStream& in, int tag_type,
 			bool	has_x_offset = (first_byte >> 0) & 1;
 
 			IF_VERBOSE_PARSE(
-			log_parse(_("  text style change"));
+                log_parse(_("  text style change"));
 			);
 
 			if (has_font)
@@ -74,23 +109,18 @@ void text_character_def::read(SWFStream& in, int tag_type,
 				}
 
 				IF_VERBOSE_PARSE(
-				log_parse(_("  has_font: font id = %d (%p)"), font_id, (const void*)style.getFont());
+				log_parse(_("  has_font: font id = %d (%p)"), font_id,
+                    (const void*)style.getFont());
 				);
 			} // else reuse previous record font
 
 			if (has_color)
 			{
-				if (tag_type == SWF::DEFINETEXT)
-				{
-					style.m_color.read_rgb(in);
-				}
-				else
-				{
-					assert(tag_type == SWF::DEFINETEXT2);
-					style.m_color.read_rgba(in);
-				}
+				if (tag == DEFINETEXT) style.m_color.read_rgb(in);
+				else style.m_color.read_rgba(in);
+
 				IF_VERBOSE_PARSE(
-				log_parse(_("  has_color"));
+				    log_parse(_("  has_color"));
 				);
 			} // else reuse previous record color
 
@@ -138,12 +168,6 @@ void text_character_def::read(SWFStream& in, int tag_type,
 
 			unsigned int glyph_count = first_byte;
 
-// 			if (! last_record_was_style_change)
-// 			{
-// 				glyph_count &= 0x7F;
-// 			}
-// 			// else { Don't mask the top bit; the first record is allowed to have > 127 glyphs. }
-
 			m_text_glyph_records.resize(m_text_glyph_records.size() + 1);
 			text_glyph_record& grecord = m_text_glyph_records.back();
 			grecord.m_style = style; // copy current style
@@ -154,21 +178,23 @@ void text_character_def::read(SWFStream& in, int tag_type,
 			for (unsigned int i = 0; i < glyph_count; i++)
 			{
 				text_glyph_record::glyph_entry& ge = grecord.m_glyphs[i];
-				log_parse(_("   glyph%d: index=%d, advance=%g"), i, ge.m_glyph_index, ge.m_glyph_advance);
+				log_parse(_("   glyph%d: index=%d, advance=%g"), i,
+                    ge.m_glyph_index, ge.m_glyph_advance);
 			}
 			);
 		}
 	}
 }
 
-void text_character_def::display(character* inst)
+void DefineTextTag::display(character* inst)
 {
-//	GNASH_REPORT_FUNCTION;
 
-	bool useEmbeddedGlyphs = true;
+	const bool useEmbeddedGlyphs = true;
 
-	display_glyph_records(m_matrix, inst,
-		m_text_glyph_records, useEmbeddedGlyphs); 
+	display_glyph_records(m_matrix, inst, m_text_glyph_records,
+            useEmbeddedGlyphs); 
 }
 
+
+}
 }	// end namespace gnash
