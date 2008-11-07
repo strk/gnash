@@ -515,7 +515,7 @@ Button::on_button_event(const event_id& event)
 	set_current_state(new_state);
     
 	// Button transition sounds.
-	if (_def.m_sound != NULL)
+	if (_def.hasSound())
 	{
 		int bi; // button sound array index [0..3]
 		sound::sound_handler* s = _vm.getRoot().runInfo().soundHandler();
@@ -542,19 +542,22 @@ Button::on_button_event(const event_id& event)
 			}
 			if (bi >= 0)
 			{
-				button_character_definition::button_sound_info& bs = _def.m_sound->m_button_sounds[bi];
+				const SWF::DefineButtonSoundTag::ButtonSound& bs = _def.buttonSound(bi);
 				// character zero is considered as null character
-				if (bs.m_sound_id > 0)
+				if (bs.soundID > 0)
 				{
-					if (_def.m_sound->m_button_sounds[bi].m_sam != NULL)
+					if (bs.sample)
 					{
-						if (bs.m_sound_style.m_stop_playback)
+						if (bs.soundInfo.stopPlayback)
 						{
-							s->stop_sound(bs.m_sam->m_sound_handler_id);
+							s->stop_sound(bs.sample->m_sound_handler_id);
 						}
 						else
 						{
-							s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0, (bs.m_sound_style.m_envelopes.size() == 0 ? NULL : &bs.m_sound_style.m_envelopes));
+							s->play_sound(bs.sample->m_sound_handler_id,
+                                    bs.soundInfo.loopCount, 0, 0, 
+                                    (bs.soundInfo.envelopes.empty() ? NULL :
+                                                    &bs.soundInfo.envelopes));
 						}
 					}
 				}
@@ -562,7 +565,7 @@ Button::on_button_event(const event_id& event)
 		}
 	}
 
-	// From: "ActionScript - The Definiteve Guide" by Colin Moock
+	// From: "ActionScript - The Definitive Guide" by Colin Moock
 	// (chapter 10: Events and Event Handlers)
 	//
 	// "Event-based code [..] is said to be executed asynchronously

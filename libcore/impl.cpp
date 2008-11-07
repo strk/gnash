@@ -47,6 +47,7 @@
 #include "SetBackgroundColorTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
+#include "DefineButtonSoundTag.h"
 #include "DefineVideoStreamTag.h"
 #include "VideoFrameTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
@@ -108,13 +109,17 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
     register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader); // 62
     register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
-    register_tag_loader(SWF::STARTSOUND,  StartSoundTag::loader);
+    register_tag_loader(SWF::STARTSOUND, StartSoundTag::loader);
+    register_tag_loader(SWF::STARTSOUND2, StartSound2Tag::loader);
 
     register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16 
 
-    register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
-    register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader); // 18
-    register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader); // 19
+    // 17
+    register_tag_loader(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader);
+    // 18
+    register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader);
+    // 19
+    register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader);
     register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
     register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
     register_tag_loader(SWF::DEFINESHAPE2,  define_shape_loader);

@@ -1,4 +1,3 @@
-// button_character_def.h:  Mouse-sensitive SWF buttons, for Gnash.
 //
 //   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -31,9 +30,11 @@
 #include "action_buffer.h" // for composition of button_action
 #include "filter_factory.h" // for Filters (composition of button_record)
 #include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
+#include "DefineButtonSoundTag.h"
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
+#include <memory>
 
 // Forward declarations
 namespace gnash {
@@ -96,9 +97,8 @@ public:
 	/// @param endPos
 	///	Last stream offset available for a valid read
 	///
-	/// TODO: take the stream by ref, not pointer
-	///
-	bool	read(SWFStream& in, int tag_type, movie_definition& m, unsigned long endPos);
+	bool read(SWFStream& in, int tag_type, movie_definition& m,
+            unsigned long endPos);
 
 	/// Return true if the button_record is valid
 	//
@@ -134,7 +134,8 @@ public:
 	///	The movie_definition this button action was read from
 	///
 	///
-	button_action(SWFStream& in, int tag_type, unsigned long endPos, movie_definition& mdef);
+	button_action(SWFStream& in, int tag_type, unsigned long endPos,
+            movie_definition& mdef);
 
 	/// Return true if this action should be triggered by the given event.
 	bool triggeredBy(const event_id& ev) const;
@@ -178,66 +179,6 @@ class button_character_definition : public character_def
 {
 public:
 
-	struct sound_info
-	{
-		void read(SWFStream& in);
-
-		bool m_no_multiple;
-		bool m_stop_playback;
-		bool m_has_envelope;
-		bool m_has_loops;
-		bool m_has_out_point;
-		bool m_has_in_point;
-		boost::uint32_t m_in_point;
-		boost::uint32_t m_out_point;
-		boost::uint16_t m_loop_count;
-		sound::SoundEnvelopes m_envelopes;
-	};
-
-	struct button_sound_info
-	{
-		boost::uint16_t m_sound_id;
-		sound_sample*	m_sam;
-		sound_info m_sound_style;
-
-		button_sound_info()
-			:
-			m_sam(0)
-		{
-		}
-
-#ifdef GNASH_USE_GC
-		/// Mark all reachable resources (for GC)
-		//
-		/// Reachable resources are:
-		///  - sound sample (m_sam)
-		///
-		void markReachableResources() const;
-#endif // GNASH_USE_GC
-	};
-
-	struct button_sound_def
-	{
-		// TODO: implement ?
-		//void	read(SWFStream& in, movie_definition& m);
-
-		button_sound_info m_button_sounds[4];
-
-#ifdef GNASH_USE_GC
-		/// Mark all reachable resources (for GC)
-		//
-		/// Reachable resources are:
-		///  - button sound infos (m_button_sounds)
-		///
-		void markReachableResources() const
-		{
-			for (int i=0; i<4; ++i)
-			{
-				m_button_sounds[i].markReachableResources();
-			}
-		}
-#endif // GNASH_USE_GC
-	};
 
 	/// \brief
 	/// Construct a character definition as read from
@@ -258,9 +199,6 @@ public:
 	/// Read a SWF::DEFINEBUTTON2 tag
 	void	readDefineButton2(SWFStream& in, movie_definition& m);
 
-	/// Read a SWF::DEFINEBUTTONSOUND tag
-	void	readDefineButtonSound(SWFStream& in, movie_definition& m);
-	
 	/// Read a SWF::DEFINEBUTTONCXFORM tag
 	void readDefineButtonCxform(SWFStream& in, movie_definition& m);
 	
@@ -277,6 +215,23 @@ public:
 		return unused;
 	}
   
+
+    /// Does this button have an associated DefineButtonSoundTag?
+    bool hasSound() const { return (_soundTag.get()); }
+
+    void addSoundTag(std::auto_ptr<SWF::DefineButtonSoundTag> soundTag) {
+        _soundTag.reset(soundTag.release());
+    }
+
+    /// Return one of the four sounds associated with this Button
+    //
+    /// @param index    The sound index (0-3) to get.
+    /// Do not call this function without checking hasSound() first.
+    const SWF::DefineButtonSoundTag::ButtonSound& buttonSound(size_t index) const {
+        assert(_soundTag.get());
+        return _soundTag->getSound(index);
+    }
+
 	/// \brief
 	/// Return version of the SWF containing
 	/// this button definition.
@@ -311,12 +266,13 @@ protected:
 	void markReachableResources() const
 	{
 		assert(isReachable());
-		for (ButtonRecVect::const_iterator i=m_button_records.begin(), e=m_button_records.end(); i!=e; ++i)
+		for (ButtonRecVect::const_iterator i=m_button_records.begin(),
+                e=m_button_records.end(); i!=e; ++i)
 		{
 			i->markReachableResources();
 		}
 
-		if ( m_sound ) m_sound->markReachableResources();
+		if (_soundTag) _soundTag->markReachableResources();
 	}
 #endif // GNASH_USE_GC
 
@@ -325,7 +281,7 @@ public: // TODO: make private
 	typedef std::vector<button_record> ButtonRecVect; 
 	ButtonRecVect m_button_records;
 
-	boost::scoped_ptr<button_sound_def> m_sound;
+	boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
 
 private:
 

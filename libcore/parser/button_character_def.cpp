@@ -220,7 +220,7 @@ button_record::read(SWFStream& in, int tag_type,
 
 button_character_definition::button_character_definition(movie_definition& m)
 	:
-	m_sound(NULL),
+	_soundTag(0),
 	_movieDef(m)
 
 // Constructor.
@@ -237,66 +237,6 @@ button_character_definition::~button_character_definition()
 	}
 }
 
-
-void button_character_definition::sound_info::read(SWFStream& in)
-{
-	in.ensureBytes(1);
-	m_in_point = m_out_point = m_loop_count = 0;
-    
-    // highest 2 bits are reserved(unused).
-    int flags = in.read_u8();
-	m_stop_playback = flags & (1 << 5); 
-	m_no_multiple   = flags & (1 << 4); 
-	m_has_envelope  = flags & (1 << 3); 
-	m_has_loops     = flags & (1 << 2);  
-	m_has_out_point = flags & (1 << 1); 
-	m_has_in_point  = flags & (1 << 0);  
-    
-	if (m_has_in_point)
-	{
-		in.ensureBytes(4);
-		m_in_point = in.read_u32();
-	}
-	if (m_has_out_point)
-	{
-		in.ensureBytes(4);
-		m_out_point = in.read_u32();
-	}
-	if (m_has_loops)
-	{
-		in.ensureBytes(2);
-		m_loop_count = in.read_u16();
-	}
-	if (m_has_envelope)
-	{
-		in.ensureBytes(1);
-		int nPoints = in.read_u8();
-		m_envelopes.resize(nPoints);
-		in.ensureBytes(8 * nPoints);
-		for (int i=0; i < nPoints; i++)
-		{
-			m_envelopes[i].m_mark44 = in.read_u32();
-			m_envelopes[i].m_level0 = in.read_u16();
-			m_envelopes[i].m_level1 = in.read_u16();
-		}
-	}
-	else
-	{
-		m_envelopes.resize(0);
-	}
-
-
-	IF_VERBOSE_PARSE(
-	log_parse("	has_envelope = %d", m_has_envelope);
-	log_parse("	has_loops = %d", m_has_loops);
-	log_parse("	has_out_point = %d", m_has_out_point);
-	log_parse("	has_in_point = %d", m_has_in_point);
-	log_parse("	in_point = %d", m_in_point);
-	log_parse("	out_point = %d", m_out_point);
-	log_parse("	loop_count = %d", m_loop_count);
-	log_parse("	envelope size = %d", m_envelopes.size());
-	);
-}
 
 void
 button_character_definition::readDefineButton(SWFStream& in, movie_definition& m)
@@ -442,46 +382,6 @@ button_character_definition::readDefineButton2(SWFStream& in, movie_definition& 
 	}
 }
 
-void
-button_character_definition::readDefineButtonSound(SWFStream& in, movie_definition& m)
-{
-	// Character ID has been read already
-
-	if ( m_sound )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("Attempt to redefine button sound ignored"));
-		);
-		return;
-	}
-
-	m_sound.reset( new button_sound_def() );
-
-	IF_VERBOSE_PARSE(
-	log_parse(_("button sound options: "));
-	);
-
-	for (int i = 0; i < 4; i++)
-	{
-		button_sound_info& bs = m_sound->m_button_sounds[i];
-		in.ensureBytes(2);
-		bs.m_sound_id = in.read_u16();
-		if (bs.m_sound_id)
-		{
-			bs.m_sam = m.get_sound_sample(bs.m_sound_id);
-			if ( ! bs.m_sam )
-			{
-				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror(_("sound tag not found, sound_id=%d, button state #=%i"), bs.m_sound_id, i);
-				);
-			}
-			IF_VERBOSE_PARSE(
-			log_parse("\tsound_id = %d", bs.m_sound_id);
-			);
-			bs.m_sound_style.read(in);
-		}
-	}
-}
 
 
 void
@@ -493,9 +393,6 @@ button_character_definition::read(SWFStream& in, int tag_type, movie_definition&
 	{
 		case SWF::DEFINEBUTTON:
 			readDefineButton(in, m);
-			break;
-		case SWF::DEFINEBUTTONSOUND:
-			readDefineButtonSound(in, m);
 			break;
 		case SWF::DEFINEBUTTON2:
 			readDefineButton2(in, m);
@@ -513,14 +410,6 @@ button_character_definition::create_character_instance(
 	character* ch = new Button(*this, parent, id);
 	return ch;
 }
-
-#ifdef GNASH_USE_GC
-void
-button_character_definition::button_sound_info::markReachableResources() const
-{
-	if ( m_sam ) m_sam->setReachable();
-}
-#endif // GNASH_USE_GC
 
 int
 button_character_definition::getSWFVersion() const

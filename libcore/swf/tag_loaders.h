@@ -140,9 +140,6 @@ void import_loader(SWFStream&, tag_type, movie_definition&, const RunInfo&);
 void define_sound_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
-void button_sound_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
 void do_init_action_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
