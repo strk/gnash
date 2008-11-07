@@ -208,6 +208,8 @@ GtkAggGlue::create_shm_image(
         destroy_shm_image();
         return;
     }
+    // allows below to work. bug fix by cliff (bug #24692)
+    XSync(gdk_display, False);
 
     // mark segment for automatic destruction after last process detaches
     shmctl(_shm_info->shmid, IPC_RMID, 0);
