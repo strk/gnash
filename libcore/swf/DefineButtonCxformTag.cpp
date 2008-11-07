@@ -20,6 +20,7 @@
 #include "SWFStream.h" // for inlines
 #include "movie_definition.h"
 #include "button_character_def.h"
+#include "DefineButtonCxformTag.h"
 
 namespace gnash {
 namespace SWF {
