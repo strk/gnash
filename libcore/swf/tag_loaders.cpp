@@ -52,7 +52,7 @@
 #include "text_character_def.h"
 #include "URL.h"
 #include "GnashException.h"
-#include "video_stream_def.h"
+#include "swf/DefineVideoStreamTag.h"
 #include "sound_definition.h"
 #include "abc_block.h"
 #include "SoundInfo.h"
@@ -1442,54 +1442,6 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m,
     m.set_loading_sound_stream_id(handler_id);
 }
 
-void
-define_video_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
-    
-    in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
-
-    std::auto_ptr<video_stream_definition> chdef (
-            new video_stream_definition(character_id));
-
-    chdef->readDefineVideoStream(in, tag, m);
-
-    m.add_character(character_id, chdef.release());
-
-}
-
-void
-video_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::VIDEOFRAME); // 61
-
-    in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
-    character_def* chdef = m.get_character_def(character_id);
-
-    if (!chdef)
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("VideoFrame tag refers to unknown video stream id %d"), character_id);
-        );
-        return;
-    }
-
-    // TODO: add a character_def::cast_to_video_def ?
-    video_stream_definition* vdef = dynamic_cast<video_stream_definition*> (chdef);
-    if ( ! vdef )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("VideoFrame tag refers to a non-video character %d (%s)"), character_id, typeName(*chdef));
-        );
-        return;
-    }
-
-    vdef->readDefineVideoFrame(in, tag, m);
-}
 
 void
 file_attributes_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,

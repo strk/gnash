@@ -49,7 +49,8 @@ public:
     /// Incoming coords are local coords (twips).
     /// The SWFMatrix will be used for lines with non-scalable strokes.
     ///
-    virtual bool point_test_local(boost::int32_t x, boost::int32_t y, SWFMatrix& wm);
+    virtual bool point_test_local(boost::int32_t x, boost::int32_t y,
+            SWFMatrix& wm);
 
     /// \brief
     /// Read a shape definition as included in DEFINEFONT*,
@@ -73,12 +74,10 @@ public:
     ///	The movie definition corresponding to the SWF we/re parsing.
     ///	This is used to resolve bitmap characters for fill styles, never
     ///	used if with_style is false.
-    ///
-    void read(SWFStream& in, int tag_type, bool with_style, movie_definition& m);
+    void read(SWFStream& in, int tag_type, bool with_style,
+            movie_definition& m);
 
-    void	display(
-        const SWFMatrix& mat,
-        const cxform& cx,
+    void display(const SWFMatrix& mat, const cxform& cx,
         const std::vector<fill_style>& fill_styles,
         const std::vector<line_style>& line_styles) const;
 
@@ -86,7 +85,7 @@ public:
     const rect&	get_bound() const { return m_bound; }
 
     /// Compute bounds by looking at the component paths
-    void	compute_bound(rect* r, int swfVersion) const;
+    void compute_bound(rect* r, int swfVersion) const;
 
     const FillStyleVect& get_fill_styles() const { return m_fill_styles; }
     const LineStyleVect& get_line_styles() const { return m_line_styles; }
@@ -94,15 +93,20 @@ public:
     const std::vector<path>& get_paths() const { return m_paths; }
 
     // morph uses this
-    void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
+    // Should this be verified?
+    void set_bound(const rect& r) { m_bound = r; }
 
-    size_t numEdges() const;
+    // Morph uses this.
+    void addFillStyle(const fill_style& fs) {
+        m_fill_styles.push_back(fs);
+    }
 
-    size_t numPaths() const;
+    void addLineStyle(const line_style& fs) {
+        m_line_styles.push_back(fs);
+    }
 
 protected:
 
-    friend class morph2_character_def;
 #ifdef GNASH_USE_GC
     /// Mark reachable resources (for the GC)
     //

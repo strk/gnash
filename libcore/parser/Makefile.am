@@ -57,8 +57,7 @@ libgnashparser_la_SOURCES = \
         morph2_character_def.cpp \
 	shape_character_def.cpp	\
 	sound_definition.cpp \
-	sprite_definition.cpp \
-	video_stream_def.cpp
+	sprite_definition.cpp
 
 noinst_HEADERS = \
 	abc_block.h \
@@ -74,8 +73,7 @@ noinst_HEADERS = \
 	Namespace.h \
 	shape_character_def.h \
 	sound_definition.h \
-	sprite_definition.h \
-	video_stream_def.h
+	sprite_definition.h
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \

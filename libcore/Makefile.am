@@ -82,6 +82,8 @@ libgnashcore_la_SOURCES = \
 	rect.cpp \
 	MovieClip.cpp \
 	swf/TagLoadersTable.cpp	\
+	swf/DefineVideoStreamTag.cpp \
+	swf/VideoFrameTag.cpp \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
 	swf/DefineEditTextTag.cpp \
@@ -91,7 +93,7 @@ libgnashcore_la_SOURCES = \
 	swf/StartSoundTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
 	swf_function.cpp \
-	video_stream_instance.cpp \
+	Video.cpp \
 	StreamProvider.cpp \
 	array.cpp \
 	Button.cpp \
@@ -175,6 +177,8 @@ noinst_HEADERS = \
 	swf.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
+	swf/VideoFrameTag.h \
+	swf/DefineVideoStreamTag.h \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
@@ -194,7 +198,7 @@ noinst_HEADERS = \
 	text.h \
 	timers.h \
 	RGBA.h	\
-	video_stream_instance.h \
+	Video.h \
 	$(NULL)
 
 libgnashcore_la_LIBADD = \

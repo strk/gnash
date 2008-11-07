@@ -58,7 +58,7 @@
 #include "System_as.h"
 #include "TextFormat.h"
 #include "TextSnapshot_as.h"
-#include "video_stream_instance.h"
+#include "Video.h"
 #include "extension.h"
 #include "VM.h"
 #include "timers.h"
