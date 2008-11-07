@@ -43,6 +43,7 @@
 #include "StringPredicates.h"
 #include "TextFormat.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
+#include "TextRecord.h"
 #include "Text.h"
 
 #include <algorithm> // std::min
@@ -948,7 +949,7 @@ TextField::display()
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
     
-    display_glyph_records(m, this, m_text_glyph_records, _embedFonts);
+    display_glyph_records(m, this, _textRecords, _embedFonts);
 
     if (m_has_focus) show_cursor(wmat);
     
@@ -1431,14 +1432,12 @@ TextField::align_line(TextAlignment align,
     }
 
     // Shift the beginnings of the records on this line.
-    for (unsigned int i = last_line_start_record; i < m_text_glyph_records.size(); i++)
+    for (unsigned int i = last_line_start_record; i < _textRecords.size(); ++i)
     {
-        text_glyph_record&    rec = m_text_glyph_records[i];
+        SWF::TextRecord& rec = _textRecords[i];
 
-        if ( rec.m_style.hasXOffset() )
-        {
-            rec.m_style.shiftXOffset(shift_right); 
-        }
+        //if ( rec.hasXOffset() ) // why?
+            rec.setXOffset(rec.xOffset() + shift_right); 
     }
     return shift_right;
 }
@@ -1458,7 +1457,7 @@ TextField::setFont(boost::intrusive_ptr<const font> newfont)
 void
 TextField::format_text()
 {
-    m_text_glyph_records.clear();
+    _textRecords.clear();
 
     // nothing more to do if text is empty
     if ( _text.empty() )
@@ -1512,16 +1511,16 @@ TextField::format_text()
 
     //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g", getTarget(), fontDescent, fontLeading, fontHeight, scale);
 
-    text_glyph_record rec;    // one to work on
-    rec.m_style.setFont(_font.get());
-    rec.m_style.setUnderlined(underlined);
-    rec.m_style.m_color = getTextColor(); 
-    rec.m_style.setXOffset( PADDING_TWIPS + std::max(0, leftMargin + indent + blockIndent) );
-    rec.m_style.setYOffset( PADDING_TWIPS + fontHeight + (fontLeading - fontDescent) );
-    rec.m_style.m_text_height = fontHeight;
+    SWF::TextRecord rec;    // one to work on
+    rec.setFont(_font.get());
+    rec.setUnderline(underlined);
+    rec.setColor(getTextColor()); 
+    rec.setXOffset(PADDING_TWIPS + std::max(0, leftMargin + indent + blockIndent));
+    rec.setYOffset(PADDING_TWIPS + fontHeight + (fontLeading - fontDescent));
+    rec.setTextHeight(fontHeight);
 
-    boost::int32_t    x = static_cast<boost::int32_t>(rec.m_style.getXOffset());
-    boost::int32_t    y = static_cast<boost::int32_t>(rec.m_style.getYOffset());
+    boost::int32_t x = static_cast<boost::int32_t>(rec.xOffset());
+    boost::int32_t y = static_cast<boost::int32_t>(rec.yOffset());
 
     // Start the bbox at the upper-left corner of the first glyph.
     reset_bounding_box(x, y - fontDescent + fontHeight); 
@@ -1574,7 +1573,7 @@ TextField::format_text()
             // need to detect \r\n and treat it as one newline.
 
             // Close out this stretch of glyphs.
-            m_text_glyph_records.push_back(rec);
+            _textRecords.push_back(rec);
             align_line(textAlignment, last_line_start_record, x);
 
             // Expand bounding box to include last column of text ...
@@ -1585,16 +1584,16 @@ TextField::format_text()
             y += fontHeight + leading; 
 
             // Start a new record on the next line.
-            rec.m_glyphs.resize(0);
-            rec.m_style.setFont(_font.get()); 
-            rec.m_style.setUnderlined(underlined);
-            rec.m_style.m_color = getTextColor();
-            rec.m_style.setXOffset(x);
-            rec.m_style.setYOffset(y);
-            rec.m_style.m_text_height = fontHeight; 
+            rec.clearGlyphs();
+            rec.setFont(_font.get()); 
+            rec.setUnderline(underlined);
+            rec.setColor(getTextColor());
+            rec.setXOffset(x);
+            rec.setYOffset(y);
+            rec.setTextHeight(fontHeight); 
 
             last_space_glyph = -1;
-            last_line_start_record = m_text_glyph_records.size();
+            last_line_start_record = _textRecords.size();
 
             continue;
         }
@@ -1614,13 +1613,14 @@ TextField::format_text()
             // ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
             // OVER NEWLINES, ETC.
 
-            if (rec.m_glyphs.size() > 0)
+            if (!rec.glyphs().empty())
             {
                 // Peek at the previous glyph, and zero out its advance
                 // value, so the next char overwrites it.
-                float    advance = rec.m_glyphs.back().m_glyph_advance;
+                float advance = rec.glyphs().back().advance;
                 x -= advance;    // maintain formatting
-                rec.m_glyphs.back().m_glyph_advance = 0;    // do the BS effect
+                // Remove one glyph
+                rec.clearGlyphs(1);
             }
             continue;
         }
@@ -1657,13 +1657,13 @@ TextField::format_text()
             }
             else
             {
-                text_glyph_record::glyph_entry    ge;
-                ge.m_glyph_index = index;
-                ge.m_glyph_advance = scale * _font->get_advance(index, _embedFonts);
+                SWF::TextRecord::GlyphEntry ge;
+                ge.index = index;
+                ge.advance = scale * _font->get_advance(index, _embedFonts);
 
-                const int tabstop=8;
-                rec.m_glyphs.insert(rec.m_glyphs.end(), tabstop, ge);
-                x += ge.m_glyph_advance*tabstop;
+                const int tabstop = 8;
+                rec.addGlyph(ge, tabstop);
+                x += ge.advance * tabstop;
             }
             goto after_x_advance;
         }
@@ -1671,7 +1671,7 @@ TextField::format_text()
         // Remember where word breaks occur.
         if (code == 32)
         {
-            last_space_glyph = rec.m_glyphs.size();
+            last_space_glyph = rec.glyphs().size();
         }
 
         {
@@ -1693,7 +1693,7 @@ TextField::format_text()
                 // error -- missing glyph!
                 
                 // Log an error, but don't log too many times.
-                static int    s_log_count = 0;
+                static int s_log_count = 0;
                 if (s_log_count < 10)
                 {
                     s_log_count++;
@@ -1722,13 +1722,13 @@ TextField::format_text()
             }
         ); // IF_VERBOSE_MALFORMED_SWF
 
-        text_glyph_record::glyph_entry    ge;
-        ge.m_glyph_index = index;
-        ge.m_glyph_advance = scale * _font->get_advance(index, _embedFonts);
+        SWF::TextRecord::GlyphEntry ge;
+        ge.index = index;
+        ge.advance = scale * _font->get_advance(index, _embedFonts);
 
-        rec.m_glyphs.push_back(ge);
+        rec.addGlyph(ge);
 
-        x += ge.m_glyph_advance;
+        x += ge.advance;
         }
         
 after_x_advance:
@@ -1784,55 +1784,56 @@ after_x_advance:
                 // Insert newline if there's space or autosize != none
 
                 // Close out this stretch of glyphs.
-                m_text_glyph_records.push_back(rec);
+                _textRecords.push_back(rec);
 
-                float    previous_x = x;
+                float previous_x = x;
                 x = leftMargin + blockIndent + PADDING_TWIPS;
                 y += fontHeight + leading;
 
                 // Start a new record on the next line.
-                rec.m_glyphs.resize(0);
-                rec.m_style.setFont(_font.get());
-                rec.m_style.setUnderlined(underlined);
-                rec.m_style.m_color = getTextColor();
-                rec.m_style.setXOffset(x);
-                rec.m_style.setYOffset(y);
-                rec.m_style.m_text_height = getFontHeight();
+                rec.clearGlyphs();
+                rec.setFont(_font.get());
+                rec.setUnderline(underlined);
+                rec.setColor(getTextColor());
+                rec.setXOffset(x);
+                rec.setYOffset(y);
+                rec.setTextHeight(getFontHeight());
 
                 // TODO : what if m_text_glyph_records is empty ? Is it possible ?
-                assert(!m_text_glyph_records.empty());
-                text_glyph_record&    last_line = m_text_glyph_records.back();
+                assert(!_textRecords.empty());
+                SWF::TextRecord& last_line = _textRecords.back();
                 if (last_space_glyph == -1)
                 {
                     // Pull the previous glyph down onto the
                     // new line.
-                    if (last_line.m_glyphs.size() > 0)
+                    if (!last_line.glyphs().empty())
                     {
-                        rec.m_glyphs.push_back(last_line.m_glyphs.back());
-                        x += last_line.m_glyphs.back().m_glyph_advance;
-                        previous_x -= last_line.m_glyphs.back().m_glyph_advance;
-                        last_line.m_glyphs.resize(last_line.m_glyphs.size() - 1);
+                        rec.addGlyph(last_line.glyphs().back());
+                        x += last_line.glyphs().back().advance;
+                        previous_x -= last_line.glyphs().back().advance;
+                        last_line.clearGlyphs(1);
                     }
                 }
                 else
                 {
                     // Move the previous word down onto the next line.
 
-                    previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
+                    previous_x -= last_line.glyphs()[last_space_glyph].advance;
 
-                    for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
+                    const SWF::TextRecord::Glyphs::size_type lineSize = last_line.glyphs().size();
+                    for (unsigned int i = last_space_glyph + 1; i < lineSize; ++i)
                     {
-                        rec.m_glyphs.push_back(last_line.m_glyphs[i]);
-                        x += last_line.m_glyphs[i].m_glyph_advance;
-                        previous_x -= last_line.m_glyphs[i].m_glyph_advance;
+                        rec.addGlyph(last_line.glyphs()[i]);
+                        x += last_line.glyphs()[i].advance;
+                        previous_x -= last_line.glyphs()[i].advance;
                     }
-                    last_line.m_glyphs.resize(last_space_glyph);
+                    last_line.clearGlyphs(lineSize - last_space_glyph);
                 }
 
                 align_line(textAlignment, last_line_start_record, previous_x);
 
                 last_space_glyph = -1;
-                last_line_start_record = m_text_glyph_records.size();
+                last_line_start_record = _textRecords.size();
                 
             }
             else
@@ -1849,9 +1850,10 @@ after_x_advance:
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
             log_debug("Text with wordWrap exceeds height of box");
 #endif
-            rec.m_glyphs.clear();
+            rec.clearGlyphs();
             // TODO: should still compute m_text_bounds !
-            LOG_ONCE(log_unimpl("Computing text bounds of a TextField containing text that doesn't fit the box vertically"));
+            LOG_ONCE(log_unimpl("Computing text bounds of a TextField "
+                        "containing text that doesn't fit the box vertically"));
             break;
         }
 
@@ -1873,7 +1875,7 @@ after_x_advance:
     }
 
     // Add this line to our output.
-    if ( ! rec.m_glyphs.empty() ) m_text_glyph_records.push_back(rec);
+    if (!rec.glyphs().empty()) _textRecords.push_back(rec);
 
     float extra_space = align_line(textAlignment, last_line_start_record, x);
 
@@ -2215,11 +2217,11 @@ TextField::setTextColor(const rgba& col)
         _textColor = col;
 
         // Change color of all current glyph records
-        for (TextGlyphRecords::iterator i=m_text_glyph_records.begin(),
-            e=m_text_glyph_records.end(); i!=e; ++i)
+        for (TextRecords::iterator i=_textRecords.begin(),
+            e = _textRecords.end(); i!=e; ++i)
         {
-             text_glyph_record& rec=*i;
-            rec.m_style.m_color = _textColor;
+            SWF::TextRecord& rec = *i;
+            rec.setColor(_textColor);
         }
 
     }

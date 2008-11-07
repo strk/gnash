@@ -38,6 +38,7 @@
 #include "render.h"
 #include "Text.h"
 #include "movie_definition.h"
+#include "TextRecord.h"
 
 // Define the following macro to get debugging messages
 // for text rendering
@@ -50,70 +51,29 @@
 
 namespace gnash {
 
-	bool text_style::setFont(int id, movie_definition& root_def) 
-	{
-		return resolve_font(id, root_def);
-	}
-
-	bool text_style::resolve_font(int id, const movie_definition& root_def)
-	{
-		assert(id >= 0);
-
-		_font = root_def.get_font(id);
-		if (_font == NULL)
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-                log_error(_("text style references unknown font (id = %d)"), id);
-			);
-			return false;
-		}
-
-		return true;
-	}
-
-	void text_glyph_record::read(SWFStream& in, int glyph_count,
-			int glyph_bits, int advance_bits)
-	{
-		// TODO: shouldn't we take unsigned for *_bits ?
-		m_glyphs.resize(glyph_count);
-		in.ensureBits(glyph_count * (glyph_bits+advance_bits));
-		for (int i = 0; i < glyph_count; i++)
-		{
-			m_glyphs[i].m_glyph_index = in.read_uint(glyph_bits);
-			m_glyphs[i].m_glyph_advance = (float) in.read_sint(advance_bits);
-		}
-	}
-
 	// Render the given glyph records.
-	void	display_glyph_records(
-		const SWFMatrix& this_mat,
-		character* inst,
-		const std::vector<text_glyph_record>& records,
-		bool useEmbeddedGlyphs)
+	void display_glyph_records(const SWFMatrix& this_mat, character* inst,
+		const std::vector<SWF::TextRecord>& records, bool useEmbeddedGlyphs)
 	{
-		//GNASH_REPORT_FUNCTION;
 		
 		static std::vector<fill_style>	s_dummy_style;	// used to pass a color on to shape_character::display()
 		static std::vector<line_style>	s_dummy_line_style;
 		s_dummy_style.resize(1);
 
-		SWFMatrix	mat = inst->getWorldMatrix();
+		SWFMatrix mat = inst->getWorldMatrix();
 		mat.concatenate(this_mat);
 
 		cxform	cx = inst->get_world_cxform();
 		SWFMatrix	base_matrix = mat;
 
-		float x = 0.0f;
-		float y = 0.0f;
-
 		for (unsigned int i = 0; i < records.size(); i++)
 		{
 			// Draw the characters within the current record; i.e. consecutive
 			// chars that share a particular style.
-			const text_glyph_record&	rec = records[i];
+			const SWF::TextRecord& rec = records[i];
 
-			const font*	fnt = rec.m_style.getFont();
-			if (fnt == NULL)
+			const font*	fnt = rec.getFont();
+			if (!fnt)
 			{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
 				log_debug("No font in style of record %u", i);
@@ -124,28 +84,28 @@ namespace gnash {
 			// unitsPerEM returns an int, we cast to float to get
 			// a float division
 			float unitsPerEM = fnt->unitsPerEM(useEmbeddedGlyphs);
-			float scale = rec.m_style.m_text_height / unitsPerEM;
+			float scale = rec.textHeight() / unitsPerEM;
 
 #ifdef GNASH_DEBUG_TEXT_RENDERING
 			log_debug("font for record %u == %p", i, (const void*)fnt);
 #endif
 
-			if ( rec.m_style.hasXOffset() ) x = rec.m_style.getXOffset();
-			if ( rec.m_style.hasYOffset() ) y = rec.m_style.getYOffset();
+			float x = rec.xOffset();
+			float y = rec.yOffset();
 
 			boost::int16_t startX = x; // for the underline, if any
 
-			s_dummy_style[0].set_color(rec.m_style.m_color);
+			s_dummy_style[0].set_color(rec.color());
 
-			rgba	transformed_color = cx.transform(rec.m_style.m_color);
+			rgba transformed_color = cx.transform(rec.color());
 
-			unsigned int nglyphs = rec.m_glyphs.size();
+			unsigned int nglyphs = rec.glyphs().size();
 			for (unsigned int j = 0; j < nglyphs; ++j)
 			{
 				// the glyph entry
-				const text_glyph_record::glyph_entry& ge = rec.m_glyphs[j];
+				const SWF::TextRecord::GlyphEntry& ge = rec.glyphs()[j];
 
-				int	index = ge.m_glyph_index;
+				int	index = ge.index;
 					
 				mat = base_matrix;
 				mat.concatenate_translation(x, y);
@@ -193,10 +153,10 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 						gnash::render::draw_glyph(glyph, mat, transformed_color);
 					}
 				}
-				x += ge.m_glyph_advance;
+				x += ge.advance;
 			}
 
-			bool underline = rec.m_style.isUnderlined(); 
+			bool underline = rec.underline(); 
 			if ( nglyphs && underline )
 			{
 				// Underline should end where last displayed glyphs
@@ -224,7 +184,6 @@ log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 			}
 		}
 	}
-
 }	// end namespace gnash
 
 

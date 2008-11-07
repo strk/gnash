@@ -29,11 +29,14 @@ namespace gnash {
     class movie_definition;
     class SWFStream;
     class RunInfo;
+    namespace SWF {
+        class TextRecord;
+    }
 }
-
 
 namespace gnash {
 namespace SWF {
+
 
 /// Text character 
 //
@@ -49,7 +52,6 @@ public:
 
 	rect m_rect;
 	SWFMatrix m_matrix;
-	std::vector<text_glyph_record> m_text_glyph_records;
 
 	DefineTextTag(SWFStream& in, movie_definition& m, tag_type tag)
     {
@@ -68,6 +70,7 @@ public:
 private:
 	void read(SWFStream& in, movie_definition& m, tag_type tag);
 	
+    std::vector<TextRecord> _textRecords;
 };
 
 /// Parse a DefineText2Tag.
