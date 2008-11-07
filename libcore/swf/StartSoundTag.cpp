@@ -29,12 +29,12 @@
 namespace gnash {
 namespace SWF {
 
-/* public static */
+
 void
 StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
         const RunInfo& r)
 {
-    assert(tag == SWF::STARTSOUND); // 15 
+    assert(tag == STARTSOUND); 
 
     sound::sound_handler* handler = r.soundHandler();
 
@@ -72,7 +72,6 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 void
 StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 {
-    //GNASH_REPORT_FUNCTION;
 
     sound::sound_handler* handler = 
         m->getVM().getRoot().runInfo().soundHandler();
@@ -92,6 +91,24 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
                      &_soundInfo.envelopes));
         }
     }
+}
+
+void
+StartSoundTag2::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& r)
+{
+    assert(tag == STARTSOUND2);
+
+    std::string className;
+    in.read_stream(className);
+    log_unimpl(_("STARTSOUND2 tag not parsed and not used"));
+
+    // We should probably then use StartSoundTag to parse the
+    // tag, but we don't know which sound_handler_id to use.
+
+    IF_VERBOSE_PARSE(
+        log_parse("StartSound2 tag: SoundClassName %s", className);
+    );
 }
 
 

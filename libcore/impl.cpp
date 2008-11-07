@@ -109,7 +109,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
     register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader); // 62
     register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
-    register_tag_loader(SWF::STARTSOUND,  StartSoundTag::loader);
+    register_tag_loader(SWF::STARTSOUND, StartSoundTag::loader);
+    register_tag_loader(SWF::STARTSOUND2, StartSound2Tag::loader);
 
     register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16 
 

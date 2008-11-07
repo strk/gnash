@@ -168,6 +168,8 @@ typedef enum
 
     DEFINEFONTNAME        = 88,	
 
+    STARTSOUND2           = 89,
+
     REFLEX                = 777,
 
     DEFINEBITSPTR         = 1023

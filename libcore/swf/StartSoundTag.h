@@ -87,6 +87,18 @@ public:
 
 };
 
+/// StartSound2Tag (SWF9)
+//
+/// Very similar to StartSoundTag, but uses a SoundClassName instead of
+/// character ID. This is not implemented.
+class StartSound2Tag
+{
+public:
+
+	/// Load a SWF::STARTSOUND2 tag.
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
+};
 
 } // namespace gnash::SWF
 } // namespace gnash
