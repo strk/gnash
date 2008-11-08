@@ -46,7 +46,8 @@ StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 
 /* public static */
 void
-StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r)
+StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& r)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 

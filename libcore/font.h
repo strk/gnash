@@ -140,18 +140,6 @@ public:
 	{
 	}
 
-	/// Get number of embedded glyphs defined for this font
-	//
-	/// Callers of this function are:
-	///
-	///	- fontlib, for writing cache data (known to be not working anyway).
-	///	- edit_text_character, for validating the font (obsoleted too).
-	///
-	int	getEmbedGlyphCount() const
-	{
-		return _embedGlyphTable.size();
-	}
-
 	/// Get glyph by index.
 	//
 	/// @param glyph_index

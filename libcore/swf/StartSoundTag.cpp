@@ -109,6 +109,7 @@ StartSound2Tag::loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
     IF_VERBOSE_PARSE(
         log_parse("StartSound2 tag: SoundClassName %s", className);
     );
+    in.skip_to_tag_end();
 }
 
 

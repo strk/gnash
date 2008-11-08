@@ -68,8 +68,6 @@ public:
 
     typedef std::vector<ButtonSound> Sounds;
 
-    DefineButtonSoundTag(SWFStream& in, movie_definition& m);
-
     static void loader(SWFStream& in, tag_type tag, movie_definition& m,
 		    const RunInfo& r);
 
@@ -96,6 +94,11 @@ public:
 #endif // GNASH_USE_GC
 
 private:
+
+    /// Construct a DefineButtonSoundTag.
+    //
+    /// This can only be used from the loader() function.
+    DefineButtonSoundTag(SWFStream& in, movie_definition& m);
 
     void read(SWFStream& in, movie_definition& m);
 

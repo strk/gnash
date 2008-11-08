@@ -40,6 +40,7 @@
 #include "DefineButtonCxformTag.h"
 #include "CSMTextSettingsTag.h"
 #include "DefineButtonTag.h"
+#include "DefineTextTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
@@ -105,7 +106,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
     register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
     register_tag_loader(SWF::DEFINEFONT,  define_font_loader);
-    register_tag_loader(SWF::DEFINETEXT,  define_text_loader);
+    register_tag_loader(SWF::DEFINETEXT, DefineTextTag::loader);
     register_tag_loader(SWF::DOACTION,  DoActionTag::doActionLoader);
     register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
     // 62
@@ -138,7 +139,7 @@ static void ensure_loaders_registered()
     // 30 - _UNKNOWN_ unimplemented
     register_tag_loader(SWF::FREEALL, fixme_loader); // 31
     register_tag_loader(SWF::DEFINESHAPE3,  define_shape_loader);
-    register_tag_loader(SWF::DEFINETEXT2, define_text_loader);
+    register_tag_loader(SWF::DEFINETEXT2, DefineText2Tag::loader);
     // 37
     register_tag_loader(SWF::DEFINEBUTTON2, DefineButton2Tag::loader);
     register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);

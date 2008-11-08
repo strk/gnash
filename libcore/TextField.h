@@ -20,16 +20,15 @@
 
 #include "character.h" // for inheritance
 #include "styles.h" // for fill_style and line_style
-#include "text.h" // for text_glyph_record
 #include "Range2d.h"
 #include "rect.h" // for inlines
 #include "font.h" // for visibility of font add_ref/drop_ref
 
 // Forward declarations
 namespace gnash {
-	class text_glyph_record; 
     namespace SWF {
         class DefineEditTextTag;
+        class TextRecord;
     }
 }
 
@@ -505,8 +504,8 @@ private:
 		m_text_bounding_box.set_to_point(x, y);
 	}
 
-	typedef std::vector<text_glyph_record> TextGlyphRecords;
-	TextGlyphRecords m_text_glyph_records;
+	typedef std::vector<SWF::TextRecord> TextRecords;
+	TextRecords _textRecords;
 
 	/// used to pass a color on to shape_character::display()
 	std::vector<fill_style>	m_dummy_style;

@@ -83,11 +83,13 @@ libgnashcore_la_SOURCES = \
 	MovieClip.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/DefineVideoStreamTag.cpp \
+	swf/DefineTextTag.cpp \
 	swf/DefineButtonSoundTag.cpp \
 	swf/DefineButtonCxformTag.cpp \
 	swf/DefineButtonTag.cpp \
 	swf/VideoFrameTag.cpp \
 	swf/SoundInfoRecord.cpp \
+	swf/TextRecord.cpp \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
 	swf/DefineEditTextTag.cpp \
@@ -111,7 +113,6 @@ libgnashcore_la_SOURCES = \
 	shape.cpp \
 	SWFStream.cpp \
 	styles.cpp \
-	text.cpp \
 	timers.cpp \
 	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
@@ -187,7 +188,9 @@ noinst_HEADERS = \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
 	swf/SoundInfoRecord.h \
+	swf/TextRecord.h \
 	swf/DefineButtonSoundTag.h \
+	swf/DefineTextTag.h \
 	swf/DefineButtonTag.h \
 	swf/DefineEditTextTag.h \
 	swf/DefineButtonCxformTag.h \
@@ -202,7 +205,6 @@ noinst_HEADERS = \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
-	text.h \
 	timers.h \
 	RGBA.h	\
 	Video.h \

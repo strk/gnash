@@ -61,12 +61,11 @@ class DefineEditTextTag : public character_def
 
 public:
 
-	DefineEditTextTag(SWFStream& in, movie_definition& m);
-
     ~DefineEditTextTag() {}
 
 	/// Load an SWF::DEFINEEDITTEXT (37) tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
 
     const rect& get_bound() const { return _rect; }
 
@@ -226,9 +225,16 @@ protected:
 
 private:
 
+    /// Construct a DefineEditTextTag.
+    //
+    /// This should only be used from the loader() function.
+	DefineEditTextTag(SWFStream& in, movie_definition& m);
+
+    /// Read a tag from the SWFStream.
     void read(SWFStream& in, movie_definition& m);
 
 	rect _rect;
+
 	std::string _variableName;
 
     // For an SWF-defined textfield we'll read
@@ -292,7 +298,7 @@ private:
 	/// height of font text, in twips
     // TODO: initialize to a meaningful value (see MovieClip::add_textfield)
     //       and make sure get_font_height is not called for rendering purposes
-    //       (instead call a method of edit_text_character_def)
+    //       (instead call a method of TextField) (?)
 	boost::uint16_t _textHeight;
 
 	/// Text color
