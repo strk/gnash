@@ -24,20 +24,15 @@
 #define GNASH_FONT_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-
 #include "ExportableResource.h" 
-#include "swf.h" // for tag_type definition
-#include "bitmap_info.h" // for dtor visibility by smart pointer
-#include "FreetypeGlyphsProvider.h" // for device fonts support
-#include "log.h"
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <map>
 
 namespace gnash {
-    class movie_definition;
     class shape_character_def;
-    class SWFStream;
+    class FreetypeGlyphsProvider;
     namespace SWF {
         class DefineFontTag;
     }
@@ -142,26 +137,7 @@ public:
 	///
 	shape_character_def*	get_glyph(int glyph_index, bool embedded) const;
 
-	/// \brief
-	/// Read additional information about this font, from a
-	/// DefineFontInfo or DefineFontInfo2 tag. 
-	//
-	/// The caller has already read the tag type and font id.
-	///
-	/// @see SWF::define_font_info_loader
-	///
-	void read_font_info(SWFStream& in, SWF::tag_type tag, movie_definition& m);
-
-    /// \brief
-    /// Read the name of this font, from a DEFINEFONTNAME tag.
-    //
-    /// The caller has already read the tag type and font id.
-    //
-    /// @see SWF::define_font_name_loader
-    ///
-    void read_font_name(SWFStream& in, SWF::tag_type tag, movie_definition& m);
-
-	/// Get name of this font. Warning: can be NULL.
+	/// Get name of this font. 
 	const std::string& get_name() const { return _name; }
 
 	/// Return the glyph index for a given character code
@@ -225,6 +201,15 @@ public:
 	bool isBold() const { return _bold; }
 	bool isItalic() const { return _italic; }
 
+    /// A pair of strings describing the font.
+    //
+    /// Used by the DefineFontName tag, usefulness unclear.
+    struct FontNameInfo
+    {
+        std::string displayName;
+        std::string copyrightName;
+    };
+
     /// Glyph info structure
     struct GlyphInfo
     {
@@ -248,6 +233,32 @@ public:
     };
 
 	typedef std::vector<GlyphInfo> GlyphInfoRecords;
+
+    /// Add display name and copyright name for an embedded font.
+    //
+    /// It's a string copy, but a decent standard library implementation
+    /// should be able to avoid actually copying. Since it's only two
+    /// strings, it doesn't seem worth the effort to avoid the copy.
+    void addFontNameInfo(const FontNameInfo& fontName);
+
+    /// Set the name of the font.
+    //
+    /// This is used by SWF::DefineFontInfoTag
+    void setName(const std::string& name);
+
+    /// Set the language and encoding flags of the font.
+    //
+    /// This is used by SWF::DefineFontInfoTag
+    void setFlags(boost::uint8_t flags);
+
+    /// Add a CodeTable to the font.
+    //
+    /// This is used by SWF::DefineFontInfoTag
+    void setCodeTable(std::auto_ptr<CodeTable> table);
+
+    /// Retrieve the number of embedded glyphs in this font.
+    //
+    GlyphInfoRecords::size_type glyphCount() const;
 
 private:
 
@@ -276,17 +287,14 @@ private:
 	GlyphInfoRecords _deviceGlyphTable;
 
 	std::string	_name;
-    std::string m_display_name;
-    std::string m_copyright_name;
+    std::string _displayName;
+    std::string _copyrightName;
 
-	bool	m_has_layout;
-	bool	m_unicode_chars;
-	bool	m_shift_jis_chars;
-	bool	m_ansi_chars;
+	bool	_unicodeChars;
+	bool	_shiftJISChars;
+	bool	_ansiChars;
 	bool	_italic;
 	bool	_bold;
-	bool	m_wide_codes;
-	bool	m_subpixel_font;
 
 	/// Code to index table for embedded glyphs
     //

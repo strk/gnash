@@ -22,13 +22,10 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "Font.h"
-#include "SWFStream.h"
 #include "log.h"
-#include "movie_definition.h"
 #include "shape_character_def.h"
-#include "swf.h"
-#include "GnashException.h"
 #include "DefineFontTag.h"
+#include "FreetypeGlyphsProvider.h"
 
 #include <utility> // for std::make_pair
 
@@ -66,14 +63,11 @@ Font::Font(std::auto_ptr<SWF::DefineFontTag> ft)
     :
     _fontTag(ft.release()),
     _name(_fontTag->name()),
-    m_display_name(),
-    m_copyright_name(),
-    m_unicode_chars(_fontTag->unicodeChars()),
-    m_shift_jis_chars(_fontTag->shiftJISChars()),
-    m_ansi_chars(_fontTag->ansiChars()),
+    _unicodeChars(_fontTag->unicodeChars()),
+    _shiftJISChars(_fontTag->shiftJISChars()),
+    _ansiChars(_fontTag->ansiChars()),
     _italic(_fontTag->italic()),
-    _bold(_fontTag->bold()),
-    m_wide_codes(_fontTag->wideCodes())
+    _bold(_fontTag->bold())
 {
     if (_fontTag->hasCodeTable()) _embeddedCodeTable = _fontTag->getCodeTable();
 }
@@ -82,14 +76,11 @@ Font::Font(const std::string& name, bool bold, bool italic)
     :
     _fontTag(0),
     _name(name),
-    m_display_name(),
-    m_copyright_name(),
-    m_unicode_chars(false),
-    m_shift_jis_chars(false),
-    m_ansi_chars(true),
+    _unicodeChars(false),
+    _shiftJISChars(false),
+    _ansiChars(true),
     _italic(italic),
-    _bold(bold),
-    m_wide_codes(false)
+    _bold(bold)
 {
     assert(!_name.empty());
 }
@@ -117,55 +108,71 @@ Font::get_glyph(int index, bool embedded) const
     }
 }
 
-
-// Read the font name, display and legal, from a DefineFontName tag.
-void Font::read_font_name(SWFStream& in, SWF::tag_type tag,
-    movie_definition& /*m*/) 
+void
+Font::addFontNameInfo(const FontNameInfo& fontName)
 {
-    assert(tag == SWF::DEFINEFONTNAME);
-    in.read_string(m_display_name);
-    in.read_string(m_copyright_name);
-}
-
-// TODO: move libcore/swf
-// Read additional information about this font, from a
-// DefineFontInfo tag.  The caller has already read the tag
-// type and font id.
-void	Font::read_font_info(SWFStream& in, SWF::tag_type tag,
-        movie_definition& /*m*/)
-{
-    assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
-
-    if ( tag == SWF::DEFINEFONTINFO2 )
+    if (!_displayName.empty() || !_copyrightName.empty())
     {
-        // See: SWFalexref/SWFalexref.html#tag_definefont2
-        LOG_ONCE(log_unimpl(_("DefineFontInfo2 partially implemented")));
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Attempt to set font display or copyright name"
+                    "again. This should mean there is more than one "
+                    "DefineFontName tag referring to the same Font. Don't "
+                    "know what to do in this case, so ignoring."));
+        );
+        return;
     }
 
-    // Can a DefineFontInfo or DefineFontInfo2 tag possibly be called on
-    // a device-only font? Otherwise the font won't exist.
-    assert(_fontTag.get());
+    _displayName = fontName.displayName;
+    _copyrightName = fontName.copyrightName;
+}
 
-    in.read_string_with_length(_name);
 
-    in.ensureBytes(1);
-    int	flags = in.read_u8();
-    // highest two bits are reserved.
-    m_unicode_chars   = flags & (1 << 5); //???
-    m_shift_jis_chars = flags & (1 << 4);
-    m_ansi_chars      = flags & (1 << 3);
-    _italic       = flags & (1 << 2);
-    _bold         = flags & (1 << 1);
-    m_wide_codes      = flags & (1 << 0);
+Font::GlyphInfoRecords::size_type
+Font::glyphCount() const
+{
+        assert(_fontTag);
+        return _fontTag->glyphTable().size();
+}
 
-    std::auto_ptr<CodeTable> table(new CodeTable);
-    SWF::DefineFontTag::readCodeTable(in, *table, m_wide_codes,
-            _fontTag->glyphTable().size());
 
+void
+Font::setFlags(boost::uint8_t flags)
+{
+    _shiftJISChars = flags & (1 << 6);
+    _unicodeChars = flags & (1 << 5);
+    _ansiChars = flags & (1 << 4);
+    _italic = flags & (1 << 1);
+    _bold = flags & (1 << 0);
+}
+
+
+void
+Font::setCodeTable(std::auto_ptr<CodeTable> table)
+{
+    if (_embeddedCodeTable)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("Attempt to add an embedded glyph CodeTable to "
+                    "a font that already has one. This should mean there "
+                    "are several DefineFontInfo tags, or a DefineFontInfo "
+                    "tag refers to a font created by DefineFone2 or "
+                    "DefineFont3. Don't know what should happen in this "
+                    "case, so ignoring."));
+        );
+        return;
+    }
     _embeddedCodeTable.reset(table.release());
 }
 
-int	Font::get_glyph_index(boost::uint16_t code, bool embedded) const
+    
+void
+Font::setName(const std::string& name)
+{
+    _name = name;
+}
+
+int
+Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 {
     const CodeTable& ctable = (embedded && _embeddedCodeTable) ? 
         *_embeddedCodeTable : _deviceCodeTable;
