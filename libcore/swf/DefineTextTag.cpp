@@ -66,10 +66,11 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, tag_type tag)
 	    log_parse(_("begin text records for DefineTextTag %p"), (void*)this);
 	);
 
-    /// Parse until there are no more records.
+    /// Parse until there are no more records. Each new TextRecord
+    /// uses the values from the previous one unless they are overridden.
+    TextRecord text;
 	for (;;)
 	{
-	    TextRecord text;
         if (!text.read(in, m, glyphBits, advanceBits, tag)) break;
         _textRecords.push_back(text);
 	}
