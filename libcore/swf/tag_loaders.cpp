@@ -825,29 +825,6 @@ void define_shape_morph_loader(SWFStream& in, tag_type tag, movie_definition& m,
 //
 
 
-void define_font_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-    // Load a DefineFont or DefineFont2 tag.
-{
-    assert(tag == SWF::DEFINEFONT
-       || tag == SWF::DEFINEFONT2
-       || tag == SWF::DEFINEFONT3 ); // 10 || 48 || 75
-
-    in.ensureBytes(2);
-    boost::uint16_t font_id = in.read_u16();
-
-    font* f = new font;
-    f->read(in, tag, m);
-
-    m.add_font(font_id, f);
-
-    // Automatically keeping fonts in fontlib is
-    // problematic.  The app should be responsible for
-    // optionally adding fonts to fontlib.
-    // //fontlib::add_font(f);
-}
-
-
 // See description in header
 void define_font_info_loader(SWFStream& in, tag_type tag, movie_definition& m,
 		const RunInfo& /*r*/)

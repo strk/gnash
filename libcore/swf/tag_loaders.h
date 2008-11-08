@@ -69,13 +69,6 @@ void define_shape_loader(SWFStream&, tag_type, movie_definition&,
 void define_shape_morph_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
-/// SWF Tags DefineFont (10), DefineFont2 (48) and DefineFont3 (75)
-//
-/// Load a font and adds it the the movie definition.
-///
-void define_font_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
 /// SWF Tags Reflex (777)
 //
 void reflex_loader(SWFStream&, tag_type, movie_definition&,

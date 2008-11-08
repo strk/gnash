@@ -34,14 +34,20 @@
 # include "GC.h"
 #endif
 
+#include <boost/scoped_ptr.hpp>
 #include <map>
 
+namespace gnash {
+    class movie_definition;
+    class shape_character_def;
+    class SWFStream;
+    namespace SWF {
+        class DefineFontTag;
+    }
+}
 
 namespace gnash {
 
-class movie_definition;
-class shape_character_def;
-class SWFStream;
 
 
 // @@ replace this with a flat hash, or else a sorted array
@@ -85,7 +91,10 @@ inline bool operator< (const kerning_pair& p1, const kerning_pair& p2)
 class font : public ExportableResource
 {
 public:
-	font();
+	// This table maps from Unicode character number to glyph index.
+	typedef std::map<boost::uint16_t, int> code_table;
+
+	font(std::auto_ptr<SWF::DefineFontTag> ft);
 
 	/// Create a device-font only font, using the given name to find it
 	//
@@ -135,15 +144,6 @@ public:
 	///
 	shape_character_def*	get_glyph(int glyph_index, bool embedded) const;
 
-	/// Read a DefineFont or DefineFont2 tag from an SWF stream 
-	//
-	/// @param in is the SWF stream
-	/// @param tag is the tag type either DefineFont or DefineFont2
-	/// @param m is the movie_definition containing this definition
-	///          (used to resolve dictionary simbols referred to by glyphs, if any)
-	///
-	void	read(SWFStream& in, SWF::tag_type tag, movie_definition& m);
-
 	/// \brief
 	/// Read additional information about this font, from a
 	/// DefineFontInfo or DefineFontInfo2 tag. 
@@ -152,7 +152,7 @@ public:
 	///
 	/// @see SWF::define_font_info_loader
 	///
-	void	read_font_info(SWFStream& in, SWF::tag_type tag, movie_definition& m);
+	void read_font_info(SWFStream& in, SWF::tag_type tag, movie_definition& m);
 
     /// \brief
     /// Read the name of this font, from a DEFINEFONTNAME tag.
@@ -164,7 +164,7 @@ public:
     void read_font_name(SWFStream& in, SWF::tag_type tag, movie_definition& m);
 
 	/// Get name of this font. Warning: can be NULL.
-	const std::string& get_name() const { return m_name; }
+	const std::string& get_name() const { return _name; }
 
 	/// Return the glyph index for a given character code
 	//
@@ -194,7 +194,7 @@ public:
 	///	If true, queries the 'embedded' glyphs table, 
 	///	otherwise, looks in the 'device' font table.
 	///
-	float	get_advance(int glyph_index, bool embedded) const;
+	float get_advance(int glyph_index, bool embedded) const;
 
 	/// \brief
 	/// Return the adjustment in advance between the given two
@@ -206,7 +206,7 @@ public:
 	///       fonts, or you'll end up mixing information from device fonts
 	///	  with information from embedded fonts.
 	///
-	float	get_kerning_adjustment(int last_code, int this_code) const;
+	float get_kerning_adjustment(int last_code, int this_code) const;
 
 	/// Return height of the EM square used for glyphs definition
 	//
@@ -216,16 +216,16 @@ public:
 	///
 	unsigned short int unitsPerEM(bool embedded) const;
 
-	float	get_leading() const { return m_leading; }
-	float	get_descent() const { return m_descent; }
+    // TODO: what about device fonts?
+	float	get_leading() const;
+ 
+    // TODO: what about device fonts?
+    float get_descent() const;
+        
+	bool is_subpixel_font() const;
 
-	bool	is_subpixel_font() const { return m_subpixel_font; }
-	void	set_subpixel_font(bool isit) { m_subpixel_font = isit; }
-
-	bool	isBold() const { return m_is_bold; }
-	bool	isItalic() const { return m_is_italic; }
-
-private:
+	bool isBold() const { return _bold; }
+	bool isItalic() const { return _italic; }
 
     /// Glyph info structure
     struct GlyphInfo
@@ -249,7 +249,10 @@ private:
         float advance;
     };
 	/// Read the table that maps from glyph indices to character codes.
-	void	read_code_table(SWFStream& in);
+	static void read_code_table(SWFStream& in, code_table& table, bool wide, size_t num);
+
+private:
+
 
 	/// Read a DefineFont2 or DefineFont3 tag
 	void readDefineFont2_or_3(SWFStream& in, movie_definition& m);
@@ -275,32 +278,29 @@ private:
 	///
 	bool initDeviceFontProvider() const;
 
-	typedef std::vector< GlyphInfo > GlyphInfoVect;
+    /// If we were constructed from a definition, this is not NULL.
+    boost::scoped_ptr<SWF::DefineFontTag> _fontTag;
 
-	// Embedded glyphs
-	GlyphInfoVect _embedGlyphTable;
+	typedef std::vector< GlyphInfo > GlyphInfoVect;
 
 	// Device glyphs
 	GlyphInfoVect _deviceGlyphTable;
 
-	std::string	m_name;
-    std::string     m_display_name;
-    std::string     m_copyright_name;
+	std::string	_name;
+    std::string m_display_name;
+    std::string m_copyright_name;
 
 	bool	m_has_layout;
 	bool	m_unicode_chars;
 	bool	m_shift_jis_chars;
 	bool	m_ansi_chars;
-	bool	m_is_italic;
-	bool	m_is_bold;
+	bool	_italic;
+	bool	_bold;
 	bool	m_wide_codes;
 	bool	m_subpixel_font;
 
-	// This table maps from Unicode character number to glyph index.
-	typedef std::map<boost::uint16_t, int> code_table;
-
 	/// Code to index table for embedded glyphs
-	code_table _embedded_code_table; 
+    boost::shared_ptr<const code_table> _embedded_code_table; 
 
 	/// Code to index table for device glyphs
 	code_table _device_code_table; 
@@ -309,7 +309,6 @@ private:
 	float	m_ascent;
 	float	m_descent;
 	float	m_leading;
-	//std::vector<float>	m_advance_table;
 
 	typedef std::map<kerning_pair, float> kernings_table;
 	kernings_table m_kerning_pairs;
