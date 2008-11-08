@@ -197,7 +197,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
     _unicodeChars = flags & (1 << 5);
     _ansiChars = flags & (1 << 4);
     bool wide_offsets = flags & (1 << 3);
-    _wideCodes = flags & (1 << 2);
+    bool wideCodes = flags & (1 << 2);
     _italic = flags & (1 << 1);
     _bold = flags & (1 << 0);
 
@@ -218,7 +218,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
         log_parse(" m_unicode_chars = %d", _unicodeChars);
         log_parse(" m_ansi_chars = %d", _ansiChars);
         log_parse(" wide_offsets = %d", wide_offsets);
-        log_parse(" wide_codes = %d", _wideCodes);
+        log_parse(" wide_codes = %d", wideCodes);
         log_parse(" is_italic = %d", _italic);
         log_parse(" is_bold = %d", _bold);
         log_parse(" name = %s", _name);
@@ -301,7 +301,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
 
     std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
 
-    readCodeTable(in, *table, _wideCodes, _glyphTable.size());
+    readCodeTable(in, *table, wideCodes, _glyphTable.size());
     _codeTable.reset(table.release());
 
     // Read layout info for the glyphs.
@@ -322,7 +322,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
 
         // Bounds table.
         {
-            rect	dummy_rect;
+            rect dummy_rect;
             // TODO: shouldn't we log_unimpl here ??
             for (size_t i = 0; i < nGlyphs; i++) dummy_rect.read(in);
         }
@@ -330,7 +330,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
         // Kerning pairs.
         in.ensureBytes(2);
         int	kerning_count = in.read_u16();
-        if ( _wideCodes )
+        if (wideCodes)
         {
             in.ensureBytes(6*kerning_count); // includes the adjustment 
         }
@@ -342,7 +342,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
         for (int i = 0; i < kerning_count; i++)
         {
             boost::uint16_t	char0, char1;
-            if (_wideCodes)
+            if (wideCodes)
             {
                 char0 = in.read_u16();
                 char1 = in.read_u16();
@@ -369,6 +369,48 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
 
         }
     }
+}
+
+void
+DefineFontInfoTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& /*r*/)
+{
+    assert(tag == DEFINEFONTINFO || tag == DEFINEFONTINFO2); 
+
+    in.ensureBytes(2);
+    boost::uint16_t fontID = in.read_u16();
+
+    Font* f = m.get_font(fontID);
+    if (!f)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("DefineFontInfo tag loader: "
+                   "can't find font with id %d"), fontID);
+        );
+        return;
+    }
+
+    if (tag == DEFINEFONTINFO2)
+    {
+        // See: SWFalexref/SWFalexref.html#tag_definefont2
+        LOG_ONCE(log_unimpl(_("DefineFontInfo2 partially implemented")));
+    }
+
+    std::string name;
+    in.read_string_with_length(name);
+
+    in.ensureBytes(1);
+    boost::uint8_t flags = in.read_u8();
+
+    bool wideCodes = flags & (1 << 0);
+
+    std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
+
+    DefineFontTag::readCodeTable(in, *table, wideCodes, f->glyphCount());
+
+    f->setName(name);
+    f->setFlags(flags);
+    f->setCodeTable(table);
 }
 
 

@@ -74,20 +74,6 @@ void define_shape_morph_loader(SWFStream&, tag_type, movie_definition&,
 void reflex_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
-/// SWF Tag DefineFontInfo (13 or 62) 
-//
-/// Load a DefineFontInfo or DefineFontInfo2 tag. 
-/// This adds information to an existing font.
-///
-void define_font_info_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
-/// SWF Tag DefineFontName (88)
-//  Load the display name and copyright string of a font.
-//  This adds to an existing font.
-void define_font_name_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
 void place_object_2_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 

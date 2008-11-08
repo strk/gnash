@@ -825,52 +825,6 @@ void define_shape_morph_loader(SWFStream& in, tag_type tag, movie_definition& m,
 //
 
 
-// See description in header
-void define_font_info_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2);
-
-    in.ensureBytes(2);
-    boost::uint16_t font_id = in.read_u16();
-
-    Font* f = m.get_font(font_id);
-    if (f)
-    {
-        f->read_font_info(in, tag, m);
-    }
-    else
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("define_font_info_loader: "
-                   "can't find font w/ id %d"), font_id);
-        );
-    }
-}
-
-// Set font name for a font.
-void define_font_name_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEFONTNAME);
-
-    in.ensureBytes(2);
-    boost::uint16_t font_id = in.read_u16();
-
-    Font* f = m.get_font(font_id);
-    if (f)
-    {
-        f->read_font_name(in, tag, m);
-    }
-    else
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("define_font_name_loader: "
-                           "can't find font w/ id %d"), font_id);
-        );
-    }
-}
-
 // Create and initialize a sprite, and add it to the movie.
 void
 sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,

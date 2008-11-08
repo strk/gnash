@@ -1,4 +1,4 @@
-// DefineFontTag.h   Read DefineFont and DefineFont2 tags
+// DefineFontTag.h   Read DefineFont and DefineFontInfo tags
 //
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -19,6 +19,12 @@
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
+/// This file handles DefineFont, DefineFontInfo, DefineFontInfo2,
+/// DefineFont2, and DefineFont3.
+//
+/// They are all handled in one file because a DefineFont2 or 3 tag
+/// contains practically the same as a DefineFont plus DefineFontInfo
+/// or DefineFontInfo2.
 
 #ifndef GNASH_SWF_DEFINEFONTTAG_H
 #define GNASH_SWF_DEFINEFONTTAG_H
@@ -80,7 +86,6 @@ public:
     bool unicodeChars() const { return _unicodeChars; }
     bool italic() const { return _italic; }
     bool bold() const { return _bold; }
-    bool wideCodes() const { return _wideCodes; }
     bool subpixelFont() const { return _subpixelFont; }
     bool leading() const { return _leading; }
     bool ascent() const { return _ascent; }
@@ -126,6 +131,19 @@ private:
 	kernings_table m_kerning_pairs;
 
     boost::shared_ptr<const Font::CodeTable> _codeTable;
+};
+
+
+class DefineFontInfoTag
+{
+public:
+    /// Load a DefineFontInfo tag.
+    //
+    /// Adds a CodeTable and other information to a Font created by a
+    /// DefineFont tag. The information is already contained in a 
+    /// DefineFont2 or DefineFont3 tag.
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
 };
 
 }

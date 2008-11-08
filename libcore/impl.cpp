@@ -51,6 +51,7 @@
 #include "StreamSoundBlockTag.h"
 #include "DefineButtonSoundTag.h"
 #include "DefineVideoStreamTag.h"
+#include "DefineFontNameTag.h"
 #include "VideoFrameTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
 #include "RunInfo.h"
@@ -108,9 +109,9 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEFONT, DefineFontTag::loader);
     register_tag_loader(SWF::DEFINETEXT, DefineTextTag::loader);
     register_tag_loader(SWF::DOACTION,  DoActionTag::doActionLoader);
-    register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
+    register_tag_loader(SWF::DEFINEFONTINFO, DefineFontInfoTag::loader);
     // 62
-    register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader);
+    register_tag_loader(SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader);
     register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
     register_tag_loader(SWF::STARTSOUND, StartSoundTag::loader);
     // 89
@@ -218,7 +219,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINESHAPE4, define_shape_loader); // 83
     register_tag_loader(SWF::DEFINEMORPHSHAPE2, define_shape_morph_loader); // 84
     register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,define_scene_frame_label_loader); //86
-    register_tag_loader(SWF::DEFINEFONTNAME, define_font_name_loader); // 88
+    // 88
+    register_tag_loader(SWF::DEFINEFONTNAME, DefineFontNameTag::loader);
 
     register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
