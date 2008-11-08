@@ -22,7 +22,6 @@
 #include "IOChannel.h"
 #include "utility.h"
 #include "impl.h"
-#include "font.h"
 #include "fontlib.h"
 #include "log.h"
 #include "GnashImage.h"
@@ -39,6 +38,7 @@
 #include "DefineFontAlignZonesTag.h"
 #include "DefineButtonCxformTag.h"
 #include "CSMTextSettingsTag.h"
+#include "DefineFontTag.h"
 #include "DefineButtonTag.h"
 #include "DefineTextTag.h"
 #include "PlaceObject2Tag.h"
@@ -105,7 +105,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEBUTTON, DefineButtonTag::loader);
     register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
     register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
-    register_tag_loader(SWF::DEFINEFONT,  define_font_loader);
+    register_tag_loader(SWF::DEFINEFONT, DefineFontTag::loader);
     register_tag_loader(SWF::DEFINETEXT, DefineTextTag::loader);
     register_tag_loader(SWF::DOACTION,  DoActionTag::doActionLoader);
     register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
@@ -158,7 +158,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
     register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
     register_tag_loader(SWF::FRAMETAG,  fixme_loader); // 47
-    register_tag_loader(SWF::DEFINEFONT2, define_font_loader); // 48
+    // 48
+    register_tag_loader(SWF::DEFINEFONT2, DefineFontTag::loader);
     register_tag_loader(SWF::GENCOMMAND,  fixme_loader); // 49
     register_tag_loader(SWF::DEFINECOMMANDOBJ, fixme_loader); // 50
     register_tag_loader(SWF::CHARACTERSET,  fixme_loader); // 51
@@ -208,7 +209,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
     register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader); // 74
-    register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
+    // 75
+    register_tag_loader(SWF::DEFINEFONT3, DefineFontTag::loader);
     register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
     register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78

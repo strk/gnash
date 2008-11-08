@@ -87,6 +87,7 @@ libgnashcore_la_SOURCES = \
 	swf/DefineButtonSoundTag.cpp \
 	swf/DefineButtonCxformTag.cpp \
 	swf/DefineButtonTag.cpp \
+	swf/DefineFontTag.cpp \
 	swf/VideoFrameTag.cpp \
 	swf/SoundInfoRecord.cpp \
 	swf/TextRecord.cpp \
@@ -105,7 +106,7 @@ libgnashcore_la_SOURCES = \
 	Button.cpp \
 	DisplayList.cpp \
 	fill_style.cpp \
-	font.cpp \
+	Font.cpp \
 	fontlib.cpp \
 	impl.cpp \
 	LoadVariablesThread.cpp \
@@ -160,7 +161,7 @@ noinst_HEADERS = \
         ConvolutionFilter.h \
         ColorMatrixFilter.h \
         parser/filter_factory.h \
-	font.h \
+	Font.h \
 	fontlib.h \
 	generic_character.h \
 	gnash.h	\
@@ -195,6 +196,7 @@ noinst_HEADERS = \
 	swf/DefineEditTextTag.h \
 	swf/DefineButtonCxformTag.h \
 	swf/PlaceObject2Tag.h \
+	swf/DefineFontTag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \
 	swf/DoActionTag.h \

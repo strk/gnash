@@ -22,7 +22,7 @@
 #include "styles.h" // for fill_style and line_style
 #include "Range2d.h"
 #include "rect.h" // for inlines
-#include "font.h" // for visibility of font add_ref/drop_ref
+#include "Font.h" // for visibility of font add_ref/drop_ref
 
 // Forward declarations
 namespace gnash {
@@ -377,9 +377,9 @@ public:
 	/// @param newfont
 	///	Will be stored in an intrusive_ptr
 	///
-	boost::intrusive_ptr<const font> setFont(boost::intrusive_ptr<const font> newfont);
+	boost::intrusive_ptr<const Font> setFont(boost::intrusive_ptr<const Font> newfont);
 
-	const font* getFont() { return _font.get(); }
+	const Font* getFont() { return _font.get(); }
 
 	boost::uint16_t getFontHeight() const
 	{
@@ -552,7 +552,7 @@ private:
 
 	boost::uint16_t _fontHeight;
 
-	boost::intrusive_ptr<const font> _font;
+	boost::intrusive_ptr<const Font> _font;
 
 	bool m_has_focus;
 	size_t m_cursor;

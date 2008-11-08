@@ -22,7 +22,7 @@
 
 // Forward declarations
 namespace gnash {
-	class font;
+	class Font;
 }
 
 namespace gnash {
@@ -41,21 +41,21 @@ namespace gnash {
 namespace fontlib {
 
 	// For adding fonts.
-	void add_font(font* f);
+	void add_font(Font* f);
 
 	/// Clean up the font library
 	void clear();
 
 	int	get_font_count();
 
-	font* get_font(int index);
+	Font* get_font(int index);
 
-	font* get_font(const std::string& name, bool bold, bool italic);
+	Font* get_font(const std::string& name, bool bold, bool italic);
 
 	/// Return a default device font.
-	boost::intrusive_ptr<font> get_default_font();
+	boost::intrusive_ptr<Font> get_default_font();
 
-	const char*	get_font_name(const font* f);
+	const char*	get_font_name(const Font* f);
 
 	
 }	// end namespace fontlib

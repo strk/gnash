@@ -24,7 +24,7 @@
 #include "swf.h"
 #include "log.h"
 #include "render.h"
-#include "font.h"
+#include "Font.h"
 
 #include <vector>
 
@@ -168,7 +168,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
         static std::vector<fill_style> s_dummy_style(1, fill_style());    
         static std::vector<line_style> s_dummy_line_style;
 
-        const font*    fnt = rec.getFont();
+        const Font* fnt = rec.getFont();
         if (!fnt) {
             IF_VERBOSE_MALFORMED_SWF(
                 log_swferror("No font in style of TextRecord");

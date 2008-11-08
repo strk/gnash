@@ -66,7 +66,7 @@ namespace gnash {
 	class movie_instance;
 	class MovieClip;
 	class ControlTag;
-    class font;
+    class Font;
     class ExportableResource;
     class sound_sample;
 }
@@ -246,7 +246,7 @@ public:
 	/// This method is here to be called by DEFINEFONT tags loaders.
 	/// The default implementation does nothing.
 	///
-	virtual void add_font(int /*id*/, font* /*ch*/)
+	virtual void add_font(int /*id*/, Font* /*ch*/)
 	{
 	}
 
@@ -257,13 +257,13 @@ public:
 	///
 	/// @see add_font
 	///
-	virtual font* get_font(int /*id*/) const
+	virtual Font* get_font(int /*id*/) const
 	{
 		return NULL;
 	}
 
 	/// Find a font from the movie (not shared) lib
-	virtual font* get_font(const std::string& /*name*/, 
+	virtual Font* get_font(const std::string& /*name*/, 
             bool /*bold*/, bool /*italic*/) const
 	{
 		return 0;

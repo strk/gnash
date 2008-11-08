@@ -18,7 +18,7 @@
 //
 
 
-#include "font.h"
+#include "Font.h"
 #include "log.h"
 #include "shape.h"
 #include "SWFStream.h"
@@ -44,7 +44,7 @@ DefineFontAlignZonesTag::loader(SWFStream& in, tag_type tag,
 
     in.ensureBytes(1);
 	unsigned short ref = in.read_u8(); // must reference a valid DEFINEFONT3 tag
-	font* referencedFont = m.get_font(ref);
+	Font* referencedFont = m.get_font(ref);
 	if ( ! referencedFont )
 	{
 		IF_VERBOSE_MALFORMED_SWF(

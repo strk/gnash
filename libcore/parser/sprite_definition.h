@@ -146,7 +146,7 @@ public:
 	}
 
 	/// Overridden just for complaining  about malformed SWF
-	virtual void add_font(int /*id*/, font* /*ch*/)
+	virtual void add_font(int /*id*/, Font* /*ch*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
 		log_swferror(_("add_font tag appears in sprite tags"));
@@ -154,7 +154,7 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual font* get_font(int id) const
+	virtual Font* get_font(int id) const
 	{
 		return m_movie_def.get_font(id);
 	}

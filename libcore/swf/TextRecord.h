@@ -27,7 +27,7 @@ namespace gnash {
     class movie_definition;
     class SWFStream;
     class SWFMatrix;
-    class font;
+    class Font;
 }
 
 namespace gnash {
@@ -94,11 +94,11 @@ public:
     }
 
     // TODO: check font properly.
-    void setFont(const font* f) {
+    void setFont(const Font* f) {
         _font = f;
     }
 
-    const font* getFont() const {
+    const Font* getFont() const {
         return _font;
     }
 
@@ -173,7 +173,7 @@ private:
     float _yOffset;
 
     /// The font associated with the TextRecord. Can be NULL.
-    const font* _font;
+    const Font* _font;
 
     /// Whether the text should be underlined.
     bool _underline;

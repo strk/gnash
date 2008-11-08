@@ -18,7 +18,7 @@
 #include "DefineEditTextTag.h"
 #include "TextField.h"
 #include "movie_definition.h"
-#include "font.h"
+#include "Font.h"
 #include "SWFStream.h"
 
 namespace gnash {

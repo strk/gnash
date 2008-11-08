@@ -30,7 +30,7 @@
 #include "SWFStream.h"
 #include "GnashImageJpeg.h"
 #include "RunInfo.h"
-#include "font.h"
+#include "Font.h"
 #include "log.h"
 #include "MovieClip.h"
 #include "movie_instance.h"
@@ -251,29 +251,29 @@ SWFMovieDefinition::get_character_def(int character_id)
 	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
 }
 
-void SWFMovieDefinition::add_font(int font_id, font* f)
+void SWFMovieDefinition::add_font(int font_id, Font* f)
 {
     assert(f);
-    m_fonts.insert(std::make_pair(font_id, boost::intrusive_ptr<font>(f)));
+    m_fonts.insert(std::make_pair(font_id, boost::intrusive_ptr<Font>(f)));
 }
 
-font* SWFMovieDefinition::get_font(int font_id) const
+Font* SWFMovieDefinition::get_font(int font_id) const
 {
 
     FontMap::const_iterator it = m_fonts.find(font_id);
     if ( it == m_fonts.end() ) return NULL;
-    boost::intrusive_ptr<font> f = it->second;
+    boost::intrusive_ptr<Font> f = it->second;
     assert(f->get_ref_count() > 1);
     return f.get();
 }
 
-font*
+Font*
 SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic) const
 {
 
     for (FontMap::const_iterator it=m_fonts.begin(), itEnd=m_fonts.end(); it != itEnd; ++it)
     {
-       font* f = it->second.get();
+       Font* f = it->second.get();
        if ( f->matches(name, bold, italic) ) return f;
     }
     return 0;
@@ -935,7 +935,7 @@ SWFMovieDefinition::importResources(
                         "movie '%s'"), symbolName, source->get_url());
 			continue;
         }
-        else if (font* f = dynamic_cast<font*>(res.get()))
+        else if (Font* f = dynamic_cast<Font*>(res.get()))
 		{
 			// Add this shared font to the currently-loading movie.
 			add_font(id, f);
