@@ -35,6 +35,8 @@ bool
 TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         int advanceBits, tag_type tag)
 {
+    _glyphs.clear();
+
     in.ensureBytes(1);
     boost::uint8_t flags = in.read_u8();
         
@@ -55,7 +57,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
     if (hasFont)
     {
         in.ensureBytes(2);
-        boost::uint16_t    fontID = in.read_u16();
+        boost::uint16_t fontID = in.read_u16();
 
         _font = m.get_font(fontID);
         if (!_font)
