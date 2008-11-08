@@ -77,27 +77,6 @@ inline bool operator< (const kerning_pair& p1, const kerning_pair& p2)
 	}
 }
 
-/// Glyph info structure
-struct GlyphInfo
-{
-	// no glyph, default textured glyph, 0 advance
-	GlyphInfo();
-
-	// given glyph and advance, default textured glyph
-	GlyphInfo(boost::intrusive_ptr<shape_character_def> nGlyph, float nAdvance);
-
-	GlyphInfo(const GlyphInfo&);
-
-#ifdef GNASH_USE_GC
-	/// Mark any glyph and texture glyph resources as reachable
-	void markReachableResources() const;
-#endif
-
-	boost::intrusive_ptr<shape_character_def> glyph;
-
-	float advance;
-};
-
 /// \brief
 /// A 'font' definition as read from SWF::DefineFont,
 /// SWF::DefineFont2 or SWF::DefineFont3 tags.
@@ -245,8 +224,30 @@ public:
 
 	bool	isBold() const { return m_is_bold; }
 	bool	isItalic() const { return m_is_italic; }
+
 private:
 
+    /// Glyph info structure
+    struct GlyphInfo
+    {
+        // no glyph, default textured glyph, 0 advance
+        GlyphInfo();
+
+        // given glyph and advance, default textured glyph
+        GlyphInfo(boost::intrusive_ptr<shape_character_def> glyph,
+                float advance);
+
+        GlyphInfo(const GlyphInfo&);
+
+#ifdef GNASH_USE_GC
+        /// Mark any glyph and texture glyph resources as reachable
+        void markReachableResources() const;
+#endif
+
+        boost::intrusive_ptr<shape_character_def> glyph;
+
+        float advance;
+    };
 	/// Read the table that maps from glyph indices to character codes.
 	void	read_code_table(SWFStream& in);
 
@@ -283,8 +284,8 @@ private:
 	GlyphInfoVect _deviceGlyphTable;
 
 	std::string	m_name;
-        std::string     m_display_name;
-        std::string     m_copyright_name;
+    std::string     m_display_name;
+    std::string     m_copyright_name;
 
 	bool	m_has_layout;
 	bool	m_unicode_chars;
