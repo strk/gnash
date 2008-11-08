@@ -46,10 +46,13 @@
 //#define GNASH_DEBUG_MIXING
 
 // Debug create_sound/delete_sound/play_sound/stop_sound, loops
-#define GNASH_DEBUG_SOUNDS_MANAGEMENT
+//#define GNASH_DEBUG_SOUNDS_MANAGEMENT
 
 // Debug sound decoding
-#define GNASH_DEBUG_SOUNDS_DECODING
+//#define GNASH_DEBUG_SOUNDS_DECODING
+
+// Debug samples fetching
+//#define GNASH_DEBUG_SAMPLES_FETCHING
 
 namespace { // anonymous
 
@@ -107,7 +110,6 @@ SDL_sound_handler::initAudioSpec()
 SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
     :
     soundOpened(false),
-    soundsPlaying(0),
     muted(false)
 {
 
@@ -130,7 +132,6 @@ SDL_sound_handler::SDL_sound_handler(const std::string& wavefile)
 SDL_sound_handler::SDL_sound_handler()
     :
     soundOpened(false),
-    soundsPlaying(0),
     muted(false)
 {
     initAudioSpec();
@@ -158,10 +159,10 @@ SDL_sound_handler::delete_all_sounds()
         // The sound may have been deleted already.
         if (!sdef) continue;
 
-        size_t nInstances = sdef->_soundInstances.size();
+        size_t nInstances = sdef->numPlayingInstances();
 
-        // Decrement callback clients count 
-        soundsPlaying -= nInstances;
+        log_debug("delete_all_sounds: marking %d instances of embedded sound as stopped",
+                    nInstances);
 
         // Increment number of sound stop request for the testing framework
         _soundsStopped += nInstances;
@@ -259,15 +260,6 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
 {
     boost::mutex::scoped_lock lock(_mutex);
 
-    // Increment number of sound start request for the testing framework
-    ++_soundsStarted;
-
-    // Check if audio is muted
-    if (muted)
-    {
-        return;
-    }
-
     // Check if the sound exists
     if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
     {
@@ -325,7 +317,7 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
     // @todo: plug the returned EmbedSoundInst to the set
     //        of InputStream channels !
     //
-    /*InputStream* sound =*/ sounddata.createInstance(
+    std::auto_ptr<InputStream> sound ( sounddata.createInstance(
 
             // MediaHandler to use for decoding
             *_mediaHandler,
@@ -345,78 +337,100 @@ SDL_sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
             // Loop count
             loopCount
 
-    );
+    ) );
 
-    if (!soundOpened) {
-        if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-            log_error(_("Unable to start SDL sound: %s"), SDL_GetError());
-            return;
-        }
-        soundOpened = true;
-
-    }
-
-    // Increment callback clients count 
-    ++soundsPlaying;
-
-    if (soundsPlaying == 1) {
-#ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
-        log_debug("Unpausing SDL Audio...");
-#endif
-        SDL_PauseAudio(0);
-    }
-
+    plugInputStream(sound);
 }
 
 
-void    SDL_sound_handler::stop_sound(int sound_handle)
+void
+SDL_sound_handler::stop_sound(int sound_handle)
 {
     boost::mutex::scoped_lock lock(_mutex);
 
     // Check if the sound exists.
     if (sound_handle < 0 || (unsigned int) sound_handle >= _sounds.size())
     {
+        log_debug("stop_sound(%d): invalid sound id", sound_handle);
         // Invalid handle.
         return;
     }
 
     
     EmbedSound* sounddata = _sounds[sound_handle];
+    if ( ! sounddata )
+    {
+        log_error("stop_sound(%d): sound was deleted", sound_handle);
+        return;
+    }
 
-    size_t nInstances = sounddata->_soundInstances.size();
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("stop_sound %d called", sound_handle);
+#endif
 
-    // Decrement callback clients count 
-    soundsPlaying -= nInstances;
-
-    // Increment number of sound stop request for the testing framework
-    _soundsStopped += nInstances;
-
-    sounddata->clearInstances();
+    stopEmbedSoundInstances(*sounddata);
 
 }
 
 
 // this gets called when it's done with a sample.
-void    SDL_sound_handler::delete_sound(int sound_handle)
+void
+SDL_sound_handler::delete_sound(int sound_handle)
 {
     boost::mutex::scoped_lock lock(_mutex);
+
+    // Check if the sound exists
+    if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
+    {
+        log_error("Invalid (%d) sound_handle passed to delete_sound, "
+                  "doing nothing", sound_handle);
+        return;
+    }
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
     log_debug ("deleting sound :%d", sound_handle);
 #endif
 
-    if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < _sounds.size())
+    EmbedSound* def = _sounds[sound_handle];
+    if ( ! def )
     {
-        delete _sounds[sound_handle];
-        _sounds[sound_handle] = NULL;
+        log_error("sound_handle passed to delete_sound (%d) "
+                  "already deleted", sound_handle);
+        return;
     }
+    
+    stopEmbedSoundInstances(*def);
+    delete def;
+    _sounds[sound_handle] = NULL;
 
 }
 
-// This will stop all sounds playing. Will cause problems if the soundhandler is made static
-// and supplys sound_handling for many SWF's, since it will stop all sounds with no regard
-// for what sounds is associated with what SWF.
-void    SDL_sound_handler::stop_all_sounds()
+void   
+SDL_sound_handler::stopEmbedSoundInstances(EmbedSound& def)
+{
+    // Assert _mutex is locked ...
+
+    typedef std::vector<InputStream*> InputStreamVect;
+    InputStreamVect playing;
+    def.getPlayingInstances(playing);
+
+    // Now, for each playing InputStream, unplug it!
+    // NOTE: could be optimized...
+    for (InputStreamVect::iterator i=playing.begin(), e=playing.end();
+            i!=e; ++i)
+    {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+        log_debug(" unplugging input stream %p from stopEmbedSoundInstances", *i);
+#endif
+
+        unplugInputStreamNonLocking(*i);
+    }
+
+    def.clearInstances();
+}
+
+void   
+SDL_sound_handler::stop_all_sounds()
 {
     boost::mutex::scoped_lock lock(_mutex);
 
@@ -424,18 +438,7 @@ void    SDL_sound_handler::stop_all_sounds()
                           e = _sounds.end(); i != e; ++i)
     {
         EmbedSound* sounddata = *i;
-
-        // The sound may have been deleted already.     
-        if (!sounddata) continue;
-        size_t nInstances = sounddata->_soundInstances.size();
-
-        // Decrement callback clients count 
-        soundsPlaying -= nInstances;
-
-        // Increment number of sound stop request for the testing framework
-        _soundsStopped += nInstances;
-
-        sounddata->clearInstances();
+        stopEmbedSoundInstances(*sounddata);
     }
 }
 
@@ -524,36 +527,13 @@ SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
     assert(owner);
     assert(ptr);
 
-    AuxStream* newStreamer = new AuxStream(ptr, owner);
+    std::auto_ptr<InputStream> newStreamer ( new AuxStream(ptr, owner) );
 
-    if ( ! _inputStreams.insert(newStreamer).second )
-    {
-        // this should never happen !
-        log_error("_inputStreams container still has a pointer "
-            "to a deleted InputStream!");
-        abort();
-        
-    }
+    InputStream* ret = newStreamer.get();
 
-    if (!soundOpened) {
-        if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-                boost::format fmt = boost::format(
-                _("Unable to start aux SDL sound: %s"))
-                % SDL_GetError();
-            throw SoundException(fmt.str());
-        }
-        soundOpened = true;
-    }
+    plugInputStream(newStreamer);
 
-    // Increment callback clients count 
-    ++soundsPlaying;
-
-#ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
-    log_debug("Unpausing SDL Audio...");
-#endif
-    SDL_PauseAudio(0);
-
-    return newStreamer;
+    return ret;
 }
 
 void
@@ -561,6 +541,12 @@ SDL_sound_handler::unplugInputStream(InputStream* id)
 {
     boost::mutex::scoped_lock lock(_mutex);
 
+    unplugInputStreamNonLocking(id);
+}
+
+void
+SDL_sound_handler::unplugInputStreamNonLocking(InputStream* id)
+{
     // WARNING: erasing would break any iteration in the set
     InputStreams::iterator it2=_inputStreams.find(id);
     if ( it2 == _inputStreams.end() )
@@ -572,6 +558,15 @@ SDL_sound_handler::unplugInputStream(InputStream* id)
     }
 
     _inputStreams.erase(it2);
+
+    // Increment number of sound stop request for the testing framework
+    _soundsStopped++;
+
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("Unplugged InputStream %p", id);
+#endif
+
+    // Delete the InputStream (we own it..)
     delete id;
 }
 
@@ -619,11 +614,10 @@ SDL_sound_handler::tell(int sound_handle)
     EmbedSound* sounddata = _sounds[sound_handle];
 
     // If there is no active sounds, return 0
-    if (sounddata->_soundInstances.empty()) return 0;
+    if ( ! sounddata->isPlaying() ) return 0;
 
     // We use the first active sound of this.
-    //EmbedSoundInst* asound = sounddata->_soundInstances.front();
-    InputStream* asound = sounddata->_soundInstances.front();
+    InputStream* asound = sounddata->firstPlayingInstance();
 
     // Return the playhead position in milliseconds
     unsigned int samplesPlayed = asound->samplesFetched();
@@ -755,7 +749,8 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
 
     // If nothing to play there is no reason to play
     // Is this a potential deadlock problem?
-    if (soundsPlaying == 0 && _inputStreams.empty()) {
+    if (_inputStreams.empty())
+    {
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
         log_debug("Pausing SDL Audio...");
 #endif
@@ -774,6 +769,10 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
         unsigned int nSamples = buffer_length/2;
         boost::scoped_array<boost::int16_t> buf ( new boost::int16_t[nSamples] );
 
+#ifdef GNASH_DEBUG_SAMPLES_FETCHING
+        log_debug("Fetching %d samples for %d input streams", nSamples, _inputStreams.size());
+#endif
+
         // Loop through the aux streamers sounds
         InputStreams::iterator it = _inputStreams.begin();
         InputStreams::iterator end = _inputStreams.end();
@@ -781,12 +780,20 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
         {
             InputStream* is = *it;
 
+            // Should we use mixIn here instead of doing manually ?
+
             unsigned int wrote = is->fetchSamples(buf.get(), nSamples);
             if ( wrote < nSamples )
             {
                 // fill what wasn't written
                 std::fill(buf.get()+wrote, buf.get()+nSamples, 0);
             }
+
+#ifdef GNASH_DEBUG_SAMPLES_FETCHING
+            log_debug("  fetched %d/%d samples from input stream %p"
+                    " (%d samples fetchehd in total)",
+                    wrote, nSamples, is, is->samplesFetched());
+#endif
 
             // On EOF, detach
             if (is->eof())
@@ -800,28 +807,29 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
                     abort();
                 }
                 it = it2;
+
+                log_debug("fetchSamples: marking stopped InputStream %p (on EOF)", is);
+
+                // WARNING! deleting the InputStream here means
+                //          a lot of things will happen from a
+                //          separate thread. Instead, if we
+                //          extend sound_handler interface to
+                //          have an unplugCompletedInputStreams
+                //          we may call it at heart-beating intervals
+                //          and drop any threading paranoia!
                 delete is;
-                // Decrement callback clients count 
-                soundsPlaying--;
+
+                // Increment number of sound stop request for the testing framework
+                _soundsStopped++;
             }
             else
             {
                 ++it;
             }
+
             SDL_MixAudio(stream, reinterpret_cast<Uint8*>(buf.get()), buffer_length, finalVolume);
 
         }
-    }
-
-    const SDL_sound_handler::Sounds& soundData = _sounds;
-
-    // Run through all the sounds. TODO: don't call .size() at every iteration !
-    for (SDL_sound_handler::Sounds::const_iterator i = soundData.begin(),
-                e = soundData.end(); i != e; ++i)
-    {
-        // Check whether sound has been deleted first.
-        if (!*i) continue;
-        mixSoundData(**i, buffer, buffer_length);
     }
 
     // 
@@ -881,44 +889,41 @@ SDL_sound_handler::mixIn(InputStream& sound, Uint8* buf, unsigned int nSamples)
     return wrote;
 }
 
-/*private*/
 void
-SDL_sound_handler::mixSoundData(EmbedSound& sounddata, Uint8* buffer, unsigned int buffer_length)
+SDL_sound_handler::plugInputStream(std::auto_ptr<InputStream> newStreamer)
 {
-    assert(!(buffer_length%2));
-    unsigned int nSamples = buffer_length/2;
+    InputStream* newStream = newStreamer.get(); // for debugging
 
-    for (EmbedSound::Instances::iterator
-         i=sounddata._soundInstances.begin();
-         i != sounddata._soundInstances.end(); // don't cache .end(), isn't necessarely safe on erase
-        )
+    if ( ! _inputStreams.insert(newStreamer.release()).second )
     {
-
-        // Temp variables to make the code simpler and easier to read
-        InputStream& sound = *(*i); 
-
-        /* unsigned int mixed = */ mixIn(sound, buffer, nSamples);
-        if ( sound.eof() ) // unplug an InputStream run out of data
-        {
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-            log_debug("Instance of sound reached eof, unplugging");
-#endif
-            // Sound is done, remove it from the active list
-
-            // WARNING: can't use 'sound' anymore from now on!
-            i = sounddata.eraseActiveSound(i);
-
-            // Decrement callback clients count 
-            soundsPlaying--;
-
-            // Increment number of sound stop request for the testing framework
-            _soundsStopped++;
-        } 
-        else
-        {
-            ++i;
-        }
+        // this should never happen !
+        log_error("_inputStreams container still has a pointer "
+            "to deleted InputStream %p!", newStreamer.get());
+        // FIXME: replace the old element with the new one !
+        abort();
     }
+
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("Plugged InputStream %p", newStream);
+#endif
+
+    // Increment number of sound start request for the testing framework
+    ++_soundsStarted;
+
+    if (!soundOpened) {
+        if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
+                boost::format fmt = boost::format(
+                _("Unable to open SDL audio: %s"))
+                % SDL_GetError();
+            throw SoundException(fmt.str());
+        }
+        soundOpened = true;
+    }
+
+#ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
+    log_debug("Unpausing SDL Audio...");
+#endif
+    SDL_PauseAudio(0);
 }
 
 } // gnash.sound namespace 

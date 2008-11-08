@@ -82,7 +82,7 @@ public:
     ///     Number of times this instance should loop over the defined sound.
     ///     @todo document if every loop starts at secsOffset !
     ///
-    EmbedSoundInst(const EmbedSound& def, media::MediaHandler& mh,
+    EmbedSoundInst(EmbedSound& def, media::MediaHandler& mh,
             unsigned long blockOffset, unsigned int secsOffset,
             const SoundEnvelopes* envelopes,
             unsigned int loopCount);
@@ -95,6 +95,12 @@ public:
 
     // See dox in sound_handler.h (InputStream)
     bool eof() const;
+
+    /// Unregister self from the associated EmbedSound
+    //
+    /// WARNING: must be thread-safe!
+    ///
+    ~EmbedSoundInst();
 
 private:
 
@@ -275,7 +281,11 @@ private:
     boost::int16_t* getDecodedData(unsigned long int pos);
 
     /// The encoded data
-    const EmbedSound& _soundDef;
+    //
+    /// It is non-const because we deregister ourselves
+    /// from its container of playing instances on destruction
+    ///
+    EmbedSound& _soundDef;
 
     /// The decoded buffer
     //

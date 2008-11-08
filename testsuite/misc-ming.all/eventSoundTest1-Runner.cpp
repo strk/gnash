@@ -60,6 +60,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	dbglogfile.setVerbosity(2);
 	//dbglogfile.setActionDump(1);
 
 	MovieClip* root = tester.getRootMovie();

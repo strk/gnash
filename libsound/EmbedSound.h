@@ -25,13 +25,16 @@
 
 #include <map> // for composition (m_frame_size)
 #include <memory> // for auto_ptr (composition)
+#include <set> // for composition (_soundInstances)
 #include <cassert>
+#include <boost/thread/mutex.hpp>
 
 
 // Forward declarations
 namespace gnash {
     namespace sound {
         class EmbedSoundInst;
+        class InputStream;
     }
     namespace media {
         class MediaHandler;
@@ -125,13 +128,29 @@ public:
     }
 
     /// Are there known playing instances of this sound ?
-    bool isPlaying() const {
-        return !_soundInstances.empty();
-    }
+    //
+    /// Locks _soundInstancesMutex
+    ///
+    bool isPlaying() const;
+
+    /// Return number of playing instances of this sound
+    //
+    /// Locks _soundInstancesMutex
+    ///
+    size_t numPlayingInstances() const;
+
+    /// Append to the given vector all playing instances of this sound def
+    void getPlayingInstances(std::vector<InputStream*>& to) const;
+
+    /// Return the first created instance of this sound
+    //
+    /// Locks _soundInstancesMutex
+    ///
+    EmbedSoundInst* firstPlayingInstance() const;
 
     /// Create an instance of this sound
     //
-    /// The returned instance is owned by this class
+    /// The returned instance ownership is transferred
     ///
     /// @param mh
     ///     The MediaHandler to use for on-demand decoding
@@ -158,7 +177,10 @@ public:
     /// @todo split this in createEventSoundInstance
     ///                 and createStreamingSoundInstance
     ///
-    EmbedSoundInst* createInstance( media::MediaHandler& mh,
+    ///
+    /// Locks the _soundInstancesMutex when pushing to it
+    ///
+    std::auto_ptr<EmbedSoundInst> createInstance( media::MediaHandler& mh,
             unsigned long blockOffset, unsigned int secsOffset,
             const SoundEnvelopes* envelopes, unsigned int loopCount);
 
@@ -168,20 +190,52 @@ public:
 
     /// Vector containing the active instances of this sounds being played
     //
-    /// NOTE: This class *owns* all active sounds
+    /// NOTE: This class does NOT own the active sounds
     ///
     typedef std::list<EmbedSoundInst*> Instances;
 
+    /// Playing instances of this sound definition
+    //
+    /// Multithread access to this member is protected
+    /// by the _soundInstancesMutex mutex
+    ///
+    /// @todo make private
+    ///
     Instances _soundInstances;
 
+    /// Mutex protecting access to _soundInstances
+    //
+    /// @todo make private
+    ///
+    mutable boost::mutex _soundInstancesMutex;
+
     /// Drop all active sounds
+    //
+    /// Locks _soundInstancesMutex
+    ///
     void clearInstances();
 
     /// Drop an active sound (by iterator)
     //
+    /// Does *NOT* lock the _soundInstancesMutex
+    ///
     /// @return iterator after the one being erased
     ///
     Instances::iterator eraseActiveSound(Instances::iterator i);
+
+    /// Drop an active sound (by pointer)
+    //
+    /// @param inst The active sound instance to unregister
+    ///
+    /// This is intended to be called by EmbedSoundInst
+    /// destructor, which may be called by a separate thread
+    /// so MUST be thread-safe
+    ///
+    /// Does lock the _soundInstancesMutex
+    ///
+    /// @todo make private and mark EmbedSoundInst as friend ?
+    ///
+    void eraseActiveSound(EmbedSoundInst* inst);
 };
 
 } // gnash.sound namespace 

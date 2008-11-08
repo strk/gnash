@@ -75,9 +75,6 @@ private:
 
     void initAudioSpec();
     
-    /// Keeps track of numbers of playing sounds
-    int soundsPlaying;
-
     /// Is the audio muted?
     bool muted;
     
@@ -92,8 +89,6 @@ private:
 
     // write a .WAV file header
     void write_wave_header(std::ofstream& outfile);
-
-    void mixSoundData(EmbedSound& sounddata, Uint8* stream, unsigned int buffer_length);
 
     /// Mix an InputStream in
     //
@@ -128,6 +123,19 @@ private:
     ///     (negative is probably an SDL bug, zero dunno yet).
     ///
     static void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in);
+
+    /// Non-locking version of unplugInputStream
+    //
+    /// Used when lock is already obtained by caller.
+    /// Increments _soundsStopped.
+    ///
+    void unplugInputStreamNonLocking(InputStream* id);
+
+    /// Stop all instances of an embedded sound
+    //
+    /// Does NOT lock _mutex
+    ///
+    void stopEmbedSoundInstances(EmbedSound& def);
 
 public:
 
@@ -189,6 +197,17 @@ public:
 
     // See dox in sound_handler.h
     virtual void unplugInputStream(InputStream* id);
+
+    /// Plug an InputStream to the mixer
+    //
+    /// @param in
+    ///     The InputStream to plug, ownership transferred
+    ///
+    /// @todo turn into a virtual of base class !
+    ///
+    /// Does NOT lock _mutex, make sure you lock before calling ?
+    ///
+    void plugInputStream(std::auto_ptr<InputStream> in);
 
     /// Refills the output buffer with data.
     //

@@ -44,7 +44,7 @@ EmbedSoundInst::samplesFetched() const
     return _samplesFetched;
 }
 
-EmbedSoundInst::EmbedSoundInst(const EmbedSound& soundData,
+EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
             media::MediaHandler& mediaHandler,
             unsigned long blockOffset, unsigned int secsOffset,
             const SoundEnvelopes* env,
@@ -397,6 +397,11 @@ EmbedSoundInst::eof() const
     // it isn't threaded, but just in case, we call decodingCompleted first
     // and we also check loopCount... (over paranoid?)
     return ( decodingCompleted() && !loopCount && !decodedSamplesAhead() );
+}
+
+EmbedSoundInst::~EmbedSoundInst()
+{
+    _soundDef.eraseActiveSound(this);
 }
 
 } // gnash.sound namespace 

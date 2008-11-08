@@ -87,33 +87,33 @@ EmbedSound::EmbedSound(std::auto_ptr<SimpleBuffer> data,
 void
 EmbedSound::clearInstances()
 {
-    for (Instances::iterator i=_soundInstances.begin(), e=_soundInstances.end(); i!=e; ++i)
-    {
-        delete *i;
-    }
+    boost::mutex::scoped_lock lock(_soundInstancesMutex);
     _soundInstances.clear();
 }
 
 EmbedSound::Instances::iterator
 EmbedSound::eraseActiveSound(Instances::iterator i)
 {
-    delete *i;
+    // Mutex intentionally NOT locked...
     return _soundInstances.erase(i);
 }
 
-EmbedSoundInst*
+std::auto_ptr<EmbedSoundInst>
 EmbedSound::createInstance(media::MediaHandler& mh,
             unsigned long blockOffset, unsigned int secsOffset,
             const SoundEnvelopes* envelopes,
             unsigned int loopCount)
 {
-    EmbedSoundInst* ret = new EmbedSoundInst(*this,
+    std::auto_ptr<EmbedSoundInst> ret ( new EmbedSoundInst(
+                                *this,
                                 mh, blockOffset,
                                 secsOffset, envelopes,
-                                loopCount);
+                                loopCount) );
+
+    boost::mutex::scoped_lock lock(_soundInstancesMutex);
 
     // Push the sound onto the playing sounds container.
-    _soundInstances.push_back(ret);
+    _soundInstances.push_back(ret.get());
 
     return ret;
 }
@@ -123,6 +123,56 @@ EmbedSound::~EmbedSound()
     clearInstances();
 }
 
+void
+EmbedSound::eraseActiveSound(EmbedSoundInst* inst)
+{
+    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+
+    Instances::iterator it = std::find(
+            _soundInstances.begin(),
+            _soundInstances.end(),
+            inst);
+
+    if ( it == _soundInstances.end() )
+    {
+        log_error("EmbedSound::eraseActiveSound: instance %p not found!", inst);
+        return;
+    }
+    
+    eraseActiveSound(it);
+}
+
+bool
+EmbedSound::isPlaying() const
+{
+    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    return !_soundInstances.empty();
+}
+
+size_t
+EmbedSound::numPlayingInstances() const
+{
+    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    return _soundInstances.size();
+}
+
+EmbedSoundInst*
+EmbedSound::firstPlayingInstance() const
+{
+    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    return _soundInstances.front();
+}
+
+void
+EmbedSound::getPlayingInstances(std::vector<InputStream*>& to) const
+{
+    boost::mutex::scoped_lock lock(_soundInstancesMutex);
+    for (Instances::const_iterator i=_soundInstances.begin(), e=_soundInstances.end();
+            i!=e; ++i)
+    {
+        to.push_back(*i);
+    }
+}
 
 } // gnash.sound namespace 
 } // namespace gnash
