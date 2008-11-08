@@ -27,7 +27,6 @@
 #include "swf.h"
 #include "Font.h"
 #include <vector>
-#include <map>
 
 // Forward declarations
 namespace gnash {
@@ -39,20 +38,39 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
 
+/// Read and store DefineFont and DefineFont2 tag.
 class DefineFontTag
 {
 public:
+
+    /// Load a DefineFont tag.
+    //
+    /// A corresponding Font is created and added to the movie_definition.
     static void loader(SWFStream& in, tag_type tag, movie_definition& m,
             const RunInfo& r);
 
+    /// Return the glyphs read from the DefineFont tag.
     const Font::GlyphInfoRecords& glyphTable() const {
         return _glyphTable;
     }
 
+    /// Check for the existence of a Font::CodeTable.
+    //
+    /// @return     True if the tag has a Font::CodeTable.
+    //
+    /// This can only be true for a DefineFont2 tag.
     bool hasCodeTable() const {
         return _codeTable.get();
     }
     
+    /// Retrieve the tag's Font::CodeTable.
+    //
+    /// This DefineFontTag always retains ownership, and the CodeTable
+    /// may not be altered.
+    //
+    /// @return     shared ownership of the tag's Font::CodeTable. This
+    ///             may be NULL, which can be checked first with
+    ///             hasCodeTable().
     boost::shared_ptr<const Font::CodeTable> getCodeTable() const {
         return _codeTable;
     }
@@ -74,7 +92,7 @@ public:
         void markReachableResources() const;
 #endif
 
-    /// Read the table that maps from glyph indices to character codes.
+    /// Read Font::CodeTable, which maps glyph indices to character codes.
 	static void readCodeTable(SWFStream& in, Font::CodeTable& table,
             bool wideCodes, size_t glyphCount);
 
@@ -82,10 +100,13 @@ private:
 
     DefineFontTag(SWFStream& in, movie_definition& m, tag_type tag);
 
+    /// Read a DefineFont tag.
     void readDefineFont(SWFStream& in, movie_definition & m);
 
+    /// Read a DefineFont2 or DefineFont3 tag.
     void readDefineFont2Or3(SWFStream& in, movie_definition& m);
 
+    /// The GlyphInfo records contained in the tag.
     Font::GlyphInfoRecords _glyphTable;
 
     std::string _name;

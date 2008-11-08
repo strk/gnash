@@ -88,7 +88,8 @@ inline bool operator< (const kerning_pair& p1, const kerning_pair& p2)
 class Font : public ExportableResource
 {
 public:
-	// This table maps from Unicode character number to glyph index.
+
+    // This table maps from Unicode character number to glyph index.
 	typedef std::map<boost::uint16_t, int> CodeTable;
 
 	Font(std::auto_ptr<SWF::DefineFontTag> ft);
@@ -214,7 +215,7 @@ public:
 	unsigned short int unitsPerEM(bool embedded) const;
 
     // TODO: what about device fonts?
-	float	get_leading() const;
+	float get_leading() const;
  
     // TODO: what about device fonts?
     float get_descent() const;
@@ -293,7 +294,7 @@ private:
     /// substituted by a device font. This can arise with
     /// a) a DefineFont tag without a corresponding DefineFontInfo
     ///    or DefineFontInfo2, or
-    /// b) a DefineFont2 tag with no CodeTable.
+    /// b) a DefineFont2 or DefineFont3 tag with no CodeTable.
     ///
     /// It is a shared_ptr to avoid changing an original
     /// DefineFont2Tag, while allowing this class to take ownership
