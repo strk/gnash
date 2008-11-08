@@ -101,9 +101,10 @@ Font::~Font()
 shape_character_def*
 Font::get_glyph(int index, bool embedded) const
 {
-    if (embedded) assert(_fontTag);
-    const GlyphInfoRecords& lookup = embedded ? _fontTag->glyphTable()
-                                            : _deviceGlyphTable;
+    // What to do if embedded is true and this is a
+    // device-only font?
+    const GlyphInfoRecords& lookup = (embedded && _fontTag) ? 
+            _fontTag->glyphTable() : _deviceGlyphTable;
 
     if (index >= 0 && (size_t)index < lookup.size())
     {
@@ -187,17 +188,18 @@ int	Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 
 float Font::get_advance(int glyph_index, bool embedded) const
 {
-    if (embedded) assert(_fontTag.get());
-    const GlyphInfoRecords& lookup = embedded ? 
-        _fontTag->glyphTable() : _deviceGlyphTable;
+    // What to do if embedded is true and this is a
+    // device-only font?
+    const GlyphInfoRecords& lookup = (embedded && _fontTag) ? 
+            _fontTag->glyphTable() : _deviceGlyphTable;
 
-    if (glyph_index <= -1)
+    if (glyph_index < 0)
     {
         // Default advance.
         return 512.0f;
     }
 
-    if ((size_t)glyph_index < lookup.size())
+    if (static_cast<size_t>(glyph_index) < lookup.size())
     {
         assert(glyph_index >= 0);
         return lookup[glyph_index].advance;
@@ -221,7 +223,7 @@ float	Font::get_kerning_adjustment(int last_code, int code) const
     kernings_table::const_iterator it = m_kerning_pairs.find(k);
     if ( it != m_kerning_pairs.end() )
     {
-        float	adjustment = it->second;
+        float adjustment = it->second;
         return adjustment;
     }
     return 0;
@@ -231,10 +233,11 @@ unsigned short int Font::unitsPerEM(bool embed) const
 {
     // the EM square is 1024 x 1024 for DefineFont up to 2
     // and 20 as much for DefineFont3 up
-    if ( embed )
+    if (embed)
     {
-        assert(_fontTag);
-        if ( _fontTag->subpixelFont() ) return 1024*20;
+        // If this is not an embedded font, what should we do
+        // here?
+        if ( _fontTag && _fontTag->subpixelFont() ) return 1024 * 20;
         else return 1024;
     }
     else

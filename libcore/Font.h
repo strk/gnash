@@ -294,6 +294,10 @@ private:
     /// a) a DefineFont tag without a corresponding DefineFontInfo
     ///    or DefineFontInfo2, or
     /// b) a DefineFont2 tag with no CodeTable.
+    ///
+    /// It is a shared_ptr to avoid changing an original
+    /// DefineFont2Tag, while allowing this class to take ownership
+    /// of CodeTables from a DefineFontInfo tag.
     boost::shared_ptr<const CodeTable> _embeddedCodeTable; 
 
 	/// Code to index table for device glyphs
