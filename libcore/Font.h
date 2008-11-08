@@ -1,4 +1,4 @@
-// font.h -- font class, for Gnash
+// Font.h -- Font class, for Gnash
 //
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -84,17 +84,17 @@ inline bool operator< (const kerning_pair& p1, const kerning_pair& p2)
 }
 
 /// \brief
-/// A 'font' definition as read from SWF::DefineFont,
+/// A 'Font' definition as read from SWF::DefineFont,
 /// SWF::DefineFont2 or SWF::DefineFont3 tags.
 /// Includes definitions from SWF::DefineFontInfo tags
 ///
-class font : public ExportableResource
+class Font : public ExportableResource
 {
 public:
 	// This table maps from Unicode character number to glyph index.
 	typedef std::map<boost::uint16_t, int> code_table;
 
-	font(std::auto_ptr<SWF::DefineFontTag> ft);
+	Font(std::auto_ptr<SWF::DefineFontTag> ft);
 
 	/// Create a device-font only font, using the given name to find it
 	//
@@ -107,9 +107,9 @@ public:
 	/// @param italic
 	///	Whether to use the italic variant of the font.
 	///
-	font(const std::string& name, bool bold=false, bool italic=false);
+	Font(const std::string& name, bool bold=false, bool italic=false);
 
-	~font();
+	~Font();
 
 	/// Return true if this font matches given name and flags
 	//
@@ -252,13 +252,6 @@ public:
 	static void read_code_table(SWFStream& in, code_table& table, bool wide, size_t num);
 
 private:
-
-
-	/// Read a DefineFont2 or DefineFont3 tag
-	void readDefineFont2_or_3(SWFStream& in, movie_definition& m);
-
-	/// Read a DefineFont tag
-	void readDefineFont(SWFStream& in, movie_definition& m);
 
 	/// Add a glyph from the os font into the device glyphs table
 	//

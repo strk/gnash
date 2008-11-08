@@ -19,7 +19,7 @@
 
 #include "DefineFontTag.h"
 #include "SWFStream.h"
-#include "font.h"
+#include "Font.h"
 #include "RunInfo.h"
 #include "swf.h"
 #include "movie_definition.h"
@@ -41,7 +41,7 @@ DefineFontTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     std::auto_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag));
 
-    font* f = new font(ft);
+    Font* f = new Font(ft);
 
     m.add_font(fontID, f);
 
@@ -253,9 +253,9 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
         return;
     }
 
-    std::auto_ptr<font::code_table> table(new font::code_table);
+    std::auto_ptr<Font::code_table> table(new Font::code_table);
 
-    font::read_code_table(in, *table, _wideCodes, _glyphTable.size());
+    Font::read_code_table(in, *table, _wideCodes, _glyphTable.size());
     _codeTable.reset(table.release());
 
     // Read layout info for the glyphs.

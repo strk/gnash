@@ -30,7 +30,7 @@
 #include "utility.h"
 #include "action.h"
 #include "action_buffer.h"
-#include "font.h"
+#include "Font.h"
 #include "fontlib.h"
 #include "log.h"
 #include "morph2_character_def.h"
@@ -834,7 +834,7 @@ void define_font_info_loader(SWFStream& in, tag_type tag, movie_definition& m,
     in.ensureBytes(2);
     boost::uint16_t font_id = in.read_u16();
 
-    font* f = m.get_font(font_id);
+    Font* f = m.get_font(font_id);
     if (f)
     {
         f->read_font_info(in, tag, m);
@@ -857,7 +857,7 @@ void define_font_name_loader(SWFStream& in, tag_type tag, movie_definition& m,
     in.ensureBytes(2);
     boost::uint16_t font_id = in.read_u16();
 
-    font* f = m.get_font(font_id);
+    Font* f = m.get_font(font_id);
     if (f)
     {
         f->read_font_name(in, tag, m);
@@ -964,7 +964,7 @@ void export_loader(SWFStream& in, tag_type tag, movie_definition& m,
             log_parse(_("  export: id = %d, name = %s"), id, symbolName);
         );
 
-        if (font* f = m.get_font(id))
+        if (Font* f = m.get_font(id))
         {
             // Expose this font for export.
             m.export_resource(symbolName, f);

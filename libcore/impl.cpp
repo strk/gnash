@@ -22,7 +22,6 @@
 #include "IOChannel.h"
 #include "utility.h"
 #include "impl.h"
-#include "font.h"
 #include "fontlib.h"
 #include "log.h"
 #include "GnashImage.h"

@@ -34,7 +34,7 @@
 #include "action.h" // for as_standard_member enum
 #include "VM.h"
 #include "builtin_function.h" // for getter/setter properties
-#include "font.h" // for using the _font member
+#include "Font.h" // for using the _font member
 #include "fontlib.h" // for searching or adding fonts the _font member
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
@@ -189,7 +189,7 @@ textfield_getTextFormat(const fn_call& fn)
     tf->colorSet(text->getTextColor());
     tf->underlinedSet(text->getUnderlined());
 
-    const font* font = text->getFont();
+    const Font* font = text->getFont();
     if (font)
     {
         tf->fontSet(font->get_name());
@@ -274,7 +274,7 @@ textfield_setTextFormat(const fn_call& fn)
             assert(mi);
             movie_definition* md = mi->get_movie_definition();
             assert(md);
-            font* f = md->get_font(fontName, bold, italic);
+            Font* f = md->get_font(fontName, bold, italic);
             if ( ! f ) f = fontlib::get_font(fontName, bold, italic);
             text->setFont( f );
         }
@@ -743,7 +743,7 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
 {
 
     // WARNING! remember to set the font *before* setting text value!
-    boost::intrusive_ptr<const font> f = def.getFont();
+    boost::intrusive_ptr<const Font> f = def.getFont();
     if (!f) f = fontlib::get_default_font(); 
     setFont(f);
 
@@ -799,7 +799,7 @@ TextField::TextField(character* parent, const rect& bounds)
 {
     // Use the default font (Times New Roman for Windows, Times for Mac
     // according to docs. They don't say what it is for Linux.
-    boost::intrusive_ptr<const font> f = fontlib::get_default_font(); 
+    boost::intrusive_ptr<const Font> f = fontlib::get_default_font(); 
     setFont(f);
 
     init();
@@ -1441,12 +1441,12 @@ TextField::align_line(TextAlignment align,
     return shift_right;
 }
 
-boost::intrusive_ptr<const font>
-TextField::setFont(boost::intrusive_ptr<const font> newfont)
+boost::intrusive_ptr<const Font>
+TextField::setFont(boost::intrusive_ptr<const Font> newfont)
 {
     if ( newfont == _font ) return _font;
 
-    boost::intrusive_ptr<const font> oldfont = _font;
+    boost::intrusive_ptr<const Font> oldfont = _font;
     set_invalidated();
     _font = newfont; 
     format_text();

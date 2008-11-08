@@ -24,7 +24,7 @@
 #define GNASH_SWF_DEFINEFONTTAG_H
 
 #include "swf.h"
-#include "font.h"
+#include "Font.h"
 #include <vector>
 #include <map>
 
@@ -44,7 +44,7 @@ public:
     static void loader(SWFStream& in, tag_type tag, movie_definition& m,
             const RunInfo& r);
 
-    const std::vector<font::GlyphInfo>& glyphTable() const {
+    const std::vector<Font::GlyphInfo>& glyphTable() const {
         return _glyphTable;
     }
 
@@ -52,7 +52,7 @@ public:
         return _codeTable.get();
     }
     
-    boost::shared_ptr<const font::code_table> getCodeTable() const {
+    boost::shared_ptr<const Font::code_table> getCodeTable() const {
         return _codeTable;
     }
 
@@ -76,7 +76,7 @@ private:
 
     void readDefineFont2Or3(SWFStream& in, movie_definition& m);
 
-    std::vector<font::GlyphInfo> _glyphTable;
+    std::vector<Font::GlyphInfo> _glyphTable;
 
     std::string _name;
     bool _subpixelFont;
@@ -94,7 +94,7 @@ private:
 	typedef std::map<kerning_pair, float> kernings_table;
 	kernings_table m_kerning_pairs;
 
-    boost::shared_ptr<const font::code_table> _codeTable;
+    boost::shared_ptr<const Font::code_table> _codeTable;
 };
 
 }

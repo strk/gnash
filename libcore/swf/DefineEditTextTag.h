@@ -27,8 +27,6 @@
 #include "swf.h" // for tag_type definition
 #include "RGBA.h"
 #include "TextField.h"
-// Move to cpp:
-#include "font.h"
 
 #include <boost/cstdint.hpp> // for boost::uint16_t and friends
  
@@ -38,7 +36,7 @@ namespace gnash {
 	class SWFStream;
 	class movie_definition;
 	class RunInfo;
-    class font;
+    class Font;
 }
 
 namespace gnash {
@@ -209,7 +207,7 @@ public:
 		return _useOutlines;
 	}
 
-    boost::intrusive_ptr<font> getFont() const
+    boost::intrusive_ptr<Font> getFont() const
     {
         return _font;
     }
@@ -293,7 +291,7 @@ private:
 	bool _useOutlines;
 
 	int	_fontID;
-	boost::intrusive_ptr<font> _font;
+	boost::intrusive_ptr<Font> _font;
 
 	/// height of font text, in twips
     // TODO: initialize to a meaningful value (see MovieClip::add_textfield)

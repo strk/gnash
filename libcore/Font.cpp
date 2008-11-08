@@ -1,4 +1,4 @@
-// font.cpp:  ActionScript font handling, for Gnash.
+// Font.cpp:  ActionScript Font handling, for Gnash.
 // 
 //   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -21,7 +21,7 @@
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "font.h"
+#include "Font.h"
 #include "SWFStream.h"
 #include "log.h"
 #include "movie_definition.h"
@@ -35,20 +35,20 @@
 namespace gnash {
 
 
-font::GlyphInfo::GlyphInfo()
+Font::GlyphInfo::GlyphInfo()
 	:
 	glyph(),
 	advance(0)
 {}
 
-font::GlyphInfo::GlyphInfo(boost::intrusive_ptr<shape_character_def> glyph,
+Font::GlyphInfo::GlyphInfo(boost::intrusive_ptr<shape_character_def> glyph,
         float advance)
 	:
 	glyph(glyph.get()),
 	advance(advance)
 {}
 
-font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
+Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 	:
 	glyph(o.glyph.get()),
 	advance(o.advance)
@@ -56,13 +56,13 @@ font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 
 #ifdef GNASH_USE_GC
 void
-font::GlyphInfo::markReachableResources() const
+Font::GlyphInfo::markReachableResources() const
 {
 	if ( glyph ) glyph->setReachable();
 }
 #endif
 
-font::font(std::auto_ptr<SWF::DefineFontTag> ft)
+Font::Font(std::auto_ptr<SWF::DefineFontTag> ft)
     :
     _fontTag(ft.release()),
     _name(_fontTag->name()),
@@ -78,7 +78,7 @@ font::font(std::auto_ptr<SWF::DefineFontTag> ft)
     if (_fontTag->hasCodeTable()) _embedded_code_table = _fontTag->getCodeTable();
 }
 
-font::font(const std::string& name, bool bold, bool italic)
+Font::Font(const std::string& name, bool bold, bool italic)
     :
     _fontTag(0),
     _name(name),
@@ -94,11 +94,11 @@ font::font(const std::string& name, bool bold, bool italic)
     assert(!_name.empty());
 }
 
-font::~font()
+Font::~Font()
 {
 }
 
-shape_character_def*	font::get_glyph(int index, bool embedded) const
+shape_character_def*	Font::get_glyph(int index, bool embedded) const
 {
     if (embedded) assert(_fontTag);
     const GlyphInfoVect& lookup = embedded ? _fontTag->glyphTable() : _deviceGlyphTable;
@@ -116,7 +116,7 @@ shape_character_def*	font::get_glyph(int index, bool embedded) const
 
 
 // Read the font name, display and legal, from a DefineFontName tag.
-void font::read_font_name(SWFStream& in, SWF::tag_type tag,
+void Font::read_font_name(SWFStream& in, SWF::tag_type tag,
     movie_definition& /*m*/) 
 {
     assert(tag == SWF::DEFINEFONTNAME);
@@ -127,7 +127,7 @@ void font::read_font_name(SWFStream& in, SWF::tag_type tag,
 // Read additional information about this font, from a
 // DefineFontInfo tag.  The caller has already read the tag
 // type and font id.
-void	font::read_font_info(SWFStream& in, SWF::tag_type tag,
+void	Font::read_font_info(SWFStream& in, SWF::tag_type tag,
         movie_definition& /*m*/)
 {
     assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
@@ -160,7 +160,7 @@ void	font::read_font_info(SWFStream& in, SWF::tag_type tag,
 }
 
 void
-font::read_code_table(SWFStream& in, code_table& table, bool wide, size_t num)
+Font::read_code_table(SWFStream& in, code_table& table, bool wide, size_t num)
 {
     IF_VERBOSE_PARSE (
     log_parse(_("reading code table at offset %lu"), in.tell());
@@ -191,7 +191,7 @@ font::read_code_table(SWFStream& in, code_table& table, bool wide, size_t num)
     }
 }
 
-int	font::get_glyph_index(boost::uint16_t code, bool embedded) const
+int	Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 {
     const code_table& ctable = (embedded && _embedded_code_table) ? 
         *_embedded_code_table : _device_code_table;
@@ -207,12 +207,12 @@ int	font::get_glyph_index(boost::uint16_t code, bool embedded) const
     // Try adding an os font, of possible
     if ( ! embedded )
     {
-        glyph_index = const_cast<font*>(this)->add_os_glyph(code);
+        glyph_index = const_cast<Font*>(this)->add_os_glyph(code);
     }
     return glyph_index;
 }
 
-float font::get_advance(int glyph_index, bool embedded) const
+float Font::get_advance(int glyph_index, bool embedded) const
 {
     if (embedded) assert(_fontTag.get());
     const GlyphInfoVect& lookup = embedded ? _fontTag->glyphTable() : _deviceGlyphTable;
@@ -239,7 +239,7 @@ float font::get_advance(int glyph_index, bool embedded) const
 
 // Return the adjustment in advance between the given two
 // characters.  Normally this will be 0; i.e. the 
-float	font::get_kerning_adjustment(int last_code, int code) const
+float	Font::get_kerning_adjustment(int last_code, int code) const
 {
     kerning_pair	k;
     k.m_char0 = last_code;
@@ -253,7 +253,7 @@ float	font::get_kerning_adjustment(int last_code, int code) const
     return 0;
 }
 
-unsigned short int font::unitsPerEM(bool embed) const
+unsigned short int Font::unitsPerEM(bool embed) const
 {
     // the EM square is 1024 x 1024 for DefineFont up to 2
     // and 20 as much for DefineFont3 up
@@ -279,7 +279,7 @@ unsigned short int font::unitsPerEM(bool embed) const
 }
 
 int
-font::add_os_glyph(boost::uint16_t code)
+Font::add_os_glyph(boost::uint16_t code)
 {
     if ( ! _ftProvider.get() )
     {
@@ -321,7 +321,7 @@ font::add_os_glyph(boost::uint16_t code)
 }
 
 bool
-font::initDeviceFontProvider() const
+Font::initDeviceFontProvider() const
 {
     if ( _name.empty() )
     {
@@ -339,26 +339,26 @@ font::initDeviceFontProvider() const
 }
 
 bool
-font::matches(const std::string& name, bool bold, bool italic) const
+Font::matches(const std::string& name, bool bold, bool italic) const
 {
 	return (_bold == bold && _italic == italic && name ==_name);
 }
 
 // TODO: what about device fonts?
 float
-font::get_leading() const {
+Font::get_leading() const {
     return _fontTag ? _fontTag->leading() : 0.0f;
 }
 
 // TODO: what about device fonts?
 float
-font::get_descent() const { 
+Font::get_descent() const { 
     return _fontTag ? _fontTag->leading() : 0.0f;
 }
     
 // TODO: what about device fonts?
 bool
-font::is_subpixel_font() const {
+Font::is_subpixel_font() const {
     return _fontTag ? _fontTag->subpixelFont() : false;
 }
 
@@ -369,7 +369,7 @@ font::is_subpixel_font() const {
 ///	- shape_character_defs (vector glyphs, devide and embeded)
 ///
 void
-font::markReachableResources() const
+Font::markReachableResources() const
 {
 // TODO: move to tag.
 #if 0
