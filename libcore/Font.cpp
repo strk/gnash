@@ -75,7 +75,7 @@ Font::Font(std::auto_ptr<SWF::DefineFontTag> ft)
     _bold(_fontTag->bold()),
     m_wide_codes(_fontTag->wideCodes())
 {
-    if (_fontTag->hasCodeTable()) _embedded_code_table = _fontTag->getCodeTable();
+    if (_fontTag->hasCodeTable()) _embeddedCodeTable = _fontTag->getCodeTable();
 }
 
 Font::Font(const std::string& name, bool bold, bool italic)
@@ -98,10 +98,12 @@ Font::~Font()
 {
 }
 
-shape_character_def*	Font::get_glyph(int index, bool embedded) const
+shape_character_def*
+Font::get_glyph(int index, bool embedded) const
 {
     if (embedded) assert(_fontTag);
-    const GlyphInfoVect& lookup = embedded ? _fontTag->glyphTable() : _deviceGlyphTable;
+    const GlyphInfoRecords& lookup = embedded ? _fontTag->glyphTable()
+                                            : _deviceGlyphTable;
 
     if (index >= 0 && (size_t)index < lookup.size())
     {
@@ -124,6 +126,7 @@ void Font::read_font_name(SWFStream& in, SWF::tag_type tag,
     in.read_string(m_copyright_name);
 }
 
+// TODO: move libcore/swf
 // Read additional information about this font, from a
 // DefineFontInfo tag.  The caller has already read the tag
 // type and font id.
@@ -154,50 +157,20 @@ void	Font::read_font_info(SWFStream& in, SWF::tag_type tag,
     _bold         = flags & (1 << 1);
     m_wide_codes      = flags & (1 << 0);
 
-    std::auto_ptr<code_table> table(new code_table);
-    read_code_table(in, *table, m_wide_codes, _fontTag->glyphTable().size());
-    _embedded_code_table.reset(table.release());
-}
+    std::auto_ptr<CodeTable> table(new CodeTable);
+    SWF::DefineFontTag::readCodeTable(in, *table, m_wide_codes,
+            _fontTag->glyphTable().size());
 
-void
-Font::read_code_table(SWFStream& in, code_table& table, bool wide, size_t num)
-{
-    IF_VERBOSE_PARSE (
-    log_parse(_("reading code table at offset %lu"), in.tell());
-    );
-
-    // Good. We can only do this once.
-    assert(table.empty());
-
-    if (wide)
-    {
-        in.ensureBytes(2 * num);
-        // Code table is made of boost::uint16_t's.
-        for (size_t i=0; i < num; ++i)
-        {
-            boost::uint16_t code = in.read_u16();
-            table.insert(std::make_pair(code, i));
-        }
-    }
-    else
-    {
-        // Code table is made of bytes.
-        in.ensureBytes(1 * num);
-        for (size_t i=0; i < num; ++i)
-        {
-            boost::uint8_t code = in.read_u8();
-            table.insert(std::make_pair(code, i));
-        }
-    }
+    _embeddedCodeTable.reset(table.release());
 }
 
 int	Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 {
-    const code_table& ctable = (embedded && _embedded_code_table) ? 
-        *_embedded_code_table : _device_code_table;
+    const CodeTable& ctable = (embedded && _embeddedCodeTable) ? 
+        *_embeddedCodeTable : _deviceCodeTable;
 
     int glyph_index = -1;
-    code_table::const_iterator it = ctable.find(code);
+    CodeTable::const_iterator it = ctable.find(code);
     if ( it != ctable.end() )
     {
         glyph_index = it->second;
@@ -215,7 +188,8 @@ int	Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 float Font::get_advance(int glyph_index, bool embedded) const
 {
     if (embedded) assert(_fontTag.get());
-    const GlyphInfoVect& lookup = embedded ? _fontTag->glyphTable() : _deviceGlyphTable;
+    const GlyphInfoRecords& lookup = embedded ? 
+        _fontTag->glyphTable() : _deviceGlyphTable;
 
     if (glyph_index <= -1)
     {
@@ -291,7 +265,7 @@ Font::add_os_glyph(boost::uint16_t code)
         }
     }
 
-    assert(_device_code_table.find(code) == _device_code_table.end());
+    assert(_deviceCodeTable.find(code) == _deviceCodeTable.end());
 
     float advance;
 
@@ -311,7 +285,7 @@ Font::add_os_glyph(boost::uint16_t code)
     int newOffset = _deviceGlyphTable.size();
 
     // Add the new glyph id
-    _device_code_table[code] = newOffset;
+    _deviceCodeTable[code] = newOffset;
 
     _deviceGlyphTable.push_back(GlyphInfo(sh, advance));
 
@@ -371,17 +345,9 @@ Font::is_subpixel_font() const {
 void
 Font::markReachableResources() const
 {
-// TODO: move to tag.
-#if 0
-	// Mark embed glyphs (textured and vector)
-	for (GlyphInfoVect::const_iterator i=_embedGlyphTable.begin(), e=_embedGlyphTable.end(); i!=e; ++i)
-	{
-		i->markReachableResources();
-	}
-#endif
-
 	// Mark device glyphs (textured and vector)
-	for (GlyphInfoVect::const_iterator i=_deviceGlyphTable.begin(), e=_deviceGlyphTable.end(); i!=e; ++i)
+	for (GlyphInfoRecords::const_iterator i = _deviceGlyphTable.begin(),
+            e=_deviceGlyphTable.end(); i != e; ++i)
 	{
 		i->markReachableResources();
 	}

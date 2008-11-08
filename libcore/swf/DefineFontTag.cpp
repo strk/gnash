@@ -47,6 +47,52 @@ DefineFontTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 }
 
+void
+DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
+        bool wideCodes, size_t glyphCount)
+{
+    IF_VERBOSE_PARSE (
+    log_parse(_("reading code table at offset %lu"), in.tell());
+    );
+
+    // Good. We can only do this once.
+    assert(table.empty());
+
+    if (wideCodes)
+    {
+        in.ensureBytes(2 * glyphCount);
+        // Code table is made of boost::uint16_t's.
+        for (size_t i=0; i < glyphCount; ++i)
+        {
+            boost::uint16_t code = in.read_u16();
+            table.insert(std::make_pair(code, i));
+        }
+    }
+    else
+    {
+        // Code table is made of bytes.
+        in.ensureBytes(1 * glyphCount);
+        for (size_t i=0; i < glyphCount; ++i)
+        {
+            boost::uint8_t code = in.read_u8();
+            table.insert(std::make_pair(code, i));
+        }
+    }
+}
+
+#ifdef GNASH_USE_GC
+void
+DefineFontTag::markReachableResources() const
+{
+	// Mark glyphs
+	for (Font::GlyphInfoRecords::const_iterator i = _glyphTable.begin(),
+            e = _glyphTable.end(); i != e; ++i)
+	{
+		i->markReachableResources();
+	}
+}
+#endif
+
 
 DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, tag_type tag)
     :
@@ -253,9 +299,9 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
         return;
     }
 
-    std::auto_ptr<Font::code_table> table(new Font::code_table);
+    std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
 
-    Font::read_code_table(in, *table, _wideCodes, _glyphTable.size());
+    readCodeTable(in, *table, _wideCodes, _glyphTable.size());
     _codeTable.reset(table.release());
 
     // Read layout info for the glyphs.

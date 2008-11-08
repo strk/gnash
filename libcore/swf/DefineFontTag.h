@@ -23,6 +23,7 @@
 #ifndef GNASH_SWF_DEFINEFONTTAG_H
 #define GNASH_SWF_DEFINEFONTTAG_H
 
+#include "smart_ptr.h" // GC
 #include "swf.h"
 #include "Font.h"
 #include <vector>
@@ -44,7 +45,7 @@ public:
     static void loader(SWFStream& in, tag_type tag, movie_definition& m,
             const RunInfo& r);
 
-    const std::vector<Font::GlyphInfo>& glyphTable() const {
+    const Font::GlyphInfoRecords& glyphTable() const {
         return _glyphTable;
     }
 
@@ -52,7 +53,7 @@ public:
         return _codeTable.get();
     }
     
-    boost::shared_ptr<const Font::code_table> getCodeTable() const {
+    boost::shared_ptr<const Font::CodeTable> getCodeTable() const {
         return _codeTable;
     }
 
@@ -68,6 +69,15 @@ public:
     bool descent() const { return _descent; }
     const std::string& name() const { return _name; }
 
+#ifdef GNASH_USE_GC
+        /// Mark glyph resources as reachable
+        void markReachableResources() const;
+#endif
+
+    /// Read the table that maps from glyph indices to character codes.
+	static void readCodeTable(SWFStream& in, Font::CodeTable& table,
+            bool wideCodes, size_t glyphCount);
+
 private:
 
     DefineFontTag(SWFStream& in, movie_definition& m, tag_type tag);
@@ -76,7 +86,7 @@ private:
 
     void readDefineFont2Or3(SWFStream& in, movie_definition& m);
 
-    std::vector<Font::GlyphInfo> _glyphTable;
+    Font::GlyphInfoRecords _glyphTable;
 
     std::string _name;
     bool _subpixelFont;
@@ -94,7 +104,7 @@ private:
 	typedef std::map<kerning_pair, float> kernings_table;
 	kernings_table m_kerning_pairs;
 
-    boost::shared_ptr<const Font::code_table> _codeTable;
+    boost::shared_ptr<const Font::CodeTable> _codeTable;
 };
 
 }

@@ -30,9 +30,6 @@
 #include "bitmap_info.h" // for dtor visibility by smart pointer
 #include "FreetypeGlyphsProvider.h" // for device fonts support
 #include "log.h"
-#ifdef GNASH_USE_GC
-# include "GC.h"
-#endif
 
 #include <boost/scoped_ptr.hpp>
 #include <map>
@@ -92,7 +89,7 @@ class Font : public ExportableResource
 {
 public:
 	// This table maps from Unicode character number to glyph index.
-	typedef std::map<boost::uint16_t, int> code_table;
+	typedef std::map<boost::uint16_t, int> CodeTable;
 
 	Font(std::auto_ptr<SWF::DefineFontTag> ft);
 
@@ -248,8 +245,8 @@ public:
 
         float advance;
     };
-	/// Read the table that maps from glyph indices to character codes.
-	static void read_code_table(SWFStream& in, code_table& table, bool wide, size_t num);
+
+	typedef std::vector<GlyphInfo> GlyphInfoRecords;
 
 private:
 
@@ -274,10 +271,8 @@ private:
     /// If we were constructed from a definition, this is not NULL.
     boost::scoped_ptr<SWF::DefineFontTag> _fontTag;
 
-	typedef std::vector< GlyphInfo > GlyphInfoVect;
-
 	// Device glyphs
-	GlyphInfoVect _deviceGlyphTable;
+	GlyphInfoRecords _deviceGlyphTable;
 
 	std::string	_name;
     std::string m_display_name;
@@ -293,15 +288,21 @@ private:
 	bool	m_subpixel_font;
 
 	/// Code to index table for embedded glyphs
-    boost::shared_ptr<const code_table> _embedded_code_table; 
+    //
+    /// This can be NULL if an embedded font should not be
+    /// substituted by a device font. This can arise with
+    /// a) a DefineFont tag without a corresponding DefineFontInfo
+    ///    or DefineFontInfo2, or
+    /// b) a DefineFont2 tag with no CodeTable.
+    boost::shared_ptr<const CodeTable> _embeddedCodeTable; 
 
 	/// Code to index table for device glyphs
-	code_table _device_code_table; 
+	CodeTable _deviceCodeTable; 
 
 	// Layout stuff.
-	float	m_ascent;
-	float	m_descent;
-	float	m_leading;
+	float m_ascent;
+	float m_descent;
+	float m_leading;
 
 	typedef std::map<kerning_pair, float> kernings_table;
 	kernings_table m_kerning_pairs;
