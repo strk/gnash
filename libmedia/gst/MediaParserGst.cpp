@@ -30,7 +30,8 @@
 #include <unistd.h>
 
 #define PUSHBUF_SIZE 1024
-#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
+//#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
+#define MIN_PROBE_SIZE 0
 
 #define GNASH_DEBUG_DATAFLOW
 
@@ -254,7 +255,7 @@ bool MediaParserGst::foundAllStreams()
 
 bool MediaParserGst::probingConditionsMet(const SimpleTimer& timer)
 {
-    return foundAllStreams() || (timer.expired() && getBytesLoaded() > MIN_PROBE_SIZE);
+    return foundAllStreams() || (timer.expired() && getBytesLoaded() >= MIN_PROBE_SIZE);
 }
 
 static void
