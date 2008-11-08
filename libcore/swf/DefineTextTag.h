@@ -19,19 +19,17 @@
 #define GNASH_SWF_DEFINETEXTTAG_H
 
 #include "character_def.h" // for inheritance
-#include "Text.h" // for text_glyph_record TODO: move this to its own file.
 #include "styles.h" 
 #include "rect.h" // for composition
 #include "swf.h"
 #include "movie_definition.h"
+#include "SWFMatrix.h"
+#include "TextRecord.h"
 
 namespace gnash {
     class movie_definition;
     class SWFStream;
     class RunInfo;
-    namespace SWF {
-        class TextRecord;
-    }
 }
 
 namespace gnash {
@@ -50,24 +48,32 @@ public:
     static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
             const RunInfo& r);
 
-	rect m_rect;
-	SWFMatrix m_matrix;
+	/// Draw the string.
+	void display(character* inst);
+	
+	const rect&	get_bound() const {
+        // TODO: There is a _matrix field in the definition(!) that's
+        // currently ignored. Don't know if it needs to be transformed... 
+        return _rect; 
+    }
 
+private:
+
+    /// DefineText2Tag::loader also constructs a DefineTextTag.
+    friend class DefineText2Tag;
+
+    /// Construct a DefineTextTag.
+    //
+    /// This should only be constructed using the loader() functions.
 	DefineTextTag(SWFStream& in, movie_definition& m, tag_type tag)
     {
         read(in, m, tag);
     }
 
-	/// Draw the string.
-	void display(character* inst);
-	
-	const rect&	get_bound() const {
-        // TODO: There is a m_matrix field in the definition(!) that's
-        // currently ignored. Don't know if it needs to be transformed... 
-        return m_rect; 
-    }
+	rect _rect;
 
-private:
+    SWFMatrix _matrix;
+
 	void read(SWFStream& in, movie_definition& m, tag_type tag);
 	
     std::vector<TextRecord> _textRecords;

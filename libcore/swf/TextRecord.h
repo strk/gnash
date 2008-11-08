@@ -23,8 +23,10 @@
 #include <vector>
 
 namespace gnash {
+    class character;
     class movie_definition;
     class SWFStream;
+    class SWFMatrix;
     class font;
 }
 
@@ -43,7 +45,7 @@ public:
 
     struct GlyphEntry
     {
-        int	index;
+        int index;
         float advance;
     };
 
@@ -62,9 +64,21 @@ public:
     typedef std::vector<GlyphEntry> Glyphs;  
     Glyphs _glyphs;
     
-    /// Read a TextRecord
+    /// Read a TextRecord from the stream
+    //
+    /// @param in           The SWFStream to read from.
+    /// @param m            The movie_definition containing this TextRecord.
+    /// @param glyphBits    The number of bits per glyph
+    /// @param advanceBits  The number of bits per advance
+    /// @param tag          The tag type of this TextRecord. This must be
+    ///                     DefineText or DefineText2
+    /// @return             False if we have reached the end of the
+    ///                     TextRecords, true if there are more to parse.
     bool read(SWFStream& in, movie_definition& m, int glyphBits,
             int advanceBits, tag_type tag);
+
+    static void displayRecords(const SWFMatrix& this_mat, character* inst,
+        const std::vector<SWF::TextRecord>& records, bool useEmbeddedGlyphs);
 
     const Glyphs& glyphs() const {
         return _glyphs;
@@ -139,13 +153,29 @@ public:
     }
 
 private:
+
+    /// The text color.
     rgba _color;
+
+    /// The height of the text as a multiple of the font height.
     float _textHeight;
+
+    /// Whether the TextRecord has an x offset.
     bool _hasXOffset;
+
+    /// Whether the TextRecord has a y offset.
     bool _hasYOffset;
+
+    /// The x offset of the text, by default 0.0
     float _xOffset;
+
+    /// The y offset of the text, by default 0.0
     float _yOffset;
+
+    /// The font associated with the TextRecord. Can be NULL.
     const font* _font;
+
+    /// Whether the text should be underlined.
     bool _underline;
 };
 

@@ -44,7 +44,6 @@
 #include "TextFormat.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
-#include "Text.h"
 
 #include <algorithm> // std::min
 #include <string>
@@ -940,7 +939,7 @@ TextField::display()
     // Draw our actual text.
     // Using a SWFMatrix to translate to def bounds seems an hack to me.
     // A cleaner implementation is likely correctly setting the
-    // m_x_offset and m_y_offset memebers in glyph records.
+    // _xOffset and _yOffset memebers in glyph records.
     // Anyway, see bug #17954 for a testcase.
     SWFMatrix m;
 
@@ -949,7 +948,7 @@ TextField::display()
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
     
-    display_glyph_records(m, this, _textRecords, _embedFonts);
+    SWF::TextRecord::displayRecords(m, this, _textRecords, _embedFonts);
 
     if (m_has_focus) show_cursor(wmat);
     

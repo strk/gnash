@@ -72,14 +72,6 @@ class DefineVideoStreamTag : public character_def
 {
 public:
 
-	/// Construct a video stream definition with given ID
-	//
-	/// NOTE: for dynamically created definitions (ActionScript Video class
-    ///       instances) you can use an id of -1. See character_def
-    ///       constructor, as that's the one which will eventually get passed
-    ///       the id.
-	DefineVideoStreamTag(SWFStream& in, boost::uint16_t id);
-
 	~DefineVideoStreamTag();
 
 	character* create_character_instance(character* parent, int id);
@@ -141,6 +133,15 @@ public:
     void addVideoFrameTag(std::auto_ptr<media::EncodedVideoFrame> frame);
 
 private:
+
+	/// Construct a video stream definition with given ID
+	//
+	/// NOTE: for dynamically created definitions (ActionScript Video class
+    ///       instances) you can use an id of -1. See character_def
+    ///       constructor, as that's the one which will eventually get passed
+    ///       the id.
+    /// NOTE: What dynamically created definitions?
+	DefineVideoStreamTag(SWFStream& in, boost::uint16_t id);
 
 	void read(SWFStream& in);
 

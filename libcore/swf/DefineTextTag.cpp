@@ -55,8 +55,8 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, tag_type tag)
 {
 	assert(tag == DEFINETEXT || tag == DEFINETEXT2);
 
-	m_rect.read(in);
-	m_matrix.read(in);
+	_rect.read(in);
+	_matrix.read(in);
 
 	in.ensureBytes(2); // glyph_bits + advance_bits
 	int glyphBits = in.read_u8();
@@ -81,7 +81,7 @@ DefineTextTag::display(character* inst)
 
 	const bool useEmbeddedGlyphs = true;
 
-	display_glyph_records(m_matrix, inst, _textRecords,
+    TextRecord::displayRecords(_matrix, inst, _textRecords,
             useEmbeddedGlyphs); 
 }
 

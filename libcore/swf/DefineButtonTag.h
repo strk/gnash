@@ -189,9 +189,6 @@ public:
 	typedef std::vector<ButtonRecord> ButtonRecords; 
 	typedef std::vector<ButtonAction*> ButtonActions;
 
-	/// Construct a DefineButtonTag (DefinitionTag) (SWF)
-	DefineButtonTag(SWFStream& in, movie_definition& m, tag_type tag);
-
 	virtual ~DefineButtonTag();
 
 	/// Create a mutable instance of our definition.
@@ -280,6 +277,14 @@ protected:
 
 
 private:
+
+    /// DefineButton2Tag::loader also needs to create a DefineButtonTag.
+    friend class DefineButton2Tag;
+
+	/// Construct a DefineButtonTag (DefinitionTag)
+    //
+    /// This can only be constructed using a loader() function.
+	DefineButtonTag(SWFStream& in, movie_definition& m, tag_type tag);
 
 	/// Read a DEFINEBUTTON tag
 	void readDefineButtonTag(SWFStream& in, movie_definition& m);
