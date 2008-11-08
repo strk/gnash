@@ -202,31 +202,8 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 inline bool abstractEquality(const as_value& a, const as_value& b,
        bool strictness_on)
 {
-	if (a.is_object() && b.is_object())	{
-        return (a.to_object() == b.to_object());
-    }
-	if (a.is_object() || b.is_object())	return false;
-
-    if (a.ptype() != b.ptype())	{
-		if (!strictness_on && (a.is_undefined() || b.is_undefined()) &&
-			(a.is_null() || b.is_null())) {
-			return true;
-        }            
-		return false;		
-	}
-
-	if (a.is_number())						
-	{										
-		double ad = a.to_number(); double bd = b.to_number();
-		if (isNaN(ad) || isNaN(bd)) return false;								
-		if (isinf(ad) && ad > 0) return (isinf(bd) && bd > 0);		
-		if (isinf(ad) && ad < 0) return (isinf(bd) && bd < 0);
-		return (ad == bd);	
-	}							
-
-    if (a.is_bool() && b.is_bool()) return (a.to_bool() == b.to_bool());
-	
-    return false;				
+    if ( strictness_on ) return a.strictly_equals(b);
+    else return a.equals(b);
 }								
 
 #define ABSTRACT_TYPELATE(st, checkval, matchval)							\
