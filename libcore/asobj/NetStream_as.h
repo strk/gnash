@@ -53,6 +53,7 @@ namespace gnash {
 	}
 	namespace sound {
 		class sound_handler;
+        class InputStream;
 	}
 }
 
@@ -649,8 +650,8 @@ private:
 	/// is invoked by a separate thread (dunno if it makes sense actually)
 	boost::mutex _audioQueueMutex;
 
-	// Whether or not the aux streamer is attached
-	bool _auxStreamerAttached;
+	// Id of an attached audio streamer, 0 if none
+	sound::InputStream* _auxStreamer;
 
 	/// Attach the aux streamer.
 	//
@@ -711,7 +712,6 @@ private:
 
 	/// Identifier of the advance timer
 	unsigned int _advanceTimer;
-
 };
 
 

@@ -54,6 +54,7 @@ noinst_HEADERS = \
 	InputStream.h \
 	EmbedSound.h \
 	EmbedSoundInst.h \
+    AuxStream.h
 	$(NULL)
 
 

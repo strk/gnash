@@ -31,6 +31,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 #include "MediaHandler.h" // for inlined ctor
 #include "SoundEnvelope.h" // for SoundEnvelopes typedef
+#include "AuxStream.h" // for aux_stramer_ptr typedef
 
 #include <vector>
 #include <memory>
@@ -78,11 +79,6 @@ class DSOEXPORT sound_handler
 {
 public:
 
-	/// @see attach_aux_streamer
-	typedef unsigned int (*aux_streamer_ptr)(void *udata, boost::int16_t* samples, unsigned int nSamples, bool& eof);
-
-	// If stereo is true, samples are interleaved w/ left sample first.
-	
 	/// Create a sound buffer slot, for on-demand playback.
 	//
 	/// @param data
@@ -285,15 +281,19 @@ public:
 	///
 	/// @param udata
 	///	    User data pointer, passed as first argument to the registered callback.
-	/// 	WARNING: this is currently also used to *identify* the callback for later
-	///	    removal, see detach_aux_streamer. TODO: stop using the data pointer for 
-	///	    identification purposes and use the callback pointer directly instead.
+    ///
+    /// @return an InputStream pointer, for passing to unplugInputStream.
+    ///         Callers do not own the InputStream, and should NOT realy
+    ///         on it to be point to allocated memory! It is meant to be used
+    ///         as an identifier for the newly created mixer channel.
 	///
 	/// @todo change to plugInputStream(InputStream* str),
 	///       implement in base class
+    ///
+    /// @see unplugInputStream
 	///
-	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* udata)
-	{ ptr=ptr; /*unused*/ udata=udata; /*unused*/ } 
+	virtual InputStream* attach_aux_streamer(aux_streamer_ptr ptr, void* udata)
+	{ ptr=ptr; /*unused*/ udata=udata; /*unused*/ return 0; } 
 
 	/// Unplug an external InputStream from the mixer
 	//
@@ -301,16 +301,12 @@ public:
 	/// that audio from the classes no longer will be played through the 
 	/// soundhandler.
 	//
-	/// @param udata
-	/// 	The key identifying the auxiliary streamer.
-	/// 	WARNING: this need currently be the 'udata' pointer passed to attach_aux_streamer.
-	///	TODO: get the aux_streamer_ptr as key !!
+	/// @param id
+	/// 	The key identifying the auxiliary streamer, as returned
+    ///     by attach_aux_streamer.
 	///
-	/// @todo change to unplugInputStream(InputStream* str),
-	///       implement in base class
-	///
-	virtual void	detach_aux_streamer(void* udata)
-	{ udata=udata; /*unused*/ } 
+	virtual void unplugInputStream(InputStream* id)
+	{ id=id; /*unused*/ } 
 
 	virtual ~sound_handler() {};
 	

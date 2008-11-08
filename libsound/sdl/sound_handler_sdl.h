@@ -23,15 +23,10 @@
 
 #include "sound_handler.h" // for inheritance
 
-#include "log.h"
-
-#include <vector>
-#include <map> // for composition
-
-//#include <iconv.h>
+#include <vector> // for composition (Sounds)
+#include <set> // for composition (InputStreams)
+#include <fstream> // for composition (file_stream)
 #include <SDL_audio.h>
-//#include <boost/thread/thread.hpp>
-//#include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
 
 // Forward declarations
@@ -54,9 +49,17 @@ public:
     typedef std::vector<EmbedSound*> Sounds;
 
 private:
-    /// AS classes (NetStream, Sound) audio callbacks
-    typedef std::map< void* /* owner */, aux_streamer_ptr /* callback */> CallbacksMap;
-    CallbacksMap m_aux_streamer;
+
+    typedef std::set< InputStream* > InputStreams;
+
+    /// Sound input streams.
+    //
+    /// Elements owned by this class.
+    ///
+    InputStreams _inputStreams;
+
+    /// Unplug all input streams
+    void unplugAllInputStreams();
 
     /// Vector containing all sounds.
     //
@@ -182,10 +185,10 @@ public:
     virtual unsigned int tell(int sound_handle);
     
     // See dox in sound_handler.h
-    virtual void    attach_aux_streamer(aux_streamer_ptr ptr, void* owner);
+    virtual InputStream* attach_aux_streamer(aux_streamer_ptr ptr, void* owner);
 
     // See dox in sound_handler.h
-    virtual void    detach_aux_streamer(void* owner);
+    virtual void unplugInputStream(InputStream* id);
 
     /// Refills the output buffer with data.
     //

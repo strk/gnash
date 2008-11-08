@@ -43,6 +43,7 @@ namespace gnash {
 	class CharacterProxy;
 	namespace sound {
 		class sound_handler;
+        class InputStream;
 	}
 	namespace media {
 		class MediaHandler;
@@ -148,21 +149,21 @@ private:
 
 	unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF);
 
-	// Are this sound attached to the soundhandler?
-	bool isAttached;
+    /// The aux streamer for sound handler
+	sound::InputStream* _inputStream;
 
 	int remainingLoops;
 
     /// Query media parser for audio info, create decoder and attach aux streamer
     /// if found.
     ///
-    /// @return  1: audio found, aux streamer attached
-    ///          0: no audio found
+    /// @return  an InputStream* if audio found and aux streamer attached,
+    ///          0 if no audio found.
     ///
     /// May throw a MediaException if audio was found but
     /// audio decoder could not be created
     /// 
-    int attachAuxStreamerIfNeeded();
+    sound::InputStream* attachAuxStreamerIfNeeded();
 
     /// Register a timer for audio info probing
     void startProbeTimer();
@@ -183,6 +184,11 @@ private:
 
     /// Thread-safe setter for _soundCompleted
     void markSoundCompleted(bool completed);
+
+	/// Is this sound attached to the soundhandler?
+    bool isAttached() const {
+        return _inputStream!=0;
+    }
 };
 
 void sound_class_init(as_object& global);

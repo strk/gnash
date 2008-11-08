@@ -95,14 +95,6 @@ public:
 	// See dox in sound_handler.h (why is this virtual anyway ?)
 	virtual bool	is_muted() { return false; }
 
-#ifdef USE_FFMPEG
-	// See dox in sound_handler.h
-	virtual void	attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*owner*/) {}
-
-	// See dox in sound_handler.h
-	virtual void	detach_aux_streamer(void* /*udata*/) {}
-#endif
-
 	// See dox in sound_handler.h
 	virtual unsigned int get_duration(int /*sound_handle*/) { return 0; }
 

@@ -26,19 +26,15 @@
 #endif
 
 #include "sound_handler_sdl.h"
-//#include "utility.h" // for convert_raw_data
-//#include "AudioDecoderSimple.h"
-//#include "AudioDecoderNellymoser.h"
 #include "SoundInfo.h"
 #include "EmbedSound.h"
 #include "EmbedSoundInst.h" // for upcasting to InputStream
-
-//#include "MediaHandler.h"
+#include "AuxStream.h" // for use..
 
 #include "log.h" // will import boost::format too
 #include "GnashException.h" // for SoundException
 
-#include <cmath>
+//#include <cmath>
 #include <vector>
 #include <boost/scoped_array.hpp>
 #include <SDL.h>
@@ -175,9 +171,24 @@ SDL_sound_handler::delete_all_sounds()
     _sounds.clear();
 }
 
+void
+SDL_sound_handler::unplugAllInputStreams()
+{
+    boost::mutex::scoped_lock lock(_mutex);
+
+    for (InputStreams::iterator it=_inputStreams.begin(),
+                                itE=_inputStreams.end();
+            it != itE; ++it)
+    {
+        delete *it;
+    }
+    _inputStreams.clear();
+}
+
 SDL_sound_handler::~SDL_sound_handler()
 {
     delete_all_sounds();
+    unplugAllInputStreams();
     if (soundOpened) SDL_CloseAudio();
     if (file_stream) file_stream.close();
 
@@ -506,18 +517,22 @@ SDL_sound_handler::is_muted()
     return muted;
 }
 
-void
+InputStream*
 SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 {
     boost::mutex::scoped_lock lock(_mutex);
     assert(owner);
     assert(ptr);
 
-    if ( ! m_aux_streamer.insert(std::make_pair(owner, ptr)).second )
+    AuxStream* newStreamer = new AuxStream(ptr, owner);
+
+    if ( ! _inputStreams.insert(newStreamer).second )
     {
-        // Already in the hash.
-        // TODO: throw SoundException ?
-        return;
+        // this should never happen !
+        log_error("_inputStreams container still has a pointer "
+            "to a deleted InputStream!");
+        abort();
+        
     }
 
     if (!soundOpened) {
@@ -538,21 +553,26 @@ SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 #endif
     SDL_PauseAudio(0);
 
+    return newStreamer;
 }
 
 void
-SDL_sound_handler::detach_aux_streamer(void* owner)
+SDL_sound_handler::unplugInputStream(InputStream* id)
 {
     boost::mutex::scoped_lock lock(_mutex);
 
-    // WARNING: erasing would break any iteration in the map
-    CallbacksMap::iterator it2=m_aux_streamer.find(owner);
-    if ( it2 != m_aux_streamer.end() )
+    // WARNING: erasing would break any iteration in the set
+    InputStreams::iterator it2=_inputStreams.find(id);
+    if ( it2 == _inputStreams.end() )
     {
-        // Decrement callback clients count 
-        --soundsPlaying;
-        m_aux_streamer.erase(it2);
+        log_error("SDL_sound_handler::unplugInputStream: "
+                "Aux streamer %p not found. ",
+                id);
+        return; // we won't delete it, as it's likely deleted already
     }
+
+    _inputStreams.erase(it2);
+    delete id;
 }
 
 unsigned int
@@ -735,7 +755,7 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
 
     // If nothing to play there is no reason to play
     // Is this a potential deadlock problem?
-    if (soundsPlaying == 0 && m_aux_streamer.empty()) {
+    if (soundsPlaying == 0 && _inputStreams.empty()) {
 #ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
         log_debug("Pausing SDL Audio...");
 #endif
@@ -748,22 +768,20 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
     std::fill(buffer, buffer+buffer_length, 0);
 
     // call NetStream or Sound audio callbacks
-    if ( !m_aux_streamer.empty() )
+    if ( !_inputStreams.empty() )
     {
         assert(!(buffer_length%2));
         unsigned int nSamples = buffer_length/2;
         boost::scoped_array<boost::int16_t> buf ( new boost::int16_t[nSamples] );
 
-        // Loop through the attached sounds
-        CallbacksMap::iterator it = m_aux_streamer.begin();
-        CallbacksMap::iterator end = m_aux_streamer.end();
+        // Loop through the aux streamers sounds
+        InputStreams::iterator it = _inputStreams.begin();
+        InputStreams::iterator end = _inputStreams.end();
         while (it != end)
         {
-            SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; 
-            void* owner = it->first;
+            InputStream* is = *it;
 
-            bool atEOF=false;
-            unsigned int wrote = (aux_streamer)(owner, buf.get(), nSamples, atEOF);
+            unsigned int wrote = is->fetchSamples(buf.get(), nSamples);
             if ( wrote < nSamples )
             {
                 // fill what wasn't written
@@ -771,13 +789,18 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
             }
 
             // On EOF, detach
-            if (atEOF)
-                    {
+            if (is->eof())
+            {
                 // InputStream EOF, detach
-                CallbacksMap::iterator it2=it;
+                InputStreams::iterator it2=it;
                 ++it2; // before we erase it
-                m_aux_streamer.erase(it);
+                InputStreams::size_type erased = _inputStreams.erase(is);
+                if ( erased != 1 ) {
+                    log_error("Expected 1 InputStream element, found %d", erased);
+                    abort();
+                }
                 it = it2;
+                delete is;
                 // Decrement callback clients count 
                 soundsPlaying--;
             }

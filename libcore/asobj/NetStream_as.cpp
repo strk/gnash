@@ -99,7 +99,7 @@ NetStream_as::NetStream_as()
 	_soundHandler(_vm.getRoot().runInfo().soundHandler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_audioQueueSize(0),
-	_auxStreamerAttached(false),
+	_auxStreamer(0),
 	_lastStatus(invalidStatus),
 	_advanceTimer(0)
 {
@@ -1550,7 +1550,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 		log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
 #endif
 
-		if ( _auxStreamerAttached )
+		if ( _auxStreamer )
 		{
 			_audioQueue.push_back(audio);
 			_audioQueueSize += audio->m_size;
@@ -1898,17 +1898,16 @@ void
 NetStream_as::attachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
-	if ( _auxStreamerAttached )
+	if ( _auxStreamer )
 	{
 		log_debug("attachAuxStreamer called while already attached");
-		// we do nonetheless, isn't specified by SoundHandler.h
-		// whether or not this is legal...
+        // Let's detach first..
+	    _soundHandler->unplugInputStream(_auxStreamer);
+        _auxStreamer=0;
 	}
 
 	try {
-		_soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
-
-		_auxStreamerAttached = true;
+		_auxStreamer = _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 	} catch (SoundException& e) {
 		log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
 	}
@@ -1918,15 +1917,13 @@ void
 NetStream_as::detachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
-	if ( !_auxStreamerAttached )
+	if ( !_auxStreamer )
 	{
 		log_debug("detachAuxStreamer called while not attached");
-		// we do nonetheless, isn't specified by SoundHandler.h
-		// whether or not this is legal...
+        return;
 	}
-	_soundHandler->detach_aux_streamer(this);
-
-	_auxStreamerAttached = false;
+	_soundHandler->unplugInputStream(_auxStreamer);
+	_auxStreamer = 0;
 }
 
 
