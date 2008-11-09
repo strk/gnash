@@ -111,6 +111,13 @@ while(<STDIN>){
 	#Replace delete object.prop or delete object["prop"] with Reflect.deleteField(object,'prop')
 	if($_ =~ /delete\s*([\w\[\]\"\\.]+)/){
 		my $prop = $1;
+		#Letting Haxe delete a string's length property causes this:
+		#ReferenceError: Error #1120: Cannot delete property length on String.
+		if($1 =~ /length/){
+			skip_line();
+			next;
+		}
+		
 		#Check if we have this case: delete a["Prop"];
 		if(index($prop,'.') == $[-1){
 			$prop =~ s/(\w+)\[['"](\w+)['"]\]/$1.$2/g;
@@ -183,12 +190,16 @@ while(<STDIN>){
 		#CHECK 5.2
 		#If the delimiter is undefined, replace with an array whose only member is the caller
 		$_ =~ s/(\w+)\.split\(\s*undefined\s*,.+\)/[$1]/g;
+		
+		#CHECK 5.5 - Must go after CHECK 5.4 and CHECK 5.3
+		#If the string and the delimiter are both empty replace the cal with an empty array.
+		$_ =~ s/(\w+)\.split\(""\)/$1==""?[]:$1.split("")/g;
 
-		#CHECK 5.4
+		#CHECK 5.4 - Must go after CHECK 5.5
 		#If the limit is undefined, ignore it.
 		$_ =~ s/(\w+)\.split\(\s*(\S+)\s*,\s*undefined\s*\)/$1.split($2)/g;
 
-		#CHECK 5.3
+		#CHECK 5.3 - Must go after CHECK 5.5
 		#Replace calls to str.split(a,b) with a==""?[]:str==""||a==null?[str]:str.split(a).slice(0,b)
 		#		 str			a		b
 		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""||$2==null?[$1]:$1.split($2).slice(0,$3)/g;
@@ -260,6 +271,19 @@ while(<STDIN>){
 	#ReferenceError: Error #1074: Illegal write to read-only property length on String.
 	#So we need to skip attempts to set a string's length property.
 	if($_ =~ /\.length\s*=/){
+		skip_line();
+		next;
+	}
+
+	#HACK: These are just quick fixes to prevent run-time errors that are caused when 
+	#functions are called on objects that are initialized like this o = {}.  The corect way
+	#to fix this is to keep track of objects that are initialized this way, and then
+	#only comment out those objects when they try and call functions.
+	if($_ =~ /c.toString = null;/){
+		skip_line();
+		next;
+	}
+	if($_ =~ /o.substr/){
 		skip_line();
 		next;
 	}
