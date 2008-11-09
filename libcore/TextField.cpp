@@ -783,7 +783,6 @@ TextField::TextField(character* parent, const rect& bounds)
     _password(false),
     _maxChars(0),
     _text_variable_registered(false),
-    _variable_name(), //?
     _drawBackground(false),
     _backgroundColor(255,255,255,255),
     _drawBorder(false),
@@ -1536,8 +1535,8 @@ TextField::format_text()
     boost::uint16_t blockIndent = getBlockIndent();
     bool underlined = getUnderlined();
 
-    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
-    //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
+    log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
+      getTarget(), fontDescent, fontLeading, fontHeight, scale);
 
     SWF::TextRecord rec;    // one to work on
     rec.setFont(_font.get());

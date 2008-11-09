@@ -52,7 +52,7 @@ public:
     TextRecord()
         :
         _color(0, 0, 0, 255),
-        _textHeight(1.0f),
+        _textHeight(0),
         _hasXOffset(false),
         _hasYOffset(false),
         _xOffset(0.0f),
@@ -102,11 +102,11 @@ public:
         return _font;
     }
 
-    void setTextHeight(float height) {
+    void setTextHeight(boost::uint16_t height) {
         _textHeight = height;
     }
 
-    float textHeight() const {
+    boost::uint16_t textHeight() const {
         return _textHeight;
     }
 
@@ -157,8 +157,8 @@ private:
     /// The text color.
     rgba _color;
 
-    /// The height of the text as a multiple of the font height.
-    float _textHeight;
+    /// The height of the text in TWIPS.
+    boost::uint16_t _textHeight;
 
     /// Whether the TextRecord has an x offset.
     bool _hasXOffset;
