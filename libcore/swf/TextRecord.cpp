@@ -246,8 +246,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
     log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 #endif
 
-                    gnash::render::draw_glyph(glyph, mat,
-                            textColor);
+                    gnash::render::draw_glyph(glyph, mat, textColor);
                 }
             }
             x += ge.advance;
