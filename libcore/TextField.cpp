@@ -1491,30 +1491,30 @@ TextField::format_text()
     // to find the appropriate font to use, as ActionScript
     // code should be able to change the font of a TextField
     //
-    if (_font == NULL)
+    if (!_font)
     {
-        log_error(_("No font for TextField! [%s:%d]"),
-            __FILE__, __LINE__);
+        log_error(_("No font for TextField!"));
         return;
     }
 
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts); 
-    float fontDescent = _embedFonts ? (_font->get_descent()*scale) : 0; // TODO: fetch descent from device fonts as well ?
-    float fontLeading = _embedFonts ? (_font->get_leading()*scale) : 0;  // TODO: fetch leading from device fonts as well ?
+    float fontDescent = _font->get_descent() * scale; 
+    float fontLeading = _font->get_leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
     boost::uint16_t rightMargin = getRightMargin();
     boost::uint16_t indent = getIndent();
     boost::uint16_t blockIndent = getBlockIndent();
     bool underlined = getUnderlined();
 
-    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g", getTarget(), fontDescent, fontLeading, fontHeight, scale);
+    log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g", getTarget(), fontDescent, fontLeading, fontHeight, scale);
 
     SWF::TextRecord rec;    // one to work on
     rec.setFont(_font.get());
     rec.setUnderline(underlined);
     rec.setColor(getTextColor()); 
-    rec.setXOffset(PADDING_TWIPS + std::max(0, leftMargin + indent + blockIndent));
+    rec.setXOffset(PADDING_TWIPS + 
+            std::max(0, leftMargin + indent + blockIndent));
     rec.setYOffset(PADDING_TWIPS + fontHeight + (fontLeading - fontDescent));
     rec.setTextHeight(fontHeight);
 
@@ -1554,7 +1554,8 @@ TextField::format_text()
 
         if ( _embedFonts )
         {
-            x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
+            x += rec.getFont()->get_kerning_adjustment(last_code, 
+                    static_cast<int>(code)) * scale;
             last_code = static_cast<int>(code);
         }
 
@@ -1576,20 +1577,19 @@ TextField::format_text()
             align_line(textAlignment, last_line_start_record, x);
 
             // Expand bounding box to include last column of text ...
-            if ( _autoSize != autoSizeNone ) _bounds.expand_to_point(x+PADDING_TWIPS, y+PADDING_TWIPS);
+            if ( _autoSize != autoSizeNone ) {
+                _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
+            }
 
             // new paragraphs get the indent.
             x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
             y += fontHeight + leading; 
 
-            // Start a new record on the next line.
+            // Start a new record on the next line. Other properties of the
+            // TextRecord should be left unchanged.
             rec.clearGlyphs();
-            rec.setFont(_font.get()); 
-            rec.setUnderline(underlined);
-            rec.setColor(getTextColor());
             rec.setXOffset(x);
             rec.setYOffset(y);
-            rec.setTextHeight(fontHeight); 
 
             last_space_glyph = -1;
             last_line_start_record = _textRecords.size();
@@ -1617,7 +1617,7 @@ TextField::format_text()
                 // Peek at the previous glyph, and zero out its advance
                 // value, so the next char overwrites it.
                 float advance = rec.glyphs().back().advance;
-                x -= advance;    // maintain formatting
+                x -= advance; 
                 // Remove one glyph
                 rec.clearGlyphs(1);
             }
@@ -1627,38 +1627,40 @@ TextField::format_text()
         if (code == '<' && _html )
         {
             LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
-                                 "gnash will just forget the tags and print their content")));
+                                 "gnash will just forget the tags and "
+                                 "print their content")));
  
             std::wstring discard;
             bool complete = parseHTML(discard, it, e);
             
-            //log_debug("HTML tag: %s", utf8::encodeCanonicalString(discard, 7));
-        
-            // Check incomplete tag (end of string or NULL character in the text).
-            // We should stop parsing and not increment the iterator in this case.
+            // Check incomplete tag (end of string or NULL character
+            // in the text).
+            // We should stop parsing and not increment the
+            // iterator in this case.
             if (!complete) break;
-            
+
             continue;
         }
 
         if (code == 9) // tab (ASCII HT)
         {
-            int index = _font->get_glyph_index(32, _embedFonts); // ascii SPACE
+            // ascii SPACE 
+            int index = rec.getFont()->get_glyph_index(32, _embedFonts); 
             if ( index == -1 )
             {
                 IF_VERBOSE_MALFORMED_SWF (
-                  log_error(_("%s -- missing glyph for space char (needed for TAB). "
-                        " Make sure character shapes for font %s are being exported "
-                        "into your SWF file."),
-                        __PRETTY_FUNCTION__,
-                        _font->get_name());
+                  log_error(_("TextField: missing glyph for space char (needed "
+                          "for TAB). Make sure character shapes for font "
+                          "%s are being exported into your SWF file."),
+                        rec.getFont()->get_name());
                 );
             }
             else
             {
                 SWF::TextRecord::GlyphEntry ge;
                 ge.index = index;
-                ge.advance = scale * _font->get_advance(index, _embedFonts);
+                ge.advance = scale * rec.getFont()->get_advance(index, 
+                        _embedFonts);
 
                 const int tabstop = 8;
                 rec.addGlyph(ge, tabstop);
@@ -1683,7 +1685,7 @@ TextField::format_text()
         // would ever happen, but UTF-8 conversion code can deal with codes
         // up to 2^32; if they are valid, the code table will have to be
         // enlarged.
-        int index = _font->get_glyph_index(
+        int index = rec.getFont()->get_glyph_index(
                 static_cast<boost::uint16_t>(code), _embedFonts);
 
         IF_VERBOSE_MALFORMED_SWF (
@@ -1723,7 +1725,7 @@ TextField::format_text()
 
         SWF::TextRecord::GlyphEntry ge;
         ge.index = index;
-        ge.advance = scale * _font->get_advance(index, _embedFonts);
+        ge.advance = scale * rec.getFont()->get_advance(index, _embedFonts);
 
         rec.addGlyph(ge);
 
@@ -1750,13 +1752,14 @@ after_x_advance:
                 while ( it != e )
                 {
                     code = *it++;
-                    if ( _embedFonts )
+                    if (_embedFonts)
                     {
-                        x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
+                        x += rec.getFont()->get_kerning_adjustment(last_code,
+                                static_cast<int>(code)) * scale;
                         last_code = static_cast<int>(code);
                     }
-                    // Expand the bounding-box to the lower-right corner of each glyph,
-                    // even if we don't display it 
+                    // Expand the bounding-box to the lower-right corner
+                    // of each glyph, even if we don't display it 
                     m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                     log_debug("Text bbox expanded to %s (width: %f)", m_text_bounding_box, m_text_bounding_box.width());
@@ -1768,8 +1771,8 @@ after_x_advance:
                         break;
                     }
 
-                    int index = _font->get_glyph_index((boost::uint16_t) code, _embedFonts);
-                    x += scale * _font->get_advance(index, _embedFonts);
+                    int index = rec.getFont()->get_glyph_index((boost::uint16_t) code, _embedFonts);
+                    x += scale * rec.getFont()->get_advance(index, _embedFonts);
 
                 }
                 if ( ! newlinefound ) break;
@@ -1791,14 +1794,11 @@ after_x_advance:
 
                 // Start a new record on the next line.
                 rec.clearGlyphs();
-                rec.setFont(_font.get());
-                rec.setUnderline(underlined);
-                rec.setColor(getTextColor());
                 rec.setXOffset(x);
                 rec.setYOffset(y);
-                rec.setTextHeight(getFontHeight());
 
-                // TODO : what if m_text_glyph_records is empty ? Is it possible ?
+                // TODO : what if m_text_glyph_records is empty ?
+                // Is it possible ?
                 assert(!_textRecords.empty());
                 SWF::TextRecord& last_line = _textRecords.back();
                 if (last_space_glyph == -1)

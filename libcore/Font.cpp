@@ -336,8 +336,8 @@ Font::get_leading() const {
 
 // TODO: what about device fonts?
 float
-Font::get_descent() const { 
-    return _fontTag ? _fontTag->leading() : 0.0f;
+Font::get_descent() const {
+    return _fontTag ? _fontTag->descent() : 0.0f;
 }
     
 // TODO: what about device fonts?
