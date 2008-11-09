@@ -466,6 +466,8 @@ private:
     /// updated.
 	void updateText(const std::wstring& s);
 
+    void insertTab(SWF::TextRecord& rec, int& x, float scale);
+
 	/// Set focus 
 	void setFocus();
 

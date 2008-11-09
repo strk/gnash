@@ -1453,6 +1453,35 @@ TextField::setFont(boost::intrusive_ptr<const Font> newfont)
     return oldfont;  
 }
 
+
+void
+TextField::insertTab(SWF::TextRecord& rec, int& x, float scale)
+{
+    // tab (ASCII HT)
+    const int space = 32;
+    int index = rec.getFont()->get_glyph_index(space, _embedFonts); 
+    if ( index == -1 )
+    {
+        IF_VERBOSE_MALFORMED_SWF (
+          log_error(_("TextField: missing glyph for space char (needed "
+                  "for TAB). Make sure character shapes for font "
+                  "%s are being exported into your SWF file."),
+                rec.getFont()->get_name());
+        );
+    }
+    else
+    {
+        SWF::TextRecord::GlyphEntry ge;
+        ge.index = index;
+        ge.advance = scale * rec.getFont()->get_advance(index, 
+                _embedFonts);
+
+        const int tabstop = 8;
+        rec.addGlyph(ge, tabstop);
+        x += ge.advance * tabstop;
+    }
+}
+
 void
 TextField::format_text()
 {
@@ -1563,177 +1592,151 @@ TextField::format_text()
         // we generate it.
         m_text_bounding_box.expand_to_point(x, y + fontDescent);
 
-        if (code == 13 || code == 10)
+        switch (code)
         {
-            // newline.
-
-            // Frigging Flash seems to use '\r' (13) as its
-            // default newline character.  If we get DOS-style \r\n
-            // sequences, it'll show up as double newlines, so maybe we
-            // need to detect \r\n and treat it as one newline.
-
-            // Close out this stretch of glyphs.
-            _textRecords.push_back(rec);
-            align_line(textAlignment, last_line_start_record, x);
-
-            // Expand bounding box to include last column of text ...
-            if ( _autoSize != autoSizeNone ) {
-                _bounds.expand_to_point(x + PADDING_TWIPS, y + PADDING_TWIPS);
-            }
-
-            // new paragraphs get the indent.
-            x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
-            y += fontHeight + leading; 
-
-            // Start a new record on the next line. Other properties of the
-            // TextRecord should be left unchanged.
-            rec.clearGlyphs();
-            rec.setXOffset(x);
-            rec.setYOffset(y);
-
-            last_space_glyph = -1;
-            last_line_start_record = _textRecords.size();
-
-            continue;
-        }
-
-        if (code == 8)
-        {
-            // backspace (ASCII BS).
-
-            // This is a limited hack to enable overstrike effects.
-            // It backs the cursor up by one character and then continues
-            // the layout.  E.g. you can use this to display an underline
-            // cursor inside a simulated text-entry box.
-            //
-            // ActionScript understands the '\b' escape sequence
-            // for inserting a BS character.
-            //
-            // ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
-            // OVER NEWLINES, ETC.
-
-            if (!rec.glyphs().empty())
+            case 9:
+                insertTab(rec, x, scale);
+                break;
+            case 13:
+            case 10:
             {
-                // Peek at the previous glyph, and zero out its advance
-                // value, so the next char overwrites it.
-                float advance = rec.glyphs().back().advance;
-                x -= advance; 
-                // Remove one glyph
-                rec.clearGlyphs(1);
-            }
-            continue;
-        }
+                // newline.
 
-        if (code == '<' && _html )
-        {
-            LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
-                                 "gnash will just forget the tags and "
-                                 "print their content")));
- 
-            std::wstring discard;
-            bool complete = parseHTML(discard, it, e);
-            
-            // Check incomplete tag (end of string or NULL character
-            // in the text).
-            // We should stop parsing and not increment the
-            // iterator in this case.
-            if (!complete) break;
+                // Frigging Flash seems to use '\r' (13) as its
+                // default newline character.  If we get DOS-style \r\n
+                // sequences, it'll show up as double newlines, so maybe we
+                // need to detect \r\n and treat it as one newline.
 
-            continue;
-        }
+                // Close out this stretch of glyphs.
+                _textRecords.push_back(rec);
+                align_line(textAlignment, last_line_start_record, x);
 
-        if (code == 9) // tab (ASCII HT)
-        {
-            // ascii SPACE 
-            int index = rec.getFont()->get_glyph_index(32, _embedFonts); 
-            if ( index == -1 )
-            {
-                IF_VERBOSE_MALFORMED_SWF (
-                  log_error(_("TextField: missing glyph for space char (needed "
-                          "for TAB). Make sure character shapes for font "
-                          "%s are being exported into your SWF file."),
-                        rec.getFont()->get_name());
-                );
-            }
-            else
-            {
-                SWF::TextRecord::GlyphEntry ge;
-                ge.index = index;
-                ge.advance = scale * rec.getFont()->get_advance(index, 
-                        _embedFonts);
-
-                const int tabstop = 8;
-                rec.addGlyph(ge, tabstop);
-                x += ge.advance * tabstop;
-            }
-            goto after_x_advance;
-        }
-
-        // Remember where word breaks occur.
-        if (code == 32)
-        {
-            last_space_glyph = rec.glyphs().size();
-        }
-
-        {
-        // need a sub-scope to avoid the 'goto' in TAB handling to cross
-        // initialization of the 'index' variable
-
-        // The font table holds up to 65535 glyphs. Casting from uint32_t
-        // would, in the event that the code is higher than 65535, result
-        // in the wrong character being chosen. It isn't clear whether this
-        // would ever happen, but UTF-8 conversion code can deal with codes
-        // up to 2^32; if they are valid, the code table will have to be
-        // enlarged.
-        int index = rec.getFont()->get_glyph_index(
-                static_cast<boost::uint16_t>(code), _embedFonts);
-
-        IF_VERBOSE_MALFORMED_SWF (
-            if (index == -1)
-            {
-                // error -- missing glyph!
-                
-                // Log an error, but don't log too many times.
-                static int s_log_count = 0;
-                if (s_log_count < 10)
-                {
-                    s_log_count++;
-        
-                    if ( _embedFonts )
-                    {
-                    log_swferror(_("%s -- missing embedded glyph for char %d. "
-                        " Make sure character shapes for font %s are being exported "
-                        "into your SWF file"),
-                        __PRETTY_FUNCTION__,
-                        code,
-                        _font->get_name());
-                    }
-                    else
-                    {
-                    log_swferror(_("%s -- missing device glyph for char %d. "
-                        " Maybe you don't have font '%s' installed in your system?"),
-                        __PRETTY_FUNCTION__,
-                        code,
-                        _font->get_name());
-                    }
+                // Expand bounding box to include last column of text ...
+                if ( _autoSize != autoSizeNone ) {
+                    _bounds.expand_to_point(x + PADDING_TWIPS,
+                            y + PADDING_TWIPS);
                 }
 
-                // Drop through and use index == -1; this will display
-                // using the empty-box glyph
+                // new paragraphs get the indent.
+                x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
+                y += fontHeight + leading; 
+
+                // Start a new record on the next line. Other properties of the
+                // TextRecord should be left unchanged.
+                rec.clearGlyphs();
+                rec.setXOffset(x);
+                rec.setYOffset(y);
+
+                last_space_glyph = -1;
+                last_line_start_record = _textRecords.size();
+
+                continue;
             }
-        ); // IF_VERBOSE_MALFORMED_SWF
+            case 8:
+                // backspace (ASCII BS).
 
-        SWF::TextRecord::GlyphEntry ge;
-        ge.index = index;
-        ge.advance = scale * rec.getFont()->get_advance(index, _embedFonts);
+                // This is a limited hack to enable overstrike effects.
+                // It backs the cursor up by one character and then continues
+                // the layout.  E.g. you can use this to display an underline
+                // cursor inside a simulated text-entry box.
+                //
+                // ActionScript understands the '\b' escape sequence
+                // for inserting a BS character.
+                //
+                // ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
+                // OVER NEWLINES, ETC.
 
-        rec.addGlyph(ge);
+                if (!rec.glyphs().empty())
+                {
+                    // Peek at the previous glyph, and zero out its advance
+                    // value, so the next char overwrites it.
+                    float advance = rec.glyphs().back().advance;
+                    x -= advance; 
+                    // Remove one glyph
+                    rec.clearGlyphs(1);
+                }
+                continue;
+            case '<':
+                if (_html)
+                {
+                    LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
+                                         "gnash will just forget the tags and "
+                                         "print their content")));
+         
+                    std::wstring discard;
+                    bool complete = parseHTML(discard, it, e);
+                    
+                    // Check incomplete tag (end of string or NULL character
+                    // in the text).
+                    // We should stop parsing and not increment the
+                    // iterator in this case.
+                    if (!complete) continue;
+                    else break;
 
-        x += ge.advance;
+                    //continue;
+                }
+            case 32:
+                last_space_glyph = rec.glyphs().size();
+            default:
+            {
+                // need a sub-scope to avoid the 'goto' in TAB handling to cross
+                // initialization of the 'index' variable
+
+                // The font table holds up to 65535 glyphs. Casting from uint32_t
+                // would, in the event that the code is higher than 65535, result
+                // in the wrong character being chosen. It isn't clear whether this
+                // would ever happen, but UTF-8 conversion code can deal with codes
+                // up to 2^32; if they are valid, the code table will have to be
+                // enlarged.
+                int index = rec.getFont()->get_glyph_index(
+                        static_cast<boost::uint16_t>(code), _embedFonts);
+
+                IF_VERBOSE_MALFORMED_SWF (
+                    if (index == -1)
+                    {
+                        // error -- missing glyph!
+                        
+                        // Log an error, but don't log too many times.
+                        static int s_log_count = 0;
+                        if (s_log_count < 10)
+                        {
+                            s_log_count++;
+                
+                            if ( _embedFonts )
+                            {
+                            log_swferror(_("%s -- missing embedded glyph for char %d. "
+                                " Make sure character shapes for font %s are being exported "
+                                "into your SWF file"),
+                                __PRETTY_FUNCTION__,
+                                code,
+                                _font->get_name());
+                            }
+                            else
+                            {
+                            log_swferror(_("%s -- missing device glyph for char %d. "
+                                " Maybe you don't have font '%s' installed in your system?"),
+                                __PRETTY_FUNCTION__,
+                                code,
+                                _font->get_name());
+                            }
+                        }
+
+                        // Drop through and use index == -1; this will display
+                        // using the empty-box glyph
+                    }
+                ); // IF_VERBOSE_MALFORMED_SWF
+
+                SWF::TextRecord::GlyphEntry ge;
+                ge.index = index;
+                ge.advance = scale * rec.getFont()->get_advance(index, _embedFonts);
+
+                rec.addGlyph(ge);
+
+                x += ge.advance;
+                }
         }
-        
-after_x_advance:
 
+        
         float width = defBounds.width();
         if (x >= width - rightMargin - PADDING_TWIPS)
         {
