@@ -1536,7 +1536,8 @@ TextField::format_text()
     boost::uint16_t blockIndent = getBlockIndent();
     bool underlined = getUnderlined();
 
-    log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g", getTarget(), fontDescent, fontLeading, fontHeight, scale);
+    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
+    //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
 
     SWF::TextRecord rec;    // one to work on
     rec.setFont(_font.get());
@@ -1594,6 +1595,9 @@ TextField::format_text()
 
         switch (code)
         {
+            case 27:
+                // Ignore escape
+                break;
             case 9:
                 insertTab(rec, x, scale);
                 break;
@@ -1633,7 +1637,7 @@ TextField::format_text()
                 continue;
             }
             case 8:
-                // backspace (ASCII BS).
+                // Backspace 
 
                 // This is a limited hack to enable overstrike effects.
                 // It backs the cursor up by one character and then continues
@@ -1660,112 +1664,105 @@ TextField::format_text()
                 if (_html)
                 {
                     LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
-                                         "gnash will just forget the tags and "
+                                         "gnash will just ignore the tags and "
                                          "print their content")));
          
                     std::wstring discard;
                     bool complete = parseHTML(discard, it, e);
                     
-                    // Check incomplete tag (end of string or NULL character
-                    // in the text).
-                    // We should stop parsing and not increment the
-                    // iterator in this case.
                     if (!complete) continue;
                     else break;
 
-                    //continue;
                 }
+                // If HTML isn't enabled, carry on and insert the glyph.
+
             case 32:
                 last_space_glyph = rec.glyphs().size();
+                // Don't break, as we still need to insert the space glyph.
+
             default:
             {
-                // need a sub-scope to avoid the 'goto' in TAB handling to cross
-                // initialization of the 'index' variable
 
-                // The font table holds up to 65535 glyphs. Casting from uint32_t
-                // would, in the event that the code is higher than 65535, result
-                // in the wrong character being chosen. It isn't clear whether this
-                // would ever happen, but UTF-8 conversion code can deal with codes
-                // up to 2^32; if they are valid, the code table will have to be
-                // enlarged.
+                // The font table holds up to 65535 glyphs. Casting
+                // from uint32_t would, in the event that the code
+                // is higher than 65535, result in the wrong character
+                // being chosen. Flash can currently only handle 16-bit
+                // values.
                 int index = rec.getFont()->get_glyph_index(
                         static_cast<boost::uint16_t>(code), _embedFonts);
 
                 IF_VERBOSE_MALFORMED_SWF (
                     if (index == -1)
                     {
-                        // error -- missing glyph!
-                        
-                        // Log an error, but don't log too many times.
+                        // Missing glyph! Log the first few errors.
                         static int s_log_count = 0;
                         if (s_log_count < 10)
                         {
                             s_log_count++;
-                
-                            if ( _embedFonts )
+                            if (_embedFonts)
                             {
-                            log_swferror(_("%s -- missing embedded glyph for char %d. "
-                                " Make sure character shapes for font %s are being exported "
-                                "into your SWF file"),
-                                __PRETTY_FUNCTION__,
-                                code,
-                                _font->get_name());
+                                log_swferror(_("TextField: missing embedded "
+                                    "glyph for char %d. Make sure character "
+                                    "shapes for font %s are being exported "
+                                    "into your SWF file"),
+                                    code, _font->get_name());
                             }
                             else
                             {
-                            log_swferror(_("%s -- missing device glyph for char %d. "
-                                " Maybe you don't have font '%s' installed in your system?"),
-                                __PRETTY_FUNCTION__,
-                                code,
-                                _font->get_name());
+                                log_swferror(_("TextField: missing device "
+                                    "glyph for char %d. Maybe you don't have "
+                                    "font '%s' installed in your system."),
+                                    code, _font->get_name());
                             }
                         }
 
                         // Drop through and use index == -1; this will display
                         // using the empty-box glyph
                     }
-                ); // IF_VERBOSE_MALFORMED_SWF
+                );
 
                 SWF::TextRecord::GlyphEntry ge;
                 ge.index = index;
-                ge.advance = scale * rec.getFont()->get_advance(index, _embedFonts);
+                ge.advance = scale * rec.getFont()->get_advance(index, 
+                        _embedFonts);
 
                 rec.addGlyph(ge);
 
                 x += ge.advance;
-                }
+            }
         }
 
-        
         float width = defBounds.width();
         if (x >= width - rightMargin - PADDING_TWIPS)
         {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-            log_debug("Text in TextField %s exceeds width [ _bounds %s ]", getTarget(), _bounds);
+            log_debug("Text in TextField %s exceeds width [ _bounds %s ]", 
+                    getTarget(), _bounds);
 #endif
 
-            // no wrap and no resize --> truncate
-            if ( ! doWordWrap() && autoSize == autoSizeNone )
+            // No wrap and no resize: truncate
+            if (!doWordWrap() && autoSize == autoSizeNone)
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=false, autoSize=none");
 #endif 
-                // truncate long line, but keep expanding text box
+                // Truncate long line, but keep expanding text box
                 bool newlinefound = false;
-                while ( it != e )
+                while (it != e)
                 {
                     code = *it++;
                     if (_embedFonts)
                     {
                         x += rec.getFont()->get_kerning_adjustment(last_code,
                                 static_cast<int>(code)) * scale;
-                        last_code = static_cast<int>(code);
+                        last_code = code;
                     }
                     // Expand the bounding-box to the lower-right corner
                     // of each glyph, even if we don't display it 
                     m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                    log_debug("Text bbox expanded to %s (width: %f)", m_text_bounding_box, m_text_bounding_box.width());
+                    log_debug("Text bbox expanded to %s (width: %f)",
+                            m_text_bounding_box, m_text_bounding_box.width());
 #endif
 
                     if (code == 13 || code == 10)
@@ -1774,17 +1771,18 @@ TextField::format_text()
                         break;
                     }
 
-                    int index = rec.getFont()->get_glyph_index((boost::uint16_t) code, _embedFonts);
+                    int index = rec.getFont()->get_glyph_index(
+                            static_cast<boost::uint16_t>(code), _embedFonts);
                     x += scale * rec.getFont()->get_advance(index, _embedFonts);
 
                 }
-                if ( ! newlinefound ) break;
+                if (!newlinefound) break;
             }
             else if ( doWordWrap() )
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=true");
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+#endif 
 
                 // Insert newline if there's space or autosize != none
 
@@ -1822,8 +1820,10 @@ TextField::format_text()
 
                     previous_x -= last_line.glyphs()[last_space_glyph].advance;
 
-                    const SWF::TextRecord::Glyphs::size_type lineSize = last_line.glyphs().size();
-                    for (unsigned int i = last_space_glyph + 1; i < lineSize; ++i)
+                    const SWF::TextRecord::Glyphs::size_type lineSize =
+                        last_line.glyphs().size();
+                    for (unsigned int i = last_space_glyph + 1; i < lineSize;
+                            ++i)
                     {
                         rec.addGlyph(last_line.glyphs()[i]);
                         x += last_line.glyphs()[i].advance;
@@ -1842,12 +1842,12 @@ TextField::format_text()
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=%d, autoSize=%d", _wordWrap, _autoSize);
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+#endif 
             }
         }
 
-
-        if ( (y) > (defBounds.height() - PADDING_TWIPS) && autoSize == autoSizeNone )
+        if (y > (defBounds.height() - PADDING_TWIPS) && 
+                autoSize == autoSizeNone )
         {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
             log_debug("Text with wordWrap exceeds height of box");
