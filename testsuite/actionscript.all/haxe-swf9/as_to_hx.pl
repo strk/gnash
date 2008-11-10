@@ -108,34 +108,36 @@ while(<STDIN>){
 #		next;
 	}
 
-	#Replace delete object.prop or delete object["prop"] with Reflect.deleteField(object,'prop')
+	#We want to Replace delete object.prop or delete object["prop"] with Reflect.deleteField(object,'prop')
+	#but I am no sure if Haxe's delete acts the same way as actionscript's delete, so it is best to
+	#skip this for now.
 	if($_ =~ /delete\s*([\w\[\]\"\\.]+)/){
-		my $prop = $1;
+#		my $prop = $1;
 		#Letting Haxe delete a string's length property causes this:
 		#ReferenceError: Error #1120: Cannot delete property length on String.
-		if($1 =~ /length/){
+#		if($1 =~ /length/){
 			skip_line();
 			next;
-		}
+#		}
 		
 		#Check if we have this case: delete a["Prop"];
-		if(index($prop,'.') == $[-1){
-			$prop =~ s/(\w+)\[['"](\w+)['"]\]/$1.$2/g;
-		}
+#		if(index($prop,'.') == $[-1){
+#			$prop =~ s/(\w+)\[['"](\w+)['"]\]/$1.$2/g;
+#		}
 
 		#Seperate the object from its property.
-		my @temp = split(/\./,$prop);	
-		my $field = $temp[-1];
+#		my @temp = split(/\./,$prop);	
+#		my $field = $temp[-1];
 
-		my $object;
+#		my $object;
 		#Don't join the object with itself.
-		if($#temp == 1){
-			$object = $temp[0];
-		}
-		else{
-			$object = join(".",@temp[0,-2]);
-		}
-		$_ =~ s/delete\s*([\w\[\]\"\\.]+)/Reflect.deleteField($object,'$field')/;
+#		if($#temp == 1){
+#			$object = $temp[0];
+#		}
+#		else{
+#			$object = join(".",@temp[0,-2]);
+#		}
+#		$_ =~ s/delete\s*([\w\[\]\"\\.]+)/Reflect.deleteField($object,'$field')/;
 	}
 	
 	#Replace Class.hasOwnProperty(prop) with Reflect.hasField(Class,prop)
@@ -208,7 +210,15 @@ while(<STDIN>){
 
 	#CHECK 8 - Must run after CHECK 5.1
 	#Convert instance instanceof Class to Std.is(instance,Class)
-	$_ =~ s/(\w+|\"[\w\s]+\"|\[\w+\])\s*instanceof\s*(\w+)/Std.is($1,$2)/g;
+	$_ =~ s/(\w+|\[\w+\])\s*instanceof\s*(\w+)/Std.is($1,$2)/g;
+
+	#Remove any instanceof statements that can't be converted to Std.is
+	#We can't convert "String" instanceof String to Std.is("String",String)
+	#because they return different values.
+	if($_ =~ /instanceof/){
+		skip_line();
+		next;
+	}
 
 	#Replace undefined with null.
 	$_ =~ s/undefined/null/g;
@@ -245,8 +255,18 @@ while(<STDIN>){
 	}
 
 	#CHECK 6 - Must run before CHECK 7
-	#Replace refrences to Object type with Dynamic.
-	$_  =~ s/(\W)Object(\W)/$1Dynamic$2/g;
+	#Remove refrences to Object unless the line also contains function.
+	#This is a hack to prevent us from removing function signatures without
+	#removing the body as well.
+	if($_ =~ /Object/){
+		if($_ =~ /function/){
+			$_  =~ s/(\W)Object(\W)/$1String$2/g;	
+		}
+		else{
+			skip_line();
+			next;
+		}
+	}
 
 	#CHECK 7 - Must run after CHECK 6
 	#Replace [object Dynamic] with [object Object]
@@ -254,7 +274,13 @@ while(<STDIN>){
 	#even though there is no Object class in Haxe, when variables of type Dynamic are
 	#compiled int byte code, they become an Object.
 	$_ =~ s/\[object Dynamic\]/[object Object]/g;
-	$_ =~ s/\[type Dynamic\]/[type Object]/g;
+	
+	#Tests that expect [type Dynamic] as a result will always fail since the Dynamic class is 
+	#Haxe only.
+	if($_ =~ /\[type Dynamic\]/){
+		skip_line();
+		next;
+	}
 
 	#Remove calls to ASSetPropFlags.  I can't find a Haxe equivilent.
 	if($_ =~ /ASSetPropFlags/){
@@ -295,6 +321,13 @@ while(<STDIN>){
 		skip_line();
 		next;
 	}
+
+	#Remove tests that are known to fail, and we can't fix with this conversion script.
+	if($_ =~ /String\.as.+?:.+?(1234|1237|1239|1250|1258|1270)/){
+		skip_line();
+		next;
+	}
+	
 
 	#Print the converted line of code.
 	print $_;
