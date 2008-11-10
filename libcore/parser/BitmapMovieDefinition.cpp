@@ -23,7 +23,7 @@
 #include "fill_style.h"
 #include "shape.h" // for class path and class edge
 #include "render.h" // for ::display
-#include "image.h"
+#include "GnashImage.h"
 #include "log.h"
 
 namespace gnash {
@@ -81,11 +81,11 @@ BitmapMovieDefinition::getShapeDef()
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(
-		std::auto_ptr<image::ImageBase> image,
+		std::auto_ptr<GnashImage> image,
 		const std::string& url)
 	:
 	_version(6),
-	// image::ImageBase size is in pixels
+	// GnashImage size is in pixels
 	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
 	_framerate(12),

@@ -28,7 +28,6 @@
 #include "rc.h"
 #include "gtksup.h"
 #include "sound_handler.h"
-#include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
 #include "VM.h"
 #include "lirc.h"
@@ -155,14 +154,16 @@ GtkGui::init(int argc, char **argv[])
     g_object_ref(G_OBJECT(_drawingArea));
 
     _resumeButton = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(_resumeButton), gtk_label_new(_("Click to play")));
+    gtk_container_add(GTK_CONTAINER(_resumeButton),
+            gtk_label_new(_("Click to play")));
     gtk_widget_show_all(_resumeButton);
 
     // Same here.
     g_object_ref(G_OBJECT(_resumeButton));
 
     // This callback indirectly results in playHook() being called.
-    g_signal_connect(G_OBJECT(_resumeButton), "clicked", G_CALLBACK (menuitem_play_callback), this);
+    g_signal_connect(G_OBJECT(_resumeButton), "clicked",
+            G_CALLBACK(menuitem_play_callback), this);
 
     // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
@@ -225,7 +226,7 @@ GtkGui::init(int argc, char **argv[])
 
     // The first time stop() was called, stopHook() might not have had a chance
     // to do anything, because GTK+ wasn't garanteed to be initialised.
-    if (isStopped()) stopHook();
+    //if (isStopped()) stopHook();
 
     return true;
 }
@@ -607,22 +608,15 @@ GtkGui::createMenu()
     gtk_widget_show (separator1);
     gtk_container_add (GTK_CONTAINER (_popup_menu), separator1);
 
-    if (/*media::sound_handler *s = */ get_sound_handler()) {
-        GtkCheckMenuItem *menuitem_sound =
-            GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
-        // Set toggle inactive if an active sound handler is muted at start (can't
-        // happen at the moment, but might in the future).
-        
-        // The is_muted() function appears to have changed, and this doesn't work at the
-        // moment:
-        // gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), (!s->is_muted()) );
-        
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
-        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
-        gtk_widget_show(GTK_WIDGET(menuitem_sound));
-        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
-                         G_CALLBACK(&menuitem_sound_callback), this);
-    }
+    /// The sound handler is initialized after the Gui is created, and
+    /// may be disabled or enabled dynamically.
+    GtkCheckMenuItem *menuitem_sound =
+        GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
+    gtk_widget_show(GTK_WIDGET(menuitem_sound));
+    g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
+                     G_CALLBACK(&menuitem_sound_callback), this);
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));
@@ -1086,7 +1080,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->streamsTimeoutScale ) {
             _rcfile.setStreamsTimeout(
-        	    gtk_range_get_value(GTK_RANGE(prefs->streamsTimeoutScale)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->streamsTimeoutScale)));
         }
 
         if ( prefs->ASCodingErrorToggle ) {
@@ -1151,7 +1146,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->librarySize ) {
             _rcfile.setMovieLibraryLimit(
-                gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(prefs->librarySize)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->librarySize)));
         }
 
         if ( prefs->startStoppedToggle ) {
@@ -2088,7 +2084,11 @@ GtkGui::button_press_event(GtkWidget *const /*widget*/,
                            GdkEventButton *const event,
                            const gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
+
+    /// Double- and triple-clicks should not send an extra event!
+    /// Flash has no built-in double click.
+    if (event->type != GDK_BUTTON_PRESS) return false;
+
     GtkGui *obj = static_cast<GtkGui *>(data);
 
     obj->grabFocus();
@@ -2541,7 +2541,8 @@ void
 GtkGui::stopHook()
 {
 
-    // FIXME: this can't work for the stand-alone player, because _drawingArea is
+    // FIXME: this can't work for the stand-alone player, because
+    // _drawingArea is
     // packed into a vbox.
     if (! _xid) return;
 

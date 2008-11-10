@@ -57,6 +57,7 @@ endif
 		--infodir=\$${prefix}/share/info \
 		--enable-cygnal --enable-media=gst --enable-renderer=agg \
 		--with-npapi-plugindir=\$${prefix}/lib/gnash \
+		--with-kde-pluginprefix=\$${prefix} \
 		--enable-shared --disable-static --disable-testsuite \
 		--disable-rpath CXXFLAGS=-O0
 	@printf "\n ------------------------------------------- End of CONFIGURE ---- \n\n"
@@ -141,24 +142,21 @@ install: build
 
 	#cd debian/h2m; $(MAKE)
 
-	install -d $(CURDIR)/debian/tmp/usr/share/lintian/overrides/
-	cp debian/overrides/* $(CURDIR)/debian/tmp/usr/share/lintian/overrides/
-
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
 	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
-	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libgeometry/
-	cp libgeometry/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libgeometry/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libamf/
 	cp libamf/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libamf/
-	install -d $(CURDIR)/debian/tmp/usr/include/gnash/server/
-	cp server/*.h $(CURDIR)/debian/tmp/usr/include/gnash/server/
+	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libcore/
+	cp libcore/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libcore/
+	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libmedia/
+	cp libmedia/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libmedia/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/backend/
 	cp backend/*.h $(CURDIR)/debian/tmp/usr/include/gnash/backend/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/gui/
 	cp gui/*.h $(CURDIR)/debian/tmp/usr/include/gnash/gui/
 
 	install -d $(CURDIR)/debian/tmp/usr/share/pixmaps/
-	cp debian/*.xpm $(CURDIR)/debian/tmp/usr/share/pixmaps/
+	cp packaging/*.xpm $(CURDIR)/debian/tmp/usr/share/pixmaps/
 	install -d $(CURDIR)/debian/tmp/usr/share/applications/
 	cp debian/*.desktop $(CURDIR)/debian/tmp/usr/share/applications/
 

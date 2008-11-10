@@ -31,7 +31,8 @@ CSMTextSettingsTag::CSMTextSettingsTag(movie_definition& /* m */,
 }
 
 void
-CSMTextSettingsTag::loader(SWFStream& in, tag_type tag, movie_definition& /*m*/)
+CSMTextSettingsTag::loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& /*r*/)
 {
     assert(tag == SWF::CSMTEXTSETTINGS); // 73
 

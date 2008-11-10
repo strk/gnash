@@ -35,7 +35,6 @@
 namespace gnash
 {
 
-
 class Handler : public gnash::Network
 {
 public:
@@ -62,45 +61,45 @@ public:
     typedef enum { INCOMING, OUTGOING } fifo_e;
     
     // Push bytes on the incoming FIFO, which is the default
-    bool push(amf::Buffer *data)
+    bool push(boost::shared_ptr<amf::Buffer> data)
 	{ return _incoming.push(data); };
-    bool push(amf::Buffer *data, fifo_e direction);
+    bool push(boost::shared_ptr<amf::Buffer> data, fifo_e direction);
     bool push(gnash::Network::byte_t *data, int nbytes, fifo_e direction);
     bool push(gnash::Network::byte_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
     bool pushin(gnash::Network::byte_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
-    bool pushin(amf::Buffer *data)
+    bool pushin(boost::shared_ptr<amf::Buffer> data)
 	{ return _incoming.push(data); };
     
     // Push bytes on the incoming FIFO, which must be specified
     bool pushout(gnash::Network::byte_t *data, int nbytes)
 	{ return _outgoing.push(data, nbytes); };
-    bool pushout(amf::Buffer *data)
+    bool pushout(boost::shared_ptr<amf::Buffer> data)
 	{ return _outgoing.push(data); };
     
     // Pop the first date element off the incoming FIFO
-    amf::Buffer *pop() { return _incoming.pop(); };
-    amf::Buffer *pop(fifo_e direction);
-    amf::Buffer *popin()
+    boost::shared_ptr<amf::Buffer> pop() { return _incoming.pop(); };
+    boost::shared_ptr<amf::Buffer> pop(fifo_e direction);
+    boost::shared_ptr<amf::Buffer> popin()
     	{ return _incoming.pop(); };
     // Pop the first date element off the outgoing FIFO
-    amf::Buffer *popout()
+    boost::shared_ptr<amf::Buffer> popout()
     	{ return _outgoing.pop(); };
     
     // Peek at the first data element without removing it
-    amf::Buffer *peek() { return _incoming.peek(); };
-    amf::Buffer *peek(fifo_e direction);
-    amf::Buffer *peekin()
+    boost::shared_ptr<amf::Buffer> peek() { return _incoming.peek(); };
+    boost::shared_ptr<amf::Buffer> peek(fifo_e direction);
+    boost::shared_ptr<amf::Buffer> peekin()
     	{ return _incoming.peek(); };
     // Pop the first date element off the outgoing FIFO
-    amf::Buffer *peekout()
+    boost::shared_ptr<amf::Buffer> peekout()
     	{ return _outgoing.peek(); };    
 
     // Removes all the buffers from the queues
-    amf::Buffer *merge(amf::Buffer *begin) { return _incoming.merge(begin); };
-    amf::Buffer *mergein(amf::Buffer *begin) { return _incoming.merge(begin); };
-    amf::Buffer *mergeout(amf::Buffer *begin) { return _outgoing.merge(begin); };
+    boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin) { return _incoming.merge(begin); };
+    boost::shared_ptr<amf::Buffer> mergein(boost::shared_ptr<amf::Buffer> begin) { return _incoming.merge(begin); };
+    boost::shared_ptr<amf::Buffer> mergeout(boost::shared_ptr<amf::Buffer> begin) { return _outgoing.merge(begin); };
 
     // Removes all the buffers from the queues
     void clear() { _incoming.clear(); };
@@ -125,14 +124,16 @@ public:
     void waitin() { _incoming.wait(); };
     void waitout() { _outgoing.wait(); };
 
+    size_t readPacket(int fd);
+    
     // start the two thread handlers for the queues
     bool DSOEXPORT start(thread_params_t *args);
 
     // Take a buffer and write it to the network
-    int  DSOEXPORT writeNet(int fd, amf::Buffer *buf)
+    int  DSOEXPORT writeNet(int fd, boost::shared_ptr<amf::Buffer> buf)
     	{ return Network::writeNet(fd, buf->reference(), buf->size()); };
     
-    int  DSOEXPORT writeNet(amf::Buffer *buf)
+    int  DSOEXPORT writeNet(boost::shared_ptr<amf::Buffer> buf)
     	{ return Network::writeNet(buf->reference(), buf->size()); };
     
     // Dump internal data.

@@ -78,11 +78,10 @@ libgnashmedia_la_SOURCES = \
 	AudioDecoderSimple.cpp \
 	MediaParser.cpp \
 	FLVParser.cpp \
-	Util.cpp \
+	AudioResampler.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
-	MediaBuffer.h \
 	AudioDecoder.h \
 	VideoDecoder.h \
 	MediaParser.h \
@@ -90,10 +89,8 @@ noinst_HEADERS = \
 	FLVParser.h \
 	AudioDecoderNellymoser.h \
 	AudioDecoderSimple.h \
-	sound_handler.h \
-	NullSoundHandler.h \
 	SoundInfo.h \
-	Util.h \
+	AudioResampler.h \
 	$(NULL)
 
 
@@ -105,7 +102,7 @@ if USE_GST_ENGINE
 		gst/MediaParserGst.cpp \
 		gst/GstUtil.cpp \
 		gst/swfdec_codec_gst.c \
-		ffmpeg/sound_handler_sdl.cpp
+		$(NULL)
 	
    noinst_HEADERS += \
 		gst/MediaHandlerGst.h \
@@ -114,17 +111,17 @@ if USE_GST_ENGINE
 		gst/MediaParserGst.h \
 		gst/GstUtil.h \
 		gst/swfdec_codec_gst.h \
-		ffmpeg/sound_handler_sdl.h \
-		gst/gnash_gst_version.h
+		gst/gnash_gst_version.h \
+		$(NULL)
 
    libgnashmedia_la_CPPFLAGS += \
 		-I$(top_srcdir)/libmedia/gst \
 		$(GSTREAMER_CFLAGS) \
-		$(SDL_CFLAGS)
+		$(NULL)
 
    libgnashmedia_la_LIBADD += \
 		$(GSTREAMER_LIBS) -lgstbase-0.10 \
-		$(SDL_LIBS)
+		$(NULL)
 
 endif
 
@@ -134,25 +131,38 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/MediaParserFfmpeg.cpp \
 		ffmpeg/AudioDecoderFfmpeg.cpp \
 		ffmpeg/VideoDecoderFfmpeg.cpp \
-		ffmpeg/sound_handler_sdl.cpp \
-		ffmpeg/ffmpegNetStreamUtil.cpp 
+		ffmpeg/AudioResamplerFfmpeg.cpp \
+		$(NULL)
 
    noinst_HEADERS += \
 		ffmpeg/MediaHandlerFfmpeg.h \
 		ffmpeg/MediaParserFfmpeg.h \
 		ffmpeg/AudioDecoderFfmpeg.h \
 		ffmpeg/VideoDecoderFfmpeg.h \
-		ffmpeg/sound_handler_sdl.h \
-		ffmpeg/ffmpegNetStreamUtil.h \
-		ffmpeg/ffmpegHeaders.h
+		ffmpeg/AudioResamplerFfmpeg.h \
+		ffmpeg/ffmpegHeaders.h \
+		$(NULL)
 
    libgnashmedia_la_LIBADD += \
 		$(FFMPEG_LIBS) \
-		$(SDL_LIBS)
+		$(NULL)
 
    libgnashmedia_la_CPPFLAGS += \
 		$(FFMPEG_CFLAGS) \
-		$(SDL_CFLAGS)
+		$(NULL)
+endif
+
+if HAVE_SPEEX
+   libgnashmedia_la_LIBADD += \
+	$(SPEEX_LIBS) \
+	$(SPEEXDSP_LIBS) \
+	$(NULL)
+   libgnashmedia_la_CPPFLAGS += \
+	$(SPEEX_CFLAGS) \
+	$(SPEEXDSP_CFLAGS) \
+	$(NULL)
+   libgnashmedia_la_SOURCES += AudioDecoderSpeex.cpp
+   noinst_HEADERS += AudioDecoderSpeex.h
 endif
 
 libgnashmedia_la_LDFLAGS = -release $(VERSION)

@@ -19,7 +19,7 @@
 
 
 #include "RemoveObjectTag.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "swf.h" // for tag_type definition
 #include "log.h"
 #include "SWFStream.h"
@@ -46,7 +46,7 @@ RemoveObjectTag::read(SWFStream& in, tag_type tag)
 }
 
 void
-RemoveObjectTag::execute(sprite_instance* m, DisplayList& dlist) const
+RemoveObjectTag::execute(MovieClip* m, DisplayList& dlist) const
 {
     m->set_invalidated();
 	dlist.remove_character(m_depth);
@@ -54,7 +54,8 @@ RemoveObjectTag::execute(sprite_instance* m, DisplayList& dlist) const
 
 /* public static */
 void
-RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
+RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& /*r*/)
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 

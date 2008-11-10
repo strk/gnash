@@ -89,6 +89,7 @@ main(int argc, char** argv)
 	SWFMovie mo;
 	const char *srcdir=".";
 	SWFMovieClip  dejagnuclip;
+    SWFDisplayItem it;
 
 
 	/*********************************************
@@ -121,7 +122,7 @@ main(int argc, char** argv)
 	 *********************************************/
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 80, 800, 600);
-	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 	addSoundExport(mo);
 
 	SWFMovie_nextFrame(mo);  /* end of frame1 */
@@ -178,27 +179,28 @@ main(int argc, char** argv)
 
     // This is the longest sound, so the test should end when this is called.
     add_actions(mo, "a.onSoundComplete = function() {"
-            "check_equals(a.position, 13740);"
-            "check_equals(c_soundComplete, 1);"
-            "check_equals(d_soundComplete, 1);"
-            "check_equals(e_soundComplete, 2);"
-            "totals(24); "
+            "check_equals(arguments.length, 0);"
+            "check_equals(a.position, 13740, 'a.position at a.onSoundComplete time');"
+            "check_equals(c_soundComplete, 1, 'c_soundComplete at a.onSoundComplete time');"
+            "check_equals(d_soundComplete, 1, 'd_soundComplete at a.onSoundComplete time');"
+            "check_equals(e_soundComplete, 2, 'e_soundComplete at a.onSoundComplete time');"
+            "totals(26); "
             "finished = true;"
             "};");
 
     // Check position of b, c, d, and e after the first loop of c.
     add_actions(mo, "c.onSoundComplete = function() {"
             // I'm not sure how reliable this is:
-            "check_equals(b.position, 10472);"
-            "check_equals(c.position, 5224);"
-            "check_equals(d.position, 5224);"
-            "check_equals(e.position, 5224);"
+            "check_equals(b.position, 10472, 'b.position at c.onSoundComplete time');"
+            "check_equals(c.position, 5224, 'c.position at c.onSoundComplete time');"
+            "check_equals(d.position, 5224, 'd.position at c.onSoundComplete time');"
+            "check_equals(e.position, 5224, 'e.position at c.onSoundComplete time');"
             "c_soundComplete++;"
             "note('c.onSoundComplete() called '+c_soundComplete+' time(s).');"
             "};");
 
     add_actions(mo, "d.onSoundComplete = function() {"
-            "check_equals(d.position, 5224);"
+            "check_equals(d.position, 5224, 'd.position at d.onSoundComplete time');"
             "d_soundComplete++;"
             "note('d.onSoundComplete() called '+d_soundComplete+' time(s).');"
             "};");
@@ -206,10 +208,10 @@ main(int argc, char** argv)
     // This starts e again. It should run twice before the longest
     // sound stops.
     add_actions(mo, "e.onSoundComplete = function() {"
-            "check_equals(e.position, 5224);"
+            "check_equals(e.position, 5224, 'e.position at e.onSoundComplete time');"
             "e_soundComplete++;"
             "note('e.onSoundComplete() called '+e_soundComplete+' time(s).');"
-            "e.start();"
+            "if ( e_soundComplete < 2 ) e.start();"
             "};");
 
 

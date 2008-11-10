@@ -97,7 +97,7 @@ public:
 		_sprite(0)
 	{}
 
-	color_as_object(sprite_instance* sp)
+	color_as_object(MovieClip* sp)
 		:
 		as_object(getColorInterface()),
 		_sprite(sp)
@@ -118,7 +118,7 @@ public:
 		markAsObjectReachable();
 	}
 
-	sprite_instance* getSprite() const
+	MovieClip* getSprite() const
 	{
 		checkSprite();
 		return _sprite;
@@ -155,7 +155,7 @@ private:
 		return true;
 	}
 
-	mutable sprite_instance* _sprite;
+	mutable MovieClip* _sprite;
 
 };
 
@@ -164,7 +164,7 @@ color_getrgb(const fn_call& fn)
 {
 	boost::intrusive_ptr<color_as_object> obj = ensureType<color_as_object>(fn.this_ptr);
 
-	sprite_instance* sp = obj->getSprite();
+	MovieClip* sp = obj->getSprite();
 	if ( ! sp ) return as_value();
 
 	const cxform& trans = obj->getTransform();
@@ -183,7 +183,7 @@ color_gettransform(const fn_call& fn)
 {
 	boost::intrusive_ptr<color_as_object> obj = ensureType<color_as_object>(fn.this_ptr);
 
-	sprite_instance* sp = obj->getSprite();
+	MovieClip* sp = obj->getSprite();
 	if ( ! sp )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -286,7 +286,7 @@ color_settransform(const fn_call& fn)
 		return as_value();
 	}
 
-	sprite_instance* sp = obj->getSprite();
+	MovieClip* sp = obj->getSprite();
 	if ( ! sp )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -334,7 +334,7 @@ color_settransform(const fn_call& fn)
 static as_value
 color_ctor(const fn_call& fn)
 {
-	sprite_instance* sp=0;
+	MovieClip* sp=0;
 	if ( fn.nargs )
 	{
 		const as_value& arg = fn.arg(0);

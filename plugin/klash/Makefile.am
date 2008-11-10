@@ -99,9 +99,7 @@ install-plugin install-plugins: test_perms $(plugin_LTLIBRARIES) $(dist_kde_serv
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
 
 uninstall-plugin uninstall-plugins: 
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.*
 
 endif
 

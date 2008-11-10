@@ -27,6 +27,7 @@
 
 namespace gnash {
 namespace media {
+namespace gst {
 
 // TODO: implement proper seeking.
 
@@ -39,8 +40,9 @@ VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
 }
 
 
-VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height,
-                                 const boost::uint8_t* extradata, size_t extradatasize)
+VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
+        int /*width*/, int /*height*/,
+        const boost::uint8_t* extradata, size_t extradatasize)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
@@ -152,13 +154,13 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
 }
   
 
-std::auto_ptr<image::ImageBase>
+std::auto_ptr<GnashImage>
 VideoDecoderGst::pop()
 {
     GstBuffer * buffer = swfdec_gst_decoder_pull (&_decoder);
 
     if (!buffer) {
-        return std::auto_ptr<image::ImageBase>();
+        return std::auto_ptr<GnashImage>();
     }
   
     GstCaps* caps = gst_buffer_get_caps(buffer);
@@ -174,7 +176,7 @@ VideoDecoderGst::pop()
   
     gst_caps_unref(caps);
   
-    std::auto_ptr<image::ImageBase> ret(new gnashGstBuffer(buffer, width, height));
+    std::auto_ptr<GnashImage> ret(new gnashGstBuffer(buffer, width, height));
   
     return ret;
 }
@@ -187,5 +189,6 @@ VideoDecoderGst::peek()
 }
 
 
+} // namespace gnash::media::gst
 } // namespace gnash::media
 } // namespace gnash

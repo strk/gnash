@@ -65,7 +65,6 @@ static as_value xml_createtextnode(const fn_call& fn);
 static as_value xml_getbytesloaded(const fn_call& fn);
 static as_value xml_getbytestotal(const fn_call& fn);
 static as_value xml_parsexml(const fn_call& fn);
-static as_value xml_send(const fn_call& fn);
 static as_value xml_ondata(const fn_call& fn);
 
 
@@ -347,14 +346,19 @@ attachXMLInterface(as_object& o)
     // No flags:
     o.init_member("addRequestHeader", new builtin_function(
                 LoadableObject::loadableobject_addRequestHeader), flags);
-    o.init_member("createElement", new builtin_function(xml_createelement), flags);
-    o.init_member("createTextNode", new builtin_function(xml_createtextnode), flags);
-    o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded), flags);
-    o.init_member("getBytesTotal", new builtin_function(xml_getbytestotal), flags);
+    o.init_member("createElement", 
+            new builtin_function(xml_createelement), flags);
+    o.init_member("createTextNode", 
+            new builtin_function(xml_createtextnode), flags);
+    o.init_member("getBytesLoaded", 
+            new builtin_function(xml_getbytesloaded), flags);
+    o.init_member("getBytesTotal", 
+            new builtin_function(xml_getbytestotal), flags);
     o.init_member("load", new builtin_function(
                 LoadableObject::loadableobject_load), flags);
     o.init_member("parseXML", new builtin_function(xml_parsexml), flags);
-    o.init_member("send", new builtin_function(xml_send), flags);
+    o.init_member("send", new builtin_function(
+                LoadableObject::loadableobject_send), flags);
     o.init_member("sendAndLoad", new builtin_function(
                 LoadableObject::loadableobject_sendAndLoad), flags);
     o.init_member("onData", new builtin_function(xml_ondata), flags);
@@ -469,7 +473,8 @@ xml_createtextnode(const fn_call& fn)
 }
 
 
-as_value xml_getbytesloaded(const fn_call& fn)
+as_value
+xml_getbytesloaded(const fn_call& fn)
 {
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
     long int ret = ptr->getBytesLoaded();
@@ -478,7 +483,8 @@ as_value xml_getbytesloaded(const fn_call& fn)
 }
 
 
-as_value xml_getbytestotal(const fn_call& fn)
+as_value
+xml_getbytestotal(const fn_call& fn)
 {
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
     long int ret = ptr->getBytesTotal();
@@ -487,7 +493,8 @@ as_value xml_getbytestotal(const fn_call& fn)
 }
 
 
-as_value xml_parsexml(const fn_call& fn)
+static as_value
+xml_parsexml(const fn_call& fn)
 {
 
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
@@ -503,17 +510,6 @@ as_value xml_parsexml(const fn_call& fn)
     const std::string& text = fn.arg(0).to_string();
     ptr->parseXML(text);
     
-    return as_value();
-}
-
-/// \brief removes the specified XML object from its parent. Also
-/// deletes all descendants of the node.
-as_value xml_send(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
-    
-    ptr->send("");
     return as_value();
 }
 

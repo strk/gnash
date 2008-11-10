@@ -53,10 +53,11 @@ main(int /*argc*/, char** /*argv*/)
 	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
 
 	ManualClock clock;
-	VM& vm = VM::init(*md5, clock);
+    RunInfo ri("");
+    movie_root stage(*md5, clock, ri);
 
 	movie_instance* root = md5->create_movie_instance();
-    	vm.getRoot().setRootMovie( root );
+    stage.setRootMovie( root );
 
 	DisplayList dlist1;
 

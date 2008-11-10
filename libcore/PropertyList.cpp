@@ -305,7 +305,12 @@ void
 PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 {
 	string_table& st = env.getVM().getStringTable();
-	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
+
+    // We should enumerate in order of creation, not lexicographically.
+    typedef container::nth_index<1>::type ContainerByOrder;
+
+	for (ContainerByOrder::const_reverse_iterator i=_props.get<1>().rbegin(),
+            ie=_props.get<1>().rend(); i != ie; ++i)
 	{
 		if (i->getFlags().get_dont_enum())
 			continue;
@@ -321,26 +326,38 @@ PropertyList::enumerateKeys(as_environment& env, propNameSet& donelist) const
 }
 
 void
-PropertyList::enumerateKeyValue(const as_object& this_ptr, std::map<std::string, std::string>& to) const
+PropertyList::enumerateKeyValue(const as_object& this_ptr,
+        SortedPropertyList& to) const
 {
-	string_table& st = this_ptr.getVM().getStringTable();
-	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
-	{
-		if (i->getFlags().get_dont_enum())
-			continue;
+    VM& vm = this_ptr.getVM();
+	string_table& st = vm.getStringTable();
+    typedef container::nth_index<1>::type ContainerByOrder;
 
-		to.insert(make_pair(st.value(i->mName),
-				i->getValue(this_ptr).to_string()));
+	for (ContainerByOrder::const_iterator i=_props.get<1>().begin(),
+            ie=_props.get<1>().end(); i != ie; ++i)
+	{
+		if (i->getFlags().get_dont_enum()) continue;
+
+        // Undefined values should be "undefined" for SWF7 and
+        // empty for SWF6.
+        const int version = vm.getSWFVersion();
+		to.push_back(std::make_pair(st.value(i->mName),
+				i->getValue(this_ptr).to_string_versioned(version)));
 	}
 }
 
+/// This does not reflect the normal enumeration order. It is sorted
+/// lexicographically by property.
 void
 PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to) 
 {
 	string_table& st = VM::get().getStringTable();
-	for (container::const_iterator i=_props.begin(), ie=_props.end(); i != ie; ++i)
+
+	for (container::const_iterator i=_props.begin(), ie=_props.end();
+            i != ie; ++i)
 	{
-		to.insert(make_pair(st.value(i->mName), i->getValue(this_ptr)));
+		to.insert(std::make_pair(st.value(i->mName),
+                    i->getValue(this_ptr)));
 	}
 }
 

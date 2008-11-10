@@ -216,11 +216,14 @@ test_data()
     Element *el;
     vector<amf::Element *> els;
 
+#if 0
+    // Apparently this constructor no longer exists.
+
     el = new Element(true, 123.456, 987.654, "IAmReplyingNow");
 //    el->dump();
     els.push_back(el);
     delete el;    
-
+#endif
 #if 0
     // 
     el = new Element(true);

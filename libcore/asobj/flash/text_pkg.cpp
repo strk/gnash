@@ -25,7 +25,7 @@
 
 #include "flash/text/TextRenderer_as.h"
 #include "flash/text/TextFieldAutoSize_as.h"
-#include "edit_text_character.h"
+#include "TextField.h"
 
 namespace gnash {
 

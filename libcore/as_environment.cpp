@@ -19,7 +19,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_environment.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "shape_character_def.h"
 #include "as_value.h"
 #include "with_stack_entry.h"
@@ -31,7 +31,6 @@
 #include "as_function.h" 
 #include "CallStack.h"
 
-#include <cstring> // std::strpbrk
 #include <string>
 #include <utility> // for std::pair
 #include <boost/algorithm/string/case_conv.hpp>
@@ -111,7 +110,7 @@ as_environment::get_variable(const std::string& varname,
 		if ( target ) 
 		{
 			// ... but only if it resolves to a sprite
-			sprite_instance* m = target->to_movie();
+			MovieClip* m = target->to_movie();
 			if ( m ) return as_value(m);
 		}
 	}
@@ -227,15 +226,14 @@ as_environment::get_variable_raw(
 }
 
 bool
-as_environment::del_variable_raw(
-    const std::string& varname,
-    const ScopeStack& scopeStack) 
-    // varname must be a plain variable name; no path parsing.
+as_environment::delVariableRaw(const std::string& varname,
+        const ScopeStack& scopeStack) 
 {
-	assert( ! std::strpbrk(varname.c_str(), ":/.") );
+    // varname must be a plain variable name; no path parsing.
+    assert(varname.find_first_of(":/.") == std::string::npos);
 
 	string_table::key varkey = _vm.getStringTable().find(varname);
-	as_value	val;
+	as_value val;
 
 	// Check the with-stack.
 	for (size_t i = scopeStack.size(); i > 0; --i)
@@ -569,13 +567,13 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
     if (*p == '/')
     {
 	// Absolute path.  Start at the (AS) root (handle _lockroot)
-	sprite_instance* root = 0;
-        if ( m_target ) root = const_cast<sprite_instance*>(m_target->getAsRoot());
+	MovieClip* root = 0;
+        if ( m_target ) root = const_cast<MovieClip*>(m_target->getAsRoot());
         else {
             if ( _original_target )
             {
                 log_debug("current target is undefined on as_environment::find_object, we'll use original");
-                root = const_cast<sprite_instance*>(_original_target->getAsRoot());
+                root = const_cast<MovieClip*>(_original_target->getAsRoot());
             }
             else
             {

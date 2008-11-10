@@ -51,7 +51,7 @@ typedef boost::intrusive_ptr<character> DisplayItem;
 
 /// A list of on-stage characters, ordered by depth
 //
-/// Any sprite_instance has an associated DisplayList
+/// Any MovieClip has an associated DisplayList
 /// that may change from frame to frame due to control
 /// tags instructing when to add or remove characters
 /// from the stage.

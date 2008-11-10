@@ -29,6 +29,7 @@
 #	include <netinet/in.h>
 #endif
 
+#include <boost/shared_ptr.hpp>
 #include "log.h"
 #include "rc.h"
 #include "amf.h"
@@ -71,7 +72,7 @@ RTMPClient::~RTMPClient()
 
 // Make the NetConnection object that is used to connect to the
 // server.
-amf::Buffer *
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
                           double audioCodecs, double videoCodecs, double videoFunction,
                           const char *pageUrl)
@@ -93,7 +94,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     Element obj;
     obj.makeObject();
     
-    Element *appnode = new Element;
+    boost::shared_ptr<amf::Element> appnode(new Element);
     appnode->makeString("app", app);
     obj.addProperty(appnode);
 
@@ -104,45 +105,45 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
         version = "LNX 9,0,31,0";
     }  
 
-    Element *flashVer = new Element;
+    boost::shared_ptr<amf::Element> flashVer(new Element);
     flashVer->makeString("flashVer", "LNX 9,0,31,0");
     obj.addProperty(flashVer);
     
-    Element *swfUrlnode = new Element;
+    boost::shared_ptr<amf::Element> swfUrlnode(new Element);
 //    swfUrl->makeString("swfUrl", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf");
     swfUrlnode->makeString("swfUrl", swfUrl);
     obj.addProperty(swfUrlnode);
 
 //    filespec = "rtmp://localhost/oflaDemo";
-    Element *tcUrlnode = new Element;
+    boost::shared_ptr<amf::Element> tcUrlnode(new Element);
     tcUrlnode->makeString("tcUrl", tcUrl);
     obj.addProperty(tcUrlnode);
 
-    Element *fpad = new Element;
+    boost::shared_ptr<amf::Element> fpad(new Element);
     fpad->makeBoolean("fpad", false);
     obj.addProperty(fpad);
 
-    Element *audioCodecsnode = new Element;
+    boost::shared_ptr<amf::Element> audioCodecsnode(new Element);
 //    audioCodecsnode->makeNumber("audioCodecs", 615);
     audioCodecsnode->makeNumber("audioCodecs", audioCodecs);
     obj.addProperty(audioCodecsnode);
     
-    Element *videoCodecsnode = new Element;
+    boost::shared_ptr<amf::Element> videoCodecsnode(new Element);
 //    videoCodecsnode->makeNumber("videoCodecs", 124);
     videoCodecsnode->makeNumber("videoCodecs", videoCodecs);
     obj.addProperty(videoCodecsnode);
 
-    Element *videoFunctionnode = new Element;
+    boost::shared_ptr<amf::Element> videoFunctionnode(new Element);
 //    videoFunctionnode->makeNumber("videoFunction", 0x1);
     videoFunctionnode->makeNumber("videoFunction", videoFunction);
     obj.addProperty(videoFunctionnode);
 
-    Element *pageUrlnode = new Element;
+    boost::shared_ptr<amf::Element> pageUrlnode(new Element);
 //    pageUrlnode->makeString("pageUrl", "http://x86-ubuntu/software/gnash/tests/");
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj.addProperty(pageUrlnode);
 
-    Element *objencodingnode = new Element;
+    boost::shared_ptr<amf::Element> objencodingnode(new Element);
     objencodingnode->makeNumber("objectEncoding", 0.0);
     obj.addProperty(objencodingnode);
     
@@ -151,27 +152,22 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
 //     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
 //     Buffer *rtmpBuf = hex2mem(rtmpStr);
-    Buffer *conobj = connect.encode();
-    Buffer *numobj = connum.encode();
-    Buffer *encobj = obj.encode();
+    boost::shared_ptr<Buffer> conobj = connect.encode();
+    boost::shared_ptr<Buffer> numobj = connum.encode();
+    boost::shared_ptr<Buffer> encobj = obj.encode();
 
-    Buffer *buf = new Buffer(conobj->size() + numobj->size() + encobj->size());
-//    buf->append(out);
-    buf->append(conobj);
-    buf->append(numobj);
-    buf->append(encobj);
-
-    delete conobj;
-    delete numobj;
-    delete encobj;
-    
+    boost::shared_ptr<Buffer> buf(new Buffer(conobj->size() + numobj->size() + encobj->size()));
+    *buf += conobj;
+    *buf += numobj;
+    *buf += encobj;
+		   
     return buf;
 }
 
 // 43 00 1a 21 00 00 19 14 02 00 0c 63 72 65 61 74  C..!.......creat
 // 65 53 74 72 65 61 6d 00 40 08 00 00 00 00 00 00  eStream.@.......
 // 05                                                    .               
-amf::Buffer *
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeStream(double id)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -179,41 +175,25 @@ RTMPClient::encodeStream(double id)
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
 
-    Element str = new Element;
-    str.makeString("createStream");
-    Buffer *strobj = str.encode();
-    if (!strobj) {
-	return 0;
-    }
+    boost::shared_ptr<amf::Element> str(new Element);
+    str->makeString("createStream");
+    boost::shared_ptr<Buffer> strobj = str->encode();
   
-    Element num = new Element;
-    num.makeNumber(id);
-    Buffer *numobj = num.encode();
-    if (!numobj) {
-	return 0;
-    }
+    boost::shared_ptr<amf::Element>  num(new Element);
+    num->makeNumber(id);
+    boost::shared_ptr<Buffer> numobj = num->encode();
 
-    Buffer *buf = new Buffer(strobj->size() + numobj->size());
-    if (!buf) {
-	return 0;
-    }
+    boost::shared_ptr<Buffer> buf(new Buffer(strobj->size() + numobj->size()));
 
     // Set the NULL object element that follows the stream ID
-    Element null;
-    null.makeNull();
-    Buffer *nullobj = null.encode();    
-    if (!nullobj) {
-	return 0;
-    }
+    boost::shared_ptr<amf::Element> null;
+    null->makeNull();
+    boost::shared_ptr<Buffer> nullobj = null->encode();    
 
-    buf->append(strobj);
-    buf->append(numobj);
-    buf->append(nullobj);
+    *buf += strobj;
+    *buf += numobj;
+    *buf += nullobj;
 
-    delete strobj;
-    delete numobj;
-    delete nullobj;
-    
     return buf;
 }
 
@@ -223,21 +203,21 @@ RTMPClient::encodeStream(double id)
 // 6f 6e 32 5f 66 6c 61 73 68 38 5f 77 5f 61 75 64  on2_flash8_w_aud
 // 69 6f 2e 66 6c 76 c2 00 03 00 00 00 01 00 00 27  io.flv.........'
 // 10
-amf::Buffer *
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeStreamOp(id, op, flag, "", 0);
 }    
 
-amf::Buffer *
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos)
 {
 //    GNASH_REPORT_FUNCTION;
     return encodeStreamOp(id, op, flag, "", pos);
 }    
 
-amf::Buffer *
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -250,7 +230,7 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 // A pause packet is the operation name "pause", followed by the stream ID,
 // then a NULL object, a boolean (always true from what I can tell), and then
 // a location, which appears to always be 0.
-amf::Buffer *
+boost::shared_ptr<Buffer> 
 RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -274,37 +254,26 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
 	  str.makeString("seek");
 	  break;
       default:
-	  return 0;
+	  boost::shared_ptr<Buffer> foo;
+	  return foo;
     };
 
-    Buffer *strobj = str.encode();
-    if (!strobj) {
-	return 0;
-    }
+    boost::shared_ptr<Buffer> strobj = str.encode();
 
     // Set the stream ID, which follows the command
     Element strid;
     strid.makeNumber(id);
-    Buffer *stridobj = strid.encode();
-    if (!stridobj) {
-	return 0;
-    }
+    boost::shared_ptr<Buffer> stridobj = strid.encode();
 
     // Set the NULL object element that follows the stream ID
     Element null;
     null.makeNull();
-    Buffer *nullobj = null.encode();    
-    if (!nullobj) {
-	return 0;
-    }
+    boost::shared_ptr<Buffer> nullobj = null.encode();    
 
     // Set the BOOLEAN object element that is the last field in the packet
     Element boolean;
     boolean.makeBoolean(flag);
-    Buffer *boolobj = boolean.encode();    
-    if (!boolobj) {
-	return 0;
-    }
+    boost::shared_ptr<Buffer> boolobj = boolean.encode();    
     
     // Calculate the packet size, rather than use the default as we want to
     // to be concious of the memory usage. The command name and the optional
@@ -313,24 +282,14 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     // Add 2 bytes for the Boolean, and 16 bytes for the two doubles, which are
     // 8 bytes apiece.
     pktsize += (sizeof(double) * 2) + 2;
-    Buffer *buf = new Buffer(pktsize);
-    buf->clear();
-//    Buffer *buf = new Buffer;
-    
-    if (!buf) {
-	return 0;
-    }
-    buf->append(strobj);
-    delete strobj;
-    buf->append(stridobj);
-    delete stridobj;    
-    buf->append(nullobj);
-    delete nullobj;
+    boost::shared_ptr<Buffer> buf(new Buffer(pktsize));    
+    *buf += strobj;
+    *buf += stridobj;
+    *buf += nullobj;
     // Seek doesn't use the boolean flag
     if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
-	buf->append(boolobj);
+	*buf += boolobj;
     }
-    delete boolobj;
 
     // The play command has an optional field, which is the name of the file
     // used for the stream. A Play command without this name set play an
@@ -338,21 +297,16 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     if (!name.empty()) {
 	Element filespec;
 	filespec.makeString(name);
-	Buffer *fileobj = filespec.encode();
-	buf->append(fileobj);
-	delete fileobj;
+	boost::shared_ptr<Buffer> fileobj = filespec.encode();
+	*buf += fileobj;
     }
     
     // The seek command also may have an optional location to seek to
     if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
 	Element seek;
 	seek.makeNumber(pos);
-	Buffer *posobj = seek.encode();
-	if (!posobj) {
-	    return 0;
-	}
-	buf->append(posobj);
-	delete posobj;
+	boost::shared_ptr<Buffer> posobj = seek.encode();
+	*buf += posobj;
     }
 
     return buf;
@@ -372,13 +326,13 @@ RTMPClient::handShakeRequest()
     }
 
     // All RTMP connections start with a 0x3
-    _handshake->copy(RTMP_HANDSHAKE);
+    *_handshake = RTMP_HANDSHAKE;
 
     // Since we don't know what the format is, create a pattern we can
     // recognize if we stumble across it later on.
     for (int i=0; i<RTMP_BODY_SIZE; i++) {
 	Network::byte_t pad = i^256;
-        _handshake->append(pad);
+        *_handshake += pad;
     }
     
     int ret = writeNet(_handshake);

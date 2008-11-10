@@ -174,7 +174,7 @@ check-DEJAGNU: site-update $(check_PROGRAMS)
 	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $(SHELL) $$i; \
 	  done; \
 	fi; \
-	echo "Number of discrepant lines (for information only): `grep -e "^-\|^+" *.log | wc -l`"
+	echo "Number of discrepant lines (for information only): `LC_ALL=C ${EGREP} "^-\|^+" *.log | wc -l`"
 
 site-update: site.exp
 	@rm -fr site.exp.bak

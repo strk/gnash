@@ -1,19 +1,10 @@
-This directory contains both MediaHandler and SoundHandler
-interfaces and implementations.
+This directory contains the MediaHandler subsystem,
+see doc/DESIGN for more info.
 
-Interfaces are in this dir, implementations in subdirs.
+Interfaces and common implementations are in this dir,
+modules in subdirs.
 
-Implementations for MediaHandler are gst and ffmpeg, in
-their own directories.
+Available modules for MediaHandler are gst and ffmpeg,
+in their own directories.
 
-The only current implementation of SoundHandler is sdl,
-which currently resides under ffmpeg dir for historical
-reasons.
-
-The layout of this directory should change after 0.8.4
-release is out, so to have two separate directories
-for "MediaHandler" and "SoundHandler". See doc/DESIGN
-in top-level source dir for a picture of it.
-
-
---strk(Wed Oct  8 10:31:23 CEST 2008)
+--strk(Sat Nov  8 20:04:41 CET 2008)

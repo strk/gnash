@@ -173,10 +173,10 @@ static void build_options()
         << _("   Configured with: ") << CONFIG_CONFIG << endl
         << _("   CXXFLAGS: ") << CXXFLAGS << endl;
 
-#ifdef HAVE_FFMPEG_AVCODEC_H
+#ifdef USE_FFMPEG
     cout << _("Built against ffmpeg version: ") << LIBAVCODEC_IDENT << endl;
 #endif
-#ifdef HAVE_GST_GST_H
+#ifdef USE_GST
     cout << _("Built against gstreamer version: ") << GST_VERSION_MAJOR << "."
         << GST_VERSION_MINOR << "." << GST_VERSION_MICRO << endl;
     guint major, minor, micro, nano;

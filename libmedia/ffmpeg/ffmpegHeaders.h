@@ -19,6 +19,10 @@
 #ifndef GNASH_MEDIA_FFMPEG_HEADERS_H
 #define GNASH_MEDIA_FFMPEG_HEADERS_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 // This is for compatibility with braindamaged versions of ffmpeg
 #if !defined INT64_C
 #if defined __WORDSIZE && __WORDSIZE == 64

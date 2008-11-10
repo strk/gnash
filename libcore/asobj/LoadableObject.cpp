@@ -63,10 +63,26 @@ LoadableObject::~LoadableObject()
 
 
 void
-LoadableObject::send(const std::string& /*urlstr*/)
+LoadableObject::send(const std::string& urlstr, const std::string& target,
+        bool post)
 {
-    log_unimpl (__FUNCTION__);
+    movie_root& m = _vm.getRoot();
+
+    // Encode the object for HTTP. If post is true,
+    // XML should not be encoded. LoadVars is always
+    // encoded.
+    // TODO: test properly.
+    std::ostringstream data;
+    toString(data, !post);
+
+    // Only GET and POST are possible here.
+    MovieClip::VariablesMethod method = post ? MovieClip::METHOD_POST :
+                                               MovieClip::METHOD_GET;
+
+    m.getURL(urlstr, target, data.str(), method);
+
 }
+
 
 void
 LoadableObject::sendAndLoad(const std::string& urlstr,
@@ -76,7 +92,8 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
     /// All objects get a loaded member, set to false.
     target.set_member(NSV::PROP_LOADED, false);
 
-	URL url(urlstr, get_base_url());
+    const RunInfo& ri = _vm.getRoot().runInfo();
+	URL url(urlstr, ri.baseURL());
 
 	std::auto_ptr<IOChannel> str;
 	if (post)
@@ -137,8 +154,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
         toString(data, false);
 
         /// It doesn't matter if there are no request headers.
-        str = StreamProvider::getDefaultInstance().getStream(url,
-                                                    data.str(), headers);
+        str = ri.streamProvider().getStream(url, data.str(), headers);
     }
 	else
     {
@@ -149,7 +165,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
 
     	std::string getURL = urlstr + "?" + data.str();
         log_debug("Using GET method for sendAndLoad: %s", getURL);
-        str = StreamProvider::getDefaultInstance().getStream(getURL);
+        str = ri.streamProvider().getStream(getURL);
     }
 
 	if (!str.get()) 
@@ -173,10 +189,11 @@ LoadableObject::load(const std::string& urlstr)
     // when loading is complete.
 	set_member(NSV::PROP_LOADED, false);
 
-	URL url(urlstr, get_base_url());
+    const RunInfo& ri = _vm.getRoot().runInfo();
+	URL url(urlstr, ri.baseURL());
 
     // Checks whether access is allowed.
-    std::auto_ptr<IOChannel> str(StreamProvider::getDefaultInstance().getStream(url));
+    std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
 
 	if (!str.get()) 
 	{
@@ -478,5 +495,47 @@ LoadableObject::loadableobject_load(const fn_call& fn)
 	return as_value(true);
 
 }
+
+    
+as_value
+LoadableObject::loadableobject_send(const fn_call& fn)
+{
+    boost::intrusive_ptr<LoadableObject> ptr =
+        ensureType<LoadableObject>(fn.this_ptr);
+ 
+    std::ostringstream os;
+    fn.dump_args(os);
+    log_debug("XML.send(%s) / LoadVars.send() TESTING", os.str());
+
+    std::string target;
+    std::string url;
+    std::string method;
+
+    switch (fn.nargs)
+    {
+        case 0:
+            return as_value(false);
+        case 3:
+            method = fn.arg(2).to_string();
+        case 2:
+            target = fn.arg(1).to_string();
+        case 1:
+            url = fn.arg(0).to_string();
+            break;
+    }
+
+    StringNoCaseEqual noCaseCompare;
+    
+    // POST is the default in a browser, GET supposedly default
+    // in a Flash test environment (whatever that is).
+    bool post = !noCaseCompare(method, "get");
+
+    // Encode the data in the default way for the type.
+    std::ostringstream data;
+
+    ptr->send(url, target, post);
+    return as_value(true);
+}
+
 
 }

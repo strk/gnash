@@ -28,7 +28,7 @@
 #include "fn_call.h"
 #include "as_function.h"
 #include "movie_definition.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h" // for loadClip (get_parent)
 #include "log.h"
 #include "URL.h" // for url parsing
@@ -160,7 +160,7 @@ public:
 	~MovieClipLoader();
 
 	/// MovieClip
-	bool loadClip(const std::string& url, sprite_instance& target);
+	bool loadClip(const std::string& url, MovieClip& target);
 
 	void unloadClip(void *);
 
@@ -189,10 +189,12 @@ MovieClipLoader::~MovieClipLoader()
 }
 
 bool
-MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
+MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 {
+    
+    movie_root& mr = _vm.getRoot();
 
-	URL url(url_str.c_str(), get_base_url());
+	URL url(url_str.c_str(), mr.runInfo().baseURL());
 	
 #if GNASH_DEBUG
 	log_debug(_(" resolved url: %s"), url.str());
@@ -213,11 +215,11 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 		return false;
 	}
 
-	sprite_instance* newChar = targetVal.to_sprite(); // this is to resolve the soft ref
+	MovieClip* newChar = targetVal.to_sprite(); // this is to resolve the soft ref
 	if ( ! newChar )
 	{
 		// We could assert, but let's try to be nicer...
-		log_error("sprite_instance::loadMovie destroyed self w/out replacing ?");
+		log_error("MovieClip::loadMovie destroyed self w/out replacing ?");
 		return false;
 	}
 
@@ -237,7 +239,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	/// This event must be dispatched when actions
 	/// in first frame of loaded clip have been executed.
 	///
-	/// Since sprite_instance::loadMovie above will invoke stagePlacementCallback
+	/// Since MovieClip::loadMovie above will invoke stagePlacementCallback
 	/// and thus queue all actions in first frame, we'll queue the
 	/// onLoadInit call next, so it happens after the former.
 	///
@@ -287,7 +289,7 @@ moviecliploader_loadclip(const fn_call& fn)
 		return as_value(false);
 	}
 
-	sprite_instance* sprite = target->to_movie();
+	MovieClip* sprite = target->to_movie();
 	if ( ! sprite )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -355,7 +357,7 @@ moviecliploader_getprogress(const fn_call& fn)
 		return as_value();
 	}
 
-	sprite_instance* sp = target->to_movie();
+	MovieClip* sp = target->to_movie();
 	if ( ! sp )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

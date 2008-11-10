@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "masks_test.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -46,13 +46,13 @@ main(int /*argc*/, char** /*argv*/)
 	dbglogfile.setVerbosity(1);
 
 	Ranges invalidated;
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	// FRAME 1 (start)
 
 	check_equals(root->get_frame_count(), 6);
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 1);  // dejagnu clip
 	invalidated = tester.getInvalidatedRanges();
@@ -61,7 +61,7 @@ main(int /*argc*/, char** /*argv*/)
 	// FRAME 2 -- masks at different depth ranges
 	tester.advance();
 	
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 	check_equals(root->get_current_frame(), 1); // 0-based
 	check_equals(root->getDisplayList().size(), 9);
 	root->getDisplayList().dump();

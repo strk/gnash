@@ -163,7 +163,9 @@ namespace gnash {
 
     // @@ forward decl to avoid including base/image.h; TODO change the
     // render_handler interface to not depend on these classes at all.
-    namespace image { class ImageBase; class ImageRGB; class ImageRGBA; }
+    class GnashImage;
+    class ImageRGB;
+    class ImageRGBA;
 }
 
 namespace gnash {
@@ -222,7 +224,7 @@ public:
   /// Given an image, returns a pointer to a bitmap_info class
   /// that can later be passed to fill_styleX_bitmap(), to set a
   /// bitmap fill style.
-  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im) = 0;
+  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im) = 0;
 
   /// \brief
   /// Given an image, returns a pointer to a bitmap_info class
@@ -231,7 +233,7 @@ public:
   //
   /// This version takes an image with an alpha channel.
   ///
-  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im) = 0;
+  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im) = 0;
 
   /// Draws a video frame. 
   //
@@ -253,7 +255,7 @@ public:
   ///   The width and height determine the size of the Flash video instance
   ///   on the stage (in TWIPS) prior to SWFMatrix transformations.         
   ///
-  virtual void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* mat, const rect* bounds) = 0;
+  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds) = 0;
 
   /// Sets the update region (called prior to begin_display).
   //

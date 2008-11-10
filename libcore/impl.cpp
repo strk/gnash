@@ -22,34 +22,41 @@
 #include "IOChannel.h"
 #include "utility.h"
 #include "impl.h"
-#include "font.h"
 #include "fontlib.h"
 #include "log.h"
-#include "image.h"
+#include "GnashImage.h"
 #include "sprite_definition.h"
 #include "SWFMovieDefinition.h"
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
 #include "URL.h"
 #include "StreamProvider.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "VM.h"
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
 #include "DefineButtonCxformTag.h"
 #include "CSMTextSettingsTag.h"
+#include "DefineFontTag.h"
+#include "DefineButtonTag.h"
+#include "DefineTextTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
 #include "DoABCTag.h"
 #include "DoActionTag.h"
 #include "DoInitActionTag.h"
+#include "DefineEditTextTag.h"
 #include "SetBackgroundColorTag.h"
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
 #include "SymbolClassTag.h"
+#include "DefineButtonSoundTag.h"
+#include "DefineVideoStreamTag.h"
+#include "DefineFontNameTag.h"
+#include "VideoFrameTag.h"
 #include "swf/tag_loaders.h" // for all tag loaders..
-#include "sound_handler.h" // for get_sound_handler
+#include "RunInfo.h"
 #ifdef GNASH_USE_GC
 #include "GC.h"
 #endif
@@ -63,45 +70,6 @@ namespace gnash
 {
 
 static void clear_library();
-
-/// Namespace for global data (will likely turn into a class)
-namespace globals { // gnash::globals
-
-  /// global StreamProvider
-  StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
-
-  /// Base url (for relative urls resolution)
-  //
-  /// we need an auto_ptr becase the URL class
-  /// is an immutable one and needs to be set 
-  /// at construction time..
-  ///
-  static std::auto_ptr<URL> baseurl;
-
-} // namespace gnash::global
-
-// global Sound handler stuff. Should this be moved to the VM class ?
-static media::sound_handler* _sound_handler = 0;
-void  set_sound_handler(media::sound_handler* s) { _sound_handler = s; }
-media::sound_handler* get_sound_handler() { return _sound_handler; }
-
-void
-set_base_url(const URL& url)
-{
-  // can call this only once during a single run
-  assert(!globals::baseurl.get());
-  globals::baseurl.reset(new URL(url));
-  log_debug(_("Base url set to: %s"), globals::baseurl->str());
-}
-
-const URL&
-get_base_url()
-{
-  // Don't call me if you haven't set me !
-  assert(globals::baseurl.get());
-  return *globals::baseurl;
-}
-
 
 // Associate the specified tag type with the given tag loader
 // function.
@@ -137,22 +105,28 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::PLACEOBJECT, PlaceObject2Tag::loader);
     register_tag_loader(SWF::REMOVEOBJECT,  RemoveObjectTag::loader); // 05
     register_tag_loader(SWF::DEFINEBITS,  define_bits_jpeg_loader);
-    register_tag_loader(SWF::DEFINEBUTTON,  button_character_loader);
-    register_tag_loader(SWF::JPEGTABLES,  jpeg_tables_loader);
+    register_tag_loader(SWF::DEFINEBUTTON, DefineButtonTag::loader);
+    register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
     register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
-    register_tag_loader(SWF::DEFINEFONT,  define_font_loader);
-    register_tag_loader(SWF::DEFINETEXT,  define_text_loader);
+    register_tag_loader(SWF::DEFINEFONT, DefineFontTag::loader);
+    register_tag_loader(SWF::DEFINETEXT, DefineTextTag::loader);
     register_tag_loader(SWF::DOACTION,  DoActionTag::doActionLoader);
-    register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
-    register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader); // 62
+    register_tag_loader(SWF::DEFINEFONTINFO, DefineFontInfoTag::loader);
+    // 62
+    register_tag_loader(SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader);
     register_tag_loader(SWF::DEFINESOUND, define_sound_loader);
-    register_tag_loader(SWF::STARTSOUND,  StartSoundTag::loader);
+    register_tag_loader(SWF::STARTSOUND, StartSoundTag::loader);
+    // 89
+    register_tag_loader(SWF::STARTSOUND2, StartSound2Tag::loader);
 
-    register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16 
+    register_tag_loader(SWF::STOPSOUND, fixme_loader); // 16 
 
-    register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
-    register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader); // 18
-    register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader); // 19
+    // 17
+    register_tag_loader(SWF::DEFINEBUTTONSOUND, DefineButtonSoundTag::loader);
+    // 18
+    register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader);
+    // 19
+    register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader);
     register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
     register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
     register_tag_loader(SWF::DEFINESHAPE2,  define_shape_loader);
@@ -168,11 +142,12 @@ static void ensure_loaders_registered()
     // 30 - _UNKNOWN_ unimplemented
     register_tag_loader(SWF::FREEALL, fixme_loader); // 31
     register_tag_loader(SWF::DEFINESHAPE3,  define_shape_loader);
-    register_tag_loader(SWF::DEFINETEXT2, define_text_loader);
-    register_tag_loader(SWF::DEFINEBUTTON2, button_character_loader);
+    register_tag_loader(SWF::DEFINETEXT2, DefineText2Tag::loader);
+    // 37
+    register_tag_loader(SWF::DEFINEBUTTON2, DefineButton2Tag::loader);
     register_tag_loader(SWF::DEFINEBITSJPEG3, define_bits_jpeg3_loader);
     register_tag_loader(SWF::DEFINELOSSLESS2, define_bits_lossless_2_loader);
-    register_tag_loader(SWF::DEFINEEDITTEXT, define_edit_text_loader);
+    register_tag_loader(SWF::DEFINEEDITTEXT, DefineEditTextTag::loader);
     register_tag_loader(SWF::DEFINEVIDEO, fixme_loader); // 38
     register_tag_loader(SWF::DEFINESPRITE,  sprite_loader);
     register_tag_loader(SWF::NAMECHARACTER, fixme_loader); // 40
@@ -186,7 +161,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
     register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
     register_tag_loader(SWF::FRAMETAG,  fixme_loader); // 47
-    register_tag_loader(SWF::DEFINEFONT2, define_font_loader); // 48
+    // 48
+    register_tag_loader(SWF::DEFINEFONT2, DefineFontTag::loader);
     register_tag_loader(SWF::GENCOMMAND,  fixme_loader); // 49
     register_tag_loader(SWF::DEFINECOMMANDOBJ, fixme_loader); // 50
     register_tag_loader(SWF::CHARACTERSET,  fixme_loader); // 51
@@ -206,8 +182,10 @@ static void ensure_loaders_registered()
 
     register_tag_loader(SWF::INITACTION, DoInitActionTag::doInitActionLoader);  // 59  
 
-    register_tag_loader(SWF::DEFINEVIDEOSTREAM, define_video_loader); // 60
-    register_tag_loader(SWF::VIDEOFRAME, video_loader); // 61
+    // 60
+    register_tag_loader(SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader);
+    // 61
+    register_tag_loader(SWF::VIDEOFRAME, VideoFrameTag::loader);
 
     // 62, DEFINEFONTINFO2 is done above.
     // We're not an authoring tool.
@@ -234,7 +212,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
     register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader); // 74
-    register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
+    register_tag_loader(SWF::DEFINEFONT3, DefineFontTag::loader); // 75
     register_tag_loader(SWF::SYMBOLCLASS, SymbolClassTag::loader); // 76 
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
     register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
@@ -242,7 +220,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINESHAPE4, define_shape_loader); // 83
     register_tag_loader(SWF::DEFINEMORPHSHAPE2, define_shape_morph_loader); // 84
     register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,define_scene_frame_label_loader); //86
-    register_tag_loader(SWF::DEFINEFONTNAME, define_font_name_loader); // 88
+    // 88
+    register_tag_loader(SWF::DEFINEFONTNAME, DefineFontNameTag::loader);
 
     register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
@@ -261,7 +240,7 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 
     try
     {
-        std::auto_ptr<image::ImageBase> im(image::readImageData(imageData, type));
+        std::auto_ptr<GnashImage> im(ImageInput::readImageData(imageData, type));
         if (!im.get())
         {
             log_error(_("Can't read image file from %s"), url);
@@ -363,27 +342,21 @@ getFileType(IOChannel* in)
 // NOTE: this method assumes this *is* an SWF stream
 //
 static SWFMovieDefinition*
-create_swf_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoaderThread)
+create_swf_movie(std::auto_ptr<IOChannel> in, const std::string& url,
+        const RunInfo& runInfo, bool startLoaderThread)
 {
 
-  // Avoid leaks on error 
-  std::auto_ptr<SWFMovieDefinition> m ( new SWFMovieDefinition() );
+    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
 
-  if ( ! m->readHeader(in, url) )
-  {
-    return NULL;
-  }
+    if (!m->readHeader(in, url)) return 0;
+    if (startLoaderThread && !m->completeLoad()) return 0;
 
-  if ( startLoaderThread && ! m->completeLoad() )
-  {
-    return NULL;
-  }
-
-  return m.release();
+    return m.release();
 }
 
 movie_definition*
-create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoaderThread)
+create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
+        const RunInfo& runInfo, bool startLoaderThread)
 {
   assert(in.get());
 
@@ -410,7 +383,7 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
 
 
         case GNASH_FILETYPE_SWF:
-            return create_swf_movie(in, url, startLoaderThread);
+            return create_swf_movie(in, url, runInfo, startLoaderThread);
 
         case GNASH_FILETYPE_FLV:
             log_unimpl(_("FLV can't be loaded directly as a movie"));
@@ -424,27 +397,31 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoad
 }
 
 movie_definition*
-create_movie(const URL& url, const char* reset_url, bool startLoaderThread, const std::string* postdata)
+create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
+        bool startLoaderThread, const std::string* postdata)
 {
 
-  const std::string swfurl = url.str();
-
   std::auto_ptr<IOChannel> in;
-  if ( postdata ) in = globals::streamProvider.getStream(url, *postdata);
-  else in = globals::streamProvider.getStream(url);
+
+  StreamProvider& streamProvider = runInfo.streamProvider();
+
+  if ( postdata ) in = streamProvider.getStream(url, *postdata);
+  else in = streamProvider.getStream(url);
   if ( ! in.get() )
   {
-      log_error(_("failed to open '%s'; can't create movie"), swfurl);
+      log_error(_("failed to open '%s'; can't create movie"), url);
       return NULL;
   }
   else if ( in->get_error() )
   {
-      log_error(_("streamProvider opener can't open '%s'"), swfurl);
+      log_error(_("streamProvider opener can't open '%s'"), url);
       return NULL;
   }
 
-  const char* movie_url = reset_url ? reset_url : swfurl.c_str();
-  movie_definition* ret = create_movie(in, movie_url, startLoaderThread);
+  std::string urlstr = url.str();
+  const char* movie_url = reset_url ? reset_url : urlstr.c_str();
+  movie_definition* ret = create_movie(in, movie_url, runInfo,
+          startLoaderThread);
 
   return ret;
 
@@ -473,26 +450,16 @@ void  clear()
     //
     // See task task #6959 and depending items
     //
-    std::cerr << "Any segfault past this message is likely due to improper threads cleanup." << std::endl;
-    //exit(EXIT_SUCCESS);
+    log_debug("Any segfault past this message is likely due to improper threads cleanup.");
 
     clear_library();
     fontlib::clear();
-
-    if ( VM::isInitialized() )
-    {
-        VM::get().getRoot().clear();
-    }
 
 #ifdef GNASH_USE_GC 
     GC::get().collect();
 
     GC::cleanup();
 #endif
-
-    // By setting the soundhandler to NULL we avoid it being used
-    // after it's been de-referenced
-    set_sound_handler(NULL);
 
     // By setting the render handler to NULL we avoid it being used
     // after it's been de-referenced (fixes bug #21310)
@@ -624,65 +591,57 @@ static void clear_library()
 // loaded it already.  Add it to our library on success, and
 // return a pointer to it.
 //
-movie_definition* create_library_movie(const URL& url, const char* real_url, bool startLoaderThread, const std::string* postdata)
+movie_definition* create_library_movie(const URL& url, const RunInfo& runInfo,
+        const char* real_url, bool startLoaderThread,
+        const std::string* postdata)
 {
-//    log_debug(_("%s: url is %s"), __PRETTY_FUNCTION__, url.str());
 
     // Use real_url as label for cache if available 
     std::string cache_label = real_url ? URL(real_url).str() : url.str();
 
     // Is the movie already in the library? (don't check if we have post data!)
-    if ( ! postdata )
+    if (!postdata)
     {
-  boost::intrusive_ptr<movie_definition>  m;
-  if ( s_movie_library.get(cache_label, &m) )
-      {
-        log_debug(_("Movie %s already in library"), cache_label);
-    return m.get();
-      }
+        boost::intrusive_ptr<movie_definition>  m;
+        if ( s_movie_library.get(cache_label, &m) )
+        {
+            log_debug(_("Movie %s already in library"), cache_label);
+            return m.get();
+        }
     }
 
-  // Try to open a file under the filename, but DO NOT start
-  // the loader thread now to avoid IMPORT tag loaders from 
-  // calling create_library_movie() again and NOT finding
-  // the just-created movie.
-  movie_definition* mov = create_movie(url, real_url, false, postdata);
-  //log_debug(_("create_movie(%s, %s, false) returned %p"), url.str(), real_url, mov);
+    // Try to open a file under the filename, but DO NOT start
+    // the loader thread now to avoid IMPORT tag loaders from 
+    // calling create_library_movie() again and NOT finding
+    // the just-created movie.
+    movie_definition* mov = create_movie(url, runInfo, real_url, false,
+            postdata);
 
-  if (mov == NULL)
-  {
-    log_error(_("Couldn't load library movie '%s'"),
-      url.str());
-    return NULL;
-  }
-
-  // Movie is good, add to the library 
-  if ( ! postdata ) // don't add if we POSTed
-  {
-  	s_movie_library.add(cache_label, mov);
-        log_debug(_("Movie %s (SWF%d) added to library"), cache_label, mov->get_version());
-  }
-  else
-  {
-        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from a POST)"), cache_label, mov->get_version());
-  }
-
-  // Now complete the load if the movie is an SWF movie
-  // 
-  // FIXME: add completeLoad() to movie_definition class
-  //        to allow loads of JPEG to use a loader thread
-  //        too...
-  //
-  if ( startLoaderThread )
-  {
-    SWFMovieDefinition* mdi = dynamic_cast<SWFMovieDefinition*>(mov);
-    if ( mdi ) {
-      mdi->completeLoad();
+    if (!mov)
+    {
+        log_error(_("Couldn't load library movie '%s'"), url.str());
+        return NULL;
     }
-  }
 
-  //log_debug(_("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p"), url.str(), real_url, startLoaderThread, mov);
-  return mov;
+    // Movie is good, add to the library 
+    if (!postdata) // don't add if we POSTed
+    {
+        s_movie_library.add(cache_label, mov);
+        log_debug(_("Movie %s (SWF%d) added to library"),
+                cache_label, mov->get_version());
+    }
+    else
+    {
+        log_debug(_("Movie %s (SWF%d) NOT added to library (resulted from "
+                    "a POST)"), cache_label, mov->get_version());
+    }
+
+    /// Now complete the load if the movie is an SWF movie
+    // 
+    /// This is a no-op except for SWF movies.
+    if (startLoaderThread) mov->completeLoad();
+
+    return mov;
 }
 
 #ifdef GNASH_USE_GC

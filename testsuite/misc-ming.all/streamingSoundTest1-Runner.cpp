@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "streamingSoundTest1.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -61,7 +61,7 @@ main(int /*argc*/, char** /*argv*/)
 	dbglogfile.setVerbosity(1);
 	dbglogfile.setActionDump(1);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 1);

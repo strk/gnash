@@ -20,8 +20,8 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "log.h"
-#include "sprite_instance.h"
-#include "movie_instance.h" // for implicit upcast to sprite_instance
+#include "MovieClip.h"
+#include "movie_instance.h" // for implicit upcast to MovieClip
 #include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
@@ -33,8 +33,8 @@
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
 #include "GnashKey.h" // key::code
-#include "../gui/gui.h"
 
+#include <boost/algorithm/string/replace.hpp>
 #include <utility>
 #include <iostream>
 #include <string>
@@ -44,6 +44,7 @@
 #include <functional> // std::bind2nd, std::equal_to
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
+#include <unistd.h>
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -88,9 +89,12 @@ movie_root::testInvariant() const
 }
 
 
-movie_root::movie_root(VM& vm)
+movie_root::movie_root(const movie_definition& def,
+        VirtualClock& clock, const RunInfo& runInfo)
 	:
-    _vm(vm),
+    _runInfo(runInfo),
+    _originalURL(def.get_url()),
+    _vm(VM::init(def.get_version(), *this, clock)),
 	_interfaceHandler(0),
 	_fsCommandHandler(0),
 	m_viewport_x0(0),
@@ -98,7 +102,7 @@ movie_root::movie_root(VM& vm)
 	m_viewport_width(1),
 	m_viewport_height(1),
 	m_background_color(255, 255, 255, 255),
-        m_background_color_set(false),
+    m_background_color_set(false),
 	m_timer(0.0f),
 	m_mouse_x(0),
 	m_mouse_y(0),
@@ -118,7 +122,6 @@ movie_root::movie_root(VM& vm)
 	_displayState(normal),
 	_recursionLimit(256),
 	_timeoutLimit(15),
-	_gui(0),
 	_movieAdvancementDelay(83), // ~12 fps by default
 	_lastMovieAdvancement(0)
 {
@@ -200,7 +203,7 @@ movie_root::setRootMovie(movie_instance* movie)
 	}
 	catch (ActionLimitException& al)
 	{
-		boost::format fmt = boost::format(_("ActionLimits hit during setRootMovie: %s. Disable scripts ?")) % al.what();
+		boost::format fmt = boost::format(_("ActionLimits hit during setRootMovie: %s. Disable scripts?")) % al.what();
 		handleActionLimitHit(fmt.str());
 	}
     catch (ActionParserException& e)
@@ -216,8 +219,9 @@ void
 movie_root::handleActionLimitHit(const std::string& msg)
 {
 	bool disable = true;
-	if ( _gui ) disable = _gui->yesno(msg);
-	else log_error("No gui registered, assuming 'Yes' answer to question: %s", msg);
+	if ( _interfaceHandler ) disable = _interfaceHandler->yesNo(msg);
+	else log_error("No user interface registered, assuming 'Yes' answer to "
+            "question: %s", msg);
 	if ( disable )
 	{
 		disableScripts();
@@ -295,7 +299,7 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 }
 
 void
-movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
+movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 {
 	assert(movie);
 
@@ -348,7 +352,7 @@ movie_root::swapLevels(boost::intrusive_ptr<sprite_instance> movie, int depth)
 	}
 	else
 	{
-		boost::intrusive_ptr<sprite_instance> otherMovie = targetIt->second;
+		boost::intrusive_ptr<MovieClip> otherMovie = targetIt->second;
 		otherMovie->set_depth(oldDepth);
 		oldIt->second = otherMovie;
 		targetIt->second = movie;
@@ -381,7 +385,7 @@ movie_root::dropLevel(int depth)
 		return;
 	}
 
-	sprite_instance* mo = it->second.get();
+	MovieClip* mo = it->second.get();
 	if ( mo == getRootMovie() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -401,8 +405,9 @@ movie_root::dropLevel(int depth)
 bool
 movie_root::loadLevel(unsigned int num, const URL& url)
 {
-	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
-	if (md == NULL)
+	boost::intrusive_ptr<movie_definition> md (
+            create_library_movie(url, _runInfo));
+	if (!md)
 	{
 		log_error(_("can't create movie_definition for %s"),
 			url.str());
@@ -419,7 +424,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	}
 
 	// Parse query string
-	sprite_instance::VariableMap vars;
+	MovieClip::VariableMap vars;
 	url.parse_querystring(url.querystring(), vars);
 	extern_movie->setVariables(vars);
 
@@ -444,7 +449,7 @@ movie_root::getLevel(unsigned int num) const
 void
 movie_root::reset()
 {
-	media::sound_handler* sh = get_sound_handler();
+	sound::sound_handler* sh = _runInfo.soundHandler();
 	if ( sh ) sh->reset();
 	clear();
 	_disableScripts = false;
@@ -840,7 +845,7 @@ movie_root::fire_mouse_event()
     m_mouse_button_state.currentButtonState = (m_mouse_buttons & 1);
 
     // Set _droptarget if dragging a sprite
-    sprite_instance* dragging = 0;
+    MovieClip* dragging = 0;
     character* draggingChar = getDraggingCharacter();
     if ( draggingChar ) dragging = draggingChar->to_movie();
     if ( dragging )
@@ -1121,7 +1126,7 @@ movie_root::display()
 
 	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		boost::intrusive_ptr<sprite_instance> movie = i->second;
+		boost::intrusive_ptr<MovieClip> movie = i->second;
 
 		movie->clear_invalidated();
 
@@ -1870,7 +1875,7 @@ movie_root::cleanupDisplayList()
         //       method of each sprite, but that will introduce 
         //       problems when we'll implement skipping ::display()
         //       when late on FPS. Alternatively we may have the
-        //       sprite_instance::markReachableResources take care
+        //       MovieClip::markReachableResources take care
         //       of cleaning up unloaded... but that will likely
         //       introduce problems when allowing the GC to run
         //       at arbitrary times.
@@ -2048,9 +2053,141 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 }
 
 void
-movie_root::loadMovie(const URL& url, const std::string& target, const std::string* postdata)
+movie_root::getURL(const std::string& urlstr, const std::string& target,
+        const std::string& data, MovieClip::VariablesMethod method)
 {
+
+    if (_hostfd == -1)
+    {
+        /// If there is no hosting application, call the URL launcher. For
+        /// safety, we resolve the URL against the base URL for this run.
+        /// The data is not sent at all.
+        URL url(urlstr, _runInfo.baseURL());
+
+        gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+        std::string command = rcfile.getURLOpenerFormat();
+
+        /// Try to avoid letting flash movies execute
+        /// arbitrary commands (sic)
+        ///
+        /// Maybe we should exec here, but if we do we might have problems
+        /// with complex urlOpenerFormats like:
+        ///    firefox -remote 'openurl(%u)'
+        ///
+        ///
+        /// NOTE: this escaping implementation is far from optimal, but
+        ///       I felt pretty in rush to fix the arbitrary command
+        ///      execution... we'll optimize if needed
+        ///
+        std::string safeurl = url.str(); 
+        boost::replace_all(safeurl, "\\", "\\\\");    // escape backslashes first
+        boost::replace_all(safeurl, "'", "\\'");    // then single quotes
+        boost::replace_all(safeurl, "\"", "\\\"");    // double quotes
+        boost::replace_all(safeurl, ";", "\\;");    // colons
+        boost::replace_all(safeurl, " ", "\\ ");    // spaces
+        boost::replace_all(safeurl, ">", "\\>");    // output redirection
+        boost::replace_all(safeurl, "<", "\\<");    // input redirection
+        boost::replace_all(safeurl, "&", "\\&");    // background (sic)
+        boost::replace_all(safeurl, "\n", "\\n");    // newline
+        boost::replace_all(safeurl, "\r", "\\r");    // return
+        boost::replace_all(safeurl, "\t", "\\t");    // tab
+        boost::replace_all(safeurl, "|", "\\|");    // pipe
+        boost::replace_all(safeurl, "`", "\\`");    // backtick
+
+        boost::replace_all(safeurl, "(", "\\(");    // subshell :'(
+        boost::replace_all(safeurl, ")", "\\)");    // 
+        boost::replace_all(safeurl, "}", "\\}");    // 
+        boost::replace_all(safeurl, "{", "\\{");    // 
+
+        boost::replace_all(safeurl, "$", "\\$");    // variable expansions
+
+        boost::replace_all(command, "%u", safeurl);
+
+        log_debug (_("Launching URL: %s"), command);
+        std::system(command.c_str());
+        return;
+    }
+
+    /// This is when there is a hosting application.
+    std::ostringstream request;
+    std::string querystring;
+    switch (method)
+    {
+        case MovieClip::METHOD_POST:
+             request << "POST " << target << ":" << 
+                data << "$" << urlstr << std::endl;
+             break;
+
+        // METHOD_GET and METHOD_NONE are the same, except that
+        // for METHOD_GET we append the variables to the query
+        // string.
+        case MovieClip::METHOD_GET:
+            // Append vars to URL query string
+            if (urlstr.find("?") == std::string::npos) {
+                querystring = "?";
+            }
+            else querystring = "&";
+            querystring.append(data);
+
+        case MovieClip::METHOD_NONE:
+            // use the original url, non parsed (the browser will know
+            // better how to resolve relative urls and handle
+            // javascript)
+            request << "GET " << target << ":" << urlstr << std::endl;
+            break;
+    }
+
+    std::string requestString = request.str();
+    size_t len = requestString.length();
+    // TODO: should mutex-protect this ?
+    // NOTE: we are assuming the hostfd is set in blocking mode here..
+    log_debug(_("Attempt to write geturl requests fd %d"), _hostfd);
+
+    int ret = write(_hostfd, requestString.c_str(), len);
+    if (ret == -1)
+    {
+        log_error(_("Could not write to user-provided host requests "
+                    "fd %d: %s"), _hostfd, std::strerror(errno));
+    }
+    if (static_cast<size_t>(ret) < len)
+    {
+        log_error(_("Could only write %d bytes over %d required to "
+                    "user-provided host requests fd %d"),
+                    ret, len, _hostfd);
+    }
+
+    // The request string ends with newline, and we don't want to log that
+    requestString.resize(requestString.size() - 1);
+    log_debug(_("Sent request '%s' to host fd %d"), requestString, _hostfd);
+
+}
+
+void
+movie_root::loadMovie(const std::string& urlstr, const std::string& target,
+        const std::string& data, MovieClip::VariablesMethod method)
+{
+
+    /// URL security is checked in StreamProvider::getStream() down the
+    /// chain.
+    URL url(urlstr, _runInfo.baseURL());
+
+    /// If the method is MovieClip::METHOD_NONE, we send no data.
+    if (method == MovieClip::METHOD_GET)
+    {
+        std::string varsToSend(urlstr);
+        /// GET: append data to query string.
+        std::string qs = url.querystring();
+        if ( qs.empty() ) varsToSend.insert(0, 1, '?');
+        else varsToSend.insert(0, 1, '&');
+        url.set_querystring(qs + varsToSend);
+    }
+
     log_debug("movie_root::loadMovie(%s, %s)", url.str(), target);
+
+    const std::string* postdata = NULL;
+
+    /// POST: send variables using the POST method.
+    if (method == MovieClip::METHOD_POST) postdata = &data;
     _loadMovieRequests.push_front(LoadMovieRequest(url, target, postdata));
 }
 
@@ -2062,23 +2199,26 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
     bool usePost = r.usePost();
     const std::string& postData = r.getPostData();
 
-    if ( target.compare(0, 6, "_level") == 0 && target.find_first_not_of("0123456789", 7) == std::string::npos )
+    if (target.compare(0, 6, "_level") == 0 &&
+            target.find_first_not_of("0123456789", 7) == std::string::npos)
     {
-        unsigned int levelno = strtoul(target.c_str()+6, NULL, 0);
-        log_debug(_("processLoadMovieRequest: Testing _level loading (level %u)"), levelno);
+        unsigned int levelno = std::strtoul(target.c_str() + 6, NULL, 0);
+        log_debug(_("processLoadMovieRequest: Testing _level loading "
+                    "(level %u)"), levelno);
         loadLevel(levelno, url);
         return;
     }
 
     character* ch = findCharacterByTarget(target);
-    if ( ! ch )
+    if (!ch)
     {
-        log_debug("Target %s of a loadMovie request doesn't exist at processing time", target);
+        log_debug("Target %s of a loadMovie request doesn't exist at "
+                "processing time", target);
         return;
     }
 
-    sprite_instance* sp = ch->to_movie();
-    if ( ! sp )
+    MovieClip* sp = ch->to_movie();
+    if (!sp)
     {
         log_unimpl("loadMovie against a %s character", typeName(*ch));
         return;

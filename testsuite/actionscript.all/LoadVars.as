@@ -175,15 +175,83 @@ check_equals(r.loaded, false);
 // For checking that the data were loaded with XML.prototype.load.
 x.onLoad = function(success) {
     check_equals(x['var2'], 'val2');
+    check_totals(127);
     play();
 };
 
-// The two objects are also interchangeable for these functions.
-x.sendAndLoad = XML.prototype.sendAndLoad;
-check_equals(x.sendAndLoad("some server name", r), true);
-x.load = XML.prototype.load;
-check_equals(x.load( MEDIA(vars.txt) ), true);
-stop();
+// This is called from the next onLoad() handler to make sure there is no
+// race condition for end of test.
+checkXMLAndLoadVarsInterchangeable = function() {
+
+    // The two objects are also interchangeable for these functions.
+    x.sendAndLoad = XML.prototype.sendAndLoad;
+    check_equals(x.sendAndLoad("some server name", r), true);
+    x.load = XML.prototype.load;
+    stop();
+    check_equals(x.load( MEDIA(vars.txt) ), true);
+};
+
+//--------------------------------------------------------------------------
+// Test LoadVars::toString()
+//--------------------------------------------------------------------------
+
+lv = new LoadVars();
+lv.a = 3;
+check_equals(lv.toString(), "a=3");
+
+lv.b = "string";
+check_equals(lv.toString(), "b=string&a=3");
+
+lv.c = Mouse.hide;
+check_equals(lv.toString(), "c=%5Btype%20Function%5D&b=string&a=3");
+
+lv["3"] = 6;
+check_equals(lv.toString(), "3=6&c=%5Btype%20Function%5D&b=string&a=3");
+
+o = { a:5, b:6 };
+lv["f"] = o;
+check_equals(lv.toString(), "f=%5Bobject%20Object%5D&3=6&c=%5Btype%20Function%5D&b=string&a=3");
+
+lv[4] = "string";
+check_equals(lv.toString(), "4=string&f=%5Bobject%20Object%5D&3=6&c=%5Btype%20Function%5D&b=string&a=3");
+
+delete lv[3];
+delete lv["f"];
+check_equals(lv.toString(), "4=string&c=%5Btype%20Function%5D&b=string&a=3");
+
+lv[o] = o;
+check_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=string&a=3");
+
+lv.b = undefined;
+#if OUTPUT_VERSION > 6
+check_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=undefined&a=3");
+#else
+check_equals(lv.toString(), "%5Bobject%20Object%5D=%5Bobject%20Object%5D&4=string&c=%5Btype%20Function%5D&b=&a=3");
+#endif
+
+tsc = 0;
+voc = 0;
+
+o = new Object();
+
+o.toString = function() { tsc++; return "fake toString"; };
+o.valueOf = function() { voc++; return "fake valueOf"; };
+
+lv2 = new LoadVars();
+lv2.a = o;
+check_equals(tsc, 0);
+check_equals(voc, 0);
+
+check_equals(lv2.toString(), "a=fake%20toString");
+check_equals(tsc, 1);
+check_equals(voc, 0);
+
+// This should *not* call valueOf.
+o.toString = undefined;
+xcheck_equals(lv2.toString(), "a=%5Btype%20Object%5D");
+check_equals(tsc, 1);
+xcheck_equals(voc, 0);
+
 
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
@@ -230,9 +298,9 @@ loadvarsObj.onLoad = function(success) {
 		// Gnash insists in looking for an ending & char !!		
 		check_equals(loadvarsObj['var3'], 'val3\n');
 
-		xcheck_totals(110);
+        checkXMLAndLoadVarsInterchangeable();
 
-		play();
+		stop();
 	}
 };
 

@@ -125,7 +125,7 @@ AGG ressources
 
 #include "gnash.h"
 #include "RGBA.h"
-#include "image.h"
+#include "GnashImage.h"
 #include "utility.h"
 #include "log.h"
 #include "render_handler.h"
@@ -396,7 +396,7 @@ public:
   };
 
 
-  gnash::bitmap_info* create_bitmap_info_rgb(image::ImageRGB* im)
+  gnash::bitmap_info* create_bitmap_info_rgb(ImageRGB* im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_styleX_bitmap(), to set a
   // bitmap fill style.
@@ -407,7 +407,7 @@ public:
   }
 
 
-  gnash::bitmap_info* create_bitmap_info_rgba(image::ImageRGBA* im)
+  gnash::bitmap_info* create_bitmap_info_rgba(ImageRGBA* im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_style_bitmap(), to set a
   // bitmap fill style.
@@ -431,7 +431,7 @@ public:
     return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
   }
 
-  void drawVideoFrame(image::ImageBase* frame, const SWFMatrix* source_mat, 
+  void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
     const rect* bounds) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8

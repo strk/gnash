@@ -30,8 +30,9 @@
 
 #include <memory> // for auto_ptr
 #include <locale>
-#include <boost/cstdint.hpp> // for boost::?int??_t 
+#include <boost/cstdint.hpp> // for cstdints 
 #include <boost/random.hpp>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -84,7 +85,7 @@ public:
 /// For the moment, it will be a singleton, providing one-time
 /// initialization.
 ///
-class DSOEXPORT VM {
+class DSOEXPORT VM : boost::noncopyable {
 
 public:
 
@@ -92,20 +93,13 @@ public:
 
 private:
 
-
 	friend class VmGcRoot;
 
 	/// Use VM::get() to access the singleton
 	//
 	/// Initializes the GC singleton
 	///
-	VM(movie_definition& movie, VirtualClock& clock);
-
-	/// Don't copy
-	VM(const VM&);
-
-	/// Don't assign
-	VM& operator=(const VM&);
+	VM(int version, movie_root& root, VirtualClock& clock);
 
 	/// Should deinitialize the GC singleton
 	/// If it doesn't is just because it corrupts memory :)
@@ -117,16 +111,13 @@ private:
 	static std::auto_ptr<VM> _singleton;
 
 	/// Stage associated with this VM
-	std::auto_ptr<movie_root> _root_movie;
+	movie_root& _rootMovie;
 
 	/// The _global ActionScript object
 	boost::intrusive_ptr<as_object> _global;
 
 	/// Target SWF version
-	int _swfversion;
-
-	/// Originating URL 
-	std::string _swfurl;
+	const int _swfversion;
 
 	/// Set the _global Object for actions run by Virtual Machine
 	//
@@ -194,7 +185,7 @@ public:
 	/// @param clock
 	///	Virtual clock used as system time.
 	///
-	static VM& init(movie_definition& movie, VirtualClock& clock);
+	static VM& init(int version, movie_root& root, VirtualClock& clock);
 
 	/// Return true if the singleton VM has been initialized
 	static bool isInitialized();
@@ -213,12 +204,6 @@ public:
 	/// This information will drive operations of the virtual machine
 	///
 	int getSWFVersion() const;
-
-	/// Get URL of the SWF movie used to initialize this VM
-	//
-	/// This information will be used for security checks
-	///
-	const std::string& getSWFUrl() const;
 
 	/// Get the number of milliseconds since VM was started
 	unsigned long int getTime() const;
@@ -291,7 +276,7 @@ public:
 
 	/// Mark all reachable resources (for GC)
 	//
-	/// - root movie / stage (_root_movie)
+	/// - root movie / stage (_rootMovie)
 	/// - Global object (_global)
 	/// - registered static GcResources (_statics)
 	/// - Class Hierarchy object

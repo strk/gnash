@@ -114,7 +114,7 @@ bool
 #ifdef ENABLE_MIT_SHM
 GtkAggGlue::check_mit_shm(Display *display) 
 #else
-GtkAggGlue::check_mit_shm(void *display) 
+GtkAggGlue::check_mit_shm(void* /*display*/) 
 #endif
 {
 #ifdef ENABLE_MIT_SHM
@@ -146,7 +146,13 @@ GtkAggGlue::check_mit_shm(void *display)
 }
 
 void 
-GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
+GtkAggGlue::create_shm_image(
+#ifdef ENABLE_MIT_SHM
+    unsigned int width, unsigned int height
+#else
+    unsigned int, unsigned int
+#endif
+    )
 {
 
     // destroy any already existing structures
@@ -202,6 +208,8 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
         destroy_shm_image();
         return;
     }
+    // allows below to work. bug fix by cliff (bug #24692)
+    XSync(gdk_display, False);
 
     // mark segment for automatic destruction after last process detaches
     shmctl(_shm_info->shmid, IPC_RMID, 0);

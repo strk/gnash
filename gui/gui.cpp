@@ -21,12 +21,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "gui.h"
 #include "render.h"  // debug
 #include "render_handler.h"
 #include "sound_handler.h"
-#include "gnash.h" // for get_sound_handler
 #include "movie_root.h"
 #include "VM.h"
 
@@ -445,17 +444,15 @@ Gui::menu_jump_backward()
 void
 Gui::toggleSound()
 {
+    assert (_stage);
+    // @todo since we registered the sound handler, shouldn't we know
+    //       already what it is ?!
+    sound::sound_handler* s = _stage->runInfo().soundHandler();
 
-    media::sound_handler* s = get_sound_handler();
+    if (!s) return;
 
-    if (!s)
-       return;
-
-    if (s->is_muted()) {
-       s->unmute();
-    } else {
-       s->mute();
-    }
+    if (s->is_muted()) s->unmute();
+    else s->mute();
 }
 
 
@@ -837,7 +834,10 @@ Gui::play()
     if ( ! _started ) start();
     else
     {
-        media::sound_handler* s = get_sound_handler();
+        assert (_stage);
+        // @todo since we registered the sound handler, shouldn't we know
+        //       already what it is ?!
+        sound::sound_handler* s = _stage->runInfo().soundHandler();
         if ( s ) s->unpause();
     }
 
@@ -847,12 +847,17 @@ Gui::play()
 void
 Gui::stop()
 {
+    // _stage must be registered before this is called.
+    assert(_stage);
+
     if ( _stopped ) return;
     if ( isFullscreen() ) unsetFullscreen();
 
     _stopped = true;
 
-    media::sound_handler* s = get_sound_handler();
+    // @todo since we registered the sound handler, shouldn't we know
+    //       already what it is ?!
+    sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->pause();
 
     stopHook();
@@ -867,7 +872,9 @@ Gui::pause()
     }
     else
     {
-    	media::sound_handler* s = get_sound_handler();
+        // @todo since we registered the sound handler, shouldn't we know
+        //       already what it is ?!
+    	sound::sound_handler* s = _stage->runInfo().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
     }
@@ -892,7 +899,9 @@ Gui::start()
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
 
-    media::sound_handler* s = get_sound_handler();
+    // @todo since we registered the sound handler, shouldn't we know
+    //       already what it is ?!
+    sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->unpause();
     _started = true;
 }
@@ -930,7 +939,7 @@ Gui::advanceMovie()
 	m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
-    	m->set_play_state(gnash::sprite_instance::PLAY);
+    	m->set_play_state(gnash::MovieClip::PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
 
@@ -979,7 +988,7 @@ Gui::advanceMovie()
 	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
-		gnash::sprite_instance* si = m->getRootMovie();
+		gnash::MovieClip* si = m->getRootMovie();
 		if (curframe + 1 >= si->get_frame_count())
 		{
 			quit(); 
@@ -1221,7 +1230,6 @@ Gui::setStage(movie_root* stage)
     assert(stage);
     assert(!_stage);
     _stage = stage;
-    _stage->setGui(this);
 }
 
 bool

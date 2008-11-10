@@ -19,9 +19,9 @@
 #define GNASH_SOUND_H
 
 
-#include "resource.h" // for sound_sample inheritance
-#include "sound_handler.h"
+#include "ExportableResource.h"
 #include "ControlTag.h" // for sound tags inheritance
+#include "RunInfo.h" // TODO: drop.
 
 // Forward declarations
 namespace gnash {
@@ -31,9 +31,8 @@ namespace gnash {
 
 namespace gnash {
 
-/// This class is simply an identifier for a sound sample managed
-/// by a sound_handler, so should likely be defined in sound_handler.h
-///
+/// An identifier for a sound sample managed by a sound_handler
+//
 /// Definition tags will maintain a mapping between SWF-defined id
 /// of the sound and these identifiers.
 ///
@@ -45,20 +44,24 @@ namespace gnash {
 /// of the identified sound_sample. This *might* be the reason why
 /// it is a ref-counted thing (hard to belive...).
 ///
-//
+///
 /// QUESTION: why is this a resource ?
 ///           does it really need to be ref-counted ?
 ///
-/// TODO: move definition to sound_handler.h and possibly nest inside sound_handler itself ?
-///
-class sound_sample: public resource
+/// @todo move definition to sound_handler.h and possibly nest
+/// inside sound_handler itself ?
+/// @todo   work out why this is a resource, what a resource is useful for,
+///         and if it really needs access to a sound_handler rather than
+///         belonging to it.
+class sound_sample: public ExportableResource
 {
 public:
 	int	m_sound_handler_id;
 
-	sound_sample(int id)
+	sound_sample(int id, const RunInfo& r)
 		:
-		m_sound_handler_id(id)
+		m_sound_handler_id(id),
+        _runInfo(r)
 	{
 	}
 
@@ -66,7 +69,12 @@ public:
 	/// sound handler.
 	~sound_sample();
 
-	sound_sample* cast_to_sound_sample() { return this; }
+    /// This is necessary because at least some sound_samples are
+    /// destroyed after the movie_root has been destroyed, so that
+    /// access through the VM (which assumes movie_root exists) causes
+    /// a segfault.
+    const RunInfo& _runInfo;
+
 };
 
 } // namespace gnash

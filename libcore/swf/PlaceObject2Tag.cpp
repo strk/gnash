@@ -27,7 +27,7 @@
 
 #include "PlaceObject2Tag.h"
 #include "character.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "swf_event.h"
 #include "log.h"
 #include "SWFStream.h"
@@ -85,7 +85,8 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
     IF_VERBOSE_MALFORMED_SWF (
         if ( reserved != 0 ) // must be 0
         {
-            log_swferror(_("Reserved field in PlaceObject actions == %u (expected 0)"), reserved);
+            log_swferror(_("Reserved field in PlaceObject actions == "
+                    "%u (expected 0)"), reserved);
         }
     );
     
@@ -297,7 +298,8 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
     }
 
     IF_VERBOSE_PARSE (
-        log_parse(_("  PLACEOBJECT2: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
+        log_parse(_("  PLACEOBJECT2: depth = %d (%d)"),
+            m_depth, m_depth-character::staticDepthOffset);
         if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
         if ( hasMatrix() )
         {
@@ -313,7 +315,6 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
         log_parse(_(" m_place_type: %d"), getPlaceType() );
     );
 
-    //log_debug("place object at depth %i", m_depth);
 }
 
 // read SWF::PLACEOBJECT3
@@ -336,51 +337,44 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 
     m_depth = in.read_u16() + character::staticDepthOffset;
 
-    IF_VERBOSE_PARSE (
-        log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
-    // TODO: add more info here
-    );
-
-    if ( hasCharacter() )
-    {
-        in.ensureBytes(2);
-        m_character_id = in.read_u16();
-        IF_VERBOSE_PARSE (
-        log_parse("   char:%d", m_character_id);
-        );
-    }
-
-    if ( hasClassName() || ( hasImage() && hasCharacter() ) )
+    // This is documented to be here, but real instances of 
+    // tags with either className or hasImage defined are rare to
+    // non-existent. Alexis' SWF reference has neither of them,
+    // instead specifying 5 reserved bits in the PlaceObject3 flags.
+    if (hasClassName() || (hasImage() && hasCharacter()))
     {
         log_unimpl("PLACEOBJECT3 with associated class name");
         in.read_string(className);
-        IF_VERBOSE_PARSE (
-        log_parse("   className:%s", className.c_str());
-        );
     }
 
-    if ( hasMatrix() )
+    if (hasCharacter())
+    {
+        in.ensureBytes(2);
+        m_character_id = in.read_u16();
+    }
+
+    if (hasMatrix())
     {
         m_matrix.read(in);
     }
 
-    if ( hasCxform() )
+    if (hasCxform())
     {
         m_color_transform.read_rgba(in);
     }
 
-    if ( hasRatio() ) 
+    if (hasRatio()) 
     {
         in.ensureBytes(2);
         m_ratio = in.read_u16();
     }
     
-    if ( hasName() )
+    if (hasName())
     {
         in.read_string(m_name);
     }
 
-    if ( hasClipDepth() )
+    if (hasClipDepth())
     {
         in.ensureBytes(2);
         m_clip_depth = in.read_u16()+character::staticDepthOffset;
@@ -390,63 +384,54 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
         m_clip_depth = character::noClipDepthValue;
     }
 
-    IF_VERBOSE_PARSE
-    (
-        if ( hasMatrix() ) {
-            log_parse("   SWFMatrix: %s", m_matrix);
-    }
-        if ( hasCxform() ) {
-            log_parse("   cxform: %s", m_color_transform);
-    }
-        if ( hasRatio() )  log_parse("   ratio:%d", m_ratio);
-        if ( hasName() ) log_parse("   name:%s", m_name);
-
-        if ( hasClipDepth() ) {
-            log_parse("   clip_depth:%d(%d)", m_clip_depth,
-                      m_clip_depth-character::staticDepthOffset);
-        }
-    );
 
     if ( hasFilters() )
     {
         Filters v; // TODO: Attach the filters to the display object.
         filter_factory::read(in, true, &v);
-	// at time of writing no renderer supports bitmap filters
-	LOG_ONCE( log_unimpl("Bitmap filters") );
+	    // at time of writing no renderer supports bitmap filters
+	    LOG_ONCE( log_unimpl("Bitmap filters") );
     }
 
     if ( hasBlendMode() )
     {
         in.ensureBytes(1);
         blend_mode = in.read_u8();
-	// 0 or 1 : normal
-	// 2 : layer
-	// 3 : multiply
-	// 4 : screen
-	// 5 : lighten
-	// 6 : darken
-	// 7 : add
-	// 8 : subtract
-	// 9 : difference
-	// 10 : invert
-	// 11 : alpha
-	// 12 : erase
-	// 13 : overlay
-	// 14 : hardlight
-	// 15 to 255 reserved	
-	//
-	// at time of writing no renderer supports blend modes
-	LOG_ONCE( log_unimpl("Blend mode") );
+	    // 0 or 1 : normal
+	    // 2 : layer
+	    // 3 : multiply
+        // 4 : screen
+        // 5 : lighten
+        // 6 : darken
+        // 7 : add
+        // 8 : subtract
+        // 9 : difference
+        // 10 : invert
+        // 11 : alpha
+        // 12 : erase
+        // 13 : overlay
+        // 14 : hardlight
+        // 15 to 255 reserved	
+        //
+        // at time of writing no renderer supports blend modes
+        LOG_ONCE( log_unimpl("Blend mode") );
     }
 
     if ( hasBitmapCaching() )
     {
-        // It is not certain that this actually exists, so if this reader
-        // is broken, it is probably here!
+        // cacheAsBitmap is a boolean value, so the flag itself ought to be
+        // enough. Alexis' SWF reference is unsure about this, but suggests
+        // reading a byte here. The official SWF format spec doesn't mention
+        // it.
+        //
+        // However, the movie the-last-stand.swf has one PlaceObject3 tag
+        // with both PlaceActions and bitmap caching, and the reserved bytes
+        // of the PlaceActions (see readPlaceActions) are not 0 if this byte
+        // isn't read.
+        // TODO: set object property
         in.ensureBytes(1);
         bitmask = in.read_u8();
-	// at time of writing no renderer supports bitmap caching 
-	LOG_ONCE( log_unimpl("Bitmap caching") );
+	    LOG_ONCE( log_unimpl("Bitmap caching") );
     }
 
     if ( hasClipActions() )
@@ -455,25 +440,21 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     }
 
     IF_VERBOSE_PARSE (
-        log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
-        if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
-        if ( hasMatrix() )
-        {
-            log_parse(_("  SWFMatrix: %s"), m_matrix);
-        }
-        if ( hasCxform() )
-        {
-            log_parse(_("  cxform: %d"), m_color_transform);
-        }
-        if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
-        if ( hasName() ) log_parse(_("  name = %s"), m_name);
-        if ( hasClassName() ) log_parse(_("  class name = %s"), className);
-        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"),
-                                m_clip_depth, m_clip_depth-character::staticDepthOffset);
+
+        log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth,
+            m_depth - character::staticDepthOffset);
+        if (hasCharacter()) log_parse(_("  char id = %d"), m_character_id);
+        if (hasMatrix()) log_parse(_("  SWFMatrix: %s"), m_matrix);
+        if (hasCxform()) log_parse(_("  cxform: %d"), m_color_transform);
+        if (hasRatio()) log_parse(_("  ratio: %d"), m_ratio);
+        if (hasName()) log_parse(_("  name = %s"), m_name);
+        if (hasClassName()) log_parse(_("  class name = %s"), className);
+        if (hasClipDepth()) log_parse(_("  clip_depth = %d (%d)"),
+                    m_clip_depth, m_clip_depth-character::staticDepthOffset);
+        if (hasBitmapCaching()) log_parse(_("   bitmapCaching enabled"));
         log_parse(_(" m_place_type: %d"), getPlaceType());
     );
 
-    //log_debug("place object at depth %i", m_depth);
 }
 
 void
@@ -498,7 +479,7 @@ PlaceObject2Tag::read(SWFStream& in, tag_type tag)
 
 /// Place/move/whatever our object in the given movie.
 void
-PlaceObject2Tag::execute(sprite_instance* m, DisplayList& dlist) const
+PlaceObject2Tag::execute(MovieClip* m, DisplayList& dlist) const
 {
     switch ( getPlaceType() ) 
     {
@@ -540,7 +521,8 @@ PlaceObject2Tag::~PlaceObject2Tag()
 
 /* public static */
 void
-PlaceObject2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m)
+PlaceObject2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& /*r*/)
 {
     assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
 

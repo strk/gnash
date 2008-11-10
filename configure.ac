@@ -539,7 +539,7 @@ build_ogl=no
 build_agg=no
 build_cairo=no
 AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=], [Use the specified GUI toolkit (default=ogl,agg)]),
+  AC_HELP_STRING([--enable-renderer=[[agg|ogl|cairo]]], [Use the specified renderer (default=agg)]),
     [case "${enableval}" in
       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
         build_ogl=yes
@@ -1486,6 +1486,17 @@ if test x"${GIF_LIBS}" = x ; then
 fi
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
+GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
+AM_CONDITIONAL(HAVE_SPEEX, [ test x$has_speex = xyes ])
+if test x$has_speex = xyes ; then
+  AC_DEFINE([DECODING_SPEEX], [1], [Speex codec available])
+fi
+
+GNASH_PKG_FIND(speexdsp, [speex_resampler.h], [speex DSP utilities], speex_resampler_process_int)
+if test x$has_speexdsp = xyes ; then
+  AC_DEFINE([RESAMPLING_SPEEX], [1], [Speex resampler available])
+fi
+
 dnl Find freetype and fontconfig
 dnl GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
 dnl rob might be working on this or not ;)
@@ -1734,12 +1745,13 @@ if test x"$media_handler" = x"gst"; then
   CFLAGS=$GSTREAMER_CFLAGS
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_async],
     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-    has_modern_gstpbutils='no')
+    has_gst_install_plugins_async='no')
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_supported],
     AC_DEFINE([HAVE_GST_INSTALL_PLUGINS_SUPPORTED], [], [GStreamer provides the gst_install_plugins_supported function]),
     has_gst_install_plugins_supported='no')
   CFLAGS=$save_cflags
-  if test x$has_modern_gstpbutils = xno; then
+  if test x$has_gst_install_plugins_async = xno -o x$has_gst_install_plugins_supported = xno; then
+    has_modern_gstpbutils='no'
     AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
   else
     AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
@@ -1889,6 +1901,10 @@ fi
 # We want warnings, lots of warnings  :-)
 # It should be possible to build with -ansi, not with
 # -pedantic because of agg.
+#
+# -ansi was actually dropped because it hides 'fileno', which
+# is used in a few places
+#
 if test x"$GCC" = x"yes"; then
   CXXFLAGS="$CXXFLAGS \
     -W \
@@ -1899,7 +1915,6 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    #-ansi \
     "
   CFLAGS="$CFLAGS \
     -W \
@@ -2065,6 +2080,7 @@ AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.
 AC_OUTPUT(Makefile
 po/Makefile
 libmedia/Makefile
+libsound/Makefile
 libbase/Makefile
 libcore/Makefile
 libcore/asobj/Makefile
@@ -2271,7 +2287,7 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
       echo "               To be able to build the kde gui," >&3
       echo "               install the KDE development environment from http://kde.org" >&3
       echo "               or .deb users: apt-get install kdelibs-dev" >&3
-      echo "               or .rpm users: yum install <something-else>." >&3
+      echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
   if test x"$has_qt" = xyes; then
     echo "        QT flags are: $QT_CFLAGS"
@@ -2511,7 +2527,7 @@ if test "$media_handler" = "gst"; then
     if test x"$has_modern_gstpbutils" = "xno"; then
       echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&4
       echo "                     Gstreamer can pop up a message prompting them to." >&4
-      echo "                     Install gstpbutils from http://www.gstreamer.net for that to be enabled" >&4
+      echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&4
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
     fi
   else
@@ -2699,6 +2715,21 @@ else
   echo "                     or .rpm users: yum install curl-devel" >&4
 fi
 
+if test x"$SPEEX_LIBS" != x; then
+  if test x"$SPEEX_CFLAGS" != x; then
+    echo "        Speex flags are: $SPEEX_CFLAGS"
+  else
+    echo "        Speex flags are: default include path"
+  fi
+    echo "        Speex libs are: $SPEEX_LIBS"
+else
+  echo "        RECOMMENDED: If you install the Speex library, Gnash will be able to" >&4
+  echo "                     decoded Speex encoded audio in FLV files." >&4
+  echo "                     Install libspeex from http://speex.org" >&4
+  echo "                     or .deb users: apt-get install libspeex-dev" >&4
+  echo "                     or .rpm users: yum install speex-devel" >&4
+fi
+
 if test x"$ext_dbus" = xyes; then
   if test x"$DBUS_LIBS" != x; then
     if test x"$DBUS_CFLAGS" != x; then
@@ -2832,7 +2863,7 @@ if test x$cross_compiling = xno; then
     echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://haxe.org" >&4
-    echo "                 or .deb users: apt-get install haxe (version 2 or later required)" >&4
+    echo "                 or .deb users: apt-get install haxe" >&4
   fi
 
   if test x"$SWFMILL" != x; then
@@ -2872,6 +2903,8 @@ if test x$cross_compiling = xno; then
   else
     echo "        WARNING: You need to have csound installed" >&4
     echo "                 to have real fun." >&4
+    echo "                 Install it from http://www.csounds.com/" >&4
+    echo "                 or .deb users: apt-get install csound" >&4
   fi
 
 fi
@@ -2998,8 +3031,8 @@ if test -s $cwarn; then
   cat $cwarn
   rm $cwarn
   echo ""
-  echo "Gnash should still compile even with these warnings.  If it doesn't,"
-  echo "report the warnings as a bug."
+  echo "Gnash should still compile even with these warnings."
+  echo "If it doesn't, report the warnings as a bug."
 fi
 
 dnl If anything critical is missing, don't bother to continue

@@ -34,28 +34,30 @@
 
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 
-/// Forward declarations
+// Forward declarations
 class CodecContextWrapper;
 #ifdef HAVE_SWSCALE_H
 class SwsContextWrapper;
 #endif
 
 
+/// FFMPEG based VideoDecoder
 class VideoDecoderFfmpeg : public VideoDecoder {
     
 public:
 
     DSOEXPORT VideoDecoderFfmpeg(videoCodecType format, int width, int height);
 
-    DSOEXPORT VideoDecoderFfmpeg(VideoInfo& info);
+    DSOEXPORT VideoDecoderFfmpeg(const VideoInfo& info);
 
     DSOEXPORT ~VideoDecoderFfmpeg();
     
     void push(const EncodedVideoFrame& buffer);
 
-    std::auto_ptr<image::ImageBase> pop();
+    std::auto_ptr<GnashImage> pop();
     
     bool peek();
     
@@ -69,7 +71,7 @@ public:
     ///                 caller owns that pointer, which must be freed with delete [].
     ///                 It is advised to wrap the pointer in a boost::scoped_array.
     ///                 If conversion fails, AVPicture::data[0] will be NULL.
-    std::auto_ptr<image::ImageBase> frameToImage(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+    std::auto_ptr<GnashImage> frameToImage(AVCodecContext* srcCtx, const AVFrame& srcFrame);
 
     /// Convert FLASH codec id to FFMPEG codec id
     //
@@ -81,9 +83,9 @@ private:
 
     void init(enum CodecID format, int width, int height, boost::uint8_t* extradata=0, int extradataSize=0);
 
-    std::auto_ptr<image::ImageBase> decode(const boost::uint8_t* input, boost::uint32_t input_size);
+    std::auto_ptr<GnashImage> decode(const boost::uint8_t* input, boost::uint32_t input_size);
 
-    std::auto_ptr<image::ImageBase> decode(const EncodedVideoFrame* vf)
+    std::auto_ptr<GnashImage> decode(const EncodedVideoFrame* vf)
     {
     	return decode(vf->data(), vf->dataSize());
     }
@@ -104,6 +106,7 @@ private:
     std::vector<const EncodedVideoFrame*> _video_frames;
 };
     
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace
 

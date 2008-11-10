@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "intervalTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -46,18 +46,18 @@ main(int /*argc*/, char** /*argv*/)
 
 	as_value tmp;
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 
 	tester.advanceClock(50); // "sleep" 50 milliseconds
 	tester.advance(); // execute actions in second frame frame
 
 	check_equals(root->get_current_frame(), 1);
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 
 	// Now timers are set and counters initialized
 

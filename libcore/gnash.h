@@ -33,12 +33,11 @@ namespace gnash {
 	class movie_definition; // for create_movie
 	class render_handler; // for set_render_handler 
 	class URL; // for set_base_url
- 	namespace media {
- 		class sound_handler; // for set_sound_handler
- 	}
+    class RunInfo;
 }
 
 
+/// Freedom bites
 namespace gnash {
 
 
@@ -54,35 +53,14 @@ enum FileType {
 
 // Sound callbacks stuff
 
-/// \brief
-/// Pass in a sound handler, so you can handle audio on behalf of
-/// gnash.  This is optional; if you don't set a handler, or set
-/// NULL, then sounds won't be played.
-///
-/// If you want sound support, you should set this at startup,
-/// before loading or playing any movies!
-///
-DSOEXPORT void  set_sound_handler(media::sound_handler* s);
-
-/// Get currently registered sound handler
-DSOEXPORT media::sound_handler* get_sound_handler();
-
 /// Set the render handler.  This is one of the first
 /// things you should do to initialise the player (assuming you
 /// want to display anything).
 DSOEXPORT void set_render_handler(render_handler* s);
 
-/// Set the base url against which to resolve relative urls
-DSOEXPORT void set_base_url(const URL& url);
-
-/// Return base url
-DSOEXPORT const gnash::URL& get_base_url();
-
 // Some helpers that may or may not be compiled into your
 // version of the library, depending on platform etc.
-DSOEXPORT render_handler*   create_render_handler_xbox();
 DSOEXPORT render_handler*   create_render_handler_ogl(bool init = true);
-//DSOEXPORT render_handler* create_render_handler_cairo(void* cairohandle);
 
 /// Create a gnash::movie_definition from the given URL.
 //
@@ -141,6 +119,10 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 /// movie definition. This is required as it can not be
 /// derived from the IOChannel.
 ///
+/// @param runInfo
+/// A RunInfo containing resources needed for parsing, such as the
+/// base URL for the run, the sound::sound_handler, and a StreamProvider.
+///
 /// @param startLoaderThread
 /// If false only the header will be read, and you'll need to call completeLoad
 /// on the returned movie_definition to actually start it. This is tipically 
@@ -148,7 +130,9 @@ movie_definition* create_movie(const URL& url, const char* real_url=NULL, bool s
 /// Initializing the VirtualMachine requires a target SWF version, which can
 /// be found in the SWF header.
 ///
-DSOEXPORT movie_definition* create_movie(std::auto_ptr<IOChannel> in, const std::string& url, bool startLoaderThread=true);
+DSOEXPORT movie_definition* create_movie(std::auto_ptr<IOChannel> in,
+        const std::string& url, const RunInfo& runInfo,
+        bool startLoaderThread = true);
 
 /// \brief
 /// Create a gnash::movie_definition from the given URL
@@ -176,6 +160,10 @@ DSOEXPORT movie_definition* create_movie(std::auto_ptr<IOChannel> in, const std:
 /// @param url
 /// The URL to load the movie from.
 ///
+/// @param runInfo
+/// A RunInfo containing resources needed for parsing, such as the
+/// base URL for the run, the sound::sound_handler, and a StreamProvider.
+///
 /// @param real_url
 /// The url to encode as the _url member of the resulting
 /// movie definition. Use NULL if it is not different from
@@ -194,8 +182,8 @@ DSOEXPORT movie_definition* create_movie(std::auto_ptr<IOChannel> in, const std:
 /// NOTE: when POSTing, the movies library won't be used.
 ///
 DSOEXPORT movie_definition* create_library_movie(const URL& url,
-	const char* real_url=NULL, bool startLoaderThread=true,
-	const std::string* postdata=NULL);
+        const RunInfo& runInfo, const char* real_url = NULL,
+        bool startLoaderThread = true, const std::string* postdata = NULL);
     
 
 

@@ -32,18 +32,31 @@
 namespace gnash {
 namespace media {
 
+/// Gstreamer-based media handler module
+namespace gst {
+
+/// GST based MediaHandler
+//
+/// The module implements the MediaHandler factory as required
+/// by Gnash core for a loadable media handler module.
+///
+/// It uses gstreamer: http://gstreamer.freedesktop.org/
+///
+/// Starting point is MediaHandlerGst.
+/// 
 class DSOEXPORT MediaHandlerGst : public MediaHandler
 {
 public:
 
 	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
 
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info);
+	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info);
 
-	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info);
+	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info);
 };
 
 
+} // gnash.media.gst namespace
 } // gnash.media namespace 
 } // namespace gnash
 

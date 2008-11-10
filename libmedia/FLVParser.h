@@ -43,38 +43,75 @@ namespace gnash {
 namespace media {
 
 
-
+/// Extra video info found in some FLV embedded streams
+//
+/// This is basically composed by an header for the audio stream
+///
 class ExtraVideoInfoFlv : public VideoInfo::ExtraInfo
 {
 public:
-        ExtraVideoInfoFlv(boost::uint8_t* extradata, size_t datasize)
-                :
-                data(extradata),
-                size(datasize)
-        {
-        }
-        boost::scoped_array<boost::uint8_t> data;
-        size_t size;
+
+    /// Construct an ExtraVideoInfoFlv
+    //
+    /// @param extradata
+    ///     Video header data. Ownership transferred.
+    ///
+    /// @param datasize
+    ///     Video header data size
+    ///
+    /// @todo take a SimpleBuffer by auto_ptr
+    ///
+    ExtraVideoInfoFlv(boost::uint8_t* extradata, size_t datasize)
+        :
+        data(extradata),
+        size(datasize)
+    {
+    }
+
+    /// Video stream header
+    boost::scoped_array<boost::uint8_t> data;
+
+    /// Video stream header size
+    size_t size;
 };
 
+/// Extra audoi info found in some FLV embedded streams
+//
+/// This is basically composed by an header for the audio stream
+///
 class ExtraAudioInfoFlv : public AudioInfo::ExtraInfo
 {
 public:
-        ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
+
+    /// Construct an ExtraAudioInfoFlv
+    //
+    /// @param extradata
+    ///     Audio header data. Ownership transferred.
+    ///
+    /// @param datasize
+    ///     Audio header data size
+    ///
+    /// @todo take a SimpleBuffer by auto_ptr
+    ///
+    ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
                 :
                 data(extradata),
                 size(datasize)
         {
         }
-        boost::scoped_array<boost::uint8_t> data;
-        size_t size;
+
+    /// Audio stream header
+    boost::scoped_array<boost::uint8_t> data;
+
+    /// Audio stream header size
+    size_t size;
 };
 
 /// The FLVParser class parses FLV streams
 class DSOEXPORT FLVParser : public MediaParser
 {
 
-public:
+private:
 
 	enum tagType
 	{
@@ -83,6 +120,64 @@ public:
 		FLV_META_TAG = 0x12
 	};
 
+	struct FLVTag : public boost::noncopyable
+	{
+		FLVTag(boost::uint8_t* stream)
+		: type(stream[0]),
+		  body_size(getUInt24(stream+1)),
+		  timestamp(getUInt24(stream+4) | (stream[7] << 24) )
+		{}
+
+		/// Equals tagType
+		boost::uint8_t type;
+		boost::uint32_t body_size;
+		boost::uint32_t timestamp;
+	};
+
+	struct FLVAudioTag : public boost::noncopyable
+	{
+		FLVAudioTag(const boost::uint8_t& byte)
+		: codec( (byte & 0xf0) >> 4 ),
+		  samplerate( flv_audio_rates[(byte & 0x0C) >> 2] ),
+		  samplesize( 1 + ((byte & 0x02) >> 1)),
+		  stereo( (byte & 0x01) )
+		{
+		}
+
+		/// Equals audioCodecType
+		boost::uint8_t codec;
+
+		boost::uint16_t samplerate;
+
+		/// Size of each sample, in bytes
+		boost::uint8_t samplesize;
+
+		bool stereo;
+	private:
+		static const boost::uint16_t flv_audio_rates[];
+	};
+
+	enum frameType
+	{
+		FLV_VIDEO_KEYFRAME = 1,
+		FLV_VIDEO_INTERLACED = 2,
+		FLV_VIDEO_DISPOSABLE = 3
+	};
+
+	struct FLVVideoTag : public boost::noncopyable
+	{
+		FLVVideoTag(const boost::uint8_t& byte)
+		: frametype( (byte & 0xf0) >> 4 ),
+		  codec( byte & 0x0f )
+		{}
+
+		/// Equals frameType
+		boost::uint8_t frametype;
+		/// Equals videoCodecType
+		boost::uint8_t codec;
+	};
+
+public:
 
 	/// \brief
 	/// Create an FLV parser reading input from
@@ -121,15 +216,21 @@ private:
 	/// Returns true if something was parsed, false otherwise.
 	/// Sets _parsingComplete=true on end of file.
 	///
-	bool parseNextTag();
+	bool parseNextTag(bool index_only);
 
-	bool indexNextTag();
+	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
+	std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
+
+	void indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos);
+	void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
 
 	/// Parses the header of the file
 	bool parseHeader();
 
-	// Functions used to extract numbers from the file
-	inline boost::uint32_t getUInt24(boost::uint8_t* in);
+	/// Reads three bytes in FLV (big endian) byte order.
+	/// @param in Pointer to read 3 bytes from.
+	/// @return 24-bit integer.
+	static boost::uint32_t getUInt24(boost::uint8_t* in);
 
 	/// The position where the parsing should continue from.
 	/// Will be reset on seek, and will be protected by the _streamMutex

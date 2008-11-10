@@ -117,6 +117,7 @@ boolean-properties-5.swf:d955b32271cf8a073de42566eb13a5d8
 boolean-properties-6.swf:606b0b8883de19dce98bbeb9c91e0215
 boolean-properties-7.swf:f01da3f46a6a70f22682ad6655e1be6a
 boolean-properties-8.swf:bcb5f70be1ae877fb31c198925ba1375
+builtin-construction-5.swf:c3bcb8608999fa7a42a04b22e9e4929a
 call-arguments-5.swf:422c391a2abd3e864eb8ed8a1e05ad31
 callfunction-stack.swf:21d0c957f4caf0eb0ccd0dcadaf17500
 case1-6.swf:ba805f628a3a2d1bbd292ec1e56d1708
@@ -179,6 +180,7 @@ constructor-madness-6.swf:85b10c1724ac5a083a3f40cb8322011d
 constructor-madness-7.swf:616b5b2cfbed3f3703e1b774974d7f48
 constructor-madness-8.swf:5357273baf6b66f6af0223cb1d13b144
 constructor-prototype.swf:22505f0f8dd8440972a298110d697e3b
+constructor-relay-5.swf:2d1a814c37f55485d66624cb97c58e03
 convolution-filter-properties-5.swf:96e15de475e31c328e201c152ffd2f42
 convolution-filter-properties-5.swf:db6e2ddcbee195363a53c276bfc460d7
 countdown.swf:db94f8e7bb5a46cbf210c94a19fa068d
@@ -264,6 +266,18 @@ crash-0.8.0-huffmann-table-5.swf:6819164ec8cc6299bbd6d0d05a7428d8
 crash-0.8.0-huffmann-table-6.swf:a269bc06dd35de125087b2444622f130
 crash-0.8.0-huffmann-table-7.swf:2134c93509e1fc5d2eff527e79e1ea60
 crash-0.8.0-huffmann-table-8.swf:4548f1e9d10a5cd70852c367c8f39af6
+crash-0.8.2-gotoAndPlay-5.swf:8b4ebc57963ce4c0b8c80a1ba79a2ed0
+crash-0.8.2-gotoAndPlay-6.swf:808289d1821d14debfaea5aca5f14273
+crash-0.8.2-gotoAndPlay-7.swf:434c0a520e86655e14ac3767cb745dbc
+crash-0.8.2-gotoAndPlay-8.swf:26aa36651e9882257c65bf70abd79bca
+crash-0.8.2-sendAndLoad-without-target-5.swf:d2a5093d2d9094c89e9ba1b1956e566d
+crash-0.8.2-sendAndLoad-without-target-6.swf:91e40b45f08ecae5582af816dd2f4f99
+crash-0.8.2-sendAndLoad-without-target-7.swf:e9284acf35bc444e2600721b4f2b8067
+crash-0.8.2-sendAndLoad-without-target-8.swf:7fb6a52bbb2d9e9896fdb4e0d3602c36
+crash-0.9.1-getvariable-shapes-5.swf:5d55b2511943ac08b0565d8e84447b4a
+crash-0.9.1-getvariable-shapes-6.swf:45e434a401447915500c275c238b8ac0
+crash-0.9.1-getvariable-shapes-7.swf:49f7609f50e4099528b3477b7124834c
+crash-0.9.1-getvariable-shapes-8.swf:9827e209d6bf155d49fcdb4e15cf0442
 createTextField-returnvalue-6.swf:876f64cb4349313be58d1b9de5ca2ff4
 createTextField-returnvalue-7.swf:397473c78af05cbb9e7e394ec4ce1a07
 createTextField-returnvalue-8.swf:398e15cdabb4c9f9bdb56ee5b07e5126
@@ -567,6 +581,8 @@ movieclip-lockroot-loadmovie-6.swf:679b3cea0d9643744aa29c88ae9908e1
 movieclip-lockroot-loadmovie-7.swf:84ad9218797251db3ee79f9241f27b67
 movieclip-lockroot-loadmovie-8.swf:3ac7430bf84185e34aee32b2d2394600
 movieclip-property-priorities-5.swf:21ffe3baf551c2dea5d2e04db214ff7f
+movieclip-references-5.swf:1a9faa42d479cff63da56135c1b298aa
+movieclip-references-6.swf:d3cc27ec41e9368c21f27fee48027b89
 movieclip-set-prototype-5.swf:99235a738d69d9c78fa2bc5d355c6dae
 movieclip-set-prototype-6.swf:bae79ccbb89bb7c11cd1961d2c473022
 movieclip-set-prototype-7.swf:f147fff166cc46cdcda77d5012faddb0
@@ -610,6 +626,10 @@ newobject-paths-6.swf:e2e207b7b6966fdffd3a0017cdbf2f1c
 newobject-paths-7.swf:e8af4c2cd51e1b3c5e7ab3121386d0ba
 newobject-paths-8.swf:fc8407413a00bf2e41e27db7e7ec8c9f
 nextframe-stop.swf:8528e3ead382f99f046e6c27aa4fd311
+number-construct-5.swf:088dba71e4cd7a40af90e5e9d587d37d
+number-construct-6.swf:dcc593e3aa5895ba1afb3aacbaf0b6a0
+number-construct-7.swf:983a9fd7016e14aa58b03cd0b4f4cf08
+number-construct-8.swf:cded06557be37197e945a29fd09e0b0f
 number.swf:3ef5211bf02f128749453b0ea006061d
 number-tostring-radix-5.swf:9c620b9523efbfc2cd30832d38c3d403
 number-tostring-radix-6.swf:82b91ba51d982a8c27dddffd129051df
@@ -631,6 +651,7 @@ object-isprototypeof-propflags-9.swf:03d8c864e892083523ce19f764f21497
 object-math-5.swf:2d509f7b6e94776a2208fcbec80b7a67
 object-math-6.swf:bdf73b4bfb144113a80ff78a282558d7
 object-math-7.swf:15d6cb896cc58fe289ed0e6de39b3347
+object-resolve-propflags-9.swf:db769008cba912cd906834a4722fdb95
 object-valueof-5.swf:2520f058ac5a1af3db81ba9b3002e6ab
 object-valueof-6.swf:68d80a5ba580357d1dfeb3b515691e7e
 object-valueof-7.swf:9b4f95998e0bd9a950062362e3cf1487
@@ -1065,6 +1086,9 @@ text-field-get-text-format-5.swf:1e3a1b39de01a627e3d9cf327b6fcefa
 text-field-hscroll-5.swf:f0b6b2bdc087164334da9fad1ca0140a
 text-field-init-5.swf:f9c095838e41c5b00de362cef6c20167
 text-field-init-native-5.swf:881f1f6314617bd2d789fa99f9765e60
+text-field-init-native-6.swf:39c6fb4139696e3334b64fb4e48376e1
+text-field-init-native-7.swf:167277605ec309a453caa1b713afbc45
+text-field-init-native-8.swf:86e8f2d4419f1747735f180d22030701
 text-field-replace-text-5.swf:571ec2f1d311c65f98e5e7f76392cb9e
 text-field-replace-text-5.swf:e89d3694aef9f668e714916e8db3195f
 text-field-set-text-format-5.swf:f576da900f9e9b8d911f6791d4114983

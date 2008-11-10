@@ -53,7 +53,12 @@ namespace gnash {
 class PropertyList
 {
 public:
-	/// A tag type for multi-index
+
+    typedef std::pair<std::string, std::string> KeyValuePair;
+    typedef std::vector<KeyValuePair> SortedPropertyList;
+    
+
+    /// A tag type for multi-index
 	struct oType {/**/};
 
 	/// The actual container
@@ -461,14 +466,14 @@ public:
 
 	/// \brief
 	/// Enumerate all non-hidden properties inserting
-	/// their name/value pair to the given map
+	/// their name/value pair to the given SortedPropertyList.
 	///
 	/// @param this_ptr
 	/// 	The as_object used to set the 'this' pointer
 	/// 	for calling getter/setter function (GetterSetterProperty);
 	/// 	it will be unused when getting or setting SimpleProperty
 	/// 	properties.
-	void enumerateKeyValue(const as_object& this_ptr, std::map<std::string, std::string>& to) const;
+	void enumerateKeyValue(const as_object& this_ptr, SortedPropertyList& to) const;
 
 	/// Remove all entries in the container
 	void clear();

@@ -26,6 +26,7 @@
 #include <string>
 #include <cstring>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "log.h"
 #include "buffer.h"
@@ -37,7 +38,7 @@
 #include "lcshm.h"
 
 using namespace std;
-using namespace amf;
+using namespace gnash;
 
 // Some facts:
 //     * The header is 16 bytes,
@@ -45,80 +46,115 @@ using namespace amf;
 //     * The listeners block starts at 40k+16 = 40976 bytes,
 //     * To add a listener, simply append its name in the listeners list (null terminated strings)
 
-namespace gnash {
+/// \namespace amf
+///
+/// This namespace is for all the AMF specific classes in libamf.
+namespace amf {
 
 // The maximum 
 // although a bool is one byte, it appears to be a short in AMF,
 // plus the type byte.
 const int AMF_BOOLEAN_SIZE = 3;
+
+/// \var LC_HEADER_SIZE
+///     The header size for a memory segment.
 const int LC_HEADER_SIZE = 16;
+
+/// \var MAX_LC_HEADER_SIZE
+///     The maximum size allowed for the header of a memory segment.
 const int MAX_LC_HEADER_SIZE = 40960;
+
+/// \var LC_LISTENERS_START
+///     The starting address for the block of Listeners in the memory
+///     segment.
 const int LC_LISTENERS_START  = MAX_LC_HEADER_SIZE +  LC_HEADER_SIZE;
 
-// This doesn't exist on all systems, but here's the vaue used on Unix.
+/// \def MAXHOSTNAMELEN
+///     This doesn't exist on all systems, but here's the value used on Unix.
 #ifndef MAXHOSTNAMELEN
 # define MAXHOSTNAMELEN 64
 #endif
 
+/// \define ENSUREBYTES
+///
+/// @param from The base address to check.
+///
+/// @param tooFar The ending address that is one byte too many.
+///
+/// @param size The number of bytes to check for: from to tooFar.
+///
+/// @remarks May throw an Exception
 #define ENSUREBYTES(from, toofar, size) { \
 	if ( from+size >= toofar ) \
 		throw ParserException("Premature end of AMF stream"); \
 }
 
-// \class LocalConnection
-/// \brief Open a connection between two SWF movies so they can send
-/// each other Flash Objects to be executed.
-///
+/// \brief Construct an uninitialized shared memory segment.
+///     Open a connection between two SWF movies so they can send
+///     each other Flash Objects, but does not initialize the memory
+///     segment.
 LcShm::LcShm() 
     : _baseaddr(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
+/// \brief Construct an initialized shared memory segment.
+///
+/// @param addr The address to use for the memory segment.
 LcShm::LcShm(Network::byte_t *addr)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = addr;
 }
 
+/// \brief Construct an initialized shared memory segment.
+///
+/// @param key The SYSV style key to use for the memory segment.
 LcShm::LcShm(key_t key)
 {
 //    GNASH_REPORT_FUNCTION;
     _shmkey = key;
 }
 
+/// \brief Delete the shared memory segment.
+///
+/// @remark This does not clear the content of the memory segment.
 LcShm::~LcShm()
 {
-//    GNASH_REPORT_FUNCTION;
-    
-    vector<amf::Element *>::iterator it;
-    for (it = _amfobjs.begin(); it != _amfobjs.end(); it++) {
-	amf::Element *el = (*(it));
-         if (el) {
-//             el->dump();
-             delete el;
-         }
-    }
+//    GNASH_REPORT_FUNCTION;    
 }
 
+/// \brief Construct a block of Listeners.
+///     This constructs an uninitialized Listener block.
 Listener::Listener()
     : _baseaddr(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
+/// \brief Construct a block Listeners at the specified address.
+///
+/// @param baseaddr The address to use for the block of
+///     Listeners.
 Listener::Listener(Network::byte_t *x)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = x;
 }
 
+/// \brief Delete the Listener block
 Listener::~Listener()
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-// see if a connection name exists in our list of listeners
+/// \brief See if a connection name exists in our list of Listeners
+///
+/// @param name An ASCII string that is the name of the Listener
+///		to search for.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 Listener::findListener(const string &name)
 {
@@ -137,6 +173,11 @@ Listener::findListener(const string &name)
     return false;
 }
 
+/// \brief Create a new Listener in the memory segment.
+///
+/// @param name The name for the Listener.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 Listener::addListener(const string &name)
 {
@@ -175,9 +216,17 @@ Listener::addListener(const string &name)
     return true;
 }
 
-// I don't believe this function is support by other swf players,
-// but we do, as it's nice to remove oneself from the listeners
-// list so nobody knows we were here listening.
+/// \brief Remove the Listener for this Object.
+///
+/// @param name An ASCII string that is the name of the Listener
+///		to remove from the  memory segment..
+///
+/// @return true if this succeeded. false if it doesn't.
+///
+/// @remark
+///     I don't believe this function is support by other swf players,
+///     but we do, as it's nice to remove oneself from the listeners
+///     list so nobody knows we were here listening.
 bool
 Listener::removeListener(const string &name)
 {
@@ -204,7 +253,11 @@ Listener::removeListener(const string &name)
     return false;
 }
 
-// Get a list of alll the listeners waiting on this channel
+/// \brief List the Listeners for this memory segment.
+///
+/// @return A smart pointer to a vector of Listener names.
+///
+/// @remarks This is only used for debugging
 auto_ptr< vector<string> >
 Listener::listListeners()
 {
@@ -225,7 +278,11 @@ Listener::listListeners()
     return listeners;
 }
 
-/// \brief Closes (disconnects) the LcShm object.
+/// \brief Close a memory segment.
+///		This closes the shared memory segment, but the data
+///		remains until the next reboot of the computer.
+///
+/// @return nothing.    
 void
 LcShm::close()
 {
@@ -233,72 +290,35 @@ LcShm::close()
     closeMem();
 }
 
-#if 0
-Network::byte_t *
-LcShm::parseElement(amf::Element *el, Network::byte_t *data)
-{
-    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<uint8_t *>(data);
-    Element::astype_e type = (Element::astype_e)*ptr;
-    switch (type) {
-      case AMF::NUMBER:
-          double dub = 50.0;
-          amf_obj.createElement(&el, "gain", dub);
-          break;
-      case AMF::STRING:
-          amf_obj.createElement(&el, name, data);
-          break;
-      default:
-          break;
-    };
-}
+/// @note
+///     From what I can tell by exaimining the memory segment, after
+///     the raw 16 bytes is a LocalConnection object. This appears to
+///     have the following data types:
+/// String - This appears to the connection name, and looks like
+///          "localhost:lc_replay"
+/// String - This appears to be the hostname of the connection, and at
+///          least in my tests, has always been "localhost".
+/// Boolean - In all the files I've looked at, this has always been
+///           TRUE. I assume this is the domain security flag.
+/// Number - No idea what this number represents.
+/// Number - No idea what this number represents.
+/// NULL terminator
+///     AMF objects - this is followed by the AMF objects that have
+///     been added to the LocalConnection. This can be up to 40k
+///     long. While other web sites have claimed there is a length
+///     field in the initial shared memory segment header, I've never
+///     seen one in my tests.
 
-vector<amf::Element *> 
-LcShm::parseBody(Network::byte_t *data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<uint8_t *>(data);
-    AMF amf;
-
-    while (ptr) {
-        amf::Element *el = amf.extractAMF(ptr);
-        if (el) {
-            if (el->getType() == Element::NUMBER) {
-                if (el->to_number() == 0.0) {
-                    break;
-                }
-            }
-            if (el->getType() != Element::NOTYPE) {
-                _amfobjs.push_back(el);
-                ptr += el->getLength();
-            } else {
-                break;
-            }
-        } else {
-
-        }
-    };
-    
-    return _amfobjs;
-}
-#endif
-
-// From what I can tell by exaimining the memory segment, after the
-// raw 16 bytes is a LocalConnection object. This appears to have the
-// following data types:
-// String - This appears to the connection name, and looks like
-//          "localhost:lc_replay"
-// String - This appears to be the hostname of the connection, and at
-//          least in my tests, has always been "localhost".
-// Boolean - In all the files I've looked at, this has always been
-//           TRUE. I assume this is the domain security flag.
-// Number - No idea what this number represents.
-// Number - No idea what this number represents.
-// NULL terminator
-// AMF objects - this is followed by the AMF objects that have been
-// added to the LocalConnection. This can be up to 40k long. While
-// other web sites have claimed there is a length field in the initial
-// shared memory segment header, I've never seen one in my tests.
+/// \brief Parse the header of the memory segment.
+///
+/// @param data real pointer to start parsing from.
+///
+/// @param tooFar A pointer to one-byte-past the last valid memory
+///		address within the buffer.
+///
+/// @return A real pointer to the data after the headers has been parsed.
+///
+/// @remarks May throw a ParserException
 Network::byte_t *
 LcShm::parseHeader(Network::byte_t *data, Network::byte_t* tooFar)
 {
@@ -324,20 +344,18 @@ LcShm::parseHeader(Network::byte_t *data, Network::byte_t* tooFar)
 
     
     AMF amf;
-    Element *el = amf.extractAMF(ptr, tooFar);
+    boost::shared_ptr<Element> el = amf.extractAMF(ptr, tooFar);
     if (el == 0) {
         log_debug("Didn't extract an element from the byte stream!");
         return 0;
     }
     
     _object.connection_name = el->to_string();
-    delete el;
     
     el = amf.extractAMF(ptr, tooFar);
     if (ptr != 0) {
         _object.hostname = el->to_string();
     }
-    delete el;
     
 //     el = new amf::Element;
 //     ptr = amf.extractElement(el, ptr);
@@ -365,6 +383,15 @@ LcShm::parseHeader(Network::byte_t *data, Network::byte_t* tooFar)
     return ptr;
 }
 
+/// \brief Format the header for the memory segment.
+///
+/// @param con The name of the connection.
+///
+/// @param host The bostname of the connection, often "localhost"
+///
+/// @param domain The domain the hostname is in.
+///
+/// @return A real pointer to a header for a memory segment.
 Network::byte_t *
 LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
@@ -385,23 +412,29 @@ LcShm::formatHeader(const std::string &con, const std::string &host, bool /* dom
     ptr = header + LC_HEADER_SIZE;
 
     // Which is then always followed by 3 AMF objects.
-    Buffer *buf1 = AMF::encodeString(con);
+    boost::shared_ptr<amf::Buffer> buf1 = AMF::encodeString(con);
     memcpy(ptr, buf1->begin(), buf1->size());
     ptr += buf1->size();
 
-    Buffer *buf2 = AMF::encodeString(host);
+    boost::shared_ptr<amf::Buffer> buf2 = AMF::encodeString(host);
     memcpy(ptr, buf2->begin(), buf2->size());
     ptr += buf2->size();
     
     return ptr;
 }
 
-/// \brief Prepares the LcShm object to receive commands from a
-/// LcShm.send() command.
-/// 
-/// The name is a symbolic name like "lc_name", that is used by the
-/// send() command to signify which local connection to send the
-/// object to.
+/// \brief Connect to a memory segment.
+///     Prepares the LcShm object to receive commands from a
+///     LcShm.send() command.
+///
+/// @param name The name to use for POSIX shared memory, which is not
+///		the default type used.
+///
+/// @return true if this succeeded. false if it doesn't.
+///
+/// @remarks The name is a symbolic name like "lc_name", that is used
+///     by the send() command to signify which local connection to
+///     send the object to.
 bool
 LcShm::connect(const string &name)
 {
@@ -427,7 +460,7 @@ LcShm::connect(const string &name)
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
-//    vector<amf::Element *> ellist = parseBody(ptr);
+//    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
 
@@ -436,6 +469,12 @@ LcShm::connect(const string &name)
     return true;
 }
 
+/// \brief Connect to a memory segment.
+///
+/// @param key The SYSV style key for the shared memory segment,
+///	which is the default type used.
+///
+/// @return true if this succeeded. false if it doesn't.
 bool
 LcShm::connect(key_t key)
 {
@@ -455,17 +494,27 @@ LcShm::connect(key_t key)
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
-//    vector<amf::Element *> ellist = parseBody(ptr);
+//    vector<boost::shared_ptr<Element> > ellist = parseBody(ptr);
 //     log_debug("Base address is: 0x%x, 0x%x",
 //               (unsigned int)Listener::getBaseAddress(), (unsigned int)_baseaddr);
     
     return true;
 }
 
-/// \brief Invokes a method on a specified LcShm object.
+/// \brief Put data in the memory segment
+///		This puts data into the memory segment
+///
+/// @param name The connection name for this connection
+///
+/// @param dataname The name of the data to send.
+///
+/// @param data A vector of smart pointers to the AMF0 Elements
+///		contaiing the data for this memory segment.
+///
+/// @return nothing.
 void
 LcShm::send(const string & /* name */, const string & /* domainname */,
-            vector<amf::Element *> &/* data */)
+            vector<boost::shared_ptr<Element> > &/* data */)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -544,6 +593,8 @@ LcShm::send(const string & /* name */, const string & /* domainname */,
     
 }
 
+///  \brief Dump the internal data of this class in a human readable form.
+/// @remarks This should only be used for debugging purposes.
 void
 LcShm::dump()
 {
@@ -555,10 +606,10 @@ LcShm::dump()
     cerr << "Connection Name:\t" << _object.connection_name << endl;
     cerr << "Hostname Name:\t\t" << _object.hostname << endl;
     cerr << "Domain Allowed:\t\t" << ((_object.domain) ? "true" : "false") << endl;
-    vector<amf::Element *>::iterator ait;
+    vector<boost::shared_ptr<Element> >::iterator ait;
     cerr << "# of Elements in file: " << _amfobjs.size() << endl;
     for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
-	amf::Element *el = (*(ait));
+	boost::shared_ptr<Element> el = (*(ait));
         el->dump();
     }
 
@@ -574,3 +625,8 @@ LcShm::dump()
 }
 
 } // end of gnash namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

@@ -23,7 +23,7 @@
 #include "movie_definition.h"
 #include "movie_instance.h"
 #include "movie_root.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "gnash.h"
 #include "VM.h"
 #include "render.h"

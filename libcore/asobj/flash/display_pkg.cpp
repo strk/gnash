@@ -29,7 +29,7 @@
 #include "flash/display/InteractiveObject_as.h"
 #include "flash/display/DisplayObjectContainer_as.h"
 #include "flash/display/Sprite_as.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 
 namespace gnash {
 

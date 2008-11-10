@@ -30,7 +30,8 @@
 #include <unistd.h>
 
 #define PUSHBUF_SIZE 1024
-#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
+//#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
+#define MIN_PROBE_SIZE 0
 
 #define GNASH_DEBUG_DATAFLOW
 
@@ -38,10 +39,7 @@
 
 namespace gnash {
 namespace media {
-
-
-
-
+namespace gst {
 
 
 MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
@@ -88,9 +86,11 @@ MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
 
     log_debug(_("Needed %d dead iterations to detect audio type."), counter);
     
+#if 0
     if (! (_videoInfo.get() || _audioInfo.get()) ) {
         throw MediaException(_("MediaParserGst failed to detect any stream types."));    
     }
+#endif
     
     if (!gst_element_set_state (_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
         throw MediaException(_("MediaParserGst could not change element state"));
@@ -102,6 +102,8 @@ MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
 
 MediaParserGst::~MediaParserGst()
 {
+    stopParserThread();
+
     if (_bin) {
         gst_element_set_state (_bin, GST_STATE_NULL);
         g_object_unref (_bin);
@@ -255,10 +257,11 @@ bool MediaParserGst::foundAllStreams()
 
 bool MediaParserGst::probingConditionsMet(const SimpleTimer& timer)
 {
-    return foundAllStreams() || (timer.expired() && getBytesLoaded() > MIN_PROBE_SIZE);
+    return foundAllStreams() || (timer.expired() && getBytesLoaded() >= MIN_PROBE_SIZE);
 }
 
-void print_caps(GstCaps* caps)
+static void
+print_caps(GstCaps* caps)
 {
     if (!caps) {
         return;
@@ -433,7 +436,7 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         
         g_object_set_data (G_OBJECT (parser->_audiosink), "mediaparser-obj", parser);
         
-        AudioInfo* audioinfo = new AudioInfo(0, 0, 0, false, 0, FFMPEG);
+        AudioInfo* audioinfo = new AudioInfo(0, 0, 0, false, 0, CUSTOM);
         audioinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_audioInfo.reset(audioinfo);
@@ -450,7 +453,7 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         
         g_object_set_data (G_OBJECT (parser->_videosink), "mediaparser-obj", parser);
 
-        VideoInfo* videoinfo = new VideoInfo(0, 0, 0, false, 0, FFMPEG);
+        VideoInfo* videoinfo = new VideoInfo(0, 0, 0, false, 0, CUSTOM);
         videoinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_videoInfo.reset(videoinfo);
@@ -517,11 +520,19 @@ MediaParserGst::cb_chain_func_audio (GstPad *pad, GstBuffer *buffer)
     assert(parser);
 
     EncodedAudioFrame* frame = new EncodedAudioFrame;
-    frame->dataSize = GST_BUFFER_SIZE(buffer);
+
+    // 'dataSize' should reflect size of 'data'.
+    // Since we're not allocating any 'data' there's no point
+    // in setting dataSize.
+    //frame->dataSize = GST_BUFFER_SIZE(buffer);
 
     if (GST_BUFFER_TIMESTAMP_IS_VALID(buffer)) {
         frame->timestamp = GST_TIME_AS_MSECONDS(GST_BUFFER_TIMESTAMP(buffer));
     } else {
+        // What if a frame with invalid timestamp is found
+        // in the middle of the stream ? Using 0 here, might
+        // mean that the computed "bufferTime" is huge (0 to last valid timestamp)
+        // Not necessarely a big deal, but a conceptual glitch.
         frame->timestamp = 0;
     }
     
@@ -537,5 +548,6 @@ MediaParserGst::cb_chain_func_audio (GstPad *pad, GstBuffer *buffer)
     return GST_FLOW_OK;
 }
 
+} // gnash.media.gst namespace
 } // namespace media
 } // namespace gnash

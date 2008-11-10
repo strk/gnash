@@ -41,7 +41,7 @@
 #include "LoadVars_as.h"
 #include "LocalConnection.h"
 #include "Microphone.h"
-#include "Number.h"
+#include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
 #include "XML_as.h"
@@ -58,13 +58,13 @@
 #include "System_as.h"
 #include "TextFormat.h"
 #include "TextSnapshot_as.h"
-#include "video_stream_instance.h"
+#include "Video.h"
 #include "extension.h"
 #include "VM.h"
 #include "timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
-#include "edit_text_character.h"
+#include "TextField.h"
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
@@ -72,7 +72,7 @@
 #include "flash_pkg.h"
 
 #include "fn_call.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>

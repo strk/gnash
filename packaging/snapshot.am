@@ -35,8 +35,8 @@ SNAPSHOT_TMP = /tmp/gnash-$(NOW)
 # '20080202trunk'
 snapshot: distdir
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}trunk"; \
-	snapshot_dir="$${pkgname}"; \
+	pkgname="gnash-trunk_$${now}"; \
+	snapshot_dir="gnash-$${now}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
 	if test -d $${snapshot_dir}; then \
 	  rm -fr $${snapshot_dir}; \
@@ -44,7 +44,7 @@ snapshot: distdir
 	mv -f gnash-trunk $${snapshot_dir}; \
 	if test ! -f $${snapshot_dir}/configure.ac.orig; then \
 	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $${now}trunk)/" \
+	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, trunk-$${now})/" \
 	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
 	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;\
 	fi; \
@@ -122,14 +122,6 @@ snapshot-bundle: #snapshot-install
 	strip $${snapshot_tmp}/bin/soldumper; \
 	tar zcvCf /tmp $${snapshot_tar} $${pkgname}
 
-snapshot-rpm: snapshot $(srcdir)/packaging/redhat/gnash.spec
-	-@rm -f /usr/src/redhat/SPECS/gnash.spec
-	now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}trunk"; \
-	snapshot_tar="$${pkgname}.tar.gz"; \
-	sed -e "s:%define version .*:%define version $${now}:" $(srcdir)/packaging/redhat/gnash.spec > /usr/src/redhat/SPECS/gnash.spec; \
-	cp $${snapshot_tar} /usr/src/redhat/SOURCES/
-	rpmbuild -ba --clean --rmsource --rmspec /usr/src/redhat/SPECS/gnash.spec
 
 snapshot-clean:
 	-@rm -fr snapshot-* $(SNAPSHOT_BUILD) $(SNAPSHOT_TMP) gnash*$(VERSION)*.ipk

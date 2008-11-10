@@ -22,6 +22,7 @@
 #endif
 
 #include <boost/detail/endian.hpp>
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 #include <cmath>
@@ -65,76 +66,80 @@ Flv::~Flv()
 }
 
 // Encode the data into a Buffer
-Buffer *
+boost::shared_ptr<amf::Buffer>
 Flv::encodeHeader(Network::byte_t type)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(sizeof(Flv::flv_header_t));
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(Flv::flv_header_t)));
     buf->clear();
     
     Network::byte_t version = 0x1;
-    buf->copy("FLV");
-    buf->append(version);
+    *buf = "FLV";
+    *buf += version;
 
-    buf->append(type);
+    *buf += type;
 
     boost::uint32_t size = htonl(0x9);
-    buf->append(size);
+    buf->append((Network::byte_t *)&size, sizeof(boost::uint32_t));
 
     return buf;
 }
 
 // Decode a Buffer into a header
-Flv::flv_header_t *
-Flv::decodeHeader(amf::Buffer *buf)
+boost::shared_ptr<Flv::flv_header_t>
+Flv::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    memcpy(&_header, buf->begin(), sizeof(Flv::flv_header_t));
+    boost::shared_ptr<flv_header_t> header(new flv_header_t);
+    memcpy(header.get(), buf->reference(), sizeof(flv_header_t));
+//    std::copy(buf->begin(), buf->begin() + sizeof(flv_header_t), header.get());
 
     // test the magic number
-    if (memcmp(_header.sig, "FLV", 3) != 0) {
+    if (memcmp(header->sig, "FLV", 3) != 0) {
 	log_error("Bad magic number for FLV file!");
-	return 0;
+	header.reset();
+	return header;
     }
 
     // Make sure the version is legit, it should alwys be 1
-    if (_header.version != 0x1) {
+    if (header->version != 0x1) {
 	log_error("Bad version in FLV header! %d", _header.version);
-		  return 0;
+	header.reset();
+	return header;
     }
 
     // Make sure the type is set correctly
-    if (((_header.type & Flv::FLV_AUDIO) && (_header.type & Flv::FLV_VIDEO))
-	|| (_header.type & Flv::FLV_AUDIO) || (_header.type & Flv::FLV_VIDEO)) {
+    if (((header->type & Flv::FLV_AUDIO) && (header->type & Flv::FLV_VIDEO))
+	|| (header->type & Flv::FLV_AUDIO) || (header->type & Flv::FLV_VIDEO)) {
     } else {
-	    log_error("Bad FLV file Type: %d", _header.type);
+	    log_error("Bad FLV file Type: %d", header->type);
     }
     
     // Be lazy, as head_size is an array of 4 bytes, and not an integer in the data
     // structure. This is to get around possible padding done to the data structure
     // done by some compilers.
-    boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(_header.head_size));
+    boost::uint32_t size = *(reinterpret_cast<boost::uint32_t *>(header->head_size));
     // The header size is big endian
-    swapBytes(_header.head_size, sizeof(boost::uint32_t));
+    swapBytes(header->head_size, sizeof(boost::uint32_t));
     
     // The header size is always 9, guess it could change some day in the far future, so
     // we should use it.
     if (ntohl(size) != 0x9) {
 	log_error("Bad header size in FLV header! %d", size);
-		  return 0;
+	header.reset();
     }
     
-    return &_header;
+    return header;
 }
 
 // Decode a MetaData object, which is after the header, but before all the tags
-amf::Element *
-Flv::decodeMetaData(amf::Buffer *buf)
+boost::shared_ptr<amf::Element> 
+Flv::decodeMetaData(boost::shared_ptr<amf::Buffer> buf)
 {
     return decodeMetaData(buf->reference(), buf->size());
 }
 
-amf::Element *
+boost::shared_ptr<amf::Element> 
 Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -161,19 +166,19 @@ Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
     ptr += length;
     
     // Extract the properties for this metadata object.
-    Element *el = amf.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el = amf.extractAMF(ptr, tooFar);
     ptr += amf.totalsize();
     el->setName(name.c_str(), length);
 
     return el;
 }
 
-Flv::flv_audio_t *
+boost::shared_ptr<Flv::flv_audio_t>
 Flv::decodeAudioData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_audio_t *audio = new flv_audio_t;
-    memset(audio, 0, sizeof(flv_audio_t));
+    boost::shared_ptr<flv_audio_t> audio(new flv_audio_t);
+//    memset(audio->reference(), 0, sizeof(flv_audio_t));
 
     // Get the sound type
     if (byte && Flv::AUDIO_STEREO) {
@@ -227,12 +232,12 @@ Flv::decodeAudioData(gnash::Network::byte_t byte)
     return audio;
 }
 
-Flv::flv_video_t *
+boost::shared_ptr<Flv::flv_video_t>
 Flv::decodeVideoData(gnash::Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_video_t *video = new flv_video_t;
-    memset(video, 0, sizeof(flv_video_t));
+    boost::shared_ptr<flv_video_t> video(new flv_video_t);
+//    memset(video, 0, sizeof(flv_video_t));
 
     // Get the codecID codecID
     if (byte && Flv::VIDEO_H263) {
@@ -274,6 +279,7 @@ Flv::convert24(boost::uint8_t *num)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t bodysize = 0;
+
 #ifdef BOOST_BIG_ENDIAN
     bodysize = *(reinterpret_cast<boost::uint32_t *>(num)) >> 8;
 #else
@@ -285,12 +291,15 @@ Flv::convert24(boost::uint8_t *num)
 }
 
 // Decode the tag header
-Flv::flv_tag_t *
-Flv::decodeTagHeader(amf::Buffer *buf)
+boost::shared_ptr<Flv::flv_tag_t>
+Flv::decodeTagHeader(boost::shared_ptr<amf::Buffer> &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    flv_tag_t *tag = new flv_tag_t;
-    memcpy(tag, buf->reference(), sizeof(flv_tag_t));
+    flv_tag_t *data = reinterpret_cast<flv_tag_t *>(buf->reference());
+    boost::shared_ptr<flv_tag_t> tag(new flv_tag_t);
+    memcpy(tag.get(), data, sizeof(flv_tag_t));
+
+//    std::copy(buf->begin(), buf->end(), tag);
 
     // These fields are all 24 bit, big endian integers
     swapBytes(tag->bodysize, 3);
@@ -300,21 +309,22 @@ Flv::decodeTagHeader(amf::Buffer *buf)
     return tag;
 }
 
-amf::Element *
+boost::shared_ptr<amf::Element> 
 Flv::findProperty(const std::string &name)
 {
     if (_properties.size() > 0) {
-	vector<amf::Element *>::iterator ait;
+	vector<boost::shared_ptr<amf::Element> >::iterator ait;
 //	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    amf::Element *el = (*(ait));
+	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    if (el->getName() == name) {
 		return el;
 	    }
 //	    el->dump();
 	}
     }
-    return 0;
+    boost::shared_ptr<amf::Element> el;
+    return el;
 }
 
 void
@@ -322,10 +332,10 @@ Flv::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_properties.size() > 0) {
-	vector<amf::Element *>::iterator ait;
+	vector<boost::shared_ptr<amf::Element> >::iterator ait;
 	cerr << "# of Properties in object: " << _properties.size() << endl;
 	for (ait = _properties.begin(); ait != _properties.end(); ait++) {
-	    amf::Element *el = (*(ait));
+	    boost::shared_ptr<amf::Element> el = (*(ait));
             // an onMetaData packet of an FLV stream only contains number or
             // boolean bydefault
             if (el->getType() == Element::NUMBER_AMF0) {

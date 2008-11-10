@@ -25,12 +25,11 @@
 #include "movie_definition.h"
 #include "movie_instance.h"
 #include "movie_root.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "as_environment.h"
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
 #include "sound_handler.h" // for creating the "test" sound handlers
-#include "render.h" // for get_render_handler
 #include "RGBA.h" // for rgba class
 #include "FuzzyPixel.h"
 #include "render.h"
@@ -74,16 +73,21 @@ MovieTester::MovieTester(const std::string& url)
 	// Initialize gnash code lib
 	gnashInit();
 
-	// Set base url *before* calling create_movie
-	// TODO: use PWD if url == '-'
-	set_base_url(url);
+	// Initialize the testing media handlers
+	initTestingMediaHandlers();
+
+	// Initialize the sound handler(s)
+	initTestingSoundHandlers();
+
+    _runInfo.reset(new RunInfo(url));
+    _runInfo->setSoundHandler(_sound_handler.get());
 
 	if ( url == "-" )
 	{
 		std::auto_ptr<IOChannel> in (
 				noseek_fd_adapter::make_stream(fileno(stdin))
 				);
-		_movie_def = gnash::create_movie(in, url, false);
+		_movie_def = gnash::create_movie(in, url, *_runInfo, false);
 	}
 	else
 	{
@@ -103,7 +107,8 @@ MovieTester::MovieTester(const std::string& url)
 #endif
 		}
 		// _url should be always set at this point...
-		_movie_def = gnash::create_library_movie(urlObj, NULL, false);
+		_movie_def = gnash::create_library_movie(urlObj, *_runInfo,
+                NULL, false);
 	}
 
 	if ( ! _movie_def )
@@ -111,13 +116,7 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	// Initialize the testing media handlers
-	initTestingMediaHandlers();
-
-	// Initialize the sound handler(s)
-	initTestingSoundHandlers();
-
-	_movie_root = &(VM::init(*_movie_def, _clock).getRoot());
+	_movie_root = new movie_root(*_movie_def, _clock, *_runInfo);
 
 	// Initialize viewport size with the one advertised in the header
 	_width = unsigned(_movie_def->get_width_pixels());
@@ -283,7 +282,7 @@ MovieTester::resizeStage(int x, int y)
 }
 
 const character*
-MovieTester::findDisplayItemByName(const sprite_instance& mc,
+MovieTester::findDisplayItemByName(const MovieClip& mc,
 		const std::string& name) 
 {
 	const DisplayList& dlist = mc.getDisplayList();
@@ -291,7 +290,7 @@ MovieTester::findDisplayItemByName(const sprite_instance& mc,
 }
 
 const character*
-MovieTester::findDisplayItemByDepth(const sprite_instance& mc,
+MovieTester::findDisplayItemByDepth(const MovieClip& mc,
 		int depth)
 {
 	const DisplayList& dlist = mc.getDisplayList();
@@ -548,17 +547,16 @@ MovieTester::initTestingSoundHandlers()
 
 #ifdef SOUND_SDL
 	std::cout << "Creating SDL sound handler" << std::endl;
-        _sound_handler.reset( gnash::media::create_sound_handler_sdl() );
+        _sound_handler.reset( sound::create_sound_handler_sdl() );
 #elif defined(SOUND_GST)
 	std::cout << "Creating GST sound handler" << std::endl;
-        _sound_handler.reset( gnash::media::create_sound_handler_gst() );
+        _sound_handler.reset( media::create_sound_handler_gst() );
 #else
 	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
 	return;
 	//exit(1);
 #endif
 
-	gnash::set_sound_handler(_sound_handler.get());
 }
 
 void
@@ -568,9 +566,9 @@ MovieTester::initTestingMediaHandlers()
 	std::auto_ptr<media::MediaHandler> handler;
 
 #ifdef USE_FFMPEG
-	handler.reset( new gnash::media::MediaHandlerFfmpeg() );
+	handler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
-        handler.reset( new gnash::media::MediaHandlerGst() );
+        handler.reset( new gnash::media::gst::MediaHandlerGst() );
 #else
 	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
 	return;

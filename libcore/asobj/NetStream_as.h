@@ -29,7 +29,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
-#include "video_stream_instance.h"
 #include "NetConnection.h"
 #include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
@@ -50,8 +49,11 @@ namespace gnash {
 	class CharacterProxy;
 	class IOChannel;
 	namespace media {
-		class sound_handler;
 		class MediaHandler;
+	}
+	namespace sound {
+		class sound_handler;
+        class InputStream;
 	}
 }
 
@@ -72,7 +74,7 @@ public:
 	/// Initialize playhead given a VirtualCock to use
 	/// as clock source.
 	//
-	/// The PlayHead will have initial state set to PLAYING
+	/// The PlayHead will have initial state set to PAUSED
 	///
 	/// @param clockSource
 	///	The VirtualClock to use as time source.
@@ -80,15 +82,25 @@ public:
 	///
 	PlayHead(VirtualClock* clockSource);
 
-	/// Initialize playhead 
-	//
-	/// @param hasVideo
-	/// 	Whether video consumer is available
-	///
-	/// @param hasAudio
-	/// 	Whether video consumer is available
-	///
-	void init(bool hasVideo, bool hasAudio);
+    /// Set a video consumer as available
+    //
+    /// This should be completely fine to do during
+    /// PlayHead lifetime.
+    ///
+    void setVideoConsumerAvailable()
+    {
+        _availableConsumers |= CONSUMER_VIDEO;
+    }
+
+    /// Set an audio consumer as available
+    //
+    /// This should be completely fine to do during
+    /// PlayHead lifetime.
+    ///
+    void setAudioConsumerAvailable()
+    {
+        _availableConsumers |= CONSUMER_AUDIO;
+    }
 
 	/// Get current playhead position (milliseconds)
 	boost::uint64_t getPosition() { return _position; }
@@ -108,13 +120,10 @@ public:
 		return (_positionConsumers & CONSUMER_VIDEO);
 	}
 
-	/// \brief
-	/// Mark current position as being consumed by video consumer,
-	/// advancing if needed
+	/// Mark current position as being consumed by video consumer
 	void setVideoConsumed()
 	{
 		_positionConsumers |= CONSUMER_VIDEO;
-		advanceIfConsumed();
 	}
 
 	/// Return true if audio of current position have been consumed
@@ -123,13 +132,10 @@ public:
 		return (_positionConsumers & CONSUMER_AUDIO);
 	}
 
-	/// \brief
-	/// Mark current position as being consumed by audio consumer,
-	/// advancing if needed.
+	/// Mark current position as being consumed by audio consumer
 	void setAudioConsumed()
 	{
 		_positionConsumers |= CONSUMER_AUDIO;
-		advanceIfConsumed();
 	}
 
 	/// Change current position to the given time.
@@ -146,9 +152,7 @@ public:
 	///
 	void seekTo(boost::uint64_t position);
 
-private:
-
-	/// Advance position if all consumers consumed the current one
+	/// Advance position if all available consumers consumed the current one
 	//
 	/// Clock source will be used to determine the amount
 	/// of milliseconds to advance position to.
@@ -161,6 +165,9 @@ private:
 	///
 	void advanceIfConsumed();
 		
+
+private:
+
 	/// Flags for consumers state
 	enum ConsumerFlag {
 		CONSUMER_VIDEO = 1,
@@ -190,35 +197,6 @@ private:
 	/// The offset will be 
 	boost::uint64_t _clockOffset; 
 
-};
-
-
-
-
-
-class raw_mediadata_t
-{
-public:
-        DSOEXPORT raw_mediadata_t()
-		:
-	        m_stream_index(-1),
-        	m_size(0),
-        	m_data(NULL),
-        	m_ptr(NULL),
-        	m_pts(0)
-	{}
-
-        DSOEXPORT ~raw_mediadata_t()
-	{
-		delete [] m_data;
-	}
-	
-
-        int m_stream_index;
-        boost::uint32_t m_size;
-        boost::uint8_t* m_data;
-        boost::uint8_t* m_ptr;
-        boost::uint32_t m_pts;  // presentation timestamp in millisec
 };
 
 
@@ -315,7 +293,7 @@ protected:
 	boost::mutex image_mutex;
 
 	// The image/videoframe which is given to the renderer
-	std::auto_ptr<image::ImageBase> m_imageframe;
+	std::auto_ptr<GnashImage> m_imageframe;
 
 	// The video URL
 	std::string url;
@@ -355,8 +333,6 @@ protected:
 public:
 
 
-typedef std::deque<raw_mediadata_t*> AudioQueue;
-
 	enum PauseMode {
 	  pauseModeToggle = -1,
 	  pauseModePause = 0,
@@ -389,9 +365,9 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 
 	/// Seek in the media played by the current instance
 	//
-	/// @param position
-	///	Defines in seconds where to seek to
-	///	TODO: take milliseconds !!
+	/// @param pos
+	///	    Defines in seconds where to seek to
+	///     @todo take milliseconds !!
 	///
 	void seek(boost::uint32_t pos);
 
@@ -412,7 +388,8 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 
 	/// Sets the NetConnection needed to access external files
 	//
-	/// @param netconnection
+	/// @param nc
+    ///     The NetConnection object to use for network access
 	///
 	void setNetCon(boost::intrusive_ptr<NetConnection> nc)
 	{
@@ -461,7 +438,7 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	//
 	/// @return a image containing the video frame, a NULL auto_ptr if none were ready
 	///
-	std::auto_ptr<image::ImageBase> get_video();
+	std::auto_ptr<GnashImage> get_video();
 	
 	/// Register the character to invalidate on video updates
 	void setInvalidatedVideo(character* ch)
@@ -475,9 +452,9 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 	//
 	/// This is a sound_handler::aux_streamer_ptr type.
 	///
-	/// It will be invoked by a separate thread (neither main, nor decoder thread).
+	/// It might be invoked by a separate thread (neither main, nor decoder thread).
 	///
-	static bool audio_streamer(void *udata, boost::uint8_t *stream, int len);
+	static unsigned int audio_streamer(void *udata, boost::int16_t* samples, unsigned int nSamples, bool& eof);
 
 
 
@@ -485,7 +462,39 @@ typedef std::deque<raw_mediadata_t*> AudioQueue;
 
 private:
 
+    /// A buffer with a cursor state
+    class CursoredBuffer
+    {
+    public:
+        DSOEXPORT CursoredBuffer()
+            :
+            m_size(0),
+            m_data(NULL),
+            m_ptr(NULL)
+        {}
 
+        DSOEXPORT ~CursoredBuffer()
+        {
+            delete [] m_data;
+        }
+
+        /// Number of samples left in buffer starting from cursor
+        boost::uint32_t m_size;
+
+        /// Actual data
+        //
+        /// The data must be allocated with new []
+        /// as will be delete []'d by the dtor
+        boost::uint8_t* m_data;
+
+        /// Cursor into the data
+        boost::uint8_t* m_ptr;
+    };
+
+    typedef std::deque<CursoredBuffer*> AudioQueue;
+
+    // Delete all samples in the audio queue.
+    void cleanAudioQueue();
 
 	enum PlaybackState {
 		PLAY_NONE,
@@ -501,17 +510,17 @@ private:
 		DEC_BUFFERING
 	};
 
-	/// Gets video info from the parser and initializes _videoDecoder
+	/// Initialize video decoder and (if successful) PlayHead consumer 
 	//
-	/// @param parser the parser to use to get video information.
+	/// @param info Video codec information
 	///
-	void initVideoDecoder(media::MediaParser& parser);
+	void initVideoDecoder(const media::VideoInfo& info);
 
-	/// Gets audio info from the parser and initializes _audioDecoder
+	/// Initialize audio decoder and (if successful) a PlayHead consumer 
 	//
-	/// @param parser the parser to use to get audio information.
+	/// @param info Audio codec information
 	///
-	void initAudioDecoder(media::MediaParser& parser);
+	void initAudioDecoder(const media::AudioInfo& parser);
 
 	DecodingState _decoding_state;
 
@@ -567,13 +576,13 @@ private:
 	//
 	/// @return 0 on EOF or error, a decoded video otherwise
 	///
-	std::auto_ptr<image::ImageBase> decodeNextVideoFrame();
+	std::auto_ptr<GnashImage> decodeNextVideoFrame();
 
 	/// Decode next audio frame fetching it MediaParser cursor
 	//
 	/// @return 0 on EOF or error, a decoded audio frame otherwise
 	///
-	raw_mediadata_t* decodeNextAudioFrame();
+	CursoredBuffer* decodeNextAudioFrame();
 
 	/// \brief
 	/// Decode input audio frames with timestamp <= ts
@@ -590,15 +599,21 @@ private:
 	///	3. next element in cursor has timestamp > tx
 	///	4. there was an error decoding
 	///
-	std::auto_ptr<image::ImageBase> getDecodedVideoFrame(boost::uint32_t ts);
+	std::auto_ptr<GnashImage> getDecodedVideoFrame(boost::uint32_t ts);
 
 	DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 
 	/// Video decoder
 	std::auto_ptr<media::VideoDecoder> _videoDecoder;
 
+	/// True if video info are known
+	bool _videoInfoKnown;
+
 	/// Audio decoder
 	std::auto_ptr<media::AudioDecoder> _audioDecoder;
+
+	/// True if an audio info are known
+	bool _audioInfoKnown;
 
 	/// Virtual clock used as playback clock source
 	std::auto_ptr<InterruptableVirtualClock> _playbackClock;
@@ -607,7 +622,7 @@ private:
 	PlayHead _playHead;
 
 	// Current sound handler
-	media::sound_handler* _soundHandler;
+	sound::sound_handler* _soundHandler;
 
 	// Current media handler
 	media::MediaHandler* _mediaHandler;
@@ -635,8 +650,8 @@ private:
 	/// is invoked by a separate thread (dunno if it makes sense actually)
 	boost::mutex _audioQueueMutex;
 
-	// Whether or not the aux streamer is attached
-	bool _auxStreamerAttached;
+	// Id of an attached audio streamer, 0 if none
+	sound::InputStream* _auxStreamer;
 
 	/// Attach the aux streamer.
 	//
@@ -697,7 +712,6 @@ private:
 
 	/// Identifier of the advance timer
 	unsigned int _advanceTimer;
-
 };
 
 

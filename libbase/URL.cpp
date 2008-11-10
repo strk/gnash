@@ -50,8 +50,6 @@
 #include <climits>
 #include <boost/tokenizer.hpp>
 
-using namespace std;
-
 namespace gnash {
 
 /*private*/
@@ -59,8 +57,8 @@ void
 URL::init_absolute(const std::string& in)
 {
 	// Find protocol
-	string::size_type pos = in.find("://");
-	if ( pos != string::npos )
+    std::string::size_type pos = in.find("://");
+	if ( pos != std::string::npos )
 	{
 		// copy initial part to protocol
 		_proto = in.substr(0, pos);
@@ -74,8 +72,8 @@ URL::init_absolute(const std::string& in)
 		}
 
 		// Find host 
-		string::size_type pos1 = in.find('/', pos);
-		if ( pos1 == string::npos )
+        std::string::size_type pos1 = in.find('/', pos);
+		if ( pos1 == std::string::npos )
 		{
 			// no slashes ? all hostname, I presume
 			_host = in.substr(pos);
@@ -84,7 +82,7 @@ URL::init_absolute(const std::string& in)
 		}
 
 		// copy hostname
-                _host = in.substr(pos, pos1-pos);
+        _host = in.substr(pos, pos1-pos);
                 
 		// next come path
 		_path = in.substr(pos1);
@@ -111,7 +109,7 @@ URL::URL(const std::string& absolute_url)
 {
 	//cerr << "URL(" << absolute_url << ")" << endl;
 	if ( ( absolute_url.size() && absolute_url[0] == '/' )
-		|| absolute_url.find("://") != string::npos 
+		|| absolute_url.find("://") != std::string::npos 
 		|| ( absolute_url.size() > 1 && absolute_url[1] == ':' ))	//for win32
 	{
 		//cerr << "It's absolute" << endl;
@@ -124,7 +122,7 @@ URL::URL(const std::string& absolute_url)
 		char buf[PATH_MAX+1];
 		if ( ! getcwd(buf, PATH_MAX) )
 		{
-			stringstream err;
+            std::stringstream err;
 			err << "getcwd failed: " << strerror(errno);
 			throw gnash::GnashException(err.str());
 		}
@@ -158,19 +156,16 @@ URL::normalize_path(std::string& path)
 
 	assert(path[0] == '/');
 
+    std::vector<std::string> components;
 
-	//cerr << "path=" << path << endl;
-
-	vector<string> components;
-
-	string::iterator prev=path.begin();
-	for (string::iterator curr=prev+1;
+    std::string::iterator prev=path.begin();
+	for (std::string::iterator curr = prev + 1;
 			curr != path.end();
 			++curr )
 	{
 		if ( *curr == '/')
 		{
-			string comp = string(prev+1, curr);
+            std::string comp = std::string(prev+1, curr);
 			//cerr << "comp:" << comp << endl;
 			prev = curr;
 
@@ -181,19 +176,16 @@ URL::normalize_path(std::string& path)
 		}
 	}
 	// add last component 
-	components.push_back(string(prev+1, path.end()));
+	components.push_back(std::string(prev+1, path.end()));
 
-	//cerr << "number of dir components:" << components.size() << endl;
 	path = "";
-	for (vector<string>::iterator i=components.begin(),
+	for (std::vector<std::string>::const_iterator i=components.begin(),
 			e=components.end();
 			i!=e; ++i)
 	{
 		path += "/" + *i;
-		//cerr << "component:" << *i << endl;
 	}
 
-	//cerr << "after normalization: path=" << path << endl;
 }
 
 /*public*/
@@ -206,53 +198,44 @@ URL::URL(const std::string& relative_url, const URL& baseurl)
 void
 URL::init_relative(const std::string& relative_url, const URL& baseurl)
 {
+
 	// If relative url starts with an hash, it's just
 	// an anchor change
 	if ( relative_url[0] == '#' )
 	{
 		_proto = baseurl._proto;
 		_host = baseurl._host;
-                _port= baseurl._port;
+        _port= baseurl._port;
 		_path = baseurl._path;
 		_anchor = relative_url.substr(1);
 		return;
 	}
 
 	// If has a protocol, call absolute_url ctor
-	if ( relative_url.find("://") != string::npos )
+	if ( relative_url.find("://") != std::string::npos )
 	{
 		init_absolute(relative_url);
 		return;
 	}
 
-//fprintf(stderr, " input=%s\n", in.c_str());
-
 	// use protocol and host from baseurl
 	_proto = baseurl._proto;
 	_host = baseurl._host;
 
-        // 
-#if 0 // check moved to StreamProvider
-         if (!host_check(_host)) {
-             return;
-         }
-#endif
-
 	if ( relative_url.size() && relative_url[0] == '/' ) 
 	{
 		// get path from here
-		//_path.assign(in, strlen(in));
 		_path = relative_url;
 	}
 
 	else // path-relative
 	{
-		string in = relative_url;
+		std::string in = relative_url;
 
 		// see how many dirs we want to take
 		// off the baseurl path
 		int dirsback=0;
-		string::size_type pos;
+		std::string::size_type pos;
 		while ( ( pos = in.find("../") ) == 0 ) 
 		{
 			++dirsback;
@@ -264,11 +247,9 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 			in = in.substr(pos);
 		}
 
-//fprintf(stderr, "dirsback=%d, in=%s\n", dirsback, in.c_str());
-
 		// find dirsback'th slash from end of
 		// baseurl path
-		string basedir = baseurl._path.substr(0,
+		std::string basedir = baseurl._path.substr(0,
 			baseurl._path.find_last_of("/")+1);
 
 		// for WIN32
@@ -278,8 +259,6 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 				baseurl._path.find_last_of("\\")+1);
 		}
 
-//fprintf(stderr, "basedir=%s\n", basedir.c_str());
-
 		assert(basedir[0] == '/'
 			|| basedir[1] == ':');	// for WIN32
 #ifndef __OS2__
@@ -287,14 +266,13 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		assert(*(basedir.rbegin()) == '/' 
 			|| *(basedir.rbegin()) == '\\'); 	// for WIN32
 #endif
-		string::size_type lpos =  basedir.size()-1;
+        std::string::size_type lpos =  basedir.size()-1;
 		for (int i=0; i<dirsback; ++i)
 		{
 			if ( lpos == 0 ) break;
-			string::size_type pos = basedir.rfind('/', lpos-1);
-//fprintf(stderr, "slash %d at offset %d (rfind from %d)\n", i, pos, lpos-1);
+			std::string::size_type pos = basedir.rfind('/', lpos-1);
 			// no more slashes found, break and set at 1
-			if ( pos == string::npos ) lpos = 1;
+			if ( pos == std::string::npos ) lpos = 1;
 			else lpos = pos;
 		}
 		basedir.resize(lpos+1);
@@ -316,10 +294,10 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 }
 
 /*public*/
-string
+std::string
 URL::str() const
 {
-        string ret = _proto + "://" + _host;
+        std::string ret = _proto + "://" + _host;
 	if ( _port != "" )
 	{
 		ret += ":" + _port;
@@ -344,8 +322,8 @@ URL::split_anchor_from_path()
 	assert(_anchor == "");
 
 	// Extract anchor from path, if any
-	string::size_type hashpos = _path.find('#');
-	if ( hashpos != string::npos )
+	std::string::size_type hashpos = _path.find('#');
+	if ( hashpos != std::string::npos )
 	{
 		_anchor = _path.substr(hashpos+1);
 		_path.erase(hashpos);
@@ -359,8 +337,8 @@ URL::split_port_from_host()
 	assert(_port == "");
 
 	// Extract anchor from path, if any
-	string::size_type hashpos = _host.find(':');
-	if ( hashpos != string::npos )
+	std::string::size_type hashpos = _host.find(':');
+	if ( hashpos != std::string::npos )
 	{
 		_port = _host.substr(hashpos+1);
 		_host.erase(hashpos);
@@ -376,7 +354,7 @@ URL::split_querystring_from_path()
 	// extract the parameters from the URL
 
     	size_t qmpos = _path.find("?");
-	if (qmpos == string::npos)
+	if (qmpos == std::string::npos)
 	{
 		// no query string
 		return;
@@ -411,11 +389,11 @@ URL::parse_querystring(const std::string& query_string,
 	{
 		const std::string& nameval = *tit;
 
-		string name;
-		string value;
+		std::string name;
+        std::string value;
 
 		size_t eq = nameval.find("=");
-		if ( eq == string::npos )
+		if ( eq == std::string::npos )
 		{
 			name = nameval;
 		}
@@ -437,14 +415,14 @@ URL::parse_querystring(const std::string& query_string,
 void
 URL::encode(std::string& input)
 {
-	const string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~";
-	const string hexdigits = "0123456789ABCDEF";
+	const std::string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~_";
+	const std::string hexdigits = "0123456789ABCDEF";
 
 	for (unsigned int i=0;i<input.length(); i++)
 	{
 		unsigned c = input[i] & 0xFF;	// ensure value is 0-255 not -ve
 
-		if (c < 32 || c > 126 || escapees.find((char)c) != string::npos)
+		if (c < 32 || c > 126 || escapees.find((char)c) != std::string::npos)
 		{
 			input[i] = '%';
 			input.insert(++i, hexdigits.substr(c >> 4, 1));
@@ -498,7 +476,7 @@ URL::decode(std::string& input)
 	}
 }
 
-ostream& operator<< (ostream& o, const URL& u)
+std::ostream& operator<< (std::ostream& o, const URL& u)
 {
 	return o << u.str();
 }

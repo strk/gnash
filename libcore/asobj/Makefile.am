@@ -31,6 +31,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libltdl \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \
@@ -61,7 +62,7 @@ libgnashasobjs_la_SOURCES = \
 	Mouse.cpp \
 	NetConnection.cpp \
 	NetStream_as.cpp \
-	Number.cpp \
+	Number_as.cpp \
 	Object.cpp \
 	Selection.cpp \
 	SharedObject.cpp\
@@ -136,7 +137,7 @@ noinst_HEADERS = \
 	MovieClipLoader.h \
 	NetConnection.h	\
 	NetStream_as.h \
-	Number.h \
+	Number_as.h \
 	Object.h \
 	prophelper.h \
 	Selection.h \

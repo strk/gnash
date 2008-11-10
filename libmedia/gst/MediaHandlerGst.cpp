@@ -24,6 +24,10 @@
 #include "MediaParserGst.h"
 #include "FLVParser.h"
 
+#ifdef DECODING_SPEEX
+#include "AudioDecoderSpeex.h"
+#endif
+
 #include "IOChannel.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
 
@@ -32,6 +36,7 @@
 
 namespace gnash { 
 namespace media {
+namespace gst {
 
 std::auto_ptr<MediaParser>
 MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
@@ -60,7 +65,7 @@ MediaHandlerGst::createMediaParser(std::auto_ptr<IOChannel> stream)
 }
 
 std::auto_ptr<VideoDecoder>
-MediaHandlerGst::createVideoDecoder(VideoInfo& info)
+MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 {
 	if ( info.type != FLASH )
 	{
@@ -89,11 +94,22 @@ MediaHandlerGst::createVideoDecoder(VideoInfo& info)
 }
 
 std::auto_ptr<AudioDecoder>
-MediaHandlerGst::createAudioDecoder(AudioInfo& info)
+MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 {
-	std::auto_ptr<AudioDecoder> ret( new AudioDecoderGst(info) );
-	return ret;
+        AudioDecoder* decoder = 0;
+#ifdef DECODING_SPEEX
+	if (info.codec == AUDIO_CODEC_SPEEX) {
+		assert(info.type == FLASH);
+		decoder = new AudioDecoderSpeex;
+	} else
+#endif
+	{
+		decoder = new AudioDecoderGst(info);
+	}
+
+	return std::auto_ptr<AudioDecoder>(decoder);
 }
 
+} // gnash.media.gst namespace
 } // gnash.media namespace 
 } // gnash namespace

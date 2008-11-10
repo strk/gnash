@@ -28,6 +28,7 @@
 #include "smart_ptr.h"
 #include "as_prop_flags.h"
 #include "ManualClock.h"
+#include "RunInfo.h"
 
 #include <iostream>
 #include <sstream>
@@ -59,8 +60,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	ManualClock clock;
 
-	VM& vm = VM::init(*md5, clock);
-    	vm.getRoot().setRootMovie( md5->create_movie_instance() );
+    // We don't care about the base URL.
+    RunInfo runInfo("");
+    movie_root root(*md5, clock, runInfo);
+
+    root.setRootMovie( md5->create_movie_instance() );
+
+    VM& vm = VM::get();
 
 	log_debug("VM version %d", vm.getSWFVersion());
 
@@ -123,12 +129,15 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(delpair.second, false); // property was NOT deleted
 		check_equals(props.size(), 4);
 
-		std::map<std::string, std::string> vals;
+        PropertyList::SortedPropertyList vals;
 		props.enumerateKeyValue(obj, vals);
 		check_equals( vals.size(), 4 );
-		check_equals( vals["var0"], "value3" );
-		check_equals( vals["Var0"], "value2" );
-		check_equals( vals["var1"], "value" );
+		check_equals( vals[0].first, "var0");
+		check_equals( vals[0].second, "value3");
+		check_equals( vals[1].first, "Var0");
+		check_equals( vals[1].second, "value2");
+		check_equals( vals[2].first, "var1");
+		check_equals( vals[2].second, "value");
 
 	}
 	else
@@ -184,12 +193,16 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(delpair.second, false); // property was NOT deleted
 		check_equals(props.size(), 3);
 
-		std::map<std::string, std::string> vals;
+        PropertyList::SortedPropertyList vals;
 		props.enumerateKeyValue(obj, vals);
 		check_equals( vals.size(), 3 );
-		check_equals( vals["Var0"], "value3" );
-		check_equals( vals["var1"], "value" );
-		check_equals( vals["var2"], "value" );
+		check_equals( vals[0].first, "var2");
+		check_equals( vals[0].second, "value");
+		check_equals( vals[1].first, "var1");
+		check_equals( vals[1].second, "value");
+		check_equals( vals[2].first, "Var0");
+		check_equals( vals[2].second, "value3");
+
 	}
 }
 

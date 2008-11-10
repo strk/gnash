@@ -21,7 +21,7 @@
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
-#include "sprite_instance.h" // for inlines
+#include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
 #include "abc_block.h"
 #include "Machine.h"
@@ -53,7 +53,7 @@ public:
 //             m_buf.read(*in, in->get_tag_end_position());
 // 	}
 
-	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
+	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
 	{
 		VM& vm = VM::get();
 		log_debug("getting machine.");
@@ -94,12 +94,11 @@ public:
 	    return true;
 	}
 
-	void read(SWFStream* in){
-
-
+	void read(SWFStream* /*in*/)
+    {
 	}
 	
-	static void doABCLoader(SWFStream& in,tag_type tag, movie_definition& m)
+	static void doABCLoader(SWFStream& in,tag_type tag, movie_definition& m, const gnash::RunInfo&)
 	{
 		if(tag == SWF::DOABCDEFINE){
 			in.ensureBytes(4);

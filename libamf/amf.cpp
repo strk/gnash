@@ -21,8 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "GnashException.h"
-
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -33,6 +32,7 @@
 #endif
 
 #include "log.h"
+#include "GnashException.h"
 #include "buffer.h"
 #include "amf.h"
 #include "network.h"
@@ -46,13 +46,24 @@ using namespace gnash;
 namespace amf 
 {
 
+/// \define ENSUREBYTES
+///
+/// @param from The base address to check.
+///
+/// @param tooFar The ending address that is one byte too many.
+///
+/// @param size The number of bytes to check for: from to tooFar.
+///
+/// @remarks May throw an Exception
 #define ENSUREBYTES(from, toofar, size) { \
 	if ( from+size >= toofar ) \
 		throw ParserException("Premature end of AMF stream"); \
 }
 
 
-// These are used to print more intelligent debug messages
+/// \brief String representations of AMF0 data types.
+///
+///	These are used to print more intelligent debug messages.
 const char *amftype_str[] = {
     "Number",
     "Boolean",
@@ -74,46 +85,30 @@ const char *amftype_str[] = {
     "AMF3 Data"
 };
 
+/// \brief Create a new AMF class.
+///	As most of the methods in the AMF class a static, this
+///	is primarily only used when encoding complex objects
+///	where the byte count is accumulated.
 AMF::AMF() 
     : _totalsize(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-// AMF::AMF(int size) 
-//     : _type(NONE),
-// #if 0
-//       _amf_index(0),
-//       _header_size(0),
-//       _total_size(0),
-//       _packet_size(0),
-//       _amf_data(0),
-// #endif
-//       _mystery_word(0)
-// {
-// //    GNASH_REPORT_FUNCTION;
-// #if 0
-//     if (!_amf_data) {
-//         _amf_data = new uint8_t(size+1);
-//         memset(_amf_data, 0, size+1);
-//     }
-//     _seekptr = _amf_data;
-// #endif
-// }
-
+/// Delete the alloczted AMF class
 AMF::~AMF()
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-
-/// \brief Swap bytes from big to little endian.
+/// \brief Swap bytes in raw data.
+///	This only swaps bytes if the host byte order is little endian.
 ///
-/// All Numeric values for AMF files are big endian, so we have
-/// to swap the bytes to be little endian for most machines. Don't do
-/// anything if we happen to be on a big-endian machine.
+/// @param word The address of the data to byte swap.
 ///
-/// Returns its first parameter, pointing to the (maybe-byte-swapped) data.
+/// @param size The number of bytes in the data.
+///
+/// @return A pointer to the raw data.
 void *
 swapBytes(void *word, size_t size)
 {
@@ -136,31 +131,9 @@ swapBytes(void *word, size_t size)
     // A conveniently-typed pointer to the source data
     Network::byte_t *x = static_cast<Network::byte_t *>(word);
 
-    switch (size) {
-    case 2: // 16-bit integer
-      {
-	Network::byte_t c;
-	c=x[0]; x[0]=x[1]; x[1]=c;
-	break;
-      }
-    case 4: // 32-bit integer
-      {
-	Network::byte_t c;
-	c=x[0]; x[0]=x[3]; x[3]=c;
-	c=x[1]; x[1]=x[2]; x[2]=c;
-	break;
-      }
-    case 8: // 64-bit integer
-      {
-	Network::byte_t c;
-	c=x[0]; x[0]=x[7]; x[7]=c;
-	c=x[1]; x[1]=x[6]; x[6]=c;
-	c=x[2]; x[2]=x[5]; x[5]=c;
-	c=x[3]; x[3]=x[4]; x[4]=c;
-	break;
-      }
-    }
-
+    /// Handle odd as well as even counts of bytes
+    std::reverse(x, x+size);
+    
     return word;
 }
 
@@ -168,284 +141,283 @@ swapBytes(void *word, size_t size)
 // Methods for encoding data into big endian formatted raw AMF data.
 //
 
-/// Encode a 64 bit number
+/// \brief Encode a 64 bit number to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param num A double value to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeNumber(double indata)
 {
 //    GNASH_REPORT_FUNCTION;
     double num;
     // Encode the data as a 64 bit, big-endian, numeric value
-    Buffer *buf = new Buffer(AMF0_NUMBER_SIZE + 1); // only one additional byte for the type
-    buf->append(Element::NUMBER_AMF0);
+    // only one additional byte for the type
+    boost::shared_ptr<Buffer> buf(new Buffer(AMF0_NUMBER_SIZE + 1));
+    *buf = Element::NUMBER_AMF0;
     num = indata;
     swapBytes(&num, AMF0_NUMBER_SIZE);
-    buf->append(num);
+    *buf += (num);
     
     return buf;
 }
 
-/// Encode a Boolean object
+/// \brief Encode a Boolean object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param flag The boolean value to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     // Encode a boolean value. 0 for false, 1 for true
-    Buffer *buf = new Buffer(2);
-    buf->append(Element::BOOLEAN_AMF0);
-    buf->append(flag);
+    boost::shared_ptr<Buffer> buf(new Buffer(2));
+    *buf = Element::BOOLEAN_AMF0; 
+    *buf += static_cast<Network::byte_t>(flag);
     
     return buf;
 }
 
-/// Encode the end of an object
+/// \brief Encode the end of an object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeObjectEnd()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(1);
-    buf->append(TERMINATOR);
+    boost::shared_ptr<Buffer> buf(new Buffer(1));
+    *buf += TERMINATOR;
 
     return buf;
 }
 
-#if 0
-/// Encode an object
+/// \brief Encode an "Undefined" object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
-AMF::encodeObject(Element *el)
-{
-    GNASH_REPORT_FUNCTION;
-//    AMF amf_obj;
-    
-    for (size_t i=0; i< el->propertiesSize(); i++) {
-//	Buffer *var = amf_obj.encodeProperty();
-//	Element *child = el[i];
-#if 0
-	Buffer *buf = new Buffer(AMF_HEADER_SIZE + size);
-	buf->append(Element::OBJECT);
-	boost::uint32_t num = size;
-	swapBytes(&num, 4);
-	buf->append(num);
-	buf->append(data, size);
-	
-	return buf;
-#endif
-//	child.dump();
-    }
-
-}
-#endif
-
-/// Encode an "Undefined" object
-///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::UNDEFINED_AMF0);
+    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+    *buf = Element::UNDEFINED_AMF0;
     
     return buf;
 }
 
-/// Encode an "Undefined" object
+/// \brief Encode a "Unsupported" object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeUnsupported()
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::UNSUPPORTED_AMF0);
+    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+    *buf = Element::UNSUPPORTED_AMF0;
     
     return buf;
 }
 
-/// Encode a Date
+/// \brief Encode a Date to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeDate(Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::DATE_AMF0);
+    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+    *buf = Element::DATE_AMF0;
     double num = *reinterpret_cast<const double*>(data);
     swapBytes(&num, 8);
-    buf->append(num);
+    *buf += num;
     
     return buf;
 }
-/// Encode a "NULL" object
+
+/// \brief Encode a NULL object to it's serialized representation.
+///		A NULL object is often used as a placeholder in RTMP.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeNull()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    Buffer *buf = new Buffer(1);
-    buf->append(Element::NULL_AMF0);
+    boost::shared_ptr<Buffer> buf(new Buffer(1));
+    *buf = Element::NULL_AMF0;
     
     return buf;
 }
 
-/// Encode an XML object
+/// \brief Encode an XML object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the XML data.
+/// 
+/// @param nbytes The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeXMLObject(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("XML AMF objects not supported yet");
     
-    return 0;
+    return buf;
 }
 
-/// Encode a Typed Object
+/// \brief Encode a Typed Object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("Typed AMF objects not supported yet");
 
-    return 0;
+    return buf;
 }
 
-/// Encode a Reference to an object
+/// \brief Encode a Reference to an object to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format (header,data)
+boost::shared_ptr<Buffer>
 AMF::encodeReference(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("Reference AMF objects not supported yet");
     
-    return 0;
+    return buf;
 }
 
-/// Encode a Movie Clip
+/// \brief Encode a Movie Clip (swf data) to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format (header,data)
+boost::shared_ptr<Buffer>
 AMF::encodeMovieClip(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("Movie Clip AMF objects not supported yet");
     
-    return 0;
+    return buf;
 }
 
-/// Encode an ECMA Array
+/// \brief Encode an ECMA Array to it's serialized representation.
+///		An ECMA Array, also called a Mixed Array, contains any
+///		AMF data type as an item in the array.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeECMAArray(Network::byte_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("ECMA Array AMF objects not supported yet");
     
-    return 0;
+    return buf;
 }
 
-/// Encode a long string
+/// \brief Encode a Long String to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeLongString(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("Long String AMF objects not supported yet");
     
-    return 0;
+    return buf;
 }
 
-/// Encode a Record Set
+/// \brief Encode a Record Set to it's serialized representation.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeRecordSet(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("Reecord Set AMF objects not supported yet");
     
-    return 0;
+    return buf;
 }
 
-/// Encode a Strict Array
+/// \brief Encode a Strict Array to it's serialized representation.
+///	A Strict Array is one where all the items are the same
+///	data type, commonly either a number or a string.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
+/// @param data A pointer to the raw bytes that becomes the data.
+/// 
+/// @param size The number of bytes to serialize.
 ///
-Buffer *
+/// @return a binary AMF packet in big endian format (header,data)
+boost::shared_ptr<Buffer>
 AMF::encodeStrictArray(Network::byte_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<Buffer> buf;
     log_unimpl("Strict Array AMF objects not supported yet");
     
-    return 0;
+    return buf;
 }
 
-/// Encode a string object
+/// \brief Encode a string to it's serialized representation.
+/// 
+/// @param str a string value
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeString(const string &str)
 {
     Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
     return encodeString(ptr, str.size());
 }
 
-Buffer *
+/// \brief Encode a string to it's serialized representation.
+/// 
+/// @param data The data to serialize into big endian format
+/// 
+/// @param size The size of the data in bytes
+///
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeString(Network::byte_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
-    Buffer *buf = new Buffer(size + AMF_HEADER_SIZE);
-    buf->append(Element::STRING_AMF0);
+    boost::shared_ptr<Buffer>buf(new Buffer(size + AMF_HEADER_SIZE));
+    *buf = Element::STRING_AMF0;
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
     // doesn't get written when encoding a string as it has a byte count
@@ -453,31 +425,30 @@ AMF::encodeString(Network::byte_t *data, size_t size)
     length = size;
 //    log_debug("Encoded data size is going to be %d", length);
     swapBytes(&length, 2);
-    buf->append(length);
+    *buf += length;
     buf->append(data, size);
     
     return buf;
 }
 
-/// Encode a NULL string object, which is a string with no data.
+/// \brief Encode a String object to it's serialized representation.
+///	A NULL String is a string with no associated data.
 ///
-/// @return a binary AMF packet in big endian format (header,data) which
-/// needs to be deleted[] after being used.
-///
-Buffer *
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
     
-    Buffer *buf = new Buffer(AMF_HEADER_SIZE);
-    buf->append(Element::STRING_AMF0);
+    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+    *buf = Element::STRING_AMF0;
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
     // doesn't get written when encoding a string as it has a byte count
     // instead.
     length = 0;
-    buf->append(length);
+    *buf += length;
     
     return buf;
 }
@@ -499,98 +470,115 @@ AMF::encodeNullString()
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
-Buffer *
-AMF::encodeElement(Element *el)
+
+/// \brief Encode an Element to it's serialized representation.
+///
+/// @param el A smart pointer to the Element to encode.
+///
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
+AMF::encodeElement(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
-    Buffer *buf = 0;
-    Buffer *tmp = 0;
-    
     size_t outsize;
     if (el->getType() == Element::BOOLEAN_AMF0) {
 	outsize = el->getNameSize() + 2;
     } else {
-	outsize = el->getNameSize() + AMF_VAR_HEADER_SIZE;
+	outsize = el->getNameSize() + el->getDataSize() + AMF_PROP_HEADER_SIZE;
     }
     // A NULL object is a single byte
     if (el->getType() == Element::NULL_AMF0) {
 	outsize = 1;
     }
-    buf = new Buffer(outsize);
-    buf->clear();		// FIXME: temporary, makes buffers cleaner in gdb.
-    // If the name field is set, it's a "property", followed by the data
+    
+    boost::shared_ptr<Buffer> buf(new Buffer(outsize));
+//    log_debug("AMF::%s: Outsize is: %d", __FUNCTION__, outsize);
+    // If the name field is set, it's a property, followed by the data
     if (el->getName()) {
 	// Add the length of the string for the name of the variable
 	size_t length = el->getNameSize();
 	boost::uint16_t enclength = length;
 	swapBytes(&enclength, 2);
-	buf->append(enclength);
+	*buf = enclength;
 	// Now the name itself
 	string name = el->getName();
 	if (name.size() > 0) {
-	    buf->append(name);
+	    *buf += name;
 	}
     }
 
     // Encode the element's data
     switch (el->getType()) {
       case Element::NOTYPE:
-	  return 0;
+	  return buf;
 	  break;
       case Element::NUMBER_AMF0:
-	  tmp = encodeNumber(el->to_number());
+      {
+	  boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(el->to_number());
+	  *buf += encnum;
+//	  *buf += encodeNumber(el->to_number());
           break;
+      }
       case Element::BOOLEAN_AMF0:
-	  tmp = encodeBoolean(el->to_bool());
+      {
+	  boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(el->to_bool());
+	  *buf += encodeBoolean(el->to_bool());
+	  *buf += encbool;
           break;
+      }
       case Element::STRING_AMF0:
-	  tmp = encodeString(el->getData(), el->getLength());
+      {
+	  boost::shared_ptr<Buffer> encstr = AMF::encodeString(el->to_string());
+	  *buf += encstr;
+//	  *buf += encodeString(el->to_reference(), el->getDataSize());
 	  break;
+      }
       case Element::OBJECT_AMF0:
-	  tmp = el->encode();
+	  // tmp = el->encode();
+	  log_unimpl("FIXME: Element::encode() temporarily disabled.");
           break;
       case Element::MOVIECLIP_AMF0:
-	  tmp = encodeMovieClip(el->getData(), el->getLength());
+	  *buf += encodeMovieClip(el->to_reference(), el->getDataSize());
           break;
       case Element::NULL_AMF0:
-	  tmp = encodeNull();
+	  *buf += encodeNull();
           break;
       case Element::UNDEFINED_AMF0:
-	  tmp = encodeUndefined();
+	  *buf += encodeUndefined();
 	  break;
       case Element::REFERENCE_AMF0:
-	  tmp = encodeReference(el->getData(), el->getLength());
+	  *buf += encodeReference(el->to_reference(), el->getDataSize());
           break;
       case Element::ECMA_ARRAY_AMF0:
-	  tmp = encodeECMAArray(el->getData(), el->getLength());
+	  *buf += encodeECMAArray(el->to_reference(), el->getDataSize());
           break;
 	  // The Object End gets added when creating the object, so we can just ignore it here.
       case Element::OBJECT_END_AMF0:
-	  tmp = encodeObjectEnd();
+	  *buf += encodeObjectEnd();
           break;
       case Element::STRICT_ARRAY_AMF0:
-	  tmp = encodeStrictArray(el->getData(), el->getLength());
+	  *buf += encodeStrictArray(el->to_reference(), el->getDataSize());
           break;
       case Element::DATE_AMF0:
-	  tmp = encodeDate(el->getData());
+	  *buf += encodeDate(el->to_reference());
           break;
       case Element::LONG_STRING_AMF0:
-	  tmp = encodeLongString(el->getData(), el->getLength());
+	  *buf += encodeLongString(el->to_reference(), el->getDataSize());
           break;
       case Element::UNSUPPORTED_AMF0:
-	  tmp = encodeUnsupported();
+	  *buf += encodeUnsupported();
           break;
       case Element::RECORD_SET_AMF0:
-	  tmp = encodeRecordSet(el->getData(), el->getLength());
+	  *buf += encodeRecordSet(el->to_reference(), el->getDataSize());
           break;
       case Element::XML_OBJECT_AMF0:
-	  tmp = encodeXMLObject(el->getData(), el->getLength());
+	  *buf += encodeXMLObject(el->to_reference(), el->getDataSize());
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
           break;
       case Element::TYPED_OBJECT_AMF0:
-//	  tmp = encodeTypedObject(el->getData(), el->getLength());
-	  tmp = 0;
+//	  tmp = encodeTypedObject(el->to_reference(), el->getDataSize());
+	  buf.reset();
           break;
 // 	  // This is a Gnash specific value
 //       case Element::VARIABLE:
@@ -600,70 +588,81 @@ AMF::encodeElement(Element *el)
 	  log_error("FIXME: got AMF3 data type");
 	  break;
       default:
-	  tmp = 0;
+	  buf.reset();
           break;
     };
 
-    if (tmp) {
-        buf->append(tmp);
-        delete tmp;
-    }
+//     if (tmp) {
+//         *buf += *tmp;
+//     }
     return buf;
 }
 
-Buffer *
-AMF::encodeProperty(amf::Element *el)
+/// Encode a variable to it's serialized representation.
+///
+/// @param el A smart pointer to the Element to encode.
+///
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
+AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t outsize;
     
-    outsize = el->getNameSize() + el->getLength() + AMF_VAR_HEADER_SIZE;
+    outsize = el->getNameSize() + el->getDataSize() + AMF_PROP_HEADER_SIZE;
 
-    Buffer *buf = new Buffer(outsize);
+    boost::shared_ptr<Buffer> buf(new Buffer(outsize));
     _totalsize += outsize;
 
     // Add the length of the string for the name of the variable
     size_t length = el->getNameSize();
     boost::uint16_t enclength = length;
     swapBytes(&enclength, 2);
-    buf->copy(enclength);
+    *buf = enclength;
 
     if (el->getName()) {
 	string name = el->getName();
 	if (name.size() > 0) {
-	    buf->append(name);
+	    *buf += name;
 	}
     }
 
     // Add the type of the variable's data
-    buf->append(el->getType());
+    *buf += el->getType();
     // Booleans appear to be encoded weird. Just a short after
     // the type byte that's the value.
     switch (el->getType()) {
       case Element::BOOLEAN_AMF0:
 //  	  enclength = el->to_bool();
 //  	  buf->append(enclength);
-  	  buf->append(el->to_bool());
+  	  *buf += el->to_bool();
 	  break;
       case Element::NUMBER_AMF0:
-	  if (el->getData()) {
-	      swapBytes(el->getData(), AMF0_NUMBER_SIZE);
-	      buf->append(el->getData(), AMF0_NUMBER_SIZE);
+	  if (el->to_reference()) {
+	      swapBytes(el->to_reference(), AMF0_NUMBER_SIZE);
+	      buf->append(el->to_reference(), AMF0_NUMBER_SIZE);
 	  }
 	  break;
       default:
-	  enclength = el->getLength();
+	  enclength = el->getDataSize();
 	  swapBytes(&enclength, 2);
-	  buf->append(enclength);
+	  *buf += enclength;
 	  // Now the data for the variable
-	  buf->append(el->getData(), el->getLength());
+	  buf->append(el->to_reference(), el->getDataSize());
     }
     
     return buf;
 }
 
-Element *
-AMF::extractAMF(Buffer *buf)
+/// \brief Extract an AMF object from an array of raw bytes.
+///
+/// @param buf A smart pointer to a Buffer to parse the data from.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
+boost::shared_ptr<amf::Element> 
+AMF::extractAMF(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
     Network::byte_t* start = buf->reference();
@@ -672,17 +671,29 @@ AMF::extractAMF(Buffer *buf)
     return extractAMF(start, tooFar);
 }
 
-Element *
+/// \brief Extract an AMF object from an array of raw bytes.
+///	An AMF object is one of the support data types.
+///
+/// @param in A real pointer to the raw data to start parsing from.
+///
+/// @param tooFar A pointer to one-byte-past the last valid memory
+///	address within the buffer.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
+boost::shared_ptr<amf::Element> 
 AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
 
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
+    boost::shared_ptr<amf::Element> el(new Element);
 
     if (in == 0) {
         log_error(_("AMF body input data is NULL"));
-        return 0;
+        return el;
     }
 
     // All elements look like this:
@@ -697,7 +708,6 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     // mostly to make valgrind shut up, as it has a tendency to
     // complain about legit code when it comes to all this byte
     // manipulation stuff.
-    Element *el = new Element;
     AMF amf_obj;
     // Jump through hoops to get the type so valgrind stays happy
 //    char c = *(reinterpret_cast<char *>(tmpptr));
@@ -724,8 +734,8 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  if (length >= SANE_STR_SIZE) {
 	      log_error("%d bytes for a string is over the safe limit of %d",
 			length, SANE_STR_SIZE);
-	      delete el;
-	      return 0;
+	      el.reset();
+	      return el;
 	  }
 //	  log_debug(_("AMF String length is: %d"), length);
 	  if (length > 0) {
@@ -746,7 +756,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 		  tmpptr++;
 		  break;
 	      }
-	      Element *child = amf_obj.extractProperty(tmpptr, tooFar); 
+	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
 		  tmpptr += 4;
@@ -777,7 +787,7 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 		  tmpptr++;
 		  break;
 	      }
-	      Element *child = amf_obj.extractProperty(tmpptr, tooFar); 
+	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  break;
 	      }
@@ -799,12 +809,12 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  tmpptr += sizeof(boost::uint32_t) + 1;
 	  // each number is 8 bytes, plus one byte for the type.
 	  tooFar = tmpptr += length * AMF0_NUMBER_SIZE + 1;
-// 	  Element *name = amf_obj.extractAMF(tmpptr, tooFar);
+// 	  boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(tmpptr, tooFar);
 // 	  tmpptr += amf_obj.totalsize();
 // 	  el->setName(name->getName());
 	  length -= 2;
 	  while (length) {
-	      Element *child = amf_obj.extractAMF(tmpptr, tooFar); 
+	      boost::shared_ptr<amf::Element> child = amf_obj.extractAMF(tmpptr, tooFar); 
 	      if (child == 0) {
 		  break;
 	      } else {
@@ -825,8 +835,8 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
       case Element::AMF3_DATA:
       default:
 	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
-	  delete el;
-	  return 0;
+	  el.reset();
+	  return el;
       }
     
     // Calculate the offset for the next read
@@ -835,8 +845,18 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
     return el;
 }
 
-Element *
-AMF::extractProperty(Buffer *buf)
+/// \brief Extract a Property.
+///	A Property is a standard AMF object preceeded by a
+///	length and an ASCII name field. These are only used
+///	with higher level ActionScript objects.
+///
+/// @param buf A smart pointer to an Buffer to parse the data from.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
+boost::shared_ptr<amf::Element> 
+AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -845,13 +865,27 @@ AMF::extractProperty(Buffer *buf)
     return extractProperty(start, tooFar);
 }
 
-Element *
+/// \brief Extract a Property.
+///	A Property is a standard AMF object preceeded by a
+///	length and an ASCII name field. These are only used
+///	with higher level ActionScript objects.
+///
+/// @param in A real pointer to the raw data to start parsing from.
+///
+/// @param tooFar A pointer to one-byte-past the last valid memory
+///	address within the buffer.
+///
+/// @return A smart ptr to an Element.
+///
+/// @remarks May throw a ParserException
+boost::shared_ptr<amf::Element> 
 AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
     
     Network::byte_t *tmpptr = in;
     boost::uint16_t length;
+    boost::shared_ptr<amf::Element> el;
 
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     // go past the length bytes, which leaves us pointing at the raw data
@@ -865,7 +899,7 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
     // braindamaging code to keep valgrind happy.
     if (length <= 0) {
  	log_debug("No Property name, object done");
- 	return 0;
+ 	return el;
     }
     
     if (length + tmpptr > tooFar) {
@@ -877,16 +911,18 @@ AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
 //    log_debug(_("AMF property name length is: %d"), length);
     std::string name(reinterpret_cast<const char *>(tmpptr), length);
 //    log_debug(_("AMF property name is: %s"), name);
-    tmpptr += length;
-
-    Element *el = 0;
+    // Don't read past the end
+    if (tmpptr + length < tooFar) {
+	tmpptr += length;
+    }
+    
     char c = *(reinterpret_cast<char *>(tmpptr));
     Element::amf0_type_e type = static_cast<Element::amf0_type_e>(c);
     // If we get a NULL object, there is no data. In that case, we only return
     // the name of the property.
     if (type == Element::NULL_AMF0) {
 	log_debug("No data associated with Property \"%s\"", name);
-	el = new Element;
+	el.reset(new Element);
 	el->setName(name.c_str(), length);
 	tmpptr += 1;
 	// Calculate the offset for the next read

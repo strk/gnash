@@ -50,6 +50,9 @@
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
 
+// Define the following macro to enable decoding debugging
+//#define GNASH_DEBUG_DECODING
+
 namespace gnash {
  
 static as_value netstream_new(const fn_call& fn);
@@ -82,15 +85,21 @@ NetStream_as::NetStream_as()
 	_invalidatedVideoCharacter(0),
 	_decoding_state(DEC_NONE),
 
+	_videoDecoder(0),
+	_videoInfoKnown(false),
+
+	_audioDecoder(0),
+	_audioInfoKnown(false),
+
 	// TODO: if audio is available, use _audioClock instead of SystemClock
 	// as additional source
 	_playbackClock(new InterruptableVirtualClock(new SystemClock)),
 	_playHead(_playbackClock.get()), 
 
-	_soundHandler(get_sound_handler()),
+	_soundHandler(_vm.getRoot().runInfo().soundHandler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_audioQueueSize(0),
-	_auxStreamerAttached(false),
+	_auxStreamer(0),
 	_lastStatus(invalidStatus),
 	_advanceTimer(0)
 {
@@ -540,14 +549,11 @@ NetStream_as::newFrameReady()
 	}
 }
 
-std::auto_ptr<image::ImageBase>
+std::auto_ptr<GnashImage>
 NetStream_as::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
 
-	if (!m_imageframe.get()) return std::auto_ptr<image::ImageBase>(0);
-
-	// TODO: inspect if we could return m_imageframe directly...
 	return m_imageframe;	
 }
 
@@ -650,25 +656,16 @@ NetStream_as::markReachableResources() const
 PlayHead::PlayHead(VirtualClock* clockSource)
 	:
 	_position(0),
-	_state(PLAY_PLAYING),
+	_state(PLAY_PAUSED),
 	_availableConsumers(0),
 	_positionConsumers(0),
 	_clockSource(clockSource)
 {
-	_clockOffset = _clockSource->elapsed();
-}
-
-void
-PlayHead::init(bool hasVideo, bool hasAudio)
-{
-	boost::uint64_t now = _clockSource->elapsed();
-	if ( hasVideo ) _availableConsumers |= CONSUMER_VIDEO;
-	if ( hasAudio ) _availableConsumers |= CONSUMER_AUDIO;
-	_positionConsumers = 0;
-
-	_position = 0;
-	_clockOffset = now;
-	assert(now-_clockOffset == _position);
+	// NOTE: we construct in PAUSE mode so do not
+	// really *need* to query _clockSource here.
+	// We initialize it to an arbitrary value just
+	// to be polite.
+	_clockOffset = 0; // _clockSource->elapsed();
 }
 
 PlayHead::PlaybackStatus
@@ -686,15 +683,19 @@ PlayHead::setState(PlaybackStatus newState)
 		// when querying clock source *now*
 		boost::uint64_t now = _clockSource->elapsed();
 		_clockOffset = ( now - _position );
-		assert( now-_clockOffset == _position ); // check if we did the right thing
+
+		// check if we did the right thing
+		// TODO: wrap this in PARANOIA_LEVEL > 1
+		assert( now-_clockOffset == _position );
 
 		return PLAY_PAUSED;
 	}
 	else
 	{
+		// TODO: wrap these in PARANOIA_LEVEL > 1 (or > 2)
 		assert(_state == PLAY_PLAYING);
-
 		assert(newState == PLAY_PAUSED);
+
 		_state = PLAY_PAUSED;
 
 		// When going from PLAYING to PAUSED
@@ -779,17 +780,6 @@ NetStream_as::startAdvanceTimer()
 }
 
 
-
-
-
-
-
-static void
-cleanQueue(NetStream_as::AudioQueue::value_type data)
-{
-    delete data;
-}
-
 // AS-volume adjustment
 void adjust_volume(boost::int16_t* data, int size, int volume)
 {
@@ -802,9 +792,6 @@ void adjust_volume(boost::int16_t* data, int size, int volume)
 NetStream_as::~NetStream_as()
 {
 	close(); // close will also detach from sound handler
-	if (m_parser.get()) {
-		m_parser->join();
-	}
 }
 
 
@@ -834,10 +821,7 @@ void NetStream_as::close()
 	GNASH_REPORT_FUNCTION;
 
     // Delete any samples in the audio queue.
-	{
-		boost::mutex::scoped_lock lock(_audioQueueMutex);
-		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
-    }
+    cleanAudioQueue();
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -864,7 +848,8 @@ NetStream_as::play(const std::string& c_url)
 	if ( ! _netCon )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("No NetConnection associated with this NetStream, won't play"));
+		log_aserror(_("No NetConnection associated with this NetStream, "
+                "won't play"));
 		);
 		return;
 	}
@@ -887,7 +872,9 @@ NetStream_as::play(const std::string& c_url)
 
 	log_security( _("Connecting to movie: %s"), url );
 
-	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
+    const movie_root& mr = _vm.getRoot();
+
+	StreamProvider& streamProvider = mr.runInfo().streamProvider();
 	_inputStream = streamProvider.getStream(url);
 
 	if ( ! _inputStream.get() )
@@ -911,47 +898,47 @@ NetStream_as::play(const std::string& c_url)
 }
 
 void
-NetStream_as::initVideoDecoder(media::MediaParser& parser)
+NetStream_as::initVideoDecoder(const media::VideoInfo& info)
 {
-	// Get video info from the parser
-	media::VideoInfo* videoInfo = parser.getVideoInfo();
-	if (!videoInfo) {
-		log_debug("No video in NetStream stream");
-		return;
-	}
-
 	assert ( _mediaHandler ); // caller should check this
+	assert ( !_videoInfoKnown ); // caller should check this
+	assert ( !_videoDecoder.get() ); // caller should check this
 
-    try {
-	    _videoDecoder = _mediaHandler->createVideoDecoder(*videoInfo);
+	_videoInfoKnown = true; 
+
+	try {
+	    _videoDecoder = _mediaHandler->createVideoDecoder(info);
+            assert ( _videoDecoder.get() ); // PARANOIA_LEVEL ?
 	}
 	catch (MediaException& e) {
 	    log_error("NetStream: Could not create Video decoder: %s", e.what());
 	}
 
+    log_debug("NetStream_as::initVideoDecoder: hot-plugging video consumer");
+    _playHead.setVideoConsumerAvailable();
 }
 
 
 /* private */
 void
-NetStream_as::initAudioDecoder(media::MediaParser& parser)
+NetStream_as::initAudioDecoder(const media::AudioInfo& info)
 {
-	// Get audio info from the parser
-	media::AudioInfo* audioInfo =  parser.getAudioInfo();
-	if (!audioInfo) {
-		log_debug("No audio in NetStream input");
-		return;
-	}
-
 	assert ( _mediaHandler ); // caller should check this
+	assert ( !_audioInfoKnown ); // caller should check this
+	assert ( !_audioDecoder.get() ); // caller should check this
 
-    try {
-	    _audioDecoder = _mediaHandler->createAudioDecoder(*audioInfo);
+	_audioInfoKnown = true; 
+
+	try {
+	    _audioDecoder = _mediaHandler->createAudioDecoder(info);
+            assert ( _audioDecoder.get() ); // PARANOIA_LEVE ?
 	}
 	catch (MediaException& e) {
 	    log_error("Could not create Audio decoder: %s", e.what());
 	}
 
+    log_debug("NetStream_as::initAudioDecoder: hot-plugging audio consumer");
+    _playHead.setAudioConsumerAvailable();
 }
 
 
@@ -982,14 +969,18 @@ NetStream_as::startPlayback()
 
 	m_parser->setBufferTime(m_bufferTime);
 
-	initVideoDecoder(*m_parser); 
-	initAudioDecoder(*m_parser); 
-
-	_playHead.init(_videoDecoder.get(), _audioDecoder.get());
-	_playHead.setState(PlayHead::PLAY_PLAYING);
+	// TODO:
+	// We do NOT want to initialize decoders right after construction
+	// of the MediaParser, but rather construct them when needed, which
+	// is when we have something to decode.
+	// Postponing this will allow us NOT to block while probing
+	// for stream contents.
+	//
 
 	decodingStatus(DEC_BUFFERING);
 	_playbackClock->pause(); // NOTE: should be paused already
+
+	_playHead.setState(PlayHead::PLAY_PLAYING);
 
 	// Register ::advance callback
 	startAdvanceTimer();
@@ -1003,10 +994,14 @@ NetStream_as::startPlayback()
 }
 
 
-// audio callback is running in sound handler thread
-bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
+// audio callback, possibly running in a separate thread
+unsigned int
+NetStream_as::audio_streamer(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& eof)
 {
 	//GNASH_REPORT_FUNCTION;
+
+	boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
+	int len = nSamples*2;
 
 	NetStream_as* ns = static_cast<NetStream_as*>(owner);
 
@@ -1019,18 +1014,19 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 #endif
 
 
-	while (len > 0)
+	while (len)
 	{
-
 		if ( ns->_audioQueue.empty() )
 		{
 			break;
 		}
 
-    		raw_mediadata_t* samples = ns->_audioQueue.front();
+		CursoredBuffer* samples = ns->_audioQueue.front();
 
+		assert( ! (samples->m_size%2) ); 
 		int n = std::min<int>(samples->m_size, len);
-		memcpy(stream, samples->m_ptr, n);
+		std::copy(samples->m_ptr, samples->m_ptr+n, stream);
+		//memcpy(stream, samples->m_ptr, n);
 		stream += n;
 		samples->m_ptr += n;
 		samples->m_size -= n;
@@ -1046,15 +1042,19 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 
 	}
 
-	return true;
+	assert( ! (len%2) ); 
+
+	// currently never signalling EOF
+	eof=false;
+	return nSamples-(len/2);
 }
 
-std::auto_ptr<image::ImageBase> 
+std::auto_ptr<GnashImage> 
 NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 {
 	assert(_videoDecoder.get()); // caller should check this
 
-	std::auto_ptr<image::ImageBase> video;
+	std::auto_ptr<GnashImage> video;
 
 	assert(m_parser.get());
 	if ( ! m_parser.get() )
@@ -1101,9 +1101,9 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
     		video = decodeNextVideoFrame();
 		if ( ! video.get() )
 		{
-			log_error("nextVideoFrameTimestamp returned true, "
+			log_error("nextVideoFrameTimestamp returned true (%d), "
 				"but decodeNextVideoFrame returned null, "
-				"I don't think this should ever happen");
+				"I don't think this should ever happen", nextTimestamp);
 			break;
 		}
 
@@ -1132,10 +1132,10 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
 	return video;
 }
 
-std::auto_ptr<image::ImageBase> 
+std::auto_ptr<GnashImage> 
 NetStream_as::decodeNextVideoFrame()
 {
-	std::auto_ptr<image::ImageBase> video;
+	std::auto_ptr<GnashImage> video;
 
 	if ( ! m_parser.get() )
 	{
@@ -1180,7 +1180,7 @@ NetStream_as::decodeNextVideoFrame()
 	return video;
 }
 
-raw_mediadata_t*
+NetStream_as::CursoredBuffer*
 NetStream_as::decodeNextAudioFrame()
 {
 	assert ( m_parser.get() );
@@ -1196,11 +1196,8 @@ NetStream_as::decodeNextAudioFrame()
 		return 0;
 	}
 
-    	raw_mediadata_t* raw = new raw_mediadata_t();
+	CursoredBuffer* raw = new CursoredBuffer();
 	raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
- 	if (!raw->m_data || !raw->m_size) {
-		return 0;
-	}
 
 	if ( _audioController ) // TODO: let the sound_handler do this .. sounds cleaner
 	{
@@ -1226,8 +1223,7 @@ NetStream_as::decodeNextAudioFrame()
 		raw->m_size);
 #endif // GNASH_DEBUG_DECODING
 
-	raw->m_ptr = raw->m_data; // no idea what this is needed for
-	raw->m_pts = frame->timestamp;
+	raw->m_ptr = raw->m_data;
 
 	return raw;
 }
@@ -1274,11 +1270,8 @@ NetStream_as::seek(boost::uint32_t posSeconds)
 	}
 	log_debug("m_parser->seek(%d) returned %d", pos, newpos);
 
-	{ // cleanup audio queue, so won't be consumed while seeking
-		boost::mutex::scoped_lock lock(_audioQueueMutex);
-		std::for_each(_audioQueue.begin(), _audioQueue.end(), &cleanQueue);
-		_audioQueue.clear();
-	}
+    // cleanup audio queue, so won't be consumed while seeking
+    cleanAudioQueue();
 	
 	// 'newpos' will always be on a keyframe (supposedly)
 	_playHead.seekTo(newpos);
@@ -1351,8 +1344,56 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 {
 	assert(m_parser.get());
 
-	// nothing to do if we don't have an audio decoder
-	if ( ! _audioDecoder.get() ) return;
+	if ( ! _audioDecoder.get() )
+	{
+		// There are 3 possible reasons for _audioDecoder to not be here:
+		//
+		// 1: The stream does contain audio but we were unable to find
+		//    an appropriate decoder for it
+		//
+		// 2: The stream does contain audio but we didn't try to construct
+		//    a decoder for it yet.
+		//
+		// 3: The stream does NOT contain audio yet
+
+		if ( _audioInfoKnown )
+		{
+			// case 1: we saw the audio info already,
+			//         but couldn't construct a decoder
+
+			// TODO: shouldn't we still flush any existing Audio frame
+			//       in the encoded queue ?
+
+			// log_debug("pushDecodedAudioFrames: no decoder for audio in stream, nothing to do");
+			return;
+		}
+
+		media::AudioInfo* audioInfo = m_parser->getAudioInfo();
+		if ( ! audioInfo )
+		{
+			// case 3: no audio found yet
+
+			// assert(!parser.nextAudioFrameTimestamp); // if it was threadless...
+
+			// log_debug("pushDecodedAudioFrames: no audio in stream (yet), nothing to do");
+			return;
+		}
+
+		// case 2: here comes the audio !
+
+		// try to create an AudioDecoder!
+		initAudioDecoder(*audioInfo);
+
+		// Don't go ahead if audio decoder construction failed
+		if ( ! _audioDecoder.get() )
+		{
+			// TODO: we should still flush any existing Audio frame
+			//       in the encoded queue...
+			//       (or rely on next call)
+
+			return; 
+		}
+	}
 
 	bool consumed = false;
 
@@ -1482,13 +1523,23 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 			if ( nextTimestamp > ts+msecsPerAdvance ) break; // next frame is in the future
 		}
 
-		raw_mediadata_t* audio = decodeNextAudioFrame();
+		CursoredBuffer* audio = decodeNextAudioFrame();
 		if ( ! audio )
 		{
-			log_error("nextAudioFrameTimestamp returned true, "
+			// Well, it *could* happen, why not ?
+			log_error("nextAudioFrameTimestamp returned true (%d), "
 				"but decodeNextAudioFrame returned null, "
-				"I don't think this should ever happen");
+				"I don't think this should ever happen", nextTimestamp);
 			break;
+		}
+
+		if ( ! audio->m_size )
+		{
+			// Don't bother pushing an empty frame
+			// to the audio queue...
+			log_debug("pushDecodedAudioFrames(%d): Decoded audio frame contains no samples");
+			delete audio;
+			continue;
 		}
 
 		lock.lock(); // now needs locking
@@ -1499,7 +1550,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 		log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
 #endif
 
-		if ( _auxStreamerAttached )
+		if ( _auxStreamer )
 		{
 			_audioQueue.push_back(audio);
 			_audioQueueSize += audio->m_size;
@@ -1536,18 +1587,60 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 {
 	assert ( m_parser.get() );
 
-	// nothing to do if we don't have a video decoder
 	if ( ! _videoDecoder.get() )
 	{
-		//log_debug("refreshVideoFrame: no video decoder, nothing to do");
-		return;
+		// There are 3 possible reasons for _videoDecoder to not be here:
+		//
+		// 1: The stream does contain video but we were unable to find
+		//    an appropriate decoder for it
+		//
+		// 2: The stream does contain video but we didn't try to construct
+		//    a decoder for it yet.
+		//
+		// 3: The stream does NOT contain video yet
+		//
+
+		if ( _videoInfoKnown )
+		{
+			// case 1: we saw the video info already,
+			//         but couldn't construct a decoder
+
+			// TODO: shouldn't we still flush any existing Video frame
+			//       in the encoded queue ?
+
+			// log_debug("refreshVideoFrame: no decoder for video in stream, nothing to do");
+			return;
+		}
+
+		media::VideoInfo* videoInfo = m_parser->getVideoInfo();
+		if ( ! videoInfo )
+		{
+			// case 3: no video found yet
+
+			// assert(!parser.nextVideoFrameTimestamp); // if it was threadless...
+
+			// log_debug("refreshVideoFrame: no video in stream (yet), nothing to do");
+			return;
+		}
+
+		// case 2: here comes the video !
+
+		// Try to initialize the video decoder 
+		initVideoDecoder(*videoInfo);
+
+		// Don't go ahead if video decoder construction failed
+		if ( ! _videoDecoder.get() )
+		{
+			// TODO: we should still flush any existing Video frame
+			//       in the encoded queue...
+			//       (or rely on next call)
+
+			return; 
+		}
+
 	}
 
 #ifdef GNASH_DEBUG_DECODING
-	// bufferLength() would lock the mutex (which we already hold),
-	// so this is to avoid that.
-	boost::uint32_t parserTime = m_parser->getBufferLength();
-	boost::uint32_t playHeadTime = time();
 	boost::uint32_t bufferLen = bufferLength();
 #endif
 
@@ -1581,7 +1674,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 #endif // GNASH_DEBUG_DECODING
 
 	// Get next decoded video frame from parser, will have the lowest timestamp
-	std::auto_ptr<image::ImageBase> video = getDecodedVideoFrame(curPos);
+	std::auto_ptr<GnashImage> video = getDecodedVideoFrame(curPos);
 
 	// to be decoded or we're out of data
 	if (!video.get())
@@ -1639,6 +1732,7 @@ NetStream_as::advance()
 	processStatusNotifications();
 
 	// Nothing to do if we don't have a parser
+	// TODO: should we stopAdvanceTimer() ?
 	if ( ! m_parser.get() ) return;
 
 	if ( decodingStatus() == DEC_STOPPED )
@@ -1697,6 +1791,7 @@ NetStream_as::advance()
 			// reguardless bufferLength...
 			if ( ! m_imageframe.get() && _playHead.getState() != PlayHead::PLAY_PAUSED )
 			{
+                log_debug("refreshing video frame for the first time");
 				refreshVideoFrame(true);
 			}
 
@@ -1721,6 +1816,10 @@ NetStream_as::advance()
 	// Refill audio buffer to consume all samples
 	// up to current playhead
 	refreshAudioBuffer();
+
+    // Advance PlayeHead position if current one was consumed
+    // by all available consumers
+    _playHead.advanceIfConsumed();
 
 	// Process media tags
 	m_parser->processTags(_playHead.getPosition(), this, getVM());
@@ -1799,17 +1898,16 @@ void
 NetStream_as::attachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
-	if ( _auxStreamerAttached )
+	if ( _auxStreamer )
 	{
 		log_debug("attachAuxStreamer called while already attached");
-		// we do nonetheless, isn't specified by SoundHandler.h
-		// whether or not this is legal...
+        // Let's detach first..
+	    _soundHandler->unplugInputStream(_auxStreamer);
+        _auxStreamer=0;
 	}
 
 	try {
-		_soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
-
-		_auxStreamerAttached = true;
+		_auxStreamer = _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 	} catch (SoundException& e) {
 		log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
 	}
@@ -1819,18 +1917,26 @@ void
 NetStream_as::detachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
-	if ( !_auxStreamerAttached )
+	if ( !_auxStreamer )
 	{
 		log_debug("detachAuxStreamer called while not attached");
-		// we do nonetheless, isn't specified by SoundHandler.h
-		// whether or not this is legal...
+        return;
 	}
-	_soundHandler->detach_aux_streamer(this);
-
-	_auxStreamerAttached = false;
+	_soundHandler->unplugInputStream(_auxStreamer);
+	_auxStreamer = 0;
 }
 
 
+void
+NetStream_as::cleanAudioQueue()
+{
+    boost::mutex::scoped_lock lock(_audioQueueMutex);
+    for (AudioQueue::iterator i=_audioQueue.begin(), e=_audioQueue.end(); i!=e; ++i)
+    {
+        delete *i;
+    }
+    _audioQueue.clear();
+}
 
 
 

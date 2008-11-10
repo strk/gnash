@@ -28,6 +28,7 @@
 #include "log.h"
 #include "rect.h"
 #include "StringPredicates.h" // StringNoCaseLessThen
+#include "TagLoadersTable.h"
 
 // Forward declarations
 namespace gnash {
@@ -62,7 +63,8 @@ public:
 	///	The stream associated with the sprite. It is assumed
 	///	to be already positioned right before the frame count
 	///
-	sprite_definition(movie_definition& m, SWFStream& in);
+	sprite_definition(movie_definition& m, SWFStream& in,
+            const RunInfo& runInfo);
 
 	/// \brief
 	/// Create an empty sprite
@@ -144,7 +146,7 @@ public:
 	}
 
 	/// Overridden just for complaining  about malformed SWF
-	virtual void add_font(int /*id*/, font* /*ch*/)
+	virtual void add_font(int /*id*/, Font* /*ch*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
 		log_swferror(_("add_font tag appears in sprite tags"));
@@ -152,7 +154,7 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual font* get_font(int id) const
+	virtual Font* get_font(int id) const
 	{
 		return m_movie_def.get_font(id);
 	}
@@ -202,13 +204,14 @@ public:
 
 	/// Delegate call to associated root movie
 	virtual void export_resource(const std::string& sym,
-			resource* res)
+			ExportableResource* res)
 	{
 		m_movie_def.export_resource(sym, res);
 	}
 
 	/// Delegate call to associated root movie
-	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& sym)
+	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
+            const std::string& sym)
 	{
 		return m_movie_def.get_exported_resource(sym);
 	}
@@ -247,7 +250,7 @@ public:
 
 private:
 
-	void read(SWFStream& in);
+	void read(SWFStream& in, const RunInfo& runInfo);
 
 	/// Tags loader table.
 	//
@@ -319,12 +322,6 @@ private:
 			return false;
 		}
 		return true;
-	}
-
-	virtual void load_next_frame_chunk()
-	{
-		/// We load full sprite definitions at once, so
-		/// this function is a no-op.
 	}
 
 	const rect&	get_bound() const {

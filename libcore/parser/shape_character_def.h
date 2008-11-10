@@ -27,129 +27,121 @@ namespace gnash {
 
 namespace gnash {
 
-	/// \brief
-	/// Represents the outline of one or more shapes, along with
-	/// information on fill and line styles.
-	//
-	class shape_character_def : public character_def
-	{
-	public:
+/// \brief
+/// Represents the outline of one or more shapes, along with
+/// information on fill and line styles.
+//
+class shape_character_def : public character_def
+{
+public:
 
-		typedef std::vector<fill_style> FillStyleVect;
-		typedef std::vector<line_style> LineStyleVect;
-		typedef std::vector<path> PathVect;
+    typedef std::vector<fill_style> FillStyleVect;
+    typedef std::vector<line_style> LineStyleVect;
+    typedef std::vector<path> PathVect;
 
-		shape_character_def();
-		virtual ~shape_character_def();
+    shape_character_def();
+    virtual ~shape_character_def();
 
-		virtual void	display(character* inst);
+    virtual void display(character* inst);
 
-		/// Return true if the specified point is on the interior of our shape.
-		//
-		/// Incoming coords are local coords (twips).
-		/// The SWFMatrix will be used for lines with non-scalable strokes.
-		///
-		virtual bool point_test_local(boost::int32_t x, boost::int32_t y, SWFMatrix& wm);
+    /// Return true if the specified point is on the interior of our shape.
+    //
+    /// Incoming coords are local coords (twips).
+    /// The SWFMatrix will be used for lines with non-scalable strokes.
+    ///
+    virtual bool point_test_local(boost::int32_t x, boost::int32_t y,
+            SWFMatrix& wm);
 
-		float	get_height_local() const;
-		float	get_width_local() const;
+    /// \brief
+    /// Read a shape definition as included in DEFINEFONT*,
+    /// DEFINESHAPE* or DEFINEMORPH* tag
+    //
+    /// @param in
+    ///	The stream to read the shape from
+    ///
+    /// @param tag_type
+    ///	The SWF::tag_type this shape definition is read for.
+    ///	TODO: change to an actual SWF::tag_type type
+    ///
+    /// @param with_style
+    ///	If true, this definition includes bounds, fill styles and line styles.
+    ///	Tipically, this is only false for DEFINEFONT* tags.
+    ///	NOTE: if with_style is false, bounds of the shape will be computed
+    ///	      rather then read.
+    ///	TODO: drop this function, set based on tag_type ?
+    ///
+    /// @param m
+    ///	The movie definition corresponding to the SWF we/re parsing.
+    ///	This is used to resolve bitmap characters for fill styles, never
+    ///	used if with_style is false.
+    void read(SWFStream& in, int tag_type, bool with_style,
+            movie_definition& m);
 
-		/// \brief
-		/// Read a shape definition as included in DEFINEFONT*,
-		/// DEFINESHAPE* or DEFINEMORPH* tag
-		//
-		/// @param in
-		///	The stream to read the shape from
-		///
-		/// @param tag_type
-		///	The SWF::tag_type this shape definition is read for.
-		///	TODO: change to an actual SWF::tag_type type
-		///
-		/// @param with_style
-		///	If true, this definition includes bounds, fill styles and line styles.
-		///	Tipically, this is only false for DEFINEFONT* tags.
-		///	NOTE: if with_style is false, bounds of the shape will be computed
-		///	      rather then read.
-		///	TODO: drop this function, set based on tag_type ?
-		///
-		/// @param m
-		///	The movie definition corresponding to the SWF we/re parsing.
-		///	This is used to resolve bitmap characters for fill styles, never
-		///	used if with_style is false.
-		///
-		void read(SWFStream& in, int tag_type, bool with_style, movie_definition& m);
+    void display(const SWFMatrix& mat, const cxform& cx,
+        const std::vector<fill_style>& fill_styles,
+        const std::vector<line_style>& line_styles) const;
 
-		void	display(
-			const SWFMatrix& mat,
-			const cxform& cx,
-			const std::vector<fill_style>& fill_styles,
-			const std::vector<line_style>& line_styles) const;
+    /// Get cached bounds of this shape.
+    const rect&	get_bound() const { return m_bound; }
 
-		/// Get cached bounds of this shape.
-		const rect&	get_bound() const { return m_bound; }
+    /// Compute bounds by looking at the component paths
+    void compute_bound(rect* r, int swfVersion) const;
 
-		/// Compute bounds by looking at the component paths
-		void	compute_bound(rect* r, int swfVersion) const;
+    const FillStyleVect& get_fill_styles() const { return m_fill_styles; }
+    const LineStyleVect& get_line_styles() const { return m_line_styles; }
 
-		const FillStyleVect& get_fill_styles() const { return m_fill_styles; }
-		const LineStyleVect& get_line_styles() const { return m_line_styles; }
+    const std::vector<path>& get_paths() const { return m_paths; }
 
-		const std::vector<path>& get_paths() const { return m_paths; }
+    // morph uses this
+    // Should this be verified?
+    void set_bound(const rect& r) { m_bound = r; }
 
-		// morph uses this
-		void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
+    // Morph uses this.
+    void addFillStyle(const fill_style& fs) {
+        m_fill_styles.push_back(fs);
+    }
 
-		size_t numEdges() const;
+    void addLineStyle(const line_style& fs) {
+        m_line_styles.push_back(fs);
+    }
 
-		size_t numPaths() const;
-
-	protected:
-		friend class morph2_character_def;
+protected:
 
 #ifdef GNASH_USE_GC
-		/// Mark reachable resources (for the GC)
-		//
-		/// Reachable resources are:
-		///	- Associated fill styles (m_fill_styles).
-		///	  These are not actual resources, but may contain some.
-		///
-		virtual void markReachableResources() const;
+    /// Mark reachable resources (for the GC)
+    //
+    /// Reachable resources are:
+    ///	- Associated fill styles (m_fill_styles).
+    ///	  These are not actual resources, but may contain some.
+    ///
+    virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
 
-		// derived morph classes changes these
-		FillStyleVect m_fill_styles;
-		LineStyleVect m_line_styles;
-		PathVect m_paths;
-		rect	m_bound;
+    // derived morph classes changes these
+    FillStyleVect m_fill_styles;
+    LineStyleVect m_line_styles;
+    PathVect m_paths;
+    rect	m_bound;
 
-		/// Free all meshes (deprecated)
-		//void clear_meshes();
+    /// Copy a shape character definition
+    shape_character_def(const shape_character_def& o);
 
-		/// Copy a shape character definition
-		shape_character_def(const shape_character_def& o);
+private:
 
-	private:
+    /// Shape record flags
+    enum ShapeRecordFlags {
+        flagEnd = 0x00,
+        flagMove = 0x01,
+        flagFillStyle0Change = 0x02,
+        flagFillStyle1Change = 0x04,
+        flagLineStyleChange = 0x08,
+        flagHasNewStyles = 0x10
+    };
+    
+    // Don't assign to a shape character definition
+    shape_character_def& operator= (const shape_character_def&);
 
-		/// Shape record flags
-		enum ShapeRecordFlags {
-			flagEnd = 0x00,
-			flagMove = 0x01,
-			flagFillStyle0Change = 0x02,
-			flagFillStyle1Change = 0x04,
-			flagLineStyleChange = 0x08,
-			flagHasNewStyles = 0x10
-		};
-
-		void	sort_and_clean_meshes() const;
-		
-		// Don't assign to a shape character definition
-		shape_character_def& operator= (const shape_character_def&)
-		{
-			abort();
-			return *this;
-		}
-
-	};
+};
 
 }	// end namespace gnash
 

@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "GnashException.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -58,7 +58,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Colors used for pixel checking
 	rgba red(255,0,0,255);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	check_equals(root->get_frame_count(), 2);

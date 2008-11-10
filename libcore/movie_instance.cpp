@@ -31,7 +31,7 @@ namespace gnash {
 
 movie_instance::movie_instance(movie_definition* def, character* parent)
 	:
-	sprite_instance(def, this, parent, parent ? 0 : -1),
+	MovieClip(def, this, parent, parent ? 0 : -1),
 	_def(def)
 {
 }
@@ -56,7 +56,7 @@ movie_instance::stagePlacementCallback()
 	}
 
 	// Invoke parent placement event handler
-	sprite_instance::stagePlacementCallback();  
+	MovieClip::stagePlacementCallback();  
 }
 
 // Advance of an SWF-defined movie instance

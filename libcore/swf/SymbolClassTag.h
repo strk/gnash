@@ -21,7 +21,7 @@
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
-#include "sprite_instance.h" // for inlines
+#include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
 
 // Forward declarations
@@ -42,7 +42,7 @@ public:
 
 	{}
 
-	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
+	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
 		VM& vm = VM::get();
 		Machine *mach = vm.getMachine();
@@ -55,7 +55,7 @@ public:
 	{
 	    return true;
 	}
-	static void loader(SWFStream& in,tag_type tag, movie_definition& m)
+	static void loader(SWFStream& in,tag_type tag, movie_definition& m, const RunInfo&)
 	{
 		assert(tag == SYMBOLCLASS); //76
 

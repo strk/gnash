@@ -30,7 +30,7 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
-#include "sprite_instance.h" // For MovieClip
+#include "MovieClip.h" // For MovieClip
 #include "ColorTransform_as.h"
 
 #include <sstream>
@@ -52,18 +52,18 @@ attachTransformInterface(as_object& o)
 {
     const int protectedFlags = as_prop_flags::isProtected;
 
+    o.init_property("matrix",
+            Transform_matrix_getset,
+            Transform_matrix_getset, protectedFlags);
+    o.init_property("concatenatedMatrix",
+            Transform_concatenatedMatrix_getset,
+            Transform_concatenatedMatrix_getset, protectedFlags);
     o.init_property("colorTransform",
             Transform_colorTransform_getset,
             Transform_colorTransform_getset, protectedFlags);
     o.init_property("concatenatedColorTransform",
             Transform_concatenatedColorTransform_getset,
             Transform_concatenatedColorTransform_getset, protectedFlags);
-    o.init_property("concatenatedMatrix",
-            Transform_concatenatedMatrix_getset,
-            Transform_concatenatedMatrix_getset, protectedFlags);
-    o.init_property("matrix",
-            Transform_matrix_getset,
-            Transform_matrix_getset, protectedFlags);
     o.init_property("pixelBounds",
             Transform_pixelBounds_getset,
             Transform_pixelBounds_getset, protectedFlags);
@@ -99,7 +99,7 @@ class Transform_as: public as_object
 
 public:
 
-	Transform_as(sprite_instance& movieClip)
+	Transform_as(MovieClip& movieClip)
 		:
 		as_object(getTransformInterface()),
 		_movieClip(movieClip)
@@ -112,7 +112,7 @@ public:
 
 protected:
 
-    void markReachableResources()
+    void markReachableResources() const
     {
         _movieClip.setReachable();
         markAsObjectReachable();
@@ -120,7 +120,7 @@ protected:
 
 private:
 
-    sprite_instance& _movieClip;
+    MovieClip& _movieClip;
 
 };
 
@@ -455,7 +455,7 @@ Transform_ctor(const fn_call& fn)
 	}
 
     // TODO: does this have to be a MovieClip or can it be any character?
-    boost::intrusive_ptr<sprite_instance> mc = ensureType<sprite_instance>(fn.arg(0).to_object());
+    boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.arg(0).to_object());
 
 	boost::intrusive_ptr<as_object> obj = new Transform_as(*mc);
 

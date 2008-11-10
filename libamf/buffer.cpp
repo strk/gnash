@@ -18,23 +18,29 @@
 
 #include <boost/cstdint.hpp>
 #include <iostream>
+
 #include "buffer.h"
 #include "amf.h"
 #include "log.h"
 #include "network.h"
+#include "GnashException.h"
 
 using namespace std;
 using namespace gnash;
 
+/// \namespace amf
+///
+/// This namespace is for all the AMF specific classes in libamf.
 namespace amf
 {
 
-#if 0
-// convert an ascii hex digit to a number.
-//      param is hex digit.
-//      returns a decimal digit.
+/// \brief Convert a Hex digit into it's decimal value.
+///
+/// @param digit The digit as a hex value
+///
+/// @return The byte as a decimal value.
 Network::byte_t
-hex2digit (Network::byte_t digit)
+Buffer::hex2digit (Network::byte_t digit)
 {  
     if (digit == 0)
         return 0;
@@ -50,386 +56,471 @@ hex2digit (Network::byte_t digit)
     return -1;
 }
 
-// Convert the hex array pointed to by buf into binary to be placed in mem
-Buffer *
-Buffer::hex2mem(const char *str)
-{
-    size_t count = strlen(str);
-    Network::byte_t ch = 0;
-    _ptr = new Buffer((count/3)+1);
-//    buf->clear();
-
-    Network::byte_t *strdata = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
-    
-    for (size_t i=0; i<count; i++) {
-        if (*strdata == ' ') {      // skip spaces.
-            strdata++;
-            continue;
-        }
-        ch = hex2digit(*strdata++) << 4;
-        ch |= hex2digit(*strdata++);
-        append(ch);
-    }
-    return _ptr;
-}
-#endif
-
-void *
-Buffer::init(size_t nbytes)
+/// \brief Encode a Buffer from a hex string.
+///
+/// @param str A hex string, ex... "00 03 05 0a"
+///
+/// @return A reference to a Buffer in host endian format. This is
+///		primary used only for testing to create binary data
+///		from an easy to read and edit format.
+Buffer &
+Buffer::hex2mem(const string &str)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_ptr == 0) {
-        _ptr = new Network::byte_t[nbytes];
-	_seekptr = _ptr;
-	if (_ptr == 0) {
-	    return _ptr;
-	}
-        _nbytes = nbytes;
-    }
+    size_t count = str.size();
+    size_t size = (count/3) + 1;
+    Network::byte_t ch = 0;
+    
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    Network::byte_t *end = ptr + count;
 
+    init(size);
+    
+    for (size_t i=0; ptr<end; i++) {
+        if (*ptr == ' ') {      // skip spaces.
+            ptr++;
+            continue;
+        }
+        ch = hex2digit(*ptr++) << 4;
+        ch |= hex2digit(*ptr++);
+        *this += ch;
+	    i++;
+    }
+    resize(size);
+    
+    return *this;
+}
+
+/// \brief Initialize a block of memory for this buffer.
+///		This should only be used internally by the Buffer
+///		class.
+///
+/// @param nbytes The total size to allocate memory for.
+///
+/// @return A reference to the initialized Buffer.
+Buffer &
+Buffer::init(size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (!_data) {
+	_data.reset(new Network::byte_t[size]);
+	_seekptr = _data.get();
+    }
+    _seekptr = _data.get();
+    _nbytes = size;
+
+    clear();// FIXME; this is a perforance hit, but aids in debugging
 #ifdef USE_STATS_BUFFERS
     clock_gettime (CLOCK_REALTIME, &_stamp);
 #endif
-    return _ptr;
+    
+    return *this;
 }
 
+/// \brief Create a new Buffer with the default size
 Buffer::Buffer() 
-    : _seekptr(0),
-      _ptr(0)
+    : _seekptr(0)
 {
 //    GNASH_REPORT_FUNCTION;
     _nbytes = gnash::NETBUFSIZE;
     init(gnash::NETBUFSIZE);
 }
     
-// Create with a size other than the default
+/// \brief Create a new Buffer with a size other than the default
 Buffer::Buffer(size_t nbytes)
-    : _seekptr(0),
-      _ptr(0)
+    : _seekptr(0)
 {
 //    GNASH_REPORT_FUNCTION;
     _nbytes = nbytes;
     init(nbytes);
 }
 
-// Delete the allocate memory
+/// \brief Create a new Buffer with a hex string.
+///		This is primary used only for testing to create binary
+///		data from an easy to read and edit format.
+/// @param str A hex string, ex... "00 03 05 0a"
+Buffer::Buffer(const std::string &str)
+{
+//    GNASH_REPORT_FUNCTION;
+    hex2mem(str);
+}
+
+/// Delete the memory allocated for this Buffer
 Buffer::~Buffer()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_ptr) {
+    if (_data) {
 #ifdef USE_STATS_BUFFERS
 	struct timespec now;
 	clock_gettime (CLOCK_REALTIME, &now);
 	log_debug("Buffer %x (%d) stayed in queue for %f seconds",
-		  (void *)_ptr, _nbytes,
+		  (void *)_data.get(), _nbytes,
 		  (float)((now.tv_sec - _stamp.tv_sec) + ((now.tv_nsec - _stamp.tv_nsec)/1e9)));
 #endif
-        delete[] _ptr;
-        _seekptr = _ptr = 0;
+        _seekptr = 0;
         _nbytes = 0;
     }
 }
 
-// Put data into the buffer
-void
+/// \brief Copy data into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param data A pointer to the raw bytes to copy into the
+///		buffer.
+/// 
+/// @param nbytes The number of bytes to copy.
+///		
+/// @return A reference to a Buffer.
+Buffer &
 Buffer::copy(Network::byte_t *data, size_t nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
-    std::copy(data, data + nbytes, _ptr);
-    _seekptr = _ptr + nbytes;
-}
-
-void
-Buffer::copy(const string &str)
-{    
-//    GNASH_REPORT_FUNCTION;
-    std::copy(str.begin(), str.end(), _ptr);
-    _seekptr = _ptr + str.size();
-}
-
-void
-Buffer::copy(boost::uint16_t length)
-{
-    Network::byte_t *data = reinterpret_cast<Network::byte_t *>(&length);
-    std::copy(data, data + sizeof(boost::uint16_t), _ptr);    
-    _seekptr = _ptr + sizeof(boost::uint16_t);
-}
-
-void
-Buffer::copy(double num)
-{
-//    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
-    std::copy(ptr, ptr + amf::AMF0_NUMBER_SIZE, _ptr);    
-    _seekptr = _ptr + amf::AMF0_NUMBER_SIZE;
-}
-
-void
-Buffer::copy(Network::byte_t val)
-{
-    GNASH_REPORT_FUNCTION;
-    *_ptr = val;
-    _seekptr = _ptr + sizeof(bool);
-}
-
-#if 0
-void
-Buffer::copy(bool val)
-{
-    GNASH_REPORT_FUNCTION;
-    return copy(static_cast<Network::byte_t>(val));
-}
-#endif
-
-Network::byte_t *
-Buffer::append(boost::uint16_t length)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    if ((_seekptr + sizeof(boost::uint16_t)) <= (_ptr + _nbytes)) {
-	Network::byte_t *data = reinterpret_cast<Network::byte_t *>(&length);
-	std::copy(data, data + sizeof(boost::uint16_t), _seekptr);
-	_seekptr += sizeof(boost::uint16_t);
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    if ((_seekptr + nbytes) <= (_ptr + _nbytes)) {
-	std::copy(data, data + nbytes, _seekptr);    
-	_seekptr += nbytes;
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(double num)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + sizeof(double)) <= (_ptr + _nbytes)) {
-	Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
-	std::copy(ptr, ptr + amf::AMF0_NUMBER_SIZE, _seekptr);    
-	_seekptr += amf::AMF0_NUMBER_SIZE;
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(bool val)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + sizeof(bool)) <= (_ptr + _nbytes)) {
-	*_seekptr = val;
-	_seekptr += sizeof(bool);
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(boost::uint32_t num)
-{
-//    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast< Network::byte_t *>(&num);    
-    return append(ptr, sizeof(boost::uint32_t));
-}
-
-Network::byte_t *
-Buffer::append(Network::byte_t byte)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + sizeof(gnash::Network::byte_t)) <= (_ptr + _nbytes)) {
-	*_seekptr = byte;
-	_seekptr += sizeof(gnash::Network::byte_t);
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(const std::string &str)
-{
-//    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + str.size()) <= (_ptr + _nbytes)) {
-	std::copy(str.begin(), str.end(), _seekptr);    
-	_seekptr += str.size();
-	return _seekptr;
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::append(amf::Element::amf0_type_e type)
-{
-    return append(static_cast<Network::byte_t>(type));
-}
-
-Network::byte_t *
-Buffer::append(Buffer &buf)
-{
-//    GNASH_REPORT_FUNCTION;
-    return append(&buf);
-}
-
-Network::byte_t *
-Buffer::append(Buffer *buf)
-{
-//    GNASH_REPORT_FUNCTION;
-    size_t diff = _seekptr - _ptr;
-    
-    if (buf->size() > (_nbytes - diff)) {
-         resize(buf->size() + diff);
-    }
-    
-    std::copy(buf->begin(), buf->end(), _seekptr);
-    _seekptr += buf->size();
-
-    return _seekptr;
-}
-
-// make ourselves be able to appended too. If the source
-// buffer is larger than the current buffer has room for,
-// resize ourselves (which copies the data too) to make
-// enough room.
-// note that using this may have a performance hit due to
-// the resize operation, which has to copy data.
-Buffer &
-Buffer::operator+=(Buffer &buf)
-{
-    return operator+=(&buf);
-}
-
-Buffer &
-Buffer::operator+=(Buffer *buf)
-{
-//    GNASH_REPORT_FUNCTION;
-    size_t diff = 0;
-    if (buf->size() >= _nbytes) {
-	diff = _seekptr - _ptr;
-	resize(buf->size() + diff);
-    }
-    
-    if ((_seekptr + buf->size()) <= (_ptr + _nbytes)) {
-	std::copy(buf->begin(), buf->end(), _seekptr);
-	_seekptr += buf->size();
+    if (_data) {
+	std::copy(data, data + nbytes, _data.get());
+	_seekptr = _data.get() + nbytes;
+    } else {
+	throw GnashException("Not enough storage was allocated to hold the copied data!");
     }
     return *this;
 }
 
+/// \brief Append data to existing data in the buffer.
+///
+/// @param data A pointer to the raw bytes to append to the
+///		buffer.
+/// 
+/// @param nbytes The number of bytes to append.
+///		
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_data) {
+	if (spaceLeft() >= nbytes) {
+	    std::copy(data, data + nbytes, _seekptr);
+	    _seekptr += nbytes;
+	} else {
+	    throw GnashException("Not enough storage was allocated to hold the appended data!");
+	}
+    }
+
+    return *this;
+}
+
+/// \brief Append a Buffer class to existing data in the buffer.
+///
+/// @param buf A Buffer class containing the data to append.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(Buffer &buf)
+{
+// //    GNASH_REPORT_FUNCTION;
+    append(buf.reference(), buf.size());
+    return *this;
+}
+
+/// \brief Copy a AMF0 type into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param type An AMF0 type. 
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(amf::Element::amf0_type_e type)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t nb = static_cast<Network::byte_t>(type);
+    
+    return operator+=(nb);
+}
+
+/// \brief Append a byte to existing data in the buffer.
+///
+/// @param byte A single byte.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(char byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    return operator+=(static_cast<Network::byte_t>(byte));
+    Network::byte_t nb = static_cast<Network::byte_t>(byte);
+    return operator+=(nb);
 }
 
+/// \brief Append a boolean to existing data in the buffer.
+///
+/// @param type A boolean. 
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(bool flag)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t nb = static_cast<Network::byte_t>(flag);
+    return operator+=(nb);
+}
+
+/// \brief Append a byte to existing data in the buffer.
+///
+/// @param byte A single byte.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator+=(Network::byte_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    if ((_seekptr + 1) <= (_ptr + _nbytes)) {
+    if ((_seekptr + 1) <= (_data.get() + _nbytes)) {
 	*_seekptr = byte;
 	_seekptr += sizeof(char);
     }
     return *this;
 }
 
-// make ourselves be able to be copied.
+/// \brief Append a string to existing data in the buffer.
+///
+/// @param str A string containing ASCII data to copy into the
+///		buffer.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(Buffer *buf)
+Buffer::operator+=(const char *str)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (buf->size() > _nbytes) {
-         resize(buf->size());
-    }
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
+    return append(ptr, strlen(str));
     
-    std::copy(buf->begin(), buf->end(), _ptr);
-    _seekptr += buf->size();
+}
 
+/// \brief Append a string to existing data in the buffer.
+///
+/// @param str A string containing ASCII data to copy into the
+///		buffer.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(const std::string &str)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    return append(ptr, str.size());
+    
+}
+
+/// \brief Append a double to existing data in the buffer.
+///
+/// @param num A numeric double value.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(double num)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
+    return append(ptr, AMF0_NUMBER_SIZE);
+}
+
+/// \brief Append a short to existing data in the buffer.
+/// 
+/// @param num A numeric short value.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(boost::uint16_t length)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
+    return append(ptr, sizeof(boost::uint16_t));
+}
+
+/// \brief Append a Buffer class to existing data in the buffer.
+///
+/// @param buf A Buffer class containing the data to append.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(boost::shared_ptr<Buffer> &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    append(buf->reference(), buf->size());
     return *this;
 }
 
+/// \brief Append a Buffer class to existing data in the buffer.
+///
+/// @param buf A Buffer class containing the data to append.
+/// 
+/// @return A reference to a Buffer.
 Buffer &
 Buffer::operator=(Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
     if (buf.size() != _nbytes) {
-         resize(buf.size());
+	resize(buf.size());
     }
-    
-    std::copy(buf.begin(), buf.end(), _ptr);
+    copy(buf.reference(), buf.size());
 
     return *this;
 }
 
-// Check to see if two Buffer objects are identical
-bool
-Buffer::operator==(Buffer *buf)
-{ 
+/// \brief Copy a string into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param str A string containing ASCII data to copy into the
+///		buffer.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(const std::string &str)
+{
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *bufptr = buf->reference();
-    if (buf->size() == _nbytes) {
-        if (memcmp(bufptr, _ptr, _nbytes) == 0)  {
-            return true;
-        }
-    }
-    return false;
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    return copy(ptr, str.size());
 }
 
+Buffer &
+Buffer::operator=(const char *str)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
+    return copy(ptr, strlen(str));
+}
+
+/// \brief Copy a double into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param num A numeric double value.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(double num)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
+    return copy(ptr, AMF0_NUMBER_SIZE);
+}
+
+/// \brief Copy a short into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param num A numeric short value.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(boost::uint16_t length)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
+    return copy(ptr, sizeof(boost::uint16_t));
+}
+
+/// \brief Copy a AMF0 type into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param type An AMF0 type. 
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(amf::Element::amf0_type_e type)
+{
+    Network::byte_t nb = static_cast<Network::byte_t>(type);
+    return operator+=(nb);
+}
+
+/// Copy a boolean into the buffer. This overwrites all data, and
+///		resets the seek ptr.
+///
+/// @param flag A boolean. 
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(bool flag)
+{
+    Network::byte_t nb = static_cast<Network::byte_t>(flag);
+    return operator=(nb);
+}
+
+/// \brief Copy a byte into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param byte A single byte.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(gnash::Network::byte_t byte)
+{
+//    GNASH__FUNCTION;
+    return copy(&byte, 1);
+}
+
+/// \brief Copy a byte into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param byte A pointer to a single byte.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(gnash::Network::byte_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (data) {
+	_data.reset(data);
+    } else {
+	throw ParserException("Passing invalid pointer!");
+    }
+    return *this;
+}
+
+/// \brief Copy a Buffer class into the buffer.
+///		This overwrites all data, and resets the seek ptr.
+///
+/// @param buf A Buffer class containing the data to copy.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator=(boost::shared_ptr<Buffer> &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    copy(buf->reference(), buf->size());
+    return *this;
+}
+
+/// \brief Test equivalance against another Buffer.
+///		This compares all the data on the current Buffer with
+///		the supplied one, so it can be a performance hit. This
+///		is primarily only used for testing purposes.
+///
+/// @param buf A reference to a Buffer.
+///
+/// @return A boolean true if the Buffers are indentical.
 bool
 Buffer::operator==(Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-//     Network::byte_t *bufptr = buf.reference();
-//     size_t max = 0;
-    
-//     if (buf.size() == _nbytes){
-//         if (memcmp(bufptr, _ptr, _nbytes) == 0) {
-//             return true;
-//         }
-//     }
-//     return false;
-    return operator==(&buf);
+     if (buf.size() == _nbytes){
+         if (memcmp(buf.reference(), _data.get(), _nbytes) == 0) {
+             return true;
+         }
+     }
+     return false;
 }
 
-Network::byte_t *
-Buffer::find(Network::byte_t *b, size_t size)
-{
-//    GNASH_REPORT_FUNCTION;
-    for (size_t i=0; i< _nbytes; i++) {
-	if (memcmp((_ptr + i), b, size) == 0) {
-	    return _ptr + i;
-	}
-    }
-    return 0;
-}
-
-Network::byte_t *
-Buffer::find(Network::byte_t c)
-{
-//    GNASH_REPORT_FUNCTION;
-    for (size_t i=0; i< _nbytes; i++) {
-	if (*(_ptr + i) == c) {
-	    return _ptr + i;
-	}
-    }
-    return 0;
-}
-
+/// \brief Drop a byte without resizing.
+///		This will remove the byte from the Buffer, and then
+///		move the remaining data to be in the correct
+///		location. This resets the seek pointer.
+///
+/// @param byte The byte to remove from the buffer.
+///
+/// @return A real pointer to the base address of the buffer.
 Network::byte_t *
 Buffer::remove(Network::byte_t c)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *start = find(c);
+    Network::byte_t *start = std::find(begin(), end(), c);
 
-    log_debug("Byte is at %x", (void *)start);
+//    log_debug("Byte is at %x", (void *)start);
     
     if (start == 0) {
 	return 0;
@@ -439,98 +530,142 @@ Buffer::remove(Network::byte_t c)
 //    *(end()) = 0;
     _nbytes--;
 
-    return _ptr;
+    return _data.get();
 }
 
+/// \brief Drop a byte without resizing.
+///		This will remove the byte from the Buffer, and then
+///		move the remaining data to be in the correct
+///		location. This resets the seek pointer.
+///
+/// @param start The location of the byte to remove from the
+///		Buffer
+///
+/// @return A real pointer to the base address of the Buffer.
 Network::byte_t *
 Buffer::remove(int start)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::copy((_ptr + start + 1), end(), (_ptr + start)),
+    std::copy((_data.get() + start + 1), end(), (_data.get() + start)),
 //    *end() = 0;
     _nbytes--;
-    return _ptr;
+    return _data.get();
 }
 
+/// \brief Drop bytes without resizing.
+///		This will remove the bytes from the Buffer, and then
+///		move the remaining data to be in the correct
+///		location. This resets the seek pointer.
+///
+/// @param index The location of the byte to start removing data
+///		from the Buffer. This is an numerical value, not a
+///		pointer.
+///
+/// @param start The location of the byte to remove from the
+///		Buffer
+/// @param range The amoiunt of bytes to remove from the Buffer.
+///
+/// @return A real pointer to the base address of the Buffer.
 Network::byte_t *
-Buffer::remove(int start, int stop)
+Buffer::remove(int start, int range)
 {
 //    GNASH_REPORT_FUNCTION;
-    std::copy((_ptr + stop + 1), end(), (_ptr + start)),
+    std::copy((_data.get() + range + 1), end(), (_data.get() + start)),
 //    *end() = 0;
-    _nbytes -= stop-start;
-    return _ptr;
+	_nbytes -= (range - start);
+    return _data.get();
 }
 
-// Just reset to having no data, but still having storage
+/// \brief Clear the contents of the buffer by setting all the bytes to
+///		zeros.
+///
+/// @return nothing
 void
 Buffer::clear()
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_ptr) {
-        memset(_ptr, 0, _nbytes);
+    if (_data) {
+        memset(_data.get(), 0, _nbytes);
     }
-    _seekptr = _ptr;
+    _seekptr = _data.get();
 }
 
-// Resize the buffer that holds the data.
-// Resize the buffer that holds the data.
-void *
+/// \brief Resize the buffer that holds the data.
+///		The new size of the current data is based on the
+///		current amount of data within the allocated memory.
+///		This is used to make a Buffer the same size as
+///		the existing data, and to truncate the unsed portion
+///		of the Buffer when copying to the new memory
+///		location.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
 Buffer::resize()
 {
 //    GNASH_REPORT_FUNCTION;
-    return resize(_seekptr - _ptr);
+    return resize(_seekptr - _data.get());
 }
 
-void *
+/// \brief Resize the buffer that holds the data.
+///		If the size is larger than the existing data, the data
+///		is copied into the new region. If the size is smaller
+///		than the existing data, the remaining data is
+///		truncated when copying to the new memory location.
+///
+/// @param nbyte The size to resize the Buffer to.
+///
+/// @return A reference to a Buffer.
+Buffer &
 Buffer::resize(size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    // Allocate a new memory block
-    if (_nbytes == 0) {
-	init(size);
-    } else {
-	size_t diff =_seekptr - _ptr;
-	Network::byte_t *tmp = new Network::byte_t[size];
-	// The size is the same, don't do anything.
-	if (size == _nbytes) {
-	    return _ptr;
-	}
-	// And copy ourselves into it
-	if (size > _nbytes) {
-	    std::copy(_ptr, _ptr + _nbytes, tmp);
-	    // Delete the old block, it's unused now
-	    delete[] _ptr;
-	    // Make the memory block use the new space
-	    _ptr = tmp;
-	    // Make the seekptr point into the new space with the correct offset
-	    _seekptr = tmp + diff;
-	}
-	if (size < _nbytes) {
-	    std::copy(_ptr, _ptr + size, tmp);
-	    // Delete the old block, it's unused now
-	    delete[] _ptr;
-	    // Make the memory block use the new space
-	    _ptr = tmp;
-	    // Make the seekptr point into the new space with the correct offset
-	    _seekptr = _ptr + size;
-	}
-    }
-    // Adjust the size
-    _nbytes = size;
+    boost::scoped_array<gnash::Network::byte_t> tmp;
     
-    return _ptr;
+    if (_nbytes == 0) {
+	return init(size);
+    } else {
+	// Don't bother to resize without really changing anything
+	if (size == _nbytes) {
+	    return *this;
+	}
+
+	// Cache the number of bytes currently being held
+	size_t used = _seekptr - _data.get();
+	
+	// Copy the existing data into the new block of memory. The data
+	// held currently is moved to the temporary array, and then gets
+	// deleted when this method returns.
+	tmp.swap(_data);
+	
+	// We loose data if we resize smaller than the data currently held.
+	if (size < used) {
+	    log_error("Truncating data (%d bytes) while resizing!", used - size);
+	    used = size;
+	}
+	_data.reset(new Network::byte_t[size]);
+	std::copy(tmp.get(), tmp.get() + used, _data.get());
+	
+	// Make the seekptr point into the new space with the correct offset
+	_seekptr = _data.get() + used;
+
+	// Adjust the size
+	_nbytes = size;
+    }
+    
+    return *this;
 }
 
+///  \brief Dump the internal data of this class in a human readable form.
+///		This should only be used for debugging purposes.
 void
-Buffer::dump()
+Buffer::dump(std::ostream& os) const
 {
-    cerr << "Buffer is " << _nbytes << " bytes at " << (void *)_ptr << endl;
+    os << "Buffer is " << _nbytes << " bytes at " << (void *)_data.get() << endl;
     if (_nbytes < 0xffff) {
-	cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, false) << endl;
-	cerr << gnash::hexify((unsigned char *)_ptr, _nbytes, true) << endl;
+	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, false) << endl;
+	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, true) << endl;
     } else {
-	cerr << "ERROR: Buffer size out of range!" << endl;
+	os << "ERROR: Buffer size out of range!" << endl;
 	abort();
     }
 }

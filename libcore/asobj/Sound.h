@@ -32,17 +32,21 @@
 #include "as_object.h" // for inheritance
 #include "NetConnection.h"
 
-#include "MediaHandler.h"
-#include "MediaParser.h"
-#include "AudioDecoder.h"
+#include "MediaParser.h" // is this really needed for scoped_ptr ?
+#include "AudioDecoder.h" // is this really needed for scoped_ptr ?
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
 
-/// Forward declarations
+// Forward declarations
 namespace gnash {
 	class CharacterProxy;
-	namespace media {
+	namespace sound {
 		class sound_handler;
+        class InputStream;
+	}
+	namespace media {
+		class MediaHandler;
 	}
 }
 
@@ -123,9 +127,12 @@ private:
 	std::string externalURL;
 	bool isStreaming;
 
-	media::sound_handler* _soundHandler;
+	sound::sound_handler* _soundHandler;
+
 	media::MediaHandler* _mediaHandler;
+
 	boost::scoped_ptr<media::MediaParser> _mediaParser;
+
 	boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
 
 	/// Number of milliseconds into the sound to start it
@@ -137,15 +144,51 @@ private:
 	boost::uint8_t* _leftOverPtr;
 	boost::uint32_t _leftOverSize;
 
-	static bool getAudioWrapper(void *owner, boost::uint8_t *stream, int len);
+	/// This is a sound_handler::aux_streamer_ptr type.
+	static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& etEOF);
 
-	bool getAudio(boost::uint8_t *stream, int len);
+	unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF);
 
-	// Are this sound attached to the soundhandler?
-	bool isAttached;
+    /// The aux streamer for sound handler
+	sound::InputStream* _inputStream;
 
 	int remainingLoops;
 
+    /// Query media parser for audio info, create decoder and attach aux streamer
+    /// if found.
+    ///
+    /// @return  an InputStream* if audio found and aux streamer attached,
+    ///          0 if no audio found.
+    ///
+    /// May throw a MediaException if audio was found but
+    /// audio decoder could not be created
+    /// 
+    sound::InputStream* attachAuxStreamerIfNeeded();
+
+    /// Register a timer for audio info probing
+    void startProbeTimer();
+
+    /// Unregister the probe timer
+    void stopProbeTimer();
+
+    /// Probe audio
+    void probeAudio();
+
+    static as_value probeAudioWrapper(const fn_call&);
+
+    int _probeTimer;
+
+    bool _soundCompleted;
+
+    boost::mutex _soundCompletedMutex;
+
+    /// Thread-safe setter for _soundCompleted
+    void markSoundCompleted(bool completed);
+
+	/// Is this sound attached to the soundhandler?
+    bool isAttached() const {
+        return _inputStream!=0;
+    }
 };
 
 void sound_class_init(as_object& global);

@@ -332,8 +332,9 @@ ActionExec::operator() ()
             {
                 if ( ++branchCount > maxBranchCount )
                 {
-                    boost::format fmt(_("Loop iterations count exceeded limit of "
-                                        "%d. Last branch was from pc %d to %d."));
+                    boost::format fmt(_("Loop iterations count exceeded "
+                                "limit of %d. Last branch was from pc %d "
+                                "to %d"));
                     fmt % maxBranchCount % oldPc % pc;
                     throw ActionLimitException(fmt.str());
                 }
@@ -670,7 +671,7 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 bool
 ActionExec::delVariable(const std::string& name)
 {
-    return env.del_variable_raw(PROPNAME(name), getScopeStack());
+    return env.delVariableRaw(name, getScopeStack());
 }
 
 bool
