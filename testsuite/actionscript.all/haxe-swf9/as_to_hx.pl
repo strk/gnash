@@ -202,7 +202,7 @@ while(<STDIN>){
 		#CHECK 5.3 - Must go after CHECK 5.5
 		#Replace calls to str.split(a,b) with a==""?[]:str==""||a==null?[str]:str.split(a).slice(0,b)
 		#		 str			a		b
-		$_ =~ s/(\w+)\.split\((.+),\s*(\w+)\s*\)/$2==""?[]:$1==""||$2==null?[$1]:$1.split($2).slice(0,$3)/g;
+		$_ =~ s/(\w+)\.split\((.+),\s*([-\w]+)\s*\)/$2==""?[]:$1==""||$2==null?[$1]:($3<1)?[]:$1.split($2).slice(0,$3)/g;
 		
 	}
 
@@ -213,18 +213,26 @@ while(<STDIN>){
 	#Replace undefined with null.
 	$_ =~ s/undefined/null/g;
 
+	#CHECK 10 - Must run before CHECK 9
 	#Haxe only allows one argument to String.fromCharCode(), so replace
 	#String.fromCharCode(1,2) with String.fromCharCode(1) + String.fromCharCode(2)
-	if($_ =~ /String.fromCharCode\(.+\)/){
+	if($_ =~ /String.fromCharCode\((.+)\)/){
 		
 		#TODO: Can this be combined with regex above?
 		$_ =~ s/,\s*(\w+)\s*/) + String.fromCharCode($1/g;
 	}
 	
+	#CHECK 11 - Must run before CHECK 9
 	#Convert calls to chr and ord.  I think these have been depreciated since SWF v5.
 	$_ =~ s/chr\(\s*(\w+)\s*\)/String.fromCharCode($1)/g;
 	$_ =~ s/ord\(\s*(\S+)\s*\)/$1.charCodeAt(0)/g;
 
+	#CHECK 9 - Must run after CHECK 10 and after CHECK 11
+	#Replace calls to String.fromCharCode(0) with "" When compiled with haxe a trace call
+	#will die if it is passed String.fromCharCode(0)
+	$_ =~ s/String.fromCharCode\(\s*0\s*\)/""/g;
+
+	$_ =~ s/\((.+?)\.charCodeAt\(\s*(\S*)\s*\)/($1.charCodeAt($2)==null?0:$1.charCodeAt($2)/g;
 
 	#Replace String in "for .. in" loops that iterator over String's properties with 
 	#Type.getInstanceFields(String).
