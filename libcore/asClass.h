@@ -221,8 +221,16 @@ public:
 	string_table::key getPrefix() const { return mPrefix; }
 
 	/// Create an empty namespace
-	asNamespace() : mParent(NULL), mUri(0), mAbcURI(0), mPrefix(0), mClasses(),
-		mRecursePrevent(false), mPrivate(false), mProtected(false)
+	asNamespace()
+        :
+        mParent(0),
+        mUri(0),
+        mPrefix(0),
+        mAbcURI(0),
+        mClasses(),
+		mRecursePrevent(false),
+        mPrivate(false),
+        mProtected(false)
 	{/**/}
 
 	/// Add a class to the namespace. The namespace stores this, but
@@ -621,10 +629,23 @@ public:
 	void unsetSystem() { mSystem = false; }
 	bool isSystem() { return mSystem; }
 
-	asClass() : mFinal(false), mSealed(false), mDynamic(false),
-		mInterface(false), mName(0), mInterfaces(), mProtectedNs(NULL),
-		mSuper(NULL), mConstructor(NULL), mStaticConstructor(NULL),
-		mBindings(), mStaticBindings(), mDeclared(false), mInherited(false),
+	asClass()
+        :
+        mPrototype(0),
+        mFinal(false),
+        mSealed(false),
+        mDynamic(false),
+		mInterface(false),
+        mName(0),
+        mInterfaces(),
+        mProtectedNs(0),
+		mSuper(0),
+        mConstructor(0),
+        mStaticConstructor(0),
+		mBindings(),
+        mStaticBindings(),
+        mDeclared(false),
+        mInherited(false),
 		mSystem(false)/*,mTraits()*/
 	{/**/}
 
