@@ -197,6 +197,7 @@ noinst_HEADERS = \
 	swf/DefineButtonCxformTag.h \
 	swf/PlaceObject2Tag.h \
 	swf/DefineFontTag.h \
+	swf/DefineFontNameTag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \
 	swf/DoActionTag.h \
