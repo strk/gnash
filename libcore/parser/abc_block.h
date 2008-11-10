@@ -78,19 +78,35 @@ public:
 	asMethod *mMTarget;
 	bool mStatic;
 
-	abc_Trait() : mHasValue(false), mKind(KIND_SLOT), mSlotId(0),
-		mTypeIndex(0), mClassInfoIndex(0), mValue(), mName(0),
-		mNamespace(NULL), mMethod(NULL), mValueSet(false)
+	abc_Trait()
+        :
+        mHasValue(false),
+        mKind(KIND_SLOT),
+        mSlotId(0),
+        mTypeIndex(0),
+        mClassInfoIndex(0),
+        mValue(),
+        mName(0),
+        mGlobalName(),
+        mNamespace(0),
+        mMethod(0),
+        mValueSet(false),
+        mCTarget(0),
+        mMTarget(0),
+        mStatic(false)
 	{/**/}
 
 	bool read(SWFStream* in, abc_block *pBlock);
+
 	bool finalize(abc_block *pBlock, asClass *pClass, bool do_static);
+
 	bool finalize_mbody(abc_block *pBlock, asMethod *pMethod);
 
 	void set_target(asClass *pClass, bool do_static)
 	{ mCTarget = pClass; mStatic = do_static; }
+
 	void set_target(asMethod *pMethod)
-	{ mCTarget = NULL; mMTarget = pMethod; }
+	{ mCTarget = 0; mMTarget = pMethod; }
 
 	bool finalize(abc_block *pBlock)
 	{
