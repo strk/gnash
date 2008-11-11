@@ -1160,14 +1160,21 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		//TODO: If multiname is runtime also pop namespace and/or name values.
+        if ( a.isRuntime() )
+        {
+            log_unimpl("ABC_ACTION_CALL* with runtime multiname");
+        }
 		as_value object_val = pop_stack();
 
-		if(object_val.is_undefined() || object_val.is_null()){
-			LOG_DEBUG_AVM("Can't call a method on an undefined object.");
+		as_object *object = object_val.to_object().get();
+		if (!object) {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't call a method of a value that doesn't cast to an object (%s)."),
+                object_val);
+            )
 		}
 		else{
 
-			as_object *object = object_val.to_object().get();
 			as_value property = object->getMember(a.getGlobalName(),0);
 		
 			if(!property.is_undefined() && !property.is_null()){

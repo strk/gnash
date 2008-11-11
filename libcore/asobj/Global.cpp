@@ -108,6 +108,7 @@ static as_value as_global_assetnative(const fn_call& /*fn*/);
 static as_value as_global_assetnativeaccessor(const fn_call& /*fn*/);
 static as_value as_global_asconstructor(const fn_call& /*fn*/);
 static as_value as_global_updateAfterEvent(const fn_call& /*fn*/);
+static as_value as_global_addChild(const fn_call& fn);
 
 Global::Global(VM& vm, ClassHierarchy *ch)
     :
@@ -187,6 +188,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
         default:
             // Version 10 or above reported
         case 9:
+            init_member("addChild", new builtin_function(as_global_addChild));
         case 8:
 
         case 7:
@@ -675,6 +677,16 @@ as_value
 as_global_updateAfterEvent(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("updateAfterEvent()"));
+    return as_value();
+}
+
+static as_value
+as_global_addChild(const fn_call& fn)
+{
+    //LOG_ONCE(
+        std::stringstream ss; fn.dump_args(ss);
+        log_unimpl("addChild(%s)", ss.str());
+    //);
     return as_value();
 }
 
