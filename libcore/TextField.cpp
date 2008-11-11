@@ -1535,8 +1535,8 @@ TextField::format_text()
     boost::uint16_t blockIndent = getBlockIndent();
     bool underlined = getUnderlined();
 
-    log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
-      getTarget(), fontDescent, fontLeading, fontHeight, scale);
+    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
+    //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
 
     SWF::TextRecord rec;    // one to work on
     rec.setFont(_font.get());

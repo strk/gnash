@@ -124,7 +124,8 @@ video_attach(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<NetStream_as> ns = boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
+	boost::intrusive_ptr<NetStream_as> ns = 
+        boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
 	if (ns)
 	{
 		video->setStream(ns);
@@ -140,9 +141,11 @@ video_attach(const fn_call& fn)
 }
 
 static as_value
-video_clear(const fn_call& /*fn*/)
+video_clear(const fn_call& fn)
 {
-    log_unimpl (__FUNCTION__);
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+
+    video->clear();
     return as_value();
 }
 
@@ -151,8 +154,8 @@ video_ctor(const fn_call& /* fn */)
 {
 	log_debug("new Video() TESTING !");
 
-	// I'm not sure We can rely on the def and parent values being accepted  as NULL
-	// Not till we add some testing...
+	// I'm not sure We can rely on the def and parent values being accepted 
+    // as NULL. Not till we add some testing...
 	boost::intrusive_ptr<character> obj = new Video(NULL, NULL, -1);
 	obj->setDynamic();
 	return as_value(obj.get()); // will keep alive
@@ -193,17 +196,14 @@ Video::Video(SWF::DefineVideoStreamTag* def,
 	:
 	character(parent, id),
 	m_def(def),
-	//m_video_source(NULL),
 	_ns(NULL),
-	_embeddedStream(false),
+	_embeddedStream(m_def ? true : false),
 	_lastDecodedVideoFrameNum(-1),
 	_lastDecodedVideoFrame()
 {
-	//log_debug("Video %p ctor", (void*)this);
 
-	if ( m_def )
+	if (_embeddedStream)
 	{
-		_embeddedStream = true;
 		attachVideoProperties(*this);
 		initializeDecoder();
 	}
@@ -213,6 +213,17 @@ Video::Video(SWF::DefineVideoStreamTag* def,
 
 Video::~Video()
 {
+}
+
+void
+Video::clear()
+{
+    // Clear the current image only if paused.
+    if (_ns && _ns->playbackState() == PlayHead::PLAY_PAUSED)
+    {
+        set_invalidated();
+        _lastDecodedVideoFrame.reset();
+    }
 }
 
 void
@@ -239,14 +250,16 @@ Video::getVideoFrame()
 {
 
 
-	// If this is a video from a NetStream_as object, retrieve a video frame from there.
+	// If this is a video from a NetStream_as object, retrieve a video
+    // frame from there.
 	if (_ns)
 	{
 		std::auto_ptr<GnashImage> tmp = _ns->get_video();
 		if ( tmp.get() ) _lastDecodedVideoFrame = tmp;
 	}
 
-	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
+	// If this is a video from a VideoFrame tag, retrieve a video frame
+    // from there.
 	else if (_embeddedStream)
 	{
 
@@ -267,19 +280,22 @@ Video::getVideoFrame()
 		if ( _lastDecodedVideoFrameNum == current_frame )
 		{
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-			log_debug("  current frame == _lastDecodedVideoFrameNum (%d)", current_frame);
+			log_debug("  current frame == _lastDecodedVideoFrameNum (%d)",
+                    current_frame);
 #endif
 			return _lastDecodedVideoFrame.get();
 		}
 
-		int from_frame = _lastDecodedVideoFrameNum < 0 ? 0 : _lastDecodedVideoFrameNum+1;
+		int from_frame = _lastDecodedVideoFrameNum < 0 ?
+            0 : _lastDecodedVideoFrameNum + 1;
 
 		// If current frame is smaller then last decoded frame
 		// we restart decoding from scratch
 		if ( current_frame < _lastDecodedVideoFrameNum )
 		{
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-			log_debug("  current frame (%d) < _lastDecodedVideoFrameNum (%d)", current_frame, _lastDecodedVideoFrameNum);
+			log_debug("  current frame (%d) < _lastDecodedVideoFrameNum (%d)",
+                    current_frame, _lastDecodedVideoFrameNum);
 #endif
 			from_frame = 0;
 		}
@@ -289,8 +305,8 @@ Video::getVideoFrame()
 		_lastDecodedVideoFrameNum = current_frame;
 
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
-		log_debug("  decoding embedded frames from %d to %d for video instance %s",
-			from_frame, current_frame, getTarget());
+		log_debug("  decoding embedded frames from %d to %d for Video "
+                "object %s", from_frame, current_frame, getTarget());
 #endif
 
 		typedef std::vector<media::EncodedVideoFrame*> EncodedFrames;
@@ -307,7 +323,8 @@ Video::getVideoFrame()
 			return _lastDecodedVideoFrame.get();
 		}
 
-		for (EncodedFrames::iterator it=toDecode.begin(), itEnd=toDecode.end(); it!=itEnd; ++it)
+		for (EncodedFrames::iterator it=toDecode.begin(),
+                itEnd=toDecode.end(); it!=itEnd; ++it)
 		{
 			media::EncodedVideoFrame* frame = *it;
 #ifdef DEBUG_EMBEDDED_VIDEO_DECODING
@@ -337,7 +354,9 @@ Video::advance()
 {
 	if (_ns) {
 		//_ns->advance();
-		if (_ns->newFrameReady()) set_invalidated(); // NOTE: only needed for gstreamer !!
+        
+        // NOTE: only needed for gstreamer:
+		if (_ns->newFrameReady()) set_invalidated();
 	}
 }
 
@@ -378,10 +397,6 @@ void video_class_init(as_object& global)
 	{
 		cl=new builtin_function(&video_ctor, getVideoInterface(global));
 		global.getVM().addStatic(cl.get());
-
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		//attachVideoInterface(*cl);
 	}
 
 	// Register _global.Video
