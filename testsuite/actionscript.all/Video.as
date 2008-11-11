@@ -31,6 +31,27 @@ check_totals(1);
 
 #else
 
+check(Video.prototype.hasOwnProperty("attachVideo"));
+check(Video.prototype.hasOwnProperty("clear"));
+check(!Video.prototype.hasOwnProperty("smoothing"));
+check(!Video.prototype.hasOwnProperty("deblocking"));
+check(!Video.prototype.hasOwnProperty("_alpha"));
+check(!Video.prototype.hasOwnProperty("_height"));
+check(!Video.prototype.hasOwnProperty("height"));
+check(!Video.prototype.hasOwnProperty("_name"));
+check(!Video.prototype.hasOwnProperty("_parent"));
+check(!Video.prototype.hasOwnProperty("_rotation"));
+check(!Video.prototype.hasOwnProperty("_visible"));
+check(!Video.prototype.hasOwnProperty("_width"));
+check(!Video.prototype.hasOwnProperty("width"));
+check(!Video.prototype.hasOwnProperty("_x"));
+check(!Video.prototype.hasOwnProperty("_xmouse"));
+check(!Video.prototype.hasOwnProperty("_xscale"));
+check(!Video.prototype.hasOwnProperty("_y"));
+check(!Video.prototype.hasOwnProperty("_ymouse"));
+check(!Video.prototype.hasOwnProperty("_yscale"));
+check(!Video.prototype.hasOwnProperty("_xmouse"));
+
 // test Video class an interface availability
 check_equals(typeof(Video), 'function');
 check_equals(typeof(Video.prototype), 'object');
@@ -57,8 +78,27 @@ check_equals (typeof(videoObj._rotation), 'undefined');
 check_equals (typeof(videoObj._target), 'undefined');
 check_equals (typeof(videoObj._parent), 'undefined');
 
-// TODO: test other properties !
+check(!videoObj.hasOwnProperty("attachVideo"));
+check(!videoObj.hasOwnProperty("smoothing"));
+check(!videoObj.hasOwnProperty("deblocking"));
+check(!videoObj.hasOwnProperty("clear"));
+check(!videoObj.hasOwnProperty("_alpha"));
+check(!videoObj.hasOwnProperty("_height"));
+check(!videoObj.hasOwnProperty("height"));
+check(!videoObj.hasOwnProperty("_name"));
+check(!videoObj.hasOwnProperty("_parent"));
+check(!videoObj.hasOwnProperty("_rotation"));
+check(!videoObj.hasOwnProperty("_visible"));
+check(!videoObj.hasOwnProperty("_width"));
+check(!videoObj.hasOwnProperty("width"));
+check(!videoObj.hasOwnProperty("_x"));
+check(!videoObj.hasOwnProperty("_xmouse"));
+check(!videoObj.hasOwnProperty("_xscale"));
+check(!videoObj.hasOwnProperty("_y"));
+check(!videoObj.hasOwnProperty("_ymouse"));
+check(!videoObj.hasOwnProperty("_yscale"));
+check(!videoObj.hasOwnProperty("_xmouse"));
 
-check_totals(21);
+check_totals(61);
 
 #endif
