@@ -38,130 +38,45 @@
 
 namespace gnash {
 
-static as_object* getVideoInterface(as_object& where);
-static void attachVideoInterface(as_object& o);
-static void attachVideoProperties(as_object& o);
-static as_value video_ctor(const fn_call& fn);
-static as_value video_attach(const fn_call& fn);
-static as_value video_clear(const fn_call& fn);
+namespace {    
+    as_object* getVideoInterface(as_object& where);
+    void attachPrototypeProperties(as_object& o);
+    void attachVideoInterface(as_object& o);
+    void attachVideoProperties(as_object& o);
+    as_value video_ctor(const fn_call& fn);
+    as_value video_attach(const fn_call& fn);
+    as_value video_clear(const fn_call& fn);
+    as_value video_deblocking(const fn_call& fn);
+    as_value video_smoothing(const fn_call& fn);
+    as_value video_width(const fn_call& fn);
+    as_value video_height(const fn_call& fn);
+}
 
-static as_object* getVideoInterface(as_object& where)
+Video::Video(SWF::DefineVideoStreamTag* def,
+		character* parent, int id)
+	:
+	character(parent, id),
+	m_def(def),
+	_ns(0),
+	_embeddedStream(m_def ? true : false),
+	_lastDecodedVideoFrameNum(-1),
+	_lastDecodedVideoFrame()
 {
-	static boost::intrusive_ptr<as_object> proto;
-	if ( proto == NULL )
+
+	set_prototype(getVideoInterface(*this));
+	if (_embeddedStream)
 	{
-		proto = new as_object(getObjectInterface());
-		where.getVM().addStatic(proto.get());
-
-		attachVideoInterface(*proto);
-		//proto->init_member("constructor", new builtin_function(video_ctor));
+		attachVideoProperties(*this);
+		initializeDecoder();
+        
+        attachPrototypeProperties(*get_prototype());
 	}
-	return proto.get();
 }
 
-static void attachVideoInterface(as_object& o)
+Video::~Video()
 {
-	o.init_member("attachVideo", new builtin_function(video_attach));
-	o.init_member("clear", new builtin_function(video_clear));
 }
 
-static void attachVideoProperties(as_object& o)
-{
-	//int target_version = o.getVM().getSWFVersion();
-
-	as_c_function_ptr gettersetter;
-
-	gettersetter = &character::x_getset;
-	o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
-
-	gettersetter = &character::y_getset;
-	o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
-
-	gettersetter = &character::xscale_getset;
-	o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
-
-	gettersetter = &character::yscale_getset;
-	o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
-
-	gettersetter = &character::xmouse_get;
-	o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
-
-	gettersetter = &character::ymouse_get;
-	o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
-
-	gettersetter = &character::alpha_getset;
-	o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
-
-	gettersetter = &character::visible_getset;
-	o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
-
-	gettersetter = &character::width_getset;
-	o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
-
-	gettersetter = &character::height_getset;
-	o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
-
-	gettersetter = &character::rotation_getset;
-	o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
-
-	gettersetter = &character::parent_getset;
-	o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
-
-	gettersetter = &character::target_getset;
-	o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
-}
-
-static as_value
-video_attach(const fn_call& fn)
-{
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
-
-	if (fn.nargs < 1)
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("attachVideo needs 1 arg"));
-		);
-		return as_value();
-	}
-
-	boost::intrusive_ptr<NetStream_as> ns = 
-        boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
-	if (ns)
-	{
-		video->setStream(ns);
-	}
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
-			fn.arg(0));
-		);
-	}
-	return as_value();
-}
-
-static as_value
-video_clear(const fn_call& fn)
-{
-	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
-
-    video->clear();
-    return as_value();
-}
-
-static as_value
-video_ctor(const fn_call& /* fn */)
-{
-	log_debug("new Video() TESTING !");
-
-	// I'm not sure We can rely on the def and parent values being accepted 
-    // as NULL. Not till we add some testing...
-	boost::intrusive_ptr<character> obj = new Video(NULL, NULL, -1);
-	obj->setDynamic();
-	return as_value(obj.get()); // will keep alive
-}
-
-/*private*/
 void
 Video::initializeDecoder()
 {
@@ -189,30 +104,6 @@ Video::initializeDecoder()
 	{
 	    log_error("Could not create Video Decoder: %s", e.what());
 	}
-}
-
-Video::Video(SWF::DefineVideoStreamTag* def,
-		character* parent, int id)
-	:
-	character(parent, id),
-	m_def(def),
-	_ns(NULL),
-	_embeddedStream(m_def ? true : false),
-	_lastDecodedVideoFrameNum(-1),
-	_lastDecodedVideoFrame()
-{
-
-	if (_embeddedStream)
-	{
-		attachVideoProperties(*this);
-		initializeDecoder();
-	}
-
-	set_prototype(getVideoInterface(*this));
-}
-
-Video::~Video()
-{
 }
 
 void
@@ -388,7 +279,8 @@ Video::setStream(boost::intrusive_ptr<NetStream_as> ns)
 }
 
 // extern (used by Global.cpp)
-void video_class_init(as_object& global)
+void
+video_class_init(as_object& global)
 {
 	// This is going to be the global Video "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
@@ -424,4 +316,178 @@ Video::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
+namespace {
+
+as_object*
+getVideoInterface(as_object& where)
+{
+	static boost::intrusive_ptr<as_object> proto;
+	if ( proto == NULL )
+	{
+		proto = new as_object(getObjectInterface());
+		where.getVM().addStatic(proto.get());
+
+		attachVideoInterface(*proto);
+		//proto->init_member("constructor", new builtin_function(video_ctor));
+	}
+	return proto.get();
+}
+
+void
+attachVideoInterface(as_object& o)
+{
+	o.init_member("attachVideo", new builtin_function(video_attach));
+	o.init_member("clear", new builtin_function(video_clear));
+}
+
+void
+attachPrototypeProperties(as_object& proto)
+{
+    proto.init_property("deblocking", &video_deblocking, &video_deblocking);
+    proto.init_property("smoothing", &video_smoothing, &video_smoothing);
+    proto.init_property("height", &video_height, &video_height);
+    proto.init_property("width", &video_width, &video_width);
+}
+
+void
+attachVideoProperties(as_object& o)
+{
+
+	as_c_function_ptr gettersetter;
+
+	gettersetter = &character::x_getset;
+	o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
+
+	gettersetter = &character::y_getset;
+	o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
+
+	gettersetter = &character::xscale_getset;
+	o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
+
+	gettersetter = &character::yscale_getset;
+	o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
+
+	gettersetter = &character::xmouse_get;
+	o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
+
+	gettersetter = &character::ymouse_get;
+	o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
+
+	gettersetter = &character::alpha_getset;
+	o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
+
+	gettersetter = &character::visible_getset;
+	o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
+
+	gettersetter = &character::width_getset;
+	o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
+
+	gettersetter = &character::height_getset;
+	o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
+
+	gettersetter = &character::rotation_getset;
+	o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
+
+	gettersetter = &character::parent_getset;
+	o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
+
+	gettersetter = &character::target_getset;
+	o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
+}
+
+as_value
+video_attach(const fn_call& fn)
+{
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+
+	if (fn.nargs < 1)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("attachVideo needs 1 arg"));
+		);
+		return as_value();
+	}
+
+	boost::intrusive_ptr<NetStream_as> ns = 
+        boost::dynamic_pointer_cast<NetStream_as>(fn.arg(0).to_object());
+	if (ns)
+	{
+		video->setStream(ns);
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
+			fn.arg(0));
+		);
+	}
+	return as_value();
+}
+
+as_value
+video_deblocking(const fn_call& fn)
+{
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+    UNUSED(video);
+
+    log_unimpl("Video.deblocking");
+    return as_value();
+}
+
+as_value
+video_smoothing(const fn_call& fn)
+{
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+    UNUSED(video);
+
+    log_unimpl("Video.smoothing");
+    return as_value();
+}
+
+as_value
+video_width(const fn_call& fn)
+{
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+    UNUSED(video);
+
+    log_unimpl("Video.width");
+    return as_value();
+}
+
+as_value
+video_height(const fn_call& fn)
+{
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+    UNUSED(video);
+
+    log_unimpl("Video.height");
+    return as_value();
+}
+
+as_value
+video_clear(const fn_call& fn)
+{
+	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
+
+    video->clear();
+    return as_value();
+}
+
+as_value
+video_ctor(const fn_call& /* fn */)
+{
+	log_debug("new Video() TESTING !");
+
+	// I'm not sure We can rely on the def and parent values being accepted 
+    // as NULL. Not till we add some testing...
+	boost::intrusive_ptr<character> obj = new Video(NULL, NULL, -1);
+	obj->setDynamic();
+	return as_value(obj.get()); // will keep alive
+}
+
+} // anonymous namespace
+
 } // end of namespace gnash
+
+
+
