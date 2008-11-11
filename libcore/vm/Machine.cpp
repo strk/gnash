@@ -1177,7 +1177,11 @@ Machine::execute()
 
 			}
 			else{
-				LOG_DEBUG_AVM("Method is undefined cannot call method on object %s",object_val.toDebugString());
+                IF_VERBOSE_ASCODING_ERRORS(
+				log_aserror(_("Property '%s' of object '%s' is '%s', cannot call as method"),
+                    mPoolObject->mStringPool[a.getABCName()],
+                    object_val, property);
+                )
 			}
 
 		}
