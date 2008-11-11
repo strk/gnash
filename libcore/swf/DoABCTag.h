@@ -64,6 +64,11 @@ public:
 		for(; ci != mABC->mClasses.end(); ++ci){
 			(*ci)->initPrototype();
 		}
+		
+		std::vector<asClass*>::iterator si = mABC->mScripts.begin();
+		for(; si != mABC->mScripts.end(); ++si){
+			(*si)->initPrototype();
+		}
 
 		std::vector<asMethod*>::iterator mi = mABC->mMethods.begin();
 		for(; mi != mABC->mMethods.end(); ++mi){
