@@ -79,8 +79,12 @@ public:
 		typeInput
 	};
 
+    /// Constructs a TextField as specified in a DefineEditText tag.
 	TextField(character* parent, const SWF::DefineEditTextTag& def, int id);
 
+    /// Constructs a TextField with default values and the specified bounds.
+    //
+    /// Notably, the default textHeight is 12pt (240 twips).
     TextField(character* parent, const rect& bounds);
 
 	~TextField();
@@ -269,13 +273,6 @@ public:
 	///
 	static const char* autoSizeValueName(AutoSizeValue val);
 
-    /// Attaches more properties to the prototype on first instantiation.
-    //
-    /// @param proto    The prototype of the TextField object.
-    //
-    /// This is used when constructing non-AS textfields.
-    static void attachTextFieldInstanceProperties(as_object& proto);
-
 	/// Set type (input or dynamic)
 	//
 	/// @param val
@@ -377,7 +374,8 @@ public:
 	/// @param newfont
 	///	Will be stored in an intrusive_ptr
 	///
-	boost::intrusive_ptr<const Font> setFont(boost::intrusive_ptr<const Font> newfont);
+	boost::intrusive_ptr<const Font> setFont(
+            boost::intrusive_ptr<const Font> newfont);
 
 	const Font* getFont() { return _font.get(); }
 
@@ -465,6 +463,8 @@ private:
     /// by ourselves or by MovieClip when a registered TextVariable is
     /// updated.
 	void updateText(const std::wstring& s);
+
+    void insertTab(SWF::TextRecord& rec, int& x, float scale);
 
 	/// Set focus 
 	void setFocus();

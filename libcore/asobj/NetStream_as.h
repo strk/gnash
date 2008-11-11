@@ -69,7 +69,6 @@ public:
 		PLAY_PLAYING = 1,
 		PLAY_PAUSED = 2
 	};
-	
 
 	/// Initialize playhead given a VirtualCock to use
 	/// as clock source.
@@ -103,10 +102,10 @@ public:
     }
 
 	/// Get current playhead position (milliseconds)
-	boost::uint64_t getPosition() { return _position; }
+	boost::uint64_t getPosition() const { return _position; }
 
 	/// Get current playback state
-	PlaybackStatus getState() { return _state; }
+	PlaybackStatus getState() const { return _state; }
 
 	/// Set playback state, returning old state
 	PlaybackStatus setState(PlaybackStatus newState);
@@ -332,7 +331,6 @@ protected:
 
 public:
 
-
 	enum PauseMode {
 	  pauseModeToggle = -1,
 	  pauseModePause = 0,
@@ -343,7 +341,11 @@ public:
 
 	~NetStream_as();
 
-	/// Closes the video session and frees all ressources used for decoding
+    PlayHead::PlaybackStatus playbackState() const {
+        return _playHead.getState();
+    }
+
+    /// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).
 	void close();
 
@@ -496,13 +498,6 @@ private:
     // Delete all samples in the audio queue.
     void cleanAudioQueue();
 
-	enum PlaybackState {
-		PLAY_NONE,
-		PLAY_STOPPED,
-		PLAY_PLAYING,
-		PLAY_PAUSED
-	};
-
 	enum DecodingState {
 		DEC_NONE,
 		DEC_STOPPED,
@@ -554,9 +549,10 @@ private:
 	//
 	/// Uses by ::advance().
 	///
-	/// Note that get_video will be called by video_stream_instance::display, which
-	/// is usually called right after video_stream_instance::advance, so  the result
-	/// is that  refreshVideoFrame() is called right before get_video(). This is important
+	/// Note that get_video will be called by Video::display(), which
+	/// is usually called right after Video::advance(), so the result
+	/// is that refreshVideoFrame() is called right before
+    /// get_video(). This is important
 	/// to ensure timing is correct..
 	///
 	/// @param alsoIfPaused
@@ -569,7 +565,8 @@ private:
 	/// and up to current timestamp
 	void refreshAudioBuffer();
 
-	// Used to decode and push the next available (non-FLV) frame to the audio or video queue
+	/// Used to decode and push the next available (non-FLV) frame to
+    /// the audio or video queue
 	bool decodeMediaFrame();
 
 	/// Decode next video frame fetching it MediaParser cursor
@@ -666,8 +663,6 @@ private:
 	/// Won't detach if not attached.
 	///
 	void detachAuxStreamer();
-
-
 
 	/// Pop next queued status notification from the queue
 	//

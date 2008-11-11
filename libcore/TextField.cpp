@@ -24,7 +24,7 @@
 #include "utf8.h"
 #include "log.h"
 #include "swf/DefineEditTextTag.h"
-#include "render.h" // for display()
+#include "render.h"
 #include "movie_definition.h" // to extract version info
 #include "MovieClip.h"
 #include "TextField.h"
@@ -74,634 +74,49 @@
 namespace gnash {
 
 // Forward declarations
-static as_value textfield_variable(const fn_call& fn);
-static as_value textfield_setTextFormat(const fn_call& fn);
-static as_value textfield_getTextFormat(const fn_call& fn);
-static as_value textfield_setNewTextFormat(const fn_call& fn);
-static as_value textfield_getNewTextFormat(const fn_call& fn);
+namespace {
+    as_object* getTextFieldInterface(VM& vm);
+    void attachPrototypeProperties(as_object& proto);
+    void attachTextFieldStaticMembers(as_object& o);
 
-static as_value textfield_getDepth(const fn_call& fn);
-static as_value textfield_getFontList(const fn_call& fn);
-static as_value textfield_removeTextField(const fn_call& fn);
-static as_value textfield_replaceSel(const fn_call& fn);
-static as_value textfield_replaceText(const fn_call& fn);
+    as_value textfield_variable(const fn_call& fn);
+    as_value textfield_setTextFormat(const fn_call& fn);
+    as_value textfield_getTextFormat(const fn_call& fn);
+    as_value textfield_setNewTextFormat(const fn_call& fn);
+    as_value textfield_getNewTextFormat(const fn_call& fn);
+    as_value textfield_getDepth(const fn_call& fn);
+    as_value textfield_getFontList(const fn_call& fn);
+    as_value textfield_removeTextField(const fn_call& fn);
+    as_value textfield_replaceSel(const fn_call& fn);
+    as_value textfield_replaceText(const fn_call& fn);
 
-static as_object* getTextFieldInterface(VM& vm);
-
-static as_value textfield_background(const fn_call& fn);
-static as_value textfield_border(const fn_call& fn);
-static as_value textfield_backgroundColor(const fn_call& fn);
-static as_value textfield_borderColor(const fn_call& fn);
-static as_value textfield_text(const fn_call& fn);
-static as_value textfield_textColor(const fn_call& fn);
-static as_value textfield_embedFonts(const fn_call& fn);
-static as_value textfield_autoSize(const fn_call& fn);
-static as_value textfield_type(const fn_call& fn);
-static as_value textfield_wordWrap(const fn_call& fn);
-static as_value textfield_html(const fn_call& fn);
-static as_value textfield_selectable(const fn_call& fn);
-static as_value textfield_length(const fn_call& fn);
-static as_value textfield_textWidth(const fn_call& fn);
-static as_value textfield_textHeight(const fn_call& fn);
-
-
-//
-// TextField interface functions
-//
-
-static as_value
-textfield_variable(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    if (!fn.nargs)
-    {
-        // Getter
-        const std::string& varName = text->getVariableName();
-        // An empty variable name returns null.
-        if (varName.empty()) {
-            as_value null;
-            null.set_null();
-            return null;
-        }
-        return as_value(varName);
-    }
-
-    // Setter
-    const as_value& varName = fn.arg(0);
-    if (varName.is_undefined() || varName.is_null()) {
-        text->set_variable_name("");
-    }
-    else text->set_variable_name(varName.to_string());
-
-    return as_value();
-
+    as_value textfield_password(const fn_call& fn);
+    as_value textfield_ctor(const fn_call& fn);
+    as_value textfield_multiline(const fn_call& fn);
+    as_value textfield_scroll(const fn_call& fn);
+    as_value textfield_maxscroll(const fn_call& fn);
+    as_value textfield_maxhscroll(const fn_call& fn);
+    as_value textfield_maxChars(const fn_call& fn);
+    as_value textfield_bottomScroll(const fn_call& fn);
+    as_value textfield_hscroll(const fn_call& fn);
+    as_value textfield_htmlText(const fn_call& fn);
+    as_value textfield_restrict(const fn_call& fn);
+    as_value textfield_background(const fn_call& fn);
+    as_value textfield_border(const fn_call& fn);
+    as_value textfield_backgroundColor(const fn_call& fn);
+    as_value textfield_borderColor(const fn_call& fn);
+    as_value textfield_text(const fn_call& fn);
+    as_value textfield_textColor(const fn_call& fn);
+    as_value textfield_embedFonts(const fn_call& fn);
+    as_value textfield_autoSize(const fn_call& fn);
+    as_value textfield_type(const fn_call& fn);
+    as_value textfield_wordWrap(const fn_call& fn);
+    as_value textfield_html(const fn_call& fn);
+    as_value textfield_selectable(const fn_call& fn);
+    as_value textfield_length(const fn_call& fn);
+    as_value textfield_textWidth(const fn_call& fn);
+    as_value textfield_textHeight(const fn_call& fn);
 }
-
-
-static as_value
-textfield_getDepth(const fn_call& fn)
-{
-    // TODO: make this a character::getDepth_method function...
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    int n = text->get_depth();
-
-    return as_value(n);
-
-}
-
-static as_value
-textfield_getFontList(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE(log_unimpl("TextField.getFontList()"));
-
-    return as_value();
-}
-
-static as_value
-textfield_getNewTextFormat(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE(log_unimpl("TextField.getNewTextFormat()"));
-
-    return as_value();
-}
-
-static as_value
-textfield_getTextFormat(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    boost::intrusive_ptr<TextFormat> tf = new TextFormat();
-    tf->alignSet(text->getTextAlignment());
-    tf->sizeSet(text->getFontHeight());
-    tf->indentSet(text->getIndent());
-    tf->blockIndentSet(text->getBlockIndent());
-    tf->leadingSet(text->getLeading());
-    tf->leftMarginSet(text->getLeftMargin());
-    tf->rightMarginSet(text->getRightMargin());
-    tf->colorSet(text->getTextColor());
-    tf->underlinedSet(text->getUnderlined());
-
-    const Font* font = text->getFont();
-    if (font)
-    {
-        tf->fontSet(font->get_name());
-        tf->italicedSet(font->isItalic());
-        tf->boldSet(font->isBold());
-    }
-
-    // TODO: add font color and some more
-
-    LOG_ONCE(
-        log_unimpl("TextField.getTextFormat() discards url, target, "
-            "tabStops, bullet and display")
-    );
-
-    return as_value(tf.get());
-}
-
-static as_value
-textfield_setTextFormat(const fn_call& fn)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    if ( ! fn.nargs )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
-            _("missing arg"))
-        );
-        return as_value();
-    }
-    else if ( fn.nargs > 2 )
-    {
-        std::stringstream ss; fn.dump_args(ss);
-        log_debug("TextField.setTextFormat(%s) : args past the first are "
-                "unhandled by Gnash", ss.str());
-    }
-
-    as_object* obj = fn.arg(0).to_object().get();
-    if ( ! obj )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), _("first argument is not an object"))
-        );
-        return as_value();
-    }
-
-    TextFormat* tf = dynamic_cast<TextFormat*>(obj);
-    if ( ! tf )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
-            _("first argument is not a TextFormat"))
-        );
-        return as_value();
-    }
-
-    if ( tf->alignDefined() ) text->setAlignment(tf->align());
-    if ( tf->sizeDefined() ) text->setFontHeight(tf->size()); // keep twips
-    if ( tf->indentDefined() ) text->setIndent(tf->indent());
-    if ( tf->blockIndentDefined() ) text->setBlockIndent(tf->blockIndent());
-    if ( tf->leadingDefined() ) text->setLeading(tf->leading());
-    if ( tf->leftMarginDefined() ) text->setLeftMargin(tf->leftMargin());
-    if ( tf->rightMarginDefined() ) text->setRightMargin(tf->rightMargin());
-    if ( tf->colorDefined() ) text->setTextColor(tf->color());
-    if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
-
-    if ( tf->fontDefined() )
-    {
-        const std::string& fontName = tf->font();
-        if ( ! fontName.empty() )
-        {
-            bool bold = tf->bold();
-            bool italic = tf->italiced();
-
-            // NOTE: should query movie-private font lib, not global-shared one
-            movie_instance* mi = text->get_root();
-            assert(mi);
-            movie_definition* md = mi->get_movie_definition();
-            assert(md);
-            Font* f = md->get_font(fontName, bold, italic);
-            if ( ! f ) f = fontlib::get_font(fontName, bold, italic);
-            text->setFont( f );
-        }
-    }
-
-    // TODO: add font color and some more
-
-    LOG_ONCE( log_unimpl("TextField.setTextFormat() discards url, target, tabStops, bullet and display") );
-
-    return as_value();
-
-}
-
-static as_value
-textfield_setNewTextFormat(const fn_call& fn)
-{
-    //boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    //UNUSED(text);
-
-    LOG_ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate to setTextFormat") );
-    return textfield_setTextFormat(fn);
-
-    //return as_value();
-}
-
-static as_value
-textfield_password(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    LOG_ONCE(log_unimpl("TextField.password"));
-
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(text->password());
-    }
-    // Setter
-    text->password(fn.arg(0).to_bool());
-    return as_value();
-}
-
-static as_value
-textfield_multiline(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    LOG_ONCE(log_unimpl("TextField.multiline"));
-
-    if (!fn.nargs) {
-        // Getter
-        return as_value(text->multiline());
-    }
-    // Setter
-    text->multiline(fn.arg(0).to_bool());
-    return as_value();
-}
-
-static as_value
-textfield_restrict(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE (log_unimpl("TextField.restrict"));
-
-    return as_value();
-}
-
-static as_value
-textfield_bottomScroll(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE (log_unimpl("TextField.bottomScroll"));
-
-    return as_value();
-}
-
-static as_value
-textfield_maxhscroll(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE (log_unimpl("TextField.maxhscroll"));
-
-    return as_value();
-}
-
-/// TextField.maxChars().
-//
-/// This does not limit the length of the text, but rather the
-/// number of characters that can be entered in the TextField.
-//
-/// Returns null when the value is 0.
-static as_value
-textfield_maxChars(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    LOG_ONCE(log_unimpl("TextField.maxChars"));
-
-    if (!fn.nargs)
-    {
-        boost::int32_t maxChars = text->maxChars();
-        if (maxChars == 0)
-        {
-            as_value null;
-            null.set_null();
-            return null;
-        }
-        return as_value(maxChars);
-    }
-    // Setter
-    text->maxChars(fn.arg(0).to_int());
-    return as_value();
-}
-
-static as_value
-textfield_text(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        //
-        // FIXME: should return text without HTML tags.
-        return as_value(ptr->get_text_value());
-    }
-
-    // Setter
-    int version = ptr->getVM().getSWFVersion();
-    ptr->setTextValue(
-            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
-
-    return as_value();
-}
-
-static as_value
-textfield_htmlText(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->get_text_value());
-    }
-
-    // Setter
-    int version = ptr->getVM().getSWFVersion();
-    ptr->setTextValue(
-            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
-
-    return as_value();
-}
-
-
-static as_value
-textfield_replaceSel(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE (log_unimpl("TextField.replaceSel()"));
-
-    return as_value();
-}
-
-static as_value
-textfield_scroll(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE (log_unimpl("TextField.scroll()"));
-
-    return as_value();
-}
-
-static as_value
-textfield_hscroll(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE (log_unimpl("TextField.hscroll()"));
-
-    return as_value();
-}
-
-static as_value
-textfield_maxscroll(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE (log_unimpl("TextField.maxscroll"));
-
-    return as_value();
-}
-
-static as_value
-textfield_replaceText(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
-
-    LOG_ONCE(log_unimpl("TextField.replaceText()"));
-
-    return as_value();
-}
-
-static as_value
-textfield_removeTextField(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-
-    text->removeTextField();
-
-    LOG_ONCE(log_debug("TextField.removeTextField() TESTING"));
-
-    return as_value();
-}
-
-/// This is called for 'new TextField()' only
-static as_value
-textfield_ctor(const fn_call& /* fn */)
-{
-    as_object* proto = getTextFieldInterface(VM::get());
-
-    // We should attach more properties to the prototype on first
-    // instantiation.
-    // TODO: this also attaches properties to the SWF5 prototype but makes
-    // them invisible with prop flags. Is this correct?
-    TextField::attachTextFieldInstanceProperties(*proto);
-
-    boost::intrusive_ptr<as_object> obj = new as_object(proto);
-
-    return as_value(obj);
-}
-
-//
-// TextField interface initialization
-//
-
-static void
-attachTextFieldInterface(as_object& o)
-{
-    boost::intrusive_ptr<builtin_function> getset;
-
-    // TextField is an AsBroadcaster
-    AsBroadcaster::initialize(o);
-
-    int propFlags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum
-        |as_prop_flags::readOnly
-        |as_prop_flags::isProtected;
-
-    // Parent seems to not be a normal property
-    getset = new builtin_function(&character::parent_getset, NULL);
-    o.init_property(NSV::PROP_uPARENT, *getset, *getset);
-
-    // Target seems to not be a normal property
-    getset = new builtin_function(&character::target_getset, NULL);
-    o.init_property(NSV::PROP_uTARGET, *getset, *getset);
-
-    // _name should be a property of the instance, not the prototype
-    getset = new builtin_function(&character::name_getset, NULL);
-    o.init_property(NSV::PROP_uNAME, *getset, *getset);
-
-    o.init_property(NSV::PROP_uXMOUSE,
-            character::xmouse_get, character::xmouse_get, propFlags);
-    o.init_property(NSV::PROP_uYMOUSE,
-            character::ymouse_get, character::ymouse_get, propFlags);
-    o.init_property(NSV::PROP_uXSCALE,
-            character::xscale_getset, character::xscale_getset);
-    o.init_property(NSV::PROP_uYSCALE,
-            character::yscale_getset, character::yscale_getset);
-    // Standard flags.
-    const int flags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum;
-
-    // SWF6 or higher
-    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
-
-    o.init_member("setTextFormat", 
-            new builtin_function(textfield_setTextFormat), swf6Flags);
-    o.init_member("getTextFormat", 
-            new builtin_function(textfield_getTextFormat), swf6Flags);
-    o.init_member("setNewTextFormat",
-            new builtin_function(textfield_setNewTextFormat), swf6Flags);
-    o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
-    o.init_member("getNewTextFormat",
-            new builtin_function(textfield_getNewTextFormat), swf6Flags);
-    o.init_member("getDepth",
-            new builtin_function(textfield_getDepth), swf6Flags);
-    o.init_member("removeTextField",
-            new builtin_function(textfield_removeTextField), swf6Flags);
-    o.init_member("replaceSel",
-            new builtin_function(textfield_replaceSel), swf6Flags);
-
-    // SWF7 or higher
-    const int swf7Flags = flags | as_prop_flags::onlySWF7Up;
-
-    o.init_member("replaceText",
-            new builtin_function(textfield_replaceText), swf7Flags);
-
-}
-
-void
-TextField::attachTextFieldInstanceProperties(as_object& o)
-{
-    // Standard flags.
-    const int flags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum;
-
-    // SWF6 or higher
-    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
-
-    boost::intrusive_ptr<builtin_function> getset;
-
-    // The following properties should only be attached to the prototype
-    // on first textfield creation.
-    o.init_property(NSV::PROP_TEXT_WIDTH,
-            textfield_textWidth, textfield_textWidth);
-    o.init_property(NSV::PROP_TEXT_HEIGHT,
-            textfield_textHeight, textfield_textHeight);
-
-    getset = new builtin_function(textfield_variable);
-    o.init_property("variable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_background);
-    o.init_property("background", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_text);
-    o.init_property("text", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_backgroundColor);
-    o.init_property("backgroundColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_border);
-    o.init_property("border", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_borderColor);
-    o.init_property("borderColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_textColor);
-    o.init_property("textColor", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_embedFonts);
-    o.init_property("embedFonts", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_autoSize);
-    o.init_property("autoSize", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_type);
-    o.init_property("type", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_wordWrap);
-    o.init_property("wordWrap", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_html);
-    o.init_property("html", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_selectable);
-    o.init_property("selectable", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_length);
-    o.init_property("length", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxscroll);
-    o.init_property("maxscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxhscroll);
-    o.init_property("maxhscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_maxChars);
-    o.init_property("maxChars", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_bottomScroll);
-    o.init_property("bottomScroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_scroll);
-    o.init_property("scroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_hscroll);
-    o.init_property("hscroll", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_restrict);
-    o.init_property("restrict", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_multiline);
-    o.init_property("multiline", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_password);
-    o.init_property("password", *getset, *getset, swf6Flags);
-    getset = new builtin_function(textfield_htmlText);
-    o.init_property("htmlText", *getset, *getset, swf6Flags);
-}
-
-
-static void
-attachTextFieldStaticMembers(as_object& o)
-{
-    // Standard flags.
-    const int flags = as_prop_flags::dontDelete
-        |as_prop_flags::dontEnum;
-
-    // SWF6 or higher
-    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
-
-    o.init_member("getFontList",
-            new builtin_function(textfield_getFontList), swf6Flags);
-
-}
-
-/// This is called when a prototype should be added
-//
-/// @note   This is called at different times, depending on the version.
-///         For SWF5 it is called only on first instantiation. For SWF6 it
-///         is called at the registration of _global.TextField.
-static as_object*
-getTextFieldInterface(VM& vm)
-{
-    static boost::intrusive_ptr<as_object> proto;
-
-    if ( proto == NULL )
-    {
-        if (vm.getSWFVersion() < 6) {
-            /// The prototype for SWF5 is a simple as_object without
-            /// toString() or valueOf().
-            proto = new as_object();
-        }
-        else {
-            proto = new as_object(getObjectInterface());
-            vm.addStatic(proto.get());
-            attachTextFieldInterface(*proto);
-        }
-
-    }
-    return proto.get();
-}
-
-//
-// TextField class
-//
 
 TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
         int id)
@@ -783,7 +198,6 @@ TextField::TextField(character* parent, const rect& bounds)
     _password(false),
     _maxChars(0),
     _text_variable_registered(false),
-    _variable_name(), //?
     _drawBackground(false),
     _backgroundColor(255,255,255,255),
     _drawBorder(false),
@@ -815,7 +229,7 @@ TextField::init()
     // prototype.
     // TODO: is it correct to do it here, or can some TextFields
     // be constructed without attaching these?
-    attachTextFieldInstanceProperties(*proto);
+    attachPrototypeProperties(*proto);
 
     set_prototype(proto);
 
@@ -1453,6 +867,35 @@ TextField::setFont(boost::intrusive_ptr<const Font> newfont)
     return oldfont;  
 }
 
+
+void
+TextField::insertTab(SWF::TextRecord& rec, int& x, float scale)
+{
+    // tab (ASCII HT)
+    const int space = 32;
+    int index = rec.getFont()->get_glyph_index(space, _embedFonts); 
+    if ( index == -1 )
+    {
+        IF_VERBOSE_MALFORMED_SWF (
+          log_error(_("TextField: missing glyph for space char (needed "
+                  "for TAB). Make sure character shapes for font "
+                  "%s are being exported into your SWF file."),
+                rec.getFont()->get_name());
+        );
+    }
+    else
+    {
+        SWF::TextRecord::GlyphEntry ge;
+        ge.index = index;
+        ge.advance = scale * rec.getFont()->get_advance(index, 
+                _embedFonts);
+
+        const int tabstop = 8;
+        rec.addGlyph(ge, tabstop);
+        x += ge.advance * tabstop;
+    }
+}
+
 void
 TextField::format_text()
 {
@@ -1491,30 +934,31 @@ TextField::format_text()
     // to find the appropriate font to use, as ActionScript
     // code should be able to change the font of a TextField
     //
-    if (_font == NULL)
+    if (!_font)
     {
-        log_error(_("No font for TextField! [%s:%d]"),
-            __FILE__, __LINE__);
+        log_error(_("No font for TextField!"));
         return;
     }
 
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts); 
-    float fontDescent = _embedFonts ? (_font->get_descent()*scale) : 0; // TODO: fetch descent from device fonts as well ?
-    float fontLeading = _embedFonts ? (_font->get_leading()*scale) : 0;  // TODO: fetch leading from device fonts as well ?
+    float fontDescent = _font->get_descent() * scale; 
+    float fontLeading = _font->get_leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
     boost::uint16_t rightMargin = getRightMargin();
     boost::uint16_t indent = getIndent();
     boost::uint16_t blockIndent = getBlockIndent();
     bool underlined = getUnderlined();
 
-    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g", getTarget(), fontDescent, fontLeading, fontHeight, scale);
+    //log_debug("%s: fontDescent:%g, fontLeading:%g, fontHeight:%g, scale:%g",
+    //  getTarget(), fontDescent, fontLeading, fontHeight, scale);
 
     SWF::TextRecord rec;    // one to work on
     rec.setFont(_font.get());
     rec.setUnderline(underlined);
     rec.setColor(getTextColor()); 
-    rec.setXOffset(PADDING_TWIPS + std::max(0, leftMargin + indent + blockIndent));
+    rec.setXOffset(PADDING_TWIPS + 
+            std::max(0, leftMargin + indent + blockIndent));
     rec.setYOffset(PADDING_TWIPS + fontHeight + (fontLeading - fontDescent));
     rec.setTextHeight(fontHeight);
 
@@ -1554,7 +998,8 @@ TextField::format_text()
 
         if ( _embedFonts )
         {
-            x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
+            x += rec.getFont()->get_kerning_adjustment(last_code, 
+                    static_cast<int>(code)) * scale;
             last_code = static_cast<int>(code);
         }
 
@@ -1562,204 +1007,176 @@ TextField::format_text()
         // we generate it.
         m_text_bounding_box.expand_to_point(x, y + fontDescent);
 
-        if (code == 13 || code == 10)
+        switch (code)
         {
-            // newline.
-
-            // Frigging Flash seems to use '\r' (13) as its
-            // default newline character.  If we get DOS-style \r\n
-            // sequences, it'll show up as double newlines, so maybe we
-            // need to detect \r\n and treat it as one newline.
-
-            // Close out this stretch of glyphs.
-            _textRecords.push_back(rec);
-            align_line(textAlignment, last_line_start_record, x);
-
-            // Expand bounding box to include last column of text ...
-            if ( _autoSize != autoSizeNone ) _bounds.expand_to_point(x+PADDING_TWIPS, y+PADDING_TWIPS);
-
-            // new paragraphs get the indent.
-            x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
-            y += fontHeight + leading; 
-
-            // Start a new record on the next line.
-            rec.clearGlyphs();
-            rec.setFont(_font.get()); 
-            rec.setUnderline(underlined);
-            rec.setColor(getTextColor());
-            rec.setXOffset(x);
-            rec.setYOffset(y);
-            rec.setTextHeight(fontHeight); 
-
-            last_space_glyph = -1;
-            last_line_start_record = _textRecords.size();
-
-            continue;
-        }
-
-        if (code == 8)
-        {
-            // backspace (ASCII BS).
-
-            // This is a limited hack to enable overstrike effects.
-            // It backs the cursor up by one character and then continues
-            // the layout.  E.g. you can use this to display an underline
-            // cursor inside a simulated text-entry box.
-            //
-            // ActionScript understands the '\b' escape sequence
-            // for inserting a BS character.
-            //
-            // ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
-            // OVER NEWLINES, ETC.
-
-            if (!rec.glyphs().empty())
+            case 27:
+                // Ignore escape
+                break;
+            case 9:
+                insertTab(rec, x, scale);
+                break;
+            case 13:
+            case 10:
             {
-                // Peek at the previous glyph, and zero out its advance
-                // value, so the next char overwrites it.
-                float advance = rec.glyphs().back().advance;
-                x -= advance;    // maintain formatting
-                // Remove one glyph
-                rec.clearGlyphs(1);
-            }
-            continue;
-        }
+                // newline.
 
-        if (code == '<' && _html )
-        {
-            LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
-                                 "gnash will just forget the tags and print their content")));
- 
-            std::wstring discard;
-            bool complete = parseHTML(discard, it, e);
-            
-            //log_debug("HTML tag: %s", utf8::encodeCanonicalString(discard, 7));
-        
-            // Check incomplete tag (end of string or NULL character in the text).
-            // We should stop parsing and not increment the iterator in this case.
-            if (!complete) break;
-            
-            continue;
-        }
+                // Frigging Flash seems to use '\r' (13) as its
+                // default newline character.  If we get DOS-style \r\n
+                // sequences, it'll show up as double newlines, so maybe we
+                // need to detect \r\n and treat it as one newline.
 
-        if (code == 9) // tab (ASCII HT)
-        {
-            int index = _font->get_glyph_index(32, _embedFonts); // ascii SPACE
-            if ( index == -1 )
-            {
-                IF_VERBOSE_MALFORMED_SWF (
-                  log_error(_("%s -- missing glyph for space char (needed for TAB). "
-                        " Make sure character shapes for font %s are being exported "
-                        "into your SWF file."),
-                        __PRETTY_FUNCTION__,
-                        _font->get_name());
-                );
-            }
-            else
-            {
-                SWF::TextRecord::GlyphEntry ge;
-                ge.index = index;
-                ge.advance = scale * _font->get_advance(index, _embedFonts);
+                // Close out this stretch of glyphs.
+                _textRecords.push_back(rec);
+                align_line(textAlignment, last_line_start_record, x);
 
-                const int tabstop = 8;
-                rec.addGlyph(ge, tabstop);
-                x += ge.advance * tabstop;
-            }
-            goto after_x_advance;
-        }
-
-        // Remember where word breaks occur.
-        if (code == 32)
-        {
-            last_space_glyph = rec.glyphs().size();
-        }
-
-        {
-        // need a sub-scope to avoid the 'goto' in TAB handling to cross
-        // initialization of the 'index' variable
-
-        // The font table holds up to 65535 glyphs. Casting from uint32_t
-        // would, in the event that the code is higher than 65535, result
-        // in the wrong character being chosen. It isn't clear whether this
-        // would ever happen, but UTF-8 conversion code can deal with codes
-        // up to 2^32; if they are valid, the code table will have to be
-        // enlarged.
-        int index = _font->get_glyph_index(
-                static_cast<boost::uint16_t>(code), _embedFonts);
-
-        IF_VERBOSE_MALFORMED_SWF (
-            if (index == -1)
-            {
-                // error -- missing glyph!
-                
-                // Log an error, but don't log too many times.
-                static int s_log_count = 0;
-                if (s_log_count < 10)
-                {
-                    s_log_count++;
-        
-                    if ( _embedFonts )
-                    {
-                    log_swferror(_("%s -- missing embedded glyph for char %d. "
-                        " Make sure character shapes for font %s are being exported "
-                        "into your SWF file"),
-                        __PRETTY_FUNCTION__,
-                        code,
-                        _font->get_name());
-                    }
-                    else
-                    {
-                    log_swferror(_("%s -- missing device glyph for char %d. "
-                        " Maybe you don't have font '%s' installed in your system?"),
-                        __PRETTY_FUNCTION__,
-                        code,
-                        _font->get_name());
-                    }
+                // Expand bounding box to include last column of text ...
+                if ( _autoSize != autoSizeNone ) {
+                    _bounds.expand_to_point(x + PADDING_TWIPS,
+                            y + PADDING_TWIPS);
                 }
 
-                // Drop through and use index == -1; this will display
-                // using the empty-box glyph
+                // new paragraphs get the indent.
+                x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
+                y += fontHeight + leading; 
+
+                // Start a new record on the next line. Other properties of the
+                // TextRecord should be left unchanged.
+                rec.clearGlyphs();
+                rec.setXOffset(x);
+                rec.setYOffset(y);
+
+                last_space_glyph = -1;
+                last_line_start_record = _textRecords.size();
+
+                continue;
             }
-        ); // IF_VERBOSE_MALFORMED_SWF
+            case 8:
+                // Backspace 
 
-        SWF::TextRecord::GlyphEntry ge;
-        ge.index = index;
-        ge.advance = scale * _font->get_advance(index, _embedFonts);
+                // This is a limited hack to enable overstrike effects.
+                // It backs the cursor up by one character and then continues
+                // the layout.  E.g. you can use this to display an underline
+                // cursor inside a simulated text-entry box.
+                //
+                // ActionScript understands the '\b' escape sequence
+                // for inserting a BS character.
+                //
+                // ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
+                // OVER NEWLINES, ETC.
 
-        rec.addGlyph(ge);
+                if (!rec.glyphs().empty())
+                {
+                    // Peek at the previous glyph, and zero out its advance
+                    // value, so the next char overwrites it.
+                    float advance = rec.glyphs().back().advance;
+                    x -= advance; 
+                    // Remove one glyph
+                    rec.clearGlyphs(1);
+                }
+                continue;
+            case '<':
+                if (_html)
+                {
+                    LOG_ONCE(log_debug(_("HTML in a text field is unsupported, "
+                                         "gnash will just ignore the tags and "
+                                         "print their content")));
+         
+                    std::wstring discard;
+                    bool complete = parseHTML(discard, it, e);
+                    
+                    if (!complete) continue;
+                    else break;
 
-        x += ge.advance;
+                }
+                // If HTML isn't enabled, carry on and insert the glyph.
+
+            case 32:
+                last_space_glyph = rec.glyphs().size();
+                // Don't break, as we still need to insert the space glyph.
+
+            default:
+            {
+
+                // The font table holds up to 65535 glyphs. Casting
+                // from uint32_t would, in the event that the code
+                // is higher than 65535, result in the wrong character
+                // being chosen. Flash can currently only handle 16-bit
+                // values.
+                int index = rec.getFont()->get_glyph_index(
+                        static_cast<boost::uint16_t>(code), _embedFonts);
+
+                IF_VERBOSE_MALFORMED_SWF (
+                    if (index == -1)
+                    {
+                        // Missing glyph! Log the first few errors.
+                        static int s_log_count = 0;
+                        if (s_log_count < 10)
+                        {
+                            s_log_count++;
+                            if (_embedFonts)
+                            {
+                                log_swferror(_("TextField: missing embedded "
+                                    "glyph for char %d. Make sure character "
+                                    "shapes for font %s are being exported "
+                                    "into your SWF file"),
+                                    code, _font->get_name());
+                            }
+                            else
+                            {
+                                log_swferror(_("TextField: missing device "
+                                    "glyph for char %d. Maybe you don't have "
+                                    "font '%s' installed in your system."),
+                                    code, _font->get_name());
+                            }
+                        }
+
+                        // Drop through and use index == -1; this will display
+                        // using the empty-box glyph
+                    }
+                );
+
+                SWF::TextRecord::GlyphEntry ge;
+                ge.index = index;
+                ge.advance = scale * rec.getFont()->get_advance(index, 
+                        _embedFonts);
+
+                rec.addGlyph(ge);
+
+                x += ge.advance;
+            }
         }
-        
-after_x_advance:
 
         float width = defBounds.width();
         if (x >= width - rightMargin - PADDING_TWIPS)
         {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-            log_debug("Text in TextField %s exceeds width [ _bounds %s ]", getTarget(), _bounds);
+            log_debug("Text in TextField %s exceeds width [ _bounds %s ]", 
+                    getTarget(), _bounds);
 #endif
 
-            // no wrap and no resize --> truncate
-            if ( ! doWordWrap() && autoSize == autoSizeNone )
+            // No wrap and no resize: truncate
+            if (!doWordWrap() && autoSize == autoSizeNone)
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=false, autoSize=none");
 #endif 
-                // truncate long line, but keep expanding text box
+                // Truncate long line, but keep expanding text box
                 bool newlinefound = false;
-                while ( it != e )
+                while (it != e)
                 {
                     code = *it++;
-                    if ( _embedFonts )
+                    if (_embedFonts)
                     {
-                        x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
-                        last_code = static_cast<int>(code);
+                        x += rec.getFont()->get_kerning_adjustment(last_code,
+                                static_cast<int>(code)) * scale;
+                        last_code = code;
                     }
-                    // Expand the bounding-box to the lower-right corner of each glyph,
-                    // even if we don't display it 
+                    // Expand the bounding-box to the lower-right corner
+                    // of each glyph, even if we don't display it 
                     m_text_bounding_box.expand_to_point(x, y + fontDescent);
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
-                    log_debug("Text bbox expanded to %s (width: %f)", m_text_bounding_box, m_text_bounding_box.width());
+                    log_debug("Text bbox expanded to %s (width: %f)",
+                            m_text_bounding_box, m_text_bounding_box.width());
 #endif
 
                     if (code == 13 || code == 10)
@@ -1768,17 +1185,18 @@ after_x_advance:
                         break;
                     }
 
-                    int index = _font->get_glyph_index((boost::uint16_t) code, _embedFonts);
-                    x += scale * _font->get_advance(index, _embedFonts);
+                    int index = rec.getFont()->get_glyph_index(
+                            static_cast<boost::uint16_t>(code), _embedFonts);
+                    x += scale * rec.getFont()->get_advance(index, _embedFonts);
 
                 }
-                if ( ! newlinefound ) break;
+                if (!newlinefound) break;
             }
             else if ( doWordWrap() )
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=true");
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+#endif 
 
                 // Insert newline if there's space or autosize != none
 
@@ -1791,14 +1209,11 @@ after_x_advance:
 
                 // Start a new record on the next line.
                 rec.clearGlyphs();
-                rec.setFont(_font.get());
-                rec.setUnderline(underlined);
-                rec.setColor(getTextColor());
                 rec.setXOffset(x);
                 rec.setYOffset(y);
-                rec.setTextHeight(getFontHeight());
 
-                // TODO : what if m_text_glyph_records is empty ? Is it possible ?
+                // TODO : what if m_text_glyph_records is empty ?
+                // Is it possible ?
                 assert(!_textRecords.empty());
                 SWF::TextRecord& last_line = _textRecords.back();
                 if (last_space_glyph == -1)
@@ -1819,8 +1234,10 @@ after_x_advance:
 
                     previous_x -= last_line.glyphs()[last_space_glyph].advance;
 
-                    const SWF::TextRecord::Glyphs::size_type lineSize = last_line.glyphs().size();
-                    for (unsigned int i = last_space_glyph + 1; i < lineSize; ++i)
+                    const SWF::TextRecord::Glyphs::size_type lineSize =
+                        last_line.glyphs().size();
+                    for (unsigned int i = last_space_glyph + 1; i < lineSize;
+                            ++i)
                     {
                         rec.addGlyph(last_line.glyphs()[i]);
                         x += last_line.glyphs()[i].advance;
@@ -1839,12 +1256,12 @@ after_x_advance:
             {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
                 log_debug(" wordWrap=%d, autoSize=%d", _wordWrap, _autoSize);
-#endif // DEBUG_MOUSE_ENTITY_FINDING
+#endif 
             }
         }
 
-
-        if ( (y) > (defBounds.height() - PADDING_TWIPS) && autoSize == autoSizeNone )
+        if (y > (defBounds.height() - PADDING_TWIPS) && 
+                autoSize == autoSizeNone )
         {
 #ifdef GNASH_DEBUG_TEXT_FORMATTING
             log_debug("Text with wordWrap exceeds height of box");
@@ -2357,300 +1774,7 @@ TextField::setFontHeight(boost::uint16_t h)
     }
 }
 
-static as_value
-textfield_background(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->getDrawBackground());
-    }
-    else // setter
-    {
-        ptr->setDrawBackground(fn.arg(0).to_bool());
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_border(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->getDrawBorder());
-    }
-    else // setter
-    {
-        ptr->setDrawBorder(fn.arg(0).to_bool());
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_backgroundColor(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->getBackgroundColor().toRGB());
-    }
-    else // setter
-    {
-        rgba newColor;
-        newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_int()));
-        ptr->setBackgroundColor(newColor);
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_borderColor(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->getBorderColor().toRGB());
-    }
-    else // setter
-    {
-        rgba newColor;
-        newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
-        ptr->setBorderColor(newColor);
-    }
-
-    return as_value();
-}
-
-    
-static as_value
-textfield_textColor(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getTextColor().toRGB());
-    }
-
-    // Setter
-    rgba newColor;
-    newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
-    ptr->setTextColor(newColor);
-
-    return as_value();
-}
-
-static as_value
-textfield_embedFonts(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if (!fn.nargs)
-    {
-        // Getter
-        return as_value(ptr->getEmbedFonts());
-    }
-
-    // Setter
-    ptr->setEmbedFonts( fn.arg(0).to_bool() );
-    return as_value();
-}
-
-static as_value
-textfield_wordWrap(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->doWordWrap());
-    }
-    else // setter
-    {
-        ptr->setWordWrap( fn.arg(0).to_bool() );
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_html(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->doHtml());
-    }
-    else // setter
-    {
-        ptr->setHtml( fn.arg(0).to_bool() );
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_selectable(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value(ptr->isSelectable());
-    }
-    else // setter
-    {
-        ptr->setSelectable( fn.arg(0).to_bool() );
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_length(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        const std::string& s = ptr->get_text_value();
-        return as_value(s.length()); // TOCHECK: utf-8 ?
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set length property of TextField %s"),
-            ptr->getTarget());
-        );
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_textHeight(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // Return the height, in pixels, of the text as laid out.
-        // (I.e. the actual text content, not our defined
-        // bounding box.)
-        //
-        // In local coords.  Verified against Macromedia Flash.
-        return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().height()));
-
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set read-only %s property of TextField "
-                "%s"), "textHeight", ptr->getTarget());
-        );
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_textWidth(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // Return the width, in pixels, of the text as laid out.
-        // (I.e. the actual text content, not our defined
-        // bounding box.)
-        //
-        // In local coords.  Verified against Macromedia Flash.
-        return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().width()));
-
-    }
-    else // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Attempt to set read-only %s property of TextField %s"),
-            "textWidth", ptr->getTarget());
-        );
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_autoSize(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return ptr->autoSizeValueName(ptr->getAutoSize());
-    }
-    else // setter
-    {
-        const as_value& arg = fn.arg(0);
-        if ( arg.is_bool() )
-        {
-            if ( arg.to_bool() ) // true == left
-            {
-                ptr->setAutoSize( TextField::autoSizeLeft );
-            }
-            else
-            {
-                ptr->setAutoSize( TextField::autoSizeNone );
-            }
-        }
-        else
-        {
-            std::string strval = arg.to_string();
-            TextField::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
-            //log_debug("%s => %d", strval, val);
-            ptr->setAutoSize( val );
-        }
-    }
-
-    return as_value();
-}
-
-static as_value
-textfield_type(const fn_call& fn)
-{
-    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
-
-    if (!fn.nargs)
-    {
-        // getter
-        return ptr->typeValueName(ptr->getType());
-    }
-
-    // setter
-    const as_value& arg = fn.arg(0);
-    std::string strval = arg.to_string();
-    TextField::TypeValue val = ptr->parseTypeValue(strval);
-
-    IF_VERBOSE_ASCODING_ERRORS(
-        if ( val == TextField::typeInvalid )
-        {
-            log_aserror(_("Invalid value given to TextField.type: %s"), strval);
-        }
-    );
-    ptr->setType(val);
-    return as_value();
-}
-
-/* public static */
 TextField::AutoSizeValue
 TextField::parseAutoSizeValue(const std::string& val)
 {
@@ -2672,7 +1796,7 @@ TextField::parseAutoSizeValue(const std::string& val)
 
 }
 
-/* public static */
+
 const char*
 TextField::autoSizeValueName(AutoSizeValue val)
 {
@@ -2691,7 +1815,7 @@ TextField::autoSizeValueName(AutoSizeValue val)
 
 }
 
-/* public static */
+
 TextField::TypeValue
 TextField::parseTypeValue(const std::string& val)
 {
@@ -2709,7 +1833,7 @@ TextField::parseTypeValue(const std::string& val)
 
 }
 
-/* public static */
+
 const char*
 TextField::typeValueName(TypeValue val)
 {
@@ -2816,6 +1940,897 @@ TextField::markReachableResources() const
     // recurse to parent...
     markCharacterReachable();
 }
+
+/// TextField interface functions
+
+namespace {
+
+void
+attachPrototypeProperties(as_object& o)
+{
+    // Standard flags.
+    const int flags = as_prop_flags::dontDelete
+        |as_prop_flags::dontEnum;
+
+    // SWF6 or higher
+    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
+
+    boost::intrusive_ptr<builtin_function> getset;
+
+    // The following properties should only be attached to the prototype
+    // on first textfield creation.
+    o.init_property(NSV::PROP_TEXT_WIDTH,
+            textfield_textWidth, textfield_textWidth);
+    o.init_property(NSV::PROP_TEXT_HEIGHT,
+            textfield_textHeight, textfield_textHeight);
+
+    getset = new builtin_function(textfield_variable);
+    o.init_property("variable", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_background);
+    o.init_property("background", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_text);
+    o.init_property("text", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_backgroundColor);
+    o.init_property("backgroundColor", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_border);
+    o.init_property("border", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_borderColor);
+    o.init_property("borderColor", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_textColor);
+    o.init_property("textColor", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_embedFonts);
+    o.init_property("embedFonts", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_autoSize);
+    o.init_property("autoSize", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_type);
+    o.init_property("type", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_wordWrap);
+    o.init_property("wordWrap", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_html);
+    o.init_property("html", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_selectable);
+    o.init_property("selectable", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_length);
+    o.init_property("length", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_maxscroll);
+    o.init_property("maxscroll", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_maxhscroll);
+    o.init_property("maxhscroll", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_maxChars);
+    o.init_property("maxChars", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_bottomScroll);
+    o.init_property("bottomScroll", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_scroll);
+    o.init_property("scroll", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_hscroll);
+    o.init_property("hscroll", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_restrict);
+    o.init_property("restrict", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_multiline);
+    o.init_property("multiline", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_password);
+    o.init_property("password", *getset, *getset, swf6Flags);
+    getset = new builtin_function(textfield_htmlText);
+    o.init_property("htmlText", *getset, *getset, swf6Flags);
+}
+
+
+as_value
+textfield_background(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->getDrawBackground());
+    }
+    else // setter
+    {
+        ptr->setDrawBackground(fn.arg(0).to_bool());
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_border(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->getDrawBorder());
+    }
+    else // setter
+    {
+        ptr->setDrawBorder(fn.arg(0).to_bool());
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_backgroundColor(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->getBackgroundColor().toRGB());
+    }
+    else // setter
+    {
+        rgba newColor;
+        newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_int()));
+        ptr->setBackgroundColor(newColor);
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_borderColor(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->getBorderColor().toRGB());
+    }
+    else // setter
+    {
+        rgba newColor;
+        newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
+        ptr->setBorderColor(newColor);
+    }
+
+    return as_value();
+}
+
+    
+as_value
+textfield_textColor(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(ptr->getTextColor().toRGB());
+    }
+
+    // Setter
+    rgba newColor;
+    newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
+    ptr->setTextColor(newColor);
+
+    return as_value();
+}
+
+as_value
+textfield_embedFonts(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(ptr->getEmbedFonts());
+    }
+
+    // Setter
+    ptr->setEmbedFonts( fn.arg(0).to_bool() );
+    return as_value();
+}
+
+as_value
+textfield_wordWrap(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->doWordWrap());
+    }
+    else // setter
+    {
+        ptr->setWordWrap( fn.arg(0).to_bool() );
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_html(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->doHtml());
+    }
+    else // setter
+    {
+        ptr->setHtml( fn.arg(0).to_bool() );
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_selectable(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value(ptr->isSelectable());
+    }
+    else // setter
+    {
+        ptr->setSelectable( fn.arg(0).to_bool() );
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_length(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        const std::string& s = ptr->get_text_value();
+        return as_value(s.length()); // TOCHECK: utf-8 ?
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set length property of TextField %s"),
+            ptr->getTarget());
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_textHeight(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        // Return the height, in pixels, of the text as laid out.
+        // (I.e. the actual text content, not our defined
+        // bounding box.)
+        //
+        // In local coords.  Verified against Macromedia Flash.
+        return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().height()));
+
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set read-only %s property of TextField "
+                "%s"), "textHeight", ptr->getTarget());
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_textWidth(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        // Return the width, in pixels, of the text as laid out.
+        // (I.e. the actual text content, not our defined
+        // bounding box.)
+        //
+        // In local coords.  Verified against Macromedia Flash.
+        return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().width()));
+
+    }
+    else // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Attempt to set read-only %s property of TextField %s"),
+            "textWidth", ptr->getTarget());
+        );
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_autoSize(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return ptr->autoSizeValueName(ptr->getAutoSize());
+    }
+    else // setter
+    {
+        const as_value& arg = fn.arg(0);
+        if ( arg.is_bool() )
+        {
+            if ( arg.to_bool() ) // true == left
+            {
+                ptr->setAutoSize( TextField::autoSizeLeft );
+            }
+            else
+            {
+                ptr->setAutoSize( TextField::autoSizeNone );
+            }
+        }
+        else
+        {
+            std::string strval = arg.to_string();
+            TextField::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
+            //log_debug("%s => %d", strval, val);
+            ptr->setAutoSize( val );
+        }
+    }
+
+    return as_value();
+}
+
+as_value
+textfield_type(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // getter
+        return ptr->typeValueName(ptr->getType());
+    }
+
+    // setter
+    const as_value& arg = fn.arg(0);
+    std::string strval = arg.to_string();
+    TextField::TypeValue val = ptr->parseTypeValue(strval);
+
+    IF_VERBOSE_ASCODING_ERRORS(
+        if ( val == TextField::typeInvalid )
+        {
+            log_aserror(_("Invalid value given to TextField.type: %s"), strval);
+        }
+    );
+    ptr->setType(val);
+    return as_value();
+}
+
+
+as_value
+textfield_variable(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // Getter
+        const std::string& varName = text->getVariableName();
+        // An empty variable name returns null.
+        if (varName.empty()) {
+            as_value null;
+            null.set_null();
+            return null;
+        }
+        return as_value(varName);
+    }
+
+    // Setter
+    const as_value& varName = fn.arg(0);
+    if (varName.is_undefined() || varName.is_null()) {
+        text->set_variable_name("");
+    }
+    else text->set_variable_name(varName.to_string());
+
+    return as_value();
+
+}
+
+
+as_value
+textfield_getDepth(const fn_call& fn)
+{
+    // TODO: make this a character::getDepth_method function...
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    int n = text->get_depth();
+
+    return as_value(n);
+
+}
+
+as_value
+textfield_getFontList(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE(log_unimpl("TextField.getFontList()"));
+
+    return as_value();
+}
+
+as_value
+textfield_getNewTextFormat(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE(log_unimpl("TextField.getNewTextFormat()"));
+
+    return as_value();
+}
+
+as_value
+textfield_getTextFormat(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    boost::intrusive_ptr<TextFormat> tf = new TextFormat();
+    tf->alignSet(text->getTextAlignment());
+    tf->sizeSet(text->getFontHeight());
+    tf->indentSet(text->getIndent());
+    tf->blockIndentSet(text->getBlockIndent());
+    tf->leadingSet(text->getLeading());
+    tf->leftMarginSet(text->getLeftMargin());
+    tf->rightMarginSet(text->getRightMargin());
+    tf->colorSet(text->getTextColor());
+    tf->underlinedSet(text->getUnderlined());
+
+    const Font* font = text->getFont();
+    if (font)
+    {
+        tf->fontSet(font->get_name());
+        tf->italicedSet(font->isItalic());
+        tf->boldSet(font->isBold());
+    }
+
+    // TODO: add font color and some more
+
+    LOG_ONCE(
+        log_unimpl("TextField.getTextFormat() discards url, target, "
+            "tabStops, bullet and display")
+    );
+
+    return as_value(tf.get());
+}
+
+as_value
+textfield_setTextFormat(const fn_call& fn)
+{
+    //GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    if ( ! fn.nargs )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
+            _("missing arg"))
+        );
+        return as_value();
+    }
+    else if ( fn.nargs > 2 )
+    {
+        std::stringstream ss; fn.dump_args(ss);
+        log_debug("TextField.setTextFormat(%s) : args past the first are "
+                "unhandled by Gnash", ss.str());
+    }
+
+    as_object* obj = fn.arg(0).to_object().get();
+    if ( ! obj )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(), 
+            _("first argument is not an object"))
+        );
+        return as_value();
+    }
+
+    TextFormat* tf = dynamic_cast<TextFormat*>(obj);
+    if ( ! tf )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+        log_aserror("TextField.setTextFormat(%s) : %s", ss.str(),
+            _("first argument is not a TextFormat"))
+        );
+        return as_value();
+    }
+
+    if ( tf->alignDefined() ) text->setAlignment(tf->align());
+    if ( tf->sizeDefined() ) text->setFontHeight(tf->size()); // keep twips
+    if ( tf->indentDefined() ) text->setIndent(tf->indent());
+    if ( tf->blockIndentDefined() ) text->setBlockIndent(tf->blockIndent());
+    if ( tf->leadingDefined() ) text->setLeading(tf->leading());
+    if ( tf->leftMarginDefined() ) text->setLeftMargin(tf->leftMargin());
+    if ( tf->rightMarginDefined() ) text->setRightMargin(tf->rightMargin());
+    if ( tf->colorDefined() ) text->setTextColor(tf->color());
+    if ( tf->underlinedDefined() ) text->setUnderlined(tf->underlined());
+
+    if ( tf->fontDefined() )
+    {
+        const std::string& fontName = tf->font();
+        if ( ! fontName.empty() )
+        {
+            bool bold = tf->bold();
+            bool italic = tf->italiced();
+
+            // NOTE: should query movie-private font lib, not global-shared one
+            movie_instance* mi = text->get_root();
+            assert(mi);
+            movie_definition* md = mi->get_movie_definition();
+            assert(md);
+            Font* f = md->get_font(fontName, bold, italic);
+            if ( ! f ) f = fontlib::get_font(fontName, bold, italic);
+            text->setFont( f );
+        }
+    }
+
+    // TODO: add font color and some more
+
+    LOG_ONCE( log_unimpl("TextField.setTextFormat() discards url, target, "
+                "tabStops, bullet and display") );
+
+    return as_value();
+
+}
+
+as_value
+textfield_setNewTextFormat(const fn_call& fn)
+{
+    //boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    //UNUSED(text);
+
+    LOG_ONCE( log_unimpl("TextField.setNewTextFormat(), we'll delegate "
+                "to setTextFormat") );
+    return textfield_setTextFormat(fn);
+
+    //return as_value();
+}
+
+as_value
+textfield_password(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    LOG_ONCE(log_unimpl("TextField.password"));
+
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(text->password());
+    }
+    // Setter
+    text->password(fn.arg(0).to_bool());
+    return as_value();
+}
+
+as_value
+textfield_multiline(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    LOG_ONCE(log_unimpl("TextField.multiline"));
+
+    if (!fn.nargs) {
+        // Getter
+        return as_value(text->multiline());
+    }
+    // Setter
+    text->multiline(fn.arg(0).to_bool());
+    return as_value();
+}
+
+as_value
+textfield_restrict(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE (log_unimpl("TextField.restrict"));
+
+    return as_value();
+}
+
+as_value
+textfield_bottomScroll(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE (log_unimpl("TextField.bottomScroll"));
+
+    return as_value();
+}
+
+as_value
+textfield_maxhscroll(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE (log_unimpl("TextField.maxhscroll"));
+
+    return as_value();
+}
+
+/// TextField.maxChars().
+//
+/// This does not limit the length of the text, but rather the
+/// number of characters that can be entered in the TextField.
+//
+/// Returns null when the value is 0.
+as_value
+textfield_maxChars(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    LOG_ONCE(log_unimpl("TextField.maxChars"));
+
+    if (!fn.nargs)
+    {
+        boost::int32_t maxChars = text->maxChars();
+        if (maxChars == 0)
+        {
+            as_value null;
+            null.set_null();
+            return null;
+        }
+        return as_value(maxChars);
+    }
+    // Setter
+    text->maxChars(fn.arg(0).to_int());
+    return as_value();
+}
+
+as_value
+textfield_text(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+    if (!fn.nargs)
+    {
+        // Getter
+        //
+        // FIXME: should return text without HTML tags.
+        return as_value(ptr->get_text_value());
+    }
+
+    // Setter
+    int version = ptr->getVM().getSWFVersion();
+    ptr->setTextValue(
+            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
+
+    return as_value();
+}
+
+as_value
+textfield_htmlText(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
+    if (!fn.nargs)
+    {
+        // Getter
+        return as_value(ptr->get_text_value());
+    }
+
+    // Setter
+    int version = ptr->getVM().getSWFVersion();
+    ptr->setTextValue(
+            utf8::decodeCanonicalString(fn.arg(0).to_string(), version));
+
+    return as_value();
+}
+
+
+as_value
+textfield_replaceSel(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE (log_unimpl("TextField.replaceSel()"));
+
+    return as_value();
+}
+
+as_value
+textfield_scroll(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE (log_unimpl("TextField.scroll()"));
+
+    return as_value();
+}
+
+as_value
+textfield_hscroll(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE (log_unimpl("TextField.hscroll()"));
+
+    return as_value();
+}
+
+as_value
+textfield_maxscroll(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE (log_unimpl("TextField.maxscroll"));
+
+    return as_value();
+}
+
+as_value
+textfield_replaceText(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+    UNUSED(text);
+
+    LOG_ONCE(log_unimpl("TextField.replaceText()"));
+
+    return as_value();
+}
+
+as_value
+textfield_removeTextField(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
+
+    text->removeTextField();
+
+    LOG_ONCE(log_debug("TextField.removeTextField() TESTING"));
+
+    return as_value();
+}
+
+
+/// This is called for 'new TextField()' only
+as_value
+textfield_ctor(const fn_call& /* fn */)
+{
+    as_object* proto = getTextFieldInterface(VM::get());
+
+    // We should attach more properties to the prototype on first
+    // instantiation.
+    // TODO: this also attaches properties to the SWF5 prototype but makes
+    // them invisible with prop flags. Is this correct?
+    attachPrototypeProperties(*proto);
+
+    boost::intrusive_ptr<as_object> obj = new as_object(proto);
+
+    return as_value(obj);
+}
+
+
+void
+attachTextFieldInterface(as_object& o)
+{
+    boost::intrusive_ptr<builtin_function> getset;
+
+    // TextField is an AsBroadcaster
+    AsBroadcaster::initialize(o);
+
+    int propFlags = as_prop_flags::dontDelete
+        |as_prop_flags::dontEnum
+        |as_prop_flags::readOnly
+        |as_prop_flags::isProtected;
+
+    // Parent seems to not be a normal property
+    getset = new builtin_function(&character::parent_getset, NULL);
+    o.init_property(NSV::PROP_uPARENT, *getset, *getset);
+
+    // Target seems to not be a normal property
+    getset = new builtin_function(&character::target_getset, NULL);
+    o.init_property(NSV::PROP_uTARGET, *getset, *getset);
+
+    // _name should be a property of the instance, not the prototype
+    getset = new builtin_function(&character::name_getset, NULL);
+    o.init_property(NSV::PROP_uNAME, *getset, *getset);
+
+    o.init_property(NSV::PROP_uXMOUSE,
+            character::xmouse_get, character::xmouse_get, propFlags);
+    o.init_property(NSV::PROP_uYMOUSE,
+            character::ymouse_get, character::ymouse_get, propFlags);
+    o.init_property(NSV::PROP_uXSCALE,
+            character::xscale_getset, character::xscale_getset);
+    o.init_property(NSV::PROP_uYSCALE,
+            character::yscale_getset, character::yscale_getset);
+    // Standard flags.
+    const int flags = as_prop_flags::dontDelete
+        |as_prop_flags::dontEnum;
+
+    // SWF6 or higher
+    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
+
+    o.init_member("setTextFormat", 
+            new builtin_function(textfield_setTextFormat), swf6Flags);
+    o.init_member("getTextFormat", 
+            new builtin_function(textfield_getTextFormat), swf6Flags);
+    o.init_member("setNewTextFormat",
+            new builtin_function(textfield_setNewTextFormat), swf6Flags);
+    o.init_member("getNewTextFormat",
+            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+    o.init_member("getNewTextFormat",
+            new builtin_function(textfield_getNewTextFormat), swf6Flags);
+    o.init_member("getDepth",
+            new builtin_function(textfield_getDepth), swf6Flags);
+    o.init_member("removeTextField",
+            new builtin_function(textfield_removeTextField), swf6Flags);
+    o.init_member("replaceSel",
+            new builtin_function(textfield_replaceSel), swf6Flags);
+
+    // SWF7 or higher
+    const int swf7Flags = flags | as_prop_flags::onlySWF7Up;
+
+    o.init_member("replaceText",
+            new builtin_function(textfield_replaceText), swf7Flags);
+
+}
+
+void
+attachTextFieldStaticMembers(as_object& o)
+{
+    // Standard flags.
+    const int flags = as_prop_flags::dontDelete
+        |as_prop_flags::dontEnum;
+
+    // SWF6 or higher
+    const int swf6Flags = flags | as_prop_flags::onlySWF6Up;
+
+    o.init_member("getFontList",
+            new builtin_function(textfield_getFontList), swf6Flags);
+
+}
+
+/// This is called when a prototype should be added
+//
+/// @note   This is called at different times, depending on the version.
+///         For SWF5 it is called only on first instantiation. For SWF6 it
+///         is called at the registration of _global.TextField.
+as_object*
+getTextFieldInterface(VM& vm)
+{
+    static boost::intrusive_ptr<as_object> proto;
+
+    if ( proto == NULL )
+    {
+        if (vm.getSWFVersion() < 6) {
+            /// The prototype for SWF5 is a simple as_object without
+            /// toString() or valueOf().
+            proto = new as_object();
+        }
+        else {
+            proto = new as_object(getObjectInterface());
+            vm.addStatic(proto.get());
+            attachTextFieldInterface(*proto);
+        }
+
+    }
+    return proto.get();
+}
+
+} // anonymous namespace
 
 } // namespace gnash
 
