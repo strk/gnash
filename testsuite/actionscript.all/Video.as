@@ -124,6 +124,6 @@ check(!Video.prototype.hasOwnProperty("_ymouse"));
 check(!Video.prototype.hasOwnProperty("_yscale"));
 check(!Video.prototype.hasOwnProperty("_xmouse"));
 
-check_totals(61);
+check_totals(79);
 
 #endif
