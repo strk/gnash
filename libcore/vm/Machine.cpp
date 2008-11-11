@@ -1298,6 +1298,12 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		as_object* object = pop_stack().to_object().get();
+		if(!object){
+			//TODO: Should this result in an exeception or an actionscript error?
+			LOG_DEBUG_AVM("Can't constructor property on a null object.  Property not constructed.");
+			push_stack(as_value());
+			break;
+		}
 		std::string& classname = mPoolObject->mStringPool[a.getABCName()];
 		
 		as_value constructor_val = object->getMember(a.getGlobalName());
