@@ -280,7 +280,8 @@ Font::add_os_glyph(boost::uint16_t code)
     float advance;
 
     // Get the vectorial glyph
-    boost::intrusive_ptr<shape_character_def> sh = _ftProvider->getGlyph(code, advance);
+    boost::intrusive_ptr<shape_character_def> sh = 
+        _ftProvider->getGlyph(code, advance);
 
     if ( ! sh )
     {
@@ -309,7 +310,8 @@ Font::initDeviceFontProvider() const
 {
     if ( _name.empty() )
     {
-        log_error("No name associated with this font, can't use device fonts (should I use a default one?)");
+        log_error("No name associated with this font, can't use device "
+                "fonts (should I use a default one?)");
         return false;
     }
 
@@ -336,8 +338,8 @@ Font::get_leading() const {
 
 // TODO: what about device fonts?
 float
-Font::get_descent() const { 
-    return _fontTag ? _fontTag->leading() : 0.0f;
+Font::get_descent() const {
+    return _fontTag ? _fontTag->descent() : 0.0f;
 }
     
 // TODO: what about device fonts?

@@ -96,8 +96,8 @@ DefineEditTextTag::read(SWFStream& in, movie_definition& m)
 	if (hasFontClass && hasFont )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror("DefineEditText: hasFontClass can't be true if hasFont "
-                "is true, ignoring");
+		    log_swferror("DefineEditText: hasFontClass can't be true if "
+                "hasFont is true, ignoring");
 		);
 		hasFontClass = false;
 	}

@@ -100,7 +100,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         in.ensureBytes(2);
         _yOffset = in.read_s16();
         IF_VERBOSE_PARSE(
-            log_parse(_("  _yOffset = %g"), _yOffset);
+            log_parse(_("  yOffset = %g"), _yOffset);
         );
     }
 
@@ -118,7 +118,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
     if (!glyphCount) return false;
 
     IF_VERBOSE_PARSE(
-        log_parse(_("  glyph_records: count = %d"), glyphCount);
+        log_parse(_("  GlyphEntries: count = %d"), glyphCount);
     );
 
     in.ensureBits(glyphCount * (glyphBits + advanceBits));
@@ -194,14 +194,13 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
 
         rgba textColor = cx.transform(rec.color());
 
-        typedef SWF::TextRecord::Glyphs Glyphs;
         for (Glyphs::const_iterator j = rec.glyphs().begin(),
                 je = rec.glyphs().end(); j != je; ++j)
         {
             // the glyph entry
             const SWF::TextRecord::GlyphEntry& ge = *j;
 
-            int    index = ge.index;
+            const int index = ge.index;
                 
             mat = base_matrix;
             mat.concatenate_translation(x, y);
@@ -223,7 +222,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
                 //       square is not hard-coded anymore but can be
                 //       queried from the font class
                 //
-                static const boost::int16_t    s_empty_char_box[5 * 2] =
+                static const boost::int16_t s_empty_char_box[5 * 2] =
                 {
                      32,   32,
                     480,   32,
@@ -247,8 +246,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
     log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
 #endif
 
-                    gnash::render::draw_glyph(glyph, mat,
-                            textColor);
+                    gnash::render::draw_glyph(glyph, mat, textColor);
                 }
             }
             x += ge.advance;
