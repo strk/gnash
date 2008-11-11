@@ -141,9 +141,11 @@ static as_value netstream_close(const fn_call& fn)
 	return as_value();
 }
 
-static as_value netstream_pause(const fn_call& fn)
+static as_value
+netstream_pause(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
 	NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
@@ -156,7 +158,8 @@ static as_value netstream_pause(const fn_call& fn)
 	return as_value();
 }
 
-static as_value netstream_play(const fn_call& fn)
+static as_value
+netstream_play(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 

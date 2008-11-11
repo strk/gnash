@@ -63,12 +63,12 @@ public:
 	rect getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
-	virtual void	advance();
+	virtual void advance();
 
 	/// Register this video instance as a live character
 	virtual void stagePlacementCallback();
 
-	void	display();
+	void display();
 
 	// For sure isActionScriptReferenceable...
 	bool wantsInstanceName() const
@@ -80,6 +80,8 @@ public:
 
 	/// Set the input stream for this video
 	void setStream(boost::intrusive_ptr<NetStream_as> ns);
+
+    void clear();
 
 protected:
 
@@ -103,11 +105,6 @@ private:
 
 	/// Get video frame to be displayed
 	GnashImage* getVideoFrame();
-
-	// m_video_source - A Camera object that is capturing video data or a NetStream object.
-	// To drop the connection to the Video object, pass null for source.
-	// FIXME: don't use as_object, but a more meaningful type
-	//as_object* m_video_source;
 
 	// Who owns this ? Should it be an intrusive ptr ?
 	boost::intrusive_ptr<NetStream_as> _ns;
