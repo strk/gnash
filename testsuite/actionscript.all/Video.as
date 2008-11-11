@@ -78,6 +78,12 @@ check_equals (typeof(videoObj._rotation), 'undefined');
 check_equals (typeof(videoObj._target), 'undefined');
 check_equals (typeof(videoObj._parent), 'undefined');
 
+nc = new NetConnection();
+nc.connect(null);
+ns = new NetStream(nc);
+videoObj.attachVideo(ns);
+ns.play(MEDIA(square.flv));
+
 check(!videoObj.hasOwnProperty("attachVideo"));
 check(!videoObj.hasOwnProperty("smoothing"));
 check(!videoObj.hasOwnProperty("deblocking"));
@@ -98,6 +104,25 @@ check(!videoObj.hasOwnProperty("_y"));
 check(!videoObj.hasOwnProperty("_ymouse"));
 check(!videoObj.hasOwnProperty("_yscale"));
 check(!videoObj.hasOwnProperty("_xmouse"));
+
+check(!Video.prototype.hasOwnProperty("smoothing"));
+check(!Video.prototype.hasOwnProperty("deblocking"));
+check(!Video.prototype.hasOwnProperty("_alpha"));
+check(!Video.prototype.hasOwnProperty("_height"));
+check(!Video.prototype.hasOwnProperty("height"));
+check(!Video.prototype.hasOwnProperty("_name"));
+check(!Video.prototype.hasOwnProperty("_parent"));
+check(!Video.prototype.hasOwnProperty("_rotation"));
+check(!Video.prototype.hasOwnProperty("_visible"));
+check(!Video.prototype.hasOwnProperty("_width"));
+check(!Video.prototype.hasOwnProperty("width"));
+check(!Video.prototype.hasOwnProperty("_x"));
+check(!Video.prototype.hasOwnProperty("_xmouse"));
+check(!Video.prototype.hasOwnProperty("_xscale"));
+check(!Video.prototype.hasOwnProperty("_y"));
+check(!Video.prototype.hasOwnProperty("_ymouse"));
+check(!Video.prototype.hasOwnProperty("_yscale"));
+check(!Video.prototype.hasOwnProperty("_xmouse"));
 
 check_totals(61);
 

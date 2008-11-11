@@ -296,6 +296,12 @@ main(int argc, char** argv)
   //------------------------------------------
   // Now attach video to the video characters
   //------------------------------------------
+  check(mo, "Video.prototype.hasOwnProperty('attachVideo')");
+  check(mo, "Video.prototype.hasOwnProperty('smoothing')");
+  check(mo, "Video.prototype.hasOwnProperty('deblocking')");
+  check(mo, "Video.prototype.hasOwnProperty('clear')");
+  check(mo, "Video.prototype.hasOwnProperty('height')");
+  check(mo, "Video.prototype.hasOwnProperty('width')");
   
   add_actions(mo, "video.attachVideo(stream);"); 
   add_actions(mo, "video2.attachVideo(stream2);"); 
@@ -376,6 +382,27 @@ main(int argc, char** argv)
   check_equals(mo, "video._yscale", "100");
   check_equals(mo, "video._rotation", "0");
   check_equals(mo, "video._target", "'/video'");
+  check(mo, "Video.prototype.hasOwnProperty('attachVideo')");
+  check(mo, "Video.prototype.hasOwnProperty('smoothing')");
+  check(mo, "Video.prototype.hasOwnProperty('deblocking')");
+  check(mo, "Video.prototype.hasOwnProperty('clear')");
+  check(mo, "Video.prototype.hasOwnProperty('height')");
+  check(mo, "Video.prototype.hasOwnProperty('width')");
+
+  check(mo, "!Video.prototype.hasOwnProperty('_alpha')");
+  check(mo, "!Video.prototype.hasOwnProperty('_height')");
+  check(mo, "!Video.prototype.hasOwnProperty('_name')");
+  check(mo, "!Video.prototype.hasOwnProperty('_parent')");
+  check(mo, "!Video.prototype.hasOwnProperty('_rotation')");
+  check(mo, "!Video.prototype.hasOwnProperty('_visible')");
+  check(mo, "!Video.prototype.hasOwnProperty('_width')");
+  check(mo, "!Video.prototype.hasOwnProperty('_x')");
+  check(mo, "!Video.prototype.hasOwnProperty('_xmouse')");
+  check(mo, "!Video.prototype.hasOwnProperty('_xscale')");
+  check(mo, "!Video.prototype.hasOwnProperty('_y')");
+  check(mo, "!Video.prototype.hasOwnProperty('_ymouse')");
+  check(mo, "!Video.prototype.hasOwnProperty('_yscale')");
+  check(mo, "!Video.prototype.hasOwnProperty('_xmouse')");
 
   add_actions(mo,
 		"video._x = 100;"
@@ -615,7 +642,7 @@ main(int argc, char** argv)
   check_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(142); stop(); end_of_test=true;"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(162); stop(); end_of_test=true;"));
 
   SWFMovie_nextFrame(mo);
 
