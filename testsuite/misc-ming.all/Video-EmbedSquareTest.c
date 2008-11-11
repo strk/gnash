@@ -53,8 +53,11 @@ main(int argc, char** argv)
   SWFVideoStream stream;
   SWFDisplayItem item;
   SWFMovieClip mc;
-  FILE *flv;
+  SWFMovieClip dejagnuclip;
+  FILE *flv, *font_file;
+  SWFFont font;
   char filename[256];
+  char fdbfont[1024];
 
   if ( argc>1 ) mediadir=argv[1];
   else
@@ -71,9 +74,18 @@ main(int argc, char** argv)
 	  return -1;
   }
 
+  sprintf(fdbfont, "%s/Bitstream-Vera-Sans.fdb", mediadir);
+  font_file = fopen(fdbfont, "r");
+  if ( font_file == NULL )
+  {
+    perror(fdbfont);
+    exit(1);
+  }
+
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
 
+  font = loadSWFFontFromFile(font_file);
 	
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 320, 96);
@@ -82,8 +94,14 @@ main(int argc, char** argv)
 
   SWFMovie_setRate(mo, 5);
 
+  dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 200, 200);
+  item = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  SWFDisplayItem_setDepth(item, 200); 
+  SWFDisplayItem_move(item, 140, 0); 
+
   stream = newSWFVideoStream_fromFile(flv);
   item = SWFMovie_add(mo, (SWFBlock)stream);
+  SWFDisplayItem_setName(item, "vid");
 
   // A bug in Ming prevents this from working the
   // way I liked it to. It was useful to try this
@@ -117,7 +135,20 @@ main(int argc, char** argv)
   // TODO: dynamic frame rate adjust
   frames = SWFVideoStream_getNumFrames(stream);
   for(; frames > 0; frames--)
+  {
     SWFMovie_nextFrame(mo);
+  }
+
+  /// Video.clear() should not work on embedded Videos.
+  add_actions(mo, "stop(); vid.clear(); trace(vid);");
+  add_actions(mo, "note('You should still see the video frame."
+          " Click to replay');"
+		  "o = {};"
+		  "o.onMouseDown = function() { _root.play(); };"
+		  "Mouse.addListener(o);"
+	     );
+
+  SWFMovie_nextFrame(mo);
 
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
