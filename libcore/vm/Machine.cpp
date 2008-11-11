@@ -2278,10 +2278,10 @@ Machine::execute()
 ///  truth -- Truth of "obj is of type"
 	case SWF::ABC_ACTION_ISTYPELATE:
 	{
-		bool truth;
-		ABSTRACT_TYPELATE(truth, mStack.top(1), mStack.top(0));
-		mStack.top(1).set_bool(truth);
-		mStack.drop(1);
+		as_value type = pop_stack();
+		as_value value = pop_stack();
+		bool truth = value.to_object().get()->instanceOf(type.to_object().get());
+		push_stack(as_value(truth));
 		break;
 	}
 /// 0xB4 ABC_ACTION_IN
