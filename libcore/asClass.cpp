@@ -40,6 +40,10 @@ asMethod::asMethod():mBody()
 void
 asMethod::print_body()
 {
+		if(!mBody){
+			log_parse("Method has no body.");
+			return;
+		}
 		boost::uint8_t opcode;
 		std::stringstream ss;
 		ss << "Method Body: ";
