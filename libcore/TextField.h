@@ -273,13 +273,6 @@ public:
 	///
 	static const char* autoSizeValueName(AutoSizeValue val);
 
-    /// Attaches more properties to the prototype on first instantiation.
-    //
-    /// @param proto    The prototype of the TextField object.
-    //
-    /// This is used when constructing non-AS textfields.
-    static void attachTextFieldInstanceProperties(as_object& proto);
-
 	/// Set type (input or dynamic)
 	//
 	/// @param val
