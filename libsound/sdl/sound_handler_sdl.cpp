@@ -147,7 +147,7 @@ SDL_sound_handler::reset()
 void
 SDL_sound_handler::delete_all_sounds()
 {
-    stop_all_sounds();
+    stop_all_sounds(); // should unplug every instance of embedded sounds
 
     boost::mutex::scoped_lock lock(_mutex);
 
@@ -160,14 +160,12 @@ SDL_sound_handler::delete_all_sounds()
         if (!sdef) continue;
 
         size_t nInstances = sdef->numPlayingInstances();
-
-        log_debug("delete_all_sounds: marking %d instances of embedded sound as stopped",
-                    nInstances);
+        assert(!nInstances); // we stopped them all didn't we ?
 
         // Increment number of sound stop request for the testing framework
         _soundsStopped += nInstances;
 
-        delete sdef;
+        delete sdef; // warning, plugged streams might be referencing this, if any
     }
     _sounds.clear();
 }
@@ -188,8 +186,17 @@ SDL_sound_handler::unplugAllInputStreams()
 
 SDL_sound_handler::~SDL_sound_handler()
 {
+    boost::mutex::scoped_lock lock(_mutex);
+#ifdef GNASH_DEBUG_SDL_AUDIO_PAUSING
+    log_debug("Pausing SDL Audio on destruction");
+#endif
+    SDL_PauseAudio(1);
+
+    lock.unlock();
+
     delete_all_sounds();
     unplugAllInputStreams();
+
     if (soundOpened) SDL_CloseAudio();
     if (file_stream) file_stream.close();
 
@@ -401,7 +408,7 @@ SDL_sound_handler::delete_sound(int sound_handle)
     
     stopEmbedSoundInstances(*def);
     delete def;
-    _sounds[sound_handle] = NULL;
+    _sounds[sound_handle] = 0;
 
 }
 
@@ -438,6 +445,7 @@ SDL_sound_handler::stop_all_sounds()
                           e = _sounds.end(); i != e; ++i)
     {
         EmbedSound* sounddata = *i;
+        if ( ! sounddata ) continue; // could have been deleted already
         stopEmbedSoundInstances(*sounddata);
     }
 }
@@ -808,7 +816,7 @@ SDL_sound_handler::fetchSamples (boost::uint8_t* stream, unsigned int buffer_len
                 }
                 it = it2;
 
-                log_debug("fetchSamples: marking stopped InputStream %p (on EOF)", is);
+                //log_debug("fetchSamples: marking stopped InputStream %p (on EOF)", is);
 
                 // WARNING! deleting the InputStream here means
                 //          a lot of things will happen from a
