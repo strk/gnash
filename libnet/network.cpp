@@ -258,7 +258,7 @@ Network::newConnection(bool block)
 int
 Network::newConnection(bool block, int fd)
 {
-    GNASH_REPORT_FUNCTION;
+  //    GNASH_REPORT_FUNCTION;
 
     struct sockaddr	newfsin;
     socklen_t		alen;
@@ -660,7 +660,7 @@ Network::closeNet(int sockfd)
 #endif
                 retries++;
             } else {
-		log_debug(_("Closed the socket on fd #%d for port %d"), sockfd, _port);
+		log_debug(_("Closed the socket on fd #%d"), sockfd);
                 return true;
             }
         }
@@ -781,17 +781,17 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_error (_("The socket for fd %d was interupted by a system call"), fd);
+            log_error (_("The socket for fd #%d was interupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            log_error (_("The socket for fd %d was never available for reading"), fd);
+            log_error (_("The socket for fd #%d was never available for reading"), fd);
             return -1;
         }
 
         if (ret == 0) {
 	    if (_debug) {
-		log_debug (_("The socket for fd %d timed out waiting to read"), fd);
+		log_debug (_("The socket for #fd %d timed out waiting to read"), fd);
 	    }
             return 0;
         }
@@ -964,28 +964,49 @@ Network::waitForNetData(int limit, struct pollfd *fds)
     while (ret--) {
 	for (int i = 0; i<limit; i++) {
 	    // If we get this event, the other end of the connection has been shut down
-#if 0
-	    if (fds[i].revents & POLLERR) {
-		log_debug("Revents has a  set %d", fds[i].revents);
+#if 1
+	    if (fds[i].revents &POLLPRI ) {
+		log_debug("%s: Revents has aPOLLPRI  set 0x%x",
+			  __FUNCTION__, fds[i].revents);
+	    }
+	    if (fds[i].revents & POLLRDNORM) {
+		log_debug("%s: Revents has a POLLRDNORM set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
 	    }
 	    if (fds[i].revents & POLLHUP) {
-		log_debug("Revents has a POLLHUP set %d", fds[i].revents);
+		log_debug("%s: Revents has a POLLHUP set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
+	    }
+
+
+	    if (fds[i].revents & POLLERR) {
+		log_debug("%s: Revents has a POLLERR set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
+	    }
+	    if (fds[i].revents & POLLHUP) {
+		log_debug("%s: Revents has a POLLHUP set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
 	    }
 	    if (fds[i].revents & POLLNVAL) {
-		log_debug("Revents has a POLLNVAL set %d", fds[i].revents);
+		log_debug("%s: Revents has a POLLNVAL set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
 //		throw GnashException("Polling an invalid file descritor");
 	    }
 	    if (fds[i].revents & POLLIN) {
-		log_debug("Revents has a POLLIN set %d", fds[i].revents);
+		log_debug("%s: Revents has a POLLIN set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
 	    }
 	    if (fds[i].revents & POLLMSG) {
-		log_debug("Revents has a POLLMSG set %d", fds[i].revents);
+		log_debug("%s: Revents has a POLLMSG set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
 	    }
 	    if (fds[i].revents & POLLREMOVE) {
-		log_debug("Revents has a POLLREMOVE set %d", fds[i].revents);
+		log_debug("%s: Revents has a POLLREMOVE set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
 	    }
 	    if (fds[i].revents & POLLRDHUP) {
-		log_debug("Revents has a POLLRDHUP set %d", fds[i].revents);
+		log_debug("%s: Revents has a POLLRDHUP set 0x%x",
+			  __FUNCTION__,  fds[i].revents);
 //		throw GnashException("Connection dropped from client side.");
 	    }
 #endif    
@@ -997,7 +1018,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 // 		    break;
 // 		}
 // 	    } else {
-// 		log_debug("No data on fd #%d, revents is %d", fds[i].fd, fds[i].revents);
+// 		log_debug("No data on fd #%d, revents is 0x%x", fds[i].fd, fds[i].revents);
 // 	    }
 	}
     }
@@ -1050,15 +1071,15 @@ Network::waitForNetData(int limit, fd_set files)
 #endif
     // If interupted by a system call, try again
     if (ret == -1 && errno == EINTR) {
-	log_error (_("Waiting for data for fdset %d was interupted by a system call"), reinterpret_cast<int>(fdset.fds_bits));
+	log_error (_("Waiting for data for fdset 0x%x was interupted by a system call"), reinterpret_cast<long>(fdset.fds_bits));
     }
     
     if (ret == -1) {
-	log_error (_("Waiting for data for fdset  %d was never available for reading"), reinterpret_cast<int>(fdset.fds_bits));
+	log_error (_("Waiting for data for fdset  0x%x was never available for reading"), reinterpret_cast<long>(fdset.fds_bits));
     }
     
     if (ret == 0) {
-	log_debug (_("Waiting for data for fdset  %d timed out waiting for data"), reinterpret_cast<int>(fdset.fds_bits));
+	log_debug (_("Waiting for data for fdset  0x%x timed out waiting for data"), reinterpret_cast<long>(fdset.fds_bits));
 	FD_ZERO(&fdset);
     }
 
