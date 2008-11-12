@@ -83,6 +83,18 @@ public:
 
     void clear();
 
+    /// Get the height of the video.
+    //
+    /// The method depends on whether it is an embedded or a live
+    /// stream.
+    int height() const;
+
+    /// Get the width of the video.
+    //
+    /// The method depends on whether it is an embedded or a live
+    /// stream.
+    int width() const;
+
 protected:
 
 #ifdef GNASH_USE_GC

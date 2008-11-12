@@ -345,6 +345,9 @@ public:
         return _playHead.getState();
     }
 
+    int videoHeight() const;
+    int videoWidth() const;
+
     /// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).
 	void close();

@@ -106,6 +106,20 @@ Video::initializeDecoder()
 	}
 }
 
+int
+Video::width() const
+{
+    if (_ns) return _ns->videoHeight();
+    return 0;
+}
+
+int
+Video::height() const
+{
+    if (_ns) return _ns->videoWidth();
+    return 0;
+}
+
 void
 Video::clear()
 {
@@ -448,20 +462,14 @@ as_value
 video_width(const fn_call& fn)
 {
 	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
-    UNUSED(video);
-
-    log_unimpl("Video.width");
-    return as_value();
+    return as_value(video->width());
 }
 
 as_value
 video_height(const fn_call& fn)
 {
 	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
-    UNUSED(video);
-
-    log_unimpl("Video.height");
-    return as_value();
+    return as_value(video->height());
 }
 
 as_value
