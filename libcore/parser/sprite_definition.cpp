@@ -209,6 +209,7 @@ sprite_definition::sprite_definition(movie_definition& m)
 {
 }
 
+
 /*
  * This function is not inlined to avoid having to include as_function.h
  * from sprite_definition.h. We need as_function.h for visibility of
