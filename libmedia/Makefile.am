@@ -41,7 +41,7 @@ libgnashmedia_la_CPPFLAGS = \
 	$(DMALLOC_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(LIBXML_CFLAGS) \
-	$(LIBPNG_CFLAGS) \
+	$(PNG_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(Z_CFLAGS) \

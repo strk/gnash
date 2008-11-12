@@ -2358,13 +2358,13 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${LIBPNG_LIBS}" != x ; then
-  if test x"${LIBPNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $LIBPNG_CFLAGS"
+if test x"${PNG_LIBS}" != x ; then
+  if test x"${PNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $PNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
   fi
-  echo "        PNG libs are: $LIBPNG_LIBS"
+  echo "        PNG libs are: $PNG_LIBS"
 else
   echo "        WARNING: No PNG library development package installed!" >&4
   echo "                 Gnash will be built without support for dynamic loading of PNG files." >&4
