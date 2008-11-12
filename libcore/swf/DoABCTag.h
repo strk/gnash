@@ -34,9 +34,8 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
 
-/// SWF Tag DoAction (12) 
+/// SWF Tag DoABC (72)
 //
-/// Thin wrapper around action_buffer.
 ///
 class DoABCTag : public ControlTag
 {
