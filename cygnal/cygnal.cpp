@@ -576,6 +576,7 @@ dispatch_handler(Handler::thread_params_t *args)
 		    }
 		    log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
 		    hand->getEntry(it->fd)(args);
+		    hand->erasePollFD(it);
 		    net.closeNet(it->fd);
 		}
 	    } catch (std::exception& e) {
@@ -584,8 +585,8 @@ dispatch_handler(Handler::thread_params_t *args)
 		if (hits) {
 		    for (it = hits->begin(); it != hits->end(); it++) {
 			log_debug("Need to disconnect fd #%d, it got an error.", (*it).fd);
-//		    hand->erasePollFD(*it);
-// 		    net.closeNet(*it);
+//		    hand->erasePollFD(it);
+// 		    net.closeNet(it->fd);
 		    }
 		}
 	    }
