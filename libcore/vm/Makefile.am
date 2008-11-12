@@ -45,7 +45,7 @@ libgnashvm_la_SOURCES = \
 	Machine.cpp \
 	ActionExec.cpp \
 	VM.cpp		\
-    action.cpp \
+	action.cpp \
 	CallStack.cpp \
 	CodeStream.cpp \
 	$(NULL)
