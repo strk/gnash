@@ -200,7 +200,7 @@ public:
 
 	/// Create a new asMethod object for use.
 	asMethod *newMethod()
-	{ mMethodMemory.grow(1); return &mMethodMemory.top(0);}
+	{ mMethodMemory.grow(1); return &mMethodMemory.top(0); }
 
 	asBoundValue *newBoundValue()
 	{ mBoundValueMemory.grow(1); return &mBoundValueMemory.top(0); }
