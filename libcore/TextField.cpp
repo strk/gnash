@@ -178,7 +178,8 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
 
 TextField::TextField(character* parent, const rect& bounds)
     :
-    character(parent, 0),
+    // the id trick is to fool assertions in character ctor
+    character(parent, parent ? 0 : -1),
     _text(L""),
     _textDefined(false),
     _underlined(false),
@@ -308,6 +309,7 @@ TextField::show_cursor(const SWFMatrix& mat)
 void
 TextField::display()
 {
+    GNASH_REPORT_FUNCTION;
 
     registerTextVariable();
 
@@ -2711,13 +2713,25 @@ textfield_ctor(const fn_call& /* fn */)
 {
     as_object* proto = getTextFieldInterface(VM::get());
 
-    // We should attach more properties to the prototype on first
-    // instantiation.
-    // TODO: this also attaches properties to the SWF5 prototype but makes
-    // them invisible with prop flags. Is this correct?
-    attachPrototypeProperties(*proto);
+    VM& vm = VM::get(); // TODO: ask fn about VM !
 
-    boost::intrusive_ptr<as_object> obj = new as_object(proto);
+    as_object* obj = 0;
+
+    if ( vm.getSWFVersion() < 9 )
+    {
+        // We should attach more properties to the prototype on first
+        // instantiation.
+        // TODO: this also attaches properties to the SWF5 prototype but makes
+        // them invisible with prop flags. Is this correct?
+        attachPrototypeProperties(*proto);
+
+        obj = new as_object(proto);
+    }
+    else
+    {
+        rect nullRect;
+        obj = new TextField(0, nullRect);
+    }
 
     return as_value(obj);
 }
