@@ -52,6 +52,7 @@ public:
 	/// value.
 	T& top(StackSize i)
 	{
+
 		if (i >= size()) 
 			throw StackException();
 		StackSize offset = mEnd - i;
@@ -78,6 +79,7 @@ public:
 
 		StackSize offset = mDownstop + i + 2;
 		//log_debug("value(%d): mEnd:%d, mDownstop:%d, offset:%d", i, mEnd, mDownstop, offset);
+
 		return mData[offset >> mChunkShift][offset & mChunkMod];
 	}
 
@@ -119,6 +121,7 @@ public:
 		StackSize n = size()+i;
 		while (available < n)
 		{
+//			log_debug("Increasing size of the real stack: %d.",mData.size());
 			mData.push_back(new T[1 << mChunkShift]);
 			available += 1 << mChunkShift;
 		}
