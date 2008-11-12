@@ -21,6 +21,7 @@ AUTOMAKE_OPTIONS = dejagnu
 # These will get executed and parsed for test output
 SANE_ASTESTS = \
 	Hello.hx \
+	AddChild.hx \
 	$(NULL)
 # These ones are the ones for which consistency check fail 
 BOGUS_ASTESTS = \
