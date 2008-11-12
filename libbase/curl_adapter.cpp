@@ -231,7 +231,7 @@ CurlSession::~CurlSession()
 
 CurlSession::CurlSession()
 	:
-	_shandle(0),
+    _shandle(0),
 	_shareMutex(),
 	_shareMutexLock(_shareMutex, GNASH_DEFER_LOCK), // start unlocked
 	_cookieMutex(),
@@ -862,6 +862,9 @@ are not honored during the DNS lookup - which you can  work  around  by
 
 /*public*/
 CurlStreamFile::CurlStreamFile(const std::string& url)
+    :
+    _handle(0),
+    _mhandle(0)
 {
 	log_debug("CurlStreamFile %p created", this);
 	init(url);

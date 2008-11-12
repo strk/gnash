@@ -1729,15 +1729,15 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 int
 NetStream_as::videoHeight() const
 {
-    assert(m_parser.get());
-    return m_parser->getVideoInfo()->height;
+    if (!_videoDecoder.get()) return 0;
+    return _videoDecoder->height();
 }
 
 int
 NetStream_as::videoWidth() const
 {
-    assert(m_parser.get());
-    return m_parser->getVideoInfo()->width;
+    if (!_videoDecoder.get()) return 0;
+    return _videoDecoder->width();
 }
 
 void

@@ -109,14 +109,14 @@ Video::initializeDecoder()
 int
 Video::width() const
 {
-    if (_ns) return _ns->videoHeight();
+    if (_ns) return _ns->videoWidth();
     return 0;
 }
 
 int
 Video::height() const
 {
-    if (_ns) return _ns->videoWidth();
+    if (_ns) return _ns->videoHeight();
     return 0;
 }
 

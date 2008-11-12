@@ -130,17 +130,23 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
 
     boost::uint8_t* extradata=0;
     int extradataSize=0;
-    if ( info.extra.get() )
+    if (info.extra.get())
     {
         if (dynamic_cast<ExtraVideoInfoFfmpeg*>(info.extra.get())) {
-            const ExtraVideoInfoFfmpeg& ei = static_cast<ExtraVideoInfoFfmpeg&>(*info.extra);
+            const ExtraVideoInfoFfmpeg& ei = 
+                static_cast<ExtraVideoInfoFfmpeg&>(*info.extra);
             extradata = ei.data;
             extradataSize = ei.dataSize;
-        } else if (dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get())) {
-            const ExtraVideoInfoFlv& ei = static_cast<ExtraVideoInfoFlv&>(*info.extra);
+        }
+        else if (dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get())) {
+            const ExtraVideoInfoFlv& ei = 
+                static_cast<ExtraVideoInfoFlv&>(*info.extra);
             extradata = ei.data.get();
             extradataSize = ei.size;
-        } else assert(0);
+        }
+        else {
+            std::abort();
+        }
     }
     init(codec_id, info.width, info.height, extradata, extradataSize);
 }
@@ -186,6 +192,20 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
 
 VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
 {
+}
+
+int
+VideoDecoderFfmpeg::width() const
+{
+    if (!_videoCodecCtx.get()) return 0;
+    return _videoCodecCtx->getContext()->width;
+}
+
+int
+VideoDecoderFfmpeg::height() const
+{
+    if (!_videoCodecCtx.get()) return 0;
+    return _videoCodecCtx->getContext()->height;
 }
 
 std::auto_ptr<GnashImage>
