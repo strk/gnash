@@ -839,13 +839,8 @@ void NetStream_as::close()
 void
 NetStream_as::play(const std::string& c_url)
 {
-	// Is it already playing ?
-	if ( m_parser.get() )
-	{
-		// TODO: check what to do in these cases
-		log_error("FIXME: NetStream.play() called while already streaming");
-		return;
-	}
+	// It doesn't matter if the NetStream object is already streaming; this
+    // starts it again, possibly with a new URL.
 
 	// Does it have an associated NetConnection ?
 	if ( ! _netCon )
