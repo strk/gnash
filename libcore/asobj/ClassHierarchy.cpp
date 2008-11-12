@@ -67,6 +67,7 @@
 #include "XML_as.h"
 #include "XMLNode_as.h"
 #include "asClass.h"
+#include "flash/text/TextFieldAutoSize_as.h"
 
 namespace gnash {
 
@@ -294,7 +295,8 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
 	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 }
+	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 },
+	{ TextFieldAutoSize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE, NSV::CLASS_OBJECT, 9 }
 
 // These classes are all implicitly constructed; that is, it is not necessary for
 // the class name to be used to construct the class, so they must always be available.
