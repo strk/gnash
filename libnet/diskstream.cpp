@@ -184,7 +184,7 @@ DiskStream::loadChunk(off_t offset)
     /// page, then just return the existing data pointer.
     if (_dataptr != 0) {
 	// If the offset is less than what we already mmapped, we
-	boost::uint32_t diff = reinterpret_cast<boost::uint32_t>(_dataptr + _offset);
+	boost::uint32_t diff = *reinterpret_cast<boost::uint32_t *>(_dataptr + _offset);
 	if (diff < _pagesize) {
 	    return _dataptr + _offset;
 	    // unmap the old data before allocating a new chunk
