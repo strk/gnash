@@ -32,6 +32,9 @@ namespace gst {
 // TODO: implement proper seeking.
 
 VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
+    :
+    _width(0),
+    _height(0)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
