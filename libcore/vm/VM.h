@@ -48,7 +48,6 @@ namespace gnash {
 
 class ClassHierarchy;
 
-
 /// A GC root used to mark all reachable collectable pointers
 class VmGcRoot : public GcRoot 
 {
@@ -212,7 +211,7 @@ public:
 	string_table& getStringTable() const { return mStringTable; }
 
 	/// Get a pointer to the machine, if it exists.
-	Machine* getMachine() const { return _singleton->mMachine; }
+	Machine* getMachine() const { return mMachine; }
 
 	/// Get version of the player, in a compatible representation
 	//
