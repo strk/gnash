@@ -2421,7 +2421,7 @@ movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 void
 movie_root::addChild(character* ch)
 {
-    int newDepth = _childs.empty() ? 0 : _childs.rbegin()->second->get_depth();
+    int newDepth = _childs.empty() ? 0 : _childs.rbegin()->second->get_depth()+1;
     ch->set_depth(newDepth);
 
     assert(!_childs[newDepth]);
