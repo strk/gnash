@@ -32,7 +32,6 @@
 namespace gnash {
 	class movie_root; 
 	class character; 
-	class movie_def_impl;
 }
 
 namespace gnash
