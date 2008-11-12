@@ -929,6 +929,7 @@ boost::intrusive_ptr<as_object>
 as_value::to_object() const
 {
 	typedef boost::intrusive_ptr<as_object> ptr;
+
 	switch (m_type)
 	{
 		case OBJECT:
