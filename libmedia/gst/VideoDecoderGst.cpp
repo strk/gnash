@@ -32,6 +32,9 @@ namespace gst {
 // TODO: implement proper seeking.
 
 VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
+    :
+    _width(0),
+    _height(0)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
@@ -39,6 +42,17 @@ VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
     setup(caps);
 }
 
+int
+VideoDecoderGst::width() const
+{
+    return _width;
+}
+
+int
+VideoDecoderGst::height() const
+{
+    return _height;
+}
 
 VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
         int /*width*/, int /*height*/,
@@ -169,14 +183,12 @@ VideoDecoderGst::pop()
   
     GstStructure* structure = gst_caps_get_structure (caps, 0);
 
-    gint height, width;
+    gst_structure_get_int (structure, "width", &_width);
+    gst_structure_get_int (structure, "height", &_height);
 
-    gst_structure_get_int (structure, "width", &width);
-    gst_structure_get_int (structure, "height", &height);
-  
     gst_caps_unref(caps);
   
-    std::auto_ptr<GnashImage> ret(new gnashGstBuffer(buffer, width, height));
+    std::auto_ptr<GnashImage> ret(new gnashGstBuffer(buffer, _width, _height));
   
     return ret;
 }

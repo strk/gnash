@@ -83,6 +83,22 @@ public:
 
     void clear();
 
+    /// Get the height of the video.
+    //
+    /// The method depends on whether it is an embedded or a live
+    /// stream. This returns 0 until the height is known, which for
+    /// FLV streams is only after decoding. The value may possibly
+    /// vary during playback.
+    int height() const;
+
+    /// Get the width of the video.
+    //
+    /// The method depends on whether it is an embedded or a live
+    /// stream. This returns 0 until the height is known, which for
+    /// FLV streams is only after decoding. The value may possibly
+    /// vary during playback.
+    int width() const;
+
 protected:
 
 #ifdef GNASH_USE_GC

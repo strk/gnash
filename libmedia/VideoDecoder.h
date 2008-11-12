@@ -69,6 +69,19 @@ public:
   /// @return true if there is a frame ready to be popped.
   ///
   virtual bool peek() = 0;
+
+  /// Get the width in pixels of the Video
+  //
+  /// @return   The width of a video frame, or 0 until this is known.
+  ///           This is used ultimately for the AS Video.width property.
+  virtual int width() const = 0;
+
+  /// Get the height in pixels of the Video
+  //
+  /// @return   The height of a video frame, or 0 until this is known.
+  ///           This is used ultimately for the AS Video.height property.
+  virtual int height() const = 0;
+
 };
 
 	

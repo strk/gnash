@@ -774,7 +774,7 @@ NetStream_as::stopAdvanceTimer()
 void
 NetStream_as::startAdvanceTimer()
 {
-	boost::intrusive_ptr<builtin_function> advanceCallback = \
+	boost::intrusive_ptr<builtin_function> advanceCallback = 
 		new builtin_function(&NetStream_as::advanceWrapper);
 	std::auto_ptr<Timer> timer(new Timer);
 	unsigned long delayMS = 50; // TODO: base on media file FPS !!!
@@ -1726,6 +1726,19 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 
 }
 
+int
+NetStream_as::videoHeight() const
+{
+    if (!_videoDecoder.get()) return 0;
+    return _videoDecoder->height();
+}
+
+int
+NetStream_as::videoWidth() const
+{
+    if (!_videoDecoder.get()) return 0;
+    return _videoDecoder->width();
+}
 
 void
 NetStream_as::advance()

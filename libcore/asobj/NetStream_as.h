@@ -345,6 +345,20 @@ public:
         return _playHead.getState();
     }
 
+    /// Get the real height of the video in pixels if the decoder exists.
+    //
+    /// @return the height of the video in pixels or 0 if no decoder exists.
+    ///         The width returned from the decoder may also vary, and will
+    ///         be 0 until it knows the width.
+    int videoHeight() const;
+
+    /// Get the real width of the video in pixels if the decoder exists.
+    //
+    /// @return the width of the video in pixels or 0 if no decoder exists.
+    ///         The width returned from the decoder may also vary, and will
+    ///         be 0 until it knows the width.
+    int videoWidth() const;
+
     /// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).
 	void close();
