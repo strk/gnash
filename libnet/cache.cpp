@@ -38,7 +38,7 @@
 
 using namespace std;
 
-//static boost::mutex cache_mutex;
+static boost::mutex cache_mutex;
 
 namespace gnash
 {
@@ -56,11 +56,10 @@ void
 Cache::removePath(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
     map<string, string>::iterator it;
     for (it = _pathnames.begin(); it != _pathnames.end(); it++) {
-        cerr << name << " : " << it->first << " : " << it->second << endl;
  	if (it->first == name) {
-            cerr << "Matched!" << endl;
             _pathnames.erase(it);
             break;
  	}
@@ -71,6 +70,7 @@ void
 Cache::removeResponse(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
     map<string, string>::iterator it;
     for (it = _responses.begin(); it != _responses.end(); it++) {
  	if (it->first == name) {
@@ -84,6 +84,7 @@ void
 Cache::removeFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
     map<string, DiskStream *>::iterator it;
     for (it = _files.begin(); it != _files.end(); it++) {
 //        DiskStream *ds = it->second;
@@ -97,9 +98,8 @@ Cache::removeFile(const std::string &name)
 void
 Cache::dump(std::ostream& os) const
 {    
-//    GNASH_REPORT_FUNCTION;
-    
-//    boost::mutex::scoped_lock lock(cache_mutex);
+//    GNASH_REPORT_FUNCTION;    
+    boost::mutex::scoped_lock lock(cache_mutex);
 
     // Dump all the pathnames
     map<std::string, std::string>::const_iterator name;
