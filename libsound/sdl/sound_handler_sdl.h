@@ -44,67 +44,33 @@ namespace sound {
 /// SDL-based sound_handler
 class SDL_sound_handler : public sound_handler
 {
-public:
-
-    typedef std::vector<EmbedSound*> Sounds;
-
 private:
-
-    typedef std::set< InputStream* > InputStreams;
-
-    /// Sound input streams.
-    //
-    /// Elements owned by this class.
-    ///
-    InputStreams _inputStreams;
-
-    /// Unplug all input streams
-    void unplugAllInputStreams();
-
-    /// Vector containing all sounds.
-    //
-    /// Elements of the vector are owned by this class
-    ///
-    Sounds  _sounds;
-
-    /// Is sound device opened?
-    bool soundOpened;
 
     /// The SDL_audio specs
     SDL_AudioSpec audioSpec;
 
-    void initAudioSpec();
-    
-    /// Is the audio muted?
-    bool muted;
+    /// Initialize audio card
+    void initAudio();
     
     /// Mutex for making sure threads doesn't mess things up
     boost::mutex _mutex;
 
-    // stop and delete all sounds
-    void delete_all_sounds();
+    /// Mutex protecting _muted (defined in base class)
+    mutable boost::mutex _mutedMutex;
 
     /// File stream for dump file
+    //
+    /// TODO: move to base class ?
+    ///
     std::ofstream file_stream;
 
     // write a .WAV file header
     void write_wave_header(std::ofstream& outfile);
 
-    /// Mix an InputStream in
-    //
-    /// @param sound
-    ///     The active sound to mix in
-    //
-    /// @param mixTo
-    ///     The buffer to mix sound into
-    ///
-    /// @param nSamples
-    ///     The number of samples to mix in
-    ///
-    /// @return the number of samples mixed in. 
-    ///         If < nSamples we reached EOF of the EmbedSoundInst
-    ///
-    unsigned int mixIn(InputStream& sound, Uint8* mixTo, unsigned int nSamples);
+    // See dox in sound_handler.h
+    void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+                unsigned int nSamples, float volume);
+
 
     /// Callback invoked by the SDL audio thread.
     //
@@ -123,19 +89,6 @@ private:
     ///     (negative is probably an SDL bug, zero dunno yet).
     ///
     static void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in);
-
-    /// Non-locking version of unplugInputStream
-    //
-    /// Used when lock is already obtained by caller.
-    /// Increments _soundsStopped.
-    ///
-    void unplugInputStreamNonLocking(InputStream* id);
-
-    /// Stop all instances of an embedded sound
-    //
-    /// Does NOT lock _mutex
-    ///
-    void stopEmbedSoundInstances(EmbedSound& def);
 
 public:
 
@@ -178,13 +131,16 @@ public:
     virtual media::SoundInfo* get_sound_info(int soundHandle);
 
     // See dox in sound_handler.h
-    virtual void    mute();
+    // overridden to serialize access to the _muted member
+    virtual void mute();
 
     // See dox in sound_handler.h
-    virtual void    unmute();
+    // overridden to serialize access to the _muted member
+    virtual void unmute();
 
     // See dox in sound_handler.h
-    virtual bool    is_muted();
+    // overridden to serialize access to the _muted member
+    virtual bool is_muted() const;
 
     // See dox in sound_handler.h
     virtual unsigned int get_duration(int sound_handle);
@@ -196,38 +152,11 @@ public:
     virtual InputStream* attach_aux_streamer(aux_streamer_ptr ptr, void* owner);
 
     // See dox in sound_handler.h
-    virtual void unplugInputStream(InputStream* id);
-
-    /// Plug an InputStream to the mixer
-    //
-    /// @param in
-    ///     The InputStream to plug, ownership transferred
-    ///
-    /// @todo turn into a virtual of base class !
-    ///
-    /// Does NOT lock _mutex, make sure you lock before calling ?
-    ///
+    // Overridden to unpause SDL audio
     void plugInputStream(std::auto_ptr<InputStream> in);
 
-    /// Refills the output buffer with data.
-    //
-    /// We run trough all the attached auxiliary streamers fetching decoded
-    /// audio blocks and mixing them into the given output stream.
-    ///
-    /// If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
-    /// and resampled if needed. When the buffer has been sampled, another
-    /// frame is decoded until all frames has been decoded.
-    /// If a sound is looping it will be decoded from the beginning again.
-    ///
-    /// @param to
-    ///     The buffer to refill
-    ///
-    /// @param nBytes
-    ///     The amount of bytes the output buffer holds
-    ///
-    /// @todo make this a virtual method in the base class
-    ///
-    void fetchSamples(boost::uint8_t* to, unsigned int nBytes);
+    // See dox in sound_handler.h
+    void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 };
 
 } // gnash.sound namespace 
