@@ -37,10 +37,15 @@
 #include <memory>
 #include <cassert>
 #include <cstring>
+#include <set> // for composition
 
 namespace gnash {
     namespace media {
 	    class SoundInfo;
+    }
+    namespace sound {
+        class EmbedSound;
+        class InputStream;
     }
 	class SimpleBuffer;
 }
@@ -57,23 +62,21 @@ namespace sound {
 /// %Sound mixer.
 //
 /// Stores the audio found by the parser and plays on demand.
-/// Can also play sound from AS classes NetStream and Sound using callbacks
-/// (see attach_aux_streamer and dettach_aux_streamer).
+/// Also allows plugging auxiliary streamers for ActionScript
+/// driven %sound (Sound, NetStream).
 ///
-/// You may define a subclass of this, and pass an instance to
-/// set_sound_handler().
+/// The main interface this class exposes to hosting application
+/// is fetching of sound samples, in couples of signed 16bit integers
+/// (left channel, right channel) in PCM.
+/// See fetchSamples.
+///       
+/// Implementations of this class willing to allow
+/// hosting application to use a thread for fetching
+/// audio should make sure to take care about mutex
+/// protecting the relevant datastores.
+/// The default implementation uses NO locking.
 ///
-/// NOTE
-/// The role of this class is currently somewhat confusing.
-/// The main service it should offer is mixing of gnash core sounds.
-/// Additionally it currently does on-demand decoding too for
-/// some kind of sounds (but not all).
-/// Also, it is unspecified what drives consumption of sound.
-/// For SDL handler the clock is driven by SDL lib itself.
-/// For GST, I have no idea..
-/// TODO: clean this up.
-///
-/// @todo rename to gnash::sound::Mixer
+/// @todo rename to gnash::sound::Mixer ?
 ///
 class DSOEXPORT sound_handler
 {
@@ -96,7 +99,7 @@ public:
 	virtual int	create_sound(
 		std::auto_ptr<SimpleBuffer> data,
 		std::auto_ptr<media::SoundInfo> sinfo
-		) = 0;
+		);
 
 	/// Append data to an existing sound buffer slot.
 	//
@@ -110,18 +113,19 @@ public:
 	/// 	The sound data to be saved, allocated by new[]. Ownership is transferred.
 	///	TODO: define a class for containing both data and data_bytes ? or use vector ?
 	///
-	/// @param data_bytes
+	/// @param dataBytes
 	///     Size of the data in bytes
 	///
-	/// @param sample_count
+	/// @param sampleCount
 	/// 	Number of samples in the data
 	///
-	/// @param handle_id
+	/// @param handleId
 	/// 	The soundhandlers id of the sound we want some info about.
 	///
 	/// @return size of the data buffer before the new data is appended
 	///
-	virtual long	fill_stream_data(unsigned char* data, unsigned int data_bytes, unsigned int sample_count, int handle_id) = 0;
+	virtual long fill_stream_data(unsigned char* data, unsigned int dataBytes,
+                                  unsigned int sampleCount, int handleId);
 
 	/// Returns a pointer to the SoundInfo object for the sound with the given id.
     //
@@ -132,7 +136,7 @@ public:
 	///
 	/// @return a pointer to the SoundInfo object for the sound with the given id.
 	///
-	virtual media::SoundInfo* get_sound_info(int soundHandle) = 0;
+	virtual media::SoundInfo* get_sound_info(int soundHandle);
 
 	/// Schedule playing of a sound buffer slot
 	//
@@ -164,10 +168,10 @@ public:
 	/// TODO: add out_point parameter (when to stop playing the sound)
 	///
 	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset,
-					long start, const SoundEnvelopes* envelopes) = 0;
+					long start, const SoundEnvelopes* envelopes);
 
 	/// Remove all scheduled request for playback of sound buffer slots
-	virtual void	stop_all_sounds() = 0;
+	virtual void	stop_all_sounds();
 
 	/// Gets the volume for a given sound buffer slot.
 	//
@@ -179,7 +183,7 @@ public:
 	/// @return the sound volume level as an integer from 0 to 100,
 	/// 	where 0 is off and 100 is full volume. The default setting is 100.
 	///
-	virtual int	get_volume(int sound_handle) = 0;
+	virtual int	get_volume(int sound_handle);
 
 	/// Get the volume to apply to mixed output
 	//
@@ -200,7 +204,7 @@ public:
 	/// 	100 is full volume and 0 is no volume.
 	///	The default setting is 100.
 	///
-	virtual void	set_volume(int sound_handle, int volume) = 0;
+	virtual void set_volume(int sound_handle, int volume);
 
 	/// Set the volume to apply to mixed output
 	//
@@ -219,14 +223,17 @@ public:
 	/// @param sound_handle
 	///	The sound_handlers id for the sound to be deleted
 	///
-	virtual void	stop_sound(int sound_handle) = 0;
-		
+	virtual void	stop_sound(int sound_handle);
+
 	/// Discard a sound buffer slot
 	//
 	/// @param sound_handle
 	///	The sound_handlers id for the sound to be deleted
 	///
-	virtual void	delete_sound(int sound_handle) = 0;
+	virtual void delete_sound(int sound_handle);
+
+    // Stop and delete all sounds
+    virtual void delete_all_sounds();
 
 	/// \brief
 	/// Discard all sound inputs (slots and aux streamers)
@@ -237,19 +244,19 @@ public:
 	/// The function should stop all sounds and get ready
 	/// for a "parse from scratch" operation.
 	///
-	virtual void reset() = 0;
+	virtual void reset();
 		
-	/// gnash calls this to mute audio
-	virtual void	mute() = 0;
+	/// Call this to mute audio
+	virtual void mute();
 
-	/// gnash calls this to unmute audio
-	virtual void	unmute() = 0;
+	/// Call this to unmute audio
+	virtual void unmute();
 
 	/// Returns whether or not sound is muted.
 	//
 	/// @return true if muted, false if not
 	///
-	virtual bool	is_muted() = 0;
+	virtual bool is_muted() const;
 
 	/// gnash calls this to pause audio
 	virtual void pause() { _paused=true; }
@@ -305,8 +312,7 @@ public:
 	/// 	The key identifying the auxiliary streamer, as returned
     ///     by attach_aux_streamer.
 	///
-	virtual void unplugInputStream(InputStream* id)
-	{ id=id; /*unused*/ } 
+	virtual void unplugInputStream(InputStream* id);
 
 	virtual ~sound_handler() {};
 	
@@ -318,7 +324,8 @@ public:
 	/// The id of the event sound
 	///
 	/// @return the duration of the sound in milliseconds
-	virtual unsigned int get_duration(int sound_handle) = 0;
+    ///
+	virtual unsigned int get_duration(int sound_handle);
 
 	/// \brief
 	/// Gets the playhead position in milliseconds of an event sound connected
@@ -328,13 +335,34 @@ public:
 	/// The id of the event sound
 	///
 	/// @return the duration of the sound in milliseconds
-	virtual unsigned int tell(int sound_handle) = 0;
+    ///
+	virtual unsigned int tell(int sound_handle);
 
 	/// Special test-fuction. Reports how many times a sound has been started
+    //
+    /// @deprecated Use a TestingSoundHanlder !
+    ///
 	size_t numSoundsStarted() const { return _soundsStarted; }
 
 	/// Special test-fuction. Reports how many times a sound has been stopped
+    //
+    /// @deprecated Use a TestingSoundHanlder !
+    ///
 	size_t numSoundsStopped() const { return _soundsStopped; }
+
+    /// Fetch mixed samples
+    //
+    /// We run trough all the plugged InputStreams fetching decoded
+    /// audio blocks and mixing them into the given output stream.
+    ///
+    /// @param to
+    ///     The buffer to write mixed samples to.
+    ///     Buffer must be big enough to hold nSamples samples.
+    ///
+    /// @param nSamples
+    ///     The amount of samples to fetch.
+    ///
+    virtual void fetchSamples(boost::int16_t* to, unsigned int nSamples);
 
 protected:
 
@@ -344,11 +372,57 @@ protected:
 		_soundsStarted(0),
 		_soundsStopped(0),
 		_paused(false),
+		_muted(false),
 		_mediaHandler(media::MediaHandler::get()),
-		_volume(100)
+		_volume(100),
+        _sounds(),
+        _inputStreams()
 	{
 		assert(_mediaHandler); // for now, we rely on this being always available
 	}
+
+    /// Plug an InputStream to the mixer
+    //
+    /// @param in
+    ///     The InputStream to plug, ownership transferred
+    ///
+    virtual void plugInputStream(std::auto_ptr<InputStream> in);
+
+    /// Unplug all input streams
+    virtual void unplugAllInputStreams();
+
+    /// Does the mixer have input streams ?
+    bool hasInputStreams() const;
+
+    /// Mix nSamples from inSamples to outSamples, with given volume
+    //
+    /// @param outSamples
+    ///     The output samples buffer, to mix to.
+    ///     Must be big enough to contain nSamples.
+    ///     Can be larger.
+    ///
+    /// @param inSamples
+    ///     The input samples buffer, to mix in.
+    ///     It is non-const as this method *is* allowed
+    ///     to mess with content, for example to apply
+    ///     volume.
+    ///     TODO: why not applying volume upstream ?!
+    ///
+    /// @param nSamples
+    ///     The amount of samples to mix in.
+    ///
+    /// @param volume
+    ///     The volume to apply to input samples, as a fraction (0..1)
+    ///
+    /// TODO: this interface says nothing about how many channels we're
+    ///       going to mix. It should, to be a sane interface.
+    ///       Maybe, a Mixer instance should be created, initialized
+    ///       with number of channels, at each fetching.
+    ///
+    virtual void mix(boost::int16_t* outSamples, boost::int16_t* inSamples,
+                unsigned int nSamples, float volume);
+
+private:
 
 	/// Special test-member. Stores count of started sounds.
 	size_t _soundsStarted;
@@ -359,20 +433,45 @@ protected:
 	/// True if sound is paused
 	bool _paused;
 
+    /// True if sound is muted
+    bool _muted;
+
 	/// The registered MediaHandler at construction time
 	media::MediaHandler* _mediaHandler;
-
-private:
 
 	/// Final output volume
 	int _volume;
 
+    typedef std::vector<EmbedSound*> Sounds;
+
+    /// Vector containing all sounds.
+    //
+    /// Elements of the vector are owned by this class
+    ///
+    Sounds  _sounds;
+
+    /// Stop all instances of an embedded sound
+    void stopEmbedSoundInstances(EmbedSound& def);
+
+    typedef std::set< InputStream* > InputStreams;
+
+    /// Sound input streams.
+    //
+    /// Elements owned by this class.
+    ///
+    InputStreams _inputStreams;
+
+    /// Unplug any completed input stream
+    void unplugCompletedInputStreams();
+
 };
 
 // TODO: move to appropriate specific sound handlers
+
+/// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler*	create_sound_handler_sdl();
+/// @throw a SoundException if fails to initialize audio card.
 DSOEXPORT sound_handler*	create_sound_handler_sdl(const std::string& wave_file);
-DSOEXPORT sound_handler*	create_sound_handler_gst();
 	
 
 } // gnash.sound namespace 

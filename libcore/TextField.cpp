@@ -309,7 +309,6 @@ TextField::show_cursor(const SWFMatrix& mat)
 void
 TextField::display()
 {
-    GNASH_REPORT_FUNCTION;
 
     registerTextVariable();
 

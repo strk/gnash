@@ -37,70 +37,12 @@ namespace gnash {
 namespace sound {
 
 /// Null sound_handler, for testing 
+//
+/// @todo start a thread to fetch samples ?
+///
 class DSOEXPORT NullSoundHandler : public sound_handler
 {
 public:
-
-	// See dox in sound_handler.h 
-	virtual int	create_sound(
-		std::auto_ptr<SimpleBuffer> /*data*/,
-		std::auto_ptr<media::SoundInfo> /*sinfo*/
-		)
-	{
-		return 0;
-	}
-
-	// See dox in sound_handler.h 
-	// implement?
-	virtual long	fill_stream_data(unsigned char* /*data*/, unsigned int /*data_bytes*/, unsigned int /*sample_count*/, int /*handle_id*/)
-	{
-		return 0;
-	}
-
-	// See dox in sound_handler.h 
-	virtual media::SoundInfo* get_sound_info(int) { return 0; }
-
-	// See dox in sound_handler.h 
-	virtual void play_sound(int /*sound_handle*/, int /*loop_count*/, int /*secondOffset*/, long /*start*/,
-		const SoundEnvelopes* /*envelopes*/)
-	{
-	}
-
-	// See dox in sound_handler.h 
-	virtual void	stop_all_sounds() {}
-
-	// See dox in sound_handler.h 
-	// TODO: implement here
-	virtual int	get_volume(int /*sound_handle*/) { return 0; }
-
-	// See dox in sound_handler.h 
-	// TODO: implement here
-	virtual void	set_volume(int /*sound_handle*/, int /*volume*/) {}
-
-	// See dox in sound_handler.h 
-	virtual void	stop_sound(int /*sound_handle*/) {}
-		
-	// See dox in sound_handler.h 
-	virtual void	delete_sound(int /*sound_handle*/) {}
-
-	// See dox in sound_handler.h 
-	virtual void reset() {}
-		
-	// See dox in sound_handler.h (why is this virtual anyway ?)
-	virtual void	mute() {}
-
-	// See dox in sound_handler.h (why is this virtual anyway ?)
-	virtual void	unmute() {}
-
-	// See dox in sound_handler.h (why is this virtual anyway ?)
-	virtual bool	is_muted() { return false; }
-
-	// See dox in sound_handler.h
-	virtual unsigned int get_duration(int /*sound_handle*/) { return 0; }
-
-	// See dox in sound_handler.h
-	virtual unsigned int tell(int /*sound_handle*/) { return 0; }
-
 };
 	
 } // gnash.sound namespace 

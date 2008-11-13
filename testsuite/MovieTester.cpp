@@ -30,6 +30,7 @@
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
 #include "sound_handler.h" // for creating the "test" sound handlers
+#include "NullSoundHandler.h"
 #include "RGBA.h" // for rgba class
 #include "FuzzyPixel.h"
 #include "render.h"
@@ -233,6 +234,17 @@ void
 MovieTester::advanceClock(unsigned long ms)
 {
 	_clock.advance(ms);
+
+    // We need to fetch as many samples
+    // as needed for a theoretical 44100hz loop.
+    // That is 44100 samples each second.
+    // 44100/1000 = x/ms
+    //  x = (44100*ms) / 1000
+    unsigned int nSamples = (44100*ms) / 1000;
+    log_debug("advanceClock(%d) needs to fetch %d samples", ms, nSamples);
+    boost::scoped_array<boost::int16_t> samples(new boost::int16_t[nSamples]);
+    _sound_handler->fetchSamples(samples.get(), nSamples);
+    
 }
 
 void
@@ -545,18 +557,7 @@ void
 MovieTester::initTestingSoundHandlers()
 {
 
-#ifdef SOUND_SDL
-	std::cout << "Creating SDL sound handler" << std::endl;
-        _sound_handler.reset( sound::create_sound_handler_sdl() );
-#elif defined(SOUND_GST)
-	std::cout << "Creating GST sound handler" << std::endl;
-        _sound_handler.reset( media::create_sound_handler_gst() );
-#else
-	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
-	return;
-	//exit(1);
-#endif
-
+    _sound_handler.reset( new sound::NullSoundHandler() );
 }
 
 void

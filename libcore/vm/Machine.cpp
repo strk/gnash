@@ -1278,7 +1278,7 @@ Machine::execute()
 		LOG_DEBUG_AVM("There are %u arguments.",argc);
 		get_args(argc);
 //		ENSURE_OBJECT(mStack.top(argc));
-		as_object *super = pop_stack().to_object().get()->get_super();
+		//as_object *super = pop_stack().to_object().get()->get_super();
 		//TODO: Actually construct the super.
 //		as_object *super = mStack.top(argc).to_object()->get_super();
 // 		if (!super)
@@ -1291,6 +1291,8 @@ Machine::execute()
 		// argc arguments, and we drop all of the arguments plus 'obj' from
 		// the stack.
 //		pushCall(func, obj, mIgnoreReturn, argc, -1);
+
+        LOG_ONCE( log_unimpl("ABC_ACTION_CONSTRUCTSUPER") );
 		break;
 	}
 /// 0x4A ABC_ACTION_CONSTRUCTPROP
@@ -1315,7 +1317,7 @@ Machine::execute()
 			push_stack(as_value());
 			break;
 		}
-		std::string& classname = mPoolObject->mStringPool[a.getABCName()];
+		//std::string& classname = mPoolObject->mStringPool[a.getABCName()];
 		
 		as_value constructor_val = object->getMember(a.getGlobalName());
 		boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
@@ -1447,11 +1449,12 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETDESCENDANTS:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		as_value &v = mStack.top(0);
+		//as_value &v = mStack.top(0);
 		ENSURE_OBJECT(v);
 		mStack.drop(1);
 		mStack.drop(completeName(a));
 		// TODO: Decide or discover what to do with this.
+        LOG_ONCE( log_unimpl("ABC_ACTION_GETDESCENDANTS") );
 		break;
 	}
 /// 0x5A ABC_ACTION_NEWCATCH
@@ -2752,7 +2755,27 @@ void Machine::instantiateClass(std::string className, as_object* global){
 	executeCodeblock(theClass->getConstructor()->getBody());
 }
 
-Machine::Machine(VM& vm):mST(vm.getStringTable()),mRegisters(),mExitWithReturn(false),_vm(vm)
+Machine::Machine(VM& vm)
+        :
+        mStack(),
+        mRegisters(),
+        mScopeStack(),
+        mStream(0),
+        //mCH(0), // initialized in the body
+        mST(vm.getStringTable()),
+        mDefaultXMLNamespace(0),
+        mCurrentScope(0),
+        mGlobalScope(0),
+        mDefaultThis(0),
+        mThis(0),
+        mGlobalObject(0),
+        mGlobalReturn(),
+        mIgnoreReturn(),
+        mIsAS3(false),
+        mExitWithReturn(false),
+        mPoolObject(0),
+        mCurrentFunction(0),
+        _vm(vm)
 {
 	mCH = vm.getClassHierarchy();
 	//Local registers should be initialized at the beginning of each function call, but
@@ -2766,7 +2789,8 @@ as_value Machine::find_prop_strict(asName multiname){
 	
 	as_value val;
 	mScopeStack.push(mGlobalObject);
-	for(int i=0;i<mScopeStack.size();i++){
+	for(size_t i=0;i<mScopeStack.size();i++)
+    {
 
 		val = mScopeStack.top(i).get()->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
 
@@ -2863,7 +2887,7 @@ void Machine::load_function(CodeStream* stream,boost::uint32_t maxRegisters){
 
 as_environment::ScopeStack* Machine::getScopeStack(){
 	as_environment::ScopeStack *stack = new as_environment::ScopeStack();
-	for(int i=0;i<mScopeStack.size();i++){
+	for(size_t i=0;i<mScopeStack.size();i++){
 		stack->push_back(mScopeStack.top(i));
 	}
 	return stack;

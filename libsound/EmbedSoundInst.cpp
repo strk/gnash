@@ -35,6 +35,9 @@
 #include <vector>
 #include <boost/scoped_array.hpp>
 
+// Debug sound decoding
+//#define GNASH_DEBUG_SOUNDS_DECODING
+
 namespace gnash {
 namespace sound {
 
