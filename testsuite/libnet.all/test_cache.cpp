@@ -229,9 +229,9 @@ test_remove(void)
     if ((cache.findFile("foo")->getFileSize() == file1.getFileSize())
         && (cache.findFile("barfoo") == 0)
         && (cache.findFile("bar")->getFileSize() == file2.getFileSize())) {
-        runtest.pass("addFile()/findFile()");
+        runtest.pass("Cache::removeFile()");
     } else {
-        runtest.fail("addFile()/findFile()");
+        runtest.fail("Cache::removeFile()");
     }    
 
     if (dbglogfile.getVerbosity() > 0) {
