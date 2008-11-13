@@ -27,11 +27,12 @@ kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic
 kde4_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
-	$(AM_LDFLAGS) @QTCORE@ @QTGUI@ @KDECORE@ @KDEUI@
+	$(AM_LDFLAGS) @QTCORE@ @QTGUI@
+# @KDECORE@ @KDEUI@
 if BUILD_AGG_RENDERER
 kde4_gnash_CPPFLAGS += $(AGG_CFLAGS)
 kde4_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
-	$(KDE4_LIBS) $(QT4_LIBS) $(AGG_LIBS)
+	$(QT4_LIBS) $(AGG_LIBS)
 kde4_gnash_SOURCES += Kde4GlueAgg.cpp Kde4GlueAgg.h \
 	 	Kde4Gui.cpp Kde4Gui.h KdeGlue.h
 endif

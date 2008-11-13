@@ -26,6 +26,7 @@
 #include <boost/assign/list_inserter.hpp>
 
 #include <QMainWindow>
+#include <QX11Info>
 #include <QMenu>
 #include <QMenuBar>
 #include <QWidget>
@@ -49,6 +50,10 @@
 #include "render_handler.h"
 #include "utility.h" // for PIXELS_TO_TWIPS 
 
+
+extern "C" {
+#include <X11/Xlib.h>
+}
 
 namespace gnash 
 {
@@ -113,9 +118,20 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
     _drawingWidget->setFocusPolicy(Qt::StrongFocus);
     _window->setWindowTitle(windowtitle);
     
-    // The QMainWindow takes ownership of the DrawingWidget.
-    _window->setCentralWidget(_drawingWidget);
-    _window->show();
+    if(_xid) {
+        _drawingWidget->embedInto(_xid);
+	_drawingWidget->show();
+	// Adjust width and height to the window we're being embedded into...
+	XWindowAttributes winAttributes;
+	XGetWindowAttributes(QX11Info::display(), _xid, &winAttributes);
+	_width=winAttributes.width;
+	_height=winAttributes.height;
+	_drawingWidget->resize(_width, _height);
+    } else {
+        // The QMainWindow takes ownership of the DrawingWidget.
+        _window->setCentralWidget(_drawingWidget);
+        _window->show();
+    }
 
     _glue.prepDrawingArea(_drawingWidget);
 
@@ -126,7 +142,7 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
     }
 
     _validbounds.setTo(0, 0, _width, _height);
-    _glue.initBuffer(width, height);
+    _glue.initBuffer(_width, _height);
     
     set_render_handler(_renderer);
    
