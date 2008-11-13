@@ -358,7 +358,8 @@ else
 endif
 
 if TESTSUITE
-check: check-recursive anal
+check: check-recursive 
+	$(MAKE) anal
 
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
