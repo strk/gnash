@@ -2437,23 +2437,45 @@ movie_root::addChild(character* ch)
 void
 movie_root::addChildAt(character* ch, int depth)
 {
-    ch->set_depth(depth);
-	Childs::iterator it = _childs.find(depth);
-	if ( it == _childs.end() )
+    setInvalidated();
+
+    // If this character already exist
+    // as a child, drop it first.
+	Childs::iterator existing = _childs.begin();
+    for (Childs::iterator end=_childs.end(); existing!=end; ++existing)
     {
-        _childs[depth] = ch;
+        if ( existing->second == ch )
+        {
+            log_debug("Character %s found as child %d",
+                ch->getTarget(), existing->first);
+            _childs.erase(existing);
+            break;
+        }
     }
-    else
-    {
+
+    ch->set_depth(depth);
+
+	Childs::iterator it = _childs.find(depth);
+	if ( it == _childs.end() ) {
+        _childs[depth] = ch;
+    } else {
+        if ( it->second == ch )
+        {
+            log_debug("Character %s already the child at depth %d",
+                ch->getTarget(), depth);
+        }
         // don't leak overloaded childs
         it->second->destroy();
         it->second = ch;
     }
 
-    ch->set_invalidated();
+    if ( existing == _childs.end() )
+    {
+        ch->set_invalidated();
 
-	/// Notify placement 
-	ch->stagePlacementCallback();
+        /// Notify placement 
+        ch->stagePlacementCallback();
+    }
 
 	assert(testInvariant());
 }
