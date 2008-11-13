@@ -1663,13 +1663,17 @@ Machine::execute()
 		asName a = pool_name(index, mPoolObject);
 		as_value v = pop_stack();
 		//TODO: If multiname is a runtime mutiname we need to also pop name and namespace values.
-		as_value object_asval = pop_stack();
-		if(object_asval.is_undefined() || object_asval.is_null()){
-			LOG_DEBUG_AVM("Object is undefined will skip trying to initialize property.");
+		as_value object_val = pop_stack();
+
+		as_object* object = object_val.to_object().get();
+		if(!object){
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't initialize a property of a value that doesn't cast to an object (%s)."),
+				object_val);
+			)		
 		}
 		else{
-			as_object& obj = *object_asval.to_object().get();
-			!obj.set_member(a.getGlobalName(),v,false);
+			object->set_member(a.getGlobalName(),v,false);
 		}
 		break;
 	}
