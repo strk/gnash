@@ -3,7 +3,6 @@
 // Class must be named with the PP prefix, as that's the name the
 // file passed to haxe will have after the preprocessing step
 class PP_AddChild {
-    asci
     static function main()
     {
         var tf = new flash.text.TextField();
