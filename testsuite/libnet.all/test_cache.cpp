@@ -51,6 +51,7 @@ using namespace std;
 static void usage (void);
 static void test (void);
 static void test_errors (void);
+static void test_remove (void);
 static void create_file(const std::string &, size_t);
 
 static TestState runtest;
@@ -80,6 +81,7 @@ main(int argc, char *argv[])
 
     test();
     test_errors();
+    test_remove();
 
     unlink("outbuf1.raw");
     unlink("outbuf2.raw");
@@ -153,12 +155,88 @@ test (void)
         runtest.fail("addFile()/findFile()");
     }
     
-    if (dbglogfile.getVerbosity() > 0) {
-        cache.dump();
-    }
+//     if (dbglogfile.getVerbosity() > 0) {
+//         cache.dump();
+//     }
 
     file1.close();
     
+}
+
+static void
+test_remove(void)
+{
+    Cache cache;
+
+    // Add a few path names
+    cache.addPath("foo", "/bar/foo");
+    cache.addPath("bar", "/foo/bar");
+    cache.addPath("barfoo", "/foo/bar/barfoo");
+    cache.addPath("foobar", "/foo/bar/foobar");
+
+     if (dbglogfile.getVerbosity() > 0) {
+         cache.dump();
+     }
+    // now remove one in the middle
+    cache.removePath("barfoo");
+    if ((cache.findPath("foo") == "/bar/foo")
+        && (cache.findPath("bar") == "/foo/bar")
+        && (cache.findPath("barfoo").empty())
+        && (cache.findPath("foobar") == "/foo/bar/foobar")) {
+        runtest.pass("Cache::removePath()");
+    } else {
+        runtest.fail("Cache::removePath()");
+    }
+    
+    // FIXME: make these different, although it probably makes not difference.
+    std::string resp1 = "HTTP/1.1\r\n404 Object Not Found\r\nServer: Microsoft-IIS/4.0\r\n\r\nDate: Sat, 08 Dec 2007 20:32:20 GMT\r\nConnection: close\r\nContent-Length: 461\r\nContent-Type: text/html";
+
+    cache.addResponse("foo", resp1);
+    cache.addResponse("bar", resp1);
+    cache.addResponse("barfoo", resp1);
+    cache.addResponse("foobar", resp1);
+    cache.removeResponse("barfoo");
+    if ((cache.findResponse("foo") == resp1)
+        && (cache.findResponse("bar") == resp1)
+        && (cache.findResponse("barfoo").empty())
+        && (cache.findResponse("foobar") == resp1)) {
+        runtest.pass("Cache::removeResponse()");
+    } else {
+        runtest.fail("Cache::removeResponse()");
+    }
+
+    DiskStream file1;
+    create_file("outbuf1.raw", 100);
+    file1.open("outbuf1.raw");
+
+    DiskStream file2;
+    create_file("outbuf2.raw", 200);
+    file1.open("outbuf2.raw");
+
+    DiskStream file3;
+    create_file("outbuf3.raw", 300);
+    file1.open("outbuf3.raw");
+
+    DiskStream file4;
+    create_file("outbuf4.raw", 400);
+    file1.open("outbuf4.raw");
+
+    cache.addFile("foo", &file1);
+    cache.addFile("bar", &file2);
+    cache.addFile("barfoo", &file3);
+    cache.addFile("foobar", &file4);
+    cache.removeFile("barfoo");
+    if ((cache.findFile("foo")->getFileSize() == file1.getFileSize())
+        && (cache.findFile("barfoo") == 0)
+        && (cache.findFile("bar")->getFileSize() == file2.getFileSize())) {
+        runtest.pass("addFile()/findFile()");
+    } else {
+        runtest.fail("addFile()/findFile()");
+    }    
+
+    if (dbglogfile.getVerbosity() > 0) {
+         cache.dump();
+     }
 }
 
 static void
@@ -221,6 +299,9 @@ test_errors (void)
         runtest.fail("Cache::findFile(empty)");
     }
     
+//      if (dbglogfile.getVerbosity() > 0) {
+//          cache.dump();
+//      }
 }
 
 /// \brief create a test file to read in later. This lets us create
