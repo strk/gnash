@@ -1617,7 +1617,7 @@ Machine::execute()
 /// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of ns/key.
 	case SWF::ABC_ACTION_GETPROPERTY:
 	{
-		as_value val;
+		as_value prop;
 		string_table::key ns = 0;
 		string_table::key name = 0;
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
@@ -1630,12 +1630,20 @@ Machine::execute()
 			name = a.getGlobalName();
 		}
 
-		as_value obj = pop_stack();
+		as_value object_val = pop_stack();
 
-		if(!obj.is_undefined() && !obj.is_null()){
-			obj.to_object().get()->get_member(name, &val, ns);
+		as_object* object = object_val.to_object().get();
+		if (!object) {
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't get a property of a value that doesn't cast to an object (%s)."),
+				object_val);
+			)
 		}
-		push_stack(val);
+		else{
+			object->get_member(name, &prop, ns);
+		}
+
+		push_stack(prop);
 
 		break;
 	}
