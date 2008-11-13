@@ -48,12 +48,17 @@ check_PROGRAMS = \
 	test_cque \
 	test_handler \
 	test_http \
-	test_diskstream
+	test_diskstream \
+	test_cache
 #	test_rtmp 
 
 test_http_SOURCES = test_http.cpp
 test_http_LDADD = $(AM_LDFLAGS) 
 test_http_DEPENDENCIES = site-update
+
+test_cache_SOURCES = test_cache.cpp
+test_cache_LDADD = $(AM_LDFLAGS) 
+test_cache_DEPENDENCIES = site-update
 
 test_diskstream_SOURCES = test_diskstream.cpp
 test_diskstream_LDADD = $(AM_LDFLAGS) 
