@@ -180,11 +180,17 @@ public:
     /// @return A value that is the size of the file in bytes.
     size_t getFileSize() { return _filesize; };
     
+    ///  \brief Dump the internal data of this class in a human readable form.
+    /// @remarks This should only be used for debugging purposes.
+    void dump() const { dump(std::cerr); }
+    /// \overload dump(std::ostream& os) const
+    void dump(std::ostream& os) const;    
+
 private:
     /// \var DiskStream::_state
     ///		The current status of the stream while streaming.
     state_e     _state;
-    int         _bytes;
+    int         _bytes;		// FIXME: is this a dup ?
     
     /// \var DiskStream::_filefd
     ///		The file descriptor of the disk file.
@@ -226,7 +232,14 @@ private:
     
     gnash::CQue _que;
 };
- 
+
+/// \brief Dump to the specified output stream.
+inline std::ostream& operator << (std::ostream& os, const DiskStream& cache)
+{
+	cache.dump(os);
+	return os;
+}
+
 } // end of cygnal namespace
 
 #endif // __DISKSTREAM_H__

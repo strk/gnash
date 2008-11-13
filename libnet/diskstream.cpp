@@ -486,9 +486,15 @@ bool DiskStream::multicast(const string & /*filespec*/)
     log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true    
 }
+void
+DiskStream::dump(std::ostream& os) const
+{
+    
+//    GNASH_REPORT_FUNCTION;
+}
+
 
 } // end of cygnal namespace
-
 
 // local Variables:
 // mode: C++
