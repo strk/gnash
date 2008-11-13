@@ -53,9 +53,50 @@ Cache::~Cache()
 }
 
 void
-Cache::dump(std::ostream& os) const
+Cache::removePath(const std::string &name)
 {
-    
+//    GNASH_REPORT_FUNCTION;
+    map<string, string>::iterator it;
+    for (it = _pathnames.begin(); it != _pathnames.end(); it++) {
+        cerr << name << " : " << it->first << " : " << it->second << endl;
+ 	if (it->first == name) {
+            cerr << "Matched!" << endl;
+            _pathnames.erase(it);
+            break;
+ 	}
+    }
+}
+
+void
+Cache::removeResponse(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    map<string, string>::iterator it;
+    for (it = _responses.begin(); it != _responses.end(); it++) {
+ 	if (it->first == name) {
+            _responses.erase(it);
+            break;
+ 	}
+    }
+}
+
+void
+Cache::removeFile(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    map<string, DiskStream *>::iterator it;
+    for (it = _files.begin(); it != _files.end(); it++) {
+//        DiskStream *ds = it->second;
+  	if (it->first == name) {
+            _files.erase(it);
+             break;
+  	}
+    }
+}
+
+void
+Cache::dump(std::ostream& os) const
+{    
 //    GNASH_REPORT_FUNCTION;
     
 //    boost::mutex::scoped_lock lock(cache_mutex);

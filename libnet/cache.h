@@ -41,12 +41,17 @@ public:
     ~Cache();
     
     void addPath(const std::string &name, const std::string &fullpath) { _pathnames[name] = fullpath; };
-    void addResponse(const std::string &name, const std::string &response) { _responses[name] = response; };
-    void addFile(const std::string &name, DiskStream *file) { _files[name] = file; };
-
     std::string &findPath(const std::string &name) { return _pathnames[name]; };
+    void removePath(const std::string &name);
+
+    void addResponse(const std::string &name, const std::string &response) { _responses[name] = response; };
+    void removeResponse(const std::string &name);
+
     std::string &findResponse(const std::string &name) { return _responses[name]; };
+
+    void addFile(const std::string &name, DiskStream *file) { _files[name] = file; };
     DiskStream *findFile(const std::string &name) { return _files[name]; };
+    void removeFile(const std::string &name);
 
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
