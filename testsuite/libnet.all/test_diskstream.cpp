@@ -45,7 +45,6 @@
 
 using namespace amf;
 using namespace gnash;
-using namespace cygnal;
 using namespace std;
 
 static void usage (void);
