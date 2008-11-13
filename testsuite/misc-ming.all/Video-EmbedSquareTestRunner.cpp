@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "Video-EmbedSquareTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -42,7 +42,7 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	if ( ! tester.canTestRendering() )
@@ -59,7 +59,7 @@ main(int /*argc*/, char** /*argv*/)
 	int scale_y = 1;
 
 	size_t framecount = root->get_frame_count();
-	check_equals(framecount, 11);
+	check_equals(framecount, 12);
 	
 	// Just loop twice, so to catch crashes...
 	for (int j = 0; j < 2; ++j) {
@@ -108,10 +108,10 @@ main(int /*argc*/, char** /*argv*/)
 				check_pixel((45 + i)*scale_x, 5, 2, yellow, 5);
 			}
 
-			if ( framenum == framecount-1 )
+			if ( framenum == framecount-2 )
 			{
 				// check we're playing, or we'll never get to next loop...
-				check_equals(root->get_play_state(), sprite_instance::PLAY);
+				check_equals(root->get_play_state(), MovieClip::PLAY);
 				break;
 			}
 
@@ -119,6 +119,18 @@ main(int /*argc*/, char** /*argv*/)
 		}
 
 		tester.advance();
+
+		// Check the color in (5,5) - should be yellow. Well, anything
+		// but white or transparent.
+		check_pixel(5, 5, 2, yellow, 5);
+		check_equals(root->get_play_state(), MovieClip::STOP);
+		tester.click();
+
+		// Sanity check
+		check_equals(root->get_play_state(), MovieClip::PLAY);
+
+		tester.advance();
+
 	}
 
 }

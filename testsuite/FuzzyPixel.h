@@ -22,7 +22,7 @@
 
 #include "Range2d.h"
 #include "GnashKey.h" // for namespace key
-#include "types.h" // for rgba class
+#include "RGBA.h" // for rgba class (composition)
 
 #include <iostream> 
 

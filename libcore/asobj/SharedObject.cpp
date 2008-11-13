@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <boost/tokenizer.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 #include <cerrno>
 
 #include "SimpleBuffer.h"
@@ -94,8 +95,8 @@ public:
         {
             //GNASH_REPORT_FUNCTION;
             AMF amf;
-            Element *el = 0;
-
+            boost::shared_ptr<amf::Element> el;
+            
             const std::string& name = _st.string_table::value(key);
 
             //log_debug("Serializing SharedObject property %s:%s", name, val);
@@ -105,13 +106,11 @@ public:
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                el = new amf::Element;
-                el->init(name, str);
+                el.reset(new amf::Element(name, str));
             }
             if (val.is_bool()) {
                 bool flag = val.to_bool();
-                el = new amf::Element;
-                el->init(name, flag);
+                el.reset(new amf::Element(name, flag));
             }
             if (val.is_number()) { 
                 double dub;
@@ -120,8 +119,7 @@ public:
                 } else {
                     dub = val.to_number();
                 }
-                el = new amf::Element;
-                el->init(name, dub);
+                el.reset(new amf::Element(name, dub));
             }
 
             if (el) {
@@ -312,8 +310,8 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     struct stat statbuf;
     if ( -1 == stat(_solSafeDir.c_str(), &statbuf) )
     {
-       log_error("Invalid SOL safe dir %s: %s. Won't save any SharedObject.", _solSafeDir, std::strerror(errno));
-        _solSafeDir.clear();
+       log_debug("Invalid SOL safe dir %s: %s. Will try to create on flush/exit.", _solSafeDir, std::strerror(errno));
+        //_solSafeDir.clear();
     }
 
     // Which URL we should use here is under research.
@@ -329,12 +327,13 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // loaded SWF, so that in the A loads B scenario above the
     // domain would be the one of A, not B.
     //
-    // NOTE: using the base url (get_base_url) would mean
+    // NOTE: using the base url RunInfo::baseURL() would mean
     // blindly trusting the SWF publisher as base url is changed
     // by the 'base' attribute of OBJECT or EMBED tags trough
     // -P base=xxx
     //
-    const std::string& swfURL = _vm.getSWFUrl();
+    const movie_root& mr = _vm.getRoot();
+    const std::string& swfURL = mr.getOriginalURL();
 
     // Get the domain part, or take as 'localhost' if none
     // (loaded from filesystem)
@@ -444,7 +443,7 @@ SharedObjectLibrary::getLocal(const std::string& objName, const std::string& roo
         
     if ( ! obj->readSOL(newspec) )
     {
-        log_error("Couldn't read SOL %s, will create on flush/exit", newspec);
+        log_debug("Couldn't read SOL %s, will create on flush/exit.", newspec);
     }
 
     return obj;
@@ -549,8 +548,8 @@ SharedObject::readSOL(const std::string& filespec)
         return false;
     }
     
-    std::vector<Element *>::const_iterator it, e;
-    std::vector<Element *> els = sol.getElements();
+    std::vector<boost::shared_ptr<amf::Element> >::const_iterator it, e;
+    std::vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
     log_debug("Read %d AMF objects from %s", els.size(), filespec);
 
     string_table& st = _vm.getStringTable();
@@ -559,7 +558,7 @@ SharedObject::readSOL(const std::string& filespec)
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     
     for (it = els.begin(), e = els.end(); it != e; it++) {
-        Element *el = *it;
+        boost::shared_ptr<amf::Element> el = *it;
 
 #if 0 // this would be using as_value::as_value(const Element&)
 

@@ -18,13 +18,13 @@
 #ifndef GNASH_CHARACTER_DEF_H
 #define GNASH_CHARACTER_DEF_H
 
-#include "resource.h" // for inheritance from resource class
+#include "ExportableResource.h"
 
 // Forward declarations
 
 namespace gnash {
 	class character;
-	class matrix;
+	class SWFMatrix;
 	class rect;
 }
 
@@ -40,13 +40,13 @@ class render_cache_manager;
 /// can be mixed into movie_definition and sprite_definition,
 /// without using multiple inheritance.
 ///
-class character_def : public resource
+class character_def : public ExportableResource
 {
 private:
 	int	m_id;
 		
 	// don't assign-to
-	character_def& operator= (const character_def&) { abort(); return *this; }
+	character_def& operator= (const character_def&);
 public:
 	character_def()
 		:
@@ -67,22 +67,12 @@ public:
 	/// Point coordinates are local coords (TWIPS)
 	///
 	/// @param wm
-	///	Current world matrix of the instance we want to check.
+	///	Current world SWFMatrix of the instance we want to check.
 	///	This is needed to properly scale non-scalable strokes.
 	///
-	virtual bool point_test_local(boost::int32_t /*x*/, boost::int32_t /*y*/, matrix& /*wm*/)
+	virtual bool point_test_local(boost::int32_t /*x*/, boost::int32_t /*y*/, SWFMatrix& /*wm*/)
 	{
 		return false;
-	}
-
-	virtual float get_height_local() const
-	{
-		return 0.0f;
-	}
-
-	virtual float get_width_local() const
-	{
-		return 0.0f;
 	}
 
 	/// Should stick the result in a boost::intrusive_ptr immediately.
@@ -91,12 +81,6 @@ public:
 	///
 	virtual character* create_character_instance(character* parent,
 			int id);
-	
-	// From resource interface.
-	virtual character_def*	cast_to_character_def()
-	{
-		return this;
-	}
 	
 	// Declared as virtual here because generic_character needs access to it
 	virtual const rect&	get_bound() const = 0;
@@ -137,7 +121,7 @@ protected:
 	///
 	character_def(const character_def& o)
 		:
-		resource(), // this is a new resource, nothing to copy
+        ExportableResource(),
 		m_id(o.m_id),
 		m_render_cache(NULL)
 	{}

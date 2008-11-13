@@ -1,0 +1,84 @@
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+                   "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+[
+  <!ENTITY legal SYSTEM "legal.xml">
+  <!ENTITY appversion "0.8">
+  <!ENTITY manrevision "0.1">
+  <!ENTITY date "Feb 2008">
+  <!ENTITY app "<application>Flvdumper</application>">
+  <!ENTITY appname "flvdumper">
+  <!ENTITY version "0.8">
+]
+>
+
+<refentry id="flvdumper">
+<refmeta>
+<refentrytitle>flvdumper</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<!-- the refname becomes the output name of the man page -->
+<refnamediv>
+<refname>flvdumper</refname>
+<refpurpose>Gnash FLash Video File Dumper</refpurpose>
+</refnamediv>
+
+
+<refsynopsisdiv><title>Synopsis</title>
+<synopsis>
+flvdumper (options)... (file)...
+</synopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  Dump information about .flv files.
+</para>
+
+<para>
+  When a SWF player, including Gnash, plays a SWF "movie",
+  the movie can contain video files.
+
+  Flvdumper prints these files,
+  which are comprised of an H.263 variant or H.254 video bit stream.
+</para>
+
+<para>
+  More information about Flash Video is available at the Wikipedia Flash
+  Video article: http://en.wikipedia.org/wiki/Flash_Video
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term>-h</term>
+    <listitem>
+      <para>
+	Print usage info.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-m</term>
+    <listitem>
+      <para>
+	Print only meta tags (default).
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>-a</term>
+    <listitem>
+      <para>
+	Print all the tags.
+      </para>
+    </listitem>
+  </varlistentry>
+
+
+</variablelist>
+
+</refsect1>
+</refentry>
+

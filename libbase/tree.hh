@@ -7,7 +7,7 @@
 
 */
 
-/** \mainpage tree.hh
+/** \page tree.hh
     \author   Kasper Peeters
     \version  2.51
     \date     28-Feb-2008

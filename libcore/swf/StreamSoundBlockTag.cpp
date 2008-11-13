@@ -1,4 +1,3 @@
-// StreamSoundBlockTag.cpp:  for Gnash.
 //
 //   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 //
@@ -17,24 +16,26 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #include "StreamSoundBlockTag.h"
 #include "sound_handler.h" 
 #include "movie_definition.h" // for addControlTag
-#include "sprite_instance.h" // for execute
+#include "MovieClip.h" // for execute
 #include "SoundInfo.h" // for loader
 #include "SWFStream.h"
-#include "log.h" 
-//#include "sound_definition.h" // for sound_sample
+#include "log.h"
+#include "RunInfo.h"
+#include "VM.h" // For getting movie_root. TODO: drop
 
 namespace gnash {
 namespace SWF {
 
 void
-StreamSoundBlockTag::execute(sprite_instance* m, DisplayList& /*dlist*/) const
+StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 {
-	// Make static ?
-	media::sound_handler* handler = get_sound_handler();
+
+    const movie_root& mr = m->getVM().getRoot();
+
+	sound::sound_handler* handler = mr.runInfo().soundHandler(); 
 	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.
@@ -45,16 +46,17 @@ StreamSoundBlockTag::execute(sprite_instance* m, DisplayList& /*dlist*/) const
 
 /* public static */
 void
-StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
+StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+        const RunInfo& r)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-    media::sound_handler* handler = get_sound_handler();
+    sound::sound_handler* handler = r.soundHandler(); 
 
     // If we don't have a sound_handler registered stop here
     if (!handler)
     {
-	// log_debug ?
+	    // log_debug ?
         return;
     }
 
@@ -69,7 +71,8 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     if (!sinfo)
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("Found SOUNDSTREAMBLOCK tag w/out preceeding SOUNDSTREAMHEAD"));
+            log_swferror(_("Found SOUNDSTREAMBLOCK tag w/out preceding "
+                "SOUNDSTREAMHEAD"));
         );
         return;
     }
@@ -81,23 +84,25 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     if (format == media::AUDIO_CODEC_MP3)
     {
         in.ensureBytes(4);
-	// FIXME: use these values !
+	    // FIXME: use these values !
         unsigned int samplesCount = in.read_u16(); UNUSED(samplesCount);
         unsigned int seekSamples = in.read_u16();
-	LOG_ONCE ( if ( seekSamples ) log_unimpl("MP3 soundblock seek samples") );
+	    if (seekSamples) LOG_ONCE(log_unimpl(_("MP3 soundblock seek samples")));
     }
 
     const unsigned int dataLength = in.get_tag_end_position() - in.tell();
     if ( ! dataLength )
     {
         IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common waste of space") );
+            LOG_ONCE(log_swferror("Empty SOUNDSTREAMBLOCK tag, seems common "
+                    "waste of space"));
         );
         return;
     }
 
     unsigned char *data = new unsigned char[dataLength];
-    const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data), dataLength);
+    const unsigned int bytesRead = in.read(reinterpret_cast<char*>(data),
+            dataLength);
     
     if (bytesRead < dataLength)
     {
@@ -109,7 +114,8 @@ StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m)
     //
     // ownership of 'data' is transferred here
     //
-    long start = handler->fill_stream_data(data, dataLength, sample_count, handle_id);
+    long start = handler->fill_stream_data(data, dataLength, sample_count,
+            handle_id);
 
     // TODO: log_parse ?
 

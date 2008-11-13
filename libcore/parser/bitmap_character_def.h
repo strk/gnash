@@ -21,7 +21,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "gnash.h" // for bitmap_info definition
 #include "ref_counted.h" // for character_def inheritance
-#include "types.h"
 #include "smart_ptr.h"
 #include "bitmap_info.h" // for dtor visibility by intrusive_ptr
 #include "GC.h" // for GcResource (markReachableResources)
@@ -31,9 +30,7 @@
 
 
 namespace gnash {
-namespace image {
-	class ImageBase;
-}
+	class GnashImage;
 }
 
 namespace gnash {
@@ -48,26 +45,26 @@ namespace gnash {
 ///	- SWF::DEFINELOSSLESS
 ///	- SWF::DEFINELOSSLESS2
 ///
-/// The definition currently only takes an image::ImageRGB 
-/// or image::ImageRGBA pointer. We should probably move
+/// The definition currently only takes an ImageRGB 
+/// or ImageRGBA pointer. We should probably move
 /// the methods for actually reading such tags instead.
 ///
 /// One problem with this class is that it relies on the
 /// availability of a render_handler in order to transform
-/// image::ImageRGB or image::ImageRGBA to a bitmap_info.
+/// ImageRGB or image::ImageRGBA to a bitmap_info.
 ///
 class bitmap_character_def : public ref_counted // @@ why not character_def ?
 {
 
 public:
 
-	/// Construct a bitmap_character_def from an image::ImageRGB
+	/// Construct a bitmap_character_def from an ImageRGB
 	//
 	/// NOTE: uses currently registered render_handler to
 	///       create a bitmap_info, don't call before a renderer
 	///	  has been registered
 	///
- 	bitmap_character_def(std::auto_ptr<image::ImageBase> image);
+ 	bitmap_character_def(std::auto_ptr<GnashImage> image);
 
 	bitmap_info* get_bitmap_info() {
 		return _bitmap_info.get();

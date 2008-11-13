@@ -24,7 +24,7 @@
 #include <vector>
 #include <set>
 
-#include "sprite_instance.h" // for inheritance
+#include "MovieClip.h" // for inheritance
 #include "smart_ptr.h" // for composition
 #include "movie_definition.h" // for dtor visibility by smart ptr
 
@@ -32,14 +32,13 @@
 namespace gnash {
 	class movie_root; 
 	class character; 
-	class movie_def_impl;
 }
 
 namespace gnash
 {
 
 /// Stateful Movie object (a special kind of sprite)
-class movie_instance : public sprite_instance
+class movie_instance : public MovieClip
 {
 
 public:
@@ -55,7 +54,7 @@ public:
 	/// Handle a top-level movie on stage placement.
 	//
 	/// This method will just ensure first frame is loaded
-	/// and then call sprite_instance::stagePlacementCallback.
+	/// and then call MovieClip::stagePlacementCallback.
 	///
 	/// It's intended to be called by movie_root::setLevel().
 	///

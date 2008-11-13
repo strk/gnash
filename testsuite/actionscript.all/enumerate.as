@@ -98,5 +98,63 @@ rcsid="$Id: enumerate.as,v 1.10 2008/03/11 19:31:48 strk Exp $";
   delete recorder;
 }
 
+enumerateObj = function(object) {
+   list = ""; 
+    for (el in object) {
+        list += el + ",";
+    }
+    return list;
+};
+
+/// Try different enumerations.
+{
+    list = "";
+    o = {};
+
+    o.a = 3;
+    check_equals(enumerateObj(o), "a,");
+
+    o.b = "string";
+    check_equals(enumerateObj(o), "b,a,");
+
+    o["el"] = 5;
+    check_equals(enumerateObj(o), "el,b,a,");
+    
+    o[8] = new Date();
+    check_equals(enumerateObj(o), "8,el,b,a,");
+    
+    o.b = 8;
+    check_equals(enumerateObj(o), "8,el,b,a,");
+
+    delete o.b;
+    check_equals(enumerateObj(o), "8,el,a,");
+
+    o.b = "string again";
+    check_equals(enumerateObj(o), "b,8,el,a,");
+
+    r = o.u;
+    check_equals(enumerateObj(o), "b,8,el,a,");
+
+    t = {};
+    o[t] = 9;
+    check_equals(enumerateObj(o), "[object Object],b,8,el,a,");
+
+    delete o["8"];
+    check_equals(enumerateObj(o), "[object Object],b,el,a,");
+
+    o.c = Object.prototype.toString;
+    check_equals(enumerateObj(o), "c,[object Object],b,el,a,");
+
+    o[9] = 7;
+    check_equals(enumerateObj(o), "9,c,[object Object],b,el,a,");
+    
+    o["6"] = 8;
+    check_equals(enumerateObj(o), "6,9,c,[object Object],b,el,a,");
+
+}
+totals(31);
+#else
+totals(0);
 #endif  // OUTPUT_VERSION > 5
-totals();
+
+

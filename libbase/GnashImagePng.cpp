@@ -271,11 +271,11 @@ PngImageOutput::init()
 }
 
 void
-PngImageOutput::writeImageRGBA(unsigned char* rgbaData)
+PngImageOutput::writeImageRGBA(const unsigned char* rgbaData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
-    boost::scoped_array<png_bytep> rows(new png_bytep[_height]);
+    boost::scoped_array<const png_byte*> rows(new const png_byte*[_height]);
 
     // RGBA
     const size_t components = 4;
@@ -285,7 +285,8 @@ PngImageOutput::writeImageRGBA(unsigned char* rgbaData)
         rows[y] = rgbaData + _width * y * components;
     }
 
-    png_set_rows(_pngPtr, _infoPtr, rows.get());
+    // libpng needs non-const. We'll hope it doesn't change our image.
+    png_set_rows(_pngPtr, _infoPtr, const_cast<png_bytepp>(rows.get()));
 
     png_set_IHDR(_pngPtr, _infoPtr, _width, _height,
        8, PNG_COLOR_TYPE_RGBA, PNG_INTERLACE_NONE,
@@ -296,11 +297,11 @@ PngImageOutput::writeImageRGBA(unsigned char* rgbaData)
 
 
 void
-PngImageOutput::writeImageRGB(unsigned char* rgbData)
+PngImageOutput::writeImageRGB(const unsigned char* rgbData)
 {
     png_set_write_fn(_pngPtr, _outStream.get(), &writeData, &flushData);
 
-    boost::scoped_array<png_bytep> rows(new png_bytep[_height]);
+    boost::scoped_array<const png_byte*> rows(new const png_byte*[_height]);
 
     // RGB
     const size_t components = 3;
@@ -310,7 +311,8 @@ PngImageOutput::writeImageRGB(unsigned char* rgbData)
         rows[y] = rgbData + _width * y * components;
     }
 
-    png_set_rows(_pngPtr, _infoPtr, rows.get());
+    // libpng needs non-const. We'll hope it doesn't change our image.
+    png_set_rows(_pngPtr, _infoPtr, const_cast<png_bytepp>(rows.get()));
 
     png_set_IHDR(_pngPtr, _infoPtr, _width, _height,
        8, PNG_COLOR_TYPE_RGB, PNG_INTERLACE_NONE,

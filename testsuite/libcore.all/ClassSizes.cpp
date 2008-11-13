@@ -23,9 +23,9 @@
 #include "as_object.h"
 #include "Property.h"
 #include "PropertyList.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
-#include "types.h"
+#include "RGBA.h"
 
 #include <iostream>
 #include <sstream>
@@ -61,7 +61,7 @@ main(int /*argc*/, char** /*argv*/)
 	std::cout << "sizeof(GcResource): " << (sizeof(GcResource)) << std::endl;
 	std::cout << "sizeof(as_object): " << (sizeof(as_object)) << std::endl;
 	std::cout << "sizeof(character): " << (sizeof(character)) << std::endl;
-	std::cout << "sizeof(sprite_instance): " << (sizeof(sprite_instance)) << std::endl;
+	std::cout << "sizeof(MovieClip): " << (sizeof(MovieClip)) << std::endl;
 
 	std::cout << "sizeof(rgba): " << (sizeof(rgba)) << std::endl;
 	std::cout << "sizeof(line_style): " << (sizeof(line_style)) << std::endl;

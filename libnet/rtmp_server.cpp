@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/detail/endian.hpp>
 
 #if ! (defined(_WIN32) || defined(WIN32))
@@ -76,7 +77,7 @@ RTMPServer::handShakeWait()
 
 //     char buffer[RTMP_BODY_SIZE+16];
 //     memset(buffer, 0, RTMP_BODY_SIZE+16);
-    amf::Buffer *buf = _handler->pop();
+    boost::shared_ptr<amf::Buffer> buf = _handler->pop();
 
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -98,10 +99,8 @@ RTMPServer::handShakeWait()
 	_handshake = new amf::Buffer(RTMP_BODY_SIZE);
 	_handshake->copy(buf->reference() + 1, RTMP_BODY_SIZE);
 	log_debug (_("Handshake Data matched"));
-	delete buf;			// we're done with the buffer
 //	return true;
     } else {
-	delete buf;			// we're done with the buffer
  	log_error (_("Handshake Data didn't match"));
 // 	return false;
     }
@@ -116,17 +115,17 @@ RTMPServer::handShakeResponse()
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf1 = new amf::Buffer(RTMP_BODY_SIZE + 1);
-    *buf1->begin() = RTMP_HANDSHAKE;
-    buf1->append(_handshake);
-    _handler->pushout(buf1);
+    boost::shared_ptr<amf::Buffer> buf1(new amf::Buffer(RTMP_BODY_SIZE + 1));
+    *buf1 = RTMP_HANDSHAKE;
+    *buf1 += _handshake;
+//  _handler->pushout(buf1); FIXME:
 
-    amf::Buffer *buf2 = new amf::Buffer(RTMP_BODY_SIZE);
+    boost::shared_ptr<amf::Buffer> buf2(new amf::Buffer(RTMP_BODY_SIZE));
     buf2->copy(_handshake->begin(), RTMP_BODY_SIZE);
-    _handler->pushout(buf2);
+//    _handler->pushout(buf2); FIXME:
     
 //     std::copy(_handshake->begin(), _handshake->end(), (buf1->begin() + 1));    
-//     amf::Buffer *buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
+//     boost::shared_ptr<amf::Buffer> buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
 //     std::copy(_handshake->begin(), _handshake->end(), buf->begin() + 1 + RTMP_BODY_SIZE);
     _handler->notifyout();
 
@@ -140,8 +139,8 @@ RTMPServer::serverFinish()
 {
     GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buf = _handler->pop();
-    amf::Buffer *obj = buf;
+    boost::shared_ptr<amf::Buffer> buf = _handler->pop();
+    boost::shared_ptr<amf::Buffer> obj = buf;
     
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
@@ -153,7 +152,7 @@ RTMPServer::serverFinish()
     // the remainder for processing.
     if (buf->size() >= static_cast<size_t>(RTMP_BODY_SIZE)) {
 	size_t size = buf->size() - RTMP_BODY_SIZE;  
-	obj = new amf::Buffer[size];
+	obj.reset(new amf::Buffer[size]);
 	obj->copy(buf->begin()+RTMP_BODY_SIZE, size);
     } else {
 	_handler->wait();
@@ -161,7 +160,6 @@ RTMPServer::serverFinish()
     }
     
     int diff = std::memcmp(buf->begin(), _handshake->begin(), RTMP_BODY_SIZE);
-    delete buf;			// we're done with the buffer
     if (diff == 0) {
 	log_debug (_("Handshake Finish Data matched"));
     } else {
@@ -175,14 +173,14 @@ RTMPServer::serverFinish()
 }
 
 bool
-RTMPServer::packetSend(amf::Buffer * /* buf */)
+RTMPServer::packetSend(boost::shared_ptr<amf::Buffer>  /* buf */)
 {
     GNASH_REPORT_FUNCTION;
     return false;
 }
 
 bool
-RTMPServer::packetRead(amf::Buffer *buf)
+RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -222,12 +220,12 @@ RTMPServer::packetRead(amf::Buffer *buf)
     Network::byte_t* tooFar = ptr+300+sizeof(int); // FIXME:
     
     AMF amf_obj;
-    amf::Element *el1 = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el1 = amf_obj.extractAMF(ptr, tooFar);
     ptr += amf_obj.totalsize();
-    amf::Element *el2 = amf_obj.extractAMF(ptr, tooFar);
+    boost::shared_ptr<amf::Element> el2 = amf_obj.extractAMF(ptr, tooFar);
 
     int size = 0;
-    amf::Element *el;
+    boost::shared_ptr<amf::Element> el;
     while ( size < static_cast<boost::uint16_t>(_header.bodysize) - 24 ) {
 	if (ptr) {
 	    el = amf_obj.extractProperty(ptr, tooFar);
@@ -243,9 +241,6 @@ RTMPServer::packetRead(amf::Buffer *buf)
 	    break;
 	}
     }
-
-    delete el1;
-    delete el2;
     
 # if 0
     Element el;
@@ -256,7 +251,7 @@ RTMPServer::packetRead(amf::Buffer *buf)
     log_debug (_("Reading AMF packets till we're done..."));
     buf->dump();
     while (ptr < end) {
-	amf::Element *el = new amf::Element;
+	boost::shared_ptr<amf::Element> el(new amf::Element);
 	ptr = amf.extractProperty(el, ptr);
 	addProperty(el);
 	el->dump();
@@ -270,7 +265,7 @@ RTMPServer::packetRead(amf::Buffer *buf)
 	buf = _handler->merge(buf);
     }
     while ((ptr - buf->begin()) < static_cast<int>(actual_size)) {
-	amf::Element *el = new amf::Element;
+	boost::shared_ptr<amf::Element> el(new amf::Element);
 	if (ptr) {
 	    ptr = amf.extractProperty(el, ptr);
 	    addProperty(el);
@@ -337,18 +332,18 @@ RTMPServer::packetRead(amf::Buffer *buf)
           break;
     };
     
-    Element *url = getProperty("tcUrl");
-    Element *file = getProperty("swfUrl");
-    Element *app = getProperty("app");
+    boost::shared_ptr<amf::Element> url = getProperty("tcUrl");
+    boost::shared_ptr<amf::Element> file = getProperty("swfUrl");
+    boost::shared_ptr<amf::Element> app = getProperty("app");
 
     if (file) {
-	log_debug("SWF file %s", file->getData());
+	log_debug("SWF file %s", file->to_string());
     }
     if (url) {
-	log_debug("is Loading video %s", url->getData());
+	log_debug("is Loading video %s", url->to_string());
     }
     if (app) {
-	log_debug("is file name is %s", app->getData());
+	log_debug("is file name is %s", app->to_string());
     }
     
     return true;
@@ -368,7 +363,7 @@ RTMPServer::packetRead(amf::Buffer *buf)
 //
 // _result(double ClientStream, NULL, double ServerStream)
 // These are handlers for the various types
-amf::Buffer *
+boost::shared_ptr<Buffer>
 RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 {
     GNASH_REPORT_FUNCTION;
@@ -408,15 +403,15 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
       {
 // 	  errstr = new Element;
 // 	  errstr->makeString("error");
-	  Element *level = new Element;
+	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "error");
 	  top.addProperty(level);
 
-	  Element *description = new Element;
+	  boost::shared_ptr<amf::Element> description(new Element);
 	  description->makeString("description", "Connection Failed.");
 	  top.addProperty(description);
 	  
-	  Element *code = new Element;
+	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "Connection.Connect.Failed");
 	  top.addProperty(code);
       }
@@ -426,29 +421,29 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 // 	  delete str;
 // 	  str = new Element;
 // 	  str->makeString("error");
-	  Element *level = new Element;
+	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "error");
 	  top.addProperty(level);
 
-	  Element *description = new Element;
+	  boost::shared_ptr<amf::Element> description(new Element);
 	  description->makeString("description", "Connection Rejected.");
 	  top.addProperty(description);
 	  
-	  Element *code = new Element;
+	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "NetConnection.Connect.Rejected");
 	  top.addProperty(code);
       }
       case RTMPMsg::NC_CONNECT_SUCCESS:
       {
-	  Element *level = new Element;
+	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
 
-	  Element *description = new Element;
+	  boost::shared_ptr<amf::Element> description(new Element);
 	  description->makeString("description", "Connection succeeded.");
 	  top.addProperty(description);
 	  
-	  Element *code = new Element;
+	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "NetConnection.Connect.Success");
 	  top.addProperty(code);
       }
@@ -489,22 +484,19 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 	  break;
     };
     
-    Buffer *strbuf = str->encode();
-    Buffer *numbuf = number->encode();
-    Buffer *topbuf = top.encode();
+    boost::shared_ptr<amf::Buffer> strbuf = str->encode();
+    boost::shared_ptr<amf::Buffer> numbuf = number->encode();
+    boost::shared_ptr<amf::Buffer> topbuf = top.encode();
 
-    Buffer *buf = new Buffer(strbuf->size() + numbuf->size() + topbuf->size());
-    buf->append(strbuf);
-    buf->append(numbuf);
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(strbuf->size() + numbuf->size() + topbuf->size()));
+    *buf += strbuf;
+    *buf += numbuf;
     Network::byte_t byte = static_cast<Network::byte_t>(RTMP::SERVER & 0x000000ff);
-    buf->append(byte);
-    buf->append(topbuf);
+    *buf += byte;
+    *buf += topbuf;
 
     delete str;
     delete number;
-    delete strbuf;
-    delete numbuf;
-//    delete topbuf;//   FIXME: deleting this shouldn't core dump.
     
     return buf;
 }
@@ -613,30 +605,26 @@ rtmp_handler(Handler::thread_params_t *args)
 // A RTMP Ping packet looks like this: "02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 0",
 // which is the Ping type byte, followed by two shorts that are the parameters. Only the first
 // two paramters are required.
-amf::Buffer *
+boost::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type)
 {
     GNASH_REPORT_FUNCTION;
     return encodePing(type, 0);
 }
 
-amf::Buffer *
+boost::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
     GNASH_REPORT_FUNCTION;
-    Buffer *buf = new Buffer(sizeof(boost::uint16_t) * 3);
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
     Network::byte_t *ptr = buf->reference();
     buf->clear();	// default everything to zeros, real data gets optionally added.
 
-    boost::uint32_t field = htonl(*reinterpret_cast<boost::uint32_t *>(&type));
-#ifdef BOOST_LITTLE_ENDIAN
-    field = field >> 16;
-#endif
-    boost::uint16_t typefield = static_cast<boost::uint16_t>(field);
+    boost::uint16_t typefield = htons(type);
     ptr += sizeof(boost::uint16_t); // go past the first short
 
     boost::uint32_t swapped = 0;
-    buf->copy(typefield);
+    *buf = typefield;
     switch (type) {
         // These two don't appear to have any paramaters
       case PING_CLEAR:
@@ -648,7 +636,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 	  ptr += sizeof(boost::uint16_t); // go past the second short
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append(swapped);
+	  buf->append((Network::byte_t *)&swapped, sizeof(boost::uint32_t));
 	  break;
       }
       // reset doesn't have any parameters
@@ -661,11 +649,10 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 //	  swapped = htonl(milliseconds);
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append(swapped);
+	  buf->append((Network::byte_t *)&swapped, sizeof(boost::uint32_t));
 	  break;
       }
       default:
-	  return 0;
 	  break;
     };
     

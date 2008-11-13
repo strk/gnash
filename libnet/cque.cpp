@@ -55,12 +55,12 @@ CQue::~CQue()
 //    clear();
     que_t::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
-    for (it = _que.begin(); it != _que.end(); it++) {
-	amf::Buffer *ptr = *(it);
-	if (ptr->size()) {	// FIXME: we probably want to delete ptr anyway,
-	    delete ptr;		// but if we do, this will core dump.
-	}
-    }
+//     for (it = _que.begin(); it != _que.end(); it++) {
+// 	boost::shared_ptr<amf::Buffer> ptr = *(it);
+// 	if (ptr->size()) {	// FIXME: we probably want to delete ptr anyway,
+// 	    delete ptr;		// but if we do, this will core dump.
+// 	}
+//     }
 }
 
 // Wait for a condition variable to trigger
@@ -91,7 +91,7 @@ CQue::size()
 }
 
 bool
-CQue::push(amf::Buffer *data)
+CQue::push(boost::shared_ptr<amf::Buffer> data)
 {
     GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
@@ -108,18 +108,18 @@ bool
 CQue::push(gnash::Network::byte_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
-    amf::Buffer *buf = new amf::Buffer;
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
     std::copy(data, data + nbytes, buf->reference());
     return push(buf);
 }
 
 
 // Pop the first date element off the FIFO
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 CQue::pop()
 {
 //    GNASH_REPORT_FUNCTION;
-    amf::Buffer *buf = 0;
+    boost::shared_ptr<amf::Buffer> buf;
     boost::mutex::scoped_lock lock(_mutex);
     if (_que.size()) {
         buf = _que.front();
@@ -132,7 +132,7 @@ CQue::pop()
 }
 
 // Peek at the first data element without removing it
-amf::Buffer *
+boost::shared_ptr<amf::Buffer> 
 CQue::peek()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -140,7 +140,6 @@ CQue::peek()
     if (_que.size()) {
         return _que.front();
     }
-    return 0;	
 }
 
 // Return the size of the queues
@@ -154,14 +153,14 @@ CQue::clear()
 
 // Remove a range of elements
 void
-CQue::remove(amf::Buffer *begin, amf::Buffer *end)
+CQue::remove(boost::shared_ptr<amf::Buffer> begin, boost::shared_ptr<amf::Buffer> end)
 {
     GNASH_REPORT_FUNCTION;
-    deque<amf::Buffer *>::iterator it;
-    deque<amf::Buffer *>::iterator start;
-    deque<amf::Buffer *>::iterator stop;
+    deque<boost::shared_ptr<amf::Buffer> >::iterator it;
+    deque<boost::shared_ptr<amf::Buffer> >::iterator start;
+    deque<boost::shared_ptr<amf::Buffer> >::iterator stop;
     boost::mutex::scoped_lock lock(_mutex);
-    amf::Buffer *ptr;
+    boost::shared_ptr<amf::Buffer> ptr;
     for (it = _que.begin(); it != _que.end(); it++) {
 	ptr = *(it);
 	if (ptr->reference() == begin->reference()) {
@@ -177,13 +176,13 @@ CQue::remove(amf::Buffer *begin, amf::Buffer *end)
 
 // Remove an element
 void
-CQue::remove(amf::Buffer *element)
+CQue::remove(boost::shared_ptr<amf::Buffer> element)
 {
     GNASH_REPORT_FUNCTION;
-    deque<amf::Buffer *>::iterator it;
+    deque<boost::shared_ptr<amf::Buffer> >::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     for (it = _que.begin(); it != _que.end(); ) {
-	amf::Buffer *ptr = *(it);
+	boost::shared_ptr<amf::Buffer> ptr = *(it);
 	if (ptr->reference() == element->reference()) {
 	    it = _que.erase(it);
 	} else {
@@ -194,14 +193,14 @@ CQue::remove(amf::Buffer *element)
 
 // Merge sucessive buffers into one single larger buffer. This is for some
 // protocols, than have very long headers.
-amf::Buffer *
-CQue::merge(amf::Buffer *start)
+boost::shared_ptr<amf::Buffer> 
+CQue::merge(boost::shared_ptr<amf::Buffer> start)
 {
     // Find iterator to first element to merge
     que_t::iterator from = std::find(_que.begin(), _que.end(), start); 
     if (from == _que.end()) {
         // Didn't find the requested Buffer pointer
-        return NULL;
+        return start;		// FIXME:
     }
 
     // Find iterator to last element to merge (first with size < NETBUFSIZE)
@@ -215,15 +214,15 @@ CQue::merge(amf::Buffer *start)
     }
     if (to == _que.end()) {
         // Didn't find an element ending the merge
-        return NULL;
+        return start;		// FIXME:
     }
 
     // Merge all elements in a single buffer. We have totalsize now.
-    std::auto_ptr<amf::Buffer> newbuf ( new amf::Buffer(totalsize) );
+    boost::shared_ptr<amf::Buffer> newbuf(new Buffer(totalsize));
     Network::byte_t *tmp = newbuf->reference();
     ++to;
     for (que_t::iterator i=from; i!=to; ++i) {
-        amf::Buffer *buf = *i;
+        boost::shared_ptr<amf::Buffer> buf = *i;
         size_t sz = buf->size();
         std::copy(buf->reference(), buf->reference() + sz, tmp);
 	//
@@ -236,9 +235,9 @@ CQue::merge(amf::Buffer *start)
 
     // Finally erase all merged elements, and replace with the composite one
     que_t::iterator nextIter = _que.erase(from, to);
-    _que.insert(nextIter, newbuf.get());
+//    _que.insert(nextIter, newbuf.get()); FIXME:
 
-    return newbuf.release(); // ownership is transferred. TODO: return auto_ptr
+    return newbuf; //->release(); // ownership is transferred. TODO: return auto_ptr
 }
 
 // Dump internal data.
@@ -246,11 +245,11 @@ void
 CQue::dump()
 {
 //    GNASH_REPORT_FUNCTION;
-    deque<amf::Buffer *>::iterator it;
+    deque<boost::shared_ptr<amf::Buffer> >::iterator it;
     boost::mutex::scoped_lock lock(_mutex);
     cerr << endl << "CQue \"" << _name << "\" has "<< _que.size() << " buffers." << endl;
     for (it = _que.begin(); it != _que.end(); it++) {
-	amf::Buffer *ptr = *(it);
+	boost::shared_ptr<amf::Buffer> ptr = *(it);
         ptr->dump();
     }
 #ifdef USE_STATS_QUEUE

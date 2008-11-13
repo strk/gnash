@@ -206,7 +206,7 @@ MediaParser::peekNextAudioFrame() const
 }
 
 void
-MediaParser::join()
+MediaParser::stopParserThread()
 {
 	if ( _parserThread.get() )
 	{
@@ -218,7 +218,7 @@ MediaParser::join()
 
 MediaParser::~MediaParser()
 {
-	assert (! _parserThread.get() );
+	stopParserThread();
 
 	for (VideoFrames::iterator i=_videoFrames.begin(),
 		e=_videoFrames.end(); i!=e; ++i)
@@ -292,7 +292,9 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
 	_audioFrames.insert(loc, frame.release());
 
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
-	waitIfNeeded(lock); // if the push reaches a "buffer full" condition, wait to be waken up
+	// if the push reaches a "buffer full" condition, or if we find the parsing
+	// to be completed, wait to be waken up
+	waitIfNeeded(lock);
 #endif
 }
 
@@ -372,7 +374,7 @@ MediaParser::parserLoop()
 	while (!parserThreadKillRequested())
 	{
 		parseNextChunk();
-        gnashSleep(100); // no rush....
+        	gnashSleep(100); // no rush....
 	}
 }
 
@@ -411,6 +413,9 @@ operator<< (std::ostream& os, const videoCodecType& t)
                 case VIDEO_CODEC_SCREENVIDEO2:
                         os << "Screenvideo2";
                         break;
+                case VIDEO_CODEC_H264:
+                        os << "H264";
+                        break;
                 default:
                         os << "unknown/invalid";
                         break;
@@ -441,6 +446,12 @@ operator<< (std::ostream& os, const audioCodecType& t)
                 case AUDIO_CODEC_NELLYMOSER:
                         os << "Nellymoser";
                         break;
+                case AUDIO_CODEC_AAC:
+                        os << "Advanced Audio Coding";
+                        break;
+		case AUDIO_CODEC_SPEEX:
+			os << "Speex";
+			break;
                 default:
                         os << "unknown/invalid";
                         break;

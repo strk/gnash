@@ -1,0 +1,2721 @@
+2008-10-13  Russell Nelson <nelson@crynwr.com>
+
+	[9987] add flvdumper documentation, update preformmated docs, fix the
+	required bzr version, and make the ltdl patch work correctly if srcdir
+	<> builddir
+
+2008-10-13  Russell Nelson <nelson@crynwr.com>
+
+	[9986] we ship libtoolize; don't detect the version they've installed
+
+2008-10-12  Russell Nelson <nelson@crynwr.com>
+
+	[9985] updated NEWS, README for the release, and changed version in
+	configure.ac to 0.8.4
+
+2008-10-11  Russell Nelson <nelson@crynwr.com>
+
+	[9984] Make install-plugins a little more clear.
+
+2008-10-11  bastiaan <bastiaan@smeg>
+
+	[9983] Wallpaper over the MIT-SHM crashbug. (bug #23624)
+
+2008-10-11  strk <strk@ubuntu>
+
+	[9982] Add a RECCOMMENDED label on configure output, and put in this
+	list libcurl and modern pbutils
+
+2008-10-10  strk <strk@ubuntu>
+
+	[9981] drop duplicated ERROR label in logging output
+
+2008-10-10  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9980] Set default stream timeout to 60 seconds because sites like
+	youtube redirect a lot and with poor network performance (e.g. DNS
+	lookups) 10 isn't enough.  Change stream timeout chooser in the
+	preferences box to a spin box with a  max of 300.
+
+2008-10-10  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9979] configure.ac: Properly test for windows. Disable MIT-SHM by
+	default. gui: Fix compilation for MIT-SHM enabled GTK build.
+
+2008-10-10  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9978] Drop debugging.
+
+2008-10-10  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9977] Return the actual size of the buffer. Fixes bug #24503.
+
+2008-10-10  Russell Nelson <nelson@crynwr.com>
+
+	[9976] need to call pkg-config for libs; restore cerr outs to make
+	xpi's getHome work.
+
+2008-10-09  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9975] Drop tests with inconsistent results for now.
+
+2008-10-08  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9974] Bring back support for missing-plugins installation.
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9973] Register media handler before sound handler (next step would be
+	having the sound handler cache the media handler pointer...)
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9972] More tests for Sound.
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9971] More tests.
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9970] be more verbose about failure in AudioDecoder initialization
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9969] Update expected results for ffmpeg. Gstreamer fails an extra
+	one.  Add onSoundComplete to named strings.
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9968] comment out debugging lines
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9967] Rework the expected resampler output size computation, and put
+	the abort back. Seems sane now.
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9966] Make the resampler output buffer even-sized (as it's being
+	considered an array of int16); don't abort if the samples-based
+	computation of output buffer doesn't match the input one, as
+	EmbeddedSoundTest.swf shows a case in which it fails but doesn't
+	trigger any invalid write (using valgrind).
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9965] Change sound_handler::create_sound interface to take a
+	SimpleBuffer by auto_ptr, avoiding memory copies for event sounds (and
+	improving readability); have sound_data constructor make sure that if
+	a SimpleBuffer is passed it's padded a MediaHandler requires; have
+	DEFINESOUND tag loader query MediaHandler for padding bytes when
+	allocating the buffer for sound data. Fixes an invalid read of ffmpeg
+	on EmbeddedSoundTest.swf
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9964] Get padding information from media backend.
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9963] Test for onSoundComplete and duration.
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9962] copyright dates and totals count
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9961] Add simple MovieTester-based runner for EmbeddedSound, enable
+	automatic run of test.
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9960] Test for embedded sound and the Sound object. Not yet enabled.
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9959] Test for ming version 0.4.3.
+
+2008-10-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9958] Add some media files for testing.
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9957] Remove dead code (old matrix mat, non-cached matrix params)
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9956] Add some info about libmedia layout (how it is and how it needs
+	to be changed)
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9955] Change some methods and member names in sound stuff
+	(readability)
+
+2008-10-08  Sandro Santilli <strk@keybit.net>
+
+	[9954] Fix computation of sound duration for stereo sounds. See bug
+	#24481.
+
+2008-10-07  Sandro Santilli <strk@keybit.net>
+
+	[9953] Correct use of tmpnam
+
+2008-10-07  Sandro Santilli <strk@keybit.net>
+
+	[9952] More cleanups for xpcom: 1. Rename --with-xpcom-lib to --with-
+	xpcom-sdk-dir 2. Don't use pkg-config to find libs (won't work),
+	rather scan /usr/lib/iceape 3. Use libxpcomglue_s.a, not
+	libxpcomglue.a 4. Re-introduce use of XPCOM_LIB in plugin link line
+
+2008-10-07  Sandro Santilli <strk@keybit.net>
+
+	[9951] Cleanups on the cookie code. Still #if 0'ed out (due to linking
+	errors) but now dumps the cookie file in its own method and has code
+	prepared to unlink it.
+
+2008-10-07  Sandro Santilli <strk@keybit.net>
+
+	[9950] Have xpi packaging scripts define GNASH_XPI_PLUGIN, don't force
+	it from HAVE_XPCOM
+
+2008-10-07  Sandro Santilli <strk@keybit.net>
+
+	[9949] Don't add XPCOM ldflags. Fixes plugin load under iceapi on
+	lenny. See bug #24469.
+
+2008-10-07  Sandro Santilli <strk@keybit.net>
+
+	[9948] Tried to make the plugin section more informative.
+
+2008-10-06  Russell Nelson <nelson@crynwr.com>
+
+	[9947] Make note about make install-plugins
+
+2008-10-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9946] FLVParser sometimes provides the wrong dimensions for video, so
+	let Gstreamer figure them out by itself. Fixes the video "scaling"
+	issue.
+
+2008-10-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9945] Don't forget the break inside switch...
+
+2008-10-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9944] {Audio,Video}DecoderGst.cpp: don't unref a buffer owned by the
+	bin, even if pushing failed.  VideoDecoderGst.cpp: Handle VP6A
+	correctly.  MediaParserGst.{cpp,h}: Comment fixes.
+
+2008-10-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9943] Allow build with all versions of ffmpeg up to current trunk.
+
+2008-10-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9942] Stop using _stream inside getBytesLoaded. (fixes #24460)
+	AudioDecoderGst: use ffaudioresample, or fallback on speexresample; if
+	neither are available, use audioresample. ("fixes" #24417)
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9941] Committed cookies patch by asac, with umask fixed and actual
+	dump disabled till we properly unlink it on exit
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9940] Don't use DISTCHECK flags for configuring the xpi builds, also
+	disable testsuite for that task.
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9939] Make less pkg_config --exist calls, aimed at readability
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9938] comment out debugging lines as they make self-contained
+	instructions fall off the bounds
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9937] hush some sound debugging
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9936] Avoid newlines in log messages
+
+2008-10-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9935] Drop a last reference to libmad.
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9934] Consisteny checking for NetStream-SquareTest
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9933] Don't wait for more frames to arrive when last advertised frame
+	was already parsed at time of symbol table lookup. Should fix bug
+	#24455.
+
+2008-10-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9932] libmedia/Makefile.am: Stop building our own versions and copies
+	of   Gstreamer elements.  Remove many files now unused.
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9931] document debugging macro
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9930] define GST_TIME_AS_MSECONDS when not already defined
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9929] call gst_init in VideoDecoderGst constructor (for consistency
+	with AudioDecoderGst) -- I thikn this may be saner to do in
+	MediaHandlerGst ctor btw...
+
+2008-10-06  Sandro Santilli <strk@keybit.net>
+
+	[9928] Don't call gstreamer functions before gst_init ! Fixes bug
+	#24459.
+
+2008-10-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9927] Fix properly now I've tested the branch that changed.
+
+2008-10-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9926] Get initialization order right.
+
+2008-10-04  Sandro Santilli <strk@keybit.net>
+
+	[9925] Make creation of preferences dialogue easier to read and hack
+	on; add Network preferences tab (streamsTimeout)
+
+2008-10-04  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9924] libmedia:   Makefile.am: Stop building SoundHandlerGst and
+	SoundGst.      MediaParser.cpp: In waitIfNeeded(), check that thread
+	kill has not been     requested. Previously, if the kill was
+	requested, and the parser     thread subsequently called
+	pushEncoded{Audio,Video}Frame,     waitIfNeeded() could again lock,
+	which caused a deadlock.   MediaParser.cpp: Move thread::join() out of
+	the destructor. As the     destructor is run *after* the child
+	constructor (i.e,      ~MediaParser{Gst,Ffmpeg}), the parser thread,
+	will be running after     the child destructor has finished. If the
+	parser thread then attempts     to access the child data (which is
+	expected), Pandora's box opens. Now,     every user of MediaParser
+	must call join() before it destroys the     MediaParser object.
+	MediaParser.h: Add extra data fields to encoded frame classes. Should
+	be     done more cleanly in the future.
+	gst/AudioDecoderGst.{cpp,h}: Clean up. Also, make sure that all the
+	buffers     available after the data push in decode() are accumulated
+	and returned.     Should fix some audio issues.
+	gst/MediaHandlerGst.cpp: Start using MediaParserGst.
+	gst/MediaParserGst.{cpp,h}: New Gstreamer based MediaParser
+	implementation. Should theoretically work even with Debian stable.
+	gst/VideoDecoderGst.{cpp,h}: Reimplement (and simplify) using swfdec's
+	Gstreamer bindings.    gst/swfdec_codec_gst.{c,h}: Make
+	specializations of the factory finder     for other types of
+	factories, such as parsers and demuxers.      libcore/asobj:
+	Makefile.am: Stop building Sound's child classes.   Sound.{h,cpp}:
+	Merge SoundFFmpeg. Call MediaParser::join() before its     destructor
+	is called.    NetStream.cpp: call MediaParser::join() before its
+	destructor is called.
+
+2008-10-04  Sandro Santilli <strk@keybit.net>
+
+	[9923] Raise the default streams timeout from 1.5 to 3 seconds. See
+	bug #24449
+
+2008-10-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9922] Remove macros from Date.cpp.
+
+2008-10-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9921] More tests, fewer macros for Date class to try and catch why
+	there is a failure on Debian Lenny.
+
+2008-10-04  Sandro Santilli <strk@keybit.net>
+
+	[9920] Don't force update of gnash.pot on 'make dist'
+
+2008-10-04  Sandro Santilli <strk@keybit.net>
+
+	[9919] few translation lines, just for fun
+
+2008-10-04  Sandro Santilli <strk@keybit.net>
+
+	[9918] Update po files (this time with relative paths)
+
+2008-10-04  Sandro Santilli <strk@keybit.net>
+
+	[9917] Use paths relative to top sourcedir for po files, so updates
+	from different hosts don't change just for that. Other cleanups.
+
+2008-10-03  Sandro Santilli <strk@keybit.net>
+
+	[9916] NetStream doesn't need to be virtual anymore
+
+2008-10-03  Sandro Santilli <strk@keybit.net>
+
+	[9915] Maintain audio/video buffers in timestamp order
+
+2008-10-03  Sandro Santilli <strk@keybit.net>
+
+	[9914] Minor comment and debug cleanups
+
+2008-10-03  Sandro Santilli <strk@keybit.net>
+
+	[9913] Consider the media stream fully parsed on parse error.
+
+2008-10-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9912] Document gnashSleep.
+
+2008-10-03  Sandro Santilli <strk@keybit.net>
+
+	[9911] Don't distribute .gmo files, you'll need gettext for an
+	internationalized gnash.
+
+2008-10-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9910] ifdefs round pthreads.h include.
+
+2008-10-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9909] htons...
+
+2008-10-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9908] Use GnashSleep in rtmp_client.cpp. A FIXME suggests it might be
+	better to drop the sleep entirely, but since I don't know I'll leave
+	this to someone else.
+
+2008-10-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9907] Initial stage in fixing sleep compatibility. Will hopefully
+	allow windows build to complete.
+
+2008-10-03  Sandro Santilli <strk@keybit.net>
+
+	[9906] Have 'dumpconfig' say about jemalloc use; say about LIBINTL,
+	not INTLIBS.
+
+2008-10-02  Sandro Santilli <strk@keybit.net>
+
+	[9905] Make sure the parser consumes all input, even on error. Fixes
+	bug #24429.
+
+2008-10-02  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9904] Compiler warning fixes (visibility).
+
+2008-10-02  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9903] Tests.
+
+2008-10-02  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9902] Correct totals.
+
+2008-10-02  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9901] Fix compiler warnings. Test for LoadVars.
+
+2008-10-01  Russell Nelson <nelson@crynwr.com>
+
+	[9900] Add a query to XPCOM code to get our XPI install directory.
+	Install via XPI now works!
+
+2008-10-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9899] Correct configure output for cairo/sdl.
+
+2008-10-01  Sandro Santilli <strk@keybit.net>
+
+	[9898] Fix CURL-full build (eh)
+
+2008-10-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9897] Make sure 'close' closes the about dialogue.
+
+2008-10-01  Sandro Santilli <strk@keybit.net>
+
+	[9896] Fix CURL-less build (please test CURL-full ones)
+
+2008-10-01  Sandro Santilli <strk@keybit.net>
+
+	[9895] Gnash is an SWF player (not that other trademarked thing)
+
+2008-10-01  strk <strk@lo>
+
+	[9894] SDL is now a requirement for GST media handler too..
+
+2008-10-01  strk <strk@lo>
+
+	[9893] Make GTK about dialog compatible with libgtk 2.8.20 (fixes bug
+	#24426)
+
+2008-10-01  strk <strk@lo>
+
+	[9892] answer the 'why not CODEC_ID_H263I?' question
+
+2008-10-01  strk <strk@lo>
+
+	[9891] log errors cleanups
+
+2008-10-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9890] Initialize _auxStreamerAttached, sort out initialization order
+	properly.
+
+2008-10-01  strk <strk@lo>
+
+	[9889] Implement output operator for videoCodecType and audioCodecType
+	enums
+
+2008-10-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9888] More compiler warnings.
+
+2008-10-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9887] Silence compiler warnings and verbose debugging messages.
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9886] Add comment about why PROBE_BYTES has that value
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9885] drop annoying error message about matrix not being invertible,
+	the code is correct and tested in matrix_test.swf
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9884] Re-enable a test in MovieClip.as temporarely commented-out to
+	avoid having to fix immediately (it's fixed now). Add anotehr test to
+	matrix_test.swf to show effects of negative _xscale cache at time of
+	setting _rotation. I'm pretty satisfied about matrices at this point.
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9883] remove things already done, try adding more todo
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9882] unused variables warnings..
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9881] Drop the get_parent hack in character::set_rotation, only add
+	PI if xscale cache is negative, no matter yscale. Fixes the last known
+	failing tests in matrix_test.swf. We need more tests!
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9880] Another test, showing that success/failure of gnash on the last
+	added test is based on the _yscale cache values (while expected result
+	doesn't)
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9879] Add failing test in matrix_test.swf (sign related, triggered on
+	_rotation set)
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9878] Round more for the checks only failing due to accuracy. This
+	way we have NO expected failures in matrix_test.swf and can work on
+	getting some of them (in particular a reproduction of the one failing
+	in MovieClip.as with the get_parent hack in ::set_rotation removed)
+
+2008-09-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9877] Swap the matrix scale sign appropriately. Fixes the _xscale and
+	_yscale tests in MovieClip.as and matrix_test.c. Fixes mario.swf and
+	snowy.swf, no FAILs in the testsuite. Senocular transform_grabber.swf
+	also works again.
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9876] Add another matrix test showing that the failures in
+	MovieClip.as were not related to being _root or not. We get the matrix
+	values wrong but the actual transforms succeed...
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9875] Have character's matrix parameter setters use parameter-
+	specific setters of gnash::matrix but only if the character is not a
+	root one. Gets only XPASS in matrix_test.swf  (the XFAIL left seem
+	related to accuracy) and doesn't break the MovieClip-v8.swf ones.
+
+2008-09-30  Sandro Santilli <strk@keybit.net>
+
+	[9874] Test: matrix caches not updated assigning Matrix to Transform
+
+2008-09-29  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9873] Use the new Gstreamer preprocessor conditional.
+
+2008-09-29  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9872] Don't bother including pbutils.h.
+
+2008-09-29  Sandro Santilli <strk@keybit.net>
+
+	[9871] Few more tests for matrix of root.
+
+2008-09-29  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9870] configure.ac: fix typo. libmedia/gst/AudioDecoderGst.cpp: For
+	now, default to audioresample.
+
+2008-09-29  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9869] Fixes for more robustness issues and code cleanup.
+
+2008-09-29  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9868] Make Gstreamer also use SDL sound handler. Reimplement
+	AudioDecoderGst. Merge NetStreamFfmpeg up. Raise FLV probing limit.
+
+2008-09-29  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9867] Another abort in action_buffer.
+
+2008-09-29  Sandro Santilli <strk@keybit.net>
+
+	[9866] Reset yscale sign on setting _width
+
+2008-09-29  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9865] Another robustness fix.
+
+2008-09-29  Sandro Santilli <strk@keybit.net>
+
+	[9864] enable new math by default
+
+2008-09-29  Sandro Santilli <strk@keybit.net>
+
+	[9863] Add a test showing that setting _width changes _yscale too !
+	(sign of it)
+
+2008-09-29  strk <strk@gnash>
+
+	[9862] Add character::set_width and ::set_height, closing the circle
+	of AS-accessible matrix setters
+
+2008-09-29  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9861] Fix malformed SWF abort.
+
+2008-09-29  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9860] Separate LoadVars properly with "&" when converting to string
+	and don't add the "?" there. It's only necessary when actually
+	sending. Allow XML to be sent using the GET method, appropriately URL
+	encoded (undocumented).  Add documentation, drop default "post"
+	argument for sendAndLoad, as all users now need to specify a method.
+
+2008-09-29  strk <strk@gnash>
+
+	[9859] Hint deb package name for swfmill
+
+2008-09-28  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9858] Check that data is returned in XMLSocket_as::fillMessageList to
+	prevent out-of-bounds reads. Don't recycle the return from select()
+	for read(), which doesn't help clarity. And make the function void, as
+	we don't care about the return.  Fixes an abort in the CSU. Er, I mean
+	the tagesschau.de election monitor (which almost works now, by the
+	way).
+
+2008-09-27  strk <strk@lo>
+
+	[9857] Make sure sol files copied over SOLDIR are writable by user
+	while running the SharedObjectTestRunner. On 'distcheck' they aren't
+	by default writeable because they inherit permission flags from the
+	source copy which is in a read-only tree (this is an hack of
+	'distcheck' to verify there's NO copy on the source tree while
+	building)
+
+2008-09-26  strk <strk@xtops>
+
+	[9856] Force cleanup of target soldir
+
+2008-09-26  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9855] Workaround for older ming.
+
+2008-09-26  strk <strk@xtops>
+
+	[9854] For the sake of testing framework, still push sounds to the
+	active sounds container when asked to play them.
+
+2008-09-26  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9853] Drop render.h includes.
+
+2008-09-26  strk <strk@xtops>
+
+	[9852] Increment the count of sounds start/stop requests (for testing
+	framework) even if it isn't possible to actually start sounds (system
+	audio errors).
+
+2008-09-26  strk <strk@xtops>
+
+	[9851] Don't increment callback clients count if not registerin a new
+	one.
+
+2008-09-26  strk <strk@xtops>
+
+	[9850] Add a SoundException class; Have attach_aux_streamer
+	implementation for SDL throw a SoundException when it can't fullfill
+	the caller request; refactor NetStreamFfmpeg to not only check for the
+	existance of a SoundHandler but also an actual success in registering
+	as an aux_streamer. This fixes the hung-on-audio-error on mx1.
+
+2008-09-26  strk <strk@xtops>
+
+	[9849] Fix readNetworkLong version found in NetConnection.cpp too
+
+2008-09-26  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9848] Fix a bug in readNetworkLong and amf0_read_value.
+
+2008-09-26  strk <strk@xtops>
+
+	[9847] Don't read one byte more for META FLV tag; log unimpl if type
+	of first AMF0 value is not STRING as expected.
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9846] Prevent aborts in some malformed SWFs.
+
+2008-09-25  Russell Nelson <nelson@crynwr.com>
+
+	[9845] update README with building options, and README_CVS for bzr.
+
+2008-09-25  strk <strk@lo>
+
+	[9844] Don't add +5 to the "beta" version of Ming if ming-config
+	--version  returns NO beta and NO rc substrings. Fixes recognition of
+	latest Ming release (0.4.2). Fix Ming-version dependent stuff in
+	matrix_test.c; it will fail with ming-head but just due to the fact
+	version hasn't been updated in Ming cvs yet (ie: cvs appers to be the
+	same version of latest release). I'll be fixing the Ming part next..
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9843] Fix bug #24363.
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9842] Bugfixes to and more tests for flash.geom.Transform class.
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9841] Log warning if an unsuitable locale is used.
+
+2008-09-25  Jason Woofenden <jason@jasonwoof.com>
+
+	[9840] set startstopped off for gnash testing and fix typo (see bug
+	#24372)
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9839] Update for new swfdec tests, correct Color class propflags.
+
+2008-09-25  strk <strk@lo>
+
+	[9838] Limit the FLV streams probe to a compile-time defined number of
+	bytes. Always probe the stream, even if FLV headers flag say there's
+	nothing in it (tested as expected behavior). See bug #24371 for more
+	info.
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9837] Passing test, complete / correct Key class.
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9836] Set valid bounds to full window, not 1 less. Fixes graphical
+	rubbish on the bottom line of some movies.
+
+2008-09-25  strk <strk@lo>
+
+	[9835] Fix streams info scan in FLVParser (bug #24371); turn the a/v
+	flags off when no actual tags were found; log an error when a/v tags
+	are  found while not expected.
+
+2008-09-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9834] Small improvement to logging, correct propflags.  More help
+	interpreting the swfdec testsuite run.
+
+2008-09-24  strk <strk@lo>
+
+	[9833] Don't reset a TextField bounding box if autoSize!=none BUT
+	wordWrap=true Fixes bug #24348.
+
+2008-09-24  strk <strk@lo>
+
+	[9832] Just tested plugin with Iceweasel 2.0.0.6
+
+2008-09-24  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9831] Minor cleanups, minor AS compatibility fixes.
+
+2008-09-24  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9830] Const correctness, reduce unnecessary const_casts (const_casts
+	are particularly evil), optimize Button (button_character_instance)
+	class.  Minor actionscript compatibility fixes.  Drop unused methods.
+
+2008-09-24  strk <strk@lo>
+
+	[9829] as_errors are as_errors...
+
+2008-09-24  strk <strk@lo>
+
+	[9828] Make matrix_test.c aware of latest Ming bugfixes.
+
+2008-09-24  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9827] Minor cleanups, simplification and documentation of Gui class.
+
+2008-09-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9826] Improve swfdec testsuite run.
+
+2008-09-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9825] Fix bug #24355.
+
+2008-09-23  strk <strk@xtops>
+
+	[9824] ignore SIGHUP while running tests. Fixes false failures on
+	debian stable.
+
+2008-09-23  strk <strk@xtops>
+
+	[9823] add comments above snippet of code handling exceptional returns
+
+2008-09-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9822] Update docs for libmad removal.
+
+2008-09-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9821] Remove all mad code finally.
+
+2008-09-23  Sandro Santilli <strk@keybit.net>
+
+	[9820] Add more matrix tests
+
+2008-09-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9819] Another tested browser.
+
+2008-09-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9818] Missing commit from yesterday.  Update README a bit.
+
+2008-09-23  Sandro Santilli <strk@keybit.net>
+
+	[9817] Add test for matrix values right before the tests that fail
+	with new math (the new tests succeed with current code)
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9816] Look for LIBAVCODEC_VERSION_TRIPLET before LIBAVCODEC_VERSION
+	as the latter is defined in terms of the former when available. Fixes
+	configuration on fedora9.
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9815] Don't forget the dust-hiding carpet !
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9814] Hide ffmpeg include dust in a custom header, included by all
+	users. Provide the damn INT64_C macro if not defined. Fixes support
+	for 51.40.2 and 51.40.4 and 51.12.1  and who knows what else
+
+2008-09-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9813] Improve flash package testing. Add new tests for
+	ColorTransform.  Make corrections to availability of
+	flash.geom.Transform based on tests (also in swfdec testsuite).
+	Implement ColorTransform and Transform.colorTransform.  Passes in
+	MovieClip, Transform and all the new tests for ColorTransform.
+	Cleanups to flash package classes.
+
+2008-09-22  Russell Nelson <nelson@crynwr.com>
+
+	[9812] warn ppl about changing doc/C without --enable-docbook
+
+2008-09-22  strk <strk@xtops>
+
+	[9811] Fixes to support ffmpeg in debian stable (51.11.0).
+
+2008-09-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9810] More tests for ColorTransform.
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9809] Include external headers with <>
+
+2008-09-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9808] Tests for flash.geom.ColorTransform.
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9807] Fail ffmpeg version check if version > 52.0.0 and swscale isn't
+	found
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9806] Don't assume an 'ffmpeg' substring in avcodec.h path means the
+	layout is ffmpeg/avcodec.h rather then libavcodec/avcodec.h. Be more
+	accurate about the test...
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9805] Pad ffmpeg version to make space for 2 digit per version level,
+	cleanups and improvements in output. See bug #24310.
+
+2008-09-22  Sandro Santilli <strk@keybit.net>
+
+	[9804] Don't add -I/usr/include for X11 headers
+
+2008-09-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9803] Some localization for the release.  Fix the SAMPLE_FMT_S24
+	build problem.  Credit translators in GTK gui.
+
+2008-09-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9802] Make Transform_as's sprite_instance reference safe (I think),
+	pending more tests about how the binding should be done.  Implement
+	matrix setter because it's easy, may be useful in testing, and makes
+	all the senocular Matrix demonstrations work, which is nice.
+	Transform.as matrix tests all pass (apart from one accuracy-based
+	one).
+
+2008-09-20  Sandro Santilli <strk@keybit.net>
+
+	[9801] Expect more successes about MovieClip.transform
+
+2008-09-20  Sandro Santilli <strk@keybit.net>
+
+	[9800] Add zou's new matrix math (compile-time off for now)
+
+2008-09-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9799] MovieClip binding tests.
+
+2008-09-20  Sandro Santilli <strk@keybit.net>
+
+	[9798] Sound is still an object, needs to mark proper properties too
+	for GC! NOTE: this isn't tested, to test it should be enough to add a
+	custom property to a Sound instance and access it on next frame (and
+	check with valgrind if that isn't enough for a segfault)
+
+2008-09-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9797] Working but *not sufficiently tested* implementation of
+	MovieClip.transform and flash.geom.Transform.matrix getter. This is
+	for testing of the internal matrix.  Implementing the setter should be
+	very easy.
+
+2008-09-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9796] Another test for Transform.
+
+2008-09-20  Sandro Santilli <strk@keybit.net>
+
+	[9795] Use libungif if libgif isn't found. Minor tweaks in
+	matrix_test.swf.
+
+2008-09-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9794] Prevent an abort.  Test Transform more.
+
+2008-09-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9793] Tests.
+
+2008-09-19  Russell Nelson <nelson@crynwr.com>
+
+	[9792] xpi needs a .../plugins directory
+
+2008-09-19  Sandro Santilli <strk@keybit.net>
+
+	[9791] Add info about corrispondence between gnash::matrix and
+	flash.geom.Matrix
+
+2008-09-19  Sandro Santilli <strk@keybit.net>
+
+	[9790] Good stuff: inspect matrix values after setting parameters
+
+2008-09-19  Sandro Santilli <strk@keybit.net>
+
+	[9789] Fix make check (hopefully)
+
+2008-09-19  Sandro Santilli <strk@keybit.net>
+
+	[9788] More matrix tests using MovieClip.prototype.transform getter
+
+2008-09-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9787] Define an as_object interface class for loadable objects, for
+	use by LoadVars and XML. This reflects the relationship between the
+	objects (and saves much code duplication).  Const correct property
+	enumeration.
+
+2008-09-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9786] Commit before merging...
+
+2008-09-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9785] Tests for MovieClip properties, plus a rename that was
+	languishing forgotten somewhere.
+
+2008-09-18  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9784] removed from now on
+
+2008-09-18  Sandro Santilli <strk@keybit.net>
+
+	[9783] add visual widget to better show effects of matrices. seems to
+	me that gnash is failing there
+
+2008-09-18  Sandro Santilli <strk@keybit.net>
+
+	[9782] yet some other matrix test
+
+2008-09-18  Sandro Santilli <strk@keybit.net>
+
+	[9781] add test for inversion of not-invertible matrix
+
+2008-09-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9780] Minor stuff.
+
+2008-09-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9779] Simplify and tidy up.
+
+2008-09-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9778] Simplify as_object interface.
+
+2008-09-18  Sandro Santilli <strk@keybit.net>
+
+	[9777] further improved matrix_test to use _rotation too
+
+2008-09-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9776] Use namedStrings more.  Do more tidying up of old XML_as code.
+
+2008-09-18  Sandro Santilli <strk@keybit.net>
+
+	[9775] Add compile-time define to switch cached matrix parameters off
+
+2008-09-17  Russell Nelson <nelson@crynwr.com>
+
+	[9774] use portable shell
+
+2008-09-17  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9773] Note to self: KISS; Darwin's liboolize
+
+2008-09-17  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9772] Fix Darwin's liboolize to not run configure
+
+2008-09-17  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9771] Added Darwin's libtoolize support
+
+2008-09-17  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9770] Added Darwin's libtoolize support
+
+2008-09-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9769] Use PROP_uCUSTOM_HEADERS everywhere.
+
+2008-09-17  Sandro Santilli <strk@keybit.net>
+
+	[9768] Another read-matrix-from-swf case
+
+2008-09-17  Sandro Santilli <strk@keybit.net>
+
+	[9767] fix compiler errors in mysql extension
+
+2008-09-17  Sandro Santilli <strk@keybit.net>
+
+	[9766] fix build of extensions after array class rename
+
+2008-09-17  Sandro Santilli <strk@keybit.net>
+
+	[9765] Add tests for effects of setting _xscale and _yscale on
+	characters with weird matrices read from SWF. Changed
+	character::set_x_scale to use matrix::set_x_scale as that seems to
+	give better results. (overall results are still frustrating though)
+
+2008-09-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9764] Clarify ownership of network streams.  Implement
+	addRequestHeaders for XML and LoadVars correctly (passes in swfdec and
+	for new tests in actionscript.all). There's quite a bit of code
+	duplication for these two classes.  Rename various as classes for
+	consistency.
+
+2008-09-17  Sandro Santilli <strk@keybit.net>
+
+	[9763] Try hitTest with the transformed characters. Gnash succeeds.
+	Note that this is with shapeFlag off (only checking boundaries). Dunno
+	why, when trying shapeFlag on (check actual shape hit) the pp gives
+	odd results.
+
+2008-09-17  Sandro Santilli <strk@keybit.net>
+
+	[9762] More tests for matrix to caches, fix computation of matrix
+	caches in button instances, minor cleanup
+
+2008-09-17  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9761] libcore/matrix.cpp: document determinant() implementation.
+	libcore/vm/CallStack.h: allow vector as_value class visibility; fixes
+	compile.
+
+2008-09-16  Sandro Santilli <strk@keybit.net>
+
+	[9760] Use named strings where appropriate, shake code a bit in array
+
+2008-09-16  Sandro Santilli <strk@keybit.net>
+
+	[9759] add test for 'constructor' property of array instances
+
+2008-09-16  Sandro Santilli <strk@keybit.net>
+
+	[9758] - Drop another static member (CallStack) - Implement
+	arguments.caller
+
+2008-09-16  Russell Nelson <nelson@crynwr.com>
+
+	[9757] simplify code and only look where we expect testrun.sum files
+
+2008-09-16  Russell Nelson <nelson@crynwr.com>
+
+	[9756] testsuite/MovieTester.cpp: back out debugging printfs
+
+2008-09-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9755] Do the same for LoadVars as for XML (sendAndLoad).
+
+2008-09-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9754] Allow XML.sendAndLoad to take any object as second argument
+	(tested in  actionscript.all/XML.as).  Allow loading of data into
+	either XML or LoadVars (not automatically tested). Fixes Twitter's
+	SWF, which expects data to be loaded into a passed LoadVars.  Partial
+	implementation of XML.addRequestHeader (not automatically tested),
+	which may not be completely correct but is better than nothing.
+
+2008-09-16  Sandro Santilli <strk@keybit.net>
+
+	[9753] Test that _parent of a new TextField is undefined
+
+2008-09-16  Sandro Santilli <strk@keybit.net>
+
+	[9752] more ignores
+
+2008-09-15  Russell Nelson <nelson@crynwr.com>
+
+	[9751] Can't use ``thingie'' in a shell script
+
+2008-09-15  Sandro Santilli <strk@keybit.net>
+
+	[9750] Fix bug #24266 (handling of TextField's _width & _height)
+
+2008-09-15  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9749] Simplify SimpleBuffer using a scoped array.
+
+2008-09-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9748] Check whether sound has been deleted before mixing; might fix
+	bug #22314.
+
+2008-09-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9747] Don't write the address of std::ofsteam out to the rcfile.
+
+2008-09-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9746] We don't protect the stack any more. Clarify std::bad_alloc
+	handling.
+
+2008-09-15  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9745] Make sed expression BSD-compatible.
+
+2008-09-15  Sandro Santilli <strk@keybit.net>
+
+	[9744] minor cleanups
+
+2008-09-15  Sandro Santilli <strk@keybit.net>
+
+	[9743] modify test to be compatible with an older Ming having troubles
+	with enumeration syntax (fixes run on gnashdev).
+
+2008-09-15  Sandro Santilli <strk@keybit.net>
+
+	[9742] - Allow MovieClip.getBounds to be called for any character and
+	with   any character as first arg - Add more tests to TextField.as -
+	Fix debugging output of SharedObjectTestRunner
+
+2008-09-15  Sandro Santilli <strk@keybit.net>
+
+	[9741] update expected swfdec test results
+
+2008-09-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9740] Fix for bug #24265 (crash loading malformed jpeg).
+
+2008-09-15  Sandro Santilli <strk@keybit.net>
+
+	[9739] - Fix haxe-based testsuite build scripts. - Don't pretend
+	as_value by Element is able to construct sprites (isn't)
+
+2008-09-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9738] Revert plugin to snprintf, as it didn't work (forgot make
+	install-plugin). Should be sorted out properly later, but we can't
+	have the plugin not working...
+
+2008-09-15  Sandro Santilli <strk@keybit.net>
+
+	[9737] Test/fix MOVIECLIP types with amf0
+
+2008-09-14  Sandro Santilli <strk@keybit.net>
+
+	[9736] Improvements in AMF0 serialization (skip hidden props, skip
+	functions)
+
+2008-09-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9735] Simplify gui interface.  Use C++ for conversion.
+
+2008-09-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9734] snprintf is barely better than printf and isn't at all
+	standard. Use stringstreams instead. Use strncpy to copy data into a C
+	string.
+
+2008-09-13  Sandro Santilli <strk@keybit.net>
+
+	[9733] Switch default AMF decode/encode implementation used for
+	SharedObject to buffer-based, stub missing SharedObject methods
+
+2008-09-12  Russell Nelson <nelson@crynwr.com>
+
+	[9732] testsuite/actionscript.all/SharedObject.as: don't create files
+	with spaces in their namesplugin/xpcom/README.txt: point at the
+	tutorial and author.
+
+2008-09-12  Russell Nelson <nelson@crynwr.com>
+
+	[9731] Ugly but necessary switch from 'flash' to 'SWF' everywhere
+	appropriate
+
+2008-09-12  Russell Nelson <nelson@crynwr.com>
+
+	[9730] testsuite/misc-haxe.all/Makefile.am: improvements for
+	distcheckpackaging/xpi.am: really ought to include the version.
+
+2008-09-12  Sandro Santilli <strk@keybit.net>
+
+	[9729] Fix latest youtube player.
+
+2008-09-12  Sandro Santilli <strk@keybit.net>
+
+	[9728] - Improve Element to as_value converter. - Add log_amferror and
+	related gnashrc directive.
+
+2008-09-12  Sandro Santilli <strk@keybit.net>
+
+	[9727] - Fix make dist (SharedObjectTest stuff) - Update expected
+	results from swfdec testsuite - Improve SharedObjectTest.as (effects
+	of prop flags over serialization) - Improve SharedObjectTestRunner
+	(now tests both reading and writing) - Make object property visitor a
+	virtual non templated method, so to   allow scanning array properties
+	in the short term (they should really   be normal properties instead).
+	- Improve AMF deserialization (readAMF0) - Improve AMF serialization
+	(writeAMF0) - Fix enumeration of array properties and add tests for it
+
+2008-09-12  Bastiaan <bastiaan@apex.bjacques.org>
+
+	[9726] Make sure exported symbols are visible across DSOs.
+	http://wiki.gnashdev.org/CodingStyle#Preprocessor_directives
+
+2008-09-11  rob@welcomehome.org
+
+	[9725] build libtool2 in it's own directory. Make distcheck work again
+	using either libtool 1.5.x or 2.2.6.
+
+2008-09-11  Sandro Santilli <strk@keybit.net>
+
+	[9724] Test ECMA_ARRAY amf0 parsing (still bogus in gnash)
+
+2008-09-11  Sandro Santilli <strk@keybit.net>
+
+	[9723] Don't access the VM singleton from movie_root. Hold a ref
+	instead. Hush debugging for remoting.
+
+2008-09-11  Sandro Santilli <strk@keybit.net>
+
+	[9722] Improve SharedObject test. Commit patches contributed by Jason
+	Woofenden implementing SharedObject.cpp using the buffer-based
+	encoder/decoder. Jason code make all of the self-contained test
+	succeed except comparison of input and output (gnash fails in
+	producing an optimization version of the .sol file for a strict
+	array). NOTE: Jason code doesn't replace original code; instead it's
+	DISABLED BY DEFAULT and can be enabled by defining a macro in
+	SharedObject.cpp for further testing (#define BUFFERED_AMF_SOL).
+
+2008-09-11  Sandro Santilli <strk@keybit.net>
+
+	[9721] Expect failures in the test
+
+2008-09-11  rob@welcomehome.org
+
+	[9720] fix the conditionals for libtool, and for libtool 2.x, force
+	the build directory paths to be libbase/libltdl
+
+2008-09-11  rob@welcomehome.org
+
+	[9719] install libltdl as a subdirectory of libbase when using libtool
+	2.x
+
+2008-09-11  rob@welcomehome.org
+
+	[9718] use libbase as the top builddir.
+
+2008-09-10  rob@welcomehome.org
+
+	[9717] test for a yes value instead of a no value, which fixes builds
+	for libtool 1.5 without specifing --enable-ltdl-install
+
+2008-09-10  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9716] Let autotools figure out what the preprocessor is.
+
+2008-09-10  Sandro Santilli <strk@keybit.net>
+
+	[9715] More cleanups to SharedObject and normalization tests.
+
+2008-09-10  Sandro Santilli <strk@keybit.net>
+
+	[9714] Introduce SharedObjectLibrary, cleanup code (still using SOL)
+
+2008-09-10  Sandro Santilli <strk@keybit.net>
+
+	[9713] const-correctness in gnash::SOL, more tests about SharedObject
+
+2008-09-10  Sandro Santilli <strk@keybit.net>
+
+	[9712] test effects of calling SharedObject.getLocal with no arg
+
+2008-09-10  Sandro Santilli <strk@keybit.net>
+
+	[9711] run the new SharedObject test as part of 'make check'
+
+2008-09-10  Sandro Santilli <strk@keybit.net>
+
+	[9710] Add read/write test for SharedObject (self-contained).
+
+2008-09-09  Sandro Santilli <strk@keybit.net>
+
+	[9709] Fix name clash of PropsSerializer class (fixes bug #24224).
+	Cleanups and tests for SharedObject.
+
+2008-09-09  Sandro Santilli <strk@keybit.net>
+
+	[9708] fix segfault on non-existing movie (bug #24232)
+
+2008-09-09  Sandro Santilli <strk@keybit.net>
+
+	[9707] SharedObject cleanups and test improvement
+
+2008-09-09  Sandro Santilli <strk@keybit.net>
+
+	[9706] Fix AMF0 serializer/deserializer (add OBJECT and ARRAY writing
+	support, fix visibility of __proto__ and constructor members, fix
+	reference indexing) Potlatch now works.
+
+2008-09-09  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9705] sprintf -> snprintf
+
+2008-09-09  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9704] atof -> strtof
+
+2008-09-09  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9703] atoi -> strto(u)l
+
+2008-09-08  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9702] signal.h -> csignal
+
+2008-09-08  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9701] atoi() -> strtol()
+
+2008-09-08  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9700] Use env.bottom() for debbuger
+
+2008-09-08  Sandro Santilli <strk@keybit.net>
+
+	[9699] fix amf reference debugging output
+
+2008-09-08  Sandro Santilli <strk@keybit.net>
+
+	[9698] Oops, fix serialization of object/reference
+
+2008-09-08  Sandro Santilli <strk@keybit.net>
+
+	[9697] add as_value serializer (writeAMF0) and support circular
+	references
+
+2008-09-08  rob@welcomehome.org
+
+	[9696] don't waste time on client side RTMP support anymore.
+
+2008-09-08  Sandro Santilli <strk@keybit.net>
+
+	[9695] Fix last make check failure (but a bug is still around in
+	collision detection)
+
+2008-09-08  rob@welcomehome.org
+
+	[9694] merge libtool2 support from branch
+
+2008-09-07  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9693] implemted set_stack_index()
+
+2008-09-07  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9692] Fixed make check
+
+2008-09-07  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9691] remove non-existent libcygnal.la
+
+2008-09-06  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9690] Fix debugger
+
+2008-09-06  Sandro Santilli <strk@keybit.net>
+
+	[9689] Add .vimrc file helping with the 4-spaces tabs style.
+
+2008-09-06  Russell Nelson <nelson@crynwr.com>
+
+	[9688] Fixed a couple of problems that prevented 'make xpi' from
+	working.
+
+2008-09-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9687] Pass Element by reference (and not by pointer) to as_value so
+	it won't be converted to bool or int. Don't delete two objects that
+	got their ownership transferred. Should fix AsValueTest all around.
+
+2008-09-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9686] Allow the Ming tests to run on OpenBSD by added some includes
+	and forcing the argument to sqrt to floating point to resolve
+	ambiguity.
+
+2008-09-06  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9685] Add extra includes for compatibility on OpenBSD.
+
+2008-09-05  Russell Nelson <nelson@crynwr.com>
+
+	[9684] May not fix XPCOM, but it doesn't break 'make check' any worse
+	than it already is.
+
+2008-09-05  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9683] Remove references to fixed bugs.
+
+2008-09-04  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9682] Fixed deletion of auto_ptr
+
+2008-09-04  Sandro Santilli <strk@keybit.net>
+
+	[9681] close loadVariables IOChannel as soon as done with it, prepare
+	to debug more CURL haging due to IOCHannel leaks on exit.
+
+2008-09-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9680] Pass movie_definition by reference, as it always has to be
+	there.  Other minor cleanups.
+
+2008-09-04  rob@welcomehome.org
+
+	[9679] merge bug fix from rtmp branch for failing test cases
+
+2008-09-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9678] Drop assertion in Sound.cpp, make mouse button events handling
+	in movie_root a bit more sensible. Don't leak ClassHierarchy on VM
+	destruction (doesn't really matter now, but would if SWFs could be
+	played successively).
+
+2008-09-04  Sandro Santilli <strk@keybit.net>
+
+	[9677] Make as_value::to_element return by auto_ptr, have as_value by
+	Element constructor take a const ref. Minor const correctness and
+	headers streamline in libamf.
+
+2008-09-04  Sandro Santilli <strk@keybit.net>
+
+	[9676] Don't include element.h, a forward declaration is enough and
+	avoids having to include libamf from lots of subdirs (testsuite and
+	extensions)
+
+2008-09-04  bastiaan <bastiaan@rimmer>
+
+	[9675] Stop stating the obvious.
+
+2008-09-03  Sandro Santilli <strk@keybit.net>
+
+	[9674] Make Player's Gui non-static, rework core to host communication
+	design
+
+2008-09-03  rob@welcomehome.org
+
+	[9673] merge support from branch for maming amf elements from
+	as_values.
+
+2008-09-03  rob@welcomehome.org
+
+	[9672] merge patch from rtmp branch.
+
+2008-09-03  rob@welcomehome.org
+
+	[9671] merge patch for getting element data
+
+2008-09-03  rob@welcomehome.org
+
+	[9670] merge patch for creating as_values
+
+2008-09-03  rob@welcomehome.org
+
+	[9669] Merge from rtmp branch.
+
+2008-09-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9668] Plug leak.
+
+2008-09-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9667] Drop some unnecessary utility code.  Other maintenance
+	(renaming, cleanups).
+
+2008-09-03  Sandro Santilli <strk@keybit.net>
+
+	[9666] Generated ChangeLog using 'bzr log --gnu -r 9417..'
+
+2008-09-03  Sandro Santilli <strk@keybit.net>
+
+	[9665] Reintroduce MIT_SHM for agg (was forced off); testsuite
+	(matrix) cleanups; remoting cleanups
+
+2008-09-03  bastiaan <bastiaan@rimmer>
+
+	[9664] Use boost's numeric conversion instead of trunc to improve
+	portability. This should not result in a change of behaviour.
+
+2008-09-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9663] Failing tests for try.
+
+2008-09-03  Sandro Santilli <strk@keybit.net>
+
+	[9662] add tag interface to MediaParser; implement it in FLVParser and
+	use from NetStreamFfmpeg
+
+2008-09-02  Russell Nelson <nelson@nelson-desktop>
+
+	[9661] removing -fshort-wchar; we need to use it only on the NPAPI
+
+2008-09-02  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9660] Small cleanups.
+
+2008-09-02  Sandro Santilli <strk@keybit.net>
+
+	[9659] Cleanups in amf::Element class and libmedia
+
+2008-09-01  Russell Nelson <nelson@nelson-desktop>
+
+	[9658] Changes needed to make --enable-xpcom to compile on Gutsy
+	Gibbon
+
+2008-09-01  Sandro Santilli <strk@keybit.net>
+
+	[9657] Use a single stack (VM-owned) for ActionScript execution
+
+2008-09-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9656] Fix segfault when video pitch is not a multiple of 4. Fix
+	segfault when decoder setup fails for embedded video. Don't abort when
+	an unknown codec is encountered; instead, log error, fail to construct
+	a VideoDecoder, and continue. Also don't construct a VideoDecoder when
+	other fatal errors occur.  Add MediaException class for use in
+	libmedia.
+
+2008-09-01  Sandro Santilli <strk@keybit.net>
+
+	[9655] some missing unimplemented messages and args marshalling
+	optimization
+
+2008-09-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9654] Remove obsolete code.
+
+2008-08-31  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9653] Use an appropriate size_type for SafeStack so that it is always
+	guaranteed to be valid (although the stack size is never likely to
+	exceed an unsigned int).  Make more members private, which ought to
+	fix any visibility problems. There's something wrong if private
+	members need to be exported, and it builds fine for me now with
+	visibility support enabled.  Comment out unused variables in obsolete
+	functions.
+
+2008-08-31  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9652] fix std::min() as suggested by Bastiaan. TODO: Fix Debugger.cpp
+
+2008-08-31  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9651] visbility fix
+
+2008-08-30  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9650] Fix std:min on BSD
+
+2008-08-30  Sandro Santilli <strk@keybit.net>
+
+	[9649] Change AVM1 stack management to allow smashing as expected. Fix
+	build with older ffmpeg.
+
+2008-08-28  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9648] Convert VP6A video to image::ImageRGBA. This only succeeds with
+	SwScale, not with older versions of ffmpeg.  Make renderers accept but
+	ignore RGBA data. It is easy to get agg to render the RGBA images,
+	slightly harder to get it to handle both RGB and RGBA, and so far I
+	don't see how to get it to handle transparency correctly.
+
+2008-08-28  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9647] Fix for bug #24144. It isn't very elegant, but should work
+	until FLVParser gets some much needed attention.
+
+2008-08-28  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9646] Drop the unused half of NetConnection so that it's clear how
+	the class  works and what it's for. Some minor cleanups to logging and
+	code. Use smart pointers when it's useful.  Allocate a SwsContext for
+	each instance of the VideoDecoderFfmpeg class so that newer versions
+	of Ffmpeg can decode more than one NetStream simultaneously. Make sure
+	it's freed on destruction. The ifdefs make the code a bit messier, but
+	that's ffmpeg's fault for changing its API.
+
+2008-08-26  Sandro Santilli <strk@keybit.net>
+
+	[9645] Add test for effects of setting _width on _xscale and _height
+	on _yscale
+
+2008-08-26  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9644] Minor optimizations and removal of unused functions.
+
+2008-08-26  Sandro Santilli <strk@keybit.net>
+
+	[9643] Fix the matrix regression (youtube, potlatch and friends). See
+	bug #24094 and bug #21756.
+
+2008-08-25  Sandro Santilli <strk@keybit.net>
+
+	[9642] fix up the annoinlgy failing testcase
+
+2008-08-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9641] Reduce XMLSocket code, various bugfixes and AS compatibility
+	corrections.  Improve tests.
+
+2008-08-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9640] Stub unimplemented XMLNode functions.
+
+2008-08-25  Sandro Santilli <strk@keybit.net>
+
+	[9639] Fix ffmpeg version detection for deb-based packages
+
+2008-08-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9638] Some maintenance on XMLSocket class.  Tests for XMLNode.
+	Update swfdec testsuite results.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9637] Fix build bug.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9636] Remerge of last few commits for the sake of the log messages.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9635] Apparently a partial merge doesn't include all the individual
+	commit messages, which is rubbish and makes it hard to see what I've
+	done, so I'm reverting and recommitting this.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9634] Missed in last merge.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9633] Fixes to Math class, cleanup in as_value.cpp.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9632] Progress in making tu_file redundant. It is now an ordinary
+	derived class of IOChannel, with no custom callbacks, and is only used
+	for opening files or file descriptors so can be replaced easily with
+	anything  suitable.
+
+2008-08-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9631] Some cleanups.
+
+2008-08-21  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9630] Drop temporary debug logging, add ostream operator<< for
+	event_id.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9629] Partial fix and major cleanup for XMLSocket. It is unfinished,
+	but appears to fix a crash occurring whenever XMLSocket.onXML() is
+	called (that is, when XMLSocket.onData is undefined), gets onData
+	generally correct, and produces some sensible output for onXML.
+	Remove non-existent names from namedStrings.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9628] Minor cleanups only.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9627] Refine the test and make it a bit more robust.
+
+2008-08-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9626] Add a Perl XMLSocket server and a self-contained test for
+	XMLSocket.onData, which Gnash fails.  The server must be running
+	before the SWF starts. It sends back everything it receives, replacing
+	certain patterns with \n or \0.  Does anyone have any idea how to
+	automate this?
+
+2008-08-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9625] Use tRNS block, setting the image type to RGBA when it's used.
+
+2008-08-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9624] Fix build with older versions of ffmpeg (which will abort if
+	they encounter a VP6A video).
+
+2008-08-19  Markus Gothe <markus@Coetzee>
+
+	[9623] Leave out rtmpget
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9622] Fixed building
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9621] tidy up
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9620] Use csignal instead of signal.h
+
+2008-08-19  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9619] rtmpget added, take 1
+
+2008-08-19  rob@welcomehome.org
+
+	[9618] merge from rtmp branch.
+
+2008-08-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9617] We use our own isNaN() now, not any non-standard isnan (whether
+	or not it is in namespace std), and that it what we should test.
+
+2008-08-18  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9616] use namespace std for isnan
+
+2008-08-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9615] Some abstractions and class clean-ups to make implementing
+	transparent video possible.  Fix gstreamer again, which subclasses
+	ImageBase (this seems unnecessary,  but it needs an immediate fix).
+
+2008-08-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9614] More image abstraction, cleanup, and removal of unused code.
+
+2008-08-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9613] Clean up some silly as_value constructors.
+
+2008-08-17  rob@welcomehome.org
+
+	[9612] Use trunk instead of cvs in the version string.
+
+2008-08-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9611] Add some missing NAN->NaN and a missing
+	INFINITY->numeric_limits<double>:: infinity().
+
+2008-08-16  rob@welcomehome.org
+
+	[9610] Don't use bogus test case as it has 64bit issues as well.
+
+2008-08-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9609] Fix isnan conflict by renaming rather than undefining it. Drop
+	other reliance on macros that may or may not exist and use our own
+	methods everywhere.
+
+2008-08-16  rob@welcomehome.org
+
+	[9608] Include pthread.h, so it'll compile on the latest OpenBSD
+
+2008-08-16  rob@welcomehome.org
+
+	[9607] Cast squareDistance() to a double, whioch sqrt wants.
+
+2008-08-16  rob@welcomehome.org
+
+	[9606] Use -lm when looking for finite or isfinite as they are link
+	tests.
+
+2008-08-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9605] Minor cleanups in FreetypeGlyphsProvider. Drop unused function.
+
+2008-08-15  rob@welcomehome.org
+
+	[9604] Only use -Wextra for strict compiling.
+
+2008-08-15  rob@welcomehome.org
+
+	[9603] Decode the MetaData tag in the video stream. FLVParser needs to
+	be fixed to pass in the entire packet before this will work 100%.
+
+2008-08-15  rob@welcomehome.org
+
+	[9602] Properly handle meta data tags without the leading type field.
+
+2008-08-15  rob@welcomehome.org
+
+	[9601] Add test cases for decoding meta tag headers without the
+	leading type field.
+
+2008-08-15  rob@welcomehome.org
+
+	[9600] Change png to libpng, so it works with pkg-config.
+
+2008-08-15  rob@welcomehome.org
+
+	[9599] include boost/bin.hpp too
+
+2008-08-15  rob@welcomehome.org
+
+	[9598] undef isnan, otherwise we get conflicts on NetBSD.
+
+2008-08-15  rob@welcomehome.org
+
+	[9597] Use older version of the test case that actually compiles.
+
+2008-08-15  Sandro Santilli <strk@keybit.net>
+
+	[9596] Recompute matrix from parameters on update. Fixes MovieClip.as
+	but still not potlatch.
+
+2008-08-15  Sandro Santilli <strk@keybit.net>
+
+	[9595] make check fixes and mit-shm leak fix (bug #24068)
+
+2008-08-15  Sandro Santilli <strk@keybit.net>
+
+	[9594] Cache matrix parameters in character instances.
+
+2008-08-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9593] Let BitmapMovieDefinition take RGBA as well as RGB images,
+	which allows creating transparent bitmap characters from PNG,
+	potentially from GIF (not yet implemented) and should make
+	implementing MovieClip.attachBitmap() possible.  Restore the clone()
+	method of ImageBase, as I'm not sure it was a good idea to drop it.
+
+2008-08-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9592] Fix cairo and ogl builds (oops).
+
+2008-08-14  rob@welcomehome.org
+
+	[9591] Merge from rtmp branch the new flvdumper utility, various other
+	libamf patches, and some new test cases.
+
+2008-08-13  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9590] Do PNG reading better.
+
+2008-08-13  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9589] Various image-related bugfixes and improvements.
+
+2008-08-13  rob@welcomehome.org
+
+	[9588] We need to link against GIF_LIBS too.
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9587] Bugfix to PNG image input.
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9586] collision detection fixes, minor cleanups to remoting
+
+2008-08-12  rob@welcomehome.org
+
+	[9585] Merge new XPCOM support from branch.
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9584] Fix remoting for GC, cleanups, fix support for short
+	PLACEOBJECT tag
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9583] improve headers parsing
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9582] Fix 404 handling with non-blocking read (well, kind-of).
+	Improve remoting by dropping any string_table lookups and properly
+	handle 404.
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9581] Write an RGBA image if an image::rgba is passed.
+
+2008-08-12  Sandro Santilli <strk@keybit.net>
+
+	[9580] Initial remoting support. Needs further cleanup, test and
+	improvement .
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9579] Minor cleanups to ImageOutput.
+
+2008-08-12  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9578] Attempt to fix the Debian Etch build.
+
+2008-08-11  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9577] Provide a unified image-writing interface: ImageOutput. Bring
+	JPEG writing under this structure and implement PNG writing. I see no
+	point in implementing GIF writing.  There are no users of these yet.
+	They will write any valid image_base (presently just image::rgb) to
+	the provided IOChannel.
+
+2008-08-11  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9576] Rename stream.{h,cpp} to SWFStream.{h,cpp} to reflect the class
+	name.  Add constructor to sprite_definition.cpp for creating an empty
+	MovieClip; the SWFStream can then be passed by reference like
+	everywhere else.
+
+2008-08-10  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9575] Pass SWFStream always by reference, except in a couple of cases
+	where a  NULL pointer has a meaning.  This is an unfinished general
+	cleanup to take SWFStream always by reference instead of a mixture of
+	pointers and references, with some classes having hacks to convert one
+	to the other. It's being committed because others are also working on
+	parsing and need to adapt them to this  tag loader interface change.
+
+2008-08-10  rob@welcomehome.org
+
+	[9574] update from branch, XPI packaging now works.
+
+2008-08-10  rob@welcomehome.org
+
+	[9573] Add actionscript.all and libnet.all into DIST_SUBDIRS Ming
+	release rc1 is *after* beta5.
+
+2008-08-09  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9572] Delete unused files in doc/C. I keep wasting time editing the
+	wrong ones.  Update the correct files with current information.
+
+2008-08-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9571] Some cleanups, drop unused functions.  Parse and implement
+	DefineButtonCxform tag (SWF2 only).
+
+2008-08-08  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9570] Restore support for SWF2 (PlaceObject tag), which stopped
+	working sometime between 2006 and now.
+
+2008-08-08  rob@welcomehome.org
+
+	[9569] Newer version of ffmpeg use LIBAVCODEC_VERSION_TRIPLET instead
+	of LIBAVCODEC_VERSION.
+
+2008-08-07  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9568] Parse CSMTextSettings tag (used by myspace).
+
+2008-08-07  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9567] Fix for a segfault in sound_handler_sdl.cpp.  Drop some unused
+	functions.
+
+2008-08-07  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9566] Minor addition to image cleanup.  Drop SIZET_FMT everywhere.
+
+2008-08-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9565] Unify and clean up the image input interface.
+
+2008-08-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9564] Add an interlaced gif in the test suite.
+
+2008-08-06  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9563] Add GIF reading support, improve PNG reading support. Both are
+	now a  subclass of ImageInput, which keeps format complications well
+	away from the core.
+
+2008-08-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9562] Manual test for loading gifs.
+
+2008-08-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9561] Clean up logging.
+
+2008-08-05  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9560] Add PNG-reading capabilities. This is only for PNG movies;
+	there isn't a way of embedding them in a SWF (at least up to version
+	8).  There still might be something to be said for unifying the
+	interface to JPEG and PNG.
+
+2008-08-04  Sandro Santilli <strk@keybit.net>
+
+	[9559] Fix xtrace to also do off-visual trace
+
+2008-08-04  Sandro Santilli <strk@keybit.net>
+
+	[9558] First draft of an haxe-based testing framework plus some
+	distribution fixes (looks like we weren't distributing the testsuite
+	if configure didn't find the required tools to run them !)
+
+2008-08-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9557] Enable toString() counting tests.
+
+2008-08-04  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9556] Minor cleanup to gui code.  Log unimplemented when trying to
+	jump to before the tag start. This gives a lot of logging when a movie
+	is thoroughly obfuscated, but that corresponds to the way the SWF
+	looks when it plays.
+
+2008-08-04  Sandro Santilli <strk@keybit.net>
+
+	[9555] SimpleBuffer and cross-blocks branching
+
+2008-08-03  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9554] Give dump gui the C++ treatment. Minor cleanups to
+	extention.cpp, comment on implementation of edit_text_character.cpp.
+
+2008-08-01  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9553] Fix autogen.
+
+2008-08-01  Russell Nelson <nelson@nelson-desktop>
+
+	[9552] Fix typo in advice about libming-util
+
+2008-07-31  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9551] Minor cleanups.
+
+2008-07-31  Russell Nelson <nelson@nelson-desktop>
+
+	[9550] Be more paranoid about ming versions
+
+2008-07-31  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9549] Complete implementation of string methods with SWF5 to
+	upper/lower. Improve String.toUpper and .toLower. Both need more work.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9548] New swfdec tests.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9547] Drop -ansi again.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9546] Cleanups of extension handling, replace C-style implementation
+	with (unoptimized) C++ one. It won't be a bottleneck, but some further
+	cleanup would be fine.  Other minor cleanups.  Restore -ansi now that
+	some non-standard functions have gone and see how far the win32 build
+	gets.
+
+2008-07-30  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9545] Cleanup of extension / module / plugin loading, part I.
+
+2008-07-30  Dossy Shiobara <dossy@panoptic.com>
+
+	[9544] * configure.ac: MinGW gcc 3.4.5 on Win32 won't build with
+	-ansi,   which undefines things like strdup, etc.  *
+	libbase/Makefile.am: Win32 builds fail when linking against
+	libltdl.dll.a, as it's missing the lt_* symbols.  Need to look   into
+	this further, but in the meantime, this gets the build   going again.
+	* libbase/utility.h: GetCurrentThreadId@0 symbol in kernel32.dll
+	needs to be defined outside of the gnash C++ namespace.   Needless to
+	say, this change is a fragile hack to get the   build moving again.  *
+	libmedia/MediaParser.cpp: usleep() not available on Win32.   This
+	should probably go into utility.h or some other platform   abstraction
+	lib.
+
+2008-07-29  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9543] Catch actionlimits exception thrown in executeTimers.
+
+2008-07-28  Sandro Santilli <strk@keybit.net>
+
+	[9542] Array fixes and negative matrix scale tests
+
+2008-07-28  Sandro Santilli <strk@keybit.net>
+
+	[9541] Tom's avm2 patches
+
+2008-07-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9540] Some minor improvements to BitmapData. This needs more testing.
+
+2008-07-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9539] A bit more BitmapData.
+
+2008-07-25  Sandro Santilli <strk@keybit.net>
+
+	[9538] check fixes
+
+2008-07-25  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9537] More tests for instance construction, minor change to
+	BitmapData.
+
+2008-07-24  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9536] comment might be threated as part of the preprocessor-statement
+
+2008-07-24  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9535] Removed all .cvsignore
+
+2008-07-24  Sandro Santilli <strk@keybit.net>
+
+	[9534] fix most of bwy new testcases (more needed)
+
+2008-07-24  Sandro Santilli <strk@keybit.net>
+
+	[9533] another "check" fix
+
+2008-07-24  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9532] Tests for instance construction.
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9531] Minor cleanups / Makefile bugfix.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9530] Fix 'make check' and runs with sound disabled
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9529] Kill zombie files.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9528] Embedded streaming sound fix
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9527] URL querystring parsing fix, agg cleanups, avm1 reduced
+	paranoia
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9526] Color class as verbosity cleanups
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9525] Drop compatibility_include.h. Improve string implementation,
+	many new passes in testsuite.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9524] typo
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9523] Minor cleanups.
+
+2008-07-23  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9522] Implement String.split more correctly. Document.
+
+2008-07-23  Sandro Santilli <strk@keybit.net>
+
+	[9521] ignore renames
+
+2008-07-22  rob@welcomehome.org
+
+	[9520]   Rename server directory to libcore. Change path in all
+	Makefiles. Change   libgnashserver to libgnashcore, change name in all
+	Makefiles. Move files from   libgeometry to libbase, and from
+	testsuite/libgeometry to testsuite/libbase.   Rename testsuite/server
+	to testsuite/libcore.all.
+
+2008-07-22  Sandro Santilli <strk@keybit.net>
+
+	[9519] Have TextFormat query fonts from relative movie root before
+	then the global shared font lib; trim trailing nulls in string-with-
+	length to avoid false negative equality comparisons. Fixes bug #23323.
+
+2008-07-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9518] Add xcheck to failing tests.
+
+2008-07-22  Sandro Santilli <strk@keybit.net>
+
+	[9517] hopefully enough to fix 'distcheck'
+
+2008-07-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9516] C++ify gtk_glue_agg.
+
+2008-07-22  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9515] Minor cleanups.
+
+2008-07-22  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9514] Fixed DSOEXPORT
+
+2008-07-22  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9513] Added Leopard X11 support
+
+2008-07-21  Sandro Santilli <strk@keybit.net>
+
+	[9512] avm2 contributed patch
+
+2008-07-21  Sandro Santilli <strk@keybit.net>
+
+	[9511] more ignores
+
+2008-07-21  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9510] Stub Accessibility class. Rename some asobj files for
+	consistency.
+
+2008-07-21  Sandro Santilli <strk@keybit.net>
+
+	[9509] more ignores
+
+2008-07-20  Sandro Santilli <strk@keybit.net>
+
+	[9508] more ignores
+
+2008-07-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9507] Fix to try/catch/finally with function returns. The fix is
+	suspiciously simple, but has no more unexpected failures. There's more
+	to do on try/catch.
+
+2008-07-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9506] Modify Try.as for a bug-fixed ming. Don't build for versions of
+	ming under 0.4.1 (CVS head of today).
+
+2008-07-20  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9505] Add a test for try / catch with malformed output, as ming
+	should now be correct. Add further tests for try / catch in mtasc
+	(which produces correct output).
+
+2008-07-20  Sandro Santilli <strk@keybit.net>
+
+	[9504] pause/unpause sound handler, cairo build fix
+
+2008-07-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9503] Logging changes.
+
+2008-07-19  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9502] Correct MovieClip depth tests.
+
+2008-07-18  Sandro Santilli <strk@keybit.net>
+
+	[9501] Tom Stellard patches for AVM2 (sorry, I missed to use the
+	'avm2' branch, still learning)
+
+2008-07-18  Russell Nelson <nelson@nelson-desktop>
+
+	[9500] libming has its own domain; ming.sourceforget.net redirects
+	there.
+
+2008-07-18  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9499] Add a group of tests for depth limits. Do depth checking on
+	MovieClip.attachMovie, duplicateMovieClip and
+	MovieClip.duplicateMovieClip. This conveniently also prevents UB when
+	converting to int.  Allow attachMovie to accept all legal depths, not
+	just 0-65535. Don't use depth as ID.  Add static constants to
+	character class for upper and lower bounds.
+
+2008-07-17  Sandro Santilli <strk@keybit.net>
+
+	[9498] testsuite fixes, flv meta tag dumping
+
+2008-07-17  Sandro Santilli <strk@keybit.net>
+
+	[9497] avm2 starts to get some love (and bzr branches too)
+
+2008-07-17  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9496] Fix SIZET_FMT warning.
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9495] Merge of image class changes: slim down the class by removing
+	unused code, move into gnash namespace, const correct where possible.
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9494] Zou's fix to bug 23846 (stage matrix).
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9493] Define PI properly and update character.cpp. This belongs with
+	the last revision, but I forgot to commit locally before merging.
+
+2008-07-16  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9492] Remove obsolete support for dlmalloc and dmalloc. Drop dlmalloc
+	files and utility.cpp.
+
+2008-07-15  Russell Nelson <nelson@nelson-desktop>
+
+	[9491] abc_block.cpp requires gnashconfig.h because a boost header
+	requires it. Added some protectors for asm blocks, but make check
+	still not succeeding. It's a start....
+
+2008-07-15  Sandro Santilli <strk@keybit.net>
+
+	[9490] timers execution and ignores.
+
+2008-07-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9489] Update for new swfdec tests.
+
+2008-07-15  Russell Nelson <nelson@nelson-desktop>
+
+	[9488] Add ChangeLog-0.8.3 and adjust ChangeLog
+
+2008-07-15  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9487] Partial fix to bug #23624, minor changes to advance counter,
+	cleanups.
+
+2008-07-14  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9486] server/sprite_instance.cpp: minor comments update, added TODO
+	about excessive depth handling (undefined behaviour if not checked
+	elsewhere)
+
+2008-07-13  Sandro Santilli <strk@keybit.net>
+
+	[9485] Implement Rectangle.contains and add tests for it. Thanks to
+	Sean Stangl for the initial draft.
+
+2008-07-13  zou lunkai <zoulunkai@gmail.com>
+
+	[9484] fixed rendering quality regression; fixed bug#23811
+
+2008-07-11  Sandro Santilli <strk@keybit.net>
+
+	[9483] Embedded video refactoring
+
+2008-07-11  Sandro Santilli <strk@keybit.net>
+
+	[9482] maintain last decoded frame for reuse on refresh or gaps
+
+2008-07-10  Sandro Santilli <strk@keybit.net>
+
+	[9481] Allow for binary post data
+
+2008-07-10  Sandro Santilli <strk@keybit.net>
+
+	[9480] Non-blocking IOChannel, heart-beating and distcheck
+
+2008-07-09  Sandro Santilli <strk@keybit.net>
+
+	[9479] version label change: cvs->trunk
+
+2008-07-09  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9478] Try to do some sanity checks, should fix bug #21095
+
+2008-07-09  zou lunkai <zoulunkai@gmail.com>
+
+	[9477] get rid of 'float to int conversion' warnings messages,
+	cleanups, tabs to spaces
+
+2008-07-09  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9476] Fixed ls -dr check
+
+2008-07-09  Sandro Santilli <strk@keybit.net>
+
+	[9475] update bytes loaded on EOF during FLV indexing - reduce
+	debugging noise while playing audio-only flvs with ffmpeg handler.
+
+2008-07-09  Sandro Santilli <strk@keybit.net>
+
+	[9474] Oops, I knew gstreamer would suffer (fix build)
+
+2008-07-09  Sandro Santilli <strk@keybit.net>
+
+	[9473] Use a private timer to advance a NetStream (don't rely on a
+	video character driving it). Fixes bug #23802.
+
+2008-07-08  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9472] Added BOOST_CFLAGS to INCLUDE-path
+
+2008-07-08  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9471] Edge is not a template anymore
+
+2008-07-08  zou lunkai <zoulunkai@gmail.com>
+
+	[9470] get rid of debugging prints left in my last commit
+
+2008-07-08  zou lunkai <zoulunkai@gmail.com>
+
+	[9469] refactoring of Point2d, Edge and Path classes, now they are all
+	implemented by integers
+
+2008-07-08  Sandro Santilli <strk@keybit.net>
+
+	[9468] Summer games : v9
+
+2008-07-08  Sandro Santilli <strk@keybit.net>
+
+	[9467] More swf5 scoping issues
+
+2008-07-05  Sandro Santilli <strk@keybit.net>
+
+	[9466] When calling a function in SWF5, set target to the 'this'
+	pointer, if it is a character. Fixes many tests in setProperty.as but
+	nothing new in other testsuites. We need more tests on this.
+
+2008-07-04  zou lunkai <zoulunkai@gmail.com>
+
+	[9465] fix some remaining warnings with float points and coordinates,
+	cleanups
+
+2008-07-04  zou lunkai <zoulunkai@gmail.com>
+
+	[9464] add tests for boost types(intxx_x), minor cleanups in
+	matrix.cpp
+
+2008-07-04  Tom Stellard <tstellar@gmail.com>
+
+	[9463] Patch #6556: Add tag_loader stub for
+	DEFINESCENEANDFRAMELABELDATA tag
+
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9462] Added OpenGL dependencies
+
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9461] __APPLE__ should be dinfined by CPP
+
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9460] Use fmod() in favor of typecasting on OS X
+
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9459] Opppssss
+
+2008-07-03  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9458] Revert back to old behaviour but keep C++-typecsting
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9457] Fixes the fmod() issue as seen on OS X.
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9456] downcast double to float
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9455] Pass floats to sinf and cosf.
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9454] beautify
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9453] More typecast fixes
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9452] Fixed fmod() on some systems...
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9451] Clean-up typecasting...
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9450] Added #include <cmath>
+
+2008-07-02  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9449] use std::getline instead of getline() to avoid confusion.
+
+2008-07-02  zou lunkai <zoulunkai@gmail.com>
+
+	[9448] cleanups, float --> int32 conversion for coordinates related
+	stuff
+
+2008-07-01  Sandro Santilli <strk@keybit.net>
+
+	[9447] Allow null target in as_environment. Fixes bug #23735 and a few
+	cases in our and swfdec's testsuite.
+
+2008-07-01  zou lunkai <zoulunkai@gmail.com>
+
+	[9446] fix rect::expand_to_point(), fix regressions detected in swfdec
+	and cvrveball.swf
+
+2008-06-30  Sandro Santilli <strk@keybit.net>
+
+	[9445] dlist.{cpp,h} -> DisplayList.{cpp,h} movie_def_impl.{cpp,h} ->
+	SWFMovieDefinition.{cpp,h} Cleanups.
+
+2008-06-30  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9444] 1.0?
+
+2008-06-30  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9443] Remove the unused and undocumented pixel-scale argument from
+	many methods.
+
+2008-06-30  zou lunkai <zoulunkai@gmail.com>
+
+	[9442] don't set the height when the bounds is null, fix a regression
+	made by my last commit
+
+2008-06-30  zou lunkai <zoulunkai@gmail.com>
+
+	[9441] use integer rect instead of float Range2D for instance bounds,
+	more integer math
+
+2008-06-30  Bastiaan Jacques <bastiaan@bjacques.org>
+
+	[9440] PathParser: optimize by allowing inlining and other small
+	cleanups. Cairo: Implement cap and line styles and cleanups.
+
+2008-06-28  Bastiaan Jacques <bastiaan@bjacques.org
+
+	[9439] Introducing PathParser for correct shape rendering for Cairo,
+	compilation fixes for the Cairo GUI and related changes.
+
+2008-06-27  zou lunkai <zoulunkai@gmail.com>
+
+	[9438] rect class refactory, use integer math instead of float
+
+2008-06-27  Sandro Santilli <strk@keybit.net>
+
+	[9437] Register Gui with movie_root, have movie_root ask gui to prompt
+	user on action limit hit.
+
+2008-06-26  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9436] Make sure we free only alloc'ed pointers.
+
+2008-06-25  Sandro Santilli <strk@keybit.net>
+
+	[9435] Fix leak in ffmpeg audio decoder, other minor cleanups
+
+2008-06-25  Petr Pisar <petr.pisar@atlas.cz>
+
+	[9434] updated Czech translation
+
+2008-06-25  Ed Martin <edman007@edman007.com>
+
+	[9433] This patch moves the argument list creation to before the fork
+	removing the malloc/free calls preventing bogus FF3 jemalloc from
+	causing a deadlock
+
+2008-06-25  Sandro Santilli <strk@keybit.net>
+
+	[9432] Only use fontconfig from main thread. Fixes bug #23697.
+
+2008-06-25  Sandro Santilli <strk@keybit.net>
+
+	[9431] Allocate just the required amount of bytes on audio resample
+	(ffmpeg)
+
+2008-06-25  Markus Gothe <nietzsche@lysator.liu.se>
+
+	[9430] bzr ci
+
+2008-06-25  Sandro Santilli <strk@keybit.net>
+
+	[9429] simplify ignores, add Makefile (in any dir!)
+
+2008-06-25  Daniel Drake <dsd@laptop.org>
+
+	[9428] Fix missing libgnashplugin.so glib link. libgnashplugin uses
+	functions like g_io_channel_unix_get_fd()
+	http://dev.laptop.org/ticket/7328
+
+2008-06-25  Sandro Santilli <strk@keybit.net>
+
+	[9427] few more ignores (gmo don't get cleared on distcheck,
+	expected?)
+
+2008-06-24  Sandro Santilli <strk@keybit.net>
+
+	[9426] Add CTRL-equals, CTRL-minus and CTRL-plus keystroke controlling
+	FPS (gtk guys around willing to have fun with some slidebar?) Fix
+	computation of "min" fps for fps-debugging.
+
+2008-06-24  Sandro Santilli <strk@keybit.net>
+
+	[9425] Implement fscommand:allowscale, drop debug output at each
+	fscommand (unhandled ones will still be printed)
+
+2008-06-24  zou lunkai <zoulunkai@gmail.com>
+
+	[9424] bzr test
+
+2008-06-23  Sandro Santilli <strk@keybit.net>
+
+	[9423] Implement seeking in FLVParser, hopefully fix (or greatly
+	reduce chances to incur in) race condition on seek.
+
+2008-06-23  Sandro Santilli <strk@keybit.net>
+
+	[9422] Add test for global/local registers; make registers access
+	safer and more general
+
+2008-06-23  Russell Nelson <nelson@nelson-desktop>
+
+	[9421] Update the preformatted docs.
+
+2008-06-22  Sandro Santilli <strk@keybit.net>
+
+	[9420] ignores
+
+2008-06-21  rob@welcomehome.org
+
+	[9419] Disable for now
+
+2008-06-21  rob@welcomehome.org
+
+	[9418] merge from cygnal branch, drop old files
+
+2008-06-21  Benjamin Wolsey <bwy@benjaminwolsey.de>
+
+	[9417] Don't heap allocate vectors, as they allocate their elements on
+	the heap anyway.
+

@@ -41,15 +41,20 @@ public:
 		THICK = 2
 	};
 
-	DefineFontAlignZonesTag(movie_definition& m, SWFStream& in);
 
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
 
 private:
 
+    /// Construct a DefineFoneAlignZonesTag
+    //
+    /// This should only be called from the loader() function.
+	DefineFontAlignZonesTag(movie_definition& m, SWFStream& in);
+
 	unsigned short _font2_id_ref;
 
-	unsigned _csm_table_int:2;
+	unsigned _csm_table_int;
 
 };
 

@@ -23,12 +23,15 @@
 
 
 #include "AudioDecoderGst.h"
-#include "MediaParser.h"
+#include "MediaParser.h" // for AudioInfo
 #include "MediaParserGst.h"
+#include "GstUtil.h"
+#include "FLVParser.h" // for ExtraAudioInfoFlv
+#include "SoundInfo.h"
 
 namespace gnash {
 namespace media {
-
+namespace gst {
 
 
 AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
@@ -47,7 +50,7 @@ AudioDecoderGst::AudioDecoderGst(SoundInfo& info)
     // FIXME: should we handle other types?
 }
 
-AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
+AudioDecoderGst::AudioDecoderGst(const AudioInfo& info)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
@@ -74,14 +77,45 @@ AudioDecoderGst::AudioDecoderGst(AudioInfo& info)
         return;
     }
 
+    if (info.type == FLASH && info.codec == AUDIO_CODEC_AAC)
+    {
+        srccaps = gst_caps_new_simple ("audio/mpeg",
+            "mpegversion", G_TYPE_INT, 4,
+            "rate", G_TYPE_INT, 44100,
+            "channels", G_TYPE_INT, 2, 
+            NULL);
+
+        ExtraAudioInfoFlv* extra = dynamic_cast<ExtraAudioInfoFlv*>(info.extra.get());
+        if (extra) {
+            GstBuffer* buf = gst_buffer_new_and_alloc(extra->size);
+            memcpy(GST_BUFFER_DATA(buf), extra->data.get(), extra->size);
+            gst_caps_set_simple (srccaps, "codec_data", GST_TYPE_BUFFER, buf, NULL);
+
+        } else {
+            log_error(_("Creating AAC decoder without extra data. This will probably fail!"));
+        }
+
+        setup(srccaps);
+        return;
+    }
+
+
     if (info.type == FLASH) {
-        throw MediaException("AudioDecoderGst: cannot handle this codec!");
+		boost::format err = boost::format(
+                _("AudioDecoderGst: cannot handle codec %d (%s)")) %
+                info.codec %
+                (audioCodecType)info.codec;
+        throw MediaException(err.str());
     }
 
     ExtraInfoGst* extraaudioinfo = dynamic_cast<ExtraInfoGst*>(info.extra.get());
 
     if (!extraaudioinfo) {
-        throw MediaException("AudioDecoderGst: cannot handle this codec!");
+		boost::format err = boost::format(
+                _("AudioDecoderGst: cannot handle codec %d "
+                  "(no ExtraInfoGst attached)")) %
+                info.codec;
+        throw MediaException(err.str());
     }
 
     setup(extraaudioinfo->caps);
@@ -94,7 +128,8 @@ AudioDecoderGst::~AudioDecoderGst()
     swfdec_gst_decoder_finish(&_decoder);
 }
 
-std::string 
+/// Find the best available audio resampler on the system
+static std::string 
 findResampler()
 {
     std::string resampler = "ffaudioresample";
@@ -127,6 +162,14 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
     }
 
+    bool success = GstUtil::check_missing_plugins(srccaps);
+    if (!success) {
+        gst_caps_unref(srccaps);
+	/// @todo print *which* codec 
+        throw MediaException(_("AudioDecoderGst: couldn't find a plugin for audio type ..."));
+    }
+
+
     GstCaps* sinkcaps = gst_caps_from_string ("audio/x-raw-int, endianness=byte_order, signed=(boolean)true, width=16, depth=16, rate=44100, channels=2");
     if (!sinkcaps) {
         throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
@@ -134,8 +177,9 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
 
     std::string resampler = findResampler();
 
-    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", resampler.c_str(), NULL);
-    if (!rv) {
+    success = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "audioconvert", resampler.c_str(), NULL);
+    if (!success) {
+	/// @todo print more about why, and for which codec ...
         throw MediaException(_("AudioDecoderGst: initialisation failed."));      
     }
 
@@ -143,7 +187,7 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
     gst_caps_unref (sinkcaps);
 }
 
-void
+static void
 buf_add(gpointer buf, gpointer data)
 {
     boost::uint32_t* total = (boost::uint32_t*) data;
@@ -186,7 +230,7 @@ AudioDecoderGst::pullBuffers(boost::uint32_t&  outputSize)
 }
 
 boost::uint8_t*
-AudioDecoderGst::decode(boost::uint8_t* input, boost::uint32_t inputSize,
+AudioDecoderGst::decode(const boost::uint8_t* input, boost::uint32_t inputSize,
                         boost::uint32_t& outputSize,
                         boost::uint32_t& decodedData, bool /*parse*/)
 {
@@ -233,6 +277,7 @@ AudioDecoderGst::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize
 }
 
 
+} // gnash.media.gst namespace
 } // end of media namespace
 } // end of gnash namespace
 

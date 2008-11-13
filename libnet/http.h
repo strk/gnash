@@ -128,51 +128,51 @@ public:
     // extension to HTTP that adds commands to manipulate the
     // connection's persistance.
     rtmpt_cmd_e extractRTMPT(gnash::Network::byte_t *data);
-    rtmpt_cmd_e extractRTMPT(amf::Buffer *data)
+    rtmpt_cmd_e extractRTMPT(boost::shared_ptr<amf::Buffer> data)
 	{ return extractRTMPT(data->reference()); };
 
     // These methods extract the fields in the HTTP header.
     // These all return the number of items found, or 0
     http_method_e extractCommand(gnash::Network::byte_t *data);
-    http_method_e extractCommand(amf::Buffer *data)
+    http_method_e extractCommand(boost::shared_ptr<amf::Buffer> data)
 	{ return extractCommand(data->reference()); };
     int extractAccept(gnash::Network::byte_t *data);
-    int extractAccept(amf::Buffer *data)
+    int extractAccept(boost::shared_ptr<amf::Buffer> data)
 	{ return extractAccept(data->reference()); };
     std::string &extractAcceptRanges(gnash::Network::byte_t *data);
-    std::string &extractAcceptRanges(amf::Buffer *data)
+    std::string &extractAcceptRanges(boost::shared_ptr<amf::Buffer> data)
 	{ return extractAcceptRanges(data->reference()); };
     int extractLanguage(gnash::Network::byte_t *data);
-    int extractLanguage(amf::Buffer *data)
+    int extractLanguage(boost::shared_ptr<amf::Buffer> data)
 	{ return extractLanguage(data->reference()); };
     int extractCharset(gnash::Network::byte_t *data);
-    int extractCharset(amf::Buffer *data)
+    int extractCharset(boost::shared_ptr<amf::Buffer> data)
 	{ return extractCharset(data->reference()); };
     int extractEncoding(gnash::Network::byte_t *data);
-    int extractEncoding(amf::Buffer *data)
+    int extractEncoding(boost::shared_ptr<amf::Buffer> data)
 	{ return extractEncoding(data->reference()); };
     int extractTE(gnash::Network::byte_t *data);
-    int extractTE(amf::Buffer *data)
+    int extractTE(boost::shared_ptr<amf::Buffer> data)
 	{ return extractTE(data->reference()); };
     int extractConnection(gnash::Network::byte_t *data);
-    int extractConnection(amf::Buffer *data)
+    int extractConnection(boost::shared_ptr<amf::Buffer> data)
 	{ return extractConnection(data->reference()); };
     int extractKeepAlive(gnash::Network::byte_t *data);
-    int extractKeepAlive(amf::Buffer *data)
+    int extractKeepAlive(boost::shared_ptr<amf::Buffer> data)
 	{ return extractConnection(data->reference()); };
 
     // These return the string that was found for this field.
     std::string &extractMethod(gnash::Network::byte_t *data);
-    std::string &extractMethod(amf::Buffer *data)
+    std::string &extractMethod(boost::shared_ptr<amf::Buffer> data)
 	{ return extractMethod(data->reference()); };
     std::string &extractReferer(gnash::Network::byte_t *data);
-    std::string &extractReferer(amf::Buffer *data)
+    std::string &extractReferer(boost::shared_ptr<amf::Buffer> data)
 	{ return extractReferer(data->reference()); };
     std::string &extractHost(gnash::Network::byte_t *data);
-    std::string &extractHost(amf::Buffer *data)
+    std::string &extractHost(boost::shared_ptr<amf::Buffer> data)
 	{ return extractHost(data->reference()); };
     std::string &extractAgent(gnash::Network::byte_t *data);
-    std::string &extractAgent(amf::Buffer *data)
+    std::string &extractAgent(boost::shared_ptr<amf::Buffer> data)
 	{ return extractAgent(data->reference()); };
 
     // These methods add data to the fields in the HTTP header.

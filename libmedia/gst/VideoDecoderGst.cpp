@@ -23,14 +23,18 @@
 
 #include "VideoDecoderGst.h"
 #include "MediaParserGst.h"
-
+#include "GstUtil.h"
 
 namespace gnash {
 namespace media {
+namespace gst {
 
 // TODO: implement proper seeking.
 
 VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
+    :
+    _width(0),
+    _height(0)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
@@ -38,14 +42,40 @@ VideoDecoderGst::VideoDecoderGst(GstCaps* caps)
     setup(caps);
 }
 
+int
+VideoDecoderGst::width() const
+{
+    return _width;
+}
 
-VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type, int width, int height)
+int
+VideoDecoderGst::height() const
+{
+    return _height;
+}
+
+VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
+        int /*width*/, int /*height*/,
+        const boost::uint8_t* extradata, size_t extradatasize)
 {
     // init GStreamer. TODO: what about doing this in MediaHandlerGst ctor?
     gst_init (NULL, NULL);
 
   GstCaps* caps;  
   switch (codec_type) {
+    case VIDEO_CODEC_H264:
+    {
+      caps = gst_caps_new_simple ("video/x-h264",
+                                      NULL);
+
+      if (extradata && extradatasize) {
+
+          GstBuffer* buf = gst_buffer_new_and_alloc(extradatasize);
+          memcpy(GST_BUFFER_DATA(buf), extradata, extradatasize);
+          gst_caps_set_simple (caps, "codec_data", GST_TYPE_BUFFER, buf, NULL);
+      }
+      break;
+    } 
     case VIDEO_CODEC_H263:
       caps = gst_caps_new_simple ("video/x-flash-video",
                                       NULL);
@@ -91,6 +121,11 @@ VideoDecoderGst::setup(GstCaps* srccaps)
         throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
     }
 
+    bool success = GstUtil::check_missing_plugins(srccaps);
+    if (!success) {
+        throw MediaException(_("Couldn't find a plugin for video type ..."));
+    }
+
     GstCaps* sinkcaps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
                                              "depth", G_TYPE_INT, 24,
                                              NULL);
@@ -133,13 +168,13 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
 }
   
 
-std::auto_ptr<image::ImageBase>
+std::auto_ptr<GnashImage>
 VideoDecoderGst::pop()
 {
     GstBuffer * buffer = swfdec_gst_decoder_pull (&_decoder);
 
     if (!buffer) {
-        return std::auto_ptr<image::ImageBase>();
+        return std::auto_ptr<GnashImage>();
     }
   
     GstCaps* caps = gst_buffer_get_caps(buffer);
@@ -148,14 +183,12 @@ VideoDecoderGst::pop()
   
     GstStructure* structure = gst_caps_get_structure (caps, 0);
 
-    gint height, width;
+    gst_structure_get_int (structure, "width", &_width);
+    gst_structure_get_int (structure, "height", &_height);
 
-    gst_structure_get_int (structure, "width", &width);
-    gst_structure_get_int (structure, "height", &height);
-  
     gst_caps_unref(caps);
   
-    std::auto_ptr<image::ImageBase> ret(new gnashGstBuffer(buffer, width, height));
+    std::auto_ptr<GnashImage> ret(new gnashGstBuffer(buffer, _width, _height));
   
     return ret;
 }
@@ -168,5 +201,6 @@ VideoDecoderGst::peek()
 }
 
 
+} // namespace gnash::media::gst
 } // namespace gnash::media
 } // namespace gnash

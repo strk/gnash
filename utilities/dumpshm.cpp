@@ -234,7 +234,7 @@ dump_shm(bool convert, bool out)
 	     << ", Size is: " << dec << size << endl;
     }
     
-    LcShm lc;
+    amf::LcShm lc;
     lc.connect(key);
     lc.dump();
     

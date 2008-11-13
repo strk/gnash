@@ -25,6 +25,14 @@ majorscale.sco
 
 	Csound score file for a major scale execution
 
+brokenchord.sco
+
+	Csound score file for testing event sounds (bwy productions)
+
+brokenchord.wav
+
+	Produced with csound from default.orc and brokenchord.sco
+
 offspring.swf
 offspring.jpg
 green.jpg

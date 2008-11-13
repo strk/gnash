@@ -40,6 +40,7 @@
 #endif
 #include "buffer.h"
 #include "arg_parser.h"
+#include "GnashException.h"
 
 using namespace std;
 using namespace amf;
@@ -49,6 +50,7 @@ using namespace boost;
 static void usage();
 
 // Prototypes for test cases
+static void test_resize();
 static void test_construct();
 static void test_copy();
 static void test_find();
@@ -130,39 +132,6 @@ main (int argc, char** argv)
     }
 #endif
     
-    Buffer buf;
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif    
-    if (buf.size() == gnash::NETBUFSIZE) {
-         runtest.pass ("Buffer::size()");
-     } else {
-         runtest.fail ("Buffer::size()");
-    }
-
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif
-    buf.resize(112);
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif
-    if (buf.size() == 112) {
-         runtest.pass ("Buffer::resize()");
-     } else {
-         runtest.fail ("Buffer::resize()");
-    }
-#ifdef HAVE_MALLINFO
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
-#endif
 // these tests are bogus unless you have both mallinfo()
 // and also have memory statistics gathering turned on.
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
@@ -171,7 +140,8 @@ main (int argc, char** argv)
     // test destroying Buffers
     test_destruct();
 #endif
-    
+
+    test_resize();
     test_copy();
     test_find();
     test_append();
@@ -199,6 +169,53 @@ main (int argc, char** argv)
 }
 
 void
+test_resize()
+{
+    Buffer buf;
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif    
+    if (buf.size() == gnash::NETBUFSIZE) {
+        runtest.pass ("Buffer::size(NETBUFSIZE)");
+    } else {
+        runtest.fail ("Buffer::size(NETBUFSIZE)");
+    }
+    
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif
+    buf.resize(112);
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif
+    if (buf.size() == 112) {
+         runtest.pass ("Buffer::resize(112)");
+     } else {
+         runtest.fail ("Buffer::resize(112)");
+    }
+#ifdef HAVE_MALLINFO
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
+#endif
+
+    string str = "Hello World";
+    buf = str;
+    buf.resize(5);
+    if (memcmp(buf.begin(), str.c_str(), 5) == 0) {
+        runtest.pass ("Buffer resize(5)");
+    } else {
+        runtest.fail ("Buffer resize(5)");
+    }
+}
+
+void
 test_copy()
 {
     // Make some data for the buffers
@@ -222,46 +239,76 @@ test_copy()
 
     const char *str = "I'm bored";
     string str1 = str;
-    buf1.copy(str1);
+    buf1 = str1;
     if (memcmp(ptr1, str, 9) == 0) {
-         runtest.pass ("Buffer::copy(std::string &)");
+         runtest.pass ("Buffer::operator=(std::string &)");
     } else {
-         runtest.fail ("Buffer::copy(std::string &)");
+         runtest.fail ("Buffer::operator=(std::string &)");
     }
 
     Buffer buf2;
-    buf2.copy(str);
+    buf2 = str;
     Network::byte_t *ptr2 = buf2.reference();
     if (memcmp(ptr2, str, 9) == 0) {
-         runtest.pass ("Buffer::copy(const char *)");
+         runtest.pass ("Buffer::operator=(const char *)");
     } else {
-         runtest.fail ("Buffer::copy(const char *)");
+         runtest.fail ("Buffer::operator=(const char *)");
     }
 
     boost::uint16_t length = 12;
     Buffer buf3;
-    buf3.copy(length);
+    buf3 = length;
     Network::byte_t *ptr3 = buf3.reference();
     boost::uint16_t newlen = *(reinterpret_cast<boost::uint16_t *>(ptr3));
     if (length == newlen) {
-         runtest.pass ("Buffer::copy(boost::uint16_t)");
+         runtest.pass ("Buffer::operator=(boost::uint16_t)");
     } else {
-         runtest.fail ("Buffer::copy(boost::uint16_t)");
+         runtest.fail ("Buffer::operator=(boost::uint16_t)");
     }
 
-#if 0
     double num = 1.2345;
     Buffer buf4;
-    buf4.clear();
-    buf4.copy(num);
+    buf4 = num;
+
+    // Copy the raw bytes used for the number into the temporary
+    // data pointer, so we can do a comparison
     memcpy(data, &num, amf::AMF0_NUMBER_SIZE);
 
     if (memcmp(data, buf4.reference(), amf::AMF0_NUMBER_SIZE) == 0) {
-         runtest.pass ("Buffer::copy(double)");
+         runtest.pass ("Buffer::operator=(double)");
     } else {
-         runtest.fail ("Buffer::copy(double)");
+         runtest.fail ("Buffer::operator=(double)");
     }   
-#endif
+
+    Network::byte_t byte = 67;
+    Buffer buf5;
+    buf5 = byte;
+    if (*buf5.reference() == 67) {
+         runtest.pass ("Buffer::operator=(Network::byte_t)");
+    } else {
+         runtest.fail ("Buffer::operator=(Network::byte_t)");
+    }
+
+    amf::Element::amf0_type_e type = Element::NUMBER_AMF0;
+    Buffer buf6;
+    buf6 = type;
+    if (*buf6.reference() == type) {
+         runtest.pass ("Buffer::operator=(amf::Element::amf0_type_e)");
+    } else {
+         runtest.fail ("Buffer::operator=(amf::Element::amf0_type_e)");
+    }
+    
+    bool flag = true;
+    Buffer buf7;
+    buf7 = flag;
+    if (*buf7.reference() == flag) {
+         runtest.pass ("Buffer::operator=(bool)");
+    } else {
+         runtest.fail ("Buffer::operator=(bool)");
+    }
+    
+
+        // cleanup the temporary data
     delete[] data;
 }
 
@@ -282,7 +329,7 @@ test_find()
     delete[] data;
     
     // See if we can find a character
-    Network::byte_t *fptr = buf1.find('c');
+    Network::byte_t *fptr = std::find(buf1.begin(), buf1.end(), 'c'); 
     if (fptr == (ptr1 + 2)) {
          runtest.pass ("Buffer::find(Network::byte_t)");
     } else {
@@ -291,7 +338,7 @@ test_find()
 
     const char *sub = "fgh";
     Network::byte_t *ptr2 = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(sub));
-    fptr = buf1.find(ptr2, 3);
+    fptr = std::search(buf1.begin(), buf1.end(), sub, sub+3);
     if (fptr == (ptr1 + 5)) {
          runtest.pass ("Buffer::find(Network::byte_t *, size_t)");
     } else {
@@ -336,14 +383,14 @@ test_append()
     buf2.clear();
     buf2.copy(data1, 10);
     Network::byte_t byte = '@';
-    buf2.append(byte);
+    buf2 += byte;
     memset(data3, 0, 20);
     memcpy(data3, data1, 10);
     *(data3 + 10) = '@';
     if (memcmp(data3, buf2.reference(), 11) == 0) {
-         runtest.pass ("Buffer::append(Network::byte_t)");
+         runtest.pass ("Buffer::operator+=(Network::byte_t)");
     } else {
-         runtest.fail ("Buffer::append(Network::byte_t)");
+         runtest.fail ("Buffer::operator+=(Network::byte_t)");
     }
 
     // Append a number
@@ -351,28 +398,63 @@ test_append()
     Buffer buf3;
     buf3.clear();
     buf3.copy(data1, 10);
-    buf3.append(num);
+    buf3 += num;
     
     memset(data3, 0, 20);
     memcpy(data3, data1, 10);
     memcpy(data3 + 10, &num, sizeof(double));
     if (memcmp(data3, buf3.reference(), 10+sizeof(double)) == 0) {
-         runtest.pass ("Buffer::append(double)");
+         runtest.pass ("Buffer::operator+=(double)");
     } else {
-         runtest.fail ("Buffer::append(double)");
+         runtest.fail ("Buffer::operator+=(double)");
     }
 
+    string str1 = "Writing test cases";
+    const char *str2 = "is so tedious";
+    string str3 = str1 + str2;
+    Buffer buf6(50);
+    buf6 = str1;
+    buf6 += str2;
+    if (memcmp(buf6.reference(), str3.c_str(), str3.size()) == 0) {
+        runtest.pass ("Buffer::operator+=(const string &)");
+    } else {
+        runtest.fail ("Buffer::operator+=(const string &)");
+    }
+
+    boost::uint16_t length = 1047;
+    Buffer buf7(70);
+    buf7.copy(data1, 10);
+    buf7 += length;
+    if (memcmp(buf7.reference() + 10, &length, sizeof(boost::uint16_t)) == 0) {
+        runtest.pass ("Buffer::operator+=(boost::uint16_t)");
+    } else {
+        runtest.fail ("Buffer::operator+=(boost::uint16_t)");
+    }
+
+    buf7 += buf6;
+    Network::byte_t *ptr1 = buf7.reference() + 10 + sizeof(boost::uint16_t);
+    Network::byte_t *ptr2 = buf6.reference();
+    if (memcmp(buf7.reference() + 10 + sizeof(boost::uint16_t), buf6.reference(), 30) == 0) {
+        runtest.pass ("Buffer::operator+=(Buffer &)");
+    } else {
+        runtest.fail ("Buffer::operator+=(Buffer &)");
+    }
+
+    bool flag = true;
+    Buffer buf8;
+    buf8.copy(data1, 10);
+    buf8 += flag;
+    if (*(buf8.reference() + 10) == 1) {
+        runtest.pass ("Buffer::operator+=(bool)");
+    } else {
+        runtest.fail ("Buffer::operator+=(bool)");
+    }
+    
+    // Clean up temporary data
     delete[] data1;
     delete[] data2;
     delete[] data3;
     
-// amf::Buffer::append(amf::Element::amf_type_e)
-// amf::Buffer::append(amf::Buffer*)
-// amf::Buffer::append(std::string const&)
-// amf::Buffer::append(amf::Buffer&)
-// amf::Buffer::append(bool)
-// amf::Buffer::append(unsigned int)
-// amf::Buffer::append(unsigned short)
 }
 
 void
@@ -588,7 +670,7 @@ test_operators()
          runtest.fail ("Buffer::operator+=(char)");
     }
 
-    Buffer buf6(10);
+    Buffer buf6(6);
     buf6.clear();
     buf6 += 'D';
     buf6 += 'E';
@@ -596,12 +678,25 @@ test_operators()
     buf5 += buf6;
     ptr3 = buf5.reference();    // refresh the pointer, as it changes
                                 // on a resize()
-    // The size should now be the default 10, plus the 3 characters
-    // already added.
-    if ((memcmp(ptr3, "abcDEF", 6) == 0) && (buf5.size() == 13)) {
+    if ((memcmp(ptr3, "abcDEF", 6) == 0) && (buf5.size() == 10)) {
          runtest.pass ("Buffer::operator+=(Buffer &)");
     } else {
          runtest.fail ("Buffer::operator+=(Buffer &)");
+    }
+
+    bool caught = false;
+    try {
+        buf5 += buf6;
+    }
+
+    catch (GnashException& ge) {
+        caught = true;
+//        log_debug("Got exeception from operator+=: %s", ge.what());
+    }
+    if (caught) {
+         runtest.pass ("Buffer::operator+=(Buffer &) error");
+    } else {
+         runtest.fail ("Buffer::operator+=(Buffer &) error");
     }
 }
 

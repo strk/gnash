@@ -30,6 +30,7 @@
 namespace gnash {
 	class SWFStream;
 	class movie_definition;
+    class RunInfo;
 }
 
 namespace gnash {
@@ -47,7 +48,7 @@ public:
 	/// 'm' a pointer to the movie (or sprite) being read
 	///
 	typedef void (*loader_function)(
-		SWFStream& input, tag_type type, movie_definition& m);
+        SWFStream& input, tag_type type, movie_definition& m, const RunInfo& r);
 
 	/// \brief
 	/// Get a pointer to the loader_function for the

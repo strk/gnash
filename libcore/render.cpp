@@ -19,7 +19,7 @@
 // Based on original by Willem Kokke <willem@mindparity.com> 2003
 
 #include "render.h"
-#include "image.h"
+#include "GnashImage.h"
 
 // Define this to have all renderer calls print a message (with -vv)
 #undef DEBUG_RENDER_CALLS 
@@ -62,7 +62,7 @@ namespace render
 		bogus_bi() {}
 	};
 
-	bitmap_info* createBitmapInfo(std::auto_ptr<image::ImageBase> im)
+	bitmap_info* createBitmapInfo(std::auto_ptr<GnashImage> im)
 	{
 	
         if (!s_render_handler)
@@ -79,16 +79,16 @@ namespace render
 
             case GNASH_IMAGE_RGB:
             {
-                std::auto_ptr<image::ImageRGB> imageRGB(
-                            dynamic_cast<image::ImageRGB*>(im.release()));
+                std::auto_ptr<ImageRGB> imageRGB(
+                            dynamic_cast<ImageRGB*>(im.release()));
                 assert(imageRGB.get());
                 return  s_render_handler->create_bitmap_info_rgb(imageRGB.get());
             }
 
             case GNASH_IMAGE_RGBA:
             {
-                std::auto_ptr<image::ImageRGBA> imageRGBA(
-                            dynamic_cast<image::ImageRGBA*>(im.release()));
+                std::auto_ptr<ImageRGBA> imageRGBA(
+                            dynamic_cast<ImageRGBA*>(im.release()));
                 assert(imageRGBA.get());
                 return s_render_handler->create_bitmap_info_rgba(imageRGBA.get());
             }
@@ -97,7 +97,7 @@ namespace render
 	}
 
 	// Draws the video frames
-	void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds){
+	void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds){
 		if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);
 	}
 
@@ -137,7 +137,7 @@ namespace render
 	}
 
 
-	void	draw_line_strip(const boost::int16_t coords[], int vertex_count, const rgba& color, const matrix& mat)
+	void	draw_line_strip(const boost::int16_t coords[], int vertex_count, const rgba& color, const SWFMatrix& mat)
 	{
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
@@ -147,7 +147,7 @@ namespace render
 
 
 void  draw_poly(const point* corners, int corner_count, const rgba& fill, 
-  const rgba& outline, const matrix& mat, bool masked) 
+  const rgba& outline, const SWFMatrix& mat, bool masked) 
 	{
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
@@ -167,7 +167,7 @@ void draw_shape_character(shape_character_def *def,
 }
 
 void draw_glyph(shape_character_def *def,
-  const matrix& mat,
+  const SWFMatrix& mat,
   const rgba& color)
 {
 #ifdef DEBUG_RENDER_CALLS

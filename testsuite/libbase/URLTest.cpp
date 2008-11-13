@@ -96,7 +96,6 @@ main(int /*argc*/, char** /*argv*/)
 	URL u8("../..//../../../../tmp//curl.h", u6);
 	check_equals ( u8.protocol() , "file" );
 	check_equals ( u8.path() , "/tmp/curl.h" );
-	check_equals ( "/tmp/curl.h", "/tmp/curl.h" );
 
 	/// Test path normalization 
 	check_equals (URL("/hello/world/../file").path(), "/hello/file");

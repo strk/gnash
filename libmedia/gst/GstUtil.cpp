@@ -22,15 +22,23 @@
 #include "gnashconfig.h"
 #endif
 
+#include <sstream>
+
 #include "GstUtil.h"
 #include "log.h"
 
-#include <gst/gst.h>
-#include <sstream>
+#include "swfdec_codec_gst.h"
+
+#ifdef GST_HAS_MODERN_PBUTILS
+#include <gst/pbutils/pbutils.h>
+#include <gst/pbutils/missing-plugins.h>
+#include <gst/pbutils/install-plugins.h>
+#endif // GST_HAS_MODERN_PBUTILS
 
 
 namespace gnash {
 namespace media {
+namespace gst {
 
 GstElement* GstUtil::get_audiosink_element()
 {   
@@ -88,27 +96,55 @@ GstElement* GstUtil::get_audiosink_element()
     return element;
 }
 
-
-// FIXME: decide on a single style for this file...
-void
-GstUtil::ensure_plugin_registered(const char* name, GType type)
+// static
+bool
+GstUtil::check_missing_plugins(GstCaps* caps)
 {
-  GstElementFactory* factory = gst_element_factory_find (name);
+    GstElementFactory * factory = swfdec_gst_get_element_factory (caps);
 
-  if (!factory) {
-    if (!gst_element_register (NULL, name, GST_RANK_PRIMARY,
-          type)) {
-      log_error("Failed to register our plugin %s. This may inhibit media "
-                "playback.", name);
+    if (factory) {
+        gst_object_unref(factory);
+        return true;
     }
-  } else {
-    gst_object_unref(GST_OBJECT(factory));
-  }
 
-  log_debug("element %s should now be registered", name);
+#ifdef GST_HAS_MODERN_PBUTILS
+    gst_pb_utils_init();
+
+
+    if (!gst_install_plugins_supported()) {
+        log_error(_("Missing plugin, but plugin installing not supported."
+                    " Will try anyway, but expect failure."));
+    }
+
+    char* detail = gst_missing_decoder_installer_detail_new (caps);
+    if (!detail) {
+        log_error(_("Missing plugin, but failed to convert it to gst"
+                    " missing plugin detail."));
+        return false;
+    }
+
+    char* details[] =  { detail, 0 };
+
+    GstInstallPluginsReturn ret = gst_install_plugins_sync(details, NULL);
+    g_free(details[0]);
+
+    // FIXME: what about partial success?
+    if (ret == GST_INSTALL_PLUGINS_SUCCESS) {
+        if (! gst_update_registry()) {
+            log_error(_("gst_update_registry failed. You'll need to "
+                        "restart Gnash to use the new plugins."));
+        }
+
+        return true;
+    }
+#else
+    log_error(_("Missing plugin, but plugin installation not available."));
+#endif
+
+    return false;
 }
 
-
+} // gnash.media.gst namespace
 } // gnash.media namespace 
 } // namespace gnash
 

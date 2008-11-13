@@ -25,7 +25,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_function.h"
-#include "sprite_instance.h"
 #include "ActionExec.h"
 #include "fn_call.h"
 

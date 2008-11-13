@@ -32,7 +32,7 @@ DSOEXPORT NPError OSCALL NP_Shutdown()
   return NPERR_NO_ERROR;
 }
 
-DSOEXPORT static NPError fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
+static NPError fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
 {
   if(aNPPFuncs == NULL)
     return NPERR_INVALID_FUNCTABLE_ERROR;
@@ -78,7 +78,7 @@ DSOEXPORT static NPError fillPluginFunctionTable(NPPluginFuncs* aNPPFuncs)
   return NPERR_NO_ERROR;
 }
 
-DSOEXPORT static NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
+static NPError fillNetscapeFunctionTable(NPNetscapeFuncs* aNPNFuncs)
 {
   int i = 0, n;
 

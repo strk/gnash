@@ -45,6 +45,7 @@ STD_DIRS = \
 	libamf \
 	libnet \
 	libmedia \
+	libsound \
 	libcore \
 	backend \
 	utilities \
@@ -80,13 +81,16 @@ DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite
 EXTRA_DIST =  autogen.sh \
 	config.rpath \
 	macros/incllist macros/libslist \
-	ChangeLog-0.8.0 ChangeLog-0.8.1 ChangeLog-0.8.2 \
+	ChangeLog-0.8.0 ChangeLog-0.8.1 ChangeLog-0.8.2 ChangeLog-0.8.3 \
+	ChangeLog-0.8.4 \
 	packaging/deb.am \
 	packaging/snapshot.am \
 	packaging/alp.am \
-	packaging/ipkg.am
+	packaging/ipkg.am \
 	packaging/bsd.am \
-	packaging/rpm.am
+	packaging/rpm.am \
+	packaging/gnash.xpm \
+	packaging/klash.xpm
 
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
@@ -147,8 +151,8 @@ dumpconfig:
 	@echo "Image decoding support..."
 	@echo "	JPEG_CFLAGS is $(JPEG_CFLAGS)"
 	@echo "	JPEG_LIBS is $(JPEG_LIBS)"
-	@echo "	PNG_CFLAGS is $(LIBPNG_CFLAGS)"
-	@echo "	PNG_LIBS is $(LIBPNG_LIBS)"
+	@echo "	PNG_CFLAGS is $(PNG_CFLAGS)"
+	@echo "	PNG_LIBS is $(PNG_LIBS)"
 	@echo "Audio decoding support..."
 if USE_GST_ENGINE
 	@echo "	GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
@@ -159,6 +163,12 @@ if USE_FFMPEG_ENGINE
 	@echo "	FFMPEG_LIBS is $(FFMPEG_LIBS)"
 	@echo "	OGG_CFLAGS is $(OGG_CFLAGS)"
 	@echo "	OGG_LIBS is $(OGG_LIBS)"
+endif
+if HAVE_SPEEX
+	@echo " SPEEX_CFLAGS is $(SPEEX_CFLAGS)"
+	@echo " SPEEXDSP_CFLAGS is $(SPEEXDSP_CFLAGS)"
+	@echo " SPEEX_LIBS is $(SPEEX_LIBS)"
+	@echo " SPEEXDSP_LIBS is $(SPEEXDSP_LIBS)"
 endif
 	@echo "GUI Toolkit decoding support..."	
 	@echo "	SDL_CFLAGS is $(SDL_CFLAGS)"
@@ -348,7 +358,8 @@ else
 endif
 
 if TESTSUITE
-check: check-recursive anal
+check: check-recursive 
+	$(MAKE) anal
 
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
@@ -362,7 +373,13 @@ endif
 	mudflap \
 	mudflap-check \
 	install-plugins \
-	install-plugin
+	uninstall-plugins \
+	install-plugin \
+	apidoc
 
-install-plugins install-plugin:
+install-plugins install-plugin uninstall-plugins:
 	$(MAKE) -C plugin $@
+
+apidoc:
+	$(MAKE) -C doc $@
+

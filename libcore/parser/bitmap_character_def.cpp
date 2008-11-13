@@ -18,7 +18,7 @@
 #include "bitmap_character_def.h"
 #include "gnash.h" // for bitmap_info
 #include "render.h" // createBitmapInfo
-#include "image.h" // image::ImageBase
+#include "GnashImage.h" // GnashImage
 
 #include <vector>
 #include <string>
@@ -28,7 +28,7 @@
 
 namespace gnash {
 
-bitmap_character_def::bitmap_character_def(std::auto_ptr<image::ImageBase> image)
+bitmap_character_def::bitmap_character_def(std::auto_ptr<GnashImage> image)
 	:
  	_bitmap_info ( gnash::render::createBitmapInfo(image) )
 {

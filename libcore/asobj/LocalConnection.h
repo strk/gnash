@@ -28,7 +28,7 @@
 
 namespace gnash {
   
-class LocalConnection : public as_object, LcShm {
+  class LocalConnection : public as_object, amf::LcShm {
 public:
     LocalConnection();
     ~LocalConnection();

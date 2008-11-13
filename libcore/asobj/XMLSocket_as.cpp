@@ -32,7 +32,6 @@
 #include "timers.h"
 #include "as_function.h"
 #include "fn_call.h"
-#include "sprite_instance.h"
 #include "VM.h"
 #include "builtin_function.h" // for setting timer, should likely avoid that..
 #include "URLAccessManager.h"

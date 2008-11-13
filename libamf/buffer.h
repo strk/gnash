@@ -20,6 +20,9 @@
 #define __BUFFER_H__ 1
 
 #include <boost/cstdint.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+#include <iostream> // for output operator
 #include <string>
 
 #include "getclocktime.hpp"
@@ -29,98 +32,356 @@
 #include "dsodefs.h"
 
 // _definst_ is the default instance name
+
+/// \namespace amf
+///
+/// This namespace is for all the AMF specific classes in libamf.
 namespace amf
 {
 
+/// \class Buffer
+///
+/// This class is used to hold all data for libamf classes. It is a
+/// simplified form of std::vector, but with more knowledge of data
+/// types when copying or appending data to make higher level code
+/// easier to read.
 class DSOEXPORT Buffer 
 {
 public:
+    /// \brief Create a new Buffer with the default size
     Buffer();
-    // Create with a size other than the default
+    /// \brief Create a new Buffer with a size other than the default
     Buffer(size_t nbytes);
-    
-    // Delete the allocate memory
+
+    /// \brief Create a new Buffer with a hex string.
+    ///		This is primary used only for testing to create binary
+    ///		data from an easy to read and edit format.
+    /// @param str A hex string
+    /// @example "00 03 05 0a"
+    Buffer(const std::string &str);
+
+    /// Delete the memory allocated for this Buffer
     ~Buffer();
+
+    /// \brief Encode a Buffer from a hex string.
+    ///
+    /// @param str A hex string.
+    /// @example "00 03 05 0a"
+    ///
+    /// @return A reference to a Buffer in host endian format. This is
+    ///		primary used only for testing to create binary data
+    ///		from an easy to read and edit format.
+    Buffer &hex2mem(const std::string &str);
+    
+    /// \brief Clear the contents of the buffer by setting all the bytes to
+    ///		zeros.
+    ///
+    /// @return nothing
     void clear();
+    
+    /// \brief Test to see if the buffer has any data.
+    ///
+    /// @return true or false
     bool empty() { return (_seekptr)?true:false; };
 
-    // Resize the buffer that holds the data
-    void *resize();
-    void *resize(size_t nbytes);
+    /// \brief Resize the buffer that holds the data.
+    ///		The new size of the current data is based on the
+    ///		current amount of data within the allocated memory.
+    ///		This is used to make a Buffer the same size as
+    ///		the existing data, and to truncate the unsed portion
+    ///		of the Buffer when copying to the new memory
+    ///		location.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &resize();
+    /// \brief Resize the buffer that holds the data.
+    ///		If the size is larger than the existing data, the data
+    ///		is copied into the new region. If the size is smaller
+    ///		than the existing data, the remaining data is
+    ///		truncated when copying to the new memory location.
+    ///
+    /// @param nbyte The size to resize the Buffer to.
+    ///
+    /// @return A reference to a Buffer.
+    Buffer &resize(size_t nbytes);
 
-    // Put data into the buffer. This overwrites all data, and resets the seek ptr.
-    void copy(gnash::Network::byte_t *data, size_t nbytes);
-    void copy(gnash::Network::byte_t *data) { copy(data, _nbytes); };
-    void copy(const std::string &str);
-    void copy(double num);
-    void copy(boost::uint16_t length);
-    void copy(gnash::Network::byte_t byte);
-//    void copy(bool);
-//     void copy(boost::uint32_t val);
-//     void copy(Element::amf_type_e type);
-
-    // Append data to the existing data in the buffer. This assume the
-    // buffer has been sized to hold the data as it is appended.
-    gnash::Network::byte_t *append(Buffer *buf);
-    gnash::Network::byte_t *append(Buffer &buf);
-    gnash::Network::byte_t *append(boost::uint32_t val);
-    gnash::Network::byte_t *append(bool);
-    gnash::Network::byte_t *append(double num);
-    gnash::Network::byte_t *append(Element::amf0_type_e type);
-    gnash::Network::byte_t *append(boost::uint16_t length);
-    gnash::Network::byte_t *append(gnash::Network::byte_t *data, size_t nbytes);
-    gnash::Network::byte_t *append(gnash::Network::byte_t byte);
-    gnash::Network::byte_t *append(const std::string &str);
-
-    // Find a byte in the buffer
-//    Network::byte_t *find(char c);
-    gnash::Network::byte_t *find(gnash::Network::byte_t b);
-    gnash::Network::byte_t *find(gnash::Network::byte_t *b, size_t size);
+    /// \brief Copy data into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param data A pointer to the raw bytes to copy into the
+    ///		buffer.
+    /// 
+    /// @param nbytes The number of bytes to copy.
+    ///		
+    /// @return A reference to a Buffer.
+    Buffer &copy(gnash::Network::byte_t *data, size_t nbytes);
     
-    // Drop a byte or range of characters without resizing
-//    Network::byte_t *remove(char c);
-    gnash::Network::byte_t *remove(gnash::Network::byte_t c);
-    gnash::Network::byte_t *remove(int x);
-    gnash::Network::byte_t *remove(int x, int y);
-    
-    // Accessors
-    gnash::Network::byte_t *begin() { return _ptr ; };
-    gnash::Network::byte_t *end() { return _ptr + _nbytes; };
-    gnash::Network::byte_t *reference() { return _ptr; }
-    size_t size() { return _nbytes; }
-    void setSize(size_t nbytes) { _nbytes = nbytes; };
-    
-    // make ourselves be able to be copied.
-    Buffer &operator=(Buffer *buf);
+    /// \brief Copy a Buffer class into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param buf A Buffer class containing the data to copy.
+    /// 
+    /// @return A reference to a Buffer.
     Buffer &operator=(Buffer &buf);
+    Buffer &operator=(boost::shared_ptr<Buffer>& buf);
+    /// \brief Copy a string into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param str A string containing ASCII data to copy into the
+    ///		buffer.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator=(const std::string &str);
+    Buffer &operator=(const char *str);
+    /// \brief Copy a double into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param num A numeric double value.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator=(double num);
+    /// \brief Copy a short into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param num A numeric short value.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator=(boost::uint16_t length);
+    /// \brief Copy a byte into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param byte A single byte.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator=(gnash::Network::byte_t byte);
+    /// \brief Copy a byte into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param byte A pointer to a single byte.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator=(gnash::Network::byte_t *byte);
+    /// \brief Copy a AMF0 type into the buffer.
+    ///		This overwrites all data, and resets the seek ptr.
+    ///
+    /// @param type An AMF0 type. 
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator=(amf::Element::amf0_type_e type);
+    /// Copy a boolean into the buffer. This overwrites all data, and
+    ///		resets the seek ptr.
+    ///
+    /// @param flag A boolean. 
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator=(bool flag);
+    
+    /// \brief Append data to existing data in the buffer.
+    ///
+    /// @param data A pointer to the raw bytes to append to the
+    ///		buffer.
+    /// 
+    /// @param nbytes The number of bytes to append.
+    ///		
+    /// @return A reference to a Buffer.
+    Buffer &append(gnash::Network::byte_t *data, size_t nbytes);
 
-    // Test against other buffers
-    bool operator==(Buffer *buf);
-    bool operator==(Buffer &buf);
-    Buffer &operator+=(Buffer *buf);
+    /// \brief Append a Buffer class to existing data in the buffer.
+    ///
+    /// @param buf A Buffer class containing the data to append.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(Buffer &buf);
+    Buffer &operator+=(boost::shared_ptr<Buffer> &buf);
+
+    /// \brief Append a string to existing data in the buffer.
+    ///
+    /// @param str A string containing ASCII data to copy into the
+    ///		buffer.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(const std::string &str);
+    Buffer &operator+=(const char *str);
+    /// \brief Append a double to existing data in the buffer.
+    ///
+    /// @param num A numeric double value.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(double num);
+    /// \brief Append a short to existing data in the buffer.
+    /// 
+    /// @param num A numeric short value.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(boost::uint16_t length);
+    /// \brief Append a byte to existing data in the buffer.
+    ///
+    /// @param byte A single byte.
+    /// 
+    /// @return A reference to a Buffer.
     Buffer &operator+=(gnash::Network::byte_t byte);
     Buffer &operator+=(char byte);
-    Buffer &operator+=(Buffer &buf);
-    gnash::Network::byte_t operator[](int x) { return *(_ptr + x); };
-    gnash::Network::byte_t *at(int x) { return _ptr + x; };
-//    Buffer *hex2mem(const char *str);
-
-    // How much room is left in the buffer past the seek pointer. This is
-    // primarily used to see if the buffer is full populated with data.
-    size_t spaceLeft() { return (_nbytes - (_seekptr - _ptr)); };
+    /// \brief Append an AMF0 type to existing data in the buffer.
+    ///
+    /// @param type An AMF0 type. 
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(amf::Element::amf0_type_e type);
+    /// \brief Append a boolean to existing data in the buffer.
+    ///
+    /// @param type A boolean. 
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(bool);
     
-    // debug stuff, not need for running Cygnal
-    void dump();
+    /// \brief Drop a byte without resizing.
+    ///		This will remove the byte from the Buffer, and then
+    ///		move the remaining data to be in the correct
+    ///		location. This resets the seek pointer.
+    ///
+    /// @param byte The byte to remove from the buffer.
+    ///
+    /// @return A real pointer to the base address of the buffer.
+    gnash::Network::byte_t *remove(gnash::Network::byte_t c);
+    /// \brief Drop a byte without resizing.
+    ///		This will remove the byte from the Buffer, and then
+    ///		move the remaining data to be in the correct
+    ///		location. This resets the seek pointer.
+    ///
+    /// @param index The location of the byte to remove from the
+    ///		Buffer
+    ///
+    /// @return A real pointer to the base address of the Buffer.
+    gnash::Network::byte_t *remove(int index);
+    /// \brief Drop bytes without resizing.
+    ///		This will remove the bytes from the Buffer, and then
+    ///		move the remaining data to be in the correct
+    ///		location. This resets the seek pointer.
+    ///
+    /// @param index The location of the byte to start removing data
+    ///		from the Buffer. This is an numerical value, not a
+    ///		pointer.
+    ///
+    /// @param start The location of the byte to remove from the
+    ///		Buffer
+    /// @param range The amoiunt of bytes to remove from the Buffer.
+    ///
+    /// @return A real pointer to the base address of the Buffer.
+    gnash::Network::byte_t *remove(int start, int range);
+//    Network::byte_t *remove(char c);
+    
+    /// \brief Return the base address of the Buffer.
+    ///
+    /// @return A real pointer to the base address of the Buffer.
+    gnash::Network::byte_t *begin() { return _data.get() ; };
+    gnash::Network::byte_t *reference() { return _data.get(); }
+    /// \brief Return the last address of the Buffer
+    ///		Which is the base address plus the total size of the
+    ///		Buffer.
+    ///
+    /// @return A real pointer to the last address of the Buffer.
+    gnash::Network::byte_t *end() { return begin() + _nbytes; };
+
+    /// \brief Get the size of the Buffer.
+    ///
+    /// @return The size of the Buffer.
+    size_t size() { return _nbytes; }
+    
+    /// \brief Set the size of the Buffer.
+    ///		Note that this does not resize the Buffer, it merely
+    ///		is a convienient way to set the size field of the
+    ///		Buffer class, and should only be used by low level
+    ///		internal code and testing.
+    ///
+    /// @param nbytes 
+    ///
+    /// @return The size of the Buffer.
+    void setSize(size_t nbytes) { _nbytes = nbytes; };
+    
+    /// \brief Test equivalance against another Buffer.
+    ///		This compares all the data on the current Buffer with
+    ///		the supplied one, so it can be a performance hit. This
+    ///		is primarily only used for testing purposes.
+    ///
+    /// @param buf A reference to a Buffer.
+    ///
+    /// @return A boolean true if the Buffers are indentical.
+    bool operator==(Buffer &buf);
+
+    /// \brief Get the byte at a specified location.
+    ///
+    /// @param index The location as a numerical value of the byte to
+    ///		get.
+    ///
+    /// @return The byte at the specified location.
+    gnash::Network::byte_t operator[](int index) { return _data[index]; };
+
+    /// \brief Get the byte at a specified location.
+    ///
+    /// @param index The location as a numerical value of the byte to
+    ///		get.
+    ///
+    /// @return A real pointer to the byte at the specified location.
+    gnash::Network::byte_t *at(int index) { return _data.get() + index; };
+
+    /// \brief How much room is left in the buffer past the seek pointer.
+    ///		This is primarily used to see if the buffer is fully
+    ///		populated with data before appending more.
+    ///
+    /// @return The amoount of unused bytes in the Buffer.
+    size_t spaceLeft() { return (_nbytes - (_seekptr - _data.get())); };
+    
+    ///  \brief Dump the internal data of this class in a human readable form.
+    ///		This should only be used for debugging purposes.
+    void dump() const { dump(std::cerr); }
+    /// \overload dump(std::ostream& os) const
+    void dump(std::ostream& os) const;
+    
   protected:
-    void *init(size_t nbytes);
+    /// \var _seekptr
+    ///	\brief This is a pointer to the address in the Buffer to
+    ///		write data to then next time some is appended.
     gnash::Network::byte_t *_seekptr;
-    gnash::Network::byte_t *_ptr;
+    
+    /// \var _data
+    ///	\brief This is the container of the actual data in this
+    ///		Buffer.
+    boost::scoped_array<gnash::Network::byte_t> _data;
+    /// \var _nbytes
+    ///	\brief This is the total allocated size of the Buffer.
     size_t         _nbytes;
+    /// \var _stamp
+    ///	\brief This is used when collecting performance statistics of
+    ///		the low level functioning of the Buffer, and should
+    ///		only be used for testing and debugging purposes.
 #ifdef USE_STATS_BUFFERS
     struct timespec _stamp;	// used for timing how long data stays in the queue.
 #endif
+    
+  private:
+    /// \brief Initialize a block of memory for this buffer.
+    ///		This should only be used internally by the Buffer
+    ///		class.
+    ///
+    /// @param nbytes The total size to allocate memory for.
+    ///
+    /// @return A reference to the initialized Buffer.
+    Buffer &init(size_t nbytes);
+    
+    /// \brief Convert a Hex digit into it's decimal value.
+    ///
+    /// @param digit The digit as a hex value
+    ///
+    /// @return The byte as a decimal value.
+    gnash::Network::byte_t hex2digit (gnash::Network::byte_t digit);
 };
 
+/// \brief Dump to the specified output stream.
+inline std::ostream& operator << (std::ostream& os, const Buffer& buf)
+{
+	buf.dump(os);
+	return os;
+}
 
 } // end of amf namespace
 

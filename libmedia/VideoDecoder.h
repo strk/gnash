@@ -20,7 +20,7 @@
 #ifndef GNASH_VIDEODECODER_H
 #define GNASH_VIDEODECODER_H
 
-#include "image.h"
+#include "GnashImage.h"
 
 #include <boost/noncopyable.hpp>
 
@@ -51,7 +51,7 @@ public:
   
   /// Push an encoded video frame into the decoder
   //
-  /// @param the video frame to decode
+  /// @param buffer the video frame to decode
   ///
   virtual void push(const EncodedVideoFrame& buffer) = 0;
   
@@ -59,7 +59,7 @@ public:
   //
   /// @return The decoded video frame, or a NULL-containing auto_ptr if an
   ///         error occurred.
-  virtual std::auto_ptr<image::ImageBase> pop() = 0;
+  virtual std::auto_ptr<GnashImage> pop() = 0;
   
   /// \brief
   /// Check whether a decoded frame is ready to be popped.
@@ -69,6 +69,19 @@ public:
   /// @return true if there is a frame ready to be popped.
   ///
   virtual bool peek() = 0;
+
+  /// Get the width in pixels of the Video
+  //
+  /// @return   The width of a video frame, or 0 until this is known.
+  ///           This is used ultimately for the AS Video.width property.
+  virtual int width() const = 0;
+
+  /// Get the height in pixels of the Video
+  //
+  /// @return   The height of a video frame, or 0 until this is known.
+  ///           This is used ultimately for the AS Video.height property.
+  virtual int height() const = 0;
+
 };
 
 	

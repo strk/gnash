@@ -46,7 +46,7 @@ namespace gnash {
 	class as_object;
 	class fn_call;
 	class as_function;
-	class sprite_instance;
+	class MovieClip;
 	class character;
 	class asNamespace;
 	class asName;
@@ -208,13 +208,29 @@ public:
 	///
 	/// TODO restore first parameter on parse errors
 	///
+	/// @param b
+    ///     Pointer to buffer where to start reading.
+    ///     Will be moved as data is read.
+    ///
+	/// @param end
+    ///     Pointer to end of buffer. Reading from this would
+    ///     be invalid.
+    ///
+	/// @param inType
+    ///     Type of the AMF object to read. If -1, type will be
+    ///     read from a type byte.
+    ///
 	/// @param objRefs
 	///     A vector of already-parsed objects to properly interpret references.
 	///     Pass an empty vector on first call as it will be used internally.
 	///     On return, the vector will be filled with pointers to every complex object
 	///     parsed from the stream.
+    ///
+	/// @param vm
+    ///     Virtual machine to use for initialization of the values (string_table)
 	///
-	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs, VM& vm);
+	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType,
+            std::vector<as_object*>& objRefs, VM& vm);
 
     /// Serialize value in AMF0 format.
     //
@@ -224,6 +240,10 @@ public:
     /// @param offsetTable
     ///     A map of already-parsed objects, pass an empty map on first call as
     ///     it will be used internally.
+    ///
+	/// @param vm
+    ///     Virtual machine to use for serialization of property names
+    ///     (string_table)
     ///
     bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable, VM& vm) const;
 
@@ -297,11 +317,6 @@ public:
 	}
 
 	/// Get a std::string representation for this value.
-	//
-	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
-	///
 	std::string to_string() const;
 
     // Used for operator<< to give useful information about an
@@ -315,18 +330,12 @@ public:
 	/// source. 
 	/// @@ shouldn't this be the default ?
 	///
-	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
+	/// @param version
+    ///     SWF version for which the operation is desired.
 	///
 	std::string to_string_versioned(int version) const;
 
 	/// Get a number representation for this value
-	//
-	/// @param env
-	///	The environment to use for running the valueOf() method
-	///	for object values. If NULL, valueOf() won't be run.
-	///
 	double	to_number() const;
 
 	/// Get an AMF element representation for this value
@@ -336,10 +345,6 @@ public:
 	//
 	/// Use this conversion whenever an int is needed.
 	/// This is NOT the same as calling to_number<boost::int32_t>().
-	///
-	/// @param env
-	///	The environment to use for running the valueOf() method
-	///	for object values. 
 	///
 	boost::int32_t	to_int() const;
 
@@ -405,7 +410,7 @@ public:
 	/// This is just a wrapper around to_character() performing 
 	/// an additional final cast.
 	///
-	sprite_instance* to_sprite(bool skipRebinding=false) const;
+	MovieClip* to_sprite(bool skipRebinding=false) const;
 
 	/// Return value as a character or NULL if this is not possible.
 	//
@@ -453,9 +458,6 @@ public:
 	/// Primitive types are: undefined, null, boolean, string, number.
 	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
 	///
-	/// @param env
-	/// 	The environment to use for calling the valueOf method.
-	///
 	/// @param hint
 	/// 	NUMBER or STRING, the preferred representation we're asking for.
 	///
@@ -476,11 +478,6 @@ public:
 	as_value& convert_to_primitive(AsType hint);
 
 	/// Force type to number.
-	//
-	/// @param env
-	///	The environment to use for running the valueOf() method
-	///	for object values. If NULL, valueOf() won't be run.
-	///
 	void convert_to_number();
 
 	/// Force type to string.
@@ -492,12 +489,11 @@ public:
 	/// Force type to string.
 	//
 	/// uses swf-version-aware converter
+    ///
+	/// @param version
+    ///     SWF version for which the operation is desired.
 	///
-	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
-	///
-	/// @see to_string_versionioned
+	/// @see to_string_versioned
 	///
 	void convert_to_string_versioned(int version);
 
@@ -511,7 +507,7 @@ public:
 
 	void set_bool(bool val);
 
-	void set_sprite(sprite_instance& sp);
+	void set_sprite(MovieClip& sp);
 
 	void set_character(character& sp);
 
@@ -594,9 +590,8 @@ public:
 	///	- A == B is equivalent to B == A, except for order of
 	///	  evaluation of A and B.
 	///
-	/// @param env
-	///	The environment to use for running the toString() and valueOf()
-	///	methods for object values. 
+	/// @param v
+    ///     The as_value to compare to
 	///
 	bool equals(const as_value& v) const;
 
@@ -628,7 +623,7 @@ private:
 
 	AsType m_type;
 
-	typedef sprite_instance* SpritePtr;
+	typedef MovieClip* SpritePtr;
 	typedef character* CharacterPtr;
 	typedef boost::intrusive_ptr<as_function> AsFunPtr;
 	typedef boost::intrusive_ptr<as_object> AsObjPtr;

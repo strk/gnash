@@ -21,13 +21,13 @@
 #include "as_value.h"
 #include "as_object.h"
 #include "as_function.h" // for as_function
-#include "sprite_instance.h" // for MOVIECLIP values
+#include "MovieClip.h" // for MOVIECLIP values
 #include "character.h" // for MOVIECLIP values
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
 #include "String_as.h" // for automatic as_value::STRING => String as object
-#include "Number.h" // for automatic as_value::NUMBER => Number as object
+#include "Number_as.h" // for automatic as_value::NUMBER => Number as object
 #include "Boolean.h" // for automatic as_value::BOOLEAN => Boolean as object
 #include "action.h" // for call_method0
 #include "utility.h" // for typeName() and utility::isFinite
@@ -132,7 +132,7 @@ public:
 
             //GNASH_REPORT_FUNCTION;
             amf::AMF amf;
-            amf::Element *el = 0;
+            boost::shared_ptr<amf::Element> el;
 	    
             const string& name = _st.value(key);
 
@@ -144,13 +144,11 @@ public:
                 if (!val.is_undefined()) {
                     str = val.to_string();
                 }
-                el = new amf::Element;
-                el->init(name, str);
+                el.reset(new amf::Element(name, str));
             }
             if (val.is_bool()) {
                 bool flag = val.to_bool();
-                el = new amf::Element;
-                el->init(name, flag);
+                el.reset(new amf::Element(name, flag));
             }
             if (val.is_number()) { 
                 double dub;
@@ -159,8 +157,7 @@ public:
                 } else {
                     dub = val.to_number();
                 }
-                el = new amf::Element;
-                el->init(name, dub);
+                el.reset(new amf::Element(name, dub));
             }
 	    
             if (el) {
@@ -961,7 +958,7 @@ as_value::to_object() const
 	}
 }
 
-sprite_instance*
+MovieClip*
 as_value::to_sprite(bool allowUnloaded) const
 {
 	if ( m_type != MOVIECLIP ) return 0;
@@ -980,7 +977,7 @@ as_value::to_character(bool allowUnloaded) const
 }
 
 void
-as_value::set_sprite(sprite_instance& sprite)
+as_value::set_sprite(MovieClip& sprite)
 {
 	set_character(sprite);
 }
@@ -1911,8 +1908,8 @@ as_value::as_value(const amf::Element& el)
 #endif
           as_object* obj = new as_object(getObjectInterface());
           if (el.propertySize()) {
-              for (size_t i = 0, e = el.propertySize(); i != e; ++i) {
-              const amf::Element *prop = el.getProperty(i);
+              for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
               if (prop == 0) {
                   break;
               } else {
@@ -1935,8 +1932,8 @@ as_value::as_value(const amf::Element& el)
 #endif
           Array_as* obj = new Array_as;
           if (el.propertySize()) {
-              for (size_t i = 0, e = el.propertySize(); i != e; ++i) {
-              const amf::Element *prop = el.getProperty(i);
+              for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
               if (prop == 0) {
                   break;
               } else {
@@ -1958,8 +1955,8 @@ as_value::as_value(const amf::Element& el)
           size_t len = el.propertySize();
           obj->resize(len);
 
-          for (size_t i = 0, e = el.propertySize(); i != e; ++i) {
-              const amf::Element *prop = el.getProperty(i);
+          for (size_t i=0; i < el.propertySize(); i++) {
+              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
               if (prop == 0) {
                   break;
               } else {
@@ -2175,7 +2172,10 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inTy
 				log_error(_("AMF0 read: premature end of input reading Number type"));
 				return false;
 			}
-			double dub = *(reinterpret_cast<double*>(b)); b += 8;
+			double dub;
+            // TODO: may we avoid a copy and swapBytes call
+            //       by bitshifting b[0] trough b[7] ?
+            std::copy(b, b+8, (char*)&dub); b+=8; 
 			amf::swapBytes(&dub, 8);
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read double: %e", dub);

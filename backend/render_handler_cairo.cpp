@@ -37,7 +37,7 @@
 #include <cairo/cairo.h>
 #include <boost/scoped_array.hpp>
 #include "render_handler.h"
-#include "image.h"
+#include "GnashImage.h"
 #include <cmath>
 #include "PathParser.h"
 
@@ -47,7 +47,7 @@ namespace gnash {
 
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::ImageRGB* im)
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const ImageRGB* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -62,7 +62,7 @@ rgb_to_cairo_rgb24(boost::uint8_t* dst, const image::ImageRGB* im)
 
 // Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
 static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const image::ImageRGBA* im)
+rgba_to_cairo_argb(boost::uint8_t* dst, const ImageRGBA* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -113,7 +113,7 @@ snap_to_half_pixel(cairo_t* cr, double& x, double& y)
 }
 
 static void
-init_cairo_matrix(cairo_matrix_t* cairo_matrix, const matrix& gnash_matrix)
+init_cairo_matrix(cairo_matrix_t* cairo_matrix, const SWFMatrix& gnash_matrix)
 {
   cairo_matrix_init(cairo_matrix,
     gnash_matrix.sx/65536.0, gnash_matrix.shx/65536.0,
@@ -209,7 +209,7 @@ get_cairo_pattern(const fill_style& style, const cxform& cx)
 
     case SWF::FILL_LINEAR_GRADIENT:
     {
-      matrix m = style.get_gradient_matrix();
+      SWFMatrix m = style.getGradientMatrix();
     
       cairo_matrix_t mat;
       init_cairo_matrix(&mat, m);
@@ -224,10 +224,10 @@ get_cairo_pattern(const fill_style& style, const cxform& cx)
     case SWF::FILL_RADIAL_GRADIENT:
     case SWF::FILL_FOCAL_GRADIENT:
     {
-      matrix m = style.get_gradient_matrix();
+      SWFMatrix m = style.getGradientMatrix();
       
       // Undo the translation our parser applied.
-      gnash::matrix transl;
+      gnash::SWFMatrix transl;
       transl.concatenate_translation(-32, -32);
       transl.concatenate(m);
 
@@ -252,7 +252,7 @@ get_cairo_pattern(const fill_style& style, const cxform& cx)
     case SWF::FILL_CLIPPED_BITMAP:
     case SWF::FILL_CLIPPED_BITMAP_HARD:
     {
-      matrix m = style.get_bitmap_matrix();        
+      SWFMatrix m = style.getBitmapMatrix();        
       
       bitmap_info_cairo* binfo
         = dynamic_cast<bitmap_info_cairo*>(style.get_bitmap_info());
@@ -374,13 +374,13 @@ private:
 
 
 
-/// Transforms the current Cairo matrix using the given matrix. When it goes
-/// out of scope, the matrix will be reset to what it was before the new matrix
+/// Transforms the current Cairo SWFMatrix using the given SWFMatrix. When it goes
+/// out of scope, the SWFMatrix will be reset to what it was before the new SWFMatrix
 /// was applied.
 class CairoScopeMatrix : public boost::noncopyable
 {
 public:
-  CairoScopeMatrix(cairo_t* cr, const matrix& new_mat)
+  CairoScopeMatrix(cairo_t* cr, const SWFMatrix& new_mat)
    : _cr(cr)
   {
     cairo_get_matrix(_cr, &old_mat);
@@ -419,7 +419,7 @@ public:
   {
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im) 
+  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im) 
   {
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
@@ -430,7 +430,7 @@ public:
                                  CAIRO_FORMAT_RGB24);
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im)
+  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im)
   {        
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
@@ -441,7 +441,7 @@ public:
                                  CAIRO_FORMAT_ARGB32);
   }
 
-  virtual void drawVideoFrame(image::ImageBase* baseframe, const matrix* m, const rect* bounds)
+  virtual void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m, const rect* bounds)
   {
 
     if (baseframe->type() == GNASH_IMAGE_RGBA)
@@ -450,7 +450,7 @@ public:
         return;
     }
 
-    image::ImageRGB* frame = dynamic_cast<image::ImageRGB*>(baseframe);
+    ImageRGB* frame = dynamic_cast<ImageRGB*>(baseframe);
 
     assert(frame);
 
@@ -474,7 +474,7 @@ public:
 
     cairo_matrix_multiply(&mat, &mat, &frame_mat);
 
-    // Inverse the matrix for pattern space
+    // Inverse the SWFMatrix for pattern space
     cairo_matrix_invert(&mat);
 
     // Convert RGB frame to cairo format
@@ -620,7 +620,7 @@ public:
   }
     
   virtual void  draw_line_strip(const boost::int16_t coords[], int vertex_count,
-      const rgba& color, const matrix& mat)
+      const rgba& color, const SWFMatrix& mat)
   {
     CairoScopeMatrix mat_transformer(_cr, mat);
 
@@ -655,7 +655,7 @@ public:
   }
   
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, const matrix& mat, bool masked)
+    const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool masked)
   {
     CairoScopeMatrix mat_transformer(_cr, mat);
     cairo_transform(_cr, &_stage_mat);
@@ -858,7 +858,7 @@ public:
   }
 
 void
-draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
+draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
   { 
@@ -916,16 +916,16 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     }  
   }
 
-  /// Takes a path and translates it using the given matrix.
+  /// Takes a path and translates it using the given SWFMatrix.
   void
-  apply_matrix_to_paths(std::vector<path>& paths, const matrix& mat)
+  apply_matrix_to_paths(std::vector<path>& paths, const SWFMatrix& mat)
   {  
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&path::transform, _1, boost::ref(mat)));
   }
                   
   virtual void draw_shape_character(shape_character_def *def, 
-    const matrix& mat,
+    const SWFMatrix& mat,
     const cxform& cx,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles)
@@ -966,7 +966,7 @@ draw_subshape(const PathVec& path_vec, const matrix& mat, const cxform& cx,
     
   }
   
-  virtual void draw_glyph(shape_character_def *def, const matrix& mat,
+  virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
     const rgba& color)
   {
   

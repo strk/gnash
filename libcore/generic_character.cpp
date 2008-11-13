@@ -30,7 +30,7 @@ generic_character::add_invalidated_bounds(InvalidatedRanges& ranges,
   if (m_visible && (m_invalidated||force))
   {
     rect bounds;    
-    bounds.expand_to_transformed_rect(get_world_matrix(), 
+    bounds.expand_to_transformed_rect(getWorldMatrix(), 
       m_def->get_bound());
     ranges.add(bounds.getRange());            
   }    
@@ -46,8 +46,8 @@ generic_character::enclose_own_bounds(rect *) const
 bool
 generic_character::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 {
-  matrix wm = get_world_matrix();
-  matrix wm_inverse = wm.invert();
+  SWFMatrix wm = getWorldMatrix();
+  SWFMatrix wm_inverse = wm.invert();
   point  lp(x, y);
   wm_inverse.transform(lp);
   return m_def->point_test_local(lp.x, lp.y, wm);

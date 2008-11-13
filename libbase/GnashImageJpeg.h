@@ -19,8 +19,6 @@
 //
 // Original version by Thatcher Ulrich <tu@tulrich.com> 2002
 //
-// Wrapper for jpeg file operations.  The actual work is done by the
-// IJG jpeg lib.
 
 #ifndef GNASH_IMAGE_JPEG_H
 #define GNASH_IMAGE_JPEG_H
@@ -30,11 +28,14 @@
 #include "GnashImage.h"
 
 
+/// \brief A namespace solely for avoiding name 
+/// conflicts with other external headers.
 namespace jpeg {
 
 extern "C" {
 // jpeglib.h redefines HAVE_STDLIB_H. This silences
 // the warnings, but it's not good.
+#undef HAVE_STDLIB_H
 #include <jpeglib.h>
 #undef HAVE_STDLIB_H
 }
@@ -44,14 +45,12 @@ extern "C" {
 // Forward declarations
 namespace gnash { class IOChannel; }
 
-/// Wrapper for jpeg file operations. 
-//
-/// The actual work is done by the
-/// IJG jpeg lib.
-///
 namespace gnash
 {
-/// Bascially this is a thin wrapper around jpeg_decompress object.
+
+/// Class for reading JPEG image data. 
+//
+/// This uses the IJG jpeglib to implement the ImageInput interface.
 class JpegImageInput : public ImageInput
 {
 
@@ -66,99 +65,138 @@ private:
 	jpeg::jpeg_error_mgr m_jerr;
 
 	bool _compressorOpened;
-	
-	bool _ownStream;
 
 public:
 
-	/// \brief
-	/// Constructor.  
+	/// Construct a JpegImageInput object to read from an IOChannel.
 	//
-	/// @param in
-	/// 	The stream to read from. Ownership specified by
-	///	second argument.
+	/// @param in   The stream to read JPEG data from. Ownership is shared
+    ///             between caller and JpegImageInput, so it is freed
+    ///             automatically when the last owner is destroyed.
 	DSOEXPORT JpegImageInput(boost::shared_ptr<IOChannel> in);
 
+    /// Read the JPEG header information only.
+    //
+    /// @param maxHeaderBytes   The maximum number of bytes to read before
+    ///                         Stopping. If the header is shorter, we stop
+    ///                         early.
 	void DSOEXPORT readHeader(unsigned int maxHeaderBytes);
 
-	// Destructor.  Clean up our jpeg reader state.
 	~JpegImageInput();
 
-    void read()
-    {
-        startImage();
-    }
+    /// Begin processing the image data.
+    void read();
 
-	// Discard any data sitting in our input buffer.  Use
-	// this before/after reading headers or partial image
-	// data, to avoid screwing up future reads.
-	void DSOEXPORT discardPartialBuffer();
+	/// Discard any data sitting in our input buffer.
+    //
+    /// Use this before/after reading headers or partial image
+	/// data, to avoid screwing up future reads.
+	DSOEXPORT void discardPartialBuffer();
 
-	// This is something you can do with "abbreviated"
-	// streams; i.e. if you constructed this inputter
-	// using (SWF_JPEG2_HEADER_ONLY) to just load the
-	// tables, or if you called finish_image() and want to
-	// load another image using the existing tables.
-	// 
-	void startImage();
-
+    /// Complete processing the image and clean up.
+    //
+    /// This should close / free all resources from libjpeg.
 	void finishImage();
 
-	// Return the height of the image.  Take the data from our m_cinfo struct.
+	/// Get the image's height in pixels.
+    //
+    /// @return     The height of the image in pixels.
 	size_t getHeight() const;
 
-	// Return the width of the image.  Take the data from our m_cinfo struct.
+	/// Get the image's width in pixels.
+    //
+    /// @return     The width of the image in pixels.
 	size_t getWidth() const;
 
-	// Return number of components (i.e. == 3 for RGB
-	// data).  The size of the data for a scanline is
-	// get_width() * get_components().
-	//
-	int	getComponents() const;
+	/// Get number of components (channels)
+    //
+	/// @return     The number of components, e.g. 3 for RGB
+	size_t getComponents() const;
 
-	// Read a scanline's worth of image data into the
-	// given buffer.  The amount of data read is
-	// get_width() * get_components().
-	//
-	void readScanline(unsigned char* rgb_data);
+	/// Read a scanline's worth of image data into the given buffer.
+    //
+    /// The amount of data read is getWidth() * getComponents().
+	///
+    /// @param rgbData  The buffer for writing raw RGB data to.
+	void readScanline(unsigned char* rgbData);
 
+    /// Create a JpegImageInput and transfer ownership to the caller.
+    //
+    /// @param in   The IOChannel to read JPEG data from.
     static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
     {
         std::auto_ptr<ImageInput> ret ( new JpegImageInput(in) );
-        if ( ret.get() ) ret->read(); // might throw an exception (I guess)
+        // might throw an exception (I guess)
+        if ( ret.get() ) ret->read();
         return ret;
     }
 
-    static std::auto_ptr<JpegImageInput> createSWFJpeg2HeaderOnly(boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
+    /// \brief
+    /// For reading SWF JPEG2-style image data, using pre-loaded
+    /// headers stored in the given jpeg::input object.
+    //
+    /// @param loader   The JpegImageInput object to use for reading the
+    ///                 data. This should have been constructed with
+    ///                 createSWFJpeg2HeaderOnly().
+    DSOEXPORT static std::auto_ptr<GnashImage> readSWFJpeg2WithTables(
+            JpegImageInput& loader);
+
+    /// Create a JPEG 'loader' object by reading a JPEG header.
+    //
+    /// This is for reusing the header information for different JPEGs images.
+    //
+    /// @param in               The channel to read JPEG header data from.
+    /// @param maxHeaderBytes   The maximum number of bytes to read.
+    static std::auto_ptr<JpegImageInput> createSWFJpeg2HeaderOnly(
+            boost::shared_ptr<IOChannel> in, unsigned int maxHeaderBytes)
     {
         std::auto_ptr<JpegImageInput> ret ( new JpegImageInput(in) );
-        if ( ret.get() ) ret->readHeader(maxHeaderBytes); // might throw an exception
+        // might throw an exception
+        if ( ret.get() ) ret->readHeader(maxHeaderBytes);
         return ret;
     }
 
+    /// This function is called when libjpeg encounters an error.
+    //
+    /// It is needed to avoid memory corruption during stack unwinding by
+    /// freeing libjpeg resources correctly before throwing an exception.
+    ///
+    /// @param msg  An error message for logging.
     void errorOccurred(const char* msg);
 
 
 };
 
-// Helper object for writing jpeg image data.
+// Class for writing JPEG image data.
 class JpegImageOutput : public ImageOutput
 {
 
 public:
 
-	/// Create an output object bount to a IOChannel
-	//
-	/// @param quality
-	///	Quality goes from 1-100.
-	///
-	JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
+    /// Constract a JpegImageOutput for writing to an IOChannel
+    //
+    /// @param out      The gnash::IOChannel to write the image to
+    /// @param width    The width of the resulting image
+    /// @param height   The height of the resulting image.
+    /// @param quality  The quality of the created image, from 1-100.
+    JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width,
+            size_t height, int quality);
 	
-	~JpegImageOutput();
+    ~JpegImageOutput();
 
-	void writeImageRGB(unsigned char* rgbData);
+    /// Write RGB image data using the parameters supplied at construction.
+    //
+    /// @param rgbData  The raw RGB image data to write as a JPEG.
+    void writeImageRGB(const unsigned char* rgbData);
 
-	DSOEXPORT static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out, size_t width, size_t height, int quality);
+    /// Create a JpegImageOutput, transferring ownership to the caller.
+    //
+    /// @param out      The gnash::IOChannel to write the image to
+    /// @param width    The width of the resulting image
+    /// @param height   The height of the resulting image.
+    /// @param quality  The quality of the created image, from 1-100.
+    static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out,
+            size_t width, size_t height, int quality);
 	
 private:
 

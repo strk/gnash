@@ -71,9 +71,6 @@ public:
 
 	typedef std::list<as_value> ValueList;
 
-
-	enum { itemBlank, itemValue };
-
 	/// Visit all elements 
 	//
 	/// The visitor class will have to expose a visit(as_value&) method
@@ -152,6 +149,9 @@ public:
 
 	void set_indexed(unsigned int index, const as_value &v);
 
+	/// @param separator
+    ///     String to use as separator between elements
+    ///
 	/// @param env
 	///	If not-null will be used to properl invoke the toString()
 	///	method against member values.

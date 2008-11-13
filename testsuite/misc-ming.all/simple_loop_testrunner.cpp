@@ -23,7 +23,7 @@
 #define INPUT_FILENAME "simple_loop_test.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -59,13 +59,13 @@ void testAll(MovieTester& tester)
 	typedef gnash::geometry::Range2d<int> Bounds;
 
 	Ranges invalidated;
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	// FRAME 1/4 (start)
 
 	check_equals(root->get_frame_count(), 4);
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0); // no chars
 	invalidated = tester.getInvalidatedRanges();
@@ -75,7 +75,7 @@ void testAll(MovieTester& tester)
 
 	tester.advance(); // FRAME 2/4
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
@@ -84,7 +84,7 @@ void testAll(MovieTester& tester)
 
 	tester.advance(); // FRAME 3/4
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 2);
 	check_equals(root->getDisplayList().size(), 2);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
@@ -94,7 +94,7 @@ void testAll(MovieTester& tester)
 
 	tester.advance(); // FRAME 4/4
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 3);
 	check_equals(root->getDisplayList().size(), 3);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
@@ -105,7 +105,7 @@ void testAll(MovieTester& tester)
 
 	tester.advance(); // FRAME 1/4 (loop back)
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0);
 	invalidated = tester.getInvalidatedRanges();
@@ -113,7 +113,7 @@ void testAll(MovieTester& tester)
 
 	tester.advance(); // FRAME 2/4
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
@@ -122,7 +122,7 @@ void testAll(MovieTester& tester)
 
 	tester.advance(); // FRAME 3/4
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 2);
 	check_equals(root->getDisplayList().size(), 2);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
@@ -132,7 +132,7 @@ void testAll(MovieTester& tester)
 
 	tester.advance(); // FRAME 4/4
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 3);
 	check_equals(root->getDisplayList().size(), 3);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );

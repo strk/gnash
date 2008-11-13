@@ -20,57 +20,28 @@
 #define GNASH_SWF_DEFINEBUTTONCXFORMTAG_H
 
 #include "swf.h" // for tag_type definition
-#include "SWFStream.h" // for inlines
-#include "movie_definition.h"
-#include "button_character_def.h"
+
+namespace gnash {
+    class SWFStream;
+    class movie_definition;
+}
 
 namespace gnash {
 namespace SWF {
-
-/// \brief Sets the desired limits for recursion and timeout for AS scripts
-//
-/// A loaded movie containing a ScriptLimits tag should change the *global*
-/// scriptlimits setting, so this is kept in movie_root rather than the
-/// immutable movie_definition. Whenever this tag is parsed, the value in
-/// movie_root is overridden.
-namespace DefineButtonCxformTag
-{
-
-void loader(SWFStream& in, tag_type tag, movie_definition& m)
-{
-
-    assert(tag == SWF::DEFINEBUTTONCXFORM);
-
-    in.ensureBytes(2);
-    const boost::uint16_t buttonID = in.read_u16();
-
-    IF_VERBOSE_PARSE (
-        log_debug("DefineButtonCxformTag: ButtonId=%d", buttonID);
-    );
     
-    character_def* chdef = m.get_character_def(buttonID);
-    if ( ! chdef )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DefineButtonCxform refers to an unknown character %d"), buttonID);
-        );
-        return;
-    }
+/// A simple rgb cxform for SWF2 buttons, superseded by DefineButton2.
+//
+/// The loader directly modifies a previous DefineButton tag.
+/// TODO: should it also modify a DefineButton2 tag? Probably, but not
+/// tested.
+class DefineButtonCxformTag
+{
+public:
 
-    button_character_definition* ch = dynamic_cast<button_character_definition*> (chdef);
-    if ( ! ch )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DefineButtonCxform refers to character ID %d (%s)."
-                  " Expected a button definition"),
-                  buttonID, typeName(*chdef));
-        );
-        return;
-    }
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& /*r*/);
 
-    ch->readDefineButtonCxform(in, m);
-    }
-}
+};
 
 } // namespace gnash::SWF
 } // namespace gnash

@@ -70,8 +70,185 @@ check_equals(typeof(obj.a), 'undefined');
 check(!delete obj.a);
 check(!delete unexistent.a);
 
-// TODO: try other malformed ActionDelete calls
 
 // TODO: test deletion of variables referenced by path (slash-based or dot-based)
 //       make sure to test use of 'this' here too !
-totals();
+
+// --------------------------------------------------------
+// Check malformed delete calls. Most of these work anyway.
+// --------------------------------------------------------
+
+#if MING_VERSION_CODE >= 00040300
+
+/* Check normal deletes. The first probably uses delete, the second
+   probably delete2 */
+o = 5;
+delete o;
+check_equals(o, undefined);
+
+o = {};
+o.b = 5;
+delete o.b;
+check_equals(o.b, undefined);
+
+/* Check deleting a single variable with delete and delete2. This should fail
+   with delete */
+o = 5;
+asm {
+   push 'o'
+   delete
+   pop
+};
+#if OUTPUT_VERSION < 7
+ check_equals(o, undefined)
+#else
+ check_equals(o, 5);
+#endif
+
+o = 5;
+asm {
+   push 'o'
+   delete2
+   pop
+};
+
+check_equals(o, undefined);
+
+/* Check deleting a path with delete and delete2 */
+o = {};
+o.b = 5;
+asm {
+   push 'o.b'
+   delete
+   pop
+};
+#if OUTPUT_VERSION < 7
+ check_equals(o.b, undefined)
+#else
+ check_equals(o.b, 5);
+#endif
+
+o = {};
+o.b = 5;
+asm {
+   push 'o.b'
+   delete2
+   pop
+};
+
+check_equals(o.b, undefined);
+
+/* Check deleting a path with an object on the stack. This should fail
+   for delete, but work for delete2 */ 
+o = {};
+o.b = 5;
+asm {
+   push 'o'
+   getvariable
+   push 'o.b'
+   delete
+   pop
+};
+
+check_equals(o.b, 5);
+
+o = {};
+o.b = 5;
+asm {
+   push 'o'
+   getvariable
+   push 'o.b'
+   delete2
+   pop
+};
+
+check_equals(o.b, undefined);
+
+/* Check deleting a path with a string on the stack. This should fail
+   for delete, but work for delete2 */ 
+o = {};
+o.b = 5;
+asm {
+   push 'string'
+   push 'o.b'
+   delete
+   pop
+};
+
+check_equals(o.b, 5);
+
+o = {};
+o.b = 5;
+asm {
+   push 'string'
+   push 'o.b'
+   delete2
+   pop
+};
+
+check_equals(o.b, undefined);
+
+/* Check deleting a path relative to an object on the stack. This should fail
+   for both */ 
+o = {};
+o.b = {};
+o.b.c = 5;
+asm {
+   push 'o'
+   getvariable
+   push 'b.c'
+   delete
+   pop
+};
+
+check_equals(o.b.c, 5);
+
+o = {};
+o.b = {};
+o.b.c = 5;
+asm {
+   push 'o'
+   getvariable
+   push 'b.c'
+   delete2
+   pop
+};
+
+check_equals(o.b.c, 5);
+
+/* Check deleting a property with getVariable used on a path. This doesn't have
+   much to do with delete, but it should work for delete */ 
+o = {};
+o.b = {};
+o.b.c = 5;
+asm {
+   push 'o.b'
+   getvariable
+   push 'c'
+   delete
+   pop
+};
+
+check_equals(o.b.c, undefined);
+
+o = {};
+o.b = {};
+o.b.c = 5;
+asm {
+   push 'o.b'
+   getvariable
+   push 'c'
+   delete2
+   pop
+};
+
+check_equals(o.b.c, 5);
+
+
+totals(27+14);
+
+#else
+
+totals(27);
+
+#endif

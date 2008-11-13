@@ -27,10 +27,11 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/parser \
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/libamf \
-        -I$(top_srcdir)/libmedia \
-        -I$(top_srcdir)/libltdl \
+    -I$(top_srcdir)/libbase \
+    -I$(top_srcdir)/libamf \
+    -I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
+    -I$(top_srcdir)/libltdl \
 	$(GLIB_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -70,7 +71,11 @@ if USE_FFMPEG_ENGINE
 	libgnashvm_la_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
 
-libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION) -no-undefined 
+libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION)
+
+if WIN32
+  libgnashvm_la_LDFLAGS += -no-undefined
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

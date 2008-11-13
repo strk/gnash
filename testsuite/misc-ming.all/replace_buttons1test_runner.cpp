@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "replace_buttons1test.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -55,13 +55,13 @@ main(int /*argc*/, char** /*argv*/)
 	Range2d<int> redRange2(130,330,190,390);
 
 	Ranges invalidated;
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	// FRAME 1 (start)
 
 	check_equals(root->get_frame_count(), 4);
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 1);  // dejagnu clip
 	invalidated = tester.getInvalidatedRanges();
@@ -70,7 +70,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 2, place character
 	invalidated = tester.getInvalidatedRanges();
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 2); // dejagnu + red square
 
@@ -92,7 +92,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 3, replace character
 	invalidated = tester.getInvalidatedRanges();
 	
-	check_equals(root->get_play_state(), sprite_instance::PLAY);
+	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 2);
 	check_equals(root->getDisplayList().size(), 2); // dejagnu + red square
 
@@ -120,7 +120,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 4, jump to frame 2 and stop
 	invalidated = tester.getInvalidatedRanges();
 
-	check_equals(root->get_play_state(), sprite_instance::STOP);
+	check_equals(root->get_play_state(), MovieClip::STOP);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 2); // dejagnu + red square
 

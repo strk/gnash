@@ -22,6 +22,13 @@
 
 HINSTANCE g_hInst;
 
+int
+main(int argc, const char *argv[])
+{
+	/* Satisfy SDL_main link issue. */
+	return 0;
+}
+
 BOOL WINAPI
 DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {

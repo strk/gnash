@@ -110,9 +110,13 @@ AC_DEFINE_UNQUOTED([DEFAULT_FLASH_SYSTEM_OS], ["${DEFAULT_FLASH_SYSTEM_OS}"], [D
 AC_SUBST(DEFAULT_FLASH_PLATFORM_ID)
 AC_SUBST(DEFAULT_FLASH_SYSTEM_OS)
 
-DEFAULT_STREAMS_TIMEOUT=10
+DEFAULT_STREAMS_TIMEOUT=60
 AC_SUBST(DEFAULT_STREAMS_TIMEOUT)
 AC_DEFINE_UNQUOTED([DEFAULT_STREAMS_TIMEOUT], [${DEFAULT_STREAMS_TIMEOUT}], [Default streams timeout in seconds])
+
+DEFAULT_SOL_SAFEDIR="~/.gnash/SharedObjects"
+AC_SUBST(DEFAULT_SOL_SAFEDIR)
+AC_DEFINE_UNQUOTED([DEFAULT_SOL_SAFEDIR], ["${DEFAULT_SOL_SAFEDIR}"], [Default SharedObject base directory])
 
 
 dnl Some things you can only do by looking at the platform name.
@@ -180,53 +184,6 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
-dnl We shouldn't need SIZET_FMT anywhere anymore, so all of this
-dnl is useless.
-
-dnl AC_CHECK_SIZEOF([size_t], 4, AC_INCLUDES_DEFAULT)
-
-dnl AC_DEFINE(SIZET_FMT, ["%z"], [size_t printf modifier is z])
-
-dnl NOTE: Using AC_TRY_COMPILE is bogus when cross-compiling !
-dnl       We need to know the size of size_t in the *target* host, 
-dnl       not the build host (right?)
-dnl
-dnl AC_LANG_PUSH(C++)
-dnl if test "$GXX" = yes; then
-dnl save_CXXFLAGS="$CXXFLAGS"
-dnl CXXFLAGS="$CXXFLAGS -Werror -Wformat"
-dnl fi
-
-dnl AC_TRY_COMPILE([#include <sys/types.h>
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%d", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d]), [
-
-dnl AC_TRY_COMPILE([#include <sys/types.h>
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%u", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u]), [
-
-dnl AC_TRY_COMPILE([#include <sys/types.h>
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%lu", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu]), [
-
-dnl AC_TRY_COMPILE([#include <sys/types.h> 
-dnl   #include <stdio.h>], [
-dnl   size_t num = 0;
-dnl   printf("%ld", num); ],
-dnl   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
-dnl )])])])
-
-dnl if test "$GXX" = yes; then
-dnl CXXFLAGS="$save_CXXFLAGS"
-dnl fi
-dnl AC_LANG_POP(C++)
-
 dnl This is primarily used when compiling for a similar architecture,
 dnl like pentium->geode, which can use the same compiler, but have
 dnl different development libraries.
@@ -274,7 +231,7 @@ AC_ARG_ENABLE(jemalloc,
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-jemalloc option]) ;;
 esac],jemalloc=no)
 
-dnl There is some weird stuff going on with NetBSD and jemalloc, so don't built it for now.
+dnl There is some weird stuff going on with NetBSD and jemalloc, so don't build it for now.
 if test x"${netbsd}" = x"yes"; then
   jemalloc=no
 fi
@@ -444,6 +401,19 @@ if test x"$write" = x"yes"; then
   AC_DEFINE([WRITE_FILE], [], [Write files while streaming])
 fi
 
+dnl Write a standalone gnash launcher to disk from the plugin, if specified.
+AC_ARG_ENABLE(sa-launcher,
+  AC_HELP_STRING([--disable-sa-launcher], [Drops support for the NPAPI plugin writing of standalone executable launcher scripts for the currently playing SWF movie to /tmp.]),
+[case "${enableval}" in
+  yes) sa_launcher=yes ;;
+  no)  sa_launcher=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-sa-launcher option]) ;;
+esac],sa_launcher=yes)
+
+if test x"$sa_launcher" = x"yes"; then
+  AC_DEFINE([CREATE_STANDALONE_GNASH_LAUNCHER], [], [Add support for writing a standalone executable launcher for movies embedded in web pages])
+fi
+
 dnl Build the cygnal server if specified.
 AC_ARG_ENABLE(cygnal,
   AC_HELP_STRING([--enable-cygnal], [Enable building of the Cygnal server]),
@@ -575,13 +545,7 @@ build_ogl=no
 build_agg=no
 build_cairo=no
 AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=], [Use the specified GUI toolkit (default=ogl,agg)]),
-dnl  if test -n ${enableval}; then
-dnl    add_renderer="${enableval}"
-dnl    enableval=`echo ${enableval} | tr '\054' ' ' `
-dnl  fi
-dnl  while test -n "${enableval}" ; do
-dnl    val=`echo ${enableval} | cut -d ' ' -f 1`
+  AC_HELP_STRING([--enable-renderer=[[agg|ogl|cairo]]], [Use the specified renderer (default=agg)]),
     [case "${enableval}" in
       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
         build_ogl=yes
@@ -606,18 +570,7 @@ dnl         ;;
       esac],
 	build_agg=yes
 	add_renderer=agg
-dnl    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-dnl    if test x$val = x$enableval; then
-dnl      break;
-dnl    fi
-dnl  done
 )
-
-dnl if test x$add_renderer = x; then
-dnl    build_ogl=yes
-dnl    build_agg=yes
-dnl    add_renderer="ogl,agg"
-dnl fi
 
 if test x$build_ogl = xyes; then
   if test x$build_fb = xyes; then
@@ -707,14 +660,14 @@ dnl  Toggle support for MIT-SHM extension to the X server
 dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(mit-shm,
-  AC_HELP_STRING([--disable-mit-shm], [Disable support for the MIT-SHM X extension]),
+  AC_HELP_STRING([--enable-mit-shm], [Enable support for the MIT-SHM X extension]),
 [case "${enableval}" in
   yes) xmitshm=yes ;;
   no)  xmitshm=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
-esac],xmitshm=yes)
+esac],xmitshm=no)
 dnl as windows doesn't run X11, don't enable this extension there.
-if test "x${xmitshm}" = "xyes" -a "x${windows}" = "xno"; then
+if test "x${xmitshm}" = "xyes" -a "x${windows}" != "xyes"; then
 	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
@@ -867,10 +820,11 @@ AM_CONDITIONAL(BUILD_METOME_EXT, [ test x$ext_metome = xyes ])
 AM_CONDITIONAL(BUILD_EXTENSIONS, [ test -n "$extensions_list"])
 
 AC_MSG_CHECKING([For the version of libtool])
-if test "x$darwin" != x; then
-LIBTOOLIZE=glibtoolize
+if test -d ${srcdir}/libltdl/libltdl; then
+ltver=2.x
+else
+ltver=1.x
 fi
-ltver=`${LIBTOOLIZE:-libtoolize} --version | head -1 | cut -d ' ' -f 4`
 ltmajor=`echo $ltver | cut -d '.' -f 1`
 AC_MSG_RESULT([$ltver])
 if test $ltmajor -eq 1; then
@@ -1139,6 +1093,12 @@ PKG_PROG_PKG_CONFIG
 AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
 AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], false)
 
+AC_PATH_PROG(PERL, perl)
+AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
+
+AC_PATH_PROG(CSOUND, csound)
+AM_CONDITIONAL(HAVE_CSOUND, test x"$CSOUND" != x)
+
 dnl Look for scratchbox
 sbox=no
 if test x"${SBOX_REDIRECT_FROM_DIRS}" != x; then
@@ -1213,6 +1173,11 @@ if test x"$gcc_cv_ld_as_needed" = xyes; then
 	LDFLAGS="${LDFLAGS} -Wl,--as-needed"
 fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
+
+AC_DEFINE(USE_GIF, [1], [Use the GIF library])
+AC_DEFINE(USE_PNG, [1], [Use the PNG library])
+AM_CONDITIONAL(USE_GIF, true)
+AM_CONDITIONAL(USE_PNG, true)
 
 dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
@@ -1349,12 +1314,7 @@ AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
 AC_CHECK_LIB(lber, ber_free)
-dnl AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
-
-dnl AC_CHECK_LIB(m, exp2, AC_DEFINE(HAVE_EXP2, 1, [Has exp2()]))
-dnl AC_CHECK_LIB(m, log2, AC_DEFINE(HAVE_LOG2, 1, [Has log2()]))
-dnl AC_CHECK_LIB(m, trunc, AC_DEFINE(HAVE_TRUNC, 1, [Has trunc()]))
 
 dnl X11 is needed for fltk (at least),
 dnl and probably for many other guis too ...
@@ -1516,30 +1476,15 @@ fi
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(memmove)
-AC_CHECK_FUNC(strndup, AC_DEFINE(HAVE_STRNDUP, 1, [Has strndup()] ))
+dnl AC_CHECK_FUNC(strndup, AC_DEFINE(HAVE_STRNDUP, 1, [Has strndup()] ))
 AC_CHECK_FUNC(clock_gettime, AC_DEFINE(HAVE_CLOCK_GETTIME, 1, [Has clock_gettime()] ))
-AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
-AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
+dnl AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
+dnl AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
 AC_CHECK_HEADERS(winsock2.h)
 AC_CHECK_FUNCS(socket)
 AC_CHECK_FUNCS(CreateFileMappingA)
-
-dnl GNASH_HASHMAP
-dnl Let's get rid of this small file and inline the function.
-
-dnl AC_LANG_PUSH(C++)
-dnl 	AC_CHECK_HEADER(ext/hash_map, [
-dnl 		AC_DEFINE([GNU_HASH_MAP], [1], [Using GNU ext/hash_map.h])
-dnl 		AC_DEFINE([HASH_MAP_NS], [__gnu_cxx], [Using GNU __gnu_cxx::])
-dnl 	], [
-dnl 		AC_CHECK_HEADER(hash_map, [
-dnl 			AC_DEFINE([WIN32_HASH_MAP], [1], [Using Win32 hash_map.h])
-dnl 			AC_DEFINE([HASH_MAP_NS], [stdext], [Using win32 stdext::])
-dnl 		])
-dnl 	])
-dnl AC_LANG_POP(C++)
 
 dnl Shm::resize() uses this if it exists
 AC_CHECK_LIB(c, mremap)
@@ -1551,7 +1496,7 @@ AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 if test x"${GIF_LIBS}" = x ; then
  GNASH_PKG_FIND(ungif, [gif_lib.h], [gif images], DGifOpen)
@@ -1559,6 +1504,17 @@ if test x"${GIF_LIBS}" = x ; then
  GIF_CFLAGS=${UNGIF_CFLAGS}
 fi
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
+
+GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
+AM_CONDITIONAL(HAVE_SPEEX, [ test x$has_speex = xyes ])
+if test x$has_speex = xyes ; then
+  AC_DEFINE([DECODING_SPEEX], [1], [Speex codec available])
+fi
+
+GNASH_PKG_FIND(speexdsp, [speex_resampler.h], [speex DSP utilities], speex_resampler_process_int)
+if test x$has_speexdsp = xyes ; then
+  AC_DEFINE([RESAMPLING_SPEEX], [1], [Speex resampler available])
+fi
 
 dnl Find freetype and fontconfig
 dnl GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
@@ -1827,12 +1783,13 @@ if test x"$media_handler" = x"gst"; then
   CFLAGS=$GSTREAMER_CFLAGS
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_async],
     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-    has_modern_gstpbutils='no')
+    has_gst_install_plugins_async='no')
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_supported],
     AC_DEFINE([HAVE_GST_INSTALL_PLUGINS_SUPPORTED], [], [GStreamer provides the gst_install_plugins_supported function]),
     has_gst_install_plugins_supported='no')
   CFLAGS=$save_cflags
-  if test x$has_modern_gstpbutils = xno; then
+  if test x$has_gst_install_plugins_async = xno -o x$has_gst_install_plugins_supported = xno; then
+    has_modern_gstpbutils='no'
     AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
   else
     AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
@@ -1982,6 +1939,10 @@ fi
 # We want warnings, lots of warnings  :-)
 # It should be possible to build with -ansi, not with
 # -pedantic because of agg.
+#
+# -ansi was actually dropped because it hides 'fileno', which
+# is used in a few places
+#
 if test x"$GCC" = x"yes"; then
   CXXFLAGS="$CXXFLAGS \
     -W \
@@ -1992,7 +1953,6 @@ if test x"$GCC" = x"yes"; then
     -Wreturn-type \
     -Wnon-virtual-dtor \
     -Wunused \
-    #-ansi \
     "
   CFLAGS="$CFLAGS \
     -W \
@@ -2042,7 +2002,7 @@ fi
 dnl /* http://gcc.gnu.org/bugzilla/show_bug.cgi?id=19664 */
 AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
   [
-    AC_CACHE_CHECK([if -fvisibility-inlines-hidden is broken], gcc_visibility_bug, [
+    AC_CACHE_CHECK([if -fvisibility-inlines-hidden is broken], ac_cv_gcc_visibility_bug, [
         AC_LANG_PUSH(C++)
         save_CXXFLAGS=$CXXFLAGS
         save_LDFLAGS=$LDFLAGS
@@ -2067,14 +2027,14 @@ AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
             return 0;
           }
         ], [],
-        gcc_visibility_bug=no, gcc_visibility_bug=yes)
+        ac_cv_gcc_visibility_bug=no, ac_cv_gcc_visibility_bug=yes)
 
         CXXFLAGS=$save_CXXFLAGS
         LDFLAGS=$save_LDFLAGS
         AC_LANG_POP(C++)
       ]
     )
-    if test x$gcc_visibility_bug = xno; then
+    if test x$ac_cv_gcc_visibility_bug = xno; then
       CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
       if test x"$enable_visibility" != x"no"; then
         CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
@@ -2161,6 +2121,7 @@ AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.
 AC_OUTPUT(Makefile
 po/Makefile
 libmedia/Makefile
+libsound/Makefile
 libbase/Makefile
 libcore/Makefile
 libcore/asobj/Makefile
@@ -2175,6 +2136,7 @@ doc/C/Makefile
 doc/Doxyfile
 pythonmodule/Makefile
 testsuite/Makefile
+testsuite/media/Makefile
 testsuite/libbase/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
@@ -2377,7 +2339,7 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
       echo "               To be able to build the kde 3.x gui," >&3
       echo "               install version 3.x of the KDE development environment from http://kde.org" >&3
       echo "               or .deb users: apt-get install kdelibs-dev" >&3
-      echo "               or .rpm users: yum install <something-else>." >&3
+      echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
   if test x"$has_qt" = xyes; then
     echo "        QT flags are: $QT_CFLAGS"
@@ -2448,13 +2410,13 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${LIBPNG_LIBS}" != x ; then
-  if test x"${LIBPNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $LIBPNG_CFLAGS"
+if test x"${PNG_LIBS}" != x ; then
+  if test x"${PNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $PNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
   fi
-  echo "        PNG libs are: $LIBPNG_LIBS"
+  echo "        PNG libs are: $PNG_LIBS"
 else
   echo "        WARNING: No PNG library development package installed!" >&4
   echo "                 Gnash will be built without support for dynamic loading of PNG files." >&4
@@ -2613,7 +2575,13 @@ if test "$media_handler" = "gst"; then
     else
       echo "        Gstreamer flags are: default include path"
     fi
-      echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+    echo "        Gstreamer libs are: $GSTREAMER_LIBS"
+    if test x"$has_modern_gstpbutils" = "xno"; then
+      echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&4
+      echo "                     Gstreamer can pop up a message prompting them to." >&4
+      echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&4
+      echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
+    fi
   else
     echo "        ERROR: GST media handling requested but gstreamer-0.10+ not found" >&3
     echo "               Install it from http://www.gstreamer.net" >&3
@@ -2690,7 +2658,8 @@ if test x$build_fltk = xyes; then
   else
     echo "        ERROR: No FLTK2 development package installed!" >&3
     echo "               There are currently no Debian or RPM packages for FLTK2;" >&3
-    echo "		 see http://www.fltk.org to install it from source." >&3
+    echo "               see http://www.fltk.org to install it from source." >&3
+    echo "               or change to a different gui with --enable-gui=..." >&3
 dnl What it was for FLTK 1:
 dnl    echo "               or .deb users: apt-get install fltk-1.1-dev"
 dnl    echo "               or .rpm users: yum install fltk-devel"
@@ -2791,11 +2760,26 @@ if test x"$CURL_LIBS" != x; then
   fi
     echo "        CURL libs are: $CURL_LIBS"
 else
-  echo "        WARNING: CURL library not found." >&4
-  echo "                 Gnash will be built without support for streaming from URLs." >&4
-  echo "                 Why not install libcurl from http://curl.haxx.se/libcurl" >&4
-  echo "                 or .deb users: apt-get install libcurl3-dev" >&4
-  echo "                 or .rpm users: yum install curl-devel" >&4
+  echo "        RECOMMENDED: If you install the CURL library, Gnash will be able to" >&4
+  echo "                     display remote content (streaming from URLs) using CURL." >&4
+  echo "                     Install libcurl from http://curl.haxx.se/libcurl" >&4
+  echo "                     or .deb users: apt-get install libcurl3-dev" >&4
+  echo "                     or .rpm users: yum install curl-devel" >&4
+fi
+
+if test x"$SPEEX_LIBS" != x; then
+  if test x"$SPEEX_CFLAGS" != x; then
+    echo "        Speex flags are: $SPEEX_CFLAGS"
+  else
+    echo "        Speex flags are: default include path"
+  fi
+    echo "        Speex libs are: $SPEEX_LIBS"
+else
+  echo "        RECOMMENDED: If you install the Speex library, Gnash will be able to" >&4
+  echo "                     decoded Speex encoded audio in FLV files." >&4
+  echo "                     Install libspeex from http://speex.org" >&4
+  echo "                     or .deb users: apt-get install libspeex-dev" >&4
+  echo "                     or .rpm users: yum install speex-devel" >&4
 fi
 
 if test x"$ext_dbus" = xyes; then
@@ -2858,10 +2842,10 @@ if test x"$BOOST_LIBS" != x; then
     fi
     if test x"${extra_missing_libs}" != x; then
       for i in ${extra_missing_libs}; do
-	      echo "        WARNING: The BOOST $i library is recommended!" >&4
-        echo "               Install it from http://www.boost.org" >&4
-        echo "               or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
-        echo "               Gnash will compile anyway, but not all tests will work." >&4
+	echo "        WARNING: The BOOST $i library is recommended!" >&4
+        echo "                 Install it from http://www.boost.org" >&4
+        echo "                 or .deb users: apt-get install libboost-"`echo ${i} | sed 's/_/-/g'`"-dev" >&4
+        echo "                 Gnash will compile anyway, but not all tests will work." >&4
       done
     fi
     if test x"${missing_libs}" != x; then
@@ -2931,7 +2915,7 @@ if test x$cross_compiling = xno; then
     echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://haxe.org" >&4
-    echo "                 or .deb users: apt-get install haxe (version 2 or later required)" >&4
+    echo "                 or .deb users: apt-get install haxe" >&4
   fi
 
   if test x"$SWFMILL" != x; then
@@ -2957,6 +2941,22 @@ if test x$cross_compiling = xno; then
   else
     echo "        WARNING: You need to have python installed" >&4
     echo "                 to run some of the tests in Gnash testsuite." >&4
+  fi
+
+  if test x"$PERL" != x; then
+    echo "        PERL is $PERL"
+  else
+    echo "        WARNING: You need to have perl installed" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+  fi
+
+  if test x"$CSOUND" != x; then
+    echo "        CSOUND is $CSOUND"
+  else
+    echo "        WARNING: You need to have csound installed" >&4
+    echo "                 to have real fun." >&4
+    echo "                 Install it from http://www.csounds.com/" >&4
+    echo "                 or .deb users: apt-get install csound" >&4
   fi
 
 fi
@@ -3017,7 +3017,7 @@ if test x$ext_mysql = xyes; then
       echo "        MYSQL libs are: $MYSQL_LIBS"
     else
       echo "        ERROR: No MySQL development package is installed." >&3
-      echo "               Either reconfigure without --with-extensions=mysql" >&3
+      echo "               Either reconfigure without --enable-extensions=mysql" >&3
       echo "               or install MySQL header files from http://www.mysql.org" >&3
       echo "               or .deb users: apt-get install libmysqlclient-dev" >&3
     fi
@@ -3083,8 +3083,8 @@ if test -s $cwarn; then
   cat $cwarn
   rm $cwarn
   echo ""
-  echo "Gnash should still compile even with these warnings.  If it doesn't,"
-  echo "report the warnings as a bug."
+  echo "Gnash should still compile even with these warnings."
+  echo "If it doesn't, report the warnings as a bug."
 fi
 
 dnl If anything critical is missing, don't bother to continue

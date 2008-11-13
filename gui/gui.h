@@ -218,7 +218,7 @@ public:
     /// @param height The desired height in pixels.
     void resize_view(int width, int height);
 
-    /// Update stage matrix accordingly to window size and flash Stage
+    /// Update stage SWFMatrix accordingly to window size and flash Stage
     /// configuration (scaleMode, alignment)
     //
     /// This method should be called from the core lib when Stage configuration
@@ -494,7 +494,8 @@ private:
     VariableMap _flashVars;
 
     boost::intrusive_ptr<movie_definition> _movieDef;
-
+    
+    /// The root movie, or "Stage"
     movie_root* _stage;
 
     /// True if the application has been put into "stop" mode
@@ -502,7 +503,7 @@ private:
 
     /// True if the application didn't start yet
     bool            _started;
-    
+
     /// If true, updated regions (invalidated ranges) are visibly outlined.
     bool _showUpdatedRegions;
     

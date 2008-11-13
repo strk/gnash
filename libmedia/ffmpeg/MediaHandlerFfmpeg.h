@@ -31,21 +31,35 @@
 namespace gnash {
 namespace media {
 
+/// FFMPEG-based media handler module
+//
+/// The module implements the MediaHandler factory as required
+/// by Gnash core for a loadable media handler module.
+///
+/// It uses libavformat and libavcodec:
+/// http://www.irisa.fr/texmex/people/dufouil/ffmpegdoxy/index.html
+///
+/// Starting point is MediaHandlerFfmpeg.
+/// 
+namespace ffmpeg {
+
+/// FFMPEG based MediaHandler
 class DSOEXPORT MediaHandlerFfmpeg : public MediaHandler
 {
 public:
 
 	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
 
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info);
+	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info);
 
-	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info);
+	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info);
 
     virtual size_t getInputPaddingSize() const;
 
 };
 
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // namespace gnash
 

@@ -82,11 +82,12 @@ ASTESTS =			\
 	Boolean.as		\
 	Camera.as		\
 	Color.as		\
-    ColorTransform.as \
+	ColorTransform.as 	\
 	ContextMenu.as		\
 	CustomActions.as	\
 	Date.as			\
 	Error.as		\
+	ExternalInterface.as	\
 	Function.as		\
 	Global.as		\
 	Inheritance.as		\
@@ -187,41 +188,47 @@ all:
 ONLINETEST_RULES = v5-online-tests v6-online-tests v7-online-tests v8-online-tests online-tests vn-online-tests
 
 #
-# 'online' rules are needed to override the path to Dejagnu.swf 
+# 'online' rules are needed to override the path to Dejagnu.swf and to MEDIADIR
 #
 
-v8-online-tests: $(ASTESTS_V8_OUT) alltests-v8.swf 
+v8-online-tests: 
+	rm -f $(ASTESTS_V8_OUT) # force rebuild
+	$(MAKE) $(ASTESTS_V8_OUT) alltests-v8.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v8
-	cp $(ASTESTS_V8_OUT) alltests-v8.swf online-tests/v8
+	mv $(ASTESTS_V8_OUT) alltests-v8.swf online-tests/v8
 	sh $(srcdir)/gen-index.sh alltests-v8.swf $(ASTESTS_V8_OUT) 
-	cp index.html embed.html online-tests/v8
-	cp $(DEJAGNU_SO_PATH) online-tests/v8
+	mv index.html embed.html online-tests/v8
 
-v7-online-tests: $(ASTESTS_V7_OUT) alltests-v7.swf 
+v7-online-tests: 
+	rm -f $(ASTESTS_V7_OUT) # force rebuild
+	$(MAKE) $(ASTESTS_V7_OUT) alltests-v7.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v7
-	cp $(ASTESTS_V7_OUT) alltests-v7.swf online-tests/v7
+	mv $(ASTESTS_V7_OUT) alltests-v7.swf online-tests/v7
 	sh $(srcdir)/gen-index.sh alltests-v7.swf $(ASTESTS_V7_OUT) 
-	cp index.html embed.html online-tests/v7
-	cp $(DEJAGNU_SO_PATH) online-tests/v7
+	mv index.html embed.html online-tests/v7
 
-v6-online-tests: $(ASTESTS_V6_OUT) alltests-v6.swf 
+v6-online-tests: 
+	rm -f $(ASTESTS_V6_OUT) # force rebuild
+	$(MAKE) $(ASTESTS_V6_OUT) alltests-v6.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v6
-	cp $(ASTESTS_V6_OUT) alltests-v6.swf online-tests/v6
+	mv $(ASTESTS_V6_OUT) alltests-v6.swf online-tests/v6
 	sh $(srcdir)/gen-index.sh alltests-v6.swf $(ASTESTS_V6_OUT) 
-	cp index.html embed.html online-tests/v6
-	cp $(DEJAGNU_SO_PATH) online-tests/v6
+	mv index.html embed.html online-tests/v6
 
-v5-online-tests: $(ASTESTS_V5_OUT) alltests-v5.swf 
+v5-online-tests: 
+	rm -f $(ASTESTS_V5_OUT) # force rebuild
+	$(MAKE) $(ASTESTS_V5_OUT) alltests-v5.swf DEF_MAKESWF_FLAGS="-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\\\"../media\\\"'" DEJAGNU_SO_URL=../Dejagnu.swf
 	mkdir -p online-tests/v5
-	cp $(ASTESTS_V5_OUT) alltests-v5.swf online-tests/v5
+	mv $(ASTESTS_V5_OUT) alltests-v5.swf online-tests/v5
 	sh $(srcdir)/gen-index.sh alltests-v5.swf $(ASTESTS_V5_OUT) 
-	cp index.html embed.html online-tests/v5
-	cp $(DEJAGNU_SO_PATH) online-tests/v5
+	mv index.html embed.html online-tests/v5
 
 index.wiki: gen-index-wiki.sh
 	sh $(srcdir)/gen-index-wiki.sh $(ASTESTS_OUT)
 
 online-tests: v5-online-tests v6-online-tests v7-online-tests v8-online-tests index.wiki
+	cp -a $(abs_mediadir) online-tests/media
+	cp $(DEJAGNU_SO_PATH) online-tests/
 
 # List 'require-ming' as a dependency if the rule needs Ming to run
 require-ming:

@@ -31,7 +31,7 @@
 #include "gnash.h" // still needed ?
 #include "movie_definition.h"
 #include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
-#include "sprite_instance.h" // for setting FlashVars
+#include "MovieClip.h" // for setting FlashVars
 #include "movie_root.h" 
 #include "Player.h"
 
@@ -61,6 +61,8 @@ using namespace gnash;
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
+
+/// @todo Shouldn't Player be in 'gnash' namespace ?
 
 /*static private*/
 void
@@ -157,19 +159,21 @@ Player::init_logfile()
 
 }
 
-bool
-Player::silentStream(void* /*udata*/, boost::uint8_t* stream, int len)
+unsigned int
+Player::silentStream(void* /*udata*/, boost::int16_t* stream, unsigned int len, bool& atEOF)
 {
-    memset((void*)stream, 0, len);
-    return true;
+    std::fill(stream, stream+len, 0);
+    atEOF=false;
+    return len;
 }
 
 void
 Player::init_sound()
 {
+
     if (_doSound) {
 #ifdef SOUND_SDL
-        _soundHandler.reset( gnash::media::create_sound_handler_sdl(_audioDump) );
+        _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
         if (! _audioDump.empty()) {
             // add a silent stream to the audio pool so that our output file
             // is homogenous;  we actually want silent wave data when no sounds
@@ -177,13 +181,11 @@ Player::init_sound()
             _soundHandler->attach_aux_streamer(silentStream, (void*) this);
         }
 #elif defined(SOUND_GST)
-        _soundHandler.reset( gnash::media::create_sound_handler_gst() );
+        _soundHandler.reset(media::create_sound_handler_gst());
 #else
         log_error(_("Sound requested but no sound support compiled in"));
         return;
 #endif
-        
-        gnash::set_sound_handler(_soundHandler.get());
     }
 }
 
@@ -191,9 +193,9 @@ void
 Player::init_media()
 {
 #ifdef USE_FFMPEG
-        _mediaHandler.reset( new gnash::media::MediaHandlerFfmpeg() );
+        _mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
 #elif defined(USE_GST)
-        _mediaHandler.reset( new gnash::media::MediaHandlerGst() );
+        _mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
 #else
         log_error(_("No media support compiled in"));
         return;
@@ -209,13 +211,6 @@ Player::init_gui()
     if ( _doRender )
     {
         _gui = getGui(); 
-
-        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-        if ( rcfile.startStopped() )
-        {
-            _gui->stop();
-        }
-
     }
     else
     {
@@ -236,6 +231,10 @@ Player::init_gui()
 boost::intrusive_ptr<movie_definition>
 Player::load_movie()
 {
+    /// The RunInfo must be initialized by this point to provide resources
+    /// for parsing.
+    assert(_runInfo.get());
+
     boost::intrusive_ptr<gnash::movie_definition> md;
 
     RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -253,8 +252,9 @@ Player::load_movie()
     try {
         if ( _infile == "-" )
         {
-            std::auto_ptr<IOChannel> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
-            md = gnash::create_movie(in, _url, false);
+            std::auto_ptr<IOChannel> in (
+                    noseek_fd_adapter::make_stream(fileno(stdin)));
+            md = gnash::create_movie(in, _url, *_runInfo, false);
         }
         else
         {
@@ -274,7 +274,8 @@ Player::load_movie()
             }
 
             // _url should be always set at this point...
-            md = gnash::create_library_movie(url, _url.c_str(), false);
+            md = gnash::create_library_movie(url, *_runInfo, _url.c_str(),
+                    false);
         }
     } catch (const GnashException& er) {
         std::cerr << er.what() << std::endl;
@@ -299,8 +300,8 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     // a cache of setting some parameter before calling us...
     // (example: setDoSound(), setWindowId() etc.. ) 
     init_logfile();
-    init_sound();
     init_media();
+    init_sound();
     init_gui();
    
     // gnash.cpp should check that a filename is supplied.
@@ -308,7 +309,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     _infile = infile;
 
-    // Set base url
+    // Work out base url
     if ( _baseurl.empty() )
     {
         if (! url.empty() ) _baseurl = url;
@@ -361,9 +362,12 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
         }
     }
 
-    // Set base url for this movie (needed before parsing)
-    if ( hasOverriddenBaseUrl ) gnash::set_base_url(URL(overriddenBaseUrl, URL(_baseurl)));
-    else gnash::set_base_url(URL(_baseurl));
+    URL baseURL = hasOverriddenBaseUrl ? URL(overriddenBaseUrl, URL(_baseurl))
+                                       : URL(_baseurl);
+
+    /// The RunInfo should be populated before parsing.
+    _runInfo.reset(new RunInfo(baseURL.str()));
+    _runInfo->setSoundHandler(_soundHandler.get());
 
     // Load the actual movie.
     _movieDef = load_movie();
@@ -397,7 +401,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     _gui->createWindow(_url.c_str(), _width, _height);
 
     SystemClock clock; // use system clock here...
-    movie_root& root = VM::init(*_movieDef, clock).getRoot();
+    movie_root root(*_movieDef, clock, *_runInfo);
 
     _callbacksHandler.reset(new CallbacksHandler(_gui.get())); 
     
@@ -412,6 +416,18 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
 
     _gui->setStage(&root);
+
+    // When startStopped is true, stop here after the stage has been 
+    // registered, but before the movie has started. Initial loading
+    // and VM initialization have been done by this stage, but not
+    // the complete parsing of the SWF. This is important because
+    // the Gui accesses movie_root to get the sound_handler, but also
+    // because the gui window should be properly set up by this point.
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    if ( rcfile.startStopped() )
+    {
+        _gui->stop();
+    }
 
     // Start loader thread
     // NOTE: the loader thread might (in IMPORT tag parsing)
@@ -441,12 +457,18 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     }
     _gui->run();
 
-    std::cerr << "Main loop ended, cleaning up" << std::endl;
+    log_debug("Main loop ended, cleaning up");
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
 
     return EXIT_SUCCESS;
+}
+
+bool
+Player::CallbacksHandler::yesNo(const std::string& query)
+{
+    return _gui->yesno(query);
 }
 
 std::string
@@ -688,6 +710,7 @@ Player::~Player()
 {
     if (_movieDef.get())
     {
-            log_debug("~Player - _movieDef refcount: %d (1 will be dropped now)", _movieDef->get_ref_count());
+        log_debug("~Player - _movieDef refcount: %d (1 will be dropped "
+                "now)", _movieDef->get_ref_count());
     }
 }

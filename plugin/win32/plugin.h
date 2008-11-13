@@ -35,7 +35,7 @@
 #include "sound_handler.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_definition.h"
 #include "movie_root.h"
 #include "SystemClock.h"
@@ -108,7 +108,7 @@ private:
     int mouse_y;
     int mouse_buttons;
 
-    static void FSCommand_callback(gnash::sprite_instance* movie, const std::string& command, const std::string& args);
+    static void FSCommand_callback(gnash::MovieClip* movie, const std::string& command, const std::string& args);
 };
  
 #endif // __PLUGIN_H__

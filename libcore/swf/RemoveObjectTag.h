@@ -30,10 +30,11 @@
 // Forward declarations
 namespace gnash {
 	class SWFStream;
-	class sprite_instance;
+	class MovieClip;
 	class swf_event;
 	class movie_definition;
 	class DisplayList;
+    class RunInfo;
 }
 
 namespace gnash {
@@ -58,10 +59,11 @@ public:
 	/// Read SWF::REMOVEOBJECT or SWF::REMOVEOBJECT2 
 	void read(SWFStream& in, tag_type tag);
 
-	/// Remove object at specified depth from sprite_instance DisplayList.
-	void execute(sprite_instance* m, DisplayList& dlist) const;
+	/// Remove object at specified depth from MovieClip DisplayList.
+	void execute(MovieClip* m, DisplayList& dlist) const;
 
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m);
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
 
 private:
 

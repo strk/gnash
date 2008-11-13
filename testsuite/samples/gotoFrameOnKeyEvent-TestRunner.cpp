@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "GnashException.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -59,7 +59,7 @@ main(int /*argc*/, char** /*argv*/)
   //       I wouldn't want the first advance to be needed
   tester.advance();
 
-  sprite_instance* root = tester.getRootMovie();
+  MovieClip* root = tester.getRootMovie();
   assert(root);
 
   check_equals(root->get_frame_count(), 7);
@@ -69,7 +69,7 @@ main(int /*argc*/, char** /*argv*/)
   check_equals(root->get_current_frame(), 0);
 
   // press key 1 four times
-  for(int i=1; i<=4; i++)
+  for(unsigned int i=1; i<=4; i++)
   {
     tester.pressKey(key::_1);
     tester.releaseKey(key::_1);
@@ -79,17 +79,17 @@ main(int /*argc*/, char** /*argv*/)
   }
   
   // press key 0 four times
-  for(int i=3; i>=0; i--)
+  for(unsigned int i=4; i>0; --i)
   {
     tester.pressKey(key::_0);
     tester.releaseKey(key::_0);
-    check_equals(root->get_current_frame(), i);
+    check_equals(root->get_current_frame(), i-1);
     tester.advance();
-    check_equals(root->get_current_frame(), i);
+    check_equals(root->get_current_frame(), i-1);
   }
 
   // press key 1 two times
-  for(int i=1; i<=2; i++)
+  for(unsigned int i=1; i<=2; i++)
   {
     tester.pressKey(key::_1);
     tester.releaseKey(key::_1);
@@ -129,13 +129,13 @@ main(int /*argc*/, char** /*argv*/)
   }
 
   // press key 0 two times, now should be back to the first frame
-  for(int i=1; i>=0; i--)
+  for(unsigned int i=2; i>0; --i)
   {
     tester.pressKey(key::_0);
     tester.releaseKey(key::_0);
-    check_equals(root->get_current_frame(), i);
+    check_equals(root->get_current_frame(), i-1);
     tester.advance();
-    check_equals(root->get_current_frame(), i);
+    check_equals(root->get_current_frame(), i-1);
   }
 }
 

@@ -69,8 +69,8 @@ public:
   /// Runs the path parser, invoking the pure virtual methods where
   /// appropriate.
   /// @param cx the color transform that will be passed to prepareFill.
-  /// @param mat the matrix that will be passed to prepareFill.
-  void run(const cxform& cx, const matrix& mat);
+  /// @param mat the SWFMatrix that will be passed to prepareFill.
+  void run(const cxform& cx, const SWFMatrix& mat);
 
   /// Prepare the fill style for subsequent use for filling one or more shapes.
   /// @param fill_style fill style number, as indicated by class Path.

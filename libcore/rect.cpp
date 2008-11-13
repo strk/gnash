@@ -18,8 +18,7 @@
 #include "rect.h"
 #include "log.h"
 #include "SWFStream.h"
-#include "matrix.h"
-#include "types.h" // for TWIPS_TO_PIXELS
+#include "SWFMatrix.h"
 #include "utility.h" // for flerp, clamp...
 
 #include <sstream> // for ::print and ::toString
@@ -81,7 +80,7 @@ rect::get_point(int i) const
 }
 
 
-void    rect::enclose_transformed_rect(const matrix& m, const rect& r)
+void    rect::enclose_transformed_rect(const SWFMatrix& m, const rect& r)
 // Set ourself to bound a rectangle that has been transformed by m.  
 {   
     boost::int32_t  x1 = r.get_x_min();
@@ -122,7 +121,7 @@ void  rect::expand_to_rect(const rect& r)
     }
 }   
 
-void    rect::expand_to_transformed_rect(const matrix& m, const rect& r)
+void    rect::expand_to_transformed_rect(const SWFMatrix& m, const rect& r)
 // Expand ourself to a transformed rect.
 {   
     if ( r.is_null() )

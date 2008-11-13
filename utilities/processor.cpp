@@ -22,6 +22,11 @@
 #endif
 
 #include "NullSoundHandler.h"
+#ifdef USE_FFMPEG
+# include "ffmpeg/MediaHandlerFfmpeg.h"
+#elif defined(USE_GST)
+# include "gst/MediaHandlerGst.h"
+#endif
 
 #include <iostream>
 #include <cstdio>
@@ -37,7 +42,7 @@
 #include "ClockTime.h"
 #include "gnash.h"
 #include "movie_definition.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "movie_root.h"
 #include "log.h"
 #include "rc.h"
@@ -102,7 +107,8 @@ struct movie_data
     std::string	m_filename;
 };
 
-static boost::intrusive_ptr<gnash::movie_definition>	play_movie(const char* filename);
+static boost::intrusive_ptr<gnash::movie_definition> play_movie(
+        const std::string& filename, const RunInfo& runInfo);
 
 static bool s_do_output = false;
 static bool s_stop_on_errors = true;
@@ -191,6 +197,11 @@ public:
 	    return "";
 
 	}
+
+    bool yesNo(const std::string& /*query*/)
+    {
+        return true;
+    }
 };
 
 EventCallback eventCallback;
@@ -223,7 +234,7 @@ main(int argc, char *argv[])
       }
     }
  
-    std::vector<const char*> infiles;
+    std::vector<std::string> infiles;
  
     //RcInitFile& rcfile = RcInitFile::getDefaultInstance();
     //rcfile.loadFiles();
@@ -308,53 +319,68 @@ main(int argc, char *argv[])
     // get the file name from the command line
     while (optind < argc) {
         infiles.push_back(argv[optind]);
-	optind++;
+	    optind++;
     }
 
     // No file names were supplied
-    if (infiles.size() == 0) {
-	printf("no input files\n");
-	usage(argv[0]);
+    if (infiles.empty()) {
+	    std::cerr << "no input files" << std::endl;
+	    usage(argv[0]);
         dbglogfile.removeLog();
-	exit(1);
+	    exit(1);
     }
-
-    std::auto_ptr<media::sound_handler> soundHandler(new media::NullSoundHandler());
-    gnash::set_sound_handler(soundHandler.get());
-        
-    std::vector<movie_data>	data;
 
     if (infiles.size() > 1)
     {
-    	// this is due to set_base_url setting, only allowed once
-    	fprintf(stderr, "Multiple input files not supported.\n");
-	usage(argv[0]);
-	dbglogfile.removeLog();
-	exit(1);
+        // We're not ready for multiple runs yet.
+        std::cerr << "Multiple input files not supported." << std::endl;
+        usage(argv[0]);
+        dbglogfile.removeLog();
+        exit(1);
     }
+
+
+#ifdef USE_FFMPEG
+    std::auto_ptr<media::MediaHandler> handler(
+            new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
+#elif defined(USE_GST)
+    std::auto_ptr<media::MediaHandler> handler(
+            new gnash::media::gst::MediaHandlerGst() );
+#else
+    std::cerr << "Neither SOUND_SDL nor SOUND_GST defined" << std::endl;
+    exit(1);
+#endif
+    gnash::media::MediaHandler::set(handler);
+
+    std::auto_ptr<sound::sound_handler> soundHandler(
+            new sound::NullSoundHandler());
+
+    std::vector<movie_data>	data;
 
     // Play through all the movies.
-    for (int i = 0, n = infiles.size(); i < n; i++) {
+    for (std::vector<std::string>::const_iterator i = infiles.begin(), 
+            e = infiles.end(); i != e; ++i)
+    {
 
-        set_base_url(URL(infiles[i]));
+        RunInfo runInfo(*i);
+        runInfo.setSoundHandler(soundHandler.get());
 
-	boost::intrusive_ptr<gnash::movie_definition> m = play_movie(infiles[i]);
-	if (m == NULL) {
-	    if (s_stop_on_errors) {
-		// Fail.
-		fprintf(stderr, "error playing through movie '%s', quitting\n", infiles[i]);
-		exit(1);
-	    }
-	}
+	    boost::intrusive_ptr<gnash::movie_definition> m =
+            play_movie(*i, runInfo);
+	    if (!m) {
+	        if (s_stop_on_errors) {
+		    // Fail.
+                std::cerr << "error playing through movie " << *i << std::endl;
+		        std::exit(1);
+	        }
+        }
 	
-	movie_data	md;
-	md.m_movie = m.get();
-	md.m_filename = std::string(infiles[i]);
-	data.push_back(md);
+        movie_data	md;
+        md.m_movie = m.get();
+        md.m_filename = *i;
+        data.push_back(md);
     }
     
-    // Signal core lib we're willing to quit.
-    gnash::clear();
     
     return 0;
 }
@@ -369,19 +395,22 @@ main(int argc, char *argv[])
 //
 // Return the movie definition.
 boost::intrusive_ptr<gnash::movie_definition>
-play_movie(const char* filename)
+play_movie(const std::string& filename, const RunInfo& runInfo)
 {
     boost::intrusive_ptr<gnash::movie_definition> md;
+
+    URL url(filename);
+
     try
     {
-      if ( ! strcmp(filename, "-") )
+      if (filename == "-")
       {
-         std::auto_ptr<IOChannel> in ( noseek_fd_adapter::make_stream(fileno(stdin)) );
-         md = gnash::create_movie(in, filename, false);
+         std::auto_ptr<IOChannel> in (
+                 noseek_fd_adapter::make_stream(fileno(stdin)) );
+         md = gnash::create_movie(in, filename, runInfo, false);
       }
       else
       {
-         URL url(filename);
          if ( url.protocol() == "file" )
          {
              const std::string& path = url.path();
@@ -395,7 +424,7 @@ play_movie(const char* filename)
              log_debug(_("%s appended to local sandboxes"), path.c_str());
 #endif
          }
-         md = gnash::create_library_movie(url, NULL, false);
+         md = gnash::create_library_movie(url, runInfo, NULL, false);
       }
     }
     catch (GnashException& ge)
@@ -404,8 +433,8 @@ play_movie(const char* filename)
       fprintf(stderr, "%s\n", ge.what());
     }
     if (md == NULL) {
-	fprintf(stderr, "error: can't play movie '%s'\n", filename);
-	exit(1);
+        std::cerr << "error: can't play movie: "<< filename << std::endl;
+	    std::exit(1);
     }
 
     float fps = md->get_frame_rate();
@@ -416,9 +445,10 @@ play_movie(const char* filename)
     log_debug("Will sleep %ld microseconds between iterations - "
             "fps is %g, clockAdvance is %lu", localDelay, fps, clockAdvance);
 
+
     // Use a clock advanced at every iteration to match exact FPS speed.
     ManualClock cl;
-    gnash::movie_root& m = VM::init(*md, cl).getRoot();
+    gnash::movie_root m(*md, cl, runInfo);
     
     // Register processor to receive ActionScript events (Mouse, Stage
     // System etc).
@@ -449,101 +479,104 @@ play_movie(const char* filename)
     size_t nadvances=0;
     // Run through the movie.
     for (;;) {
-	// @@ do we also have to run through all sprite frames
-	// as well?
-	//
-	// @@ also, ActionScript can rescale things
-	// dynamically -- we can't really do much about that I
-	// guess?
-	//
-	// @@ Maybe we should allow the user to specify some
-	// safety margin on scaled shapes.
-	
-	size_t	last_frame = m.get_current_frame();
-	//printf("advancing clock by %lu\n", clockAdvance);
-	cl.advance(clockAdvance);
-	m.advance();
+        // @@ do we also have to run through all sprite frames
+        // as well?
+        //
+        // @@ also, ActionScript can rescale things
+        // dynamically -- we can't really do much about that I
+        // guess?
+        //
+        // @@ Maybe we should allow the user to specify some
+        // safety margin on scaled shapes.
+        
+        size_t	last_frame = m.get_current_frame();
+        //printf("advancing clock by %lu\n", clockAdvance);
+        cl.advance(clockAdvance);
+        m.advance();
 
-	if ( quitrequested ) 
-	{
-		quitrequested = false;
-		return md;
-	}
+        if ( quitrequested ) 
+        {
+            quitrequested = false;
+            return md;
+        }
 
-	m.display(); // FIXME: for which reason are we calling display here ??
-	++nadvances;
-	if ( limit_advances && nadvances >= limit_advances)
-	{
-		log_debug("exiting after %d advances", nadvances);
-		break;
-	}
+        m.display(); // FIXME: for which reason are we calling display here ??
+        ++nadvances;
+        if ( limit_advances && nadvances >= limit_advances)
+        {
+            log_debug("exiting after %d advances", nadvances);
+            break;
+        }
 
-	size_t curr_frame = m.get_current_frame();
-	
-	// We reached the end, done !
-	if (curr_frame >= md->get_frame_count() - 1 )
-	{
-		if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
-		{
-			log_debug("exiting after %d" 
-			       " times last frame was reached", end_hitcount);
-	    		break;
-		}
-	}
+        size_t curr_frame = m.get_current_frame();
+        
+        // We reached the end, done !
+        if (curr_frame >= md->get_frame_count() - 1 )
+        {
+            if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
+            {
+                log_debug("exiting after %d" 
+                       " times last frame was reached", end_hitcount);
+                    break;
+            }
+        }
 
-	// We didn't advance 
-	if (curr_frame == last_frame)
-	{
-		// Max stop counts reached, kick it
-		if ( secondsSinceLastAdvance() > waitforadvance )
-		{
-			stop_count=0;
+        // We didn't advance 
+        if (curr_frame == last_frame)
+        {
+            // Max stop counts reached, kick it
+            if ( secondsSinceLastAdvance() > waitforadvance )
+            {
+                stop_count=0;
 
-			// Kick the movie.
-			if ( last_frame + 1 > md->get_frame_count() -1 )
-			{
-				fprintf(stderr, "Exiting after %g seconds in STOP mode at last frame\n", waitforadvance);
-				break;
-			}
-			fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
-			fflush(stderr);
-			m.goto_frame(last_frame + 1);
-			m.set_play_state(gnash::sprite_instance::PLAY);
-			kick_count++;
+                // Kick the movie.
+                if ( last_frame + 1 > md->get_frame_count() -1 )
+                {
+                    fprintf(stderr, "Exiting after %g seconds in STOP mode at last frame\n", waitforadvance);
+                    break;
+                }
+                fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
+                fflush(stderr);
+                m.goto_frame(last_frame + 1);
+                m.set_play_state(gnash::MovieClip::PLAY);
+                kick_count++;
 
-			if (kick_count > 10) {
-				printf("movie is stalled; giving up on playing it through.\n");
-				break;
-			}
+                if (kick_count > 10) {
+                    printf("movie is stalled; giving up on playing it through.\n");
+                    break;
+                }
 
-	    		resetLastAdvanceTimer(); // It's like we advanced
-		}
-	}
-	
-	// We looped back.  Skip ahead...
-	else if (m.get_current_frame() < last_frame)
-	{
-	    if ( last_frame > latest_frame ) latest_frame = last_frame;
-	    if ( ++loop_back_count > allowloopbacks )
-	    {
-		    log_debug("%d loop backs; jumping one-after "
-				    "latest frame (%d)",
-				    loop_back_count, latest_frame+1);
-		    m.goto_frame(latest_frame + 1);
-		    loop_back_count = 0;
-	    }
-	}
-	else
-	{
-	    kick_count = 0;
-	    stop_count = 0;
-	    resetLastAdvanceTimer();
-	}
+                    resetLastAdvanceTimer(); // It's like we advanced
+            }
+        }
+        
+        // We looped back.  Skip ahead...
+        else if (m.get_current_frame() < last_frame)
+        {
+            if ( last_frame > latest_frame ) latest_frame = last_frame;
+            if ( ++loop_back_count > allowloopbacks )
+            {
+                log_debug("%d loop backs; jumping one-after "
+                        "latest frame (%d)",
+                        loop_back_count, latest_frame+1);
+                m.goto_frame(latest_frame + 1);
+                loop_back_count = 0;
+            }
+        }
+        else
+        {
+            kick_count = 0;
+            stop_count = 0;
+            resetLastAdvanceTimer();
+        }
 
-	log_debug("iteration, timer: %lu, localDelay: %ld\n",
-            cl.elapsed(), localDelay);
-    gnashSleep(localDelay);
+        log_debug("iteration, timer: %lu, localDelay: %ld\n",
+                cl.elapsed(), localDelay);
+        gnashSleep(localDelay);
     }
+ 
+    // Clear resources.
+    gnash::clear();
     
     return md;
 }

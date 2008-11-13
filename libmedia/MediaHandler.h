@@ -41,6 +41,21 @@ namespace gnash {
 }
 
 namespace gnash {
+
+/// Gnash %media handling subsystem (libmedia)
+//
+/// The core Gnash lib will delegate any parsing decoding and encoding
+/// of %media files to the %media subsystem.
+///
+/// The subsystem's entry point is a MediaHandler instance, which acts
+/// as a factory for parsers, decoders and encoders.
+///
+/// Theoretically, it should be possible for actual MediaHandler
+/// implementations to be loaded at runtime, altought this is not yet
+/// implemented at time of writing (2008/10/27).
+///
+/// @todo fix http://wiki.gnashdev.org/wiki/index.php/Libmedia, is obsoleted
+///
 namespace media {
 
 /// The MediaHandler class acts as a factory to provide parser and decoders
@@ -81,7 +96,7 @@ public:
 	///             the sound correctly.
     /// @return     Will always return a valid VideoDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(VideoInfo& info)=0;
+	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info)=0;
 
 	/// Create an AudioDecoder for decoding what's specified in the AudioInfo
 	//
@@ -89,7 +104,7 @@ public:
 	///             the sound correctly.
     /// @return     Will always return a valid AudioDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
-	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(AudioInfo& info)=0;
+	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info)=0;
 
     /// Return the number of bytes padding needed for input buffers
     //
@@ -98,6 +113,21 @@ public:
     virtual size_t getInputPaddingSize() const { return 0; }
 
 protected:
+
+    /// Create an AudioDecoder for FLASH codecs 
+    //
+    /// This method is attempted as a fallback in case
+    /// a mediahandler-specific audio decoder couldn't be created
+    /// for a FLASH codec.
+    /// 
+    /// @throws a MediaException if it can't create a decoder
+    ///
+    /// @param info
+    ///     Informations about the audio. It is *required*
+    ///     for info.type to be media::FLASH (caller should check
+    ///     that before calling this).
+    ///
+    std::auto_ptr<AudioDecoder> createFlashAudioDecoder(const AudioInfo& info);
 
 	/// Return true if input stream is an FLV
 	bool isFLV(IOChannel& stream);

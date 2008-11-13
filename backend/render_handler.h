@@ -155,7 +155,7 @@ namespace gnash {
     class bitmap_info;
     class rect;
     class rgba;
-    class matrix;
+    class SWFMatrix;
     class cxform;
 
     class shape_character_def;
@@ -163,7 +163,9 @@ namespace gnash {
 
     // @@ forward decl to avoid including base/image.h; TODO change the
     // render_handler interface to not depend on these classes at all.
-    namespace image { class ImageBase; class ImageRGB; class ImageRGBA; }
+    class GnashImage;
+    class ImageRGB;
+    class ImageRGBA;
 }
 
 namespace gnash {
@@ -222,7 +224,7 @@ public:
   /// Given an image, returns a pointer to a bitmap_info class
   /// that can later be passed to fill_styleX_bitmap(), to set a
   /// bitmap fill style.
-  virtual bitmap_info*  create_bitmap_info_rgb(image::ImageRGB* im) = 0;
+  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im) = 0;
 
   /// \brief
   /// Given an image, returns a pointer to a bitmap_info class
@@ -231,7 +233,7 @@ public:
   //
   /// This version takes an image with an alpha channel.
   ///
-  virtual bitmap_info*  create_bitmap_info_rgba(image::ImageRGBA* im) = 0;
+  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im) = 0;
 
   /// Draws a video frame. 
   //
@@ -240,20 +242,20 @@ public:
   /// @param frame The RGB video buffer frame.
   ///   Ownership of the buffer is left to the caller.
   ///
-  /// @param mat The matrix with world coordinates used to retrieve the x
-  ///   and y coordinate of the video object. The scaling of the matrix only
+  /// @param mat The SWFMatrix with world coordinates used to retrieve the x
+  ///   and y coordinate of the video object. The scaling of the SWFMatrix only
   ///   refers to the Flash instance, *not* to the video inside that instance.
   ///   When a video object is placed on the stage and the loaded video is
-  ///   smaller, then the matrix is still an "identity matrix". However, if
+  ///   smaller, then the SWFMatrix is still an "identity SWFMatrix". However, if
   ///   the video object is scaled via ActionScript, for example, then the
-  ///   matrix will change. This means the renderer has to find the correct
+  ///   SWFMatrix will change. This means the renderer has to find the correct
   ///   scaling for the video inside the bounds.                                
   ///
   /// @param bounds The minX/minY fields of this rect are always zero. 
   ///   The width and height determine the size of the Flash video instance
-  ///   on the stage (in TWIPS) prior to matrix transformations.         
+  ///   on the stage (in TWIPS) prior to SWFMatrix transformations.         
   ///
-  virtual void drawVideoFrame(image::ImageBase* frame, const matrix* mat, const rect* bounds) = 0;
+  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds) = 0;
 
   /// Sets the update region (called prior to begin_display).
   //
@@ -335,9 +337,9 @@ public:
   ///
   /// @color the color to be used to draw the line strip.
   ///
-  /// @mat the matrix to be used to transform the vertices.
+  /// @mat the SWFMatrix to be used to transform the vertices.
   virtual void  draw_line_strip(const boost::int16_t* coords, int vertex_count,
-      const rgba& color, const matrix& mat) = 0;
+      const rgba& color, const SWFMatrix& mat) = 0;
     
   /// Draw a simple, solid filled polygon with a thin (~1 pixel) outline.
   //
@@ -354,7 +356,7 @@ public:
   /// ignored, otherwise it is respected.
   ///
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline, const matrix& mat, bool masked) = 0;
+    const rgba& fill, const rgba& outline, const SWFMatrix& mat, bool masked) = 0;
     
     
   /// Set line and fill styles for mesh & line_strip rendering.
@@ -398,7 +400,7 @@ public:
     // check if the character needs to be rendered at all
     rect cur_bounds;
 
-    cur_bounds.expand_to_transformed_rect(inst->get_world_matrix(), 
+    cur_bounds.expand_to_transformed_rect(inst->getWorldMatrix(), 
         def->get_bound());
         
     if (!bounds_in_clipping_area(cur_bounds))
@@ -411,7 +413,7 @@ public:
 
     // render the character
     draw_shape_character(def, 
-        inst->get_world_matrix(), 
+        inst->getWorldMatrix(), 
         inst->get_world_cxform(),
         def->get_fill_styles(),
         def->get_line_styles());
@@ -456,7 +458,7 @@ public:
   /// Draws the given character definition with the given transformations and
   /// styles. 
   virtual void draw_shape_character(shape_character_def *def, 
-    const matrix& mat,
+    const SWFMatrix& mat,
     const cxform& cx,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) = 0;
@@ -475,7 +477,7 @@ public:
   /// @param mat
   ///
   /// @param color
-  virtual void draw_glyph(shape_character_def *def, const matrix& mat,
+  virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
     const rgba& color) = 0;
 
   /// This function returns the color at any position in the stage. It is used

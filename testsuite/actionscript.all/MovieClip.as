@@ -43,19 +43,39 @@ printMatrix = function(m, roundToDecimal)
 Object.prototype.hasOwnProperty = ASnative(101, 5);
 #endif
 
-xcheck(MovieClip.prototype.hasOwnProperty("blendMode"));
+check(MovieClip.prototype.hasOwnProperty("attachAudio"));
+check(MovieClip.prototype.hasOwnProperty("attachVideo"));
+check(MovieClip.prototype.hasOwnProperty("getDepth"));
+check(MovieClip.prototype.hasOwnProperty("setMask"));
+check(MovieClip.prototype.hasOwnProperty("createEmptyMovieClip"));
+check(MovieClip.prototype.hasOwnProperty("beginFill"));
+check(MovieClip.prototype.hasOwnProperty("beginGradientFill"));
+check(MovieClip.prototype.hasOwnProperty("moveTo"));
+check(MovieClip.prototype.hasOwnProperty("lineTo"));
+check(MovieClip.prototype.hasOwnProperty("curveTo"));
+check(MovieClip.prototype.hasOwnProperty("lineStyle"));
+check(MovieClip.prototype.hasOwnProperty("endFill"));
+check(MovieClip.prototype.hasOwnProperty("clear"));
+check(MovieClip.prototype.hasOwnProperty("createTextField"));
+check(MovieClip.prototype.hasOwnProperty("getTextSnapshot")); 
+check(MovieClip.prototype.hasOwnProperty("blendMode"));
 check(MovieClip.prototype.hasOwnProperty("attachBitmap"));
-xcheck(MovieClip.prototype.hasOwnProperty("cacheAsBitmap"));
+check(MovieClip.prototype.hasOwnProperty("cacheAsBitmap"));
 check(MovieClip.prototype.hasOwnProperty("enabled"));
-xcheck(MovieClip.prototype.hasOwnProperty("filters"));
-xcheck(MovieClip.prototype.hasOwnProperty("forceSmoothing"));
-xcheck(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
-xcheck(MovieClip.prototype.hasOwnProperty("scale9Grid"));
-xcheck(MovieClip.prototype.hasOwnProperty("scrollRect"));
-xcheck(MovieClip.prototype.hasOwnProperty("tabIndex"));
+check(MovieClip.prototype.hasOwnProperty("filters"));
+check(MovieClip.prototype.hasOwnProperty("forceSmoothing"));
+check(MovieClip.prototype.hasOwnProperty("opaqueBackground"));
+check(MovieClip.prototype.hasOwnProperty("scale9Grid"));
+check(MovieClip.prototype.hasOwnProperty("scrollRect"));
+check(MovieClip.prototype.hasOwnProperty("tabIndex"));
 check(MovieClip.prototype.hasOwnProperty("transform"));
 check(MovieClip.prototype.hasOwnProperty("useHandCursor"));
 check(MovieClip.prototype.hasOwnProperty("_lockroot"));
+check(MovieClip.prototype.hasOwnProperty("beginBitmapFill"));
+check(MovieClip.prototype.hasOwnProperty("getRect"));
+check(MovieClip.prototype.hasOwnProperty("lineGradientStyle"));
+check(MovieClip.prototype.hasOwnProperty("getInstanceAtDepth"));
+check(MovieClip.prototype.hasOwnProperty("getNextHighestDepth"));
 
 check(!MovieClip.prototype.hasOwnProperty("focusEnabled"));
 check(!MovieClip.prototype.hasOwnProperty("hitArea"));
@@ -91,19 +111,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(276); // SWF5
+	check_totals(321); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(725); // SWF6
+	check_totals(800); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(742); // SWF7
+	check_totals(817); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(800); // SWF8+
+	check_totals(889); // SWF8+
 #endif
 
 	play();
@@ -441,6 +461,47 @@ xcheck(!mc.hasOwnProperty("_framesloaded"));
 check(!mc.hasOwnProperty("_lockroot"));
 xcheck(!mc.hasOwnProperty("_highquality"));
 #endif //if OUTPUT_VERSION >= 6
+
+//----------------------------------------------
+// Test _soundbuftime
+//----------------------------------------------
+
+check_equals(mc._soundbuftime, _soundbuftime);
+xcheck_equals(mc._soundbuftime, 5);
+xcheck_equals(_soundbuftime, 5);
+
+mc._soundbuftime = 20;
+xcheck_equals(mc._soundbuftime, 20);
+xcheck_equals(_soundbuftime, 20);
+
+mc._soundbuftime = -20;
+xcheck_equals(mc._soundbuftime, -20);
+xcheck_equals(_soundbuftime, -20);
+
+mc._soundbuftime = 0;
+check_equals(mc._soundbuftime, 0);
+check_equals(_soundbuftime, 0);
+
+mc._soundbuftime = 1.5;
+xcheck_equals(mc._soundbuftime, 1);
+xcheck_equals(_soundbuftime, 1);
+
+o = {};
+
+mc._soundbuftime = o;
+xcheck_equals(mc._soundbuftime, 1);
+xcheck_equals(_soundbuftime, 1);
+
+o.valueOf = function() { return 4; };
+
+mc._soundbuftime = o;
+xcheck_equals(mc._soundbuftime, 4);
+xcheck_equals(_soundbuftime, 4);
+
+mc._soundbuftime = "string";
+xcheck_equals(mc._soundbuftime, 4);
+xcheck_equals(_soundbuftime, 4);
+
 
 //----------------------------------------------
 // Test createEmptyMovieClip
@@ -1053,16 +1114,41 @@ with (draw)
 }
 check_equals(draw._width, 10);
 check_equals(draw._height, 20);
+
+// getRect and getBounds are the same in this case.
+
+c = draw.getRect();
+
+#if OUTPUT_VERSION < 8
+check_equals(c.xMin, undefined);
+#else
+xcheck_equals(c.xMin, 10);
+xcheck_equals(c.xMax, 20);
+xcheck_equals(c.yMin, 10);
+xcheck_equals(c.yMax, 30);
+#endif
+
 b = draw.getBounds();
 check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
 check_equals(b.yMin, 10);
 check_equals(b.yMax, 30);
+
 b = draw.getBounds(container);
 check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
 check_equals(b.yMin, 10);
 check_equals(b.yMax, 30);
+
+c = draw.getRect(container);
+#if OUTPUT_VERSION < 8
+check_equals(c.xMin, undefined);
+#else
+xcheck_equals(c.xMin, 10);
+xcheck_equals(c.xMax, 20);
+xcheck_equals(c.yMin, 10);
+xcheck_equals(c.yMax, 30);
+#endif
 
 draw._x += 20;
 b = draw.getBounds();
@@ -1339,6 +1425,47 @@ with (draw)
  check_equals(draw._height, 30);
 #endif
 
+// Test effects of setting _width of a 0-size character
+createEmptyMovieClip("draw4", 14);
+check_equals(draw4._width, 0);
+check_equals(draw4._xscale, 100);
+check_equals(draw4._yscale, 100);
+draw4._width = 10; // setting _width affects _yscale too !!
+check_equals(draw4._width, 0);
+check(!isNaN(draw4._xscale));
+check_equals(typeof(draw4._xscale), 'number');
+check_equals(draw4._xscale, 0); 
+check(!isNaN(draw4._yscale));
+check_equals(typeof(draw4._yscale), 'number');
+xcheck_equals(draw4._yscale, 0); 
+with (draw4)
+{
+    lineStyle(0, 0x000000);
+    moveTo(10, 10);
+    lineTo(10, 30);
+    lineTo(20, 30);
+    lineTo(20, 10);
+    lineTo(10, 10);
+}
+check_equals(draw4._width, 0); 
+xcheck_equals(draw4._height, 0);
+check_equals(draw4._xscale, 0);
+xcheck_equals(draw4._yscale, 0);
+draw4._width = 10;
+check_equals(draw4._width, 10);
+xcheck_equals(draw4._height, 0);
+check_equals(draw4._xscale, 100);
+xcheck_equals(draw4._yscale, 0);
+draw4._yscale = 100;
+check_equals(draw4._width, 10);
+check_equals(draw4._height, 20);
+check_equals(draw4._xscale, 100);
+check_equals(draw4._yscale, 100);
+draw4._width = 20; // setting _width does NOT affect _yscale here
+check_equals(draw4._xscale, 200);
+check_equals(draw4._yscale, 100);
+
+
 // TODO: check bounds of non-scaled strokes 
 //       relative to a container which is scaled
 
@@ -1454,8 +1581,8 @@ Matrix = flash.geom.Matrix;
 check(_root.transform instanceOf Object);
 check(!_root.transform instanceOf Matrix);
 temp = _root.transform;
-props = []; for (var i in temp) props.push(i); props.sort();
-check_equals(props.toString(), "colorTransform,concatenatedColorTransform,concatenatedMatrix,matrix,pixelBounds");
+props = []; for (var i in temp) props.push(i);
+check_equals(props.toString(), "pixelBounds,concatenatedColorTransform,colorTransform,concatenatedMatrix,matrix");
 
 check_equals(typeof(_root.transform.colorTransform), 'object');
 // TODO: test colorTransform
@@ -1483,14 +1610,17 @@ _root._x = 30;
 _root._y = 20;
 
 check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=30, ty=20)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=27, y=27, w=799, h=842)");
 
 _root._xscale = -300; 
 
 check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=1, tx=30, ty=20)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2361, y=27, w=2397, h=842)");
 
 _root._yscale = -200;
 
 check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=30, ty=20)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2361, y=-1671, w=2397, h=1684)");
 
 _root._rotation = -90;
 
@@ -1500,24 +1630,28 @@ check_equals(_root.transform.matrix.c, -2);
 check_equals(_root.transform.matrix.d, 0);
 check_equals(_root.transform.matrix.tx, 30);
 check_equals(_root.transform.matrix.ty, 20);
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-1663, y=16, w=1684, h=2397)");
 // TODO: test concatenatedMatrix
 
 _root.transform.matrix.ty = 300;
 check_equals(_root._y, 20); // changing the AS matrix doesn't change the actual matrix
 
 check_equals(_root.transform.matrix.toString(), "(a=0, b=3, c=-2, d=0, tx=30, ty=20)");
-
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-1663, y=16, w=1684, h=2397)");
 _root._x = _root._y = _root._rotation = 0;
 
 check_equals(_root.transform.matrix.toString(), "(a=-3, b=0, c=0, d=-2, tx=0, ty=0)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2391, y=-1691, w=2397, h=1684)");
 
 _root._xscale = 100;
 
 check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=-2, tx=0, ty=0)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2, y=-1691, w=799, h=1684)");
 
 _root._yscale = 100;
 
 check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0)");
+xcheck_equals(_root.transform.pixelBounds.toString(), "(x=-2, y=7, w=799, h=842)");
 
 OldTransform = flash.geom.Transform;
 
@@ -1531,7 +1665,6 @@ check_equals(_root.transform.matrix.toString(), "(a=1, b=0, c=0, d=1, tx=0, ty=0
 
 flash.geom.Transform = OldTransform;
 check_equals(_root.transform.toString(), "[object Object]");
-
 
 #endif
 
@@ -1868,6 +2001,65 @@ check_equals(typeof(ret), 'undefined');
 	};
 	//dataLoadInterval = setInterval(onData, 1000);
 	dataLoadInterval = setInterval(onDataCheck, 1000);
+#endif
+
+
+/// loadVariables always calls MovieClip.meth
+backup = _root.meth;
+
+mcm = 0;
+_root.meth = function() { mcm++; };
+_root.loadVariables("", "", "post");
+check_equals(mcm, 1);
+_root.loadVariables("", "");
+check_equals(mcm, 2);
+_root.loadVariables("");
+check_equals(mcm, 3);
+_root.loadVariables();
+check_equals(mcm, 4);
+
+_root.meth = backup;
+
+//----------------------------------------------------------
+// Test getURL a bit
+//----------------------------------------------------------
+
+/// getURL calls MovieClip.meth.
+backup = _root.meth;
+
+mcm = 0;
+_root.meth = function() { mcm++; };
+_root.getURL("", "", "post");
+check_equals(mcm, 1);
+_root.getURL("", "");
+check_equals(mcm, 2);
+_root.getURL("");
+check_equals(mcm, 3);
+_root.getURL();
+check_equals(mcm, 4);
+
+_root.meth = backup;
+
+//----------------------------------------------------------
+// Test loadMovie a bit
+//----------------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+
+mcdump = _root.createEmptyMovieClip("mcdump", getNextHighestDepth());
+
+mcm = 0;
+mcdump.meth = function() { mcm++; };
+
+mcdump.loadMovie(o, o, o);
+check_equals(mcm, 1);
+mcdump.loadMovie(o, o);
+check_equals(mcm, 2);
+mcdump.loadMovie(o);
+check_equals(mcm, 3);
+mcdump.loadMovie();
+check_equals(mcm, 4);
+
 #endif
 
 /// Depth tests for createEmptyMovieClip, which was introduced

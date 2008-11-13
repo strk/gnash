@@ -21,7 +21,7 @@
 #include "ControlTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 #include "action_buffer.h" // for composition
-#include "sprite_instance.h" // for inlines
+#include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
 
 // Forward declarations
@@ -52,7 +52,7 @@ public:
             m_buf.read(in, in.get_tag_end_position());
 	}
 
-	virtual void execute(sprite_instance* m, DisplayList& /* dlist */) const
+	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
 	{
 	    	m->add_action_buffer(&m_buf);
 	}
@@ -63,7 +63,8 @@ public:
 	    return true;
 	}
 
-	static void doActionLoader(SWFStream& in, tag_type tag, movie_definition& m)
+	static void doActionLoader(SWFStream& in, tag_type tag,
+            movie_definition& m, const RunInfo& /*r*/)
 	{
 		DoActionTag* da = new DoActionTag(m);
 		da->read(in);

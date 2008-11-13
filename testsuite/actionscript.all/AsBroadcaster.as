@@ -156,6 +156,14 @@ check_equals(o._listeners.pushCalled, true);
 check_equals(o._listeners.length, 2);
 check_equals(o._listeners.spliceCalled, true);
 
+dang = createEmptyMovieClip('dangling', 1);
+check_equals(typeof(dang.addListener), 'undefined');
+dang.removeMovieClip();
+AsBroadcaster.initialize(dang); // can't initialize a dangling thing
+check_equals(typeof(dang.addListener), 'undefined');
+createEmptyMovieClip('dangling', 2);
+AsBroadcaster.initialize(dang); // but can initialize a rebound thing
+check_equals(typeof(dang.addListener), 'function');
 
 //--------------------------------
 // A bit more sane calls...
@@ -304,6 +312,6 @@ check_equals(o.msg, "AB");
 // See swfdec/test/trace/asbroadcaster-override.as for more info
 //-----------------------------------------------------------------------------------
 
-check_totals(108);
+check_totals(111);
 
 #endif // OUTPUT_VERSION < 6

@@ -35,9 +35,10 @@ edit = sed \
 	-e 's|@DEFAULT_FLASH_MAJOR_VERSION[@]|$(DEFAULT_FLASH_MAJOR_VERSION)|g' \
 	-e 's|@DEFAULT_FLASH_MINOR_VERSION[@]|$(DEFAULT_FLASH_MINOR_VERSION)|g' \
 	-e 's|@DEFAULT_FLASH_REV_NUMBER[@]|$(DEFAULT_FLASH_REV_NUMBER)|g' \
-	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' 
+	-e 's|@DEFAULT_STREAMS_TIMEOUT[@]|$(DEFAULT_STREAMS_TIMEOUT)|g' \
+	-e 's|@DEFAULT_SOL_SAFEDIR[@]|$(DEFAULT_SOL_SAFEDIR)|g' 
 
-gnashrc: gnashrc.in
+gnashrc: gnashrc.in Makefile
 	$(edit) '$(srcdir)/$@.in' >$@
 
 gnashpluginrc: gnashpluginrc.in
@@ -55,7 +56,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I$(top_srcdir)/libcore/swf	\
 	$(PTHREAD_CFLAGS) \
 	$(LIBXML_CFLAGS) \
-	$(LIBPNG_CFLAGS) \
+	$(PNG_CFLAGS) \
 	$(GIF_CFLAG) \
 	$(GLIB_CFLAGS) \
 	$(GSTREAMER_CFLAGS) \
@@ -71,7 +72,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 
 libgnashbase_la_LIBADD = \
 	$(JPEG_LIBS) \
-	$(LIBPNG_LIBS) \
+	$(PNG_LIBS) \
 	$(GIF_LIBS) \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
@@ -81,6 +82,10 @@ libgnashbase_la_LIBADD = \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
+
+if WIN32
+  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
+endif
 
 # Maybe use jemalloc, which handles memory fragmentation for
 # ECAMscript languages better than the regular system malloc.
@@ -94,11 +99,9 @@ endif
 
 libgnashbase_la_SOURCES = \
 	extension.cpp \
-	image.cpp \
 	$(MALLOC) \
+	GnashImage.cpp \
 	GnashImageJpeg.cpp \
-	GnashImagePng.cpp \
-	GnashImageGif.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -120,17 +123,21 @@ libgnashbase_la_SOURCES = \
 	arg_parser.cpp \
 	$(NULL)
 
+if USE_PNG
+libgnashbase_la_SOURCES += GnashImagePng.cpp
+endif
+if USE_GIF
+libgnashbase_la_SOURCES += GnashImageGif.cpp
+endif
+
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	SimpleBuffer.h \
 	extension.h \
 	GnashException.h \
 	gettext.h \
-	image.h	\
 	jemtree.h \
 	GnashImage.h \
-	GnashImagePng.h \
-	GnashImageGif.h \
 	GnashImageJpeg.h \
 	GnashSleep.h \
 	gmemory.h \
@@ -165,7 +172,20 @@ noinst_HEADERS = \
 	snappingrange.h \
 	$(NULL)
 
+if USE_PNG
+noinst_HEADERS += GnashImagePng.h
+endif
+if USE_GIF
+noinst_HEADERS += GnashImageGif.h
+endif
+
+
 libgnashbase_la_LDFLAGS = -release $(VERSION)
+
+if WIN32
+  libgnashbase_la_LDFLAGS += -no-undefined
+  libgnashbase_la_LIBADD += -lws2_32 -lwinmm
+endif
 
 if !LIBLTDL2
 libltdlc_la_CPPFLAGS = $(LTDLINCL) -I$(top_srcdir)/libltdl

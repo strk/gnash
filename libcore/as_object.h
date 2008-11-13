@@ -42,7 +42,7 @@
 // Forward declarations
 namespace gnash {
 	class as_function;
-	class sprite_instance;
+	class MovieClip;
 	class character;
 	class as_environment;
 	class VM;
@@ -129,7 +129,11 @@ class DSOEXPORT as_object
 	friend class asClass;
 	friend class Machine;
 
-	typedef std::set<std::pair<string_table::key, string_table::key> > propNameSet;
+	typedef std::set<std::pair<string_table::key, string_table::key> >
+        propNameSet;
+
+    typedef PropertyList::SortedPropertyList SortedPropertyList;
+
 private:
 	/// Properties of this objects 
 	PropertyList _members;
@@ -161,6 +165,9 @@ public:
 	///
 	/// @param name
 	/// The string id to look for
+    ///
+	/// @param nsname
+	/// The namespace id to look for, 0 for any.
 	///
 	/// @param owner
 	/// If not null, this is set to the object which contained the property.
@@ -188,7 +195,7 @@ public:
 	///
 	void dump_members();
 
-	/// Dump all properties into the given map
+	/// Dump all properties into the given container
 	//
 	/// Note that this method is non-const
 	/// as some properties might be getter/setter
@@ -534,9 +541,21 @@ public:
 	/// The arguments are the same as the above init_property arguments,
 	/// although the setter argument is omitted.
 	///
+	/// @param key
+    ///     Property name id
+    ///
+    /// @param getter
+    ///     The getter function
+    ///
+    /// @param flags
+    ///     Property flags
+    ///
 	/// @param nsname
-	/// The id of the namespace to which this member belongs. 0 is a wildcard
-	/// and will be matched by anything not asking for a specific namespace.
+	///     The id of the namespace to which this member belongs.
+    ///     0 is a wildcard and will be matched by anything not asking
+    ///     for a specific namespace.
+    ///
+    ///
 	void init_readonly_property(const std::string& key, as_function& getter,
 			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
@@ -545,7 +564,6 @@ public:
 			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 
-	/// \brief
 	/// Use this method for read-only properties.
 	//
 	/// This method achieves the same as the above init_property method.
@@ -556,9 +574,20 @@ public:
 	/// The arguments are the same as the above init_property arguments,
 	/// although the setter argument is omitted.
 	///
+	/// @param key
+    ///     Property name id
+    ///
+    /// @param getter
+    ///     The getter function
+    ///
+    /// @param flags
+    ///     Property flags
+    ///
 	/// @param nsname
-	/// The id of the namespace to which this member belongs. 0 is a wildcard
-	/// and will be matched by anything not asking for a specific namespace.
+	///     The id of the namespace to which this member belongs.
+    ///     0 is a wildcard and will be matched by anything not asking
+    ///     for a specific namespace.
+    ///
 	void init_readonly_property(const std::string& key, as_c_function_ptr getter,
 			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
@@ -689,12 +718,6 @@ public:
 	///	if the current VM is initialized for a  target
 	///	up to SWF6.
 	///
-	/// @param env
-	///	The environment to use for setting up call frame stack
-	///
-	/// @param nargs
-	///	Number of arguments
-	///
 	/// @param ...
 	///	nargs as_value references
 	///
@@ -712,7 +735,7 @@ public:
 	//
 	/// This function does *not* recurse in this object's prototype.
 	///
-	/// @parame name
+	/// @param name
 	///     Name of the property.
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
@@ -735,7 +758,7 @@ public:
 	//
 	/// This function does *not* recurse in this object's prototype.
 	///
-	/// @parame name
+	/// @param name
 	///     Name of the property.
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
@@ -752,7 +775,7 @@ public:
 
 	/// Return true if this object has the named property
 	//
-	/// @parame name
+	/// @param name
 	///     Name of the property.
 	///	Case insensitive up to SWF6,
 	///	case *sensitive* from SWF7 up.
@@ -815,9 +838,9 @@ public:
 			int setTrue, int setFalse=0, string_table::key nsname = 0);
 
 	/// Cast to a sprite, or return NULL
-	virtual sprite_instance* to_movie() { return NULL; }
+	virtual MovieClip* to_movie() { return NULL; }
 
-	const sprite_instance* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
+	const MovieClip* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
 
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
@@ -911,7 +934,7 @@ public:
 	/// to avoid loops in prototype chain. 
 	/// NOTE: the MM player just chokes in this case (loop)
 	///
-	void enumerateProperties(std::map<std::string, std::string>& to) const;
+	void enumerateProperties(SortedPropertyList& to) const;
 
 	/// Get url-encoded variables
 	//
@@ -997,7 +1020,7 @@ public:
 	//
 	/// There is no point to make this function
 	/// protected or private, as a call to the
-	/// public: set_member("__proto__", <anyting>)
+	/// public: set_member("__proto__", anyting)
 	/// will do just the same
 	///
 	void set_prototype(boost::intrusive_ptr<as_object> proto, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
@@ -1063,9 +1086,11 @@ private:
 	TriggerContainer _trigs;
 };
 
-/// Template which does a dynamic cast for as_object pointers. It throws an
-/// exception if the dynamic cast fails.
-/// @param T the class to which the obj pointer should be cast.
+/// Template which does a dynamic cast for as_object pointers.
+//
+/// It throws an exception if the dynamic cast fails.
+///
+/// @tparam T the class to which the obj pointer should be cast.
 /// @param obj the pointer to be cast.
 /// @return If the cast succeeds, the pointer cast to the requested type.
 ///         Otherwise, NULL.

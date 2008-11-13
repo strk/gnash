@@ -22,9 +22,10 @@
 #define GNASH_FILL_STYLE_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "matrix.h"
+#include "SWFMatrix.h"
 #include "bitmap_character_def.h"
 #include "swf.h"
+#include "RGBA.h" // for rgba type
 
 #include <vector> // for composition
 
@@ -74,9 +75,9 @@ public:
 	///	The bitmap character definition to use with this bitmap fill.
 	///
 	/// @param mat
-	///	The matrix to apply to the bitmap.
+	///	The SWFMatrix to apply to the bitmap.
 	///
-	fill_style(bitmap_character_def* bitmap, const matrix& mat);
+	fill_style(bitmap_character_def* bitmap, const SWFMatrix& mat);
 
 	void setSolid(const rgba& color);
 
@@ -86,11 +87,11 @@ public:
 	///	Gradient records.
 	///
 	/// @param mat
-	///	Gradient matrix.
+	///	Gradient SWFMatrix.
 	///
 	///
 	void setLinearGradient(const std::vector<gradient_record>& gradients, 
-			const matrix& mat);
+			const SWFMatrix& mat);
 
 	/// Turn this fill style into a radial gradient
 	//
@@ -98,11 +99,11 @@ public:
 	///	Gradient records.
 	///
 	/// @param mat
-	///	Gradient matrix.
+	///	Gradient SWFMatrix.
 	///
 	///
 	void setRadialGradient(const std::vector<gradient_record>& gradients,
-			const matrix& mat);
+			const SWFMatrix& mat);
 
 	/// Turn this fill style into a focal gradient
 	//
@@ -110,13 +111,13 @@ public:
 	///	Gradient records.
 	///
 	/// @param mat
-	///	Gradient matrix.
+	///	Gradient SWFMatrix.
 	///
 	/// @param fpoint
 	///	Focal point.
 	///
 	void setRadialGradient(const std::vector<gradient_record>& gradients,
-			const matrix& mat, float fpoint);
+			const SWFMatrix& mat, float fpoint);
 
 	~fill_style() {}
 	
@@ -172,11 +173,11 @@ public:
 	///
 	bitmap_info* get_bitmap_info() const;
 	
-	/// Returns the bitmap transformation matrix
-	matrix get_bitmap_matrix() const; 
+	/// Returns the bitmap transformation SWFMatrix
+	SWFMatrix getBitmapMatrix() const; 
 	
-	/// Returns the gradient transformation matrix
-	matrix get_gradient_matrix() const; 
+	/// Returns the gradient transformation SWFMatrix
+	SWFMatrix getGradientMatrix() const; 
 	
 	/// Returns the number of color stops in the gradient
 	int get_color_stop_count() const;
@@ -211,17 +212,16 @@ private:
 	rgba sample_gradient(boost::uint8_t ratio) const;
 
 	friend class morph2_character_def;
-	friend class triangulating_render_handler;
 	
 	/// Fill type, see SWF::fill_style_type
 	int	m_type;
 	rgba	m_color;
-	matrix	m_gradient_matrix;
+	SWFMatrix	m_gradient_matrix;
     float m_focal_point; // For focal fill gradients.
 	std::vector<gradient_record>	m_gradients;
 	boost::intrusive_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
 	boost::intrusive_ptr<bitmap_character_def>	m_bitmap_character;
-	matrix	m_bitmap_matrix;
+	SWFMatrix	m_bitmap_matrix;
 
 	SWF::gradient_spread_mode m_spread_mode;
 	SWF::gradient_interpolation_mode m_interpolation;

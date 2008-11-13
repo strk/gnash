@@ -44,7 +44,7 @@ public:
 	typedef unsigned char byte;
 
 	/// Ownership of buffer left to caller
-	BitsReader(byte* input, size_t len)
+	BitsReader(const byte* input, size_t len)
 		:
 		start(input),
 		ptr(start),
@@ -178,13 +178,13 @@ private:
 	}
 
 	/// Pointer to first byte
-	byte* start;
+	const byte* start;
 
 	/// Pointer to current byte
-	byte* ptr;
+	const byte* ptr;
 
 	/// Pointer to one past last byte
-	byte* end;
+	const byte* end;
 
 	/// Number of used bits in current byte
 	unsigned usedBits;

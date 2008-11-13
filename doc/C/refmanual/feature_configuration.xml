@@ -249,6 +249,11 @@
 	  </entry>
 	</row>
 	<row>
+	  <entry><option>--disable-sa-launcher</option></entry>
+	  <entry>Drops the NPAPI plugin support for writing a standalone executable launcher script for the currently playing SWF movie to <filename>/tmp</filename>. Note that you'll still need to add a 'writelauncher' string to your GNASH_OPTIONS environment variable for the script to be created, even if the compile-time support is enabled.
+	  </entry>
+	</row>
+	<row>
 	  <entry><option>--disable-mit-shm</option>
 	  </entry>
 	  <entry>Disable support for the MIT-SHM X extensions.

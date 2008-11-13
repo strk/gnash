@@ -52,12 +52,12 @@ namespace gnash {
 std::auto_ptr<VM> VM::_singleton;
 
 VM&
-VM::init(movie_definition& movie, VirtualClock& clock)
+VM::init(int version, movie_root& root, VirtualClock& clock)
 {
 	// Don't call more then once !
 	assert(!_singleton.get());
 
-	_singleton.reset(new VM(movie, clock));
+	_singleton.reset(new VM(version, root, clock));
 
 	assert(_singleton.get());
 	NSV::loadStrings(_singleton->mStringTable, _singleton->getSWFVersion());
@@ -83,18 +83,16 @@ VM::isInitialized()
 	return _singleton.get();
 }
 
-VM::VM(movie_definition& topmovie, VirtualClock& clock)
+VM::VM(int version, movie_root& root, VirtualClock& clock)
 	:
-	_root_movie(new movie_root(*this)),
-	_swfversion(topmovie.get_version()),
-	_swfurl(topmovie.get_url()),
+    _rootMovie(root),
+	_swfversion(version),
 	mMachine(0),
 	_clock(clock),
 	_stack(),
     _shLib(new SharedObjectLibrary(*this))
 {
 	_clock.restart();
-	assert(!_swfurl.empty());
 }
 
 VM::~VM()
@@ -116,12 +114,6 @@ int
 VM::getSWFVersion() const
 {
 	return _swfversion;
-}
-
-const std::string&
-VM::getSWFUrl() const
-{
-	return _swfurl;
 }
 
 VM::RNG&
@@ -202,7 +194,7 @@ VM::getSystemLanguage()
 movie_root&
 VM::getRoot() const
 {
-	return *_root_movie;
+	return _rootMovie;
 }
 
 /*public*/
@@ -231,7 +223,7 @@ VM::markReachableResources() const
 {
 #ifdef GNASH_USE_GC
 
-	_root_movie->markReachableResources();
+	_rootMovie.markReachableResources();
 
 	_global->setReachable();
 

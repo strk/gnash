@@ -30,7 +30,7 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
-#include "sprite_instance.h" // For MovieClip
+#include "MovieClip.h" // For MovieClip
 #include "ColorTransform_as.h"
 
 #include <sstream>
@@ -52,18 +52,18 @@ attachTransformInterface(as_object& o)
 {
     const int protectedFlags = as_prop_flags::isProtected;
 
+    o.init_property("matrix",
+            Transform_matrix_getset,
+            Transform_matrix_getset, protectedFlags);
+    o.init_property("concatenatedMatrix",
+            Transform_concatenatedMatrix_getset,
+            Transform_concatenatedMatrix_getset, protectedFlags);
     o.init_property("colorTransform",
             Transform_colorTransform_getset,
             Transform_colorTransform_getset, protectedFlags);
     o.init_property("concatenatedColorTransform",
             Transform_concatenatedColorTransform_getset,
             Transform_concatenatedColorTransform_getset, protectedFlags);
-    o.init_property("concatenatedMatrix",
-            Transform_concatenatedMatrix_getset,
-            Transform_concatenatedMatrix_getset, protectedFlags);
-    o.init_property("matrix",
-            Transform_matrix_getset,
-            Transform_matrix_getset, protectedFlags);
     o.init_property("pixelBounds",
             Transform_pixelBounds_getset,
             Transform_pixelBounds_getset, protectedFlags);
@@ -99,20 +99,20 @@ class Transform_as: public as_object
 
 public:
 
-	Transform_as(sprite_instance& movieClip)
+	Transform_as(MovieClip& movieClip)
 		:
 		as_object(getTransformInterface()),
 		_movieClip(movieClip)
 	{}
 
-    const matrix& getMatrix() const { return _movieClip.get_matrix(); }
+    const SWFMatrix& getMatrix() const { return _movieClip.getMatrix(); }
     const cxform& getColorTransform() const { return _movieClip.get_cxform(); }
-    void setMatrix(const matrix& mat) { _movieClip.set_matrix(mat); }
+    void setMatrix(const SWFMatrix& mat) { _movieClip.setMatrix(mat); }
     void setColorTransform(const cxform& cx) { _movieClip.set_cxform(cx); }
 
 protected:
 
-    void markReachableResources()
+    void markReachableResources() const
     {
         _movieClip.setReachable();
         markAsObjectReachable();
@@ -120,7 +120,7 @@ protected:
 
 private:
 
-    sprite_instance& _movieClip;
+    MovieClip& _movieClip;
 
 };
 
@@ -359,7 +359,7 @@ Transform_matrix_getset(const fn_call& fn)
         }
 
         std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
-        const matrix& m = ptr->getMatrix();
+        const SWFMatrix& m = ptr->getMatrix();
 
         args->push_back(m.sx / factor);
         args->push_back(m.shx / factor);
@@ -407,7 +407,7 @@ Transform_matrix_getset(const fn_call& fn)
     obj->get_member(NSV::PROP_TX, &tx);
     obj->get_member(NSV::PROP_TY, &ty);
 
-    matrix m;
+    SWFMatrix m;
     m.sx = a.to_number() * factor;
     m.shx = b.to_number() * factor;
     m.shy = c.to_number() * factor;
@@ -455,7 +455,7 @@ Transform_ctor(const fn_call& fn)
 	}
 
     // TODO: does this have to be a MovieClip or can it be any character?
-    boost::intrusive_ptr<sprite_instance> mc = ensureType<sprite_instance>(fn.arg(0).to_object());
+    boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.arg(0).to_object());
 
 	boost::intrusive_ptr<as_object> obj = new Transform_as(*mc);
 

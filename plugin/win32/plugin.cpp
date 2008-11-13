@@ -407,7 +407,7 @@ nsPluginInstance::threadMain(void)
     DBG("Gnash logging initialized: %s\n", logfilename.c_str());
 
     // Init sound.
-    _sound_handler.reset(gnash::media::create_sound_handler_sdl());
+    _sound_handler.reset(gnash::sound::create_sound_handler_sdl());
     gnash::set_sound_handler(_sound_handler.get());
     DBG("Gnash sound initialized.\n");
 
@@ -468,7 +468,10 @@ nsPluginInstance::threadMain(void)
     
     // Register this plugin as listener for FsCommands from the core
     // (movie_root)
+#if 0
+    /* Commenting out for now as registerFSCommandCallback() has changed. */
     root.registerFSCommandCallback(FSCommand_callback);
+#endif
     
     // Register a static function to handle ActionScript events such
     // as Mouse.hide, Stage.align etc.
@@ -507,7 +510,7 @@ nsPluginInstance::threadMain(void)
         // DBG("Ensuring frame is loaded.\n");
         root.get_movie_definition()->ensure_frame_loaded(tot_frames);
         // DBG("Setting play state to PLAY.\n");
-        root.set_play_state(gnash::sprite_instance::PLAY);
+        root.set_play_state(gnash::MovieClip::PLAY);
 
         if (old_mouse_x != mouse_x || old_mouse_y != mouse_y) {
             old_mouse_x = mouse_x;
@@ -575,7 +578,7 @@ nsPluginInstance::getVersion()
 }
 
 void
-nsPluginInstance::FSCommand_callback(gnash::sprite_instance* movie, const std::string& command, const std::string& args)
+nsPluginInstance::FSCommand_callback(gnash::MovieClip* movie, const std::string& command, const std::string& args)
 // For handling notification callbacks from ActionScript.
 {
     gnash::log_debug(_("FSCommand_callback(%p): %s %s"), (void*) movie, command, args);

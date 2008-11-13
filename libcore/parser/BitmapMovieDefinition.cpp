@@ -23,7 +23,7 @@
 #include "fill_style.h"
 #include "shape.h" // for class path and class edge
 #include "render.h" // for ::display
-#include "image.h"
+#include "GnashImage.h"
 #include "log.h"
 
 namespace gnash {
@@ -50,8 +50,8 @@ BitmapMovieDefinition::getShapeDef()
 
 	// Add the bitmap fill style (fill style 0)
 
-	matrix mat;
-	mat.set_scale(1.0/20, 1.0/20); // bitmap fills get matrix reversed
+	SWFMatrix mat;
+	mat.set_scale(1.0/20, 1.0/20); // bitmap fills get SWFMatrix reversed
 	fill_style bmFill(_bitmap.get(), mat);
 	const size_t fillLeft = _shapedef->add_fill_style(bmFill);
 
@@ -81,11 +81,11 @@ BitmapMovieDefinition::getShapeDef()
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(
-		std::auto_ptr<image::ImageBase> image,
+		std::auto_ptr<GnashImage> image,
 		const std::string& url)
 	:
 	_version(6),
-	// image::ImageBase size is in pixels
+	// GnashImage size is in pixels
 	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
 	_framerate(12),

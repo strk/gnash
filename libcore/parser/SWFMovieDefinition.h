@@ -28,16 +28,15 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "fontlib.h"
-#include "font.h"
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
 #include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
-#include "resource.h" // for boost::intrusive_ptr visibility of dtor
 #include "SWFStream.h" // for get_bytes_loaded and visitbility of dtor (composition)
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 #include "utility.h" // for TWIPS_TO_PIXELS 
+#include "rect.h"
 
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources
@@ -52,11 +51,13 @@
 namespace gnash {
 	class SWFMovieDefinition;
 	class movie_root;
-	class sprite_instance;
+	class MovieClip;
 	class movie_instance;
 	namespace SWF {
 		class TagLoadersTable;
 	}
+    class RunInfo;
+    class Font;
 }
 
 namespace gnash
@@ -102,6 +103,7 @@ private:
 
 	/// Entry point for the actual thread
 	static void execute(MovieLoader& ml, SWFMovieDefinition* md);
+
 };
 
 /// The Characters dictionary associated with each SWF file.
@@ -117,7 +119,8 @@ public:
 	//
 	/// It contains pairs of 'int' and 'boost::intrusive_ptr<character_def>'
 	///
-	typedef std::map< int, boost::intrusive_ptr<character_def> > CharacterContainer;
+	typedef std::map<int, boost::intrusive_ptr<character_def> >
+        CharacterContainer;
 
 	typedef CharacterContainer::iterator CharacterIterator;
 
@@ -167,7 +170,7 @@ private:
 };
 
 
-/// Immutable definition of a movie's contents.
+/// Immutable definition of a SWF movie's contents.
 //
 /// It cannot be played directly, and does not hold
 /// current state; for that you need to call create_movie_instance()
@@ -177,7 +180,11 @@ class SWFMovieDefinition : public movie_definition
 {
 public:
 
-	SWFMovieDefinition();
+    /// Construct a SWF movie.
+    //
+    /// @param runInfo      A RunInfo containing information used for
+    ///                     parsing.
+	SWFMovieDefinition(const RunInfo& runInfo);
 
 	~SWFMovieDefinition();
 
@@ -243,16 +250,18 @@ public:
 
 	// See docs in movie_definition.h
 	virtual void export_resource(const std::string& symbol,
-			resource* res);
+            ExportableResource* res);
 
 	/// Get the named exported resource, if we expose it.
 	//
 	/// @return NULL if the label doesn't correspond to an exported
 	///         resource, or if a timeout occurs while scanning the movie.
 	///
-	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& symbol);
+	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
+            const std::string& symbol);
 
-	virtual void importResources(boost::intrusive_ptr<movie_definition> source, Imports& imports);
+	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
+            Imports& imports);
 
 	void add_character(int character_id, character_def* c);
 
@@ -269,11 +278,11 @@ public:
 	//
 	bool get_labeled_frame(const std::string& label, size_t& frame_number);
 
-	void	add_font(int font_id, font* f);
+	void	add_font(int font_id, Font* f);
 
-	font*	get_font(int font_id) const;
+	Font*	get_font(int font_id) const;
 
-	font* get_font(const std::string& name, bool bold, bool italic) const;
+	Font* get_font(const std::string& name, bool bold, bool italic) const;
 
 	// See dox in movie_definition.h
 	bitmap_character_def*	get_bitmap_character_def(int character_id);
@@ -343,14 +352,6 @@ public:
 		else return &(it->second);
 	}
 
-	/// Calls readHeader() and completeLoad() in sequence.
-	//
-	/// @return false on failure
-	/// 	see description of readHeader() and completeLoad()
-	///	for possible reasons of failures
-	///
-	bool read(std::auto_ptr<IOChannel> in, const std::string& url);
-
 	/// Read the header of the SWF file
 	//
 	/// This function only reads the header of the SWF
@@ -388,8 +389,6 @@ public:
 	/// TagLoadersTable singleton.
 	///
 	void read_all_swf();
-
-	virtual void load_next_frame_chunk();
 
 	/// Create an instance of this movie.
 	//
@@ -448,10 +447,11 @@ private:
 	/// Tags loader table
 	SWF::TagLoadersTable& _tag_loaders;
 
-	typedef std::map<int, boost::intrusive_ptr<font> > FontMap;
+	typedef std::map<int, boost::intrusive_ptr<Font> > FontMap;
 	FontMap m_fonts;
 
-	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> > BitmapMap;
+	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> >
+        BitmapMap;
 	BitmapMap m_bitmap_characters;
 
 	typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;
@@ -469,7 +469,8 @@ private:
 	// Mutex protecting access to _namedFrames
 	mutable boost::mutex _namedFramesMutex;
 
-	typedef std::map<std::string, boost::intrusive_ptr<resource>, StringNoCaseLessThen > ExportMap;
+	typedef std::map<std::string, boost::intrusive_ptr<ExportableResource>,
+            StringNoCaseLessThen > ExportMap;
 	ExportMap _exportedResources;
 
 	// Mutex protecting access to _exportedResources
@@ -521,8 +522,6 @@ private:
 	/// thread will read it.
 	///
 	mutable boost::mutex _bytes_loaded_mutex;
-
-
 
 	int	m_loading_sound_stream;
 	boost::uint32_t	m_file_length;
@@ -576,7 +575,8 @@ protected:
 	/// Reachable resources are:
 	///	- fonts (m_fonts)
 	///	- bitmap characters (m_bitmap_characters)
-	///	- bitmaps (m_bitmap_list) [ what's the difference with bitmap chracters ?? ]
+	///	- bitmaps (m_bitmap_list) [ what's the difference with bitmap
+    ///   characters ?? ]
 	///	- sound samples (m_sound_samples)
 	///	- exports (m_exports)
 	///	- imported movies (m_import_source_movies)
@@ -586,6 +586,16 @@ protected:
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
+
+private:
+
+    /// Used to retrieve the sound::sound_handler and other resources
+    /// for parsing.
+    //
+    /// @todo   Add to base class? This would make it available for other
+    ///         kinds of movies (e.g. FLV) and make it easier to initialize
+    ///         movie_root with the same RunInfo as its first definition.
+    const RunInfo& _runInfo;
 
 };
 

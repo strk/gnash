@@ -47,7 +47,12 @@ public:
     /// Carry out the AS send() operation
     //
     /// @param urlstr   The URI to send the data to
-    void send(const std::string& urlstr);
+    /// @param target   The target for the data (e.g. _self, _blank)
+    /// @param post     Whether the data should be posted or not.
+    //
+    /// The success of the operation is irrelevant to AS.
+    void send(const std::string& urlstr, const std::string& target,
+            bool post);
 
     /// Carry out the AS sendAndLoad operation
     //
@@ -78,6 +83,13 @@ public:
     /// @param str      The stream to load from. It is destroyed when
     ///                 we're finished with it.
     void queueLoad(std::auto_ptr<IOChannel> str);
+
+    /// Shared AS methods for XML and LoadVars, which can be used
+    /// interchangeably with each object in ActionScript.
+    static as_value loadableobject_addRequestHeader(const fn_call& fn);
+    static as_value loadableobject_sendAndLoad(const fn_call& fn);
+    static as_value loadableobject_load(const fn_call& fn);
+    static as_value loadableobject_send(const fn_call& fn);
 
 protected:
 

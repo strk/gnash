@@ -28,7 +28,6 @@
 #include "rc.h"
 #include "gtksup.h"
 #include "sound_handler.h"
-#include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
 #include "VM.h"
 #include "lirc.h"
@@ -155,14 +154,16 @@ GtkGui::init(int argc, char **argv[])
     g_object_ref(G_OBJECT(_drawingArea));
 
     _resumeButton = gtk_button_new();
-    gtk_container_add(GTK_CONTAINER(_resumeButton), gtk_label_new(_("Click to play")));
+    gtk_container_add(GTK_CONTAINER(_resumeButton),
+            gtk_label_new(_("Click to play")));
     gtk_widget_show_all(_resumeButton);
 
     // Same here.
     g_object_ref(G_OBJECT(_resumeButton));
 
     // This callback indirectly results in playHook() being called.
-    g_signal_connect(G_OBJECT(_resumeButton), "clicked", G_CALLBACK (menuitem_play_callback), this);
+    g_signal_connect(G_OBJECT(_resumeButton), "clicked",
+            G_CALLBACK(menuitem_play_callback), this);
 
     // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
@@ -225,7 +226,7 @@ GtkGui::init(int argc, char **argv[])
 
     // The first time stop() was called, stopHook() might not have had a chance
     // to do anything, because GTK+ wasn't garanteed to be initialised.
-    if (isStopped()) stopHook();
+    //if (isStopped()) stopHook();
 
     return true;
 }
@@ -607,22 +608,15 @@ GtkGui::createMenu()
     gtk_widget_show (separator1);
     gtk_container_add (GTK_CONTAINER (_popup_menu), separator1);
 
-    if (/*media::sound_handler *s = */ get_sound_handler()) {
-        GtkCheckMenuItem *menuitem_sound =
-            GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
-        // Set toggle inactive if an active sound handler is muted at start (can't
-        // happen at the moment, but might in the future).
-        
-        // The is_muted() function appears to have changed, and this doesn't work at the
-        // moment:
-        // gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), (!s->is_muted()) );
-        
-        gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
-        gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
-        gtk_widget_show(GTK_WIDGET(menuitem_sound));
-        g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
-                         G_CALLBACK(&menuitem_sound_callback), this);
-    }
+    /// The sound handler is initialized after the Gui is created, and
+    /// may be disabled or enabled dynamically.
+    GtkCheckMenuItem *menuitem_sound =
+        GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
+    gtk_widget_show(GTK_WIDGET(menuitem_sound));
+    g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
+                     G_CALLBACK(&menuitem_sound_callback), this);
 
     GtkMenuItem *menuitem_quit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));
@@ -796,7 +790,7 @@ GtkGui::addGnashIcon(GtkWindow* window)
     GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
     if (window_icon_pixbuf) {
         gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
-	gdk_pixbuf_unref (window_icon_pixbuf);
+		gdk_pixbuf_unref (window_icon_pixbuf);
     }
 }
 
@@ -1086,7 +1080,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->streamsTimeoutScale ) {
             _rcfile.setStreamsTimeout(
-        	    gtk_range_get_value(GTK_RANGE(prefs->streamsTimeoutScale)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->streamsTimeoutScale)));
         }
 
         if ( prefs->ASCodingErrorToggle ) {
@@ -1151,7 +1146,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->librarySize ) {
             _rcfile.setMovieLibraryLimit(
-                gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(prefs->librarySize)));
+                gtk_spin_button_get_value_as_int(
+                    GTK_SPIN_BUTTON(prefs->librarySize)));
         }
 
         if ( prefs->startStoppedToggle ) {
@@ -1244,16 +1240,17 @@ PreferencesDialog::addNetworkTab()
     gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
 
     // Streams timeout
-    label = gtk_label_new (_("Streams timeout (in seconds -- 0 to never timeout):"));
-    gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, FALSE, 0);
+    GtkWidget *timeoutbox = gtk_hbox_new (FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(vbox), timeoutbox, FALSE, FALSE, 0);
+    
+    label = gtk_label_new (_("Network timeout in seconds (0 for no timeout):"));
+    gtk_box_pack_start(GTK_BOX(timeoutbox), label, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
-    GtkWidget* scale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (_rcfile.getStreamsTimeout(), 0, 10, 1, 0, 0)));
-    gtk_scale_set_digits (GTK_SCALE (scale), 0);
-    gtk_range_set_update_policy (GTK_RANGE (scale), GTK_UPDATE_DISCONTINUOUS);
-    gtk_box_pack_start(GTK_BOX(vbox), scale, FALSE, FALSE, 0);
-
-    _prefs->streamsTimeoutScale = scale;
+    _prefs->streamsTimeoutScale = gtk_spin_button_new_with_range(0, 300, 1);
+    gtk_box_pack_start(GTK_BOX(timeoutbox), _prefs->streamsTimeoutScale, FALSE, FALSE, 0);
+    // Align to _rcfile value:
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->streamsTimeoutScale), _rcfile.getStreamsTimeout());
 
 }
 
@@ -1643,30 +1640,32 @@ void
 GtkGui::showAboutDialog()
 {
     const gchar *documentors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli",
+	"Rob Savoye", 
+	"Sandro Santilli",
 	"Ann Barcomb",
-        NULL 
+	NULL 
     };
 
     const gchar *artists[] = { 
 	"Jason Savoye",
-        NULL 
+	NULL
     };
 
     const gchar *authors[] = { 
-        "Rob Savoye", 
-        "Sandro Santilli", 
-        "Bastiaan Jacques", 
-        "Tomas Groth", 
-        "Udo Giacomozzi", 
-        "Hannes Mayr", 
-        "Markus Gothe", 
-        "Vitaly Alexeev",
+	"Rob Savoye", 
+	"Sandro Santilli", 
+	"Bastiaan Jacques", 
+	"Tomas Groth", 
+	"Udo Giacomozzi", 
+	"Hannes Mayr", 
+	"Markus Gothe", 
+	"Vitaly Alexeev",
 	"John Gilmore",
 	"Zou Lunkai",
 	"Benjamin Wolsey",
-        NULL 
+	"Russ Nelson",
+	"Dossy Shiobara",
+	NULL
     };
 
     std::string comments = _("Gnash is the GNU SWF Player based on GameSWF.");
@@ -1761,6 +1760,8 @@ GtkGui::showAboutDialog()
         "website", "http://www.gnu.org/software/gnash/",
         NULL);
 #endif
+	if (logo_pixbuf)
+		gdk_pixbuf_unref(logo_pixbuf);
 }
 
 void
@@ -2083,7 +2084,11 @@ GtkGui::button_press_event(GtkWidget *const /*widget*/,
                            GdkEventButton *const event,
                            const gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
+
+    /// Double- and triple-clicks should not send an extra event!
+    /// Flash has no built-in double click.
+    if (event->type != GDK_BUTTON_PRESS) return false;
+
     GtkGui *obj = static_cast<GtkGui *>(data);
 
     obj->grabFocus();
@@ -2536,7 +2541,8 @@ void
 GtkGui::stopHook()
 {
 
-    // FIXME: this can't work for the stand-alone player, because _drawingArea is
+    // FIXME: this can't work for the stand-alone player, because
+    // _drawingArea is
     // packed into a vbox.
     if (! _xid) return;
 

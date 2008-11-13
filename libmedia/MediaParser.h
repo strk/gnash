@@ -66,11 +66,8 @@ enum codecType
 	/// The internal flash codec ids
 	FLASH,
 
-	/// Ffmpegs codecs ids
-	//
-	/// TODO: make this media-handler agnostic
-	///
-	FFMPEG
+	/// Custom codecs ids
+	CUSTOM
 };
 
 /// Video codec ids as defined in flash
@@ -89,45 +86,152 @@ enum videoCodecType
 	VIDEO_CODEC_VP6A = 5,
 
 	/// Screenvideo2 codec
-	VIDEO_CODEC_SCREENVIDEO2 = 6
+	VIDEO_CODEC_SCREENVIDEO2 = 6,
+
+	/// MPEG-4 Part 10, or Advanced Video Coding
+	VIDEO_CODEC_H264 = 7
+
+	// NOTE: if you add more elements here remember to
+	//       also add them to the output operator!
 };
 
-std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
+DSOEXPORT std::ostream& operator<< (std::ostream& os, const videoCodecType& t);
 
 /// Audio codec ids as defined in flash
+//
+/// For some encodings, audio data is organized
+/// in logical frames. The structure of such frames
+/// (header/payload) is codec dependent.
+/// The actual size of each frame may not be known
+/// w/out parsing the encoded stream, as it
+/// might be specified in the header of each frame.
+///
+/// Other encodings are loosier on frames. For these
+/// you can define a frame any way you want, as long
+/// as a frame doesn't contain partial samples.
+///
+/// For FFMPEG, you can NOT construct a parser for the
+/// loosy-framed codecs.
+///
+/// Parser-needing codecs will be documented as such.
+///
 enum audioCodecType
 {
-	/// Raw format.  Useful for 8-bit sounds???
+	/// Linear PCM, unspecified byte order 
+   	//
+   	/// Use of this codec is deprecated (but still supported) due to
+   	/// the unspecified byte order (you can only play >8bit samples
+   	/// in a sane way when the endiannes of encoding and decoding
+   	/// hosts match).
+   	///
+   	/// 90% of the times the actual encoder did run on windows, so
+   	/// it is a good bet to guess for little-endian.
+   	/// SampleSize may be 8 or 16 bits.
+    ///
 	AUDIO_CODEC_RAW = 0,	
 
-	/// ADPCM format, flash's ADPCM is a bit different for normal ADPCM
+	/// ADPCM format
+    //
+	/// SWF support 2, 3, 4, and 5 bits / sample.
+	/// ADPCM "frames" consits of 4096 ADPCM codes per channel.
+	/// 
+	/// For streaming there is no concept of "seekSamples" like
+	/// MP3 streaming implements. Thus ADPCM ist suboptimal for
+	/// streaming as it is difficult to match sound frames with
+	/// movie frames.
+   	/// Uncompressed SampleSize is always 16 bit.
+    ///
 	AUDIO_CODEC_ADPCM = 1,
 
-	/// Mp3 format
+	/// MP3 format
+   	//
+   	/// MP3 is supported for SWF4 and later. 
+   	/// MP3 sound is structured in frames consiting of  a fixed sized 
+   	/// header (32Bit) and compressed sound data. Compressed sound
+   	/// data always contains a fixed number of sound samples (576 or 1152).
+   	/// For streaming sound an additional field is necessary (seekSamples)
+   	/// to keep track of samples exceeding movie frame border.
+   	///
+   	/// MP3 header contains all necessary information to decode a single
+   	/// frame. From this information one can derive the number of samples 
+   	/// and the frame's size.
+   	/// Uncompressed SampleSize is always 16 bit.
+    ///
 	AUDIO_CODEC_MP3 = 2,
 
-	/// 16 bits/sample, little-endian
+	/// Linear PCM, strictly little-endian
 	AUDIO_CODEC_UNCOMPRESSED = 3,
 
-	/// Proprietary simple format
+	/// Proprietary simple format. Always 5Khz mono ?
+    //
+	/// SWF6 and later.
+	/// Data is organized in frames of 256 samples.
+    ///
 	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,
 
 	/// Proprietary simple format
-	AUDIO_CODEC_NELLYMOSER = 6
+    //
+	/// SWF6 and later.
+	/// Data is organized in frames of 256 samples.
+    ///
+	AUDIO_CODEC_NELLYMOSER = 6,
+
+	/// Advanced Audio Coding
+	AUDIO_CODEC_AAC = 10,
+
+	/// Always 16kHz mono
+	AUDIO_CODEC_SPEEX = 11
+
+	// NOTE: if you add more elements here remember to
+	//       also add them to the output operator!
 };
 
-std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
+DSOEXPORT std::ostream& operator<< (std::ostream& os, const audioCodecType& t);
 
-/// \brief
-/// The AudioInfo class contains information about the audiostream
-/// in the file being parsed. The information stored is codec-id,
+/// Information about an audio stream 
+//
+/// The information stored is codec-id,
 /// samplerate, samplesize, stereo, duration and codec-type.
-/// timestamp,
+///
+/// Additionally, an abstract ExtraInfo can be hold.
+///
 class AudioInfo
 {
+
 public:
-	AudioInfo(int codeci, boost::uint16_t sampleRatei, boost::uint16_t sampleSizei, bool stereoi, boost::uint64_t durationi, codecType typei)
-		: codec(codeci),
+
+    /// Construct an AudioInfo object
+    //
+    /// @param codeci
+    ///     Audio codec id.
+    ///     To be interpreted as a media::audioCodecType if the typei
+    ///     parameter is FLASH; otherwise it's an opaque number to use
+    ///     for codec information transfer between a MediaParser and a
+    ///     AudioDecoder from the same %media handler module.
+    ///
+    /// @param sampleRatei
+    ///     Nominal sample rate.
+    ///     @todo document units.
+    ///
+    /// @param sampleSizei
+    ///     Sample size, in bytes.
+    ///
+    /// @param stereoi
+    ///     Sample type (stereo if true, mono otherwise).
+    ///     @todo document if and how intepretation of sampleSizei changes
+    ///
+    /// @param durationi
+    ///     Nominal audio stream duration.
+    ///     @todo check if still needed, if so document units!
+    ///
+    /// @param typei
+    ///     Changes interpretation of the codeci parameter.
+    ///
+	AudioInfo(int codeci, boost::uint16_t sampleRatei,
+            boost::uint16_t sampleSizei, bool stereoi,
+            boost::uint64_t durationi, codecType typei)
+		:
+        codec(codeci),
 		sampleRate(sampleRatei),
 		sampleSize(sampleSizei),
 		stereo(stereoi),
@@ -136,34 +240,85 @@ public:
 		{
 		}
 
+	/// Codec identifier
+	//
+	/// This has to be interpreted as audioCodecType if codecType type is FLASH
+	/// or interpretation is opaque and we rely on the assumption that the AudioInfo
+	/// creator and the AudioInfo user have a way to get a shared interpretation
+	///
 	int codec;
+
 	boost::uint16_t sampleRate;
+
+	/// Size of each sample, in bytes
 	boost::uint16_t sampleSize;
+
 	bool stereo;
+
 	boost::uint64_t duration;
+
 	codecType type;
 
-	/// An abstract class to hold any additional info
-	/// required for proper decoder initialization
+	/// Extra info about an audio stream
+    //
+	/// Abstract class to hold any additional info
+	/// when required for proper decoder initialization.
+    ///
 	class ExtraInfo {
 	public:
 		virtual ~ExtraInfo() {}
 	};
 
 	/// Extra info about audio stream, if when needed
+    //
+    /// Could be ExtraVideoInfoFlv or a media-handler specific info
+    ///
 	std::auto_ptr<ExtraInfo> extra;
 };
 
-/// \brief
-/// The VideoInfo class contains information about the videostream
-/// in the file being parsed. The information stored is codec-id,
-/// width, height, framerate, duration and codec-type.
-/// timestamp,
+/// Information about a video stream 
+//
+/// The information stored is codec-id, width, height, framerate and duration.
+///
+/// Additionally, an abstract ExtraInfo can be hold.
+///
 class VideoInfo
 {
 public:
-	VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti, boost::uint16_t frameRatei, boost::uint64_t durationi, codecType typei)
-		: codec(codeci),
+
+    /// Construct a VideoInfo object
+    //
+    /// @param codeci
+    ///     Video codec id.
+    ///     To be interpreted as a media::videoCodecType if the typei
+    ///     parameter is FLASH; otherwise it's an opaque number to use
+    ///     for codec information transfer between a MediaParser and a
+    ///     VideoDecoder from the same %media handler module.
+    ///
+    /// @param widthi
+    ///     Video frame width.
+    ///     @todo check if still needed.
+    ///
+    /// @param heighti
+    ///     Video frame height.
+    ///     @todo check if still needed.
+    ///
+    /// @param frameRatei
+    ///     Nominal video frame rate.
+    ///     @todo document units.
+    ///
+    /// @param durationi
+    ///     Nominal video duration.
+    ///     @todo check if still needed, if so document units!
+    ///
+    /// @param typei
+    ///     Changes interpretation of the codeci parameter.
+    ///     
+	VideoInfo(int codeci, boost::uint16_t widthi, boost::uint16_t heighti,
+            boost::uint16_t frameRatei, boost::uint64_t durationi,
+            codecType typei)
+		:
+        codec(codeci),
 		width(widthi),
 		height(heighti),
 		frameRate(frameRatei),
@@ -179,14 +334,20 @@ public:
 	boost::uint64_t duration;
 	codecType type;
 
-	/// An abstract class to hold any additional info
-	/// required for proper decoder initialization
+	/// Extra info about a video stream
+    //
+	/// Abstract class to hold any additional info
+	/// when required for proper decoder initialization
+    ///
 	class ExtraInfo {
 	public:
 		virtual ~ExtraInfo() {}
 	};
 
-	/// Extra info about audio stream, if when needed
+	/// Extra info about video stream, if when needed
+    //
+    /// Could be ExtraAudioInfoFlv or a media-handler specific info
+    ///
 	std::auto_ptr<ExtraInfo> extra;
 };
 
@@ -208,19 +369,16 @@ public:
 	/// Create an encoded video frame
 	//
 	/// @param data
-	///	Data buffer, ownership transferred
+	///     Data buffer, ownership transferred
 	///
 	/// @param size
-	///	Size of the data buffer
+	///     Size of the data buffer
 	///
 	/// @param frameNum
-	///	Frame number.
-	///
-	/// @param type
-	/// 	Video frame type
+	///     Frame number.
 	///
 	/// @param timestamp
-	///	Presentation timestamp, in milliseconds.
+	///     Presentation timestamp, in milliseconds.
 	///
 	EncodedVideoFrame(boost::uint8_t* data, boost::uint32_t size,
 			unsigned int frameNum,
@@ -266,7 +424,7 @@ public:
 	std::auto_ptr<EncodedExtraData> extradata;
 };
 
-/// The MediaParser class provides cursor-based access to encoded media frames 
+/// The MediaParser class provides cursor-based access to encoded %media frames 
 //
 /// Cursor-based access allow seeking as close as possible to a specified time
 /// and fetching frames from there on, sequentially.
@@ -286,8 +444,6 @@ public:
 	// in memory leaks..
 	//
 	virtual ~MediaParser();
-
-	void join();
 
 	/// \brief
 	/// Seeks to the closest possible position the given position,
@@ -365,14 +521,14 @@ public:
 	/// Returns a VideoInfo class about the videostream
 	//
 	/// @return a VideoInfo class about the videostream,
-	///         or zero if stream contains no video
+	///         or zero if unknown (no video or not enough data parsed yet).
 	///
 	VideoInfo* getVideoInfo() { return _videoInfo.get(); }
 
 	/// Returns a AudioInfo class about the audiostream
 	//
 	/// @return a AudioInfo class about the audiostream,
-	///         or zero if stream contains no audio
+	///         or zero if unknown (no audio or not enough data parsed yet).
 	///
 	AudioInfo* getAudioInfo() { return _audioInfo.get(); }
 
@@ -438,13 +594,28 @@ protected:
 	/// Start the parser thread
 	void startParserThread();
 
+	/// Stop the parser thread
+	//
+	/// This method should be always called
+	/// by destructors of subclasses to ensure
+	/// the parser thread won't attempt to access
+	/// destroyed structures.
+	///
+	void stopParserThread();
+
 	/// Clear the a/v buffers
 	void clearBuffers();
 
-	/// Push an encoded audio frame to buffer, will wait on a condition if buffer is full
+	/// Push an encoded audio frame to buffer.
+	//
+	/// Will wait on a condition if buffer is full or parsing was completed
+	///
 	void pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame);
 
-	/// Push an encoded video frame to buffer, will wait on a condition if buffer is full
+	/// Push an encoded video frame to buffer.
+	//
+	/// Will wait on a condition if buffer is full or parsing was completed
+	///
 	void pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame);
 
 	/// Return pointer to next encoded video frame in buffer

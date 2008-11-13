@@ -23,6 +23,7 @@ if WIN32
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libcore \
@@ -40,10 +41,13 @@ AM_CPPFLAGS = \
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashagg.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/plugin/mozilla-sdk/libmozsdk.la \
+	$(top_builddir)/plugin/mozilla-sdk/np_entry.lo \
+	$(top_builddir)/plugin/mozilla-sdk/npn_gate.lo \
+	$(top_builddir)/plugin/mozilla-sdk/npp_gate.lo \
 	$(AGG_LIBS) \
 	$(BOOST_LIBS) \
 	$(CURL_LIBS) \
@@ -60,14 +64,13 @@ plugindir = $(bindir)
 
 plugin_LTLIBRARIES = npgnash.la
 
-npgnash.la: $(npgnash_la_OBJECTS) $(npgnash_la_DEPENDENCIES)
-	$(CXXLINK) $(am_npgnash_la_rpath) $(npgnash_la_LDFLAGS) $(npgnash_la_OBJECTS) $(npgnash_la_LIBADD) $(LIBS) && touch $@
+##npgnash.la: $(npgnash_la_OBJECTS) $(npgnash_la_DEPENDENCIES)
+##	$(CXXLINK) $(am_npgnash_la_rpath) $(npgnash_la_LDFLAGS) $(npgnash_la_OBJECTS) $(npgnash_la_LIBADD) $(LIBS) && touch $@
 
 npgnash_la_SOURCES = npgnash.c plugin.cpp
 EXTRA_npgnash_la_SOURCES = npgnash.rc
 npgnash_la_LDFLAGS = -module -shared -no-undefined -version-info 0:0:0 \
-	-o npgnash.dll -Wl,--enable-stdcall-fixup npgnash.def \
-	$(AM_LDFLAGS)
+	-o npgnash.dll -Wl,--enable-stdcall-fixup npgnash.def
 npgnash_la_LIBADD = npgnashrc.o
 
 npgnashrc.o: npgnash.rc
@@ -81,7 +84,7 @@ install-plugin install-plugins: $(plugin_LTLIBRARIES)
 	test -d $(bindir) || $(mkinstalldirs) $(bindir)
 	$(INSTALL_PROGRAM) npgnash.dll $(bindir)
 
-uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+uninstall-plugin uninstall-plugins: 
 	$(RM) -f $(bindir)/npgnash.dll
 
 endif # WIN32
@@ -89,4 +92,4 @@ endif # NPAPI
 
 force:
 
-.PHONY : install-plugins install-plugin uninstall-plugin
+.PHONY : install-plugins install-plugin uninstall-plugin uninstall-plugins

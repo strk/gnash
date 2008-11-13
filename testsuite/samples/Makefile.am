@@ -16,7 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS = dejagnu -Wno-portability
+
+abs_srcdir=$(shell cd $(srcdir); pwd)
 
 CLEANFILES =  \
       gnash-dbg.log \
@@ -27,6 +29,7 @@ CLEANFILES =  \
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/libcore/parser  \
@@ -65,7 +68,7 @@ clip_as_button2_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 clip_as_button2_TestRunner_CXXFLAGS = \
-	-DSRCDIR=\"$(srcdir)\" \
+	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
 clip_as_button2_TestRunner_DEPENDENCIES = \
 	clip_as_button2.swf \
@@ -78,7 +81,7 @@ subshapes_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 subshapes_TestRunner_CXXFLAGS = \
-	-DSRCDIR=\"$(srcdir)\" \
+	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
 subshapes_TestRunner_DEPENDENCIES = \
 	subshapes.swf \
@@ -91,7 +94,7 @@ gotoFrameOnKeyEvent_TestRunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_CXXFLAGS = \
-	-DSRCDIR=\"$(srcdir)\" \
+	-DSRCDIR=\"$(abs_srcdir)\" \
 	$(NULL)
 gotoFrameOnKeyEvent_TestRunner_DEPENDENCIES = \
 	gotoFrameOnKeyEvent.swf \

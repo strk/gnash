@@ -21,7 +21,7 @@
 #define INPUT_FILENAME "DragDropTest.swf"
 
 #include "MovieTester.h"
-#include "sprite_instance.h"
+#include "MovieClip.h"
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
@@ -49,7 +49,7 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
-	sprite_instance* root = tester.getRootMovie();
+	MovieClip* root = tester.getRootMovie();
 	assert(root);
 
 	// for variables lookup (consistency checking)
@@ -94,7 +94,7 @@ main(int /*argc*/, char** /*argv*/)
 
 		// if _root displaylist contains loadedTarget and loadedTarget
 		// contains target100, we've loaded it
-		const sprite_instance* loadedTarget = 0;
+		const MovieClip* loadedTarget = 0;
 		//const character* ch = tester.findDisplayItemByName(*root, "loadedTarget");
 		const character* ch = tester.findDisplayItemByDepth(*root, 30);
 		if ( ch ) loadedTarget = ch->to_movie();

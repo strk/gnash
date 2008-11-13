@@ -40,8 +40,11 @@ extern "C" {
 #include <boost/format.hpp>
 #include <algorithm>
 
+#include "FLVParser.h"
+
 namespace gnash {
 namespace media {
+namespace ffmpeg {
 
 #ifdef HAVE_SWSCALE_H
 /// A wrapper round an SwsContext that ensures it's
@@ -104,7 +107,7 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(videoCodecType format, int width, int hei
 
 }
 
-VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
+VideoDecoderFfmpeg::VideoDecoderFfmpeg(const VideoInfo& info)
     :
     _videoCodec(NULL)
 {
@@ -127,18 +130,30 @@ VideoDecoderFfmpeg::VideoDecoderFfmpeg(VideoInfo& info)
 
     boost::uint8_t* extradata=0;
     int extradataSize=0;
-    if ( info.extra.get() )
+    if (info.extra.get())
     {
-        assert(dynamic_cast<ExtraVideoInfoFfmpeg*>(info.extra.get()));
-        const ExtraVideoInfoFfmpeg& ei = static_cast<ExtraVideoInfoFfmpeg&>(*info.extra);
-        extradata = ei.data;
-        extradataSize = ei.dataSize;
+        if (dynamic_cast<ExtraVideoInfoFfmpeg*>(info.extra.get())) {
+            const ExtraVideoInfoFfmpeg& ei = 
+                static_cast<ExtraVideoInfoFfmpeg&>(*info.extra);
+            extradata = ei.data;
+            extradataSize = ei.dataSize;
+        }
+        else if (dynamic_cast<ExtraVideoInfoFlv*>(info.extra.get())) {
+            const ExtraVideoInfoFlv& ei = 
+                static_cast<ExtraVideoInfoFlv&>(*info.extra);
+            extradata = ei.data.get();
+            extradataSize = ei.size;
+        }
+        else {
+            std::abort();
+        }
     }
     init(codec_id, info.width, info.height, extradata, extradataSize);
 }
 
 void
-VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uint8_t* extradata, int extradataSize)
+VideoDecoderFfmpeg::init(enum CodecID codecId, int /*width*/, int /*height*/,
+        boost::uint8_t* extradata, int extradataSize)
 {
     // Init the avdecoder-decoder
     avcodec_init();
@@ -170,21 +185,30 @@ VideoDecoderFfmpeg::init(enum CodecID codecId, int width, int height, boost::uin
         throw MediaException(msg.str());
     }
     
-    ctx->width = width;
-    ctx->height = height;
-
     log_debug(_("VideoDecoder: initialized FFMPEG codec %s (%d)"), 
 		_videoCodec->name, (int)codecId);
 
-    assert(ctx->width > 0);
-    assert(ctx->height > 0);
 }
 
 VideoDecoderFfmpeg::~VideoDecoderFfmpeg()
 {
 }
 
-std::auto_ptr<image::ImageBase>
+int
+VideoDecoderFfmpeg::width() const
+{
+    if (!_videoCodecCtx.get()) return 0;
+    return _videoCodecCtx->getContext()->width;
+}
+
+int
+VideoDecoderFfmpeg::height() const
+{
+    if (!_videoCodecCtx.get()) return 0;
+    return _videoCodecCtx->getContext()->height;
+}
+
+std::auto_ptr<GnashImage>
 VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrame)
 {
@@ -194,23 +218,23 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     const int height = srcCtx->height;
 
     PixelFormat pixFmt;
-    std::auto_ptr<image::ImageBase> im;
+    std::auto_ptr<GnashImage> im;
 
 #ifdef FFMPEG_VP6A
     if (srcCtx->codec->id == CODEC_ID_VP6A) {
         // Expect RGBA data
         //log_debug("alpha image");
         pixFmt = PIX_FMT_RGBA;
-        im.reset(new image::ImageRGBA(width, height));        
+        im.reset(new ImageRGBA(width, height));        
     } else {
         // Expect RGB data
         pixFmt = PIX_FMT_RGB24;
-        im.reset(new image::ImageRGB(width, height));
+        im.reset(new ImageRGB(width, height));
     }
 #else // ndef FFMPEG_VPA6
     // Expect RGB data
     pixFmt = PIX_FMT_RGB24;
-    im.reset(new image::ImageRGB(width, height));
+    im.reset(new ImageRGB(width, height));
 #endif // def FFMPEG_VP6A
 
 #ifdef HAVE_SWSCALE_H
@@ -276,15 +300,14 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 
 }
 
-std::auto_ptr<image::ImageBase>
+std::auto_ptr<GnashImage>
 VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_size)
 {
-
     // This object shouldn't exist if there's no codec, as it can'
     // do anything anyway.
     assert(_videoCodecCtx.get());
 
-    std::auto_ptr<image::ImageBase> ret;
+    std::auto_ptr<GnashImage> ret;
 
     AVFrame* frame = avcodec_alloc_frame();
     if ( ! frame ) {
@@ -316,10 +339,10 @@ VideoDecoderFfmpeg::push(const EncodedVideoFrame& buffer)
     _video_frames.push_back(&buffer);
 }
 
-std::auto_ptr<image::ImageBase>
+std::auto_ptr<GnashImage>
 VideoDecoderFfmpeg::pop()
 {
-    std::auto_ptr<image::ImageBase> ret;
+    std::auto_ptr<GnashImage> ret;
 
     for (std::vector<const EncodedVideoFrame*>::iterator it =
              _video_frames.begin(), end = _video_frames.end(); it != end; ++it) {
@@ -343,6 +366,8 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 {
         // Find the decoder and init the parser
         switch(format) {
+                case VIDEO_CODEC_H264:
+                         return CODEC_ID_H264;
                 case VIDEO_CODEC_H263:
 			 // CODEC_ID_H263I didn't work with Lavc51.50.0
 			 // and NetStream-SquareTest.swf
@@ -365,5 +390,6 @@ VideoDecoderFfmpeg::flashToFfmpegCodec(videoCodecType format)
 }
 
 
+} // gnash.media.ffmpeg namespace 
 } // gnash.media namespace 
 } // gnash namespace

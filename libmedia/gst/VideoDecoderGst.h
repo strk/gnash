@@ -25,7 +25,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "image.h"
+#include "GnashImage.h"
 #include "log.h"
 #include "VideoDecoder.h"
 #include "dsodefs.h"
@@ -39,9 +39,10 @@
 
 namespace gnash {
 namespace media {
+namespace gst {
 
 // Convenience wrapper for GstBuffer. Intended to be wrapped in an auto_ptr.
-class gnashGstBuffer : public image::ImageRGB
+class gnashGstBuffer : public ImageRGB
 {
 public:
   gnashGstBuffer(GstBuffer* buf, int width, int height)
@@ -59,9 +60,13 @@ public:
     return GST_BUFFER_DATA(_buffer);
   }
 
-  std::auto_ptr<image::ImageBase> clone() const
+  const boost::uint8_t* data() const
   {
-    return std::auto_ptr<ImageBase>(new ImageRGB(*this));
+    return GST_BUFFER_DATA(_buffer);
+  }
+  std::auto_ptr<GnashImage> clone() const
+  {
+    return std::auto_ptr<GnashImage>(new ImageRGB(*this));
   }
 
 private:
@@ -69,29 +74,46 @@ private:
 };
 
 
+/// GST based VideoDecoder
 class DSOEXPORT VideoDecoderGst : public VideoDecoder
 {
 public:
-    VideoDecoderGst(videoCodecType codec_type, int width, int height);
+    VideoDecoderGst(videoCodecType codec_type, int width, int height,
+                    const boost::uint8_t* extradata, size_t extradatasize);
     VideoDecoderGst(GstCaps* caps);
     ~VideoDecoderGst();
 
     void push(const EncodedVideoFrame& buffer);
 
-    std::auto_ptr<image::ImageBase> pop();
+    std::auto_ptr<GnashImage> pop();
   
     bool peek();
 
+    /// Get the width of the video
+    //
+    /// @return The width of the video in pixels or 0 if unknown.
+    int width() const;
+
+    /// Get the height of the video
+    //
+    /// @return The height of the video in pixels or 0 if unknown.
+    int height() const;
+
 private:
+
+    int _width;
+    int _height;
+
     void setup(GstCaps* caps);
 
     VideoDecoderGst();
-    VideoDecoderGst(const gnash::media::VideoDecoderGst&);
+    VideoDecoderGst(const VideoDecoderGst&);
 
     SwfdecGstDecoder _decoder;
 };
 
 
+} // gnash.media.gst namespace
 } // namespace media
 } // namespace gnash
 #endif // __VIDEODECODERGST_H__

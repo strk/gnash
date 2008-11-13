@@ -42,6 +42,7 @@ namespace gnash {
 
 namespace gnash {
 namespace media {
+namespace gst {
 
 /// Class to hold extra info found in any stream by the parser.
 struct ExtraInfoGst : public AudioInfo::ExtraInfo, VideoInfo::ExtraInfo, boost::noncopyable
@@ -78,6 +79,11 @@ struct EncodedExtraGstData : public EncodedExtraData, boost::noncopyable
 };
 
 
+/// Simple timer used for probe timeout (deprecated)
+//
+/// @deprecated probe-on-construction requirement for MediaParser was drop,
+///             so no use for this class anymore
+///
 class SimpleTimer : public boost::noncopyable
 {
 public:
@@ -98,7 +104,6 @@ private:
 
 
 /// Gstreamer based MediaParser
-///
 class MediaParserGst: public MediaParser
 {
 public:
@@ -156,6 +161,7 @@ private:
 };
 
 
+} // gnash.media.gst namespace
 } // gnash.media namespace 
 } // namespace gnash
 

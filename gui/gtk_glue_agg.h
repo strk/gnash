@@ -30,6 +30,7 @@
 // see http://www.xfree86.org/current/mit-shm.html
 // currently has some problems, see https://savannah.gnu.org/bugs/?20301
 #ifdef ENABLE_MIT_SHM
+#include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #endif
 

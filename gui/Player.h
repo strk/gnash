@@ -30,6 +30,7 @@
 #include "movie_definition.h" // for visibility of movie_definition destructor
 #include "smart_ptr.h" // for intrusive_ptr holding of top-level movie
 #include "movie_root.h" // for Abstract callbacks
+#include "RunInfo.h" // for passing handlers and other data to the core.
 
 #include <string>
 #include <map>
@@ -37,7 +38,7 @@
 // Forward declarations
 namespace gnash
 {
-	class sprite_instance;
+	class MovieClip;
 }
 
 
@@ -153,11 +154,14 @@ private:
 			_gui(gui)
 		{}
 
-		std::string call(const std::string& event, const std::string& arg);
+		std::string call(const std::string& event,
+				const std::string& arg);
+		bool yesNo(const std::string& query);
 
-		// For handling notification callbacks from ActionScript. The callback is
-		// always sent to a hosting application (i.e. if a file descriptor is
-		// supplied). It is never acted on by Gnash when running as a plugin.
+		// For handling notification callbacks from ActionScript.
+		// The callback is always sent to a hosting application
+		// (i.e. if a file descriptor is supplied). It is never
+		// acted on by Gnash when running as a plugin.
 		void notify(const std::string& event, const std::string& arg);
 
 	private:
@@ -174,11 +178,17 @@ private:
 	/// @param udata
 	///     Pointer to user-specific data
 	/// @param stream
-	///     Buffer into which method will put data
+	///     Buffer into which method will put samples
 	/// @param len
-	///     Requested amount of data to put
-	/// @return success
-	static bool silentStream(void* udata, boost::uint8_t* stream, int len);
+	///     Requested amount of samples to put
+	/// @param atEOF
+	///     Will always set to false, silent stream never ends ..
+    /// 
+	/// @return always the len parameter value (silent stream never ends 
+    ///         and is always available)
+    ///
+	static unsigned int silentStream(void* udata, boost::int16_t* stream,
+                unsigned int len, bool& atEOF);
         
 	void init_sound();
 
@@ -222,13 +232,36 @@ private:
 
 	std::string _baseurl;
 
-	std::auto_ptr<Gui> _gui;
 
-	std::auto_ptr<media::sound_handler> _soundHandler;
+    /// Initialization / destruction order is important here.
+    //
+    /// some sound_samples are destroyed in the dtor of SWFMovieDefinition,
+    /// which is called by the Gui's dtor. This means that the RunInfo
+    /// and sound::sound_handler must still be alive. Initializing them
+    /// later ensures that this is the case. It is still a good idea to
+    /// initialize _gui after _runInfo.
+    //
+    /// Moreover, _movieDef (the SWFMovieDefinition) would also prevent
+    /// destruction of a SWFMovieDefinition if it is not initialized after
+    /// _gui, and probably result in a segfault.
+    //
+    /// @todo   This is hairy, and the core should be sorted out so that
+    ///         sound_sample knows about its sound::sound_handler without
+    ///         needing a RunInfo.
+    std::auto_ptr<sound::sound_handler> _soundHandler;
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
 
-	std::string _url;
+    /// Handlers (for sound etc) for a libcore run.
+    //
+    /// This must be kept alive for the entire lifetime of the movie_root
+    /// (currently: of the Gui).
+    std::auto_ptr<RunInfo> _runInfo;
+
+    /// This must be initialized after _runInfo
+	std::auto_ptr<Gui> _gui;
+
+    std::string _url;
 
 	std::string _infile;
 

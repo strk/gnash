@@ -42,11 +42,13 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libltdl \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
- 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libmedia/ffmpeg \
 	-I$(top_srcdir)/libmedia/gst \
        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
+	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
         $(LIBXML_CFLAGS) \
         $(DMALLOC_CFLAGS) \
 	$(LIRC_CFLAGS) \
@@ -96,6 +98,7 @@ GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libmedia/libgnashmedia.la \
+	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la
 

@@ -47,7 +47,7 @@ namespace gnash {
 std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& /*url*/)
 {
-	log_error(_("ERROR: libcurl is not available, but "
+	log_error(_("libcurl is not available, but "
 	            "Gnash has attempted to use the curl adapter"));
 	return std::auto_ptr<IOChannel>();
 }
@@ -208,8 +208,14 @@ CurlSession::~CurlSession()
 	exportCookies();
 
 	CURLSHcode code;
+	int retries=0;
 	while ( (code=curl_share_cleanup(_shandle)) != CURLSHE_OK )
 	{
+		if ( ++retries > 10 )
+		{
+			log_error("Failed cleaning up share handle: %s. Giving up after %d retries.", curl_share_strerror(code), retries);
+			break;
+		}
 		log_error("Failed cleaning up share handle: %s. Will try again in a second.", curl_share_strerror(code));
 		gnashSleep(1000000);
 	}
@@ -360,6 +366,7 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
  *
  **********************************************************************/
 
+/// libcurl based IOChannel, for network uri accesses
 class CurlStreamFile : public IOChannel
 {
 

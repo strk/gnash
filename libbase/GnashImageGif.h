@@ -31,9 +31,6 @@ extern "C" {
 #include <gif_lib.h>
 }
 
-// It is convenient to read the gif data into memory as interlaced GIFs
-// cannot be interpreted line by line.
-
 // Forward declarations
 namespace gnash { class IOChannel; }
 
@@ -42,58 +39,71 @@ namespace gnash {
 class GifImageInput : public ImageInput
 {
 
-    typedef boost::scoped_array<GifPixelType> PixelRow;
+public:
+
+	/// Construct a GifImageInput object to read from an IOChannel.
+	//
+	/// @param in   The stream to read GIF data from. Ownership is shared
+    ///             between caller and GifImageInput, so it is freed
+    ///             automatically when the last owner is destroyed.
+	GifImageInput(boost::shared_ptr<IOChannel> in);
+	
+	~GifImageInput();
+
+    /// Begin processing the image data.
+    void read();
+
+	/// Get the image's height in pixels.
+    //
+    /// @return     The height of the image in pixels.
+	size_t getHeight() const;
+
+	/// Get the image's width in pixels.
+    //
+    /// @return     The width of the image in pixels.
+	size_t getWidth() const;
+
+	/// Get number of components (channels)
+    //
+	/// @return     The number of components, e.g. 3 for RGB
+	size_t getComponents() const { return 3; }
+
+	/// Read a scanline's worth of image data into the given buffer.
+    //
+    /// The amount of data read is getWidth() * getComponents().
+	///
+    /// @param rgbData  The buffer for writing raw RGB data to.
+	void readScanline(unsigned char* rgb_data);
+
+
+    /// Create a GifImageInput and transfer ownership to the caller.
+    //
+    /// @param in   The IOChannel to read GIF data from.
+    DSOEXPORT static std::auto_ptr<ImageInput> create(
+            boost::shared_ptr<IOChannel> in)
+    {
+        std::auto_ptr<ImageInput> ret ( new GifImageInput(in) );
+        if ( ret.get() ) ret->read();
+        return ret;
+    }
 
 private:
+	
+    /// Initialize gif_lib
+    void init();
+
 	// State needed for input.
 	GifFileType* _gif;
     
     // A counter for keeping track of the last row copied.
     size_t _currentRow;
     
+    typedef boost::scoped_array<GifPixelType> PixelRow;
+
     // A 2-dimensional scoped array holding the unpacked pixel data.
     boost::scoped_array<PixelRow> _gifData;
 
-public:
 
-	/// Constructor.  
-	//
-	/// @param in
-	/// 	The stream to read from.
-	GifImageInput(boost::shared_ptr<IOChannel> in);
-	
-	// Destructor. Free libpng-allocated memory.
-	~GifImageInput();
-	
-    void init();
-
-    void read();
-
-	// Return the height of the image.
-	size_t getHeight() const;
-
-	// Return the width of the image.
-	size_t getWidth() const;
-
-	// Return number of components (i.e. == 3 for RGB
-	// data).  The size of the data for a scanline is
-	// get_width() * get_components().
-	//
-	int	getComponents() const { return 3; }
-
-	// Read a scanline's worth of image data into the
-	// given buffer.  The amount of data read is
-	// get_width() * get_components().
-	//
-	void readScanline(unsigned char* rgb_data);
-
-
-    DSOEXPORT static std::auto_ptr<ImageInput> create(boost::shared_ptr<IOChannel> in)
-    {
-        std::auto_ptr<ImageInput> ret ( new GifImageInput(in) );
-        if ( ret.get() ) ret->read();
-        return ret;
-    }
 
 };
 

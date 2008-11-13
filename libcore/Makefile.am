@@ -28,7 +28,6 @@ FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/libamf \
 	-I$(top_srcdir)/libnet \
 	-I$(top_srcdir)/backend \
@@ -39,6 +38,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libmedia \
+	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libamf \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
@@ -64,7 +64,7 @@ libgnashcore_la_SOURCES = \
 	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
-	edit_text_character.cpp \
+	TextField.cpp \
         BlurFilter.cpp \
         GlowFilter.cpp \
         DropShadowFilter.cpp \
@@ -75,28 +75,38 @@ libgnashcore_la_SOURCES = \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
 	generic_character.cpp \
-	matrix.cpp \
+	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
 	namedStrings.cpp \
 	rect.cpp \
-	sprite_instance.cpp \
+	MovieClip.cpp \
 	swf/TagLoadersTable.cpp	\
+	swf/DefineVideoStreamTag.cpp \
+	swf/DefineTextTag.cpp \
+	swf/DefineButtonSoundTag.cpp \
+	swf/DefineButtonCxformTag.cpp \
+	swf/DefineButtonTag.cpp \
+	swf/DefineFontTag.cpp \
+	swf/VideoFrameTag.cpp \
+	swf/SoundInfoRecord.cpp \
+	swf/TextRecord.cpp \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
+	swf/DefineEditTextTag.cpp \
 	swf/CSMTextSettingsTag.cpp \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
 	swf/StartSoundTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
 	swf_function.cpp \
-	video_stream_instance.cpp \
+	Video.cpp \
 	StreamProvider.cpp \
 	array.cpp \
-	button_character_instance.cpp \
+	Button.cpp \
 	DisplayList.cpp \
 	fill_style.cpp \
-	font.cpp \
+	Font.cpp \
 	fontlib.cpp \
 	impl.cpp \
 	LoadVariablesThread.cpp \
@@ -104,9 +114,8 @@ libgnashcore_la_SOURCES = \
 	shape.cpp \
 	SWFStream.cpp \
 	styles.cpp \
-	text.cpp \
 	timers.cpp \
-	types.cpp 	\
+	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
 	$(NULL)
 
@@ -120,6 +129,7 @@ noinst_HEADERS = \
 	VirtualClock.h \
 	SystemClock.h \
 	ManualClock.h \
+	RunInfo.h \
 	array.h	\
 	as_environment.h \
 	as_function.h \
@@ -130,7 +140,7 @@ noinst_HEADERS = \
 	bitmap_info.h \
 	BitmapMovieInstance.h \
 	builtin_function.h \
-	button_character_instance.h \
+	Button.h \
 	character.h \
 	CharacterProxy.h \
 	cxform.h \
@@ -138,7 +148,7 @@ noinst_HEADERS = \
 	DynamicShape.h	\
 	DisplayList.h	\
 	drag_state.h \
-	edit_text_character.h \
+	TextField.h \
 	event_id.h \
 	fill_style.h \
         BitmapFilter.h \
@@ -151,33 +161,43 @@ noinst_HEADERS = \
         ConvolutionFilter.h \
         ColorMatrixFilter.h \
         parser/filter_factory.h \
-	font.h \
+	Font.h \
 	fontlib.h \
 	generic_character.h \
 	gnash.h	\
 	GnashKey.h \
 	impl.h \
 	LoadVariablesThread.h \
-	matrix.h \
-	mouse_button_state.h \
+	SWFMatrix.h \
+	MouseButtonState.h \
 	movie_instance.h \
 	movie_root.h \
 	namedStrings.h \
 	rect.h \
 	render.h \
-	resource.h \
+	ExportableResource.h \
 	shape.h	\
-	sprite_instance.h \
+	MovieClip.h \
 	SWFStream.h \
 	styles.h \
 	swf.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
+	swf/VideoFrameTag.h \
+	swf/DefineVideoStreamTag.h \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
+	swf/SoundInfoRecord.h \
+	swf/TextRecord.h \
+	swf/DefineButtonSoundTag.h \
+	swf/DefineTextTag.h \
+	swf/DefineButtonTag.h \
+	swf/DefineEditTextTag.h \
 	swf/DefineButtonCxformTag.h \
 	swf/PlaceObject2Tag.h \
+	swf/DefineFontTag.h \
+	swf/DefineFontNameTag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \
 	swf/DoActionTag.h \
@@ -188,17 +208,15 @@ noinst_HEADERS = \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
-	text.h \
 	timers.h \
-	types.h	\
-	video_stream_instance.h \
+	RGBA.h	\
+	Video.h \
 	$(NULL)
 
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libnet/libgnashnet.la \
-	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
@@ -226,7 +244,25 @@ libgnashcore_la_SOURCES += debugger.cpp
 endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
-libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic #-no-undefined 
+libgnashcore_la_LDFLAGS = -release $(VERSION) -export-dynamic
+
+if WIN32
+  libgnashcore_la_LDFLAGS += -no-undefined
+  libgnashcore_la_LIBADD += \
+	$(top_builddir)/libmedia/libgnashmedia_la-MediaParser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-MediaHandler.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-FLVParser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderNellymoser.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSimple.lo \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioResampler.lo 
+if HAVE_SPEEX
+  libgnashcore_la_LIBADD += \
+	$(top_builddir)/libmedia/libgnashmedia_la-AudioDecoderSpeex.lo
+endif
+else
+  libgnashcore_la_LIBADD += $(top_builddir)/libmedia/libgnashmedia.la \
+  	$(top_builddir)/libsound/libgnashsound.la
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

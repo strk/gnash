@@ -58,6 +58,7 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
+#include <gdk/gdkx.h>
 #include <gdk/gdkprivate.h>
 #endif
 
@@ -113,7 +114,7 @@ bool
 #ifdef ENABLE_MIT_SHM
 GtkAggGlue::check_mit_shm(Display *display) 
 #else
-GtkAggGlue::check_mit_shm(void *display) 
+GtkAggGlue::check_mit_shm(void* /*display*/) 
 #endif
 {
 #ifdef ENABLE_MIT_SHM
@@ -145,7 +146,13 @@ GtkAggGlue::check_mit_shm(void *display)
 }
 
 void 
-GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
+GtkAggGlue::create_shm_image(
+#ifdef ENABLE_MIT_SHM
+    unsigned int width, unsigned int height
+#else
+    unsigned int, unsigned int
+#endif
+    )
 {
 
     // destroy any already existing structures
@@ -201,6 +208,8 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
         destroy_shm_image();
         return;
     }
+    // allows below to work. bug fix by cliff (bug #24692)
+    XSync(gdk_display, False);
 
     // mark segment for automatic destruction after last process detaches
     shmctl(_shm_info->shmid, IPC_RMID, 0);
@@ -460,6 +469,10 @@ GtkAggGlue::beforeRendering()
 void
 GtkAggGlue::render()
 {
+    if (!_drawing_area) {
+        return;
+    }
+
 
 #ifdef ENABLE_MIT_SHM
     if (_shm_image) {
@@ -502,6 +515,14 @@ GtkAggGlue::render()
 void
 GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
 {
+    if (!_drawing_area) {
+        return;
+    }
+
+    size_t copy_width = std::min(_width * (_bpp/8), maxx - minx);
+    size_t copy_height = std::min(_height, maxy - miny);
+    size_t stride = _width*((_bpp+7)/8);
+
 #ifdef ENABLE_MIT_SHM
     if (_shm_image) {
   
@@ -512,7 +533,7 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
         _shm_image,
         minx, miny,
         minx, miny,
-        maxx-minx+1, maxy-miny+1,
+        copy_width, copy_height,
         False);
       
     // NOTE: Data will be copied in background, see beforeRendering()
@@ -520,10 +541,6 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
     }
     else {
 #endif
-        size_t copy_width = std::min(_width * (_bpp/8), maxx - minx);
-        size_t copy_height = std::min(_height, maxy - miny);
-        size_t stride = _width*((_bpp+7)/8);
-
 //    log_debug("minx: %d, miny: %d, copy width: %d, copy height: %d, stride: %d",
 //                            minx, miny, copy_width, copy_height, stride);
 //    log_debug("offscreenbuf size: %d", _offscreenbuf_size);
