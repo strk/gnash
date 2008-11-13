@@ -23,19 +23,21 @@ class PP_AddChild {
 
 		var tf6 = flash.Lib.current.addChildAt(tf, 1);
 		check_equals(tf6, tf);
+		check_equals(tf6, tf5);
 		var tf7 = flash.Lib.current.addChildAt(tf, 1);
 		check_equals(tf7, tf);
 		check_equals(tf7, tf6);
+		check_equals(tf7, tf5);
 
 		// TODO: check depths, add a MovieClip child,
 		//       find a way to do some checks on the
 		//	 actual stage content !
 
                 // Check number of tests run (for consistency)
-		check_totals(11);
+		check_totals(13);
 
-                // Call this after finishing all tests. It prints out the totals.
-                Dejagnu.done();
+        // Call this after finishing all tests. It prints out the totals.
+        Dejagnu.done();
 
 	}
 }
