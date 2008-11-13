@@ -195,10 +195,32 @@ test_errors (void)
     cache.addFile("foo", &file1);
     if ((cache.findFile("foo")->getFileSize() == file1.getFileSize())
          && (cache.findFile("bar") == 0)) {
-        runtest.pass("addFile()/findFile()");
+        runtest.pass("Cache::addFile()/findFile()");
     } else {
-        runtest.fail("addFile()/findFile()");
+        runtest.fail("Cache::addFile()/findFile()");
     }
+
+    // see what happens if we try an uninitialized Cache.
+    Cache c1;
+    
+    if (c1.findPath("foo").size() == 0) {
+        runtest.pass("Cache::findPath(empty)");
+    } else {
+        runtest.fail("Cache::findPath(empty)");
+    }
+
+    if (c1.findResponse("foo").size() == 0) {
+        runtest.pass("Cache::findResponse(empty)");
+    } else {
+        runtest.fail("Cache::findResponse(empty)");
+    }
+
+    if (c1.findFile("foo") == 0) {
+        runtest.pass("Cache::findFile(empty)");
+    } else {
+        runtest.fail("Cache::findFile(empty)");
+    }
+    
 }
 
 /// \brief create a test file to read in later. This lets us create
