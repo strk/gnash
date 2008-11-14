@@ -9,10 +9,6 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "Font.h"
 #include "impl.h"
 #include "log.h"

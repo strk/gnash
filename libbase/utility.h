@@ -16,8 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef UTILITY_H
-#define UTILITY_H
+#ifndef _GNASH_UTILITY_H
+#define _GNASH_UTILITY_H
 
 // HAVE_FINITE, HAVE_PTHREADS, WIN32, NDEBUG etc.
 #ifdef HAVE_CONFIG_H
@@ -31,6 +31,10 @@
 #include <boost/cstdint.hpp>
 #include <algorithm> // std::min, std::max
 #include <limits>
+
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
 
 #if defined(__GNUC__) && __GNUC__ > 2
 #  include <cxxabi.h>
@@ -184,7 +188,6 @@ std::string typeName(const T& inst)
 
 /// Used in logging.
 #ifdef HAVE_PTHREADS
-#include <pthread.h>
 #else
 # ifdef _WIN32
 } // end namespace gnash
@@ -223,7 +226,7 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
 // Handy macro to quiet compiler warnings about unused parameters/variables.
 #define UNUSED(x) (x) = (x)
 
-#endif // UTILITY_H
+#endif // _GNASH_UTILITY_H
 
 
 // Local Variables:
