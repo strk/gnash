@@ -27,9 +27,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>

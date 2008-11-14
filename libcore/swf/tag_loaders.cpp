@@ -22,10 +22,6 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "IOChannel.h" // for StreamAdapter inheritance
 #include "utility.h"
 #include "action.h"

@@ -25,10 +25,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "SWFMatrix.h"
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"

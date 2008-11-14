@@ -2832,6 +2832,7 @@ getTextFieldInterface(VM& vm)
             /// The prototype for SWF5 is a simple as_object without
             /// toString() or valueOf().
             proto = new as_object();
+            vm.addStatic(proto.get());
         }
         else {
             proto = new as_object(getObjectInterface());
