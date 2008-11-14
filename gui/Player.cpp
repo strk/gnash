@@ -671,7 +671,7 @@ Player::getGui()
     return createGTKGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
-#ifdef GUI_KDE
+#ifdef GUI_KDE3
     return createKDEGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
