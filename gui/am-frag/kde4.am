@@ -19,21 +19,30 @@
 # Build the KDE gui
 # 
 if BUILD_KDE4_GUI
+
+klash4.moc: $(srcdir)/Kde4Gui.h
+	@if test x"$(MOC4)" != x; then \
+	  echo "Generating MOC 4 file..."; \
+	  $(MOC4) $(srcdir)/Kde4Gui.h -o klash4.moc; \
+	else  \
+	  echo "WARNING: Install QT 4.x moc tool! Linking to default MOC file"; \
+	  ln -sf $(srcdir)/klash4.moc.in klash4.moc; \
+	fi
+
+endif
+
 bin_PROGRAMS += kde4-gnash
-kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" \
-	 $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
+
+kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
 kde4_gnash_SOURCES = $(GUI_SRCS) GuiKde4.cpp
 kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-kde4_gnash_LDADD = \
-	$(MYSQL_LIBS) \
-	$(GNASH_LIBS) \
-	$(AM_LDFLAGS) @QTCORE@ @QTGUI@
-# @KDECORE@ @KDEUI@
+kde4_gnash_LDADD = $(MYSQL_LIBS) $(GNASH_LIBS) $(AM_LDFLAGS) $(KDE4_LIBS)
+
 if BUILD_AGG_RENDERER
 kde4_gnash_CPPFLAGS += $(AGG_CFLAGS)
 kde4_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
 	$(QT4_LIBS) $(AGG_LIBS)
 kde4_gnash_SOURCES += Kde4GlueAgg.cpp Kde4GlueAgg.h \
 	 	Kde4Gui.cpp Kde4Gui.h KdeGlue.h
-endif
+
 endif
