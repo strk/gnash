@@ -679,6 +679,7 @@ as_environment::find_object(const std::string& path_in, const ScopeStack* scopeS
 				{
 					// const_cast needed due to non-const as_object::get_member 
 					as_object* obj = const_cast<as_object*>((*scopeStack)[i-1].get());
+					if(!obj) continue;
 					element = obj->get_path_element(subpartKey);
 					if ( element ) break;
 				}

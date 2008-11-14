@@ -2791,8 +2791,12 @@ as_value Machine::find_prop_strict(asName multiname){
 	mScopeStack.push(mGlobalObject);
 	for(size_t i=0;i<mScopeStack.size();i++)
     {
-
-		val = mScopeStack.top(i).get()->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
+		as_object* scope_object = mScopeStack.top(i).get();
+		if(!scope_object){
+			LOG_DEBUG_AVM("Scope object is NULL.");
+			continue;
+		}
+		val = scope_object->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
 
 		if(!val.is_undefined()){
 			push_stack(mScopeStack.top(i));
@@ -2808,7 +2812,6 @@ as_value Machine::find_prop_strict(asName multiname){
 	std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
 	std::string path = ns.size() == 0 ? name : ns + "." + name;
 	val = env.get_variable(path,*getScopeStack(),&target);
-	LOG_DEBUG_AVM("Got value.");
 	push_stack(as_value(target));	
 	mScopeStack.pop();
 	return val;
