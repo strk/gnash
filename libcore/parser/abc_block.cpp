@@ -27,6 +27,7 @@
 #include "asClass.h"
 #include "namedStrings.h"
 #include "CodeStream.h"
+#include "action_buffer.h"
 
 //#define ERR(x) IF_VERBOSE_MALFORMED_SWF(log_swferror x;);
 #define ERR(x) printf x; fflush(stdout);
@@ -435,6 +436,7 @@ abc_block::read_double_constants()
 	for (unsigned int i = 1; i < count; ++i)
 	{
 		mDoublePool[i] = mS->read_d64();
+		LOG_DEBUG_ABC("Double %u=%lf",i,mDoublePool[i]);
 	}
 	return true;
 }

@@ -23,6 +23,7 @@
 #include "IOChannel.h"
 #include "swf.h"
 #include "Property.h"
+#include "action_buffer.h"
 
 #include <cstring>
 #include <climits>
@@ -300,7 +301,7 @@ float    SWFStream::read_long_float()
 }
 
 // Read a 64-bit double value
-long double SWFStream::read_d64()
+double SWFStream::read_d64()
 {
 #ifdef USE_TU_FILE_BYTESWAPPING 
     align();
@@ -308,26 +309,25 @@ long double SWFStream::read_d64()
 #else
     using boost::uint32_t;
 
-    const unsigned short dataLength = 8;
-    unsigned char buf[dataLength];
+//    const unsigned short dataLength = 8;
+//    unsigned char buf[dataLength];
     
     // Should align:
-    if (read(reinterpret_cast<char*>(buf), dataLength) < dataLength)
-    {
-        throw ParserException(_("Unexpected end of stream while reading"));
+//    if (read(reinterpret_cast<boost::uint8_t*>(buf), dataLength) < dataLength)
+//    {
+//        throw ParserException(_("Unexpected end of stream while reading"));
+//    }
+
+    //Swap words so we can pass m_buffer to convert_double_wacky.
+    boost::uint8_t m_buffer[8];
+    for(int i=0;i<4;i++){
+        m_buffer[i+4] = read_u8();
     }
-    
-    uint64_t low = buf[0];
-    low |= buf[1] << 8;
-    low |= buf[2] << 16;
-    low |= buf[3] << 24;
+    for(int j=0;j<4;j++){
+        m_buffer[j] = read_u8();
+    }
 
-    uint64_t hi = buf[4];
-    hi |= buf[5] << 8;
-    hi |= buf[6] << 16;
-    hi |= buf[7] << 24;
-
-    return static_cast<long double> ( low | (hi<<32) );
+    return convert_double_wacky(&m_buffer);
 #endif
 }
 

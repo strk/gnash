@@ -39,6 +39,8 @@ namespace gnash {
 
 class ActionExec;
 
+double convert_double_wacky(const void *p);
+
 /// A code segment.
 //
 /// This currently holds the actions in a memory

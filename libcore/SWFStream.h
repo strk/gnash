@@ -126,7 +126,7 @@ public:
 	//
 	/// aligned read
 	///
-	long double read_d64();
+	double read_d64();
 
 	/// Consume all bits of current byte
 	//

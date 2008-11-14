@@ -81,6 +81,7 @@ static inline double pool_double(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool)
 		throw ASException();
+	LOG_DEBUG_AVM("Getting double from pool at index %u",index);
 	return pool->mDoublePool.at(index);
 }
 
@@ -935,8 +936,7 @@ Machine::execute()
 ///  value -- Double object from double_pool[index]
 	case SWF::ABC_ACTION_PUSHDOUBLE:
 	{
-		mStack.grow(1);
-		mStack.top(0) = pool_double(mStream->read_V32(), mPoolObject);
+		push_stack(as_value(pool_double(mStream->read_V32(), mPoolObject)));
 		break;
 	}
 /// 0x31 ABC_ACTION_PUSHNAMESPACE
