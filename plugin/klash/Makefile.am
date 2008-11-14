@@ -17,20 +17,20 @@
 
 AUTOMAKE_OPTIONS = 
 
-if KPARTS
+if KPARTS3
 AM_CPPFLAGS = \
-	$(KDE_CFLAGS) \
-	$(QT_CFLAGS) \
+	$(KDE3_CFLAGS) \
+	$(QT3_CFLAGS) \
 	$(X11_CFLAGS) \
 	-DGNASHBINDIR=\"${bindir}\"
 
-plugindir   = $(KDE_PLUGINDIR)
-kde_servicesdir = $(KDE_SERVICESDIR)
-kde_rcdir       = $(KDE_APPSDATADIR)
+plugindir   = $(KDE3_PLUGINDIR)
+kde_servicesdir = $(KDE3_SERVICESDIR)
+kde_rcdir       = $(KDE3_APPSDATADIR)
 #$(prefix)/share/apps/klash
-kde_appsdatadir = $(KDE_APPSDATADIR)
+kde_appsdatadir = $(KDE3_APPSDATADIR)
 #$(prefix)/share/apps/klash
-kde_configdir   = $(KDE_CONFIGDIR)
+kde_configdir   = $(KDE3_CONFIGDIR)
 #$(prefix)/share/config
 
 plugin_LTLIBRARIES= libklashpart.la
@@ -54,11 +54,11 @@ BUILT_SOURCES = klash_part.moc
 CLEANFILES = klash_part.moc
 
 klash_part.moc: $(srcdir)/klash_part.h
-	@if test x"$(MOC)" != x; then \
-	  echo "Generating MOC file..."; \
-	  $(MOC) $(srcdir)/klash_part.h -o klash_part.moc; \
+	@if test x"$(MOC3)" != x; then \
+	  echo "Generating MOC 3.x file..."; \
+	  $(MOC3) $(srcdir)/klash_part.h -o klash_part.moc; \
 	else  \
-	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
+	  echo "WARNING: Install QT 3.x moc tool! Linking to default MOC file"; \
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
 	fi
 
@@ -71,13 +71,13 @@ test_perms:
 	  if test -d $(DESTDIR)$(kde_appsdatadir); then \
 	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir)!"; \
 	    echo "You probably need to be root"; \
-	    echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
+	    echo "Or configure with --with-kde-prefix= set to a writable directory"; \
 	    exit 1; \
           fi; \
 	  if test -d $(DESTDIR)$(kde_servicesdir); then \
 	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir) and $(DESTDIR)$(kde_servicesdir)!"; \
 	    echo "You probably need to be root"; \
-	    echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
+	    echo "Or configure with --with-kde3-prefix= set to a writable directory"; \
 	    exit 1; \
 	  fi; \
 	fi

@@ -20,7 +20,7 @@ AUTOMAKE_OPTIONS =
 
 SUBDIRS =
 
-if KPARTS
+if KPARTS3
 SUBDIRS += klash
 endif
 

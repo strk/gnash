@@ -173,17 +173,29 @@ endif
 	@echo "GUI Toolkit decoding support..."	
 	@echo "	SDL_CFLAGS is $(SDL_CFLAGS)"
 	@echo "	SDL_LIBS is $(SDL_LIBS)"
-if BUILD_KDE_GUI
-	@echo "	KDE_CFLAGS is $(KDE_CFLAGS)"
-	@echo "	KDE_LIBS is $(KDE_LIBS)"
+if BUILD_KDE3_GUI
+	@echo "	KDE3_CFLAGS is $(KDE3_CFLAGS)"
+	@echo "	KDE3_LIBS is $(KDE3_LIBS)"
 endif
-if BUILD_QT_GUI
-	@echo "	QT_CFLAGS is $(QT_CFLAGS)"
-	@echo "	QT_LIBS is $(QT_LIBS)"
+if BUILD_KDE4_GUI
+	@echo "	KDE4_CFLAGS is $(KDE4_CFLAGS)"
+	@echo "	KDE4_LIBS is $(KDE4_LIBS)"
 endif
-if BUILD_QTOPIA_GUI
-	@echo "	QTOPIA_CFLAGS is $(QTOPIA_CFLAGS)"
-	@echo "	QTOPIA_LIBS is $(QTOPIA_LIBS)"
+if BUILD_QT3_GUI
+	@echo "	QT3_CFLAGS is $(QT3_CFLAGS)"
+	@echo "	QT3_LIBS is $(QT3_LIBS)"
+endif
+if BUILD_QT4_GUI
+	@echo "	QT4_CFLAGS is $(QT4_CFLAGS)"
+	@echo "	QT4_LIBS is $(QT4_LIBS)"
+endif
+if BUILD_QTOPIA3_GUI
+	@echo "	QTOPIA3_CFLAGS is $(QTOPIA3_CFLAGS)"
+	@echo "	QTOPIA3_LIBS is $(QTOPIA3_LIBS)"
+endif
+if BUILD_QTOPIA4_GUI
+	@echo "	QTOPIA4_CFLAGS is $(QTOPIA4_CFLAGS)"
+	@echo "	QTOPIA4_LIBS is $(QTOPIA4_LIBS)"
 endif
 if BUILD_FLTK_GUI
 	@echo "	FLTK2_CFLAGS is $(FLTK2_CFLAGS)"
@@ -306,11 +318,17 @@ endif
 if BUILD_ALP_GUI
 	@echo "	Supported GUI: ALP/Hiker"
 endif
-if BUILD_KDE_GUI
-	@echo "	Supported GUI: KDE"
+if BUILD_KDE3_GUI
+	@echo "	Supported GUI: KDE3"
 endif
-if BUILD_QTOPIA_GUI
-	@echo "	Supported GUI: QTOPIA"
+if BUILD_KDE4_GUI
+	@echo "	Supported GUI: KDE4"
+endif
+if BUILD_QTOPIA3_GUI
+	@echo "	Supported GUI: QTOPIA3"
+endif
+if BUILD_QTOPIA4_GUI
+	@echo "	Supported GUI: QTOPIA4"
 endif
 if BUILD_SDL_GUI
 	@echo "	Supported GUI: SDL"
@@ -340,14 +358,23 @@ endif
 	@if test -n "$(STATISTICS_LIST)" ; then \
 	  echo "	Statistics features enables are: $(STATISTICS_LIST)"; \
 	fi
-if KPARTS
-	@echo "	KPARTS (KDE) plugin enabled"
-	@echo "	  KPARTS plugin install dir: $(KDE_PLUGINDIR)"
-	@echo "	  KPARTS service install dir: $(KDE_SERVICESDIR)"
-	@echo "	  KPARTS config dir: ${KDE_CONFIGDIR}"
-	@echo "	  KPARTS appsdata dir: ${KDE_APPSDATADIR}"
+if KPARTS3
+	@echo "	KPARTS 3.x (KDE) plugin enabled"
+	@echo "	  KPARTS 3.x plugin install dir: $(KDE_PLUGINDIR)"
+	@echo "	  KPARTS 3.x service install dir: $(KDE_SERVICESDIR)"
+	@echo "	  KPARTS 3.x config dir: ${KDE_CONFIGDIR}"
+	@echo "	  KPARTS 3.x appsdata dir: ${KDE_APPSDATADIR}"
 else
-	@echo "	KPARTS (KDE) plugin disabled"
+	@echo "	KPARTS 3.x (KDE) plugin disabled"
+endif
+if KPARTS4
+	@echo "	KPARTS 4.x (KDE) plugin enabled"
+	@echo "	  KPARTS 4.x plugin install dir: $(KDE_PLUGINDIR)"
+	@echo "	  KPARTS 4.x service install dir: $(KDE_SERVICESDIR)"
+	@echo "	  KPARTS 4.x config dir: ${KDE_CONFIGDIR}"
+	@echo "	  KPARTS 4.x appsdata dir: ${KDE_APPSDATADIR}"
+else
+	@echo "	KPARTS 4.x (KDE) plugin disabled"
 endif
 
 if NPAPI

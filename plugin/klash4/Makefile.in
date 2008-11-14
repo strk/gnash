@@ -56,27 +56,31 @@ DIST_COMMON = README $(am__dist_kde_appsdata_DATA_DIST) \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/macros/agg.m4 \
-	$(top_srcdir)/macros/alp.m4 $(top_srcdir)/macros/boost.m4 \
-	$(top_srcdir)/macros/curl.m4 $(top_srcdir)/macros/dbus.m4 \
-	$(top_srcdir)/macros/docbook.m4 $(top_srcdir)/macros/ffmpeg.m4 \
-	$(top_srcdir)/macros/firefox.m4 \
+	$(top_srcdir)/macros/alp.m4 $(top_srcdir)/macros/argz.m4 \
+	$(top_srcdir)/macros/boost.m4 $(top_srcdir)/macros/curl.m4 \
+	$(top_srcdir)/macros/dbus.m4 $(top_srcdir)/macros/docbook.m4 \
+	$(top_srcdir)/macros/ffmpeg.m4 $(top_srcdir)/macros/firefox.m4 \
 	$(top_srcdir)/macros/freetype.m4 \
 	$(top_srcdir)/macros/gettext.m4 $(top_srcdir)/macros/glib.m4 \
 	$(top_srcdir)/macros/gnashpkgtool.m4 \
 	$(top_srcdir)/macros/gtk2.m4 $(top_srcdir)/macros/gtkglext.m4 \
 	$(top_srcdir)/macros/haxe.m4 $(top_srcdir)/macros/hildon.m4 \
-	$(top_srcdir)/macros/iconv.m4 $(top_srcdir)/macros/kde.m4 \
+	$(top_srcdir)/macros/iconv.m4 $(top_srcdir)/macros/kde3.m4 \
 	$(top_srcdir)/macros/kde4.m4 $(top_srcdir)/macros/lib-link.m4 \
 	$(top_srcdir)/macros/lib-prefix.m4 \
 	$(top_srcdir)/macros/libXML.m4 $(top_srcdir)/macros/libexe.m4 \
-	$(top_srcdir)/macros/libltdl.m4 $(top_srcdir)/macros/ming.m4 \
-	$(top_srcdir)/macros/mtasc.m4 $(top_srcdir)/macros/mysql.m4 \
-	$(top_srcdir)/macros/nls.m4 $(top_srcdir)/macros/nspr.m4 \
-	$(top_srcdir)/macros/opengl.m4 $(top_srcdir)/macros/pango.m4 \
-	$(top_srcdir)/macros/pkg.m4 $(top_srcdir)/macros/po.m4 \
-	$(top_srcdir)/macros/progtest.m4 \
-	$(top_srcdir)/macros/pthreads.m4 $(top_srcdir)/macros/qt.m4 \
-	$(top_srcdir)/macros/qtopia.m4 $(top_srcdir)/macros/sdl.m4 \
+	$(top_srcdir)/macros/libtool.m4 $(top_srcdir)/macros/ltdl.m4 \
+	$(top_srcdir)/macros/ltoptions.m4 \
+	$(top_srcdir)/macros/ltsugar.m4 \
+	$(top_srcdir)/macros/ltversion.m4 \
+	$(top_srcdir)/macros/lt~obsolete.m4 \
+	$(top_srcdir)/macros/ming.m4 $(top_srcdir)/macros/mtasc.m4 \
+	$(top_srcdir)/macros/mysql.m4 $(top_srcdir)/macros/nls.m4 \
+	$(top_srcdir)/macros/nspr.m4 $(top_srcdir)/macros/opengl.m4 \
+	$(top_srcdir)/macros/pango.m4 $(top_srcdir)/macros/pkg.m4 \
+	$(top_srcdir)/macros/po.m4 $(top_srcdir)/macros/progtest.m4 \
+	$(top_srcdir)/macros/pthreads.m4 $(top_srcdir)/macros/qt3.m4 \
+	$(top_srcdir)/macros/qt4.m4 $(top_srcdir)/macros/sdl.m4 \
 	$(top_srcdir)/macros/x11.m4 $(top_srcdir)/macros/xpcom.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -144,6 +148,7 @@ ALP_CFLAGS = @ALP_CFLAGS@
 ALP_LIBS = @ALP_LIBS@
 AMTAR = @AMTAR@
 AR = @AR@
+ARGZ_H = @ARGZ_H@
 AS = @AS@
 ATK_CFLAGS = @ATK_CFLAGS@
 ATK_CONFIG = @ATK_CONFIG@
@@ -200,7 +205,8 @@ DLLTOOL = @DLLTOOL@
 DLOPEN = @DLOPEN@
 DLPREOPEN = @DLPREOPEN@
 DOXYGEN = @DOXYGEN@
-ECHO = @ECHO@
+DSYMUTIL = @DSYMUTIL@
+DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
@@ -210,11 +216,10 @@ EXPAT_CFLAGS = @EXPAT_CFLAGS@
 EXPAT_CONFIG = @EXPAT_CONFIG@
 EXPAT_LIBS = @EXPAT_LIBS@
 EXTENSIONS_LIST = @EXTENSIONS_LIST@
-F77 = @F77@
 FC_MATCH = @FC_MATCH@
-FFLAGS = @FFLAGS@
 FFMPEG_CFLAGS = @FFMPEG_CFLAGS@
 FFMPEG_LIBS = @FFMPEG_LIBS@
+FGREP = @FGREP@
 FIREFOX_PLUGINS = @FIREFOX_PLUGINS@
 FLTK2_CFLAGS = @FLTK2_CFLAGS@
 FLTK2_CONFIG = @FLTK2_CONFIG@
@@ -257,26 +262,28 @@ JAVA = @JAVA@
 JPEG_CFLAGS = @JPEG_CFLAGS@
 JPEG_CONFIG = @JPEG_CONFIG@
 JPEG_LIBS = @JPEG_LIBS@
-KDE4 = @KDE4@
+KDE3_APPSDATADIR = @KDE3_APPSDATADIR@
+KDE3_CFLAGS = @KDE3_CFLAGS@
+KDE3_CONFIG = @KDE3_CONFIG@
+KDE3_CONFIGDIR = @KDE3_CONFIGDIR@
+KDE3_LIBS = @KDE3_LIBS@
+KDE3_PLUGINDIR = @KDE3_PLUGINDIR@
+KDE3_SERVICESDIR = @KDE3_SERVICESDIR@
 KDE4_APPSDATADIR = @KDE4_APPSDATADIR@
+KDE4_CFLAGS = @KDE4_CFLAGS@
+KDE4_CONFIG = @KDE4_CONFIG@
 KDE4_CONFIGDIR = @KDE4_CONFIGDIR@
-KDE4_INCLUDES = @KDE4_INCLUDES@
+KDE4_LIBS = @KDE4_LIBS@
 KDE4_PLUGINDIR = @KDE4_PLUGINDIR@
 KDE4_SERVICESDIR = @KDE4_SERVICESDIR@
-KDECORE = @KDECORE@
-KDEUI = @KDEUI@
-KDE_APPSDATADIR = @KDE_APPSDATADIR@
-KDE_CFLAGS = @KDE_CFLAGS@
-KDE_CONFIG = @KDE_CONFIG@
-KDE_CONFIGDIR = @KDE_CONFIGDIR@
-KDE_LIBS = @KDE_LIBS@
-KDE_PLUGINDIR = @KDE_PLUGINDIR@
-KDE_SERVICESDIR = @KDE_SERVICESDIR@
-KHTML = @KHTML@
 KLASH_PLUGIN = @KLASH_PLUGIN@
 LC_KEY = @LC_KEY@
+LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBADD_DL = @LIBADD_DL@
+LIBADD_DLD_LINK = @LIBADD_DLD_LINK@
+LIBADD_DLOPEN = @LIBADD_DLOPEN@
+LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBAVCODEC_IDENT = @LIBAVCODEC_IDENT@
 LIBEXT = @LIBEXT@
 LIBICONV = @LIBICONV@
@@ -289,10 +296,17 @@ LIBTOOL = @LIBTOOL@
 LIBTOOL_DEPS = @LIBTOOL_DEPS@
 LIBXML_CFLAGS = @LIBXML_CFLAGS@
 LIBXML_LIBS = @LIBXML_LIBS@
+LIPO = @LIPO@
 LN_S = @LN_S@
+LTDLDEPS = @LTDLDEPS@
+LTDLINCL = @LTDLINCL@
+LTDLOPEN = @LTDLOPEN@
 LTLIBICONV = @LTLIBICONV@
 LTLIBINTL = @LTLIBINTL@
 LTLIBOBJS = @LTLIBOBJS@
+LT_CONFIG_H = @LT_CONFIG_H@
+LT_DLLOADERS = @LT_DLLOADERS@
+LT_DLPREOPEN = @LT_DLPREOPEN@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MAKESWF = @MAKESWF@
@@ -304,7 +318,7 @@ MING_VERSION = @MING_VERSION@
 MING_VERSION_CODE = @MING_VERSION_CODE@
 MKDIR_P = @MKDIR_P@
 MKINSTALLDIRS = @MKINSTALLDIRS@
-MOC = @MOC@
+MOC3 = @MOC3@
 MOC4 = @MOC4@
 MSGFMT = @MSGFMT@
 MSGMERGE = @MSGMERGE@
@@ -313,6 +327,8 @@ MTASC_CLASSPATH = @MTASC_CLASSPATH@
 MYSQL_CFLAGS = @MYSQL_CFLAGS@
 MYSQL_LIBS = @MYSQL_LIBS@
 NETCAT = @NETCAT@
+NM = @NM@
+NMEDIT = @NMEDIT@
 NSPR_CFLAGS = @NSPR_CFLAGS@
 NSPR_CONFIG = @NSPR_CONFIG@
 NSPR_LIBS = @NSPR_LIBS@
@@ -320,6 +336,8 @@ OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 OPENGL_CFLAGS = @OPENGL_CFLAGS@
 OPENGL_LIBS = @OPENGL_LIBS@
+OTOOL = @OTOOL@
+OTOOL64 = @OTOOL64@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -341,15 +359,11 @@ PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_CXX = @PTHREAD_CXX@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 PYTHON = @PYTHON@
-QT = @QT@
-QTCORE = @QTCORE@
-QTGUI = @QTGUI@
-QTOPIA_CFLAGS = @QTOPIA_CFLAGS@
-QTOPIA_LIBS = @QTOPIA_LIBS@
-QT_CFLAGS = @QT_CFLAGS@
-QT_LIBS = @QT_LIBS@
+QT3_CFLAGS = @QT3_CFLAGS@
+QT3_LIBS = @QT3_LIBS@
+QT4_CFLAGS = @QT4_CFLAGS@
+QT4_LIBS = @QT4_LIBS@
 RANLIB = @RANLIB@
-RCC4 = @RCC4@
 RENDERER_CONFIG = @RENDERER_CONFIG@
 RENDERER_LIBS = @RENDERER_LIBS@
 SCROLLINSTALL = @SCROLLINSTALL@
@@ -359,6 +373,7 @@ SDL_CFLAGS = @SDL_CFLAGS@
 SDL_CONFIG = @SDL_CONFIG@
 SDL_LIBS = @SDL_LIBS@
 SECURITY_LIST = @SECURITY_LIST@
+SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SOLDIR = @SOLDIR@
@@ -403,7 +418,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
-ac_ct_F77 = @ac_ct_F77@
+ac_ct_DUMPBIN = @ac_ct_DUMPBIN@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -436,6 +451,9 @@ libdir = @libdir@
 libexecdir = @libexecdir@
 localedir = @localedir@
 localstatedir = @localstatedir@
+lt_ECHO = @lt_ECHO@
+ltdl_LIBOBJS = @ltdl_LIBOBJS@
+ltdl_LTLIBOBJS = @ltdl_LTLIBOBJS@
 mandir = @mandir@
 mconfig = @mconfig@
 mkdir_p = @mkdir_p@
@@ -449,9 +467,9 @@ pthread_config = @pthread_config@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
+sys_symbol_underscore = @sys_symbol_underscore@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = 
@@ -472,8 +490,8 @@ AUTOMAKE_OPTIONS =
 @KPARTS4_TRUE@plugin_LTLIBRARIES = libklashpart.la
 @KPARTS4_TRUE@libklashpart_la_SOURCES = klash_part.cpp klash_part.h
 @KPARTS4_TRUE@libklashpart_la_DEPENDENCIES = klash_part.moc
-@KPARTS4_TRUE@@PLUGIN_LINK_UNDEFINED_FALSE@libklashpart_la_LDFLAGS = -module -avoid-version -L$(plugindir) @QTCORE@ @QTGUI@ @KDECORE@ @KDEUI@
-@KPARTS4_TRUE@@PLUGIN_LINK_UNDEFINED_TRUE@libklashpart_la_LDFLAGS = -avoid-version -L$(plugindir) @QTCORE@ @QTGUI@ @KDECORE@ @KDEUI@
+@KPARTS4_TRUE@@PLUGIN_LINK_UNDEFINED_FALSE@libklashpart_la_LDFLAGS = -module -avoid-version -L$(plugindir) $(KDE4_LIBS) $(QT4_LIBS)
+@KPARTS4_TRUE@@PLUGIN_LINK_UNDEFINED_TRUE@libklashpart_la_LDFLAGS = -avoid-version -L$(plugindir) $(KDE4_LIBS) $(QT4_LIBS)
 @KPARTS4_TRUE@dist_kde_services_DATA = klash_part.desktop
 @KPARTS4_TRUE@dist_kde_rc_DATA = klashpartui.rc
 @KPARTS4_TRUE@dist_kde_appsdata_DATA = pluginsinfo
@@ -826,7 +844,13 @@ uninstall-am: uninstall-dist_kde_appsdataDATA \
 
 
 @KPARTS4_TRUE@klash_part.moc: $(srcdir)/klash_part.h
-@KPARTS4_TRUE@	$(MOC4) $(srcdir)/klash_part.h -o klash_part.moc;
+@KPARTS4_TRUE@	@if test x"$(MOC4)" != x; then \
+@KPARTS4_TRUE@	  echo "Generating MOC 4.x file..."; \
+@KPARTS4_TRUE@	$(MOC4) $(srcdir)/klash_part.h -o klash_part.moc; \
+@KPARTS4_TRUE@	else  \
+@KPARTS4_TRUE@	  echo "WARNING: Install QT 4.x moc tool! Linking to default MOC file"; \
+@KPARTS4_TRUE@	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
+@KPARTS4_TRUE@	fi
 
 @KPARTS4_TRUE@install-data: $(dist_kde_services_DATA)
 @KPARTS4_TRUE@	test -d $(DESTDIR)$(kde_servicesdir) || $(mkinstalldirs) $(DESTDIR)$(kde_servicesdir)
@@ -837,13 +861,13 @@ uninstall-am: uninstall-dist_kde_appsdataDATA \
 @KPARTS4_TRUE@	  if test -d $(DESTDIR)$(kde_appsdatadir); then \
 @KPARTS4_TRUE@	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir)!"; \
 @KPARTS4_TRUE@	    echo "You probably need to be root"; \
-@KPARTS4_TRUE@	    echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
+@KPARTS4_TRUE@	    echo "Or configure with --with-kde-prefix= set to a writable directory"; \
 @KPARTS4_TRUE@	    exit 1; \
 @KPARTS4_TRUE@          fi; \
 @KPARTS4_TRUE@	  if test -d $(DESTDIR)$(kde_servicesdir); then \
 @KPARTS4_TRUE@	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir) and $(DESTDIR)$(kde_servicesdir)!"; \
 @KPARTS4_TRUE@	    echo "You probably need to be root"; \
-@KPARTS4_TRUE@	    echo "Or configure with --with-kde-pluginprefix= set to a writable directory"; \
+@KPARTS4_TRUE@	    echo "Or configure with --with-kde-prefix= set to a writable directory"; \
 @KPARTS4_TRUE@	    exit 1; \
 @KPARTS4_TRUE@	  fi; \
 @KPARTS4_TRUE@	fi
