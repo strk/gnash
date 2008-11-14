@@ -46,7 +46,7 @@
 
 #include "gui.h"
 #include "Kde4Gui.h"
-#include "Kde4.moc"
+#include "klash4.moc"
 #include "render_handler.h"
 #include "utility.h" // for PIXELS_TO_TWIPS 
 
