@@ -65,6 +65,7 @@ extern "C"{
 // classes internal to Cygnal
 #include "buffer.h"
 #include "handler.h"
+#include "cache.h"
 
 #ifdef ENABLE_NLS
 #include <locale.h>
@@ -92,8 +93,6 @@ static void cntrlc_handler(int sig);
 void connection_handler(Handler::thread_params_t *args);
 void dispatch_handler(Handler::thread_params_t *args);
 void admin_handler(Handler::thread_params_t *args);
-
-LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
@@ -124,8 +123,12 @@ const int ADMINPKTSIZE = 80;
 
 // end of globals
 
+static LogFile& dbglogfile = LogFile::getDefaultInstance();
+
 // The rcfile is loaded and parsed here:
-CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
+static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
+
+static Cache& cache = Cache::getDefaultInstance();
 
 // This mutex is used to signify when all the threads are done.
 static boost::condition	alldone;
@@ -339,7 +342,7 @@ void
 admin_handler(Handler::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
-    int retries = 10;
+    int retries = 100;
     int ret;
 
     map<int, Handler *>::iterator hit;
@@ -357,15 +360,13 @@ admin_handler(Handler::thread_params_t *args)
 	    Network::byte_t data[ADMINPKTSIZE+1];
 	    memset(data, 0, ADMINPKTSIZE+1);
 	    const char *ptr = reinterpret_cast<const char *>(data);
-	    ret = net.readNet(data, ADMINPKTSIZE, 3);
+	    ret = net.readNet(data, ADMINPKTSIZE, 100);
 	    // force the case to make comparisons easier. Only compare enough characters to
 	    // till each command is unique.
 	    std::transform(ptr, ptr + ret, data, (int(*)(int)) toupper);
-	    if (ret == 0) {
+	    if (ret < 0) {
 		net.writeNet("no more admin data, exiting...\n");
 		if ((ret == 0) && cmd != Handler::POLL) {
-//		    retries = 0;
-		    ret = -1;
 		    break;
 		}
 	    } else {
@@ -388,6 +389,11 @@ admin_handler(Handler::thread_params_t *args)
 		  ret = -1;
 		  break;
 	      case Handler::STATUS:
+	      {
+#ifdef USE_STATS_CACHE
+//		  cache.dump();
+		  cache.stats();
+#endif
 #if 0
 		  response << handlers.size() << " handlers are currently active.";
  		  for (hit = handlers.begin(); hit != handlers.end(); hit++) {
@@ -401,8 +407,9 @@ admin_handler(Handler::thread_params_t *args)
 		      index++;
 		  }
 #endif
-		  index = 0;
-		  break;
+	      }
+	      index = 0;
+	      break;
 	      case Handler::POLL:
 #ifdef USE_STATS_QUEUE
 		  index = 0;
@@ -438,7 +445,7 @@ admin_handler(Handler::thread_params_t *args)
 	      default:
 		  break;
 	    };
-	} while (ret >= 0);
+	} while (ret > 0);
 	net.writeNet("admin_handler: Done...!\n");
 	net.closeNet();		// this shuts down this socket connection
     }
