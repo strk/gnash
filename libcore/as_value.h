@@ -146,35 +146,24 @@ public:
 	/// Construct an UNDEFINED value
 	as_value();
 
-	/// Copy-construct a STRING value 
-	as_value(const as_value& v);
+	/// Copy constructor.
+	as_value(const as_value& value);
 
 	/// Construct a STRING value 
 	as_value(const char* str);
-
-	/// Construct a STRING value 
 	as_value(const std::string& str);
 
 	/// Construct a BOOLEAN value
-	as_value(bool val);
-
-	/// Construct a NUMBER value
-	as_value(int val);
-
-	/// Construct a NUMBER value
-	as_value(unsigned int val);
-
-	/// Construct a NUMBER value
-	as_value(float val);
+	template <typename T>
+	as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type* dummy = 0)
+		: m_type(BOOLEAN),
+		  _value(val)
+	{
+		UNUSED(dummy);
+	}
 
 	/// Construct a NUMBER value
 	as_value(double val);
-
-	/// Construct a NUMBER value
-	as_value(long val);
-	
-	/// Construct a NUMBER value
-	as_value(unsigned long val);
 
 	/// Chad: Document this
 	as_value(asNamespace &);
