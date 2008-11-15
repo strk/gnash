@@ -1421,35 +1421,42 @@ http_handler(Handler::thread_params_t *args)
 	    filespec += "index.html";
 	}
 
+	// See if the file is in the cache and already opened.
 	DiskStream *filestream = cache.findFile(www.getFilespec());
 	if (filestream) {
-	    cerr << "FIXME: found file!" << endl;
+	    cerr << "FIXME: found file in cache!" << endl;
 	} else {
 	    filestream = new DiskStream;
 	}
 	
  	filestream->open(filespec);
-	boost::uint8_t *ptr = filestream->loadChunk();
 	string response = cache.findResponse(www.getFilespec());
 	if (response.empty()) {
-	www.clearHeader();
-	const stringstream &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
-// 	cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;	
-// 	string body = ss.str();
-// 	cerr << "Body Size = " << body.size() << endl;
-// 	body.insert(ss.str().size(), (char *)filestream.get(), filestream.getFileSize());
-// 	cerr << "Body Size = " << body.size() << endl
-// 	     << body << endl;
+	    www.clearHeader();
+	    const stringstream &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
+// 	    cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;	
+// 	    string body = ss.str();
+// 	    cerr << "Body Size = " << body.size() << endl;
+// 	    body.insert(ss.str().size(), (char *)filestream.get(), filestream.getFileSize());
+// 	    cerr << "Body Size = " << body.size() << endl
+// 	         << body << endl;
 // 	// 	cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;
 // 	www.writeNet(args->netfd, (boost::uint8_t *)body.c_str(), body.size());
- 	www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
-	cache.addResponse(www.getFilespec(), www.getHeader());
+	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
+	    cache.addResponse(www.getFilespec(), www.getHeader());
 	} else {
 //	    cerr << "FIXME hit: " << www.getFilespec() << endl;
 	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
 	}	
 
-	www.writeNet(args->netfd, filestream->get(), filestream->getFileSize());
+	size_t filesize = filestream->getFileSize();
+	size_t bytes_read = 0;
+	int ret;
+ 	do {
+	    boost::uint8_t *ptr = filestream->loadChunk();
+	    ret = www.writeNet(args->netfd, filestream->get(), filestream->getPagesize());
+	    bytes_read += ret;
+ 	} while (bytes_read <= filesize);
 	cache.addFile(www.getFilespec(), filestream);
 	log_debug("http_handler all done now finally...");
 //	cache.dump();
@@ -1461,56 +1468,19 @@ http_handler(Handler::thread_params_t *args)
 	    struct stat st;
 	    int filefd;
 	    size_t ret;
-#ifdef USE_STATISTICS
-	    struct timespec start;
-	    clock_gettime (CLOCK_REALTIME, &start);
-#endif
 	    if (stat(filespec.c_str(), &st) == 0) {
 		filefd = ::open(filespec.c_str(), O_RDONLY);
 		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
 			   st.st_size, filefd);
-		do {
-		    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-		    ret = read(filefd, buf->reference(), buf->size());
-		    if (ret == 0) { // the file is done
-			break;
-		    }
-		    if (ret != buf->size()) {
-			buf->resize(ret);
-			log_debug("Got last data block from disk file, size %d", buf->size());
-		    }
-		    log_debug("Read %d bytes from %s.", ret, filespec);
-#if 0
-		    hand->pushout(buf);
-		    hand->notifyout();
-#else
-		    // Don't bother with the outgoing que
-		    if (ret > 0) {
-			ret = hand->writeNet(buf);
-		    }
-#endif
-		} while(ret > 0);
-		log_debug("Done transferring %s to net fd #%d",
-			  filespec, args->netfd);
-		::close(filefd); // close the disk file
+		boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+		log_debug("Done transferring %s to net fd #%d", filespec, args->netfd);
+
 		// See if this is a persistant connection
 // 		if (!www.keepAlive()) {
 // 		    log_debug("Keep-Alive is off", www.keepAlive());
 // // 		    hand->closeConnection();
 //  		}
-#ifdef USE_STATISTICS
-		struct timespec end;
-		clock_gettime (CLOCK_REALTIME, &end);
-		log_debug("Read %d bytes from \"%s\" in %f seconds",
-			  st.st_size, filespec,
-			  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
-#endif
 	    }
-
-// 	    memset(args->filespec, 0, 256);
-// 	    memcpy(->filespec, filespec.c_str(), filespec.size());
-// 	    boost::thread sendthr(boost::bind(&stream_thread, args));
-// 	    sendthr.join();
 	}
 #endif
 	

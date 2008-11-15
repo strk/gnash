@@ -485,25 +485,38 @@ DiskStream::dump()
 {
 //    GNASH_REPORT_FUNCTION;
 	//state_e     _state;
+    const char *state_str[] = {
+	"NO_STATE",
+	"PLAY",
+	"PREVIEW",
+	"THUMBNAIL",
+	"PAUSE",
+	"SEEK",
+	"UPLOAD",
+	"MULTICAST",
+	"DONE"
+    };
+    
+    cerr << "State is \"" << state_str[_state] << "\"" << endl;
     cerr << "Filespec is \"" << _filespec << "\"" << endl;
-	cerr << "Disk file descriptor is fd #" << _filefd << endl;
-	cerr << "Network file descritor is fd #" << _netfd << endl;
-	cerr << "File size is " <<  _filesize << endl;
-	cerr << "Memory Page size is " << _pagesize << endl;
-	cerr << "Memory Offset is " << _offset << endl;
-	
-	// dump timing related data
-	struct timespec now;
-	clock_gettime (CLOCK_REALTIME, &now);    
-	double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
-	
-	cerr << "Time since last access:  " << fixed << ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9)) << " seconds ago." << endl;
-	
+    cerr << "Disk file descriptor is fd #" << _filefd << endl;
+    cerr << "Network file descritor is fd #" << _netfd << endl;
+    cerr << "File size is " <<  _filesize << endl;
+    cerr << "Memory Page size is " << _pagesize << endl;
+    cerr << "Memory Offset is " << _offset << endl;
+    
+    // dump timing related data
+    struct timespec now;
+    clock_gettime (CLOCK_REALTIME, &now);    
+    double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
+    
+    cerr << "Time since last access:  " << fixed << ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9)) << " seconds ago." << endl;
+    
 #ifdef USE_STATS_CACHE
-	cerr << "Time since first access: " << fixed <<
-	    ((_last_access.tv_sec - _first_access.tv_sec) + ((_last_access.tv_nsec - _first_access.tv_nsec)/1e9))
-	     << " seconds lifespan."
-	     << endl;
+    cerr << "Time since first access: " << fixed <<
+	((_last_access.tv_sec - _first_access.tv_sec) + ((_last_access.tv_nsec - _first_access.tv_nsec)/1e9))
+	 << " seconds lifespan."
+	 << endl;
 #endif
     
 }
