@@ -189,10 +189,11 @@ test()
             runtest.fail("seek(5100)");
         }
     }
-//    ds.dump();
+    if (dump) {
+        ds.dump();
+    }
 
     delete[] buf;
-    
     unlink("outbuf.raw");
     unlink("outbuf2.raw");
 }
