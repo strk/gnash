@@ -44,6 +44,7 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "dejagnu.h"
 #include "network.h"
 #include "diskstream.h"
+#include "arg_parser.h"
 
 using namespace gnash;
 using namespace std;
@@ -54,31 +55,51 @@ static void test_errors (void);
 static void test_remove (void);
 static void create_file(const std::string &, size_t);
 
-static TestState runtest;
+static bool dump = false;
 
+static TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 int
 main(int argc, char *argv[])
 {
-    int c;
+    const Arg_parser::Option opts[] =
+        {
+            { 'h', "help",          Arg_parser::no  },
+            { 'v', "verbose",       Arg_parser::no  },
+            { 'd', "dump",          Arg_parser::no  },
+        };
     
-    while ((c = getopt (argc, argv, "hdvsm:")) != -1) {
-        switch (c) {
-          case 'h':
-              usage ();
-              break;
-              
-          case 'v':
-              dbglogfile.setVerbosity();
-              break;
-              
-          default:
-              usage ();
-              break;
+    Arg_parser parser(argc, argv, opts);
+    if( ! parser.error().empty() ) {
+        cout << parser.error() << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    for( int i = 0; i < parser.arguments(); ++i ) {
+        const int code = parser.code(i);
+        try {
+            switch( code ) {
+              case 'h':
+                  usage ();
+                  exit(EXIT_SUCCESS);
+              case 'v':
+                  dbglogfile.setVerbosity();
+                  // This happens once per 'v' flag 
+                  log_debug(_("Verbose output turned on"));
+                  break;
+              case 'd':
+                  dump= true;
+                  break;
+	    }
+        }
+        
+        catch (Arg_parser::ArgParserException &e) {
+            cerr << _("Error parsing command line options: ") << e.what() << endl;
+            cerr << _("This is a Gnash bug.") << endl;
         }
     }
-
+    
     test();
     test_errors();
     test_remove();
@@ -174,7 +195,7 @@ test_remove(void)
     cache.addPath("barfoo", "/foo/bar/barfoo");
     cache.addPath("foobar", "/foo/bar/foobar");
 
-     if (dbglogfile.getVerbosity() > 0) {
+     if (dump) {
          cache.dump();
      }
     // now remove one in the middle
@@ -344,11 +365,13 @@ create_file(const std::string &filespec, size_t size)
 static void
 usage (void)
 {
-    cerr << "This program tests HTTP protocol support." << endl;
-    cerr << "Usage: test_http [hv]" << endl;
-    cerr << "-h\tHelp" << endl;
-    cerr << "-v\tVerbose" << endl;
-    exit (-1);
+    cerr << "This program tests the Cache class." << endl
+         << endl
+         << _("Usage: test_diskstream [options...]") << endl
+         << _("  -h,  --help          Print this help and exit") << endl
+         << _("  -v,  --verbose       Output verbose debug info") << endl
+         << _("  -d,  --dump          Dump data structures") << endl
+         << endl;
 }
 
 #else  // no DejaGnu support
