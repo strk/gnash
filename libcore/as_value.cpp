@@ -1587,7 +1587,7 @@ as_value::doubleToString(double val, int radix)
 	{
 		return "NaN";
 	}
-	else if (isinf(val))
+	else if (isInf(val))
 	{
 		return val < 0 ? "-Infinity" : "Infinity";
 	}

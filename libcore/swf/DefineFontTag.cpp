@@ -1,0 +1,419 @@
+// DefineFontTag.cpp: read DefineFont2 and DefineFont tags.
+// 
+//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+#include "DefineFontTag.h"
+#include "SWFStream.h"
+#include "Font.h"
+#include "RunInfo.h"
+#include "swf.h"
+#include "movie_definition.h"
+#include "shape_character_def.h"
+
+// Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
+
+namespace gnash {
+namespace SWF {
+
+void
+DefineFontTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& /*r*/)
+{
+    assert(tag == DEFINEFONT || tag == DEFINEFONT2 || tag == DEFINEFONT3);
+
+    in.ensureBytes(2);
+    boost::uint16_t fontID = in.read_u16();
+
+    std::auto_ptr<DefineFontTag> ft(new DefineFontTag(in, m, tag));
+
+    Font* f = new Font(ft);
+
+    m.add_font(fontID, f);
+
+}
+
+void
+DefineFontTag::readCodeTable(SWFStream& in, Font::CodeTable& table,
+        bool wideCodes, size_t glyphCount)
+{
+    IF_VERBOSE_PARSE (
+    log_parse(_("reading code table at offset %lu"), in.tell());
+    );
+
+    // Good. We can only do this once.
+    assert(table.empty());
+
+    if (wideCodes)
+    {
+        in.ensureBytes(2 * glyphCount);
+        // Code table is made of boost::uint16_t's.
+        for (size_t i=0; i < glyphCount; ++i)
+        {
+            boost::uint16_t code = in.read_u16();
+            table.insert(std::make_pair(code, i));
+        }
+    }
+    else
+    {
+        // Code table is made of bytes.
+        in.ensureBytes(1 * glyphCount);
+        for (size_t i=0; i < glyphCount; ++i)
+        {
+            boost::uint8_t code = in.read_u8();
+            table.insert(std::make_pair(code, i));
+        }
+    }
+}
+
+#ifdef GNASH_USE_GC
+void
+DefineFontTag::markReachableResources() const
+{
+	// Mark glyphs
+	for (Font::GlyphInfoRecords::const_iterator i = _glyphTable.begin(),
+            e = _glyphTable.end(); i != e; ++i)
+	{
+		i->markReachableResources();
+	}
+}
+#endif
+
+
+DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, tag_type tag)
+    :
+    _subpixelFont(tag == DEFINEFONT3 ? true : false),
+    _unicodeChars(false),
+    _shiftJISChars(false),
+    _ansiChars(true),
+    _italic(false),
+    _bold(false),
+    _wideCodes(false),
+    _ascent(0.0f),
+    _descent(0.0f),
+    _leading(0.0f)
+{
+    switch (tag)
+    {
+        default:
+            std::abort();
+            break;
+        case DEFINEFONT:
+            readDefineFont(in, m);
+            break;
+        case DEFINEFONT2:
+        case DEFINEFONT3:
+            readDefineFont2Or3(in, m);
+            break;
+    }
+}
+
+void
+DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m)
+{
+    IF_VERBOSE_PARSE(
+        log_parse(_("reading DefineFont"));
+    );
+
+    unsigned long table_base = in.tell();
+
+    // Read the glyph offsets.  Offsets
+    // are measured from the start of the
+    // offset table.
+    std::vector<unsigned> offsets;
+    in.ensureBytes(2);
+    offsets.push_back(in.read_u16());
+
+    IF_VERBOSE_PARSE (
+    log_parse("offset[0] = %d", offsets[0]);
+    );
+
+    int	count = offsets[0] >> 1;
+    if ( count > 0 )
+    {
+        in.ensureBytes(count*2);
+        for (int i = 1; i < count; i++)
+        {
+            offsets.push_back(in.read_u16());
+
+            IF_VERBOSE_PARSE (
+            log_parse("offset[%d] = %d", i, offsets[i]);
+            );
+        }
+    }
+    else
+    {
+        log_error("Negative embedded glyph table size: %d", count);
+    }
+
+    _glyphTable.resize(count);
+
+    // Read the glyph shapes.
+    for (int i = 0; i < count; i++)
+    {
+        // Seek to the start of the shape data.
+        unsigned long new_pos = table_base + offsets[i];
+
+        if ( ! in.seek(new_pos) )
+        {
+            throw ParserException(_("Glyphs offset table corrupted "
+                        "in DefineFont tag"));
+        }
+
+        // Create & read the shape.
+        shape_character_def* s = new shape_character_def;
+        s->read(in, SWF::DEFINEFONT, false, m); 
+
+        _glyphTable[i].glyph = s;
+    }
+}
+
+// Read a DefineFont2 or DefineFont3 tag
+void
+DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
+{
+    IF_VERBOSE_PARSE (
+    log_parse(_("reading DefineFont2 or DefineFont3"));
+    );
+
+    in.ensureBytes(2); // 1 for the flags, 1 unknown
+    int flags = in.read_u8();
+    bool has_layout = flags & (1 << 7);
+    _shiftJISChars = flags & (1 << 6);
+    _unicodeChars = flags & (1 << 5);
+    _ansiChars = flags & (1 << 4);
+    bool wide_offsets = flags & (1 << 3);
+    bool wideCodes = flags & (1 << 2);
+    _italic = flags & (1 << 1);
+    _bold = flags & (1 << 0);
+
+    // Next is language code, always 0 for SWF5 or previous
+    int languageCode = in.read_u8();
+    if (languageCode) {
+        LOG_ONCE(log_unimpl("LanguageCode in DefineFont (2 or 3)"));
+    }
+
+    in.read_string_with_length(_name);
+
+    in.ensureBytes(2); 
+    boost::uint16_t glyph_count = in.read_u16();
+
+    IF_VERBOSE_PARSE (
+        log_parse(" has_layout = %d", has_layout);
+        log_parse(" shift_jis_chars = %d", _shiftJISChars);
+        log_parse(" m_unicode_chars = %d", _unicodeChars);
+        log_parse(" m_ansi_chars = %d", _ansiChars);
+        log_parse(" wide_offsets = %d", wide_offsets);
+        log_parse(" wide_codes = %d", wideCodes);
+        log_parse(" is_italic = %d", _italic);
+        log_parse(" is_bold = %d", _bold);
+        log_parse(" name = %s", _name);
+        log_parse(" glyphs count = %d", glyph_count);
+    );
+    
+    unsigned long table_base = in.tell();
+
+    // Read the glyph offsets.  Offsets
+    // are measured from the start of the
+    // offset table. Make sure wide offsets fit into elements
+    std::vector<boost::uint32_t> offsets;
+    int	font_code_offset;
+    if (wide_offsets)
+    {
+        // 32-bit offsets.
+        in.ensureBytes(4*glyph_count + 4); 
+        for (unsigned int i = 0; i < glyph_count; i++)
+        {
+            boost::uint32_t off = in.read_u32();	
+
+            IF_VERBOSE_PARSE (
+            log_parse(_("Glyph %d at offset %u"), i, off);
+            );
+
+            offsets.push_back(off);
+        }
+        font_code_offset = in.read_u32();
+    }
+    else
+    {
+        // 16-bit offsets.
+        in.ensureBytes(2*glyph_count + 2); 
+        for (unsigned int i = 0; i < glyph_count; i++)
+        {
+            boost::uint16_t off = in.read_u16();	
+
+            IF_VERBOSE_PARSE (
+            log_parse(_("Glyph %d at offset %u"), i, off);
+            );
+
+            offsets.push_back(off);
+        }
+        font_code_offset = in.read_u16();
+    }
+
+    _glyphTable.resize(glyph_count);
+
+    // Read the glyph shapes.
+    for (int i = 0; i < glyph_count; i++)
+    {
+        // Seek to the start of the shape data.
+        unsigned long new_pos = table_base + offsets[i];
+
+        // It seems completely possible to
+        // have such seeks-back, see bug #16311
+        //assert(new_pos >= in.tell());
+
+        if ( ! in.seek(new_pos) )
+        {
+            throw ParserException(_("Glyphs offset table corrupted in DefineFont2/3 tag"));
+        }
+
+        // Create & read the shape.
+        shape_character_def* s = new shape_character_def;
+        s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
+
+        _glyphTable[i].glyph = s;
+    }
+
+    unsigned long current_position = in.tell();
+    if (font_code_offset + table_base != current_position)
+    {
+        // Bad offset!  Don't try to read any more.
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("Bad offset in DefineFont2"));
+        );
+        return;
+    }
+
+    std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
+
+    readCodeTable(in, *table, wideCodes, _glyphTable.size());
+    _codeTable.reset(table.release());
+
+    // Read layout info for the glyphs.
+    if (has_layout)
+    {
+        in.ensureBytes(6);
+        _ascent = static_cast<float>(in.read_s16());
+        _descent = static_cast<float>(in.read_s16());
+        _leading = static_cast<float>(in.read_s16());
+        
+        // Advance table; i.e. how wide each character is.
+        size_t nGlyphs = _glyphTable.size();
+        in.ensureBytes(nGlyphs*2);
+        for (size_t i = 0; i < nGlyphs; i++)
+        {
+            _glyphTable[i].advance = (float) in.read_s16();
+        }
+
+        // Bounds table.
+        {
+            rect dummy_rect;
+            // TODO: shouldn't we log_unimpl here ??
+            for (size_t i = 0; i < nGlyphs; i++) dummy_rect.read(in);
+        }
+
+        // Kerning pairs.
+        in.ensureBytes(2);
+        int	kerning_count = in.read_u16();
+        if (wideCodes)
+        {
+            in.ensureBytes(6*kerning_count); // includes the adjustment 
+        }
+        else
+        {
+            in.ensureBytes(4*kerning_count); // includes the adjustment 
+        }
+
+        for (int i = 0; i < kerning_count; i++)
+        {
+            boost::uint16_t	char0, char1;
+            if (wideCodes)
+            {
+                char0 = in.read_u16();
+                char1 = in.read_u16();
+            }
+            else
+            {
+                char0 = in.read_u8();
+                char1 = in.read_u8();
+            }
+            float	adjustment = (float) in.read_s16();
+
+            kerning_pair	k;
+            k.m_char0 = char0;
+            k.m_char1 = char1;
+
+            // Remember this adjustment; we can look it up quickly
+            // later using the character pair as the key.
+            if ( ! m_kerning_pairs.insert(std::make_pair(k, adjustment)).second )
+            {
+                IF_VERBOSE_MALFORMED_SWF(
+                log_swferror(_("Repeated kerning pair found - ignoring"));
+                );
+            }
+
+        }
+    }
+}
+
+void
+DefineFontInfoTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& /*r*/)
+{
+    assert(tag == DEFINEFONTINFO || tag == DEFINEFONTINFO2); 
+
+    in.ensureBytes(2);
+    boost::uint16_t fontID = in.read_u16();
+
+    Font* f = m.get_font(fontID);
+    if (!f)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("DefineFontInfo tag loader: "
+                   "can't find font with id %d"), fontID);
+        );
+        return;
+    }
+
+    if (tag == DEFINEFONTINFO2)
+    {
+        // See: SWFalexref/SWFalexref.html#tag_definefont2
+        LOG_ONCE(log_unimpl(_("DefineFontInfo2 partially implemented")));
+    }
+
+    std::string name;
+    in.read_string_with_length(name);
+
+    in.ensureBytes(1);
+    boost::uint8_t flags = in.read_u8();
+
+    bool wideCodes = flags & (1 << 0);
+
+    std::auto_ptr<Font::CodeTable> table(new Font::CodeTable);
+
+    DefineFontTag::readCodeTable(in, *table, wideCodes, f->glyphCount());
+
+    f->setName(name);
+    f->setFlags(flags);
+    f->setCodeTable(table);
+}
+
+
+}
+}
+

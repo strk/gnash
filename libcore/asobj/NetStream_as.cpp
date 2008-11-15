@@ -99,7 +99,7 @@ NetStream_as::NetStream_as()
 	_soundHandler(_vm.getRoot().runInfo().soundHandler()),
 	_mediaHandler(media::MediaHandler::get()),
 	_audioQueueSize(0),
-	_auxStreamerAttached(false),
+	_auxStreamer(0),
 	_lastStatus(invalidStatus),
 	_advanceTimer(0)
 {
@@ -141,9 +141,11 @@ static as_value netstream_close(const fn_call& fn)
 	return as_value();
 }
 
-static as_value netstream_pause(const fn_call& fn)
+static as_value
+netstream_pause(const fn_call& fn)
 {
-	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
 	NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
@@ -156,7 +158,8 @@ static as_value netstream_pause(const fn_call& fn)
 	return as_value();
 }
 
-static as_value netstream_play(const fn_call& fn)
+static as_value
+netstream_play(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
 
@@ -771,7 +774,7 @@ NetStream_as::stopAdvanceTimer()
 void
 NetStream_as::startAdvanceTimer()
 {
-	boost::intrusive_ptr<builtin_function> advanceCallback = \
+	boost::intrusive_ptr<builtin_function> advanceCallback = 
 		new builtin_function(&NetStream_as::advanceWrapper);
 	std::auto_ptr<Timer> timer(new Timer);
 	unsigned long delayMS = 50; // TODO: base on media file FPS !!!
@@ -836,13 +839,8 @@ void NetStream_as::close()
 void
 NetStream_as::play(const std::string& c_url)
 {
-	// Is it already playing ?
-	if ( m_parser.get() )
-	{
-		// TODO: check what to do in these cases
-		log_error("FIXME: NetStream.play() called while already streaming");
-		return;
-	}
+	// It doesn't matter if the NetStream object is already streaming; this
+    // starts it again, possibly with a new URL.
 
 	// Does it have an associated NetConnection ?
 	if ( ! _netCon )
@@ -994,10 +992,14 @@ NetStream_as::startPlayback()
 }
 
 
-// audio callback is running in sound handler thread
-bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
+// audio callback, possibly running in a separate thread
+unsigned int
+NetStream_as::audio_streamer(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& eof)
 {
 	//GNASH_REPORT_FUNCTION;
+
+	boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
+	int len = nSamples*2;
 
 	NetStream_as* ns = static_cast<NetStream_as*>(owner);
 
@@ -1010,9 +1012,8 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 #endif
 
 
-	while (len > 0)
+	while (len)
 	{
-
 		if ( ns->_audioQueue.empty() )
 		{
 			break;
@@ -1020,8 +1021,10 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 
 		CursoredBuffer* samples = ns->_audioQueue.front();
 
+		assert( ! (samples->m_size%2) ); 
 		int n = std::min<int>(samples->m_size, len);
-		memcpy(stream, samples->m_ptr, n);
+		std::copy(samples->m_ptr, samples->m_ptr+n, stream);
+		//memcpy(stream, samples->m_ptr, n);
 		stream += n;
 		samples->m_ptr += n;
 		samples->m_size -= n;
@@ -1037,7 +1040,11 @@ bool NetStream_as::audio_streamer(void *owner, boost::uint8_t *stream, int len)
 
 	}
 
-	return true;
+	assert( ! (len%2) ); 
+
+	// currently never signalling EOF
+	eof=false;
+	return nSamples-(len/2);
 }
 
 std::auto_ptr<GnashImage> 
@@ -1541,7 +1548,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
 		log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
 #endif
 
-		if ( _auxStreamerAttached )
+		if ( _auxStreamer )
 		{
 			_audioQueue.push_back(audio);
 			_audioQueueSize += audio->m_size;
@@ -1714,6 +1721,19 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 
 }
 
+int
+NetStream_as::videoHeight() const
+{
+    if (!_videoDecoder.get()) return 0;
+    return _videoDecoder->height();
+}
+
+int
+NetStream_as::videoWidth() const
+{
+    if (!_videoDecoder.get()) return 0;
+    return _videoDecoder->width();
+}
 
 void
 NetStream_as::advance()
@@ -1889,17 +1909,16 @@ void
 NetStream_as::attachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
-	if ( _auxStreamerAttached )
+	if ( _auxStreamer )
 	{
 		log_debug("attachAuxStreamer called while already attached");
-		// we do nonetheless, isn't specified by SoundHandler.h
-		// whether or not this is legal...
+        // Let's detach first..
+	    _soundHandler->unplugInputStream(_auxStreamer);
+        _auxStreamer=0;
 	}
 
 	try {
-		_soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
-
-		_auxStreamerAttached = true;
+		_auxStreamer = _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
 	} catch (SoundException& e) {
 		log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
 	}
@@ -1909,15 +1928,13 @@ void
 NetStream_as::detachAuxStreamer()
 {
 	if ( ! _soundHandler ) return;
-	if ( !_auxStreamerAttached )
+	if ( !_auxStreamer )
 	{
 		log_debug("detachAuxStreamer called while not attached");
-		// we do nonetheless, isn't specified by SoundHandler.h
-		// whether or not this is legal...
+        return;
 	}
-	_soundHandler->detach_aux_streamer(this);
-
-	_auxStreamerAttached = false;
+	_soundHandler->unplugInputStream(_auxStreamer);
+	_auxStreamer = 0;
 }
 
 

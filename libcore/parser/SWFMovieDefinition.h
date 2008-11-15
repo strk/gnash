@@ -28,7 +28,6 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "fontlib.h"
-#include "font.h"
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
@@ -37,6 +36,7 @@
 #include "SWFStream.h" // for get_bytes_loaded and visitbility of dtor (composition)
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 #include "utility.h" // for TWIPS_TO_PIXELS 
+#include "rect.h"
 
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources
@@ -57,6 +57,7 @@ namespace gnash {
 		class TagLoadersTable;
 	}
     class RunInfo;
+    class Font;
 }
 
 namespace gnash
@@ -277,11 +278,11 @@ public:
 	//
 	bool get_labeled_frame(const std::string& label, size_t& frame_number);
 
-	void	add_font(int font_id, font* f);
+	void	add_font(int font_id, Font* f);
 
-	font*	get_font(int font_id) const;
+	Font*	get_font(int font_id) const;
 
-	font* get_font(const std::string& name, bool bold, bool italic) const;
+	Font* get_font(const std::string& name, bool bold, bool italic) const;
 
 	// See dox in movie_definition.h
 	bitmap_character_def*	get_bitmap_character_def(int character_id);
@@ -446,7 +447,7 @@ private:
 	/// Tags loader table
 	SWF::TagLoadersTable& _tag_loaders;
 
-	typedef std::map<int, boost::intrusive_ptr<font> > FontMap;
+	typedef std::map<int, boost::intrusive_ptr<Font> > FontMap;
 	FontMap m_fonts;
 
 	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> >

@@ -22,16 +22,11 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "IOChannel.h" // for StreamAdapter inheritance
 #include "utility.h"
 #include "action.h"
 #include "action_buffer.h"
-#include "button_character_def.h"
-#include "font.h"
+#include "Font.h"
 #include "fontlib.h"
 #include "log.h"
 #include "morph2_character_def.h"
@@ -49,17 +44,16 @@
 #include "SWFMovieDefinition.h"
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
-#include "text_character_def.h"
-#include "edit_text_character_def.h"
 #include "URL.h"
 #include "GnashException.h"
-#include "video_stream_def.h"
+#include "swf/DefineVideoStreamTag.h"
 #include "sound_definition.h"
 #include "abc_block.h"
 #include "SoundInfo.h"
 #include "gnash.h" // FileType enum
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
+#include "sound_handler.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -827,75 +821,6 @@ void define_shape_morph_loader(SWFStream& in, tag_type tag, movie_definition& m,
 //
 
 
-void define_font_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-    // Load a DefineFont or DefineFont2 tag.
-{
-    assert(tag == SWF::DEFINEFONT
-       || tag == SWF::DEFINEFONT2
-       || tag == SWF::DEFINEFONT3 ); // 10 || 48 || 75
-
-    in.ensureBytes(2);
-    boost::uint16_t font_id = in.read_u16();
-
-    font* f = new font;
-    f->read(in, tag, m);
-
-    m.add_font(font_id, f);
-
-    // Automatically keeping fonts in fontlib is
-    // problematic.  The app should be responsible for
-    // optionally adding fonts to fontlib.
-    // //fontlib::add_font(f);
-}
-
-
-// See description in header
-void define_font_info_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2);
-
-    in.ensureBytes(2);
-    boost::uint16_t font_id = in.read_u16();
-
-    font* f = m.get_font(font_id);
-    if (f)
-    {
-        f->read_font_info(in, tag, m);
-    }
-    else
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("define_font_info_loader: "
-                   "can't find font w/ id %d"), font_id);
-        );
-    }
-}
-
-// Set font name for a font.
-void define_font_name_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEFONTNAME);
-
-    in.ensureBytes(2);
-    boost::uint16_t font_id = in.read_u16();
-
-    font* f = m.get_font(font_id);
-    if (f)
-    {
-        f->read_font_name(in, tag, m);
-    }
-    else
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("define_font_name_loader: "
-                           "can't find font w/ id %d"), font_id);
-        );
-    }
-}
-
 // Create and initialize a sprite, and add it to the movie.
 void
 sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,
@@ -945,57 +870,6 @@ sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 // end_tag doesn't actually need to exist.
 
-void button_sound_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEBUTTONSOUND); // 17
-
-    in.ensureBytes(2);
-    int    button_character_id = in.read_u16();
-    character_def* chdef = m.get_character_def(button_character_id);
-    if ( ! chdef )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBUTTONSOUND refers to an unknown character def %d"), button_character_id);
-        );
-        return;
-    }
-
-    button_character_definition* ch = dynamic_cast<button_character_definition*> (chdef);
-    if ( ! ch )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBUTTONSOUND refers to character id %d, "
-            "being a %s (expected a button definition)"),
-            button_character_id,
-            typeName(*chdef));
-        );
-        return;
-    }
-
-    ch->read(in, tag, m);
-}
-
-
-void button_character_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    // 7 || 34
-    assert(tag == SWF::DEFINEBUTTON || tag == SWF::DEFINEBUTTON2);
-
-    in.ensureBytes(2);
-    int    character_id = in.read_u16();
-
-    IF_VERBOSE_PARSE(
-        log_parse(_("  button character loader: char_id = %d"), character_id);
-    );
-
-    button_character_definition* ch = new button_character_definition(m);
-    ch->read(in, tag, m);
-
-    m.add_character(character_id, ch);
-}
-
 
 //
 // export
@@ -1040,7 +914,7 @@ void export_loader(SWFStream& in, tag_type tag, movie_definition& m,
             log_parse(_("  export: id = %d, name = %s"), id, symbolName);
         );
 
-        if (font* f = m.get_font(id))
+        if (Font* f = m.get_font(id))
         {
             // Expose this font for export.
             m.export_resource(symbolName, f);
@@ -1148,42 +1022,6 @@ void import_loader(SWFStream& in, tag_type tag, movie_definition& m,
     m.importResources(source_movie, imports);
 }
 
-// Read a DefineText tag.
-void define_edit_text_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEEDITTEXT); // 37
-
-    in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
-
-    edit_text_character_def* ch = new edit_text_character_def();
-    IF_VERBOSE_PARSE(
-        log_parse(_("edit_text_char, id = %d"), character_id);
-    );
-    ch->read(in, tag, m);
-
-    m.add_character(character_id, ch);
-}
-
-// See description in header
-void
-define_text_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINETEXT || tag == SWF::DEFINETEXT2);
-
-    in.ensureBytes(2);
-    boost::uint16_t    character_id = in.read_u16();
-
-    text_character_def* ch = new text_character_def();
-    IF_VERBOSE_PARSE(
-        log_parse(_("text_character, id = %d"), character_id);
-    );
-    ch->read(in, tag, m);
-
-    m.add_character(character_id, ch);
-}
 
 //
 // Sound
@@ -1460,54 +1298,6 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m,
     m.set_loading_sound_stream_id(handler_id);
 }
 
-void
-define_video_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
-    
-    in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
-
-    std::auto_ptr<video_stream_definition> chdef (
-            new video_stream_definition(character_id));
-
-    chdef->readDefineVideoStream(in, tag, m);
-
-    m.add_character(character_id, chdef.release());
-
-}
-
-void
-video_loader(SWFStream& in, tag_type tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::VIDEOFRAME); // 61
-
-    in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
-    character_def* chdef = m.get_character_def(character_id);
-
-    if (!chdef)
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("VideoFrame tag refers to unknown video stream id %d"), character_id);
-        );
-        return;
-    }
-
-    // TODO: add a character_def::cast_to_video_def ?
-    video_stream_definition* vdef = dynamic_cast<video_stream_definition*> (chdef);
-    if ( ! vdef )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("VideoFrame tag refers to a non-video character %d (%s)"), character_id, typeName(*chdef));
-        );
-        return;
-    }
-
-    vdef->readDefineVideoFrame(in, tag, m);
-}
 
 void
 file_attributes_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,

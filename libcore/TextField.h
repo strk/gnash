@@ -15,31 +15,39 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_EDIT_TEXT_CHARACTER_H
-#define GNASH_EDIT_TEXT_CHARACTER_H
+#ifndef GNASH_TEXTFIELD_H
+#define GNASH_TEXTFIELD_H
 
 #include "character.h" // for inheritance
-#include "edit_text_character_def.h" // for inlines and typedefs
 #include "styles.h" // for fill_style and line_style
-#include "text.h" // for text_glyph_record
 #include "Range2d.h"
 #include "rect.h" // for inlines
-#include "font.h" // for visibility of font add_ref/drop_ref
+#include "Font.h" // for visibility of font add_ref/drop_ref
 
 // Forward declarations
 namespace gnash {
-	class text_character_def; 
-	class text_glyph_record; 
-	//class MovieClip;
+    namespace SWF {
+        class DefineEditTextTag;
+        class TextRecord;
+    }
 }
 
 namespace gnash {
 
-/// An instance of an edit_text_character_def 
-class edit_text_character : public character
+/// An instance of a DefineEditTextTag 
+class TextField : public character
 {
 
 public:
+
+    /// Text alignment values
+	enum TextAlignment
+	{
+		ALIGN_LEFT = 0,
+		ALIGN_RIGHT,
+		ALIGN_CENTER,
+		ALIGN_JUSTIFY
+	};
 
 	/// Possible autoSize values
 	enum AutoSizeValue {
@@ -71,18 +79,21 @@ public:
 		typeInput
 	};
 
-	edit_text_character(
-			character* parent,
-			edit_text_character_def* def,
-			int id);
+    /// Constructs a TextField as specified in a DefineEditText tag.
+	TextField(character* parent, const SWF::DefineEditTextTag& def, int id);
 
-	~edit_text_character();
+    /// Constructs a TextField with default values and the specified bounds.
+    //
+    /// Notably, the default textHeight is 12pt (240 twips).
+    TextField(character* parent, const rect& bounds);
+
+	~TextField();
 
 	// TODO: should this return isSelectable() ?
 	bool can_handle_mouse_event() const { return true; }
 
 	character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
-	
+
 	bool wantsInstanceName() const
 	{
 		return true; // text fields can be referenced 
@@ -90,9 +101,9 @@ public:
 		
 	bool on_event(const event_id& id);	
 
-	const char* get_variable_name() const
+	const std::string& getVariableName() const
 	{
-		return _variable_name.c_str();
+		return _variable_name;
 	}
 
 	/// Set the name of a variable associated to this
@@ -103,10 +114,12 @@ public:
 	/// 
 	void set_variable_name(const std::string& newname);
 	
-	/// Set our text to the given string by effect of an update of a registered variable name
+	/// \brief Set our text to the given string by effect of an update of a
+    /// registered variable name
 	//
-	/// This cal only updates the text and is only meant to be called by ourselves
-	/// or by MovieClip when a registered TextVariable is updated.
+	/// This call only updates the text and is only meant to be called
+    /// by ourselves or by MovieClip when a registered TextVariable is
+    /// updated.
 	void updateText(const std::string& s);
 
  	/// Return value of our text.
@@ -137,7 +150,7 @@ public:
 
 	/// See dox in character::unload (character.h)
 	//
-	/// NOTE: edit_text_character (TextField) never has
+	/// NOTE: TextField (TextField) never has
 	///       an onUnload event, so we always return false
 	///	  here. (TODO: verify this)
 	///
@@ -189,6 +202,35 @@ public:
 		return _embedFonts;
 	}
 
+    /// Get the current maxChars setting of the TextField
+    boost::int32_t maxChars() const {
+        return _maxChars;
+    }
+
+    /// Set the current maxChars setting of the TextField
+    void maxChars(boost::int32_t max) {
+        _maxChars = max;
+    }
+
+    /// Get the current multiline setting of the TextField
+    bool multiline() const {
+        return _multiline;
+    }
+
+    /// Set the current multiline setting of the TextField
+    void multiline(bool b) {
+        _multiline = b;
+    }
+
+    /// Get the current password setting of the TextField
+    bool password() const {
+        return _password;
+    }
+
+    /// Set the current password setting of the TextField
+    void password(bool b) {
+        _password = b;
+    }
 	/// \brief
 	/// Set whether this TextField should use embedded font glyphs,
 	/// or use device font glyphs
@@ -202,8 +244,8 @@ public:
 		return _autoSize;
 	}
 
-	/// Return text alignment
-	edit_text_character_def::alignment getTextAlignment();
+	/// Return text TextAlignment
+    TextAlignment getTextAlignment();
 
 	/// Set autoSize value 
 	//
@@ -332,9 +374,10 @@ public:
 	/// @param newfont
 	///	Will be stored in an intrusive_ptr
 	///
-	boost::intrusive_ptr<const font> setFont(boost::intrusive_ptr<const font> newfont);
+	boost::intrusive_ptr<const Font> setFont(
+            boost::intrusive_ptr<const Font> newfont);
 
-	const font* getFont() { return _font.get(); }
+	const Font* getFont() { return _font.get(); }
 
 	boost::uint16_t getFontHeight() const
 	{
@@ -371,12 +414,12 @@ public:
 
 	void setBlockIndent(boost::uint16_t h);
 
-	edit_text_character_def::alignment getAlignment() const
+	TextAlignment getAlignment() const
 	{
 		return _alignment;
 	}
 
-	void setAlignment(edit_text_character_def::alignment h);
+	void setAlignment(TextAlignment h);
 
 	boost::uint16_t getLeading() const
 	{
@@ -397,20 +440,31 @@ public:
 		return m_text_bounding_box;
 	}
 
-private:
-
 	/// Set our text to the given string.
 	//
 	/// This function will also update any registered variable
 	///
 	void setTextValue(const std::wstring& wstr);
 
-	/// Set our text to the given string by effect of an update of a registered variable name
+
+private:
+
+    void init();
+
+    /// The immutable definition of our TextField
+    //
+    /// This is NULL for dynamic TextFields.
+    boost::intrusive_ptr<const SWF::DefineEditTextTag> _tag;
+
+	/// \brief Set our text to the given string by effect of an update of a
+    /// registered variable name
 	//
-	/// This cal only updates the text and is only meant to be called by ourselves
-	/// or by MovieClip when a registered TextVariable is updated.
-	///
+	/// This call only updates the text and is only meant to be called
+    /// by ourselves or by MovieClip when a registered TextVariable is
+    /// updated.
 	void updateText(const std::wstring& s);
+
+    void insertTab(SWF::TextRecord& rec, int& x, float scale);
 
 	/// Set focus 
 	void setFocus();
@@ -427,9 +481,12 @@ private:
 	/// Call this function when willing to invoke the onKillFocus event handler
 	void onKillFocus();
 
-	/// The actual text. Because we have to deal with non-ascii characters (129-255)
-	/// this is a wide string; the cursor position and the position within the string
-	/// are then the same, which makes manipulating the string much easier.
+	/// The actual text.
+    //
+    /// Because we have to deal with non-ascii characters (129-255), this
+    /// is a wide string; the cursor position and the position within the
+    /// string are then the same, which makes manipulating the string much
+    /// easier.
 	std::wstring _text;
 
 	/// This flag will be true as soon as the TextField
@@ -438,22 +495,17 @@ private:
 	/// and no actionscript added text.
 	bool _textDefined;
 
-	/// immutable definition of this object, as read
-	/// from the SWF stream. Assured to be not-NULL
-	/// by constructor. This might change in the future
-	boost::intrusive_ptr<edit_text_character_def> m_def;
-
 	/// bounds of dynamic text, as laid out
 	rect m_text_bounding_box;
 
 	/// Reset our text bounding box to the given point.
-	void	reset_bounding_box(boost::int32_t x, boost::int32_t y)
+	void reset_bounding_box(boost::int32_t x, boost::int32_t y)
 	{
 		m_text_bounding_box.set_to_point(x, y);
 	}
 
-	typedef std::vector<text_glyph_record> TextGlyphRecords;
-	TextGlyphRecords m_text_glyph_records;
+	typedef std::vector<SWF::TextRecord> TextRecords;
+	TextRecords _textRecords;
 
 	/// used to pass a color on to shape_character::display()
 	std::vector<fill_style>	m_dummy_style;
@@ -462,7 +514,7 @@ private:
 
 	/// Convert the characters in _text into a series of
 	/// text_glyph_records to be rendered.
-	void	format_text();
+	void format_text();
 	
 	/// Extracts an HTML tag.
 	///
@@ -480,14 +532,13 @@ private:
 	/// m_text_glyph_records[], starting with
 	/// last_line_start_record and going through the end of
 	/// m_text_glyph_records.
-	float align_line(edit_text_character_def::alignment align,
-			int last_line_start_record, float x);
+	float align_line(TextAlignment align, int last_line_start_record, float x);
 
 	bool _underlined;
 
 	boost::uint16_t _leading;
 
-	edit_text_character_def::alignment _alignment;
+	TextAlignment _alignment;
 
 	boost::uint16_t _indent;
 
@@ -501,13 +552,22 @@ private:
 
 	boost::uint16_t _fontHeight;
 
-	boost::intrusive_ptr<const font> _font;
+	boost::intrusive_ptr<const Font> _font;
 
 	bool m_has_focus;
 	size_t m_cursor;
 	void show_cursor(const SWFMatrix& mat);
 	float m_xcursor;
 	float m_ycursor;
+
+    /// Corresponds to the multiline property.
+    bool _multiline;
+
+    /// Corresponds to the password property.
+    bool _password;
+
+    /// Corresponds to the maxChars property.
+    boost::int32_t _maxChars;
 
 	/// Associate a variable to the text of this character
 	//

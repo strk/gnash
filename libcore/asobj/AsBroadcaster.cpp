@@ -162,6 +162,14 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<as_object> tgt = tgtval.to_object();
+	if ( ! tgt )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("AsBroadcaster.initialize(%s): first arg is an object"
+            " but doesn't cast to one (dangling character ref?)"), tgtval); 
+		);
+		return as_value();
+	}
 
 	AsBroadcaster::initialize(*tgt);
 

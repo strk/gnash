@@ -21,12 +21,17 @@
 #define GNASH_VIDEO_STREAM_INSTANCE_H
 
 #include "character.h" // for inheritance
-#include "video_stream_def.h"
-#include "snappingrange.h"
 
 // Forward declarations
 namespace gnash {
 	class NetStream_as;
+    class GnashImage;
+    namespace SWF {
+        class DefineVideoStreamTag;
+    }
+    namespace media {
+        class VideoDecoder;
+    }
 }
 
 namespace gnash {
@@ -37,17 +42,17 @@ namespace gnash {
 /// embedded into the SWF itself or loaded from the
 /// network using an associated NetStream object.
 ///
-class video_stream_instance : public character
+class Video : public character
 {
 
 public:
 
-	boost::intrusive_ptr<video_stream_definition>	m_def;
+	boost::intrusive_ptr<SWF::DefineVideoStreamTag> m_def;
 	
-	video_stream_instance(video_stream_definition* def,
-			character* parent, int id);
+	Video(SWF::DefineVideoStreamTag* def, character* parent,
+            int id);
 
-	~video_stream_instance();
+	~Video();
 
 	virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const
 	{
@@ -58,12 +63,12 @@ public:
 	rect getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
-	virtual void	advance();
+	virtual void advance();
 
 	/// Register this video instance as a live character
 	virtual void stagePlacementCallback();
 
-	void	display();
+	void display();
 
 	// For sure isActionScriptReferenceable...
 	bool wantsInstanceName() const
@@ -75,6 +80,24 @@ public:
 
 	/// Set the input stream for this video
 	void setStream(boost::intrusive_ptr<NetStream_as> ns);
+
+    void clear();
+
+    /// Get the height of the video.
+    //
+    /// The method depends on whether it is an embedded or a live
+    /// stream. This returns 0 until the height is known, which for
+    /// FLV streams is only after decoding. The value may possibly
+    /// vary during playback.
+    int height() const;
+
+    /// Get the width of the video.
+    //
+    /// The method depends on whether it is an embedded or a live
+    /// stream. This returns 0 until the height is known, which for
+    /// FLV streams is only after decoding. The value may possibly
+    /// vary during playback.
+    int width() const;
 
 protected:
 
@@ -98,11 +121,6 @@ private:
 
 	/// Get video frame to be displayed
 	GnashImage* getVideoFrame();
-
-	// m_video_source - A Camera object that is capturing video data or a NetStream object.
-	// To drop the connection to the Video object, pass null for source.
-	// FIXME: don't use as_object, but a more meaningful type
-	//as_object* m_video_source;
 
 	// Who owns this ? Should it be an intrusive ptr ?
 	boost::intrusive_ptr<NetStream_as> _ns;

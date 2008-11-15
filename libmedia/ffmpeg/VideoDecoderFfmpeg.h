@@ -60,30 +60,36 @@ public:
     std::auto_ptr<GnashImage> pop();
     
     bool peek();
+
+    int width() const;
+
+    int height() const;
     
+private:
     
+    /// Convert FLASH codec id to FFMPEG codec id
+    //
+    /// @return CODEC_ID_NONE for unsupported flash codecs
+    ///
+    static CodecID flashToFfmpegCodec(videoCodecType format);
+
     /// \brief converts an video frame from (almost) any type to RGB24.
     ///
     /// @param srcCtx The source context that was used to decode srcFrame.
     /// @param srcFrame the source frame to be converted.
     /// @return an AVPicture containing the converted image. Please be advised
-    ///                 that the RGB data pointer is stored in AVPicture::data[0]. The
-    ///                 caller owns that pointer, which must be freed with delete [].
-    ///                 It is advised to wrap the pointer in a boost::scoped_array.
-    ///                 If conversion fails, AVPicture::data[0] will be NULL.
-    std::auto_ptr<GnashImage> frameToImage(AVCodecContext* srcCtx, const AVFrame& srcFrame);
+    ///         that the RGB data pointer is stored in AVPicture::data[0]. The
+    ///         caller owns that pointer, which must be freed with delete [].
+    ///         It is advised to wrap the pointer in a boost::scoped_array.
+    ///         If conversion fails, AVPicture::data[0] will be NULL.
+    std::auto_ptr<GnashImage> frameToImage(AVCodecContext* srcCtx,
+            const AVFrame& srcFrame);
 
-    /// Convert FLASH codec id to FFMPEG codec id
-    //
-    /// @return CODEC_ID_NONE for unsupported flash codecs
-    ///
-    DSOEXPORT static enum CodecID flashToFfmpegCodec(videoCodecType format);
+    void init(enum CodecID format, int width, int height,
+            boost::uint8_t* extradata=0, int extradataSize=0);
 
-private:
-
-    void init(enum CodecID format, int width, int height, boost::uint8_t* extradata=0, int extradataSize=0);
-
-    std::auto_ptr<GnashImage> decode(const boost::uint8_t* input, boost::uint32_t input_size);
+    std::auto_ptr<GnashImage> decode(const boost::uint8_t* input,
+            boost::uint32_t input_size);
 
     std::auto_ptr<GnashImage> decode(const EncodedVideoFrame* vf)
     {

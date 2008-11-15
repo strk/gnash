@@ -112,6 +112,7 @@ movie_root::movie_root(const movie_definition& def,
 	m_time_remainder(0.0f),
 	m_drag_state(),
 	_movies(),
+	_childs(),
 	_rootMovie(),
 	_invalidated(true),
 	_disableScripts(false),
@@ -471,6 +472,9 @@ movie_root::clear()
 
 	// wipe out all levels
 	_movies.clear();
+
+	// wipe out all childs
+	_childs.clear();
 
 	// remove all intervals
 	clearIntervalTimers();
@@ -1145,6 +1149,18 @@ movie_root::display()
 
 	}
 
+	for (Childs::iterator i=_childs.begin(), e=_childs.end(); i!=e; ++i)
+	{
+		character* ch = i->second;
+
+		ch->clear_invalidated();
+
+		if (ch->get_visible() == false) continue;
+
+		ch->display();
+
+	}
+
 	render::end_display();
 }
 
@@ -1500,11 +1516,17 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	{
 		i->second->add_invalidated_bounds(ranges, force);
 	}
+
+	for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+	{
+		i->second->add_invalidated_bounds(ranges, force);
+	}
 }
 
 void 
 movie_root::dump_character_tree() const 
 {
+    // @@ deprecated
   for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
 	  log_debug("--- movie at depth %d:", i->second->get_depth());
@@ -1767,6 +1789,12 @@ movie_root::markReachableResources() const
         i->second->setReachable();
     }
 
+    // Mark childs as reachable
+    for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+    {
+        i->second->setReachable();
+    }
+
     // Mark original top-level movie
     // This should always be in _movies, but better make sure
     if ( _rootMovie ) _rootMovie->setReachable();
@@ -1838,17 +1866,30 @@ movie_root::markReachableResources() const
 character *
 movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
+
+	for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+	{
+		character* ret = i->second->get_topmost_mouse_entity(x, y);
+		if ( ret ) return ret;
+	}
+
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
 		character* ret = i->second->get_topmost_mouse_entity(x, y);
 		if ( ret ) return ret;
 	}
+
 	return NULL;
 }
 
 const character *
 movie_root::findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const
 {
+	for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+	{
+		const character* ret = i->second->findDropTarget(x, y, dragging);
+		if ( ret ) return ret;
+	}
 	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
 		const character* ret = i->second->findDropTarget(x, y, dragging);
@@ -1883,6 +1924,11 @@ movie_root::cleanupDisplayList()
         //       in local display lists must happen at the *end* of global action
         //       queue processing.
         //
+        for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+        {
+                MovieClip* mc = dynamic_cast<MovieClip*>(i->second);
+                if ( mc ) mc->cleanupDisplayList();
+        }
         for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
         {
                 i->second->cleanupDisplayList();
@@ -1909,6 +1955,7 @@ movie_root::cleanupDisplayList()
 		int cleaned =0;
 #endif
 		needScan=false;
+
 		// Remove unloaded characters from the _liveChars list
 		for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
 		{
@@ -1945,6 +1992,7 @@ movie_root::cleanupDisplayList()
 				++i;
 			}
 		}
+
 #ifdef GNASH_DEBUG_DLIST_CLEANUP
 		cout << " Scan " << scansCount << " cleaned " << cleaned << " instances" << endl;
 #endif
@@ -2368,6 +2416,68 @@ movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 	log_error("Hosting application registered no callback for events/queries");
 
 	return "<no iface to hosting app>";
+}
+
+void
+movie_root::addChild(character* ch)
+{
+    int newDepth = _childs.empty() ? 0 : _childs.rbegin()->second->get_depth()+1;
+    ch->set_depth(newDepth);
+
+    assert(!_childs[newDepth]);
+
+    _childs[newDepth] = ch;
+
+    ch->set_invalidated();
+
+	/// Notify placement 
+	ch->stagePlacementCallback();
+}
+
+void
+movie_root::addChildAt(character* ch, int depth)
+{
+    setInvalidated();
+
+    // If this character already exist
+    // as a child, drop it first.
+	Childs::iterator existing = _childs.begin();
+    for (Childs::iterator end=_childs.end(); existing!=end; ++existing)
+    {
+        if ( existing->second == ch )
+        {
+            log_debug("Character %s found as child %d",
+                ch->getTarget(), existing->first);
+            _childs.erase(existing);
+            break;
+        }
+    }
+
+    ch->set_depth(depth);
+
+	Childs::iterator it = _childs.find(depth);
+	if ( it == _childs.end() ) {
+        _childs[depth] = ch;
+    } else {
+        if ( it->second == ch )
+        {
+            log_debug("Character %s already the child at depth %d",
+                ch->getTarget(), depth);
+        }
+        // don't leak overloaded childs
+        it->second->destroy();
+        it->second = ch;
+    }
+
+    if ( existing == _childs.end() )
+    {
+        ch->set_invalidated();
+
+        /// Notify placement 
+        ch->stagePlacementCallback();
+    }
+
+	assert(testInvariant());
 }
 
 } // namespace gnash

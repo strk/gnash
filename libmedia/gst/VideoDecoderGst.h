@@ -89,7 +89,21 @@ public:
   
     bool peek();
 
+    /// Get the width of the video
+    //
+    /// @return The width of the video in pixels or 0 if unknown.
+    int width() const;
+
+    /// Get the height of the video
+    //
+    /// @return The height of the video in pixels or 0 if unknown.
+    int height() const;
+
 private:
+
+    int _width;
+    int _height;
+
     void setup(GstCaps* caps);
 
     VideoDecoderGst();

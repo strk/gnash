@@ -41,6 +41,7 @@
 #include <list>
 #include <map>
 #include <string>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -49,7 +50,7 @@ namespace gnash {
     class drag_state;
     class LoadVariablesThread;
     class gradient_record;
-    class edit_text_character;
+    class TextField;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -64,15 +65,14 @@ namespace gnash
 /// This means that they define a variable scope (see
 /// the as_environment member) and are divided into "frames"
 ///
-class MovieClip : public character
+class MovieClip : public character, boost::noncopyable
 {
 
 public:
 
     typedef std::list<const action_buffer*> ActionList;
 
-    // definition must match movie_definition::PlayList
-    typedef std::vector<ControlTag*> PlayList;
+    typedef movie_definition::PlayList PlayList;
 
     typedef std::vector<swf_event*> SWFEventsVector;
 
@@ -139,9 +139,9 @@ public:
     /// \brief
     /// Return the sprite_definition (or movie_definition)
     /// from which this MovieClip has been created
-        movie_definition* get_movie_definition() {
-                return m_def.get();
-        }
+    movie_definition* get_movie_definition() {
+        return m_def.get();
+    }
 
     /// \brief
     /// Return version of the SWF definition of this instance
@@ -372,16 +372,20 @@ public:
     /// @return
     ///     A pointer to the character being added or NULL
     ///
-    character* add_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+    character* add_display_object(const SWF::PlaceObject2Tag* tag,
+            DisplayList& dlist);
 
     /// Proxy of DisplayList::move_character()
-    void move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+    void move_display_object(const SWF::PlaceObject2Tag* tag,
+            DisplayList& dlist);
 
     /// Proxy of DisplayList::replace_character()
-    void replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+    void replace_display_object(const SWF::PlaceObject2Tag* tag,
+            DisplayList& dlist);
 
     /// Proxy of DisplayList::remove_character()
-    void remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist);
+    void remove_display_object(const SWF::PlaceObject2Tag* tag,
+            DisplayList& dlist);
 
     /// Proxy of DisplayList::remove_character()
     ///
@@ -396,8 +400,10 @@ public:
     /// if false, the cxform of the new character will be untouched.
     ///
     /// @param use_old_matrix
-    /// if true, the transformation SWFMatrix of the new character will be set to the old one.
-    /// if false, the transformation SWFMatrix of the new character will be untouched.
+    /// if true, the transformation SWFMatrix of the new character 
+    /// will be set to the old one.
+    /// if false, the transformation SWFMatrix of the new character will
+    /// be untouched.
     ///
     void replace_display_object(character* ch,  int depth,
         bool use_old_cxform,
@@ -414,11 +420,13 @@ public:
     /// in the depth(think about multiple characters within the same
     /// depth, not tested and a rare case)
     ///
-    void    remove_display_object(int depth, int /* id */)
+    void remove_display_object(int depth, int /* id */)
     {
         set_invalidated();
         m_display_list.remove_character(depth);
     }
+
+    void unloadMovie();
 
     /// Attach the given character instance to current display list
     //
@@ -609,14 +617,12 @@ public:
     /// A TextField variable is a variable that acts
     /// as a setter/getter for a TextField 'text' member.
     ///
-    void set_textfield_variable(const std::string& name,
-            edit_text_character* ch);
+    void set_textfield_variable(const std::string& name, TextField* ch);
 
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
     void dump_character_tree(const std::string prefix) const;
             
-
     const DisplayList& getDisplayList() const {
             return m_display_list;
     }
@@ -819,12 +825,6 @@ private:
     // See dox in character.h
     bool allowHandCursor() const;
 
-    /// Forbid copy
-    MovieClip(const MovieClip&);
-
-    /// Forbid assignment
-    MovieClip& operator=(const MovieClip&);
-
     /// Advance to a previous frame.
     //
     /// This function will basically restore the DisplayList as it supposedly
@@ -835,20 +835,25 @@ private:
     ///
     /// - Remove from current DisplayList:
     /// - Timeline instances constructed after target frame 
-    /// - Timeline instances constructed before or at the target frame but no more at the original depth
+    /// - Timeline instances constructed before or at the target frame but no
+    ///   more at the original depth
     /// - Dynamic instances found in the static depth zone
     /// - Execute all displaylist tags from first to one-before target frame,
-    ///   appropriately setting m_current_frame as it goes, finally execute both displaylist and action
+    ///   appropriately setting m_current_frame as it goes, finally execute
+    ///   both displaylist and action
     ///   tags for target frame.
     ///
     /// Callers of this methods are:
     /// - goto_frame (for jump-backs)
     /// - advance_sprite (for loop-back)
     ///
-    /// See: http://www.gnashdev.org/wiki/index.php/TimelineControl#Timeline_instances
+    /// See:
+    //  http://www.gnashdev.org/wiki/index.php/TimelineControl
+    ///              #Timeline_instances
     ///
     /// @param targetFrame
-    /// The target frame for which we're willing to restore the static DisplayList.
+    /// The target frame for which we're willing to restore the static
+    /// DisplayList.
     /// 0-based.
     //
     /// POSTCONDITIONS:
@@ -919,8 +924,8 @@ private:
     /// Increment m_current_frame, and take care of looping.
     void increment_frame_and_check_for_loop();
 
-    typedef boost::intrusive_ptr< edit_text_character > TextFieldPtr;
-    typedef std::vector< TextFieldPtr > TextFieldPtrVect;
+    typedef boost::intrusive_ptr<TextField> TextFieldPtr;
+    typedef std::vector<TextFieldPtr> TextFieldPtrVect;
 
     /// A container for textfields, indexed by their variable name
     typedef std::map< std::string, TextFieldPtrVect > TextFieldMap;
@@ -977,7 +982,8 @@ protected:
     ///     Which kind of control tags we want to execute. 
     ///     See control_tag_type enum. TODO: *take* a control_tag_type ?
     ///
-    void execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags=TAG_DLIST|TAG_ACTION);
+    void execute_frame_tags(size_t frame, DisplayList& dlist,
+            int typeflags = TAG_DLIST | TAG_ACTION);
 
     /// \brief
     /// This is either sprite_definition (for sprites defined by

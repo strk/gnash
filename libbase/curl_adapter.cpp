@@ -21,14 +21,10 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "NetworkAdapter.h"
 #include "utility.h" // UNUSED macro
-#include "IOChannel.h"
 #include "log.h"
+#include "IOChannel.h"
 #include "WallClockTimer.h"
 #include "GnashSleep.h"
 

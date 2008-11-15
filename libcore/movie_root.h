@@ -805,6 +805,22 @@ public:
 
     const RunInfo& runInfo() const { return _runInfo; }
 
+    /// Add a character child on top depth
+    //
+    /// @param ch
+    ///     The child character to add
+    void addChild(character* ch);
+
+    /// Add a character child at given depth
+    //
+    /// @param ch
+    ///     The child character to add
+    ///
+    /// @param depth
+    ///     The depth to add the child to
+    ///
+    void addChildAt(character* ch, int depth);
+
 private:
 
     const RunInfo& _runInfo; 
@@ -980,6 +996,12 @@ private:
     /// to avoid having to replicate all of the base class
     /// interface to the movie_instance class definition
     Levels _movies;
+
+    typedef character* DisplayObject;
+    typedef std::map<int, DisplayObject> Childs;
+
+    /// The stage childs
+    Childs _childs;
 
     /// The root movie. This is initially the same as getLevel(0) but might
     /// change during the run. It will be used to setup and retrive initial

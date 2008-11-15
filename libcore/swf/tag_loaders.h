@@ -69,38 +69,9 @@ void define_shape_loader(SWFStream&, tag_type, movie_definition&,
 void define_shape_morph_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
-/// SWF Tags DefineFont (10), DefineFont2 (48) and DefineFont3 (75)
-//
-/// Load a font and adds it the the movie definition.
-///
-void define_font_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
 /// SWF Tags Reflex (777)
 //
 void reflex_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
-/// SWF Tag DefineFontInfo (13 or 62) 
-//
-/// Load a DefineFontInfo or DefineFontInfo2 tag. 
-/// This adds information to an existing font.
-///
-void define_font_info_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
-/// SWF Tag DefineFontName (88)
-//  Load the display name and copyright string of a font.
-//  This adds to an existing font.
-void define_font_name_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
-/// Read SWF::DEFINETEXT and SWF::DEFINETEXT2 tags.
-void define_text_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
-/// Read an SWF::DEFINEEDITTEXT tag.
-void define_edit_text_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
 void place_object_2_loader(SWFStream&, tag_type, movie_definition&,
@@ -128,9 +99,6 @@ void remove_object_2_loader(SWFStream&, tag_type, movie_definition&,
 
 void do_action_loader(SWFStream&, tag_type, movie_definition&, const RunInfo&);
 
-void button_character_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
 /// Label the current frame  (SWF::FRAMELABEL)
 void frame_label_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
@@ -142,9 +110,6 @@ void import_loader(SWFStream&, tag_type, movie_definition&, const RunInfo&);
 
 /// Load a SWF::DEFINESOUND tag.
 void define_sound_loader(SWFStream&, tag_type, movie_definition&,
-		const RunInfo&);
-
-void button_sound_loader(SWFStream&, tag_type, movie_definition&,
 		const RunInfo&);
 
 void do_init_action_loader(SWFStream&, tag_type, movie_definition&,

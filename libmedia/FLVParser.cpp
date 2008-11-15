@@ -256,7 +256,8 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 		case VIDEO_CODEC_H264:
 		{
 			boost::uint8_t packettype = _stream->read_byte();
-			IF_VERBOSE_PARSE( log_debug(_("AVC packet type: %d"), (unsigned)packettype) );
+			IF_VERBOSE_PARSE( log_debug(_("AVC packet type: %d"),
+                        (unsigned)packettype) );
 
 			header = (packettype == 0);
 
@@ -271,7 +272,8 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 			break;
 	}
 
-	std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1, flvtag.timestamp);
+	std::auto_ptr<EncodedVideoFrame> frame = readVideoFrame(bodyLength-1,
+            flvtag.timestamp);
 	if ( ! frame.get() ) {
 		log_error("could not read video frame?");
 	}
@@ -384,7 +386,8 @@ bool FLVParser::parseNextTag(bool index_only)
 		}
 
 
-		std::auto_ptr<EncodedAudioFrame> frame = parseAudioTag(flvtag, audiotag, thisTagPos);
+		std::auto_ptr<EncodedAudioFrame> frame = 
+            parseAudioTag(flvtag, audiotag, thisTagPos);
 		if (!frame.get()) {
 			return false;
 		}
@@ -407,7 +410,8 @@ bool FLVParser::parseNextTag(bool index_only)
 			}
 		}
 
-		std::auto_ptr<EncodedVideoFrame> frame = parseVideoTag(flvtag, videotag, thisTagPos);
+		std::auto_ptr<EncodedVideoFrame> frame = 
+            parseVideoTag(flvtag, videotag, thisTagPos);
 		if (!frame.get()) {
 			return false;
 		}
@@ -425,22 +429,29 @@ bool FLVParser::parseNextTag(bool index_only)
 		if ( chunk[11] != 2 )
 		{
 			// ::processTags relies on the first AMF0 value being a string...
-			log_unimpl(_("First byte of FLV_META_TAG is %d, expected 0x02 (STRING AMF0 type)"),
-				(int)chunk[11]);
+			log_unimpl(_("First byte of FLV_META_TAG is %d, expected "
+                        "0x02 (STRING AMF0 type)"),
+                    static_cast<int>(chunk[11]));
 		}
 		// Extract information from the meta tag
-		std::auto_ptr<SimpleBuffer> metaTag(new SimpleBuffer(flvtag.body_size-1));
-		size_t actuallyRead = _stream->read(metaTag->data(), flvtag.body_size-1);
-		if ( actuallyRead < flvtag.body_size-1 )
+		std::auto_ptr<SimpleBuffer> metaTag(new SimpleBuffer(
+                    flvtag.body_size-1));
+		size_t actuallyRead = _stream->read(metaTag->data(),
+                flvtag.body_size - 1);
+
+        if ( actuallyRead < flvtag.body_size-1 )
 		{
-			log_error("FLVParser::parseNextTag: can't read metaTag (%d) body (needed %d bytes, only got %d)",
+			log_error("FLVParser::parseNextTag: can't read metaTag (%d) "
+                    "body (needed %d bytes, only got %d)",
 				FLV_META_TAG, flvtag.body_size, actuallyRead);
 			return false;
 		}
 		metaTag->resize(actuallyRead);
 
-		boost::uint32_t terminus = getUInt24(metaTag->data() + actuallyRead - 3);
-		if (terminus != 9) {
+		boost::uint32_t terminus = getUInt24(metaTag->data() +
+                actuallyRead - 3);
+
+        if (terminus != 9) {
 			log_error(_("Corrupt FLV: Meta tag unterminated!"));
 		}
 

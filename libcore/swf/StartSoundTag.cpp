@@ -23,17 +23,18 @@
 #include "log.h" // for log_parse
 #include "sound_definition.h" // for sound_sample
 #include "RunInfo.h"
+#include "SoundInfoRecord.h"
 #include "MovieClip.h"
 
 namespace gnash {
 namespace SWF {
 
-/* public static */
+
 void
 StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
         const RunInfo& r)
 {
-    assert(tag == SWF::STARTSOUND); // 15 
+    assert(tag == STARTSOUND); 
 
     sound::sound_handler* handler = r.soundHandler();
 
@@ -58,87 +59,26 @@ StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
     // NOTE: sound_id is the SWF-defined id,
     //       sam->m_sound_handler_id is the sound_handler-provided id
     //
-    StartSoundTag*  sst = new StartSoundTag(sam->m_sound_handler_id);
-    sst->read(in);
+    in.align(); // necessary?
+    StartSoundTag* sst = new StartSoundTag(in, sam->m_sound_handler_id);
 
     IF_VERBOSE_PARSE (
-         log_parse(_("StartSound: id=%d, stop = %d, loop ct = %d"),
-              sound_id, int(sst->m_stop_playback), sst->m_loop_count);
+         log_parse(_("StartSound: id=%d"), sound_id);
     );
 
     m.addControlTag(sst); // takes ownership
 }
 
-/* private */
-void
-StartSoundTag::read(SWFStream& in)
-{
-    in.align();
-    in.ensureBytes(1); // header
-
-    int flags = in.read_u8();
-    // first two bits are reserved.
-    m_stop_playback     = flags & (1 << 5); 
-    bool  no_multiple   = flags & (1 << 4); 
-    bool  has_envelope  = flags & (1 << 3); 
-    bool  has_loops     = flags & (1 << 2); 
-    bool  has_out_point = flags & (1 << 1); 
-    bool  has_in_point  = flags & (1 << 0); 
-
-    if (no_multiple)
-    {
-        LOG_ONCE( log_unimpl("syncNoMultiple flag in StartSoundTag") );
-    }
-
-    boost::uint32_t in_point = 0;
-    boost::uint32_t out_point = 0;
-
-    if ( in_point ) log_unimpl(_("StartSoundTag with in point"));
-    if ( out_point ) log_unimpl(_("StartSoundTag with out point"));
-
-    in.ensureBytes(has_in_point*4 + has_out_point*4 + has_loops*2);
-
-    if (has_in_point)
-    {
-        in_point = in.read_u32();
-    }
-    if (has_out_point)
-    {
-        out_point = in.read_u32();
-    }
-    if (has_loops)
-    {
-        m_loop_count = in.read_u16();
-    }
-
-    if (has_envelope)
-    {
-        in.ensureBytes(1);
-        int nPoints = in.read_u8();
-
-        m_envelopes.resize(nPoints);
-        in.ensureBytes(8*nPoints);
-        for (int i=0; i < nPoints; i++)
-        {
-            m_envelopes[i].m_mark44 = in.read_u32();
-            m_envelopes[i].m_level0 = in.read_u16();
-            m_envelopes[i].m_level1 = in.read_u16();
-        }
-    }
-
-}
-
 void
 StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 {
-    //GNASH_REPORT_FUNCTION;
 
     sound::sound_handler* handler = 
         m->getVM().getRoot().runInfo().soundHandler();
 
     if (handler)
     {
-        if (m_stop_playback)
+        if (_soundInfo.stopPlayback)
         {
             //log_debug("Execute StartSoundTag with 'stop playback' flag on");
             handler->stop_sound(m_handler_id);
@@ -146,10 +86,30 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
         else
         {
             //log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
-            handler->play_sound(m_handler_id, m_loop_count, 0, 0,
-                    (m_envelopes.empty() ? NULL : &m_envelopes));
+            handler->play_sound(m_handler_id, _soundInfo.loopCount, 0, 0,
+                    (_soundInfo.envelopes.empty() ? NULL :
+                     &_soundInfo.envelopes));
         }
     }
+}
+
+void
+StartSound2Tag::loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+        const RunInfo& /*r*/)
+{
+    assert(tag == STARTSOUND2);
+
+    std::string className;
+    in.read_string(className);
+    log_unimpl(_("STARTSOUND2 tag not parsed and not used"));
+
+    // We should probably then use StartSoundTag to parse the
+    // tag, but we don't know which sound_handler_id to use.
+
+    IF_VERBOSE_PARSE(
+        log_parse("StartSound2 tag: SoundClassName %s", className);
+    );
+    in.skip_to_tag_end();
 }
 
 

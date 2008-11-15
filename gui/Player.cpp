@@ -159,11 +159,12 @@ Player::init_logfile()
 
 }
 
-bool
-Player::silentStream(void* /*udata*/, boost::uint8_t* stream, int len)
+unsigned int
+Player::silentStream(void* /*udata*/, boost::int16_t* stream, unsigned int len, bool& atEOF)
 {
-    memset((void*)stream, 0, len);
-    return true;
+    std::fill(stream, stream+len, 0);
+    atEOF=false;
+    return len;
 }
 
 void
@@ -172,7 +173,12 @@ Player::init_sound()
 
     if (_doSound) {
 #ifdef SOUND_SDL
-        _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
+        try {
+            _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
+        } catch (SoundException& ex) {
+            log_error(_("Could not create sound handler: %s."
+                " Will continue w/out sound."), ex.what());
+        }
         if (! _audioDump.empty()) {
             // add a silent stream to the audio pool so that our output file
             // is homogenous;  we actually want silent wave data when no sounds
@@ -210,13 +216,6 @@ Player::init_gui()
     if ( _doRender )
     {
         _gui = getGui(); 
-
-        RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-        if ( rcfile.startStopped() )
-        {
-            _gui->stop();
-        }
-
     }
     else
     {
@@ -422,6 +421,18 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     if ( _hostfd != -1 ) root.setHostFD(_hostfd);
 
     _gui->setStage(&root);
+
+    // When startStopped is true, stop here after the stage has been 
+    // registered, but before the movie has started. Initial loading
+    // and VM initialization have been done by this stage, but not
+    // the complete parsing of the SWF. This is important because
+    // the Gui accesses movie_root to get the sound_handler, but also
+    // because the gui window should be properly set up by this point.
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    if ( rcfile.startStopped() )
+    {
+        _gui->stop();
+    }
 
     // Start loader thread
     // NOTE: the loader thread might (in IMPORT tag parsing)

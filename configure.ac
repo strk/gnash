@@ -1489,7 +1489,7 @@ AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 if test x"${GIF_LIBS}" = x ; then
  GNASH_PKG_FIND(ungif, [gif_lib.h], [gif images], DGifOpen)
@@ -1757,12 +1757,13 @@ if test x"$media_handler" = x"gst"; then
   CFLAGS=$GSTREAMER_CFLAGS
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_async],
     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-    has_modern_gstpbutils='no')
+    has_gst_install_plugins_async='no')
   AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_supported],
     AC_DEFINE([HAVE_GST_INSTALL_PLUGINS_SUPPORTED], [], [GStreamer provides the gst_install_plugins_supported function]),
     has_gst_install_plugins_supported='no')
   CFLAGS=$save_cflags
-  if test x$has_modern_gstpbutils = xno; then
+  if test x$has_gst_install_plugins_async = xno -o x$has_gst_install_plugins_supported = xno; then
+    has_modern_gstpbutils='no'
     AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
   else
     AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
@@ -2370,13 +2371,13 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${LIBPNG_LIBS}" != x ; then
-  if test x"${LIBPNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $LIBPNG_CFLAGS"
+if test x"${PNG_LIBS}" != x ; then
+  if test x"${PNG_CFLAGS}" != x ; then
+    echo "        PNG flags are: $PNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
   fi
-  echo "        PNG libs are: $LIBPNG_LIBS"
+  echo "        PNG libs are: $PNG_LIBS"
 else
   echo "        WARNING: No PNG library development package installed!" >&4
   echo "                 Gnash will be built without support for dynamic loading of PNG files." >&4
@@ -2539,7 +2540,7 @@ if test "$media_handler" = "gst"; then
     if test x"$has_modern_gstpbutils" = "xno"; then
       echo "        RECOMMENDED: If the user has not installed the necessary Gstreamer plugins," >&4
       echo "                     Gstreamer can pop up a message prompting them to." >&4
-      echo "                     Install gstpbutils from http://www.gstreamer.net for that to be enabled" >&4
+      echo "                     Install gstpbutils (>= 0.10.15) from http://www.gstreamer.net for that to be enabled" >&4
       echo "                     or .deb users: apt-get install libgstreamer-plugins-base0.10-dev" >&4
     fi
   else

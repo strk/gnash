@@ -9,11 +9,7 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
-#include "font.h"
+#include "Font.h"
 #include "impl.h"
 #include "log.h"
 #include "render.h"
@@ -28,8 +24,8 @@ namespace gnash {
 namespace fontlib {
 
 namespace {
-	std::vector< boost::intrusive_ptr<font> >	s_fonts;
-	boost::intrusive_ptr<font> _defaultFont;
+	std::vector< boost::intrusive_ptr<Font> >	s_fonts;
+	boost::intrusive_ptr<Font> _defaultFont;
 }
 
 
@@ -44,11 +40,11 @@ namespace {
 		s_fonts.clear();
 	}
 
-boost::intrusive_ptr<font>
+boost::intrusive_ptr<Font>
 get_default_font()
 {
 	if ( _defaultFont ) return _defaultFont;
-	_defaultFont = new font(DEFAULT_FONT_NAME);
+	_defaultFont = new Font(DEFAULT_FONT_NAME);
 	return _defaultFont;
 }
 
@@ -59,7 +55,7 @@ get_default_font()
 	}
 
 
-	font*	get_font(int index)
+	Font*	get_font(int index)
 	// Retrieve one of our fonts, by index.
 	{
 		if (index < 0 || index >= (int) s_fonts.size())
@@ -71,24 +67,24 @@ get_default_font()
 	}
 
 
-	font*	get_font(const std::string& name, bool bold, bool italic)
+	Font*	get_font(const std::string& name, bool bold, bool italic)
 	{
 		// Dumb linear search.
 		for (unsigned int i = 0; i < s_fonts.size(); i++)
 		{
-			font*	f = s_fonts[i].get();
+			Font*	f = s_fonts[i].get();
 			assert(f);
 			if ( f->matches(name, bold, italic) )
 			{
 				return f;
 			}
 		}
-		font* f = new font(name, bold, italic);
+		Font* f = new Font(name, bold, italic);
 		s_fonts.push_back(f);
 		return f;
 	}
 
-	void	add_font(font* f)
+	void	add_font(Font* f)
 	// Add the given font to our library.
 	{
 		assert(f);

@@ -18,7 +18,7 @@
 //
 
 
-#include "font.h"
+#include "Font.h"
 #include "log.h"
 #include "shape.h"
 #include "SWFStream.h"
@@ -30,6 +30,8 @@ namespace SWF {
 
 DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
 	SWFStream& /* in */)
+    :
+    _csm_table_int(2)
 {
 }
 
@@ -38,15 +40,16 @@ void
 DefineFontAlignZonesTag::loader(SWFStream& in, tag_type tag,
         movie_definition& m, const RunInfo& /*r*/)
 {
-	assert(tag == SWF::DEFINEALIGNZONES); // 73
+	assert(tag == SWF::DEFINEALIGNZONES);
 
     in.ensureBytes(1);
 	unsigned short ref = in.read_u8(); // must reference a valid DEFINEFONT3 tag
-	font* referencedFont = m.get_font(ref);
+	Font* referencedFont = m.get_font(ref);
 	if ( ! referencedFont )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("DefineFontAlignZones tag references an undefined font %d"), ref);
+		log_swferror(_("DefineFontAlignZones tag references an undefined "
+                "font %d"), ref);
 		);
 		in.skip_to_tag_end();
 		return;

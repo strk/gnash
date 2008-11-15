@@ -49,8 +49,8 @@ public:
     /// invalidated area when rendering morphs
     virtual const rect&	get_bound() const 
     { 
-        m_bound.expand_to_rect(m_shape1->m_bound);
-        m_bound.expand_to_rect(m_shape2->m_bound);
+        m_bound.expand_to_rect(m_shape1->get_bound());
+        m_bound.expand_to_rect(m_shape2->get_bound());
         return m_bound;
     }
 

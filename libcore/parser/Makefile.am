@@ -50,34 +50,26 @@ libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
 	bitmap_character_def.cpp \
 	BitmapMovieDefinition.cpp \
-	button_character_def.cpp \
 	character_def.cpp \
-	edit_text_character_def.cpp \
-	text_character_def.cpp \
 	SWFMovieDefinition.cpp \
         morph2_character_def.cpp \
 	shape_character_def.cpp	\
 	sound_definition.cpp \
-	sprite_definition.cpp \
-	video_stream_def.cpp
+	sprite_definition.cpp
 
 noinst_HEADERS = \
 	abc_block.h \
 	action_buffer.h \
-	button_character_def.h \
 	character_def.h	\
 	bitmap_character_def.h \
 	BitmapMovieDefinition.h \
-	edit_text_character_def.h \
-	text_character_def.h \
 	morph2_character_def.h \
 	movie_definition.h \
 	SWFMovieDefinition.h \
 	Namespace.h \
 	shape_character_def.h \
 	sound_definition.h \
-	sprite_definition.h \
-	video_stream_def.h
+	sprite_definition.h
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \

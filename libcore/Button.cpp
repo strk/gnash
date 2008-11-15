@@ -23,7 +23,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "Button.h"
-#include "button_character_def.h"
+#include "DefineButtonTag.h"
 #include "as_value.h"
 
 #include "ActionExec.h"
@@ -290,9 +290,7 @@ attachButtonInterface(as_object& o)
 
 }
 
-Button::Button(
-		button_character_definition& def,
-		character* parent, int id)
+Button::Button(SWF::DefineButtonTag& def, character* parent, int id)
 	:
 	character(parent, id),
 	m_last_mouse_flags(IDLE),
@@ -515,7 +513,7 @@ Button::on_button_event(const event_id& event)
 	set_current_state(new_state);
     
 	// Button transition sounds.
-	if (_def.m_sound != NULL)
+	if (_def.hasSound())
 	{
 		int bi; // button sound array index [0..3]
 		sound::sound_handler* s = _vm.getRoot().runInfo().soundHandler();
@@ -542,19 +540,23 @@ Button::on_button_event(const event_id& event)
 			}
 			if (bi >= 0)
 			{
-				button_character_definition::button_sound_info& bs = _def.m_sound->m_button_sounds[bi];
+				const SWF::DefineButtonSoundTag::ButtonSound& bs = 
+                    _def.buttonSound(bi);
 				// character zero is considered as null character
-				if (bs.m_sound_id > 0)
+				if (bs.soundID > 0)
 				{
-					if (_def.m_sound->m_button_sounds[bi].m_sam != NULL)
+					if (bs.sample)
 					{
-						if (bs.m_sound_style.m_stop_playback)
+						if (bs.soundInfo.stopPlayback)
 						{
-							s->stop_sound(bs.m_sam->m_sound_handler_id);
+							s->stop_sound(bs.sample->m_sound_handler_id);
 						}
 						else
 						{
-							s->play_sound(bs.m_sam->m_sound_handler_id, bs.m_sound_style.m_loop_count, 0, 0, (bs.m_sound_style.m_envelopes.size() == 0 ? NULL : &bs.m_sound_style.m_envelopes));
+							s->play_sound(bs.sample->m_sound_handler_id,
+                                    bs.soundInfo.loopCount, 0, 0, 
+                                    (bs.soundInfo.envelopes.empty() ? NULL :
+                                                    &bs.soundInfo.envelopes));
 						}
 					}
 				}
@@ -562,7 +564,7 @@ Button::on_button_event(const event_id& event)
 		}
 	}
 
-	// From: "ActionScript - The Definiteve Guide" by Colin Moock
+	// From: "ActionScript - The Definitive Guide" by Colin Moock
 	// (chapter 10: Events and Event Handlers)
 	//
 	// "Event-based code [..] is said to be executed asynchronously
@@ -588,7 +590,8 @@ Button::on_button_event(const event_id& event)
 	//else log_debug(_("No statically-defined handler for event: %s"), event);
 
 	// Call conventional attached method.
-	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_key());
+	boost::intrusive_ptr<as_function> method =
+        getUserDefinedEventHandler(event.get_function_key());
 	if ( method )
 	{
 		//log_debug(_("Got user-defined handler for event: %s"), event);
@@ -634,20 +637,21 @@ Button::get_active_records(RecSet& list, MouseState state)
 {
 	list.clear();
 	
-	size_t nrecs = _def.m_button_records.size();
+    using namespace SWF;
+    const DefineButtonTag::ButtonRecords& br = _def.buttonRecords();
+    size_t index = 0;
 
-	//log_debug("%s.get_active_records(%s) - def has %d records", getTarget(), mouseStateName(state), _def.m_button_records.size());
-	for (size_t i=0; i<nrecs; ++i)
+	for (DefineButtonTag::ButtonRecords::const_iterator i = br.begin(),
+            e = br.end(); i != e; ++i, ++index)
 	{
-		button_record& rec = _def.m_button_records[i];
-		//log_debug(" rec %d has hit:%d down:%d over:%d up:%d", i, rec.m_hit_test, rec.m_down, rec.m_over, rec.m_up);
+		const ButtonRecord& rec =*i;
 
 		if ((state == UP && rec.m_up)
 		    || (state == DOWN && rec.m_down)
 		    || (state == OVER && rec.m_over)
 		    || (state == HIT && rec.m_hit_test))
 		{
-			list.insert(i);
+			list.insert(index);
 		}
 	}
 }
@@ -740,14 +744,16 @@ Button::set_current_state(MouseState new_state)
 			if ( ! oldch )
 			{
 				// Not there, instantiate
-				button_record& bdef = _def.m_button_records[i];
+                SWF::ButtonRecord& bdef = _def.buttonRecords()[i];
 
-				const SWFMatrix&	mat = bdef.m_button_matrix;
-				const cxform&	cx = bdef.m_button_cxform;
-				int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
+				const SWFMatrix& mat = bdef.m_button_matrix;
+				const cxform& cx = bdef.m_button_cxform;
+				int ch_depth = bdef.m_button_layer + 
+                    character::staticDepthOffset + 1;
 				int ch_id = bdef.m_character_id;
 
-				character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+				character* ch = bdef.m_character_def->create_character_instance(
+                        this, ch_id);
 				ch->setMatrix(mat, true); // update caches
 				ch->set_cxform(cx); 
 				ch->set_depth(ch_depth); 
@@ -893,7 +899,7 @@ Button::stagePlacementCallback()
 	get_active_records(hitChars, HIT);
 	for (RecSet::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
 	{
-		button_record& bdef = _def.m_button_records[*i];
+        SWF::ButtonRecord& bdef = _def.buttonRecords()[*i];
 
 		const SWFMatrix& mat = bdef.m_button_matrix;
 		const cxform& cx = bdef.m_button_cxform;
@@ -915,7 +921,7 @@ Button::stagePlacementCallback()
 	// Some slots will probably be never used (consider HIT-only records)
 	// but for now this direct corrispondence between record number
 	// and active character will be handy.
-	_stateCharacters.resize(_def.m_button_records.size());
+	_stateCharacters.resize(_def.buttonRecords().size());
 
 	// Instantiate the default state characters 
 	RecSet upChars;
@@ -924,14 +930,15 @@ Button::stagePlacementCallback()
 	for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
 	{
 		int rno = *i;
-		button_record& bdef = _def.m_button_records[rno];
+        SWF::ButtonRecord& bdef = _def.buttonRecords()[rno];
 
-		const SWFMatrix&	mat = bdef.m_button_matrix;
-		const cxform&	cx = bdef.m_button_cxform;
+		const SWFMatrix& mat = bdef.m_button_matrix;
+		const cxform& cx = bdef.m_button_cxform;
 		int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
 		int ch_id = bdef.m_character_id;
 
-		character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+		character* ch = bdef.m_character_def->create_character_instance(
+                this, ch_id);
 		ch->setMatrix(mat, true);  // update caches
 		ch->set_cxform(cx); 
 		ch->set_depth(ch_depth); 

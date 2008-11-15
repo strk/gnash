@@ -151,8 +151,8 @@ dumpconfig:
 	@echo "Image decoding support..."
 	@echo "	JPEG_CFLAGS is $(JPEG_CFLAGS)"
 	@echo "	JPEG_LIBS is $(JPEG_LIBS)"
-	@echo "	PNG_CFLAGS is $(LIBPNG_CFLAGS)"
-	@echo "	PNG_LIBS is $(LIBPNG_LIBS)"
+	@echo "	PNG_CFLAGS is $(PNG_CFLAGS)"
+	@echo "	PNG_LIBS is $(PNG_LIBS)"
 	@echo "Audio decoding support..."
 if USE_GST_ENGINE
 	@echo "	GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
@@ -358,7 +358,8 @@ else
 endif
 
 if TESTSUITE
-check: check-recursive anal
+check: check-recursive 
+	$(MAKE) anal
 
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh

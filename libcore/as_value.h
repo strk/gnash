@@ -72,7 +72,13 @@ isNaN(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::typ
 	return num != num;
 }
 
-#define isinf(x) (isNaN(x - x))
+template <typename T>
+inline bool
+isInf(const T& num)
+{
+	return isNaN(num - num);
+}
+
 
 /// Use this methods to obtain a properly-formatted property name
 /// The methods will convert the name to lowercase if the current VM target

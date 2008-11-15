@@ -26,7 +26,6 @@
 #include "DisplayList.h"
 #include "log.h"
 #include "GnashException.h"
-#include "GnashSleep.h"
 #include "VM.h"
 
 #include "check.h"
@@ -60,6 +59,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+	//dbglogfile.setVerbosity(2);
 	//dbglogfile.setActionDump(1);
 
 	MovieClip* root = tester.getRootMovie();
@@ -117,8 +117,6 @@ main(int /*argc*/, char** /*argv*/)
 		}
 		tester.advance();
 		frame++;
-		// Frame length should be 2 seconds.
-		gnashSleep(2000000);
 	}
 
 }

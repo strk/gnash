@@ -63,6 +63,18 @@ class StreamSoundBlockTag : public ControlTag
 
 public:
 
+	/// Start the associated block of sound
+	void execute(MovieClip* m, DisplayList& dlist) const;
+
+	/// Load an SWF::SOUNDSTREAMBLOCK (19) tag.
+	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+            const RunInfo& r);
+
+	/// Not a "state" (DisplayList?) tag, do doesn't need to provide
+    ///  execute_state
+
+private:
+
 	/// Create a ControlTag playing the given sample when executed.
 	//
 	/// @param handlerId
@@ -72,20 +84,12 @@ public:
 	///	Offset to start playback from.
 	///	(Should be offset of the associated sound block).
 	///
+    /// This should only be constructed using the loader() function.
 	StreamSoundBlockTag(int handlerId, long start)
 		:
 		m_handler_id(handlerId),
 		m_start(start)
 	{}
-
-	/// Start the associated block of sound
-	void execute(MovieClip* m, DisplayList& /*dlist*/) const;
-
-	/// Load an SWF::SOUNDSTREAMBLOCK (19) tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r);
-
-	/// Not a "state" (DisplayList?) tag, do doesn't need to provide execute_state
-	//void execute_state(MovieClip* m) const {}
 };
 
 

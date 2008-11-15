@@ -52,7 +52,9 @@ main(int argc, char** argv)
   char buffer_a[1028];
   char buffer_b[2048];
 
-  int video_width = 128;
+  // This is different from the real video width to make sure that
+  // Video.width returns the actual width (128).
+  int video_width = 130;
   int video_height = 96;
 
   if ( argc>1 ) mediadir=argv[1];
@@ -296,10 +298,25 @@ main(int argc, char** argv)
   //------------------------------------------
   // Now attach video to the video characters
   //------------------------------------------
-  
+  check(mo, "Video.prototype.hasOwnProperty('attachVideo')");
+  check(mo, "Video.prototype.hasOwnProperty('smoothing')");
+  check(mo, "Video.prototype.hasOwnProperty('deblocking')");
+  check(mo, "Video.prototype.hasOwnProperty('clear')");
+  check(mo, "Video.prototype.hasOwnProperty('height')");
+  check(mo, "Video.prototype.hasOwnProperty('width')");
+  check_equals(mo, "video.height", "0");
+  check_equals(mo, "video.width", "0");
+  check_equals(mo, "video2.height", "0");
+  check_equals(mo, "video2.width", "0");
+
   add_actions(mo, "video.attachVideo(stream);"); 
   add_actions(mo, "video2.attachVideo(stream2);"); 
   
+  check_equals(mo, "video.height", "0");
+  check_equals(mo, "video.width", "0");
+  check_equals(mo, "video2.height", "0");
+  check_equals(mo, "video2.width", "0");
+
   // currentFps (read-only)
   check_equals (mo, "typeof(stream.currentFps)", "'number'" );
   add_actions(mo, "stream.currentFps = 'string';");
@@ -376,6 +393,32 @@ main(int argc, char** argv)
   check_equals(mo, "video._yscale", "100");
   check_equals(mo, "video._rotation", "0");
   check_equals(mo, "video._target", "'/video'");
+  check_equals(mo, "video.height", "0");
+  check_equals(mo, "video.width", "0");
+  check_equals(mo, "video2.height", "0");
+  check_equals(mo, "video2.width", "0");
+
+  check(mo, "Video.prototype.hasOwnProperty('attachVideo')");
+  check(mo, "Video.prototype.hasOwnProperty('smoothing')");
+  check(mo, "Video.prototype.hasOwnProperty('deblocking')");
+  check(mo, "Video.prototype.hasOwnProperty('clear')");
+  check(mo, "Video.prototype.hasOwnProperty('height')");
+  check(mo, "Video.prototype.hasOwnProperty('width')");
+
+  check(mo, "!Video.prototype.hasOwnProperty('_alpha')");
+  check(mo, "!Video.prototype.hasOwnProperty('_height')");
+  check(mo, "!Video.prototype.hasOwnProperty('_name')");
+  check(mo, "!Video.prototype.hasOwnProperty('_parent')");
+  check(mo, "!Video.prototype.hasOwnProperty('_rotation')");
+  check(mo, "!Video.prototype.hasOwnProperty('_visible')");
+  check(mo, "!Video.prototype.hasOwnProperty('_width')");
+  check(mo, "!Video.prototype.hasOwnProperty('_x')");
+  check(mo, "!Video.prototype.hasOwnProperty('_xmouse')");
+  check(mo, "!Video.prototype.hasOwnProperty('_xscale')");
+  check(mo, "!Video.prototype.hasOwnProperty('_y')");
+  check(mo, "!Video.prototype.hasOwnProperty('_ymouse')");
+  check(mo, "!Video.prototype.hasOwnProperty('_yscale')");
+  check(mo, "!Video.prototype.hasOwnProperty('_xmouse')");
 
   add_actions(mo,
 		"video._x = 100;"
@@ -399,7 +442,8 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(video.getBounds)", "'undefined'");
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction(
-
+        "note('The video on the right is an OGG theora stream. It will appear "
+        "in Gnash, but not the Adobe player');"
 		"_root.onKeyDown = function() {"
 		" 	_root.note(' bufferLength:'+stream.bufferLength+"
 		" 		' bytesLoaded:'+stream.bytesLoaded+"
@@ -612,10 +656,19 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
+  check_equals(mo, "video.height", "96");
+  check_equals(mo, "video.width", "128");
+
+  //add_actions(mo, "note('This is an OGG stream, so the Adobe player "
+  //    "will fail the next two tests.');");
+  // gstreamer also fails, so let's not test this.
+  //check_equals(mo, "video2.height", "96");
+  //check_equals(mo, "video2.width", "128");
+
   check_equals(mo, "metadataNotified", "1");
   check_equals(mo, "stopNotified", "2");
   check_equals(mo, "startNotified", "1");
-  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(142); stop(); end_of_test=true;"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(182); stop(); end_of_test=true;"));
 
   SWFMovie_nextFrame(mo);
 

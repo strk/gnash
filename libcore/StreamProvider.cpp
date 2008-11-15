@@ -21,10 +21,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 
 #include "StreamProvider.h"
 #include "URL.h"

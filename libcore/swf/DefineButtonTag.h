@@ -1,4 +1,3 @@
-// button_character_def.h:  Mouse-sensitive SWF buttons, for Gnash.
 //
 //   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -18,9 +17,8 @@
 //
 
 
-
-#ifndef GNASH_BUTTON_CHARACTER_DEF_H
-#define GNASH_BUTTON_CHARACTER_DEF_H
+#ifndef GNASH_SWF_DEFINEBUTTONTAG_H
+#define GNASH_SWF_DEFINEBUTTONTAG_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character_def.h"
@@ -28,12 +26,14 @@
 #include "rect.h" // for get_bound
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
-#include "action_buffer.h" // for composition of button_action
+#include "action_buffer.h" // for composition of ButtonAction
 #include "filter_factory.h" // for Filters (composition of button_record)
 #include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
+#include "DefineButtonSoundTag.h"
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
+#include <memory>
 
 // Forward declarations
 namespace gnash {
@@ -44,8 +44,11 @@ namespace gnash {
 }
 
 namespace gnash {
+namespace SWF {
 
-class button_record
+
+/// A class for parsing ButtonRecord, used by DefineButton and DefineButton2
+class ButtonRecord
 {
 
 private:
@@ -83,7 +86,7 @@ public:
 
 public:
 
-	button_record()
+	ButtonRecord()
 		:
 		m_character_def(0)
 	{
@@ -96,9 +99,8 @@ public:
 	/// @param endPos
 	///	Last stream offset available for a valid read
 	///
-	/// TODO: take the stream by ref, not pointer
-	///
-	bool	read(SWFStream& in, int tag_type, movie_definition& m, unsigned long endPos);
+	bool read(SWFStream& in, int tag_type, movie_definition& m,
+            unsigned long endPos);
 
 	/// Return true if the button_record is valid
 	//
@@ -120,7 +122,8 @@ public:
 
 };
 	
-class button_action
+/// A class for parsing an ActionRecord.
+class ButtonAction
 {
 public:
 
@@ -134,7 +137,8 @@ public:
 	///	The movie_definition this button action was read from
 	///
 	///
-	button_action(SWFStream& in, int tag_type, unsigned long endPos, movie_definition& mdef);
+	ButtonAction(SWFStream& in, int tag_type, unsigned long endPos,
+            movie_definition& mdef);
 
 	/// Return true if this action should be triggered by the given event.
 	bool triggeredBy(const event_id& ev) const;
@@ -142,7 +146,7 @@ public:
 	/// Return true if this action is triggered by a keypress
 	bool triggeredByKeyPress() const
 	{
-		return m_conditions&KEYPRESS;
+		return (m_conditions & KEYPRESS);
 	}
 
 private:
@@ -153,7 +157,7 @@ private:
 	///
 	int getKeyCode() const
 	{
-		return (m_conditions&KEYPRESS) >> 9;
+		return (m_conditions & KEYPRESS) >> 9;
 	}
 
 	enum condition
@@ -173,110 +177,60 @@ private:
 
 };
 
-
-class button_character_definition : public character_def
+/// A class for parsing DefineButton and DefineButton2 tags.
+class DefineButtonTag : public character_def
 {
 public:
 
-	struct sound_info
-	{
-		void read(SWFStream& in);
+    /// Load a DefineButtonTag.
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& r);
 
-		bool m_no_multiple;
-		bool m_stop_playback;
-		bool m_has_envelope;
-		bool m_has_loops;
-		bool m_has_out_point;
-		bool m_has_in_point;
-		boost::uint32_t m_in_point;
-		boost::uint32_t m_out_point;
-		boost::uint16_t m_loop_count;
-		sound::SoundEnvelopes m_envelopes;
-	};
+	typedef std::vector<ButtonRecord> ButtonRecords; 
+	typedef std::vector<ButtonAction*> ButtonActions;
 
-	struct button_sound_info
-	{
-		boost::uint16_t m_sound_id;
-		sound_sample*	m_sam;
-		sound_info m_sound_style;
-
-		button_sound_info()
-			:
-			m_sam(0)
-		{
-		}
-
-#ifdef GNASH_USE_GC
-		/// Mark all reachable resources (for GC)
-		//
-		/// Reachable resources are:
-		///  - sound sample (m_sam)
-		///
-		void markReachableResources() const;
-#endif // GNASH_USE_GC
-	};
-
-	struct button_sound_def
-	{
-		// TODO: implement ?
-		//void	read(SWFStream& in, movie_definition& m);
-
-		button_sound_info m_button_sounds[4];
-
-#ifdef GNASH_USE_GC
-		/// Mark all reachable resources (for GC)
-		//
-		/// Reachable resources are:
-		///  - button sound infos (m_button_sounds)
-		///
-		void markReachableResources() const
-		{
-			for (int i=0; i<4; ++i)
-			{
-				m_button_sounds[i].markReachableResources();
-			}
-		}
-#endif // GNASH_USE_GC
-	};
-
-	/// \brief
-	/// Construct a character definition as read from
-	/// the given movie_definition (SWF)
-	button_character_definition(movie_definition& m);
-
-	virtual ~button_character_definition();
+	virtual ~DefineButtonTag();
 
 	/// Create a mutable instance of our definition.
 	character* create_character_instance(character* parent, int id);
 
-	/// Read a SWF::DEFINEBUTTON, SWF::DEFINEBUTTONSOUND or SWF::DEFINEBUTTON2
-	void	read(SWFStream& in, int tag_type, movie_definition& m);
-
-	/// Read a SWF::DEFINEBUTTON tag
-	void	readDefineButton(SWFStream& in, movie_definition& m);
-
-	/// Read a SWF::DEFINEBUTTON2 tag
-	void	readDefineButton2(SWFStream& in, movie_definition& m);
-
-	/// Read a SWF::DEFINEBUTTONSOUND tag
-	void	readDefineButtonSound(SWFStream& in, movie_definition& m);
-	
-	/// Read a SWF::DEFINEBUTTONCXFORM tag
-	void readDefineButtonCxform(SWFStream& in, movie_definition& m);
-	
 	const rect&	get_bound() const {
-		// It is required that get_bound() is implemented in character definition
-		// classes. However, button character definitions do not have shape 
-		// definitions themselves. Instead, they hold a list of shape_character_def.
-		// get_bound() is currently only used by generic_character which normally
-		// is used only shape character definitions. See character_def.h to learn
-		// why it is virtual anyway.
+		// It is required that get_bound() is implemented in character
+        // definition classes. However, button character definitions do
+        // not have shape definitions themselves. Instead, they hold a list
+        // of shape_character_def. get_bound() is currently only used
+        // by generic_character which normally is used only shape character
+        // definitions. See character_def.h to learn why it is virtual anyway.
 		// get_button_bound() is used for buttons.
 		abort(); // should not be called  
 		static rect unused;
 		return unused;
 	}
   
+    /// Access the ButtonRecords directly. Used for modifying the
+    /// Cxform by a DefineButtonCxform tag.
+    ButtonRecords& buttonRecords() { return _buttonRecords; }
+
+    /// Does this button have an associated DefineButtonSoundTag?
+    bool hasSound() const { return (_soundTag.get()); }
+
+    /// Add a DefineButtonSoundTag to the button. This should not be
+    /// done twice, so check hasSound() first.
+    void addSoundTag(std::auto_ptr<SWF::DefineButtonSoundTag> soundTag) {
+        // Do not replace a sound tag.
+        assert(!_soundTag.get());
+        _soundTag.reset(soundTag.release());
+    }
+
+    /// Return one of the four sounds associated with this Button
+    //
+    /// @param index    The sound index (0-3) to get.
+    /// Do not call this function without checking hasSound() first.
+    const DefineButtonSoundTag::ButtonSound& buttonSound(size_t index) const {
+        assert(_soundTag.get());
+        return _soundTag->getSound(index);
+    }
+
 	/// \brief
 	/// Return version of the SWF containing
 	/// this button definition.
@@ -292,9 +246,9 @@ public:
 	template <class E>
 	void forEachTrigger(const event_id& ev, E& f) const
 	{
-		for (size_t i = 0, e = m_button_actions.size(); i < e; ++i)
+		for (size_t i = 0, e = _buttonActions.size(); i < e; ++i)
 		{
-			const button_action& ba = *(m_button_actions[i]);
+			const ButtonAction& ba = *(_buttonActions[i]);
 			if ( ba.triggeredBy(ev) ) f(ba.m_actions);
 		}
 	}
@@ -311,26 +265,37 @@ protected:
 	void markReachableResources() const
 	{
 		assert(isReachable());
-		for (ButtonRecVect::const_iterator i=m_button_records.begin(), e=m_button_records.end(); i!=e; ++i)
+		for (ButtonRecords::const_iterator i = _buttonRecords.begin(),
+                e = _buttonRecords.end(); i!=e; ++i)
 		{
 			i->markReachableResources();
 		}
 
-		if ( m_sound ) m_sound->markReachableResources();
+		if (_soundTag) _soundTag->markReachableResources();
 	}
 #endif // GNASH_USE_GC
 
-public: // TODO: make private
-
-	typedef std::vector<button_record> ButtonRecVect; 
-	ButtonRecVect m_button_records;
-
-	boost::scoped_ptr<button_sound_def> m_sound;
 
 private:
 
-	typedef std::vector<button_action*> ButtonActVect;
-	ButtonActVect m_button_actions;
+    /// DefineButton2Tag::loader also needs to create a DefineButtonTag.
+    friend class DefineButton2Tag;
+
+	/// Construct a DefineButtonTag (DefinitionTag)
+    //
+    /// This can only be constructed using a loader() function.
+	DefineButtonTag(SWFStream& in, movie_definition& m, tag_type tag);
+
+	/// Read a DEFINEBUTTON tag
+	void readDefineButtonTag(SWFStream& in, movie_definition& m);
+
+	/// Read a DEFINEBUTTON2 tag
+	void readDefineButton2Tag(SWFStream& in, movie_definition& m);
+
+    boost::scoped_ptr<SWF::DefineButtonSoundTag> _soundTag;
+
+	ButtonRecords _buttonRecords;
+	ButtonActions _buttonActions;
 
 	/// Currently set but unused (and also unaccessible)
 	bool m_menu;
@@ -339,6 +304,19 @@ private:
 	movie_definition& _movieDef;
 };
 
+/// A class for parsing a DefineButton2 tag.
+//
+/// This only contains a loader because a DefineButton2Tag uses the same
+/// code as DefineButtonTag with minor modifications. 
+class DefineButton2Tag
+{
+public:
+    /// Load a DefineButton2 tag.
+    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+            const RunInfo& r);
+};
+
+}
 }	// end namespace gnash
 
 

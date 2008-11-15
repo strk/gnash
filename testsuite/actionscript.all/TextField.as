@@ -35,7 +35,31 @@ printBounds = function(b)
 
 TextField.prototype.getBounds = MovieClip.prototype.getBounds;
 
-#if OUTPUT_VERSION > 5
+
+// check that the dejagnu clip is *not* a TextField, which is why the
+// following prototype properties are not yet initialized.
+#if OUTPUT_VERSION > 6
+ check_equals(_root.getInstanceAtDepth(-16383), _level0.__shared_assets);
+ xcheck(!_level0.__shared_assets.instance1._xtrace_win instanceof TextField);
+ xcheck_equals(typeof(_level0.__shared_assets.instance1._xtrace_win),
+            "movieclip");
+ note(_level0.__shared_assets.instance1._xtrace_win.toString());
+#endif
+
+#if OUTPUT_VERSION < 6
+
+    check_equals(typeof(TextField), 'function');
+    check_equals(TextField.prototype, undefined);
+    createTextField("tf", 50, 10, 10, 10, 10);
+    xcheck_equals(typeof(tf), "movieclip");
+    xcheck_equals(tf.__proto__.toString(), "[object Object]");
+    check(!tf instanceOf TextField);
+
+    tf = new TextField();
+    xcheck(tf instanceOf TextField);
+    totals();
+
+#else
 
 check_equals(typeof(TextField), 'function');
 check_equals(typeof(TextField.prototype), 'object');
@@ -65,21 +89,21 @@ xcheck( !TextField.prototype.hasOwnProperty('backgroundColor'));
 xcheck( !TextField.prototype.hasOwnProperty('autoSize') );
 xcheck( !TextField.prototype.hasOwnProperty('border') );
 xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
-check( !TextField.prototype.hasOwnProperty('bottomScroll') );
+xcheck( !TextField.prototype.hasOwnProperty('bottomScroll') );
 xcheck( !TextField.prototype.hasOwnProperty('embedFonts') );
-check( !TextField.prototype.hasOwnProperty('hscroll') );
+xcheck( !TextField.prototype.hasOwnProperty('hscroll') );
 xcheck( !TextField.prototype.hasOwnProperty('html') );
-check( !TextField.prototype.hasOwnProperty('htmlText') );
+xcheck( !TextField.prototype.hasOwnProperty('htmlText') );
 xcheck( !TextField.prototype.hasOwnProperty('length') );
-check( !TextField.prototype.hasOwnProperty('maxChars') );
-check( !TextField.prototype.hasOwnProperty('maxhscroll') );
-check( !TextField.prototype.hasOwnProperty('maxscroll') );
-check( !TextField.prototype.hasOwnProperty('multiline') );
-check( !TextField.prototype.hasOwnProperty('password') );
-check( !TextField.prototype.hasOwnProperty('restrict') );
-check( !TextField.prototype.hasOwnProperty('scroll') );
+xcheck( !TextField.prototype.hasOwnProperty('maxChars') );
+xcheck( !TextField.prototype.hasOwnProperty('maxhscroll') );
+xcheck( !TextField.prototype.hasOwnProperty('maxscroll') );
+xcheck( !TextField.prototype.hasOwnProperty('multiline') );
+xcheck( !TextField.prototype.hasOwnProperty('password') );
+xcheck( !TextField.prototype.hasOwnProperty('restrict') );
+xcheck( !TextField.prototype.hasOwnProperty('scroll') );
 xcheck( !TextField.prototype.hasOwnProperty('selectable') );
-check( !TextField.prototype.hasOwnProperty('text') );
+xcheck( !TextField.prototype.hasOwnProperty('text') );
 xcheck( !TextField.prototype.hasOwnProperty('textColor') );
 xcheck( !TextField.prototype.hasOwnProperty('textHeight') ); // should be available on first instantiation
 xcheck( !TextField.prototype.hasOwnProperty('textWidth') ); // should be available on first instantiation
@@ -127,6 +151,7 @@ check_equals(typeof(ret), 'object');
 check_equals(ret, _root.tf);
 #endif
 
+check(tf instanceof TextField);
 check_equals(typeof(tf), 'object');
 check(tf.hasOwnProperty('_listeners'));
 check_equals(tf._listeners.length, 1); // adds self to the listeners
@@ -141,21 +166,21 @@ check( TextField.prototype.hasOwnProperty('backgroundColor'));
 check( TextField.prototype.hasOwnProperty('autoSize') );
 check( TextField.prototype.hasOwnProperty('border') );
 check( TextField.prototype.hasOwnProperty('borderColor') );
-xcheck( TextField.prototype.hasOwnProperty('bottomScroll') );
+check( TextField.prototype.hasOwnProperty('bottomScroll') );
 check( TextField.prototype.hasOwnProperty('embedFonts') );
-xcheck( TextField.prototype.hasOwnProperty('hscroll') );
+check( TextField.prototype.hasOwnProperty('hscroll') );
 check( TextField.prototype.hasOwnProperty('html') );
-xcheck( TextField.prototype.hasOwnProperty('htmlText') );
+check( TextField.prototype.hasOwnProperty('htmlText') );
 check( TextField.prototype.hasOwnProperty('length') );
-xcheck( TextField.prototype.hasOwnProperty('maxChars') );
-xcheck( TextField.prototype.hasOwnProperty('maxhscroll') );
-xcheck( TextField.prototype.hasOwnProperty('maxscroll') );
-xcheck( TextField.prototype.hasOwnProperty('multiline') );
-xcheck( TextField.prototype.hasOwnProperty('password') );
-xcheck( TextField.prototype.hasOwnProperty('restrict') );
-xcheck( TextField.prototype.hasOwnProperty('scroll') );
+check( TextField.prototype.hasOwnProperty('maxChars') );
+check( TextField.prototype.hasOwnProperty('maxhscroll') );
+check( TextField.prototype.hasOwnProperty('maxscroll') );
+check( TextField.prototype.hasOwnProperty('multiline') );
+check( TextField.prototype.hasOwnProperty('password') );
+check( TextField.prototype.hasOwnProperty('restrict') );
+check( TextField.prototype.hasOwnProperty('scroll') );
 check( TextField.prototype.hasOwnProperty('selectable') );
-xcheck( TextField.prototype.hasOwnProperty('text') );
+check( TextField.prototype.hasOwnProperty('text') );
 check( TextField.prototype.hasOwnProperty('textColor') );
 check( TextField.prototype.hasOwnProperty('textHeight') );
 check( TextField.prototype.hasOwnProperty('textWidth') );
@@ -342,13 +367,21 @@ check_equals(tf.length, 18); // the tags are also counted
 
 // Check TextField.maxChars
 
-xcheck_equals(typeof(tf.maxChars), 'null');
+check_equals(typeof(tf.maxChars), 'null');
 check(!tf.hasOwnProperty('maxChars'));
 tf.maxChars = 5;
 check_equals(tf.maxChars, 5);
 tf.text = "0123456789";
 // no effect (maybe only limits user input)
 check_equals(tf.text, "0123456789");
+tf.maxChars = "string";
+check_equals(typeof(tf.maxChars), "null");
+tf.maxChars = -6;
+check_equals(typeof(tf.maxChars), "number");
+check_equals(tf.maxChars, -6);
+tf.maxChars = 0;
+check_equals(typeof(tf.maxChars), "null");
+
 tf.maxChars = null;
 
 // Check TextField.maxhscroll
@@ -369,9 +402,10 @@ xcheck_equals(tf.maxscroll, 1); // read-only
 
 // Check TextField.multiline
 
-xcheck_equals(typeof(tf.multiline), 'boolean');
+check_equals(typeof(tf.multiline), 'boolean');
+check_equals(tf.multiline, false);
 check(!tf.hasOwnProperty('multiline'));
-xcheck_equals(tf.multiline, false);
+check_equals(tf.multiline, false);
 tf.multiline = true;
 check_equals(tf.multiline, true);
 tf.multiline = false;
@@ -420,11 +454,32 @@ tf._parent = bk;
 // Check TextField.password
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf.password), 'boolean');
+// This verifies it really uses to_bool.
+
+check_equals(typeof(tf.password), 'boolean');
+check_equals(tf.password, false);
 check(!tf.hasOwnProperty('password'));
-xcheck_equals(tf.password, false);
+check_equals(tf.password, false);
 tf.password = true;
 check_equals(tf.password, true);
+tf.password = 7;
+check_equals(tf.password, true);
+tf.password = "string";
+#if OUTPUT_VERSION > 6
+check_equals(tf.password, true);
+#else
+check_equals(tf.password, false);
+#endif
+tf.password = 0;
+check_equals(tf.password, false);
+tf.password = "a string";
+#if OUTPUT_VERSION > 6
+check_equals(tf.password, true);
+#else
+check_equals(tf.password, false);
+#endif
+tf.password = undefined;
+check_equals(tf.password, false);
 // TODO: check effects of setting to 'password' (should hide characters)
 tf.password = false;
 
@@ -593,22 +648,22 @@ xcheck_equals(tf._url, _root._url); // read-only
 //
 //-------------------------------------------------------------------------
 
-xcheck_equals(typeof(tf.variable), 'null');
+check_equals(typeof(tf.variable), 'null');
 check( ! tf.hasOwnProperty('variable') ); 
 tf.variable = _level0.inputVar;
-xcheck_equals(typeof(tf.variable), 'null'); // _level0.inputVar doesn't exist !
+check_equals(typeof(tf.variable), 'null'); // _level0.inputVar doesn't exist !
 tf.variable = 2;
 check_equals(typeof(tf.variable), 'string'); 
 check_equals(tf.variable, '2'); 
 tf.variable = undefined;
-xcheck_equals(typeof(tf.variable), 'null'); 
+check_equals(typeof(tf.variable), 'null'); 
 tf.variable = 2;
 tf.variable = null;
-xcheck_equals(typeof(tf.variable), 'null'); 
+check_equals(typeof(tf.variable), 'null'); 
 tf.variable = "_level0.inputVar";
 check_equals(tf.variable, '_level0.inputVar'); 
 xcheck_equals(typeof(_level0.inputVar), 'undefined');
-xcheck_equals(tf.text, "hello world");  // as _level0.inputVar is unexistent
+check_equals(tf.text, "hello world");  // as _level0.inputVar is unexistent
 xcheck(!_level0.hasOwnProperty('inputVar'));
 _level0.inputVar = "dynamic variable";
 check_equals(tf.text, "dynamic variable");
@@ -616,9 +671,9 @@ tf.text = "back-propagated";
 check_equals(_level0.inputVar, "back-propagated");
 o = new Object();
 tf.variable = "_level0.o.t"; // non-existent member (yet)
-xcheck_equals(tf.text, "back-propagated");  // _level0.o.t doesn't exist yet
+check_equals(tf.text, "back-propagated");  // _level0.o.t doesn't exist yet
 o.t = "from object"; // here we create _level0.o.t
-xcheck_equals(tf.text, "back-propagated"); // but creating _level0.o.t doesn't trigger textfield text update
+check_equals(tf.text, "back-propagated"); // but creating _level0.o.t doesn't trigger textfield text update
 tf.text = "back-to-object"; // instead, assigning to TextField.text updates the object
 check_equals(o.t, "back-to-object");  
 o.t = "from object again"; // but updates to the object still don't update the TextField
@@ -948,14 +1003,12 @@ _root._xscale = _root._yscale = 100;
 // END OF TESTS
 //------------------------------------------------------------
 
-#if OUTPUT_VERSION < 8
- check_totals(426);
-#else
- check_totals(427);
+#if OUTPUT_VERSION == 6
+ check_totals(438);
+#elif OUTPUT_VERSION == 7
+ check_totals(441);
+#elif OUTPUT_VERSION == 8
+ check_totals(442);
 #endif
-
-#else // OUTPUT_VERSION <= 5
-
- totals();
 
 #endif

@@ -64,7 +64,7 @@ libgnashcore_la_SOURCES = \
 	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
-	edit_text_character.cpp \
+	TextField.cpp \
         BlurFilter.cpp \
         GlowFilter.cpp \
         DropShadowFilter.cpp \
@@ -82,29 +82,37 @@ libgnashcore_la_SOURCES = \
 	rect.cpp \
 	MovieClip.cpp \
 	swf/TagLoadersTable.cpp	\
+	swf/DefineVideoStreamTag.cpp \
+	swf/DefineTextTag.cpp \
+	swf/DefineButtonSoundTag.cpp \
+	swf/DefineButtonCxformTag.cpp \
+	swf/DefineButtonTag.cpp \
+	swf/DefineFontTag.cpp \
+	swf/VideoFrameTag.cpp \
+	swf/SoundInfoRecord.cpp \
+	swf/TextRecord.cpp \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
+	swf/DefineEditTextTag.cpp \
 	swf/CSMTextSettingsTag.cpp \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
 	swf/StartSoundTag.cpp \
 	swf/StreamSoundBlockTag.cpp \
 	swf_function.cpp \
-	video_stream_instance.cpp \
+	Video.cpp \
 	StreamProvider.cpp \
 	array.cpp \
 	Button.cpp \
 	DisplayList.cpp \
 	fill_style.cpp \
-	font.cpp \
+	Font.cpp \
 	fontlib.cpp \
 	impl.cpp \
 	LoadVariablesThread.cpp \
 	render.cpp \
-	shape.cpp \
 	SWFStream.cpp \
 	styles.cpp \
-	text.cpp \
 	timers.cpp \
 	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
@@ -139,7 +147,7 @@ noinst_HEADERS = \
 	DynamicShape.h	\
 	DisplayList.h	\
 	drag_state.h \
-	edit_text_character.h \
+	TextField.h \
 	event_id.h \
 	fill_style.h \
         BitmapFilter.h \
@@ -152,7 +160,7 @@ noinst_HEADERS = \
         ConvolutionFilter.h \
         ColorMatrixFilter.h \
         parser/filter_factory.h \
-	font.h \
+	Font.h \
 	fontlib.h \
 	generic_character.h \
 	gnash.h	\
@@ -174,11 +182,21 @@ noinst_HEADERS = \
 	swf.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
+	swf/VideoFrameTag.h \
+	swf/DefineVideoStreamTag.h \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
+	swf/SoundInfoRecord.h \
+	swf/TextRecord.h \
+	swf/DefineButtonSoundTag.h \
+	swf/DefineTextTag.h \
+	swf/DefineButtonTag.h \
+	swf/DefineEditTextTag.h \
 	swf/DefineButtonCxformTag.h \
 	swf/PlaceObject2Tag.h \
+	swf/DefineFontTag.h \
+	swf/DefineFontNameTag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \
 	swf/DoActionTag.h \
@@ -189,10 +207,9 @@ noinst_HEADERS = \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
-	text.h \
 	timers.h \
 	RGBA.h	\
-	video_stream_instance.h \
+	Video.h \
 	$(NULL)
 
 libgnashcore_la_LIBADD = \

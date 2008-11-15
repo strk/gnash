@@ -30,7 +30,8 @@
 #include <unistd.h>
 
 #define PUSHBUF_SIZE 1024
-#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
+//#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)
+#define MIN_PROBE_SIZE 0
 
 #define GNASH_DEBUG_DATAFLOW
 
@@ -85,9 +86,11 @@ MediaParserGst::MediaParserGst(std::auto_ptr<IOChannel> stream)
 
     log_debug(_("Needed %d dead iterations to detect audio type."), counter);
     
+#if 0
     if (! (_videoInfo.get() || _audioInfo.get()) ) {
         throw MediaException(_("MediaParserGst failed to detect any stream types."));    
     }
+#endif
     
     if (!gst_element_set_state (_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
         throw MediaException(_("MediaParserGst could not change element state"));
@@ -254,7 +257,7 @@ bool MediaParserGst::foundAllStreams()
 
 bool MediaParserGst::probingConditionsMet(const SimpleTimer& timer)
 {
-    return foundAllStreams() || (timer.expired() && getBytesLoaded() > MIN_PROBE_SIZE);
+    return foundAllStreams() || (timer.expired() && getBytesLoaded() >= MIN_PROBE_SIZE);
 }
 
 static void

@@ -134,7 +134,8 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	bool point_test_local(boost::int32_t x, boost::int32_t y, SWFMatrix& wm)
+	bool point_test_local(boost::int32_t x, boost::int32_t y,
+            const SWFMatrix& wm)
 	{
 		finalize();
 		return shape_character_def::point_test_local(x, y, wm);
@@ -155,10 +156,6 @@ public:
 	void finalize();
 
 private:
-
-	/// Movie definition containing the code 
-	/// that created this shape.
-	movie_definition* _mdef;
 
 	/// Initialize a new path
 	//
