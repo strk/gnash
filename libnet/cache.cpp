@@ -44,13 +44,111 @@ namespace gnash
 {
 
 Cache::Cache() 
-    : _max_size(0)
+    : _max_size(0),
+#ifdef USE_STATS_CACHE
+      _pathname_lookups(0),
+      _pathname_hits(0),
+      _response_lookups(0),
+      _response_hits(0),
+      _file_lookups(0),
+      _file_hits(0),
+#endif
+      _pagesize(0)
 {
+//    GNASH_REPORT_FUNCTION;
+    log_error("using this constructor is only allowed for testing purposes.");
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+#endif
 }
 
 Cache::~Cache()
 {
+//    GNASH_REPORT_FUNCTION;
 }
+
+Cache&
+Cache::getDefaultInstance()
+{
+//    GNASH_REPORT_FUNCTION;
+    static Cache c;
+    return c;
+}
+
+void
+Cache::addPath(const std::string &name, const std::string &fullpath)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
+    _pathnames[name] = fullpath;
+};
+
+void
+Cache::addResponse(const std::string &name, const std::string &response)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
+    _responses[name] = response;
+};
+
+void
+Cache::addFile(const std::string &name, DiskStream *file)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
+    _files[name] = file;
+};
+
+string &
+Cache::findPath(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+    _pathname_lookups++;
+    map<string, string>::iterator it;
+    it = _pathnames.find(name);
+    if (it != _pathnames.end()) {
+        _pathname_hits++;
+    }
+#endif
+    return _pathnames[name];
+};
+
+string &
+Cache::findResponse(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+    _response_lookups++;
+    map<string, string>::const_iterator it;
+    it = _responses.find(name);
+    if (it != _responses.end()) {
+        _response_hits++;
+    }
+#endif
+    return _responses[name];
+};
+
+DiskStream *
+Cache::findFile(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(cache_mutex);
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+    _file_lookups++;
+    map<string, DiskStream *>::const_iterator it;
+    it = _files.find(name);
+    if (it != _files.end()) {
+        _file_hits++;
+    }
+#endif
+    return _files[name];
+};
 
 void
 Cache::removePath(const std::string &name)
@@ -76,6 +174,50 @@ Cache::removeFile(const std::string &name)
     _files.erase(name);
 }
 
+#ifdef USE_STATS_CACHE
+boost::shared_ptr<string>
+Cache::stats() const
+{
+//    GNASH_REPORT_FUNCTION;
+    // dump timing related data
+    struct timespec now;
+    stringstream text;
+    
+    clock_gettime (CLOCK_REALTIME, &now);    
+    double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
+    
+    text << "Time since last access:  " << fixed << ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9)) << " seconds ago." << endl;
+
+    text << "Pathnames in cache: " << _pathnames.size() << " accessed "
+	 << _pathname_lookups << " times" << endl;
+     text << "Pathname hits from cache: " << _pathname_hits << endl;
+    
+    text << "Responses in cache: " << _responses.size() << " accessed "
+	 << _response_lookups << " times" << endl;
+    text << "Response hits from cache: " << _response_hits << endl;
+
+    text << "Files in cache: " << _files.size() << " accessed "
+	 << _file_lookups << " times" << endl;
+    text << "File hits from cache: " << _file_hits << endl;
+
+#if 0
+    map<std::string, DiskStream *>::const_iterator data;
+    for (data = _files.begin(); data != _files.end(); data++) {
+        const struct timespec *last = data->second->getLastAccessTime();
+	text << "Disktream: " << data->first << endl;
+	time = ((now.tv_sec - last->tv_sec) + ((now.tv_nsec - last->tv_nsec)/1e9));
+	text << "Time since last file access:  " << fixed << time << " seconds ago." << endl;
+    }
+#endif
+
+    cerr << text.str() << endl;
+    
+    boost::shared_ptr<string> str;
+
+    return str;
+}
+#endif
+
 void
 Cache::dump(std::ostream& os) const
 {    
@@ -83,7 +225,7 @@ Cache::dump(std::ostream& os) const
     boost::mutex::scoped_lock lock(cache_mutex);
 
     // Dump all the pathnames
-    map<std::string, std::string>::const_iterator name;
+    map<string, string>::const_iterator name;
     for (name = _pathnames.begin(); name != _pathnames.end(); name++) {
         os << "Full path for \"" << name->first << "\" is: " << name->second << endl;
     }
@@ -100,6 +242,10 @@ Cache::dump(std::ostream& os) const
         os << "File info for \"" << data->first << "\" is: ";
 //        filedata.dump(os) << endl;
     }
+#endif
+
+#ifdef USE_STATS_CACHE
+    this->stats();
 #endif
 }
 

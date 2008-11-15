@@ -26,8 +26,10 @@
 #include <string>
 #include <iostream> 
 
+#include "amf.h"
 #include "cque.h"
 #include "statistics.h"
+#include "getclocktime.hpp"
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
@@ -165,7 +167,7 @@ public:
     /// @return nothing.
     void setPagesize(size_t size) { _pagesize = size; };
     
-    ///  \brief Dump the internal data of this class in a human readable form.
+    /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
      void dump();
 //    friend std::ostream& operator<< (std::ostream &os, const DiskStream &ds);
@@ -179,18 +181,31 @@ public:
     ///
     /// @return A value that is the size of the file in bytes.
     size_t getFileSize() { return _filesize; };
+
+    /// \brief Get the time of the last access.
+    ///
+    /// @return A real pointer to the struct timespec of the last access.
+    struct timespec *getLastAccessTime() { return &_last_access; };
     
-    ///  \brief Dump the internal data of this class in a human readable form.
+#ifdef USE_STATS_CACHE
+    /// \brief Get the time of the first access.
+    ///		This function should only be used for debugging and
+    ///		performance testing.
+    ///
+    /// @return A real pointer to the struct timespec of the last access.
+    struct timespec *getFirstAccessTime() { return &_first_access; };
+#endif    
+
+    /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
     /// \overload dump(std::ostream& os) const
-    void dump(std::ostream& os) const;    
+    void dump(std::ostream& os) const;
 
 private:
     /// \var DiskStream::_state
     ///		The current status of the stream while streaming.
     state_e     _state;
-    int         _bytes;		// FIXME: is this a dup ?
     
     /// \var DiskStream::_filefd
     ///		The file descriptor of the disk file.
@@ -230,13 +245,21 @@ private:
     ///		page.
     off_t	_offset;
     
-    gnash::CQue _que;
+    struct timespec _last_access;
+    
+#ifdef USE_STATS_CACHE
+    struct timespec _first_access;	// used for timing how long data stays in the queue.
+#endif
+
+#ifdef USE_STATS_FILE
+    int         _bytes;
+#endif
 };
 
 /// \brief Dump to the specified output stream.
-inline std::ostream& operator << (std::ostream& os, const DiskStream& cache)
+inline std::ostream& operator << (std::ostream& os, const DiskStream& ds)
 {
-	cache.dump(os);
+	ds.dump(os);
 	return os;
 }
 

@@ -50,6 +50,7 @@
 #include "utility.h"
 #include "buffer.h"
 #include "diskstream.h"
+#include "cache.h"
 
 using namespace gnash;
 using namespace std;
@@ -63,6 +64,8 @@ extern map<int, Handler *> handlers;
 
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
+
+static Cache& cache = Cache::getDefaultInstance();
 
 HTTP::HTTP() 
     : _filetype(amf::AMF::FILETYPE_HTML),
@@ -165,6 +168,7 @@ HTTP::processGetRequest()
 //    dump();
 
     _filespec = _url;
+
     if (!_url.empty()) {
 	return true;
     }
@@ -1136,59 +1140,63 @@ HTTP::extractTE(Network::byte_t *data) {
 // Get the file type, so we know how to set the
 // Content-type in the header.
 amf::AMF::filetype_e
+
 HTTP::getFileStats(std::string &filespec)
 {
-//    GNASH_REPORT_FUNCTION;    
+    GNASH_REPORT_FUNCTION;    
     bool try_again = true;
     string actual_filespec = filespec;
     struct stat st;
 
-    while (try_again) {
-	try_again = false;
+    if (cache.findPath(filespec).empty()) {
+	while (try_again) {
+	    try_again = false;
 //	cerr << "Trying to open " << actual_filespec << "\r\n";
-	if (stat(actual_filespec.c_str(), &st) == 0) {
-	    // If it's a directory, then we emulate what apache
-	    // does, which is to load the index.html file in that
-	    // directry if it exists.
-	    if (S_ISDIR(st.st_mode)) {
-		log_debug("%s is a directory\n", actual_filespec.c_str());
-		if (actual_filespec[actual_filespec.size()-1] != '/') {
-		    actual_filespec += '/';
+	    if (stat(actual_filespec.c_str(), &st) == 0) {
+		// If it's a directory, then we emulate what apache
+		// does, which is to load the index.html file in that
+		// directry if it exists.
+		if (S_ISDIR(st.st_mode)) {
+		    log_debug("%s is a directory\n", actual_filespec.c_str());
+		    if (actual_filespec[actual_filespec.size()-1] != '/') {
+			actual_filespec += '/';
 		}
-		actual_filespec += "index.html";
-		try_again = true;
-		continue;
-	    } else { 		// not a directory
-		log_debug("%s is not a directory\n", actual_filespec.c_str());
-		_filespec = actual_filespec;
-		string::size_type pos;
-		pos = filespec.rfind(".");
-		if (pos != string::npos) {
-		    string suffix = filespec.substr(pos, filespec.size());
-		    if (suffix == "html") {
-			_filetype = amf::AMF::FILETYPE_HTML;
-			log_debug("HTML content found");
-		    }
-		    if (suffix == "swf") {
-			_filetype = amf::AMF::FILETYPE_SWF;
-			log_debug("SWF content found");
-		    }
-		    if (suffix == "flv") {
-			_filetype = amf::AMF::FILETYPE_VIDEO;
-			log_debug("FLV content found");
-		    }
-		    if (suffix == "mp3") {
-			_filetype = amf::AMF::FILETYPE_AUDIO;
-			log_debug("MP3 content found");
+		    actual_filespec += "index.html";
+		    try_again = true;
+		    continue;
+		} else { 		// not a directory
+		    log_debug("%s is not a directory\n", actual_filespec.c_str());
+		    _filespec = actual_filespec;
+		    string::size_type pos;
+		    pos = filespec.rfind(".");
+		    if (pos != string::npos) {
+			string suffix = filespec.substr(pos, filespec.size());
+			if (suffix == "html") {
+			    _filetype = amf::AMF::FILETYPE_HTML;
+			    log_debug("HTML content found");
+			}
+			if (suffix == "swf") {
+			    _filetype = amf::AMF::FILETYPE_SWF;
+			    log_debug("SWF content found");
+			}
+			if (suffix == "flv") {
+			    _filetype = amf::AMF::FILETYPE_VIDEO;
+			    log_debug("FLV content found");
+			}
+			if (suffix == "mp3") {
+			    _filetype = amf::AMF::FILETYPE_AUDIO;
+			    log_debug("MP3 content found");
+			}
 		    }
 		}
-	    }
-	} else {
-	    _filetype = amf::AMF::FILETYPE_ERROR;
-	} // end of stat()
-    } // end of try_waiting
-
-    _filesize = st.st_size;
+	    } else {
+		_filetype = amf::AMF::FILETYPE_ERROR;
+	    } // end of stat()
+	} // end of try_waiting
+	
+	_filesize = st.st_size;
+    }
+    
     return _filetype;
 }
 
@@ -1384,10 +1392,14 @@ http_handler(Handler::thread_params_t *args)
 	pos = url.find("?");
 	filespec = url.substr(0, pos);
 	parameters = url.substr(pos + 1, url.size());
-	// Get the file size for the HTTP header
+
+	if (cache.findPath(www.getFilespec()).empty()) {
+	    cache.addPath(www.getFilespec(), filespec);
 	
-	if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
-	    www.formatErrorResponse(HTTP::NOT_FOUND);
+	    // Get the file size for the HTTP header
+	    if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
+		www.formatErrorResponse(HTTP::NOT_FOUND);
+	    }
 	}
 	// Send the reply
 //	www.formatGetReply(HTTP::LIFE_IS_GOOD);
@@ -1409,11 +1421,19 @@ http_handler(Handler::thread_params_t *args)
 	    filespec += "index.html";
 	}
 
- 	DiskStream filestream;
- 	filestream.open(filespec);
-	boost::uint8_t *ptr = filestream.loadChunk();
+	DiskStream *filestream = cache.findFile(www.getFilespec());
+	if (filestream) {
+	    cerr << "FIXME: found file!" << endl;
+	} else {
+	    filestream = new DiskStream;
+	}
+	
+ 	filestream->open(filespec);
+	boost::uint8_t *ptr = filestream->loadChunk();
+	string response = cache.findResponse(www.getFilespec());
+	if (response.empty()) {
 	www.clearHeader();
-	const stringstream &ss = www.formatHeader(filestream.getFileSize(), HTTP::LIFE_IS_GOOD);
+	const stringstream &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
 // 	cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;	
 // 	string body = ss.str();
 // 	cerr << "Body Size = " << body.size() << endl;
@@ -1423,8 +1443,16 @@ http_handler(Handler::thread_params_t *args)
 // 	// 	cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;
 // 	www.writeNet(args->netfd, (boost::uint8_t *)body.c_str(), body.size());
  	www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
-	www.writeNet(args->netfd, filestream.get(), filestream.getFileSize());
+	cache.addResponse(www.getFilespec(), www.getHeader());
+	} else {
+//	    cerr << "FIXME hit: " << www.getFilespec() << endl;
+	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
+	}	
+
+	www.writeNet(args->netfd, filestream->get(), filestream->getFileSize());
+	cache.addFile(www.getFilespec(), filestream);
 	log_debug("http_handler all done now finally...");
+//	cache.dump();
 	return;
 #if 0
 	if (url != docroot) {

@@ -19,12 +19,18 @@
 #ifndef __CACHE_H__
 #define __CACHE_H__
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <string>
 #include <map> 
 #include <iostream> // for output operator
+#include <boost/shared_ptr.hpp>
 
 #include "statistics.h"
 #include "diskstream.h"
+#include "getclocktime.hpp"
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
@@ -39,34 +45,59 @@ class Cache {
 public:
     Cache();
     ~Cache();
+    static Cache& getDefaultInstance();
     
-    void addPath(const std::string &name, const std::string &fullpath) { _pathnames[name] = fullpath; };
-    std::string &findPath(const std::string &name) { return _pathnames[name]; };
+    void addPath(const std::string &name, const std::string &fullpath);
+    std::string &findPath(const std::string &name);
     void removePath(const std::string &name);
-
-    void addResponse(const std::string &name, const std::string &response) { _responses[name] = response; };
+    
+    void addResponse(const std::string &name, const std::string &response);
+    std::string &findResponse(const std::string &name);
     void removeResponse(const std::string &name);
-
-    std::string &findResponse(const std::string &name) { return _responses[name]; };
-
-    void addFile(const std::string &name, DiskStream *file) { _files[name] = file; };
-    DiskStream *findFile(const std::string &name) { return _files[name]; };
+    
+    void addFile(const std::string &name, DiskStream *file);
+    DiskStream *findFile(const std::string &name);
     void removeFile(const std::string &name);
-
+    
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
     /// \overload dump(std::ostream& os) const
     void dump(std::ostream& os) const;    
-    
+
+#ifdef USE_STATS_CACHE
+    boost::shared_ptr<std::string> stats() const;
+#endif
 private:
+    /// \var Cache::_pathnames
+    ///		The cache of file names converted to absolute path names.
     std::map<std::string, std::string> _pathnames;
+    /// \var Cache::
+    ///		The cache of HTTP responses.
     std::map<std::string, std::string> _responses;
+    /// \var Cache::_responses
+    ///		The cache of Distream handles to often played files.
     std::map<std::string, DiskStream *> _files;
+
+    /// \var Cache::_max_size
+    ///		The maximum amount of memory the cache is allowed to use.
     size_t _max_size;
+
+    /// \brief Cache file statistics variables are defined here.
+#ifdef USE_STATS_CACHE
+    struct timespec _last_access;
+    long	_pathname_lookups;
+    long	_pathname_hits;
+    long	_response_lookups;
+    long	_response_hits;
+    long	_file_lookups;
+    long	_file_hits;
+#endif
     /// \var Cache::_pagesize
     ///		The memory page size.
-    size_t	pagesize;        
+    size_t	_pagesize;    
+
+amf::AMF::filetype_e  _filetype; // FIXME: this shouldn't be here still
 };
 
 /// \brief Dump to the specified output stream.

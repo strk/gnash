@@ -35,6 +35,8 @@
 #include "log.h"
 #include "cque.h"
 #include "diskstream.h"
+#include "cache.h"
+#include "getclocktime.hpp"
 
 #include <boost/thread/mutex.hpp>
 static boost::mutex io_mutex;
@@ -42,13 +44,11 @@ static boost::mutex io_mutex;
 using namespace gnash;
 using namespace std;
 
-// namespace {
-// gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-// }
-
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
+
+static Cache& cache = Cache::getDefaultInstance();
 
 /// \def _SC_PAGESIZE
 ///	This isn't set on all systems, but is used to get the page
@@ -58,8 +58,7 @@ namespace gnash {
 #endif
 
 DiskStream::DiskStream()
-    : _bytes(0),
-      _filefd(0),
+    : _filefd(0),
       _netfd(0),
       _dataptr(0),
       _filesize(0),
@@ -67,11 +66,13 @@ DiskStream::DiskStream()
       _offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+#endif
 }
 
 DiskStream::DiskStream(const string &str)
-    : _bytes(0),
-      _filefd(0),
+    : _filefd(0),
       _netfd(0),
       _dataptr(0),
       _filesize(0),
@@ -80,11 +81,13 @@ DiskStream::DiskStream(const string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     _filespec = str;
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+#endif
 }
 
 DiskStream::DiskStream(const string &str, int netfd)
-    : _bytes(0),
-      _filefd(0),
+    : _filefd(0),
       _filespec(0),
       _dataptr(0),
       _filesize(0),
@@ -94,6 +97,9 @@ DiskStream::DiskStream(const string &str, int netfd)
 //    GNASH_REPORT_FUNCTION;
     _netfd = netfd;
     _filespec = str;
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+#endif
 }
 
 DiskStream::~DiskStream()
@@ -119,26 +125,6 @@ DiskStream::close()
     }
     _dataptr = 0;
     _filespec.clear();
-}
-
-///  \brief Dump the internal data of this class in a human readable form.
-/// @remarks This should only be used for debugging purposes.
-void
-DiskStream::dump()
-{
-//    GNASH_REPORT_FUNCTION;
-    //state_e     _state;
-    cerr << "Bytes read is is " << _bytes << endl;
-    cerr << "Disk file descriptor is " << _filefd << endl;
-    cerr << "Network file descritor is " << _netfd << endl;
-    cerr << "Filespec is " << _filespec << endl;
-//    gnash::Statistics  _statistics;
-//     unsigned char *_dataptr;
-//     unsigned char *_seekptr;
-    cerr << "File size is " <<  _filesize << endl;
-    cerr << "Memory Page size is " << _pagesize << endl;
-
-    _que.dump();
 }
 
 /// \brief Load a chunk (pagesize) of the file into memory.
@@ -179,23 +165,23 @@ DiskStream::loadChunk(off_t offset)
     }
     
     if (_filefd) {
-    /// If the data pointer is legit, then we need to unmap that page
-    /// to mmap() a new one. If we're still in the current mapped
-    /// page, then just return the existing data pointer.
-    if (_dataptr != 0) {
-	// If the offset is less than what we already mmapped, we
-	boost::uint32_t diff = *reinterpret_cast<boost::uint32_t *>(_dataptr + _offset);
-	if (diff < _pagesize) {
-	    return _dataptr + _offset;
-	    // unmap the old data before allocating a new chunk
-	} else {
-	    munmap(_dataptr, _pagesize);
-	    _dataptr = 0;
+	/// If the data pointer is legit, then we need to unmap that page
+	/// to mmap() a new one. If we're still in the current mapped
+	/// page, then just return the existing data pointer.
+	if (_dataptr != 0) {
+	    // If the offset is less than what we already mmapped, we
+	    boost::uint32_t diff = *reinterpret_cast<boost::uint32_t *>(_dataptr + _offset);
+	    if (diff < _pagesize) {
+		return _dataptr + _offset;
+		// unmap the old data before allocating a new chunk
+	    } else {
+		munmap(_dataptr, _pagesize);
+		_dataptr = 0;
+	    }
 	}
-    }
-
+	
 	_dataptr = static_cast<unsigned char *>(mmap(0, _pagesize,
-					PROT_READ, MAP_SHARED, _filefd, _offset));
+						     PROT_READ, MAP_SHARED, _filefd, _offset));
 	offset = (offset % _pagesize);
     } else {
 	log_error (_("Couldn't load file %s"), _filespec);
@@ -207,6 +193,7 @@ DiskStream::loadChunk(off_t offset)
 		   _filespec, strerror(errno));
 	return 0;
     } else {
+	clock_gettime (CLOCK_REALTIME, &_last_access);
 //	log_debug (_("File %s mapped to: %p"), _filespec, (void *)_dataptr);
 	_seekptr = _dataptr + offset;
 	_state = OPEN;
@@ -300,7 +287,11 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
     } else {
 	log_error (_("File %s doesn't exist"), filespec);
     }
-
+    
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_first_access);
+#endif
+    
     /// \brief get the pagesize and cache the value
 #ifdef HAVE_SYSCONF
     _pagesize = sysconf(_SC_PAGESIZE);
@@ -486,11 +477,35 @@ bool DiskStream::multicast(const string & /*filespec*/)
     log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true    
 }
+
+///  \brief Dump the internal data of this class in a human readable form.
+/// @remarks This should only be used for debugging purposes.
 void
-DiskStream::dump(std::ostream& os) const
+DiskStream::dump()
 {
-    
 //    GNASH_REPORT_FUNCTION;
+	//state_e     _state;
+    cerr << "Filespec is \"" << _filespec << "\"" << endl;
+	cerr << "Disk file descriptor is fd #" << _filefd << endl;
+	cerr << "Network file descritor is fd #" << _netfd << endl;
+	cerr << "File size is " <<  _filesize << endl;
+	cerr << "Memory Page size is " << _pagesize << endl;
+	cerr << "Memory Offset is " << _offset << endl;
+	
+	// dump timing related data
+	struct timespec now;
+	clock_gettime (CLOCK_REALTIME, &now);    
+	double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
+	
+	cerr << "Time since last access:  " << fixed << ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9)) << " seconds ago." << endl;
+	
+#ifdef USE_STATS_CACHE
+	cerr << "Time since first access: " << fixed <<
+	    ((_last_access.tv_sec - _first_access.tv_sec) + ((_last_access.tv_nsec - _first_access.tv_nsec)/1e9))
+	     << " seconds lifespan."
+	     << endl;
+#endif
+    
 }
 
 
