@@ -115,15 +115,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(815); // SWF6
+	check_totals(823); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(832); // SWF7
+	check_totals(840); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(906); // SWF8+
+	check_totals(914); // SWF8+
 #endif
 
 	play();
@@ -2137,6 +2137,27 @@ check_equals(d4.getDepth(), -2147483648);
 createEmptyMovieClip("d5", 0x79999999);
 check_equals(d5.getDepth(), 2040109465);
 
+#endif
+
+// Test _visible property
+
+#if OUTPUT_VERSION > 5
+vis = _root.createEmptyMovieClip("vis", getNextHighestDepth());
+check_equals(vis._visible, true);
+vis._visible = false;
+check_equals(vis._visible, false);
+vis._visible = "1";
+check_equals(vis._visible, true);
+vis._visible = 0;
+check_equals(vis._visible, false);
+vis._visible = "true";
+check_equals(vis._visible, false);
+vis._visible = "false";
+check_equals(vis._visible, false);
+vis._visible = "gibberish";
+check_equals(vis._visible, false);
+vis._visible = undefined;
+check_equals(vis._visible, false);
 #endif
 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
