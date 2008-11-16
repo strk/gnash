@@ -803,11 +803,11 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	}
 	
 	if (_debug) {
-	    log_debug (_("read %d bytes from fd %d from port %d"), ret, fd, _port);
+	    log_debug (_("read %d bytes from fd #%d from port %d"), ret, fd, _port);
 	}
 #if 0
 	if (ret) {
-	    log_debug (_("%s: Read packet data from fd %d (%d bytes): \n%s"),
+	    log_debug (_("%s: Read packet data from fd #%d (%d bytes): \n%s"),
 		       __FUNCTION__, fd, ret, hexify(buffer, ret, true));
 	}
 #endif    
@@ -885,27 +885,27 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_error (_("The socket for fd %d was interupted by a system call"), fd);
+            log_error (_("The socket for fd #%d was interupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            log_error (_("The socket for fd %d was never available for writing"), fd);
+            log_error (_("The socket for fd #%d was never available for writing"), fd);
         }
 
         if (ret == 0) {
-            log_debug (_("The socket for fd %d timed out waiting to write"), fd);
+            log_debug (_("The socket for fd #%d timed out waiting to write"), fd);
 	    return 0;
         }
 
         ret = write(fd, bufptr, nbytes);
 
         if (ret == 0) {
-            log_error (_("Wrote zero out of %d bytes to fd %d: %s"), 
+            log_error (_("Wrote zero out of %d bytes to fd #%d: %s"), 
 		nbytes, fd, strerror(errno));
             return ret;
         }
         if (ret < 0) {
-            log_error (_("Couldn't write %d bytes to fd %d: %s"), 
+            log_error (_("Couldn't write %d bytes to fd #%d: %s"), 
 		nbytes, fd, strerror(errno));
             return ret;
         }
@@ -913,12 +913,12 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
             bufptr += ret;
             if (ret != nbytes) {
 		if (_debug) {
-		    log_debug (_("wrote %d bytes to fd %d, expected %d"),
+		    log_debug (_("wrote %d bytes to fd #%d, expected %d"),
 			       ret, fd, nbytes);
 		}
             } else {
 		if (_debug) {
-		    log_debug (_("wrote %d bytes to fd %d for port %d"),
+		    log_debug (_("wrote %d bytes to fd #%d for port %d"),
 			       ret, fd, _port);
 		}
 //                return ret;
@@ -926,7 +926,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
         }
 #if 0
 	if (ret) {
-	    log_debug (_("%s: Wrote packet data to fd %d: \n%s"),
+	    log_debug (_("%s: Wrote packet data to fd #%d: \n%s"),
 		       __FUNCTION__, fd, hexify(buffer, ret, true));
 	}
 #endif    
