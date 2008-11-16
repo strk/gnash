@@ -1,0 +1,182 @@
+
+load_lib "dejagnu.exp"
+
+
+# If tracing has been enabled at the top level, then turn it on here
+# too.
+if $tracelevel {
+    strace $tracelevel
+}
+
+# After these many seconds of execution the test script is aborted with a failure.
+# This is to handle deadlocks. We don't reset the timeout when a match is
+# found to avoid hanging in case of a testcase sending matches in an infinite loops.
+# (not unlikely as it seems, think about flash movies...)
+set timeout 600
+set file all
+set params ""
+
+set cport 80
+set chost "localhost"
+
+proc create_file { name contents } {
+    verbose "Trying to create $name"
+    set fd [ open $name "w" ]
+    puts -nonewline $fd $contents
+    catch "close -i $fd"
+}
+
+#
+# Send something to the copy of Cygnal we started
+proc netcat { name } {
+    global chost
+    global cport
+    verbose "Trying to send $name to Cygnal $chost : $cport)"
+    spawn -noecho nc -q 10 $chost $cport
+    set nid $spawn_id
+    expect {
+	eof {
+	    verbose "Netcat all done..."
+	}
+	timeout {
+	    verbose "Netcat still running after ${timeout} seconds, killing it (deadlock?)"
+		catch close
+		continue;
+	}
+    }
+#verbose "Started NetCat $netcat -q 10"
+    
+}
+
+set data "GET /index.html HTTP/1.0
+Host: localhost:4080
+Accept: text/html, text/plain, text/css, text/sgml, */*;q=0.01
+Accept-Encoding: gzip, bzip2
+Accept-Language: en
+User-Agent: DejaGnu 1.x
+"
+
+create_file "foo" $data
+
+set server "/usr/local/bin/cygnal"
+spawn -noecho $server -p 4000 -vv -n
+set sid $spawn_id
+
+set netcat "netcat"
+#set nid [spawn -noecho $netcat]
+#verbose "Started NetCat $netcat -q 10"
+
+
+netcat "foo"
+
+# testcases is set by the Makefile in the site.exp data file.
+foreach file $testcases {
+
+    expect {
+	-i $sid "*Starting" {
+	    verbose "Started Cygnal \"$server -p 4000 -vv -n\""
+	}
+	-i $sid "HTTP Handler" {
+	    verbose "Started HTTP Handler"
+	}
+	-i $sid eof {
+	    #	    unresolved "${file} died prematurely"
+	    #	    catch close
+	    #	    return "${file} died prematurely"
+	}
+	timeout {
+		fail "Test case ${server} still running after ${timeout} seconds, killing it (deadlock?)"
+		catch close
+		continue;
+	}
+    }
+
+#     verbose "Running test $file"
+
+#     # spawn the executable and look for the DejaGnu output messages from the
+#     # test case.
+
+#     # this version of the call allows use of 'wait' to check return code
+#     # -open [open "|cmd" "r"] doesn't work for that
+#     spawn -noecho ./$file 
+
+#     expect {
+# 	-re "^\[^\n]*NOTE:\[^\n]*\n" {
+# 	    regsub ".*NOTE: " $expect_out(0,string) "" output
+# 	    set output [string range $output 0 end-2]
+# 	    verbose "${file} $output" 
+# 	    exp_continue -continue_timer
+# 	}
+# 	-re "^\[^\n]*XPASSED:\[^\n]*\n" {
+# 	    regsub ".*XPASSED: " $expect_out(0,string) "" output
+# 	    set output [string range $output 0 end-2]
+# 	    xpass "${file}: $output"
+# 	    exp_continue -continue_timer
+# 	}
+# 	-re "^\[^\n]*PASSED:\[^\n]*\n" {
+# 	    regsub ".*PASSED: " $expect_out(0,string) "" output
+# 	    set output [string range $output 0 end-2]
+# 	    pass "${file}: $output"
+# 	    exp_continue -continue_timer
+# 	}
+# 	-re "^\[^\n]*XFAILED:\[^\n]*\n" {
+# 	    regsub ".*XFAILED: " $expect_out(0,string) "" output
+# 	    set output [string range $output 0 end-2] 
+# 	    xfail "${file}: $output"
+# 	    exp_continue -continue_timer
+# 	}
+# 	-re "^\[^\n]*FAILED:\[^\n]*\n" {
+# 	    regsub ".*FAILED: " $expect_out(0,string) "" output
+# 	    set output [string range $output 0 end-2] 
+# 	    fail "${file}: $output"
+# 	    exp_continue -continue_timer
+# 	}
+# 	-re "^\[^\n]*UNTESTED:\[^\n]*\n" {
+# 	    regsub ".*UNTESTED: " $expect_out(0,string) "" output
+# 	    set output [string range $output 0 end-2]
+# 	    untested "${file}: $output"
+# 	    exp_continue -continue_timer
+# 	}
+# 	-re "^\[^\n]*UNRESOLVED:\[^\n]*\n" {
+# 	    regsub ".*UNRESOLVED: " $expect_out(0,string) "" output
+# 	    set output [string range $output 0 end-2]
+# 	    unresolved "${file}: $output"
+# 	    exp_continue -continue_timer
+# 	}
+# 	-re "^\[^\n]*\n" {
+#             # just remove non-matching lines!
+#             exp_continue -continue_timer
+# 	}
+# 	eof {
+# 	    #	    unresolved "${file} died prematurely"
+# 	    #	    catch close
+# 	    #	    return "${file} died prematurely"
+# 	}
+# 	timeout {
+# 		fail "Test case ${file} still running after ${timeout} seconds, killing it (deadlock?)"
+# 		catch close
+# 		continue;
+# 	}
+#     }
+
+    # wait for the process to coplete to
+    # check return code
+    set retcode [wait]
+    
+    # debugging
+    #set i 0; foreach j $retcode { print "${file} wait($i) $j"; incr i }
+    
+    if { [ llength $retcode ] > 5 } {
+		fail "${file} died prematurely ([lindex $retcode 6])"
+    }
+    if { [ lindex $retcode 3 ] != 0 } {
+	fail "${file} exited with non-zero code ([lindex $retcode 3])"
+    }
+
+    
+    
+    # force a close of the executable to be safe.
+    catch close
+}
+
+
