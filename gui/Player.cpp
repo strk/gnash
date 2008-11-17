@@ -173,7 +173,12 @@ Player::init_sound()
 
     if (_doSound) {
 #ifdef SOUND_SDL
-        _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
+        try {
+            _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
+        } catch (SoundException& ex) {
+            log_error(_("Could not create sound handler: %s."
+                " Will continue w/out sound."), ex.what());
+        }
         if (! _audioDump.empty()) {
             // add a silent stream to the audio pool so that our output file
             // is homogenous;  we actually want silent wave data when no sounds

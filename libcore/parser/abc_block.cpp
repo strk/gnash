@@ -63,7 +63,7 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 		// The name has been validated in read.
 		// TODO: Find a better way to initialize trait values.
 		if (!mHasValue){
-			mValue = as_value(0);
+			mValue = as_value((as_object*)0); // NULL value, right ?
 		}
 		LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
 		pClass->addValue(mGlobalName, mNamespace, mSlotId, pType, 
@@ -135,7 +135,7 @@ abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 		// The name has been validated in read.
 		// TODO: Find a better way to initialize trait values.
 		if (!mHasValue){
-			mValue = as_value(0);
+			mValue = as_value((as_object*)0); // NULL value, right ?
 		}
 		LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
 		pMethod->addValue(mGlobalName, mNamespace, mSlotId, pType, 

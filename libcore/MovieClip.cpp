@@ -259,15 +259,13 @@ public:
 } // anonymous namespace
 
 
-MovieClip::MovieClip(
-        movie_definition* def, movie_instance* r,
+MovieClip::MovieClip( movie_definition* def, movie_instance* r,
         character* parent, int id)
     :
     character(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
     _drawable_inst(_drawable->create_character_instance(this, 0)),
-    //m_goto_frame_action_list(),
     m_play_state(PLAY),
     m_current_frame(0),
     m_has_looped(false),
@@ -1779,10 +1777,9 @@ MovieClip::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
     MouseEntityFinder finder(wp, pp);
     m_display_list.visitAll(finder);
     character* ch = finder.getEntity();
-    if ( ! ch ) 
-    {
-        ch = _drawable_inst->get_topmost_mouse_entity(pp.x, pp.y);
-    }
+
+    // It doesn't make any sense to query _drawable_inst, as it's
+    // a generic character and not a referencable character.
 
     return ch; // might be NULL
 }

@@ -112,7 +112,6 @@ libgnashcore_la_SOURCES = \
 	impl.cpp \
 	LoadVariablesThread.cpp \
 	render.cpp \
-	shape.cpp \
 	SWFStream.cpp \
 	styles.cpp \
 	timers.cpp \

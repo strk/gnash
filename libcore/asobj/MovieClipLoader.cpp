@@ -209,7 +209,7 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 		// TODO: find semantic of last argument
 		as_value met("onLoadError");
 		as_value arg1("Failed to load movie or jpeg");
-		as_value arg2(0);
+		as_value arg2(0.0);
 		callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal, arg1, arg2);
 
 		return false;
@@ -234,7 +234,7 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 
 	// Dispatch onLoadComplete
 	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadComplete"), targetVal,
-		as_value(0)); // TODO: find semantic of last arg
+		as_value(0.0)); // TODO: find semantic of last arg
 
 	/// This event must be dispatched when actions
 	/// in first frame of loaded clip have been executed.
