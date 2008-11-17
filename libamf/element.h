@@ -744,7 +744,7 @@ private:
     /// \var _buffer
     ///		A smart pointer to the Buffer used to hold the data
     ///		for this Element.
-    boost::shared_ptr<Buffer> _buffer;
+    boost::shared_ptr<amf::Buffer> _buffer;
 
     /// \var _type
     ///		The AMF0 data type of this Element.
