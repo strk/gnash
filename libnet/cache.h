@@ -55,8 +55,8 @@ public:
     std::string &findResponse(const std::string &name);
     void removeResponse(const std::string &name);
     
-    void addFile(const std::string &name, DiskStream *file);
-    DiskStream *findFile(const std::string &name);
+    void addFile(const std::string &name, boost::shared_ptr<DiskStream > &file);
+    boost::shared_ptr<DiskStream> findFile(const std::string &name);
     void removeFile(const std::string &name);
     
     ///  \brief Dump the internal data of this class in a human readable form.
@@ -77,7 +77,7 @@ private:
     std::map<std::string, std::string> _responses;
     /// \var Cache::_responses
     ///		The cache of Distream handles to often played files.
-    std::map<std::string, DiskStream *> _files;
+    std::map<std::string, boost::shared_ptr<DiskStream> > _files;
 
     /// \var Cache::_max_size
     ///		The maximum amount of memory the cache is allowed to use.

@@ -149,39 +149,47 @@ test (void)
         runtest.fail("addResponse()/findResponse()");
     }
 
-    DiskStream file1;
+    boost::shared_ptr<DiskStream> file1(new DiskStream);
     create_file("outbuf1.raw", 100);
-    file1.open("outbuf1.raw");
+    file1->open("outbuf1.raw");
 
-    DiskStream file2;
+    boost::shared_ptr<DiskStream> file2(new DiskStream);
     create_file("outbuf2.raw", 200);
-    file1.open("outbuf2.raw");
+    file1->open("outbuf2.raw");
 
-    DiskStream file3;
+    boost::shared_ptr<DiskStream> file3(new DiskStream);
     create_file("outbuf3.raw", 300);
-    file1.open("outbuf3.raw");
+    file1->open("outbuf3.raw");
 
-    DiskStream file4;
+    boost::shared_ptr<DiskStream> file4(new DiskStream);
     create_file("outbuf4.raw", 400);
-    file1.open("outbuf4.raw");
+    file1->open("outbuf4.raw");
 
-    cache.addFile("foo", &file1);
-    cache.addFile("bar", &file2);
-    cache.addFile("barfoo", &file3);
-    cache.addFile("foobar", &file4);
-    if ((cache.findFile("foo")->getFileSize() == file1.getFileSize())
-         && (cache.findFile("bar")->getFileSize() == file2.getFileSize())) {
-        runtest.pass("addFile()/findFile()");
+    cache.addFile("foo", file1);
+    cache.addFile("bar", file2);
+    cache.addFile("barfoo", file3);
+    cache.addFile("foobar", file4);
+
+    boost::shared_ptr<DiskStream> ds1 = cache.findFile("foo");
+    boost::shared_ptr<DiskStream> ds2 = cache.findFile("bar");
+    if (ds1 && ds2) {
+        if ((ds1->getFileSize() == file1->getFileSize())
+            && (ds2->getFileSize() == file2->getFileSize())) {
+            runtest.pass("addFile()/findFile()");
+        } else {
+            runtest.fail("addFile()/findFile()");
+        }
     } else {
-        runtest.fail("addFile()/findFile()");
+        runtest.unresolved("addFile()/findFile()");        
     }
-    
 //     if (dbglogfile.getVerbosity() > 0) {
 //         cache.dump();
 //     }
 
-    file1.close();
-    
+    file1->close();
+    file2->close();
+    file3->close();
+    file4->close();
 }
 
 static void
@@ -226,35 +234,42 @@ test_remove(void)
         runtest.fail("Cache::removeResponse()");
     }
 
-    DiskStream file1;
+    boost::shared_ptr<DiskStream> file1(new DiskStream);
     create_file("outbuf1.raw", 100);
-    file1.open("outbuf1.raw");
+    file1->open("outbuf1.raw");
 
-    DiskStream file2;
+    boost::shared_ptr<DiskStream> file2(new DiskStream);
     create_file("outbuf2.raw", 200);
-    file1.open("outbuf2.raw");
+    file2->open("outbuf2.raw");
 
-    DiskStream file3;
+    boost::shared_ptr<DiskStream> file3(new DiskStream);
     create_file("outbuf3.raw", 300);
-    file1.open("outbuf3.raw");
+    file3->open("outbuf3.raw");
 
-    DiskStream file4;
+    boost::shared_ptr<DiskStream> file4(new DiskStream);
     create_file("outbuf4.raw", 400);
-    file1.open("outbuf4.raw");
+    file4->open("outbuf4.raw");
 
-    cache.addFile("foo", &file1);
-    cache.addFile("bar", &file2);
-    cache.addFile("barfoo", &file3);
-    cache.addFile("foobar", &file4);
+    cache.addFile("foo", file1);
+    cache.addFile("bar", file2);
+    cache.addFile("barfoo", file3);
+    cache.addFile("foobar", file4);
     cache.removeFile("barfoo");
-    if ((cache.findFile("foo")->getFileSize() == file1.getFileSize())
-        && (cache.findFile("barfoo") == 0)
-        && (cache.findFile("bar")->getFileSize() == file2.getFileSize())) {
-        runtest.pass("Cache::removeFile()");
-    } else {
-        runtest.fail("Cache::removeFile()");
-    }    
 
+    boost::shared_ptr<DiskStream> ds1 = cache.findFile("foo");
+    boost::shared_ptr<DiskStream> ds2 = cache.findFile("bar");
+    if (ds1 && ds2) {
+        if ((cache.findFile("foo")->getFileSize() == file1->getFileSize())
+            && (cache.findFile("barfoo") == 0)
+            && (cache.findFile("bar")->getFileSize() == file2->getFileSize())) {
+            runtest.pass("Cache::removeFile()");
+        } else {
+            runtest.fail("Cache::removeFile()");
+        }
+    } else {
+        runtest.unresolved("Cache::removeFile()");
+    }
+    
     if (dbglogfile.getVerbosity() > 0) {
          cache.dump();
      }
@@ -287,18 +302,18 @@ test_errors (void)
         runtest.fail("Cache::findResponse()");
     }
 
-    DiskStream file1;
+    boost::shared_ptr<DiskStream> file1(new DiskStream);
 //    create_file("outbuf1.raw", 100);   it's created aleady in test().
-    file1.open("outbuf1.raw");
+    file1->open("outbuf1.raw");
 
-    cache.addFile("foo", &file1);
-    if ((cache.findFile("foo")->getFileSize() == file1.getFileSize())
+    cache.addFile("foo", file1);
+    if ((cache.findFile("foo")->getFileSize() == file1->getFileSize())
          && (cache.findFile("bar") == 0)) {
         runtest.pass("Cache::addFile()/findFile()");
     } else {
         runtest.fail("Cache::addFile()/findFile()");
     }
-
+    
     // see what happens if we try an uninitialized Cache.
     Cache c1;
     

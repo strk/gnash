@@ -92,7 +92,7 @@ Cache::addResponse(const std::string &name, const std::string &response)
 };
 
 void
-Cache::addFile(const std::string &name, DiskStream *file)
+Cache::addFile(const std::string &name, boost::shared_ptr<DiskStream> &file)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(cache_mutex);
@@ -133,7 +133,7 @@ Cache::findResponse(const std::string &name)
     return _responses[name];
 };
 
-DiskStream *
+boost::shared_ptr<DiskStream> 
 Cache::findFile(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -141,7 +141,7 @@ Cache::findFile(const std::string &name)
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
     _file_lookups++;
-    map<string, DiskStream *>::const_iterator it;
+    map<string, boost::shared_ptr<DiskStream> >::const_iterator it;
     it = _files.find(name);
     if (it != _files.end()) {
         _file_hits++;
@@ -235,10 +235,10 @@ Cache::dump(std::ostream& os) const
         os << "Response for \"" << name->first << "\" is: " << name->second << endl;
     }
 
-#if 0
-    map<std::string, DiskStream>::const_iterator data;
+#if 1
+    map<std::string, boost::shared_ptr<DiskStream> >::const_iterator data;
     for (data = _files.begin(); data != _files.end(); data++) {
-        DiskStream filedata = data->second;
+        boost::shared_ptr<DiskStream> filedata = data->second;
         os << "File info for \"" << data->first << "\" is: ";
 //        filedata.dump(os) << endl;
     }
