@@ -56,7 +56,27 @@ public:
         MULTICAST,
         DONE
     } state_e;
-    
+
+  typedef enum {
+    FILETYPE_NONE,
+    FILETYPE_SWF,
+    FILETYPE_HTML,
+    FILETYPE_PNG,
+    FILETYPE_JPEG,
+    FILETYPE_GIF,
+    FILETYPE_MP3,
+    FILETYPE_MP4,
+    FILETYPE_OGG,
+    FILETYPE_VORBIS,
+    FILETYPE_THEORA,
+    FILETYPE_DIRAC,
+    FILETYPE_TEXT,
+    FILETYPE_FLV,
+    FILETYPE_VP6,
+    FILETYPE_XML,
+    FILETYPE_FLAC
+  } filetype_e;
+
     DiskStream();
     DiskStream(const std::string &filespec);
     DiskStream(const std::string &filespec, int netfd);
@@ -182,6 +202,8 @@ public:
     /// @return A value that is the size of the file in bytes.
     size_t getFileSize() { return _filesize; };
 
+    filetype_e getFileType() { return _filetype; };
+
     /// \brief Get the time of the last access.
     ///
     /// @return A real pointer to the struct timespec of the last access.
@@ -244,7 +266,19 @@ private:
     ///		The offset within the file of the current memory
     ///		page.
     off_t	_offset;
-    
+
+    /// \brief An internal routine used to extract the type of file.
+    ///
+    /// @param filespec An optional filename to extract the type from.
+    ///
+    /// @return an AMF filetype
+    filetype_e determineFileType();
+    filetype_e determineFileType( boost::uint8_t *data);
+    filetype_e determineFileType(const std::string &filespec);
+
+
+    filetype_e _filetype;
+
     struct timespec _last_access;
     
 #ifdef USE_STATS_CACHE

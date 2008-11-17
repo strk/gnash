@@ -32,6 +32,7 @@
 
 #include "network.h"
 #include "buffer.h"
+#include "amf.h"
 #include "log.h"
 #include "cque.h"
 #include "diskstream.h"
@@ -43,6 +44,7 @@ static boost::mutex io_mutex;
 
 using namespace gnash;
 using namespace std;
+using namespace amf;
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
@@ -469,13 +471,118 @@ DiskStream::upload(const string & /*filespec*/)
 }
 
 // Stream a single "real-time" source.
-bool DiskStream::multicast(const string & /*filespec*/)
+bool
+DiskStream::multicast(const string & /*filespec*/)
 {
 //    GNASH_REPORT_FUNCTION;
     
     _state = MULTICAST;
     log_unimpl("%s", __PRETTY_FUNCTION__);
     return true; // Default to true    
+}
+
+DiskStream::filetype_e
+DiskStream::determineFileType()
+{
+//    GNASH_REPORT_FUNCTION;
+    
+  return(determineFileType(_filespec));
+}
+
+DiskStream::filetype_e 
+DiskStream::determineFileType(const string &filespec)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+  if (filespec.empty()) {
+    return FILETYPE_NONE;
+  }
+
+  string::size_type pos;
+  pos = filespec.rfind(".");
+  if (pos != string::npos) {
+    string suffix = filespec.substr(pos, filespec.size());
+    if (suffix == "html") {
+      _filetype = FILETYPE_HTML;
+    }
+    if (suffix == "ogg") {
+      _filetype = FILETYPE_OGG;
+    }
+    if (suffix == "swf") {
+      _filetype = FILETYPE_SWF;
+    }
+    if (suffix == "flv") {
+      _filetype = FILETYPE_FLV;
+    }
+    if (suffix == "mp3") {
+      _filetype = FILETYPE_MP3;
+    }
+    if (suffix == "flac") {
+      _filetype = FILETYPE_FLAC;
+    }
+  }
+
+  return _filetype;
+}
+
+DiskStream::filetype_e 
+DiskStream::determineFileType( boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+
+  if (data == 0) {
+    return FILETYPE_NONE;
+  }
+ 
+  // JPEG, offset 6 bytes, read the string JFIF
+  if (memcpy(data + 6, "JFIF", 4) == 0) {
+    return FILETYPE_NONE;
+  }
+  // SWF, offset 0, read the string FWS
+  if (memcpy(data, "SWF", 3) == 0) {
+    return FILETYPE_SWF;
+  }
+  // compressed SWF, offset 0, read the string CWS
+  // FLV, offset 0, read the string FLV
+  // PNG, offset 0, read the string PNG
+  if (memcpy(data, "PNG", 3) == 0) {
+    return FILETYPE_PNG;
+  }
+  // Ogg, offset 0, read the string OggS
+  if (memcpy(data, "OggS", 4) == 0) {
+    return FILETYPE_OGG;
+  }
+  // Theora, offset 28, read string theora
+  if (memcpy(data + 28, "theora", 6) == 0) {
+    return FILETYPE_THEORA;
+  }
+  // FLAC, offset 28, read string FLAC
+  if (memcpy(data + 28, "FLAC", 4) == 0) {
+    return FILETYPE_FLAC;
+  }
+  // Vorbis, offset 28, read string vorbis
+  if (memcpy(data + 28, "vorbis", 6) == 0) {
+    return FILETYPE_VORBIS;
+  }
+  // MP3, offset 0, read string ID3
+  if (memcpy(data, "ID3", 3) == 0) {
+    return FILETYPE_MP3;
+  }
+
+  // HTML
+  //   offset 0, read string "\<!doctype\ html"
+  //   offset 0, read string "\<head"
+  //   offset 0, read string "\<title"
+  //   offset 0, read string "\<html"
+  if (memcpy(data, "ID3", 3) == 0) {
+    return FILETYPE_HTML;
+  }
+
+  // XML, offset 0, read string "\<?xml"
+  if (memcpy(data, "<?xml", 5) == 0) {
+    return FILETYPE_XML;
+  }
+  
 }
 
 ///  \brief Dump the internal data of this class in a human readable form.
