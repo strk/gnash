@@ -544,6 +544,7 @@ typedef enum
 typedef enum
 {
     /// AS3 Actions go below here.
+    ABC_ACTION_END                 = 0x00,
 
     /// Do: Enter the debugger if one has been invoked.
     ABC_ACTION_BKPT                = 0x01,
