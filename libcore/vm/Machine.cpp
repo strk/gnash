@@ -240,24 +240,22 @@ inline bool abstractEquality(const as_value& a, const as_value& b,
 void
 Machine::execute()
 {
-	boost::uint8_t opcode;
-	
 	for ( ; ; )
 	{
 		std::size_t opStart = mStream->tellg();
 //		std::size_t opStart = mStreamStack.top(0)->tell();
 	if (1/*mIsAS3*/)
 	{
-//	opcode = mStreamStack.top(0)->read_as3op();
-	opcode = mStream->read_as3op();
-	LOG_DEBUG_AVM("** Executing opcode: %X **",opcode | 0x0);
+    SWF::abc_action_type opcode = (SWF::abc_action_type)mStream->read_as3op();
+	
+	LOG_DEBUG_AVM("** Executing opcode: %s (%d) **", opcode, (int)opcode);
 //	continue;
 	switch ((opcode /*= mStream->read_as3op()*/)) // Assignment intentional
 	{
 	default:
 		throw ASException();
 		break;
-	case 0:
+	case SWF::ABC_ACTION_END:
 	{
 // This is not actually an opcode -- it occurs when the stream is
 // empty. We may need to return from a function, or we may be done.
@@ -2463,9 +2461,7 @@ Machine::execute()
 	} // end of AS3 conditional
 	else // beginning of !AS3 (this code is AS2)
 	{
-	switch (opcode)
-	{
-	} // end of switch statement
+        // not using Machine for AS2 yet
 	} // end of AS2 conditional (!AS3)
 	} // end of main loop
 } // end of execute function
