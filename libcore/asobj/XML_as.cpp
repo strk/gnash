@@ -266,7 +266,7 @@ XML_as::parseAttribute(XMLNode* node, const std::string& xml,
 }
 
 void
-XML_as::parseDocTypeDecl(XMLNode* node, const std::string& xml,
+XML_as::parseDocTypeDecl(XMLNode* /*node*/, const std::string& xml,
     std::string::const_iterator& it)
 {
     std::string content;
@@ -274,7 +274,7 @@ XML_as::parseDocTypeDecl(XMLNode* node, const std::string& xml,
 }
 
 void
-XML_as::parseXMLDecl(XMLNode* node, const std::string& xml,
+XML_as::parseXMLDecl(XMLNode* /*node*/, const std::string& xml,
     std::string::const_iterator& it)
 {
     std::string content;
