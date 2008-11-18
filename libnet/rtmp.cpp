@@ -27,6 +27,7 @@
 #include <vector>
 #include <boost/detail/endian.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/format.hpp>
 
 #if ! (defined(_WIN32) || defined(WIN32))
 #	include <netinet/in.h>
@@ -184,15 +185,17 @@ RTMP::RTMP()
       _timeout(1)
 {
 //    GNASH_REPORT_FUNCTION;
-//    _queues.resize(MAX_AMF_INDEXES);
+
     // Initialize all of the queues
-    for (size_t i=0; i<MAX_AMF_INDEXES; i++) {
-	string name = "channel #";
-	for (size_t i=0; i<10; i++) {
-	    name[9] = i+'0';
-	    _queues[i].setName(name.c_str()); // this name is only used for debugging
-	    _chunksize[i] = RTMP_VIDEO_PACKET_SIZE; // each channel can have a different chunksize
-	}
+    for (int i=0; i<MAX_AMF_INDEXES; i++)
+    {
+        // Name is only used for debugging
+        boost::format fmt("channel #%s");
+	    string name = (fmt % i).str();
+	    _queues[i].setName(name.c_str());
+
+        // each channel can have a different chunksize
+	    _chunksize[i] = RTMP_VIDEO_PACKET_SIZE;
     }
 }
 
