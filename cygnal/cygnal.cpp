@@ -45,6 +45,8 @@ extern "C"{
 #endif
 }
 
+#include <boost/shared_ptr.hpp>
+
 // classes internal to Gnash
 #include "network.h"
 #include "log.h"
@@ -106,7 +108,7 @@ static struct sigaction  act;
 // same read-only value.
 
 // This is the default path to look in for files to be streamed.
-const char *docroot;
+const char *docroot = 0;
 
 // This is the number of times a thread loop continues, for debugging only
 int thread_retries = 10;
@@ -147,6 +149,7 @@ usage()
 	<< _("  -n,  --netdebug      Turn on net debugging messages") << endl
 	<< _("  -t,  --testing       Turn on special Gnash testing support") << endl
 	<< _("  -a,  --admin         Enable the administration thread") << endl
+	<< _("  -r,  --root          Document root for all files") << endl
 	<< endl;
 }
 
@@ -169,7 +172,8 @@ main(int argc, char *argv[])
         { 'd', "dump",          Arg_parser::no  },
         { 'n', "netdebug",      Arg_parser::no  },
         { 't', "testing",       Arg_parser::no  },
-        { 'a', "admin",         Arg_parser::no  }
+        { 'a', "admin",         Arg_parser::no  },
+        { 'r', "root",          Arg_parser::yes }
         };
 
     Arg_parser parser(argc, argv, opts);
@@ -178,7 +182,7 @@ main(int argc, char *argv[])
         cout << parser.error() << endl;
         exit(EXIT_FAILURE);
     }
-
+    
 //    crcfile.loadFiles();
     
     // Set the log file name before trying to write to
@@ -196,7 +200,9 @@ main(int argc, char *argv[])
     } else {
         docroot = "/var/www/html/software/tests/";
     }
-
+    if (crcfile.getPortOffset()) {
+      port_offset = crcfile.getPortOffset();
+    }
 
     // Handle command line arguments
     for( int i = 0; i < parser.arguments(); ++i ) {
@@ -223,6 +229,9 @@ main(int argc, char *argv[])
 	      port_offset = parser.argument<int>(i);
 	      crcfile.setPortOffset(port_offset);
 	      break;
+	  case 'r':
+	      docroot = parser.argument(i).c_str();
+	      break;
 	  case 'n':
 	      netdebug = true;
 	      break;
@@ -245,6 +254,13 @@ main(int argc, char *argv[])
 //     struct thread_params ssl_data;
 //     rtmp_data.port = port_offset + 1935;
 //     boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
+    // Admin handler
+    if (admin) {
+	Handler::thread_params_t admin_data;
+	admin_data.port = gnash::ADMIN_PORT;
+	boost::thread admin_thread(boost::bind(&admin_handler, &admin_data));
+//	admin_thread.join();
+    }
 
     // Incomming connection handler for port 80, HTTP and
     // RTMPT. As port 80 requires root access, cygnal supports a
@@ -256,34 +272,36 @@ main(int argc, char *argv[])
     http_data.port = port_offset + gnash::RTMPT_PORT;
     http_data.netfd = 0;
     http_data.filespec = docroot;
-    boost::thread http_thread(boost::bind(&connection_handler, &http_data));
-    
-    // Incomming connection handler for port 1935, RTMP. As RTMP
-    // is not a priviledged port, we just open it without an offset.
-    Handler::thread_params_t rtmp_data;
-    rtmp_data.port = gnash::RTMP_PORT;
-    rtmp_data.netfd = 0;
-    rtmp_data.filespec = docroot;
-    boost::thread rtmp_thread(boost::bind(&connection_handler, &rtmp_data));
-
-    // Admin handler
-    if (admin) {
-	Handler::thread_params_t admin_data;
-	admin_data.port = gnash::ADMIN_PORT;
-	boost::thread admin_thread(boost::bind(&admin_handler, &admin_data));
-	admin_thread.join();
+    if (crcfile.getThreadingFlag()) {
+      boost::thread http_thread(boost::bind(&connection_handler, &http_data));
+    } else {
+      connection_handler(&http_data);
     }
-
+    
+#if 0  
+      // Incomming connection handler for port 1935, RTMP. As RTMP
+      // is not a priviledged port, we just open it without an offset.
+      Handler::thread_params_t rtmp_data;
+      rtmp_data.port = gnash::RTMP_PORT;
+      rtmp_data.netfd = 0;
+      rtmp_data.filespec = docroot;
+      if (crcfile.getThreadingFlag()) {
+	  boost::thread rtmp_thread(boost::bind(&connection_handler, &rtmp_data));
+    } else {
+      connection_handler(&rtmp_data);
+    }
+#endif
+    
     // wait for the thread to finish
 //     http_thread.join();
 //     rtmp_thread.join();
 
-    // Wait for all the threads to die
-    alldone.wait(lk);
+      // Wait for all the threads to die
+      alldone.wait(lk);
+      
+      log_debug (_("Cygnal done..."));
     
-    log_debug (_("Cygnal done..."));
-    
-    return(0);
+      return(0);
 }
 
 #if 0
@@ -523,9 +541,9 @@ connection_handler(Handler::thread_params_t *args)
 	if (args->port == (port_offset + RTMPT_PORT)) {
 	    hand->addPollFD(fds, http_handler);
 	}
-	if (args->port == RTMP_PORT) {
-	    hand->addPollFD(fds, rtmp_handler);
-	}
+// 	if (args->port == RTMP_PORT) {
+// 	    hand->addPollFD(fds, rtmp_handler);
+// 	}
 	// if supporting multiple threads
 	if (crcfile.getThreadingFlag()) {
 	    hand = new Handler;
@@ -542,7 +560,8 @@ connection_handler(Handler::thread_params_t *args)
 	} else {		// single threaded
 	    log_debug("Single threaded mode for fd #%d", args->netfd);
 	    args->handler = hand;
-	    dispatch_handler(args);
+//	    dispatch_handler(args);
+	    http_handler(args);
 	}
 	//
 	log_debug("Restarting loop for next connection for port %d...", args->port);
