@@ -363,7 +363,7 @@ public:
     bool operator() (const as_value& a, const as_value& b)
     {
         as_value cmp_method(&_comp);
-        as_value ret(0);
+        as_value ret(0.0);
 
 	    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	    args->push_back(b);

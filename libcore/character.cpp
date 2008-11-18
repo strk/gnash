@@ -429,6 +429,8 @@ character::alpha_getset(const fn_call& fn)
 
 }
 
+/// _visible can be set with true/false, but also
+/// 0 and 1.
 as_value
 character::visible_getset(const fn_call& fn)
 {
@@ -441,8 +443,17 @@ character::visible_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		ptr->set_visible(fn.arg(0).to_bool());
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+        /// We cast to number and rely (mostly) on C++'s automatic
+        /// cast to bool, as string "0" should be converted to
+        /// its numeric equivalent, not interpreted as 'true', which
+        /// SWF7+ does for strings.
+        double d = fn.arg(0).to_number();
+
+        // Undefined or NaN is false.
+        if (isInf(d) || isNaN(d)) ptr->set_visible(false);
+		else ptr->set_visible(d);
+
+		ptr->transformedByScript();
 	}
 	return rv;
 

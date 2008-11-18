@@ -522,8 +522,8 @@ BitmapData_rectangle_getset(const fn_call& fn)
 
 	boost::intrusive_ptr<as_object> obj = init_Rectangle_instance();
 
-	obj->set_member(NSV::PROP_X, 0);
-	obj->set_member(NSV::PROP_Y, 0);
+	obj->set_member(NSV::PROP_X, 0.0);
+	obj->set_member(NSV::PROP_Y, 0.0);
 	obj->set_member(NSV::PROP_WIDTH, ptr->getWidth());
 	obj->set_member(NSV::PROP_HEIGHT, ptr->getHeight());
 

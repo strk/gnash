@@ -959,7 +959,7 @@ Machine::execute()
 		{
 			mStack.top(0).set_bool(false);
 			mFrame.value(oindex).set_null();
-			mFrame.value(iindex) = 0;
+			mFrame.value(iindex) = 0.0;
 		}
 		break;
 	}

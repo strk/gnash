@@ -78,6 +78,10 @@ URL::init_absolute(const std::string& in)
 			// no slashes ? all hostname, I presume
 			_host = in.substr(pos);
 			_path = "/";
+
+            // Extract the port number from the hostname, if any
+            split_port_from_host();
+
 			return;
 		}
 

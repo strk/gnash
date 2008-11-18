@@ -24,6 +24,7 @@
 #include "dsodefs.h" // For DSOEXPORT
 #include <string>
 #include <boost/cstdint.hpp> // for C99 int types
+#include <limits>
 
 /// Utilities to convert between std::string and std::wstring.
 //
@@ -53,7 +54,7 @@
 /// gnash::edit_text_character, ord() and chr().
 namespace utf8
 {
-    static const boost::uint32_t invalid = -1;
+    static const boost::uint32_t invalid = std::numeric_limits<boost::uint32_t>::max();
 
 	/// Converts a std::string with multibyte characters into a std::wstring.
 	//

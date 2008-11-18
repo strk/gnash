@@ -73,7 +73,6 @@ libgnashasobjs_la_SOURCES = \
 	MovieClipLoader.cpp\
 	String_as.cpp \
 	XML_as.cpp \
-	xmlattrs.cpp \
 	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \

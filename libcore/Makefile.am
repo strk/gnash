@@ -81,6 +81,7 @@ libgnashcore_la_SOURCES = \
 	namedStrings.cpp \
 	rect.cpp \
 	MovieClip.cpp \
+	swf.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/DefineVideoStreamTag.cpp \
 	swf/DefineTextTag.cpp \
