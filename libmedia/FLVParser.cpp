@@ -171,7 +171,8 @@ FLVParser::indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos)
 	CuePointsMap::iterator it = _cuePoints.lower_bound(tag.timestamp);
 	if ( it == _cuePoints.end() || it->first - tag.timestamp >= 5000)
 	{
-		log_debug("Added cue point at timestamp %d and position %d (audio frame)", tag.timestamp, thisTagPos);
+		//log_debug("Added cue point at timestamp %d and position %d "
+        //"(audio frame)", tag.timestamp, thisTagPos);
 		_cuePoints[tag.timestamp] = thisTagPos; 
 	}
 }
@@ -183,7 +184,8 @@ FLVParser::indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::
 		return;
 	}
 
-	log_debug("Added cue point at timestamp %d and position %d (key video frame)", tag.timestamp, thisTagPos);
+	//log_debug("Added cue point at timestamp %d and position %d "
+    //"(key video frame)", tag.timestamp, thisTagPos);
 	_cuePoints[tag.timestamp] = thisTagPos;
 }
 
