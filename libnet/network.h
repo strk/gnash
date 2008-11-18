@@ -81,10 +81,11 @@ const short RTMPTS_PORT = 443;
 const size_t NETBUFSIZE = 1448;	// 1500 appears to be the default size as used by FMS
 //const size_t NETBUFSIZE = 1357*2;	// 1500 appears to be the default size as used by FMS
 
-/// \class Network
-///	This is a low level network class for Gnash and Cygnal. This
-///	handles the grunt work on both the client side and the server
-///	side of a network connection.
+/// Low level network class for Gnash and Cygnal.
+//
+/// This handles the grunt work on both the client side and the
+/// server side of a network connection.
+///
 class DSOEXPORT Network {
 public:
     typedef boost::uint8_t byte_t;
@@ -92,15 +93,27 @@ public:
     Network();
     ~Network();
     
-    /// \brief Create a new server.
-    ///		After creating it, then you have to wait for an
-    ///		incoming connection.
+    /// Create a new server listening on RTMP port (1935).
+    //
+    ///	After creating it, then you have to wait for an
+    ///	incoming connection.
+    ///
+    /// @return The file descritor to wait for connections on,
+    ///         or -1 on failure.
+    ///
+    int createServer(void);
+
+    /// Create a new server listening on the specified port.
+    //
+    ///	After creating it, then you have to wait for an
+    ///	incoming connection.
     ///
     /// @param port The optional port number to wait on for
     ///		connections.
     ///
-    /// @return The file descritor to wait for connections on.
-    int createServer(void);
+    /// @return The file descritor to wait for connections on,
+    ///         or -1 on failure.
+    ///
     int createServer(short port);
     
     /// \brief Accept a client connection for the current server.
