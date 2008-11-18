@@ -67,6 +67,7 @@ namespace {
     as_value xml_getbytestotal(const fn_call& fn);
     as_value xml_parsexml(const fn_call& fn);
     as_value xml_ondata(const fn_call& fn);
+    as_value xml_xmlDecl(const fn_call& fn);
     as_value xml_docTypeDecl(const fn_call& fn);
 
     bool textAfterWhitespace(const std::string& xml,
@@ -149,8 +150,9 @@ XML_as::unescape(std::string& text)
 void
 XML_as::toString(std::ostream& o, bool encode) const
 {
+    if (!_xmlDecl.empty()) o << _xmlDecl;
     if (!_docTypeDecl.empty()) o << _docTypeDecl;
-    // TODO: xmlDecl
+
     XMLNode::toString(o, encode);
 }
 
@@ -277,8 +279,8 @@ XML_as::parseAttribute(XMLNode* node, const std::string& xml,
 /// Parse and set the docTypeDecl. This is stored without any validation and
 /// with the same case as in the parsed XML.
 void
-XML_as::parseDocTypeDecl(XMLNode* /*node*/, const std::string& xml,
-    std::string::const_iterator& it)
+XML_as::parseDocTypeDecl(const std::string& xml,
+        std::string::const_iterator& it)
 {
     std::string content;
     if (!parseNodeWithTerminator(xml, it, ">", content))
@@ -291,14 +293,23 @@ XML_as::parseDocTypeDecl(XMLNode* /*node*/, const std::string& xml,
     _docTypeDecl = os.str();
 }
 
+
 void
-XML_as::parseXMLDecl(XMLNode* /*node*/, const std::string& xml,
-    std::string::const_iterator& it)
+XML_as::parseXMLDecl(const std::string& xml, std::string::const_iterator& it)
 {
     std::string content;
-    parseNodeWithTerminator(xml, it, "?>", content);
+    if (!parseNodeWithTerminator(xml, it, "?>", content))
+    {
+        _status = XML_UNTERMINATED_XML_DECL;
+        return;
+    }
 
-    // Handle content.
+    std::ostringstream os;
+    os << "<" << content << "?>";
+
+    // This is appended to any xmlDecl already there.
+    _xmlDecl += os.str();
+
 }
 
 // The iterator should be pointing to the first char after the '<'
@@ -495,13 +506,15 @@ XML_as::parseXML(const std::string& xml)
             ++it;
             if (textMatch(xml, it, "!DOCTYPE", false))
             {
-                // We should not advance past the DOCTYPE title, as
+                // We should not advance past the DOCTYPE label, as
                 // the case is preserved.
-                parseDocTypeDecl(node, xml, it);
+                parseDocTypeDecl(xml, it);
             }
-            else if (textMatch(xml, it, "?xml"))
+            else if (textMatch(xml, it, "?xml", false))
             {
-                parseXMLDecl(node, xml, it);
+                // We should not advance past the xml label, as
+                // the case is preserved.
+                parseXMLDecl(xml, it);
             }
             else if (textMatch(xml, it, "!--"))
             {
@@ -605,6 +618,7 @@ attachXMLInterface(as_object& o)
                 LoadableObject::loadableobject_sendAndLoad), flags);
     o.init_member("onData", new builtin_function(xml_ondata), flags);
 
+    o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
     o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
 }
 
@@ -754,6 +768,28 @@ xml_parsexml(const fn_call& fn)
     ptr->parseXML(text);
     
     return as_value();
+}
+
+as_value
+xml_xmlDecl(const fn_call& fn)
+{
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // Getter
+        const std::string& xml = ptr->getXMLDecl();
+        if (xml.empty()) return as_value();
+        return as_value(xml);
+    }
+
+    // Setter
+
+    const std::string& xml = fn.arg(0).to_string();
+    ptr->setDocTypeDecl(xml);
+    
+    return as_value();
+
 }
 
 as_value

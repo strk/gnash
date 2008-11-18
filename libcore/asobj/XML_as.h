@@ -68,6 +68,14 @@ public:
     /// @param encode   Whether to URL encode the node values.
     void toString(std::ostream& o, bool encode) const;
 
+    const std::string& getXMLDecl() const {
+        return _xmlDecl;
+    }
+
+    void setXMLDecl(const std::string& xml) {
+        _xmlDecl = xml;
+    }
+
     const std::string& getDocTypeDecl() const {
         return _docTypeDecl;
     }
@@ -107,13 +115,13 @@ public:
     void parseAttribute(XMLNode* node, const std::string& xml, 
             std::string::const_iterator& it);
 
-    void parseDocTypeDecl(XMLNode* node, const std::string& xml, 
+    void parseDocTypeDecl(const std::string& xml, 
             std::string::const_iterator& it);
 
     void parseText(XMLNode* node, const std::string& xml, 
             std::string::const_iterator& it);
 
-    void parseXMLDecl(XMLNode* node, const std::string& xml, 
+    void parseXMLDecl(const std::string& xml, 
             std::string::const_iterator& it);
 
     void parseComment(XMLNode* node, const std::string& xml, 

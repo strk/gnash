@@ -864,9 +864,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(375);
+		check_totals(386);
 #else
-		check_totals(415);
+		check_totals(426);
 #endif
 		play();
 	}
@@ -980,15 +980,38 @@ check_equals(h.toString(), "<open />");
 // Check DOCTYPE and xml declarations.
 
 check_equals(h.docTypeDecl, undefined);
+check_equals(h.xmlDecl, undefined);
 
 h = new XML("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><tag></tag>");
-
 check_equals(h.toString(), "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><tag />");
 check_equals(h.docTypeDecl, "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>");
 
 h = new XML("<!DOcTyPE text><tag></tag>");
-
 check_equals(h.toString(), "<!DOcTyPE text><tag />");
 check_equals(h.docTypeDecl, "<!DOcTyPE text>");
+
+h = new XML("<?xml declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xml declaration goes here?><tag>content</tag>");
+check_equals(h.xmlDecl, "<?xml declaration goes here?>");
+
+h = new XML("<?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.xmlDecl, "<?xMl declaration goes here?>");
+
+// Check order
+h = new XML("<!doctype d><?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xMl declaration goes here?><!doctype d><tag>content</tag>");
+check_equals(h.xmlDecl, "<?xMl declaration goes here?>");
+check_equals(h.docTypeDecl, "<!doctype d>");
+
+// Check order
+h = new XML("<tag></tag><!doctype d><?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xMl declaration goes here?><!doctype d><tag /><tag>content</tag>");
+
+// Check multiple declarations
+h = new XML("<tag></tag><!doctype d><?xMl decl?><!dOcType new><?XMl new?>");
+check_equals(h.toString(), "<?xMl decl?><?XMl new?><!dOcType new><tag />");
+check_equals(h.xmlDecl, "<?xMl decl?><?XMl new?>");
+
 stop();
 
