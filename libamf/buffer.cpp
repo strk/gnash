@@ -633,14 +633,24 @@ Buffer::resize(size_t size)
 	    return *this;
 	}
 
-	// Cache the number of bytes currently being held
-	size_t used = _seekptr - _data.get();
+	// check the sizes. If we had data read using ->reference(), the seekptr isn't
+	// increased, so in these cases we just copy al lthe data blindly, as it's
+	// better than loosing data.
+	size_t used = 0;
+	if (_seekptr != _data.get()) {
+	    used = _seekptr - _data.get();
+	} else {
+	    if (size < _nbytes) {
+		used = size;
+	    } else {
+		used = _nbytes;
+	    }
+	}
+	
 	
 	// Copy the existing data into the new block of memory. The data
 	// held currently is moved to the temporary array, and then gets
 	// deleted when this method returns.
-//	tmp.swap(_data);
-	
 	// We loose data if we resize smaller than the data currently held.
 	if (size < used) {
 	    log_error("Truncating data (%d bytes) while resizing!", used - size);
