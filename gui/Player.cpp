@@ -402,6 +402,9 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
         if ( ! _height ) _height = 1;
     }
 
+    // Register movie definition before creating the window
+    _gui->setMovieDefinition(_movieDef.get());
+
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height);
 
@@ -443,8 +446,6 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     //       on luck ? So we made sure to keep _movieDef by 
     //       intrusive_ptr...
     _movieDef->completeLoad();
-
-    _gui->setMovieDefinition(_movieDef.get());
 
     if (! _delay) {
       //float movie_fps = _movieDef->get_frame_rate();
