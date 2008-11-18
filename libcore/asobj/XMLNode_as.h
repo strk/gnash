@@ -26,10 +26,6 @@
 #include "xmlattrs.h"
 #include "log.h"
 
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/xmlreader.h>
-
 #include <list>
 #include <vector>
 #include <string>

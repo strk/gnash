@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// The XML parsing algorithms are based on swfdec.
+// The XML parsing algorithms are based on swfdec's parsing model.
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
