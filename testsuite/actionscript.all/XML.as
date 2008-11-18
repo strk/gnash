@@ -448,7 +448,7 @@ tmp.checkParsed(); // onLoad won't be called
 //note("Parsed XML: "+tmp.toString());
 
 // TODO: FIX THIS !
-xcheck_equals(tmp.toString(), xml_out);
+check_equals(tmp.toString(), xml_out);
 
 //------------------------------------------------
 // Test XML editing
@@ -864,9 +864,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(361);
+		check_totals(370);
 #else
-		check_totals(401);
+		check_totals(410);
 #endif
 		play();
 	}
@@ -947,6 +947,35 @@ check_equals(myxml2.toString(), "<X1 />");
 myxml2.ignoreWhite = true; 
 myxml2.parseXML("<X1> t </X1>");
 check_equals(myxml2.toString(), "<X1> t </X1>"); 
+
+/// Check various malformed XMLs
+
+h = new XML("<open>");
+check_equals(h.toString(), "<open />");
+
+h = new XML("<open></close>");
+check_equals(h.toString(), "<open />");
+
+h = new XML("<open><open2></open>");
+check_equals(h.toString(), "<open><open2 /></open>");
+
+h = new XML("<open att='");
+xcheck_equals(h.toString(), "");
+
+h = new XML("<open att      r='kk'");
+xcheck_equals(h.toString(), "");
+
+h = new XML("<open>& ' \"<");
+check_equals(h.toString(), "<open>&amp; &apos; &quot;</open>");
+
+h = new XML("</open><open>node with \"</open>");
+check_equals(h.toString(), "");
+
+h = new XML("<open/><open><!-- lkjsdcölkj<hello>");
+check_equals(h.toString(), "<open /><open />");
+
+h = new XML("<open><![CDATA[jlkjdc</open>");
+check_equals(h.toString(), "<open />");
 
 stop();
 

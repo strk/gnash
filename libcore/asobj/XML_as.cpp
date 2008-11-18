@@ -111,10 +111,10 @@ XML_as::getEntities()
 
     static Entities entities = boost::assign::map_list_of
         ("&amp;", "&")
-        ("&apos;", "\"")
+        ("&quot;", "\"")
         ("&lt;", "<")
         ("&gt;", ">")
-        ("&quot;", "'");
+        ("&apos;", "'");
 
     return entities;
 
