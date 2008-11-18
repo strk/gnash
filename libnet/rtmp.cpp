@@ -676,6 +676,7 @@ RTMP::encodeChunkSize()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void
@@ -690,6 +691,7 @@ RTMP::encodeBytesRead()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void
@@ -704,6 +706,7 @@ RTMP::encodeServer()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void 
@@ -718,6 +721,7 @@ RTMP::encodeClient()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void 
@@ -732,6 +736,7 @@ RTMP::encodeAudioData()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void 
@@ -746,6 +751,7 @@ RTMP::encodeVideoData()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void 
@@ -760,6 +766,7 @@ RTMP::encodeNotify()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void 
@@ -774,6 +781,7 @@ RTMP::encodeSharedObj()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 
 void 
@@ -788,6 +796,7 @@ RTMP::encodeInvoke()
 {
     GNASH_REPORT_FUNCTION;
     log_unimpl(__PRETTY_FUNCTION__);
+    return boost::shared_ptr<amf::Buffer>((amf::Buffer*)0);
 }
 void 
 RTMP::decodeInvoke()
