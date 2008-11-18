@@ -43,6 +43,7 @@
 #include <algorithm>
 #include <boost/assign/list_of.hpp>
 #include <boost/algorithm/string/compare.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 
 namespace gnash {
