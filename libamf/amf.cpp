@@ -480,17 +480,8 @@ boost::shared_ptr<Buffer>
 AMF::encodeElement(boost::shared_ptr<amf::Element> el)
 {
 //    GNASH_REPORT_FUNCTION;
-    size_t outsize;
-    if (el->getType() == Element::BOOLEAN_AMF0) {
-	outsize = el->getNameSize() + 2;
-    } else {
-	outsize = el->getNameSize() + el->getDataSize() + AMF_PROP_HEADER_SIZE;
-    }
-    // A NULL object is a single byte
-    if (el->getType() == Element::NULL_AMF0) {
-	outsize = 1;
-    }
-    
+    size_t outsize = el->getNameSize() + el->getDataSize() + AMF_PROP_HEADER_SIZE;
+
     boost::shared_ptr<Buffer> buf(new Buffer(outsize));
 //    log_debug("AMF::%s: Outsize is: %d", __FUNCTION__, outsize);
     // If the name field is set, it's a property, followed by the data
