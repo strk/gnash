@@ -696,55 +696,83 @@ Network::closeConnection(int fd)
     return false;
 }
 
-amf::Buffer *
+boost::shared_ptr<amf::Buffer>
 Network::readNet()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    amf::Buffer *buffer = new amf::Buffer;
-    int nbytes = readNet(buffer);
-    if (nbytes > 0) {
-	buffer->resize(nbytes);
-	return buffer;
+    boost::shared_ptr<amf::Buffer> buffer(new amf::Buffer);
+    int ret = readNet(buffer);
+    if (ret > 0) {
+	buffer->resize(ret);
     }
 
-    return 0;
+    return buffer;
 }
 
 // Read from the connection
 int
-Network::readNet(amf::Buffer *buffer)
+Network::readNet(int fd, boost::shared_ptr<amf::Buffer> buffer)
 {
-//    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer->reference(), buffer->size(), _timeout);
+    int ret = readNet(fd, buffer->reference(), buffer->size(), _timeout);
+    if (ret > 0) {
+	buffer->resize(ret);
+    }
+
+    return ret;
 }
 
 int
-Network::readNet(amf::Buffer *buffer, int timeout)
+Network::readNet(boost::shared_ptr<amf::Buffer> buffer)
 {
 //    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer->reference(), buffer->size(), timeout);
+    int ret = readNet(_sockfd, buffer, _timeout);
+
+    return ret;
 }
 
 int
-Network::readNet(byte_t *buffer, int nbytes)
+Network::readNet(boost::shared_ptr<amf::Buffer> buffer, int timeout)
 {
 //    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer, nbytes, _timeout);
+    int ret = readNet(_sockfd, buffer->reference(), buffer->size(), timeout);
+    if (ret > 0) {
+	buffer->resize(ret);
+    }
+
+    return ret;
 }
 
 int
-Network::readNet(byte_t *buffer, int nbytes, int timeout)
+Network::readNet(int fd, boost::shared_ptr<amf::Buffer> buffer, int timeout)
 {
-//    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer, nbytes, timeout);
+    int ret = readNet(fd, buffer->reference(), buffer->size(), timeout);
+    if (ret > 0) {
+	buffer->resize(ret);
+    }
+
+    return ret;
 }
 
 int
-Network::readNet(int fd, byte_t *buffer, int nbytes)
+Network::readNet(byte_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
-    return readNet(fd, buffer, nbytes, _timeout);
+    return readNet(_sockfd, data, nbytes, _timeout);
+}
+
+int
+Network::readNet(byte_t *data, int nbytes, int timeout)
+{
+//    GNASH_REPORT_FUNCTION;
+    return readNet(_sockfd, data, nbytes, timeout);
+}
+
+int
+Network::readNet(int fd, byte_t *data, int nbytes)
+{
+//    GNASH_REPORT_FUNCTION;
+    return readNet(fd, data, nbytes, _timeout);
 }
 
 int

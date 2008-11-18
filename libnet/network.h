@@ -148,13 +148,15 @@ public:
     /// @param nbytes The number of bytes to try to read.
     ///
     /// @return The number of bytes read.
-    amf::Buffer *readNet();
-    int readNet(amf::Buffer *buffer);
-    int readNet(amf::Buffer *buffer, int timeout);
-    int readNet(byte_t *buffer, int nbytes);
-    int readNet(byte_t *buffer, int nbytes, int timeout);
-    int readNet(int fd, byte_t *buffer, int nbytes);
-    int readNet(int fd, byte_t *buffer, int nbytes, int timeout);
+    boost::shared_ptr<amf::Buffer> readNet();
+    int readNet(boost::shared_ptr<amf::Buffer> buffer);
+    int readNet(int fd, boost::shared_ptr<amf::Buffer> buffer);
+    int readNet(boost::shared_ptr<amf::Buffer> buffer, int timeout);
+    int readNet(int fd, boost::shared_ptr<amf::Buffer> buffer, int timeout);
+    int readNet(byte_t *data, int nbytes);
+    int readNet(byte_t *data, int nbytes, int timeout);
+    int readNet(int fd, byte_t *data, int nbytes);
+    int readNet(int fd, byte_t *data, int nbytes, int timeout);
     
     /// \brief Write to the opened connection.
     ///
