@@ -46,6 +46,8 @@ using namespace gnash;
 using namespace std;
 using namespace amf;
 
+typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
+
 namespace gnash
 {
 
@@ -81,22 +83,22 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     
     AMF amf_obj;
 
-    Element connect;
-    connect.makeString("connect");
+    ElementSharedPtr connect(new amf::Element);
+    connect->makeString("connect");
 
-    Element connum;
+    ElementSharedPtr connum(new amf::Element);
     // update the counter for the number of connections. This number is used heavily
     // in RTMP to help keep communications clear when there are multiple streams.
     _connections++;
-    connum.makeNumber(_connections);
+    connum->makeNumber(_connections);
     
     // Make the top level object
-    Element obj;
-    obj.makeObject();
+    ElementSharedPtr obj(new amf::Element);
+    obj->makeObject();
     
-    boost::shared_ptr<amf::Element> appnode(new Element);
+    ElementSharedPtr appnode(new amf::Element);
     appnode->makeString("app", app);
-    obj.addProperty(appnode);
+    obj->addProperty(appnode);
 
     const char *version = 0;
     if (rcfile.getFlashVersionString().size() > 0) {
@@ -105,56 +107,56 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
         version = "LNX 9,0,31,0";
     }  
 
-    boost::shared_ptr<amf::Element> flashVer(new Element);
+    ElementSharedPtr flashVer(new amf::Element);
     flashVer->makeString("flashVer", "LNX 9,0,31,0");
-    obj.addProperty(flashVer);
+    obj->addProperty(flashVer);
     
-    boost::shared_ptr<amf::Element> swfUrlnode(new Element);
+    ElementSharedPtr swfUrlnode(new amf::Element);
 //    swfUrl->makeString("swfUrl", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf");
     swfUrlnode->makeString("swfUrl", swfUrl);
-    obj.addProperty(swfUrlnode);
+    obj->addProperty(swfUrlnode);
 
 //    filespec = "rtmp://localhost/oflaDemo";
-    boost::shared_ptr<amf::Element> tcUrlnode(new Element);
+    ElementSharedPtr tcUrlnode(new amf::Element);
     tcUrlnode->makeString("tcUrl", tcUrl);
-    obj.addProperty(tcUrlnode);
+    obj->addProperty(tcUrlnode);
 
-    boost::shared_ptr<amf::Element> fpad(new Element);
+    ElementSharedPtr fpad(new amf::Element);
     fpad->makeBoolean("fpad", false);
-    obj.addProperty(fpad);
+    obj->addProperty(fpad);
 
-    boost::shared_ptr<amf::Element> audioCodecsnode(new Element);
+    ElementSharedPtr audioCodecsnode(new Element);
 //    audioCodecsnode->makeNumber("audioCodecs", 615);
     audioCodecsnode->makeNumber("audioCodecs", audioCodecs);
-    obj.addProperty(audioCodecsnode);
+    obj->addProperty(audioCodecsnode);
     
-    boost::shared_ptr<amf::Element> videoCodecsnode(new Element);
+    ElementSharedPtr videoCodecsnode(new Element);
 //    videoCodecsnode->makeNumber("videoCodecs", 124);
     videoCodecsnode->makeNumber("videoCodecs", videoCodecs);
-    obj.addProperty(videoCodecsnode);
+    obj->addProperty(videoCodecsnode);
 
-    boost::shared_ptr<amf::Element> videoFunctionnode(new Element);
+    ElementSharedPtr videoFunctionnode(new Element);
 //    videoFunctionnode->makeNumber("videoFunction", 0x1);
     videoFunctionnode->makeNumber("videoFunction", videoFunction);
-    obj.addProperty(videoFunctionnode);
+    obj->addProperty(videoFunctionnode);
 
-    boost::shared_ptr<amf::Element> pageUrlnode(new Element);
+    ElementSharedPtr pageUrlnode(new Element);
 //    pageUrlnode->makeString("pageUrl", "http://x86-ubuntu/software/gnash/tests/");
     pageUrlnode->makeString("pageUrl", pageUrl);
-    obj.addProperty(pageUrlnode);
+    obj->addProperty(pageUrlnode);
 
-    boost::shared_ptr<amf::Element> objencodingnode(new Element);
+    ElementSharedPtr objencodingnode(new Element);
     objencodingnode->makeNumber("objectEncoding", 0.0);
-    obj.addProperty(objencodingnode);
+    obj->addProperty(objencodingnode);
     
 //    size_t total_size = 227;
 //     Buffer *out = encodeHeader(0x3, RTMP::HEADER_12, total_size,
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
 //     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
 //     Buffer *rtmpBuf = hex2mem(rtmpStr);
-    boost::shared_ptr<Buffer> conobj = connect.encode();
-    boost::shared_ptr<Buffer> numobj = connum.encode();
-    boost::shared_ptr<Buffer> encobj = obj.encode();
+    boost::shared_ptr<Buffer> conobj = connect->encode();
+    boost::shared_ptr<Buffer> numobj = connum->encode();
+    boost::shared_ptr<Buffer> encobj = obj->encode();
 
     boost::shared_ptr<Buffer> buf(new Buffer(conobj->size() + numobj->size() + encobj->size()));
     *buf += conobj;
