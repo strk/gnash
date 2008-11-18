@@ -128,8 +128,6 @@ public:
     /// Note this is not the same as a URL unescape.
     static void unescape(std::string& text);
 
-    XMLNode* processNode(xmlTextReaderPtr reader, XMLNode *node);
-
     XMLNode* createElement(const std::string& name);
 
     XMLNode* createTextNode(const std::string& name);
