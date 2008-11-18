@@ -131,14 +131,14 @@ main(int argc, char *argv[])
         { 'a', "app",           Arg_parser::yes  },
         { 'p', "path",          Arg_parser::yes  },
         { 'f', "filename",      Arg_parser::yes  },
-        { 't', "tcurl",		Arg_parser::yes  },
-        { 's', "swfurl",	Arg_parser::yes  },
-        { 'u', "url",	        Arg_parser::yes  },
+        { 't', "tcurl",     Arg_parser::yes  },
+        { 's', "swfurl",    Arg_parser::yes  },
+        { 'u', "url",           Arg_parser::yes  },
         { 'n', "netdebug",      Arg_parser::no  }
         };
 
     Arg_parser parser(argc, argv, opts);
-    if( ! parser.error().empty() )	
+    if( ! parser.error().empty() )  
     {
         cout << parser.error() << endl;
         exit(EXIT_FAILURE);
@@ -154,66 +154,66 @@ main(int argc, char *argv[])
 
     RTMPClient client;    
     short port = 0;
-    string protocol;		// the network protocol, rtmp or http
-    string app;			// the application name
-    string path;		// the path to the file on the server
-    string query;		// any queries for the host
-    string filename;		// the filename to play
-    string tcUrl;		// the tcUrl field
-    string swfUrl;		// the swfUrl field
-    string pageUrl;		// the pageUrl field
-    string hostname;		// the hostname of the server
-	
+    string protocol;        // the network protocol, rtmp or http
+    string app;         // the application name
+    string path;        // the path to the file on the server
+    string query;       // any queries for the host
+    string filename;        // the filename to play
+    string tcUrl;       // the tcUrl field
+    string swfUrl;      // the swfUrl field
+    string pageUrl;     // the pageUrl field
+    string hostname;        // the hostname of the server
+    
     // Handle command line arguments
     for( int i = 0; i < parser.arguments(); ++i ) {
-	const int code = parser.code(i);
-	try {
-	    switch( code ) {
-	      case 'h':
-		  version_and_copyright();
-		  usage();
-		  exit(0);
-	      case 'V':
-		  version_and_copyright();
-		  exit(0);
-	      case 'v':
-		  dbglogfile.setVerbosity();
-		  log_debug (_("Verbose output turned on"));
-		  break;
-	      case 'a':
-		  app = parser.argument(i);
-		  break;
-	      case 'p':
-		  path = parser.argument(i);
-		  break;
-	      case 't':
-		  tcUrl = parser.argument(i);
-		  break;
-	      case 's':
-		  swfUrl = parser.argument(i);
-		  break;
-	      case 'f':
-		  filename = parser.argument(i);
-		  break;
-	      case 'n':
-		  netdebug = true;
-		  break;
-	      case 'd':
-		  rcfile.dump();
-		  exit(0);
-		  break;
-	      case 0:
-		  infiles.push_back(parser.argument(i));
-		  break;
-	      default:
-		  log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
-	    }
-	}
-	
-	catch (Arg_parser::ArgParserException &e) {
-	    cerr << _("Error parsing command line options: ") << e.what() << endl;
-	    cerr << _("This is a Gnash bug.") << endl;
-	}
+        const int code = parser.code(i);
+        try {
+            switch( code ) {
+              case 'h':
+              version_and_copyright();
+              usage();
+              exit(0);
+              case 'V':
+              version_and_copyright();
+              exit(0);
+              case 'v':
+              dbglogfile.setVerbosity();
+              log_debug (_("Verbose output turned on"));
+              break;
+              case 'a':
+              app = parser.argument(i);
+              break;
+              case 'p':
+              path = parser.argument(i);
+              break;
+              case 't':
+              tcUrl = parser.argument(i);
+              break;
+              case 's':
+              swfUrl = parser.argument(i);
+              break;
+              case 'f':
+              filename = parser.argument(i);
+              break;
+              case 'n':
+              netdebug = true;
+              break;
+              case 'd':
+              rcfile.dump();
+              exit(0);
+              break;
+              case 0:
+              infiles.push_back(parser.argument(i));
+              break;
+              default:
+              log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
+            }
+        }
+        
+        catch (Arg_parser::ArgParserException &e) {
+            cerr << _("Error parsing command line options: ") << e.what() << endl;
+            cerr << _("This is a Gnash bug.") << endl;
+        }
     }
     
     if (infiles.empty()) {
@@ -232,91 +232,91 @@ main(int argc, char *argv[])
     // Take a standard URL apart.
     string::size_type start = url.find(':', 0);
     if (start != string::npos) {
-	protocol = url.substr(0, start);
-	start += 3;		// skip past the "://" part after the protocol
+        protocol = url.substr(0, start);
+        start += 3;     // skip past the "://" part after the protocol
     }
     string::size_type end = url.find('/', start);
     if (end != string::npos) {
-	string::size_type pos = url.find(':', start);
-	if (pos != string::npos) {
-	    hostname = url.substr(start, pos - start);
-	    portstr = url.substr(pos + 1, (end - pos) - 1);
-	    port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
-	} else {
-	    hostname = url.substr(start, end - start);
-	    if ((protocol == "http") || (protocol == "rtmpt")) {
-		port = RTMPT_PORT;
-	    }
-	    if (protocol == "rtmp") {
-		port = RTMP_PORT;
-	    }
-	}
-	start = end;
+        string::size_type pos = url.find(':', start);
+        if (pos != string::npos) {
+            hostname = url.substr(start, pos - start);
+            portstr = url.substr(pos + 1, (end - pos) - 1);
+            port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
+        } else {
+            hostname = url.substr(start, end - start);
+            if ((protocol == "http") || (protocol == "rtmpt")) {
+                port = RTMPT_PORT;
+            }
+            if (protocol == "rtmp") {
+                port = RTMP_PORT;
+            }
+        }
+        start = end;
     }
     end = url.rfind('/');
     if (end != string::npos) {
-	path = url.substr(start + 1, end - start - 1);
-	start = end;
-	filename = url.substr(end + 1);
+        path = url.substr(start + 1, end - start - 1);
+        start = end;
+        filename = url.substr(end + 1);
     }
 
     start = path.find('?', 0);
     if (start != string::npos) {
-	end = path.find('/', 0);
-	query = path.substr(0, end);
-	app = query;
-	path = path.substr(end, path.size());
+        end = path.find('/', 0);
+        query = path.substr(0, end);
+        app = query;
+        path = path.substr(end, path.size());
     } else {
-	app = path;
+        app = path;
     }
 
     if (tcUrl.empty()) {
-	tcUrl = protocol + "://" + hostname;
-	if (!portstr.empty()) {
-	    tcUrl += ":" + portstr;
-	}
-	if (!query.empty()) {
-	    tcUrl += "/" + query;
-	} else {
-	    tcUrl += "/" + path;
-	}
+        tcUrl = protocol + "://" + hostname;
+        if (!portstr.empty()) {
+            tcUrl += ":" + portstr;
+        }
+        if (!query.empty()) {
+            tcUrl += "/" + query;
+        } else {
+            tcUrl += "/" + path;
+        }
     }
     
     if (app.empty()) {
-	// Get the application name
-	app = path;
-	
-	if (!query.empty()) {
-	    app = path;
-	    app += "?" + query;
-	}
+        // Get the application name
+        app = path;
+        
+        if (!query.empty()) {
+            app = path;
+            app += "?" + query;
+        }
     }
 
     if (swfUrl.empty()) {
-	swfUrl = "mediaplayer.swf";
+        swfUrl = "mediaplayer.swf";
     }
     if (pageUrl.empty()) {
-	pageUrl = "http://gnashdev.org";
+        pageUrl = "http://gnashdev.org";
     }
     
     if (netdebug) {
-	cerr << "URL is " << url << endl;
-	cerr << "Protocol is " << protocol << endl;
-	cerr << "Host is "  << hostname << endl;
-	cerr << "Port is "  << port << endl;
-	cerr << "Path is "  << path << endl;
-	cerr << "Filename is "  << filename << endl;
-	cerr << "App is "   << app << endl;
-	cerr << "Query is " << query << endl;
-	cerr << "tcUrl is " << tcUrl << endl;
-	cerr << "swfUrl is " << swfUrl << endl;
-	cerr << "pageUrl is " << pageUrl << endl;
+        cerr << "URL is " << url << endl;
+        cerr << "Protocol is " << protocol << endl;
+        cerr << "Host is "  << hostname << endl;
+        cerr << "Port is "  << port << endl;
+        cerr << "Path is "  << path << endl;
+        cerr << "Filename is "  << filename << endl;
+        cerr << "App is "   << app << endl;
+        cerr << "Query is " << query << endl;
+        cerr << "tcUrl is " << tcUrl << endl;
+        cerr << "swfUrl is " << swfUrl << endl;
+        cerr << "pageUrl is " << pageUrl << endl;
     }
 
     client.toggleDebug(netdebug);
     if (client.createClient(hostname, port) == false) {
-	log_error("Can't connect to RTMP server %s", hostname);
-	exit(-1);
+        log_error("Can't connect to RTMP server %s", hostname);
+        exit(-1);
     }
     
     client.handShakeRequest();
@@ -336,13 +336,13 @@ main(int argc, char *argv[])
     RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf2);
     
     if (msg1) {
-		msg1->dump();
-		if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-	    	log_debug("Sent NetConnection Connect message sucessfully");
-		} else {
-	    log_error("Couldn't send NetConnection Connect message,");
-	//	    exit(-1);
-		}
+        msg1->dump();
+        if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+            log_debug("Sent NetConnection Connect message sucessfully");
+        } else {
+        log_error("Couldn't send NetConnection Connect message,");
+    //      exit(-1);
+        }
     }
     
     // make the createStream for ID 3 encoded object
@@ -353,21 +353,21 @@ main(int argc, char *argv[])
     RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
     double streamID = 0.0;
     if (msg2) {
-	msg2->dump();
-	log_debug("Sent NetStream::createStream message successfully.");
-	std::vector<ElementSharedPtr> hell = msg2->getElements();
-	if (hell.size() > 0) {
-	    streamID = hell[0]->to_number();
-	} else {
-	    if (msg2->getMethodName() == "close") {	
-		log_debug("Got close packet!!! Exiting...");
-		exit(0);
-	    }
-	    streamID = 0.0;
-	}
+        msg2->dump();
+        log_debug("Sent NetStream::createStream message successfully.");
+        std::vector<ElementSharedPtr> hell = msg2->getElements();
+        if (hell.size() > 0) {
+            streamID = hell[0]->to_number();
+        } else {
+            if (msg2->getMethodName() == "close") { 
+            log_debug("Got close packet!!! Exiting...");
+            exit(0);
+            }
+            streamID = 0.0;
+        }
     } else {
-	log_error("Couldn't send NetStream::createStream message,");
-//	exit(-1);
+        log_error("Couldn't send NetStream::createStream message,");
+    //  exit(-1);
     }
     int id = int(streamID);
     log_debug("Stream ID returned from createStream is: %d", id);
@@ -382,49 +382,49 @@ main(int argc, char *argv[])
     if (msg3) {
         msg3->dump();
         if (msg3->getStatus() ==  RTMPMsg::NS_PLAY_START) {
-	    log_debug("Sent NetStream::play message sucessfully.");
-	} else {
-	    log_error("Couldn't send NetStream::play message,");
-//	    exit(-1);
-	}
+            log_debug("Sent NetStream::play message sucessfully.");
+        } else {
+            log_error("Couldn't send NetStream::play message,");
+//          exit(-1);
+        }
     }
 
     int loop = 20;
     do {
-	BufferSharedPtr msgs = client.recvMsg(1);	// use a 1 second timeout
-	if (msgs == 0) {
-	    log_error("Never got any data!");
-	    exit(-1);
-	}
-	RTMP::queues_t *que = client.split(msgs);
-	if (que == 0) {
-	    log_error("Never got any messages!");
-	    exit(-1);
-	}
+        BufferSharedPtr msgs = client.recvMsg(1);   // use a 1 second timeout
+        if (msgs == 0) {
+            log_error("Never got any data!");
+            exit(-1);
+        }
+        RTMP::queues_t *que = client.split(msgs);
+        if (que == 0) {
+            log_error("Never got any messages!");
+            exit(-1);
+        }
 
 #if 0
-	deque<CQue *>::iterator it;
-	for (it = que->begin(); it != que->end(); it++) {
-	    CQue *q = *(it);
-	    q->dump();
-	}
+        deque<CQue *>::iterator it;
+        for (it = que->begin(); it != que->end(); it++) {
+            CQue *q = *(it);
+            q->dump();
+        }
 #endif
-	while (que->size()) {
-	    cerr << "QUE SIZE: " << que->size() << endl;
-	    BufferSharedPtr ptr = que->front()->pop();
-	    if (!ptr->empty()) {
-			que->pop_front();	// delete the item from the queue
-			/* RTMP::rtmp_head_t *rthead = */ client.decodeHeader(ptr);
-			msg2 = client.decodeMsgBody(ptr);
-			if (msg2 == 0) {
-//		    	log_error("Couldn't process the RTMP message!");
-		    	continue;
-			}
-	    } else {
-			log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
-			break;
-	    }
-	}
+        while (que->size()) {
+            cerr << "QUE SIZE: " << que->size() << endl;
+            BufferSharedPtr ptr = que->front()->pop();
+            if (!ptr->empty()) {
+                que->pop_front();   // delete the item from the queue
+                /* RTMP::rtmp_head_t *rthead = */ client.decodeHeader(ptr);
+                msg2 = client.decodeMsgBody(ptr);
+                if (msg2 == 0) {
+    //              log_error("Couldn't process the RTMP message!");
+                    continue;
+                }
+            } else {
+                log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
+                break;
+            }
+        }
     } while(loop--);
 
 //     std::vector<amf::Element *> hell = msg2->getElements();
@@ -443,11 +443,11 @@ main(int argc, char *argv[])
 
 //     Element *eell = hell[0]->findProperty("level");
 //     if (eell) {
-// 	eell->dump();
+//  eell->dump();
 //     }
 //     *eell = hell[0]->findProperty("code");
 //     if (eell) {
-// 	eell->dump();
+//  eell->dump();
 //     }
 
 #if 0
@@ -483,22 +483,22 @@ version_and_copyright()
         "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute copies of Cygnal under the terms of the GNU General\n"
         "Public License.  For more information, see the file named COPYING.\n")
-    << endl;
+        << endl;
 }
 
 
 static void
 usage()
 {
-	cout << _("rtmpget -- a file downloaded that uses RTMP.") << endl
-	<< endl
-	<< _("Usage: rtmpget [options...] <url>") << endl
-	<< _("  -h,  --help          Print this help and exit") << endl
-	<< _("  -V,  --version       Print version information and exit") << endl
-	<< _("  -v,  --verbose       Output verbose debug info") << endl
-	<< _("  -n,  --netdebug      Verbose networking debug info") << endl
-	<< _("  -d,  --dump          display init file to terminal") << endl
-	<< endl;
+    cout << _("rtmpget -- a file downloaded that uses RTMP.") << endl
+        << endl
+        << _("Usage: rtmpget [options...] <url>") << endl
+        << _("  -h,  --help          Print this help and exit") << endl
+        << _("  -V,  --version       Print version information and exit") << endl
+        << _("  -v,  --verbose       Output verbose debug info") << endl
+        << _("  -n,  --netdebug      Verbose networking debug info") << endl
+        << _("  -d,  --dump          display init file to terminal") << endl
+        << endl;
 }
 
 // local Variables:
