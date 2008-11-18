@@ -46,45 +46,45 @@ class XMLNode : public virtual as_object
 {
 public:
 
-    typedef enum {
+    enum NodeType {
 
         /// Element
-        tElement = 1,
+        Element = 1,
 
         /// Attribute
-        tAttribute = 2,
+        Attribute = 2,
 
         /// Text
-        tText = 3,
+        Text = 3,
 
         /// CDATA section 
-        tCdata = 4,
+        Cdata = 4,
 
         /// Entity reference
-        tEntityRef = 5,
+        EntityRef = 5,
         
         /// Entity
-        tEntity = 6,
+        Entity = 6,
         
         /// Processing instruction
-        tProcInstr = 7,
+        ProcInstr = 7,
                 
         /// Comment
-        tComment = 8,
+        Comment = 8,
 
         /// Document
-        tDocument = 9,
+        Document = 9,
 
         /// Document type
-        tDocType = 10,
+        DocType = 10,
 
         /// Document fragment
-        tDocFgarment = 11,
+        DocFragment = 11,
 
         /// Notation
-        tNotation = 12
+        Notation = 12
 
-    } NodeType;
+    };
 
     XMLNode();
 
@@ -116,7 +116,8 @@ public:
     void nodeValueSet(const std::string& value) { _value = value; }
     //  nodeType 	XML.nodeType
 
-    ///  Returns true if the specified node has child nodes; otherwise, returns false.
+    ///  Returns true if the specified node has child nodes; otherwise,
+    ///  returns false.
     bool hasChildNodes();
 
     boost::intrusive_ptr<XMLNode> firstChild();

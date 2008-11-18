@@ -123,6 +123,7 @@ check_equals(typeof(tmp.status), 'number');
 check(! tmp.hasOwnProperty("status"));
 xcheck(tmp.__proto__.hasOwnProperty('status') );
 
+tmp = new XML();
 check_equals(tmp.status, 0);
 tmp.status = -1;
 check_equals(tmp.status, -1);
@@ -281,7 +282,6 @@ var xml_in = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNO
 // with comments stripped out.
 var xml_out = '<TOPNODE tna1="tna1val" tna2="tna2val" tna3="tna3val"><SUBNODE1 sna1="sna1val" sna2="sna2val"><SUBSUBNODE1 ssna1="ssna1val" ssna2="ssna2val">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /sub1 &lt;br&gt;&quot;node data 2&quot;</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>';
 //var xml_out = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /\sub1 \<br\>\"node data 2\"</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
-
 
 check(XML);
 tmp.checkParsed = function ()
