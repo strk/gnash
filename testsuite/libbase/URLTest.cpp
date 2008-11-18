@@ -234,9 +234,9 @@ main(int /*argc*/, char** /*argv*/)
 
     URL u29("rtmp://pms.youtube.com:443");
     check_equals (u29.protocol(), "rtmp");
-    xcheck_equals (u29.hostname(), "pms.youtube.com");
-    xcheck_equals (u29.port(), "443");
-    xcheck_equals (u29.path(), "");
+    check_equals (u29.hostname(), "pms.youtube.com");
+    check_equals (u29.port(), "443");
+    check_equals (u29.path(), "/");
 
 
 	// TODO: Samba paths
