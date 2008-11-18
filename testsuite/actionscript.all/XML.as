@@ -864,9 +864,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(370);
+		check_totals(375);
 #else
-		check_totals(410);
+		check_totals(415);
 #endif
 		play();
 	}
@@ -977,5 +977,18 @@ check_equals(h.toString(), "<open /><open />");
 h = new XML("<open><![CDATA[jlkjdc</open>");
 check_equals(h.toString(), "<open />");
 
+// Check DOCTYPE and xml declarations.
+
+check_equals(h.docTypeDecl, undefined);
+
+h = new XML("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><tag></tag>");
+
+check_equals(h.toString(), "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><tag />");
+check_equals(h.docTypeDecl, "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>");
+
+h = new XML("<!DOcTyPE text><tag></tag>");
+
+check_equals(h.toString(), "<!DOcTyPE text><tag />");
+check_equals(h.docTypeDecl, "<!DOcTyPE text>");
 stop();
 

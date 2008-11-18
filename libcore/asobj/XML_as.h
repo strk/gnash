@@ -61,12 +61,19 @@ public:
 
     /// Convert the XML object to a string
     //
-    /// This calls XMLNode::toString.
+    /// This calls XMLNode::toString after adding an xmlDecl and
+    /// docTypeDecl
+    //
     /// @param o        The ostream to write the string to.
     /// @param encode   Whether to URL encode the node values.
-    void toString(std::ostream& o, bool encode) const
-    {
-        XMLNode::toString(o, encode);
+    void toString(std::ostream& o, bool encode) const;
+
+    const std::string& getDocTypeDecl() const {
+        return _docTypeDecl;
+    }
+
+    void setDocTypeDecl(const std::string& docType) {
+        _docTypeDecl = docType;
     }
 
     /// This is overridden to provide the 'status' and 'loaded' members,
@@ -152,7 +159,11 @@ private:
     int _loaded;
 
     ParseStatus _status;	
-    
+ 
+    std::string _docTypeDecl;
+
+    std::string _xmlDecl;
+
 };
 
 
