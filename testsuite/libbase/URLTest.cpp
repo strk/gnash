@@ -226,6 +226,12 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals (u27.hostname(), "localhost");
 	check_equals (u27.path(), "/");
 
+    URL u28("rtmp://pms.youtube.com:443/");
+    check_equals (u28.protocol(), "rtmp");
+    check_equals (u28.hostname(), "pms.youtube.com");
+    check_equals (u28.port(), "443");
+    check_equals (u28.path(), "/");
+
 
 	// TODO: Samba paths
 }
