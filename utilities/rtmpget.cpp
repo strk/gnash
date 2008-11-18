@@ -158,7 +158,7 @@ main(int argc, char *argv[])
     string app;         // the application name
     string path;        // the path to the file on the server
     string query;       // any queries for the host
-    string filename;        // the filename to play
+    string filename;    // the filename to play
     string tcUrl;       // the tcUrl field
     string swfUrl;      // the swfUrl field
     string pageUrl;     // the pageUrl field
@@ -170,43 +170,43 @@ main(int argc, char *argv[])
         try {
             switch( code ) {
               case 'h':
-              version_and_copyright();
-              usage();
-              exit(0);
+                  version_and_copyright();
+                  usage();
+                  exit(0);
               case 'V':
-              version_and_copyright();
-              exit(0);
+                  version_and_copyright();
+                  exit(0);
               case 'v':
-              dbglogfile.setVerbosity();
-              log_debug (_("Verbose output turned on"));
-              break;
+                  dbglogfile.setVerbosity();
+                  log_debug (_("Verbose output turned on"));
+                  break;
               case 'a':
-              app = parser.argument(i);
-              break;
+                  app = parser.argument(i);
+                  break;
               case 'p':
-              path = parser.argument(i);
-              break;
+                  path = parser.argument(i);
+                  break;
               case 't':
-              tcUrl = parser.argument(i);
-              break;
+                  tcUrl = parser.argument(i);
+                  break;
               case 's':
-              swfUrl = parser.argument(i);
-              break;
+                  swfUrl = parser.argument(i);
+                  break;
               case 'f':
-              filename = parser.argument(i);
-              break;
+                  filename = parser.argument(i);
+                  break;
               case 'n':
-              netdebug = true;
-              break;
+                  netdebug = true;
+                  break;
               case 'd':
-              rcfile.dump();
-              exit(0);
-              break;
+                  rcfile.dump();
+                  exit(0);
+                  break;
               case 0:
-              infiles.push_back(parser.argument(i));
-              break;
+                  infiles.push_back(parser.argument(i));
+                  break;
               default:
-              log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
+                  log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
             }
         }
         
@@ -222,53 +222,40 @@ main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     
-    string url = infiles[0];
+    URL url( infiles[0] );
     string portstr;
     
     // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act, NULL);
 
-    // Take a standard URL apart.
-    string::size_type start = url.find(':', 0);
-    if (start != string::npos) {
-        protocol = url.substr(0, start);
-        start += 3;     // skip past the "://" part after the protocol
-    }
-    string::size_type end = url.find('/', start);
-    if (end != string::npos) {
-        string::size_type pos = url.find(':', start);
-        if (pos != string::npos) {
-            hostname = url.substr(start, pos - start);
-            portstr = url.substr(pos + 1, (end - pos) - 1);
-            port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
-        } else {
-            hostname = url.substr(start, end - start);
-            if ((protocol == "http") || (protocol == "rtmpt")) {
-                port = RTMPT_PORT;
-            }
-            if (protocol == "rtmp") {
-                port = RTMP_PORT;
-            }
+    protocol = url.protocol();
+    hostname = url.hostname();
+    log_debug("hostname: %s", hostname);
+    portstr = url.port();
+    query = url.querystring();
+
+    if ( portstr.empty() )
+    {
+        if ((protocol == "http") || (protocol == "rtmpt")) {
+            port = RTMPT_PORT;
         }
-        start = end;
+        if (protocol == "rtmp") {
+            port = RTMP_PORT;
+        }
     }
-    end = url.rfind('/');
-    if (end != string::npos) {
-        path = url.substr(start + 1, end - start - 1);
-        start = end;
-        filename = url.substr(end + 1);
+    else
+    {
+        port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
     }
 
-    start = path.find('?', 0);
-    if (start != string::npos) {
-        end = path.find('/', 0);
-        query = path.substr(0, end);
-        app = query;
-        path = path.substr(end, path.size());
-    } else {
-        app = path;
+
+    path = url.path();
+    string::size_type end = path.rfind('/');
+    if (end != string::npos) {
+        filename = path.substr(end + 1);
     }
+
 
     if (tcUrl.empty()) {
         tcUrl = protocol + "://" + hostname;
