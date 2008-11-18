@@ -483,11 +483,13 @@ Network::createClient(const string &hostname, short port)
 
     assert( ! connected() );
 
+#if 0
     if (port < 1024) {
         log_error(_("Can't connect to privileged port %hd"), port);
         _connected = false;
         return false;
     }
+#endif
 
     _port = port;    
     log_debug(_("%s: to host %s at port %d"), __FUNCTION__, hostname, port);
