@@ -152,18 +152,12 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity(rcfile.verbosityLevel());
     }    
 
-    RTMPClient client;    
-    short port = 0;
-    string protocol;        // the network protocol, rtmp or http
-    string app;         // the application name
-    string path;        // the path to the file on the server
-    string query;       // any queries for the host
-    string filename;    // the filename to play
-    string tcUrl;       // the tcUrl field
-    string swfUrl;      // the swfUrl field
-    string pageUrl;     // the pageUrl field
-    string hostname;        // the hostname of the server
-    
+    string app; // the application name
+    string path; // the path to the file on the server
+    string tcUrl; // the tcUrl field
+    string swfUrl; // the swfUrl field
+    string filename; // the filename to play
+
     // Handle command line arguments
     for( int i = 0; i < parser.arguments(); ++i ) {
         const int code = parser.code(i);
@@ -221,6 +215,13 @@ main(int argc, char *argv[])
         usage();
         return EXIT_FAILURE;
     }
+
+    RTMPClient client;    
+    short port = 0;
+    string protocol;        // the network protocol, rtmp or http
+    string query;       // any queries for the host
+    string pageUrl;     // the pageUrl field
+    string hostname;        // the hostname of the server
     
     URL url( infiles[0] );
     string portstr;
@@ -250,10 +251,17 @@ main(int argc, char *argv[])
     }
 
 
-    path = url.path();
-    string::size_type end = path.rfind('/');
-    if (end != string::npos) {
-        filename = path.substr(end + 1);
+    if ( path.empty() )
+    {
+        path = url.path();
+    }
+
+    if ( filename.empty() )
+    {
+        string::size_type end = path.rfind('/');
+        if (end != string::npos) {
+            filename = path.substr(end + 1);
+        }
     }
 
 
