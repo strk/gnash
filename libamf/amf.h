@@ -197,7 +197,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeXMLObject(gnash::Network::byte_t *data, size_t nbytes);
+    static boost::shared_ptr<Buffer> encodeXMLObject(const gnash::Network::byte_t *data, size_t nbytes);
 
     /// Encode a Typed Object to its serialized representation.
     //
@@ -217,7 +217,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeReference(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeReference(const gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Movie Clip (swf data) to its serialized representation.
     //
@@ -227,7 +227,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeMovieClip(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeMovieClip(const gnash::Network::byte_t *data, size_t size);
 
     /// Encode an ECMA Array to its serialized representation.
     //
@@ -240,7 +240,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeECMAArray(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeECMAArray(const gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Long String to its serialized representation.
     //
@@ -250,7 +250,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeLongString(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeLongString(const gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Record Set to its serialized representation.
     //
@@ -260,7 +260,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeRecordSet(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeRecordSet(const gnash::Network::byte_t *data, size_t size);
 
     /// Encode a Date to its serialized representation.
     //
@@ -268,7 +268,7 @@ public:
     /// 
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeDate(gnash::Network::byte_t *data);
+    static boost::shared_ptr<Buffer> encodeDate(const gnash::Network::byte_t *data);
 
     /// Encode a Strict Array to its serialized representation.
     //
@@ -281,7 +281,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeStrictArray(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeStrictArray(const gnash::Network::byte_t *data, size_t size);
     
     /// Encode an object to its serialized representation.
     //
@@ -312,6 +312,14 @@ public:
     /// @return a binary AMF packet in big endian format
     ///
     static boost::shared_ptr<Buffer> encodeElement(boost::shared_ptr<amf::Element> el);
+
+    /// Encode an Element to its serialized representation.
+    //
+    /// @param el the Element to encode.
+    ///
+    /// @return a binary AMF packet in big endian format
+    ///
+    static boost::shared_ptr<Buffer> encodeElement(const amf::Element& el);
 
     /// Encode a variable to its serialized representation.
     //

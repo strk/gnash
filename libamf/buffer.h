@@ -275,6 +275,8 @@ public:
     /// @return A real pointer to the base address of the Buffer.
     gnash::Network::byte_t *begin() { return _data.get() ; };
     gnash::Network::byte_t *reference() { return _data.get(); }
+    const gnash::Network::byte_t *reference() const { return _data.get(); }
+
     /// \brief Return the last address of the Buffer
     ///		Which is the base address plus the total size of the
     ///		Buffer.
