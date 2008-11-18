@@ -2544,17 +2544,27 @@ GtkGui::stopHook()
     // FIXME: this can't work for the stand-alone player, because
     // _drawingArea is
     // packed into a vbox.
-    if (! _xid) return;
+    if (! _xid)
+    {
+        // Assert they're either both initialised or both uninitialised
+        assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
+        if (_resumeButton) {
+            gtk_container_add(GTK_CONTAINER(_vbox), _resumeButton);
+        }
 
-    // Assert they're either both initialised or both uninitialised
-    assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
-
-    if (_drawingArea) {
-        gtk_container_remove(GTK_CONTAINER(_window), _drawingArea);
     }
-    
-    if (_resumeButton) {
-        gtk_container_add(GTK_CONTAINER(_window), _resumeButton);
+    else
+    {
+        // Assert they're either both initialised or both uninitialised
+        assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
+
+        if (_drawingArea) {
+            gtk_container_remove(GTK_CONTAINER(_window), _drawingArea);
+        }
+        
+        if (_resumeButton) {
+            gtk_container_add(GTK_CONTAINER(_window), _resumeButton);
+        }
     }
 
 }
@@ -2564,16 +2574,23 @@ GtkGui::playHook()
 {
     // FIXME: this can't work for the stand-alone player, because _drawingArea is
     // packed into a vbox.
-    if (! _xid) return;
-
-    // Assert they're either both initialised or both uninitialised
-    assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
-
-    if (_resumeButton) {
-        gtk_container_remove(GTK_CONTAINER(_window), _resumeButton);
+    if (! _xid)
+    {
+        if (_resumeButton) {
+            gtk_container_remove(GTK_CONTAINER(_vbox), _resumeButton);
+        }
     }
-    if (_drawingArea) {
-        gtk_container_add(GTK_CONTAINER(_window), _drawingArea);
+    else
+    {
+        // Assert they're either both initialised or both uninitialised
+        assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
+
+        if (_resumeButton) {
+            gtk_container_remove(GTK_CONTAINER(_window), _resumeButton);
+        }
+        if (_drawingArea) {
+            gtk_container_add(GTK_CONTAINER(_window), _drawingArea);
+        }
     }
 
 }

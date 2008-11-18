@@ -877,6 +877,8 @@ Gui::pause()
     	sound::sound_handler* s = _stage->runInfo().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
+
+        stopHook();
     }
 }
 
