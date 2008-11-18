@@ -1254,7 +1254,7 @@ HTTP::recvMsg(int fd)
 
     do {
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);	
-	size_t ret = net.readNet(fd, buf->reference(), buf->size(), 1);
+	int ret = net.readNet(fd, buf, 5);
 
 	cerr << __PRETTY_FUNCTION__ << ": " << (char *)buf->reference() << endl;
 	
@@ -1422,16 +1422,18 @@ http_handler(Handler::thread_params_t *args)
 	}
 
 	// See if the file is in the cache and already opened.
-	DiskStream *filestream = cache.findFile(www.getFilespec());
+	boost::shared_ptr<DiskStream> filestream(cache.findFile(www.getFilespec()));
 	if (filestream) {
 	    cerr << "FIXME: found file in cache!" << endl;
 	} else {
-	    filestream = new DiskStream;
+	  filestream.reset(new DiskStream);
 	}
 	
  	filestream->open(filespec);
+	filestream->loadChunk();
 	string response = cache.findResponse(www.getFilespec());
 	if (response.empty()) {
+	    cerr << "FIXME no hit for: " << www.getFilespec() << endl;
 	    www.clearHeader();
 	    const stringstream &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
 // 	    cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;	
@@ -1445,22 +1447,52 @@ http_handler(Handler::thread_params_t *args)
 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
 	    cache.addResponse(www.getFilespec(), www.getHeader());
 	} else {
-//	    cerr << "FIXME hit: " << www.getFilespec() << endl;
+	    cerr << "FIXME hit on: " << www.getFilespec() << endl;
 	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
 	}	
+
+	cerr << www.getHeader().c_str() << endl;
 
 	size_t filesize = filestream->getFileSize();
 	size_t bytes_read = 0;
 	int ret;
- 	do {
-	    boost::uint8_t *ptr = filestream->loadChunk();
-	    ret = www.writeNet(args->netfd, filestream->get(), filestream->getPagesize());
-	    bytes_read += ret;
- 	} while (bytes_read <= filesize);
-	cache.addFile(www.getFilespec(), filestream);
+	if (filesize) {
+#ifdef USE_STATS_CACHE
+	    struct timespec start;
+	    clock_gettime (CLOCK_REALTIME, &start);
+#endif
+	    size_t page = filestream->getPagesize();
+	    size_t getbytes = 0;
+	    if (filesize < filestream->getPagesize()) {
+		getbytes = filesize;
+	    } else {
+		getbytes = filestream->getPagesize();
+	    }
+	    do {
+		ret = www.writeNet(args->netfd, filestream->get(), filesize);
+		if (ret <= 0) {
+		    break;
+		}
+		bytes_read += ret;
+		page += filestream->getPagesize();
+		filestream->loadChunk(page);
+	    } while (bytes_read <= filesize);
+#ifdef USE_STATS_CACHE
+	    struct timespec end;
+	    clock_gettime (CLOCK_REALTIME, &end);
+	    double time = (end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9);
+	    cerr << "File " << www.getFilespec()
+		 << " transferred " << filesize << " bytes in: " << fixed
+		 << time << " seconds." << endl;
+#endif
+//	    filestream->close();
+	    cache.addFile(www.getFilespec(), filestream);
+	}
 	log_debug("http_handler all done now finally...");
 //	cache.dump();
 	return;
+
+
 #if 0
 	if (url != docroot) {
 	    log_debug (_("File to load is: %s"), filespec.c_str());
@@ -1478,11 +1510,13 @@ http_handler(Handler::thread_params_t *args)
 		// See if this is a persistant connection
 // 		if (!www.keepAlive()) {
 // 		    log_debug("Keep-Alive is off", www.keepAlive());
-// // 		    hand->closeConnection();
+		hand->closeConnection();
 //  		}
 	    }
 	}
 #endif
+
+
 	
 #ifdef USE_STATISTICS
 	struct timespec end;
@@ -1495,7 +1529,7 @@ http_handler(Handler::thread_params_t *args)
 //    } while(!hand->timetodie());
     } while(true);
     
-    log_debug("httphandler all done now finally...");
+    log_debug("http_handler all done now finally...");
     
 } // end of httphandler
     
