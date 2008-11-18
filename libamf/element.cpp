@@ -427,8 +427,7 @@ Element::encode()
 	*buf += TERMINATOR;
 	return buf;
     } else {
-	boost::shared_ptr<amf::Element> el(this);
-	return AMF::encodeElement(el);
+	    return AMF::encodeElement(*this);
     }
     
     return buf;
