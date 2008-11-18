@@ -321,7 +321,7 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
         childNode->nodeNameSet(tagName);
         childNode->nodeTypeSet(Element);
 
-        log_debug("created childNode with name %s", childNode->nodeName());
+        //log_debug("created childNode with name %s", childNode->nodeName());
         // Skip to the end of any whitespace after the tag name
         it = endName;
 
