@@ -1071,6 +1071,15 @@ Gui::getMovieInfo() const
     os << "SWF " << vm.getSWFVersion();
     topIter = tr->insert(topIter, StringPair("VM version", os.str()));
 
+    // This short-cut is to avoid a bug in movie_root's getMovieInfo,
+    // which relies on the availability of a _rootMovie for doing
+    // it's work, while we don't set it if we didn't start..
+    // 
+    if ( ! _started )
+    {
+        topIter = tr->insert(topIter, StringPair("Stage properties", "not constructed yet"));
+        return tr;
+    }
 
     movie_root& stage = vm.getRoot();
     stage.getMovieInfo(*tr, topIter);
