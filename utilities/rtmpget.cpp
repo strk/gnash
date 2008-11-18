@@ -22,16 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <csignal>
-#include <vector>
-#include <sys/mman.h>
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "gettext.h"
 
 // classes internal to Gnash
@@ -61,11 +51,23 @@
 #include <locale.h>
 #endif
 
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <csignal>
+#include <vector>
+#include <sys/mman.h>
+#include <cerrno>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/time_zone_base.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
+#include <boost/shared_ptr.hpp>
 
 using gnash::log_debug;
 using namespace std;
@@ -96,6 +98,9 @@ std::vector<std::string> infiles;
 // any of the threads are started, and it's value should never change,
 // it's safe to use these without a mutex, as all threads share the
 // same read-only value.
+
+typedef boost::shared_ptr<amf::Buffer> BufferSharedPtr;
+typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
 
 // end of globals
 
@@ -320,12 +325,12 @@ main(int argc, char *argv[])
     
     // Make a buffer to hold the handshake data.
     Buffer buf(1537);
-    RTMP::rtmp_head_t *rthead = 0;
-    int ret = 0;
+    // RTMP::rtmp_head_t *rthead = 0;
+    // int ret = 0;
     log_debug("Sending NetConnection Connect message,");
-    Buffer *buf2 = client.encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
-//    Buffer *buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
-//    Buffer *buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
+    BufferSharedPtr buf2 = client.encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
+//    BufferSharedPtr buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
+//    BufferSharedPtr buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
     buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
     size_t total_size = buf2->size();    
     RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf2);
@@ -342,7 +347,7 @@ main(int argc, char *argv[])
     
     // make the createStream for ID 3 encoded object
     log_debug("Sending NetStream::createStream message,");
-    Buffer *buf3 = client.encodeStream(0x2);
+    BufferSharedPtr buf3 = client.encodeStream(0x2);
 //    buf3->dump();
     total_size = buf3->size();
     RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
@@ -350,7 +355,7 @@ main(int argc, char *argv[])
     if (msg2) {
 	msg2->dump();
 	log_debug("Sent NetStream::createStream message successfully.");
-	std::vector<amf::Element *> hell = msg2->getElements();
+	std::vector<ElementSharedPtr> hell = msg2->getElements();
 	if (hell.size() > 0) {
 	    streamID = hell[0]->to_number();
 	} else {
@@ -369,8 +374,8 @@ main(int argc, char *argv[])
     
     // make the NetStream::play() operations for ID 2 encoded object
 //    log_debug("Sending NetStream play message,");
-    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, filename.c_str());
-//    Buffer *buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
+    BufferSharedPtr buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, filename.c_str());
+//    BufferSharedPtr buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
 //     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
     total_size = buf4->size();
     RTMPMsg *msg3 = client.sendRecvMsg(0x8, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf4);
@@ -386,7 +391,7 @@ main(int argc, char *argv[])
 
     int loop = 20;
     do {
-	Buffer *msgs = client.recvMsg(1);	// use a 1 second timeout
+	BufferSharedPtr msgs = client.recvMsg(1);	// use a 1 second timeout
 	if (msgs == 0) {
 	    log_error("Never got any data!");
 	    exit(-1);
@@ -406,18 +411,18 @@ main(int argc, char *argv[])
 #endif
 	while (que->size()) {
 	    cerr << "QUE SIZE: " << que->size() << endl;
-	    Buffer *ptr = que->front()->pop();
-	    if ((ptr->size() >= 0) && (ptr->size() <= 0xffff)) {
-		que->pop_front();	// delete the item from the queue
-		RTMP::rtmp_head_t *rthead = client.decodeHeader(ptr);
-		msg2 = client.decodeMsgBody(ptr);
-		if (msg2 == 0) {
-//		    log_error("Couldn't process the RTMP message!");
-		    continue;
-		}
+	    BufferSharedPtr ptr = que->front()->pop();
+	    if (!ptr->empty()) {
+			que->pop_front();	// delete the item from the queue
+			/* RTMP::rtmp_head_t *rthead = */ client.decodeHeader(ptr);
+			msg2 = client.decodeMsgBody(ptr);
+			if (msg2 == 0) {
+//		    	log_error("Couldn't process the RTMP message!");
+		    	continue;
+			}
 	    } else {
-		log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
-		break;
+			log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
+			break;
 	    }
 	}
     } while(loop--);
@@ -487,7 +492,7 @@ usage()
 {
 	cout << _("rtmpget -- a file downloaded that uses RTMP.") << endl
 	<< endl
-	<< _("Usage: rtmpget     [options...]") << endl
+	<< _("Usage: rtmpget [options...] <url>") << endl
 	<< _("  -h,  --help          Print this help and exit") << endl
 	<< _("  -V,  --version       Print version information and exit") << endl
 	<< _("  -v,  --verbose       Output verbose debug info") << endl
