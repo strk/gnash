@@ -266,6 +266,10 @@ crash-0.8.0-huffmann-table-5.swf:6819164ec8cc6299bbd6d0d05a7428d8
 crash-0.8.0-huffmann-table-6.swf:a269bc06dd35de125087b2444622f130
 crash-0.8.0-huffmann-table-7.swf:2134c93509e1fc5d2eff527e79e1ea60
 crash-0.8.0-huffmann-table-8.swf:4548f1e9d10a5cd70852c367c8f39af6
+crash-0.8.2-copyPixels-5.swf:54ff82671f1aed95c9af6812ec84a559
+crash-0.8.2-copyPixels-6.swf:b683c00022ef469dcd5b3d9312e1b6f6
+crash-0.8.2-copyPixels-7.swf:490a05f3e8637f23fae76fbd9ff921a7
+crash-0.8.2-copyPixels-8.swf:135d28bfa9d79977c26e6dd61885103c
 crash-0.8.2-gotoAndPlay-5.swf:8b4ebc57963ce4c0b8c80a1ba79a2ed0
 crash-0.8.2-gotoAndPlay-6.swf:808289d1821d14debfaea5aca5f14273
 crash-0.8.2-gotoAndPlay-7.swf:434c0a520e86655e14ac3767cb745dbc
@@ -1166,6 +1170,9 @@ with-outobject-8.swf:914a0e922ae9d4b1b933b33d7abc2502
 with-prototypes-5.swf:4fbad4d181fef388e50d993d61c16917
 with-prototypes-6.swf:6b9dcb482fe520cbc9dc4a8456688905
 with-prototypes-7.swf:20f1f3b8905c8a3f3a61cb18e7e59e76
+xml-cdata-6.swf:d7559375e07591033d7739671a8c4d42
+xml-cdata-7.swf:5e51dafbe7f6af8206041ecabf0016f8
+xml-cdata-8.swf:d5537f4fb83eaf49d615eecb89b2ae95
 xml-init-5.swf:2ba1da174f2b1958749fede5667a60c4
 xml-init-5.swf:bb54cac64e38396084a147266f7d9711
 xml-node-init-5.swf:12fd3762a2bfa787b01fc0b8abfaa492

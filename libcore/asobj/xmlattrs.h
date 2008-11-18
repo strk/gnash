@@ -18,20 +18,7 @@
 #ifndef GNASH_XML_ATTRS_H
 #define GNASH_XML_ATTRS_H
 
-//#define DEBUG_MEMORY_ALLOCATION 1
-#include "as_object.h" // for inheritance
-
 #include "log.h"
-
-#include <vector>
-
-#ifdef DEBUG_MEMORY_ALLOCATION
-	#include "log.h"
-#endif
-
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/xmlreader.h>
 
 namespace gnash {
   
@@ -60,29 +47,12 @@ private:
 
     std::string _name;
     std::string _value;
-    xmlAttributeType _type;
     
 };
 
-/// XML Attribute ActionScript Object
-class xmlattr_as_object : public as_object
-{
-public:
-    //XMLAttr obj;
-    int   padding;
-#ifdef DEBUG_MEMORY_ALLOCATION
-    xmlattr_as_object() {
-        log_debug("\t\tCreating xmlattr_as_object at %p\n", this);
-    };
-    ~xmlattr_as_object() {
-        log_debug("\tDeleting xmlattr_as_object at %p \n", this);
-    };
-#endif
-};
- 
 } // end of gnash namespace
 
-#endif	// __XML_ATTRS_H__
+#endif
 
 
 // Local Variables:
