@@ -68,11 +68,13 @@ namespace {
     as_value xml_getbytestotal(const fn_call& fn);
     as_value xml_parsexml(const fn_call& fn);
     as_value xml_ondata(const fn_call& fn);
+    as_value xml_xmlDecl(const fn_call& fn);
+    as_value xml_docTypeDecl(const fn_call& fn);
 
     bool textAfterWhitespace(const std::string& xml,
             std::string::const_iterator& it);
     bool textMatch(const std::string& xml, std::string::const_iterator& it,
-            const std::string& match);
+            const std::string& match, bool advance = true);
     bool parseNodeWithTerminator(const std::string& xml,
             std::string::const_iterator& it, const std::string& terminator,
             std::string& content);
@@ -112,10 +114,10 @@ XML_as::getEntities()
 
     static Entities entities = boost::assign::map_list_of
         ("&amp;", "&")
-        ("&apos;", "\"")
+        ("&quot;", "\"")
         ("&lt;", "<")
         ("&gt;", ">")
-        ("&quot;", "'");
+        ("&apos;", "'");
 
     return entities;
 
@@ -144,6 +146,15 @@ XML_as::unescape(std::string& text)
         boost::replace_all(text, i->first, i->second);
     }
 
+}
+
+void
+XML_as::toString(std::ostream& o, bool encode) const
+{
+    if (!_xmlDecl.empty()) o << _xmlDecl;
+    if (!_docTypeDecl.empty()) o << _docTypeDecl;
+
+    XMLNode::toString(o, encode);
 }
 
 bool
@@ -266,22 +277,40 @@ XML_as::parseAttribute(XMLNode* node, const std::string& xml,
 
 }
 
+/// Parse and set the docTypeDecl. This is stored without any validation and
+/// with the same case as in the parsed XML.
 void
-XML_as::parseDocTypeDecl(XMLNode* /*node*/, const std::string& xml,
-    std::string::const_iterator& it)
+XML_as::parseDocTypeDecl(const std::string& xml,
+        std::string::const_iterator& it)
 {
     std::string content;
-    parseNodeWithTerminator(xml, it, ">", content);
+    if (!parseNodeWithTerminator(xml, it, ">", content))
+    {
+        _status = XML_UNTERMINATED_DOCTYPE_DECL;
+        return;
+    }
+    std::ostringstream os;
+    os << '<' << content << '>';
+    _docTypeDecl = os.str();
 }
 
+
 void
-XML_as::parseXMLDecl(XMLNode* /*node*/, const std::string& xml,
-    std::string::const_iterator& it)
+XML_as::parseXMLDecl(const std::string& xml, std::string::const_iterator& it)
 {
     std::string content;
-    parseNodeWithTerminator(xml, it, "?>", content);
+    if (!parseNodeWithTerminator(xml, it, "?>", content))
+    {
+        _status = XML_UNTERMINATED_XML_DECL;
+        return;
+    }
 
-    // Handle content.
+    std::ostringstream os;
+    os << "<" << content << "?>";
+
+    // This is appended to any xmlDecl already there.
+    _xmlDecl += os.str();
+
 }
 
 // The iterator should be pointing to the first char after the '<'
@@ -476,13 +505,17 @@ XML_as::parseXML(const std::string& xml)
         if (*it == '<')
         {
             ++it;
-            if (textMatch(xml, it, "!DOCTYPE"))
+            if (textMatch(xml, it, "!DOCTYPE", false))
             {
-                parseDocTypeDecl(node, xml, it);
+                // We should not advance past the DOCTYPE label, as
+                // the case is preserved.
+                parseDocTypeDecl(xml, it);
             }
-            else if (textMatch(xml, it, "?xml"))
+            else if (textMatch(xml, it, "?xml", false))
             {
-                parseXMLDecl(node, xml, it);
+                // We should not advance past the xml label, as
+                // the case is preserved.
+                parseXMLDecl(xml, it);
             }
             else if (textMatch(xml, it, "!--"))
             {
@@ -514,8 +547,9 @@ XML_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
     _children.clear();
-
     _attributes.clear();
+    _docTypeDecl.clear();
+    _xmlDecl.clear();
 }
 
 bool
@@ -585,6 +619,8 @@ attachXMLInterface(as_object& o)
                 LoadableObject::loadableobject_sendAndLoad), flags);
     o.init_member("onData", new builtin_function(xml_ondata), flags);
 
+    o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
+    o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
 }
 
 as_object*
@@ -735,11 +771,53 @@ xml_parsexml(const fn_call& fn)
     return as_value();
 }
 
+as_value
+xml_xmlDecl(const fn_call& fn)
+{
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // Getter
+        const std::string& xml = ptr->getXMLDecl();
+        if (xml.empty()) return as_value();
+        return as_value(xml);
+    }
+
+    // Setter
+
+    const std::string& xml = fn.arg(0).to_string();
+    ptr->setDocTypeDecl(xml);
+    
+    return as_value();
+
+}
+
+as_value
+xml_docTypeDecl(const fn_call& fn)
+{
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // Getter
+        const std::string& docType = ptr->getDocTypeDecl();
+        if (docType.empty()) return as_value();
+        return as_value(docType);
+    }
+
+    // Setter
+
+    const std::string& docType = fn.arg(0).to_string();
+    ptr->setDocTypeDecl(docType);
+    
+    return as_value();
+
+}
 
 as_value
 xml_ondata(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
 
     as_object* thisPtr = fn.this_ptr.get();
     assert(thisPtr);
@@ -765,11 +843,11 @@ xml_ondata(const fn_call& fn)
 }
 
 /// Case insenstive match of a string, returning false if there too few
-/// characters left or if there is no match. If there is a match, the
-/// iterator points to the character after the match.
+/// characters left or if there is no match. If there is a match, and advance
+/// is not false, the iterator points to the character after the match.
 bool
 textMatch(const std::string& xml, std::string::const_iterator& it,
-        const std::string& match)
+        const std::string& match, bool advance)
 {
 
     const std::string::size_type len = match.length();
@@ -780,7 +858,7 @@ textMatch(const std::string& xml, std::string::const_iterator& it,
     if (!std::equal(it, it + len, match.begin(), boost::is_iequal())) {
         return false;
     }
-    it += len;
+    if (advance) it += len;
     return true;
 }
 

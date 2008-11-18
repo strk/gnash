@@ -211,7 +211,7 @@ public:
     /// @param encode   Whether to URL encode the node values. This
     ///                 is false by default, as it is only necessary
     ///                 for XML.sendAndLoad.
-    void toString(std::ostream& str, bool encode = false) const;
+    virtual void toString(std::ostream& str, bool encode = false) const;
 
     // We might turn this back to a dumb pointer, as long
     // as we'll make sure in the XMLNode destructor and
