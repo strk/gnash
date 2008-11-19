@@ -560,8 +560,8 @@ connection_handler(Handler::thread_params_t *args)
 	} else {		// single threaded
 	    log_debug("Single threaded mode for fd #%d", args->netfd);
 	    args->handler = hand;
-//	    dispatch_handler(args);
-	    http_handler(args);
+	    dispatch_handler(args);
+//	    http_handler(args);
 	}
 	//
 	log_debug("Restarting loop for next connection for port %d...", args->port);
