@@ -853,15 +853,15 @@ Network::writeNet(amf::Buffer *buffer)
 };
 
 int
-Network::writeNet(const std::string& buffer)
+Network::writeNet(const std::string& data)
 {
-    return writeNet(reinterpret_cast<const byte_t *>(buffer.c_str()), buffer.size());
+    return writeNet(reinterpret_cast<const byte_t *>(data.c_str()), data.size());
 }
 
 int
-Network::writeNet(const byte_t *buffer, int nbytes)
+Network::writeNet(const byte_t *data, int nbytes)
 {
-    return writeNet(_sockfd, buffer, nbytes, _timeout);
+    return writeNet(_sockfd, data, nbytes, _timeout);
 }
 
 // int
@@ -877,9 +877,9 @@ Network::writeNet(const byte_t *buffer, int nbytes)
 // }
 
 int
-Network::writeNet(int fd, const byte_t *buffer, int nbytes)
+Network::writeNet(int fd, const byte_t *data, int nbytes)
 {
-    return writeNet(fd, buffer, nbytes, _timeout);
+    return writeNet(fd, data, nbytes, _timeout);
 }
 
 int

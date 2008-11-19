@@ -170,8 +170,8 @@ public:
     ///
     /// @return The number of bytes read.
     int writeNet(amf::Buffer *buffer);
-    int writeNet(const std::string &buffer);
-    int writeNet(const byte_t *buffer, int nbytes);
+    int writeNet(const std::string &data);
+    int writeNet(const byte_t *data, int nbytes);
 //    int writeNet(int fd, const byte_t *buffer);
     int writeNet(int fd, const byte_t *buffer, int nbytes);
     int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
