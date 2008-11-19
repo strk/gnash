@@ -622,6 +622,12 @@ action_buffer::getDefinitionURL() const
     return _src.get_url();
 }
 
+int
+action_buffer::getDefinitionVersion() const
+{
+    return _src.get_version();
+}
+
 }
 
 // Local Variables:

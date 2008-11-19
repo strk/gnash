@@ -238,7 +238,11 @@ public:
 	///
 	void process_decl_dict(size_t start_pc, size_t stop_pc) const;
 
+    /// Return url of the SWF this action block was found in
 	const std::string& getDefinitionURL() const;
+
+    /// Return version of the SWF this action block was found in
+	int getDefinitionVersion() const;
 
 private:
 

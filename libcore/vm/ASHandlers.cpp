@@ -839,10 +839,11 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
 {
     as_environment& env = thread.env;
 
-    // FIXME: we should be using version of the SWF containing
-    //        this opcode, not version of the top-level SWF !!
+    // NOTE: I've tested that we should change behaviour
+    //       based on code definition version, not top-level
+    //       SWF version. Just not automated yet.
     //
-    const int version = env.get_version();
+    const int version = thread.code.getDefinitionVersion();
     if ( version > 5 )
     {
         // when SWF version is > 5 we compute the multi-byte length
@@ -3021,7 +3022,11 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
     if (v1.is_string() || v2.is_string() )
     {
-        const int version = env.get_version();
+        // NOTE: I've tested that we should change behaviour
+        //       based on code definition version, not top-level
+        //       SWF version. Just not automated yet.
+        //
+        const int version = thread.code.getDefinitionVersion();
         v2.convert_to_string_versioned(version);
         v2.string_concat(v1.to_string_versioned(version));
         env.top(1) = v2;
