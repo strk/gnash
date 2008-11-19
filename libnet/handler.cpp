@@ -289,10 +289,10 @@ Handler::start(thread_params_t *args)
     log_debug(_("Starting Handlers for port %d, tid %ld"),
 	      args->port, get_thread_id());
 
-    struct pollfd *fds;
+    struct pollfd fds; // FIXME: never initialized ?
     int nfds = 1;
     Network net;
-    boost::shared_ptr<vector<struct pollfd> > hits = net.waitForNetData(nfds, fds);
+    boost::shared_ptr<vector<struct pollfd> > hits = net.waitForNetData(nfds, &fds);
     vector<int>::const_iterator it;
 #if 0
     for (it = _pollfds.begin(); it != _pollfds.end(); it++) {
@@ -330,8 +330,8 @@ netin_handler(Handler::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 
-    Network *net = reinterpret_cast<Network *>(args->handler);
-    size_t ret;
+    //Network *net = reinterpret_cast<Network *>(args->handler);
+    size_t ret=0;
 
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
     
