@@ -653,7 +653,7 @@ Buffer::resize(size_t size)
 	// deleted when this method returns.
 	// We loose data if we resize smaller than the data currently held.
 	if (size < used) {
-	    log_error("Truncating data (%d bytes) while resizing!", used - size);
+	    log_error("amf::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
 	    used = size;
 	}
 	Network::byte_t *newptr = new Network::byte_t[size];

@@ -297,6 +297,16 @@ Element::to_reference()
     return 0;
 };
 
+const gnash::Network::byte_t *
+Element::to_reference() const
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_buffer) {
+	return _buffer->reference();
+    }
+    return 0;
+};
+
 /// \brief Test equivalance against another Element.
 ///	This compares all the data and the data type in the
 ///	current Element with the supplied one, so it can be a
@@ -417,8 +427,7 @@ Element::encode()
 	*buf += TERMINATOR;
 	return buf;
     } else {
-	boost::shared_ptr<amf::Element> el(this);
-	return AMF::encodeElement(el);
+	    return AMF::encodeElement(*this);
     }
     
     return buf;
@@ -1193,7 +1202,7 @@ Element::makeDate(Network::byte_t *date)
 ///
 /// @return The size of the name string.
 size_t
-Element::getNameSize()
+Element::getNameSize() const
 {
 //    GNASH_REPORT_FUNCTION;
     if (_name) {

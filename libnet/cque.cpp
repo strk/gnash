@@ -140,6 +140,7 @@ CQue::peek()
     if (_que.size()) {
         return _que.front();
     }
+    return boost::shared_ptr<amf::Buffer>();
 }
 
 // Return the size of the queues
