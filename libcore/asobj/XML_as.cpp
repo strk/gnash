@@ -154,7 +154,7 @@ XML_as::toString(std::ostream& o, bool encode) const
     if (!_xmlDecl.empty()) o << _xmlDecl;
     if (!_docTypeDecl.empty()) o << _docTypeDecl;
 
-    XMLNode::toString(o, encode);
+    XMLNode_as::toString(o, encode);
 }
 
 bool
@@ -208,7 +208,7 @@ XML_as::set_member(string_table::key name, const as_value& val,
 }
 
 void
-XML_as::parseAttribute(XMLNode* node, const std::string& xml,
+XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
         std::string::const_iterator& it)
 {
 
@@ -324,7 +324,7 @@ XML_as::parseXMLDecl(const std::string& xml, std::string::const_iterator& it)
 
 // The iterator should be pointing to the first char after the '<'
 void
-XML_as::parseTag(XMLNode*& node, const std::string& xml,
+XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
     std::string::const_iterator& it)
 {
     //log_debug("Processing node: %s", node->nodeName());
@@ -355,7 +355,7 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
 
     if (!closing) {
 
-        XMLNode* childNode = new XMLNode;
+        XMLNode_as* childNode = new XMLNode_as;
         childNode->nodeNameSet(tagName);
         childNode->nodeTypeSet(Element);
 
@@ -411,7 +411,7 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
     }
     else {
         // Malformed. Search for the parent node.
-        XMLNode* s = node;
+        XMLNode_as* s = node;
         while (s && !noCaseCompare(s->nodeName(), tagName)) {
             //log_debug("parent: %s, this: %s", s->nodeName(), tagName);
             s = s->getParent();
@@ -429,7 +429,7 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
 }
 
 void
-XML_as::parseText(XMLNode* node, const std::string& xml, 
+XML_as::parseText(XMLNode_as* node, const std::string& xml, 
         std::string::const_iterator& it)
 {
     std::string::const_iterator end = std::find(it, xml.end(), '<');
@@ -440,9 +440,9 @@ XML_as::parseText(XMLNode* node, const std::string& xml,
     if (ignoreWhite() && 
         content.find_first_not_of("\t\r\n ") == std::string::npos) return;
 
-    XMLNode* childNode = new XMLNode;
+    XMLNode_as* childNode = new XMLNode_as;
 
-    childNode->nodeTypeSet(XMLNode::Text);
+    childNode->nodeTypeSet(XMLNode_as::Text);
 
     // Replace any entitites.
     unescape(content);
@@ -456,7 +456,7 @@ XML_as::parseText(XMLNode* node, const std::string& xml,
 
 
 void
-XML_as::parseComment(XMLNode* /*node*/, const std::string& xml, 
+XML_as::parseComment(XMLNode_as* /*node*/, const std::string& xml, 
         std::string::const_iterator& it)
 {
     log_debug("discarding comment node");
@@ -472,7 +472,7 @@ XML_as::parseComment(XMLNode* /*node*/, const std::string& xml,
 }
 
 void
-XML_as::parseCData(XMLNode* node, const std::string& xml, 
+XML_as::parseCData(XMLNode_as* node, const std::string& xml, 
         std::string::const_iterator& it)
 {
     std::string content;
@@ -482,7 +482,7 @@ XML_as::parseCData(XMLNode* node, const std::string& xml,
         return;
     }
 
-    XMLNode* childNode = new XMLNode;
+    XMLNode_as* childNode = new XMLNode_as;
     childNode->nodeValueSet(content);
     childNode->nodeTypeSet(Text);
     node->appendChild(childNode);
@@ -507,7 +507,7 @@ XML_as::parseXML(const std::string& xml)
     
 
     std::string::const_iterator it = xml.begin();
-    XMLNode* node = this;
+    XMLNode_as* node = this;
 
     while (it != xml.end() && _status == XML_OK)
     {
@@ -700,9 +700,9 @@ xml_createelement(const fn_call& fn)
     if (fn.nargs > 0)
     {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode *xml_obj = new XMLNode;
+        XMLNode_as *xml_obj = new XMLNode_as;
         xml_obj->nodeNameSet(text);
-        xml_obj->nodeTypeSet(XMLNode::Text);
+        xml_obj->nodeTypeSet(XMLNode_as::Text);
 
         return as_value(xml_obj);
         
@@ -728,9 +728,9 @@ xml_createtextnode(const fn_call& fn)
 
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode* xml_obj = new XMLNode;
+        XMLNode_as* xml_obj = new XMLNode_as;
         xml_obj->nodeValueSet(text);
-        xml_obj->nodeTypeSet(XMLNode::Text);
+        xml_obj->nodeTypeSet(XMLNode_as::Text);
         return as_value(xml_obj);
     }
     else {

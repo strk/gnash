@@ -255,7 +255,8 @@ xcheck_equals(ns.getNamespaceForPrefix(""), "standard");
 xcheck_equals(ns.getPrefixForNamespace("standard"), "");
 check_equals(ns.getPrefixForNamespace("standard2"), undefined);
 
-// Multiple definition of prefix (first one counts, second never defined).
+// Multiple definition of prefix during parsing (first one counts,
+// second never defined). Can be changed later using attributes.
 x = new XML('<tag xmlns:n1="ns1" xmlns:n1="ns2"></tag>');
 ns = x.firstChild;
 check_equals(ns.nodeName, "tag");
@@ -319,4 +320,4 @@ check_equals(ns.nodeName, "tag");
 check_equals(ns.localName, "tag");
 check_equals(ns.prefix, "");
 
-check_totals(134);
+check_totals(152);

@@ -36,7 +36,7 @@ class URL;
 class LoaderThread;
 
 /// XML class and ActionScript object
-class XML_as : public XMLNode, public LoadableObject
+class XML_as : public XMLNode_as, public LoadableObject
 {
 public:
 
@@ -109,25 +109,25 @@ public:
     ///
     void parseXML(const std::string& xml);
 
-    void parseTag(XMLNode*& node, const std::string& xml, 
+    void parseTag(XMLNode_as*& node, const std::string& xml, 
             std::string::const_iterator& it);
 
-    void parseAttribute(XMLNode* node, const std::string& xml, 
+    void parseAttribute(XMLNode_as* node, const std::string& xml, 
             std::string::const_iterator& it);
 
     void parseDocTypeDecl(const std::string& xml, 
             std::string::const_iterator& it);
 
-    void parseText(XMLNode* node, const std::string& xml, 
+    void parseText(XMLNode_as* node, const std::string& xml, 
             std::string::const_iterator& it);
 
     void parseXMLDecl(const std::string& xml, 
             std::string::const_iterator& it);
 
-    void parseComment(XMLNode* node, const std::string& xml, 
+    void parseComment(XMLNode_as* node, const std::string& xml, 
             std::string::const_iterator& it);
 
-    void parseCData(XMLNode* node, const std::string& xml, 
+    void parseCData(XMLNode_as* node, const std::string& xml, 
             std::string::const_iterator& it);
  
     // An event handler that returns a what?
@@ -143,9 +143,9 @@ public:
     /// Note this is not the same as a URL unescape.
     static void unescape(std::string& text);
 
-    XMLNode* createElement(const std::string& name);
+    XMLNode_as* createElement(const std::string& name);
 
-    XMLNode* createTextNode(const std::string& name);
+    XMLNode_as* createTextNode(const std::string& name);
 
 private:
 

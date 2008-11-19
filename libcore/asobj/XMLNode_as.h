@@ -38,7 +38,7 @@ namespace gnash {
 /// This is also the base class for the XML actionscript class (see
 /// XML_as.cpp, XML_as.h). Because XML_as also inherits from LoadableObject,
 /// this is a virtual base class.
-class XMLNode : public virtual as_object
+class XMLNode_as : public virtual as_object
 {
 public:
 
@@ -82,10 +82,10 @@ public:
 
     };
 
-    XMLNode();
+    XMLNode_as();
 
-    XMLNode(const XMLNode &node, bool deep);
-    virtual ~XMLNode();
+    XMLNode_as(const XMLNode_as &node, bool deep);
+    virtual ~XMLNode_as();
 
     size_t length() const { return _children.size(); }
 
@@ -123,11 +123,11 @@ public:
     ///  returns false.
     bool hasChildNodes();
 
-    boost::intrusive_ptr<XMLNode> firstChild();
-    boost::intrusive_ptr<XMLNode> lastChild();
+    boost::intrusive_ptr<XMLNode_as> firstChild();
+    boost::intrusive_ptr<XMLNode_as> lastChild();
     
     // Use a list for quick erasing
-    typedef std::list< boost::intrusive_ptr<XMLNode> > Children;
+    typedef std::list< boost::intrusive_ptr<XMLNode_as> > Children;
 
     typedef std::vector< XMLAttr > Attributes;
 
@@ -135,7 +135,7 @@ public:
 
     Attributes& attributes() { return _attributes; }
     
-    XMLNode& operator = (XMLNode &node) {
+    XMLNode_as& operator = (XMLNode_as &node) {
         log_debug("%s: \n", __PRETTY_FUNCTION__);
         if (this == &node) return *this;
         _name = node._name;
@@ -145,14 +145,14 @@ public:
         return *this;
     }
     
-    XMLNode& operator = (XMLNode *node)
+    XMLNode_as& operator = (XMLNode_as *node)
     {
 	    assert(node);
 	    return (*this = *node);
     }
 
-    XMLNode* previousSibling();
-    XMLNode* nextSibling();
+    XMLNode_as* previousSibling();
+    XMLNode_as* nextSibling();
 
     /// Copy a node
     //
@@ -161,7 +161,7 @@ public:
     /// is set to true, all child nodes are recursively cloned, resulting
     /// in an exact copy of the original object's document tree. 
     ///
-    boost::intrusive_ptr<XMLNode> cloneNode(bool deep);
+    boost::intrusive_ptr<XMLNode_as> cloneNode(bool deep);
 
     /// Append a child node the the XML object
     //
@@ -176,15 +176,15 @@ public:
     /// its existing parent node. 
     ///
     /// @param as
-    ///	   The XMLNode ?
+    ///	   The XMLNode_as ?
     ///
     /// @param node
-    ///	   same as XMLNode::obj ?
+    ///	   same as XMLNode_as::obj ?
     ///
-    void appendChild(boost::intrusive_ptr<XMLNode> childNode);
+    void appendChild(boost::intrusive_ptr<XMLNode_as> childNode);
 
-    void setParent(XMLNode *node) { _parent = node; };
-    XMLNode *getParent() { return _parent.get(); };
+    void setParent(XMLNode_as *node) { _parent = node; };
+    XMLNode_as *getParent() { return _parent.get(); };
 
     /// Insert a node before a node
     //
@@ -201,8 +201,8 @@ public:
     ///     The node before which to insert the new one.
     ///     Must be a child of this XMLNode or the operation will fail.
     ///
-    void insertBefore(boost::intrusive_ptr<XMLNode> newnode, 
-            boost::intrusive_ptr<XMLNode> pos);
+    void insertBefore(boost::intrusive_ptr<XMLNode_as> newnode, 
+            boost::intrusive_ptr<XMLNode_as> pos);
 
     /// Removes the specified XML object from its parent.
     //
@@ -225,7 +225,7 @@ public:
     // as we'll make sure in the XMLNode destructor and
     // any child cleaning interface to set child parent
     // to NULL
-    boost::intrusive_ptr<XMLNode> _parent;
+    boost::intrusive_ptr<XMLNode_as> _parent;
 
     Children _children;
     Attributes _attributes;
@@ -255,21 +255,21 @@ private:
 
     std::string _namespaceURI;
 
-    static void stringify(const XMLNode& xml, std::ostream& xmlout,
+    static void stringify(const XMLNode_as& xml, std::ostream& xmlout,
             bool encode);
 
 };
 
 // Initialize the global XMLNode class
-void XMLNode_class_init(as_object& global);
+void xmlnode_class_init(as_object& global);
 
-// External, used by getXMLInterface() !
+// Used by XML_as
 as_object* getXMLNodeInterface();
 
-} // end of gnash namespace
+} // gnash namespace
 
 
-#endif	// __XMLNODE_NODE_H__
+#endif	
 
 
 // Local Variables:
