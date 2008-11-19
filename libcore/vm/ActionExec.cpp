@@ -149,8 +149,8 @@ ActionExec::operator() ()
 #if DEBUG_STACK
     IF_VERBOSE_ACTION (
             log_action(_("at ActionExec operator() start, pc=%d"
-                   ", stop_pc=%d, code.size=%d."),
-                pc, stop_pc, code.size());
+                   ", stop_pc=%d, code.size=%d, func=%d"),
+                pc, stop_pc, code.size(), _func ? _func : 0);
         std::stringstream ss;
         env.dump_stack(ss, STACK_DUMP_LIMIT);
         env.dump_global_registers(ss);
