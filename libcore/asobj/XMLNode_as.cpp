@@ -531,45 +531,47 @@ XMLNode_namespaceURI(const fn_call& fn)
 }
 
 
+// Return the prefix part of the node name. If there is no colon, or one
+// colon at the end of the string, this is empty. Otherwise it is the part
+// up to the first colon.
 as_value
 XMLNode_prefix(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
-    if (fn.nargs > 0)
-    {
-        // no setter
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("XMLNode.prefix is readonly!");
-        );
-        
-        return as_value();
-    }
+    // Read-only property
     
-    // TODO: implement getter
-    log_unimpl("XMLNode.prefix");
-    return as_value();
+    const std::string& nodeName = ptr->nodeName();
+    if (nodeName.empty()) return as_value("");
+
+    std::string::size_type pos = nodeName.find(':');
+    if (pos == std::string::npos || pos == nodeName.size() - 1) {
+        return as_value("");
+    }
+
+    return as_value(nodeName.substr(0, pos));
 }
 
 
+// The local part of a node name. If there is no colon or a single colon
+// at the end of the string, this is the whole string. Otherwise all of the
+// string after the first colon.
 as_value
 XMLNode_localName(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
-    if (fn.nargs > 0)
-    {
-        // no setter
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("XMLNode.localName is readonly!");
-        );
-        
-        return as_value();
-    }
+    // Read-only property
     
-    // TODO: implement getter
-    log_unimpl("XMLNode.localName");
-    return as_value();
+    const std::string& nodeName = ptr->nodeName();
+    if (nodeName.empty()) return as_value("");
+
+    std::string::size_type pos = nodeName.find(':');
+    if (pos == std::string::npos || pos == nodeName.size() - 1) {
+        return as_value(nodeName);
+    }
+
+    return as_value(nodeName.substr(pos + 1));
 }
 
 
@@ -661,9 +663,10 @@ XMLNode_attributes(const fn_call& fn)
     string_table& st = vm.getStringTable();
 
     XMLNode::Attributes& attrs = ptr->attributes();
-    //log_debug("Node %p has %d attributes", (void*)ptr.get(), attrs.size());
 
-    boost::intrusive_ptr<as_object> ret = new as_object(); // attributes are not Object types (getObjectInterface());
+    // Attributes are simple objects.
+    boost::intrusive_ptr<as_object> ret = new as_object(); 
+
     for (XMLNode::Attributes::const_iterator it=attrs.begin(),
         itEnd=attrs.end(); it != itEnd; ++it)
     {
@@ -671,7 +674,6 @@ XMLNode_attributes(const fn_call& fn)
         const XMLAttr& at = *it;
         const std::string& name = at.name();
         const std::string& val = at.value();
-        //log_debug("%s: %s", name.c_str(), val.c_str());
         // These must be enumerable !
         ret->set_member(st.find(name), val);
     }

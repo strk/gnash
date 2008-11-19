@@ -282,6 +282,41 @@ ns.attributes["xmlns"] = "nss";
 xcheck_equals(ns.attributes["xmlns"], "nss");
 check_equals(ns.namespaceURI, "");
 
+/// Prefix, localName
+x = new XML('<fr:tag/>');
+ns = x.firstChild;
+check_equals(ns.nodeName, "fr:tag");
+check_equals(ns.localName, "tag");
+check_equals(ns.prefix, "fr");
 
+x = new XML('<fr:pr:tag/>');
+ns = x.firstChild;
+check_equals(ns.nodeName, "fr:pr:tag");
+check_equals(ns.localName, "pr:tag");
+check_equals(ns.prefix, "fr");
+
+x = new XML('<:fr:tag/>');
+ns = x.firstChild;
+check_equals(ns.nodeName, ":fr:tag");
+check_equals(ns.localName, "fr:tag");
+check_equals(ns.prefix, "");
+
+x = new XML('<:tag/>');
+ns = x.firstChild;
+check_equals(ns.nodeName, ":tag");
+check_equals(ns.localName, "tag");
+check_equals(ns.prefix, "");
+
+x = new XML('<tag:/>');
+ns = x.firstChild;
+check_equals(ns.nodeName, "tag:");
+check_equals(ns.localName, "tag:");
+check_equals(ns.prefix, "");
+
+x = new XML('<tag/>');
+ns = x.firstChild;
+check_equals(ns.nodeName, "tag");
+check_equals(ns.localName, "tag");
+check_equals(ns.prefix, "");
 
 check_totals(134);
