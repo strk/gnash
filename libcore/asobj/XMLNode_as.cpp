@@ -86,8 +86,8 @@ XMLNode::XMLNode(const XMLNode& tpl, bool deep)
     // only clone children if in deep mode
     if ( deep ) 
     {
-        const ChildList& from=tpl._children;
-        for (ChildList::const_iterator it=from.begin(), itEnd=from.end();
+        const Children& from=tpl._children;
+        for (Children::const_iterator it=from.begin(), itEnd=from.end();
                         it != itEnd; ++it)
         {
                 _children.push_back(new XMLNode(*(*it), deep));
@@ -164,7 +164,7 @@ void
 XMLNode::insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_ptr<XMLNode> pos)
 {
     // find iterator for positional parameter
-    ChildList::iterator it = std::find(_children.begin(), _children.end(), pos);
+    Children::iterator it = std::find(_children.begin(), _children.end(), pos);
     if ( it == _children.end() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -210,7 +210,7 @@ XMLNode::previousSibling()
  	if (_parent->_children.size() <= 1) return NULL;
 
     XMLNode *previous_node = NULL;
-    ChildList::iterator itx;
+    Children::iterator itx;
     for (itx = _parent->_children.begin(); itx != _parent->_children.end(); itx++)
     {
         if (itx->get() == this)
@@ -241,7 +241,7 @@ XMLNode::nextSibling()
     }
 
     XMLNode *previous_node = NULL;
-    ChildList::reverse_iterator itx;
+    Children::reverse_iterator itx;
     for (itx = _parent->_children.rbegin(); itx != _parent->_children.rend(); itx++)
     {
         if (itx->get() == this)
@@ -282,7 +282,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode)
         xmlout << "<" << nodename;
     
         // Process the attributes, if any
-        AttribList::const_iterator ita;
+        Attributes::const_iterator ita;
         for (ita = xml._attributes.begin(); ita != xml._attributes.end(); ita++)
         {
             const XMLAttr& xa = *ita;
@@ -315,13 +315,13 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode)
     }
 
     // Childs, after node as_value.
-    ChildList::const_iterator itx;
+    Children::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
         (*itx)->toString(xmlout, encode);
     }
 
-    if ( nodename.size() )
+    if (!nodename.empty())
     {
 	    xmlout << "</" << nodename << ">";
     }
@@ -392,7 +392,6 @@ getXMLNodeInterface()
 static as_value
 XMLNode_new(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     
     XMLNode *xml_obj = new XMLNode;
     if ( fn.nargs > 0 )
@@ -422,11 +421,13 @@ XMLNode_appendchild(const fn_call& fn)
 		return as_value();
 	}
 
-	boost::intrusive_ptr<XMLNode> xml_obj = boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());	
+	boost::intrusive_ptr<XMLNode> xml_obj = 
+        boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());	
 	if ( ! xml_obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("First argument to XMLNode::appendChild() is not an XMLNode"));
+		log_aserror(_("First argument to XMLNode::appendChild() is not "
+                "an XMLNode"));
 		);
 		return as_value();
 	}
@@ -439,8 +440,6 @@ XMLNode_appendchild(const fn_call& fn)
 static as_value
 XMLNode_clonenode(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
-//    log_debug("%s: %d args", __PRETTY_FUNCTION__, fn.nargs);
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
     bool deep = false;
@@ -453,36 +452,38 @@ XMLNode_clonenode(const fn_call& fn)
 static as_value
 XMLNode_insertbefore(const fn_call& fn)
 {
-	//GNASH_REPORT_FUNCTION;
 	boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("XMLNode.insertBefore(%s) needs at least two argument"), ss.str().c_str());
+		log_aserror(_("XMLNode.insertBefore(%s) needs at least two "
+                "arguments"), ss.str());
 		);
 		return as_value();
 	}
 
-	boost::intrusive_ptr<XMLNode> newnode = boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());
+	boost::intrusive_ptr<XMLNode> newnode = 
+        boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());
 	if ( ! newnode )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("First argument to XMLNode.insertBefore(%s) is not an XMLNode"),
-                ss.str().c_str());
+		log_aserror(_("First argument to XMLNode.insertBefore(%s) is not "
+                "an XMLNode"), ss.str());
 		);
 		return as_value();
 	}
 
-	boost::intrusive_ptr<XMLNode> pos = boost::dynamic_pointer_cast<XMLNode>(fn.arg(1).to_object());
+	boost::intrusive_ptr<XMLNode> pos = 
+        boost::dynamic_pointer_cast<XMLNode>(fn.arg(1).to_object());
 	if ( ! pos )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Second argument to XMLNode.insertBefore(%s) is not an XMLNode"),
-                ss.str().c_str());
+		log_aserror(_("Second argument to XMLNode.insertBefore(%s) is not "
+                "an XMLNode"), ss.str());
 		);
 		return as_value();
 	}
@@ -490,10 +491,6 @@ XMLNode_insertbefore(const fn_call& fn)
     ptr->insertBefore(newnode, pos);
     return as_value();
     
-//    return as_value(ptr->obj.getAllocated());
-//    ptr->obj.insertBefore();
-    log_unimpl (__PRETTY_FUNCTION__);
-    return as_value();
 }
 
 
@@ -520,19 +517,17 @@ XMLNode_namespaceURI(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
-    if (fn.nargs > 0)
-    {
-        // no setter
-        IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("XMLNode.namespaceURI is readonly!");
-        );
-        
-        return as_value();
-    }
+    // Read-only property
     
-    // TODO: implement getter
-    log_unimpl("XMLNode.namespaceURI");
-    return as_value();
+    // Search recursively for a namespace. Return an empty string
+    // if none found.
+    XMLNode* node = ptr.get();
+    while (node && node->getNamespaceURI().empty()) {
+        node = node->getParent();
+    }
+    if (!node) return as_value("");
+
+    return as_value(ptr->getNamespaceURI());
 }
 
 
@@ -665,11 +660,11 @@ XMLNode_attributes(const fn_call& fn)
     VM& vm = ptr->getVM();
     string_table& st = vm.getStringTable();
 
-    XMLNode::AttribList& attrs = ptr->attributes();
+    XMLNode::Attributes& attrs = ptr->attributes();
     //log_debug("Node %p has %d attributes", (void*)ptr.get(), attrs.size());
 
     boost::intrusive_ptr<as_object> ret = new as_object(); // attributes are not Object types (getObjectInterface());
-    for (XMLNode::AttribList::const_iterator it=attrs.begin(),
+    for (XMLNode::Attributes::const_iterator it=attrs.begin(),
         itEnd=attrs.end(); it != itEnd; ++it)
     {
 
@@ -776,10 +771,10 @@ XMLNode_childNodes(const fn_call& fn)
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     boost::intrusive_ptr<Array_as> ary = new Array_as();
 
-    typedef XMLNode::ChildList ChildList;
+    typedef XMLNode::Children Children;
 
-    ChildList& child = ptr->childNodes();
-    for ( ChildList::const_iterator it=child.begin(), itEnd=child.end();
+    Children& child = ptr->childNodes();
+    for ( Children::const_iterator it=child.begin(), itEnd=child.end();
                     it != itEnd; ++it )
     {
             boost::intrusive_ptr<XMLNode> node = *it;
@@ -808,7 +803,8 @@ void
 XMLNode::markReachableResources() const
 {
 	// Mark childs
-	for (ChildList::const_iterator i=_children.begin(), e=_children.end(); i!=e; ++i)
+	for (Children::const_iterator i=_children.begin(),
+            e=_children.end(); i!=e; ++i)
 	{
 		(*i)->setReachable();
 	}

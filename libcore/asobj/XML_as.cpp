@@ -272,8 +272,17 @@ XML_as::parseAttribute(XMLNode* node, const std::string& xml,
     // Replace entities in the value.
     escape(value);
 
+    // Handle namespace. This is set once only for each node, and is also
+    // pushed to the attributes list once.
+    StringNoCaseEqual noCaseCompare;
+    if (noCaseCompare(name, "xmlns")) {
+        if (!node->getNamespaceURI().empty()) return;
+        node->setNamespaceURI(value);
+    }
+
     XMLAttr attr(name, value);
     node->_attributes.push_back(attr);
+
 
 }
 

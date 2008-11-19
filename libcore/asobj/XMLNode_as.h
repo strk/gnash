@@ -110,7 +110,14 @@ public:
 
     /// Set value of this node, overriding any previous value
     void nodeValueSet(const std::string& value) { _value = value; }
-    //  nodeType 	XML.nodeType
+
+    void setNamespaceURI(const std::string value) {
+        _namespaceURI = value;
+    }
+
+    const std::string& getNamespaceURI() const {
+        return _namespaceURI;
+    }
 
     ///  Returns true if the specified node has child nodes; otherwise,
     ///  returns false.
@@ -120,13 +127,13 @@ public:
     boost::intrusive_ptr<XMLNode> lastChild();
     
     // Use a list for quick erasing
-    typedef std::list< boost::intrusive_ptr<XMLNode> > ChildList;
+    typedef std::list< boost::intrusive_ptr<XMLNode> > Children;
 
-    typedef std::vector< XMLAttr > AttribList;
+    typedef std::vector< XMLAttr > Attributes;
 
-    ChildList& childNodes() { return _children; }
+    Children& childNodes() { return _children; }
 
-    AttribList& attributes() { return _attributes; }
+    Attributes& attributes() { return _attributes; }
     
     XMLNode& operator = (XMLNode &node) {
         log_debug("%s: \n", __PRETTY_FUNCTION__);
@@ -194,7 +201,8 @@ public:
     ///     The node before which to insert the new one.
     ///     Must be a child of this XMLNode or the operation will fail.
     ///
-    void insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_ptr<XMLNode> pos);
+    void insertBefore(boost::intrusive_ptr<XMLNode> newnode, 
+            boost::intrusive_ptr<XMLNode> pos);
 
     /// Removes the specified XML object from its parent.
     //
@@ -219,8 +227,8 @@ public:
     // to NULL
     boost::intrusive_ptr<XMLNode> _parent;
 
-    ChildList       _children;
-    AttribList      _attributes;
+    Children _children;
+    Attributes _attributes;
 
 protected:
 
@@ -245,7 +253,10 @@ private:
 
     NodeType     _type;
 
-    static void stringify(const XMLNode& xml, std::ostream& xmlout, bool encode);
+    std::string _namespaceURI;
+
+    static void stringify(const XMLNode& xml, std::ostream& xmlout,
+            bool encode);
 
 };
 
