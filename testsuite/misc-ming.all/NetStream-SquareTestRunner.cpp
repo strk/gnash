@@ -27,6 +27,7 @@
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
+#include "GnashSleep.h"
 
 #include "check.h"
 #include <string>
@@ -75,7 +76,8 @@ main(int /*argc*/, char** /*argv*/)
         // data and trigger notifications
 		// needs more analisys to find a good way for doing this..
         // TODO: sleep less ! GnashSleep !
-		sleep(1);
+        gnashSleep(10000); // 10 milliseconds should be enough for loading
+		//sleep(1);
 	}
 
 	cout << "Pressing space" << endl;
@@ -89,7 +91,8 @@ main(int /*argc*/, char** /*argv*/)
 		// sleep to give the NetStream a chance to load data and trigger notifications
 		// needs more analisys to find a good way for doing this..
         // TODO: sleep less !!
-		sleep(1);
+        gnashSleep(10000); // 10 milliseconds should be enough for loading
+		//sleep(1);
 	}
 
 	// Consistency check 
