@@ -55,12 +55,16 @@ check(XMLNode.prototype.hasOwnProperty("parentNode"));
 check(XMLNode.prototype.hasOwnProperty("prefix"));
 check(XMLNode.prototype.hasOwnProperty("previousSibling"));
 
+check_equals(typeof(XMLNode.prototype.attributes), "undefined");
+
 var doc = new XML();
 
 check(doc);
 var textnode = doc.createTextNode("text content");
 check_equals(typeOf(textnode), 'object');
 
+check_equals(typeof(textnode.attributes), "object");
+check_equals(textnode.attributes.toString(), undefined);
 check(textnode.appendChild);
 check(textnode.cloneNode);
 check(textnode.hasChildNodes);
@@ -189,9 +193,29 @@ check_equals(node2.previousSibling.nodeValue, "first text node");
 
 // TODO: test removeNode, insertNode
 
-// for (var aNode = node1.firstChild; node1 != null; aNode = node1.nextSibling) {
-//     trace(aNode);
-// }
+// Test attributes. It's just a normal object.
+check_equals(node2.attributes, undefined);
+check_equals(typeof(node2.attributes), "object");
+node2.attributes[3] = "a3";
+check_equals(node2.attributes[3], "a3");
+check_equals(node2.attributes["3"], "a3");
+node2.attributes.a = "aa";
+check_equals(node2.attributes.a, "aa");
+check_equals(node2.attributes["a"], "aa");
+check_equals(node2.toString(), '<node2 a="aa" 3="a3">second text node</node2>');
+
+// Seems not to be overwritable
+node2.attributes = 3;
+check_equals(node2.toString(), '<node2 a="aa" 3="a3">second text node</node2>');
+
+ASSetPropFlags(XMLNode.prototype, "attributes", 0, 1);
+node77 = doc.createElement("tag");
+node77.attributes.a1 = "at1";
+check_equals(node77.toString(), '<tag a1="at1" />');
+node77.attributes = 5;
+check_equals(node77.toString(), '<tag a1="at1" />');
+
+// Check namespace functions.
 
 // Standard namespace
 x = new XML('<tag xmlns="standard" att="u"></tag>');
