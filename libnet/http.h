@@ -152,6 +152,12 @@ public:
     std::string &extractAcceptRanges(gnash::Network::byte_t *data);
     std::string &extractAcceptRanges(boost::shared_ptr<amf::Buffer> data)
 	{ return extractAcceptRanges(data->reference()); };
+
+    
+    int extractField(const std::string &name, gnash::Network::byte_t *data);
+    int extractField(const std::string &name, amf::Buffer *data);
+
+    
     int extractLanguage(gnash::Network::byte_t *data);
     int extractLanguage(boost::shared_ptr<amf::Buffer> data)
 	{ return extractLanguage(data->reference()); };
@@ -169,7 +175,7 @@ public:
 	{ return extractConnection(data->reference()); };
     int extractKeepAlive(gnash::Network::byte_t *data);
     int extractKeepAlive(boost::shared_ptr<amf::Buffer> data)
-	{ return extractConnection(data->reference()); };
+	{ return extractKeepAlive(data->reference()); };
 
     // These return the string that was found for this field.
     std::string &extractMethod(gnash::Network::byte_t *data);
@@ -202,6 +208,7 @@ public:
     ///		of numerical data into string data, so they can't use
     ///		the common form.
     const std::stringstream &formatCommon(const std::string &data);
+
     const std::stringstream &formatHeader(int filesize, http_status_e type);
     const std::stringstream &formatHeader(http_status_e type);
     const std::stringstream &formatRequest(const std::string &url, http_method_e req);
@@ -291,6 +298,7 @@ public:
     std::string getVersion() { return _version; }
     std::string getMethod() { return _method; }
     std::string getReferer() { return _referer; }
+
     std::vector<std::string> getLanguage() { return _language;  }
     std::vector<std::string> getConnection() { return _connections; }
     std::vector<std::string> getKeepAlive() { return _kalive; }
@@ -322,6 +330,7 @@ private:
     int			_port;
     std::string		_agent;
     std::string		_acceptranges;
+    std::map<std::string, std::vector<std::string> > _fields;  
     std::vector<std::string> _connections;
     std::vector<std::string> _language;
     std::vector<std::string> _charset;

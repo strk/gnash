@@ -71,7 +71,7 @@ HTTP::HTTP()
     : _filetype(amf::AMF::FILETYPE_HTML),
       _filesize(0),
       _port(80),
-      _keepalive(true),
+      _keepalive(false),
       _handler(0),
       _clientid(0),
       _index(0)
@@ -126,6 +126,39 @@ HTTP::operator = (HTTP& /*obj*/)
 }
 
 bool
+HTTP::processClientRequest()
+{
+    GNASH_REPORT_FUNCTION;
+    
+    boost::shared_ptr<amf::Buffer> buf(_que.peek());
+    if (buf) {
+	switch (extractCommand(buf->reference())) {
+	  case HTTP::HTTP_GET:
+	      return processGetRequest();
+	      break;
+	  case HTTP::HTTP_POST:
+	      return processPostRequest();
+	      break;
+	  case HTTP::HTTP_HEAD:
+	      break;
+	  case HTTP::HTTP_CONNECT:
+	      break;
+	  case HTTP::HTTP_TRACE:
+	      break;
+	  case HTTP::HTTP_OPTIONS:
+	      break;
+	  case HTTP::HTTP_PUT:
+	      break;
+	  case HTTP::HTTP_DELETE:
+	      break;
+	  default:
+	      break;
+	}
+    }
+    
+}
+
+bool
 HTTP::processGetRequest()
 {
     GNASH_REPORT_FUNCTION;
@@ -154,6 +187,46 @@ HTTP::processGetRequest()
     
     clearHeader();
     extractCommand(buf);    
+    extractConnection(buf);
+    extractAccept(buf);
+    extractMethod(buf);
+    extractReferer(buf);
+    extractHost(buf);
+    extractAgent(buf);
+    extractLanguage(buf);
+    extractCharset(buf);
+    extractKeepAlive(buf);
+    extractEncoding(buf);
+    extractTE(buf);
+//    dump();
+
+    _filespec = _url;
+
+    if (!_url.empty()) {
+	return true;
+    }
+    return false;
+}
+
+bool
+HTTP::processPostRequest()
+{
+    GNASH_REPORT_FUNCTION;
+
+    cerr << "QUE = " << _que.size() << endl;
+
+    if (_que.size() == 0) {
+	return false;
+    }
+    
+    boost::shared_ptr<amf::Buffer> buf(_que.pop());
+    if (buf == 0) {
+	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
+	return false;
+    }
+    
+    clearHeader();
+    extractCommand(buf);    
     extractAccept(buf);
     extractMethod(buf);
     extractReferer(buf);
@@ -165,7 +238,6 @@ HTTP::processGetRequest()
     extractKeepAlive(buf);
     extractEncoding(buf);
     extractTE(buf);
-//    dump();
 
     _filespec = _url;
 
@@ -219,7 +291,7 @@ HTTP::formatHeader(int filesize, http_status_e /* type */)
     formatAcceptRanges("bytes");
     formatContentLength(filesize);
     formatKeepAlive("timeout=15, max=100");
-    formatConnection("Keep-Alive");
+//    formatConnection("Keep-Alive");
     formatContentType(amf::AMF::FILETYPE_HTML);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
@@ -572,7 +644,7 @@ HTTP::formatRequest(const string &url, http_method_e req)
     _header << "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0" << "\r\n";
     _header << "Referer: " << url << "\r\n";
 
-    _header << "Connection: Keep-Alive, TE" << "\r\n";
+//    _header << "Connection: Keep-Alive, TE" << "\r\n";
     _header << "TE: deflate, gzip, chunked, identity, trailers" << "\r\n";
 
     return _header;
@@ -595,7 +667,8 @@ HTTP::formatRequest(const string &url, http_method_e req)
 // Connection: Keep-Alive, TE
 // TE: deflate, gzip, chunked, identity, trailers
 int
-HTTP::extractAccept(Network::byte_t *data) {
+HTTP::extractAccept(Network::byte_t *data)
+{
 //    GNASH_REPORT_FUNCTION;
     
     string body = reinterpret_cast<const char *>(data);
@@ -753,7 +826,8 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
 }
 
 string &
-HTTP::extractAcceptRanges(Network::byte_t *data) {
+HTTP::extractAcceptRanges(Network::byte_t *data)
+{
 //    GNASH_REPORT_FUNCTION;
     
     string body = reinterpret_cast<const char *>(data);
@@ -775,8 +849,9 @@ HTTP::extractAcceptRanges(Network::byte_t *data) {
 }
 
 string &
-HTTP::extractMethod(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
+HTTP::extractMethod(Network::byte_t *data)
+{
+    GNASH_REPORT_FUNCTION;
     
     boost::mutex::scoped_lock lock(stl_mutex);
     string body = reinterpret_cast<const char *>(data);
@@ -798,13 +873,15 @@ HTTP::extractMethod(Network::byte_t *data) {
     _url = body.substr(start+1, end-start-1);
     _version = body.substr(end+1, length);
 
+    cerr << "HTTP version is: " << _version << endl;
     end = _url.find("?", 0);
 //    _filespec = _url.substr(start+1, end);
     return _method;
 }
 
 string &
-HTTP::extractReferer(Network::byte_t *data) {
+HTTP::extractReferer(Network::byte_t *data)
+{
 //    GNASH_REPORT_FUNCTION;
     
     string body = reinterpret_cast<const char *>(data);
@@ -827,12 +904,12 @@ HTTP::extractReferer(Network::byte_t *data) {
 }
 
 int
-HTTP::extractConnection(Network::byte_t *data) {
+HTTP::extractField(const std::string &name, gnash::Network::byte_t *data)
+{
 //    GNASH_REPORT_FUNCTION;
-    
     string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos;
-    string pattern = "Connection: ";
+    string pattern = name + ": ";
     
     start = body.find(pattern, 0);
     if (start == string::npos) {
@@ -868,12 +945,71 @@ HTTP::extractConnection(Network::byte_t *data) {
 	start = pos;
     }
 
+    return _fields[name].size();
+}
+
+int
+HTTP::extractField(const std::string &name, amf::Buffer *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    return extractField(name, data->reference());
+}
+
+int
+HTTP::extractConnection(Network::byte_t *data)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    string body = reinterpret_cast<const char *>(data);
+    string::size_type start, end, length, pos;
+    string pattern = "Connection: ";
+    
+    start = body.find(pattern, 0);
+    if (start == string::npos) {
+	log_error("Couldn't match pattern %s to %s", pattern, body);
+        return -1;
+    }
+    end =  body.find("\r\n", start);
+    if (end == string::npos) {
+	end = body.find("\n", start);
+//	    return "error";
+    }
+
+    length = end-start-pattern.size();
+    start = start+pattern.size();
+    string _connection = body.substr(start, length);
+    pos = start;
+    while (pos <= end) {
+	pos = (body.find(",", start) + 2);
+	if (pos <= start) {
+	    return _encoding.size();
+	}
+	if ((pos == string::npos) || (pos > end)) {
+	    length = end - start;
+	} else {
+	    length = pos - start - 2;
+	}
+	string substr = body.substr(start, length);
+//	printf("FIXME: \"%s\"\n", substr.c_str());
+	_connections.push_back(substr);
+	// Opera uses upper case first letters, Firefox doesn't.
+	if ((substr == "Keep-Alive") || (substr == "keep-alive")) {
+	    log_debug("Keep Alive connection specified in header");
+	    _keepalive = true;
+	} else {
+	    log_debug("Keep Alive connection not specified in header!");
+	}
+	
+	start = pos;
+    }
+
     return _connections.size();
 }
 
 int
-HTTP::extractKeepAlive(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
+HTTP::extractKeepAlive(Network::byte_t *data)
+{
+    GNASH_REPORT_FUNCTION;
     
     string body = reinterpret_cast<const char *>(data);
     string::size_type start, end, length, pos;
@@ -904,7 +1040,6 @@ HTTP::extractKeepAlive(Network::byte_t *data) {
 	    length = pos - start - 2;
 	}
 	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
 	_kalive.push_back(substr);
 	_keepalive = true;	// if we get this header setting, we want to keep alive
 	start = pos;
@@ -1253,10 +1388,10 @@ HTTP::recvMsg(int fd)
     Network net;
 
     do {
-	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);	
+	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
 	int ret = net.readNet(fd, buf, 5);
 
-	cerr << __PRETTY_FUNCTION__ << ": " << (char *)buf->reference() << endl;
+	cerr << __PRETTY_FUNCTION__ << endl << (char *)buf->reference() << endl;
 	
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
@@ -1343,6 +1478,7 @@ http_handler(Handler::thread_params_t *args)
     string::size_type pos;
     Network *net = reinterpret_cast<Network *>(args->handler);
     HTTP www;
+    bool done = false;
 //    www.setHandler(net);
 
     log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
@@ -1428,9 +1564,10 @@ http_handler(Handler::thread_params_t *args)
 	} else {
 	  filestream.reset(new DiskStream);
 	}
+//	cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
 	
+	// Oopen the file and read the furst chunk into memory
  	filestream->open(filespec);
-	filestream->loadChunk();
 	string response = cache.findResponse(www.getFilespec());
 	if (response.empty()) {
 	    cerr << "FIXME no hit for: " << www.getFilespec() << endl;
@@ -1451,31 +1588,31 @@ http_handler(Handler::thread_params_t *args)
 	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
 	}	
 
-	cerr << www.getHeader().c_str() << endl;
+//	cerr << www.getHeader().c_str() << endl;
 
 	size_t filesize = filestream->getFileSize();
 	size_t bytes_read = 0;
 	int ret;
+	size_t page = 0;
 	if (filesize) {
 #ifdef USE_STATS_CACHE
 	    struct timespec start;
 	    clock_gettime (CLOCK_REALTIME, &start);
 #endif
-	    size_t page = filestream->getPagesize();
 	    size_t getbytes = 0;
-	    if (filesize < filestream->getPagesize()) {
+	    if (filesize <= filestream->getPagesize()) {
 		getbytes = filesize;
 	    } else {
 		getbytes = filestream->getPagesize();
 	    }
 	    do {
-		ret = www.writeNet(args->netfd, filestream->get(), filesize);
+		boost::uint8_t *ptr = filestream->loadChunk(page);
+		ret = www.writeNet(args->netfd, filestream->get(), getbytes);
 		if (ret <= 0) {
 		    break;
 		}
 		bytes_read += ret;
 		page += filestream->getPagesize();
-		filestream->loadChunk(page);
 	    } while (bytes_read <= filesize);
 #ifdef USE_STATS_CACHE
 	    struct timespec end;
@@ -1488,11 +1625,14 @@ http_handler(Handler::thread_params_t *args)
 //	    filestream->close();
 	    cache.addFile(www.getFilespec(), filestream);
 	}
-	log_debug("http_handler all done now finally...");
+	log_debug("http_handler all done transferring requested file...");
 //	cache.dump();
-	return;
 
-
+	if (!www.keepAlive()) {
+	    log_debug("Keep-Alive is off", www.keepAlive());
+//	    www.closeConnection();
+	    done = true;
+	}
 #if 0
 	if (url != docroot) {
 	    log_debug (_("File to load is: %s"), filespec.c_str());
@@ -1527,7 +1667,7 @@ http_handler(Handler::thread_params_t *args)
 //	conndata->statistics->dump();
 //    }
 //    } while(!hand->timetodie());
-    } while(true);
+    } while(done != true);
     
     log_debug("http_handler all done now finally...");
     
