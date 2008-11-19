@@ -244,6 +244,10 @@ public:
     /// Return version of the SWF this action block was found in
 	int getDefinitionVersion() const;
 
+    const movie_definition& getMovieDefinition() const {
+        return _src;
+    }
+
 private:
 
 	/// the code itself, as read from the SWF

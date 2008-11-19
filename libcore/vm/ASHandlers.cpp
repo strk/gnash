@@ -1686,7 +1686,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
     
     // Should return 0 
 
-    const int version = env.get_version();
+    const int swfVersion = thread.code.getDefinitionVersion();
     
     std::string str = env.top(0).to_string();
     
@@ -1696,7 +1696,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
         return;
     }
 
-    std::wstring wstr = utf8::decodeCanonicalString(str, version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, swfVersion);
 
     // decodeCanonicalString should correctly work out what the first character
     // is according to version.
@@ -1709,7 +1709,6 @@ SWFHandlers::ActionChr(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    
     // Only handles values up to 65535
     boost::uint16_t c = static_cast<boost::uint16_t>(env.top(0).to_int());
 
@@ -1721,7 +1720,8 @@ SWFHandlers::ActionChr(ActionExec& thread)
         return;
     }
     
-    if (env.get_version() > 5)
+    int swfVersion = thread.code.getDefinitionVersion();
+    if (swfVersion > 5)
     {
         env.top(0).set_string(utf8::encodeUnicodeCharacter(c));
         return;
@@ -2749,7 +2749,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
-                  args, super);
+                  args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
 
@@ -3394,7 +3394,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     as_value result = call_method(method_val, &env, this_ptr, 
-            args, super);
+            args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
 

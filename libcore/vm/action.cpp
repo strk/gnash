@@ -53,11 +53,13 @@ call_method(
     as_environment* env,
     as_object* this_ptr, // this is ourself
     std::auto_ptr< std::vector<as_value> > args,
-    as_object* super)
+    as_object* super,
+    const movie_definition* callerDef)
 {
 	as_value val;
 	fn_call call(this_ptr, env, args);
 	call.super = super;
+    call.callerDef = callerDef;
 
 	try
 	{
