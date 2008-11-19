@@ -837,11 +837,21 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
 void
 SWFHandlers::ActionStringLength(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    
+
+    // FIXME: we should be using version of the SWF containing
+    //        this opcode, not version of the top-level SWF !!
+    //
     const int version = env.get_version();
-    env.top(0).set_int(env.top(0).to_string_versioned(version).size());
+    if ( version > 5 )
+    {
+        // when SWF version is > 5 we compute the multi-byte length
+        ActionMbLength(thread);
+    }
+    else
+    {
+        env.top(0).set_int(env.top(0).to_string_versioned(version).size());
+    }
 }
 
 void
