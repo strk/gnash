@@ -95,7 +95,8 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 
     // Functions defined in SWF version 6 and higher pushes
     // the activation object to the scope stack
-    if ( func.getActionBuffer().getDefinitionVersion() > 5 )
+    //if ( code.getDefinitionVersion() > 5 )
+    if ( env.get_version() > 5 )
     {
         // We assume that the swf_function () operator already initialized its environment
         // so that it's activation object is now in the top element of the CallFrame stack
