@@ -88,12 +88,14 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     assert(stop_pc < code.size());
 
     // See comment in header
+    // TODO: stack limit dependent on function version or VM version ?
     if ( env.get_version() > 5 ) {
         _withStackLimit = 15;
     }
 
-    // SWF version 6 and higher pushes the activation object to the scope stack
-    if ( env.get_version() > 5 )
+    // Functions defined in SWF version 6 and higher pushes
+    // the activation object to the scope stack
+    if ( func.getActionBuffer().getDefinitionVersion() > 5 )
     {
         // We assume that the swf_function () operator already initialized its environment
         // so that it's activation object is now in the top element of the CallFrame stack
@@ -126,6 +128,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
     //GNASH_REPORT_FUNCTION;
 
     /// See comment in header
+    // TODO: stack limit dependent on function version or VM version ?
     if ( env.get_version() > 5 ) {
         _withStackLimit = 15;
     }
