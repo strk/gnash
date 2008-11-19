@@ -906,14 +906,14 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
 
 	try {
 	    _videoDecoder = _mediaHandler->createVideoDecoder(info);
-            assert ( _videoDecoder.get() ); // PARANOIA_LEVEL ?
+        assert ( _videoDecoder.get() ); // PARANOIA_LEVEL ?
+        log_debug("NetStream_as::initVideoDecoder: hot-plugging video consumer");
+        _playHead.setVideoConsumerAvailable();
 	}
 	catch (MediaException& e) {
 	    log_error("NetStream: Could not create Video decoder: %s", e.what());
 	}
 
-    log_debug("NetStream_as::initVideoDecoder: hot-plugging video consumer");
-    _playHead.setVideoConsumerAvailable();
 }
 
 
@@ -929,14 +929,14 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
 
 	try {
 	    _audioDecoder = _mediaHandler->createAudioDecoder(info);
-            assert ( _audioDecoder.get() ); // PARANOIA_LEVE ?
+        assert ( _audioDecoder.get() ); // PARANOIA_LEVE ?
+        log_debug("NetStream_as::initAudioDecoder: hot-plugging audio consumer");
+        _playHead.setAudioConsumerAvailable();
 	}
 	catch (MediaException& e) {
 	    log_error("Could not create Audio decoder: %s", e.what());
 	}
 
-    log_debug("NetStream_as::initAudioDecoder: hot-plugging audio consumer");
-    _playHead.setAudioConsumerAvailable();
 }
 
 

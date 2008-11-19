@@ -22,25 +22,16 @@
 #include "builtin_function.h"
 #include "array.h" // for childNodes
 #include "XMLNode_as.h"
+#include "XML_as.h" // escape / unescape
 #include "log.h"
 #include "Object.h" // for getObjectInterface
-#include "VM.h" // for getting the string_table..
-#include "string_table.h" // ..for using the string_table
-
-#include <boost/algorithm/string/case_conv.hpp>
+#include "VM.h" // for getting the string_table.
+#include "string_table.h" 
 
 #include <string>
 #include <sstream>
 #include <vector>
 #include <algorithm>
-
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xmlreader.h>
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 
@@ -76,7 +67,7 @@ XMLNode::XMLNode()
     :
     as_object(getXMLNodeInterface()),
     _parent(0),
-    _type(tElement)
+    _type(Element)
 {
     //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -280,8 +271,9 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode)
 
 
 #ifdef GNASH_DEBUG
-    log_debug(_("Stringifying node %p with name %s, as_value %s, %u attributes and %u children"),
-                    (void*)&xml, nodename, node_value, xml._attributes.size(), xml._children.size());
+    log_debug(_("Stringifying node %p with name %s, as_value %s, %u "
+                "attributes and %u children"), (void*)&xml, nodename,
+            node_value, xml._attributes.size(), xml._children.size());
 #endif
 
     // Create the beginning of the tag
@@ -312,9 +304,14 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout, bool encode)
     }
 
     // Node as_value first, then children
-    if ( type == tText )
+    if ( type == Text )
     {
-	    encode ? xmlout << URL::encode(node_value) : xmlout << node_value;
+        // Insert entities.
+        std::string escaped(node_value);
+        XML_as::escape(escaped);
+        if (encode) URL::encode(escaped);
+
+	    xmlout << escaped;
     }
 
     // Childs, after node as_value.
@@ -338,29 +335,41 @@ attachXMLNodeInterface(as_object& o)
     const int noFlags = 0;
     
     // No prop flags:
-    o.init_member("appendChild", new builtin_function(XMLNode_appendchild), noFlags);
-    o.init_member("cloneNode", new builtin_function(XMLNode_clonenode), noFlags);
-    o.init_member("hasChildNodes", new builtin_function(XMLNode_haschildnodes), noFlags);
-    o.init_member("insertBefore", new builtin_function(XMLNode_insertbefore), noFlags);
-    o.init_member("removeNode", new builtin_function(XMLNode_removenode), noFlags);
+    o.init_member("appendChild", new builtin_function(
+                XMLNode_appendchild), noFlags);
+    o.init_member("cloneNode", new builtin_function(
+                XMLNode_clonenode), noFlags);
+    o.init_member("hasChildNodes", new builtin_function(
+                XMLNode_haschildnodes), noFlags);
+    o.init_member("insertBefore", new builtin_function(
+                XMLNode_insertbefore), noFlags);
+    o.init_member("removeNode", new builtin_function(
+                XMLNode_removenode), noFlags);
     o.init_member("toString", new builtin_function(XMLNode_tostring), noFlags);
-    o.init_member("getPrefixForNamespace", new builtin_function(XMLNode_getPrefixForNamespace), noFlags);
-    o.init_member("getNamespaceForPrefix", new builtin_function(XMLNode_getNamespaceForPrefix), noFlags);
+    o.init_member("getPrefixForNamespace", new builtin_function(
+                XMLNode_getPrefixForNamespace), noFlags);
+    o.init_member("getNamespaceForPrefix", new builtin_function(
+                XMLNode_getNamespaceForPrefix), noFlags);
 
 
     const int protectedFlags = as_prop_flags::isProtected;
 
     // Just the protected flag:
-    o.init_property("nodeValue", &XMLNode_node_value, &XMLNode_node_value, protectedFlags);
-    o.init_property("nodeName", &XMLNode_nodename, &XMLNode_nodename, protectedFlags);
+    o.init_property("nodeValue", &XMLNode_node_value, 
+            &XMLNode_node_value, protectedFlags);
+    o.init_property("nodeName", &XMLNode_nodename, 
+            &XMLNode_nodename, protectedFlags);
 
     o.init_readonly_property("firstChild", &XMLNode_firstchild, protectedFlags);
     o.init_readonly_property("lastChild", &XMLNode_lastchild, protectedFlags);
     o.init_readonly_property("localName", &XMLNode_localName, protectedFlags);
-    o.init_readonly_property("namespaceURI", &XMLNode_namespaceURI, protectedFlags);
-    o.init_readonly_property("nextSibling", &XMLNode_nextsibling, protectedFlags);
+    o.init_readonly_property("namespaceURI", 
+            &XMLNode_namespaceURI, protectedFlags);
+    o.init_readonly_property("nextSibling", 
+            &XMLNode_nextsibling, protectedFlags);
     o.init_readonly_property("prefix", &XMLNode_prefix, protectedFlags);
-    o.init_readonly_property("previousSibling", &XMLNode_previoussibling, protectedFlags);
+    o.init_readonly_property("previousSibling", 
+            &XMLNode_previoussibling, protectedFlags);
     o.init_readonly_property("nodeType", &XMLNode_nodetype, protectedFlags);
     o.init_readonly_property("attributes", &XMLNode_attributes, protectedFlags);
     o.init_readonly_property("childNodes", &XMLNode_childNodes, protectedFlags);

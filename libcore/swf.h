@@ -18,6 +18,9 @@
 #ifndef GNASH_SWF_H
 #define GNASH_SWF_H
 
+//#include <iofwd.h>
+#include <iostream> // for std::ostream
+
 namespace gnash {
 
 /// SWF format parsing classes
@@ -541,6 +544,7 @@ typedef enum
 typedef enum
 {
     /// AS3 Actions go below here.
+    ABC_ACTION_END                 = 0x00,
 
     /// Do: Enter the debugger if one has been invoked.
     ABC_ACTION_BKPT                = 0x01,
@@ -1711,6 +1715,9 @@ typedef enum
     ABC_ACTION_VERIFYOP             = 0xFE
 
 } abc_action_type;
+
+/// Output operator for abc_action_type
+std::ostream& operator<< (std::ostream& os, const abc_action_type& typ);
 
 
 /// SWF fill style types. Symbolic names copied from Ming.
