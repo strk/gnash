@@ -185,12 +185,14 @@ RTMPClient::encodeStream(double id)
     num->makeNumber(id);
     boost::shared_ptr<Buffer> numobj = num->encode();
 
-    boost::shared_ptr<Buffer> buf(new Buffer(strobj->size() + numobj->size()));
-
     // Set the NULL object element that follows the stream ID
     boost::shared_ptr<amf::Element> null(new amf::Element);
     null->makeNull();
     boost::shared_ptr<Buffer> nullobj = null->encode();    
+
+    size_t totalsize = strobj->size() + numobj->size() + nullobj->size();
+
+    boost::shared_ptr<Buffer> buf(new Buffer(totalsize));
 
     *buf += strobj;
     *buf += numobj;
