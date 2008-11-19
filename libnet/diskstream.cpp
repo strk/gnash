@@ -144,13 +144,14 @@ DiskStream::loadChunk(off_t offset)
 {
 //    GNASH_REPORT_FUNCTION;
 
+    log_debug("%s: offset is: %d", __FUNCTION__, offset);
     /// If the data pointer is left from a failed mmap, don't do
     /// anything.
     if (_dataptr ==  MAP_FAILED) {
 	log_error("Bad pointer to memory for file %s!", _filespec);
 	return 0;
     }
-
+#if 0
     /// We only map pages of pagesize, so if the offset is smaller
     /// than that, don't use it.
     if (static_cast<size_t>(offset) < _pagesize) {
@@ -161,30 +162,35 @@ DiskStream::loadChunk(off_t offset)
 	    // calculate the number of pages
 	    int pages = ((offset - (offset % _pagesize)) / _pagesize);
 	    _offset = pages * _pagesize;
-// 	    log_debug("Adjusting offset from %d to %d so it's page aligned.",
-// 		      offset, _offset);
+ 	    log_debug("Adjusting offset from %d to %d so it's page aligned.",
+ 		      offset, _offset);
 	}
     }
+#endif
     
     if (_filefd) {
 	/// If the data pointer is legit, then we need to unmap that page
 	/// to mmap() a new one. If we're still in the current mapped
 	/// page, then just return the existing data pointer.
 	if (_dataptr != 0) {
+#if 0
 	    // If the offset is less than what we already mmapped, we
-	    boost::uint32_t diff = *reinterpret_cast<boost::uint32_t *>(_dataptr + _offset);
+	    boost::uint32_t diff = *reinterpret_cast<boost::uint32_t *>(_dataptr + offset);
 	    if (diff < _pagesize) {
 		return _dataptr + _offset;
 		// unmap the old data before allocating a new chunk
-	    } else {
-		munmap(_dataptr, _pagesize);
-		_dataptr = 0;
+  	    } else {
+  		munmap(_dataptr, _pagesize);
+ 		_dataptr = 0;
 	    }
+#else
+  		munmap(_dataptr, _pagesize);
+ 		_dataptr = 0;
+#endif
 	}
 	
 	_dataptr = static_cast<unsigned char *>(mmap(0, _pagesize,
-						     PROT_READ, MAP_SHARED, _filefd, _offset));
-	offset = (offset % _pagesize);
+						     PROT_READ, MAP_SHARED, _filefd, offset));
     } else {
 	log_error (_("Couldn't load file %s"), _filespec);
 	return 0;
@@ -196,12 +202,13 @@ DiskStream::loadChunk(off_t offset)
 	return 0;
     } else {
 	clock_gettime (CLOCK_REALTIME, &_last_access);
-//	log_debug (_("File %s mapped to: %p"), _filespec, (void *)_dataptr);
+	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, _offset, (void *)_dataptr);
 	_seekptr = _dataptr + offset;
 	_state = OPEN;
     }
     
     return _seekptr;
+    
 #if 0
     do {
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
@@ -273,6 +280,11 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 //    GNASH_REPORT_FUNCTION;
 
     struct stat st;
+
+    // the file is already open
+    if (_state == OPEN) {
+	return true;
+    }
     
     _netfd = netfd;
     _statistics = statistics;
