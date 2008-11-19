@@ -82,8 +82,8 @@ static const short DEFAULTPORT  = RTMP_PORT;
 Network::Network()
 	:
 	_ipaddr(INADDR_ANY),
-	_sockfd(0),
-	_listenfd(0),
+	_sockfd(-1),
+	_listenfd(-1),
 	_port(0),
 	_connected(false),
 	_debug(false),
@@ -258,7 +258,7 @@ Network::newConnection(bool block)
 int
 Network::newConnection(bool block, int fd)
 {
-  //    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     struct sockaddr	newfsin;
     socklen_t		alen;
@@ -863,6 +863,7 @@ Network::writeNet(const std::string& buffer)
 int
 Network::writeNet(const byte_t *buffer, int nbytes)
 {
+    assert(_sockfd>=0);
     return writeNet(_sockfd, buffer, nbytes, _timeout);
 }
 
@@ -1134,6 +1135,7 @@ Network::operator = (Network &net)
     _connected = net.connected();
     _debug = net.netDebug();
     _timeout = net.getTimeout();
+    return *this;
 }
 
 void
