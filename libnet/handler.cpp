@@ -129,7 +129,7 @@ Handler::peek(fifo_e direction)
 	    return _incoming.peek();
 	}
     }    
-//    FIXME: return ;
+    return boost::shared_ptr<amf::Buffer>();
 }
 
 // Return the size of the queues

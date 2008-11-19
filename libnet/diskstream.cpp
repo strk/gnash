@@ -583,6 +583,7 @@ DiskStream::determineFileType( boost::uint8_t *data)
     return FILETYPE_XML;
   }
   
+  return FILETYPE_NONE;
 }
 
 ///  \brief Dump the internal data of this class in a human readable form.

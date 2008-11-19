@@ -1210,6 +1210,7 @@ HTTP::sendMsg()
 {
     GNASH_REPORT_FUNCTION;
     
+    return 0; // FIXME
 }
 
 /// \brief Send a message to the other end of the network connection.
@@ -1224,6 +1225,7 @@ HTTP::sendMsg(int fd)
 {
     GNASH_REPORT_FUNCTION;
     
+    return 0; // FIXME
 }
 
 /// \brief Send a message to the other end of the network connection.
@@ -1235,12 +1237,12 @@ HTTP::sendMsg(int fd)
 ///
 /// @return The number of bytes sent
 int DSOEXPORT
-HTTP::sendMsg(const Network::byte_t *, size_t size)
+HTTP::sendMsg(const Network::byte_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 //    _header
 
-//    return Network::writeNet(buf->reference(), buf->size());
+    return Network::writeNet(data, size);
 }
 
 int
