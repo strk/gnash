@@ -177,18 +177,18 @@ RTMPClient::encodeStream(double id)
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
 
-    boost::shared_ptr<amf::Element> str(new Element);
+    boost::shared_ptr<amf::Element> str(new amf::Element);
     str->makeString("createStream");
     boost::shared_ptr<Buffer> strobj = str->encode();
   
-    boost::shared_ptr<amf::Element>  num(new Element);
+    boost::shared_ptr<amf::Element>  num(new amf::Element);
     num->makeNumber(id);
     boost::shared_ptr<Buffer> numobj = num->encode();
 
     boost::shared_ptr<Buffer> buf(new Buffer(strobj->size() + numobj->size()));
 
     // Set the NULL object element that follows the stream ID
-    boost::shared_ptr<amf::Element> null;
+    boost::shared_ptr<amf::Element> null(new amf::Element);
     null->makeNull();
     boost::shared_ptr<Buffer> nullobj = null->encode();    
 
