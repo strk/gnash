@@ -379,15 +379,15 @@ admin_handler(Handler::thread_params_t *args)
 	    memset(data, 0, ADMINPKTSIZE+1);
 	    const char *ptr = reinterpret_cast<const char *>(data);
 	    ret = net.readNet(data, ADMINPKTSIZE, 100);
-	    // force the case to make comparisons easier. Only compare enough characters to
-	    // till each command is unique.
-	    std::transform(ptr, ptr + ret, data, (int(*)(int)) toupper);
 	    if (ret < 0) {
-		net.writeNet("no more admin data, exiting...\n");
+		log_debug("no more admin data, exiting...\n");
 		if ((ret == 0) && cmd != Handler::POLL) {
 		    break;
 		}
 	    } else {
+		// force the case to make comparisons easier. Only compare enough characters to
+		// till each command is unique.
+		std::transform(ptr, ptr + ret, data, (int(*)(int)) toupper);
 		if (strncmp(ptr, "QUIT", 4) == 0) { 
 		    cmd = Handler::QUIT;
 		} else if (strncmp(ptr, "STATUS", 5) == 0) {
@@ -410,7 +410,11 @@ admin_handler(Handler::thread_params_t *args)
 	      {
 #ifdef USE_STATS_CACHE
 //		  cache.dump();
-		  cache.stats();
+		  string results = cache.stats();
+		  if (results.size()) {
+		      net.writeNet(results);
+		      results.clear();
+		  }
 #endif
 #if 0
 		  response << handlers.size() << " handlers are currently active.";
@@ -421,7 +425,7 @@ admin_handler(Handler::thread_params_t *args)
 			       << hand->insize()
 			       << "," << hand->outsize()
 			       << "\r\n";
-		      net.writeNet(response.str());
+		      net.writeNet(response);
 		      index++;
 		  }
 #endif
@@ -464,7 +468,7 @@ admin_handler(Handler::thread_params_t *args)
 		  break;
 	    };
 	} while (ret > 0);
-	net.writeNet("admin_handler: Done...!\n");
+        log_debug("admin_handler: Done...!\n");
 	net.closeNet();		// this shuts down this socket connection
     }
     net.closeConnection();		// this shuts down the server on this connection
@@ -561,7 +565,6 @@ connection_handler(Handler::thread_params_t *args)
 	    log_debug("Single threaded mode for fd #%d", args->netfd);
 	    args->handler = hand;
 	    dispatch_handler(args);
-//	    http_handler(args);
 	}
 	//
 	log_debug("Restarting loop for next connection for port %d...", args->port);
