@@ -734,7 +734,7 @@ SWFMovieDefinition::export_resource(const std::string& symbol,
 
 
 boost::intrusive_ptr<ExportableResource>
-SWFMovieDefinition::get_exported_resource(const std::string& symbol)
+SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 {
 #ifdef DEBUG_EXPORTS
 	log_debug("get_exported_resource(%s) called, loading frame:%u", symbol, m_frame_count);
@@ -778,7 +778,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 		// _exportedResources access is thread-safe
 		{
 			boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-			ExportMap::iterator it = _exportedResources.find(symbol);
+			ExportMap::const_iterator it = _exportedResources.find(symbol);
 			if ( it != _exportedResources.end() )
             {
 #ifdef DEBUG_EXPORTS
@@ -845,6 +845,7 @@ SWFMovieDefinition::get_exported_resource(const std::string& symbol)
 		log_error("No export symbol %s found in movie %s. "
 			"Frames loaded %d/%d",
 			symbol, _url, loading_frame, m_frame_count);
+        //abort();
 	}
 
 	return boost::intrusive_ptr<ExportableResource>(0); // 0
