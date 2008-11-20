@@ -160,7 +160,9 @@ Gui::~Gui()
 
     delete _renderer;
 #ifdef GNASH_FPS_DEBUG
-    std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
+    if ( fps_timer_interval ) {
+        std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
+    }
 #endif
 }
 
