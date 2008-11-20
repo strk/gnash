@@ -175,7 +175,7 @@ Cache::removeFile(const std::string &name)
 }
 
 #ifdef USE_STATS_CACHE
-boost::shared_ptr<string>
+string
 Cache::stats() const
 {
 //    GNASH_REPORT_FUNCTION;
@@ -190,7 +190,7 @@ Cache::stats() const
 
     text << "Pathnames in cache: " << _pathnames.size() << " accessed "
 	 << _pathname_lookups << " times" << endl;
-     text << "Pathname hits from cache: " << _pathname_hits << endl;
+    text << "Pathname hits from cache: " << _pathname_hits << endl;
     
     text << "Responses in cache: " << _responses.size() << " accessed "
 	 << _response_lookups << " times" << endl;
@@ -210,11 +210,9 @@ Cache::stats() const
     }
 #endif
 
-    cerr << text.str() << endl;
-    
-    boost::shared_ptr<string> str;
+//    cerr << text.str() << endl;    
 
-    return str;
+    return text.str();
 }
 #endif
 

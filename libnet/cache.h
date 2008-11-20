@@ -25,7 +25,7 @@
 
 #include <string>
 #include <map> 
-#include <iostream> // for output operator
+#include <iostream>
 #include <boost/shared_ptr.hpp>
 
 #include "statistics.h"
@@ -66,7 +66,7 @@ public:
     void dump(std::ostream& os) const;    
 
 #ifdef USE_STATS_CACHE
-    boost::shared_ptr<std::string> stats() const;
+    std::string stats() const;
 #endif
 private:
     /// \var Cache::_pathnames
