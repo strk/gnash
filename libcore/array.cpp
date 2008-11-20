@@ -1550,7 +1550,8 @@ void
 array_class_init(as_object& glob)
 {
     // Register _global.Array
-    glob.init_member("Array", getArrayConstructor(glob.getVM()));
+    int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
+    glob.init_member("Array", getArrayConstructor(glob.getVM()), flags);
 }
 
 void

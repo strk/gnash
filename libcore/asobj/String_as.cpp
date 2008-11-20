@@ -877,10 +877,11 @@ void string_class_init(as_object& global)
     // This is going to be the global String "class"/"function"
     boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
 
-    // Register _global.String
+    // Register _global.String (should be only visible from SWF5 up)
     // TODO: register as ASnative(251, 0)
     // TODO: register as ASnative(3, 0) for SWF5 ?
-    global.init_member("String", cl.get());
+    int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
+    global.init_member("String", cl.get(), flags);
 }
 
 boost::intrusive_ptr<as_object>
