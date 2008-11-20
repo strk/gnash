@@ -66,7 +66,7 @@ public:
     void dump(std::ostream& os) const;    
 
 #ifdef USE_STATS_CACHE
-    std::string stats() const;
+    std::string stats(bool xml) const;
 #endif
 private:
     /// \var Cache::_pathnames

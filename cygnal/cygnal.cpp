@@ -410,7 +410,7 @@ admin_handler(Handler::thread_params_t *args)
 	      {
 #ifdef USE_STATS_CACHE
 //		  cache.dump();
-		  string results = cache.stats();
+		  string results = cache.stats(false);
 		  if (results.size()) {
 		      net.writeNet(results);
 		      results.clear();
