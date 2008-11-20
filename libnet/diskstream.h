@@ -220,6 +220,7 @@ public:
     ///
     /// @return A real pointer to the struct timespec of the last access.
     struct timespec *getFirstAccessTime() { return &_first_access; };
+    size_t getAccessCount() { return _accesses; };
 #endif    
 
     /// \brief Dump the internal data of this class in a human readable form.
@@ -287,6 +288,7 @@ private:
     
 #ifdef USE_STATS_CACHE
     struct timespec _first_access;	// used for timing how long data stays in the queue.
+    size_t	    _accesses;
 #endif
 
 #ifdef USE_STATS_FILE

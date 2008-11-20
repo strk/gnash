@@ -70,6 +70,7 @@ DiskStream::DiskStream()
 //    GNASH_REPORT_FUNCTION;
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
+    _accesses = 1;
 #endif
 }
 
@@ -85,6 +86,7 @@ DiskStream::DiskStream(const string &str)
     _filespec = str;
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
+    _accesses = 1;
 #endif
 }
 
@@ -101,6 +103,7 @@ DiskStream::DiskStream(const string &str, int netfd)
     _filespec = str;
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
+    _accesses = 1;
 #endif
 }
 
@@ -293,6 +296,9 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 
     // the file is already open
     if (_state == OPEN) {
+#ifdef USE_STATS_CACHE
+	_accesses++;
+#endif
 	return true;
     }
     
