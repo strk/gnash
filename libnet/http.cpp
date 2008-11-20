@@ -65,6 +65,9 @@ extern map<int, Handler *> handlers;
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
 
+// max size of files to map enirely into the cache
+static const size_t CACHE_LIMIT = 102400000;
+
 static Cache& cache = Cache::getDefaultInstance();
 
 HTTP::HTTP() 
@@ -279,7 +282,7 @@ HTTP::formatHeader(int filesize, http_status_e /* type */)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    _header << "HTTP/1.1 200 OK" << "\r\n";
+    _header << "HTTP/1.0 200 OK" << "\r\n";
     formatDate();
     formatServer();
 //     if (type == NONE) {
@@ -1607,15 +1610,21 @@ http_handler(Handler::thread_params_t *args)
 	    } else {
 		getbytes = filestream->getPagesize();
 	    }
-	    do {
-		boost::uint8_t *ptr = filestream->loadChunk(page);
-		ret = www.writeNet(args->netfd, filestream->get(), getbytes);
-		if (ret <= 0) {
-		    break;
-		}
-		bytes_read += ret;
+	    if (filesize >= CACHE_LIMIT) {
+		do {
+		    boost::uint8_t *ptr = filestream->loadChunk(page);
+		    ret = www.writeNet(args->netfd, filestream->get(), getbytes);
+		    if (ret <= 0) {
+			break;
+		    }
+		    bytes_read += ret;
 		page += filestream->getPagesize();
-	    } while (bytes_read <= filesize);
+		} while (bytes_read <= filesize);
+	    } else {
+		boost::uint8_t *ptr = filestream->loadChunk(filesize, 0);
+		ret = www.writeNet(args->netfd, filestream->get(), filesize);
+	    }
+	    
 #ifdef USE_STATS_CACHE
 	    struct timespec end;
 	    clock_gettime (CLOCK_REALTIME, &end);
