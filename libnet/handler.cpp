@@ -163,6 +163,7 @@ Handler::clear(fifo_e direction)
 void
 Handler::addPollFD(struct pollfd &fd, Handler::entry_t *func)
 {
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     _handlers[fd.fd] = func;
      _pollfds.push_back(fd);
@@ -171,19 +172,23 @@ Handler::addPollFD(struct pollfd &fd, Handler::entry_t *func)
 void
 Handler::addPollFD(struct pollfd &fd)
 {
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
-    return _pollfds.push_back(fd);
+     _pollfds.push_back(fd);
 }
 
 struct pollfd
 &Handler::getPollFD(int index)
 {
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     return _pollfds[index];
 }
+
 struct pollfd *
 Handler::getPollFDPtr()
 {
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     return &_pollfds[0];
 };
