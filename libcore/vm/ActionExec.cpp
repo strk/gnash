@@ -96,8 +96,18 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 
     // Functions defined in SWF version 6 and higher pushes
     // the activation object to the scope stack
-    //if ( code.getDefinitionVersion() > 5 )
-    if ( env.get_version() > 5 )
+    // NOTE: if we query env.get_version() we get version of the calling
+    //       code, not the one we're about to call. This is because
+    //       it is ActionExec's call operator switching the VM version!
+    //
+    //       TESTCASE: winterbell from orisinal.
+    //       If we query VM version here, the movie results in:
+    //              set local var: i=[number:0]
+    //              push 'i' getvariable
+    //              get var: i=[undefined] 
+    // 
+    if ( code.getDefinitionVersion() > 5 )
+    //if ( env.get_version() > 5 )
     {
         // We assume that the swf_function () operator already initialized its environment
         // so that it's activation object is now in the top element of the CallFrame stack
