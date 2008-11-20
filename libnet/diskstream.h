@@ -164,10 +164,14 @@ public:
     /// \brief Load a chunk of the file into memory
     ///		This offset must be a multipe of the pagesize.
     ///
-    /// @param size The location in bytes in the file of the desired data.
+    /// @param size The amount of bytes to read, often the filesize
+    ///		for smaller files below CACHE_LIMIT.
+    ///
+    /// @param offset The location in bytes in the file of the desired data.
     ///
     /// @return A real pointer to the location of the data at the
     ///		location pointed to by the offset.
+    boost::uint8_t *loadChunk(size_t size, off_t offset);
     boost::uint8_t *loadChunk(off_t size);
     boost::uint8_t *loadChunk() { return loadChunk(_offset); };
 

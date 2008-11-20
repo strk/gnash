@@ -135,12 +135,21 @@ DiskStream::close()
 ///	than read(), which add buffering we don't need.
 ///	This offset must be a multipe of the pagesize.
 ///
-/// @param size The location in bytes in the file of the desired data.
+/// @param size The amount of bytes to read, often the filesize
+///		for smaller files below CACHE_LIMIT.
+///
+/// @param offset The location in bytes in the file of the desired data.
 ///
 /// @return A real pointer to the location of the data at the
 ///	location pointed to by the offset.
 boost::uint8_t *
 DiskStream::loadChunk(off_t offset)
+{
+    return loadChunk(_pagesize, offset);
+}
+
+boost::uint8_t *
+DiskStream::loadChunk(size_t size, off_t offset)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -151,6 +160,7 @@ DiskStream::loadChunk(off_t offset)
 	log_error("Bad pointer to memory for file %s!", _filespec);
 	return 0;
     }
+
 #if 0
     /// We only map pages of pagesize, so if the offset is smaller
     /// than that, don't use it.
@@ -165,6 +175,7 @@ DiskStream::loadChunk(off_t offset)
  	    log_debug("Adjusting offset from %d to %d so it's page aligned.",
  		      offset, _offset);
 	}
+	log_debug("Offset is page aligned already");
     }
 #endif
     
@@ -173,23 +184,22 @@ DiskStream::loadChunk(off_t offset)
 	/// to mmap() a new one. If we're still in the current mapped
 	/// page, then just return the existing data pointer.
 	if (_dataptr != 0) {
-#if 0
-	    // If the offset is less than what we already mmapped, we
-	    boost::uint32_t diff = *reinterpret_cast<boost::uint32_t *>(_dataptr + offset);
-	    if (diff < _pagesize) {
-		return _dataptr + _offset;
-		// unmap the old data before allocating a new chunk
-  	    } else {
-  		munmap(_dataptr, _pagesize);
- 		_dataptr = 0;
-	    }
-#else
-  		munmap(_dataptr, _pagesize);
- 		_dataptr = 0;
-#endif
+	    munmap(_dataptr, _pagesize);
+	    _dataptr = 0;
 	}
-	
-	_dataptr = static_cast<unsigned char *>(mmap(0, _pagesize,
+
+#if 0
+	// See if the page has alady been mapped in;
+	unsigned char vec[_pagesize];
+	mincore(offset, _pagesize, vec);
+	if (vec[i] & 0x1) {
+	    // cached page is in memory
+	}
+#endif
+	if (size <= _pagesize) {
+	    size = _pagesize;
+	}
+	_dataptr = static_cast<unsigned char *>(mmap(0, size,
 						     PROT_READ, MAP_SHARED, _filefd, offset));
     } else {
 	log_error (_("Couldn't load file %s"), _filespec);
