@@ -176,7 +176,7 @@ Cache::removeFile(const std::string &name)
 
 #ifdef USE_STATS_CACHE
 string
-Cache::stats() const
+Cache::stats(bool xml) const
 {
 //    GNASH_REPORT_FUNCTION;
     // dump timing related data
@@ -185,33 +185,60 @@ Cache::stats() const
     
     clock_gettime (CLOCK_REALTIME, &now);    
     double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
-    
-    text << "Time since last access:  " << fixed << ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9)) << " seconds ago." << endl;
 
-    text << "Pathnames in cache: " << _pathnames.size() << " accessed "
-	 << _pathname_lookups << " times" << endl;
-    text << "Pathname hits from cache: " << _pathname_hits << endl;
-    
-    text << "Responses in cache: " << _responses.size() << " accessed "
-	 << _response_lookups << " times" << endl;
-    text << "Response hits from cache: " << _response_hits << endl;
-
-    text << "Files in cache: " << _files.size() << " accessed "
-	 << _file_lookups << " times" << endl;
-    text << "File hits from cache: " << _file_hits << endl;
-
-#if 0
-    map<std::string, DiskStream *>::const_iterator data;
-    for (data = _files.begin(); data != _files.end(); data++) {
-        const struct timespec *last = data->second->getLastAccessTime();
-	text << "Disktream: " << data->first << endl;
-	time = ((now.tv_sec - last->tv_sec) + ((now.tv_nsec - last->tv_nsec)/1e9));
-	text << "Time since last file access:  " << fixed << time << " seconds ago." << endl;
+    if (xml) {
+	text << "<cache>" << endl;
+	text << "	<LastAccess>"       << time              << " </LastAccess>" << endl;
+	text << "	<PathNames>" << endl
+	     << "		<Total>" << _pathnames.size() << "</Total>" << endl
+	     << "		<Hits>"     << _pathname_hits    << "</Hits>" << endl
+	     << "	</PathNames>" << endl;
+	text << "	<Responses>" << endl;
+	text << "		<Total>" << _responses.size() << "</Total>" << endl
+	     << "		<Hits>"     << _response_hits   << "</Hits>" << endl
+	     << "       </Responses>" << endl;
+	text << "	<Files>" << endl
+	     << "		<Total>"     << _files.size()     << "</Total>" << endl
+	     << "		<Hits>"     << _file_hits        << "</Hits>" << endl
+	     << "       </Files>" << endl;
+    } else {
+	text << "Time since last access:  " << fixed << time << " seconds ago." << endl;
+	
+	text << "Pathnames in cache: " << _pathnames.size() << ", accessed "
+	     << _pathname_lookups << " times" << endl;
+	text << "	Pathname hits from cache: " << _pathname_hits << endl;
+	
+	text << "Responses in cache: " << _responses.size() << ", accessed "
+	     << _response_lookups << " times" << endl;
+	text << "	Response hits from cache: " << _response_hits << endl;
+	
+	text << "Files in cache: " << _files.size() << ", accessed "
+	     << _file_lookups << " times" << endl;
+	text << "	File hits from cache: " << _file_hits << endl;
     }
-#endif
+    
+    map<std::string, boost::shared_ptr<DiskStream> >::const_iterator data;
+    for (data = _files.begin(); data != _files.end(); data++) {
+	const struct timespec *last = data->second->getLastAccessTime();
+	time = ((now.tv_sec - last->tv_sec) + ((now.tv_nsec - last->tv_nsec)/1e9));
+	if (xml) {
+	    text << "	<DiskStreams>" << endl
+		 << "		<Name>\"" << data->first << "\"</Name>" << endl
+		 << "		<Hits>" << data->second->getAccessCount() << "</Hits>" << endl
+		 << "		<LastAccess>" << time << "</LastAccess>" << endl
+		 << "	</DiskStreams>" << endl;
+	} else {
+	    text << "Disktream: " << data->first
+		 << ", accessed: " << data->second->getAccessCount()
+		 << " times." << endl;
+	    text << "	Time since last file access:  " << fixed << time << " seconds ago." << endl;
+	}
+    }
 
-//    cerr << text.str() << endl;    
-
+    if (xml) {
+	text << "</cache>" << endl;
+    }
+    
     return text.str();
 }
 #endif
@@ -243,7 +270,7 @@ Cache::dump(std::ostream& os) const
 #endif
 
 #ifdef USE_STATS_CACHE
-    this->stats();
+    this->stats(false);
 #endif
 }
 
