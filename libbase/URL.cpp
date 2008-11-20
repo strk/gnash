@@ -419,7 +419,7 @@ URL::parse_querystring(const std::string& query_string,
 void
 URL::encode(std::string& input)
 {
-	const std::string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~_";
+	const std::string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~_.!-(')";
 	const std::string hexdigits = "0123456789ABCDEF";
 
 	for (unsigned int i=0;i<input.length(); i++)

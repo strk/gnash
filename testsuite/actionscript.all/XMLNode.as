@@ -225,7 +225,7 @@ xcheck_equals(node77.toString(), '<tag a1="at1" />');
 // Check namespace functions.
 
 // Standard namespace
-x = new XML('<tag xmlns="standard" att="u"></tag>');
+x = new XML('<tag xmlns="standard" att="u">text</tag>');
 ns = x.firstChild;
 check_equals(ns.nodeName, "tag");
 check_equals(ns.attributes["att"], "u");
@@ -238,6 +238,12 @@ xcheck_equals(ns.getPrefixForNamespace("standard"), "");
 ns.attributes["xmlns"] = "standard2";
 check_equals(ns.namespaceURI, "standard");
 xcheck_equals(ns.getNamespaceForPrefix(""), "standard2");
+
+ns = ns.firstChild;
+check_equals(ns.nodeName, null);
+check_equals(ns.nodeValue, "text");
+check_equals(ns.namespaceURI, null);
+check_equals(ns.prefix, null);
 
 x = new XML('<tag xmlns:t="standard"></tag>');
 ns = x.firstChild;
@@ -268,7 +274,7 @@ xcheck_equals(n.getPrefixForNamespace("nst"), "t");
 
 n = n.firstChild;
 check_equals(n.nodeName, "tag3");
-xcheck_equals(n.namespaceURI, "nss");
+check_equals(n.namespaceURI, "nss");
 check_equals(n.getNamespaceForPrefix(), undefined);
 xcheck_equals(n.getNamespaceForPrefix("r"), "nsr");
 xcheck_equals(n.getPrefixForNamespace("nsr"), "r");
@@ -351,4 +357,4 @@ check_equals(ns.nodeName, "tag");
 check_equals(ns.localName, "tag");
 check_equals(ns.prefix, "");
 
-check_totals(165);
+check_totals(169);

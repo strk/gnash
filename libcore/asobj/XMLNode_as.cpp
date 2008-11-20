@@ -528,6 +528,12 @@ xmlnode_namespaceURI(const fn_call& fn)
 
     // Read-only property
     
+    if (ptr->nodeName().empty()) {
+        as_value null;
+        null.set_null();
+        return null;
+    }
+
     // Search recursively for a namespace. Return an empty string
     // if none found.
     XMLNode_as* node = ptr.get();
@@ -536,7 +542,7 @@ xmlnode_namespaceURI(const fn_call& fn)
     }
     if (!node) return as_value("");
 
-    return as_value(ptr->getNamespaceURI());
+    return as_value(node->getNamespaceURI());
 }
 
 
@@ -549,6 +555,12 @@ xmlnode_prefix(const fn_call& fn)
     boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
 
     // Read-only property
+    
+    if (ptr->nodeName().empty()) {
+        as_value null;
+        null.set_null();
+        return null;
+    }
     
     const std::string& nodeName = ptr->nodeName();
     if (nodeName.empty()) return as_value("");
@@ -572,6 +584,12 @@ xmlnode_localName(const fn_call& fn)
 
     // Read-only property
     
+    if (ptr->nodeName().empty()) {
+        as_value null;
+        null.set_null();
+        return null;
+    }
+
     const std::string& nodeName = ptr->nodeName();
     if (nodeName.empty()) return as_value("");
 
