@@ -258,7 +258,7 @@ Network::newConnection(bool block)
 int
 Network::newConnection(bool block, int fd)
 {
-  //    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct sockaddr	newfsin;
     socklen_t		alen;
@@ -471,7 +471,7 @@ Network::createClient(const string &hostname)
 bool
 Network::createClient(const string &hostname, short port)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct sockaddr_in  sock_in;
     fd_set              fdset;
@@ -982,9 +982,13 @@ boost::shared_ptr<std::vector<struct pollfd> >
 Network::waitForNetData(int limit, struct pollfd *fds)
 {
     GNASH_REPORT_FUNCTION;
-    
+
     boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
 
+    if (fds == 0) {
+	return hits;
+    }
+    
     int ret = poll(fds, limit, _timeout);
 
     log_debug("Poll returned: %d, timeout is: %d", ret, _timeout);
