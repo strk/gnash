@@ -200,7 +200,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // we just built it the same way it always is.
     // first is the TCSO, we have no idea what this stands for.
 //    ptr = reinterpret_cast<uint8_t *>(const_cast<uint8_t *>("TCSO");
-    ptr = (uint8_t *)"TCSO";
+	ptr = (boost::uint8_t *)"TCSO";
     for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -337,7 +337,7 @@ SOL::writeFile(const string &filespec, const string &name)
     }
     
     _filesize = ptr - body.get();
-    int len = name.size() + sizeof(uint16_t) + 16;
+	int len = name.size() + sizeof(boost::uint16_t) + 16;
     boost::scoped_array<char> head ( new char[len + 4] );
     memset(head.get(), 0, len);
     ptr = head.get();
