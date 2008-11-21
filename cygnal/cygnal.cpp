@@ -145,11 +145,12 @@ usage()
 	<< _("  -h,  --help          Print this help and exit") << endl
 	<< _("  -V,  --version       Print version information and exit") << endl
 	<< _("  -v,  --verbose       Output verbose debug info") << endl
-	<< _("  -p   --port-offset   RTMPT port offset") << endl
+	<< _("  -p   --port-offset   Port offset for debugging") << endl
 	<< _("  -n,  --netdebug      Turn on net debugging messages") << endl
-	<< _("  -t,  --testing       Turn on special Gnash testing support") << endl
+        << _("  -t,  --testing       Turn on special Gnash testing support") << endl
 	<< _("  -a,  --admin         Enable the administration thread") << endl
 	<< _("  -r,  --root          Document root for all files") << endl
+	<< _("  -c,  --threads       Enable Threading") << endl
 	<< endl;
 }
 
@@ -173,7 +174,8 @@ main(int argc, char *argv[])
         { 'n', "netdebug",      Arg_parser::no  },
         { 't', "testing",       Arg_parser::no  },
         { 'a', "admin",         Arg_parser::no  },
-        { 'r', "root",          Arg_parser::yes }
+        { 'r', "root",          Arg_parser::yes },
+        { 'c', "threads",       Arg_parser::no }
         };
 
     Arg_parser parser(argc, argv, opts);
@@ -232,6 +234,9 @@ main(int argc, char *argv[])
 	  case 'r':
 	      docroot = parser.argument(i).c_str();
 	      break;
+	  case 'c':
+	      crcfile.setThreadingFlag(true);
+	      break;
 	  case 'n':
 	      netdebug = true;
 	      break;
@@ -282,7 +287,7 @@ main(int argc, char *argv[])
       // Incomming connection handler for port 1935, RTMP. As RTMP
       // is not a priviledged port, we just open it without an offset.
       Handler::thread_params_t rtmp_data;
-      rtmp_data.port = gnash::RTMP_PORT;
+      rtmp_data.port = port_offset + gnash::RTMP_PORT;
       rtmp_data.netfd = 0;
       rtmp_data.filespec = docroot;
       if (crcfile.getThreadingFlag()) {
@@ -469,7 +474,7 @@ admin_handler(Handler::thread_params_t *args)
 	    };
 	} while (ret > 0);
         log_debug("admin_handler: Done...!\n");
-	net.closeNet();		// this shuts down this socket connection
+//	net.closeNet();		// this shuts down this socket connection
     }
     net.closeConnection();		// this shuts down the server on this connection
 
@@ -483,7 +488,7 @@ connection_handler(Handler::thread_params_t *args)
     GNASH_REPORT_FUNCTION;
     int fd = 0;
 //    list<Handler *> *handlers = reinterpret_cast<list<Handler *> *>(args->handle);
-
+    bool done = false;
     static int tid = 0;
     Network net;
     if (netdebug) {
@@ -545,30 +550,30 @@ connection_handler(Handler::thread_params_t *args)
 	if (args->port == (port_offset + RTMPT_PORT)) {
 	    hand->addPollFD(fds, http_handler);
 	}
-// 	if (args->port == RTMP_PORT) {
-// 	    hand->addPollFD(fds, rtmp_handler);
-// 	}
+//  	if (args->port == RTMP_PORT) {
+//  	    hand->addPollFD(fds, rtmp_handler);
+//  	}
 	// if supporting multiple threads
+	args->handler = hand;
 	if (crcfile.getThreadingFlag()) {
-	    hand = new Handler;
-	    args->handler = hand;
+	    log_debug("Multi-threaded mode for fd #%d", args->netfd);
 	    log_debug("Starting handler: %x for fd #%d", (void *)hand, args->netfd);
+#if 0
 	    if (args->port == (port_offset + RTMPT_PORT)) {
 		boost::thread handler(boost::bind(&http_handler, args));
 	    }
-	    if (args->port == RTMP_PORT) {
+	    if (args->port == (port_offset + RTMP_PORT)) {
 		boost::thread handler(boost::bind(&rtmp_handler, args));
 	    }
-	    dispatch_handler(args);
-//	    net.closeNet(args->netfd);
+#endif
+	    boost::thread handler(boost::bind(&dispatch_handler, args));
 	} else {		// single threaded
 	    log_debug("Single threaded mode for fd #%d", args->netfd);
-	    args->handler = hand;
 	    dispatch_handler(args);
 	}
-	//
+//	net.closeNet(args->netfd); 		// this shuts down this socket connection
 	log_debug("Restarting loop for next connection for port %d...", args->port);
-    } while(1);
+    } while(!done);
     
     // All threads should exit now.
     alldone.notify_all();
@@ -600,8 +605,8 @@ dispatch_handler(Handler::thread_params_t *args)
 		    if ((it->revents & POLLRDHUP) || (it->revents & POLLNVAL))  {
 			log_debug("Revents has a POLLRDHUP or POLLNVAL set to %d for fd #%d",
 				  it->revents, it->fd);
-			hand->erasePollFD(it);
-			net.closeNet(it->fd);
+ 			hand->erasePollFD(it);
+ 			net.closeNet(it->fd);
 		    }
 		    log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
 		    hand->getEntry(it->fd)(args);

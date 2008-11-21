@@ -65,6 +65,7 @@ Cache::Cache()
 Cache::~Cache()
 {
 //    GNASH_REPORT_FUNCTION;
+//    dump();
 }
 
 Cache&
