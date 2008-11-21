@@ -290,10 +290,10 @@ XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 {
     XMLNode_as* node = this;
     PropertyList::SortedPropertyList::const_iterator it; 
+    PropertyList::SortedPropertyList attrs;
     
     while (node)
     {
-        PropertyList::SortedPropertyList attrs;
         enumerateAttributes(*node, attrs);
         if (!attrs.empty())
         {
@@ -309,13 +309,17 @@ XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 
     // Return the matching prefix
     const std::string& name = it->first;
-    std::string::size_type pos = name.find(':');
 
-    /// If we have a match and there is no colon, this is a standard
-    /// namespace.
-    if (pos == std::string::npos) return true;
+    if (name.length() == 5) {
+        return true;
+    }
+
+    assert (name.length() >= 6);
     
-    prefix = name.substr(pos + 1);
+    if (name[5] != ':') return false;
+
+    // Can also be empty.
+    prefix = name.substr(6);
     return true;
     
 }
@@ -325,10 +329,10 @@ XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
 {
     XMLNode_as* node = this;
     PropertyList::SortedPropertyList::const_iterator it; 
+    PropertyList::SortedPropertyList attrs;
     
     while (node)
     {
-        PropertyList::SortedPropertyList attrs;
         enumerateAttributes(*node, attrs);
         if (!attrs.empty())
         {
@@ -956,7 +960,7 @@ namespaceMatches(const PropertyList::SortedPropertyList::value_type& val,
         const std::string& ns)
 {
     StringNoCaseEqual noCaseCompare;
-    return (noCaseCompare(val.first.substr(0,5), "xmlns") && 
+    return (noCaseCompare(val.first.substr(0, 5), "xmlns") && 
                 noCaseCompare(val.second, ns));
 }
 
@@ -972,18 +976,12 @@ prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
     // Attributes are stored with no trailing or leading whitespace,
     // so a simple comparison should do. TODO: what about "xmlns:"?
     if (prefix.empty()) {
-        return noCaseCompare(name, "xmlns");
+        return noCaseCompare(name, "xmlns") || noCaseCompare(name, "xmlns:");
     }
 
-    if (!noCaseCompare(name.substr(0, 5), "xmlns")) return false;
+    if (!noCaseCompare(name.substr(0, 6), "xmlns:")) return false;
 
-    std::string::size_type pos = name.find(':');
-
-    // There is no colon or nothing after the colon, so this node has
-    // no matching prefix.
-    if (pos == std::string::npos) return false;
-
-    return noCaseCompare(prefix, name.substr(pos + 1));
+    return noCaseCompare(prefix, name.substr(6));
 }
 
 } // anonymous namespace
