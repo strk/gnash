@@ -35,7 +35,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <algorithm>
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h" // read()
 
 #include "amf.h"
 #include "http.h"

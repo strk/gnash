@@ -32,7 +32,7 @@
 #include "check.h"
 #include <string>
 #include <cassert>
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 
 using namespace gnash;
 using namespace std;

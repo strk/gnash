@@ -139,7 +139,6 @@ noinst_HEADERS = \
 	String_as.h \
 	XML_as.h \
 	XMLSocket_as.h \
-	xmlattrs.h \
 	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
 	flash/display_pkg.h \

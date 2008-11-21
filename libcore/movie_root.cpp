@@ -17,6 +17,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
+#include "GnashSystemIOHeaders.h" // write()
+
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_root.h"
 #include "log.h"
@@ -44,7 +46,6 @@
 #include <functional> // std::bind2nd, std::equal_to
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/bind.hpp>
-#include <unistd.h>
 
 #ifdef USE_SWFTREE
 # include "tree.hh"

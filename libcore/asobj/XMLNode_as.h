@@ -23,7 +23,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "action.h"
 #include "impl.h"
-#include "xmlattrs.h"
 #include "log.h"
 
 #include <list>

@@ -40,7 +40,7 @@
 #	include <io.h>
 #	define dup _dup
 #else
-#include <unistd.h>
+#include <unistd.h> // dup
 #endif
 
 namespace gnash

@@ -50,7 +50,6 @@
 #include "utf8.h"
 #include "StringPredicates.h" // StringNoCaseEqual
 
-#include <unistd.h>  // For write() on BSD
 #include <string>
 #include <vector>
 #include <locale>
