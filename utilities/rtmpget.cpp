@@ -294,19 +294,17 @@ main(int argc, char *argv[])
         pageUrl = "http://gnashdev.org";
     }
     
-    if (netdebug) {
-        cerr << "URL is " << url << endl;
-        cerr << "Protocol is " << protocol << endl;
-        cerr << "Host is "  << hostname << endl;
-        cerr << "Port is "  << port << endl;
-        cerr << "Path is "  << path << endl;
-        cerr << "Filename is "  << filename << endl;
-        cerr << "App is "   << app << endl;
-        cerr << "Query is " << query << endl;
-        cerr << "tcUrl is " << tcUrl << endl;
-        cerr << "swfUrl is " << swfUrl << endl;
-        cerr << "pageUrl is " << pageUrl << endl;
-    }
+    log_debug("URL is %s", url);
+    log_debug("Protocol is %s", protocol);
+    log_debug("Host is %s", hostname);
+    log_debug("Port is %s", port);
+    log_debug("Path is %s", path);
+    log_debug("Filename is %s", filename);
+    log_debug("App is %s", app);
+    log_debug("Query is %s", query);
+    log_debug("tcUrl is %s", tcUrl);
+    log_debug("swfUrl is %s", swfUrl);
+    log_debug("pageUrl is %s", pageUrl);
 
     client.toggleDebug(netdebug);
     if (client.createClient(hostname, port) == false) {
@@ -458,6 +456,8 @@ main(int argc, char *argv[])
     write(fd, buf3->reference(), buf3->size());
     close(fd);
 #endif    
+
+    exit(0);
 }
 
 // Trap Control-C so we can cleanly exit
