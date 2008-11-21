@@ -44,6 +44,9 @@ namespace {
             PropertyList::SortedPropertyList&attributes);
     bool prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
             const std::string& prefix);
+    bool namespaceMatches(
+            const PropertyList::SortedPropertyList::value_type& val,
+            const std::string& ns);
 }
 
 static as_value xmlnode_new(const fn_call& fn);
@@ -282,9 +285,38 @@ XMLNode_as::setAttribute(const std::string& name, const std::string& value)
     }
 }
 
-void
+bool
 XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
 {
+    XMLNode_as* node = this;
+    PropertyList::SortedPropertyList::const_iterator it; 
+    
+    while (node)
+    {
+        PropertyList::SortedPropertyList attrs;
+        enumerateAttributes(*node, attrs);
+        if (!attrs.empty())
+        {
+            it = std::find_if(attrs.begin(), attrs.end(), 
+                        boost::bind(namespaceMatches, _1, ns));
+            if (it != attrs.end()) break;
+        }
+        node = node->getParent();
+    }
+
+    // None found.
+    if (!node) return false;
+
+    // Return the matching prefix
+    const std::string& name = it->first;
+    std::string::size_type pos = name.find(':');
+
+    /// If we have a match and there is no colon, this is a standard
+    /// namespace.
+    if (pos == std::string::npos) return true;
+    
+    prefix = name.substr(pos + 1);
+    return true;
     
 }
 
@@ -573,8 +605,18 @@ as_value
 xmlnode_getPrefixForNamespace(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
-    log_unimpl("XMLNode.getPrefixForNamespace");
-    return as_value();
+    if (!fn.nargs) {
+        return as_value();
+    }
+
+    std::string prefix;
+
+    // Return undefined if none found; otherwise the prefix string found.
+    // This can be empty if it is a standard namespace.
+    if (!ptr->getPrefixForNamespace(fn.arg(0).to_string(), prefix)) {
+        return as_value();
+    }
+    return as_value(prefix);
 }
 
 
@@ -907,6 +949,18 @@ enumerateAttributes(const XMLNode_as& node,
 
 }
 
+/// Return true if this attribute is a namespace specifier and the
+/// namespace matches.
+bool
+namespaceMatches(const PropertyList::SortedPropertyList::value_type& val,
+        const std::string& ns)
+{
+    StringNoCaseEqual noCaseCompare;
+    return (noCaseCompare(val.first.substr(0,5), "xmlns") && 
+                noCaseCompare(val.second, ns));
+}
+
+
 bool
 prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
         const std::string& prefix)
@@ -924,15 +978,12 @@ prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
     if (!noCaseCompare(name.substr(0, 5), "xmlns")) return false;
 
     std::string::size_type pos = name.find(':');
-    pos = name.find_first_not_of("\n\r\t ", pos + 1);
 
     // There is no colon or nothing after the colon, so this node has
     // no matching prefix.
     if (pos == std::string::npos) return false;
 
-    log_debug("prefix compare: %s, %s", prefix, name.substr(pos));
-
-    return noCaseCompare(prefix, name.substr(pos));
+    return noCaseCompare(prefix, name.substr(pos + 1));
 }
 
 } // anonymous namespace

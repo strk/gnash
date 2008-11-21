@@ -114,7 +114,9 @@ public:
     void getNamespaceForPrefix(const std::string& prefix, std::string& ns);
 
     /// Performs a recursive search of node attributes to find a match
-    void getPrefixForNamespace(const std::string& ns, std::string& prefix);
+    //
+    /// @return false if no match found.
+    bool getPrefixForNamespace(const std::string& ns, std::string& prefix);
 
     void setNamespaceURI(const std::string value) {
         _namespaceURI = value;

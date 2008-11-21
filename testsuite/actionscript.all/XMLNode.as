@@ -244,12 +244,12 @@ check_equals(ns.attributes["att"], "u");
 check_equals(ns.attributes["xmlns"], "standard");
 check_equals(ns.namespaceURI, "standard");
 check_equals(ns.getNamespaceForPrefix(), undefined);
-xcheck_equals(ns.getNamespaceForPrefix(""), "standard");
-xcheck_equals(ns.getPrefixForNamespace("standard"), "");
+check_equals(ns.getNamespaceForPrefix(""), "standard");
+check_equals(ns.getPrefixForNamespace("standard"), "");
 
 ns.attributes["xmlns"] = "standard2";
 check_equals(ns.namespaceURI, "standard");
-xcheck_equals(ns.getNamespaceForPrefix(""), "standard2");
+check_equals(ns.getNamespaceForPrefix(""), "standard2");
 
 ns = ns.firstChild;
 check_equals(ns.nodeName, null);
@@ -262,7 +262,7 @@ ns = x.firstChild;
 check_equals(ns.namespaceURI, "");
 check_equals(ns.getNamespaceForPrefix(), undefined);
 check_equals(ns.getNamespaceForPrefix("t"), "standard");
-xcheck_equals(ns.getPrefixForNamespace("standard"), "t");
+check_equals(ns.getPrefixForNamespace("standard"), "t");
 
 x = new XML('<tag xmlns:t="nst"><tag2 xmlns="nss"><tag3 xmlns:r="nsr"></tag3></tag2></tag>');
 
@@ -273,7 +273,7 @@ check_equals(n.getNamespaceForPrefix("r"), undefined);
 check_equals(n.getPrefixForNamespace("nsr"), undefined);
 check_equals(n.getNamespaceForPrefix(), undefined);
 check_equals(n.getNamespaceForPrefix("t"), "nst");
-xcheck_equals(n.getPrefixForNamespace("nst"), "t");
+check_equals(n.getPrefixForNamespace("nst"), "t");
 
 n = n.firstChild;
 check_equals(n.nodeName, "tag2");
@@ -282,16 +282,16 @@ check_equals(n.getNamespaceForPrefix(), undefined);
 check_equals(n.getNamespaceForPrefix("r"), undefined);
 check_equals(n.getPrefixForNamespace("nsr"), undefined);
 check_equals(n.getNamespaceForPrefix("t"), "nst");
-xcheck_equals(n.getPrefixForNamespace("nst"), "t");
+check_equals(n.getPrefixForNamespace("nst"), "t");
 
 n = n.firstChild;
 check_equals(n.nodeName, "tag3");
 check_equals(n.namespaceURI, "nss");
 check_equals(n.getNamespaceForPrefix(), undefined);
 check_equals(n.getNamespaceForPrefix("r"), "nsr");
-xcheck_equals(n.getPrefixForNamespace("nsr"), "r");
+check_equals(n.getPrefixForNamespace("nsr"), "r");
 check_equals(n.getNamespaceForPrefix("t"), "nst");
-xcheck_equals(n.getPrefixForNamespace("nst"), "t");
+check_equals(n.getPrefixForNamespace("nst"), "t");
 
 // Multiple definition of standard namespace (first one counts, second never
 // defined).
@@ -300,8 +300,9 @@ ns = x.firstChild;
 check_equals(ns.nodeName, "tag");
 check_equals(ns.attributes["xmlns"], "standard");
 check_equals(ns.namespaceURI, "standard");
-xcheck_equals(ns.getNamespaceForPrefix(""), "standard");
-xcheck_equals(ns.getPrefixForNamespace("standard"), "");
+check_equals(ns.getNamespaceForPrefix(""), "standard");
+
+check_equals(ns.getPrefixForNamespace("standard"), "");
 check_equals(ns.getPrefixForNamespace("standard2"), undefined);
 
 // Multiple definition of prefix during parsing (first one counts,
@@ -313,14 +314,14 @@ check_equals(ns.attributes["xmlns"], undefined);
 check_equals(ns.attributes["xmlns:n1"], "ns1");
 check_equals(ns.namespaceURI, "");
 check_equals(ns.getNamespaceForPrefix("n1"), "ns1");
-xcheck_equals(ns.getPrefixForNamespace("ns1"), "n1");
+check_equals(ns.getPrefixForNamespace("ns1"), "n1");
 check_equals(ns.getPrefixForNamespace("ns2"), undefined);
 
 ns.attributes["xmlns:n1"] = "ns2";
 check_equals(ns.attributes["xmlns:n1"], "ns2");
 check_equals(ns.getNamespaceForPrefix("n1"), "ns2");
 check_equals(ns.getPrefixForNamespace("ns1"), undefined);
-xcheck_equals(ns.getPrefixForNamespace("ns2"), "n1");
+check_equals(ns.getPrefixForNamespace("ns2"), "n1");
 
 // Setting via attributes
 x = new XML('<tag></tag>');
