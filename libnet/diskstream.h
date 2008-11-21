@@ -46,6 +46,7 @@ public:
     ///		This represents the state of the current stream.
     typedef enum {
         NO_STATE,
+	CLOSED,
         OPEN,
         PLAY,
         PREVIEW,

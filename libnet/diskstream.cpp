@@ -123,13 +123,22 @@ void
 DiskStream::close()
 {
 //    GNASH_REPORT_FUNCTION;
+
+    log_debug("Closing %s on fd #%d", _filespec, _filefd);
+
+    if (_filefd) {
+        ::close(_filefd);
+    }
+    
     _filesize = 0;
     _offset = 0;
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
     }
     _dataptr = 0;
-    _filespec.clear();
+    _filefd = 0;
+    _state == CLOSED;
+//    _filespec.clear();
 }
 
 /// \brief Load a chunk (pagesize) of the file into memory.
@@ -312,7 +321,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 	_filesize = st.st_size;
 	boost::mutex::scoped_lock lock(io_mutex);
 	_filefd = ::open(filespec.c_str(), O_RDONLY);
-	log_debug (_("File %s is %lld bytes in size."), filespec,
+	log_debug (_("Opening file %s (fd #%d), %lld bytes in size."), filespec, _filefd,
 		 (long long int) _filesize);
     } else {
 	log_error (_("File %s doesn't exist"), filespec);
