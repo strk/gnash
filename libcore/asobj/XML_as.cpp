@@ -280,8 +280,7 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
         node->setNamespaceURI(value);
     }
 
-    XMLAttr attr(name, value);
-    node->_attributes.push_back(attr);
+    node->setAttribute(name, value);
 
 
 }
@@ -556,7 +555,7 @@ XML_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
     _children.clear();
-    _attributes.clear();
+    //_attributes.clear();
     _docTypeDecl.clear();
     _xmlDecl.clear();
 }

@@ -129,12 +129,8 @@ public:
     // Use a list for quick erasing
     typedef std::list< boost::intrusive_ptr<XMLNode_as> > Children;
 
-    typedef std::vector< XMLAttr > Attributes;
-
     Children& childNodes() { return _children; }
 
-    Attributes& attributes() { return _attributes; }
-    
     XMLNode_as& operator = (XMLNode_as &node) {
         log_debug("%s: \n", __PRETTY_FUNCTION__);
         if (this == &node) return *this;
@@ -228,7 +224,12 @@ public:
     boost::intrusive_ptr<XMLNode_as> _parent;
 
     Children _children;
-    Attributes _attributes;
+
+    as_object* getAttributes() { return _attributes; }
+
+    const as_object* getAttributes() const { return _attributes; }
+
+    void setAttribute(const std::string& name, const std::string& value);
 
 protected:
 
@@ -246,6 +247,8 @@ protected:
 private:
 
     // TODO: make a lot more things private !
+
+    as_object* _attributes;
 
     std::string _name;
 

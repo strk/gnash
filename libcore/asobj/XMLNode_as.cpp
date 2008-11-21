@@ -67,6 +67,7 @@ XMLNode_as::XMLNode_as()
     :
     as_object(getXMLNodeInterface()),
     _parent(0),
+    _attributes(new as_object),
     _type(Element)
 {
     //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
@@ -79,6 +80,7 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     :
     as_object(getXMLNodeInterface()),
     _parent(0), // _parent is never implicitly copied
+    _attributes(0),
     _name(tpl._name),
     _value(tpl._value),
     _type(tpl._type)
@@ -243,7 +245,8 @@ XMLNode_as::nextSibling()
 
     XMLNode_as *previous_node = NULL;
     Children::reverse_iterator itx;
-    for (itx = _parent->_children.rbegin(); itx != _parent->_children.rend(); itx++)
+    for (itx = _parent->_children.rbegin(); itx != _parent->_children.rend();
+            itx++)
     {
         if (itx->get() == this)
         {
@@ -260,6 +263,16 @@ XMLNode_as::toString(std::ostream& xmlout, bool encode) const
 {
     stringify(*this, xmlout, encode);
 }
+
+void
+XMLNode_as::setAttribute(const std::string& name, const std::string& value)
+{
+    if (_attributes) {
+        string_table& st = _vm.getStringTable();
+        _attributes->set_member(st.find(name), value);
+    }
+}
+
 
 /* static private */
 void
@@ -278,16 +291,23 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 #endif
 
     // Create the beginning of the tag
-    if ( nodename.size() )
+    if (!nodename.empty())
     {
         xmlout << "<" << nodename;
     
         // Process the attributes, if any
-        Attributes::const_iterator ita;
-        for (ita = xml._attributes.begin(); ita != xml._attributes.end(); ita++)
-        {
-            const XMLAttr& xa = *ita;
-            xmlout << " " << xa.name() << "=\"" << xa.value() << "\"";
+        PropertyList::SortedPropertyList attrs;
+        const as_object* obj = xml.getAttributes();
+        if (obj) {
+            obj->enumerateProperties(attrs);
+        }
+        if (!attrs.empty()) {
+
+            for (PropertyList::SortedPropertyList::const_reverse_iterator i = 
+                    attrs.rbegin(), e = attrs.rend(); i != e; ++i) { 
+
+                xmlout << " " << i->first << "=\"" << i->second << "\"";
+            }
         }
 
     	// If the node has no content, just close the tag now
@@ -640,10 +660,8 @@ xmlnode_node_value(const fn_call& fn)
     as_value rv;
     rv.set_null();
     
-    //log_debug("xmlnode_node_value called with %d args against 'this' = %p", fn.nargs, ptr);
     if ( fn.nargs == 0 )
     {
-	    //log_debug("  nodeValue() returns '%s'", ptr->nodeValue().c_str());
         const std::string& val = ptr->nodeValue();
         if ( ! val.empty() ) rv = val;
     }
@@ -683,29 +701,11 @@ xmlnode_nodetype(const fn_call& fn)
 as_value
 xmlnode_attributes(const fn_call& fn)
 {
-    
     boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
 
-    VM& vm = ptr->getVM();
-    string_table& st = vm.getStringTable();
-
-    XMLNode_as::Attributes& attrs = ptr->attributes();
-
-    // Attributes are simple objects.
-    boost::intrusive_ptr<as_object> ret = new as_object(); 
-
-    for (XMLNode_as::Attributes::const_iterator it=attrs.begin(),
-        itEnd=attrs.end(); it != itEnd; ++it)
-    {
-
-        const XMLAttr& at = *it;
-        const std::string& name = at.name();
-        const std::string& val = at.value();
-        // These must be enumerable !
-        ret->set_member(st.find(name), val);
-    }
-
-    return as_value(ret); 
+    as_object* attrs = ptr->getAttributes();
+    if (attrs) return as_value(attrs);
+    return as_value(); 
 }
 
 /// Read-only property; evaluates the specified XML object and
@@ -840,6 +840,9 @@ XMLNode_as::markReachableResources() const
 
 	// Mark parent
 	if ( _parent ) _parent->setReachable();
+
+	// Mark attributes object
+	if (_attributes) _attributes->setReachable();
 
 	markAsObjectReachable();
 }
