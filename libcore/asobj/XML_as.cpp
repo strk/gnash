@@ -275,7 +275,7 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     // Handle namespace. This is set once only for each node, and is also
     // pushed to the attributes list once.
     StringNoCaseEqual noCaseCompare;
-    if (noCaseCompare(name, "xmlns")) {
+    if (noCaseCompare(name, "xmlns") || noCaseCompare(name, "xmlns:")) {
         if (!node->getNamespaceURI().empty()) return;
         node->setNamespaceURI(value);
     }

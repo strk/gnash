@@ -293,6 +293,17 @@ check_equals(n.getPrefixForNamespace("nsr"), "r");
 check_equals(n.getNamespaceForPrefix("t"), "nst");
 check_equals(n.getPrefixForNamespace("nst"), "t");
 
+// Poorly formed prefix namespaces: become standard namespaces
+x = new XML('<tag xmlns:="nst"><tag2 xmlns="nss"><tag3 xmlns:="nsr"></tag3></tag2></tag>');
+
+n = x.firstChild.firstChild.firstChild;
+check_equals(n.nodeName, "tag3");
+check_equals(n.namespaceURI, "nsr");
+check_equals(n.getPrefixForNamespace("nsr"), "");
+check_equals(n.getNamespaceForPrefix(), undefined);
+check_equals(n.getPrefixForNamespace("nst"), "");
+
+
 // Multiple definition of standard namespace (first one counts, second never
 // defined).
 x = new XML('<tag xmlns="standard" xmlns="standard2"></tag>');
@@ -370,4 +381,4 @@ check_equals(ns.nodeName, "tag");
 check_equals(ns.localName, "tag");
 check_equals(ns.prefix, "");
 
-check_totals(170);
+check_totals(175);
