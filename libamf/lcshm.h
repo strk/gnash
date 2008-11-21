@@ -119,11 +119,11 @@ public:
     /// \struct LcShm::lc_header_t
     ///		Hold the data in the memory segment's header.
     typedef struct {
-        uint32_t unknown1;
-        uint32_t unknown2;
-        uint32_t timestamp;	// number of milliseconds that have
+		boost::uint32_t unknown1;
+		boost::uint32_t unknown2;
+		boost::uint32_t timestamp;	// number of milliseconds that have
 				// elapsed since the system was started
-        uint32_t length;
+		boost::uint32_t length;
     } lc_header_t;
     /// \struct LcShm::lc_message_t
     ///		Hold the data for a single message in the memory segment.
