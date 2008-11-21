@@ -1578,14 +1578,6 @@ http_handler(Handler::thread_params_t *args)
 	    cerr << "FIXME no hit for: " << www.getFilespec() << endl;
 	    www.clearHeader();
 	    const stringstream &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
-// 	    cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;	
-// 	    string body = ss.str();
-// 	    cerr << "Body Size = " << body.size() << endl;
-// 	    body.insert(ss.str().size(), (char *)filestream.get(), filestream.getFileSize());
-// 	    cerr << "Body Size = " << body.size() << endl
-// 	         << body << endl;
-// 	// 	cerr << "Size = " << ss.str().size() << "	" << ss.str() << endl;
-// 	www.writeNet(args->netfd, (boost::uint8_t *)body.c_str(), body.size());
 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
 	    cache.addResponse(www.getFilespec(), www.getHeader());
 	} else {
@@ -1622,9 +1614,10 @@ http_handler(Handler::thread_params_t *args)
 		} while (bytes_read <= filesize);
 	    } else {
 		boost::uint8_t *ptr = filestream->loadChunk(filesize, 0);
+//		filestream->close();
 		ret = www.writeNet(args->netfd, filestream->get(), filesize);
 	    }
-	    
+	    filestream->close();
 #ifdef USE_STATS_CACHE
 	    struct timespec end;
 	    clock_gettime (CLOCK_REALTIME, &end);
@@ -1638,6 +1631,7 @@ http_handler(Handler::thread_params_t *args)
 	}
 	log_debug("http_handler all done transferring requested file...");
 //	cache.dump();
+	done = true;
 
 	if (!www.keepAlive()) {
 	    log_debug("Keep-Alive is off", www.keepAlive());
