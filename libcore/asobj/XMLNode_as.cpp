@@ -303,8 +303,8 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         }
         if (!attrs.empty()) {
 
-            for (PropertyList::SortedPropertyList::const_reverse_iterator i = 
-                    attrs.rbegin(), e = attrs.rend(); i != e; ++i) { 
+            for (PropertyList::SortedPropertyList::const_iterator i = 
+                    attrs.begin(), e = attrs.end(); i != e; ++i) { 
 
                 xmlout << " " << i->first << "=\"" << i->second << "\"";
             }

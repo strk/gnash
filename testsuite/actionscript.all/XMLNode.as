@@ -222,6 +222,18 @@ check_equals(node77.toString(), '<tag a1="at1" />');
 node77.attributes = 5;
 check_equals(node77.toString(), '<tag a1="at1" />');
 
+// Check order of attributes:
+
+node77.attributes.z = "z";
+node77.attributes.x = "x";
+node77.attributes.c = "c";
+node77.attributes.y = "y";
+node77.attributes.f = "f";
+node77.attributes[5] = "5";
+node77.attributes["$"] = "$";
+node77.attributes.x = "x2";
+check_equals(node77.toString(), '<tag $="$" 5="5" f="f" y="y" c="c" x="x2" z="z" a1="at1" />');
+
 // Check namespace functions.
 
 // Standard namespace
@@ -357,4 +369,4 @@ check_equals(ns.nodeName, "tag");
 check_equals(ns.localName, "tag");
 check_equals(ns.prefix, "");
 
-check_totals(169);
+check_totals(170);
