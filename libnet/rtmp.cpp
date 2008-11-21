@@ -1005,11 +1005,12 @@ RTMP::recvMsg(int timeout)
     int ret = 0;
     bool nopacket = true;
 
-    boost::shared_ptr<amf::Buffer> buf(new Buffer);
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(NETBUFSIZE));
     while (nopacket) {
-	ret = readNet(buf->reference(), timeout);
+	ret = readNet(buf->reference(), buf->size(), timeout);
 	if (ret <= 0) {
 	    log_error("Never got any data at line %d", __LINE__);
+	    buf.reset(); // no point in returning a buffer, right?
 	    return buf;
 	}
 	if ((ret == 1) && (*(buf->reference()) == 0xff)) {
