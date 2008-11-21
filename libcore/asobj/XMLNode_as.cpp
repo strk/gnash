@@ -27,7 +27,9 @@
 #include "Object.h" // for getObjectInterface
 #include "VM.h" // for getting the string_table.
 #include "string_table.h" 
+#include "PropertyList.h"
 
+#include <boost/bind.hpp>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -36,6 +38,13 @@
 //#define DEBUG_MEMORY_ALLOCATION 1
 
 namespace gnash {
+
+namespace {
+    void enumerateAttributes(const XMLNode_as& node,
+            PropertyList::SortedPropertyList&attributes);
+    bool prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
+            const std::string& prefix);
+}
 
 static as_value xmlnode_new(const fn_call& fn);
 static as_value xmlnode_nodename(const fn_call& fn);
@@ -273,6 +282,38 @@ XMLNode_as::setAttribute(const std::string& name, const std::string& value)
     }
 }
 
+void
+XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
+{
+    
+}
+
+void
+XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
+{
+    XMLNode_as* node = this;
+    PropertyList::SortedPropertyList::const_iterator it; 
+    
+    while (node)
+    {
+        PropertyList::SortedPropertyList attrs;
+        enumerateAttributes(*node, attrs);
+        if (!attrs.empty())
+        {
+            it = std::find_if(attrs.begin(), attrs.end(), 
+                        boost::bind(prefixMatches, _1, prefix));
+            if (it != attrs.end()) break;
+        }
+        node = node->getParent();
+    }
+
+    // None found; return undefined
+    if (!node) return;
+
+    // Return the matching namespace
+    ns = it->second;
+
+}
 
 /* static private */
 void
@@ -297,10 +338,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     
         // Process the attributes, if any
         PropertyList::SortedPropertyList attrs;
-        const as_object* obj = xml.getAttributes();
-        if (obj) {
-            obj->enumerateProperties(attrs);
-        }
+        enumerateAttributes(xml, attrs);
         if (!attrs.empty()) {
 
             for (PropertyList::SortedPropertyList::const_iterator i = 
@@ -519,8 +557,15 @@ as_value
 xmlnode_getNamespaceForPrefix(const fn_call& fn)
 {
     boost::intrusive_ptr<XMLNode_as> ptr = ensureType<XMLNode_as>(fn.this_ptr);
-    log_unimpl("XMLNode.getNamespaceForPrefix");
-    return as_value();
+    if (!fn.nargs) {
+        return as_value();
+    }
+
+    std::string ns;
+
+    ptr->getNamespaceForPrefix(fn.arg(0).to_string(), ns);
+    if (ns.empty()) return as_value();
+    return as_value(ns);
 }
 
 
@@ -847,6 +892,50 @@ XMLNode_as::markReachableResources() const
 	markAsObjectReachable();
 }
 #endif // GNASH_USE_GC
+
+namespace {
+
+void
+enumerateAttributes(const XMLNode_as& node,
+            PropertyList::SortedPropertyList& attrs)
+{
+    attrs.clear();
+    const as_object* obj = node.getAttributes();
+    if (obj) {
+        obj->enumerateProperties(attrs);
+    }
+
+}
+
+bool
+prefixMatches(const PropertyList::SortedPropertyList::value_type& val,
+        const std::string& prefix)
+{
+    const std::string& name = val.first;
+    StringNoCaseEqual noCaseCompare;
+
+    // An empty prefix searches for a standard namespace specifier.
+    // Attributes are stored with no trailing or leading whitespace,
+    // so a simple comparison should do. TODO: what about "xmlns:"?
+    if (prefix.empty()) {
+        return noCaseCompare(name, "xmlns");
+    }
+
+    if (!noCaseCompare(name.substr(0, 5), "xmlns")) return false;
+
+    std::string::size_type pos = name.find(':');
+    pos = name.find_first_not_of("\n\r\t ", pos + 1);
+
+    // There is no colon or nothing after the colon, so this node has
+    // no matching prefix.
+    if (pos == std::string::npos) return false;
+
+    log_debug("prefix compare: %s, %s", prefix, name.substr(pos));
+
+    return noCaseCompare(prefix, name.substr(pos));
+}
+
+} // anonymous namespace
 
 } // end of gnash namespace
 

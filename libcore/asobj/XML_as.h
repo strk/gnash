@@ -22,6 +22,7 @@
 #include "XMLNode_as.h"
 #include "log.h"
 #include "dsodefs.h"
+#include "StringPredicates.h"
 
 #include <map>
 #include <string>
@@ -109,27 +110,6 @@ public:
     ///
     void parseXML(const std::string& xml);
 
-    void parseTag(XMLNode_as*& node, const std::string& xml, 
-            std::string::const_iterator& it);
-
-    void parseAttribute(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it);
-
-    void parseDocTypeDecl(const std::string& xml, 
-            std::string::const_iterator& it);
-
-    void parseText(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it);
-
-    void parseXMLDecl(const std::string& xml, 
-            std::string::const_iterator& it);
-
-    void parseComment(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it);
-
-    void parseCData(XMLNode_as* node, const std::string& xml, 
-            std::string::const_iterator& it);
- 
     // An event handler that returns a what?
     bool onLoad();
 
@@ -153,6 +133,29 @@ private:
 
     static const Entities& getEntities();
 
+    typedef std::map<std::string, std::string, StringNoCaseLessThen> Attributes;
+
+    void parseTag(XMLNode_as*& node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseAttribute(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it, Attributes& attributes);
+
+    void parseDocTypeDecl(const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseText(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseXMLDecl(const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseComment(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseCData(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+ 
     /// Remove all children
     void clear();
   
