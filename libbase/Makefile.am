@@ -154,6 +154,7 @@ noinst_HEADERS = \
 	tu_file.h \
 	IOChannel.h \
 	tu_opengl_includes.h \
+	GnashSystemIOHeaders.h \
 	ClockTime.h \
 	WallClockTimer.h \
 	utf8.h \

@@ -21,6 +21,7 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
+#include "GnashSleep.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "SWFMovieDefinition.h"
 #include "movie_definition.h" // for inheritance
@@ -41,7 +42,6 @@
 #include "GnashException.h" // for parser exception
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
-#include "GnashSleep.h"
 #include "ExportableResource.h"
 
 #include <boost/bind.hpp>
@@ -50,7 +50,6 @@
 #include <memory>
 #include <string>
 #include <algorithm> // std::make_pair
-#include <unistd.h>
 
 // Debug frames load
 #undef DEBUG_FRAMES_LOAD

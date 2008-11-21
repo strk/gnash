@@ -21,7 +21,7 @@
 #include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <boost/tokenizer.hpp>

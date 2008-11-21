@@ -24,7 +24,7 @@
 #include "utility.h"
 #include "log.h"
 
-#include <unistd.h> // for ::read
+#include "GnashSystemIOHeaders.h" // for ::read
 
 #include <boost/scoped_array.hpp>
 
@@ -37,10 +37,6 @@
 #include <cstdio>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#if !defined(_WIN32) && !defined(WIN32)
-# include <unistd.h>
-#endif
 
 #include <string>
 #include <boost/format.hpp>
