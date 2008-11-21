@@ -97,8 +97,7 @@ public:
     NodeType nodeType() const { return _type; }
 
     /// Set the type of an XML Node.
-    void nodeTypeSet(NodeType type)
-    {
+    void nodeTypeSet(NodeType type) {
 	    _type = type;
     }
 
@@ -110,6 +109,14 @@ public:
 
     /// Set value of this node, overriding any previous value
     void nodeValueSet(const std::string& value) { _value = value; }
+
+    /// Performs a recursive search of node attributes to find a match
+    void getNamespaceForPrefix(const std::string& prefix, std::string& ns);
+
+    /// Performs a recursive search of node attributes to find a match
+    //
+    /// @return false if no match found.
+    bool getPrefixForNamespace(const std::string& ns, std::string& prefix);
 
     void setNamespaceURI(const std::string value) {
         _namespaceURI = value;
@@ -129,12 +136,8 @@ public:
     // Use a list for quick erasing
     typedef std::list< boost::intrusive_ptr<XMLNode_as> > Children;
 
-    typedef std::vector< XMLAttr > Attributes;
-
     Children& childNodes() { return _children; }
 
-    Attributes& attributes() { return _attributes; }
-    
     XMLNode_as& operator = (XMLNode_as &node) {
         log_debug("%s: \n", __PRETTY_FUNCTION__);
         if (this == &node) return *this;
@@ -160,7 +163,6 @@ public:
     /// name, value, and attributes as the specified XML object. If deep
     /// is set to true, all child nodes are recursively cloned, resulting
     /// in an exact copy of the original object's document tree. 
-    ///
     boost::intrusive_ptr<XMLNode_as> cloneNode(bool deep);
 
     /// Append a child node the the XML object
@@ -175,10 +177,7 @@ public:
     /// node is placed in the new tree structure after it is removed from
     /// its existing parent node. 
     ///
-    /// @param as
-    ///	   The XMLNode_as ?
-    ///
-    /// @param node
+    /// @param childNode
     ///	   same as XMLNode_as::obj ?
     ///
     void appendChild(boost::intrusive_ptr<XMLNode_as> childNode);
@@ -221,14 +220,11 @@ public:
     ///                 for XML.sendAndLoad.
     virtual void toString(std::ostream& str, bool encode = false) const;
 
-    // We might turn this back to a dumb pointer, as long
-    // as we'll make sure in the XMLNode destructor and
-    // any child cleaning interface to set child parent
-    // to NULL
-    boost::intrusive_ptr<XMLNode_as> _parent;
+    as_object* getAttributes() { return _attributes; }
 
-    Children _children;
-    Attributes _attributes;
+    const as_object* getAttributes() const { return _attributes; }
+
+    void setAttribute(const std::string& name, const std::string& value);
 
 protected:
 
@@ -243,15 +239,19 @@ protected:
 	virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
 
+    Children _children;
+
 private:
 
-    // TODO: make a lot more things private !
+    boost::intrusive_ptr<XMLNode_as> _parent;
+
+    as_object* _attributes;
 
     std::string _name;
 
     std::string _value;
 
-    NodeType     _type;
+    NodeType _type;
 
     std::string _namespaceURI;
 

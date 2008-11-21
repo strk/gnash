@@ -209,7 +209,7 @@ XML_as::set_member(string_table::key name, const as_value& val,
 
 void
 XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
-        std::string::const_iterator& it)
+        std::string::const_iterator& it, Attributes& attributes)
 {
 
     const std::string terminators("\r\t\n >=");
@@ -275,14 +275,14 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     // Handle namespace. This is set once only for each node, and is also
     // pushed to the attributes list once.
     StringNoCaseEqual noCaseCompare;
-    if (noCaseCompare(name, "xmlns")) {
+    if (noCaseCompare(name, "xmlns") || noCaseCompare(name, "xmlns:")) {
         if (!node->getNamespaceURI().empty()) return;
         node->setNamespaceURI(value);
     }
 
-    XMLAttr attr(name, value);
-    node->_attributes.push_back(attr);
-
+    // This ensures values are not inserted twice, which is expected
+    // behaviour
+    attributes.insert(std::make_pair(name, value));
 
 }
 
@@ -370,12 +370,14 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
 
         // Parse any attributes in an opening tag only, stopping at "/>" or
         // '>'
+        // Attributes are added in reverse order and without any duplicates.
+        Attributes attributes;
         while (it != xml.end() && *it != '>' && _status == XML_OK)
         {
             if (xml.end() - it > 1 && std::equal(it, it + 2, "/>")) break;
 
             // This advances the iterator
-            parseAttribute(childNode, xml, it);
+            parseAttribute(childNode, xml, it, attributes);
 
             // Skip any whitespace. If we reach the end of the string,
             // it's malformed.
@@ -383,6 +385,11 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
                 _status = XML_UNTERMINATED_ELEMENT;
                 return;
             }
+        }
+        
+        for (Attributes::const_reverse_iterator i = attributes.rbegin(),
+                e = attributes.rend(); i != e; ++i) {
+            childNode->setAttribute(i->first, i->second);
         }
 
         node->appendChild(childNode);
@@ -556,7 +563,7 @@ XML_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
     _children.clear();
-    _attributes.clear();
+    //_attributes.clear();
     _docTypeDecl.clear();
     _xmlDecl.clear();
 }
