@@ -122,7 +122,8 @@ public:
 	/// @param handleId
 	/// 	The soundhandlers id of the sound we want some info about.
 	///
-	/// @return size of the data buffer before the new data is appended
+	/// @return size of the data buffer before the new data is appended, or -1
+	///         on error.
 	///
 	virtual long fill_stream_data(unsigned char* data, unsigned int dataBytes,
                                   unsigned int sampleCount, int handleId);

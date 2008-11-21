@@ -41,21 +41,34 @@ namespace sound {
 long
 sound_handler::fill_stream_data(unsigned char* data,
         unsigned int data_bytes, unsigned int /*sample_count*/,
-        int handle_id)
+        int handleId)
 {
     // @@ does a negative handle_id have any meaning ?
     //    should we change it to unsigned instead ?
-    if (handle_id < 0 || (unsigned int) handle_id+1 > _sounds.size())
+    if (handleId < 0 || (unsigned int) handleId+1 > _sounds.size())
     {
+        log_error("Invalid (%d) sound_handle passed to fill_stream_data, "
+                  "doing nothing", handleId);
         delete [] data;
         return -1;
     }
 
-    EmbedSound* sounddata = _sounds[handle_id];
+    EmbedSound* sounddata = _sounds[handleId];
+    if ( ! sounddata )
+    {
+        log_error("sound_handle passed to fill_stream_data (%d) "
+                  "was deleted", handleId);
+        return -1;
+    }
 
     // Handling of the sound data
     size_t start_size = sounddata->size();
     sounddata->append(reinterpret_cast<boost::uint8_t*>(data), data_bytes);
+
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("fill_stream_data: sound %d, %d samples (%d bytes) appended at offset %d",
+        handleId, data_bytes/2, data_bytes, start_size);
+#endif
 
     return start_size;
 }
