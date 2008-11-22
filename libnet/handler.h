@@ -175,6 +175,7 @@ public:
     CQue::que_stats_t *statsout() { return _outgoing.stats(); };
 #endif
     void die() { _die = true; _outgoing.notify(); };
+    void resetDie() { _die = false; };
     bool timetodie() { return _die; };
 
     // The pollfd are an array of data structures used by the poll()
@@ -182,6 +183,7 @@ public:
     // connections get added and disconnected.
     void addPollFD(struct pollfd &fd, entry_t *ptr);
     void addPollFD(struct pollfd &fd);
+    void erasePollFD(int fd);
     void erasePollFD(std::vector<struct pollfd>::iterator &itt);
     struct pollfd &getPollFD(int fd);
     struct pollfd *getPollFDPtr();

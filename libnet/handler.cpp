@@ -167,6 +167,7 @@ Handler::addPollFD(struct pollfd &fd, Handler::entry_t *func)
     boost::mutex::scoped_lock lock(_poll_mutex);
     _handlers[fd.fd] = func;
      _pollfds.push_back(fd);
+     notify();
 }
 
 void
@@ -175,6 +176,7 @@ Handler::addPollFD(struct pollfd &fd)
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
      _pollfds.push_back(fd);
+     notify();
 }
 
 struct pollfd
@@ -194,27 +196,30 @@ Handler::getPollFDPtr()
 };
 
 void
+Handler::erasePollFD(int fd)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    if (_pollfds.size() > 0) {
+	vector<struct pollfd>::iterator it;
+	for (it=_pollfds.begin(); it<_pollfds.end(); it++) {
+	    if ((*it).fd == fd) {
+		_pollfds.erase(it);
+	    }
+	}
+    }
+}
+
+void
 Handler::erasePollFD(vector<struct pollfd>::iterator &itt)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
-//    struct pollfd fff = _pollfds.at(fd);
-#if 1
-    if (_pollfds.size() <= 1) {
-	_pollfds.clear();
-    } else {
+    if (_pollfds.size() == 1) {
+ 	_pollfds.clear();
+     } else {
 	_pollfds.erase(itt);
     }
-#else
-    vector<struct pollfd>::iterator it;
-    for (it=_pollfds.begin(); it<_pollfds.end(); it++) {
-	if ((*it).fd == fd) {
-	    _pollfds.erase(it);
-	}
-    }
-#endif
-    
-//    _handlers[fd] = 0;
 }
 
 void
