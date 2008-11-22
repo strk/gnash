@@ -282,19 +282,11 @@ Network::newConnection(bool block, int fd)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t emptyset, blockset;
+	sigset_t sigset, emptyset, blockset, pending;
 	sigemptyset(&blockset);         /* Block SIGINT */
         sigaddset(&blockset, SIGINT);
 //        sigaddset(&blockset, SIGPIPE);
-	sigprocmask(SIG_BLOCK, &blockset, NULL);
-
-// 	// Trap ^C (SIGINT) so we can kill all the threads
-// 	struct sigaction  act;
-// 	act.sa_handler = cntrlc_handler;
-// 	act.sa_flags = 0;
-// 	sigemptyset(&act.sa_mask);
-// 	sigaction (SIGINT, &act, NULL);
-//	sigaction (SIGPIPE, &act, NULL);
+	sigprocmask(SIG_BLOCK, &blockset, &sigset);
 #else
 	struct timeval tval;
 #endif
@@ -318,6 +310,15 @@ Network::newConnection(bool block, int fd)
 	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &emptyset);
 	} else {
 	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &emptyset);
+	}
+	if (sig_number) {
+	    log_debug("Have a SIGINT interupt waiting!");
+	}
+	sigpending(&pending);
+	if (sigismember(&pending, SIGINT)) {
+	    log_debug("Have a pending SIGINT interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
 	}
 #else
         tval.tv_sec = 1;
@@ -833,7 +834,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t emptyset, blockset;
+	sigset_t pending, emptyset, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
         sigaddset(&blockset, SIGINT);
         sigprocmask(SIG_BLOCK, &blockset, NULL);
@@ -858,6 +859,12 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	    tval.tv_sec = timeout;
 	    tval.tv_nsec = 0;
 	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &emptyset);
+	    sigpending(&pending);
+	    if (sigismember(&pending, SIGINT)) {
+		log_debug("Have a pending SIGINT interupt waiting!");
+		int sig;
+		sigwait(&blockset, &sig);
+	    }
 #else
 	    tval.tv_sec = timeout;
 	    tval.tv_usec = 0;
@@ -962,19 +969,11 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t emptyset, blockset;
+	sigset_t pending, emptyset, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
         sigaddset(&blockset, SIGINT);
 //        sigaddset(&blockset, SIGPIPE);
         sigprocmask(SIG_BLOCK, &blockset, NULL);
-
-	// Trap ^C (SIGINT) so we can kill all the threads
-// 	struct sigaction  act;
-// 	act.sa_handler = cntrlc_handler;
-// 	act.sa_flags = 0;
-// 	sigemptyset(&act.sa_mask);
-// 	sigaction (SIGINT, &act, NULL);
-//	sigaction (SIGPIPE, &act, NULL);
 #else
 	struct timeval tval;
 #endif
@@ -986,6 +985,12 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 	tval.tv_sec = timeout;
 	tval.tv_nsec = 0;
 	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &emptyset);
+	sigpending(&pending);
+	if (sigismember(&pending, SIGINT)) {
+	    log_debug("Have a pending SIGINT interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
+	}
 #else
 	tval.tv_sec = timeout;
         tval.tv_usec = 0;
@@ -1074,22 +1079,21 @@ Network::waitForNetData(int limit, struct pollfd *fds)
     
 #ifdef HAVE_PPOLL
 	struct timespec tval;
-	sigset_t emptyset, blockset;
+	sigset_t pending, emptyset, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
         sigaddset(&blockset, SIGINT);
 //        sigaddset(&blockset, SIGPIPE);
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
-	// Trap ^C (SIGINT) so we can kill all the threads
-// 	struct sigaction  act;
-// 	act.sa_handler = cntrlc_handler;
-// 	act.sa_flags = 0;
-// 	sigemptyset(&act.sa_mask);
-// 	sigaction (SIGINT, &act, NULL);
-//	sigaction (SIGPIPE, &act, NULL);
 	tval.tv_sec = _timeout;
 	tval.tv_nsec = 0;
 	int ret = ppoll(fds, limit, &tval, &emptyset);
+	sigpending(&pending);
+	if (sigismember(&pending, SIGINT)) {
+	    log_debug("Have a pending SIGINT interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
+	}
 #else
 	int ret = poll(fds, limit, _timeout);
 #endif
@@ -1190,14 +1194,20 @@ Network::waitForNetData(int limit, fd_set files)
     if (timeout <= 0) {
 	timeout = 5;
     }
-#if 0
+#ifdef HAVE_PSELECT
     struct timespec tval;
-    sigset_t sigmask;
+    sigset_t pending, sigmask;
     sigprocmask(SIG_BLOCK, &sigmask, NULL);
 
     tval.tv_sec = timeout;
     tval.tv_nsec = 0;
     int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
+    sigpending(&pending);
+    if (sigismember(&pending, SIGINT)) {
+	log_debug("Have a pending SIGINT interupt waiting!");
+	int sig;
+	sigwait(&sigmask, &sig);
+    }
 #else
     struct timeval        tval;
     tval.tv_sec = timeout;
