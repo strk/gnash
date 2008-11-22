@@ -252,6 +252,7 @@ main(int argc, char *argv[])
     // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act, NULL);
+//    sigaction (SIGPIPE, &act, NULL);
 
     boost::mutex::scoped_lock lk(alldone_mutex);
     
@@ -309,42 +310,12 @@ main(int argc, char *argv[])
       return(0);
 }
 
-#if 0
-
-static void
-ssl_thread(struct thread_params *conndata)
-{
-    GNASH_REPORT_FUNCTION;
-    int retries = 0;
-    HTTP www;
-    RTMPproto proto;
-    struct thread_params loadfile;
-    string filespec;
-    int port = RTMPTS_PORT + port_offset;
-
-    Statistics st;
-    st.setFileType(NetStats::RTMPTS_PORT);
-    
-    www.createServer(port);
-    
-    log_debug("Param port is: %d", conndata->port);
-    while (retries++ < thread_retries) {
-	log_debug (_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
-	www.newConnection(true);
-	loadfile.netfd = www.getFileFd();
-	strcpy(loadfile.filespec, "Hello World");
-	boost::thread sendthr(boost::bind(&stream_thread, &loadfile));
-	sendthr.join();
-    }
-}
-#endif
-
 // Trap Control-C so we can cleanly exit
 static void
-cntrlc_handler (int /*sig*/)
+cntrlc_handler (int sig)
 {
-    log_debug(_("Got an interrupt"));
-
+    log_debug(_("Got a %d interrupt"), sig);
+//    sigaction (SIGINT, &act, NULL);
     exit(-1);
 }
 
@@ -379,6 +350,7 @@ admin_handler(Handler::thread_params_t *args)
 	log_debug(_("Starting Admin Handler for port %d"), args->port);
 	net.newConnection(true);
 	log_debug(_("Got an incoming Admin request"));
+	sleep(1);
 	do {
 	    Network::byte_t data[ADMINPKTSIZE+1];
 	    memset(data, 0, ADMINPKTSIZE+1);
@@ -474,7 +446,7 @@ admin_handler(Handler::thread_params_t *args)
 	    };
 	} while (ret > 0);
         log_debug("admin_handler: Done...!\n");
-//	net.closeNet();		// this shuts down this socket connection
+	net.closeNet();		// this shuts down this socket connection
     }
     net.closeConnection();		// this shuts down the server on this connection
 
@@ -564,7 +536,9 @@ connection_handler(Handler::thread_params_t *args)
 //  	    hand->addPollFD(fds, rtmp_handler);
 //  	}
 	// if supporting multiple threads
-	if (!crcfile.getThreadingFlag()) {
+	if (crcfile.getThreadingFlag()) {
+	    hand->notify();
+	} else {
 	  log_debug("Single threaded mode for fd #%d", args->netfd);
 	  dispatch_handler(args);
 #if 0
@@ -612,9 +586,9 @@ dispatch_handler(Handler::thread_params_t *args)
 		    if ((it->revents & POLLRDHUP) || (it->revents & POLLNVAL))  {
 			log_debug("Revents has a POLLRDHUP or POLLNVAL set to %d for fd #%d",
 				  it->revents, it->fd);
- 			hand->erasePollFD(it);
+// 			hand->erasePollFD(it);
  			net.closeNet(it->fd);
-			continue;
+//			continue;
 		    }
 		    log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
 		    hand->getEntry(it->fd)(args);
@@ -637,9 +611,9 @@ dispatch_handler(Handler::thread_params_t *args)
 	    }
         } else {
 	    log_debug("nothing to wait for...");
-	    sleep(1);
-	    return;
-	    //hand->wait();
+	    hand->wait();
+	    log_debug("Got new network file descriptor to watch");
+//	    return;
         }
     }
 } // end of dispatch_handler
