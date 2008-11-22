@@ -50,6 +50,7 @@
 # include <netdb.h>
 # include <sys/param.h>
 # include <sys/select.h>
+#include <signal.h>
 #ifdef HAVE_POLL
 # include <poll.h>
 #else 
@@ -78,6 +79,8 @@ static const short DEFAULTPORT  = RTMP_PORT;
 #ifndef INADDR_NONE
 #define INADDR_NONE  0xffffffff
 #endif
+
+static void cntrlc_handler(int sig);
 
 Network::Network()
 	:
@@ -263,7 +266,6 @@ Network::newConnection(bool block, int fd)
     struct sockaddr	newfsin;
     socklen_t		alen;
     int			ret;
-    struct timeval        tval;
     fd_set                fdset;
     int                   retries = 3;
 
@@ -276,6 +278,25 @@ Network::newConnection(bool block, int fd)
 	log_debug(_("Trying to accept net traffic on fd #%d for port %d"), fd, _port);
     }
 
+#ifdef HAVE_PSELECT
+	struct timespec tval;
+	sigset_t emptyset, blockset;
+	sigemptyset(&blockset);         /* Block SIGINT */
+        sigaddset(&blockset, SIGINT);
+        sigaddset(&blockset, SIGPIPE);
+        sigprocmask(SIG_BLOCK, &blockset, NULL);
+
+	// Trap ^C (SIGINT) so we can kill all the threads
+	struct sigaction  act;
+	act.sa_handler = cntrlc_handler;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+	sigaction (SIGINT, &act, NULL);
+	sigaction (SIGPIPE, &act, NULL);
+#else
+	struct timeval tval;
+#endif
+	
     while (retries--) {
         // We use select to wait for the read file descriptor to be
         // active, which means there is a client waiting to connect.
@@ -288,14 +309,23 @@ Network::newConnection(bool block, int fd)
 
         // Reset the timeout value, since select modifies it on return. To
         // block, set the timeout to zero.
+#ifdef HAVE_PSELECT
+	tval.tv_sec = 1;
+	tval.tv_nsec = 0;
+        if (block) {
+	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &emptyset);
+	} else {
+	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &emptyset);
+	}
+#else
         tval.tv_sec = 1;
         tval.tv_usec = 0;
-
         if (block) {
             ret = select(fd+1, &fdset, NULL, NULL, NULL);
         } else {
             ret = select(fd+1, &fdset, NULL, NULL, &tval);
         }
+#endif
 
         if (FD_ISSET(0, &fdset)) {
 	    if (_debug) {
@@ -782,7 +812,6 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
     fd_set              fdset;
     int                 ret = -1;
-    struct timeval      tval;
 
     if (_debug) {
 	log_debug (_("Trying to read %d bytes from fd #%d"), nbytes, fd);
@@ -799,12 +828,38 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
+#ifdef HAVE_PSELECT
+	struct timespec tval;
+	sigset_t emptyset, blockset;
+	sigemptyset(&blockset);         /* Block SIGINT */
+        sigaddset(&blockset, SIGINT);
+        sigprocmask(SIG_BLOCK, &blockset, NULL);
+
+	// Trap ^C (SIGINT) so we can kill all the threads
+	struct sigaction  act;
+	act.sa_handler = cntrlc_handler;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+	sigaction (SIGINT, &act, NULL);
+#else
+	struct timeval tval;
+#endif
         if (timeout == 0) {
+#ifdef HAVE_PSELECT
+	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &emptyset);
+#else
 	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
+#endif
 	} else {	
+#ifdef HAVE_PSELECT
+	    tval.tv_sec = timeout;
+	    tval.tv_nsec = 0;
+	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &emptyset);
+#else
 	    tval.tv_sec = timeout;
 	    tval.tv_usec = 0;
 	    ret = select(fd+1, &fdset, NULL, NULL, &tval);
+#endif
 	}
 
         // If interupted by a system call, try again
@@ -887,7 +942,6 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 {
     fd_set              fdset;
     int                 ret = -1;
-    struct timeval      tval;
 
     // We need a writable, and not const point for byte arithmetic.
     byte_t *bufptr = const_cast<byte_t *>(buffer);
@@ -903,14 +957,38 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
+#ifdef HAVE_PSELECT
+	struct timespec tval;
+	sigset_t emptyset, blockset;
+	sigemptyset(&blockset);         /* Block SIGINT */
+        sigaddset(&blockset, SIGINT);
+//        sigaddset(&blockset, SIGPIPE);
+        sigprocmask(SIG_BLOCK, &blockset, NULL);
+
+	// Trap ^C (SIGINT) so we can kill all the threads
+	struct sigaction  act;
+	act.sa_handler = cntrlc_handler;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+	sigaction (SIGINT, &act, NULL);
+//	sigaction (SIGPIPE, &act, NULL);
+#else
+	struct timeval tval;
+#endif
         // Reset the timeout value, since select modifies it on return
         if (timeout <= 0) {
             timeout = 5;
         }
-        tval.tv_sec = timeout;
+#ifdef HAVE_PSELECT
+	tval.tv_sec = timeout;
+	tval.tv_nsec = 0;
+	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &emptyset);
+#else
+	tval.tv_sec = timeout;
         tval.tv_usec = 0;
         ret = select(fd+1, NULL, &fdset, NULL, &tval);
-
+#endif
+	
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
             log_error (_("The socket for fd #%d was interupted by a system call"), fd);
@@ -991,7 +1069,27 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	return hits;
     }
     
-    int ret = poll(fds, limit, _timeout);
+#ifdef HAVE_PPOLL
+	struct timespec tval;
+	sigset_t emptyset, blockset;
+	sigemptyset(&blockset);         /* Block SIGINT */
+        sigaddset(&blockset, SIGINT);
+        sigaddset(&blockset, SIGPIPE);
+        sigprocmask(SIG_BLOCK, &blockset, NULL);
+
+	// Trap ^C (SIGINT) so we can kill all the threads
+	struct sigaction  act;
+	act.sa_handler = cntrlc_handler;
+	act.sa_flags = 0;
+	sigemptyset(&act.sa_mask);
+	sigaction (SIGINT, &act, NULL);
+	sigaction (SIGPIPE, &act, NULL);
+	tval.tv_sec = _timeout;
+	tval.tv_nsec = 0;
+	int ret = ppoll(fds, limit, &tval, &emptyset);
+#else
+	int ret = poll(fds, limit, _timeout);
+#endif
 
     log_debug("Poll returned: %d, timeout is: %d", ret, _timeout);
 
@@ -1151,6 +1249,15 @@ Network::toggleDebug(bool val)
     // toggleDebug(true);
 }
 
+
+// Trap Control-C so we can cleanly exit
+static void
+cntrlc_handler (int sig)
+{
+    log_debug(_("Got an %d interrupt while blocked on pselect()"), sig);
+
+    exit(-1);
+}
 
 } // end of gnash namespace
 
