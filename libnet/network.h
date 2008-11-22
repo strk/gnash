@@ -141,7 +141,7 @@ public:
     ///
     /// @param buffer A Buffer class to hold the data.
     ///
-    /// @param timeout An optional timeout value for reading data.
+    /// @param timeout An optional timeout for reading data, in seconds.
     ///
     /// @param fd The optional file descriptor to read data from.
     ///
@@ -162,7 +162,7 @@ public:
     ///
     /// @param buffer A Buffer class holding the data.
     ///
-    /// @param timeout An optional timeout value for writing data.
+    /// @param timeout An optional timeout for writing data, in seconds.
     ///
     /// @param fd The optional file descriptor to write data to from.
     ///
