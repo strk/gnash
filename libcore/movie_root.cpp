@@ -590,11 +590,11 @@ movie_root::getMouseObject()
 Key_as *
 movie_root::notify_global_key(key::code k, bool down)
 {
-	if ( _vm.getSWFVersion() < 5 )
-	{
-		// Key was added in SWF5
-		return NULL; 
-	}
+    // NOTE: we don't check SWF version here
+    //       because even if the top-level movie was
+    //       an SWF4, it could have loaded an SWF5+
+    //       which would need to query Key object.
+    //       Testcase: http://www.ferryhalim.com/orisinal/g3/00dog.swf 
 
 	boost::intrusive_ptr<Key_as> keyobject = getKeyObject();
 	if ( keyobject )
