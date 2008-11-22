@@ -216,8 +216,6 @@ endif
 	@echo "	GLIB_LIBS is $(GLIB_LIBS)"
 	@echo "	Z_CFLAGS is $(Z_CFLAGS)"
 	@echo "	Z_LIBS is $(Z_LIBS)"
-	@echo "	LIBXML_CFLAGS is $(LIBXML_CFLAGS)"
-	@echo "	LIBXML_LIBS is $(LIBXML_LIBS)"
 	@echo "	FREETYPE_CFLAGS is $(FREETYPE2_CFLAGS)"
 	@echo "	FREETYPE_LIBS is $(FREETYPE2_LIBS)"
 	@echo "	FONTCONFIG_CFLAGS is $(FONTCONFIG_CFLAGS)"
