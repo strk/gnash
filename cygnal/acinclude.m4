@@ -44,6 +44,6 @@ dnl For Asynchronous I/O
 dnl AC_CHECK_HEADERS(aio.h poll.h)
 
 dnl Look for the various ways of blocking while waiting for I/O
-AC_CHECK_FUNCS(pselect poll epoll)
+AC_CHECK_FUNCS(pselect poll ppoll epoll)
  
 ])
