@@ -640,6 +640,17 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
         return;
     }
 
+    unsigned int totframes = target_sprite->get_frame_count();
+    if ( framenum > totframes )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("ActionWaitForFrame(%d): "
+                       "target (%s) has only %d frames"),
+                       framenum, totframes);
+        );
+        framenum = totframes;
+    }
+
     // Actually *wait* for target frame, and never skip any action
 #ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
     target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
@@ -649,7 +660,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     size_t lastloaded = target_sprite->get_loaded_frames();
     if ( lastloaded < framenum )
     {
-        //log_debug(_("%s: frame %u not reached yet (loaded %u), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, skip);
+        //log_debug(_("%s: frame %u not reached yet (loaded %u for sprite %s), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, target_sprite->getTarget(), skip);
         // better delegate this to ActionExec
         thread.skip_actions(skip);
     }
