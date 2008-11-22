@@ -258,7 +258,7 @@ Network::newConnection(bool block)
 int
 Network::newConnection(bool block, int fd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     struct sockaddr	newfsin;
     socklen_t		alen;
@@ -981,11 +981,13 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 boost::shared_ptr<std::vector<struct pollfd> >
 Network::waitForNetData(int limit, struct pollfd *fds)
 {
-    GNASH_REPORT_FUNCTION;
+  //    GNASH_REPORT_FUNCTION;
 
     boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
 
-    if (fds == 0) {
+    log_debug("%s: waiting for %d fds", __FUNCTION__, limit);
+
+    if ((fds == 0) || (limit == 0)) {
 	return hits;
     }
     
@@ -996,49 +998,49 @@ Network::waitForNetData(int limit, struct pollfd *fds)
     while (ret--) {
 	for (int i = 0; i<limit; i++) {
 	    // If we get this event, the other end of the connection has been shut down
-#if 1
+#if 0
 	    if (fds[i].revents &POLLPRI ) {
-		log_debug("%s: Revents has aPOLLPRI  set 0x%x",
-			  __FUNCTION__, fds[i].revents);
+		log_debug("%s: Revents has aPOLLPRI  set 0x%x for fd #%d",
+			  __FUNCTION__, fds[i].revents, i);
 	    }
 	    if (fds[i].revents & POLLRDNORM) {
-		log_debug("%s: Revents has a POLLRDNORM set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLRDNORM set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 	    }
 	    if (fds[i].revents & POLLHUP) {
-		log_debug("%s: Revents has a POLLHUP set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLHUP set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 	    }
 
 
 	    if (fds[i].revents & POLLERR) {
-		log_debug("%s: Revents has a POLLERR set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLERR set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 	    }
 	    if (fds[i].revents & POLLHUP) {
-		log_debug("%s: Revents has a POLLHUP set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLHUP set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 	    }
 	    if (fds[i].revents & POLLNVAL) {
-		log_debug("%s: Revents has a POLLNVAL set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLNVAL set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 //		throw GnashException("Polling an invalid file descritor");
 	    }
 	    if (fds[i].revents & POLLIN) {
-		log_debug("%s: Revents has a POLLIN set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLIN set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 	    }
 	    if (fds[i].revents & POLLMSG) {
-		log_debug("%s: Revents has a POLLMSG set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLMSG set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 	    }
 	    if (fds[i].revents & POLLREMOVE) {
-		log_debug("%s: Revents has a POLLREMOVE set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLREMOVE set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 	    }
 	    if (fds[i].revents & POLLRDHUP) {
-		log_debug("%s: Revents has a POLLRDHUP set 0x%x",
-			  __FUNCTION__,  fds[i].revents);
+		log_debug("%s: Revents has a POLLRDHUP set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, i);
 //		throw GnashException("Connection dropped from client side.");
 	    }
 #endif    
