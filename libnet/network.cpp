@@ -81,6 +81,8 @@ static const short DEFAULTPORT  = RTMP_PORT;
 #endif
 
 static void cntrlc_handler(int sig);
+// this is set when we get a signal during a pselect() or ppoll()
+static int  sig_number = 0;
 
 Network::Network()
 	:
@@ -283,16 +285,16 @@ Network::newConnection(bool block, int fd)
 	sigset_t emptyset, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
         sigaddset(&blockset, SIGINT);
-        sigaddset(&blockset, SIGPIPE);
-        sigprocmask(SIG_BLOCK, &blockset, NULL);
+//        sigaddset(&blockset, SIGPIPE);
+	sigprocmask(SIG_BLOCK, &blockset, NULL);
 
-	// Trap ^C (SIGINT) so we can kill all the threads
-	struct sigaction  act;
-	act.sa_handler = cntrlc_handler;
-	act.sa_flags = 0;
-	sigemptyset(&act.sa_mask);
-	sigaction (SIGINT, &act, NULL);
-	sigaction (SIGPIPE, &act, NULL);
+// 	// Trap ^C (SIGINT) so we can kill all the threads
+// 	struct sigaction  act;
+// 	act.sa_handler = cntrlc_handler;
+// 	act.sa_flags = 0;
+// 	sigemptyset(&act.sa_mask);
+// 	sigaction (SIGINT, &act, NULL);
+//	sigaction (SIGPIPE, &act, NULL);
 #else
 	struct timeval tval;
 #endif
@@ -329,11 +331,11 @@ Network::newConnection(bool block, int fd)
 
         if (FD_ISSET(0, &fdset)) {
 	    if (_debug) {
-		log_debug(_("There is data at the console for stdin"));
+		log_debug(_("There is a new network connection request."));
 	    }
             return 1;
         }
-
+	
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
             log_debug(_("The accept() socket for fd #%d was interupted by a system call"), fd);
@@ -349,6 +351,7 @@ Network::newConnection(bool block, int fd)
                 log_debug(_("The accept() socket for fd #%d timed out waiting to write"), fd);
             }
         }
+	
     }
 
 #ifndef HAVE_WINSOCK_H
@@ -836,11 +839,11 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
 	// Trap ^C (SIGINT) so we can kill all the threads
-	struct sigaction  act;
-	act.sa_handler = cntrlc_handler;
-	act.sa_flags = 0;
-	sigemptyset(&act.sa_mask);
-	sigaction (SIGINT, &act, NULL);
+// 	struct sigaction  act;
+// 	act.sa_handler = cntrlc_handler;
+// 	act.sa_flags = 0;
+// 	sigemptyset(&act.sa_mask);
+// 	sigaction (SIGINT, &act, NULL);
 #else
 	struct timeval tval;
 #endif
@@ -966,11 +969,11 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
 	// Trap ^C (SIGINT) so we can kill all the threads
-	struct sigaction  act;
-	act.sa_handler = cntrlc_handler;
-	act.sa_flags = 0;
-	sigemptyset(&act.sa_mask);
-	sigaction (SIGINT, &act, NULL);
+// 	struct sigaction  act;
+// 	act.sa_handler = cntrlc_handler;
+// 	act.sa_flags = 0;
+// 	sigemptyset(&act.sa_mask);
+// 	sigaction (SIGINT, &act, NULL);
 //	sigaction (SIGPIPE, &act, NULL);
 #else
 	struct timeval tval;
@@ -1074,16 +1077,16 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	sigset_t emptyset, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
         sigaddset(&blockset, SIGINT);
-        sigaddset(&blockset, SIGPIPE);
+//        sigaddset(&blockset, SIGPIPE);
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
 	// Trap ^C (SIGINT) so we can kill all the threads
-	struct sigaction  act;
-	act.sa_handler = cntrlc_handler;
-	act.sa_flags = 0;
-	sigemptyset(&act.sa_mask);
-	sigaction (SIGINT, &act, NULL);
-	sigaction (SIGPIPE, &act, NULL);
+// 	struct sigaction  act;
+// 	act.sa_handler = cntrlc_handler;
+// 	act.sa_flags = 0;
+// 	sigemptyset(&act.sa_mask);
+// 	sigaction (SIGINT, &act, NULL);
+//	sigaction (SIGPIPE, &act, NULL);
 	tval.tv_sec = _timeout;
 	tval.tv_nsec = 0;
 	int ret = ppoll(fds, limit, &tval, &emptyset);
@@ -1254,8 +1257,8 @@ Network::toggleDebug(bool val)
 static void
 cntrlc_handler (int sig)
 {
+    sig_number = sig;
     log_debug(_("Got an %d interrupt while blocked on pselect()"), sig);
-
     exit(-1);
 }
 
