@@ -77,7 +77,8 @@ HTTP::HTTP()
       _keepalive(false),
       _handler(0),
       _clientid(0),
-      _index(0)
+      _index(0),
+      _max_requests(0)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
@@ -91,7 +92,8 @@ HTTP::HTTP(Handler *hand)
       _port(80),
       _keepalive(false),
       _clientid(0),
-      _index(0)
+      _index(0),
+      _max_requests(0)
 {
 //    GNASH_REPORT_FUNCTION;
     _handler = hand;
@@ -116,6 +118,8 @@ HTTP::clearHeader()
     _filesize = 0;
     _clientid = 0;
     _index = 0;
+    _max_requests = 0;
+    
     return true;
 }
 
@@ -189,18 +193,18 @@ HTTP::processGetRequest()
     }
     
     clearHeader();
-    extractCommand(buf);    
-    extractConnection(buf);
-    extractAccept(buf);
-    extractMethod(buf);
-    extractReferer(buf);
-    extractHost(buf);
-    extractAgent(buf);
-    extractLanguage(buf);
-    extractCharset(buf);
-    extractKeepAlive(buf);
-    extractEncoding(buf);
-    extractTE(buf);
+    extractCommand(*buf);
+    extractConnection(*buf);
+    extractAccept(*buf);
+    extractMethod(*buf);
+    extractReferer(*buf);
+    extractHost(*buf);
+    extractAgent(*buf);
+    extractLanguage(*buf);
+    extractCharset(*buf);
+    extractKeepAlive(*buf);
+    extractEncoding(*buf);
+    extractTE(*buf);
 //    dump();
 
     _filespec = _url;
@@ -229,18 +233,18 @@ HTTP::processPostRequest()
     }
     
     clearHeader();
-    extractCommand(buf);    
-    extractAccept(buf);
-    extractMethod(buf);
-    extractReferer(buf);
-    extractHost(buf);
-    extractAgent(buf);
-    extractLanguage(buf);
-    extractCharset(buf);
-    extractConnection(buf);
-    extractKeepAlive(buf);
-    extractEncoding(buf);
-    extractTE(buf);
+    extractCommand(*buf);
+    extractAccept(*buf);
+    extractMethod(*buf);
+    extractReferer(*buf);
+    extractHost(*buf);
+    extractAgent(*buf);
+    extractLanguage(*buf);
+    extractCharset(*buf);
+    extractConnection(*buf);
+    extractKeepAlive(*buf);
+    extractEncoding(*buf);
+    extractTE(*buf);
 
     _filespec = _url;
 
@@ -874,9 +878,21 @@ HTTP::extractMethod(Network::byte_t *data)
         return _method;
     }
     _url = body.substr(start+1, end-start-1);
-    _version = body.substr(end+1, length);
 
-    cerr << "HTTP version is: " << _version << endl;
+    // HTTP 1.0 doesn't support persistant connections by default.
+    if (body.substr(end+6, 3) == "1.0") {
+	log_debug("Disbling Keep Alive for default");
+	_version = 1.0;
+	_keepalive = false;
+    }
+    // HTTP 1.1 does support persistant connections by default.
+    if (body.substr(end+6, 3) == "1.1") {
+	log_debug("Enabling Keep Alive for default");
+	_version = 1.1;
+	_keepalive = true;
+    }    
+
+    log_debug("HTTP version is: HTTP %g", _version);
     end = _url.find("?", 0);
 //    _filespec = _url.substr(start+1, end);
     return _method;
@@ -943,6 +959,7 @@ HTTP::extractField(const std::string &name, gnash::Network::byte_t *data)
 	_connections.push_back(substr);
 	// Opera uses upper case first letters, Firefox doesn't.
 	if ((substr == "Keep-Alive") || (substr == "keep-alive")) {
+	    log_debug("Got a Keep Alive in field!");
 	    _keepalive = true;
 	}
 	start = pos;
@@ -974,7 +991,7 @@ HTTP::extractConnection(Network::byte_t *data)
     }
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-	end = body.find("\n", start);
+	end = body.size();
 //	    return "error";
     }
 
@@ -1009,7 +1026,15 @@ HTTP::extractConnection(Network::byte_t *data)
     return _connections.size();
 }
 
-int
+// KeepAlive directive
+// Syntax: (Apache 1.1) KeepAlive max-requests
+// Default: (Apache 1.1) KeepAlive 5
+// Syntax: (Apache 1.2) KeepAlive on|off
+// Default: (Apache 1.2) KeepAlive On
+// Context: server config
+// Status: Core
+// Compatibility: KeepAlive is only available in Apache 1.1 and later. 
+bool
 HTTP::extractKeepAlive(Network::byte_t *data)
 {
     GNASH_REPORT_FUNCTION;
@@ -1022,33 +1047,32 @@ HTTP::extractKeepAlive(Network::byte_t *data)
     if (start == string::npos) {
         return -1;
     }
+
+    log_debug("Got a Keep Alive!");
     end =  body.find("\r\n", start);
     if (end == string::npos) {
-	end = body.find("\n", start);
+	end = body.size();
 //	    return "error";
     }
 
     length = end-start-pattern.size();
     start = start+pattern.size();
-    string _connection = body.substr(start, length);
-    pos = start;
-    while (pos <= end) {
-	pos = (body.find(",", start) + 2);
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos > end)) {
-	    length = end - start;
-	} else {
-	    length = pos - start - 2;
-	}
-	string substr = body.substr(start, length);
-	_kalive.push_back(substr);
-	_keepalive = true;	// if we get this header setting, we want to keep alive
-	start = pos;
-    }
+    string tmp = body.substr(start, length);
 
-    return _connections.size();
+    std::transform(tmp.begin(), tmp.end(), tmp.begin(), 
+               (int(*)(int)) toupper);
+    if ((tmp[0] >= '0') && (tmp[0] <= '9')) {
+	_max_requests = strtol(tmp.c_str(), NULL, 0);
+	_keepalive = true;	// if we get this header setting, we want to keep alive	
+    }    
+    if (tmp == "ON") {
+	_keepalive = true;	// if we get this header setting, we want to keep alive	
+    }
+    if (tmp == "OFF") {
+	_keepalive = false;	// if we get this header setting, we want to not keep alive	
+    }
+    
+    return _keepalive;
 }
 
 string &
@@ -1442,7 +1466,7 @@ HTTP::dump() {
     log_debug (_("==== The HTTP header breaks down as follows: ===="));
     log_debug (_("Filespec: %s"), _filespec.c_str());
     log_debug (_("URL: %s"), _url.c_str());
-    log_debug (_("Version: %s"), _version.c_str());
+    log_debug (_("Version: %g"), _version);
     for (it = _accept.begin(); it != _accept.end(); it++) {
         log_debug("Accept param: \"%s\"", (*(it)).c_str());
     }

@@ -273,7 +273,7 @@ main(int argc, char *argv[])
     http.clearHeader();
     http.formatHeader(HTTP::LIFE_IS_GOOD);
 //    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "HTTP/1.1 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
+    regcomp (&regex_pat, "HTTP/1.* 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
     if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatHeader(port)");
@@ -333,7 +333,52 @@ main(int argc, char *argv[])
 // Connection: keep-alive
 
 // User Agent: Lynx/2.8.6rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.8b
+
+    Network::byte_t *field1 = (Network::byte_t *)"GET /index.html HTTP/1.1";
+    HTTP http1;
+    http1.extractMethod(field1);
+    if ((http1.keepAlive() == true) && (http1.getVersion() == 1.1)) {
+        runtest.pass ("HTTP::extractMethod(HTTP/1.1)");
+    } else {
+        runtest.fail ("HTTP::extractMethod(HTTP/1.1)");
+    }
+
+    Network::byte_t *field2 = (Network::byte_t *)"GET /index.html HTTP/1.0";
+    HTTP http2;
+    http2.extractMethod(field2);
+    if ((http2.keepAlive() == false) && (http2.getVersion() == 1.0)) {
+        runtest.pass ("HTTP::extractMethod(HTTP/1.0)");
+    } else {
+        runtest.fail ("HTTP::extractMethod(HTTP/1.0)");
+    }
+
+    Network::byte_t *field3 = (Network::byte_t *) "Keep-Alive: 300";
+    HTTP http3;
+    http3.extractKeepAlive(field3);
+    if ((http3.keepAlive() == true) && (http3.getMaxRequests() == 300)) {
+        runtest.pass ("HTTP::extractKeepAlive(300)");
+    } else {
+        runtest.fail ("HTTP::extractKeepAlive(300)");
+    }
     
+    Network::byte_t *field4 = (Network::byte_t *) "Keep-Alive: On";
+    HTTP http4;
+    http4.extractKeepAlive(field4);
+    if (http4.keepAlive() == true) {
+        runtest.pass ("HTTP::extractKeepAlive(On)");
+    } else {
+        runtest.fail ("HTTP::extractKeepAlive(On)");
+    }
+    
+    Network::byte_t *field5 = (Network::byte_t *) "Keep-Alive: Off";
+    HTTP http5;
+    http5.extractKeepAlive(field5);
+    if (http5.keepAlive() == false) {
+        runtest.pass ("HTTP::extractKeepAlive(Off)");
+    } else {
+        runtest.fail ("HTTP::extractKeepAlive(Off)");
+    }
+
 // Some browsers have a different synatax, of course, to keep things
 // interesting.
     Network::byte_t *buffer2 = (Network::byte_t *)"GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n)"
