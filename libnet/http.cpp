@@ -1501,11 +1501,11 @@ extern "C" {
 void
 http_handler(Handler::thread_params_t *args)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 //    struct thread_params thread_data;
     string url, filespec, parameters;
     string::size_type pos;
-    Network *net = reinterpret_cast<Network *>(args->handler);
+    Handler *hand = reinterpret_cast<Handler *>(args->handler);
     HTTP www;
     bool done = false;
 //    www.setHandler(net);
@@ -1519,30 +1519,12 @@ http_handler(Handler::thread_params_t *args)
 
     // Wait for data, and when we get it, process it.
     do {
-#ifdef THREADED_IO
-	hand->wait();
-	if (hand->timetodie()) {
-	    log_debug("Not waiting no more, no more for more HTTP data for fd #%d...", args->netfd);
-	    map<int, Handler *>::iterator hit = handlers.find(args->netfd);
-	    if ((*hit).second) {
-		log_debug("Removing handle %x for HTTP on fd #%d",
-			  (void *)hand, args->netfd);
-		handlers.erase(args->netfd);
-		delete (*hit).second;
-	    }
-	    return;
-	}
-#endif
 	
 #ifdef USE_STATISTICS
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
 #endif
 	
-// 	conndata->statistics->setFileType(NetStats::RTMPT);
-// 	conndata->statistics->startClock();
-//	args->netfd = www.getFileFd();
-//	www.recvMsg(5);
 	www.recvMsg(args->netfd);
 	
 	if (!www.processGetRequest()) {
@@ -1655,11 +1637,12 @@ http_handler(Handler::thread_params_t *args)
 	}
 	log_debug("http_handler all done transferring requested file...");
 //	cache.dump();
-	done = true;
+//	done = true;
 
+	// Unless the Keep-Alive flag is set, this isn't a persisant network
+	// connection.
 	if (!www.keepAlive()) {
 	    log_debug("Keep-Alive is off", www.keepAlive());
-//	    www.closeConnection();
 	    done = true;
 	}
 #if 0
@@ -1679,7 +1662,7 @@ http_handler(Handler::thread_params_t *args)
 		// See if this is a persistant connection
 // 		if (!www.keepAlive()) {
 // 		    log_debug("Keep-Alive is off", www.keepAlive());
-		hand->closeConnection();
+		hand->closeNet();
 //  		}
 	    }
 	}
@@ -1697,6 +1680,10 @@ http_handler(Handler::thread_params_t *args)
 //    }
 //    } while(!hand->timetodie());
     } while(done != true);
+    
+//     www.closeNet(args->netfd);
+//     hand->erasePollFD(args->netfd);
+    hand->notify();
     
     log_debug("http_handler all done now finally...");
     
