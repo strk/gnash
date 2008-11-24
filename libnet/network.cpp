@@ -307,9 +307,9 @@ Network::newConnection(bool block, int fd)
 	tval.tv_sec = 1;
 	tval.tv_nsec = 0;
         if (block) {
-	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &emptyset);
+	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &blockset);
 	} else {
-	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &emptyset);
+	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
 	}
 	if (sig_number) {
 	    log_debug("Have a SIGINT interupt waiting!");
@@ -850,7 +850,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 #endif
         if (timeout == 0) {
 #ifdef HAVE_PSELECT
-	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &emptyset);
+	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &blockset);
 #else
 	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
 #endif
@@ -858,7 +858,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 #ifdef HAVE_PSELECT
 	    tval.tv_sec = timeout;
 	    tval.tv_nsec = 0;
-	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &emptyset);
+	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
 	    sigpending(&pending);
 	    if (sigismember(&pending, SIGINT)) {
 		log_debug("Have a pending SIGINT interupt waiting!");
@@ -984,7 +984,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 #ifdef HAVE_PSELECT
 	tval.tv_sec = timeout;
 	tval.tv_nsec = 0;
-	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &emptyset);
+	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &blockset);
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
 	    log_debug("Have a pending SIGINT interupt waiting!");
