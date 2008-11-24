@@ -77,7 +77,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(! tester.findDisplayItemByDepth(*root, 72) );
 	check(! tester.findDisplayItemByDepth(*root, 73) );
 
-	tester.movePointerTo(100, 30);
+	tester.movePointerTo(100, 5);
 	check(tester.isMouseOverMouseEntity());
 	tester.movePointerTo(170, 30);
 	check(!tester.isMouseOverMouseEntity());
@@ -90,7 +90,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 72) );
 	check(! tester.findDisplayItemByDepth(*root, 73) );
 
-	tester.movePointerTo(170, 30);
+	tester.movePointerTo(170, 10);
 	check(tester.isMouseOverMouseEntity());
 	tester.movePointerTo(240, 30);
 	check(!tester.isMouseOverMouseEntity());
@@ -103,7 +103,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 72) );
 	check( tester.findDisplayItemByDepth(*root, 73) );
 
-	tester.movePointerTo(240, 30);
+	tester.movePointerTo(240, 5);
 	check(tester.isMouseOverMouseEntity());
 }
 
