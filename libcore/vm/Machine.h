@@ -290,8 +290,10 @@ private:
 	}
 
 	void push_scope_stack(as_value object){
+		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
+		assert(scopeObj.get());
 		LOG_DEBUG_AVM("Pushing value %s onto scope stack.",object.toDebugString());
-		mScopeStack.push(object.to_object());
+		mScopeStack.push(scopeObj);
 		print_scope_stack();
 	}
 

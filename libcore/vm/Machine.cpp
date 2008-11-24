@@ -688,7 +688,14 @@ Machine::execute()
 /// 0x30 ABC_ACTION_PUSHSCOPE
 	case SWF::ABC_ACTION_PUSHSCOPE:
 	{
-		push_scope_stack(pop_stack());
+		as_value scope_value = pop_stack();
+		if(!scope_value.to_object().get()){
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't push a null value onto the scope stack (%s)."), scope_value);
+			);
+			scope_value = as_value(new as_object());
+		}	
+		push_scope_stack(scope_value);
 		break;
 	}
 /// 0x1C ABC_ACTION_PUSHWITH
