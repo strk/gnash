@@ -364,12 +364,10 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
 
     // Knock off the "/>" of a self-closing tag.
     if (std::equal(endName - 1, endName + 1, "/>")) {
-        //log_debug("self-closing tag");
         --endName;
     }
 
     std::string tagName(it, endName);
-    //log_debug("tagName : %s", tagName);
 
     if (!closing) {
 
@@ -484,7 +482,7 @@ void
 XML_as::parseComment(XMLNode_as* /*node*/, const std::string& xml, 
         std::string::const_iterator& it)
 {
-    log_debug("discarding comment node");
+    //log_debug("discarding comment node");
 
     std::string content;
 
