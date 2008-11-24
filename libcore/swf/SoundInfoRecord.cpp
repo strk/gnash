@@ -41,10 +41,6 @@ SoundInfoRecord::read(SWFStream& in)
 	hasOutPoint = flags & (1 << 1); 
 	hasInPoint  = flags & (1 << 0);  
     
-    if (noMultiple) {
-        LOG_ONCE(log_unimpl("syncNoMultiple flag in SoundInfo record"));
-    }
-
     in.ensureBytes(hasInPoint * 4 + hasOutPoint * 4 + hasLoops * 2);
 
 	if (hasInPoint) {
