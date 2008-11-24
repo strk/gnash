@@ -43,8 +43,10 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "dejagnu.h"
 #include "network.h"
 #include "amf.h"
+#include "buffer.h"
 
 using namespace gnash;
+using namespace amf;
 using namespace std;
 
 static void usage (void);
@@ -522,6 +524,10 @@ test_post()
 {
 
     HTTP http;
+
+    boost::shared_ptr<amf::Buffer> encstr = AMF::encodeString("Hello World!");
+    boost::shared_ptr<amf::Buffer> encnum = AMF::encodeNumber(1.2345);
+
     amf::Buffer ptr1;
     ptr1 = "POST /echo/gateway HTTP/1.1\r\n";
     ptr1 += "User-Agent: Opera/9.62 (X11; Linux i686; U; en) Presto/2.1.1\r\n";
@@ -530,12 +536,16 @@ test_post()
     ptr1 += "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0\r\n";
     ptr1 += "Referer: http://localhost:5080/demos/echo_test.swf\r\n";
     ptr1 += "Connection: Keep-Alive, TE\r\n";
-    ptr1 += "Content-Length: 26\r\n";
+    ptr1 += "Content-Length: 14\r\n";
     ptr1 += "Content-Type: application/x-amf\r\n";
     ptr1 += "\r\n";
-    ptr1 += "foobar";
+    ptr1 += *encstr;
     ptr1.resize();              // shrink the buffer to be the exact size of the data
-    
+
+    AMF amf;
+    gnash::Network::byte_t *data1 = http.processHeaderFields(ptr1);
+    boost::shared_ptr<amf::Element> el1 = amf.extractAMF(data1, data1 + 9);
+
     amf::Buffer ptr2;
     ptr2 += "POST /echo/gateway HTTP/1.1\r\n";
     ptr2 += "User-Agent: Opera/9.62.(X11;.Linux.i686;.U;.en) Presto/2.1.1\r\n";
@@ -546,10 +556,10 @@ test_post()
     ptr2 += "Accept-Encoding: deflate, gzip,.x-gzip, identity, *;q=0\r\n";
     ptr2 += "Referer: http://localhost:5080/demos/echo_test.swf\r\n";
     ptr2 += "Connection: Keep-Alive, TE. TE: deflate, gzip, chunked, identity, trailers\r\n";
-    ptr2 += "Content-Length:.35\r\n";
+    ptr2 += "Content-Length:.15\r\n";
     ptr2 += "Content-Type: application/x-amf\r\n";
     ptr2 += "\r\n";
-    ptr2 += "foobar";
+    ptr2 += *encnum;
     ptr2.resize();              // shrink the buffer to be the exact size of the data
 
 #if 0
@@ -564,9 +574,10 @@ test_post()
 #endif
         
     gnash::Network::byte_t *data2 = http.processHeaderFields(ptr2);
+    boost::shared_ptr<amf::Element> el2 = amf.extractAMF(data2, data2 + 15);
     if ((http.getField("host") == "localhost:5080")
-        && (memcmp(data2, "foobar", 6) == 0)
-        && (http.getField("content-length") == "35")) {
+        && (el2->to_number() == 1.2345)
+        && (http.getField("content-length") == "15")) {
         runtest.pass("HTTP::processHeaderFields(POST)");
     } else {
         runtest.fail("HTTP::processHeaderFields(POST)");
@@ -593,6 +604,7 @@ test_post()
             runtest.fail("HTTP::getFieldItem(Connection)");
         }
     }
+
 }
 
 static void
