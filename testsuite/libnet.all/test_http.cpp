@@ -48,6 +48,8 @@ using namespace gnash;
 using namespace std;
 
 static void usage (void);
+static void tests (void);
+static void test_post (void);
 
 static TestState runtest;
 
@@ -74,6 +76,14 @@ main(int argc, char *argv[])
         }
     }
 
+    tests();
+    test_post();
+}
+
+
+void
+tests()
+{    
     HTTP http;
 
     http.clearHeader();
@@ -336,8 +346,9 @@ main(int argc, char *argv[])
 
     Network::byte_t *field1 = (Network::byte_t *)"GET /index.html HTTP/1.1";
     HTTP http1;
+    HTTP::http_version_t version = http1.getVersion();
     http1.extractMethod(field1);
-    if ((http1.keepAlive() == true) && (http1.getVersion() == 1.1)) {
+    if ((http1.keepAlive() == true) && (version.minor == 1)) {
         runtest.pass ("HTTP::extractMethod(HTTP/1.1)");
     } else {
         runtest.fail ("HTTP::extractMethod(HTTP/1.1)");
@@ -345,8 +356,9 @@ main(int argc, char *argv[])
 
     Network::byte_t *field2 = (Network::byte_t *)"GET /index.html HTTP/1.0";
     HTTP http2;
+    version = http2.getVersion();
     http2.extractMethod(field2);
-    if ((http2.keepAlive() == false) && (http2.getVersion() == 1.0)) {
+    if ((http2.keepAlive() == false) && (http2.getVersion().minor == 0)) {
         runtest.pass ("HTTP::extractMethod(HTTP/1.0)");
     } else {
         runtest.fail ("HTTP::extractMethod(HTTP/1.0)");
@@ -506,6 +518,79 @@ main(int argc, char *argv[])
         http.dump();
     }
 }
+
+void
+test_post()
+{
+
+    HTTP http;
+    amf::Buffer ptr1;
+    ptr1 = "POST /echo/gateway HTTP/1.1";
+    ptr1 += "User-Agent: Opera/9.62 (X11; Linux i686; U; en) Presto/2.1.1";
+    ptr1 += "Host: localhost:4080";
+    ptr1 += "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap;q=0.1";
+    ptr1 += "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0";
+    ptr1 += "Referer: http://localhost:5080/demos/echo_test.swf";
+    ptr1 += "Connection: Keep-Alive, TE";
+    ptr1 += "Content-Length: 26";
+    ptr1 += "Content-Type: application/x-amf";
+    
+    amf::Buffer ptr2;
+    ptr2 += "POST./echo/gateway.HTTP/1.1\r\n";
+    ptr2 += "User-Agent: Opera/9.62.(X11;.Linux.i686;.U;.en) Presto/2.1.1\r\n";
+    ptr2 += "Host: localhost:5080\r\n";
+    ptr2 += "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap\r\n";
+    ptr2 += "Accept-Language: en\r\n";
+    ptr2 += "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\r\n";
+    ptr2 += "Accept-Encoding: deflate, gzip,.x-gzip, identity, *;q=0\r\n";
+    ptr2 += "Referer: http://localhost:5080/demos/echo_test.swf\r\n";
+    ptr2 += "Connection: Keep-Alive, TE. TE: deflate, gzip, chunked, identity, trailers\r\n";
+    ptr2 += "Content-Length:.35\r\n";
+    ptr2 += "Content-Type: application/x-amf\r\n";
+
+#if 0
+2...........echo../2............ Hello.world!
+    
+00 00
+00 00 00 01
+00 04 65 63 68 6f
+   00 02 2f 32 00 00 00 14 0a
+00 00 00 01
+   02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21
+#endif
+        
+    http.processHeaderFields(ptr2);
+    if ((http.getField("host") == "localhost:5080")
+        && (http.getField("content-type") == "application/x-amf")
+        && (http.getField("content-length") == "35")) {
+        runtest.pass("HTTP::processHeaderFields(POST)");
+    } else {
+        runtest.fail("HTTP::processHeaderFields(POST)");
+    }
+
+    boost::shared_ptr<std::vector<std::string> > item2 = http.getFieldItem("accept");
+    if (!item2) {
+        runtest.unresolved("HTTP::getFieldItem(Accept)");
+    } else {
+        if (item2->at(2) == "application/xhtml+xml") {
+            runtest.pass("HTTP::getFieldItem(Accept)");
+        } else {
+            runtest.fail("HTTP::getFieldItem(Accept)");
+        }
+    }
+
+    boost::shared_ptr<std::vector<std::string> > item3 = http.getFieldItem("connection");
+    if (!item3) {
+        runtest.unresolved("HTTP::getFieldItem(POST)");
+    } else {
+        if (item3->at(0) == "keep-alive") {
+            runtest.pass("HTTP::getFieldItem(Connection)");
+        } else {
+            runtest.fail("HTTP::getFieldItem(Connection)");
+        }
+    }
+}
+
 static void
 usage (void)
 {
