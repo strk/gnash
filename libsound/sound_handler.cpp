@@ -364,10 +364,19 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
 
     EmbedSound& sounddata = *(_sounds[sound_handle]);
 
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("playSound %d called, SoundInfo format is %s",
+            sound_handle, sounddata.soundinfo->getFormat());
+#endif
+
     // When this is called from a StreamSoundBlockTag,
     // we only start if this sound isn't already playing.
     if ( ! allowMultiples && sounddata.isPlaying() )
     {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+        log_debug(" playSound: multiple instances not allowed, "
+                  "and sound %d is already playing", sound_handle);
+#endif
         // log_debug("Stream sound block play request, "
         //           "but an instance of the stream is "
         //           "already playing, so we do nothing");
@@ -383,10 +392,6 @@ sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
         );
         return;
     }
-
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("playSound %d called, SoundInfo format is %s", sound_handle, sounddata.soundinfo->getFormat());
-#endif
 
 
     // Make a "EmbedSoundInst" for this sound which is later placed
@@ -515,6 +520,11 @@ sound_handler::unplugCompletedInputStreams()
 {
     InputStreams::iterator it = _inputStreams.begin();
     InputStreams::iterator end = _inputStreams.end();
+
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("Scanning %d input streams for completion", _inputStreams.size());
+#endif
+
     while (it != end)
     {
         InputStream* is = *it;
@@ -533,6 +543,9 @@ sound_handler::unplugCompletedInputStreams()
             it = it2;
 
             //log_debug("fetchSamples: marking stopped InputStream %p (on EOF)", is);
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+            log_debug(" Input stream %p reached EOF, unplugging", is);
+#endif
 
             // WARNING! deleting the InputStream here means
             //          a lot of things will happen from a
