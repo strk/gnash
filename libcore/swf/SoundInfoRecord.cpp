@@ -28,7 +28,7 @@ namespace SWF {
 
 
 void
-SoundInfo::read(SWFStream& in)
+SoundInfoRecord::read(SWFStream& in)
 {
 	in.ensureBytes(1);
     
