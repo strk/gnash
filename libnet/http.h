@@ -308,7 +308,7 @@ public:
     std::string &getURL() { return _url; }
     std::map<int, struct status_codes *> getStatusCodes()
 	{ return _status_codes; }
-    http_version_t &getVersion() { return _version; }
+    http_version_t *getVersion() { return &_version; }
     std::string getMethod() { return _method; }
     std::string getReferer() { return _referer; }
     std::string getCommand() { return _command; }

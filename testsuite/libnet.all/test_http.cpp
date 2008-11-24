@@ -346,9 +346,8 @@ tests()
 
     Network::byte_t *field1 = (Network::byte_t *)"GET /index.html HTTP/1.1";
     HTTP http1;
-    HTTP::http_version_t version = http1.getVersion();
     http1.extractMethod(field1);
-    if ((http1.keepAlive() == true) && (version.minor == 1)) {
+    if ((http1.keepAlive() == true) && (http1.getVersion()->minor == 1)) {
         runtest.pass ("HTTP::extractMethod(HTTP/1.1)");
     } else {
         runtest.fail ("HTTP::extractMethod(HTTP/1.1)");
@@ -356,9 +355,8 @@ tests()
 
     Network::byte_t *field2 = (Network::byte_t *)"GET /index.html HTTP/1.0";
     HTTP http2;
-    version = http2.getVersion();
     http2.extractMethod(field2);
-    if ((http2.keepAlive() == false) && (http2.getVersion().minor == 0)) {
+    if ((http2.keepAlive() == false) && (http2.getVersion()->minor == 0)) {
         runtest.pass ("HTTP::extractMethod(HTTP/1.0)");
     } else {
         runtest.fail ("HTTP::extractMethod(HTTP/1.0)");
@@ -536,7 +534,7 @@ test_post()
     ptr1 += "Content-Type: application/x-amf\r\n";
     ptr1 += "\r\n";
     ptr1 += "foobar";
-    ptr1.resize();
+    ptr1.resize();              // shrink the buffer to be the exact size of the data
     
     amf::Buffer ptr2;
     ptr2 += "POST /echo/gateway HTTP/1.1\r\n";
@@ -552,7 +550,7 @@ test_post()
     ptr2 += "Content-Type: application/x-amf\r\n";
     ptr2 += "\r\n";
     ptr2 += "foobar";
-    ptr2.resize();
+    ptr2.resize();              // shrink the buffer to be the exact size of the data
 
 #if 0
 2...........echo../2............ Hello.world!
