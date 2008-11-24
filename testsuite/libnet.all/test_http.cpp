@@ -536,7 +536,7 @@ test_post()
     ptr1 += "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0\r\n";
     ptr1 += "Referer: http://localhost:5080/demos/echo_test.swf\r\n";
     ptr1 += "Connection: Keep-Alive, TE\r\n";
-    ptr1 += "Content-Length: 14\r\n";
+    ptr1 += "Content-Length: 15\r\n";
     ptr1 += "Content-Type: application/x-amf\r\n";
     ptr1 += "\r\n";
     ptr1 += *encstr;
@@ -544,7 +544,16 @@ test_post()
 
     AMF amf;
     gnash::Network::byte_t *data1 = http.processHeaderFields(ptr1);
-    boost::shared_ptr<amf::Element> el1 = amf.extractAMF(data1, data1 + 9);
+    boost::shared_ptr<amf::Element> el1 = amf.extractAMF(data1, data1 + 15);
+    string str1 = el1->to_string();
+
+    if ((http.getField("host") == "localhost:4080")
+        && (str1 == "Hello World!")
+        && (http.getField("content-length") == "15")) {
+        runtest.pass("HTTP::processHeaderFields(POST) + STRING");
+    } else {
+        runtest.fail("HTTP::processHeaderFields(POST) + STRING");
+    }
 
     amf::Buffer ptr2;
     ptr2 += "POST /echo/gateway HTTP/1.1\r\n";
@@ -556,7 +565,7 @@ test_post()
     ptr2 += "Accept-Encoding: deflate, gzip,.x-gzip, identity, *;q=0\r\n";
     ptr2 += "Referer: http://localhost:5080/demos/echo_test.swf\r\n";
     ptr2 += "Connection: Keep-Alive, TE. TE: deflate, gzip, chunked, identity, trailers\r\n";
-    ptr2 += "Content-Length:.15\r\n";
+    ptr2 += "Content-Length:.9\r\n";
     ptr2 += "Content-Type: application/x-amf\r\n";
     ptr2 += "\r\n";
     ptr2 += *encnum;
@@ -577,10 +586,10 @@ test_post()
     boost::shared_ptr<amf::Element> el2 = amf.extractAMF(data2, data2 + 15);
     if ((http.getField("host") == "localhost:5080")
         && (el2->to_number() == 1.2345)
-        && (http.getField("content-length") == "15")) {
-        runtest.pass("HTTP::processHeaderFields(POST)");
+        && (http.getField("content-length") == "9")) {
+        runtest.pass("HTTP::processHeaderFields(POST) + NUMBER");
     } else {
-        runtest.fail("HTTP::processHeaderFields(POST)");
+        runtest.fail("HTTP::processHeaderFields(POST) + NUMBER");
     }
 
     boost::shared_ptr<std::vector<std::string> > item2 = http.getFieldItem("accept");
