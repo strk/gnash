@@ -143,13 +143,13 @@ public:
 	//
 	/// All scheduled sounds will be played on next output flush.
 	///
-	/// @param sound_handle
-	///	Id of the sound buffer slot schedule playback of.
+	/// @param id
+	///     Id of the sound buffer slot schedule playback of.
 	///
-	/// @param loop_count
-	/// 	loop_count == 0 means play the sound once (1 means play it twice, etc)
+	/// @param loops
+	/// 	loops == 0 means play the sound once (1 means play it twice, etc)
 	///
-	/// @param secondOffset
+	/// @param secsOffset
 	/// 	When starting event sounds there sometimes is a offset to make the sound
 	/// 	start at the exact right moment. Gnash supports this troough 'Sound' AS
 	///     class only, not from the actual control tag (StartSound). Units given in 
@@ -162,14 +162,19 @@ public:
 	///     are already playing.
 	///     @todo use unsigned
 	///
-	/// @param envelopes
+	/// @param env
 	/// 	Some eventsounds have some volume control mechanism called envelopes.
 	/// 	They basically tells that from sample X the volume should be Y.
+    ///
+	/// @param allowMultiple
+	/// 	If false, the sound will not be scheduled if there's another
+    ///     instance of it already playing.
 	///
 	/// TODO: add out_point parameter (when to stop playing the sound)
 	///
-	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset,
-					long start, const SoundEnvelopes* envelopes);
+	virtual void playSound(int id, int loops, int secsOffset,
+					long start, const SoundEnvelopes* env,
+                    bool allowMultiple);
 
 	/// Remove all scheduled request for playback of sound buffer slots
 	virtual void	stop_all_sounds();

@@ -38,6 +38,8 @@
 #include "Object.h" // for getObjectInterface
 #include "StringPredicates.h"
 #include "GnashKey.h" // key::code
+#include "SoundInfoRecord.h" // for use
+
 #include <boost/bind.hpp>
 
 /** \page buttons Buttons and mouse behaviour
@@ -560,14 +562,18 @@ Button::on_button_event(const event_id& event)
         }
         else
         {
-            if (bs.soundInfo.noMultiple) {
-                LOG_ONCE(log_unimpl("syncNoMultiple flag "
-                    "in button transition sound tag"));
-            }
-            s->play_sound(bs.sample->m_sound_handler_id,
-                    bs.soundInfo.loopCount, 0, 0, 
-                    (bs.soundInfo.envelopes.empty() ? NULL :
-                                    &bs.soundInfo.envelopes));
+            const SWF::SoundInfoRecord& sinfo = bs.soundInfo;
+
+            const sound::SoundEnvelopes* env = 
+                sinfo.envelopes.empty() ? 0 : &sinfo.envelopes;
+
+            s->playSound(bs.sample->m_sound_handler_id,
+                    bs.soundInfo.loopCount,
+                    0, // secs offset
+                    0, // byte offset
+                    env, // envelopes
+                    !sinfo.noMultiple // allow multiple instances ?
+                    );
         }
 
     } while(0);

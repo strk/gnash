@@ -87,13 +87,21 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
         {
 
             if (_soundInfo.noMultiple) {
-                LOG_ONCE(log_unimpl("syncNoMultiple flag in StartSound tag"));
+                log_unimpl("TESTING: syncNoMultiple flag in StartSound tag");
             }
 
             //log_debug("Execute StartSoundTag with 'stop playback' flag OFF");
-            handler->play_sound(m_handler_id, _soundInfo.loopCount, 0, 0,
-                    (_soundInfo.envelopes.empty() ? NULL :
-                     &_soundInfo.envelopes));
+
+            const sound::SoundEnvelopes* env = 
+                _soundInfo.envelopes.empty() ? 0 : &_soundInfo.envelopes;
+
+            handler->playSound(m_handler_id,
+                    _soundInfo.loopCount,
+                    0, // secs offset
+                    0, // byte offset
+                    env, // envelopes
+                    !_soundInfo.noMultiple // allow multiple instances ?
+                    );
         }
     }
 }

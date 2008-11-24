@@ -29,7 +29,7 @@
 #include <boost/cstdint.hpp> // For C99 int types
 #include <vector> // for use
 
-// Debug create_sound/delete_sound/play_sound/stop_sound, loops
+// Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
 
 // Debug samples fetching
@@ -333,13 +333,15 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 }
 
 void
-sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
-                          long start_position, const SoundEnvelopes* envelopes)
+sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
+                            long start_position,
+                            const SoundEnvelopes* envelopes,
+                            bool allowMultiples)
 {
     // Check if the sound exists
     if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
     {
-        log_error("Invalid (%d) sound_handle passed to play_sound, "
+        log_error("Invalid (%d) sound_handle passed to playSound, "
                   "doing nothing", sound_handle);
         return;
     }
@@ -347,7 +349,7 @@ sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
     // parameter checking
     if (start_position < 0)
     {
-        log_error("Negative (%d) start_position passed to play_sound, "
+        log_error("Negative (%d) start_position passed to playSound, "
                   "taking as zero ", start_position);
         start_position=0;
     }
@@ -355,7 +357,7 @@ sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
     // parameter checking
     if (offSecs < 0)
     {
-        log_error("Negative (%d) seconds offset passed to play_sound, "
+        log_error("Negative (%d) seconds offset passed to playSound, "
                   "taking as zero ", offSecs);
         offSecs = 0;
     }
@@ -364,7 +366,7 @@ sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
 
     // When this is called from a StreamSoundBlockTag,
     // we only start if this sound isn't already playing.
-    if ( start_position && sounddata.isPlaying() )
+    if ( ! allowMultiples && sounddata.isPlaying() )
     {
         // log_debug("Stream sound block play request, "
         //           "but an instance of the stream is "
@@ -383,7 +385,7 @@ sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
     }
 
 #ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("play_sound %d called, SoundInfo format is %s", sound_handle, sounddata.soundinfo->getFormat());
+    log_debug("playSound %d called, SoundInfo format is %s", sound_handle, sounddata.soundinfo->getFormat());
 #endif
 
 

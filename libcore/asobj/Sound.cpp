@@ -359,7 +359,14 @@ Sound::start(int offset, int loops)
 	}
 	else
 	{
-	    	_soundHandler->play_sound(soundId, loops, offset, 0, NULL);
+        _soundHandler->playSound(
+                    soundId,
+                    loops,
+                    offset, // in seconds
+                    0, // start position in bytes...
+                    0, // envelopes
+                    true // allow multiple instances (TODO: checkme)
+                    );
 	}
 }
 
