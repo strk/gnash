@@ -88,10 +88,11 @@ main(int /*argc*/, char** /*argv*/)
 		6
 	};
 
+    /// Expected success for each test
 	bool testPasses[] = {
 		true,
 		true,
-		false
+		true
 	};
 
 	// Advance and check...
