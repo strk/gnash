@@ -291,15 +291,34 @@ void
 XML_as::parseDocTypeDecl(const std::string& xml,
         std::string::const_iterator& it)
 {
-    std::string content;
-    if (!parseNodeWithTerminator(xml, it, ">", content))
-    {
-        _status = XML_UNTERMINATED_DOCTYPE_DECL;
-        return;
+
+    std::string::const_iterator end;
+    std::string::const_iterator current = it; 
+
+    std::string::size_type count = 1;
+
+    // Look for angle brackets in the doctype declaration.
+    while (count) {
+
+        // Find the next closing bracket after the current position.
+        end = std::find(current, xml.end(), '>');
+        if (end == xml.end()) {
+            _status = XML_UNTERMINATED_DOCTYPE_DECL;
+            return;
+        }
+        --count;
+
+        // Count any opening brackets in between.
+        count += std::count(current, end, '<');
+        current = end;
+        ++current;
     }
+
+    const std::string content(it, end);
     std::ostringstream os;
     os << '<' << content << '>';
     _docTypeDecl = os.str();
+    it = end + 1;
 }
 
 
