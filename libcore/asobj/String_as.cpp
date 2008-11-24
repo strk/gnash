@@ -245,7 +245,18 @@ string_slice(const fn_call& fn)
     
     const std::string& str = val.to_string();
 
-    int version = obj->getVM().getSWFVersion();
+    /// version to use is the one of the SWF containing caller code.
+    /// If callerDef is null, this calls is spontaneous (system-event?)
+    /// in which case we should research on which version should drive behaviour.
+    /// NOTE: it is unlikely that a system event triggers string_split so
+    ///       in most cases a null callerDef means the caller forgot to 
+    ///       set the field (ie: a programmatic error)
+    if ( ! fn.callerDef )
+    {
+        log_error("No fn_call::callerDef in string_slice call");
+        //abort();
+    }
+    const int version = fn.callerDef ? fn.callerDef->get_version() : obj->getVM().getSWFVersion();
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -301,7 +312,14 @@ string_split(const fn_call& fn)
     
     const std::string& str = val.to_string();
 
-    const int version = obj->getVM().getSWFVersion();
+    /// version to use is the one of the SWF containing caller code.
+    /// If callerDef is null, this calls is spontaneous (system-event?)
+    /// in which case we should research on which version should drive behaviour.
+    /// NOTE: it is unlikely that a system event triggers string_split so
+    ///       in most cases a null callerDef means the caller forgot to 
+    ///       set the field (ie: a programmatic error)
+    if ( ! fn.callerDef ) log_error("No fn_call::callerDef in string_split call");
+    const int version = fn.callerDef ? fn.callerDef->get_version() : obj->getVM().getSWFVersion();
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -859,10 +877,11 @@ void string_class_init(as_object& global)
     // This is going to be the global String "class"/"function"
     boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
 
-    // Register _global.String
+    // Register _global.String (should be only visible from SWF5 up)
     // TODO: register as ASnative(251, 0)
     // TODO: register as ASnative(3, 0) for SWF5 ?
-    global.init_member("String", cl.get());
+    int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
+    global.init_member("String", cl.get(), flags);
 }
 
 boost::intrusive_ptr<as_object>

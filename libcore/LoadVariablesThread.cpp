@@ -126,8 +126,8 @@ LoadVariablesThread::completeLoad()
 	_bytesLoaded = _stream->tell();
 	if ( _bytesTotal !=  _bytesLoaded )
 	{
-		log_error("Size of stream variables were loaded from advertised to be %d bytes long,"
-		         " but turned out to be only %d bytes long",
+		log_error("Size of 'variables' stream advertised to be %d bytes,"
+		         " but turned out to be %d bytes.",
 			_bytesTotal, _bytesLoaded);
 		_bytesTotal = _bytesLoaded;
 	}

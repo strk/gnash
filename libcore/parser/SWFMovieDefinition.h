@@ -258,7 +258,7 @@ public:
 	///         resource, or if a timeout occurs while scanning the movie.
 	///
 	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& symbol);
+            const std::string& symbol) const;
 
 	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             Imports& imports);

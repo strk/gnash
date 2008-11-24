@@ -24,7 +24,7 @@
 #include <netinet/in.h>
 #include <string>
 #include <sys/types.h>
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

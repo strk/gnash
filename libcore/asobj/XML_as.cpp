@@ -17,6 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+// The XML parsing algorithms are based on swfdec's parsing model.
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -27,22 +28,21 @@
 #include "fn_call.h"
 
 #include "LoadableObject.h"
-#include "xmlattrs.h"
 #include "XMLNode_as.h"
 #include "XML_as.h"
 #include "builtin_function.h"
 #include "VM.h"
 #include "namedStrings.h"
 #include "array.h"
+#include "StringPredicates.h"
 
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-#include <libxml/xmlreader.h>
 #include <string>
 #include <sstream>
 #include <vector>
-#include <boost/algorithm/string/case_conv.hpp>
+#include <algorithm>
+#include <boost/assign/list_of.hpp>
+#include <boost/algorithm/string/compare.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 
 namespace gnash {
@@ -54,25 +54,36 @@ namespace gnash {
 
 // Define this to enable verbosity of XML parsing
 //#define DEBUG_XML_PARSE 1
+// Forward declarations.
+namespace {
+    as_object* getXMLInterface();
+    void attachXMLInterface(as_object& o);
+    void attachXMLProperties(as_object& o);
 
-static as_object* getXMLInterface();
-static void attachXMLInterface(as_object& o);
-static void attachXMLProperties(as_object& o);
+    as_value xml_new(const fn_call& fn);
+    as_value xml_createelement(const fn_call& fn);
+    as_value xml_createtextnode(const fn_call& fn);
+    as_value xml_getbytesloaded(const fn_call& fn);
+    as_value xml_getbytestotal(const fn_call& fn);
+    as_value xml_parsexml(const fn_call& fn);
+    as_value xml_ondata(const fn_call& fn);
+    as_value xml_xmlDecl(const fn_call& fn);
+    as_value xml_docTypeDecl(const fn_call& fn);
 
-static as_value xml_new(const fn_call& fn);
-static as_value xml_createelement(const fn_call& fn);
-static as_value xml_createtextnode(const fn_call& fn);
-static as_value xml_getbytesloaded(const fn_call& fn);
-static as_value xml_getbytestotal(const fn_call& fn);
-static as_value xml_parsexml(const fn_call& fn);
-static as_value xml_ondata(const fn_call& fn);
-
+    bool textAfterWhitespace(const std::string& xml,
+            std::string::const_iterator& it);
+    bool textMatch(const std::string& xml, std::string::const_iterator& it,
+            const std::string& match, bool advance = true);
+    bool parseNodeWithTerminator(const std::string& xml,
+            std::string::const_iterator& it, const std::string& terminator,
+            std::string& content);
+}
 
 XML_as::XML_as() 
     :
     as_object(getXMLInterface()),
     _loaded(-1), 
-    _status(sOK)
+    _status(XML_OK)
 {
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_debug(_("Creating XML data at %p"), this);
@@ -82,36 +93,86 @@ XML_as::XML_as()
 }
 
 
-// Parse the ASCII XML string into memory
-XML_as::XML_as(const std::string& xml_in)
+// Parse the ASCII XML string into an XMLNode tree
+XML_as::XML_as(const std::string& xml)
     :
     as_object(getXMLInterface()),
     _loaded(-1), 
-    _status(sOK)
+    _status(XML_OK)
 {
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_debug(_("Creating XML data at %p"), this);
 #endif
 
-    parseXML(xml_in);
+    parseXML(xml);
+}
+
+const XML_as::Entities&
+XML_as::getEntities()
+{
+
+    static Entities entities = boost::assign::map_list_of
+        ("&amp;", "&")
+        ("&quot;", "\"")
+        ("&lt;", "<")
+        ("&gt;", ">")
+        ("&apos;", "'");
+
+    return entities;
+
+}
+
+void
+XML_as::escape(std::string& text)
+{
+    const Entities& ent = getEntities();
+
+    for (Entities::const_iterator i = ent.begin(), e = ent.end();
+            i != e; ++i)
+    {
+        boost::replace_all(text, i->second, i->first);
+    }
+}
+
+void
+XML_as::unescape(std::string& text)
+{
+    const Entities& ent = getEntities();
+
+    for (Entities::const_iterator i = ent.begin(), e = ent.end();
+            i != e; ++i)
+    {
+        boost::replace_all(text, i->first, i->second);
+    }
+
+}
+
+void
+XML_as::toString(std::ostream& o, bool encode) const
+{
+    if (!_xmlDecl.empty()) o << _xmlDecl;
+    if (!_docTypeDecl.empty()) o << _docTypeDecl;
+
+    XMLNode_as::toString(o, encode);
 }
 
 bool
-XML_as::get_member(string_table::key name, as_value *val, string_table::key nsname)
+XML_as::get_member(string_table::key name, as_value *val,
+        string_table::key nsname)
 {
-        if (name == NSV::PROP_STATUS) 
-        {
-                val->set_int(_status);
-                return true;
-        }
-        else if (name == NSV::PROP_LOADED)
-        {
-                if ( _loaded < 0 ) val->set_undefined();
-                else val->set_bool(_loaded);
-                return true;
-        }
+    if (name == NSV::PROP_STATUS) 
+    {
+        val->set_int(_status);
+        return true;
+    }
+    else if (name == NSV::PROP_LOADED)
+    {
+        if ( _loaded < 0 ) val->set_undefined();
+        else val->set_bool(_loaded);
+        return true;
+    }
 
-        return as_object::get_member(name, val, nsname);
+    return as_object::get_member(name, val, nsname);
 }
 
 bool
@@ -123,7 +184,8 @@ XML_as::set_member(string_table::key name, const as_value& val,
         // TODO: this should really be a proper property (see XML.as)
         if ( ! val.is_number() )
         {
-            _status = static_cast<ParseStatus>(std::numeric_limits<boost::int32_t>::min());
+            _status = static_cast<ParseStatus>(
+                    std::numeric_limits<boost::int32_t>::min());
         }
         else
         {
@@ -136,7 +198,6 @@ XML_as::set_member(string_table::key name, const as_value& val,
     {
         // TODO: this should really be a proper property
         bool b = val.to_bool();
-        //log_debug(_("set_member 'loaded' (%s) became boolean %d"), val, b);
         if ( b ) _loaded = 1;
         else _loaded = 0;
         return true;
@@ -145,180 +206,347 @@ XML_as::set_member(string_table::key name, const as_value& val,
     return as_object::set_member(name, val, nsname, ifFound);
 }
 
-bool
-XML_as::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
+void
+XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
+        std::string::const_iterator& it, Attributes& attributes)
 {
-    xmlAttrPtr attr;
-    xmlChar *ptr = NULL;
-    boost::intrusive_ptr<XMLNode> child;
 
-#ifdef DEBUG_XML_PARSE
-    log_debug(_("%s: extracting node %s"), __FUNCTION__, node->name);
-#endif
+    const std::string terminators("\r\t\n >=");
 
-    // See if we have any Attributes (properties)
-    attr = node->properties;
-    while (attr != NULL)
-    {
-#ifdef DEBUG_XML_PARSE
-        log_debug(_("extractNode %s has property %s, value is %s"),
-                  node->name, attr->name, attr->children->content);
-#endif
-        
-        std::ostringstream name, content;
+    std::string::const_iterator end = std::find_first_of(it, xml.end(),
+            terminators.begin(), terminators.end());
 
-        name << attr->name;
-        content << attr->children->content;
-        
-        XMLAttr attrib(name.str(), content.str());
-
-#ifdef DEBUG_XML_PARSE
-        log_debug(_("\tPushing attribute %s for element %s has value %s, next attribute is %p"),
-                attr->name, node->name, attr->children->content, attr->next);
-#endif
-
-        element._attributes.push_back(attrib);
-        attr = attr->next;
+    if (end == xml.end()) {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
     }
-    if (node->type == XML_COMMENT_NODE)
-    {
-        // Comments apparently not handled until AS3
-        // Comments in a text node are a *sibling* of the text node
-        // for libxml2.
-        return false;
-    }
-    else if (node->type == XML_ELEMENT_NODE)
-    {
-            element.nodeTypeSet(tElement);
+    std::string name(it, end);
 
-            std::ostringstream name;
-            name << node->name;
-            element.nodeNameSet(name.str());
-    }
-    else if ( node->type == XML_TEXT_NODE )
-    {
-            element.nodeTypeSet(tText);
+    // Point iterator to the character after the name.
+    it = end;
 
-            ptr = xmlNodeGetContent(node);
-            if (ptr == NULL) return false;
-        if (node->content)
+    // Skip any whitespace before the '='. If we reach the end of the string
+    // or don't find an '=', it's a parser error.
+    if (!textAfterWhitespace(xml, it) || *it != '=') {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
+    }
+
+    // Point to the character after the '='
+    ++it;
+
+    // Skip any whitespace. If we reach the end of the string, or don't find
+    // a " or ', it's a parser error.
+    if (!textAfterWhitespace(xml, it) || (*it != '"' && *it != '\'')) {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
+    }
+
+    // Find the end of the attribute, looking for the opening character,
+    // as long as it's not escaped. We begin one after the present position,
+    // which should be the opening character. We want to remember what the
+    // iterator is pointing to for a while, so don't advance it.
+    end = it;
+    do {
+        ++end;
+        end = std::find(end, xml.end(), *it);
+    } while (end != xml.end() && *(end - 1) == '\'');
+
+    if (end == xml.end()) {
+        _status = XML_UNTERMINATED_ATTRIBUTE;
+        return;
+    }
+    ++it;
+
+    std::string value(it, end);
+    //log_debug("adding attribute to node %s: %s, %s", node->nodeName(),
+    //        name, value);
+
+    // We've already checked that end != xml.end(), so we can advance at 
+    // least once.
+    it = end;
+    // Advance past the last attribute character
+    ++it;
+
+    // Replace entities in the value.
+    escape(value);
+
+    // Handle namespace. This is set once only for each node, and is also
+    // pushed to the attributes list once.
+    StringNoCaseEqual noCaseCompare;
+    if (noCaseCompare(name, "xmlns") || noCaseCompare(name, "xmlns:")) {
+        if (!node->getNamespaceURI().empty()) return;
+        node->setNamespaceURI(value);
+    }
+
+    // This ensures values are not inserted twice, which is expected
+    // behaviour
+    attributes.insert(std::make_pair(name, value));
+
+}
+
+/// Parse and set the docTypeDecl. This is stored without any validation and
+/// with the same case as in the parsed XML.
+void
+XML_as::parseDocTypeDecl(const std::string& xml,
+        std::string::const_iterator& it)
+{
+    std::string content;
+    if (!parseNodeWithTerminator(xml, it, ">", content))
+    {
+        _status = XML_UNTERMINATED_DOCTYPE_DECL;
+        return;
+    }
+    std::ostringstream os;
+    os << '<' << content << '>';
+    _docTypeDecl = os.str();
+}
+
+
+void
+XML_as::parseXMLDecl(const std::string& xml, std::string::const_iterator& it)
+{
+    std::string content;
+    if (!parseNodeWithTerminator(xml, it, "?>", content))
+    {
+        _status = XML_UNTERMINATED_XML_DECL;
+        return;
+    }
+
+    std::ostringstream os;
+    os << "<" << content << "?>";
+
+    // This is appended to any xmlDecl already there.
+    _xmlDecl += os.str();
+
+}
+
+// The iterator should be pointing to the first char after the '<'
+void
+XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
+    std::string::const_iterator& it)
+{
+    //log_debug("Processing node: %s", node->nodeName());
+
+    bool closing = (*it == '/');
+    if (closing) ++it;
+
+    // These are for terminating the tag name, not (necessarily) the tag.
+    const std::string terminators("\r\n\t >");
+
+    std::string::const_iterator endName = std::find_first_of(it, xml.end(),
+            terminators.begin(), terminators.end());
+
+    // Check that one of the terminators was found; otherwise it's malformed.
+    if (endName == xml.end()) {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
+    }
+
+    // Knock off the "/>" of a self-closing tag.
+    if (std::equal(endName - 1, endName + 1, "/>")) {
+        //log_debug("self-closing tag");
+        --endName;
+    }
+
+    std::string tagName(it, endName);
+    //log_debug("tagName : %s", tagName);
+
+    if (!closing) {
+
+        XMLNode_as* childNode = new XMLNode_as;
+        childNode->nodeNameSet(tagName);
+        childNode->nodeTypeSet(Element);
+
+        //log_debug("created childNode with name %s", childNode->nodeName());
+        // Skip to the end of any whitespace after the tag name
+        it = endName;
+
+        if (!textAfterWhitespace(xml, it)) {
+            _status = XML_UNTERMINATED_ELEMENT;
+           return;
+        }
+
+        // Parse any attributes in an opening tag only, stopping at "/>" or
+        // '>'
+        // Attributes are added in reverse order and without any duplicates.
+        Attributes attributes;
+        while (it != xml.end() && *it != '>' && _status == XML_OK)
         {
-        std::ostringstream in;
-        in << ptr;
-        // XML_PARSE_NOBLANKS seems not to be working, so here's
-        // a custom implementation of it.
-        if ( ignoreWhite() )
-        {
-            if ( in.str().find_first_not_of(" \n\t\r") == std::string::npos )
-            {
-#ifdef DEBUG_XML_PARSE
-                log_debug("Text node value consists in blanks only, discarding");
-#endif
-                xmlFree(ptr);
-                return false;
+            if (xml.end() - it > 1 && std::equal(it, it + 2, "/>")) break;
+
+            // This advances the iterator
+            parseAttribute(childNode, xml, it, attributes);
+
+            // Skip any whitespace. If we reach the end of the string,
+            // it's malformed.
+            if (!textAfterWhitespace(xml, it)) {
+                _status = XML_UNTERMINATED_ELEMENT;
+                return;
             }
         }
-        element.nodeValueSet(in.str());
+        
+        for (Attributes::const_reverse_iterator i = attributes.rbegin(),
+                e = attributes.rend(); i != e; ++i) {
+            childNode->setAttribute(i->first, i->second);
         }
-            xmlFree(ptr);
+
+        node->appendChild(childNode);
+        if (*it == '/') ++it;
+        else node = childNode;
+
+        if (*it == '>') ++it;
+
+        return;
     }
 
-    // See if we have any data (content)
-    xmlNodePtr childnode = node->children;
+    // This may be xml.end(), which is okay.
+    it = std::find(endName, xml.end(), '>');
 
-    while (childnode)
+    if (it == xml.end())
     {
-        child = new XMLNode();
-        child->setParent(&element);
-        if ( extractNode(*child, childnode, mem) )
-        {
-            element._children.push_back(child);
+       _status = XML_UNTERMINATED_ELEMENT;
+       return;
+    }
+    ++it;
+
+    StringNoCaseEqual noCaseCompare;
+
+    if (node->getParent() && noCaseCompare(node->nodeName(), tagName)) {
+        node = node->getParent();
+    }
+    else {
+        // Malformed. Search for the parent node.
+        XMLNode_as* s = node;
+        while (s && !noCaseCompare(s->nodeName(), tagName)) {
+            //log_debug("parent: %s, this: %s", s->nodeName(), tagName);
+            s = s->getParent();
         }
-        childnode = childnode->next;
+        if (s) {
+            // If there's a parent, the open tag is orphaned.
+            _status = XML_MISSING_CLOSE_TAG;
+        }
+        else {
+            // If no parent, the close tag is orphaned.
+            _status = XML_MISSING_OPEN_TAG;
+        }
     }
 
-    return true;
 }
 
-/*private*/
-bool
-XML_as::parseDoc(xmlNodePtr cur, bool mem)
+void
+XML_as::parseText(XMLNode_as* node, const std::string& xml, 
+        std::string::const_iterator& it)
 {
-    GNASH_REPORT_FUNCTION;  
+    std::string::const_iterator end = std::find(it, xml.end(), '<');
+    std::string content(it, end);
+    
+    it = end;
 
-    while (cur)
-    {
-        boost::intrusive_ptr<XMLNode> child = new XMLNode();
-        child->setParent(this);
-#ifdef DEBUG_XML_PARSE
-        log_debug("\tParsing top-level node %s", cur->name);
-#endif
-        if ( extractNode(*child, cur, mem) ) 
-        {
-                _children.push_back(child);
-        }
-        cur = cur->next;
-    }  
+    if (ignoreWhite() && 
+        content.find_first_not_of("\t\r\n ") == std::string::npos) return;
 
-    return true;
+    XMLNode_as* childNode = new XMLNode_as;
+
+    childNode->nodeTypeSet(XMLNode_as::Text);
+
+    // Replace any entitites.
+    unescape(content);
+
+    childNode->nodeValueSet(content);
+    node->appendChild(childNode);
+
+    //log_debug("appended text node: %s", content);
 }
 
-// This parses an XML string into a
-// tree which can be walked through later.
-bool
-XML_as::parseXML(const std::string& xml_in)
-{
 
-    if (xml_in.empty())
+
+void
+XML_as::parseComment(XMLNode_as* /*node*/, const std::string& xml, 
+        std::string::const_iterator& it)
+{
+    log_debug("discarding comment node");
+
+    std::string content;
+
+    if (!parseNodeWithTerminator(xml, it, "-->", content)) {
+        _status = XML_UNTERMINATED_COMMENT;
+        return;
+    }
+    // Comments are discarded at least up to SWF8
+    
+}
+
+void
+XML_as::parseCData(XMLNode_as* node, const std::string& xml, 
+        std::string::const_iterator& it)
+{
+    std::string content;
+
+    if (!parseNodeWithTerminator(xml, it, "]]>", content)) {
+        _status = XML_UNTERMINATED_CDATA;
+        return;
+    }
+
+    XMLNode_as* childNode = new XMLNode_as;
+    childNode->nodeValueSet(content);
+    childNode->nodeTypeSet(Text);
+    node->appendChild(childNode);
+    
+}
+
+
+// This parses an XML string into a tree of XMLNodes.
+void
+XML_as::parseXML(const std::string& xml)
+{
+    GNASH_REPORT_FUNCTION; 
+    if (xml.empty())
     {
         log_error(_("XML data is empty"));
-        return false;
+        return;
     }
 
     // Clear current data
     clear(); 
+    _status = XML_OK;
     
-    initParser();
 
-    xmlNodePtr firstNode; 
+    std::string::const_iterator it = xml.begin();
+    XMLNode_as* node = this;
 
-    xmlDocPtr doc = xmlReadMemory(xml_in.c_str(), xml_in.size(), NULL, NULL, getXMLOptions()); // do NOT recover here !
-    if ( doc )
+    while (it != xml.end() && _status == XML_OK)
     {
-        firstNode = doc->children; // xmlDocGetRootElement(doc);
-    }
-    else
-    {
-        log_debug(_("malformed XML, trying to recover"));
-        int ret = xmlParseBalancedChunkMemoryRecover(NULL, NULL, NULL, 
-                0, (const xmlChar*)xml_in.c_str(), &firstNode, 1);
-        log_debug("xmlParseBalancedChunkMemoryRecover returned %d", ret);
-        if ( ! firstNode )
+        if (*it == '<')
         {
-            log_error(_("unrecoverable malformed XML "
-                        "(xmlParseBalancedChunkMemoryRecover returned "
-                        "%d)."), ret);
-            return false;
+            ++it;
+            if (textMatch(xml, it, "!DOCTYPE", false))
+            {
+                // We should not advance past the DOCTYPE label, as
+                // the case is preserved.
+                parseDocTypeDecl(xml, it);
+            }
+            else if (textMatch(xml, it, "?xml", false))
+            {
+                // We should not advance past the xml label, as
+                // the case is preserved.
+                parseXMLDecl(xml, it);
+            }
+            else if (textMatch(xml, it, "!--"))
+            {
+                parseComment(node, xml, it);
+            }
+            else if (textMatch(xml, it, "![CDATA["))
+            {
+                parseCData(node, xml, it);
+            }
+            else parseTag(node, xml, it);
         }
-        else
-        {
-            log_error(_("recovered malformed XML."));
-        }
+        else parseText(node, xml, it);
     }
-
-
-
-    bool ret = parseDoc(firstNode, true);
-
-    xmlCleanupParser();
-    if ( doc ) xmlFreeDoc(doc); // TOCHECK: can it be freed before ?
-    else if ( firstNode ) xmlFreeNodeList(firstNode);
-    xmlMemoryDump();
-
-    return ret;
   
+    return;
 }
-
 
 bool
 XML_as::onLoad()
@@ -329,8 +557,51 @@ XML_as::onLoad()
 }
 
 
+void
+XML_as::clear()
+{
+    // TODO: should set childs's parent to NULL ?
+    _children.clear();
+    //_attributes.clear();
+    _docTypeDecl.clear();
+    _xmlDecl.clear();
+}
 
-static void
+bool
+XML_as::ignoreWhite() const
+{
+
+    string_table::key propnamekey = _vm.getStringTable().find("ignoreWhite");
+    as_value val;
+    if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val)) return false;
+    return val.to_bool();
+}
+
+
+// extern (used by Global.cpp)
+void
+xml_class_init(as_object& global)
+{
+
+    static boost::intrusive_ptr<builtin_function> cl;
+
+    if ( cl == NULL )
+    {
+        cl=new builtin_function(&xml_new, getXMLInterface());
+    }
+    
+    global.init_member("XML", cl.get());
+
+}
+
+///
+/// XML object AS interface.
+///
+
+namespace {
+
+
+void
 attachXMLProperties(as_object& /*o*/)
 {
     // if we use a proper member here hasOwnProperty() would return true
@@ -338,7 +609,7 @@ attachXMLProperties(as_object& /*o*/)
     //o.init_member("status", as_value(XML::sOK));
 }
 
-static void
+void
 attachXMLInterface(as_object& o)
 {
     const int flags = 0;
@@ -363,9 +634,11 @@ attachXMLInterface(as_object& o)
                 LoadableObject::loadableobject_sendAndLoad), flags);
     o.init_member("onData", new builtin_function(xml_ondata), flags);
 
+    o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
+    o.init_property("docTypeDecl", &xml_docTypeDecl, &xml_docTypeDecl, flags);
 }
 
-static as_object*
+as_object*
 getXMLInterface()
 {
     static boost::intrusive_ptr<as_object> o;
@@ -426,16 +699,16 @@ xml_new(const fn_call& fn)
 /// created XML object that represents the element. This method and
 /// the XML.createTextNode() method are the constructor methods for
 /// creating nodes for an XML object. 
-static as_value
+as_value
 xml_createelement(const fn_call& fn)
 {
     
     if (fn.nargs > 0)
     {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode *xml_obj = new XMLNode;
+        XMLNode_as *xml_obj = new XMLNode_as;
         xml_obj->nodeNameSet(text);
-        xml_obj->nodeTypeSet(XMLNode::tText);
+        xml_obj->nodeTypeSet(XMLNode_as::Text);
 
         return as_value(xml_obj);
         
@@ -461,9 +734,9 @@ xml_createtextnode(const fn_call& fn)
 
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode* xml_obj = new XMLNode;
+        XMLNode_as* xml_obj = new XMLNode_as;
         xml_obj->nodeValueSet(text);
-        xml_obj->nodeTypeSet(XMLNode::tText);
+        xml_obj->nodeTypeSet(XMLNode_as::Text);
         return as_value(xml_obj);
     }
     else {
@@ -493,7 +766,7 @@ xml_getbytestotal(const fn_call& fn)
 }
 
 
-static as_value
+as_value
 xml_parsexml(const fn_call& fn)
 {
 
@@ -513,11 +786,53 @@ xml_parsexml(const fn_call& fn)
     return as_value();
 }
 
+as_value
+xml_xmlDecl(const fn_call& fn)
+{
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
 
-static as_value
+    if (!fn.nargs)
+    {
+        // Getter
+        const std::string& xml = ptr->getXMLDecl();
+        if (xml.empty()) return as_value();
+        return as_value(xml);
+    }
+
+    // Setter
+
+    const std::string& xml = fn.arg(0).to_string();
+    ptr->setDocTypeDecl(xml);
+    
+    return as_value();
+
+}
+
+as_value
+xml_docTypeDecl(const fn_call& fn)
+{
+    boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        // Getter
+        const std::string& docType = ptr->getDocTypeDecl();
+        if (docType.empty()) return as_value();
+        return as_value(docType);
+    }
+
+    // Setter
+
+    const std::string& docType = fn.arg(0).to_string();
+    ptr->setDocTypeDecl(docType);
+    
+    return as_value();
+
+}
+
+as_value
 xml_ondata(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
 
     as_object* thisPtr = fn.this_ptr.get();
     assert(thisPtr);
@@ -542,78 +857,66 @@ xml_ondata(const fn_call& fn)
     return as_value();
 }
 
-// extern (used by Global.cpp)
-void xml_class_init(as_object& global)
-{
-
-    static boost::intrusive_ptr<builtin_function> cl;
-
-    if ( cl == NULL )
-    {
-        cl=new builtin_function(&xml_new, getXMLInterface());
-    }
-    
-    global.init_member("XML", cl.get());
-
-}
-
-
-void
-XML_as::initParser()
-{
-    static bool initialized = false;
-    if ( ! initialized )
-    {
-        xmlInitParser();
-        //xmlGenericErrorFunc func = _xmlErrorHandler;
-        //initGenericErrorDefaultFunc(&func);
-        initialized = true;
-    }
-}
-
-void
-XML_as::clear()
-{
-    // TODO: should set childs's parent to NULL ?
-    _children.clear();
-
-    _attributes.clear();
-}
-
-/*private*/
+/// Case insenstive match of a string, returning false if there too few
+/// characters left or if there is no match. If there is a match, and advance
+/// is not false, the iterator points to the character after the match.
 bool
-XML_as::ignoreWhite() const
+textMatch(const std::string& xml, std::string::const_iterator& it,
+        const std::string& match, bool advance)
 {
 
-    string_table::key propnamekey = _vm.getStringTable().find("ignoreWhite");
-    as_value val;
-    if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val) ) return false;
-    return val.to_bool();
+    const std::string::size_type len = match.length();
+    const std::string::const_iterator end = xml.end();
+
+    if (static_cast<size_t>(end - it) < len) return false;
+
+    if (!std::equal(it, it + len, match.begin(), boost::is_iequal())) {
+        return false;
+    }
+    if (advance) it += len;
+    return true;
 }
 
-/*private*/
-int
-XML_as::getXMLOptions() const
+/// Advance past whitespace
+//
+/// @return true if there is text after the whitespace, false if we 
+///         reach the end of the string.
+bool
+textAfterWhitespace(const std::string& xml, std::string::const_iterator& it)
 {
-    int options = XML_PARSE_NOENT
-        //| XML_PARSE_RECOVER -- don't recover now, we'll call xmlParseBalancedChunkRecover later
-        //| XML_PARSE_NOWARNING
-            //| XML_PARSE_NOERROR
-        | XML_PARSE_NOCDATA;
-    // Using libxml2 to convert CDATA nodes to text seems to be what is
-    // required.
-    
-    if ( ignoreWhite() )
-    {
-        // This doesn't seem to work, so the blanks skipping
-        // is actually implemented in XML::extractNode instead.
-            //log_debug("Adding XML_PARSE_NOBLANKS to options");
-            options |= XML_PARSE_NOBLANKS;
+    const std::string whitespace("\r\t\n ");
+    while (it != xml.end() && whitespace.find(*it) != std::string::npos) ++it;
+    return (it != xml.end());
+}
+
+/// Parse a complete node up to a specified terminator.
+//
+/// @return     false if we reach the end of the text before finding the
+///             terminator.
+/// @param it   The current position of the iterator. If the return is true,
+///             this points to the first character after the terminator 
+///             after return
+/// @param content  If the return is true, this is filled with the content of
+///                 the tag.
+/// @param xml      The complete XML string.
+bool
+parseNodeWithTerminator(const std::string& xml, std::string::const_iterator& it,
+        const std::string& terminator, std::string& content)
+{
+    std::string::const_iterator end = std::search(it, xml.end(),
+            terminator.begin(), terminator.end());
+
+    if (end == xml.end()) {
+        return false;
     }
 
-    return options;
+    content = std::string(it, end);
+    it = end + terminator.length();
+
+    return true;
 }
 
+} // anonymous namespace
 } // end of gnash namespace
 
 // Local Variables:

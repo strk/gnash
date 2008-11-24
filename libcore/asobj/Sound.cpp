@@ -686,7 +686,17 @@ sound_attachsound(const fn_call& fn)
 	}
 
 	// check the import.
-	movie_definition* def = so->getVM().getRoot().get_movie_definition();
+    // NOTE: we should be checking in the SWF containing the calling code
+    // (see 'winter bell' from orisinal morning sunshine for a testcase)
+	const movie_definition* def;
+    if ( ! fn.callerDef ) {
+        log_error("Function call to Sound.attachSound have no callerDef");
+        def = so->getVM().getRoot().get_movie_definition();
+    }
+    else {
+        def = fn.callerDef;
+    }
+
 	assert(def);
 	boost::intrusive_ptr<ExportableResource> res = 
         def->get_exported_resource(name);

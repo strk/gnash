@@ -27,7 +27,6 @@
 #include "swfdec_codec_gst.h"
 #include <iostream>
 #include <fstream>
-#include <unistd.h>
 
 #define PUSHBUF_SIZE 1024
 //#define MIN_PROBE_SIZE (PUSHBUF_SIZE * 3)

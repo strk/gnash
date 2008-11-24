@@ -182,8 +182,9 @@ void object_class_init(as_object& global)
 		     
 	}
 
-	// Register _global.Object
-	global.init_member("Object", cl.get());
+	// Register _global.Object (should only be visible in SWF5 up)
+	int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
+	global.init_member("Object", cl.get(), flags);
 
 }
 

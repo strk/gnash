@@ -22,10 +22,10 @@
 #include "XMLNode_as.h"
 #include "log.h"
 #include "dsodefs.h"
+#include "StringPredicates.h"
 
-#include <libxml/xmlmemory.h>
-#include <libxml/parser.h>
-#include <libxml/xmlreader.h>
+#include <map>
+#include <string>
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 
@@ -37,57 +37,52 @@ class URL;
 class LoaderThread;
 
 /// XML class and ActionScript object
-class XML_as : public XMLNode, public LoadableObject
+class XML_as : public XMLNode_as, public LoadableObject
 {
 public:
 
     enum ParseStatus {
-
-            /// Parsing was successful
-            sOK = 0,
-
-            /// Unterminated CDATA section
-            sECDATA = -2,
-
-            /// Unterminated XML declaration
-            sEXMLDECL = -3,
-
-            /// Unterminated DOCTYPE declaration
-            sEDOCTYPEDECL = -4,
-
-            /// Unterminated comment
-            sECOMM = -5,
-
-            /// Malformed XML element structure
-            sESTRUCT = -6,
-
-            /// Out of memory
-            sEMEM = -7,
-
-            /// Unterminated attribute value
-            sEATTR = -8,
-
-            /// Missing close tag (orphaned open tag)
-            sEOPENTAG = -9,
-
-            /// Missing start tag (orphaned close tag)
-            sECLOSETAG = -10
-
+            XML_OK = 0,
+            XML_UNTERMINATED_CDATA = -2,
+            XML_UNTERMINATED_XML_DECL = -3,
+            XML_UNTERMINATED_DOCTYPE_DECL = -4,
+            XML_UNTERMINATED_COMMENT = -5,
+            XML_UNTERMINATED_ELEMENT = -6,
+            XML_OUT_OF_MEMORY = -7,
+            XML_UNTERMINATED_ATTRIBUTE = -8,
+            XML_MISSING_CLOSE_TAG = -9,
+            XML_MISSING_OPEN_TAG = -10
     };
 
-
     XML_as();
-    XML_as(const std::string& xml_in);
+
+    XML_as(const std::string& xml);
+
     ~XML_as() {};
 
     /// Convert the XML object to a string
     //
-    /// This calls XMLNode::toString.
+    /// This calls XMLNode::toString after adding an xmlDecl and
+    /// docTypeDecl
+    //
     /// @param o        The ostream to write the string to.
     /// @param encode   Whether to URL encode the node values.
-    void toString(std::ostream& o, bool encode) const
-    {
-        XMLNode::toString(o, encode);
+    void toString(std::ostream& o, bool encode) const;
+
+    const std::string& getXMLDecl() const {
+        return _xmlDecl;
+    }
+
+    void setXMLDecl(const std::string& xml) {
+        _xmlDecl = xml;
+    }
+
+    const std::string& getDocTypeDecl() const {
+        return _docTypeDecl;
+    }
+
+    void setDocTypeDecl(const std::string& docType) {
+        _docTypeDecl = docType;
     }
 
     /// This is overridden to provide the 'status' and 'loaded' members,
@@ -108,48 +103,66 @@ public:
 
     /// Parses an XML document into the specified XML object tree.
     //
-    /// This reads in an XML file from disk and parses into into a memory resident
-    /// tree which can be walked through later.
+    /// This reads in an XML file from disk and parses into into a memory
+    /// resident tree which can be walked through later.
     ///
     /// Calls to this function clear any precedently parsed data.
     ///
-    bool parseXML(const std::string& xml_in);
+    void parseXML(const std::string& xml);
 
-    // An event handler that returns a
+    // An event handler that returns a what?
     bool onLoad();
 
-    XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
+    /// Escape using XML entities.
+    //
+    /// Note this is not the same as a URL escape.
+    static void escape(std::string& text);
 
-    void change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
+    /// Unescape XML entities.
+    //
+    /// Note this is not the same as a URL unescape.
+    static void unescape(std::string& text);
 
-    XMLNode *createElement(const char *name);
+    XMLNode_as* createElement(const std::string& name);
 
-    XMLNode *createTextNode(const char *name);
+    XMLNode_as* createTextNode(const std::string& name);
 
 private:
 
-    /// Remove all childs
+    typedef std::map<std::string, std::string> Entities;
+
+    static const Entities& getEntities();
+
+    typedef std::map<std::string, std::string, StringNoCaseLessThen> Attributes;
+
+    void parseTag(XMLNode_as*& node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseAttribute(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it, Attributes& attributes);
+
+    void parseDocTypeDecl(const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseText(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseXMLDecl(const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseComment(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+
+    void parseCData(XMLNode_as* node, const std::string& xml, 
+            std::string::const_iterator& it);
+ 
+    /// Remove all children
     void clear();
   
     /// \brief
-    /// Return true if ignoreWhite property was set to anythign evaluating
+    /// Return true if ignoreWhite property was set to anything evaluating
     /// to true.
     bool ignoreWhite() const;
-
-    /// Return the libxml2 options to use during parsing.
-    //
-    /// The options might depend on current XML object state, like
-    /// the 'ignoreWhite' parameter.
-    ///
-    /// See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption
-    ///
-    int getXMLOptions() const;
-
-    /// Read in an XML document from the specified source
-    //
-    /// This is the base method used by both parseXML() and load().
-    ///
-    bool parseDoc(xmlNodePtr startNode, bool mem);
 
     // -1 if never asked to load anything
     //  0 if asked to load but not yet loaded (or failure)
@@ -157,22 +170,11 @@ private:
     int _loaded;
 
     ParseStatus _status;	
+ 
+    std::string _docTypeDecl;
 
-    /// Initialize an XMLNode from an xmlNodePtr
-    //
-    /// @param element
-    ///     The XMLNode to initialize.
-    ///
-    /// @return false if the xmlNodePtr shouldn't exist
-    /// (ie: an all-blanks node with ignoreWhite set to true).
-    ///
-    bool extractNode(XMLNode& element, xmlNodePtr node, bool mem);
+    std::string _xmlDecl;
 
-    void setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
-  
-    /// Initialize the libxml2 parser
-    void initParser();
-    
 };
 
 

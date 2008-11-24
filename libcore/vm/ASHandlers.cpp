@@ -50,7 +50,6 @@
 #include "utf8.h"
 #include "StringPredicates.h" // StringNoCaseEqual
 
-#include <unistd.h>  // For write() on BSD
 #include <string>
 #include <vector>
 #include <locale>
@@ -641,6 +640,17 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
         return;
     }
 
+    unsigned int totframes = target_sprite->get_frame_count();
+    if ( framenum > totframes )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("ActionWaitForFrame(%d): "
+                       "target (%s) has only %d frames"),
+                       framenum, totframes);
+        );
+        framenum = totframes;
+    }
+
     // Actually *wait* for target frame, and never skip any action
 #ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
     target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
@@ -650,7 +660,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     size_t lastloaded = target_sprite->get_loaded_frames();
     if ( lastloaded < framenum )
     {
-        //log_debug(_("%s: frame %u not reached yet (loaded %u), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, skip);
+        //log_debug(_("%s: frame %u not reached yet (loaded %u for sprite %s), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, target_sprite->getTarget(), skip);
         // better delegate this to ActionExec
         thread.skip_actions(skip);
     }
@@ -837,11 +847,22 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
 void
 SWFHandlers::ActionStringLength(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    
-    const int version = env.get_version();
-    env.top(0).set_int(env.top(0).to_string_versioned(version).size());
+
+    // NOTE: I've tested that we should change behaviour
+    //       based on code definition version, not top-level
+    //       SWF version. Just not automated yet.
+    //
+    const int version = thread.code.getDefinitionVersion();
+    if ( version > 5 )
+    {
+        // when SWF version is > 5 we compute the multi-byte length
+        ActionMbLength(thread);
+    }
+    else
+    {
+        env.top(0).set_int(env.top(0).to_string_versioned(version).size());
+    }
 }
 
 void
@@ -1675,7 +1696,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
     
     // Should return 0 
 
-    const int version = env.get_version();
+    const int swfVersion = thread.code.getDefinitionVersion();
     
     std::string str = env.top(0).to_string();
     
@@ -1685,7 +1706,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
         return;
     }
 
-    std::wstring wstr = utf8::decodeCanonicalString(str, version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, swfVersion);
 
     // decodeCanonicalString should correctly work out what the first character
     // is according to version.
@@ -1698,7 +1719,6 @@ SWFHandlers::ActionChr(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    
     // Only handles values up to 65535
     boost::uint16_t c = static_cast<boost::uint16_t>(env.top(0).to_int());
 
@@ -1710,7 +1730,8 @@ SWFHandlers::ActionChr(ActionExec& thread)
         return;
     }
     
-    if (env.get_version() > 5)
+    int swfVersion = thread.code.getDefinitionVersion();
+    if (swfVersion > 5)
     {
         env.top(0).set_string(utf8::encodeUnicodeCharacter(c));
         return;
@@ -2738,7 +2759,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
-                  args, super);
+                  args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
 
@@ -3011,7 +3032,11 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
     if (v1.is_string() || v2.is_string() )
     {
-        const int version = env.get_version();
+        // NOTE: I've tested that we should change behaviour
+        //       based on code definition version, not top-level
+        //       SWF version. Just not automated yet.
+        //
+        const int version = thread.code.getDefinitionVersion();
         v2.convert_to_string_versioned(version);
         v2.string_concat(v1.to_string_versioned(version));
         env.top(1) = v2;
@@ -3379,7 +3404,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     as_value result = call_method(method_val, &env, this_ptr, 
-            args, super);
+            args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
 

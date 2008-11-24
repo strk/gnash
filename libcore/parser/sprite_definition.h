@@ -211,7 +211,7 @@ public:
 
 	/// Delegate call to associated root movie
 	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& sym)
+            const std::string& sym) const
 	{
 		return m_movie_def.get_exported_resource(sym);
 	}

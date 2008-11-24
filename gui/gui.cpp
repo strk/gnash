@@ -160,7 +160,9 @@ Gui::~Gui()
 
     delete _renderer;
 #ifdef GNASH_FPS_DEBUG
-    std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
+    if ( fps_timer_interval ) {
+        std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
+    }
 #endif
 }
 
@@ -877,6 +879,8 @@ Gui::pause()
     	sound::sound_handler* s = _stage->runInfo().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
+
+        stopHook();
     }
 }
 
@@ -1069,6 +1073,15 @@ Gui::getMovieInfo() const
     os << "SWF " << vm.getSWFVersion();
     topIter = tr->insert(topIter, StringPair("VM version", os.str()));
 
+    // This short-cut is to avoid a bug in movie_root's getMovieInfo,
+    // which relies on the availability of a _rootMovie for doing
+    // it's work, while we don't set it if we didn't start..
+    // 
+    if ( ! _started )
+    {
+        topIter = tr->insert(topIter, StringPair("Stage properties", "not constructed yet"));
+        return tr;
+    }
 
     movie_root& stage = vm.getRoot();
     stage.getMovieInfo(*tr, topIter);

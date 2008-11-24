@@ -38,7 +38,6 @@ AM_LDFLAGS = \
 	$(LIBADD_DL) \
 	$(LIBLTDL) \
 	$(MYSQL_LIBS) \
-	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
@@ -59,11 +58,10 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libmedia \
         -I$(top_srcdir)/libsound \
         -DLOCALEDIR=\"$(localedir)\" \
-	$(PTHREAD_CFLAGS) \
-	$(BOOST_CFLAGS) \
-        $(LIBXML_CFLAGS) \
+		$(PTHREAD_CFLAGS) \
+		$(BOOST_CFLAGS) \
         $(MYSQL_CFLAGS) \
-	$(NULL)
+		$(NULL)
 
 if WIN32
   GNASH_LIBS += -lintl -lz -lws2_32

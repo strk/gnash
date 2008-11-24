@@ -36,6 +36,7 @@ namespace gnash {
     class as_function;
     class as_object;
     class as_value;
+    class movie_definition;
 }
 
 namespace gnash {
@@ -57,9 +58,12 @@ public:
 	/// Number of arguments to this ActionScript function call.
 	unsigned int nargs;
 
+    /// Definition containing caller code. 0 if spontaneous (system event).
+    const movie_definition* callerDef;
+
 public:
 	fn_call(const fn_call& fn) : this_ptr(fn.this_ptr), super(fn.super),
-		nargs(fn.nargs), _env(fn._env)
+		nargs(fn.nargs), callerDef(fn.callerDef), _env(fn._env)
 	{
 		if ( fn._args.get() )
 			_args.reset(new std::vector<as_value>(*fn._args));
@@ -67,6 +71,7 @@ public:
 
 	fn_call(const fn_call& fn, as_object* this_in, as_object* sup=NULL)
 		: this_ptr(this_in), super(sup), nargs(fn.nargs),
+        callerDef(fn.callerDef),
 		_env(fn._env)
 	{
 		if ( fn._args.get() )
@@ -80,6 +85,7 @@ public:
 		this_ptr(this_in),
 		super(sup),
 		nargs(nargs_in),
+        callerDef(0),
 		_env(env_in)
 	{
 		assert(first_in + 1 == env_in->stack_size());
@@ -93,6 +99,7 @@ public:
 		this_ptr(this_in),
 		super(sup),
 		nargs(args->size()),
+        callerDef(0),
 		_env(env_in),
 		_args(args)
 	{
@@ -104,6 +111,7 @@ public:
 		this_ptr(this_in),
 		super(0),
 		nargs(0),
+        callerDef(0),
 		_env(env_in),
 		_args(0)
 	{

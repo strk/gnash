@@ -74,7 +74,6 @@ libgnashasobjs_la_SOURCES = \
 	MovieClipLoader.cpp\
 	String_as.cpp \
 	XML_as.cpp \
-	xmlattrs.cpp \
 	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
@@ -150,7 +149,6 @@ noinst_HEADERS = \
 	String_as.h \
 	XML_as.h \
 	XMLSocket_as.h \
-	xmlattrs.h \
 	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
 	flash/display/DisplayObject_as.h \
