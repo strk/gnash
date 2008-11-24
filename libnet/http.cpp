@@ -320,13 +320,16 @@ HTTP::processEntityFields(amf::Buffer &buf)
 
 }
 
-bool
+gnash::Network::byte_t *
 HTTP::processHeaderFields(amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
     string head(reinterpret_cast<const char *>(buf.reference()));
+    // The end of the header block is always followed by a blank line
+    string::size_type end = head.find("\r\n\r\n", 0);
+    head.erase(end, buf.size()-end);
     Tok t(head, Sep("\r\n"));
-    for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {
+    for (Tok::iterator i = t.begin(); i != t.end(); ++i) {
 	string::size_type pos = i->find(":", 0);
  	if (pos != string::npos) {
 	    string name = i->substr(0, pos);
@@ -335,11 +338,16 @@ HTTP::processHeaderFields(amf::Buffer &buf)
  			   (int(*)(int)) tolower);
  	    std::transform(value.begin(), value.end(), value.begin(), 
  			   (int(*)(int)) tolower);
- 	    _fields[name] = value;	    
+ 	    _fields[name] = value;
+	} else {
+	    const gnash::Network::byte_t *cmd = reinterpret_cast<const gnash::Network::byte_t *>(i->c_str());
+	    if (extractCommand(const_cast<gnash::Network::byte_t *>(cmd)) == HTTP::HTTP_NONE) {
+		break;
+	    }
 	}
     }
     
-    return true;
+    return buf.reference() + end + 4;
 }
 
 boost::shared_ptr<std::vector<std::string> >
@@ -919,38 +927,46 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
     start = body.find("GET", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_GET;
+	return cmd;
     }
     start = body.find("POST", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_POST;
+	return cmd;
     }
     start = body.find("HEAD", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_HEAD;
+	return cmd;
     }
     start = body.find("CONNECT", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_CONNECT;
+	return cmd;
     }
     start = body.find("TRACE", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_TRACE;
+	return cmd;
     }
     start = body.find("OPTIONS", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_OPTIONS;
+	return cmd;
     }
     start = body.find("PUT", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_PUT;
+	return cmd;
     }
     start = body.find("DELETE", 0);
     if (start != string::npos) {
         cmd = HTTP::HTTP_DELETE;
+	return cmd;
     }
 
-    _command = cmd;
-    return cmd;
+//    _command = cmd;
+    return HTTP::HTTP_NONE;
 }
 
 string &

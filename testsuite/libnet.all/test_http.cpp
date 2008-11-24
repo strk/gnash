@@ -525,18 +525,21 @@ test_post()
 
     HTTP http;
     amf::Buffer ptr1;
-    ptr1 = "POST /echo/gateway HTTP/1.1";
-    ptr1 += "User-Agent: Opera/9.62 (X11; Linux i686; U; en) Presto/2.1.1";
-    ptr1 += "Host: localhost:4080";
-    ptr1 += "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap;q=0.1";
-    ptr1 += "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0";
-    ptr1 += "Referer: http://localhost:5080/demos/echo_test.swf";
-    ptr1 += "Connection: Keep-Alive, TE";
-    ptr1 += "Content-Length: 26";
-    ptr1 += "Content-Type: application/x-amf";
+    ptr1 = "POST /echo/gateway HTTP/1.1\r\n";
+    ptr1 += "User-Agent: Opera/9.62 (X11; Linux i686; U; en) Presto/2.1.1\r\n";
+    ptr1 += "Host: localhost:4080\r\n";
+    ptr1 += "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap;q=0.1\r\n";
+    ptr1 += "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0\r\n";
+    ptr1 += "Referer: http://localhost:5080/demos/echo_test.swf\r\n";
+    ptr1 += "Connection: Keep-Alive, TE\r\n";
+    ptr1 += "Content-Length: 26\r\n";
+    ptr1 += "Content-Type: application/x-amf\r\n";
+    ptr1 += "\r\n";
+    ptr1 += "foobar";
+    ptr1.resize();
     
     amf::Buffer ptr2;
-    ptr2 += "POST./echo/gateway.HTTP/1.1\r\n";
+    ptr2 += "POST /echo/gateway HTTP/1.1\r\n";
     ptr2 += "User-Agent: Opera/9.62.(X11;.Linux.i686;.U;.en) Presto/2.1.1\r\n";
     ptr2 += "Host: localhost:5080\r\n";
     ptr2 += "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap\r\n";
@@ -547,6 +550,9 @@ test_post()
     ptr2 += "Connection: Keep-Alive, TE. TE: deflate, gzip, chunked, identity, trailers\r\n";
     ptr2 += "Content-Length:.35\r\n";
     ptr2 += "Content-Type: application/x-amf\r\n";
+    ptr2 += "\r\n";
+    ptr2 += "foobar";
+    ptr2.resize();
 
 #if 0
 2...........echo../2............ Hello.world!
@@ -559,9 +565,9 @@ test_post()
    02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21
 #endif
         
-    http.processHeaderFields(ptr2);
+    gnash::Network::byte_t *data2 = http.processHeaderFields(ptr2);
     if ((http.getField("host") == "localhost:5080")
-        && (http.getField("content-type") == "application/x-amf")
+        && (memcmp(data2, "foobar", 6) == 0)
         && (http.getField("content-length") == "35")) {
         runtest.pass("HTTP::processHeaderFields(POST)");
     } else {

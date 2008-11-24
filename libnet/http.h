@@ -95,6 +95,7 @@ public:
 	CLOSEPIPE = 1235
     } http_status_e;
     typedef enum {
+	HTTP_NONE,
         HTTP_OPTIONS,
         HTTP_GET,
         HTTP_HEAD,
@@ -131,7 +132,7 @@ public:
     bool processRequestFields(amf::Buffer &buf);
     bool processEntityFields(amf::Buffer &buf);
     bool processGeneralFields(amf::Buffer &buf);
-    bool processHeaderFields(amf::Buffer &buf);
+    gnash::Network::byte_t *processHeaderFields(amf::Buffer &buf);
     
 //    bool processPostRequest(gnash::Network &net);
 
@@ -160,6 +161,7 @@ public:
     http_method_e extractCommand(gnash::Network::byte_t *data);
     http_method_e extractCommand(amf::Buffer &data)
 	{ return extractCommand(data.reference()); };
+    
     int extractAccept(gnash::Network::byte_t *data);
     int extractAccept(amf::Buffer &data)
 	{ return extractAccept(data.reference()); };
