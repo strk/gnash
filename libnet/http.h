@@ -114,6 +114,10 @@ public:
         const char *code;
         const char *msg;
     };
+    typedef struct {
+	int major;
+	int minor;
+    } http_version_t;
     HTTP();
     HTTP(Handler *hand);
     ~HTTP();
@@ -122,7 +126,17 @@ public:
     bool processClientRequest();
     bool processGetRequest();
     bool processPostRequest();
+    bool processPostRequest(amf::Buffer &buf);
+
+    bool processRequestFields(amf::Buffer &buf);
+    bool processEntityFields(amf::Buffer &buf);
+    bool processGeneralFields(amf::Buffer &buf);
+    bool processHeaderFields(amf::Buffer &buf);
+    
 //    bool processPostRequest(gnash::Network &net);
+
+    std::string &getField(const std::string &name) { return _fields[name]; };
+    boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
     
     // Handle the GET request response
     boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
@@ -292,9 +306,10 @@ public:
     std::string &getURL() { return _url; }
     std::map<int, struct status_codes *> getStatusCodes()
 	{ return _status_codes; }
-    double getVersion() { return _version; }
+    http_version_t &getVersion() { return _version; }
     std::string getMethod() { return _method; }
     std::string getReferer() { return _referer; }
+    std::string getCommand() { return _command; }
 
     std::vector<std::string> getLanguage() { return _language;  }
     std::vector<std::string> getConnection() { return _connections; }
@@ -310,6 +325,9 @@ public:
     void setHandler(Handler *hand) { _handler = hand; };
     
 private:
+    typedef boost::char_separator<char> Sep;
+    typedef boost::tokenizer<Sep> Tok;
+
     CQue		_que;
     std::stringstream	_header;
     std::stringstream	_body;
@@ -319,15 +337,17 @@ private:
     int			_filesize;
     std::string		_url;
     std::map<int, struct status_codes *> _status_codes;
-//    std::map<std::string, std::string> DSOEXPORT _datafields;  
-    double		_version;
+    
+    std::map<std::string, std::string> DSOEXPORT _fields;
+    http_version_t	_version;
+    
     std::string		_method;
     std::string		_referer;
     std::string		_host;
     int			_port;
     std::string		_agent;
     std::string		_acceptranges;
-    std::map<std::string, std::vector<std::string> > _fields;  
+    
     std::vector<std::string> _connections;
     std::vector<std::string> _language;
     std::vector<std::string> _charset;

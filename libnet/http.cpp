@@ -25,6 +25,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/tokenizer.hpp>
 //#include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -231,20 +232,30 @@ HTTP::processPostRequest()
 	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }
-    
+    return processPostRequest();
+}
+
+// The order in which header fields with differing field names are
+// received is not significant. However, it is "good practice" to send
+// general-header fields first, followed by request-header or
+// response- header fields, and ending with the entity-header fields.
+bool
+HTTP::processPostRequest(amf::Buffer &buf)
+{
+    GNASH_REPORT_FUNCTION;
     clearHeader();
-    extractCommand(*buf);
-    extractAccept(*buf);
-    extractMethod(*buf);
-    extractReferer(*buf);
-    extractHost(*buf);
-    extractAgent(*buf);
-    extractLanguage(*buf);
-    extractCharset(*buf);
-    extractConnection(*buf);
-    extractKeepAlive(*buf);
-    extractEncoding(*buf);
-    extractTE(*buf);
+    extractCommand(buf);
+    extractAccept(buf);
+    extractMethod(buf);
+    extractReferer(buf);
+    extractHost(buf);
+    extractAgent(buf);
+    extractLanguage(buf);
+    extractCharset(buf);
+    extractConnection(buf);
+    extractKeepAlive(buf);
+    extractEncoding(buf);
+    extractTE(buf);
 
     _filespec = _url;
 
@@ -252,6 +263,116 @@ HTTP::processPostRequest()
 	return true;
     }
     return false;
+}
+
+// http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 (5.3 Request Header Fields)
+bool
+HTTP::processRequestFields(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    const char *foo[] = {
+	"Accept",
+	"Accept-Charset",
+	"Accept-Encoding",
+	"Accept-Language",
+	"Authorization",
+	"Expect",
+	"From",
+	"Host",
+	"If-Match",
+	"If-Modified-Since",
+	"If-None-Match",
+	"If-Range",
+	"If-Unmodified-Since",
+	"Max-Forwards",
+	"Proxy-Authorization",
+	"Range",
+	"Referer",
+	"TE",
+	"User-Agent",
+	0
+	};
+}
+
+// http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec7 (7.1 Entity Header Fields)
+bool
+HTTP::processEntityFields(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    const char *foo[] = {
+	"Accept",
+	"Allow",
+	"Content-Encoding",
+	"Content-Language",
+	"Content-Length",	// Must be used when sending a Response
+	"Content-Location",
+	"Content-MD5",
+	"Content-Range",
+	"Content-Type",		// Must be used when sending non text/html files
+	"Expires",
+	"Last-Modified",
+	0
+	};
+    
+    return true;
+
+}
+
+bool
+HTTP::processHeaderFields(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+    string head(reinterpret_cast<const char *>(buf.reference()));
+    Tok t(head, Sep("\r\n"));
+    for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {
+	string::size_type pos = i->find(":", 0);
+ 	if (pos != string::npos) {
+	    string name = i->substr(0, pos);
+	    string value = i->substr(pos+2, i->size());
+ 	    std::transform(name.begin(), name.end(), name.begin(), 
+ 			   (int(*)(int)) tolower);
+ 	    std::transform(value.begin(), value.end(), value.begin(), 
+ 			   (int(*)(int)) tolower);
+ 	    _fields[name] = value;	    
+	}
+    }
+    
+    return true;
+}
+
+boost::shared_ptr<std::vector<std::string> >
+HTTP::getFieldItem(const std::string &name)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<std::vector<std::string> > ptr(new std::vector<std::string>);
+    Tok t(_fields[name], Sep(", "));
+    for (Tok::iterator i = t.begin(), e = t.end(); i != e; ++i) {
+	ptr->push_back(*i);
+    }
+
+    return ptr;
+}
+
+// http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec4 (4.5 General Header Fields)
+bool
+HTTP::processGeneralFields(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    const char *foo[] = {
+	"Cache-Control"
+	"Connection",		// Must look for Keep-Alive and close
+	"Date",
+	"Pragma",
+	"Trailer",
+	"Transfer-Encoding",	// Must look for Chunked-Body too
+	"Upgrade",
+	"Via",
+	"Warning",
+	0
+	};
 }
 
 bool
@@ -882,17 +1003,19 @@ HTTP::extractMethod(Network::byte_t *data)
     // HTTP 1.0 doesn't support persistant connections by default.
     if (body.substr(end+6, 3) == "1.0") {
 	log_debug("Disbling Keep Alive for default");
-	_version = 1.0;
+	_version.major = 1;
+	_version.minor = 0;
 	_keepalive = false;
     }
     // HTTP 1.1 does support persistant connections by default.
     if (body.substr(end+6, 3) == "1.1") {
 	log_debug("Enabling Keep Alive for default");
-	_version = 1.1;
+	_version.major = 1;
+	_version.minor = 1;
 	_keepalive = true;
     }    
 
-    log_debug("HTTP version is: HTTP %g", _version);
+    log_debug("HTTP version is: HTTP %d.%d", _version.major, _version.minor);
     end = _url.find("?", 0);
 //    _filespec = _url.substr(start+1, end);
     return _method;
@@ -1466,7 +1589,7 @@ HTTP::dump() {
     log_debug (_("==== The HTTP header breaks down as follows: ===="));
     log_debug (_("Filespec: %s"), _filespec.c_str());
     log_debug (_("URL: %s"), _url.c_str());
-    log_debug (_("Version: %g"), _version);
+    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
     for (it = _accept.begin(); it != _accept.end(); it++) {
         log_debug("Accept param: \"%s\"", (*(it)).c_str());
     }
