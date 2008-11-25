@@ -24,6 +24,12 @@
  *  Deduction:
  *
  *     There is no NaN number in swf4 at all, invalid numbers are converted to 0.
+ *
+ * 2008-11-25 UPDATE: the deduction is wrong, as shown by this:
+ *     /mc1.xscale = "0"; // make xscale=0
+ *     /mc1.xscale = 100; // make xscale=100
+ *     /mc1.xscale = "N"; // doesn't change xscale (still 100)
+ * --strk;
  *    
  */
 
@@ -202,8 +208,152 @@
         // Question: how to generate the above opcodes?
     .end
     
-    
 .frame 3
+
+    .box b1 color=white fill=green width=50 height=50 
+    .sprite mc1
+        .put shape1=b1 x=100 y=100
+    .end
+    .put mc1
+
+    .action:
+        //
+        // Test assigning undefined/null to properties
+        //
+
+        // test with _x
+        /mc1.x = 100;
+        check_equals(/mc1.x, 100);
+        /mc1.x=undefined; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.x, 100);
+        /mc1.x=null; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.x, 100);
+        /mc1.x=0; // this is a real zero
+        check_equals(/mc1.x, 0);
+        /mc1.x=100; // reset
+        check_equals(/mc1.x, 100);
+        s="0";
+        /mc1.x=s; // evaluates to 0
+        check_equals(/mc1.x, 0);
+        /mc1.x=100; // reset
+        s="not a number";
+        /mc1.x=s; // evaluates to ? 
+        xcheck_equals(/mc1.x, 100); // not a number it seems? 
+
+        // test with _y
+        /mc1.y = 100;
+        check_equals(/mc1.y, 100);
+        /mc1.y=undefined; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.y, 100);
+        /mc1.y=null; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.y, 100);
+        /mc1.y=0; // this is a real zero
+        check_equals(/mc1.y, 0);
+        /mc1.y=100; // reset
+        check_equals(/mc1.y, 100);
+        s="0";
+        /mc1.y=s; // evaluates to 0
+        check_equals(/mc1.y, 0);
+        /mc1.y=100; // reset
+        s="not a number";
+        /mc1.y=s; // evaluates to ? 
+        xcheck_equals(/mc1.y, 100); // not a number it seems? 
+
+        // test with _xscale
+        check_equals(/mc1.xscale, 100);
+        /mc1.xscale=undefined; // evaluates to 0, not NaN !
+        check_equals(/mc1.xscale, 100);
+        /mc1.xscale=null; // evaluates to 0, not NaN !
+        check_equals(/mc1.xscale, 100);
+        /mc1.xscale=0; // this is a real zero
+        check_equals(/mc1.xscale, 0);
+        /mc1.xscale=100; // reset
+        check_equals(/mc1.xscale, 100);
+        s="0";
+        /mc1.xscale=s; // evaluates to 0
+        check_equals(/mc1.xscale, 0);
+        /mc1.xscale=100; // reset
+        s="not a number";
+        /mc1.xscale=s; // evaluates to ? 
+        xcheck_equals(/mc1.xscale, 100); // not a number it seems? 
+
+        // test with _yscale
+        xcheck_equals(/mc1.yscale, 100);
+        /mc1.yscale=undefined; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.yscale, 100);
+        /mc1.yscale=null; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.yscale, 100);
+        /mc1.yscale=0; // this is a real zero
+        check_equals(/mc1.yscale, 0);
+        /mc1.yscale=100; // reset
+        check_equals(/mc1.yscale, 100);
+        s="0";
+        /mc1.yscale=s; // evaluates to 0
+        check_equals(/mc1.yscale, 0);
+        /mc1.yscale=100; // reset
+        s="not a number";
+        /mc1.yscale=s; // evaluates to ? 
+        xcheck_equals(/mc1.yscale, 100); // not a number it seems? 
+
+        // test with _alpha
+        check_equals(/mc1.alpha, 100);
+        /mc1.alpha=undefined; // evaluates to 0, not NaN !
+        check_equals(/mc1.alpha, 100);
+        /mc1.alpha=null; // evaluates to 0, not NaN !
+        check_equals(/mc1.alpha, 100);
+        /mc1.alpha=0; // this is a real zero
+        check_equals(/mc1.alpha, 0);
+        /mc1.alpha=100; // reset
+        check_equals(/mc1.alpha, 100);
+        s="0";
+        /mc1.alpha=s; // evaluates to 0
+        check_equals(/mc1.alpha, 0);
+        /mc1.alpha=100; // reset
+        s="not a number";
+        /mc1.alpha=s; // evaluates to ? 
+        xcheck_equals(/mc1.alpha, 100); // not a number it seems? 
+
+        // test with _visible
+        check_equals(/mc1.visible, 1);
+        /mc1.visible=undefined; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.visible, 1);
+        /mc1.visible=null; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.visible, 1);
+        /mc1.visible=0; // this is a real zero
+        check_equals(/mc1.visible, 0);
+        /mc1.visible=100; // reset
+        check_equals(/mc1.visible, 1);
+        s="0";
+        /mc1.visible=s; // evaluates to 0
+        check_equals(/mc1.visible, 0);
+        /mc1.visible=100; // reset
+        s="not a number";
+        /mc1.visible=s; // evaluates to ? 
+        xcheck_equals(/mc1.visible, 1); // not a number it seems? 
+
+        // test with _rotation
+        /mc1.rotation = 90;
+        check_equals(/mc1.rotation, 90);
+        /mc1.rotation=undefined; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.rotation, 90);
+        /mc1.rotation=null; // evaluates to 0, not NaN !
+        xcheck_equals(/mc1.rotation, 90);
+        /mc1.rotation=0; // this is a real zero
+        check_equals(/mc1.rotation, 0);
+        /mc1.rotation=90; // reset
+        check_equals(/mc1.rotation, 90);
+        s="0";
+        /mc1.rotation=s; // evaluates to 0
+        check_equals(/mc1.rotation, 0);
+        /mc1.rotation=90; // reset
+        s="not a number";
+        /mc1.rotation=s; // evaluates to ? 
+        xcheck_equals(/mc1.rotation, 90); // not a number it seems? 
+
+    .end
+	
+    
+.frame 4
     .action:
         stop();
     .end
