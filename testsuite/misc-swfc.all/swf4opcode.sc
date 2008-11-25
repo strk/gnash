@@ -222,6 +222,7 @@
         //
 
         // test with _x
+        check_equals(/mc1:_x, undefined); // no variable, only property
         /mc1.x = 100;
         check_equals(/mc1.x, 100);
         /mc1.x=undefined; // evaluates to 0, not NaN !
@@ -241,6 +242,7 @@
         xcheck_equals(/mc1.x, 100); // not a number it seems? 
 
         // test with _y
+        check_equals(/mc1:_y, undefined); // no variable, only property
         /mc1.y = 100;
         check_equals(/mc1.y, 100);
         /mc1.y=undefined; // evaluates to 0, not NaN !
@@ -260,6 +262,7 @@
         xcheck_equals(/mc1.y, 100); // not a number it seems? 
 
         // test with _xscale
+        xcheck_equals(/mc1:_xscale, undefined); // no variable, only property
         check_equals(/mc1.xscale, 100);
         /mc1.xscale=undefined; // evaluates to 0, not NaN !
         check_equals(/mc1.xscale, 100);
@@ -278,6 +281,7 @@
         xcheck_equals(/mc1.xscale, 100); // not a number it seems? 
 
         // test with _yscale
+        xcheck_equals(/mc1:_yscale, undefined); // no variable, only property
         xcheck_equals(/mc1.yscale, 100);
         /mc1.yscale=undefined; // evaluates to 0, not NaN !
         xcheck_equals(/mc1.yscale, 100);
@@ -296,6 +300,7 @@
         xcheck_equals(/mc1.yscale, 100); // not a number it seems? 
 
         // test with _alpha
+        xcheck_equals(/mc1:_alpha, undefined); // no variable, only property
         check_equals(/mc1.alpha, 100);
         /mc1.alpha=undefined; // evaluates to 0, not NaN !
         check_equals(/mc1.alpha, 100);
@@ -314,6 +319,7 @@
         xcheck_equals(/mc1.alpha, 100); // not a number it seems? 
 
         // test with _visible
+        xcheck_equals(/mc1:_visible, undefined); // no variable, only property
         check_equals(/mc1.visible, 1);
         /mc1.visible=undefined; // evaluates to 0, not NaN !
         xcheck_equals(/mc1.visible, 1);
@@ -332,6 +338,7 @@
         xcheck_equals(/mc1.visible, 1); // not a number it seems? 
 
         // test with _rotation
+        check_equals(/mc1:_rotation, undefined); // no variable, only property
         /mc1.rotation = 90;
         check_equals(/mc1.rotation, 90);
         /mc1.rotation=undefined; // evaluates to 0, not NaN !
