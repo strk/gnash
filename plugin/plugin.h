@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef __PLUGIN_H__
-#define __PLUGIN_H__
+#ifndef GNASH_PLUGIN_H
+#define GNASH_PLUGIN_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -51,20 +51,11 @@
 #include "prcvar.h"
 #include "prthread.h"
 
-/* ascii codes for various special keys */
-#define ESCAPE 27
-#define PAGE_UP 73
-#define PAGE_DOWN 81
-#define UP_ARROW 72
-#define DOWN_ARROW 80
-#define LEFT_ARROW 75
-#define RIGHT_ARROW 77
-
 extern NPBool      plugInitialized;
 extern PRLock      *playerMutex;
 extern PRCondVar   *playerCond;
 
-class DSOLOCAL nsPluginInstance : public nsPluginInstanceBase
+class nsPluginInstance : public nsPluginInstanceBase
 {
 public:
     nsPluginInstance(nsPluginCreateData* );

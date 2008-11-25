@@ -575,7 +575,6 @@ character::visible_getset(const fn_call& fn)
                 ptr->getTarget(), val, d);
 			);
             return rv;
-            //ptr->set_visible(false);
         }
 
 		ptr->set_visible(d);
