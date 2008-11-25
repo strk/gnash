@@ -282,11 +282,11 @@
 
         // test with _yscale
         xcheck_equals(/mc1:_yscale, undefined); // no variable, only property
-        xcheck_equals(/mc1.yscale, 100);
+        check_equals(/mc1.yscale, 100);
         /mc1.yscale=undefined; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.yscale, 100);
+        check_equals(/mc1.yscale, 100);
         /mc1.yscale=null; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.yscale, 100);
+        check_equals(/mc1.yscale, 100);
         /mc1.yscale=0; // this is a real zero
         check_equals(/mc1.yscale, 0);
         /mc1.yscale=100; // reset
