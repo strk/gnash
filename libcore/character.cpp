@@ -841,27 +841,6 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 {
 	_event_handlers[id].push_back(&code);
 
-	//log_debug(_("Setting handler for event %s"), id);
-
-	// Set the character as a listener iff the
-	// kind of event is a KEY or MOUSE one 
-	switch (id.m_id)
-	{
-		case event_id::KEY_DOWN:  
-		case event_id::KEY_PRESS:
-		case event_id::KEY_UP:    
-			has_key_event();
-			break;
-		case event_id::MOUSE_UP:
-		case event_id::MOUSE_DOWN:
-		case event_id::MOUSE_MOVE:
-			//log_debug(_("Registering character as having mouse events"));
-			has_mouse_event();
-			break;
-		default:
-			break;
-	}
-
 	// todo: drop the character as a listener
 	//       if it gets no valid handlers for
 	//       mouse or Key events.
