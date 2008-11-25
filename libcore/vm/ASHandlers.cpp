@@ -403,7 +403,7 @@ propertyKey(unsigned int val)
         NSV::PROP_uX, // 0
         NSV::PROP_uY, // 1
         NSV::PROP_uXSCALE, // 2
-        NSV::PROP_uXSCALE, // 3
+        NSV::PROP_uYSCALE, // 3
         NSV::PROP_uCURRENTFRAME, // 4
         NSV::PROP_uTOTALFRAMES, // 5
         NSV::PROP_uALPHA, // 6
