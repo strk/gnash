@@ -86,22 +86,32 @@ _root._xscale = 100;
 // setProperty("", _x, "F");
 _root._x=100; // set
 asm{ push "", 0, "F" setproperty };  
-xcheck_equals(_root._x, 100);
+check_equals(_root._x, 100);
 _root._x=100; // reset
 // setProperty("", _x, "0");
 asm{ push "", 0, "0" setproperty };  
 check_equals(_root._x, 0);
-//_root._x=0; // reset
+_root._x=100; // set
+_root._x = Infinity; // infinity != nan
+xcheck_equals(_root._x, -107374182.4);
+_root._x = -Infinity; // infinity != nan
+xcheck_equals(_root._x, -107374182.4);
+_root._x=0; // reset
 
 // setProperty("", _y, "F");
 _root._y=100; // set
 asm{ push "", 1, "F" setproperty };  
-xcheck_equals(_root._y, 100);
+check_equals(_root._y, 100);
 _root._y=100; // reset
 // setProperty("", _y, "0");
 asm{ push "", 1, "0" setproperty };  
 check_equals(_root._y, 0);
-//_root._y=0; // reset
+_root._y=100; // set
+_root._y = Infinity; // infinity != nan
+xcheck_equals(_root._y, -107374182.4);
+_root._y = -Infinity; // infinity != nan
+xcheck_equals(_root._y, -107374182.4);
+_root._y=0; // reset
 
 // setProperty("", _xscale, "F");
 asm{ push "", 2, "F" setproperty };  
@@ -110,6 +120,11 @@ _root._xscale=100; // reset
 // setProperty("", _xscale, "0");
 asm{ push "", 2, "0" setproperty };  
 check_equals(_root._xscale, 0);
+_root._xscale=100; // reset
+_root._xscale = Infinity; // infinity != nan
+check_equals(_root._xscale, Infinity);
+_root._xscale = -Infinity; // infinity != nan
+check_equals(_root._xscale, -Infinity);
 _root._xscale=100; // reset
 
 // setProperty("", _yscale, "F");
@@ -120,6 +135,11 @@ _root._yscale=100; // reset
 asm{ push "", 3, "0" setproperty };  
 check_equals(_root._yscale, 0);
 _root._yscale=100; // reset
+_root._yscale = Infinity; // infinity != nan
+check_equals(_root._yscale, Infinity);
+_root._yscale = -Infinity; // infinity != nan
+check_equals(_root._yscale, -Infinity);
+_root._yscale=100; // reset
 
 // setProperty("", _alpha, "F");
 asm{ push "", 6, "F" setproperty };  
@@ -129,13 +149,16 @@ _root._alpha=100; // reset
 asm{ push "", 6, "0" setproperty };  
 check_equals(_root._alpha, 0);
 _root._alpha=100; // reset
+_root._alpha = Infinity; // infinity != nan
+check_equals(_root._alpha, -12800);
+_root._alpha=100; // reset
 
 check_equals(typeof(_root._visible), 'boolean');
 check_equals(_root._visible, true);
 // setProperty("", _visible, "F"); [ won't change the value ! ]
 asm{ push "", 7, "F" setproperty };  
 check_equals(typeof(_root._visible), 'boolean');
-xcheck_equals(_root._visible, true); 
+check_equals(_root._visible, true); 
 _root._visible=true; // reset
 // setProperty("", _visible, "1");
 asm{ push "", 7, "1" setproperty };  
@@ -145,6 +168,9 @@ check_equals(_root._visible, true);
 asm{ push "", 7, "0" setproperty };  
 check_equals(typeof(_root._visible), 'boolean');
 check_equals(_root._visible, false); 
+_root._visible=true; // reset
+_root._visible = Infinity; // infinity is skipped
+check_equals(_root._visible, true);
 _root._visible=true; // reset
 
 // TODO: _width & _height
@@ -157,6 +183,8 @@ _root._rotation=100; // reset
 // setProperty("", _rotation, "0");
 asm{ push "", 10, "0" setproperty };  
 check_equals(_root._rotation, 0);
+_root._rotation = Infinity; // infinity != nan
+check(isNaN(_root._rotation));
 _root._rotation=0; // reset
 
 //
@@ -253,6 +281,6 @@ obj.func = function () {
 };
 obj.func();
 
-check_totals(35);
+check_totals(46);
 
 #endif //MING_SUPPORTS_ASM

@@ -226,9 +226,9 @@
         /mc1.x = 100;
         check_equals(/mc1.x, 100);
         /mc1.x=undefined; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.x, 100);
+        check_equals(/mc1.x, 100);
         /mc1.x=null; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.x, 100);
+        check_equals(/mc1.x, 100);
         /mc1.x=0; // this is a real zero
         check_equals(/mc1.x, 0);
         /mc1.x=100; // reset
@@ -246,9 +246,9 @@
         /mc1.y = 100;
         check_equals(/mc1.y, 100);
         /mc1.y=undefined; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.y, 100);
+        check_equals(/mc1.y, 100);
         /mc1.y=null; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.y, 100);
+        check_equals(/mc1.y, 100);
         /mc1.y=0; // this is a real zero
         check_equals(/mc1.y, 0);
         /mc1.y=100; // reset
@@ -322,9 +322,9 @@
         xcheck_equals(/mc1:_visible, undefined); // no variable, only property
         check_equals(/mc1.visible, 1);
         /mc1.visible=undefined; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.visible, 1);
+        check_equals(/mc1.visible, 1);
         /mc1.visible=null; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.visible, 1);
+        check_equals(/mc1.visible, 1);
         /mc1.visible=0; // this is a real zero
         check_equals(/mc1.visible, 0);
         /mc1.visible=100; // reset
@@ -342,9 +342,9 @@
         /mc1.rotation = 90;
         check_equals(/mc1.rotation, 90);
         /mc1.rotation=undefined; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.rotation, 90);
+        check_equals(/mc1.rotation, 90);
         /mc1.rotation=null; // evaluates to 0, not NaN !
-        xcheck_equals(/mc1.rotation, 90);
+        check_equals(/mc1.rotation, 90);
         /mc1.rotation=0; // this is a real zero
         check_equals(/mc1.rotation, 0);
         /mc1.rotation=90; // reset
