@@ -315,7 +315,7 @@ character::xscale_getset(const fn_call& fn)
 
 		const double scale_percent = val.to_number();
 
-		if (val.is_undefined() || isNaN(scale_percent))
+		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _xscale to %g, refused"),
@@ -359,7 +359,7 @@ character::yscale_getset(const fn_call& fn)
 
 		const double scale_percent = val.to_number();
 
-		if ( isNaN(scale_percent))
+		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _yscale to %s, refused"),
