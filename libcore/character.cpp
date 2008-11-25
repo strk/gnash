@@ -299,10 +299,23 @@ character::xscale_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		const double scale_percent = fn.arg(0).to_number();
+		const as_value& val = fn.arg(0);
 
 		// Handle bogus values
-		if (isNaN(scale_percent))
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 on to_number
+		if (val.is_undefined() || val.is_null())
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set _xscale to %s, refused"),
+                            val);
+			);
+			return as_value();
+		}
+
+		const double scale_percent = val.to_number();
+
+		if (val.is_undefined() || isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Attempt to set _xscale to %g, refused"),
@@ -330,17 +343,31 @@ character::yscale_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		const double scale_percent = fn.arg(0).to_number();
+		const as_value& val = fn.arg(0);
 
 		// Handle bogus values
-		if (isNaN(scale_percent))
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 on to_number
+		if (val.is_undefined() || val.is_null())
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set _yscale to %g, refused"),
+			log_aserror(_("Attempt to set _yscale to %s, refused"),
+                            val);
+			);
+			return as_value();
+		}
+
+		const double scale_percent = val.to_number();
+
+		if ( isNaN(scale_percent))
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set _yscale to %s, refused"),
                             scale_percent);
 			);
-                        return as_value();
+			return as_value();
 		}
+
 
 		// input is in percent
 		ptr->set_y_scale(scale_percent);
