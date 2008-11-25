@@ -667,7 +667,7 @@ as_value::to_number() const
                 // characters is returned, including exponent, positive
                 // and negative signs and whitespace before.
                 double d = 0;
-                std::istringstream is (getStr());
+                std::istringstream is(s);
                 is >> d;
                 return d;
             }
