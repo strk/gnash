@@ -544,8 +544,8 @@ Buffer::remove(Network::byte_t c)
     }
     
     std::copy(start + 1, end(), start);
-//    *(end()) = 0;
-    _nbytes--;
+    *(end() - 1) = 0;
+    _seekptr--;
 
     return _data.get();
 }
@@ -565,7 +565,7 @@ Buffer::remove(int start)
 //    GNASH_REPORT_FUNCTION;
     std::copy((_data.get() + start + 1), end(), (_data.get() + start)),
 //    *end() = 0;
-    _nbytes--;
+    _seekptr--;
     return _data.get();
 }
 
@@ -580,7 +580,7 @@ Buffer::remove(int start)
 ///
 /// @param start The location of the byte to remove from the
 ///		Buffer
-/// @param range The amoiunt of bytes to remove from the Buffer.
+/// @param range The amount of bytes to remove from the Buffer.
 ///
 /// @return A real pointer to the base address of the Buffer.
 Network::byte_t *
@@ -589,7 +589,8 @@ Buffer::remove(int start, int range)
 //    GNASH_REPORT_FUNCTION;
     std::copy((_data.get() + range + 1), end(), (_data.get() + start)),
 //    *end() = 0;
-	_nbytes -= (range - start);
+	_seekptr -= range;
+    
     return _data.get();
 }
 
