@@ -223,7 +223,7 @@ public:
     amf::Buffer &formatTE(const std::string &data)
  	{return formatCommon("TE: " + data); };
     // All HTTP messages are terminated with a blank line
-    void terminateHeader() { formatCommon(""); };    
+    void terminateHeader() { formatCommon("\r\n"); };    
     
     amf::Buffer &formatErrorResponse(http_status_e err);
     
@@ -233,8 +233,8 @@ public:
     // Return the header that's been built up.
     amf::Buffer &getBuffer() { return _buffer; };
 
-    // Return the body that's been built up.
-    std::string getBody() { return _body.str(); };
+//     // Return the body that's been built up.
+//     std::string getBody() { return _body.str(); };
 
     // Get the file type, so we know how to set the
     // Content-type in the header.
@@ -285,7 +285,8 @@ private:
 
     amf::Buffer	_buffer;
     CQue		_que;
-    std::stringstream	_body;
+    
+//    std::stringstream	_body;
 //    std::string		 _command;
     amf::AMF::filetype_e  _filetype;
     std::string		_filespec;

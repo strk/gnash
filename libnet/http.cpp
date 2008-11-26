@@ -53,6 +53,16 @@
 #include "diskstream.h"
 #include "cache.h"
 
+#if defined(_WIN32) || defined(WIN32)
+# define PATH_MAX 255
+# define __PRETTY_FUNCTION__ __FUNCDNAME__
+# include <winsock2.h>
+# include <direct.h>
+#else
+# include <unistd.h>
+# include <sys/param.h>
+#endif
+
 using namespace gnash;
 using namespace std;
 
@@ -153,7 +163,6 @@ HTTP::processClientRequest()
 	      break;
 	}
     }
-    
 }
 
 bool
@@ -184,16 +193,14 @@ HTTP::processGetRequest()
     }
     
     clearHeader();
-    extractCommand(*buf);
     processHeaderFields(*buf);
+
 //    dump();
-
-    _filespec = _url;
-
-    if (!_url.empty()) {
+    if (_version.major > 0) {
 	return true;
+    } else {
+	return false;
     }
-    return false;
 }
 
 bool
@@ -214,7 +221,13 @@ HTTP::processPostRequest()
     }
     clearHeader();
     extractCommand(*buf);
-    return processHeaderFields(*buf);
+    processHeaderFields(*buf);
+
+    if (_version.major > 0) {
+	return true;
+    } else {
+	return false;
+    }
 }
 
 // The order in which header fields with differing field names are
@@ -229,20 +242,20 @@ HTTP::processPostRequest(amf::Buffer &buf)
     extractCommand(buf);
     processHeaderFields(buf);
     
-    _filespec = _url;
-
-    if (!_url.empty()) {
+    if (!getFilespec().empty()) {
 	return true;
+    } else {
+	return false;
     }
-    return false;
 }
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 (5.3 Request Header Fields)
 bool
-HTTP::checkRequestFields(amf::Buffer &buf)
+HTTP::checkRequestFields(amf::Buffer & /* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
 
+#if 0
     const char *foo[] = {
 	"Accept",
 	"Accept-Charset",
@@ -265,14 +278,17 @@ HTTP::checkRequestFields(amf::Buffer &buf)
 	"User-Agent",
 	0
 	};
+#endif
+    return false;
 }
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec7 (7.1 Entity Header Fields)
 bool
-HTTP::checkEntityFields(amf::Buffer &buf)
+HTTP::checkEntityFields(amf::Buffer & /* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
 
+#if 0
     const char *foo[] = {
 	"Accept",
 	"Allow",
@@ -289,15 +305,17 @@ HTTP::checkEntityFields(amf::Buffer &buf)
 	};
     
     return true;
-
+#endif
+    return false;
 }
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec4 (4.5 General Header Fields)
 bool
-HTTP::checkGeneralFields(amf::Buffer &buf)
+HTTP::checkGeneralFields(amf::Buffer & /* buf */)
 {
 //    GNASH_REPORT_FUNCTION;
 
+#if 0
     const char *foo[] = {
 	"Cache-Control"
 	"Connection",		// Must look for Keep-Alive and close
@@ -310,6 +328,8 @@ HTTP::checkGeneralFields(amf::Buffer &buf)
 	"Warning",
 	0
 	};
+#endif
+    return false;
 }
 
 gnash::Network::byte_t *
@@ -406,7 +426,6 @@ HTTP::formatHeader(http_status_e type)
 amf::Buffer &
 HTTP::formatCommon(const string &data)
 {
-//    _header << data << "\r\n";
     _buffer += data;
     _buffer += "\r\n";
 
@@ -414,24 +433,124 @@ HTTP::formatCommon(const string &data)
 }
 
 amf::Buffer &
-HTTP::formatHeader(int filesize, http_status_e /* type */)
+HTTP::formatHeader(int filesize, http_status_e type)
 {
 //    GNASH_REPORT_FUNCTION;
 
-//    _header << "HTTP/1.0 200 OK" << "\r\n";
-    _buffer = "HTTP/1.0 200 OK\r\n";
+    char num[12];
+
+    _buffer = "HTTP/";
+    sprintf(num, "%d.%d", _version.major, _version.minor);
+    _buffer += num;
+    sprintf(num, " %d", static_cast<int>(type));
+    _buffer += num;
+    _buffer += "\r\n";
+    switch (type) {
+      case CONTINUE:
+	  break;
+      case SWITCHPROTOCOLS:
+	  break;
+	  // 2xx: Success - The action was successfully received,
+	  // understood, and accepted
+	  break;
+      case OK:
+	  _buffer += " OK\r\n";
+	  break;
+      case CREATED:
+	  break;
+      case ACCEPTED:
+	  break;
+      case NON_AUTHORITATIVE:
+	  break;
+      case NO_CONTENT:
+	  break;
+      case RESET_CONTENT:
+	  break;
+      case PARTIAL_CONTENT:
+	  break;
+        // 3xx: Redirection - Further action must be taken in order to
+        // complete the request
+      case MULTIPLE_CHOICES:
+	  break;
+      case MOVED_PERMANENTLY:
+	  break;
+      case FOUND:
+	  break;
+      case SEE_OTHER:
+	  break;
+      case NOT_MODIFIED:
+	  break;
+      case USE_PROXY:
+	  break;
+      case TEMPORARY_REDIRECT:
+	  break;
+        // 4xx: Client Error - The request contains bad syntax or
+        // cannot be fulfilled
+      case BAD_REQUEST:
+	  break;
+      case UNAUTHORIZED:
+	  break;
+      case PAYMENT_REQUIRED:
+	  break;
+      case FORBIDDEN:
+	  break;
+      case NOT_FOUND:
+	  _buffer += " NOT FOUND\r\n";
+	  break;
+      case METHOD_NOT_ALLOWED:
+	  break;
+      case NOT_ACCEPTABLE:
+	  break;
+      case PROXY_AUTHENTICATION_REQUIRED:
+	  break;
+      case REQUEST_TIMEOUT:
+	  break;
+      case CONFLICT:
+	  break;
+      case GONE:
+	  break;
+      case LENGTH_REQUIRED:
+	  break;
+      case PRECONDITION_FAILED:
+	  break;
+      case REQUEST_ENTITY_TOO_LARGE:
+	  break;
+      case REQUEST_URI_TOO_LARGE:
+	  break;
+      case UNSUPPORTED_MEDIA_TYPE:
+	  break;
+      case REQUESTED_RANGE_NOT_SATISFIABLE:
+	  break;
+      case EXPECTATION_FAILED:
+	  break;
+	  // 5xx: Server Error - The server failed to fulfill an apparently valid request
+      case INTERNAL_SERVER_ERROR:
+	  break;
+      case NOT_IMPLEMENTED:
+	  break;
+      case BAD_GATEWAY:
+	  break;
+      case SERVICE_UNAVAILABLE:
+	  break;
+      case GATEWAY_TIMEOUT:
+	  break;
+      case HTTP_VERSION_NOT_SUPPORTED:
+	  break;
+	  // Gnash/Cygnal extensions for internal use
+      case LIFE_IS_GOOD:
+	  break;
+      case CLOSEPIPE:
+	  break;
+      default:
+	  break;
+    }
+    
     formatDate();
     formatServer();
-//     if (type == NONE) {
-// 	formatConnection("close"); // this is the default for HTTP 1.1
-//     }
-//     _header << "Accept-Ranges: bytes" << "\r\n";
     formatLastModified();
-    formatEtag("24103b9-1c54-ec8632c0"); // FIXME: borrowed from tcpdump
     formatAcceptRanges("bytes");
     formatContentLength(filesize);
     formatKeepAlive("timeout=15, max=100");
-//    formatConnection("Keep-Alive");
     formatContentType(amf::AMF::FILETYPE_HTML);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
@@ -444,26 +563,36 @@ HTTP::formatErrorResponse(http_status_e code)
 {
 //    GNASH_REPORT_FUNCTION;
 
+    char num[12];
     // First build the message body, so we know how to set Content-Length
-    _body << "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">" << "\r\n";
-    _body << "<html><head>" << "\r\n";
-    _body << "<title>" << code << " Not Found</title>" << "\r\n";
-    _body << "</head><body>" << "\r\n";
-    _body << "<h1>Not Found</h1>" << "\r\n";
-    _body << "<p>The requested URL " << _filespec << " was not found on this server.</p>" << "\r\n";
-    _body << "<hr>" << "\r\n";
-    _body << "<address>Cygnal (GNU/Linux) Server at localhost Port " << _port << " </address>" << "\r\n";
-    _body << "</body></html>" << "\r\n";
-    _body << "\r\n";
+    _buffer += "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n";
+    _buffer += "<html><head>\r\n";
+    _buffer += "<title>";
+    sprintf(num, "%d", code);
+    _buffer += num;
+    _buffer += " Not Found</title>\r\n";
+    _buffer += "</head><body>\r\n";
+    _buffer += "<h1>Not Found</h1>\r\n";
+    _buffer += "<p>The requested URL ";
+    _buffer += _filespec;
+    _buffer += " was not found on this server.</p>\r\n";
+    _buffer += "<hr>\r\n";
+    _buffer += "<address>Cygnal (GNU/Linux) Server at ";
+    _buffer += getField("host");
+    _buffer += " </address>\r\n";
+    _buffer += "</body></html>\r\n";
 
     // First build the header
 //    _header << "HTTP/1.1 " << code << " Not Found" << "\r\n";
     formatDate();
     formatServer();
-    _filesize = _body.str().size();
+//    _filesize = _body.str().size();
     formatContentLength(_filesize);
     formatConnection("close");
     formatContentType(amf::AMF::FILETYPE_HTML);
+
+    // All HTTP messages are followed by a blank line.
+    terminateHeader();
 
     return _buffer;
 }
@@ -481,21 +610,21 @@ HTTP::formatDate()
 //    cerr << boost::gregorian::to_simple_string(d) << endl;
 //    cerr << boost::posix_time::to_simple_string(now.time_of_day()) << endl;
 //    cerr << boost::posix_time::to_posix_string() << endl;
-    const char *months[] = {
-	"None",
-	"Jan",
-	"Feb",
-	"March",
-	"April",
-	"May",
-	"June",
-	"July",
-	"Aug",
-	"Sept",
-	"Oct",
-	"Nov",
-	"Dec"
-    };
+//     const char *months[] = {
+// 	"None",
+// 	"Jan",
+// 	"Feb",
+// 	"March",
+// 	"April",
+// 	"May",
+// 	"June",
+// 	"July",
+// 	"Aug",
+// 	"Sept",
+// 	"Oct",
+// 	"Nov",
+// 	"Dec"
+//     };
     
     char num[12];
 
@@ -694,7 +823,7 @@ HTTP::formatPostReply(rtmpt_cmd_e /* code */)
 }
 
 amf::Buffer &
-HTTP::formatRequest(const string &url, http_method_e req)
+HTTP::formatRequest(const string & /* url */, http_method_e /* req */)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -790,58 +919,48 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    string body = reinterpret_cast<const char *>(data);
-    HTTP::http_method_e cmd;
+//    string body = reinterpret_cast<const char *>(data);
+    HTTP::http_method_e cmd = HTTP::HTTP_NONE;
 
     // force the case to make comparisons easier
 //     std::transform(body.begin(), body.end(), body.begin(), 
 //                (int(*)(int)) toupper);
-    string::size_type start; 
 
     // Extract the command
-    start = body.find("GET", 0);
-    if (start != string::npos) {
+    if (memcmp(data, "GET", 3) == 0) {
         cmd = HTTP::HTTP_GET;
-	return cmd;
-    }
-    start = body.find("POST", 0);
-    if (start != string::npos) {
+    } else if (memcmp(data, "POST", 4) == 0) {
         cmd = HTTP::HTTP_POST;
-	return cmd;
-    }
-    start = body.find("HEAD", 0);
-    if (start != string::npos) {
+    } else if (memcmp(data, "HEAD", 4) == 0) {
         cmd = HTTP::HTTP_HEAD;
-	return cmd;
-    }
-    start = body.find("CONNECT", 0);
-    if (start != string::npos) {
+    } else if (memcmp(data, "CONNECT", 7) == 0) {
         cmd = HTTP::HTTP_CONNECT;
-	return cmd;
-    }
-    start = body.find("TRACE", 0);
-    if (start != string::npos) {
+    } else if (memcmp(data, "TRACE", 5) == 0) {
         cmd = HTTP::HTTP_TRACE;
-	return cmd;
-    }
-    start = body.find("OPTIONS", 0);
-    if (start != string::npos) {
-        cmd = HTTP::HTTP_OPTIONS;
-	return cmd;
-    }
-    start = body.find("PUT", 0);
-    if (start != string::npos) {
+    } else if (memcmp(data, "PUT", 3) == 0) {
         cmd = HTTP::HTTP_PUT;
-	return cmd;
-    }
-    start = body.find("DELETE", 0);
-    if (start != string::npos) {
+    } else if (memcmp(data, "OPTIONS", 4) == 0) {
+        cmd = HTTP::HTTP_OPTIONS;
+    } else if (memcmp(data, "DELETE", 4) == 0) {
         cmd = HTTP::HTTP_DELETE;
-	return cmd;
     }
 
-//    _command = cmd;
-    return HTTP::HTTP_NONE;
+    // For valid requests, the second argument, delimited by spaces is the filespec
+    // of the file being requested or transmitted.
+    if (cmd != HTTP::HTTP_NONE) {
+	Network::byte_t *start = std::find(data, data+7, ' ') + 1;
+	Network::byte_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
+	// FIXME: there has got to be a way to copy into a string that actually works.
+	char path[(end-start) + 1];
+	memset(path, 0, (end-start) + 1);
+	std::copy(start, end, path);
+	_filespec = path;
+// 	_filespec.reserve((end - start));
+// 	std::fill(_filespec.begin(), _filespec.end(), 0);
+//	std::copy(start, end, _filespec.begin());
+    }
+    
+    return cmd;
 }
 
 // Get the file type, so we know how to set the
@@ -928,7 +1047,7 @@ HTTP::sendMsg()
 ///
 /// @return The number of bytes sent
 int DSOEXPORT
-HTTP::sendMsg(int fd)
+HTTP::sendMsg(int /* fd */)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -965,7 +1084,7 @@ HTTP::recvMsg(int fd)
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
 	int ret = net.readNet(fd, buf, 5);
 
-	cerr << __PRETTY_FUNCTION__ << endl << (char *)buf->reference() << endl;
+//	cerr << __PRETTY_FUNCTION__ << endl << (char *)buf->reference() << endl;
 	
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
@@ -974,14 +1093,14 @@ HTTP::recvMsg(int fd)
  	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
-	if ((ret == string::npos) || (ret == 0xffffffff)) {
+	if ((ret == static_cast<int>(string::npos)) || (ret == -1)) {
 	    log_debug("socket for fd #%d was closed...", fd);
 	    break;
 	}
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
 //	    cerr << "XXXXX: " << (char *)buf->reference() << endl;
- 	    if (ret < NETBUFSIZE) {
+ 	    if (ret < static_cast<int>(NETBUFSIZE)) {
 // 		buf->resize(ret);	FIXME: why does this corrupt
 // 		the buffer ?
 		_que.push(buf);
@@ -1009,7 +1128,6 @@ HTTP::dump() {
         
     log_debug (_("==== The HTTP header breaks down as follows: ===="));
     log_debug (_("Filespec: %s"), _filespec.c_str());
-    log_debug (_("URL: %s"), _url.c_str());
     log_debug (_("Version: %d.%d"), _version.major, _version.minor);
 
     map<string, string>::const_iterator it;
@@ -1053,13 +1171,15 @@ http_handler(Handler::thread_params_t *args)
 	
 	www.recvMsg(args->netfd);
 	
-	if (!www.processGetRequest()) {
+	if (!www.processClientRequest()) {
 //	    hand->die();	// tell all the threads for this connection to die
 //	    hand->notifyin();
 	    log_debug("Net HTTP done for fd #%d...", args->netfd);
 // 	    hand->closeNet(args->netfd);
 	    return;
 	}
+//	www.dump();
+	
 	url = docroot;
 	url += www.getURL();
 	pos = url.find("?");
@@ -1074,12 +1194,12 @@ http_handler(Handler::thread_params_t *args)
 		www.formatErrorResponse(HTTP::NOT_FOUND);
 	    }
 	}
-	// Send the reply
-//	www.formatGetReply(HTTP::LIFE_IS_GOOD);
-//	cerr << "Size = " << www.getHeader().size() << "	" << www.getHeader() << endl;
 	
-//	www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
-//	hand->writeNet(args->netfd, www.getHeader(), www.getHeader().size());
+	// Send the reply
+	amf::Buffer &fooby = www.formatGetReply(HTTP::OK);
+	
+	www.writeNet(args->netfd, fooby);
+//	hand->writeNet(args->netfd, www.getHeader(), www.getHeader().allocated());
 //	strcpy(thread_data.filespec, filespec.c_str());
 //	thread_data.statistics = conndata->statistics;
 	
@@ -1108,7 +1228,7 @@ http_handler(Handler::thread_params_t *args)
 	string response = cache.findResponse(www.getFilespec());
 	if (response.empty()) {
 	    cerr << "FIXME no hit for: " << www.getFilespec() << endl;
-	    www.clearHeader();
+//	    www.clearHeader();
 // 	    amf::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
 // 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
 // 	    cache.addResponse(www.getFilespec(), www.getHeader());
@@ -1136,7 +1256,7 @@ http_handler(Handler::thread_params_t *args)
 	    }
 	    if (filesize >= CACHE_LIMIT) {
 		do {
-		    boost::uint8_t *ptr = filestream->loadChunk(page);
+		    filestream->loadChunk(page);
 		    ret = www.writeNet(args->netfd, filestream->get(), getbytes);
 		    if (ret <= 0) {
 			break;
@@ -1145,7 +1265,7 @@ http_handler(Handler::thread_params_t *args)
 		page += filestream->getPagesize();
 		} while (bytes_read <= filesize);
 	    } else {
-		boost::uint8_t *ptr = filestream->loadChunk(filesize, 0);
+		filestream->loadChunk(filesize, 0);
 //		filestream->close();
 		ret = www.writeNet(args->netfd, filestream->get(), filesize);
 	    }
