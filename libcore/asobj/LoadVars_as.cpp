@@ -295,7 +295,7 @@ loadvars_class_init(as_object& global)
 
 	// Register _global.LoadVars, only visible for SWF6 up
 	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
-	global.init_member("LoadVars", cl.get());
+	global.init_member("LoadVars", cl.get(), swf6flags);
 
 }
 
