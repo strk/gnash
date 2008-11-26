@@ -115,7 +115,7 @@ long
 Sound::getBytesLoaded()
 {
 	if ( _mediaParser ) return _mediaParser->getBytesLoaded();
-	return 0;
+	return -1;
 }
 
 long
@@ -736,17 +736,21 @@ sound_attachsound(const fn_call& fn)
 }
 
 as_value
-sound_getbytesloaded(const fn_call& /*fn*/)
+sound_getbytesloaded(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl ("Sound.getBytesLoaded()") );
-	return as_value();
+	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+	long loaded = so->getBytesLoaded();
+    if (loaded < 0) return as_value();
+    return as_value(loaded);
 }
 
 as_value
-sound_getbytestotal(const fn_call& /*fn*/)
+sound_getbytestotal(const fn_call& fn)
 {
-	LOG_ONCE( log_unimpl ("Sound.getBytesTotal()") );
-	return as_value();
+	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+	long total = so->getBytesTotal();
+    if (total < 0) return as_value();
+    return as_value(total);
 }
 
 as_value

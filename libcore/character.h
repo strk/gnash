@@ -1108,7 +1108,7 @@ public:
   /// If you override the method remember to call saveOriginalTarget()
   /// as the first thing.
   ///
-  virtual void stagePlacementCallback()
+  virtual void stagePlacementCallback(as_object* = 0)
   {
     saveOriginalTarget();
   }

@@ -66,7 +66,7 @@ public:
 	virtual void advance();
 
 	/// Register this video instance as a live character
-	virtual void stagePlacementCallback();
+	virtual void stagePlacementCallback(as_object* initObj = 0);
 
 	void display();
 

@@ -213,7 +213,7 @@ public:
     {
         // don't include bounds of unloaded characters
         if ( ch->isUnloaded() ) return;
-        rect    chb = ch->getBounds();
+        rect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
     }
@@ -393,13 +393,18 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     {
         try { *val = prop->getValue(*this); }
         catch (ActionLimitException&) { throw; }
-        catch (ActionTypeError& ex) { log_error(_("Caught exception: %s"), ex.what()); return false; }
+        catch (ActionTypeError& ex) {
+            log_error(_("Caught exception: %s"), ex.what());
+            return false;
+        }
         return true;
     }
 
     // Try items on our display list.
     character* ch;
-    if ( _vm.getSWFVersion() >= 7 ) ch =    m_display_list.get_character_by_name(name);
+    if ( _vm.getSWFVersion() >= 7 ) {
+        ch = m_display_list.get_character_by_name(name);
+    }
     else ch = m_display_list.get_character_by_name_i(name);
     if (ch) {
             // Found object.
@@ -422,14 +427,15 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     TextFieldPtrVect* etc = get_textfield_variable(name);
     if ( etc )
     {
-        for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
+        for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end();
+                i!=e; ++i)
         {
-    TextFieldPtr tf = *i;
-    if ( tf->getTextDefined() )
-    {
-        val->set_string(tf->get_text_value());
+            TextFieldPtr tf = *i;
+            if ( tf->getTextDefined() )
+            {
+                val->set_string(tf->get_text_value());
                 return true;
-    }
+            }
         }
     }
 
@@ -596,11 +602,12 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
 
     newmovieclip->setDynamic();
 
-    if ( initObject ) newmovieclip->copyProperties(*initObject);
+    //if ( initObject ) newmovieclip->copyProperties(*initObject);
     //else newmovieclip->copyProperties(*this);
 
     // Copy event handlers from movieclip
-    // We should not copy 'm_action_buffer' since the 'm_method' already contains it
+    // We should not copy 'm_action_buffer' since the 
+    // 'm_method' already contains it
     newmovieclip->set_event_handlers(get_event_handlers());
 
     // Copy drawable
@@ -611,7 +618,8 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
-    parent->m_display_list.place_character(newmovieclip.get(), depth);
+    parent->m_display_list.place_character(newmovieclip.get(), depth, 
+            initObject);
     
     return newmovieclip; 
 }
@@ -1266,11 +1274,12 @@ void MovieClip::omit_display()
 }
 
 bool
-MovieClip::attachCharacter(character& newch, int depth)
+MovieClip::attachCharacter(character& newch, int depth, as_object* initObject)
 { 
-    m_display_list.place_character(&newch, depth);    
+    m_display_list.place_character(&newch, depth, initObject);    
 
-    return true; // FIXME: check return from place_character above ?
+    // FIXME: check return from place_character above ?
+    return true; 
 }
 
 character*
@@ -2123,15 +2132,14 @@ MovieClip::registerAsListener()
     _vm.getRoot().add_key_listener(this);
     _vm.getRoot().add_mouse_listener(this);
 }
-    
 
 
-// WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is
-//          it's target path needs to exist, or any as_value for it will be
+// WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", that is,
+//          its target path needs to exist, or any as_value for it will be
 //          a dangling reference to an unexistent movieclip !
 //          NOTE: this is just due to the wrong steps, see comment in header
 void
-MovieClip::stagePlacementCallback()
+MovieClip::stagePlacementCallback(as_object* initObj)
 {
     assert(!isUnloaded());
 
@@ -2143,57 +2151,14 @@ MovieClip::stagePlacementCallback()
 
     // Register this movieclip as a live one
     _vm.getRoot().addLiveChar(this);
+  
 
     // Register this movieclip as a core broadcasters listener
     registerAsListener();
 
     // It seems it's legal to place 0-framed movieclips on stage.
     // See testsuite/misc-swfmill.all/zeroframe_definemovieclip.swf
-    //m_def->ensure_frame_loaded(0);
 
-#if 0
-    // We might have loaded NO frames !
-    bool hasFrames = get_loaded_frames();
-    if ( ! hasFrames )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror(_("stagePlacementCallback: no frames loaded for movieclip/movie %s"), getTarget()) );
-        );
-    }
-#endif
-
-    // We execute events immediately when the stage-placed character 
-    // is dynamic, This is becase we assume that this means that 
-    // the character is placed during processing of actions (opposed 
-    // that during advancement iteration).
-    //
-    // A more general implementation might ask movie_root about it's state
-    // (iterating or processing actions?)
-    // Another possibility to inspect could be letting movie_root decide
-    // when to really queue and when rather to execute immediately the 
-    // events with priority INITIALIZE or CONSTRUCT ...
-    if ( isDynamic() )
-    {
-#ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s is dynamic, sending "
-                "INITIALIZE and CONSTRUCT events immediately"), getTarget());
-#endif
-        on_event(event_id::INITIALIZE);
-        constructAsScriptObject(); 
-    }
-    else
-    {
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
-#endif
-        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
-
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
-#endif
-        std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
-        _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
-    }
 
     // Now execute frame tags and take care of queuing the LOAD event.
     //
@@ -2232,6 +2197,49 @@ MovieClip::stagePlacementCallback()
 #endif
         execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
     }
+
+    // We execute events immediately when the stage-placed character 
+    // is dynamic, This is becase we assume that this means that 
+    // the character is placed during processing of actions (opposed 
+    // that during advancement iteration).
+    //
+    // A more general implementation might ask movie_root about its state
+    // (iterating or processing actions?)
+    // Another possibility to inspect could be letting movie_root decide
+    // when to really queue and when rather to execute immediately the 
+    // events with priority INITIALIZE or CONSTRUCT ...
+    if (!isDynamic())
+    {
+        assert(!initObj);
+#ifdef GNASH_DEBUG
+        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
+#endif
+        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+
+#ifdef GNASH_DEBUG
+        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
+#endif
+        std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
+        _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
+    }
+    else {
+
+        // Properties from an initObj must be copied before construction, but
+        // after the display list has been populated, so that _height and
+        // _width (which depend on bounds) are correct.
+        if (initObj) {
+            copyProperties(*initObj);
+        }
+
+        constructAsScriptObject(); 
+#ifdef GNASH_DEBUG
+        log_debug(_("Sprite %s is dynamic, sending "
+                "INITIALIZE and CONSTRUCT events immediately"), getTarget());
+#endif
+
+        on_event(event_id::INITIALIZE);
+    }
+
 
 }
 
@@ -2311,7 +2319,7 @@ MovieClip::constructAsScriptObject()
                 fn_call call(this, &env);
                 call.super = super;
 
-                // we don't use the constructor return (should we?)
+                    // we don't use the constructor return (should we?)
                 (*ctor)(call);
             }
         }
@@ -3226,7 +3234,6 @@ movieclip_attachMovie(const fn_call& fn)
     boost::intrusive_ptr<character> newch =
         exported_movie->create_character_instance(movieclip.get(), 0);
 
-    assert(newch.get() > reinterpret_cast<void*>(0xFFFF) );
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);
 #endif // ndef GNASH_USE_GC
@@ -3234,25 +3241,14 @@ movieclip_attachMovie(const fn_call& fn)
     newch->set_name(newname);
     newch->setDynamic();
 
-    // place_character() will set depth on newch
-    if ( ! movieclip->attachCharacter(*newch, depthValue) )
-    {
-        log_error(_("Could not attach character at depth %d"), depthValue);
-        return as_value();
-    }
+    boost::intrusive_ptr<as_object> initObj;
 
-    /// Properties must be copied *after* the call to attachCharacter
-    /// because attachCharacter() will reset SWFMatrix !!
     if (fn.nargs > 3 ) {
-        boost::intrusive_ptr<as_object> initObject = fn.arg(3).to_object();
-        if ( initObject ) {
-            //log_debug(_("Initializing properties from object"));
-            newch->copyProperties(*initObject);
-        }
-        else {
+        initObj = fn.arg(3).to_object();
+        if (!initObj) {
             // This is actually a valid thing to do,
             // the documented behaviour is to just NOT
-            // initializing the properties in this
+            // initialize the properties in this
             // case.
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Fourth argument of attachMovie doesn't cast to "
@@ -3261,6 +3257,14 @@ movieclip_attachMovie(const fn_call& fn)
             );
         }
     }
+
+    // place_character() will set depth on newch
+    if (!movieclip->attachCharacter(*newch, depthValue, initObj.get()))
+    {
+        log_error(_("Could not attach character at depth %d"), depthValue);
+        return as_value();
+    }
+
     return as_value(newch.get());
 }
 
@@ -3538,7 +3542,8 @@ movieclip_duplicateMovieClip(const fn_call& fn)
             depth > character::upperAccessibleBound)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("MovieClip.duplicateMovieClip: invalid depth %d passed; not duplicating"), depth);
+                log_aserror(_("MovieClip.duplicateMovieClip: "
+                        "invalid depth %d passed; not duplicating"), depth);
         );    
         return as_value();
     }
@@ -3551,7 +3556,8 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     if (fn.nargs == 3)
     {
         boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
-        ch = movieclip->duplicateMovieClip(newname, depthValue, initObject.get());
+        ch = movieclip->duplicateMovieClip(newname, depthValue,
+                initObject.get());
     }
     else
     {

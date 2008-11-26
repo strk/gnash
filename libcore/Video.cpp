@@ -245,8 +245,12 @@ Video::getVideoFrame()
 }
 
 void
-Video::stagePlacementCallback()
+Video::stagePlacementCallback(as_object* initObj)
 {
+
+    // A Video cannot be created with an initObj
+    assert(!initObj);
+
     saveOriginalTarget(); // for softref
 
     // Register this video instance as a live character

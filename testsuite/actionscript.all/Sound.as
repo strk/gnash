@@ -261,8 +261,8 @@ check_equals(typeof(s.getDuration()), "undefined");
 s.loadSound(MEDIA(sound1.mp3), true); 
 
 
-xcheck_equals(typeof(s.getBytesTotal()), "number");
-xcheck_equals(typeof(s.getBytesLoaded()), "number");
+check_equals(typeof(s.getBytesTotal()), "number");
+check_equals(typeof(s.getBytesLoaded()), "number");
 xcheck_equals(typeof(s.getPosition()), "number");
 check_equals(typeof(s.duration), "number");
 xcheck_equals(typeof(s.getDuration()), "number");
