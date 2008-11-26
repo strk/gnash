@@ -393,13 +393,18 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     {
         try { *val = prop->getValue(*this); }
         catch (ActionLimitException&) { throw; }
-        catch (ActionTypeError& ex) { log_error(_("Caught exception: %s"), ex.what()); return false; }
+        catch (ActionTypeError& ex) {
+            log_error(_("Caught exception: %s"), ex.what());
+            return false;
+        }
         return true;
     }
 
     // Try items on our display list.
     character* ch;
-    if ( _vm.getSWFVersion() >= 7 ) ch =    m_display_list.get_character_by_name(name);
+    if ( _vm.getSWFVersion() >= 7 ) {
+        ch = m_display_list.get_character_by_name(name);
+    }
     else ch = m_display_list.get_character_by_name_i(name);
     if (ch) {
             // Found object.
@@ -422,14 +427,15 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     TextFieldPtrVect* etc = get_textfield_variable(name);
     if ( etc )
     {
-        for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
+        for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end();
+                i!=e; ++i)
         {
-    TextFieldPtr tf = *i;
-    if ( tf->getTextDefined() )
-    {
-        val->set_string(tf->get_text_value());
+            TextFieldPtr tf = *i;
+            if ( tf->getTextDefined() )
+            {
+                val->set_string(tf->get_text_value());
                 return true;
-    }
+            }
         }
     }
 
@@ -2123,11 +2129,10 @@ MovieClip::registerAsListener()
     _vm.getRoot().add_key_listener(this);
     _vm.getRoot().add_mouse_listener(this);
 }
-    
 
 
-// WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is
-//          it's target path needs to exist, or any as_value for it will be
+// WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", that is,
+//          its target path needs to exist, or any as_value for it will be
 //          a dangling reference to an unexistent movieclip !
 //          NOTE: this is just due to the wrong steps, see comment in header
 void
@@ -2143,31 +2148,22 @@ MovieClip::stagePlacementCallback()
 
     // Register this movieclip as a live one
     _vm.getRoot().addLiveChar(this);
+  
+    log_debug("Matrix: %s", getMatrix());
+
 
     // Register this movieclip as a core broadcasters listener
     registerAsListener();
 
     // It seems it's legal to place 0-framed movieclips on stage.
     // See testsuite/misc-swfmill.all/zeroframe_definemovieclip.swf
-    //m_def->ensure_frame_loaded(0);
-
-#if 0
-    // We might have loaded NO frames !
-    bool hasFrames = get_loaded_frames();
-    if ( ! hasFrames )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        LOG_ONCE( log_swferror(_("stagePlacementCallback: no frames loaded for movieclip/movie %s"), getTarget()) );
-        );
-    }
-#endif
 
     // We execute events immediately when the stage-placed character 
     // is dynamic, This is becase we assume that this means that 
     // the character is placed during processing of actions (opposed 
     // that during advancement iteration).
     //
-    // A more general implementation might ask movie_root about it's state
+    // A more general implementation might ask movie_root about its state
     // (iterating or processing actions?)
     // Another possibility to inspect could be letting movie_root decide
     // when to really queue and when rather to execute immediately the 
@@ -3234,13 +3230,6 @@ movieclip_attachMovie(const fn_call& fn)
     newch->set_name(newname);
     newch->setDynamic();
 
-    // place_character() will set depth on newch
-    if ( ! movieclip->attachCharacter(*newch, depthValue) )
-    {
-        log_error(_("Could not attach character at depth %d"), depthValue);
-        return as_value();
-    }
-
     /// Properties must be copied *after* the call to attachCharacter
     /// because attachCharacter() will reset SWFMatrix !!
     if (fn.nargs > 3 ) {
@@ -3261,6 +3250,14 @@ movieclip_attachMovie(const fn_call& fn)
             );
         }
     }
+
+    // place_character() will set depth on newch
+    if ( ! movieclip->attachCharacter(*newch, depthValue) )
+    {
+        log_error(_("Could not attach character at depth %d"), depthValue);
+        return as_value();
+    }
+
     return as_value(newch.get());
 }
 
@@ -3538,7 +3535,8 @@ movieclip_duplicateMovieClip(const fn_call& fn)
             depth > character::upperAccessibleBound)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("MovieClip.duplicateMovieClip: invalid depth %d passed; not duplicating"), depth);
+                log_aserror(_("MovieClip.duplicateMovieClip: "
+                        "invalid depth %d passed; not duplicating"), depth);
         );    
         return as_value();
     }
@@ -3551,7 +3549,8 @@ movieclip_duplicateMovieClip(const fn_call& fn)
     if (fn.nargs == 3)
     {
         boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
-        ch = movieclip->duplicateMovieClip(newname, depthValue, initObject.get());
+        ch = movieclip->duplicateMovieClip(newname, depthValue,
+                initObject.get());
     }
     else
     {

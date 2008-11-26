@@ -244,6 +244,7 @@ character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 as_value
 character::x_getset(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
@@ -334,7 +335,8 @@ character::y_getset(const fn_call& fn)
         }
 
 		SWFMatrix m = ptr->getMatrix();
-        // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
+        // NOTE: infinite_to_zero is wrong here, 
+        // see actionscript.all/setProperty.as
 		m.set_y_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newy)));
 		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
@@ -1104,8 +1106,8 @@ character::getTarget() const
 				// character created using 'new'
 				// like, new MovieClip, new Video, new TextField...
 				// 
-				log_debug("Character %p (%s) doesn't have a parent and is not a movie_instance",
-					ch, typeName(*ch));
+				log_debug("Character %p (%s) doesn't have a parent and "
+                        "is not a movie_instance", ch, typeName(*ch));
 				ss << "<no parent, depth" << ch->get_depth() << ">";
 				path.push_back(ss.str());
 			}
