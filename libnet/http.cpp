@@ -74,7 +74,6 @@ static Cache& cache = Cache::getDefaultInstance();
 HTTP::HTTP() 
     : _filetype(amf::AMF::FILETYPE_HTML),
       _filesize(0),
-      _port(80),
       _keepalive(false),
       _handler(0),
       _clientid(0),
@@ -90,7 +89,6 @@ HTTP::HTTP()
 HTTP::HTTP(Handler *hand) 
     : _filetype(amf::AMF::FILETYPE_HTML),
       _filesize(0),
-      _port(80),
       _keepalive(false),
       _clientid(0),
       _index(0),
@@ -108,17 +106,9 @@ HTTP::~HTTP()
 bool
 HTTP::clearHeader()
 {
-    _header.str("");
-    _body.str("");
-    _charset.clear();
-    _connections.clear();
-    _language.clear();
-    _encoding.clear();
-    _te.clear();
-    _accept.clear();
+//     _header.str("");
+    _buffer.clear();
     _filesize = 0;
-    _clientid = 0;
-    _index = 0;
     _max_requests = 0;
     
     return true;
@@ -195,17 +185,7 @@ HTTP::processGetRequest()
     
     clearHeader();
     extractCommand(*buf);
-    extractConnection(*buf);
-    extractAccept(*buf);
-    extractMethod(*buf);
-    extractReferer(*buf);
-    extractHost(*buf);
-    extractAgent(*buf);
-    extractLanguage(*buf);
-    extractCharset(*buf);
-    extractKeepAlive(*buf);
-    extractEncoding(*buf);
-    extractTE(*buf);
+    processHeaderFields(*buf);
 //    dump();
 
     _filespec = _url;
@@ -232,7 +212,9 @@ HTTP::processPostRequest()
 	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }
-    return processPostRequest();
+    clearHeader();
+    extractCommand(*buf);
+    return processHeaderFields(*buf);
 }
 
 // The order in which header fields with differing field names are
@@ -245,18 +227,8 @@ HTTP::processPostRequest(amf::Buffer &buf)
     GNASH_REPORT_FUNCTION;
     clearHeader();
     extractCommand(buf);
-    extractAccept(buf);
-    extractMethod(buf);
-    extractReferer(buf);
-    extractHost(buf);
-    extractAgent(buf);
-    extractLanguage(buf);
-    extractCharset(buf);
-    extractConnection(buf);
-    extractKeepAlive(buf);
-    extractEncoding(buf);
-    extractTE(buf);
-
+    processHeaderFields(buf);
+    
     _filespec = _url;
 
     if (!_url.empty()) {
@@ -267,7 +239,7 @@ HTTP::processPostRequest(amf::Buffer &buf)
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 (5.3 Request Header Fields)
 bool
-HTTP::processRequestFields(amf::Buffer &buf)
+HTTP::checkRequestFields(amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -297,7 +269,7 @@ HTTP::processRequestFields(amf::Buffer &buf)
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec7 (7.1 Entity Header Fields)
 bool
-HTTP::processEntityFields(amf::Buffer &buf)
+HTTP::checkEntityFields(amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -320,14 +292,35 @@ HTTP::processEntityFields(amf::Buffer &buf)
 
 }
 
+// http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec4 (4.5 General Header Fields)
+bool
+HTTP::checkGeneralFields(amf::Buffer &buf)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    const char *foo[] = {
+	"Cache-Control"
+	"Connection",		// Must look for Keep-Alive and close
+	"Date",
+	"Pragma",
+	"Trailer",
+	"Transfer-Encoding",	// Must look for Chunked-Body too
+	"Upgrade",
+	"Via",
+	"Warning",
+	0
+	};
+}
+
 gnash::Network::byte_t *
 HTTP::processHeaderFields(amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
     string head(reinterpret_cast<const char *>(buf.reference()));
+
     // The end of the header block is always followed by a blank line
     string::size_type end = head.find("\r\n\r\n", 0);
-    head.erase(end, buf.size()-end);
+//    head.erase(end, buf.size()-end);
     Tok t(head, Sep("\r\n"));
     for (Tok::iterator i = t.begin(); i != t.end(); ++i) {
 	string::size_type pos = i->find(":", 0);
@@ -339,10 +332,39 @@ HTTP::processHeaderFields(amf::Buffer &buf)
  	    std::transform(value.begin(), value.end(), value.begin(), 
  			   (int(*)(int)) tolower);
  	    _fields[name] = value;
+	    if (name == "keep-alive") {
+		log_debug("Got a Keep Alive HTTP header field!");
+		_keepalive = true;
+		if ((value != "on") && (value != "off")) {
+		    _max_requests = strtol(value.c_str(), NULL, 0);
+		    log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
+		}
+	    }
+	    // 
+	    if (name == "connection") {
+		if (value.find("keep-alive", 0) != string::npos) {
+		    log_debug("Got a Keep Alive in HTTP Connection header field!");
+		    _keepalive = true;
+		}
+	    }
+	    
+//	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
 	} else {
 	    const gnash::Network::byte_t *cmd = reinterpret_cast<const gnash::Network::byte_t *>(i->c_str());
 	    if (extractCommand(const_cast<gnash::Network::byte_t *>(cmd)) == HTTP::HTTP_NONE) {
 		break;
+	    } else {
+		string::size_type pos = i->find("HTTP/");
+		if (pos != string::npos) {
+		    _version.major = i->at(pos+5) - '0';
+		    _version.minor = i->at(pos+7) - '0';
+		    // HTTP 1.1 enables persistant network connections
+		    // by default.
+		    if (_version.minor > 0) {
+			log_debug("Enabling Keep Alive by default for HTTP > 1.0");
+			_keepalive = true;
+		    }
+		}
 	    }
 	}
     }
@@ -363,26 +385,6 @@ HTTP::getFieldItem(const std::string &name)
     return ptr;
 }
 
-// http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec4 (4.5 General Header Fields)
-bool
-HTTP::processGeneralFields(amf::Buffer &buf)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    const char *foo[] = {
-	"Cache-Control"
-	"Connection",		// Must look for Keep-Alive and close
-	"Date",
-	"Pragma",
-	"Trailer",
-	"Transfer-Encoding",	// Must look for Chunked-Body too
-	"Upgrade",
-	"Via",
-	"Warning",
-	0
-	};
-}
-
 bool
 HTTP::startHeader()
 {
@@ -393,29 +395,31 @@ HTTP::startHeader()
     return true;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatHeader(http_status_e type)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    formatHeader(_filesize, type);
-    return _header;
+    return formatHeader(_filesize, type);
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatCommon(const string &data)
 {
-    _header << data << "\r\n";
+//    _header << data << "\r\n";
+    _buffer += data;
+    _buffer += "\r\n";
 
-    return _header;
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatHeader(int filesize, http_status_e /* type */)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    _header << "HTTP/1.0 200 OK" << "\r\n";
+//    _header << "HTTP/1.0 200 OK" << "\r\n";
+    _buffer = "HTTP/1.0 200 OK\r\n";
     formatDate();
     formatServer();
 //     if (type == NONE) {
@@ -432,10 +436,10 @@ HTTP::formatHeader(int filesize, http_status_e /* type */)
     // All HTTP messages are followed by a blank line.
     terminateHeader();
 
-    return _header;
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatErrorResponse(http_status_e code)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -453,7 +457,7 @@ HTTP::formatErrorResponse(http_status_e code)
     _body << "\r\n";
 
     // First build the header
-    _header << "HTTP/1.1 " << code << " Not Found" << "\r\n";
+//    _header << "HTTP/1.1 " << code << " Not Found" << "\r\n";
     formatDate();
     formatServer();
     _filesize = _body.str().size();
@@ -461,10 +465,10 @@ HTTP::formatErrorResponse(http_status_e code)
     formatConnection("close");
     formatContentType(amf::AMF::FILETYPE_HTML);
 
-    return _header;
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatDate()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -473,222 +477,146 @@ HTTP::formatDate()
 //    cout <<  now.time_of_day() << "\r\n";
     
     boost::gregorian::date d(now.date());
-//     boost::gregorian::date d(boost::gregorian::day_clock::local_day());
-//     cout << boost::posix_time::to_simple_string(now) << "\r\n";
-//     cout << d.day_of_week() << "\r\n";
-//     cout << d.day() << "\r\n";
-//     cout << d.year() << "\r\n";
-//     cout << d.month() << "\r\n";
+
+//    cerr << boost::gregorian::to_simple_string(d) << endl;
+//    cerr << boost::posix_time::to_simple_string(now.time_of_day()) << endl;
+//    cerr << boost::posix_time::to_posix_string() << endl;
+    const char *months[] = {
+	"None",
+	"Jan",
+	"Feb",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"Aug",
+	"Sept",
+	"Oct",
+	"Nov",
+	"Dec"
+    };
     
-//    boost::date_time::time_zone_ptr zone(new posix_time_zone("MST"));
-//    boost::date_time::time_zone_base b(now "MST");
-//    cout << zone.dst_zone_abbrev() << "\r\n";
+    char num[12];
 
-    _header << "Date: " << d.day_of_week();
-    _header << ", " << d.day();
-    _header << " "  << d.month();
-    _header << " "  << d.year();
-    _header << " "  << now.time_of_day();
-    _header << " GMT" << "\r\n";
+    boost::gregorian::greg_weekday wd = d.day_of_week();
+//    _header << "Date: " << wd.as_long_string();
+    _buffer += "Date: ";
+    _buffer += wd.as_long_string();
+    
+//    _header << ", " << d.day();
+    _buffer += ", ";
+    sprintf(num, "%d", static_cast<int>(d.day()));
+    _buffer += num;
+    
+//    _header << " "  << d.month();
+    _buffer += " ";
+    _buffer += boost::gregorian::greg_month(d.month()).as_short_string();
 
-    return _header;
+//    _header << " "  << d.year();
+    _buffer += " ";
+    sprintf(num, "%d", static_cast<int>(d.year()));
+    _buffer += num;
+    
+//    _header << " "  << now.time_of_day();
+    _buffer += " ";
+    _buffer += boost::posix_time::to_simple_string(now.time_of_day());
+    
+//    _header << " GMT\r\n";
+    _buffer += " GMT\r\n";
+
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatServer()
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Server: Cygnal (GNU/Linux)" << "\r\n";
+//    _header << "Server: Cygnal (GNU/Linux)\r\n";
+    _buffer += "Server: Cygnal (GNU/Linux)\r\n";
 
-    return _header;
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatServer(const string &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Server: " << data << "\r\n";
+//    _header << "Server: " << data << "\r\n";
+    _buffer += "Server: ";
+    _buffer += data;
+    _buffer += "\r\n";
 
-    return _header;
+    return _buffer;
 }
 
-#if 0
-const stringstream &
-HTTP::formatMethod(const string &data)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Method: " << data << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatReferer(const string &refer)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Referer: " << refer << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatConnection(const string &options)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Connection: " << options << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatKeepAlive(const string &options)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Keep-Alive: " << options << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatHost(const string &host)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Host: " << host << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatAgent(const string &agent)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "User-Agent: " << agent << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatAcceptRanges(const string &range)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Accept-Ranges: " << range << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatEtag(const string &tag)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Etag: " << tag << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatLastModified(const string &date)
-{
-    _header << "Last-Modified: " << date << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatLanguage(const string &lang)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    // For some browsers this appears to also be Content-Language
-    _header << "Accept-Language: " << lang << "\r\n";
-    return _header;
-}
-
-const stringstream &
-HTTP::formatCharset(const string &set)
-{
-//    GNASH_REPORT_FUNCTION;
-    // For some browsers this appears to also be Content-Charset
-    _header << "Accept-Charset: " << set << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatEncoding(const string &code)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "Accept-Encoding: " << code << "\r\n";
-
-    return _header;
-}
-
-const stringstream &
-HTTP::formatTE(const string &te)
-{
-//    GNASH_REPORT_FUNCTION;
-    _header << "TE: " << te << "\r\n";
-
-    return _header;
-}
-
-#endif
-
-const stringstream &
+amf::Buffer &
 HTTP::formatContentLength()
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Content-Length: " << _filesize << "\r\n";
-
-    return _header;
+    
+    return formatContentLength(_filesize);
 }
 
-const stringstream &
-HTTP::formatContentLength(int filesize)
+amf::Buffer &
+HTTP::formatContentLength(boost::uint32_t filesize)
 {
 //    GNASH_REPORT_FUNCTION;
-    _header << "Content-Length: " << filesize << "\r\n";
+//    _header << "Content-Length: " << filesize << "\r\n";
 
-    return _header;
+    _buffer += "Content-Length: ";
+    char num[12];
+    sprintf(num, "%d", filesize);
+    _buffer += num;
+    _buffer += "\r\n";
+    
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatContentType()
 {
     return formatContentType(_filetype);
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatContentType(amf::AMF::filetype_e filetype)
 {
 //    GNASH_REPORT_FUNCTION;
     
     switch (filetype) {
       case amf::AMF::FILETYPE_HTML:
-	  _header << "Content-Type: text/html" << "\r\n";
+//	  _header << "Content-Type: text/html\r\n";
+	  _buffer += "Content-Type: text/html\r\n";
 //	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
 	  break;
       case amf::AMF::FILETYPE_SWF:
-	  _header << "Content-Type: application/x-shockwave-flash" << "\r\n";
+//	  _header << "Content-Type: application/x-shockwave-flash\r\n";
+	  _buffer += "Content-Type: application/x-shockwave-flash\r\n";
 //	  _header << "Content-Type: application/futuresplash" << "\r\n";
 	  break;
       case amf::AMF::FILETYPE_VIDEO:
-	  _header << "Content-Type: video/flv" << "\r\n";
+//	  _header << "Content-Type: video/flv\r\n";
+	  _buffer += "Content-Type: video/flv\r\n";
 	  break;
       case amf::AMF::FILETYPE_MP3:
-	  _header << "Content-Type: audio/mpeg" << "\r\n";
+//	  _header << "Content-Type: audio/mpeg\r\n";
+	  _buffer += "Content-Type: audio/mpeg\r\n";
 	  break;
       case amf::AMF::FILETYPE_FCS:
-	  _header << "Content-Type: application/x-fcs" << "\r\n";
+//	  _header << "Content-Type: application/x-fcs\r\n";
+	  _buffer += "Content-Type: application/x-fcs\r\n";
 	  break;
       default:
-	  _header << "Content-Type: text/html" << "\r\n";
+//	  _header << "Content-Type: text/html\r\n";
+	  _buffer += "Content-Type: text/html\r\n";
 //	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
     }
 
-    return _header;
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatLastModified()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -707,7 +635,7 @@ HTTP::formatLastModified()
     return formatLastModified(date.str());
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatGetReply(http_status_e code)
 {
     GNASH_REPORT_FUNCTION;
@@ -719,29 +647,31 @@ HTTP::formatGetReply(http_status_e code)
 //     buf->copy(ptr, _body.str().size());
 //    _handler->dump();
 
+#if 0
     if (_header.str().size()) {
         log_debug (_("Sent GET Reply"));
-	return _header;
+	return _buffer;
     } else {
 	clearHeader();
 	log_debug (_("Couldn't send GET Reply, no header data"));
     }    
-
-    return _header;
+#endif
+    
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatPostReply(rtmpt_cmd_e /* code */)
 {
     GNASH_REPORT_FUNCTION;
 
-    _header << "HTTP/1.1 200 OK" << "\r\n";
+//    _header << "HTTP/1.1 200 OK" << "\r\n";
     formatDate();
     formatServer();
     formatContentType(amf::AMF::FILETYPE_FCS);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
-    return _header;
+    return _buffer;
 
 #if 0
     formatHeader(_filesize, code);
@@ -760,14 +690,15 @@ HTTP::formatPostReply(rtmpt_cmd_e /* code */)
     }
 #endif
 
-    return _header;
+    return _buffer;
 }
 
-const stringstream &
+amf::Buffer &
 HTTP::formatRequest(const string &url, http_method_e req)
 {
 //    GNASH_REPORT_FUNCTION;
 
+#if 0
     _header.str("");
 
     _header << req << " " << url << "HTTP/1.1" << "\r\n";
@@ -782,65 +713,9 @@ HTTP::formatRequest(const string &url, http_method_e req)
 
 //    _header << "Connection: Keep-Alive, TE" << "\r\n";
     _header << "TE: deflate, gzip, chunked, identity, trailers" << "\r\n";
-
-    return _header;
-}
-// bool
-// HTTP::sendGetReply(Network &net)
-// {
-//     GNASH_REPORT_FUNCTION;    
-// }
-
-// This is what a GET request looks like.
-// GET /software/gnash/tests/flvplayer2.swf?file=http://localhost:4080/software/gnash/tests/lulutest.flv HTTP/1.1
-// User-Agent: Opera/9.01 (X11; Linux i686; U; en)
-// Host: localhost:4080
-// Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1
-// Accept-Language: en
-// Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1
-// Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0
-// Referer: http://localhost/software/gnash/tests/
-// Connection: Keep-Alive, TE
-// TE: deflate, gzip, chunked, identity, trailers
-int
-HTTP::extractAccept(Network::byte_t *data)
-{
-//    GNASH_REPORT_FUNCTION;
+#endif
     
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos;
-    string pattern = "Accept: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return -1;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.find("\n", start);
-//	    return "error";
-    }
-
-    length = end-start-pattern.size();
-    start = start+pattern.size();
-    pos = start;
-    while (pos <= end) {
-	pos = (body.find(",", start) + 2);
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos > end)) {
-	    length = end - start;
-	} else {
-	    length = pos - start - 2;
-	}
-	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
-	_accept.push_back(substr);
-	start = pos;
-    }
-
-    return _accept.size();
+    return _buffer;
 }
 
 /// These methods extract data from an RTMPT message. RTMP is an
@@ -967,475 +842,6 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
 
 //    _command = cmd;
     return HTTP::HTTP_NONE;
-}
-
-string &
-HTTP::extractAcceptRanges(Network::byte_t *data)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end;
-    string pattern = "Accept-Ranges: ";
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        _acceptranges = "error";
-        return _acceptranges;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-        _acceptranges = "error";
-        return _acceptranges;
-    }
-    
-    _acceptranges = body.substr(start+pattern.size(), end-start-1);
-    return _acceptranges;    
-}
-
-string &
-HTTP::extractMethod(Network::byte_t *data)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    boost::mutex::scoped_lock lock(stl_mutex);
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end;
-    int length;
-
-    length = body.size();
-    start = body.find(" ", 0);
-    if (start == string::npos) {
-        _method = "error";
-        return _method;
-    }
-    _method = body.substr(0, start);
-    end = body.find(" ", start+1);
-    if (end == string::npos) {
-        _method = "error";
-        return _method;
-    }
-    _url = body.substr(start+1, end-start-1);
-
-    // HTTP 1.0 doesn't support persistant connections by default.
-    if (body.substr(end+6, 3) == "1.0") {
-	log_debug("Disbling Keep Alive for default");
-	_version.major = 1;
-	_version.minor = 0;
-	_keepalive = false;
-    }
-    // HTTP 1.1 does support persistant connections by default.
-    if (body.substr(end+6, 3) == "1.1") {
-	log_debug("Enabling Keep Alive for default");
-	_version.major = 1;
-	_version.minor = 1;
-	_keepalive = true;
-    }    
-
-    log_debug("HTTP version is: HTTP %d.%d", _version.major, _version.minor);
-    end = _url.find("?", 0);
-//    _filespec = _url.substr(start+1, end);
-    return _method;
-}
-
-string &
-HTTP::extractReferer(Network::byte_t *data)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end;
-    string pattern = "Referer: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-	_referer = "error";
-	return _referer;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	_referer = "error";
-        return _referer;
-    }
-    
-    _referer = body.substr(start+pattern.size(), end-start-1);
-    return _referer;
-}
-
-int
-HTTP::extractField(const std::string &name, gnash::Network::byte_t *data)
-{
-//    GNASH_REPORT_FUNCTION;
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos;
-    string pattern = name + ": ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return -1;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.find("\n", start);
-//	    return "error";
-    }
-
-    length = end-start-pattern.size();
-    start = start+pattern.size();
-    string _connection = body.substr(start, length);
-    pos = start;
-    while (pos <= end) {
-	pos = (body.find(",", start) + 2);
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos > end)) {
-	    length = end - start;
-	} else {
-	    length = pos - start - 2;
-	}
-	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
-	_connections.push_back(substr);
-	// Opera uses upper case first letters, Firefox doesn't.
-	if ((substr == "Keep-Alive") || (substr == "keep-alive")) {
-	    log_debug("Got a Keep Alive in field!");
-	    _keepalive = true;
-	}
-	start = pos;
-    }
-
-    return _fields[name].size();
-}
-
-int
-HTTP::extractField(const std::string &name, amf::Buffer *data)
-{
-//    GNASH_REPORT_FUNCTION;
-    return extractField(name, data->reference());
-}
-
-int
-HTTP::extractConnection(Network::byte_t *data)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos;
-    string pattern = "Connection: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-	log_error("Couldn't match pattern %s to %s", pattern, body);
-        return -1;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.size();
-//	    return "error";
-    }
-
-    length = end-start-pattern.size();
-    start = start+pattern.size();
-    string _connection = body.substr(start, length);
-    pos = start;
-    while (pos <= end) {
-	pos = (body.find(",", start) + 2);
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos > end)) {
-	    length = end - start;
-	} else {
-	    length = pos - start - 2;
-	}
-	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
-	_connections.push_back(substr);
-	// Opera uses upper case first letters, Firefox doesn't.
-	if ((substr == "Keep-Alive") || (substr == "keep-alive")) {
-	    log_debug("Keep Alive connection specified in header");
-	    _keepalive = true;
-	} else {
-	    log_debug("Keep Alive connection not specified in header!");
-	}
-	
-	start = pos;
-    }
-
-    return _connections.size();
-}
-
-// KeepAlive directive
-// Syntax: (Apache 1.1) KeepAlive max-requests
-// Default: (Apache 1.1) KeepAlive 5
-// Syntax: (Apache 1.2) KeepAlive on|off
-// Default: (Apache 1.2) KeepAlive On
-// Context: server config
-// Status: Core
-// Compatibility: KeepAlive is only available in Apache 1.1 and later. 
-bool
-HTTP::extractKeepAlive(Network::byte_t *data)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos;
-    string pattern = "Keep-Alive: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return -1;
-    }
-
-    log_debug("Got a Keep Alive!");
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.size();
-//	    return "error";
-    }
-
-    length = end-start-pattern.size();
-    start = start+pattern.size();
-    string tmp = body.substr(start, length);
-
-    std::transform(tmp.begin(), tmp.end(), tmp.begin(), 
-               (int(*)(int)) toupper);
-    if ((tmp[0] >= '0') && (tmp[0] <= '9')) {
-	_max_requests = strtol(tmp.c_str(), NULL, 0);
-	_keepalive = true;	// if we get this header setting, we want to keep alive	
-    }    
-    if (tmp == "ON") {
-	_keepalive = true;	// if we get this header setting, we want to keep alive	
-    }
-    if (tmp == "OFF") {
-	_keepalive = false;	// if we get this header setting, we want to not keep alive	
-    }
-    
-    return _keepalive;
-}
-
-string &
-HTTP::extractHost(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end;
-    string pattern = "Host: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        _host = "error"; 
-        return _host;
-   }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-        _host = "error"; 
-        return _host;
-    }
-    
-    _host = body.substr(start+pattern.size(), end-start-1);
-    return _host;
-}
-
-string &
-HTTP::extractAgent(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end;
-    string pattern = "User-Agent: ";
-    _agent = "error";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return _agent;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-        return _agent;
-    }
-    
-    _agent = body.substr(start+pattern.size(), end-start-1);
-    return _agent;
-}
-
-int
-HTTP::extractLanguage(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos, terminate;
-    // match both Accept-Language and Content-Language
-    string pattern = "-Language: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return -1;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.find("\n", start);
-//        return "error";
-    }
-    length = end-start-pattern.size();
-    start = start+pattern.size();
-    pos = start;
-    terminate = (body.find(";", start));
-    if (terminate == string::npos) {
-	terminate = end;
-    }
-    
-    while (pos <= end) {
-	pos = (body.find(",", start));
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos >= terminate)) {
-	    length = terminate - start;
-	} else {
-	    length = pos - start;
-	}
-	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
-	_language.push_back(substr);
-	start = pos + 1;
-    }
-    
-//    _language = body.substr(start+pattern.size(), end-start-1);
-    return _language.size();
-}
-
-int
-HTTP::extractCharset(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos, terminate;
-// match both Accept-Charset and Content-Charset
-    string pattern = "-Charset: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return -1;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.find("\n", start);
-//        return "error";
-    }
-    
-    length = end-start-pattern.size();
-    start = start+pattern.size();
-    string _connection = body.substr(start, length);
-    pos = start;
-    terminate = (body.find(";", start));
-    if (terminate == string::npos) {
-	terminate = end;
-    }
-    while (pos <= end) {
-	pos = (body.find(",", start) + 2);
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos >= terminate)) {
-	    length = terminate - start;
-	} else {
-	    length = pos - start - 2;
-	}
-	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
-	_charset.push_back(substr);
-	start = pos;
-    }
-//    _charset = body.substr(start+pattern.size(), end-start-1);
-    return _charset.size();
-}
-
-int
-HTTP::extractEncoding(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos, terminate;
-    // match both Accept-Encoding and Content-Encoding
-    string pattern = "-Encoding: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return -1;
-    }
-    end =  body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.find("\n", start);
-//        return "error";
-    }
-    
-   length = end-start-pattern.size();
-    start = start+pattern.size();
-    string _connection = body.substr(start, length);
-    pos = start;
-    // Drop anything after a ';' character
-    terminate = (body.find(";", start));
-    if (terminate == string::npos) {
-	terminate = end;
-    }
-    while (pos <= end) {
-	pos = (body.find(",", start) + 2);
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos >= terminate)) {
-	    length = terminate - start;
-	} else {
-	    length = pos - start - 2;
-	}
-	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
-	_encoding.push_back(substr);
-	start = pos;
-    }
-
-//    _encoding = body.substr(start+pattern.size(), end-start-1);
-    return _encoding.size();
-}
-
-int
-HTTP::extractTE(Network::byte_t *data) {
-//    GNASH_REPORT_FUNCTION;
-    
-    string body = reinterpret_cast<const char *>(data);
-    string::size_type start, end, length, pos;
-    string pattern = "TE: ";
-    
-    start = body.find(pattern, 0);
-    if (start == string::npos) {
-        return -1;
-    }
-    end = body.find("\r\n", start);
-    if (end == string::npos) {
-	end = body.find("\n", start);
-//        return "error";
-    }
-    
-    length = end-start-pattern.size();
-    start = start+pattern.size();
-    pos = start;
-    while (pos <= end) {
-	pos = (body.find(",", start));
-	if (pos <= start) {
-	    return _encoding.size();
-	}
-	if ((pos == string::npos) || (pos >= end)) {
-	    length = end - start;
-	} else {
-	    length = pos - start;
-	}
-	string substr = body.substr(start, length);
-//	printf("FIXME: \"%s\"\n", substr.c_str());
-	_te.push_back(substr);
-	start = pos + 2;
-    }
-    return _te.size();
 }
 
 // Get the file type, so we know how to set the
@@ -1600,36 +1006,17 @@ HTTP::dump() {
 //    GNASH_REPORT_FUNCTION;
     
     boost::mutex::scoped_lock lock(stl_mutex);
-    vector<string>::iterator it;
-    
+        
     log_debug (_("==== The HTTP header breaks down as follows: ===="));
     log_debug (_("Filespec: %s"), _filespec.c_str());
     log_debug (_("URL: %s"), _url.c_str());
     log_debug (_("Version: %d.%d"), _version.major, _version.minor);
-    for (it = _accept.begin(); it != _accept.end(); it++) {
-        log_debug("Accept param: \"%s\"", (*(it)).c_str());
-    }
-    log_debug (_("Method: %s"), _method.c_str());
-    log_debug (_("Referer: %s"), _referer.c_str());
-    log_debug (_("Connections:"));
-    for (it = _connections.begin(); it != _connections.end(); it++) {
-        log_debug("Connection param is: \"%s\"", (*(it)).c_str());
-    }
-    log_debug (_("Host: %s"), _host.c_str());
-    log_debug (_("User Agent: %s"), _agent.c_str());
-    for (it = _language.begin(); it != _language.end(); it++) {
-        log_debug("Language param: \"%s\"", (*(it)).c_str());
-    }
-    for (it = _charset.begin(); it != _charset.end(); it++) {
-        log_debug("Charset param: \"%s\"", (*(it)).c_str());
-    }
-    for (it = _encoding.begin(); it != _encoding.end(); it++) {
-        log_debug("Encodings param: \"%s\"", (*(it)).c_str());
-    }
-    for (it = _te.begin(); it != _te.end(); it++) {
-        log_debug("TE param: \"%s\"", (*(it)).c_str());
-    }
 
+    map<string, string>::const_iterator it;
+    for (it = _fields.begin(); it != _fields.end(); ++it) {
+	log_debug("Field: \"%s\" = \"%s\"", it->first, it->second);
+    }
+    
     // Dump the RTMPT fields
     log_debug("RTMPT optional index is: ", _index);
     log_debug("RTMPT optional client ID is: ", _clientid);
@@ -1722,9 +1109,9 @@ http_handler(Handler::thread_params_t *args)
 	if (response.empty()) {
 	    cerr << "FIXME no hit for: " << www.getFilespec() << endl;
 	    www.clearHeader();
-	    const stringstream &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
-	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
-	    cache.addResponse(www.getFilespec(), www.getHeader());
+// 	    amf::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
+// 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
+// 	    cache.addResponse(www.getFilespec(), www.getHeader());
 	} else {
 	    cerr << "FIXME hit on: " << www.getFilespec() << endl;
 	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
