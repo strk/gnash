@@ -226,6 +226,14 @@ MediaParserFfmpeg::parseNextFrame()
 
 	//log_debug("av_read_frame call");
   	int rc = av_read_frame(_formatCtx, &packet);
+
+	// Update _lastParsedPosition, even in case of error..
+	boost::uint64_t curPos = _stream->tell();
+	if ( curPos > _lastParsedPosition )
+	{
+		_lastParsedPosition = curPos;
+	}
+
 	//log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
@@ -262,13 +270,6 @@ MediaParserFfmpeg::parseNextFrame()
 		log_debug("MediaParserFfmpeg::parseNextFrame: at eof after "
                 "av_read_frame");
 		_parsingComplete=true;
-	}
-
-	// Update _lastParsedPosition
-	boost::uint64_t curPos = _stream->tell();
-	if ( curPos > _lastParsedPosition )
-	{
-		_lastParsedPosition = curPos;
 	}
 
 	return ret;
