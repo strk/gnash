@@ -900,8 +900,11 @@ Button::getChildByName(const std::string& name)
 }
 
 void
-Button::stagePlacementCallback(as_object*)
+Button::stagePlacementCallback(as_object* initObj)
 {
+
+    assert(!initObj);
+
     saveOriginalTarget(); // for soft refs
 
     // Register this button instance as a live character

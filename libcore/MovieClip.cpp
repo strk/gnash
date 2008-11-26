@@ -602,11 +602,12 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
 
     newmovieclip->setDynamic();
 
-    if ( initObject ) newmovieclip->copyProperties(*initObject);
+    //if ( initObject ) newmovieclip->copyProperties(*initObject);
     //else newmovieclip->copyProperties(*this);
 
     // Copy event handlers from movieclip
-    // We should not copy 'm_action_buffer' since the 'm_method' already contains it
+    // We should not copy 'm_action_buffer' since the 
+    // 'm_method' already contains it
     newmovieclip->set_event_handlers(get_event_handlers());
 
     // Copy drawable
@@ -617,7 +618,8 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
-    parent->m_display_list.place_character(newmovieclip.get(), depth);
+    parent->m_display_list.place_character(newmovieclip.get(), depth, 
+            initObject);
     
     return newmovieclip; 
 }
