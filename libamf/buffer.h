@@ -208,6 +208,13 @@ public:
     /// 
     /// @return A reference to a Buffer.
     Buffer &operator+=(double num);
+
+    /// \brief Append an integer to existing data in the buffer.
+    /// 
+    /// @param num A numeric integer value.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(boost::uint32_t length);
     /// \brief Append a short to existing data in the buffer.
     /// 
     /// @param num A numeric short value.
@@ -281,8 +288,8 @@ public:
     ///		Which is the base address plus the total size of the
     ///		Buffer.
     ///
-    /// @return A real pointer to the last address of the Buffer.
-    gnash::Network::byte_t *end() { return begin() + _nbytes; };
+    /// @return A real pointer to the last address of the Buffer with data.
+    gnash::Network::byte_t *end() { return _seekptr - 1; };
 
     /// \brief Get the size of the Buffer.
     ///

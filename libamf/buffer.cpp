@@ -338,6 +338,19 @@ Buffer::operator+=(boost::uint16_t length)
     return append(ptr, sizeof(boost::uint16_t));
 }
 
+/// \brief Append an integer to existing data in the buffer.
+/// 
+/// @param num A numeric integer value.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(boost::uint32_t length)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
+    return append(ptr, sizeof(boost::uint32_t));
+}
+
 /// \brief Append a Buffer class to existing data in the buffer.
 ///
 /// @param buf A Buffer class containing the data to append.
