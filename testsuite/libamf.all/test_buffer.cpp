@@ -460,21 +460,21 @@ test_append()
 void
 test_remove()
 {
-    Network::byte_t *data1 = new Network::byte_t[12];
-    memset(data1, 0, 12);
-    Network::byte_t *data2 = new Network::byte_t[12];
-    memset(data2, 0, 12);
-    Network::byte_t *data3 = new Network::byte_t[12];
-    memset(data3, 0, 12);
+    Network::byte_t *data1 = new Network::byte_t[20];
+    memset(data1, 0, 20);
+    Network::byte_t *data2 = new Network::byte_t[20];
+    memset(data2, 0, 20);
+    Network::byte_t *data3 = new Network::byte_t[20];
+    memset(data3, 0, 20);
 
     // populate a buffer with some data
-    for (size_t i=0; i< 12; i++) {
+    for (size_t i=0; i< 20; i++) {
         data1[i] = i + 'a';
     }
 
     // Build identical buffer nissing one character
     memcpy(data2, data1, 6);
-    memcpy(data2 + 6, data1 + 7, 4);
+    memcpy(data2 + 6, data1 + 7, 20-7);
 
     // Remove a single byte
     Network::byte_t byte = 'g';
@@ -482,7 +482,7 @@ test_remove()
     buf1.clear();
     buf1.copy(data1, 10);
     buf1.remove(byte);
-    if (memcmp(data2, buf1.reference(), 9) == 0) {
+    if (memcmp(data2, buf1.reference(), 8) == 0) {
          runtest.pass ("Buffer::remove(Network::byte_t)");
     } else {
          runtest.fail ("Buffer::remove(Network::byte_t)");
@@ -492,7 +492,7 @@ test_remove()
     buf2.clear();
     buf2.copy(data1, 10);
     buf2.remove(6);
-    if (memcmp(data2, buf2.reference(), 9) == 0) {
+    if (memcmp(data2, buf2.reference(), 8) == 0) {
          runtest.pass ("Buffer::remove(int)");
     } else {
          runtest.fail ("Buffer::remove(int)");
@@ -506,7 +506,7 @@ test_remove()
     buf3.clear();
     buf3.copy(data1, 10);
     buf3.remove(6, 8);
-    if (memcmp(data3, buf3.reference(), 7) == 0) {
+    if (memcmp(data3, buf3.reference(), 6) == 0) {
          runtest.pass ("Buffer::remove(int, int)");
     } else {
          runtest.fail ("Buffer::remove(int, int)");
