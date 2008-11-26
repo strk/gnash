@@ -2159,30 +2159,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // It seems it's legal to place 0-framed movieclips on stage.
     // See testsuite/misc-swfmill.all/zeroframe_definemovieclip.swf
 
-    // We execute events immediately when the stage-placed character 
-    // is dynamic, This is becase we assume that this means that 
-    // the character is placed during processing of actions (opposed 
-    // that during advancement iteration).
-    //
-    // A more general implementation might ask movie_root about its state
-    // (iterating or processing actions?)
-    // Another possibility to inspect could be letting movie_root decide
-    // when to really queue and when rather to execute immediately the 
-    // events with priority INITIALIZE or CONSTRUCT ...
-    if (!isDynamic())
-    {
-        assert(!initObj);
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
-#endif
-        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
-
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
-#endif
-        std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
-        _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
-    }
 
     // Now execute frame tags and take care of queuing the LOAD event.
     //
@@ -2222,7 +2198,31 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
     }
 
-    if (isDynamic()) {
+    // We execute events immediately when the stage-placed character 
+    // is dynamic, This is becase we assume that this means that 
+    // the character is placed during processing of actions (opposed 
+    // that during advancement iteration).
+    //
+    // A more general implementation might ask movie_root about its state
+    // (iterating or processing actions?)
+    // Another possibility to inspect could be letting movie_root decide
+    // when to really queue and when rather to execute immediately the 
+    // events with priority INITIALIZE or CONSTRUCT ...
+    if (!isDynamic())
+    {
+        assert(!initObj);
+#ifdef GNASH_DEBUG
+        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
+#endif
+        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
+
+#ifdef GNASH_DEBUG
+        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
+#endif
+        std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
+        _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
+    }
+    else {
 
         // Properties from an initObj must be copied before construction, but
         // after the display list has been populated, so that _height and

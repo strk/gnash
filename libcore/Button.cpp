@@ -903,6 +903,8 @@ void
 Button::stagePlacementCallback(as_object* initObj)
 {
 
+    // A Button cannot be created dynamically, so can't have an 
+    // initObj.
     assert(!initObj);
 
     saveOriginalTarget(); // for soft refs
