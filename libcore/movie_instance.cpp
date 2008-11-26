@@ -39,6 +39,9 @@ movie_instance::movie_instance(movie_definition* def, character* parent)
 void
 movie_instance::stagePlacementCallback(as_object* initObj)
 {
+
+    assert (!initObj);
+
 	saveOriginalTarget();
 
 	//GNASH_REPORT_FUNCTION;

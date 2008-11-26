@@ -210,7 +210,8 @@ MediaParserFfmpeg::parseNextFrame()
 
 	if ( _parsingComplete )
 	{
-		//log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
+		//log_debug("MediaParserFfmpeg::parseNextFrame: parsing "
+        //"complete, nothing to do");
 		return false;
 	}
 
@@ -236,7 +237,7 @@ MediaParserFfmpeg::parseNextFrame()
         return false;
 	}
 
-	bool ret=false;
+	bool ret = false;
 
 	if ( packet.stream_index == _videoStreamIndex )
 	{
@@ -249,7 +250,8 @@ MediaParserFfmpeg::parseNextFrame()
 	else
 	{
 		ret = false; // redundant..
-		log_debug("MediaParserFfmpeg::parseNextFrame: unknown stream index %d", packet.stream_index);
+		log_debug("MediaParserFfmpeg::parseNextFrame: unknown stream index %d",
+                packet.stream_index);
 	}
 
 	av_free_packet(&packet);
@@ -257,7 +259,8 @@ MediaParserFfmpeg::parseNextFrame()
 	// Check if EOF was reached
 	if ( _stream->eof() )
 	{
-		log_debug("MediaParserFfmpeg::parseNextFrame: at eof after av_read_frame");
+		log_debug("MediaParserFfmpeg::parseNextFrame: at eof after "
+                "av_read_frame");
 		_parsingComplete=true;
 	}
 
