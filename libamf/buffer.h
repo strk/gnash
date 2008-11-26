@@ -289,7 +289,7 @@ public:
     ///		Buffer.
     ///
     /// @return A real pointer to the last address of the Buffer with data.
-    gnash::Network::byte_t *end() { return _seekptr - 1; };
+    gnash::Network::byte_t *end() { return _seekptr; };
 
     /// \brief Get the size of the Buffer.
     ///
