@@ -468,7 +468,7 @@ test_remove()
     memset(data3, 0, 20);
 
     // populate a buffer with some data
-    for (size_t i=0; i< 20; i++) {
+    for (size_t i=0; i< 19; i++) {
         data1[i] = i + 'a';
     }
 
@@ -478,21 +478,21 @@ test_remove()
 
     // Remove a single byte
     Network::byte_t byte = 'g';
-    Buffer buf1(10);
+    Buffer buf1(20);
     buf1.clear();
-    buf1.copy(data1, 10);
+    buf1.copy(data1, 20);
     buf1.remove(byte);
-    if (memcmp(data2, buf1.reference(), 8) == 0) {
+    if (memcmp(data2, buf1.reference(), 19) == 0) {
          runtest.pass ("Buffer::remove(Network::byte_t)");
     } else {
          runtest.fail ("Buffer::remove(Network::byte_t)");
     }
     
-    Buffer buf2(10);
+    Buffer buf2(20);
     buf2.clear();
-    buf2.copy(data1, 10);
+    buf2.copy(data1, 20);
     buf2.remove(6);
-    if (memcmp(data2, buf2.reference(), 8) == 0) {
+    if (memcmp(data2, buf2.reference(), 18) == 0) {
          runtest.pass ("Buffer::remove(int)");
     } else {
          runtest.fail ("Buffer::remove(int)");
@@ -502,9 +502,9 @@ test_remove()
     memcpy(data3, data1, 6);
     memcpy(data3 + 6, data1 + 9, 1);
     
-    Buffer buf3(10);
+    Buffer buf3(20);
     buf3.clear();
-    buf3.copy(data1, 10);
+    buf3.copy(data1, 20);
     buf3.remove(6, 8);
     if (memcmp(data3, buf3.reference(), 6) == 0) {
          runtest.pass ("Buffer::remove(int, int)");
