@@ -914,12 +914,37 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 int
 Network::writeNet(amf::Buffer *buffer)
 {
-    return writeNet(buffer->reference(), buffer->size());
+    GNASH_REPORT_FUNCTION;
+    return writeNet(buffer->reference(), buffer->allocated());
+};
+
+int
+Network::writeNet(int fd, amf::Buffer *buffer)
+{
+    GNASH_REPORT_FUNCTION;
+    return writeNet(fd, buffer->reference(), buffer->allocated());
+};
+
+// Write to the connection
+int
+Network::writeNet(amf::Buffer &buffer)
+{
+    GNASH_REPORT_FUNCTION;
+    return writeNet(buffer.reference(), buffer.allocated());
+};
+
+// Write to the connection
+int
+Network::writeNet(int fd, amf::Buffer &buffer)
+{
+    GNASH_REPORT_FUNCTION;
+    return writeNet(fd, buffer.reference(), buffer.allocated());
 };
 
 int
 Network::writeNet(const std::string& data)
 {
+//    GNASH_REPORT_FUNCTION;
     return writeNet(reinterpret_cast<const byte_t *>(data.c_str()), data.size());
 }
 
