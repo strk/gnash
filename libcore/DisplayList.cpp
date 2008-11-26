@@ -177,7 +177,7 @@ DisplayList::get_character_by_name_i(const std::string& name)
 }
 
 void
-DisplayList::place_character(character* ch, int depth)
+DisplayList::place_character(character* ch, int depth, as_object* initObj)
 {
   assert(!ch->isUnloaded());
   ch->set_invalidated();
@@ -219,7 +219,7 @@ DisplayList::place_character(character* ch, int depth)
   }
 
   // Give life to this instance
-  ch->stagePlacementCallback();
+  ch->stagePlacementCallback(initObj);
 
   testInvariant();
 }

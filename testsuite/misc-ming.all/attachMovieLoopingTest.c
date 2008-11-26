@@ -147,11 +147,14 @@ main(int argc, char** argv)
 		"			'square'+counter, 70+counter);"
 		"	}"
 		" 	check_equals(this['square'+counter]._x, 70*counter);"
-		"	note('Depth is '+70*counter);"
+        "   if (counter > 0) {"
+		" 	    check_equals(this['square'+counter]._height, 10 * counter + 5);"
+		"   };"
+        "	note('Depth is '+70*counter);"
 		"	counter++;"
 		"	note('Next counter is '+counter);"
 		"} else {"
-		"	totals(23); stop();"
+		"	totals(26); stop();"
 		"}"
 		);
 

@@ -245,7 +245,7 @@ Video::getVideoFrame()
 }
 
 void
-Video::stagePlacementCallback()
+Video::stagePlacementCallback(as_object*)
 {
     saveOriginalTarget(); // for softref
 

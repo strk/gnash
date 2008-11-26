@@ -900,7 +900,7 @@ Button::getChildByName(const std::string& name)
 }
 
 void
-Button::stagePlacementCallback()
+Button::stagePlacementCallback(as_object*)
 {
     saveOriginalTarget(); // for soft refs
 

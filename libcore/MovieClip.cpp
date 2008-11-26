@@ -213,7 +213,7 @@ public:
     {
         // don't include bounds of unloaded characters
         if ( ch->isUnloaded() ) return;
-        rect    chb = ch->getBounds();
+        rect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
     }
@@ -1272,11 +1272,12 @@ void MovieClip::omit_display()
 }
 
 bool
-MovieClip::attachCharacter(character& newch, int depth)
+MovieClip::attachCharacter(character& newch, int depth, as_object* initObject)
 { 
-    m_display_list.place_character(&newch, depth);    
+    m_display_list.place_character(&newch, depth, initObject);    
 
-    return true; // FIXME: check return from place_character above ?
+    // FIXME: check return from place_character above ?
+    return true; 
 }
 
 character*
@@ -2136,7 +2137,7 @@ MovieClip::registerAsListener()
 //          a dangling reference to an unexistent movieclip !
 //          NOTE: this is just due to the wrong steps, see comment in header
 void
-MovieClip::stagePlacementCallback()
+MovieClip::stagePlacementCallback(as_object* initObj)
 {
     assert(!isUnloaded());
 
@@ -2149,8 +2150,6 @@ MovieClip::stagePlacementCallback()
     // Register this movieclip as a live one
     _vm.getRoot().addLiveChar(this);
   
-    log_debug("Matrix: %s", getMatrix());
-
 
     // Register this movieclip as a core broadcasters listener
     registerAsListener();
@@ -2168,17 +2167,9 @@ MovieClip::stagePlacementCallback()
     // Another possibility to inspect could be letting movie_root decide
     // when to really queue and when rather to execute immediately the 
     // events with priority INITIALIZE or CONSTRUCT ...
-    if ( isDynamic() )
+    if (!isDynamic())
     {
-#ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s is dynamic, sending "
-                "INITIALIZE and CONSTRUCT events immediately"), getTarget());
-#endif
-        on_event(event_id::INITIALIZE);
-        constructAsScriptObject(); 
-    }
-    else
-    {
+        assert(!initObj);
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
 #endif
@@ -2228,6 +2219,25 @@ MovieClip::stagePlacementCallback()
 #endif
         execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
     }
+
+    if (isDynamic()) {
+
+        // Properties from an initObj must be copied before construction, but
+        // after the display list has been populated, so that _height and
+        // _width (which depend on bounds) are correct.
+        if (initObj) {
+            copyProperties(*initObj);
+        }
+
+        constructAsScriptObject(); 
+#ifdef GNASH_DEBUG
+        log_debug(_("Sprite %s is dynamic, sending "
+                "INITIALIZE and CONSTRUCT events immediately"), getTarget());
+#endif
+
+        on_event(event_id::INITIALIZE);
+    }
+
 
 }
 
@@ -2307,7 +2317,7 @@ MovieClip::constructAsScriptObject()
                 fn_call call(this, &env);
                 call.super = super;
 
-                // we don't use the constructor return (should we?)
+                    // we don't use the constructor return (should we?)
                 (*ctor)(call);
             }
         }
@@ -3222,7 +3232,6 @@ movieclip_attachMovie(const fn_call& fn)
     boost::intrusive_ptr<character> newch =
         exported_movie->create_character_instance(movieclip.get(), 0);
 
-    assert(newch.get() > reinterpret_cast<void*>(0xFFFF) );
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);
 #endif // ndef GNASH_USE_GC
@@ -3230,18 +3239,14 @@ movieclip_attachMovie(const fn_call& fn)
     newch->set_name(newname);
     newch->setDynamic();
 
-    /// Properties must be copied *after* the call to attachCharacter
-    /// because attachCharacter() will reset SWFMatrix !!
+    boost::intrusive_ptr<as_object> initObj;
+
     if (fn.nargs > 3 ) {
-        boost::intrusive_ptr<as_object> initObject = fn.arg(3).to_object();
-        if ( initObject ) {
-            //log_debug(_("Initializing properties from object"));
-            newch->copyProperties(*initObject);
-        }
-        else {
+        initObj = fn.arg(3).to_object();
+        if (!initObj) {
             // This is actually a valid thing to do,
             // the documented behaviour is to just NOT
-            // initializing the properties in this
+            // initialize the properties in this
             // case.
             IF_VERBOSE_ASCODING_ERRORS(
                 log_aserror(_("Fourth argument of attachMovie doesn't cast to "
@@ -3252,7 +3257,7 @@ movieclip_attachMovie(const fn_call& fn)
     }
 
     // place_character() will set depth on newch
-    if ( ! movieclip->attachCharacter(*newch, depthValue) )
+    if (!movieclip->attachCharacter(*newch, depthValue, initObj.get()))
     {
         log_error(_("Could not attach character at depth %d"), depthValue);
         return as_value();

@@ -102,7 +102,9 @@ public:
 	/// @param depth 
 	///	depth at which the new character is placed.
 	///
-	void	place_character(character* ch, int depth);
+    /// @param initObj
+    /// an object to initialize the new character's properties with.
+	void place_character(character* ch, int depth, as_object* initObj = 0);
 
 	/// \brief
 	/// Replace the old character at the specified depth with

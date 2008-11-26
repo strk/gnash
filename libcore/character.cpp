@@ -244,7 +244,6 @@ character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 as_value
 character::x_getset(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
@@ -651,7 +650,7 @@ character::height_getset(const fn_call& fn)
 	{
 		SWFMatrix m = ptr->getMatrix();
 		m.transform(bounds);
-		double h = TWIPS_TO_PIXELS( bounds.height() );      
+		double h = TWIPS_TO_PIXELS(bounds.height());      
 		rv = as_value(h);
 	}
 	else // setter
@@ -662,7 +661,7 @@ character::height_getset(const fn_call& fn)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Setting _height=%g of character %s (%s)"),
-			                newheight / 20,ptr->getTarget(), typeName(*ptr));
+			                newheight / 20, ptr->getTarget(), typeName(*ptr));
 			);
 		}
 
@@ -676,6 +675,7 @@ void
 character::set_height(double newheight)
 {
 	const rect bounds = getBounds();
+
 #if 0
 	if ( bounds.is_null() ) {
 		log_unimpl("FIXME: when setting _height of null-bounds character it seems we're supposed to change _xscale too (see MovieClip.as)");
@@ -684,13 +684,13 @@ character::set_height(double newheight)
 	const double oldheight = bounds.height();
 	assert(oldheight >= 0); // can't be negative can it?
 
-        double yscale = oldheight ? (newheight / oldheight) : 0; // avoid division by zero
-        double xscale = _xscale / 100.0;
-        double rotation = _rotation * PI / 180.0;
+    double yscale = oldheight ? (newheight / oldheight) : 0; // avoid division by zero
+    double xscale = _xscale / 100.0;
+    double rotation = _rotation * PI / 180.0;
 
-        SWFMatrix m = getMatrix();
-        m.set_scale_rotation(xscale, yscale, rotation);
-        setMatrix(m, true); // let caches be updated
+    SWFMatrix m = getMatrix();
+    m.set_scale_rotation(xscale, yscale, rotation);
+    setMatrix(m, true); // let caches be updated
 }
 
 as_value
@@ -800,23 +800,18 @@ void
 character::setMatrix(const SWFMatrix& m, bool updateCache)
 {
 
-    if (!(m == m_matrix))
-    {
-        //log_debug("setting SWFMatrix to: %s", m);
-		set_invalidated(__FILE__, __LINE__);
-		m_matrix = m;
+    if (m == m_matrix) return;
 
-		if ( updateCache ) // don't update caches if SWFMatrix wasn't updated too
-		{
-			_xscale = m_matrix.get_x_scale() * 100.0;
-			_yscale = m_matrix.get_y_scale() * 100.0;
-			_rotation = m_matrix.get_rotation() * 180.0 / PI;
-		}
-    }
-    else
+    //log_debug("setting SWFMatrix to: %s", m);
+    set_invalidated(__FILE__, __LINE__);
+    m_matrix = m;
+
+    // don't update caches if SWFMatrix wasn't updated too
+    if (updateCache) 
     {
-        //log_debug("setMatrix of character %s: SWFMatrix "
-        //"not changed", getTarget());
+        _xscale = m_matrix.get_x_scale() * 100.0;
+        _yscale = m_matrix.get_y_scale() * 100.0;
+        _rotation = m_matrix.get_rotation() * 180.0 / PI;
     }
 
 }
@@ -968,10 +963,8 @@ character::set_rotation(double rot)
 
 	//log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
 
-        if (_xscale < 0 ) // TODO: check if there's any case we should use _yscale here
-	{
-		rotation += PI;
-	}
+    // TODO: check if there's any case we should use _yscale here
+    if (_xscale < 0 ) rotation += PI; 
 
 	SWFMatrix m = getMatrix();
     m.set_rotation(rotation);
@@ -989,10 +982,7 @@ character::set_y_scale(double scale_percent)
     
     if (yscale != 0.0 && _yscale != 0.0)
     {
-        if (scale_percent * _yscale < 0.0)
-        {
-            yscale = -std::abs(yscale);
-        }
+        if (scale_percent * _yscale < 0.0) yscale = -std::abs(yscale);
         else yscale = std::abs(yscale);
     }
 
