@@ -92,6 +92,11 @@ tests()
     http.formatDate();
 //    cerr << "FIXME: " << http.getHeader() << endl;
 
+//     amf::Buffer &buf = http.getBuffer();
+//     cerr << "STREAM: " << http.getHeader() << endl;
+//     char *ptr = (char *)buf.reference();
+//     cerr << "BUFFER: " << buf.reference() << endl;
+
     regex_t regex_pat;
 
     // Check the Date field
@@ -100,9 +105,9 @@ tests()
     //     Date: Tue, 1 Apr 2008 19:52:16 GMT\r\n
     regcomp (&regex_pat, "Date: [A-Z][a-z]*, [0-9]* [A-Z][a-z]* [0-9]* [0-9:]* *GMT.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatDate()");
-        cerr << http.getHeader().c_str() << endl;
+        cerr << http.getHeader() << endl;
     } else {
         runtest.pass ("HTTP::formatDate()");
     }
@@ -112,10 +117,11 @@ tests()
     // Content-Length: 12345\r\n"
     http.clearHeader();
     http.formatContentLength(12345);
+
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Content-Length: [0-9]*.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatContentLength()");
     } else {
         runtest.pass ("HTTP::formatContentLength()");
@@ -131,7 +137,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Connection: [A-za-z-]*",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatConnection()");
     } else {
         runtest.pass ("HTTP::formatConnection()");
@@ -144,7 +150,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Server: Cygnal (GNU/Linux).*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatServer()");
     } else {
         runtest.pass ("HTTP::formatServer()");
@@ -159,7 +165,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Host: [A-za-z-]*:[0-9]*.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatHost()");
     } else {
         runtest.pass ("HTTP::formatHost()");
@@ -174,7 +180,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Accept-Language: en-US,en;q=0.9.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatLanguage()");
     } else {
         runtest.pass ("HTTP::formatLanguage()");
@@ -189,7 +195,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Accept-Charset: iso-8859-1.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatCharset()");
     } else {
         runtest.pass ("HTTP::formatCharset()");
@@ -203,7 +209,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Accept-Encoding: deflate, gzip.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatEncoding()");
     } else {
         runtest.pass ("HTTP::formatEncoding()");
@@ -218,7 +224,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "TE: deflate, gzip,.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatTE()");
     } else {
         runtest.pass ("HTTP::formatTE()");
@@ -232,7 +238,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "User-Agent: Gnash 0.8.1-cvs.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatAgent()");
     } else {
         runtest.pass ("HTTP::formatAgent()");
@@ -247,7 +253,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Content-Type: application/x-shockwave-flash.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatContentType(type)");
     } else {
         runtest.pass ("HTTP::formatContentType(type)");
@@ -259,7 +265,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Content-Type: text/html.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatContentType()");
     } else {
         runtest.pass ("HTTP::formatContenType()");
@@ -273,7 +279,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Referer: http://localhost.*index.html.*$",
              REG_NOSUB|REG_NEWLINE);
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatReferer()");
     } else {
         runtest.pass ("HTTP::formatReferer()");
@@ -287,7 +293,7 @@ tests()
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "HTTP/1.* 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatHeader(port)");
     } else {
         runtest.pass ("HTTP::formatheader(port)");
@@ -301,7 +307,7 @@ tests()
 //    cerr << "FIXME: " << http.getBody() << endl;
     regcomp (&regex_pat, "Date:.*Server:.*Content-Length:.*Connection:.*Content-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
-    if (regexec (&regex_pat, http.getHeader().c_str(), 0, (regmatch_t *)0, 0)) {
+    if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatErrorResponse(header)");
     } else {
         runtest.pass ("HTTP::formatErrorResponse(header)");
@@ -346,6 +352,7 @@ tests()
 
 // User Agent: Lynx/2.8.6rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.8b
 
+#if 0
     Network::byte_t *field1 = (Network::byte_t *)"GET /index.html HTTP/1.1";
     HTTP http1;
     http1.extractMethod(field1);
@@ -496,7 +503,8 @@ tests()
     } else {
         runtest.fail ("HTTP::extractTE()");
     }
-
+#endif
+    
 //     http.formatHeader(666, RTMP);
 //     http.formatRequest("http://localhost:4080", HTTP::GET);
     
@@ -560,6 +568,7 @@ test_post()
     ptr2 += "User-Agent: Opera/9.62.(X11;.Linux.i686;.U;.en) Presto/2.1.1\r\n";
     ptr2 += "Host: localhost:5080\r\n";
     ptr2 += "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap\r\n";
+    ptr2 += "Keep-Alive: 300\r\n";
     ptr2 += "Accept-Language: en\r\n";
     ptr2 += "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\r\n";
     ptr2 += "Accept-Encoding: deflate, gzip,.x-gzip, identity, *;q=0\r\n";
@@ -612,6 +621,10 @@ test_post()
         } else {
             runtest.fail("HTTP::getFieldItem(Connection)");
         }
+    }
+
+    if (dbglogfile.getVerbosity() > 0) {
+        http.dump();
     }
 
 }
