@@ -957,10 +957,8 @@ character::set_rotation(double rot)
 {
 	// Translate to the -180 .. 180 range
 	rot = std::fmod (rot, 360.0);
-	if (rot > 180.0)
-		rot -= 360.0;
-	else if (rot < -180.0)
-		rot += 360.0;
+	if (rot > 180.0) rot -= 360.0;
+	else if (rot < -180.0) rot += 360.0;
 
 	//log_debug("_rotation: %d", rot);
 
@@ -974,7 +972,7 @@ character::set_rotation(double rot)
 	}
 
 	SWFMatrix m = getMatrix();
-        m.set_rotation(rotation);
+    m.set_rotation(rotation);
 	setMatrix(m); // we update the cache ourselves
 
 	_rotation = rot;
