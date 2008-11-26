@@ -340,6 +340,13 @@ public:
     /// @return The amoount of unused bytes in the Buffer.
     size_t spaceLeft() { return (_nbytes - (_seekptr - _data.get())); };
     
+    /// \brief How much room has been allocated before the seek pointer.
+    ///		This is primarily used to see if the buffer is fully
+    ///		populated with data before appending more.
+    ///
+    /// @return The amoount of unused bytes in the Buffer.
+    size_t allocated() { return (_seekptr - _data.get()); };
+    
     ///  \brief Dump the internal data of this class in a human readable form.
     ///		This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
