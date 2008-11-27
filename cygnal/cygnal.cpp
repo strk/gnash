@@ -524,6 +524,11 @@ connection_handler(Handler::thread_params_t *args)
 	// connect at a time. This is to make it easier to debug
 	// things when you have a heavily threadd application.
 	args->netfd = net.newConnection(true, fd);
+	if (args->netfd <= 0) {
+	    log_debug("No new network connections");
+	    continue;
+	}
+	
 	log_debug("New network connection for fd #%d", args->netfd);
     
 	struct pollfd fds;
@@ -611,9 +616,12 @@ dispatch_handler(Handler::thread_params_t *args)
 	    }
         } else {
 	    log_debug("nothing to wait for...");
-	    hand->wait();
-	    log_debug("Got new network file descriptor to watch");
-//	    return;
+	    if (crcfile.getThreadingFlag()) {
+		hand->wait();
+		log_debug("Got new network file descriptor to watch");
+	    } else {
+		return;
+	    }
         }
     }
 } // end of dispatch_handler
