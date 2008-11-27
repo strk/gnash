@@ -178,7 +178,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//
 
 	boost::uint64_t dts = packet.dts;
-    if ( dts == AV_NOPTS_VALUE ) {
+    if ( dts == static_cast<boost::uint64_t>(AV_NOPTS_VALUE) ) {
         // We'll take 'nopts' value as zero.
         // Would likely be better to make it use timestamp
         // of previous frame, if any.
