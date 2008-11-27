@@ -442,104 +442,142 @@ HTTP::formatHeader(int filesize, http_status_e type)
     _buffer = "HTTP/";
     sprintf(num, "%d.%d", _version.major, _version.minor);
     _buffer += num;
-    sprintf(num, " %d", static_cast<int>(type));
+    sprintf(num, " %d ", static_cast<int>(type));
     _buffer += num;
-    _buffer += "\r\n";
     switch (type) {
       case CONTINUE:
+	  _buffer += "Continue\r\n";
 	  break;
       case SWITCHPROTOCOLS:
+	  _buffer += "Switch Protocols\r\n";
 	  break;
 	  // 2xx: Success - The action was successfully received,
 	  // understood, and accepted
 	  break;
       case OK:
-	  _buffer += " OK\r\n";
+	  _buffer += "OK\r\n";
 	  break;
       case CREATED:
+	  _buffer += "Created\r\n";
 	  break;
       case ACCEPTED:
+	  _buffer += "Accepted\r\n";
 	  break;
       case NON_AUTHORITATIVE:
+	  _buffer += "Non Authoritive\r\n";
 	  break;
       case NO_CONTENT:
+	  _buffer += "No Content\r\n";
 	  break;
       case RESET_CONTENT:
+	  _buffer += "Reset Content\r\n";
 	  break;
       case PARTIAL_CONTENT:
+	  _buffer += "Partial Content:\r\n";
 	  break;
         // 3xx: Redirection - Further action must be taken in order to
         // complete the request
       case MULTIPLE_CHOICES:
+	  _buffer += "Multiple Choices\r\n";
 	  break;
       case MOVED_PERMANENTLY:
+	  _buffer += "Moved Permanently\r\n";
 	  break;
       case FOUND:
+	  _buffer += "Found\r\n";
 	  break;
       case SEE_OTHER:
+	  _buffer += "See Other\r\n";
 	  break;
       case NOT_MODIFIED:
+	  _buffer += "Not Modified\r\n";
 	  break;
       case USE_PROXY:
+	  _buffer += "Use Proxy\r\n";
 	  break;
       case TEMPORARY_REDIRECT:
+	  _buffer += "Temporary Redirect\r\n";
 	  break;
         // 4xx: Client Error - The request contains bad syntax or
         // cannot be fulfilled
       case BAD_REQUEST:
+	  _buffer += "Bad Request\r\n";
 	  break;
       case UNAUTHORIZED:
+	  _buffer += "Unauthorized\r\n";
 	  break;
       case PAYMENT_REQUIRED:
+	  _buffer += "Payment Required\r\n";
 	  break;
       case FORBIDDEN:
+	  _buffer += "Forbidden\r\n";
 	  break;
       case NOT_FOUND:
-	  _buffer += " NOT FOUND\r\n";
+	  _buffer += "Not Found\r\n";
 	  break;
       case METHOD_NOT_ALLOWED:
+	  _buffer += "Method Not Allowed\r\n";
 	  break;
       case NOT_ACCEPTABLE:
+	  _buffer += "Not Acceptable\r\n";
 	  break;
       case PROXY_AUTHENTICATION_REQUIRED:
+	  _buffer += "Proxy Authentication Required\r\n";
 	  break;
       case REQUEST_TIMEOUT:
+	  _buffer += "Request Timeout\r\n";
 	  break;
       case CONFLICT:
+	  _buffer += "Conflict\r\n";
 	  break;
       case GONE:
+	  _buffer += "Gone\r\n";
 	  break;
       case LENGTH_REQUIRED:
+	  _buffer += "Length Required\r\n";
 	  break;
       case PRECONDITION_FAILED:
+	  _buffer += "Precondition Failed\r\n";
 	  break;
       case REQUEST_ENTITY_TOO_LARGE:
+	  _buffer += "Request Entity Too Large\r\n";
 	  break;
       case REQUEST_URI_TOO_LARGE:
+	  _buffer += "Request URI Too Large\r\n";
 	  break;
       case UNSUPPORTED_MEDIA_TYPE:
+	  _buffer += "Unsupported Media Type\r\n";
 	  break;
       case REQUESTED_RANGE_NOT_SATISFIABLE:
+	  _buffer += "Request Range Not Satisfiable\r\n";
 	  break;
       case EXPECTATION_FAILED:
+	  _buffer += "Expectation Failed\r\n";
 	  break;
 	  // 5xx: Server Error - The server failed to fulfill an apparently valid request
       case INTERNAL_SERVER_ERROR:
+	  _buffer += "Internal Server Error\r\n";
 	  break;
       case NOT_IMPLEMENTED:
+	  _buffer += "Method Not Implemented";
 	  break;
       case BAD_GATEWAY:
+	  _buffer += "Bad Gateway";
 	  break;
       case SERVICE_UNAVAILABLE:
+	  _buffer += "Service Unavailable\r\n";
 	  break;
       case GATEWAY_TIMEOUT:
+	  _buffer += "Gateway Timeout\r\n";
 	  break;
       case HTTP_VERSION_NOT_SUPPORTED:
+	  _buffer += "HTTP Version Not Supported\r\n";
 	  break;
 	  // Gnash/Cygnal extensions for internal use
       case LIFE_IS_GOOD:
 	  break;
       case CLOSEPIPE:
+	  _buffer += "Close Pipe\r\n";	  
 	  break;
       default:
 	  break;
@@ -629,29 +667,23 @@ HTTP::formatDate()
     char num[12];
 
     boost::gregorian::greg_weekday wd = d.day_of_week();
-//    _header << "Date: " << wd.as_long_string();
     _buffer += "Date: ";
     _buffer += wd.as_long_string();
     
-//    _header << ", " << d.day();
     _buffer += ", ";
     sprintf(num, "%d", static_cast<int>(d.day()));
     _buffer += num;
     
-//    _header << " "  << d.month();
     _buffer += " ";
     _buffer += boost::gregorian::greg_month(d.month()).as_short_string();
 
-//    _header << " "  << d.year();
     _buffer += " ";
     sprintf(num, "%d", static_cast<int>(d.year()));
     _buffer += num;
     
-//    _header << " "  << now.time_of_day();
     _buffer += " ";
     _buffer += boost::posix_time::to_simple_string(now.time_of_day());
     
-//    _header << " GMT\r\n";
     _buffer += " GMT\r\n";
 
     return _buffer;
@@ -661,7 +693,6 @@ amf::Buffer &
 HTTP::formatServer()
 {
 //    GNASH_REPORT_FUNCTION;
-//    _header << "Server: Cygnal (GNU/Linux)\r\n";
     _buffer += "Server: Cygnal (GNU/Linux)\r\n";
 
     return _buffer;
@@ -671,7 +702,6 @@ amf::Buffer &
 HTTP::formatServer(const string &data)
 {
 //    GNASH_REPORT_FUNCTION;
-//    _header << "Server: " << data << "\r\n";
     _buffer += "Server: ";
     _buffer += data;
     _buffer += "\r\n";
@@ -715,31 +745,22 @@ HTTP::formatContentType(amf::AMF::filetype_e filetype)
     
     switch (filetype) {
       case amf::AMF::FILETYPE_HTML:
-//	  _header << "Content-Type: text/html\r\n";
 	  _buffer += "Content-Type: text/html\r\n";
-//	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
 	  break;
       case amf::AMF::FILETYPE_SWF:
-//	  _header << "Content-Type: application/x-shockwave-flash\r\n";
 	  _buffer += "Content-Type: application/x-shockwave-flash\r\n";
-//	  _header << "Content-Type: application/futuresplash" << "\r\n";
 	  break;
       case amf::AMF::FILETYPE_VIDEO:
-//	  _header << "Content-Type: video/flv\r\n";
 	  _buffer += "Content-Type: video/flv\r\n";
 	  break;
       case amf::AMF::FILETYPE_MP3:
-//	  _header << "Content-Type: audio/mpeg\r\n";
 	  _buffer += "Content-Type: audio/mpeg\r\n";
 	  break;
       case amf::AMF::FILETYPE_FCS:
-//	  _header << "Content-Type: application/x-fcs\r\n";
 	  _buffer += "Content-Type: application/x-fcs\r\n";
 	  break;
       default:
-//	  _header << "Content-Type: text/html\r\n";
 	  _buffer += "Content-Type: text/html\r\n";
-//	  _header << "Content-Type: text/html; charset=UTF-8" << "\r\n";
     }
 
     return _buffer;
@@ -794,7 +815,6 @@ HTTP::formatPostReply(rtmpt_cmd_e /* code */)
 {
     GNASH_REPORT_FUNCTION;
 
-//    _header << "HTTP/1.1 200 OK" << "\r\n";
     formatDate();
     formatServer();
     formatContentType(amf::AMF::FILETYPE_FCS);
@@ -840,7 +860,6 @@ HTTP::formatRequest(const string & /* url */, http_method_e /* req */)
     _header << "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0" << "\r\n";
     _header << "Referer: " << url << "\r\n";
 
-//    _header << "Connection: Keep-Alive, TE" << "\r\n";
     _header << "TE: deflate, gzip, chunked, identity, trailers" << "\r\n";
 #endif
     
@@ -1186,6 +1205,20 @@ http_handler(Handler::thread_params_t *args)
 	filespec = url.substr(0, pos);
 	parameters = url.substr(pos + 1, url.size());
 
+	// See if the file is in the cache and already opened.
+	boost::shared_ptr<DiskStream> filestream(cache.findFile(filespec));
+	if (filestream) {
+	    cerr << "FIXME: found file in cache!" << endl;
+	} else {
+	    filestream.reset(new DiskStream);
+	    // Get the file size for the HTTP header
+	    if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
+		www.formatErrorResponse(HTTP::NOT_FOUND);
+	    }
+	}
+	
+//	cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
+	
 	if (cache.findPath(www.getFilespec()).empty()) {
 	    cache.addPath(www.getFilespec(), filespec);
 	
@@ -1210,19 +1243,6 @@ http_handler(Handler::thread_params_t *args)
 //	st.setBytes(www.getBytesIn() + www.getBytesOut());
 //	conndata->statistics->addStats();
 
-	if (filespec[filespec.size()-1] == '/') {
-	    filespec += "index.html";
-	}
-
-	// See if the file is in the cache and already opened.
-	boost::shared_ptr<DiskStream> filestream(cache.findFile(www.getFilespec()));
-	if (filestream) {
-	    cerr << "FIXME: found file in cache!" << endl;
-	} else {
-	  filestream.reset(new DiskStream);
-	}
-//	cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
-	
 	// Oopen the file and read the furst chunk into memory
  	filestream->open(filespec);
 	string response = cache.findResponse(www.getFilespec());
