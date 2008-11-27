@@ -57,6 +57,113 @@ namespace gnash {
 
 namespace gnash {
 
+/// Buffered AudioStreamer
+//
+/// This class you create passing a sound handler, which will
+/// be used to implement attach/detach and eventually throw away
+/// buffers of sound when no sound handler is given.
+///
+/// Then you push samples to a buffer of it and can request attach/detach 
+/// operations. When attached, the sound handler will fetch samples
+/// from the buffer, in a thread-safe way.
+///
+class BufferedAudioStreamer {
+public:
+
+    /// @param handler
+    ///     %Sound handler to use for attach/detach
+    ///
+    BufferedAudioStreamer(sound::sound_handler* handler);
+
+    /// A buffer with a cursor state
+    //
+    /// @todo Make private, have ::push take a simpler
+    ///       form (Buffer?)
+    ///
+    class CursoredBuffer
+    {
+    public:
+        DSOEXPORT CursoredBuffer()
+            :
+            m_size(0),
+            m_data(NULL),
+            m_ptr(NULL)
+        {}
+
+        DSOEXPORT ~CursoredBuffer()
+        {
+            delete [] m_data;
+        }
+
+        /// Number of samples left in buffer starting from cursor
+        boost::uint32_t m_size;
+
+        /// Actual data
+        //
+        /// The data must be allocated with new []
+        /// as will be delete []'d by the dtor
+        boost::uint8_t* m_data;
+
+        /// Cursor into the data
+        boost::uint8_t* m_ptr;
+    };
+
+    typedef std::deque<CursoredBuffer*> AudioQueue;
+
+    // Delete all samples in the audio queue.
+    void cleanAudioQueue();
+
+    sound::sound_handler* _soundHandler;
+
+    /// This is where audio frames are pushed by ::advance
+    /// and consumed by sound_handler callback (audio_streamer)
+    AudioQueue _audioQueue;
+
+    /// Number of bytes in the audio queue, protected by _audioQueueMutex
+    size_t _audioQueueSize;
+
+    /// The queue needs to be protected as sound_handler callback
+    /// is invoked by a separate thread (dunno if it makes sense actually)
+    boost::mutex _audioQueueMutex;
+
+    // Id of an attached audio streamer, 0 if none
+    sound::InputStream* _auxStreamer;
+
+    /// Attach the aux streamer.
+    //
+    /// On success, _auxStreamerAttached will be set to true.
+    /// Won't attach again if already attached.
+    ///
+    void attachAuxStreamer();
+
+    /// Detach the aux streamer
+    //
+    /// _auxStreamerAttached will be set to true.
+    /// Won't detach if not attached.
+    ///
+    void detachAuxStreamer();
+
+    /// Fetch samples from the audio queue
+    unsigned int fetch(boost::int16_t* samples, unsigned int nSamples,
+                    bool& eof);
+
+    /// Fetch samples from the audio queue
+    static unsigned int fetchWrapper(void* owner, boost::int16_t* samples,
+                    unsigned int nSamples, bool& eof);
+
+    /// Push a buffer to the audio queue
+    //
+    /// @param audio
+    ///     Samples buffer, ownership transferred.
+    ///
+    /// @todo: take something simpler (SimpleBuffer?)
+    ///
+    void push(CursoredBuffer* audio);
+
+};
+
+// -----------------------------------------------------------------
+
 /// NetStream_as ActionScript class
 //
 /// This class is responsible for handlign external
@@ -333,40 +440,6 @@ public:
 
 private:
 
-    /// A buffer with a cursor state
-    class CursoredBuffer
-    {
-    public:
-        DSOEXPORT CursoredBuffer()
-            :
-            m_size(0),
-            m_data(NULL),
-            m_ptr(NULL)
-        {}
-
-        DSOEXPORT ~CursoredBuffer()
-        {
-            delete [] m_data;
-        }
-
-        /// Number of samples left in buffer starting from cursor
-        boost::uint32_t m_size;
-
-        /// Actual data
-        //
-        /// The data must be allocated with new []
-        /// as will be delete []'d by the dtor
-        boost::uint8_t* m_data;
-
-        /// Cursor into the data
-        boost::uint8_t* m_ptr;
-    };
-
-    typedef std::deque<CursoredBuffer*> AudioQueue;
-
-    // Delete all samples in the audio queue.
-    void cleanAudioQueue();
-
     enum DecodingState {
         DEC_NONE,
         DEC_STOPPED,
@@ -448,7 +521,7 @@ private:
     //
     /// @return 0 on EOF or error, a decoded audio frame otherwise
     ///
-    CursoredBuffer* decodeNextAudioFrame();
+    BufferedAudioStreamer::CursoredBuffer* decodeNextAudioFrame();
 
     /// \brief
     /// Decode input audio frames with timestamp <= ts
@@ -505,33 +578,8 @@ private:
     ///
     std::auto_ptr<IOChannel> _inputStream;
 
-    /// This is where audio frames are pushed by ::advance
-    /// and consumed by sound_handler callback (audio_streamer)
-    AudioQueue _audioQueue;
-
-    /// Number of bytes in the audio queue, protected by _audioQueueMutex
-    size_t _audioQueueSize;
-
-    /// The queue needs to be protected as sound_handler callback
-    /// is invoked by a separate thread (dunno if it makes sense actually)
-    boost::mutex _audioQueueMutex;
-
-    // Id of an attached audio streamer, 0 if none
-    sound::InputStream* _auxStreamer;
-
-    /// Attach the aux streamer.
-    //
-    /// On success, _auxStreamerAttached will be set to true.
-    /// Won't attach again if already attached.
-    ///
-    void attachAuxStreamer();
-
-    /// Detach the aux streamer
-    //
-    /// _auxStreamerAttached will be set to true.
-    /// Won't detach if not attached.
-    ///
-    void detachAuxStreamer();
+    /// The buffered audio streamer
+    BufferedAudioStreamer _audioStreamer;
 
     /// Pop next queued status notification from the queue
     //

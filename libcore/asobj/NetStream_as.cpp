@@ -98,8 +98,9 @@ NetStream_as::NetStream_as()
 
     _soundHandler(_vm.getRoot().runInfo().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
-    _audioQueueSize(0),
-    _auxStreamer(0),
+
+    _audioStreamer(_soundHandler),
+
     _lastStatus(invalidStatus),
     _advanceTimer(0)
 {
@@ -728,11 +729,11 @@ void NetStream_as::close()
     GNASH_REPORT_FUNCTION;
 
     // Delete any samples in the audio queue.
-    cleanAudioQueue();
+    _audioStreamer.cleanAudioQueue();
 
     // When closing gnash before playback is finished, the soundhandler 
     // seems to be removed before netstream is destroyed.
-    detachAuxStreamer();
+    _audioStreamer.detachAuxStreamer();
 
     m_imageframe.reset();
 
@@ -794,7 +795,7 @@ NetStream_as::play(const std::string& c_url)
     }
 
     // We need to restart the audio
-    attachAuxStreamer();
+    _audioStreamer.attachAuxStreamer();
 
     return;
 }
@@ -895,61 +896,6 @@ NetStream_as::startPlayback()
     return true;
 }
 
-
-// audio callback, possibly running in a separate thread
-unsigned int
-NetStream_as::audio_streamer(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& eof)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
-    int len = nSamples*2;
-
-    NetStream_as* ns = static_cast<NetStream_as*>(owner);
-
-    boost::mutex::scoped_lock lock(ns->_audioQueueMutex);
-
-#if 0
-    log_debug("audio_streamer called, audioQueue size: %d, "
-        "requested %d bytes of fill-up",
-        ns->_audioQueue.size(), len);
-#endif
-
-
-    while (len)
-    {
-        if ( ns->_audioQueue.empty() )
-        {
-            break;
-        }
-
-        CursoredBuffer* samples = ns->_audioQueue.front();
-
-        assert( ! (samples->m_size%2) ); 
-        int n = std::min<int>(samples->m_size, len);
-        std::copy(samples->m_ptr, samples->m_ptr+n, stream);
-        //memcpy(stream, samples->m_ptr, n);
-        stream += n;
-        samples->m_ptr += n;
-        samples->m_size -= n;
-        len -= n;
-
-        if (samples->m_size == 0)
-        {
-            delete samples;
-            ns->_audioQueue.pop_front();
-        }
-
-        ns->_audioQueueSize -= n; // we consumed 'n' bytes here 
-
-    }
-
-    assert( ! (len%2) ); 
-
-    // currently never signalling EOF
-    eof=false;
-    return nSamples-(len/2);
-}
 
 std::auto_ptr<GnashImage> 
 NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
@@ -1082,7 +1028,7 @@ NetStream_as::decodeNextVideoFrame()
     return video;
 }
 
-NetStream_as::CursoredBuffer*
+BufferedAudioStreamer::CursoredBuffer*
 NetStream_as::decodeNextAudioFrame()
 {
     assert ( m_parser.get() );
@@ -1098,7 +1044,8 @@ NetStream_as::decodeNextAudioFrame()
         return 0;
     }
 
-    CursoredBuffer* raw = new CursoredBuffer();
+    // TODO: make the buffer cursored later ?
+    BufferedAudioStreamer::CursoredBuffer* raw = new BufferedAudioStreamer::CursoredBuffer();
     raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
 
     if ( _audioController ) // TODO: let the sound_handler do this .. sounds cleaner
@@ -1173,7 +1120,7 @@ NetStream_as::seek(boost::uint32_t posSeconds)
     log_debug("m_parser->seek(%d) returned %d", pos, newpos);
 
     // cleanup audio queue, so won't be consumed while seeking
-    cleanAudioQueue();
+    _audioStreamer.cleanAudioQueue();
     
     // 'newpos' will always be on a keyframe (supposedly)
     _playHead.seekTo(newpos);
@@ -1303,7 +1250,8 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
     while ( 1 )
     {
 
-        boost::mutex::scoped_lock lock(_audioQueueMutex);
+        // FIXME: use services of BufferedAudioStreamer for this
+        boost::mutex::scoped_lock lock(_audioStreamer._audioQueueMutex);
 
         // The sound_handler mixer will pull decoded
         // audio frames off the _audioQueue whenever 
@@ -1364,7 +1312,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
         //unsigned int bufferLimit = outSampleSize*samplesPerAdvance;
 
         unsigned int bufferLimit = 20;
-        unsigned int bufferSize = _audioQueue.size();
+        unsigned int bufferSize = _audioStreamer._audioQueue.size();
         if ( bufferSize > bufferLimit )
         {
             // we won't buffer more then 'bufferLimit' frames in the queue
@@ -1425,7 +1373,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
             if ( nextTimestamp > ts+msecsPerAdvance ) break; // next frame is in the future
         }
 
-        CursoredBuffer* audio = decodeNextAudioFrame();
+        BufferedAudioStreamer::CursoredBuffer* audio = decodeNextAudioFrame();
         if ( ! audio )
         {
             // Well, it *could* happen, why not ?
@@ -1444,23 +1392,14 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
             continue;
         }
 
-        lock.lock(); // now needs locking
-
 #ifdef GNASH_DEBUG_DECODING
         // this one we might avoid :) -- a less intrusive logging could
         // be take note about how many things we're pushing over
         log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
 #endif
 
-        if ( _auxStreamer )
-        {
-            _audioQueue.push_back(audio);
-            _audioQueueSize += audio->m_size;
-        }
-        else // don't bother pushing audio to the queue, nobody would consume it...
-        {
-            delete audio;
-        }
+        _audioStreamer.push(audio);
+
     }
 
     // If we consumed audio of current position, feel free to advance if needed,
@@ -1755,7 +1694,7 @@ void NetStream_as::pausePlayback()
     // Disconnect the soundhandler if we were playing before
     if ( oldStatus == PlayHead::PLAY_PLAYING )
     {
-        detachAuxStreamer();
+        _audioStreamer.detachAuxStreamer();
     }
 }
 
@@ -1768,7 +1707,7 @@ void NetStream_as::unpausePlayback()
     // Re-connect to the soundhandler if we were paused before
     if ( oldStatus == PlayHead::PLAY_PAUSED )
     {
-        attachAuxStreamer();
+        _audioStreamer.attachAuxStreamer();
     }
 }
 
@@ -1809,8 +1748,10 @@ NetStream_as::decodingStatus(DecodingState newstate)
     return _decoding_state;
 }
 
+//------- BufferedAudioStreamer (move in his own file)
+
 void
-NetStream_as::attachAuxStreamer()
+BufferedAudioStreamer::attachAuxStreamer()
 {
     if ( ! _soundHandler ) return;
     if ( _auxStreamer )
@@ -1822,14 +1763,15 @@ NetStream_as::attachAuxStreamer()
     }
 
     try {
-        _auxStreamer = _soundHandler->attach_aux_streamer(audio_streamer, (void*) this);
+        _auxStreamer = _soundHandler->attach_aux_streamer(BufferedAudioStreamer::fetchWrapper,
+            (void*)this);
     } catch (SoundException& e) {
         log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
     }
 }
 
 void
-NetStream_as::detachAuxStreamer()
+BufferedAudioStreamer::detachAuxStreamer()
 {
     if ( ! _soundHandler ) return;
     if ( !_auxStreamer )
@@ -1841,9 +1783,93 @@ NetStream_as::detachAuxStreamer()
     _auxStreamer = 0;
 }
 
+// audio callback, possibly running in a separate thread
+unsigned int
+BufferedAudioStreamer::fetchWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& eof)
+{
+    BufferedAudioStreamer* streamer = static_cast<BufferedAudioStreamer*>(owner);
+    return streamer->fetch(samples, nSamples, eof);
+}
+
+BufferedAudioStreamer::BufferedAudioStreamer(sound::sound_handler* handler)
+    :
+    _soundHandler(handler),
+    _audioQueue(),
+    _audioQueueSize(0),
+    _auxStreamer(0)
+{
+}
+
+unsigned int
+BufferedAudioStreamer::fetch(boost::int16_t* samples, unsigned int nSamples, bool& eof)
+{
+    //GNASH_REPORT_FUNCTION;
+
+    boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
+    int len = nSamples*2;
+
+    boost::mutex::scoped_lock lock(_audioQueueMutex);
+
+#if 0
+    log_debug("audio_streamer called, audioQueue size: %d, "
+        "requested %d bytes of fill-up",
+        _audioQueue.size(), len);
+#endif
+
+
+    while (len)
+    {
+        if ( _audioQueue.empty() )
+        {
+            break;
+        }
+
+        CursoredBuffer* samples = _audioQueue.front();
+
+        assert( ! (samples->m_size%2) ); 
+        int n = std::min<int>(samples->m_size, len);
+        std::copy(samples->m_ptr, samples->m_ptr+n, stream);
+        //memcpy(stream, samples->m_ptr, n);
+        stream += n;
+        samples->m_ptr += n;
+        samples->m_size -= n;
+        len -= n;
+
+        if (samples->m_size == 0)
+        {
+            delete samples;
+            _audioQueue.pop_front();
+        }
+
+        _audioQueueSize -= n; // we consumed 'n' bytes here 
+
+    }
+
+    assert( ! (len%2) ); 
+
+    // currently never signalling EOF
+    eof=false;
+    return nSamples-(len/2);
+}
 
 void
-NetStream_as::cleanAudioQueue()
+BufferedAudioStreamer::push(CursoredBuffer* audio)
+{
+    boost::mutex::scoped_lock lock(_audioQueueMutex);
+
+    if ( _auxStreamer )
+    {
+        _audioQueue.push_back(audio);
+        _audioQueueSize += audio->m_size;
+    }
+    else // don't bother pushing audio to the queue, nobody would consume it...
+    {
+        delete audio;
+    }
+}
+
+void
+BufferedAudioStreamer::cleanAudioQueue()
 {
     boost::mutex::scoped_lock lock(_audioQueueMutex);
     for (AudioQueue::iterator i=_audioQueue.begin(), e=_audioQueue.end(); i!=e; ++i)
@@ -1852,7 +1878,6 @@ NetStream_as::cleanAudioQueue()
     }
     _audioQueue.clear();
 }
-
 
 
 } // end of gnash namespace
