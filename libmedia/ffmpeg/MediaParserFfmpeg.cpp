@@ -176,12 +176,23 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//    pkt->pts can be AV_NOPTS_VALUE if the video format has B frames,
 	//    so it is better to rely on pkt->dts if you do not decompress the payload.
 	//
-	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_audioStream->time_base) * 1000.0); 
 
-#if 0
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return false;
-#else
+	boost::uint64_t dts = packet.dts;
+    if ( dts == AV_NOPTS_VALUE ) {
+        // We'll take 'nopts' value as zero.
+        // Would likely be better to make it use timestamp
+        // of previous frame, if any.
+        //
+        // For now, this handling fixes warnings like:
+        //   mdb:93, lastbuf:0 skiping granule 0
+        //   mdb:93, lastbuf:0 skiping granule 0
+        // When playing: http://downloads.bbc.co.uk/news/nol/shared/spl/hi/audio_slideshow/kenadamptw/slideshow_629.swf
+        //
+        log_error("FIXME: FFMPEG packet decompression timestamp has no value, taking as zero");
+        dts=0;
+    }
+	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
+
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
 	// TODO: FIXME: *2 is an hack to avoid libavcodec reading past end of allocated space
@@ -198,7 +209,6 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	pushEncodedAudioFrame(frame); 
 
 	return true;
-#endif
 }
 
 bool
