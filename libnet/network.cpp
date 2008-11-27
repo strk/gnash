@@ -284,8 +284,8 @@ Network::newConnection(bool block, int fd)
 	struct timespec tval;
 	sigset_t sigset, emptyset, blockset, pending;
 	sigemptyset(&blockset);         /* Block SIGINT */
-        sigaddset(&blockset, SIGINT);
-//        sigaddset(&blockset, SIGPIPE);
+//        sigaddset(&blockset, SIGINT);
+        sigaddset(&blockset, SIGPIPE);
 	sigprocmask(SIG_BLOCK, &blockset, &sigset);
 #else
 	struct timeval tval;
@@ -304,7 +304,7 @@ Network::newConnection(bool block, int fd)
         // Reset the timeout value, since select modifies it on return. To
         // block, set the timeout to zero.
 #ifdef HAVE_PSELECT
-	tval.tv_sec = 1;
+	tval.tv_sec = _timeout;
 	tval.tv_nsec = 0;
         if (block) {
 	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &blockset);
@@ -1110,9 +1110,9 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 //        sigaddset(&blockset, SIGPIPE);
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
-	tval.tv_sec = _timeout;
+	tval.tv_sec = 5; // FIXME: was _timeout;
 	tval.tv_nsec = 0;
-	int ret = ppoll(fds, limit, &tval, &emptyset);
+	int ret = ppoll(fds, limit, &tval, &blockset);
 	sigpending(&pending);
 	if (sigismember(&pending, SIGINT)) {
 	    log_debug("Have a pending SIGINT interupt waiting!");
