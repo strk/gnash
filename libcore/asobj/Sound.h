@@ -40,14 +40,14 @@
 
 // Forward declarations
 namespace gnash {
-	class CharacterProxy;
-	namespace sound {
-		class sound_handler;
+    class CharacterProxy;
+    namespace sound {
+        class sound_handler;
         class InputStream;
-	}
-	namespace media {
-		class MediaHandler;
-	}
+    }
+    namespace media {
+        class MediaHandler;
+    }
 }
 
 namespace gnash {
@@ -57,102 +57,102 @@ class fn_call;
   
 class Sound : public as_object {
 public:
-	Sound();
+    Sound();
 
-	/// Make this sound control the given character
-	//
-	/// NOTE: 0 is accepted, to implement an "invalid"
-	///       controller type.
-	///
-	void attachCharacter(character* attachedChar);
+    /// Make this sound control the given character
+    //
+    /// NOTE: 0 is accepted, to implement an "invalid"
+    ///       controller type.
+    ///
+    void attachCharacter(character* attachedChar);
 
-	~Sound();
-	void attachSound(int si, const std::string& name);
+    ~Sound();
+    void attachSound(int si, const std::string& name);
 
-	/// Get number of bytes loaded from the external sound (if any)
-	long getBytesLoaded();
+    /// Get number of bytes loaded from the external sound (if any)
+    long getBytesLoaded();
 
-	/// Get total number of bytes in the external sound being loaded
-	//
-	/// @return -1 if unknown
-	///
-	long getBytesTotal();
+    /// Get total number of bytes in the external sound being loaded
+    //
+    /// @return -1 if unknown
+    ///
+    long getBytesTotal();
 
-	void getPan();
-	void getTransform();
+    void getPan();
+    void getTransform();
 
-	/// Get volume from associated resource
-	//
-	/// @return true of volume was obtained, false
-	///         otherwise (for example if the associated
-	///         character was unloaded).
-	///
-	bool getVolume(int& volume);
-	void setVolume(int volume);
+    /// Get volume from associated resource
+    //
+    /// @return true of volume was obtained, false
+    ///         otherwise (for example if the associated
+    ///         character was unloaded).
+    ///
+    bool getVolume(int& volume);
+    void setVolume(int volume);
 
-	void loadSound(const std::string& file, bool streaming);
-	void setPan();
-	void setTransform();
-	void start(int offset, int loops);
-	void stop(int si);
-	unsigned int getDuration();
-	unsigned int getPosition();
+    void loadSound(const std::string& file, bool streaming);
+    void setPan();
+    void setTransform();
+    void start(int offset, int loops);
+    void stop(int si);
+    unsigned int getDuration();
+    unsigned int getPosition();
 
-	std::string soundName;	
+    std::string soundName;  
 
 private:
 
 #ifdef GNASH_USE_GC
-	/// Mark all reachable resources of a Sound, for the GC
-	//
-	/// Reachable resources are:
-	///	- associated NetConnection object (connection)
-	///	- attached character object (attachedCharacter)
-	///
-	void markReachableResources() const;
+    /// Mark all reachable resources of a Sound, for the GC
+    //
+    /// Reachable resources are:
+    /// - associated NetConnection object (connection)
+    /// - attached character object (attachedCharacter)
+    ///
+    void markReachableResources() const;
 #endif // GNASH_USE_GC
 
-	bool _duration;
-	bool _id3;
-	bool _onID3;
-	bool _onLoad;
-	bool _onComplete;
-	bool _position;
+    bool _duration;
+    bool _id3;
+    bool _onID3;
+    bool _onLoad;
+    bool _onComplete;
+    bool _position;
 
-	boost::intrusive_ptr<NetConnection> connection;
+    boost::intrusive_ptr<NetConnection> connection;
 
-	boost::scoped_ptr<CharacterProxy> attachedCharacter;
-	int soundId;
-	bool externalSound;
-	std::string externalURL;
-	bool isStreaming;
+    boost::scoped_ptr<CharacterProxy> attachedCharacter;
+    int soundId;
+    bool externalSound;
+    std::string externalURL;
+    bool isStreaming;
 
-	sound::sound_handler* _soundHandler;
+    sound::sound_handler* _soundHandler;
 
-	media::MediaHandler* _mediaHandler;
+    media::MediaHandler* _mediaHandler;
 
-	boost::scoped_ptr<media::MediaParser> _mediaParser;
+    boost::scoped_ptr<media::MediaParser> _mediaParser;
 
-	boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
+    boost::scoped_ptr<media::AudioDecoder> _audioDecoder;
 
-	/// Number of milliseconds into the sound to start it
-	//
-	/// This is set by start()
-	boost::uint64_t _startTime;
+    /// Number of milliseconds into the sound to start it
+    //
+    /// This is set by start()
+    boost::uint64_t _startTime;
 
-	boost::scoped_array<boost::uint8_t> _leftOverData;
-	boost::uint8_t* _leftOverPtr;
-	boost::uint32_t _leftOverSize;
+    boost::scoped_array<boost::uint8_t> _leftOverData;
+    boost::uint8_t* _leftOverPtr;
+    boost::uint32_t _leftOverSize;
 
-	/// This is a sound_handler::aux_streamer_ptr type.
-	static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& etEOF);
+    /// This is a sound_handler::aux_streamer_ptr type.
+    static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& etEOF);
 
-	unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF);
+    unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF);
 
     /// The aux streamer for sound handler
-	sound::InputStream* _inputStream;
+    sound::InputStream* _inputStream;
 
-	int remainingLoops;
+    int remainingLoops;
 
     /// Query media parser for audio info, create decoder and attach aux streamer
     /// if found.
@@ -185,7 +185,7 @@ private:
     /// Thread-safe setter for _soundCompleted
     void markSoundCompleted(bool completed);
 
-	/// Is this sound attached to the soundhandler?
+    /// Is this sound attached to the soundhandler?
     bool isAttached() const {
         return _inputStream!=0;
     }
