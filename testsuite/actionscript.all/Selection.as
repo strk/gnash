@@ -52,6 +52,21 @@ check_equals (typeof(Selection.setFocus), 'function');
 // test the Selection::setSelection method
 check_equals (typeof(Selection.setSelection), 'function'); 
 
+check_equals(typeof(Selection.getFocus()), "null");
+
+ret = Selection.setFocus();
+check_equals(ret, false);
+
+ret = Selection.setFocus(4);
+check_equals(ret, false);
+
+ret = Selection.setFocus(_root);
+check_equals(ret, false);
+
+ret = Selection.setFocus(_root, 5);
+check_equals(ret, false);
+
+
 // Methods added in version 6
 #if OUTPUT_VERSION >= 6
 
@@ -63,6 +78,54 @@ check_equals (typeof(Selection.setSelection), 'function');
  xcheck(Selection.hasOwnProperty("_listeners"));
  xcheck_equals(typeof(Selection._listeners), 'object');
  xcheck(Selection._listeners instanceof Array);
+
+ _root.createEmptyMovieClip("mc", getNextHighestDepth());
+ check(mc instanceof MovieClip);
+ ret = Selection.setFocus(mc);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+
+ mc.createTextField("tx", getNextHighestDepth(), 400, 400, 10, 10);
+
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(tx);
+ check_equals(typeof(ret), "boolean");
+ check_equals(ret, true);
+
+ // An extra argument when the first argument is valid.
+ ret = Selection.setFocus(tx, 5);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+
+ tx.focusEnabled = true;
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(tx);
+ check_equals(ret, true);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus("tx");
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+
+ mc.focusEnabled = true;
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(mc);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
+ ret = Selection.setFocus("mc");
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
+ ret = Selection.setFocus(5);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
+
+ Selection.setFocus(tx);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus("tx");
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(tx);
+ check_equals(ret, true);
+ check_equals(Selection.getFocus(), null);
 
 #endif // OUTPUT_VERSION >= 6
 
