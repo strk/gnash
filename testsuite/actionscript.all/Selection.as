@@ -28,6 +28,8 @@ rcsid="$Id: Selection.as,v 1.15 2008/03/11 19:31:48 strk Exp $";
 // Selection was added in SWF5
 //-------------------------------
 
+note("If you click on the window or change focus before or during this test, some checks may fail.");
+
 check_equals (typeof(Selection), 'object');
 
 // Selection is an obect, not a class !
@@ -52,6 +54,21 @@ check_equals (typeof(Selection.setFocus), 'function');
 // test the Selection::setSelection method
 check_equals (typeof(Selection.setSelection), 'function'); 
 
+xcheck_equals(typeof(Selection.getFocus()), "null");
+
+ret = Selection.setFocus();
+xcheck_equals(ret, false);
+
+ret = Selection.setFocus(4);
+xcheck_equals(ret, false);
+
+ret = Selection.setFocus(_root);
+xcheck_equals(ret, false);
+
+ret = Selection.setFocus(_root, 5);
+xcheck_equals(ret, false);
+
+
 // Methods added in version 6
 #if OUTPUT_VERSION >= 6
 
@@ -63,6 +80,54 @@ check_equals (typeof(Selection.setSelection), 'function');
  xcheck(Selection.hasOwnProperty("_listeners"));
  xcheck_equals(typeof(Selection._listeners), 'object');
  xcheck(Selection._listeners instanceof Array);
+
+ _root.createEmptyMovieClip("mc", getNextHighestDepth());
+ check(mc instanceof MovieClip);
+ ret = Selection.setFocus(mc);
+ xcheck_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+
+ mc.createTextField("tx", getNextHighestDepth(), 400, 400, 10, 10);
+
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(tx);
+ xcheck_equals(typeof(ret), "boolean");
+ xcheck_equals(ret, true);
+
+ // An extra argument when the first argument is valid.
+ ret = Selection.setFocus(tx, 5);
+ xcheck_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+
+ tx.focusEnabled = true;
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(tx);
+ xcheck_equals(ret, true);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus("tx");
+ xcheck_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+
+ mc.focusEnabled = true;
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(mc);
+ xcheck_equals(ret, false);
+ xcheck_equals(Selection.getFocus(), "_level0.mc");
+ ret = Selection.setFocus("mc");
+ xcheck_equals(ret, false);
+ xcheck_equals(Selection.getFocus(), "_level0.mc");
+ ret = Selection.setFocus(5);
+ xcheck_equals(ret, false);
+ xcheck_equals(Selection.getFocus(), "_level0.mc");
+
+ Selection.setFocus(tx);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus("tx");
+ xcheck_equals(ret, false);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(tx);
+ xcheck_equals(ret, true);
+ check_equals(Selection.getFocus(), null);
 
 #endif // OUTPUT_VERSION >= 6
 
