@@ -154,7 +154,7 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
     } else {
         buffer = gst_buffer_new();
 
-        GST_BUFFER_DATA(buffer) = const_cast<uint8_t*>(frame.data());
+        GST_BUFFER_DATA(buffer) = const_cast<boost::uint8_t*>(frame.data());
         GST_BUFFER_SIZE(buffer) = frame.dataSize();
         GST_BUFFER_OFFSET(buffer) = frame.frameNum();
         GST_BUFFER_TIMESTAMP(buffer) = GST_CLOCK_TIME_NONE;

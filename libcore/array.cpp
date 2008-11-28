@@ -863,7 +863,7 @@ Array_as::set_member(string_table::key name,
     }
 
 
-    return as_object::as_object::set_member(name,val, nsname, ifFound);
+    return as_object::set_member(name,val, nsname, ifFound);
 }
 
 Array_as*

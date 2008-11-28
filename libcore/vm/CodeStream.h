@@ -178,11 +178,11 @@ public:
 	}
 
 	/// Read a signed 8-bit character.
-	int8_t read_s8()
+    boost::int8_t read_s8()
 	{
 		if (mCurrent == mEnd)
 			throw CodeStreamException();
-		return static_cast<int8_t> (*mCurrent++);
+		return static_cast<boost::int8_t> (*mCurrent++);
 	}
 
 	/// Read an unsigned 8-bit character.

@@ -317,12 +317,12 @@ long double SWFStream::read_d64()
         throw ParserException(_("Unexpected end of stream while reading"));
     }
     
-    uint64_t low = buf[0];
+    boost::uint64_t low = buf[0];
     low |= buf[1] << 8;
     low |= buf[2] << 16;
     low |= buf[3] << 24;
 
-    uint64_t hi = buf[4];
+    boost::uint64_t hi = buf[4];
     hi |= buf[5] << 8;
     hi |= buf[6] << 16;
     hi |= buf[7] << 24;
@@ -337,7 +337,8 @@ boost::uint8_t    SWFStream::read_u8()
     return m_input->read_byte();
 }
 
-int8_t    SWFStream::read_s8()
+boost::int8_t
+SWFStream::read_s8()
 {
     // read_u8 will align
     return read_u8();

@@ -793,7 +793,7 @@ Machine::execute()
 ///  byte -- as a raw byte
 	case SWF::ABC_ACTION_PUSHBYTE:
 	{
-		int8_t b = mStream->read_s8();
+        boost::int8_t b = mStream->read_s8();
 		mStack.grow(1);
 		mStack.top(0) = b;
 		break;
