@@ -275,43 +275,47 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     boost::shared_ptr<Buffer> nullobj = null.encode();    
 
     // Set the BOOLEAN object element that is the last field in the packet
-    Element boolean;
-    boolean.makeBoolean(flag);
-    boost::shared_ptr<Buffer> boolobj = boolean.encode();    
-    
-    // Calculate the packet size, rather than use the default as we want to
-    // to be concious of the memory usage. The command name and the optional
-    // file name are the only two dynamically sized fields.
-    size_t pktsize = strobj->size() + name.size();
-    // Add 2 bytes for the Boolean, and 16 bytes for the two doubles, which are
-    // 8 bytes apiece.
-    pktsize += (sizeof(double) * 2) + 2;
-    boost::shared_ptr<Buffer> buf(new Buffer(pktsize));    
-    *buf += strobj;
-    *buf += stridobj;
-    *buf += nullobj;
-    // Seek doesn't use the boolean flag
+    // (SEEK and PLAY don't use the boolean flag)
+    boost::shared_ptr<Buffer> boolobj;
     if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
-	*buf += boolobj;
+        Element boolean;
+        boolean.makeBoolean(flag);
+        boolobj = boolean.encode();    
+    }
+
+    // The seek command also may have an optional location to seek to
+    boost::shared_ptr<Buffer> posobj;
+    if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
+        Element seek;
+        seek.makeNumber(pos);
+        posobj = seek.encode();
     }
 
     // The play command has an optional field, which is the name of the file
     // used for the stream. A Play command without this name set play an
     // existing stream that is already open.
+    boost::shared_ptr<Buffer> fileobj; 
     if (!name.empty()) {
-	Element filespec;
-	filespec.makeString(name);
-	boost::shared_ptr<Buffer> fileobj = filespec.encode();
-	*buf += fileobj;
+        Element filespec;
+        filespec.makeString(name);
+        fileobj = filespec.encode();
     }
-    
-    // The seek command also may have an optional location to seek to
-    if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
-	Element seek;
-	seek.makeNumber(pos);
-	boost::shared_ptr<Buffer> posobj = seek.encode();
-	*buf += posobj;
-    }
+
+    // Calculate the packet size, rather than use the default as we want to
+    // to be concious of the memory usage. The command name and the optional
+    // file name are the only two dynamically sized fields.
+    size_t pktsize = strobj->size() + stridobj->size() + nullobj->size();
+    if ( boolobj ) pktsize += boolobj->size();
+    if ( fileobj ) pktsize += fileobj->size();
+    if ( posobj ) pktsize += posobj->size();
+
+    boost::shared_ptr<Buffer> buf(new Buffer(pktsize));    
+    *buf += strobj;
+    *buf += stridobj;
+    *buf += nullobj;
+    if ( boolobj ) *buf += boolobj;
+    if ( fileobj ) *buf += fileobj;
+    if ( posobj ) *buf += posobj;
 
     return buf;
 }
@@ -391,7 +395,8 @@ RTMPClient::clientFinish()
 	}
     }
 
-    writeNet(_handshake->reference(), RTMP_BODY_SIZE);
+    ret = writeNet(_handshake->reference(), RTMP_BODY_SIZE);
+    if ( ret <= 0 ) return false;
 
     return true;
 }
