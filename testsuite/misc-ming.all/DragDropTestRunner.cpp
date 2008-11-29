@@ -33,7 +33,7 @@
 #include <string>
 #include <cassert>
 #include <sstream>
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 
 
 using namespace gnash;

@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 #include <cerrno>
 #include <cstring>
 #include <boost/cstdint.hpp> // for boost::?int??_t

@@ -28,7 +28,7 @@
 #include <string>
 #include <cerrno>
 #include <sys/mman.h>
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 
 #include "network.h"
 #include "buffer.h"

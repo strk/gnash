@@ -159,7 +159,7 @@ public:
 	//
 	/// aligned read
 	///
-	int8_t   read_s8();
+    boost::int8_t read_s8();
 
 	/// Read a aligned unsigned 16-bit value from the stream.		
 	//

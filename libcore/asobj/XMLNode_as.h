@@ -23,7 +23,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "action.h"
 #include "impl.h"
-#include "xmlattrs.h"
 #include "log.h"
 
 #include <list>
@@ -38,7 +37,7 @@ namespace gnash {
 /// This is also the base class for the XML actionscript class (see
 /// XML_as.cpp, XML_as.h). Because XML_as also inherits from LoadableObject,
 /// this is a virtual base class.
-class XMLNode : public virtual as_object
+class XMLNode_as : public virtual as_object
 {
 public:
 
@@ -82,10 +81,10 @@ public:
 
     };
 
-    XMLNode();
+    XMLNode_as();
 
-    XMLNode(const XMLNode &node, bool deep);
-    virtual ~XMLNode();
+    XMLNode_as(const XMLNode_as &node, bool deep);
+    virtual ~XMLNode_as();
 
     size_t length() const { return _children.size(); }
 
@@ -97,8 +96,7 @@ public:
     NodeType nodeType() const { return _type; }
 
     /// Set the type of an XML Node.
-    void nodeTypeSet(NodeType type)
-    {
+    void nodeTypeSet(NodeType type) {
 	    _type = type;
     }
 
@@ -110,25 +108,36 @@ public:
 
     /// Set value of this node, overriding any previous value
     void nodeValueSet(const std::string& value) { _value = value; }
-    //  nodeType 	XML.nodeType
+
+    /// Performs a recursive search of node attributes to find a match
+    void getNamespaceForPrefix(const std::string& prefix, std::string& ns);
+
+    /// Performs a recursive search of node attributes to find a match
+    //
+    /// @return false if no match found.
+    bool getPrefixForNamespace(const std::string& ns, std::string& prefix);
+
+    void setNamespaceURI(const std::string value) {
+        _namespaceURI = value;
+    }
+
+    const std::string& getNamespaceURI() const {
+        return _namespaceURI;
+    }
 
     ///  Returns true if the specified node has child nodes; otherwise,
     ///  returns false.
     bool hasChildNodes();
 
-    boost::intrusive_ptr<XMLNode> firstChild();
-    boost::intrusive_ptr<XMLNode> lastChild();
+    boost::intrusive_ptr<XMLNode_as> firstChild();
+    boost::intrusive_ptr<XMLNode_as> lastChild();
     
     // Use a list for quick erasing
-    typedef std::list< boost::intrusive_ptr<XMLNode> > ChildList;
+    typedef std::list< boost::intrusive_ptr<XMLNode_as> > Children;
 
-    typedef std::vector< XMLAttr > AttribList;
+    Children& childNodes() { return _children; }
 
-    ChildList& childNodes() { return _children; }
-
-    AttribList& attributes() { return _attributes; }
-    
-    XMLNode& operator = (XMLNode &node) {
+    XMLNode_as& operator = (XMLNode_as &node) {
         log_debug("%s: \n", __PRETTY_FUNCTION__);
         if (this == &node) return *this;
         _name = node._name;
@@ -138,14 +147,14 @@ public:
         return *this;
     }
     
-    XMLNode& operator = (XMLNode *node)
+    XMLNode_as& operator = (XMLNode_as *node)
     {
 	    assert(node);
 	    return (*this = *node);
     }
 
-    XMLNode* previousSibling();
-    XMLNode* nextSibling();
+    XMLNode_as* previousSibling();
+    XMLNode_as* nextSibling();
 
     /// Copy a node
     //
@@ -153,8 +162,7 @@ public:
     /// name, value, and attributes as the specified XML object. If deep
     /// is set to true, all child nodes are recursively cloned, resulting
     /// in an exact copy of the original object's document tree. 
-    ///
-    boost::intrusive_ptr<XMLNode> cloneNode(bool deep);
+    boost::intrusive_ptr<XMLNode_as> cloneNode(bool deep);
 
     /// Append a child node the the XML object
     //
@@ -168,16 +176,13 @@ public:
     /// node is placed in the new tree structure after it is removed from
     /// its existing parent node. 
     ///
-    /// @param as
-    ///	   The XMLNode ?
+    /// @param childNode
+    ///	   same as XMLNode_as::obj ?
     ///
-    /// @param node
-    ///	   same as XMLNode::obj ?
-    ///
-    void appendChild(boost::intrusive_ptr<XMLNode> childNode);
+    void appendChild(boost::intrusive_ptr<XMLNode_as> childNode);
 
-    void setParent(XMLNode *node) { _parent = node; };
-    XMLNode *getParent() { return _parent.get(); };
+    void setParent(XMLNode_as *node) { _parent = node; };
+    XMLNode_as *getParent() { return _parent.get(); };
 
     /// Insert a node before a node
     //
@@ -194,7 +199,8 @@ public:
     ///     The node before which to insert the new one.
     ///     Must be a child of this XMLNode or the operation will fail.
     ///
-    void insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_ptr<XMLNode> pos);
+    void insertBefore(boost::intrusive_ptr<XMLNode_as> newnode, 
+            boost::intrusive_ptr<XMLNode_as> pos);
 
     /// Removes the specified XML object from its parent.
     //
@@ -213,14 +219,11 @@ public:
     ///                 for XML.sendAndLoad.
     virtual void toString(std::ostream& str, bool encode = false) const;
 
-    // We might turn this back to a dumb pointer, as long
-    // as we'll make sure in the XMLNode destructor and
-    // any child cleaning interface to set child parent
-    // to NULL
-    boost::intrusive_ptr<XMLNode> _parent;
+    as_object* getAttributes() { return _attributes; }
 
-    ChildList       _children;
-    AttribList      _attributes;
+    const as_object* getAttributes() const { return _attributes; }
+
+    void setAttribute(const std::string& name, const std::string& value);
 
 protected:
 
@@ -235,30 +238,37 @@ protected:
 	virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
 
+    Children _children;
+
 private:
 
-    // TODO: make a lot more things private !
+    boost::intrusive_ptr<XMLNode_as> _parent;
+
+    as_object* _attributes;
 
     std::string _name;
 
     std::string _value;
 
-    NodeType     _type;
+    NodeType _type;
 
-    static void stringify(const XMLNode& xml, std::ostream& xmlout, bool encode);
+    std::string _namespaceURI;
+
+    static void stringify(const XMLNode_as& xml, std::ostream& xmlout,
+            bool encode);
 
 };
 
 // Initialize the global XMLNode class
-void XMLNode_class_init(as_object& global);
+void xmlnode_class_init(as_object& global);
 
-// External, used by getXMLInterface() !
+// Used by XML_as
 as_object* getXMLNodeInterface();
 
-} // end of gnash namespace
+} // gnash namespace
 
 
-#endif	// __XMLNODE_NODE_H__
+#endif	
 
 
 // Local Variables:

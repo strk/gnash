@@ -1,4 +1,4 @@
-// SoundInfo.h: parse and store a SoundInfo record.
+// SoundInfoRecord.h: parse and store a SoundInfoRecord record.
 //
 //   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -29,12 +29,12 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
 
-struct SoundInfo
+struct SoundInfoRecord
 {
-    /// Construct a SoundInfo record object
+    /// Construct a SoundInfoRecord record object
     //
-    /// This SoundInfo is not valid until read() has been called.
-    SoundInfo()
+    /// This SoundInfoRecord is not valid until read() has been called.
+    SoundInfoRecord()
         :
         loopCount(0),
         inPoint(0),

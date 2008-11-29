@@ -33,6 +33,7 @@ namespace gnash {
 	class as_environment;
 	class as_object;
 	class as_value;
+    class movie_definition;
 
 	//
 	// Some handy helpers
@@ -47,9 +48,14 @@ namespace gnash {
 	/// probably worth dropping.
 	///
 	DSOEXPORT as_value call_method(const as_value& method, as_environment* env,
-		as_object* this_ptr, // this is ourself
+        // this is ourself
+		as_object* this_ptr,
 		std::auto_ptr<std::vector<as_value> > args,
-        as_object* super=0); // the super object
+        // the super object
+        as_object* super=0,
+        // the movie_definition containing caller code
+        // or 0 for spontaneous calls
+        const movie_definition* callerDef=0);
 
 
 }	// end namespace gnash

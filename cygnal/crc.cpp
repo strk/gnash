@@ -31,7 +31,7 @@
 #endif
 
 #include <sys/types.h>
-#include <unistd.h> // for getuid()
+#include "GnashSystemIOHeaders.h" // for getuid()
 #include <sys/stat.h>
 #include <boost/cstdint.hpp>
 

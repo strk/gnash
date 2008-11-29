@@ -439,7 +439,7 @@ public:
     /// @return true on success, false on failure
     /// FIXME: currently never returns false !
     ///
-    bool attachCharacter(character& newch, int depth);
+    bool attachCharacter(character& newch, int depth, as_object* initObject);
 
     /// Handle placement event
     //
@@ -455,7 +455,7 @@ public:
     /// (1) Construct this instance as an ActionScript object.
     ///     See constructAsScriptObject() method.
     ///
-    virtual void stagePlacementCallback();
+    virtual void stagePlacementCallback(as_object* initObj = 0);
 
     /// Unload all contents in the displaylist and this instance
     /// See character::unload for more info

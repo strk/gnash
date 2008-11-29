@@ -245,8 +245,12 @@ Video::getVideoFrame()
 }
 
 void
-Video::stagePlacementCallback()
+Video::stagePlacementCallback(as_object* initObj)
 {
+
+    // A Video cannot be created with an initObj
+    assert(!initObj);
+
     saveOriginalTarget(); // for softref
 
     // Register this video instance as a live character
@@ -357,10 +361,14 @@ attachVideoInterface(as_object& o)
 void
 attachPrototypeProperties(as_object& proto)
 {
-    proto.init_property("deblocking", &video_deblocking, &video_deblocking);
-    proto.init_property("smoothing", &video_smoothing, &video_smoothing);
-    proto.init_property("height", &video_height, &video_height);
-    proto.init_property("width", &video_width, &video_width);
+    const int flags = as_prop_flags::dontDelete |
+        as_prop_flags::readOnly;
+
+    proto.init_property("deblocking", &video_deblocking, &video_deblocking,
+            flags);
+    proto.init_property("smoothing", &video_smoothing, &video_smoothing, flags);
+    proto.init_property("height", &video_height, &video_height, flags);
+    proto.init_property("width", &video_width, &video_width, flags);
 }
 
 void

@@ -111,6 +111,7 @@ BlurFilter-construct-6.swf:9f183e7e0a35fbe488aa7c447dced20c
 BlurFilter-construct-7.swf:c38a6f916e3bc1a0141c9c78d23e0aa0
 blur-filter-properties-5.swf:4c29ecc04df379ced45039fdbb79eb9c
 blur-filter-properties-5.swf:f2e1d9ccc47765bd6c88095b19974c7b
+boolean-6.swf:5bd542a9133a3abd9a2c7bcd960e816b
 boolean-7.swf:4124413f55f405ad865a05403bc24662
 boolean-8.swf:c3c872988d25c8e49c11e5e337ea1e69
 boolean-properties-5.swf:d955b32271cf8a073de42566eb13a5d8
@@ -489,6 +490,7 @@ height1.swf:245da260d32dbc48a5f38566ee70171b
 height3.swf:2b7547493377ae1c0163c8273a4073f7
 height4.swf:8d36c180d196b49608f996db21a421bc
 if-5.swf:002715aadbca3abb464937342f878c74
+if-6.swf:5614cb54434514d009899dd41eadb610
 if-7.swf:18727241da6944c4f0127262353ab1c4
 implements-5.swf:92a657f3a89add44b1dd4f0e30632bc8
 implements-6.swf:280cde1bf92ae5c9358f30ae96e72016
@@ -1012,6 +1014,9 @@ stringlength-5.swf:bf014dcc64776fb859ff878286f56b16
 stringlength-6.swf:94b4de2a590c915696b4a783338a1f05
 stringlength-7.swf:140952977abb85b966f1e5c4447854ce
 string-length-old-5.swf:f36c21547709eea722f285ce2af1748b
+string-length-old-6.swf:aeb9d544b2d5ae0a5d7193379c17b12c
+string-length-old-7.swf:7953720150a86bac0c5719c3cab61b37
+string-length-old-8.swf:46b7ef4fee939ddae8f84fb5e3bb1093
 string-length-old-mb-6.swf:388cb02cbd3332aed19c68bda39938a0
 string-length-old-mb-7.swf:cbbab1b31471911335b426c80c3b641c
 string-length-old-mb-8.swf:60b4e211f6c937f953c2acfe02684295
@@ -1155,9 +1160,11 @@ undefinedtrace-v6.swf:
 undefinedtrace-v7.swf:
 undefinedtrace-v8.swf:
 unloadmovie-simple-5.swf:3b897f539cb7eb764692def6fcc62853
+video-enumerate.swf:5eced177f03fc88bccb99f0acd2d2f7d
 video-properties-6.swf:95109f25a5cac0fe2d18628dcea22633
 video-properties-7.swf:64f07e267ae93cdefec5c51c3fc9981d
 video-properties-8.swf:389ff730a73ec2c24f107abe9de0fa61
+waitforframe-huge-4.swf:6efc9f15d7945f38c23ede5f28dbbaed
 with-delete-5.swf:e4db8598315a7f70785e7e96af7f3c3f
 with-delete-6.swf:49de7093280168a4013377eaf7753fa0
 with-delete-7.swf:f7668d30827a77f415ec325f052125c6

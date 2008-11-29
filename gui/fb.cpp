@@ -78,7 +78,7 @@
 #include <linux/fb.h>
 #include <linux/kd.h>
 #include <linux/vt.h>
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 #include <csignal>
 #include <cstdlib> // getenv
 

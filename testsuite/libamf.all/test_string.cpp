@@ -24,7 +24,7 @@
 #include <cstdlib>
 #include <sys/types.h>
 extern "C"{
-        #include <unistd.h>
+        #include "GnashSystemIOHeaders.h"
 #ifdef HAVE_GETOPT_H
         #include <getopt.h>
 #endif

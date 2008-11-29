@@ -21,8 +21,6 @@
 
 #include <iostream>
 #include "URL.h"
-//#include "impl.h"
-//#include "rc.h"
 
 #include <string>
 #include <cstring>
@@ -33,22 +31,16 @@
 #include <cerrno>
 #include <GnashException.h>
 
-// these are for stat(2)
-#include <sys/types.h>
-#include <sys/stat.h>
+// This is for getcwd(2) 
 
-#if defined(_WIN32) || defined(WIN32)
-# define PATH_MAX 255
-# define __PRETTY_FUNCTION__ __FUNCDNAME__
-# include <winsock2.h>
-# include <direct.h>
-#else
+#if !defined(_WIN32) && !defined(WIN32)
 # include <unistd.h>
-#	include <sys/param.h>
+#else
+# include <direct.h>
 #endif
 
-#include <climits>
 #include <boost/tokenizer.hpp>
+#include <boost/scoped_array.hpp>
 
 namespace gnash {
 
@@ -122,19 +114,32 @@ URL::URL(const std::string& absolute_url)
 	}
 	else
 	{
-		//cerr << "It's relative" << endl;
-		char buf[PATH_MAX+1];
-		if ( ! getcwd(buf, PATH_MAX) )
-		{
-            std::stringstream err;
-			err << "getcwd failed: " << strerror(errno);
-			throw gnash::GnashException(err.str());
+        const size_t incr = 1024;
+        // When does it get silly?
+        const size_t maxSize = 4096; 
+
+        boost::scoped_array<char> buf; 
+        char* dir = 0;
+        size_t bufSize = 0;
+
+        // This just assumes a failure in getcwd is a name-length error,
+        // though that perhaps isn't the case.
+		while (!dir) {
+            bufSize += incr;
+            buf.reset(new char[bufSize]);
+            dir = getcwd(buf.get(), bufSize);
+            if (bufSize >= maxSize) break;
 		}
-		char* ptr = buf+strlen(buf);
-		*ptr = '/';
-		++ptr;
-		*ptr = '\0';
-		URL cwd(buf);
+
+        if (!dir) {
+            std::stringstream err;
+            err << "getcwd failed: " << strerror(errno);
+            throw gnash::GnashException(err.str());
+        }
+
+        std::string currentDir(buf.get());
+        currentDir.append("/");
+		URL cwd(currentDir);
 		init_relative(absolute_url, cwd);
 	}
 }
@@ -419,7 +424,7 @@ URL::parse_querystring(const std::string& query_string,
 void
 URL::encode(std::string& input)
 {
-	const std::string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~_";
+	const std::string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~_.!-(')";
 	const std::string hexdigits = "0123456789ABCDEF";
 
 	for (unsigned int i=0;i<input.length(); i++)

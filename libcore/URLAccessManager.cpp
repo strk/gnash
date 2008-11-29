@@ -36,7 +36,7 @@
 #ifdef WIN32
 # include <winsock2.h>
 #else
-# include <unistd.h>
+# include "GnashSystemIOHeaders.h"
 #endif
 
 #include <cstring> // for strerror

@@ -49,13 +49,9 @@ mc1.func = function () {
         setproperty
     };  
 #if OUTPUT_VERSION == 5
-    // Gnash might be failed due to accuracy problem.
-    // should we be more tolerant here?
     check_equals(Math.round(_root.mc1._xscale), 30);
     check_equals(_root._xscale, 100);
 #else
-    // Gnash might be failed due to accuracy problem.
-    // should we be more tolerant here?
     check_equals(_root.mc1._xscale, 100);
     check_equals(Math.round(_root._xscale), 30); 
 #endif
@@ -77,15 +73,124 @@ mc1.func = function () {
     // should we be more tolerant here?
     check_equals(Math.round(testvar), 60);
 #endif
+
 };
 mc1.func();
 // restore the _xscale of _root after test.
 _root._xscale = 100;
 
+//
+// Test setProperty with string argument
+//
+
+// setProperty("", _x, "F");
+_root._x=100; // set
+asm{ push "", 0, "F" setproperty };  
+check_equals(_root._x, 100);
+_root._x=100; // reset
+// setProperty("", _x, "0");
+asm{ push "", 0, "0" setproperty };  
+check_equals(_root._x, 0);
+_root._x=100; // set
+_root._x = Infinity; // infinity != nan
+xcheck_equals(_root._x, -107374182.4);
+_root._x = -Infinity; // infinity != nan
+xcheck_equals(_root._x, -107374182.4);
+_root._x=0; // reset
+
+// setProperty("", _y, "F");
+_root._y=100; // set
+asm{ push "", 1, "F" setproperty };  
+check_equals(_root._y, 100);
+_root._y=100; // reset
+// setProperty("", _y, "0");
+asm{ push "", 1, "0" setproperty };  
+check_equals(_root._y, 0);
+_root._y=100; // set
+_root._y = Infinity; // infinity != nan
+xcheck_equals(_root._y, -107374182.4);
+_root._y = -Infinity; // infinity != nan
+xcheck_equals(_root._y, -107374182.4);
+_root._y=0; // reset
+
+// setProperty("", _xscale, "F");
+asm{ push "", 2, "F" setproperty };  
+check_equals(_root._xscale, 100);
+_root._xscale=100; // reset
+// setProperty("", _xscale, "0");
+asm{ push "", 2, "0" setproperty };  
+check_equals(_root._xscale, 0);
+_root._xscale=100; // reset
+_root._xscale = Infinity; // infinity != nan
+check_equals(_root._xscale, Infinity);
+_root._xscale = -Infinity; // infinity != nan
+check_equals(_root._xscale, -Infinity);
+_root._xscale=100; // reset
+
+// setProperty("", _yscale, "F");
+asm{ push "", 3, "F" setproperty };  
+check_equals(_root._yscale, 100);
+_root._yscale=100; // reset
+// setProperty("", _yscale, "0");
+asm{ push "", 3, "0" setproperty };  
+check_equals(_root._yscale, 0);
+_root._yscale=100; // reset
+_root._yscale = Infinity; // infinity != nan
+check_equals(_root._yscale, Infinity);
+_root._yscale = -Infinity; // infinity != nan
+check_equals(_root._yscale, -Infinity);
+_root._yscale=100; // reset
+
+// setProperty("", _alpha, "F");
+asm{ push "", 6, "F" setproperty };  
+check_equals(_root._alpha, 100);
+_root._alpha=100; // reset
+// setProperty("", _alpha, "0");
+asm{ push "", 6, "0" setproperty };  
+check_equals(_root._alpha, 0);
+_root._alpha=100; // reset
+_root._alpha = Infinity; // infinity != nan
+check_equals(_root._alpha, -12800);
+_root._alpha=100; // reset
+
+check_equals(typeof(_root._visible), 'boolean');
+check_equals(_root._visible, true);
+// setProperty("", _visible, "F"); [ won't change the value ! ]
+asm{ push "", 7, "F" setproperty };  
+check_equals(typeof(_root._visible), 'boolean');
+check_equals(_root._visible, true); 
+_root._visible=true; // reset
+// setProperty("", _visible, "1");
+asm{ push "", 7, "1" setproperty };  
+check_equals(typeof(_root._visible), 'boolean');
+check_equals(_root._visible, true); 
+// setProperty("", _visible, "0");
+asm{ push "", 7, "0" setproperty };  
+check_equals(typeof(_root._visible), 'boolean');
+check_equals(_root._visible, false); 
+_root._visible=true; // reset
+_root._visible = Infinity; // infinity is skipped
+check_equals(_root._visible, true);
+_root._visible=true; // reset
+
+// TODO: _width & _height
+
+_root._rotation=90;
+// setProperty("", _rotation, "F");
+asm{ push "", 10, "F" setproperty };  
+check_equals(_root._rotation, 90);
+_root._rotation=100; // reset
+// setProperty("", _rotation, "0");
+asm{ push "", 10, "0" setproperty };  
+check_equals(_root._rotation, 0);
+_root._rotation = Infinity; // infinity != nan
+check(isNaN(_root._rotation));
+_root._rotation=0; // reset
 
 //
 //  test removeMovieClip(""), opcode 37
 //
+
 createSprite("mc2", 20);
 mc2.remove = function () {
     // in SWF6 and obove, it's no effect(probably results _root.removeMovieClip()).
@@ -176,6 +281,6 @@ obj.func = function () {
 };
 obj.func();
 
-check_totals(15); 
+check_totals(46);
 
 #endif //MING_SUPPORTS_ASM

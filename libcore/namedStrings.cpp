@@ -63,6 +63,7 @@ static string_table::svt preload_names[] =
     string_table::svt( "h", NSV::PROP_H ),
 	string_table::svt( "height", NSV::PROP_HEIGHT ),
 	string_table::svt( "_highquality", NSV::PROP_uHIGHQUALITY ),
+	string_table::svt( "_quality", NSV::PROP_uQUALITY ),
 	string_table::svt( "htmlText", NSV::PROP_HTML_TEXT ),
 	string_table::svt( "indent", NSV::PROP_INDENT ),
 	string_table::svt( "italic", NSV::PROP_ITALIC ),

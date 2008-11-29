@@ -26,7 +26,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include <dirent.h> // used by scandir()
-#include <unistd.h> // used by unlink()
+#include "GnashSystemIOHeaders.h" // used by unlink()
 #include <fcntl.h>  // used by asyncmode()
 
 #include "VM.h"

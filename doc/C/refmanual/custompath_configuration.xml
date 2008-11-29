@@ -42,30 +42,6 @@
 	</row>
 	<row>
 	  <entry>
-	    <option>--with-libxml=PFX</option>
-	  </entry>
-	  <entry>
-	    Prefix to where libxml is installed.
-	  </entry>
-	</row>
-	<row>
-	  <entry>
-	    <option>--with-libxml-libraries=DIR</option>
-	  </entry>
-	  <entry>
-	    Directory where libxml library is installed.
-	  </entry>
-	</row>
-	<row>
-	  <entry>
-	    <option>--with-libxml-includes=DIR</option>
-	  </entry>
-	  <entry>
-	    Directory where libxml header files are installed.
-	  </entry>
-	</row>
-	<row>
-	  <entry>
 	    <option>--with-docbook=DIR</option>
 	  </entry>
 	  <entry>

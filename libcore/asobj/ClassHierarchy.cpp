@@ -71,6 +71,16 @@ namespace gnash {
 
 namespace { // anonymous namespace
 
+static void
+addVisibilityFlag(int& flags, int version)
+{
+    // TODO: more visibility for swf10+?
+    if ( version >= 9 ) flags |= as_prop_flags::onlySWF9Up;
+    else if ( version >= 8 ) flags |= as_prop_flags::onlySWF8Up;
+    else if ( version >= 7 ) flags |= as_prop_flags::onlySWF7Up;
+    else if ( version >= 6 ) flags |= as_prop_flags::onlySWF6Up;
+}
+
 class declare_extension_function : public as_function
 {
 private:
@@ -230,7 +240,9 @@ ClassHierarchy::declareClass(extensionClass& c)
 	boost::intrusive_ptr<as_function> getter =
 		new declare_extension_function(c, mGlobal, mExtension);
 
-	return mGlobal->init_destructive_property(c.name, *getter);
+	int flags=as_prop_flags::dontEnum;
+	addVisibilityFlag(flags, c.version);
+	return mGlobal->init_destructive_property(c.name, *getter, flags);
 }
 
 bool
@@ -248,8 +260,10 @@ ClassHierarchy::declareClass(const nativeClass& c)
 	boost::intrusive_ptr<as_function> getter =
 		new declare_native_function(c, mGlobal, mExtension);
 
+	int flags=as_prop_flags::dontEnum;
+	addVisibilityFlag(flags, c.version);
 	return mGlobal->init_destructive_property(c.name,
-		*getter);
+		*getter, flags);
 }
 
 static const ClassHierarchy::nativeClass knownClasses[] =
@@ -274,7 +288,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
 	{ date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ xml_class_init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ XMLNode_class_init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT, NSV::NS_FLASH_XML, 5 },
+	{ xmlnode_class_init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT, NSV::NS_FLASH_XML, 5 },
 	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
@@ -303,7 +317,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 };
 
 void
-ClassHierarchy::massDeclare(int version)
+ClassHierarchy::massDeclare(int /*version*/) // drop version...
 {
 	// Natives get declared first. It doesn't make any sense for a native
 	// to depend on an extension, but it does make sense the other way
@@ -312,7 +326,7 @@ ClassHierarchy::massDeclare(int version)
 	for (size_t i = 0; i < size; ++i)
 	{
 		const nativeClass& c = knownClasses[i];
-		if (c.version > version) continue;
+		//if (c.version > version) continue;
 
 		if ( ! declareClass(c) )
 		{

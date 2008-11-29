@@ -19,14 +19,14 @@
 #include "gnashconfig.h"
 #endif
 
-#include <stdarg.h>
+#include "GnashSystemIOHeaders.h" // write()
+#include <cstdarg>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <cerrno>
 
 extern "C"{
-#include <unistd.h>
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #endif

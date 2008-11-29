@@ -28,7 +28,6 @@
 #include "fn_call.h"
 
 #include "LoadableObject.h"
-#include "xmlattrs.h"
 #include "XMLNode_as.h"
 #include "XML_as.h"
 #include "builtin_function.h"
@@ -154,7 +153,7 @@ XML_as::toString(std::ostream& o, bool encode) const
     if (!_xmlDecl.empty()) o << _xmlDecl;
     if (!_docTypeDecl.empty()) o << _docTypeDecl;
 
-    XMLNode::toString(o, encode);
+    XMLNode_as::toString(o, encode);
 }
 
 bool
@@ -208,8 +207,8 @@ XML_as::set_member(string_table::key name, const as_value& val,
 }
 
 void
-XML_as::parseAttribute(XMLNode* node, const std::string& xml,
-        std::string::const_iterator& it)
+XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
+        std::string::const_iterator& it, Attributes& attributes)
 {
 
     const std::string terminators("\r\t\n >=");
@@ -272,8 +271,17 @@ XML_as::parseAttribute(XMLNode* node, const std::string& xml,
     // Replace entities in the value.
     escape(value);
 
-    XMLAttr attr(name, value);
-    node->_attributes.push_back(attr);
+    // Handle namespace. This is set once only for each node, and is also
+    // pushed to the attributes list once.
+    StringNoCaseEqual noCaseCompare;
+    if (noCaseCompare(name, "xmlns") || noCaseCompare(name, "xmlns:")) {
+        if (!node->getNamespaceURI().empty()) return;
+        node->setNamespaceURI(value);
+    }
+
+    // This ensures values are not inserted twice, which is expected
+    // behaviour
+    attributes.insert(std::make_pair(name, value));
 
 }
 
@@ -283,15 +291,34 @@ void
 XML_as::parseDocTypeDecl(const std::string& xml,
         std::string::const_iterator& it)
 {
-    std::string content;
-    if (!parseNodeWithTerminator(xml, it, ">", content))
-    {
-        _status = XML_UNTERMINATED_DOCTYPE_DECL;
-        return;
+
+    std::string::const_iterator end;
+    std::string::const_iterator current = it; 
+
+    std::string::size_type count = 1;
+
+    // Look for angle brackets in the doctype declaration.
+    while (count) {
+
+        // Find the next closing bracket after the current position.
+        end = std::find(current, xml.end(), '>');
+        if (end == xml.end()) {
+            _status = XML_UNTERMINATED_DOCTYPE_DECL;
+            return;
+        }
+        --count;
+
+        // Count any opening brackets in between.
+        count += std::count(current, end, '<');
+        current = end;
+        ++current;
     }
+
+    const std::string content(it, end);
     std::ostringstream os;
     os << '<' << content << '>';
     _docTypeDecl = os.str();
+    it = end + 1;
 }
 
 
@@ -315,7 +342,7 @@ XML_as::parseXMLDecl(const std::string& xml, std::string::const_iterator& it)
 
 // The iterator should be pointing to the first char after the '<'
 void
-XML_as::parseTag(XMLNode*& node, const std::string& xml,
+XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
     std::string::const_iterator& it)
 {
     //log_debug("Processing node: %s", node->nodeName());
@@ -337,16 +364,14 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
 
     // Knock off the "/>" of a self-closing tag.
     if (std::equal(endName - 1, endName + 1, "/>")) {
-        //log_debug("self-closing tag");
         --endName;
     }
 
     std::string tagName(it, endName);
-    //log_debug("tagName : %s", tagName);
 
     if (!closing) {
 
-        XMLNode* childNode = new XMLNode;
+        XMLNode_as* childNode = new XMLNode_as;
         childNode->nodeNameSet(tagName);
         childNode->nodeTypeSet(Element);
 
@@ -361,12 +386,14 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
 
         // Parse any attributes in an opening tag only, stopping at "/>" or
         // '>'
+        // Attributes are added in reverse order and without any duplicates.
+        Attributes attributes;
         while (it != xml.end() && *it != '>' && _status == XML_OK)
         {
             if (xml.end() - it > 1 && std::equal(it, it + 2, "/>")) break;
 
             // This advances the iterator
-            parseAttribute(childNode, xml, it);
+            parseAttribute(childNode, xml, it, attributes);
 
             // Skip any whitespace. If we reach the end of the string,
             // it's malformed.
@@ -374,6 +401,11 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
                 _status = XML_UNTERMINATED_ELEMENT;
                 return;
             }
+        }
+        
+        for (Attributes::const_reverse_iterator i = attributes.rbegin(),
+                e = attributes.rend(); i != e; ++i) {
+            childNode->setAttribute(i->first, i->second);
         }
 
         node->appendChild(childNode);
@@ -402,7 +434,7 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
     }
     else {
         // Malformed. Search for the parent node.
-        XMLNode* s = node;
+        XMLNode_as* s = node;
         while (s && !noCaseCompare(s->nodeName(), tagName)) {
             //log_debug("parent: %s, this: %s", s->nodeName(), tagName);
             s = s->getParent();
@@ -420,7 +452,7 @@ XML_as::parseTag(XMLNode*& node, const std::string& xml,
 }
 
 void
-XML_as::parseText(XMLNode* node, const std::string& xml, 
+XML_as::parseText(XMLNode_as* node, const std::string& xml, 
         std::string::const_iterator& it)
 {
     std::string::const_iterator end = std::find(it, xml.end(), '<');
@@ -431,9 +463,9 @@ XML_as::parseText(XMLNode* node, const std::string& xml,
     if (ignoreWhite() && 
         content.find_first_not_of("\t\r\n ") == std::string::npos) return;
 
-    XMLNode* childNode = new XMLNode;
+    XMLNode_as* childNode = new XMLNode_as;
 
-    childNode->nodeTypeSet(XMLNode::Text);
+    childNode->nodeTypeSet(XMLNode_as::Text);
 
     // Replace any entitites.
     unescape(content);
@@ -447,10 +479,10 @@ XML_as::parseText(XMLNode* node, const std::string& xml,
 
 
 void
-XML_as::parseComment(XMLNode* /*node*/, const std::string& xml, 
+XML_as::parseComment(XMLNode_as* /*node*/, const std::string& xml, 
         std::string::const_iterator& it)
 {
-    log_debug("discarding comment node");
+    //log_debug("discarding comment node");
 
     std::string content;
 
@@ -463,7 +495,7 @@ XML_as::parseComment(XMLNode* /*node*/, const std::string& xml,
 }
 
 void
-XML_as::parseCData(XMLNode* node, const std::string& xml, 
+XML_as::parseCData(XMLNode_as* node, const std::string& xml, 
         std::string::const_iterator& it)
 {
     std::string content;
@@ -473,7 +505,7 @@ XML_as::parseCData(XMLNode* node, const std::string& xml,
         return;
     }
 
-    XMLNode* childNode = new XMLNode;
+    XMLNode_as* childNode = new XMLNode_as;
     childNode->nodeValueSet(content);
     childNode->nodeTypeSet(Text);
     node->appendChild(childNode);
@@ -498,7 +530,7 @@ XML_as::parseXML(const std::string& xml)
     
 
     std::string::const_iterator it = xml.begin();
-    XMLNode* node = this;
+    XMLNode_as* node = this;
 
     while (it != xml.end() && _status == XML_OK)
     {
@@ -547,7 +579,7 @@ XML_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
     _children.clear();
-    _attributes.clear();
+    //_attributes.clear();
     _docTypeDecl.clear();
     _xmlDecl.clear();
 }
@@ -691,9 +723,9 @@ xml_createelement(const fn_call& fn)
     if (fn.nargs > 0)
     {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode *xml_obj = new XMLNode;
+        XMLNode_as *xml_obj = new XMLNode_as;
         xml_obj->nodeNameSet(text);
-        xml_obj->nodeTypeSet(XMLNode::Text);
+        xml_obj->nodeTypeSet(XMLNode_as::Text);
 
         return as_value(xml_obj);
         
@@ -719,9 +751,9 @@ xml_createtextnode(const fn_call& fn)
 
     if (fn.nargs > 0) {
         const std::string& text = fn.arg(0).to_string();
-        XMLNode* xml_obj = new XMLNode;
+        XMLNode_as* xml_obj = new XMLNode_as;
         xml_obj->nodeValueSet(text);
-        xml_obj->nodeTypeSet(XMLNode::Text);
+        xml_obj->nodeTypeSet(XMLNode_as::Text);
         return as_value(xml_obj);
     }
     else {

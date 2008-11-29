@@ -254,8 +254,36 @@ character::x_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		const double newx = fn.arg(0).to_number();
+        const as_value& val = fn.arg(0);
+
+        // Undefined or null are ignored
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 (not NaN)
+        //       on to_number
+        if (val.is_undefined() || val.is_null() )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._x to %s, refused"),
+                ptr->getTarget(), val);
+			);
+            return rv;
+        }
+
+		const double newx = val.to_number();
+
+        // NaN is skipped, Infinite isn't
+        if (isNaN(newx))
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._x to %s "
+                "(evaluating to number %g) refused"),
+                ptr->getTarget(), val, newx);
+			);
+            return rv;
+        }
+
 		SWFMatrix m = ptr->getMatrix();
+        // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
 		m.set_x_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newx)));
 		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
@@ -277,8 +305,37 @@ character::y_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		const double newy = fn.arg(0).to_number();
+        const as_value& val = fn.arg(0);
+
+        // Undefined or null are ignored
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 (not NaN)
+        //       on to_number
+        if (val.is_undefined() || val.is_null() )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._y to %s, refused"),
+                ptr->getTarget(), val);
+			);
+            return rv;
+        }
+
+		const double newy = val.to_number();
+
+        // NaN is skipped, infinite isn't
+        if (isNaN(newy))
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._y to %s "
+                "(evaluating to number %g) refused"),
+                ptr->getTarget(), val, newy);
+			);
+            return rv;
+        }
+
 		SWFMatrix m = ptr->getMatrix();
+        // NOTE: infinite_to_zero is wrong here, 
+        // see actionscript.all/setProperty.as
 		m.set_y_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newy)));
 		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
@@ -299,14 +356,29 @@ character::xscale_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		const double scale_percent = fn.arg(0).to_number();
+		const as_value& val = fn.arg(0);
 
 		// Handle bogus values
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 on to_number
+		if (val.is_undefined() || val.is_null())
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._xscale to %s, refused"),
+                ptr->getTarget(), val);
+			);
+			return as_value();
+		}
+
+		const double scale_percent = val.to_number();
+
+        // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
 		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set _xscale to %g, refused"),
-                            scale_percent);
+			log_aserror(_("Attempt to set %s._xscale to %s "
+                "(evaluating to number %g) refused"),
+                ptr->getTarget(), val, scale_percent);
 			);
 			return as_value();
 		}
@@ -330,17 +402,34 @@ character::yscale_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		const double scale_percent = fn.arg(0).to_number();
+		const as_value& val = fn.arg(0);
 
-		// Handle bogus values
+        // Undefined or null are ignored
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 (not NaN)
+        //       on to_number
+		if (val.is_undefined() || val.is_null())
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._yscale to %s, refused"),
+                ptr->getTarget(), val);
+			);
+			return as_value();
+		}
+
+		const double scale_percent = val.to_number();
+
+        // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
 		if (isNaN(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set _yscale to %g, refused"),
-                            scale_percent);
+			log_aserror(_("Attempt to set %s._yscale to %s "
+                "(evaluating to number %g) refused"),
+                ptr->getTarget(), val, scale_percent);
 			);
-                        return as_value();
+			return as_value();
 		}
+
 
 		// input is in percent
 		ptr->set_y_scale(scale_percent);
@@ -392,22 +481,36 @@ character::alpha_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		const as_value& inval = fn.arg(0);
+		const as_value& val = fn.arg(0);
+
+        // Undefined or null are ignored
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 (not NaN)
+        //       on to_number
+        if (val.is_undefined() || val.is_null() )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._alpha to %s, refused"),
+                ptr->getTarget(), val);
+			);
+            return rv;
+        }
 
         // The new internal alpha value is input / 100.0 * 256.
         // We test for finiteness later, but the multiplication
         // won't make any difference.
-		const double newAlpha = inval.to_number() * 2.56;
+		const double newAlpha = val.to_number() * 2.56;
 
-        if ( inval.is_undefined() || inval.is_null() ||
-                !utility::isFinite(newAlpha) )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Ignored attempt to set %s._alpha=%s"),
-				ptr->getTarget(), fn.arg(0));
+        // NaN is skipped, Infinite is not, see actionscript.all/setProperty.as
+        if (isNaN(newAlpha))
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._alpha to %s "
+                "(evaluating to number %g) refused"),
+                ptr->getTarget(), val, newAlpha);
 			);
-			return rv;
-		}
+            return rv;
+        }
 
         cxform cx = ptr->get_cxform();
 
@@ -443,15 +546,39 @@ character::visible_getset(const fn_call& fn)
 	}
 	else // setter
 	{
+        const as_value& val = fn.arg(0);
+
+        // Undefined or null are ignored
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 (not NaN)
+        //       on to_number
+        if (val.is_undefined() || val.is_null() )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._visible to %s, refused"),
+                ptr->getTarget(), val);
+			);
+            return rv;
+        }
+
         /// We cast to number and rely (mostly) on C++'s automatic
         /// cast to bool, as string "0" should be converted to
         /// its numeric equivalent, not interpreted as 'true', which
         /// SWF7+ does for strings.
-        double d = fn.arg(0).to_number();
+        double d = val.to_number();
 
-        // Undefined or NaN is false.
-        if (isInf(d) || isNaN(d)) ptr->set_visible(false);
-		else ptr->set_visible(d);
+        // Infinite or NaN is skipped
+        if (isInf(d) || isNaN(d))
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._visible to %s "
+                "(evaluating to number %g) refused"),
+                ptr->getTarget(), val, d);
+			);
+            return rv;
+        }
+
+		ptr->set_visible(d);
 
 		ptr->transformedByScript();
 	}
@@ -523,7 +650,7 @@ character::height_getset(const fn_call& fn)
 	{
 		SWFMatrix m = ptr->getMatrix();
 		m.transform(bounds);
-		double h = TWIPS_TO_PIXELS( bounds.height() );      
+		double h = TWIPS_TO_PIXELS(bounds.height());      
 		rv = as_value(h);
 	}
 	else // setter
@@ -534,7 +661,7 @@ character::height_getset(const fn_call& fn)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Setting _height=%g of character %s (%s)"),
-			                newheight / 20,ptr->getTarget(), typeName(*ptr));
+			                newheight / 20, ptr->getTarget(), typeName(*ptr));
 			);
 		}
 
@@ -548,6 +675,7 @@ void
 character::set_height(double newheight)
 {
 	const rect bounds = getBounds();
+
 #if 0
 	if ( bounds.is_null() ) {
 		log_unimpl("FIXME: when setting _height of null-bounds character it seems we're supposed to change _xscale too (see MovieClip.as)");
@@ -556,13 +684,13 @@ character::set_height(double newheight)
 	const double oldheight = bounds.height();
 	assert(oldheight >= 0); // can't be negative can it?
 
-        double yscale = oldheight ? (newheight / oldheight) : 0; // avoid division by zero
-        double xscale = _xscale / 100.0;
-        double rotation = _rotation * PI / 180.0;
+    double yscale = oldheight ? (newheight / oldheight) : 0; // avoid division by zero
+    double xscale = _xscale / 100.0;
+    double rotation = _rotation * PI / 180.0;
 
-        SWFMatrix m = getMatrix();
-        m.set_scale_rotation(xscale, yscale, rotation);
-        setMatrix(m, true); // let caches be updated
+    SWFMatrix m = getMatrix();
+    m.set_scale_rotation(xscale, yscale, rotation);
+    setMatrix(m, true); // let caches be updated
 }
 
 as_value
@@ -577,18 +705,34 @@ character::rotation_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		// input is in degrees
-		double  rotation_val = fn.arg(0).to_number();
+		const as_value& val = fn.arg(0);
 
-		// Handle bogus values
-		if (isNaN(rotation_val))
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set _rotation to %g, refused"),
-                            rotation_val);
+        // Undefined or null are ignored
+		// NOTE: we explicitly check is_undefined and is_null
+		//       because for SWF4 they result in 0 (not NaN)
+        //       on to_number
+        if (val.is_undefined() || val.is_null() )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._rotation to %s, refused"),
+                ptr->getTarget(), val);
 			);
-			return as_value();
-		}
+            return rv;
+        }
+
+		// input is in degrees
+		double  rotation_val = val.to_number();
+
+        // NaN is skipped, Infinity isn't
+        if (isNaN(rotation_val))
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Attempt to set %s._rotation to %s "
+                "(evaluating to number %g) refused"),
+                ptr->getTarget(), val, rotation_val);
+			);
+            return rv;
+        }
 
 		ptr->set_rotation(rotation_val);
 	}
@@ -656,23 +800,18 @@ void
 character::setMatrix(const SWFMatrix& m, bool updateCache)
 {
 
-    if (!(m == m_matrix))
-    {
-        //log_debug("setting SWFMatrix to: %s", m);
-		set_invalidated(__FILE__, __LINE__);
-		m_matrix = m;
+    if (m == m_matrix) return;
 
-		if ( updateCache ) // don't update caches if SWFMatrix wasn't updated too
-		{
-			_xscale = m_matrix.get_x_scale() * 100.0;
-			_yscale = m_matrix.get_y_scale() * 100.0;
-			_rotation = m_matrix.get_rotation() * 180.0 / PI;
-		}
-    }
-    else
+    //log_debug("setting SWFMatrix to: %s", m);
+    set_invalidated(__FILE__, __LINE__);
+    m_matrix = m;
+
+    // don't update caches if SWFMatrix wasn't updated too
+    if (updateCache) 
     {
-        //log_debug("setMatrix of character %s: SWFMatrix "
-        //"not changed", getTarget());
+        _xscale = m_matrix.get_x_scale() * 100.0;
+        _yscale = m_matrix.get_y_scale() * 100.0;
+        _rotation = m_matrix.get_rotation() * 180.0 / PI;
     }
 
 }
@@ -698,27 +837,6 @@ void
 character::add_event_handler(const event_id& id, const action_buffer& code)
 {
 	_event_handlers[id].push_back(&code);
-
-	//log_debug(_("Setting handler for event %s"), id);
-
-	// Set the character as a listener iff the
-	// kind of event is a KEY or MOUSE one 
-	switch (id.m_id)
-	{
-		case event_id::KEY_DOWN:  
-		case event_id::KEY_PRESS:
-		case event_id::KEY_UP:    
-			has_key_event();
-			break;
-		case event_id::MOUSE_UP:
-		case event_id::MOUSE_DOWN:
-		case event_id::MOUSE_MOVE:
-			//log_debug(_("Registering character as having mouse events"));
-			has_mouse_event();
-			break;
-		default:
-			break;
-	}
 
 	// todo: drop the character as a listener
 	//       if it gets no valid handlers for
@@ -836,10 +954,8 @@ character::set_rotation(double rot)
 {
 	// Translate to the -180 .. 180 range
 	rot = std::fmod (rot, 360.0);
-	if (rot > 180.0)
-		rot -= 360.0;
-	else if (rot < -180.0)
-		rot += 360.0;
+	if (rot > 180.0) rot -= 360.0;
+	else if (rot < -180.0) rot += 360.0;
 
 	//log_debug("_rotation: %d", rot);
 
@@ -847,13 +963,11 @@ character::set_rotation(double rot)
 
 	//log_debug("xscale cached: %d, yscale cached: %d", _xscale, _yscale);
 
-        if (_xscale < 0 ) // TODO: check if there's any case we should use _yscale here
-	{
-		rotation += PI;
-	}
+    // TODO: check if there's any case we should use _yscale here
+    if (_xscale < 0 ) rotation += PI; 
 
 	SWFMatrix m = getMatrix();
-        m.set_rotation(rotation);
+    m.set_rotation(rotation);
 	setMatrix(m); // we update the cache ourselves
 
 	_rotation = rot;
@@ -868,10 +982,7 @@ character::set_y_scale(double scale_percent)
     
     if (yscale != 0.0 && _yscale != 0.0)
     {
-        if (scale_percent * _yscale < 0.0)
-        {
-            yscale = -std::abs(yscale);
-        }
+        if (scale_percent * _yscale < 0.0) yscale = -std::abs(yscale);
         else yscale = std::abs(yscale);
     }
 
@@ -985,8 +1096,8 @@ character::getTarget() const
 				// character created using 'new'
 				// like, new MovieClip, new Video, new TextField...
 				// 
-				log_debug("Character %p (%s) doesn't have a parent and is not a movie_instance",
-					ch, typeName(*ch));
+				log_debug("Character %p (%s) doesn't have a parent and "
+                        "is not a movie_instance", ch, typeName(*ch));
 				ss << "<no parent, depth" << ch->get_depth() << ">";
 				path.push_back(ss.str());
 			}

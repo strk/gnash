@@ -22,11 +22,9 @@
 #endif
 
 extern "C"{
-#include <unistd.h>
 #ifdef HAVE_GETOPT_H
 	#include <getopt.h>
 #endif
-//	extern int getopt(int, char *const *, const char *);
 }
 
 #include "gnash.h"

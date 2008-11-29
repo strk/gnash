@@ -288,6 +288,8 @@ typedef enum
     ACTION_GETURL2                 = 0x9A,
     ACTION_BRANCHIFTRUE            = 0x9D,
     ACTION_CALLFRAME               = 0x9E,
+
+    /// aka GOTOFRAME2
     ACTION_GOTOEXPRESSION          = 0x9F,
 
     /// http://sswf.sourceforge.net/SWFalexref.html#action_delete

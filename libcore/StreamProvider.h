@@ -41,7 +41,7 @@ public:
 
 	virtual ~StreamProvider() {}
 
-	static StreamProvider& getDefaultInstance();
+	DSOEXPORT static StreamProvider& getDefaultInstance();
 
 	/// Returned stream ownership is transferred to caller.
 	//

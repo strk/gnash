@@ -25,12 +25,6 @@
 #include <string>
 #include <vector>
 
-#if defined(_WIN32) || defined(WIN32)
-# include <winsock2.h>
-#else
-# include <netinet/in.h>
-#endif
-
 #include "log.h"
 #include "GnashException.h"
 #include "buffer.h"

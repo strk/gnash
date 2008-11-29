@@ -20,7 +20,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include <unistd.h>
 #include <cerrno>
 #include <vector>
 #include <string>
@@ -455,8 +454,8 @@ LcShm::connect(const string &name)
         return false; 
     }
     
-    uint8_t* baseAddress = reinterpret_cast<uint8_t *>(Shm::getAddr());
-    uint8_t* tooFar = baseAddress+Shm::getSize();
+	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(Shm::getAddr());
+	boost::uint8_t* tooFar = baseAddress+Shm::getSize();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);
@@ -489,8 +488,8 @@ LcShm::connect(key_t key)
         return false; 
     }
     
-    uint8_t* baseAddress = reinterpret_cast<uint8_t *>(Shm::getAddr());
-    uint8_t* tooFar = baseAddress+Shm::getSize();
+	boost::uint8_t* baseAddress = reinterpret_cast<boost::uint8_t *>(Shm::getAddr());
+	boost::uint8_t* tooFar = baseAddress+Shm::getSize();
     Listener::setBaseAddress(baseAddress);
     _baseaddr = baseAddress;
     parseHeader(baseAddress, tooFar);

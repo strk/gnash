@@ -32,7 +32,7 @@
 #include <iostream>
 #include <cassert>
 
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>

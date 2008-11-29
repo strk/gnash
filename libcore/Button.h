@@ -133,7 +133,7 @@ public:
 	/// (1) Register this button instance as a live character
 	/// (2) Setup the state characters calling stagePlacementCallback on all [WRONG]
 	///
-	virtual void stagePlacementCallback();
+	virtual void stagePlacementCallback(as_object* initObj = 0);
 
 	/// Properly unload contained characters
 	bool unload();

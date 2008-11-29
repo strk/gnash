@@ -116,7 +116,7 @@ private:
 	boost::intrusive_ptr<as_object> _global;
 
 	/// Target SWF version
-	const int _swfversion;
+	int _swfversion;
 
 	/// Set the _global Object for actions run by Virtual Machine
 	//
@@ -198,11 +198,14 @@ public:
 	///
 	static VM& get();
 
-	/// Get version of the SWF movie used to initialize this VM
+	/// Get SWF version context for the currently running actions.
 	//
 	/// This information will drive operations of the virtual machine
 	///
 	int getSWFVersion() const;
+
+	/// Set SWF version of the currently executing code
+	void setSWFVersion(int v);
 
 	/// Get the number of milliseconds since VM was started
 	unsigned long int getTime() const;

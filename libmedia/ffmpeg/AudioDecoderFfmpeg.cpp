@@ -52,7 +52,8 @@ AudioDecoderFfmpeg::AudioDecoderFfmpeg(const AudioInfo& info)
         log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s)"),
             _audioCodec->id, _audioCodec->name);
     } else {
-        log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s) for FLASH codec %d (%s)"),
+        log_debug(_("AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s) "
+                    "for FLASH codec %d (%s)"),
             _audioCodec->id, _audioCodec->name,
             info.codec, (audioCodecType)info.codec);
     }
@@ -124,7 +125,8 @@ void AudioDecoderFfmpeg::setup(SoundInfo& info)
 		// Init the parser
 		_parser = av_parser_init(codec_id);
 		if (!_parser) {	
-			throw MediaException(_("AudioDecoderFfmpeg can't initialize MP3 parser"));
+        throw MediaException(_("AudioDecoderFfmpeg can't initialize "
+                    "MP3 parser"));
 		}
     }
 
@@ -212,8 +214,9 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 
 			default:
 			    boost::format err = boost::format(
-			        _("AudioDecoderFfmpeg: unsupported FLASH audio codec %d (%s)")) %
-			        info.codec % (audioCodecType)info.codec;
+			        _("AudioDecoderFfmpeg: unsupported FLASH audio "
+                        "codec %d (%s)")) %
+                        info.codec % (audioCodecType)info.codec;
 			    throw MediaException(err.str());
 		}
 	}
@@ -230,13 +233,14 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	{
 		if (info.type == FLASH) {
 			boost::format err = boost::format(
-				_("AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)")) %
-				info.codec % static_cast<audioCodecType>(info.codec);
+				_("AudioDecoderFfmpeg: libavcodec could not find a decoder "
+                    "for codec %d (%s)")) %
+                    info.codec % static_cast<audioCodecType>(info.codec);
 			throw MediaException(err.str());
 		} else {
 			boost::format err = boost::format(
-				_("AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id %s")) %
-				codec_id;
+				_("AudioDecoderFfmpeg: libavcodec could not find a decoder "
+                    "for ffmpeg codec id %s")) % codec_id;
 			throw MediaException(err.str());
 		}
 	}
@@ -253,12 +257,13 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
             if ( info.type == FLASH )
             {
                 err = boost::format(
-                    _("AudioDecoderFfmpeg: could not initialize a parser for flash codec id %d (%s)")) %
+                    _("AudioDecoderFfmpeg: could not initialize a parser for "
+                        "flash codec id %d (%s)")) %
                         info.codec % (audioCodecType)info.codec;
             } else {
                 err = boost::format(
-                    _("AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s")) %
-                        codec_id;
+                    _("AudioDecoderFfmpeg: could not initialize a parser "
+                        "for ffmpeg codec id %s")) % codec_id;
             }
             throw MediaException(err.str());
         }
@@ -270,17 +275,20 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 	// Create an audioCodecCtx from the ffmpeg parser if exists/possible
 	_audioCodecCtx = avcodec_alloc_context();
 	if (!_audioCodecCtx) {
-		throw MediaException(_("AudioDecoderFfmpeg: libavcodec couldn't allocate context"));
+		throw MediaException(_("AudioDecoderFfmpeg: libavcodec couldn't "
+                    "allocate context"));
 	}
 
 	if ( info.extra.get() )
 	{
 		if (dynamic_cast<ExtraAudioInfoFfmpeg*>(info.extra.get())) {
-			const ExtraAudioInfoFfmpeg& ei = static_cast<ExtraAudioInfoFfmpeg&>(*info.extra);
+			const ExtraAudioInfoFfmpeg& ei = 
+                static_cast<ExtraAudioInfoFfmpeg&>(*info.extra);
 			_audioCodecCtx->extradata = ei.data;
 			_audioCodecCtx->extradata_size = ei.dataSize;
 		} else if (dynamic_cast<ExtraAudioInfoFlv*>(info.extra.get())) {
-			ExtraAudioInfoFlv* extra = static_cast<ExtraAudioInfoFlv*>(info.extra.get());
+			ExtraAudioInfoFlv* extra = 
+                static_cast<ExtraAudioInfoFlv*>(info.extra.get());
 			_audioCodecCtx->extradata = extra->data.get();
 			_audioCodecCtx->extradata_size = extra->size;
 		}
@@ -298,14 +306,16 @@ void AudioDecoderFfmpeg::setup(const AudioInfo& info)
 			case CODEC_ID_PCM_U16LE:
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.sampleRate;
-                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; // was commented out, why ?
+                // was commented out (why?):
+                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16;
                 _audioCodecCtx->frame_size = 1; 
                 break;
 
             default:
                 _audioCodecCtx->channels = (info.stereo ? 2 : 1);
                 _audioCodecCtx->sample_rate = info.sampleRate;
-                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; // was commented out, why ?
+                // was commented out (why?):
+                _audioCodecCtx->sample_fmt = SAMPLE_FMT_S16; 
                 break;
 	}
 
@@ -349,8 +359,9 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
         {
             assert(!_parser); // so we can directly return here...
             log_debug("AudioDecoderFfmpeg::decode called with 'parse' "
-                "parameter on but we know we don't need parsing for this codec");
-            parse = false; // let's belive in us !
+                "parameter on but we know we don't need parsing for "
+                "this codec");
+            parse = false; // let's believe in us !
         }
     }
 
@@ -359,8 +370,9 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 	int retBufSize = 0;
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-	log_debug("  Parsing loop starts, input is %d bytes, retCapacity is %d bytes", inputSize, retCapacity);
-#endif // GNASH_DEBUG_AUDIO_DECODING
+	log_debug("  Parsing loop starts, input is %d bytes, retCapacity is %d "
+            "bytes", inputSize, retCapacity);
+#endif
 	decodedBytes = 0; // nothing decoded yet
 	while (decodedBytes < inputSize)
 	{
@@ -382,8 +394,9 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
         }
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("   parsed frame is %d bytes (consumed +%d = %d/%d)", framesize, consumed, decodedBytes+consumed, inputSize);
-#endif // GNASH_DEBUG_AUDIO_DECODING
+		log_debug("   parsed frame is %d bytes (consumed +%d = %d/%d)",
+                framesize, consumed, decodedBytes+consumed, inputSize);
+#endif
 
 #if GNASH_PARANOIA_LEVEL > 1
 		if ( frame )
@@ -433,7 +446,8 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 		// Now, decode the frame. We use the ::decodeFrame specialized function
 		// here so resampling is done appropriately
 		boost::uint32_t outSize = 0;
-		boost::scoped_array<boost::uint8_t> outBuf ( decodeFrame(frame, framesize, outSize) );
+		boost::scoped_array<boost::uint8_t> outBuf(
+                decodeFrame(frame, framesize, outSize));
 
 		if (!outBuf)
 		{
@@ -444,8 +458,10 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 		}
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-		log_debug("   decoded frame is %d bytes, would grow return buffer size to %d bytes", outSize, retBufSize+static_cast<unsigned int>(outSize));
-#endif // GNASH_DEBUG_AUDIO_DECODING
+		log_debug("   decoded frame is %d bytes, would grow return "
+                "buffer size to %d bytes", outSize,
+                retBufSize+static_cast<unsigned int>(outSize));
+#endif 
 
 		//
 		// Now append this data to the buffer we're going to return
@@ -456,9 +472,10 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 		if ( retBufSize+(unsigned)outSize > retCapacity )
 		{
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-			log_debug("    output buffer won't be able to hold %d bytes, capacity is only %d bytes",
-				retBufSize+(unsigned)outSize, retCapacity);
-#endif // GNASH_DEBUG_AUDIO_DECODING
+			log_debug("    output buffer won't be able to hold %d bytes, "
+                    "capacity is only %d bytes",
+                    retBufSize+(unsigned)outSize, retCapacity);
+#endif 
 			boost::uint8_t* tmp = retBuf;
 			retCapacity = std::max(retBufSize+static_cast<size_t>(outSize), retCapacity*2);
 #ifdef GNASH_DEBUG_AUDIO_DECODING
@@ -479,7 +496,8 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 }
 
 boost::uint8_t*
-AudioDecoderFfmpeg::decode(const EncodedAudioFrame& ef, boost::uint32_t& outputSize)
+AudioDecoderFfmpeg::decode(const EncodedAudioFrame& ef,
+        boost::uint32_t& outputSize)
 {
 	return decodeFrame(ef.data.get(), ef.dataSize, outputSize);
 }
@@ -492,7 +510,9 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
     assert(inputSize);
 
-    //static const unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+    //static const unsigned int bufsize = 
+    //(AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+
     static const unsigned int bufsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
 	// TODO: make this a private member, to reuse (see NetStreamFfmpeg in 0.8.3)
@@ -509,21 +529,21 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
         inputSize, _audioCodecCtx->channels, _audioCodecCtx->frame_size);
 #endif
 
+    // older ffmpeg versions didn't accept a const input..
 	int tmp = AVCODEC_DECODE_AUDIO(_audioCodecCtx, outPtr, &outSize,
-                                   // older ffmpeg versions didn't accept a const input..
                                    const_cast<boost::uint8_t*>(input),
                                    inputSize);
 
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-	log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) returned %d; set frame_size=%d",
-		bufsize, inputSize, tmp, outSize);
+	log_debug(" avcodec_decode_audio[2](ctx, bufptr, %d, input, %d) "
+            "returned %d; set frame_size=%d",
+		    bufsize, inputSize, tmp, outSize);
 #endif
 
 	if (tmp < 0)
 	{
-		log_error(_("avcodec_decode_audio returned %d. "
-            "Upgrading ffmpeg/libavcodec might fix this issue."),
-            tmp);
+		log_error(_("avcodec_decode_audio returned %d. Upgrading "
+                    "ffmpeg/libavcodec might fix this issue."), tmp);
 		outputSize = 0;
 		delete [] output;
 		return NULL;
@@ -531,9 +551,9 @@ AudioDecoderFfmpeg::decodeFrame(const boost::uint8_t* input,
 
 	if (outSize < 2)
 	{
-		log_error(_("outputSize:%d after decoding %d bytes of input audio data. "
-            "Upgrading ffmpeg/libavcodec might fix this issue."),
-			outputSize, inputSize);
+		log_error(_("outputSize:%d after decoding %d bytes of input audio "
+                    "data. Upgrading ffmpeg/libavcodec might fix this issue."),
+			        outputSize, inputSize);
 		outputSize = 0;
 		delete [] output;
 		return NULL;

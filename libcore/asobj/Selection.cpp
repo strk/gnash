@@ -29,32 +29,61 @@
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
 
+// For getting and setting focus
+#include "VM.h"
+#include "movie_root.h"
+
 namespace gnash {
 
-as_value selection_addlistener(const fn_call& fn);
-as_value selection_getbeginindex(const fn_call& fn);
-as_value selection_getcaretindex(const fn_call& fn);
-as_value selection_getendindex(const fn_call& fn);
-as_value selection_getfocus(const fn_call& fn);
-as_value selection_removelistener(const fn_call& fn);
-as_value selection_setfocus(const fn_call& fn);
-as_value selection_setselection(const fn_call& fn);
-as_value selection_ctor(const fn_call& fn);
+namespace {    
+    as_value selection_addlistener(const fn_call& fn);
+    as_value selection_getbeginindex(const fn_call& fn);
+    as_value selection_getcaretindex(const fn_call& fn);
+    as_value selection_getendindex(const fn_call& fn);
+    as_value selection_getfocus(const fn_call& fn);
+    as_value selection_removelistener(const fn_call& fn);
+    as_value selection_setfocus(const fn_call& fn);
+    as_value selection_setselection(const fn_call& fn);
 
-static void
+    as_object* getSelectionInterface();
+    void attachSelectionInterface(as_object& o);
+}
+
+
+// extern (used by Global.cpp)
+void
+selection_class_init(as_object& global)
+{
+	// Selection is NOT a class, but a simple object, see Selection.as
+
+	static boost::intrusive_ptr<as_object> obj = 
+        new as_object(getObjectInterface());
+	attachSelectionInterface(*obj);
+	global.init_member("Selection", obj.get());
+
+}
+
+namespace {
+
+void
 attachSelectionInterface(as_object& o)
 {
 	o.init_member("addListener", new builtin_function(selection_addlistener));
-	o.init_member("getBeginIndex", new builtin_function(selection_getbeginindex));
-	o.init_member("getCaretIndex", new builtin_function(selection_getcaretindex));
-	o.init_member("getEndIndex", new builtin_function(selection_getendindex));
-	o.init_member("getFocus", new builtin_function(selection_getfocus));
-	o.init_member("removeListener", new builtin_function(selection_removelistener));
+	o.init_member("getBeginIndex",
+            new builtin_function(selection_getbeginindex));
+	o.init_member("getCaretIndex",
+            new builtin_function(selection_getcaretindex));
+	o.init_member("getEndIndex",
+            new builtin_function(selection_getendindex));
+	o.init_member("getFocus",
+            new builtin_function(selection_getfocus));
+	o.init_member("removeListener",
+            new builtin_function(selection_removelistener));
 	o.init_member("setFocus", new builtin_function(selection_setfocus));
 	o.init_member("setSelection", new builtin_function(selection_setselection));
 }
 
-static as_object*
+as_object*
 getSelectionInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
@@ -66,75 +95,92 @@ getSelectionInterface()
 	return o.get();
 }
 
-class selection_as_object: public as_object
-{
+as_value
+selection_addlistener(const fn_call& /*fn*/) {
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
+}
 
-public:
-
-	selection_as_object()
-		:
-		as_object(getSelectionInterface())
-	{}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "Selection"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-};
-
-as_value selection_addlistener(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-as_value selection_getbeginindex(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-as_value selection_getcaretindex(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-as_value selection_getendindex(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-as_value selection_getfocus(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-as_value selection_removelistener(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-as_value selection_setfocus(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-as_value selection_setselection(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
 
 as_value
-selection_ctor(const fn_call& /* fn */)
-{
-	boost::intrusive_ptr<as_object> obj = new selection_as_object;
-	
-	return as_value(obj.get()); // will keep alive
-}
-
-// extern (used by Global.cpp)
-void
-selection_class_init(as_object& global)
-{
-	// Selection is NOT a class, but a simple object, see Selection.as
-
-	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
-	attachSelectionInterface(*obj);
-	global.init_member("Selection", obj.get());
-
+selection_getbeginindex(const fn_call& /*fn*/) {
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
 }
 
 
+as_value
+selection_getcaretindex(const fn_call& /*fn*/) {
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
+}
+
+
+as_value
+selection_getendindex(const fn_call& /*fn*/) {
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
+}
+
+/// Returns null when there is no focus, otherwise the target of the
+/// character.
+as_value
+selection_getfocus(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    
+    UNUSED(ptr);
+    log_unimpl("Selection.getFocus()");
+
+    return as_value();
+}
+
+
+as_value
+selection_removelistener(const fn_call& /*fn*/) {
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
+}
+
+
+// Documented to return true when setFocus succeeds, but that seems like the
+// usual Adobe crap.
+//
+// TODO: clean this up when it's better tested.
+//
+// Returns true if the character can normally receive focus (TextField), false
+// if it can't (MovieClip, any other object), regardless of whether focus
+// was set or not.
+//
+// A MovieClip must have the focusEnabled property evaluate to true in order
+// to receive focus.
+//
+// At least MovieClip behaves differently for SWF5, where focusEnabled
+// is probably irrelevant and setFocus can return true for MovieClips.
+// No idea what a TextField has to do to receive focus. 
+//
+// Button? Should be able to receive focus normally, so perhaps like TextField.
+//
+// Any number of arguments other than one returns false and does nothing. The
+// single argument can be a character or a full target path.
+as_value
+selection_setfocus(const fn_call& fn)
+{
+
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    
+    UNUSED(ptr);
+    log_unimpl("Selection.setFocus()");
+
+    return as_value();
+}
+
+
+as_value
+selection_setselection(const fn_call& /*fn*/) {
+    LOG_ONCE( log_unimpl (__FUNCTION__) );
+    return as_value();
+}
+
+} // anonymous namespace
 } // end of gnash namespace

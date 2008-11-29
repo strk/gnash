@@ -96,18 +96,40 @@ MediaHandlerGst::createVideoDecoder(const VideoInfo& info)
 std::auto_ptr<AudioDecoder>
 MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 {
-        AudioDecoder* decoder = 0;
+	std::auto_ptr<AudioDecoder> ret;
+
 #ifdef DECODING_SPEEX
 	if (info.codec == AUDIO_CODEC_SPEEX) {
 		assert(info.type == FLASH);
-		decoder = new AudioDecoderSpeex;
+		ret.reset(new AudioDecoderSpeex);
 	} else
 #endif
 	{
-		decoder = new AudioDecoderGst(info);
+        try
+        {
+		    ret.reset(new AudioDecoderGst(info));
+        }
+        catch (MediaException& ex)
+        {
+            if ( info.type != FLASH ) throw ex;
+
+            try
+            {
+                ret = createFlashAudioDecoder(info);
+            } 
+            catch (MediaException& ex2)
+            {
+                boost::format err = boost::format(
+                    _("MediaHandlerGst::createAudioDecoder: %s "
+                      "-- %s")) %
+                    ex.what() % ex2.what();
+                throw MediaException(err.str());
+            }
+        }
+    
 	}
 
-	return std::auto_ptr<AudioDecoder>(decoder);
+	return ret;
 }
 
 } // gnash.media.gst namespace

@@ -179,12 +179,12 @@ SDL_sound_handler::fill_stream_data(unsigned char* data,
 
 
 void
-SDL_sound_handler::play_sound(int soundHandle, int loopCount, int offSecs,
-        long startPos, const SoundEnvelopes* env)
+SDL_sound_handler::playSound(int id, int loops, int offSecs,
+        long startPos, const SoundEnvelopes* env, bool allowMulti)
 {
     boost::mutex::scoped_lock lock(_mutex);
-    // WARNING: play_sound will likely trigger another lock of _mutex here...
-    sound_handler::play_sound(soundHandle, loopCount, offSecs, startPos, env);
+    // WARNING: playSound might trigger another lock of _mutex here (check me)
+    sound_handler::playSound(id, loops, offSecs, startPos, env, allowMulti);
 }
 
 

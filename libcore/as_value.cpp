@@ -667,7 +667,7 @@ as_value::to_number() const
                 // characters is returned, including exponent, positive
                 // and negative signs and whitespace before.
                 double d = 0;
-                std::istringstream is (getStr());
+                std::istringstream is(s);
                 is >> d;
                 return d;
             }
@@ -865,7 +865,7 @@ as_value::to_bool_v5() const
 		case NUMBER:
 		{
 			double d = getNum();
-			return ! isNaN(d) && d; 
+			return d && ! isNaN(d);
 		}
 		case BOOLEAN:
 			return getBool();
@@ -897,7 +897,8 @@ as_value::to_bool_v6() const
 		case NUMBER:
 		{
 			double d = getNum();
-			return utility::isFinite(d) && d;
+            // see testsuite/swfdec/if-6.swf
+			return d && ! isNaN(d);
 		}
 		case BOOLEAN:
 			return getBool();

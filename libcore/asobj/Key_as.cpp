@@ -30,6 +30,9 @@
 #include "namedStrings.h"
 #include "GnashKey.h" // key::code
 
+// Define this to get DEBUG lines on key events
+//#define GNASH_DEBUG_KEYEVENTS
+
 namespace gnash {
 
 /************************************************************************
@@ -56,7 +59,9 @@ Key_as::Key_as()
 bool
 Key_as::is_key_down(int keycode)
 {
-    if (keycode < 0 || keycode >= key::KEYCOUNT) return false;
+    // caller must check this
+    assert (keycode >= 0 && keycode < key::KEYCOUNT);
+
     if (_unreleasedKeys.test(keycode)) return true;
     return false;
 }
@@ -64,7 +69,12 @@ Key_as::is_key_down(int keycode)
 void
 Key_as::set_key_down(key::code code)
 {
-    if (code >= key::KEYCOUNT) return;
+    if (code >= key::KEYCOUNT)
+    {
+        // programmatic error, as only movie_root calls us
+        log_error("Key_as::set_key_down(%d): code out of range", code);
+        return;
+    }
 
     // This is used for getAscii() of the last key event, so we store
     // the unique gnash::key::code.
@@ -74,13 +84,21 @@ Key_as::set_key_down(key::code code)
     // we lookup keycode to add to _unreleasedKeys.   
     size_t keycode = key::codeMap[code][key::KEY];
 
+#ifdef GNASH_DEBUG_KEYEVENTS
+    log_debug("Key_as::set_key_down(%d): setting unreleased keycode %d (from code %d)", keycode, code);
+#endif
     _unreleasedKeys.set(keycode, 1);
 }
 
 void
 Key_as::set_key_up(key::code code)
 {
-    if (code >= key::KEYCOUNT) return;
+    if (code >= key::KEYCOUNT)
+    {
+        // programmatic error, as only movie_root calls us
+        log_error("Key_as::set_key_up(%d): code out of range", code);
+        return;
+    }
 
     // This is used for getAscii() of the last key event, so we store
     // the unique gnash::key::code.    
@@ -90,6 +108,9 @@ Key_as::set_key_up(key::code code)
     // we lookup keycode to add to _unreleasedKeys.
     size_t keycode = key::codeMap[code][key::KEY];
 
+#ifdef GNASH_DEBUG_KEYEVENTS
+    log_debug("Key_as::set_key_down(%d): setting released keycode %d (from code %d)", keycode, code);
+#endif
     _unreleasedKeys.set(keycode, 0);
 }
 
@@ -102,7 +123,9 @@ Key_as::notify_listeners(const event_id& key_event)
 
     as_value ev(key_event.get_function_name());
 
-    //log_debug("notify_listeners calling broadcastMessage with arg %s", ev);
+#ifdef GNASH_DEBUG_KEYEVENTS
+    log_debug("notify_listeners calling broadcastMessage with arg %s", ev);
+#endif
     callMethod(NSV::PROP_BROADCAST_MESSAGE, ev);
 }
 
@@ -164,6 +187,14 @@ key_is_down(const fn_call& fn)
     }
 
     int keycode = fn.arg(0).to_int();
+    if (keycode < 0 || keycode >= key::KEYCOUNT)
+    {
+        // AS coding error !
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("Key.isKeyDown(%d): keycode out of range", keycode);
+        );
+        return as_value(false);
+    }
 
     return as_value(ko->is_key_down(keycode));
 }

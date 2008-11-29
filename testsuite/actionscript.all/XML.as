@@ -864,9 +864,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(386);
+		check_totals(387);
 #else
-		check_totals(426);
+		check_totals(427);
 #endif
 		play();
 	}
@@ -967,6 +967,10 @@ xcheck_equals(h.toString(), "");
 
 h = new XML("<open>& ' \"<");
 check_equals(h.toString(), "<open>&amp; &apos; &quot;</open>");
+
+// A non-breaking space (honest).
+h = new XML("<open> </open>");
+check_equals(h.toString(), "<open> </open>");
 
 h = new XML("</open><open>node with \"</open>");
 check_equals(h.toString(), "");

@@ -50,7 +50,6 @@
 #include "utf8.h"
 #include "StringPredicates.h" // StringNoCaseEqual
 
-#include <unistd.h>  // For write() on BSD
 #include <string>
 #include <vector>
 #include <locale>
@@ -165,32 +164,6 @@ SWFHandlers::SWFHandlers()
     {
         log_error(_("FIXME: VM not initialized at SWFHandlers construction time, can't set action handlers based on SWF version"));
     }
-
-    std::vector<std::string> & property_names = get_property_names();
-
-    property_names.reserve(32);
-    property_names.push_back("_x"); // 0
-    property_names.push_back("_y"); // 1
-    property_names.push_back("_xscale"); // 2
-    property_names.push_back("_yscale"); // 3
-    property_names.push_back("_currentframe"); // 4
-    property_names.push_back("_totalframes"); // 5
-    property_names.push_back("_alpha"); // 6
-    property_names.push_back("_visible"); // 7
-    property_names.push_back("_width"); // 8
-    property_names.push_back("_height"); // 9
-    property_names.push_back("_rotation"); // 10
-    property_names.push_back("_target"); // 11
-    property_names.push_back("_framesloaded"); // 12
-    property_names.push_back("_name"); // 13
-    property_names.push_back("_droptarget"); // 14
-    property_names.push_back("_url"); // 15
-    property_names.push_back("_highquality"); // 16
-    property_names.push_back("_focusrect"); // 17
-    property_names.push_back("_soundbuftime"); // 18
-    property_names.push_back("_quality"); // 19 - quality: what the quality is (0, 1 or 2)
-    property_names.push_back("_xmouse"); // 20
-    property_names.push_back("_ymouse"); // 21
 
     container_type & handlers = get_handlers();
 
@@ -412,11 +385,46 @@ SWFHandlers::get_handlers()
     return handlers;
 }
 
-std::vector<std::string> &
-SWFHandlers::get_property_names()
+/// @todo: make properties available outside, for
+///        example for Machine.cpp
+/// @todo: consider sorting named strings so that
+///        the first 22 or more elements have
+///        the corresponding property number (drops
+///        one level of indirection).
+///
+static const string_table::key&
+propertyKey(unsigned int val)
 {
-    static std::vector<std::string> prop_names;
-    return prop_names;
+    static const string_table::key invalidKey=0;
+
+    if ( val > 21u ) return invalidKey;
+
+    static const string_table::key props[22] = {
+        NSV::PROP_uX, // 0
+        NSV::PROP_uY, // 1
+        NSV::PROP_uXSCALE, // 2
+        NSV::PROP_uYSCALE, // 3
+        NSV::PROP_uCURRENTFRAME, // 4
+        NSV::PROP_uTOTALFRAMES, // 5
+        NSV::PROP_uALPHA, // 6
+        NSV::PROP_uVISIBLE, // 7
+        NSV::PROP_uWIDTH, // 8
+        NSV::PROP_uHEIGHT, // 9
+        NSV::PROP_uROTATION, // 10
+        NSV::PROP_uTARGET, // 11
+        NSV::PROP_uFRAMESLOADED, // 12
+        NSV::PROP_uNAME, // 13
+        NSV::PROP_uDROPTARGET, // 14
+        NSV::PROP_uURL, // 15
+        NSV::PROP_uHIGHQUALITY, // 16
+        NSV::PROP_uFOCUSRECT, // 17
+        NSV::PROP_uSOUNDBUFTIME, // 18
+        NSV::PROP_uQUALITY, // 19
+        NSV::PROP_uXMOUSE, // 20
+        NSV::PROP_uYMOUSE // 21
+    };
+
+    return props[val];
 }
 
 
@@ -641,6 +649,17 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
         return;
     }
 
+    unsigned int totframes = target_sprite->get_frame_count();
+    if ( framenum > totframes )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("ActionWaitForFrame(%d): "
+                       "target (%s) has only %d frames"),
+                       framenum, totframes);
+        );
+        framenum = totframes;
+    }
+
     // Actually *wait* for target frame, and never skip any action
 #ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
     target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
@@ -650,7 +669,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     size_t lastloaded = target_sprite->get_loaded_frames();
     if ( lastloaded < framenum )
     {
-        //log_debug(_("%s: frame %u not reached yet (loaded %u), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, skip);
+        //log_debug(_("%s: frame %u not reached yet (loaded %u for sprite %s), skipping next %u actions"), __FUNCTION__, framenum, lastloaded, target_sprite->getTarget(), skip);
         // better delegate this to ActionExec
         thread.skip_actions(skip);
     }
@@ -837,11 +856,22 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
 void
 SWFHandlers::ActionStringLength(ActionExec& thread)
 {
-
     as_environment& env = thread.env;
-    
-    const int version = env.get_version();
-    env.top(0).set_int(env.top(0).to_string_versioned(version).size());
+
+    // NOTE: I've tested that we should change behaviour
+    //       based on code definition version, not top-level
+    //       SWF version. Just not automated yet.
+    //
+    const int version = thread.code.getDefinitionVersion();
+    if ( version > 5 )
+    {
+        // when SWF version is > 5 we compute the multi-byte length
+        ActionMbLength(thread);
+    }
+    else
+    {
+        env.top(0).set_int(env.top(0).to_string_versioned(version).size());
+    }
 }
 
 void
@@ -1072,22 +1102,18 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 
     if (target)
     {
-        if ( prop_number < get_property_names().size() )
-        {
-            as_value val;
-#if GNASH_PARANOIA_LEVEL > 1
-            assert( ! get_property_names().empty() );
-#endif
-            std::string propname = get_property_names()[prop_number];
-
-            thread.getObjectMember(*target, propname, val);
-            env.top(1) = val;
-        }
-        else
+        string_table::key propKey = propertyKey(prop_number);
+        if ( propKey == 0 )
         {
             log_error(_("invalid property query, property "
                 "number %d"), prop_number);
             env.top(1) = as_value();
+        }
+        else
+        {
+            as_value val;
+            target->get_member(propKey, &val);
+            env.top(1) = val;
         }
     }
     else
@@ -1112,32 +1138,30 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     // FIXME: what happens when it's an invalid number? This will cause
     // undefined behaviour on overflow.
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
+
     as_value prop_val = env.top(0);
 
-    if (target) {
-
-    if ( prop_number < get_property_names().size() )
+    if (target)
     {
-        // TODO: check if get_property_names() return a string&
-        std::string member_name = get_property_names()[prop_number];
-        thread.setObjectMember(*target, member_name, prop_val);
-    }
-    else
-    {
-        // Malformed SWF ? (don't think this is possible to do with syntactically valid ActionScript)
-        IF_VERBOSE_MALFORMED_SWF (
+        string_table::key propKey = propertyKey(prop_number);
+        if ( propKey == 0 )
+        {
+            // Malformed SWF ? (don't think this is possible to do with syntactically valid ActionScript)
+            IF_VERBOSE_MALFORMED_SWF (
             log_swferror(_("invalid set_property, property number %d"), prop_number);
-        )
-    }
-
+            )
+        }
+        else
+        {
+            target->set_member(propKey, prop_val);
+        }
     }
     else
     {
-    IF_VERBOSE_ASCODING_ERRORS (
-    log_aserror(_("ActionSetProperty: can't find target %s for setting property %s"),
-        env.top(2), get_property_names()[prop_number]);
-    )
-
+        IF_VERBOSE_ASCODING_ERRORS (
+        log_aserror(_("ActionSetProperty: can't find target %s for setting property %s"),
+            env.top(2), prop_number);
+        )
     }
     env.drop(3);
 }
@@ -1675,7 +1699,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
     
     // Should return 0 
 
-    const int version = env.get_version();
+    const int swfVersion = thread.code.getDefinitionVersion();
     
     std::string str = env.top(0).to_string();
     
@@ -1685,7 +1709,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
         return;
     }
 
-    std::wstring wstr = utf8::decodeCanonicalString(str, version);
+    std::wstring wstr = utf8::decodeCanonicalString(str, swfVersion);
 
     // decodeCanonicalString should correctly work out what the first character
     // is according to version.
@@ -1698,7 +1722,6 @@ SWFHandlers::ActionChr(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    
     // Only handles values up to 65535
     boost::uint16_t c = static_cast<boost::uint16_t>(env.top(0).to_int());
 
@@ -1710,7 +1733,8 @@ SWFHandlers::ActionChr(ActionExec& thread)
         return;
     }
     
-    if (env.get_version() > 5)
+    int swfVersion = thread.code.getDefinitionVersion();
+    if (swfVersion > 5)
     {
         env.top(0).set_string(utf8::encodeUnicodeCharacter(c));
         return;
@@ -2738,7 +2762,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
     //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
     as_value result = call_method(function, &env, this_ptr,
-                  args, super);
+                  args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
 
@@ -3011,7 +3035,11 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
     if (v1.is_string() || v2.is_string() )
     {
-        const int version = env.get_version();
+        // NOTE: I've tested that we should change behaviour
+        //       based on code definition version, not top-level
+        //       SWF version. Just not automated yet.
+        //
+        const int version = thread.code.getDefinitionVersion();
         v2.convert_to_string_versioned(version);
         v2.string_concat(v1.to_string_versioned(version));
         env.top(1) = v2;
@@ -3379,7 +3407,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
     as_value result = call_method(method_val, &env, this_ptr, 
-            args, super);
+            args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
 
