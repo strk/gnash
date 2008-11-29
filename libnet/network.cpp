@@ -864,6 +864,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 		log_debug("Have a pending SIGINT interupt waiting!");
 		int sig;
 		sigwait(&blockset, &sig);
+		cntrlc_handler(SIGINT);
 	    }
 #else
 	    tval.tv_sec = timeout;
@@ -1015,6 +1016,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 	    log_debug("Have a pending SIGINT interupt waiting!");
 	    int sig;
 	    sigwait(&blockset, &sig);
+	    cntrlc_handler(SIGINT);
 	}
 #else
 	tval.tv_sec = timeout;
