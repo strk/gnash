@@ -230,7 +230,7 @@ public:
     amf::Buffer &formatTE(const std::string &data)
  	{return formatCommon("TE: " + data); };
     // All HTTP messages are terminated with a blank line
-    void terminateHeader() { formatCommon("\r\n"); };    
+    void terminateHeader() { _buffer += "\r\n"; };    
     
     amf::Buffer &formatErrorResponse(http_status_e err);
     
