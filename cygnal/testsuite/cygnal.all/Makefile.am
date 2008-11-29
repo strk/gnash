@@ -67,7 +67,9 @@ TEST_DRIVERS = ../cygnal.exp
 
 CLEANFILES =  \
 	site.exp.bak \
-	testrun.* 
+	testrun.* \
+	foo* \
+	wget-log*
 
 check-DEJAGNU: site-update
 	@runtest=$(RUNTEST); \
