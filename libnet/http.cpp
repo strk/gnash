@@ -82,7 +82,7 @@ static const size_t CACHE_LIMIT = 102400000;
 static Cache& cache = Cache::getDefaultInstance();
 
 HTTP::HTTP() 
-    : _filetype(amf::AMF::FILETYPE_HTML),
+    : _filetype(DiskStream::FILETYPE_HTML),
       _filesize(0),
       _keepalive(false),
       _handler(0),
@@ -97,7 +97,7 @@ HTTP::HTTP()
 }
 
 HTTP::HTTP(Handler *hand) 
-    : _filetype(amf::AMF::FILETYPE_HTML),
+    : _filetype(DiskStream::FILETYPE_HTML),
       _filesize(0),
       _keepalive(false),
       _clientid(0),
@@ -136,7 +136,7 @@ HTTP::operator = (HTTP& /*obj*/)
 bool
 HTTP::processClientRequest()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     boost::shared_ptr<amf::Buffer> buf(_que.peek());
     if (buf) {
@@ -168,7 +168,7 @@ HTTP::processClientRequest()
 bool
 HTTP::processGetRequest()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
 //     Network::byte_t buffer[readsize+1];
 //     const char *ptr = reinterpret_cast<const char *>(buffer);
@@ -335,7 +335,7 @@ HTTP::checkGeneralFields(amf::Buffer & /* buf */)
 gnash::Network::byte_t *
 HTTP::processHeaderFields(amf::Buffer &buf)
 {
-//    GNASH_REPORT_FUNCTION;
+  //    GNASH_REPORT_FUNCTION;
     string head(reinterpret_cast<const char *>(buf.reference()));
 
     // The end of the header block is always followed by a blank line
@@ -353,7 +353,7 @@ HTTP::processHeaderFields(amf::Buffer &buf)
  			   (int(*)(int)) tolower);
  	    _fields[name] = value;
 	    if (name == "keep-alive") {
-		log_debug("Got a Keep Alive HTTP header field!");
+     //		log_debug("Got a Keep Alive HTTP header field!");
 		_keepalive = true;
 		if ((value != "on") && (value != "off")) {
 		    _max_requests = strtol(value.c_str(), NULL, 0);
@@ -363,7 +363,7 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 	    // 
 	    if (name == "connection") {
 		if (value.find("keep-alive", 0) != string::npos) {
-		    log_debug("Got a Keep Alive in HTTP Connection header field!");
+  //		    log_debug("Got a Keep Alive in HTTP Connection header field!");
 		    _keepalive = true;
 		}
 	    }
@@ -374,10 +374,22 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 	    if (extractCommand(const_cast<gnash::Network::byte_t *>(cmd)) == HTTP::HTTP_NONE) {
 		break;
 	    } else {
+	      log_debug("Got a request, parsing \"%s\"", *i);
+		string::size_type start = i->find(" ");
 		string::size_type pos = i->find("HTTP/");
 		if (pos != string::npos) {
+		    // The version is the last field and is the protocol name
+		    // followed by a slash, and the version number. Note that
+		    // the version is not a double, even though it has a dot
+		    // in it. It's actually two separate integers.
 		    _version.major = i->at(pos+5) - '0';
 		    _version.minor = i->at(pos+7) - '0';
+		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
+		    // the filespec in the request is the middle field, deliminated
+		    // by a space on each end.
+		    _filespec = i->substr(start+1, pos-start-2);
+		    log_debug("Requesting file: \"%s\"", _filespec);
+
 		    // HTTP 1.1 enables persistant network connections
 		    // by default.
 		    if (_version.minor > 0) {
@@ -433,130 +445,139 @@ HTTP::formatCommon(const string &data)
 }
 
 amf::Buffer &
-HTTP::formatHeader(int filesize, http_status_e type)
+HTTP::formatHeader(size_t size, http_status_e code)
 {
 //    GNASH_REPORT_FUNCTION;
+  return formatHeader(_filetype, size, code);
+}
+
+amf::Buffer &
+HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
+{
+    GNASH_REPORT_FUNCTION;
+
+    clearHeader();
 
     char num[12];
 
     _buffer = "HTTP/";
     sprintf(num, "%d.%d", _version.major, _version.minor);
     _buffer += num;
-    sprintf(num, " %d ", static_cast<int>(type));
+    sprintf(num, " %d ", static_cast<int>(code));
     _buffer += num;
-    switch (type) {
+    switch (code) {
       case CONTINUE:
-	  _buffer += "Continue\r\n";
+	  _buffer += "Continue";
 	  break;
       case SWITCHPROTOCOLS:
-	  _buffer += "Switch Protocols\r\n";
+	  _buffer += "Switch Protocols";
 	  break;
 	  // 2xx: Success - The action was successfully received,
 	  // understood, and accepted
 	  break;
       case OK:
-	  _buffer += "OK\r\n";
+	  _buffer += "OK";
 	  break;
       case CREATED:
-	  _buffer += "Created\r\n";
+	  _buffer += "Created";
 	  break;
       case ACCEPTED:
-	  _buffer += "Accepted\r\n";
+	  _buffer += "Accepted";
 	  break;
       case NON_AUTHORITATIVE:
-	  _buffer += "Non Authoritive\r\n";
+	  _buffer += "Non Authoritive";
 	  break;
       case NO_CONTENT:
-	  _buffer += "No Content\r\n";
+	  _buffer += "No Content";
 	  break;
       case RESET_CONTENT:
-	  _buffer += "Reset Content\r\n";
+	  _buffer += "Reset Content";
 	  break;
       case PARTIAL_CONTENT:
-	  _buffer += "Partial Content:\r\n";
+	  _buffer += "Partial Content";
 	  break;
         // 3xx: Redirection - Further action must be taken in order to
         // complete the request
       case MULTIPLE_CHOICES:
-	  _buffer += "Multiple Choices\r\n";
+	  _buffer += "Multiple Choices";
 	  break;
       case MOVED_PERMANENTLY:
-	  _buffer += "Moved Permanently\r\n";
+	  _buffer += "Moved Permanently";
 	  break;
       case FOUND:
-	  _buffer += "Found\r\n";
+	  _buffer += "Found";
 	  break;
       case SEE_OTHER:
-	  _buffer += "See Other\r\n";
+	  _buffer += "See Other";
 	  break;
       case NOT_MODIFIED:
-	  _buffer += "Not Modified\r\n";
+	  _buffer += "Not Modified";
 	  break;
       case USE_PROXY:
-	  _buffer += "Use Proxy\r\n";
+	  _buffer += "Use Proxy";
 	  break;
       case TEMPORARY_REDIRECT:
-	  _buffer += "Temporary Redirect\r\n";
+	  _buffer += "Temporary Redirect";
 	  break;
         // 4xx: Client Error - The request contains bad syntax or
         // cannot be fulfilled
       case BAD_REQUEST:
-	  _buffer += "Bad Request\r\n";
+	  _buffer += "Bad Request";
 	  break;
       case UNAUTHORIZED:
-	  _buffer += "Unauthorized\r\n";
+	  _buffer += "Unauthorized";
 	  break;
       case PAYMENT_REQUIRED:
-	  _buffer += "Payment Required\r\n";
+	  _buffer += "Payment Required";
 	  break;
       case FORBIDDEN:
-	  _buffer += "Forbidden\r\n";
+	  _buffer += "Forbidden";
 	  break;
       case NOT_FOUND:
-	  _buffer += "Not Found\r\n";
+	  _buffer += "Not Found";
 	  break;
       case METHOD_NOT_ALLOWED:
-	  _buffer += "Method Not Allowed\r\n";
+	  _buffer += "Method Not Allowed";
 	  break;
       case NOT_ACCEPTABLE:
-	  _buffer += "Not Acceptable\r\n";
+	  _buffer += "Not Acceptable";
 	  break;
       case PROXY_AUTHENTICATION_REQUIRED:
-	  _buffer += "Proxy Authentication Required\r\n";
+	  _buffer += "Proxy Authentication Required";
 	  break;
       case REQUEST_TIMEOUT:
-	  _buffer += "Request Timeout\r\n";
+	  _buffer += "Request Timeout";
 	  break;
       case CONFLICT:
-	  _buffer += "Conflict\r\n";
+	  _buffer += "Conflict";
 	  break;
       case GONE:
-	  _buffer += "Gone\r\n";
+	  _buffer += "Gone";
 	  break;
       case LENGTH_REQUIRED:
-	  _buffer += "Length Required\r\n";
+	  _buffer += "Length Required";
 	  break;
       case PRECONDITION_FAILED:
-	  _buffer += "Precondition Failed\r\n";
+	  _buffer += "Precondition Failed";
 	  break;
       case REQUEST_ENTITY_TOO_LARGE:
-	  _buffer += "Request Entity Too Large\r\n";
+	  _buffer += "Request Entity Too Large";
 	  break;
       case REQUEST_URI_TOO_LARGE:
-	  _buffer += "Request URI Too Large\r\n";
+	  _buffer += "Request URI Too Large";
 	  break;
       case UNSUPPORTED_MEDIA_TYPE:
-	  _buffer += "Unsupported Media Type\r\n";
+	  _buffer += "Unsupported Media Type";
 	  break;
       case REQUESTED_RANGE_NOT_SATISFIABLE:
-	  _buffer += "Request Range Not Satisfiable\r\n";
+	  _buffer += "Request Range Not Satisfiable";
 	  break;
       case EXPECTATION_FAILED:
-	  _buffer += "Expectation Failed\r\n";
+	  _buffer += "Expectation Failed";
 	  break;
 	  // 5xx: Server Error - The server failed to fulfill an apparently valid request
       case INTERNAL_SERVER_ERROR:
-	  _buffer += "Internal Server Error\r\n";
+	  _buffer += "Internal Server Error";
 	  break;
       case NOT_IMPLEMENTED:
 	  _buffer += "Method Not Implemented";
@@ -565,31 +586,34 @@ HTTP::formatHeader(int filesize, http_status_e type)
 	  _buffer += "Bad Gateway";
 	  break;
       case SERVICE_UNAVAILABLE:
-	  _buffer += "Service Unavailable\r\n";
+	  _buffer += "Service Unavailable";
 	  break;
       case GATEWAY_TIMEOUT:
-	  _buffer += "Gateway Timeout\r\n";
+	  _buffer += "Gateway Timeout";
 	  break;
       case HTTP_VERSION_NOT_SUPPORTED:
-	  _buffer += "HTTP Version Not Supported\r\n";
+	  _buffer += "HTTP Version Not Supported";
 	  break;
 	  // Gnash/Cygnal extensions for internal use
       case LIFE_IS_GOOD:
 	  break;
       case CLOSEPIPE:
-	  _buffer += "Close Pipe\r\n";	  
+	  _buffer += "Close Pipe";	  
 	  break;
       default:
 	  break;
     }
-    
+
+    // end the line
+    _buffer += "\r\n";
+
     formatDate();
     formatServer();
     formatLastModified();
     formatAcceptRanges("bytes");
-    formatContentLength(filesize);
+    formatContentLength(size);
     formatKeepAlive("timeout=15, max=100");
-    formatContentType(amf::AMF::FILETYPE_HTML);
+    formatContentType(type);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
 
@@ -627,7 +651,7 @@ HTTP::formatErrorResponse(http_status_e code)
 //    _filesize = _body.str().size();
     formatContentLength(_filesize);
     formatConnection("close");
-    formatContentType(amf::AMF::FILETYPE_HTML);
+    formatContentType(_filetype);
 
     // All HTTP messages are followed by a blank line.
     terminateHeader();
@@ -735,29 +759,70 @@ HTTP::formatContentLength(boost::uint32_t filesize)
 amf::Buffer &
 HTTP::formatContentType()
 {
+//    GNASH_REPORT_FUNCTION;
     return formatContentType(_filetype);
 }
 
 amf::Buffer &
-HTTP::formatContentType(amf::AMF::filetype_e filetype)
+HTTP::formatContentType(DiskStream::filetype_e filetype)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     switch (filetype) {
-      case amf::AMF::FILETYPE_HTML:
+      // default to HTML if the type isn't known
+      case DiskStream::FILETYPE_NONE:
 	  _buffer += "Content-Type: text/html\r\n";
 	  break;
-      case amf::AMF::FILETYPE_SWF:
+      case DiskStream::FILETYPE_AMF:
+	  _buffer += "Content-Type: application/amf\r\n";
+	  break;
+      case DiskStream::FILETYPE_SWF:
 	  _buffer += "Content-Type: application/x-shockwave-flash\r\n";
 	  break;
-      case amf::AMF::FILETYPE_VIDEO:
-	  _buffer += "Content-Type: video/flv\r\n";
+      case DiskStream::FILETYPE_HTML:
+	  _buffer += "Content-Type: text/html\r\n";
 	  break;
-      case amf::AMF::FILETYPE_MP3:
+    case DiskStream::FILETYPE_PNG:
+	  _buffer += "Content-Type: image/png\r\n";
+	  break;
+    case DiskStream::FILETYPE_JPEG:
+	  _buffer += "Content-Type: image/jpeg\r\n";
+	  break;
+    case DiskStream::FILETYPE_GIF:
+	  _buffer += "Content-Type: image/gif\r\n";
+	  break;
+    case DiskStream::FILETYPE_MP3:
 	  _buffer += "Content-Type: audio/mpeg\r\n";
 	  break;
-      case amf::AMF::FILETYPE_FCS:
-	  _buffer += "Content-Type: application/x-fcs\r\n";
+    case DiskStream::FILETYPE_MP4:
+	  _buffer += "Content-Type: video/mp4\r\n";
+	  break;
+    case DiskStream::FILETYPE_OGG:
+	  _buffer += "Content-Type: audio/ogg\r\n";
+	  break;
+    case DiskStream::FILETYPE_VORBIS:
+	  _buffer += "Content-Type: audio/ogg\r\n";
+	  break;
+    case DiskStream::FILETYPE_THEORA:
+	  _buffer += "Content-Type: video/ogg\r\n";
+	  break;
+    case DiskStream::FILETYPE_DIRAC:
+	  _buffer += "Content-Type: video/dirac\r\n";
+	  break;
+    case DiskStream::FILETYPE_TEXT:
+	  _buffer += "Content-Type: text/plain\r\n";
+	  break;
+    case DiskStream::FILETYPE_FLV:
+	  _buffer += "Content-Type: video/x-flv\r\n";
+	  break;
+    case DiskStream::FILETYPE_VP6:
+	  _buffer += "Content-Type: video/vp6\r\n";
+	  break;
+    case DiskStream::FILETYPE_XML:
+	  _buffer += "Content-Type: application/xml\r\n";
+	  break;
+    case DiskStream::FILETYPE_FLAC:
+	  _buffer += "Content-Type: audio/flac\r\n";
 	  break;
       default:
 	  _buffer += "Content-Type: text/html\r\n";
@@ -788,9 +853,18 @@ HTTP::formatLastModified()
 amf::Buffer &
 HTTP::formatGetReply(http_status_e code)
 {
-    GNASH_REPORT_FUNCTION;
+
+//    GNASH_REPORT_FUNCTION;
     
-    formatHeader(_filesize, code);
+    return formatHeader(_filesize, code);
+}
+
+amf::Buffer &
+HTTP::formatGetReply(size_t size, http_status_e code)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    formatHeader(size, code);
     
 //    int ret = Network::writeNet(_header.str());    
 //    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
@@ -817,7 +891,7 @@ HTTP::formatPostReply(rtmpt_cmd_e /* code */)
 
     formatDate();
     formatServer();
-    formatContentType(amf::AMF::FILETYPE_FCS);
+    formatContentType(DiskStream::FILETYPE_AMF);
     // All HTTP messages are followed by a blank line.
     terminateHeader();
     return _buffer;
@@ -982,69 +1056,6 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
     return cmd;
 }
 
-// Get the file type, so we know how to set the
-// Content-type in the header.
-amf::AMF::filetype_e
-
-HTTP::getFileStats(std::string &filespec)
-{
-    GNASH_REPORT_FUNCTION;    
-    bool try_again = true;
-    string actual_filespec = filespec;
-    struct stat st;
-
-    if (cache.findPath(filespec).empty()) {
-	while (try_again) {
-	    try_again = false;
-//	cerr << "Trying to open " << actual_filespec << "\r\n";
-	    if (stat(actual_filespec.c_str(), &st) == 0) {
-		// If it's a directory, then we emulate what apache
-		// does, which is to load the index.html file in that
-		// directry if it exists.
-		if (S_ISDIR(st.st_mode)) {
-		    log_debug("%s is a directory\n", actual_filespec.c_str());
-		    if (actual_filespec[actual_filespec.size()-1] != '/') {
-			actual_filespec += '/';
-		}
-		    actual_filespec += "index.html";
-		    try_again = true;
-		    continue;
-		} else { 		// not a directory
-		    log_debug("%s is not a directory\n", actual_filespec.c_str());
-		    _filespec = actual_filespec;
-		    string::size_type pos;
-		    pos = filespec.rfind(".");
-		    if (pos != string::npos) {
-			string suffix = filespec.substr(pos, filespec.size());
-			if (suffix == "html") {
-			    _filetype = amf::AMF::FILETYPE_HTML;
-			    log_debug("HTML content found");
-			}
-			if (suffix == "swf") {
-			    _filetype = amf::AMF::FILETYPE_SWF;
-			    log_debug("SWF content found");
-			}
-			if (suffix == "flv") {
-			    _filetype = amf::AMF::FILETYPE_VIDEO;
-			    log_debug("FLV content found");
-			}
-			if (suffix == "mp3") {
-			    _filetype = amf::AMF::FILETYPE_AUDIO;
-			    log_debug("MP3 content found");
-			}
-		    }
-		}
-	    } else {
-		_filetype = amf::AMF::FILETYPE_ERROR;
-	    } // end of stat()
-	} // end of try_waiting
-	
-	_filesize = st.st_size;
-    }
-    
-    return _filetype;
-}
-
 /// \brief Send a message to the other end of the network connection.
 ///`	Sends the contents of the _header and _body private data to
 ///	the already opened network connection.
@@ -1200,37 +1211,32 @@ http_handler(Handler::thread_params_t *args)
 //	www.dump();
 	
 	url = docroot;
-	url += www.getURL();
-	pos = url.find("?");
-	filespec = url.substr(0, pos);
-	parameters = url.substr(pos + 1, url.size());
+	url += www.getFilespec();
 
 	// See if the file is in the cache and already opened.
-	boost::shared_ptr<DiskStream> filestream(cache.findFile(filespec));
+	boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
 	if (filestream) {
 	    cerr << "FIXME: found file in cache!" << endl;
 	} else {
 	    filestream.reset(new DiskStream);
+//	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
+
+	    // Oopen the file and read the furst chunk into memory
+	    filestream->open(url);
+	    
 	    // Get the file size for the HTTP header
-	    if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
+	    if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
 		www.formatErrorResponse(HTTP::NOT_FOUND);
+	    } else {
+	      cache.addPath(www.getFilespec(), filestream->getFilespec());
 	    }
 	}
 	
-//	cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
-	
-	if (cache.findPath(www.getFilespec()).empty()) {
-	    cache.addPath(www.getFilespec(), filespec);
-	
-	    // Get the file size for the HTTP header
-	    if (www.getFileStats(filespec) == amf::AMF::FILETYPE_ERROR) {
-		www.formatErrorResponse(HTTP::NOT_FOUND);
-	    }
-	}
 	
 	// Send the reply
-	amf::Buffer &fooby = www.formatGetReply(HTTP::OK);
-	
+	amf::Buffer &fooby = www.formatHeader(filestream->getFileType(),
+					      filestream->getFileSize(),
+					      HTTP::OK);
 	www.writeNet(args->netfd, fooby);
 //	hand->writeNet(args->netfd, www.getHeader(), www.getHeader().allocated());
 //	strcpy(thread_data.filespec, filespec.c_str());
@@ -1243,17 +1249,15 @@ http_handler(Handler::thread_params_t *args)
 //	st.setBytes(www.getBytesIn() + www.getBytesOut());
 //	conndata->statistics->addStats();
 
-	// Oopen the file and read the furst chunk into memory
- 	filestream->open(filespec);
-	string response = cache.findResponse(www.getFilespec());
+	string response = cache.findResponse(filestream->getFilespec());
 	if (response.empty()) {
-	    cerr << "FIXME no hit for: " << www.getFilespec() << endl;
+	    cerr << "FIXME no cache hit for: " << www.getFilespec() << endl;
 //	    www.clearHeader();
 // 	    amf::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
 // 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
 // 	    cache.addResponse(www.getFilespec(), www.getHeader());
 	} else {
-	    cerr << "FIXME hit on: " << www.getFilespec() << endl;
+	    cerr << "FIXME cache hit on: " << www.getFilespec() << endl;
 	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
 	}	
 
@@ -1299,7 +1303,7 @@ http_handler(Handler::thread_params_t *args)
 		 << time << " seconds." << endl;
 #endif
 //	    filestream->close();
-	    cache.addFile(www.getFilespec(), filestream);
+//	    cache.addFile(www.getFilespec(), filestream);
 	}
 	log_debug("http_handler all done transferring requested file...");
 //	cache.dump();
@@ -1310,6 +1314,8 @@ http_handler(Handler::thread_params_t *args)
 	if (!www.keepAlive()) {
 	    log_debug("Keep-Alive is off", www.keepAlive());
 	    done = true;
+	} else {
+	    log_debug("Keep-Alive is on", www.keepAlive());
 	}
 #if 0
 	if (url != docroot) {

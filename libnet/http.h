@@ -33,6 +33,7 @@
 #include "handler.h"
 #include "network.h"
 #include "buffer.h"
+#include "diskstream.h"
 
 namespace gnash
 {
@@ -147,7 +148,9 @@ public:
     
     // Handle the response for the request.
     boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
-    amf::Buffer &formatGetReply(http_status_e code);    
+    amf::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
+    amf::Buffer &formatGetReply(size_t size, http_status_e code); 
+    amf::Buffer &formatGetReply(http_status_e code); 
     amf::Buffer &formatPostReply(rtmpt_cmd_e code);
 
     // Make copies of ourself
@@ -184,9 +187,13 @@ public:
     ///		the common form.
     amf::Buffer &formatCommon(const std::string &data);
 
-    amf::Buffer &formatHeader(int filesize, http_status_e type);
+
+    amf::Buffer &formatHeader(DiskStream::filetype_e type, size_t filesize,
+			    http_status_e code);
+    amf::Buffer &formatHeader(size_t filesize, http_status_e type);
     amf::Buffer &formatHeader(http_status_e type);
     amf::Buffer &formatRequest(const std::string &url, http_method_e req);
+
 
     amf::Buffer &formatMethod(const std::string &data)
  	{return formatCommon("Method: " + data); };
@@ -202,7 +209,7 @@ public:
     amf::Buffer &formatContentLength();
     amf::Buffer &formatContentLength(boost::uint32_t filesize);
     amf::Buffer &formatContentType();
-    amf::Buffer &formatContentType(amf::AMF::filetype_e type);
+    amf::Buffer &formatContentType(DiskStream::filetype_e type);
     amf::Buffer &formatHost(const std::string &data)
  	{return formatCommon("Host: " + data); };
     amf::Buffer &formatAgent(const std::string &data)
@@ -239,7 +246,7 @@ public:
     // Get the file type, so we know how to set the
     // Content-type in the header.
 //    filetype_e getFileType(std::string &filespec);
-    amf::AMF::filetype_e getFileStats(std::string &filespec);
+//    amf::AMF::filetype_e getFileStats(std::string &filespec);
     void dump();
 
     /// \brief Receive a message from the other end of the network connection.
@@ -272,7 +279,7 @@ public:
     int getMaxRequests() { return _max_requests; }
     int getFileSize() { return _filesize; }
     std::string &getFilespec() { return _filespec; }
-    std::string &getURL() { return _url; }
+  //    std::string &getURL() { return _url; }
     std::map<int, struct status_codes *> getStatusCodes()
 	{ return _status_codes; }
     http_version_t *getVersion() { return &_version; }
@@ -288,7 +295,7 @@ private:
     
 //    std::stringstream	_body;
 //    std::string		 _command;
-    amf::AMF::filetype_e  _filetype;
+    DiskStream::filetype_e  _filetype;
     std::string		_filespec;
     boost::uint32_t     _filesize;
 //    std::string		_url;
