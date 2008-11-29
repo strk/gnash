@@ -16,13 +16,32 @@ set timeout 600
 set file all
 set params ""
 
-set cport 80
-set chost "localhost"
+set cport 5080;			# the port for the connection to Cygnal
+set chost "localhost";		# the host to connect to
+set sid 0;			# the server ID
 
-proc create_file { name contents } {
-    verbose "Trying to create $name"
+proc delete_files {} {
+    # Get rid of old temp files created by testing,
+    if {[file exists foo]} {
+	set junk [glob foo* wget-log*]
+	if { $junk != "" } {
+	    catch "exec rm -f $junk"
+	}
+    }
+}
+
+#
+# Create a bogus test file with predictable data we can use to test file
+# transfers.
+#
+proc create_file { name size } {
+    verbose "Trying to create $name" 2
     set fd [ open $name "w" ]
-    puts -nonewline $fd $contents
+    for { set i 0 } { $i < $size } { incr i } {
+	# split out the argument for options that take them
+	puts -nonewline $fd "$i "
+    }
+    flush $fd
     catch "close -i $fd"
 }
 
@@ -31,8 +50,8 @@ proc create_file { name contents } {
 proc netcat { name } {
     global chost
     global cport
-    verbose "Trying to send $name to Cygnal $chost : $cport)"
-    spawn -noecho nc -q 10 $chost $cport
+    verbose "Trying to netcat $name to Cygnal $chost : $cport)"
+    spawn -noecho nc $chost $cport
     set nid $spawn_id
     expect {
 	eof {
@@ -48,32 +67,171 @@ proc netcat { name } {
     
 }
 
-set data "GET /index.html HTTP/1.0
-Host: localhost:4080
-Accept: text/html, text/plain, text/css, text/sgml, */*;q=0.01
-Accept-Encoding: gzip, bzip2
-Accept-Language: en
-User-Agent: DejaGnu 1.x
-"
+#
+# Get something from the copy of Cygnal we started
+proc wget { name } {
+    global chost
+    global cport
+    global sid
+    set result false
+    verbose "Trying to wget from Cygnal http://$chost:$cport/$name" 2
+    spawn -noecho wget -v http://$chost:$cport/$name
+    set wid $spawn_id
+    expect {
+	-i $wid "*Saving to: *" {
+	    verbose "Wget all done..." 2
+	    set result true
+	}
+	-i $wid "* saved " {
+	    verbose "Wget all done..." 2
+	    set result true
+	}
+	-i $wid "connected." {
+	    exp_continue
+	}
+	-i $wid "has sprung into existence" {
+	    set result true
+	}
+	-i $wid "Connection closed at" {
+	}
+	eof "*Connection refused" {
+	    verbose "Wget failed..."
+	}
+	-i $wid eof {
+	    verbose "Wget EOF..."
+	    set result true
+	}
+	-i $wid timeout {
+	    verbose "Wget still running after ${timeout} seconds, killing it (deadlock?)"
+	}
+    }
 
-create_file "foo" $data
+    return $result
+}
 
-set server "/usr/local/bin/cygnal"
-spawn -noecho $server -p 4000 -vv -n
-set sid $spawn_id
+#
+# Start the server running. 
+#
+proc start_cygnal { } {
+    global sid
+    set result false
+    set server "/usr/local/bin/cygnal"
+    set options "-p 5000 -vv -n -t -r [pwd]"
+    verbose "Starting Cygnal server \"$server $options\" for testing"
+    spawn $server $options
+    set sid $spawn_id
+#    set pid [exp_pid -i $sid]
+    expect -timeout 5 {
+	-i $sid "*Server bound to service" {
+	    verbose "Cygnal \"$server -p 4000 -vv -n\" bound to port"
+	    set result true
+	}
+	-i $sid "*Starting*" {
+	    verbose "Started Cygnal \"$server -p 4000 -vv -n\""
+	    set result true
+	}
+	-i $sid "File * transferred" {
+	    verbose "File transferred"
+	}
+	-i $sid "unable to bind to port" {
+	    log_error "Another Cygnal is already on this port!"
+	}
+	-i $sid "HTTP Handler" {
+	    verbose "Started HTTP Handler"
+	}
+	-i $sid eof {
+	    #	    unresolved "${file} died prematurely"
+	    #	    catch close
+	    verbose "${file} died prematurely"
+	}
+	timeout {
+	    fail "Test case ${server} still running after ${timeout} seconds, killing it (deadlock?)"
+	}
+	-i $sid timeout {
+		fail "Test case ${server} still running after ${timeout} seconds, killing it (deadlock?)"
+	    verbose "Cygnal timed out, killing PID $pid"
+#	    exec kill -HUP $pid
+#	    catch close -i $sid
+	}
+    }
+
+    return $result
+}
 
 set netcat "netcat"
 #set nid [spawn -noecho $netcat]
 #verbose "Started NetCat $netcat -q 10"
 
+delete_files
 
-netcat "foo"
+#start_cygnal
+
+#
+# Test transferring a single file
+#
+
+# create test file
+create_file "foo" 120
+
+# get the test file
+set result [ wget "foo" ]
+if { $result == true } {
+    if { [file exists foo] && [file size foo] > 0 } {
+	verbose "foo was transferred!" 2
+	pass "HTTP GET single file"
+    } else {
+	fail "HTTP GET single file"
+    }
+} else {
+    unresolved "HTTP GET single file"
+}
+
+
+set files ""
+for { set i 1 } { $i < 5 } { incr i } {
+    set size [ expr $i * 120]
+    create_file "foo$i" $size
+    set files "$files foo$i"
+    set result [ wget "foo$i" ]
+    if { $result == true } {
+	if { [file exists foo$i] && [file size foo$i] > 0 } {
+	    verbose "foo$i was transferred!" 2
+	    pass "HTTP GET multiple files"
+	} else {
+	    fail "HTTP GET multiple files"
+	}
+    } else {
+	unresolved "HTTP GET multiple files"
+    }
+}
+
+# expect {
+#     -i $sid "*Starting*" {
+# 	verbose "Started Cygnal \"$server -p 4000 -vv -n\""
+#     }
+#     -i $sid "HTTP Handler" {
+# 	verbose "Started HTTP Handler"
+#     }
+# }
+
+#############################################################
+# Stop the server, we're done. As the server doesn't die when a connection is
+# closed, we have to kill it, and then close the pty handle.
+if {$sid > 0} {
+    set pid [exp_pid -i $sid]
+    verbose "Attempting to shut down Cygnal, PID is: $pid"
+    exec kill -STOP $pid
+    catch "close -i $sid"
+}
+
+#delete_files
+
+exit
 
 # testcases is set by the Makefile in the site.exp data file.
-foreach file $testcases {
-
+#foreach file $testcases {
     expect {
-	-i $sid "*Starting" {
+	-i $sid "*Starting*" {
 	    verbose "Started Cygnal \"$server -p 4000 -vv -n\""
 	}
 	-i $sid "HTTP Handler" {
@@ -84,10 +242,10 @@ foreach file $testcases {
 	    #	    catch close
 	    #	    return "${file} died prematurely"
 	}
-	timeout {
+	-i $sid timeout {
 		fail "Test case ${server} still running after ${timeout} seconds, killing it (deadlock?)"
-		catch close
-		continue;
+#		catch close -i $sid
+#		continue;
 	}
     }
 
@@ -177,6 +335,6 @@ foreach file $testcases {
     
     # force a close of the executable to be safe.
     catch close
-}
+#}
 
 
