@@ -207,9 +207,10 @@ DiskStream::loadChunk(size_t size, off_t offset)
 	    // cached page is in memory
 	}
 #endif
-	if (size <= _pagesize) {
-	    size = _filesize;
-	}
+// 	if (size <= _pagesize) {
+// 	    size = _filesize;
+// 	}
+	
 	_dataptr = static_cast<unsigned char *>(mmap(0, size,
 						     PROT_READ, MAP_SHARED, _filefd, offset));
     } else {
@@ -584,7 +585,6 @@ DiskStream::determineFileType(const string &filespec)
   if (pos != string::npos) {
     string suffix = filespec.substr(pos+1, filespec.size());
     _filetype = FILETYPE_NONE;
-    log_debug("SUFFIX is: %s for filespec %s", suffix, filespec);
     if (suffix == "html") {
       _filetype = FILETYPE_HTML;
     } else if (suffix == "ogg") {
