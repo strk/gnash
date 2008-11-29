@@ -691,8 +691,9 @@ Buffer::dump(std::ostream& os) const
 {
     os << "Buffer is " << _nbytes << " bytes at " << (void *)_data.get() << endl;
     if (_nbytes < 0xffff) {
-	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, false) << endl;
-	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, true) << endl;
+	const size_t bytes = _seekptr - _data.get();
+	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
+	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;
     } else {
 	os << "ERROR: Buffer size out of range!" << endl;
 	abort();
