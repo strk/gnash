@@ -60,6 +60,7 @@ public:
 
   typedef enum {
     FILETYPE_NONE,
+    FILETYPE_AMF,
     FILETYPE_SWF,
     FILETYPE_HTML,
     FILETYPE_PNG,
@@ -207,7 +208,9 @@ public:
     /// @return A value that is the size of the file in bytes.
     size_t getFileSize() { return _filesize; };
 
-    filetype_e getFileType() { return _filetype; };
+    DiskStream::filetype_e getFileType() { return _filetype; };
+
+    std::string &getFilespec() { return _filespec; }
 
     /// \brief Get the time of the last access.
     ///
@@ -282,8 +285,12 @@ private:
     filetype_e determineFileType( boost::uint8_t *data);
     filetype_e determineFileType(const std::string &filespec);
 
+    // Get the file stats, so we know how to set the
+    // Content-Length in the header.
+    bool getFileStats(const std::string &filespec);
 
-    filetype_e _filetype;
+
+    DiskStream::filetype_e _filetype;
 
     struct timespec _last_access;
     

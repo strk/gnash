@@ -157,7 +157,7 @@ DiskStream::close()
 boost::uint8_t *
 DiskStream::loadChunk(off_t offset)
 {
-    return loadChunk(_pagesize, offset);
+    return loadChunk(_filesize, offset);
 }
 
 boost::uint8_t *
@@ -199,7 +199,6 @@ DiskStream::loadChunk(size_t size, off_t offset)
 	    munmap(_dataptr, _pagesize);
 	    _dataptr = 0;
 	}
-
 #if 0
 	// See if the page has alady been mapped in;
 	unsigned char vec[_pagesize];
@@ -209,7 +208,7 @@ DiskStream::loadChunk(size_t size, off_t offset)
 	}
 #endif
 	if (size <= _pagesize) {
-	    size = _pagesize;
+	    size = _filesize;
 	}
 	_dataptr = static_cast<unsigned char *>(mmap(0, size,
 						     PROT_READ, MAP_SHARED, _filefd, offset));
@@ -317,14 +316,14 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 
     log_debug("Trying to open %s", filespec);
     
-    if (stat(filespec.c_str(), &st) == 0) {
-	_filesize = st.st_size;
+    if (getFileStats(filespec)) {
 	boost::mutex::scoped_lock lock(io_mutex);
-	_filefd = ::open(filespec.c_str(), O_RDONLY);
-	log_debug (_("Opening file %s (fd #%d), %lld bytes in size."), filespec, _filefd,
+	_filefd = ::open(_filespec.c_str(), O_RDONLY);
+	log_debug (_("Opening file %s (fd #%d), %lld bytes in size."),
+		   _filespec, _filefd,
 		 (long long int) _filesize);
     } else {
-	log_error (_("File %s doesn't exist"), filespec);
+	log_error (_("File %s doesn't exist"), _filespec);
     }
     
 #ifdef USE_STATS_CACHE
@@ -526,6 +525,51 @@ DiskStream::determineFileType()
   return(determineFileType(_filespec));
 }
 
+
+
+
+// Get the file type, so we know how to set the
+// Content-type in the header.
+bool
+DiskStream::getFileStats(const std::string &filespec)
+{
+  //    GNASH_REPORT_FUNCTION;    
+    string actual_filespec = filespec;
+    struct stat st;
+    bool try_again = false;
+
+    do {
+      //	cerr << "Trying to open " << actual_filespec << "\r\n";
+      if (stat(actual_filespec.c_str(), &st) == 0) {
+	// If it's a directory, then we emulate what apache
+	// does, which is to load the index.html file in that
+	// directry if it exists.
+	if (S_ISDIR(st.st_mode)) {
+	  log_debug("%s is a directory, appending index.html\n",
+		    actual_filespec.c_str());
+	  if (actual_filespec[actual_filespec.size()-1] != '/') {
+	    actual_filespec += '/';
+	  }
+	  actual_filespec += "index.html";
+	  try_again = true;
+	  continue;
+	} else { 		// not a directory
+	  //	  log_debug("%s is a normal file\n", actual_filespec.c_str());
+	  _filespec = actual_filespec;
+	  _filetype = determineFileType(_filespec);
+	  _filesize = st.st_size;
+	  try_again = false;
+	}
+      } else {
+	_filetype = FILETYPE_NONE;
+      } // end of stat()
+      
+      _filesize = st.st_size;
+    } while (try_again);
+    
+    return true;
+}
+
 DiskStream::filetype_e 
 DiskStream::determineFileType(const string &filespec)
 {
@@ -538,24 +582,35 @@ DiskStream::determineFileType(const string &filespec)
   string::size_type pos;
   pos = filespec.rfind(".");
   if (pos != string::npos) {
-    string suffix = filespec.substr(pos, filespec.size());
+    string suffix = filespec.substr(pos+1, filespec.size());
+    _filetype = FILETYPE_NONE;
+    log_debug("SUFFIX is: %s for filespec %s", suffix, filespec);
     if (suffix == "html") {
       _filetype = FILETYPE_HTML;
-    }
-    if (suffix == "ogg") {
+    } else if (suffix == "ogg") {
       _filetype = FILETYPE_OGG;
-    }
-    if (suffix == "swf") {
+    } else if (suffix == "swf") {
       _filetype = FILETYPE_SWF;
-    }
-    if (suffix == "flv") {
+    } else if (suffix == "flv") {
       _filetype = FILETYPE_FLV;
-    }
-    if (suffix == "mp3") {
+    }else if (suffix == "mp3") {
       _filetype = FILETYPE_MP3;
-    }
-    if (suffix == "flac") {
+    } else if (suffix == "flac") {
       _filetype = FILETYPE_FLAC;
+    } else if (suffix == "jpg") {
+      _filetype = FILETYPE_JPEG;
+    } else if (suffix == "jpeg") {
+      _filetype = FILETYPE_JPEG;
+    } else if (suffix == "txt") {
+      _filetype = FILETYPE_TEXT;
+    } else if (suffix == "xml") {
+      _filetype = FILETYPE_XML;
+    } else if (suffix == "mp4") {
+      _filetype = FILETYPE_MP4;
+    } else if (suffix == "png") {
+      _filetype = FILETYPE_PNG;
+    } else if (suffix == "gif") {
+      _filetype = FILETYPE_GIF;
     }
   }
 
