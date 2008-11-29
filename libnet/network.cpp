@@ -282,10 +282,10 @@ Network::newConnection(bool block, int fd)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t sigset, emptyset, blockset, pending;
-	sigemptyset(&blockset);         /* Block SIGINT */
-//        sigaddset(&blockset, SIGINT);
-        sigaddset(&blockset, SIGPIPE);
+	sigset_t sigset, blockset, pending;
+	sigemptyset(&blockset);        
+//        sigaddset(&blockset, SIGINT); /* Block SIGINT */
+        sigaddset(&blockset, SIGPIPE); /* Block SIGPIPE */
 	sigprocmask(SIG_BLOCK, &blockset, &sigset);
 #else
 	struct timeval tval;
@@ -834,9 +834,9 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t pending, emptyset, blockset;
-	sigemptyset(&blockset);         /* Block SIGINT */
-        sigaddset(&blockset, SIGINT);
+	sigset_t pending, blockset;
+	sigemptyset(&blockset);        
+        // sigaddset(&blockset, SIGINT); /* Block SIGINT */
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
 	// Trap ^C (SIGINT) so we can kill all the threads
@@ -995,10 +995,10 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t pending, emptyset, blockset;
-	sigemptyset(&blockset);         /* Block SIGINT */
-        sigaddset(&blockset, SIGINT);
-//        sigaddset(&blockset, SIGPIPE);
+	sigset_t pending, blockset;
+	sigemptyset(&blockset);        
+        // sigaddset(&blockset, SIGINT); /* Block SIGINT */
+        sigaddset(&blockset, SIGPIPE);
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 #else
 	struct timeval tval;
@@ -1276,6 +1276,7 @@ Network::operator = (Network &net)
     _connected = net.connected();
     _debug = net.netDebug();
     _timeout = net.getTimeout();
+    return *this;
 }
 
 void
