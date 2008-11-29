@@ -610,10 +610,12 @@ HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
     formatDate();
     formatServer();
     formatLastModified();
-    formatAcceptRanges("bytes");
+    formatAcceptRanges("nytes");
     formatContentLength(size);
-    formatKeepAlive("timeout=15, max=100");
+    // Apache closes the connection on GET requests, so we do the same.
+    formatConnection("close");
     formatContentType(type);
+
     // All HTTP messages are followed by a blank line.
     terminateHeader();
 
@@ -1221,6 +1223,8 @@ http_handler(Handler::thread_params_t *args)
 	    filestream.reset(new DiskStream);
 //	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
 
+//	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
+	    
 	    // Oopen the file and read the furst chunk into memory
 	    filestream->open(url);
 	    
@@ -1234,10 +1238,10 @@ http_handler(Handler::thread_params_t *args)
 	
 	
 	// Send the reply
-	amf::Buffer &fooby = www.formatHeader(filestream->getFileType(),
+	amf::Buffer &reply = www.formatHeader(filestream->getFileType(),
 					      filestream->getFileSize(),
 					      HTTP::OK);
-	www.writeNet(args->netfd, fooby);
+	www.writeNet(args->netfd, reply);
 //	hand->writeNet(args->netfd, www.getHeader(), www.getHeader().allocated());
 //	strcpy(thread_data.filespec, filespec.c_str());
 //	thread_data.statistics = conndata->statistics;
@@ -1249,6 +1253,7 @@ http_handler(Handler::thread_params_t *args)
 //	st.setBytes(www.getBytesIn() + www.getBytesOut());
 //	conndata->statistics->addStats();
 
+#if 0
 	string response = cache.findResponse(filestream->getFilespec());
 	if (response.empty()) {
 	    cerr << "FIXME no cache hit for: " << www.getFilespec() << endl;
@@ -1260,7 +1265,8 @@ http_handler(Handler::thread_params_t *args)
 	    cerr << "FIXME cache hit on: " << www.getFilespec() << endl;
 	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
 	}	
-
+#endif
+	
 //	cerr << www.getHeader().c_str() << endl;
 
 	size_t filesize = filestream->getFileSize();
@@ -1303,7 +1309,6 @@ http_handler(Handler::thread_params_t *args)
 		 << time << " seconds." << endl;
 #endif
 //	    filestream->close();
-//	    cache.addFile(www.getFilespec(), filestream);
 	}
 	log_debug("http_handler all done transferring requested file...");
 //	cache.dump();
