@@ -306,6 +306,9 @@ public:
     ///
     /// @return The size of the Buffer.
     void setSize(size_t nbytes) { _nbytes = nbytes; };
+
+    /// \brief Set the real pointer to a block of Memory.
+    void setPointer(boost::uint8_t *ptr) { _data.reset(ptr); };
     
     /// \brief Test equivalance against another Buffer.
     ///		This compares all the data on the current Buffer with
@@ -363,6 +366,7 @@ public:
     ///	\brief This is the container of the actual data in this
     ///		Buffer.
     boost::scoped_array<gnash::Network::byte_t> _data;
+    
     /// \var _nbytes
     ///	\brief This is the total allocated size of the Buffer.
     size_t         _nbytes;
