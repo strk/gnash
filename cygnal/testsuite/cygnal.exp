@@ -229,7 +229,7 @@ if {$sid > 0} {
     catch "close -i $sid"
 }
 
-#delete_files
+delete_files
 
 exit
 
