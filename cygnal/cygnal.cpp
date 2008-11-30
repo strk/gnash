@@ -91,6 +91,7 @@ using namespace amf;
 static void usage();
 static void version_and_copyright();
 static void cntrlc_handler(int sig);
+static void hup_handler(int sig);
 
 void connection_handler(Handler::thread_params_t *args);
 void dispatch_handler(Handler::thread_params_t *args);
@@ -98,8 +99,6 @@ void admin_handler(Handler::thread_params_t *args);
 
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
-
-static struct sigaction  act;
 
 // The next few global variables have to be global because Boost
 // threads don't take arguments. Since these are set in main() before
@@ -250,8 +249,11 @@ main(int argc, char *argv[])
     }
     
     // Trap ^C (SIGINT) so we can kill all the threads
-    act.sa_handler = cntrlc_handler;
-    sigaction (SIGINT, &act, NULL);
+    struct sigaction  act1, act2;
+    act1.sa_handler = cntrlc_handler;
+    sigaction (SIGINT, &act1, NULL);
+    act2.sa_handler = hup_handler;
+    sigaction (SIGHUP, &act2, NULL);
 //    sigaction (SIGPIPE, &act, NULL);
 
     boost::mutex::scoped_lock lk(alldone_mutex);
@@ -310,13 +312,23 @@ main(int argc, char *argv[])
       return(0);
 }
 
-// Trap Control-C so we can cleanly exit
+// Trap Control-C (SIGINT) so we can cleanly exit
 static void
 cntrlc_handler (int sig)
 {
     log_debug(_("Got a %d interrupt"), sig);
 //    sigaction (SIGINT, &act, NULL);
     exit(-1);
+}
+
+// Trap SIGHUP so we can 
+static void
+hup_handler (int sig)
+{
+    if (crcfile.getTestingFlag()) {
+	cerr << "Testing, Testing, Testing..." << endl;
+    }
+	
 }
 
 static void
@@ -596,6 +608,7 @@ dispatch_handler(Handler::thread_params_t *args)
 //			continue;
 		    }
 		    log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
+		    // Call the protocol handler for this network connection
 		    hand->getEntry(it->fd)(args);
 // 		    if (!crcfile.getThreadingFlag()) {
 // 			hand->die();
