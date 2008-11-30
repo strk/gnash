@@ -1,3 +1,20 @@
+# 
+# Copyright (C) 2008 Free Software Foundation, Inc.
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 3 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
 
 load_lib "dejagnu.exp"
 
@@ -69,13 +86,13 @@ proc netcat { name } {
 
 #
 # Get something from the copy of Cygnal we started
-proc wget { name } {
+proc wget { name options } {
     global chost
     global cport
     global sid
     set result false
     verbose "Trying to wget from Cygnal http://$chost:$cport/$name" 2
-    spawn -noecho wget -v http://$chost:$cport/$name
+    spawn -noecho wget -v $options http://$chost:$cport/$name
     set wid $spawn_id
     expect {
 	-i $wid "*Saving to: *" {
@@ -85,6 +102,9 @@ proc wget { name } {
 	-i $wid "* saved " {
 	    verbose "Wget all done..." 2
 	    set result true
+	}
+	-i $wid "Retrying." {
+	    verbose "Retrying file"
 	}
 	-i $wid "connected." {
 	    exp_continue
@@ -117,13 +137,13 @@ proc wget { name } {
 proc start_cygnal { } {
     global sid
     set result false
-    set server "/usr/local/bin/cygnal"
+    set server "../../cygnal"
     set options "-p 5000 -vv -n -t -r [pwd]"
     verbose "Starting Cygnal server \"$server $options\" for testing"
     spawn $server $options
     set sid $spawn_id
 #    set pid [exp_pid -i $sid]
-    expect -timeout 5 {
+    expect -timeout 1 {
 	-i $sid "*Server bound to service" {
 	    verbose "Cygnal \"$server -p 4000 -vv -n\" bound to port"
 	    set result true
@@ -166,7 +186,11 @@ set netcat "netcat"
 
 delete_files
 
-#start_cygnal
+start_cygnal
+
+#
+# Test transferring files from the server to the client
+#
 
 #
 # Test transferring a single file
@@ -176,9 +200,9 @@ delete_files
 create_file "foo" 120
 
 # get the test file
-set result [ wget "foo" ]
+set result [ wget "foo" "" ]
 if { $result == true } {
-    if { [file exists foo] && [file size foo] > 0 } {
+    if { [file exists foo.1] } {
 	verbose "foo was transferred!" 2
 	pass "HTTP GET single file"
     } else {
@@ -190,7 +214,7 @@ if { $result == true } {
 
 
 #
-# Testing transferring multiple files in a niuce tight loop for stress testing.
+# Testing transferring multiple files in a nice tight loop for stress testing.
 #
 set files ""
 set limit 150
@@ -198,24 +222,42 @@ set count 0
 for { set i 1 } { $i <= $limit } { incr i } {
     set size [ expr $i * 120]
     create_file "foo$i" $size
-    set result [ wget "foo$i" ]
+    set result [ wget "foo$i" "" ]
     if { $result == true } {
- 	if { [file exists foo$i] && [file size foo$i] > 0 } {
+	# foo$i.1
+ 	if { [file exists foo$i.1] } {
 	    verbose "foo$i was transferred!" 2
 	    incr count
-#	    pass "HTTP GET multiple files"
-	} else {
-#	    fail "HTTP GET multiple files"
+	    verbose -n "."
 	}
     } else {
 	unresolved "HTTP GET multiple files"
     }
 }
 
+verbose "."
 if { $count == $limit } {
     pass "HTTP GET multiple files"
 } else {
     fail "HTTP GET multiple files"
+}
+
+
+#
+# Test transferring files from the client to the server using POST
+#
+
+# send the test file
+set result [ wget "foo" "--post-file=foo.1" ]
+if { $result == true } {
+    if { [file exists foo.1] } {
+	verbose "foo was transferred!" 2
+	pass "HTTP POST single file"
+    } else {
+	fail "HTTP POST single file"
+    }
+} else {
+    unresolved "HTTP POST single file"
 }
 
 
