@@ -59,15 +59,29 @@ static Cache& cache = Cache::getDefaultInstance();
 #define _SC_PAGESIZE 8
 #endif
 
+/// \var MAX_PAGES
+///	This is the maximum number of pages that we load into memory from a file.
+const size_t MAX_PAGES = 2560;
+
 DiskStream::DiskStream()
-    : _filefd(0),
+    : _state(DiskStream::NO_STATE),
+      _filefd(0),
       _netfd(0),
       _dataptr(0),
+      _max_memload(0),
       _filesize(0),
       _pagesize(0),
       _offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
+    /// \brief get the pagesize and cache the value
+#ifdef HAVE_SYSCONF
+    _pagesize = sysconf(_SC_PAGESIZE);
+    _max_memload = _pagesize * MAX_PAGES;    
+#else
+#error "Need to define the memory page size without sysconf()!"
+#endif
+
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
     _accesses = 1;
@@ -75,14 +89,24 @@ DiskStream::DiskStream()
 }
 
 DiskStream::DiskStream(const string &str)
-    : _filefd(0),
+    : _state(DiskStream::NO_STATE),
+      _filefd(0),
       _netfd(0),
       _dataptr(0),
+      _max_memload(0),
       _filesize(0),
       _pagesize(0),
       _offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
+    /// \brief get the pagesize and cache the value
+#ifdef HAVE_SYSCONF
+    _pagesize = sysconf(_SC_PAGESIZE);
+    _max_memload = _pagesize * MAX_PAGES;    
+#else
+#error "Need to define the memory page size without sysconf()!"
+#endif
+
     _filespec = str;
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
@@ -90,15 +114,58 @@ DiskStream::DiskStream(const string &str)
 #endif
 }
 
+DiskStream::DiskStream(const string &str, amf::Buffer &buf)
+    : _state(DiskStream::NO_STATE),
+      _filefd(0),
+      _netfd(0),
+      _dataptr(0),
+      _max_memload(0),
+      _pagesize(0),
+      _offset(0)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    /// \brief get the pagesize and cache the value
+#ifdef HAVE_SYSCONF
+    _pagesize = sysconf(_SC_PAGESIZE);
+    _max_memload = _pagesize * MAX_PAGES;    
+#else
+#error "Need to define the memory page size without sysconf()!"
+#endif
+
+    _dataptr = new boost::uint8_t[buf.size()];
+    // Note that this is a copy operation, which may effect performance. We do this for now
+    // incase the top level pointer gets deleted. This should really be using
+    // boost::scoped_array, but we don't want that complexity till this code stabalizes.
+    std::copy(buf.begin(), buf.end(), _dataptr);
+    _filespec = str;
+    _filesize = buf.size();
+    
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+    _accesses = 1;
+#endif
+}
+
 DiskStream::DiskStream(const string &str, int netfd)
-    : _filefd(0),
+    : _state(DiskStream::NO_STATE),
+      _filefd(0),
       _filespec(0),
       _dataptr(0),
+      _max_memload(0),
       _filesize(0),
       _pagesize(0),
       _offset(0)
 {
 //    GNASH_REPORT_FUNCTION;
+    /// \brief get the pagesize and cache the value
+#ifdef HAVE_SYSCONF
+    _pagesize = sysconf(_SC_PAGESIZE);
+    _max_memload = _pagesize * MAX_PAGES;    
+#else
+#error "Need to define the memory page size without sysconf()!"
+#endif
+
     _netfd = netfd;
     _filespec = str;
 #ifdef USE_STATS_CACHE
@@ -132,12 +199,14 @@ DiskStream::close()
     
     _filesize = 0;
     _offset = 0;
+    
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
+	_dataptr = 0;
     }
-    _dataptr = 0;
+     
     _filefd = 0;
-    _state == CLOSED;
+    _state = CLOSED;
 //    _filespec.clear();
 }
 
@@ -155,52 +224,66 @@ DiskStream::close()
 /// @return A real pointer to the location of the data at the
 ///	location pointed to by the offset.
 boost::uint8_t *
-DiskStream::loadChunk(off_t offset)
+DiskStream::loadToMem(off_t offset)
 {
-    return loadChunk(_filesize, offset);
+    return loadToMem(_filesize, offset);
 }
 
 boost::uint8_t *
-DiskStream::loadChunk(size_t size, off_t offset)
+DiskStream::loadToMem(size_t filesize, off_t offset)
 {
 //    GNASH_REPORT_FUNCTION;
 
     log_debug("%s: offset is: %d", __FUNCTION__, offset);
-    /// If the data pointer is left from a failed mmap, don't do
-    /// anything.
-    if (_dataptr ==  MAP_FAILED) {
-	log_error("Bad pointer to memory for file %s!", _filespec);
-	return 0;
-    }
 
-#if 0
-    /// We only map pages of pagesize, so if the offset is smaller
-    /// than that, don't use it.
+    // store the offset we came in with so next time we know where to start
+    _offset = offset;
+	
+    /// We only map memory in pages of pagesize, so if the offset is smaller
+    /// than that, start at page 0.
+    off_t page = 0;
     if (static_cast<size_t>(offset) < _pagesize) {
-	_offset = 0;
-//	log_debug("Loading first segment");
+	page = 0;
     } else {
 	if (offset % _pagesize) {
 	    // calculate the number of pages
-	    int pages = ((offset - (offset % _pagesize)) / _pagesize);
-	    _offset = pages * _pagesize;
+	    page = ((offset - (offset % _pagesize)) / _pagesize) * _pagesize;
  	    log_debug("Adjusting offset from %d to %d so it's page aligned.",
- 		      offset, _offset);
+ 		      offset, page);
+	} else {
+	    log_debug("Offset is page aligned already");
 	}
-	log_debug("Offset is page aligned already");
     }
-#endif
+
+    // Figure out the maximum number of bytes we can load into memory.
+    size_t loadsize = 0;
+    if (filesize < _max_memload) {
+	log_debug("Loading entire file of %d bytes into memory segment", filesize);
+	loadsize = filesize;
+    } else {
+	log_debug("Loading partial file of %d bytes into memory segment", filesize, _max_memload);
+	loadsize = _max_memload;
+    }
+    
+    // If we were initialized from a memory Buffer, data is being uploaded into
+    // this DiskStream, so sufficient memory will already be allocated for this data.
+    // If the data came from a disk based file, then we allocate enough memory to hold it.
+    if (_dataptr) {
+	log_debug("Using existing Buffer for file");
+	return _dataptr + offset;
+    }
+    
+    boost::uint8_t *dataptr = 0;
     
     if (_filefd) {
 	/// If the data pointer is legit, then we need to unmap that page
 	/// to mmap() a new one. If we're still in the current mapped
 	/// page, then just return the existing data pointer.
-	if (_dataptr != 0) {
+	if (dataptr != 0) {
 	    munmap(_dataptr, _pagesize);
-	    _dataptr = 0;
 	}
 #if 0
-	// See if the page has alady been mapped in;
+	// See if the page has already been mapped in;
 	unsigned char vec[_pagesize];
 	mincore(offset, _pagesize, vec);
 	if (vec[i] & 0x1) {
@@ -210,47 +293,71 @@ DiskStream::loadChunk(size_t size, off_t offset)
 // 	if (size <= _pagesize) {
 // 	    size = _filesize;
 // 	}
-	
-	_dataptr = static_cast<unsigned char *>(mmap(0, size,
-						     PROT_READ, MAP_SHARED, _filefd, offset));
+
+	dataptr = static_cast<unsigned char *>(mmap(0, loadsize,
+						     PROT_READ, MAP_SHARED, _filefd, page));
     } else {
 	log_error (_("Couldn't load file %s"), _filespec);
 	return 0;
     }
     
-    if (_dataptr == MAP_FAILED) {
+    if (dataptr == MAP_FAILED) {
 	log_error (_("Couldn't map file %s into memory: %s"),
 		   _filespec, strerror(errno));
 	return 0;
     } else {
+	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, offset, (void *)dataptr);
 	clock_gettime (CLOCK_REALTIME, &_last_access);
-	log_debug (_("File %s a offset %d mapped to: %p"), _filespec, _offset, (void *)_dataptr);
+	_dataptr = dataptr;
 	_seekptr = _dataptr + offset;
 	_state = OPEN;
     }
     
     return _seekptr;
     
-#if 0
-    do {
-	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-	ret = read(filefd, buf->reference(), buf->size());
-	if (ret == 0) { // the file is done
-	    break;
-	}
-	if (ret != buf->size()) {
-	    buf->resize(ret);
-	    log_debug("Got last data block from disk file, size %d", buf->size());
-	}
-	log_debug("Read %d bytes from %s.", ret, filespec);
-	hand->pushout(buf);
-	hand->notifyout();
-    } while(ret > 0);
-    log_debug("Done transferring %s to net fd #%d",
-	      filespec, args->netfd);
-    ::close(filefd); // close the disk file
-    
-#endif
+}
+
+/// \brief Write the data in memory to disk
+///
+/// @param filespec The relative path to the file to write, which goes in
+///		a safebox for storage.
+///
+/// @return true if the operation suceeded, false if it failed.
+bool
+DiskStream::writeToDisk()
+{
+//    GNASH_REPORT_FUNCTION;
+    return writeToDisk(_filespec, _dataptr, _filesize);
+}
+
+bool
+DiskStream::writeToDisk(const std::string &filespec)
+{
+//    GNASH_REPORT_FUNCTION;
+    return writeToDisk(filespec, _dataptr, _filesize);
+}
+
+bool
+DiskStream::writeToDisk(const std::string &filespec, amf::Buffer &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    return writeToDisk(filespec, data.reference(), data.size());
+}
+
+bool
+DiskStream::writeToDisk(const std::string &filespec, boost::uint8_t *data, size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    int fd = ::open(filespec.c_str() ,O_WRONLY|O_CREAT, S_IRWXU);
+    if (fd < 0) {
+        perror("open");
+    }
+    cout << "Writing packet to disk: \"outbuf.raw\"" << endl;
+    write(fd, data, size);
+    ::close(fd);
+
+    return true;
 }
 
 /// \brief Open a file to be streamed.
@@ -301,8 +408,6 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    struct stat st;
-
     // the file is already open
     if (_state == OPEN) {
 #ifdef USE_STATS_CACHE
@@ -331,13 +436,6 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
     clock_gettime (CLOCK_REALTIME, &_first_access);
 #endif
     
-    /// \brief get the pagesize and cache the value
-#ifdef HAVE_SYSCONF
-    _pagesize = sysconf(_SC_PAGESIZE);
-#else
-#error "Need to define the memory page size without sysconf()!"
-#endif
-
 //     // The pagesize is how much of the file to load. As all memory is
 //     // only mapped in multiples of pages, we use that for the default size.
 //     if (_pagesize == 0) {
@@ -485,7 +583,7 @@ DiskStream::seek(off_t offset)
 //    GNASH_REPORT_FUNCTION;
     
     _state = SEEK;
-    return loadChunk(offset);    
+    return loadToMem(offset);    
 }
 
 /// \brief Upload a file into a sandbox.
@@ -708,7 +806,7 @@ DiskStream::dump()
     // dump timing related data
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);    
-    double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
+//    double time = ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9));
     
     cerr << "Time since last access:  " << fixed << ((now.tv_sec - _last_access.tv_sec) + ((now.tv_nsec - _last_access.tv_nsec)/1e9)) << " seconds ago." << endl;
     
