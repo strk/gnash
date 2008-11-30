@@ -106,6 +106,8 @@ proc wget { name } {
 	}
     }
 
+    catch close -i $wid
+
     return $result
 }
 
@@ -187,32 +189,35 @@ if { $result == true } {
 }
 
 
+#
+# Testing transferring multiple files in a niuce tight loop for stress testing.
+#
 set files ""
-for { set i 1 } { $i < 5 } { incr i } {
+set limit 150
+set count 0
+for { set i 1 } { $i <= $limit } { incr i } {
     set size [ expr $i * 120]
     create_file "foo$i" $size
-    set files "$files foo$i"
     set result [ wget "foo$i" ]
     if { $result == true } {
-	if { [file exists foo$i] && [file size foo$i] > 0 } {
+ 	if { [file exists foo$i] && [file size foo$i] > 0 } {
 	    verbose "foo$i was transferred!" 2
-	    pass "HTTP GET multiple files"
+	    incr count
+#	    pass "HTTP GET multiple files"
 	} else {
-	    fail "HTTP GET multiple files"
+#	    fail "HTTP GET multiple files"
 	}
     } else {
 	unresolved "HTTP GET multiple files"
     }
 }
 
-# expect {
-#     -i $sid "*Starting*" {
-# 	verbose "Started Cygnal \"$server -p 4000 -vv -n\""
-#     }
-#     -i $sid "HTTP Handler" {
-# 	verbose "Started HTTP Handler"
-#     }
-# }
+if { $count == $limit } {
+    pass "HTTP GET multiple files"
+} else {
+    fail "HTTP GET multiple files"
+}
+
 
 #############################################################
 # Stop the server, we're done. As the server doesn't die when a connection is
