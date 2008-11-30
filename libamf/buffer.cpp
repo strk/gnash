@@ -638,6 +638,14 @@ Buffer::resize(size_t size)
 {
     GNASH_REPORT_FUNCTION;
     boost::scoped_array<gnash::Network::byte_t> tmp;
+
+    // If we don't have any data yet in this buffer, resizing is cheap, as
+    // we don't havce to copy any data.
+    if (_seekptr == _data.get()) {
+	_data.reset(new Network::byte_t[size]);
+	_nbytes= size;
+	return *this;
+    }
     
     if (_nbytes == 0) {
 	return init(size);
