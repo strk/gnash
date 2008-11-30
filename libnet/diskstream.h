@@ -27,9 +27,11 @@
 #include <iostream> 
 
 #include "amf.h"
+#include "buffer.h"
 #include "cque.h"
 #include "statistics.h"
 #include "getclocktime.hpp"
+#include <boost/scoped_ptr.hpp>
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
@@ -76,11 +78,13 @@ public:
     FILETYPE_FLV,
     FILETYPE_VP6,
     FILETYPE_XML,
-    FILETYPE_FLAC
+    FILETYPE_FLAC,
+    FILETYPE_ENCODED
   } filetype_e;
 
     DiskStream();
     DiskStream(const std::string &filespec);
+    DiskStream(const std::string &filespec, amf::Buffer &buf);
     DiskStream(const std::string &filespec, int netfd);
     ~DiskStream();
 
@@ -90,7 +94,7 @@ public:
     /// \brief Open a file to be streamed.
     ///
     /// @param filespec The full path and file name for the data to be
-    ///		read.
+    ///		read. The file must already exist.
     ///
     /// @param netfd An optional file descriptor to read data from
     ///
@@ -101,7 +105,7 @@ public:
     bool open(const std::string &filespec);
     bool open(const std::string &filespec, int netfd);
     bool open(const std::string &filespec, int netfd, gnash::Statistics  &statistics);
-    
+
     /// \brief Stream the file that has been loaded,
     ///
     /// @param netfd An optional file descriptor to read data from
@@ -173,9 +177,29 @@ public:
     ///
     /// @return A real pointer to the location of the data at the
     ///		location pointed to by the offset.
-    boost::uint8_t *loadChunk(size_t size, off_t offset);
-    boost::uint8_t *loadChunk(off_t size);
-    boost::uint8_t *loadChunk() { return loadChunk(_offset); };
+    boost::uint8_t *loadToMem(size_t filesize, off_t offset);
+    boost::uint8_t *loadToMem(off_t offset);
+    boost::uint8_t *loadToMem() { return loadToMem(_offset); };
+
+    /// \brief Write the data in memory to disk
+    ///
+    /// @param filespec The relative path to the file to write, which goes in
+    ///		a safebox for storage.
+    ///
+    /// @param data The data to be written
+    ///
+    /// @param size The amount of data in bytes to be written
+    ///
+    /// @return true if the operation suceeded, false if it failed.
+    bool writeToDisk(const std::string &filespec, boost::uint8_t *data, size_t size);
+    bool writeToDisk(const std::string &filespec, amf::Buffer &data);
+    bool writeToDisk(const std::string &filespec);
+    bool writeToDisk();
+
+    /// \brief Write the existing data to the Network.
+    ///
+    /// @return true is the write suceeded, false if it failed.
+    bool writeToNet();
 
     /// \brief Get the memory page size
     ///		This is a cached value of the system configuration
@@ -202,7 +226,7 @@ public:
     ///
     /// @return A real pointer to the base address.
     boost::uint8_t *get() { return _dataptr; };
-
+    
     /// \brief Get the size of the file.
     ///
     /// @return A value that is the size of the file in bytes.
@@ -216,6 +240,8 @@ public:
     ///
     /// @return A real pointer to the struct timespec of the last access.
     struct timespec *getLastAccessTime() { return &_last_access; };
+
+    state_e getState() { return _state; };
     
 #ifdef USE_STATS_CACHE
     /// \brief Get the time of the first access.
@@ -259,6 +285,10 @@ private:
     ///		The base address of the memory page.
     boost::uint8_t *_dataptr;
 
+    /// \var DiskStream::_max_memload
+    ///		The maximum amount of data to load into memory
+    size_t	_max_memload;
+    
     /// \var DiskStream::_seekptr
     ///		The current location within the current memory page.
     boost::uint8_t *_seekptr;
