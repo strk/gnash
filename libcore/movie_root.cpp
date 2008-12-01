@@ -801,22 +801,11 @@ movie_root::generate_mouse_button_events()
 		        // It's another entity ?
 		        if (current_active_entity != ms.activeEntity.get())
 		        {
-			        // First to clean focus
-			        if (current_active_entity != NULL)
-			        {
-				        current_active_entity->on_event(event_id::KILLFOCUS);
-				        need_redisplay=true;
-				        setFocus(NULL);
-			        }
-
-			        // Then to set focus
-			        if (ms.activeEntity)
-			        {
-				        if (ms.activeEntity->on_event(event_id::SETFOCUS))
-				        {
-					        setFocus(ms.activeEntity.get());
-				        }
-			        }
+			        // Try setting focus on the new character. This will handle
+                    // all necessary events and removal of current focus.
+			        if (setFocus(ms.activeEntity.get())) {
+                        need_redisplay=true;
+                    }
 		        }
 
 		        if (ms.activeEntity)
@@ -1337,21 +1326,34 @@ movie_root::getFocus()
 	return _currentFocus;
 }
 
-void
+bool
 movie_root::setFocus(character* ch)
 {
+
+    /// Nothing to do in this case, but the operation counts as successful.
+    if (ch == _currentFocus) return true;
 
     /// Undefined or NULL character removes current focus. Otherwise, try
     /// setting focus to the new character. If it fails, remove current
     /// focus anyway.
-    if (!ch || !ch->setFocus()) {
+    if (!ch) {
+        if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
         _currentFocus = 0;
-        return;
+        return true;
     }
 
+    if (!ch->setFocus()) {
+        _currentFocus = 0;
+        return false;
+    }
+
+    if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
     _currentFocus = ch;
+    _currentFocus->on_event(event_id::SETFOCUS);
 
 	assert(testInvariant());
+
+    return true;
 }
 
 character*

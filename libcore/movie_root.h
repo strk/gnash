@@ -439,8 +439,10 @@ public:
     //
     /// @param ch
     /// The character having focus. NULL to kill focus.
-    ///
-    void setFocus(character* ch);
+    /// @return true if the focus operation succeeded, false if the passed
+    /// character cannot receive focus. setFocus(0) is a valid operation, so
+    /// returns true (always succeeds).
+    bool setFocus(character* ch);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges,
             bool force);

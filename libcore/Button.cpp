@@ -382,6 +382,13 @@ Button::on_event(const event_id& id)
     return xec.called;
 }
 
+bool
+Button::setFocus() {
+    /// Nothing to do, but can receive focus.
+    return true;
+}
+
+
 void
 Button::restart()
 {
