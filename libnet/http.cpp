@@ -43,6 +43,7 @@
 #include "GnashSystemIOHeaders.h" // read()
 
 #include "amf.h"
+#include "element.h"
 #include "cque.h"
 #include "http.h"
 #include "log.h"
@@ -283,13 +284,15 @@ HTTP::processGetRequest(int fd)
     return true;
 }
 
-// A POST request asks sends a data from the client to the server.
+// A POST request asks sends a data from the client to the server. After processing
+// the header like we normally do, we then read the amount of bytes specified by
+// the "content-length" field, and then write that data to disk, or decode the amf.
 bool
 HTTP::processPostRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
 
-    cerr << "QUE = " << _que.size() << endl;
+//    cerr << "QUE1 = " << _que.size() << endl;
 
     if (_que.size() == 0) {
 	return false;
@@ -301,20 +304,31 @@ HTTP::processPostRequest(int fd)
 	return false;
     }
     clearHeader();
-    extractCommand(*buf);
     gnash::Network::byte_t *data = processHeaderFields(*buf);
+    size_t length = strtol(getField("content-length").c_str(), NULL, 0);
+    boost::shared_ptr<amf::Buffer> content(new amf::Buffer(length));
+//	cerr << __PRETTY_FUNCTION__ << " : " << content->size() << endl;
+    int ret = readNet(fd, *content, 5);
+//	cerr << __PRETTY_FUNCTION__ << " : " << ret << " : " << (char *)content->reference() << endl;
+    
+    if (getField("content-type") == "application/x-www-form-urlencoded") {
+	log_debug("Got file data in POST");
+	string url = _docroot + _filespec;
+	DiskStream ds(url, *content);
+	ds.writeToDisk();
+//    ds.close();
+	// oh boy, we got ourselves some encoded AMF objects instead of a boring file.
+    } else if (getField("content-type") == "application/x-amf") {
+	log_debug("Got AMF data in POST");
+	amf::AMF amf;
+	boost::shared_ptr<amf::Element> el = amf.extractAMF(content);
+	el->dump();		// FIXME: do something intelligent with this Element
+    }
     
     // Send the reply
-    amf::Buffer &reply = formatHeader(_filetype,_filesize, HTTP::OK);
+    amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTP::OK);
     writeNet(fd, reply);
 
-    size_t length = strtol(getField("content-length").c_str(), NULL, 0);
-    
-    string url = _docroot + _filespec;
-    DiskStream ds(url, data, length);
-    ds.writeToDisk();
-    ds.close();
-    
     return true;
 }
 
@@ -489,12 +503,12 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 	    if (name == "content-type") {
 		// This is the type used by flash when sending a AMF data via POST
 		if (value == "application/x-amf") {
-		    log_debug("Got AMF data in the POST request!");
+//		    log_debug("Got AMF data in the POST request!");
 		    _filetype = DiskStream::FILETYPE_AMF;
 		}
 		// This is the type used by wget when sending a file via POST
 		if (value == "application/x-www-form-urlencoded") {
-		    log_debug("Got file data in the POST request");
+//		    log_debug("Got file data in the POST request");
 		    _filetype = DiskStream::FILETYPE_ENCODED;
 		}
 		log_debug("Setting Content Type to %d", _filetype);
@@ -743,7 +757,7 @@ HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
     formatDate();
     formatServer();
     formatLastModified();
-    formatAcceptRanges("nytes");
+    formatAcceptRanges("bytes");
     formatContentLength(size);
     // Apache closes the connection on GET requests, so we do the same.
     formatConnection("close");
@@ -1227,9 +1241,8 @@ HTTP::recvMsg(int fd)
     do {
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
 	int ret = net.readNet(fd, *buf, 5);
+//	cerr << __PRETTY_FUNCTION__ << ret << " : " << (char *)buf->reference() << endl;
 
-//	cerr << __PRETTY_FUNCTION__ << endl << (char *)buf->reference() << endl;
-	
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
 	    log_debug("no data yet for fd #%d, continuing...", fd);
@@ -1243,6 +1256,7 @@ HTTP::recvMsg(int fd)
 	}
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
+	    buf->setSeekPointer(buf->reference() + ret);
 //	    cerr << "XXXXX: " << (char *)buf->reference() << endl;
  	    if (ret < static_cast<int>(NETBUFSIZE)) {
 // 		buf->resize(ret);	FIXME: why does this corrupt
@@ -1251,6 +1265,9 @@ HTTP::recvMsg(int fd)
 		break;
  	    } else {
 		_que.push(buf);
+	    }
+	    if (ret == buf->size()) {
+		continue;
 	    }
 	} else {
 	    log_debug("no more data for fd #%d, exiting...", fd);
