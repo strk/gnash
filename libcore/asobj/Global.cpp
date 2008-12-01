@@ -39,7 +39,7 @@
 #include "String_as.h"
 #include "Key_as.h"
 //#include "LoadVars_as.h"
-#include "LocalConnection.h"
+//#include "LocalConnection.h"
 #include "Microphone.h"
 #include "Number_as.h"
 #include "Object.h"
@@ -186,6 +186,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     object_class_init(*this); // flagged for sole SWF5+ visibility
     string_class_init(*this); // should be SWF5+ only
     array_class_init(*this); // should be only for SWF5+
+    //localconnection_class_init(*this); // only for SWF6+
     registerDateNative(*this); // natives are always present
 
     switch (version)
@@ -201,7 +202,6 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             flash_package_init(*this); // will hide unless swf8 (by prop flags)
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
             ch->getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
-            init_member("LocalConnection", new builtin_function(localconnection_new));
 
         case 5:
         
