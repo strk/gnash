@@ -194,7 +194,7 @@ selection_setfocus(const fn_call& fn)
     /// These should remove focus.
     if (focus.is_null() || focus.is_undefined()) {
         mr.setFocus(0);
-        return as_value(ret);
+        return as_value(true);
     }
 
     boost::intrusive_ptr<character> ch;

@@ -68,6 +68,9 @@ check_equals(ret, false);
 ret = Selection.setFocus(_root, 5);
 check_equals(ret, false);
 
+_root.focusEnabled = false;
+ret = Selection.setFocus(_root, 5);
+check_equals(ret, false);
 
 // Methods added in version 6
 #if OUTPUT_VERSION >= 6
@@ -92,7 +95,7 @@ check_equals(ret, false);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(tx);
  check_equals(typeof(ret), "boolean");
- xcheck_equals(ret, true);
+ check_equals(ret, true);
 
  // An extra argument when the first argument is valid.
  ret = Selection.setFocus(tx, 5);
@@ -102,7 +105,7 @@ check_equals(ret, false);
  tx.focusEnabled = true;
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(tx);
- xcheck_equals(ret, true);
+ check_equals(ret, true);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus("tx");
  check_equals(ret, false);
@@ -120,13 +123,37 @@ check_equals(ret, false);
  check_equals(ret, false);
  check_equals(Selection.getFocus(), "_level0.mc");
 
+ // Setting _visible to false removes focus, otherwise visibility seems
+ // to have no effect.
+ mc._visible = false;
+ check_equals(mc._visible, false);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(mc);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc._visible = false;
+ check_equals(Selection.getFocus(), "_level0.mc");
+
+ ret = Selection.setFocus(null);
+ check_equals(ret, true);
+ check_equals(Selection.getFocus(), null);
+
+ ret = Selection.setFocus(mc);
+ check_equals(ret, false);
+ mc._visible = false;
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc._visible = true;
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc._visible = false;
+ check_equals(Selection.getFocus(), null);
+
  Selection.setFocus(tx);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus("tx");
  check_equals(ret, false);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(tx);
- xcheck_equals(ret, true);
+ check_equals(ret, true);
  check_equals(Selection.getFocus(), null);
 
 #endif // OUTPUT_VERSION >= 6

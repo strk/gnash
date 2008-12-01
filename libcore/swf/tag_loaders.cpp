@@ -238,7 +238,8 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     if ( ! jpegHeaderSize )
     {
-        log_debug(_("No bytes to read in JPEGTABLES tag at offset %d"), currPos);
+        log_debug(_("No bytes to read in JPEGTABLES tag at offset %d"),
+                currPos);
     }
 
     std::auto_ptr<JpegImageInput> input;
