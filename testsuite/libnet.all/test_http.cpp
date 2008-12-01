@@ -289,7 +289,7 @@ tests()
     // Check formatHeader()
     // HTTP/1.1 200 OK\r\nDate: Tue, 1 Apr 2008 19:58:40 GMT\r\nServer: Cygnal (GNU/Linux)\r\nLast-Modified: Tue, 1 Apr 2008 19:58:40 GMT\r\nEtag: 24103b9-1c54-ec8632c0\r\nAccept-Ranges: bytes\r\nContent-Length: 0\r\nKeep
     http.clearHeader();
-    http.formatHeader(HTTP::LIFE_IS_GOOD);
+    http.formatHeader(HTTP::OK);
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "HTTP/1.* 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
