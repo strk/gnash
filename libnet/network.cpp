@@ -320,6 +320,11 @@ Network::newConnection(bool block, int fd)
 	    int sig;
 	    sigwait(&blockset, &sig);
 	}
+	if (sigismember(&pending, SIGPIPE)) {
+	    log_debug("Have a pending SIGPIPE interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
+	}
 #else
         tval.tv_sec = 1;
         tval.tv_usec = 0;
@@ -734,30 +739,28 @@ boost::shared_ptr<amf::Buffer>
 Network::readNet()
 {
 //    GNASH_REPORT_FUNCTION;
-
     boost::shared_ptr<amf::Buffer> buffer(new amf::Buffer);
-    int ret = readNet(buffer);
+    int ret = readNet(*buffer);
     if (ret > 0) {
 	buffer->resize(ret);
     }
-
     return buffer;
 }
 
 // Read from the connection
 int
-Network::readNet(int fd, boost::shared_ptr<amf::Buffer> buffer)
+Network::readNet(int fd, amf::Buffer &buffer)
 {
-    int ret = readNet(fd, buffer->reference(), buffer->size(), _timeout);
+    int ret = readNet(fd, buffer.reference(), buffer.size(), _timeout);
     if (ret > 0) {
-	buffer->resize(ret);
+	buffer.resize(ret);
     }
 
     return ret;
 }
 
 int
-Network::readNet(boost::shared_ptr<amf::Buffer> buffer)
+Network::readNet(amf::Buffer &buffer)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = readNet(_sockfd, buffer, _timeout);
@@ -766,25 +769,27 @@ Network::readNet(boost::shared_ptr<amf::Buffer> buffer)
 }
 
 int
-Network::readNet(boost::shared_ptr<amf::Buffer> buffer, int timeout)
+Network::readNet(amf::Buffer &buffer, int timeout)
 {
 //    GNASH_REPORT_FUNCTION;
-    int ret = readNet(_sockfd, buffer->reference(), buffer->size(), timeout);
+    int ret = readNet(_sockfd, buffer.reference(), buffer.size(), timeout);
     if (ret > 0) {
-	buffer->resize(ret);
+	buffer.resize(ret);	// FIXME: why does this corrupt
     }
 
     return ret;
 }
 
 int
-Network::readNet(int fd, boost::shared_ptr<amf::Buffer> buffer, int timeout)
+Network::readNet(int fd, amf::Buffer &buffer, int timeout)
 {
-    int ret = readNet(fd, buffer->reference(), buffer->size(), timeout);
+    int ret = readNet(fd, buffer.reference(), buffer.size(), timeout);
+#if 0
     if (ret > 0) {
-	buffer->resize(ret);
+	buffer.resize(ret);	// FIXME: why does this corrupt
     }
-
+#endif
+    
     return ret;
 }
 
@@ -837,6 +842,7 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	sigset_t pending, blockset;
 	sigemptyset(&blockset);        
         // sigaddset(&blockset, SIGINT); /* Block SIGINT */
+//        sigaddset(&blockset, SIGPIPE); /* Block SIGPIPE */
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
 	// Trap ^C (SIGINT) so we can kill all the threads
@@ -862,6 +868,12 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	    sigpending(&pending);
 	    if (sigismember(&pending, SIGINT)) {
 		log_debug("Have a pending SIGINT interupt waiting!");
+		int sig;
+		sigwait(&blockset, &sig);
+		cntrlc_handler(SIGINT);
+	    }
+	    if (sigismember(&pending, SIGPIPE)) {
+		log_debug("Have a pending SIGPIPE interupt waiting!");
 		int sig;
 		sigwait(&blockset, &sig);
 		cntrlc_handler(SIGINT);
@@ -915,14 +927,14 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 int
 Network::writeNet(amf::Buffer *buffer)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return writeNet(buffer->reference(), buffer->allocated());
 };
 
 int
 Network::writeNet(int fd, amf::Buffer *buffer)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer->reference(), buffer->allocated());
 };
 
@@ -930,7 +942,7 @@ Network::writeNet(int fd, amf::Buffer *buffer)
 int
 Network::writeNet(amf::Buffer &buffer)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return writeNet(buffer.reference(), buffer.allocated());
 };
 
@@ -938,7 +950,7 @@ Network::writeNet(amf::Buffer &buffer)
 int
 Network::writeNet(int fd, amf::Buffer &buffer)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return writeNet(fd, buffer.reference(), buffer.allocated());
 };
 
@@ -1108,7 +1120,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	struct timespec tval;
 	sigset_t pending, emptyset, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
-        sigaddset(&blockset, SIGINT);
+//        sigaddset(&blockset, SIGINT);
 //        sigaddset(&blockset, SIGPIPE);
         sigprocmask(SIG_BLOCK, &blockset, NULL);
 
@@ -1232,6 +1244,11 @@ Network::waitForNetData(int limit, fd_set files)
     sigpending(&pending);
     if (sigismember(&pending, SIGINT)) {
 	log_debug("Have a pending SIGINT interupt waiting!");
+	int sig;
+	sigwait(&sigmask, &sig);
+    }
+    if (sigismember(&pending, SIGPIPE)) {
+	log_debug("Have a pending SIGPIPE interupt waiting!");
 	int sig;
 	sigwait(&sigmask, &sig);
     }
