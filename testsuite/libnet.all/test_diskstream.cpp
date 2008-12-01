@@ -51,6 +51,7 @@ static void usage (void);
 
 // Prototypes for test cases
 static void test();
+static void test_mem();
 static void create_file(const std::string &, size_t);
 
 // Enable the display of memory allocation and timing data
@@ -103,12 +104,13 @@ main(int argc, char *argv[])
 
     // run the tests
     test();
+    test_mem();
 }
 
 void
 test()
 {
-    DiskStream ds;
+    DiskStream ds1;
 
     // Create an array of printable ASCII characters
     int range = '~' - '!';
@@ -118,20 +120,20 @@ test()
     }
 
     create_file("outbuf.raw", 500);    
-    ds.open("outbuf.raw");
+    ds1.open("outbuf.raw");
 
     // ptr should be the base address of the memory plus the offset
-    boost::uint8_t *ptr = ds.loadChunk(48);
-    boost::uint8_t *dsptr = ds.get(); // cache the initial base address
+    boost::uint8_t *ptr = ds1.loadToMem(48);
+//    boost::uint8_t *dsptr = ds1.get(); // cache the initial base address
     
-    if ((ds.get() == MAP_FAILED) || (ds.get() == 0)) {
-        runtest.unresolved("loadChunk(48)");
+    if ((ds1.get() == MAP_FAILED) || (ds1.get() == 0)) {
+        runtest.unresolved("loadToMem(48)");
     } else {
-        if ((memcmp(ds.get(), buf, 48) == 0)
+        if ((memcmp(ds1.get(), buf, 48) == 0)
             && (memcmp(ptr, buf+48, range-48) == 0)) {
-            runtest.pass("loadChunk(48)");
+            runtest.pass("loadToMem(48)");
         } else {
-            runtest.fail("loadChunk(48)");
+            runtest.fail("loadToMem(48)");
         }
     }
 
@@ -139,63 +141,86 @@ test()
     // should be the same as before, as it points to data in the
     // current segment. The temporary pointer should point to the
     // appropriate place in memory page.
-    ptr = ds.loadChunk(128);
-    if ((ds.get() == MAP_FAILED) || (ds.get() == 0)) {
-        runtest.unresolved("loadChunk(128)");
+    ptr = ds1.loadToMem(128);
+    if ((ds1.get() == MAP_FAILED) || (ds1.get() == 0)) {
+        runtest.unresolved("loadToMem(128)");
     } else {
-        if ((memcmp(ds.get(), buf, range) == 0)
-            && (dsptr == ds.get())
+        if ((memcmp(ds1.get(), buf, range) == 0)
             && (memcmp(ptr, buf+(128-range), 128-range) == 0)) {
-            runtest.pass("loadChunk(128)");
+            runtest.pass("loadToMem(128)");
         } else {
-            runtest.fail("loadChunk(128)");
+            runtest.fail("loadToMem(128)");
         }
     }
 
     // close the currently opened file
-    ds.close();
-    if (ds.get() == 0) {
+    ds1.close();
+    if (ds1.getState() == DiskStream::CLOSED) {
         runtest.pass("close()");
     } else {
         runtest.fail("close()");
     }
 
+    
+    DiskStream ds2;
     // Create a bigger file that's larger than the page size
     create_file("outbuf2.raw", 12000);
-    ds.open("outbuf2.raw");
-    ptr = ds.loadChunk(6789);
-    if ((ds.get() == MAP_FAILED) || (ds.get() == 0)) {
-        runtest.unresolved("loadChunk(6789)");
+    ds2.open("outbuf2.raw");
+    ptr = ds2.loadToMem(6789);
+    if ((ds2.get() == MAP_FAILED) || (ds2.get() == 0)) {
+        runtest.unresolved("loadToMem(6789)");
     } else {
-        if ((memcmp(ds.get(), buf+4, range-4) == 0)
-            && (memcmp(ptr, buf, range) == 0)
-            && (dsptr == ds.get())) {
-            runtest.pass("loadChunk(6789)");
+        if ((memcmp(ds2.get(), buf+4, range-4) == 0)
+            && (memcmp(ptr, buf+4, range-4) == 0)) {
+            runtest.pass("loadToMem(6789)");
         } else {
-            runtest.fail("loadChunk(6789)");
+            runtest.fail("loadToMem(6789)");
         }
     }
 
     // test seeking in data files.
-    ptr = ds.seek(5100);
-    if ((ds.get() == MAP_FAILED) || (ds.get() == 0)) {
+    ptr = ds2.seek(5100);
+    if ((ds2.get() == MAP_FAILED) || (ds2.get() == 0)) {
         runtest.unresolved("seek(5100)");
     } else {
-        if ((memcmp(ds.get(), buf+4, range-4) == 0)
-            && (memcmp(ptr, buf+78, range-78) == 0)
-            && (dsptr == ds.get())) {
+        if ((memcmp(ds2.get(), buf+4, range-4) == 0)
+            && (memcmp(ptr, buf+82, range-82) == 0)) {
             runtest.pass("seek(5100)");
         } else {
             runtest.fail("seek(5100)");
         }
     }
-    if (dump) {
-        ds.dump();
-    }
+    
+//     if (dump) {
+//         ds2.dump();
+//     }
 
     delete[] buf;
     unlink("outbuf.raw");
     unlink("outbuf2.raw");
+}
+
+void
+test_mem()
+{
+    boost::shared_ptr<amf::Buffer> buf1(new amf::Buffer(12));
+    *buf1 = "Hello World";
+    // drop the null terminator byte we inherit when using a simnple
+    // string for testing
+    buf1->resize(buf1->size() - 1);
+
+    DiskStream ds("fooBar1", *buf1);
+    ds.writeToDisk();
+    ds.close();
+
+    struct stat st;
+    memset(&st, 0, sizeof(struct stat));
+    
+    if (stat("fooBar1", &st) == 0) {
+        runtest.pass("DiskStream::writeToDisk()");
+    } else {
+        runtest.fail("DiskStream::writeToDisk()");
+    }   
 }
 
 /// \brief create a test file to read in later. This lets us create
@@ -206,7 +231,7 @@ create_file(const std::string &filespec, size_t size)
     // Open an output file
 //    cerr << "Creating a test file.;
     
-    int fd = open(filespec.c_str(), O_WRONLY|O_CREAT|O_TRUNC, S_IRWXU);
+    int fd = open(filespec.c_str(), O_WRONLY|O_CREAT|O_TRUNC, S_IRWXU|S_IRGRP|S_IROTH);
     if (fd < 0) {
         perror("open");
     }
