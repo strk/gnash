@@ -1458,13 +1458,17 @@ MovieClip::handleFocus()
     if (_vm.getSWFVersion() < 6) return true;
 
     // A MovieClip can receive focus if the focusEnabled property evaluates to
-    // true, or if a mouse event handler is defined.
+    // true and no mouse event handler is defined, or if it is false and 
+    // a mouse event handler is defined.
+    
+    bool fe = false;
+
     as_value focusEnabled;
     if (get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
-        if (focusEnabled.to_bool() == true) return true;
+        fe = focusEnabled.to_bool(); 
     }
 
-    return (can_handle_mouse_event());
+    return (fe ? !can_handle_mouse_event() : can_handle_mouse_event());
 }
 
 /// Find a character hit by the given coordinates.

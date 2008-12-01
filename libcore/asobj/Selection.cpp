@@ -131,8 +131,8 @@ selection_getfocus(const fn_call& fn)
     
     movie_root& mr = ptr->getVM().getRoot();
 
-    character* ch = mr.getFocus();
-    if (!ch) {
+    boost::intrusive_ptr<character> ch = mr.getFocus();
+    if (!ch.get()) {
         as_value null;
         null.set_null();
         return null;
@@ -197,7 +197,7 @@ selection_setfocus(const fn_call& fn)
         return as_value(ret);
     }
 
-    character* ch;
+    boost::intrusive_ptr<character> ch;
 
     if (focus.is_string()) {
         const std::string& target = focus.to_string();
@@ -211,7 +211,7 @@ selection_setfocus(const fn_call& fn)
         /// Convert to character. If it's an object, but not a valid character,
         /// current focus is removed by passing 0 to movie_root::setFocus.
         ch = dynamic_cast<character*>(focus.to_object().get());
-        log_debug("setFocus(%s)", ch->getTarget());
+        //log_debug("setFocus(%s)", ch->getTarget());
     }
 
     // Will handle whether to set focus or not.

@@ -795,18 +795,11 @@ movie_root::generate_mouse_button_events()
 	        {
 		        // onPress
 
-		        // set/kill focus for current root
-		        character* current_active_entity = getFocus();
-
-		        // It's another entity ?
-		        if (current_active_entity != ms.activeEntity.get())
-		        {
-			        // Try setting focus on the new character. This will handle
-                    // all necessary events and removal of current focus.
-			        if (setFocus(ms.activeEntity.get())) {
-                        need_redisplay=true;
-                    }
-		        }
+                // Try setting focus on the new character. This will handle
+                // all necessary events and removal of current focus.
+                if (setFocus(ms.activeEntity)) {
+                    need_redisplay=true;
+                }
 
 		        if (ms.activeEntity)
 		        {
@@ -1241,7 +1234,8 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 }
 
 /* static private */
-void movie_root::add_listener(CharacterList& ll, character* listener)
+void
+movie_root::add_listener(CharacterList& ll, character* listener)
 {
 	assert(listener);
 	for(CharacterList::const_iterator i = ll.begin(), e = ll.end(); i != e; ++i)
@@ -1319,7 +1313,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	}
 }
 
-character*
+boost::intrusive_ptr<character>
 movie_root::getFocus()
 {
 	assert(testInvariant());
@@ -1327,11 +1321,11 @@ movie_root::getFocus()
 }
 
 bool
-movie_root::setFocus(character* ch)
+movie_root::setFocus(boost::intrusive_ptr<character> ch)
 {
 
-    /// Nothing to do in this case, but the operation counts as successful.
-    if (ch == _currentFocus) return true;
+    /// Nothing to do in this case.
+    if (ch == _currentFocus) return false;
 
     /// Undefined or NULL character removes current focus. Otherwise, try
     /// setting focus to the new character. If it fails, remove current
@@ -1797,13 +1791,15 @@ void
 movie_root::markReachableResources() const
 {
     // Mark movie levels as reachable
-    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
+            i!=e; ++i)
     {
         i->second->setReachable();
     }
 
     // Mark childs as reachable
-    for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+    for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend();
+            i!=e; ++i)
     {
         i->second->setReachable();
     }
@@ -1816,8 +1812,8 @@ movie_root::markReachableResources() const
     m_mouse_button_state.markReachableResources();
     
     // Mark timer targets
-    for (TimerMap::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
-            i != e; ++i)
+    for (TimerMap::const_iterator i=_intervalTimers.begin(),
+            e=_intervalTimers.end(); i != e; ++i)
     {
         i->second->markReachableResources();
     }
@@ -1839,6 +1835,8 @@ movie_root::markReachableResources() const
     // Mark global Mouse object
     if ( _mouseobject ) _mouseobject->setReachable();
 
+    if (_currentFocus) _currentFocus->setReachable();
+
     // Mark character being dragged, if any
     m_drag_state.markReachableResources();
 
@@ -1847,7 +1845,8 @@ movie_root::markReachableResources() const
     //       parent.
     //std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(&character::setReachable, _1));
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e; ++i)
+    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
+            i!=e; ++i)
     {
         assert((*i)->isReachable());
     }

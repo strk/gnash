@@ -1898,6 +1898,9 @@ bool
 TextField::handleFocus()
 {
 
+    /// Only selectable TextFields can receive focus.
+    if (!_selectable) return false;
+
     set_invalidated();
 
     m_has_focus = true;
