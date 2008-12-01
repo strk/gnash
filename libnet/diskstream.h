@@ -85,6 +85,7 @@ public:
     DiskStream();
     DiskStream(const std::string &filespec);
     DiskStream(const std::string &filespec, amf::Buffer &buf);
+    DiskStream(const std::string &filespec, boost::uint8_t *data, size_t size);
     DiskStream(const std::string &filespec, int netfd);
     ~DiskStream();
 

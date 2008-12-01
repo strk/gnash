@@ -114,6 +114,39 @@ DiskStream::DiskStream(const string &str)
 #endif
 }
 
+DiskStream::DiskStream(const string &str, boost::uint8_t *data, size_t size)
+    : _state(DiskStream::NO_STATE),
+      _filefd(0),
+      _netfd(0),
+      _dataptr(0),
+      _max_memload(0),
+      _pagesize(0),
+      _offset(0)
+{
+//    GNASH_REPORT_FUNCTION;
+    
+    /// \brief get the pagesize and cache the value
+#ifdef HAVE_SYSCONF
+    _pagesize = sysconf(_SC_PAGESIZE);
+    _max_memload = _pagesize * MAX_PAGES;    
+#else
+#error "Need to define the memory page size without sysconf()!"
+#endif
+
+    _dataptr = new boost::uint8_t[size];
+    // Note that this is a copy operation, which may effect performance. We do this for now
+    // incase the top level pointer gets deleted. This should really be using
+    // boost::scoped_array, but we don't want that complexity till this code stabalizes.
+    std::copy(data, data + size, _dataptr);
+    _filespec = str;
+    _filesize = size;
+    
+#ifdef USE_STATS_CACHE
+    clock_gettime (CLOCK_REALTIME, &_last_access);
+    _accesses = 1;
+#endif    
+}
+
 DiskStream::DiskStream(const string &str, amf::Buffer &buf)
     : _state(DiskStream::NO_STATE),
       _filefd(0),
@@ -341,7 +374,7 @@ bool
 DiskStream::writeToDisk(const std::string &filespec, amf::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    return writeToDisk(filespec, data.reference(), data.size());
+    return writeToDisk(filespec, data.reference(), data.allocated());
 }
 
 bool
@@ -351,10 +384,10 @@ DiskStream::writeToDisk(const std::string &filespec, boost::uint8_t *data, size_
 
     int fd = ::open(filespec.c_str() ,O_WRONLY|O_CREAT, S_IRWXU);
     if (fd < 0) {
-        perror("open");
+        log_error(strerror(errno));
     }
-    cout << "Writing packet to disk: \"outbuf.raw\"" << endl;
-    write(fd, data, size);
+    log_debug("Writing data (%d bytes) to disk: \"%s\"", size, filespec);
+    ::write(fd, data, size);
     ::close(fd);
 
     return true;
