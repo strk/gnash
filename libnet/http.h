@@ -125,10 +125,15 @@ public:
     ~HTTP();
 
     // These are for the protocol itself
-    bool processClientRequest();
-    bool processGetRequest();
-    bool processPostRequest();
-    bool processPostRequest(amf::Buffer &buf);
+    http_method_e processClientRequest(int fd);
+    bool processGetRequest(int fd);
+    bool processPostRequest(int fd);
+    bool processPutRequest(int fd);
+    bool processDeleteRequest(int fd);
+    bool processConnectRequest(int fd);
+    bool processOptionsRequest(int fd);
+    bool processHeadRequest(int fd);
+    bool processTraceRequest(int fd);
 
     // Check the Header fields to make sure they're valid values.
     bool checkRequestFields(amf::Buffer &buf);
@@ -285,33 +290,32 @@ public:
     http_version_t *getVersion() { return &_version; }
     
     void setHandler(Handler *hand) { _handler = hand; };
+    void setDocRoot(const std::string &path) { _docroot = path; };
     
 private:
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
+    http_method_e	_cmd;
 
-    amf::Buffer	_buffer;
+    amf::Buffer		_buffer;
     CQue		_que;
     
-//    std::stringstream	_body;
-//    std::string		 _command;
     DiskStream::filetype_e  _filetype;
     std::string		_filespec;
     boost::uint32_t     _filesize;
-//    std::string		_url;
     std::map<int, struct status_codes *> _status_codes;
     
     std::map<std::string, std::string> DSOEXPORT _fields;
     http_version_t	_version;
     
     // Connection parameters we care about
-    bool	_keepalive;
-    Handler     *_handler;
+    bool		_keepalive;
+    Handler		*_handler;
     // These two field hold the data from an RTMPT message
-    int	        _clientid;
-    int	        _index;
-    int		_max_requests;
-//    bool	_te;
+    int			_clientid;
+    int			_index;
+    int			_max_requests;
+    std::string		_docroot;
 };  
 
 // This is the thread for all incoming HTTP connections

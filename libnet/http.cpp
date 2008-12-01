@@ -133,42 +133,57 @@ HTTP::operator = (HTTP& /*obj*/)
     return *this; 
 }
 
-bool
-HTTP::processClientRequest()
+HTTP::http_method_e
+HTTP::processClientRequest(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
+    bool result;
     
     boost::shared_ptr<amf::Buffer> buf(_que.peek());
     if (buf) {
-	switch (extractCommand(buf->reference())) {
+	_cmd = extractCommand(buf->reference());
+	switch (_cmd) {
 	  case HTTP::HTTP_GET:
-	      return processGetRequest();
+	      result = processGetRequest(fd);
 	      break;
 	  case HTTP::HTTP_POST:
-	      return processPostRequest();
+	      result = processPostRequest(fd);
 	      break;
 	  case HTTP::HTTP_HEAD:
+	      result = processHeadRequest(fd);
 	      break;
 	  case HTTP::HTTP_CONNECT:
+	      result = processConnectRequest(fd);
 	      break;
 	  case HTTP::HTTP_TRACE:
+	      result = processTraceRequest(fd);
 	      break;
 	  case HTTP::HTTP_OPTIONS:
+	      result = processOptionsRequest(fd);
 	      break;
 	  case HTTP::HTTP_PUT:
+	      result = processPutRequest(fd);
 	      break;
 	  case HTTP::HTTP_DELETE:
+	      result = processDeleteRequest(fd);
 	      break;
 	  default:
 	      break;
 	}
     }
+
+    if (result) {
+	return _cmd;
+    } else {
+	return HTTP::HTTP_NONE;
+    }
 }
 
+// A GET request asks the server to send a file to the client
 bool
-HTTP::processGetRequest()
+HTTP::processGetRequest(int fd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
 //     Network::byte_t buffer[readsize+1];
 //     const char *ptr = reinterpret_cast<const char *>(buffer);
@@ -185,7 +200,7 @@ HTTP::processGetRequest()
     
     boost::shared_ptr<amf::Buffer> buf(_que.pop());
 //    cerr << "YYYYYYY: " << (char *)buf->reference() << endl;
-//    cerr << hexify(buf->reference(), buf->size(), false) << endl;
+//    cerr << hexify(buf->reference(), buf->allocated(), false) << endl;
     
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
@@ -195,16 +210,82 @@ HTTP::processGetRequest()
     clearHeader();
     processHeaderFields(*buf);
 
-//    dump();
-    if (_version.major > 0) {
-	return true;
+    string url = _docroot + _filespec;
+    // See if the file is in the cache and already opened.
+    boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
+    if (filestream) {
+	cerr << "FIXME: found file in cache!" << endl;
     } else {
-	return false;
+	filestream.reset(new DiskStream);
+//	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
+	
+//	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
+	
+	// Oopen the file and read the furst chunk into memory
+	filestream->open(url);
+	
+	// Get the file size for the HTTP header
+	if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
+	    formatErrorResponse(HTTP::NOT_FOUND);
+	} else {
+	    cache.addPath(_filespec, filestream->getFilespec());
+	}
     }
+    
+    // Send the reply
+    amf::Buffer &reply = formatHeader(filestream->getFileType(),
+					  filestream->getFileSize(),
+					  HTTP::OK);
+    writeNet(fd, reply);
+
+    size_t filesize = filestream->getFileSize();
+    size_t bytes_read = 0;
+    int ret;
+    size_t page = 0;
+    if (filesize) {
+#ifdef USE_STATS_CACHE
+	struct timespec start;
+	clock_gettime (CLOCK_REALTIME, &start);
+#endif
+	size_t getbytes = 0;
+	if (filesize <= filestream->getPagesize()) {
+	    getbytes = filesize;
+	} else {
+	    getbytes = filestream->getPagesize();
+	}
+	if (filesize >= CACHE_LIMIT) {
+	    do {
+		filestream->loadToMem(page);
+		ret = writeNet(fd, filestream->get(), getbytes);
+		if (ret <= 0) {
+		    break;
+		}
+		bytes_read += ret;
+		page += filestream->getPagesize();
+	    } while (bytes_read <= filesize);
+	} else {
+	    filestream->loadToMem(filesize, 0);
+	    ret = writeNet(fd, filestream->get(), filesize);
+	}
+	filestream->close();
+#ifdef USE_STATS_CACHE
+	struct timespec end;
+	clock_gettime (CLOCK_REALTIME, &end);
+	double time = (end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9);
+	cerr << "File " << _filespec
+	     << " transferred " << filesize << " bytes in: " << fixed
+	     << time << " seconds." << endl;
+#endif
+    }
+
+    log_debug("http_handler all done transferring requested file \"%s\".", _filespec);
+    
+    return true;
 }
 
+// A POST request asks sends a data from the client to the server.
 bool
-HTTP::processPostRequest()
+HTTP::processPostRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -221,32 +302,58 @@ HTTP::processPostRequest()
     }
     clearHeader();
     extractCommand(*buf);
-    processHeaderFields(*buf);
-
-    if (_version.major > 0) {
-	return true;
-    } else {
-	return false;
-    }
+    gnash::Network::byte_t *data = processHeaderFields(*buf);
+    
+    return true;
 }
 
-// The order in which header fields with differing field names are
-// received is not significant. However, it is "good practice" to send
-// general-header fields first, followed by request-header or
-// response- header fields, and ending with the entity-header fields.
 bool
-HTTP::processPostRequest(amf::Buffer &buf)
+HTTP::processPutRequest(int /* fd */)
 {
-    GNASH_REPORT_FUNCTION;
-    clearHeader();
-    extractCommand(buf);
-    processHeaderFields(buf);
-    
-    if (!getFilespec().empty()) {
-	return true;
-    } else {
-	return false;
-    }
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("PUT request");
+
+    return false;
+}
+
+bool
+HTTP::processDeleteRequest(int /* fd */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("DELETE request");
+    return false;
+}
+
+bool
+HTTP::processConnectRequest(int /* fd */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("CONNECT request");
+    return false;
+}
+
+bool
+HTTP::processOptionsRequest(int /* fd */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("OPTIONS request");
+    return false;
+}
+
+bool
+HTTP::processHeadRequest(int /* fd */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("HEAD request");
+    return false;
+}
+
+bool
+HTTP::processTraceRequest(int /* fd */)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_unimpl("TRACE request");
+    return false;
 }
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 (5.3 Request Header Fields)
@@ -353,19 +460,33 @@ HTTP::processHeaderFields(amf::Buffer &buf)
  			   (int(*)(int)) tolower);
  	    _fields[name] = value;
 	    if (name == "keep-alive") {
-     //		log_debug("Got a Keep Alive HTTP header field!");
 		_keepalive = true;
 		if ((value != "on") && (value != "off")) {
 		    _max_requests = strtol(value.c_str(), NULL, 0);
 		    log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
 		}
 	    }
-	    // 
 	    if (name == "connection") {
 		if (value.find("keep-alive", 0) != string::npos) {
-  //		    log_debug("Got a Keep Alive in HTTP Connection header field!");
 		    _keepalive = true;
 		}
+	    }
+	    if (name == "content-length") {
+		_filesize = strtol(value.c_str(), NULL, 0);
+		log_debug("Setting Content Length to %d", _filesize);
+	    }
+	    if (name == "content-type") {
+		// This is the type used by flash when sending a AMF data via POST
+		if (value == "application/x-amf") {
+		    log_debug("Got AMF data in the POST request!");
+		    _filetype = DiskStream::FILETYPE_AMF;
+		}
+		// This is the type used by wget when sending a file via POST
+		if (value == "application/x-www-form-urlencoded") {
+		    log_debug("Got file data in the POST request");
+		    _filetype = DiskStream::FILETYPE_ENCODED;
+		}
+		log_debug("Setting Content Type to %d", _filetype);
 	    }
 	    
 //	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
@@ -438,6 +559,7 @@ HTTP::formatHeader(http_status_e type)
 amf::Buffer &
 HTTP::formatCommon(const string &data)
 {
+//    GNASH_REPORT_FUNCTION;
     _buffer += data;
     _buffer += "\r\n";
 
@@ -454,7 +576,7 @@ HTTP::formatHeader(size_t size, http_status_e code)
 amf::Buffer &
 HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     clearHeader();
 
@@ -647,10 +769,8 @@ HTTP::formatErrorResponse(http_status_e code)
     _buffer += "</body></html>\r\n";
 
     // First build the header
-//    _header << "HTTP/1.1 " << code << " Not Found" << "\r\n";
     formatDate();
     formatServer();
-//    _filesize = _body.str().size();
     formatContentLength(_filesize);
     formatConnection("close");
     formatContentType(_filetype);
@@ -670,25 +790,6 @@ HTTP::formatDate()
 //    cout <<  now.time_of_day() << "\r\n";
     
     boost::gregorian::date d(now.date());
-
-//    cerr << boost::gregorian::to_simple_string(d) << endl;
-//    cerr << boost::posix_time::to_simple_string(now.time_of_day()) << endl;
-//    cerr << boost::posix_time::to_posix_string() << endl;
-//     const char *months[] = {
-// 	"None",
-// 	"Jan",
-// 	"Feb",
-// 	"March",
-// 	"April",
-// 	"May",
-// 	"June",
-// 	"July",
-// 	"Aug",
-// 	"Sept",
-// 	"Oct",
-// 	"Nov",
-// 	"Dec"
-//     };
     
     char num[12];
 
@@ -768,7 +869,7 @@ HTTP::formatContentType()
 amf::Buffer &
 HTTP::formatContentType(DiskStream::filetype_e filetype)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     switch (filetype) {
       // default to HTML if the type isn't known
@@ -1114,7 +1215,7 @@ HTTP::recvMsg(int fd)
 
     do {
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-	int ret = net.readNet(fd, buf, 5);
+	int ret = net.readNet(fd, *buf, 5);
 
 //	cerr << __PRETTY_FUNCTION__ << endl << (char *)buf->reference() << endl;
 	
@@ -1127,7 +1228,7 @@ HTTP::recvMsg(int fd)
 	// so we're done.
 	if ((ret == static_cast<int>(string::npos)) || (ret == -1)) {
 	    log_debug("socket for fd #%d was closed...", fd);
-	    break;
+	    return 0;
 	}
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
@@ -1142,14 +1243,14 @@ HTTP::recvMsg(int fd)
 	    }
 	} else {
 	    log_debug("no more data for fd #%d, exiting...", fd);
-	    break;
+	    return 0;
 	}
     } while (ret);
     
     // We're done. Notify the other threads the socket is closed, and tell them to die.
     log_debug("Handler done for fd #%d...", fd);
 
-    return _que.size();
+    return ret;
 }
 
 void
@@ -1190,7 +1291,8 @@ http_handler(Handler::thread_params_t *args)
 	      args->netfd, get_thread_id());
     
     string docroot = args->filespec;
-    
+
+    www.setDocRoot(docroot);
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.
@@ -1200,59 +1302,22 @@ http_handler(Handler::thread_params_t *args)
 	struct timespec start;
 	clock_gettime (CLOCK_REALTIME, &start);
 #endif
-	
-	www.recvMsg(args->netfd);
-	
-	if (!www.processClientRequest()) {
+
+	// See if we have any messages waiting
+	if (www.recvMsg(args->netfd) == 0) {
+	    done = true;
+	}
+
+	// Process incoming messages
+	if (!www.processClientRequest(args->netfd)) {
 //	    hand->die();	// tell all the threads for this connection to die
 //	    hand->notifyin();
 	    log_debug("Net HTTP done for fd #%d...", args->netfd);
 // 	    hand->closeNet(args->netfd);
-	    return;
+	    done = true;
 	}
 //	www.dump();
 	
-	url = docroot;
-	url += www.getFilespec();
-
-	// See if the file is in the cache and already opened.
-	boost::shared_ptr<DiskStream> filestream(cache.findFile(url));
-	if (filestream) {
-	    cerr << "FIXME: found file in cache!" << endl;
-	} else {
-	    filestream.reset(new DiskStream);
-//	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
-
-//	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
-	    
-	    // Oopen the file and read the furst chunk into memory
-	    filestream->open(url);
-	    
-	    // Get the file size for the HTTP header
-	    if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
-		www.formatErrorResponse(HTTP::NOT_FOUND);
-	    } else {
-	      cache.addPath(www.getFilespec(), filestream->getFilespec());
-	    }
-	}
-	
-	
-	// Send the reply
-	amf::Buffer &reply = www.formatHeader(filestream->getFileType(),
-					      filestream->getFileSize(),
-					      HTTP::OK);
-	www.writeNet(args->netfd, reply);
-//	hand->writeNet(args->netfd, www.getHeader(), www.getHeader().allocated());
-//	strcpy(thread_data.filespec, filespec.c_str());
-//	thread_data.statistics = conndata->statistics;
-	
-	// Keep track of the network statistics
-//	conndata->statistics->stopClock();
-// 	log_debug (_("Bytes read: %d"), www.getBytesIn());
-// 	log_debug (_("Bytes written: %d"), www.getBytesOut());
-//	st.setBytes(www.getBytesIn() + www.getBytesOut());
-//	conndata->statistics->addStats();
-
 #if 0
 	string response = cache.findResponse(filestream->getFilespec());
 	if (response.empty()) {
@@ -1267,53 +1332,6 @@ http_handler(Handler::thread_params_t *args)
 	}	
 #endif
 	
-//	cerr << www.getHeader().c_str() << endl;
-
-	size_t filesize = filestream->getFileSize();
-	size_t bytes_read = 0;
-	int ret;
-	size_t page = 0;
-	if (filesize) {
-#ifdef USE_STATS_CACHE
-	    struct timespec start;
-	    clock_gettime (CLOCK_REALTIME, &start);
-#endif
-	    size_t getbytes = 0;
-	    if (filesize <= filestream->getPagesize()) {
-		getbytes = filesize;
-	    } else {
-		getbytes = filestream->getPagesize();
-	    }
-	    if (filesize >= CACHE_LIMIT) {
-		do {
-		    filestream->loadChunk(page);
-		    ret = www.writeNet(args->netfd, filestream->get(), getbytes);
-		    if (ret <= 0) {
-			break;
-		    }
-		    bytes_read += ret;
-		page += filestream->getPagesize();
-		} while (bytes_read <= filesize);
-	    } else {
-		filestream->loadChunk(filesize, 0);
-//		filestream->close();
-		ret = www.writeNet(args->netfd, filestream->get(), filesize);
-	    }
-	    filestream->close();
-#ifdef USE_STATS_CACHE
-	    struct timespec end;
-	    clock_gettime (CLOCK_REALTIME, &end);
-	    double time = (end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9);
-	    cerr << "File " << www.getFilespec()
-		 << " transferred " << filesize << " bytes in: " << fixed
-		 << time << " seconds." << endl;
-#endif
-//	    filestream->close();
-	}
-	log_debug("http_handler all done transferring requested file...");
-//	cache.dump();
-//	done = true;
-
 	// Unless the Keep-Alive flag is set, this isn't a persisant network
 	// connection.
 	if (!www.keepAlive()) {
@@ -1322,44 +1340,14 @@ http_handler(Handler::thread_params_t *args)
 	} else {
 	    log_debug("Keep-Alive is on", www.keepAlive());
 	}
-#if 0
-	if (url != docroot) {
-	    log_debug (_("File to load is: %s"), filespec.c_str());
-	    log_debug (_("Parameters are: %s"), parameters.c_str());
-	    struct stat st;
-	    int filefd;
-	    size_t ret;
-	    if (stat(filespec.c_str(), &st) == 0) {
-		filefd = ::open(filespec.c_str(), O_RDONLY);
-		log_debug (_("File \"%s\" is %lld bytes in size, disk fd #%d"), filespec,
-			   st.st_size, filefd);
-		boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-		log_debug("Done transferring %s to net fd #%d", filespec, args->netfd);
-
-		// See if this is a persistant connection
-// 		if (!www.keepAlive()) {
-// 		    log_debug("Keep-Alive is off", www.keepAlive());
-		hand->closeNet();
-//  		}
-	    }
-	}
-#endif
-
-
-	
 #ifdef USE_STATISTICS
 	struct timespec end;
 	clock_gettime (CLOCK_REALTIME, &end);
 	log_debug("Processing time for GET request was %f seconds",
 		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
 #endif
-//	conndata->statistics->dump();
-//    }
-//    } while(!hand->timetodie());
     } while(done != true);
     
-//     www.closeNet(args->netfd);
-//     hand->erasePollFD(args->netfd);
     hand->notify();
     
     log_debug("http_handler all done now finally...");
