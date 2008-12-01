@@ -249,7 +249,7 @@ tests()
     // specified field, then next to see if the default works.
 //     bool formatContentType();
     http.clearHeader();
-    http.formatContentType(amf::AMF::FILETYPE_SWF);
+    http.formatContentType(DiskStream::FILETYPE_SWF);
 //    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "Content-Type: application/x-shockwave-flash.*$",
              REG_NOSUB|REG_NEWLINE);
@@ -312,6 +312,7 @@ tests()
     } else {
         runtest.pass ("HTTP::formatErrorResponse(header)");
     }
+# if 0
     regfree(&regex_pat);
     regcomp (&regex_pat, "DOCTYPE.*<title>404 Not Found</title>.*$",
              REG_NOSUB);        // note that we do want to look for NL
@@ -321,6 +322,7 @@ tests()
         runtest.pass ("HTTP::formatErrorResponse(body)");
     }
     regfree(&regex_pat);
+#endif
     
     //
     // Decoding tests for HTTP
