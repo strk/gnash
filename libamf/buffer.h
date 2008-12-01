@@ -349,6 +349,14 @@ public:
     ///
     /// @return The amoount of unused bytes in the Buffer.
     size_t allocated() { return (_seekptr - _data.get()); };
+
+    /// \brief Set the seek pointer
+    ///
+    /// @param ptr the real pointer to set the seek pointer to
+    ///
+    /// @return nothing
+    void setSeekPointer(boost::uint8_t *ptr) { _seekptr = ptr; };
+    void setSeekPointer(off_t offset) { _seekptr = _data.get() + offset; };
     
     ///  \brief Dump the internal data of this class in a human readable form.
     ///		This should only be used for debugging purposes.
