@@ -108,10 +108,10 @@ proc wget { name options } {
 	-i $wid "Giving up" {
 	    verbose "Giving up on file transfer"
 	}
-	-i $wid "Retrying." {
-	    verbose "Retrying file"
-	    exp_continue
-	}
+# 	-i $wid "Retrying." {
+# 	    verbose "Retrying file"
+# 	    exp_continue
+# 	}
 	-i $wid "Connection close" {
 	    verbose "Connection closed from other end"
 	}
@@ -124,8 +124,12 @@ proc wget { name options } {
 	}
 	-i $wid "Connection closed at" {
 	}
-	-i $wid eof "*Connection refused" {
+	-i $wid "*Connection refused" {
 	    verbose "Wget failed..."
+	}
+	-i $wid "Content-Type: " {
+	    verbose "Got HTTP response header $name" 2
+	    set result true
 	}
 	-i $wid eof {
 	    verbose "Wget EOF..."
@@ -133,6 +137,10 @@ proc wget { name options } {
 	}
 	-i $wid timeout {
 	    verbose "Wget still running after ${timeout} seconds, killing it (deadlock?)"
+	}
+    }
+    expect {
+	-i $wid "*" {
 	}
     }
 
@@ -207,7 +215,7 @@ start_cygnal
 #
 
 # create test file
-create_file "foo" 120
+create_file "foo" 320
 
 # get the test file
 set result [ wget "foo" "" ]
@@ -227,7 +235,7 @@ if { $result == true } {
 # Testing transferring multiple files in a nice tight loop for stress testing.
 #
 set files ""
-set limit 40
+set limit 12
 set count 0
 for { set i 1 } { $i <= $limit } { incr i } {
     set size [ expr $i * 120]
@@ -235,11 +243,11 @@ for { set i 1 } { $i <= $limit } { incr i } {
     set result [ wget "foo$i" "" ]
     if { $result == true } {
 	# foo$i.1
- 	if { [file exists foo$i.1] } {
+# 	if { [file exists foo$i.1] } {
 	    verbose "foo$i was transferred!" 2
 	    incr count
 	    verbose -n "."
-	}
+#	}
     } else {
 	unresolved "HTTP GET multiple files"
     }
@@ -260,32 +268,31 @@ if { $count == $limit } {
 # send the test file
 set result [ wget "foo" "--post-file=foo.1" ]
 if { $result == true } {
-    if { [file exists foo.1] } {
-	verbose "foo was transferred!" 2
-	pass "HTTP POST single file"
-    } else {
-	fail "HTTP POST single file"
-    }
+    verbose "foo was transferred!" 2
+    pass "HTTP POST single file"
 } else {
-    unresolved "HTTP POST single file"
+    fail "HTTP POST single file"
 }
+# } else {
+#     unresolved "HTTP POST single file"
+# }
 
 
 set binsdir "[file dirname [file dirname [file dirname $srcdir]]]/testsuite/libnet.all"
-set bins [glob $binsdir/*.bin]
+set bins [glob -nocomplain $binsdir/*.bin]
+#set foo "amf0-number.bin amf0-undefined-object.bin amf0-null-object.bin"
 
-foreach binfile $bins {
-    set result [ wget foo {--header="Content-Type: application/x-amf" --post-file=$binfile} ]
+foreach i $bins {
+    set pos [string last  "/" $i]
+    if { $pos > 0 } {
+	set j [string range $i $pos+1 end]
+    }
+    set options { --header="Content-Type: application/x-am" --post-file=$i }
+    set result [ wget $j $options ]    
     if { $result == true } {
-	if { [file exists foo] } {
-	    [file delete foo]
-	    verbose "$binfile was transferred!" 2
-	    pass "HTTP POST single AMF0 $binfile"
-	} else {
-	    fail "HTTP POST single AMF0 $binfile"
-	}
+ 	pass "HTTP POST single AMF0 $j"
     } else {
-	unresolved "HTTP POST single AMF0 $binfile"
+ 	fail "HTTP POST single AMF0 $j"
     }
 }
 
