@@ -747,6 +747,11 @@ public:
         _drawable->clear();
     }
 
+    /// Set focus to this MovieClip
+    //
+    /// @return true if this MovieClip can receive focus.
+    virtual bool setFocus();
+
     /// @} Drawing API
     
 

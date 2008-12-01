@@ -129,10 +129,16 @@ selection_getfocus(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
-    UNUSED(ptr);
-    log_unimpl("Selection.getFocus()");
+    movie_root& mr = ptr->getVM().getRoot();
 
-    return as_value();
+    character* ch = mr.getFocus();
+    if (!ch) {
+        as_value null;
+        null.set_null();
+        return null;
+    }
+
+    return as_value(ch->getTarget());
 }
 
 
@@ -168,11 +174,47 @@ selection_setfocus(const fn_call& fn)
 {
 
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-    
-    UNUSED(ptr);
-    log_unimpl("Selection.setFocus()");
 
-    return as_value();
+    /// Handle invalid arguments: must be one argument, or no action is
+    /// taken.
+    if (!fn.nargs || fn.nargs > 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+           log_aserror("Selection.setFocus: expected 1 argument, got %d",
+               fn.nargs);
+        );
+        return as_value(false);
+    }
+
+    bool ret = false;
+
+    movie_root& mr = ptr->getVM().getRoot();
+
+    const as_value& focus = fn.arg(0);
+
+    /// These should remove focus.
+    if (focus.is_null() || focus.is_undefined()) {
+        mr.setFocus(0);
+        return as_value(ret);
+    }
+
+    if (focus.is_string()) {
+        /// TODO: handle target; what to return?
+        return as_value(ret);
+    }
+
+    if (!focus.is_object()) {
+        // No action if it's not a string, undefined, null, or an object.
+        return as_value(false);
+    }
+
+    /// Convert to character. If it's an object, but not a valid character,
+    /// current focus is removed by passing 0 to movie_root::setFocus.
+    character* ch = dynamic_cast<character*>(focus.to_object().get());
+
+    // Will handle whether to set focus or not.
+    mr.setFocus(ch);
+
+    return as_value(ret);
 }
 
 

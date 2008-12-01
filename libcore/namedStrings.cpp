@@ -56,6 +56,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "_droptarget", NSV::PROP_uDROPTARGET ),
 	string_table::svt( "enabled", NSV::PROP_ENABLED ),
 	string_table::svt( "useHandCursor", NSV::PROP_USEHANDCURSOR ),
+	string_table::svt( "focusEnabled", NSV::PROP_FOCUS_ENABLED ),	
 	string_table::svt( "_focusrect", NSV::PROP_uFOCUSRECT ),
 	string_table::svt( "_framesloaded", NSV::PROP_uFRAMESLOADED ),
 	string_table::svt( "_height", NSV::PROP_uHEIGHT ),

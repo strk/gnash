@@ -109,7 +109,7 @@ movie_root::movie_root(const movie_definition& def,
 	m_mouse_y(0),
 	m_mouse_buttons(0),
 	_lastTimerId(0),
-	m_active_input_text(NULL),
+	_currentFocus(NULL),
 	m_time_remainder(0.0f),
 	m_drag_state(),
 	_movies(),
@@ -1334,13 +1334,23 @@ character*
 movie_root::getFocus()
 {
 	assert(testInvariant());
-	return m_active_input_text;
+	return _currentFocus;
 }
 
 void
 movie_root::setFocus(character* ch)
 {
-	m_active_input_text = ch;
+
+    /// Undefined or NULL character removes current focus. Otherwise, try
+    /// setting focus to the new character. If it fails, remove current
+    /// focus anyway.
+    if (!ch || !ch->setFocus()) {
+        _currentFocus = 0;
+        return;
+    }
+
+    _currentFocus = ch;
+
 	assert(testInvariant());
 }
 

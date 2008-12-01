@@ -73,6 +73,18 @@ public:
   typedef tree<StringPair> InfoTree; // ifdef USE_MENU
 #endif
 
+  /// Set the current focus to this character.
+  //
+  /// @return false if the character cannot receive focus, true if it can
+  ///         (and does).
+  //
+  /// Button, Textfield and MovieClip can receive focus. In SWF6 and above,
+  /// MovieClip can only receive focus if the focusEnabled property
+  /// evaluates to true.
+  virtual bool setFocus() { 
+      return false;
+  }
+
 private:
 
   int m_id;

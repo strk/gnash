@@ -1894,10 +1894,10 @@ TextField::onKillFocus()
     callMethod(NSV::PROP_ON_KILL_FOCUS);
 }
 
-void
+bool
 TextField::setFocus()
 {
-    if ( m_has_focus ) return; // nothing to do
+    if ( m_has_focus ) return true; 
 
     set_invalidated();
 
@@ -1911,6 +1911,7 @@ TextField::setFocus()
     format_text();
 
     onSetFocus();
+    return true;
 }
 
 void

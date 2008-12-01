@@ -981,7 +981,9 @@ private:
     /// Objects listening for mouse events (down,up,move)
     MouseListeners m_mouse_listeners;
 
-    character*  m_active_input_text;
+    /// The character currently holding focus, or 0 if no focus.
+    character* _currentFocus;
+
     float m_time_remainder;
 
     /// @todo fold this into m_mouse_button_state?

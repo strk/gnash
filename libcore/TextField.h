@@ -467,7 +467,10 @@ private:
     void insertTab(SWF::TextRecord& rec, int& x, float scale);
 
 	/// Set focus 
-	void setFocus();
+    //
+    /// @return true if focus was set. A TextField can always receive focus,
+    /// so this always returns true.
+	virtual bool setFocus();
 
 	/// Kill focus 
 	void killFocus();

@@ -111,19 +111,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(321); // SWF5
+	check_totals(327); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(823); // SWF6
+	check_totals(829); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(840); // SWF7
+	check_totals(846); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(914); // SWF8+
+	check_totals(920); // SWF8+
 #endif
 
 	play();
@@ -2159,6 +2159,18 @@ check_equals(vis._visible, false);
 vis._visible = undefined;
 check_equals(vis._visible, false);
 #endif
+
+check_equals(_root.focusEnabled, undefined);
+_root.focusEnabled = 5;
+check_equals(_root.focusEnabled, 5);
+_root.focusEnabled = 0;
+check_equals(_root.focusEnabled, 0);
+_root.focusEnabled = true;
+check_equals(_root.focusEnabled, true);
+_root.focusEnabled = false;
+check_equals(_root.focusEnabled, false);
+_root.focusEnabled = "hello";
+check_equals(_root.focusEnabled, "hello");
 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 
