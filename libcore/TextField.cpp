@@ -395,11 +395,11 @@ TextField::on_event(const event_id& id)
     switch (id.m_id)
     {
         case event_id::SETFOCUS:
-            setFocus();
+            onSetFocus();
             break;
 
         case event_id::KILLFOCUS:
-            killFocus();
+            onKillFocus();
             break;
 
         case event_id::KEY_PRESS:
@@ -1894,10 +1894,12 @@ TextField::onKillFocus()
     callMethod(NSV::PROP_ON_KILL_FOCUS);
 }
 
-void
-TextField::setFocus()
+bool
+TextField::handleFocus()
 {
-    if ( m_has_focus ) return; // nothing to do
+
+    /// Only selectable TextFields can receive focus.
+    if (!_selectable) return false;
 
     set_invalidated();
 
@@ -1909,8 +1911,7 @@ TextField::setFocus()
 
     m_cursor = _text.size();
     format_text();
-
-    onSetFocus();
+    return true;
 }
 
 void
@@ -1923,11 +1924,9 @@ TextField::killFocus()
     m_has_focus = false;
 
     movie_root& root = _vm.getRoot();
-    root.setFocus(NULL);
     root.remove_key_listener(this);
     format_text(); // is this needed ?
 
-    onKillFocus();
 }
 
 void

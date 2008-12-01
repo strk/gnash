@@ -109,7 +109,7 @@ movie_root::movie_root(const movie_definition& def,
 	m_mouse_y(0),
 	m_mouse_buttons(0),
 	_lastTimerId(0),
-	m_active_input_text(NULL),
+	_currentFocus(0),
 	m_time_remainder(0.0f),
 	m_drag_state(),
 	_movies(),
@@ -795,29 +795,12 @@ movie_root::generate_mouse_button_events()
 	        {
 		        // onPress
 
-		        // set/kill focus for current root
-		        character* current_active_entity = getFocus();
-
-		        // It's another entity ?
-		        if (current_active_entity != ms.activeEntity.get())
-		        {
-			        // First to clean focus
-			        if (current_active_entity != NULL)
-			        {
-				        current_active_entity->on_event(event_id::KILLFOCUS);
-				        need_redisplay=true;
-				        setFocus(NULL);
-			        }
-
-			        // Then to set focus
-			        if (ms.activeEntity)
-			        {
-				        if (ms.activeEntity->on_event(event_id::SETFOCUS))
-				        {
-					        setFocus(ms.activeEntity.get());
-				        }
-			        }
-		        }
+                // Try setting focus on the new character. This will handle
+                // all necessary events and removal of current focus.
+                // Do not set focus to NULL.
+                if (ms.activeEntity.get() && setFocus(ms.activeEntity)) {
+                    need_redisplay=true;
+                }
 
 		        if (ms.activeEntity)
 		        {
@@ -1252,7 +1235,8 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 }
 
 /* static private */
-void movie_root::add_listener(CharacterList& ll, character* listener)
+void
+movie_root::add_listener(CharacterList& ll, character* listener)
 {
 	assert(listener);
 	for(CharacterList::const_iterator i = ll.begin(), e = ll.end(); i != e; ++i)
@@ -1330,18 +1314,47 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	}
 }
 
-character*
+boost::intrusive_ptr<character>
 movie_root::getFocus()
 {
 	assert(testInvariant());
-	return m_active_input_text;
+	return _currentFocus;
 }
 
-void
-movie_root::setFocus(character* ch)
+bool
+movie_root::setFocus(boost::intrusive_ptr<character> ch)
 {
-	m_active_input_text = ch;
+
+    // Nothing to do if current focus is the same as the new focus. 
+    // _level0 also seems unable to receive focus under any circumstances
+    // TODO: what about _level1 etc ?
+    if (ch == _currentFocus || ch == static_cast<character*>(getRootMovie())) {
+        return false;
+    }
+
+    // Undefined or NULL character removes current focus. Otherwise, try
+    // setting focus to the new character. If it fails, remove current
+    // focus anyway.
+    if (!ch) {
+        if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
+        _currentFocus = 0;
+        return true;
+    }
+
+    if (!ch->handleFocus()) {
+        // TODO: not clear whether to remove focus in this case.
+        return false;
+    }
+
+    if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
+    _currentFocus = ch;
+    _currentFocus->on_event(event_id::SETFOCUS);
+
+    log_debug("%s", ch->getTarget());
+
 	assert(testInvariant());
+
+    return true;
 }
 
 character*
@@ -1785,13 +1798,15 @@ void
 movie_root::markReachableResources() const
 {
     // Mark movie levels as reachable
-    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
+            i!=e; ++i)
     {
         i->second->setReachable();
     }
 
     // Mark childs as reachable
-    for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+    for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend();
+            i!=e; ++i)
     {
         i->second->setReachable();
     }
@@ -1804,8 +1819,8 @@ movie_root::markReachableResources() const
     m_mouse_button_state.markReachableResources();
     
     // Mark timer targets
-    for (TimerMap::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
-            i != e; ++i)
+    for (TimerMap::const_iterator i=_intervalTimers.begin(),
+            e=_intervalTimers.end(); i != e; ++i)
     {
         i->second->markReachableResources();
     }
@@ -1827,6 +1842,8 @@ movie_root::markReachableResources() const
     // Mark global Mouse object
     if ( _mouseobject ) _mouseobject->setReachable();
 
+    if (_currentFocus) _currentFocus->setReachable();
+
     // Mark character being dragged, if any
     m_drag_state.markReachableResources();
 
@@ -1835,7 +1852,8 @@ movie_root::markReachableResources() const
     //       parent.
     //std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(&character::setReachable, _1));
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e; ++i)
+    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
+            i!=e; ++i)
     {
         assert((*i)->isReachable());
     }

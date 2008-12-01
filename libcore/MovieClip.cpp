@@ -1410,13 +1410,16 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
     } 
 }
 
-void MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+void
+MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag,
+        DisplayList& dlist)
 {
     set_invalidated();
     dlist.remove_character(tag->getDepth());
 }
 
-void MovieClip::replace_display_object(character* ch, int depth, 
+void
+MovieClip::replace_display_object(character* ch, int depth, 
         bool use_old_cxform, bool use_old_matrix)
 {
     assert(ch);
@@ -1424,14 +1427,16 @@ void MovieClip::replace_display_object(character* ch, int depth,
             use_old_cxform, use_old_matrix);
 }
 
-int MovieClip::get_id_at_depth(int depth)
+int
+MovieClip::get_id_at_depth(int depth)
 {
     character* ch = m_display_list.get_character_at_depth(depth);
     if ( ! ch ) return -1;
     return ch->get_id();
 }
 
-void MovieClip::increment_frame_and_check_for_loop()
+void
+MovieClip::increment_frame_and_check_for_loop()
 {
     size_t frame_count = get_loaded_frames(); 
     if ( ++m_current_frame >= frame_count )
@@ -1445,11 +1450,24 @@ void MovieClip::increment_frame_and_check_for_loop()
         }
     }
 
-#if 0 // debugging
-    log_debug(_("Frame %u/%u, bytes %u/%u"),
-        m_current_frame, frame_count,
-        get_bytes_loaded(), get_bytes_total());
-#endif
+}
+
+bool
+MovieClip::handleFocus()
+{
+
+    // For SWF6 and above: the MovieClip can always receive focus if
+    // focusEnabled evaluates to true.
+    if (_vm.getSWFVersion() > 5) {
+        as_value focusEnabled;
+        if (get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
+            if (focusEnabled.to_bool() == true) return true; 
+        }
+    }
+        
+    // If focusEnabled doesn't evaluate to true or for SWF5, return true
+    // only if at least one mouse event handler is defined.
+    return can_handle_mouse_event();
 }
 
 /// Find a character hit by the given coordinates.

@@ -540,7 +540,7 @@ character::visible_getset(const fn_call& fn)
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
-	if ( fn.nargs == 0 ) // getter
+	if (!fn.nargs) // getter
 	{
 		rv = as_value(ptr->get_visible());
 	}
@@ -617,6 +617,21 @@ character::width_getset(const fn_call& fn)
 	return rv;
 }
 
+void
+character::set_visible(bool visible)
+{
+    if (m_visible != visible) set_invalidated(__FILE__, __LINE__);
+
+    // Remove focus from this character if it changes from visible to
+    // invisible (see Selection.as).
+    if (m_visible && !visible) {
+        movie_root& mr = _vm.getRoot();
+        if (mr.getFocus().get() == this) {
+            mr.setFocus(0);
+        }
+    }
+    m_visible = visible;      
+}
 void
 character::set_width(double newwidth)
 {

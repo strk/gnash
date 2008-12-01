@@ -547,7 +547,7 @@ SWFStream::open_tag()
 
     if ( tagLength > 1024*64 )
     {
-        log_debug("Tag %d has a size of %d bytes !!", tagType, tagLength);
+        //log_debug("Tag %d has a size of %d bytes !!", tagType, tagLength);
     }
 
     unsigned long tagEnd = tell() + tagLength;

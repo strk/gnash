@@ -433,14 +433,16 @@ public:
     ///
     /// @return the character having focus or NULL of none.
     ///
-    character* getFocus();
+    boost::intrusive_ptr<character> getFocus();
 
     /// Set the character having focus
     //
     /// @param ch
     /// The character having focus. NULL to kill focus.
-    ///
-    void setFocus(character* ch);
+    /// @return true if the focus operation succeeded, false if the passed
+    /// character cannot receive focus. setFocus(0) is a valid operation, so
+    /// returns true (always succeeds).
+    bool setFocus(boost::intrusive_ptr<character> ch);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges,
             bool force);
@@ -981,7 +983,9 @@ private:
     /// Objects listening for mouse events (down,up,move)
     MouseListeners m_mouse_listeners;
 
-    character*  m_active_input_text;
+    /// The character currently holding focus, or 0 if no focus.
+    boost::intrusive_ptr<character> _currentFocus;
+
     float m_time_remainder;
 
     /// @todo fold this into m_mouse_button_state?

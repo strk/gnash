@@ -129,10 +129,16 @@ selection_getfocus(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
-    UNUSED(ptr);
-    log_unimpl("Selection.getFocus()");
+    movie_root& mr = ptr->getVM().getRoot();
 
-    return as_value();
+    boost::intrusive_ptr<character> ch = mr.getFocus();
+    if (!ch.get()) {
+        as_value null;
+        null.set_null();
+        return null;
+    }
+
+    return as_value(ch->getTarget());
 }
 
 
@@ -146,33 +152,66 @@ selection_removelistener(const fn_call& /*fn*/) {
 // Documented to return true when setFocus succeeds, but that seems like the
 // usual Adobe crap.
 //
-// TODO: clean this up when it's better tested.
+// Returns true if focus is set to 0 (no focus), otherwise false. It is 
+// irrelevant whether focus was set. 
 //
-// Returns true if the character can normally receive focus (TextField), false
-// if it can't (MovieClip, any other object), regardless of whether focus
-// was set or not.
+// A MovieClip must have the focusEnabled property evaluate to true or at 
+// least one mouse event handler defined in order to receive focus.
 //
-// A MovieClip must have the focusEnabled property evaluate to true in order
-// to receive focus.
+// TextFields can only receive focus if selectable (TODO: check this).
+// Buttons are documented to be able to receive focus always.
 //
-// At least MovieClip behaves differently for SWF5, where focusEnabled
-// is probably irrelevant and setFocus can return true for MovieClips.
-// No idea what a TextField has to do to receive focus. 
-//
-// Button? Should be able to receive focus normally, so perhaps like TextField.
+// focusEnabled has no effect in SWF5.
 //
 // Any number of arguments other than one returns false and does nothing. The
-// single argument can be a character or a full target path.
+// single argument can be a character or a full target path, otherwise it's
+// a no-op and returns false.
 as_value
 selection_setfocus(const fn_call& fn)
 {
 
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-    
-    UNUSED(ptr);
-    log_unimpl("Selection.setFocus()");
 
-    return as_value();
+    /// Handle invalid arguments: must be one argument, or no action is
+    /// taken.
+    if (!fn.nargs || fn.nargs > 1) {
+        IF_VERBOSE_ASCODING_ERRORS(
+           log_aserror("Selection.setFocus: expected 1 argument, got %d",
+               fn.nargs);
+        );
+        return as_value(false);
+    }
+
+    bool ret = false;
+
+    movie_root& mr = ptr->getVM().getRoot();
+
+    const as_value& focus = fn.arg(0);
+
+    /// These should remove focus.
+    if (focus.is_null() || focus.is_undefined()) {
+        mr.setFocus(0);
+        return as_value(true);
+    }
+
+    boost::intrusive_ptr<character> ch;
+
+    if (focus.is_string()) {
+        const std::string& target = focus.to_string();
+        ch = fn.env().find_target(target);
+    }
+    else {
+        /// Try converting directly to character.
+        ch = dynamic_cast<character*>(focus.to_object().get());
+    }
+
+    // If the argument is not a character, do nothing.
+    if (!ch) return as_value(false);
+
+    // Will handle whether to set focus or not.
+    mr.setFocus(ch);
+
+    return as_value(ret);
 }
 
 
