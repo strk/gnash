@@ -1342,7 +1342,7 @@ movie_root::setFocus(character* ch)
         return true;
     }
 
-    if (!ch->setFocus()) {
+    if (!ch->handleFocus()) {
         _currentFocus = 0;
         return false;
     }

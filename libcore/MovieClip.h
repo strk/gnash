@@ -750,7 +750,7 @@ public:
     /// Set focus to this MovieClip
     //
     /// @return true if this MovieClip can receive focus.
-    virtual bool setFocus();
+    virtual bool handleFocus();
 
     /// @} Drawing API
     

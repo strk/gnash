@@ -383,7 +383,7 @@ Button::on_event(const event_id& id)
 }
 
 bool
-Button::setFocus() {
+Button::handleFocus() {
     /// Nothing to do, but can receive focus.
     return true;
 }

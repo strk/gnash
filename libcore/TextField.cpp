@@ -1895,7 +1895,7 @@ TextField::onKillFocus()
 }
 
 bool
-TextField::setFocus()
+TextField::handleFocus()
 {
 
     set_invalidated();

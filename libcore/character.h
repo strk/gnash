@@ -81,7 +81,7 @@ public:
   /// Button, Textfield and MovieClip can receive focus. In SWF6 and above,
   /// MovieClip can only receive focus if the focusEnabled property
   /// evaluates to true.
-  virtual bool setFocus() { 
+  virtual bool handleFocus() { 
       return false;
   }
 

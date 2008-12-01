@@ -1453,7 +1453,7 @@ MovieClip::increment_frame_and_check_for_loop()
 }
 
 bool
-MovieClip::setFocus()
+MovieClip::handleFocus()
 {
     if (_vm.getSWFVersion() < 6) return true;
     

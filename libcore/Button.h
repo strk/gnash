@@ -111,7 +111,7 @@ public:
 
 	virtual void on_button_event(const event_id& event);
 
-    virtual bool setFocus();
+    virtual bool handleFocus();
 
 	//
 	// ActionScript overrides
