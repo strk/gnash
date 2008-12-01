@@ -211,6 +211,7 @@ selection_setfocus(const fn_call& fn)
         /// Convert to character. If it's an object, but not a valid character,
         /// current focus is removed by passing 0 to movie_root::setFocus.
         ch = dynamic_cast<character*>(focus.to_object().get());
+        log_debug("setFocus(%s)", ch->getTarget());
     }
 
     // Will handle whether to set focus or not.
