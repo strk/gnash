@@ -147,6 +147,15 @@ check_equals(ret, false);
  mc._visible = false;
  check_equals(Selection.getFocus(), null);
 
+ // Check setting mouse events.
+ Selection.setFocus(mc);
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc.onRelease = function() {};
+ check_equals(Selection.getFocus(), "_level0.mc");
+ Selection.setFocus(mc);
+ check_equals(Selection.getFocus(), "_level0.mc");
+
+
  Selection.setFocus(tx);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus("tx");

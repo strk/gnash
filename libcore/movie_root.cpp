@@ -1325,12 +1325,16 @@ bool
 movie_root::setFocus(boost::intrusive_ptr<character> ch)
 {
 
-    /// Nothing to do in this case.
-    if (ch == _currentFocus) return false;
+    // Nothing to do if current focus is the same as the new focus. 
+    // _level0 also seems unable to receive focus under any circumstances
+    // TODO: what about _level1 etc ?
+    if (ch == _currentFocus || ch == static_cast<character*>(getRootMovie())) {
+        return false;
+    }
 
-    /// Undefined or NULL character removes current focus. Otherwise, try
-    /// setting focus to the new character. If it fails, remove current
-    /// focus anyway.
+    // Undefined or NULL character removes current focus. Otherwise, try
+    // setting focus to the new character. If it fails, remove current
+    // focus anyway.
     if (!ch) {
         if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
         _currentFocus = 0;
@@ -1345,6 +1349,8 @@ movie_root::setFocus(boost::intrusive_ptr<character> ch)
     if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
     _currentFocus = ch;
     _currentFocus->on_event(event_id::SETFOCUS);
+
+    log_debug("%s", ch->getTarget());
 
 	assert(testInvariant());
 

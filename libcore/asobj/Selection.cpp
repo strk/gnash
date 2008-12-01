@@ -152,23 +152,20 @@ selection_removelistener(const fn_call& /*fn*/) {
 // Documented to return true when setFocus succeeds, but that seems like the
 // usual Adobe crap.
 //
-// TODO: clean this up when it's better tested.
+// Returns true if focus is set to 0 (no focus), otherwise false. It is 
+// irrelevant whether focus was set. 
 //
-// Returns true if the character can normally receive focus (TextField), false
-// if it can't (MovieClip, any other object), regardless of whether focus
-// was set or not.
+// A MovieClip must have the focusEnabled property evaluate to true or at 
+// least one mouse event handler defined in order to receive focus.
 //
-// A MovieClip must have the focusEnabled property evaluate to true in order
-// to receive focus.
+// TextFields can only receive focus if selectable (TODO: check this).
+// Buttons are documented to be able to receive focus always.
 //
-// At least MovieClip behaves differently for SWF5, where focusEnabled
-// is probably irrelevant and setFocus can return true for MovieClips.
-// No idea what a TextField has to do to receive focus. 
-//
-// Button? Should be able to receive focus normally, so perhaps like TextField.
+// focusEnabled has no effect in SWF5.
 //
 // Any number of arguments other than one returns false and does nothing. The
-// single argument can be a character or a full target path.
+// single argument can be a character or a full target path, otherwise it's
+// a no-op and returns false.
 as_value
 selection_setfocus(const fn_call& fn)
 {
