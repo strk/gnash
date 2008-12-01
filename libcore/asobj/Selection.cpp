@@ -203,16 +203,13 @@ selection_setfocus(const fn_call& fn)
         const std::string& target = focus.to_string();
         ch = fn.env().find_target(target);
     }
-    else if (!focus.is_object()) {
-        // No action if it's not a string, undefined, null, or an object.
-        return as_value(false);
-    }
     else {
-        /// Convert to character. If it's an object, but not a valid character,
-        /// current focus is removed by passing 0 to movie_root::setFocus.
+        /// Try converting directly to character.
         ch = dynamic_cast<character*>(focus.to_object().get());
-        //log_debug("setFocus(%s)", ch->getTarget());
     }
+
+    // If the argument is not a character, do nothing.
+    if (!ch) return as_value(false);
 
     // Will handle whether to set focus or not.
     mr.setFocus(ch);

@@ -797,7 +797,8 @@ movie_root::generate_mouse_button_events()
 
                 // Try setting focus on the new character. This will handle
                 // all necessary events and removal of current focus.
-                if (setFocus(ms.activeEntity)) {
+                // Do not set focus to NULL.
+                if (ms.activeEntity.get() && setFocus(ms.activeEntity)) {
                     need_redisplay=true;
                 }
 
@@ -1337,7 +1338,7 @@ movie_root::setFocus(boost::intrusive_ptr<character> ch)
     }
 
     if (!ch->handleFocus()) {
-        _currentFocus = 0;
+        // TODO: not clear whether to remove focus in this case.
         return false;
     }
 
