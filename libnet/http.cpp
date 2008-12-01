@@ -304,6 +304,17 @@ HTTP::processPostRequest(int fd)
     extractCommand(*buf);
     gnash::Network::byte_t *data = processHeaderFields(*buf);
     
+    // Send the reply
+    amf::Buffer &reply = formatHeader(_filetype,_filesize, HTTP::OK);
+    writeNet(fd, reply);
+
+    size_t length = strtol(getField("content-length").c_str(), NULL, 0);
+    
+    string url = _docroot + _filespec;
+    DiskStream ds(url, data, length);
+    ds.writeToDisk();
+    ds.close();
+    
     return true;
 }
 
