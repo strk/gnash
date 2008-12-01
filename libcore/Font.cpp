@@ -114,7 +114,7 @@ Font::addFontNameInfo(const FontNameInfo& fontName)
     if (!_displayName.empty() || !_copyrightName.empty())
     {
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Attempt to set font display or copyright name"
+            log_swferror(_("Attempt to set font display or copyright name "
                     "again. This should mean there is more than one "
                     "DefineFontName tag referring to the same Font. Don't "
                     "know what to do in this case, so ignoring."));
