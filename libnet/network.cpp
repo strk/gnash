@@ -783,7 +783,9 @@ Network::readNet(amf::Buffer &buffer, int timeout)
 int
 Network::readNet(int fd, amf::Buffer &buffer, int timeout)
 {
+    GNASH_REPORT_FUNCTION;
     int ret = readNet(fd, buffer.reference(), buffer.size(), timeout);
+    buffer.setSeekPointer(ret);
 #if 0
     if (ret > 0) {
 	buffer.resize(ret);	// FIXME: why does this corrupt
