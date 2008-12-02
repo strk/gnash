@@ -85,6 +85,11 @@ public:
       return false;
   }
 
+  /// Some characters require actions on losing focus.
+  //
+  /// Default is a no-op. TextField implements this function.
+  virtual void killFocus() {}
+
 private:
 
   int m_id;

@@ -385,7 +385,7 @@ Button::on_event(const event_id& id)
 bool
 Button::handleFocus() {
     /// Nothing to do, but can receive focus.
-    return true;
+    return false;
 }
 
 
@@ -438,7 +438,8 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
         point  p(x, y);
         m.invert().transform(p);
 
-        for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend(); it!=itE; ++it)
+        for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend();
+                it!=itE; ++it)
         {
             character* ch = *it;
             if ( ! ch->get_visible() ) continue;
@@ -482,8 +483,7 @@ Button::on_button_event(const event_id& event)
 {
     if ( isUnloaded() )
     {
-        // We dont' respond to events while unloaded
-        // See bug #22982
+        // We don't respond to events while unloaded. See bug #22982.
         log_debug("Button %s received %s button event while unloaded: ignored",
             getTarget(), event);
         return;
@@ -494,30 +494,29 @@ Button::on_button_event(const event_id& event)
     // Set our mouse state (so we know how to render).
     switch (event.m_id)
     {
-    case event_id::ROLL_OUT:
-    case event_id::RELEASE_OUTSIDE:
-        new_state = UP;
-        break;
+        case event_id::ROLL_OUT:
+        case event_id::RELEASE_OUTSIDE:
+            new_state = UP;
+            break;
 
-    case event_id::RELEASE:
-    case event_id::ROLL_OVER:
-    case event_id::DRAG_OUT:
-    case event_id::MOUSE_UP:
-        new_state = OVER;
-        break;
+        case event_id::RELEASE:
+        case event_id::ROLL_OVER:
+        case event_id::DRAG_OUT:
+        case event_id::MOUSE_UP:
+            new_state = OVER;
+            break;
 
-    case event_id::PRESS:
-    case event_id::DRAG_OVER:
-    case event_id::MOUSE_DOWN:
-        new_state = DOWN;
-        break;
+        case event_id::PRESS:
+        case event_id::DRAG_OVER:
+        case event_id::MOUSE_DOWN:
+            new_state = DOWN;
+            break;
 
-    default:
-        //abort();  // missed a case?
-        log_error(_("Unhandled button event %s"), event);
-        break;
-    };
-    
+        default:
+            //abort();  // missed a case?
+            log_error(_("Unhandled button event %s"), event);
+            break;
+    }
     
     set_current_state(new_state);
     
@@ -606,20 +605,15 @@ Button::on_button_event(const event_id& event)
     {
         //log_debug(_("Got statically-defined handler for event: %s"), event);
         mr.pushAction(code, movie_root::apDOACTION);
-        //code->execute();
     }
-    //else log_debug(_("No statically-defined handler for event: %s"), event);
 
     // Call conventional attached method.
     boost::intrusive_ptr<as_function> method =
         getUserDefinedEventHandler(event.get_function_key());
     if ( method )
     {
-        //log_debug(_("Got user-defined handler for event: %s"), event);
         mr.pushAction(method, this, movie_root::apDOACTION);
-        //call_method0(as_value(method.get()), &(get_environment()), this);
     }
-    //else log_debug(_("No statically-defined handler for event: %s"), event);
 }
 
 

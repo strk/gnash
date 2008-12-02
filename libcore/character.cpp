@@ -878,6 +878,7 @@ character::get_event_handler(const event_id& id) const
 bool
 character::unload()
 {
+
 	if ( ! _unloaded )
 	{
 		queueEvent(event_id::UNLOAD, movie_root::apDOACTION);

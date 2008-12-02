@@ -28,6 +28,8 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
+#include "array.h"
+#include "AsBroadcaster.h"
 
 // For getting and setting focus
 #include "VM.h"
@@ -81,6 +83,11 @@ attachSelectionInterface(as_object& o)
             new builtin_function(selection_removelistener));
 	o.init_member("setFocus", new builtin_function(selection_setfocus));
 	o.init_member("setSelection", new builtin_function(selection_setselection));
+
+    AsBroadcaster::initialize(o);
+ 
+    Array_as* ar = new Array_as();
+    o.set_member(NSV::PROP_uLISTENERS, ar);
 }
 
 as_object*
@@ -96,8 +103,26 @@ getSelectionInterface()
 }
 
 as_value
-selection_addlistener(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+selection_addlistener(const fn_call& fn) {
+
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+    if (!fn.nargs) {
+        return as_value();
+    }
+
+    as_value listeners;
+    if (!ptr->get_member(NSV::PROP_uLISTENERS, &listeners)) return as_value();
+
+    as_object* obj = listeners.to_object().get();
+    if (!obj) return as_value();
+    Array_as* ar = dynamic_cast<Array_as*>(obj);
+    if (!ar) return as_value();
+
+    as_object* l = fn.arg(0).to_object().get();
+    if (!l) return as_value();
+    ar->push(l);
+
     return as_value();
 }
 
@@ -182,8 +207,6 @@ selection_setfocus(const fn_call& fn)
         return as_value(false);
     }
 
-    bool ret = false;
-
     movie_root& mr = ptr->getVM().getRoot();
 
     const as_value& focus = fn.arg(0);
@@ -205,13 +228,13 @@ selection_setfocus(const fn_call& fn)
         ch = dynamic_cast<character*>(focus.to_object().get());
     }
 
-    // If the argument is not a character, do nothing.
+    // If the argument does not resolve to a character, do nothing.
     if (!ch) return as_value(false);
 
     // Will handle whether to set focus or not.
     mr.setFocus(ch);
 
-    return as_value(ret);
+    return as_value(false);
 }
 
 
