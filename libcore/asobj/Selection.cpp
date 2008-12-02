@@ -38,12 +38,10 @@
 namespace gnash {
 
 namespace {    
-    as_value selection_addlistener(const fn_call& fn);
     as_value selection_getbeginindex(const fn_call& fn);
     as_value selection_getcaretindex(const fn_call& fn);
     as_value selection_getendindex(const fn_call& fn);
     as_value selection_getfocus(const fn_call& fn);
-    as_value selection_removelistener(const fn_call& fn);
     as_value selection_setfocus(const fn_call& fn);
     as_value selection_setselection(const fn_call& fn);
 
@@ -70,24 +68,26 @@ namespace {
 void
 attachSelectionInterface(as_object& o)
 {
-	o.init_member("addListener", new builtin_function(selection_addlistener));
-	o.init_member("getBeginIndex",
-            new builtin_function(selection_getbeginindex));
-	o.init_member("getCaretIndex",
-            new builtin_function(selection_getcaretindex));
-	o.init_member("getEndIndex",
-            new builtin_function(selection_getendindex));
-	o.init_member("getFocus",
-            new builtin_function(selection_getfocus));
-	o.init_member("removeListener",
-            new builtin_function(selection_removelistener));
-	o.init_member("setFocus", new builtin_function(selection_setfocus));
-	o.init_member("setSelection", new builtin_function(selection_setselection));
 
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::readOnly;
+
+	o.init_member("getBeginIndex",
+            new builtin_function(selection_getbeginindex), flags);
+	o.init_member("getCaretIndex",
+            new builtin_function(selection_getcaretindex), flags);
+	o.init_member("getEndIndex",
+            new builtin_function(selection_getendindex), flags);
+	o.init_member("getFocus",
+            new builtin_function(selection_getfocus), flags);
+	o.init_member("setFocus", new builtin_function(selection_setfocus), flags);
+	o.init_member("setSelection",
+            new builtin_function(selection_setselection), flags);
+
+    /// Handles addListener, removeListener, and _listeners.
     AsBroadcaster::initialize(o);
  
-    Array_as* ar = new Array_as();
-    o.set_member(NSV::PROP_uLISTENERS, ar);
 }
 
 as_object*
@@ -101,31 +101,6 @@ getSelectionInterface()
 	}
 	return o.get();
 }
-
-as_value
-selection_addlistener(const fn_call& fn) {
-
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-
-    if (!fn.nargs) {
-        return as_value();
-    }
-
-    as_value listeners;
-    if (!ptr->get_member(NSV::PROP_uLISTENERS, &listeners)) return as_value();
-
-    as_object* obj = listeners.to_object().get();
-    if (!obj) return as_value();
-    Array_as* ar = dynamic_cast<Array_as*>(obj);
-    if (!ar) return as_value();
-
-    as_object* l = fn.arg(0).to_object().get();
-    if (!l) return as_value();
-    ar->push(l);
-
-    return as_value();
-}
-
 
 as_value
 selection_getbeginindex(const fn_call& /*fn*/) {
@@ -164,13 +139,6 @@ selection_getfocus(const fn_call& fn)
     }
 
     return as_value(ch->getTarget());
-}
-
-
-as_value
-selection_removelistener(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
 }
 
 

@@ -103,22 +103,20 @@ AsBroadcaster::initialize(as_object& o)
 {
 	as_object* asb = getAsBroadcaster();
 
-	//log_debug("Initializing object %p as an AsBroadcaster", (void*)&o);
-
 	as_value tmp;
 
-	if ( asb->get_member(NSV::PROP_ADD_LISTENER, &tmp) )
-	{
-		o.set_member(NSV::PROP_ADD_LISTENER, tmp);
+	if (asb->get_member(NSV::PROP_ADD_LISTENER, &tmp)) {
+        o.set_member(NSV::PROP_ADD_LISTENER, tmp);
 	}
 
-	if ( asb->get_member(NSV::PROP_REMOVE_LISTENER, &tmp) )
-	{
-		o.set_member(NSV::PROP_REMOVE_LISTENER, tmp);
+	if (asb->get_member(NSV::PROP_REMOVE_LISTENER, &tmp)) {
+        o.set_member(NSV::PROP_REMOVE_LISTENER, tmp);
 	}
 	
-	o.set_member(NSV::PROP_BROADCAST_MESSAGE, new builtin_function(AsBroadcaster::broadcastMessage_method));
-	o.set_member(NSV::PROP_uLISTENERS, new Array_as());
+    o.set_member(NSV::PROP_BROADCAST_MESSAGE,
+            new builtin_function(AsBroadcaster::broadcastMessage_method));
+
+    o.set_member(NSV::PROP_uLISTENERS, new Array_as());
 
 #ifndef NDEBUG
 	assert(o.get_member(NSV::PROP_uLISTENERS, &tmp));
@@ -126,27 +124,19 @@ AsBroadcaster::initialize(as_object& o)
 	assert(o.get_member(NSV::PROP_BROADCAST_MESSAGE, &tmp));
 	assert(tmp.is_function());
 
-#if 0 // we can't rely on the following, due to possible override 
-      // of the AsBroadcaster properties used to intialize this
-      // object
-	assert(o.get_member(NSV::PROP_ADD_LISTENER, &tmp));
-	assert(tmp.is_function());
-	assert(o.get_member(NSV::PROP_REMOVE_LISTENER, &tmp));
-	assert(tmp.is_function());
-#endif // 0
-
+    // The following properties may be overridden in the AsBroadcaster object
+    // and thus unavailable: addListener, removeListener
 #endif
 }
 
 as_value
 AsBroadcaster::initialize_method(const fn_call& fn)
 {
-	// TODO: initialize first arg object as an AsBroadcaster
-	//       (call the AsBroadcaster::initialize(as_object*) static ?)
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("AsBroadcaster.initialize() requires one argument, none given"));
+		log_aserror(_("AsBroadcaster.initialize() requires one argument, "
+                "none given"));
 		);
 		return as_value();
 	}
@@ -156,7 +146,8 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 	if ( ! tgtval.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("AsBroadcaster.initialize(%s): first arg is not an object"), tgtval); 
+		log_aserror(_("AsBroadcaster.initialize(%s): first arg is "
+                "not an object"), tgtval); 
 		);
 		return as_value();
 	}
@@ -172,8 +163,6 @@ AsBroadcaster::initialize_method(const fn_call& fn)
 	}
 
 	AsBroadcaster::initialize(*tgt);
-
-	//log_debug("AsBroadcaster.initialize(%s): TESTING", tgtval);
 
 	return as_value();
 }
@@ -205,10 +194,11 @@ AsBroadcaster::addListener_method(const fn_call& fn)
 	}
 
 	// assuming no automatic primitive-to-object cast will return an array...
-	if ( ! listenersValue.is_object() )
+	if (!listenersValue.is_object())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%p.addListener(%s): this object's _listener isn't an object: %s"),
+		log_aserror(_("%p.addListener(%s): this object's _listener isn't "
+                "an object: %s"),
 			(void*)fn.this_ptr.get(),
 			fn.dump_args(), listenersValue);
 		);
@@ -400,25 +390,36 @@ as_object*
 AsBroadcaster::getAsBroadcaster()
 {
 	VM& vm = VM::get();
-	int swfVersion = vm.getSWFVersion();
 
 	static boost::intrusive_ptr<as_object> obj = NULL;
 	if ( ! obj )
 	{
-		obj = new builtin_function(AsBroadcaster_ctor, getAsBroadcasterInterface()); 
-		VM::get().addStatic(obj.get()); // correct ?
-		if ( swfVersion >= 6 )
-		{
-			// NOTE: we may add NSV::PROP_INITIALIZE, unavailable at time of writing.
-			//       anyway, since AsBroadcaster is the only class we know using an 'initialize'
-			//       method we might as well save the string_table size in case we'll not load
-			//       the class.
-			obj->init_member("initialize", new builtin_function(AsBroadcaster::initialize_method));
+		obj = new builtin_function(AsBroadcaster_ctor,
+                getAsBroadcasterInterface()); 
+		vm.addStatic(obj.get()); // correct ?
 
-			obj->init_member(NSV::PROP_ADD_LISTENER, new builtin_function(AsBroadcaster::addListener_method));
-			obj->init_member(NSV::PROP_REMOVE_LISTENER, new builtin_function(AsBroadcaster::removeListener_method));
-			obj->init_member(NSV::PROP_BROADCAST_MESSAGE, new builtin_function(AsBroadcaster::broadcastMessage_method));
-		}
+        const int flags = as_prop_flags::dontEnum |
+                          as_prop_flags::dontDelete |
+                          as_prop_flags::readOnly |
+                          as_prop_flags::onlySWF6Up;
+
+        // NOTE: we may add NSV::PROP_INITIALIZE, unavailable at
+        // time of writing. Anyway, since AsBroadcaster is the only
+        // class we know using an 'initialize' method we might as
+        // well save the string_table size in case we'll not load
+        // the class.
+        obj->init_member("initialize",
+                new builtin_function(AsBroadcaster::initialize_method),
+                flags);
+        obj->init_member(NSV::PROP_ADD_LISTENER,
+                new builtin_function(AsBroadcaster::addListener_method),
+                flags);
+        obj->init_member(NSV::PROP_REMOVE_LISTENER,
+                new builtin_function(AsBroadcaster::removeListener_method),
+                flags);
+        obj->init_member(NSV::PROP_BROADCAST_MESSAGE,
+                new builtin_function( AsBroadcaster::broadcastMessage_method),
+                flags);
 	}
 
 	return obj.get();
