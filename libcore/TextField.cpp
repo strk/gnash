@@ -250,15 +250,6 @@ TextField::~TextField()
 {
 }
 
-bool
-TextField::unload()
-{
-    // TODO: unregisterTextVariable() ?
-    on_event(event_id::KILLFOCUS);
-
-    return character::unload(); 
-}
-
 void
 TextField::removeTextField()
 {
@@ -394,14 +385,6 @@ TextField::on_event(const event_id& id)
 
     switch (id.m_id)
     {
-        case event_id::SETFOCUS:
-            onSetFocus();
-            break;
-
-        case event_id::KILLFOCUS:
-            onKillFocus();
-            break;
-
         case event_id::KEY_PRESS:
         {
             if ( getType() != typeInput ) break; // not an input field
@@ -1882,18 +1865,9 @@ TextField::onChanged()
     callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal);
 }
 
-void
-TextField::onSetFocus()
-{
-    callMethod(NSV::PROP_ON_SET_FOCUS);
-}
-
-void
-TextField::onKillFocus()
-{
-    callMethod(NSV::PROP_ON_KILL_FOCUS);
-}
-
+/// This is called by movie_root when focus is applied to this TextField.
+//
+/// The return value is true if the TextField can recieve focus.
 bool
 TextField::handleFocus()
 {
@@ -1914,13 +1888,14 @@ TextField::handleFocus()
     return true;
 }
 
+/// This is called by movie_root when focus is removed from the
+/// current TextField.
 void
 TextField::killFocus()
 {
     if ( ! m_has_focus ) return; // nothing to do
 
     set_invalidated();
-
     m_has_focus = false;
 
     movie_root& root = _vm.getRoot();

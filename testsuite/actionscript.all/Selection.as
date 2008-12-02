@@ -79,10 +79,10 @@ check_equals(ret, false);
  // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
  check_equals (typeof(Selection.addListener), 'function');
  check_equals (typeof(Selection.removeListener), 'function'); 
- xcheck_equals(typeof(Selection.broadcastMessage), 'function');
- xcheck(Selection.hasOwnProperty("_listeners"));
- xcheck_equals(typeof(Selection._listeners), 'object');
- xcheck(Selection._listeners instanceof Array);
+ check_equals(typeof(Selection.broadcastMessage), 'function');
+ check(Selection.hasOwnProperty("_listeners"));
+ check_equals(typeof(Selection._listeners), 'object');
+ check(Selection._listeners instanceof Array);
 
  _root.createEmptyMovieClip("mc", getNextHighestDepth());
  check(mc instanceof MovieClip);

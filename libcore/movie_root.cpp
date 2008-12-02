@@ -495,6 +495,20 @@ movie_root::clear()
 	setInvalidated();
 }
 
+as_object*
+movie_root::getSelectionObject() const
+{
+    as_object* global = _vm.getGlobal();
+    if (!global) return 0;
+
+    as_value s;
+    if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
+    
+    as_object* sel = s.to_object().get();
+   
+    return sel;
+}
+
 boost::intrusive_ptr<Stage_as>
 movie_root::getStageObject()
 {
@@ -798,15 +812,13 @@ movie_root::generate_mouse_button_events()
                 // Try setting focus on the new character. This will handle
                 // all necessary events and removal of current focus.
                 // Do not set focus to NULL.
-                if (ms.activeEntity.get() && setFocus(ms.activeEntity)) {
-                    need_redisplay=true;
-                }
+                if (ms.activeEntity) {
+                    setFocus(ms.activeEntity);
 
-		        if (ms.activeEntity)
-		        {
 			        ms.activeEntity->on_button_event(event_id::PRESS);
 			        need_redisplay=true;
 		        }
+
 		        ms.wasInsideActiveEntity = true;
 		        ms.previousButtonState = MouseButtonState::DOWN;
 	        }
@@ -1322,35 +1334,49 @@ movie_root::getFocus()
 }
 
 bool
-movie_root::setFocus(boost::intrusive_ptr<character> ch)
+movie_root::setFocus(boost::intrusive_ptr<character> to)
 {
 
     // Nothing to do if current focus is the same as the new focus. 
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
-    if (ch == _currentFocus || ch == static_cast<character*>(getRootMovie())) {
+    if (to == _currentFocus || to == static_cast<character*>(getRootMovie())) {
+        return false;
+    }
+
+    if (to && !to->handleFocus()) {
+        // TODO: not clear whether to remove focus in this case.
         return false;
     }
 
     // Undefined or NULL character removes current focus. Otherwise, try
     // setting focus to the new character. If it fails, remove current
     // focus anyway.
-    if (!ch) {
-        if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
-        _currentFocus = 0;
-        return true;
+
+    // Store previous focus, as the focus needs to change before onSetFocus
+    // is called and listeners are notified.
+    character* from = _currentFocus.get();
+
+    if (from) {
+
+        // Perform any actions required on killing focus (only TextField).
+        from->killFocus();
+        from->callMethod(NSV::PROP_ON_KILL_FOCUS, to.get());
     }
 
-    if (!ch->handleFocus()) {
-        // TODO: not clear whether to remove focus in this case.
-        return false;
+    _currentFocus = to;
+
+    if (to) {
+        to->callMethod(NSV::PROP_ON_SET_FOCUS, from);
     }
 
-    if (_currentFocus) _currentFocus->on_event(event_id::KILLFOCUS);
-    _currentFocus = ch;
-    _currentFocus->on_event(event_id::SETFOCUS);
+    as_object* sel = getSelectionObject();
 
-    log_debug("%s", ch->getTarget());
+    /// Notify Selection listeners with previous and new focus as arguments.
+    if (sel) {
+        sel->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onSetFocus",
+                from, to.get());
+    }
 
 	assert(testInvariant());
 

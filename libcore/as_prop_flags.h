@@ -75,7 +75,8 @@ public:
 	}
 
 	/// Constructor
-	as_prop_flags(const bool read_only, const bool dont_delete, const bool dont_enum)
+	as_prop_flags(const bool read_only, const bool dont_delete,
+            const bool dont_enum)
 		:
 		_flags(((read_only) ? readOnly : 0) |
 				((dont_delete) ? dontDelete : 0) |
@@ -102,7 +103,7 @@ public:
 	/// Get "static" flag
 	bool get_static() const
 	{
-	    return (_flags & staticProp) ? true : false;
+	    return (_flags & staticProp);
 	}
 
 	/// Set "static" flag
@@ -114,7 +115,7 @@ public:
 	/// Get "read-only" flag 
 	bool get_read_only() const
 	{
-	    return (((_flags & readOnly) != 0) ? true : false);
+	    return (_flags & readOnly);
 	}
 
 	/// Set "read-only" flag 
@@ -126,7 +127,7 @@ public:
 	/// Get "don't delete" flag
 	bool get_dont_delete() const
 	{
-	    return (((_flags & dontDelete) != 0) ? true : false);
+	    return (_flags & dontDelete);
 	}
 
 	/// Set "don't delete" flag
@@ -138,7 +139,7 @@ public:
 	/// Get "don't enum" flag
 	bool get_dont_enum() const
 	{
-	    return (((_flags & dontEnum) != 0) ? true : false);
+	    return (_flags & dontEnum);
 	}
 
 	/// Set "don't enum" flag
@@ -177,17 +178,9 @@ public:
 	int get_flags() const { return _flags; }
 
 	/// Get "protected" flag
-	bool get_is_protected() const { return (_flags & isProtected) ? true : false; }
-
-	/// Set "protected" flag
-	//
-	void set_is_protected(const bool is_protected)
-	{
-		if (is_protected)
-			_flags |= isProtected;
-		else
-			_flags &= ~isProtected;
-	}
+	bool get_is_protected() const {
+        return (_flags & isProtected);
+    }
 
 	/// set the numerical flags value (return the new value )
 	/// If unlocked is false, you cannot un-protect from over-write,

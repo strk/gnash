@@ -28,6 +28,8 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
+#include "array.h"
+#include "AsBroadcaster.h"
 
 // For getting and setting focus
 #include "VM.h"
@@ -36,12 +38,10 @@
 namespace gnash {
 
 namespace {    
-    as_value selection_addlistener(const fn_call& fn);
     as_value selection_getbeginindex(const fn_call& fn);
     as_value selection_getcaretindex(const fn_call& fn);
     as_value selection_getendindex(const fn_call& fn);
     as_value selection_getfocus(const fn_call& fn);
-    as_value selection_removelistener(const fn_call& fn);
     as_value selection_setfocus(const fn_call& fn);
     as_value selection_setselection(const fn_call& fn);
 
@@ -68,19 +68,26 @@ namespace {
 void
 attachSelectionInterface(as_object& o)
 {
-	o.init_member("addListener", new builtin_function(selection_addlistener));
+
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::readOnly;
+
 	o.init_member("getBeginIndex",
-            new builtin_function(selection_getbeginindex));
+            new builtin_function(selection_getbeginindex), flags);
 	o.init_member("getCaretIndex",
-            new builtin_function(selection_getcaretindex));
+            new builtin_function(selection_getcaretindex), flags);
 	o.init_member("getEndIndex",
-            new builtin_function(selection_getendindex));
+            new builtin_function(selection_getendindex), flags);
 	o.init_member("getFocus",
-            new builtin_function(selection_getfocus));
-	o.init_member("removeListener",
-            new builtin_function(selection_removelistener));
-	o.init_member("setFocus", new builtin_function(selection_setfocus));
-	o.init_member("setSelection", new builtin_function(selection_setselection));
+            new builtin_function(selection_getfocus), flags);
+	o.init_member("setFocus", new builtin_function(selection_setfocus), flags);
+	o.init_member("setSelection",
+            new builtin_function(selection_setselection), flags);
+
+    /// Handles addListener, removeListener, and _listeners.
+    AsBroadcaster::initialize(o);
+ 
 }
 
 as_object*
@@ -94,13 +101,6 @@ getSelectionInterface()
 	}
 	return o.get();
 }
-
-as_value
-selection_addlistener(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-
 
 as_value
 selection_getbeginindex(const fn_call& /*fn*/) {
@@ -142,13 +142,6 @@ selection_getfocus(const fn_call& fn)
 }
 
 
-as_value
-selection_removelistener(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
-
-
 // Documented to return true when setFocus succeeds, but that seems like the
 // usual Adobe crap.
 //
@@ -182,8 +175,6 @@ selection_setfocus(const fn_call& fn)
         return as_value(false);
     }
 
-    bool ret = false;
-
     movie_root& mr = ptr->getVM().getRoot();
 
     const as_value& focus = fn.arg(0);
@@ -205,13 +196,13 @@ selection_setfocus(const fn_call& fn)
         ch = dynamic_cast<character*>(focus.to_object().get());
     }
 
-    // If the argument is not a character, do nothing.
+    // If the argument does not resolve to a character, do nothing.
     if (!ch) return as_value(false);
 
     // Will handle whether to set focus or not.
     mr.setFocus(ch);
 
-    return as_value(ret);
+    return as_value(false);
 }
 
 

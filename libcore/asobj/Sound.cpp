@@ -146,11 +146,12 @@ Sound::getVolume(int& volume)
     //
     if ( attachedCharacter )
     {
-        log_debug("Sound has an attached character");
+        //log_debug("Sound has an attached character");
         character* ch = attachedCharacter->get();
         if ( ! ch )
         {
-            log_debug("Character attached to Sound was unloaded and couldn't rebind");
+            log_debug("Character attached to Sound was unloaded and "
+                    "couldn't rebind");
             return false;
         }
         volume = ch->getVolume();

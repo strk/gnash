@@ -750,7 +750,7 @@ MovieClip::on_event(const event_id& id)
     }
 
     // Check for member function.
-    if( ! id.is_key_event ())
+    if (! id.is_key_event ())
     {
         boost::intrusive_ptr<as_function> method = 
             getUserDefinedEventHandler(id.get_function_key());
@@ -3121,7 +3121,7 @@ movieclip_filters(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.filters()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.filters()")));
     return as_value();
 }
 
