@@ -1,9 +1,49 @@
+/***********************************************************************
+ *
+ *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ *
+ ***********************************************************************
+ *
+ * Set of widget to use in 'makeswf' based quick tests
+ * 
+ * Initial author: Sandro Santilli <strk@keybit.net>
+ *
+ ***********************************************************************/
 
-function Checkbox(where, label) {
+function Widget(where) {
+	//trace("Widget ctor called");
+	if ( ! arguments.length ) return;
 	if ( ! where.hasOwnProperty('nextHighestDepth') ) where.nextHighestDepth=1;
 	var d = where.nextHighestDepth++;
-	var nam = 'cb'+d;
+	var nam = 'clip'+d;
 	this.clip = where.createEmptyMovieClip(nam, d);
+}
+
+Widget.prototype.moveTo = function(x, y)
+{
+	this.clip._x = x;
+	this.clip._y = y;
+};
+
+function Checkbox(where, label) {
+
+	super(where);
+
 	this.size = 10;
 
 	this.clip.createEmptyMovieClip('box', 1);
@@ -40,6 +80,8 @@ function Checkbox(where, label) {
 	this.clip.label.text = label;
 }
 
+Checkbox.prototype = new Widget();
+
 Checkbox.prototype.check = function()
 {
 	trace("Making check visible");
@@ -58,25 +100,12 @@ Checkbox.prototype.checked = function()
 	return this.clip.check._visible;
 };
 
-Checkbox.prototype.valueOf = function()
-{
-	return this.checked();
-};
-
-Checkbox.prototype.moveTo = function(x, y)
-{
-	this.clip._x = x;
-	this.clip._y = y;
-};
-
 // ------------------------------------------------------------------
 
 function Button(where, label, cb)
 {
-	if ( ! where.hasOwnProperty('nextHighestDepth') ) where.nextHighestDepth=1;
-	var d = where.nextHighestDepth++;
-	var nam = 'bt'+d;
-	this.clip = where.createEmptyMovieClip(nam, d);
+	super(where);
+
 	this.clip.createEmptyMovieClip('eh', 1); // event handler
 	this.clip.onRelease = cb;
 
@@ -99,20 +128,13 @@ function Button(where, label, cb)
 	}
 }
 
-Button.prototype.moveTo = function(x, y)
-{
-	this.clip._x = x;
-	this.clip._y = y;
-};
+Button.prototype = new Widget();
 
 //-------------------
 
 function Input(where, label)
 {
-	if ( ! where.hasOwnProperty('nextHighestDepth') ) where.nextHighestDepth=1;
-	var d = where.nextHighestDepth++;
-	var nam = 'bt'+d;
-	this.clip = where.createEmptyMovieClip(nam, d);
+	super(where);
 
 	this.clip.createTextField('label', 3, 0, 0, 0, 0, 0);
 	this.clip.label.autoSize = true;
@@ -122,15 +144,11 @@ function Input(where, label)
 	this.clip.inp.autoSize = false;
 	this.clip.inp.type = 'input';
 	this.clip.inp.border = true;
-	this.clip.inp.text = 'your input here';
-	this.clip.inp._x = this.clip.label._x+this.clip.label._width+10;
+	//this.clip.inp.text = 'your input here';
+	this.clip.inp._x = this.clip.label._x+this.clip.label._width+5;
 }
 
-Input.prototype.moveTo = function(x, y)
-{
-	this.clip._x = x;
-	this.clip._y = y;
-};
+Input.prototype = new Widget();
 
 Input.prototype.setText = function(txt)
 {
@@ -142,6 +160,39 @@ Input.prototype.getText = function()
 	return this.clip.inp.text;
 };
 
-Input.prototype.toStrinpg = getInput;
+Input.prototype.toString = getInput;
 
 
+// -------------------------------------------
+
+function InfoLine(where, label, cb)
+{
+	super(where);
+
+	this.clip.createEmptyMovieClip('eh', 1); // event handler
+
+	this.clip.createTextField('label', 3, this.size+this.size, 0, 0, 0);
+	this.clip.label.autoSize = true;
+	this.clip.label.text = label;
+
+	this.clip.createTextField('inp', 4, 0, 0, 100, 20); // TODO: take as params
+	this.clip.inp.autoSize = false;
+	this.clip.inp.type = 'dynamic';
+	this.clip.inp.border = true;
+	this.clip.inp.text = 'your input here';
+	this.clip.inp._x = this.clip.label._x+this.clip.label._width+5;
+	trace('this clip inp is: '+this.clip.inp);
+
+	this.clip.onEnterFrame = function() {
+		info = cb();
+		//trace("cb: "+cb()+" inp:"+inp+" clip:"+clip+" this:"+this);
+		this.inp.text = info;
+	};
+}
+
+InfoLine.prototype = new Widget();
+
+InfoLine.prototype.setText = function(txt)
+{
+	this.clip.inp.text = txt;
+};
