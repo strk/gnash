@@ -74,16 +74,18 @@ public:
     void call(as_object* asCallback, const std::string& callNumber, 
             const SimpleBuffer& buf);
 
-    void setConnected(bool b) {
-        _isConnected = b;
-    }
+    /// Process the close() method.
+    void close();
+
+    /// Process the connect(uri) method.
+    void connect(const std::string& uri);
+
+    /// Carry out the connect(null) method.
+    void connect();
 
     bool isConnected() const {
         return _isConnected;
     }
-
-	/// Extend the URL to be used for playing
-	void addToURL(const std::string& url);
 
     /// Notify the NetConnection onStatus handler of a change.
     void notifyStatus(StatusCode code);
@@ -92,8 +94,17 @@ protected:
 
 	/// Mark responders associated with remoting calls
 	void markReachableResources() const;
+
 private:
+
 	friend class AMFQueue;
+
+    typedef std::pair<std::string, std::string> NetConnectionStatus;
+
+    void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
+
+	/// Extend the URL to be used for playing
+	void addToURL(const std::string& url);
 
 	std::auto_ptr<AMFQueue> _callQueue;
 
@@ -105,9 +116,8 @@ private:
 
     bool _isConnected;
 
-    typedef std::pair<std::string, std::string> NetConnectionStatus;
+    bool _inError;
 
-    void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
 
 };
 

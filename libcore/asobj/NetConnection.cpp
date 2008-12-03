@@ -46,7 +46,6 @@
 
 // for NetConnection.call()
 #include "VM.h"
-//#include "array.h"
 #include "amf.h"
 #include "SimpleBuffer.h"
 #include "timers.h"
@@ -190,14 +189,7 @@ public:
                 reply_start = 0;
                 reply_end = 0;
                 // reset connection before calling the callback
-                _connection.reset(); 
-
-                // FIXME: should only call NetConnection's onStatus
-                //        if the IOChannel is in error condition.
-                //        (tipically 404).
-                //        When the response is empty, just nothing happens.
-                _nc.callMethod(NSV::PROP_ON_STATUS, as_value());
-
+                _connection.reset();
             }
             else if(_connection->eof() )
             {
@@ -472,7 +464,8 @@ NetConnection::NetConnection()
     :
     as_object(getNetConnectionInterface()),
     _callQueue(0),
-    _isConnected(false)
+    _isConnected(false),
+    _inError(false)
 {
     attachProperties(*this);
 }
@@ -605,6 +598,46 @@ NetConnection::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
     }
 
 }
+
+
+void
+NetConnection::connect()
+{
+    _isConnected = true;
+    _inError = false;
+    notifyStatus(CONNECT_SUCCESS);
+}
+
+void
+NetConnection::connect(const std::string& uri)
+{
+
+    // FIXME: RTMP URLs should attempt a connection (warning: this seems
+    // to be different for SWF8). Would probably return true on success and
+    // set isConnected.
+    //
+    // For URLs starting with anything other than "rtmp://" no connection is
+    // initiated, but the uri is still set.
+    addToURL(uri);
+
+    _isConnected = false;
+    _inError = true;
+    notifyStatus(CONNECT_FAILED);
+}
+
+
+void
+NetConnection::close()
+{
+    /// TODO: what should actually happen here? Should an attached
+    /// NetStream object be interrupted?
+    _isConnected = false;
+
+    // If a previous connect() attempt failed, close() will not send
+    // an onStatus event.
+    if (!_inError) notifyStatus(CONNECT_CLOSED);
+}
+
 
 void
 NetConnection::call(as_object* asCallback, const std::string& callNumber,
@@ -778,13 +811,8 @@ netconnection_close(const fn_call& fn)
 {
     boost::intrusive_ptr<NetConnection> ptr =
         ensureType<NetConnection>(fn.this_ptr); 
-    
 
-    /// TODO: what should actually happen here? Should an attached
-    /// NetStream object be interrupted?
-    ptr->setConnected(false);
-
-    ptr->notifyStatus(NetConnection::CONNECT_CLOSED);
+    ptr->close();
 
     return as_value();
 }
@@ -897,42 +925,25 @@ netconnection_connect(const fn_call& fn)
 
     const VM& vm = ptr->getVM();
 
-    bool success = false;
-
     // Check first arg for validity 
     if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined()))
     {
         // Null URL was passed. This is expected. Of course, it also makes this
         // function (and, this class) rather useless. We return true,
         // even though returning true has no meaning.
-        
-        success = true;
-
+        ptr->connect();
     }
-    else if (uri.is_string()) {
-
-        // FIXME: RTMP URLs should attempt a connection (warning: this seems
-        // to be different for SWF8). Would probably return true on success.
-        //
-        // URLs starting with "http://" are invalid, and no connection is
-        // initiated.
-        ptr->addToURL(uri.to_string());
-
+    else {
         if ( fn.nargs > 1 )
         {
             std::stringstream ss; fn.dump_args(ss);
             log_unimpl("NetConnection.connect(%s): args after the first are "
                     "not supported", ss.str());
         }
-
-        success = false;
+        ptr->connect(uri.to_string());
     }
 
-    ptr->notifyStatus(success ? NetConnection::CONNECT_SUCCESS :
-                                NetConnection::CONNECT_FAILED); 
-
-    ptr->setConnected(success);
-    return as_value(success);
+    return as_value(ptr->isConnected());
 
 }
 

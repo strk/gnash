@@ -188,8 +188,6 @@ check_equals(ret, undefined);
 check_equals(result, "NetConnection.Connect.Closed");
 check_equals(level, "status");
 
-// Always the same.
-
 ret = nc.close();
 check_equals(nc.isConnected, false);
 check_equals(typeof(ret), "undefined");
@@ -197,7 +195,20 @@ check_equals(ret, undefined);
 check_equals(result, "NetConnection.Connect.Closed");
 check_equals(level, "status");
 
-check_totals(74);
+nc.connect(1);
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+
+check_totals(84);
 
 
 
