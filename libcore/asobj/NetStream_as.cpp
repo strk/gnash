@@ -780,8 +780,6 @@ NetStream_as::play(const std::string& c_url)
         url = url.substr(4);
     }
 
-    // TODO: check what is this needed for, I'm not sure it would be needed..
-    url = _netCon->validateURL(url);
     if (url.empty())
     {
         log_error("Couldn't load URL %s", c_url);
