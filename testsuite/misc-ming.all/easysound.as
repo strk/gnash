@@ -27,7 +27,7 @@
 
 #include "widgets.as"
 
-if ( typeof(url) == 'undefined' )
+if ( !hasOwnProperty('url') )
 {
 	trace("No 'url' passed in querystring, using 'easysound.mp3'");
 	url='easysound.mp3';
@@ -62,7 +62,7 @@ s_stop = function()
 
 s_getposition = function() {
 	//trace("s_getposition called, position is "+mySound.position);
-	return mySound.position;
+	return mySound.position+"/"+mySound.duration;
 };
 
 s_pause = function()

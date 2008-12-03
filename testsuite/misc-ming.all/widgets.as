@@ -109,7 +109,7 @@ function Button(where, label, cb)
 	this.clip.createEmptyMovieClip('eh', 1); // event handler
 	this.clip.onRelease = cb;
 
-	this.clip.createTextField('label', 3, this.size+this.size, 0, 0, 0);
+	this.clip.createTextField('label', 3, 0, 0, 0, 0);
 	this.clip.label.autoSize = true;
 	this.clip.label.text = label;
 
@@ -141,7 +141,7 @@ function Input(where, label)
 	this.clip.label.text = label;
 
 	this.clip.createTextField('inp', 4, 0, 0, 100, 20); // TODO: take as params
-	this.clip.inp.autoSize = false;
+	this.clip.inp.autoSize = true;
 	this.clip.inp.type = 'input';
 	this.clip.inp.border = true;
 	//this.clip.inp.text = 'your input here';
@@ -160,9 +160,6 @@ Input.prototype.getText = function()
 	return this.clip.inp.text;
 };
 
-Input.prototype.toString = getInput;
-
-
 // -------------------------------------------
 
 function InfoLine(where, label, cb)
@@ -171,7 +168,7 @@ function InfoLine(where, label, cb)
 
 	this.clip.createEmptyMovieClip('eh', 1); // event handler
 
-	this.clip.createTextField('label', 3, this.size+this.size, 0, 0, 0);
+	this.clip.createTextField('label', 3, 0, 0, 0, 0);
 	this.clip.label.autoSize = true;
 	this.clip.label.text = label;
 
@@ -181,7 +178,7 @@ function InfoLine(where, label, cb)
 	this.clip.inp.border = true;
 	this.clip.inp.text = 'your input here';
 	this.clip.inp._x = this.clip.label._x+this.clip.label._width+5;
-	trace('this clip inp is: '+this.clip.inp);
+	//trace('this clip inp is: '+this.clip.inp);
 
 	this.clip.onEnterFrame = function() {
 		info = cb();
