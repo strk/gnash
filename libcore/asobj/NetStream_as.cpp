@@ -486,7 +486,7 @@ NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
   log_debug(" Invoking onMetaData");
 #endif
 
-        string_table::key func = getVM().getStringTable().find(PROPNAME(funcname));
+    string_table::key func = getVM().getStringTable().find(PROPNAME(funcname));
 
     callMethod(func, as_value(info_obj));
 }
@@ -503,14 +503,10 @@ NetStream_as::processStatusNotifications()
         code = popNextPendingStatusNotification();
         if ( code == invalidStatus ) break; // no more pending notifications
 
-#ifdef GNASH_DEBUG_STATUS
-        log_debug(" Invoking onStatus(%s)", getStatusCodeInfo(code).first);
-#endif
+        // Must be a new object every time.
+        as_object* o = getStatusObject(code);
 
-        // TODO: optimize by reusing the same as_object ?
-        boost::intrusive_ptr<as_object> o = getStatusObject(code);
-
-        callMethod(NSV::PROP_ON_STATUS, as_value(o.get()));
+        callMethod(NSV::PROP_ON_STATUS, o);
     }
 }
 
@@ -561,50 +557,69 @@ NetStream_as::get_video()
     return m_imageframe;    
 }
 
-std::pair<const char*, const char*>
-NetStream_as::getStatusCodeInfo(StatusCode code)
+void
+NetStream_as::getStatusCodeInfo(StatusCode code, NetStreamStatus& info)
 {
     switch (code)
     {
     
         case bufferEmpty:
-            return std::pair<const char*, const char*>("NetStream.Buffer.Empty", "status");
+            info.first = "NetStream.Buffer.Empty";
+            info.second = "status";
+            return;
 
         case bufferFull:
-            return std::pair<const char*, const char*>("NetStream.Buffer.Full", "status");
+            info.first = "NetStream.Buffer.Full";
+            info.second = "status";
+            return;
 
         case bufferFlush:
-            return std::pair<const char*, const char*>("NetStream.Buffer.Flush", "status");
+            info.first = "NetStream.Buffer.Flush";
+            info.second = "status";
+            return;
 
         case playStart:
-            return std::pair<const char*, const char*>("NetStream.Play.Start", "status");
+            info.first = "NetStream.Play.Start";
+            info.second = "status";
+            return;
 
         case playStop:
-            return std::pair<const char*, const char*>("NetStream.Play.Stop", "status");
+            info.first = "NetStream.Play.Stop";
+            info.second = "status";
+            return;
 
         case seekNotify:
-            return std::pair<const char*, const char*>("NetStream.Seek.Notify", "status");
+            info.first = "NetStream.Seek.Notify";
+            info.second = "status";
+            return;
 
         case streamNotFound:
-            return std::pair<const char*, const char*>("NetStream.Play.StreamNotFound", "error");
+            info.first = "NetStream.Play.StreamNotFound";
+            info.second = "error";
+            return;
 
         case invalidTime:
-            return std::pair<const char*, const char*>("NetStream.Seek.InvalidTime", "error");
-
+            info.first = "NetStream.Seek.InvalidTime";
+            info.second = "error";
+            return;
         default:
-            return std::pair<const char*, const char*>("","");
+            return;
     }
 }
 
-boost::intrusive_ptr<as_object>
+as_object* 
 NetStream_as::getStatusObject(StatusCode code)
 {
     // code, level
-    std::pair<const char*, const char*> info = getStatusCodeInfo(code);
+    NetStreamStatus info;
+    getStatusCodeInfo(code, info);
 
-    boost::intrusive_ptr<as_object> o = new as_object(getObjectInterface());
-    o->init_member("code",  info.first,  0); // enumerable, deletable
-    o->init_member("level", info.second, 0); // enumerable, deletable
+    // Enumerable and deletable.
+    const int flags = 0;
+
+    as_object* o = new as_object(getObjectInterface());
+    o->init_member("code",  info.first, flags);
+    o->init_member("level", info.second, flags);
 
     return o;
 }

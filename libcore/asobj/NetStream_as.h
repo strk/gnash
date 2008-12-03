@@ -169,7 +169,8 @@ public:
 /// This class is responsible for handlign external
 /// media files. Provides interfaces for playback control.
 ///
-class NetStream_as : public as_object {
+class NetStream_as : public as_object
+{
 
 protected:
     
@@ -203,7 +204,6 @@ protected:
         /// NetStream.Seek.InvalidTime (level: error)
         invalidTime
     };
-    
 
     boost::intrusive_ptr<NetConnection> _netCon;
 
@@ -432,10 +432,8 @@ public:
     ///
     /// It might be invoked by a separate thread (neither main, nor decoder thread).
     ///
-    static unsigned int audio_streamer(void *udata, boost::int16_t* samples, unsigned int nSamples, bool& eof);
-
-
-
+    static unsigned int audio_streamer(void *udata, boost::int16_t* samples,
+            unsigned int nSamples, bool& eof);
 
 
 private:
@@ -596,7 +594,7 @@ private:
     ///
     void clearStatusQueue();
 
-    // TODO: change to a container with fast pop_front()
+    // Queue of status notifications.
     typedef std::deque<StatusCode> StatusQueue;
 
     /// List of status messages to be processed
@@ -608,16 +606,17 @@ private:
     /// Last status code (to avoid consecutively notifying the same event)
     StatusCode _lastStatus;
 
+    typedef std::pair<std::string, std::string> NetStreamStatus;
+
     /// Get 'status' (first) and 'level' (second) strings for given status code
     //
-    /// The two members of the pair are ensured to be not-NULL
     /// Any invalid code, out of bound or explicitly invalid (invalidCode) 
-    /// returns two empty C strings.
+    /// returns two empty strings.
     ///
-    std::pair<const char*, const char*> getStatusCodeInfo(StatusCode code);
+    void getStatusCodeInfo(StatusCode code, NetStreamStatus& info);
 
     /// Return a newly allocated information object for the given status
-    boost::intrusive_ptr<as_object> getStatusObject(StatusCode code);
+    as_object* getStatusObject(StatusCode code);
 
     /// hack for using a Timer to drive ::advance calls
     static as_value advanceWrapper(const fn_call& fn);
