@@ -46,7 +46,6 @@
 
 // for NetConnection.call()
 #include "VM.h"
-//#include "array.h"
 #include "amf.h"
 #include "SimpleBuffer.h"
 #include "timers.h"
@@ -190,14 +189,11 @@ public:
                 reply_start = 0;
                 reply_end = 0;
                 // reset connection before calling the callback
-                _connection.reset(); 
+                _connection.reset();
 
-                // FIXME: should only call NetConnection's onStatus
-                //        if the IOChannel is in error condition.
-                //        (tipically 404).
-                //        When the response is empty, just nothing happens.
-                _nc.callMethod(NSV::PROP_ON_STATUS, as_value());
-
+                // This is just a guess, but is better than sending
+                // 'undefined'
+                _nc.notifyStatus(NetConnection::CALL_FAILED);
             }
             else if(_connection->eof() )
             {
@@ -472,7 +468,8 @@ NetConnection::NetConnection()
     :
     as_object(getNetConnectionInterface()),
     _callQueue(0),
-    _isConnected(false)
+    _isConnected(false),
+    _inError(false)
 {
     attachProperties(*this);
 }
@@ -589,18 +586,73 @@ NetConnection::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
             info.second = "error";
             return;
 
+        case CONNECT_APPSHUTDOWN:
+            info.first = "NetConnection.Connect.AppShutdown";
+            info.second = "error";
+            return;
+
+        case CONNECT_REJECTED:
+            info.first = "NetConnection.Connect.Rejected";
+            info.second = "error";
+            return;
+
         case CALL_FAILED:
             info.first = "NetConnection.Call.Failed";
             info.second = "error";
             return;
 
-        case CALL_SUCCESS:
-            info.first = "NetConnection.Call.Success";
+        case CALL_BADVERSION:
+            info.first = "NetConnection.Call.BadVersion";
             info.second = "status";
             return;
+
+        case CONNECT_CLOSED:
+            info.first = "NetConnection.Connect.Closed";
+            info.second = "status";
     }
 
 }
+
+
+void
+NetConnection::connect()
+{
+    _isConnected = true;
+    _inError = false;
+    notifyStatus(CONNECT_SUCCESS);
+}
+
+
+void
+NetConnection::connect(const std::string& uri)
+{
+
+    // FIXME: RTMP URLs should attempt a connection (warning: this seems
+    // to be different for SWF8). Would probably return true on success and
+    // set isConnected.
+    //
+    // For URLs starting with anything other than "rtmp://" no connection is
+    // initiated, but the uri is still set.
+    addToURL(uri);
+
+    _isConnected = false;
+    _inError = true;
+    notifyStatus(CONNECT_FAILED);
+}
+
+
+void
+NetConnection::close()
+{
+    /// TODO: what should actually happen here? Should an attached
+    /// NetStream object be interrupted?
+    _isConnected = false;
+
+    // If a previous connect() attempt failed, close() will not send
+    // an onStatus event.
+    if (!_inError) notifyStatus(CONNECT_CLOSED);
+}
+
 
 void
 NetConnection::call(as_object* asCallback, const std::string& callNumber,
@@ -666,6 +718,11 @@ readNetworkLong(const boost::uint8_t* buf) {
 
 namespace {
 
+
+/// NetConnection.call()
+//
+/// Documented to return void, and current tests suggest this might be
+/// correct, though they don't test with any calls that might succeed.
 as_value
 netconnection_call(const fn_call& fn)
 {
@@ -675,9 +732,9 @@ netconnection_call(const fn_call& fn)
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("NetConnection.call(): needs at least one argument"));
+            log_aserror(_("NetConnection.call(): needs at least one argument"));
         );
-        return as_value(false); // FIXME should we return true anyway?
+        return as_value(); 
     }
 
     const as_value& methodName_as = fn.arg(0);
@@ -687,7 +744,7 @@ netconnection_call(const fn_call& fn)
         log_aserror(_("NetConnection.call(%s): first argument "
                 "(methodName) must be a string"), ss.str());
         );
-        return as_value(false); // FIXME should we return true anyway?
+        return as_value(); 
     }
 
     std::stringstream ss; fn.dump_args(ss);
@@ -714,7 +771,7 @@ netconnection_call(const fn_call& fn)
 
     static int call_number = 0;
 
-    boost::scoped_ptr<SimpleBuffer> buf ( new SimpleBuffer(32) );
+    boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
 
     // method name
     buf->appendNetworkShort(methodName.size());
@@ -761,7 +818,6 @@ netconnection_call(const fn_call& fn)
 
     ptr->call(asCallback.get(), callNumberString, *buf);
 
-    // Why return undefined here?
     return as_value();
 }
 
@@ -770,9 +826,9 @@ netconnection_close(const fn_call& fn)
 {
     boost::intrusive_ptr<NetConnection> ptr =
         ensureType<NetConnection>(fn.this_ptr); 
-    UNUSED(ptr);
 
-    log_unimpl("NetConnection.close()");
+    ptr->close();
+
     return as_value();
 }
 
@@ -884,42 +940,25 @@ netconnection_connect(const fn_call& fn)
 
     const VM& vm = ptr->getVM();
 
-    bool success = false;
-
     // Check first arg for validity 
     if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined()))
     {
         // Null URL was passed. This is expected. Of course, it also makes this
         // function (and, this class) rather useless. We return true,
         // even though returning true has no meaning.
-        
-        success = true;
-
+        ptr->connect();
     }
-    else if (uri.is_string()) {
-
-        // FIXME: RTMP URLs should attempt a connection (warning: this seems
-        // to be different for SWF8). Would probably return true on success.
-        //
-        // URLs starting with "http://" are invalid, and no connection is
-        // initiated.
-        ptr->addToURL(uri.to_string());
-
+    else {
         if ( fn.nargs > 1 )
         {
             std::stringstream ss; fn.dump_args(ss);
             log_unimpl("NetConnection.connect(%s): args after the first are "
                     "not supported", ss.str());
         }
-
-        success = false;
+        ptr->connect(uri.to_string());
     }
 
-    ptr->notifyStatus(success ? NetConnection::CONNECT_SUCCESS :
-                                NetConnection::CONNECT_FAILED); 
-
-    ptr->setConnected(success);
-    return as_value(success);
+    return as_value(ptr->isConnected());
 
 }
 
