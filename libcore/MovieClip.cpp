@@ -347,7 +347,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     //             care of these ?
     //             Duplicates code in character::get_path_element_character too..
     //
-    if (name_key == NSV::PROP_uROOT)
+    if (getSWFVersion() > 4 && name_key == NSV::PROP_uROOT)
     {
 
         // getAsRoot() will take care of _lockroot

@@ -171,7 +171,7 @@
         check(true); // doh !
         check(!0); 
         check(4); 
-        xcheck(!_root);  // undefined ?
+        check(!_root);  // undefined ?
         check(!null); 
         check(!undefined); 
 

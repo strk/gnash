@@ -118,7 +118,7 @@ character::get_mouse_state(int& x, int& y, int& buttons)
 as_object*
 character::get_path_element_character(string_table::key key)
 {
-	if (key == NSV::PROP_uROOT)
+	if (_vm.getSWFVersion() > 4 && key == NSV::PROP_uROOT)
 	{
 		// getAsRoot() will handle _lockroot 
 		return const_cast<MovieClip*>(getAsRoot());

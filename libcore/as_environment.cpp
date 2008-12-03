@@ -136,6 +136,9 @@ as_environment::get_variable_raw(
     const ScopeStack& scopeStack, as_object** retTarget) const
     // varname must be a plain variable name; no path parsing.
 {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+    log_debug(_("get_variable_raw(%s)"), varname);
+#endif
     //assert(strchr(varname.c_str(), ':') == NULL);
 
     if ( ! validRawVariableName(varname) )
@@ -161,7 +164,9 @@ as_environment::get_variable_raw(
         if (obj && obj->get_member(key, &val))
         {
             // Found the var in with context.
-            //log_debug("Found %s in object %d/%d of scope stack (%p)", varname, i, scopeStack.size(), obj);
+#ifdef GNASH_DEBUG_GET_VARIABLE
+            log_debug("Found %s in object %d/%d of scope stack (%p)", varname, i, scopeStack.size(), obj);
+#endif
             if ( retTarget ) *retTarget = obj;
             return val;
         }
@@ -181,6 +186,9 @@ as_environment::get_variable_raw(
     if (m_target)
     {
         if (m_target->get_member(key, &val)) {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+            log_debug("Found %s in target %p", varname, m_target->getTarget());
+#endif
             if ( retTarget ) *retTarget = m_target;
             return val;
         }
@@ -188,13 +196,19 @@ as_environment::get_variable_raw(
     else if ( _original_target ) // this only for swf5+ ?
     {
         if (_original_target->get_member(key, &val)) {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+            log_debug("Found %s in original target %s", varname, _original_target->getTarget());
+#endif
             if ( retTarget ) *retTarget = _original_target;
             return val;
         }
     }
 
-    // Looking for "this" 
+    // Looking for "this"  (TODO: add NSV::PROP_THIS)
     if (varname == "this") {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+        log_debug("Took %s as this, returning original target %s", varname, _original_target->getTarget());
+#endif
         val.set_as_object(_original_target);
         if ( retTarget ) *retTarget = NULL; // correct ??
         return val;
@@ -204,6 +218,9 @@ as_environment::get_variable_raw(
 
     if ( swfVersion > 5 && key == NSV::PROP_uGLOBAL )
     {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+        log_debug("Took %s as _global, returning _global", varname);
+#endif
         // The "_global" ref was added in SWF6
         if ( retTarget ) *retTarget = NULL; // correct ??
         return as_value(global);
@@ -211,6 +228,9 @@ as_environment::get_variable_raw(
 
     if (global->get_member(key, &val))
     {
+#ifdef GNASH_DEBUG_GET_VARIABLE
+        log_debug("Found %s in _global", varname);
+#endif
         if ( retTarget ) *retTarget = global;
         return val;
     }
