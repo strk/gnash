@@ -447,8 +447,6 @@ public:
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges,
             bool force);
     
-    void dump_character_tree() const;
-
     /// Return the topmost active entity under the pointer
     //
     /// This method returns cached info, with cache updated
@@ -797,6 +795,7 @@ public:
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair;
     void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
+    void getCharacterTree(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif
 
 	/// Get URL of the SWF movie used to initialize this VM

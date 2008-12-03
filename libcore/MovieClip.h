@@ -621,8 +621,6 @@ public:
 
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
-    void dump_character_tree(const std::string prefix) const;
-            
     const DisplayList& getDisplayList() const {
             return m_display_list;
     }

@@ -2134,13 +2134,6 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 
 }
 
-void 
-MovieClip::dump_character_tree(const std::string prefix) const
-{
-    character::dump_character_tree(prefix);
-    m_display_list.dump_character_tree(prefix+" ");
-}
-
 
 /// register characters as key listeners if they have clip key events defined.
 /// Don't call twice for the same chracter.

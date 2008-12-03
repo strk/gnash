@@ -1563,16 +1563,6 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	}
 }
 
-void 
-movie_root::dump_character_tree() const 
-{
-    // @@ deprecated
-  for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-	{
-	  log_debug("--- movie at depth %d:", i->second->get_depth());
-		i->second->dump_character_tree("CTREE: ");
-	}
-}
 
 int
 movie_root::minPopulatedPriorityQueue() const
@@ -2382,9 +2372,6 @@ void
 movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 {
 
-    const std::string yes = _("yes");
-    const std::string no = _("no");
-
     tree<StringPair>::iterator localIter;
 
     //
@@ -2431,9 +2418,19 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     // Stage: scripts state (enabled/disabled)
     localIter = tr.append_child(it, StringPair("Scripts",
                 _disableScripts ? " disabled" : "enabled"));
-                
+     
+    getCharacterTree(tr, it);    
+}
+
+void
+movie_root::getCharacterTree(tree<StringPair>& tr,
+        tree<StringPair>::iterator it)
+{
+
+    tree<StringPair>::iterator localIter;
+
     /// Stage: number of live characters
-    os.str("");
+    std::ostringstream os;
     os << _liveChars.size();
     localIter = tr.append_child(it, StringPair(_("Live characters"), os.str()));
 
@@ -2445,6 +2442,7 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 	}
 
 }
+
 #endif
 
 void

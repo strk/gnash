@@ -221,13 +221,6 @@ character::set_child_invalidated()
   } 
 }
 
-void 
-character::dump_character_tree(const std::string prefix) const
-{
-  log_debug("%s%s<%p> I=%d,CI=%d", prefix, typeName(*this), this,
-    m_invalidated, m_child_invalidated);  
-}
-
 void
 character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 {
@@ -1292,33 +1285,38 @@ character::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	os << get_depth();
 	tr.append_child(it, StringPair(_("Depth"), os.str()));
 
-        /// Don't add if the character has no ratio value
-        if (get_ratio() >= 0)
-        {
-            os.str("");
-            os << get_ratio();
-	        tr.append_child(it, StringPair(_("Ratio"), os.str()));
-	    }	    
+    /// Don't add if the character has no ratio value
+    if (get_ratio() >= 0)
+    {
+        os.str("");
+        os << get_ratio();
+        tr.append_child(it, StringPair(_("Ratio"), os.str()));
+    }	    
 
-        /// Don't add if it's not a real clipping depth
-        if (int cd = get_clip_depth() != noClipDepthValue )
-        {
+    /// Don't add if it's not a real clipping depth
+    if (int cd = get_clip_depth() != noClipDepthValue )
+    {
 		os.str("");
 		if (cd == dynClipDepthValue) os << "Dynamic mask";
 		else os << cd;
 
 		tr.append_child(it, StringPair(_("Clipping depth"), os.str()));	    
-        }
+    }
 
-        os.str("");
-        os << get_width() << "x" << get_height();
+    os.str("");
+    os << get_width() << "x" << get_height();
 	tr.append_child(it, StringPair(_("Dimensions"), os.str()));	
 
 	tr.append_child(it, StringPair(_("Dynamic"), isDynamic() ? yes : no));	
 	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
 	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
 	tr.append_child(it, StringPair(_("Unloaded"), isUnloaded() ? yes : no));
-
+#ifndef NDEBUG
+    // This probably isn't interesting for non-developers
+    tr.append_child(it, StringPair(_("Invalidated"), m_invalidated ? yes : no));
+    tr.append_child(it, StringPair(_("Child invalidated"),
+                m_child_invalidated ? yes : no));
+#endif
 	return it;
 }
 #endif

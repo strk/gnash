@@ -750,8 +750,18 @@ Gui::display(movie_root* m)
     // m_child_invalidated flag if at least one of it's childs has the
     // invalidated flag set.
     log_debug("DUMPING CHARACTER TREE"); 
-    m->dump_character_tree();
     
+    InfoTree tr;
+    InfoTree::iterator top = tr.begin();
+    _stage->getMovieInfo(tr, top);
+
+    for (InfoTree::iterator i = tr.begin(), e = tr.end();
+            i != e; ++i) {
+        std::cout << std::string(tr.depth(i) * 2, ' ') << i->first << ": " << 
+            i->second << std::endl;
+    }
+
+
     // less verbose, and often necessary: see the exact coordinates of the
     // invalidated bounds (mainly to see if it's NULL or something else).	
     std::cout << "Calculated changed ranges: " << changed_ranges << "\n";
@@ -1079,7 +1089,8 @@ Gui::getMovieInfo() const
     // 
     if ( ! _started )
     {
-        topIter = tr->insert(topIter, StringPair("Stage properties", "not constructed yet"));
+        topIter = tr->insert(topIter, StringPair("Stage properties", 
+                    "not constructed yet"));
         return tr;
     }
 

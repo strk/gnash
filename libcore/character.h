@@ -1099,14 +1099,6 @@ public:
   ///
   virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force) = 0;
 
-  /// Prints a human readable character tree to LOG_DEBUG for debugging purposes.
-  /// 
-  /// This is mainly intended to debug invalidated bounds issues as it shows
-  /// the status of the relevant flags. 'prefix' is prepended to each line
-  /// to achieve the tree structure.
-  ///
-  virtual void dump_character_tree(const std::string prefix) const;
-  
   /// Called instead of display() when the character is not visible on stage.
   /// Used to clear the invalidated flags.
   virtual void omit_display() { clear_invalidated(); }; 

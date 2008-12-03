@@ -323,9 +323,6 @@ public:
   /// method with the same name of all childs.	
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);	
 	
-	void dump_character_tree(const std::string prefix) const;
-	
-
 	/// Return number of elements in the list
 	size_t size() const
 	{ 
