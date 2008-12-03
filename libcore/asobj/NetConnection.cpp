@@ -500,6 +500,7 @@ NetConnection::~NetConnection()
 {
 }
 
+
 void
 NetConnection::markReachableResources() const
 {
@@ -507,23 +508,13 @@ NetConnection::markReachableResources() const
     markAsObjectReachable();
 }
 
-/*public*/
+
 std::string
-NetConnection::validateURL(const std::string& url)
+NetConnection::validateURL() const
 {
-    std::string completeUrl;
-    if (_prefixUrl.size() > 0) {
-        if(url.size() > 0) {
-            completeUrl += _prefixUrl + "/" + url;
-        } else {
-            completeUrl += _prefixUrl;
-        }
-    } else {
-        completeUrl += url;
-    }
 
     const movie_root& mr = _vm.getRoot();
-    URL uri(completeUrl, mr.runInfo().baseURL());
+    URL uri(_uri, mr.runInfo().baseURL());
 
     std::string uriStr(uri.str());
     assert(uriStr.find("://") != std::string::npos);
@@ -537,19 +528,6 @@ NetConnection::validateURL(const std::string& url)
     log_debug(_("Connection to movie: %s"), uriStr);
 
     return uriStr;
-}
-
-void
-NetConnection::addToURL(const std::string& url)
-{
-    // What is this ? It is NOT documented in the header !!
-    //if (url == "null" || url == "NULL") return;
-
-    // If there already is something in _prefixUrl, then we already have a url,
-    // so no need to renew it. This may not correct, needs some testing.
-    if (_prefixUrl.size() > 0) return;
-
-    _prefixUrl += url;
 }
 
 void
@@ -633,7 +611,7 @@ NetConnection::connect(const std::string& uri)
     //
     // For URLs starting with anything other than "rtmp://" no connection is
     // initiated, but the uri is still set.
-    addToURL(uri);
+    setURI(uri);
 
     _isConnected = false;
     _inError = true;
@@ -655,6 +633,13 @@ NetConnection::close()
 
 
 void
+NetConnection::setURI(const std::string& uri)
+{
+    init_readonly_property("uri", &netconnection_uri);
+    _uri = uri;
+}
+
+void
 NetConnection::call(as_object* asCallback, const std::string& callNumber,
         const SimpleBuffer& buf)
 {
@@ -664,8 +649,8 @@ NetConnection::call(as_object* asCallback, const std::string& callNumber,
             hexify(buf->data(), buf->size(), false));
 #endif
 
-    // FIXME check that ptr->_prefixURL is valid
-    URL url(validateURL(""));
+    // FIXME check that ptr->_uri is valid
+    URL url(validateURL());
 
     // FIXME check if it's possible for the URL of a NetConnection
     // to change between call()s
@@ -848,19 +833,8 @@ netconnection_uri(const fn_call& fn)
 {
     boost::intrusive_ptr<NetConnection> ptr =
         ensureType<NetConnection>(fn.this_ptr); 
-    UNUSED(ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
-        log_unimpl("NetConnection.uri get");
-        return as_value();
-    }
-    else // setter
-    {
-        log_unimpl("NetConnection.uri set");
-        return as_value();
-    }
-
+    return as_value(ptr->getURI());
 }
 
 void
@@ -876,7 +850,6 @@ void
 attachProperties(as_object& o)
 {
     o.init_readonly_property("isConnected", &netconnection_isConnected);
-    o.init_property("uri", &netconnection_uri, &netconnection_uri);
 }
 
 as_object*
@@ -939,14 +912,12 @@ netconnection_connect(const fn_call& fn)
     const as_value& uri = fn.arg(0);
 
     const VM& vm = ptr->getVM();
+    const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
 
     // Check first arg for validity 
-    if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined()))
-    {
-        // Null URL was passed. This is expected. Of course, it also makes this
-        // function (and, this class) rather useless. We return true,
-        // even though returning true has no meaning.
+    if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined())) {
         ptr->connect();
+        ptr->setURI(uriStr);
     }
     else {
         if ( fn.nargs > 1 )
@@ -955,7 +926,7 @@ netconnection_connect(const fn_call& fn)
             log_unimpl("NetConnection.connect(%s): args after the first are "
                     "not supported", ss.str());
         }
-        ptr->connect(uri.to_string());
+        ptr->connect(uriStr);
     }
 
     return as_value(ptr->isConnected());

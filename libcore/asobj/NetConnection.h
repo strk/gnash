@@ -54,24 +54,8 @@ public:
 	NetConnection();
 	~NetConnection();
 
-	/// Open a connection to stream FLV files.
-	//
-	/// If already connected an error is raised and false
-	/// is returned. Otherwise, a connection is attempted
-	/// using a separate thread that starts loading data
-	/// caching it.
-	///
-	/// @param url
-	///	An url portion to append to the base url (???)
-	///
-	/// @return true on success, false on error.
-	///
-	/// @note Older Flash movies can only take a NULL value as
-	/// the parameter, which therefor only connects to the localhost using
-	/// RTMP. Newer Flash movies have a parameter to connect which is a
-	/// URL string like rtmp://foobar.com/videos/bar.flv
-	///
-	std::string validateURL(const std::string& url);
+    /// Make the stored URI into a valid and checked URL.
+	std::string validateURL() const;
 
     void call(as_object* asCallback, const std::string& callNumber, 
             const SimpleBuffer& buf);
@@ -87,6 +71,12 @@ public:
 
     bool isConnected() const {
         return _isConnected;
+    }
+
+    void setURI(const std::string& uri);
+
+    const std::string& getURI() const {
+        return _uri;
     }
 
     /// Notify the NetConnection onStatus handler of a change.
@@ -111,10 +101,7 @@ private:
 	std::auto_ptr<AMFQueue> _callQueue;
 
 	/// the url prefix optionally passed to connect()
-	std::string _prefixUrl;
-
-	/// the complete url of the file
-	std::string _completeUrl;
+	std::string _uri;
 
     bool _isConnected;
 

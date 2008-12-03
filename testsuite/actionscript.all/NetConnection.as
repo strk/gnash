@@ -49,6 +49,8 @@ check_equals(typeof(tmp), 'object');
 check_equals(tmp.__proto__, NetConnection.prototype);
 check(tmp instanceof NetConnection);
 check_equals(typeof(tmp.isConnected), 'boolean');
+check_equals(typeof(tmp.uri), 'undefined');
+check_equals(tmp.uri, undefined);
 check_equals(tmp.isConnected, false);
 
 tmp.isConnected = true;
@@ -58,7 +60,6 @@ tmp.isConnected = 56;
 check_equals(tmp.isConnected, false);
 
 // test the NetConnection::connect method
-tmp.connect();
 if ( ! tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv") )
 {
 	// FIXME: this would fail in the reference player too...
@@ -83,24 +84,49 @@ check_equals(tmp.isConnected, false);
 check_equals(result, "");
 check_equals(level, "");
 
+ret = tmp.connect("");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "");
+
+ret = tmp.connect("null");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "null");
 
 ret = tmp.connect(null, "another argument");
 check_equals(ret, true);
 check_equals(tmp.isConnected, true);
 check_equals(result, "NetConnection.Connect.Success");
 check_equals(level, "status");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "null");
+
+// Can't set
+tmp.uri = 6;
+check_equals(tmp.uri, "null");
 
 ret = tmp.connect(1);
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "1");
 
 ret = tmp.connect("string");
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "string");
 
 ret = tmp.connect(undefined);
 
@@ -109,11 +135,15 @@ check_equals(ret, true);
 check_equals(tmp.isConnected, true);
 check_equals(result, "NetConnection.Connect.Success");
 check_equals(level, "status");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "undefined");
 #else
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "");
 #endif
 
 ret = tmp.connect(null);
@@ -208,7 +238,7 @@ check_equals(ret, undefined);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 
-check_totals(84);
+check_totals(107);
 
 
 
