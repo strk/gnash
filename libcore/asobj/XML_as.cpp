@@ -250,7 +250,7 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     do {
         ++end;
         end = std::find(end, xml.end(), *it);
-    } while (end != xml.end() && *(end - 1) == '\'');
+    } while (end != xml.end() && *(end - 1) == '\\');
 
     if (end == xml.end()) {
         _status = XML_UNTERMINATED_ATTRIBUTE;
@@ -259,6 +259,10 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     ++it;
 
     std::string value(it, end);
+
+    // Replace entities in the value.
+    unescape(value);
+
     //log_debug("adding attribute to node %s: %s, %s", node->nodeName(),
     //        name, value);
 
@@ -267,9 +271,6 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     it = end;
     // Advance past the last attribute character
     ++it;
-
-    // Replace entities in the value.
-    escape(value);
 
     // Handle namespace. This is set once only for each node, and is also
     // pushed to the attributes list once.
@@ -527,7 +528,6 @@ XML_as::parseXML(const std::string& xml)
     // Clear current data
     clear(); 
     _status = XML_OK;
-    
 
     std::string::const_iterator it = xml.begin();
     XMLNode_as* node = this;
@@ -579,7 +579,6 @@ XML_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
     _children.clear();
-    //_attributes.clear();
     _docTypeDecl.clear();
     _xmlDecl.clear();
 }
@@ -590,7 +589,9 @@ XML_as::ignoreWhite() const
 
     string_table::key propnamekey = _vm.getStringTable().find("ignoreWhite");
     as_value val;
-    if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val)) return false;
+    if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val)) {
+        return false;
+    }
     return val.to_bool();
 }
 
@@ -616,7 +617,6 @@ xml_class_init(as_object& global)
 ///
 
 namespace {
-
 
 void
 attachXMLProperties(as_object& /*o*/)
@@ -670,7 +670,6 @@ getXMLInterface()
 as_value
 xml_new(const fn_call& fn)
 {
-    as_value inum;
     boost::intrusive_ptr<XML_as> xml_obj;
   
     if ( fn.nargs > 0 )
@@ -874,7 +873,7 @@ xml_ondata(const fn_call& fn)
     return as_value();
 }
 
-/// Case insenstive match of a string, returning false if there too few
+/// Case insensitive match of a string, returning false if there too few
 /// characters left or if there is no match. If there is a match, and advance
 /// is not false, the iterator points to the character after the match.
 bool
@@ -917,8 +916,9 @@ textAfterWhitespace(const std::string& xml, std::string::const_iterator& it)
 ///                 the tag.
 /// @param xml      The complete XML string.
 bool
-parseNodeWithTerminator(const std::string& xml, std::string::const_iterator& it,
-        const std::string& terminator, std::string& content)
+parseNodeWithTerminator(const std::string& xml,
+        std::string::const_iterator& it, const std::string& terminator,
+        std::string& content)
 {
     std::string::const_iterator end = std::search(it, xml.end(),
             terminator.begin(), terminator.end());
