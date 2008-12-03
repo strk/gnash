@@ -561,9 +561,13 @@ NetConnection::notifyStatus(StatusCode code)
     std::pair<std::string, std::string> info;
     getStatusCodeInfo(code, info);
 
-    as_object* o = new as_object;
-    o->init_member("code", info.first);
-    o->init_member("level", info.second);
+    /// This is a new normal object each time (see NetConnection.as)
+    as_object* o = new as_object(getObjectInterface());
+
+    const int flags = 0;
+
+    o->init_member("code", info.first, flags);
+    o->init_member("level", info.second, flags);
 
     callMethod(NSV::PROP_ON_STATUS, o);
 

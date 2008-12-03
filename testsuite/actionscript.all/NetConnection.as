@@ -120,7 +120,27 @@ check_equals(tmp.isConnected, false);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 
-check_totals(39);
+// Check onStatus object.
+
+nc = new NetConnection;
+nc.onStatus = function(info) {
+    infoObj = info;
+};
+
+nc.connect(6);
+nc.onStatus = undefined;
+check_equals(infoObj.code, "NetConnection.Connect.Failed");
+
+// It is a full object
+check(infoObj instanceof Object);
+check_equals(infoObj.toString(), "[object Object]");
+
+// Check whether the original object is modified on a new connect attempt.
+nc.connect(null);
+check_equals(infoObj.code, "NetConnection.Connect.Failed");
+
+
+check_totals(43);
 
 
 

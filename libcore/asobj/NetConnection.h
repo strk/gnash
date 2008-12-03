@@ -84,6 +84,7 @@ public:
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);
 
+    /// Notify the NetConnection onStatus handler of a change.
     void notifyStatus(StatusCode code);
 
 protected:
