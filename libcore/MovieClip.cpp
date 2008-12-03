@@ -3092,7 +3092,7 @@ movieclip_blendMode(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.blendMode()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.blendMode()")));
     return as_value();
 }
 

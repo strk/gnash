@@ -1996,13 +1996,12 @@ SWFHandlers::ActionPushData(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     size_t pc = thread.getCurrentPC();
-    boost::int16_t length = code.read_int16(pc+1);
-    assert( length >= 0 ); // TODO: trigger this with a testcase !
+    boost::uint16_t length = code.read_uint16(pc+1);
 
     //---------------
     size_t i = pc;
     size_t count = 0;
-    while (i - pc < static_cast<size_t>(length)) {
+    while (i - pc < length) {
         int id=0; // for dict (constant pool) lookup
                   // declared here because also used
               // by verbose action output
