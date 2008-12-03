@@ -172,7 +172,7 @@
         check(!0); 
         check(4); 
         check(!_root);  // undefined ?
-        xcheck(!_level0);  // undefined ?
+        check(!_level0);  // undefined ?
         check(!null); 
         check(!undefined); 
 
@@ -364,10 +364,13 @@
         /mc1.rotation=0; // reset
 
         // 'mc1' is undefined as a variable
-        // but is found as a target
-        xcheck_equals(mc1, undefined);
+        check_equals(mc1, undefined);
         check_equals(/mc1, undefined);
-        check_equals(/mc1.xscale, 100);
+        check_equals(/:mc1, undefined);
+
+        // You can define your own 'mc1' variable though
+        mc1=54;
+        check_equals(mc1, 54);
 
     .end
 	

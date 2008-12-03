@@ -1004,6 +1004,16 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
     }
 
     top_value = thread.getVariable(var_string);
+    if ( env.get_version() < 5 && top_value.is_sprite() )
+    {
+        // See http://www.ferryhalim.com/orisinal/g2/penguin.htm
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Can't assign a sprite/character to a variable in SWF%d. "
+                    "We'll return undefined instead of %s."),
+                    env.get_version(), top_value);
+        );
+        top_value.set_undefined();
+    }
 
     IF_VERBOSE_ACTION
     (
