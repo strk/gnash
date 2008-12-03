@@ -598,6 +598,10 @@ NetConnection::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
             info.first = "NetConnection.Call.Success";
             info.second = "status";
             return;
+
+        case CONNECT_CLOSED:
+            info.first = "NetConnection.Connect.Closed";
+            info.second = "status";
     }
 
 }
@@ -666,6 +670,11 @@ readNetworkLong(const boost::uint8_t* buf) {
 
 namespace {
 
+
+/// NetConnection.call()
+//
+/// Documented to return void, and current tests suggest this might be
+/// correct, though they don't test with any calls that might succeed.
 as_value
 netconnection_call(const fn_call& fn)
 {
@@ -675,9 +684,9 @@ netconnection_call(const fn_call& fn)
     if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("NetConnection.call(): needs at least one argument"));
+            log_aserror(_("NetConnection.call(): needs at least one argument"));
         );
-        return as_value(false); // FIXME should we return true anyway?
+        return as_value(); 
     }
 
     const as_value& methodName_as = fn.arg(0);
@@ -687,7 +696,7 @@ netconnection_call(const fn_call& fn)
         log_aserror(_("NetConnection.call(%s): first argument "
                 "(methodName) must be a string"), ss.str());
         );
-        return as_value(false); // FIXME should we return true anyway?
+        return as_value(); 
     }
 
     std::stringstream ss; fn.dump_args(ss);
@@ -714,7 +723,7 @@ netconnection_call(const fn_call& fn)
 
     static int call_number = 0;
 
-    boost::scoped_ptr<SimpleBuffer> buf ( new SimpleBuffer(32) );
+    boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
 
     // method name
     buf->appendNetworkShort(methodName.size());
@@ -761,7 +770,6 @@ netconnection_call(const fn_call& fn)
 
     ptr->call(asCallback.get(), callNumberString, *buf);
 
-    // Why return undefined here?
     return as_value();
 }
 
@@ -770,9 +778,14 @@ netconnection_close(const fn_call& fn)
 {
     boost::intrusive_ptr<NetConnection> ptr =
         ensureType<NetConnection>(fn.this_ptr); 
-    UNUSED(ptr);
+    
 
-    log_unimpl("NetConnection.close()");
+    /// TODO: what should actually happen here? Should an attached
+    /// NetStream object be interrupted?
+    ptr->setConnected(false);
+
+    ptr->notifyStatus(NetConnection::CONNECT_CLOSED);
+
     return as_value();
 }
 

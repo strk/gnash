@@ -29,13 +29,20 @@ rcsid="$Id: NetConnection.as,v 1.18 2008/03/11 19:31:47 strk Exp $";
 check_equals(NetConnection, undefined);
 check_totals(1);
 
-#else // OUTPUT_VERSION >= 7
+#else // OUTPUT_VERSION >= 6
+
+check(NetConnection.prototype.hasOwnProperty("call"));
+check(NetConnection.prototype.hasOwnProperty("connect"));
+check(NetConnection.prototype.hasOwnProperty("addHeader"));
+check(NetConnection.prototype.hasOwnProperty("close"));
+
+check(!NetConnection.prototype.hasOwnProperty("isConnected"));
+check(!NetConnection.prototype.hasOwnProperty("uri"));
 
 check_equals(typeof(NetConnection), 'function');
 check_equals(typeof(NetConnection.prototype), 'object');
 check_equals(typeof(NetConnection.prototype.isConnected), 'undefined');
 check_equals(typeof(NetConnection.prototype.connect), 'function');
-// TODO: add tests for all interfaces
 
 var tmp = new NetConnection;
 check_equals(typeof(tmp), 'object');
@@ -112,6 +119,7 @@ check_equals(level, "error");
 ret = tmp.connect(null);
 check_equals(ret, true);
 check_equals(tmp.isConnected, true);
+check_equals(result, "NetConnection.Connect.Success");
 check_equals(level, "status");
 
 ret = tmp.connect("http://someserver");
@@ -139,8 +147,57 @@ check_equals(infoObj.toString(), "[object Object]");
 nc.connect(null);
 check_equals(infoObj.code, "NetConnection.Connect.Failed");
 
+/// Check call
 
-check_totals(43);
+result = "";
+level = "";
+
+nc.onStatus = function(info) {
+    result = info.code;
+    level = info.level;
+};
+
+// Sanity check
+check(nc.isConnected);
+
+ret = nc.call();
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = nc.call(1);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = nc.call("string");
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+// NetConnection close
+
+check(nc.isConnected);
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Closed");
+check_equals(level, "status");
+
+// Always the same.
+
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Closed");
+check_equals(level, "status");
+
+check_totals(74);
 
 
 

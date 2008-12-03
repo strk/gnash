@@ -44,6 +44,7 @@ public:
     {
         CONNECT_FAILED,
         CONNECT_SUCCESS,
+        CONNECT_CLOSED,
         CALL_FAILED,
         CALL_SUCCESS
     };
