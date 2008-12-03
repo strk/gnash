@@ -503,10 +503,10 @@ NetStream_as::processStatusNotifications()
         code = popNextPendingStatusNotification();
         if ( code == invalidStatus ) break; // no more pending notifications
 
-        // TODO: optimize by reusing the same as_object ?
-        boost::intrusive_ptr<as_object> o = getStatusObject(code);
+        // Must be a new object every time.
+        as_object* o = getStatusObject(code);
 
-        callMethod(NSV::PROP_ON_STATUS, as_value(o.get()));
+        callMethod(NSV::PROP_ON_STATUS, o);
     }
 }
 
@@ -607,16 +607,19 @@ NetStream_as::getStatusCodeInfo(StatusCode code, NetStreamStatus& info)
     }
 }
 
-boost::intrusive_ptr<as_object>
+as_object* 
 NetStream_as::getStatusObject(StatusCode code)
 {
     // code, level
     NetStreamStatus info;
     getStatusCodeInfo(code, info);
 
-    boost::intrusive_ptr<as_object> o = new as_object(getObjectInterface());
-    o->init_member("code",  info.first,  0); // enumerable, deletable
-    o->init_member("level", info.second, 0); // enumerable, deletable
+    // Enumerable and deletable.
+    const int flags = 0;
+
+    as_object* o = new as_object(getObjectInterface());
+    o->init_member("code",  info.first, flags);
+    o->init_member("level", info.second, flags);
 
     return o;
 }

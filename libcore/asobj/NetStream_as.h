@@ -594,7 +594,7 @@ private:
     ///
     void clearStatusQueue();
 
-    // TODO: change to a container with fast pop_front()
+    // Queue of status notifications.
     typedef std::deque<StatusCode> StatusQueue;
 
     /// List of status messages to be processed
@@ -616,7 +616,7 @@ private:
     void getStatusCodeInfo(StatusCode code, NetStreamStatus& info);
 
     /// Return a newly allocated information object for the given status
-    boost::intrusive_ptr<as_object> getStatusObject(StatusCode code);
+    as_object* getStatusObject(StatusCode code);
 
     /// hack for using a Timer to drive ::advance calls
     static as_value advanceWrapper(const fn_call& fn);
