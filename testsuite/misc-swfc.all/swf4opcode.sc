@@ -172,6 +172,7 @@
         check(!0); 
         check(4); 
         check(!_root);  // undefined ?
+        xcheck(!_level0);  // undefined ?
         check(!null); 
         check(!undefined); 
 
