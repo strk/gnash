@@ -469,7 +469,8 @@ NetConnection::NetConnection()
     as_object(getNetConnectionInterface()),
     _callQueue(0),
     _isConnected(false),
-    _inError(false)
+    _inError(false),
+    _uriValid(false)
 {
     attachProperties(*this);
 }
@@ -597,6 +598,7 @@ NetConnection::connect()
 {
     _isConnected = true;
     _inError = false;
+    _uriValid = false;
     notifyStatus(CONNECT_SUCCESS);
 }
 
@@ -615,6 +617,7 @@ NetConnection::connect(const std::string& uri)
 
     _isConnected = false;
     _inError = true;
+    _uriValid = true;
     notifyStatus(CONNECT_FAILED);
 }
 

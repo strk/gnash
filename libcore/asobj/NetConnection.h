@@ -79,6 +79,10 @@ public:
         return _uri;
     }
 
+    bool uriValid() const {
+        return _uriValid;
+    }
+
     /// Notify the NetConnection onStatus handler of a change.
     void notifyStatus(StatusCode code);
 
@@ -107,6 +111,7 @@ private:
 
     bool _inError;
 
+    bool _uriValid;
 
 };
 

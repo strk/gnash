@@ -788,10 +788,16 @@ NetStream_as::play(const std::string& c_url)
 
     log_security( _("Connecting to movie: %s"), url );
 
-    const movie_root& mr = _vm.getRoot();
+    const RunInfo& ri = _vm.getRoot().runInfo();
 
-    StreamProvider& streamProvider = mr.runInfo().streamProvider();
-    _inputStream = streamProvider.getStream(url);
+    StreamProvider& streamProvider = ri.streamProvider();
+
+    /// If a URI was passed to NetConnection.connect, add it here.
+    std::string uri;
+    if (_netCon->uriValid()) uri.append(_netCon->getURI());
+    uri.append(url);
+
+    _inputStream = streamProvider.getStream(URL(uri, ri.baseURL()));
 
     if ( ! _inputStream.get() )
     {
