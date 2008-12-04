@@ -325,7 +325,8 @@ void SWFMovieDefinition::add_sound_sample(int character_id, sound_sample* sam)
 
 // Read header and assign url
 bool
-SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& url)
+SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
+        const std::string& url)
 {
 
 	_in = in;
