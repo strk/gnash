@@ -250,15 +250,6 @@ TextField::~TextField()
 {
 }
 
-bool
-TextField::unload()
-{
-    // TODO: unregisterTextVariable() ?
-    on_event(event_id::KILLFOCUS);
-
-    return character::unload(); 
-}
-
 void
 TextField::removeTextField()
 {
@@ -394,14 +385,6 @@ TextField::on_event(const event_id& id)
 
     switch (id.m_id)
     {
-        case event_id::SETFOCUS:
-            setFocus();
-            break;
-
-        case event_id::KILLFOCUS:
-            killFocus();
-            break;
-
         case event_id::KEY_PRESS:
         {
             if ( getType() != typeInput ) break; // not an input field
@@ -1882,22 +1865,15 @@ TextField::onChanged()
     callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal);
 }
 
-void
-TextField::onSetFocus()
+/// This is called by movie_root when focus is applied to this TextField.
+//
+/// The return value is true if the TextField can recieve focus.
+bool
+TextField::handleFocus()
 {
-    callMethod(NSV::PROP_ON_SET_FOCUS);
-}
 
-void
-TextField::onKillFocus()
-{
-    callMethod(NSV::PROP_ON_KILL_FOCUS);
-}
-
-void
-TextField::setFocus()
-{
-    if ( m_has_focus ) return; // nothing to do
+    /// Only selectable TextFields can receive focus.
+    if (!_selectable) return false;
 
     set_invalidated();
 
@@ -1909,25 +1885,23 @@ TextField::setFocus()
 
     m_cursor = _text.size();
     format_text();
-
-    onSetFocus();
+    return true;
 }
 
+/// This is called by movie_root when focus is removed from the
+/// current TextField.
 void
 TextField::killFocus()
 {
     if ( ! m_has_focus ) return; // nothing to do
 
     set_invalidated();
-
     m_has_focus = false;
 
     movie_root& root = _vm.getRoot();
-    root.setFocus(NULL);
     root.remove_key_listener(this);
     format_text(); // is this needed ?
 
-    onKillFocus();
 }
 
 void
@@ -2832,6 +2806,7 @@ getTextFieldInterface(VM& vm)
             /// The prototype for SWF5 is a simple as_object without
             /// toString() or valueOf().
             proto = new as_object();
+            vm.addStatic(proto.get());
         }
         else {
             proto = new as_object(getObjectInterface());

@@ -49,12 +49,11 @@
 # include "MediaHandlerGst.h"
 #endif
 
-
+#include "GnashSystemIOHeaders.h" // for write() 
 #include "log.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <unistd.h> // for write() on BSD
 
 using namespace gnash;
 
@@ -173,7 +172,12 @@ Player::init_sound()
 
     if (_doSound) {
 #ifdef SOUND_SDL
-        _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
+        try {
+            _soundHandler.reset(sound::create_sound_handler_sdl(_audioDump));
+        } catch (SoundException& ex) {
+            log_error(_("Could not create sound handler: %s."
+                " Will continue w/out sound."), ex.what());
+        }
         if (! _audioDump.empty()) {
             // add a silent stream to the audio pool so that our output file
             // is homogenous;  we actually want silent wave data when no sounds
@@ -397,6 +401,9 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
         if ( ! _height ) _height = 1;
     }
 
+    // Register movie definition before creating the window
+    _gui->setMovieDefinition(_movieDef.get());
+
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height);
 
@@ -438,8 +445,6 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     //       on luck ? So we made sure to keep _movieDef by 
     //       intrusive_ptr...
     _movieDef->completeLoad();
-
-    _gui->setMovieDefinition(_movieDef.get());
 
     if (! _delay) {
       //float movie_fps = _movieDef->get_frame_rate();

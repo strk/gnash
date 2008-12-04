@@ -26,7 +26,6 @@
 #include "DisplayList.h"
 #include "log.h"
 #include "GnashException.h"
-#include "GnashSleep.h"
 #include "VM.h"
 
 #include "check.h"
@@ -89,10 +88,11 @@ main(int /*argc*/, char** /*argv*/)
 		6
 	};
 
+    /// Expected success for each test
 	bool testPasses[] = {
 		true,
 		true,
-		false
+		true
 	};
 
 	// Advance and check...
@@ -118,8 +118,6 @@ main(int /*argc*/, char** /*argv*/)
 		}
 		tester.advance();
 		frame++;
-		// Frame length should be 2 seconds.
-		gnashSleep(2000000);
 	}
 
 }

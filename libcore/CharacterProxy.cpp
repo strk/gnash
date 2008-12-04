@@ -21,10 +21,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "CharacterProxy.h"
 
 #include "utility.h" // for typeName

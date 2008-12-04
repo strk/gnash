@@ -167,7 +167,7 @@ public:
 	///         resource. This is the default behaviour.
 	///
 	virtual boost::intrusive_ptr<ExportableResource> get_exported_resource(
-            const std::string& /*symbol*/)
+            const std::string& /*symbol*/) const
 	{
 		return NULL;
 	}

@@ -33,13 +33,13 @@
 #include "Color.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
-#include "Date.h"
+#include "Date.h" // for registerDateNative
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
 #include "Key_as.h"
-#include "LoadVars_as.h"
-#include "LocalConnection.h"
+//#include "LoadVars_as.h"
+//#include "LocalConnection.h"
 #include "Microphone.h"
 #include "Number_as.h"
 #include "Object.h"
@@ -182,6 +182,13 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     /// TODO: establish when classes should be available (see
     ///       note above).
 
+    function_class_init(*this); // flagged for sole SWF6+ visibility
+    object_class_init(*this); // flagged for sole SWF5+ visibility
+    string_class_init(*this); // should be SWF5+ only
+    array_class_init(*this); // should be only for SWF5+
+    //localconnection_class_init(*this); // only for SWF6+
+    registerDateNative(*this); // natives are always present
+
     switch (version)
     {
         default:
@@ -192,21 +199,16 @@ Global::Global(VM& vm, ClassHierarchy *ch)
         case 7:
         case 6:
 
-            function_class_init(*this);
             flash_package_init(*this); // will hide unless swf8 (by prop flags)
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
             ch->getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
-            init_member("LocalConnection", new builtin_function(localconnection_new));
 
         case 5:
         
-            object_class_init(*this);
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
             ch->getGlobalNs()->getClass(NSV::CLASS_OBJECT)->setDeclared();
-            array_class_init(*this);
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_ARRAY);
             ch->getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
-            string_class_init(*this);
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_STRING);
             ch->getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
         
@@ -232,7 +234,6 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
             registerColorNative(*this);
             registerTextFormatNative(*this);
-            registerDateNative(*this);
             registerMouseNative(*this);
 
         case 4:

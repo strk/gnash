@@ -387,7 +387,7 @@ public:
 
     ~__Host_Function_Report__(void) {
 	if (LogFile::getDefaultInstance().getVerbosity() >= GNASH_DEBUG_LEVEL + 1) {
-	    log_debug("returning");
+	    log_debug("%s returning", func);
 	}
     }
 };

@@ -45,7 +45,7 @@ public:
 	{
 		boost::uint16_t soundID;
 		sound_sample* sample;
-		SoundInfo soundInfo;
+		SoundInfoRecord soundInfo;
 
 		ButtonSound()
 			:

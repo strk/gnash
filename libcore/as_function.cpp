@@ -79,11 +79,9 @@ static as_object* getFunctionPrototype()
 
 		VM::get().addStatic(proto.get());
 
-		if ( VM::get().getSWFVersion() >= 6 )
-		{
-			proto->init_member("apply", new builtin_function(function_apply));
-			proto->init_member("call", new builtin_function(function_call));
-		}
+		int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; 
+		proto->init_member("apply", new builtin_function(function_apply), flags);
+		proto->init_member("call", new builtin_function(function_call), flags);
 	}
 
 	return proto.get();
@@ -188,8 +186,9 @@ function_class_init(as_object& global)
 {
 	boost::intrusive_ptr<builtin_function> func=as_function::getFunctionConstructor();
 
-	// Register _global.Function
-	global.init_member("Function", func.get());
+	// Register _global.Function, only visible for SWF6 up
+	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
+	global.init_member("Function", func.get(), swf6flags);
 
 }
 

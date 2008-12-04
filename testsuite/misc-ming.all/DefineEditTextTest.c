@@ -179,7 +179,18 @@ main(int argc, char** argv)
   check_equals(mo, "etext1.embedFonts", "true");
   check_equals(mo, "etext1.hasOwnProperty('embedFonts')", "false");
 
+  add_actions(mo, "ret = Selection.setFocus(dtext1);"
+                  "check_equals(ret, false);"
+                  "check_equals(Selection.getFocus(), '_level0.dtext1');");
+  add_actions(mo, "ret = Selection.setFocus(etext1);"
+                  "check_equals(ret, false);"
+                  "check_equals(Selection.getFocus(), '_level0.etext1');");
+
   add_actions(mo, "createTextField('dynamictext1', 99, 10, 10, 10, 10);");
+
+  add_actions(mo, "ret = Selection.setFocus(dynamictext1);"
+               "check_equals(ret, false);"
+               "check_equals(Selection.getFocus(), '_level0.dynamictext1');");
 
   check_equals(mo, "dtext1.__proto__", "TextField.prototype");
   check_equals(mo, "etext1.__proto__", "TextField.prototype");

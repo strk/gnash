@@ -29,34 +29,217 @@ rcsid="$Id: NetConnection.as,v 1.18 2008/03/11 19:31:47 strk Exp $";
 check_equals(NetConnection, undefined);
 check_totals(1);
 
-#else // OUTPUT_VERSION >= 7
+#else // OUTPUT_VERSION >= 6
+
+check(NetConnection.prototype.hasOwnProperty("call"));
+check(NetConnection.prototype.hasOwnProperty("connect"));
+check(NetConnection.prototype.hasOwnProperty("addHeader"));
+check(NetConnection.prototype.hasOwnProperty("close"));
+
+check(!NetConnection.prototype.hasOwnProperty("isConnected"));
+check(!NetConnection.prototype.hasOwnProperty("uri"));
 
 check_equals(typeof(NetConnection), 'function');
 check_equals(typeof(NetConnection.prototype), 'object');
 check_equals(typeof(NetConnection.prototype.isConnected), 'undefined');
 check_equals(typeof(NetConnection.prototype.connect), 'function');
-// TODO: add tests for all interfaces
 
 var tmp = new NetConnection;
 check_equals(typeof(tmp), 'object');
 check_equals(tmp.__proto__, NetConnection.prototype);
 check(tmp instanceof NetConnection);
-xcheck_equals(typeof(tmp.isConnected), 'boolean');
-xcheck_equals(tmp.isConnected, false);
-// TODO: add tests for all properties
+check_equals(typeof(tmp.isConnected), 'boolean');
+check_equals(typeof(tmp.uri), 'undefined');
+check_equals(tmp.uri, undefined);
+check_equals(tmp.isConnected, false);
+
+tmp.isConnected = true;
+check_equals(tmp.isConnected, false);
+
+tmp.isConnected = 56;
+check_equals(tmp.isConnected, false);
 
 // test the NetConnection::connect method
-tmp.connect();
 if ( ! tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv") )
 {
 	// FIXME: this would fail in the reference player too...
-	xfail("NetConnection::connect() didn't initialized correctly");
+	xfail("NetConnection::connect() didn't initialize correctly");
 }
 else
 {
 	pass("NetConnection::connect() initialized correctly");
 }
 
-check_totals(10);
+tmp.onStatus = function(info) {
+    result = info.code;
+    level = info.level;
+};
+
+result = "";
+level = "";
+
+ret = tmp.connect();
+check_equals(ret, undefined);
+check_equals(tmp.isConnected, false);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = tmp.connect("");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "");
+
+ret = tmp.connect("null");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "null");
+
+ret = tmp.connect(null, "another argument");
+check_equals(ret, true);
+check_equals(tmp.isConnected, true);
+check_equals(result, "NetConnection.Connect.Success");
+check_equals(level, "status");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "null");
+
+// Can't set
+tmp.uri = 6;
+check_equals(tmp.uri, "null");
+
+ret = tmp.connect(1);
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "1");
+
+ret = tmp.connect("string");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "string");
+
+ret = tmp.connect(undefined);
+
+#if OUTPUT_VERSION > 6
+check_equals(ret, true);
+check_equals(tmp.isConnected, true);
+check_equals(result, "NetConnection.Connect.Success");
+check_equals(level, "status");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "undefined");
+#else
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "");
+#endif
+
+ret = tmp.connect(null);
+check_equals(ret, true);
+check_equals(tmp.isConnected, true);
+check_equals(result, "NetConnection.Connect.Success");
+check_equals(level, "status");
+
+ret = tmp.connect("http://someserver");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+
+// Check onStatus object.
+
+nc = new NetConnection;
+nc.onStatus = function(info) {
+    infoObj = info;
+};
+
+nc.connect(6);
+nc.onStatus = undefined;
+check_equals(infoObj.code, "NetConnection.Connect.Failed");
+
+// It is a full object
+check(infoObj instanceof Object);
+check_equals(infoObj.toString(), "[object Object]");
+
+// Check whether the original object is modified on a new connect attempt.
+nc.connect(null);
+check_equals(infoObj.code, "NetConnection.Connect.Failed");
+
+/// Check call
+
+result = "";
+level = "";
+
+nc.onStatus = function(info) {
+    result = info.code;
+    level = info.level;
+};
+
+// Sanity check
+check(nc.isConnected);
+
+ret = nc.call();
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = nc.call(1);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = nc.call("string");
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+// NetConnection close
+
+check(nc.isConnected);
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Closed");
+check_equals(level, "status");
+
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Closed");
+check_equals(level, "status");
+
+nc.connect(1);
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+
+check_totals(107);
+
+
 
 #endif // OUTPUT_VERSION >= 7

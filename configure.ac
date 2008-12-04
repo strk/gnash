@@ -1590,8 +1590,6 @@ fi
 
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
-GNASH_PATH_LIBXML
-
 dnl
 dnl NOTE: make sure to check for GLIB and LIBXML2 
 dnl before checking for gstreamer
@@ -2330,18 +2328,6 @@ fi
 # set a variable if we shouldn't continue. This way we can print
 # out everything that is missing in one pass, hopefully making it
 # easy for new developers to get everything they need installed.
-
-if test x$xml != xno; then
-  if test x"$LIBXML_CFLAGS" != x; then
-    echo "        XML flags are: $LIBXML_CFLAGS"
-    echo "        XML libs are: $LIBXML_LIBS"
-  else
-    echo "        ERROR: No libxml2 development package installed!" >&3
-    echo "               To compile this project install" >&3
-    echo "               or .deb users: apt-get install libxml2-dev" >&3
-    echo "               or .rpm users: yum install libxml2-devel" >&3
-  fi
-fi
 
 dnl Dump QT3 options is the user specified a QT3 or KDE3 GUI
 if test x"${build_qt3}" = xyes; then

@@ -50,7 +50,7 @@ public:
     /// The SWFMatrix will be used for lines with non-scalable strokes.
     ///
     virtual bool point_test_local(boost::int32_t x, boost::int32_t y,
-            SWFMatrix& wm);
+            const SWFMatrix& wm);
 
     /// \brief
     /// Read a shape definition as included in DEFINEFONT*,

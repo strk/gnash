@@ -40,7 +40,14 @@ StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 	{
 		// This makes it possible to stop only the stream when framejumping.
 		m->setStreamSoundId(m_handler_id);
-		handler->play_sound(m_handler_id, 0, 0, m_start, NULL);
+
+		handler->playSound(m_handler_id,
+                0, // no looping
+                0, // no seconds offset (MP3 seek samples might use this ?)
+                m_start, // offset to this block of sound
+                0, // no envelopes
+                false // don't allow multiple instances of the same sound
+                );
 	}
 }
 

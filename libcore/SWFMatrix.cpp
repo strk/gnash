@@ -25,10 +25,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "SWFMatrix.h"
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
@@ -313,7 +309,8 @@ SWFMatrix::get_y_scale() const
 double
 SWFMatrix::get_rotation() const
 {
-    return atan2(shx, sx); // more successes in misc-ming.all/SWFMatrix_test.c
+    // more successes in misc-ming.all/SWFMatrix_test.c
+    return atan2(static_cast<double>(shx), sx); 
 }
 
 // private

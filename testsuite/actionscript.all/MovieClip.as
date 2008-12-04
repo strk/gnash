@@ -111,19 +111,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(321); // SWF5
+	check_totals(327); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(800); // SWF6
+	check_totals(829); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(817); // SWF7
+	check_totals(846); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(889); // SWF8+
+	check_totals(920); // SWF8+
 #endif
 
 	play();
@@ -850,6 +850,61 @@ check_equals(sr60._target, "/hardref5");
 check_equals(sr60.member, "hardref5@60");
 
 #endif // OUTPUT_VERSION >= 6
+
+//----------------------------------------------
+// Test unloadMovie
+//----------------------------------------------
+#if OUTPUT_VERSION >= 6
+umc = _root.createEmptyMovieClip("umc", getNextHighestDepth());
+check_equals(typeof(umc), 'movieclip');
+
+#if OUTPUT_VERSION >= 8
+check_equals(umc.getBounds().xMax, 6710886.35);
+// This shouldn't be seen.
+with (umc) {
+    lineStyle(2, 0xff6699);
+    beginFill(0x997798);
+    moveTo(100, 100);
+    lineTo(80, 0);
+    lineTo(80, 60);
+    lineTo(0, 60);
+    lineTo(0, 0);
+    endFill();
+}
+check_equals(umc.getBounds().xMax, 101);
+#endif
+
+umc.onData = function() { };
+umc.onLoad = function() { };
+umc.a = 7;
+umc.b = "string";
+umc.unloadMovie();
+
+#if OUTPUT_VERSION >=8
+check_equals(umc.getBounds().xMax, 101);
+#else
+check_equals(umc.getBounds().xMax, 6710886.35);
+#endif
+
+check_equals(umc.a, 7);
+check_equals(umc.b, "string");
+check_equals(typeof(umc.onRollOut), "undefined");
+check_equals(typeof(umc.onData), "function");
+check_equals(typeof(umc.onLoad), "function");
+
+// Prevent it from being really removed.
+umcref = umc;
+umc.removeMovieClip();
+check_equals(typeof(umc), 'movieclip');
+check_equals(typeof(umcref), 'movieclip');
+check_equals(umc.getBounds().xMax, undefined);
+check_equals(umc.a, undefined);
+check_equals(umc.b, undefined);
+check_equals(typeof(umc.onRollOut), "undefined");
+check_equals(typeof(umc.onData), "undefined");
+check_equals(typeof(umc.onLoad), "undefined");
+
+#endif
 
 //----------------------------------------------
 // Test duplicateMovieClip
@@ -2083,6 +2138,39 @@ createEmptyMovieClip("d5", 0x79999999);
 check_equals(d5.getDepth(), 2040109465);
 
 #endif
+
+// Test _visible property
+
+#if OUTPUT_VERSION > 5
+vis = _root.createEmptyMovieClip("vis", getNextHighestDepth());
+check_equals(vis._visible, true);
+vis._visible = false;
+check_equals(vis._visible, false);
+vis._visible = "1";
+check_equals(vis._visible, true);
+vis._visible = 0;
+check_equals(vis._visible, false);
+vis._visible = "true";
+check_equals(vis._visible, false);
+vis._visible = "false";
+check_equals(vis._visible, false);
+vis._visible = "gibberish";
+check_equals(vis._visible, false);
+vis._visible = undefined;
+check_equals(vis._visible, false);
+#endif
+
+check_equals(_root.focusEnabled, undefined);
+_root.focusEnabled = 5;
+check_equals(_root.focusEnabled, 5);
+_root.focusEnabled = 0;
+check_equals(_root.focusEnabled, 0);
+_root.focusEnabled = true;
+check_equals(_root.focusEnabled, true);
+_root.focusEnabled = false;
+check_equals(_root.focusEnabled, false);
+_root.focusEnabled = "hello";
+check_equals(_root.focusEnabled, "hello");
 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 

@@ -21,10 +21,6 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 
 #include "StreamProvider.h"
 #include "URL.h"
@@ -44,7 +40,7 @@
 #	include <io.h>
 #	define dup _dup
 #else
-#include <unistd.h>
+#include <unistd.h> // dup
 #endif
 
 namespace gnash

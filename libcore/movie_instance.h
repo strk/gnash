@@ -58,7 +58,7 @@ public:
 	///
 	/// It's intended to be called by movie_root::setLevel().
 	///
-	void stagePlacementCallback();
+	void stagePlacementCallback(as_object* initObj = 0);
 
 	/// Set a character in the dictionary as initialized, returning
 	/// true if not already initialized.

@@ -61,25 +61,7 @@
 	      boost-headers, boost-libs, or just boost
 	  </filename></entry>
 	</row>
-	
-	<row>
-	  <entry>libxml2</entry>
-	  <entry>Required</entry>
-	  <entry></entry>
-	  <entry>
-	    Libxml2 is the GNOME XML parser library and
-	    is available at <ulink type="http"
-	    url="http://xmlsoft.org">http://xmlsoft.org</ulink>.
-	  </entry>
-	  <entry>
-	    This library is used to parse messages for the
-	    XML XMLNode, or XMLSocket ActionScript classes.
-	  </entry>
-	  <entry><filename>libxml2-dev</filename></entry>
-	  <entry><filename>libxml2-devel</filename></entry>
-	  <entry><filename>libxml2</filename></entry>
-	</row>
-	
+
 	<row>
 	  <entry>AGG</entry>
 	  <entry>Possibly Required</entry>

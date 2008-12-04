@@ -160,7 +160,9 @@ Gui::~Gui()
 
     delete _renderer;
 #ifdef GNASH_FPS_DEBUG
-    std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
+    if ( fps_timer_interval ) {
+        std::cerr << "Total frame advances: " << fps_counter_total << std::endl;
+    }
 #endif
 }
 
@@ -748,8 +750,18 @@ Gui::display(movie_root* m)
     // m_child_invalidated flag if at least one of it's childs has the
     // invalidated flag set.
     log_debug("DUMPING CHARACTER TREE"); 
-    m->dump_character_tree();
     
+    InfoTree tr;
+    InfoTree::iterator top = tr.begin();
+    _stage->getMovieInfo(tr, top);
+
+    for (InfoTree::iterator i = tr.begin(), e = tr.end();
+            i != e; ++i) {
+        std::cout << std::string(tr.depth(i) * 2, ' ') << i->first << ": " << 
+            i->second << std::endl;
+    }
+
+
     // less verbose, and often necessary: see the exact coordinates of the
     // invalidated bounds (mainly to see if it's NULL or something else).	
     std::cout << "Calculated changed ranges: " << changed_ranges << "\n";
@@ -877,6 +889,8 @@ Gui::pause()
     	sound::sound_handler* s = _stage->runInfo().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
+
+        stopHook();
     }
 }
 
@@ -1069,6 +1083,16 @@ Gui::getMovieInfo() const
     os << "SWF " << vm.getSWFVersion();
     topIter = tr->insert(topIter, StringPair("VM version", os.str()));
 
+    // This short-cut is to avoid a bug in movie_root's getMovieInfo,
+    // which relies on the availability of a _rootMovie for doing
+    // it's work, while we don't set it if we didn't start..
+    // 
+    if ( ! _started )
+    {
+        topIter = tr->insert(topIter, StringPair("Stage properties", 
+                    "not constructed yet"));
+        return tr;
+    }
 
     movie_root& stage = vm.getRoot();
     stage.getMovieInfo(*tr, topIter);

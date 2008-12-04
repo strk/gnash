@@ -57,6 +57,7 @@ static void usage (void);
 static void test_el();
 static void test_obj();
 static void test_isnan();
+static void test_conversion();
 
 // Enable the display of memory allocation and timing data
 static bool memdebug = false;
@@ -118,7 +119,68 @@ main(int argc, char *argv[])
     test_isnan();
     test_el();
     test_obj();
+    test_conversion();
+   
 }
+
+void
+test_bool(as_value boolval)
+{
+    if (boolval.is_bool()) {
+        runtest.pass("as_value(bool)");
+    } else {
+        runtest.fail("as_value(bool)");
+    }
+}
+
+void
+test_int(as_value val)
+{
+    if (val.is_number()) {
+        runtest.pass("as_value(int)");
+    } else {
+        runtest.fail("as_value(int)");
+    }
+}
+
+void
+test_string(as_value val)
+{
+    if (val.is_string()) {
+        runtest.pass("as_value(string)");
+    } else {
+        runtest.fail("as_value(string)");
+    }
+}
+
+
+typedef enum {
+    ONE = 0,
+    TWO = 1,
+    THREE = 2
+} enumbers;
+
+void
+test_conversion()
+{
+    test_bool(true);
+    test_bool(false);
+    test_int(5);
+    test_int(1);
+    test_int(double(0));
+    test_int(0.0);
+
+    test_int(THREE);
+    test_int(ONE);
+    test_int(TWO);
+
+    test_string(std::string("lar"));
+
+    test_string("lar");
+
+    
+}
+
 
 void
 test_el()

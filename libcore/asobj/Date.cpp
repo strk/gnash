@@ -360,7 +360,7 @@ Date::toString() const
                                    "Thu", "Fri", "Sat" };
   
     /// NaN and infinities all print as "Invalid Date"
-    if (isNaN(_value) || isinf(_value)) {
+    if (isNaN(_value) || isInf(_value)) {
         return as_value("Invalid Date");
     }
   
@@ -490,7 +490,7 @@ date_new(const fn_call& fn)
 inline
 bool invalidDate(double timeValue)
 {
-    return (isNaN(timeValue) || isinf(timeValue));
+    return (isNaN(timeValue) || isInf(timeValue));
 }
 
 /// Returns an element of the Date object as an as_value
@@ -919,13 +919,13 @@ date_setmonth(const fn_call& fn)
         // It seems odd, but FlashPlayer takes all bad month values to mean
         // January
         double monthvalue =  fn.arg(0).to_number();
-        if (isNaN(monthvalue) || isinf(monthvalue)) monthvalue = 0.0;
+        if (isNaN(monthvalue) || isInf(monthvalue)) monthvalue = 0.0;
         truncateDouble(gt.month, monthvalue);
 
         // If the day-of-month value is invalid instead, the result is NaN.
         if (fn.nargs >= 2) {
             double mdayvalue = fn.arg(1).to_number();
-            if (isNaN(mdayvalue) || isinf(mdayvalue)) {
+            if (isNaN(mdayvalue) || isInf(mdayvalue)) {
                 date->setTimeValue(NaN);
                 return as_value(date->getTimeValue());
             }
@@ -1275,7 +1275,7 @@ rogue_date_args(const fn_call& fn, unsigned maxargs)
 
         if (isNaN(arg)) return(NaN);
 
-        if (isinf(arg)) {
+        if (isInf(arg)) {
             if (arg > 0) {  // Plus infinity
                 plusinf = true;
             }

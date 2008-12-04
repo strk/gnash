@@ -110,9 +110,9 @@ public:
 	}
 
 	/// Read one bytes as a signed int (aligned)
-	int8_t	read_s8()
+    boost::int8_t read_s8()
 	{
-		return static_cast<int8_t>(read_u8());
+		return static_cast<boost::int8_t>(read_u8());
 	}
 
 	/// Read two bytes as an unsigned int (aligned)

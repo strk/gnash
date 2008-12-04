@@ -119,7 +119,6 @@ public:
 private:
 
 	static container_type & get_handlers();
-	static std::vector<std::string> & get_property_names();
 
 	/// Common code for ActionGetUrl and ActionGetUrl2
 	//

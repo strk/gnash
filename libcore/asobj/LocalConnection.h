@@ -50,11 +50,7 @@ private:
     std::map<const char *, short> _allocated;
 };
 
-as_value localconnection_new(const fn_call& fn);
-as_value localconnection_close(const fn_call& fn);
-as_value localconnection_connect(const fn_call& fn);
-as_value localconnection_domain(const fn_call& fn);
-as_value localconnection_send(const fn_call& fn);
+void localconnection_class_init(as_object& glob);
 
 } // end of gnash namespace
 

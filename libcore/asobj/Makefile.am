@@ -63,6 +63,7 @@ libgnashasobjs_la_SOURCES = \
 	NetStream_as.cpp \
 	Number_as.cpp \
 	Object.cpp \
+	PlayHead.cpp \
 	Selection.cpp \
 	SharedObject.cpp\
 	Sound.cpp \
@@ -73,7 +74,6 @@ libgnashasobjs_la_SOURCES = \
 	MovieClipLoader.cpp\
 	String_as.cpp \
 	XML_as.cpp \
-	xmlattrs.cpp \
 	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
@@ -129,6 +129,7 @@ noinst_HEADERS = \
 	NetStream_as.h \
 	Number_as.h \
 	Object.h \
+	PlayHead.h \
 	prophelper.h \
 	Selection.h \
 	SharedObject.h \
@@ -140,7 +141,6 @@ noinst_HEADERS = \
 	String_as.h \
 	XML_as.h \
 	XMLSocket_as.h \
-	xmlattrs.h \
 	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
 	flash/display_pkg.h \

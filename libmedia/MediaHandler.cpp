@@ -64,7 +64,8 @@ MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
 
 	if ( ! isFLV(*stream) )
 	{
-		log_error(_("MediaHandler::createMediaParser: only FLV input is supported by this MediaHandler"));
+		log_error(_("MediaHandler::createMediaParser: only FLV input is "
+                    "supported by this MediaHandler"));
 		return parser;
 	}
 

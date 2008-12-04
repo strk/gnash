@@ -190,6 +190,8 @@ private:
 
 	character* _originalTarget;
 
+	int _origExecSWFVersion;
+
 	std::list<TryBlock> _tryList;
 
 	bool _returning;

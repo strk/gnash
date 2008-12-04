@@ -176,13 +176,13 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 		double ad = a.to_number(); double bd = b.to_number();				\
 		if (isNaN(ad) || isNaN(bd))											\
 			store = truth_of_undefined; 									\
-		else if (isinf(ad) && ad > 0)	 									\
+		else if (isInf(ad) && ad > 0)	 									\
 			store = false; 													\
-		else if (isinf(bd) && bd > 0)	 									\
+		else if (isInf(bd) && bd > 0)	 									\
 			store = true; 													\
-		else if (isinf(bd) && bd < 0)	 									\
+		else if (isInf(bd) && bd < 0)	 									\
 			store = false; 													\
-		else if (isinf(ad) && ad < 0)										\
+		else if (isInf(ad) && ad < 0)										\
 			store = true;													\
 		else 																\
 			store = ad < bd; 												\
@@ -211,10 +211,10 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 		double ad = a.to_number(); double bd = b.to_number();				\
 		if (isNaN(ad) || isNaN(bd))											\
 			*store = false;													\
-		else if (isinf(ad) && ad > 0)										\
-			*store = (isinf(bd) && bd > 0);									\
-		else if (isinf(ad) && ad < 0)										\
-			*store = (isinf(bd) && bd < 0);									\
+		else if (isInf(ad) && ad > 0)										\
+			*store = (isInf(bd) && bd > 0);									\
+		else if (isInf(ad) && ad < 0)										\
+			*store = (isInf(bd) && bd < 0);									\
 		else																\
 			*store = (ad == bd);											\
 	}																		\
@@ -793,7 +793,7 @@ Machine::execute()
 ///  byte -- as a raw byte
 	case SWF::ABC_ACTION_PUSHBYTE:
 	{
-		int8_t b = mStream->read_s8();
+        boost::int8_t b = mStream->read_s8();
 		mStack.grow(1);
 		mStack.top(0) = b;
 		break;
@@ -959,7 +959,7 @@ Machine::execute()
 		{
 			mStack.top(0).set_bool(false);
 			mFrame.value(oindex).set_null();
-			mFrame.value(iindex) = 0;
+			mFrame.value(iindex) = 0.0;
 		}
 		break;
 	}

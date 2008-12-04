@@ -667,7 +667,7 @@ as_value::to_number() const
                 // characters is returned, including exponent, positive
                 // and negative signs and whitespace before.
                 double d = 0;
-                std::istringstream is (getStr());
+                std::istringstream is(s);
                 is >> d;
                 return d;
             }
@@ -865,7 +865,7 @@ as_value::to_bool_v5() const
 		case NUMBER:
 		{
 			double d = getNum();
-			return ! isNaN(d) && d; 
+			return d && ! isNaN(d);
 		}
 		case BOOLEAN:
 			return getBool();
@@ -897,7 +897,8 @@ as_value::to_bool_v6() const
 		case NUMBER:
 		{
 			double d = getNum();
-			return utility::isFinite(d) && d;
+            // see testsuite/swfdec/if-6.swf
+			return d && ! isNaN(d);
 		}
 		case BOOLEAN:
 			return getBool();
@@ -1587,7 +1588,7 @@ as_value::doubleToString(double val, int radix)
 	{
 		return "NaN";
 	}
-	else if (isinf(val))
+	else if (isInf(val))
 	{
 		return val < 0 ? "-Infinity" : "Infinity";
 	}
@@ -1772,52 +1773,10 @@ as_value::as_value(const std::string& str)
 {
 }
 
-as_value::as_value(bool val)
-	:
-	m_type(BOOLEAN),
-	_value(val)
-{
-}
-
-as_value::as_value(int val)
+as_value::as_value(double num)
 	:
 	m_type(NUMBER),
-	_value(double(val))
-{
-}
-
-as_value::as_value(unsigned int val)
-	:
-	m_type(NUMBER),
-	_value(double(val))
-{
-}
-
-as_value::as_value(float val)
-	:
-	m_type(NUMBER),
-	_value(double(val))
-{
-}
-
-as_value::as_value(double val)
-	:
-	m_type(NUMBER),
-	_value(val)
-{
-}
-
-as_value::as_value(long val)
-	:
-	m_type(NUMBER),
-	_value(double(val))
-{
-}
-
-as_value::as_value(unsigned long val)
-	:
-	m_type(NUMBER),
-	_value(double(val))
+	_value(num)
 {
 }
 
@@ -1827,6 +1786,7 @@ as_value::as_value(as_object* obj)
 {
 	set_as_object(obj);
 }
+
 
 /// Chad: Document this
 as_value::as_value(asNamespace &)

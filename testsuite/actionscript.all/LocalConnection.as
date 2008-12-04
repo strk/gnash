@@ -33,10 +33,11 @@ totals(1);
 
 #else // OUTPUT_VERSION >= 6
 
-xcheck (LocalConnection.prototype.hasOwnProperty("send"));
-xcheck (LocalConnection.prototype.hasOwnProperty("connect"));
-xcheck (LocalConnection.prototype.hasOwnProperty("close"));
-xcheck (LocalConnection.prototype.hasOwnProperty("domain"));
+check_equals(LocalConnection.prototype.__proto__, Object.prototype);
+check (LocalConnection.prototype.hasOwnProperty("send"));
+check (LocalConnection.prototype.hasOwnProperty("connect"));
+check (LocalConnection.prototype.hasOwnProperty("close"));
+check (LocalConnection.prototype.hasOwnProperty("domain"));
 check (! LocalConnection.prototype.hasOwnProperty("allowDomain"));
 check (! LocalConnection.prototype.hasOwnProperty("onStatus"));
 
@@ -107,7 +108,7 @@ xcheck_equals (result, true);
 
 rec.close();
 
-totals(22);
+totals(23);
 
 #endif // OUTPUT_VERSION >= 6
 

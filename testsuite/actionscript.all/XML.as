@@ -123,6 +123,7 @@ check_equals(typeof(tmp.status), 'number');
 check(! tmp.hasOwnProperty("status"));
 xcheck(tmp.__proto__.hasOwnProperty('status') );
 
+tmp = new XML();
 check_equals(tmp.status, 0);
 tmp.status = -1;
 check_equals(tmp.status, -1);
@@ -281,7 +282,6 @@ var xml_in = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNO
 // with comments stripped out.
 var xml_out = '<TOPNODE tna1="tna1val" tna2="tna2val" tna3="tna3val"><SUBNODE1 sna1="sna1val" sna2="sna2val"><SUBSUBNODE1 ssna1="ssna1val" ssna2="ssna2val">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /sub1 &lt;br&gt;&quot;node data 2&quot;</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>';
 //var xml_out = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub /\sub1 \<br\>\"node data 2\"</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
-
 
 check(XML);
 tmp.checkParsed = function ()
@@ -448,7 +448,7 @@ tmp.checkParsed(); // onLoad won't be called
 //note("Parsed XML: "+tmp.toString());
 
 // TODO: FIX THIS !
-xcheck_equals(tmp.toString(), xml_out);
+check_equals(tmp.toString(), xml_out);
 
 //------------------------------------------------
 // Test XML editing
@@ -864,9 +864,9 @@ myxml.onLoad = function(success)
 	if ( this.onLoadCalls == 2 )
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(361);
+		check_totals(387);
 #else
-		check_totals(401);
+		check_totals(427);
 #endif
 		play();
 	}
@@ -947,6 +947,75 @@ check_equals(myxml2.toString(), "<X1 />");
 myxml2.ignoreWhite = true; 
 myxml2.parseXML("<X1> t </X1>");
 check_equals(myxml2.toString(), "<X1> t </X1>"); 
+
+/// Check various malformed XMLs
+
+h = new XML("<open>");
+check_equals(h.toString(), "<open />");
+
+h = new XML("<open></close>");
+check_equals(h.toString(), "<open />");
+
+h = new XML("<open><open2></open>");
+check_equals(h.toString(), "<open><open2 /></open>");
+
+h = new XML("<open att='");
+xcheck_equals(h.toString(), "");
+
+h = new XML("<open att      r='kk'");
+xcheck_equals(h.toString(), "");
+
+h = new XML("<open>& ' \"<");
+check_equals(h.toString(), "<open>&amp; &apos; &quot;</open>");
+
+// A non-breaking space (honest).
+h = new XML("<open> </open>");
+check_equals(h.toString(), "<open> </open>");
+
+h = new XML("</open><open>node with \"</open>");
+check_equals(h.toString(), "");
+
+h = new XML("<open/><open><!-- lkjsdcölkj<hello>");
+check_equals(h.toString(), "<open /><open />");
+
+h = new XML("<open><![CDATA[jlkjdc</open>");
+check_equals(h.toString(), "<open />");
+
+// Check DOCTYPE and xml declarations.
+
+check_equals(h.docTypeDecl, undefined);
+check_equals(h.xmlDecl, undefined);
+
+h = new XML("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><tag></tag>");
+check_equals(h.toString(), "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'><tag />");
+check_equals(h.docTypeDecl, "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.01 Transitional//EN' 'http://www.w3.org/TR/html4/loose.dtd'>");
+
+h = new XML("<!DOcTyPE text><tag></tag>");
+check_equals(h.toString(), "<!DOcTyPE text><tag />");
+check_equals(h.docTypeDecl, "<!DOcTyPE text>");
+
+h = new XML("<?xml declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xml declaration goes here?><tag>content</tag>");
+check_equals(h.xmlDecl, "<?xml declaration goes here?>");
+
+h = new XML("<?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.xmlDecl, "<?xMl declaration goes here?>");
+
+// Check order
+h = new XML("<!doctype d><?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xMl declaration goes here?><!doctype d><tag>content</tag>");
+check_equals(h.xmlDecl, "<?xMl declaration goes here?>");
+check_equals(h.docTypeDecl, "<!doctype d>");
+
+// Check order
+h = new XML("<tag></tag><!doctype d><?xMl declaration goes here?><tag>content</tag>");
+check_equals(h.toString(), "<?xMl declaration goes here?><!doctype d><tag /><tag>content</tag>");
+
+// Check multiple declarations
+h = new XML("<tag></tag><!doctype d><?xMl decl?><!dOcType new><?XMl new?>");
+check_equals(h.toString(), "<?xMl decl?><?XMl new?><!dOcType new><tag />");
+check_equals(h.xmlDecl, "<?xMl decl?><?XMl new?>");
 
 stop();
 

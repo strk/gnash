@@ -46,9 +46,6 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Now set some flags and check result
 
-	flags.set_is_protected(true);
-	check(flags.get_is_protected());
-
 	flags.set_read_only();
 	check(flags.get_read_only());
 
@@ -59,9 +56,6 @@ main(int /*argc*/, char** /*argv*/)
 	check(flags.get_dont_delete());
 
 	// Now clear the flags and check result
-
-	flags.set_is_protected(false);
-	check(!flags.get_is_protected());
 
 	flags.clear_read_only();
 	check(!flags.get_read_only());

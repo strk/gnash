@@ -25,7 +25,6 @@
 #include "character.h"
 #include "DisplayList.h"
 #include "log.h"
-#include "GnashSleep.h"
 #include "VM.h"
 
 #include "check.h"
@@ -60,9 +59,7 @@ main(int /*argc*/, char** /*argv*/)
         {
             if (root->get_current_frame() + 1 == framecount) break;
             tester.advance();
-	
         }
-        gnashSleep(750000);
     }
     as_value eot;
     xcheck(root->get_member(st.find("finished"), &eot));

@@ -85,7 +85,7 @@ VM::isInitialized()
 
 VM::VM(int version, movie_root& root, VirtualClock& clock)
 	:
-    _rootMovie(root),
+	_rootMovie(root),
 	_swfversion(version),
 	mMachine(0),
 	_clock(clock),
@@ -114,6 +114,12 @@ int
 VM::getSWFVersion() const
 {
 	return _swfversion;
+}
+
+void
+VM::setSWFVersion(int v) 
+{
+	_swfversion=v;
 }
 
 VM::RNG&

@@ -98,7 +98,8 @@ public:
 	//
 	/// I.e. check against ourself.
 	///
-	virtual character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
+	virtual character* get_topmost_mouse_entity(boost::int32_t x,
+            boost::int32_t y);
 	
 	virtual bool wantsInstanceName() const
 	{
@@ -109,6 +110,8 @@ public:
 	virtual as_object* get_path_element(string_table::key key);
 
 	virtual void on_button_event(const event_id& event);
+
+    virtual bool handleFocus();
 
 	//
 	// ActionScript overrides
@@ -133,7 +136,7 @@ public:
 	/// (1) Register this button instance as a live character
 	/// (2) Setup the state characters calling stagePlacementCallback on all [WRONG]
 	///
-	virtual void stagePlacementCallback();
+	virtual void stagePlacementCallback(as_object* initObj = 0);
 
 	/// Properly unload contained characters
 	bool unload();

@@ -22,10 +22,6 @@
 #include "gnashconfig.h" // HAVE_ZLIB_H, USE_SWFTREE
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "IOChannel.h" // for StreamAdapter inheritance
 #include "utility.h"
 #include "action.h"
@@ -242,7 +238,8 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     if ( ! jpegHeaderSize )
     {
-        log_debug(_("No bytes to read in JPEGTABLES tag at offset %d"), currPos);
+        log_debug(_("No bytes to read in JPEGTABLES tag at offset %d"),
+                currPos);
     }
 
     std::auto_ptr<JpegImageInput> input;

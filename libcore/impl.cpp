@@ -347,7 +347,9 @@ create_swf_movie(std::auto_ptr<IOChannel> in, const std::string& url,
 
     std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
 
-    if (!m->readHeader(in, url)) return 0;
+    const std::string& absURL = URL(url).str();
+
+    if (!m->readHeader(in, absURL)) return 0;
     if (startLoaderThread && !m->completeLoad()) return 0;
 
     return m.release();

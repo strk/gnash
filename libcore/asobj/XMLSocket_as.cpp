@@ -21,9 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
+#include "GnashSystemIOHeaders.h" // read
 
 #include "network.h"
 #include "utility.h"
@@ -39,13 +37,12 @@
 
 #include "log.h"
 
-// For select() and read()
+// For select() 
 #ifdef HAVE_WINSOCK2_H
 # include <winsock2.h>
 #else
 # include <sys/types.h>
 # include <sys/stat.h>
-# include <unistd.h>
 #endif
 
 #include <boost/scoped_array.hpp>

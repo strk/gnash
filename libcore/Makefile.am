@@ -81,6 +81,7 @@ libgnashcore_la_SOURCES = \
 	namedStrings.cpp \
 	rect.cpp \
 	MovieClip.cpp \
+	swf.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/DefineVideoStreamTag.cpp \
 	swf/DefineTextTag.cpp \
@@ -111,7 +112,6 @@ libgnashcore_la_SOURCES = \
 	impl.cpp \
 	LoadVariablesThread.cpp \
 	render.cpp \
-	shape.cpp \
 	SWFStream.cpp \
 	styles.cpp \
 	timers.cpp \

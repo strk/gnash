@@ -75,6 +75,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     _initialStackSize(0),
     _initialCallStackDepth(0),
     _originalTarget(0),
+    _origExecSWFVersion(0),
     _tryList(),
     _returning(false),
     _abortOnUnload(false),
@@ -88,12 +89,25 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
     assert(stop_pc < code.size());
 
     // See comment in header
+    // TODO: stack limit dependent on function version or VM version ?
     if ( env.get_version() > 5 ) {
         _withStackLimit = 15;
     }
 
-    // SWF version 6 and higher pushes the activation object to the scope stack
-    if ( env.get_version() > 5 )
+    // Functions defined in SWF version 6 and higher pushes
+    // the activation object to the scope stack
+    // NOTE: if we query env.get_version() we get version of the calling
+    //       code, not the one we're about to call. This is because
+    //       it is ActionExec's call operator switching the VM version!
+    //
+    //       TESTCASE: winterbell from orisinal.
+    //       If we query VM version here, the movie results in:
+    //              set local var: i=[number:0]
+    //              push 'i' getvariable
+    //              get var: i=[undefined] 
+    // 
+    if ( code.getDefinitionVersion() > 5 )
+    //if ( env.get_version() > 5 )
     {
         // We assume that the swf_function () operator already initialized its environment
         // so that it's activation object is now in the top element of the CallFrame stack
@@ -113,6 +127,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
     _initialStackSize(0),
     _initialCallStackDepth(0),
     _originalTarget(0),
+    _origExecSWFVersion(0),
     _tryList(),
     _returning(false),
     _abortOnUnload(abortOnUnloaded),
@@ -126,6 +141,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
     //GNASH_REPORT_FUNCTION;
 
     /// See comment in header
+    // TODO: stack limit dependent on function version or VM version ?
     if ( env.get_version() > 5 ) {
         _withStackLimit = 15;
     }
@@ -134,9 +150,14 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
 void
 ActionExec::operator() ()
 {
+    VM& vm = env.getVM();
 
     // Do not execute if scripts are disabled
-    if ( env.getVM().getRoot().scriptsDisabled() ) return;
+    if ( vm.getRoot().scriptsDisabled() ) return;
+
+    _origExecSWFVersion = vm.getSWFVersion();
+    int codeVersion = code.getDefinitionVersion();
+    vm.setSWFVersion(codeVersion);
 
     static const SWF::SWFHandlers& ash = SWF::SWFHandlers::instance();
         
@@ -149,8 +170,8 @@ ActionExec::operator() ()
 #if DEBUG_STACK
     IF_VERBOSE_ACTION (
             log_action(_("at ActionExec operator() start, pc=%d"
-                   ", stop_pc=%d, code.size=%d."),
-                pc, stop_pc, code.size());
+                   ", stop_pc=%d, code.size=%d, func=%d, codeVersion=%d"),
+                pc, stop_pc, code.size(), _func ? _func : 0, codeVersion);
         std::stringstream ss;
         env.dump_stack(ss, STACK_DUMP_LIMIT);
         env.dump_global_registers(ss);
@@ -577,9 +598,13 @@ ActionExec::processExceptions(TryBlock& t)
 void
 ActionExec::cleanupAfterRun(bool /*expectInconsistencies*/) // TODO: drop argument...
 {
+    VM& vm = env.getVM();
+
     //assert(_originalTarget); // this execution context might have been started while target had a null target
     env.set_target(_originalTarget);
     _originalTarget = NULL;
+
+    vm.setSWFVersion(_origExecSWFVersion);
 
     IF_VERBOSE_MALFORMED_SWF
     (

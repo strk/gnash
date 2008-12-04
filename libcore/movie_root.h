@@ -433,20 +433,20 @@ public:
     ///
     /// @return the character having focus or NULL of none.
     ///
-    character* getFocus();
+    boost::intrusive_ptr<character> getFocus();
 
     /// Set the character having focus
     //
-    /// @param ch
-    /// The character having focus. NULL to kill focus.
-    ///
-    void setFocus(character* ch);
+    /// @param to
+    /// The character to receive focus. NULL to kill focus.
+    /// @return true if the focus operation succeeded, false if the passed
+    /// character cannot receive focus. setFocus(0) is a valid operation, so
+    /// returns true (always succeeds).
+    bool setFocus(boost::intrusive_ptr<character> to);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges,
             bool force);
     
-    void dump_character_tree() const;
-
     /// Return the topmost active entity under the pointer
     //
     /// This method returns cached info, with cache updated
@@ -795,6 +795,7 @@ public:
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair;
     void getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it);
+    void getCharacterTree(tree<StringPair>& tr, tree<StringPair>::iterator it);
 #endif
 
 	/// Get URL of the SWF movie used to initialize this VM
@@ -945,6 +946,11 @@ private:
     /// yet initialized.
     boost::intrusive_ptr<Stage_as> getStageObject();
 
+    /// Return the singleton Selection object
+    //
+    /// Can return 0 if it's been deleted.
+    as_object* getSelectionObject() const;
+
     typedef std::list<ExecutableCode*> ActionQueue;
 
     ActionQueue _actionQueue[apSIZE];
@@ -981,7 +987,9 @@ private:
     /// Objects listening for mouse events (down,up,move)
     MouseListeners m_mouse_listeners;
 
-    character*  m_active_input_text;
+    /// The character currently holding focus, or 0 if no focus.
+    boost::intrusive_ptr<character> _currentFocus;
+
     float m_time_remainder;
 
     /// @todo fold this into m_mouse_button_state?

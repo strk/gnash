@@ -221,8 +221,7 @@ public:
     ///     @todo document if and how intepretation of sampleSizei changes
     ///
     /// @param durationi
-    ///     Nominal audio stream duration.
-    ///     @todo check if still needed, if so document units!
+    ///     Nominal audio stream duration, in milliseconds.
     ///
     /// @param typei
     ///     Changes interpretation of the codeci parameter.

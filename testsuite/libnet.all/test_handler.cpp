@@ -26,7 +26,7 @@
 
 #include <sys/stat.h>
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 #endif
 
 #include <regex.h>

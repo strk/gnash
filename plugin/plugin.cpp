@@ -58,7 +58,7 @@
 #include <sys/param.h>
 #include "plugin.h" //Fixes Warning on redef of MIN/MAX
 #include <csignal>
-#include <unistd.h>
+#include "GnashSystemIOHeaders.h"
 #include <cstdio>
 #include <cstddef>
 #include <cstring>

@@ -178,25 +178,18 @@ GtkGui::init(int argc, char **argv[])
     _glue->prepDrawingArea(_drawingArea);
 #endif
 
-    // Plugin
-    if (_xid) {
-     	gtk_container_add(GTK_CONTAINER(_window), _drawingArea);
-    }
-    
-    // Stand-alone
-    else {
-
-        // A vertical box is used to allow display of the menu bar
-        _vbox = gtk_vbox_new(FALSE, 0);
-        gtk_widget_show(_vbox);
-        gtk_container_add(GTK_CONTAINER(_window), _vbox);
+    // A vertical box is used to allow display of the menu bar and paused widget
+    _vbox = gtk_vbox_new(FALSE, 0);
+    gtk_widget_show(_vbox);
+    gtk_container_add(GTK_CONTAINER(_window), _vbox);
 
 #if defined(USE_MENUS) && !defined(GUI_HILDON)
+    if ( ! _xid ) {
         createMenuBar();
+    }
 #endif
 
-        gtk_box_pack_start(GTK_BOX(_vbox), _drawingArea, TRUE, TRUE, 0);
-    }
+    gtk_box_pack_start(GTK_BOX(_vbox), _drawingArea, TRUE, TRUE, 0);
 
     setupEvents();
 
@@ -305,7 +298,7 @@ GtkGui::setFullscreen()
         
         // Reparent drawing area from GtkPlug to fullscreen window
         gtk_widget_realize(_overlay);      
-        gtk_widget_reparent(_drawingArea, _overlay);
+        gtk_widget_reparent(_vbox, _overlay);
         
         // Apply key event callbacks to the new window.
         setupWindowEvents();
@@ -339,7 +332,7 @@ GtkGui::unsetFullscreen()
     
     // Plugin
     if (_xid) {
-        gtk_widget_reparent (_drawingArea, _window);
+        gtk_widget_reparent (_vbox, _window);
         
         // Apply key event callbacks to the plugin instance.
         setupWindowEvents();
@@ -2541,41 +2534,20 @@ void
 GtkGui::stopHook()
 {
 
-    // FIXME: this can't work for the stand-alone player, because
-    // _drawingArea is
-    // packed into a vbox.
-    if (! _xid) return;
-
     // Assert they're either both initialised or both uninitialised
-    assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
-
-    if (_drawingArea) {
-        gtk_container_remove(GTK_CONTAINER(_window), _drawingArea);
-    }
-    
+    assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
     if (_resumeButton) {
-        gtk_container_add(GTK_CONTAINER(_window), _resumeButton);
+        gtk_container_add(GTK_CONTAINER(_vbox), _resumeButton);
     }
-
 }
 
 void
 GtkGui::playHook()
 {
-    // FIXME: this can't work for the stand-alone player, because _drawingArea is
-    // packed into a vbox.
-    if (! _xid) return;
-
-    // Assert they're either both initialised or both uninitialised
-    assert ((_resumeButton && _drawingArea) || !(_resumeButton || _drawingArea));
-
+    assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
     if (_resumeButton) {
-        gtk_container_remove(GTK_CONTAINER(_window), _resumeButton);
+        gtk_container_remove(GTK_CONTAINER(_vbox), _resumeButton);
     }
-    if (_drawingArea) {
-        gtk_container_add(GTK_CONTAINER(_window), _drawingArea);
-    }
-
 }
 
 } // end of namespace gnash

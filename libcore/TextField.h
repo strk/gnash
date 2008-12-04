@@ -148,14 +148,6 @@ public:
 	// See dox in character.h
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
-	/// See dox in character::unload (character.h)
-	//
-	/// NOTE: TextField (TextField) never has
-	///       an onUnload event, so we always return false
-	///	  here. (TODO: verify this)
-	///
-	bool unload();
-
 	/// Return true if the 'background' should be drawn
 	bool getDrawBackground() const;
 
@@ -466,20 +458,17 @@ private:
 
     void insertTab(SWF::TextRecord& rec, int& x, float scale);
 
-	/// Set focus 
-	void setFocus();
+	/// What happens when setFocus() is called on this TextField.
+    //
+    /// @return true if focus was set. A TextField can always receive focus,
+    /// so this always returns true.
+	virtual bool handleFocus();
 
 	/// Kill focus 
-	void killFocus();
+	virtual void killFocus();
 
 	/// Call this function when willing to invoke the onChanged event handler
 	void onChanged();
-
-	/// Call this function when willing to invoke the onSetFocus event handler
-	void onSetFocus();
-
-	/// Call this function when willing to invoke the onKillFocus event handler
-	void onKillFocus();
 
 	/// The actual text.
     //

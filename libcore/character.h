@@ -73,6 +73,23 @@ public:
   typedef tree<StringPair> InfoTree; // ifdef USE_MENU
 #endif
 
+  /// Set the current focus to this character.
+  //
+  /// @return false if the character cannot receive focus, true if it can
+  ///         (and does).
+  //
+  /// Button, Textfield and MovieClip can receive focus. In SWF6 and above,
+  /// MovieClip can only receive focus if the focusEnabled property
+  /// evaluates to true.
+  virtual bool handleFocus() { 
+      return false;
+  }
+
+  /// Some characters require actions on losing focus.
+  //
+  /// Default is a no-op. TextField implements this function.
+  virtual void killFocus() {}
+
 private:
 
   int m_id;
@@ -249,31 +266,9 @@ protected:
 
   bool _dynamicallyCreated;
 
-  
-
   /// @{ Common ActionScript getter-setters for characters
 
 public:  // TODO: make protected
-
-#if 0
-  static as_value onrollover_getset(const fn_call& fn);
-
-  static as_value onrollout_getset(const fn_call& fn);
-
-  static as_value onload_getset(const fn_call& fn);
-
-  static as_value onpress_getset(const fn_call& fn);
-
-  static as_value onrelease_getset(const fn_call& fn);
-
-  static as_value onreleaseoutside_getset(const fn_call& fn);
-
-  static as_value onmouseup_getset(const fn_call& fn);
-
-  static as_value onmousedown_getset(const fn_call& fn);
-
-  static as_value onmousemove_getset(const fn_call& fn);
-#endif
 
   /// Getter-setter for _x
   static as_value x_getset(const fn_call& fn);
@@ -641,14 +636,6 @@ public:
         return false;
     }
 
-    // For edit_text support (Flash 5).  More correct way
-    // is to do "text_character.text = whatever", via
-    // set_member().
-    virtual const char* get_text_name() const { return ""; }
-
-    // The Flash user can write moviclip="text", but it should not lead to crash
-    virtual void set_text_value(const char* /*new_text*/) { }
-
   /// \brief
   /// Get our concatenated SWFMatrix (all our ancestor transforms,
   /// times our SWFMatrix). 
@@ -694,28 +681,6 @@ public:
   /// is kept alive for the whole lifetime of this character.
   ///
   void add_event_handler(const event_id& id, const action_buffer& code);
-
-  /// \brief
-  /// Call this when a character get equipped
-  /// with a Key event handler
-  //
-  /// TODO: provide a function to *unset*
-  ///       the flag. This should happen
-  ///       when Key event handler is
-  ///       set to undefined or equivalent..
-  ///
-  virtual void has_key_event() {}
-
-  /// \brief
-  /// Call this when a character get equipped
-  /// with a mouse event handler (move,down,up)
-  //
-  /// TODO: provide a function to *unset*
-  ///       the flag. This should happen
-  ///       when all mouse event handlers are
-  ///       set to undefined or equivalent..
-  ///
-  virtual void has_mouse_event() {}
 
   /// Render this character
   virtual void  display() {}
@@ -923,11 +888,7 @@ public:
   }
 
   // Set whether this character should be rendered
-  void set_visible(bool visible)
-  {
-    if (m_visible!=visible) set_invalidated(__FILE__, __LINE__);  
-    m_visible = visible;      
-  }
+  void set_visible(bool visible);
 
   // Return true if this character should be rendered
   bool get_visible() const { return m_visible; }
@@ -1138,14 +1099,6 @@ public:
   ///
   virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force) = 0;
 
-  /// Prints a human readable character tree to LOG_DEBUG for debugging purposes.
-  /// 
-  /// This is mainly intended to debug invalidated bounds issues as it shows
-  /// the status of the relevant flags. 'prefix' is prepended to each line
-  /// to achieve the tree structure.
-  ///
-  virtual void dump_character_tree(const std::string prefix) const;
-  
   /// Called instead of display() when the character is not visible on stage.
   /// Used to clear the invalidated flags.
   virtual void omit_display() { clear_invalidated(); }; 
@@ -1160,7 +1113,7 @@ public:
   /// If you override the method remember to call saveOriginalTarget()
   /// as the first thing.
   ///
-  virtual void stagePlacementCallback()
+  virtual void stagePlacementCallback(as_object* = 0)
   {
     saveOriginalTarget();
   }

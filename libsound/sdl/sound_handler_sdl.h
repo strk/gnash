@@ -106,8 +106,9 @@ public:
                      unsigned int sample_count, int handle_id);
 
     // See dox in sound_handler.h
-    virtual void    play_sound(int sound_handle, int loopCount, int offset,
-                   long start_position, const SoundEnvelopes* envelopes);
+    virtual void playSound(int id, int loops, int secsOffset,
+                    long start, const SoundEnvelopes* env,
+                    bool allowMultiple);
 
     // See dox in sound_handler.h
     virtual void    stop_sound(int sound_handle);

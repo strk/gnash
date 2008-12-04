@@ -652,7 +652,7 @@ int curve_x_crossings(float x0, float y0, float x1, float y1,
 }
 
 bool  shape_character_def::point_test_local(boost::int32_t x,
-        boost::int32_t y, SWFMatrix& wm)
+        boost::int32_t y, const SWFMatrix& wm)
 {
     /*
     Principle:

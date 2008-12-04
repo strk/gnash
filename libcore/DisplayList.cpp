@@ -177,7 +177,7 @@ DisplayList::get_character_by_name_i(const std::string& name)
 }
 
 void
-DisplayList::place_character(character* ch, int depth)
+DisplayList::place_character(character* ch, int depth, as_object* initObj)
 {
   assert(!ch->isUnloaded());
   ch->set_invalidated();
@@ -219,7 +219,7 @@ DisplayList::place_character(character* ch, int depth)
   }
 
   // Give life to this instance
-  ch->stagePlacementCallback();
+  ch->stagePlacementCallback(initObj);
 
   testInvariant();
 }
@@ -865,25 +865,6 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
   
 }
 
-
-void 
-DisplayList::dump_character_tree(const std::string prefix) const
-{
-  // print self:
-  //character::dump_character_tree(prefix);
-
-  // recursion:
-  for( const_iterator it = _charsByDepth.begin(),
-      endIt = _charsByDepth.end();
-    it != endIt; ++it)
-  {
-    const DisplayItem& dobj = *it;
-    
-    dobj->dump_character_tree(prefix+" "); 
-  }
-  
-
-}
 
 /// This method is not in the header in the hope DisplayItemDepthLess
 /// will be inlined by compiler

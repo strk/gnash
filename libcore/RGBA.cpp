@@ -3,11 +3,6 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-// Some basic types for gnash.
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include <boost/thread.hpp>
 
 #include "RGBA.h"

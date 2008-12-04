@@ -21,9 +21,6 @@
 
 #include "IOChannel.h"
 #include <string>
-
-// TODO: port to new AS architecture
-//
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 
@@ -39,33 +36,51 @@ namespace gnash {
 //
 /// Provides interfaces to load data from an URL
 ///
-class NetConnection: public as_object {
+class NetConnection: public as_object
+{
 public:
+
+    enum StatusCode
+    {
+        CONNECT_FAILED,
+        CONNECT_SUCCESS,
+        CONNECT_CLOSED,
+        CONNECT_REJECTED,
+        CONNECT_APPSHUTDOWN,
+        CALL_FAILED,
+        CALL_BADVERSION
+    };
 
 	NetConnection();
 	~NetConnection();
 
-	/// Open a connection to stream FLV files.
-	//
-	/// If already connected an error is raised and false
-	/// is returned. Otherwise, a connection is attempted
-	/// using a separate thread that starts loading data
-	/// caching it.
-	///
-	/// @param url
-	///	An url portion to append to the base url (???)
-	///
-	/// @return true on success, false on error.
-	///
-	/// @note Older Flash movies can only take a NULL value as
-	/// the parameter, which therefor only connects to the localhost using
-	/// RTMP. Newer Flash movies have a parameter to connect which is a
-	/// URL string like rtmp://foobar.com/videos/bar.flv
-	///
-	std::string validateURL(const std::string& url);
+    /// Make the stored URI into a valid and checked URL.
+	std::string validateURL() const;
 
-	/// Register the "NetConnection" constructor to the given global object
-	static void registerConstructor(as_object& global);
+    void call(as_object* asCallback, const std::string& callNumber, 
+            const SimpleBuffer& buf);
+
+    /// Process the close() method.
+    void close();
+
+    /// Process the connect(uri) method.
+    void connect(const std::string& uri);
+
+    /// Carry out the connect(null) method.
+    void connect();
+
+    bool isConnected() const {
+        return _isConnected;
+    }
+
+    void setURI(const std::string& uri);
+
+    const std::string& getURI() const {
+        return _uri;
+    }
+
+    /// Notify the NetConnection onStatus handler of a change.
+    void notifyStatus(StatusCode code);
 
 protected:
 
@@ -73,45 +88,25 @@ protected:
 	void markReachableResources() const;
 
 private:
+
 	friend class AMFQueue;
 
-	std::auto_ptr<AMFQueue> _callQueue;
+    typedef std::pair<std::string, std::string> NetConnectionStatus;
+
+    void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
 
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);
 
+	std::auto_ptr<AMFQueue> _callQueue;
+
 	/// the url prefix optionally passed to connect()
-	std::string _prefixUrl;
+	std::string _uri;
 
-	/// the complete url of the file
-	std::string _completeUrl;
+    bool _isConnected;
 
-	/// Attach ActionScript instance properties
-	void attachProperties();
+    bool _inError;
 
-	/// Attach ActionScript class interface
-	static void attachNetConnectionInterface(as_object& o);
-
-	/// Get ActionScript class interface
-	static as_object* getNetConnectionInterface();
-
-	/// NetConnection.isConnected ActionScript Property
-	static as_value isConnected_getset(const fn_call& fn);
-
-	/// NetConnection.uri ActionScript Property
-	static as_value uri_getset(const fn_call& fn);
-
-	/// NetConnection.connect() ActionScript Method
-	static as_value connect_method(const fn_call& fn);
-
-	/// NetConnection.close() ActionScript Method
-	static as_value close_method(const fn_call& fn);
-
-	/// NetConnection.call() ActionScript Method
-	static as_value call_method(const fn_call& fn);
-
-	/// NetConnection.addHeader() ActionScript Method
-	static as_value addHeader_method(const fn_call& fn);
 
 };
 
@@ -119,5 +114,4 @@ void netconnection_class_init(as_object& global);
 
 } // end of gnash namespace
 
-// __NETCONNECTION_H__
 #endif

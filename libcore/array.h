@@ -316,7 +316,7 @@ public:
 		nelem.sort(avc);
 
 		if (std::adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
-			return as_value(0);
+			return as_value(0.0);
 
 		elements.resize(oldSize, false);
 		size_t idx=0;
@@ -363,7 +363,7 @@ public:
 		std::sort(ielem.begin(), ielem.end(), avc);
 
 		if (std::adjacent_find(ielem.begin(), ielem.end(), ave) != ielem.end() )
-			return as_value(0);
+			return as_value(0.0);
 
 		return get_indices(ielem);
 	}
