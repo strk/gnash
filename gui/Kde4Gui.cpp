@@ -203,10 +203,9 @@ Kde4Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
         _renderer->world_to_pixel(ranges.getRange(i)),
         _validbounds);
 
-        // it may happen that a particular range is out of the screen, which 
+        // It may happen that a particular range is out of the screen, which 
         // will lead to bounds==null. 
         if (bounds.isNull()) continue;
-
 
         assert(bounds.isFinite());
 
@@ -226,14 +225,14 @@ Kde4Gui::setTimeout(unsigned int timeout)
 void
 Kde4Gui::setInterval(unsigned int interval)
 {
-      _drawingWidget->startTimer(interval);
+    _drawingWidget->startTimer(interval);
 }
 
 
 void
 Kde4Gui::setCursor(gnash_cursor_type newcursor)
 {
-    switch(newcursor) {
+    switch (newcursor) {
         case CURSOR_HAND:
             _drawingWidget->setCursor(Qt::PointingHandCursor);
             break;
@@ -245,6 +244,21 @@ Kde4Gui::setCursor(gnash_cursor_type newcursor)
     }
 }
 
+void
+Kde4Gui::setFullscreen()
+{
+    _window->showFullScreen();
+    QMenuBar* mainMenu = _window->menuBar();
+    if (mainMenu) mainMenu->hide();
+}
+
+void
+Kde4Gui::unsetFullscreen()
+{
+    _window->showNormal();
+    QMenuBar* mainMenu = _window->menuBar();
+    if (mainMenu) mainMenu->show();
+}
 
 gnash::key::code
 Kde4Gui::qtToGnashKey(QKeyEvent *event)
@@ -259,7 +273,8 @@ Kde4Gui::qtToGnashKey(QKeyEvent *event)
     //
     // Gnash's keycodes are gnash::key::code. They are mainly in ascii order.
     // Standard ascii characters (32-127) have the same value. Extended ascii
-    // characters (160-254) are in ascii order but correspond to gnash::key::code
+    // characters (160-254) are in ascii order but correspond to
+    // gnash::key::code
     // 169-263. Non-character values must normally be mapped separately.
 
     const int key = event->key();
@@ -354,6 +369,10 @@ Kde4Gui::setupActions()
     _drawingWidget->connect(refreshAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(refresh()));
 
+    fullscreenAction = new QAction(_("Fullscreen"), _window.get());
+    fullscreenAction->setCheckable(true);
+    _drawingWidget->connect(fullscreenAction, SIGNAL(toggled(bool)),
+                           _drawingWidget, SLOT(fullscreen(bool)));
 }
 
 
@@ -378,6 +397,7 @@ Kde4Gui::setupMenus()
     // Set up the View menu
     viewMenu = new QMenu(_("View"), _window.get());
     viewMenu->addAction(refreshAction);
+    viewMenu->addAction(fullscreenAction);
 }
 
 
@@ -538,6 +558,17 @@ void
 DrawingWidget::refresh()
 {
     _gui.refreshView();
+}
+
+void
+DrawingWidget::fullscreen(bool isFull)
+{
+    if (isFull) {
+        _gui.setFullscreen();
+    }
+    else {
+        _gui.unsetFullscreen();
+    }
 }
 
 

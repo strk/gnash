@@ -52,7 +52,12 @@ class DrawingWidget : public QX11EmbedWidget
     Q_OBJECT
 
 public:
-    DrawingWidget(Kde4Gui& gui) : QX11EmbedWidget(),_gui(gui) {}
+    DrawingWidget(Kde4Gui& gui)
+        :
+        QX11EmbedWidget(),
+        _gui(gui)
+    {}
+
     ~DrawingWidget() {}
 
 public slots:
@@ -62,6 +67,7 @@ public slots:
     void stop();
     void restart();
     void refresh();
+    void fullscreen(bool isFull);
 
 protected:
     void paintEvent(QPaintEvent*);
@@ -95,6 +101,8 @@ public:
     virtual void setTimeout(unsigned int timeout);
     virtual void handleKeyEvent(QKeyEvent *event, bool down);
     virtual void setCursor(gnash_cursor_type newcursor);
+    virtual void setFullscreen();
+    virtual void unsetFullscreen();
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
     void quit();
@@ -161,6 +169,7 @@ private:
     // View Menu
     QMenu* viewMenu;
     QAction* refreshAction;
+    QAction* fullscreenAction;
 
 };
 

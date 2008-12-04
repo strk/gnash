@@ -1,340 +1,213 @@
 /****************************************************************************
-** KlashBrowserExtension meta object code from reading C++ file 'klash_part.h'
+** Meta object code from reading C++ file 'klash_part.h'
 **
-** Created: Sat Oct 21 10:23:39 2006
+** Created: Thu Dec 4 10:00:51 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#undef QT_NO_COMPAT
-#include "../../../../gnash/plugin/klash/klash_part.h"
-#include <qmetaobject.h>
-#include <qapplication.h>
-
-#include <private/qucomextra_p.h>
-#if !defined(Q_MOC_OUTPUT_REVISION) || (Q_MOC_OUTPUT_REVISION != 26)
-#error "This file was generated using the moc from 3.3.6. It"
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'klash_part.h' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 59
+#error "This file was generated using the moc from 4.4.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
 
-const char *KlashBrowserExtension::className() const
+QT_BEGIN_MOC_NAMESPACE
+static const uint qt_meta_data_KlashBrowserExtension[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_KlashBrowserExtension[] = {
+    "KlashBrowserExtension\0"
+};
+
+const QMetaObject KlashBrowserExtension::staticMetaObject = {
+    { &KParts::BrowserExtension::staticMetaObject, qt_meta_stringdata_KlashBrowserExtension,
+      qt_meta_data_KlashBrowserExtension, 0 }
+};
+
+const QMetaObject *KlashBrowserExtension::metaObject() const
 {
-    return "KlashBrowserExtension";
+    return &staticMetaObject;
 }
 
-QMetaObject *KlashBrowserExtension::metaObj = 0;
-static QMetaObjectCleanUp cleanUp_KlashBrowserExtension( "KlashBrowserExtension", &KlashBrowserExtension::staticMetaObject );
-
-#ifndef QT_NO_TRANSLATION
-QString KlashBrowserExtension::tr( const char *s, const char *c )
+void *KlashBrowserExtension::qt_metacast(const char *_clname)
 {
-    if ( qApp )
-	return qApp->translate( "KlashBrowserExtension", s, c, QApplication::DefaultCodec );
-    else
-	return QString::fromLatin1( s );
-}
-#ifndef QT_NO_TRANSLATION_UTF8
-QString KlashBrowserExtension::trUtf8( const char *s, const char *c )
-{
-    if ( qApp )
-	return qApp->translate( "KlashBrowserExtension", s, c, QApplication::UnicodeUTF8 );
-    else
-	return QString::fromUtf8( s );
-}
-#endif // QT_NO_TRANSLATION_UTF8
-
-#endif // QT_NO_TRANSLATION
-
-QMetaObject* KlashBrowserExtension::staticMetaObject()
-{
-    if ( metaObj )
-	return metaObj;
-    QMetaObject* parentObject = KParts::BrowserExtension::staticMetaObject();
-    metaObj = QMetaObject::new_metaobject(
-	"KlashBrowserExtension", parentObject,
-	0, 0,
-	0, 0,
-#ifndef QT_NO_PROPERTIES
-	0, 0,
-	0, 0,
-#endif // QT_NO_PROPERTIES
-	0, 0 );
-    cleanUp_KlashBrowserExtension.setMetaObject( metaObj );
-    return metaObj;
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_KlashBrowserExtension))
+        return static_cast<void*>(const_cast< KlashBrowserExtension*>(this));
+    typedef KParts::BrowserExtension QMocSuperClass;
+    return QMocSuperClass::qt_metacast(_clname);
 }
 
-void* KlashBrowserExtension::qt_cast( const char* clname )
+int KlashBrowserExtension::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    if ( !qstrcmp( clname, "KlashBrowserExtension" ) )
-	return this;
-    return BrowserExtension::qt_cast( clname );
+    typedef KParts::BrowserExtension QMocSuperClass;
+    _id = QMocSuperClass::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    return _id;
+}
+static const uint qt_meta_data_KlashLiveConnectExtension[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       4,   10, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+ // signals: signature, parameters, type, tag, flags
+      30,   27,   26,   26, 0x05,
+
+ // slots: signature, parameters, type, tag, flags
+      97,   93,   26,   26, 0x0a,
+     114,   26,   26,   26, 0x0a,
+     124,   26,   26,   26, 0x0a,
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_KlashLiveConnectExtension[] = {
+    "KlashLiveConnectExtension\0\0,,\0"
+    "partEvent(ulong,QString,KParts::LiveConnectExtension::ArgList)\0"
+    "w,h\0setSize(int,int)\0started()\0"
+    "finished()\0"
+};
+
+const QMetaObject KlashLiveConnectExtension::staticMetaObject = {
+    { &KParts::LiveConnectExtension::staticMetaObject, qt_meta_stringdata_KlashLiveConnectExtension,
+      qt_meta_data_KlashLiveConnectExtension, 0 }
+};
+
+const QMetaObject *KlashLiveConnectExtension::metaObject() const
+{
+    return &staticMetaObject;
 }
 
-bool KlashBrowserExtension::qt_invoke( int _id, QUObject* _o )
+void *KlashLiveConnectExtension::qt_metacast(const char *_clname)
 {
-    return BrowserExtension::qt_invoke(_id,_o);
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_KlashLiveConnectExtension))
+        return static_cast<void*>(const_cast< KlashLiveConnectExtension*>(this));
+    typedef KParts::LiveConnectExtension QMocSuperClass;
+    return QMocSuperClass::qt_metacast(_clname);
 }
 
-bool KlashBrowserExtension::qt_emit( int _id, QUObject* _o )
+int KlashLiveConnectExtension::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    return BrowserExtension::qt_emit(_id,_o);
-}
-#ifndef QT_NO_PROPERTIES
-
-bool KlashBrowserExtension::qt_property( int id, int f, QVariant* v)
-{
-    return BrowserExtension::qt_property( id, f, v);
-}
-
-bool KlashBrowserExtension::qt_static_property( QObject* , int , int , QVariant* ){ return FALSE; }
-#endif // QT_NO_PROPERTIES
-
-
-const char *KlashLiveConnectExtension::className() const
-{
-    return "KlashLiveConnectExtension";
-}
-
-QMetaObject *KlashLiveConnectExtension::metaObj = 0;
-static QMetaObjectCleanUp cleanUp_KlashLiveConnectExtension( "KlashLiveConnectExtension", &KlashLiveConnectExtension::staticMetaObject );
-
-#ifndef QT_NO_TRANSLATION
-QString KlashLiveConnectExtension::tr( const char *s, const char *c )
-{
-    if ( qApp )
-	return qApp->translate( "KlashLiveConnectExtension", s, c, QApplication::DefaultCodec );
-    else
-	return QString::fromLatin1( s );
-}
-#ifndef QT_NO_TRANSLATION_UTF8
-QString KlashLiveConnectExtension::trUtf8( const char *s, const char *c )
-{
-    if ( qApp )
-	return qApp->translate( "KlashLiveConnectExtension", s, c, QApplication::UnicodeUTF8 );
-    else
-	return QString::fromUtf8( s );
-}
-#endif // QT_NO_TRANSLATION_UTF8
-
-#endif // QT_NO_TRANSLATION
-
-QMetaObject* KlashLiveConnectExtension::staticMetaObject()
-{
-    if ( metaObj )
-	return metaObj;
-    QMetaObject* parentObject = KParts::LiveConnectExtension::staticMetaObject();
-    static const QUParameter param_slot_0[] = {
-	{ "w", &static_QUType_int, 0, QUParameter::In },
-	{ "h", &static_QUType_int, 0, QUParameter::In }
-    };
-    static const QUMethod slot_0 = {"setSize", 2, param_slot_0 };
-    static const QUMethod slot_1 = {"started", 0, 0 };
-    static const QUMethod slot_2 = {"finished", 0, 0 };
-    static const QMetaData slot_tbl[] = {
-	{ "setSize(int,int)", &slot_0, QMetaData::Public },
-	{ "started()", &slot_1, QMetaData::Public },
-	{ "finished()", &slot_2, QMetaData::Public }
-    };
-    static const QUParameter param_signal_0[] = {
-	{ 0, &static_QUType_ptr, "unsigned long", QUParameter::In },
-	{ 0, &static_QUType_QString, 0, QUParameter::In },
-	{ 0, &static_QUType_ptr, "KParts::LiveConnectExtension::ArgList", QUParameter::In }
-    };
-    static const QUMethod signal_0 = {"partEvent", 3, param_signal_0 };
-    static const QMetaData signal_tbl[] = {
-	{ "partEvent(const unsigned long,const QString&,const KParts::LiveConnectExtension::ArgList&)", &signal_0, QMetaData::Public }
-    };
-    metaObj = QMetaObject::new_metaobject(
-	"KlashLiveConnectExtension", parentObject,
-	slot_tbl, 3,
-	signal_tbl, 1,
-#ifndef QT_NO_PROPERTIES
-	0, 0,
-	0, 0,
-#endif // QT_NO_PROPERTIES
-	0, 0 );
-    cleanUp_KlashLiveConnectExtension.setMetaObject( metaObj );
-    return metaObj;
-}
-
-void* KlashLiveConnectExtension::qt_cast( const char* clname )
-{
-    if ( !qstrcmp( clname, "KlashLiveConnectExtension" ) )
-	return this;
-    return LiveConnectExtension::qt_cast( clname );
-}
-
-#include <qobjectdefs.h>
-#include <qsignalslotimp.h>
-
-// SIGNAL partEvent
-void KlashLiveConnectExtension::partEvent( const unsigned long t0, const QString& t1, const KParts::LiveConnectExtension::ArgList& t2 )
-{
-    if ( signalsBlocked() )
-	return;
-    QConnectionList *clist = receivers( staticMetaObject()->signalOffset() + 0 );
-    if ( !clist )
-	return;
-    QUObject o[4];
-    static_QUType_ptr.set(o+1,&t0);
-    static_QUType_QString.set(o+2,t1);
-    static_QUType_ptr.set(o+3,&t2);
-    activate_signal( clist, o );
-}
-
-bool KlashLiveConnectExtension::qt_invoke( int _id, QUObject* _o )
-{
-    switch ( _id - staticMetaObject()->slotOffset() ) {
-    case 0: setSize((int)static_QUType_int.get(_o+1),(int)static_QUType_int.get(_o+2)); break;
-    case 1: started(); break;
-    case 2: finished(); break;
-    default:
-	return LiveConnectExtension::qt_invoke( _id, _o );
+    typedef KParts::LiveConnectExtension QMocSuperClass;
+    _id = QMocSuperClass::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: partEvent((*reinterpret_cast< const ulong(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const KParts::LiveConnectExtension::ArgList(*)>(_a[3]))); break;
+        case 1: setSize((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 2: started(); break;
+        case 3: finished(); break;
+        }
+        _id -= 4;
     }
-    return TRUE;
+    return _id;
 }
 
-bool KlashLiveConnectExtension::qt_emit( int _id, QUObject* _o )
+// SIGNAL 0
+void KlashLiveConnectExtension::partEvent(const unsigned long _t1, const QString & _t2, const KParts::LiveConnectExtension::ArgList & _t3)
 {
-    switch ( _id - staticMetaObject()->signalOffset() ) {
-    case 0: partEvent((const unsigned long)(*((const unsigned long*)static_QUType_ptr.get(_o+1))),(const QString&)static_QUType_QString.get(_o+2),(const KParts::LiveConnectExtension::ArgList&)*((const KParts::LiveConnectExtension::ArgList*)static_QUType_ptr.get(_o+3))); break;
-    default:
-	return LiveConnectExtension::qt_emit(_id,_o);
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+static const uint qt_meta_data_KlashPart[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+      10,   10, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+ // slots: signature, parameters, type, tag, flags
+      20,   16,   11,   10, 0x0a,
+      34,   10,   11,   10, 0x0a,
+      45,   10,   10,   10, 0x0a,
+      52,   10,   10,   10, 0x0a,
+      59,   10,   10,   10, 0x0a,
+      71,   10,   67,   10, 0x0a,
+      79,   10,   67,   10, 0x0a,
+      88,   10,   10,   10, 0x09,
+     105,   10,   10,   10, 0x09,
+     124,  122,   10,   10, 0x09,
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_KlashPart[] = {
+    "KlashPart\0\0bool\0url\0openUrl(KUrl)\0"
+    "closeUrl()\0play()\0stop()\0pause()\0int\0"
+    "width()\0height()\0playingStarted()\0"
+    "playingStopped()\0,\0"
+    "processStopped(int,QProcess::ExitStatus)\0"
+};
+
+const QMetaObject KlashPart::staticMetaObject = {
+    { &KParts::ReadOnlyPart::staticMetaObject, qt_meta_stringdata_KlashPart,
+      qt_meta_data_KlashPart, 0 }
+};
+
+const QMetaObject *KlashPart::metaObject() const
+{
+    return &staticMetaObject;
+}
+
+void *KlashPart::qt_metacast(const char *_clname)
+{
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_KlashPart))
+        return static_cast<void*>(const_cast< KlashPart*>(this));
+    typedef KParts::ReadOnlyPart QMocSuperClass;
+    return QMocSuperClass::qt_metacast(_clname);
+}
+
+int KlashPart::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    typedef KParts::ReadOnlyPart QMocSuperClass;
+    _id = QMocSuperClass::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: { bool _r = openUrl((*reinterpret_cast< const KUrl(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 1: { bool _r = closeUrl();
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 2: play(); break;
+        case 3: stop(); break;
+        case 4: pause(); break;
+        case 5: { int _r = width();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
+        case 6: { int _r = height();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
+        case 7: playingStarted(); break;
+        case 8: playingStopped(); break;
+        case 9: processStopped((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QProcess::ExitStatus(*)>(_a[2]))); break;
+        }
+        _id -= 10;
     }
-    return TRUE;
+    return _id;
 }
-#ifndef QT_NO_PROPERTIES
-
-bool KlashLiveConnectExtension::qt_property( int id, int f, QVariant* v)
-{
-    return LiveConnectExtension::qt_property( id, f, v);
-}
-
-bool KlashLiveConnectExtension::qt_static_property( QObject* , int , int , QVariant* ){ return FALSE; }
-#endif // QT_NO_PROPERTIES
-
-
-const char *KlashPart::className() const
-{
-    return "KlashPart";
-}
-
-QMetaObject *KlashPart::metaObj = 0;
-static QMetaObjectCleanUp cleanUp_KlashPart( "KlashPart", &KlashPart::staticMetaObject );
-
-#ifndef QT_NO_TRANSLATION
-QString KlashPart::tr( const char *s, const char *c )
-{
-    if ( qApp )
-	return qApp->translate( "KlashPart", s, c, QApplication::DefaultCodec );
-    else
-	return QString::fromLatin1( s );
-}
-#ifndef QT_NO_TRANSLATION_UTF8
-QString KlashPart::trUtf8( const char *s, const char *c )
-{
-    if ( qApp )
-	return qApp->translate( "KlashPart", s, c, QApplication::UnicodeUTF8 );
-    else
-	return QString::fromUtf8( s );
-}
-#endif // QT_NO_TRANSLATION_UTF8
-
-#endif // QT_NO_TRANSLATION
-
-QMetaObject* KlashPart::staticMetaObject()
-{
-    if ( metaObj )
-	return metaObj;
-    QMetaObject* parentObject = KParts::ReadOnlyPart::staticMetaObject();
-    static const QUParameter param_slot_0[] = {
-	{ 0, &static_QUType_bool, 0, QUParameter::Out },
-	{ "url", &static_QUType_ptr, "KURL", QUParameter::In }
-    };
-    static const QUMethod slot_0 = {"openURL", 2, param_slot_0 };
-    static const QUParameter param_slot_1[] = {
-	{ 0, &static_QUType_bool, 0, QUParameter::Out }
-    };
-    static const QUMethod slot_1 = {"closeURL", 1, param_slot_1 };
-    static const QUMethod slot_2 = {"play", 0, 0 };
-    static const QUMethod slot_3 = {"stop", 0, 0 };
-    static const QUMethod slot_4 = {"pause", 0, 0 };
-    static const QUParameter param_slot_5[] = {
-	{ 0, &static_QUType_int, 0, QUParameter::Out }
-    };
-    static const QUMethod slot_5 = {"width", 1, param_slot_5 };
-    static const QUParameter param_slot_6[] = {
-	{ 0, &static_QUType_int, 0, QUParameter::Out }
-    };
-    static const QUMethod slot_6 = {"height", 1, param_slot_6 };
-    static const QUMethod slot_7 = {"playingStarted", 0, 0 };
-    static const QUMethod slot_8 = {"playingStopped", 0, 0 };
-    static const QUParameter param_slot_9[] = {
-	{ 0, &static_QUType_ptr, "KProcess", QUParameter::In }
-    };
-    static const QUMethod slot_9 = {"processStopped", 1, param_slot_9 };
-    static const QMetaData slot_tbl[] = {
-	{ "openURL(const KURL&)", &slot_0, QMetaData::Public },
-	{ "closeURL()", &slot_1, QMetaData::Public },
-	{ "play()", &slot_2, QMetaData::Public },
-	{ "stop()", &slot_3, QMetaData::Public },
-	{ "pause()", &slot_4, QMetaData::Public },
-	{ "width()", &slot_5, QMetaData::Public },
-	{ "height()", &slot_6, QMetaData::Public },
-	{ "playingStarted()", &slot_7, QMetaData::Protected },
-	{ "playingStopped()", &slot_8, QMetaData::Protected },
-	{ "processStopped(KProcess*)", &slot_9, QMetaData::Protected }
-    };
-    metaObj = QMetaObject::new_metaobject(
-	"KlashPart", parentObject,
-	slot_tbl, 10,
-	0, 0,
-#ifndef QT_NO_PROPERTIES
-	0, 0,
-	0, 0,
-#endif // QT_NO_PROPERTIES
-	0, 0 );
-    cleanUp_KlashPart.setMetaObject( metaObj );
-    return metaObj;
-}
-
-void* KlashPart::qt_cast( const char* clname )
-{
-    if ( !qstrcmp( clname, "KlashPart" ) )
-	return this;
-    return ReadOnlyPart::qt_cast( clname );
-}
-
-bool KlashPart::qt_invoke( int _id, QUObject* _o )
-{
-    switch ( _id - staticMetaObject()->slotOffset() ) {
-    case 0: static_QUType_bool.set(_o,openURL((const KURL&)*((const KURL*)static_QUType_ptr.get(_o+1)))); break;
-    case 1: static_QUType_bool.set(_o,closeURL()); break;
-    case 2: play(); break;
-    case 3: stop(); break;
-    case 4: pause(); break;
-    case 5: static_QUType_int.set(_o,width()); break;
-    case 6: static_QUType_int.set(_o,height()); break;
-    case 7: playingStarted(); break;
-    case 8: playingStopped(); break;
-    case 9: processStopped((KProcess*)static_QUType_ptr.get(_o+1)); break;
-    default:
-	return ReadOnlyPart::qt_invoke( _id, _o );
-    }
-    return TRUE;
-}
-
-bool KlashPart::qt_emit( int _id, QUObject* _o )
-{
-    return ReadOnlyPart::qt_emit(_id,_o);
-}
-#ifndef QT_NO_PROPERTIES
-
-bool KlashPart::qt_property( int id, int f, QVariant* v)
-{
-    return ReadOnlyPart::qt_property( id, f, v);
-}
-
-bool KlashPart::qt_static_property( QObject* , int , int , QVariant* ){ return FALSE; }
-#endif // QT_NO_PROPERTIES
+QT_END_MOC_NAMESPACE
