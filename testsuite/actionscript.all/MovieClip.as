@@ -123,7 +123,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(920); // SWF8+
+	check_totals(935); // SWF8+
 #endif
 
 	play();
@@ -2171,6 +2171,40 @@ _root.focusEnabled = false;
 check_equals(_root.focusEnabled, false);
 _root.focusEnabled = "hello";
 check_equals(_root.focusEnabled, "hello");
+
+#if OUTPUT_VERSION > 7
+check_equals(_root.blendMode, "normal");
+check_equals(typeof(_root.blendMode), "string");
+_root.blendMode = 2;
+check_equals(_root.blendMode, "layer");
+_root.blendMode = "multiply";
+check_equals(_root.blendMode, "multiply");
+_root.blendMode = 0;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = 14;
+check_equals(_root.blendMode, "hardlight");
+_root.blendMode = 15;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = "scre";
+check_equals(_root.blendMode, undefined);
+_root.blendMode = "daRkEn";
+check_equals(_root.blendMode, undefined);
+_root.blendMode = "darken";
+check_equals(_root.blendMode, "darken");
+_root.blendMode = "Some rubbish";
+check_equals(_root.blendMode, "darken");
+_root.blendMode = -1;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = 5.5;
+check_equals(_root.blendMode, "lighten");
+_root.blendMode = "NORMAL";
+check_equals(_root.blendMode, "lighten");
+
+// Set back to normal so we can see the results...
+_root.blendMode = "normal";
+check_equals(_root.blendMode, "normal");
+
+#endif
 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 
