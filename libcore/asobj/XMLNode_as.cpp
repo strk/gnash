@@ -352,6 +352,23 @@ XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
 
 }
 
+
+bool
+XMLNode_as::extractPrefix(std::string& prefix)
+{
+    prefix.clear();
+    if (_name.empty()) return false;
+
+    std::string::size_type pos = _name.find(':');
+    if (pos == std::string::npos || pos == _name.size() - 1) {
+        return false;
+    }
+
+    prefix = _name.substr(0, pos);
+    return true;
+}
+
+
 void
 XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode) 
 {
@@ -668,12 +685,12 @@ xmlnode_getPrefixForNamespace(const fn_call& fn)
     return as_value(prefix);
 }
 
-
-/// Returns a namespaceURI set with the xmlns attribute, searching upwards
+/// If the node has a prefix, return the matching namespace. Otherwise, 
+/// returns a namespaceURI set with the xmlns attribute, searching upwards
 /// through parent nodes if necessary.
 //
-/// This property can only be set during XML parsing and cannot be changed
-/// or set using attributes.
+/// This standard namespace can only  be set during XML parsing and cannot
+/// be changed or set using attributes.
 //
 /// Conversely, the similar getNamespaceForPrefix("") can be set and changed
 /// through attributes.
@@ -684,10 +701,19 @@ xmlnode_namespaceURI(const fn_call& fn)
 
     // Read-only property
     
-    if (ptr->nodeName().empty()) {
+    const std::string& name = ptr->nodeName();
+
+    if (name.empty()) {
         as_value null;
         null.set_null();
         return null;
+    }
+
+    std::string prefix;
+    if (ptr->extractPrefix(prefix)) {
+        std::string ns;
+        ptr->getNamespaceForPrefix(prefix, ns);
+        return as_value(ns);
     }
 
     // Search recursively for a namespace. Return an empty string
@@ -718,15 +744,9 @@ xmlnode_prefix(const fn_call& fn)
         return null;
     }
     
-    const std::string& nodeName = ptr->nodeName();
-    if (nodeName.empty()) return as_value("");
-
-    std::string::size_type pos = nodeName.find(':');
-    if (pos == std::string::npos || pos == nodeName.size() - 1) {
-        return as_value("");
-    }
-
-    return as_value(nodeName.substr(0, pos));
+    std::string prefix;
+    if (!ptr->extractPrefix(prefix)) return as_value("");
+    return as_value(prefix);
 }
 
 

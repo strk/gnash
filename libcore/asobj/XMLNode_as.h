@@ -106,6 +106,8 @@ public:
     ///
     void nodeNameSet(const std::string& name) { _name = name; }
 
+    bool extractPrefix(std::string& prefix);
+
     /// Set value of this node, overriding any previous value
     void nodeValueSet(const std::string& value) { _value = value; }
 
