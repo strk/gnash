@@ -763,11 +763,21 @@ NetStream_as::play(const std::string& c_url)
     // starts it again, possibly with a new URL.
 
     // Does it have an associated NetConnection ?
-    if ( ! _netCon )
+    if ( ! _netCon)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("No NetConnection associated with this NetStream, "
+            log_aserror(_("No NetConnection associated with this NetStream, "
                 "won't play"));
+        );
+        return;
+    }
+
+    if (!_netCon->isConnected()) {
+
+        // This can happen when NetConnection is called with anything but
+        // null.
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("NetConnection is not connected. Won't play."));
         );
         return;
     }
@@ -788,10 +798,12 @@ NetStream_as::play(const std::string& c_url)
 
     log_security( _("Connecting to movie: %s"), url );
 
-    const movie_root& mr = _vm.getRoot();
+    const RunInfo& ri = _vm.getRoot().runInfo();
 
-    StreamProvider& streamProvider = mr.runInfo().streamProvider();
-    _inputStream = streamProvider.getStream(url);
+    StreamProvider& streamProvider = ri.streamProvider();
+
+    // Construct URL with base URL.
+    _inputStream = streamProvider.getStream(URL(url, ri.baseURL()));
 
     if ( ! _inputStream.get() )
     {
