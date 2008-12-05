@@ -123,7 +123,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(935); // SWF8+
+	check_totals(936); // SWF8+
 #endif
 
 	play();
@@ -2199,6 +2199,8 @@ _root.blendMode = 5.5;
 check_equals(_root.blendMode, "lighten");
 _root.blendMode = "NORMAL";
 check_equals(_root.blendMode, "lighten");
+_root.blendMode = undefined;
+check_equals(_root.blendMode, "normal");
 
 // Set back to normal so we can see the results...
 _root.blendMode = "normal";

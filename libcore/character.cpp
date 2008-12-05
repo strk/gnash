@@ -564,8 +564,15 @@ character::blendMode(const fn_call& fn)
     // Setter
     //
     
-    // Numeric argument.
     const as_value& bm = fn.arg(0);
+
+    // Undefined argument sets blend mode to normal.
+    if (bm.is_undefined()) {
+        ch->setBlendMode(BLENDMODE_NORMAL);
+        return as_value();
+    }
+
+    // Numeric argument.
     if (bm.is_number()) {
         double mode = bm.to_number();
 
