@@ -26,7 +26,6 @@
 
 // Forward declarations
 namespace gnash {
-	//class NetStream_as;
 	class AMFQueue;
 }
 
@@ -36,7 +35,7 @@ namespace gnash {
 //
 /// Provides interfaces to load data from an URL
 ///
-class NetConnection: public as_object
+class NetConnection_as: public as_object
 {
 public:
 
@@ -51,8 +50,8 @@ public:
         CALL_BADVERSION
     };
 
-	NetConnection();
-	~NetConnection();
+	NetConnection_as();
+	~NetConnection_as();
 
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;

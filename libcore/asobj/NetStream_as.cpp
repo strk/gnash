@@ -32,7 +32,7 @@
 #include "builtin_function.h"
 #include "timers.h" // for registering the advance timer
 #include "GnashException.h"
-#include "NetConnection.h"
+#include "NetConnection_as.h"
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
 #include "namedStrings.h"
@@ -54,33 +54,40 @@
 //#define GNASH_DEBUG_DECODING
 
 namespace gnash {
- 
-static as_value netstream_new(const fn_call& fn);
-static as_value netstream_close(const fn_call& fn);
-static as_value netstream_pause(const fn_call& fn);
-static as_value netstream_play(const fn_call& fn);
-static as_value netstream_seek(const fn_call& fn);
-static as_value netstream_setbuffertime(const fn_call& fn);
-static as_value netstream_time(const fn_call& fn);
 
-static as_value netstream_attachAudio(const fn_call& fn);
-static as_value netstream_attachVideo(const fn_call& fn);
-static as_value netstream_publish(const fn_call& fn);
-static as_value netstream_receiveAudio(const fn_call& fn);
-static as_value netstream_receiveVideo(const fn_call& fn);
-static as_value netstream_send(const fn_call& fn);
+namespace {
 
-static as_object* getNetStreamInterface();
+    as_value netstream_new(const fn_call& fn);
+    as_value netstream_close(const fn_call& fn);
+    as_value netstream_pause(const fn_call& fn);
+    as_value netstream_play(const fn_call& fn);
+    as_value netstream_seek(const fn_call& fn);
+    as_value netstream_setbuffertime(const fn_call& fn);
+    as_value netstream_time(const fn_call& fn);
 
+    as_value netstream_attachAudio(const fn_call& fn);
+    as_value netstream_attachVideo(const fn_call& fn);
+    as_value netstream_publish(const fn_call& fn);
+    as_value netstream_receiveAudio(const fn_call& fn);
+    as_value netstream_receiveVideo(const fn_call& fn);
+    as_value netstream_send(const fn_call& fn);
+
+    as_object* getNetStreamInterface();
+    void attachNetStreamInterface(as_object& o);
+}
+
+/// Contruct a NetStream object.
+//
+/// The default size needed to begin playback (m_bufferTime) of media
+/// is 100 milliseconds.
 NetStream_as::NetStream_as()
     :
     as_object(getNetStreamInterface()),
-    _netCon(NULL),
-    m_bufferTime(100), // The default size needed to begin playback of media is 100 miliseconds
+    _netCon(0),
+    m_bufferTime(100), 
     m_newFrameReady(false),
     m_imageframe(),
     m_parser(NULL),
-    m_isFLV(false),
     inputPos(0),
     _invalidatedVideoCharacter(0),
     _decoding_state(DEC_NONE),
@@ -104,355 +111,6 @@ NetStream_as::NetStream_as()
     _lastStatus(invalidStatus),
     _advanceTimer(0)
 {
-}
-
-static as_value
-netstream_new(const fn_call& fn)
-{
-
-    boost::intrusive_ptr<NetStream_as> netstream_obj;
-       
-    netstream_obj = new NetStream_as();
-
-    if (fn.nargs > 0)
-    {
-        boost::intrusive_ptr<NetConnection> ns = boost::dynamic_pointer_cast<NetConnection>(fn.arg(0).to_object());
-        if ( ns )
-        {
-            netstream_obj->setNetCon(ns);
-        }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("First argument "
-                    "to NetStream constructor "
-                    "doesn't cast to a NetConnection (%s)"),
-                    fn.arg(0));
-            );
-        }
-    }
-    return as_value(netstream_obj.get());
-
-}
-
-static as_value netstream_close(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-    ns->close();
-    return as_value();
-}
-
-static as_value
-netstream_pause(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = 
-        ensureType<NetStream_as>(fn.this_ptr);
-    
-    // mode: -1 ==> toogle, 0==> pause, 1==> play
-    NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
-    if (fn.nargs > 0)
-    {
-        mode = fn.arg(0).to_bool() ? NetStream_as::pauseModePause :
-                                     NetStream_as::pauseModeUnPause;
-    }
-    ns->pause(mode);    // toggle mode
-    return as_value();
-}
-
-static as_value
-netstream_play(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    if (fn.nargs < 1)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("NetStream_as play needs args"));
-        );
-        return as_value();
-    }
-
-    if ( ! ns->isConnected() )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("NetStream.play(%s): stream is not connected"), fn.arg(0));
-        );
-        return as_value();
-    }
-
-    ns->play(fn.arg(0).to_string());
-
-    return as_value();
-}
-
-static as_value netstream_seek(const fn_call& fn) {
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    boost::uint32_t time = 0;
-    if (fn.nargs > 0)
-    {
-        time = static_cast<boost::uint32_t>(fn.arg(0).to_number());
-    }
-    ns->seek(time);
-
-    return as_value();
-}
-
-static as_value netstream_setbuffertime(const fn_call& fn)
-{
-
-    //GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    // TODO: should we do anything if given no args ?
-    //       are we sure setting bufferTime to 0 is what we have to do ?
-    double time = 0;
-    if (fn.nargs > 0)
-    {
-        time = fn.arg(0).to_number();
-    }
-
-    // TODO: don't allow a limit < 100 
-
-    ns->setBufferTime(boost::uint32_t(time*1000));
-
-    return as_value();
-}
-
-static as_value netstream_attachAudio(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-    UNUSED(ns);
-
-    bool warned = false;
-    if ( ! warned ) {
-        log_unimpl("NetStream.attachAudio");
-        warned = true;
-    }
-
-    return as_value();
-}
-
-static as_value netstream_attachVideo(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-    UNUSED(ns);
-
-    bool warned = false;
-    if ( ! warned ) {
-        log_unimpl("NetStream.attachVideo");
-        warned = true;
-    }
-
-    return as_value();
-}
-
-static as_value netstream_publish(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-    UNUSED(ns);
-
-    bool warned = false;
-    if ( ! warned ) {
-        log_unimpl("NetStream.publish");
-        warned = true;
-    }
-
-    return as_value();
-}
-
-static as_value netstream_receiveAudio(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-    UNUSED(ns);
-
-    bool warned = false;
-    if ( ! warned ) {
-        log_unimpl("NetStream.receiveAudio");
-        warned = true;
-    }
-
-    return as_value();
-}
-
-static as_value netstream_receiveVideo(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-    UNUSED(ns);
-
-    bool warned = false;
-    if ( ! warned ) {
-        log_unimpl("NetStream.receiveVideo");
-        warned = true;
-    }
-
-    return as_value();
-}
-
-static as_value netstream_send(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-    UNUSED(ns);
-
-    bool warned = false;
-    if ( ! warned ) {
-        log_unimpl("NetStream.send");
-        warned = true;
-    }
-
-    return as_value();
-}
-
-// Both a getter and a (do-nothing) setter for time
-static as_value
-netstream_time(const fn_call& fn)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    assert(fn.nargs == 0); // we're a getter
-    return as_value(double(ns->time()/1000.0));
-}
-
-// Both a getter and a (do-nothing) setter for bytesLoaded
-static as_value
-netstream_bytesloaded(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    if ( ! ns->isConnected() )
-    {
-        return as_value();
-    }
-    long ret = ns->bytesLoaded();
-    return as_value(ret);
-}
-
-// Both a getter and a (do-nothing) setter for bytesTotal
-static as_value
-netstream_bytestotal(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    if ( ! ns->isConnected() )
-    {
-        return as_value();
-    }
-    long ret = ns->bytesTotal();
-    return as_value(ret);
-}
-
-// Both a getter and a (do-nothing) setter for currentFPS
-static as_value
-netstream_currentFPS(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    if ( ! ns->isConnected() )
-    {
-        return as_value();
-    }
-
-    double fps = ns->getCurrentFPS();
-
-#if 0
-    if (fps <= 0) {
-        return as_value(); // undef
-    }
-#endif
-
-    return as_value(fps);
-}
-
-// read-only property bufferLength: amount of time buffered before playback
-static as_value
-netstream_bufferLength(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    // NetStream_as::bufferLength returns milliseconds, we want
-    // to return *fractional* seconds.
-    double ret = ns->bufferLength()/1000.0;
-    return as_value(ret);
-}
-
-// Both a getter and a (do-nothing) setter for bufferTime
-static as_value
-netstream_bufferTime(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    // We return bufferTime in seconds
-    double ret = ns->bufferTime()/1000.0;
-    return as_value(ret);
-}
-
-// Both a getter and a (do-nothing) setter for liveDelay
-static as_value
-netstream_liveDelay(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ns = ensureType<NetStream_as>(fn.this_ptr);
-
-    bool warned = false;
-    if ( ! warned ) {
-        log_unimpl("NetStream.liveDelay getter/setter");
-        warned = true;
-    }
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        return as_value();
-    }
-    else // setter
-    {
-        return as_value();
-    }
-}
-
-void
-attachNetStreamInterface(as_object& o)
-{
-
-    o.init_member("close", new builtin_function(netstream_close));
-    o.init_member("pause", new builtin_function(netstream_pause));
-    o.init_member("play", new builtin_function(netstream_play));
-    o.init_member("seek", new builtin_function(netstream_seek));
-    o.init_member("setBufferTime", new builtin_function(netstream_setbuffertime));
-
-    o.init_member("attachAudio", new builtin_function(netstream_attachAudio));
-    o.init_member("attachVideo", new builtin_function(netstream_attachVideo));
-    o.init_member("publish", new builtin_function(netstream_publish));
-    o.init_member("receiveAudio", new builtin_function(netstream_receiveAudio));
-    o.init_member("receiveVideo", new builtin_function(netstream_receiveVideo));
-    o.init_member("send", new builtin_function(netstream_send));
-
-    // Properties
-    // TODO: attach to each instance rather then to the class ? check it ..
-
-    o.init_readonly_property("time", &netstream_time);
-    o.init_readonly_property("bytesLoaded", &netstream_bytesloaded);
-    o.init_readonly_property("bytesTotal", &netstream_bytestotal);
-    o.init_readonly_property("currentFps", &netstream_currentFPS);
-    o.init_readonly_property("bufferLength", &netstream_bufferLength);
-    o.init_readonly_property("bufferTime", &netstream_bufferTime);
-    o.init_readonly_property("liveDelay", &netstream_liveDelay);
-
-}
-
-static as_object*
-getNetStreamInterface()
-{
-
-    static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
-        o = new as_object(getObjectInterface());
-        attachNetStreamInterface(*o);
-    }
-
-    return o.get();
 }
 
 // extern (used by Global.cpp)
@@ -1904,5 +1562,351 @@ BufferedAudioStreamer::cleanAudioQueue()
     _audioQueue.clear();
 }
 
+namespace {
 
-} // end of gnash namespace
+as_value
+netstream_new(const fn_call& fn)
+{
+
+    boost::intrusive_ptr<NetStream_as> netstream_obj = new NetStream_as;
+
+    if (fn.nargs > 0)
+    {
+        boost::intrusive_ptr<NetConnection_as> ns =
+            boost::dynamic_pointer_cast<NetConnection_as>(
+                    fn.arg(0).to_object());
+        if ( ns )
+        {
+            netstream_obj->setNetCon(ns);
+        }
+        else
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+                log_aserror(_("First argument "
+                    "to NetStream constructor "
+                    "doesn't cast to a NetConnection (%s)"),
+                    fn.arg(0));
+            );
+        }
+    }
+    return as_value(netstream_obj.get());
+
+}
+
+as_value
+netstream_close(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+    ns->close();
+    return as_value();
+}
+
+as_value
+netstream_pause(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
+    
+    // mode: -1 ==> toogle, 0==> pause, 1==> play
+    NetStream_as::PauseMode mode = NetStream_as::pauseModeToggle;
+    if (fn.nargs > 0)
+    {
+        mode = fn.arg(0).to_bool() ? NetStream_as::pauseModePause :
+                                     NetStream_as::pauseModeUnPause;
+    }
+    ns->pause(mode);    // toggle mode
+    return as_value();
+}
+
+as_value
+netstream_play(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    if (!fn.nargs)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("NetStream_as play needs args"));
+        );
+        return as_value();
+    }
+
+    if ( ! ns->isConnected() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("NetStream.play(%s): stream is not connected"),
+            fn.arg(0));
+        );
+        return as_value();
+    }
+
+    ns->play(fn.arg(0).to_string());
+
+    return as_value();
+}
+
+as_value
+netstream_seek(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    boost::uint32_t time = 0;
+    if (fn.nargs > 0)
+    {
+        time = static_cast<boost::uint32_t>(fn.arg(0).to_number());
+    }
+    ns->seek(time);
+
+    return as_value();
+}
+
+as_value
+netstream_setbuffertime(const fn_call& fn)
+{
+
+    //GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    // TODO: should we do anything if given no args ?
+    //       are we sure setting bufferTime to 0 is what we have to do ?
+    double time = 0;
+    if (fn.nargs > 0)
+    {
+        time = fn.arg(0).to_number();
+    }
+
+    // TODO: don't allow a limit < 100 
+
+    ns->setBufferTime(boost::uint32_t(time*1000));
+
+    return as_value();
+}
+
+as_value
+netstream_attachAudio(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+    UNUSED(ns);
+
+    LOG_ONCE(log_unimpl("NetStream.attachAudio"));;
+
+    return as_value();
+}
+
+as_value
+netstream_attachVideo(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+    UNUSED(ns);
+
+    LOG_ONCE(log_unimpl("NetStream.attachVideo"));
+
+    return as_value();
+}
+
+as_value
+netstream_publish(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
+    UNUSED(ns);
+
+    LOG_ONCE(log_unimpl("NetStream.publish"));
+
+    return as_value();
+}
+
+as_value
+netstream_receiveAudio(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+    UNUSED(ns);
+
+    LOG_ONCE(log_unimpl("NetStream.receiveAudio"));
+
+    return as_value();
+}
+
+as_value
+netstream_receiveVideo(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+    UNUSED(ns);
+
+    LOG_ONCE(log_unimpl("NetStream.receiveVideo"));
+
+    return as_value();
+}
+
+as_value
+netstream_send(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+    UNUSED(ns);
+
+    LOG_ONCE(log_unimpl("NetStream.send"));
+
+    return as_value();
+}
+
+// Both a getter and a (do-nothing) setter for time
+as_value
+netstream_time(const fn_call& fn)
+{
+    //GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    assert(fn.nargs == 0); // we're a getter
+    return as_value(double(ns->time()/1000.0));
+}
+
+// Both a getter and a (do-nothing) setter for bytesLoaded
+as_value
+netstream_bytesloaded(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    if ( ! ns->isConnected() )
+    {
+        return as_value();
+    }
+    long ret = ns->bytesLoaded();
+    return as_value(ret);
+}
+
+// Both a getter and a (do-nothing) setter for bytesTotal
+as_value
+netstream_bytestotal(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    if ( ! ns->isConnected() )
+    {
+        return as_value();
+    }
+    long ret = ns->bytesTotal();
+    return as_value(ret);
+}
+
+// Both a getter and a (do-nothing) setter for currentFPS
+as_value
+netstream_currentFPS(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    if ( ! ns->isConnected() )
+    {
+        return as_value();
+    }
+
+    double fps = ns->getCurrentFPS();
+
+    return as_value(fps);
+}
+
+// read-only property bufferLength: amount of time buffered before playback
+as_value
+netstream_bufferLength(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    // NetStream_as::bufferLength returns milliseconds, we want
+    // to return *fractional* seconds.
+    double ret = ns->bufferLength()/1000.0;
+    return as_value(ret);
+}
+
+// Both a getter and a (do-nothing) setter for bufferTime
+as_value
+netstream_bufferTime(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns =
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    // We return bufferTime in seconds
+    double ret = ns->bufferTime() / 1000.0;
+    return as_value(ret);
+}
+
+// Both a getter and a (do-nothing) setter for liveDelay
+as_value
+netstream_liveDelay(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetStream_as> ns = 
+        ensureType<NetStream_as>(fn.this_ptr);
+
+    LOG_ONCE(log_unimpl("NetStream.liveDelay getter/setter"));
+
+    if ( fn.nargs == 0 ) // getter
+    {
+        return as_value();
+    }
+    else // setter
+    {
+        return as_value();
+    }
+}
+
+void
+attachNetStreamInterface(as_object& o)
+{
+
+    o.init_member("close", new builtin_function(netstream_close));
+    o.init_member("pause", new builtin_function(netstream_pause));
+    o.init_member("play", new builtin_function(netstream_play));
+    o.init_member("seek", new builtin_function(netstream_seek));
+    o.init_member("setBufferTime",
+            new builtin_function(netstream_setbuffertime));
+
+    o.init_member("attachAudio", new builtin_function(netstream_attachAudio));
+    o.init_member("attachVideo", new builtin_function(netstream_attachVideo));
+    o.init_member("publish", new builtin_function(netstream_publish));
+    o.init_member("receiveAudio", new builtin_function(netstream_receiveAudio));
+    o.init_member("receiveVideo", new builtin_function(netstream_receiveVideo));
+    o.init_member("send", new builtin_function(netstream_send));
+
+    // Properties
+    // TODO: attach to each instance rather then to the class ? check it ..
+
+    o.init_readonly_property("time", &netstream_time);
+    o.init_readonly_property("bytesLoaded", &netstream_bytesloaded);
+    o.init_readonly_property("bytesTotal", &netstream_bytestotal);
+    o.init_readonly_property("currentFps", &netstream_currentFPS);
+    o.init_readonly_property("bufferLength", &netstream_bufferLength);
+    o.init_readonly_property("bufferTime", &netstream_bufferTime);
+    o.init_readonly_property("liveDelay", &netstream_liveDelay);
+
+}
+
+as_object*
+getNetStreamInterface()
+{
+
+    static boost::intrusive_ptr<as_object> o;
+    if ( o == NULL )
+    {
+        o = new as_object(getObjectInterface());
+        attachNetStreamInterface(*o);
+    }
+
+    return o.get();
+}
+
+} // anonymous namespace
+} // gnash namespace

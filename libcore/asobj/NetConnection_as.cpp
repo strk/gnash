@@ -1,4 +1,4 @@
-// NetConnection.cpp:  Open local connections for FLV files or URLs.
+// NetConnection_as.cpp:  Open local connections for FLV files or URLs.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -33,7 +33,7 @@
 #include <arpa/inet.h> // for htons
 #endif
 
-#include "NetConnection.h"
+#include "NetConnection_as.h"
 #include "log.h"
 #include "GnashException.h"
 #include "builtin_function.h"
@@ -44,7 +44,7 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 
-// for NetConnection.call()
+// for NetConnection_as.call()
 #include "VM.h"
 #include "amf.h"
 #include "SimpleBuffer.h"
@@ -95,7 +95,7 @@ namespace {
 class AMFQueue {
 private:
 
-    NetConnection& _nc;
+    NetConnection_as& _nc;
     static const int NCCALLREPLYMAX=200000;
 
     typedef std::map<std::string, boost::intrusive_ptr<as_object> > 
@@ -112,7 +112,7 @@ private:
     unsigned int ticker;
 
 public:
-    AMFQueue(NetConnection& nc, URL url)
+    AMFQueue(NetConnection_as& nc, URL url)
         :
         _nc(nc),
         postdata(),
@@ -193,7 +193,7 @@ public:
 
                 // This is just a guess, but is better than sending
                 // 'undefined'
-                _nc.notifyStatus(NetConnection::CALL_FAILED);
+                _nc.notifyStatus(NetConnection_as::CALL_FAILED);
             }
             else if(_connection->eof() )
             {
@@ -390,8 +390,8 @@ public:
 
     static as_value amfqueue_tick_wrapper(const fn_call& fn)
     {
-        boost::intrusive_ptr<NetConnection> ptr = 
-            ensureType<NetConnection>(fn.this_ptr);
+        boost::intrusive_ptr<NetConnection_as> ptr = 
+            ensureType<NetConnection_as>(fn.this_ptr);
         // FIXME check if it's possible for the URL of a NetConnection to change between call()s
         ptr->_callQueue->tick();
         return as_value();
@@ -464,7 +464,7 @@ private:
 /// \brief Opens a local connection through which you can play
 /// back video (FLV) files from an HTTP address or from the local file
 /// system, using curl.
-NetConnection::NetConnection()
+NetConnection_as::NetConnection_as()
     :
     as_object(getNetConnectionInterface()),
     _callQueue(0),
@@ -496,13 +496,13 @@ netconnection_class_init(as_object& global)
 }
 
 // here to have AMFQueue definition available
-NetConnection::~NetConnection()
+NetConnection_as::~NetConnection_as()
 {
 }
 
 
 void
-NetConnection::markReachableResources() const
+NetConnection_as::markReachableResources() const
 {
     if ( _callQueue.get() ) _callQueue->markReachableResources();
     markAsObjectReachable();
@@ -510,7 +510,7 @@ NetConnection::markReachableResources() const
 
 
 std::string
-NetConnection::validateURL() const
+NetConnection_as::validateURL() const
 {
 
     const movie_root& mr = _vm.getRoot();
@@ -531,7 +531,7 @@ NetConnection::validateURL() const
 }
 
 void
-NetConnection::notifyStatus(StatusCode code)
+NetConnection_as::notifyStatus(StatusCode code)
 {
     std::pair<std::string, std::string> info;
     getStatusCodeInfo(code, info);
@@ -549,7 +549,7 @@ NetConnection::notifyStatus(StatusCode code)
 }
 
 void
-NetConnection::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
+NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 {
     /// The Call statuses do exist, but this implementation is a guess.
     switch (code)
@@ -593,7 +593,7 @@ NetConnection::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 
 
 void
-NetConnection::connect()
+NetConnection_as::connect()
 {
     _isConnected = true;
     _inError = false;
@@ -602,7 +602,7 @@ NetConnection::connect()
 
 
 void
-NetConnection::connect(const std::string& uri)
+NetConnection_as::connect(const std::string& uri)
 {
 
     // FIXME: RTMP URLs should attempt a connection (warning: this seems
@@ -620,7 +620,7 @@ NetConnection::connect(const std::string& uri)
 
 
 void
-NetConnection::close()
+NetConnection_as::close()
 {
     /// TODO: what should actually happen here? Should an attached
     /// NetStream object be interrupted?
@@ -633,14 +633,14 @@ NetConnection::close()
 
 
 void
-NetConnection::setURI(const std::string& uri)
+NetConnection_as::setURI(const std::string& uri)
 {
     init_readonly_property("uri", &netconnection_uri);
     _uri = uri;
 }
 
 void
-NetConnection::call(as_object* asCallback, const std::string& callNumber,
+NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
         const SimpleBuffer& buf)
 {
 
@@ -711,8 +711,8 @@ namespace {
 as_value
 netconnection_call(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection> ptr = 
-        ensureType<NetConnection>(fn.this_ptr); 
+    boost::intrusive_ptr<NetConnection_as> ptr = 
+        ensureType<NetConnection_as>(fn.this_ptr); 
 
     if (fn.nargs < 1)
     {
@@ -809,8 +809,8 @@ netconnection_call(const fn_call& fn)
 as_value
 netconnection_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection> ptr =
-        ensureType<NetConnection>(fn.this_ptr); 
+    boost::intrusive_ptr<NetConnection_as> ptr =
+        ensureType<NetConnection_as>(fn.this_ptr); 
 
     ptr->close();
 
@@ -822,8 +822,8 @@ netconnection_close(const fn_call& fn)
 as_value
 netconnection_isConnected(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection> ptr =
-        ensureType<NetConnection>(fn.this_ptr); 
+    boost::intrusive_ptr<NetConnection_as> ptr =
+        ensureType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->isConnected());
 }
@@ -831,8 +831,8 @@ netconnection_isConnected(const fn_call& fn)
 as_value
 netconnection_uri(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection> ptr =
-        ensureType<NetConnection>(fn.this_ptr); 
+    boost::intrusive_ptr<NetConnection_as> ptr =
+        ensureType<NetConnection_as>(fn.this_ptr); 
 
     return as_value(ptr->getURI());
 }
@@ -875,7 +875,7 @@ netconnection_new(const fn_call& /* fn */)
 {
     GNASH_REPORT_FUNCTION;
 
-    NetConnection* nc = new NetConnection;
+    NetConnection_as* nc = new NetConnection_as;
 
     return as_value(nc);
 }
@@ -897,8 +897,8 @@ as_value
 netconnection_connect(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<NetConnection> ptr =
-        ensureType<NetConnection>(fn.this_ptr); 
+    boost::intrusive_ptr<NetConnection_as> ptr =
+        ensureType<NetConnection_as>(fn.this_ptr); 
     
     if (fn.nargs < 1)
     {
@@ -937,8 +937,8 @@ netconnection_connect(const fn_call& fn)
 as_value
 netconnection_addHeader(const fn_call& fn)
 {
-    boost::intrusive_ptr<NetConnection> ptr =
-        ensureType<NetConnection>(fn.this_ptr); 
+    boost::intrusive_ptr<NetConnection_as> ptr =
+        ensureType<NetConnection_as>(fn.this_ptr); 
     UNUSED(ptr);
 
     log_unimpl("NetConnection.addHeader()");
