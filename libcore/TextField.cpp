@@ -154,7 +154,8 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
     _selectable(!def.noSelect()),
     _autoSize(autoSizeNone),
     _type(def.readOnly() ? typeDynamic : typeInput),
-    _bounds(def.get_bound())
+    _bounds(def.get_bound()),
+    _selection(0, 0)
 {
 
     // WARNING! remember to set the font *before* setting text value!
@@ -210,7 +211,8 @@ TextField::TextField(character* parent, const rect& bounds)
     _selectable(true),
     _autoSize(autoSizeNone),
     _type(typeDynamic),
-    _bounds(bounds)
+    _bounds(bounds),
+    _selection(0, 0)
 {
     // Use the default font (Times New Roman for Windows, Times for Mac
     // according to docs. They don't say what it is for Linux.
@@ -378,6 +380,31 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
     ranges.add( bounds.getRange() );            
 }
 
+void
+TextField::setSelection(int start, int end)
+{
+
+    if (_text.empty()) {
+        _selection = std::make_pair(0, 0);
+        return;
+    }
+
+    const size_t textLength = _text.size();
+
+    if (start < 0) start = 0;
+    else start = std::min<size_t>(start, textLength);
+
+    if (end < 0) end = 0;
+    else end = std::min<size_t>(end, textLength);
+
+    // The cursor position is always set to the end value, even if the
+    // two values are swapped to obtain the selection. Equal values are
+    // fine.
+    m_cursor = end;
+    if (start > end) std::swap(start, end);
+
+    _selection = std::make_pair(start, end);
+}
 bool
 TextField::on_event(const event_id& id)
 {
@@ -1872,10 +1899,10 @@ bool
 TextField::handleFocus()
 {
 
-    /// Only selectable TextFields can receive focus.
-    if (!_selectable) return false;
-
     set_invalidated();
+
+    /// Select the entire text on focus.
+    setSelection(0, _text.length());
 
     m_has_focus = true;
 
@@ -2249,7 +2276,6 @@ textfield_autoSize(const fn_call& fn)
         {
             std::string strval = arg.to_string();
             TextField::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
-            //log_debug("%s => %d", strval, val);
             ptr->setAutoSize( val );
         }
     }

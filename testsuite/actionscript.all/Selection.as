@@ -90,7 +90,7 @@ check_equals(ret, false);
  check_equals(ret, false);
  check_equals(Selection.getFocus(), null);
 
- mc.createTextField("tx", getNextHighestDepth(), 400, 400, 10, 10);
+ tx = undefined;
 
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(tx);
@@ -155,6 +155,14 @@ check_equals(ret, false);
  Selection.setFocus(mc);
  check_equals(Selection.getFocus(), "_level0.mc");
 
+ // Indices of MovieClip focus.
+ ret = Selection.getBeginIndex();
+ check_equals(ret, -1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, -1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, -1);
+
 
  Selection.setFocus(tx);
  check_equals(Selection.getFocus(), null);
@@ -164,6 +172,127 @@ check_equals(ret, false);
  ret = Selection.setFocus(tx);
  check_equals(ret, true);
  check_equals(Selection.getFocus(), null);
+
+ // Indices of null focus.
+ ret = Selection.getBeginIndex();
+ check_equals(ret, -1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, -1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, -1);
+
+ createTextField('text1', 99, 10, 10, 10, 10);
+ ret = Selection.setFocus(text1);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), '_level0.text1');
+
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 0);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+
+ // setSelection
+ ret = Selection.setSelection(0, 1);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 0);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+ 
+ text1.text = "Some Text";
+ ret = Selection.setSelection(0, 1);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 1);
+
+ ret = Selection.setSelection(4, -5);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 4);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+
+ ret = Selection.setSelection(6, 3);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 3);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 6);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 3);
+
+ ret = Selection.setSelection(1, 0);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+
+ ret = Selection.setSelection(2, 6);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 2);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 6);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 6);
+
+ ret = Selection.setSelection(3);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 2);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 6);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 6);
+
+ ret = Selection.setSelection(2, 25);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 2);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 9);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 9);
+
+ ret = Selection.setSelection(-1, 4);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 4);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 4);
+
+ ret = Selection.setSelection(1, 1);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 1);
+
+ ret = Selection.setSelection(1, 2, 3);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 1);
 
 #endif // OUTPUT_VERSION >= 6
 
