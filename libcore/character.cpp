@@ -1392,6 +1392,10 @@ character::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
 	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
 	tr.append_child(it, StringPair(_("Unloaded"), isUnloaded() ? yes : no));
+	
+    os.str("");
+    os << _blendMode;
+    tr.append_child(it, StringPair(_("Blend mode"), os.str()));
 #ifndef NDEBUG
     // This probably isn't interesting for non-developers
     tr.append_child(it, StringPair(_("Invalidated"), m_invalidated ? yes : no));
