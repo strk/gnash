@@ -29,9 +29,9 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
-#include "NetConnection.h"
 #include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
+#include "NetConnection_as.h"
 #include "PlayHead.h" // for composition
 
 #include "VideoDecoder.h" // for visibility of dtor
@@ -205,7 +205,7 @@ protected:
         invalidTime
     };
 
-    boost::intrusive_ptr<NetConnection> _netCon;
+    boost::intrusive_ptr<NetConnection_as> _netCon;
 
     boost::scoped_ptr<CharacterProxy> _audioController;
 
@@ -263,8 +263,6 @@ protected:
     std::auto_ptr<media::MediaParser> m_parser;
 
     // Are we playing a FLV?
-    bool m_isFLV;
-
     // The handler which is invoked on status change
     boost::intrusive_ptr<as_function> m_statusHandler;
 
@@ -369,13 +367,12 @@ public:
     /// @param nc
     ///     The NetConnection object to use for network access
     ///
-    void setNetCon(boost::intrusive_ptr<NetConnection> nc)
-    {
+    void setNetCon(boost::intrusive_ptr<NetConnection_as> nc) {
         _netCon = nc;
     }
 
     /// Return true if the NetStream has an associated NetConnection
-    bool isConnected() const { return _netCon != 0; }
+    bool isConnected() const { return (_netCon); }
 
     /// Specifies the number of milliseconds to buffer before starting to display the stream.
     //

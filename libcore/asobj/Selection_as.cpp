@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Selection.h"
+#include "Selection_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
