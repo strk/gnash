@@ -161,17 +161,12 @@ XMLNode_as::appendChild(boost::intrusive_ptr<XMLNode_as> node)
         oldparent->_children.remove(node);
     }
 
-//  log_unimpl("%s: partially unimplemented", __PRETTY_FUNCTION__);
 }
 
 boost::intrusive_ptr<XMLNode_as> 
 XMLNode_as::cloneNode(bool deep)
 {
-    //GNASH_REPORT_FUNCTION;
-    //log_debug(_("%s: deep is %d"), __PRETTY_FUNCTION__, deep);
-
     boost::intrusive_ptr<XMLNode_as> newnode = new XMLNode_as(*this, deep);
-
     return newnode;
 }
 

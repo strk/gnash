@@ -1957,7 +1957,8 @@ as_value::as_value(const amf::Element& el)
           log_unimpl("AMF3 data type is not supported yet");
           break;
       default:
-          log_unimpl("Element to as_value - unsupported Element type %d", el.getType());
+          log_unimpl("Element to as_value - unsupported Element type %d", 
+                  el.getType());
           break;
     }
 }
