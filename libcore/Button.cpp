@@ -417,7 +417,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 {
-    if ( (!get_visible()) || (!get_enabled()))
+    if ( (!isVisible()) || (!get_enabled()))
     {
         return 0;
     }
@@ -442,7 +442,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
                 it!=itE; ++it)
         {
             character* ch = *it;
-            if ( ! ch->get_visible() ) continue;
+            if ( ! ch->isVisible() ) continue;
             character *hit = ch->get_topmost_mouse_entity(p.x, p.y);
             if ( hit ) return hit;
         }
@@ -814,7 +814,7 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
     // Not visible anyway
-    if (!m_visible) return;
+    if (!isVisible()) return;
 
     ranges.add(m_old_invalidated_ranges);  
 

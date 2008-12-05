@@ -609,7 +609,7 @@ character::visible_getset(const fn_call& fn)
 	as_value rv;
 	if (!fn.nargs) // getter
 	{
-		rv = as_value(ptr->get_visible());
+		rv = as_value(ptr->isVisible());
 	}
 	else // setter
 	{
@@ -687,17 +687,17 @@ character::width_getset(const fn_call& fn)
 void
 character::set_visible(bool visible)
 {
-    if (m_visible != visible) set_invalidated(__FILE__, __LINE__);
+    if (_visible != visible) set_invalidated(__FILE__, __LINE__);
 
     // Remove focus from this character if it changes from visible to
     // invisible (see Selection.as).
-    if (m_visible && !visible) {
+    if (_visible && !visible) {
         movie_root& mr = _vm.getRoot();
         if (mr.getFocus().get() == this) {
             mr.setFocus(0);
         }
     }
-    m_visible = visible;      
+    _visible = visible;      
 }
 void
 character::set_width(double newwidth)

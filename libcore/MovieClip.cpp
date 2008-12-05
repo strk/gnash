@@ -1541,9 +1541,6 @@ public:
 
         if ( ch->isMaskLayer() )
         {
-            //if ( ! ch->get_visible() ) {
-            //    log_debug("invisible mask in MouseEntityFinder.");
-            //}
             if ( ! ch->pointInShape(_wp.x, _wp.y) )
             {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
@@ -1566,7 +1563,7 @@ public:
             return;
         }
 
-        if ( ! ch->get_visible() ) return;
+        if ( ! ch->isVisible() ) return;
 
         _candidates.push_back(ch);
 
@@ -1720,7 +1717,7 @@ MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 bool
 MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 {
-    if ( ! get_visible() ) return false;
+    if ( ! isVisible() ) return false;
     if ( isDynamicMask() && ! can_handle_mouse_event() )
     {
         // see testsuite/misc-ming.all/masks_test.swf
@@ -1731,7 +1728,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
         return false;
     }
     character* mask = getMask(); // dynamic one
-    if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
+    if ( mask && mask->isVisible() && ! mask->pointInShape(x, y) )
     {
 #ifdef GNASH_DEBUG_HITTEST
         log_debug(_("%s is dynamically masked by %s, which "
@@ -1778,10 +1775,7 @@ MovieClip::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
 
-    if (get_visible() == false)
-    {
-        return NULL;
-    }
+    if (!isVisible()) return 0;
 
     // point is in parent's space, we need to convert it in world space
     point    wp(x, y);
@@ -1873,7 +1867,7 @@ public:
 
         if ( ch->isMaskLayer() )
         {
-            if ( ! ch->get_visible() )
+            if ( ! ch->isVisible() )
             {
                 log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
             }
@@ -1933,7 +1927,7 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 {
     if ( this == dragging ) return 0; // not here...
 
-    if ( ! get_visible() ) return 0; // isn't me !
+    if ( ! isVisible() ) return 0; // isn't me !
 
     DropTargetFinder finder(x, y, dragging);
     m_display_list.visitAll(finder);
@@ -2113,7 +2107,7 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
     // nothing to do if this movieclip is not visible
-    if (!m_visible || get_cxform().is_invisible() )
+    if (!isVisible() || get_cxform().is_invisible() )
     {
         ranges.add(m_old_invalidated_ranges); // (in case we just hided)
         return;
