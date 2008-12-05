@@ -86,6 +86,8 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
         }
     );
     
+    boost::uint32_t all_event_flags;
+
     // The logical 'or' of all the following handlers.
     if (movie_version >= 6)
     {
@@ -327,7 +329,6 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     // PlaceObject3 speckfic flags, first 3 bits are unused
     m_has_flags3 = in.read_u8();
     
-    boost::uint8_t blend_mode = 0;
     boost::uint8_t bitmask = 0;
     std::string className;
 
@@ -337,49 +338,40 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     // tags with either className or hasImage defined are rare to
     // non-existent. Alexis' SWF reference has neither of them,
     // instead specifying 5 reserved bits in the PlaceObject3 flags.
-    if (hasClassName() || (hasImage() && hasCharacter()))
-    {
+    if (hasClassName() || (hasImage() && hasCharacter())) {
         log_unimpl("PLACEOBJECT3 with associated class name");
         in.read_string(className);
     }
 
-    if (hasCharacter())
-    {
+    if (hasCharacter()) {
         in.ensureBytes(2);
         m_character_id = in.read_u16();
     }
 
-    if (hasMatrix())
-    {
+    if (hasMatrix()) {
         m_matrix.read(in);
     }
 
-    if (hasCxform())
-    {
+    if (hasCxform()) {
         m_color_transform.read_rgba(in);
     }
 
-    if (hasRatio()) 
-    {
+    if (hasRatio()) {
         in.ensureBytes(2);
         m_ratio = in.read_u16();
     }
     
-    if (hasName())
-    {
+    if (hasName()) {
         in.read_string(m_name);
     }
 
-    if (hasClipDepth())
-    {
+    if (hasClipDepth()) {
         in.ensureBytes(2);
         m_clip_depth = in.read_u16()+character::staticDepthOffset;
     }
-    else
-    {
+    else {
         m_clip_depth = character::noClipDepthValue;
     }
-
 
     if ( hasFilters() )
     {
@@ -392,29 +384,10 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     if ( hasBlendMode() )
     {
         in.ensureBytes(1);
-        blend_mode = in.read_u8();
-	    // 0 or 1 : normal
-	    // 2 : layer
-	    // 3 : multiply
-        // 4 : screen
-        // 5 : lighten
-        // 6 : darken
-        // 7 : add
-        // 8 : subtract
-        // 9 : difference
-        // 10 : invert
-        // 11 : alpha
-        // 12 : erase
-        // 13 : overlay
-        // 14 : hardlight
-        // 15 to 255 reserved	
-        //
-        // at time of writing no renderer supports blend modes
-        LOG_ONCE( log_unimpl("Blend mode") );
+        _blendMode = in.read_u8();
     }
 
-    if ( hasBitmapCaching() )
-    {
+    if ( hasBitmapCaching() ) {
         // cacheAsBitmap is a boolean value, so the flag itself ought to be
         // enough. Alexis' SWF reference is unsure about this, but suggests
         // reading a byte here. The official SWF format spec doesn't mention
@@ -430,8 +403,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 	    LOG_ONCE( log_unimpl("Bitmap caching") );
     }
 
-    if ( hasClipActions() )
-    {
+    if ( hasClipActions() ) {
         readPlaceActions(in);
     }
 

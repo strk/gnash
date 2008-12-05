@@ -1130,7 +1130,7 @@ movie_root::display()
 
 		movie->clear_invalidated();
 
-		if (movie->get_visible() == false) continue;
+		if (movie->isVisible() == false) continue;
 
 		// null frame size ? don't display !
 		const rect& sub_frame_size = movie->get_frame_size();
@@ -1151,7 +1151,7 @@ movie_root::display()
 
 		ch->clear_invalidated();
 
-		if (ch->get_visible() == false) continue;
+		if (ch->isVisible() == false) continue;
 
 		ch->display();
 

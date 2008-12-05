@@ -27,7 +27,7 @@ generic_character::add_invalidated_bounds(InvalidatedRanges& ranges,
   bool force)
 {
   ranges.add(m_old_invalidated_ranges);
-  if (m_visible && (m_invalidated||force))
+  if (isVisible() && (m_invalidated||force))
   {
     rect bounds;    
     bounds.expand_to_transformed_rect(getWorldMatrix(), 

@@ -616,7 +616,7 @@ DisplayList::display()
         character* ch = it->get();
 
         character* mask = ch->getMask();
-        if ( mask && ch->get_visible() && ! mask->isUnloaded() )
+        if ( mask && ch->isVisible() && ! mask->isUnloaded() )
         {
             render::begin_submit_mask();
             
@@ -658,7 +658,7 @@ DisplayList::display()
         }
         
         // check for non-mask hiden characters
-        if( !renderAsMask && (ch->get_visible() == false))
+        if( !renderAsMask && (!ch->isVisible()))
         {
             ch->omit_display();
             // Don't display non-mask hidden characters

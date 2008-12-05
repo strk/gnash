@@ -111,25 +111,6 @@ public:
         STOP
     };
 
-    enum BlendMode
-    {
-        BLENDMODE_UNDEFINED = 0,
-        BLENDMODE_NORMAL = 1,
-        BLENDMODE_LAYER,
-        BLENDMODE_MULTIPLY,
-        BLENDMODE_SCREEN,
-        BLENDMODE_LIGHTEN,
-        BLENDMODE_DARKEN,
-        BLENDMODE_DIFFERENCE,
-        BLENDMODE_ADD,
-        BLENDMODE_SUBTRACT,
-        BLENDMODE_INVERT,
-        BLENDMODE_ALPHA,
-        BLENDMODE_ERASE,
-        BLENDMODE_OVERLAY,
-        BLENDMODE_HARDLIGHT = 14
-    };
-
     /// Type of execute tags
     //
     /// TODO: move to ControlTag.h ?
@@ -234,14 +215,6 @@ public:
     DSOEXPORT void set_play_state(play_state s);
 
     play_state get_play_state() const { return m_play_state; }
-
-    BlendMode getBlendMode() const {
-        return _blendMode;
-    }
- 
-    void setBlendMode(BlendMode bm) {
-        _blendMode = bm;
-    }
 
     character* get_character(int character_id);
 
@@ -938,8 +911,6 @@ private:
 
     play_state  m_play_state;
 
-    BlendMode _blendMode;
-
     // 0-based index to current frame
     size_t      m_current_frame;
 
@@ -1056,10 +1027,6 @@ protected:
 
 /// Initialize the global MovieClip class
 void movieclip_class_init(as_object& global);
-
-/// Stream operator for MovieClip blend mode.
-std::ostream&
-operator<<(std::ostream& o, MovieClip::BlendMode bm);
 
 } // end of namespace gnash
 

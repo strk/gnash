@@ -27,13 +27,12 @@
 #include "swf.h" // for tag_type definition
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition 
-
+#include "character.h" // BlendMode enum
 #include <vector>
 
 // Forward declarations
 namespace gnash {
     class SWFStream;
-    class MovieClip;
     class swf_event;
     class action_buffer;
     class movie_definition;
@@ -101,8 +100,8 @@ public:
         m_has_flags3(0),
         m_character_id(0),
         m_ratio(0),
-        m_name(""),
         m_clip_depth(0),
+        _blendMode(0),
         _movie_def(def)
     {
     }
@@ -118,7 +117,9 @@ public:
     static void loader(SWFStream& in, tag_type tag, movie_definition& m,
             const RunInfo& r);
 
-    int getPlaceType() const { return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK); } 
+    int getPlaceType() const { 
+        return m_has_flags2 & (HAS_CHARACTER_MASK | MOVE_MASK);
+    } 
     int getRatio()     const { return m_ratio; }
     int getClipDepth() const { return m_clip_depth; }
     int getID()        const { return m_character_id; }
@@ -136,10 +137,30 @@ public:
     bool hasCharacter()   const { return m_has_flags2 & HAS_CHARACTER_MASK; }
 
     bool hasImage()         const { return m_has_flags3 & HAS_IMAGE_MASK; }
-    bool hasClassName()     const { return m_has_flags3 & HAS_CLASS_NAME_MASK; }
-    bool hasBitmapCaching() const { return m_has_flags3 & HAS_BITMAP_CACHING_MASK; }
-    bool hasBlendMode()     const { return m_has_flags3 & HAS_BLEND_MODE_MASK; }
-    bool hasFilters()       const { return m_has_flags3 & HAS_FILTERS_MASK; }      
+
+    bool hasClassName() const {
+        return m_has_flags3 & HAS_CLASS_NAME_MASK;
+    }
+
+    bool hasBitmapCaching() const { 
+        return m_has_flags3 & HAS_BITMAP_CACHING_MASK;
+    }
+
+    bool hasBlendMode() const {
+        return m_has_flags3 & HAS_BLEND_MODE_MASK;
+    }
+
+    bool hasFilters() const {
+        return m_has_flags3 & HAS_FILTERS_MASK;
+    }
+
+    /// Get an associated blend mode.
+    //
+    /// This is stored as a uint8_t to allow for future expansion of
+    /// blend modes.
+    boost::uint8_t getBlendMode() const {
+        return _blendMode;
+    }
 
 private:
     int m_tag_type;
@@ -151,8 +172,9 @@ private:
     int     m_ratio;
     std::string m_name;
     int     m_clip_depth;
-    boost::uint32_t all_event_flags; 
     
+    boost::uint8_t _blendMode;
+
     /// NOTE: getPlaceType() is dependent on the enum values.
     enum PlaceType
     {
