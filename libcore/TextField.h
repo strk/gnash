@@ -128,6 +128,16 @@ public:
 	/// Return true if text is defined
 	bool getTextDefined() const { return _textDefined; }
 
+    size_t getCaretIndex() const {
+        return m_cursor;
+    }
+
+    const std::pair<size_t, size_t>& getSelection() const {
+        return _selection;
+    }
+
+    void setSelection(int start, int end);
+
 	/// We have a "text" member.
 	bool set_member(string_table::key name, const as_value& val, 
 		string_table::key nsname = 0, bool ifFound=false);
@@ -632,6 +642,8 @@ private:
 	///
 	rect _bounds;
 
+    std::pair<size_t, size_t> _selection;
+
 protected:
 
 	/// Mark reachable reosurces (for GC)
@@ -649,4 +661,4 @@ void textfield_class_init(as_object& global);
 
 } // namespace gnash
 
-#endif // _GNASH_EDIT_TEXT_CHARACTER_H_
+#endif 

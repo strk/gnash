@@ -30,6 +30,7 @@
 #include "Object.h" // for getObjectInterface
 #include "array.h"
 #include "AsBroadcaster.h"
+#include "TextField.h"
 
 // For getting and setting focus
 #include "VM.h"
@@ -103,23 +104,56 @@ getSelectionInterface()
 }
 
 as_value
-selection_getbeginindex(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
+selection_getbeginindex(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+    
+    movie_root& mr = ptr->getVM().getRoot();
+    character* focus = mr.getFocus().get();
+
+    TextField* tf = dynamic_cast<TextField*>(focus);
+
+    if (!tf) return as_value(-1);
+
+    return as_value(tf->getSelection().first);
+
+}
+
+/// Return -1 if focus is not a TextField, otherwise the 0-based index of the
+/// selection.
+//
+/// An alternative implementation would have a getCaretIndex in the character
+/// base class, with a default implementation returning -1. We would still
+/// have to check for no-focus events here, though.
+as_value
+selection_getcaretindex(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+    movie_root& mr = ptr->getVM().getRoot();
+    character* focus = mr.getFocus().get();
+
+    TextField* tf = dynamic_cast<TextField*>(focus);
+
+    if (!tf) return as_value(-1);
+
+    return as_value(tf->getCaretIndex());
 }
 
 
 as_value
-selection_getcaretindex(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
-}
+selection_getendindex(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
+    movie_root& mr = ptr->getVM().getRoot();
+    character* focus = mr.getFocus().get();
 
-as_value
-selection_getendindex(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
-    return as_value();
+    TextField* tf = dynamic_cast<TextField*>(focus);
+
+    if (!tf) return as_value(-1);
+
+    return as_value(tf->getSelection().second);
 }
 
 /// Returns null when there is no focus, otherwise the target of the
@@ -207,8 +241,27 @@ selection_setfocus(const fn_call& fn)
 
 
 as_value
-selection_setselection(const fn_call& /*fn*/) {
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+selection_setselection(const fn_call& fn)
+{
+    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+    movie_root& mr = ptr->getVM().getRoot();
+    character* focus = mr.getFocus().get();
+
+    TextField* tf = dynamic_cast<TextField*>(focus);
+
+    if (!tf) return as_value();
+
+    if (fn.nargs != 2) {
+        // Only two arguments are acceptable.
+        return as_value();
+    }
+
+    int start = fn.arg(0).to_int();
+    int end = fn.arg(1).to_int();
+
+    tf->setSelection(start, end);
+
     return as_value();
 }
 
