@@ -64,6 +64,33 @@ class character : public as_object
 
 public:
 
+    enum BlendMode
+    {
+        BLENDMODE_UNDEFINED = 0,
+        BLENDMODE_NORMAL = 1,
+        BLENDMODE_LAYER,
+        BLENDMODE_MULTIPLY,
+        BLENDMODE_SCREEN,
+        BLENDMODE_LIGHTEN,
+        BLENDMODE_DARKEN,
+        BLENDMODE_DIFFERENCE,
+        BLENDMODE_ADD,
+        BLENDMODE_SUBTRACT,
+        BLENDMODE_INVERT,
+        BLENDMODE_ALPHA,
+        BLENDMODE_ERASE,
+        BLENDMODE_OVERLAY,
+        BLENDMODE_HARDLIGHT = 14
+    };
+
+    BlendMode getBlendMode() const {
+        return _blendMode;
+    }
+ 
+    void setBlendMode(BlendMode bm) {
+        _blendMode = bm;
+    }
+
   // action_buffer is externally owned
   typedef std::vector<const action_buffer*> BufferList;
   typedef std::map<event_id, BufferList> Events;
@@ -92,51 +119,53 @@ public:
 
 private:
 
-  int m_id;
+    int m_id;
 
-  int m_depth;
-  cxform  m_color_transform;
-  SWFMatrix  m_matrix;
+    int m_depth;
+    cxform  m_color_transform;
+    SWFMatrix  m_matrix;
 
-  /// Cache values for ActionScript access.
-  /// NOTE: not all characters need this, just the
-  ///       ones which are ActionScript-referenceable
-  double _xscale, _yscale, _rotation;
+    /// Cache values for ActionScript access.
+    /// NOTE: not all characters need this, just the
+    ///       ones which are ActionScript-referenceable
+    double _xscale, _yscale, _rotation;
 
-  /// Volume control associated to this character
-  //
-  /// This is used by Sound objects
-  ///
-  /// NOTE: probably only ActionScript-referenceable characters
-  ///       need this (assuming soft ref don't rebind to other
-  ///       kind of characters).
-  ///
-  int  _volume;
+    /// Volume control associated to this character
+    //
+    /// This is used by Sound objects
+    ///
+    /// NOTE: probably only ActionScript-referenceable characters
+    ///       need this (assuming soft ref don't rebind to other
+    ///       kind of characters).
+    ///
+    int  _volume;
 
-  int   m_ratio;
-  int m_clip_depth;
-  Events  _event_handlers;
+    int   m_ratio;
+    int m_clip_depth;
+    Events  _event_handlers;
 
-  /// Used to assign a name to unnamed instances
-  static unsigned int _lastUnnamedInstanceNum;
+    /// Used to assign a name to unnamed instances
+    static unsigned int _lastUnnamedInstanceNum;
 
-  /// Set to yes when this instance has been unloaded
-  bool _unloaded;
+    /// Set to yes when this instance has been unloaded
+    bool _unloaded;
 
-  /// This flag should be set to true by a call to destroy()
-  bool _destroyed;
+    /// This flag should be set to true by a call to destroy()
+    bool _destroyed;
 
-  /// Build the _target member recursive on parent
-  std::string computeTargetPath() const;
+    /// Build the _target member recursive on parent
+    std::string computeTargetPath() const;
 
-  /// The character masking this instance (if any)
-  character* _mask;
+    /// The character masking this instance (if any)
+    character* _mask;
 
-  /// The character masked by this instance (if any)
-  character* _maskee;
+    /// The character masked by this instance (if any)
+    character* _maskee;
 
-  /// Original target, as at construction time
-  std::string _origTarget;
+    /// Original target, as at construction time
+    std::string _origTarget;
+
+    BlendMode _blendMode;
 
   /// Register a character masked by this instance
   void setMaskee(character* maskee);
@@ -270,6 +299,8 @@ protected:
 
 public:  // TODO: make protected
 
+  static as_value blendMode(const fn_call& fn);
+
   /// Getter-setter for _x
   static as_value x_getset(const fn_call& fn);
 
@@ -400,7 +431,7 @@ public:
         _destroyed(false),
         _mask(0),
         _maskee(0),
-        _origTarget(),
+        _blendMode(BLENDMODE_NORMAL),
         m_visible(true),
         m_parent(parent),
         m_invalidated(true),
@@ -1221,6 +1252,10 @@ public: // istn't this 'public' reduntant ?
 #endif
 
 };
+
+/// Stream operator for character blend mode.
+std::ostream&
+operator<<(std::ostream& o, character::BlendMode bm);
 
 
 } // end namespace gnash

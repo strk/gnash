@@ -38,11 +38,23 @@
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
 
 #undef set_invalidated
 
 namespace gnash
 {
+
+// Forward declarations.
+namespace {
+    /// Match blend modes.
+    typedef std::map<MovieClip::BlendMode, std::string> BlendModeMap;
+    const BlendModeMap& getBlendModeMap();
+    bool blendModeMatches(const BlendModeMap::value_type& val,
+            const std::string& mode);
+}
+
 
 // Define static const members or there will be linkage problems.
 const int character::lowerAccessibleBound;
@@ -524,6 +536,68 @@ character::alpha_getset(const fn_call& fn)
 	return rv;
 
 }
+
+as_value
+character::blendMode(const fn_call& fn)
+{
+    boost::intrusive_ptr<character> ch =
+        ensureType<character>(fn.this_ptr);
+
+    // This is AS-correct, but doesn't do anything.
+    // TODO: implement in the renderers!
+    LOG_ONCE(log_unimpl(_("blendMode")));
+
+    if (!fn.nargs)
+    {
+        // Getter
+        BlendMode bm = ch->getBlendMode();
+
+        /// If the blend mode is undefined, it doesn't return a string.
+        if (bm == BLENDMODE_UNDEFINED) return as_value();
+
+        std::ostringstream blendMode;
+        blendMode << bm;
+        return as_value(blendMode.str());
+    }
+
+    //
+    // Setter
+    //
+    
+    // Numeric argument.
+    const as_value& bm = fn.arg(0);
+    if (bm.is_number()) {
+        double mode = bm.to_number();
+
+        // hardlight is the last known value
+        if (mode < 0 || mode > BLENDMODE_HARDLIGHT) {
+
+            // An invalid numeric argument becomes undefined.
+            ch->setBlendMode(BLENDMODE_UNDEFINED);
+        }
+        else {
+            ch->setBlendMode(static_cast<BlendMode>(mode));
+        }
+        return as_value();
+    }
+
+    // Other arguments use toString method.
+    const std::string& mode = bm.to_string();
+
+    const BlendModeMap& bmm = getBlendModeMap();
+    BlendModeMap::const_iterator it = std::find_if(bmm.begin(), bmm.end(),
+            boost::bind(blendModeMatches, _1, mode));
+
+    if (it != bmm.end()) {
+        ch->setBlendMode(it->first);
+    }
+
+    // An invalid string argument has no effect.
+
+    return as_value();
+
+}
+
 
 /// _visible can be set with true/false, but also
 /// 0 and 1.
@@ -1325,6 +1399,51 @@ const MovieClip*
 character::getAsRoot() const
 {
     return get_root();
+}
+
+namespace {
+
+const BlendModeMap&
+getBlendModeMap()
+{
+    /// BLENDMODE_UNDEFINED has no matching string in AS. It is included
+    /// here for logging purposes.
+    static const BlendModeMap bm = boost::assign::map_list_of
+        (character::BLENDMODE_UNDEFINED, "undefined")
+        (character::BLENDMODE_NORMAL, "normal")
+        (character::BLENDMODE_LAYER, "layer")
+        (character::BLENDMODE_MULTIPLY, "multiply")
+        (character::BLENDMODE_SCREEN, "screen")
+        (character::BLENDMODE_LIGHTEN, "lighten")
+        (character::BLENDMODE_DARKEN, "darken")
+        (character::BLENDMODE_DIFFERENCE, "difference")
+        (character::BLENDMODE_ADD, "add")
+        (character::BLENDMODE_SUBTRACT, "subtract")
+        (character::BLENDMODE_INVERT, "invert")
+        (character::BLENDMODE_ALPHA, "alpha")
+        (character::BLENDMODE_ERASE, "erase")
+        (character::BLENDMODE_OVERLAY, "overlay")
+        (character::BLENDMODE_HARDLIGHT, "hardlight");
+
+    return bm;
+}
+
+// Match a blend mode to its string.
+bool
+blendModeMatches(const BlendModeMap::value_type& val, const std::string& mode)
+{
+    /// The match must be case-sensitive.
+    if (mode.empty()) return false;
+    return (val.second == mode);
+}
+
+}
+
+std::ostream&
+operator<<(std::ostream& o, character::BlendMode bm)
+{
+    const BlendModeMap& bmm = getBlendModeMap();
+    return (o << bmm.find(bm)->second);
 }
 
 

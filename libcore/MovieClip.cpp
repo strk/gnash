@@ -66,7 +66,6 @@
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/assign/list_of.hpp>
 #include <boost/bind.hpp>
 
 namespace gnash {
@@ -95,7 +94,6 @@ namespace {
     void attachMovieClipProperties(character& o);
 
     as_value movieclip_transform(const fn_call& fn);
-    as_value movieclip_blendMode(const fn_call& fn);
     as_value movieclip_scale9Grid(const fn_call& fn);
     as_value movieclip_attachVideo(const fn_call& fn);
     as_value movieclip_attachAudio(const fn_call& fn);
@@ -152,12 +150,6 @@ namespace {
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
     as_value movieclip_(const fn_call& fn);
-
-    /// Match blend modes.
-    typedef std::map<MovieClip::BlendMode, std::string> BlendModeMap;
-    const BlendModeMap& getBlendModeMap();
-    bool blendModeMatches(const BlendModeMap::value_type& val,
-            const std::string& mode);
 
 }
 
@@ -275,7 +267,6 @@ MovieClip::MovieClip( movie_definition* def, movie_instance* r,
     _drawable(new DynamicShape()),
     _drawable_inst(_drawable->create_character_instance(this, 0)),
     m_play_state(PLAY),
-    _blendMode(BLENDMODE_NORMAL),
     m_current_frame(0),
     m_has_looped(false),
     _callingFrameActions(false),
@@ -1320,6 +1311,11 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     {
         std::string instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
+    }
+
+    if (tag->hasBlendMode()) {
+        boost::uint8_t bm = tag->getBlendMode();
+        ch->setBlendMode(static_cast<character::BlendMode>(bm));
     }
 
     // Attach event handlers (if any).
@@ -2971,8 +2967,8 @@ attachMovieClipInterface(as_object& o)
                     movieclip_lineGradientStyle));
         o.init_member("attachBitmap", new builtin_function(
                     movieclip_attachBitmap));
-        o.init_property("blendMode", &movieclip_blendMode,
-                &movieclip_blendMode);
+        o.init_property("blendMode", &character::blendMode,
+                &character::blendMode);
         o.init_property("cacheAsBitmap", &movieclip_cacheAsBitmap, 
                 &movieclip_cacheAsBitmap);
         o.init_property("filters", &movieclip_filters, &movieclip_filters);
@@ -3092,68 +3088,6 @@ movieclip_removeMovieClip(const fn_call& fn)
         ensureType<MovieClip>(fn.this_ptr);
     movieclip->removeMovieClip();
     return as_value();
-}
-
-
-as_value
-movieclip_blendMode(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> movieclip =
-        ensureType<MovieClip>(fn.this_ptr);
-
-    // This is AS-correct, but doesn't do anything.
-    // TODO: implement in the renderers!
-    LOG_ONCE(log_unimpl(_("MovieClip.blendMode()")));
-
-    if (!fn.nargs)
-    {
-        // Getter
-        MovieClip::BlendMode bm = movieclip->getBlendMode();
-
-        /// If the blend mode is undefined, it doesn't return a string.
-        if (bm == MovieClip::BLENDMODE_UNDEFINED) return as_value();
-
-        std::ostringstream blendMode;
-        blendMode << bm;
-        return as_value(blendMode.str());
-    }
-
-    //
-    // Setter
-    //
-    
-    // Numeric argument.
-    const as_value& bm = fn.arg(0);
-    if (bm.is_number()) {
-        double mode = bm.to_number();
-
-        // hardlight is the last known value
-        if (mode < 0 || mode > MovieClip::BLENDMODE_HARDLIGHT) {
-
-            // An invalid string argument becomes undefined.
-            movieclip->setBlendMode(MovieClip::BLENDMODE_UNDEFINED);
-        }
-        else {
-            movieclip->setBlendMode(static_cast<MovieClip::BlendMode>(mode));
-        }
-        return as_value();
-    }
-
-    // Other arguments use toString method.
-    const std::string& mode = bm.to_string();
-
-    const BlendModeMap& bmm = getBlendModeMap();
-    BlendModeMap::const_iterator it = std::find_if(bmm.begin(), bmm.end(),
-            boost::bind(blendModeMatches, _1, mode));
-
-    if (it != bmm.end()) {
-        movieclip->setBlendMode(it->first);
-    }
-
-    // An invalid string argument has no effect.
-
-    return as_value();
-
 }
 
 
@@ -3517,7 +3451,7 @@ movieclip_swapDepths(const fn_call& fn)
 
         // Check we're not swapping the our own depth so
         // to avoid unecessary bounds invalidation and immunizing
-        // the instance from subsequent PlaceObjec tags attempting
+        // the instance from subsequent PlaceObject tags attempting
         // to transform it.
         if ( movieclip->get_depth() == target_depth )
         {
@@ -5374,10 +5308,6 @@ attachMovieClipProperties(character& o)
     if ( ! o.get_parent() ) o.init_member( "$version",
             VM::get().getPlayerVersion(), 0); 
 
-    //
-    // Properties (TODO: move to appropriate SWF version section)
-    //
-    
     as_c_function_ptr gettersetter;
 
     gettersetter = character::x_getset;
@@ -5464,49 +5394,8 @@ getMovieClipInterface()
     return proto.get();
 }
 
-const BlendModeMap&
-getBlendModeMap()
-{
-    /// BLENDMODE_UNDEFINED has no matching string in AS. It is included
-    /// here for logging purposes.
-    static const BlendModeMap bm = boost::assign::map_list_of
-        (MovieClip::BLENDMODE_UNDEFINED, "undefined")
-        (MovieClip::BLENDMODE_NORMAL, "normal")
-        (MovieClip::BLENDMODE_LAYER, "layer")
-        (MovieClip::BLENDMODE_MULTIPLY, "multiply")
-        (MovieClip::BLENDMODE_SCREEN, "screen")
-        (MovieClip::BLENDMODE_LIGHTEN, "lighten")
-        (MovieClip::BLENDMODE_DARKEN, "darken")
-        (MovieClip::BLENDMODE_DIFFERENCE, "difference")
-        (MovieClip::BLENDMODE_ADD, "add")
-        (MovieClip::BLENDMODE_SUBTRACT, "subtract")
-        (MovieClip::BLENDMODE_INVERT, "invert")
-        (MovieClip::BLENDMODE_ALPHA, "alpha")
-        (MovieClip::BLENDMODE_ERASE, "erase")
-        (MovieClip::BLENDMODE_OVERLAY, "overlay")
-        (MovieClip::BLENDMODE_HARDLIGHT, "hardlight");
-
-    return bm;
-}
-
-// Match a blend mode to its string.
-bool
-blendModeMatches(const BlendModeMap::value_type& val, const std::string& mode)
-{
-    /// The match must be case-sensitive.
-    if (mode.empty()) return false;
-    return (val.second == mode);
-}
-
 } // anonymous namespace
 
-
-std::ostream&
-operator<<(std::ostream& o, MovieClip::BlendMode bm)
-{
-    const BlendModeMap& bmm = getBlendModeMap();
-    return (o << bmm.find(bm)->second);
-}
 
 
 } // namespace gnash
