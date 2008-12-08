@@ -86,6 +86,15 @@ public:
     XMLNode_as(const XMLNode_as &node, bool deep);
     virtual ~XMLNode_as();
 
+    // Initialize the global XMLNode class
+    static void init(as_object& global);
+
+    // Used by XML_as
+    static as_object* getXMLNodeInterface();
+
+    /// Register ASnative methods
+    static void registerNative(as_object& global);
+
     size_t length() const { return _children.size(); }
 
     const std::string& nodeName() const { return _name; }
@@ -260,12 +269,6 @@ private:
             bool encode);
 
 };
-
-// Initialize the global XMLNode class
-void xmlnode_class_init(as_object& global);
-
-// Used by XML_as
-as_object* getXMLNodeInterface();
 
 } // gnash namespace
 

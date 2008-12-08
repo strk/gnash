@@ -188,6 +188,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
     registerDateNative(*this);
 
+    XMLNode_as::registerNative(*this);
+
     // LoadableObject has natives shared between LoadVars and XML, so 
     // should be registered first.
     LoadableObject::registerNative(*this);

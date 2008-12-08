@@ -671,7 +671,7 @@ getXMLInterface()
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL )
     {
-        o = new as_object(getXMLNodeInterface());
+        o = new as_object(XMLNode_as::getXMLNodeInterface());
         attachXMLInterface(*o);
     }
     return o.get();
