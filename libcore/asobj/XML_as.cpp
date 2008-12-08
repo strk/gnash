@@ -599,7 +599,7 @@ XML_as::ignoreWhite() const
 
 // extern (used by Global.cpp)
 void
-xml_class_init(as_object& global)
+XML_as::init(as_object& global)
 {
 
     static boost::intrusive_ptr<builtin_function> cl;
@@ -614,16 +614,13 @@ xml_class_init(as_object& global)
 }
 
 void
-registerXMLNative(as_object& global)
+XML_as::registerNative(as_object& global)
 {
     VM& vm = global.getVM();
     vm.registerNative(xml_escape, 100, 5);
     vm.registerNative(xml_createElement, 253, 8);
     vm.registerNative(xml_createTextNode, 253, 9);
     vm.registerNative(xml_parseXML, 253, 10);
-    vm.registerNative(LoadableObject::loadableobject_load, 301, 0);
-    vm.registerNative(LoadableObject::loadableobject_send, 301, 1);
-    vm.registerNative(LoadableObject::loadableobject_sendAndLoad, 301, 2);
 }
 
 ///

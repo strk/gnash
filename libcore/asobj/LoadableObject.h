@@ -44,6 +44,9 @@ public:
 
     virtual ~LoadableObject();
 
+    /// Register methods as native for use by XML_as and LoadVars_as
+    static void registerNative(as_object& global);
+
     /// Carry out the AS send() operation
     //
     /// @param urlstr   The URI to send the data to
@@ -87,9 +90,6 @@ public:
     /// Shared AS methods for XML and LoadVars, which can be used
     /// interchangeably with each object in ActionScript.
     static as_value loadableobject_addRequestHeader(const fn_call& fn);
-    static as_value loadableobject_sendAndLoad(const fn_call& fn);
-    static as_value loadableobject_load(const fn_call& fn);
-    static as_value loadableobject_send(const fn_call& fn);
 
 protected:
 
