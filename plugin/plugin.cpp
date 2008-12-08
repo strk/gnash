@@ -633,7 +633,7 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
 #endif
 
     _filefd = open(fname.c_str(),
-            O_CREAT | O_WRONLY
+            O_CREAT | O_WRONLY,
             S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
     
     if (_filefd < 0)
