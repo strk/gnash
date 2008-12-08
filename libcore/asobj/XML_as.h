@@ -178,7 +178,8 @@ private:
 };
 
 
-DSOEXPORT void xml_class_init(as_object& global);
+void xml_class_init(as_object& global);
+void registerXMLNative(as_object& global);
 
 }	// end namespace gnash
 
