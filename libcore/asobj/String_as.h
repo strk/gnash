@@ -20,9 +20,7 @@
 #ifndef GNASH_STRING_H
 #define GNASH_STRING_H
 
-#include "smart_ptr.h"
-
-#include <memory> // for auto_ptr
+#include <string>
 
 namespace gnash {
 
