@@ -188,13 +188,17 @@ void object_class_init(as_object& global)
 
 }
 
+
+/// The return value is not dependent on the result of add_property (though
+/// this is always true anyway), but rather on the validity of the arguments.
 static as_value
 object_addproperty(const fn_call& fn)
 {
 	assert(fn.this_ptr);
 	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
-	if ( fn.nargs != 3 )
+    /// Extra arguments are just ignored.
+	if ( fn.nargs < 3 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss;
@@ -213,7 +217,7 @@ object_addproperty(const fn_call& fn)
 	}
 
 	const std::string& propname = fn.arg(0).to_string();
-	if ( propname.empty() )
+	if (propname.empty())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to Object.addProperty() - "
@@ -223,7 +227,7 @@ object_addproperty(const fn_call& fn)
 	}
 
 	as_function* getter = fn.arg(1).to_as_function();
-	if ( ! getter )
+	if (!getter)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to Object.addProperty() - "
@@ -234,10 +238,10 @@ object_addproperty(const fn_call& fn)
 
 	as_function* setter = NULL;
 	const as_value& setterval = fn.arg(2);
-	if ( ! setterval.is_null() )
+	if (!setterval.is_null())
 	{
 		setter = setterval.to_as_function();
-		if ( ! setter )
+		if (!setter)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Invalid call to Object.addProperty() - "
@@ -248,14 +252,11 @@ object_addproperty(const fn_call& fn)
 		}
 	}
 
-
 	// Now that we checked everything, let's call the as_object
 	// interface for getter/setter properties :)
-	
-	bool result = obj->add_property(propname, *getter, setter);
+	obj->add_property(propname, *getter, setter);
 
-	//log_debug("Object.addProperty(): testing");
-	return as_value(result);
+	return as_value(true);
 }
 
 static as_value

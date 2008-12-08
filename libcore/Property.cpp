@@ -80,8 +80,7 @@ Property::setGetter(as_function* func)
 		GetterSetter* a = boost::get<GetterSetter>(&mBound);
 		a->setGetter(func);
 	}
-	else
-		mBound = GetterSetter(func, NULL);
+	else mBound = GetterSetter(func, 0);
 }
 
 void
@@ -89,22 +88,22 @@ Property::setReachable() const
 {
 	switch (mBound.which())
 	{
-	case 0: // Blank, nothing to do.
-		break;
-	case 1: // Simple property, value
-	{
-		boost::get<as_value>(mBound).setReachable();
-		break;
-	}
-	case 2: // Getter/setter
-	{
-		const GetterSetter& a = boost::get<GetterSetter>(mBound);
-		a.markReachableResources();
-		break;
-	}
-	default:
-		abort(); // Not here.
-		break;
+	    case 0: // Blank, nothing to do.
+		    break;
+	    case 1: // Simple property, value
+	    {
+		    boost::get<as_value>(mBound).setReachable();
+		    break;
+	    }
+	    case 2: // Getter/setter
+	    {
+		    const GetterSetter& a = boost::get<GetterSetter>(mBound);
+		    a.markReachableResources();
+		    break;
+	    }
+	    default:
+	    	abort(); // Not here.
+		    break;
 	}
 }
 
@@ -190,8 +189,7 @@ Property::setValue(as_object& this_ptr, const as_value &value)
 			mDestructive = false;
 			mBound = value;
 		}
-		else
-			setDelayedValue(this_ptr, value);
+		else setDelayedValue(this_ptr, value);
 		return;
 	}
 }

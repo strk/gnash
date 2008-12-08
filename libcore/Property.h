@@ -280,60 +280,93 @@ private:
 
 public:
 	/// Default constructor
-	Property(string_table::key name = 0, string_table::key nsId = 0) : 
-		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId),
+	Property(string_table::key name = 0, string_table::key nsId = 0)
+        : 
+		mBound(as_value()),
+        mDestructive(false),
+        mName(name),
+        mNamespace(nsId),
 		mOrderId(0)
-	{/**/}
+	{}
 
 	/// Copy constructor
-	Property(const Property& p) :
-		_flags(p._flags), mBound(p.mBound), mDestructive(p.mDestructive),
-		mName(p.mName), mNamespace(p.mNamespace), mOrderId(p.mOrderId)
-	{/**/}
+	Property(const Property& p)
+        :
+		_flags(p._flags),
+        mBound(p.mBound),
+        mDestructive(p.mDestructive),
+		mName(p.mName),
+        mNamespace(p.mNamespace),
+        mOrderId(p.mOrderId)
+	{}
 
 	/// Constructor taking initial flags
 	Property(string_table::key name, string_table::key nsId,
-		const as_prop_flags& flags) : _flags(flags),
-		mBound(as_value()), mDestructive(false), mName(name), mNamespace(nsId),
+		const as_prop_flags& flags)
+        :
+        _flags(flags),
+		mBound(as_value()),
+        mDestructive(false),
+        mName(name),
+        mNamespace(nsId),
 		mOrderId(0)
-	{/**/}
+	{}
 
 	Property(string_table::key name, string_table::key nsId, 
-		const as_value& value) : mBound(value), mDestructive(false),
-		mName(name), mNamespace(nsId),
+		const as_value& value)
+        :
+        mBound(value),
+        mDestructive(false),
+		mName(name),
+        mNamespace(nsId),
 		mOrderId(0)
-	{/**/}
+	{}
 
 	Property(string_table::key name, string_table::key nsId,
-		const as_value& value, const as_prop_flags& flags) :
-		_flags(flags), mBound(value), mDestructive(false),
-		mName(name), mNamespace(nsId),
+		const as_value& value, const as_prop_flags& flags)
+        :
+		_flags(flags),
+        mBound(value),
+        mDestructive(false),
+		mName(name),
+        mNamespace(nsId),
 		mOrderId(0)
-	{/**/}
+	{}
 
 	Property(string_table::key name, string_table::key nsId,
 		as_function *getter, as_function *setter, 
-		const as_prop_flags& flags, bool destroy = false) :
-		_flags(flags), mBound(GetterSetter(getter, setter)),
-		mDestructive(destroy), mName(name), mNamespace(nsId),
+		const as_prop_flags& flags, bool destroy = false)
+        :
+		_flags(flags), 
+        mBound(GetterSetter(getter, setter)),
+		mDestructive(destroy),
+        mName(name),
+        mNamespace(nsId),
 		mOrderId(0)
-	{/**/}
+	{}
 
 	Property(string_table::key name, string_table::key nsId,
-		as_function *getter, as_function *setter, bool destroy = false) :
-		_flags(), mBound(GetterSetter(getter, setter)), mDestructive(destroy),
-		mName(name), mNamespace(nsId),
+		as_function *getter, as_function *setter, bool destroy = false)
+        :
+		_flags(),
+        mBound(GetterSetter(getter, setter)),
+        mDestructive(destroy),
+		mName(name),
+        mNamespace(nsId),
 		mOrderId(0)
-	{/**/}
+	{}
 
 	Property(string_table::key name, string_table::key nsId,
 		as_c_function_ptr getter, as_c_function_ptr setter,
 		const as_prop_flags& flags, bool destroy = false)
 		:
-		_flags(flags), mBound(GetterSetter(getter, setter)), mDestructive(destroy),
-		mName(name), mNamespace(nsId),
+		_flags(flags),
+        mBound(GetterSetter(getter, setter)),
+        mDestructive(destroy),
+		mName(name),
+        mNamespace(nsId),
 		mOrderId(0)
-	{/**/}
+	{}
 
 	/// Set a user-defined setter
 	void setSetter(as_function* fun);
@@ -421,7 +454,9 @@ public:
 	bool isStatic() const { return _flags.get_static(); }
 
 	/// Is this member supposed to be visible by a VM of given version ?
-	bool isVisible(int swfVersion) const { return _flags.get_visible(swfVersion); }
+	bool isVisible(int swfVersion) const {
+        return _flags.get_visible(swfVersion);
+    }
 
 	/// Clear visibility flags
 	void clearVisible(int swfVersion) { _flags.clear_visible(swfVersion); }
