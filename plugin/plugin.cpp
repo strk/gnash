@@ -453,7 +453,7 @@ nsPluginInstance::~nsPluginInstance()
 #if GNASH_PLUGIN_DEBUG > 1
     std::cout << "plugin instance destruction" << std::endl;
 #endif
-    if ( _ichan )
+    if (_ichan)
     {
 #if GNASH_PLUGIN_DEBUG > 1
         std::cout << "shutting down input chan " << _ichan << std::endl;
@@ -461,10 +461,13 @@ nsPluginInstance::~nsPluginInstance()
         GError *error = NULL;
         g_io_channel_shutdown (_ichan, TRUE, &error);
         g_io_channel_unref (_ichan);
+        _ichan = 0;
     }
+
     if ( _ichanWatchId )
     {
         g_source_remove(_ichanWatchId);
+        _ichanWatchId = 0;
     }
 
     // TODO: unlink the cookie jar
@@ -705,7 +708,8 @@ nsPluginInstance::Write(NPStream* /*stream*/, int32_t /*offset*/, int32_t len,
 }
 
 bool
-nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan, GIOCondition cond, nsPluginInstance* plugin)
+nsPluginInstance::handlePlayerRequestsWrapper(GIOChannel* iochan,
+        GIOCondition cond, nsPluginInstance* plugin)
 {
     return plugin->handlePlayerRequests(iochan, cond);
 }
