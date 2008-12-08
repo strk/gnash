@@ -5,6 +5,7 @@
     for blend modes and bitmap filters.
   - SWF 9 / AVM2 support.
   - RTMP support.
+  - IO redesign.
   - Performance improvements, and reducing the footprint.
   - Custom ActionScript plugins (think MySQL support in Flash).
   - Implement all the missing player classes/methods.
