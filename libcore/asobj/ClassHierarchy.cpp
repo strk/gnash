@@ -308,11 +308,14 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ contextmenu_class_init, NSV::CLASS_CONTEXT_MENU, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 7 },
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
 	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
-// These classes are all implicitly constructed; that is, it is not necessary for
-// the class name to be used to construct the class, so they must always be available.
+	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT, 
+        NS_GLOBAL, 5 }
+// These classes are all implicitly constructed; that is, it is not
+// necessary for the class name to be used to construct the class, so
+// they must always be available.
 //	{ object_class_init, NSV::CLASS_OBJECT, 0, NS_GLOBAL, 5 }
-//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 }
+//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT,
+//	NS_GLOBAL, 6 }
 //	{ array_class_init, NSV::CLASS_ARRAY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
 //	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
 
