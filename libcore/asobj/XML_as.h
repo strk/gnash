@@ -59,6 +59,9 @@ public:
     XML_as(const std::string& xml);
 
     ~XML_as() {};
+    
+    static void init(as_object& global);
+    static void registerNative(as_object& global);
 
     /// Convert the XML object to a string
     //
@@ -177,10 +180,7 @@ private:
 
 };
 
-
-DSOEXPORT void xml_class_init(as_object& global);
-
-}	// end namespace gnash
+}	// namespace gnash
 
 #endif
 

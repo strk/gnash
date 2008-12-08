@@ -185,8 +185,15 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     object_class_init(*this); // flagged for sole SWF5+ visibility
     string_class_init(*this); // should be SWF5+ only
     array_class_init(*this); // should be only for SWF5+
-    //localconnection_class_init(*this); // only for SWF6+
-    registerDateNative(*this); // natives are always present
+
+    registerDateNative(*this);
+
+    XMLNode_as::registerNative(*this);
+
+    // LoadableObject has natives shared between LoadVars and XML, so 
+    // should be registered first.
+    LoadableObject::registerNative(*this);
+    XML_as::registerNative(*this);
 
     switch (version)
     {
