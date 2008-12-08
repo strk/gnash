@@ -39,12 +39,12 @@
 namespace gnash {
 
 namespace {    
-    as_value selection_getbeginindex(const fn_call& fn);
-    as_value selection_getcaretindex(const fn_call& fn);
-    as_value selection_getendindex(const fn_call& fn);
-    as_value selection_getfocus(const fn_call& fn);
-    as_value selection_setfocus(const fn_call& fn);
-    as_value selection_setselection(const fn_call& fn);
+    as_value selection_getBeginIndex(const fn_call& fn);
+    as_value selection_getCaretIndex(const fn_call& fn);
+    as_value selection_getEndIndex(const fn_call& fn);
+    as_value selection_getFocus(const fn_call& fn);
+    as_value selection_setFocus(const fn_call& fn);
+    as_value selection_setSelection(const fn_call& fn);
 
     as_object* getSelectionInterface();
     void attachSelectionInterface(as_object& o);
@@ -64,27 +64,37 @@ selection_class_init(as_object& global)
 
 }
 
+void
+registerSelectionNative(as_object& global)
+{
+    VM& vm = global.getVM();
+
+    vm.registerNative(selection_getBeginIndex, 600, 0);
+    vm.registerNative(selection_getEndIndex, 600, 1);
+    vm.registerNative(selection_getCaretIndex, 600, 2);
+    vm.registerNative(selection_getFocus, 600, 3);
+    vm.registerNative(selection_setFocus, 600, 4);
+    vm.registerNative(selection_setSelection, 600, 5);
+}
+
 namespace {
 
 void
 attachSelectionInterface(as_object& o)
 {
 
+    VM& vm = o.getVM();
+
     const int flags = as_prop_flags::dontEnum |
                       as_prop_flags::dontDelete |
                       as_prop_flags::readOnly;
 
-	o.init_member("getBeginIndex",
-            new builtin_function(selection_getbeginindex), flags);
-	o.init_member("getCaretIndex",
-            new builtin_function(selection_getcaretindex), flags);
-	o.init_member("getEndIndex",
-            new builtin_function(selection_getendindex), flags);
-	o.init_member("getFocus",
-            new builtin_function(selection_getfocus), flags);
-	o.init_member("setFocus", new builtin_function(selection_setfocus), flags);
-	o.init_member("setSelection",
-            new builtin_function(selection_setselection), flags);
+	o.init_member("getBeginIndex", vm.getNative(600, 0), flags);
+	o.init_member("getEndIndex", vm.getNative(600, 1), flags);
+	o.init_member("getCaretIndex", vm.getNative(600, 2), flags); 
+	o.init_member("getFocus", vm.getNative(600, 3), flags);
+	o.init_member("setFocus", vm.getNative(600, 4), flags);
+	o.init_member("setSelection", vm.getNative(600, 5), flags);
 
     /// Handles addListener, removeListener, and _listeners.
     AsBroadcaster::initialize(o);
@@ -104,7 +114,7 @@ getSelectionInterface()
 }
 
 as_value
-selection_getbeginindex(const fn_call& fn)
+selection_getBeginIndex(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
@@ -126,7 +136,7 @@ selection_getbeginindex(const fn_call& fn)
 /// base class, with a default implementation returning -1. We would still
 /// have to check for no-focus events here, though.
 as_value
-selection_getcaretindex(const fn_call& fn)
+selection_getCaretIndex(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
@@ -142,7 +152,7 @@ selection_getcaretindex(const fn_call& fn)
 
 
 as_value
-selection_getendindex(const fn_call& fn)
+selection_getEndIndex(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
@@ -159,7 +169,7 @@ selection_getendindex(const fn_call& fn)
 /// Returns null when there is no focus, otherwise the target of the
 /// character.
 as_value
-selection_getfocus(const fn_call& fn)
+selection_getFocus(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
@@ -194,7 +204,7 @@ selection_getfocus(const fn_call& fn)
 // single argument can be a character or a full target path, otherwise it's
 // a no-op and returns false.
 as_value
-selection_setfocus(const fn_call& fn)
+selection_setFocus(const fn_call& fn)
 {
 
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
@@ -241,7 +251,7 @@ selection_setfocus(const fn_call& fn)
 
 
 as_value
-selection_setselection(const fn_call& fn)
+selection_setSelection(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
