@@ -1006,15 +1006,10 @@ public:
 	///
 	/// @param setter
 	///	A function to invoke when setting this property's value.
-	///	add_ref will be called on the function.
 	///	By passing NULL, the property will have no setter
 	///	(valid ActionScript - see actionscript.all/Object.as)
-	///
-	/// @return true if the property was successfully added, false
-	///         otherwise (property already existent?)
-	///
-	bool add_property(const std::string& key, as_function& getter,
-		as_function* setter=NULL);
+	void add_property(const std::string& key, as_function& getter,
+		as_function* setter);
 
 	/// Return this object '__proto__' member.
 	//

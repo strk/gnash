@@ -248,7 +248,7 @@ public:
 
 namespace gnash {
 
-bool
+void
 as_object::add_property(const std::string& name, as_function& getter,
 		as_function* setter)
 {
@@ -266,7 +266,7 @@ as_object::add_property(const std::string& name, as_function& getter,
         // is always true.
 		_members.addGetterSetter(k, getter, setter, cacheVal);
 
-        return true;
+        return;
 		// NOTE: watch triggers not called when adding a new
         // getter-setter property
 	}
@@ -275,8 +275,6 @@ as_object::add_property(const std::string& name, as_function& getter,
 
 		_members.addGetterSetter(k, getter, setter, cacheVal);
 
-        // Used to return here if addGetterSetter returned false, but this
-        // never happened.
 #if 1
 		// check if we have a trigger, if so, invoke it
 		// and set val to its return
@@ -297,14 +295,12 @@ as_object::add_property(const std::string& name, as_function& getter,
 			{
 				log_debug("Property %s deleted by trigger on create "
                         "(getter-setter)", name);
-				return false; // or true ?
+				return;
 			}
 			prop->setCache(cacheVal);
 		}
 #endif
-
-        /// Return value of addGetterSetter? 
-		return true;
+		return;
 	}
 }
 
