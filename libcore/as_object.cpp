@@ -669,66 +669,6 @@ as_object::set_member(string_table::key key, const as_value& val,
 	return false;
 }
 
-#if 0
-std::pair<bool,bool>
-as_object::update_member(string_table::key key, const as_value& val,
-	string_table::key nsname)
-{
-	std::pair<bool,bool> ret; // first is found, second is updated
-
-	//log_debug(_("set_member_default(%s)"), key);
-	Property* prop = findUpdatableProperty(key, nsname);
-	if (prop)
-	{
-		if (prop->isReadOnly())
-		{
-			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
-				"Attempt to set read-only property '%s'"),
-				_vm.getStringTable().value(key)););
-			return std::make_pair(true, false);
-		}
-
-		try
-		{
-			as_value newVal = val;
-
-			// check if we have a trigger, if so, invoke it
-			// and set val to it's return
-			TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, nsname));
-			if ( trigIter != _trigs.end() )
-			{
-				Trigger& trig = trigIter->second;
-				// WARNING: getValue might itself invoke a trigger (getter-setter)... ouch ?
-				as_value curVal = prop->getCache(); // Value(*this); 
-				log_debug("Property %s is being watched: firing trigger on update (current val:%s, new val:%s",
-					_vm.getStringTable().value(key),
-					curVal, val);
-				newVal = trig.call(curVal, val, *this);
-				// The trigger call could have deleted the property,
-				// so we check for its existance again, and do NOT put
-				// it back in if it was deleted
-				prop = findUpdatableProperty(key, nsname);
-				if ( ! prop )
-				{
-					return std::make_pair(true, true);
-				}
-			}
-
-			prop->setValue(*this, newVal);
-			return std::make_pair(true, true);
-		}
-		catch (ActionTypeError& exc)
-		{
-			log_debug(_("%s: Exception %s. Will create a new member"),
-				_vm.getStringTable().value(key), exc.what());
-		}
-
-		return std::make_pair(true, false);
-	}
-
-	return std::make_pair(false, false);
-}
-#endif
 
 void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
