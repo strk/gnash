@@ -1040,8 +1040,6 @@ public:
 	void set_prototype(boost::intrusive_ptr<as_object> proto,
             int flags=as_prop_flags::dontDelete | as_prop_flags::dontEnum);
 
-	std::string asPropName(string_table::key name);
-	
 	/// @{ Common ActionScript methods for characters
 	/// TODO: make protected
 

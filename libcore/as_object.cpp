@@ -261,25 +261,32 @@ as_object::add_property(const std::string& name, as_function& getter,
 	if ( prop )
 	{
 		cacheVal = prop->getCache();
-		return _members.addGetterSetter(k, getter, setter, cacheVal);
 
-		// NOTE: watch triggers not called when adding a new getter-setter property
+        // Used to return the return value of addGetterSetter, but this
+        // is always true.
+		_members.addGetterSetter(k, getter, setter, cacheVal);
+
+        return true;
+		// NOTE: watch triggers not called when adding a new
+        // getter-setter property
 	}
 	else
 	{
 
-		bool ret = _members.addGetterSetter(k, getter, setter, cacheVal);
-		if (!ret) return false;
+		_members.addGetterSetter(k, getter, setter, cacheVal);
 
+        // Used to return here if addGetterSetter returned false, but this
+        // never happened.
 #if 1
 		// check if we have a trigger, if so, invoke it
-		// and set val to it's return
+		// and set val to its return
 		TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(k, 0));
 		if ( trigIter != _trigs.end() )
 		{
 			Trigger& trig = trigIter->second;
 
-			log_debug("add_property: property %s is being watched, current val: %s", name, cacheVal);
+			log_debug("add_property: property %s is being watched, "
+                    "current val: %s", name, cacheVal);
 			cacheVal = trig.call(cacheVal, as_value(), *this);
 
 			// The trigger call could have deleted the property,
@@ -288,15 +295,16 @@ as_object::add_property(const std::string& name, as_function& getter,
 			prop = _members.getProperty(k);
 			if ( ! prop )
 			{
-				log_debug("Property %s deleted by trigger on create (getter-setter)", name);
+				log_debug("Property %s deleted by trigger on create "
+                        "(getter-setter)", name);
 				return false; // or true ?
 			}
 			prop->setCache(cacheVal);
-			//prop->setValue(*this, cacheVal);
 		}
 #endif
 
-		return ret;
+        /// Return value of addGetterSetter? 
+		return true;
 	}
 }
 
@@ -768,17 +776,9 @@ as_object::init_property(string_table::key key, as_function& getter,
 {
 	as_value cacheValue;
 
-	bool success;
-	success = _members.addGetterSetter(key, getter, &setter, cacheValue, flags, nsname);
-
-	// We shouldn't attempt to initialize a property twice, should we ?
-	assert(success);
-
-	//log_debug(_("Initialized property '%s'"), name);
-
-	// TODO: optimize this, don't scan again !
-	//_members.setFlags(key, flags, nsname);
-
+    // PropertyList::addGetterSetter always returns true (used to be
+    // an assert).
+	_members.addGetterSetter(key, getter, &setter, cacheValue, flags, nsname);
 }
 
 void
@@ -793,38 +793,26 @@ void
 as_object::init_property(string_table::key key, as_c_function_ptr getter,
 		as_c_function_ptr setter, int flags, string_table::key nsname)
 {
-	bool success;
-	success = _members.addGetterSetter(key, getter, setter, nsname);
-
-	// We shouldn't attempt to initialize a property twice, should we ?
-	assert(success);
-
-	//log_debug(_("Initialized property '%s'"), name);
-
-	// TODO: optimize this, don't scan again !
-	_members.setFlags(key, flags, nsname);
-
+    // PropertyList::addGetterSetter always returns true (used to be
+    // an assert).
+	_members.addGetterSetter(key, getter, setter, flags, nsname);
 }
 
 bool
 as_object::init_destructive_property(string_table::key key, as_function& getter,
 	int flags, string_table::key nsname)
 {
-	bool success;
-
 	// No case check, since we've already got the key.
-	success = _members.addDestructiveGetter(key, getter, nsname, flags);
+	bool success = _members.addDestructiveGetter(key, getter, nsname, flags);
 	return success;
 }
 
 bool
-as_object::init_destructive_property(string_table::key key, as_c_function_ptr getter,
-	int flags, string_table::key nsname)
+as_object::init_destructive_property(string_table::key key,
+        as_c_function_ptr getter, int flags, string_table::key nsname)
 {
-	bool success;
-
 	// No case check, since we've already got the key.
-	success = _members.addDestructiveGetter(key, getter, nsname, flags);
+	bool success = _members.addDestructiveGetter(key, getter, nsname, flags);
 	return success;
 }
 
@@ -840,8 +828,8 @@ as_object::init_readonly_property(const std::string& key, as_function& getter,
 }
 
 void
-as_object::init_readonly_property(const string_table::key& k, as_function& getter,
-	int initflags, string_table::key nsname)
+as_object::init_readonly_property(const string_table::key& k,
+        as_function& getter, int initflags, string_table::key nsname)
 {
 	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
 		| as_prop_flags::isProtected, nsname);
@@ -849,8 +837,8 @@ as_object::init_readonly_property(const string_table::key& k, as_function& gette
 }
 
 void
-as_object::init_readonly_property(const std::string& key, as_c_function_ptr getter,
-	int initflags, string_table::key nsname)
+as_object::init_readonly_property(const std::string& key,
+        as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
 	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
 
@@ -860,20 +848,12 @@ as_object::init_readonly_property(const std::string& key, as_c_function_ptr gett
 }
 
 void
-as_object::init_readonly_property(const string_table::key& k, as_c_function_ptr getter,
-	int initflags, string_table::key nsname)
+as_object::init_readonly_property(const string_table::key& k,
+        as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
 	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
 		| as_prop_flags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));
-}
-
-std::string
-as_object::asPropName(string_table::key name)
-{
-	std::string orig = _vm.getStringTable().value(name);
-
-	return PROPNAME(orig); // why is PROPNAME needed here ?
 }
 
 
