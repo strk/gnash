@@ -722,7 +722,7 @@ nsPluginInstance::handlePlayerRequests(GIOChannel* iochan, GIOCondition cond)
 #if GNASH_PLUGIN_DEBUG > 1
         std::cout << "Player request channel hang up" << std::endl;
 #endif
-        g_source_remove(_ichanWatchId);
+        // false signals that the source should be removed.
         return false;
     }
 
