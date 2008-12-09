@@ -167,7 +167,7 @@ so4 = SharedObject.getLocal("Another-one", "/subdir");
 check(so4 != so3);
 check_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(typeof(ret), 'undefined');
 
 //------------------------------------------
 // Test that if 'data' is a getter-setter,
@@ -193,6 +193,9 @@ xcheck_equals(getCalls, 0); // flush didn't cal the getter
 
 so6 = SharedObject.getLocal("so6");
 check(so6.hasOwnProperty("data"));
+ret = so6.flush();
+check_equals(ret, true);
+
 a = new Array;
 for (var i in so6) a.push(i);
 check_equals(a.toString(), 'data');
@@ -214,7 +217,12 @@ so7 = SharedObject.getLocal();
  check_equals(typeof(so7), 'null');
 #endif
 so7.data.a = 1;
-so7.flush();
+ret = so7.flush();
+#if OUTPUT_VERSION < 7
+check_equals(ret, undefined);
+#else
+check_equals(ret, true);
+#endif 
 
 so8 = SharedObject.getLocal('');
 check_equals(typeof(so8), 'null');
@@ -226,7 +234,7 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(75);
+check_totals(77);
 
 #else
 

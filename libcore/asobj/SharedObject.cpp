@@ -235,7 +235,7 @@ public:
     { 
     }
 
-    bool flush() const;
+    bool flush(as_object& data) const;
 
     const std::string& getFilespec() const {
         return _sol.getFilespec();
@@ -261,6 +261,104 @@ private:
 
     SOL _sol;
 };
+
+
+SharedObject::~SharedObject()
+{
+}
+
+
+bool
+SharedObject::flush(as_object& data) const
+{
+    const std::string& filespec = _sol.getFilespec();
+
+    if ( ! createDirForFile(filespec) )
+    {
+        log_error("Couldn't create dir for flushing SharedObject %s", filespec);
+        return false;
+    }
+
+#ifdef USE_SOL_READONLY
+    log_debug(_("SharedObject %s not flushed (compiled as read-only mode)"),
+            filespec);
+    return false;
+#endif
+
+    if (rcfile.getSOLReadOnly() ) {
+        log_security("Attempting to write object %s when it's SOL "
+                "Read Only is set! Refusing...", filespec);
+        return false;
+    }
+    
+#ifdef BUFFERED_AMF_SOL
+
+    gnash::SimpleBuffer buf;
+    // see http://osflash.org/documentation/amf/envelopes/sharedobject
+    buf.append("\x00\xbf\x00\x00\x00\x00TCSO\x00\x04\x00\x00\x00\x00", 16); // length field filled in later
+
+    // append object name
+    std::string object_name = getObjectName();
+    boost::uint16_t len = object_name.length();
+    buf.appendNetworkShort(len);
+    buf.append(object_name.c_str(), len);
+
+    // append padding
+    buf.append("\x00\x00\x00\x00", 4);
+
+    // append properties of object
+    VM& vm = getVM();
+
+    std::map<as_object*, size_t> offsetTable;
+    SOLPropsBufSerializer props(buf, vm, offsetTable);
+    data.visitPropertyValues(props);
+    if ( ! props.success() ) 
+    {
+        log_error("Could not serialize object");
+        return false;
+    }
+
+    // fix length field
+    *(reinterpret_cast<uint32_t*>(buf.data() + 2)) = htonl(buf.size() - 6);
+    
+    // TODO write file
+    std::ofstream ofs(filespec.c_str(), std::ios::binary);
+    if(! ofs) {
+        log_error("SharedObject::flush(): Failed opening file '%s' in "
+                "binary mode", filespec.c_str());
+        return false;
+    }
+    
+    if(ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size()).fail() )
+    {
+        log_error("Error writing %d bytes to output file %s",
+                buf.size(), filespec.c_str());
+        ofs.close();
+        return false;
+    }
+    ofs.close();
+
+#else // amf::SOL-based serialization
+
+    // append properties of object
+    VM& vm = getVM();
+
+    SOL sol;
+    PropsSerializer props(sol, vm);
+    data.visitPropertyValues(props);
+    // We only want to access files in this directory
+    bool ret = sol.writeFile(filespec, getObjectName().c_str());
+    if ( ! ret )
+    {
+        log_error("writing SharedObject file to %s", filespec);
+        return false;
+    }
+#endif
+
+    log_security("SharedObject '%s' written to filesystem.", filespec);
+    return true;
+}
+
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
@@ -379,123 +477,13 @@ SharedObjectLibrary::getLocal(const std::string& objName,
         
     boost::intrusive_ptr<as_object> data = readSOL(_vm, newspec);
 
-    if (data)
-    {
+    if (data) {
         const int flags = as_prop_flags::dontDelete |
                           as_prop_flags::readOnly;
-        obj->init_member("data", data, flags);
+        obj->init_member(NSV::PROP_DATA, data, flags);
     }
 
     return obj;
-}
-
-
-SharedObject::~SharedObject()
-{
-    // flush(); // needs more care, if destroyed after VM we get killed
-}
-
-
-bool
-SharedObject::flush() const
-{
-    const std::string& filespec = _sol.getFilespec();
-
-    if ( ! createDirForFile(filespec) )
-    {
-        log_error("Couldn't create dir for flushing SharedObject %s", filespec);
-        return false;
-    }
-
-#ifdef USE_SOL_READONLY
-    log_debug(_("SharedObject %s not flushed (compiled as read-only mode)"), filespec);
-    return false;
-#endif
-
-//    log_debug("Flushing to file %s", filespec);
-
-    VM& vm = getVM();
-
-    if (rcfile.getSOLReadOnly() ) {
-        log_security("Attempting to write object %s when it's SOL Read Only is set! Refusing...",
-                     filespec);
-        return false;
-    }
-    
-    // TODO: cache the dataKey in SharedObject prototype on first use ?
-    //       a SharedObject::getDataKey() might do...
-    string_table::key dataKey = vm.getStringTable().find("data");
-    
-    as_value as = const_cast<SharedObject*>(this)->getMember(dataKey);
-    log_debug("data member of this SharedObject is %s", as);
-    boost::intrusive_ptr<as_object> ptr = as.to_object();
-    if ( ! ptr ) {
-        log_aserror("'data' member of SharedObject is not an object (%s)",
-                  as);
-        return true;
-    }
-
-#ifdef BUFFERED_AMF_SOL
-
-    gnash::SimpleBuffer buf;
-    // see http://osflash.org/documentation/amf/envelopes/sharedobject
-    buf.append("\x00\xbf\x00\x00\x00\x00TCSO\x00\x04\x00\x00\x00\x00", 16); // length field filled in later
-
-    // append object name
-    std::string object_name = getObjectName();
-    boost::uint16_t len = object_name.length();
-    buf.appendNetworkShort(len);
-    buf.append(object_name.c_str(), len);
-
-    // append padding
-    buf.append("\x00\x00\x00\x00", 4);
-
-    // append properties of object
-    std::map<as_object*, size_t> offsetTable;
-    SOLPropsBufSerializer props(buf, vm, offsetTable);
-    ptr->visitPropertyValues(props);
-    if ( ! props.success() ) 
-    {
-        log_error("Could not serialize object");
-        return false;
-    }
-
-    // fix length field
-    *(reinterpret_cast<uint32_t*>(buf.data() + 2)) = htonl(buf.size() - 6);
-    
-    // TODO write file
-    std::ofstream ofs(filespec.c_str(), std::ios::binary);
-    if(! ofs) {
-        log_error("SharedObject::flush(): Failed opening file '%s' in "
-                "binary mode", filespec.c_str());
-        return false;
-    }
-    
-    if(ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size()).fail() )
-    {
-        log_error("Error writing %d bytes to output file %s",
-                buf.size(), filespec.c_str());
-        ofs.close();
-        return false;
-    }
-    ofs.close();
-
-#else // amf::SOL-based serialization
-
-    SOL sol;
-    PropsSerializer props(sol, vm);
-    ptr->visitPropertyValues(props);
-    // We only want to access files in this directory
-    bool ret = sol.writeFile(filespec, getObjectName().c_str());
-    if ( ! ret )
-    {
-        log_error("writing SharedObject file to %s", filespec);
-        return false;
-    }
-#endif
-
-    log_security("SharedObject '%s' written to filesystem.", filespec);
-    return true;
 }
 
 
@@ -664,16 +652,24 @@ sharedobject_flush(const fn_call& fn)
         ensureType<SharedObject>(fn.this_ptr);
 
     IF_VERBOSE_ASCODING_ERRORS(
-    if ( fn.nargs )
-    {
-        std::stringstream ss;
-        fn.dump_args(ss);
-        log_aserror(_("Arguments to SharedObject.flush(%s) will be ignored"),
-            ss.str());
-    }
-    )
+        if ( fn.nargs )
+        {
+            std::stringstream ss;
+            fn.dump_args(ss);
+            log_aserror(_("Arguments to SharedObject.flush(%s) will be "
+                    "ignored"), ss.str());
+        }
+    );
 
-    return as_value(obj->flush());
+    /// If there is no data member, returns undefined.
+    as_value dataMember;
+    if (!obj->get_member(NSV::PROP_DATA, &dataMember)) return as_value();
+   
+    as_object* data = dataMember.to_object().get();
+    if (!data) return as_value();
+
+    // If there is an object data member, returns the success of flush().
+    return as_value(obj->flush(*data));
 }
 
 // Set the file name
@@ -892,9 +888,7 @@ readSOL(VM& vm, const std::string& filespec)
     std::vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
     log_debug("Read %d AMF objects from %s", els.size(), filespec);
 
-    string_table& st = _vm.getStringTable();
-    string_table::key dataKey =  st.find("data");
-    as_value as = getMember(dataKey);
+    as_value as = getMember(NSV::PROP_DATA);
     boost::intrusive_ptr<as_object> ptr = as.to_object();
     
     for (it = els.begin(), e = els.end(); it != e; it++) {
