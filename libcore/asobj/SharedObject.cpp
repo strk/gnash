@@ -104,39 +104,39 @@ public:
     {};
 
     void accept(string_table::key key, const as_value& val) 
-        {
-            AMF amf;
-            boost::shared_ptr<amf::Element> el;
-            
-            const std::string& name = _st.string_table::value(key);
+    {
+        AMF amf;
+        boost::shared_ptr<amf::Element> el;
+        
+        const std::string& name = _st.string_table::value(key);
 
-            //log_debug("Serializing SharedObject property %s:%s", name, val);
+        //log_debug("Serializing SharedObject property %s:%s", name, val);
 
-            if (val.is_string()) {
-                std::string str;
-                if (!val.is_undefined()) {
-                    str = val.to_string();
-                }
-                el.reset(new amf::Element(name, str));
+        if (val.is_string()) {
+            std::string str;
+            if (!val.is_undefined()) {
+                str = val.to_string();
             }
-            if (val.is_bool()) {
-                bool flag = val.to_bool();
-                el.reset(new amf::Element(name, flag));
-            }
-            if (val.is_number()) { 
-                double dub;
-                if (val.is_undefined()) {
-                    dub = 0.0;
-                } else {
-                    dub = val.to_number();
-                }
-                el.reset(new amf::Element(name, dub));
-            }
-
-            if (el) {
-                _sol.addObj(el);
-            }
+            el.reset(new amf::Element(name, str));
         }
+        if (val.is_bool()) {
+            bool flag = val.to_bool();
+            el.reset(new amf::Element(name, flag));
+        }
+        if (val.is_number()) { 
+            double dub;
+            if (val.is_undefined()) {
+                dub = 0.0;
+            } else {
+                dub = val.to_number();
+            }
+            el.reset(new amf::Element(name, dub));
+        }
+
+        if (el) {
+            _sol.addObj(el);
+        }
+    }
 
 private:
 
@@ -202,7 +202,7 @@ public:
         {
             log_error("Problems serializing an object's member %s=%s",
                     name, val);
-            _error=true;
+            _error = true;
         }
 
         _buf.appendByte(0); // SOL-specific
@@ -323,13 +323,13 @@ SharedObject::flush(as_object& data) const
     
     // TODO write file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
-    if(! ofs) {
+    if (!ofs) {
         log_error("SharedObject::flush(): Failed opening file '%s' in "
                 "binary mode", filespec.c_str());
         return false;
     }
     
-    if(ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size()).fail() )
+    if (ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size()).fail())
     {
         log_error("Error writing %d bytes to output file %s",
                 buf.size(), filespec.c_str());
@@ -794,11 +794,10 @@ readSOL(VM& vm, const std::string& filespec)
 
     if (st.st_size < 28)
     {
-        // A SOL file exists, but it was invalid. There will be no
-        // data member.
+        // A SOL file exists, but it was invalid. Count it as not existing.
         log_error("SharedObject::readSOL: SOL file %s is too short "
                 "(only %s bytes long) to be valid.", filespec, st.st_size);
-        return 0;
+        return data;
     }
 
     boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
@@ -822,6 +821,7 @@ readSOL(VM& vm, const std::string& filespec)
 
         if (buf >= end)
         {
+            // In this case there is no data member.
             log_error("SharedObject::readSOL: file ends before data segment");
             return 0;
         }
