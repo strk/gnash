@@ -425,7 +425,7 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
 {
     for (size_t i=0, n=data->argc; i<n; ++i)
     {
-        string name, val;
+        std::string name, val;
 
         if (data->argn[i])
         {
@@ -623,7 +623,7 @@ nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
 
 #ifdef WRITE_FILE
     size_t start, end;
-    string fname;
+    std::string fname;
     end   = _swf_url.find(".swf", 0) + 4;
     start = _swf_url.rfind("/", end) + 1;
     fname = "/tmp/";
@@ -1141,7 +1141,7 @@ nsPluginInstance::dumpCookies()
 void
 nsPluginInstance::startProc(Window win)
 {
-    string procname;
+    std::string procname;
     char *gnash_env = std::getenv("GNASH_PLAYER");
 #ifdef GNASH_XPI_PLUGIN
     if (getHome(procname) >= 0)
@@ -1215,16 +1215,16 @@ nsPluginInstance::startProc(Window win)
     snprintf(hostfd, buf_size, "%d", c2p_pipe[1]);
 
     // Prepare Actionscript variables (e.g. Flashvars).
-    vector<string> paramvalues;
+    std::vector<std::string> paramvalues;
     paramvalues.reserve(_params.size());
 
-    for (map<string,string>::const_iterator it = _params.begin(),
+    for (std::map<std::string,std::string>::const_iterator it = _params.begin(),
         itEnd = _params.end(); it != itEnd; ++it) {
-        const string& nam = it->first; 
-        const string& val = it->second;
+        const std::string& nam = it->first; 
+        const std::string& val = it->second;
 
-        string param = nam;
-        param += string("=");
+        std::string param = nam;
+        param += std::string("=");
         param += val;
         paramvalues.push_back(param);
     }
@@ -1242,7 +1242,7 @@ nsPluginInstance::startProc(Window win)
     const char **argv = new const char *[maxargc];
 
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-    ofstream saLauncher;
+    std::ofstream saLauncher;
 
     if ( createSaLauncher )
     {
@@ -1250,7 +1250,7 @@ nsPluginInstance::startProc(Window win)
         static int debugno = 0;
         debugno = (debugno + 1) % 10;
         ss << "/tmp/gnash-debug-" << debugno << ".sh";
-        saLauncher.open(ss.str().c_str(), ios::out | ios::trunc);
+        saLauncher.open(ss.str().c_str(), std::ios::out | std::ios::trunc);
     }
 
     if ( saLauncher )
