@@ -348,14 +348,16 @@ SOL::writeFile(const string &filespec, const string &name)
     
     if ( ofs.write(head.get(), _header.size()).fail() )
     {
-        log_error("Error writing %d bytes of header to output file %s", _header.size(), filespec.c_str());
+        log_error("Error writing %d bytes of header to output file %s", 
+                _header.size(), filespec);
         return false;
     }
 
 //    ofs.write(body, (ptr - body));
     if ( ofs.write(body.get(), _filesize).fail() )
     {
-        log_error("Error writing %d bytes of body to output file %s", _filesize, filespec.c_str());
+        log_error("Error writing %d bytes of body to output file %s",
+                _filesize, filespec);
         return false;
     }
     ofs.close();
@@ -374,19 +376,23 @@ SOL::readFile(const std::string &filespec)
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
     boost::uint16_t size;
-    Network::byte_t *buf = 0;
-    Network::byte_t *ptr = 0;
     size_t bodysize;
 
     // Make sure it's an SOL file
-    if (stat(filespec.c_str(), &st) == 0) {
+    if (stat(filespec.c_str(), &st) != 0)  return false;
 
 	try {
+
+        Network::byte_t *ptr = 0;
+
 	    ifstream ifs(filespec.c_str(), ios::binary);
-	    _filesize = st.st_size;
-	    buf = new Network::byte_t[_filesize + sizeof(int)];
-	    ptr = buf;
-	    Network::byte_t* tooFar = buf+_filesize;
+
+        _filesize = st.st_size;
+        boost::scoped_array<Network::byte_t> buf(
+                new Network::byte_t[_filesize + sizeof(int)]);
+
+	    ptr = buf.get();
+	    Network::byte_t* tooFar = buf.get() + _filesize;
 	    
 	    bodysize = st.st_size - 6;
 	    _filespec = filespec;
@@ -409,22 +415,25 @@ SOL::readFile(const std::string &filespec)
 	    
 	    // consistency check
 	    if ((buf[0] == 0) && (buf[1] == 0xbf)) {
-		if (bodysize == length) {
-		    log_debug("%s is an SOL file", filespec.c_str());
-		} else {
-		    log_error("%s looks like an SOL file, but the length is wrong. Should be %d, got %d",
-			      filespec.c_str(), (_filesize - 6), length);
-		}
-		
-        } else {
-		log_error("%s isn't an SOL file", filespec.c_str());
+            if (bodysize == length) {
+                log_debug("%s is an SOL file", filespec);
+            }
+            else {
+		    log_error("%s looks like an SOL file, but the length is wrong. "
+                    "Should be %d, got %d",
+                    filespec, (_filesize - 6), length);
+            }
+        }
+        else {
+            log_error("%s isn't an SOL file", filespec);
 	    }
 	    
 #ifndef GNASH_TRUST_AMF
 	    ENSUREBYTES(ptr, tooFar, 2); 
 #endif
 	    
-	    // 2 bytes for the length of the object name, but it's also null terminated
+	    // 2 bytes for the length of the object name, but it's also 
+        // null terminated
 	    size = *(reinterpret_cast<boost::uint16_t *>(ptr));
 	    size = ntohs(size);
 	    ptr += 2;
@@ -444,31 +453,24 @@ SOL::readFile(const std::string &filespec)
 	    AMF amf_obj;
 	    boost::shared_ptr<amf::Element> el;
 	    while ( ptr < tooFar) {
-		if (ptr) {
-		    el = amf_obj.extractProperty(ptr, tooFar);
-		    if (el != 0) {
-			ptr += amf_obj.totalsize() + 1;
-			_amfobjs.push_back(el);
-		    } else {
-			break;
-		    }
-//		log_debug("Bodysize is: %d size is: %d for %s", bodysize, size, el->getName());
-		} else {
-		    break;
-		}
+            if (ptr) {
+                el = amf_obj.extractProperty(ptr, tooFar);
+                if (el != 0) {
+                    ptr += amf_obj.totalsize() + 1;
+                    _amfobjs.push_back(el);
+                }
+                else break;
+            } else break;
 	    }
-	    delete[] buf;
 	    
 	    ifs.close();
 	    return true;
-	} catch (std::exception& e) {
+	}
+    catch (std::exception& e) {
 	    log_error("Reading SharedObject %s: %s", filespec, e.what());
 	    return false;
 	}
-    }
     
-//    log_error("Couldn't open file: %s", strerror(errno));
-    return false;
 }
 
 ///  \brief Dump the internal data of this class in a human readable form.
