@@ -253,6 +253,8 @@ public:
         _sol.setObjectName(s);
     }
 
+    /// This isn't correct, as the default implementation doesn't use SOL
+    /// for reading.
     size_t size() const { 
         return _sol.fileSize(); 
     }
