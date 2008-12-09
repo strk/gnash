@@ -282,7 +282,7 @@ SOL::writeFile(const string &filespec, const string &name)
     _filesize = size;
     
     boost::scoped_array<char> body ( new char[size + 20] );
-    memset(body.get(), 0, size);
+    std::fill_n(body.get(), size, 0);
     ptr = body.get();
     char* endPtr = ptr+size+20; // that's the amount we allocated..
 
@@ -353,7 +353,6 @@ SOL::writeFile(const string &filespec, const string &name)
         return false;
     }
 
-//    ofs.write(body, (ptr - body));
     if ( ofs.write(body.get(), _filesize).fail() )
     {
         log_error("Error writing %d bytes of body to output file %s",

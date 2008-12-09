@@ -254,7 +254,7 @@ public:
     }
 
     size_t size() const { 
-        return _sol.size(); // TODO: fix this, is bogus
+        return _sol.fileSize(); 
     }
 
 private:
