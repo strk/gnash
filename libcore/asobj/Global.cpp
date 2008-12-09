@@ -214,6 +214,35 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 
 }
 
+#ifdef USE_EXTENSIONS
+
+//-----------------------
+// Extensions
+//-----------------------
+// Scan the plugin directories for all plugins, and load them now.
+// FIXME: this should actually be done dynamically, and only
+// if a plugin defines a class that a movie actually wants to
+// use.
+void
+Global::loadExtensions()
+{
+
+    if ( RcInitFile::getDefaultInstance().enableExtensions() )
+    {
+        log_security(_("Extensions enabled, scanning plugin dir for load"));
+        _et.scanAndLoad(*this);
+    }
+    else
+    {
+        log_security(_("Extensions disabled"));
+    }
+
+}
+
+#endif
+
+
+
 as_value
 as_global_trace(const fn_call& fn)
 {
@@ -636,7 +665,6 @@ as_global_updateAfterEvent(const fn_call& /*fn*/)
     return as_value();
 }
 
-
 namespace {
 
 void
@@ -679,33 +707,6 @@ registerNatives(as_object& global)
     XMLNode_as::registerNative(global);
 
 }
-
-#ifdef USE_EXTENSIONS
-
-//-----------------------
-// Extensions
-//-----------------------
-// Scan the plugin directories for all plugins, and load them now.
-// FIXME: this should actually be done dynamically, and only
-// if a plugin defines a class that a movie actually wants to
-// use.
-void
-Global::loadExtensions()
-{
-
-    if ( RcInitFile::getDefaultInstance().enableExtensions() )
-    {
-        log_security(_("Extensions enabled, scanning plugin dir for load"));
-        _et.scanAndLoad(*this);
-    }
-    else
-    {
-        log_security(_("Extensions disabled"));
-    }
-
-}
-
-#endif
 
 } // anonymous namespace
 } // namespace gnash
