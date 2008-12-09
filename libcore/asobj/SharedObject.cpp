@@ -79,9 +79,11 @@ namespace {
     as_value sharedobject_deleteAll(const fn_call& fn);
     as_value sharedobject_getDiskUsage(const fn_call& fn);
     as_value sharedobject_getRemote(const fn_call& fn);
+    as_value sharedobject_data(const fn_call& fn);
 
     as_value sharedobject_getLocal(const fn_call& fn);
     as_value sharedobject_ctor(const fn_call& fn);
+
     
     as_object* readSOL(VM& vm, const std::string& filespec);
 
@@ -231,11 +233,12 @@ public:
 
     SharedObject()
         :
-        as_object(getSharedObjectInterface())
+        as_object(getSharedObjectInterface()),
+        _data(0)
     { 
     }
 
-    bool flush(as_object& data) const;
+    bool flush(int space = 0) const;
 
     const std::string& getFilespec() const {
         return _sol.getFilespec();
@@ -259,20 +262,65 @@ public:
         return _sol.fileSize(); 
     }
 
+    void setData(as_object* data) {
+
+        assert(data);
+        _data = data;
+
+        const int flags = as_prop_flags::dontDelete |
+                          as_prop_flags::readOnly;
+
+        init_property(NSV::PROP_DATA, &sharedobject_data, &sharedobject_data,
+                flags);
+
+    }
+
+    as_object* data() {
+        return _data;
+    }
+
+    const as_object* data() const {
+        return _data;
+    }
+
+protected:
+
+    void markReachableResources() const {
+        if (_data) _data->setReachable();
+    }
+
 private:
+
+    as_object* _data;
 
     SOL _sol;
 };
 
-
 SharedObject::~SharedObject()
 {
+    /// This apparently used to cause problems if the VM no longer exists on
+    /// destruction. It certainly would. However, it *has* to be done, so if it
+    /// still causes problems, it must be fixed another way than not doing it.
+    flush();
 }
 
 
 bool
-SharedObject::flush(as_object& data) const
+SharedObject::flush(int space) const
 {
+
+    /// This is called on on destruction of the SharedObject, or (allegedly)
+    /// on a call to SharedObject.data, so _data is not guaranteed to exist.
+    //
+    /// The function should never be called from SharedObject.flush() when
+    /// _data is 0.
+    if (!_data) return false;
+
+    if (space > 0) {
+        log_unimpl("SharedObject.flush() called with a minimum disk space "
+                "argument (%d), which is currently ignored", space);
+    }
+
     const std::string& filespec = _sol.getFilespec();
 
     if ( ! createDirForFile(filespec) )
@@ -297,7 +345,9 @@ SharedObject::flush(as_object& data) const
 
     gnash::SimpleBuffer buf;
     // see http://osflash.org/documentation/amf/envelopes/sharedobject
-    buf.append("\x00\xbf\x00\x00\x00\x00TCSO\x00\x04\x00\x00\x00\x00", 16); // length field filled in later
+
+    // length field filled in later
+    buf.append("\x00\xbf\x00\x00\x00\x00TCSO\x00\x04\x00\x00\x00\x00", 16); 
 
     // append object name
     std::string object_name = getObjectName();
@@ -313,7 +363,7 @@ SharedObject::flush(as_object& data) const
 
     std::map<as_object*, size_t> offsetTable;
     SOLPropsBufSerializer props(buf, vm, offsetTable);
-    data.visitPropertyValues(props);
+    _data->visitPropertyValues(props);
     if ( ! props.success() ) 
     {
         log_error("Could not serialize object");
@@ -347,7 +397,7 @@ SharedObject::flush(as_object& data) const
 
     SOL sol;
     PropsSerializer props(sol, vm);
-    data.visitPropertyValues(props);
+    _data->visitPropertyValues(props);
     // We only want to access files in this directory
     bool ret = sol.writeFile(filespec, getObjectName().c_str());
     if ( ! ret )
@@ -479,11 +529,8 @@ SharedObjectLibrary::getLocal(const std::string& objName,
         
     boost::intrusive_ptr<as_object> data = readSOL(_vm, newspec);
 
-    if (data) {
-        const int flags = as_prop_flags::dontDelete |
-                          as_prop_flags::readOnly;
-        obj->init_member(NSV::PROP_DATA, data, flags);
-    }
+    /// Don't set to 0, or it will initialize a property.
+    if (data) obj->setData(data.get());
 
     return obj;
 }
@@ -650,28 +697,31 @@ as_value
 sharedobject_flush(const fn_call& fn)
 {
     
+    GNASH_REPORT_FUNCTION;
+
     boost::intrusive_ptr<SharedObject> obj =
         ensureType<SharedObject>(fn.this_ptr);
 
     IF_VERBOSE_ASCODING_ERRORS(
-        if ( fn.nargs )
+        if (fn.nargs > 1)
         {
-            std::stringstream ss;
+            std::ostringstream ss;
             fn.dump_args(ss);
             log_aserror(_("Arguments to SharedObject.flush(%s) will be "
                     "ignored"), ss.str());
         }
     );
 
+    int space = 0;
+    if (fn.nargs) {
+        space = fn.arg(0).to_int();
+    }
+
     /// If there is no data member, returns undefined.
-    as_value dataMember;
-    if (!obj->get_member(NSV::PROP_DATA, &dataMember)) return as_value();
-   
-    as_object* data = dataMember.to_object().get();
-    if (!data) return as_value();
+    if (!obj->data()) return as_value();
 
     // If there is an object data member, returns the success of flush().
-    return as_value(obj->flush(*data));
+    return as_value(obj->flush(space));
 }
 
 // Set the file name
@@ -757,6 +807,15 @@ sharedobject_getDiskUsage(const fn_call& fn)
     return as_value();
 }
 
+
+as_value
+sharedobject_data(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
+    return as_value(obj->data());
+}
+
 as_value
 sharedobject_getsize(const fn_call& fn)
 {
@@ -825,7 +884,7 @@ readSOL(VM& vm, const std::string& filespec)
         {
             // In this case there is no data member.
             log_error("SharedObject::readSOL: file ends before data segment");
-            return 0;
+            return data;
         }
 
         std::vector<as_object*> objRefs;

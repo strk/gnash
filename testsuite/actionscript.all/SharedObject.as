@@ -164,6 +164,7 @@ if (typeof(newso.data) != 'undefined') {
 }
 
 so4 = SharedObject.getLocal("Another-one", "/subdir");
+xcheck_equals(typeof(so4), "null");
 check(so4 != so3);
 check_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
@@ -184,7 +185,7 @@ check_equals(getCalls, 1); // the getter works
 getCalls=0;
 ret=so5.flush();
 check_equals(ret, true);
-xcheck_equals(getCalls, 0); // flush didn't cal the getter
+check_equals(getCalls, 0); // flush didn't cal the getter
 
 //------------------------------------------
 // Test that 'data' is enumerable, read-only
@@ -234,7 +235,7 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(77);
+check_totals(78);
 
 #else
 
