@@ -229,6 +229,8 @@ Sound::loadSound(const std::string& file, bool streaming)
         // not necessarely correct, the stream might have been found...
         return;
     }
+
+    // TODO: use associated character's _soundbuftime, if any
     _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
     if ( isStreaming )
