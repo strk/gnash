@@ -153,9 +153,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     ch->setExtension(&_et);
 #endif
 
-    const int version = vm.getSWFVersion();
-
-    ch->massDeclare(version);
+    ch->massDeclare();
 
     object_class_init(*this); 
     string_class_init(*this); 
@@ -167,6 +165,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     // SWF8 visibility:
     flash_package_init(*this); 
 
+    const int version = vm.getSWFVersion();
 
     switch (version)
     {
@@ -671,6 +670,7 @@ registerNatives(as_object& global)
     registerMathNative(global);
     registerSystemNative(global);
     registerStageNative(global);
+    registerSharedObjectNative(global);
 
     // LoadableObject has natives shared between LoadVars and XML, so 
     // should be registered first.

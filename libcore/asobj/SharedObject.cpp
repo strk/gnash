@@ -66,25 +66,37 @@ namespace gnash {
 #define MAXHOSTNAMELEN 64
 #endif
 
-static as_value sharedobject_connect(const fn_call& fn);
-static as_value sharedobject_send(const fn_call& fn);
-static as_value sharedobject_flush(const fn_call& fn);
-static as_value sharedobject_close(const fn_call& fn);
-static as_value sharedobject_getsize(const fn_call& fn);
-static as_value sharedobject_setFps(const fn_call& fn);
-static as_value sharedobject_clear(const fn_call& fn);
+// Forward declarations
+namespace {
 
-static as_value sharedobject_getlocal(const fn_call& fn);
-static as_value sharedobject_ctor(const fn_call& fn);
+    as_value sharedobject_connect(const fn_call& fn);
+    as_value sharedobject_send(const fn_call& fn);
+    as_value sharedobject_flush(const fn_call& fn);
+    as_value sharedobject_close(const fn_call& fn);
+    as_value sharedobject_getsize(const fn_call& fn);
+    as_value sharedobject_setFps(const fn_call& fn);
+    as_value sharedobject_clear(const fn_call& fn);
+    as_value sharedobject_deleteAll(const fn_call& fn);
+    as_value sharedobject_getDiskUsage(const fn_call& fn);
+    as_value sharedobject_getRemote(const fn_call& fn);
 
-void sharedobject_iter(SOL &sol, string_table::key key, const as_value &reference);
+    as_value sharedobject_getLocal(const fn_call& fn);
+    as_value sharedobject_ctor(const fn_call& fn);
+    
+    as_object* readSOL(VM& vm, const std::string& filespec);
 
+    as_object* getSharedObjectInterface();
+    void attachSharedObjectStaticInterface(as_object& o);
+    bool createDirForFile(const std::string& filespec);
+}
+
+// Serializer helper
 namespace { 
 
-class PropsSerializer : public AbstractPropertyVisitor {
-    SOL& _sol;
-    string_table& _st;
+class PropsSerializer : public AbstractPropertyVisitor
+{
 public:
+
     PropsSerializer(SOL& sol, VM& vm)
         :
         _sol(sol),
@@ -93,7 +105,6 @@ public:
 
     void accept(string_table::key key, const as_value& val) 
         {
-            //GNASH_REPORT_FUNCTION;
             AMF amf;
             boost::shared_ptr<amf::Element> el;
             
@@ -126,17 +137,23 @@ public:
                 _sol.addObj(el);
             }
         }
+
+private:
+
+    SOL& _sol;
+    string_table& _st;
 };
 
 /// Class used to serialize properties of an object to a buffer in SOL format
-class SOLPropsBufSerializer : public AbstractPropertyVisitor {
-    SimpleBuffer& _buf;
-    VM& _vm;
-    string_table& _st;
-    std::map<as_object*, size_t>& _offsetTable;
-    bool _error;
+class SOLPropsBufSerializer : public AbstractPropertyVisitor
+{
+
+    typedef std::map<as_object*, size_t> PropertiesOffsetTable;
+
 public:
-    SOLPropsBufSerializer(SimpleBuffer& buf, VM& vm, std::map<as_object*, size_t>& offsetTable)
+
+    SOLPropsBufSerializer(SimpleBuffer& buf, VM& vm,
+            PropertiesOffsetTable& offsetTable)
         :
         _buf(buf),
         _vm(vm),
@@ -164,11 +181,11 @@ public:
         // A '__constructor__' member gets back, but only if 
         // not a function. Actually no function gets back.
         // 
-        if ( key == NSV::PROP_uuPROTOuu || 
-             key == NSV::PROP_CONSTRUCTOR )
+        if ( key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR )
         {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(" skip serialization of specially-named property %s", _st.value(key));
+            log_debug(" skip serialization of specially-named property %s",
+                    _st.value(key));
 #endif
             return;
         }
@@ -183,75 +200,28 @@ public:
         _buf.append(name.c_str(), namelen);
         if ( ! val.writeAMF0(_buf, _offsetTable, _vm) )
         {
-            log_error("Problems serializing an object's member %s=%s", name, val);
+            log_error("Problems serializing an object's member %s=%s",
+                    name, val);
             _error=true;
         }
 
         _buf.appendByte(0); // SOL-specific
     }
+
+private:
+
+    SimpleBuffer& _buf;
+
+    VM& _vm;
+
+    string_table& _st;
+
+    PropertiesOffsetTable& _offsetTable;
+
+    bool _error;
 };
 
-} // anonimous namespace
-
-static void
-attachProperties(as_object& o)
-{
-//    GNASH_REPORT_FUNCTION;
-     as_object *proto = new as_object(getObjectInterface());
-     o.init_member("data", proto, as_prop_flags::dontDelete|as_prop_flags::readOnly);
-}
-
-static void
-attachSharedObjectInterface(as_object& o)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    VM& vm = o.getVM();
-
-    // ASnative table registration
-	vm.registerNative(sharedobject_connect, 2106, 0);
-	vm.registerNative(sharedobject_send, 2106, 1);
-	vm.registerNative(sharedobject_flush, 2106, 2);
-	vm.registerNative(sharedobject_close, 2106, 3);
-	vm.registerNative(sharedobject_getsize, 2106, 4);
-	vm.registerNative(sharedobject_setFps, 2106, 5);
-	vm.registerNative(sharedobject_clear, 2106, 6);
-
-    const int swfVersion = vm.getSWFVersion();
-
-    // clear, flush and getSize not in SWF<6 , it seems
-    if ( swfVersion < 6 ) return; 
-
-    o.init_member("connect", new builtin_function(sharedobject_connect)); // asnative 2106,0
-    o.init_member("send", new builtin_function(sharedobject_send)); // asnative 2106,1
-    o.init_member("flush", new builtin_function(sharedobject_flush)); // asnative 2106,2
-    o.init_member("close", new builtin_function(sharedobject_close)); // asnative 2106,3
-    o.init_member("getSize", new builtin_function(sharedobject_getsize)); // asnative 2106,4
-    o.init_member("setFps", new builtin_function(sharedobject_setFps)); // asnative 2106,5
-    o.init_member("clear", new builtin_function(sharedobject_clear)); // asnative 2106,6
-}
-
-static void
-attachSharedObjectStaticInterface(as_object& o)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
-}
-
-static as_object*
-getSharedObjectInterface()
-{
-//    GNASH_REPORT_FUNCTION;
-
-    static boost::intrusive_ptr<as_object> o;
-    if ( ! o ) {
-        o = new as_object(getObjectInterface());
-        attachSharedObjectInterface(*o);
-    }
-    return o.get();
-}
-
+} // anonymous namespace
 
 class SharedObject: public as_object 
 {
@@ -263,7 +233,6 @@ public:
         :
         as_object(getSharedObjectInterface())
     { 
-		attachProperties(*this);
     }
 
     bool flush() const;
@@ -288,8 +257,6 @@ public:
         return _sol.size(); // TODO: fix this, is bogus
     }
 
-    bool readSOL(const std::string& filename);
-
 private:
 
     SOL _sol;
@@ -310,8 +277,8 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     struct stat statbuf;
     if ( -1 == stat(_solSafeDir.c_str(), &statbuf) )
     {
-       log_debug("Invalid SOL safe dir %s: %s. Will try to create on flush/exit.", _solSafeDir, std::strerror(errno));
-        //_solSafeDir.clear();
+       log_debug("Invalid SOL safe dir %s: %s. Will try to create on "
+               "flush/exit.", _solSafeDir, std::strerror(errno));
     }
 
     // Which URL we should use here is under research.
@@ -338,7 +305,8 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // Get the domain part, or take as 'localhost' if none
     // (loaded from filesystem)
     URL url(swfURL);
-//  log_debug(_("BASE URL=%s (%s)"), url.str(), url.hostname());
+
+    //  log_debug(_("BASE URL=%s (%s)"), url.str(), url.hostname());
     _baseDomain = url.hostname();
     if ( _baseDomain.empty() ) _baseDomain = "localhost";
 
@@ -352,68 +320,36 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
 void
 SharedObjectLibrary::markReachableResources() const
 {
-    for (SoLib::const_iterator it=_soLib.begin(), itE=_soLib.end(); it!=itE; ++it)
+    for (SoLib::const_iterator it = _soLib.begin(), itE = _soLib.end();
+            it != itE; ++it)
     {
         SharedObject* sh = it->second;
         sh->setReachable();
     }
 }
 
-static bool createDirForFile(const std::string& filename)
-{
-    if (filename.find("/", 0) != std::string::npos)
-    {
-        typedef boost::tokenizer<boost::char_separator<char> > Tok;
-        boost::char_separator<char> sep("/");
-        Tok t(filename, sep);
-        Tok::iterator tit;
-        std::string newdir = "/";
-        for(tit=t.begin(); tit!=t.end();++tit){
-            //cout << *tit << "\n";
-            newdir += *tit;
-            if (newdir.find("..", 0) != std::string::npos) {
-		log_error("Invalid SharedObject path (contains '..'): %s", filename);
-                return false;
-            }
-            // Don't try to create a directory of the .sol file name!
-            // TODO: don't fail if the movie url has a component ending with .sol (eh...)
-            //
-            if (newdir.rfind(".sol") != (newdir.size()-4)) {
-#ifndef _WIN32
-                int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
-#else
-                int ret = mkdir(newdir.c_str());
-#endif
-                if ((errno != EEXIST) && (ret != 0)) {
-                    log_error(_("Couldn't create SOL files directory %s: %s"),
-                              newdir, std::strerror(errno));
-                    return false;
-                }
-            } // else log_debug("newdir %s ends with .sol", newdir);
-            newdir += "/";
-        }
-    }
-    else log_debug("no slash in filespec %s", filename);
-    return true;
-}
-
 SharedObject*
-SharedObjectLibrary::getLocal(const std::string& objName, const std::string& root)
+SharedObjectLibrary::getLocal(const std::string& objName,
+        const std::string& root)
 {
     assert ( ! objName.empty() );
 
-    if ( _solSafeDir.empty() ) return 0; // already warned about it at construction time
+    // already warned about it at construction time
+    if ( _solSafeDir.empty() ) return 0; 
 
     // TODO: this check sounds kind of lame, fix it
     if ( rcfile.getSOLLocalDomain() && _baseDomain != "localhost") 
     {
-        log_security("Attempting to open SOL file from non localhost-loaded SWF");
+        log_security("Attempting to open SOL file from non "
+                "localhost-loaded SWF");
         return 0;
     }
 
     // The optional second argument drops the domain and the swf file name
     std::string key;
-    if ( root.empty() ) key = "/" + _baseDomain + "/" + _basePath + "/" + objName;
+    if ( root.empty() ) {
+        key = "/" + _baseDomain + "/" + _basePath + "/" + objName;
+    }
     else key = root + "/" + objName;
 
     // TODO: normalize key!
@@ -441,180 +377,16 @@ SharedObjectLibrary::getLocal(const std::string& objName, const std::string& roo
 
     log_debug("SharedObject path: %s", newspec);
         
-    if ( ! obj->readSOL(newspec) )
+    boost::intrusive_ptr<as_object> data = readSOL(_vm, newspec);
+
+    if (data)
     {
-        log_debug("Couldn't read SOL %s, will create on flush/exit.", newspec);
+        const int flags = as_prop_flags::dontDelete |
+                          as_prop_flags::readOnly;
+        obj->init_member("data", data, flags);
     }
 
     return obj;
-}
-
-bool
-SharedObject::readSOL(const std::string& filespec)
-{
-#ifdef BUFFERED_AMF_SOL
-    struct stat st;
-
-    if (stat(filespec.c_str(), &st) != 0)
-    {
-        return false;
-    }
-
-    if( st.st_size < 28 )
-    {
-        log_error("SharedObject::readSOL: SOL file %s is too short (only %s bytes long) to be valid.", filespec, st.st_size);
-        return false;
-    }
-
-    boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
-    boost::uint8_t *buf = sbuf.get();
-    boost::uint8_t *end = buf + st.st_size;
-
-    // FIXME clear existing key/value pairs?
-
-    try
-    {
-        std::ifstream ifs(filespec.c_str(), std::ios::binary);
-        ifs.read(reinterpret_cast<char *>(buf), st.st_size);
-
-        // TODO check initial bytes, and print warnings if they are fishy
-
-        buf += 16; // skip const-length headers
-
-        // skip past name   TODO add sanity check
-        buf += ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
-        buf += 2;
-        
-        buf += 4; // skip past padding
-
-        if( buf >= end )
-        {
-            log_error("SharedObject::readSOL: file ends before data segment");
-            return false;
-        }
-
-        string_table& strtab = _vm.getStringTable();
-        std::vector<as_object*> objRefs;
-        boost::intrusive_ptr<as_object> data = getMember(strtab.string_table::find("data")).to_object();
-
-        while( buf < end )
-        {
-            log_debug("SharedObject::readSOL: reading property name at byte %s", buf - sbuf.get());
-            // read property name
-            boost::uint16_t len = ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
-            buf += 2;
-            if( buf + len >= end )
-            {
-                log_error("SharedObject::readSOL: premature end of input");
-                break;
-            }
-            if ( ! len ) {
-                log_error("SharedObject::readSOL: empty property name");
-                break;
-            }
-            std::string prop_name(reinterpret_cast<char*>(buf), len);
-            buf += len;
-
-            // read value
-            as_value as;
-            if(as.readAMF0(buf, end, -1 /* read type from buffer */, objRefs, _vm) == false) {
-                log_error("SharedObject::readSOL: Parsing SharedObject '%s'", filespec);
-                return false;
-            }
-
-            log_debug("parsed sol member named '%s' (len %s),  value '%s'", prop_name, len, as);
-
-            // set name/value as a member of this (SharedObject) object
-            data->set_member(strtab.find(prop_name), as);
-            
-            buf += 1; // skip null byte after each property
-        }
-        log_debug("setting data member: %s, %s", strtab.find(std::string("data")),  as_value(data.get()));
-        set_member(strtab.find(std::string("data")), as_value(data.get()));
-        return true;
-    }
-    catch (std::exception& e)
-    {
-        log_error("SharedObject::readSOL: Reading SharedObject %s: %s", filespec, e.what());
-        return false;
-    }
-
-
-#else
-    SOL sol;
-    log_security("Opening SharedObject file: %s", filespec);
-    if (sol.readFile(filespec) == false) {
-        log_security("empty or non-existing SOL file \"%s\", will be created on flush/exit", filespec);
-        return false;
-    }
-    
-    std::vector<boost::shared_ptr<amf::Element> >::const_iterator it, e;
-    std::vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
-    log_debug("Read %d AMF objects from %s", els.size(), filespec);
-
-    string_table& st = _vm.getStringTable();
-    string_table::key dataKey =  st.find("data");
-    as_value as = getMember(dataKey);
-    boost::intrusive_ptr<as_object> ptr = as.to_object();
-    
-    for (it = els.begin(), e = els.end(); it != e; it++) {
-        boost::shared_ptr<amf::Element> el = *it;
-
-#if 0 // this would be using as_value::as_value(const Element&)
-
-        std::string name(el->getName());
-        as_value val(*el);
-        ptr->set_member(st.find(name), val);
-
-#else // this is original code 
-
-        switch (el->getType())
-        {
-            case Element::NUMBER_AMF0:
-            {
-                double dub =  *(reinterpret_cast<double*>(el->getData()));
-                ptr->set_member(st.string_table::find(el->getName()), as_value(dub));
-                break;
-            }
-
-            case Element::BOOLEAN_AMF0:
-                ptr->set_member(st.string_table::find(el->getName()),
-                                            as_value(el->to_bool()));
-                break;
-
-            case Element::STRING_AMF0:
-            {
-                if (el->getLength() == 0) {
-                    ptr->set_member(st.string_table::find(el->getName()), as_value(""));
-                    break;
-                }
-                
-                std::string str(reinterpret_cast<const char*>(el->getData()), el->getLength());
-                ptr->set_member(st.string_table::find(el->getName()), as_value(str));
-                break;
-            }
-
-            case Element::OBJECT_AMF0:
-                // TODO: implement!
-                log_unimpl("Reading OBJECT type from SharedObject");
-                //data.convert_to_object();
-                //ptr->set_member(st.string_table::find(el->name), data);
-                return false;
-                break;
-
-            default:
-                // TODO: what about other types?
-                log_unimpl("Reading SOL type %d", el->getType());
-                return false;
-                break;
-        } 
-
-#endif
-
-    }
-
-    return true;
-#endif
 }
 
 
@@ -694,13 +466,15 @@ SharedObject::flush() const
     // TODO write file
     std::ofstream ofs(filespec.c_str(), std::ios::binary);
     if(! ofs) {
-        log_error("SharedObject::flush(): Failed opening file '%s' in binary mode", filespec.c_str());
+        log_error("SharedObject::flush(): Failed opening file '%s' in "
+                "binary mode", filespec.c_str());
         return false;
     }
     
     if(ofs.write(reinterpret_cast<const char*>(buf.data()), buf.size()).fail() )
     {
-        log_error("Error writing %d bytes to output file %s", buf.size(), filespec.c_str());
+        log_error("Error writing %d bytes to output file %s",
+                buf.size(), filespec.c_str());
         ofs.close();
         return false;
     }
@@ -725,11 +499,110 @@ SharedObject::flush() const
 }
 
 
+// extern (used by Global.cpp)
+void
+sharedobject_class_init(as_object& global)
+{
+    static boost::intrusive_ptr<builtin_function> cl;
+    
+    if (cl == NULL) {
+        cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
+        attachSharedObjectStaticInterface(*cl);
+    }
+    
+    // Register _global.SharedObject
+    global.init_member("SharedObject", cl.get());    
+}
+
+void
+registerSharedObjectNative(as_object& o)
+{
+    VM& vm = o.getVM();
+
+    // ASnative table registration
+	vm.registerNative(sharedobject_connect, 2106, 0);
+	vm.registerNative(sharedobject_send, 2106, 1);
+	vm.registerNative(sharedobject_flush, 2106, 2);
+	vm.registerNative(sharedobject_close, 2106, 3);
+	vm.registerNative(sharedobject_getsize, 2106, 4);
+	vm.registerNative(sharedobject_setFps, 2106, 5);
+	vm.registerNative(sharedobject_clear, 2106, 6);
+
+    // FIXME: getRemote and getLocal use both these methods,
+    // but aren't identical with either of them.
+    // TODO: find out what each native does, and break each of these 
+    // methods into two functions.
+	vm.registerNative(sharedobject_getLocal, 2106, 202);
+	vm.registerNative(sharedobject_getRemote, 2106, 203);
+	vm.registerNative(sharedobject_getLocal, 2106, 204);
+	vm.registerNative(sharedobject_getRemote, 2106, 205);
+
+	vm.registerNative(sharedobject_deleteAll, 2106, 206);
+	vm.registerNative(sharedobject_getDiskUsage, 2106, 207);
+}
+
+
+/// SharedObject AS interface
+namespace {
+
+void
+attachSharedObjectInterface(as_object& o)
+{
+
+    VM& vm = o.getVM();
+
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::onlySWF6Up;
+
+    o.init_member("connect", vm.getNative(2106, 0), flags);
+    o.init_member("send", vm.getNative(2106, 1), flags);
+    o.init_member("flush", vm.getNative(2106, 2), flags);
+    o.init_member("close", vm.getNative(2106, 3), flags);
+    o.init_member("getSize", vm.getNative(2106, 4), flags);
+    o.init_member("setFps", vm.getNative(2106, 5), flags);
+    o.init_member("clear", vm.getNative(2106, 6), flags);
+
+}
+
+
+void
+attachSharedObjectStaticInterface(as_object& o)
+{
+    VM& vm = o.getVM();
+
+    const int flags = 0;
+
+    o.init_member("getLocal", 
+            new builtin_function(sharedobject_getLocal), flags);
+    o.init_member("getRemote",
+            new builtin_function(sharedobject_getRemote), flags);
+
+    const int hiddenOnly = as_prop_flags::dontEnum;
+
+    o.init_member("deleteAll",  vm.getNative(2106, 206), hiddenOnly);
+    o.init_member("getDiskUsage",  vm.getNative(2106, 207), hiddenOnly);
+}
+
+
+as_object*
+getSharedObjectInterface()
+{
+
+    static boost::intrusive_ptr<as_object> o;
+    if ( ! o ) {
+        o = new as_object(getObjectInterface());
+        attachSharedObjectInterface(*o);
+    }
+    return o.get();
+}
+
+
 as_value
 sharedobject_clear(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject> obj = 
+        ensureType<SharedObject>(fn.this_ptr);
     UNUSED(obj);
     
     LOG_ONCE(log_unimpl (__FUNCTION__));
@@ -740,7 +613,8 @@ sharedobject_clear(const fn_call& fn)
 as_value
 sharedobject_connect(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.connect"));
@@ -750,7 +624,8 @@ sharedobject_connect(const fn_call& fn)
 as_value
 sharedobject_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.close"));
@@ -760,7 +635,8 @@ sharedobject_close(const fn_call& fn)
 as_value
 sharedobject_setFps(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.setFps"));
@@ -770,7 +646,8 @@ sharedobject_setFps(const fn_call& fn)
 as_value
 sharedobject_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.send"));
@@ -780,16 +657,17 @@ sharedobject_send(const fn_call& fn)
 as_value
 sharedobject_flush(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
 
     IF_VERBOSE_ASCODING_ERRORS(
     if ( fn.nargs )
     {
         std::stringstream ss;
         fn.dump_args(ss);
-        log_aserror(_("Arguments to SharedObject.flush(%s) will be ignored"), ss.str());
+        log_aserror(_("Arguments to SharedObject.flush(%s) will be ignored"),
+            ss.str());
     }
     )
 
@@ -798,9 +676,8 @@ sharedobject_flush(const fn_call& fn)
 
 // Set the file name
 as_value
-sharedobject_getlocal(const fn_call& fn)
+sharedobject_getLocal(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
 
     VM& vm = fn.env().getVM();
     int swfVersion = vm.getSWFVersion();
@@ -811,10 +688,13 @@ sharedobject_getlocal(const fn_call& fn)
     if ( objName.empty() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror("SharedObject.getLocal(%s): %s", _("missing object name"));
+            std::ostringstream ss;
+            fn.dump_args(ss);
+            log_aserror("SharedObject.getLocal(%s): %s", 
+                _("missing object name"));
         );
-        as_value ret; ret.set_null();
+        as_value ret;
+        ret.set_null();
         return ret;
     }
 
@@ -827,43 +707,295 @@ sharedobject_getlocal(const fn_call& fn)
     log_debug("SO name:%s, root:%s", objName, root);
 
     SharedObject* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
+
     as_value ret(obj);
     log_debug("SharedObject.getLocal returning %s", ret);
     return ret;
 }
 
+/// Undocumented
+as_value
+sharedobject_getRemote(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
+
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.getRemote()"));
+    return as_value();
+}
+
+
+/// Undocumented
+//
+/// Takes a URL argument and deletes all SharedObjects under that URL.
+as_value
+sharedobject_deleteAll(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
+
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.deleteAll()"));
+    return as_value();
+}
+
+/// Undocumented
+//
+/// Should be quite obvious what it does.
+as_value
+sharedobject_getDiskUsage(const fn_call& fn)
+{
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
+
+    UNUSED(obj);
+
+    LOG_ONCE(log_unimpl("SharedObject.getDiskUsage()"));
+    return as_value();
+}
+
 as_value
 sharedobject_getsize(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject> obj =
+        ensureType<SharedObject>(fn.this_ptr);
     return as_value(obj->size());
 }
 
 as_value
 sharedobject_ctor(const fn_call& /* fn */)
 {
-//    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<as_object> obj = new SharedObject;
-//    static boost::intrusive_ptr<as_object> obj = new as_object(getSharedObjectInterface());
     
     return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void sharedobject_class_init(as_object& global)
+as_object*
+readSOL(VM& vm, const std::string& filespec)
 {
-//    GNASH_REPORT_FUNCTION;
-    // This is going to be the global SharedObject "class"/"function"
-    static boost::intrusive_ptr<builtin_function> cl;
-    
-    if (cl == NULL) {
-        cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
-        attachSharedObjectStaticInterface(*cl);
+
+#ifdef BUFFERED_AMF_SOL
+
+    // The 'data' member is initialized only on getLocal() (and probably
+    // getRemote()): i.e. when there is some data, or when it's ready to
+    // be added.
+    as_object* data = new as_object(getObjectInterface());
+
+    struct stat st;
+
+    if (stat(filespec.c_str(), &st) != 0)
+    {
+        // No existing SOL file. A new one will be created.
+        log_debug("No existing SOL %s found. Will create on flush/exit.",
+                filespec);
+        return data;
+    }
+
+    if (st.st_size < 28)
+    {
+        // A SOL file exists, but it was invalid. There will be no
+        // data member.
+        log_error("SharedObject::readSOL: SOL file %s is too short "
+                "(only %s bytes long) to be valid.", filespec, st.st_size);
+        return 0;
+    }
+
+    boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
+    boost::uint8_t *buf = sbuf.get();
+    boost::uint8_t *end = buf + st.st_size;
+
+    try
+    {
+        std::ifstream ifs(filespec.c_str(), std::ios::binary);
+        ifs.read(reinterpret_cast<char *>(buf), st.st_size);
+
+        // TODO check initial bytes, and print warnings if they are fishy
+
+        buf += 16; // skip const-length headers
+
+        // skip past name   TODO add sanity check
+        buf += ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
+        buf += 2;
+        
+        buf += 4; // skip past padding
+
+        if (buf >= end)
+        {
+            log_error("SharedObject::readSOL: file ends before data segment");
+            return 0;
+        }
+
+        std::vector<as_object*> objRefs;
+
+        while (buf < end)
+        {
+            log_debug("SharedObject::readSOL: reading property name at "
+                    "byte %s", buf - sbuf.get());
+            // read property name
+            boost::uint16_t len = 
+                ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
+            buf += 2;
+
+            if( buf + len >= end )
+            {
+                log_error("SharedObject::readSOL: premature end of input");
+                break;
+            }
+            if ( ! len ) {
+                log_error("SharedObject::readSOL: empty property name");
+                break;
+            }
+            std::string prop_name(reinterpret_cast<char*>(buf), len);
+            buf += len;
+
+            // read value
+            as_value as;
+            if (!as.readAMF0(buf, end, -1, objRefs, vm)) {
+                log_error("SharedObject::readSOL: Parsing SharedObject '%s'",
+                        filespec);
+                return false;
+            }
+
+            log_debug("parsed sol member named '%s' (len %s),  value '%s'",
+                    prop_name, len, as);
+
+            // set name/value as a member of this (SharedObject) object
+            string_table& st = vm.getStringTable();
+            data->set_member(st.find(prop_name), as);
+            
+            buf += 1; // skip null byte after each property
+        }
+        return data;
+    }
+    catch (std::exception& e)
+    {
+        log_error("SharedObject::readSOL: Reading SharedObject %s: %s", 
+                filespec, e.what());
+        return 0;
+    }
+
+#else
+    SOL sol;
+    log_security("Opening SharedObject file: %s", filespec);
+    if (sol.readFile(filespec) == false) {
+        log_security("empty or non-existing SOL file \"%s\", will be "
+                "created on flush/exit", filespec);
+        return false;
     }
     
-    // Register _global.SharedObject
-    global.init_member("SharedObject", cl.get());    
+    std::vector<boost::shared_ptr<amf::Element> >::const_iterator it, e;
+    std::vector<boost::shared_ptr<amf::Element> > els = sol.getElements();
+    log_debug("Read %d AMF objects from %s", els.size(), filespec);
+
+    string_table& st = _vm.getStringTable();
+    string_table::key dataKey =  st.find("data");
+    as_value as = getMember(dataKey);
+    boost::intrusive_ptr<as_object> ptr = as.to_object();
+    
+    for (it = els.begin(), e = els.end(); it != e; it++) {
+        boost::shared_ptr<amf::Element> el = *it;
+
+#if 0 // this would be using as_value::as_value(const Element&)
+
+        std::string name(el->getName());
+        as_value val(*el);
+        ptr->set_member(st.find(name), val);
+
+#else // this is original code 
+
+        switch (el->getType())
+        {
+            case Element::NUMBER_AMF0:
+            {
+                double dub =  *(reinterpret_cast<double*>(el->getData()));
+                ptr->set_member(st.string_table::find(el->getName()),
+                        as_value(dub));
+                break;
+            }
+
+            case Element::BOOLEAN_AMF0:
+                ptr->set_member(st.string_table::find(el->getName()),
+                                            as_value(el->to_bool()));
+                break;
+
+            case Element::STRING_AMF0:
+            {
+                if (el->getLength() == 0) {
+                    ptr->set_member(st.string_table::find(el->getName()), "");
+                    break;
+                }
+                
+                std::string str(reinterpret_cast<const char*>(el->getData()),
+                        el->getLength());
+                ptr->set_member(st.string_table::find(el->getName()), str);
+                break;
+            }
+
+            case Element::OBJECT_AMF0:
+                // TODO: implement!
+                log_unimpl("Reading OBJECT type from SharedObject");
+                //data.convert_to_object();
+                //ptr->set_member(st.string_table::find(el->name), data);
+                return false;
+                break;
+
+            default:
+                // TODO: what about other types?
+                log_unimpl("Reading SOL type %d", el->getType());
+                return false;
+                break;
+        } 
+
+#endif
+
+    }
+
+    return true;
+#endif
 }
 
+bool
+createDirForFile(const std::string& filename)
+{
+    if (filename.find("/", 0) != std::string::npos)
+    {
+        typedef boost::tokenizer<boost::char_separator<char> > Tok;
+        boost::char_separator<char> sep("/");
+        Tok t(filename, sep);
+        Tok::iterator tit;
+        std::string newdir = "/";
+        for(tit=t.begin(); tit!=t.end();++tit){
+            //cout << *tit << "\n";
+            newdir += *tit;
+            if (newdir.find("..", 0) != std::string::npos) {
+		log_error("Invalid SharedObject path (contains '..'): %s", filename);
+                return false;
+            }
+            // Don't try to create a directory of the .sol file name!
+            // TODO: don't fail if the movie url has a component 
+            // ending with .sol (eh...)
+            //
+            if (newdir.rfind(".sol") != (newdir.size()-4)) {
+#ifndef _WIN32
+                int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
+#else
+                int ret = mkdir(newdir.c_str());
+#endif
+                if ((errno != EEXIST) && (ret != 0)) {
+                    log_error(_("Couldn't create SOL files directory %s: %s"),
+                              newdir, std::strerror(errno));
+                    return false;
+                }
+            } // else log_debug("newdir %s ends with .sol", newdir);
+            newdir += "/";
+        }
+    }
+    else log_debug("no slash in filespec %s", filename);
+    return true;
+}
+
+} // anonymous namespace
 } // end of gnash namespace

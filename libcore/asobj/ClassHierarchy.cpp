@@ -71,14 +71,27 @@ namespace gnash {
 
 namespace { // anonymous namespace
 
-static void
+void
 addVisibilityFlag(int& flags, int version)
 {
     // TODO: more visibility for swf10+?
-    if ( version >= 9 ) flags |= as_prop_flags::onlySWF9Up;
-    else if ( version >= 8 ) flags |= as_prop_flags::onlySWF8Up;
-    else if ( version >= 7 ) flags |= as_prop_flags::onlySWF7Up;
-    else if ( version >= 6 ) flags |= as_prop_flags::onlySWF6Up;
+    switch (version)
+    {
+        default:
+            return;
+        case 9:
+            flags |= as_prop_flags::onlySWF9Up;
+            break;
+        case 8:
+            flags |= as_prop_flags::onlySWF8Up;
+            break;
+        case 7:
+            flags |= as_prop_flags::onlySWF7Up;
+            break;
+        case 6:
+            flags |= as_prop_flags::onlySWF6Up;
+            break;
+    }
 }
 
 class declare_extension_function : public as_function
@@ -230,8 +243,7 @@ ClassHierarchy::~ClassHierarchy()
 bool
 ClassHierarchy::declareClass(extensionClass& c)
 {
-	if (mExtension == NULL)
-		return false; // Extensions can't be loaded.
+	if (mExtension == NULL) return false; 
 
 	mGlobalNamespace->stubPrototype(c.name);
 	mGlobalNamespace->getClass(c.name)->setDeclared();
@@ -251,8 +263,9 @@ ClassHierarchy::declareClass(const nativeClass& c)
 	// For AS2 and below, registering with mGlobal _should_ make it equivalent
 	// to being in the global namespace, since everything is global there.
 	asNamespace *nso = findNamespace(c.namespace_name);
-	if (!nso)
-		nso = addNamespace(c.namespace_name);
+
+	if (!nso) nso = addNamespace(c.namespace_name);
+
 	nso->stubPrototype(c.name);
 	nso->getClass(c.name)->setDeclared();
 	nso->getClass(c.name)->setSystem();
@@ -260,10 +273,9 @@ ClassHierarchy::declareClass(const nativeClass& c)
 	boost::intrusive_ptr<as_function> getter =
 		new declare_native_function(c, mGlobal, mExtension);
 
-	int flags=as_prop_flags::dontEnum;
+	int flags = as_prop_flags::dontEnum;
 	addVisibilityFlag(flags, c.version);
-	return mGlobal->init_destructive_property(c.name,
-		*getter, flags);
+	return mGlobal->init_destructive_property(c.name, *getter, flags);
 }
 
 static const ClassHierarchy::nativeClass knownClasses[] =
@@ -299,7 +311,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 6 },
 	{ camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
 	{ microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
-	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
+	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
 	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
 	{ localconnection_class_init, NSV::CLASS_LOCAL_CONNECTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 }, // FIXME: not global ?
 	{ customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT, NSV::NS_ADOBE_UTILS, 6 },
@@ -322,7 +334,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 };
 
 void
-ClassHierarchy::massDeclare(int /*version*/) // drop version...
+ClassHierarchy::massDeclare()
 {
 	// Natives get declared first. It doesn't make any sense for a native
 	// to depend on an extension, but it does make sense the other way
@@ -331,7 +343,6 @@ ClassHierarchy::massDeclare(int /*version*/) // drop version...
 	for (size_t i = 0; i < size; ++i)
 	{
 		const nativeClass& c = knownClasses[i];
-		//if (c.version > version) continue;
 
 		if ( ! declareClass(c) )
 		{
