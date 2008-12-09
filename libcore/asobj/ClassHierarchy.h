@@ -127,7 +127,7 @@ public:
 	/// Declare all of the native and extension classes from the
 	/// tables contained in the source file.
 	///
-	void massDeclare(int version);
+	void massDeclare();
 
 	/// The global namespace
 	///

@@ -51,6 +51,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "_currentframe", NSV::PROP_uCURRENTFRAME ),
 	string_table::svt( "_customHeaders", NSV::PROP_uCUSTOM_HEADERS ),
 	string_table::svt( "d", NSV::PROP_D ),
+	string_table::svt( "data", NSV::PROP_DATA ),
 	string_table::svt( "decode", NSV::PROP_DECODE ),
 	string_table::svt( "e", NSV::PROP_E ),	
 	string_table::svt( "_droptarget", NSV::PROP_uDROPTARGET ),

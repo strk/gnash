@@ -26,19 +26,6 @@ rcsid="$Id: SharedObject.as,v 1.23 2008/03/11 19:31:48 strk Exp $";
 
 var sharedobjectObj = new SharedObject;
 
-#if OUTPUT_VERSION < 6
-
-// test the SharedObject constuctor
-xcheck_equals (typeof(sharedobjectObj), 'object');
-
-// test the SharedObject::getlocal method
-check_equals (typeof(sharedobjectObj.getLocal), 'undefined');
-xcheck_equals (typeof(SharedObject.getLocal), 'function');
-
-check_totals(3);
-
-#else // OUTPUT_VERSION >= 6
-
 // test the SharedObject constuctor
 check_equals (typeof(sharedobjectObj), 'object');
 
@@ -47,29 +34,48 @@ check_equals (typeof(sharedobjectObj), 'object');
 check_equals (typeof(sharedobjectObj.getLocal), 'undefined');
 check_equals (typeof(SharedObject.getLocal), 'function');
 
-// test the SharedObject.connect method (asnative 2106,0)
+#if OUTPUT_VERSION > 5
+
+check(SharedObject.prototype.hasOwnProperty("connect"));
+check(SharedObject.prototype.hasOwnProperty("send"));
+check(SharedObject.prototype.hasOwnProperty("flush"));
+check(SharedObject.prototype.hasOwnProperty("getSize"));
+check(SharedObject.prototype.hasOwnProperty("setFps"));
+check(SharedObject.prototype.hasOwnProperty("clear"));
+check(SharedObject.prototype.hasOwnProperty("close"));
+check(!SharedObject.prototype.hasOwnProperty("data"));
+
+check(!SharedObject.prototype.hasOwnProperty("getLocal"));
+check(!SharedObject.prototype.hasOwnProperty("getRemote"));
+check(!SharedObject.prototype.hasOwnProperty("getDiskUsage"));
+check(!SharedObject.prototype.hasOwnProperty("deleteAll"));
+check(SharedObject.hasOwnProperty("getLocal"));
+check(SharedObject.hasOwnProperty("getRemote"));
+check(SharedObject.hasOwnProperty("getDiskUsage"));
+check(SharedObject.hasOwnProperty("deleteAll"));
+
 check_equals (typeof(sharedobjectObj.connect), 'function');
-
-// test the SharedObject.send method (asnative 2106,1)
 check_equals (typeof(sharedobjectObj.send), 'function');
-
-// test the SharedObject.flush method (asnative 2106,2)
 check_equals (typeof(sharedobjectObj.flush), 'function');
-
-// test the SharedObject.close method (asnative 2106,3)
 check_equals (typeof(sharedobjectObj.close), 'function');
-
-// test the SharedObject.getsize method (asnative 2106,4)
 check_equals (typeof(sharedobjectObj.getSize), 'function');
-
-// test the SharedObject.setFps method (asnative 2106,5)
 check_equals (typeof(sharedobjectObj.setFps), 'function');
-
-// test the SharedObject.clear method (asnative 2106,6)
 check_equals (typeof(sharedobjectObj.clear), 'function');
+check_equals (typeof(sharedobjectObj.data), 'undefined');
+#else
+check_equals (typeof(sharedobjectObj.connect), 'undefined');
+check_equals (typeof(sharedobjectObj.send), 'undefined');
+check_equals (typeof(sharedobjectObj.flush), 'undefined');
+check_equals (typeof(sharedobjectObj.close), 'undefined');
+check_equals (typeof(sharedobjectObj.getSize), 'undefined');
+check_equals (typeof(sharedobjectObj.setFps), 'undefined');
+check_equals (typeof(sharedobjectObj.clear), 'undefined');
+#endif
 
 // FIXME: Test code that will soon be a formal test case.
 so = SharedObject.getLocal("level1/level2/settings", "/");
+
+check(so instanceof SharedObject);
 
 // Private data
 so.name = "Joe";
@@ -77,6 +83,10 @@ so.age = 20;
 so.pet = "Dog";
 
 // public data that gets written
+#if OUTPUT_VERSION > 5
+check(so.hasOwnProperty("data"));
+#endif
+
 so.data.gain = 50.0;
 so.data.echosuppression = false;
 so.data.defaultmicrophone = "/dev/input/mic";
@@ -110,12 +120,13 @@ delete so.data.tmp;
 so3 = SharedObject.getLocal("level1/level2/settings3", "/");
 check(so3 != so);
 
+// Doesn't make much sense to test the rest for SWF5
+#if OUTPUT_VERSION > 5
 
 // trace(so.getSize());
 ret = so.flush();
 check_equals(typeof(ret), 'boolean');
 check_equals(ret, true);
-
 
 newso = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals (typeof(newso), 'object');
@@ -138,8 +149,6 @@ if (typeof(newso.data) != 'undefined') {
     check_equals (typeof(newso.data.defaultalways), 'boolean');
     check_equals (newso.data.defaultalways, so.data.defaultalways);
 
-    // FIXME: why did all these start failing ? Accoring to dump() they
-    // all still exist.
     check_equals (typeof(newso.data.crossdomainAllow), 'boolean');
     check_equals (newso.data.crossdomainAllow, true);
     check_equals (typeof(newso.data.crossdomainAlways), 'boolean');
@@ -156,9 +165,9 @@ if (typeof(newso.data) != 'undefined') {
 
 so4 = SharedObject.getLocal("Another-one", "/subdir");
 check(so4 != so3);
-xcheck_equals(typeof(so4.data), 'undefined');
+check_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(typeof(ret), 'undefined');
 
 //------------------------------------------
 // Test that if 'data' is a getter-setter,
@@ -183,6 +192,10 @@ xcheck_equals(getCalls, 0); // flush didn't cal the getter
 //------------------------------------------
 
 so6 = SharedObject.getLocal("so6");
+check(so6.hasOwnProperty("data"));
+ret = so6.flush();
+check_equals(ret, true);
+
 a = new Array;
 for (var i in so6) a.push(i);
 check_equals(a.toString(), 'data');
@@ -204,7 +217,12 @@ so7 = SharedObject.getLocal();
  check_equals(typeof(so7), 'null');
 #endif
 so7.data.a = 1;
-so7.flush();
+ret = so7.flush();
+#if OUTPUT_VERSION < 7
+check_equals(ret, undefined);
+#else
+check_equals(ret, true);
+#endif 
 
 so8 = SharedObject.getLocal('');
 check_equals(typeof(so8), 'null');
@@ -216,6 +234,12 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(55);
+check_totals(77);
 
-#endif // OUTPUT_VERSION >= 6
+#else
+
+// SWF5 totals
+check_totals(17);
+
+#endif
+
