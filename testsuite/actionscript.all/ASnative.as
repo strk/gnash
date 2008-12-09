@@ -262,8 +262,21 @@ check_equals (countTS, 2);
 
 xcheck_equals (countVO, 25);
 
+/// SharedObject undocumented functions.
+
+a = ASnative(2106, 202);
+f = a("level1/level2/settings", "/", undefined); 
+xcheck_equals(typeof(f), "null");
+
+a = ASnative(2106, 204);
+f = new SharedObject;
+check_equals (typeof(f.data), "undefined");
+ret = a(f, "level1/level2/settings", "/", undefined); 
+xcheck_equals(ret, true);
+xcheck_equals (typeof(f.data), "object");
+
 #if OUTPUT_VERSION > 5
-check_totals(79);
+check_totals(83);
 #else
-check_totals(76);
+check_totals(80);
 #endif

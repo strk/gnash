@@ -530,8 +530,10 @@ registerSharedObjectNative(as_object& o)
 
     // FIXME: getRemote and getLocal use both these methods,
     // but aren't identical with either of them.
-    // TODO: find out what each native does, and break each of these 
-    // methods into two functions.
+    // TODO: The first method looks in a library and returns either a
+    // SharedObject or null. The second takes a new SharedObject as
+    // its first argument and populates its data member (more or less
+    // like readSOL). This is only important for ASNative compatibility.
 	vm.registerNative(sharedobject_getLocal, 2106, 202);
 	vm.registerNative(sharedobject_getRemote, 2106, 203);
 	vm.registerNative(sharedobject_getLocal, 2106, 204);
