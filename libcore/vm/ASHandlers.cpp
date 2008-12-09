@@ -2928,7 +2928,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 
     const int nmembers = env.pop().to_int();
 
-    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance().release());
+    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance());
 
     // Set provided members
     for (int i = 0; i < nmembers; ++i) {
