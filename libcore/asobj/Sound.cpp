@@ -1017,10 +1017,12 @@ void sound_class_init(as_object& global)
 void
 Sound::startProbeTimer()
 {
-    boost::intrusive_ptr<builtin_function> cb = \
+    boost::intrusive_ptr<builtin_function> cb = 
         new builtin_function(&Sound::probeAudioWrapper);
     std::auto_ptr<Timer> timer(new Timer);
-    unsigned long delayMS = 500; // 2 times each second (83 would be 12 times each second)
+
+    // 2 times each second (83 would be 12 times each second)
+    unsigned long delayMS = 500; 
     timer->setInterval(*cb, delayMS, this);
     _probeTimer = getVM().getRoot().add_interval_timer(timer, true);
 }
