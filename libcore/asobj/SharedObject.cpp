@@ -452,19 +452,27 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     const movie_root& mr = _vm.getRoot();
     const std::string& swfURL = mr.getOriginalURL();
 
-    // Get the domain part, or take as 'localhost' if none
-    // (loaded from filesystem)
     URL url(swfURL);
 
-    //  log_debug(_("BASE URL=%s (%s)"), url.str(), url.hostname());
+    // Remember the hostname of our SWF URL. This can be empty if loaded
+    // from the filesystem
     _baseDomain = url.hostname();
-    if ( _baseDomain.empty() ) _baseDomain = "localhost";
 
-    // Get the path part
-    _basePath = url.path();
+    const std::string& urlPath = url.path();
 
-	// TODO: if the original url was a relative one, the pp uses just
-	// the relative portion rather then the resolved absolute path !
+    // Get the path part. If loaded from the filesystem, the pp stupidly
+    // removes the first directory.
+    if (!_baseDomain.empty()) {
+        _basePath = urlPath;
+    }
+    else if (!urlPath.empty()) {
+        // _basePath should be empty if there are no slashes or just one.
+        std::string::size_type pos = urlPath.find('/', 1);
+        if (pos != std::string::npos) {
+            _basePath = urlPath.substr(pos);
+        }
+    }
+
 }
 
 void
@@ -482,27 +490,72 @@ SharedObject*
 SharedObjectLibrary::getLocal(const std::string& objName,
         const std::string& root)
 {
-    assert ( ! objName.empty() );
+    assert (!objName.empty());
 
     // already warned about it at construction time
-    if ( _solSafeDir.empty() ) return 0; 
+    if (_solSafeDir.empty()) return 0; 
 
-    // TODO: this check sounds kind of lame, fix it
-    if ( rcfile.getSOLLocalDomain() && _baseDomain != "localhost") 
+    if (rcfile.getSOLLocalDomain() && !_baseDomain.empty()) 
     {
         log_security("Attempting to open SOL file from non "
                 "localhost-loaded SWF");
         return 0;
     }
 
-    // The optional second argument drops the domain and the swf file name
-    std::string key;
-    if ( root.empty() ) {
-        key = "/" + _baseDomain + "/" + _basePath + "/" + objName;
+    // The 'root' argument, otherwise known as localPath, specifies where
+    // in the SWF path the SOL should be stored. It cannot be outside this
+    // path.
+    std::string requestedPath;
+
+    // If a root is specified, check it first for validity
+    if (!root.empty()) {
+
+        const movie_root& mr = _vm.getRoot();
+        const std::string& swfURL = mr.getOriginalURL();
+        // The specified root may or may not have a domain. If it doesn't,
+        // this constructor will add the SWF's domain.
+        URL localPath(root, swfURL);
+        
+        StringNoCaseEqual noCaseCompare;
+
+        // All we care about is whether the domains match. They may be 
+        // empty filesystem-loaded.
+        if (!noCaseCompare(localPath.hostname(), _baseDomain)) {
+            log_security(_("SharedObject path %s is outside the SWF domain "
+                        "%s. Cannot access this object."), localPath, 
+                        _baseDomain);
+            return 0;
+        }
+
+        requestedPath = localPath.path();
+
+        // The domains match. Now check that the path is a sub-path of 
+        // the SWF's URL. It is done by case-insensitive string comparison,
+        // so a double slash in the requested path will fail.
+        if (!noCaseCompare(requestedPath,
+                    _basePath.substr(0, requestedPath.size()))) {
+            log_security(_("SharedObject path %s is not part of the SWF path "
+                        "%s. Cannot access this object."), requestedPath, 
+                        _basePath);
+            return 0;
+        }
+
     }
-    else key = root + "/" + objName;
+
+    // A leading slash is added later
+    std::ostringstream solPath;
+
+    // If the domain name is empty, the SWF was loaded from the filesystem.
+    // Use "localhost".
+    solPath << (_baseDomain.empty() ? "localhost" : _baseDomain) << "/";
+
+    // If no path was requested, use the SWF's path.
+    solPath << (requestedPath.empty() ? _basePath : requestedPath) << "/"
+            << objName;
 
     // TODO: normalize key!
+
+    const std::string& key = solPath.str();
 
     // If the shared object was already opened, use it.
     SoLib::iterator it = _soLib.find(key);
