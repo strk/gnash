@@ -458,11 +458,21 @@ SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     // from the filesystem
     _baseDomain = url.hostname();
 
-    // Get the path part
-    _basePath = url.path();
+    const std::string& urlPath = url.path();
 
-	// TODO: if the original url was a relative one, the pp uses just
-	// the relative portion rather then the resolved absolute path !
+    // Get the path part. If loaded from the filesystem, the pp stupidly
+    // removes the first directory.
+    if (!_baseDomain.empty()) {
+        _basePath = urlPath;
+    }
+    else if (!urlPath.empty()) {
+        // _basePath should be empty if there are no slashes or just one.
+        std::string::size_type pos = urlPath.find('/', 1);
+        if (pos != std::string::npos) {
+            _basePath = urlPath.substr(pos);
+        }
+    }
+
 }
 
 void
@@ -480,13 +490,12 @@ SharedObject*
 SharedObjectLibrary::getLocal(const std::string& objName,
         const std::string& root)
 {
-    assert ( ! objName.empty() );
+    assert (!objName.empty());
 
     // already warned about it at construction time
-    if ( _solSafeDir.empty() ) return 0; 
+    if (_solSafeDir.empty()) return 0; 
 
-    // TODO: this check sounds kind of lame, fix it
-    if ( rcfile.getSOLLocalDomain() && !_baseDomain.empty()) 
+    if (rcfile.getSOLLocalDomain() && !_baseDomain.empty()) 
     {
         log_security("Attempting to open SOL file from non "
                 "localhost-loaded SWF");
@@ -496,21 +505,22 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     // The 'root' argument, otherwise known as localPath, specifies where
     // in the SWF path the SOL should be stored. It cannot be outside this
     // path.
-    //
-    //
-
     std::string requestedPath;
 
     // If a root is specified, check it first for validity
     if (!root.empty()) {
 
+        const movie_root& mr = _vm.getRoot();
+        const std::string& swfURL = mr.getOriginalURL();
         // The specified root may or may not have a domain. If it doesn't,
         // this constructor will add the SWF's domain.
-        URL localPath(root, _baseDomain);
+        URL localPath(root, swfURL);
         
+        StringNoCaseEqual noCaseCompare;
+
         // All we care about is whether the domains match. They may be 
         // empty filesystem-loaded.
-        if (localPath.hostname() != _baseDomain) {
+        if (!noCaseCompare(localPath.hostname(), _baseDomain)) {
             log_security(_("SharedObject path %s is outside the SWF domain "
                         "%s. Cannot access this object."), localPath, 
                         _baseDomain);
@@ -520,8 +530,10 @@ SharedObjectLibrary::getLocal(const std::string& objName,
         requestedPath = localPath.path();
 
         // The domains match. Now check that the path is a sub-path of 
-        // the SWFs URL.
-        if (requestedPath != _basePath.substr(0, requestedPath.size())) {
+        // the SWF's URL. It is done by case-insensitive string comparison,
+        // so a double slash in the requested path will fail.
+        if (!noCaseCompare(requestedPath,
+                    _basePath.substr(0, requestedPath.size()))) {
             log_security(_("SharedObject path %s is not part of the SWF path "
                         "%s. Cannot access this object."), requestedPath, 
                         _basePath);

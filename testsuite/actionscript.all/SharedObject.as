@@ -163,12 +163,73 @@ if (typeof(newso.data) != 'undefined') {
     trace("New Shared Object doesn't exist!");
 }
 
+/// Check localPath argument.
+
+// It seems this is quite restrictive, using a non-normalized text match
+// for the path, and removing the first directory for filesystem loads. Case
+// is irrelevant, however.
+
+note("Some of the following tests (all preceded by a 'checking' message) will fail when run over the network. Only the tests where an object is expected should fail");
+
 so4 = SharedObject.getLocal("Another-one", "/subdir");
-xcheck_equals(typeof(so4), "null");
+check_equals(typeof(so4), "null");
 check(so4 != so3);
-xcheck_equals(typeof(so4.data), 'undefined');
+check_equals(typeof(so4.data), 'undefined');
 ret = so4.flush();
-xcheck_equals(typeof(ret), 'undefined');
+check_equals(typeof(ret), 'undefined');
+
+so4 = SharedObject.getLocal("name", "subdir");
+check_equals(typeof(so4), "null");
+
+so4 = SharedObject.getLocal("name", "http://ahost/subdir");
+check_equals(typeof(so4), "null");
+
+ourPath = SWFDIR + "/";
+note ("checking getLocal with path: " + ourPath);
+so4 = SharedObject.getLocal("name", ourPath);
+check_equals(typeof(so4), "null");
+
+ourPath = ourPath.substr(0, ourPath.lastIndexOf("/"));
+note ("checking getLocal with path: " + ourPath);
+so4 = SharedObject.getLocal("name", ourPath);
+check_equals(typeof(so4), "null");
+
+// Knock the first directory off. This is also confirmed to work with 
+// a SWF in /tmp/, but it can't really be tested here.
+ourPath = ourPath.substr(ourPath.indexOf("/", 1));
+note ("checking getLocal with path: " + ourPath);
+so4 = SharedObject.getLocal("name", ourPath);
+check_equals(typeof(so4), "object");
+
+// Upper case
+note ("checking getLocal with path: " + ourPath.toUpperCase());
+so4 = SharedObject.getLocal("name", ourPath.toUpperCase());
+check_equals(typeof(so4), "object");
+
+// Knock the last directory off
+ourPath = ourPath.substr(0, ourPath.lastIndexOf("/"));
+note ("checking getLocal with path: " + ourPath);
+so4 = SharedObject.getLocal("name", ourPath);
+check_equals(typeof(so4), "object");
+
+// Put one trailing slash on 
+ourPath += "/";
+note ("checking getLocal with path: " + ourPath);
+so4 = SharedObject.getLocal("name", ourPath);
+check_equals(typeof(so4), "object");
+
+// Put another trailing slash on 
+ourPath += "/";
+note ("checking getLocal with path: " + ourPath);
+so4 = SharedObject.getLocal("name", ourPath);
+check_equals(typeof(so4), "null");
+
+// Take the last slash off and add a bit of rubbish
+ourPath = ourPath.substr(0, ourPath.lastIndexOf("/"));
+ourPath += "aswfd.df";
+note ("checking getLocal with path: " + ourPath);
+so4 = SharedObject.getLocal("name", ourPath);
+check_equals(typeof(so4), "null");
 
 //------------------------------------------
 // Test that if 'data' is a getter-setter,
@@ -235,7 +296,7 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(78);
+check_totals(88);
 
 #else
 
