@@ -91,8 +91,6 @@ private:
 	/// Return the as_function with given name, converting case if needed
 	boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
 
-    bool _data;
-
     MessageList _messages;
 
     std::string _remainder;
@@ -102,8 +100,7 @@ private:
   
 XMLSocket_as::XMLSocket_as()
     :
-    as_object(getXMLSocketInterface()),
-    _data(false)
+    as_object(getXMLSocketInterface())
 {
     attachXMLSocketProperties(*this);
 }
@@ -131,8 +128,6 @@ XMLSocket_as::connect(const std::string& host, short port)
 void
 XMLSocket_as::close()
 {
-    GNASH_REPORT_FUNCTION;
-
     assert(_connected);
 
     closeNet();
@@ -264,11 +259,13 @@ xmlsocket_connect(const fn_call& fn)
     log_debug(_("XMLSocket.connect(%s) called"), ss.str());
 #endif
 
-    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr =
+        ensureType<XMLSocket_as>(fn.this_ptr);
 
     if (ptr->connected())
     {
-        log_error(_("XMLSocket.connect() called while already connected, ignored"));
+        log_error(_("XMLSocket.connect() called while already "
+                    "connected, ignored"));
     }
     
     as_value hostval = fn.arg(0);
@@ -277,9 +274,10 @@ xmlsocket_connect(const fn_call& fn)
     
     if (!ptr->connect(host, port))
     {
-        return as_value(false);
         // onConnect(false) should not be called here, but rather
         // only if a failure occurs after the initial connection.
+        log_error(_("XMLSocket.connect(): connection failed"));
+        return as_value(false);
     }
 
     // Actually, if first-stage connection was successful, we
@@ -291,7 +289,7 @@ xmlsocket_connect(const fn_call& fn)
     // The same applies to onConnect(false), which will never
     // be called at the moment.
     //
-    log_debug(_("XMLSocket.connect(): tring to call onConnect"));
+    log_debug(_("XMLSocket.connect(): trying to call onConnect"));
     ptr->callMethod(NSV::PROP_ON_CONNECT, true);
 	    
 
@@ -299,10 +297,12 @@ xmlsocket_connect(const fn_call& fn)
     log_debug(_("Setting up timer for calling XMLSocket.onData()"));
 
     std::auto_ptr<Timer> timer(new Timer);
-    boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
+    boost::intrusive_ptr<builtin_function> ondata_handler =
+        new builtin_function(&xmlsocket_inputChecker, NULL);
     // just make sure it's expired at every frame iteration (20 FPS used here)
     unsigned interval = 50;
-    timer->setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
+    timer->setInterval(*ondata_handler, interval,
+            boost::dynamic_pointer_cast<as_object>(ptr));
 
     VM& vm = ptr->getVM();
     vm.getRoot().add_interval_timer(timer, true);

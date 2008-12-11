@@ -21,13 +21,11 @@
 #include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
-#include "GnashSystemIOHeaders.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <boost/tokenizer.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
-#include <cerrno>
 
 #include "SimpleBuffer.h"
 #include "as_value.h"
@@ -54,17 +52,12 @@
 #define BUFFERED_AMF_SOL
 
 namespace {
-//gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
 using namespace amf;
 
 namespace gnash {
-
-#ifndef MAXHOSTNAMELEN
-#define MAXHOSTNAMELEN 64
-#endif
 
 // Forward declarations
 namespace {
@@ -90,6 +83,7 @@ namespace {
     as_object* getSharedObjectInterface();
     void attachSharedObjectStaticInterface(as_object& o);
     bool createDirForFile(const std::string& filespec);
+    bool validateName(const std::string& solName);
 }
 
 // Serializer helper
@@ -493,7 +487,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     assert (!objName.empty());
 
     // already warned about it at construction time
-    if (_solSafeDir.empty()) return 0; 
+    if (_solSafeDir.empty()) return 0;
 
     if (rcfile.getSOLLocalDomain() && !_baseDomain.empty()) 
     {
@@ -501,6 +495,9 @@ SharedObjectLibrary::getLocal(const std::string& objName,
                 "localhost-loaded SWF");
         return 0;
     }
+
+    // Check that the name is valid; if not, return null
+    if (!validateName(objName)) return 0;
 
     // The 'root' argument, otherwise known as localPath, specifies where
     // in the SWF path the SOL should be stored. It cannot be outside this
@@ -883,6 +880,23 @@ sharedobject_ctor(const fn_call& /* fn */)
     boost::intrusive_ptr<as_object> obj = new SharedObject;
     
     return as_value(obj.get()); // will keep alive
+}
+
+/// Return true if the name is a valid SOL name.
+//
+/// The official docs claim that '%' is also an invalid character,
+/// but that is incorrect (see actionscript.all/SharedObject.as)
+bool
+validateName(const std::string& solName)
+{
+    // A double forward slash isn't allowed
+    std::string::size_type pos = solName.find("//");
+    if (pos != std::string::npos) return false;
+
+    // These characters are also illegal
+    pos = solName.find_first_of(",~;\"'<&>?#:\\ ");
+
+    return (pos == std::string::npos);
 }
 
 as_object*
