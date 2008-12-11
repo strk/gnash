@@ -85,6 +85,9 @@ so.pet = "Dog";
 // public data that gets written
 #if OUTPUT_VERSION > 5
 check(so.hasOwnProperty("data"));
+check(!so.data.hasOwnProperty("toString"));
+check(!so.data.hasOwnProperty("valueOf"));
+check_equals(typeof(so.data.valueOf), "function");
 #endif
 
 so.data.gain = 50.0;
@@ -104,10 +107,60 @@ so.data.localSecPathTime = 1.19751160683e+12;
 so.data.tmp = "custom value";
 so2 = SharedObject.getLocal("level1/level2/settings", "/");
 check_equals(so2.data.tmp, "custom value");
+check_equals(so2.data.toString(), "[object Object]");
 check_equals(so, so2);
 
+// Check SOL names validity.
 so2bis = SharedObject.getLocal("level1//level2/settings", "/");
-xcheck_equals(typeof(so2bis), 'null'); // invalid path
+check_equals(typeof(so2bis), 'null'); // invalid path
+so2bis = SharedObject.getLocal("a");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a~");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a ");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a'");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("%");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a%");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a&");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a\\");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a;");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a:");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a\"");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a,");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a>");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a<");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a#");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a?");
+check_equals(typeof(so2bis), 'null'); 
+so2bis = SharedObject.getLocal("a(");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a)");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a{");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a}");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a$");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("a!");
+check_equals(typeof(so2bis), 'object'); 
+so2bis = SharedObject.getLocal("ü");
+check_equals(typeof(so2bis), 'object');
+so2bis = SharedObject.getLocal("a*");
+check_equals(typeof(so2bis), 'object'); 
 
 so2bis = SharedObject.getLocal("level1/./level2/settings", "/");
 check_equals(typeof(so2bis), 'object'); // valid path
@@ -296,12 +349,12 @@ check_equals(typeof(so9), 'null');
 // END OF TESTS
 //------------------------------------------
 
-check_totals(88);
+check_totals(116);
 
 #else
 
 // SWF5 totals
-check_totals(17);
+check_totals(42);
 
 #endif
 

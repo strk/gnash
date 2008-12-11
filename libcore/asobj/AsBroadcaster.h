@@ -41,7 +41,7 @@ public:
 	/// can call this internally.
 	///
 	/// The AsBroadcaster_init will take care of registering
-	/// the _global.AsBroadcaster object and it's 'initialize'
+	/// the _global.AsBroadcaster object and its 'initialize'
 	/// method for user-defined broadcasters initialization
 	///
 	static void initialize(as_object& obj);
