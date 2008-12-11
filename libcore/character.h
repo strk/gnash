@@ -64,32 +64,7 @@ class character : public as_object
 
 public:
 
-    character(character* parent, int id)
-        :
-        m_parent(parent),
-        m_invalidated(true),
-        m_child_invalidated(true),
-        m_id(id),
-        m_depth(0),
-        _xscale(100),
-        _yscale(100),
-        _rotation(0),
-        _volume(100),
-        m_ratio(0),
-        m_clip_depth(noClipDepthValue),
-        _unloaded(false),
-        _destroyed(false),
-        _mask(0),
-        _maskee(0),
-        _blendMode(BLENDMODE_NORMAL),
-        _visible(true),
-        _scriptTransformed(false),
-        _dynamicallyCreated(false)
-    {
-        assert((parent == NULL && m_id == -1) || 
-                (parent != NULL && m_id >= 0));
-        assert(m_old_invalidated_ranges.isNull());
-    }
+    character(character* parent, int id);
 
     /// The lowest placeable and accessible depth for a character.
     /// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
@@ -1258,8 +1233,8 @@ private:
 std::ostream&
 operator<<(std::ostream& o, character::BlendMode bm);
 
-
 } // end namespace gnash
+
 
 #ifdef DEBUG_SET_INVALIDATED
 #define set_invalidated() set_invalidated(__FILE__, __LINE__)
