@@ -54,12 +54,6 @@ public:
 	///
 	static as_object* getAsBroadcaster();
 
-private:
-
-	static as_value addListener_method(const fn_call& fn);
-	static as_value removeListener_method(const fn_call& fn);
-	static as_value broadcastMessage_method(const fn_call& fn);
-
 };
 
 void AsBroadcaster_init(as_object& global);
