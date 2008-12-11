@@ -95,11 +95,6 @@ public:
 	// See dox in character.h
 	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
 
-	/// \brief
-	/// Return the character definition from which this
-	/// instance derive. 
-	character_def* get_character_def() { return m_def.get(); }
-  
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
 
