@@ -36,12 +36,6 @@ generic_character::add_invalidated_bounds(InvalidatedRanges& ranges,
   }    
 }
 
-void
-generic_character::enclose_own_bounds(rect *) const
-{
-  log_unimpl("generic_character::enclose_own_bounds");
-  abort(); // TO BE IMPLEMENTED!!!!!
-}
 
 bool
 generic_character::pointInShape(boost::int32_t  x, boost::int32_t  y) const

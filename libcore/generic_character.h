@@ -70,11 +70,9 @@ public:
 	/// override in your subclass to change this
 	virtual bool can_handle_mouse_event() const {
 		return false;
-		//assert(m_parent != NULL);
-		//return m_parent->can_handle_mouse_event();
 	}
 
-	virtual void	display();
+	virtual void display();
 
 	rect getBounds() const
 	{
@@ -88,7 +86,8 @@ public:
 	/// If you need to check for a generic character to contain a 
 	/// given point, use the pointInShape() function instead.
 	/// 
-	virtual character* get_topmost_mouse_entity(boost::int32_t /*x*/, boost::int32_t /*y*/)
+	virtual character* get_topmost_mouse_entity(boost::int32_t /*x*/, 
+            boost::int32_t /*y*/)
 	{
 		return NULL;
 	}
@@ -101,8 +100,6 @@ public:
 	/// instance derive. 
 	character_def* get_character_def() { return m_def.get(); }
   
-	void enclose_own_bounds(rect *) const;
-
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
 
