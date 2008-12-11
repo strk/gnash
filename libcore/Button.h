@@ -124,10 +124,7 @@ public:
 	// See dox in character.h
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
-	static as_value enabled_getset(const fn_call& fn);
-	
-	bool get_enabled();
-	void set_enabled(bool value);
+	bool isEnabled();
 	
 	/// Receive a stage placement notification
 	//
@@ -215,8 +212,6 @@ private:
 	/// Return version of the SWF containing
 	/// the button definition this is an instance of.
     int getSWFVersion() const;
-
-	bool m_enabled;
 
 };
 

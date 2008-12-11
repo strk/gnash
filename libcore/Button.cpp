@@ -287,8 +287,8 @@ attachButtonInterface(as_object& o)
     gettersetter = character::name_getset;
     o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
     
-    gettersetter = &Button::enabled_getset;
-    o.init_property(NSV::PROP_ENABLED, *gettersetter, *gettersetter);
+    const int unprotected = 0;
+    o.init_member(NSV::PROP_ENABLED, true, unprotected);
 
 }
 
@@ -298,8 +298,7 @@ Button::Button(SWF::DefineButtonTag& def, character* parent, int id)
     m_last_mouse_flags(IDLE),
     m_mouse_flags(IDLE),
     m_mouse_state(UP),
-    _def(def),
-    m_enabled(true)
+    _def(def)
 {
 
     set_prototype(getButtonInterface());
@@ -319,39 +318,13 @@ Button::~Button()
 
 
 bool 
-Button::get_enabled()
+Button::isEnabled()
 {
-    return m_enabled;
+    as_value enabled;
+    if (!get_member(NSV::PROP_ENABLED, &enabled)) return false;
+
+    return enabled.to_bool();
 }
-
-void 
-Button::set_enabled(bool value)
-{
-    if (value == m_enabled) return;
-    m_enabled = value; 
-    
-    // NOTE: no visual change
-}
-
-
-as_value
-Button::enabled_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<Button> ptr = ensureType<Button>(fn.this_ptr);
-
-    as_value rv;
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        rv = as_value(ptr->get_enabled());
-    }
-    else // setter
-    {
-        ptr->set_enabled(fn.arg(0).to_bool());
-    }
-    return rv;
-}
-
 
 
 // called from Key listener only
@@ -417,7 +390,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 {
-    if ( (!isVisible()) || (!get_enabled()))
+    if (!isVisible() || !isEnabled())
     {
         return 0;
     }
