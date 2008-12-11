@@ -45,8 +45,10 @@ class Button : public character
 {
 public:
 
-	typedef std::vector< character* > CharsVect;
-	typedef std::set<int> RecSet;
+	typedef std::vector< character* > DisplayObjects;
+	
+    /// A container for holding the id of active button records.
+    typedef std::set<int> ActiveRecords;
 
 	enum mouse_flags
 	{
@@ -76,6 +78,9 @@ public:
 	Button(SWF::DefineButtonTag& def, character* parent, int id);
 
 	~Button();
+
+    /// Initialize the global Button class
+    static void init(as_object& global);
 
 	// See dox in as_object.h
 	bool get_member(string_table::key name, as_value* val, 
@@ -163,9 +168,9 @@ private:
 
     SWF::DefineButtonTag& _def;
 
-	CharsVect _stateCharacters;
+	DisplayObjects _stateCharacters;
 
-	CharsVect _hitCharacters;
+	DisplayObjects _hitCharacters;
 
 	/// Returns all characters that are active based on the current state.
 	//
@@ -188,7 +193,8 @@ private:
     /// @param list     The container to push unmodifiable characters into.
 	void getActiveCharacters(std::vector<const character*>& list) const;
 
-	/// Returns all characters (record nums) that should be active on the given state.
+	/// Returns all characters (record nums) that should be active on
+    /// the given state.
 	//
 	/// @param list
 	///	The set to push active characters record number into
@@ -196,7 +202,7 @@ private:
 	/// @param state
 	///	The state we're interested in
 	///
-	void get_active_records(RecSet& list, MouseState state);
+	void get_active_records(ActiveRecords& list, MouseState state);
 
 	/// Return any state character whose name matches the given string
 	//
@@ -214,9 +220,6 @@ private:
     int getSWFVersion() const;
 
 };
-
-/// Initialize the global Button class
-void button_class_init(as_object& global);
 
 }	// end namespace gnash
 
