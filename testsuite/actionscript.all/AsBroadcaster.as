@@ -79,6 +79,13 @@ check_equals(typeof(bcast.addListener), 'function');
 check_equals(typeof(bcast.removeListener), 'function');
 check_equals(typeof(bcast.broadcastMessage), 'function');
 
+bob = { _listeners:5, addListener:"string" };
+check_equals(bob._listeners, 5);
+check_equals(bob.addListener, "string");
+AsBroadcaster.initialize(bob);
+check_equals(typeof(bob._listeners), "object");
+check_equals(typeof(bob.addListener), "function");
+
 //--------------------------------
 // Some insane calls...
 //--------------------------------
@@ -312,6 +319,6 @@ check_equals(o.msg, "AB");
 // See swfdec/test/trace/asbroadcaster-override.as for more info
 //-----------------------------------------------------------------------------------
 
-check_totals(111);
+check_totals(115);
 
 #endif // OUTPUT_VERSION < 6
