@@ -3091,7 +3091,7 @@ movieclip_cacheAsBitmap(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.cacheAsBitmap()"));
+    LOG_ONCE( log_unimpl(_("MovieClip.cacheAsBitmap()")) );
     return as_value();
 }
 
