@@ -96,7 +96,7 @@ class AMFQueue {
 private:
 
     NetConnection_as& _nc;
-    static const int NCCALLREPLYMAX=200000;
+    static const int NCCALLREPLYCHUNK=1024*200;
 
     typedef std::map<std::string, boost::intrusive_ptr<as_object> > 
         CallbacksMap;
@@ -107,7 +107,6 @@ private:
     boost::scoped_ptr<IOChannel> _connection;
     SimpleBuffer reply;
     int reply_start;
-    int reply_end;
     int queued_count;
     unsigned int ticker;
 
@@ -118,14 +117,14 @@ public:
         postdata(),
         url(url),
         _connection(0),
-        reply(NCCALLREPLYMAX),
+        reply(),
         reply_start(0),
-        reply_end(0),
         queued_count(0),
         ticker(0)
     {
         // leave space for header
         postdata.append("\000\000\000\000\000\000", 6);
+        assert(reply.size() == 0);
     }
 
     ~AMFQueue() {
@@ -159,14 +158,47 @@ public:
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("have connection");
 #endif
-            int read = _connection->readNonBlocking(reply.data() + reply_end,
-                    NCCALLREPLYMAX - reply_end);
+
+            // Fill last chunk before reading in the next
+            size_t toRead = reply.capacity()-reply.size();
+            if ( ! toRead ) toRead = NCCALLREPLYCHUNK;
+
+#ifdef GNASH_DEBUG_REMOTING
+            log_debug("Attempt to read %d bytes", toRead);
+#endif
+
+            //
+            // See if we need to allocate more bytes for the next
+            // read chunk
+            //
+            if ( reply.capacity() < reply.size()+toRead )
+            {
+                // if _connection->size() >= 0, reserve for it, so
+                // if HTTP Content-Length response header is correct
+                // we'll be allocating only once for all.
+                size_t newCapacity = reply.size()+toRead;
+
+#ifdef GNASH_DEBUG_REMOTING
+                log_debug("NetConnection.call: reply buffer capacity (%d) "
+                          "is too small to accept next %d bytes of chunk "
+                          "(current size is %d). Reserving %d bytes.",
+                    reply.capacity(), toRead, reply.size(), newCapacity);
+#endif
+
+                reply.reserve(newCapacity);
+
+#ifdef GNASH_DEBUG_REMOTING
+                log_debug(" after reserve, new capacity is %d", reply.capacity());
+#endif
+            }
+
+            int read = _connection->readNonBlocking(reply.data() + reply.size(), toRead);
             if(read > 0) {
 #ifdef GNASH_DEBUG_REMOTING
                 log_debug("read '%1%' bytes: %2%", read, 
-                        hexify(reply.data() + reply_end, read, false));
+                        hexify(reply.data() + reply.size(), read, false));
 #endif
-                reply_end += read;
+                reply.resize(reply.size()+read);
             }
 
             // There is no way to tell if we have a whole amf reply without
@@ -186,8 +218,8 @@ public:
             {
                 log_debug("connection is in error condition, calling "
                         "NetConnection.onStatus");
+                reply.resize(0);
                 reply_start = 0;
-                reply_end = 0;
                 // reset connection before calling the callback
                 _connection.reset();
 
@@ -197,7 +229,7 @@ public:
             }
             else if(_connection->eof() )
             {
-                if ( reply_end > 8)
+                if ( reply.size() > 8)
                 {
                     std::vector<as_object*> objRefs;
 
@@ -207,7 +239,7 @@ public:
                     boost::int16_t si;
                     boost::uint16_t li;
                     boost::uint8_t *b = reply.data() + reply_start;
-                    boost::uint8_t *end = reply.data() + reply_end;
+                    boost::uint8_t *end = reply.data() + reply.size();
 
                     // parse header
                     b += 2; // skip version indicator and client id
@@ -354,8 +386,8 @@ public:
                 log_debug("deleting connection");
 #endif
                 _connection.reset();
+                reply.resize(0);
                 reply_start = 0;
-                reply_end = 0;
             }
         }
 
@@ -646,7 +678,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
 
 #ifdef GNASH_DEBUG_REMOTING
     log_debug(_("NetConnection.call(): encoded args: %s"),
-            hexify(buf->data(), buf->size(), false));
+            hexify(buf.data(), buf.size(), false));
 #endif
 
     // FIXME check that ptr->_uri is valid
