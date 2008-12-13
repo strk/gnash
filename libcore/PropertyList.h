@@ -109,7 +109,7 @@ public:
 	/// @param visitor
 	///	The visitor function. Must take a string_table::key 
 	///	reference as first argument and a const as_value reference
-	///	as second argument.
+	///	as second argument. Scan by enumeration order.
 	///
 	/// @param this_ptr
 	///	The object reference used to extract values from properties.
@@ -117,8 +117,9 @@ public:
 	template <class V>
 	void visitValues(V& visitor, const as_object& this_ptr) const
 	{
-		for (container::const_iterator it = _props.begin(),
-			itEnd = _props.end(); it != itEnd; ++it)
+        typedef container::nth_index<1>::type ContainerByOrder;
+        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
+            ie=_props.get<1>().rend(); it != ie; ++it)
 		{
 			as_value val = it->getValue(this_ptr);
 			visitor.accept(it->mName, val);
