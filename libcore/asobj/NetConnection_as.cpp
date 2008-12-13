@@ -809,10 +809,15 @@ netconnection_call(const fn_call& fn)
 
     // client id (result number) as counted string
     // the convention seems to be / followed by a unique (ascending) number
-    ++call_number;
-
     std::ostringstream os;
-    os << "/" << call_number;
+    os << "/";
+    // Call number is not used if the callback is undefined
+    // TESTED manually by strk
+    if ( asCallback )
+    {
+        ++call_number;
+        os << call_number;
+    }
     const std::string callNumberString = os.str();
 
     buf->appendNetworkShort(callNumberString.size());
