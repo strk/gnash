@@ -85,6 +85,11 @@ a=[]; for (i in tmp) a.push(i);
 a.sort();
 check_equals(a.toString(), '0,1,2,custom'); // note: no 'length'
 
+// Test reading STRICT_ARRAY
+check_equals(typeof(so1.data.strictary), 'object');
+check_equals(so1.data.strictary.toString(), 'a,b,c');
+check_equals(so1.data.strictary.length, 3);
+
 // Test reading OBJECT
 check(so1.data.obj instanceOf Object);
 check_equals(typeof(so1.data.obj), 'object');
@@ -129,6 +134,13 @@ so1.data.aryns.fun = function() {}; // functions in arrays are simply skipped
 so1.data.aryns.custom = 7;
 so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
 
+// This member is an attempt to trigger encoding
+// of a STRICT array. The attempt seems to be
+// unsuccessful tough, but no way to test with 
+// ActionScript. Time to look at the binary differences
+// between the pp and gnash versions of the saved sol.
+so1.data.strictary = ['a','b','c'];
+
 so1.data.obj = {a:10,b:'20',c:true};
 so1.data.obj.fun = function() {}; // functions in objects are simply skipped
 so1.data.obj.mc = createEmptyMovieClip("mc1", 1); // movieclip values are skipped
@@ -164,4 +176,4 @@ note();
 setInterval(quit, 5000);
 stop();
 
-check_totals(38);
+check_totals(41);
