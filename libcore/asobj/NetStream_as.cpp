@@ -456,16 +456,11 @@ NetStream_as::play(const std::string& c_url)
 
     log_security( _("Connecting to movie: %s"), url );
 
-    const RunInfo& ri = _vm.getRoot().runInfo();
-
-    StreamProvider& streamProvider = ri.streamProvider();
-
-    // Construct URL with base URL.
-    _inputStream = streamProvider.getStream(URL(url, ri.baseURL()));
+    _inputStream = _netCon->getStream(url); 
 
     if ( ! _inputStream.get() )
     {
-        log_error( _("Gnash could not open this url: %s"), url );
+        log_error( _("Gnash could not get stream '%s' from NetConnection"), url );
         setStatus(streamNotFound);
         return;
     }

@@ -81,6 +81,9 @@ public:
     /// Notify the NetConnection onStatus handler of a change.
     void notifyStatus(StatusCode code);
 
+    /// Get an stream by name
+    std::auto_ptr<IOChannel> getStream(const std::string& name);
+
 protected:
 
 	/// Mark responders associated with remoting calls

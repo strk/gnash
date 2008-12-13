@@ -711,6 +711,19 @@ NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
 
 }
 
+std::auto_ptr<IOChannel>
+NetConnection_as::getStream(const std::string& name)
+{
+    const RunInfo& ri = _vm.getRoot().runInfo();
+
+    StreamProvider& streamProvider = ri.streamProvider();
+
+    // Construct URL with base URL (assuming not connected to RTMP server..)
+    // TODO: use getURI to figure the base url, if any
+    return streamProvider.getStream(URL(name, ri.baseURL()));
+
+}
+
 /// Anonymous namespace for NetConnection AMF-reading helper functions
 /// (shouldn't be here).
 
