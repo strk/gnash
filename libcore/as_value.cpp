@@ -2446,7 +2446,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             buf.appendByte(amf::Element::STRING_AMF0);
             const std::string& str = getStr();
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing string '%s"), str);
+            log_debug(_("writeAMF0: serializing string '%s'"), str);
 #endif
             buf.appendNetworkShort(str.size());
             buf.append(str.c_str(), str.size());
@@ -2457,7 +2457,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
         {
             double d = getNum();
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing number '%g"), d);
+            log_debug(_("writeAMF0: serializing number '%g'"), d);
 #endif
             buf.appendByte(amf::Element::NUMBER_AMF0);
             amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
