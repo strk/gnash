@@ -5049,7 +5049,6 @@ movieclip_startDrag(const fn_call& fn)
 
     movieclip->getVM().getRoot().set_drag_state(st);
 
-    log_debug("MovieClip.startDrag() TESTING");
     return as_value();
 }
 
@@ -5059,11 +5058,9 @@ movieclip_stopDrag(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> movieclip = 
         ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(movieclip);
 
     movieclip->getVM().getRoot().stop_drag();
 
-    log_debug("MovieClip.stopDrag() TESTING");
     return as_value();
 }
 
