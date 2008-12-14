@@ -1,0 +1,5 @@
+Test for remoting trought NetConnection and http.
+To use the test:
+	- make remoting.swf
+	- put remoting.swf and remoting.php to your webroot
+	- <flashplayer> <url_to_remoting.swf>

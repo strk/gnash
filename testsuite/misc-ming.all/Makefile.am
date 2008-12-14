@@ -34,6 +34,7 @@ EXTRA_DIST = \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
 	remoting.as \
+	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
