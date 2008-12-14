@@ -22,7 +22,9 @@ rcsid="remoting.as - <bzr revno here>";
 #include "../actionscript.all/utils.as"
 
 if ( ! _root.hasOwnProperty('url') ) {
-	url='http://flash.jasonwoof.com/echo/echo.php';
+    // updated daily from bzr !
+    // TODO: let ./configure specify another one
+    url='http://www.gnashdev.org/testcases/remoting.php';
 }
 
 stop();
