@@ -180,14 +180,15 @@ class PropsBufSerializer : public AbstractPropertyVisitor
 
 public:
     PropsBufSerializer(SimpleBuffer& buf, VM& vm,
-            PropertyOffsets& offsetTable)
+            PropertyOffsets& offsetTable, bool allowStrict)
         :
+        _allowStrict(allowStrict),
         _buf(buf),
         _vm(vm),
         _st(vm.getStringTable()),
         _offsetTable(offsetTable),
         _error(false)
-	{};
+	{}
     
     bool success() const { return !_error; }
 
@@ -226,7 +227,7 @@ public:
         boost::uint16_t namelen = name.size();
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
-        if ( ! val.writeAMF0(_buf, _offsetTable, _vm) )
+        if ( ! val.writeAMF0(_buf, _offsetTable, _vm, _allowStrict) )
         {
             log_error("Problems serializing an object's member");
             _error=true;
@@ -235,6 +236,7 @@ public:
 
 private:
 
+    bool _allowStrict;
     SimpleBuffer& _buf;
     VM& _vm;
     string_table& _st;
@@ -2369,7 +2371,8 @@ as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vec
 
 bool
 as_value::writeAMF0(SimpleBuffer& buf, 
-        std::map<as_object*, size_t>& offsetTable, VM& vm) const
+        std::map<as_object*, size_t>& offsetTable, VM& vm,
+        bool allowStrict) const
 {
     typedef std::map<as_object*, size_t> OffsetTable;
 
@@ -2399,13 +2402,38 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 if ( ary )
                 {
                     size_t len = ary->size();
+                    if ( allowStrict && ary->isStrict() )
+                    {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                    log_debug(_("writeAMF0: serializing array of %d "
-                                "elements as ECMA_ARRAY (index %d)"),
-                                len, idx);
+                        log_debug(_("writeAMF0: serializing array of %d "
+                                    "elements as STRICT_ARRAY (index %d)"),
+                                    len, idx);
 #endif
-                    buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
-                    buf.appendNetworkLong(len);
+                        buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
+                        buf.appendNetworkLong(len);
+
+                        as_value elem;
+                        for (size_t i=0; i<len; ++i)
+                        {
+                            elem = ary->at(i);
+                            if ( ! elem.writeAMF0(buf, offsetTable, vm, allowStrict) )
+                            {
+                                log_error("Problems serializing strict array member %d=%s", i, elem);
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    else 
+                    {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                        log_debug(_("writeAMF0: serializing array of %d "
+                                    "elements as ECMA_ARRAY (index %d) [allowStrict:%d, isStrict:%d]"),
+                                    len, idx, allowStrict, ary->isStrict());
+#endif
+                        buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
+                        buf.appendNetworkLong(len);
+                    }
                 }
                 else
                 {
@@ -2416,7 +2444,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                     buf.appendByte(amf::Element::OBJECT_AMF0);
                 }
 
-                PropsBufSerializer props(buf, vm, offsetTable);
+                PropsBufSerializer props(buf, vm, offsetTable, allowStrict);
                 obj->visitNonHiddenPropertyValues(props);
                 if ( ! props.success() ) 
                 {

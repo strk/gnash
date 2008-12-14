@@ -122,6 +122,15 @@ public:
 
 	~Array_as();
 
+    /// Return true if this is a strict array
+    //
+    /// Strict arrays are those whose enumerable
+    /// properties are only valid positive integer.
+    /// Telling strict apart from non-strict is needed
+    /// for AMF encoding in remoting.
+    ///
+    bool isStrict() const;
+
 	std::deque<indexed_as_value> get_indexed_elements();
 
 	Array_as::const_iterator begin();

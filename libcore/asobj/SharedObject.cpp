@@ -194,7 +194,8 @@ public:
         boost::uint16_t namelen = name.size();
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
-        if ( ! val.writeAMF0(_buf, _offsetTable, _vm) )
+        // Strict array are never encoded in SharedObject
+        if ( ! val.writeAMF0(_buf, _offsetTable, _vm, false) )
         {
             log_error("Problems serializing an object's member %s=%s",
                     name, val);

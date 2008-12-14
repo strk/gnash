@@ -157,6 +157,11 @@ private:
 
 public:
 
+    /// Is any non-hidden property in this object ?
+    bool hasNonHiddenProperties() const {
+        return _members.hasNonHiddenProperties();
+    }
+
 	/// Find a property scanning the inheritance chain
 	///
 	/// @param name

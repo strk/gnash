@@ -1702,6 +1702,13 @@ Array_as::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
     as_object::visitNonHiddenPropertyValues(visitor);
 }
 
+bool
+Array_as::isStrict() const
+{
+    if ( hasNonHiddenProperties() ) return false;
+    return true;
+}
+
 } // end of gnash namespace
 
 

@@ -848,7 +848,8 @@ netconnection_call(const fn_call& fn)
         for (unsigned int i = 2; i < fn.nargs; ++i)
         {
             const as_value& arg = fn.arg(i);
-            if ( ! arg.writeAMF0(*buf, offsetTable, vm) )
+            // STRICT_ARRAY encoding is allowed for remoting
+            if ( ! arg.writeAMF0(*buf, offsetTable, vm, true) )
             {
                 log_error("Could not serialize NetConnection.call argument %d",
                         i);

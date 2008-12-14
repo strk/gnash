@@ -240,7 +240,11 @@ public:
     ///     Virtual machine to use for serialization of property names
     ///     (string_table)
     ///
-    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable, VM& vm) const;
+	/// @param allowStrictArray
+    ///     If true strict arrays will be encoded a STRICT_ARRAY types.
+    ///
+    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable,
+                   VM& vm, bool allowStrictArray) const;
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//

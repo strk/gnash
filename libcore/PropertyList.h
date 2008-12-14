@@ -153,6 +153,18 @@ public:
 		}
 	}
 
+    /// Is any non-hidden property in this list ?
+    bool hasNonHiddenProperties() const
+    {
+        typedef container::nth_index<1>::type ContainerByOrder;
+        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
+            ie=_props.get<1>().rend(); it != ie; ++it)
+		{
+	        if (! it->getFlags().get_dont_enum()) return true;
+        }
+        return false;
+    }
+
 
 	/// Get the as_value value of a named property
 	//
