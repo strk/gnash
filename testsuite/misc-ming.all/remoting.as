@@ -15,6 +15,7 @@
 #define xfail_check _root.xfail
 #define xpass_check _root.xpass
 
+note("SWF" + OUTPUT_VERSION + " - " + System.capabilities.version + "\n");
 rcsid="remoting.as - <bzr revno here>";
 
 #include "../actionscript.all/check.as"
