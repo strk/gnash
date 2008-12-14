@@ -70,11 +70,12 @@ function amf_1st_arg_type($message_name, $amf) {
 	}
 }
 
-function raw_rpc_to_array($message_name, $amf) {
+function raw_rpc_to_array($request_id, $message_name, $amf) {
 	$ret = array();
 	$ret['type'] = amf_1st_arg_type($message_name, $amf);
 	$ret['hex'] = hexify($amf);
 	$ret['message'] = $message_name;
+	$ret['request_id'] = $request_id;
 	return $ret;
 }
 
@@ -100,9 +101,9 @@ function make_val($val) {
 
 # pass: name of remote procedure, AMF encoded args
 # returns: amf reply
-function raw_rpc($message_name, $amf) {
+function raw_rpc($request_id, $message_name, $amf) {
 	$ret = '';
-	$ary = raw_rpc_to_array($message_name, $amf);
+	$ary = raw_rpc_to_array($request_id, $message_name, $amf);
 	$ret .= make_val($ary);
 	return $ret;
 }
@@ -125,7 +126,7 @@ function echo_main() {
 		$len = get_short($amf, $i);  $i += 2;
 		$request_id = substr($amf, $i, $len); $i += $len; # eg /1
 		$len = get_long($amf, $i); $i += 4; # total size in bytes
-		$answer = raw_rpc($message_name, substr($amf, $i, $len)); $i += $len;
+		$answer = raw_rpc($request_id, $message_name, substr($amf, $i, $len)); $i += $len;
 
 		if($request_id != '/') {
 			$num_replies += 1;
