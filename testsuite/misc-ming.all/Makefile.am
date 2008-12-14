@@ -33,6 +33,7 @@ EXTRA_DIST = \
 	VarAndCharClashTest.as \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
+	remoting.as \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
@@ -1716,6 +1717,9 @@ PrototypeEventListenersTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	PrototypeEventListeners.swf	\
 	$(NULL)
+
+remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/remoting.as
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
