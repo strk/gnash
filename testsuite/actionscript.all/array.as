@@ -416,6 +416,10 @@ sparse[4] = 4;
 check_equals(sparse[3], 3); // crawl inheritance chain !
 delete Array.prototype[3];
 
+c = []; c[''] = 2;
+check_equals(c.length, 0);
+check_equals(typeof(c['']), 'undefined');
+
 //-----------------------------------------------------
 // Test Array.pop()
 //-----------------------------------------------------
@@ -1466,11 +1470,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(497);
+ check_totals(499);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(558);
+  check_totals(560);
 # else
-  check_totals(568);
+  check_totals(570);
 # endif
 #endif

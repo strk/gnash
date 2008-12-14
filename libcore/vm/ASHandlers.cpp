@@ -1033,6 +1033,15 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
     as_environment& env = thread.env;
 
     const std::string& name = env.top(1).to_string();
+    if ( name.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS (
+            // Invalid object, can't set.
+            log_aserror(_("ActionSetVariable: %s=%s: variable name evaluates to invalid (empty) string"),
+                env.top(1),
+                env.top(0));
+        );
+    }
     thread.setVariable(name, env.top(0));
 
     IF_VERBOSE_ACTION (
@@ -3245,7 +3254,17 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
-    if (obj)
+    if ( member_name.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS (
+            // Invalid object, can't set.
+            log_aserror(_("ActionSetMember: %s.%s=%s: member name evaluates to invalid (empty) string"),
+                env.top(2),
+                env.top(1),
+                env.top(0));
+        );
+    }
+    else if (obj)
     {
         thread.setObjectMember(*(obj.get()), member_name, member_value);
 
