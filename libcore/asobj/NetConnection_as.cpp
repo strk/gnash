@@ -110,6 +110,12 @@ private:
     int queued_count;
     unsigned int ticker;
 
+    // Quick hack to send Content-Type: application/x-amf
+    // TODO: check if we should take headers on a per-call basis
+    //       due to NetConnection.addHeader.
+    //
+    NetworkAdapter::RequestHeaders _headers;
+
 public:
     AMFQueue(NetConnection_as& nc, URL url)
         :
@@ -125,6 +131,8 @@ public:
         // leave space for header
         postdata.append("\000\000\000\000\000\000", 6);
         assert(reply.size() == 0);
+
+        _headers["Content-Type"] = "application/x-amf";
     }
 
     ~AMFQueue() {
@@ -402,7 +410,8 @@ public:
             log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
 #endif
             queued_count = 0;
-            _connection.reset(StreamProvider::getDefaultInstance().getStream(url, postdata_str).release());
+
+            _connection.reset(StreamProvider::getDefaultInstance().getStream(url, postdata_str, _headers).release());
             postdata.resize(6);
 #ifdef GNASH_DEBUG_REMOTING
             log_debug("connection created");
