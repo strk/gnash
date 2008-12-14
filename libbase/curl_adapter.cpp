@@ -909,15 +909,11 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
     // don't implement them, and some (namely lighttpd/1.4.19,
     // running on openstreetmap.org at time of writing) return
     // a '417 Expectance Failure' response on getting that.
-    {
-        if ( ! _customHeaders ) {
-            // Initialize only once
-            _customHeaders = curl_slist_append(_customHeaders, "Expect:");
-        }
-        ccode = curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, _customHeaders);
-        if ( ccode != CURLE_OK ) {
-            throw gnash::GnashException(curl_easy_strerror(ccode));
-        }
+    assert ( ! _customHeaders );
+    _customHeaders = curl_slist_append(_customHeaders, "Expect:");
+    ccode = curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, _customHeaders);
+    if ( ccode != CURLE_OK ) {
+        throw gnash::GnashException(curl_easy_strerror(ccode));
     }
 
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
@@ -932,9 +928,20 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
 {
 	log_debug("CurlStreamFile %p created", this);
 	init(url);
-	
-    curl_slist *headerList = 0;
-    
+
+	_postdata = vars;
+
+    // Disable sending an Expect: header, as some older HTTP/1.1
+    // don't implement them, and some (namely lighttpd/1.4.19,
+    // running on openstreetmap.org at time of writing) return
+    // a '417 Expectance Failure' response on getting that.
+    //
+    // Do this before adding user-requested headers so user
+    // specified ones take precedence
+    //
+    assert ( ! _customHeaders );
+    _customHeaders = curl_slist_append(_customHeaders, "Expect:");
+
     for (NetworkAdapter::RequestHeaders::const_iterator i = headers.begin(),
          e = headers.end(); i != e; ++i)
     {
@@ -942,16 +949,15 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
         if (!NetworkAdapter::isHeaderAllowed(i->first)) continue;
         std::ostringstream os;
         os << i->first << ": " << i->second;
-        headerList = curl_slist_append(headerList, os.str().c_str());
+        _customHeaders = curl_slist_append(_customHeaders, os.str().c_str());
     }
 
-    curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, headerList);
-
-//    curl_slist_free_all(headerList);
-
-	_postdata = vars;
-
 	CURLcode ccode;
+
+    ccode = curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, _customHeaders);
+    if ( ccode != CURLE_OK ) {
+        throw gnash::GnashException(curl_easy_strerror(ccode));
+    }
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
 	if ( ccode != CURLE_OK ) {
@@ -975,21 +981,6 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
-
-    // Disable sending an Expect: header, as some older HTTP/1.1
-    // don't implement them, and some (namely lighttpd/1.4.19,
-    // running on openstreetmap.org at time of writing) return
-    // a '417 Expectance Failure' response on getting that.
-    {
-        if ( ! _customHeaders ) {
-            // Initialize only once
-            _customHeaders = curl_slist_append(_customHeaders, "Expect:");
-        }
-        ccode = curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, _customHeaders);
-        if ( ccode != CURLE_OK ) {
-            throw gnash::GnashException(curl_easy_strerror(ccode));
-        }
-    }
 
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
