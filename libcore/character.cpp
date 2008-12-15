@@ -56,7 +56,7 @@ namespace {
 }
 
 
-// Define static const members or there will be linkage problems.
+// Define static const members.
 const int character::lowerAccessibleBound;
 const int character::upperAccessibleBound;
 const int character::staticDepthOffset;
@@ -65,7 +65,33 @@ const int character::noClipDepthValue;
 const int character::dynClipDepthValue;
 
 // Initialize unnamed instance count
-unsigned int character::_lastUnnamedInstanceNum=0;
+unsigned int character::_lastUnnamedInstanceNum = 0;
+
+character::character(character* parent, int id)
+    :
+    m_parent(parent),
+    m_invalidated(true),
+    m_child_invalidated(true),
+    m_id(id),
+    m_depth(0),
+    _xscale(100),
+    _yscale(100),
+    _rotation(0),
+    _volume(100),
+    m_ratio(0),
+    m_clip_depth(noClipDepthValue),
+    _unloaded(false),
+    _destroyed(false),
+    _mask(0),
+    _maskee(0),
+    _blendMode(BLENDMODE_NORMAL),
+    _visible(true),
+    _scriptTransformed(false),
+    _dynamicallyCreated(false)
+{
+    assert((!parent && m_id == -1) || ((parent) && m_id >= 0));
+    assert(m_old_invalidated_ranges.isNull());
+}
 
 /*protected static*/
 std::string
@@ -115,17 +141,6 @@ character::get_world_cxform() const
 	return m;
 }
 
-#if 0
-void
-character::get_mouse_state(int& x, int& y, int& buttons)
-{
-	assert(m_parent != NULL);
-#ifndef GNASH_USE_GC
-	assert(m_parent->get_ref_count() > 0);
-#endif // GNASH_USE_GC
-	get_parent()->get_mouse_state(x, y, buttons);
-}
-#endif
 
 as_object*
 character::get_path_element_character(string_table::key key)
@@ -970,7 +985,8 @@ character::queueEvent(const event_id& id, int lvl)
 {
 
 	movie_root& root = _vm.getRoot();
-	std::auto_ptr<ExecutableCode> event(new QueuedEvent(boost::intrusive_ptr<character>(this), id));
+	std::auto_ptr<ExecutableCode> event(
+            new QueuedEvent(boost::intrusive_ptr<character>(this), id));
 	root.pushAction(event, lvl);
 }
 
@@ -980,7 +996,8 @@ character::hasEventHandler(const event_id& id) const
 	Events::const_iterator it = _event_handlers.find(id);
 	if ( it != _event_handlers.end() ) return true;
 
-	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(id.get_function_key());
+	boost::intrusive_ptr<as_function> method = 
+        getUserDefinedEventHandler(id.get_function_key());
 	if (method) return true;
 
 	return false;
@@ -1028,7 +1045,6 @@ character::set_x_scale(double scale_percent)
     // As per misc-ming.all/SWFMatrix_test.{c,swf}
     // we don't need to recompute the SWFMatrix from the 
     // caches.
-
 
 	SWFMatrix m = getMatrix();
 
@@ -1219,14 +1235,6 @@ character::getTarget() const
 	return target;
 }
 
-#if 0
-/*public*/
-std::string
-character::get_text_value() const
-{
-	return getTarget();
-}
-#endif
 
 void
 character::destroy()
@@ -1285,7 +1293,7 @@ character::setMask(character* mask)
 		// on any previously registered maskee
 		// so we make sure to set our _mask to 
 		// NULL before getting called again
-		_mask->setMaskee(NULL);
+		_mask->setMaskee(0);
 	}
 
 	// if we had a maskee, notify it to stop using
@@ -1324,8 +1332,9 @@ character::setMaskee(character* maskee)
 	{
 		// We don't want the maskee to call setMaskee(null)
 		// on us again
-		log_debug(" %s.setMaskee(%s) : previously masked char %s being set as non-masked",
-			getTarget(), maskee ? maskee->getTarget() : "null", _maskee->getTarget());
+		log_debug(" %s.setMaskee(%s) : previously masked char %s "
+                "being set as non-masked", getTarget(), 
+                maskee ? maskee->getTarget() : "null", _maskee->getTarget());
 		_maskee->_mask = NULL;
 	}
 
@@ -1412,7 +1421,9 @@ character::getAsRoot() const
     return get_root();
 }
 
+
 namespace {
+
 
 const BlendModeMap&
 getBlendModeMap()

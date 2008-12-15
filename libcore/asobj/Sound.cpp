@@ -527,7 +527,6 @@ Sound::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
         //log_debug(" consuming %d bytes of decoded audio", n);
 
         std::copy(_leftOverPtr, _leftOverPtr+n, stream);
-        //memcpy(stream, _leftOverPtr, n);
 
         stream += n;
         _leftOverPtr += n;

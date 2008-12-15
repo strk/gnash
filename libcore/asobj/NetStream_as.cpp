@@ -1507,7 +1507,7 @@ BufferedAudioStreamer::fetch(boost::int16_t* samples, unsigned int nSamples, boo
         assert( ! (samples->m_size%2) ); 
         int n = std::min<int>(samples->m_size, len);
         std::copy(samples->m_ptr, samples->m_ptr+n, stream);
-        //memcpy(stream, samples->m_ptr, n);
+
         stream += n;
         samples->m_ptr += n;
         samples->m_size -= n;
