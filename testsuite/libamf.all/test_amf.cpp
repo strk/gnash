@@ -34,7 +34,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "GnashException.h"
-#include "dejagnu.h"
+#include "check.h"
+//#include "dejagnu.h"
 #include "as_object.h"
 #include "arg_parser.h"
 #include "amf.h"
@@ -66,7 +67,7 @@ static bool memdebug = false;
 Memory *mem = 0;
 #endif
 
-TestState runtest;
+TestState& runtest=_runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -183,81 +184,93 @@ test_encoding()
     
     // Encode a boolean. Although we know a bool is only one character, for AMF,
     // it's actually a two byte short instead.
-    bool flag = true;
-    boost::shared_ptr<Buffer> buf2(new Buffer("01 01"));
-    boost::uint16_t sht = *(boost::uint16_t *)buf2->reference();
-    swapBytes(&sht, sizeof(boost::uint16_t)); // we always encode in big endian format
+    {
+        bool flag = true;
+        boost::shared_ptr<Buffer> buf2(new Buffer("01 01"));
+        boost::uint16_t sht = *(boost::uint16_t *)buf2->reference();
+        swapBytes(&sht, sizeof(boost::uint16_t)); // we always encode in big endian format
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(flag);
+        boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(flag);
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
     
-    // A boolean AMF object has only one header byte, which is the type field.
-    // AMF3 changes this to being two different type, FALSE & TRUE
-    // which are finally only one byte apiece.
-    if ((*encbool->reference() == Element::BOOLEAN_AMF0) &&
-        (encbool->size() == 2) &&
-        (memcmp(buf2->reference(), encbool->reference(), sizeof(boost::uint16_t)) == 0)) {
-        runtest.pass("Encoded AMF Boolean");
-    } else {
-        runtest.fail("Encoded AMF Boolean");
+        // A boolean AMF object has only one header byte, which is the type field.
+        // AMF3 changes this to being two different type, FALSE & TRUE
+        // which are finally only one byte apiece.
+        if ((*encbool->reference() == Element::BOOLEAN_AMF0) &&
+            (encbool->size() == 2) &&
+            (memcmp(buf2->reference(), encbool->reference(), sizeof(boost::uint16_t)) == 0)) {
+            runtest.pass("Encoded AMF Boolean");
+        } else {
+            runtest.fail("Encoded AMF Boolean");
+        }
     }
-//     delete buf2;
-//     delete encbool;
     
     // Encode a String.
-    string str = "Jerry Garcia rules";
+    {
+        string str = "Jerry Garcia rules";
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::shared_ptr<Buffer> encstr = AMF::encodeString(str);
+        boost::shared_ptr<Buffer> buf = AMF::encodeString(str);
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), str.size()+AMF_HEADER_SIZE);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check((memcmp(buf->reference() + 3, str.c_str(), str.size()) == 0));
 
-    // A String AMF object has a 3 bytes head, the type, and a two byte length.
-    if ((*encstr->reference() == Element::STRING_AMF0) &&
-        (encstr->size() == str.size() + AMF_HEADER_SIZE) &&
-        (memcmp(encstr->reference() + 3, str.c_str(), str.size()) == 0)) {
-        runtest.pass("Encoded AMF String");
-    } else {
-        runtest.fail("Encoded AMF String");
+        Element el(str);
+        buf = AMF::encodeElement(el);
+        
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), str.size()+AMF_HEADER_SIZE);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check((memcmp(buf->reference() + 3, str.c_str(), str.size()) == 0));
     }
-//    delete encstr;
     
     // Encode a NULL String.
+    {
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::shared_ptr<Buffer> encnull = AMF::encodeNullString();
+        boost::shared_ptr<Buffer> buf = AMF::encodeNullString();
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::uint16_t len = *(boost::uint16_t *)(encnull->reference() + 1);
-    // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
-    if ((*encnull->reference() == Element::STRING_AMF0) &&
-        (encnull->size() == AMF_HEADER_SIZE) && 
-        (len == 0)) {
-        runtest.pass("Encoded AMF NULL String");
-    } else {
-        runtest.fail("Encoded AMF NULL String");
+        boost::uint16_t len = *(boost::uint16_t *)(buf->reference() + 1);
+
+        // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), (size_t)AMF_HEADER_SIZE);
+        check_equals(len, 0);
+
+        Element el;
+        el.makeNullString();
+        buf = AMF::encodeElement(el);
+        len = *(boost::uint16_t *)(buf->reference() + 1);
+
+        // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), (size_t)AMF_HEADER_SIZE);
+        check_equals(len, 0);
     }
-//    delete encnull;
 
 // amf::AMF::encodeECMAArray(unsigned char*, int)
 }

@@ -277,9 +277,31 @@ main(int argc, char *argv[])
         }
     }
     
-    if (app.empty()) {
+    if (app.empty())
+    {
+
         // Get the application name
+        // rtmp://localhost/application/resource
+        //                  ^^^^^^^^^^^ <-- appname is this
+        //
         app = path;
+	if ( ! filename.empty() )
+	{
+        	string::size_type end = app.rfind(filename);
+		if (end != string::npos) {
+		    app = app.substr(0, end);
+		}
+	}
+
+	// drop slashes
+        string::size_type end = app.find_first_not_of('/');
+	if (end != string::npos) {
+	    app = app.substr(end);
+	}
+        end = app.find_last_not_of('/');
+	if (end != string::npos) {
+	    app = app.substr(0, end+1);
+	}
         
         if (!query.empty()) {
             app = path;
@@ -348,7 +370,7 @@ main(int argc, char *argv[])
         log_error("Couldn't send NetConnection Connect message,");
         //exit(-1);
     }
-    
+
     // make the createStream for ID 3 encoded object
     log_debug("Sending NetStream::createStream message,");
     BufferSharedPtr buf3 = client.encodeStream(0x2);
