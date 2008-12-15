@@ -1375,7 +1375,7 @@ http_handler(Network::thread_params_t *args)
 	    done = true;
 	} else {
 	    log_debug("Keep-Alive is on", www->keepAlive());
-	    done = true;
+//	    done = true;
 	}
 #ifdef USE_STATISTICS
 	struct timespec end;
