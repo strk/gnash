@@ -70,9 +70,11 @@ else
 	pass("NetConnection::connect() initialized correctly");
 }
 
+statuses = new Array;
 tmp.onStatus = function(info) {
     result = info.code;
     level = info.level;
+    statuses.push(info.code);
 };
 
 result = "";
@@ -112,6 +114,8 @@ check_equals(tmp.uri, "null");
 tmp.uri = 6;
 check_equals(tmp.uri, "null");
 
+
+statuses = new Array();
 ret = tmp.connect(1);
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
@@ -119,7 +123,10 @@ check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 check_equals(typeof(tmp.uri), "string");
 check_equals(tmp.uri, "1");
+check_equals(statuses.toString(),
+            "NetConnection.Connect.Closed,NetConnection.Connect.Failed");
 
+statuses = new Array();
 ret = tmp.connect("string");
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
@@ -127,6 +134,8 @@ check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 check_equals(typeof(tmp.uri), "string");
 check_equals(tmp.uri, "string");
+check_equals(statuses.toString(),
+            "NetConnection.Connect.Failed");
 
 ret = tmp.connect(undefined);
 
@@ -146,11 +155,14 @@ check_equals(typeof(tmp.uri), "string");
 check_equals(tmp.uri, "");
 #endif
 
+statuses = new Array;
 ret = tmp.connect(null);
 check_equals(ret, true);
 check_equals(tmp.isConnected, true);
 check_equals(result, "NetConnection.Connect.Success");
 check_equals(level, "status");
+check_equals(statuses.toString(),
+        "NetConnection.Connect.Closed,NetConnection.Connect.Success");
 
 // The pp and Gnash sandboxes behave differently. The pp rejects any
 // network connection from filesystem-loaded SWFs unless the SWF location
@@ -164,6 +176,20 @@ check_equals(ret, false);
 check_equals(tmp.isConnected, false);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
+
+
+// Close() doesn't reset uri
+tmp.close();
+check_equals(tmp.uri, "http://www.blacklistedserver.org");
+
+// Test call()
+
+// Invalid arguments.
+statuses = new Array;
+ret = tmp.call("o");
+check_equals(ret, undefined);
+check_equals(statuses.length, 0);
+
 
 // Check onStatus object.
 
