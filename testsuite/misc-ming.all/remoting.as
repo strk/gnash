@@ -24,7 +24,7 @@ rcsid="remoting.as - <bzr revno here>";
 endOfTest = function()
 {
 	//note("END OF TEST");
-	check_totals(74);
+	check_totals(79);
 };
 
 
@@ -249,6 +249,23 @@ function test14()
         connectionPort = res.remote_port;
         xcheck_equals(res.request_id, '/1'); // connection is reset
         check_equals(res.message, 'ary_newconnect');
+        check_equals(res.arg1_type, 'STRICT_ARRAY');
+        check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:00');
+    };
+
+    note('Connecting again to: '+url);
+    nc.connect(url); // reconnect, should reset call id
+
+    o={onStatus:handleOnStatus};
+    ary13=[]; 
+    nc.call("ary_newconnect2", o, ary13); //
+    o.onResult = function(res) {
+        //note(printInfo(res));
+        // Gnash uses the same connection, even on re-connect !
+        xcheck(res.remote_port != connectionPort);
+        connectionPort = res.remote_port;
+        xcheck_equals(res.request_id, '/1'); // connection is reset
+        check_equals(res.message, 'ary_newconnect2');
         check_equals(res.arg1_type, 'STRICT_ARRAY');
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:00');
         onEnterFrame = test15;
