@@ -78,8 +78,8 @@ static void usage();
 static void version_and_copyright();
 static void cntrlc_handler(int sig);
 
-void connection_handler(Handler::thread_params_t *args);
-void admin_handler(Handler::thread_params_t *args);
+void connection_handler(Network::thread_params_t *args);
+void admin_handler(Network::thread_params_t *args);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
