@@ -1,5 +1,18 @@
 <?php
 
+class o_amf_val {
+	var $data;
+	var $type;
+	function o_amf_val($data, $type) {
+		$this->data = $data;
+		$this->type = $type;
+	}
+}
+function raw($amf) {
+	return new o_amf_val($amf, 'raw');
+}
+
+
 # read a network short i bytes into amf
 function get_short($amf, $i) {
 	return (ord($amf[$i]) << 8) | ord($amf[$i + 1]);
@@ -35,7 +48,7 @@ function hexify($bin) {
 
 # pass: name of remote procedure, AMF encoded args
 # returns: string
-function amf_1st_arg_type($message_name, $amf) {
+function arg1_type($amf) {
 	if(ord($amf[0]) != 0x0a) {
 		return "couldn't find args";
 	} else {
@@ -70,12 +83,18 @@ function amf_1st_arg_type($message_name, $amf) {
 	}
 }
 
-function raw_rpc_to_array($request_id, $message_name, $amf) {
+function raw_rpc_to_array($amf, $extras) {
 	$ret = array();
-	$ret['type'] = amf_1st_arg_type($message_name, $amf);
+    #phpinfo();
+    $ret['remote_port'] = $_SERVER['REMOTE_PORT'];
+	$ret['arg1_type'] = arg1_type($amf);
+	$ret['type'] = $ret['arg1_type']; # depricated. used arg1_type
 	$ret['hex'] = hexify($amf);
-	$ret['message'] = $message_name;
-	$ret['request_id'] = $request_id;
+	$ret['message'] = $extras['message_name'];
+	$ret['request_id'] = $extras['request_id'];
+	if(isset($extras['unsent'])) {
+		$ret['unsent'] = $extras['unsent'];
+	}
 	return $ret;
 }
 
@@ -94,6 +113,8 @@ function make_ecma($o) {
 function make_val($val) {
 	if(is_array($val)) {
 		return chr(0x08) . make_ecma($val);
+	} elseif(is_object($val) && $val->type == 'raw') {
+		return $val->data;
 	} else {
 		return chr(0x02) . make_string($val);
 	}
@@ -101,11 +122,9 @@ function make_val($val) {
 
 # pass: name of remote procedure, AMF encoded args
 # returns: amf reply
-function raw_rpc($request_id, $message_name, $amf) {
-	$ret = '';
-	$ary = raw_rpc_to_array($request_id, $message_name, $amf);
-	$ret .= make_val($ary);
-	return $ret;
+function raw_rpc($amf, $extras) {
+	$ary = raw_rpc_to_aRray($amf, $extras);
+	return make_val($ary);
 }
 
 function echo_main() {
@@ -120,15 +139,26 @@ function echo_main() {
 	}
 
 	$bodies = get_short($amf, $i); $i += 2;
+	$unsent = false; # if the previous message(s) was not sent it's stored in this
 	while($bodies && $i < strlen($amf)) {
 		$len = get_short($amf, $i);  $i += 2;
 		$message_name = substr($amf, $i, $len); $i += $len; # this is the name of the remote procedure requested
 		$len = get_short($amf, $i);  $i += 2;
 		$request_id = substr($amf, $i, $len); $i += $len; # eg /1
 		$len = get_long($amf, $i); $i += 4; # total size in bytes
-		$answer = raw_rpc($request_id, $message_name, substr($amf, $i, $len)); $i += $len;
+		$extra = array('message_name' => $message_name, 'request_id' => $request_id);
+		if($unsent) {
+			$extra['unsent'] = $unsent;
+			$unsent = false;
+		}
+		$answer = raw_rpc(substr($amf, $i, $len), $extra); $i += $len;
 
-		if($request_id != '/') {
+		if($request_id == '/' || $request_id == '' || $request_id == 'null') {
+			if(!$unsent) {
+				$unsent = array();
+			}
+			$unsent[] = raw($answer);
+		} else {
 			$num_replies += 1;
 			$reply .= make_string($request_id . '/onResult');
 			$reply .= make_string('null');
