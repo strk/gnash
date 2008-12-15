@@ -107,9 +107,6 @@ private:
 
     bool _isConnected;
 
-    bool _inError;
-
-
 };
 
 void netconnection_class_init(as_object& global);
