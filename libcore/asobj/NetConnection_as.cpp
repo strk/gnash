@@ -510,8 +510,7 @@ NetConnection_as::NetConnection_as()
     :
     as_object(getNetConnectionInterface()),
     _callQueue(0),
-    _isConnected(false),
-    _inError(false)
+    _isConnected(false)
 {
     attachProperties(*this);
 }
@@ -644,8 +643,9 @@ NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 void
 NetConnection_as::connect()
 {
+    // Close any current connections.
+    close();
     _isConnected = true;
-    _inError = false;
     notifyStatus(CONNECT_SUCCESS);
 }
 
@@ -653,6 +653,8 @@ NetConnection_as::connect()
 void
 NetConnection_as::connect(const std::string& /*uri*/)
 {
+    // Close any current connections.
+    close();
 
     // FIXME: We should attempt a connection here (this is called when an
     // argument is passed to NetConnection.connect(url).
@@ -667,7 +669,6 @@ NetConnection_as::connect(const std::string& /*uri*/)
     //    and fails immediately.
     // TODO: modify validateURL for doing this.
     _isConnected = false;
-    _inError = true;
     notifyStatus(CONNECT_FAILED);
 }
 
@@ -677,13 +678,13 @@ NetConnection_as::connect(const std::string& /*uri*/)
 void
 NetConnection_as::close()
 {
+    if (!_isConnected) return;
+
     /// TODO: what should actually happen here? Should an attached
     /// NetStream object be interrupted?
     _isConnected = false;
 
-    // If a previous connect() attempt failed, close() will not send
-    // an onStatus event.
-    if (!_inError) notifyStatus(CONNECT_CLOSED);
+    notifyStatus(CONNECT_CLOSED);
 }
 
 
@@ -711,19 +712,16 @@ NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
     // not connected).
     URL url(validateURL());
 
-    // FIXME check if it's possible for the URL of a NetConnection
-    // to change between call()s
+    // The URL depends on the URL passed to NetConnection.connect();
     if (!_callQueue.get()) {
         _callQueue.reset(new AMFQueue(*this, url));
     }
 
     if (asCallback) {
-        //boost::intrusive_ptr<as_object> intrusive_callback(asCallback);
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue with callback");
 #endif
         _callQueue->enqueue(buf, callNumber, asCallback);
-        //? delete asCallback;
     }
     
     else {
@@ -746,7 +744,10 @@ NetConnection_as::getStream(const std::string& name)
     StreamProvider& streamProvider = ri.streamProvider();
 
     // Construct URL with base URL (assuming not connected to RTMP server..)
-    // TODO: use getURI to figure the base url, if any
+    // TODO: For RTMP return the named stream from an existing RTMP connection.
+    // If name is a full or relative URL passed from NetStream.play(), it
+    // must be constructed against the base URL, not the NetConnection uri,
+    // which should always be null in this case.
     return streamProvider.getStream(URL(name, ri.baseURL()));
 
 }

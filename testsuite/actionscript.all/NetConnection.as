@@ -70,9 +70,11 @@ else
 	pass("NetConnection::connect() initialized correctly");
 }
 
+statuses = new Array;
 tmp.onStatus = function(info) {
     result = info.code;
     level = info.level;
+    statuses.push(info.code);
 };
 
 result = "";
@@ -112,6 +114,8 @@ check_equals(tmp.uri, "null");
 tmp.uri = 6;
 check_equals(tmp.uri, "null");
 
+
+statuses = new Array();
 ret = tmp.connect(1);
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
@@ -119,7 +123,10 @@ check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 check_equals(typeof(tmp.uri), "string");
 check_equals(tmp.uri, "1");
+check_equals(statuses.toString(),
+            "NetConnection.Connect.Closed,NetConnection.Connect.Failed");
 
+statuses = new Array();
 ret = tmp.connect("string");
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
@@ -127,6 +134,8 @@ check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 check_equals(typeof(tmp.uri), "string");
 check_equals(tmp.uri, "string");
+check_equals(statuses.toString(),
+            "NetConnection.Connect.Failed");
 
 ret = tmp.connect(undefined);
 
@@ -146,12 +155,21 @@ check_equals(typeof(tmp.uri), "string");
 check_equals(tmp.uri, "");
 #endif
 
+statuses = new Array;
 ret = tmp.connect(null);
 check_equals(ret, true);
 check_equals(tmp.isConnected, true);
 check_equals(result, "NetConnection.Connect.Success");
 check_equals(level, "status");
 
+// This depends on whether isConnected() was true or not.
+#if OUTPUT_VERSION > 6
+check_equals(statuses.toString(),
+        "NetConnection.Connect.Closed,NetConnection.Connect.Success");
+#else
+check_equals(statuses.toString(),
+        "NetConnection.Connect.Success");
+#endif
 // The pp and Gnash sandboxes behave differently. The pp rejects any
 // network connection from filesystem-loaded SWFs unless the SWF location
 // is added to the player configuration file. This server is blacklisted
@@ -164,6 +182,26 @@ check_equals(ret, false);
 check_equals(tmp.isConnected, false);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
+
+
+// Close() doesn't reset uri
+tmp.close();
+check_equals(tmp.uri, "http://www.blacklistedserver.org");
+
+// Test call()
+
+statuses = new Array;
+// No Call onStatus event when not connected.
+ret = tmp.call("o");
+check_equals(ret, undefined);
+check_equals(statuses.length, 0);
+
+// No Call onStatus event when connected with null.
+tmp.connect(null);
+ret = tmp.call("o");
+check_equals(ret, undefined);
+check_equals(statuses.length, 1);
+check_equals(result, "NetConnection.Connect.Success");
 
 // Check onStatus object.
 
@@ -192,6 +230,7 @@ level = "";
 nc.onStatus = function(info) {
     result = info.code;
     level = info.level;
+    statuses.push(info.code);
 };
 
 // Sanity check
@@ -217,6 +256,7 @@ check_equals(level, "");
 
 // NetConnection close
 
+statuses = new Array;
 check(nc.isConnected);
 ret = nc.close();
 check_equals(nc.isConnected, false);
@@ -232,6 +272,9 @@ check_equals(ret, undefined);
 check_equals(result, "NetConnection.Connect.Closed");
 check_equals(level, "status");
 
+// Only called once
+check_equals(statuses.toString(), "NetConnection.Connect.Closed");
+
 nc.connect(1);
 check_equals(nc.isConnected, false);
 check_equals(typeof(ret), "undefined");
@@ -245,7 +288,7 @@ check_equals(ret, undefined);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 
-check_totals(107);
+check_totals(117);
 
 
 
