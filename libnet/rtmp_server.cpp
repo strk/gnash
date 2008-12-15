@@ -127,7 +127,7 @@ RTMPServer::handShakeResponse()
 //     std::copy(_handshake->begin(), _handshake->end(), (buf1->begin() + 1));    
 //     boost::shared_ptr<amf::Buffer> buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
 //     std::copy(_handshake->begin(), _handshake->end(), buf->begin() + 1 + RTMP_BODY_SIZE);
-    _handler->notifyout();
+//    _handler->notifyout();
 
     log_debug("Sent RTMP Handshake response");
 
@@ -503,7 +503,7 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 
 // This is the thread for all incoming RTMP connections
 void
-rtmp_handler(Handler::thread_params_t *args)
+rtmp_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
     Handler *hand = reinterpret_cast<Handler *>(args->handler);
@@ -539,7 +539,7 @@ rtmp_handler(Handler::thread_params_t *args)
 	clock_gettime (CLOCK_REALTIME, &start);
 #endif
 	if (!rtmp.handShakeWait()) {
-	    hand->clearout();	// remove all data from the outgoing que
+ //	    hand->clearout();	// remove all data from the outgoing que
 	    hand->die();	// tell all the threads for this connection to die
 	    hand->notifyin();
 	    log_debug("Net RTMP done for fd #%d...", args->netfd);
