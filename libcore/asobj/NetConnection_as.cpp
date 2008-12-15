@@ -639,7 +639,7 @@ NetConnection_as::connect(const std::string& /*uri*/)
         _callQueues.push_back(_currentCallQueue.release());
     }
 
-    // Close any current connections. (why?)
+    // Close any current connections. (why?) Because that's what happens.
     close();
 
     // FIXME: We should attempt a connection here (this is called when an
@@ -698,8 +698,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
     // not connected).
     URL url(validateURL());
 
-    // FIXME check if it's possible for the URL of a NetConnection
-    // to change between call()s
+    // This should use the uri set with connect()
     if (!_currentCallQueue.get()) {
         _currentCallQueue.reset(new AMFQueue(*this, url));
     }
@@ -747,8 +746,7 @@ NetConnection_as::advanceWrapper(const fn_call& fn)
 {
     boost::intrusive_ptr<NetConnection_as> ptr = 
         ensureType<NetConnection_as>(fn.this_ptr);
-    // FIXME check if it's possible for the URL of a 
-    // NetConnection to change between call()s
+    
     ptr->advance();
     return as_value();
 };
@@ -767,7 +765,7 @@ NetConnection_as::startAdvanceTimer()
             new builtin_function(&NetConnection_as::advanceWrapper);
 
     std::auto_ptr<Timer> timer(new Timer);
-    unsigned long delayMS = 50; // FIXME crank up to 50 or so
+    unsigned long delayMS = 50; 
     timer->setInterval(*ticker_as, delayMS, this);
     _advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
 
