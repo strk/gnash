@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "gettext.h"
+//#include "cvm.h"
 
 extern "C"{
 # include "GnashSystemIOHeaders.h"
@@ -93,12 +94,14 @@ static void version_and_copyright();
 static void cntrlc_handler(int sig);
 static void hup_handler(int sig);
 
-void connection_handler(Handler::thread_params_t *args);
-void dispatch_handler(Handler::thread_params_t *args);
-void admin_handler(Handler::thread_params_t *args);
+void connection_handler(Network::thread_params_t *args);
+void dispatch_handler(Network::thread_params_t *args);
+void admin_handler(Network::thread_params_t *args);
 
 // Toggles very verbose debugging info from the network Network class
 static bool netdebug = false;
+
+struct sigaction  act1, act2;
 
 // The next few global variables have to be global because Boost
 // threads don't take arguments. Since these are set in main() before
@@ -249,7 +252,6 @@ main(int argc, char *argv[])
     }
     
     // Trap ^C (SIGINT) so we can kill all the threads
-    struct sigaction  act1, act2;
     act1.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act1, NULL);
     act2.sa_handler = hup_handler;
@@ -264,19 +266,22 @@ main(int argc, char *argv[])
 //     boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
     // Admin handler
     if (admin) {
-	Handler::thread_params_t admin_data;
+	Network::thread_params_t admin_data;
 	admin_data.port = gnash::ADMIN_PORT;
 	boost::thread admin_thread(boost::bind(&admin_handler, &admin_data));
 //	admin_thread.join();
     }
 
+//    Cvm cvm;
+//    cvm.loadMovie("/tmp/out.swf");
+    
     // Incomming connection handler for port 80, HTTP and
     // RTMPT. As port 80 requires root access, cygnal supports a
     // "port offset" for debugging and development of the
     // server. Since this port offset changes the constant to test
     // for which protocol, we pass the info to the start thread so
     // it knows which handler to invoke. 
-    Handler::thread_params_t http_data;
+    Network::thread_params_t http_data;
     http_data.port = port_offset + gnash::RTMPT_PORT;
     http_data.netfd = 0;
     http_data.filespec = docroot;
@@ -323,7 +328,7 @@ cntrlc_handler (int sig)
 
 // Trap SIGHUP so we can 
 static void
-hup_handler (int sig)
+hup_handler (int /* sig */)
 {
     if (crcfile.getTestingFlag()) {
 	cerr << "Testing, Testing, Testing..." << endl;
@@ -345,7 +350,7 @@ version_and_copyright()
 
 // FIXME: this function could be tweaked for better performance
 void
-admin_handler(Handler::thread_params_t *args)
+admin_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
     int retries = 100;
@@ -467,14 +472,13 @@ admin_handler(Handler::thread_params_t *args)
 }
     
 void
-connection_handler(Handler::thread_params_t *args)
+connection_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
     int fd = 0;
-//    list<Handler *> *handlers = reinterpret_cast<list<Handler *> *>(args->handle);
+    Network net;
     bool done = false;
     static int tid = 0;
-    Network net;
     if (netdebug) {
 	net.toggleDebug(true);
     }
@@ -513,12 +517,14 @@ connection_handler(Handler::thread_params_t *args)
 
     // Rotate in a range of 0 to the limit.
     tid = (tid + 1) % (spawn_limit + 1);
-    log_debug("thread ID %d for fd #%d", tid, args->netfd);
+    log_debug("thread ID %d for fd #%d", tid, fd);
 	
-    Handler *hand = new Handler;
-    args->handler = hand;
-    if (crcfile.getThreadingFlag()) {
-      log_debug("Multi-threaded mode for server on fd #%d", fd);
+//    Handler *hand = new Handler;
+
+    args->handler = &net;
+    if (crcfile.getThreadingFlag() == true) {
+	boost::bind(dispatch_handler, args);
+        log_debug("Multi-threaded mode for server on fd #%d", fd);
 //      log_debug("Starting handler: %x for fd #%d", (void *)hand, args->netfd);
       boost::thread handler(boost::bind(&dispatch_handler, args));
     }
@@ -545,17 +551,22 @@ connection_handler(Handler::thread_params_t *args)
     
 	struct pollfd fds;
 	fds.fd = args->netfd;
-	fds.events = POLLIN |POLLRDHUP;
+	fds.events = POLLIN | POLLRDHUP;
 	if (args->port == (port_offset + RTMPT_PORT)) {
-	    hand->addPollFD(fds, http_handler);
+// 	    Handler::thread_params_t *targs = new Handler::thread_params_t;
+// 	    targs->netfd = args->netfd;
+// 	    targs->handler = args->handler;
+	    HTTP *http = new HTTP;
+	    http->setFileFd(args->netfd);
+	    args->handler = http;
+	    boost::bind(http_handler, args);
+	    http->addPollFD(fds, http_handler);
+//	    hand->notify();
 	}
 //  	if (args->port == RTMP_PORT) {
 //  	    hand->addPollFD(fds, rtmp_handler);
 //  	}
-	// if supporting multiple threads
-	if (crcfile.getThreadingFlag()) {
-	    hand->notify();
-	} else {
+	if (crcfile.getThreadingFlag() == false) {     // single threaded
 	  log_debug("Single threaded mode for fd #%d", args->netfd);
 	  dispatch_handler(args);
 #if 0
@@ -565,8 +576,11 @@ connection_handler(Handler::thread_params_t *args)
 	  if (args->port == (port_offset + RTMP_PORT)) {
 	    boost::thread handler(boost::bind(&rtmp_handler, args));
 	  }
-	} else {		// single threaded
 #endif
+	} else {
+	    //    	    hand->wait();
+	    //	    handler->join();
+	    log_debug("Debug mode, waiting for thread to complete");
 	}
 //	net.closeNet(args->netfd); 		// this shuts down this socket connection
 	log_debug("Restarting loop for next connection for port %d...", args->port);
@@ -578,43 +592,48 @@ connection_handler(Handler::thread_params_t *args)
 } // end of connection_handler
 
 void
-dispatch_handler(Handler::thread_params_t *args)
+dispatch_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 
-    Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    Network net;
+//    Handler *hand = reinterpret_cast<Handler *>(args->handler);
+    Network *net = reinterpret_cast<Network *>(args->handler);
+//    Network net;
     int timeout = 5000;
 
-    while(!hand->timetodie()) {    
-	int limit = hand->getPollFDSize();
-	net.setTimeout(timeout);
+//    while(!hand->timetodie()) {
+	int limit = net->getPollFDSize();
+	net->setTimeout(timeout);
 	cerr << "LIMIT is: " << limit << endl;
 	if (limit > 0) {
-	    struct pollfd *fds = hand->getPollFDPtr();
+	    struct pollfd *fds = net->getPollFDPtr();
 	    boost::shared_ptr< vector<struct pollfd> > hits;
 	    try {
 //                boost::shared_ptr< vector< int > > hits(net.waitForNetData(limit, fds));
-                hits = net.waitForNetData(limit, fds);
+                hits = net->waitForNetData(limit, fds);
 		vector<struct pollfd>::iterator it;
 		cerr << "Hits: " << hits->size() << endl;
-		cerr << "Pollfds: " << hand->getPollFDSize() << endl;
+		cerr << "Pollfds: " << net->getPollFDSize() << endl;
 		for (it = hits->begin(); it != hits->end(); it++) {
 		    if ((it->revents & POLLRDHUP) || (it->revents & POLLNVAL))  {
 			log_debug("Revents has a POLLRDHUP or POLLNVAL set to %d for fd #%d",
 				  it->revents, it->fd);
-// 			hand->erasePollFD(it);
- 			net.closeNet(it->fd);
+// 			hand->erasePollFD(it->fd);
+// 			net.closeNet(it->fd);
 //			continue;
+			break;
+		    } else {
+		      log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
+		      // Call the protocol handler for this network connection
+		      net->getEntry(it->fd)(args);
 		    }
-		    log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
-		    // Call the protocol handler for this network connection
-		    hand->getEntry(it->fd)(args);
 // 		    if (!crcfile.getThreadingFlag()) {
 // 			hand->die();
 // 		    }
-		    hand->erasePollFD(it->fd);
-		    net.closeNet(it->fd);
+		    if (it->fd <= net->getPollFDSize()) {
+		      net->closeNet(it->fd);
+		      net->erasePollFD(it->fd);
+		    }
 		}
 	    } catch (std::exception& e) {
 		log_error("Network connection was dropped:  %s", e.what());
@@ -630,12 +649,12 @@ dispatch_handler(Handler::thread_params_t *args)
         } else {
 	    log_debug("nothing to wait for...");
 	    if (crcfile.getThreadingFlag()) {
-		hand->wait();
+//		hand->wait();
 		log_debug("Got new network file descriptor to watch");
 	    } else {
 		return;
 	    }
-        }
+//        }
     }
 } // end of dispatch_handler
 	
