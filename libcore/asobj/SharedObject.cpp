@@ -545,7 +545,12 @@ SharedObjectLibrary::getLocal(const std::string& objName,
 
     // If the domain name is empty, the SWF was loaded from the filesystem.
     // Use "localhost".
-    solPath << (_baseDomain.empty() ? "localhost" : _baseDomain) << "/";
+    solPath << (_baseDomain.empty() ? "localhost" : _baseDomain);
+
+    // Paths should start with a '/', so we shouldn't have to add another
+    // one.
+    assert(requestedPath.empty() ? _basePath[0] == '/' :
+                                    requestedPath[0] == '/');
 
     // If no path was requested, use the SWF's path.
     solPath << (requestedPath.empty() ? _basePath : requestedPath) << "/"
@@ -562,7 +567,8 @@ SharedObjectLibrary::getLocal(const std::string& objName,
         log_debug("SharedObject %s already known, returning it", key);
         return it->second;
     }
-    log_debug("SharedObject %s not known, creating it", key);
+
+    log_debug("SharedObject %s not loaded. Loading it now", key);
 
     // Otherwise create a new one and register to the lib
     SharedObject* obj = new SharedObject();
