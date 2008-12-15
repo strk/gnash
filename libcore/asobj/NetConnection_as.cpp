@@ -433,7 +433,8 @@ public:
     {
         boost::intrusive_ptr<NetConnection_as> ptr = 
             ensureType<NetConnection_as>(fn.this_ptr);
-        // FIXME check if it's possible for the URL of a NetConnection to change between call()s
+        // FIXME check if it's possible for the URL of a 
+        // NetConnection to change between call()s
         ptr->_callQueue->tick();
         return as_value();
     };
@@ -550,6 +551,10 @@ NetConnection_as::markReachableResources() const
 }
 
 
+/// FIXME: this should not use _uri, but rather take a URL argument.
+/// Validation should probably be done on connect() only and return a 
+/// bool indicating validity. That can be used to return a failure
+/// for invalid or blocked URLs.
 std::string
 NetConnection_as::validateURL() const
 {
@@ -633,6 +638,9 @@ NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 }
 
 
+/// Called on NetConnection.connect(null).
+//
+/// The status notification happens immediately, isConnected becomes true.
 void
 NetConnection_as::connect()
 {
@@ -643,23 +651,29 @@ NetConnection_as::connect()
 
 
 void
-NetConnection_as::connect(const std::string& uri)
+NetConnection_as::connect(const std::string& /*uri*/)
 {
 
-    // FIXME: RTMP URLs should attempt a connection (warning: this seems
-    // to be different for SWF8). Would probably return true on success and
-    // set isConnected.
+    // FIXME: We should attempt a connection here (this is called when an
+    // argument is passed to NetConnection.connect(url).
+    // Would probably return true on success and set isConnected.
     //
-    // For URLs starting with anything other than "rtmp://" no connection is
-    // initiated, but the uri is still set.
-    setURI(uri);
-
+    // Under certain circumstances, an an immediate failure notification
+    // happens. These are:
+    // a) sandbox restriction
+    // b) invalid URL? NetConnection.connect(5) fails straight away, but
+    //    could be either because a URL has to be absolute, perhaps including
+    //    a protocol, or because the load is attempted from the filesystem
+    //    and fails immediately.
+    // TODO: modify validateURL for doing this.
     _isConnected = false;
     _inError = true;
     notifyStatus(CONNECT_FAILED);
 }
 
 
+/// FIXME: This should close an active connection as well as setting the
+/// appropriate properties.
 void
 NetConnection_as::close()
 {
@@ -690,7 +704,11 @@ NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
             hexify(buf.data(), buf.size(), false));
 #endif
 
-    // FIXME check that ptr->_uri is valid
+    // FIXME: Don't do this here. Use a single connection object member
+    // for all calls (depends on the following FIXME), and also check
+    // whether a connection exists and don't call() if it doesn't (can be
+    // done in the AS implementation to save processing arguments when
+    // not connected).
     URL url(validateURL());
 
     // FIXME check if it's possible for the URL of a NetConnection
@@ -948,9 +966,9 @@ netconnection_new(const fn_call& /* fn */)
 //
 /// For non-rtmp streams:
 //
-/// Returns undefined if there are no arguments. Otherwise true if the first
-/// argument is null, false if it is anything else. Undefined is also valid
-/// for SWF7 and above.
+/// Returns undefined if there are no arguments, true if the first
+/// argument is null, otherwise the result of the attempted connection.
+/// Undefined is also a valid argument for SWF7 and above.
 //
 /// The isConnected property is set to the result of connect().
 as_value
@@ -973,11 +991,13 @@ netconnection_connect(const fn_call& fn)
 
     const VM& vm = ptr->getVM();
     const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
+    
+    // This is always set without validification.
+    ptr->setURI(uriStr);
 
     // Check first arg for validity 
     if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined())) {
         ptr->connect();
-        ptr->setURI(uriStr);
     }
     else {
         if ( fn.nargs > 1 )

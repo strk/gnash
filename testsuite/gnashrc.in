@@ -38,4 +38,7 @@ set startStopped false
 #       so that test runners can check what's sent!
 set urlOpenerFormat echo '%u' > /dev/null
 
+# Blacklist (for testing NetConnection)
+set blacklist www.blacklistedserver.org
+
 # TODO: enable extensions ?
