@@ -511,7 +511,6 @@ NetConnection_as::NetConnection_as()
     as_object(getNetConnectionInterface()),
     _callQueue(0),
     _isConnected(false),
-    _inError(false)
 {
     attachProperties(*this);
 }
@@ -644,8 +643,9 @@ NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 void
 NetConnection_as::connect()
 {
+    // Close any current connections.
+    close();
     _isConnected = true;
-    _inError = false;
     notifyStatus(CONNECT_SUCCESS);
 }
 
@@ -653,6 +653,8 @@ NetConnection_as::connect()
 void
 NetConnection_as::connect(const std::string& /*uri*/)
 {
+    // Close any current connections.
+    close();
 
     // FIXME: We should attempt a connection here (this is called when an
     // argument is passed to NetConnection.connect(url).
@@ -667,7 +669,6 @@ NetConnection_as::connect(const std::string& /*uri*/)
     //    and fails immediately.
     // TODO: modify validateURL for doing this.
     _isConnected = false;
-    _inError = true;
     notifyStatus(CONNECT_FAILED);
 }
 
@@ -677,13 +678,13 @@ NetConnection_as::connect(const std::string& /*uri*/)
 void
 NetConnection_as::close()
 {
+    if (!_isConnected) return;
+
     /// TODO: what should actually happen here? Should an attached
     /// NetStream object be interrupted?
     _isConnected = false;
 
-    // If a previous connect() attempt failed, close() will not send
-    // an onStatus event.
-    if (!_inError) notifyStatus(CONNECT_CLOSED);
+    notifyStatus(CONNECT_CLOSED);
 }
 
 
