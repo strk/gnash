@@ -52,7 +52,7 @@
 #include "namedStrings.h"
 
 
-// #define GNASH_DEBUG_REMOTING
+//#define GNASH_DEBUG_REMOTING
 
 // Forward declarations.
 
@@ -135,15 +135,12 @@ public:
         _headers["Content-Type"] = "application/x-amf";
     }
 
-    ~AMFQueue() {
-        stop_ticking();
-    }
-    
     void enqueue(const SimpleBuffer &amf, const std::string& identifier,
             boost::intrusive_ptr<as_object> callback) {
         push_amf(amf);
         push_callback(identifier, callback);
     };
+
     void enqueue(const SimpleBuffer &amf) {
         push_amf(amf);
     };
@@ -153,7 +150,11 @@ public:
     //
     // it handles all networking for NetConnection::call() and dispatches
     // callbacks when needed
-    void tick() {
+    //
+    // @return true if wants to be called again false when done
+    //
+    bool tick()
+    {
 
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("tick running");
@@ -400,9 +401,9 @@ public:
         }
 
         if(!_connection && queued_count > 0) {
-#ifdef GNASH_DEBUG_REMOTING
+//#ifdef GNASH_DEBUG_REMOTING
             log_debug("creating connection");
-#endif
+//#endif
             // set the "number of bodies" header
             (reinterpret_cast<boost::uint16_t*>(postdata.data() + 4))[0] = htons(queued_count);
             std::string postdata_str(reinterpret_cast<char*>(postdata.data()), postdata.size());
@@ -418,25 +419,12 @@ public:
 #endif
         }
 
-        if(_connection == 0 && queued_count == 0) {
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("stopping ticking");
-#endif
-            stop_ticking();
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("ticking stopped");
-#endif
+        if (_connection == 0) {
+            // nothing more to do
+            return false;
         }
-    };
 
-    static as_value amfqueue_tick_wrapper(const fn_call& fn)
-    {
-        boost::intrusive_ptr<NetConnection_as> ptr = 
-            ensureType<NetConnection_as>(fn.this_ptr);
-        // FIXME check if it's possible for the URL of a 
-        // NetConnection to change between call()s
-        ptr->_callQueue->tick();
-        return as_value();
+        return true;
     };
 
     void markReachableResources() const
@@ -449,35 +437,13 @@ public:
     }
 
 private:
-    void start_ticking() 
-    {
-
-        if (ticker) return;
-
-        boost::intrusive_ptr<builtin_function> ticker_as = 
-                new builtin_function(&AMFQueue::amfqueue_tick_wrapper);
-
-        std::auto_ptr<Timer> timer(new Timer);
-        unsigned long delayMS = 50; // FIXME crank up to 50 or so
-        timer->setInterval(*ticker_as, delayMS, &_nc);
-        ticker = _nc.getVM().getRoot().add_interval_timer(timer, true);
-    }
 
     void push_amf(const SimpleBuffer &amf) 
     {
-        GNASH_REPORT_FUNCTION;
+        //GNASH_REPORT_FUNCTION;
 
         postdata.append(amf.data(), amf.size());
         queued_count++;
-
-        start_ticking();
-    }
-
-    void stop_ticking() 
-    {
-        if (!ticker) return;
-        _nc.getVM().getRoot().clear_interval_timer(ticker);
-        ticker=0;
     }
 
     void push_callback(const std::string& id,
@@ -509,8 +475,10 @@ private:
 NetConnection_as::NetConnection_as()
     :
     as_object(getNetConnectionInterface()),
-    _callQueue(0),
-    _isConnected(false)
+    _callQueues(),
+    _currentCallQueue(0),
+    _isConnected(false),
+    _advanceTimer(0)
 {
     attachProperties(*this);
 }
@@ -539,13 +507,25 @@ netconnection_class_init(as_object& global)
 // here to have AMFQueue definition available
 NetConnection_as::~NetConnection_as()
 {
+    for (std::list<AMFQueue*>::iterator
+            i=_callQueues.begin(), e=_callQueues.end();
+            i!=e; ++i)
+    {
+        delete *i;
+    }
 }
 
 
 void
 NetConnection_as::markReachableResources() const
 {
-    if ( _callQueue.get() ) _callQueue->markReachableResources();
+    if ( _currentCallQueue.get() ) _currentCallQueue->markReachableResources();
+    for (std::list<AMFQueue*>::const_iterator
+            i=_callQueues.begin(), e=_callQueues.end();
+            i!=e; ++i)
+    {
+        (*i)->markReachableResources();
+    }
     markAsObjectReachable();
 }
 
@@ -653,7 +633,13 @@ NetConnection_as::connect()
 void
 NetConnection_as::connect(const std::string& /*uri*/)
 {
-    // Close any current connections.
+    /// Queue the current call queue
+    if ( _currentCallQueue.get() )
+    {
+        _callQueues.push_back(_currentCallQueue.release());
+    }
+
+    // Close any current connections. (why?)
     close();
 
     // FIXME: We should attempt a connection here (this is called when an
@@ -712,27 +698,31 @@ NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
     // not connected).
     URL url(validateURL());
 
-    // The URL depends on the URL passed to NetConnection.connect();
-    if (!_callQueue.get()) {
-        _callQueue.reset(new AMFQueue(*this, url));
+    // FIXME check if it's possible for the URL of a NetConnection
+    // to change between call()s
+    if (!_currentCallQueue.get()) {
+        _currentCallQueue.reset(new AMFQueue(*this, url));
     }
 
     if (asCallback) {
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue with callback");
 #endif
-        _callQueue->enqueue(buf, callNumber, asCallback);
+        _currentCallQueue->enqueue(buf, callNumber, asCallback);
     }
     
     else {
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue without callback");
 #endif
-        _callQueue->enqueue(buf);
+        _currentCallQueue->enqueue(buf);
     }
+
 #ifdef GNASH_DEBUG_REMOTING
     log_debug("called enqueue");
 #endif
+
+    startAdvanceTimer();
 
 }
 
@@ -750,6 +740,92 @@ NetConnection_as::getStream(const std::string& name)
     // which should always be null in this case.
     return streamProvider.getStream(URL(name, ri.baseURL()));
 
+}
+
+as_value
+NetConnection_as::advanceWrapper(const fn_call& fn)
+{
+    boost::intrusive_ptr<NetConnection_as> ptr = 
+        ensureType<NetConnection_as>(fn.this_ptr);
+    // FIXME check if it's possible for the URL of a 
+    // NetConnection to change between call()s
+    ptr->advance();
+    return as_value();
+};
+
+void
+NetConnection_as::startAdvanceTimer() 
+{
+
+    if (_advanceTimer)
+    {
+        //log_debug("startAdvanceTimer: already running %d", _advanceTimer);
+        return;
+    }
+
+    boost::intrusive_ptr<builtin_function> ticker_as = 
+            new builtin_function(&NetConnection_as::advanceWrapper);
+
+    std::auto_ptr<Timer> timer(new Timer);
+    unsigned long delayMS = 50; // FIXME crank up to 50 or so
+    timer->setInterval(*ticker_as, delayMS, this);
+    _advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
+
+    log_debug("startAdvanceTimer: registered advance timer %d", _advanceTimer);
+}
+
+void
+NetConnection_as::stopAdvanceTimer() 
+{
+    if (!_advanceTimer)
+    {
+        log_debug("stopAdvanceTimer: not running");
+        return;
+    }
+
+    getVM().getRoot().clear_interval_timer(_advanceTimer);
+    log_debug("stopAdvanceTimer: deregistered timer %d", _advanceTimer);
+    _advanceTimer=0;
+}
+
+void
+NetConnection_as::advance()
+{
+    // Advance
+    if ( _currentCallQueue.get() ) 
+    {
+        _callQueues.push_back(_currentCallQueue.release());
+        assert(!_currentCallQueue.get());
+    }
+
+#ifdef GNASH_DEBUG_REMOTING
+    log_debug("NetConnection_as::advance: %d calls to advance", _callQueues.size());
+#endif
+
+    while ( ! _callQueues.empty() )
+    {
+        AMFQueue* que = _callQueues.front();
+        if ( ! que->tick() )
+        {
+            log_debug("AMFQueue done, dropping");
+            _callQueues.pop_front();
+            delete que;
+        }
+        else break; // queues handling is serialized
+    }
+
+    // ticking of the queue might have triggered creation
+    // of a new queue, so we won't stop the tick in that case
+    if ( _callQueues.empty() && ! _currentCallQueue.get() )
+    {
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("stopping ticking");
+#endif
+        stopAdvanceTimer();
+#ifdef GNASH_DEBUG_REMOTING
+        log_debug("ticking stopped");
+#endif
+    }
 }
 
 /// Anonymous namespace for NetConnection AMF-reading helper functions

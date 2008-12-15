@@ -20,9 +20,11 @@
 #define GNASH_NETCONNECTION_H
 
 #include "IOChannel.h"
-#include <string>
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
+
+#include <string>
+#include <list>
 
 // Forward declarations
 namespace gnash {
@@ -52,6 +54,11 @@ public:
 
 	NetConnection_as();
 	~NetConnection_as();
+
+    /// Process connection stuff
+    virtual void advance();
+
+    static as_value advanceWrapper(const fn_call& fn);
 
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;
@@ -100,13 +107,20 @@ private:
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);
 
-	std::auto_ptr<AMFQueue> _callQueue;
+	std::list<AMFQueue*> _callQueues;
+
+    std::auto_ptr<AMFQueue> _currentCallQueue; 
 
 	/// the url prefix optionally passed to connect()
 	std::string _uri;
 
     bool _isConnected;
 
+    void startAdvanceTimer();
+
+    void stopAdvanceTimer();
+
+    int _advanceTimer;
 };
 
 void netconnection_class_init(as_object& global);

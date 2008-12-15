@@ -261,8 +261,7 @@ function test14()
     nc.call("ary_newconnect2", o, ary13); //
     o.onResult = function(res) {
         //note(printInfo(res));
-        // Gnash uses the same connection, even on re-connect !
-        xcheck(res.remote_port != connectionPort);
+        check(res.remote_port != connectionPort);
         connectionPort = res.remote_port;
         xcheck_equals(res.request_id, '/1'); // connection is reset
         check_equals(res.message, 'ary_newconnect2');
