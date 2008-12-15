@@ -263,7 +263,7 @@ Network::newConnection(bool block)
 int
 Network::newConnection(bool block, int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct sockaddr	newfsin;
     socklen_t		alen;
@@ -1105,6 +1105,89 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
     return ret;
 }
 
+void
+Network::addPollFD(struct pollfd &fd, Network::entry_t *func)
+{
+    GNASH_REPORT_FUNCTION;
+
+    log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    _handlers[fd.fd] = func;
+     _pollfds.push_back(fd);
+//     notify();
+}
+
+void
+Network::addPollFD(struct pollfd &fd)
+{
+    GNASH_REPORT_FUNCTION;
+    log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
+    boost::mutex::scoped_lock lock(_poll_mutex);
+     _pollfds.push_back(fd);
+//     notify();
+}
+
+struct pollfd
+&Network::getPollFD(int index)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return _pollfds[index];
+}
+
+struct pollfd *
+Network::getPollFDPtr()
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return &_pollfds[0];
+};
+
+void
+Network::erasePollFD(int fd)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_debug("%s: erasing fd #%d from pollfds", __PRETTY_FUNCTION__, fd);
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    if (_pollfds.size() > 0) {
+	vector<struct pollfd>::iterator it;
+	for (it=_pollfds.begin(); it<_pollfds.end(); it++) {
+	    if ((*it).fd == fd) {
+		_pollfds.erase(it);
+		break;
+	    }
+	}
+    }
+}
+
+void
+Network::erasePollFD(vector<struct pollfd>::iterator &itt)
+{
+    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    if (_pollfds.size() == 1) {
+ 	_pollfds.clear();
+     } else {
+	_pollfds.erase(itt);
+    }
+}
+
+void
+Network::addEntry(int fd, Network::entry_t *func)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    _handlers[fd] = func;
+}
+
+Network::entry_t *
+Network::getEntry(int fd)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return _handlers[fd];
+}
+
 boost::shared_ptr<std::vector<struct pollfd> >
 Network::waitForNetData(int limit, struct pollfd *fds)
 {
@@ -1144,49 +1227,49 @@ Network::waitForNetData(int limit, struct pollfd *fds)
     while (ret--) {
 	for (int i = 0; i<limit; i++) {
 	    // If we get this event, the other end of the connection has been shut down
-#if 0
+#if 1
 	    if (fds[i].revents &POLLPRI ) {
-		log_debug("%s: Revents has aPOLLPRI  set 0x%x for fd #%d",
-			  __FUNCTION__, fds[i].revents, i);
+		log_debug("%s: Revents has a POLLPRI  set 0x%x for fd #%d",
+			  __FUNCTION__, fds[i].revents, fds[i].fd);
 	    }
 	    if (fds[i].revents & POLLRDNORM) {
 		log_debug("%s: Revents has a POLLRDNORM set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 	    }
 	    if (fds[i].revents & POLLHUP) {
 		log_debug("%s: Revents has a POLLHUP set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 	    }
 
 
 	    if (fds[i].revents & POLLERR) {
 		log_debug("%s: Revents has a POLLERR set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 	    }
 	    if (fds[i].revents & POLLHUP) {
 		log_debug("%s: Revents has a POLLHUP set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 	    }
 	    if (fds[i].revents & POLLNVAL) {
 		log_debug("%s: Revents has a POLLNVAL set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 //		throw GnashException("Polling an invalid file descritor");
 	    }
 	    if (fds[i].revents & POLLIN) {
 		log_debug("%s: Revents has a POLLIN set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 	    }
 	    if (fds[i].revents & POLLMSG) {
 		log_debug("%s: Revents has a POLLMSG set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 	    }
 	    if (fds[i].revents & POLLREMOVE) {
 		log_debug("%s: Revents has a POLLREMOVE set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 	    }
 	    if (fds[i].revents & POLLRDHUP) {
 		log_debug("%s: Revents has a POLLRDHUP set 0x%x for fd #%d",
-			  __FUNCTION__,  fds[i].revents, i);
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
 //		throw GnashException("Connection dropped from client side.");
 	    }
 #endif    

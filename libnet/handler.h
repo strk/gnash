@@ -65,16 +65,7 @@ public:
 	INTERVAL,
 	QUIT,
     } admin_cmd_e;
-    // This is used to pass parameters to a thread using boost::bind
-    typedef struct {
-	int netfd;
-	int port;
-	void *handler;
-	std::string filespec;
-    } thread_params_t ;
     
-    typedef void entry_t (thread_params_t *);
-
     // Specify which queue should be used
     typedef enum { INCOMING, OUTGOING } fifo_e;
     
@@ -89,63 +80,65 @@ public:
 	{ return _incoming.push(data, nbytes); };
     bool pushin(boost::shared_ptr<amf::Buffer> data)
 	{ return _incoming.push(data); };
-    
+#if 0
     // Push bytes on the incoming FIFO, which must be specified
     bool pushout(gnash::Network::byte_t *data, int nbytes)
 	{ return _outgoing.push(data, nbytes); };
     bool pushout(boost::shared_ptr<amf::Buffer> data)
 	{ return _outgoing.push(data); };
-    
+#endif
+
     // Pop the first date element off the incoming FIFO
     boost::shared_ptr<amf::Buffer> pop() { return _incoming.pop(); };
     boost::shared_ptr<amf::Buffer> pop(fifo_e direction);
     boost::shared_ptr<amf::Buffer> popin()
     	{ return _incoming.pop(); };
+#if 0
     // Pop the first date element off the outgoing FIFO
     boost::shared_ptr<amf::Buffer> popout()
     	{ return _outgoing.pop(); };
-    
+#endif
     // Peek at the first data element without removing it
     boost::shared_ptr<amf::Buffer> peek() { return _incoming.peek(); };
     boost::shared_ptr<amf::Buffer> peek(fifo_e direction);
     boost::shared_ptr<amf::Buffer> peekin()
     	{ return _incoming.peek(); };
     // Pop the first date element off the outgoing FIFO
-    boost::shared_ptr<amf::Buffer> peekout()
-    	{ return _outgoing.peek(); };    
+//    boost::shared_ptr<amf::Buffer> peekout() { return _outgoing.peek(); };    
 
     // Removes all the buffers from the queues
     boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin) { return _incoming.merge(begin); };
     boost::shared_ptr<amf::Buffer> mergein(boost::shared_ptr<amf::Buffer> begin) { return _incoming.merge(begin); };
-    boost::shared_ptr<amf::Buffer> mergeout(boost::shared_ptr<amf::Buffer> begin) { return _outgoing.merge(begin); };
+//    boost::shared_ptr<amf::Buffer> mergeout(boost::shared_ptr<amf::Buffer> begin) { return _outgoing.merge(begin); };
 
     // Removes all the buffers from the queues
     void clear() { _incoming.clear(); };
     void clear(fifo_e direction);
     void clearin() { _incoming.clear(); };
+#if 0
     void clearout() { _outgoing.clear(); };
     void clearall() { _outgoing.clear(); _incoming.clear(); };
-    
+#endif
     // Return the size of the queues, default to the incoming queue
     size_t size(fifo_e direction);
     size_t size() { return _incoming.size(); };
     size_t insize() { return _incoming.size(); };
-    size_t outsize() { return _outgoing.size(); };
+//    size_t outsize() { return _outgoing.size(); };
 
     // Notify the other thread a message is in the que
     void notify() { _incoming.notify(); };
     void notifyin() { _incoming.notify(); };
-    void notifyout() { _outgoing.notify(); };
+  //    void notifyout() { _outgoing.notify(); };
 
     // Wait for a message from the other thread
     void wait() { _incoming.wait(); };
     void waitin() { _incoming.wait(); };
-    void waitout() { _outgoing.wait(); };
+//    void waitout() { _outgoing.wait(); };
 
 //    size_t readPacket(int fd);
     
     // start the two thread handlers for the queues
-    bool DSOEXPORT start(thread_params_t *args);
+    bool DSOEXPORT start(Network::thread_params_t *args);
 
 #if 0
     /// \brief Write a Buffer the network connection.
@@ -174,50 +167,24 @@ public:
     CQue::que_stats_t *statsin()  { return _incoming.stats(); };
     CQue::que_stats_t *statsout() { return _outgoing.stats(); };
 #endif
-    void die() { _die = true; _outgoing.notify(); };
+    void die() { _die = true; };
+//    void die() { _die = true; _outgoing.notify(); };
     void resetDie() { _die = false; };
     bool timetodie() { return _die; };
 
-    // The pollfd are an array of data structures used by the poll()
-    // system call. We have to keep track of these as network
-    // connections get added and disconnected.
-    void addPollFD(struct pollfd &fd, entry_t *ptr);
-    void addPollFD(struct pollfd &fd);
-    void erasePollFD(int fd);
-    void erasePollFD(std::vector<struct pollfd>::iterator &itt);
-    struct pollfd &getPollFD(int fd);
-    struct pollfd *getPollFDPtr();
-    size_t getPollFDSize() { return _pollfds.size(); };
-    void clearPollFD() { _pollfds.clear(); };
-
-    // The entry point is an function pointer, which is the event
-    // handler when there is data on a file descriptor.
-    void addEntry(int fd, entry_t *func);
-    entry_t *getEntry(int fd);
-    
-//    void executePollFD(int index) { _handler[index](); ];
-    
 private:
     bool	_die;
     int		_netfd;
     CQue	_incoming;
-    CQue	_outgoing;
-    /// \var Handler::_handlers
-    ///		Keep a list of all active network connections
-    std::map<int, entry_t *> _handlers;
-#ifdef HAVE_POLL
-    // This is the mutex that controls access to the que.
-    std::vector<struct pollfd> _pollfds;
-    boost::mutex	_poll_mutex;
-#endif
+    std::map<int, CQue>	_outgoing;
 };
 
 // This is the thread for all incoming network connections, which
 // has to be in C.
 extern "C" {
-    void netin_handler(Handler::thread_params_t *args);
-    void netout_handler(Handler::thread_params_t *args);
-    void start_handler(Handler::thread_params_t *args);
+    void netin_handler(Network::thread_params_t *args);
+    void netout_handler(Network::thread_params_t *args);
+    void start_handler(Network::thread_params_t *args);
 }
 
 } // end of gnash namespace
@@ -226,5 +193,6 @@ extern "C" {
 
 // local Variables:
 // mode: C++
+// tab-width: 8
 // indent-tabs-mode: t
 // End:

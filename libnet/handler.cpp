@@ -61,7 +61,7 @@ Handler::~Handler()
 //    GNASH_REPORT_FUNCTION;
 //    closeConnection();
     _die = true;
-    notifyout();
+//    notifyout();
     notifyin();
 }
 
@@ -69,15 +69,17 @@ bool
 Handler::push(boost::shared_ptr<amf::Buffer> data, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
+#if 0
     if (direction == Handler::OUTGOING) {
-	_outgoing.push(data);
+      _outgoing.push(data);
 	return true;
     }
+#endif
     if (direction == Handler::INCOMING) {
-	_incoming.push(data);
+        _incoming.push(data);
 	return true;
     }
-    
+  
     return false;
 }
 
@@ -98,12 +100,14 @@ Handler::pop(fifo_e direction)
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf;
     
+#if 0
     if (direction == Handler::OUTGOING) {
 	if (_outgoing.size()) {
 	    buf = _outgoing.pop();
 	    return buf;	
 	}
     }
+#endif
     if (direction == Handler::INCOMING) {
 	if (_incoming.size()) {
 	    buf = _incoming.pop();
@@ -119,11 +123,13 @@ boost::shared_ptr<amf::Buffer>
 Handler::peek(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
+#if 0
     if (direction == Handler::OUTGOING) {
 	if (_outgoing.size()) {
 	    return _outgoing.peek();
 	}
     }
+#endif
     if (direction == Handler::INCOMING) {
 	if (_incoming.size()) {
 	    return _incoming.peek();
@@ -137,9 +143,11 @@ size_t
 Handler::size(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
+#if 0
     if (direction == Handler::OUTGOING) {
 	return _outgoing.size();
     }
+#endif
     if (direction == Handler::INCOMING) {
 	return _incoming.size();
     }
@@ -152,91 +160,15 @@ void
 Handler::clear(fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
+#if 0
     if (direction == Handler::OUTGOING) {
 	_outgoing.clear();
     }
+#endif
     if (direction == Handler::INCOMING) {
 	_incoming.clear();
     }    
 }
-
-void
-Handler::addPollFD(struct pollfd &fd, Handler::entry_t *func)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-    _handlers[fd.fd] = func;
-     _pollfds.push_back(fd);
-     notify();
-}
-
-void
-Handler::addPollFD(struct pollfd &fd)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-     _pollfds.push_back(fd);
-     notify();
-}
-
-struct pollfd
-&Handler::getPollFD(int index)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-    return _pollfds[index];
-}
-
-struct pollfd *
-Handler::getPollFDPtr()
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-    return &_pollfds[0];
-};
-
-void
-Handler::erasePollFD(int fd)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-    if (_pollfds.size() > 0) {
-	vector<struct pollfd>::iterator it;
-	for (it=_pollfds.begin(); it<_pollfds.end(); it++) {
-	    if ((*it).fd == fd) {
-		_pollfds.erase(it);
-	    }
-	}
-    }
-}
-
-void
-Handler::erasePollFD(vector<struct pollfd>::iterator &itt)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-    if (_pollfds.size() == 1) {
- 	_pollfds.clear();
-     } else {
-	_pollfds.erase(itt);
-    }
-}
-
-void
-Handler::addEntry(int fd, Handler::entry_t *func)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-    _handlers[fd] = func;
-}
-
-Handler::entry_t *
-Handler::getEntry(int fd)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::mutex::scoped_lock lock(_poll_mutex);
-    return _handlers[fd];
-};
 
 // Dump internal data.
 void
@@ -244,7 +176,7 @@ Handler::dump()
 {
 //    GNASH_REPORT_FUNCTION;
     _incoming.dump();
-    _outgoing.dump();    
+//    _outgoing.dump();    
 }
 
 #if 0
@@ -288,13 +220,13 @@ Handler::readPacket(int fd)
 
 // start the two thread handlers for the queues
 bool
-Handler::start(thread_params_t *args)
+Handler::start(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 //    Handler *hand = reinterpret_cast<Handler *>(args->handle);
     
     _incoming.setName("Incoming");
-    _outgoing.setName("Outgoing");
+//    _outgoing.setName("Outgoing");
     
     log_debug(_("Starting Handlers for port %d, tid %ld"),
 	      args->port, get_thread_id());
@@ -336,7 +268,7 @@ Handler::start(thread_params_t *args)
 
 extern "C" {
 void
-netin_handler(Handler::thread_params_t *args)
+netin_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -385,7 +317,7 @@ netin_handler(Handler::thread_params_t *args)
 
 #if 0
 void
-netout_handler(Handler::thread_params_t *args)
+netout_handler(Network::thread_params_t *args)
 {
 //    GNASH_REPORT_FUNCTION;
     int ret = 0;

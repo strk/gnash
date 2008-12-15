@@ -22,6 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
+#include <boost/thread/mutex.hpp>
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 # include <sys/types.h>
 # include <netinet/in.h>
@@ -87,7 +88,15 @@ const size_t NETBUFSIZE = 1448;	// 1500 appears to be the default size as used b
 ///	side of a network connection.
 class DSOEXPORT Network {
 public:
+    // This is used to pass parameters to a thread using boost::bind
+    typedef struct {
+	int netfd;
+	int port;
+	void *handler;
+	std::string filespec;
+    } thread_params_t;
     typedef boost::uint8_t byte_t;
+    typedef void entry_t (thread_params_t *);
 
     Network();
     ~Network();
@@ -224,6 +233,25 @@ public:
 
     Network &operator = (Network &net);
 
+    // The pollfd are an array of data structures used by the poll()
+    // system call. We have to keep track of these as network
+    // connections get added and disconnected.
+    void addPollFD(struct pollfd &fd, entry_t *ptr);
+    void addPollFD(struct pollfd &fd);
+    void erasePollFD(int fd);
+    void erasePollFD(std::vector<struct pollfd>::iterator &itt);
+    struct pollfd &getPollFD(int fd);
+    struct pollfd *getPollFDPtr();
+    size_t getPollFDSize() { return _pollfds.size(); };
+    void clearPollFD() { _pollfds.clear(); };
+
+    // The entry point is an function pointer, which is the event
+    // handler when there is data on a file descriptor.
+    void addEntry(int fd, entry_t *func);
+    entry_t *getEntry(int fd);
+    
+//    void executePollFD(int index) { _handler[index](); ];
+    
  protected:
     in_addr_t   _ipaddr;
     int         _sockfd;	// the file descriptor used for reading and writing
@@ -237,6 +265,14 @@ public:
     bool        _connected;
     bool        _debug;
     int         _timeout;
+    /// \var Handler::_handlers
+    ///		Keep a list of all active network connections
+    std::map<int, entry_t *> _handlers;
+#ifdef HAVE_POLL
+    std::vector<struct pollfd> _pollfds;
+    // This is the mutex that controls access to the que.
+    boost::mutex	_poll_mutex;
+#endif
 };
 
 } // end of gnash namespace
