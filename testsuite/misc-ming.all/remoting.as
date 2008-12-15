@@ -132,8 +132,8 @@ o.onResult = function(res) {
 	check_equals(res.request_id, '/7');
 	check_equals(res.message, 'ary_float');
 	check_equals(res.type, 'ECMA_ARRAY');
-    // The bug here is that gnash encodes 3 as the length of the array due
-    // to assignment of the '2.5' member.
+    // The bug here is that gnash encodes 0 as the length of the array while
+    // the expected behaviour is to encode 3.
 	xcheck_equals(res.hex, '0a:00:00:00:01:08:00:00:00:03:00:03:32:2e:35:00:3f:f0:00:00:00:00:00:00:00:00:09');
 };
 
@@ -203,4 +203,8 @@ o.onResult = function(res) {
 	check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:02:06:0a:00:00:00:03:02:00:01:61:02:00:01:62:02:00:01:63');
 	endOfTest();
 };
+
+// TODO: check encoding of calls w/out an handler, should
+// have a request_id == '/' but we can't check immediately
+// as we don't have the response handler....
 
