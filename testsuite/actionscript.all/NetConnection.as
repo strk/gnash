@@ -152,7 +152,14 @@ check_equals(tmp.isConnected, true);
 check_equals(result, "NetConnection.Connect.Success");
 check_equals(level, "status");
 
-ret = tmp.connect("http://someserver");
+// The pp and Gnash sandboxes behave differently. The pp rejects any
+// network connection from filesystem-loaded SWFs unless the SWF location
+// is added to the player configuration file. This server is blacklisted
+// in the testsuite gnashrc file, so Gnash should refuse to load this too.
+// The test should work on both players for a SWF loaded from anywhere but
+// www.blacklistedserver.org (domain still available, in case anyone wants to
+// mess up the test).
+ret = tmp.connect("http://www.blacklistedserver.org");
 check_equals(ret, false);
 check_equals(tmp.isConnected, false);
 check_equals(result, "NetConnection.Connect.Failed");
