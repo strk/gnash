@@ -26,10 +26,8 @@
 #include <boost/shared_array.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/tokenizer.hpp>
-//#include <boost/date_time/local_time/local_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-//#include <boost/date_time/time_zone_base.hpp>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -204,7 +202,8 @@ HTTP::processGetRequest(int fd)
 //    cerr << hexify(buf->reference(), buf->allocated(), false) << endl;
     
     if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
+     //	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
+	log_debug("Que empty, net connection dropped for fd #%d", fd);
 	return false;
     }
     
@@ -275,7 +274,7 @@ HTTP::processGetRequest(int fd)
 	double time = (end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9);
 	cerr << "File " << _filespec
 	     << " transferred " << filesize << " bytes in: " << fixed
-	     << time << " seconds." << endl;
+	     << time << " seconds for net fd #" << fd << endl;
 #endif
     }
 
@@ -760,6 +759,8 @@ HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
     formatAcceptRanges("bytes");
     formatContentLength(size);
     // Apache closes the connection on GET requests, so we do the same.
+    // This is a bit silly, because if we close after every GET request,
+    // we're not really handling the persistance of HTTP 1.1 at all.
     formatConnection("close");
     formatContentType(type);
 
@@ -1273,6 +1274,10 @@ HTTP::recvMsg(int fd)
 	    log_debug("no more data for fd #%d, exiting...", fd);
 	    return 0;
 	}
+	if (ret == -1) {
+	  log_debug("Handler done for fd #%d, can't read any data...", fd);
+	  return -1;
+	}
     } while (ret);
     
     // We're done. Notify the other threads the socket is closed, and tell them to die.
@@ -1304,23 +1309,26 @@ HTTP::dump() {
 
 extern "C" {
 void
-http_handler(Handler::thread_params_t *args)
+http_handler(Network::thread_params_t *args)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct thread_params thread_data;
     string url, filespec, parameters;
     string::size_type pos;
-    Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    HTTP www;
+    HTTP *www = reinterpret_cast<HTTP *>(args->handler);
     bool done = false;
 //    www.setHandler(net);
 
+    struct pollfd fds;
+    fds.fd = args->netfd;
+    fds.events = POLLIN | POLLRDHUP;
+    www->addPollFD(fds, http_handler);
     log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
 	      args->netfd, get_thread_id());
     
     string docroot = args->filespec;
 
-    www.setDocRoot(docroot);
+    www->setDocRoot(docroot);
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.
@@ -1332,12 +1340,12 @@ http_handler(Handler::thread_params_t *args)
 #endif
 
 	// See if we have any messages waiting
-	if (www.recvMsg(args->netfd) == 0) {
+	if (www->recvMsg(args->netfd) == 0) {
 	    done = true;
 	}
 
 	// Process incoming messages
-	if (!www.processClientRequest(args->netfd)) {
+	if (!www->processClientRequest(args->netfd)) {
 //	    hand->die();	// tell all the threads for this connection to die
 //	    hand->notifyin();
 	    log_debug("Net HTTP done for fd #%d...", args->netfd);
@@ -1362,11 +1370,12 @@ http_handler(Handler::thread_params_t *args)
 	
 	// Unless the Keep-Alive flag is set, this isn't a persisant network
 	// connection.
-	if (!www.keepAlive()) {
-	    log_debug("Keep-Alive is off", www.keepAlive());
+	if (!www->keepAlive()) {
+	    log_debug("Keep-Alive is off", www->keepAlive());
 	    done = true;
 	} else {
-	    log_debug("Keep-Alive is on", www.keepAlive());
+	    log_debug("Keep-Alive is on", www->keepAlive());
+	    done = true;
 	}
 #ifdef USE_STATISTICS
 	struct timespec end;
@@ -1376,7 +1385,7 @@ http_handler(Handler::thread_params_t *args)
 #endif
     } while(done != true);
     
-    hand->notify();
+//    hand->notify();
     
     log_debug("http_handler all done now finally...");
     

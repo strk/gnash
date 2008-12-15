@@ -320,7 +320,7 @@ private:
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    void http_handler(Handler::thread_params_t *args);
+    void http_handler(Network::thread_params_t *args);
 }
 
 
