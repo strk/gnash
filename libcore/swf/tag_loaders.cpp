@@ -608,59 +608,35 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
     inflate_wrapper(in, buffer.get(), bufSize);
     assert(in.tell() <= in.get_tag_end_position());
 
-    if (bitmap_format == 5) {
+    switch(bitmap_format)
+    {
 
-        // Need to re-arrange ARGB into RGB or RGBA.
-        for (int j = 0; j < height; j++)
+        case 3:
         {
-            boost::uint8_t* inRow = buffer.get() + j * pitch;
-            boost::uint8_t* outRow = image->scanline(j);
-            const int inChannels = 4;
+            // 8-bit data, preceded by a palette.
+            boost::uint8_t* color_table = buffer.get();
 
-            for (int i = 0; i < width; ++i)
+            for (int j = 0; j < height; j++)
             {
-                // Copy pixels 1-3.
-                std::copy(&inRow[i * inChannels + 1], &inRow[i * inChannels + 4],
-                        &outRow[i * channels]);
-                // Add the alpha channel if necessary.
-                if (alpha) {
-                    outRow[i * channels + 3] = inRow[i * 4];
+                boost::uint8_t* image_in_row = buffer.get() + 
+                    colorTableSize * channels + j * pitch;
+
+                boost::uint8_t*    image_out_row = image->scanline(j);
+                for (int i = 0; i < width; i++)
+                {
+                    boost::uint8_t pixel = image_in_row[i * bytes_per_pixel];
+                    image_out_row[i * channels + 0] = color_table[pixel * channels + 0];
+                    image_out_row[i * channels + 1] = color_table[pixel * channels + 1];
+                    image_out_row[i * channels + 2] = color_table[pixel * channels + 2];
+                    if (alpha) {
+                        image_out_row[i * channels + 3] = color_table[pixel * channels + 3];
+                    }
                 }
             }
+            break;
         }
 
-    }
-    else if (bitmap_format == 3)
-    {
-        // 8-bit data, preceded by a palette.
-        boost::uint8_t* color_table = buffer.get();
-
-        for (int j = 0; j < height; j++)
-        {
-            boost::uint8_t* image_in_row = buffer.get() + 
-                colorTableSize * channels + j * pitch;
-
-            boost::uint8_t*    image_out_row = image->scanline(j);
-            for (int i = 0; i < width; i++)
-            {
-                boost::uint8_t pixel = image_in_row[i * bytes_per_pixel];
-                image_out_row[i * channels + 0] = color_table[pixel * channels + 0];
-                image_out_row[i * channels + 1] = color_table[pixel * channels + 1];
-                image_out_row[i * channels + 2] = color_table[pixel * channels + 2];
-                if (alpha) {
-                    image_out_row[i * channels + 3] = color_table[pixel * channels + 3];
-                }
-            }
-        }
-    }
-
-
-    if (tag == SWF::DEFINELOSSLESS) // 20
-    {
-        // RGB image data.
-
-        if (bitmap_format == 4)
-        {
+        case 4:
             // 16 bits / pixel
 
             for (int j = 0; j < height; j++)
@@ -672,50 +648,44 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
                     boost::uint16_t pixel = image_in_row[i * 2] |
                         (image_in_row[i * 2 + 1] << 8);
 
-                    // @@ How is the data packed???  I'm just guessing
+                    // How is the data packed??? Whoever wrote this was just guessing
                     // here that it's 565!
-                    image_out_row[i * 3 + 0] = (pixel >> 8) & 0xF8;    // red
-                    image_out_row[i * 3 + 1] = (pixel >> 3) & 0xFC;    // green
-                    image_out_row[i * 3 + 2] = (pixel << 3) & 0xF8;    // blue
+                    image_out_row[i * channels + 0] = (pixel >> 8) & 0xF8;    // red
+                    image_out_row[i * channels + 1] = (pixel >> 3) & 0xFC;    // green
+                    image_out_row[i * channels + 2] = (pixel << 3) & 0xF8;    // blue
+ 
+                    // This was saved to the first byte before, but that can hardly be correct.
+                    // Real examples of this format are rare to non-existent.
+                    if (alpha) {
+                        image_out_row[i * channels + 3] = 255;
+                    }
                 }
             }
+            break;
 
-        }
-
-        boost::intrusive_ptr<bitmap_character_def> ch =
-            new bitmap_character_def(image);
-
-        // add image to movie, under character id.
-        m.add_bitmap_character_def(character_id, ch.get());
-
-        return;
-    }
-
-
-    // RGBA image data.
-    assert(tag == SWF::DEFINELOSSLESS2); // 36
-
-    if (bitmap_format == 4)
-    {
-
-        for (int j = 0; j < height; j++)
-        {
-            boost::uint8_t* image_in_row = buffer.get() + j * pitch;
-            boost::uint8_t* image_out_row = image->scanline(j);
-            for (int i = 0; i < width; i++)
+        case 5:
+            // Need to re-arrange ARGB into RGB or RGBA.
+            for (int j = 0; j < height; j++)
             {
-                boost::uint16_t pixel = image_in_row[i * 2] | 
-                    (image_in_row[i * 2 + 1] << 8);
+                boost::uint8_t* inRow = buffer.get() + j * pitch;
+                boost::uint8_t* outRow = image->scanline(j);
+                const int inChannels = 4;
 
-                // @@ How is the data packed???  I'm just guessing
-                // here that it's 565!
-                image_out_row[i * 4 + 0] = 255;            // alpha
-                image_out_row[i * 4 + 1] = (pixel >> 8) & 0xF8;    // red
-                image_out_row[i * 4 + 2] = (pixel >> 3) & 0xFC;    // green
-                image_out_row[i * 4 + 3] = (pixel << 3) & 0xF8;    // blue
+                for (int i = 0; i < width; ++i)
+                {
+                    // Copy pixels 1-3.
+                    std::copy(&inRow[i * inChannels + 1], &inRow[i * inChannels + 4],
+                            &outRow[i * channels]);
+                    // Add the alpha channel if necessary.
+                    if (alpha) {
+                        outRow[i * channels + 3] = inRow[i * 4];
+                    }
+                }
             }
-        }
+            break;
+
     }
+
 
     boost::intrusive_ptr<bitmap_character_def> ch =
         new bitmap_character_def(image);
