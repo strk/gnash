@@ -159,11 +159,10 @@ ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData,
     boost::uint8_t* p = data();
 
     // Set each 4th byte to the correct alpha value.
-    for (size_t i = 0; i < bufferLength; ++i) {
+    for (size_t i = 0; i < bufferLength; ++i, ++alphaData) {
         p += 3;
         *p = *alphaData;
         ++p;
-        ++alphaData;
     }
 }
 
