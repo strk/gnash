@@ -12,7 +12,6 @@
 #include "impl.h"
 #include "RGBA.h"
 #include "bitmap_character_def.h"
-#include "fill_style.h"
 
 namespace gnash {
 

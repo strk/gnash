@@ -419,7 +419,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
     return m_gradients.back().m_color;
 }
 
-gnash::bitmap_info*
+bitmap_info*
 fill_style::create_gradient_bitmap() const
 {
     assert(m_type == SWF::FILL_LINEAR_GRADIENT
@@ -493,7 +493,7 @@ fill_style::create_gradient_bitmap() const
 }
 
 
-gnash::bitmap_info*
+bitmap_info*
 fill_style::need_gradient_bitmap() const 
 {
 

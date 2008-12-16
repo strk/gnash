@@ -138,12 +138,12 @@ public:
 	/// \brief
 	/// Make a bitmap_info* corresponding to our gradient.
 	/// We can use this to set the gradient fill style.
-	gnash::bitmap_info*	create_gradient_bitmap() const;
+	bitmap_info* create_gradient_bitmap() const;
 	
 	/// \brief
 	/// Makes sure that m_gradient_bitmap_info is not NULL. Calls 
 	/// create_gradient_bitmap() if necessary and returns m_gradient_bitmap_info.
-	gnash::bitmap_info* need_gradient_bitmap() const; 
+	bitmap_info* need_gradient_bitmap() const; 
 	
 	rgba	get_color() const { return m_color; }
 
@@ -218,8 +218,8 @@ private:
 	rgba	m_color;
 	SWFMatrix	m_gradient_matrix;
     float m_focal_point; // For focal fill gradients.
-	std::vector<gradient_record>	m_gradients;
-	boost::intrusive_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
+	std::vector<gradient_record> m_gradients;
+	boost::intrusive_ptr<bitmap_info> m_gradient_bitmap_info;
 	boost::intrusive_ptr<bitmap_character_def>	m_bitmap_character;
 	SWFMatrix	m_bitmap_matrix;
 

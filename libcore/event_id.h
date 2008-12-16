@@ -21,7 +21,6 @@
 #define GNASH_EVENT_ID_H
 
 #include "string_table.h"
-#include "dsodefs.h"
 
 #include "GnashKey.h" // for gnash::key::code
 
@@ -31,7 +30,7 @@ namespace gnash {
 //
 /// Implementation is currently in action.cpp
 ///
-class DSOEXPORT event_id
+class event_id
 {
 public:
 	/// These must match the function names in event_id::get_function_name()

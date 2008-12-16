@@ -23,6 +23,11 @@
 #include "shape_character_def.h"  // for inheritance
 #include "styles.h" // for cap_style_e and join_style_e enums
 
+
+namespace gnash {
+    class fill_style;
+}
+
 namespace gnash {
 
 /// \brief

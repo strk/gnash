@@ -83,14 +83,14 @@ public:
     class CursoredBuffer
     {
     public:
-        DSOEXPORT CursoredBuffer()
+        CursoredBuffer()
             :
             m_size(0),
             m_data(NULL),
             m_ptr(NULL)
         {}
 
-        DSOEXPORT ~CursoredBuffer()
+        ~CursoredBuffer()
         {
             delete [] m_data;
         }

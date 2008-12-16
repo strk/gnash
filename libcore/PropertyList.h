@@ -18,8 +18,6 @@
 #ifndef GNASH_PROPERTYLIST_H
 #define GNASH_PROPERTYLIST_H
 
-#include "dsodefs.h" // DSOEXPORT
-
 #include "Property.h" // for templated functions
 #include "as_prop_flags.h" // for templated functions
 #include "as_value.h" // for templated functions
@@ -540,7 +538,7 @@ public:
 
 	/// Mark all simple properties, getters and setters
 	/// as being reachable (for the GC)
-	void DSOEXPORT setReachable() const;
+	void setReachable() const;
 
 private:
 	container _props;

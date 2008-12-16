@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "dsodefs.h" // DSOEXPORT
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "string_table.h"
 #include "ref_counted.h" // for inheritance  (to drop)
@@ -118,7 +117,7 @@ public:
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class DSOEXPORT as_object
+class as_object
 	:
 #ifdef GNASH_USE_GC
 	public GcResource
@@ -733,7 +732,7 @@ public:
 	///	need to know wheter it was found or not.
 	///
 	as_value callMethod(string_table::key name);
-	as_value callMethod(string_table::key name, const as_value& arg0);
+	DSOEXPORT as_value callMethod(string_table::key name, const as_value& arg0);
 	as_value callMethod(string_table::key name, const as_value& arg0,
             const as_value& arg1);
 	as_value callMethod(string_table::key name, const as_value& arg0,
