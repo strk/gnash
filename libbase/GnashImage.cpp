@@ -158,14 +158,15 @@ ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData,
     // Point to the first alpha byte
     boost::uint8_t* p = data();
 
-    // Set each 4th byte to the correct alpha value and premultiply the
+    // Set each 4th byte to the correct alpha value and adjust the
     // other values.
     for (size_t i = 0; i < bufferLength; ++i, ++alphaData) {
-        float alphaVal = *alphaData / static_cast<float>(
-                std::numeric_limits<boost::uint8_t>::max());
-        *p++ *= alphaVal;
-        *p++ *= alphaVal;
-        *p++ *= alphaVal;
+        *p = std::min(*p, *alphaData);
+        ++p;
+        *p = std::min(*p, *alphaData);
+        ++p;
+        *p = std::min(*p, *alphaData);
+        ++p;
         *p = *alphaData;
         ++p;
     }

@@ -110,13 +110,10 @@ template <class PixelFormat, class span_allocator_type, class img_source_type,
 class agg_style_bitmap : public agg_style_base
 {
 public:
-
-  bool m_force_premultiply;
     
   agg_style_bitmap(int width, int height, int rowlen, boost::uint8_t* data, 
     gnash::SWFMatrix mat, gnash::cxform cx) :
     
-    m_force_premultiply(false),
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
     m_img_src(m_pixf),
@@ -154,13 +151,7 @@ public:
         span->premultiply();
         ++span;
       }
-    } else 
-    if (m_force_premultiply) {
-      for (unsigned int i=0; i<len; i++) { 
-        span->premultiply();
-        span++;
-      }    
-    }
+    }  
   }
     
   

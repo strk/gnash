@@ -556,6 +556,26 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
     return;
 #else
 
+    unsigned short channels;
+    std::auto_ptr<GnashImage> image;
+    bool alpha = false;
+
+    switch (tag)
+    {
+        case SWF::DEFINELOSSLESS:
+            image.reset(new ImageRGB(width, height));
+            channels = 3;
+            break;
+        case SWF::DEFINELOSSLESS2:
+            image.reset(new ImageRGBA(width, height));
+            channels = 4;
+            alpha = true;
+            break;
+        default:
+            // This is already asserted.
+            std::abort();
+    }
+
     unsigned short bytes_per_pixel;
     int colorTableSize = 0;
 
@@ -581,26 +601,6 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
             return;
     }
 
-    unsigned short channels;
-    std::auto_ptr<GnashImage> image;
-    bool alpha = false;
-
-    switch (tag)
-    {
-        case SWF::DEFINELOSSLESS:
-            image.reset(new ImageRGB(width, height));
-            channels = 3;
-            break;
-        case SWF::DEFINELOSSLESS2:
-            image.reset(new ImageRGBA(width, height));
-            channels = 4;
-            alpha = true;
-            break;
-        default:
-            // This is already asserted.
-            std::abort();
-    }
-
     const size_t pitch = (width * bytes_per_pixel + 3) &~ 3;
     const size_t bufSize = colorTableSize * channels + pitch * height;
     boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufSize]);
@@ -608,7 +608,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
     inflate_wrapper(in, buffer.get(), bufSize);
     assert(in.tell() <= in.get_tag_end_position());
 
-    switch(bitmap_format)
+    switch (bitmap_format)
     {
 
         case 3:
@@ -641,8 +641,8 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
             for (int j = 0; j < height; j++)
             {
-                boost::uint8_t*    image_in_row = buffer.get() + j * pitch;
-                boost::uint8_t*    image_out_row = image->scanline(j);
+                boost::uint8_t* image_in_row = buffer.get() + j * pitch;
+                boost::uint8_t* image_out_row = image->scanline(j);
                 for (int i = 0; i < width; i++)
                 {
                     boost::uint16_t pixel = image_in_row[i * 2] |
