@@ -24,7 +24,7 @@ rcsid="remoting.as - <bzr revno here>";
 endOfTest = function()
 {
 	//note("END OF TEST");
-	check_totals(79);
+	check_totals(84);
 };
 
 
@@ -294,6 +294,25 @@ function test15()
 }
 
 function test16()
+{
+    o={onStatus:handleOnStatus};
+    nc.call("noarg", o); // no arguments
+    o.onResult = function(res) {
+        //note(printInfo(res));
+
+        // connection ID is NOT reset if the call happens
+        // on next frame
+        check(res.remote_port != connectionPort);
+        connectionPort = res.remote_port;
+        xcheck_equals(res.request_id, '/3');
+        check_equals(res.message, 'noarg');
+        check_equals(res.arg_count, '0');
+        check_equals(res.hex, '0a:00:00:00:00');
+        test17();
+    };
+}
+
+function test17()
 {
     endOfTest();
 }

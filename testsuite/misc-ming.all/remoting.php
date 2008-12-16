@@ -83,11 +83,23 @@ function arg1_type($amf) {
 	}
 }
 
+function arg_count($amf) {
+	if(ord($amf[0]) != 0x0a) {
+		return "couldn't find args";
+	} else {
+		$i = 1; # done with first byte
+		$num_args = get_long($amf, $i); $i += 4;
+        return $num_args;
+    }
+}
+
 function raw_rpc_to_array($amf, $extras) {
 	$ret = array();
     #phpinfo();
     $ret['remote_port'] = $_SERVER['REMOTE_PORT'];
 	$ret['arg1_type'] = arg1_type($amf);
+	$ret['arg_count'] = arg_count($amf);
+    # TODO: return an 'args' array member, containing info about all arguments
 	$ret['type'] = $ret['arg1_type']; # depricated. used arg1_type
 	$ret['hex'] = hexify($amf);
 	$ret['message'] = $extras['message_name'];
