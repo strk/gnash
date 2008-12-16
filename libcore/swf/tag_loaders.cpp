@@ -557,50 +557,69 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 #else
 
     unsigned short bytes_per_pixel;
+    int colorTableSize = 0;
 
     switch (bitmap_format)
     {
         case 3:
             bytes_per_pixel = 1;
+            in.ensureBytes(1);
+            // SWF stores one less than the actual size.
+            colorTableSize = in.read_u8() + 1;
             break;
+
         case 4:
             bytes_per_pixel = 2;
             break;
+
         case 5:
             bytes_per_pixel = 4;
             break;
+
+        default:
+            log_error(_("Unknown bitmap format. Ignoring"));
+            return;
     }
+
+    unsigned short channels;
+    std::auto_ptr<GnashImage> image;
+
+    switch (tag)
+    {
+        case SWF::DEFINELOSSLESS:
+            image.reset(new ImageRGB(width, height));
+            channels = 3;
+            break;
+        case SWF::DEFINELOSSLESS2:
+            image.reset(new ImageRGBA(width, height));
+            channels = 4;
+            break;
+        default:
+            // This is already asserted.
+            std::abort();
+    }
+
+    const size_t pitch = (width * bytes_per_pixel + 3) &~ 3;
+    const size_t bufSize = colorTableSize * channels + pitch * height;
+    boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufSize]);
+
+    inflate_wrapper(in, buffer.get(), bufSize);
+    assert(in.tell() <= in.get_tag_end_position());
 
     if (tag == SWF::DEFINELOSSLESS) // 20
     {
 
         // RGB image data.
-        std::auto_ptr<GnashImage> image (new ImageRGB(width, height));
 
         if (bitmap_format == 3)
         {
             // 8-bit data, preceded by a palette.
-
-            in.ensureBytes(1); // color table size
-            int color_table_size = in.read_u8();
-            // !! SWF stores one less than the actual size
-            color_table_size++;
-
-            int pitch = (width * bytes_per_pixel + 3) & ~3;
-
-            int buffer_bytes = color_table_size * 3 + pitch * height;
-            boost::scoped_array<boost::uint8_t> buffer (
-                    new boost::uint8_t[buffer_bytes] );
-
-            inflate_wrapper(in, buffer.get(), buffer_bytes);
-            assert(in.tell() <= in.get_tag_end_position());
-
             boost::uint8_t* color_table = buffer.get();
 
             for (int j = 0; j < height; j++)
             {
                 boost::uint8_t* image_in_row = buffer.get() + 
-                    color_table_size * 3 + j * pitch;
+                    colorTableSize * channels + j * pitch;
 
                 boost::uint8_t*    image_out_row = image->scanline(j);
                 for (int i = 0; i < width; i++)
@@ -615,14 +634,6 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
         else if (bitmap_format == 4)
         {
             // 16 bits / pixel
-            int pitch = (width * bytes_per_pixel + 3) & ~3;
-
-            int buffer_bytes = pitch * height;
-            boost::scoped_array<boost::uint8_t> buffer (
-                    new boost::uint8_t[buffer_bytes] );
-
-            inflate_wrapper(in, buffer.get(), buffer_bytes);
-            assert(in.tell() <= in.get_tag_end_position());
 
             for (int j = 0; j < height; j++)
             {
@@ -633,7 +644,8 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
                     boost::uint16_t pixel = image_in_row[i * 2] |
                         (image_in_row[i * 2 + 1] << 8);
 
-                // @@ How is the data packed???  I'm just guessing here that it's 565!
+                    // @@ How is the data packed???  I'm just guessing
+                    // here that it's 565!
                     image_out_row[i * 3 + 0] = (pixel >> 8) & 0xF8;    // red
                     image_out_row[i * 3 + 1] = (pixel >> 3) & 0xFC;    // green
                     image_out_row[i * 3 + 2] = (pixel << 3) & 0xF8;    // blue
@@ -643,31 +655,21 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
         }
         else if (bitmap_format == 5)
         {
-            // 32 bits / pixel, input is ARGB format (???)
-            int pitch = width * bytes_per_pixel;
-
-            int buffer_bytes = pitch * height;
-            boost::scoped_array<boost::uint8_t> buffer (
-                    new boost::uint8_t[buffer_bytes]);
-
-            inflate_wrapper(in, buffer.get(), buffer_bytes);
-            assert(in.tell() <= in.get_tag_end_position());
 
             // Need to re-arrange ARGB into RGB.
             for (int j = 0; j < height; j++)
             {
-                boost::uint8_t*    image_in_row = buffer.get() + j * pitch;
-                boost::uint8_t*    image_out_row = image->scanline(j);
+                boost::uint8_t* image_in_row = buffer.get() + j * pitch;
+                boost::uint8_t* image_out_row = image->scanline(j);
                 for (int i = 0; i < width; i++)
                 {
-                    boost::uint8_t a = image_in_row[i * 4 + 0];
+                    //boost::uint8_t a = image_in_row[i * 4 + 0];
                     boost::uint8_t r = image_in_row[i * 4 + 1];
                     boost::uint8_t g = image_in_row[i * 4 + 2];
                     boost::uint8_t b = image_in_row[i * 4 + 3];
                     image_out_row[i * 3 + 0] = r;
                     image_out_row[i * 3 + 1] = g;
                     image_out_row[i * 3 + 2] = b;
-                    a = a;    // Inhibit warning.
                 }
             }
 
@@ -686,63 +688,42 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
     // RGBA image data.
     assert(tag == SWF::DEFINELOSSLESS2); // 36
 
-    std::auto_ptr<GnashImage> image(new ImageRGBA(width, height));
-
     if (bitmap_format == 3)
     {
         // 8-bit data, preceded by a palette.
 
-        const int bytes_per_pixel = 1;
-            in.ensureBytes(1); // color table size
-        int color_table_size = in.read_u8();
-        color_table_size++;    // !! SWF stores one less than the actual size
-
-        int pitch = (width * bytes_per_pixel + 3) & ~3;
-
-        int buffer_bytes = color_table_size * 4 + pitch * height;
-        boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
-
-        inflate_wrapper(in, buffer.get(), buffer_bytes);
-        assert(in.tell() <= in.get_tag_end_position());
-
         boost::uint8_t* color_table = buffer.get();
 
-    for (int j = 0; j < height; j++)
-    {
-        boost::uint8_t*    image_in_row = buffer.get() + color_table_size * 4 + j * pitch;
-        boost::uint8_t*    image_out_row = image->scanline(j);
-        for (int i = 0; i < width; i++)
+        for (int j = 0; j < height; j++)
         {
-            boost::uint8_t    pixel = image_in_row[i * bytes_per_pixel];
-            image_out_row[i * 4 + 0] = color_table[pixel * 4 + 0];
-            image_out_row[i * 4 + 1] = color_table[pixel * 4 + 1];
-            image_out_row[i * 4 + 2] = color_table[pixel * 4 + 2];
-            image_out_row[i * 4 + 3] = color_table[pixel * 4 + 3];
+            boost::uint8_t* image_in_row = buffer.get() + 
+                colorTableSize * channels + j * pitch;
+            boost::uint8_t* image_out_row = image->scanline(j);
+            for (int i = 0; i < width; i++)
+            {
+                boost::uint8_t    pixel = image_in_row[i * bytes_per_pixel];
+                image_out_row[i * 4 + 0] = color_table[pixel * 4 + 0];
+                image_out_row[i * 4 + 1] = color_table[pixel * 4 + 1];
+                image_out_row[i * 4 + 2] = color_table[pixel * 4 + 2];
+                image_out_row[i * 4 + 3] = color_table[pixel * 4 + 3];
+            }
         }
-    }
 
     }
     else if (bitmap_format == 4)
     {
-        // 16 bits / pixel
-        const int bytes_per_pixel = 2;
-        int pitch = (width * bytes_per_pixel + 3) & ~3;
-
-        int buffer_bytes = pitch * height;
-        boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[buffer_bytes] );
-
-        inflate_wrapper(in, buffer.get(), buffer_bytes);
-        assert(in.tell() <= in.get_tag_end_position());
 
         for (int j = 0; j < height; j++)
         {
-            boost::uint8_t*    image_in_row = buffer.get() + j * pitch;
-            boost::uint8_t*    image_out_row = image->scanline(j);
+            boost::uint8_t* image_in_row = buffer.get() + j * pitch;
+            boost::uint8_t* image_out_row = image->scanline(j);
             for (int i = 0; i < width; i++)
             {
-                boost::uint16_t    pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
+                boost::uint16_t pixel = image_in_row[i * 2] | 
+                    (image_in_row[i * 2 + 1] << 8);
 
-                // @@ How is the data packed???  I'm just guessing here that it's 565!
+                // @@ How is the data packed???  I'm just guessing
+                // here that it's 565!
                 image_out_row[i * 4 + 0] = 255;            // alpha
                 image_out_row[i * 4 + 1] = (pixel >> 8) & 0xF8;    // red
                 image_out_row[i * 4 + 2] = (pixel >> 3) & 0xFC;    // green
@@ -754,19 +735,18 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
     {
         // 32 bits / pixel, input is ARGB format
 
-        inflate_wrapper(in, image->data(), width * height * 4);
-        assert(in.tell() <= in.get_tag_end_position());
+        image->update(buffer.get());
 
         // Need to re-arrange ARGB into RGBA.
         for (int j = 0; j < height; j++)
         {
-            boost::uint8_t*    image_row = image->scanline(j);
+            boost::uint8_t* image_row = image->scanline(j);
             for (int i = 0; i < width; i++)
             {
-                boost::uint8_t    a = image_row[i * 4 + 0];
-                boost::uint8_t    r = image_row[i * 4 + 1];
-                boost::uint8_t    g = image_row[i * 4 + 2];
-                boost::uint8_t    b = image_row[i * 4 + 3];
+                boost::uint8_t a = image_row[i * 4 + 0];
+                boost::uint8_t r = image_row[i * 4 + 1];
+                boost::uint8_t g = image_row[i * 4 + 2];
+                boost::uint8_t b = image_row[i * 4 + 3];
                 image_row[i * 4 + 0] = r;
                 image_row[i * 4 + 1] = g;
                 image_row[i * 4 + 2] = b;
