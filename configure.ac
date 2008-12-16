@@ -1534,6 +1534,20 @@ if test x$cross_compiling = xno; then
 fi
 AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
+if test x$cross_compiling = xno; then
+  AC_ARG_ENABLE([http_testsuite],
+      dnl # TODO: find out how to add [quotes] around '=<baseurl>'
+	  AC_HELP_STRING([--enable-http-testsuite=<baseurl>],
+		  [Enable http based testsuite (default url is http://www.gnashdev.org/testcases)]),
+	      [case "${enableval}" in
+             no) HTTP_TESTSUITE="" ;;
+            yes) HTTP_TESTSUITE="http://www.gnashdev.org/testcases" ;;
+              *) HTTP_TESTSUITE="${enableval}";;
+           esac])
+  AC_SUBST(HTTP_TESTSUITE)
+fi
+AM_CONDITIONAL(ENABLE_HTTP_TESTSUITE, [ test x"$HTTP_TESTSUITE" != x ])
+
 dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
@@ -2869,6 +2883,11 @@ if test x$cross_compiling = xno; then
     echo "                 You can install it from http://www.swftools.org/" >&4
     echo "                 or .deb users: apt-get install swftools" >&4
   fi
+
+  if test x"$HTTP_TESTSUITE" != x; then
+    echo "        HTTP testsuite dir is $HTTP_TESTSUITE"
+  fi
+
 
   if test x"$PYTHON" != x; then
     echo "        PYTHON is $PYTHON"

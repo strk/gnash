@@ -34,6 +34,7 @@ EXTRA_DIST = \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
 	remoting.as \
+	remoting_end.as \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
@@ -152,7 +153,7 @@ check_PROGRAMS = \
 	action_execution_order_test11 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
-    loadImageTest \
+	loadImageTest \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -305,6 +306,12 @@ check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
 	FlashVarsTest-Runner \
 	SharedObjectTestRunner
+endif
+
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+if ENABLE_HTTP_TESTSUITE
+check_SCRIPTS += remotingTestRunner
+endif
 endif
 
 if MING_VERSION_0_4
@@ -1720,7 +1727,12 @@ PrototypeEventListenersTestRunner_DEPENDENCIES = \
 	$(NULL)
 
 remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -n network -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/remoting.as
+	$(MAKESWF) -n network -r12 -o $@ -v6 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/remoting.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
+	sh $< $(top_builddir) remoting.swf > $@
+	chmod 755 $@
+	
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
@@ -1978,6 +1990,12 @@ TEST_CASES += VarAndCharClashTest-Runner \
 	SharedObjectTestRunner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner 
+endif
+
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+if ENABLE_HTTP_TESTSUITE
+TEST_CASES += remotingTestRunner
+endif
 endif
 
 if MING_SUPPORTS_INIT_ACTIONS

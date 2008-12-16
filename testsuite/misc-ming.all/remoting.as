@@ -25,13 +25,14 @@ endOfTest = function()
 {
 	//note("END OF TEST");
 	check_totals(89);
+	play();
 };
 
 
 if ( ! _root.hasOwnProperty('url') ) {
     // updated daily from bzr !
     // TODO: let ./configure specify another one
-    url='http://www.gnashdev.org/testcases/remoting.php';
+    url=HTTP_TESTSUITE+'/remoting.php';
 }
 
 stop();
