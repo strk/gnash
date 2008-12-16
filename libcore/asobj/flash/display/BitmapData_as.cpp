@@ -22,6 +22,7 @@
 #endif
 
 #include "BitmapData_as.h"
+#include "Bitmap.h"
 #include "flash/geom/Rectangle_as.h" // for BitmapData.rectangle
 #include "as_object.h" // for inheritance
 #include "log.h"
@@ -140,8 +141,14 @@ BitmapData_as::BitmapData_as(size_t width, size_t height,
 {
 }
 
+void
+BitmapData_as::updateAttachedBitmaps()
+{
+    log_debug("Updating %d attached bitmaps", _attachedBitmaps.size());
+    std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
+            std::mem_fun(&Bitmap::update));
+}
 
-// 
 boost::int32_t
 BitmapData_as::getPixel(int x, int y, bool transparency) const
 {
@@ -150,7 +157,9 @@ BitmapData_as::getPixel(int x, int y, bool transparency) const
     if (x < 0 || y < 0) return 0;
     
     // A value of _width, _height is outside the bitmap.
-    if (static_cast<size_t>(x) >= _width || static_cast<size_t>(y) >= _height) return 0;
+    if (static_cast<size_t>(x) >= _width || static_cast<size_t>(y) >= _height) {
+        return 0;
+    }
 
     const size_t pixelIndex = y * _width + x;
 
@@ -171,6 +180,9 @@ BitmapData_as::getPixel(int x, int y, bool transparency) const
 void
 BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 {
+
+    GNASH_REPORT_FUNCTION;
+
     // The bitmap has been "disposed".
     if (_bitmapData.empty()) return;
     assert (_bitmapData.size() == _width * _height);
@@ -200,6 +212,7 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
     // bitmap and that its bottom corner is within the
     // the bitmap.    
     if (w <= 0 || h <= 0) return;
+
     w = std::min<size_t>(_width - x, w);
     h = std::min<size_t>(_height - y, h);
     
@@ -223,12 +236,15 @@ BitmapData_as::fillRect(int x, int y, int w, int h, boost::uint32_t color)
 
     }
 
+    updateAttachedBitmaps();
+
 }
 
 void
 BitmapData_as::dispose()
 {
     _bitmapData.clear();
+    updateAttachedBitmaps();
 }
 
 as_function* getFlashDisplayBitmapDataConstructor()

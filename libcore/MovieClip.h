@@ -51,6 +51,7 @@ namespace gnash {
     class LoadVariablesThread;
     class gradient_record;
     class TextField;
+    class BitmapData_as;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -676,6 +677,9 @@ public:
     /// testsuite/misc-ming.all/displaylist_depths_test.swf
     ///
     void removeMovieClip();
+
+    /// Create a Bitmap DisplayObject at the specified depth.
+    void attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth);
 
     /// @name Drawing API
     /// @{ 
