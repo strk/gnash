@@ -5113,18 +5113,27 @@ movieclip_lineGradientStyle(const fn_call& fn)
 as_value
 movieclip_attachBitmap(const fn_call& fn)
 {
+
+    GNASH_REPORT_FUNCTION;
+
     boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
     if (fn.nargs < 2) {
-        // log error
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: expected 2 args, got %d",
+                fn.nargs);
+        );
         return as_value();
     }
 
     as_object* obj = fn.arg(0).to_object().get();
     boost::intrusive_ptr<BitmapData_as> bd = dynamic_cast<BitmapData_as*>(obj);
 
-    if (!obj) {
-        // log_error
+    if (!bd) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: first argument should be a "
+                "BitmapData", fn.arg(1));
+        );
         return as_value();
     }
 
