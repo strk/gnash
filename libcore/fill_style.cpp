@@ -238,12 +238,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         _gradientBitmapInfo = create_gradient_bitmap();
         if (is_morph)
         {
-            pOther->_gradientBitmapInfo = 
-                pOther->need_gradient_bitmap();
-            //md.addBitmap(pOther->_gradientBitmapInfo);
+            pOther->_gradientBitmapInfo = pOther->need_gradient_bitmap();
         }
-        // Make sure our SWFMovieDefinition knows about this bitmap.
-        //md.addBitmap(_gradientBitmapInfo);
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
           || m_type == SWF::FILL_CLIPPED_BITMAP
