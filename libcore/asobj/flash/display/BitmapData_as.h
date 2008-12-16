@@ -75,6 +75,10 @@ public:
                     bitmap));
     }
 
+protected:
+
+    void markReachableResources() const;
+
 private:
 
     void updateAttachedBitmaps();

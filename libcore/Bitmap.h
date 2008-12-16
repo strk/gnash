@@ -56,9 +56,12 @@ protected:
     void markReachableObjects() const {
         if (_bitmapData) _bitmapData->setReachable();
         if (_bitmapInfo) _bitmapInfo->setReachable();
+        if (_shapeDef) _shapeDef->setReachable();
     }
 
 private:
+
+    void finalize();
 
     boost::intrusive_ptr<BitmapData_as> _bitmapData;
 

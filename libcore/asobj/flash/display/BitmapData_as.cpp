@@ -142,6 +142,11 @@ BitmapData_as::BitmapData_as(size_t width, size_t height,
 }
 
 void
+BitmapData_as::markReachableResources() const
+{
+}
+
+void
 BitmapData_as::updateAttachedBitmaps()
 {
     log_debug("Updating %d attached bitmaps", _attachedBitmaps.size());
