@@ -53,7 +53,7 @@ namespace gnash {
 /// availability of a render_handler in order to transform
 /// ImageRGB or image::ImageRGBA to a bitmap_info.
 ///
-class bitmap_character_def : public ref_counted // @@ why not character_def ?
+class bitmap_character_def : public ref_counted 
 {
 
 public:
