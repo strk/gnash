@@ -48,21 +48,21 @@ render_handler* get_render_handler()
 namespace render
 {
 
-	/// A fake bitmap_info created when no renderer
+	/// A fake BitmapInfo created when no renderer
 	/// is registered.
 	///
 	/// Note that if you register a renderer *after* one of
-	/// these bogus bitmap_info has been created and attached
+	/// these bogus BitmapInfo has been created and attached
 	/// as the cache of a movie element, things would likely
 	/// screw up.
 	///
-	class bogus_bi : public bitmap_info
+	class bogus_bi : public BitmapInfo
 	{
 	public:
 		bogus_bi() {}
 	};
 
-	bitmap_info* createBitmapInfo(std::auto_ptr<GnashImage> im)
+	BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
 	{
 	
         if (!s_render_handler)

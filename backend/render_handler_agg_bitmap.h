@@ -25,7 +25,7 @@ namespace gnash {
 
 /// Bitmap class used internally by the AGG renderer. There's no reason to
 /// use it outside. It does not much except providing all necessary information. 
-class agg_bitmap_info_base : public bitmap_info
+class agg_bitmap_info_base : public BitmapInfo
 {
 public:
 

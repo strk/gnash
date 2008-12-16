@@ -35,7 +35,6 @@
 
 // Forward declarations
 namespace gnash {
-	class bitmap_info;
 	class shape_character_def;
 }
 

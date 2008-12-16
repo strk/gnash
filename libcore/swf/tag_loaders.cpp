@@ -55,6 +55,9 @@
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
 
+// TODO: pass the render handler with RunInfo and use that.
+#include "render.h"
+
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
@@ -283,7 +286,7 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m,
     in.ensureBytes(2);
     boost::uint16_t character_id = in.read_u16();
 
-    if (m.get_bitmap_character_def(character_id))
+    if (m.getBitmap(character_id))
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character "
@@ -319,11 +322,10 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m,
         return;
     }
     
-    
-    boost::intrusive_ptr<bitmap_character_def> ch = 
-        new bitmap_character_def(im);
-    
-    m.add_bitmap_character_def(character_id, ch.get());
+    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
 }
 
 
@@ -343,7 +345,7 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition& m,
     );
 
     
-    if ( m.get_bitmap_character_def(character_id) )
+    if ( m.getBitmap(character_id) )
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap "
@@ -360,9 +362,10 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition& m,
     std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad,
                 GNASH_FILETYPE_JPEG));
 
-    boost::intrusive_ptr<bitmap_character_def> ch =
-        new bitmap_character_def(im);
-    m.add_bitmap_character_def(character_id, ch.get());
+    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
 
 }
 
@@ -504,11 +507,11 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition& m,
     //  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
     im->mergeAlpha(buffer.get(), bufferLength);
 
-    // Create bitmap character.
-    boost::intrusive_ptr<bitmap_character_def> ch =
-         new bitmap_character_def(static_cast<std::auto_ptr<GnashImage> >(im));
+    boost::intrusive_ptr<BitmapInfo> bi =
+        render::createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
 
-    m.add_bitmap_character_def(character_id, ch.get());
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
 #endif
 }
 
@@ -545,7 +548,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     // No need to parse any further if it already exists, as we aren't going
     // to add it.
-    if (m.get_bitmap_character_def(character_id))
+    if (m.getBitmap(character_id))
     {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("DEFINEBITSLOSSLESS: Duplicate id (%d) "
@@ -692,12 +695,10 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     }
 
+    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(image);
 
-    boost::intrusive_ptr<bitmap_character_def> ch =
-        new bitmap_character_def(image);
-
-    // add image to movie, under character id.
-    m.add_bitmap_character_def(character_id, ch.get());
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
 #endif // HAVE_ZLIB_H
 
 }

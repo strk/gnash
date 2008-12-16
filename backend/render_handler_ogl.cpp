@@ -641,12 +641,12 @@ public:
 #endif
   }    
 
-  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im)
+  virtual BitmapInfo*  create_bitmap_info_rgb(ImageRGB* im)
   {
     return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im)
+  virtual BitmapInfo*  create_bitmap_info_rgba(ImageRGBA* im)
   {
     return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
   }

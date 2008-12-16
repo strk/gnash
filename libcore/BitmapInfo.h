@@ -24,17 +24,17 @@
 
 namespace gnash {
 
-/// Your render_handler creates bitmap_info's for gnash.  You
-/// need to subclass bitmap_info in order to add the
+/// Your render_handler creates BitmapInfos for gnash.  You
+/// need to subclass BitmapInfo in order to add the
 /// information and functionality your app needs to render
 /// using textures.
-class DSOEXPORT bitmap_info : public ref_counted
+class DSOEXPORT BitmapInfo : public ref_counted
 {
 public:
 
-	bitmap_info() {}
+	BitmapInfo() {}
 
-    virtual ~bitmap_info() {}
+    virtual ~BitmapInfo() {}
 };
 	
 
