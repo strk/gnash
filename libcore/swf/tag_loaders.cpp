@@ -625,7 +625,6 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
                 // Add the alpha channel if necessary.
                 if (alpha) {
                     outRow[i * channels + 3] = inRow[i * 4];
-                    std::abort();
                 }
             }
         }
@@ -698,7 +697,6 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     if (bitmap_format == 4)
     {
-        std::abort();
 
         for (int j = 0; j < height; j++)
         {
