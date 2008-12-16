@@ -61,8 +61,7 @@
 
 // Forward declarations
 namespace gnash {
-	class bitmap_character_def;
-	class bitmap_info;
+	class BitmapInfo;
 	class movie_instance;
 	class MovieClip;
 	class ControlTag;
@@ -138,10 +137,6 @@ public:
 		return NULL;
 	}
 	
-
-	virtual int	get_bitmap_info_count() const { return 0; }
-
-	virtual bitmap_info* get_bitmap_info(int /*i*/) const { return NULL; }
 
 	/// Return the list of execute tags for given frame number
 	//
@@ -325,31 +320,30 @@ public:
 	}
 
 	/// \brief
-	/// Get a bitmap character from the dictionary.
+	/// Get a bitmap from the bitmap dictionary.
 	//
 	/// Note that only top-level movies (those belonging to a single
-	/// SWF stream) have a characters dictionary, thus our
+	/// SWF stream) have a bitmap dictionary, thus our
 	/// SWFMovieDefinition. The other derived class, sprite_definition
-	/// will seek for characters in it's base SWFMovieDefinition.
+	/// will seek for characters in its base SWFMovieDefinition.
 	///
-	/// @return NULL if no character with the given ID is found, or
+	/// @return 0 if no character with the given ID is found, or
 	///	    if the corresponding character is not a bitmap.
 	///
-	/// The default implementation returns NULL.
+	/// The default implementation returns 0.
 	///
-	virtual bitmap_character_def* get_bitmap_character_def(int /*character_id*/)
+	virtual BitmapInfo* getBitmap(int /*character_id*/)
 	{
-		return NULL;
+		return 0;
 	}
 
 	/// \brief
 	/// Add a bitmap character in the dictionary, with the specified
 	/// character id.
 	//
-	/// The default implementation is a no-op
+	/// The default implementation is a no-op (deletes the image data).
 	///
-	virtual void add_bitmap_character_def(int /*character_id*/,
-			bitmap_character_def* /*ch*/)
+	virtual void addBitmap(int /*id*/, boost::intrusive_ptr<BitmapInfo> /*im*/)
 	{
 	}
 
@@ -410,22 +404,6 @@ public:
 	{
 	}
 
-
-	/// \brief
-	/// All bitmap_info's used by this movie should be
-	/// registered with this API.
-	//
-	/// This was likely used for 'caching' renderer-specific
-	/// versions of bitmaps. I'm not sure it is really needed
-	/// currently (caching on disk is broken).
-	///
-	/// The default implementation is a no-op
-	///
-	virtual void add_bitmap_info(bitmap_info* /*ch*/)
-	{
-	}
-
-	// ...
 
 	/// \brief
 	/// Return the URL of the SWF stream this definition has been read

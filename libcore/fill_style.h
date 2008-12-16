@@ -23,7 +23,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "SWFMatrix.h"
-#include "bitmap_character_def.h"
+#include "BitmapInfo.h"
 #include "swf.h"
 #include "RGBA.h" // for rgba type
 
@@ -32,6 +32,7 @@
 namespace gnash {
 
 class SWFStream;
+class movie_definition;
 
 class gradient_record
 {
@@ -77,7 +78,7 @@ public:
 	/// @param mat
 	///	The SWFMatrix to apply to the bitmap.
 	///
-	fill_style(bitmap_character_def* bitmap, const SWFMatrix& mat);
+	fill_style(BitmapInfo* bitmap, const SWFMatrix& mat);
 
 	void setSolid(const rgba& color);
 
@@ -136,14 +137,14 @@ public:
 		fill_style *pOther);
 
 	/// \brief
-	/// Make a bitmap_info* corresponding to our gradient.
+	/// Make a BitmapInfo* corresponding to our gradient.
 	/// We can use this to set the gradient fill style.
-	gnash::bitmap_info*	create_gradient_bitmap() const;
+	BitmapInfo* create_gradient_bitmap() const;
 	
 	/// \brief
-	/// Makes sure that m_gradient_bitmap_info is not NULL. Calls 
-	/// create_gradient_bitmap() if necessary and returns m_gradient_bitmap_info.
-	gnash::bitmap_info* need_gradient_bitmap() const; 
+	/// Makes sure that _gradientBitmapInfo is not NULL. Calls 
+	/// create_gradient_bitmap() if necessary and returns _gradientBitmapInfo.
+	BitmapInfo* need_gradient_bitmap() const; 
 	
 	rgba	get_color() const { return m_color; }
 
@@ -171,7 +172,7 @@ public:
 	///        to a character defined in the characters dictionary.
 	///        (it happens..)
 	///
-	bitmap_info* get_bitmap_info() const;
+	BitmapInfo* get_bitmap_info() const;
 	
 	/// Returns the bitmap transformation SWFMatrix
 	SWFMatrix getBitmapMatrix() const; 
@@ -196,7 +197,7 @@ public:
 	//
 	/// fill_style specific reachable resources are:
 	///
-	///	- gradient bitmap info (m_gradient_bitmap_info)
+	///	- gradient bitmap info (_gradientBitmapInfo)
 	///	- bitmap character (m_bitmap_character)
 	///
 	void markReachableResources() const;
@@ -218,9 +219,9 @@ private:
 	rgba	m_color;
 	SWFMatrix	m_gradient_matrix;
     float m_focal_point; // For focal fill gradients.
-	std::vector<gradient_record>	m_gradients;
-	boost::intrusive_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
-	boost::intrusive_ptr<bitmap_character_def>	m_bitmap_character;
+	std::vector<gradient_record> m_gradients;
+	boost::intrusive_ptr<BitmapInfo> _gradientBitmapInfo;
+	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
 	SWFMatrix	m_bitmap_matrix;
 
 	SWF::gradient_spread_mode m_spread_mode;

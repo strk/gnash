@@ -138,7 +138,7 @@ pattern_add_color_stops(const fill_style& style, cairo_pattern_t* pattern,
 }
 
 
-class bitmap_info_cairo : public bitmap_info, boost::noncopyable
+class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
 {
   public:
     bitmap_info_cairo(boost::uint8_t* data, int width, int height,
@@ -419,7 +419,7 @@ public:
   {
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im) 
+  virtual BitmapInfo*  create_bitmap_info_rgb(ImageRGB* im) 
   {
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
@@ -430,7 +430,7 @@ public:
                                  CAIRO_FORMAT_RGB24);
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im)
+  virtual BitmapInfo*  create_bitmap_info_rgba(ImageRGBA* im)
   {        
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];

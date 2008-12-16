@@ -392,7 +392,7 @@ public:
   };
 
 
-  gnash::bitmap_info* create_bitmap_info_rgb(ImageRGB* im)
+  gnash::BitmapInfo* create_bitmap_info_rgb(ImageRGB* im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_styleX_bitmap(), to set a
   // bitmap fill style.
@@ -403,8 +403,8 @@ public:
   }
 
 
-  gnash::bitmap_info* create_bitmap_info_rgba(ImageRGBA* im)
-  // Given an image, returns a pointer to a bitmap_info class
+  gnash::BitmapInfo* create_bitmap_info_rgba(ImageRGBA* im)
+  // Given an image, returns a pointer to a BitmapInfo class
   // that can later be passed to fill_style_bitmap(), to set a
   // bitmap fill style.
   //
@@ -415,7 +415,7 @@ public:
   }
 
 
-  gnash::bitmap_info* create_bitmap_info_empty()
+  gnash::BitmapInfo* create_bitmap_info_empty()
   // Create a placeholder bitmap_info.  Used when
   // DO_NOT_LOAD_BITMAPS is set; then later on the host program
   // can use movie_definition::get_bitmap_info_count() and

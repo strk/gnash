@@ -24,6 +24,7 @@
 #include "swf.h"
 #include "log.h"
 #include "render.h"
+#include "fill_style.h"
 #include "Font.h"
 
 #include <vector>

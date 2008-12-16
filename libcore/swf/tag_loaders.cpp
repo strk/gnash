@@ -55,6 +55,9 @@
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
 
+// TODO: pass the render handler with RunInfo and use that.
+#include "render.h"
+
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
@@ -261,7 +264,8 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition& m,
     catch (std::exception& e)
     {
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror("Error creating header-only jpeg2 input: %s", e.what());
+            log_swferror("Error creating header-only jpeg2 input: %s",
+                e.what());
         );
         return;
     }
@@ -281,6 +285,15 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     in.ensureBytes(2);
     boost::uint16_t character_id = in.read_u16();
+
+    if (m.getBitmap(character_id))
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character "
+                "- discarding it"), character_id);
+        );
+        return;
+    }
 
     // Read the image data.
     JpegImageInput* j_in = m.get_jpeg_loader();
@@ -309,20 +322,10 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m,
         return;
     }
     
-    
-    boost::intrusive_ptr<bitmap_character_def> ch = new bitmap_character_def(im);
-    
-    if ( m.get_bitmap_character_def(character_id) )
-    {
-        IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character "
-                "- discarding it"), character_id);
-        );
-    }
-    else
-    {
-        m.add_bitmap_character_def(character_id, ch.get());
-    }
+    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
 }
 
 
@@ -341,26 +344,29 @@ define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition& m,
           character_id, in.tell());
     );
 
-    // Read the image data.
-    if ( m.get_bitmap_character_def(character_id) )
+    
+    if ( m.getBitmap(character_id) )
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap "
                 "character - discarding it"), character_id);
         );
+        return;
     }
-    else
-    {
-        boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in,
-                    in.get_tag_end_position()).release() );
 
-        std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad,
-                    GNASH_FILETYPE_JPEG));
+    // Read the image data.else
 
-        boost::intrusive_ptr<bitmap_character_def> ch =
-            new bitmap_character_def(im);
-        m.add_bitmap_character_def(character_id, ch.get());
-    }
+    boost::shared_ptr<IOChannel> ad( StreamAdapter::getFile(in,
+                in.get_tag_end_position()).release() );
+
+    std::auto_ptr<GnashImage> im (ImageInput::readImageData(ad,
+                GNASH_FILETYPE_JPEG));
+
+    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
+
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
+
 }
 
 
@@ -501,11 +507,11 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition& m,
     //  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
     im->mergeAlpha(buffer.get(), bufferLength);
 
-    // Create bitmap character.
-    boost::intrusive_ptr<bitmap_character_def> ch =
-            new bitmap_character_def(static_cast<std::auto_ptr<GnashImage> >(im));
+    boost::intrusive_ptr<BitmapInfo> bi =
+        render::createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
 
-    m.add_bitmap_character_def(character_id, ch.get());
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
 #endif
 }
 
@@ -542,7 +548,7 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     // No need to parse any further if it already exists, as we aren't going
     // to add it.
-    if ( m.get_bitmap_character_def(character_id) )
+    if (m.getBitmap(character_id))
     {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("DEFINEBITSLOSSLESS: Duplicate id (%d) "
@@ -614,22 +620,23 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
         case 3:
         {
             // 8-bit data, preceded by a palette.
-            boost::uint8_t* color_table = buffer.get();
+            boost::uint8_t* colorTable = buffer.get();
 
             for (int j = 0; j < height; j++)
             {
-                boost::uint8_t* image_in_row = buffer.get() + 
+                boost::uint8_t* inRow = buffer.get() + 
                     colorTableSize * channels + j * pitch;
 
-                boost::uint8_t*    image_out_row = image->scanline(j);
+                boost::uint8_t*    outRow = image->scanline(j);
                 for (int i = 0; i < width; i++)
                 {
-                    boost::uint8_t pixel = image_in_row[i * bytes_per_pixel];
-                    image_out_row[i * channels + 0] = color_table[pixel * channels + 0];
-                    image_out_row[i * channels + 1] = color_table[pixel * channels + 1];
-                    image_out_row[i * channels + 2] = color_table[pixel * channels + 2];
+                    boost::uint8_t pixel = inRow[i * bytes_per_pixel];
+                    outRow[i * channels + 0] = colorTable[pixel * channels + 0];
+                    outRow[i * channels + 1] = colorTable[pixel * channels + 1];
+                    outRow[i * channels + 2] = colorTable[pixel * channels + 2];
                     if (alpha) {
-                        image_out_row[i * channels + 3] = color_table[pixel * channels + 3];
+                        outRow[i * channels + 3] =
+                            colorTable[pixel * channels + 3];
                     }
                 }
             }
@@ -641,23 +648,24 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
             for (int j = 0; j < height; j++)
             {
-                boost::uint8_t* image_in_row = buffer.get() + j * pitch;
-                boost::uint8_t* image_out_row = image->scanline(j);
+                boost::uint8_t* inRow = buffer.get() + j * pitch;
+                boost::uint8_t* outRow = image->scanline(j);
                 for (int i = 0; i < width; i++)
                 {
-                    boost::uint16_t pixel = image_in_row[i * 2] |
-                        (image_in_row[i * 2 + 1] << 8);
+                    boost::uint16_t pixel = inRow[i * 2] |
+                        (inRow[i * 2 + 1] << 8);
 
-                    // How is the data packed??? Whoever wrote this was just guessing
-                    // here that it's 565!
-                    image_out_row[i * channels + 0] = (pixel >> 8) & 0xF8;    // red
-                    image_out_row[i * channels + 1] = (pixel >> 3) & 0xFC;    // green
-                    image_out_row[i * channels + 2] = (pixel << 3) & 0xF8;    // blue
+                    // How is the data packed??? Whoever wrote this was
+                    // just guessing here that it's 565!
+                    outRow[i * channels + 0] = (pixel >> 8) & 0xF8;    // red
+                    outRow[i * channels + 1] = (pixel >> 3) & 0xFC;    // green
+                    outRow[i * channels + 2] = (pixel << 3) & 0xF8;    // blue
  
-                    // This was saved to the first byte before, but that can hardly be correct.
+                    // This was saved to the first byte before, but that
+                    // can hardly be correct.
                     // Real examples of this format are rare to non-existent.
                     if (alpha) {
-                        image_out_row[i * channels + 3] = 255;
+                        outRow[i * channels + 3] = 255;
                     }
                 }
             }
@@ -674,8 +682,9 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
                 for (int i = 0; i < width; ++i)
                 {
                     // Copy pixels 1-3.
-                    std::copy(&inRow[i * inChannels + 1], &inRow[i * inChannels + 4],
-                            &outRow[i * channels]);
+                    std::copy(&inRow[i * inChannels + 1],
+                            &inRow[i * inChannels + 4], &outRow[i * channels]);
+
                     // Add the alpha channel if necessary.
                     if (alpha) {
                         outRow[i * channels + 3] = inRow[i * 4];
@@ -686,12 +695,10 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     }
 
+    boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(image);
 
-    boost::intrusive_ptr<bitmap_character_def> ch =
-        new bitmap_character_def(image);
-
-    // add image to movie, under character id.
-    m.add_bitmap_character_def(character_id, ch.get());
+    // add bitmap to movie under character id.
+    m.addBitmap(character_id, bi);
 #endif // HAVE_ZLIB_H
 
 }
@@ -699,7 +706,6 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 // This is like null_loader except it prints a message to nag us to fix it.
 void
 fixme_loader(SWFStream& /*in*/, tag_type tag, movie_definition& /*m*/,
-       
 		const RunInfo& /*r*/)
 {
     static std::map<tag_type, bool> warned;
@@ -724,7 +730,7 @@ void define_shape_loader(SWFStream& in, tag_type tag, movie_definition& m,
         log_parse(_("  shape_loader: id = %d"), character_id);
     );
 
-    shape_character_def*    ch = new shape_character_def;
+    shape_character_def* ch = new shape_character_def;
     ch->read(in, tag, true, m);
 
     m.add_character(character_id, ch);
@@ -796,14 +802,6 @@ sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,
 }
 
 
-
-//
-// end_tag
-//
-
-// end_tag doesn't actually need to exist.
-
-
 //
 // export
 //
@@ -830,7 +828,8 @@ void export_loader(SWFStream& in, tag_type tag, movie_definition& m,
             dynamic_cast<SWFMovieDefinition&>(m);
         }
         catch (std::bad_cast& e) {
-            log_swferror(_("EXPORT tag inside DEFINESPRITE. Will export in top-level symbol table."));
+            log_swferror(_("EXPORT tag inside DEFINESPRITE. Will export in "
+                    "top-level symbol table."));
         }
     );
 
@@ -1417,27 +1416,5 @@ define_scene_frame_label_loader(SWFStream& /*in*/, tag_type tag,
 // mode: C++
 // indent-tabs-mode: t
 // End:
-
-
-
-// VC6 is a recognized pile of crap and no one should
-// worry about trying to support it.
-
-class in_stream
-{
-public:
-    const unsigned char*    m_in_data;
-    int    m_current_bits;
-    int    m_unused_bits;
-
-    in_stream(const unsigned char* data)
-        :
-        m_in_data(data),
-        m_current_bits(0),
-        m_unused_bits(0)
-    {
-    }
-};
-
 
 } // namespace gnash

@@ -34,7 +34,7 @@ BitmapMovieDefinition::getShapeDef()
 {
 	if ( _shapedef ) return _shapedef.get();
 
-    _bitmap = new bitmap_character_def(_image);
+    _bitmap = gnash::render::createBitmapInfo(_image);
 
     // It's possible for this to fail.
     if (!_bitmap.get()) return 0;

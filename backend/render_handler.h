@@ -152,7 +152,7 @@
 
 // Forward declarations.
 namespace gnash {
-    class bitmap_info;
+    class BitmapInfo;
     class rect;
     class rgba;
     class SWFMatrix;
@@ -224,7 +224,7 @@ public:
   /// Given an image, returns a pointer to a bitmap_info class
   /// that can later be passed to fill_styleX_bitmap(), to set a
   /// bitmap fill style.
-  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im) = 0;
+  virtual BitmapInfo*  create_bitmap_info_rgb(ImageRGB* im) = 0;
 
   /// \brief
   /// Given an image, returns a pointer to a bitmap_info class
@@ -233,7 +233,7 @@ public:
   //
   /// This version takes an image with an alpha channel.
   ///
-  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im) = 0;
+  virtual BitmapInfo*  create_bitmap_info_rgba(ImageRGBA* im) = 0;
 
   /// Draws a video frame. 
   //
