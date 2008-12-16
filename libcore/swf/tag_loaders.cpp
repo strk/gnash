@@ -541,7 +541,6 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
     // TODO: there's a lot of duplicated code in this function, we should clean it up
 
-    //bitmap_info*    bi = NULL;
 #ifndef HAVE_ZLIB_H
     log_error(_("gnash is not linked to zlib -- can't load zipped image data"));
     return;
