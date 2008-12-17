@@ -91,6 +91,8 @@ public:
     /// Get an stream by name
     std::auto_ptr<IOChannel> getStream(const std::string& name);
 
+    unsigned int nextCallNumber();
+
 protected:
 
 	/// Mark responders associated with remoting calls
@@ -107,9 +109,26 @@ private:
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);
 
+    /// Queue of call groups
+    //
+    /// For HTTP based remoting, each element on this list
+    /// will perform a POST request containing all calls
+    /// to the same uri and dispatch results.
+    ///
 	std::list<AMFQueue*> _callQueues;
 
+    /// Queue of calls gathered during a single movie advancement
+    //
+    /// For HTTP based remoting, these calls will be performed
+    /// by a single POST operation.
+    ///
     std::auto_ptr<AMFQueue> _currentCallQueue; 
+
+    /// Number of calls queued for current connection
+    //
+    /// TODO: make it a member of AMFQueue
+    ///
+    unsigned int _numCalls;
 
 	/// the url prefix optionally passed to connect()
 	std::string _uri;

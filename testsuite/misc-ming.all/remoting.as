@@ -161,7 +161,7 @@ function test7()
 #else
         // The bug here is that gnash encodes 0 as the length of the array while
         // the expected behaviour is to encode 3 (for SWF6 or lower!)
-        xcheck_equals(res.hex, '0a:00:00:00:01:08:00:00:00:03:00:03:32:2e:35:00:3f:f0:00:00:00:00:00:00:00:00:09');
+        check_equals(res.hex, '0a:00:00:00:01:08:00:00:00:03:00:03:32:2e:35:00:3f:f0:00:00:00:00:00:00:00:00:09');
 #endif
     };
 
@@ -252,7 +252,7 @@ function test14()
         //note(printInfo(res));
         check(res.remote_port != connectionPort);
         connectionPort = res.remote_port;
-        xcheck_equals(res.request_id, '/1'); // connection is reset
+        check_equals(res.request_id, '/1'); // connection is reset
         check_equals(res.message, 'ary_newconnect');
         check_equals(res.arg1_type, 'STRICT_ARRAY');
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:00');
@@ -268,7 +268,7 @@ function test14()
         //note(printInfo(res));
         check(res.remote_port != connectionPort);
         connectionPort = res.remote_port;
-        xcheck_equals(res.request_id, '/1'); // connection is reset
+        check_equals(res.request_id, '/1'); // connection is reset
         check_equals(res.message, 'ary_newconnect2');
         check_equals(res.arg1_type, 'STRICT_ARRAY');
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:00');
@@ -290,7 +290,7 @@ function test15()
         // on next frame
         check(res.remote_port != connectionPort);
         connectionPort = res.remote_port;
-        xcheck_equals(res.request_id, '/2');
+        check_equals(res.request_id, '/2');
         check_equals(res.message, 'ary_newconnect');
         check_equals(res.arg1_type, 'STRICT_ARRAY');
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:00');
@@ -309,7 +309,7 @@ function test16()
         // on next frame
         check(res.remote_port != connectionPort);
         connectionPort = res.remote_port;
-        xcheck_equals(res.request_id, '/3');
+        check_equals(res.request_id, '/3');
         check_equals(res.message, 'noarg');
         check_equals(res.arg_count, '0');
         check_equals(res.hex, '0a:00:00:00:00');
@@ -323,7 +323,7 @@ function test16()
         // connection ID is NOT reset if the call happens
         // on next frame
         check_equals(res.remote_port, connectionPort);
-        xcheck_equals(res.request_id, '/4');
+        check_equals(res.request_id, '/4');
         check_equals(res.message, 'multiarg');
         check_equals(res.arg_count, '5');
         check_equals(res.hex, '0a:00:00:00:05:0a:00:00:00:00:02:00:01:61:03:00:01:64:00:3f:f0:00:00:00:00:00:00:00:01:62:02:00:01:63:00:00:09:05:06');
@@ -334,7 +334,7 @@ function test16()
     o.onResult = function(res) {
         //note(printInfo(res));
         check_equals(res.remote_port, connectionPort);
-        xcheck_equals(res.request_id, '/5');
+        check_equals(res.request_id, '/5');
         check_equals(res.message, '25.53');
         check_equals(res.arg_count, '0');
         check_equals(res.hex, '0a:00:00:00:00');
@@ -345,7 +345,7 @@ function test16()
     o.onResult = function(res) {
         //note(printInfo(res));
         check_equals(res.remote_port, connectionPort);
-        xcheck_equals(res.request_id, '/6');
+        check_equals(res.request_id, '/6');
         check_equals(res.message, 'true');
         check_equals(res.arg_count, '0');
         check_equals(res.hex, '0a:00:00:00:00');
@@ -357,7 +357,7 @@ function test16()
     o.onResult = function(res) {
         //note(printInfo(res));
         check_equals(res.remote_port, connectionPort);
-        xcheck_equals(res.request_id, '/7');
+        check_equals(res.request_id, '/7');
         check_equals(res.message, 'toString');
         check_equals(res.arg_count, '0');
         check_equals(res.hex, '0a:00:00:00:00');

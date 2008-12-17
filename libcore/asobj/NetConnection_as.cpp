@@ -477,10 +477,18 @@ NetConnection_as::NetConnection_as()
     as_object(getNetConnectionInterface()),
     _callQueues(),
     _currentCallQueue(0),
+    _numCalls(0),
+    _uri(),
     _isConnected(false),
     _advanceTimer(0)
 {
     attachProperties(*this);
+}
+
+unsigned int
+NetConnection_as::nextCallNumber()
+{
+    return ++_numCalls;
 }
 
 // extern (used by Global.cpp)
@@ -638,6 +646,8 @@ NetConnection_as::connect(const std::string& /*uri*/)
     {
         _callQueues.push_back(_currentCallQueue.release());
     }
+
+    _numCalls=0;
 
     // Close any current connections. (why?) Because that's what happens.
     close();
@@ -893,8 +903,6 @@ netconnection_call(const fn_call& fn)
         }
     }
 
-    static int call_number = 0;
-
     boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
 
     // method name
@@ -909,8 +917,7 @@ netconnection_call(const fn_call& fn)
     // TESTED manually by strk
     if ( asCallback )
     {
-        ++call_number;
-        os << call_number;
+        os << ptr->nextCallNumber();
     }
     const std::string callNumberString = os.str();
 
