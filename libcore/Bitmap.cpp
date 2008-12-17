@@ -52,6 +52,11 @@ Bitmap::stagePlacementCallback(as_object* initObj)
     update();
 }
 
+bool
+Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
+{
+    return pointInBounds(x, y);
+}
 
 void
 Bitmap::display()
