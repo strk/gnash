@@ -40,38 +40,6 @@ namespace gnash
 ///
 class BitmapMovieDefinition : public movie_definition
 {
-	int _version;
-	rect _framesize;
-	size_t _framecount;
-	float _framerate;
-	std::string _url;
-
-	std::auto_ptr<GnashImage> _image;
-
-	boost::intrusive_ptr<BitmapInfo> _bitmap;
-
-	boost::intrusive_ptr<DynamicShape> _shapedef;
-
-	/// Get the shape character definition for this bitmap movie
-	//
-	/// It will create the definition the first time it's called
-	///
-	shape_character_def* getShapeDef();
-
-	size_t _bytesTotal;
-
-protected:
-
-#ifdef GNASH_USE_GC
-	/// Mark reachable resources of a BitmapMovieDefinition
-	//
-	/// Reachable resources are:
-	///	- dynamic shape (_shapedef)
-	///	- bitmap (_bitmap)
-	///
-	void markReachableResources() const;
-#endif // GNASH_USE_GC
-
 public:
 
 
@@ -157,6 +125,43 @@ public:
 	{
 		return 1;
 	}
+
+    BitmapInfo* getBitmap() const {
+        return _bitmap.get();
+    }
+
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources of a BitmapMovieDefinition
+	//
+	/// Reachable resources are:
+	///	- dynamic shape (_shapedef)
+	///	- bitmap (_bitmap)
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
+
+private:
+
+	int _version;
+	rect _framesize;
+	size_t _framecount;
+	float _framerate;
+	std::string _url;
+
+	size_t _bytesTotal;
+
+    boost::intrusive_ptr<BitmapInfo> _bitmap;
+
+	boost::intrusive_ptr<DynamicShape> _shapedef;
+
+	/// Get the shape character definition for this bitmap movie
+	//
+	/// It will create the definition the first time it's called
+	///
+	shape_character_def* getShapeDef();
+
 };
 
 } // namespace gnash
