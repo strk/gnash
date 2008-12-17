@@ -96,7 +96,7 @@ public:
 	std::string filespec;
     } thread_params_t;
     typedef boost::uint8_t byte_t;
-    typedef void entry_t (thread_params_t *);
+    typedef bool entry_t (thread_params_t *);
 
     Network();
     ~Network();
@@ -187,7 +187,12 @@ public:
 //    int writeNet(int fd, const byte_t *buffer);
     int writeNet(int fd, const byte_t *buffer, int nbytes);
     int writeNet(int fd, const byte_t *buffer, int nbytes, int timeout);
-
+    
+    /// \brief Wait for sries of file descriptors for data.
+    ///
+    /// @param limit The max number of file descriptors to wait for.
+    ///
+    /// @return A vector of the file descriptors that have activity.
 #ifdef HAVE_POLL
     boost::shared_ptr<std::vector<struct pollfd> > waitForNetData(int limit, struct pollfd *fds);
 #endif
