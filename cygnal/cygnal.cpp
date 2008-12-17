@@ -570,6 +570,7 @@ connection_handler(Network::thread_params_t *args)
 		tnet = new Network;
 		tnet->setFileFd(args->netfd);
 		targs->handler = tnet;
+		targs->filespec = docroot;
 	    } else {
 		log_debug("Not starting new HTTP thread, spawned already for tid #%d", tid);
 		tnet = networks[tid];
