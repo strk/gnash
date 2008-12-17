@@ -100,6 +100,10 @@ BitmapData_as::markReachableResources() const
             std::mem_fun(&character::setReachable));
 }
 
+
+/// This function should write RGBA data to the _bitmapData array.
+//
+/// TODO: it needs to know what to do about transparency.
 void
 BitmapData_as::update(const boost::uint8_t* data)
 {
@@ -285,7 +289,8 @@ BitmapData_copyChannel(const fn_call& fn)
 as_value
 BitmapData_copyPixels(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr = 
+        ensureType<BitmapData_as>(fn.this_ptr);
 	UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
@@ -296,7 +301,8 @@ BitmapData_dispose(const fn_call& fn)
 {
     // Should free the memory storing the bitmap.
     // All properties afterwards are -1 (even the rectangle)
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
     ptr->dispose();
 	return as_value();
 }
@@ -309,7 +315,7 @@ BitmapData_draw(const fn_call& fn)
 
     std::ostringstream os;
     fn.dump_args(os);
-    log_unimpl("BitmapData.draw(%s) called", os.str());
+    log_unimpl("BitmapData.draw(%s)", os.str());
 
     if (!fn.nargs) {
         //log error
@@ -347,7 +353,8 @@ BitmapData_draw(const fn_call& fn)
 as_value
 BitmapData_fillRect(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
 
     if (fn.nargs < 2) return as_value();
     
@@ -359,7 +366,8 @@ BitmapData_fillRect(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.deltaTransformPoint(%s): needs an object", ss.str());
+            log_aserror("Matrix.deltaTransformPoint(%s): needs an object",
+                ss.str());
         );
         return as_value();
     }

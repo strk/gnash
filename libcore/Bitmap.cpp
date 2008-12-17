@@ -52,6 +52,11 @@ Bitmap::stagePlacementCallback(as_object* initObj)
     update();
 }
 
+bool
+Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
+{
+    return pointInBounds(x, y);
+}
 
 void
 Bitmap::display()
@@ -73,8 +78,6 @@ Bitmap::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     rect bounds;
     bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds()); 
     ranges.add(bounds.getRange());
-
-    log_debug("ranges now: %s", ranges);
 
 }
 
