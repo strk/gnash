@@ -16,10 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-
 #ifndef GNASH_BITMAP_H
 #define GNASH_BITMAP_H
-
 
 #include "character.h" 
 #include "BitmapInfo.h"
@@ -32,9 +30,8 @@
 namespace gnash {
 
 
-/// \brief
-/// Represents the outline of one or more shapes, along with
-/// information on fill and line styles.
+/// A Dynamic Bitmap DisplayObject. This is not AS-referencable, but can be
+/// removed and placed using depths like normal characters (DisplayObjects).
 class Bitmap : public character
 {
 public:
