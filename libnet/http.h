@@ -147,6 +147,8 @@ public:
     
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
+    size_t NumOfFields() { _fields.size(); };
+    void clearFields() { _fields.clear(); };
 
     // Get an array of values for header field 'name'.
     boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
@@ -198,7 +200,8 @@ public:
     amf::Buffer &formatHeader(size_t filesize, http_status_e type);
     amf::Buffer &formatHeader(http_status_e type);
     amf::Buffer &formatRequest(const std::string &url, http_method_e req);
-
+    // format a response to the 'echo' test used for testing Gnash.
+    amf::Buffer &formatEcho(const std::string &num, amf::Buffer &data);
 
     amf::Buffer &formatMethod(const std::string &data)
  	{return formatCommon("Method: " + data); };
@@ -320,7 +323,7 @@ private:
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    void http_handler(Network::thread_params_t *args);
+    bool http_handler(Network::thread_params_t *args);
 }
 
 

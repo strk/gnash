@@ -305,28 +305,40 @@ HTTP::processPostRequest(int fd)
     clearHeader();
     gnash::Network::byte_t *data = processHeaderFields(*buf);
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
-    boost::shared_ptr<amf::Buffer> content(new amf::Buffer(length));
-//	cerr << __PRETTY_FUNCTION__ << " : " << content->size() << endl;
-    int ret = readNet(fd, *content, 5);
+    amf::Buffer content (length);
+    cerr << __PRETTY_FUNCTION__ << " : " << content.size() << endl;
+    int ret = readNet(fd, content, 5);
 //	cerr << __PRETTY_FUNCTION__ << " : " << ret << " : " << (char *)content->reference() << endl;
     
     if (getField("content-type") == "application/x-www-form-urlencoded") {
 	log_debug("Got file data in POST");
 	string url = _docroot + _filespec;
-	DiskStream ds(url, *content);
+	DiskStream ds(url, content);
 	ds.writeToDisk();
 //    ds.close();
 	// oh boy, we got ourselves some encoded AMF objects instead of a boring file.
     } else if (getField("content-type") == "application/x-amf") {
 	log_debug("Got AMF data in POST");
 	amf::AMF amf;
-	boost::shared_ptr<amf::Element> el = amf.extractAMF(content);
+	boost::shared_ptr<amf::Element> el = amf.extractAMF(content.reference(), content.end());
 	el->dump();		// FIXME: do something intelligent with this Element
     }
     
     // Send the reply
-    amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTP::OK);
-    writeNet(fd, reply);
+
+
+    // NOTE: this is a "special" path we trap until we have real CGI support
+    if ((_filespec == "/echo/gateway")
+	&& (getField("content-type") == "application/x-amf")) {
+//	const char *num = (const char *)buf->at(10);
+	log_debug("Got CGI echo request in POST");
+//	cerr << hexify(content.reference(), content.allocated(), true) << endl;
+	amf::Buffer &reply = formatEcho("1", content); // FIXME:
+	writeNet(fd, reply);
+    } else {
+	amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTP::OK);
+	writeNet(fd, reply);
+    }
 
     return true;
 }
@@ -903,7 +915,7 @@ HTTP::formatContentType(DiskStream::filetype_e filetype)
 	  _buffer += "Content-Type: text/html\r\n";
 	  break;
       case DiskStream::FILETYPE_AMF:
-	  _buffer += "Content-Type: application/amf\r\n";
+	  _buffer += "Content-Type: application/x-amf\r\n";
 	  break;
       case DiskStream::FILETYPE_SWF:
 	  _buffer += "Content-Type: application/x-shockwave-flash\r\n";
@@ -1042,6 +1054,94 @@ HTTP::formatPostReply(rtmpt_cmd_e /* code */)
     }
 #endif
 
+    return _buffer;
+}
+
+// format a response to the 'echo' test used for testing Gnash. This
+// is only used for testing by developers.
+amf::Buffer &
+HTTP::formatEcho(const std::string &num, amf::Buffer &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *tmpptr = data.reference();
+    amf::Buffer fixme("00 00 00 00 00 01 00 0b");
+    amf::Buffer fixme1("00 04");
+    amf::Buffer fixme2("ff ff ff ff");
+    amf::Buffer fixme3("01 00");
+    string null = "null";
+
+    tmpptr += 6;
+//    cerr << hexify(tmpptr, 6, true) << endl;
+    
+    boost::uint16_t length;
+    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+    cerr << "LENGTH 1 = " << length <<  endl;
+    if (length >= amf::SANE_STR_SIZE) {
+	log_error("%d bytes for a string is over the safe limit of %d",
+		  length, amf::SANE_STR_SIZE);
+    }
+    // Get the method, example "echo"
+    tmpptr += sizeof(boost::uint16_t);
+//     cerr << hexify(tmpptr, length, false) << endl;
+//     cerr << hexify(tmpptr, length, true) << endl;
+    std::string str1(reinterpret_cast<const char *>(tmpptr), length);
+//     char *str1 = new char[length+1];
+//     memset(str1, 0, length+1);
+//     memcpy(str1, reinterpret_cast<char *>(tmpptr), length);
+//     cerr << "NAME 1 = " << str1 <<  endl;
+    tmpptr += length;
+//    Element el1("null", fixme2);
+// Get the instance number, example "/1"
+    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+    tmpptr += sizeof(boost::uint16_t);
+     cerr << hexify(tmpptr, length, false) << endl;
+     cerr << hexify(tmpptr, length, true) << endl;
+    cerr << "LENGTH 2 = " << length << endl;
+    std::string str2(reinterpret_cast<const char *>(tmpptr), length);
+//    char *str2 = new char[length+1];
+//    memset(str2, 0, length+1);
+//     memcpy(str2, reinterpret_cast<char *>(tmpptr), length);
+     cerr << "NAME 2 = " << str2 <<  endl;
+    tmpptr += length;
+    string res = str2;
+    res += "/onResult";
+
+    // Get the mystery number
+    double mysnum = *reinterpret_cast<const double*>(tmpptr);
+    tmpptr += sizeof(double) + 1;
+
+    // Get the actual data
+    size_t insize = data.spaceLeft() - 1;
+    size_t size = res.size() + insize + fixme.size() + null.size() + fixme2.size();
+    size = 31;
+
+    _buffer = "HTTP/1.1 200 OK\r\n";
+    formatContentType(DiskStream::FILETYPE_AMF);
+    formatContentLength(size);
+    // Pretend to be Red5 server
+    formatServer("Jetty(6.1.7)");
+    
+    // All HTTP messages are followed by a blank line.
+    terminateHeader();
+
+    // Add the binary blob
+    _buffer += fixme;
+
+    // Add the response
+    _buffer += res;
+
+    // Add the NULL name for this property
+    _buffer += fixme1;
+    _buffer += null;
+    
+    // Add the other binary blob
+    _buffer += fixme2;
+
+    cerr << "FIXME: " << hexify(tmpptr, 6, false) << endl;
+    // Add the AMF data we're echoing back
+    _buffer.append(tmpptr, insize);
+//    _buffer += fixme3;
+    
     return _buffer;
 }
 
@@ -1308,21 +1408,18 @@ HTTP::dump() {
 }
 
 extern "C" {
-void
+bool
 http_handler(Network::thread_params_t *args)
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct thread_params thread_data;
     string url, filespec, parameters;
     string::size_type pos;
-    HTTP *www = reinterpret_cast<HTTP *>(args->handler);
+    HTTP *www = new HTTP;
+//    HTTP *www = reinterpret_cast<HTTP *>(args->handler);
     bool done = false;
 //    www.setHandler(net);
 
-    struct pollfd fds;
-    fds.fd = args->netfd;
-    fds.events = POLLIN | POLLRDHUP;
-    www->addPollFD(fds, http_handler);
     log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
 	      args->netfd, get_thread_id());
     
@@ -1375,7 +1472,7 @@ http_handler(Network::thread_params_t *args)
 	    done = true;
 	} else {
 	    log_debug("Keep-Alive is on", www->keepAlive());
-//	    done = true;
+	    done = true;
 	}
 #ifdef USE_STATISTICS
 	struct timespec end;
