@@ -625,10 +625,20 @@ test_post()
         }
     }
 
+//    http.clearFields();
+    amf::Buffer &buf1 = http.formatEcho("2", *encstr);
+    http.processHeaderFields(buf1);
+    cerr << "FIXME: " << http.getField("content-length") << endl;
+    
+    if (http.getField("content-length") == "26") {
+        runtest.pass("HTTP::formatEcho()");
+    } else {
+        runtest.fail("HTTP::formatEcho()");
+    }
+
     if (dbglogfile.getVerbosity() > 0) {
         http.dump();
     }
-
 }
 
 static void
