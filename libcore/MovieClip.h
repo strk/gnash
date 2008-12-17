@@ -52,6 +52,7 @@ namespace gnash {
     class gradient_record;
     class TextField;
     class BitmapData_as;
+    class BitmapInfo;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -230,8 +231,7 @@ public:
 
     //float get_timer() const;
 
-    void    restart();
-
+    void restart();
 
     bool has_looped() const
     {
@@ -248,10 +248,12 @@ public:
     /// Return the topmost entity that the given point
     /// covers that can receive mouse events.  NULL if
     /// none.  Coords are in parent's frame.
-    virtual character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
+    virtual character* get_topmost_mouse_entity(boost::int32_t x,
+            boost::int32_t y);
 
     // see dox in character.h
-    const character* findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const;
+    const character* findDropTarget(boost::int32_t x, boost::int32_t y,
+            character* dragging) const;
 
     void setDropTarget(const std::string& tgt)
     {
@@ -268,16 +270,16 @@ public:
         return true; // sprites can be referenced 
     }
 
-    virtual void    advance();
+    virtual void advance();
 
-    void    advance_sprite();
+    void advance_sprite();
 
     /// Set the sprite state at the specified frame number.
     //
     /// 0-based frame numbers!! 
     ///(in contrast to ActionScript and Flash MX)
     ///
-    void    goto_frame(size_t target_frame_number);
+    void goto_frame(size_t target_frame_number);
 
     /// Parse frame spec and return a 0-based frame number.
     //
@@ -318,7 +320,7 @@ public:
     //
     /// This should only be used by the Color AS class
     ///
-    cxform  get_user_cxform() const
+    cxform get_user_cxform() const
     {
         return _userCxform;
     }
@@ -389,7 +391,7 @@ public:
 
     /// Proxy of DisplayList::remove_character()
     ///
-    /// @param ch
+    /// @
     /// new character to be used for replacing.
     ///
     /// @param depth
@@ -680,6 +682,16 @@ public:
 
     /// Create a Bitmap DisplayObject at the specified depth.
     void attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth);
+
+    /// Render this MovieClip to a GnashImage using the passed transform
+    //
+    /// @return     The GnashImage with the MovieClip drawn onto it.
+    virtual std::auto_ptr<GnashImage> drawToBitmap(
+            const SWFMatrix& mat = SWFMatrix(), 
+            const cxform& cx = cxform(),
+            character::BlendMode bm = character::BLENDMODE_NORMAL,
+            const rect& clipRect = rect(),
+            bool smooth = false);
 
     /// @name Drawing API
     /// @{ 
