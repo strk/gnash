@@ -61,6 +61,12 @@ protected:
 
 private:
 
+    /// This must convert the BitmapData to a BitmapInfo.
+    //
+    /// The result must be stored in _bitmapInfo.
+    void drawBitmap();
+
+    /// Call this before rendering to make sure the BitmapInfo is updated.
     void finalize();
 
     boost::intrusive_ptr<BitmapData_as> _bitmapData;
@@ -70,6 +76,12 @@ private:
 
     /// FIXME: using shape_character_def is unpleasant.
     boost::intrusive_ptr<DynamicShape> _shapeDef;
+
+    /// This is cached to save querying the BitmapData often
+    size_t _width;
+
+    /// This is cached to save querying the BitmapData often
+    size_t _height;
 
 };
 

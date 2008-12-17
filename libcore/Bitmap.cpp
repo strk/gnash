@@ -15,7 +15,9 @@ Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, character* parent,
     character(parent, id),
     _bitmapData(bd),
     _bitmapInfo(0),
-    _shapeDef(0)
+    _shapeDef(0),
+    _width(_bitmapData->getWidth()),
+    _height(_bitmapData->getHeight())
 {
     _bitmapData->registerBitmap(this);
     update();
@@ -56,6 +58,32 @@ Bitmap::getBounds() const
     return _shapeDef->get_bound();
 }
 
+void
+Bitmap::drawBitmap()
+{
+
+    const BitmapData_as::BitmapArray& data = _bitmapData->getBitmapData();
+
+    std::auto_ptr<GnashImage> im(new ImageRGBA(_width, _height)); 
+
+    for (size_t i = 0; i < _height; ++i) {
+
+        boost::uint8_t* row = im->scanline(i);
+
+        for (size_t j = 0; j < _width; ++j) {
+            const BitmapData_as::BitmapArray::value_type pixel =
+                data[i * _width + j];
+            row[j * 4] = (pixel & 0x00ff0000) >> 16;
+            row[j * 4 + 1] = (pixel & 0x0000ff00) >> 8;
+            row[j * 4 + 2] = (pixel & 0x000000ff);
+            row[j * 4 + 3] = (pixel & 0xff000000) >> 24;
+        }
+    }
+
+    _bitmapInfo = render::createBitmapInfo(im);
+
+}
+
 
 void
 Bitmap::finalize()
@@ -74,31 +102,12 @@ Bitmap::finalize()
         return;
     }
 
-    const size_t height = _bitmapData->getHeight();
-    const size_t width = _bitmapData->getWidth();
-
-    std::auto_ptr<GnashImage> im(new ImageRGBA(width, height)); 
-
-    for (size_t i = 0; i < height; ++i) {
-
-        boost::uint8_t* row = im->scanline(i);
-
-        for (size_t j = 0; j < width; ++j) {
-            const BitmapData_as::BitmapArray::value_type pixel =
-                data[i * width + j];
-            row[j * 4] = (pixel & 0x00ff0000) >> 16;
-            row[j * 4 + 1] = (pixel & 0x0000ff00) >> 8;
-            row[j * 4 + 2] = (pixel & 0x000000ff);
-            row[j * 4 + 3] = (pixel & 0xff000000) >> 24;
-        }
-    }
-
-    _bitmapInfo = render::createBitmapInfo(im);
+    drawBitmap();
 
     // Width and height are a maximum of 2880, so there is no risk of 
     // overflow 
-    const int w = width * 20;
-    const int h = height * 20;
+    const int w = _width * 20;
+    const int h = _height * 20;
 
     if (!_shapeDef) {
         _shapeDef = new DynamicShape;
