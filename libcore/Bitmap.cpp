@@ -79,8 +79,6 @@ Bitmap::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds()); 
     ranges.add(bounds.getRange());
 
-    log_debug("ranges now: %s", ranges);
-
 }
 
 rect

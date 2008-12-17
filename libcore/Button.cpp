@@ -878,9 +878,12 @@ void
 Button::stagePlacementCallback(as_object* initObj)
 {
 
-    // A Button cannot be created dynamically, so can't have an 
-    // initObj.
-    assert(!initObj);
+    // Not sure how this can happen, but blip.tv does it.
+    if (initObj) {
+        log_unimpl("Button placed with an initObj. How did this happen? "
+                "We'll copy the properties anyway");
+        copyProperties(*initObj);
+    }
 
     saveOriginalTarget(); // for soft refs
 
@@ -901,10 +904,12 @@ Button::stagePlacementCallback(as_object* initObj)
         character* ch =
             bdef.m_character_def->create_character_instance(this, ch_id);
         ch->setMatrix(mat, true);  // update caches
-        ch->set_cxform(cx); // TODO: who cares about color ?
-        ch->set_depth(ch_depth); // TODO: check if we care about depth, and why ...
+    
+        // TODO: who cares about color, depth etc.
+        ch->set_cxform(cx); 
+        ch->set_depth(ch_depth);
         assert(ch->get_parent() == this);
-        assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
+        assert(ch->get_name().empty()); 
 
         _hitCharacters.push_back(ch);
     }
@@ -936,7 +941,7 @@ Button::stagePlacementCallback(as_object* initObj)
         ch->set_cxform(cx); 
         ch->set_depth(ch_depth); 
         assert(ch->get_parent() == this);
-        assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
+        assert(ch->get_name().empty()); 
 
         if ( ch->wantsInstanceName() )
         {
@@ -948,7 +953,6 @@ Button::stagePlacementCallback(as_object* initObj)
         ch->stagePlacementCallback(); // give this character a life
     }
 
-    // there's no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD events for buttons
 }
 
 #ifdef GNASH_USE_GC

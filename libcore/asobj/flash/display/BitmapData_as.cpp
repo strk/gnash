@@ -315,7 +315,7 @@ BitmapData_draw(const fn_call& fn)
 
     std::ostringstream os;
     fn.dump_args(os);
-    log_unimpl("BitmapData.draw(%s) called", os.str());
+    log_unimpl("BitmapData.draw(%s)", os.str());
 
     if (!fn.nargs) {
         //log error
