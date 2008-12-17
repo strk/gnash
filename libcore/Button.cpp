@@ -953,6 +953,8 @@ Button::stagePlacementCallback(as_object* initObj)
         ch->stagePlacementCallback(); // give this character a life
     }
 
+    // There is no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD event 
+    // for Buttons
 }
 
 #ifdef GNASH_USE_GC
