@@ -86,7 +86,6 @@ namespace {
 as_value
 localconnection_new(const fn_call& /* fn */)
 {
-    GNASH_REPORT_FUNCTION;
     LocalConnection *localconnection_obj = new LocalConnection;
 
     return as_value(localconnection_obj);
@@ -96,7 +95,6 @@ localconnection_new(const fn_call& /* fn */)
 as_value
 localconnection_close(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
     
@@ -108,7 +106,6 @@ localconnection_close(const fn_call& fn)
 as_value
 localconnection_connect(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
 //    log_debug("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
 
@@ -130,7 +127,6 @@ localconnection_connect(const fn_call& fn)
 as_value
 localconnection_domain(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
 
     VM& vm = ptr->getVM();
@@ -143,13 +139,13 @@ localconnection_domain(const fn_call& fn)
 as_value
 localconnection_send(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
 
     std::ostringstream os;
     fn.dump_args(os);
 
-    // It is useful to see what's supposed being sent, so we log this every time.
+    // It is useful to see what's supposed being sent, so we log
+    // this every time.
     log_unimpl(_("LocalConnection.send unimplemented %s"), os.str());
 
     if (!ptr->connected()) {
@@ -169,7 +165,6 @@ localconnection_send(const fn_call& fn)
 void
 attachLocalConnectionInterface(as_object& o)
 {
-    GNASH_REPORT_FUNCTION;
 
     o.init_member("close", new builtin_function(localconnection_close));
     o.init_member("connect", new builtin_function(localconnection_connect));
@@ -180,7 +175,6 @@ attachLocalConnectionInterface(as_object& o)
 as_object*
 getLocalConnectionInterface()
 {
-    GNASH_REPORT_FUNCTION;
 
     static boost::intrusive_ptr<as_object> o;
 
@@ -227,19 +221,16 @@ LocalConnection::LocalConnection()
     as_object(getLocalConnectionInterface()),
     _connected(false)
 {
-    GNASH_REPORT_FUNCTION;
 }
 
 LocalConnection::~LocalConnection()
 {
-    GNASH_REPORT_FUNCTION;
 }
 
 /// \brief Closes (disconnects) the LocalConnection object.
 void
 LocalConnection::close()
 {
-    GNASH_REPORT_FUNCTION;
 #ifndef NETWORK_CONN
     closeMem();
 #endif
@@ -260,7 +251,6 @@ LocalConnection::connect()
 bool
 LocalConnection::connect(const std::string& name)
 {
-    GNASH_REPORT_FUNCTION;
 
     if (name.empty()) {
         _name = "none, sysv segment type";
@@ -295,7 +285,6 @@ LocalConnection::connect(const std::string& name)
 std::string
 LocalConnection::domain(int version)
 {
-//    GNASH_REPORT_FUNCTION;
     // We already figured out the name
     if (_name.size()) {
         return _name;
