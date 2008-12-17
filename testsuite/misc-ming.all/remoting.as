@@ -24,7 +24,7 @@ rcsid="remoting.as - <bzr revno here>";
 endOfTest = function()
 {
 	//note("END OF TEST");
-	check_totals(89);
+	check_totals(104);
 	play();
 };
 
@@ -327,6 +327,40 @@ function test16()
         check_equals(res.message, 'multiarg');
         check_equals(res.arg_count, '5');
         check_equals(res.hex, '0a:00:00:00:05:0a:00:00:00:00:02:00:01:61:03:00:01:64:00:3f:f0:00:00:00:00:00:00:00:01:62:02:00:01:63:00:00:09:05:06');
+    };
+
+    o={onStatus:handleOnStatus};
+    nc.call(25.53, o);
+    o.onResult = function(res) {
+        //note(printInfo(res));
+        check_equals(res.remote_port, connectionPort);
+        xcheck_equals(res.request_id, '/5');
+        check_equals(res.message, '25.53');
+        check_equals(res.arg_count, '0');
+        check_equals(res.hex, '0a:00:00:00:00');
+    };
+
+    o={onStatus:handleOnStatus};
+    nc.call(true, o);
+    o.onResult = function(res) {
+        //note(printInfo(res));
+        check_equals(res.remote_port, connectionPort);
+        xcheck_equals(res.request_id, '/6');
+        check_equals(res.message, 'true');
+        check_equals(res.arg_count, '0');
+        check_equals(res.hex, '0a:00:00:00:00');
+    };
+
+    o={onStatus:handleOnStatus};
+    n={}; n.toString=function() { return 'toString'; };
+    nc.call(n, o);
+    o.onResult = function(res) {
+        //note(printInfo(res));
+        check_equals(res.remote_port, connectionPort);
+        xcheck_equals(res.request_id, '/7');
+        check_equals(res.message, 'toString');
+        check_equals(res.arg_count, '0');
+        check_equals(res.hex, '0a:00:00:00:00');
         test17();
     };
 }

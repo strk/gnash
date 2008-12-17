@@ -870,14 +870,7 @@ netconnection_call(const fn_call& fn)
     }
 
     const as_value& methodName_as = fn.arg(0);
-    if (!methodName_as.is_string()) {
-        IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
-        log_aserror(_("NetConnection.call(%s): first argument "
-                "(methodName) must be a string"), ss.str());
-        );
-        return as_value(); 
-    }
+    std::string methodName = methodName_as.to_string();
 
     std::stringstream ss; fn.dump_args(ss);
 #ifdef GNASH_DEBUG_REMOTING
@@ -899,7 +892,6 @@ netconnection_call(const fn_call& fn)
             );
         }
     }
-    std::string methodName = methodName_as.to_string();
 
     static int call_number = 0;
 
