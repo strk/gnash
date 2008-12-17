@@ -646,9 +646,9 @@ public:
       switch (im->type())
       {
           case GNASH_IMAGE_RGB:
-              return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
+              return new bitmap_info_ogl(im.get(), GL_RGB, ogl_accessible());
           case GNASH_IMAGE_RGBA:
-                return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
+                return new bitmap_info_ogl(im.get(), GL_RGBA, ogl_accessible());
           default:
                 std::abort();
       }
