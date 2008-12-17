@@ -131,7 +131,7 @@ function test2()
 
     o={onStatus:handleOnStatus};
     ary6=['0','0','0'];
-    ary6.custom='custom'; AsSetPropFlags(ary6, 'custom', 1); // hide from enumeration
+    ary6.custom='custom'; ASSetPropFlags(ary6, 'custom', 1); // hide from enumeration
     nc.call("ary_000_assetpropflags", o, ary6); // 36
     o.onResult = function(res) {
         //note(printInfo(res));
@@ -156,9 +156,13 @@ function test7()
         check_equals(res.request_id, '/7');
         check_equals(res.message, 'ary_float');
         check_equals(res.arg1_type, 'ECMA_ARRAY');
+#if OUTPUT_VERSION > 6
+        check_equals(res.hex, '0a:00:00:00:01:08:00:00:00:00:00:03:32:2e:35:00:3f:f0:00:00:00:00:00:00:00:00:09');
+#else
         // The bug here is that gnash encodes 0 as the length of the array while
-        // the expected behaviour is to encode 3.
+        // the expected behaviour is to encode 3 (for SWF6 or lower!)
         xcheck_equals(res.hex, '0a:00:00:00:01:08:00:00:00:03:00:03:32:2e:35:00:3f:f0:00:00:00:00:00:00:00:00:09');
+#endif
     };
 
     o={onStatus:handleOnStatus};

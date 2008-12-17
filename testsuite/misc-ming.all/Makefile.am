@@ -1727,7 +1727,7 @@ PrototypeEventListenersTestRunner_DEPENDENCIES = \
 	$(NULL)
 
 remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -n network -r12 -o $@ -v6 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/remoting.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/remoting.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 
 remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $< $(top_builddir) remoting.swf > $@
