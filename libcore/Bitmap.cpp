@@ -15,17 +15,28 @@ Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, character* parent,
     character(parent, id),
     _bitmapData(bd),
     _bitmapInfo(0),
-    _shapeDef(0),
+    _shapeDef(new DynamicShape),
     _width(_bitmapData->getWidth()),
     _height(_bitmapData->getHeight())
 {
-    _bitmapData->registerBitmap(this);
-    update();
+    _shapeDef->set_bound(rect(0, 0, _width * 20, _height * 20));
 }
+
 
 Bitmap::~Bitmap()
 {
 }
+
+
+void
+Bitmap::stagePlacementCallback(as_object* initObj)
+{
+    assert(!initObj);
+
+    _bitmapData->registerBitmap(this);
+    update();
+}
+
 
 void
 Bitmap::display()
@@ -96,7 +107,6 @@ Bitmap::finalize()
     /// In this case, dispose() was called. It seems like a good idea to
     /// set _bitmapData to 0 to avoid any further interaction.
     if (data.empty()) {
-        _bitmapData->unregisterBitmap(this);
         _bitmapData = 0;
         _shapeDef->set_bound(rect());
         return;
@@ -110,8 +120,6 @@ Bitmap::finalize()
     const int h = _height * 20;
 
     if (!_shapeDef) {
-        _shapeDef = new DynamicShape;
-        _shapeDef->set_bound(rect(0, 0, w, h));
     }
 
     SWFMatrix mat;

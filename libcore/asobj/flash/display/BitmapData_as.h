@@ -72,11 +72,6 @@ public:
         _attachedBitmaps.push_back(bitmap);
     }
 
-    void unregisterBitmap(Bitmap* bitmap) {
-        _attachedBitmaps.remove_if(std::bind2nd(std::equal_to<Bitmap*>(),
-                    bitmap));
-    }
-
 protected:
 
     void markReachableResources() const;

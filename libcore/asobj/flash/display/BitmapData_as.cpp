@@ -96,6 +96,8 @@ BitmapData_as::BitmapData_as(size_t width, size_t height,
 void
 BitmapData_as::markReachableResources() const
 {
+    std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
+            std::mem_fun(&character::setReachable));
 }
 
 void
@@ -109,6 +111,7 @@ BitmapData_as::update(const boost::uint8_t* data)
         _bitmapData[i] = pixel;
     }
 }
+   
 
 void
 BitmapData_as::updateAttachedBitmaps()
@@ -555,7 +558,8 @@ BitmapData_rectangle(const fn_call& fn)
 {
 	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
 
-    // Returns the immutable rectangle of the bitmap or -1 if dispose() has been called.
+    // Returns the immutable rectangle of the bitmap or -1 if dispose()
+    // has been called.
     if (ptr->getBitmapData().empty()) return -1;
 
 	boost::intrusive_ptr<as_object> obj = init_Rectangle_instance();
@@ -589,7 +593,8 @@ BitmapData_width(const fn_call& fn)
     // Read-only
     if (fn.nargs) return as_value();
     
-    // Returns the immutable width of the bitmap or -1 if dispose() has been called.
+    // Returns the immutable width of the bitmap or -1 if dispose() has
+    // been called.
     if (ptr->getBitmapData().empty()) return -1;
 	return as_value(ptr->getWidth());
 }

@@ -51,6 +51,8 @@ public:
 
     virtual rect getBounds() const;
 
+    virtual void stagePlacementCallback(as_object* initObj = 0);
+
 protected:
 
     void markReachableObjects() const {
