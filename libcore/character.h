@@ -39,7 +39,6 @@
 #include <map>
 #include <string>
 #include <cassert>
-#include <typeinfo>
 
 //#define DEBUG_SET_INVALIDATED 1
 
@@ -57,8 +56,6 @@ namespace gnash {
 /// Character is a live, stateful instance of a character_def.
 //
 /// It represents a single active element in a movie.
-/// Inheritance from movie is an horrible truth!
-///
 class character : public as_object
 {
 
@@ -440,7 +437,7 @@ public:
     virtual rect getBounds() const
     {
         log_error("FIXME: character %s did not override the getBounds() method",
-                typeid(*this).name());
+                typeName(*this));
         return rect();
     }
 

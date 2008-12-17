@@ -641,14 +641,17 @@ public:
 #endif
   }    
 
-  virtual BitmapInfo*  create_bitmap_info_rgb(ImageRGB* im)
+  virtual BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
   {
-    return new bitmap_info_ogl(im, GL_RGB, ogl_accessible());
-  }
-
-  virtual BitmapInfo*  create_bitmap_info_rgba(ImageRGBA* im)
-  {
-    return new bitmap_info_ogl(im, GL_RGBA, ogl_accessible());
+      switch (im->type())
+      {
+          case GNASH_IMAGE_RGB:
+              return new bitmap_info_ogl(im.get(), GL_RGB, ogl_accessible());
+          case GNASH_IMAGE_RGBA:
+                return new bitmap_info_ogl(im.get(), GL_RGBA, ogl_accessible());
+          default:
+                std::abort();
+      }
   }
 
   // Since we store drawing operations in display lists, we take special care

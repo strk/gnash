@@ -27,7 +27,8 @@
 #include "movie_definition.h"
 #include "as_value.h"
 #include "as_function.h"
-#include "TextField.h" // for registered variables
+#include "Bitmap.h"
+#include "TextField.h"
 #include "ControlTag.h"
 #include "fn_call.h"
 #include "Key_as.h"
@@ -53,8 +54,10 @@
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
 #include "NetStream_as.h"
+#include "flash/display/BitmapData_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
+
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -492,7 +495,8 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 //
 /// The frame_spec could be an integer or a string.
 ///
-void MovieClip::call_frame_actions(const as_value& frame_spec)
+void
+MovieClip::call_frame_actions(const as_value& frame_spec)
 {
     size_t frame_number;
     if ( ! get_frame_number(frame_spec, frame_number) )
@@ -534,7 +538,8 @@ void MovieClip::call_frame_actions(const as_value& frame_spec)
 
 }
 
-character* MovieClip::add_empty_movieclip(const char* name, int depth)
+character*
+MovieClip::add_empty_movieclip(const char* name, int depth)
 {
     // empty_movieclip_def will be deleted during deleting movieclip
     sprite_definition* empty_sprite_def =
@@ -624,7 +629,6 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     return newmovieclip; 
 }
 
-/* public */
 void
 MovieClip::queueAction(const action_buffer& action)
 {
@@ -632,7 +636,6 @@ MovieClip::queueAction(const action_buffer& action)
     root.pushAction(action, boost::intrusive_ptr<MovieClip>(this));
 }
 
-/* private */
 void
 MovieClip::queueActions(ActionList& actions)
 {
@@ -1280,6 +1283,22 @@ MovieClip::attachCharacter(character& newch, int depth, as_object* initObject)
 
     // FIXME: check return from place_character above ?
     return true; 
+}
+
+std::auto_ptr<GnashImage>
+MovieClip::drawToBitmap(const SWFMatrix& mat, const cxform& cx,
+        character::BlendMode bm, const rect& clipRect, bool smooth)
+{
+    return std::auto_ptr<GnashImage>();
+}
+
+void
+MovieClip::attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth)
+{
+    character* ch = new Bitmap(bd, this, 0);
+
+    attachCharacter(*ch, depth, 0);
+
 }
 
 character*
@@ -5101,10 +5120,34 @@ movieclip_lineGradientStyle(const fn_call& fn)
 as_value
 movieclip_attachBitmap(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+
+    if (fn.nargs < 2) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: expected 2 args, got %d",
+                fn.nargs);
+        );
+        return as_value();
+    }
+
+    as_object* obj = fn.arg(0).to_object().get();
+    boost::intrusive_ptr<BitmapData_as> bd = dynamic_cast<BitmapData_as*>(obj);
+
+    if (!bd) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: first argument should be a "
+                "BitmapData", fn.arg(1));
+        );
+        return as_value();
+    }
+
+    int depth = fn.arg(1).to_int();
+
+    ptr->attachBitmap(bd, depth);
+
     return as_value();
 }
 

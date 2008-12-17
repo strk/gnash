@@ -78,19 +78,9 @@ namespace render
                 return NULL;
 
             case GNASH_IMAGE_RGB:
-            {
-                std::auto_ptr<ImageRGB> imageRGB(
-                            dynamic_cast<ImageRGB*>(im.release()));
-                assert(imageRGB.get());
-                return  s_render_handler->create_bitmap_info_rgb(imageRGB.get());
-            }
-
             case GNASH_IMAGE_RGBA:
             {
-                std::auto_ptr<ImageRGBA> imageRGBA(
-                            dynamic_cast<ImageRGBA*>(im.release()));
-                assert(imageRGBA.get());
-                return s_render_handler->create_bitmap_info_rgba(imageRGBA.get());
+                return s_render_handler->createBitmapInfo(im);
             }
         }
 
