@@ -23,20 +23,29 @@
 
 namespace gnash {
 
-BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def, character* parent)
+BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
+        character* parent)
 	:
 	movie_instance(def, parent)
 {  
 	// We need to assign a character id to the instance, or an assertion
 	// will fail in character.cpp (parent==NULL || id != -1)
+
 	character_def* chdef = def->get_character_def(1); 
 	assert(chdef);
-	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
+	boost::intrusive_ptr<character> ch = 
+        chdef->create_character_instance(this, 1);
 	
 	const int depth = 1 + character::staticDepthOffset;
 	place_character(ch.get(), depth);
 }
 
+std::auto_ptr<GnashImage>
+BitmapMovieInstance::drawToBitmap(const SWFMatrix& mat, const cxform& cx,
+        character::BlendMode bm, const rect& clipRect, bool smooth)
+{
+    return std::auto_ptr<GnashImage>();
+}
 
 } // namespace gnash
 

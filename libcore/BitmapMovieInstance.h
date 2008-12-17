@@ -25,6 +25,7 @@
 namespace gnash
 {
 	class BitmapMovieDefinition;
+    class GnashImage;
 }
 
 namespace gnash
@@ -40,6 +41,16 @@ public:
 	BitmapMovieInstance(BitmapMovieDefinition* def, character* parent=0); 
 
 	virtual ~BitmapMovieInstance() {}
+
+    /// Render this MovieClip to a GnashImage using the passed transform
+    //
+    /// @return     The GnashImage with the MovieClip drawn onto it.
+    virtual std::auto_ptr<GnashImage> drawToBitmap(
+            const SWFMatrix& mat = SWFMatrix(), 
+            const cxform& cx = cxform(),
+            character::BlendMode bm = character::BLENDMODE_NORMAL,
+            const rect& clipRect = rect(),
+            bool smooth = false);
 
 	/// Do nothing on restart. Especially don't trash the DisplayList 
 	//
