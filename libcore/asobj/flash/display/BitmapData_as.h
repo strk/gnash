@@ -59,7 +59,9 @@ public:
     // Returns an unsigned int representation of the pixel
     // at (x, y) either with or without transparency.
     boost::int32_t getPixel(int x, int y, bool transparency) const;
-    
+
+    void update(const boost::uint8_t* data);
+
     // Fill the bitmap with a colour starting at x, y
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
     

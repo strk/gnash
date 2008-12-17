@@ -22,6 +22,7 @@
 #endif
 
 #include "BitmapData_as.h"
+#include "GnashImage.h"
 #include "Bitmap.h"
 #include "flash/geom/Rectangle_as.h" // for BitmapData.rectangle
 #include "as_object.h" // for inheritance
@@ -32,6 +33,8 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
+
+#include "BitmapMovieInstance.h"
 
 #include <vector>
 #include <sstream>
@@ -93,6 +96,18 @@ BitmapData_as::BitmapData_as(size_t width, size_t height,
 void
 BitmapData_as::markReachableResources() const
 {
+}
+
+void
+BitmapData_as::update(const boost::uint8_t* data)
+{
+    for (size_t i = 0; i < _width * _height; ++i) {
+        boost::uint32_t pixel = (*(data++) << 16);
+        pixel |= (*(data++) << 8);
+        pixel |= (*(data++));
+        pixel |= (0xff << 24);
+        _bitmapData[i] = pixel;
+    }
 }
 
 void
@@ -286,9 +301,43 @@ BitmapData_dispose(const fn_call& fn)
 as_value
 BitmapData_draw(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
-	UNUSED(ptr);
-	LOG_ONCE( log_unimpl (__FUNCTION__) );
+	boost::intrusive_ptr<BitmapData_as> ptr =
+        ensureType<BitmapData_as>(fn.this_ptr);
+
+    std::ostringstream os;
+    fn.dump_args(os);
+    log_unimpl("BitmapData.draw(%s) called", os.str());
+
+    if (!fn.nargs) {
+        //log error
+        return as_value();
+    }
+
+    MovieClip* mc = fn.arg(0).to_sprite();
+
+    if (!mc) {
+        // log error
+        return as_value();
+    }
+
+    /// TODO: pass the other arguments for transform.
+    std::auto_ptr<GnashImage> im = mc->drawToBitmap();
+
+    if (!im.get()) { 
+        // log error
+        return as_value();
+    }
+
+    const size_t width = im->width();
+    const size_t height = im->height();
+
+    if (width > 2880 || height > 2880) {
+        log_error("Height (%d) or width (%d) exceed 2880", height, width);
+        return as_value();
+    }
+
+    ptr->update(im->data());
+
 	return as_value();
 }
 
