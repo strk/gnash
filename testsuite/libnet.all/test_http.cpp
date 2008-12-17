@@ -625,6 +625,7 @@ test_post()
         }
     }
 
+#if 0
 //    http.clearFields();
     amf::Buffer &buf1 = http.formatEcho("2", *encstr);
     http.processHeaderFields(buf1);
@@ -635,10 +636,11 @@ test_post()
     } else {
         runtest.fail("HTTP::formatEcho()");
     }
-
-    if (dbglogfile.getVerbosity() > 0) {
-        http.dump();
-    }
+#endif
+    
+     if (dbglogfile.getVerbosity() > 0) {
+         http.dump();
+     }
 }
 
 static void
