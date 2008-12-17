@@ -218,22 +218,11 @@ public:
  
   virtual ~render_handler() {}
 
-  // Your handler should return these with a ref-count of 0.  (@@ is that the right policy?)
-
   /// \brief
   /// Given an image, returns a pointer to a bitmap_info class
   /// that can later be passed to fill_styleX_bitmap(), to set a
   /// bitmap fill style.
-  virtual BitmapInfo*  create_bitmap_info_rgb(ImageRGB* im) = 0;
-
-  /// \brief
-  /// Given an image, returns a pointer to a bitmap_info class
-  /// that can later be passed to fill_style_bitmap(), to set a
-  /// bitmap fill style.
-  //
-  /// This version takes an image with an alpha channel.
-  ///
-  virtual BitmapInfo*  create_bitmap_info_rgba(ImageRGBA* im) = 0;
+  virtual BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im) = 0;
 
   /// Draws a video frame. 
   //
