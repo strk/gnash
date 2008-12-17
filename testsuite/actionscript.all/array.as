@@ -420,6 +420,14 @@ c = []; c[''] = 2;
 check_equals(c.length, 0);
 check_equals(typeof(c['']), 'undefined');
 
+c = []; c[2.2] = 2;
+#if OUTPUT_VERSION < 7
+  xcheck_equals(c.length, 3);
+#else
+  check_equals(c.length, 0);
+#endif
+check_equals(c[2.2], 2);
+
 //-----------------------------------------------------
 // Test Array.pop()
 //-----------------------------------------------------
@@ -1470,11 +1478,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(499);
+ check_totals(501);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(560);
+  check_totals(562);
 # else
-  check_totals(570);
+  check_totals(572);
 # endif
 #endif
