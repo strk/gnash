@@ -46,8 +46,18 @@ printInfo = function(result) {
 	//trace(result['message']);
 };
 
-handleOnStatus = function(result) {
-	fail("server reported error. " + result);
+function ResultHandler() {
+    this.onResult = function(result) {
+        note('default onResult called with args: '+dumpObject(arguments));
+    };
+    this.onCustom = function(result) {
+        note('default onCustom called with args: '+dumpObject(arguments));
+        //this.onResult(arguments[0]);
+	    //this.customResult = arguments;
+    };
+    this.onStatus = function(result) {
+	    note("default onStatus called with args: "+dumpObject(arguments));
+    };
 };
 
 nc = new NetConnection;
@@ -62,7 +72,7 @@ function test1()
     note('Connecting to: '+url+' (pass "url" param to change)');
     nc.connect(url);
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary1=[1,2,3];
     nc.call("ary_123", o, ary1); // 31
     o.onResult = function(res) {
@@ -78,7 +88,7 @@ function test1()
 
 function test2()
 {
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary2=[1,2,3]; ary2.custom='custom';
     nc.call("ary_123custom", o, ary2); // 32
     o.onResult = function(res) {
@@ -91,7 +101,7 @@ function test2()
         check_equals(res.hex, '0a:00:00:00:01:08:00:00:00:03:00:01:30:00:3f:f0:00:00:00:00:00:00:00:01:31:00:40:00:00:00:00:00:00:00:00:01:32:00:40:08:00:00:00:00:00:00:00:06:63:75:73:74:6f:6d:02:00:06:63:75:73:74:6f:6d:00:00:09');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary3=[1,2,3]; ary3.length=255;
     nc.call("ary_123length255", o, ary3); // 33
     o.onResult = function(res) {
@@ -103,7 +113,7 @@ function test2()
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:ff:00:3f:f0:00:00:00:00:00:00:00:40:00:00:00:00:00:00:00:00:40:08:00:00:00:00:00:00:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary4=[]; ary4[3]=3;
     nc.call("ary__3", o, ary4); // 34
     o.onResult = function(res) {
@@ -116,7 +126,7 @@ function test2()
         test5();
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary5=[]; ary5['3']=3;
     nc.call("ary_s3", o, ary5); // 35
     o.onResult = function(res) {
@@ -129,7 +139,7 @@ function test2()
         test6();
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary6=['0','0','0'];
     ary6.custom='custom'; ASSetPropFlags(ary6, 'custom', 1); // hide from enumeration
     nc.call("ary_000_assetpropflags", o, ary6); // 36
@@ -146,7 +156,7 @@ function test2()
 
 function test7()
 {
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary7=[]; ary7['2.5']=1;
     nc.call("ary_float", o, ary7); // 37
     o.onResult = function(res) {
@@ -165,7 +175,7 @@ function test7()
 #endif
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary8=[]; ary8['256']=1;
     nc.call("ary_s256", o, ary8); // 38
     o.onResult = function(res) {
@@ -177,7 +187,7 @@ function test7()
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:01:01:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:06:00:3f:f0:00:00:00:00:00:00');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary9=[]; ary9['-1']=1;
     nc.call("ary_sminus1", o, ary9); // 39
     o.onResult = function(res) {
@@ -189,7 +199,7 @@ function test7()
         check_equals(res.hex, '0a:00:00:00:01:08:00:00:00:00:00:02:2d:31:00:3f:f0:00:00:00:00:00:00:00:00:09');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary10=[]; ary10[-1]=1; // ECMA
     nc.call("ary_minus1", o, ary10);
     o.onResult = function(res) {
@@ -202,7 +212,7 @@ function test7()
         test11();
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary11=['a','b','c']; // STRICT
     nc.call("ary_abc", o, ary11); // 
     o.onResult = function(res) {
@@ -214,7 +224,7 @@ function test7()
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:03:02:00:01:61:02:00:01:62:02:00:01:63');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary12=[]; ary12['']=1; 
     nc.call("ary_emptypropname", o, ary12); //
     o.onResult = function(res) {
@@ -226,7 +236,7 @@ function test7()
         check_equals(res.hex, '0a:00:00:00:01:0a:00:00:00:00');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary13=[]; ary13[1] = ary11;
     nc.call("ary_nested", o, ary13); //
     o.onResult = function(res) {
@@ -245,7 +255,7 @@ function test14()
     note('Connecting again to: '+url);
     nc.connect(url); // reconnect, should reset call id
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary13=[]; 
     nc.call("ary_newconnect", o, ary13); //
     o.onResult = function(res) {
@@ -261,7 +271,7 @@ function test14()
     note('Connecting again to: '+url);
     nc.connect(url); // reconnect, should reset call id
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary13=[]; 
     nc.call("ary_newconnect2", o, ary13); //
     o.onResult = function(res) {
@@ -280,7 +290,7 @@ function test15()
 {
     delete onEnterFrame;
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     ary13=[]; 
     nc.call("ary_newconnect", o, ary13); //
     o.onResult = function(res) {
@@ -300,7 +310,7 @@ function test15()
 
 function test16()
 {
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     nc.call("noarg", o); // no arguments
     o.onResult = function(res) {
         //note(printInfo(res));
@@ -315,7 +325,7 @@ function test16()
         check_equals(res.hex, '0a:00:00:00:00');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     nc.call("multiarg", o, [], 'a', {b:'c',d:1}, null, undefined); 
     o.onResult = function(res) {
         //note(printInfo(res));
@@ -329,7 +339,7 @@ function test16()
         check_equals(res.hex, '0a:00:00:00:05:0a:00:00:00:00:02:00:01:61:03:00:01:64:00:3f:f0:00:00:00:00:00:00:00:01:62:02:00:01:63:00:00:09:05:06');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     nc.call(25.53, o);
     o.onResult = function(res) {
         //note(printInfo(res));
@@ -340,7 +350,7 @@ function test16()
         check_equals(res.hex, '0a:00:00:00:00');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     nc.call(true, o);
     o.onResult = function(res) {
         //note(printInfo(res));
@@ -351,7 +361,7 @@ function test16()
         check_equals(res.hex, '0a:00:00:00:00');
     };
 
-    o={onStatus:handleOnStatus};
+    o=new ResultHandler();
     n={}; n.toString=function() { return 'toString'; };
     nc.call(n, o);
     o.onResult = function(res) {
