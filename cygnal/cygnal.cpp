@@ -653,7 +653,7 @@ dispatch_handler(Network::thread_params_t *args)
 			log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
 			// Call the protocol handler for this network connection
 			bool ret = net->getEntry(it->fd)(args);
-			log_debug("Handler returned %s", (ret) ? "true" : "false");
+//			log_debug("Handler returned %s", (ret) ? "true" : "false");
 			// FIXME: we currently force a 'close connection' at the end
 			// of sending a file, since apache does too. This pretty much
 			// blows persistance,
@@ -663,13 +663,6 @@ dispatch_handler(Network::thread_params_t *args)
 			net->erasePollFD(it->fd);
 //			}
 		    }
-// 		    if (!crcfile.getThreadingFlag()) {
-// 			hand->die();
-// 		    }
-//		    if (it->fd <= net->getPollFDSize()) {
-// 		      net->closeNet(it->fd);
-// 		      net->erasePollFD(it->fd);
-//		    }
 		}
 	    } catch (std::exception& e) {
 		log_error("Network connection was dropped:  %s", e.what());
