@@ -1416,7 +1416,9 @@ http_handler(Network::thread_params_t *args)
     string url, filespec, parameters;
     string::size_type pos;
     HTTP *www = new HTTP;
-//    HTTP *www = reinterpret_cast<HTTP *>(args->handler);
+    bool result = false;
+    
+//    Network *net = reinterpret_cast<Network *>(args->handler);
     bool done = false;
 //    www.setHandler(net);
 
@@ -1429,7 +1431,7 @@ http_handler(Network::thread_params_t *args)
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.
-    do {
+//    do {
 	
 #ifdef USE_STATISTICS
 	struct timespec start;
@@ -1469,9 +1471,11 @@ http_handler(Network::thread_params_t *args)
 	// connection.
 	if (!www->keepAlive()) {
 	    log_debug("Keep-Alive is off", www->keepAlive());
+	    result = false;
 	    done = true;
 	} else {
 	    log_debug("Keep-Alive is on", www->keepAlive());
+	    result = true;
 	    done = true;
 	}
 #ifdef USE_STATISTICS
@@ -1480,12 +1484,13 @@ http_handler(Network::thread_params_t *args)
 	log_debug("Processing time for GET request was %f seconds",
 		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
 #endif
-    } while(done != true);
+//    } while(done != true);
     
 //    hand->notify();
     
     log_debug("http_handler all done now finally...");
-    
+
+    return result;
 } // end of httphandler
     
 } // end of extern C
