@@ -30,8 +30,6 @@ endOfTest = function()
 
 
 if ( ! _root.hasOwnProperty('url') ) {
-    // updated daily from bzr !
-    // TODO: let ./configure specify another one
     url=HTTP_TESTSUITE+'/remoting.php';
 }
 

@@ -34,6 +34,7 @@ EXTRA_DIST = \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
 	remoting.as \
+	red5test.as \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
@@ -1731,6 +1732,9 @@ remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/che
 remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $< $(top_builddir) remoting.swf > $@
 	chmod 755 $@
+
+red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/red5test.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 	
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
