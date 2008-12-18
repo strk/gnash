@@ -715,9 +715,54 @@ NetConnection_as::setURI(const std::string& uri)
 }
 
 void
-NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
-        const SimpleBuffer& buf)
+NetConnection_as::call(as_object* asCallback, const std::string& methodName,
+        const std::vector<as_value>& args, size_t firstArg)
 {
+    boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
+
+    // method name
+    buf->appendNetworkShort(methodName.size());
+    buf->append(methodName.c_str(), methodName.size());
+
+    // client id (result number) as counted string
+    // the convention seems to be / followed by a unique (ascending) number
+    std::ostringstream os;
+    os << "/";
+    // Call number is not used if the callback is undefined
+    if ( asCallback )
+    {
+        os << nextCallNumber();
+    }
+    const std::string callNumberString = os.str();
+
+    buf->appendNetworkShort(callNumberString.size());
+    buf->append(callNumberString.c_str(), callNumberString.size());
+
+    size_t total_size_offset = buf->size();
+    buf->append("\000\000\000\000", 4); // total size to be filled in later
+
+    std::map<as_object*, size_t> offsetTable;
+
+    // encode array of arguments to remote method
+    buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
+    buf->appendNetworkLong(args.size()-firstArg);
+
+    VM& vm = getVM();
+
+    for (unsigned int i = firstArg; i < args.size(); ++i)
+    {
+        const as_value& arg = args[i];
+        // STRICT_ARRAY encoding is allowed for remoting
+        if ( ! arg.writeAMF0(*buf, offsetTable, vm, true) )
+        {
+            log_error("Could not serialize NetConnection.call argument %d",
+                    i);
+        }
+    }
+
+    // Set the "total size" parameter.
+    *(reinterpret_cast<uint32_t*>(buf->data() + total_size_offset)) = 
+        htonl(buf->size() - 4 - total_size_offset);
 
 #ifdef GNASH_DEBUG_REMOTING
     log_debug(_("NetConnection.call(): encoded args: %s"),
@@ -740,14 +785,14 @@ NetConnection_as::call(as_object* asCallback, const std::string& callNumber,
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue with callback");
 #endif
-        _currentCallQueue->enqueue(buf, callNumber, asCallback);
+        _currentCallQueue->enqueue(*buf, callNumberString, asCallback);
     }
     
     else {
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("calling enqueue without callback");
 #endif
-        _currentCallQueue->enqueue(buf);
+        _currentCallQueue->enqueue(*buf);
     }
 
 #ifdef GNASH_DEBUG_REMOTING
@@ -905,8 +950,8 @@ netconnection_call(const fn_call& fn)
     const as_value& methodName_as = fn.arg(0);
     std::string methodName = methodName_as.to_string();
 
-    std::stringstream ss; fn.dump_args(ss);
 #ifdef GNASH_DEBUG_REMOTING
+    std::stringstream ss; fn.dump_args(ss);
     log_debug("NetConnection.call(%s)", ss.str());
 #endif
 
@@ -926,57 +971,8 @@ netconnection_call(const fn_call& fn)
         }
     }
 
-    boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
-
-    // method name
-    buf->appendNetworkShort(methodName.size());
-    buf->append(methodName.c_str(), methodName.size());
-
-    // client id (result number) as counted string
-    // the convention seems to be / followed by a unique (ascending) number
-    std::ostringstream os;
-    os << "/";
-    // Call number is not used if the callback is undefined
-    // TESTED manually by strk
-    if ( asCallback )
-    {
-        os << ptr->nextCallNumber();
-    }
-    const std::string callNumberString = os.str();
-
-    buf->appendNetworkShort(callNumberString.size());
-    buf->append(callNumberString.c_str(), callNumberString.size());
-
-    size_t total_size_offset = buf->size();
-    buf->append("\000\000\000\000", 4); // total size to be filled in later
-
-    std::map<as_object*, size_t> offsetTable;
-
-    // encode array of arguments to remote method
-    buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
-    buf->appendNetworkLong(fn.nargs - 2);
-
-    VM& vm = ptr->getVM();
-
-    if (fn.nargs > 2)
-    {
-        for (unsigned int i = 2; i < fn.nargs; ++i)
-        {
-            const as_value& arg = fn.arg(i);
-            // STRICT_ARRAY encoding is allowed for remoting
-            if ( ! arg.writeAMF0(*buf, offsetTable, vm, true) )
-            {
-                log_error("Could not serialize NetConnection.call argument %d",
-                        i);
-            }
-        }
-    }
-
-    // Set the "total size" parameter.
-    *(reinterpret_cast<uint32_t*>(buf->data() + total_size_offset)) = 
-        htonl(buf->size() - 4 - total_size_offset);
-
-    ptr->call(asCallback.get(), callNumberString, *buf);
+    const std::vector<as_value>& args = fn.getArgs();
+    ptr->call(asCallback.get(), methodName, args, 2);
 
     return as_value();
 }

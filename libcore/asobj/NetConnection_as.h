@@ -63,8 +63,7 @@ public:
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;
 
-    void call(as_object* asCallback, const std::string& callNumber, 
-            const SimpleBuffer& buf);
+    void call(as_object* asCallback, const std::string& methodName, const std::vector<as_value>& args, size_t firstArg);
 
     /// Process the close() method.
     void close();
