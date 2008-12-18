@@ -1108,7 +1108,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 void
 Network::addPollFD(struct pollfd &fd, Network::entry_t *func)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
     boost::mutex::scoped_lock lock(_poll_mutex);
@@ -1120,7 +1120,7 @@ Network::addPollFD(struct pollfd &fd, Network::entry_t *func)
 void
 Network::addPollFD(struct pollfd &fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
     boost::mutex::scoped_lock lock(_poll_mutex);
      _pollfds.push_back(fd);
@@ -1146,7 +1146,7 @@ Network::getPollFDPtr()
 void
 Network::erasePollFD(int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     log_debug("%s: erasing fd #%d from pollfds", __PRETTY_FUNCTION__, fd);
     boost::mutex::scoped_lock lock(_poll_mutex);
     if (_pollfds.size() > 0) {
@@ -1163,7 +1163,7 @@ Network::erasePollFD(int fd)
 void
 Network::erasePollFD(vector<struct pollfd>::iterator &itt)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_poll_mutex);
     if (_pollfds.size() == 1) {
  	_pollfds.clear();
