@@ -204,7 +204,9 @@ public:
     amf::Buffer &formatHeader(http_status_e type);
     amf::Buffer &formatRequest(const std::string &url, http_method_e req);
     // format a response to the 'echo' test used for testing Gnash.
+    amf::Buffer &formatEchoResponse(const std::string &num, amf::Element &el);
     amf::Buffer &formatEchoResponse(const std::string &num, amf::Buffer &data);
+    amf::Buffer &formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size);
 
     amf::Buffer &formatMethod(const std::string &data)
  	{return formatCommon("Method: " + data); };

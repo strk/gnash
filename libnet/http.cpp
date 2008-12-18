@@ -1110,19 +1110,35 @@ HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
 // is only used for testing by developers. The format appears to be
 // two strings, followed by a double, followed by the "onResult".
 amf::Buffer &
+HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
+{
+    GNASH_REPORT_FUNCTION;
+
+    boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
+    return formatEchoResponse(num, data->reference(), data->size());
+}
+
+amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Buffer &data)
 {
     GNASH_REPORT_FUNCTION;
-    Network::byte_t *tmpptr = data.reference();
-    amf::Buffer fixme("00 00 00 00 00 01 00 0b");
-    amf::Buffer fixme1("00 04");
+    return formatEchoResponse(num, data.reference(), data.size());
+}
+
+amf::Buffer &
+HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+
+    Network::byte_t *tmpptr  = data;
+    
+    // FIXME: temporary hacks while debugging
+    amf::Buffer fixme("00 00 00 00 00 01");
     amf::Buffer fixme2("ff ff ff ff");
-    amf::Buffer fixme3("01 00");
-    string null = "null";
     
     _buffer = "HTTP/1.1 200 OK\r\n";
     formatContentType(DiskStream::FILETYPE_AMF);
-    formatContentLength(data.size());
+    formatContentLength(size);
     
     // Pretend to be Red5 server
     formatServer("Jetty(6.1.7)");
@@ -1130,23 +1146,25 @@ HTTP::formatEchoResponse(const std::string &num, amf::Buffer &data)
     // All HTTP messages are followed by a blank line.
     terminateHeader();
 
-    // Add the binary blob
+    // Add the binary blob for the header
     _buffer += fixme;
 
-    // Add the response
-//    _buffer += res;
+    // Make the result response, which is the 2nd data item passed in
+    // the request, a slash followed by a number like "/2".
+    string result = num;
+    result += "/onResult";
+    boost::shared_ptr<amf::Buffer> res = amf::AMF::encodeString(result);
+    _buffer.append(res->begin()+1, res->size()-1);
 
-    // Add the NULL name for this property
-    _buffer += fixme1;
-    _buffer += null;
-    
+    // Add the null data item
+    boost::shared_ptr<amf::Buffer> null = amf::AMF::encodeString("null");
+    _buffer.append(null->begin()+1, null->size()-1);
+
     // Add the other binary blob
     _buffer += fixme2;
 
-//    cerr << "FIXME: " << hexify(tmpptr, 6, false) << endl;
     // Add the AMF data we're echoing back
-//    _buffer.append(tmpptr, insize);
-//    _buffer += fixme3;
+    _buffer.append(data, size);
     
     return _buffer;
 }
