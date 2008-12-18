@@ -290,7 +290,7 @@ tests()
     // HTTP/1.1 200 OK\r\nDate: Tue, 1 Apr 2008 19:58:40 GMT\r\nServer: Cygnal (GNU/Linux)\r\nLast-Modified: Tue, 1 Apr 2008 19:58:40 GMT\r\nEtag: 24103b9-1c54-ec8632c0\r\nAccept-Ranges: bytes\r\nContent-Length: 0\r\nKeep
     http.clearHeader();
     http.formatHeader(HTTP::OK);
-    cerr << "FIXME: " << http.getHeader() << endl;
+//    cerr << "FIXME: " << http.getHeader() << endl;
     regcomp (&regex_pat, "HTTP/[0-9].[0-9] 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
     if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
@@ -627,22 +627,23 @@ test_post()
         }
     }
 
-#if 0
+    // Make sure we can parse the Red5 echo_test client messages.
+    boost::shared_ptr<Buffer> hex1(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 14 0a 00 00 00 01 02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21"));
+    boost::shared_ptr<Buffer> hex2(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21"));
 //    http.clearFields();
-    amf::Buffer &buf1 = http.formatEcho("2", *encstr);
-    http.processHeaderFields(buf1);
-    cerr << "FIXME: " << http.getField("content-length") << endl;
-    
-    if (http.getField("content-length") == "26") {
-        runtest.pass("HTTP::formatEcho()");
+    vector<boost::shared_ptr<amf::Element> > headers = http.parseEchoRequest(*hex1);
+
+    if ((strncmp(headers[0]->getName(), "echo", 4) == 0)
+        && (strncmp(headers[1]->getName(), "/2", 2) == 0)
+        && (strncmp(headers[3]->to_string(), "Hello world!", 12) == 0)) {
+        runtest.pass("HTTP::parseEchoRequest()");
     } else {
-        runtest.fail("HTTP::formatEcho()");
+        runtest.fail("HTTP::parseEchoRequest()");
     }
-#endif
     
-     if (dbglogfile.getVerbosity() > 0) {
-         http.dump();
-     }
+    if (dbglogfile.getVerbosity() > 0) {
+        http.dump();
+    }
 }
 
 static void
