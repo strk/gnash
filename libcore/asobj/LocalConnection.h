@@ -28,29 +28,42 @@
 
 namespace gnash {
   
-  class LocalConnection : public as_object, amf::LcShm {
+class LocalConnection : public as_object, amf::LcShm
+{
+
 public:
+
     LocalConnection();
     ~LocalConnection();
-    void close(void);
-    bool connect();
-    bool connect(const std::string& name);
+
+    void close();
+
+    void connect(const std::string& name);
+
     const std::string& domain() {
         return _domain;
     }
 
-
     void send();
+
     std::string &getName() { return _name; };
+
     bool connected() { return _connected; };
     
 private:
     
+    /// Work out the domain.
+    //
+    /// Called once on construction to set _domain, though it will do
+    /// no harm to call it again.
     std::string getDomain();
     
     bool _connected;
     std::string _name;
     std::map<const char *, short> _allocated;
+
+    // The immutable domain of this LocalConnection, based on the 
+    // originating SWF's domain.
     const std::string _domain;
     
 };

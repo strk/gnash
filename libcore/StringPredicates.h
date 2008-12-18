@@ -27,7 +27,7 @@
 namespace gnash {
 
 /// A case-insensitive string comparator
-class StringNoCaseLessThen {
+class StringNoCaseLessThan {
 public:
 	bool operator() (const std::string& a, const std::string& b) const
 	{
@@ -58,6 +58,9 @@ private:
 /// A case-insensitive string equality operator
 class StringNoCaseEqual {
 public:
+
+    typedef bool result_type;
+
 	bool operator() (const std::string& a, const std::string& b) const
 	{
 		return boost::iequals(a, b);

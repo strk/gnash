@@ -47,7 +47,7 @@ public:
     typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
     /// The variables container (case-insensitive)
-    typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
+    typedef std::map<std::string, as_value, StringNoCaseLessThan> Variables;
 
     typedef std::vector<as_value> Registers;
 

@@ -136,7 +136,7 @@ private:
 
     static const Entities& getEntities();
 
-    typedef std::map<std::string, std::string, StringNoCaseLessThen> Attributes;
+    typedef std::map<std::string, std::string, StringNoCaseLessThan> Attributes;
 
     void parseTag(XMLNode_as*& node, const std::string& xml, 
             std::string::const_iterator& it);
