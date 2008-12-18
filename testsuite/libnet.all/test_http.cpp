@@ -640,6 +640,17 @@ test_post()
     } else {
         runtest.fail("HTTP::parseEchoRequest()");
     }
+
+    amf::Buffer &buff = http.formatEchoResponse(headers[1]->getName(), *headers[3]);
+    string head(reinterpret_cast<const char *>(buff.reference()));
+    const char *ptr3 = reinterpret_cast<const char *>(hex2->reference());
+    const char *ptr4 = reinterpret_cast<const char *>(buff.reference()) + head.size();
+    
+    if (memcmp(ptr3, ptr4, hex2->allocated()) == 0) {
+            runtest.pass("HTTP::formatEchoResponse()");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse()");
+    }
     
     if (dbglogfile.getVerbosity() > 0) {
         http.dump();
