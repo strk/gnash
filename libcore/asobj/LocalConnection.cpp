@@ -78,6 +78,141 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 namespace gnash {
 
+namespace {
+    as_value localconnection_connect(const fn_call& fn);
+    as_value localconnection_domain(const fn_call& fn);
+
+    builtin_function* getLocalConnectionConstructor();
+    as_object* getLocalConnectionInterface();
+}
+
+// \class LocalConnection
+/// \brief Open a connection between two SWF movies so they can send
+/// each other Flash Objects to be executed.
+///
+LocalConnection::LocalConnection()
+    :
+    as_object(getLocalConnectionInterface()),
+    _connected(false),
+    _domain(getDomain())
+{
+    log_debug("The domain for this host is: %s", _domain);
+}
+
+LocalConnection::~LocalConnection()
+{
+}
+
+/// \brief Closes (disconnects) the LocalConnection object.
+void
+LocalConnection::close()
+{
+#ifndef NETWORK_CONN
+    closeMem();
+#endif
+}
+
+/// \brief Prepares the LocalConnection object to receive commands from a
+/// LocalConnection.send() command.
+/// 
+/// The name is a symbolic name like "lc_name", that is used by the
+/// send() command to signify which local connection to send the
+/// object to.
+bool
+LocalConnection::connect()
+{
+    return connect("");
+}
+
+bool
+LocalConnection::connect(const std::string& name)
+{
+
+    if (name.empty()) {
+        _name = "none, sysv segment type";
+    } 
+    else {
+        _name = name;
+    }
+    
+    log_debug("trying to open shared memory segment: \"%s\"", _name);
+    
+    if (Shm::attach(_name.c_str(), true) == false) {
+        return false;
+    }
+
+    if (Shm::getAddr() <= 0) {
+        log_error("Failed to open shared memory segment: \"%s\"", _name);
+        return false; 
+    }
+    
+    _connected = true;
+    
+    return true;
+}
+
+/// \brief Returns a string representing the superdomain of the
+/// location of the current SWF file.
+//
+/// This is set on construction, as it should be constant.
+/// The domain is either the "localhost", or the hostname from the
+/// network connection. This behaviour changed for SWF v7. Prior to v7
+/// only the domain was returned, ie dropping off node names like
+/// "www". As of v7, the behaviour is to return the full host
+/// name. Gnash supports both behaviours based on the version.
+std::string
+LocalConnection::getDomain()
+{
+    
+    URL url(_vm.getRoot().getOriginalURL());
+
+    if (url.hostname().empty()) {
+        return "localhost";
+    }
+
+    // Adjust the name based on the swf version. Prior to v7, the nodename part
+    // was removed. For v7 or later. the full hostname is returned. The
+    // localhost is always just the localhost.
+    if (_vm.getSWFVersion() > 6) {
+        return url.hostname();
+    }
+
+    const std::string& domain = url.hostname();
+
+    std::string::size_type pos;
+    pos = domain.rfind('.');
+
+    // If there is no '.', return the whole thing.
+    if (pos == std::string::npos) {
+        return domain;
+    }
+
+    // If there is no second '.', return the whole thing.
+    pos = domain.rfind(".", pos - 1);
+    
+    // Return everything after the second-to-last '.'
+    // FIXME: this must be wrong, or it would return 'org.uk' for many
+    // UK websites, and not even Adobe is that stupid.
+    if (pos == std::string::npos) {
+        return domain;
+    }
+
+    return domain.substr(pos + 1);
+
+}
+
+void
+localconnection_class_init(as_object& glob)
+{
+	builtin_function* ctor=getLocalConnectionConstructor();
+
+	int swf6flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::dontDelete | 
+                    as_prop_flags::onlySWF6Up;
+
+    glob.init_member(NSV::CLASS_LOCAL_CONNECTION, ctor, swf6flags);
+}
+
 
 // Anonymous namespace for module-statics
 namespace {
@@ -86,9 +221,9 @@ namespace {
 as_value
 localconnection_new(const fn_call& /* fn */)
 {
-    LocalConnection *localconnection_obj = new LocalConnection;
+    LocalConnection *obj = new LocalConnection;
 
-    return as_value(localconnection_obj);
+    return as_value(obj);
 }
 
 /// The callback for LocalConnection::close()
@@ -96,7 +231,8 @@ as_value
 localconnection_close(const fn_call& fn)
 {
     
-    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection> ptr =
+        ensureType<LocalConnection>(fn.this_ptr);
     
     ptr->close();
     return as_value();
@@ -129,10 +265,7 @@ localconnection_domain(const fn_call& fn)
 {
     boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
 
-    VM& vm = ptr->getVM();
-    const int swfVersion = vm.getSWFVersion();
-
-    return as_value(ptr->domain(swfVersion));
+    return as_value(ptr->domain());
 }
 
 /// The callback for LocalConnection::send()
@@ -206,129 +339,5 @@ getLocalConnectionConstructor()
 }
 
 } // anonymous namespace
-
-// This doesn't exist on all systems, but here's the vaue used on Unix.
-#ifndef MAXHOSTNAMELEN
-# define MAXHOSTNAMELEN 64
-#endif
-
-// \class LocalConnection
-/// \brief Open a connection between two SWF movies so they can send
-/// each other Flash Objects to be executed.
-///
-LocalConnection::LocalConnection()
-    :
-    as_object(getLocalConnectionInterface()),
-    _connected(false)
-{
-}
-
-LocalConnection::~LocalConnection()
-{
-}
-
-/// \brief Closes (disconnects) the LocalConnection object.
-void
-LocalConnection::close()
-{
-#ifndef NETWORK_CONN
-    closeMem();
-#endif
-}
-
-/// \brief Prepares the LocalConnection object to receive commands from a
-/// LocalConnection.send() command.
-/// 
-/// The name is a symbolic name like "lc_name", that is used by the
-/// send() command to signify which local connection to send the
-/// object to.
-bool
-LocalConnection::connect()
-{
-    return connect("");
-}
-
-bool
-LocalConnection::connect(const std::string& name)
-{
-
-    if (name.empty()) {
-        _name = "none, sysv segment type";
-    } else {
-        _name = name;
-    }
-    
-    log_debug("trying to open shared memory segment: \"%s\"", _name);
-    
-    if (Shm::attach(_name.c_str(), true) == false) {
-        return false;
-    }
-
-    if (Shm::getAddr() <= 0) {
-        log_error("Failed to open shared memory segment: \"%s\"", _name);
-        return false; 
-    }
-    
-    _connected = true;
-    
-    return true;
-}
-
-/// \brief Returns a string representing the superdomain of the
-/// location of the current SWF file.
-///
-/// The domain is either the "localhost", or the hostname from the
-/// network connection. This behaviour changed for SWF v7. Prior to v7
-/// only the domain was returned, ie dropping off node names like
-/// "www". As of v7, the behaviour is to return the full host
-/// name. Gnash supports both behaviours based on the version.
-std::string
-LocalConnection::domain(int version)
-{
-    // We already figured out the name
-    if (_name.size()) {
-        return _name;
-    }
-    
-    URL url(_vm.getRoot().getOriginalURL());
-//    log_debug(_("ORIG URL=%s (%s)"), url.str(), url.hostname());
-    if (url.hostname().empty()) {
-        _name = "localhost";
-    } else {
-        _name = url.hostname();
-    }
-
-    // Adjust the name based on the swf version. Prior to v7, the nodename part
-    // was removed. For v7 or later. the full hostname is returned. The localhost
-    // is always just the localhost.
-    if (version <= 6) {
-        std::string::size_type pos;
-        pos = _name.rfind(".", _name.size());
-        if (pos != std::string::npos) {
-            pos = _name.rfind(".", pos-1);
-            if (pos != std::string::npos) {
-                _name = _name.substr(pos+1, _name.size());
-            }
-        }
-    }
-
-    // If unset, pick the default. Yes, we're paranoid.
-    if (_name.empty()) {
-        _name =  "localhost";
-    }
-    
-    log_debug("The domain for this host is: %s", _name);
-
-    return _name;
-}
-
-void
-localconnection_class_init(as_object& glob)
-{
-	builtin_function* ctor=getLocalConnectionConstructor();
-
-	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
-    glob.init_member(NSV::CLASS_LOCAL_CONNECTION, ctor, swf6flags);
-}
 
 } // end of gnash namespace

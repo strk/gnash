@@ -15,12 +15,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __LOCALCONNECTION_H__
-#define __LOCALCONNECTION_H__
+#ifndef GNASH_ASOBJ_LOCALCONNECTION_H
+#define GNASH_ASOBJ_LOCALCONNECTION_H
 
 #include <string>
 #include <map>
-#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <boost/cstdint.hpp> 
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
@@ -35,26 +35,30 @@ public:
     void close(void);
     bool connect();
     bool connect(const std::string& name);
-    std::string domain(int version);
+    const std::string& domain() {
+        return _domain;
+    }
+
+
     void send();
     std::string &getName() { return _name; };
     bool connected() { return _connected; };
     
-// FIXME: these should be callbacks
-//     bool        _allowDomain;
-//     bool        _allowInsecureDomain;
-//     bool        _onStatus;
 private:
+    
+    std::string getDomain();
+    
     bool _connected;
     std::string _name;
     std::map<const char *, short> _allocated;
+    const std::string _domain;
+    
 };
 
 void localconnection_class_init(as_object& glob);
 
 } // end of gnash namespace
 
-// __LOCALCONNECTION_H__
 #endif
 
 // local Variables:
