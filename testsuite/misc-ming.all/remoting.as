@@ -1,10 +1,10 @@
 //
 // Build with:
-//	makeswf -o remoting.swf ../Dejagnu.swf remoting.as
+//	makeswf -n network -o remoting.swf ../Dejagnu.swf remoting.as ../actionscript.all/dejagnu_so_fini.as
 // Run with:
-//	firefox DrawingApi.swf
+//	firefox remoting.swf
 // Or:
-//	gnash DrawingApi.swf
+//	gnash -v remoting.swf
 //
 //
 
