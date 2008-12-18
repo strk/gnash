@@ -103,11 +103,11 @@ function test1()
 
     nc.connect(url);
     check_equals(nc.isConnected, false);
-    xcheck_equals(nc.statuses.length, 3);
+    check_equals(nc.statuses.length, 3);
     lastStatusArgs = nc.statuses[nc.statuses.length-1];
     check_equals(lastStatusArgs.length, 1);
-    xcheck_equals(lastStatusArgs[0].level, 'status');
-    xcheck_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
+    check_equals(lastStatusArgs[0].level, 'status');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
 
     o=new ResultHandler();
     ary1=[1,2,3];
@@ -294,11 +294,11 @@ function test14()
     nc.connect(url); // reconnect, should reset call id
 
     check_equals(nc.isConnected, false);
-    xcheck_equals(nc.statuses.length, 4);
+    check_equals(nc.statuses.length, 4);
     lastStatusArgs = nc.statuses[nc.statuses.length-1];
     check_equals(lastStatusArgs.length, 1);
-    xcheck_equals(lastStatusArgs[0].level, 'status');
-    xcheck_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
+    check_equals(lastStatusArgs[0].level, 'status');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
 
     o=new ResultHandler();
     ary13=[]; 
@@ -317,11 +317,11 @@ function test14()
     nc.connect(url); // reconnect, should reset call id
 
     check_equals(nc.isConnected, false);
-    xcheck_equals(nc.statuses.length, 5);
+    check_equals(nc.statuses.length, 5);
     lastStatusArgs = nc.statuses[nc.statuses.length-1];
     check_equals(lastStatusArgs.length, 1);
-    xcheck_equals(lastStatusArgs[0].level, 'status');
-    xcheck_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
+    check_equals(lastStatusArgs[0].level, 'status');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
 
     o=new ResultHandler();
     ary13=[]; 
@@ -444,7 +444,7 @@ function test16()
 function test17()
 {
     check_equals(nc.isConnected, false);
-    xcheck_equals(nc.statuses.length, 5);
+    check_equals(nc.statuses.length, 5);
 
     endOfTest();
 }

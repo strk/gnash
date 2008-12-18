@@ -135,6 +135,11 @@ public:
         _headers["Content-Type"] = "application/x-amf";
     }
 
+    bool hasPendingCalls() const
+    {
+        return _connection || queued_count;
+    }
+
     void enqueue(const SimpleBuffer &amf, const std::string& identifier,
             boost::intrusive_ptr<as_object> callback) {
         push_amf(amf);
@@ -662,18 +667,50 @@ NetConnection_as::connect()
 
 
 void
-NetConnection_as::connect(const std::string& /*uri*/)
+NetConnection_as::connect(const std::string& uri)
 {
-    /// Queue the current call queue
-    if ( _currentCallQueue.get() )
-    {
-        _callQueues.push_back(_currentCallQueue.release());
-    }
-
     _numCalls=0;
 
     // Close any current connections. (why?) Because that's what happens.
     close();
+
+    // TODO: check for other kind of invalidities here...
+    if ( uri.empty() )
+    {
+        _isConnected = false;
+        notifyStatus(CONNECT_FAILED);
+        return;
+    }
+
+    const movie_root& mr = _vm.getRoot();
+    URL url(uri, mr.runInfo().baseURL());
+
+    if ( url.protocol() == "rtmp" )
+    {
+        LOG_ONCE( log_unimpl("NetConnection.connect(%s): RTMP not yet supported", url) );
+        notifyStatus(CONNECT_FAILED);
+        return;
+    }
+
+    if ( url.protocol() != "http" )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("NetConnection.connect(%s): invalid connection protocol", url);
+        );
+        notifyStatus(CONNECT_FAILED);
+        return;
+    }
+
+    // This is for HTTP remoting
+
+    if (!URLAccessManager::allow(url)) {
+        log_security(_("Gnash is not allowed to NetConnection.connect to %s"), url);
+        notifyStatus(CONNECT_FAILED);
+        return;
+    }
+
+    _currentCallQueue.reset(new AMFQueue(*this, url));
+
 
     // FIXME: We should attempt a connection here (this is called when an
     // argument is passed to NetConnection.connect(url).
@@ -688,7 +725,6 @@ NetConnection_as::connect(const std::string& /*uri*/)
     //    and fails immediately.
     // TODO: modify validateURL for doing this.
     _isConnected = false;
-    notifyStatus(CONNECT_FAILED);
 }
 
 
@@ -697,13 +733,22 @@ NetConnection_as::connect(const std::string& /*uri*/)
 void
 NetConnection_as::close()
 {
-    if (!_isConnected) return;
+    bool needSendClosedStatus = _currentCallQueue.get() || _isConnected;
+
+    /// Queue the current call queue if it has pending calls
+    if ( _currentCallQueue.get() && _currentCallQueue->hasPendingCalls() )
+    {
+        _callQueues.push_back(_currentCallQueue.release());
+    }
 
     /// TODO: what should actually happen here? Should an attached
     /// NetStream object be interrupted?
     _isConnected = false;
 
-    notifyStatus(CONNECT_CLOSED);
+    if ( needSendClosedStatus )
+    {
+        notifyStatus(CONNECT_CLOSED);
+    }
 }
 
 
@@ -718,6 +763,12 @@ void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args, size_t firstArg)
 {
+    if ( ! _currentCallQueue.get() )
+    {
+        log_aserror("NetConnection.call: can't call while not connected");
+        return;
+    }
+
     boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
 
     // method name
@@ -768,18 +819,6 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     log_debug(_("NetConnection.call(): encoded args: %s"),
             hexify(buf.data(), buf.size(), false));
 #endif
-
-    // FIXME: Don't do this here. Use a single connection object member
-    // for all calls (depends on the following FIXME), and also check
-    // whether a connection exists and don't call() if it doesn't (can be
-    // done in the AS implementation to save processing arguments when
-    // not connected).
-    URL url(validateURL());
-
-    // This should use the uri set with connect()
-    if (!_currentCallQueue.get()) {
-        _currentCallQueue.reset(new AMFQueue(*this, url));
-    }
 
     if (asCallback) {
 #ifdef GNASH_DEBUG_REMOTING
@@ -868,11 +907,6 @@ void
 NetConnection_as::advance()
 {
     // Advance
-    if ( _currentCallQueue.get() ) 
-    {
-        _callQueues.push_back(_currentCallQueue.release());
-        assert(!_currentCallQueue.get());
-    }
 
 #ifdef GNASH_DEBUG_REMOTING
     log_debug("NetConnection_as::advance: %d calls to advance", _callQueues.size());
@@ -888,6 +922,11 @@ NetConnection_as::advance()
             delete que;
         }
         else break; // queues handling is serialized
+    }
+
+    if ( _currentCallQueue.get() ) 
+    {
+        _currentCallQueue->tick();
     }
 
     // ticking of the queue might have triggered creation
