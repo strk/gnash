@@ -95,6 +95,20 @@ ret = rec.connect(undefined);
 check_equals(ret, false);
 check_equals(statuses.length, 0);
 
+ret = rec.connect("");
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+ret = rec.connect("string", 7);
+check_equals(ret, true);
+check_equals(statuses.length, 0);
+
+ret = rec.connect("string");
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+rec.close();
+
 ret = rec.connect("string");
 check_equals(ret, true);
 check_equals(statuses.length, 0);
@@ -180,7 +194,7 @@ check_equals (result, true);
 
 rec.close();
 
-totals(46);
+totals(52);
 
 #endif // OUTPUT_VERSION >= 6
 

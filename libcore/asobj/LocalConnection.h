@@ -60,7 +60,6 @@ private:
     
     bool _connected;
     std::string _name;
-    std::map<const char *, short> _allocated;
 
     // The immutable domain of this LocalConnection, based on the 
     // originating SWF's domain.
