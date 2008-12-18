@@ -290,8 +290,8 @@ tests()
     // HTTP/1.1 200 OK\r\nDate: Tue, 1 Apr 2008 19:58:40 GMT\r\nServer: Cygnal (GNU/Linux)\r\nLast-Modified: Tue, 1 Apr 2008 19:58:40 GMT\r\nEtag: 24103b9-1c54-ec8632c0\r\nAccept-Ranges: bytes\r\nContent-Length: 0\r\nKeep
     http.clearHeader();
     http.formatHeader(HTTP::OK);
-//    cerr << "FIXME: " << http.getHeader() << endl;
-    regcomp (&regex_pat, "HTTP/1.* 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
+    cerr << "FIXME: " << http.getHeader() << endl;
+    regcomp (&regex_pat, "HTTP/[0-9].[0-9] 200 OK.*Date:.*Server:.*:.*-Length.*-Type:.*$",
              REG_NOSUB);        // note that we do want to look for NL
     if (regexec (&regex_pat, reinterpret_cast<const char*>(http.getHeader()), 0, (regmatch_t *)0, 0)) {
         runtest.fail ("HTTP::formatHeader(port)");
@@ -312,6 +312,8 @@ tests()
     } else {
         runtest.pass ("HTTP::formatErrorResponse(header)");
     }
+    regfree(&regex_pat);
+
 # if 0
     regfree(&regex_pat);
     regcomp (&regex_pat, "DOCTYPE.*<title>404 Not Found</title>.*$",
