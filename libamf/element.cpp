@@ -1235,7 +1235,7 @@ Element::setName(const string &str)
 ///
 /// @return nothing.
 ///
-/// @remarks This add a NULL string terminator so the name can be printed.
+/// @remarks This adds a NULL string terminator so the name can be printed.
 void
 Element::setName(const char *name, size_t size)
 {
@@ -1253,7 +1253,7 @@ Element::setName(const char *name, size_t size)
 ///
 /// @return nothing.
 ///
-/// @remarks This add a NULL string terminator so the name can be printed.
+/// @remarks This adds a NULL string terminator so the name can be printed.
 void
 Element::setName(Network::byte_t *name, size_t size)
 {
