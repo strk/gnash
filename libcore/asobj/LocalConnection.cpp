@@ -25,6 +25,7 @@
 #include <cerrno>
 #include <cstring>
 #include <boost/cstdint.hpp> // for boost::?int??_t
+#include <boost/assign/list_of.hpp>
 
 #include "VM.h"
 #include "URLAccessManager.h"
@@ -38,6 +39,7 @@
 #include "lcshm.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
+#include "StringPredicates.h"
 
 using namespace amf;
 
@@ -78,6 +80,137 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
 namespace gnash {
 
+namespace {
+    as_value localconnection_connect(const fn_call& fn);
+    as_value localconnection_domain(const fn_call& fn);
+
+    bool validFunctionName(const std::string& func);
+
+    builtin_function* getLocalConnectionConstructor();
+    as_object* getLocalConnectionInterface();
+}
+
+// \class LocalConnection
+/// \brief Open a connection between two SWF movies so they can send
+/// each other Flash Objects to be executed.
+///
+LocalConnection::LocalConnection()
+    :
+    as_object(getLocalConnectionInterface()),
+    _connected(false),
+    _domain(getDomain())
+{
+    log_debug("The domain for this host is: %s", _domain);
+}
+
+LocalConnection::~LocalConnection()
+{
+}
+
+/// \brief Closes (disconnects) the LocalConnection object.
+void
+LocalConnection::close()
+{
+#ifndef NETWORK_CONN
+    closeMem();
+#endif
+}
+
+/// \brief Prepares the LocalConnection object to receive commands from a
+/// LocalConnection.send() command.
+/// 
+/// The name is a symbolic name like "lc_name", that is used by the
+/// send() command to signify which local connection to send the
+/// object to.
+void
+LocalConnection::connect(const std::string& name)
+{
+
+    if (name.empty()) {
+        _name = "none, sysv segment type";
+    } 
+    else {
+        _name = name;
+    }
+    
+    log_debug("trying to open shared memory segment: \"%s\"", _name);
+    
+    if (Shm::attach(_name.c_str(), true) == false) {
+        return;
+    }
+
+    if (Shm::getAddr() <= 0) {
+        log_error("Failed to open shared memory segment: \"%s\"", _name);
+        return; 
+    }
+    
+    _connected = true;
+    
+    return;
+}
+
+/// \brief Returns a string representing the superdomain of the
+/// location of the current SWF file.
+//
+/// This is set on construction, as it should be constant.
+/// The domain is either the "localhost", or the hostname from the
+/// network connection. This behaviour changed for SWF v7. Prior to v7
+/// only the domain was returned, ie dropping off node names like
+/// "www". As of v7, the behaviour is to return the full host
+/// name. Gnash supports both behaviours based on the version.
+std::string
+LocalConnection::getDomain()
+{
+    
+    URL url(_vm.getRoot().getOriginalURL());
+
+    if (url.hostname().empty()) {
+        return "localhost";
+    }
+
+    // Adjust the name based on the swf version. Prior to v7, the nodename part
+    // was removed. For v7 or later. the full hostname is returned. The
+    // localhost is always just the localhost.
+    if (_vm.getSWFVersion() > 6) {
+        return url.hostname();
+    }
+
+    const std::string& domain = url.hostname();
+
+    std::string::size_type pos;
+    pos = domain.rfind('.');
+
+    // If there is no '.', return the whole thing.
+    if (pos == std::string::npos) {
+        return domain;
+    }
+
+    // If there is no second '.', return the whole thing.
+    pos = domain.rfind(".", pos - 1);
+    
+    // Return everything after the second-to-last '.'
+    // FIXME: this must be wrong, or it would return 'org.uk' for many
+    // UK websites, and not even Adobe is that stupid.
+    if (pos == std::string::npos) {
+        return domain;
+    }
+
+    return domain.substr(pos + 1);
+
+}
+
+void
+localconnection_class_init(as_object& glob)
+{
+	builtin_function* ctor=getLocalConnectionConstructor();
+
+	int swf6flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::dontDelete | 
+                    as_prop_flags::onlySWF6Up;
+
+    glob.init_member(NSV::CLASS_LOCAL_CONNECTION, ctor, swf6flags);
+}
+
 
 // Anonymous namespace for module-statics
 namespace {
@@ -86,9 +219,9 @@ namespace {
 as_value
 localconnection_new(const fn_call& /* fn */)
 {
-    LocalConnection *localconnection_obj = new LocalConnection;
+    LocalConnection *obj = new LocalConnection;
 
-    return as_value(localconnection_obj);
+    return as_value(obj);
 }
 
 /// The callback for LocalConnection::close()
@@ -96,7 +229,8 @@ as_value
 localconnection_close(const fn_call& fn)
 {
     
-    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection> ptr =
+        ensureType<LocalConnection>(fn.this_ptr);
     
     ptr->close();
     return as_value();
@@ -106,59 +240,103 @@ localconnection_close(const fn_call& fn)
 as_value
 localconnection_connect(const fn_call& fn)
 {
-//    log_debug("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection> ptr =
+        ensureType<LocalConnection>(fn.this_ptr);
+
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("LocalConnection.connect() expects exactly "
+                    "1 argument"));
+        );
+        return as_value(false);
+    }
+
+    if (!fn.arg(0).is_string()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("LocalConnection.connect(): first argument must "
+                    "be a string"));
+        );
+        return as_value(false);
+    }
 
     std::string name = fn.arg(0).to_string();
-    bool ret;
 
-    if (fn.nargs != 0) {
-        ret = ptr->connect(name);
-        name = "localhost";
-    } else {
-        log_error(_("No connection name specified to LocalConnection.connect()"));
-        ret = ptr->connect(name); // FIXME: This should probably
-                                       // fail instead
-    }
-    return as_value(ret);
+    ptr->connect(name);
+
+    // We don't care whether connected or not.
+    return as_value(true);
 }
 
 /// The callback for LocalConnection::domain()
 as_value
 localconnection_domain(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection> ptr =
+        ensureType<LocalConnection>(fn.this_ptr);
 
-    VM& vm = ptr->getVM();
-    const int swfVersion = vm.getSWFVersion();
-
-    return as_value(ptr->domain(swfVersion));
+    return as_value(ptr->domain());
 }
 
-/// The callback for LocalConnection::send()
+/// LocalConnection.send()
+//
+/// Returns false only if the call was syntactically incorrect.
 as_value
 localconnection_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection> ptr = ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection> ptr =
+        ensureType<LocalConnection>(fn.this_ptr);
 
-    std::ostringstream os;
-    fn.dump_args(os);
-
-    // It is useful to see what's supposed being sent, so we log
-    // this every time.
-    log_unimpl(_("LocalConnection.send unimplemented %s"), os.str());
-
-    if (!ptr->connected()) {
-        ptr->connect();
-    }
-    
-    if (rcfile.getLocalConnection() ) {
-        log_security("Attempting to write to disabled LocalConnection!");
+    // At least 2 args (connection name, function) required.
+    if (fn.nargs < 2) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("LocalConnection.send(%s): requires at least 2 "
+                    "arguments"), os.str());
+        );
         return as_value(false);
     }
 
-    // FIXME: send something
-    return as_value();
+    // Both the first two arguments must be a string
+    if (!fn.arg(0).is_string() || !fn.arg(1).is_string()) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("LocalConnection.send(%s): requires at least 2 "
+                    "arguments"), os.str());
+        );
+        return as_value(false);
+    }
+
+    const std::string& func = fn.arg(1).to_string();
+
+    if (!validFunctionName(func)) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("LocalConnection.send(%s): requires at least 2 "
+                    "arguments"), os.str());
+        );
+        return as_value(false);
+    }
+
+
+    // Now we have a valid call.
+
+    // It is useful to see what's supposed being sent, so we log
+    // this every time until implemented.
+    std::ostringstream os;
+    fn.dump_args(os);
+    log_unimpl(_("LocalConnection.send unimplemented %s"), os.str());
+
+    // We'll return true if the LocalConnection is disabled too, as
+    // the return value doesn't indicate success of the connection.
+    if (rcfile.getLocalConnection() ) {
+        log_security("Attempting to write to disabled LocalConnection!");
+        return as_value(true);
+    }
+
+    return as_value(true);
 }
 
 
@@ -197,138 +375,40 @@ getLocalConnectionConstructor()
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&localconnection_new, getLocalConnectionInterface());
-        //attachLocalConnectionStaticInterface(*cl);
-		VM::get().addStatic(cl); // FIXME: why do we need to register ourself here ?
+		cl = new builtin_function(&localconnection_new,
+                getLocalConnectionInterface());
+
+        // FIXME: why do we need to register ourself here ?
+		VM::get().addStatic(cl);
 	}
 
 	return cl;
 }
 
+/// These names are invalid as a function name.
+bool
+validFunctionName(const std::string& func)
+{
+
+    if (func.empty()) return false;
+
+    typedef std::vector<std::string> ReservedNames;
+
+    static const ReservedNames reserved = boost::assign::list_of
+        ("send")
+        ("onStatus")
+        ("close")
+        ("connect")
+        ("domain")
+        ("allowDomain");
+
+    const ReservedNames::const_iterator it =
+        std::find_if(reserved.begin(), reserved.end(),
+                boost::bind(StringNoCaseEqual(), _1, func));
+        
+    return (it == reserved.end());
+}
+
 } // anonymous namespace
-
-// This doesn't exist on all systems, but here's the vaue used on Unix.
-#ifndef MAXHOSTNAMELEN
-# define MAXHOSTNAMELEN 64
-#endif
-
-// \class LocalConnection
-/// \brief Open a connection between two SWF movies so they can send
-/// each other Flash Objects to be executed.
-///
-LocalConnection::LocalConnection()
-    :
-    as_object(getLocalConnectionInterface()),
-    _connected(false)
-{
-}
-
-LocalConnection::~LocalConnection()
-{
-}
-
-/// \brief Closes (disconnects) the LocalConnection object.
-void
-LocalConnection::close()
-{
-#ifndef NETWORK_CONN
-    closeMem();
-#endif
-}
-
-/// \brief Prepares the LocalConnection object to receive commands from a
-/// LocalConnection.send() command.
-/// 
-/// The name is a symbolic name like "lc_name", that is used by the
-/// send() command to signify which local connection to send the
-/// object to.
-bool
-LocalConnection::connect()
-{
-    return connect("");
-}
-
-bool
-LocalConnection::connect(const std::string& name)
-{
-
-    if (name.empty()) {
-        _name = "none, sysv segment type";
-    } else {
-        _name = name;
-    }
-    
-    log_debug("trying to open shared memory segment: \"%s\"", _name);
-    
-    if (Shm::attach(_name.c_str(), true) == false) {
-        return false;
-    }
-
-    if (Shm::getAddr() <= 0) {
-        log_error("Failed to open shared memory segment: \"%s\"", _name);
-        return false; 
-    }
-    
-    _connected = true;
-    
-    return true;
-}
-
-/// \brief Returns a string representing the superdomain of the
-/// location of the current SWF file.
-///
-/// The domain is either the "localhost", or the hostname from the
-/// network connection. This behaviour changed for SWF v7. Prior to v7
-/// only the domain was returned, ie dropping off node names like
-/// "www". As of v7, the behaviour is to return the full host
-/// name. Gnash supports both behaviours based on the version.
-std::string
-LocalConnection::domain(int version)
-{
-    // We already figured out the name
-    if (_name.size()) {
-        return _name;
-    }
-    
-    URL url(_vm.getRoot().getOriginalURL());
-//    log_debug(_("ORIG URL=%s (%s)"), url.str(), url.hostname());
-    if (url.hostname().empty()) {
-        _name = "localhost";
-    } else {
-        _name = url.hostname();
-    }
-
-    // Adjust the name based on the swf version. Prior to v7, the nodename part
-    // was removed. For v7 or later. the full hostname is returned. The localhost
-    // is always just the localhost.
-    if (version <= 6) {
-        std::string::size_type pos;
-        pos = _name.rfind(".", _name.size());
-        if (pos != std::string::npos) {
-            pos = _name.rfind(".", pos-1);
-            if (pos != std::string::npos) {
-                _name = _name.substr(pos+1, _name.size());
-            }
-        }
-    }
-
-    // If unset, pick the default. Yes, we're paranoid.
-    if (_name.empty()) {
-        _name =  "localhost";
-    }
-    
-    log_debug("The domain for this host is: %s", _name);
-
-    return _name;
-}
-
-void
-localconnection_class_init(as_object& glob)
-{
-	builtin_function* ctor=getLocalConnectionConstructor();
-
-	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
-    glob.init_member(NSV::CLASS_LOCAL_CONNECTION, ctor, swf6flags);
-}
 
 } // end of gnash namespace

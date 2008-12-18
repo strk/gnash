@@ -444,14 +444,14 @@ private:
 	PlayListMap m_playlist;
 
 	/// 0-based frame #'s
-	typedef std::map<std::string, size_t, StringNoCaseLessThen> NamedFrameMap;
+	typedef std::map<std::string, size_t, StringNoCaseLessThan> NamedFrameMap;
 	NamedFrameMap _namedFrames;
 
 	// Mutex protecting access to _namedFrames
 	mutable boost::mutex _namedFramesMutex;
 
 	typedef std::map<std::string, boost::intrusive_ptr<ExportableResource>,
-            StringNoCaseLessThen > ExportMap;
+            StringNoCaseLessThan > ExportMap;
 	ExportMap _exportedResources;
 
 	// Mutex protecting access to _exportedResources

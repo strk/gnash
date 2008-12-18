@@ -1830,7 +1830,7 @@ TextField::autoSizeValueName(AutoSizeValue val)
 TextField::TypeValue
 TextField::parseTypeValue(const std::string& val)
 {
-    StringNoCaseLessThen cmp;
+    StringNoCaseLessThan cmp;
 
     if ( ! cmp(val, "input") )
     {
