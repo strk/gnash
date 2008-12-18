@@ -627,6 +627,7 @@ public:
     ///
     /// @return A real pointer to the base address of the raw data in memory.
     gnash::Network::byte_t *to_reference();
+    const gnash::Network::byte_t *to_reference() const;
 
     // Manipulate the name of a property
 
@@ -634,7 +635,7 @@ public:
     ///		Only top level Objects or properties have a name.
     ///
     /// @return The size of the name string.
-    size_t getNameSize();
+    size_t getNameSize() const;
     
     /// \brief Get the name of this Element.
     ///		Only top level Objects or properties have a name.
@@ -744,7 +745,7 @@ private:
     /// \var _buffer
     ///		A smart pointer to the Buffer used to hold the data
     ///		for this Element.
-    boost::shared_ptr<Buffer> _buffer;
+    boost::shared_ptr<amf::Buffer> _buffer;
 
     /// \var _type
     ///		The AMF0 data type of this Element.

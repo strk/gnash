@@ -181,6 +181,10 @@ do
         aclocalinclude="$ACLOCAL_FLAGS"
      fi
 
+     if test -d cygnal; then
+        aclocalinclude="-I cygnal ${aclocalinclude}"
+     fi
+
      if test -d libltdl/m4; then
         aclocalinclude="-I libltdl/m4 -I macros $ACLOCAL_FLAGS"
      fi

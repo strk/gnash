@@ -75,3 +75,7 @@ void registerSharedObjectNative(as_object& o);
 
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

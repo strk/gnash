@@ -82,7 +82,7 @@ public:
     /// \brief Test to see if the buffer has any data.
     ///
     /// @return true or false
-    bool empty() { return (_seekptr)?true:false; };
+    bool empty() { return (_seekptr) ? true : false; };
 
     /// \brief Resize the buffer that holds the data.
     ///		The new size of the current data is based on the
@@ -208,6 +208,13 @@ public:
     /// 
     /// @return A reference to a Buffer.
     Buffer &operator+=(double num);
+
+    /// \brief Append an integer to existing data in the buffer.
+    /// 
+    /// @param num A numeric integer value.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(boost::uint32_t length);
     /// \brief Append a short to existing data in the buffer.
     /// 
     /// @param num A numeric short value.
@@ -275,12 +282,14 @@ public:
     /// @return A real pointer to the base address of the Buffer.
     gnash::Network::byte_t *begin() { return _data.get() ; };
     gnash::Network::byte_t *reference() { return _data.get(); }
+    const gnash::Network::byte_t *reference() const { return _data.get(); }
+
     /// \brief Return the last address of the Buffer
     ///		Which is the base address plus the total size of the
     ///		Buffer.
     ///
-    /// @return A real pointer to the last address of the Buffer.
-    gnash::Network::byte_t *end() { return begin() + _nbytes; };
+    /// @return A real pointer to the last address of the Buffer with data.
+    gnash::Network::byte_t *end() { return _seekptr; };
 
     /// \brief Get the size of the Buffer.
     ///
@@ -297,6 +306,9 @@ public:
     ///
     /// @return The size of the Buffer.
     void setSize(size_t nbytes) { _nbytes = nbytes; };
+
+    /// \brief Set the real pointer to a block of Memory.
+    void setPointer(boost::uint8_t *ptr) { _data.reset(ptr); };
     
     /// \brief Test equivalance against another Buffer.
     ///		This compares all the data on the current Buffer with
@@ -331,6 +343,21 @@ public:
     /// @return The amoount of unused bytes in the Buffer.
     size_t spaceLeft() { return (_nbytes - (_seekptr - _data.get())); };
     
+    /// \brief How much room has been allocated before the seek pointer.
+    ///		This is primarily used to see if the buffer is fully
+    ///		populated with data before appending more.
+    ///
+    /// @return The amoount of unused bytes in the Buffer.
+    size_t allocated() { return (_seekptr - _data.get()); };
+
+    /// \brief Set the seek pointer
+    ///
+    /// @param ptr the real pointer to set the seek pointer to
+    ///
+    /// @return nothing
+    void setSeekPointer(boost::uint8_t *ptr) { _seekptr = ptr; };
+    void setSeekPointer(off_t offset) { _seekptr = _data.get() + offset; };
+    
     ///  \brief Dump the internal data of this class in a human readable form.
     ///		This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
@@ -347,6 +374,7 @@ public:
     ///	\brief This is the container of the actual data in this
     ///		Buffer.
     boost::scoped_array<gnash::Network::byte_t> _data;
+    
     /// \var _nbytes
     ///	\brief This is the total allocated size of the Buffer.
     size_t         _nbytes;

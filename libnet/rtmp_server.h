@@ -53,7 +53,7 @@ public:
 };
 
 // This is the thread for all incoming RTMP connections
-void rtmp_handler(Handler::thread_params_t *args);
+void rtmp_handler(Network::thread_params_t *args);
 
 } // end of gnash namespace
 // end of _RTMP_SERVER_H_

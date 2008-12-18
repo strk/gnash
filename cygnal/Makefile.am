@@ -53,20 +53,24 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
+        -I$(top_srcdir)/libmedia \
+        -I$(top_srcdir)/libsound \
         -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/asobj \
+        -I$(top_srcdir)/libcore/parser \
+        -I$(top_srcdir)/libcore/vm \
         -DLOCALEDIR=\"$(localedir)\" \
         $(LIBXML_CFLAGS) \
-		$(DMALLOC_CFLAGS) \
-		$(CURL_CFLAGS) \
-		$(BOOST_CFLAGS) \
-		$(PTHREAD_CFLAGS)
+	$(CURL_CFLAGS) \
+	$(BOOST_CFLAGS) \
+	$(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
 	crc.h
 
 bin_PROGRAMS = cygnal
 
-cygnal_SOURCES = cygnal.cpp crc.cpp
+cygnal_SOURCES = cygnal.cpp crc.cpp cvm.cpp
 cygnal_LDADD = $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support

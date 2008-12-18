@@ -12,3 +12,22 @@ set debuglog /tmp/cygnal-dbg.log
 
 # The Port offset to use when we're not root
 set portOffset 4000
+
+# The Document root where multimedia files live
+set documentroot /var/www/html
+
+# Don't start an admin thread
+set admin no
+
+# Do use a fully threaded server
+set threading yes
+
+# Do use a fully threaded server
+set testing yes
+
+# When running in threaded mode, this is the number of file descritors
+# watched by each thread
+set fdThread 10
+
+# Turn on debugging for network layer
+set netdebug no

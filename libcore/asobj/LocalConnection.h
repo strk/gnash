@@ -57,3 +57,7 @@ void localconnection_class_init(as_object& glob);
 // __LOCALCONNECTION_H__
 #endif
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

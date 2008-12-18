@@ -16,6 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <boost/cstdint.hpp>
 #include <iostream>
 
@@ -334,6 +338,19 @@ Buffer::operator+=(boost::uint16_t length)
     return append(ptr, sizeof(boost::uint16_t));
 }
 
+/// \brief Append an integer to existing data in the buffer.
+/// 
+/// @param num A numeric integer value.
+/// 
+/// @return A reference to a Buffer.
+Buffer &
+Buffer::operator+=(boost::uint32_t length)
+{
+//    GNASH_REPORT_FUNCTION;
+    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
+    return append(ptr, sizeof(boost::uint32_t));
+}
+
 /// \brief Append a Buffer class to existing data in the buffer.
 ///
 /// @param buf A Buffer class containing the data to append.
@@ -527,8 +544,8 @@ Buffer::remove(Network::byte_t c)
     }
     
     std::copy(start + 1, end(), start);
-//    *(end()) = 0;
-    _nbytes--;
+    *(end() - 1) = 0;
+    _seekptr--;
 
     return _data.get();
 }
@@ -548,7 +565,7 @@ Buffer::remove(int start)
 //    GNASH_REPORT_FUNCTION;
     std::copy((_data.get() + start + 1), end(), (_data.get() + start)),
 //    *end() = 0;
-    _nbytes--;
+    _seekptr--;
     return _data.get();
 }
 
@@ -563,7 +580,7 @@ Buffer::remove(int start)
 ///
 /// @param start The location of the byte to remove from the
 ///		Buffer
-/// @param range The amoiunt of bytes to remove from the Buffer.
+/// @param range The amount of bytes to remove from the Buffer.
 ///
 /// @return A real pointer to the base address of the Buffer.
 Network::byte_t *
@@ -572,7 +589,8 @@ Buffer::remove(int start, int range)
 //    GNASH_REPORT_FUNCTION;
     std::copy((_data.get() + range + 1), end(), (_data.get() + start)),
 //    *end() = 0;
-	_nbytes -= (range - start);
+	_seekptr -= range;
+    
     return _data.get();
 }
 
@@ -618,8 +636,16 @@ Buffer::resize()
 Buffer &
 Buffer::resize(size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     boost::scoped_array<gnash::Network::byte_t> tmp;
+
+    // If we don't have any data yet in this buffer, resizing is cheap, as
+    // we don't havce to copy any data.
+    if (_seekptr == _data.get()) {
+	_data.reset(new Network::byte_t[size]);
+	_nbytes= size;
+	return *this;
+    }
     
     if (_nbytes == 0) {
 	return init(size);
@@ -629,21 +655,32 @@ Buffer::resize(size_t size)
 	    return *this;
 	}
 
-	// Cache the number of bytes currently being held
-	size_t used = _seekptr - _data.get();
+	// check the sizes. If we had data read using ->reference(), the seekptr isn't
+	// increased, so in these cases we just copy al lthe data blindly, as it's
+	// better than loosing data.
+	size_t used = 0;
+	if (_seekptr != _data.get()) {
+	    used = _seekptr - _data.get();
+	} else {
+	    if (size < _nbytes) {
+		used = size;
+	    } else {
+		used = _nbytes;
+	    }
+	}
+	
 	
 	// Copy the existing data into the new block of memory. The data
 	// held currently is moved to the temporary array, and then gets
 	// deleted when this method returns.
-	tmp.swap(_data);
-	
 	// We loose data if we resize smaller than the data currently held.
 	if (size < used) {
-	    log_error("Truncating data (%d bytes) while resizing!", used - size);
+	    log_error("amf::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
 	    used = size;
 	}
-	_data.reset(new Network::byte_t[size]);
-	std::copy(tmp.get(), tmp.get() + used, _data.get());
+	Network::byte_t *newptr = new Network::byte_t[size];
+	std::copy(_data.get(), _data.get() + used, newptr);
+	_data.reset(newptr);
 	
 	// Make the seekptr point into the new space with the correct offset
 	_seekptr = _data.get() + used;
@@ -660,10 +697,11 @@ Buffer::resize(size_t size)
 void
 Buffer::dump(std::ostream& os) const
 {
-    os << "Buffer is " << _nbytes << " bytes at " << (void *)_data.get() << endl;
+    os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes at " << (void *)_data.get() << endl;
     if (_nbytes < 0xffff) {
-	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, false) << endl;
-	os << gnash::hexify((unsigned char *)_data.get(), _nbytes, true) << endl;
+	const size_t bytes = _seekptr - _data.get();
+	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
+	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;
     } else {
 	os << "ERROR: Buffer size out of range!" << endl;
 	abort();

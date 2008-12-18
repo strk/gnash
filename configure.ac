@@ -864,6 +864,7 @@ dnl by developers for tuning performance of memory allocations in Gnash.
 buffers=no
 que=no
 memory=no
+cache=yes
 AC_ARG_WITH(statistics,
   AC_HELP_STRING([--with-statistics=], [Specify which statistics features to enable]),
   if test -n ${withval}; then
@@ -892,11 +893,16 @@ AC_ARG_WITH(statistics,
         memory=yes
         nstatistics=$((nstatistics+1))
         ;;
+      cache)
+        cache=yes
+        nstatistics=$((nstatistics+1))
+        ;;
       all|ALL)
         buffers=yes
         memory=yes
         queu=yes
-        nstatistics=3
+        cache=yes
+        nstatistics=4           dnl this must be incremented if you add anything
         ;;
       *) AC_MSG_ERROR([invalid statistics feature specified: ${withval} given (accept: buffers|que|memory|all)])
         ;;
@@ -923,6 +929,12 @@ if test x${que} = xyes; then
   statistics_list="${statistics_list} queues"
   AC_DEFINE(USE_STATS_QUEUE, [1], [Support statistics collecting for the queues])
 fi
+
+if test x${cache} = xyes; then
+  statistics_list="${statistics_list} cache"
+  AC_DEFINE(USE_STATS_CACHE, [1], [Support statistics collecting for the cache])
+fi
+
 dnl this is just so Makefile can print the same list
 STATISTICS_LIST="$statistics_list"
 AC_SUBST(STATISTICS_LIST)
@@ -2042,6 +2054,7 @@ if test x"$BOOST_LIBS" != x; then
   fi
 fi
 
+CYGNAL_PATHS
 
 SUPPORTED_GUIS=
 if test x$build_qtopia = xyes; then
