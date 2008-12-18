@@ -1146,7 +1146,7 @@ Network::getPollFDPtr()
 void
 Network::erasePollFD(int fd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     log_debug("%s: erasing fd #%d from pollfds", __PRETTY_FUNCTION__, fd);
     boost::mutex::scoped_lock lock(_poll_mutex);
     if (_pollfds.size() > 0) {
@@ -1227,7 +1227,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
     while (ret--) {
 	for (int i = 0; i<limit; i++) {
 	    // If we get this event, the other end of the connection has been shut down
-#if 1
+#if 0
 	    if (fds[i].revents &POLLPRI ) {
 		log_debug("%s: Revents has a POLLPRI  set 0x%x for fd #%d",
 			  __FUNCTION__, fds[i].revents, fds[i].fd);
