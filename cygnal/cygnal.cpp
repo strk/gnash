@@ -131,6 +131,8 @@ const int ADMINPKTSIZE = 80;
 // These keep track of the number of active threads.
 ThreadCounter tids;
 
+map<int, Network *> networks;
+
 // end of globals
 
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -488,7 +490,6 @@ connection_handler(Network::thread_params_t *args)
     Network net;
     bool done = false;
     static int tid = 0;
-    map<int, Network *> networks;
     
     if (netdebug) {
 	net.toggleDebug(true);
@@ -569,8 +570,10 @@ connection_handler(Network::thread_params_t *args)
 		tids.increment();
 		tnet = new Network;
 		tnet->setFileFd(args->netfd);
+		targs->netfd = args->netfd;
 		targs->handler = tnet;
 		targs->filespec = docroot;
+		targs->tid = tid;
 	    } else {
 		log_debug("Not starting new HTTP thread, spawned already for tid #%d", tid);
 		tnet = networks[tid];
@@ -651,10 +654,14 @@ dispatch_handler(Network::thread_params_t *args)
 			// Call the protocol handler for this network connection
 			bool ret = net->getEntry(it->fd)(args);
 			log_debug("Handler returned %s", (ret) ? "true" : "false");
-			if (ret) {
-			    net->closeNet(it->fd);
-			    net->erasePollFD(it->fd);
-			}
+			// FIXME: we currently force a 'close connection' at the end
+			// of sending a file, since apache does too. This pretty much
+			// blows persistance,
+//			if (ret) {
+			networks[args->tid] = 0;
+			net->closeNet(it->fd);
+			net->erasePollFD(it->fd);
+//			}
 		    }
 // 		    if (!crcfile.getThreadingFlag()) {
 // 			hand->die();
@@ -682,7 +689,8 @@ dispatch_handler(Network::thread_params_t *args)
 	    }
         }
     } while (!done);
-    
+
+//    network[];
     tids.decrement();
     
 } // end of dispatch_handler
