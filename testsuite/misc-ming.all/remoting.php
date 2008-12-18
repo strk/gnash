@@ -172,9 +172,13 @@ function echo_main() {
 			$unsent[] = raw($answer);
 		} else {
 			$num_replies += 1;
-			$reply .= make_string($request_id . '/onResult');
-			$reply .= make_string('null');
-			$reply .= "\377\377\377\377"; # should be size of reply in bytes, but this works
+			if ( $message_name == 'fail' ) {
+				$reply .= make_string($request_id . '/onStatus');
+			} else {
+				$reply .= make_string($request_id . '/onResult');
+			}
+			$reply .= make_string('null'); # any string works here, even the empty one
+			$reply .= "\377\377\377\377";  # should be size of reply in bytes, but this works. all zeros also work.
 			$reply .= $answer;
 		}
 		

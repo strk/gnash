@@ -24,7 +24,7 @@ rcsid="remoting.as - <bzr revno here>";
 endOfTest = function()
 {
 	//note("END OF TEST");
-	check_totals(104);
+	check_totals(109);
 	play();
 };
 
@@ -52,8 +52,9 @@ function ResultHandler() {
     };
     this.onCustom = function(result) {
         note('default onCustom called with args: '+dumpObject(arguments));
-        //this.onResult(arguments[0]);
-	    //this.customResult = arguments;
+    };
+    this.onDebugEvents = function(result) {
+        note('default onDebugEvents called with args: '+dumpObject(arguments));
     };
     this.onStatus = function(result) {
 	    note("default onStatus called with args: "+dumpObject(arguments));
@@ -369,6 +370,20 @@ function test16()
         check_equals(res.remote_port, connectionPort);
         check_equals(res.request_id, '/7');
         check_equals(res.message, 'toString');
+        check_equals(res.arg_count, '0');
+        check_equals(res.hex, '0a:00:00:00:00');
+    };
+
+    o=new ResultHandler();
+    nc.call('fail', o);
+    o.onResult = function(res) {
+        fail("onResult unexpectedly called");
+        test17();
+    };
+    o.onStatus = function(res) {
+        check_equals(res.remote_port, connectionPort);
+        check_equals(res.request_id, '/8');
+        check_equals(res.message, 'fail');
         check_equals(res.arg_count, '0');
         check_equals(res.hex, '0a:00:00:00:00');
         test17();

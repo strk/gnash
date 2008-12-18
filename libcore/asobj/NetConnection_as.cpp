@@ -319,14 +319,25 @@ public:
                             while(b < end) {
                                 if(b + 2 > end) break;
                                 si = readNetworkShort(b); b += 2; // reply length
-                                if(si < 11) {
+                                if(si < 4) { // shorted valid response is '/1/a'
                                     log_error("NetConnection::call(): reply message name too short");
                                     break;
                                 }
                                 if(b + si > end) break;
-                                // TODO check that the last 9 bytes are "/onResult"
-                                // this should either split on the 2nd / or require onResult or onStatus
-                                std::string id(reinterpret_cast<char*>(b), si - 9);
+
+                                // Reply message is: '/id/methodName'
+
+                                int ns = 1; // next slash position
+                                while (ns<si-1 && *(b+ns) != '/') ++ns;
+                                if ( ns >= si-1 ) {
+                                    std::string msg(reinterpret_cast<char*>(b), si);
+                                    log_error("NetConnection::call(): invalid reply message name (%s)", msg);
+                                    break;
+                                }
+
+                                std::string id(reinterpret_cast<char*>(b), ns);
+                                std::string methodName(reinterpret_cast<char*>(b+ns+1), si-ns-1);
+
                                 b += si;
 
                                 // parse past unused string in header
@@ -369,18 +380,30 @@ public:
                                 // if actionscript specified a callback object, call it
                                 boost::intrusive_ptr<as_object> callback = pop_callback(id);
                                 if(callback) {
+
+                                    string_table::key methodKey;
+                                    if ( methodName == "onResult" ) {
+                                        methodKey = NSV::PROP_ON_RESULT;
+                                    } else if ( methodName == "onStatus" ) {
+                                        methodKey = NSV::PROP_ON_STATUS;
+                                    } else {
+                                        // NOTE: the pp is known to actually invoke the custom
+                                        //       method, but with 7 undefined arguments (?)
+                                        //methodKey = _nc.getVM().getStringTable().find(methodName);
+                                        log_error("Unsupported HTTP Remoting response callback: '%s' (size %d)", methodName, methodName.size());
+                                        continue;
+                                    }
+
 #ifdef GNASH_DEBUG_REMOTING
                                     log_debug("calling onResult callback");
 #endif
                                     // FIXME check if above line can fail and we have to react
-                                    callback->callMethod(NSV::PROP_ON_RESULT, reply_as_value);
+                                    callback->callMethod(methodKey, reply_as_value);
 #ifdef GNASH_DEBUG_REMOTING
                                     log_debug("callback called");
 #endif
                                 } else {
-#ifdef GNASH_DEBUG_REMOTING
-                                    log_debug("couldn't find callback object");
-#endif
+                                    log_error("Unknown HTTP Remoting response identifier '%s'", id);
                                 }
                             }
                         }
