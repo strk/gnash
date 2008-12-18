@@ -307,7 +307,8 @@ HTTP::processPostRequest(int fd)
 	return false;
     }
     clearHeader();
-    gnash::Network::byte_t *data = processHeaderFields(*buf);
+//    gnash::Network::byte_t *data = processHeaderFields(*buf);
+    processHeaderFields(*buf);
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
     amf::Buffer content (length);
     cerr << __PRETTY_FUNCTION__ << " : " << content.size() << endl;
@@ -337,7 +338,7 @@ HTTP::processPostRequest(int fd)
 //	const char *num = (const char *)buf->at(10);
 	log_debug("Got CGI echo request in POST");
 //	cerr << hexify(content.reference(), content.allocated(), true) << endl;
-	amf::Buffer &reply = formatEcho("1", content); // FIXME:
+	amf::Buffer &reply = formatEchoResponse("1", content); // FIXME:
 	writeNet(fd, reply);
     } else {
 	amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTP::OK);
@@ -1061,67 +1062,68 @@ HTTP::formatPostReply(rtmpt_cmd_e /* code */)
     return _buffer;
 }
 
-// format a response to the 'echo' test used for testing Gnash. This
-// is only used for testing by developers.
-amf::Buffer &
-HTTP::formatEcho(const std::string &num, amf::Buffer &data)
+// Parse an Echo Request message coming from the Red5 echo_test. This
+// method should only be used for testing purposes.
+vector<boost::shared_ptr<amf::Element > >
+HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
+    
+    vector<boost::shared_ptr<amf::Element > > headers;
+	
+    // skip past the header bytes, we don't care about them.
+    boost::uint8_t *tmpptr = data + 6;
+    
+    boost::uint16_t length;
+    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+    tmpptr += sizeof(boost::uint16_t);
+
+    // Get the first name, which is a raw string, and not preceded by
+    // a type byte.
+    boost::shared_ptr<amf::Element > el1(new amf::Element);
+    el1->setName(tmpptr, length);
+    tmpptr += length;
+    headers.push_back(el1);
+    
+    // Get the second name, which is a raw string, and not preceded by
+    // a type byte.
+    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+    tmpptr += sizeof(boost::uint16_t);
+    boost::shared_ptr<amf::Element > el2(new amf::Element);
+    el2->setName(tmpptr, length);
+    headers.push_back(el2);
+    tmpptr += length;
+
+    // Get the last two pieces of data, which are both AMF encoded
+    // with a type byte.
+    amf::AMF amf;
+    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
+    headers.push_back(el3);
+    tmpptr += amf.totalsize();
+    boost::shared_ptr<amf::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
+    headers.push_back(el4);
+
+     return headers;
+}
+
+// format a response to the 'echo' test used for testing Gnash. This
+// is only used for testing by developers. The format appears to be
+// two strings, followed by a double, followed by the "onResult".
+amf::Buffer &
+HTTP::formatEchoResponse(const std::string &num, amf::Buffer &data)
+{
+    GNASH_REPORT_FUNCTION;
     Network::byte_t *tmpptr = data.reference();
     amf::Buffer fixme("00 00 00 00 00 01 00 0b");
     amf::Buffer fixme1("00 04");
     amf::Buffer fixme2("ff ff ff ff");
     amf::Buffer fixme3("01 00");
     string null = "null";
-
-    tmpptr += 6;
-//    cerr << hexify(tmpptr, 6, true) << endl;
     
-    boost::uint16_t length;
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    cerr << "LENGTH 1 = " << length <<  endl;
-    if (length >= amf::SANE_STR_SIZE) {
-	log_error("%d bytes for a string is over the safe limit of %d",
-		  length, amf::SANE_STR_SIZE);
-    }
-    // Get the method, example "echo"
-    tmpptr += sizeof(boost::uint16_t);
-//     cerr << hexify(tmpptr, length, false) << endl;
-//     cerr << hexify(tmpptr, length, true) << endl;
-    std::string str1(reinterpret_cast<const char *>(tmpptr), length);
-//     char *str1 = new char[length+1];
-//     memset(str1, 0, length+1);
-//     memcpy(str1, reinterpret_cast<char *>(tmpptr), length);
-//     cerr << "NAME 1 = " << str1 <<  endl;
-    tmpptr += length;
-//    Element el1("null", fixme2);
-// Get the instance number, example "/1"
-    length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-    tmpptr += sizeof(boost::uint16_t);
-     cerr << hexify(tmpptr, length, false) << endl;
-     cerr << hexify(tmpptr, length, true) << endl;
-    cerr << "LENGTH 2 = " << length << endl;
-    std::string str2(reinterpret_cast<const char *>(tmpptr), length);
-//    char *str2 = new char[length+1];
-//    memset(str2, 0, length+1);
-//     memcpy(str2, reinterpret_cast<char *>(tmpptr), length);
-     cerr << "NAME 2 = " << str2 <<  endl;
-    tmpptr += length;
-    string res = str2;
-    res += "/onResult";
-
-    // Get the mystery number
-    double mysnum = *reinterpret_cast<const double*>(tmpptr);
-    tmpptr += sizeof(double) + 1;
-
-    // Get the actual data
-    size_t insize = data.spaceLeft() - 1;
-    size_t size = res.size() + insize + fixme.size() + null.size() + fixme2.size();
-    size = 31;
-
     _buffer = "HTTP/1.1 200 OK\r\n";
     formatContentType(DiskStream::FILETYPE_AMF);
-    formatContentLength(size);
+    formatContentLength(data.size());
+    
     // Pretend to be Red5 server
     formatServer("Jetty(6.1.7)");
     
@@ -1132,7 +1134,7 @@ HTTP::formatEcho(const std::string &num, amf::Buffer &data)
     _buffer += fixme;
 
     // Add the response
-    _buffer += res;
+//    _buffer += res;
 
     // Add the NULL name for this property
     _buffer += fixme1;
@@ -1141,9 +1143,9 @@ HTTP::formatEcho(const std::string &num, amf::Buffer &data)
     // Add the other binary blob
     _buffer += fixme2;
 
-    cerr << "FIXME: " << hexify(tmpptr, 6, false) << endl;
+//    cerr << "FIXME: " << hexify(tmpptr, 6, false) << endl;
     // Add the AMF data we're echoing back
-    _buffer.append(tmpptr, insize);
+//    _buffer.append(tmpptr, insize);
 //    _buffer += fixme3;
     
     return _buffer;

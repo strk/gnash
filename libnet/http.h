@@ -140,6 +140,10 @@ public:
     bool checkEntityFields(amf::Buffer &buf);
     bool checkGeneralFields(amf::Buffer &buf);
 
+    // Parse an Echo Request message coming from the Red5 echo_test.
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
@@ -147,7 +151,7 @@ public:
     
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
-    size_t NumOfFields() { _fields.size(); };
+    size_t NumOfFields() { return _fields.size(); };
     void clearFields() { _fields.clear(); };
 
     // Get an array of values for header field 'name'.
@@ -200,7 +204,7 @@ public:
     amf::Buffer &formatHeader(http_status_e type);
     amf::Buffer &formatRequest(const std::string &url, http_method_e req);
     // format a response to the 'echo' test used for testing Gnash.
-    amf::Buffer &formatEcho(const std::string &num, amf::Buffer &data);
+    amf::Buffer &formatEchoResponse(const std::string &num, amf::Buffer &data);
 
     amf::Buffer &formatMethod(const std::string &data)
  	{return formatCommon("Method: " + data); };
