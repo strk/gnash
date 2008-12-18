@@ -35,8 +35,9 @@ class DSOEXPORT ThreadCounter
     void decrement() { boost::mutex::scoped_lock lk(_tid_mutex); --_tids; };
     int num_of_tids() { return _tids; };
   private:
-    boost::mutex _tid_mutex;
-    int _tids;
+    boost::mutex  _tid_mutex;
+    int           _tids;
+    boost::thread _tid_handle;
 };
   
 // End of gnash namespace 
