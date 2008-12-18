@@ -16,10 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_SELECTION_H__
-#define __GNASH_ASOBJ_SELECTION_H__
-
-#include <memory> // for auto_ptr
+#ifndef GNASH_ASOBJ_SELECTION_H
+#define GNASH_ASOBJ_SELECTION_H
 
 namespace gnash {
 
@@ -28,11 +26,10 @@ class as_object;
 /// Initialize the global Selection class
 void selection_class_init(as_object& global);
 
-/// Return a Selection instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_selection_instance();
+/// Register native selection methods
+void registerSelectionNative(as_object& global);
   
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_SELECTION_H__
 #endif
 

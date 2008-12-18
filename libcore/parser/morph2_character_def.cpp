@@ -26,7 +26,6 @@
 #include "SWFStream.h"
 #include "render.h"
 #include "movie_definition.h"
-#include "bitmap_character_def.h"
 #include "MovieClip.h"
 
 

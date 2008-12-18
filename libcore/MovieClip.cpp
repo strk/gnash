@@ -27,7 +27,8 @@
 #include "movie_definition.h"
 #include "as_value.h"
 #include "as_function.h"
-#include "TextField.h" // for registered variables
+#include "Bitmap.h"
+#include "TextField.h"
 #include "ControlTag.h"
 #include "fn_call.h"
 #include "Key_as.h"
@@ -53,8 +54,10 @@
 #include "styles.h" // for cap_style_e and join_style_e enums
 #include "PlaceObject2Tag.h" 
 #include "NetStream_as.h"
+#include "flash/display/BitmapData_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
+
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -66,6 +69,7 @@
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/bind.hpp>
 
 namespace gnash {
 
@@ -93,7 +97,6 @@ namespace {
     void attachMovieClipProperties(character& o);
 
     as_value movieclip_transform(const fn_call& fn);
-    as_value movieclip_blendMode(const fn_call& fn);
     as_value movieclip_scale9Grid(const fn_call& fn);
     as_value movieclip_attachVideo(const fn_call& fn);
     as_value movieclip_attachAudio(const fn_call& fn);
@@ -347,7 +350,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     //             care of these ?
     //             Duplicates code in character::get_path_element_character too..
     //
-    if (name_key == NSV::PROP_uROOT)
+    if (getSWFVersion() > 4 && name_key == NSV::PROP_uROOT)
     {
 
         // getAsRoot() will take care of _lockroot
@@ -492,7 +495,8 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 //
 /// The frame_spec could be an integer or a string.
 ///
-void MovieClip::call_frame_actions(const as_value& frame_spec)
+void
+MovieClip::call_frame_actions(const as_value& frame_spec)
 {
     size_t frame_number;
     if ( ! get_frame_number(frame_spec, frame_number) )
@@ -534,7 +538,8 @@ void MovieClip::call_frame_actions(const as_value& frame_spec)
 
 }
 
-character* MovieClip::add_empty_movieclip(const char* name, int depth)
+character*
+MovieClip::add_empty_movieclip(const char* name, int depth)
 {
     // empty_movieclip_def will be deleted during deleting movieclip
     sprite_definition* empty_sprite_def =
@@ -624,7 +629,6 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     return newmovieclip; 
 }
 
-/* public */
 void
 MovieClip::queueAction(const action_buffer& action)
 {
@@ -632,7 +636,6 @@ MovieClip::queueAction(const action_buffer& action)
     root.pushAction(action, boost::intrusive_ptr<MovieClip>(this));
 }
 
-/* private */
 void
 MovieClip::queueActions(ActionList& actions)
 {
@@ -750,7 +753,7 @@ MovieClip::on_event(const event_id& id)
     }
 
     // Check for member function.
-    if( ! id.is_key_event ())
+    if (! id.is_key_event ())
     {
         boost::intrusive_ptr<as_function> method = 
             getUserDefinedEventHandler(id.get_function_key());
@@ -1282,6 +1285,22 @@ MovieClip::attachCharacter(character& newch, int depth, as_object* initObject)
     return true; 
 }
 
+std::auto_ptr<GnashImage>
+MovieClip::drawToBitmap(const SWFMatrix& mat, const cxform& cx,
+        character::BlendMode bm, const rect& clipRect, bool smooth)
+{
+    return std::auto_ptr<GnashImage>();
+}
+
+void
+MovieClip::attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth)
+{
+    character* ch = new Bitmap(bd, this, 0);
+
+    attachCharacter(*ch, depth, 0);
+
+}
+
 character*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
@@ -1311,6 +1330,11 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     {
         std::string instance_name = getNextUnnamedInstanceName();
         ch->set_name(instance_name);
+    }
+
+    if (tag->hasBlendMode()) {
+        boost::uint8_t bm = tag->getBlendMode();
+        ch->setBlendMode(static_cast<character::BlendMode>(bm));
     }
 
     // Attach event handlers (if any).
@@ -1410,13 +1434,16 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
     } 
 }
 
-void MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+void
+MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag,
+        DisplayList& dlist)
 {
     set_invalidated();
     dlist.remove_character(tag->getDepth());
 }
 
-void MovieClip::replace_display_object(character* ch, int depth, 
+void
+MovieClip::replace_display_object(character* ch, int depth, 
         bool use_old_cxform, bool use_old_matrix)
 {
     assert(ch);
@@ -1424,14 +1451,16 @@ void MovieClip::replace_display_object(character* ch, int depth,
             use_old_cxform, use_old_matrix);
 }
 
-int MovieClip::get_id_at_depth(int depth)
+int
+MovieClip::get_id_at_depth(int depth)
 {
     character* ch = m_display_list.get_character_at_depth(depth);
     if ( ! ch ) return -1;
     return ch->get_id();
 }
 
-void MovieClip::increment_frame_and_check_for_loop()
+void
+MovieClip::increment_frame_and_check_for_loop()
 {
     size_t frame_count = get_loaded_frames(); 
     if ( ++m_current_frame >= frame_count )
@@ -1445,11 +1474,24 @@ void MovieClip::increment_frame_and_check_for_loop()
         }
     }
 
-#if 0 // debugging
-    log_debug(_("Frame %u/%u, bytes %u/%u"),
-        m_current_frame, frame_count,
-        get_bytes_loaded(), get_bytes_total());
-#endif
+}
+
+bool
+MovieClip::handleFocus()
+{
+
+    // For SWF6 and above: the MovieClip can always receive focus if
+    // focusEnabled evaluates to true.
+    if (_vm.getSWFVersion() > 5) {
+        as_value focusEnabled;
+        if (get_member(NSV::PROP_FOCUS_ENABLED, &focusEnabled)) {
+            if (focusEnabled.to_bool() == true) return true; 
+        }
+    }
+        
+    // If focusEnabled doesn't evaluate to true or for SWF5, return true
+    // only if at least one mouse event handler is defined.
+    return can_handle_mouse_event();
 }
 
 /// Find a character hit by the given coordinates.
@@ -1518,9 +1560,6 @@ public:
 
         if ( ch->isMaskLayer() )
         {
-            //if ( ! ch->get_visible() ) {
-            //    log_debug("invisible mask in MouseEntityFinder.");
-            //}
             if ( ! ch->pointInShape(_wp.x, _wp.y) )
             {
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
@@ -1543,7 +1582,7 @@ public:
             return;
         }
 
-        if ( ! ch->get_visible() ) return;
+        if ( ! ch->isVisible() ) return;
 
         _candidates.push_back(ch);
 
@@ -1697,7 +1736,7 @@ MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 bool
 MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 {
-    if ( ! get_visible() ) return false;
+    if ( ! isVisible() ) return false;
     if ( isDynamicMask() && ! can_handle_mouse_event() )
     {
         // see testsuite/misc-ming.all/masks_test.swf
@@ -1708,7 +1747,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
         return false;
     }
     character* mask = getMask(); // dynamic one
-    if ( mask && mask->get_visible() && ! mask->pointInShape(x, y) )
+    if ( mask && mask->isVisible() && ! mask->pointInShape(x, y) )
     {
 #ifdef GNASH_DEBUG_HITTEST
         log_debug(_("%s is dynamically masked by %s, which "
@@ -1755,10 +1794,7 @@ MovieClip::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
 
-    if (get_visible() == false)
-    {
-        return NULL;
-    }
+    if (!isVisible()) return 0;
 
     // point is in parent's space, we need to convert it in world space
     point    wp(x, y);
@@ -1850,7 +1886,7 @@ public:
 
         if ( ch->isMaskLayer() )
         {
-            if ( ! ch->get_visible() )
+            if ( ! ch->isVisible() )
             {
                 log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
             }
@@ -1910,7 +1946,7 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 {
     if ( this == dragging ) return 0; // not here...
 
-    if ( ! get_visible() ) return 0; // isn't me !
+    if ( ! isVisible() ) return 0; // isn't me !
 
     DropTargetFinder finder(x, y, dragging);
     m_display_list.visitAll(finder);
@@ -2090,7 +2126,7 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
     // nothing to do if this movieclip is not visible
-    if (!m_visible || get_cxform().is_invisible() )
+    if (!isVisible() || get_cxform().is_invisible() )
     {
         ranges.add(m_old_invalidated_ranges); // (in case we just hided)
         return;
@@ -2114,13 +2150,6 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 
     _drawable_inst->add_invalidated_bounds(ranges, force||m_invalidated);
 
-}
-
-void 
-MovieClip::dump_character_tree(const std::string prefix) const
-{
-    character::dump_character_tree(prefix);
-    m_display_list.dump_character_tree(prefix+" ");
 }
 
 
@@ -2951,8 +2980,8 @@ attachMovieClipInterface(as_object& o)
                     movieclip_lineGradientStyle));
         o.init_member("attachBitmap", new builtin_function(
                     movieclip_attachBitmap));
-        o.init_property("blendMode", &movieclip_blendMode,
-                &movieclip_blendMode);
+        o.init_property("blendMode", &character::blendMode,
+                &character::blendMode);
         o.init_property("cacheAsBitmap", &movieclip_cacheAsBitmap, 
                 &movieclip_cacheAsBitmap);
         o.init_property("filters", &movieclip_filters, &movieclip_filters);
@@ -3076,23 +3105,12 @@ movieclip_removeMovieClip(const fn_call& fn)
 
 
 as_value
-movieclip_blendMode(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> movieclip =
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(movieclip);
-    log_unimpl(_("MovieClip.blendMode()"));
-    return as_value();
-}
-
-
-as_value
 movieclip_cacheAsBitmap(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.cacheAsBitmap()"));
+    LOG_ONCE( log_unimpl(_("MovieClip.cacheAsBitmap()")) );
     return as_value();
 }
 
@@ -3103,7 +3121,7 @@ movieclip_filters(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.filters()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.filters()")));
     return as_value();
 }
 
@@ -3446,7 +3464,7 @@ movieclip_swapDepths(const fn_call& fn)
 
         // Check we're not swapping the our own depth so
         // to avoid unecessary bounds invalidation and immunizing
-        // the instance from subsequent PlaceObjec tags attempting
+        // the instance from subsequent PlaceObject tags attempting
         // to transform it.
         if ( movieclip->get_depth() == target_depth )
         {
@@ -5050,7 +5068,6 @@ movieclip_startDrag(const fn_call& fn)
 
     movieclip->getVM().getRoot().set_drag_state(st);
 
-    log_debug("MovieClip.startDrag() TESTING");
     return as_value();
 }
 
@@ -5060,11 +5077,9 @@ movieclip_stopDrag(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> movieclip = 
         ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(movieclip);
 
     movieclip->getVM().getRoot().stop_drag();
 
-    log_debug("MovieClip.stopDrag() TESTING");
     return as_value();
 }
 
@@ -5105,10 +5120,34 @@ movieclip_lineGradientStyle(const fn_call& fn)
 as_value
 movieclip_attachBitmap(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-    LOG_ONCE( log_unimpl (__FUNCTION__) );
+
+    GNASH_REPORT_FUNCTION;
+
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
+
+    if (fn.nargs < 2) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: expected 2 args, got %d",
+                fn.nargs);
+        );
+        return as_value();
+    }
+
+    as_object* obj = fn.arg(0).to_object().get();
+    boost::intrusive_ptr<BitmapData_as> bd = dynamic_cast<BitmapData_as*>(obj);
+
+    if (!bd) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_debug("MovieClip.attachBitmap: first argument should be a "
+                "BitmapData", fn.arg(1));
+        );
+        return as_value();
+    }
+
+    int depth = fn.arg(1).to_int();
+
+    ptr->attachBitmap(bd, depth);
+
     return as_value();
 }
 
@@ -5303,10 +5342,6 @@ attachMovieClipProperties(character& o)
     if ( ! o.get_parent() ) o.init_member( "$version",
             VM::get().getPlayerVersion(), 0); 
 
-    //
-    // Properties (TODO: move to appropriate SWF version section)
-    //
-    
     as_c_function_ptr gettersetter;
 
     gettersetter = character::x_getset;
@@ -5394,5 +5429,7 @@ getMovieClipInterface()
 }
 
 } // anonymous namespace
+
+
 
 } // namespace gnash

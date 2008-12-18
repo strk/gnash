@@ -18,8 +18,6 @@
 #ifndef GNASH_PROPERTYLIST_H
 #define GNASH_PROPERTYLIST_H
 
-#include "dsodefs.h" // DSOEXPORT
-
 #include "Property.h" // for templated functions
 #include "as_prop_flags.h" // for templated functions
 #include "as_value.h" // for templated functions
@@ -109,7 +107,7 @@ public:
 	/// @param visitor
 	///	The visitor function. Must take a string_table::key 
 	///	reference as first argument and a const as_value reference
-	///	as second argument.
+	///	as second argument. Scan by enumeration order.
 	///
 	/// @param this_ptr
 	///	The object reference used to extract values from properties.
@@ -117,8 +115,9 @@ public:
 	template <class V>
 	void visitValues(V& visitor, const as_object& this_ptr) const
 	{
-		for (container::const_iterator it = _props.begin(),
-			itEnd = _props.end(); it != itEnd; ++it)
+        typedef container::nth_index<1>::type ContainerByOrder;
+        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
+            ie=_props.get<1>().rend(); it != ie; ++it)
 		{
 			as_value val = it->getValue(this_ptr);
 			visitor.accept(it->mName, val);
@@ -129,7 +128,7 @@ public:
 	//
 	/// The method will invoke the given visitor method
 	/// passing it two arguments: name of the property and
-	/// value of it.
+	/// value of it. Scan by enumeration order.
 	///
 	/// @param visitor
 	///	The visitor function. Must take a string_table::key 
@@ -142,14 +141,27 @@ public:
 	template <class V>
 	void visitNonHiddenValues(V& visitor, const as_object& this_ptr) const
 	{
-		for (container::const_iterator it = _props.begin(),
-			itEnd = _props.end(); it != itEnd; ++it)
+        typedef container::nth_index<1>::type ContainerByOrder;
+        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
+            ie=_props.get<1>().rend(); it != ie; ++it)
 		{
 	        if (it->getFlags().get_dont_enum()) continue;
 			as_value val = it->getValue(this_ptr);
 			visitor.accept(it->mName, val);
 		}
 	}
+
+    /// Is any non-hidden property in this list ?
+    bool hasNonHiddenProperties() const
+    {
+        typedef container::nth_index<1>::type ContainerByOrder;
+        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
+            ie=_props.get<1>().rend(); it != ie; ++it)
+		{
+	        if (! it->getFlags().get_dont_enum()) return true;
+        }
+        return false;
+    }
 
 
 	/// Get the as_value value of a named property
@@ -458,6 +470,7 @@ public:
 	/// \brief
 	/// Enumerate all non-hidden properties pushing
 	/// their keys to the given as_environment.
+    /// Follows enumeration order.
 	///
 	/// @param donelist
 	/// Don't enumerate those in donelist. Add those done to donelist.
@@ -467,6 +480,7 @@ public:
 	/// \brief
 	/// Enumerate all non-hidden properties inserting
 	/// their name/value pair to the given SortedPropertyList.
+    /// Follows enumeration order.
 	///
 	/// @param this_ptr
 	/// 	The as_object used to set the 'this' pointer
@@ -497,6 +511,9 @@ public:
 	///	Note that the PropertyList itself might be changed
 	///	from this call, accessed trough the 'this' pointer,
 	///	so this method too is non-const.
+    ///
+    /// This does not reflect the normal enumeration order. It is sorted
+    /// lexicographically by property.
 	///
 	void dump(as_object& this_ptr);
 
@@ -513,12 +530,15 @@ public:
 	///	Note that the PropertyList itself might be changed
 	///	from this call, accessed trough the 'this' pointer,
 	///	so this method too is non-const.
+    ///
+    /// This does not reflect the normal enumeration order. It is sorted
+    /// lexicographically by property.
 	///
 	void dump(as_object& this_ptr, std::map<std::string, as_value>& to);
 
 	/// Mark all simple properties, getters and setters
 	/// as being reachable (for the GC)
-	void DSOEXPORT setReachable() const;
+	void setReachable() const;
 
 private:
 	container _props;

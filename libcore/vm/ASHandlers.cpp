@@ -1004,6 +1004,16 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
     }
 
     top_value = thread.getVariable(var_string);
+    if ( env.get_version() < 5 && top_value.is_sprite() )
+    {
+        // See http://www.ferryhalim.com/orisinal/g2/penguin.htm
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Can't assign a sprite/character to a variable in SWF%d. "
+                    "We'll return undefined instead of %s."),
+                    env.get_version(), top_value);
+        );
+        top_value.set_undefined();
+    }
 
     IF_VERBOSE_ACTION
     (
@@ -1023,6 +1033,15 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
     as_environment& env = thread.env;
 
     const std::string& name = env.top(1).to_string();
+    if ( name.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS (
+            // Invalid object, can't set.
+            log_aserror(_("ActionSetVariable: %s=%s: variable name evaluates to invalid (empty) string"),
+                env.top(1),
+                env.top(0));
+        );
+    }
     thread.setVariable(name, env.top(0));
 
     IF_VERBOSE_ACTION (
@@ -1996,13 +2015,12 @@ SWFHandlers::ActionPushData(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     size_t pc = thread.getCurrentPC();
-    boost::int16_t length = code.read_int16(pc+1);
-    assert( length >= 0 ); // TODO: trigger this with a testcase !
+    boost::uint16_t length = code.read_uint16(pc+1);
 
     //---------------
     size_t i = pc;
     size_t count = 0;
-    while (i - pc < static_cast<size_t>(length)) {
+    while (i - pc < length) {
         int id=0; // for dict (constant pool) lookup
                   // declared here because also used
               // by verbose action output
@@ -2919,7 +2937,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 
     const int nmembers = env.pop().to_int();
 
-    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance().release());
+    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance());
 
     // Set provided members
     for (int i = 0; i < nmembers; ++i) {
@@ -3236,7 +3254,17 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
-    if (obj)
+    if ( member_name.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS (
+            // Invalid object, can't set.
+            log_aserror(_("ActionSetMember: %s.%s=%s: member name evaluates to invalid (empty) string"),
+                env.top(2),
+                env.top(1),
+                env.top(0));
+        );
+    }
+    else if (obj)
     {
         thread.setObjectMember(*(obj.get()), member_name, member_value);
 

@@ -194,7 +194,6 @@ public:
     ///		the common form.
     amf::Buffer &formatCommon(const std::string &data);
 
-
     amf::Buffer &formatHeader(DiskStream::filetype_e type, size_t filesize,
 			    http_status_e code);
     amf::Buffer &formatHeader(size_t filesize, http_status_e type);

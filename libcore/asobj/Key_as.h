@@ -37,7 +37,7 @@ namespace gnash {
  *
  ************************************************************************/
 
-class DSOEXPORT Key_as : public as_object
+class Key_as : public as_object
 {
 
 protected:

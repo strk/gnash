@@ -15,23 +15,35 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "bitmap_character_def.h"
-#include "gnash.h" // for bitmap_info
-#include "render.h" // createBitmapInfo
-#include "GnashImage.h" // GnashImage
 
-#include <vector>
-#include <string>
-#include <cassert>
-#include <memory> // for auto_ptr
+#ifndef GNASH_BITMAP_INFO_H
+#define GNASH_BITMAP_INFO_H
 
+#include "ref_counted.h" // for inheritance
+#include "dsodefs.h"
 
 namespace gnash {
 
-bitmap_character_def::bitmap_character_def(std::auto_ptr<GnashImage> image)
-	:
- 	_bitmap_info ( gnash::render::createBitmapInfo(image) )
+/// Your render_handler creates BitmapInfos for gnash.  You
+/// need to subclass BitmapInfo in order to add the
+/// information and functionality your app needs to render
+/// using textures.
+class DSOEXPORT BitmapInfo : public ref_counted
 {
-}
+public:
 
-} // namespace gnash
+	BitmapInfo() {}
+
+    virtual ~BitmapInfo() {}
+};
+	
+
+}	// namespace gnash
+
+#endif // GNASH_BITMAP_INFO_H
+
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

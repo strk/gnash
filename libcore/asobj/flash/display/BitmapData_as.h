@@ -31,13 +31,15 @@ namespace gnash {
 
 class as_function;
 class as_object;
+class Bitmap;
+
 
 class BitmapData_as: public as_object
 {
 
-    typedef std::vector<boost::uint32_t> BitmapArray;
-
 public:
+
+    typedef std::vector<boost::uint32_t> BitmapArray;
 
     // The constructor sets the fill colour and the
     // immutable size of the bitmap, as well as whether
@@ -57,14 +59,26 @@ public:
     // Returns an unsigned int representation of the pixel
     // at (x, y) either with or without transparency.
     boost::int32_t getPixel(int x, int y, bool transparency) const;
-    
+
+    void update(const boost::uint8_t* data);
+
     // Fill the bitmap with a colour starting at x, y
     void fillRect(int x, int y, int w, int h, boost::uint32_t color);
     
     // Free the bitmap data (clear the array)
     void dispose();
 
+    void registerBitmap(Bitmap* bitmap) {
+        _attachedBitmaps.push_back(bitmap);
+    }
+
+protected:
+
+    void markReachableResources() const;
+
 private:
+
+    void updateAttachedBitmaps();
 
     // The width of the image, max 2880. This is immutable.
     const size_t _width;
@@ -78,7 +92,9 @@ private:
     // A static array of 32-bit values holding the actual bitmap data.
     // The maximum size is 2880 x 2880 * 4 bytes = 33177600 bytes.
     BitmapArray _bitmapData;
-    
+
+    std::list<Bitmap*> _attachedBitmaps;
+
 };
 
 
@@ -89,5 +105,4 @@ as_function* getFlashDisplayBitmapDataConstructor();
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_BITMAPDATA_H__
 #endif

@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _SOL_H_
-#define _SOL_H_
+#ifndef GNASH_SOL_H
+#define GNASH_SOL_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -64,8 +64,10 @@ public:
     /// \brief Get the number of Elements in this class.
     ///
     /// @return The count of Elements.
-    size_t size() const { return _amfobjs.size(); };
-    
+    size_t size() const { return _amfobjs.size(); }
+ 
+    size_t fileSize() const { return _filesize; }
+
     /// \brief Extract the header from the file.
     ///
     /// @param data a reference to a vector of bytes that contains the

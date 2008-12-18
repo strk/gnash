@@ -30,7 +30,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
 #include "as_object.h" // for inheritance
-#include "NetConnection.h"
 
 #include "MediaParser.h" // is this really needed for scoped_ptr ?
 #include "AudioDecoder.h" // is this really needed for scoped_ptr ?
@@ -106,7 +105,6 @@ private:
     /// Mark all reachable resources of a Sound, for the GC
     //
     /// Reachable resources are:
-    /// - associated NetConnection object (connection)
     /// - attached character object (attachedCharacter)
     ///
     void markReachableResources() const;
@@ -119,9 +117,7 @@ private:
     bool _onComplete;
     bool _position;
 
-    boost::intrusive_ptr<NetConnection> connection;
-
-    boost::scoped_ptr<CharacterProxy> attachedCharacter;
+    boost::scoped_ptr<CharacterProxy> _attachedCharacter;
     int soundId;
     bool externalSound;
     std::string externalURL;
@@ -145,9 +141,11 @@ private:
     boost::uint32_t _leftOverSize;
 
     /// This is a sound_handler::aux_streamer_ptr type.
-    static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& etEOF);
+    static unsigned int getAudioWrapper(void *owner, boost::int16_t* samples,
+            unsigned int nSamples, bool& etEOF);
 
-    unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF);
+    unsigned int getAudio(boost::int16_t* samples, unsigned int nSamples,
+            bool& atEOF);
 
     /// The aux streamer for sound handler
     sound::InputStream* _inputStream;
@@ -195,6 +193,5 @@ void sound_class_init(as_object& global);
 
 } // end of gnash namespace
 
-// __SOUND_H__
 #endif
 

@@ -27,7 +27,7 @@ generic_character::add_invalidated_bounds(InvalidatedRanges& ranges,
   bool force)
 {
   ranges.add(m_old_invalidated_ranges);
-  if (m_visible && (m_invalidated||force))
+  if (isVisible() && (m_invalidated||force))
   {
     rect bounds;    
     bounds.expand_to_transformed_rect(getWorldMatrix(), 
@@ -36,12 +36,6 @@ generic_character::add_invalidated_bounds(InvalidatedRanges& ranges,
   }    
 }
 
-void
-generic_character::enclose_own_bounds(rect *) const
-{
-  log_unimpl("generic_character::enclose_own_bounds");
-  abort(); // TO BE IMPLEMENTED!!!!!
-}
 
 bool
 generic_character::pointInShape(boost::int32_t  x, boost::int32_t  y) const

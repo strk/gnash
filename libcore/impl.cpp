@@ -64,8 +64,17 @@
 #include <memory> // for auto_ptr
 #include <algorithm>
 
+
 namespace gnash
 {
+
+// Forward declarations
+namespace {
+    FileType getFileType(IOChannel& in);
+    SWFMovieDefinition* createSWFMovie(std::auto_ptr<IOChannel> in,
+            const std::string& url, const RunInfo& runInfo,
+            bool startLoaderThread);
+}
 
 static void clear_library();
 
@@ -225,11 +234,13 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
 
-// Create a movie_definition from a png stream
-// NOTE: this method assumes this *is* a png stream
+// Create a movie_definition from an image format stream
+// NOTE: this method assumes this *is* the format described in the
+// FileType type
 // TODO: The pp won't display PNGs for SWF7 or below.
 static movie_definition*
-createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType type)
+createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url,
+        FileType type)
 {
     assert (in.get());
 
@@ -239,7 +250,9 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 
     try
     {
-        std::auto_ptr<GnashImage> im(ImageInput::readImageData(imageData, type));
+        std::auto_ptr<GnashImage> im(
+                ImageInput::readImageData(imageData, type));
+
         if (!im.get())
         {
             log_error(_("Can't read image file from %s"), url);
@@ -258,100 +271,6 @@ createBitmapMovie(std::auto_ptr<IOChannel> in, const std::string& url, FileType 
 
 }
 
-/// Get type of file looking at first bytes
-FileType
-getFileType(IOChannel* in)
-{
-  in->seek(0);
-
-  char buf[3];
-  
-  if (3 < in->read(buf, 3))
-  {
-    log_error(_("Can't read file header"));
-    in->seek(0);
-    return GNASH_FILETYPE_UNKNOWN;
-  }
-  
-  // This is the magic number {0xff, 0xd8, 0xff} for JPEG format files
-  if (std::equal(buf, buf + 3, "\xff\xd8\xff"))
-  {
-    in->seek(0);
-    return GNASH_FILETYPE_JPEG;
-  }
-
-  // This is the magic number for any PNG format file
-  // buf[3] == 'G' (we didn't read so far)
-  if (std::equal(buf, buf + 3, "\x89PN")) 
-  {
-    in->seek(0);
-    return GNASH_FILETYPE_PNG;
-  }
-
-  // This is the magic number for any GIF format file
-  if (std::equal(buf, buf + 3, "GIF"))
-  {
-    in->seek(0);
-    return GNASH_FILETYPE_GIF;
-  }
-
-  // This is for SWF (FWS or CWS)
-  if (std::equal(buf, buf + 3, "FWS") || std::equal(buf, buf + 3, "CWS"))
-  {
-    in->seek(0);
-    return GNASH_FILETYPE_SWF;
-  }
-
-  // Take one guess at what this is. (It's an FLV-format file).
-  if (std::equal(buf, buf + 3, "FLV")) {
-    return GNASH_FILETYPE_FLV;
-  }
-  
-  // Check if it is an swf embedded in a player (.exe-file)
-  if (std::equal(buf, buf + 2, "MZ")) {
-
-    if ( 3 < in->read(buf, 3) )
-    {
-      log_error(_("Can't read 3 bytes after an MZ (.exe) header"));
-      in->seek(0);
-      return GNASH_FILETYPE_UNKNOWN;
-    }
-
-    while ((buf[0]!='F' && buf[0]!='C') || buf[1]!='W' || buf[2]!='S')
-    {
-      buf[0] = buf[1];
-      buf[1] = buf[2];
-      buf[2] = in->read_byte();
-      if (in->eof())
-      {
-        log_error(_("Could not find SWF inside an exe file"));
-        in->seek(0);
-        return GNASH_FILETYPE_UNKNOWN;
-      }
-    }
-    in->seek(in->tell()-3); // position to start of the swf itself
-    return GNASH_FILETYPE_SWF;
-  }
-
-  log_error("unknown file type, buf is %c%c%c", buf[0], buf[1], buf[2]);
-  return GNASH_FILETYPE_UNKNOWN;
-}
-
-// Create a SWFMovieDefinition from an SWF stream
-// NOTE: this method assumes this *is* an SWF stream
-//
-static SWFMovieDefinition*
-create_swf_movie(std::auto_ptr<IOChannel> in, const std::string& url,
-        const RunInfo& runInfo, bool startLoaderThread)
-{
-
-    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
-
-    if (!m->readHeader(in, url)) return 0;
-    if (startLoaderThread && !m->completeLoad()) return 0;
-
-    return m.release();
-}
 
 movie_definition*
 create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
@@ -362,7 +281,7 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
   ensure_loaders_registered();
 
   // see if it's a jpeg or an swf
-  FileType type = getFileType(in.get());
+  FileType type = getFileType(*in);
 
     switch (type)
     {
@@ -382,11 +301,12 @@ create_movie(std::auto_ptr<IOChannel> in, const std::string& url,
 
 
         case GNASH_FILETYPE_SWF:
-            return create_swf_movie(in, url, runInfo, startLoaderThread);
+            return createSWFMovie(in, url, runInfo, startLoaderThread);
 
         case GNASH_FILETYPE_FLV:
             log_unimpl(_("FLV can't be loaded directly as a movie"));
             return NULL;
+
         default:
             log_error(_("unknown file type (%s)"), type);
             break;
@@ -427,13 +347,115 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
 
 }
 
+
+namespace {
+
+/// Get type of file looking at first bytes
+FileType
+getFileType(IOChannel& in)
+{
+    in.seek(0);
+
+    char buf[3];
+    
+    if (3 < in.read(buf, 3))
+    {
+        log_error(_("Can't read file header"));
+        in.seek(0);
+        return GNASH_FILETYPE_UNKNOWN;
+    }
+    
+    // This is the magic number {0xff, 0xd8, 0xff} for JPEG format files
+    if (std::equal(buf, buf + 3, "\xff\xd8\xff"))
+    {
+        in.seek(0);
+        return GNASH_FILETYPE_JPEG;
+    }
+
+    // This is the magic number for any PNG format file
+    // buf[3] == 'G' (we didn't read so far)
+    if (std::equal(buf, buf + 3, "\x89PN")) 
+    {
+        in.seek(0);
+        return GNASH_FILETYPE_PNG;
+    }
+
+    // This is the magic number for any GIF format file
+    if (std::equal(buf, buf + 3, "GIF"))
+    {
+        in.seek(0);
+        return GNASH_FILETYPE_GIF;
+    }
+
+    // This is for SWF (FWS or CWS)
+    if (std::equal(buf, buf + 3, "FWS") || std::equal(buf, buf + 3, "CWS"))
+    {
+        in.seek(0);
+        return GNASH_FILETYPE_SWF;
+    }
+
+    // Take one guess at what this is. (It's an FLV-format file).
+    if (std::equal(buf, buf + 3, "FLV")) {
+        return GNASH_FILETYPE_FLV;
+    }
+    
+    // Check if it is an swf embedded in a player (.exe-file)
+    if (std::equal(buf, buf + 2, "MZ")) {
+
+        if ( 3 < in.read(buf, 3) )
+        {
+            log_error(_("Can't read 3 bytes after an MZ (.exe) header"));
+            in.seek(0);
+            return GNASH_FILETYPE_UNKNOWN;
+        }
+
+        while ((buf[0]!='F' && buf[0]!='C') || buf[1]!='W' || buf[2]!='S')
+        {
+            buf[0] = buf[1];
+            buf[1] = buf[2];
+            buf[2] = in.read_byte();
+            if (in.eof())
+            {
+                log_error(_("Could not find SWF inside an exe file"));
+                in.seek(0);
+                return GNASH_FILETYPE_UNKNOWN;
+            }
+        }
+        in.seek(in.tell() - 3); // position to start of the swf itself
+        return GNASH_FILETYPE_SWF;
+    }
+
+    log_error("unknown file type, buf is %c%c%c", buf[0], buf[1], buf[2]);
+    return GNASH_FILETYPE_UNKNOWN;
+}
+
+// Create a SWFMovieDefinition from an SWF stream
+// NOTE: this method assumes this *is* an SWF stream
+//
+SWFMovieDefinition*
+createSWFMovie(std::auto_ptr<IOChannel> in, const std::string& url,
+        const RunInfo& runInfo, bool startLoaderThread)
+{
+
+    std::auto_ptr<SWFMovieDefinition> m (new SWFMovieDefinition(runInfo));
+
+    const std::string& absURL = URL(url).str();
+
+    if (!m->readHeader(in, absURL)) return 0;
+    if (startLoaderThread && !m->completeLoad()) return 0;
+
+    return m.release();
+}
+
+}
+
 //
 // global gnash management
 //
 
 
+// Maximum release of resources.
 void  clear()
-    // Maximum release of resources.
 {
     // Ideally, we should make sure that function properly signals all threads
     // about exiting and giving them a chance to cleanly exit.

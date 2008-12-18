@@ -69,7 +69,7 @@ static as_object* getSoundInterface();
 Sound::Sound() 
     :
     as_object(getSoundInterface()),
-    attachedCharacter(0),
+    _attachedCharacter(0),
     soundId(-1),
     externalSound(false),
     isStreaming(false),
@@ -101,7 +101,7 @@ Sound::~Sound()
 void
 Sound::attachCharacter(character* attachTo) 
 {
-    attachedCharacter.reset(new CharacterProxy(attachTo));
+    _attachedCharacter.reset(new CharacterProxy(attachTo));
 }
 
 void
@@ -144,13 +144,14 @@ Sound::getVolume(int& volume)
     //       have both an attached character *and*
     //       some other sound...
     //
-    if ( attachedCharacter )
+    if ( _attachedCharacter )
     {
-        log_debug("Sound has an attached character");
-        character* ch = attachedCharacter->get();
+        //log_debug("Sound has an attached character");
+        character* ch = _attachedCharacter->get();
         if ( ! ch )
         {
-            log_debug("Character attached to Sound was unloaded and couldn't rebind");
+            log_debug("Character attached to Sound was unloaded and "
+                    "couldn't rebind");
             return false;
         }
         volume = ch->getVolume();
@@ -228,6 +229,8 @@ Sound::loadSound(const std::string& file, bool streaming)
         // not necessarely correct, the stream might have been found...
         return;
     }
+
+    // TODO: use associated character's _soundbuftime, if any
     _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
     if ( isStreaming )
@@ -276,12 +279,13 @@ Sound::setVolume(int volume)
     //       have both an attached character *and*
     //       some other sound...
     //
-    if ( attachedCharacter )
+    if ( _attachedCharacter )
     {
-        character* ch = attachedCharacter->get();
+        character* ch = _attachedCharacter->get();
         if ( ! ch )
         {
-            log_debug("Character attached to Sound was unloaded and couldn't rebind");
+            log_debug("Character attached to Sound was unloaded and "
+                    "couldn't rebind");
             return;
         }
         ch->setVolume(volume);
@@ -523,7 +527,6 @@ Sound::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
         //log_debug(" consuming %d bytes of decoded audio", n);
 
         std::copy(_leftOverPtr, _leftOverPtr+n, stream);
-        //memcpy(stream, _leftOverPtr, n);
 
         stream += n;
         _leftOverPtr += n;
@@ -920,41 +923,56 @@ void
 attachSoundInterface(as_object& o)
 {
 
-    int fl_hpc = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly;
+    int flags = as_prop_flags::dontEnum | 
+                as_prop_flags::dontDelete | 
+                as_prop_flags::readOnly;
 
     o.init_member("attachSound", new builtin_function(sound_attachsound),
-            fl_hpc);
-    o.init_member("getPan", new builtin_function(sound_getpan), fl_hpc);
-    o.init_member("setPan", new builtin_function(sound_setpan), fl_hpc);
-    o.init_member("start", new builtin_function(sound_start), fl_hpc);
-    o.init_member("stop", new builtin_function(sound_stop), fl_hpc);
+            flags);
+    o.init_member("getPan", new builtin_function(sound_getpan), flags);
+    o.init_member("setPan", new builtin_function(sound_setpan), flags);
+    o.init_member("start", new builtin_function(sound_start), flags);
+    o.init_member("stop", new builtin_function(sound_stop), flags);
     o.init_member("getTransform", new builtin_function(sound_gettransform),
-            fl_hpc);
+            flags);
     o.init_member("setTransform", new builtin_function(sound_settransform),
-            fl_hpc);
-    o.init_member("getVolume", new builtin_function(sound_getvolume), fl_hpc);
-    o.init_member("setVolume", new builtin_function(sound_setvolume), fl_hpc);
+            flags);
+    o.init_member("getVolume", new builtin_function(sound_getvolume), flags);
+    o.init_member("setVolume", new builtin_function(sound_setvolume), flags);
 
-    int fl_hpcn6 = fl_hpc|as_prop_flags::onlySWF6Up;
+    int flagsn6 = flags | as_prop_flags::onlySWF6Up;
 
-    o.init_member("getDuration", new builtin_function(sound_getDuration), fl_hpcn6);
-    o.init_member("setDuration", new builtin_function(sound_setDuration), fl_hpcn6);
-    o.init_member("loadSound", new builtin_function(sound_loadsound), fl_hpcn6);
-    o.init_member("getPosition", new builtin_function(sound_getPosition), fl_hpcn6);
-    o.init_member("setPosition", new builtin_function(sound_setPosition), fl_hpcn6);
-    o.init_member("getBytesLoaded", new builtin_function(sound_getbytesloaded), fl_hpcn6);
-    o.init_member("getBytesTotal", new builtin_function(sound_getbytestotal), fl_hpcn6);
+    o.init_member("getDuration", 
+            new builtin_function(sound_getDuration), flagsn6);
+    o.init_member("setDuration", 
+            new builtin_function(sound_setDuration), flagsn6);
+    o.init_member("loadSound", new builtin_function(sound_loadsound), flagsn6);
+    o.init_member("getPosition", 
+            new builtin_function(sound_getPosition), flagsn6);
+    o.init_member("setPosition", 
+            new builtin_function(sound_setPosition), flagsn6);
+    o.init_member("getBytesLoaded", 
+            new builtin_function(sound_getbytesloaded), flagsn6);
+    o.init_member("getBytesTotal", 
+            new builtin_function(sound_getbytestotal), flagsn6);
 
-    int fl_hpcn9 = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::readOnly|as_prop_flags::onlySWF9Up;
-    o.init_member("areSoundsInaccessible", new builtin_function(sound_areSoundsInaccessible), fl_hpcn9);
+    int flagsn9 = as_prop_flags::dontEnum | 
+                  as_prop_flags::dontDelete | 
+                  as_prop_flags::readOnly | 
+                  as_prop_flags::onlySWF9Up;
+
+    o.init_member("areSoundsInaccessible", 
+            new builtin_function(sound_areSoundsInaccessible), flagsn9);
 
     // Properties
     //there's no such thing as an ID3 member (swfdec shows)
     o.init_readonly_property("duration", &sound_duration);
     o.init_readonly_property("position", &sound_position);
 
-    int fl_hp = as_prop_flags::dontEnum|as_prop_flags::dontDelete;
-    o.init_property("checkPolicyFile", &checkPolicyFile_getset, &checkPolicyFile_getset, fl_hp);
+    int fl_hp = as_prop_flags::dontEnum | as_prop_flags::dontDelete;
+
+    o.init_property("checkPolicyFile", &checkPolicyFile_getset, 
+            &checkPolicyFile_getset, fl_hp);
 
 }
 
@@ -998,10 +1016,12 @@ void sound_class_init(as_object& global)
 void
 Sound::startProbeTimer()
 {
-    boost::intrusive_ptr<builtin_function> cb = \
+    boost::intrusive_ptr<builtin_function> cb = 
         new builtin_function(&Sound::probeAudioWrapper);
     std::auto_ptr<Timer> timer(new Timer);
-    unsigned long delayMS = 500; // 2 times each second (83 would be 12 times each second)
+
+    // 2 times each second (83 would be 12 times each second)
+    unsigned long delayMS = 500; 
     timer->setInterval(*cb, delayMS, this);
     _probeTimer = getVM().getRoot().add_interval_timer(timer, true);
 }
@@ -1101,8 +1121,7 @@ Sound::probeAudio()
 void
 Sound::markReachableResources() const
 {
-    if ( connection ) connection->setReachable();
-    if ( attachedCharacter ) attachedCharacter->setReachable();
+    if ( _attachedCharacter ) _attachedCharacter->setReachable();
     markAsObjectReachable();
 }
 #endif // GNASH_USE_GC

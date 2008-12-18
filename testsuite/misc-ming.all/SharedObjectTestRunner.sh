@@ -30,8 +30,8 @@
 #
 # $ ./SharedObjectTestRunner flashplayer '/home/strk/.macromedia/Flash_Player/#SharedObjects/KZNLGTEU/'
 #
-# When you pass the second argument, the script will assume you're running with
-# the proprietary player thus stripping the ^/home/ portion out of SWF filename
+# The first directory (usually "/home/") is stripped, as the proprietary
+# player and now Gnash both do this.
 # (as this is what seems to happen)
 #
 #
@@ -42,11 +42,11 @@ PLAYER="${TOP_BUILDDIR}/utilities/gprocessor -v"
 
 INPUTSOLDIR=${BASEINPUTSOLDIR}
 SWFTEST=${TOP_BUILDDIR}/testsuite/misc-ming.all/SharedObjectTest.swf
-SOLDIR=${TOP_BUILDDIR}/testsuite/tmpSharedObject/localhost/${SWFTEST}/
+homestrip=`echo ${SWFTEST} | sed -e 's/\/[^\/]*//'`
+SOLDIR=${TOP_BUILDDIR}/testsuite/tmpSharedObject/localhost/${homestrip}/
 
 if [ -n "$1" ]; then PLAYER="$1"; fi
 if [ -n "$2" ]; then
-    homestrip=`echo ${SWFTEST} | sed -e 's#^/home/##'`
     SOLDIR="$2/localhost/${homestrip}";
 fi
 
@@ -89,10 +89,10 @@ for f in ${INPUTSOLDIR}/*.sol; do
 		continue
 	fi
 	if ! cmp ${INPUTSOLDIR}/${solname} ${SOLDIR}/${solname}; then
-		echo "XFAILED: ! cmp ${SOLDIR}/${solname} ${INPUTSOLDIR}/${solname}"
+		echo "FAILED: ! cmp ${SOLDIR}/${solname} ${INPUTSOLDIR}/${solname}"
 		continue
 	fi
-	echo "XPASSED: SharedObject ${solname} matches input"
+	echo "PASSED: SharedObject ${solname} matches input"
 done
 
 #####################################################

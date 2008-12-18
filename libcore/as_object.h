@@ -22,7 +22,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "dsodefs.h" // DSOEXPORT
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "string_table.h"
 #include "ref_counted.h" // for inheritance  (to drop)
@@ -118,7 +117,7 @@ public:
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-class DSOEXPORT as_object
+class as_object
 	:
 #ifdef GNASH_USE_GC
 	public GcResource
@@ -139,27 +138,28 @@ private:
 	PropertyList _members;
 
 	/// Don't allow implicit copy, must think about behaviour
-	as_object& operator=(const as_object&)
-	{
-		abort();
-		return *this;
-	}
+	as_object& operator=(const as_object&);
 
 	/// \brief
-	/// Find an existing property for update, only scaning the inheritance chain for
-	/// getter/setters or statics.
+	/// Find an existing property for update, only scanning the
+    /// inheritance chain for getter/setters or statics.
 	//
-	/// NOTE: updatable here doesn't mean the property isn't protected from update
-	///       but only that a set_member will NOT create a new property (either
-	///	  completely new or as an override).
+	/// NOTE: updatable here doesn't mean the property isn't protected
+    /// from update but only that a set_member will NOT create a new
+    /// property (either completely new or as an override).
 	///
-	/// @returns a propery if found, NULL if not found
+	/// @returns a property if found, NULL if not found
 	///          or not visible in current VM version
 	///
 	Property* findUpdatableProperty(string_table::key name, 
 		string_table::key nsname = 0);
 
 public:
+
+    /// Is any non-hidden property in this object ?
+    bool hasNonHiddenProperties() const {
+        return _members.hasNonHiddenProperties();
+    }
 
 	/// Find a property scanning the inheritance chain
 	///
@@ -318,7 +318,7 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_member(const std::string& name, const as_value& val, 
-		int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum, 
+		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum, 
 		string_table::key nsname = 0);
 
 	/// Initialize a member value by key
@@ -381,7 +381,8 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_property(const std::string& key, as_function& getter,
-		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		as_function& setter,
+        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 		string_table::key nsname = 0);
 
 	/// \brief
@@ -411,7 +412,8 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_property(const std::string& key, as_c_function_ptr getter,
-		as_c_function_ptr setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		as_c_function_ptr setter,
+        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 		string_table::key nsname = 0);
 
 	/// \brief
@@ -440,7 +442,8 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_property(string_table::key key, as_function& getter,
-		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		as_function& setter,
+        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 		string_table::key nsname = 0);
 
 	/// \brief
@@ -469,7 +472,8 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	void init_property(string_table::key key, as_c_function_ptr getter,
-		as_c_function_ptr setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+		as_c_function_ptr setter,
+        int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 		string_table::key nsname = 0);
 
 
@@ -498,8 +502,7 @@ public:
 	/// and will be matched by anything not asking for a specific namespace.
 	///
 	bool init_destructive_property(string_table::key key, as_function& getter,
-		int flags=as_prop_flags::dontEnum,
-		string_table::key nsname = 0);
+		int flags = as_prop_flags::dontEnum, string_table::key nsname = 0);
 
 	/// \brief
 	/// Initialize a destructive getter property
@@ -525,9 +528,9 @@ public:
 	/// The id of the namespace to which this member belongs. 0 is a wildcard
 	/// and will be matched by anything not asking for a specific namespace.
 	///
-	bool init_destructive_property(string_table::key key, as_c_function_ptr getter,
-		int flags=as_prop_flags::dontEnum,
-		string_table::key nsname = 0);
+	bool init_destructive_property(string_table::key key,
+            as_c_function_ptr getter, int flags = as_prop_flags::dontEnum,
+		    string_table::key nsname = 0);
 
 
 	/// \brief
@@ -557,11 +560,12 @@ public:
     ///
     ///
 	void init_readonly_property(const std::string& key, as_function& getter,
-			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+			int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 
-	void init_readonly_property(const string_table::key& key, as_function& getter,
-			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+	void init_readonly_property(const string_table::key& key,
+            as_function& getter,
+			int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 
 	/// Use this method for read-only properties.
@@ -588,12 +592,14 @@ public:
     ///     0 is a wildcard and will be matched by anything not asking
     ///     for a specific namespace.
     ///
-	void init_readonly_property(const std::string& key, as_c_function_ptr getter,
-			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+	void init_readonly_property(const std::string& key,
+            as_c_function_ptr getter,
+			int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 
-	void init_readonly_property(const string_table::key& key, as_c_function_ptr getter,
-			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum,
+	void init_readonly_property(const string_table::key& key,
+            as_c_function_ptr getter,
+            int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum,
 			string_table::key nsname = 0);
 
 	/// \brief
@@ -726,10 +732,13 @@ public:
 	///	need to know wheter it was found or not.
 	///
 	as_value callMethod(string_table::key name);
-	as_value callMethod(string_table::key name, const as_value& arg0);
-	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1);
-	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1, const as_value& arg2);
-	as_value callMethod(string_table::key name, const as_value& arg0, const as_value& arg1, const as_value& arg2, const as_value& arg3);
+	DSOEXPORT as_value callMethod(string_table::key name, const as_value& arg0);
+	as_value callMethod(string_table::key name, const as_value& arg0,
+            const as_value& arg1);
+	as_value callMethod(string_table::key name, const as_value& arg0,
+            const as_value& arg1, const as_value& arg2);
+	as_value callMethod(string_table::key name, const as_value& arg0,
+            const as_value& arg1, const as_value& arg2, const as_value& arg3);
 
 	/// Delete a property of this object, unless protected from deletion.
 	//
@@ -752,7 +761,8 @@ public:
 	///	- (true, false) : property protected from deletion
 	///	- (true, true) : property successfully deleted
 	///
-	virtual std::pair<bool,bool> delProperty(string_table::key name, string_table::key nsname = 0);
+	virtual std::pair<bool,bool> delProperty(string_table::key name,
+            string_table::key nsname = 0);
 
 	/// Get this object's own named property, if existing.
 	//
@@ -771,7 +781,8 @@ public:
 	///	a Property pointer, or NULL if this object doesn't
 	///	contain the named property.
 	///
-	Property* getOwnProperty(string_table::key name, string_table::key nsname = 0);
+	Property* getOwnProperty(string_table::key name,
+            string_table::key nsname = 0);
 
 	/// Return true if this object has the named property
 	//
@@ -781,13 +792,15 @@ public:
 	///	case *sensitive* from SWF7 up.
 	///
 	/// @param nsname
-	/// 	The id of the namespace to which this member belongs. 0 is a wildcard
-	/// 	and will be matched by anything not asking for a specific namespace.
+	/// 	The id of the namespace to which this member belongs.
+    ///     0 is a wildcard and will be matched by anything not asking
+    ///     for a specific namespace.
 	///
 	/// @return
 	///	true if the object has the property, false otherwise.
 	///
-	virtual bool hasOwnProperty(string_table::key name, string_table::key nsname = 0);
+	virtual bool hasOwnProperty(string_table::key name,
+            string_table::key nsname = 0);
 
 	/// Get a property from this object (or a prototype) by ordering index.
 	///
@@ -840,7 +853,9 @@ public:
 	/// Cast to a sprite, or return NULL
 	virtual MovieClip* to_movie() { return NULL; }
 
-	const MovieClip* to_movie() const { return const_cast<as_object*>(this)->to_movie(); }
+    const MovieClip* to_movie() const {
+        return const_cast<as_object*>(this)->to_movie();
+    }
 
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
@@ -848,7 +863,9 @@ public:
 	/// Cast to a character, or return NULL
 	virtual character* to_character() { return NULL; }
 
-	const character* to_character() const { return const_cast<as_object*>(this)->to_character(); }
+	const character* to_character() const {
+        return const_cast<as_object*>(this)->to_character();
+    }
 
 	/// Return true if this is a Date object.
 	//
@@ -975,7 +992,8 @@ public:
 	///	reference as first argument and a const as_value reference
 	///	as second argument.
 	///
-	virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const;
+	virtual void visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor)
+        const;
 
 	/// \brief
 	/// Add a getter/setter property, if no member already has
@@ -992,15 +1010,10 @@ public:
 	///
 	/// @param setter
 	///	A function to invoke when setting this property's value.
-	///	add_ref will be called on the function.
 	///	By passing NULL, the property will have no setter
 	///	(valid ActionScript - see actionscript.all/Object.as)
-	///
-	/// @return true if the property was successfully added, false
-	///         otherwise (property already existent?)
-	///
-	bool add_property(const std::string& key, as_function& getter,
-		as_function* setter=NULL);
+	void add_property(const std::string& key, as_function& getter,
+		as_function* setter);
 
 	/// Return this object '__proto__' member.
 	//
@@ -1023,10 +1036,9 @@ public:
 	/// public: set_member("__proto__", anyting)
 	/// will do just the same
 	///
-	void set_prototype(boost::intrusive_ptr<as_object> proto, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+	void set_prototype(boost::intrusive_ptr<as_object> proto,
+            int flags=as_prop_flags::dontDelete | as_prop_flags::dontEnum);
 
-	std::string asPropName(string_table::key name);
-	
 	/// @{ Common ActionScript methods for characters
 	/// TODO: make protected
 
@@ -1034,8 +1046,6 @@ public:
 
 	static as_value valueof_method(const fn_call& fn);
 
-	/// @} Common ActionScript getter-setters for characters
-	
 protected:
 
 	/// Enumerate any non-proper properties

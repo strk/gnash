@@ -171,7 +171,8 @@
         check(true); // doh !
         check(!0); 
         check(4); 
-        xcheck(!_root);  // undefined ?
+        check(!_root);  // undefined ?
+        check(!_level0);  // undefined ?
         check(!null); 
         check(!undefined); 
 
@@ -279,6 +280,7 @@
         s="not a number";
         /mc1.xscale=s; // evaluates to ? 
         xcheck_equals(/mc1.xscale, 100); // not a number it seems? 
+        /mc1.xscale=100; // reset
 
         // test with _yscale
         xcheck_equals(/mc1:_yscale, undefined); // no variable, only property
@@ -298,6 +300,7 @@
         s="not a number";
         /mc1.yscale=s; // evaluates to ? 
         xcheck_equals(/mc1.yscale, 100); // not a number it seems? 
+        /mc1.yscale=100; // reset
 
         // test with _alpha
         xcheck_equals(/mc1:_alpha, undefined); // no variable, only property
@@ -317,6 +320,7 @@
         s="not a number";
         /mc1.alpha=s; // evaluates to ? 
         xcheck_equals(/mc1.alpha, 100); // not a number it seems? 
+        /mc1.alpha=100; // reset
 
         // test with _visible
         xcheck_equals(/mc1:_visible, undefined); // no variable, only property
@@ -336,6 +340,7 @@
         s="not a number";
         /mc1.visible=s; // evaluates to ? 
         xcheck_equals(/mc1.visible, 1); // not a number it seems? 
+        /mc1.visible=100; // reset
 
         // test with _rotation
         check_equals(/mc1:_rotation, undefined); // no variable, only property
@@ -356,6 +361,16 @@
         s="not a number";
         /mc1.rotation=s; // evaluates to ? 
         xcheck_equals(/mc1.rotation, 90); // not a number it seems? 
+        /mc1.rotation=0; // reset
+
+        // 'mc1' is undefined as a variable
+        check_equals(mc1, undefined);
+        check_equals(/mc1, undefined);
+        check_equals(/:mc1, undefined);
+
+        // You can define your own 'mc1' variable though
+        mc1=54;
+        check_equals(mc1, 54);
 
     .end
 	

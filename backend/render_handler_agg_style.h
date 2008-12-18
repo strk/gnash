@@ -110,13 +110,10 @@ template <class PixelFormat, class span_allocator_type, class img_source_type,
 class agg_style_bitmap : public agg_style_base
 {
 public:
-
-  bool m_force_premultiply;
     
   agg_style_bitmap(int width, int height, int rowlen, boost::uint8_t* data, 
     gnash::SWFMatrix mat, gnash::cxform cx) :
     
-    m_force_premultiply(false),
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
     m_img_src(m_pixf),
@@ -154,13 +151,7 @@ public:
         span->premultiply();
         ++span;
       }
-    } else 
-    if (m_force_premultiply) {
-      for (unsigned int i=0; i<len; i++) { 
-        span->premultiply();
-        span++;
-      }    
-    }
+    }  
   }
     
   
@@ -333,7 +324,7 @@ public:
     }
     
     /// Adds a new bitmap fill style
-    void add_bitmap(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx, 
+    void add_bitmap(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx, 
       bool repeat, bool smooth) {
 
       if (bi==NULL) {
@@ -405,7 +396,7 @@ public:
     // === RGB24 ===
     
 
-    void add_bitmap_repeat_nn_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_repeat_nn_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // tiled, nearest neighbor method (faster)   
 
@@ -428,7 +419,7 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_nn_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, nearest neighbor method (faster)   
 
@@ -449,7 +440,7 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
+    void add_bitmap_repeat_aa_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
 
       // tiled, bilinear method (better quality)   
 
@@ -470,7 +461,7 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgb24(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_aa_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, bilinear method (better quality)   
 
@@ -493,7 +484,7 @@ public:
     
     // === RGBA32 ===    
 
-    void add_bitmap_repeat_nn_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_repeat_nn_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
     
       // tiled, nearest neighbor method (faster)   
 
@@ -516,7 +507,7 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_nn_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, nearest neighbor method (faster)   
 
@@ -537,7 +528,7 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
+    void add_bitmap_repeat_aa_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
 
       // tiled, bilinear method (better quality)   
 
@@ -558,7 +549,7 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgba32(agg_bitmap_info_base* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_aa_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
 
       // clipped, bilinear method (better quality)   
 

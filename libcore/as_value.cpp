@@ -63,8 +63,6 @@
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
 
-using namespace std;
-
 namespace {
 
 
@@ -102,88 +100,95 @@ namespace {
 
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
-class PropsSerializer : public AbstractPropertyVisitor {
-    amf::Element& _obj;
-    string_table& _st;
+class PropsSerializer : public AbstractPropertyVisitor
+{
+
 public:
+
     PropsSerializer(amf::Element& el, VM& vm)
-        : _obj(el),
-	  _st(vm.getStringTable())
-	{};
+        :
+        _obj(el),
+	    _st(vm.getStringTable())
+	{}
     
     void accept(string_table::key key, const as_value& val) 
+    {
+
+        // Test conducted with AMFPHP:
+        // '__proto__' and 'constructor' members
+        // of an object don't get back from an 'echo-service'.
+        // Dunno if they are not serialized or just not sent back.
+        // A '__constructor__' member gets back, but only if 
+        // not a function. Actually no function gets back.
+        // 
+        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR)
         {
-
-            // Test conducted with AMFPHP:
-            // '__proto__' and 'constructor' members
-            // of an object don't get back from an 'echo-service'.
-            // Dunno if they are not serialized or just not sent back.
-            // A '__constructor__' member gets back, but only if 
-            // not a function. Actually no function gets back.
-            // 
-            if ( key == NSV::PROP_uuPROTOuu || 
-                 key == NSV::PROP_CONSTRUCTOR )
-            {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                log_debug(" skip serialization of specially-named property %s", _st.value(key));
+            log_debug(" skip serialization of specially-named property %s",
+                    _st.value(key));
 #endif
-                return;
-            }
-
-            //GNASH_REPORT_FUNCTION;
-            amf::AMF amf;
-            boost::shared_ptr<amf::Element> el;
-	    
-            const string& name = _st.value(key);
-
-	    
-//          cerr << "FIXME: yes!!!!! " << name << ": "<< val << std::endl;
-	    
-            if (val.is_string()) {
-                string str;
-                if (!val.is_undefined()) {
-                    str = val.to_string();
-                }
-                el.reset(new amf::Element(name, str));
-            }
-            if (val.is_bool()) {
-                bool flag = val.to_bool();
-                el.reset(new amf::Element(name, flag));
-            }
-            if (val.is_number()) { 
-                double dub;
-                if (val.is_undefined()) {
-                    dub = 0.0;
-                } else {
-                    dub = val.to_number();
-                }
-                el.reset(new amf::Element(name, dub));
-            }
-	    
-            if (el) {
-                _obj.addProperty(el);
-            }
+            return;
         }
+
+        amf::AMF amf;
+        boost::shared_ptr<amf::Element> el;
+    
+        const std::string& name = _st.value(key);
+
+        if (val.is_string()) {
+            std::string str;
+            if (!val.is_undefined()) {
+                str = val.to_string();
+            }
+            el.reset(new amf::Element(name, str));
+        }
+
+        else if (val.is_bool()) {
+            bool flag = val.to_bool();
+            el.reset(new amf::Element(name, flag));
+        }
+
+        else if (val.is_number()) { 
+            double dub;
+            if (val.is_undefined()) {
+                dub = 0.0;
+            } else {
+                dub = val.to_number();
+            }
+            el.reset(new amf::Element(name, dub));
+        }
+    
+        if (el) {
+            _obj.addProperty(el);
+        }
+    }
+
+private:
+
+    amf::Element& _obj;
+    string_table& _st;
+
 };
 
-} // anonimous namespace
+} // anonymous namespace
 
 /// Class used to serialize properties of an object to a buffer
-class PropsBufSerializer : public AbstractPropertyVisitor {
-    SimpleBuffer& _buf;
-    VM& _vm;
-    string_table& _st;
-    std::map<as_object*, size_t>& _offsetTable;
-    mutable bool _error;
+class PropsBufSerializer : public AbstractPropertyVisitor
+{
+
+    typedef std::map<as_object*, size_t> PropertyOffsets;
+
 public:
-    PropsBufSerializer(SimpleBuffer& buf, VM& vm, std::map<as_object*, size_t>& offsetTable)
+    PropsBufSerializer(SimpleBuffer& buf, VM& vm,
+            PropertyOffsets& offsetTable, bool allowStrict)
         :
+        _allowStrict(allowStrict),
         _buf(buf),
         _vm(vm),
         _st(vm.getStringTable()),
         _offsetTable(offsetTable),
         _error(false)
-	{};
+	{}
     
     bool success() const { return !_error; }
 
@@ -205,29 +210,39 @@ public:
         // A '__constructor__' member gets back, but only if 
         // not a function. Actually no function gets back.
         // 
-        if ( key == NSV::PROP_uuPROTOuu || 
-             key == NSV::PROP_CONSTRUCTOR )
+        if (key == NSV::PROP_uuPROTOuu || key == NSV::PROP_CONSTRUCTOR)
         {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(" skip serialization of specially-named property %s", _st.value(key));
+            log_debug(" skip serialization of specially-named property %s",
+                    _st.value(key));
 #endif
             return;
         }
 
         // write property name
-        const string& name = _st.value(key);
+        const std::string& name = _st.value(key);
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
         log_debug(" serializing property %s", name);
 #endif
         boost::uint16_t namelen = name.size();
         _buf.appendNetworkShort(namelen);
         _buf.append(name.c_str(), namelen);
-        if ( ! val.writeAMF0(_buf, _offsetTable, _vm) )
+        if ( ! val.writeAMF0(_buf, _offsetTable, _vm, _allowStrict) )
         {
             log_error("Problems serializing an object's member");
             _error=true;
         }
     }
+
+private:
+
+    bool _allowStrict;
+    SimpleBuffer& _buf;
+    VM& _vm;
+    string_table& _st;
+    PropertyOffsets& _offsetTable;
+    mutable bool _error;
+
 };
     
 //
@@ -1957,7 +1972,8 @@ as_value::as_value(const amf::Element& el)
           log_unimpl("AMF3 data type is not supported yet");
           break;
       default:
-          log_unimpl("Element to as_value - unsupported Element type %d", el.getType());
+          log_unimpl("Element to as_value - unsupported Element type %d", 
+                  el.getType());
           break;
     }
 }
@@ -2093,8 +2109,8 @@ readNetworkLong(const boost::uint8_t* buf) {
 // TODO restore first parameter on parse errors
 //
 static bool
-amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, as_value& ret, int inType,
-    std::vector<as_object*>& objRefs, VM& vm)
+amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, 
+        as_value& ret, int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	int amf_type;
 
@@ -2355,7 +2371,8 @@ as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vec
 
 bool
 as_value::writeAMF0(SimpleBuffer& buf, 
-        std::map<as_object*, size_t>& offsetTable, VM& vm) const
+        std::map<as_object*, size_t>& offsetTable, VM& vm,
+        bool allowStrict) const
 {
     typedef std::map<as_object*, size_t> OffsetTable;
 
@@ -2385,21 +2402,49 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 if ( ary )
                 {
                     size_t len = ary->size();
+                    if ( allowStrict && ary->isStrict() )
+                    {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                    log_debug(_("writeAMF0: serializing array of %d elements as ECMA_ARRAY (index %d)"), len, idx);
+                        log_debug(_("writeAMF0: serializing array of %d "
+                                    "elements as STRICT_ARRAY (index %d)"),
+                                    len, idx);
 #endif
-                    buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
-                    buf.appendNetworkLong(len);
+                        buf.appendByte(amf::Element::STRICT_ARRAY_AMF0);
+                        buf.appendNetworkLong(len);
+
+                        as_value elem;
+                        for (size_t i=0; i<len; ++i)
+                        {
+                            elem = ary->at(i);
+                            if ( ! elem.writeAMF0(buf, offsetTable, vm, allowStrict) )
+                            {
+                                log_error("Problems serializing strict array member %d=%s", i, elem);
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                    else 
+                    {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                        log_debug(_("writeAMF0: serializing array of %d "
+                                    "elements as ECMA_ARRAY (index %d) [allowStrict:%d, isStrict:%d]"),
+                                    len, idx, allowStrict, ary->isStrict());
+#endif
+                        buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
+                        buf.appendNetworkLong(len);
+                    }
                 }
                 else
                 {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                    log_debug(_("writeAMF0: serializing object (or function) with index %d"), idx);
+                    log_debug(_("writeAMF0: serializing object (or function) "
+                                "with index %d"), idx);
 #endif
                     buf.appendByte(amf::Element::OBJECT_AMF0);
                 }
 
-                PropsBufSerializer props(buf, vm, offsetTable);
+                PropsBufSerializer props(buf, vm, offsetTable, allowStrict);
                 obj->visitNonHiddenPropertyValues(props);
                 if ( ! props.success() ) 
                 {
@@ -2414,7 +2459,8 @@ as_value::writeAMF0(SimpleBuffer& buf,
             {
                 size_t idx = it->second;
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-                log_debug(_("writeAMF0: serializing object (or function) as reference to %d"), idx);
+                log_debug(_("writeAMF0: serializing object (or function) "
+                            "as reference to %d"), idx);
 #endif
                 buf.appendByte(amf::Element::REFERENCE_AMF0);
                 buf.appendNetworkShort(idx);
@@ -2428,7 +2474,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             buf.appendByte(amf::Element::STRING_AMF0);
             const std::string& str = getStr();
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing string '%s"), str);
+            log_debug(_("writeAMF0: serializing string '%s'"), str);
 #endif
             buf.appendNetworkShort(str.size());
             buf.append(str.c_str(), str.size());
@@ -2439,7 +2485,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
         {
             double d = getNum();
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing number '%g"), d);
+            log_debug(_("writeAMF0: serializing number '%g'"), d);
 #endif
             buf.appendByte(amf::Element::NUMBER_AMF0);
             amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines

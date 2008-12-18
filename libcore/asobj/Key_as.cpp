@@ -119,7 +119,8 @@ void
 Key_as::notify_listeners(const event_id& key_event)
 {  
     // There is no user defined "onKeyPress" event handler
-    if( (key_event.m_id != event_id::KEY_DOWN) && (key_event.m_id != event_id::KEY_UP) ) return;
+    if((key_event.m_id != event_id::KEY_DOWN) &&
+            (key_event.m_id != event_id::KEY_UP)) return;
 
     as_value ev(key_event.get_function_name());
 

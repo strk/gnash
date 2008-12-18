@@ -63,7 +63,7 @@ public:
 
     // We are required to implement these three methods.
     NPBool init(NPWindow *aWindow);
-    NPBool isInitialized() {return plugInitialized;}
+    NPBool isInitialized() { return plugInitialized; }
     void shut();
 
     NPError GetValue(NPPVariable variable, void *value);

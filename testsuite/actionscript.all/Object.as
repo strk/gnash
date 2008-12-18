@@ -341,10 +341,36 @@ check_equals(o._target, "/hello");
 function target_get() { _root.target_get_calls++; return this._target; }
 function target_set(v) { this._target=v; _root.target_set_calls++; }
 target_get_calls=target_set_calls=0;
-o.addProperty("_target", target_get, target_set);
+ret = o.addProperty("_target", target_get, target_set);
+check_equals(ret, true);
 check_equals(_root.target_get_calls, 0);
 check_equals(_root.target_set_calls, 0);
 check_equals(typeof(o._target), "undefined"); // native getter-setter don't get initialized with underlying value
+
+// Check return value.
+ret = o.addProperty("", target_get, target_get);
+check_equals(ret, false);
+
+ret = o.addProperty("frog", 7, target_get);
+check_equals(ret, false);
+
+ret = o.addProperty("frog", "string", target_get);
+check_equals(ret, false);
+
+ret = o.addProperty("frog", target_get, target_get);
+check_equals(ret, true);
+
+ret = o.addProperty("frog", target_get, target_get);
+check_equals(ret, true);
+
+ret = o.addProperty("frog", target_get, undefined);
+check_equals(ret, false);
+
+ret = o.addProperty("frog", target_get, null);
+check_equals(ret, true);
+
+ret = o.addProperty("frog", target_get, null, "extra arg");
+check_equals(ret, true);
 
 // Try property inheritance
 
@@ -880,6 +906,6 @@ totals(97);
 #endif
 
 #if OUTPUT_VERSION >= 6
-totals(276);
+totals(285);
 #endif
 

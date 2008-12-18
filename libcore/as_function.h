@@ -59,7 +59,7 @@ namespace gnash {
 /// 
 ///
 ///
-class DSOEXPORT as_function : public as_object
+class as_function : public as_object
 {
 public:
 

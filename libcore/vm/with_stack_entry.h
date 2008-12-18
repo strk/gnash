@@ -31,12 +31,6 @@ namespace gnash {
 class with_stack_entry
 {
 public:	
-	with_stack_entry()
-		:
-		_object(NULL),
-		_block_end_pc(0)
-	{
-	}
 
 	with_stack_entry(as_object* obj, size_t end)
 		:

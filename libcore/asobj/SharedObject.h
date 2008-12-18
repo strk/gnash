@@ -16,10 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_SHAREDOBJECT_H__
-#define __GNASH_ASOBJ_SHAREDOBJECT_H__
+#ifndef GNASH_ASOBJ_SHAREDOBJECT_H
+#define GNASH_ASOBJ_SHAREDOBJECT_H
 
-#include <memory> // for auto_ptr
 #include <string>
 #include <map>
 
@@ -70,12 +69,10 @@ private:
 /// Initialize the global SharedObject class
 void sharedobject_class_init(as_object& global);
 
-/// Return a SharedObject instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_sharedobject_instance();
+void registerSharedObjectNative(as_object& o);
   
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_SHAREDOBJECT_H__
 #endif
 
 // local Variables:

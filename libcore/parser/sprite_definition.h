@@ -160,14 +160,13 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual bitmap_character_def* get_bitmap_character_def(int id)
+	virtual BitmapInfo* getBitmap(int id)
 	{
-		return m_movie_def.get_bitmap_character_def(id);
+		return m_movie_def.getBitmap(id);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
-	virtual void add_bitmap_character_def(int /*id*/,
-			bitmap_character_def* /*ch*/)
+	virtual void addBitmap(int /*id*/, boost::intrusive_ptr<BitmapInfo> /*im*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
 		log_swferror(_("add_bitmap_character_def appears in sprite tags"));

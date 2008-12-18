@@ -192,6 +192,7 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
         dts=0;
     }
 	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
+    log_debug("On getting audio frame with timestamp %d, duration is %d", timestamp, _audioStream->duration);
 
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
@@ -420,6 +421,16 @@ MediaParserFfmpeg::initializeParser()
 #else
 		boost::uint64_t duration = _videoStream->duration;
 #endif
+        if ( duration == AV_NOPTS_VALUE )
+        {
+            log_error("Duration of video stream unknown");
+            duration=0; // TODO: guess!
+        }
+        else
+        {
+            duration = duration / as_double(_videoStream->time_base); // TODO: check this
+        }
+
 		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, CUSTOM /*codec type*/) );
 		
 		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
@@ -442,6 +453,16 @@ MediaParserFfmpeg::initializeParser()
 #else
 		boost::uint64_t duration = _audioStream->duration;
 #endif
+        if ( duration == AV_NOPTS_VALUE )
+        {
+            log_error("Duration of audio stream unknown to ffmpeg");
+            duration=0; // TODO: guess!
+        }
+        else
+        {
+            duration = duration / as_double(_audioStream->time_base); // TODO: check this
+        }
+
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, CUSTOM /*codec type*/) );
 
 		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(

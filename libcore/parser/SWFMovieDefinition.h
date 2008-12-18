@@ -32,8 +32,6 @@
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
-#include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
-#include "SWFStream.h" // for get_bytes_loaded and visitbility of dtor (composition)
 #include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
 #include "utility.h" // for TWIPS_TO_PIXELS 
 #include "rect.h"
@@ -50,7 +48,8 @@
 // Forward declarations
 namespace gnash {
 	class SWFMovieDefinition;
-	class movie_root;
+	class SWFStream;
+    class movie_root;
 	class MovieClip;
 	class movie_instance;
 	namespace SWF {
@@ -231,23 +230,6 @@ public:
 		return m_file_length;
 	}
 
-	/// All bitmap_info's used by this movie should be
-	/// registered with this API.
-	virtual void	add_bitmap_info(bitmap_info* bi)
-	{
-	    m_bitmap_list.push_back(bi);
-	}
-
-	virtual int get_bitmap_info_count() const
-	{
-		return m_bitmap_list.size();
-	}
-
-	virtual bitmap_info*	get_bitmap_info(int i) const
-	{
-		return m_bitmap_list[i].get();
-	}
-
 	// See docs in movie_definition.h
 	virtual void export_resource(const std::string& symbol,
             ExportableResource* res);
@@ -285,10 +267,10 @@ public:
 	Font* get_font(const std::string& name, bool bold, bool italic) const;
 
 	// See dox in movie_definition.h
-	bitmap_character_def*	get_bitmap_character_def(int character_id);
+	BitmapInfo* getBitmap(int character_id);
 
 	// See dox in movie_definition.h
-	void	add_bitmap_character_def(int character_id, bitmap_character_def* ch);
+	void addBitmap(int character_id, boost::intrusive_ptr<BitmapInfo> im);
 
 	// See dox in movie_definition.h
 	sound_sample*	get_sound_sample(int character_id);
@@ -450,9 +432,8 @@ private:
 	typedef std::map<int, boost::intrusive_ptr<Font> > FontMap;
 	FontMap m_fonts;
 
-	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> >
-        BitmapMap;
-	BitmapMap m_bitmap_characters;
+	typedef std::map<int, boost::intrusive_ptr<BitmapInfo> > Bitmaps;
+	Bitmaps _bitmaps;
 
 	typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;
 	SoundSampleMap m_sound_samples;
@@ -480,11 +461,6 @@ private:
 	/// to keep them alive
 	typedef std::vector<boost::intrusive_ptr<movie_definition> > ImportVect;
 	ImportVect m_import_source_movies;
-
-	/// Bitmaps used in this movie; collected in one place to make
-	/// it possible for the host to manage them as textures.
-	typedef std::vector<boost::intrusive_ptr<bitmap_info> >	BitmapVect;
-	BitmapVect m_bitmap_list;
 
 	rect	m_frame_size;
 	float	m_frame_rate;
@@ -574,7 +550,7 @@ protected:
 	//
 	/// Reachable resources are:
 	///	- fonts (m_fonts)
-	///	- bitmap characters (m_bitmap_characters)
+	///	- bitmaps (_bitmaps)
 	///	- bitmaps (m_bitmap_list) [ what's the difference with bitmap
     ///   characters ?? ]
 	///	- sound samples (m_sound_samples)

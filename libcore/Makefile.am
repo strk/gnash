@@ -64,6 +64,7 @@ libgnashcore_la_SOURCES = \
 	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
+	Bitmap.cpp \
 	TextField.cpp \
         BlurFilter.cpp \
         GlowFilter.cpp \
@@ -137,7 +138,8 @@ noinst_HEADERS = \
 	as_prop_flags.h	\
 	as_value.h \
 	asClass.h \
-	bitmap_info.h \
+	Bitmap.h \
+	BitmapInfo.h \
 	BitmapMovieInstance.h \
 	builtin_function.h \
 	Button.h \

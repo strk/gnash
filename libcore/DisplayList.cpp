@@ -616,7 +616,7 @@ DisplayList::display()
         character* ch = it->get();
 
         character* mask = ch->getMask();
-        if ( mask && ch->get_visible() && ! mask->isUnloaded() )
+        if ( mask && ch->isVisible() && ! mask->isUnloaded() )
         {
             render::begin_submit_mask();
             
@@ -658,7 +658,7 @@ DisplayList::display()
         }
         
         // check for non-mask hiden characters
-        if( !renderAsMask && (ch->get_visible() == false))
+        if( !renderAsMask && (!ch->isVisible()))
         {
             ch->omit_display();
             // Don't display non-mask hidden characters
@@ -865,25 +865,6 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
   
 }
 
-
-void 
-DisplayList::dump_character_tree(const std::string prefix) const
-{
-  // print self:
-  //character::dump_character_tree(prefix);
-
-  // recursion:
-  for( const_iterator it = _charsByDepth.begin(),
-      endIt = _charsByDepth.end();
-    it != endIt; ++it)
-  {
-    const DisplayItem& dobj = *it;
-    
-    dobj->dump_character_tree(prefix+" "); 
-  }
-  
-
-}
 
 /// This method is not in the header in the hope DisplayItemDepthLess
 /// will be inlined by compiler

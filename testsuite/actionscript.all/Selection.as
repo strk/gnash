@@ -54,20 +54,23 @@ check_equals (typeof(Selection.setFocus), 'function');
 // test the Selection::setSelection method
 check_equals (typeof(Selection.setSelection), 'function'); 
 
-xcheck_equals(typeof(Selection.getFocus()), "null");
+check_equals(typeof(Selection.getFocus()), "null");
 
 ret = Selection.setFocus();
-xcheck_equals(ret, false);
+check_equals(ret, false);
 
 ret = Selection.setFocus(4);
-xcheck_equals(ret, false);
+check_equals(ret, false);
 
 ret = Selection.setFocus(_root);
-xcheck_equals(ret, false);
+check_equals(ret, false);
 
 ret = Selection.setFocus(_root, 5);
-xcheck_equals(ret, false);
+check_equals(ret, false);
 
+_root.focusEnabled = false;
+ret = Selection.setFocus(_root, 5);
+check_equals(ret, false);
 
 // Methods added in version 6
 #if OUTPUT_VERSION >= 6
@@ -76,58 +79,220 @@ xcheck_equals(ret, false);
  // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
  check_equals (typeof(Selection.addListener), 'function');
  check_equals (typeof(Selection.removeListener), 'function'); 
- xcheck_equals(typeof(Selection.broadcastMessage), 'function');
- xcheck(Selection.hasOwnProperty("_listeners"));
- xcheck_equals(typeof(Selection._listeners), 'object');
- xcheck(Selection._listeners instanceof Array);
+ check_equals(typeof(Selection.broadcastMessage), 'function');
+ check(Selection.hasOwnProperty("_listeners"));
+ check_equals(typeof(Selection._listeners), 'object');
+ check(Selection._listeners instanceof Array);
 
  _root.createEmptyMovieClip("mc", getNextHighestDepth());
  check(mc instanceof MovieClip);
  ret = Selection.setFocus(mc);
- xcheck_equals(ret, false);
+ check_equals(ret, false);
  check_equals(Selection.getFocus(), null);
 
- mc.createTextField("tx", getNextHighestDepth(), 400, 400, 10, 10);
+ tx = undefined;
 
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(tx);
- xcheck_equals(typeof(ret), "boolean");
- xcheck_equals(ret, true);
+ check_equals(typeof(ret), "boolean");
+ check_equals(ret, true);
 
  // An extra argument when the first argument is valid.
  ret = Selection.setFocus(tx, 5);
- xcheck_equals(ret, false);
+ check_equals(ret, false);
  check_equals(Selection.getFocus(), null);
 
  tx.focusEnabled = true;
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(tx);
- xcheck_equals(ret, true);
+ check_equals(ret, true);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus("tx");
- xcheck_equals(ret, false);
+ check_equals(ret, false);
  check_equals(Selection.getFocus(), null);
 
  mc.focusEnabled = true;
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(mc);
- xcheck_equals(ret, false);
- xcheck_equals(Selection.getFocus(), "_level0.mc");
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
  ret = Selection.setFocus("mc");
- xcheck_equals(ret, false);
- xcheck_equals(Selection.getFocus(), "_level0.mc");
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
  ret = Selection.setFocus(5);
- xcheck_equals(ret, false);
- xcheck_equals(Selection.getFocus(), "_level0.mc");
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
+
+ // Setting _visible to false removes focus, otherwise visibility seems
+ // to have no effect.
+ mc._visible = false;
+ check_equals(mc._visible, false);
+ check_equals(Selection.getFocus(), null);
+ ret = Selection.setFocus(mc);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc._visible = false;
+ check_equals(Selection.getFocus(), "_level0.mc");
+
+ ret = Selection.setFocus(null);
+ check_equals(ret, true);
+ check_equals(Selection.getFocus(), null);
+
+ ret = Selection.setFocus(mc);
+ check_equals(ret, false);
+ mc._visible = false;
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc._visible = true;
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc._visible = false;
+ check_equals(Selection.getFocus(), null);
+
+ // Check setting mouse events.
+ Selection.setFocus(mc);
+ check_equals(Selection.getFocus(), "_level0.mc");
+ mc.onRelease = function() {};
+ check_equals(Selection.getFocus(), "_level0.mc");
+ Selection.setFocus(mc);
+ check_equals(Selection.getFocus(), "_level0.mc");
+
+ // Indices of MovieClip focus.
+ ret = Selection.getBeginIndex();
+ check_equals(ret, -1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, -1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, -1);
+
 
  Selection.setFocus(tx);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus("tx");
- xcheck_equals(ret, false);
+ check_equals(ret, false);
  check_equals(Selection.getFocus(), null);
  ret = Selection.setFocus(tx);
- xcheck_equals(ret, true);
+ check_equals(ret, true);
  check_equals(Selection.getFocus(), null);
+
+ // Indices of null focus.
+ ret = Selection.getBeginIndex();
+ check_equals(ret, -1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, -1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, -1);
+
+ createTextField('text1', 99, 10, 10, 10, 10);
+ ret = Selection.setFocus(text1);
+ check_equals(ret, false);
+ check_equals(Selection.getFocus(), '_level0.text1');
+
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 0);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+
+ // setSelection
+ ret = Selection.setSelection(0, 1);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 0);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+ 
+ text1.text = "Some Text";
+ ret = Selection.setSelection(0, 1);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 1);
+
+ ret = Selection.setSelection(4, -5);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 4);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+
+ ret = Selection.setSelection(6, 3);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 3);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 6);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 3);
+
+ ret = Selection.setSelection(1, 0);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 0);
+
+ ret = Selection.setSelection(2, 6);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 2);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 6);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 6);
+
+ ret = Selection.setSelection(3);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 2);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 6);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 6);
+
+ ret = Selection.setSelection(2, 25);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 2);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 9);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 9);
+
+ ret = Selection.setSelection(-1, 4);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 0);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 4);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 4);
+
+ ret = Selection.setSelection(1, 1);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 1);
+
+ ret = Selection.setSelection(1, 2, 3);
+ check_equals(ret, undefined);
+ ret = Selection.getBeginIndex();
+ check_equals(ret, 1);
+ ret = Selection.getEndIndex();
+ check_equals(ret, 1);
+ ret = Selection.getCaretIndex();
+ check_equals(ret, 1);
 
 #endif // OUTPUT_VERSION >= 6
 

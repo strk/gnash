@@ -38,8 +38,9 @@
 #include "Global.h"
 #include "String_as.h"
 #include "Key_as.h"
+#include "Selection_as.h"
 //#include "LoadVars_as.h"
-#include "LocalConnection.h"
+//#include "LocalConnection.h"
 #include "Microphone.h"
 #include "Number_as.h"
 #include "Object.h"
@@ -49,9 +50,8 @@
 #include "Mouse.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
-#include "NetConnection.h"
+#include "NetConnection_as.h"
 #include "NetStream_as.h"
-#include "Selection.h"
 #include "SharedObject.h"
 #include "Sound.h"
 #include "Stage_as.h"
@@ -109,23 +109,16 @@ static as_value as_global_assetnativeaccessor(const fn_call& /*fn*/);
 static as_value as_global_asconstructor(const fn_call& /*fn*/);
 static as_value as_global_updateAfterEvent(const fn_call& /*fn*/);
 
+namespace {
+    void registerNatives(as_object& global);
+}
+
 Global::Global(VM& vm, ClassHierarchy *ch)
     :
     as_object()
 {
 
-    //-------------------------------------------------
-    // Unclassified - TODO: move to appropriate section
-    //
-    // WARNING: this approach seems to be bogus, in 
-    //          that the proprietary player seems to 
-    //          always provide all the core classes it
-    //          supports, reguardless of target SWF version.
-    //          The only difference seems to be in actual
-    //          usability of them. For example some will
-    //          be available [ typeof(Name) == 'function' ]
-    //          but not instanciatable.
-    //-------------------------------------------------
+    registerNatives(*this);
 
     // No idea why, but it seems there's a NULL _global.o 
     // defined at player startup...
@@ -135,24 +128,17 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     as_value nullVal; nullVal.set_null();
     init_member("o", nullVal, as_prop_flags::dontEnum);
 
-    // ASNew was dropped as a builtin function but exists
-    // as ASnative.
-    vm.registerNative(as_global_assetpropflags, 1, 0);
-    vm.registerNative(as_global_asnew, 2, 0);    
-    vm.registerNative(as_global_assetnative, 4, 0);    
-    vm.registerNative(as_global_assetnativeaccessor, 4, 1);
-    vm.registerNative(as_global_updateAfterEvent, 9, 0);    
-    vm.registerNative(timer_setinterval, 250, 0);
-    vm.registerNative(timer_clearinterval, 250, 1);
-
     // _global functions.            
+    // These functions are only available in SWF6+, but this is just
+    // because SWF5 or lower did not have a "_global"
+    // reference at all.
     init_member("ASnative", new builtin_function(as_global_asnative));
     init_member("ASconstructor", new builtin_function(as_global_asconstructor));
-    
     init_member("ASSetPropFlags", vm.getNative(1, 0));
     init_member("ASSetNative", vm.getNative(4, 0));
     init_member("ASSetNativeAccessor", vm.getNative(4, 1));
     init_member("updateAfterEvent", vm.getNative(9, 0));
+    init_member("trace", vm.getNative(100, 4));
 
     // Defined in timers.h
     init_member("setInterval", vm.getNative(250, 0));
@@ -167,26 +153,19 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     ch->setExtension(&_et);
 #endif
 
+    ch->massDeclare();
+
+    object_class_init(*this); 
+    string_class_init(*this); 
+    array_class_init(*this); 
+
+    /// SWF6 visibility:
+    function_class_init(*this);
+
+    // SWF8 visibility:
+    flash_package_init(*this); 
+
     const int version = vm.getSWFVersion();
-
-    ch->massDeclare(version);
-
-    /// Version-based initialization.
-    //
-    /// ASnative functions must always be available. Gnash
-    /// loads classes on first use, so all ASnative functions
-    /// must be registered separately on startup.
-    //
-    /// TODO: which ASnative functions are available for which
-    ///       VM version?
-    /// TODO: establish when classes should be available (see
-    ///       note above).
-
-    function_class_init(*this); // flagged for sole SWF6+ visibility
-    object_class_init(*this); // flagged for sole SWF5+ visibility
-    string_class_init(*this); // should be SWF5+ only
-    array_class_init(*this); // should be only for SWF5+
-    registerDateNative(*this); // natives are always present
 
     switch (version)
     {
@@ -198,10 +177,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
         case 7:
         case 6:
 
-            flash_package_init(*this); // will hide unless swf8 (by prop flags)
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_FUNCTION);
             ch->getGlobalNs()->getClass(NSV::CLASS_FUNCTION)->setDeclared();
-            init_member("LocalConnection", new builtin_function(localconnection_new));
 
         case 5:
         
@@ -211,14 +188,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             ch->getGlobalNs()->getClass(NSV::CLASS_ARRAY)->setDeclared();
             ch->getGlobalNs()->stubPrototype(NSV::CLASS_STRING);
             ch->getGlobalNs()->getClass(NSV::CLASS_STRING)->setDeclared();        
-        
-            vm.registerNative(as_global_escape, 100, 0);
-            vm.registerNative(as_global_unescape, 100, 1);
-            vm.registerNative(as_global_parseint, 100, 2);
-            vm.registerNative(as_global_parsefloat, 100, 3);
-            vm.registerNative(as_global_isNaN, 200, 18);
-            vm.registerNative(as_global_isfinite, 200, 19);
-
+            // This is surely not correct, but they are not available
+            // in SWF4
             init_member("escape", vm.getNative(100, 0));
             init_member("unescape", vm.getNative(100, 1));
             init_member("parseInt", vm.getNative(100, 2));
@@ -226,25 +197,11 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             init_member("isNaN", vm.getNative(200, 18));
             init_member("isFinite", vm.getNative(200, 19));
 
-            // NaN and Infinity should only be in _global since SWF6,
-            // but this is just because SWF5 or lower did not have a "_global"
-            // reference at all, most likely.
             init_member("NaN", as_value(NaN));
-            init_member("Infinity", as_value(std::numeric_limits<double>::infinity()));
-
-            registerColorNative(*this);
-            registerTextFormatNative(*this);
-            registerMouseNative(*this);
-
+            init_member("Infinity", as_value(
+                        std::numeric_limits<double>::infinity()));
+        
         case 4:
-
-            registerMathNative(*this);
-            registerSystemNative(*this);
-            registerStageNative(*this);
-
-            vm.registerNative(as_global_trace, 100, 4);
-            init_member("trace", vm.getNative(100, 4));
-
         case 3:
         case 2:
         case 1:
@@ -256,6 +213,35 @@ Global::Global(VM& vm, ClassHierarchy *ch)
 #endif
 
 }
+
+#ifdef USE_EXTENSIONS
+
+//-----------------------
+// Extensions
+//-----------------------
+// Scan the plugin directories for all plugins, and load them now.
+// FIXME: this should actually be done dynamically, and only
+// if a plugin defines a class that a movie actually wants to
+// use.
+void
+Global::loadExtensions()
+{
+
+    if ( RcInitFile::getDefaultInstance().enableExtensions() )
+    {
+        log_security(_("Extensions enabled, scanning plugin dir for load"));
+        _et.scanAndLoad(*this);
+    }
+    else
+    {
+        log_security(_("Extensions disabled"));
+    }
+
+}
+
+#endif
+
+
 
 as_value
 as_global_trace(const fn_call& fn)
@@ -679,32 +665,49 @@ as_global_updateAfterEvent(const fn_call& /*fn*/)
     return as_value();
 }
 
+namespace {
 
-#ifdef USE_EXTENSIONS
-
-//-----------------------
-// Extensions
-//-----------------------
-// Scan the plugin directories for all plugins, and load them now.
-// FIXME: this should actually be done dynamically, and only
-// if a plugin defines a class that a movie actually wants to
-// use.
 void
-Global::loadExtensions()
+registerNatives(as_object& global)
 {
+    
+    VM& vm = global.getVM();
 
-    if ( RcInitFile::getDefaultInstance().enableExtensions() )
-    {
-        log_security(_("Extensions enabled, scanning plugin dir for load"));
-        _et.scanAndLoad(*this);
-    }
-    else
-    {
-        log_security(_("Extensions disabled"));
-    }
+    // ASNew was dropped as a builtin function but exists
+    // as ASnative.
+    vm.registerNative(as_global_assetpropflags, 1, 0);
+    vm.registerNative(as_global_asnew, 2, 0);    
+    vm.registerNative(as_global_assetnative, 4, 0);    
+    vm.registerNative(as_global_assetnativeaccessor, 4, 1);
+    vm.registerNative(as_global_updateAfterEvent, 9, 0);    
+    vm.registerNative(as_global_escape, 100, 0);
+    vm.registerNative(as_global_unescape, 100, 1);
+    vm.registerNative(as_global_parseint, 100, 2);
+    vm.registerNative(as_global_parsefloat, 100, 3);
+    vm.registerNative(as_global_trace, 100, 4);
+    vm.registerNative(as_global_isNaN, 200, 18);
+    vm.registerNative(as_global_isfinite, 200, 19);
+    vm.registerNative(timer_setinterval, 250, 0);
+    vm.registerNative(timer_clearinterval, 250, 1);
+
+    registerSelectionNative(global);
+    registerDateNative(global);
+    registerColorNative(global);
+    registerTextFormatNative(global);
+    registerMouseNative(global);
+    registerMathNative(global);
+    registerSystemNative(global);
+    registerStageNative(global);
+    registerSharedObjectNative(global);
+
+    // LoadableObject has natives shared between LoadVars and XML, so 
+    // should be registered first.
+    LoadableObject::registerNative(global);
+    XML_as::registerNative(global);
+    XMLNode_as::registerNative(global);
 
 }
 
-#endif
-
+} // anonymous namespace
 } // namespace gnash
+

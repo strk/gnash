@@ -20,55 +20,34 @@
 
 // This include file used only to make render_handler_agg more readable.
 
-
 namespace gnash {
-
-/// Bitmap class used internally by the AGG renderer. There's no reason to
-/// use it outside. It does not much except providing all necessary information. 
-class agg_bitmap_info_base : public bitmap_info
-{
-public:
-
-  int get_width() const { return m_width; }  
-  int get_height() const { return m_height;  }  
-  int get_bpp() const { return m_bpp; }  
-  int get_rowlen() const { return m_rowlen; }  
-  boost::uint8_t* get_data() const { return m_data; }
-
-protected:
-  boost::uint8_t* m_data;
-  int m_width;
-  int m_height;
-  int m_bpp;
-  int m_rowlen;  
-};
-
 
 /// The class itself uses a template. Currently this is unnecessary and it may
 /// be removed but an older implementation required this method and it may be
 /// necessary again when the last missing parts of the renderer will be
-/// implemented. 
-template <class PixelFormat>
-class agg_bitmap_info : public agg_bitmap_info_base 
+/// implemented. And when might that be? I don't think I'll wait.
+class agg_bitmap_info : public BitmapInfo
 {
 public:
 
-  agg_bitmap_info(int width, int height, int rowlen, boost::uint8_t* data, int bpp) 
+  agg_bitmap_info(std::auto_ptr<GnashImage> im)
+      :
+      _image(im),
+      _bpp(_image->type() == GNASH_IMAGE_RGB ? 24 : 32)
   {
-    //printf("creating bitmap %dx%d pixels with %d bytes rowsize\n", width,height,rowlen);
-
-    m_bpp = bpp;    
-    m_width = width;
-    m_height = height;
-    m_rowlen = rowlen;
-
-    m_data = new boost::uint8_t[height*rowlen];
-    memcpy(m_data, data, height*rowlen);   
   }
+ 
+  int get_width() const { return _image->width(); }  
+  int get_height() const { return _image->height();  }  
+  int get_bpp() const { return _bpp; }  
+  int get_rowlen() const { return _image->pitch(); }  
+  boost::uint8_t* get_data() const { return _image->data(); }
   
-  ~agg_bitmap_info() {
-    delete [] m_data;
-  }
+private:
+
+  std::auto_ptr<GnashImage> _image;
+
+  int _bpp;
     
 };
 

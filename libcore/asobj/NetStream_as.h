@@ -29,9 +29,9 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
-#include "NetConnection.h"
 #include "MediaParser.h"
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
+#include "NetConnection_as.h"
 #include "PlayHead.h" // for composition
 
 #include "VideoDecoder.h" // for visibility of dtor
@@ -83,14 +83,14 @@ public:
     class CursoredBuffer
     {
     public:
-        DSOEXPORT CursoredBuffer()
+        CursoredBuffer()
             :
             m_size(0),
             m_data(NULL),
             m_ptr(NULL)
         {}
 
-        DSOEXPORT ~CursoredBuffer()
+        ~CursoredBuffer()
         {
             delete [] m_data;
         }
@@ -169,7 +169,8 @@ public:
 /// This class is responsible for handlign external
 /// media files. Provides interfaces for playback control.
 ///
-class NetStream_as : public as_object {
+class NetStream_as : public as_object
+{
 
 protected:
     
@@ -203,9 +204,8 @@ protected:
         /// NetStream.Seek.InvalidTime (level: error)
         invalidTime
     };
-    
 
-    boost::intrusive_ptr<NetConnection> _netCon;
+    boost::intrusive_ptr<NetConnection_as> _netCon;
 
     boost::scoped_ptr<CharacterProxy> _audioController;
 
@@ -263,8 +263,6 @@ protected:
     std::auto_ptr<media::MediaParser> m_parser;
 
     // Are we playing a FLV?
-    bool m_isFLV;
-
     // The handler which is invoked on status change
     boost::intrusive_ptr<as_function> m_statusHandler;
 
@@ -369,13 +367,12 @@ public:
     /// @param nc
     ///     The NetConnection object to use for network access
     ///
-    void setNetCon(boost::intrusive_ptr<NetConnection> nc)
-    {
+    void setNetCon(boost::intrusive_ptr<NetConnection_as> nc) {
         _netCon = nc;
     }
 
     /// Return true if the NetStream has an associated NetConnection
-    bool isConnected() const { return _netCon != 0; }
+    bool isConnected() const { return (_netCon); }
 
     /// Specifies the number of milliseconds to buffer before starting to display the stream.
     //
@@ -432,10 +429,8 @@ public:
     ///
     /// It might be invoked by a separate thread (neither main, nor decoder thread).
     ///
-    static unsigned int audio_streamer(void *udata, boost::int16_t* samples, unsigned int nSamples, bool& eof);
-
-
-
+    static unsigned int audio_streamer(void *udata, boost::int16_t* samples,
+            unsigned int nSamples, bool& eof);
 
 
 private:
@@ -596,7 +591,7 @@ private:
     ///
     void clearStatusQueue();
 
-    // TODO: change to a container with fast pop_front()
+    // Queue of status notifications.
     typedef std::deque<StatusCode> StatusQueue;
 
     /// List of status messages to be processed
@@ -608,16 +603,17 @@ private:
     /// Last status code (to avoid consecutively notifying the same event)
     StatusCode _lastStatus;
 
+    typedef std::pair<std::string, std::string> NetStreamStatus;
+
     /// Get 'status' (first) and 'level' (second) strings for given status code
     //
-    /// The two members of the pair are ensured to be not-NULL
     /// Any invalid code, out of bound or explicitly invalid (invalidCode) 
-    /// returns two empty C strings.
+    /// returns two empty strings.
     ///
-    std::pair<const char*, const char*> getStatusCodeInfo(StatusCode code);
+    void getStatusCodeInfo(StatusCode code, NetStreamStatus& info);
 
     /// Return a newly allocated information object for the given status
-    boost::intrusive_ptr<as_object> getStatusObject(StatusCode code);
+    as_object* getStatusObject(StatusCode code);
 
     /// hack for using a Timer to drive ::advance calls
     static as_value advanceWrapper(const fn_call& fn);

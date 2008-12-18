@@ -287,8 +287,8 @@ attachButtonInterface(as_object& o)
     gettersetter = character::name_getset;
     o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
     
-    gettersetter = &Button::enabled_getset;
-    o.init_property(NSV::PROP_ENABLED, *gettersetter, *gettersetter);
+    const int unprotected = 0;
+    o.init_member(NSV::PROP_ENABLED, true, unprotected);
 
 }
 
@@ -298,8 +298,7 @@ Button::Button(SWF::DefineButtonTag& def, character* parent, int id)
     m_last_mouse_flags(IDLE),
     m_mouse_flags(IDLE),
     m_mouse_state(UP),
-    _def(def),
-    m_enabled(true)
+    _def(def)
 {
 
     set_prototype(getButtonInterface());
@@ -319,39 +318,13 @@ Button::~Button()
 
 
 bool 
-Button::get_enabled()
+Button::isEnabled()
 {
-    return m_enabled;
+    as_value enabled;
+    if (!get_member(NSV::PROP_ENABLED, &enabled)) return false;
+
+    return enabled.to_bool();
 }
-
-void 
-Button::set_enabled(bool value)
-{
-    if (value == m_enabled) return;
-    m_enabled = value; 
-    
-    // NOTE: no visual change
-}
-
-
-as_value
-Button::enabled_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<Button> ptr = ensureType<Button>(fn.this_ptr);
-
-    as_value rv;
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        rv = as_value(ptr->get_enabled());
-    }
-    else // setter
-    {
-        ptr->set_enabled(fn.arg(0).to_bool());
-    }
-    return rv;
-}
-
 
 
 // called from Key listener only
@@ -382,6 +355,13 @@ Button::on_event(const event_id& id)
     return xec.called;
 }
 
+bool
+Button::handleFocus() {
+    /// Nothing to do, but can receive focus.
+    return false;
+}
+
+
 void
 Button::restart()
 {
@@ -410,7 +390,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 {
-    if ( (!get_visible()) || (!get_enabled()))
+    if (!isVisible() || !isEnabled())
     {
         return 0;
     }
@@ -431,10 +411,11 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
         point  p(x, y);
         m.invert().transform(p);
 
-        for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend(); it!=itE; ++it)
+        for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend();
+                it!=itE; ++it)
         {
             character* ch = *it;
-            if ( ! ch->get_visible() ) continue;
+            if ( ! ch->isVisible() ) continue;
             character *hit = ch->get_topmost_mouse_entity(p.x, p.y);
             if ( hit ) return hit;
         }
@@ -456,7 +437,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
         parent->getWorldMatrix().transform(wp);
     }
 
-    for (CharsVect::const_iterator i = _hitCharacters.begin(),
+    for (DisplayObjects::const_iterator i = _hitCharacters.begin(),
          e = _hitCharacters.end(); i !=e; ++i)
     {
         if ((*i)->pointInVisibleShape(wp.x, wp.y))
@@ -475,8 +456,7 @@ Button::on_button_event(const event_id& event)
 {
     if ( isUnloaded() )
     {
-        // We dont' respond to events while unloaded
-        // See bug #22982
+        // We don't respond to events while unloaded. See bug #22982.
         log_debug("Button %s received %s button event while unloaded: ignored",
             getTarget(), event);
         return;
@@ -487,30 +467,29 @@ Button::on_button_event(const event_id& event)
     // Set our mouse state (so we know how to render).
     switch (event.m_id)
     {
-    case event_id::ROLL_OUT:
-    case event_id::RELEASE_OUTSIDE:
-        new_state = UP;
-        break;
+        case event_id::ROLL_OUT:
+        case event_id::RELEASE_OUTSIDE:
+            new_state = UP;
+            break;
 
-    case event_id::RELEASE:
-    case event_id::ROLL_OVER:
-    case event_id::DRAG_OUT:
-    case event_id::MOUSE_UP:
-        new_state = OVER;
-        break;
+        case event_id::RELEASE:
+        case event_id::ROLL_OVER:
+        case event_id::DRAG_OUT:
+        case event_id::MOUSE_UP:
+            new_state = OVER;
+            break;
 
-    case event_id::PRESS:
-    case event_id::DRAG_OVER:
-    case event_id::MOUSE_DOWN:
-        new_state = DOWN;
-        break;
+        case event_id::PRESS:
+        case event_id::DRAG_OVER:
+        case event_id::MOUSE_DOWN:
+            new_state = DOWN;
+            break;
 
-    default:
-        //abort();  // missed a case?
-        log_error(_("Unhandled button event %s"), event);
-        break;
-    };
-    
+        default:
+            //abort();  // missed a case?
+            log_error(_("Unhandled button event %s"), event);
+            break;
+    }
     
     set_current_state(new_state);
     
@@ -599,20 +578,15 @@ Button::on_button_event(const event_id& event)
     {
         //log_debug(_("Got statically-defined handler for event: %s"), event);
         mr.pushAction(code, movie_root::apDOACTION);
-        //code->execute();
     }
-    //else log_debug(_("No statically-defined handler for event: %s"), event);
 
     // Call conventional attached method.
     boost::intrusive_ptr<as_function> method =
         getUserDefinedEventHandler(event.get_function_key());
     if ( method )
     {
-        //log_debug(_("Got user-defined handler for event: %s"), event);
         mr.pushAction(method, this, movie_root::apDOACTION);
-        //call_method0(as_value(method.get()), &(get_environment()), this);
     }
-    //else log_debug(_("No statically-defined handler for event: %s"), event);
 }
 
 
@@ -639,15 +613,14 @@ Button::getActiveCharacters(
 
     // Copy all the characters to the new list, skipping NULL
     // characters, optionally including unloaded characters.
-    std::remove_copy_if(_stateCharacters.begin(),
-            _stateCharacters.end(),
+    std::remove_copy_if(_stateCharacters.begin(), _stateCharacters.end(),
             std::back_inserter(list),
             boost::bind(&isCharacterNull, _1, includeUnloaded));
     
 }
 
 void 
-Button::get_active_records(RecSet& list, MouseState state)
+Button::get_active_records(ActiveRecords& list, MouseState state)
 {
     list.clear();
     
@@ -704,7 +677,7 @@ Button::set_current_state(MouseState new_state)
 #endif
 
     // Get new state records
-    RecSet newChars;
+    ActiveRecords newChars;
     get_active_records(newChars, new_state);
 
     // For each possible record, check if it should still be there
@@ -772,7 +745,9 @@ Button::set_current_state(MouseState new_state)
                 ch->set_cxform(cx); 
                 ch->set_depth(ch_depth); 
                 assert(ch->get_parent() == this);
-                assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
+
+                // no way to specify a name for button chars anyway...
+                assert(ch->get_name().empty()); 
 
                 if ( ch->wantsInstanceName() )
                 {
@@ -813,7 +788,7 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
     // Not visible anyway
-    if (!m_visible) return;
+    if (!isVisible()) return;
 
     ranges.add(m_old_invalidated_ranges);  
 
@@ -873,13 +848,13 @@ character *
 Button::getChildByName(const std::string& name)
 {
     // Get all currently active characters, including unloaded
-    CharsVect actChars;
+    DisplayObjects actChars;
     getActiveCharacters(actChars, true);
 
     // Lower depth first for duplicated names, so we sort
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    for (CharsVect::iterator i=actChars.begin(), e=actChars.end(); i!=e; ++i)
+    for (DisplayObjects::iterator i=actChars.begin(), e=actChars.end(); i!=e; ++i)
     {
 
         character* const child = *i;
@@ -903,20 +878,21 @@ void
 Button::stagePlacementCallback(as_object* initObj)
 {
 
-    // A Button cannot be created dynamically, so can't have an 
-    // initObj.
-    assert(!initObj);
+    // Not sure how this can happen, but blip.tv does it.
+    if (initObj) {
+        log_unimpl("Button placed with an initObj. How did this happen? "
+                "We'll copy the properties anyway");
+        copyProperties(*initObj);
+    }
 
     saveOriginalTarget(); // for soft refs
 
-    // Register this button instance as a live character
-    // do we need this???
-    //_vm.getRoot().addLiveChar(this);
+    // Don't register this button instance as a live character.
 
     // Instantiate the hit characters
-    RecSet hitChars;
+    ActiveRecords hitChars;
     get_active_records(hitChars, HIT);
-    for (RecSet::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
+    for (ActiveRecords::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
     {
         SWF::ButtonRecord& bdef = _def.buttonRecords()[*i];
 
@@ -925,12 +901,15 @@ Button::stagePlacementCallback(as_object* initObj)
         int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
         int ch_id = bdef.m_character_id;
 
-        character* ch = bdef.m_character_def->create_character_instance(this, ch_id);
+        character* ch =
+            bdef.m_character_def->create_character_instance(this, ch_id);
         ch->setMatrix(mat, true);  // update caches
-        ch->set_cxform(cx); // TODO: who cares about color ?
-        ch->set_depth(ch_depth); // TODO: check if we care about depth, and why ...
+    
+        // TODO: who cares about color, depth etc.
+        ch->set_cxform(cx); 
+        ch->set_depth(ch_depth);
         assert(ch->get_parent() == this);
-        assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
+        assert(ch->get_name().empty()); 
 
         _hitCharacters.push_back(ch);
     }
@@ -943,10 +922,10 @@ Button::stagePlacementCallback(as_object* initObj)
     _stateCharacters.resize(_def.buttonRecords().size());
 
     // Instantiate the default state characters 
-    RecSet upChars;
+    ActiveRecords upChars;
     get_active_records(upChars, UP);
-    //log_debug("At StagePlacementCallback, button %s got %d active chars for state UP", getTarget(), upChars.size());
-    for (RecSet::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
+
+    for (ActiveRecords::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
     {
         int rno = *i;
         SWF::ButtonRecord& bdef = _def.buttonRecords()[rno];
@@ -962,7 +941,7 @@ Button::stagePlacementCallback(as_object* initObj)
         ch->set_cxform(cx); 
         ch->set_depth(ch_depth); 
         assert(ch->get_parent() == this);
-        assert(ch->get_name().empty()); // no way to specify a name for button chars anyway...
+        assert(ch->get_name().empty()); 
 
         if ( ch->wantsInstanceName() )
         {
@@ -974,7 +953,8 @@ Button::stagePlacementCallback(as_object* initObj)
         ch->stagePlacementCallback(); // give this character a life
     }
 
-    // there's no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD events for buttons
+    // There is no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD event 
+    // for Buttons
 }
 
 #ifdef GNASH_USE_GC
@@ -986,7 +966,7 @@ Button::markReachableResources() const
     _def.setReachable();
 
     // Mark state characters as reachable
-    for (CharsVect::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
+    for (DisplayObjects::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
             i!=e; ++i)
     {
         character* ch = *i;
@@ -994,8 +974,8 @@ Button::markReachableResources() const
     }
 
     // Mark hit characters as reachable
-    for (CharsVect::const_iterator i=_hitCharacters.begin(), e=_hitCharacters.end();
-            i!=e; ++i)
+    for (DisplayObjects::const_iterator i = _hitCharacters.begin(),
+            e=_hitCharacters.end(); i != e; ++i)
     {
         character* ch = *i;
         assert ( ch );
@@ -1013,15 +993,15 @@ Button::unload()
 
     bool childsHaveUnload = false;
 
-    // We need to unload all childs, or the global instance list will keep growing forever !
-    //std::for_each(_stateCharacters.begin(), _stateCharacters.end(), boost::bind(&character::unload, _1));
-    for (CharsVect::iterator i=_stateCharacters.begin(), e=_stateCharacters.end(); i!=e; ++i)
+    // We need to unload all children, or the global instance list
+    // will keep growing forever !
+    for (DisplayObjects::iterator i = _stateCharacters.begin(),
+            e = _stateCharacters.end(); i != e; ++i)
     {
         character* ch = *i;
         if ( ! ch ) continue;
         if ( ch->isUnloaded() ) continue;
         if ( ch->unload() ) childsHaveUnload = true;
-        //log_debug("Button child %s (%s) unloaded", ch->getTarget(), typeName(*ch));
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -1040,15 +1020,15 @@ Button::unload()
 void
 Button::destroy()
 {
-    //log_debug("Button %s being destroyed", getTarget());
 
-    for (CharsVect::iterator i=_stateCharacters.begin(), e=_stateCharacters.end(); i!=e; ++i)
+    for (DisplayObjects::iterator i = _stateCharacters.begin(),
+            e=_stateCharacters.end(); i != e; ++i)
     {
         character* ch = *i;
         if ( ! ch ) continue;
         if ( ch->isDestroyed() ) continue;
         ch->destroy();
-        *i = NULL;
+        *i = 0;
     }
 
     // NOTE: we don't need to ::unload or ::destroy here
@@ -1064,100 +1044,92 @@ Button::destroy()
 
 bool
 Button::get_member(string_table::key name_key, as_value* val,
-  string_table::key nsname)
+    string_table::key nsname)
 {
-  // FIXME: use addProperty interface for these !!
-  // TODO: or at least have a character:: protected method take
-  //       care of these ?
-  //       Duplicates code in character::get_path_element_character too..
-  //
-  if (name_key == NSV::PROP_uROOT)
-  {
-    // getAsRoot() will take care of _lockroot
-    val->set_as_object( const_cast<MovieClip*>( getAsRoot() )  );
-    return true;
-  }
+    // FIXME: use addProperty interface for these !!
+    // TODO: or at least have a character:: protected method take
+    //       care of these ?
+    //       Duplicates code in character::get_path_element_character too..
+    //
+    if (name_key == NSV::PROP_uROOT) {
+        // getAsRoot() will take care of _lockroot
+        val->set_as_object( const_cast<MovieClip*>( getAsRoot() )    );
+        return true;
+    }
 
-  // NOTE: availability of _global doesn't depend on VM version
-  //       but on actual movie version. Example: if an SWF4 loads
-  //       an SWF6 (to, say, _level2), _global will be unavailable
-  //       to the SWF4 code but available to the SWF6 one.
-  //
-  if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) // see MovieClip.as
-  {
-    // The "_global" ref was added in SWF6
-    val->set_as_object( _vm.getGlobal() );
-    return true;
-  }
+    // NOTE: availability of _global doesn't depend on VM version
+    //             but on actual movie version. Example: if an SWF4 loads
+    //             an SWF6 (to, say, _level2), _global will be unavailable
+    //             to the SWF4 code but available to the SWF6 one.
+    //
+    // see MovieClip.as
+    if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) {
+        // The "_global" ref was added in SWF6
+        val->set_as_object( _vm.getGlobal() );
+        return true;
+    }
 
-  const std::string& name = _vm.getStringTable().value(name_key);
+    const std::string& name = _vm.getStringTable().value(name_key);
 
-  movie_root& mr = _vm.getRoot();
-  unsigned int levelno;
-  if ( mr.isLevelTarget(name, levelno) )
-  {
-    movie_instance* mo = mr.getLevel(levelno).get();
-    if ( mo )
+    movie_root& mr = _vm.getRoot();
+    unsigned int levelno;
+    if ( mr.isLevelTarget(name, levelno) ) {
+        movie_instance* mo = mr.getLevel(levelno).get();
+        if ( mo ) {
+            val->set_as_object(mo);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // TOCHECK : Try object members, BEFORE display list items
+    //
+    if (as_object::get_member(name_key, val, nsname))
     {
-      val->set_as_object(mo);
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-    }
 
-  // TOCHECK : Try object members, BEFORE display list items
-  //
-  if (as_object::get_member(name_key, val, nsname))
-  {
-
-// ... trying to be useful to Flash coders ...
-// The check should actually be performed before any return
-// prior to the one due to a match in the DisplayList.
-// It's off by default anyway, so not a big deal.
-// See bug #18457
+    // ... trying to be useful to Flash coders ...
+    // The check should actually be performed before any return
+    // prior to the one due to a match in the DisplayList.
+    // It's off by default anyway, so not a big deal.
+    // See bug #18457
 #define CHECK_FOR_NAME_CLASHES 1
 #ifdef CHECK_FOR_NAME_CLASHES
-    IF_VERBOSE_ASCODING_ERRORS(
-    if ( getChildByName(name) )
-    {
-      log_aserror(_("A button member (%s) clashes with "
-          "the name of an existing character "
-          "in its display list.  "
-          "The member will hide the "
-          "character"), name);
-    }
-    );
+        IF_VERBOSE_ASCODING_ERRORS(
+        if ( getChildByName(name) )
+        {
+            log_aserror(_("A button member (%s) clashes with "
+                    "the name of an existing character "
+                    "in its display list.    "
+                    "The member will hide the "
+                    "character"), name);
+        }
+        );
 #endif
 
-    return true;
-  }
+        return true;
+    }
 
+    // Try items on our display list.
+    character* ch = getChildByName(name);
 
-  // Try items on our display list.
-  character* ch = getChildByName(name);
+    if (ch) {
+        // Found object.
 
-  if (ch)
-  {
-      // Found object.
+        // If the object is an ActionScript referenciable one we
+        // return it, otherwise we return ourselves
+        if ( ch->isActionScriptReferenceable() ) {
+            val->set_as_object(ch);
+        }
+        else {
+            val->set_as_object(this);
+        }
 
-      // If the object is an ActionScript referenciable one we
-      // return it, otherwise we return ourselves
-      if ( ch->isActionScriptReferenceable() )
-      {
-        val->set_as_object(ch);
-      }
-      else
-      {
-        val->set_as_object(this);
-      }
+        return true;
+    }
 
-      return true;
-  }
-
-  return false;
+    return false;
 
 }
 
@@ -1189,7 +1161,7 @@ button_ctor(const fn_call& /* fn */)
 }
 
 void
-button_class_init(as_object& global)
+Button::init(as_object& global)
 {
   // This is going to be the global Button "class"/"function"
   static boost::intrusive_ptr<builtin_function> cl=NULL;

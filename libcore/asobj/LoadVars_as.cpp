@@ -137,6 +137,8 @@ LoadVars_as::LoadVars_as()
 void
 LoadVars_as::attachLoadVarsInterface(as_object& o)
 {
+    VM& vm = o.getVM();
+
 	o.init_member("addRequestHeader", new builtin_function(
 	            LoadableObject::loadableobject_addRequestHeader));
 	o.init_member("decode", new builtin_function(LoadVars_as::decode_method));
@@ -144,12 +146,9 @@ LoadVars_as::attachLoadVarsInterface(as_object& o)
 	            LoadVars_as::getBytesLoaded_method));
 	o.init_member("getBytesTotal", new builtin_function(
 	            LoadVars_as::getBytesTotal_method));
-	o.init_member("load", new builtin_function(
-	            LoadableObject::loadableobject_load));
-	o.init_member("send", new builtin_function(
-                LoadableObject::loadableobject_send));
-	o.init_member("sendAndLoad", new builtin_function(
-	            LoadableObject::loadableobject_sendAndLoad));
+	o.init_member("load", vm.getNative(301, 0));
+	o.init_member("send", vm.getNative(301, 1));
+	o.init_member("sendAndLoad", vm.getNative(301, 2));
 	o.init_member("toString", new builtin_function(loadvars_tostring));
 	o.init_member("onData", new builtin_function(LoadVars_as::onData_method));
 	o.init_member("onLoad", new builtin_function(LoadVars_as::onLoad_method));

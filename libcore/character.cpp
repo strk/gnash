@@ -38,13 +38,25 @@
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
 
 #undef set_invalidated
 
 namespace gnash
 {
 
-// Define static const members or there will be linkage problems.
+// Forward declarations.
+namespace {
+    /// Match blend modes.
+    typedef std::map<MovieClip::BlendMode, std::string> BlendModeMap;
+    const BlendModeMap& getBlendModeMap();
+    bool blendModeMatches(const BlendModeMap::value_type& val,
+            const std::string& mode);
+}
+
+
+// Define static const members.
 const int character::lowerAccessibleBound;
 const int character::upperAccessibleBound;
 const int character::staticDepthOffset;
@@ -53,7 +65,33 @@ const int character::noClipDepthValue;
 const int character::dynClipDepthValue;
 
 // Initialize unnamed instance count
-unsigned int character::_lastUnnamedInstanceNum=0;
+unsigned int character::_lastUnnamedInstanceNum = 0;
+
+character::character(character* parent, int id)
+    :
+    m_parent(parent),
+    m_invalidated(true),
+    m_child_invalidated(true),
+    m_id(id),
+    m_depth(0),
+    _xscale(100),
+    _yscale(100),
+    _rotation(0),
+    _volume(100),
+    m_ratio(0),
+    m_clip_depth(noClipDepthValue),
+    _unloaded(false),
+    _destroyed(false),
+    _mask(0),
+    _maskee(0),
+    _blendMode(BLENDMODE_NORMAL),
+    _visible(true),
+    _scriptTransformed(false),
+    _dynamicallyCreated(false)
+{
+    assert((!parent && m_id == -1) || ((parent) && m_id >= 0));
+    assert(m_old_invalidated_ranges.isNull());
+}
 
 /*protected static*/
 std::string
@@ -103,22 +141,11 @@ character::get_world_cxform() const
 	return m;
 }
 
-#if 0
-void
-character::get_mouse_state(int& x, int& y, int& buttons)
-{
-	assert(m_parent != NULL);
-#ifndef GNASH_USE_GC
-	assert(m_parent->get_ref_count() > 0);
-#endif // GNASH_USE_GC
-	get_parent()->get_mouse_state(x, y, buttons);
-}
-#endif
 
 as_object*
 character::get_path_element_character(string_table::key key)
 {
-	if (key == NSV::PROP_uROOT)
+	if (_vm.getSWFVersion() > 4 && key == NSV::PROP_uROOT)
 	{
 		// getAsRoot() will handle _lockroot 
 		return const_cast<MovieClip*>(getAsRoot());
@@ -219,13 +246,6 @@ character::set_child_invalidated()
     m_child_invalidated=true;
   	if ( m_parent ) m_parent->set_child_invalidated();
   } 
-}
-
-void 
-character::dump_character_tree(const std::string prefix) const
-{
-  log_debug("%s%s<%p> I=%d,CI=%d", prefix, typeName(*this), this,
-    m_invalidated, m_child_invalidated);  
 }
 
 void
@@ -532,6 +552,75 @@ character::alpha_getset(const fn_call& fn)
 
 }
 
+as_value
+character::blendMode(const fn_call& fn)
+{
+    boost::intrusive_ptr<character> ch =
+        ensureType<character>(fn.this_ptr);
+
+    // This is AS-correct, but doesn't do anything.
+    // TODO: implement in the renderers!
+    LOG_ONCE(log_unimpl(_("blendMode")));
+
+    if (!fn.nargs)
+    {
+        // Getter
+        BlendMode bm = ch->getBlendMode();
+
+        /// If the blend mode is undefined, it doesn't return a string.
+        if (bm == BLENDMODE_UNDEFINED) return as_value();
+
+        std::ostringstream blendMode;
+        blendMode << bm;
+        return as_value(blendMode.str());
+    }
+
+    //
+    // Setter
+    //
+    
+    const as_value& bm = fn.arg(0);
+
+    // Undefined argument sets blend mode to normal.
+    if (bm.is_undefined()) {
+        ch->setBlendMode(BLENDMODE_NORMAL);
+        return as_value();
+    }
+
+    // Numeric argument.
+    if (bm.is_number()) {
+        double mode = bm.to_number();
+
+        // hardlight is the last known value
+        if (mode < 0 || mode > BLENDMODE_HARDLIGHT) {
+
+            // An invalid numeric argument becomes undefined.
+            ch->setBlendMode(BLENDMODE_UNDEFINED);
+        }
+        else {
+            ch->setBlendMode(static_cast<BlendMode>(mode));
+        }
+        return as_value();
+    }
+
+    // Other arguments use toString method.
+    const std::string& mode = bm.to_string();
+
+    const BlendModeMap& bmm = getBlendModeMap();
+    BlendModeMap::const_iterator it = std::find_if(bmm.begin(), bmm.end(),
+            boost::bind(blendModeMatches, _1, mode));
+
+    if (it != bmm.end()) {
+        ch->setBlendMode(it->first);
+    }
+
+    // An invalid string argument has no effect.
+
+    return as_value();
+
+}
+
+
 /// _visible can be set with true/false, but also
 /// 0 and 1.
 as_value
@@ -540,9 +629,9 @@ character::visible_getset(const fn_call& fn)
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
-	if ( fn.nargs == 0 ) // getter
+	if (!fn.nargs) // getter
 	{
-		rv = as_value(ptr->get_visible());
+		rv = as_value(ptr->isVisible());
 	}
 	else // setter
 	{
@@ -617,6 +706,21 @@ character::width_getset(const fn_call& fn)
 	return rv;
 }
 
+void
+character::set_visible(bool visible)
+{
+    if (_visible != visible) set_invalidated(__FILE__, __LINE__);
+
+    // Remove focus from this character if it changes from visible to
+    // invisible (see Selection.as).
+    if (_visible && !visible) {
+        movie_root& mr = _vm.getRoot();
+        if (mr.getFocus().get() == this) {
+            mr.setFocus(0);
+        }
+    }
+    _visible = visible;      
+}
 void
 character::set_width(double newwidth)
 {
@@ -863,6 +967,7 @@ character::get_event_handler(const event_id& id) const
 bool
 character::unload()
 {
+
 	if ( ! _unloaded )
 	{
 		queueEvent(event_id::UNLOAD, movie_root::apDOACTION);
@@ -880,7 +985,8 @@ character::queueEvent(const event_id& id, int lvl)
 {
 
 	movie_root& root = _vm.getRoot();
-	std::auto_ptr<ExecutableCode> event(new QueuedEvent(boost::intrusive_ptr<character>(this), id));
+	std::auto_ptr<ExecutableCode> event(
+            new QueuedEvent(boost::intrusive_ptr<character>(this), id));
 	root.pushAction(event, lvl);
 }
 
@@ -890,7 +996,8 @@ character::hasEventHandler(const event_id& id) const
 	Events::const_iterator it = _event_handlers.find(id);
 	if ( it != _event_handlers.end() ) return true;
 
-	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(id.get_function_key());
+	boost::intrusive_ptr<as_function> method = 
+        getUserDefinedEventHandler(id.get_function_key());
 	if (method) return true;
 
 	return false;
@@ -938,7 +1045,6 @@ character::set_x_scale(double scale_percent)
     // As per misc-ming.all/SWFMatrix_test.{c,swf}
     // we don't need to recompute the SWFMatrix from the 
     // caches.
-
 
 	SWFMatrix m = getMatrix();
 
@@ -1129,14 +1235,6 @@ character::getTarget() const
 	return target;
 }
 
-#if 0
-/*public*/
-std::string
-character::get_text_value() const
-{
-	return getTarget();
-}
-#endif
 
 void
 character::destroy()
@@ -1195,7 +1293,7 @@ character::setMask(character* mask)
 		// on any previously registered maskee
 		// so we make sure to set our _mask to 
 		// NULL before getting called again
-		_mask->setMaskee(NULL);
+		_mask->setMaskee(0);
 	}
 
 	// if we had a maskee, notify it to stop using
@@ -1234,8 +1332,9 @@ character::setMaskee(character* maskee)
 	{
 		// We don't want the maskee to call setMaskee(null)
 		// on us again
-		log_debug(" %s.setMaskee(%s) : previously masked char %s being set as non-masked",
-			getTarget(), maskee ? maskee->getTarget() : "null", _maskee->getTarget());
+		log_debug(" %s.setMaskee(%s) : previously masked char %s "
+                "being set as non-masked", getTarget(), 
+                maskee ? maskee->getTarget() : "null", _maskee->getTarget());
 		_maskee->_mask = NULL;
 	}
 
@@ -1276,33 +1375,42 @@ character::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	os << get_depth();
 	tr.append_child(it, StringPair(_("Depth"), os.str()));
 
-        /// Don't add if the character has no ratio value
-        if (get_ratio() >= 0)
-        {
-            os.str("");
-            os << get_ratio();
-	        tr.append_child(it, StringPair(_("Ratio"), os.str()));
-	    }	    
+    /// Don't add if the character has no ratio value
+    if (get_ratio() >= 0)
+    {
+        os.str("");
+        os << get_ratio();
+        tr.append_child(it, StringPair(_("Ratio"), os.str()));
+    }	    
 
-        /// Don't add if it's not a real clipping depth
-        if (int cd = get_clip_depth() != noClipDepthValue )
-        {
+    /// Don't add if it's not a real clipping depth
+    if (int cd = get_clip_depth() != noClipDepthValue )
+    {
 		os.str("");
 		if (cd == dynClipDepthValue) os << "Dynamic mask";
 		else os << cd;
 
 		tr.append_child(it, StringPair(_("Clipping depth"), os.str()));	    
-        }
+    }
 
-        os.str("");
-        os << get_width() << "x" << get_height();
+    os.str("");
+    os << get_width() << "x" << get_height();
 	tr.append_child(it, StringPair(_("Dimensions"), os.str()));	
 
 	tr.append_child(it, StringPair(_("Dynamic"), isDynamic() ? yes : no));	
 	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
 	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
 	tr.append_child(it, StringPair(_("Unloaded"), isUnloaded() ? yes : no));
-
+	
+    os.str("");
+    os << _blendMode;
+    tr.append_child(it, StringPair(_("Blend mode"), os.str()));
+#ifndef NDEBUG
+    // This probably isn't interesting for non-developers
+    tr.append_child(it, StringPair(_("Invalidated"), m_invalidated ? yes : no));
+    tr.append_child(it, StringPair(_("Child invalidated"),
+                m_child_invalidated ? yes : no));
+#endif
 	return it;
 }
 #endif
@@ -1311,6 +1419,53 @@ const MovieClip*
 character::getAsRoot() const
 {
     return get_root();
+}
+
+
+namespace {
+
+
+const BlendModeMap&
+getBlendModeMap()
+{
+    /// BLENDMODE_UNDEFINED has no matching string in AS. It is included
+    /// here for logging purposes.
+    static const BlendModeMap bm = boost::assign::map_list_of
+        (character::BLENDMODE_UNDEFINED, "undefined")
+        (character::BLENDMODE_NORMAL, "normal")
+        (character::BLENDMODE_LAYER, "layer")
+        (character::BLENDMODE_MULTIPLY, "multiply")
+        (character::BLENDMODE_SCREEN, "screen")
+        (character::BLENDMODE_LIGHTEN, "lighten")
+        (character::BLENDMODE_DARKEN, "darken")
+        (character::BLENDMODE_DIFFERENCE, "difference")
+        (character::BLENDMODE_ADD, "add")
+        (character::BLENDMODE_SUBTRACT, "subtract")
+        (character::BLENDMODE_INVERT, "invert")
+        (character::BLENDMODE_ALPHA, "alpha")
+        (character::BLENDMODE_ERASE, "erase")
+        (character::BLENDMODE_OVERLAY, "overlay")
+        (character::BLENDMODE_HARDLIGHT, "hardlight");
+
+    return bm;
+}
+
+// Match a blend mode to its string.
+bool
+blendModeMatches(const BlendModeMap::value_type& val, const std::string& mode)
+{
+    /// The match must be case-sensitive.
+    if (mode.empty()) return false;
+    return (val.second == mode);
+}
+
+}
+
+std::ostream&
+operator<<(std::ostream& o, character::BlendMode bm)
+{
+    const BlendModeMap& bmm = getBlendModeMap();
+    return (o << bmm.find(bm)->second);
 }
 
 

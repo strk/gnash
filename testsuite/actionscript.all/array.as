@@ -335,15 +335,15 @@ c[1.1] = "one point one";
 c[-3] = "minus three";
 
 check_equals (c[0], "zero");
-xcheck_equals (c[1], "one");
+check_equals (c[1], "one");
 check_equals (c[1.1], "one point one");
-xcheck_equals (c[1.9], undefined);
+check_equals (c[1.9], undefined);
 check_equals (c[-3], "minus three");
 check_equals (c[-3.7], undefined);
 
 c[-2147483648] = "lowest int";
 check_equals (c[0], "zero");
-xcheck_equals (c[1], "one");
+check_equals (c[1], "one");
 
 // This appears to invalidate integer indices, but
 // not non-integer ones.
@@ -379,12 +379,12 @@ c[1.1] = "one point one";
 c[-3] = "minus three";
 
 check_equals (c[0], "zero");
-xcheck_equals (c[1], "one");
+check_equals (c[1], "one");
 
 // No problem...
 c[0xffffffff + 1] = "too high";
 check_equals (c[0], "zero");
-xcheck_equals (c[1], "one");
+check_equals (c[1], "one");
 check_equals (c[0xffffffff], undefined);
 check_equals (c[0xffffffff + 1], "too high");
 
@@ -394,7 +394,7 @@ check_equals (c[0xfffffffffffffffff], "much too high");
 // Also no problem. Looks like a fairly crappy bug to me.
 c[-2147483650] = "still lower";
 check_equals (c[0], "zero");
-xcheck_equals (c[1], "one");
+check_equals (c[1], "one");
 
 xcheck_equals (c.length, 2147483647);
 
@@ -405,7 +405,7 @@ for (i in c)
     str += i + ": " + c[i] + "; ";
 }
 
-xcheck_equals(str, "-2147483650: still lower; 2.95147905179353e+20: much too high; 4294967296: too high; -3: minus three; 1.1: one point one; 3: three; 2: two; 1: one; 0: zero; ");
+check_equals(str, "-2147483650: still lower; 2.95147905179353e+20: much too high; 4294967296: too high; -3: minus three; 1.1: one point one; 3: three; 2: two; 1: one; 0: zero; ");
 
 // Getting 'holes' crawls the inheritance chain !
 Array.prototype[3] = 3;
@@ -415,6 +415,18 @@ check_equals(sparse[3], 3); // crawl inheritance chain !
 sparse[4] = 4;
 check_equals(sparse[3], 3); // crawl inheritance chain !
 delete Array.prototype[3];
+
+c = []; c[''] = 2;
+check_equals(c.length, 0);
+check_equals(typeof(c['']), 'undefined');
+
+c = []; c[2.2] = 2;
+#if OUTPUT_VERSION < 7
+  xcheck_equals(c.length, 3);
+#else
+  check_equals(c.length, 0);
+#endif
+check_equals(c[2.2], 2);
 
 //-----------------------------------------------------
 // Test Array.pop()
@@ -1466,11 +1478,11 @@ check_equals(a[1], 'overridden'); // flag was lost
 
 
 #if OUTPUT_VERSION < 6
- check_totals(497);
+ check_totals(501);
 #else
 # if OUTPUT_VERSION < 7
-  check_totals(558);
+  check_totals(562);
 # else
-  check_totals(568);
+  check_totals(572);
 # endif
 #endif

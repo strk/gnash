@@ -578,6 +578,14 @@ Array_as::index_requested(string_table::key name)
 {
     const std::string& nameString = _vm.getStringTable().value(name);
 
+    // Anything not in [0-9] makes this an invalid index
+    if ( nameString.find_first_not_of("0123456789") != std::string::npos )
+    {
+        return -1;
+    }
+
+    // TODO: do we need all this noise ? atol(3) should do !
+
     as_value temp;
     temp.set_string(nameString);
     double value = temp.to_number();
@@ -1692,6 +1700,13 @@ Array_as::visitNonHiddenPropertyValues(AbstractPropertyVisitor& visitor) const
 
     // visit proper properties
     as_object::visitNonHiddenPropertyValues(visitor);
+}
+
+bool
+Array_as::isStrict() const
+{
+    if ( hasNonHiddenProperties() ) return false;
+    return true;
 }
 
 } // end of gnash namespace
