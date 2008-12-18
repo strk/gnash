@@ -111,6 +111,7 @@ LocalConnection::~LocalConnection()
 void
 LocalConnection::close()
 {
+    _connected = false;
 #ifndef NETWORK_CONN
     closeMem();
 #endif
@@ -126,12 +127,12 @@ void
 LocalConnection::connect(const std::string& name)
 {
 
-    if (name.empty()) {
-        _name = "none, sysv segment type";
-    } 
-    else {
-        _name = name;
-    }
+    assert(!name.empty());
+
+    _name = name;
+    
+    // TODO: does this depend on success?
+    _connected = true;
     
     log_debug("trying to open shared memory segment: \"%s\"", _name);
     
@@ -143,8 +144,6 @@ LocalConnection::connect(const std::string& name)
         log_error("Failed to open shared memory segment: \"%s\"", _name);
         return; 
     }
-    
-    _connected = true;
     
     return;
 }
@@ -185,16 +184,16 @@ LocalConnection::getDomain()
         return domain;
     }
 
-    // If there is no second '.', return the whole thing.
     pos = domain.rfind(".", pos - 1);
     
-    // Return everything after the second-to-last '.'
-    // FIXME: this must be wrong, or it would return 'org.uk' for many
-    // UK websites, and not even Adobe is that stupid.
+    // If there is no second '.', return the whole thing.
     if (pos == std::string::npos) {
         return domain;
     }
 
+    // Return everything after the second-to-last '.'
+    // FIXME: this must be wrong, or it would return 'org.uk' for many
+    // UK websites, and not even Adobe is that stupid. I think.
     return domain.substr(pos + 1);
 
 }
@@ -243,6 +242,9 @@ localconnection_connect(const fn_call& fn)
     boost::intrusive_ptr<LocalConnection> ptr =
         ensureType<LocalConnection>(fn.this_ptr);
 
+    // If already connected, don't try again until close() is called.
+    if (ptr->connected()) return false;
+
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("LocalConnection.connect() expects exactly "
@@ -260,6 +262,10 @@ localconnection_connect(const fn_call& fn)
     }
 
     std::string name = fn.arg(0).to_string();
+
+    if (name.empty()) {
+        return as_value(false);
+    }
 
     ptr->connect(name);
 
@@ -343,7 +349,6 @@ localconnection_send(const fn_call& fn)
 void
 attachLocalConnectionInterface(as_object& o)
 {
-
     o.init_member("close", new builtin_function(localconnection_close));
     o.init_member("connect", new builtin_function(localconnection_connect));
     o.init_member("domain", new builtin_function(localconnection_domain));
