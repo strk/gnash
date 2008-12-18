@@ -91,6 +91,8 @@ HTTP::HTTP()
 {
 //    GNASH_REPORT_FUNCTION;
 //    struct status_codes *status = new struct status_codes;
+    _version.major = 0;
+    _version.minor = 0;
     
 //    _status_codes(CONTINUE, status);
 }
@@ -105,6 +107,8 @@ HTTP::HTTP(Handler *hand)
 {
 //    GNASH_REPORT_FUNCTION;
     _handler = hand;
+    _version.major = 0;
+    _version.minor = 0;
 }
 
 HTTP::~HTTP()
