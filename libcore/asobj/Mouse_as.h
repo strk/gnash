@@ -16,23 +16,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_MOUSE_H__
-#define __GNASH_ASOBJ_MOUSE_H__
-
-#include <memory> // for auto_ptr
+#ifndef GNASH_ASOBJ_MOUSE_H
+#define GNASH_ASOBJ_MOUSE_H
 
 namespace gnash {
 
 class as_object;
 
-/// Register native functions with the VM
-void registerMouseNative(as_object& global);
+class Mouse_as
+{
+public:
+    /// Register native functions with the VM
+    static void registerNative(as_object& global);
 
-/// Initialize the global Mouse class
-void mouse_class_init(as_object& global);
-  
+    /// Initialize the global Mouse class
+    static void init(as_object& global);
+};
+
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_MOUSE_H__
 #endif
 

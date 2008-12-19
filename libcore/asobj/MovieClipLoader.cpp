@@ -27,7 +27,6 @@
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
 #include "as_function.h"
-#include "movie_definition.h"
 #include "MovieClip.h"
 #include "character.h" // for loadClip (get_parent)
 #include "log.h"
@@ -41,10 +40,7 @@
 #include "array.h" // for _listeners construction
 #include "ExecutableCode.h"
 
-#include <typeinfo> 
 #include <string>
-#include <set>
-#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME 
 
 //#define GNASH_DEBUG 1
 
@@ -116,25 +112,16 @@ static void
 attachMovieClipLoaderInterface(as_object& o)
 {
   	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
-	o.init_member("unloadClip", new builtin_function(moviecliploader_unloadclip));
-	o.init_member("getProgress", new builtin_function(moviecliploader_getprogress));
+	o.init_member("unloadClip",
+            new builtin_function(moviecliploader_unloadclip));
+	o.init_member("getProgress",
+            new builtin_function(moviecliploader_getprogress));
 
 	// NOTE: we want addListener/removeListener/broadcastMessage
 	//       but don't what the _listeners property here...
 	// TODO: add an argument to AsBroadcaster::initialize skip listeners ?
 	AsBroadcaster::initialize(o);
 	o.delProperty(NSV::PROP_uLISTENERS);
-
-#if 0
-	// Load the default event handlers. These should really never
-	// be called directly, as to be useful they are redefined
-	// within the SWF script. These get called if there is a problem
-	// Setup the event handlers
-	o.set_event_handler(event_id::LOAD_INIT, new builtin_function(event_test));
-	o.set_event_handler(event_id::LOAD_START, new builtin_function(event_test));
-	o.set_event_handler(event_id::LOAD_PROGRESS, new builtin_function(event_test));
-	o.set_event_handler(event_id::LOAD_ERROR, new builtin_function(event_test));
-#endif
   
 }
 
@@ -145,7 +132,6 @@ getMovieClipLoaderInterface()
 	if ( o == NULL )
 	{
 		o = new as_object(getObjectInterface());
-		//log_debug(_("MovieClipLoader interface @ %p"), o.get());
 		attachMovieClipLoaderInterface(*o);
 	}
 	return o.get();
@@ -162,7 +148,7 @@ public:
 	/// MovieClip
 	bool loadClip(const std::string& url, MovieClip& target);
 
-	void unloadClip(void *);
+	void unloadClip();
 
 private:
 
@@ -185,7 +171,6 @@ MovieClipLoader::MovieClipLoader()
 
 MovieClipLoader::~MovieClipLoader()
 {
-	//GNASH_REPORT_FUNCTION;
 }
 
 bool
@@ -194,7 +179,7 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
     
     movie_root& mr = _vm.getRoot();
 
-	URL url(url_str.c_str(), mr.runInfo().baseURL());
+	URL url(url_str, mr.runInfo().baseURL());
 	
 #if GNASH_DEBUG
 	log_debug(_(" resolved url: %s"), url.str());
@@ -206,34 +191,41 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 	bool ret = target.loadMovie(url);
 	if ( ! ret ) 
 	{
-		// TODO: find semantic of last argument
-		as_value met("onLoadError");
+
+        // FIXME: docs suggest the string can be either "URLNotFound" or
+        // "LoadNeverCompleted". This is neither of them:
 		as_value arg1("Failed to load movie or jpeg");
+
+		// FIXME: The last argument is HTTP status, or 0 if no connection
+        // was attempted (sandbox) or no status information is available
+        // (supposedly the Adobe mozilla plugin).
 		as_value arg2(0.0);
-		callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal, arg1, arg2);
+		callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadError", targetVal,
+                arg1, arg2);
 
 		return false;
 	}
 
-	MovieClip* newChar = targetVal.to_sprite(); // this is to resolve the soft ref
+    // this is to resolve the soft ref
+	MovieClip* newChar = targetVal.to_sprite(); 
 	if ( ! newChar )
 	{
 		// We could assert, but let's try to be nicer...
-		log_error("MovieClip::loadMovie destroyed self w/out replacing ?");
+		log_error("MovieClip::loadMovie destroyed self without replacing?");
 		return false;
 	}
 
 	// Dispatch onLoadStart
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadStart"), targetVal);
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadStart", targetVal);
 
 	// Dispatch onLoadProgress
 	size_t bytesLoaded = newChar->get_bytes_loaded();
 	size_t bytesTotal = newChar->get_bytes_total();
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadProgress"), targetVal,
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadProgress", targetVal,
 		bytesLoaded, bytesTotal);
 
 	// Dispatch onLoadComplete
-	callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadComplete"), targetVal,
+	callMethod(NSV::PROP_BROADCAST_MESSAGE, "onLoadComplete", targetVal,
 		as_value(0.0)); // TODO: find semantic of last arg
 
 	/// This event must be dispatched when actions
@@ -242,16 +234,17 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 	/// Since MovieClip::loadMovie above will invoke stagePlacementCallback
 	/// and thus queue all actions in first frame, we'll queue the
 	/// onLoadInit call next, so it happens after the former.
-	///
-	//callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadInit"), targetVal);
-	std::auto_ptr<ExecutableCode> code ( new DelayedFunctionCall(this, NSV::PROP_BROADCAST_MESSAGE, as_value("onLoadInit"), targetVal) );
+	std::auto_ptr<ExecutableCode> code(
+            new DelayedFunctionCall(this, NSV::PROP_BROADCAST_MESSAGE, 
+                "onLoadInit", targetVal));
+
 	_vm.getRoot().pushAction(code, movie_root::apDOACTION);
 
 	return true;
 }
 
 void
-MovieClipLoader::unloadClip(void *)
+MovieClipLoader::unloadClip()
 {
   GNASH_REPORT_FUNCTION;
 }
@@ -259,17 +252,16 @@ MovieClipLoader::unloadClip(void *)
 static as_value
 moviecliploader_loadclip(const fn_call& fn)
 {
-	as_value	val, method;
 
-	//log_debug(_("%s: nargs = %d"), __FUNCTION__, fn.nargs);
-
-	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
+	boost::intrusive_ptr<MovieClipLoader> ptr =
+        ensureType<MovieClipLoader>(fn.this_ptr);
   
 	if ( fn.nargs < 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"), ss.str());
+		log_aserror(_("MovieClipLoader.loadClip(%s): missing arguments"),
+            ss.str());
 		);
 		return as_value(false);
 	}
@@ -323,10 +315,9 @@ static as_value
 moviecliploader_new(const fn_call& /* fn */)
 {
 
-  as_object*	mov_obj = new MovieClipLoader;
-  //log_debug(_("MovieClipLoader instance @ %p"), mov_obj);
+  as_object* mov_obj = new MovieClipLoader;
 
-  return as_value(mov_obj); // will store in a boost::intrusive_ptr
+  return as_value(mov_obj);
 }
 
 // Invoked every time the loading content is written to disk during
@@ -334,9 +325,9 @@ moviecliploader_new(const fn_call& /* fn */)
 static as_value
 moviecliploader_getprogress(const fn_call& fn)
 {
-	//log_debug(_("%s: nargs = %d"), __FUNCTION__, nargs);
 
-	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
+	boost::intrusive_ptr<MovieClipLoader> ptr =
+        ensureType<MovieClipLoader>(fn.this_ptr);
   
 	if ( ! fn.nargs )
 	{
@@ -351,8 +342,8 @@ moviecliploader_getprogress(const fn_call& fn)
 	if ( ! target.get() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is not an object"),
-			fn.arg(0));
+		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
+                "not an object"), fn.arg(0));
 		);
 		return as_value();
 	}
@@ -361,14 +352,14 @@ moviecliploader_getprogress(const fn_call& fn)
 	if ( ! sp )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is not an sprite"),
-			fn.arg(0));
+		log_aserror(_("MovieClipLoader.getProgress(%s): first argument is "
+                "not an sprite"), fn.arg(0));
 		);
 		return as_value();
 	}
 
 
-	boost::intrusive_ptr<as_object> mcl_obj ( new as_object() );
+	boost::intrusive_ptr<as_object> mcl_obj = new as_object;
 
 	size_t bytesLoaded = sp->get_bytes_loaded();
 	size_t bytesTotal = sp->get_bytes_total();
@@ -376,9 +367,8 @@ moviecliploader_getprogress(const fn_call& fn)
 	string_table& st = ptr->getVM().getStringTable();
 
 	// We want these to be enumerable
-	mcl_obj->set_member(st.find(PROPNAME("bytesLoaded")), bytesLoaded);
-	mcl_obj->set_member(st.find(PROPNAME("bytesTotal")),  bytesTotal);
-
+	mcl_obj->set_member(st.find("bytesLoaded"), bytesLoaded);
+	mcl_obj->set_member(st.find("bytesTotal"),  bytesTotal);
   
 	return as_value(mcl_obj.get()); // will keep alive
 }
@@ -391,10 +381,10 @@ moviecliploader_class_init(as_object& global)
 
 	if ( cl == NULL )
 	{
-		cl=new builtin_function(&moviecliploader_new, getMovieClipLoaderInterface());
+		cl=new builtin_function(&moviecliploader_new,
+                getMovieClipLoaderInterface());
 	}
-	global.init_member("MovieClipLoader", cl.get()); //as_value(moviecliploader_new));
-	//log_debug(_("MovieClipLoader class @ %p"), cl.get());
+	global.init_member("MovieClipLoader", cl.get()); 
 }
 
 } // end of gnash namespace

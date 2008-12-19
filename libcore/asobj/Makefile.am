@@ -58,14 +58,14 @@ libgnashasobjs_la_SOURCES = \
 	LocalConnection.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
-	Mouse.cpp \
+	Mouse_as.cpp \
 	NetConnection_as.cpp \
 	NetStream_as.cpp \
 	Number_as.cpp \
 	Object.cpp \
 	PlayHead.cpp \
 	Selection_as.cpp \
-	SharedObject.cpp\
+	SharedObject_as.cpp\
 	Sound.cpp \
 	Stage_as.cpp \
 	System_as.cpp \
@@ -123,7 +123,7 @@ noinst_HEADERS = \
 	LoadVars_as.h \
 	LocalConnection.h\
 	Microphone.h \
-	Mouse.h	\
+	Mouse_as.h	\
 	MovieClipLoader.h \
 	NetConnection_as.h	\
 	NetStream_as.h \
@@ -132,7 +132,7 @@ noinst_HEADERS = \
 	PlayHead.h \
 	prophelper.h \
 	Selection_as.h \
-	SharedObject.h \
+	SharedObject_as.h \
 	Sound.h \
 	Stage_as.h	\
 	System_as.h \
