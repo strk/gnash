@@ -41,7 +41,7 @@
 #include "array.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
-#include "TextFormat.h" // for getTextFormat/setTextFormat
+#include "TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
 
@@ -2379,7 +2379,7 @@ textfield_getTextFormat(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    boost::intrusive_ptr<TextFormat> tf = new TextFormat();
+    boost::intrusive_ptr<TextFormat_as> tf = new TextFormat_as;
     tf->alignSet(text->getTextAlignment());
     tf->sizeSet(text->getFontHeight());
     tf->indentSet(text->getIndent());
@@ -2442,7 +2442,7 @@ textfield_setTextFormat(const fn_call& fn)
         return as_value();
     }
 
-    TextFormat* tf = dynamic_cast<TextFormat*>(obj);
+    TextFormat_as* tf = dynamic_cast<TextFormat_as*>(obj);
     if ( ! tf )
     {
         IF_VERBOSE_ASCODING_ERRORS(

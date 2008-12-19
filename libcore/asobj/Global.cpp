@@ -56,7 +56,7 @@
 #include "Sound.h"
 #include "Stage_as.h"
 #include "System_as.h"
-#include "TextFormat.h"
+#include "TextFormat_as.h"
 #include "TextSnapshot_as.h"
 #include "Video.h"
 #include "extension.h"
@@ -693,12 +693,12 @@ registerNatives(as_object& global)
     registerSelectionNative(global);
     registerDateNative(global);
     registerColorNative(global);
-    registerTextFormatNative(global);
     registerMathNative(global);
     registerSystemNative(global);
     registerStageNative(global);
     registerSharedObjectNative(global);
 
+    TextFormat_as::registerNative(global);
     Mouse_as::registerNative(global);
 
     // LoadableObject has natives shared between LoadVars and XML, so 
