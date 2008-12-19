@@ -47,12 +47,12 @@
 #include "Math_as.h"
 #include "XML_as.h"
 #include "XMLSocket_as.h"
-#include "Mouse.h"
+#include "Mouse_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
 #include "NetStream_as.h"
-#include "SharedObject.h"
+#include "SharedObject_as.h"
 #include "Sound.h"
 #include "Stage_as.h"
 #include "System_as.h"
@@ -694,11 +694,12 @@ registerNatives(as_object& global)
     registerDateNative(global);
     registerColorNative(global);
     registerTextFormatNative(global);
-    registerMouseNative(global);
     registerMathNative(global);
     registerSystemNative(global);
     registerStageNative(global);
     registerSharedObjectNative(global);
+
+    Mouse_as::registerNative(global);
 
     // LoadableObject has natives shared between LoadVars and XML, so 
     // should be registered first.
