@@ -90,8 +90,6 @@ public:
     /// Get an stream by name
     std::auto_ptr<IOChannel> getStream(const std::string& name);
 
-    unsigned int nextCallNumber();
-
 protected:
 
 	/// Mark responders associated with remoting calls
@@ -122,12 +120,6 @@ private:
     /// by a single POST operation.
     ///
     std::auto_ptr<AMFQueue> _currentCallQueue; 
-
-    /// Number of calls queued for current connection
-    //
-    /// TODO: make it a member of AMFQueue
-    ///
-    unsigned int _numCalls;
 
 	/// the url prefix optionally passed to connect()
 	std::string _uri;
