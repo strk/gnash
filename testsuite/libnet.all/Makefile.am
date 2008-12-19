@@ -93,6 +93,7 @@ TEST_DRIVERS = ../simple.exp
 CLEANFILES =  \
 	site.exp.bak \
 	testrun.* \
+	fooBar* \
 	*.bin
 
 check-DEJAGNU: site-update
