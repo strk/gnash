@@ -712,8 +712,8 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
  	  swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
  	  el->makeNumber(swapped); 
 	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
-      }
 	  break;
+      }
       case Element::BOOLEAN_AMF0:
 	  el->makeBoolean(tmpptr);
 	  tmpptr += 1;		// sizeof(bool) isn't always 1 for all compilers 
@@ -764,8 +764,16 @@ AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
 	  log_debug("AMF0 MovieClip frame");
 	  break;
       case Element::NULL_AMF0:
+	  el->makeNull();
+	  tmpptr++;
+	  break;
       case Element::UNDEFINED_AMF0:
+	  el->makeUndefined();
+	  tmpptr++;
+	  break;
       case Element::REFERENCE_AMF0:
+	  el->makeReference();
+	  break;
       case Element::ECMA_ARRAY_AMF0:
       {
 	  el->makeECMAArray();
