@@ -97,8 +97,6 @@ protected:
 
 private:
 
-	friend class AMFQueue;
-
     typedef std::pair<std::string, std::string> NetConnectionStatus;
 
     void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
