@@ -1013,9 +1013,13 @@ test_rtmpt (void)
     // Array request
     boost::shared_ptr<Buffer> hex_req27(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 36 00 00 00 7f 0a 00 00 00 01 0a 00 00 00 65 00 3f f0 00 00 00 00 00 00 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 06 00 40 59 00 00 00 00 00 00"));
     vector<boost::shared_ptr<amf::Element> > headers27 = http.parseEchoRequest(*hex_req27);
+    std::vector<boost::shared_ptr<amf::Element> > props27 = headers27[3]->getProperties();
     if ((strncmp(headers27[0]->getName(), "echo", 4) == 0)
         && (strncmp(headers27[1]->getName(), "/6", 2) == 0)
-        && (headers27[3]->getType() == Element::STRICT_ARRAY_AMF0)) { // FIXME: add test for array values
+        && (headers27[3]->getType() == Element::STRICT_ARRAY_AMF0)
+        && (props27[0]->to_number() == 1)
+        && (props27[1]->getType() == Element::UNDEFINED_AMF0)
+        ) { // FIXME: add test for array values
         runtest.pass("HTTP::parseEchoRequest(Strict Array)");
     } else {        
         runtest.fail("HTTP::parseEchoRequest(Strict Array)");
@@ -1026,9 +1030,17 @@ test_rtmpt (void)
     // Array request
     boost::shared_ptr<Buffer> hex_req28(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 37 00 00 00 38 0a 00 00 00 01 08 00 00 00 01 00 06 6c 65 6e 67 74 68 00 3f f0 00 00 00 00 00 00 00 01 30 00 3f f0 00 00 00 00 00 00 00 03 6f 6e 65 00 3f f0 00 00 00 00 00 00 00 00 09"));
     vector<boost::shared_ptr<amf::Element> > headers28 = http.parseEchoRequest(*hex_req28);
+    std::vector<boost::shared_ptr<amf::Element> > props28 = headers28[3]->getProperties();
     if ((strncmp(headers28[0]->getName(), "echo", 4) == 0)
         && (strncmp(headers28[1]->getName(), "/7", 2) == 0)
-        && (headers28[3]->getType() == Element::ECMA_ARRAY_AMF0)) { // FIXME: add test for array values
+        && (headers28[3]->getType() == Element::ECMA_ARRAY_AMF0)
+        && (props28[0]->getType() == Element::NUMBER_AMF0)
+        && (strcmp(props28[0]->getName(), "length") == 0)
+        && (props28[0]->to_number() == 1)
+        && (props28[2]->getType() == Element::NUMBER_AMF0)
+        && (strcmp(props28[2]->getName(), "one") == 0)
+        && (props28[2]->to_number() == 1)
+        ) {
         runtest.pass("HTTP::parseEchoRequest(Strict Array)");
     } else {        
         runtest.fail("HTTP::parseEchoRequest(Strict Array)");
