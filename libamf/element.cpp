@@ -1187,6 +1187,15 @@ Element::makeRecordSet()
 ///
 /// @return A reference to this Element.
 Element &
+Element::makeDate()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::DATE_AMF0;
+
+    return *this;
+}
+
+Element &
 Element::makeDate(boost::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1332,6 +1341,8 @@ Element::dump(std::ostream& os) const
       case Element::RECORD_SET_AMF0:
       case Element::XML_OBJECT_AMF0:
       case Element::TYPED_OBJECT_AMF0:
+	  cerr << endl;
+	  break;
       case Element::AMF3_DATA:
 	  if (getDataSize() != 0) {
 	      log_debug("FIXME: got AMF3 data!");
