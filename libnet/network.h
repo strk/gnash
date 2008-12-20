@@ -78,9 +78,6 @@ const short RTMPTS_PORT = 443;
   typedef int    socklen_t;
 #endif
 
-// Adjust for the constant size
-const size_t NETBUFSIZE = 1448;	// 1500 appears to be the default size as used by FMS
-//const size_t NETBUFSIZE = 1357*2;	// 1500 appears to be the default size as used by FMS
 
 /// \class Network
 ///	This is a low level network class for Gnash and Cygnal. This

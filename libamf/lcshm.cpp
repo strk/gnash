@@ -29,7 +29,7 @@
 
 #include "log.h"
 #include "buffer.h"
-#include "network.h"
+//#include "network.h"
 #include "amf.h"
 #include "shm.h"
 #include "element.h"
@@ -101,7 +101,7 @@ LcShm::LcShm()
 /// \brief Construct an initialized shared memory segment.
 ///
 /// @param addr The address to use for the memory segment.
-LcShm::LcShm(Network::byte_t *addr)
+LcShm::LcShm(boost::uint8_t *addr)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = addr;
@@ -136,7 +136,7 @@ Listener::Listener()
 ///
 /// @param baseaddr The address to use for the block of
 ///     Listeners.
-Listener::Listener(Network::byte_t *x)
+Listener::Listener(boost::uint8_t *x)
 {
 //    GNASH_REPORT_FUNCTION;
     _baseaddr = x;
@@ -159,7 +159,7 @@ Listener::findListener(const string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
+    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
     // Walk through the list to the end
     while (*item != 0) {
@@ -182,7 +182,7 @@ Listener::addListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
+    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
     char *item = reinterpret_cast<char *>(addr);
     // Walk to the end of the list
     while ((item[0] != 0) && (item[1] != 0)) {
@@ -231,7 +231,7 @@ Listener::removeListener(const string &name)
 {
     GNASH_REPORT_FUNCTION;
 
-    Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
+    boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
 
     int len = 0;
     char *item = reinterpret_cast<char *>(addr);
@@ -263,7 +263,7 @@ Listener::listListeners()
 //    GNASH_REPORT_FUNCTION;    
     auto_ptr< vector<string> > listeners ( new vector<string> );
     if (_baseaddr != 0) {
-        Network::byte_t *addr = _baseaddr + LC_LISTENERS_START;
+        boost::uint8_t *addr = _baseaddr + LC_LISTENERS_START;
         
         const char *item = reinterpret_cast<const char *>(addr);
         while (*item != 0) {
@@ -318,11 +318,11 @@ LcShm::close()
 /// @return A real pointer to the data after the headers has been parsed.
 ///
 /// @remarks May throw a ParserException
-Network::byte_t *
-LcShm::parseHeader(Network::byte_t *data, Network::byte_t* tooFar)
+boost::uint8_t *
+LcShm::parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = data;
+    boost::uint8_t *ptr = data;
 
     if (data == 0) {
         log_debug("No data pointer to parse!");
@@ -391,17 +391,17 @@ LcShm::parseHeader(Network::byte_t *data, Network::byte_t* tooFar)
 /// @param domain The domain the hostname is in.
 ///
 /// @return A real pointer to a header for a memory segment.
-Network::byte_t *
+boost::uint8_t *
 LcShm::formatHeader(const std::string &con, const std::string &host, bool /* domain */ )
 {
     GNASH_REPORT_FUNCTION;
-//    Network::byte_t *ptr = data + LC_HEADER_SIZE;
+//    boost::uint8_t *ptr = data + LC_HEADER_SIZE;
     int size = con.size() + host.size() + 9;
 
 //    Buffer *buf;
     
-    Network::byte_t *header = new Network::byte_t[size + 1];
-    Network::byte_t *ptr = header;
+    boost::uint8_t *header = new boost::uint8_t[size + 1];
+    boost::uint8_t *ptr = header;
 
     // This is the initial 16 bytes of the header
     memset(ptr, 0, size + 1);
@@ -523,13 +523,13 @@ LcShm::send(const string & /* name */, const string & /* domainname */,
 //    formatHeader(name, domainname, _object.domain);
 
     // Update the connection name
-    Network::byte_t *ptr = Listener::getBaseAddress();
-    if (ptr == reinterpret_cast<Network::byte_t *>(0)) {
+    boost::uint8_t *ptr = Listener::getBaseAddress();
+    if (ptr == reinterpret_cast<boost::uint8_t *>(0)) {
         log_error("base address not set!");
     }
 
 #if 0
-//    Network::byte_t *tmp = AMF::encodeElement(name.c_str());
+//    boost::uint8_t *tmp = AMF::encodeElement(name.c_str());
 //     memcpy(ptr, tmp, name.size());
 //     ptr +=  name.size() + AMF_HEADER_SIZE;
 //     delete[] tmp;
@@ -539,7 +539,7 @@ LcShm::send(const string & /* name */, const string & /* domainname */,
 //     ptr +=  domainname.size() + AMF_HEADER_SIZE;
 
 //    ptr += LC_HEADER_SIZE;
-//    Network::byte_t *x = ptr;    // just for debugging from gdb. temporary
+//    boost::uint8_t *x = ptr;    // just for debugging from gdb. temporary
 
     // This is the initial 16 bytes of the header
     memset(ptr, 0, LC_HEADER_SIZE + 200);
@@ -572,8 +572,8 @@ LcShm::send(const string & /* name */, const string & /* domainname */,
     
 //     ptr += AMF_BOOLEAN_SIZE;
     
-    vector<Network::byte_t> *vec = AMF::encodeElement(data);
-    vector<Network::byte_t>::iterator vit;
+    vector<boost::uint8_t> *vec = AMF::encodeElement(data);
+    vector<boost::uint8_t>::iterator vit;
     // Can't do a memcpy with a std::vector
 //    log_debug("Number of bytes in the vector: %x", vec->size());
     for (vit = vec->begin(); vit != vec->end(); vit++) {

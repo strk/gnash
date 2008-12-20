@@ -146,7 +146,7 @@ const char *response_str[] = {
 };
 
 int
-RTMP::headerSize(Network::byte_t header)
+RTMP::headerSize(boost::uint8_t header)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -249,11 +249,11 @@ RTMP::decodeHeader(boost::shared_ptr<amf::Buffer> buf)
 }
 
 RTMP::rtmp_head_t *
-RTMP::decodeHeader(Network::byte_t *in)
+RTMP::decodeHeader(boost::uint8_t *in)
 {
     GNASH_REPORT_FUNCTION;
     
-    Network::byte_t *tmpptr = in;
+    boost::uint8_t *tmpptr = in;
     
     _header.channel = *tmpptr & RTMP_INDEX_MASK;
     log_debug (_("The AMF channel index is %d"), _header.channel);
@@ -278,7 +278,7 @@ RTMP::decodeHeader(Network::byte_t *in)
     }
 
     if (_header.head_size >= 8) {
-	Network::byte_t byte = *tmpptr;
+	boost::uint8_t byte = *tmpptr;
         _header.type = (content_types_e)byte;
         tmpptr++;
 	if (_header.type <= RTMP::INVOKE ) {
@@ -340,7 +340,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf(new Buffer(1));
-    Network::byte_t *ptr = buf->reference();
+    boost::uint8_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
     *ptr = head_size & RTMP_HEADSIZE_MASK;  
@@ -375,7 +375,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
     
 // FIXME: this is only to make this more readeable with GDB, and is a performance hit.
     buf->clear();
-    Network::byte_t *ptr = buf->reference();
+    boost::uint8_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
 //    *ptr = head_size & RTMP_HEADSIZE_MASK;
@@ -419,8 +419,8 @@ RTMP::packetRead(boost::shared_ptr<amf::Buffer> buf)
 
 //    int packetsize = 0;
     size_t amf_index, headersize;
-    Network::byte_t *ptr = buf->reference();
-    Network::byte_t *tooFar = ptr+buf->size();
+    boost::uint8_t *ptr = buf->reference();
+    boost::uint8_t *tooFar = ptr+buf->size();
     AMF amf;
     
     amf_index = *buf->reference() & RTMP_INDEX_MASK;
@@ -439,9 +439,9 @@ RTMP::packetRead(boost::shared_ptr<amf::Buffer> buf)
 //     }
 
 #if 1
-    Network::byte_t *end = buf->remove(0xc3);
+    boost::uint8_t *end = buf->remove(0xc3);
 #else
-    Network::byte_t *end = buf->find(0xc3);
+    boost::uint8_t *end = buf->find(0xc3);
     log_debug("END is %x", (void *)end);
     *end = '*';
 #endif
@@ -528,11 +528,11 @@ RTMP::dump()
 // This seems to be a ping message, 12 byte header, system channel 2
 // 02 00 00 00 00 00 06 04 00 00 00 00 00 00 00 00 00 00
 RTMP::rtmp_ping_t *
-RTMP::decodePing(Network::byte_t *data)
+RTMP::decodePing(boost::uint8_t *data)
 {
     GNASH_REPORT_FUNCTION;
     
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(data);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(data);
     rtmp_ping_t *ping = new rtmp_ping_t;
     memset(ping, 0, sizeof(rtmp_ping_t));
 
@@ -600,12 +600,12 @@ RTMP::decodePing(boost::shared_ptr<amf::Buffer> buf)
 // C^^^^^^^^^^onBWDone^@^^^^^^^^
 // 43 00 00 00 00 00 15 14 02 00 08 6f 6e 42 57 44 6f 6e 65 00 40 00 00 00 00 00 00 00 05
 RTMPMsg *
-RTMP::decodeMsgBody(Network::byte_t *data, size_t size)
+RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
     AMF amf_obj;
-    Network::byte_t *ptr = data;
-    Network::byte_t* tooFar = ptr + size;
+    boost::uint8_t *ptr = data;
+    boost::uint8_t* tooFar = ptr + size;
     bool status = false;
 
     // The first data object is the method name of this object.
@@ -816,7 +816,7 @@ RTMP::sendMsg(boost::shared_ptr<amf::Buffer> data)
 
     size_t partial = RTMP_VIDEO_PACKET_SIZE;
     size_t nbytes = 0;
-    Network::byte_t header = 0xc3;
+    boost::uint8_t header = 0xc3;
     
     while (nbytes <= data->size()) {
 	if ((data->size() - nbytes) < static_cast<signed int>(RTMP_VIDEO_PACKET_SIZE)) {
@@ -852,7 +852,7 @@ RTMP::sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
     RTMP::rtmp_head_t *rthead = 0;
     RTMPMsg *msg = 0;
     boost::shared_ptr<amf::Buffer> buf;
-    Network::byte_t *ptr = 0;
+    boost::uint8_t *ptr = 0;
 
 
     buf = recvMsg(1);	// use a 1 second timeout
@@ -1043,7 +1043,7 @@ RTMP::split(boost::shared_ptr<Buffer> buf)
     }
     
     // split the buffer at the chunksize boundary
-    Network::byte_t *ptr = 0;
+    boost::uint8_t *ptr = 0;
     rtmp_head_t *rthead = 0;
     size_t pktsize = 0;
     size_t nbytes = 0;

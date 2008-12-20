@@ -27,6 +27,13 @@
 #include <string>
 #include <vector>
 #include <sys/stat.h>
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <io.h>
+#endif
 
 #ifdef ENABLE_NLS
 # include <locale>
@@ -172,8 +179,8 @@ main(int argc, char *argv[])
     Flv flv; 
     struct stat st;
 
-    Network::byte_t *buf = 0;
-    Network::byte_t *ptr = 0;
+    boost::uint8_t *buf = 0;
+    boost::uint8_t *ptr = 0;
 //    boost::shared_ptr<Flv::flv_header_t> head;
     Flv::previous_size_t   previous = 0;
     boost::shared_ptr<Flv::flv_tag_t> tag;

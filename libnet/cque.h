@@ -48,7 +48,7 @@ public:
     CQue(const std::string &str) { _name = str; };
     ~CQue();
     // Push data onto the que
-    bool push(gnash::Network::byte_t *data, int nbytes);
+    bool push(boost::uint8_t *data, int nbytes);
     bool push(boost::shared_ptr<amf::Buffer> data);
     // Pop the first date element off the que
     boost::shared_ptr<amf::Buffer> pop();

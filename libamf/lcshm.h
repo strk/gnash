@@ -18,10 +18,6 @@
 #ifndef __LCSHM_H__
 #define __LCSHM_H__
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -52,7 +48,7 @@ public:
     ///
     /// @param baseaddr The address to use for the block of
     ///		Listeners.
-    Listener(gnash::Network::byte_t *baseaddr);
+    Listener(boost::uint8_t *baseaddr);
 
     /// \brief Delete the Listener block
     ~Listener();
@@ -92,13 +88,13 @@ public:
     /// @param addr The address for the block of Listeners.
     ///
     /// @return nothing.
-    void setBaseAddress(gnash::Network::byte_t *addr) { _baseaddr = addr; };
+    void setBaseAddress(boost::uint8_t *addr) { _baseaddr = addr; };
 
     /// \brief Set the base address for the block of Listeners.
     ///
     /// @return A real pointer to the base address of the block of
     ///		Listeners in the memory segment.
-    gnash::Network::byte_t *getBaseAddress() { return _baseaddr; };
+    boost::uint8_t *getBaseAddress() { return _baseaddr; };
     
 protected:
     /// \var LcShm::_name
@@ -107,7 +103,7 @@ protected:
 
     /// \var LcShm::_baseaddr
     ///		The base address of the block of Listeners.
-    gnash::Network::byte_t *_baseaddr;
+    boost::uint8_t *_baseaddr;
     
 //    std::vector<std::string> _listeners;
 };
@@ -152,7 +148,7 @@ public:
     /// \brief Construct an initialized shared memory segment.
     ///
     /// @param baseaddr The address to use for the memory segment.
-    LcShm(gnash::Network::byte_t *baseaddr);
+    LcShm(boost::uint8_t *baseaddr);
     
     /// \brief Construct an initialized shared memory segment.
     ///
@@ -213,7 +209,7 @@ public:
     ///
     /// @return A vector of smart pointers to the AMF0 Elements in
     ///		this memopry segment.
-    std::vector<boost::shared_ptr<amf::Element> > parseBody(gnash::Network::byte_t *data);
+    std::vector<boost::shared_ptr<amf::Element> > parseBody(boost::uint8_t *data);
 
     /// \brief Parse the header of the memory segment.
     ///
@@ -225,7 +221,7 @@ public:
     /// @return A real pointer to the data after the headers has been parsed.
     ///
     /// @remarks May throw a ParserException 
-    gnash::Network::byte_t *parseHeader(gnash::Network::byte_t *data, gnash::Network::byte_t* tooFar);
+    boost::uint8_t *parseHeader(boost::uint8_t *data, boost::uint8_t* tooFar);
 
     /// \brief Format the header for the memory segment.
     ///
@@ -236,7 +232,7 @@ public:
     /// @param domain The domain the hostname is in.
     ///
     /// @return A real pointer to a header for a memory segment.
-    gnash::Network::byte_t *formatHeader(const std::string &con, const std::string &host, bool domain);
+    boost::uint8_t *formatHeader(const std::string &con, const std::string &host, bool domain);
 
     /// \brief Set the name for this connection to the memory segment.
     ///
@@ -272,7 +268,7 @@ public:
     /// @param addr The address to use for opening the memory segment.
     ///
     /// @return nothing.
-    void setBaseAddr(gnash::Network::byte_t *addr) { _baseaddr = addr; };
+    void setBaseAddr(boost::uint8_t *addr) { _baseaddr = addr; };
 
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
@@ -281,7 +277,7 @@ public:
 private:
     /// \var LcShm::_baseaddr.
     ///		The base address of the memory segment.
-    gnash::Network::byte_t *_baseaddr;
+    boost::uint8_t *_baseaddr;
 
     /// \var LcShm::_header
     ///		A stored copy of the header for the memory segment.

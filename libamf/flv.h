@@ -165,7 +165,7 @@ class DSOEXPORT Flv {
     /// @param type The data type for the header
     ///
     /// @return a smart pointer to a Buffer containing the data in big endian format.
-    boost::shared_ptr<amf::Buffer> encodeHeader(gnash::Network::byte_t type);
+    boost::shared_ptr<amf::Buffer> encodeHeader(boost::uint8_t type);
     
     /// \brief Decode a Buffer into a header
     ///
@@ -190,21 +190,21 @@ class DSOEXPORT Flv {
     /// @param size The size of the data in bytes
     ///
     /// @return a smart pointer to an Element that contains the data.
-    boost::shared_ptr<amf::Element> decodeMetaData(gnash::Network::byte_t *data, size_t size);
+    boost::shared_ptr<amf::Element> decodeMetaData(boost::uint8_t *data, size_t size);
 
     /// \brief Decode an Audio object.
     ///
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an audio data structure that contains the data.
-    boost::shared_ptr<flv_audio_t> decodeAudioData(gnash::Network::byte_t flags);
+    boost::shared_ptr<flv_audio_t> decodeAudioData(boost::uint8_t flags);
 
     /// \brief Decode an Video object.
     ///
     /// @param flags The data to deserialize.
     /// 
     /// @return a smart pointer to an video data structure that contains the data.
-    boost::shared_ptr<flv_video_t> decodeVideoData(gnash::Network::byte_t flags);
+    boost::shared_ptr<flv_video_t> decodeVideoData(boost::uint8_t flags);
     
     /// \brief Decode an MetaData object.
     ///

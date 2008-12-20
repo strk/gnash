@@ -188,7 +188,7 @@ HTTP::processGetRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
 
-//     Network::byte_t buffer[readsize+1];
+//     boost::uint8_t buffer[readsize+1];
 //     const char *ptr = reinterpret_cast<const char *>(buffer);
 //     memset(buffer, 0, readsize+1);
     
@@ -307,12 +307,12 @@ HTTP::processPostRequest(int fd)
 	return false;
     }
     clearHeader();
-//    gnash::Network::byte_t *data = processHeaderFields(*buf);
+//    boost::uint8_t *data = processHeaderFields(*buf);
     processHeaderFields(*buf);
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
     amf::Buffer content (length);
     cerr << __PRETTY_FUNCTION__ << " : " << content.size() << endl;
-    int ret = readNet(fd, content, 5);
+    int ret = readNet(fd, content, 1);
 //	cerr << __PRETTY_FUNCTION__ << " : " << ret << " : " << (char *)content->reference() << endl;
     
     if (getField("content-type") == "application/x-www-form-urlencoded") {
@@ -324,9 +324,12 @@ HTTP::processPostRequest(int fd)
 	// oh boy, we got ourselves some encoded AMF objects instead of a boring file.
     } else if (getField("content-type") == "application/x-amf") {
 	log_debug("Got AMF data in POST");
+#if 0
 	amf::AMF amf;
 	boost::shared_ptr<amf::Element> el = amf.extractAMF(content.reference(), content.end());
-	el->dump();		// FIXME: do something intelligent with this Element
+	el->dump();		// FIXME: do something intelligent
+				// with this Element
+#endif
     }
     
     // Send the reply
@@ -337,10 +340,22 @@ HTTP::processPostRequest(int fd)
 	&& (getField("content-type") == "application/x-amf")) {
 //	const char *num = (const char *)buf->at(10);
 	log_debug("Got CGI echo request in POST");
-//	cerr << hexify(content.reference(), content.allocated(), true) << endl;
-	amf::Buffer &reply = formatEchoResponse("1", content); // FIXME:
-	writeNet(fd, reply);
-    } else {
+	cerr << hexify(content.reference(), content.allocated(), true) << endl;
+	
+	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(content);
+	boost::shared_ptr<amf::Element> &el0 = headers[0];
+ 	boost::shared_ptr<amf::Element> &el1 = headers[1];
+ 	boost::shared_ptr<amf::Element> &el3 = headers[3];
+	if (headers.size() > 0) {
+// 	    el0->dump();
+//  	    headers[1]->dump();
+//   	    headers[2]->dump();
+//   	    headers[3]->dump();
+	    cerr << "FIXME 3: " << headers[0]->getName() << endl;
+	    amf::Buffer &reply = formatEchoResponse(el0->getName(), *headers[3]);
+//	    writeNet(fd, reply);
+ 	}
+//     } else {
 	amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTP::OK);
 	writeNet(fd, reply);
     }
@@ -480,7 +495,7 @@ HTTP::checkGeneralFields(amf::Buffer & /* buf */)
     return false;
 }
 
-gnash::Network::byte_t *
+boost::uint8_t *
 HTTP::processHeaderFields(amf::Buffer &buf)
 {
   //    GNASH_REPORT_FUNCTION;
@@ -532,8 +547,8 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 	    
 //	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
 	} else {
-	    const gnash::Network::byte_t *cmd = reinterpret_cast<const gnash::Network::byte_t *>(i->c_str());
-	    if (extractCommand(const_cast<gnash::Network::byte_t *>(cmd)) == HTTP::HTTP_NONE) {
+	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
+	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
 		break;
 	    } else {
 	      log_debug("Got a request, parsing \"%s\"", *i);
@@ -1013,7 +1028,7 @@ HTTP::formatGetReply(size_t size, http_status_e code)
     formatHeader(size, code);
     
 //    int ret = Network::writeNet(_header.str());    
-//    Network::byte_t *ptr = (Network::byte_t *)_body.str().c_str();
+//    boost::uint8_t *ptr = (boost::uint8_t *)_body.str().c_str();
 //     buf->copy(ptr, _body.str().size());
 //    _handler->dump();
 
@@ -1100,6 +1115,7 @@ HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
     boost::shared_ptr<amf::Element> el3 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el3);
     tmpptr += amf.totalsize();
+    
     boost::shared_ptr<amf::Element> el4 = amf.extractAMF(tmpptr, tmpptr + size);
     headers.push_back(el4);
 
@@ -1130,7 +1146,7 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
 {
     GNASH_REPORT_FUNCTION;
 
-    Network::byte_t *tmpptr  = data;
+    boost::uint8_t *tmpptr  = data;
     
     // FIXME: temporary hacks while debugging
     amf::Buffer fixme("00 00 00 00 00 01");
@@ -1207,7 +1223,7 @@ HTTP::formatRequest(const string & /* url */, http_method_e /* req */)
 /// <index>
 ///    is a consecutive number that seems to be used to detect missing packages
 HTTP::rtmpt_cmd_e
-HTTP::extractRTMPT(gnash::Network::byte_t *data)
+HTTP::extractRTMPT(boost::uint8_t *data)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -1261,7 +1277,7 @@ HTTP::extractRTMPT(gnash::Network::byte_t *data)
 }
 
 HTTP::http_method_e
-HTTP::extractCommand(gnash::Network::byte_t *data)
+HTTP::extractCommand(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -1294,8 +1310,8 @@ HTTP::extractCommand(gnash::Network::byte_t *data)
     // For valid requests, the second argument, delimited by spaces is the filespec
     // of the file being requested or transmitted.
     if (cmd != HTTP::HTTP_NONE) {
-	Network::byte_t *start = std::find(data, data+7, ' ') + 1;
-	Network::byte_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
+	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
+	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
 	// FIXME: there has got to be a way to copy into a string that actually works.
 	char path[(end-start) + 1];
 	memset(path, 0, (end-start) + 1);
@@ -1346,7 +1362,7 @@ HTTP::sendMsg(int /* fd */)
 ///
 /// @return The number of bytes sent
 int DSOEXPORT
-HTTP::sendMsg(const Network::byte_t *data, size_t size)
+HTTP::sendMsg(const boost::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
 //    _header
@@ -1383,7 +1399,7 @@ HTTP::recvMsg(int fd)
 	if (ret > 0) {
 	    buf->setSeekPointer(buf->reference() + ret);
 //	    cerr << "XXXXX: " << (char *)buf->reference() << endl;
- 	    if (ret < static_cast<int>(NETBUFSIZE)) {
+ 	    if (ret < static_cast<int>(amf::NETBUFSIZE)) {
 // 		buf->resize(ret);	FIXME: why does this corrupt
 // 		the buffer ?
 		_que.push(buf);

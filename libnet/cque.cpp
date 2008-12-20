@@ -105,7 +105,7 @@ CQue::push(boost::shared_ptr<amf::Buffer> data)
 
 // Push data
 bool
-CQue::push(gnash::Network::byte_t *data, int nbytes)
+CQue::push(boost::uint8_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
@@ -211,7 +211,7 @@ CQue::merge(boost::shared_ptr<amf::Buffer> start)
     for (que_t::iterator e=_que.end(); to!=e; ++to) {
         size_t sz = (*to)->size();
         totalsize += sz;
-        if (sz < gnash::NETBUFSIZE) break;
+        if (sz < amf::NETBUFSIZE) break;
     }
     if (to == _que.end()) {
         // Didn't find an element ending the merge
@@ -220,7 +220,7 @@ CQue::merge(boost::shared_ptr<amf::Buffer> start)
 
     // Merge all elements in a single buffer. We have totalsize now.
     boost::shared_ptr<amf::Buffer> newbuf(new Buffer(totalsize));
-    Network::byte_t *tmp = newbuf->reference();
+    boost::uint8_t *tmp = newbuf->reference();
     ++to;
     for (que_t::iterator i=from; i!=to; ++i) {
         boost::shared_ptr<amf::Buffer> buf = *i;

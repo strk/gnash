@@ -287,7 +287,7 @@ Element::to_bool() const
 /// \brief Cast the data in this Element to an real pointer to data.
 ///
 /// @return A real pointer to the base address of the raw data in memory.
-gnash::Network::byte_t *
+boost::uint8_t *
 Element::to_reference()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -297,7 +297,7 @@ Element::to_reference()
     return 0;
 };
 
-const gnash::Network::byte_t *
+const boost::uint8_t *
 Element::to_reference() const
 {
 //    GNASH_REPORT_FUNCTION;
@@ -404,7 +404,7 @@ Element::encode()
 	    *buf += enclength;
 	    string str = _name;
 	    *buf += str;
-	    Network::byte_t byte = static_cast<Network::byte_t>(0x5);
+	    boost::uint8_t byte = static_cast<boost::uint8_t>(0x5);
 	    *buf += byte;
 	}
 
@@ -421,7 +421,7 @@ Element::encode()
 	    }
 	}
 //	log_debug("FIXME: Terminating object");
-	Network::byte_t pad = 0;
+	boost::uint8_t pad = 0;
 	*buf += pad;
 	*buf += pad;
 	*buf += TERMINATOR;
@@ -521,7 +521,7 @@ Element::operator=(bool flag)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeString(Network::byte_t *data, size_t size)
+Element::makeString(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
@@ -551,7 +551,7 @@ Element::makeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
-    check_buffer(sizeof(Network::byte_t));
+    check_buffer(sizeof(boost::uint8_t));
     *(_buffer->reference()) = 0;
     return *this;
 }
@@ -568,7 +568,7 @@ Element::makeString(const char *str, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(const_cast<char *>(str));
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(const_cast<char *>(str));
     return makeString(ptr, size);
 }
 
@@ -620,7 +620,7 @@ Element::makeNumber(boost::shared_ptr<amf::Buffer> buf)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeNumber(Network::byte_t *data)
+Element::makeNumber(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     double num = *reinterpret_cast<const double*>(data);
@@ -662,10 +662,10 @@ Element::makeNumber(const string &name, double num)
     return makeNumber(num);
 }
 
-/// \overload Element::makeNumber(const std::string &name, gnash::Network::byte_t *data);
+/// \overload Element::makeNumber(const std::string &name, boost::uint8_t *data);
 ///		The size isn't needed as a double is always the same size.
 Element &
-Element::makeNumber(const std::string &name, gnash::Network::byte_t *data)
+Element::makeNumber(const std::string &name, boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     if (name.size()) {
@@ -717,7 +717,7 @@ Element::makeBoolean(const string &name, bool flag)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeBoolean(Network::byte_t *data)
+Element::makeBoolean(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     bool flag = *reinterpret_cast<const bool*>(data);
@@ -926,7 +926,7 @@ Element::makeTypedObject(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeTypedObject(Network::byte_t *data, size_t size)
+Element::makeTypedObject(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT_AMF0;
@@ -954,7 +954,7 @@ Element::makeReference()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeReference(Network::byte_t *indata, size_t size)
+Element::makeReference(boost::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE_AMF0;
@@ -982,7 +982,7 @@ Element::makeMovieClip()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeMovieClip(Network::byte_t *indata, size_t size)
+Element::makeMovieClip(boost::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::MOVIECLIP_AMF0;
@@ -1133,7 +1133,7 @@ Element::makeUnsupported()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeUnsupported(Network::byte_t *data, size_t size)
+Element::makeUnsupported(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;    
     _type = Element::UNSUPPORTED_AMF0;
@@ -1161,7 +1161,7 @@ Element::makeLongString()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeLongString(Network::byte_t *indata, size_t size)
+Element::makeLongString(boost::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;    
     _type = Element::LONG_STRING_AMF0;
@@ -1187,7 +1187,7 @@ Element::makeRecordSet()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeDate(Network::byte_t *date)
+Element::makeDate(boost::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::DATE_AMF0;
@@ -1240,7 +1240,7 @@ void
 Element::setName(const char *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(const_cast<char *>(name));
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(const_cast<char *>(name));
     return setName(ptr, size);
 }
 
@@ -1255,7 +1255,7 @@ Element::setName(const char *name, size_t size)
 ///
 /// @remarks This adds a NULL string terminator so the name can be printed.
 void
-Element::setName(Network::byte_t *name, size_t size)
+Element::setName(boost::uint8_t *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     if ((size > 0) && (name != 0)) {

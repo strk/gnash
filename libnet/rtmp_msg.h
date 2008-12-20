@@ -103,8 +103,8 @@ public:
     void setStatus(rtmp_status_e st)     { _status = st; };
     rtmp_status_e getStatus()	         { return _status; };
 
-    void setChannel(Network::byte_t num) { _channel = num; };
-    Network::byte_t getChannel()         { return _channel; } ;
+    void setChannel(boost::uint8_t num) { _channel = num; };
+    boost::uint8_t getChannel()         { return _channel; } ;
 
     boost::shared_ptr<amf::Element> operator[](size_t x);
 
@@ -117,7 +117,7 @@ public:
     std::string           _method;
     double                _streamid;
     std::vector<boost::shared_ptr<amf::Element> > _amfobjs;
-    Network::byte_t       _channel;
+    boost::uint8_t       _channel;
 };
 
 } // end of gnash namespace

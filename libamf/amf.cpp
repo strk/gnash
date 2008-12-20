@@ -29,10 +29,18 @@
 #include "GnashException.h"
 #include "buffer.h"
 #include "amf.h"
-#include "network.h"
+//#include "network.h"
 #include "element.h"
 #include "amfutf8.h"
 #include <boost/cstdint.hpp> // for boost::?int??_t
+
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <io.h>
+#endif
 
 using namespace std;
 using namespace gnash;
@@ -109,8 +117,8 @@ swapBytes(void *word, size_t size)
     union {
 	boost::uint16_t s;
 	struct {
-	    Network::byte_t c0;
-	    Network::byte_t c1;
+	    boost::uint8_t c0;
+	    boost::uint8_t c1;
 	} c;
     } u;
 	   
@@ -123,7 +131,7 @@ swapBytes(void *word, size_t size)
     // Little-endian machine: byte-swap the word
 
     // A conveniently-typed pointer to the source data
-    Network::byte_t *x = static_cast<Network::byte_t *>(word);
+    boost::uint8_t *x = static_cast<boost::uint8_t *>(word);
 
     /// Handle odd as well as even counts of bytes
     std::reverse(x, x+size);
@@ -168,7 +176,7 @@ AMF::encodeBoolean(bool flag)
     // Encode a boolean value. 0 for false, 1 for true
     boost::shared_ptr<Buffer> buf(new Buffer(2));
     *buf = Element::BOOLEAN_AMF0; 
-    *buf += static_cast<Network::byte_t>(flag);
+    *buf += static_cast<boost::uint8_t>(flag);
     
     return buf;
 }
@@ -218,7 +226,7 @@ AMF::encodeUnsupported()
 /// 
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeDate(const Network::byte_t *data)
+AMF::encodeDate(const boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
@@ -253,7 +261,7 @@ AMF::encodeNull()
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeXMLObject(const Network::byte_t * /*data */, size_t /* size */)
+AMF::encodeXMLObject(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -270,7 +278,7 @@ AMF::encodeXMLObject(const Network::byte_t * /*data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
+AMF::encodeTypedObject(boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -287,7 +295,7 @@ AMF::encodeTypedObject(Network::byte_t * /* data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
-AMF::encodeReference(const Network::byte_t * /* data */, size_t /* size */)
+AMF::encodeReference(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -304,7 +312,7 @@ AMF::encodeReference(const Network::byte_t * /* data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
-AMF::encodeMovieClip(const Network::byte_t * /*data */, size_t /* size */)
+AMF::encodeMovieClip(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -323,7 +331,7 @@ AMF::encodeMovieClip(const Network::byte_t * /*data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeECMAArray(const Network::byte_t * /*data */, size_t /* size */)
+AMF::encodeECMAArray(const boost::uint8_t * /*data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -340,7 +348,7 @@ AMF::encodeECMAArray(const Network::byte_t * /*data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeLongString(const Network::byte_t * /* data */, size_t /* size */)
+AMF::encodeLongString(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -357,7 +365,7 @@ AMF::encodeLongString(const Network::byte_t * /* data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeRecordSet(const Network::byte_t * /* data */, size_t /* size */)
+AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -376,7 +384,7 @@ AMF::encodeRecordSet(const Network::byte_t * /* data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
-AMF::encodeStrictArray(const Network::byte_t * /* data */, size_t /* size */)
+AMF::encodeStrictArray(const boost::uint8_t * /* data */, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<Buffer> buf;
@@ -393,7 +401,7 @@ AMF::encodeStrictArray(const Network::byte_t * /* data */, size_t /* size */)
 boost::shared_ptr<Buffer>
 AMF::encodeString(const string &str)
 {
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
     return encodeString(ptr, str.size());
 }
 
@@ -405,7 +413,7 @@ AMF::encodeString(const string &str)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeString(Network::byte_t *data, size_t size)
+AMF::encodeString(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint16_t length;
@@ -656,8 +664,8 @@ boost::shared_ptr<amf::Element>
 AMF::extractAMF(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t* start = buf->reference();
-    Network::byte_t* tooFar = start+buf->size();
+    boost::uint8_t* start = buf->reference();
+    boost::uint8_t* tooFar = start+buf->size();
     
     return extractAMF(start, tooFar);
 }
@@ -674,11 +682,11 @@ AMF::extractAMF(boost::shared_ptr<Buffer> buf)
 ///
 /// @remarks May throw a ParserException
 boost::shared_ptr<amf::Element> 
-AMF::extractAMF(Network::byte_t *in, Network::byte_t* tooFar)
+AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    Network::byte_t *tmpptr = in;
+    boost::uint8_t *tmpptr = in;
     boost::uint16_t length;
     boost::shared_ptr<amf::Element> el(new Element);
 
@@ -859,8 +867,8 @@ AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    Network::byte_t* start = buf->reference();
-    Network::byte_t* tooFar = start+buf->size();
+    boost::uint8_t* start = buf->reference();
+    boost::uint8_t* tooFar = start+buf->size();
     return extractProperty(start, tooFar);
 }
 
@@ -878,11 +886,11 @@ AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 ///
 /// @remarks May throw a ParserException
 boost::shared_ptr<amf::Element> 
-AMF::extractProperty(Network::byte_t *in, Network::byte_t* tooFar)
+AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    Network::byte_t *tmpptr = in;
+    boost::uint8_t *tmpptr = in;
     boost::uint16_t length;
     boost::shared_ptr<amf::Element> el;
 
