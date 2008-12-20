@@ -1082,7 +1082,7 @@ HTTP::formatPostReply(rtmpt_cmd_e /* code */)
 vector<boost::shared_ptr<amf::Element > >
 HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     vector<boost::shared_ptr<amf::Element > > headers;
 	
