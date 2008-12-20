@@ -110,14 +110,14 @@ private:
     /// will perform a POST request containing all calls
     /// to the same uri and dispatch results.
     ///
-	std::list<ConnectionHandler*> _callQueues;
+	std::list<ConnectionHandler*> _queuedConnections;
 
     /// Queue of calls gathered during a single movie advancement
     //
     /// For HTTP based remoting, these calls will be performed
     /// by a single POST operation.
     ///
-    std::auto_ptr<ConnectionHandler> _currentCallQueue; 
+    std::auto_ptr<ConnectionHandler> _currentConnection; 
 
 	/// the url prefix optionally passed to connect()
 	std::string _uri;

@@ -169,7 +169,7 @@ ConnectionHandler::getStream(const std::string&)
     return std::auto_ptr<IOChannel>(0);
 }
 
-//---- AMFQueue (HTTPConnectionHandler) -----------------------------------------------
+//---- HTTPRemotingHandler (HTTPConnectionHandler) -----------------------------------------------
 
 /// Queue of remoting calls 
 //
@@ -184,12 +184,19 @@ ConnectionHandler::getStream(const std::string&)
 /// script specified a callback function, use the optional parameters to specify
 /// the identifier (which must be unique) and the callback object as an as_value
 ///
-/// @todo move this somewhere more appropriate, perhaps by merging with libamf.
-class AMFQueue : public ConnectionHandler {
+class HTTPRemotingHandler : public ConnectionHandler {
 
 public:
 
-    AMFQueue(NetConnection_as& nc, URL url);
+    /// Create an handler for HTTP remoting
+    //
+    /// @param nc
+    ///     The NetConnection AS object to send status/error events to
+    ///
+    /// @param url
+    ///     URL to post calls to
+    ///
+    HTTPRemotingHandler(NetConnection_as& nc, const URL& url);
 
     // See dox in ConnectionHandler
     virtual bool hasPendingCalls() const
@@ -200,7 +207,8 @@ public:
     // See dox in ConnectionHandler
     virtual bool advance();
 
-    void setReachable() const
+    // See dox in ConnectionHandler
+    virtual void setReachable() const
     {
         for (CallbacksMap::const_iterator i=callbacks.begin(),
                 e=callbacks.end(); i!=e; ++i)
@@ -218,17 +226,15 @@ private:
 
     static const int NCCALLREPLYCHUNK=1024*200;
 
-    typedef std::map<std::string, boost::intrusive_ptr<as_object> > 
-        CallbacksMap;
+    typedef std::map<std::string, as_object* > CallbacksMap;
     CallbacksMap callbacks;
 
-    SimpleBuffer postdata;
-    URL url;
+    SimpleBuffer _postdata;
+    URL _url;
     boost::scoped_ptr<IOChannel> _connection;
     SimpleBuffer reply;
     int reply_start;
     int queued_count;
-    unsigned int ticker;
     unsigned int _numCalls; // === queued_count ?
 
     // Quick hack to send Content-Type: application/x-amf
@@ -241,66 +247,64 @@ private:
     {
         //GNASH_REPORT_FUNCTION;
 
-        postdata.append(amf.data(), amf.size());
+        _postdata.append(amf.data(), amf.size());
         queued_count++;
     }
 
-    void push_callback(const std::string& id,
-            boost::intrusive_ptr<as_object> callback) {
-        callbacks.insert(std::pair<std::string,
-                boost::intrusive_ptr<as_object> >(id, callback));
+    void push_callback(const std::string& id, as_object* callback)
+    {
+        callbacks[id] = callback;
     }
 
-    boost::intrusive_ptr<as_object> pop_callback(std::string id)
+    as_object* pop_callback(const std::string& id)
     {
         CallbacksMap::iterator it = callbacks.find(id);
         if (it != callbacks.end()) {
-            boost::intrusive_ptr<as_object> callback = it->second;
+            as_object* callback = it->second;
             callbacks.erase(it);
             return callback;
         }
-        else {
-            return 0;
-        }
+        else return 0;
     }
 
     void enqueue(const SimpleBuffer &amf, const std::string& identifier,
-            boost::intrusive_ptr<as_object> callback) {
+                 as_object* callback)
+    {
         push_amf(amf);
         push_callback(identifier, callback);
     };
 
-    void enqueue(const SimpleBuffer &amf) {
+    void enqueue(const SimpleBuffer &amf)
+    {
         push_amf(amf);
     };
     
 };
 
-AMFQueue::AMFQueue(NetConnection_as& nc, URL url)
+HTTPRemotingHandler::HTTPRemotingHandler(NetConnection_as& nc, const URL& url)
         :
         ConnectionHandler(nc),
-        postdata(),
-        url(url),
+        _postdata(),
+        _url(url),
         _connection(0),
         reply(),
         reply_start(0),
         queued_count(0),
-        ticker(0),
         _numCalls(0) // TODO: replace by queued count ?
 {
     // leave space for header
-    postdata.append("\000\000\000\000\000\000", 6);
+    _postdata.append("\000\000\000\000\000\000", 6);
     assert(reply.size() == 0);
 
     _headers["Content-Type"] = "application/x-amf";
 }
 
 bool
-AMFQueue::advance()
+HTTPRemotingHandler::advance()
 {
 
 #ifdef GNASH_DEBUG_REMOTING
-    log_debug("advancing AMFQueue");
+    log_debug("advancing HTTPRemotingHandler");
 #endif
     if(_connection)
     {
@@ -571,15 +575,17 @@ AMFQueue::advance()
         log_debug("creating connection");
 //#endif
         // set the "number of bodies" header
-        (reinterpret_cast<boost::uint16_t*>(postdata.data() + 4))[0] = htons(queued_count);
-        std::string postdata_str(reinterpret_cast<char*>(postdata.data()), postdata.size());
+
+        (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] = htons(queued_count);
+        std::string postdata_str(reinterpret_cast<char*>(_postdata.data()), _postdata.size());
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
 #endif
         queued_count = 0;
 
-        _connection.reset(StreamProvider::getDefaultInstance().getStream(url, postdata_str, _headers).release());
-        postdata.resize(6);
+        _connection.reset(StreamProvider::getDefaultInstance().getStream(_url, postdata_str, _headers).release());
+
+        _postdata.resize(6);
 #ifdef GNASH_DEBUG_REMOTING
         log_debug("connection created");
 #endif
@@ -594,7 +600,7 @@ AMFQueue::advance()
 };
 
 void
-AMFQueue::call(as_object* asCallback, const std::string& methodName,
+HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
             const std::vector<as_value>& args, size_t firstArg)
 {
     boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
@@ -668,8 +674,8 @@ AMFQueue::call(as_object* asCallback, const std::string& methodName,
 NetConnection_as::NetConnection_as()
     :
     as_object(getNetConnectionInterface()),
-    _callQueues(),
-    _currentCallQueue(0),
+    _queuedConnections(),
+    _currentConnection(0),
     _uri(),
     _isConnected(false),
     _advanceTimer(0)
@@ -698,11 +704,11 @@ netconnection_class_init(as_object& global)
     global.init_member("NetConnection", cl.get());
 }
 
-// here to have AMFQueue definition available
+// here to have HTTPRemotingHandler definition available
 NetConnection_as::~NetConnection_as()
 {
     for (std::list<ConnectionHandler*>::iterator
-            i=_callQueues.begin(), e=_callQueues.end();
+            i=_queuedConnections.begin(), e=_queuedConnections.end();
             i!=e; ++i)
     {
         delete *i;
@@ -713,9 +719,9 @@ NetConnection_as::~NetConnection_as()
 void
 NetConnection_as::markReachableResources() const
 {
-    if ( _currentCallQueue.get() ) _currentCallQueue->setReachable();
+    if ( _currentConnection.get() ) _currentConnection->setReachable();
     for (std::list<ConnectionHandler*>::const_iterator
-            i=_callQueues.begin(), e=_callQueues.end();
+            i=_queuedConnections.begin(), e=_queuedConnections.end();
             i!=e; ++i)
     {
         (*i)->setReachable();
@@ -865,7 +871,7 @@ NetConnection_as::connect(const std::string& uri)
         return;
     }
 
-    _currentCallQueue.reset(new AMFQueue(*this, url));
+    _currentConnection.reset(new HTTPRemotingHandler(*this, url));
 
 
     // FIXME: We should attempt a connection here (this is called when an
@@ -889,12 +895,12 @@ NetConnection_as::connect(const std::string& uri)
 void
 NetConnection_as::close()
 {
-    bool needSendClosedStatus = _currentCallQueue.get() || _isConnected;
+    bool needSendClosedStatus = _currentConnection.get() || _isConnected;
 
     /// Queue the current call queue if it has pending calls
-    if ( _currentCallQueue.get() && _currentCallQueue->hasPendingCalls() )
+    if ( _currentConnection.get() && _currentConnection->hasPendingCalls() )
     {
-        _callQueues.push_back(_currentCallQueue.release());
+        _queuedConnections.push_back(_currentConnection.release());
     }
 
     /// TODO: what should actually happen here? Should an attached
@@ -919,13 +925,13 @@ void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args, size_t firstArg)
 {
-    if ( ! _currentCallQueue.get() )
+    if ( ! _currentConnection.get() )
     {
         log_aserror("NetConnection.call: can't call while not connected");
         return;
     }
 
-    _currentCallQueue->call(asCallback, methodName, args, firstArg);
+    _currentConnection->call(asCallback, methodName, args, firstArg);
 
 #ifdef GNASH_DEBUG_REMOTING
     log_debug("called enqueue");
@@ -1002,36 +1008,37 @@ NetConnection_as::advance()
     // Advance
 
 #ifdef GNASH_DEBUG_REMOTING
-    log_debug("NetConnection_as::advance: %d calls to advance", _callQueues.size());
+    log_debug("NetConnection_as::advance: %d calls to advance", _queuedConnections.size());
 #endif
 
-    while ( ! _callQueues.empty() )
+    while ( ! _queuedConnections.empty() )
     {
-        ConnectionHandler* ch = _callQueues.front();
+        ConnectionHandler* ch = _queuedConnections.front();
         if ( ! ch->advance() )
         {
             log_debug("ConnectionHandler done, dropping");
-            _callQueues.pop_front();
+            _queuedConnections.pop_front();
             delete ch;
         }
         else break; // queues handling is serialized
     }
 
-    if ( _currentCallQueue.get() ) 
+    if ( _currentConnection.get() ) 
     {
-        _currentCallQueue->advance();
+        _currentConnection->advance();
     }
 
-    // ticking of the queue might have triggered creation
-    // of a new queue, so we won't stop the tick in that case
-    if ( _callQueues.empty() && ! _currentCallQueue.get() )
+    // Advancement of a connection might trigger creation
+    // of a new connection, so we won't stop the advance
+    // timer in that case
+    if ( _queuedConnections.empty() && ! _currentConnection.get() )
     {
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug("stopping ticking");
+        log_debug("stopping advance timer");
 #endif
         stopAdvanceTimer();
 #ifdef GNASH_DEBUG_REMOTING
-        log_debug("ticking stopped");
+        log_debug("advance timer stopped");
 #endif
     }
 }
