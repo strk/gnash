@@ -63,7 +63,9 @@ function ResultHandler() {
 //nc.connect("rtmp://localhost/");
 
 // nc.onStatus: level:status, code:NetConnection.Connect.Success
-nc.connect("rtmp://localhost/echo");
+rtmpuri = "rtmp://"+host+"/echo";
+note("Connecting to "+rtmpuri);
+nc.connect(rtmpuri);
 check_equals(nc.isConnected, false); // not yet
 check_equals(nc.statuses.length, 0);
 

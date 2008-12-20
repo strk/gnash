@@ -264,6 +264,9 @@ endif
 if ENABLE_HTTP_TESTSUITE
 	@echo "	HTTP_TESTSUITE $(HTTP_TESTSUITE)"
 endif
+if ENABLE_RED5_TESTING
+	@echo "	RED5_HOST $(RED5_HOST)"
+endif
 	@echo "Graphics support..."	
 if BUILD_CAIRO_RENDERER
 	@echo "	CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
