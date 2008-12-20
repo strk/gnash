@@ -636,7 +636,7 @@ Buffer::resize()
 Buffer &
 Buffer::resize(size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::scoped_array<boost::uint8_t> tmp;
 
     // If we don't have any data yet in this buffer, resizing is cheap, as
