@@ -23,6 +23,11 @@
 #include "gnashconfig.h"
 #endif
 
+/// Allows complilation of 64-bit constants on a 32-bit machine.
+#ifndef __STDC_CONSTANT_MACROS
+# define __STDC_CONSTANT_MACROS
+#endif
+
 // This is for compatibility with braindamaged versions of ffmpeg
 #if !defined INT64_C
 #if defined __WORDSIZE && __WORDSIZE == 64

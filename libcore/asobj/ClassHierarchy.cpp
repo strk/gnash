@@ -51,7 +51,7 @@
 #include "Stage_as.h"
 #include "System_as.h"
 #include "TextSnapshot_as.h"
-#include "TextFormat.h"
+#include "TextFormat_as.h"
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
@@ -304,7 +304,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
         NSV::NS_FLASH_XML, 5 },
 	{ Mouse_as::init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 6 },

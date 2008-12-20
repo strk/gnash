@@ -29,12 +29,17 @@
 
 namespace gnash {  
 
-class TextFormat : public as_object
+class TextFormat_as : public as_object
 {
 public:
   
-	TextFormat();
-	~TextFormat() {}
+	TextFormat_as();
+	~TextFormat_as() {}
+
+    static void registerNative(as_object& global);
+
+    /// Initialize the global Color class
+    static void init(as_object& global);
 
 	/// Return a Boolean value that indicates whether the text is underlined.
 	bool underlined() const { return _underline; }
@@ -56,8 +61,8 @@ public:
 	bool colorDefined() const { return _flags&DEFcolor; }
 
 	/// \brief
-	/// Return ann integer that indicates the indentation from the left
-        /// margin to the first character in the paragraph
+	/// Return an integer that indicates the indentation from the left
+    /// margin to the first character in the paragraph
 	boost::uint16_t indent() const { return _indent; }
 	bool indentDefined() const { return _flags&DEFindent; }
 
@@ -111,46 +116,43 @@ public:
 	void colorSet(const rgba& x)      { _color = x; _flags |= DEFcolor; }
 	void indentSet(boost::uint16_t x)      { _indent = x; _flags |= DEFindent; }
 	void fontSet(const std::string& font) { _font=font; _flags |= DEFfont; }
-	void alignSet(TextField::TextAlignment x)  { _align = x; _flags |= DEFalign; }
+	
+    void alignSet(TextField::TextAlignment x) {
+        _align = x;
+        _flags |= DEFalign;
+    }
 
-	static TextField::TextAlignment parseAlignString(const std::string& align);
+	void alignSet(const std::string& align);
 
-	/// Return the text representation of alignment value.
-	static const char* getAlignString(TextField::TextAlignment a);
+	void blockIndentSet(boost::uint16_t x)   { 
+        _blockIndent = x;
+        _flags |= DEFblockIndent;
+    }
 
-	void alignSet(const std::string& align) { alignSet(parseAlignString(align)); }
+	void leadingSet(boost::uint16_t x) {
+        _leading = x;
+        _flags |= DEFleading;
+    }
 
-	void blockIndentSet(boost::uint16_t x)   { _blockIndent = x; _flags |= DEFblockIndent; }
-	void leadingSet(boost::uint16_t x)     { _leading = x; _flags |= DEFleading; }
-	void leftMarginSet(boost::uint16_t x)  { _leftMargin = x; _flags |= DEFleftMargin; }
-	void rightMarginSet(boost::uint16_t x) { _rightMargin = x; _flags |= DEFrightMargin; }
+	void leftMarginSet(boost::uint16_t x) {
+        _leftMargin = x;
+        _flags |= DEFleftMargin;
+    }
+	
+    void rightMarginSet(boost::uint16_t x) {
+        _rightMargin = x;
+        _flags |= DEFrightMargin;
+    }
 
 	/// Set font point size in twips
-	void sizeSet(boost::uint16_t x)        { _pointSize = x; _flags |= DEFsize; }
+	void sizeSet(boost::uint16_t x) {
+        _pointSize = x;
+        _flags |= DEFsize;
+    }
 
-	static as_value display_getset(const fn_call& fn);
-	static as_value bullet_getset(const fn_call& fn);
-	static as_value tabStops_getset(const fn_call& fn);
-	static as_value blockIndent_getset(const fn_call& fn);
-	static as_value leading_getset(const fn_call& fn);
-	static as_value indent_getset(const fn_call& fn);
-	static as_value rightMargin_getset(const fn_call& fn);
-	static as_value leftMargin_getset(const fn_call& fn);
-	static as_value align_getset(const fn_call& fn);
-	static as_value underline_getset(const fn_call& fn);
-	static as_value italic_getset(const fn_call& fn);
-	static as_value bold_getset(const fn_call& fn);
-	static as_value target_getset(const fn_call& fn);
-	static as_value url_getset(const fn_call& fn);
-	static as_value color_getset(const fn_call& fn);
-	static as_value size_getset(const fn_call& fn);
-	static as_value font_getset(const fn_call& fn);
-	static as_value getTextExtent_method(const fn_call& fn);
-
-  
 private:
 
-        enum {
+    enum {
 		DEFunderline	=1<<0,
 		DEFbold		=1<<1,
 		DEFitalic	=1<<2,
@@ -170,19 +172,20 @@ private:
 		DEFsize		=1<<16
 	};
 
-	long int _flags; // need at least 17 bit here... (1<<16)
+    // need at least 17 bit here... (1<<16)
+    boost::uint32_t _flags; 
 
 	/// A Boolean value that indicates whether the text is underlined.
-	bool          _underline;
+	bool _underline;
 
 	/// A Boolean value that indicates whether the text is boldface.
-	bool          _bold;
+	bool _bold;
 
 	/// A Boolean value that indicates whether the text is italicized.
-	bool          _italic;
+	bool _italic;
 
 	// 
-	bool          _bullet;
+	bool _bullet;
   
 	/// The alignment of the paragraph, represented as a string.
 	//
@@ -193,7 +196,7 @@ private:
 	TextField::TextAlignment _align;
 
 	// 
-	boost::uint16_t		_blockIndent;
+	boost::uint16_t _blockIndent;
 
 	/// The color of text using this text format.
 	//
@@ -205,7 +208,7 @@ private:
 	std::string _font;	
 
 	/// An integer that indicates the indentation from the left
-        /// margin to the first character in the paragraph (twips)
+    /// margin to the first character in the paragraph (twips)
 	boost::uint16_t _indent;
 
 	/// A number that indicates the amount of leading vertical
@@ -236,11 +239,6 @@ private:
 	std::string	 _url;	
 };
  
-void registerTextFormatNative(as_object& global);
-
-/// Initialize the global Color class
-void textformat_class_init(as_object& global);
-
 } // end of gnash namespace
 
-#endif	// __TEXTFORMAT_H__
+#endif
