@@ -782,6 +782,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       case Element::REFERENCE_AMF0:
 	  el->makeReference();
 	  break;
+	  // An ECMA array is comprised of any of the data types. Much like an Object,
+	  // the ECMA array is terminated by the end of object bytes, so parse till then.
       case Element::ECMA_ARRAY_AMF0:
       {
 	  el->makeECMAArray();
@@ -807,19 +809,15 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       }
       case Element::OBJECT_END_AMF0:
 	  // A strict array is only numbers
+	  break;
       case Element::STRICT_ARRAY_AMF0:
       {
 	  el->makeStrictArray();
 	  // get the number of numbers in the array
 	  length = ntohl((*(boost::uint32_t *)tmpptr));
 //	  log_debug("Strict Array, body size is %d.", length);
-	  tmpptr += sizeof(boost::uint32_t) + 1;
-	  // each number is 8 bytes, plus one byte for the type.
-	  tooFar = tmpptr += length * AMF0_NUMBER_SIZE + 1;
-// 	  boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(tmpptr, tooFar);
-// 	  tmpptr += amf_obj.totalsize();
-// 	  el->setName(name->getName());
-	  length -= 2;
+	  // Skip past the length field to get to the start of the data
+	  tmpptr += sizeof(boost::uint32_t);
 	  while (length) {
 	      boost::shared_ptr<amf::Element> child = amf_obj.extractAMF(tmpptr, tooFar); 
 	      if (child == 0) {
@@ -828,17 +826,29 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 //		  child->dump();
 		  el->addProperty(child);
 		  tmpptr += amf_obj.totalsize();
-		  length -= amf_obj.totalsize();
+		  --length;
 	      }
 	  };
 	  break;
       }
       case Element::DATE_AMF0:
+	  el->makeDate();
+	  break;
       case Element::LONG_STRING_AMF0:
+	  el->makeLongString();
+	  break;
       case Element::UNSUPPORTED_AMF0:
+	  el->makeUnsupported();
+	  break;
       case Element::RECORD_SET_AMF0:
+	  el->makeRecordSet();
+	  break;
       case Element::XML_OBJECT_AMF0:
+	  el->makeXMLObject();
+	  break;
       case Element::TYPED_OBJECT_AMF0:
+	  el->makeTypedObject("fixme");
+	  break;
       case Element::AMF3_DATA:
       default:
 	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
