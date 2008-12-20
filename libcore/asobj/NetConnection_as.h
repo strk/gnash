@@ -28,7 +28,7 @@
 
 // Forward declarations
 namespace gnash {
-	class AMFQueue;
+	class ConnectionHandler;
 }
 
 namespace gnash {
@@ -110,14 +110,14 @@ private:
     /// will perform a POST request containing all calls
     /// to the same uri and dispatch results.
     ///
-	std::list<AMFQueue*> _callQueues;
+	std::list<ConnectionHandler*> _callQueues;
 
     /// Queue of calls gathered during a single movie advancement
     //
     /// For HTTP based remoting, these calls will be performed
     /// by a single POST operation.
     ///
-    std::auto_ptr<AMFQueue> _currentCallQueue; 
+    std::auto_ptr<ConnectionHandler> _currentCallQueue; 
 
 	/// the url prefix optionally passed to connect()
 	std::string _uri;
