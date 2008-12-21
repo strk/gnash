@@ -276,7 +276,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeStrictArray(const boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeStrictArray(const amf::Element &data);
     
     /// Encode an object to its serialized representation.
     //
