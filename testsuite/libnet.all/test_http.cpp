@@ -668,6 +668,16 @@ test_rtmpt (void)
     }
     // Boolean True response
     boost::shared_ptr<Buffer> hex_res1(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 01 01"));
+    amf::Buffer &buf1 = http.formatEchoResponse(headers1[1]->getName(), *headers1[3]);
+    string head1(reinterpret_cast<const char *>(buf1.reference()));
+    const char *ptr1a = reinterpret_cast<const char *>(hex_res1->reference());
+    const char *ptr1b = reinterpret_cast<const char *>(buf1.reference()) + head1.size();
+    if (memcmp(ptr1a, ptr1b, hex_res1->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Boolean TRUE)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Boolean TRUE)");
+    }    
+    
 
     // Boolean false request
     boost::shared_ptr<Buffer> hex_req2(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 07 0a 00 00 00 01 01 00"));
@@ -682,6 +692,15 @@ test_rtmpt (void)
     }
     // Boolean False response
     boost::shared_ptr<Buffer> hex_res2(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 01 00"));
+    amf::Buffer &buf2 = http.formatEchoResponse(headers2[1]->getName(), *headers2[3]);
+    string head2(reinterpret_cast<const char *>(buf2.reference()));
+    const char *ptr2a = reinterpret_cast<const char *>(hex_res2->reference());
+    const char *ptr2b = reinterpret_cast<const char *>(buf2.reference()) + head2.size();
+    if (memcmp(ptr2a, ptr2b, hex_res2->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Boolean FALSE)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Boolean FALSE)");
+    }    
 
     // NULL Object request
     boost::shared_ptr<Buffer> hex_req3(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 31 00 00 00 06 0a 00 00 00 01 05"));
@@ -695,6 +714,15 @@ test_rtmpt (void)
     }
     // NULL Object response
     boost::shared_ptr<Buffer> hex_res3(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 05"));
+    amf::Buffer &buf3 = http.formatEchoResponse(headers3[1]->getName(), *headers3[3]);
+    string head3(reinterpret_cast<const char *>(buf3.reference()));
+    const char *ptr3a = reinterpret_cast<const char *>(hex_res3->reference());
+    const char *ptr3b = reinterpret_cast<const char *>(buf3.reference()) + head3.size();
+    if (memcmp(ptr3a, ptr3b, hex_res3->allocated()) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(NULL Object)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(NULL Object)");
+    }    
 
     // UNDEFINED Object request
     boost::shared_ptr<Buffer> hex_req4(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 31 00 00 00 06 0a 00 00 00 01 06"));
@@ -708,6 +736,15 @@ test_rtmpt (void)
     }
     // UNDEFINED Object response
     boost::shared_ptr<Buffer> hex_res4(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 05"));
+    amf::Buffer &buf4 = http.formatEchoResponse(headers4[1]->getName(), *headers4[3]);
+    string head4(reinterpret_cast<const char *>(buf4.reference()));
+    const char *ptr4a = reinterpret_cast<const char *>(hex_res4->reference());
+    const char *ptr4b = reinterpret_cast<const char *>(buf4.reference()) + head4.size();
+    if (memcmp(ptr4a, ptr4b, hex_res4->allocated()) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(UNDEFINED Object, NULL response)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(UNDEFINED Object, NULL response)");
+    }    
 
     // Date Object request
     boost::shared_ptr<Buffer> hex_req5(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 31 00 00 00 10 0a 00 00 00 01 0b 42 71 e4 ca 4e 32 d0 00 01 a4"));
@@ -715,9 +752,13 @@ test_rtmpt (void)
     if (headers5[3] == 0) {
         runtest.unresolved("HTTP::parseEchoRequest(DATE Object)");
     } else {
+        double swapped = *reinterpret_cast<const double*>(headers5[3]->to_reference());
+        swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
         if ((strncmp(headers5[0]->getName(), "echo", 4) == 0)
             && (strncmp(headers5[1]->getName(), "/1", 2) == 0)
-            && (headers5[3]->getType() == Element::DATE_AMF0)) {
+            && (headers5[3]->getType() == Element::DATE_AMF0)
+            && (headers5[3]->getDataSize() > 0 )
+            && (memcmp(hex_req5->reference()+26, &swapped, amf::AMF0_NUMBER_SIZE) == 0)) {
             runtest.pass("HTTP::parseEchoRequest(DATE Object)");
         } else {
             runtest.fail("HTTP::parseEchoRequest(DATE Object)");
@@ -725,6 +766,21 @@ test_rtmpt (void)
     }
     // Date Object response
     boost::shared_ptr<Buffer> hex_res5(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0b 42 71 e4 ca 4e 32 d0 00 fe 5c"));
+    if (headers5[3] == 0) {
+        runtest.unresolved("HTTP::formatEchoResponse(DATE Object)");
+    } else {
+        amf::Buffer &buf5 = http.formatEchoResponse(headers5[1]->getName(), *headers5[3]);
+        string head5(reinterpret_cast<const char *>(buf5.reference()));
+        const char *ptr5a = reinterpret_cast<const char *>(hex_res5->reference()+30);
+//         cerr << hexify(hex_res5->reference()+30, amf::AMF0_NUMBER_SIZE, false) << endl;
+        const char *ptr5b = reinterpret_cast<const char *>(buf5.reference() + 124);
+//         cerr << hexify(buf5.reference() + 124, amf::AMF0_NUMBER_SIZE, false) << endl;
+        if (memcmp(ptr5a, ptr5b, amf::AMF0_NUMBER_SIZE) == 0) {
+            runtest.pass("HTTP::formatEchoResponse(DATE Object)");
+        } else {
+            runtest.fail("HTTP::formatEchoResponse(DATE Object)");
+        }
+    }
 
     // Date Array request
     boost::shared_ptr<Buffer> hex_req6(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 18 0a 00 00 00 01 0a 00 00 00 02 0b 42 71 e4 ca 4e 32 d0 00 01 a4 07 00 01"));
@@ -751,12 +807,23 @@ test_rtmpt (void)
         && (headers7[3]->getType() == Element::STRICT_ARRAY_AMF0)) {
         runtest.pass("HTTP::parseEchoRequest(Undefined Strict Array)");
     } else {
-        
         runtest.fail("HTTP::parseEchoRequest(Undefined Strict Array)");
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res7(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 00"));
-
+    amf::Buffer &buf7 = http.formatEchoResponse(headers7[1]->getName(), *headers7[3]);
+    string head7(reinterpret_cast<const char *>(buf7.reference()));
+    const char *ptr7a = reinterpret_cast<const char *>(hex_res7->reference());
+        cerr << hexify(hex_res7->reference(), hex_res7->allocated(), false) << endl;
+    const char *ptr7b = reinterpret_cast<const char *>(buf7.reference()) + head7.size();
+        cerr << hexify(buf7.reference() + head7.size(), buf7.allocated() - head7.size(), false) << endl;
+        cerr << "Comparing " << hex_res7->allocated() << " bytes" << endl;
+    if (memcmp(ptr7a, ptr7b, hex_res7->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Undefined Strict Array)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Undefined Strict Array)");
+    }
+    
     // Number 1
     // Array request
     boost::shared_ptr<Buffer> hex_req8(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 13 0a 00 00 00 01 0a 00 00 00 01 00 3f f0 00 00 00 00 00 00"));
@@ -782,6 +849,16 @@ test_rtmpt (void)
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res8(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 01 00 3f f0 00 00 00 00 00 00"));
+    amf::Buffer &buf8 = http.formatEchoResponse(headers8[1]->getName(), *headers8[3]);
+    string head8(reinterpret_cast<const char *>(buf8.reference()));
+    const char *ptr8a = reinterpret_cast<const char *>(hex_res8->reference());
+    const char *ptr8b = reinterpret_cast<const char *>(buf8.reference()) + head8.size();
+    cerr << "Comparing " << hex_res8->allocated() << " bytes" << endl;
+    if (memcmp(ptr8a, ptr8b, hex_res8->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 1 item)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 1 item)");
+    }
 
     // Number 1,2
     // Array request
@@ -790,13 +867,23 @@ test_rtmpt (void)
     if ((strncmp(headers9[0]->getName(), "echo", 4) == 0)
         && (strncmp(headers9[1]->getName(), "/3", 2) == 0)
         && (headers9[3]->getType() == Element::STRICT_ARRAY_AMF0)) {
-        runtest.pass("HTTP::parseEchoRequest(Simple Strict Array)");
+        runtest.pass("HTTP::parseEchoRequest(Simple Strict Array of Numbers, 2 items)");
     } else {
         
-        runtest.fail("HTTP::parseEchoRequest(Simple Strict Array)");
+        runtest.fail("HTTP::parseEchoRequest(Simple Strict Array of Numbers, 2 items)");
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res9(new Buffer("00 00 00 00 00 01 00 0b 2f 33 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 02 00 3f f0 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00"));
+    amf::Buffer &buf9 = http.formatEchoResponse(headers9[1]->getName(), *headers9[3]);
+    string head9(reinterpret_cast<const char *>(buf9.reference()));
+    const char *ptr9a = reinterpret_cast<const char *>(hex_res9->reference());
+    const char *ptr9b = reinterpret_cast<const char *>(buf9.reference()) + head9.size();
+    cerr << "Comparing " << hex_res9->allocated() << " bytes" << endl;
+    if (memcmp(ptr9a, ptr9b, hex_res9->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 2 items)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 2 items)");
+    }
 
     // Number 1,2,3
     // Array request
@@ -805,14 +892,23 @@ test_rtmpt (void)
     if ((strncmp(headers10[0]->getName(), "echo", 4) == 0)
         && (strncmp(headers10[1]->getName(), "/4", 2) == 0)
         && (headers10[3]->getType() == Element::STRICT_ARRAY_AMF0)) {
-        runtest.pass("HTTP::parseEchoRequest(Simple Strict Array)");
+        runtest.pass("HTTP::parseEchoRequest(Simple Strict Array of Numbers, 3 items)");
     } else {
         
-        runtest.fail("HTTP::parseEchoRequest(Simple Strict Array)");
+        runtest.fail("HTTP::parseEchoRequest(Simple Strict Array of Numbers, 3 items)");
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res10(new Buffer("00 00 00 00 00 01 00 0b 2f 34 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 03 00 3f f0 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 00 40 08 00 00 00 00 00 00"));
-
+    amf::Buffer &buf10 = http.formatEchoResponse(headers10[1]->getName(), *headers10[3]);
+    string head10(reinterpret_cast<const char *>(buf10.reference()));
+    const char *ptr10a = reinterpret_cast<const char *>(hex_res10->reference());
+    const char *ptr10b = reinterpret_cast<const char *>(buf10.reference()) + head10.size();
+    cerr << "Comparing " << hex_res10->allocated() << " bytes" << endl;
+    if (memcmp(ptr10a, ptr10b, hex_res10->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 3 items)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 3 items)");
+    }
 
     // Number 0 Request
     boost::shared_ptr<Buffer> hex_req11(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 31 00 00 00 0e 0a 00 00 00 01 00 00 00 00 00 00 00 00 00"));
@@ -1002,12 +1098,22 @@ test_rtmpt (void)
     if ((strncmp(headers26[0]->getName(), "echo", 4) == 0)
         && (strncmp(headers26[1]->getName(), "/5", 2) == 0)
         && (headers26[3]->getType() == Element::STRICT_ARRAY_AMF0)) { // FIXME: add test for array values
-        runtest.pass("HTTP::parseEchoRequest(Strict Array)");
+        runtest.pass("HTTP::parseEchoRequest(Strict Array of Numbers, 3 items)");
     } else {        
-        runtest.fail("HTTP::parseEchoRequest(Strict Array)");
+        runtest.fail("HTTP::parseEchoRequest(Strict Array of Numbers, 3 items)");
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res26(new Buffer("00 00 00 00 00 01 00 0b 2f 35 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 03 00 3f f0 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00 0a 00 00 00 02 00 3f f0 00 00 00 00 00 00 00 40 00 00 00 00 00 00 00"));
+    amf::Buffer &buf26 = http.formatEchoResponse(headers26[1]->getName(), *headers26[3]);
+    string head26(reinterpret_cast<const char *>(buf26.reference()));
+    const char *ptr26a = reinterpret_cast<const char *>(hex_res26->reference());
+    const char *ptr26b = reinterpret_cast<const char *>(buf26.reference()) + head26.size();
+    cerr << "Comparing " << hex_res26->allocated() << " bytes" << endl;
+    if (memcmp(ptr26a, ptr26b, hex_res26->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 3 items)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Simple Strict Array of Numbers, 3 items)");
+    }
 
     // Number 1,,,,,,,100
     // Array request
@@ -1020,12 +1126,22 @@ test_rtmpt (void)
         && (props27[0]->to_number() == 1)
         && (props27[1]->getType() == Element::UNDEFINED_AMF0)
         ) { // FIXME: add test for array values
-        runtest.pass("HTTP::parseEchoRequest(Strict Array)");
+        runtest.pass("HTTP::parseEchoRequest(Strict Array - Number, undefines, Number)");
     } else {        
-        runtest.fail("HTTP::parseEchoRequest(Strict Array)");
+        runtest.fail("HTTP::parseEchoRequest(Strict Array - Number, undefines, Number)");
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res27(new Buffer("00 00 00 00 00 01 00 0b 2f 36 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 08 00 00 00 66 00 01 30 00 3f f0 00 00 00 00 00 00 00 03 31 30 30 00 40 59 00 00 00 00 00 00 00 06 6c 65 6e 67 74 68 00 40 59 80 00 00 00 00 00 00 00 09"));
+    amf::Buffer &buf27 = http.formatEchoResponse(headers27[1]->getName(), *headers27[3]);
+    string head27(reinterpret_cast<const char *>(buf27.reference()));
+    const char *ptr27a = reinterpret_cast<const char *>(hex_res27->reference());
+    const char *ptr27b = reinterpret_cast<const char *>(buf27.reference()) + head27.size();
+    cerr << "Comparing " << hex_res27->allocated() << " bytes" << endl;
+    if (memcmp(ptr27a, ptr27b, hex_res27->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Simple Strict Array - Number, undefines, Number)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Simple Strict Array  - Number, undefines, Number)");
+    }
 
     // Array request
     boost::shared_ptr<Buffer> hex_req28(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 37 00 00 00 38 0a 00 00 00 01 08 00 00 00 01 00 06 6c 65 6e 67 74 68 00 3f f0 00 00 00 00 00 00 00 01 30 00 3f f0 00 00 00 00 00 00 00 03 6f 6e 65 00 3f f0 00 00 00 00 00 00 00 00 09"));
@@ -1041,12 +1157,22 @@ test_rtmpt (void)
         && (strcmp(props28[2]->getName(), "one") == 0)
         && (props28[2]->to_number() == 1)
         ) {
-        runtest.pass("HTTP::parseEchoRequest(Strict Array)");
+        runtest.pass("HTTP::parseEchoRequest(ECMA Array, 2 Numbers)");
     } else {        
-        runtest.fail("HTTP::parseEchoRequest(Strict Array)");
+        runtest.fail("HTTP::parseEchoRequest(ECMA Array, 2 Numbers)");
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res28(new Buffer("00 00 00 00 00 01 00 0b 2f 37 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 08 00 00 00 01 00 03 6f 6e 65 00 3f f0 00 00 00 00 00 00 00 01 30 00 3f f0 00 00 00 00 00 00 00 06 6c 65 6e 67 74 68 00 3f f0 00 00 00 00 00 00 00 00 09"));
+    amf::Buffer &buf28 = http.formatEchoResponse(headers28[1]->getName(), *headers28[3]);
+    string head28(reinterpret_cast<const char *>(buf28.reference()));
+    const char *ptr28a = reinterpret_cast<const char *>(hex_res28->reference());
+    const char *ptr28b = reinterpret_cast<const char *>(buf28.reference()) + head28.size();
+    cerr << "Comparing " << hex_res28->allocated() << " bytes" << endl;
+    if (memcmp(ptr28a, ptr28b, hex_res28->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(ECMA Array, 2 Numbers)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(ECMA Array, 2 Numbers)");
+    }
 
     // NULL String request, ie.. no data
     boost::shared_ptr<Buffer> hex_req29(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 31 00 00 00 08 0a 00 00 00 01 02 00 00"));
@@ -1061,7 +1187,19 @@ test_rtmpt (void)
     }
     // NULL String response
     boost::shared_ptr<Buffer> hex_res29(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 02 00 00"));
-
+#if 0                           // FIXME: why does this core dump ?
+    amf::Buffer &buf29 = http.formatEchoResponse(headers29[1]->getName(), *headers29[3]);
+    string head29(reinterpret_cast<const char *>(buf29.reference()));
+    const char *ptr29a = reinterpret_cast<const char *>(hex_res29->reference());
+    const char *ptr29b = reinterpret_cast<const char *>(buf29.reference()) + head29.size();
+    cerr << "Comparing " << hex_res29->allocated() << " bytes" << endl;
+    if (memcmp(ptr29a, ptr29b, hex_res29->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(NULL String)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(NULL String)");
+    }
+#endif
+    
     // String request
     // "Hello world!"
     boost::shared_ptr<Buffer> hex_req30(new Buffer(" 00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 14 0a 00 00 00 01 02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21"));
@@ -1076,7 +1214,17 @@ test_rtmpt (void)
     }
     // String response
     boost::shared_ptr<Buffer> hex_res30(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21"));
-
+    amf::Buffer &buf30 = http.formatEchoResponse(headers30[1]->getName(), *headers30[3]);
+    string head30(reinterpret_cast<const char *>(buf30.reference()));
+    const char *ptr30a = reinterpret_cast<const char *>(hex_res30->reference());
+    const char *ptr30b = reinterpret_cast<const char *>(buf30.reference()) + head30.size();
+    cerr << "Comparing " << hex_res30->allocated() << " bytes" << endl;
+    if (memcmp(ptr30a, ptr30b, hex_res30->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Simple String)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Simple String)");
+    }
+    
     // Array of Strings request
     // test1,test2,test3,test4
     boost::shared_ptr<Buffer> hex_req31(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 33 00 00 00 2a 0a 00 00 00 01 0a 00 00 00 04 02 00 05 74 65 73 74 31 02 00 05 74 65 73 74 32 02 00 05 74 65 73 74 33 02 00 05 74 65 73 74 34"));
@@ -1102,7 +1250,16 @@ test_rtmpt (void)
     
     // Array of Strings response
     boost::shared_ptr<Buffer> hex_res31(new Buffer("00 00 00 00 00 01 00 0b 2f 33 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 04 02 00 05 74 65 73 74 31 02 00 05 74 65 73 74 32 02 00 05 74 65 73 74 33 02 00 05 74 65 73 74 34"));
-
+    amf::Buffer &buf31 = http.formatEchoResponse(headers31[1]->getName(), *headers31[3]);
+    string head31(reinterpret_cast<const char *>(buf31.reference()));
+    const char *ptr31a = reinterpret_cast<const char *>(hex_res31->reference());
+    const char *ptr31b = reinterpret_cast<const char *>(buf31.reference()) + head31.size();
+    cerr << "Comparing " << hex_res31->allocated() << " bytes" << endl;
+    if (memcmp(ptr31a, ptr31b, hex_res31->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Simple String Array)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Simple String Array)");
+    }
 
     // Custom class Request
     // [object EchoClass]                    [object.Object]
@@ -1125,6 +1282,17 @@ test_rtmpt (void)
         }
     }
     boost::shared_ptr<Buffer> hex_res40(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 03 00 05 61 74 74 72 32 00 3f f0 00 00 00 00 00 00 00 05 61 74 74 72 31 02 00 03 6f 6e 65 00 00 09"));
+    amf::Buffer &buf40 = http.formatEchoResponse(headers40[1]->getName(), *headers40[3]);
+    string head40(reinterpret_cast<const char *>(buf40.reference()));
+    const char *ptr40a = reinterpret_cast<const char *>(hex_res40->reference());
+    const char *ptr40b = reinterpret_cast<const char *>(buf40.reference()) + head40.size();
+    cerr << "Comparing " << hex_res40->allocated() << " bytes" << endl;
+    if (memcmp(ptr40a, ptr40b, hex_res40->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(object CustomClass)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(object CustomClass)");
+    }
+    
     // [object EchoClass],[object EchoClass] [object.Object],[object.Object]
     boost::shared_ptr<Buffer> hex_req41(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 2e 0a 00 00 00 01 0a 00 00 00 02 03 00 05 61 74 74 72 32 00 3f f0 00 00 00 00 00 00 00 05 61 74 74 72 31 02 00 03 6f 6e 65 00 00 09 07 00 01"));
     vector<boost::shared_ptr<amf::Element> > headers41 = http.parseEchoRequest(*hex_req41);
@@ -1140,6 +1308,16 @@ test_rtmpt (void)
         }
     }
     boost::shared_ptr<Buffer> hex_res41(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 02 03 00 05 61 74 74 72 32 00 3f f0 00 00 00 00 00 00 00 05 61 74 74 72 31 02 00 03 6f 6e 65 00 00 09 07 00 01"));
+    amf::Buffer &buf41 = http.formatEchoResponse(headers41[1]->getName(), *headers41[3]);
+    string head41(reinterpret_cast<const char *>(buf41.reference()));
+    const char *ptr41a = reinterpret_cast<const char *>(hex_res41->reference());
+    const char *ptr41b = reinterpret_cast<const char *>(buf41.reference()) + head41.size();
+    cerr << "Comparing " << hex_res41->allocated() << " bytes" << endl;
+    if (memcmp(ptr41a, ptr41b, hex_res41->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(object CustomClass)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(object CustomClass)");
+    }
 
     // Remote Class
     // [object RemoteClass]                      [object RemoteClass]
@@ -1158,7 +1336,19 @@ test_rtmpt (void)
     }
 
     boost::shared_ptr<Buffer> hex_res42(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 6f 6e 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 40 00 00 00 00 00 00 00 00 00 09"));
-
+#if 0                           // FIXME: why does this core dump ?
+    amf::Buffer &buf42 = http.formatEchoResponse(headers42[1]->getName(), *headers42[3]);
+    string head42(reinterpret_cast<const char *>(buf42.reference()));
+    const char *ptr42a = reinterpret_cast<const char *>(hex_res42->reference());
+    const char *ptr42b = reinterpret_cast<const char *>(buf42.reference()) + head42.size();
+    cerr << "Comparing " << hex_res42->allocated() << " bytes" << endl;
+    if (memcmp(ptr42a, ptr42b, hex_res42->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
+    }
+#endif
+    
     // An array of RemoteClass objects
     // [object RemoteClass],[object RemoteClass] [object RemoteClass],[object RemoteClass]
     boost::shared_ptr<Buffer> hex_req43(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 b2 0a 00 00 00 01 0a 00 00 00 02 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 32 00 3f f0 00 00 00 00 00 00 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 6f 6e 65 00 00 09 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 32 00 40 00 00 00 00 00 00 00 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 74 77 6f 00 00 09"));
@@ -1175,6 +1365,17 @@ test_rtmpt (void)
         }
     }
     boost::shared_ptr<Buffer> hex_res43(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 02 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 6f 6e 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 3f f0 00 00 00 00 00 00 00 00 09 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 74 77 6f 00 0a 61 74 74 72 69 62 75 74 65 32 00 40 00 00 00 00 00 00 00 00 00 09"));
+    amf::Buffer &buf43 = http.formatEchoResponse(headers43[1]->getName(), *headers43[3]);
+    string head43(reinterpret_cast<const char *>(buf43.reference()));
+    const char *ptr43a = reinterpret_cast<const char *>(hex_res43->reference());
+    const char *ptr43b = reinterpret_cast<const char *>(buf43.reference()) + head43.size();
+    cerr << "Comparing " << hex_res43->allocated() << " bytes" << endl;
+    if (memcmp(ptr43a, ptr43b, hex_res43->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
+    }
+
     // [object RemoteClass]                      [object RemoteClass]
     boost::shared_ptr<Buffer> hex_req44(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 33 00 00 00 5b 0a 00 00 00 01 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 32 00 41 d2 65 80 b4 80 00 00 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 05 74 68 72 65 65 00 00 09"));
     vector<boost::shared_ptr<amf::Element> > headers44 = http.parseEchoRequest(*hex_req44);
@@ -1184,12 +1385,25 @@ test_rtmpt (void)
         if ((strncmp(headers44[0]->getName(), "echo", 4) == 0)
             && (strncmp(headers44[1]->getName(), "/3", 2) == 0)
             && (headers44[3]->getType() == Element::TYPED_OBJECT_AMF0)) {
-            runtest.pass("HTTP::parseEchoRequest(object RemoteClass Array)");
+            runtest.pass("HTTP::parseEchoRequest(object RemoteClass Array, 2 items)");
         } else {        
-            runtest.fail("HTTP::parseEchoRequest(object RemoteClass Array)");
+            runtest.fail("HTTP::parseEchoRequest(object RemoteClass Array, 2 items)");
         }
     }
     boost::shared_ptr<Buffer> hex_res44(new Buffer("00 00 00 00 00 01 00 0b 2f 33 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 05 74 68 72 65 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 41 d2 65 80 b4 80 00 00 00 00 09"));
+#if 0                           // FIXME: why does this core dump ?
+    amf::Buffer &buf44 = http.formatEchoResponse(headers44[1]->getName(), *headers44[3]);
+    string head44(reinterpret_cast<const char *>(buf44.reference()));
+    const char *ptr44a = reinterpret_cast<const char *>(hex_res44->reference());
+    const char *ptr44b = reinterpret_cast<const char *>(buf44.reference()) + head44.size();
+    cerr << "Comparing " << hex_res44->allocated() << " bytes" << endl;
+    if (memcmp(ptr44a, ptr44b, hex_res44->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass Array)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass Array)");
+    }
+#endif
+    
     // [object RemoteClass]                      [object RemoteClass]
     boost::shared_ptr<Buffer> hex_req45(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 34 00 00 00 5a 0a 00 00 00 01 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 32 00 42 71 3f 8f 4d 00 00 00 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 04 66 6f 75 72 00 00 09"));
     vector<boost::shared_ptr<amf::Element> > headers45 = http.parseEchoRequest(*hex_req45);
@@ -1206,6 +1420,19 @@ test_rtmpt (void)
     }
 
     boost::shared_ptr<Buffer> hex_res45(new Buffer("00 00 00 00 00 01 00 0b 2f 34 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 04 66 6f 75 72 00 0a 61 74 74 72 69 62 75 74 65 32 00 c1 9c 2c c0 00 00 00 00 00 00 09"));
+#if 0                           // FIXME: why does this core dump ?
+    amf::Buffer &buf45 = http.formatEchoResponse(headers45[1]->getName(), *headers45[3]);
+    string head45(reinterpret_cast<const char *>(buf45.reference()));
+    const char *ptr45a = reinterpret_cast<const char *>(hex_res45->reference());
+    const char *ptr45b = reinterpret_cast<const char *>(buf45.reference()) + head45.size();
+    cerr << "Comparing " << hex_res45->allocated() << " bytes" << endl;
+    if (memcmp(ptr45a, ptr45b, hex_res45->allocated()-1) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass Array)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass Array)");
+    }
+#endif
+    
     // String test with 40000 characters
     // String test with 70000 characters
     // String test with 1000000 characters
