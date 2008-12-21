@@ -383,6 +383,7 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeXMLObject(const std::string &name, const std::string &data);
+    Element &makeXMLObject(boost::uint8_t *data);
 
     /// \brief Make this Element a Property with an ECMA Array as the value.
     ///		This is a mixed array of any AMF types. These are stored
@@ -456,7 +457,7 @@ public:
     ///
     /// @return A reference to this Element.    
     Element &makeTypedObject(const std::string &name);
-    
+
     /// \brief Make this Element a Property with an Typed Object as the value.
     ///
     /// @param data A real pointer to the raw data to use as the value.
@@ -464,7 +465,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeTypedObject(boost::uint8_t *data, size_t size);
+    Element &makeTypedObject(boost::uint8_t *data);
     
     /// \brief Make this Element a Property with an Object Reference as the value.
     ///
@@ -506,7 +507,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeLongString(boost::uint8_t *data, size_t size);
+    Element &makeLongString(boost::uint8_t *data);
     
     /// \brief Make this Element a Property with a Record Set as the value.
     ///
@@ -520,7 +521,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeRecordSet(boost::uint8_t *data, size_t size);
+    Element &makeRecordSet(boost::uint8_t *data);
     
     /// \brief Make this Element a Property with a Date as the value.
     ///
@@ -533,6 +534,7 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeDate(boost::uint8_t *data);
+    Element &makeDate(double data);
     
     /// \brief Make this Element a Property with an Unsupported value.
     ///
@@ -546,7 +548,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeUnsupported(boost::uint8_t *data, size_t size);
+    Element &makeUnsupported(boost::uint8_t *data);
     
     /// \brief Test equivalance against another Element.
     ///		This compares all the data and the data type in the
@@ -717,7 +719,7 @@ public:
     ///
     /// @remarks This is only intended to be used for testing and
     ///		debugging purposes.
-    std::vector<boost::shared_ptr<Element> > getProperties()
+    std::vector<boost::shared_ptr<Element> > getProperties() const
 			{ return _properties; };
     
     ///  \brief Dump the internal data of this class in a human readable form.
