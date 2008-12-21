@@ -42,39 +42,59 @@
 namespace gnash {
 
 // Forward declarations
-static void attachMathInterface(as_object& proto);
-static as_value math_abs(const fn_call& fn);	// Implements AS "abs"
-static as_value math_acos(const fn_call& fn);
-static as_value math_asin(const fn_call& fn);
-static as_value math_atan(const fn_call& fn);
-static as_value math_atan2(const fn_call& fn);
-static as_value math_ceil(const fn_call& fn);
-static as_value math_cos(const fn_call& fn);
-static as_value math_exp(const fn_call& fn);
-static as_value math_floor(const fn_call& fn);
-static as_value math_log(const fn_call& fn);
-static as_value math_max(const fn_call& fn);
-static as_value math_min(const fn_call& fn);
-static as_value math_pow(const fn_call& fn);
-static as_value math_random(const fn_call& fn);
-static as_value math_round(const fn_call& fn);
-static as_value math_sin(const fn_call& fn);
-static as_value math_sqrt(const fn_call& fn);
-static as_value math_tan(const fn_call& fn);
+namespace {
+    typedef double (*unaryMathFunc) (double);
+    typedef double (*binaryMathFunc) (double, double);
+
+    void attachMathInterface(as_object& proto);
+    as_value math_max(const fn_call& fn);
+    as_value math_min(const fn_call& fn);
+    as_value math_random(const fn_call& fn);
+    as_value math_round(const fn_call& fn);
+
+    template<unaryMathFunc Func> as_value unaryFunction(const fn_call& fn);
+    template<binaryMathFunc Func> as_value binaryFunction(const fn_call& fn);
+
+}
+
+
+void registerMathNative(as_object& proto)
+{
+    VM& vm = proto.getVM();
+    
+    vm.registerNative(unaryFunction<std::abs>, 200, 0);
+    vm.registerNative(math_min, 200, 1);
+    vm.registerNative(math_max, 200, 2);
+    vm.registerNative(unaryFunction<std::sin>, 200, 3);
+    vm.registerNative(unaryFunction<std::cos>, 200, 4);
+    vm.registerNative(binaryFunction<std::atan2>, 200, 5);
+    vm.registerNative(unaryFunction<std::tan>, 200, 6);
+    vm.registerNative(unaryFunction<std::exp>, 200, 7);
+    vm.registerNative(unaryFunction<std::log>, 200, 8);
+    vm.registerNative(unaryFunction<std::sqrt>, 200, 9);
+    vm.registerNative(math_round, 200, 10);
+    vm.registerNative(math_random, 200, 11);
+    vm.registerNative(unaryFunction<std::floor>, 200, 12);
+    vm.registerNative(unaryFunction<std::ceil>, 200, 13);
+    vm.registerNative(unaryFunction<std::atan>, 200, 14);
+    vm.registerNative(unaryFunction<std::asin>, 200, 15);
+    vm.registerNative(unaryFunction<std::acos>, 200, 16);
+    vm.registerNative(binaryFunction<std::pow>, 200, 17);
+}
 
 
 void
 math_class_init(as_object& global)
 {
     // Create built-in math object. It is not a class.
-	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+	static boost::intrusive_ptr<as_object> obj =
+            new as_object(getObjectInterface());
+
 	attachMathInterface(*obj);
 	global.init_member("Math", obj.get());
 }
 
-//
-// Macros to wrap C math library functions as ActionScript Math methods
-//
+namespace {
 
 //
 // One-argument simple functions.
@@ -85,27 +105,15 @@ math_class_init(as_object& global)
 // If it is called with two arguments, the valueOf method
 // (i.e. to_number()) of the second method is called, but 
 // not used. Strange, but true.
-#define MATH_WRAP_FUNC1(funcname)				\
-	as_value math_##funcname(const fn_call& fn)		\
-	{							\
-		if (fn.nargs < 1) return as_value(NaN);			\
-		if (fn.nargs == 2) fn.arg(1).to_number(); \
-		double	arg = fn.arg(0).to_number();	\
-		return as_value(std::funcname(arg));			\
-	}
-
-MATH_WRAP_FUNC1(abs)
-MATH_WRAP_FUNC1(acos)
-MATH_WRAP_FUNC1(asin)
-MATH_WRAP_FUNC1(atan)
-MATH_WRAP_FUNC1(ceil)
-MATH_WRAP_FUNC1(cos)
-MATH_WRAP_FUNC1(exp)
-MATH_WRAP_FUNC1(floor)
-MATH_WRAP_FUNC1(log)
-MATH_WRAP_FUNC1(sin)
-MATH_WRAP_FUNC1(sqrt)
-MATH_WRAP_FUNC1(tan)
+template<unaryMathFunc Func>
+as_value
+unaryFunction(const fn_call& fn)
+{
+    if (fn.nargs < 1) return as_value(NaN);
+    if (fn.nargs == 2) fn.arg(1).to_number();
+    double arg = fn.arg(0).to_number();	
+    return as_value(Func(arg));
+}
 
 // Two-argument functions.
 //
@@ -117,22 +125,15 @@ MATH_WRAP_FUNC1(tan)
 // Flash's pow() is clever cos it copes with negative numbers to an integral
 // power, and can do pow(-2, -1) == -0.5 and pow(-2, -2) == 0.25.
 // Fortunately, pow() in the cmath library works the same way.
-
-#define MATH_WRAP_FUNC2_EXP(funcname, expr)			\
-	as_value math_##funcname(const fn_call& fn)		\
-	{							\
-		double result;					\
-		if (fn.nargs < 2) result = NaN;			\
-		else {						\
-			double	arg0 = fn.arg(0).to_number();	\
-			double	arg1 = fn.arg(1).to_number();	\
-			result = (expr);			\
-		}						\
-		return as_value(result);			\
-	}
-
-MATH_WRAP_FUNC2_EXP(atan2, (std::atan2(arg0, arg1)))
-MATH_WRAP_FUNC2_EXP(pow, (std::pow(arg0, arg1)))
+template<binaryMathFunc Func>
+as_value
+binaryFunction(const fn_call& fn)
+{
+    if (fn.nargs < 2) return as_value(NaN);
+    double arg1 = fn.arg(1).to_number();
+    double arg0 = fn.arg(0).to_number();	
+    return as_value(Func(arg0, arg1));
+}
 
 
 as_value
@@ -198,31 +199,6 @@ math_round(const fn_call& fn)
 	return as_value(result);
 }
 
-
-void registerMathNative(as_object& proto)
-{
-    VM& vm = proto.getVM();
-    
-    vm.registerNative(math_abs, 200, 0);
-    vm.registerNative(math_min, 200, 1);
-    vm.registerNative(math_max, 200, 2);
-    vm.registerNative(math_sin, 200, 3);
-    vm.registerNative(math_cos, 200, 4);
-    vm.registerNative(math_atan2, 200, 5);
-    vm.registerNative(math_tan, 200, 6);
-    vm.registerNative(math_exp, 200, 7);
-    vm.registerNative(math_log, 200, 8);
-    vm.registerNative(math_sqrt, 200, 9);
-    vm.registerNative(math_round, 200, 10);
-    vm.registerNative(math_random, 200, 11);
-    vm.registerNative(math_floor, 200, 12);
-    vm.registerNative(math_ceil, 200, 13);
-    vm.registerNative(math_atan, 200, 14);
-    vm.registerNative(math_asin, 200, 15);
-    vm.registerNative(math_acos, 200, 16);
-    vm.registerNative(math_pow, 200, 17);
-}
-
 void
 attachMathInterface(as_object& proto)
 {
@@ -266,5 +242,5 @@ attachMathInterface(as_object& proto)
     proto.init_member("pow", vm.getNative(200, 17), flags);
 }
 
-
+} // anonymous namespace
 } // end of gnash namespace
