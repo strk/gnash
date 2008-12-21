@@ -177,7 +177,7 @@ test_resize()
         mem->addStats(__LINE__);             // take a sample
     }
 #endif    
-    if (buf.size() == gnash::NETBUFSIZE) {
+    if (buf.size() == amf::NETBUFSIZE) {
         runtest.pass ("Buffer::size(NETBUFSIZE)");
     } else {
         runtest.fail ("Buffer::size(NETBUFSIZE)");
