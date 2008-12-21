@@ -26,6 +26,7 @@
 #include <cmath>
 #include <climits>
 #include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp> // for boost::?int??_t
 
 #include "buffer.h"
 #include "log.h"
@@ -33,7 +34,7 @@
 #include "amfutf8.h"
 #include "utility.h"
 #include "element.h"
-#include <boost/cstdint.hpp> // for boost::?int??_t
+#include "GnashException.h"
 
 using namespace std;
 using namespace gnash;
@@ -527,7 +528,12 @@ Element::makeString(boost::uint8_t *data, size_t size)
     _type = Element::STRING_AMF0;
 
     // Make room for an additional NULL terminator
-    check_buffer(size+1);
+    try {
+	check_buffer(size+1);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
     _buffer->clear();		// FIXME: this could be a performance issue
     _buffer->copy(data, size);
     
@@ -551,7 +557,13 @@ Element::makeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
-    check_buffer(sizeof(boost::uint8_t));
+    try {
+	check_buffer(sizeof(boost::uint8_t));
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *(_buffer->reference()) = 0;
     return *this;
 }
@@ -625,7 +637,13 @@ Element::makeNumber(boost::uint8_t *data)
 //    GNASH_REPORT_FUNCTION;
     double num = *reinterpret_cast<const double*>(data);
     _type = Element::NUMBER_AMF0;
-    check_buffer(AMF0_NUMBER_SIZE);
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *_buffer = num;
     
     return *this;
@@ -641,7 +659,13 @@ Element::makeNumber(double num)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::NUMBER_AMF0;
-    check_buffer(AMF0_NUMBER_SIZE);
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *_buffer = num;
 
     return *this;
@@ -672,7 +696,13 @@ Element::makeNumber(const std::string &name, boost::uint8_t *data)
         setName(name);
     }
     _type = Element::NUMBER_AMF0;
-    check_buffer(AMF0_NUMBER_SIZE);
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *_buffer = data;
     return *this;
 }
@@ -687,7 +717,13 @@ Element::makeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::BOOLEAN_AMF0;
-    check_buffer(sizeof(bool));
+    try {
+	check_buffer(sizeof(bool));
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *(_buffer->reference()) = flag;
 
     return *this;
@@ -858,6 +894,13 @@ Element::makeXMLObject()
     _type = Element::XML_OBJECT_AMF0;
     return *this;
 }
+Element &
+Element::makeXMLObject(boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::XML_OBJECT_AMF0;
+    return *this;
+}
 
 /// \brief Make this Element a Property with an XML Object as the value.
 ///
@@ -926,12 +969,12 @@ Element::makeTypedObject(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeTypedObject(boost::uint8_t *data, size_t size)
+Element::makeTypedObject(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT_AMF0;
-    check_buffer(size);
-    _buffer->copy(data, size);
+//     check_buffer(size);
+//     _buffer->copy(data, size);
     return *this;
 }
 
@@ -958,7 +1001,13 @@ Element::makeReference(boost::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE_AMF0;
-    check_buffer(size);
+    try {
+	check_buffer(size);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     _buffer->copy(indata, size);
     return *this;
 }
@@ -1133,12 +1182,10 @@ Element::makeUnsupported()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeUnsupported(boost::uint8_t *data, size_t size)
+Element::makeUnsupported(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;    
     _type = Element::UNSUPPORTED_AMF0;
-    check_buffer(size);
-    _buffer->copy(data, size);
     return *this;
 }
 
@@ -1161,12 +1208,12 @@ Element::makeLongString()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeLongString(boost::uint8_t *indata, size_t size)
+Element::makeLongString(boost::uint8_t *indata)
 {
 //    GNASH_REPORT_FUNCTION;    
     _type = Element::LONG_STRING_AMF0;
-    check_buffer(size);
-    _buffer->copy(indata, size);
+//     check_buffer(size);
+//     _buffer->copy(indata, size);
     return *this;
 }
 
@@ -1175,6 +1222,13 @@ Element::makeLongString(boost::uint8_t *indata, size_t size)
 /// @return A reference to this Element.
 Element &
 Element::makeRecordSet()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::RECORD_SET_AMF0;
+    return *this;
+}
+Element &
+Element::makeRecordSet(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::RECORD_SET_AMF0;
@@ -1199,11 +1253,29 @@ Element &
 Element::makeDate(boost::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
+
+    makeNumber(date);
     _type = Element::DATE_AMF0;
-    size_t size = sizeof(long);
-    check_buffer(size);
-    _buffer->copy(date, sizeof(long));
-    return makeNumber(date);
+
+    return *this;
+}
+
+Element &
+Element::makeDate(double date)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&date);
+    _type = Element::DATE_AMF0;
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
+    *_buffer = date;
+
+    return *this;
 }
 
 /// \brief Get the number of bytes in the name of this Element.
@@ -1279,9 +1351,8 @@ Element::setName(boost::uint8_t *name, size_t size)
 }
 
 /// \brief Make sure the Buffer used for storing data is big enough.
-///		This will force a Buffer::resize() is the existing
-///		Buffer used to store the data isn't big enough to hold
-///		the new size.
+///		This will force an exception if the Buffer used to
+//		store the data isn't big enough to hold	the new size.
 ///
 /// @param size The minimum size the buffer needs to be.
 ///
@@ -1293,8 +1364,8 @@ Element::check_buffer(size_t size)
     if (_buffer == 0) {
 	_buffer.reset(new Buffer(size));
     } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
+	if (_buffer->size() < size) {
+	    throw ParserException("Buffer not big enough, try resizing!");
 	}
     }
 }
