@@ -1129,7 +1129,6 @@ amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
 {
     GNASH_REPORT_FUNCTION;
-
     boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
     return formatEchoResponse(num, data->reference(), data->size());
 }
@@ -1179,8 +1178,17 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
     // Add the other binary blob
     _buffer += fixme2;
 
-    // Add the AMF data we're echoing back
-    _buffer.append(data, size);
+    amf::Element::amf0_type_e type = static_cast<amf::Element::amf0_type_e>(*data);
+    if ((type == amf::Element::UNSUPPORTED_AMF0)
+	|| (type == amf::Element::NULL_AMF0)) {
+	_buffer += type;
+	// Red5 returns a NULL object when it's recieved an undefined one in the echo_test
+    } else if (type == amf::Element::UNDEFINED_AMF0) {
+	_buffer += amf::Element::NULL_AMF0;
+    } else {
+	// Add the AMF data we're echoing back
+	_buffer.append(data, size);
+    }
     
     return _buffer;
 }
