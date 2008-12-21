@@ -159,7 +159,7 @@ AMF::encodeNumber(double indata)
     *buf = Element::NUMBER_AMF0;
     num = indata;
     swapBytes(&num, AMF0_NUMBER_SIZE);
-    *buf += (num);
+    *buf += num;
     
     return buf;
 }
@@ -201,7 +201,7 @@ boost::shared_ptr<Buffer>
 AMF::encodeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+    boost::shared_ptr<Buffer> buf(new Buffer(1));
     *buf = Element::UNDEFINED_AMF0;
     
     return buf;
@@ -214,7 +214,7 @@ boost::shared_ptr<Buffer>
 AMF::encodeUnsupported()
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+    boost::shared_ptr<Buffer> buf(new Buffer(1));
     *buf = Element::UNSUPPORTED_AMF0;
     
     return buf;
@@ -226,13 +226,13 @@ AMF::encodeUnsupported()
 /// 
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeDate(const boost::uint8_t *data)
+AMF::encodeDate(const boost::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf(new Buffer(AMF_HEADER_SIZE));
+//    boost::shared_ptr<Buffer> buf;
+    boost::shared_ptr<Buffer> buf(new Buffer(AMF0_NUMBER_SIZE+1));
     *buf = Element::DATE_AMF0;
-    double num = *reinterpret_cast<const double*>(data);
-    swapBytes(&num, 8);
+    double num = *(reinterpret_cast<const double*>(date));
     *buf += num;
     
     return buf;
@@ -384,11 +384,29 @@ AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
-AMF::encodeStrictArray(const boost::uint8_t * /* data */, size_t /* size */)
+AMF::encodeStrictArray(const amf::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
-    log_unimpl("Strict Array AMF objects not supported yet");
+    boost::shared_ptr<amf::Buffer> buf;
+    boost::uint32_t length;
+    length = data.getDataSize();
+//    log_debug("Encoded data size is going to be %d", length);
+    swapBytes(&length, 2);
+    *buf += length;
+
+    vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+    vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+    for (ait = props.begin(); ait != props.end(); ait++) {
+	boost::shared_ptr<amf::Element> el = (*(ait));
+	boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
+	if (item) {
+	    *buf += item;
+	    item.reset();
+	} else {
+	    break;
+	}
+//	    el->dump();
+    }
     
     return buf;
 }
@@ -488,7 +506,7 @@ boost::shared_ptr<Buffer>
 AMF::encodeElement(const amf::Element& el)
 {
 //    GNASH_REPORT_FUNCTION;
-    size_t outsize = el.getNameSize() + el.getDataSize() + AMF_PROP_HEADER_SIZE;
+    size_t outsize = el.getNameSize() + el.getDataSize() + AMF_HEADER_SIZE;
 
     boost::shared_ptr<Buffer> buf(new Buffer(outsize));
 //    log_debug("AMF::%s: Outsize is: %d", __FUNCTION__, outsize);
@@ -515,7 +533,6 @@ AMF::encodeElement(const amf::Element& el)
       {
 	  boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(el.to_number());
 	  *buf += encnum;
-//	  *buf += encodeNumber(el.to_number());
           break;
       }
       case Element::BOOLEAN_AMF0:
@@ -537,41 +554,58 @@ AMF::encodeElement(const amf::Element& el)
 	  log_unimpl("FIXME: Element::encode() temporarily disabled.");
           break;
       case Element::MOVIECLIP_AMF0:
-	  *buf += encodeMovieClip(el.to_reference(), el.getDataSize());
+	  if (el.to_reference() > 0) {
+	      *buf += encodeMovieClip(el.to_reference(), el.getDataSize());
+	  }
           break;
       case Element::NULL_AMF0:
-	  *buf += encodeNull();
+	  *buf += Element::NULL_AMF0;
           break;
       case Element::UNDEFINED_AMF0:
-	  *buf += encodeUndefined();
+	  *buf += Element::UNDEFINED_AMF0;
 	  break;
       case Element::REFERENCE_AMF0:
-	  *buf += encodeReference(el.to_reference(), el.getDataSize());
+	  if (el.to_reference() > 0) {
+	      *buf += encodeReference(el.to_reference(), el.getDataSize());
+	  }
           break;
       case Element::ECMA_ARRAY_AMF0:
-	  *buf += encodeECMAArray(el.to_reference(), el.getDataSize());
+	  if (el.to_reference() > 0) {
+	      *buf += encodeECMAArray(el.to_reference(), el.getDataSize());
+	  }
           break;
 	  // The Object End gets added when creating the object, so we can just ignore it here.
       case Element::OBJECT_END_AMF0:
 	  *buf += encodeObjectEnd();
           break;
       case Element::STRICT_ARRAY_AMF0:
-	  *buf += encodeStrictArray(el.to_reference(), el.getDataSize());
+	  if (el.to_reference() > 0) {
+	      *buf += encodeStrictArray(el);
+	  }
           break;
       case Element::DATE_AMF0:
-	  *buf += encodeDate(el.to_reference());
+      {
+	  boost::shared_ptr<Buffer> encdate = AMF::encodeNumber(el.to_number());
+	  *buf += encdate;
           break;
+      }
       case Element::LONG_STRING_AMF0:
-	  *buf += encodeLongString(el.to_reference(), el.getDataSize());
+	  if (el.to_reference() > 0) {
+	      *buf += encodeLongString(el.to_reference(), el.getDataSize());
+	  }
           break;
       case Element::UNSUPPORTED_AMF0:
-	  *buf += encodeUnsupported();
+	  *buf += Element::UNSUPPORTED_AMF0;
           break;
       case Element::RECORD_SET_AMF0:
-	  *buf += encodeRecordSet(el.to_reference(), el.getDataSize());
+	  if (el.to_reference() > 0) {
+	      *buf += encodeRecordSet(el.to_reference(), el.getDataSize());
+	  }
           break;
       case Element::XML_OBJECT_AMF0:
-	  *buf += encodeXMLObject(el.to_reference(), el.getDataSize());
+	  if (el.to_reference() > 0) {
+	      *buf += encodeXMLObject(el.to_reference(), el.getDataSize());
+	  }
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
           break;
@@ -815,7 +849,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  el->makeStrictArray();
 	  // get the number of numbers in the array
 	  length = ntohl((*(boost::uint32_t *)tmpptr));
-//	  log_debug("Strict Array, body size is %d.", length);
+	  log_debug("Strict Array, body size is %d.", length);
 	  // Skip past the length field to get to the start of the data
 	  tmpptr += sizeof(boost::uint32_t);
 	  while (length) {
@@ -832,22 +866,28 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  break;
       }
       case Element::DATE_AMF0:
-	  el->makeDate();
+      {
+ 	  double swapped = *reinterpret_cast<const double*>(tmpptr);
+ 	  swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
+	  el->makeDate(swapped);
+	  tmpptr += AMF0_NUMBER_SIZE; // all dates are 8 bit big endian numbers
 	  break;
+      }
       case Element::LONG_STRING_AMF0:
-	  el->makeLongString();
+	  el->makeLongString(tmpptr);
 	  break;
       case Element::UNSUPPORTED_AMF0:
-	  el->makeUnsupported();
+	  el->makeUnsupported(tmpptr);
+	  tmpptr += 1;
 	  break;
       case Element::RECORD_SET_AMF0:
-	  el->makeRecordSet();
+	  el->makeRecordSet(tmpptr);
 	  break;
       case Element::XML_OBJECT_AMF0:
-	  el->makeXMLObject();
+	  el->makeXMLObject(tmpptr);
 	  break;
       case Element::TYPED_OBJECT_AMF0:
-	  el->makeTypedObject("fixme");
+	  el->makeTypedObject(tmpptr);
 	  break;
       case Element::AMF3_DATA:
       default:
