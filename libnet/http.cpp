@@ -1128,22 +1128,22 @@ HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
 amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
-    return formatEchoResponse(num, data->reference(), data->size());
+    return formatEchoResponse(num, data->reference(), data->allocated());
 }
 
 amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Buffer &data)
 {
-    GNASH_REPORT_FUNCTION;
-    return formatEchoResponse(num, data.reference(), data.size());
+//    GNASH_REPORT_FUNCTION;
+    return formatEchoResponse(num, data.reference(), data.allocated());
 }
 
 amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     boost::uint8_t *tmpptr  = data;
     
@@ -1187,7 +1187,9 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
 	_buffer += amf::Element::NULL_AMF0;
     } else {
 	// Add the AMF data we're echoing back
-	_buffer.append(data, size);
+	if (size) {
+	    _buffer.append(data, size);
+	}
     }
     
     return _buffer;
