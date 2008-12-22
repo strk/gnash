@@ -221,7 +221,7 @@ Buffer &
 Buffer::operator+=(Buffer &buf)
 {
 // //    GNASH_REPORT_FUNCTION;
-    append(buf.reference(), buf.size());
+    append(buf.reference(), buf.allocated());
     return *this;
 }
 
@@ -360,7 +360,7 @@ Buffer &
 Buffer::operator+=(boost::shared_ptr<Buffer> &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    append(buf->reference(), buf->size());
+    append(buf->reference(), buf->allocated());
     return *this;
 }
 
