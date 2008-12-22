@@ -377,6 +377,55 @@ Element::operator==(bool x)
     return false;
 };
 
+size_t
+Element::calculateSize()
+{
+//    GNASH_REPORT_FUNCTION;
+    return calculateSize();
+}
+
+size_t
+Element::calculateSize(amf::Element &el) const
+{
+//    GNASH_REPORT_FUNCTION;    
+    size_t outsize = 0;
+
+    // Simple Elements have everything contained in just the class itself.
+    // If thr name is set, it's a property, so the length is
+    // prefixed to the name string.
+    if (el.getNameSize()) {
+	outsize += el.getNameSize() + sizeof(boost::uint16_t);
+    }
+    // If there is any data, then the size of the data plus the header
+    // of the type and the length is next.
+    if (el.getDataSize()) {
+	outsize += el.getDataSize() + AMF_HEADER_SIZE;
+    }
+
+    // If an array has no data, it's undefined, so has a length of zero.
+    if (el.getType() == Element::STRICT_ARRAY_AMF0) {
+	if (el.getDataSize() == 0) {
+	    outsize = sizeof(boost::uint32_t) + 1;
+	}
+    }
+    
+    // More complex messages have child elements, either properties or
+    // the items in an array, If we have children, count up their size too.
+    // Calculate the total size of the message
+    vector<boost::shared_ptr<amf::Element> > props = el.getProperties();
+    for (size_t i=0; i<props.size(); i++) {
+	outsize += props[i]->getDataSize();
+	if (props[i]->getNameSize()) {
+	    outsize += props[i]->getNameSize();
+	    outsize += amf::AMF_PROP_HEADER_SIZE;
+	} else {
+	    outsize += amf::AMF_HEADER_SIZE;
+	}
+    }
+
+    return outsize;
+}
+
 /// \brief Encode this Element (data type object).
 ///	This encodes this Element and all of it's associated
 ///	properties into raw binary data in big endoan format.
@@ -718,13 +767,13 @@ Element::makeBoolean(bool flag)
 //    GNASH_REPORT_FUNCTION;
     _type = Element::BOOLEAN_AMF0;
     try {
-	check_buffer(sizeof(bool));
+	check_buffer(1);
     } catch (std::exception& e) {
 	log_error("%s", e.what());
 	return *this;
     }
     
-    *(_buffer->reference()) = flag;
+    *_buffer = flag;
 
     return *this;
 }
@@ -1377,11 +1426,14 @@ Element::dump(std::ostream& os) const
 {
 //    GNASH_REPORT_FUNCTION;
     
-    if (_name) {
- 	os << "Element name: " << _name << ", data length is " << getDataSize() << endl;
-    }
-
     os << astype_str[_type] << ": ";
+    if (_name) {
+ 	os << " property name is: " << _name << ", ";
+    } else {
+ 	os << "(no name)";
+    }
+    os << endl << "data length is " << getDataSize() << endl;
+
 
     switch (_type) {
       case Element::NUMBER_AMF0:
@@ -1432,9 +1484,11 @@ Element::dump(std::ostream& os) const
 	  break;
     }
 
-//     if (_buffer) {
-// 	_buffer->dump();
-//     }
+    if (_type != Element::BOOLEAN_AMF0) {
+	if (_buffer) {
+	    _buffer->dump();
+	}
+    }
 
     if (_properties.size() > 0) {
 	vector<boost::shared_ptr<Element> >::const_iterator ait;

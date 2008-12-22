@@ -721,7 +721,10 @@ public:
     ///		debugging purposes.
     std::vector<boost::shared_ptr<Element> > getProperties() const
 			{ return _properties; };
-    
+
+    size_t calculateSize();
+    size_t calculateSize(amf::Element &el) const;
+
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
