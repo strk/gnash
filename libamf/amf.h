@@ -235,7 +235,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeECMAArray(const boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeECMAArray(const amf::Element &data);
 
     /// Encode a Long String to its serialized representation.
     //
@@ -284,7 +284,7 @@ public:
     /// 
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeObject(boost::shared_ptr<amf::Element> el);
+    static boost::shared_ptr<Buffer> encodeObject(const amf::Element &data);
 
     /// Encode the end of an object to its serialized representation.
     //

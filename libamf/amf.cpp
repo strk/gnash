@@ -185,6 +185,45 @@ AMF::encodeBoolean(bool flag)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
+AMF::encodeObject(const amf::Element &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::uint32_t length;
+    length = data.propertySize();
+    //    log_debug("Encoded data size has %d properties", length);
+    boost::shared_ptr<amf::Buffer> buf;
+    if (length) {
+	buf.reset(new amf::Buffer);
+    }
+    *buf = Element::OBJECT_AMF0;
+    if (data.propertySize() > 0) {
+	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	for (ait = props.begin(); ait != props.end(); ait++) {
+	    boost::shared_ptr<amf::Element> el = (*(ait));
+	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
+	    if (item) {
+		*buf += item;
+		item.reset();
+	    } else {
+		break;
+	    }
+	    //	    el->dump();
+	}
+    }
+
+    // Terminate the object
+    *buf += '\0';
+    *buf += '\0';
+    *buf += TERMINATOR;
+
+    return buf;
+}
+
+/// \brief Encode the end of an object to it's serialized representation.
+///
+/// @return a binary AMF packet in big endian format
+boost::shared_ptr<Buffer>
 AMF::encodeObjectEnd()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -331,11 +370,39 @@ AMF::encodeMovieClip(const boost::uint8_t * /*data */, size_t /* size */)
 ///
 /// @return a binary AMF packet in big endian format
 boost::shared_ptr<Buffer>
-AMF::encodeECMAArray(const boost::uint8_t * /*data */, size_t /* size */)
+AMF::encodeECMAArray(const amf::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
-    log_unimpl("ECMA Array AMF objects not supported yet");
+    boost::uint32_t length;
+    length = data.propertySize();
+    //    log_debug("Encoded data size has %d properties", length);
+    boost::shared_ptr<amf::Buffer> buf;
+    if (length) {
+	buf.reset(new amf::Buffer);
+    } else {
+	// an undefined array is only 5 bytes, 1 for the type and
+	// 4 for the length.
+	buf.reset(new amf::Buffer(5));
+    }
+    *buf = Element::ECMA_ARRAY_AMF0;
+    swapBytes(&length, sizeof(boost::uint32_t));
+    *buf += length;
+
+    if (data.propertySize() > 0) {
+	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	for (ait = props.begin(); ait != props.end(); ait++) {
+	    boost::shared_ptr<amf::Element> el = (*(ait));
+	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
+	    if (item) {
+		*buf += item;
+		item.reset();
+	    } else {
+		break;
+	    }
+	    //	    el->dump();
+	}
+    }
     
     return buf;
 }
@@ -374,7 +441,7 @@ AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
     return buf;
 }
 
-/// \brief Encode a Strict Array to it's serialized representation.
+/// \brief Encode a Strict Array to it's serialized represenicttation.
 ///	A Strict Array is one where all the items are the same
 ///	data type, commonly either a number or a string.
 ///
@@ -387,25 +454,35 @@ boost::shared_ptr<Buffer>
 AMF::encodeStrictArray(const amf::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> buf;
     boost::uint32_t length;
-    length = data.getDataSize();
-//    log_debug("Encoded data size is going to be %d", length);
-    swapBytes(&length, 2);
+    length = data.propertySize();
+    //    log_debug("Encoded data size has %d properties", length);
+    boost::shared_ptr<amf::Buffer> buf;
+    if (length) {
+	buf.reset(new amf::Buffer);
+    } else {
+	// an undefined array is only 5 bytes, 1 for the type and
+	// 4 for the length.
+	buf.reset(new amf::Buffer(5));
+    }
+    *buf = Element::STRICT_ARRAY_AMF0;
+    swapBytes(&length, sizeof(boost::uint32_t));
     *buf += length;
 
-    vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
-    vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
-    for (ait = props.begin(); ait != props.end(); ait++) {
-	boost::shared_ptr<amf::Element> el = (*(ait));
-	boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
-	if (item) {
-	    *buf += item;
-	    item.reset();
-	} else {
-	    break;
+    if (data.propertySize() > 0) {
+	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	for (ait = props.begin(); ait != props.end(); ait++) {
+	    boost::shared_ptr<amf::Element> el = (*(ait));
+	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
+	    if (item) {
+		*buf += item;
+		item.reset();
+	    } else {
+		break;
+	    }
+	    //	    el->dump();
 	}
-//	    el->dump();
     }
     
     return buf;
@@ -434,15 +511,13 @@ boost::shared_ptr<Buffer>
 AMF::encodeString(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint16_t length;
-    
     boost::shared_ptr<Buffer>buf(new Buffer(size + AMF_HEADER_SIZE));
     *buf = Element::STRING_AMF0;
     // when a string is stored in an element, we add a NULL terminator so
     // it can be printed by to_string() efficiently. The NULL terminator
     // doesn't get written when encoding a string as it has a byte count
     // instead.
-    length = size;
+    boost::uint16_t length = size;
 //    log_debug("Encoded data size is going to be %d", length);
     swapBytes(&length, 2);
     *buf += length;
@@ -506,10 +581,68 @@ boost::shared_ptr<Buffer>
 AMF::encodeElement(const amf::Element& el)
 {
 //    GNASH_REPORT_FUNCTION;
-    size_t outsize = el.getNameSize() + el.getDataSize() + AMF_HEADER_SIZE;
+#if 0
+    size_t outsize = 0;
 
+    // Simple Elements have everything contained in just the class itself.
+    // If thr name is set, it's a property, so the length is
+    // prefixed to the name string.
+    if (el.getNameSize()) {
+	outsize += el.getNameSize() + sizeof(boost::uint16_t);
+    }
+    // If there is any data, then the size of the data plus the header
+    // of the type and the length is next.
+    if (el.getDataSize()) {
+	outsize += el.getDataSize() + AMF_HEADER_SIZE;
+    }
+
+    // More complex messages have child elements, either properties or
+    // the items in an array, If we have children, count up their size too.
+    // Calculate the total size of the message
+    vector<boost::shared_ptr<amf::Element> > props = el.getProperties();
+    for (size_t i=0; i<props.size(); i++) {
+	outsize += props[i]->getDataSize();
+	if (props[i]->getNameSize()) {
+	    outsize += props[i]->getNameSize();
+	    outsize += amf::AMF_PROP_HEADER_SIZE;
+	} else {
+	    outsize += amf::AMF_HEADER_SIZE;
+	}
+    }
+
+    // If an array has no data, it's undefined, so has a length of zero.
+    if (el.getType() == Element::STRICT_ARRAY_AMF0) {
+	if ((el.getDataSize() == 0) && (props.size() == 0)) {
+	    outsize += sizeof(boost::uint32_t) + 1;
+	}
+    }
+
+    // An encoded number is always 8 bytes (a double) plus one byte
+    // for the type field.
+    if (el.getType() == Element::NUMBER_AMF0) {
+	outsize = AMF0_NUMBER_SIZE + 1;
+    }
+    
+    // Several types have no data when encoded, like NULL, Undefined,
+    // and Unsupported, so we only need enough room to store the header
+    // type field, which is only 1 byte.
+    if (outsize == 0) {
+	outsize = 1;
+    }
+    // Arrays have an additional 4 byte long field to hold the
+    // number of items in the array.
+    if ((el.getType() == Element::STRICT_ARRAY_AMF0)
+	|| (el.getType() == Element::ECMA_ARRAY_AMF0)) {
+	log_debug("Array has %d items", props.size());
+	outsize += sizeof(boost::uint32_t);
+    }
+    if ((outsize <= 0) || (outsize > 0xffff)) {
+	log_error("Outsize is out of range!", outsize);
+	el.dump();
+    }
     boost::shared_ptr<Buffer> buf(new Buffer(outsize));
-//    log_debug("AMF::%s: Outsize is: %d", __FUNCTION__, outsize);
+    log_debug("AMF::%s: Outsize is: %d", __FUNCTION__, outsize);
+
     // If the name field is set, it's a property, followed by the data
     if (el.getName()) {
 	// Add the length of the string for the name of the variable
@@ -523,7 +656,9 @@ AMF::encodeElement(const amf::Element& el)
 	    *buf += name;
 	}
     }
+#endif
 
+    boost::shared_ptr<Buffer> buf;
     // Encode the element's data
     switch (el.getType()) {
       case Element::NOTYPE:
@@ -531,86 +666,77 @@ AMF::encodeElement(const amf::Element& el)
 	  break;
       case Element::NUMBER_AMF0:
       {
-	  boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(el.to_number());
-	  *buf += encnum;
+  //	  boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(el.to_number());
+  //	  *buf += encnum;
+	  buf = AMF::encodeNumber(el.to_number());
           break;
       }
       case Element::BOOLEAN_AMF0:
       {
-	  boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(el.to_bool());
-	  *buf += encodeBoolean(el.to_bool());
-	  *buf += encbool;
+// 	  boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(el.to_bool());
+// 	  *buf += encodeBoolean(el.to_bool());
+// 	  *buf += encbool;
+	  buf = AMF::encodeBoolean(el.to_bool());
           break;
       }
       case Element::STRING_AMF0:
       {
-	  boost::shared_ptr<Buffer> encstr = AMF::encodeString(el.to_string());
-	  *buf += encstr;
-//	  *buf += encodeString(el.to_reference(), el.getDataSize());
+  //	  boost::shared_ptr<Buffer> encstr = AMF::encodeString(el.to_string());
+	  //	  *buf += encstr;
+	  buf = encodeString(el.to_string());
 	  break;
       }
       case Element::OBJECT_AMF0:
-	  // tmp = el.encode();
-	  log_unimpl("FIXME: Element::encode() temporarily disabled.");
+	  buf = encodeObject(el);
           break;
       case Element::MOVIECLIP_AMF0:
-	  if (el.to_reference() > 0) {
-	      *buf += encodeMovieClip(el.to_reference(), el.getDataSize());
-	  }
+	  buf = encodeMovieClip(el.to_reference(), el.getDataSize());
           break;
       case Element::NULL_AMF0:
-	  *buf += Element::NULL_AMF0;
+	  //	  *buf += Element::NULL_AMF0;
+	  buf = encodeNull();
           break;
       case Element::UNDEFINED_AMF0:
-	  *buf += Element::UNDEFINED_AMF0;
+	  //	  *buf += Element::UNDEFINED_AMF0;
+	  buf = encodeUndefined();
 	  break;
       case Element::REFERENCE_AMF0:
-	  if (el.to_reference() > 0) {
-	      *buf += encodeReference(el.to_reference(), el.getDataSize());
-	  }
+	  buf = encodeReference(el.to_reference(), el.getDataSize());
           break;
       case Element::ECMA_ARRAY_AMF0:
-	  if (el.to_reference() > 0) {
-	      *buf += encodeECMAArray(el.to_reference(), el.getDataSize());
-	  }
+	  buf = encodeECMAArray(el);
           break;
 	  // The Object End gets added when creating the object, so we can just ignore it here.
       case Element::OBJECT_END_AMF0:
-	  *buf += encodeObjectEnd();
+	  buf = encodeObjectEnd();
           break;
       case Element::STRICT_ARRAY_AMF0:
-	  if (el.to_reference() > 0) {
-	      *buf += encodeStrictArray(el);
-	  }
+      {
+	  buf = AMF::encodeStrictArray(el);
           break;
+      }
       case Element::DATE_AMF0:
       {
-	  boost::shared_ptr<Buffer> encdate = AMF::encodeNumber(el.to_number());
-	  *buf += encdate;
+  //	  boost::shared_ptr<Buffer> encdate = AMF::encodeNumber(el.to_number());
+	  buf = AMF::encodeDate(el.to_reference());
           break;
       }
       case Element::LONG_STRING_AMF0:
-	  if (el.to_reference() > 0) {
-	      *buf += encodeLongString(el.to_reference(), el.getDataSize());
-	  }
+	  buf = encodeLongString(el.to_reference(), el.getDataSize());
           break;
       case Element::UNSUPPORTED_AMF0:
-	  *buf += Element::UNSUPPORTED_AMF0;
+	  buf = encodeUnsupported();
           break;
       case Element::RECORD_SET_AMF0:
-	  if (el.to_reference() > 0) {
-	      *buf += encodeRecordSet(el.to_reference(), el.getDataSize());
-	  }
+	  buf = encodeRecordSet(el.to_reference(), el.getDataSize());
           break;
       case Element::XML_OBJECT_AMF0:
-	  if (el.to_reference() > 0) {
-	      *buf += encodeXMLObject(el.to_reference(), el.getDataSize());
-	  }
+	  buf = encodeXMLObject(el.to_reference(), el.getDataSize());
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
           break;
       case Element::TYPED_OBJECT_AMF0:
-//	  tmp = encodeTypedObject(el.to_reference(), el.getDataSize());
+  //	   tmp = encodeTypedObject(el.to_reference(), el.getDataSize());
 	  buf.reset();
           break;
 // 	  // This is a Gnash specific value
@@ -625,9 +751,23 @@ AMF::encodeElement(const amf::Element& el)
           break;
     };
 
-//     if (tmp) {
-//         *buf += *tmp;
-//     }
+    // If the name field is set, it's a property, followed by the data
+    if (el.getName()) {
+	boost::shared_ptr<Buffer> bigbuf(new amf::Buffer(el.getNameSize() + sizeof(boost::uint16_t) + buf->size()));
+	// Add the length of the string for the name of the variable
+	size_t length = el.getNameSize();
+	boost::uint16_t enclength = length;
+	swapBytes(&enclength, 2);
+	*bigbuf = enclength;
+	// Now the name itself
+	string name = el.getName();
+	if (name.size() > 0) {
+	    *bigbuf += name;
+	}
+	*bigbuf += buf;
+	return bigbuf;
+    }
+    
     return buf;
 }
 
@@ -849,7 +989,6 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  el->makeStrictArray();
 	  // get the number of numbers in the array
 	  length = ntohl((*(boost::uint32_t *)tmpptr));
-	  log_debug("Strict Array, body size is %d.", length);
 	  // Skip past the length field to get to the start of the data
 	  tmpptr += sizeof(boost::uint32_t);
 	  while (length) {
@@ -857,7 +996,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	      if (child == 0) {
 		  break;
 	      } else {
-//		  child->dump();
+// 		  child->dump();
 		  el->addProperty(child);
 		  tmpptr += amf_obj.totalsize();
 		  --length;
@@ -924,7 +1063,7 @@ AMF::extractProperty(boost::shared_ptr<Buffer> buf)
 
 /// \brief Extract a Property.
 ///	A Property is a standard AMF object preceeded by a
-///	length and an ASCII name field. These are only used
+///	length and an ASCII name field. These are onicly used
 ///	with higher level ActionScript objects.
 ///
 /// @param in A real pointer to the raw data to start parsing from.
