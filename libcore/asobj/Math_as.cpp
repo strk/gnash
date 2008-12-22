@@ -43,8 +43,8 @@ namespace gnash {
 
 // Forward declarations
 namespace {
-    typedef double (*unaryMathFunc) (double);
-    typedef double (*binaryMathFunc) (double, double);
+    typedef double (*UnaryMathFunc) (double);
+    typedef double (*BinaryMathFunc) (double, double);
 
     void attachMathInterface(as_object& proto);
     as_value math_max(const fn_call& fn);
@@ -52,8 +52,8 @@ namespace {
     as_value math_random(const fn_call& fn);
     as_value math_round(const fn_call& fn);
 
-    template<unaryMathFunc Func> as_value unaryFunction(const fn_call& fn);
-    template<binaryMathFunc Func> as_value binaryFunction(const fn_call& fn);
+    template<UnaryMathFunc Func> as_value unaryFunction(const fn_call& fn);
+    template<BinaryMathFunc Func> as_value binaryFunction(const fn_call& fn);
 
 }
 
@@ -105,7 +105,7 @@ namespace {
 // If it is called with two arguments, the valueOf method
 // (i.e. to_number()) of the second method is called, but 
 // not used. Strange, but true.
-template<unaryMathFunc Func>
+template<UnaryMathFunc Func>
 as_value
 unaryFunction(const fn_call& fn)
 {
@@ -125,7 +125,7 @@ unaryFunction(const fn_call& fn)
 // Flash's pow() is clever cos it copes with negative numbers to an integral
 // power, and can do pow(-2, -1) == -0.5 and pow(-2, -2) == 0.25.
 // Fortunately, pow() in the cmath library works the same way.
-template<binaryMathFunc Func>
+template<BinaryMathFunc Func>
 as_value
 binaryFunction(const fn_call& fn)
 {
@@ -178,7 +178,8 @@ math_random(const fn_call& /* fn */)
 
 	// Produces double ( 0 <= n < 1)
 	boost::uniform_real<> uni_dist(0, 1);
-	boost::variate_generator<VM::RNG&, boost::uniform_real<> > uni(rnd, uni_dist);
+	boost::variate_generator<VM::RNG&, boost::uniform_real<> > uni(
+            rnd, uni_dist);
 
 	return as_value(uni());
 
