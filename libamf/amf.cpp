@@ -323,8 +323,8 @@ AMF::encodeTypedObject(const amf::Element &data)
     GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
-    log_debug("Encoded data size has %d properties", length);
-    boost::shared_ptr<amf::Buffer> buf;
+//    log_debug("Encoded data size has %d properties", length);
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
     size_t outsize = 0;
     if (data.getName()) {
 	outsize = data.getNameSize() + sizeof(boost::uint16_t);
@@ -335,11 +335,9 @@ AMF::encodeTypedObject(const amf::Element &data)
 	buf.reset();
  	return buf;
     }
-    buf.reset(new amf::Buffer);
-
+    //    buf.reset(new amf::Buffer);
 
     *buf = Element::TYPED_OBJECT_AMF0;
-#if 0
     // If the name field is set, it's a property, followed by the data
     if (data.getName()) {
 	// Add the length of the string for the name of the variable
@@ -355,9 +353,9 @@ AMF::encodeTypedObject(const amf::Element &data)
     }
 
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+	vector<boost::shared_ptr<amf::Element> >::reverse_iterator ait;    
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
-	for (ait = props.begin(); ait != props.end(); ait++) {
+	for (ait = props.rbegin(); ait != props.rend(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
@@ -369,7 +367,6 @@ AMF::encodeTypedObject(const amf::Element &data)
 	    //	    el->dump();
 	}
     }
-#endif
 
     // Terminate the object
     *buf += '\0';
@@ -541,7 +538,7 @@ AMF::encodeStrictArray(const amf::Element &data)
 	    } else {
 		break;
 	    }
-	    //	    el->dump();
+// 	    el->dump();
 	}
     }
     
@@ -1019,7 +1016,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       {
 	  el->makeECMAArray();
 	  // get the number of elements in the array
-	  length = ntohs((*(boost::uint32_t *)tmpptr) & 0xffff);
+	  boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr) & 0xffffffff);
 	  tmpptr += sizeof(boost::uint32_t);
 	  while (tmpptr < (tooFar - AMF_HEADER_SIZE)) {
 	      if (*tmpptr == TERMINATOR) {
@@ -1045,10 +1042,10 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       {
 	  el->makeStrictArray();
 	  // get the number of numbers in the array
-	  length = ntohl((*(boost::uint32_t *)tmpptr));
+	  boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr));
 	  // Skip past the length field to get to the start of the data
 	  tmpptr += sizeof(boost::uint32_t);
-	  while (length) {
+	  while (items) {
 	      boost::shared_ptr<amf::Element> child = amf_obj.extractAMF(tmpptr, tooFar); 
 	      if (child == 0) {
 		  break;
@@ -1056,7 +1053,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 // 		  child->dump();
 		  el->addProperty(child);
 		  tmpptr += amf_obj.totalsize();
-		  --length;
+		  --items;
 	      }
 	  };
 	  break;
@@ -1085,6 +1082,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       case Element::TYPED_OBJECT_AMF0:
       {
 	  el->makeTypedObject();
+	  // a Typed Object has a name
 	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
 	  tmpptr += sizeof(boost::uint16_t);
 	  el->setName(tmpptr, length);
@@ -1098,7 +1096,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
-		  tmpptr += 4;
+		  tmpptr += 3;
 		  break;
 	      }
      //	      child->dump();
