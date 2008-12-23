@@ -1367,11 +1367,13 @@ test_rtmpt (void)
 	//	headers43[3]->dump();
 	std::vector<boost::shared_ptr<amf::Element> > props43 = headers43[3]->getProperties();
 	std::vector<boost::shared_ptr<amf::Element> > props43a = props43[0]->getProperties();
+	//	props43[1]->dump();
         if ((strncmp(headers43[0]->getName(), "echo", 4) == 0)
             && (strncmp(headers43[1]->getName(), "/2", 2) == 0)
             && (headers43[3]->getType() == Element::STRICT_ARRAY_AMF0)
 	    && (props43[0]->getType() == Element::TYPED_OBJECT_AMF0)
 	    && (props43a[0]->getType() == Element::NUMBER_AMF0)
+	    && (props43[1]->getType() == Element::TYPED_OBJECT_AMF0)
 	    && (props43a[1]->getType() == Element::STRING_AMF0)
             && (strncmp(props43a[0]->getName(), "attribute2", 10) == 0)
             && (props43a[0]->to_number() == 1)
@@ -1385,8 +1387,12 @@ test_rtmpt (void)
     }
     boost::shared_ptr<Buffer> hex_res43(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 0a 00 00 00 02 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 6f 6e 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 3f f0 00 00 00 00 00 00 00 00 09 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 74 77 6f 00 0a 61 74 74 72 69 62 75 74 65 32 00 40 00 00 00 00 00 00 00 00 00 09"));
     amf::Buffer &buf43 = http.formatEchoResponse(headers43[1]->getName(), *headers43[3]);
-    headers43[3]->dump();
-
+    std::vector<boost::shared_ptr<amf::Element> > props43 = headers43[3]->getProperties();
+    //    std::vector<boost::shared_ptr<amf::Element> > props43a = props43[0]->getProperties();
+    //    headers43[3]->dump();
+    //    props43[0]->dump();
+    props43[0]->dump();
+    props43[1]->dump();
     cerr << hexify(hex_res43->reference()+29, hex_res43->allocated()-29 , false) << endl;
     cerr << hexify(buf43.reference() + 124, buf43.allocated()-124, false) << endl;
     string head43(reinterpret_cast<const char *>(buf43.reference()));
