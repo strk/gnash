@@ -277,7 +277,7 @@ Buffer::operator+=(boost::uint8_t byte)
 //    GNASH_REPORT_FUNCTION;
     if ((_seekptr + 1) <= (_data.get() + _nbytes)) {
 	*_seekptr = byte;
-	_seekptr += sizeof(char);
+	_seekptr += sizeof(boost::uint8_t);
     }
     return *this;
 }
@@ -442,7 +442,7 @@ Buffer &
 Buffer::operator=(amf::Element::amf0_type_e type)
 {
     boost::uint8_t nb = static_cast<boost::uint8_t>(type);
-    return operator+=(nb);
+    return operator=(nb);
 }
 
 /// Copy a boolean into the buffer. This overwrites all data, and
