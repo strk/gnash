@@ -325,18 +325,20 @@ AMF::encodeTypedObject(const amf::Element &data)
     length = data.propertySize();
 //    log_debug("Encoded data size has %d properties", length);
     boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+    buf->clear();
+#if 0
     size_t outsize = 0;
     if (data.getName()) {
 	outsize = data.getNameSize() + sizeof(boost::uint16_t);
     } else {
 	outsize == 1;
     }
-    if (length <= 0) {
-	buf.reset();
- 	return buf;
-    }
+//     if (length <= 0) {
+// 	buf.reset();
+//  	return buf;
+//     }
     //    buf.reset(new amf::Buffer);
-
+#endif
     *buf = Element::TYPED_OBJECT_AMF0;
     // If the name field is set, it's a property, followed by the data
     if (data.getName()) {
@@ -367,7 +369,7 @@ AMF::encodeTypedObject(const amf::Element &data)
 	    //	    el->dump();
 	}
     }
-
+    
     // Terminate the object
     *buf += '\0';
     *buf += '\0';
@@ -808,7 +810,7 @@ AMF::encodeElement(const amf::Element& el)
     };
 
     // If the name field is set, it's a property, followed by the data
-    if (el.getName()) {
+    if (el.getName() && (el.getType() != Element::TYPED_OBJECT_AMF0)) {
 	boost::shared_ptr<Buffer> bigbuf(new amf::Buffer(el.getNameSize() + sizeof(boost::uint16_t) + buf->size()));
 	// Add the length of the string for the name of the variable
 	size_t length = el.getNameSize();
@@ -1096,7 +1098,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
-		  tmpptr += 3;
+		  tmpptr += AMF_HEADER_SIZE;
 		  break;
 	      }
      //	      child->dump();
