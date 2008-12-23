@@ -456,6 +456,7 @@ public:
     /// @param name The name of the Property
     ///
     /// @return A reference to this Element.    
+    Element &makeTypedObject();
     Element &makeTypedObject(const std::string &name);
 
     /// \brief Make this Element a Property with an Typed Object as the value.

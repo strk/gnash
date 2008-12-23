@@ -818,6 +818,7 @@ Element::makeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::UNDEFINED_AMF0;
+
     return *this;
 }
 
@@ -1007,6 +1008,15 @@ Element::makeTypedObject(const std::string &name)
     if (name.size()) {
         setName(name);
     }
+    return *this;
+}
+
+Element &
+Element::makeTypedObject()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::TYPED_OBJECT_AMF0;  
+
     return *this;
 }
 
