@@ -1367,6 +1367,7 @@ test_rtmpt (void)
 	//	headers43[3]->dump();
 	std::vector<boost::shared_ptr<amf::Element> > props43 = headers43[3]->getProperties();
 	std::vector<boost::shared_ptr<amf::Element> > props43a = props43[0]->getProperties();
+	std::vector<boost::shared_ptr<amf::Element> > props43b = props43[1]->getProperties();
 	//	props43[1]->dump();
         if ((strncmp(headers43[0]->getName(), "echo", 4) == 0)
             && (strncmp(headers43[1]->getName(), "/2", 2) == 0)
@@ -1379,6 +1380,10 @@ test_rtmpt (void)
             && (props43a[0]->to_number() == 1)
             && (strncmp(props43a[1]->getName(), "attribute1", 10) == 0)
             && (strncmp(props43a[1]->to_string(), "one", 3) == 0)
+            && (strncmp(props43b[0]->getName(), "attribute2", 10) == 0)
+            && (props43b[0]->to_number() == 2)
+            && (strncmp(props43b[1]->getName(), "attribute1", 10) == 0)
+            && (strncmp(props43b[1]->to_string(), "two", 3) == 0)
 	    ) {
             runtest.pass("HTTP::parseEchoRequest(object RemoteClass Array, 2 items)");
         } else {        
