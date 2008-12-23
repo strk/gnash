@@ -202,7 +202,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeTypedObject(boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeTypedObject(const amf::Element &data);
 
     /// Encode a Reference to an object to its serialized representation.
     //
