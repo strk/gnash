@@ -1144,6 +1144,7 @@ test_rtmpt (void)
     amf::Buffer &buf27 = http.formatEchoResponse(headers27[1]->getName(), *headers27[3]);
     string head27(reinterpret_cast<const char *>(buf27.reference()));
     cerr << hexify(hex_res27->reference()+37, hex_res27->allocated()-37 , false) << endl;
+    headers27[3]->dump();
     cerr << hexify(buf27.reference() + 128, buf27.allocated()-128, false) << endl;
     const char *ptr27a = reinterpret_cast<const char *>(hex_res27->reference());
     const char *ptr27b = reinterpret_cast<const char *>(buf27.reference()) + head27.size();
@@ -1344,7 +1345,6 @@ test_rtmpt (void)
     }
 
     boost::shared_ptr<Buffer> hex_res42(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 6f 6e 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 40 00 00 00 00 00 00 00 00 00 09"));
-#if 0                           // FIXME: why does this core dump ?
     amf::Buffer &buf42 = http.formatEchoResponse(headers42[1]->getName(), *headers42[3]);
     string head42(reinterpret_cast<const char *>(buf42.reference()));
     const char *ptr42a = reinterpret_cast<const char *>(hex_res42->reference());
@@ -1354,7 +1354,6 @@ test_rtmpt (void)
     } else {
         runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
     }
-#endif
     
     // An array of RemoteClass objects
     // org.red5.server.webapp.echo.RemoteClass
@@ -1396,10 +1395,9 @@ test_rtmpt (void)
     //    std::vector<boost::shared_ptr<amf::Element> > props43a = props43[0]->getProperties();
     //    headers43[3]->dump();
     //    props43[0]->dump();
-    props43[0]->dump();
-    props43[1]->dump();
-    cerr << hexify(hex_res43->reference()+29, hex_res43->allocated()-29 , false) << endl;
-    cerr << hexify(buf43.reference() + 124, buf43.allocated()-124, false) << endl;
+//     cerr << hexify(hex_res43->reference()+29, hex_res43->allocated()-29 , false) << endl;
+//     cerr << hexify(buf43.reference(), buf43.allocated(), true) << endl;
+//     cerr << hexify(buf43.reference() + 124, buf43.allocated()-124, false) << endl;
     string head43(reinterpret_cast<const char *>(buf43.reference()));
     const char *ptr43a = reinterpret_cast<const char *>(hex_res43->reference());
     const char *ptr43b = reinterpret_cast<const char *>(buf43.reference()) + head43.size();
@@ -1424,17 +1422,15 @@ test_rtmpt (void)
         }
     }
     boost::shared_ptr<Buffer> hex_res44(new Buffer("00 00 00 00 00 01 00 0b 2f 33 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 05 74 68 72 65 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 41 d2 65 80 b4 80 00 00 00 00 09"));
-#if 0                           // FIXME: why does this core dump ?
     amf::Buffer &buf44 = http.formatEchoResponse(headers44[1]->getName(), *headers44[3]);
     string head44(reinterpret_cast<const char *>(buf44.reference()));
     const char *ptr44a = reinterpret_cast<const char *>(hex_res44->reference());
     const char *ptr44b = reinterpret_cast<const char *>(buf44.reference()) + head44.size();
     if (memcmp(ptr44a, ptr44b, hex_res44->allocated()-1) == 0) {
-        runtest.pass("HTTP::formatEchoResponse(object RemoteClass Array)");
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.fail("HTTP::formatEchoResponse(object RemoteClass Array)");
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
     }
-#endif
     
     // [object RemoteClass]                      [object RemoteClass]
     boost::shared_ptr<Buffer> hex_req45(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 34 00 00 00 5a 0a 00 00 00 01 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 32 00 42 71 3f 8f 4d 00 00 00 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 04 66 6f 75 72 00 00 09"));
@@ -1442,27 +1438,36 @@ test_rtmpt (void)
     if (headers45[3] == 0) {
         runtest.unresolved("HTTP::parseEchoRequest(object RemoteClass Array)");
     } else {
+	std::vector<boost::shared_ptr<amf::Element> > props45 = headers45[3]->getProperties();
         if ((strncmp(headers45[0]->getName(), "echo", 4) == 0)
             && (strncmp(headers45[1]->getName(), "/4", 2) == 0)
-            && (headers45[3]->getType() == Element::TYPED_OBJECT_AMF0)) {
-            runtest.pass("HTTP::parseEchoRequest(object RemoteClass Array)");
+            && (headers45[3]->getType() == Element::TYPED_OBJECT_AMF0)
+            && (strcmp(headers45[3]->getName(), "org.red5.server.webapp.echo.RemoteClass") == 0)
+	    && (props45[0]->getType() == Element::NUMBER_AMF0)
+            && (strncmp(props45[0]->getName(), "attribute2", 10) == 0)
+	    && (props45[1]->getType() == Element::STRING_AMF0)
+            && (strncmp(props45[1]->getName(), "attribute1", 10) == 0)
+            && (strncmp(props45[1]->to_string(), "four", 4) == 0)
+            ) {
+            runtest.pass("HTTP::parseEchoRequest(object RemoteClass)");
         } else {        
-            runtest.fail("HTTP::parseEchoRequest(object RemoteClass Array)");
+            runtest.fail("HTTP::parseEchoRequest(object RemoteClass)");
         }
     }
 
     boost::shared_ptr<Buffer> hex_res45(new Buffer("00 00 00 00 00 01 00 0b 2f 34 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 04 66 6f 75 72 00 0a 61 74 74 72 69 62 75 74 65 32 00 c1 9c 2c c0 00 00 00 00 00 00 09"));
-#if 0                           // FIXME: why does this core dump ?
     amf::Buffer &buf45 = http.formatEchoResponse(headers45[1]->getName(), *headers45[3]);
     string head45(reinterpret_cast<const char *>(buf45.reference()));
     const char *ptr45a = reinterpret_cast<const char *>(hex_res45->reference());
     const char *ptr45b = reinterpret_cast<const char *>(buf45.reference()) + head45.size();
-    if (memcmp(ptr45a, ptr45b, hex_res45->allocated()-1) == 0) {
-        runtest.pass("HTTP::formatEchoResponse(object RemoteClass Array)");
+//     cerr << hexify(hex_res45->reference()+29, hex_res45->allocated()-29 , false) << endl;
+//     cerr << hexify(buf45.reference()+124, buf45.allocated()-124, true) << endl;
+//     cerr << hexify(buf45.reference()+123, buf45.allocated()-123, false) << endl;
+    if (memcmp(ptr45a, ptr45b, hex_res45->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.fail("HTTP::formatEchoResponse(object RemoteClass Array)");
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
     }
-#endif
     
     // String test with 40000 characters
     // String test with 70000 characters
