@@ -26,7 +26,7 @@
 #include "Accessibility_as.h"
 #include "Boolean.h"
 #include "Camera.h"
-#include "Color.h"
+#include "Color_as.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
 #include "Date.h"
