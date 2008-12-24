@@ -988,12 +988,12 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number 256)");
     }
     // Number 256 Response
-    boost::shared_ptr<Buffer> hex_res14(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res14(new Buffer("00 00 00 00 00 01 00 0b 2f 34 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 40 70 00 00 00 00 00 00"));
     amf::Buffer &buf14 = http.formatEchoResponse(headers14[1]->getName(), *headers14[3]);
     string head14(reinterpret_cast<const char *>(buf14.reference()));
     const char *ptr14a = reinterpret_cast<const char *>(hex_res14->reference());
     const char *ptr14b = reinterpret_cast<const char *>(buf14.reference()) + head14.size();
-    if (memcmp(ptr14a, ptr14b, hex_res14->allocated()-11) == 0) {
+    if (memcmp(ptr14a, ptr14b, AMF0_NUMBER_SIZE) == 0) {
         runtest.pass("HTTP::formatEchoResponse(Number 256)");
     } else {
         runtest.fail("HTTP::formatEchoResponse(Number 256)");
