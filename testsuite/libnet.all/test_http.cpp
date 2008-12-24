@@ -919,7 +919,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number 0)");
     }
     // Number 0 Response
-    boost::shared_ptr<Buffer> hex_res11(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res11(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 00 00 00 00 00 00 00 00"));
+    amf::Buffer &buf11 = http.formatEchoResponse(headers11[1]->getName(), *headers11[3]);
+    string head11(reinterpret_cast<const char *>(buf11.reference()));
+    const char *ptr11a = reinterpret_cast<const char *>(hex_res11->reference());
+    const char *ptr11b = reinterpret_cast<const char *>(buf11.reference()) + head11.size();
+    if (memcmp(ptr11a, ptr11b, hex_res11->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number 0)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number 0)");
+    }    
 
     // Number 1 Request
     boost::shared_ptr<Buffer> hex_req12(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 0e 0a 00 00 00 01 00 3f f0 00 00 00 00 00 00"));
@@ -933,7 +942,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number 1)");
     }
     // Number 1 Response
-    boost::shared_ptr<Buffer> hex_res12(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res12(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 3f f0 00 00 00 00 00 00"));
+    amf::Buffer &buf12 = http.formatEchoResponse(headers12[1]->getName(), *headers12[3]);
+    string head12(reinterpret_cast<const char *>(buf12.reference()));
+    const char *ptr12a = reinterpret_cast<const char *>(hex_res12->reference());
+    const char *ptr12b = reinterpret_cast<const char *>(buf12.reference()) + head12.size();
+    if (memcmp(ptr12a, ptr12b, hex_res12->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number 1)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number 1)");
+    }    
 
     // Number -1 Request
     boost::shared_ptr<Buffer> hex_req13(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 33 00 00 00 0e 0a 00 00 00 01 00 bf f0 00 00 00 00 00 00"));
@@ -947,7 +965,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number -1)");
     }
     // Number -1 Response
-    boost::shared_ptr<Buffer> hex_res13(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res13(new Buffer("00 00 00 00 00 01 00 0b 2f 33 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 bf f0 00 00 00 00 00 00"));
+    amf::Buffer &buf13 = http.formatEchoResponse(headers13[1]->getName(), *headers13[3]);
+    string head13(reinterpret_cast<const char *>(buf13.reference()));
+    const char *ptr13a = reinterpret_cast<const char *>(hex_res13->reference());
+    const char *ptr13b = reinterpret_cast<const char *>(buf13.reference()) + head13.size();
+    if (memcmp(ptr13a, ptr13b, hex_res13->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number -1)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number -1)");
+    }
 
     // Number 256 Request
     boost::shared_ptr<Buffer> hex_req14(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 34 00 00 00 0e 0a 00 00 00 01 00 40 70 00 00 00 00 00 00"));
@@ -962,6 +989,15 @@ test_rtmpt (void)
     }
     // Number 256 Response
     boost::shared_ptr<Buffer> hex_res14(new Buffer(""));
+    amf::Buffer &buf14 = http.formatEchoResponse(headers14[1]->getName(), *headers14[3]);
+    string head14(reinterpret_cast<const char *>(buf14.reference()));
+    const char *ptr14a = reinterpret_cast<const char *>(hex_res14->reference());
+    const char *ptr14b = reinterpret_cast<const char *>(buf14.reference()) + head14.size();
+    if (memcmp(ptr14a, ptr14b, hex_res14->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number 256)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number 256)");
+    }
 
     // Number -256 Request
     boost::shared_ptr<Buffer> hex_req15(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 35 00 00 00 0e 0a 00 00 00 01 00 c0 70 00 00 00 00 00 00"));
@@ -975,7 +1011,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number -256)");
     }
     // Number -256 Response
-    boost::shared_ptr<Buffer> hex_res15(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res15(new Buffer("00 00 00 00 00 01 00 0b 2f 35 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 c0 70 00 00 00 00 00 00"));
+    amf::Buffer &buf15 = http.formatEchoResponse(headers15[1]->getName(), *headers15[3]);
+    string head15(reinterpret_cast<const char *>(buf15.reference()));
+    const char *ptr15a = reinterpret_cast<const char *>(hex_res15->reference());
+    const char *ptr15b = reinterpret_cast<const char *>(buf15.reference()) + head15.size();
+    if (memcmp(ptr15a, ptr15b, hex_res15->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number -256)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number -256)");
+    }
 
     // Number 65536 Request
     boost::shared_ptr<Buffer> hex_req16(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 36 00 00 00 0e 0a 00 00 00 01 00 40 f0 00 00 00 00 00 00"));
@@ -989,7 +1034,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number 65536)");
     }
     // Number 65536 Response
-    boost::shared_ptr<Buffer> hex_res16(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res16(new Buffer("00 00 00 00 00 01 00 0b 2f 36 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 40 f0 00 00 00 00 00 00"));
+    amf::Buffer &buf16 = http.formatEchoResponse(headers16[1]->getName(), *headers16[3]);
+    string head16(reinterpret_cast<const char *>(buf16.reference()));
+    const char *ptr16a = reinterpret_cast<const char *>(hex_res16->reference());
+    const char *ptr16b = reinterpret_cast<const char *>(buf16.reference()) + head16.size();
+    if (memcmp(ptr16a, ptr16b, hex_res16->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number 65536)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number 65536)");
+    }
 
     // Number -655536 Request
     boost::shared_ptr<Buffer> hex_req16x(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 37 00 00 00 0e 0a 00 00 00 01 00 c0 f0 00 00 00 00 00 00"));
@@ -1003,7 +1057,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number -65536)");
     }
     // Number -655536 Response
-    boost::shared_ptr<Buffer> hex_res17(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res17(new Buffer("00 00 00 00 00 01 00 0b 2f 37 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 c0 f0 00 00 00 00 00 00"));
+    amf::Buffer &buf17 = http.formatEchoResponse(headers16x[1]->getName(), *headers16x[3]);
+    string head17(reinterpret_cast<const char *>(buf17.reference()));
+    const char *ptr17a = reinterpret_cast<const char *>(hex_res17->reference());
+    const char *ptr17b = reinterpret_cast<const char *>(buf17.reference()) + head17.size();
+    if (memcmp(ptr17a, ptr17b, hex_res17->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number -65536)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number -65536)");
+    }
 
     // Number 0 Request
     boost::shared_ptr<Buffer> hex_req18(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 38 00 00 00 0e 0a 00 00 00 01 00 00 00 00 00 00 00 00 00"));
@@ -1017,7 +1080,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number 0)");
     }
     // Number 0 Response
-    boost::shared_ptr<Buffer> hex_res18(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res18(new Buffer("00 00 00 00 00 01 00 0b 2f 38 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 00 00 00 00 00 00 00 00"));
+    amf::Buffer &buf18 = http.formatEchoResponse(headers18[1]->getName(), *headers18[3]);
+    string head18(reinterpret_cast<const char *>(buf18.reference()));
+    const char *ptr18a = reinterpret_cast<const char *>(hex_res18->reference());
+    const char *ptr18b = reinterpret_cast<const char *>(buf18.reference()) + head18.size();
+    if (memcmp(ptr18a, ptr18b, hex_res18->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number 0)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number 0)");
+    }
 
     // Number 1.5 Request
     boost::shared_ptr<Buffer> hex_req19(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 39 00 00 00 0e 0a 00 00 00 01 00 3f f8 00 00 00 00 00 00"));
@@ -1031,7 +1103,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number 1.5)");
     }
     // Number 1.5 Response
-    boost::shared_ptr<Buffer> hex_res19(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res19(new Buffer("00 00 00 00 00 01 00 0b 2f 39 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 3f f8 00 00 00 00 00 00"));
+    amf::Buffer &buf19 = http.formatEchoResponse(headers19[1]->getName(), *headers19[3]);
+    string head19(reinterpret_cast<const char *>(buf19.reference()));
+    const char *ptr19a = reinterpret_cast<const char *>(hex_res19->reference());
+    const char *ptr19b = reinterpret_cast<const char *>(buf19.reference()) + head19.size();
+    if (memcmp(ptr19a, ptr19b, hex_res19->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number 1.5");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number 1.5");
+    }
 
     // Number -1.5 Request
     boost::shared_ptr<Buffer> hex_req20(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 03 2f 31 30 00 00 00 0e 0a 00 00 00 01 00 bf f8 00 00 00 00 00 00"));
@@ -1045,7 +1126,16 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number -1.5)");
     }
     // Number -1.5 Response
-    boost::shared_ptr<Buffer> hex_res20(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res20(new Buffer("00 00 00 00 00 01 00 0c 2f 31 30 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 bf f8 00 00 00 00 00 00"));
+    amf::Buffer &buf20 = http.formatEchoResponse(headers20[1]->getName(), *headers20[3]);
+    string head20(reinterpret_cast<const char *>(buf20.reference()));
+    const char *ptr20a = reinterpret_cast<const char *>(hex_res20->reference());
+    const char *ptr20b = reinterpret_cast<const char *>(buf20.reference()) + head20.size();
+    if (memcmp(ptr20a, ptr20b, hex_res20->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number -1.5");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number -1.5");
+    }
 
     // Number NaN Request
     boost::shared_ptr<Buffer> hex_req21(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 03 2f 31 31 00 00 00 0e 0a 00 00 00 01 00 ff f8 00 00 00 00 00 00"));
@@ -1059,10 +1149,19 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number Nan)");
     }
     // Number NaN Response
-    boost::shared_ptr<Buffer> hex_res21(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res21(new Buffer("00 00 00 00 00 01 00 0c 2f 31 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 ff f8 00 00 00 00 00 00"));
+    amf::Buffer &buf21 = http.formatEchoResponse(headers21[1]->getName(), *headers21[3]);
+    string head21(reinterpret_cast<const char *>(buf21.reference()));
+    const char *ptr21a = reinterpret_cast<const char *>(hex_res21->reference());
+    const char *ptr21b = reinterpret_cast<const char *>(buf21.reference()) + head21.size();
+    if (memcmp(ptr21a, ptr21b, hex_res21->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number Nan");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number Nan");
+    }
 
     // Number -Infinity Request
-    boost::shared_ptr<Buffer> hex_req22(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_req22(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 03 2f 31 32 00 00 00 0e 0a 00 00 00 01 00 ff f0 00 00 00 00 00 00"));
 
     // Number Infinity Request
     boost::shared_ptr<Buffer> hex_req22x(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 03 2f 31 34 00 00 00 0e 0a 00 00 00 01 00 7f ef ff ff ff ff ff ff"));
@@ -1076,17 +1175,28 @@ test_rtmpt (void)
         runtest.fail("HTTP::parseEchoRequest(Number Infinity)");
     }
     // Number Infinity Response
-    boost::shared_ptr<Buffer> hex_res23(new Buffer(""));
-
+    boost::shared_ptr<Buffer> hex_res23(new Buffer("00 00 00 00 00 01 00 0c 2f 31 33 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 7f f0 00 00 00 00 00 00"));
+#if 0
+    amf::Buffer &buf23 = http.formatEchoResponse(headers22x[1]->getName(), *headers22x[3]);
+    string head23(reinterpret_cast<const char *>(buf23.reference()));
+    const char *ptr23a = reinterpret_cast<const char *>(hex_res23->reference());
+    const char *ptr23b = reinterpret_cast<const char *>(buf23.reference()) + head23.size();
+    if (memcmp(ptr23a, ptr23b, hex_res23->allocated()-11) == 0) {
+        runtest.pass("HTTP::formatEchoResponse(Number Infinity)");
+    } else {
+        runtest.fail("HTTP::formatEchoResponse(Number Infinity)");
+    }
+#endif
+    
     // Number 1.79769313486231e+308 Request
     boost::shared_ptr<Buffer> hex_req24(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 03 2f 31 35 00 00 00 0e 0a 00 00 00 01 00 00 00 00 00 00 00 00 01"));
     // Number 1.79769313486231e+308 Response
-    boost::shared_ptr<Buffer> hex_res24(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res24(new Buffer("00 00 00 00 00 01 00 0c 2f 31 34 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 7f ef ff ff ff ff ff ff"));
 
     // Number 4.940656484124654e-324 Request
     boost::shared_ptr<Buffer> hex_req25(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 03 2f 31 36 00 00 00 0e 0a 00 00 00 01 00 00 00 00 00 00 00 00 00"));
     // Number 4.940656484124654e-324 Response
-    boost::shared_ptr<Buffer> hex_res25(new Buffer(""));
+    boost::shared_ptr<Buffer> hex_res25(new Buffer("00 00 00 00 00 01 00 0c 2f 31 35 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 00 00 00 00 00 00 00 00 01"));
 
     // Number 1,2,1,2
     // Array request
@@ -1143,9 +1253,8 @@ test_rtmpt (void)
     boost::shared_ptr<Buffer> hex_res27(new Buffer("00 00 00 00 00 01 00 0b 2f 36 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 08 00 00 00 66 00 01 30 00 3f f0 00 00 00 00 00 00 00 03 31 30 30 00 40 59 00 00 00 00 00 00 00 06 6c 65 6e 67 74 68 00 40 59 80 00 00 00 00 00 00 00 09"));
     amf::Buffer &buf27 = http.formatEchoResponse(headers27[1]->getName(), *headers27[3]);
     string head27(reinterpret_cast<const char *>(buf27.reference()));
-    cerr << hexify(hex_res27->reference()+37, hex_res27->allocated()-37 , false) << endl;
-    headers27[3]->dump();
-    cerr << hexify(buf27.reference() + 128, buf27.allocated()-128, false) << endl;
+    cerr << hexify(hex_res27->reference()+29, hex_res27->allocated()-29 , false) << endl;
+    cerr << hexify(buf27.reference() + 123, buf27.allocated()-123, false) << endl;
     const char *ptr27a = reinterpret_cast<const char *>(hex_res27->reference());
     const char *ptr27b = reinterpret_cast<const char *>(buf27.reference()) + head27.size();
     if (memcmp(ptr27a, ptr27b, hex_res27->allocated()-1) == 0) {
