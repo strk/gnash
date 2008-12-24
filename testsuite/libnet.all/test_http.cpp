@@ -1251,6 +1251,7 @@ test_rtmpt (void)
     }
     // Undefined Array response
     boost::shared_ptr<Buffer> hex_res27(new Buffer("00 00 00 00 00 01 00 0b 2f 36 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 08 00 00 00 66 00 01 30 00 3f f0 00 00 00 00 00 00 00 03 31 30 30 00 40 59 00 00 00 00 00 00 00 06 6c 65 6e 67 74 68 00 40 59 80 00 00 00 00 00 00 00 09"));
+#if 0
     amf::Buffer &buf27 = http.formatEchoResponse(headers27[1]->getName(), *headers27[3]);
     string head27(reinterpret_cast<const char *>(buf27.reference()));
     cerr << hexify(hex_res27->reference()+29, hex_res27->allocated()-29 , false) << endl;
@@ -1262,7 +1263,8 @@ test_rtmpt (void)
     } else {
         runtest.fail("HTTP::formatEchoResponse(Strict Array  - Number, undefines, Number)");
     }
-
+#endif
+    
     // Array request
     boost::shared_ptr<Buffer> hex_req28(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 37 00 00 00 38 0a 00 00 00 01 08 00 00 00 01 00 06 6c 65 6e 67 74 68 00 3f f0 00 00 00 00 00 00 00 01 30 00 3f f0 00 00 00 00 00 00 00 03 6f 6e 65 00 3f f0 00 00 00 00 00 00 00 00 09"));
     vector<boost::shared_ptr<amf::Element> > headers28 = http.parseEchoRequest(*hex_req28);

@@ -512,11 +512,11 @@ boost::shared_ptr<Buffer>
 AMF::encodeStrictArray(const amf::Element &data)
 {
     GNASH_REPORT_FUNCTION;
-    boost::uint32_t length;
-    length = data.propertySize();
-    //    log_debug("Encoded data size has %d properties", length);
+    boost::uint32_t items;
+    items = data.propertySize();
+    //    log_debug("Encoded data size has %d properties", items);
     boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-    if (length) {
+    if (items) {
 	buf.reset(new amf::Buffer);
     } else {
 	// an undefined array is only 5 bytes, 1 for the type and
@@ -525,20 +525,52 @@ AMF::encodeStrictArray(const amf::Element &data)
 	//	buf.reset(new amf::Buffer(5));
     }
     *buf = Element::STRICT_ARRAY_AMF0;
-    swapBytes(&length, sizeof(boost::uint32_t));
-    *buf += length;
+    swapBytes(&items, sizeof(boost::uint32_t));
+    *buf += items;
 
     if (data.propertySize() > 0) {
 	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
+	bool skip = false;
+	size_t counter = 0;
 	for (ait = props.begin(); ait != props.end(); ait++) {
+	    counter++;
 	    boost::shared_ptr<amf::Element> el = (*(ait));
-	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
-	    if (item) {
-		*buf += item;
-		item.reset();
+	    // If we see an undefined data item, then switch to an ECMA
+	    // array which is more compact. At least this is what Red5 does.
+	    if (el->getType() == Element::UNDEFINED_AMF0) {
+		if (!skip) {
+		    *buf->reference() = Element::ECMA_ARRAY_AMF0;
+		    // When returning an ECMA array for a sparsely populated
+		    // array, Red5 adds one more to the count to be 1 based,
+		    // instead of zero based.
+		    boost::uint32_t moreitems = data.propertySize() + 1;
+		    swapBytes(&moreitems, sizeof(boost::uint32_t));
+		    boost::uint8_t *ptr = buf->reference() + 1;
+		    memcpy(ptr, &moreitems, sizeof(boost::uint32_t));
+		    skip = true;
+		}
+		continue;
 	    } else {
-		break;
+		if (skip) {
+		    skip = false;
+		    char num[12];
+		    sprintf(num, "%d", counter);
+		    amf::Element elnum(num, el->to_number());
+		    *buf += AMF::encodeElement(elnum);
+		    double nodes = items;
+		    amf::Element ellen("length", nodes);
+		    *buf += AMF::encodeElement(ellen);
+		} else {
+		    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
+		    if (item) {
+			*buf += item;
+			item.reset();
+			continue;
+		    } else {
+			break;
+		    }
+		}
 	    }
 // 	    el->dump();
 	}
