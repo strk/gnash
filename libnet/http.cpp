@@ -306,19 +306,27 @@ HTTP::processPostRequest(int fd)
 	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }
+//    cerr << __FUNCTION__ << buf->allocated() << " : " << hexify(buf->reference(), buf->allocated(), true) << endl;
+    
     clearHeader();
-//    boost::uint8_t *data = processHeaderFields(*buf);
-    processHeaderFields(*buf);
+    boost::uint8_t *data = processHeaderFields(*buf);
     size_t length = strtol(getField("content-length").c_str(), NULL, 0);
-    amf::Buffer content (length);
-    cerr << __PRETTY_FUNCTION__ << " : " << content.size() << endl;
-    int ret = readNet(fd, content, 1);
-//	cerr << __PRETTY_FUNCTION__ << " : " << ret << " : " << (char *)content->reference() << endl;
+    boost::shared_ptr<amf::Buffer> content(new amf::Buffer(length));
+    int ret = 0;
+    if (buf->allocated() - (data - buf->reference()) ) {
+//	cerr << "Don't need to read more data: have " << buf->allocated() << " bytes" << endl;
+	content->copy(data, length);
+	ret = length;
+    } else {	
+//	cerr << "Need to read more data, only have "  << buf->allocated() << " bytes" << endl;
+	ret = readNet(fd, *content, 2);
+	data = content->reference();
+    }    
     
     if (getField("content-type") == "application/x-www-form-urlencoded") {
 	log_debug("Got file data in POST");
 	string url = _docroot + _filespec;
-	DiskStream ds(url, content);
+	DiskStream ds(url, *content);
 	ds.writeToDisk();
 //    ds.close();
 	// oh boy, we got ourselves some encoded AMF objects instead of a boring file.
@@ -334,28 +342,24 @@ HTTP::processPostRequest(int fd)
     
     // Send the reply
 
-
     // NOTE: this is a "special" path we trap until we have real CGI support
     if ((_filespec == "/echo/gateway")
 	&& (getField("content-type") == "application/x-amf")) {
 //	const char *num = (const char *)buf->at(10);
 	log_debug("Got CGI echo request in POST");
-	cerr << hexify(content.reference(), content.allocated(), true) << endl;
-	
-	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(content);
-	boost::shared_ptr<amf::Element> &el0 = headers[0];
- 	boost::shared_ptr<amf::Element> &el1 = headers[1];
- 	boost::shared_ptr<amf::Element> &el3 = headers[3];
+//	cerr << "FIXME 2: " << hexify(content->reference(), content->allocated(), true) << endl;
+
+	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(*content);
+  	boost::shared_ptr<amf::Element> &el0 = headers[0];
+  	boost::shared_ptr<amf::Element> &el1 = headers[1];
+  	boost::shared_ptr<amf::Element> &el3 = headers[3];
 	if (headers.size() > 0) {
-// 	    el0->dump();
-//  	    headers[1]->dump();
-//   	    headers[2]->dump();
-//   	    headers[3]->dump();
-	    cerr << "FIXME 3: " << headers[0]->getName() << endl;
-	    amf::Buffer &reply = formatEchoResponse(el0->getName(), *headers[3]);
-//	    writeNet(fd, reply);
+	    amf::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
+// 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), true) << endl;
+// 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), false) << endl;
+	    writeNet(fd, reply);
  	}
-//     } else {
+    } else {
 	amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTP::OK);
 	writeNet(fd, reply);
     }
@@ -1129,7 +1133,7 @@ amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
+    boost::shared_ptr<amf::Buffer> data = el.encode(); // amf::AMF::encodeElement(el);
     return formatEchoResponse(num, data->reference(), data->allocated());
 }
 
@@ -1153,7 +1157,9 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
     
     _buffer = "HTTP/1.1 200 OK\r\n";
     formatContentType(DiskStream::FILETYPE_AMF);
-    formatContentLength(size);
+//    formatContentLength(size);
+    // FIXME: this is a hack ! Calculate a real size!
+    formatContentLength(size+29);
     
     // Pretend to be Red5 server
     formatServer("Jetty(6.1.7)");
