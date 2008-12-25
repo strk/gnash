@@ -39,11 +39,15 @@ set sid 0;			# the server ID
 set server_dead false;	# toggle is Cygnal dies
 
 proc delete_files {} {
+    global chost
+    global cport
+
     # Get rid of old temp files created by testing,
     if {[file exists foo]} {
-	set junk [glob foo* wget-log* amf0*  *.bin* gateway*  localhost:*]
+	set junk [glob foo* wget-log* amf0*  *.bin* gateway* $chost:$cport]
+	puts "$junk"
 	if { $junk != "" } {
-	    catch "exec rm -f $junk"
+	    catch "exec rm -fr $junk"
 	}
     }
 }
@@ -238,11 +242,11 @@ proc start_cygnal { } {
 #    set pid [exp_pid -i $sid]
     expect -timeout 1 {
 	-i $sid "*Server bound to service" {
-	    verbose "Cygnal \"$server -p 4000 -vv -n\" bound to port"
+	    verbose "Cygnal \"$server -vv -n\" bound to port"
 	    set result true
 	}
 	-i $sid "*Starting*" {
-	    verbose "Started Cygnal \"$server -p 4000 -vv -n\""
+	    verbose "Started Cygnal \"$server -vv -n\""
 	    set result true
 	}
 	-i $sid "File * transferred" {
@@ -384,7 +388,6 @@ set binsdir "[file dirname [file dirname [file dirname $srcdir]]]/cygnal/testsui
 set requests  [glob -nocomplain $binsdir/*-request.bin]
 set responses [glob -nocomplain $binsdir/*-response.bin]
 
-delete_files
 # test with the Red5 echo tests
 foreach i $requests {
     set pos [string last  "/" $i]
@@ -416,6 +419,7 @@ foreach i $requests {
     }
 }
 
+delete_files
 
 #############################################################
 # Stop the server, we're done. As the server doesn't die when a connection is
