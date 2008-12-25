@@ -32,7 +32,7 @@ set timeout 600
 set file all
 set params ""
 
-set cport 4080;			# the port for the connection to Cygnal
+set cport 6080;			# the port for the connection to Cygnal
 set chost "localhost";		# the host to connect to
 set sid 0;			# the server ID
 
@@ -227,9 +227,11 @@ proc wpost { name options } {
 proc start_cygnal { } {
     global server_dead 
     global sid
+    global objdir
     set result false
-    set server "../../cygnal"
-    set options "-p 5000 -vv -n -t -r [pwd]"
+    # find the right cygnal in our build tree to run
+    set server [lookfor_file $objdir cygnal]
+    set options "-p 6000 -vv -n -t -r [pwd]"
     verbose "Starting Cygnal server \"$server $options\" for testing"
     spawn $server $options
     set sid $spawn_id
@@ -393,12 +395,12 @@ foreach i $requests {
     if {$server_dead == "false"} {
 	set result [ wpost $i "" ]
 	if { $result == true } {
-	    pass "HTTP POST AMF0 $j, posted"
+	    pass "HTTP POST AMF0 $j, sent"
 	} else {
-	    fail "HTTP POST AMF0 $j, posted"
+	    fail "HTTP POST AMF0 $j, sent"
 	}
     } else {
-	untested "HTTP POST AMF0 $j, posted"
+	untested "HTTP POST AMF0 $j, sent"
 	untested "HTTP POST AMF0 $j got no response, not saved to $chost:$cport/gateway"
 	break;
     }
