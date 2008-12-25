@@ -353,11 +353,13 @@ HTTP::processPostRequest(int fd)
   	boost::shared_ptr<amf::Element> &el0 = headers[0];
   	boost::shared_ptr<amf::Element> &el1 = headers[1];
   	boost::shared_ptr<amf::Element> &el3 = headers[3];
-	if (headers.size() > 0) {
-	    amf::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
+	if (headers.size() >= 4) {
+	    if (headers[3]) {
+		amf::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
 // 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), true) << endl;
 // 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), false) << endl;
-	    writeNet(fd, reply);
+		writeNet(fd, reply);
+	    }
  	}
     } else {
 	amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTP::OK);
