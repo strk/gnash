@@ -32,14 +32,16 @@ set timeout 600
 set file all
 set params ""
 
-set cport 5080;			# the port for the connection to Cygnal
+set cport 4080;			# the port for the connection to Cygnal
 set chost "localhost";		# the host to connect to
 set sid 0;			# the server ID
+
+set server_dead false;	# toggle is Cygnal dies
 
 proc delete_files {} {
     # Get rid of old temp files created by testing,
     if {[file exists foo]} {
-	set junk [glob foo* wget-log* amf0*  *.bin.*]
+	set junk [glob foo* wget-log* amf0*  *.bin* gateway*  localhost:*]
 	if { $junk != "" } {
 	    catch "exec rm -f $junk"
 	}
@@ -67,6 +69,7 @@ proc netcat { name } {
     global chost
     global cport
     verbose "Trying to netcat $name to Cygnal $chost : $cport)"
+    global server_dead 
     spawn -noecho nc $chost $cport
     set nid $spawn_id
     expect {
@@ -89,11 +92,12 @@ proc wget { name options } {
     global chost
     global cport
     global sid
+    global server_dead 
     set result false
 
     # --header="Content-Type: application/x-amf"
-    verbose "Trying to wget from Cygnal -v --tries=3 --server-response $options http://$chost:$cport/$name" 2
-    spawn -noecho wget -v --tries=3 --server-response $options http://$chost:$cport/$name
+    verbose "Trying to wget from Cygnal -p -v --tries=3 --server-response $options http://$chost:$cport/$name" 2
+    spawn -noecho wget -p -v --tries=3 --server-response $options http://$chost:$cport/$name
     set wid $spawn_id
     expect {
 	-i $wid "*Saving to: *" {
@@ -124,6 +128,75 @@ proc wget { name options } {
 	-i $wid "Connection closed at" {
 	}
 	-i $wid "*Connection refused" {
+	    set server_dead true
+	    verbose "Wget failed..."
+	}
+	-i $wid "Content-Type: " {
+	    verbose "Got HTTP response header $name" 2
+	    set result true
+	}
+	-i $wid eof {
+	    verbose "Wget EOF..."
+	    set result true
+	}
+	-i $wid timeout {
+	    verbose "Wget still running after ${timeout} seconds, killing it (deadlock?)"
+	}
+    }
+    expect {
+	-i $wid "*" {
+	}
+    }
+
+    catch close -i $wid
+
+    return $result
+}
+
+#
+# Get something from the copy of Cygnal we started
+proc wpost { name options } {
+    global server_dead 
+    global chost
+    global cport
+    global sid
+    set result false
+    # --header="Content-Type: application/x-amf"
+    verbose "Trying to wget POST to Cygnal -p -v --tries=3 --server-response --header=\"Content-Type: application/x-amf\" $options --post-file=$name http://$chost:$cport/echo/gateway" 2
+#    set where "[pwd]/${name}_barfoo"
+    spawn  wget -p -v --tries=3 --server-response  --post-file=$name --header 'Content-Type: application/x-amf' http://$chost:$cport/echo/gateway
+    set wid $spawn_id
+    expect {
+	-i $wid "*Saving to: *" {
+	    verbose "Wget all done..." 2
+	    set result true
+	}
+	-i $wid "* saved " {
+	    verbose "Wget all done..." 2
+	    set result true
+	}
+	-i $wid "Giving up" {
+	    verbose "Giving up on file transfer"
+	}
+# 	-i $wid "Retrying." {
+# 	    verbose "Retrying file"
+# 	    exp_continue
+# 	}
+	-i $wid "Connection close" {
+	    verbose "Connection closed from other end"
+	}
+	-i $wid "connected." {
+	    exp_continue
+	}
+	-i $wid "has sprung into existence" {
+	    verbose "File transferred but no size"
+	    set result false
+	}
+	-i $wid "Connection closed at" {
+	    set server_dead true
+	}
+	-i $wid "*Connection refused" {
+	    set server_dead true
 	    verbose "Wget failed..."
 	}
 	-i $wid "Content-Type: " {
@@ -152,6 +225,7 @@ proc wget { name options } {
 # Start the server running. 
 #
 proc start_cygnal { } {
+    global server_dead 
     global sid
     set result false
     set server "../../cygnal"
@@ -174,6 +248,7 @@ proc start_cygnal { } {
 	}
 	-i $sid "unable to bind to port" {
 	    log_error "Another Cygnal is already on this port!"
+	    set server_dead "true"
 	}
 	-i $sid "HTTP Handler" {
 	    verbose "Started HTTP Handler"
@@ -265,35 +340,80 @@ if { $count == $limit } {
 #
 
 # send the test file
-set result [ wget "foo" "--post-file=foo.1" ]
-if { $result == true } {
-    verbose "foo was transferred!" 2
-    pass "HTTP POST single file"
-} else {
-    fail "HTTP POST single file"
-}
+# set result [ wget "foo" "--post-file=foo.1" ]
+# if { $result == true } {
+#     verbose "foo was transferred!" 2
+#     pass "HTTP POST single file"
+# } else {
+#     fail "HTTP POST single file"
+# }
 # } else {
 #     unresolved "HTTP POST single file"
 # }
 
 
-set binsdir "[file dirname [file dirname [file dirname $srcdir]]]/testsuite/libnet.all"
-set bins [glob -nocomplain $binsdir/*.bin]
-#set foo "amf0-number.bin amf0-undefined-object.bin amf0-null-object.bin"
+# set binsdir "[file dirname [file dirname [file dirname $srcdir]]]/testsuite/libnet.all"
+# set bins [glob -nocomplain $binsdir/*.bin]
+# #set foo "amf0-number.bin amf0-undefined-object.bin amf0-null-object.bin"
 
-foreach i $bins {
+# foreach i $bins {
+#     set pos [string last  "/" $i]
+#     if { $pos > 0 } {
+# 	set j [string range $i $pos+1 end]
+#     }
+# #    set options { --header="Content-Type: application/x-amf" --post-file=$i }
+#     set result [ wpost $i "" ]
+#     if { $result == true } {
+#  	pass "HTTP POST single AMF0 $j"
+#     } else {
+#  	fail "HTTP POST single AMF0 $j"
+#     }
+# }
+
+# Red5, a java based RTMP server has a nice test case that lets one
+# bounce AMF data types off of a server using either RTMPT or RTMP,
+# and we collected all of these from net captures of those. While some
+# of the unit tests in the top level testsuite/libnet.all use these
+# same captures differently, these are the original raw files those
+# tests are based on. We need disk based files because wget needs
+# those to calculate the size properly for the "Content-Length" header
+# field. 
+set binsdir "[file dirname [file dirname [file dirname $srcdir]]]/cygnal/testsuite/cygnal.all/bindata"
+set requests  [glob -nocomplain $binsdir/*-request.bin]
+set responses [glob -nocomplain $binsdir/*-response.bin]
+
+delete_files
+# test with the Red5 echo tests
+foreach i $requests {
     set pos [string last  "/" $i]
     if { $pos > 0 } {
 	set j [string range $i $pos+1 end]
     }
-    set options { --header="Content-Type: application/x-am" --post-file=$i }
-    set result [ wget $j $options ]    
-    if { $result == true } {
- 	pass "HTTP POST single AMF0 $j"
+#    set options "--header='Content-Type: application/x-amf' --post-file=$i"
+    if {$server_dead == "false"} {
+	set result [ wpost $i "" ]
+	if { $result == true } {
+	    pass "HTTP POST AMF0 $j, posted"
+	} else {
+	    fail "HTTP POST AMF0 $j, posted"
+	}
     } else {
- 	fail "HTTP POST single AMF0 $j"
+	untested "HTTP POST AMF0 $j, posted"
+	untested "HTTP POST AMF0 $j got no response, not saved to $chost:$cport/gateway"
+	break;
+    }
+
+    set gotback "[string trimright $i "-request.bin"]-response.bin"
+    puts $gotback
+    if {[file exists $chost:$cport/echo/gateway]} {
+	pass "HTTP POST AMF0  got response, saved to $chost:$cport/gateway"
+# 	puts "[file size $chost:$cport/echo/gateway]"
+# set res [exec cmp $var $gotback]
+    } else {
+	fail "HTTP POST AMF0 $j got response, saved to $chost:$cport/gateway"
     }
 }
+
 
 #############################################################
 # Stop the server, we're done. As the server doesn't die when a connection is
@@ -305,7 +425,6 @@ if {$sid > 0} {
     catch "close -i $sid"
 }
 
-delete_files
 
 
 # testcases is set by the Makefile in the site.exp data file.
