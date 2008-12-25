@@ -44,7 +44,7 @@ AM_CPPFLAGS = \
 libgnashasobjs_la_SOURCES = \
 	AsBroadcaster.cpp \
 	Accessibility_as.cpp \
-	Boolean.cpp \
+	Boolean_as.cpp \
 	Camera.cpp \
 	ClassHierarchy.cpp \
 	Color_as.cpp \
@@ -109,7 +109,7 @@ libgnashasobjs_la_SOURCES = \
 noinst_HEADERS = \
 	AsBroadcaster.h \
 	Accessibility_as.h \
-	Boolean.h \
+	Boolean_as.h \
 	Camera.h \
 	ClassHierarchy.h \
 	Color_as.h	\

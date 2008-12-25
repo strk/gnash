@@ -16,12 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_BOOLEAN_H__
-#define __GNASH_ASOBJ_BOOLEAN_H__
+#ifndef GNASH_ASOBJ_BOOLEAN_H
+#define GNASH_ASOBJ_BOOLEAN_H
 
 #include "smart_ptr.h"
-
-#include <memory> // for auto_ptr
 
 namespace gnash {
 
@@ -35,6 +33,5 @@ boost::intrusive_ptr<as_object> init_boolean_instance(bool val);
   
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_BOOLEAN_H__
 #endif
 

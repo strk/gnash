@@ -24,7 +24,7 @@
 #include "array.h"
 #include "AsBroadcaster.h"
 #include "Accessibility_as.h"
-#include "Boolean.h"
+#include "Boolean_as.h"
 #include "Camera.h"
 #include "Color_as.h"
 #include "ContextMenu.h"

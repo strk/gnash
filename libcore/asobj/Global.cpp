@@ -28,7 +28,7 @@
 #include "as_function.h" // for function_class_init
 #include "array.h"
 #include "AsBroadcaster.h"
-#include "Boolean.h"
+#include "Boolean_as.h"
 #include "Camera.h"
 #include "Color_as.h"
 #include "ContextMenu.h"
