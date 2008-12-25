@@ -25,7 +25,7 @@
 // Forward declarations
 namespace gnash {
     class as_object;
-    class SharedObject;
+    class SharedObject_as;
     class VM;
 }
 
@@ -41,7 +41,7 @@ public:
     //
     /// May return NULL if name is invalid or can't access the given root
     ///
-    SharedObject* getLocal(const std::string& name, const std::string& root);
+    SharedObject_as* getLocal(const std::string& name, const std::string& root);
 
     void markReachableResources() const;
 
@@ -61,7 +61,7 @@ private:
     /// Base SOL dir
     std::string _solSafeDir; 
 
-    typedef std::map<std::string, SharedObject*> SoLib;
+    typedef std::map<std::string, SharedObject_as*> SoLib;
 
     SoLib _soLib;
 };
@@ -70,6 +70,7 @@ private:
 void sharedobject_class_init(as_object& global);
 
 void registerSharedObjectNative(as_object& o);
+
   
 } // end of gnash namespace
 

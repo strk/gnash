@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Color.h"
+#include "Color_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -38,66 +38,31 @@
 
 namespace gnash {
 
-static as_value color_getrgb(const fn_call& fn);
-static as_value color_gettransform(const fn_call& fn);
-static as_value color_setrgb(const fn_call& fn);
-static as_value color_settransform(const fn_call& fn);
-static as_value color_ctor(const fn_call& fn);
+// Forward declarations.
+namespace {
+    as_value color_getrgb(const fn_call& fn);
+    as_value color_gettransform(const fn_call& fn);
+    as_value color_setrgb(const fn_call& fn);
+    as_value color_settransform(const fn_call& fn);
+    as_value color_ctor(const fn_call& fn);
 
-void registerColorNative(as_object& o)
-{
-	VM& vm = o.getVM();
-
-	vm.registerNative(color_setrgb, 700, 0);
-	vm.registerNative(color_settransform, 700, 1);
-	vm.registerNative(color_getrgb, 700, 2);
-	vm.registerNative(color_gettransform, 700, 3);
+    as_object* getColorInterface();
 }
 
-static void
-attachColorInterface(as_object& o)
-{
-	VM& vm = o.getVM();
 
-    const int flags = as_prop_flags::dontEnum |
-                      as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly;
 
-	// Color.setRGB
-	o.init_member("setRGB", vm.getNative(700, 0), flags);
-	// Color.setTransform
-	o.init_member("setTransform", vm.getNative(700, 1), flags);
-	// Color.getRGB
-	o.init_member("getRGB", vm.getNative(700, 2), flags);
-	// Color.getTransform
-	o.init_member("getTransform", vm.getNative(700, 3), flags);
-
-}
-
-static as_object*
-getColorInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachColorInterface(*o);
-	}
-	return o.get();
-}
-
-class color_as_object: public as_object
+class Color_as: public as_object
 {
 
 public:
 
-	color_as_object()
+	Color_as()
 		:
 		as_object(getColorInterface()),
 		_sprite(0)
 	{}
 
-	color_as_object(MovieClip* sp)
+	Color_as(MovieClip* sp)
 		:
 		as_object(getColorInterface()),
 		_sprite(sp)
@@ -159,10 +124,68 @@ private:
 
 };
 
-static as_value
+void registerColorNative(as_object& o)
+{
+	VM& vm = o.getVM();
+
+	vm.registerNative(color_setrgb, 700, 0);
+	vm.registerNative(color_settransform, 700, 1);
+	vm.registerNative(color_getrgb, 700, 2);
+	vm.registerNative(color_gettransform, 700, 3);
+}
+
+// extern (used by Global.cpp)
+void color_class_init(as_object& global)
+{
+	// This is going to be the global Color "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&color_ctor, getColorInterface());
+	}
+
+	// Register _global.Color
+	global.init_member("Color", cl.get());
+
+}
+
+
+namespace {
+
+void
+attachColorInterface(as_object& o)
+{
+	VM& vm = o.getVM();
+
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::readOnly;
+
+	o.init_member("setRGB", vm.getNative(700, 0), flags);
+	o.init_member("setTransform", vm.getNative(700, 1), flags);
+	o.init_member("getRGB", vm.getNative(700, 2), flags);
+	o.init_member("getTransform", vm.getNative(700, 3), flags);
+
+}
+
+as_object*
+getColorInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object(getObjectInterface());
+		attachColorInterface(*o);
+	}
+	return o.get();
+}
+
+
+as_value
 color_getrgb(const fn_call& fn)
 {
-	boost::intrusive_ptr<color_as_object> obj = ensureType<color_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
 
 	MovieClip* sp = obj->getSprite();
 	if ( ! sp ) return as_value();
@@ -178,10 +201,10 @@ color_getrgb(const fn_call& fn)
 	return as_value(rgb);
 }
 
-static as_value
+as_value
 color_gettransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<color_as_object> obj = ensureType<color_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
 
 	MovieClip* sp = obj->getSprite();
 	if ( ! sp )
@@ -193,7 +216,7 @@ color_gettransform(const fn_call& fn)
 		return as_value();
 	}
 
-	cxform cx = obj->getTransform();
+	const cxform& cx = obj->getTransform();
 
 	// Convert to as_object
 
@@ -212,10 +235,10 @@ color_gettransform(const fn_call& fn)
 	return ret;
 }
 
-static as_value
+as_value
 color_setrgb(const fn_call& fn)
 {
-	boost::intrusive_ptr<color_as_object> obj = ensureType<color_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -244,8 +267,9 @@ color_setrgb(const fn_call& fn)
 	return as_value();
 }
 
-static inline void
-parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t *target, bool scale)
+inline void
+parseColorTransProp (as_object& obj, string_table::key key,
+        boost::int16_t *target, bool scale)
 {
 	as_value tmp;
 	double d;
@@ -263,10 +287,10 @@ parseColorTransProp (as_object& obj, string_table::key key, boost::int16_t *targ
     }
 }
 
-static as_value
+as_value
 color_settransform(const fn_call& fn)
 {
-	boost::intrusive_ptr<color_as_object> obj = ensureType<color_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<Color_as> obj = ensureType<Color_as>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -281,7 +305,8 @@ color_settransform(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.setTransform(%s) : first argument doesn't cast to an object"), ss.str());
+		log_aserror(_("Color.setTransform(%s) : first argument doesn't "
+                            "cast to an object"), ss.str());
 		);
 		return as_value();
 	}
@@ -291,7 +316,8 @@ color_settransform(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror(_("Color.setTransform(%s) : no or unloaded sprite associated with the Color object"), ss.str());
+		log_aserror(_("Color.setTransform(%s) : no or unloaded sprite "
+                        "associated with the Color object"), ss.str());
 		);
 		return as_value();
 	}
@@ -331,7 +357,7 @@ color_settransform(const fn_call& fn)
 	return as_value();
 }
 
-static as_value
+as_value
 color_ctor(const fn_call& fn)
 {
 	MovieClip* sp=0;
@@ -355,10 +381,11 @@ color_ctor(const fn_call& fn)
 				if ( ! sp )
 				{
 				std::stringstream ss; fn.dump_args(ss);
-				log_aserror(_("new Color(%s) : first argument evaluates to character %s which is a %s (not a sprite)"),
-					ss.str(), ch->getTarget(), typeName(*ch));
+				log_aserror(_("new Color(%s) : first argument evaluates "
+                                "to character %s which is a %s (not a sprite)"),
+					            ss.str(), ch->getTarget(), typeName(*ch));
 				}
-				)
+				);
 			}
 			else
 			{
@@ -371,26 +398,10 @@ color_ctor(const fn_call& fn)
 		}
 	}
 
-	boost::intrusive_ptr<as_object> obj = new color_as_object(sp);
+	boost::intrusive_ptr<as_object> obj = new Color_as(sp);
 	
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void color_class_init(as_object& global)
-{
-	// This is going to be the global Color "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&color_ctor, getColorInterface());
-	}
-
-	// Register _global.Color
-	global.init_member("Color", cl.get());
-
-}
-
-
+} // anonymous namespace 
 } // end of gnash namespace

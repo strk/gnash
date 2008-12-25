@@ -302,7 +302,7 @@ usage (void)
 #else
 
 int
-main(int /*argc*/, char /* *argv[]*/)
+main(int /*argc*/, char**)
 {
   // nop
   return 0;  

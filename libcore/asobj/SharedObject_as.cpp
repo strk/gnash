@@ -1,4 +1,4 @@
-// SharedObject.cpp:  ActionScript "SharedObject" class, for Gnash.
+// SharedObject_as.cpp:  ActionScript "SharedObject" class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -39,7 +39,7 @@
 #include "amf.h"
 #include "element.h"
 #include "sol.h"
-#include "SharedObject.h"
+#include "SharedObject_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -227,13 +227,13 @@ private:
 
 } // anonymous namespace
 
-class SharedObject: public as_object 
+class SharedObject_as: public as_object 
 {
 public:
 
-    ~SharedObject();
+    ~SharedObject_as();
 
-    SharedObject()
+    SharedObject_as()
         :
         as_object(getSharedObjectInterface()),
         _data(0)
@@ -298,7 +298,7 @@ private:
     SOL _sol;
 };
 
-SharedObject::~SharedObject()
+SharedObject_as::~SharedObject_as()
 {
     /// This apparently used to cause problems if the VM no longer exists on
     /// destruction. It certainly would. However, it *has* to be done, so if it
@@ -308,7 +308,7 @@ SharedObject::~SharedObject()
 
 
 bool
-SharedObject::flush(int space) const
+SharedObject_as::flush(int space) const
 {
 
     /// This is called on on destruction of the SharedObject, or (allegedly)
@@ -483,12 +483,12 @@ SharedObjectLibrary::markReachableResources() const
     for (SoLib::const_iterator it = _soLib.begin(), itE = _soLib.end();
             it != itE; ++it)
     {
-        SharedObject* sh = it->second;
+        SharedObject_as* sh = it->second;
         sh->setReachable();
     }
 }
 
-SharedObject*
+SharedObject_as*
 SharedObjectLibrary::getLocal(const std::string& objName,
         const std::string& root)
 {
@@ -578,7 +578,7 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     log_debug("SharedObject %s not loaded. Loading it now", key);
 
     // Otherwise create a new one and register to the lib
-    SharedObject* obj = new SharedObject();
+    SharedObject_as* obj = new SharedObject_as;
     _soLib[key] = obj;
 
     obj->setObjectName(objName);
@@ -599,8 +599,6 @@ SharedObjectLibrary::getLocal(const std::string& objName,
     return obj;
 }
 
-
-// extern (used by Global.cpp)
 void
 sharedobject_class_init(as_object& global)
 {
@@ -704,8 +702,8 @@ getSharedObjectInterface()
 as_value
 sharedobject_clear(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj = 
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj = 
+        ensureType<SharedObject_as>(fn.this_ptr);
     UNUSED(obj);
     
     LOG_ONCE(log_unimpl (__FUNCTION__));
@@ -716,8 +714,8 @@ sharedobject_clear(const fn_call& fn)
 as_value
 sharedobject_connect(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.connect"));
@@ -727,8 +725,8 @@ sharedobject_connect(const fn_call& fn)
 as_value
 sharedobject_close(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.close"));
@@ -738,8 +736,8 @@ sharedobject_close(const fn_call& fn)
 as_value
 sharedobject_setFps(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.setFps"));
@@ -749,8 +747,8 @@ sharedobject_setFps(const fn_call& fn)
 as_value
 sharedobject_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
     UNUSED(obj);
 
     LOG_ONCE(log_unimpl("SharedObject.send"));
@@ -763,8 +761,8 @@ sharedobject_flush(const fn_call& fn)
     
     GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
 
     IF_VERBOSE_ASCODING_ERRORS(
         if (fn.nargs > 1)
@@ -820,7 +818,7 @@ sharedobject_getLocal(const fn_call& fn)
 
     log_debug("SO name:%s, root:%s", objName, root);
 
-    SharedObject* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
+    SharedObject_as* obj = vm.getSharedObjectLibrary().getLocal(objName, root);
 
     as_value ret(obj);
     log_debug("SharedObject.getLocal returning %s", ret);
@@ -831,8 +829,8 @@ sharedobject_getLocal(const fn_call& fn)
 as_value
 sharedobject_getRemote(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
 
     UNUSED(obj);
 
@@ -847,8 +845,8 @@ sharedobject_getRemote(const fn_call& fn)
 as_value
 sharedobject_deleteAll(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
 
     UNUSED(obj);
 
@@ -862,8 +860,8 @@ sharedobject_deleteAll(const fn_call& fn)
 as_value
 sharedobject_getDiskUsage(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
 
     UNUSED(obj);
 
@@ -875,23 +873,23 @@ sharedobject_getDiskUsage(const fn_call& fn)
 as_value
 sharedobject_data(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
     return as_value(obj->data());
 }
 
 as_value
 sharedobject_getsize(const fn_call& fn)
 {
-    boost::intrusive_ptr<SharedObject> obj =
-        ensureType<SharedObject>(fn.this_ptr);
+    boost::intrusive_ptr<SharedObject_as> obj =
+        ensureType<SharedObject_as>(fn.this_ptr);
     return as_value(obj->size());
 }
 
 as_value
 sharedobject_ctor(const fn_call& /* fn */)
 {
-    boost::intrusive_ptr<as_object> obj = new SharedObject;
+    boost::intrusive_ptr<as_object> obj = new SharedObject_as;
     
     return as_value(obj.get()); // will keep alive
 }

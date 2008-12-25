@@ -20,11 +20,6 @@
 #ifndef GNASH_AUDIODECODERFFMPEG_H
 #define GNASH_AUDIODECODERFFMPEG_H
 
-// TODO: What's this for ?
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
-#endif
-
 #include "ffmpegHeaders.h"
 
 #include "log.h"

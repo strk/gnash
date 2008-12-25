@@ -34,6 +34,7 @@ EXTRA_DIST = \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
 	remoting.as \
+	red5test.as \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
@@ -310,6 +311,9 @@ endif
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 check_SCRIPTS += remotingTestRunner
+endif
+if ENABLE_RED5_TESTING
+check_SCRIPTS += red5testRunner
 endif
 endif
 
@@ -1731,6 +1735,13 @@ remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/che
 remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $< $(top_builddir) remoting.swf > $@
 	chmod 755 $@
+
+red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/red5test.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+red5testRunner: $(srcdir)/../generic-testrunner.sh red5test.swf
+	sh $< $(top_builddir) red5test.swf > $@
+	chmod 755 $@
 	
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
@@ -1994,6 +2005,9 @@ endif
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 TEST_CASES += remotingTestRunner
+endif
+if ENABLE_RED5_TESTING
+TEST_CASES += red5testRunner
 endif
 endif
 

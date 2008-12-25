@@ -50,11 +50,6 @@ attachErrorInterface(as_object& o)
     o.init_property("name", Error_name_getset, Error_name_getset);
 }
 
-static void
-attachErrorStaticProperties(as_object& /*o*/)
-{
-   
-}
 
 static as_object*
 getErrorInterface()
@@ -161,7 +156,6 @@ void Error_class_init(as_object& where)
 	// in the 'where' package
 	boost::intrusive_ptr<builtin_function> cl;
 	cl = new builtin_function(&Error_ctor, getErrorInterface());
-	attachErrorStaticProperties(*cl);
 
 	// Register _global.Error
 	where.init_member("Error", cl.get());

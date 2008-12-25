@@ -202,6 +202,8 @@ ret = tmp.call("o");
 check_equals(ret, undefined);
 check_equals(statuses.length, 1);
 check_equals(result, "NetConnection.Connect.Success");
+check_equals(typeof(tmp.uri), 'string');
+check_equals(tmp.uri, 'null');
 
 // Check onStatus object.
 
@@ -288,7 +290,7 @@ check_equals(ret, undefined);
 check_equals(result, "NetConnection.Connect.Failed");
 check_equals(level, "error");
 
-check_totals(117);
+check_totals(119);
 
 
 

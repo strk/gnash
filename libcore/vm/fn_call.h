@@ -136,6 +136,10 @@ public:
 		return (*_args)[n]; // _env->bottom(_stack_offset - n);
 	}
 
+    const std::vector<as_value>& getArgs() const {
+        return *_args;
+    }
+
 	void drop_bottom()
 	{
 		assert(_args.get() && !(*_args).empty());

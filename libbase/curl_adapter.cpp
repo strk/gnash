@@ -1333,7 +1333,7 @@ NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
 }
 
 /// Define static member.
-std::set<std::string, StringNoCaseLessThen>
+std::set<std::string, StringNoCaseLessThan>
 NetworkAdapter::_reservedNames = boost::assign::list_of
     ("Accept-Ranges")
     ("Age")

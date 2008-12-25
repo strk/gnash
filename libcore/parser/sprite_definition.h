@@ -27,7 +27,7 @@
 #include "movie_definition.h" // for inheritance
 #include "log.h"
 #include "rect.h"
-#include "StringPredicates.h" // StringNoCaseLessThen
+#include "StringPredicates.h" // StringNoCaseLessThan
 #include "TagLoadersTable.h"
 
 // Forward declarations
@@ -266,7 +266,7 @@ private:
 	PlayListMap m_playlist;
 
 	// stores 0-based frame #'s
-	typedef std::map<std::string, size_t, StringNoCaseLessThen> NamedFrameMap;
+	typedef std::map<std::string, size_t, StringNoCaseLessThan> NamedFrameMap;
 	NamedFrameMap _namedFrames;
 
 	size_t m_frame_count;

@@ -47,7 +47,7 @@ libgnashasobjs_la_SOURCES = \
 	Boolean.cpp \
 	Camera.cpp \
 	ClassHierarchy.cpp \
-	Color.cpp \
+	Color_as.cpp \
 	ContextMenu.cpp	\
 	CustomActions.cpp\
 	Date.cpp \
@@ -58,18 +58,18 @@ libgnashasobjs_la_SOURCES = \
 	LocalConnection.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
-	Mouse.cpp \
+	Mouse_as.cpp \
 	NetConnection_as.cpp \
 	NetStream_as.cpp \
 	Number_as.cpp \
 	Object.cpp \
 	PlayHead.cpp \
 	Selection_as.cpp \
-	SharedObject.cpp\
+	SharedObject_as.cpp\
 	Sound.cpp \
 	Stage_as.cpp \
 	System_as.cpp \
-	TextFormat.cpp \
+	TextFormat_as.cpp \
 	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
@@ -112,7 +112,7 @@ noinst_HEADERS = \
 	Boolean.h \
 	Camera.h \
 	ClassHierarchy.h \
-	Color.h	\
+	Color_as.h	\
 	ContextMenu.h \
 	CustomActions.h	\
 	Date.h \
@@ -123,7 +123,7 @@ noinst_HEADERS = \
 	LoadVars_as.h \
 	LocalConnection.h\
 	Microphone.h \
-	Mouse.h	\
+	Mouse_as.h	\
 	MovieClipLoader.h \
 	NetConnection_as.h	\
 	NetStream_as.h \
@@ -132,11 +132,11 @@ noinst_HEADERS = \
 	PlayHead.h \
 	prophelper.h \
 	Selection_as.h \
-	SharedObject.h \
+	SharedObject_as.h \
 	Sound.h \
 	Stage_as.h	\
 	System_as.h \
-	TextFormat.h \
+	TextFormat_as.h \
 	TextSnapshot_as.h \
 	String_as.h \
 	XML_as.h \

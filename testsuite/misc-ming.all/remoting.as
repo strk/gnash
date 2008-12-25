@@ -1,10 +1,10 @@
 //
 // Build with:
-//	makeswf -o remoting.swf ../Dejagnu.swf remoting.as
+//	makeswf -n network -o remoting.swf ../Dejagnu.swf remoting.as ../actionscript.all/dejagnu_so_fini.as
 // Run with:
-//	firefox DrawingApi.swf
+//	firefox remoting.swf
 // Or:
-//	gnash DrawingApi.swf
+//	gnash -v remoting.swf
 //
 //
 
@@ -24,14 +24,12 @@ rcsid="remoting.as - <bzr revno here>";
 endOfTest = function()
 {
 	//note("END OF TEST");
-	check_totals(109);
+	check_totals(140);
 	play();
 };
 
 
 if ( ! _root.hasOwnProperty('url') ) {
-    // updated daily from bzr !
-    // TODO: let ./configure specify another one
     url=HTTP_TESTSUITE+'/remoting.php';
 }
 
@@ -62,21 +60,60 @@ function ResultHandler() {
 };
 
 nc = new NetConnection;
+nc.statuses = new Array;
 nc.onStatus = function()
 {
-	note('NetConnection.onStatus called with args: '+dumpObject(arguments));
+    this.statuses.push(arguments);
+	//note('NetConnection.onStatus called with args: '+dumpObject(arguments));
 };
 
 
 function test1()
 {
-    note('Connecting to: '+url+' (pass "url" param to change)');
+    o=new ResultHandler();
+    nc.call("unconnected", o); 
+    check_equals(nc.statuses.length, 0);
+    check_equals(nc.isConnected, false);
+    check_equals(nc.statuses.length, 0);
+
+    // NOTE: next test aim is to trigger NetConnection.Connect.Failed.
+    //       The only uri which stabily triggers that is the empty uri.
+    //       Using a relative uri like 'invalid' does send Failed *only*
+    //       when the SWF is loaded from filesystem, but doesn't if it
+    //       is loaded from http. Also, 'file:///xxx' uri doesn't send
+    //       the Failed message.
+    // WARNING: pp version LNX 10,0,12,10 often chokes and either
+    //          segfaults or smashes the stack on this connect.
+    //
+    nc.connect('');
+    check_equals(nc.isConnected, false);
+    check_equals(nc.statuses.length, 1);
+    lastStatusArgs = nc.statuses[nc.statuses.length-1];
+    check_equals(lastStatusArgs.length, 1);
+    check_equals(lastStatusArgs[0].level, 'error');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Failed');
+
+    nc.connect(null);
+    check_equals(nc.isConnected, true);
+    check_equals(nc.statuses.length, 2);
+    lastStatusArgs = nc.statuses[nc.statuses.length-1];
+    check_equals(lastStatusArgs.length, 1);
+    check_equals(lastStatusArgs[0].level, 'status');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Success');
+
     nc.connect(url);
+    check_equals(nc.isConnected, false);
+    check_equals(nc.statuses.length, 3);
+    lastStatusArgs = nc.statuses[nc.statuses.length-1];
+    check_equals(lastStatusArgs.length, 1);
+    check_equals(lastStatusArgs[0].level, 'status');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
 
     o=new ResultHandler();
     ary1=[1,2,3];
     nc.call("ary_123", o, ary1); // 31
     o.onResult = function(res) {
+        check_equals(nc.isConnected, false);
         //note(printInfo(res));
         connectionPort=res.remote_port;
         check_equals(res.request_id, '/1');
@@ -256,6 +293,13 @@ function test14()
     note('Connecting again to: '+url);
     nc.connect(url); // reconnect, should reset call id
 
+    check_equals(nc.isConnected, false);
+    check_equals(nc.statuses.length, 4);
+    lastStatusArgs = nc.statuses[nc.statuses.length-1];
+    check_equals(lastStatusArgs.length, 1);
+    check_equals(lastStatusArgs[0].level, 'status');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
+
     o=new ResultHandler();
     ary13=[]; 
     nc.call("ary_newconnect", o, ary13); //
@@ -271,6 +315,13 @@ function test14()
 
     note('Connecting again to: '+url);
     nc.connect(url); // reconnect, should reset call id
+
+    check_equals(nc.isConnected, false);
+    check_equals(nc.statuses.length, 5);
+    lastStatusArgs = nc.statuses[nc.statuses.length-1];
+    check_equals(lastStatusArgs.length, 1);
+    check_equals(lastStatusArgs[0].level, 'status');
+    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Closed');
 
     o=new ResultHandler();
     ary13=[]; 
@@ -392,6 +443,9 @@ function test16()
 
 function test17()
 {
+    check_equals(nc.isConnected, false);
+    check_equals(nc.statuses.length, 5);
+
     endOfTest();
 }
 

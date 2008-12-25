@@ -38,7 +38,7 @@ public:
     /// Custom headers for addRequestHeader. These are case insensitive, and
     /// subsequent addition of a header already there replaces any previous one.
     /// Some values are not allowed.
-    typedef std::map<std::string, std::string, StringNoCaseLessThen> RequestHeaders;
+    typedef std::map<std::string, std::string, StringNoCaseLessThan> RequestHeaders;
 
     /// \brief
     /// Returns a read-only IOChannel that fetches data
@@ -82,7 +82,7 @@ public:
 
 private:
 
-    static std::set<std::string, StringNoCaseLessThen> _reservedNames;
+    static std::set<std::string, StringNoCaseLessThan> _reservedNames;
 
 };
 

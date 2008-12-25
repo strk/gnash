@@ -26,7 +26,7 @@
 #include "Accessibility_as.h"
 #include "Boolean.h"
 #include "Camera.h"
-#include "Color.h"
+#include "Color_as.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
 #include "Date.h"
@@ -40,18 +40,18 @@
 #include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
-#include "Mouse.h"
+#include "Mouse_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
 #include "NetConnection_as.h"
 #include "NetStream_as.h"
 #include "Selection_as.h"
-#include "SharedObject.h"
+#include "SharedObject_as.h"
 #include "Sound.h"
 #include "Stage_as.h"
 #include "System_as.h"
 #include "TextSnapshot_as.h"
-#include "TextFormat.h"
+#include "TextFormat_as.h"
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
@@ -302,9 +302,9 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ XML_as::init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XMLNode_as::init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_XML, 5 },
-	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
+	{ Mouse_as::init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 6 },
@@ -313,7 +313,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
 	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
 	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
-	{ localconnection_class_init, NSV::CLASS_LOCAL_CONNECTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 }, // FIXME: not global ?
+	{ localconnection_class_init, NSV::CLASS_LOCAL_CONNECTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
 	{ customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT, NSV::NS_ADOBE_UTILS, 6 },
 	{ netconnection_class_init, NSV::CLASS_NET_CONNECTION, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
 	{ netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },

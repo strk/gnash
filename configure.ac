@@ -1560,6 +1560,20 @@ if test x$cross_compiling = xno; then
 fi
 AM_CONDITIONAL(ENABLE_HTTP_TESTSUITE, [ test x"$HTTP_TESTSUITE" != x ])
 
+if test x$cross_compiling = xno; then
+  AC_ARG_ENABLE([red5_testing],
+      dnl # TODO: find out how to add [quotes] around '=<baseurl>'
+	  AC_HELP_STRING([--enable-red5-testing=<host>],
+		  [Enable red5 based testing (default host is localhost)]),
+	      [case "${enableval}" in
+             no) RED5_HOST="" ;;
+            yes) RED5_HOST="localhost" ;;
+              *) RED5_HOST="${enableval}";;
+           esac])
+  AC_SUBST(RED5_HOST)
+fi
+AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
+
 dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
@@ -2901,6 +2915,9 @@ if test x$cross_compiling = xno; then
     echo "        HTTP testsuite dir is $HTTP_TESTSUITE"
   fi
 
+  if test x"$RED5_HOST" != x; then
+    echo "        RED5 testing host is $RED5_HOST"
+  fi
 
   if test x"$PYTHON" != x; then
     echo "        PYTHON is $PYTHON"

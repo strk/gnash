@@ -28,7 +28,7 @@
 
 // Forward declarations
 namespace gnash {
-	class AMFQueue;
+	class ConnectionHandler;
 }
 
 namespace gnash {
@@ -63,8 +63,7 @@ public:
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;
 
-    void call(as_object* asCallback, const std::string& callNumber, 
-            const SimpleBuffer& buf);
+    void call(as_object* asCallback, const std::string& methodName, const std::vector<as_value>& args, size_t firstArg);
 
     /// Process the close() method.
     void close();
@@ -91,16 +90,12 @@ public:
     /// Get an stream by name
     std::auto_ptr<IOChannel> getStream(const std::string& name);
 
-    unsigned int nextCallNumber();
-
 protected:
 
 	/// Mark responders associated with remoting calls
 	void markReachableResources() const;
 
 private:
-
-	friend class AMFQueue;
 
     typedef std::pair<std::string, std::string> NetConnectionStatus;
 
@@ -115,20 +110,14 @@ private:
     /// will perform a POST request containing all calls
     /// to the same uri and dispatch results.
     ///
-	std::list<AMFQueue*> _callQueues;
+	std::list<ConnectionHandler*> _queuedConnections;
 
     /// Queue of calls gathered during a single movie advancement
     //
     /// For HTTP based remoting, these calls will be performed
     /// by a single POST operation.
     ///
-    std::auto_ptr<AMFQueue> _currentCallQueue; 
-
-    /// Number of calls queued for current connection
-    //
-    /// TODO: make it a member of AMFQueue
-    ///
-    unsigned int _numCalls;
+    std::auto_ptr<ConnectionHandler> _currentConnection; 
 
 	/// the url prefix optionally passed to connect()
 	std::string _uri;

@@ -17,22 +17,17 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
+#include "ffmpegHeaders.h"
 #include "MediaParserFfmpeg.h"
 #include "GnashException.h"
 #include "log.h"
-#include "IOChannel.h" // for use
-
-using namespace std;
-
-//#define PADDING_BYTES 64
-//#define READ_CHUNKS 64
+#include "IOChannel.h" 
 
 namespace gnash {
 namespace media {
 namespace ffmpeg {
 
-namespace { // anonymous namespace
+namespace { 
 
 	// Used to calculate a decimal value from a ffmpeg fraction
 	inline double as_double(AVRational time)

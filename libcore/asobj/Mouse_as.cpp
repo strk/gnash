@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Mouse.h"
+#include "Mouse_as.h"
 #include "as_object.h" // for inheritance
 #include "log.h"
 #include "fn_call.h"
@@ -31,33 +31,58 @@
 namespace gnash {
 
 // Forward declarations
-static as_value mouse_hide(const fn_call& fn);
-static as_value mouse_show(const fn_call& fn);
-static void attachMouseInterface(as_object& o);
+namespace {    
+    as_value mouse_hide(const fn_call& fn);
+    as_value mouse_show(const fn_call& fn);
 
-void registerMouseNative(as_object& o)
-{
-	VM& vm = o.getVM();
-
-	vm.registerNative(mouse_show, 5, 0);
-	vm.registerNative(mouse_hide, 5, 1);
+    void attachMouseInterface(as_object& o);
 }
 
-static void
+/// Mouse isn't a proper class in AS
+//
+/// Gnash's Mouse_as just has static methods.
+void
+Mouse_as::registerNative(as_object& o)
+{
+    VM& vm = o.getVM();
+
+    vm.registerNative(mouse_show, 5, 0);
+    vm.registerNative(mouse_hide, 5, 1);
+}
+
+
+// extern (used by Global.cpp)
+void
+Mouse_as::init(as_object& global)
+{
+    // This is going to be the global Mouse "class"/"function"
+    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+    attachMouseInterface(*obj);
+
+    // Register _global.Mouse
+    global.init_member("Mouse", obj.get());
+
+}
+
+
+namespace {
+
+void
 attachMouseInterface(as_object& o)
 {
-	VM& vm = o.getVM();
+    VM& vm = o.getVM();
 
-	o.init_member("show", vm.getNative(5, 0));
-	o.init_member("hide", vm.getNative(5, 1));
-	
-	if (vm.getSWFVersion() > 5)
-	{
-		AsBroadcaster::initialize(o);
-	}
+    o.init_member("show", vm.getNative(5, 0));
+    o.init_member("hide", vm.getNative(5, 1));
+    
+    if (vm.getSWFVersion() > 5) {
+        AsBroadcaster::initialize(o);
+    }
 }
 
-
+/// Returns whether the mouse was visible before the call.
+//
+/// The return is not a boolean, but rather 1 or 0.
 as_value
 mouse_hide(const fn_call& fn)
 {
@@ -73,7 +98,9 @@ mouse_hide(const fn_call& fn)
     return as_value(success);
 }
 
-
+/// Returns whether the mouse was visible before the call.
+//
+/// The return is not a boolean, but rather 1 or 0.
 as_value
 mouse_show(const fn_call& fn)
 {
@@ -89,19 +116,5 @@ mouse_show(const fn_call& fn)
     return as_value(success);
 }
 
-
-// extern (used by Global.cpp)
-void
-mouse_class_init(as_object& global)
-{
-	// This is going to be the global Mouse "class"/"function"
-	boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
-	attachMouseInterface(*obj);
-
-	// Register _global.Mouse
-	global.init_member("Mouse", obj.get());
-
-}
-
-
+} // anonymous namespace
 } // end of gnash namespace
