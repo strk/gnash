@@ -1,4 +1,4 @@
-// Sound.cpp:  ActionScript Sound output stub class, for Gnash.
+// Sound_as.cpp:  ActionScript Sound output stub class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 //
@@ -21,9 +21,11 @@
 #include "gnashconfig.h"
 #endif
 
-#include "Sound.h"
+#include "Sound_as.h"
 #include "log.h"
 #include "sound_handler.h"
+#include "AudioDecoder.h"
+#include "MediaParser.h"
 #include "MediaHandler.h"
 #include "sound_definition.h" // for sound_sample
 #include "movie_definition.h"
@@ -37,8 +39,6 @@
 #include "ExportableResource.h"
 #include "StreamProvider.h"
 
-
-#include "Sound.h"
 #include <string>
 
 // Define the macro below to get some more DEBUG
@@ -66,7 +66,7 @@ static as_value sound_stop(const fn_call& fn);
 static as_value checkPolicyFile_getset(const fn_call& fn);
 static as_object* getSoundInterface();
 
-Sound::Sound() 
+Sound_as::Sound_as() 
     :
     as_object(getSoundInterface()),
     _attachedCharacter(0),
@@ -86,7 +86,7 @@ Sound::Sound()
 {
 }
 
-Sound::~Sound()
+Sound_as::~Sound_as()
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -99,46 +99,46 @@ Sound::~Sound()
 }
 
 void
-Sound::attachCharacter(character* attachTo) 
+Sound_as::attachCharacter(character* attachTo) 
 {
     _attachedCharacter.reset(new CharacterProxy(attachTo));
 }
 
 void
-Sound::attachSound(int si, const std::string& name)
+Sound_as::attachSound(int si, const std::string& name)
 {
     soundId = si;
     soundName = name;
 }
 
 long
-Sound::getBytesLoaded()
+Sound_as::getBytesLoaded()
 {
     if ( _mediaParser ) return _mediaParser->getBytesLoaded();
     return -1;
 }
 
 long
-Sound::getBytesTotal()
+Sound_as::getBytesTotal()
 {
     if ( _mediaParser ) return _mediaParser->getBytesTotal();
     return -1;
 }
 
 void
-Sound::getPan()
+Sound_as::getPan()
 {
     LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 void
-Sound::getTransform()
+Sound_as::getTransform()
 {
     LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 bool
-Sound::getVolume(int& volume)
+Sound_as::getVolume(int& volume)
 {
     // TODO: check what takes precedence in case we
     //       have both an attached character *and*
@@ -185,7 +185,7 @@ Sound::getVolume(int& volume)
 }
 
 void
-Sound::loadSound(const std::string& file, bool streaming)
+Sound_as::loadSound(const std::string& file, bool streaming)
 {
     if ( ! _mediaHandler || ! _soundHandler ) 
     {
@@ -245,7 +245,7 @@ Sound::loadSound(const std::string& file, bool streaming)
 }
 
 sound::InputStream*
-Sound::attachAuxStreamerIfNeeded()
+Sound_as::attachAuxStreamerIfNeeded()
 {
     media::AudioInfo* audioInfo =  _mediaParser->getAudioInfo();
     if (!audioInfo) return 0;
@@ -261,19 +261,19 @@ Sound::attachAuxStreamerIfNeeded()
 }
 
 void
-Sound::setPan()
+Sound_as::setPan()
 {
     LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 void
-Sound::setTransform()
+Sound_as::setTransform()
 {
     LOG_ONCE(log_unimpl(__FUNCTION__));
 }
 
 void
-Sound::setVolume(int volume)
+Sound_as::setVolume(int volume)
 {
     // TODO: check what takes precedence in case we
     //       have both an attached character *and*
@@ -315,7 +315,7 @@ Sound::setVolume(int volume)
 }
 
 void
-Sound::start(int offset, int loops)
+Sound_as::start(int offset, int loops)
 {
     if ( ! _soundHandler )
     {
@@ -375,7 +375,7 @@ Sound::start(int offset, int loops)
 }
 
 void
-Sound::stop(int si)
+Sound_as::stop(int si)
 {
     if ( ! _soundHandler )
     {
@@ -406,7 +406,7 @@ Sound::stop(int si)
 }
 
 unsigned int
-Sound::getDuration()
+Sound_as::getDuration()
 {
     if ( ! _soundHandler )
     {
@@ -435,7 +435,7 @@ Sound::getDuration()
 }
 
 unsigned int
-Sound::getPosition()
+Sound_as::getPosition()
 {
     if ( ! _soundHandler )
     {
@@ -464,7 +464,7 @@ Sound::getPosition()
 
 
 unsigned int
-Sound::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
+Sound_as::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
 {
     boost::uint8_t* stream = reinterpret_cast<boost::uint8_t*>(samples);
     int len = nSamples*2;
@@ -550,10 +550,10 @@ Sound::getAudio(boost::int16_t* samples, unsigned int nSamples, bool& atEOF)
 
 // audio callback is running in sound handler thread
 unsigned int
-Sound::getAudioWrapper(void* owner, boost::int16_t* samples,
+Sound_as::getAudioWrapper(void* owner, boost::int16_t* samples,
         unsigned int nSamples, bool& atEOF)
 {
-    Sound* so = static_cast<Sound*>(owner);
+    Sound_as* so = static_cast<Sound_as*>(owner);
     return so->getAudio(samples, nSamples, atEOF);
 }
 
@@ -567,7 +567,7 @@ Sound::getAudioWrapper(void* owner, boost::int16_t* samples,
 as_value
 sound_new(const fn_call& fn)
 {
-    Sound* sound_obj = new Sound();
+    Sound_as* sound_obj = new Sound_as();
 
     if ( fn.nargs )
     {
@@ -607,7 +607,7 @@ sound_start(const fn_call& fn)
     IF_VERBOSE_ACTION (
     log_action(_("-- start sound"));
     )
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
     int loop = 0;
     int secondOffset = 0;
 
@@ -632,7 +632,7 @@ sound_stop(const fn_call& fn)
     IF_VERBOSE_ACTION (
     log_action(_("-- stop sound "));
     )
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
 
     int si = -1;
 
@@ -685,7 +685,7 @@ sound_attachsound(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
 
     const std::string& name = fn.arg(0).to_string();
     if (name.empty()) {
@@ -741,7 +741,7 @@ sound_attachsound(const fn_call& fn)
 as_value
 sound_getbytesloaded(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
     long loaded = so->getBytesLoaded();
     if (loaded < 0) return as_value();
     return as_value(loaded);
@@ -750,7 +750,7 @@ sound_getbytesloaded(const fn_call& fn)
 as_value
 sound_getbytestotal(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
     long total = so->getBytesTotal();
     if (total < 0) return as_value();
     return as_value(total);
@@ -802,7 +802,7 @@ as_value
 sound_getvolume(const fn_call& fn)
 {
 
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
 
     if ( fn.nargs )
     {
@@ -820,7 +820,7 @@ sound_getvolume(const fn_call& fn)
 as_value
 sound_loadsound(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
 
     if (!fn.nargs)
     {
@@ -877,7 +877,7 @@ sound_setvolume(const fn_call& fn)
         return as_value();
     }
 
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);    
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);    
     int volume = (int) fn.arg(0).to_number();
 
     so->setVolume(volume);
@@ -887,7 +887,7 @@ sound_setvolume(const fn_call& fn)
 as_value
 sound_duration(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
     return as_value(so->getDuration());
 }
 
@@ -914,7 +914,7 @@ sound_areSoundsInaccessible(const fn_call& /*fn*/)
 as_value
 sound_position(const fn_call& fn)
 {
-    boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> so = ensureType<Sound_as>(fn.this_ptr);
 
     return as_value(so->getPosition());
 }
@@ -994,7 +994,8 @@ getSoundInterface()
 }
 
 // extern (used by Global.cpp)
-void sound_class_init(as_object& global)
+void
+Sound_as::init(as_object& global)
 {
 
     // This is going to be the global Sound "class"/"function"
@@ -1014,10 +1015,10 @@ void sound_class_init(as_object& global)
 
 /*private*/
 void
-Sound::startProbeTimer()
+Sound_as::startProbeTimer()
 {
     boost::intrusive_ptr<builtin_function> cb = 
-        new builtin_function(&Sound::probeAudioWrapper);
+        new builtin_function(&Sound_as::probeAudioWrapper);
     std::auto_ptr<Timer> timer(new Timer);
 
     // 2 times each second (83 would be 12 times each second)
@@ -1028,18 +1029,18 @@ Sound::startProbeTimer()
 
 /*private static*/
 as_value
-Sound::probeAudioWrapper(const fn_call& fn)
+Sound_as::probeAudioWrapper(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
 
-    boost::intrusive_ptr<Sound> ptr = ensureType<Sound>(fn.this_ptr);
+    boost::intrusive_ptr<Sound_as> ptr = ensureType<Sound_as>(fn.this_ptr);
     ptr->probeAudio();
     return as_value();
 }
 
 /*private*/
 void
-Sound::stopProbeTimer()
+Sound_as::stopProbeTimer()
 {
 #ifdef GNASH_DEBUG_SOUND_AS
     log_debug("stopProbeTimer called");
@@ -1056,7 +1057,7 @@ Sound::stopProbeTimer()
 
 /*private*/
 void
-Sound::probeAudio()
+Sound_as::probeAudio()
 {
     if ( isAttached() )
     {
@@ -1119,7 +1120,7 @@ Sound::probeAudio()
 
 #ifdef GNASH_USE_GC
 void
-Sound::markReachableResources() const
+Sound_as::markReachableResources() const
 {
     if ( _attachedCharacter ) _attachedCharacter->setReachable();
     markAsObjectReachable();
@@ -1127,7 +1128,7 @@ Sound::markReachableResources() const
 #endif // GNASH_USE_GC
 
 void
-Sound::markSoundCompleted(bool completed)
+Sound_as::markSoundCompleted(bool completed)
 {
     boost::mutex::scoped_lock lock(_soundCompletedMutex);
     _soundCompleted=completed;

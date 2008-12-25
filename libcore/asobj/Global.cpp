@@ -51,7 +51,6 @@
 #include "NetConnection_as.h"
 #include "NetStream_as.h"
 #include "SharedObject_as.h"
-#include "Sound.h"
 #include "Stage_as.h"
 #include "System_as.h"
 #include "TextFormat_as.h"
