@@ -39,8 +39,6 @@
 #include "String_as.h"
 #include "Key_as.h"
 #include "Selection_as.h"
-//#include "LoadVars_as.h"
-//#include "LocalConnection.h"
 #include "Microphone.h"
 #include "Number_as.h"
 #include "Object.h"

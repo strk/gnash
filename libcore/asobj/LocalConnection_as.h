@@ -28,13 +28,13 @@
 
 namespace gnash {
   
-class LocalConnection : public as_object, amf::LcShm
+class LocalConnection_as : public as_object, amf::LcShm
 {
 
 public:
 
-    LocalConnection();
-    ~LocalConnection();
+    LocalConnection_as();
+    ~LocalConnection_as();
 
     void close();
 
@@ -50,6 +50,8 @@ public:
 
     bool connected() { return _connected; };
     
+    static void init(as_object& glob);
+
 private:
     
     /// Work out the domain.
@@ -61,13 +63,11 @@ private:
     bool _connected;
     std::string _name;
 
-    // The immutable domain of this LocalConnection, based on the 
+    // The immutable domain of this LocalConnection_as, based on the 
     // originating SWF's domain.
     const std::string _domain;
     
 };
-
-void localconnection_class_init(as_object& glob);
 
 } // end of gnash namespace
 

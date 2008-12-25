@@ -55,7 +55,7 @@ libgnashasobjs_la_SOURCES = \
 	Global.cpp \
 	Key_as.cpp	\
 	LoadVars_as.cpp \
-	LocalConnection.cpp\
+	LocalConnection_as.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
 	Mouse_as.cpp \
@@ -121,7 +121,7 @@ noinst_HEADERS = \
 	Global.h\
 	Key_as.h \
 	LoadVars_as.h \
-	LocalConnection.h\
+	LocalConnection_as.h\
 	Microphone.h \
 	Mouse_as.h	\
 	MovieClipLoader.h \
