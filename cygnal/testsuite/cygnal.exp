@@ -45,7 +45,6 @@ proc delete_files {} {
     # Get rid of old temp files created by testing,
     if {[file exists foo]} {
 	set junk [glob foo* wget-log* amf0*  *.bin* gateway* $chost:$cport]
-	puts "$junk"
 	if { $junk != "" } {
 	    catch "exec rm -fr $junk"
 	}
