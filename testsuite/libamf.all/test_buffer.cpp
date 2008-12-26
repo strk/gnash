@@ -674,10 +674,12 @@ test_operators()
     buf6.clear();
     buf6 += 'D';
     buf6 += 'E';
-    buf6 += 'F';
+    buf6 += 'F';    
     buf5 += buf6;
     ptr3 = buf5.reference();    // refresh the pointer, as it changes
                                 // on a resize()
+    // when appending Buffers, this destination has enough space to hold
+    // the allocated bytes from the source.
     if ((memcmp(ptr3, "abcDEF", 6) == 0) && (buf5.size() == 10)) {
          runtest.pass ("Buffer::operator+=(Buffer &)");
     } else {
@@ -685,6 +687,11 @@ test_operators()
     }
 
     bool caught = false;
+
+    // make the source Buffer have more data
+    buf6 += 'A';
+    buf6 += 'B';
+    buf6 += 'C';
     try {
         buf5 += buf6;
     }
@@ -693,6 +700,9 @@ test_operators()
         caught = true;
 //        log_debug("Got exeception from operator+=: %s", ge.what());
     }
+    // when appending Buffers, this destination doesn't have enough space to
+    // hold the allocated bytes from the source, so is supposed to throw an
+    //exception.
     if (caught) {
          runtest.pass ("Buffer::operator+=(Buffer &) error");
     } else {
