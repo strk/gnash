@@ -26,9 +26,9 @@
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
-#include "String_as.h" // for automatic as_value::STRING => String as object
-#include "Number_as.h" // for automatic as_value::NUMBER => Number as object
-#include "Boolean.h" // for automatic as_value::BOOLEAN => Boolean as object
+#include "String_as.h" // for automatic as_value::STRING => String
+#include "Number_as.h" // for automatic as_value::NUMBER => Number
+#include "Boolean_as.h" // for automatic as_value::BOOLEAN => Boolean
 #include "action.h" // for call_method0
 #include "utility.h" // for typeName() and utility::isFinite
 #include "namedStrings.h"
