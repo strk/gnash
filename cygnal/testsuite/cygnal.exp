@@ -32,7 +32,7 @@ set timeout 600
 set file all
 set params ""
 
-set cport 4080;			# the port for the connection to Cygnal
+set cport 6080;			# the port for the connection to Cygnal
 set chost "localhost";		# the host to connect to
 set sid 0;			# the server ID
 
