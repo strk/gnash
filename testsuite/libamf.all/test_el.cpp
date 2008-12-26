@@ -382,8 +382,11 @@ test_make()
     } else {
         runtest.fail("Made Unsupported Object element");
     }
-    
-    // Test recreating an element as a large size data type.
+
+#if 0
+    // this test is currently bogus, as we don't resize buffers when
+    // changing types, which shouldn't really be allowed anyway.
+    // Test recreating an element as a larger size data type.
     Element rel1;
     rel1.clear();
     rel1.makeBoolean(true);
@@ -395,7 +398,8 @@ test_make()
     } else {
         runtest.fail("Remade boolean as a double element");
     }
-
+#endif
+    
 // amf::Element::makeNumber(std::string const&, double)
 // amf::Element::makeObject(unsigned char*, unsigned int)
 // amf::Element::makeString(char const*, unsigned int)

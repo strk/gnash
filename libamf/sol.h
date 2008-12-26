@@ -18,17 +18,11 @@
 #ifndef GNASH_SOL_H
 #define GNASH_SOL_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <boost/cstdint.hpp>
 #include <string>
 #include <vector>
 
 #include "dsodefs.h" //DSOEXPORT
-#include "network.h"
-//#include "element.h"
 #include "amf.h"
 
 // It comprises of a magic number, followed by the file length, a
@@ -74,7 +68,7 @@ public:
     ///		.sol file data.
     ///
     /// @return true if this succeeded. false if it doesn't.
-    bool extractHeader(const std::vector<gnash::Network::byte_t> &data);
+    bool extractHeader(const std::vector<boost::uint8_t> &data);
 
     /// \brief Extract the header from the file.
     ///
@@ -89,7 +83,7 @@ public:
     ///		.sol file data.
     ///
     /// @return true if this succeeded. false if it doesn't.
-    bool formatHeader(const std::vector<gnash::Network::byte_t> &data);
+    bool formatHeader(const std::vector<boost::uint8_t> &data);
 
     /// \brief Create the file header.
     ///
@@ -131,7 +125,7 @@ public:
     /// \brief Get the stored copy of the header
     ///
     /// @return A vector of raw bytes that is a binary form of the header.
-    std::vector<gnash::Network::byte_t> getHeader() { return _header; };
+    std::vector<boost::uint8_t> getHeader() { return _header; };
 
     /// \brief Add the AMF objects that are the data of the file
     //
@@ -193,11 +187,11 @@ public:
  private:
     /// \var SOL::_header
     ///		A stored copy of the SOL file header.
-    std::vector<gnash::Network::byte_t> _header;
+    std::vector<boost::uint8_t> _header;
 
     /// \var SOL::_data
     ///		The vector that contains the raw dats for this .sol file.
-    std::vector<gnash::Network::byte_t> _data;
+    std::vector<boost::uint8_t> _data;
 
     /// \var SOL::_objname
     ///		The name of the SharedObject in the .sol file.

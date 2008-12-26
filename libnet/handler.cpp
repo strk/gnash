@@ -85,7 +85,7 @@ Handler::push(boost::shared_ptr<amf::Buffer> data, fifo_e direction)
 
 // Push bytes on the outgoing FIFO
 bool
-Handler::push(gnash::Network::byte_t *data, int nbytes, fifo_e direction)
+Handler::push(boost::uint8_t *data, int nbytes, fifo_e direction)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> ptr(new amf::Buffer);

@@ -136,13 +136,13 @@ main (int /*argc*/, char** /*argv*/) {
      boost::shared_ptr<amf::Buffer> merge3(new Buffer);
      size_t i;
      ptr = merge1->reference();
-     for (i=0; i<gnash::NETBUFSIZE; i++) {
+     for (i=0; i<amf::NETBUFSIZE; i++) {
          ptr[i] = i*'A';
      }
      que.push(merge1);
      
      ptr = merge2->reference();
-     for (i=0; i<gnash::NETBUFSIZE; i++) {
+     for (i=0; i<amf::NETBUFSIZE; i++) {
          ptr[i] = i+'a';
      }
      que.push(merge2);
@@ -159,7 +159,7 @@ main (int /*argc*/, char** /*argv*/) {
      if (foo == 0) {
          runtest.unresolved("CQue::merge()");
      } else {
-         if (foo->size() == (gnash::NETBUFSIZE * 2) + 96) {
+         if (foo->size() == (amf::NETBUFSIZE * 2) + 96) {
              runtest.pass("CQue::merge()");
          } else {
              runtest.fail("CQue::merge()");

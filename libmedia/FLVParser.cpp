@@ -35,6 +35,13 @@
 
 #include <string>
 #include <iosfwd>
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <io.h>
+#endif
 
 using namespace std;
 

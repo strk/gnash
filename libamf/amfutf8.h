@@ -18,10 +18,6 @@
 #ifndef _AMFUTF8_H_
 #define _AMFUTF8_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <vector>
 
 namespace amf

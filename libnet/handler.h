@@ -73,16 +73,16 @@ public:
     bool push(boost::shared_ptr<amf::Buffer> data)
 	{ return _incoming.push(data); };
     bool push(boost::shared_ptr<amf::Buffer> data, fifo_e direction);
-    bool push(gnash::Network::byte_t *data, int nbytes, fifo_e direction);
-    bool push(gnash::Network::byte_t *data, int nbytes)
+    bool push(boost::uint8_t *data, int nbytes, fifo_e direction);
+    bool push(boost::uint8_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
-    bool pushin(gnash::Network::byte_t *data, int nbytes)
+    bool pushin(boost::uint8_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
     bool pushin(boost::shared_ptr<amf::Buffer> data)
 	{ return _incoming.push(data); };
 #if 0
     // Push bytes on the incoming FIFO, which must be specified
-    bool pushout(gnash::Network::byte_t *data, int nbytes)
+    bool pushout(boost::uint8_t *data, int nbytes)
 	{ return _outgoing.push(data, nbytes); };
     bool pushout(boost::shared_ptr<amf::Buffer> data)
 	{ return _outgoing.push(data); };

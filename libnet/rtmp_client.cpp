@@ -339,7 +339,7 @@ RTMPClient::handShakeRequest()
     // Since we don't know what the format is, create a pattern we can
     // recognize if we stumble across it later on.
     for (int i=0; i<RTMP_BODY_SIZE; i++) {
-	Network::byte_t pad = i^256;
+	boost::uint8_t pad = i^256;
         *_handshake += pad;
     }
     

@@ -26,6 +26,7 @@
 #include <cmath>
 #include <climits>
 #include <boost/shared_ptr.hpp>
+#include <boost/cstdint.hpp> // for boost::?int??_t
 
 #include "buffer.h"
 #include "log.h"
@@ -33,7 +34,7 @@
 #include "amfutf8.h"
 #include "utility.h"
 #include "element.h"
-#include <boost/cstdint.hpp> // for boost::?int??_t
+#include "GnashException.h"
 
 using namespace std;
 using namespace gnash;
@@ -287,7 +288,7 @@ Element::to_bool() const
 /// \brief Cast the data in this Element to an real pointer to data.
 ///
 /// @return A real pointer to the base address of the raw data in memory.
-gnash::Network::byte_t *
+boost::uint8_t *
 Element::to_reference()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -297,7 +298,7 @@ Element::to_reference()
     return 0;
 };
 
-const gnash::Network::byte_t *
+const boost::uint8_t *
 Element::to_reference() const
 {
 //    GNASH_REPORT_FUNCTION;
@@ -376,6 +377,55 @@ Element::operator==(bool x)
     return false;
 };
 
+size_t
+Element::calculateSize()
+{
+//    GNASH_REPORT_FUNCTION;
+    return calculateSize();
+}
+
+size_t
+Element::calculateSize(amf::Element &el) const
+{
+//    GNASH_REPORT_FUNCTION;    
+    size_t outsize = 0;
+
+    // Simple Elements have everything contained in just the class itself.
+    // If thr name is set, it's a property, so the length is
+    // prefixed to the name string.
+    if (el.getNameSize()) {
+	outsize += el.getNameSize() + sizeof(boost::uint16_t);
+    }
+    // If there is any data, then the size of the data plus the header
+    // of the type and the length is next.
+    if (el.getDataSize()) {
+	outsize += el.getDataSize() + AMF_HEADER_SIZE;
+    }
+
+    // If an array has no data, it's undefined, so has a length of zero.
+    if (el.getType() == Element::STRICT_ARRAY_AMF0) {
+	if (el.getDataSize() == 0) {
+	    outsize = sizeof(boost::uint32_t) + 1;
+	}
+    }
+    
+    // More complex messages have child elements, either properties or
+    // the items in an array, If we have children, count up their size too.
+    // Calculate the total size of the message
+    vector<boost::shared_ptr<amf::Element> > props = el.getProperties();
+    for (size_t i=0; i<props.size(); i++) {
+	outsize += props[i]->getDataSize();
+	if (props[i]->getNameSize()) {
+	    outsize += props[i]->getNameSize();
+	    outsize += amf::AMF_PROP_HEADER_SIZE;
+	} else {
+	    outsize += amf::AMF_HEADER_SIZE;
+	}
+    }
+
+    return outsize;
+}
+
 /// \brief Encode this Element (data type object).
 ///	This encodes this Element and all of it's associated
 ///	properties into raw binary data in big endoan format.
@@ -404,7 +454,7 @@ Element::encode()
 	    *buf += enclength;
 	    string str = _name;
 	    *buf += str;
-	    Network::byte_t byte = static_cast<Network::byte_t>(0x5);
+	    boost::uint8_t byte = static_cast<boost::uint8_t>(0x5);
 	    *buf += byte;
 	}
 
@@ -421,7 +471,7 @@ Element::encode()
 	    }
 	}
 //	log_debug("FIXME: Terminating object");
-	Network::byte_t pad = 0;
+	boost::uint8_t pad = 0;
 	*buf += pad;
 	*buf += pad;
 	*buf += TERMINATOR;
@@ -521,13 +571,18 @@ Element::operator=(bool flag)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeString(Network::byte_t *data, size_t size)
+Element::makeString(boost::uint8_t *data, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
 
     // Make room for an additional NULL terminator
-    check_buffer(size+1);
+    try {
+	check_buffer(size+1);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
     _buffer->clear();		// FIXME: this could be a performance issue
     _buffer->copy(data, size);
     
@@ -551,7 +606,13 @@ Element::makeNullString()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
-    check_buffer(sizeof(Network::byte_t));
+    try {
+	check_buffer(sizeof(boost::uint8_t));
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *(_buffer->reference()) = 0;
     return *this;
 }
@@ -568,7 +629,7 @@ Element::makeString(const char *str, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(const_cast<char *>(str));
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(const_cast<char *>(str));
     return makeString(ptr, size);
 }
 
@@ -620,12 +681,18 @@ Element::makeNumber(boost::shared_ptr<amf::Buffer> buf)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeNumber(Network::byte_t *data)
+Element::makeNumber(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     double num = *reinterpret_cast<const double*>(data);
     _type = Element::NUMBER_AMF0;
-    check_buffer(AMF0_NUMBER_SIZE);
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *_buffer = num;
     
     return *this;
@@ -641,7 +708,13 @@ Element::makeNumber(double num)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::NUMBER_AMF0;
-    check_buffer(AMF0_NUMBER_SIZE);
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *_buffer = num;
 
     return *this;
@@ -662,17 +735,23 @@ Element::makeNumber(const string &name, double num)
     return makeNumber(num);
 }
 
-/// \overload Element::makeNumber(const std::string &name, gnash::Network::byte_t *data);
+/// \overload Element::makeNumber(const std::string &name, boost::uint8_t *data);
 ///		The size isn't needed as a double is always the same size.
 Element &
-Element::makeNumber(const std::string &name, gnash::Network::byte_t *data)
+Element::makeNumber(const std::string &name, boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     if (name.size()) {
         setName(name);
     }
     _type = Element::NUMBER_AMF0;
-    check_buffer(AMF0_NUMBER_SIZE);
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     *_buffer = data;
     return *this;
 }
@@ -687,8 +766,14 @@ Element::makeBoolean(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::BOOLEAN_AMF0;
-    check_buffer(sizeof(bool));
-    *(_buffer->reference()) = flag;
+    try {
+	check_buffer(1);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
+    *_buffer = flag;
 
     return *this;
 }
@@ -717,7 +802,7 @@ Element::makeBoolean(const string &name, bool flag)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeBoolean(Network::byte_t *data)
+Element::makeBoolean(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     bool flag = *reinterpret_cast<const bool*>(data);
@@ -733,6 +818,7 @@ Element::makeUndefined()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::UNDEFINED_AMF0;
+
     return *this;
 }
 
@@ -858,6 +944,13 @@ Element::makeXMLObject()
     _type = Element::XML_OBJECT_AMF0;
     return *this;
 }
+Element &
+Element::makeXMLObject(boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::XML_OBJECT_AMF0;
+    return *this;
+}
 
 /// \brief Make this Element a Property with an XML Object as the value.
 ///
@@ -918,6 +1011,15 @@ Element::makeTypedObject(const std::string &name)
     return *this;
 }
 
+Element &
+Element::makeTypedObject()
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::TYPED_OBJECT_AMF0;  
+
+    return *this;
+}
+
 /// \brief Make this Element a Property with an Typed Object as the value.
 ///
 /// @param data A real pointer to the raw data to use as the value.
@@ -926,12 +1028,12 @@ Element::makeTypedObject(const std::string &name)
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeTypedObject(Network::byte_t *data, size_t size)
+Element::makeTypedObject(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT_AMF0;
-    check_buffer(size);
-    _buffer->copy(data, size);
+//     check_buffer(size);
+//     _buffer->copy(data, size);
     return *this;
 }
 
@@ -954,11 +1056,17 @@ Element::makeReference()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeReference(Network::byte_t *indata, size_t size)
+Element::makeReference(boost::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE_AMF0;
-    check_buffer(size);
+    try {
+	check_buffer(size);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
     _buffer->copy(indata, size);
     return *this;
 }
@@ -982,7 +1090,7 @@ Element::makeMovieClip()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeMovieClip(Network::byte_t *indata, size_t size)
+Element::makeMovieClip(boost::uint8_t *indata, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::MOVIECLIP_AMF0;
@@ -1133,12 +1241,10 @@ Element::makeUnsupported()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeUnsupported(Network::byte_t *data, size_t size)
+Element::makeUnsupported(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;    
     _type = Element::UNSUPPORTED_AMF0;
-    check_buffer(size);
-    _buffer->copy(data, size);
     return *this;
 }
 
@@ -1161,12 +1267,12 @@ Element::makeLongString()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeLongString(Network::byte_t *indata, size_t size)
+Element::makeLongString(boost::uint8_t *indata)
 {
 //    GNASH_REPORT_FUNCTION;    
     _type = Element::LONG_STRING_AMF0;
-    check_buffer(size);
-    _buffer->copy(indata, size);
+//     check_buffer(size);
+//     _buffer->copy(indata, size);
     return *this;
 }
 
@@ -1180,6 +1286,13 @@ Element::makeRecordSet()
     _type = Element::RECORD_SET_AMF0;
     return *this;
 }
+Element &
+Element::makeRecordSet(boost::uint8_t *data)
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::RECORD_SET_AMF0;
+    return *this;
+}
 
 /// \brief Make this Element a Property with a Date as the value.
 ///
@@ -1187,14 +1300,41 @@ Element::makeRecordSet()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeDate(Network::byte_t *date)
+Element::makeDate()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::DATE_AMF0;
-    size_t size = sizeof(long);
-    check_buffer(size);
-    _buffer->copy(date, sizeof(long));
-    return makeNumber(date);
+
+    return *this;
+}
+
+Element &
+Element::makeDate(boost::uint8_t *date)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    makeNumber(date);
+    _type = Element::DATE_AMF0;
+
+    return *this;
+}
+
+Element &
+Element::makeDate(double date)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&date);
+    _type = Element::DATE_AMF0;
+    try {
+	check_buffer(AMF0_NUMBER_SIZE);
+    } catch (std::exception& e) {
+	log_error("%s", e.what());
+	return *this;
+    }
+    
+    *_buffer = date;
+
+    return *this;
 }
 
 /// \brief Get the number of bytes in the name of this Element.
@@ -1235,12 +1375,12 @@ Element::setName(const string &str)
 ///
 /// @return nothing.
 ///
-/// @remarks This add a NULL string terminator so the name can be printed.
+/// @remarks This adds a NULL string terminator so the name can be printed.
 void
 Element::setName(const char *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(const_cast<char *>(name));
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(const_cast<char *>(name));
     return setName(ptr, size);
 }
 
@@ -1253,9 +1393,9 @@ Element::setName(const char *name, size_t size)
 ///
 /// @return nothing.
 ///
-/// @remarks This add a NULL string terminator so the name can be printed.
+/// @remarks This adds a NULL string terminator so the name can be printed.
 void
-Element::setName(Network::byte_t *name, size_t size)
+Element::setName(boost::uint8_t *name, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     if ((size > 0) && (name != 0)) {
@@ -1270,9 +1410,8 @@ Element::setName(Network::byte_t *name, size_t size)
 }
 
 /// \brief Make sure the Buffer used for storing data is big enough.
-///		This will force a Buffer::resize() is the existing
-///		Buffer used to store the data isn't big enough to hold
-///		the new size.
+///		This will force an exception if the Buffer used to
+//		store the data isn't big enough to hold	the new size.
 ///
 /// @param size The minimum size the buffer needs to be.
 ///
@@ -1284,8 +1423,8 @@ Element::check_buffer(size_t size)
     if (_buffer == 0) {
 	_buffer.reset(new Buffer(size));
     } else {
-	if (_buffer->size() != size) {
-	    _buffer->resize(size);
+	if (_buffer->size() < size) {
+	    throw ParserException("Buffer not big enough, try resizing!");
 	}
     }
 }
@@ -1297,11 +1436,14 @@ Element::dump(std::ostream& os) const
 {
 //    GNASH_REPORT_FUNCTION;
     
-    if (_name) {
- 	os << "Element name: " << _name << ", data length is " << getDataSize() << endl;
-    }
-
     os << astype_str[_type] << ": ";
+    if (_name) {
+ 	os << " property name is: " << _name << ", ";
+    } else {
+ 	os << "(no name)";
+    }
+    os << endl << "data length is " << getDataSize() << endl;
+
 
     switch (_type) {
       case Element::NUMBER_AMF0:
@@ -1332,6 +1474,8 @@ Element::dump(std::ostream& os) const
       case Element::RECORD_SET_AMF0:
       case Element::XML_OBJECT_AMF0:
       case Element::TYPED_OBJECT_AMF0:
+	  cerr << endl;
+	  break;
       case Element::AMF3_DATA:
 	  if (getDataSize() != 0) {
 	      log_debug("FIXME: got AMF3 data!");
@@ -1350,9 +1494,11 @@ Element::dump(std::ostream& os) const
 	  break;
     }
 
-//     if (_buffer) {
-// 	_buffer->dump();
-//     }
+    if (_type != Element::BOOLEAN_AMF0) {
+	if (_buffer) {
+	    _buffer->dump();
+	}
+    }
 
     if (_properties.size() > 0) {
 	vector<boost::shared_ptr<Element> >::const_iterator ait;

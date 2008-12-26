@@ -34,7 +34,7 @@
 namespace gnash
 {
 
-const Network::byte_t RTMP_HANDSHAKE = 0x3;
+const boost::uint8_t RTMP_HANDSHAKE = 0x3;
 const int  RTMP_BODY_SIZE = 1536;
 const int  MAX_AMF_INDEXES = 64;
 
@@ -63,8 +63,8 @@ const char TERMINATOR = 0x09;
 // The third and fourth bytes form an integer value that specifies the
 // number of headers.
 typedef struct {
-    gnash::Network::byte_t version;
-    gnash::Network::byte_t source;
+    boost::uint8_t version;
+    boost::uint8_t source;
     boost::uint32_t  count;
 } amfpacket_t;
 
@@ -211,7 +211,7 @@ public:
     virtual ~RTMP();
 
     // Decode
-    rtmp_head_t *decodeHeader(gnash::Network::byte_t *header);
+    rtmp_head_t *decodeHeader(boost::uint8_t *header);
     rtmp_head_t *decodeHeader(boost::shared_ptr<amf::Buffer> data);
     boost::shared_ptr<amf::Buffer> encodeHeader(int amf_index, rtmp_headersize_e head_size,
 			      size_t total_size, content_types_e type, RTMPMsg::rtmp_source_e routing);
@@ -225,7 +225,7 @@ public:
     void addProperty(std::string &name, boost::shared_ptr<amf::Element> el);
     boost::shared_ptr<amf::Element> getProperty(const std::string &name);
     void setHandler(Handler *hand) { _handler = hand; };
-    int headerSize(gnash::Network::byte_t header);
+    int headerSize(boost::uint8_t header);
 
     rtmp_head_t *getHeader()    { return &_header; };
     int getHeaderSize()         { return _header.head_size; }; 
@@ -236,10 +236,10 @@ public:
     int getMysteryWord()        { return _mystery_word; };
 
     // Decode an RTMP message
-    RTMPMsg *decodeMsgBody(Network::byte_t *data, size_t size);
+    RTMPMsg *decodeMsgBody(boost::uint8_t *data, size_t size);
     RTMPMsg *decodeMsgBody(boost::shared_ptr<amf::Buffer> buf);
     
-    virtual rtmp_ping_t *decodePing(Network::byte_t *data);
+    virtual rtmp_ping_t *decodePing(boost::uint8_t *data);
     rtmp_ping_t *decodePing(boost::shared_ptr<amf::Buffer> buf);
     
     // These are handlers for the various types

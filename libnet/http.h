@@ -140,14 +140,18 @@ public:
     bool checkEntityFields(amf::Buffer &buf);
     bool checkGeneralFields(amf::Buffer &buf);
 
+    // Parse an Echo Request message coming from the Red5 echo_test.
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
-    gnash::Network::byte_t *processHeaderFields(amf::Buffer &buf);
+    boost::uint8_t *processHeaderFields(amf::Buffer &buf);
     
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
-    size_t NumOfFields() { _fields.size(); };
+    size_t NumOfFields() { return _fields.size(); };
     void clearFields() { _fields.clear(); };
 
     // Get an array of values for header field 'name'.
@@ -166,13 +170,13 @@ public:
     // These methods extract data from an RTMPT message. RTMP is an
     // extension to HTTP that adds commands to manipulate the
     // connection's persistance.
-    rtmpt_cmd_e extractRTMPT(gnash::Network::byte_t *data);
+    rtmpt_cmd_e extractRTMPT(boost::uint8_t *data);
     rtmpt_cmd_e extractRTMPT(amf::Buffer &data)
 	{ return extractRTMPT(data.reference()); };
 
     // Examine the beginning of the data for an HTTP request command
     // like GET or POST, etc...
-    http_method_e extractCommand(gnash::Network::byte_t *data);
+    http_method_e extractCommand(boost::uint8_t *data);
     http_method_e extractCommand(amf::Buffer &data)
 	{ return extractCommand(data.reference()); };    
     
@@ -194,14 +198,15 @@ public:
     ///		the common form.
     amf::Buffer &formatCommon(const std::string &data);
 
-
     amf::Buffer &formatHeader(DiskStream::filetype_e type, size_t filesize,
 			    http_status_e code);
     amf::Buffer &formatHeader(size_t filesize, http_status_e type);
     amf::Buffer &formatHeader(http_status_e type);
     amf::Buffer &formatRequest(const std::string &url, http_method_e req);
     // format a response to the 'echo' test used for testing Gnash.
-    amf::Buffer &formatEcho(const std::string &num, amf::Buffer &data);
+    amf::Buffer &formatEchoResponse(const std::string &num, amf::Element &el);
+    amf::Buffer &formatEchoResponse(const std::string &num, amf::Buffer &data);
+    amf::Buffer &formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size);
 
     amf::Buffer &formatMethod(const std::string &data)
  	{return formatCommon("Method: " + data); };
@@ -243,7 +248,7 @@ public:
     amf::Buffer &formatErrorResponse(http_status_e err);
     
     // Return the header that's been built up.
-    Network::byte_t *getHeader() { return _buffer.reference(); };
+    boost::uint8_t *getHeader() { return _buffer.reference(); };
 
     // Return the header that's been built up.
     amf::Buffer &getBuffer() { return _buffer; };
@@ -276,11 +281,11 @@ public:
     /// @return The number of bytes sent
     int DSOEXPORT sendMsg();
     int DSOEXPORT sendMsg(int fd);
-    int DSOEXPORT sendMsg(const Network::byte_t *data, size_t size);
+    int DSOEXPORT sendMsg(const boost::uint8_t *data, size_t size);
     int DSOEXPORT sendMsg(boost::shared_ptr<amf::Buffer> &buf)
 	{ return sendMsg(buf->reference(), buf->size()); };
     int DSOEXPORT sendMsg(std::stringstream &sstr)
-	{ return sendMsg(reinterpret_cast<const Network::byte_t *>(sstr.str().c_str()), sstr.str().size()); };
+	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
     
     // These accessors are used mostly just for debugging.
     bool keepAlive() { return _keepalive; }

@@ -26,7 +26,7 @@
 #include "buffer.h"
 #include "amf.h"
 #include "log.h"
-#include "network.h"
+//#include "network.h"
 #include "GnashException.h"
 
 using namespace std;
@@ -43,8 +43,8 @@ namespace amf
 /// @param digit The digit as a hex value
 ///
 /// @return The byte as a decimal value.
-Network::byte_t
-Buffer::hex2digit (Network::byte_t digit)
+boost::uint8_t
+Buffer::hex2digit (boost::uint8_t digit)
 {  
     if (digit == 0)
         return 0;
@@ -73,10 +73,10 @@ Buffer::hex2mem(const string &str)
 //    GNASH_REPORT_FUNCTION;
     size_t count = str.size();
     size_t size = (count/3) + 1;
-    Network::byte_t ch = 0;
+    boost::uint8_t ch = 0;
     
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
-    Network::byte_t *end = ptr + count;
+    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
+    boost::uint8_t *end = ptr + count;
 
     init(size);
     
@@ -107,7 +107,7 @@ Buffer::init(size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     if (!_data) {
-	_data.reset(new Network::byte_t[size]);
+	_data.reset(new boost::uint8_t[size]);
 	_seekptr = _data.get();
     }
     _seekptr = _data.get();
@@ -126,8 +126,8 @@ Buffer::Buffer()
     : _seekptr(0)
 {
 //    GNASH_REPORT_FUNCTION;
-    _nbytes = gnash::NETBUFSIZE;
-    init(gnash::NETBUFSIZE);
+    _nbytes = amf::NETBUFSIZE;
+    init(amf::NETBUFSIZE);
 }
     
 /// \brief Create a new Buffer with a size other than the default
@@ -176,7 +176,7 @@ Buffer::~Buffer()
 ///		
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::copy(Network::byte_t *data, size_t nbytes)
+Buffer::copy(boost::uint8_t *data, size_t nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
     if (_data) {
@@ -197,7 +197,7 @@ Buffer::copy(Network::byte_t *data, size_t nbytes)
 ///		
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::append(gnash::Network::byte_t *data, size_t nbytes)
+Buffer::append(boost::uint8_t *data, size_t nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_data) {
@@ -221,7 +221,7 @@ Buffer &
 Buffer::operator+=(Buffer &buf)
 {
 // //    GNASH_REPORT_FUNCTION;
-    append(buf.reference(), buf.size());
+    append(buf.reference(), buf.allocated());
     return *this;
 }
 
@@ -235,7 +235,7 @@ Buffer &
 Buffer::operator+=(amf::Element::amf0_type_e type)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t nb = static_cast<Network::byte_t>(type);
+    boost::uint8_t nb = static_cast<boost::uint8_t>(type);
     
     return operator+=(nb);
 }
@@ -249,7 +249,7 @@ Buffer &
 Buffer::operator+=(char byte)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t nb = static_cast<Network::byte_t>(byte);
+    boost::uint8_t nb = static_cast<boost::uint8_t>(byte);
     return operator+=(nb);
 }
 
@@ -262,7 +262,7 @@ Buffer &
 Buffer::operator+=(bool flag)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t nb = static_cast<Network::byte_t>(flag);
+    boost::uint8_t nb = static_cast<boost::uint8_t>(flag);
     return operator+=(nb);
 }
 
@@ -272,12 +272,12 @@ Buffer::operator+=(bool flag)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator+=(Network::byte_t byte)
+Buffer::operator+=(boost::uint8_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     if ((_seekptr + 1) <= (_data.get() + _nbytes)) {
 	*_seekptr = byte;
-	_seekptr += sizeof(char);
+	_seekptr += sizeof(boost::uint8_t);
     }
     return *this;
 }
@@ -292,7 +292,7 @@ Buffer &
 Buffer::operator+=(const char *str)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
+    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str));
     return append(ptr, strlen(str));
     
 }
@@ -307,7 +307,7 @@ Buffer &
 Buffer::operator+=(const std::string &str)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
     return append(ptr, str.size());
     
 }
@@ -321,7 +321,7 @@ Buffer &
 Buffer::operator+=(double num)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&num);
     return append(ptr, AMF0_NUMBER_SIZE);
 }
 
@@ -334,7 +334,7 @@ Buffer &
 Buffer::operator+=(boost::uint16_t length)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&length);
     return append(ptr, sizeof(boost::uint16_t));
 }
 
@@ -347,7 +347,7 @@ Buffer &
 Buffer::operator+=(boost::uint32_t length)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&length);
     return append(ptr, sizeof(boost::uint32_t));
 }
 
@@ -360,7 +360,7 @@ Buffer &
 Buffer::operator+=(boost::shared_ptr<Buffer> &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    append(buf->reference(), buf->size());
+    append(buf->reference(), buf->allocated());
     return *this;
 }
 
@@ -392,7 +392,7 @@ Buffer &
 Buffer::operator=(const std::string &str)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str.c_str()));
+    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
     return copy(ptr, str.size());
 }
 
@@ -400,7 +400,7 @@ Buffer &
 Buffer::operator=(const char *str)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = const_cast<Network::byte_t *>(reinterpret_cast<const Network::byte_t *>(str));
+    boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str));
     return copy(ptr, strlen(str));
 }
 
@@ -414,7 +414,7 @@ Buffer &
 Buffer::operator=(double num)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&num);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&num);
     return copy(ptr, AMF0_NUMBER_SIZE);
 }
 
@@ -428,7 +428,7 @@ Buffer &
 Buffer::operator=(boost::uint16_t length)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&length);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&length);
     return copy(ptr, sizeof(boost::uint16_t));
 }
 
@@ -441,8 +441,8 @@ Buffer::operator=(boost::uint16_t length)
 Buffer &
 Buffer::operator=(amf::Element::amf0_type_e type)
 {
-    Network::byte_t nb = static_cast<Network::byte_t>(type);
-    return operator+=(nb);
+    boost::uint8_t nb = static_cast<boost::uint8_t>(type);
+    return operator=(nb);
 }
 
 /// Copy a boolean into the buffer. This overwrites all data, and
@@ -454,7 +454,7 @@ Buffer::operator=(amf::Element::amf0_type_e type)
 Buffer &
 Buffer::operator=(bool flag)
 {
-    Network::byte_t nb = static_cast<Network::byte_t>(flag);
+    boost::uint8_t nb = static_cast<boost::uint8_t>(flag);
     return operator=(nb);
 }
 
@@ -465,7 +465,7 @@ Buffer::operator=(bool flag)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(gnash::Network::byte_t byte)
+Buffer::operator=(boost::uint8_t byte)
 {
 //    GNASH__FUNCTION;
     return copy(&byte, 1);
@@ -478,7 +478,7 @@ Buffer::operator=(gnash::Network::byte_t byte)
 /// 
 /// @return A reference to a Buffer.
 Buffer &
-Buffer::operator=(gnash::Network::byte_t *data)
+Buffer::operator=(boost::uint8_t *data)
 {
 //    GNASH_REPORT_FUNCTION;
     if (data) {
@@ -531,11 +531,11 @@ Buffer::operator==(Buffer &buf)
 /// @param byte The byte to remove from the buffer.
 ///
 /// @return A real pointer to the base address of the buffer.
-Network::byte_t *
-Buffer::remove(Network::byte_t c)
+boost::uint8_t *
+Buffer::remove(boost::uint8_t c)
 {
 //    GNASH_REPORT_FUNCTION;
-    Network::byte_t *start = std::find(begin(), end(), c);
+    boost::uint8_t *start = std::find(begin(), end(), c);
 
 //    log_debug("Byte is at %x", (void *)start);
     
@@ -559,7 +559,7 @@ Buffer::remove(Network::byte_t c)
 ///		Buffer
 ///
 /// @return A real pointer to the base address of the Buffer.
-Network::byte_t *
+boost::uint8_t *
 Buffer::remove(int start)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -583,7 +583,7 @@ Buffer::remove(int start)
 /// @param range The amount of bytes to remove from the Buffer.
 ///
 /// @return A real pointer to the base address of the Buffer.
-Network::byte_t *
+boost::uint8_t *
 Buffer::remove(int start, int range)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -636,13 +636,13 @@ Buffer::resize()
 Buffer &
 Buffer::resize(size_t size)
 {
-    GNASH_REPORT_FUNCTION;
-    boost::scoped_array<gnash::Network::byte_t> tmp;
+//    GNASH_REPORT_FUNCTION;
+    boost::scoped_array<boost::uint8_t> tmp;
 
     // If we don't have any data yet in this buffer, resizing is cheap, as
     // we don't havce to copy any data.
     if (_seekptr == _data.get()) {
-	_data.reset(new Network::byte_t[size]);
+	_data.reset(new boost::uint8_t[size]);
 	_nbytes= size;
 	return *this;
     }
@@ -678,7 +678,7 @@ Buffer::resize(size_t size)
 	    log_error("amf::Buffer::resize(%d): Truncating data (%d bytes) while resizing!", size, used - size);
 	    used = size;
 	}
-	Network::byte_t *newptr = new Network::byte_t[size];
+	boost::uint8_t *newptr = new boost::uint8_t[size];
 	std::copy(_data.get(), _data.get() + used, newptr);
 	_data.reset(newptr);
 	

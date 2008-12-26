@@ -69,7 +69,9 @@ CLEANFILES =  \
 	site.exp.bak \
 	testrun.* \
 	foo* \
-	wget-log*
+	*.bin* \
+	wget-log* \
+	gateway*
 
 check-DEJAGNU: site-update
 	@runtest=$(RUNTEST); \

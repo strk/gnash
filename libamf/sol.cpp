@@ -30,7 +30,7 @@
 #include <fstream>
 #include <cassert>
 
-#include "network.h"
+//#include "network.h"
 #include "element.h"
 #include "amf.h"
 #include "buffer.h"
@@ -180,7 +180,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // so we swap it first.
     boost::uint16_t swapped = SOL_MAGIC;
     swapped = htons(swapped);
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&swapped);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -191,7 +191,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     filesize += name.size() + 16;
     boost::uint32_t len = filesize;
     len = htonl(len);
-    ptr = reinterpret_cast<Network::byte_t *>(&len);
+    ptr = reinterpret_cast<boost::uint8_t *>(&len);
     for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -207,7 +207,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // then the 0x0004 bytes, also a mystery
     swapped = SOL_BLOCK_MARK;
     swapped = htons(swapped);
-    ptr = reinterpret_cast<Network::byte_t *>(&swapped);
+    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -221,12 +221,12 @@ SOL::formatHeader(const std::string &name, int filesize)
     //  First the length in two bytes
     swapped = name.size();
     swapped = htons(swapped);
-    ptr = reinterpret_cast<Network::byte_t *>(&swapped);
+    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
     // then the string itself
-    ptr = (Network::byte_t *)name.c_str();
+    ptr = (boost::uint8_t *)name.c_str();
     for (i=0; i<name.size(); i++) {
         _header.push_back(ptr[i]);
     }
@@ -265,7 +265,7 @@ SOL::writeFile(const string &filespec, const string &name)
         return false;
     }
     
-    vector<Network::byte_t>::iterator it;
+    vector<boost::uint8_t>::iterator it;
     vector<boost::shared_ptr<amf::Element> >::iterator ita; 
     AMF amf_obj;
     char *ptr;
@@ -289,7 +289,7 @@ SOL::writeFile(const string &filespec, const string &name)
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         boost::shared_ptr<Element> el = (*(ita));
         boost::shared_ptr<amf::Buffer> var = amf_obj.encodeProperty(el); 
-        //  Network::byte_t *var = amf_obj.encodeProperty(el, outsize); 
+        //  boost::uint8_t *var = amf_obj.encodeProperty(el, outsize); 
         if (!var) {
             continue;
         }
@@ -382,16 +382,16 @@ SOL::readFile(const std::string &filespec)
 
 	try {
 
-        Network::byte_t *ptr = 0;
+        boost::uint8_t *ptr = 0;
 
 	    ifstream ifs(filespec.c_str(), ios::binary);
 
         _filesize = st.st_size;
-        boost::scoped_array<Network::byte_t> buf(
-                new Network::byte_t[_filesize + sizeof(int)]);
+        boost::scoped_array<boost::uint8_t> buf(
+                new boost::uint8_t[_filesize + sizeof(int)]);
 
 	    ptr = buf.get();
-	    Network::byte_t* tooFar = buf.get() + _filesize;
+	    boost::uint8_t* tooFar = buf.get() + _filesize;
 	    
 	    bodysize = st.st_size - 6;
 	    _filespec = filespec;
