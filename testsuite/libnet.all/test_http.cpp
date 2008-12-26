@@ -658,7 +658,7 @@ usage (void)
 #else  // no DejaGnu support
 
 int
-main(int /*argc*/, char /* *argv[]*/)
+main(int /*argc*/, char**)
 {
   // nop
   return 0;  
