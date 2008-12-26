@@ -772,7 +772,7 @@ test_rtmpt (void)
         amf::Buffer &buf5 = http.formatEchoResponse(headers5[1]->getName(), *headers5[3]);
         string head5(reinterpret_cast<const char *>(buf5.reference()));
         const char *ptr5a = reinterpret_cast<const char *>(hex_res5->reference()+30);
-        const char *ptr5b = reinterpret_cast<const char *>(buf5.reference() + 123);
+        const char *ptr5b = reinterpret_cast<const char *>(buf5.reference() + 124);
         if (memcmp(ptr5a, ptr5b, amf::AMF0_NUMBER_SIZE) == 0) {
             runtest.pass("HTTP::formatEchoResponse(DATE Object)");
         } else {
