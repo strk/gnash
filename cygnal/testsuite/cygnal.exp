@@ -32,7 +32,7 @@ set timeout 600
 set file all
 set params ""
 
-set cport 6080;			# the port for the connection to Cygnal
+set cport 4080;			# the port for the connection to Cygnal
 set chost "localhost";		# the host to connect to
 set sid 0;			# the server ID
 
@@ -44,7 +44,7 @@ proc delete_files {} {
 
     # Get rid of old temp files created by testing,
     if {[file exists foo]} {
-	set junk [glob foo* wget-log* amf0*  *.bin* gateway* $chost:$cport]
+	set junk [glob foo* wget-log* amf0* *.bin* gateway* $chost:$cport]
 	if { $junk != "" } {
 	    catch "exec rm -fr $junk"
 	}
@@ -167,7 +167,7 @@ proc wpost { name options } {
     # --header="Content-Type: application/x-amf"
     verbose "Trying to wget POST to Cygnal -p -v --tries=3 --server-response --header=\"Content-Type: application/x-amf\" $options --post-file=$name http://$chost:$cport/echo/gateway" 2
 #    set where "[pwd]/${name}_barfoo"
-    spawn  wget -p -v --tries=3 --server-response  --post-file=$name --header 'Content-Type: application/x-amf' http://$chost:$cport/echo/gateway
+    spawn  wget -p -v --tries=3 --server-response  --post-file=$name --header "Content-Type: application/x-amf" http://$chost:$cport/echo/gateway
     set wid $spawn_id
     expect {
 	-i $wid "*Saving to: *" {
@@ -388,34 +388,56 @@ set requests  [glob -nocomplain $binsdir/*-request.bin]
 set responses [glob -nocomplain $binsdir/*-response.bin]
 
 # test with the Red5 echo tests
-foreach i $requests {
-    set pos [string last  "/" $i]
-    if { $pos > 0 } {
-	set j [string range $i $pos+1 end]
-    }
-#    set options "--header='Content-Type: application/x-amf' --post-file=$i"
-    if {$server_dead == "false"} {
-	set result [ wpost $i "" ]
-	if { $result == true } {
-	    pass "HTTP POST AMF0 $j, sent"
-	} else {
-	    fail "HTTP POST AMF0 $j, sent"
-	}
-    } else {
-	untested "HTTP POST AMF0 $j, sent"
-	untested "HTTP POST AMF0 $j got no response, not saved to $chost:$cport/gateway"
-	break;
-    }
 
-    set gotback "[string trimright $i "-request.bin"]-response.bin"
-    puts $gotback
-    if {[file exists $chost:$cport/echo/gateway]} {
-	pass "HTTP POST AMF0  got response, saved to $chost:$cport/gateway"
-# 	puts "[file size $chost:$cport/echo/gateway]"
-# set res [exec cmp $var $gotback]
-    } else {
-	fail "HTTP POST AMF0 $j got response, saved to $chost:$cport/gateway"
+set limit 10
+# Beat the living daylights out of Cygnal, it'll have to handle much worse.
+# There are limits to what we can do testing on just one machine, but this
+# catches quite a few problems that otherwise were hard to reproduce. There
+# are limits to what we can do on one single machine. Ultimately, this needs
+# to fire up tests running from multiple hosts in the build farm, which should
+# be totally doable in 
+#
+# Just as a note, I've found while testing that when running Cygnal in
+# single threaded mode, it can't keep up with hundreds of simultaneous
+# network connections, so many wgets processes all go zombie waiting to
+# get disconnected. So for single threaded mode, don't set the limit over
+# 10, it's just for testing protocol stuff anyway! Multi threaded testing
+# works mode works much better, I've had the limit set much higher.
+for { set k 0 } { $k <= $limit } { incr k } {
+    foreach i $requests {
+	set pos [string last  "/" $i]
+	if { $pos > 0 } {
+	    set j [string range $i $pos+1 end]
+	}
+	#    set options "--header='Content-Type: application/x-amf' --post-file=$i"
+	if {$server_dead == "false"} {
+	    set result [ wpost $i "" ]
+	    if { $result == true } {
+		pass "HTTP POST AMF0 $j, sent"
+	    } else {
+		fail "HTTP POST AMF0 $j, sent"
+	    }
+	} else {
+	    untested "HTTP POST AMF0 $j, sent"
+	    untested "HTTP POST AMF0 $j got no response, not saved to $chost:$cport/gateway"
+	    break;
+	}
+	
+	set gotback "[string trimright $i "-request.bin"]-response.bin"
+	puts $gotback
+	if {[file exists $chost:$cport/echo/gateway]} {
+	    pass "HTTP POST AMF0  got response, saved to $chost:$cport/gateway"
+	    # 	puts "[file size $chost:$cport/echo/gateway]"
+	    # set res [exec cmp $var $gotback]
+	} else {
+	    fail "HTTP POST AMF0 $j got response, saved to $chost:$cport/gateway"
+	}
     }
+    # if we don't sleep here and give the poor host machine a rest, it can't handle
+    # any more wget processes running at the same time. I was winding up with
+    # hundreds of zombies that eat my quad xeon machine with 4 gig of RAM!
+#    sleep 1
+#    catch "exec pkill. wget"
 }
 
 delete_files
