@@ -23,18 +23,12 @@
 #include "gnashconfig.h"
 #endif
 
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
-#endif
-
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "impl.h"
 #include "as_object.h" // for inheritance
 
-#include "MediaParser.h" // is this really needed for scoped_ptr ?
-#include "AudioDecoder.h" // is this really needed for scoped_ptr ?
-
 #include <boost/scoped_ptr.hpp>
+#include <boost/scoped_array.hpp>
 #include <boost/thread/mutex.hpp>
 
 // Forward declarations
@@ -46,6 +40,8 @@ namespace gnash {
     }
     namespace media {
         class MediaHandler;
+        class MediaParser;
+        class AudioDecoder;
     }
 }
 
@@ -54,9 +50,16 @@ namespace gnash {
 // Forward declarations
 class fn_call;
   
-class Sound : public as_object {
+class Sound_as : public as_object
+{
+
 public:
-    Sound();
+
+    Sound_as();
+
+    ~Sound_as();
+
+    static void init(as_object& global);
 
     /// Make this sound control the given character
     //
@@ -65,7 +68,6 @@ public:
     ///
     void attachCharacter(character* attachedChar);
 
-    ~Sound();
     void attachSound(int si, const std::string& name);
 
     /// Get number of bytes loaded from the external sound (if any)
@@ -188,8 +190,6 @@ private:
         return _inputStream!=0;
     }
 };
-
-void sound_class_init(as_object& global);
 
 } // end of gnash namespace
 

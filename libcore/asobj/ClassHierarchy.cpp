@@ -24,7 +24,7 @@
 #include "array.h"
 #include "AsBroadcaster.h"
 #include "Accessibility_as.h"
-#include "Boolean.h"
+#include "Boolean_as.h"
 #include "Camera.h"
 #include "Color_as.h"
 #include "ContextMenu.h"
@@ -35,7 +35,7 @@
 #include "String_as.h"
 #include "Key_as.h"
 #include "LoadVars_as.h"
-#include "LocalConnection.h"
+#include "LocalConnection_as.h"
 #include "Microphone.h"
 #include "Number_as.h"
 #include "Object.h"
@@ -47,7 +47,7 @@
 #include "NetStream_as.h"
 #include "Selection_as.h"
 #include "SharedObject_as.h"
-#include "Sound.h"
+#include "Sound_as.h"
 #include "Stage_as.h"
 #include "System_as.h"
 #include "TextSnapshot_as.h"
@@ -296,7 +296,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, NS_UNKNOWN, 5 },
-	{ sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },
+	{ Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },
 	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
 	{ date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XML_as::init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
@@ -313,7 +313,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
 	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
 	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
-	{ localconnection_class_init, NSV::CLASS_LOCAL_CONNECTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
+	{ LocalConnection_as::init, NSV::CLASS_LOCAL_CONNECTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
 	{ customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT, NSV::NS_ADOBE_UTILS, 6 },
 	{ netconnection_class_init, NSV::CLASS_NET_CONNECTION, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
 	{ netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },

@@ -31,7 +31,7 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 #include "log.h"
-#include "LocalConnection.h"
+#include "LocalConnection_as.h"
 #include "network.h"
 #include "fn_call.h"
 #include "builtin_function.h"
@@ -90,11 +90,11 @@ namespace {
     as_object* getLocalConnectionInterface();
 }
 
-// \class LocalConnection
+// \class LocalConnection_as
 /// \brief Open a connection between two SWF movies so they can send
 /// each other Flash Objects to be executed.
 ///
-LocalConnection::LocalConnection()
+LocalConnection_as::LocalConnection_as()
     :
     as_object(getLocalConnectionInterface()),
     _connected(false),
@@ -103,13 +103,13 @@ LocalConnection::LocalConnection()
     log_debug("The domain for this host is: %s", _domain);
 }
 
-LocalConnection::~LocalConnection()
+LocalConnection_as::~LocalConnection_as()
 {
 }
 
 /// \brief Closes (disconnects) the LocalConnection object.
 void
-LocalConnection::close()
+LocalConnection_as::close()
 {
     _connected = false;
 #ifndef NETWORK_CONN
@@ -124,7 +124,7 @@ LocalConnection::close()
 /// send() command to signify which local connection to send the
 /// object to.
 void
-LocalConnection::connect(const std::string& name)
+LocalConnection_as::connect(const std::string& name)
 {
 
     assert(!name.empty());
@@ -158,7 +158,7 @@ LocalConnection::connect(const std::string& name)
 /// "www". As of v7, the behaviour is to return the full host
 /// name. Gnash supports both behaviours based on the version.
 std::string
-LocalConnection::getDomain()
+LocalConnection_as::getDomain()
 {
     
     URL url(_vm.getRoot().getOriginalURL());
@@ -199,7 +199,7 @@ LocalConnection::getDomain()
 }
 
 void
-localconnection_class_init(as_object& glob)
+LocalConnection_as::init(as_object& glob)
 {
 	builtin_function* ctor=getLocalConnectionConstructor();
 
@@ -218,7 +218,7 @@ namespace {
 as_value
 localconnection_new(const fn_call& /* fn */)
 {
-    LocalConnection *obj = new LocalConnection;
+    LocalConnection_as *obj = new LocalConnection_as;
 
     return as_value(obj);
 }
@@ -228,8 +228,8 @@ as_value
 localconnection_close(const fn_call& fn)
 {
     
-    boost::intrusive_ptr<LocalConnection> ptr =
-        ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
     
     ptr->close();
     return as_value();
@@ -239,8 +239,8 @@ localconnection_close(const fn_call& fn)
 as_value
 localconnection_connect(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection> ptr =
-        ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
 
     // If already connected, don't try again until close() is called.
     if (ptr->connected()) return false;
@@ -277,8 +277,8 @@ localconnection_connect(const fn_call& fn)
 as_value
 localconnection_domain(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection> ptr =
-        ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
 
     return as_value(ptr->domain());
 }
@@ -289,8 +289,8 @@ localconnection_domain(const fn_call& fn)
 as_value
 localconnection_send(const fn_call& fn)
 {
-    boost::intrusive_ptr<LocalConnection> ptr =
-        ensureType<LocalConnection>(fn.this_ptr);
+    boost::intrusive_ptr<LocalConnection_as> ptr =
+        ensureType<LocalConnection_as>(fn.this_ptr);
 
     // At least 2 args (connection name, function) required.
     if (fn.nargs < 2) {

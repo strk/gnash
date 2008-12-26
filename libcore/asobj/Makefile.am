@@ -44,7 +44,7 @@ AM_CPPFLAGS = \
 libgnashasobjs_la_SOURCES = \
 	AsBroadcaster.cpp \
 	Accessibility_as.cpp \
-	Boolean.cpp \
+	Boolean_as.cpp \
 	Camera.cpp \
 	ClassHierarchy.cpp \
 	Color_as.cpp \
@@ -55,7 +55,7 @@ libgnashasobjs_la_SOURCES = \
 	Global.cpp \
 	Key_as.cpp	\
 	LoadVars_as.cpp \
-	LocalConnection.cpp\
+	LocalConnection_as.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
 	Mouse_as.cpp \
@@ -66,7 +66,7 @@ libgnashasobjs_la_SOURCES = \
 	PlayHead.cpp \
 	Selection_as.cpp \
 	SharedObject_as.cpp\
-	Sound.cpp \
+	Sound_as.cpp \
 	Stage_as.cpp \
 	System_as.cpp \
 	TextFormat_as.cpp \
@@ -109,7 +109,7 @@ libgnashasobjs_la_SOURCES = \
 noinst_HEADERS = \
 	AsBroadcaster.h \
 	Accessibility_as.h \
-	Boolean.h \
+	Boolean_as.h \
 	Camera.h \
 	ClassHierarchy.h \
 	Color_as.h	\
@@ -121,7 +121,7 @@ noinst_HEADERS = \
 	Global.h\
 	Key_as.h \
 	LoadVars_as.h \
-	LocalConnection.h\
+	LocalConnection_as.h\
 	Microphone.h \
 	Mouse_as.h	\
 	MovieClipLoader.h \
@@ -133,7 +133,7 @@ noinst_HEADERS = \
 	prophelper.h \
 	Selection_as.h \
 	SharedObject_as.h \
-	Sound.h \
+	Sound_as.h \
 	Stage_as.h	\
 	System_as.h \
 	TextFormat_as.h \
