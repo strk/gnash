@@ -29,7 +29,6 @@
 #include "SimpleBuffer.h"
 
 #include "as_object.h"
-#include "array.h"
 #include "element.h"
 #include "VM.h"
 
