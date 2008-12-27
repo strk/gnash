@@ -95,6 +95,25 @@ Buffer::hex2mem(const string &str)
     return *this;
 }
 
+// Convert each byte into its hex representation
+std::string
+Buffer::hexify ()
+{
+    return gnash::hexify(_data.get(), allocated(), false);
+}
+
+std::string
+Buffer::hexify (bool ascii)
+{
+    return gnash::hexify(_data.get(), allocated(), ascii);
+}
+
+std::string
+Buffer::hexify (amf::Buffer &buf, bool ascii)
+{
+    return gnash::hexify(buf.reference(), buf.allocated(), ascii);
+}
+
 /// \brief Initialize a block of memory for this buffer.
 ///		This should only be used internally by the Buffer
 ///		class.

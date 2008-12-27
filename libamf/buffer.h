@@ -79,6 +79,21 @@ public:
     ///		primary used only for testing to create binary data
     ///		from an easy to read and edit format.
     Buffer &hex2mem(const std::string &str);
+
+    /// \brief Output a debug version of the Buffer's data.
+    ///		This just calls the gnash::Logfile::hexify(), but is
+    ///		more convienient as we don't have to extract the pointer
+    ///		and the byte count to hexify() a Buffer.
+    ///
+    /// @param ascii True if ASCII characters should be printed, false
+    ///		if only hex is desired.
+    ///
+    /// @param buf The buffer to hexify().
+    ///
+    /// @return A string of the debug output
+    std::string hexify();
+    std::string hexify(bool ascii);
+    std::string hexify(Buffer &buf, bool ascii);
     
     /// \brief Clear the contents of the buffer by setting all the bytes to
     ///		zeros.
