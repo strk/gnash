@@ -42,7 +42,6 @@
 # include <io.h>
 #endif
 
-using namespace std;
 
 #define PADDING_BYTES 64
 #define READ_CHUNKS 64
