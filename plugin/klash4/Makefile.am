@@ -17,20 +17,20 @@
 
 AUTOMAKE_OPTIONS = 
 
-if KPARTS3
+if KPARTS4
 AM_CPPFLAGS = \
-	$(KDE3_CFLAGS) \
-	$(QT3_CFLAGS) \
+	$(KDE4_CFLAGS) \
+	$(QT4_CFLAGS) \
 	$(X11_CFLAGS) \
 	-DGNASHBINDIR=\"${bindir}\"
 
-plugindir   = $(KDE3_PLUGINDIR)
-kde_servicesdir = $(KDE3_SERVICESDIR)
-kde_rcdir       = $(KDE3_APPSDATADIR)
+plugindir   = $(KDE4_PLUGINDIR)
+kde_servicesdir = $(KDE4_SERVICESDIR)
+kde_rcdir       = $(KDE4_APPSDATADIR)
 #$(prefix)/share/apps/klash
-kde_appsdatadir = $(KDE3_APPSDATADIR)
+kde_appsdatadir = $(KDE4_APPSDATADIR)
 #$(prefix)/share/apps/klash
-kde_configdir   = $(KDE3_CONFIGDIR)
+kde_configdir   = $(KDE4_CONFIGDIR)
 #$(prefix)/share/config
 
 plugin_LTLIBRARIES= libklashpart.la
@@ -38,9 +38,9 @@ plugin_LTLIBRARIES= libklashpart.la
 libklashpart_la_SOURCES = klash_part.cpp klash_part.h
 libklashpart_la_DEPENDENCIES = klash_part.moc
 if PLUGIN_LINK_UNDEFINED
-libklashpart_la_LDFLAGS = -avoid-version -L$(plugindir)
+libklashpart_la_LDFLAGS = -avoid-version -L$(plugindir) $(KDE4_LIBS) $(QT4_LIBS)
 else
-libklashpart_la_LDFLAGS = -module -avoid-version -L$(plugindir)
+libklashpart_la_LDFLAGS = -module -avoid-version -L$(plugindir) $(KDE4_LIBS) $(QT4_LIBS)
 endif
 
 dist_kde_services_DATA = klash_part.desktop
@@ -54,11 +54,11 @@ BUILT_SOURCES = klash_part.moc
 CLEANFILES = klash_part.moc
 
 klash_part.moc: $(srcdir)/klash_part.h
-	@if test x"$(MOC3)" != x; then \
-	  echo "Generating MOC 3.x file..."; \
-	  $(MOC3) $(srcdir)/klash_part.h -o klash_part.moc; \
+	@if test x"$(MOC4)" != x; then \
+	  echo "Generating MOC 4.x file..."; \
+	$(MOC4) $(srcdir)/klash_part.h -o klash_part.moc; \
 	else  \
-	  echo "WARNING: Install QT 3.x moc tool! Linking to default MOC file"; \
+	  echo "WARNING: Install QT 4.x moc tool! Linking to default MOC file"; \
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
 	fi
 
@@ -77,7 +77,7 @@ test_perms:
 	  if test -d $(DESTDIR)$(kde_servicesdir); then \
 	    echo "WARNING: Improper permissions for $(DESTDIR)$(kde_appsdatadir) and $(DESTDIR)$(kde_servicesdir)!"; \
 	    echo "You probably need to be root"; \
-	    echo "Or configure with --with-kde3-prefix= set to a writable directory"; \
+	    echo "Or configure with --with-kde-prefix= set to a writable directory"; \
 	    exit 1; \
 	  fi; \
 	fi
@@ -98,11 +98,13 @@ install-plugin install-plugins: test_perms $(plugin_LTLIBRARIES) $(dist_kde_serv
 	test -d $(DESTDIR)$(plugindir) || $(mkinstalldirs) $(DESTDIR)$(plugindir)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugin_LTLIBRARIES) $(DESTDIR)$(plugindir)
 
-uninstall-plugin uninstall-plugins: 
-	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.*
+uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
 
 endif
 
 force:
 
-.PHONY : install-plugins install-plugin uninstall-plugins test_perms
+.PHONY : install-plugins install-plugin test_perms

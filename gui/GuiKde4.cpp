@@ -24,23 +24,23 @@
 #include "gui.h"
 #include "GnashException.h"
 
-#ifdef GUI_KDE3
-#include "kdesup.h"
+#ifdef GUI_KDE4
+#include "Kde4Gui.h"
 #endif
 
 namespace gnash {
 
-#ifdef GUI_KDE3
-std::auto_ptr<Gui> createKDEGui(unsigned long windowid, float scale, bool do_loop, unsigned int bit_depth)
+#ifdef GUI_KDE4
+std::auto_ptr<Gui> createKDE4Gui(unsigned long windowid, float scale, bool do_loop, unsigned int bit_depth)
 {
-	return std::auto_ptr<Gui>(new KdeGui(windowid, scale, do_loop, bit_depth));
+	return std::auto_ptr<Gui>(new Kde4Gui(windowid, scale, do_loop, bit_depth));
 }
-#else // ! GUI_KDE3
-std::auto_ptr<Gui> createKDEGui(unsigned long , float , bool , unsigned int )
+#else // ! GUI_KDE4
+std::auto_ptr<Gui> createKDE4Gui(unsigned long , float , bool , unsigned int )
 {
-	throw GnashException("Support for KDE gui was not compiled in");
+	throw GnashException("Support for KDE4 gui was not compiled in");
 }
-#endif // ! GUI_KDE3
+#endif // ! GUI_KDE4
 
 } // namespace gnash
 

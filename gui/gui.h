@@ -519,6 +519,7 @@ private:
 /// Named constructors
 std::auto_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createKDE4Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, unsigned int depth);
