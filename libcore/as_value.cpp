@@ -36,7 +36,7 @@
 #include "GnashException.h"
 #include "Object.h"
 #include "amf.h"
-#include "array.h"
+#include "Array_as.h"
 #include "SimpleBuffer.h"
 
 #include <cmath> // std::fmod

@@ -20,7 +20,7 @@
 #include "log.h"
 #include "fn_call.h"
 #include "builtin_function.h"
-#include "array.h" // for childNodes
+#include "Array_as.h" // for childNodes
 #include "XMLNode_as.h"
 #include "XML_as.h" // escape / unescape
 #include "log.h"

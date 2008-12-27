@@ -19,7 +19,7 @@
 
 #include "LoadableObject.h"
 #include "log.h"
-#include "array.h"
+#include "Array_as.h"
 #include "as_object.h"
 #include "StreamProvider.h"
 #include "URL.h"

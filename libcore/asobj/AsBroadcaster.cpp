@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "array.h" // for _listeners construction
+#include "Array_as.h" // for _listeners construction
 #include "log.h"
 #include "AsBroadcaster.h"
 #include "fn_call.h"

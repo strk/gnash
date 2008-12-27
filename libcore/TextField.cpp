@@ -38,7 +38,7 @@
 #include "fontlib.h" // for searching or adding fonts the _font member
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
-#include "array.h" // for _listeners construction
+#include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
 #include "TextFormat_as.h" // for getTextFormat/setTextFormat

@@ -32,7 +32,7 @@
 #include "fn_call.h" // for generic methods
 #include "Object.h" // for getObjectInterface
 #include "action.h" // for call_method
-#include "array.h" // for setPropFlags
+#include "Array_as.h" // for setPropFlags
 #include "as_function.h" // for inheritance of as_super
 
 #include <set>

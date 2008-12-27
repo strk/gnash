@@ -278,7 +278,7 @@ public:
 		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
 		{
 			elements[idx++] = *i;
-		};
+        }
 	}
 
 	/// \brief
@@ -332,7 +332,7 @@ public:
 		for (ValueList::iterator i=nelem.begin(), e=nelem.end(); i!=e; ++i)
 		{
 			elements[idx++] = *i;
-		};
+		}
 
 		return as_value(this);
 	}

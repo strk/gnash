@@ -1,4 +1,4 @@
-// array.cpp:  ActionScript array class, for Gnash.
+// Array_as.cpp:  ActionScript array class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
@@ -23,7 +23,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_value.h"
-#include "array.h"
+#include "Array_as.h"
 #include "log.h"
 #include "builtin_function.h" // for Array class
 #include "as_function.h" // for sort user-defined comparator
