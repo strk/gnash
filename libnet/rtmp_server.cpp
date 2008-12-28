@@ -571,15 +571,26 @@ rtmp_handler(Network::thread_params_t *args)
     // The very first message after the handshake is the Invoke call of
     // NetConnection::connect().
     boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*pkt);
+    RTMPMsg *body = 0;
     RTMP::queues_t *que = rtmp->split(*pkt);
 //    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
-    cerr << "FIXME4: " << que->size() << endl;
+    if (que->size() > 0) {
+	boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
+	body = rtmp->decodeMsgBody(bufptr->reference() + head->head_size, head->bodysize);
+	body->dump();
+    }
+
+    // Send a ping to clear the new stream
+    boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_CLEAR, 0);
+    bool what1 = rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+			       ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset);
     
-    boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
-    boost::shared_ptr<amf::Buffer> bufptr1 = que->at(1)->pop();
-    RTMPMsg *body = rtmp->decodeMsgBody(bufptr->reference() + head->head_size, head->bodysize);
-    body->dump();
-    
+    // send a response
+    boost::shared_ptr<amf::Buffer> response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
+    bool what = rtmp->sendMsg(args->netfd, head->channel, RTMP::HEADER_12,
+			      response->allocated(), RTMP::INVOKE,
+			      RTMPMsg::FROM_SERVER, *response);
+
     // Keep track of the network statistics
 //    Statistics st;
 //    st.setFileType(NetStats::RTMP);
@@ -640,9 +651,14 @@ boost::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
     GNASH_REPORT_FUNCTION;
+    
     boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
     boost::uint8_t *ptr = buf->reference();
     buf->clear();	// default everything to zeros, real data gets optionally added.
+    // Manually adjust the seek pointer since we add the data by
+    // walking ou own temporary pointer, so none of the regular ways
+    // of setting the seek pointer are appropriate.
+    buf->setSeekPointer(buf->reference() + buf->size());
 
     boost::uint16_t typefield = htons(type);
     ptr += sizeof(boost::uint16_t); // go past the first short
@@ -660,25 +676,30 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 	  ptr += sizeof(boost::uint16_t); // go past the second short
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append((boost::uint8_t *)&swapped, sizeof(boost::uint32_t));
+	  *buf += swapped;
 	  break;
       }
-      // reset doesn't have any parameters
+      // reset doesn't have any parameters but zeros
       case PING_RESET:
 	  break;
-	  // For Ping and Pong, the second parameter is always the milliseconds
+      // For Ping and Pong, the second parameter is always the milliseconds
       case PING_CLIENT:
       case PONG_CLIENT:
       {
 //	  swapped = htonl(milliseconds);
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append((boost::uint8_t *)&swapped, sizeof(boost::uint32_t));
+	  *buf += swapped;
 	  break;
       }
       default:
 	  break;
     };
+    
+    // Manually adjust the seek pointer since we added the data by
+    // walking ou own temporary pointer, so none of the regular ways
+    // of setting the seek pointer are appropriate.
+    buf->setSeekPointer(buf->reference() + buf->size());
     
     return buf;
 }
