@@ -28,6 +28,7 @@
 #include "handler.h"
 #include "network.h"
 #include "buffer.h"
+#include "diskstream.h"
 
 namespace gnash
 {
@@ -37,11 +38,11 @@ class DSOEXPORT RTMPServer : public RTMP
 public:
     RTMPServer();
     ~RTMPServer();
-    bool handShakeWait();
-    bool handShakeResponse();
-    bool serverFinish();
-    bool packetSend(boost::shared_ptr<amf::Buffer> buf);
-    bool packetRead(boost::shared_ptr<amf::Buffer> buf);
+//    bool processClientHandShake(int fd, amf::Buffer &buf);
+    bool handShakeResponse(int fd, amf::Buffer &buf);
+    boost::shared_ptr<amf::Buffer> serverFinish(int fd, amf::Buffer &handshake1, amf::Buffer &handshake2);
+    bool packetSend(amf::Buffer &buf);
+    bool packetRead(amf::Buffer &buf);
     
     // These are handlers for the various types
     boost::shared_ptr<amf::Buffer> encodeResult(RTMPMsg::rtmp_status_e status);
@@ -50,10 +51,15 @@ public:
     
     void dump();
   private:
+    typedef boost::char_separator<char> Sep;
+    typedef boost::tokenizer<Sep> Tok;
+    DiskStream::filetype_e  _filetype;
+    std::string		_filespec;
+    boost::uint32_t     _filesize;
 };
 
 // This is the thread for all incoming RTMP connections
-void rtmp_handler(Network::thread_params_t *args);
+bool rtmp_handler(Network::thread_params_t *args);
 
 } // end of gnash namespace
 // end of _RTMP_SERVER_H_
