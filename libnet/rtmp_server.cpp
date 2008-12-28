@@ -144,7 +144,7 @@ RTMPServer::serverFinish(int fd, amf::Buffer &handshake1, amf::Buffer &handshake
     }
 
     int diff = std::memcmp(handshake1.begin(), handshake2.begin(), RTMP_HANDSHAKE_SIZE);
-    if (diff == 0) {
+    if (diff <= 1) {
 	log_debug (_("Handshake Finish Data matched"));
     } else {
 	log_error (_("Handshake Finish Data didn't match by %d bytes"), diff);
@@ -329,22 +329,6 @@ RTMPServer::packetRead(amf::Buffer &buf)
           break;
     };
 
-#if 0
-    boost::shared_ptr<amf::Element> url = getProperty("tcUrl");
-    boost::shared_ptr<amf::Element> file = getProperty("swfUrl");
-    boost::shared_ptr<amf::Element> app = getProperty("app");
-    
-    if (file) {
-	log_debug("SWF file %s", file->to_string());
-    }
-    if (url) {
-	log_debug("is Loading video %s", url->to_string());
-    }
-    if (app) {
-	log_debug("is file name is %s", app->to_string());
-    }
-#endif
-    
     return true;
 }
 
@@ -513,6 +497,7 @@ rtmp_handler(Network::thread_params_t *args)
     url = docroot;
     bool done = false;
     static bool initialize = true;
+    RTMPMsg *body = 0;
     
     log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
 	      args->netfd, get_thread_id());
@@ -558,40 +543,54 @@ rtmp_handler(Network::thread_params_t *args)
 	if (pkt->allocated() > 0) {
 	    initialize = false;
 	}
+
+	// The very first message after the handshake is the Invoke call of
+	// NetConnection::connect().
+	boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*pkt);
+	RTMP::queues_t *que = rtmp->split(*pkt);
+//    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
+	if (que->size() > 0) {
+	    boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
+	    body = rtmp->decodeMsgBody(bufptr->reference() + head->head_size, head->bodysize);
+	}
+	
+	// Send a ping to clear the new stream
+	boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_CLEAR, 0);
+	if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+			  ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
+	    log_debug("Sent Ping to client");
+	} else {
+	    log_error("Couldn't send Ping to client!");
+	}
+	
+	// send a response to the NetConnection::connect() request
+	boost::shared_ptr<amf::Buffer> response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
+	if (rtmp->sendMsg(args->netfd, head->channel, RTMP::HEADER_12, response->allocated(),
+			  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
+	    log_error("Sent NetConnection::connect() response to client.");
+	} else {
+	    log_error("Couldn't send NetConnection::connect() response to client!");
+	}
+	boost::shared_ptr<amf::Element> url  = body->findProperty("tcUrl");
+	if (url) {
+	    log_debug("Client request for remote file is: %s", url->to_string());
+	}
+	boost::shared_ptr<amf::Element> file = body->findProperty("swfUrl");
+	if (file) {
+	    log_debug("SWF filename making request is: %s", file->to_string());
+	}
     } else {
 	// Read the handshake bytes sent by the client when requesting
 	// a connection.
 	pkt = rtmp->recvMsg(args->netfd);
+	pkt->dump();
 	// See if we have data in the handshake, we should have 1537 bytes
 	if (pkt->allocated() == 0) {
 	    log_error("failed to read RTMP data from the client.");
 	    return false;
 	}
     }
-
-    // The very first message after the handshake is the Invoke call of
-    // NetConnection::connect().
-    boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*pkt);
-    RTMPMsg *body = 0;
-    RTMP::queues_t *que = rtmp->split(*pkt);
-//    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
-    if (que->size() > 0) {
-	boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
-	body = rtmp->decodeMsgBody(bufptr->reference() + head->head_size, head->bodysize);
-	body->dump();
-    }
-
-    // Send a ping to clear the new stream
-    boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_CLEAR, 0);
-    bool what1 = rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-			       ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset);
     
-    // send a response to the NetConnection::connect() request
-    boost::shared_ptr<amf::Buffer> response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-    bool what = rtmp->sendMsg(args->netfd, head->channel, RTMP::HEADER_12,
-			      response->allocated(), RTMP::INVOKE,
-			      RTMPMsg::FROM_SERVER, *response);
-
     // Keep track of the network statistics
 //    Statistics st;
 //    st.setFileType(NetStats::RTMP);
