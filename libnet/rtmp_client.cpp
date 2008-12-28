@@ -328,7 +328,7 @@ RTMPClient::handShakeRequest()
     GNASH_REPORT_FUNCTION;
 
     // Make a buffer to hold the handshake data.
-    _handshake = new Buffer(RTMP_BODY_SIZE+1);
+    _handshake = new Buffer(RTMP_HANDSHAKE_SIZE+1);
     if (!_handshake) {
 	return false;
     }
@@ -338,7 +338,7 @@ RTMPClient::handShakeRequest()
 
     // Since we don't know what the format is, create a pattern we can
     // recognize if we stumble across it later on.
-    for (int i=0; i<RTMP_BODY_SIZE; i++) {
+    for (int i=0; i<RTMP_HANDSHAKE_SIZE; i++) {
 	boost::uint8_t pad = i^256;
         *_handshake += pad;
     }
@@ -362,32 +362,32 @@ RTMPClient::clientFinish()
     _handshake->clear();
     
     gnashSleep(1000000); // FIXME: why do we still need a delay here, when readNet() does a select ?
-    ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
-    if (ret == RTMP_BODY_SIZE) {
+    ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
+    if (ret == RTMP_HANDSHAKE_SIZE) {
         log_debug (_("Read first data block in handshake"));
     } else {
         log_error (_("Couldn't read first data block in handshake"));
 //        return false;
     }
-    if (ret > RTMP_BODY_SIZE) {
-	ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
-	if (ret == RTMP_BODY_SIZE) {        
+    if (ret > RTMP_HANDSHAKE_SIZE) {
+	ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
+	if (ret == RTMP_HANDSHAKE_SIZE) {        
 	    log_debug (_("Read second data block in handshake"));
 	} else {
 	    log_error (_("Couldn't read second data block in handshake"));
 //        return false;
 	}
     }
-    ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
-    if (ret == RTMP_BODY_SIZE) {        
+    ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
+    if (ret == RTMP_HANDSHAKE_SIZE) {        
         log_debug (_("Read second data block in handshake"));
     } else {
         log_error (_("Couldn't read second data block in handshake"));
 //        return false;
     }
-    if (ret > RTMP_BODY_SIZE) {
-	ret = readNet(_handshake->reference(), RTMP_BODY_SIZE);
-	if (ret == RTMP_BODY_SIZE) {        
+    if (ret > RTMP_HANDSHAKE_SIZE) {
+	ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
+	if (ret == RTMP_HANDSHAKE_SIZE) {        
 	    log_debug (_("Read second data block in handshake"));
 	} else {
 	    log_error (_("Couldn't read second data block in handshake"));
@@ -395,7 +395,7 @@ RTMPClient::clientFinish()
 	}
     }
 
-    ret = writeNet(_handshake->reference(), RTMP_BODY_SIZE);
+    ret = writeNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
     if ( ret <= 0 ) return false;
 
     return true;
