@@ -202,7 +202,14 @@ Buffer::copy(boost::uint8_t *data, size_t nbytes)
 	std::copy(data, data + nbytes, _data.get());
 	_seekptr = _data.get() + nbytes;
     } else {
-	throw GnashException("Not enough storage was allocated to hold the copied data!");
+	char num[12];
+	sprintf(num, "%d", nbytes);
+	string msg = "Not enough storage was allocated to hold the copied data! Needs ";
+	msg += num;
+	msg += " only has ";
+	sprintf(num, "%d", _nbytes);
+	msg += num;
+	throw GnashException(msg);
     }
     return *this;
 }
@@ -224,7 +231,14 @@ Buffer::append(boost::uint8_t *data, size_t nbytes)
 	    std::copy(data, data + nbytes, _seekptr);
 	    _seekptr += nbytes;
 	} else {
-	    throw GnashException("Not enough storage was allocated to hold the appended data!");
+	    char num[12];
+	    string msg = "Not enough storage was allocated to hold the appended data! Needs ";
+	    sprintf(num, "%d", nbytes);
+	    msg += num;
+	    msg += " only has ";
+	    sprintf(num, "%d", _nbytes - allocated());
+	    msg += num;
+	    throw GnashException(msg);
 	}
     }
 
