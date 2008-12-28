@@ -374,9 +374,6 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 	  buf.reset(new Buffer(12));
 	  break;
     }
-    
-// FIXME: this is only to make this more readeable with GDB, and is a performance hit.
-    buf->clear();
     boost::uint8_t *ptr = buf->reference();
     
     // Make the channel index & header size byte
@@ -410,6 +407,11 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
         memcpy(ptr, &swapped, 4);
         ptr += 4;
     }
+    
+    // Manually adjust the seek pointer since we added the data by
+    // walking ou own temporary pointer, so none of the regular ways
+    // of setting the seek pointer are appropriate.
+    buf->setSeekPointer(buf->reference() + buf->size());
     
     return buf;
 }
@@ -819,26 +821,45 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data)
 {
     GNASH_REPORT_FUNCTION;
-
+    int ret = 0;
+    
+    // We got some bogus parameters
+    if (total_size == 0) {
+	log_error("Bogus size parameter in %s!", __PRETTY_FUNCTION__);
+	return false;
+    }
+    
+    // This builds the full header,which is required as the first part
+    // of the packet.
     boost::shared_ptr<amf::Buffer> head = encodeHeader(channel, head_size, total_size,
 						       type, routing);
-    size_t partial = RTMP_VIDEO_PACKET_SIZE;
+    // When more data is sent than fits in the chunksize for this
+    // channel, it gets broken into chunksize pieces, and each piece
+    // after the first packet is sent gets a one byte header instead.
+    boost::shared_ptr<amf::Buffer> cont_head = encodeHeader(channel, RTMP::HEADER_1);
+    size_t partial = _chunksize[channel];
     size_t nbytes = 0;
 
-//    boost::uint8_t head = 0xc3; // FIXME: this won't always be 0xc3 !
+    // First send the full header, afterwards we only use continuation
+    // headers, which are only one byte.
+    ret = writeNet(fd, head->reference(), head->size());
 
     // now send the data
     while (nbytes <= data.allocated()) {
-	// Send the header first. There is one between every packet.
-	int ret = writeNet(*head);
-	// The last bit of data is usually less than the packet size, so we write less data
-	if ((data.allocated() - nbytes) < static_cast<signed int>(RTMP_VIDEO_PACKET_SIZE)) {
+	// The last bit of data is usually less than the packet size,
+	// so we write less data of course.
+	if ((data.allocated() - nbytes) < static_cast<signed int>(_chunksize[channel])) {
 	    partial = data.allocated() - nbytes;
+	}
+	// After the first packet, only send the single byte
+	// continuation packet.
+	if (nbytes > 0) {
+	    int ret = writeNet(fd, *cont_head);
 	}
 	// write the data to the client
 	ret = writeNet(fd, data.reference() + nbytes, partial);
 	// adjust the accumulator.
-	nbytes += RTMP_VIDEO_PACKET_SIZE;	
+	nbytes += _chunksize[channel];
     };
     return true;
 }
@@ -1025,7 +1046,6 @@ RTMP::recvMsg(int fd)
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
 	    buf->setSeekPointer(buf->reference() + ret);
-//	    cerr << "XXXXX: " << (char *)buf->reference() << endl;
 	}
 	// the read timed out as there was no data, but the socket is still open.
  	if (ret == 0) {
@@ -1052,7 +1072,6 @@ RTMP::recvMsg(int fd)
 // 	buf->dump();
 //     }
 
-    // RTMP::split pushes the data into seperate queues, one for each channel.
     return buf;
 }
 
