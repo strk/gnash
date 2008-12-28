@@ -511,6 +511,7 @@ rtmp_handler(Network::thread_params_t *args)
     string url, filespec;
     url = docroot;
     bool done = false;
+    static bool initialize = true;
     
     log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
 	      args->netfd, get_thread_id());
@@ -523,29 +524,61 @@ rtmp_handler(Network::thread_params_t *args)
     // Adjust the timeout
     rtmp->setTimeout(5);
     
-    // Read the handshake bytes sent by the client when requesting
-    // a connection.
-    boost::shared_ptr<amf::Buffer> handshake1 = rtmp->recvMsg(args->netfd);
-    // See if we have data in the handshake, we should have 1537 bytes
-    if (handshake1->allocated() == 0) {
-	log_error("failed to read the handshake from the client.");
-	return false;
-    }
-
-    // Send our response to the handshake, which primarily is the bytes
-    // we just recieved.
-    rtmp->handShakeResponse(args->netfd, *handshake1);
+    boost::shared_ptr<amf::Buffer> pkt;
     
-    boost::shared_ptr<amf::Buffer> handshake2 = rtmp->recvMsg(args->netfd);
-    // See if we have data in the handshake, we should have 1536 bytes
-    if (handshake2->allocated() == 0) {
-	log_error("failed to read the handshake from the client.");
-	return false;
-    }
-    boost::shared_ptr<amf::Buffer> start = rtmp->serverFinish(args->netfd, *handshake1, *handshake2);
+    // This handler is called everytime there is RTMP data on a socket to process the
+    // messsage. Unlike HTTP, RTMP always uses persistant network connections, so we
+    // only want to initialize the handshake once. This becomes important as the handshake
+    // is always sent as a large data block, 1536 bytes. Once we start reading packets,
+    // the default size is adjustable via the ChunkSize command.
+    if (initialize) {
+	// Read the handshake bytes sent by the client when requesting
+	// a connection.
+	boost::shared_ptr<amf::Buffer> handshake1 = rtmp->recvMsg(args->netfd);
+	// See if we have data in the handshake, we should have 1537 bytes
+	if (handshake1->allocated() == 0) {
+	    log_error("failed to read the handshake from the client.");
+	    return false;
+	}
 
-    boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*start);
-    rtmp->decodeMsgBody(start->reference() + head->head_size, head->bodysize);
+	// Send our response to the handshake, which primarily is the bytes
+	// we just recieved.
+	rtmp->handShakeResponse(args->netfd, *handshake1);
+    
+	boost::shared_ptr<amf::Buffer> handshake2 = rtmp->recvMsg(args->netfd);
+	// See if we have data in the handshake, we should have 1536 bytes
+	if (handshake2->allocated() == 0) {
+	    log_error("failed to read the handshake from the client.");
+	    return false;
+	}
+	// Don't assume the data we just read is a handshake.
+	pkt = rtmp->serverFinish(args->netfd, *handshake1, *handshake2);
+	// We got data
+	if (pkt->allocated() > 0) {
+	    initialize = false;
+	}
+    } else {
+	// Read the handshake bytes sent by the client when requesting
+	// a connection.
+	pkt = rtmp->recvMsg(args->netfd);
+	// See if we have data in the handshake, we should have 1537 bytes
+	if (pkt->allocated() == 0) {
+	    log_error("failed to read RTMP data from the client.");
+	    return false;
+	}
+    }
+
+    // The very first message after the handshake is the Invoke call of
+    // NetConnection::connect().
+    boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*pkt);
+    RTMP::queues_t *que = rtmp->split(*pkt);
+//    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
+    cerr << "FIXME4: " << que->size() << endl;
+    
+    boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
+    boost::shared_ptr<amf::Buffer> bufptr1 = que->at(1)->pop();
+    RTMPMsg *body = rtmp->decodeMsgBody(bufptr->reference() + head->head_size, head->bodysize);
+    body->dump();
     
     // Keep track of the network statistics
 //    Statistics st;
@@ -559,23 +592,21 @@ rtmp_handler(Network::thread_params_t *args)
 // 	proto.resetBytesOut();	
     
 //	st.dump(); 
-    do {
-	// See if we have any messages waiting
-	boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
-	if (buf->allocated()) {
-	    boost::uint8_t *ptr = buf->reference();
-	    if (ptr == 0) {
-		log_debug("Que empty, net connection dropped for fd #%d", args->netfd);
-		return false;
-	    }
-	    boost::shared_ptr<RTMP::rtmp_head_t> rthead = rtmp->decodeHeader(ptr);
-	    rtmp->decodeMsgBody(*buf);
-	} else {
-	    done = true;
+    // See if we have any messages waiting
+    boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
+    if (buf->allocated()) {
+	boost::uint8_t *ptr = buf->reference();
+	if (ptr == 0) {
+	    log_debug("Que empty, net connection dropped for fd #%d", args->netfd);
+	    return false;
 	}
-    } while (!done);
+	boost::shared_ptr<RTMP::rtmp_head_t> rthead = rtmp->decodeHeader(ptr);
+	body = rtmp->decodeMsgBody(*buf);
+    } else {
+	done = true;
+    }
 
-	return false;
+    return false;
 }
 
 // A Ping packet has two parameters that ae always specified, and 2 that are optional.
