@@ -1176,7 +1176,7 @@ as_object::on_event(const event_id& id )
 {
 	as_value event_handler;
 
-	if (get_member(id.get_function_key(), &event_handler) )
+	if (get_member(id.functionKey(), &event_handler) )
 	{
 		call_method0(event_handler, NULL, this);
 		return true;

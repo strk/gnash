@@ -582,7 +582,7 @@ Button::on_button_event(const event_id& event)
 
     // Call conventional attached method.
     boost::intrusive_ptr<as_function> method =
-        getUserDefinedEventHandler(event.get_function_key());
+        getUserDefinedEventHandler(event.functionKey());
     if ( method )
     {
         mr.pushAction(method, this, movie_root::apDOACTION);

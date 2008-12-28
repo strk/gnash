@@ -64,8 +64,6 @@ extern "C" {
 
 #include <boost/format.hpp> // For i18n-friendly cerr
 
-using namespace gnash; // for log_*
-
 using std::cerr;
 using std::endl;
 using std::cout;
@@ -80,8 +78,6 @@ gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 #endif
 }
-
-//extern bool g_debug;
 
 static void
 usage()
@@ -154,11 +150,11 @@ static void version_and_copyright()
 {
     cout << "Gnash " << VERSION << endl
         << endl
-        << _("Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.\n"
-        "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
-        "You may redistribute copies of Gnash under the terms of the GNU General\n"
-        "Public License.  For more information, see the file named COPYING.\n")
-    << endl;
+        << _("Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, "
+                "Inc.\nGnash comes with NO WARRANTY, to the extent permitted "
+                "by law.\nYou may redistribute copies of Gnash under the "
+                "terms of the GNU General\nPublic License.  For more "
+                "information, see the file named COPYING.\n") << endl;
 }
 
 static void build_options()
@@ -248,26 +244,26 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 case 'v':
                     dbglogfile.setVerbosity();
                     // This happens once per 'v' flag 
-                    log_debug(_("Verbose output turned on"));
+                    gnash::log_debug(_("Verbose output turned on"));
                     break;
                 case 'V':
                     version_and_copyright();
                     build_options();
                     exit(EXIT_SUCCESS);          
                 case 'w':
-                    rcfile.useWriteLog(true); // dbglogfile.setWriteDisk(true);
-                    log_debug(_("Logging to disk enabled"));
+                    rcfile.useWriteLog(true); 
+                    gnash::log_debug(_("Logging to disk enabled"));
                     break;
                 case 'a':
 #if VERBOSE_ACTION
-                    dbglogfile.setActionDump(true); //gnash::set_verbose_action(true);
+                    dbglogfile.setActionDump(true); 
 #else
                     log_error(_("No verbose actions; disabled at compile time"));
 #endif
                     break;
                 case 'p':
 #if VERBOSE_PARSE
-                    dbglogfile.setParserDump(true); // gnash::set_verbose_parse(true);
+                    dbglogfile.setParserDump(true); 
 #else
                     log_error (_("No verbose parsing; disabled at compile time"));
 #endif
@@ -279,7 +275,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setStartFullscreen(true);
                     break;                    
                 case 's':
-                    player.setScale(utility::clamp<float>(
+                    player.setScale(gnash::utility::clamp<float>(
                                     parser.argument<float>(i),
                                     0.01f, 100.f));
                     break;
@@ -288,18 +284,21 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
                 case 'u':
                     url = parser.argument(i);
-                    log_debug (_("Setting root URL to %s"), url.c_str());
+                    gnash::log_debug (_("Setting root URL to %s"), url.c_str());
                     break;
-                case 'U':    // Set base URL
+                case 'U':    
+                    // Set base URL
                     player.setBaseUrl(parser.argument(i));
-                    log_debug (_("Setting base URL to %s"), parser.argument(i));
+                    gnash::log_debug (_("Setting base URL to %s"),
+                            parser.argument(i));
                     break;
                 case 'F':
                 {
                     int fd = parser.argument<long>(i);
                     if ( fd < 1 )
                     {
-                        cerr << boost::format(_("Invalid host communication filedescriptor %d\n")) % fd << endl;
+                        cerr << boost::format(_("Invalid host communication "
+                                    "filedescriptor %d\n")) % fd << endl;
                         exit(EXIT_FAILURE);
                     }
                     player.setHostFD ( fd );
@@ -307,24 +306,27 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                 }
                 case 'j':
                     widthGiven = true;
-                    player.setWidth ( parser.argument<long>(i));
-                    log_debug (_("Setting width to %d"), player.getWidth());
+                    player.setWidth(parser.argument<long>(i));
+                    gnash::log_debug(_("Setting width to %d"),
+                            player.getWidth());
                     break;
                 case 'g':
 #ifdef USE_DEBUGGER
-                    log_debug (_("Setting debugger ON"));
+                    gnash::log_debug(_("Setting debugger ON"));
                     debugger.enabled(true);
     //              debugger.startServer(&debugger);
                     debugger.console();
 #else
-                    log_error (_("No debugger; disabled at compile time, -g is invalid"));
+                    gnash::log_error(_("No debugger; disabled at compile time, -g "
+                                "is invalid"));
                     exit(EXIT_FAILURE);
 #endif
                     break;
                 case 'k':
                     heightGiven = true;
                     player.setHeight ( parser.argument<long>(i));
-                    log_debug (_("Setting height to %d"), player.getHeight());
+                    gnash::log_debug(_("Setting height to %d"),
+                            player.getHeight());
                     break;
                 case 'x':
                     plugin = true;
@@ -358,7 +360,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                             player.setDoSound(true);
                             break;
                         default:
-                            log_error(_("ERROR: -r must be followed by 0, 1, 2 or 3 "));
+                            gnash::log_error(_("ERROR: -r must be followed by "
+                                        "0, 1, 2 or 3 "));
                             break;
                     }
                     break;
@@ -369,7 +372,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 #ifdef GNASH_FPS_DEBUG
                     player.setFpsPrintTime(parser.argument<float>(i));
 #else
-                    cout << _("FPS debugging disabled at compile time, -f is invalid") << endl;
+                    cout << _("FPS debugging disabled at compile time, -f "
+                            "is invalid") << endl;
                     exit(EXIT_FAILURE);
 #endif // ndef GNASH_FPS_DEBUG
                     break;
@@ -404,13 +408,14 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
         catch (Arg_parser::ArgParserException &e)
         {
-            cerr << _("Error parsing command line options: ") << e.what() << endl;
+            cerr << _("Error parsing command line options: ") << e.what() 
+                << endl;
             cerr << _("This is a Gnash bug.") << endl;
         }
     }
 
     if ( ! renderflag ) {
-        log_debug (_("No rendering flags specified, using rcfile"));
+        gnash::log_debug (_("No rendering flags specified, using rcfile"));
         if ( plugin ) {
             player.setDoSound( rcfile.usePluginSound() );
         } else {
@@ -427,9 +432,11 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 
 }
 
+
 int
 gnash_main(int argc, char *argv[])
 {
+
     gnash::Player player;
 
     // Enable native language support, i.e. internationalization
@@ -438,16 +445,15 @@ gnash_main(int argc, char *argv[])
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
-    //rcfile.loadFiles();
 
-    try { parseCommandLine(argc, argv, player); }
-    catch (const std::exception& ex)
-    {
+    try { 
+        parseCommandLine(argc, argv, player);
+    }
+    catch (const std::exception& ex) {
         cerr << ex.what() << endl;
         return EXIT_FAILURE;
     }
-    catch (...)
-    {
+    catch (...) {
         cerr << _("Exception thrown during parseCommandLine") << endl;
         return EXIT_FAILURE;
     }
@@ -459,5 +465,5 @@ gnash_main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    return player.run(argc, argv, infiles.front().c_str(), url.c_str());
+    return player.run(argc, argv, infiles.front(), url);
 }

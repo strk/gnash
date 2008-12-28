@@ -97,11 +97,9 @@ as_value call_method0( const as_value& method, as_environment* env,
 //
 
 const std::string&
-event_id::get_function_name() const
+event_id::functionName() const
 {
-	// TODO: use a case-insensitive matching
-	
-    typedef std::map<id_code, std::string> EventFunctionNameMap;
+    typedef std::map<EventCode, std::string> EventFunctionNameMap;
     static const EventFunctionNameMap e = boost::assign::map_list_of
         (INVALID, "INVALID")
 		(PRESS, "onPress")
@@ -134,15 +132,15 @@ event_id::get_function_name() const
 		(SETFOCUS, "onSetFocus")
 		(KILLFOCUS, "onKillFocus");
 
-    EventFunctionNameMap::const_iterator it = e.find(m_id);
+    EventFunctionNameMap::const_iterator it = e.find(_id);
     assert(it != e.end());
     return it->second;
 }
 
 string_table::key
-event_id::get_function_key() const
+event_id::functionKey() const
 {
-    typedef std::map<id_code, string_table::key> EventFunctionMap;
+    typedef std::map<EventCode, string_table::key> EventFunctionMap;
     static const EventFunctionMap e = boost::assign::map_list_of
 		(PRESS, NSV::PROP_ON_PRESS)
 		(RELEASE, NSV::PROP_ON_RELEASE)
@@ -174,7 +172,7 @@ event_id::get_function_key() const
 		(SETFOCUS, NSV::PROP_ON_SET_FOCUS)
 		(KILLFOCUS, NSV::PROP_ON_KILL_FOCUS);
 
-    EventFunctionMap::const_iterator it = e.find(m_id);
+    EventFunctionMap::const_iterator it = e.find(_id);
     assert(it != e.end());
     return it->second;
 }
@@ -182,7 +180,7 @@ event_id::get_function_key() const
 bool
 event_id::is_mouse_event() const
 {
-	switch (m_id)
+	switch (_id)
 	{
 		case event_id::PRESS:
 		case event_id::RELEASE:
@@ -202,7 +200,7 @@ event_id::is_mouse_event() const
 bool
 event_id::is_key_event() const
 {
-	switch (m_id)
+	switch (_id)
 	{
 		case event_id::KEY_DOWN:
 		case event_id::KEY_PRESS :
@@ -216,7 +214,7 @@ event_id::is_key_event() const
 bool
 event_id::is_button_event() const
 {
-	switch (m_id)
+	switch (_id)
 	{
 		case event_id::PRESS:
 		case event_id::RELEASE :
@@ -234,7 +232,7 @@ event_id::is_button_event() const
 
 std::ostream& operator<< (std::ostream& o, const event_id& ev)
 {
-    return (o << ev.get_function_name());
+    return (o << ev.functionName());
 }
 
 } // end of namespace gnash
