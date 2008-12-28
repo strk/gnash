@@ -616,7 +616,7 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
     // The first data object is the method name of this object.
     boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(ptr, tooFar);
     if (name) {
-	ptr += name->getDataSize() + 3; // skip the length bytes too
+	ptr += name->getDataSize() + AMF_HEADER_SIZE; // skip the length bytes too
     } else {
 	log_error("Name field of RTMP Message corrupted!");
 	return 0;
@@ -629,7 +629,7 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 	// Most onStatus messages have the stream ID, but the Data Start onStatus
 	// message is basically just a marker that an FLV file is coming next.
 	if (streamid->getType() == Element::NUMBER_AMF0) {
-	    ptr += streamid->getDataSize() + 2;
+	    ptr += AMF0_NUMBER_SIZE + 1;
 	}
     } else {
 	log_error("Stream ID field of RTMP Message corrupted!");
@@ -659,12 +659,12 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
         if (el == 0) {
 	    break;
 	}
-//	el->dump();
+	el->dump();
 	msg->addObject(el);
  	if (status) {
 	    msg->checkStatus(el);
 	}
-    };    
+    };
     
     return msg;
 }
@@ -673,7 +673,7 @@ RTMPMsg *
 RTMP::decodeMsgBody(amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
-    return decodeMsgBody(buf.reference(), buf.size());
+    return decodeMsgBody(buf.reference(), buf.allocated());
 }
 
 boost::shared_ptr<amf::Buffer> 
