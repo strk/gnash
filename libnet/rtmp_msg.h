@@ -108,7 +108,15 @@ public:
 
     boost::shared_ptr<amf::Element> operator[](size_t x);
 
-    // Dump internal status to the terminal
+    /// \brief Find the named property for this Object.
+    ///
+    /// @param name An ASCII string that is the name of the property to
+    ///		search for.
+    ///
+    /// @return A smart pointer to the Element for this property.
+    boost::shared_ptr<amf::Element> findProperty(const std::string &name);
+
+// Dump internal status to the terminal
     void dump();
     
   protected:

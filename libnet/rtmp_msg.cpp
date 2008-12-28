@@ -262,6 +262,31 @@ RTMPMsg::operator[](size_t index)
     return el;
 };
 
+/// \brief Find the named property for this Object.
+///
+/// @param name An ASCII string that is the name of the property to
+///	search for.
+///
+/// @return A smart pointer to the Element for this property.
+boost::shared_ptr<amf::Element> 
+RTMPMsg::findProperty(const std::string &name)
+{
+    if (_amfobjs.size() > 0) {
+	vector<boost::shared_ptr<Element> >::iterator ait;
+//	cerr << "# of Properties in object: " << _properties.size() << endl;
+	for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
+	    boost::shared_ptr<amf::Element> el = (*(ait));
+	    boost::shared_ptr<amf::Element> prop = el->findProperty(name);
+	    if (prop) {
+		return prop;
+	    }
+	}
+    }
+    boost::shared_ptr<Element> el;
+    return el;
+}
+
+
 void
 RTMPMsg::dump()
 {
