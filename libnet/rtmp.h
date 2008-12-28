@@ -294,6 +294,7 @@ public:
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
     queues_t *split(amf::Buffer &buf);
+    queues_t *split(boost::uint8_t *data, size_t size);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();

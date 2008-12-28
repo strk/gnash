@@ -659,7 +659,6 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
         if (el == 0) {
 	    break;
 	}
-	el->dump();
 	msg->addObject(el);
  	if (status) {
 	    msg->checkStatus(el);
@@ -1067,8 +1066,15 @@ RTMP::queues_t *
 RTMP::split(amf::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
+    return split(buf.reference(), buf.allocated());
+}
 
-    if (buf.reference() == 0) {
+RTMP::queues_t *
+RTMP::split(boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+
+    if (data == 0) {
 	log_error("Buffer pointer is invalid.");
     }
     
@@ -1078,29 +1084,47 @@ RTMP::split(amf::Buffer &buf)
     size_t pktsize = 0;
     size_t nbytes = 0;
     
-    ptr = buf.reference();
+    ptr = data;
     boost::shared_ptr<amf::Buffer> chunk;
-    while ((ptr - buf.reference()) < static_cast<int>(buf.size())) {
+    // There may be multiple messages in this Buffer, so we walk a
+    // temp pointer through the contents of the Buffer.
+    while ((ptr - data) < static_cast<int>(size)) {
+	// Decode the header of the packet to get the header size, the
+	// body size, and the channel, all of which we need.
 	rthead = decodeHeader(ptr);
+	// System channel messages are always on channel 2, and get
+	// processed differently.
+	// FIXME: skip system messages for now!
 	if (rthead->channel == RTMP_SYSTEM_CHANNEL) {
-	    log_debug("Got a message on the system channel");
-	    ptr += rthead->head_size + rthead->bodysize;
-	    continue;
+	    log_debug("FIXME: %s: Got a message on the system channel!", __FUNCTION__);
+//	    ptr += rthead->head_size + rthead->bodysize;
+//	    continue;
 	}
-	// Make sure the header size is in range
+	// Make sure the header size we just got is in range. We can
+	// proceed as long as it is in range, but if it is out of
+	// range, we can't really continue.
 	if (rthead->head_size <= RTMP_MAX_HEADER_SIZE) {
-	    // Any packet with a size greater than 1 is a new header, so create
-	    // a new Buffer to hold all the data.
+	    // Any packet with a header size greater than 1 is a
+	    // always a new RTMP message, so create a new Buffer to
+	    // hold all the data.
 	    if ((rthead->head_size > 1)) {
  		cerr << "New packet for channel #" << rthead->channel << " of size "
  		     << (rthead->head_size + rthead->bodysize) << endl;
+		// give it some memory to store data in. We store
 		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size));
-		chunk->clear();	// FIXME: temporary debug only, should be unnecessary
+		// Each RTMP connection has 64 channels, so we store
+		// the header with the data so that info is accessible
+		// via the Buffer for processing later. All the data
+		// goes in a queue for each channel.
 		_queues[rthead->channel].push(chunk);
 	    } else {
-		// Use the existing Buffer for this pkt
+		// Use the existing Buffer for this packet, as it's a
+		// continuation messages for an existing packet. Leave
+		// the message in the queue, we just want access to
+		// the Buffer.
 		chunk = _queues[rthead->channel].peek();
 	    }
+#if 1
 	    // Red5 version 5 sends out PING messages with a 1 byte header. I think this
 	    // may be a bug in Red5, but we should handle it anyway.
 	    if (chunk == 0) {
@@ -1109,32 +1133,44 @@ RTMP::split(amf::Buffer &buf)
 		chunk->clear();	// FIXME: temporary debug only, should be unnecessary
 		_queues[rthead->channel].push(chunk);
 	    }
-	    
-	    // Many RTMP messages are smaller than the chunksize
+#endif    
+	    // Many RTMP messages are smaller than the chunksize, so
+	    // they're easy. Each channel may have a different
+	    // chunksize, just to keep things interesting. The
+	    // chunksize for a channel is changed by the Chunksize
+	    // RTMP command.
 	    if (chunk->size() <= _chunksize[rthead->channel]) {
-		// a single byte header has no length field. As these are often
-		// used as continuation packets, the body size is the same as the
-		// previous header with a length field.
-		if ((rthead->head_size > 1)) {
-		    pktsize = chunk->size();
-		} else {
-		    pktsize = rthead->head_size + rthead->bodysize - chunk->size();
-		}
-	    } else { // this RTMP message is larger than the chunksize
+		// Since the total RTMP message size is less than the
+		// chunksize for this channel, the packet size is the
+		// total message size.
+		pktsize = chunk->size();
+	    } else {
+		// This RTMP message is larger than the chunksize for
+		// this channel, so the packet size is smaller than
+		// the total message size. The header bytes aren't
+		// counted as part of the message size, so we read the
+		// header plus all the data up to the channel chunksize.
 		if (rthead->head_size > 1) {
 		    pktsize = rthead->head_size + _chunksize[rthead->channel];
 		} else {
-		    if ((rthead->head_size + chunk->size()) < _chunksize[rthead->channel]) {
-			pktsize = rthead->head_size + chunk->size();
+		    // One byte headers are continuation messages for
+		    // existing data. There may be multiple
+		    // continuation messages to complete the RTMP
+		    // messagem, so all packets are read up to the
+		    // chunksize but the last packet of the sequence.
+		    if (chunk->spaceLeft() < _chunksize[rthead->channel]) {
+			// don't store the continutation header,jusdt
+			// append the data,
+			pktsize = chunk->spaceLeft();
 		    } else {
 			pktsize = rthead->head_size + (chunk->size() - _chunksize[rthead->channel]);
 		    }
 		}
 	    }
 	    
-	    // Range check the size of the packet
+	    // Now that we calculated the packet size, range check it
+	    // for sanity.
 	    if (pktsize <= (_chunksize[rthead->channel] + RTMP_MAX_HEADER_SIZE)) {
-		nbytes += pktsize;
 		// Skip the header for all but the first packet. The rest are just to
 		// complete all the data up to the body size from the header.
 // 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
@@ -1144,13 +1180,16 @@ RTMP::split(amf::Buffer &buf)
  		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
  			 << chunk->spaceLeft() << endl;
 		    ptr += rthead->head_size;
-		    pktsize -= rthead->head_size;
-// 		} else {
-// 		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
+ 		} else {
+ 		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
 		}
-		// This is a queue of channels with active messages
+		// This is a queue of channels with active messages. This is a
+		// much smaller list to traverse when processing data than all 64 channels.
 		_channels.push_back(&_queues[rthead->channel]);
 		if (pktsize < 0xffffff) {
+//		    cerr << "FIXME5: " << hexify(ptr, pktsize, true) << endl;
+		    // If the packet size is in range, then append the
+		    // data to the existing data to complete the message.
 		    chunk->append(ptr, pktsize);
 		    cerr << "Adding data to existing packet for channel #" << rthead->channel
 			 << ", read " << pktsize << " bytes." << endl;
