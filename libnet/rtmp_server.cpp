@@ -151,7 +151,7 @@ RTMPServer::serverFinish(int fd, amf::Buffer &handshake1, amf::Buffer &handshake
     }
 
     // Copy the extra data from the end of the handshake to the new buffer. Normally we
-    // try to avoiud copying anything around, but as this is only used once for each connection,
+    // try to avoid copying anything around, but as this is only used once for each connection,
     // there isn't a real performance hit from it.
     if (handshake2.allocated() >= static_cast<size_t>(RTMP_HANDSHAKE_SIZE)) {
 	log_debug("Got extra data in handshake, %d bytes for fd #%d",
@@ -544,10 +544,8 @@ rtmp_handler(Network::thread_params_t *args)
     }
     boost::shared_ptr<amf::Buffer> start = rtmp->serverFinish(args->netfd, *handshake1, *handshake2);
 
-    start->dump();
-    
     boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*start);
-    rtmp->decodeMsgBody(*start);
+    rtmp->decodeMsgBody(start->reference() + head->head_size, head->bodysize);
     
     // Keep track of the network statistics
 //    Statistics st;
