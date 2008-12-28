@@ -344,10 +344,10 @@ Button::on_event(const event_id& id)
     }
 
     // We only respond keypress events
-    if ( id.m_id != event_id::KEY_PRESS ) return false;
+    if ( id.id() != event_id::KEY_PRESS ) return false;
 
     // We only respond to valid key code (should we assert here?)
-    if ( id.keyCode == key::INVALID ) return false;
+    if ( id.keyCode() == key::INVALID ) return false;
 
     ButtonActionPusher xec(getVM().getRoot(), this); 
     _def.forEachTrigger(id, xec);
@@ -465,7 +465,7 @@ Button::on_button_event(const event_id& event)
     MouseState new_state = m_mouse_state;
   
     // Set our mouse state (so we know how to render).
-    switch (event.m_id)
+    switch (event.id())
     {
         case event_id::ROLL_OUT:
         case event_id::RELEASE_OUTSIDE:
@@ -504,7 +504,7 @@ Button::on_button_event(const event_id& event)
 
         int bi; // button sound array index [0..3]
 
-        switch (event.m_id)
+        switch (event.id())
         {
             case event_id::ROLL_OUT:
                 bi = 0;
