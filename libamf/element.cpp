@@ -445,7 +445,7 @@ Element::encode()
 	    size += _properties[i]->getNameSize();
 	    size += AMF_PROP_HEADER_SIZE;
 	}
-	buf.reset(new Buffer(size+1)); // FIXME: why are we one byte off ?
+	buf.reset(new Buffer(size+24)); // FIXME: why are we several bytes off ?
 	*buf = Element::OBJECT_AMF0;
 	if (_name > 0) {
 	    size_t length = getNameSize();
