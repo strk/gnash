@@ -384,7 +384,8 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
     number->makeNumber(1);	// FIXME: needs a real value, which should increment
 
     Element top;
-    top.makeObject("application");
+//    top.makeObject("application");
+    top.makeObject();
     
     switch (status) {
       case RTMPMsg::APP_GC:
@@ -437,14 +438,14 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
-
-	  boost::shared_ptr<amf::Element> description(new Element);
-	  description->makeString("description", "Connection succeeded.");
-	  top.addProperty(description);
 	  
 	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "NetConnection.Connect.Success");
 	  top.addProperty(code);
+
+	  boost::shared_ptr<amf::Element> description(new Element);
+	  description->makeString("description", "Connection succeeded.");
+	  top.addProperty(description);
       }
       break;
       case RTMPMsg::NS_CLEAR_FAILED:
@@ -585,7 +586,7 @@ rtmp_handler(Network::thread_params_t *args)
     bool what1 = rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
 			       ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset);
     
-    // send a response
+    // send a response to the NetConnection::connect() request
     boost::shared_ptr<amf::Buffer> response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
     bool what = rtmp->sendMsg(args->netfd, head->channel, RTMP::HEADER_12,
 			      response->allocated(), RTMP::INVOKE,
