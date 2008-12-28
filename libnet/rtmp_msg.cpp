@@ -56,8 +56,8 @@ RTMPMsg::RTMPMsg()
 //     _inbytes = 0;
 //     _outbytes = 0;
     
-//    _body = new unsigned char(RTMP_BODY_SIZE+1);
-//    memset(_body, 0, RTMP_BODY_SIZE+1);
+//    _body = new unsigned char(RTMP_HANDSHAKE_SIZE+1);
+//    memset(_body, 0, RTMP_HANDSHAKE_SIZE+1);
 }
 
 RTMPMsg::~RTMPMsg()
