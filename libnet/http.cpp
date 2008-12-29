@@ -52,8 +52,12 @@
 #include "diskstream.h"
 #include "cache.h"
 
+// Not POSIX, so best not rely on it if possible.
+#ifndef PATH_MAX
+# define PATH_MAX 1024
+#endif
+
 #if defined(_WIN32) || defined(WIN32)
-# define PATH_MAX 255
 # define __PRETTY_FUNCTION__ __FUNCDNAME__
 # include <winsock2.h>
 # include <direct.h>
@@ -350,10 +354,11 @@ HTTP::processPostRequest(int fd)
 //	cerr << "FIXME 2: " << hexify(content->reference(), content->allocated(), true) << endl;
 
 	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(*content);
-  	boost::shared_ptr<amf::Element> &el0 = headers[0];
-  	boost::shared_ptr<amf::Element> &el1 = headers[1];
-  	boost::shared_ptr<amf::Element> &el3 = headers[3];
-	if (headers.size() >= 4) {
+  	//boost::shared_ptr<amf::Element> &el0 = headers[0];
+  	//boost::shared_ptr<amf::Element> &el1 = headers[1];
+  	//boost::shared_ptr<amf::Element> &el3 = headers[3];
+	
+    if (headers.size() >= 4) {
 	    if (headers[3]) {
 		amf::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
 // 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), true) << endl;
@@ -1151,7 +1156,7 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
 {
 //    GNASH_REPORT_FUNCTION;
 
-    boost::uint8_t *tmpptr  = data;
+    //boost::uint8_t *tmpptr  = data;
     
     // FIXME: temporary hacks while debugging
     amf::Buffer fixme("00 00 00 00 00 01");
@@ -1420,7 +1425,9 @@ HTTP::recvMsg(int fd)
  	    } else {
 		_que.push(buf);
 	    }
-	    if (ret == buf->size()) {
+
+        // ret must be more than 0 here
+	    if (static_cast<size_t>(ret) == buf->size()) {
 		continue;
 	    }
 	} else {
@@ -1467,7 +1474,6 @@ http_handler(Network::thread_params_t *args)
 //    GNASH_REPORT_FUNCTION;
 //    struct thread_params thread_data;
     string url, filespec, parameters;
-    string::size_type pos;
     HTTP *www = new HTTP;
     bool result = false;
     
