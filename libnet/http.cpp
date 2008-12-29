@@ -1325,19 +1325,14 @@ HTTP::extractCommand(boost::uint8_t *data)
         cmd = HTTP::HTTP_DELETE;
     }
 
-    // For valid requests, the second argument, delimited by spaces is the filespec
-    // of the file being requested or transmitted.
+    // For valid requests, the second argument, delimited by spaces
+    // is the filespec of the file being requested or transmitted.
     if (cmd != HTTP::HTTP_NONE) {
 	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
 	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
-	// FIXME: there has got to be a way to copy into a string that actually works.
-	char path[(end-start) + 1];
-	memset(path, 0, (end-start) + 1);
-	std::copy(start, end, path);
-	_filespec = path;
-// 	_filespec.reserve((end - start));
-// 	std::fill(_filespec.begin(), _filespec.end(), 0);
-//	std::copy(start, end, _filespec.begin());
+	
+    // This is fine as long as end is within the buffer.
+    _filespec = std::string(start, end);
     }
     
     return cmd;
