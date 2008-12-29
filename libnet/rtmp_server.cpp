@@ -498,6 +498,7 @@ rtmp_handler(Network::thread_params_t *args)
     bool done = false;
     static bool initialize = true;
     RTMPMsg *body = 0;
+    bool echo = false;
     
     log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
 	      args->netfd, get_thread_id());
@@ -511,6 +512,8 @@ rtmp_handler(Network::thread_params_t *args)
     rtmp->setTimeout(5);
     
     boost::shared_ptr<amf::Buffer> pkt;
+    boost::shared_ptr<amf::Element> tcurl;
+    boost::shared_ptr<amf::Element> swfurl;
     
     // This handler is called everytime there is RTMP data on a socket to process the
     // messsage. Unlike HTTP, RTMP always uses persistant network connections, so we
@@ -571,13 +574,13 @@ rtmp_handler(Network::thread_params_t *args)
 	} else {
 	    log_error("Couldn't send NetConnection::connect() response to client!");
 	}
-	boost::shared_ptr<amf::Element> url  = body->findProperty("tcUrl");
-	if (url) {
-	    log_debug("Client request for remote file is: %s", url->to_string());
+	tcurl  = body->findProperty("tcUrl");
+	if (tcurl) {
+	    log_debug("Client request for remote file is: %s", tcurl->to_string());
 	}
-	boost::shared_ptr<amf::Element> file = body->findProperty("swfUrl");
-	if (file) {
-	    log_debug("SWF filename making request is: %s", file->to_string());
+	swfurl = body->findProperty("swfUrl");
+	if (swfurl) {
+	    log_debug("SWF filename making request is: %s", swfurl->to_string());
 	}
     } else {
 	// Read the handshake bytes sent by the client when requesting
@@ -591,7 +594,18 @@ rtmp_handler(Network::thread_params_t *args)
 	}
     }
     
-    // Keep track of the network statistics
+    // See if this is a Red5 style echo test.
+    string::size_type pos;
+    filespec = tcurl->to_string();
+    pos = filespec.rfind("/");
+    if (pos != string::npos) {
+	if (filespec.substr(pos, filespec.size()-pos) == "/echo") {
+	    log_debug("Red5 echo test request!");
+	    echo = true;
+	}
+    }
+  
+      // Keep track of the network statistics
 //    Statistics st;
 //    st.setFileType(NetStats::RTMP);
 // 	st.stopClock();
@@ -606,13 +620,29 @@ rtmp_handler(Network::thread_params_t *args)
     // See if we have any messages waiting
     boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
     if (buf->allocated()) {
+	buf->dump();
 	boost::uint8_t *ptr = buf->reference();
 	if (ptr == 0) {
 	    log_debug("Que empty, net connection dropped for fd #%d", args->netfd);
 	    return false;
 	}
 	boost::shared_ptr<RTMP::rtmp_head_t> rthead = rtmp->decodeHeader(ptr);
-	body = rtmp->decodeMsgBody(*buf);
+	ptr += rthead->head_size;
+	if (echo) {
+	    vector<boost::shared_ptr<amf::Element > > request = rtmp->parseEchoRequest(ptr, buf->allocated());
+	boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[2]);
+	result->dump();
+	if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
+			  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
+	    log_error("Sent echo test response response to client.");
+	} else {
+	    log_error("Couldn't send echo test response to client!");
+	}
+	
+	} else {
+	    body = rtmp->decodeMsgBody(*buf);
+	    
+	}
     } else {
 	done = true;
     }
@@ -701,6 +731,89 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
     // of setting the seek pointer are appropriate.
     buf->setSeekPointer(buf->reference() + buf->size());
     
+    return buf;
+}
+
+// Parse an Echo Request message coming from the Red5 echo_test. This
+// method should only be used for testing purposes.
+vector<boost::shared_ptr<amf::Element > >
+RTMPServer::parseEchoRequest(boost::uint8_t *ptr, size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    AMF amf;
+    vector<boost::shared_ptr<amf::Element > > headers;
+
+    // The first element is the name of the test, 'echo'
+    boost::shared_ptr<amf::Element> el1 = amf.extractAMF(ptr, ptr+size);
+    ptr += amf.totalsize();
+    headers.push_back(el1);
+
+    // The second element is the number of the test,
+    boost::shared_ptr<amf::Element> el2 = amf.extractAMF(ptr, ptr+size);
+    ptr += amf.totalsize();
+    headers.push_back(el2);
+
+    // This one has always been a NULL object from my tests
+    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(ptr, ptr+size);
+    ptr += amf.totalsize();
+    headers.push_back(el3);
+
+    // This one has always been an NULL or Undefined object from my tests
+    boost::shared_ptr<amf::Element> el4 = amf.extractAMF(ptr, ptr+size);
+    ptr += amf.totalsize();
+    headers.push_back(el4);
+    
+    return headers;
+}
+
+// format a response to the 'echo' test used for testing Gnash. This
+// is only used for testing by developers. The format appears to be
+// a string '_result', followed by the number of the test, and then two
+// NULL objects.
+boost::shared_ptr<amf::Buffer>
+RTMPServer::formatEchoResponse(double num, amf::Element &el)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> data = el.encode(); // amf::AMF::encodeElement(el);
+    return formatEchoResponse(num, data->reference(), data->allocated());
+}
+
+boost::shared_ptr<amf::Buffer>
+RTMPServer::formatEchoResponse(double num, amf::Buffer &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    return formatEchoResponse(num, data.reference(), data.allocated());
+}
+
+boost::shared_ptr<amf::Buffer>
+RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    string result = "_result";
+    Element echo;
+    echo.makeString(result);
+
+    Element index;
+    index.makeNumber(num);
+
+    Element null;
+    null.makeNull();
+
+    boost::shared_ptr<amf::Buffer> encecho = echo.encode();
+    boost::shared_ptr<amf::Buffer> encidx  = index.encode();   
+    boost::shared_ptr<amf::Buffer> encnull  = null.encode();   
+
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(encecho->size()
+						       + encidx->size()
+						       + encnull->size() + size));
+
+    *buf = encecho;
+    *buf += encidx;
+    buf->append(data, size);
+    *buf += encnull;
+
     return buf;
 }
 

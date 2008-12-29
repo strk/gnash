@@ -48,6 +48,14 @@ public:
     boost::shared_ptr<amf::Buffer> encodeResult(RTMPMsg::rtmp_status_e status);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type);
+
+    // Parse an Echo Request message coming from the Red5 echo_test.
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
+    // format a response to the 'echo' test used for testing Gnash.
+    boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Element &el);
+    boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Buffer &data);
+    boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);    
     
     void dump();
   private:
