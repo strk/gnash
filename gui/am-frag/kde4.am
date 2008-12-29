@@ -43,6 +43,6 @@ kde4_gnash_CPPFLAGS += $(AGG_CFLAGS)
 kde4_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
 	$(QT4_LIBS) $(AGG_LIBS)
 kde4_gnash_SOURCES += Kde4GlueAgg.cpp Kde4GlueAgg.h \
-	 	Kde4Gui.cpp Kde4Gui.h KdeGlue.h
+	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
 
 endif
