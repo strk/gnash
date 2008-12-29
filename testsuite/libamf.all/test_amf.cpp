@@ -159,27 +159,37 @@ void
 test_encoding()
 {
     // This is a 8 byte wide double data type in hex
-    boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
-    double num = *(reinterpret_cast<double *>(buf1->reference()));
-    swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we alwasy encode in big endian format
+    {
+        boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
+        double num = *(reinterpret_cast<double *>(buf1->reference()));
+        swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we alwasy encode in big endian format
 
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif    
-    boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(num);
-    // A number AMF object has only one header byte, which is the type field.
+        boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(num);
+        // A number AMF object has only one header byte, which is the type field.
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    if ((*encnum->reference() == Element::NUMBER_AMF0) &&
-        (memcmp(buf1->reference(), encnum->reference()+1, amf::AMF0_NUMBER_SIZE) == 0)) {
-        runtest.pass("Encoded AMF Number");
-    } else {
-        runtest.fail("Encoded AMF Number");
+        if ((*encnum->reference() == Element::NUMBER_AMF0) &&
+            (memcmp(buf1->reference(), encnum->reference()+1, amf::AMF0_NUMBER_SIZE) == 0)) {
+            runtest.pass("Encoded AMF Number");
+        } else {
+            runtest.fail("Encoded AMF Number");
+        }
+
+        Element el(num);
+        boost::shared_ptr<Buffer> buf = AMF::encodeElement(el);
+        
+        check_equals(*buf->reference(), Element::NUMBER_AMF0);
+        check_equals(buf->size(), amf::AMF0_NUMBER_SIZE+1); // +1 for the type byte
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(memcmp(buf1->reference(), buf->reference()+1, amf::AMF0_NUMBER_SIZE), 0);
     }
     
     // Encode a boolean. Although we know a bool is only one character, for AMF,
@@ -211,6 +221,22 @@ test_encoding()
         } else {
             runtest.fail("Encoded AMF Boolean");
         }
+
+        Element el(true);
+        boost::shared_ptr<Buffer> buf = AMF::encodeElement(el);
+        
+        check_equals(*buf->reference(), Element::BOOLEAN_AMF0);
+        check_equals(buf->size(), 2);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(memcmp(buf->reference(), buf2->reference(), 2), 0);
+
+        Element el2(false);
+        buf = AMF::encodeElement(el2);
+        
+        check_equals(*buf->reference(), Element::BOOLEAN_AMF0);
+        check_equals(buf->size(), 2);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(*(buf->reference()+1), 0);
     }
     
     // Encode a String.
