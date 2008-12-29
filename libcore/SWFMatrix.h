@@ -28,7 +28,6 @@
 #include "Range2d.h" // for transforming Range2d<float>
 #include "rect.h"    // for rect 
 #include "Point2d.h" // for Point2d
-#include "utility.h" // for TRUST_FLOAT_TO_UINT32_CONVERSION
 
 #include <iostream> 
 #include <boost/cstdint.hpp>
@@ -145,22 +144,10 @@ public:
     void    read(SWFStream& in);
 
     /// Transform a given point by our SWFMatrix
-    void    transform(geometry::Point2d& p) const
-    {
-        boost::int32_t t0 = Fixed16Mul(sx, p.x) + Fixed16Mul(shy, p.y) + tx;
-        boost::int32_t t1 = Fixed16Mul(shx,p.x) + Fixed16Mul(sy,  p.y) + ty;
-        p.x = t0;
-        p.y = t1;
-    }
+    void transform(geometry::Point2d& p) const;
 
     /// Transform the given point by our SWFMatrix.
-    void    transform(boost::int32_t& x, boost::int32_t& y) const
-    {
-        boost::int32_t  t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy, y) + tx;
-        boost::int32_t  t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
-        x = t0;
-        y = t1;
-    }
+    void transform(boost::int32_t& x, boost::int32_t& y) const;
     
     /// Transform point 'p' by our SWFMatrix. 
     //
@@ -203,25 +190,6 @@ public:
 private: 
     /// Return the determinant of this SWFMatrix in 32.32 fixed point format.
     boost::int64_t  determinant() const;
-
-    inline boost::int32_t DoubleToFixed16(double a)
-    {
-#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
-        // truncate when overflow occurs.
-        return static_cast<boost::int32_t>(static_cast<boost::uint32_t>(a * 65536.0));
-#else
-        boost::int32_t  b;
-        if(a >= 0)
-        {
-            b = static_cast<boost::uint32_t>(std::fmod(a * 65536.0, 4294967296.0));
-        }
-        else
-        {
-            b = -static_cast<boost::uint32_t>(std::fmod(-a * 65536.0, 4294967296.0));
-        }
-        return b;
-#endif
-    }
 
 }; //end of SWFMatrix
 
