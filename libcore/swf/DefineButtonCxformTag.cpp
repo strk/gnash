@@ -21,6 +21,7 @@
 #include "movie_definition.h"
 #include "DefineButtonTag.h"
 #include "DefineButtonCxformTag.h"
+#include "utility.h"
 
 namespace gnash {
 namespace SWF {

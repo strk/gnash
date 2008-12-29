@@ -18,12 +18,13 @@
 //
 
 #include "DefineButtonSoundTag.h"
-#include <vector>
 #include "movie_definition.h"
 #include "SoundInfoRecord.h"
 #include "SWFStream.h"
 #include "DefineButtonTag.h"
+#include "utility.h"
 
+#include <vector>
 namespace gnash {
 namespace SWF {
 
