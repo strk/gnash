@@ -204,25 +204,6 @@ private:
     /// Return the determinant of this SWFMatrix in 32.32 fixed point format.
     boost::int64_t  determinant() const;
 
-    inline boost::int32_t FloatToFixed16(float a)
-    {
-#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
-        // truncate when overflow occurs.
-        return static_cast<boost::int32_t>(static_cast<boost::uint32_t>(a * 65536.0f));
-#else
-        boost::int32_t  b;
-        if(a >= 0)
-        {
-            b = static_cast<boost::uint32_t>(std::fmod(a * 65536.0, 4294967296.0));
-        }
-        else
-        {
-            b = -static_cast<boost::uint32_t>(std::fmod(-a * 65536.0, 4294967296.0));
-        }
-        return b;
-#endif
-    }
-
     inline boost::int32_t DoubleToFixed16(double a)
     {
 #ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
