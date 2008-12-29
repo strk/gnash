@@ -811,8 +811,8 @@ RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
 
     *buf = encecho;
     *buf += encidx;
-    buf->append(data, size);
     *buf += encnull;
+    buf->append(data, size);
 
     return buf;
 }
