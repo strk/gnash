@@ -180,7 +180,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
   KLASH_PLUGIN=
   
   dnl If building the kparts plugin, get the install paths correct.  
-  if test x$build_kparts3 = xyes; then
+  if test x$build_kparts4 = xyes; then
     AC_CACHE_VAL(ac_cv_path_kde4_prefix,[
       dnl if the user specified a path, sanity check it and then use it
       if test x"${with_kde4_prefix}" != x; then
@@ -207,7 +207,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
     KDE4_SERVICESDIR="${KDE4_PREFIX}/share/services"
     KDE4_CONFIGDIR="${KDE4_PREFIX}/share/config"
     KDE4_APPSDATADIR="${KDE4_PREFIX}/share/apps/klash"
-  fi                            dnl end of build_kparts3
+  fi                            dnl end of build_kparts4
 
   if test x"${ac_cv_path_kde4_incl}" != x ; then
     if test x"${ac_cv_path_kde3_incl}" != x"-I/usr/include"; then
