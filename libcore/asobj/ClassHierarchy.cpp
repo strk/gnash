@@ -21,7 +21,6 @@
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
 #include "Button.h"
-#include "array.h"
 #include "AsBroadcaster.h"
 #include "Accessibility_as.h"
 #include "Boolean_as.h"

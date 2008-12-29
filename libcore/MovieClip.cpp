@@ -657,7 +657,7 @@ MovieClip::on_event(const event_id& id)
 #endif
 
     // We do not execute ENTER_FRAME if unloaded
-    if ( id.m_id == event_id::ENTER_FRAME && isUnloaded() )
+    if ( id.id() == event_id::ENTER_FRAME && isUnloaded() )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"), getTarget());
@@ -692,7 +692,7 @@ MovieClip::on_event(const event_id& id)
 
 
     // user-defined onInitialize is never called
-    if ( id.m_id == event_id::INITIALIZE )
+    if ( id.id() == event_id::INITIALIZE )
     {
             testInvariant();
             return called;
@@ -713,7 +713,7 @@ MovieClip::on_event(const event_id& id)
     //
     //     TODO: test the case in which it's MovieClip.prototype.onLoad defined !
     //
-    if ( id.m_id == event_id::LOAD )
+    if ( id.id() == event_id::LOAD )
     {
         // TODO: we're likely making too much noise for nothing here,
         // there must be some action-execution-order related problem instead....
@@ -756,7 +756,7 @@ MovieClip::on_event(const event_id& id)
     if (! id.is_key_event ())
     {
         boost::intrusive_ptr<as_function> method = 
-            getUserDefinedEventHandler(id.get_function_key());
+            getUserDefinedEventHandler(id.functionKey());
 
         if ( method )
         {
@@ -1999,7 +1999,7 @@ MovieClip::can_handle_mouse_event() const
         }
 
         // Check user-defined event handlers
-        if ( getUserDefinedEventHandler(event.get_function_key()) )
+        if ( getUserDefinedEventHandler(event.functionKey()) )
         {
             return true;
         }

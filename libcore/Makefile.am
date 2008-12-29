@@ -104,7 +104,6 @@ libgnashcore_la_SOURCES = \
 	swf_function.cpp \
 	Video.cpp \
 	StreamProvider.cpp \
-	array.cpp \
 	Button.cpp \
 	DisplayList.cpp \
 	fill_style.cpp \
@@ -131,7 +130,6 @@ noinst_HEADERS = \
 	SystemClock.h \
 	ManualClock.h \
 	RunInfo.h \
-	array.h	\
 	as_environment.h \
 	as_function.h \
 	as_object.h \

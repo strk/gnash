@@ -30,12 +30,11 @@
 #include "StringPredicates.h"
 #include "namedStrings.h"
 
-#include <typeinfo>
 #include <string>
 #include <algorithm>
 #include <boost/format.hpp>
 #include <cassert>
-
+#include <boost/assign/list_of.hpp>
 
 namespace gnash {
 
@@ -47,14 +46,11 @@ namespace gnash {
 // Function/method dispatch.
 //
 
+/// @param this_ptr     this is ourself.
 as_value
-call_method(
-    const as_value& method,
-    as_environment* env,
-    as_object* this_ptr, // this is ourself
-    std::auto_ptr< std::vector<as_value> > args,
-    as_object* super,
-    const movie_definition* callerDef)
+call_method(const as_value& method, as_environment* env, as_object* this_ptr,
+        std::auto_ptr< std::vector<as_value> > args, as_object* super,
+        const movie_definition* callerDef)
 {
 	as_value val;
 	fn_call call(this_ptr, env, args);
@@ -70,9 +66,9 @@ call_method(
 		}
 		else
 		{
-			boost::format fmt =
-			            boost::format(_("Attempt to call a value which is neither a "
-			                            "C nor an ActionScript function (%s)")) % method;
+			boost::format fmt = boost::format(_("Attempt to call a "
+                        "value which is neither a C nor an ActionScript "
+                        "function (%s)")) % method;
 			throw ActionTypeError(fmt.str());
 		}
 	}
@@ -87,10 +83,8 @@ call_method(
 	return val;
 }
 
-as_value	call_method0(
-    const as_value& method,
-    as_environment* env,
-    as_object* this_ptr)
+as_value call_method0( const as_value& method, as_environment* env,
+        as_object* this_ptr)
 {
     // TODO: avoid allocating a vector here
     std::auto_ptr< std::vector<as_value> > args(new std::vector<as_value>);
@@ -103,93 +97,90 @@ as_value	call_method0(
 //
 
 const std::string&
-event_id::get_function_name() const
+event_id::functionName() const
 {
-	// TODO: use a case-insensitive matching
-	static std::string s_function_names[EVENT_COUNT] =
-	{
-		"INVALID",		 // INVALID
-		"onPress",		 // PRESS
-		"onRelease",		 // RELEASE
-		"onReleaseOutside",	 // RELEASE_OUTSIDE
-		"onRollOver",		 // ROLL_OVER
-		"onRollOut",		 // ROLL_OUT
-		"onDragOver",		 // DRAG_OVER
-		"onDragOut",		 // DRAG_OUT
-		"onKeyPress",		 // KEY_PRESS
-		"onInitialize",		 // INITIALIZE
-		"onLoad",		 // LOAD
-		"onUnload",		 // UNLOAD
-		"onEnterFrame",		 // ENTER_FRAME
-		"onMouseDown",		 // MOUSE_DOWN
-		"onMouseUp",		 // MOUSE_UP
-		"onMouseMove",		 // MOUSE_MOVE
-		"onKeyDown",		 // KEY_DOWN
-		"onKeyUp",		 // KEY_UP
-		"onData",		 // DATA
-		"onLoadStart",		 // LOAD_START
-		"onLoadError",		 // LOAD_ERROR
-		"onLoadProgress",	 // LOAD_PROGRESS
-		"onLoadInit",		 // LOAD_INIT
-		"onClose",		 // CLOSE
-		"onConnect",	 // CONNECT
-		"onXML",		 // XML
-		"onTimer",	         // setInterval Timer expired
-		"onConstruct",
-		"onSetFocus",
-		"onKillFocus"
-	};
+    typedef std::map<EventCode, std::string> EventFunctionNameMap;
+    static const EventFunctionNameMap e = boost::assign::map_list_of
+        (INVALID, "INVALID")
+		(PRESS, "onPress")
+		(RELEASE, "onRelease")
+		(RELEASE_OUTSIDE, "onReleaseOutside")
+		(ROLL_OVER, "onRollOver")
+		(ROLL_OUT, "onRollOut")	
+		(DRAG_OVER, "onDragOver")
+		(DRAG_OUT, "onDragOut")	
+		(KEY_PRESS, "onKeyPress")
+		(INITIALIZE, "onInitialize")
+		(LOAD, "onLoad")
+		(UNLOAD, "onUnload")
+		(ENTER_FRAME, "onEnterFrame")
+		(MOUSE_DOWN, "onMouseDown")	
+		(MOUSE_UP, "onMouseUp")
+		(MOUSE_MOVE, "onMouseMove")
+		(KEY_DOWN, "onKeyDown")
+		(KEY_UP, "onKeyUp")	
+		(DATA, "onData")
+		(LOAD_START, "onLoadStart")	
+		(LOAD_ERROR, "onLoadError")
+		(LOAD_PROGRESS, "onLoadProgress")	
+		(LOAD_INIT, "onLoadInit")
+		(CLOSE, "onClose")
+		(CONNECT, "onConnect")
+		(XML, "onXML")
+		(TIMER, "onTimer")
+		(CONSTRUCT, "onConstruct")
+		(SETFOCUS, "onSetFocus")
+		(KILLFOCUS, "onKillFocus");
 
-	assert(m_id > INVALID && m_id < EVENT_COUNT);
-	return s_function_names[m_id];
+    EventFunctionNameMap::const_iterator it = e.find(_id);
+    assert(it != e.end());
+    return it->second;
 }
 
 string_table::key
-event_id::get_function_key() const
+event_id::functionKey() const
 {
-	// TODO: use a case-insensitive matching
-	static string_table::key function_keys[EVENT_COUNT] =
-	{
-		0,				// INVALID
-		NSV::PROP_ON_PRESS,		// PRESS
-		NSV::PROP_ON_RELEASE,		// RELEASE
-		NSV::PROP_ON_RELEASE_OUTSIDE,	// RELEASE_OUTSIDE
-		NSV::PROP_ON_ROLL_OVER,		// ROLL_OVER
-		NSV::PROP_ON_ROLL_OUT,		// ROLL_OUT
-		NSV::PROP_ON_DRAG_OVER,		// DRAG_OVER
-		NSV::PROP_ON_DRAG_OUT,		// DRAG_OUT
-		NSV::PROP_ON_KEY_PRESS,		// KEY_PRESS
-		NSV::PROP_ON_INITIALIZE,	// INITIALIZE
-		NSV::PROP_ON_LOAD,		// LOAD
-		NSV::PROP_ON_UNLOAD,		// UNLOAD
-		NSV::PROP_ON_ENTER_FRAME,	// ENTER_FRAME
-		NSV::PROP_ON_MOUSE_DOWN,	// MOUSE_DOWN
-		NSV::PROP_ON_MOUSE_UP,		// MOUSE_UP
-		NSV::PROP_ON_MOUSE_MOVE,	//  MOUSE_MOVE
-		NSV::PROP_ON_KEY_DOWN,		// KEY_DOWN
-		NSV::PROP_ON_KEY_UP,		// KEY_UP
-		NSV::PROP_ON_DATA,		// DATA
-		NSV::PROP_ON_LOAD_START,	// LOAD_START
-		NSV::PROP_ON_LOAD_ERROR,	// LOAD_ERROR
-		NSV::PROP_ON_LOAD_PROGRESS,	// LOAD_PROGRESS
-		NSV::PROP_ON_LOAD_INIT,		// LOAD_INIT
-		NSV::PROP_ON_CLOSE,	// CLOSE
-		NSV::PROP_ON_CONNECT,	// CONNECT
-		NSV::PROP_ON_XML,		// XML
-		NSV::PROP_ON_TIMER,		// setInterval Timer expired
-		NSV::PROP_ON_CONSTRUCT,		// onConstruct
-		NSV::PROP_ON_SET_FOCUS, 	// onSetFocus
-		NSV::PROP_ON_KILL_FOCUS 	// onKillFocus
-	};
+    typedef std::map<EventCode, string_table::key> EventFunctionMap;
+    static const EventFunctionMap e = boost::assign::map_list_of
+		(PRESS, NSV::PROP_ON_PRESS)
+		(RELEASE, NSV::PROP_ON_RELEASE)
+		(RELEASE_OUTSIDE, NSV::PROP_ON_RELEASE_OUTSIDE)
+		(ROLL_OVER, NSV::PROP_ON_ROLL_OVER )
+		(ROLL_OUT, NSV::PROP_ON_ROLL_OUT)
+		(DRAG_OVER, NSV::PROP_ON_DRAG_OVER)
+		(DRAG_OUT, NSV::PROP_ON_DRAG_OUT)
+		(KEY_PRESS, NSV::PROP_ON_KEY_PRESS)
+		(INITIALIZE, NSV::PROP_ON_INITIALIZE)
+		(LOAD, NSV::PROP_ON_LOAD)
+		(UNLOAD, NSV::PROP_ON_UNLOAD)
+		(ENTER_FRAME, NSV::PROP_ON_ENTER_FRAME)
+		(MOUSE_DOWN, NSV::PROP_ON_MOUSE_DOWN)
+		(MOUSE_UP, NSV::PROP_ON_MOUSE_UP)
+		(MOUSE_MOVE, NSV::PROP_ON_MOUSE_MOVE)
+		(KEY_DOWN, NSV::PROP_ON_KEY_DOWN)
+		(KEY_UP, NSV::PROP_ON_KEY_UP)
+		(DATA, NSV::PROP_ON_DATA)
+		(LOAD_START, NSV::PROP_ON_LOAD_START)
+		(LOAD_ERROR, NSV::PROP_ON_LOAD_ERROR)
+		(LOAD_PROGRESS, NSV::PROP_ON_LOAD_PROGRESS)
+		(LOAD_INIT, NSV::PROP_ON_LOAD_INIT)
+		(CLOSE, NSV::PROP_ON_CLOSE)
+		(CONNECT, NSV::PROP_ON_CONNECT)
+		(XML, NSV::PROP_ON_XML)
+		(TIMER, NSV::PROP_ON_TIMER)
+		(CONSTRUCT, NSV::PROP_ON_CONSTRUCT)
+		(SETFOCUS, NSV::PROP_ON_SET_FOCUS)
+		(KILLFOCUS, NSV::PROP_ON_KILL_FOCUS);
 
-	assert(m_id > INVALID && m_id < EVENT_COUNT);
-	return function_keys[m_id];
+    EventFunctionMap::const_iterator it = e.find(_id);
+    assert(it != e.end());
+    return it->second;
 }
 
 bool
 event_id::is_mouse_event() const
 {
-	switch (m_id)
+	switch (_id)
 	{
 		case event_id::PRESS:
 		case event_id::RELEASE:
@@ -209,7 +200,7 @@ event_id::is_mouse_event() const
 bool
 event_id::is_key_event() const
 {
-	switch (m_id)
+	switch (_id)
 	{
 		case event_id::KEY_DOWN:
 		case event_id::KEY_PRESS :
@@ -223,7 +214,7 @@ event_id::is_key_event() const
 bool
 event_id::is_button_event() const
 {
-	switch (m_id)
+	switch (_id)
 	{
 		case event_id::PRESS:
 		case event_id::RELEASE :
@@ -241,7 +232,7 @@ event_id::is_button_event() const
 
 std::ostream& operator<< (std::ostream& o, const event_id& ev)
 {
-    return (o << ev.get_function_name());
+    return (o << ev.functionName());
 }
 
 } // end of namespace gnash

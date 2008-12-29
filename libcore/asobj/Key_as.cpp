@@ -116,18 +116,16 @@ Key_as::set_key_up(key::code code)
 
 
 void 
-Key_as::notify_listeners(const event_id& key_event)
+Key_as::notify_listeners(const event_id& ev)
 {  
     // There is no user defined "onKeyPress" event handler
-    if((key_event.m_id != event_id::KEY_DOWN) &&
-            (key_event.m_id != event_id::KEY_UP)) return;
-
-    as_value ev(key_event.get_function_name());
+    if((ev.id() != event_id::KEY_DOWN) &&
+            (ev.id() != event_id::KEY_UP)) return;
 
 #ifdef GNASH_DEBUG_KEYEVENTS
     log_debug("notify_listeners calling broadcastMessage with arg %s", ev);
 #endif
-    callMethod(NSV::PROP_BROADCAST_MESSAGE, ev);
+    callMethod(NSV::PROP_BROADCAST_MESSAGE, ev.functionName());
 }
 
 int

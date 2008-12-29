@@ -31,7 +31,6 @@
 #include "smart_ptr.h"
 #include "as_prop_flags.h" // for enum
 #include "GnashException.h"
-#include "event_id.h" // for event_id
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -47,6 +46,7 @@ namespace gnash {
 	class VM;
 	class Machine;
 	class IOChannel;
+    class event_id;
 }
 
 namespace gnash {

@@ -22,14 +22,13 @@
 #include "as_function.h"
 #include "builtin_function.h" // for _global.Function
 #include "as_value.h"
-#include "array.h"
+#include "Array_as.h"
 #include "fn_call.h"
 #include "GnashException.h"
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 
-#include <typeinfo>
 #include <iostream>
 
 namespace gnash {

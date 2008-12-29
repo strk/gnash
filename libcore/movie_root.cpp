@@ -1307,7 +1307,8 @@ movie_root::notify_mouse_listeners(const event_id& event)
             // Can throw an action limit exception if the stack limit is 0 or 1.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value(PROPNAME(event.get_function_name())));
+		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, 
+                    event.functionName());
 		}
 	    catch (ActionLimitException &e)
 	    {

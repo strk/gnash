@@ -38,7 +38,7 @@
 #include "fontlib.h" // for searching or adding fonts the _font member
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
-#include "array.h" // for _listeners construction
+#include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
 #include "TextFormat_as.h" // for getTextFormat/setTextFormat
@@ -406,11 +406,11 @@ TextField::setSelection(int start, int end)
     _selection = std::make_pair(start, end);
 }
 bool
-TextField::on_event(const event_id& id)
+TextField::on_event(const event_id& ev)
 {
     if (isReadOnly()) return false;
 
-    switch (id.m_id)
+    switch (ev.id())
     {
         case event_id::KEY_PRESS:
         {
@@ -425,7 +425,7 @@ TextField::on_event(const event_id& id)
             // stored and displayed. See utf.h for more information.
             // This is a limit on the number of key codes, not on the
             // capacity of strings.
-            gnash::key::code c = id.keyCode;
+            gnash::key::code c = ev.keyCode();
 
             // maybe _text is changed in ActionScript
             m_cursor = std::min<size_t>(m_cursor, _text.size());

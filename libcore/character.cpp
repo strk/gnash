@@ -997,7 +997,7 @@ character::hasEventHandler(const event_id& id) const
 	if ( it != _event_handlers.end() ) return true;
 
 	boost::intrusive_ptr<as_function> method = 
-        getUserDefinedEventHandler(id.get_function_key());
+        getUserDefinedEventHandler(id.functionKey());
 	if (method) return true;
 
 	return false;

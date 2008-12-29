@@ -26,7 +26,7 @@
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
 #include "log.h"
-#include "array.h"
+#include "Array_as.h"
 #include "as_value.h"
 #include "GnashException.h"
 #include "VM.h" 

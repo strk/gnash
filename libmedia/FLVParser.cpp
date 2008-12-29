@@ -29,7 +29,6 @@
 #include "SimpleBuffer.h"
 
 #include "as_object.h"
-#include "array.h"
 #include "element.h"
 #include "VM.h"
 
@@ -43,7 +42,6 @@
 # include <io.h>
 #endif
 
-using namespace std;
 
 #define PADDING_BYTES 64
 #define READ_CHUNKS 64

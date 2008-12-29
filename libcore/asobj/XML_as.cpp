@@ -33,7 +33,6 @@
 #include "builtin_function.h"
 #include "VM.h"
 #include "namedStrings.h"
-#include "array.h"
 #include "StringPredicates.h"
 
 #include <string>
