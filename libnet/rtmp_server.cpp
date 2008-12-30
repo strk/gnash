@@ -687,9 +687,9 @@ rtmp_handler(Network::thread_params_t *args)
     // Adjust the timeout
     rtmp->setTimeout(10);
     
-    boost::shared_ptr<amf::Buffer> pkt;
-    boost::shared_ptr<amf::Element> tcurl;
-    boost::shared_ptr<amf::Element> swfurl;
+    static boost::shared_ptr<amf::Buffer> pkt;
+    static boost::shared_ptr<amf::Element> tcurl;
+    static boost::shared_ptr<amf::Element> swfurl;
     
     // This handler is called everytime there is RTMP data on a socket to process the
     // messsage. Unlike HTTP, RTMP always uses persistant network connections, so we
@@ -746,7 +746,6 @@ rtmp_handler(Network::thread_params_t *args)
 	    log_error("Couldn't send Ping to client!");
 	}
 	
-	gnashSleep(10000);
 	// send a response to the NetConnection::connect() request
 	boost::shared_ptr<amf::Buffer> response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
 	if (rtmp->sendMsg(args->netfd, head->channel, RTMP::HEADER_12, response->allocated(),
@@ -803,7 +802,6 @@ rtmp_handler(Network::thread_params_t *args)
 	boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
 	if (buf) {
 	    if (buf->allocated()) {
-		done = true;
 		buf->dump();
 		boost::uint8_t *ptr = buf->reference();
 		if (ptr == 0) {
@@ -819,8 +817,10 @@ rtmp_handler(Network::thread_params_t *args)
 		    if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
 				      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
 			log_error("Sent echo test response response to client.");
+			done = false;
 		    } else {
 			log_error("Couldn't send echo test response to client!");
+			done = true;
 		    }
 		    
 		} else {
