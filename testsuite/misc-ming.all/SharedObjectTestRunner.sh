@@ -62,6 +62,7 @@ echo "SOLDIR=${SOLDIR}"
 sleep 1
 
 export GNASHRC=${TOP_BUILDDIR}/testsuite/gnashrc
+export TZ=GMT-1
 
 #####################################################
 ##
