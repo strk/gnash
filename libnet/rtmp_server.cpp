@@ -41,6 +41,7 @@
 #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
+#include "GnashSleep.h"
 
 using namespace gnash;
 using namespace std;
@@ -110,7 +111,9 @@ RTMPServer::processClientHandShake(int fd, amf::Buffer &buf)
 #endif
 
 // The response is the gibberish sent back twice, preceeded by a byte
-// with the value of 0x3.
+// with the value of 0x3. We have to very carefully send the handshake
+// in one big packet as doing otherwise seems to cause subtle timing
+// problems with the Adobe player. Tis way it connects every time.
 bool
 RTMPServer::handShakeResponse(int fd, amf::Buffer &handshake)
 {
@@ -118,12 +121,18 @@ RTMPServer::handShakeResponse(int fd, amf::Buffer &handshake)
 
     boost::uint8_t byte;
     byte = RTMP_HANDSHAKE;
+
+    boost::shared_ptr<amf::Buffer> zeros(new amf::Buffer(RTMP_HANDSHAKE_SIZE*2+1));
+    zeros->clear();
+
+    boost::uint8_t *ptr = zeros->reference();
+    *ptr =  RTMP_HANDSHAKE;
+    zeros->setSeekPointer(ptr + RTMP_HANDSHAKE_SIZE+1);
+
+    zeros->append(handshake.reference()+1, handshake.allocated() - 1);
+    int ret = writeNet(fd, *zeros);
     
-    int ret1 = writeNet(fd, &byte, 1);
-    int ret2 = writeNet(fd, handshake);
-    int ret3 = writeNet(fd, handshake);
-    
-    if ((ret2 == handshake.allocated()) && (ret3 == handshake.allocated())) {
+    if (ret == zeros->allocated()) {
 	log_debug("Sent RTMP Handshake response");
     } else {
 	log_error("Couldn't sent RTMP Handshake response!");
@@ -484,172 +493,6 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
     
     return buf;
 }
-
-// This is the thread for all incoming RTMP connections
-bool
-rtmp_handler(Network::thread_params_t *args)
-{
-    GNASH_REPORT_FUNCTION;
-//    Handler *hand = reinterpret_cast<Handler *>(args->handler);
-    RTMPServer *rtmp = new RTMPServer;
-    string docroot = args->filespec;
-    string url, filespec;
-    url = docroot;
-    bool done = false;
-    static bool initialize = true;
-    RTMPMsg *body = 0;
-    bool echo = false;
-    
-    log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
-	      args->netfd, get_thread_id());
-    
-#ifdef USE_STATISTICS
-    struct timespec start;
-    clock_gettime (CLOCK_REALTIME, &start);
-#endif
-
-    // Adjust the timeout
-    rtmp->setTimeout(5);
-    
-    boost::shared_ptr<amf::Buffer> pkt;
-    boost::shared_ptr<amf::Element> tcurl;
-    boost::shared_ptr<amf::Element> swfurl;
-    
-    // This handler is called everytime there is RTMP data on a socket to process the
-    // messsage. Unlike HTTP, RTMP always uses persistant network connections, so we
-    // only want to initialize the handshake once. This becomes important as the handshake
-    // is always sent as a large data block, 1536 bytes. Once we start reading packets,
-    // the default size is adjustable via the ChunkSize command.
-    if (initialize) {
-	// Read the handshake bytes sent by the client when requesting
-	// a connection.
-	boost::shared_ptr<amf::Buffer> handshake1 = rtmp->recvMsg(args->netfd);
-	// See if we have data in the handshake, we should have 1537 bytes
-	if (handshake1->allocated() == 0) {
-	    log_error("failed to read the handshake from the client.");
-	    return false;
-	}
-
-	// Send our response to the handshake, which primarily is the bytes
-	// we just recieved.
-	rtmp->handShakeResponse(args->netfd, *handshake1);
-    
-	boost::shared_ptr<amf::Buffer> handshake2 = rtmp->recvMsg(args->netfd);
-	// See if we have data in the handshake, we should have 1536 bytes
-	if (handshake2->allocated() == 0) {
-	    log_error("failed to read the handshake from the client.");
-	    return false;
-	}
-	// Don't assume the data we just read is a handshake.
-	pkt = rtmp->serverFinish(args->netfd, *handshake1, *handshake2);
-	// We got data
-	if (pkt->allocated() > 0) {
-	    initialize = false;
-	}
-
-	// The very first message after the handshake is the Invoke call of
-	// NetConnection::connect().
-	boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*pkt);
-	RTMP::queues_t *que = rtmp->split(*pkt);
-//    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
-	if (que->size() > 0) {
-	    boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
-	    body = rtmp->decodeMsgBody(bufptr->reference() + head->head_size, head->bodysize);
-	}
-	
-	// Send a ping to clear the new stream
-	boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_CLEAR, 0);
-	if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-			  ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
-	    log_debug("Sent Ping to client");
-	} else {
-	    log_error("Couldn't send Ping to client!");
-	}
-	
-	// send a response to the NetConnection::connect() request
-	boost::shared_ptr<amf::Buffer> response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-	if (rtmp->sendMsg(args->netfd, head->channel, RTMP::HEADER_12, response->allocated(),
-			  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
-	    log_error("Sent NetConnection::connect() response to client.");
-	} else {
-	    log_error("Couldn't send NetConnection::connect() response to client!");
-	}
-	tcurl  = body->findProperty("tcUrl");
-	if (tcurl) {
-	    log_debug("Client request for remote file is: %s", tcurl->to_string());
-	}
-	swfurl = body->findProperty("swfUrl");
-	if (swfurl) {
-	    log_debug("SWF filename making request is: %s", swfurl->to_string());
-	}
-    } else {
-	// Read the handshake bytes sent by the client when requesting
-	// a connection.
-	pkt = rtmp->recvMsg(args->netfd);
-	pkt->dump();
-	// See if we have data in the handshake, we should have 1537 bytes
-	if (pkt->allocated() == 0) {
-	    log_error("failed to read RTMP data from the client.");
-	    return false;
-	}
-    }
-    
-    // See if this is a Red5 style echo test.
-    string::size_type pos;
-    filespec = tcurl->to_string();
-    pos = filespec.rfind("/");
-    if (pos != string::npos) {
-	if (filespec.substr(pos, filespec.size()-pos) == "/echo") {
-	    log_debug("Red5 echo test request!");
-	    echo = true;
-	}
-    }
-  
-      // Keep track of the network statistics
-//    Statistics st;
-//    st.setFileType(NetStats::RTMP);
-// 	st.stopClock();
-//  	log_debug (_("Bytes read: %d"), proto.getBytesIn());
-//  	log_debug (_("Bytes written: %d"), proto.getBytesOut());
-// 	st.setBytes(proto.getBytesIn() + proto.getBytesOut());
-// 	st.addStats();
-// 	proto.resetBytesIn();
-// 	proto.resetBytesOut();	
-    
-//	st.dump(); 
-    // See if we have any messages waiting
-    boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
-    if (buf->allocated()) {
-	buf->dump();
-	boost::uint8_t *ptr = buf->reference();
-	if (ptr == 0) {
-	    log_debug("Que empty, net connection dropped for fd #%d", args->netfd);
-	    return false;
-	}
-	boost::shared_ptr<RTMP::rtmp_head_t> rthead = rtmp->decodeHeader(ptr);
-	ptr += rthead->head_size;
-	if (echo) {
-	    vector<boost::shared_ptr<amf::Element > > request = rtmp->parseEchoRequest(ptr, buf->allocated());
-	boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[2]);
-	result->dump();
-	if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
-			  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
-	    log_error("Sent echo test response response to client.");
-	} else {
-	    log_error("Couldn't send echo test response to client!");
-	}
-	
-	} else {
-	    body = rtmp->decodeMsgBody(*buf);
-	    
-	}
-    } else {
-	done = true;
-    }
-
-    return false;
-}
-
 // A Ping packet has two parameters that ae always specified, and 2 that are optional.
 // The first two bytes are the ping type, as in rtmp_ping_e, the second is the ping
 // target, which is always zero as far as we can tell.
@@ -815,6 +658,185 @@ RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
     buf->append(data, size);
 
     return buf;
+}
+
+
+// This is the thread for all incoming RTMP connections
+bool
+rtmp_handler(Network::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+//    Handler *hand = reinterpret_cast<Handler *>(args->handler);
+    RTMPServer *rtmp = new RTMPServer;
+    string docroot = args->filespec;
+    string url, filespec;
+    url = docroot;
+    bool done = false;
+    RTMPMsg *body = 0;
+    static bool initialize = true;
+    static bool echo = false;
+    
+    log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
+	      args->netfd, get_thread_id());
+    
+#ifdef USE_STATISTICS
+    struct timespec start;
+    clock_gettime (CLOCK_REALTIME, &start);
+#endif
+
+    // Adjust the timeout
+    rtmp->setTimeout(10);
+    
+    boost::shared_ptr<amf::Buffer> pkt;
+    boost::shared_ptr<amf::Element> tcurl;
+    boost::shared_ptr<amf::Element> swfurl;
+    
+    // This handler is called everytime there is RTMP data on a socket to process the
+    // messsage. Unlike HTTP, RTMP always uses persistant network connections, so we
+    // only want to initialize the handshake once. This becomes important as the handshake
+    // is always sent as a large data block, 1536 bytes. Once we start reading packets,
+    // the default size is adjustable via the ChunkSize command.
+    if (initialize) {
+	// Read the handshake bytes sent by the client when requesting
+	// a connection.
+	boost::shared_ptr<amf::Buffer> handshake1 = rtmp->recvMsg(args->netfd);
+	// See if we have data in the handshake, we should have 1537 bytes
+	if (handshake1 == 0) {
+	    log_error("failed to read the handshake from the client.");
+	    return false;
+	}
+
+	// Send our response to the handshake, which primarily is the bytes
+	// we just recieved.
+	rtmp->handShakeResponse(args->netfd, *handshake1);
+    
+	boost::shared_ptr<amf::Buffer> handshake2 = rtmp->recvMsg(args->netfd);
+	// See if we have data in the handshake, we should have 1536 bytes
+	if (handshake2 == 0) {
+	    log_error("failed to read the handshake from the client.");
+	    return false;
+	}
+	// Don't assume the data we just read is a handshake.
+	pkt = rtmp->serverFinish(args->netfd, *handshake1, *handshake2);
+	if (pkt == 0) {
+	    log_error("failed to read data from the end of the handshake from the client!");
+	    return false;
+	}
+	// We got data
+	if (pkt->allocated() > 0) {
+	    initialize = false;
+	}
+
+	// The very first message after the handshake is the Invoke call of
+	// NetConnection::connect().
+	boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*pkt);
+	RTMP::queues_t *que = rtmp->split(*pkt);
+//    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
+	if (que->size() > 0) {
+	    boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
+	    body = rtmp->decodeMsgBody(bufptr->reference() + head->head_size, head->bodysize);
+	}
+
+	// Send a ping to clear the new stream
+	boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_CLEAR, 0);
+	if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+			  ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
+	    log_debug("Sent Ping to client");
+	} else {
+	    log_error("Couldn't send Ping to client!");
+	}
+	
+	gnashSleep(10000);
+	// send a response to the NetConnection::connect() request
+	boost::shared_ptr<amf::Buffer> response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
+	if (rtmp->sendMsg(args->netfd, head->channel, RTMP::HEADER_12, response->allocated(),
+			  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
+	    log_error("Sent NetConnection::connect() response to client.");
+	} else {
+	    log_error("Couldn't send NetConnection::connect() response to client!");
+	}
+	tcurl  = body->findProperty("tcUrl");
+	if (tcurl) {
+	    log_debug("Client request for remote file is: %s", tcurl->to_string());
+	}
+	swfurl = body->findProperty("swfUrl");
+	if (swfurl) {
+	    log_debug("SWF filename making request is: %s", swfurl->to_string());
+	}
+    } else {
+	// Read the handshake bytes sent by the client when requesting
+	// a connection.
+	pkt = rtmp->recvMsg(args->netfd);
+//	pkt->dump();
+	// See if we have data in the handshake, we should have 1537 bytes
+	if (pkt->allocated() == 0) {
+	    log_error("failed to read RTMP data from the client.");
+	    return false;
+	}
+    }
+
+    // See if this is a Red5 style echo test.
+    string::size_type pos;
+    filespec = tcurl->to_string();
+    pos = filespec.rfind("/");
+    if (pos != string::npos) {
+	if (filespec.substr(pos, filespec.size()-pos) == "/echo") {
+	    log_debug("Red5 echo test request!");
+	    echo = true;
+	}
+    }
+  
+      // Keep track of the network statistics
+//    Statistics st;
+//    st.setFileType(NetStats::RTMP);
+// 	st.stopClock();
+//  	log_debug (_("Bytes read: %d"), proto.getBytesIn());
+//  	log_debug (_("Bytes written: %d"), proto.getBytesOut());
+// 	st.setBytes(proto.getBytesIn() + proto.getBytesOut());
+// 	st.addStats();
+// 	proto.resetBytesIn();
+// 	proto.resetBytesOut();	
+    
+//	st.dump(); 
+    // See if we have any messages waiting
+    do {
+	boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
+	if (buf) {
+	    if (buf->allocated()) {
+		done = true;
+		buf->dump();
+		boost::uint8_t *ptr = buf->reference();
+		if (ptr == 0) {
+		    log_debug("Que empty, net connection dropped for fd #%d", args->netfd);
+		    return false;
+		}
+		boost::shared_ptr<RTMP::rtmp_head_t> rthead = rtmp->decodeHeader(ptr);
+		ptr += rthead->head_size;
+		if (echo) {
+		    vector<boost::shared_ptr<amf::Element > > request = rtmp->parseEchoRequest(ptr, buf->allocated());
+		    boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[2]);
+		    result->dump();
+		    if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
+				      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
+			log_error("Sent echo test response response to client.");
+		    } else {
+			log_error("Couldn't send echo test response to client!");
+		    }
+		    
+		} else {
+		    body = rtmp->decodeMsgBody(*buf);
+		}
+	    } else {
+		log_error("Never read any data from fd #%d", args->netfd);
+		return false;
+	    }
+	} else {
+	    log_error("Communication error with client using fd #%d", args->netfd);
+	    return false;
+	}
+    } while (!done);
+
+    return true;
 }
 
 } // end of gnash namespace
