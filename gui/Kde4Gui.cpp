@@ -120,13 +120,13 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
     
     if(_xid) {
         _drawingWidget->embedInto(_xid);
-	_drawingWidget->show();
-	// Adjust width and height to the window we're being embedded into...
-	XWindowAttributes winAttributes;
-	XGetWindowAttributes(QX11Info::display(), _xid, &winAttributes);
-	_width=winAttributes.width;
-	_height=winAttributes.height;
-	_drawingWidget->resize(_width, _height);
+        _drawingWidget->show();
+        // Adjust width and height to the window we're being embedded into...
+        XWindowAttributes winAttributes;
+        XGetWindowAttributes(QX11Info::display(), _xid, &winAttributes);
+        _width=winAttributes.width;
+        _height=winAttributes.height;
+        _drawingWidget->resize(_width, _height);
     } else {
         // The QMainWindow takes ownership of the DrawingWidget.
         _window->setCentralWidget(_drawingWidget);
@@ -232,6 +232,8 @@ Kde4Gui::setInterval(unsigned int interval)
 void
 Kde4Gui::setCursor(gnash_cursor_type newcursor)
 {
+    if (! _mouseShown) return;
+
     switch (newcursor) {
         case CURSOR_HAND:
             _drawingWidget->setCursor(Qt::PointingHandCursor);
@@ -244,9 +246,28 @@ Kde4Gui::setCursor(gnash_cursor_type newcursor)
     }
 }
 
+bool
+Kde4Gui::showMouse(bool show)
+{
+    bool prevState = _mouseShown;
+    _mouseShown = show;
+
+    if (show) {
+        _drawingWidget->unsetCursor();
+    }
+    else {
+        _drawingWidget->setCursor(Qt::BlankCursor);
+    }
+
+    return prevState;
+}
+
 void
 Kde4Gui::setFullscreen()
 {
+    _fullscreen = true;
+    fullscreenAction->setChecked(_fullscreen);
+
     _window->showFullScreen();
     QMenuBar* mainMenu = _window->menuBar();
     if (mainMenu) mainMenu->hide();
@@ -255,6 +276,9 @@ Kde4Gui::setFullscreen()
 void
 Kde4Gui::unsetFullscreen()
 {
+    _fullscreen = false;
+    fullscreenAction->setChecked(_fullscreen);
+
     _window->showNormal();
     QMenuBar* mainMenu = _window->menuBar();
     if (mainMenu) mainMenu->show();
@@ -313,12 +337,27 @@ Kde4Gui::qtToGnashKey(QKeyEvent *event)
 }
 
 
+int
+Kde4Gui::qtToGnashModifier(const Qt::KeyboardModifiers modifiers)
+{
+    int gnashModifier = gnash::key::GNASH_MOD_NONE;
+
+    if (modifiers & Qt::ShiftModifier)
+        gnashModifier = gnashModifier | gnash::key::GNASH_MOD_SHIFT;
+    if (modifiers & Qt::ControlModifier)
+        gnashModifier = gnashModifier | gnash::key::GNASH_MOD_CONTROL;
+    if (modifiers & Qt::AltModifier)
+        gnashModifier = gnashModifier | gnash::key::GNASH_MOD_ALT;
+
+    return gnashModifier;
+}
+
 void
 Kde4Gui::handleKeyEvent(QKeyEvent *event, bool down)
 {
     gnash::key::code c = qtToGnashKey(event);
-//    int mod = qtToGnashModifier(event->state());
-    notify_key_event(c, 0, down);
+    int mod = qtToGnashModifier(event->modifiers());
+    notify_key_event(c, mod, down);
 }
 
 

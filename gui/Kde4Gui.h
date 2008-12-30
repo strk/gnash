@@ -102,6 +102,7 @@ public:
     virtual void handleKeyEvent(QKeyEvent *event, bool down);
     virtual void setCursor(gnash_cursor_type newcursor);
     virtual void setFullscreen();
+    virtual bool showMouse(bool show);
     virtual void unsetFullscreen();
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
@@ -125,7 +126,6 @@ private:
     /// Set up the map of Qt to Gnash keys.
     void setupKeyMap();
 
-    DrawBounds::value_type _validbounds;
     DrawBounds _drawbounds;
  
     /// The main application, which should destroy everything
@@ -148,7 +148,9 @@ private:
     /// map onto Gnash ones.
     KeyMap _keyMap;
 
+    /// Methods for mapping key press events from qt codes to gnash ones
     gnash::key::code qtToGnashKey(QKeyEvent *event);
+    int qtToGnashModifier(const Qt::KeyboardModifiers modifiers);
 
     /// QActions and QMenus should be attached to the
     /// QMainWindow so that they are destroyed with it.
