@@ -774,7 +774,11 @@ AMF::encodeElement(const amf::Element& el)
       {
   //	  boost::shared_ptr<Buffer> encstr = AMF::encodeString(el.to_string());
 	  //	  *buf += encstr;
-	  buf = encodeString(el.to_string());
+	  if (el.getDataSize() == 0) {
+	      buf = encodeNullString();
+	  } else {
+	      buf = encodeString(el.to_string());
+	  }
 	  break;
       }
       case Element::OBJECT_AMF0:
