@@ -820,7 +820,8 @@ rtmp_handler(Network::thread_params_t *args)
 		ptr += rthead->head_size;
 		if (echo) {
 		    vector<boost::shared_ptr<amf::Element > > request = rtmp->parseEchoRequest(ptr, buf->allocated());
-		    boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[2]);
+		    request[3]->dump();
+		    boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[3]);
 		    if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
 				      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
 			log_error("Sent echo test response response to client.");
