@@ -38,12 +38,21 @@
 #include <vector>
 #include <boost/cstdint.hpp>
 
+#ifdef HAVE_POLL
+# include <sys/poll.h>
+#else 
+# ifdef HAVE_EPOLL
+#  include <sys/epoll.h>
+# endif
+#endif
+
 #ifdef HAVE_DEJAGNU_H
 #include "dejagnu.h"
 #else
 #include "check.h"
 #endif
 
+#include "arg_parser.h"
 #include "log.h"
 #include "buffer.h"
 #include "handler.h"
@@ -57,12 +66,131 @@ using namespace amf;
 
 TestState runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
+static bool dump = false;
+static const char *result;
+
+static void usage (void);
+//static void test_pollfds();
+//static void test_que();
+
+void test1(Network::thread_params_t *args);
+void test2(Network::thread_params_t *args);
 
 int
-main (int /*argc*/, char** /*argv*/) {
-    gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-    dbglogfile.setVerbosity();
+main (int argc, char* argv[]) {
+    const Arg_parser::Option opts[] =
+        {
+            { 'h', "help",          Arg_parser::no  },
+            { 'v', "verbose",       Arg_parser::no  },
+            { 'd', "dump",          Arg_parser::no  },
+        };
+    
+    Arg_parser parser(argc, argv, opts);
+    if( ! parser.error().empty() ) {
+        cout << parser.error() << endl;
+        exit(EXIT_FAILURE);
+    }
+    
+    for( int i = 0; i < parser.arguments(); ++i ) {
+        const int code = parser.code(i);
+        try {
+            switch( code ) {
+              case 'h':
+                  usage ();
+                  exit(EXIT_SUCCESS);
+              case 'v':
+                  dbglogfile.setVerbosity();
+                  // This happens once per 'v' flag 
+                  log_debug(_("Verbose output turned on"));
+                  break;
+              case 'd':
+                  dump= true;
+                  break;
+	    }
+        }
+        
+        catch (Arg_parser::ArgParserException &e) {
+            cerr << _("Error parsing command line options: ") << e.what() << endl;
+            cerr << _("This is a Gnash bug.") << endl;
+        }
+    }
 
+    log_unimpl("FIXME: this test case is mostly depreciated due to refactoring");
+    // run the tests
+//    test_que();
+//    test_pollfds();
+}
+
+#if 0
+FIXME: needs to be moved to network tests
+void
+test_pollfds()
+{
+    Handler hand;
+    struct pollfd fds1;
+    Network::entry_t *func1 = test1;
+    fds1.fd = 3;
+    fds1.events = POLLIN |  POLLRDHUP;
+
+    hand.addPollFD(fds1, test1);
+    if ((hand.getPollFD(0).fd == 3) && (hand.getEntry(3) == func1)) {
+        runtest.pass ("Handler::addPollFD(0)");
+    } else {
+        runtest.fail ("Handler::addPollFD(0)");
+    }
+
+    struct pollfd fds2;
+    Network::entry_t *func2 = test2;
+    fds2.fd = 4;
+    fds2.events = POLLIN |  POLLRDHUP;
+
+    hand.addPollFD(fds2, test2);
+    if ((hand.getPollFD(1).fd == 4)&& (hand.getEntry(4) == func2)) {
+        runtest.pass ("Handler::addPollFD(1)");
+    } else {
+        runtest.fail ("Handler::addPollFD(1)");
+    }
+
+    struct pollfd *fdsptr = hand.getPollFDPtr();
+    if ((fdsptr[0].fd == 3) && (fdsptr[1].fd == 4)) {
+        runtest.pass ("Handler::getPollFDPtr()");
+    } else {
+        runtest.fail ("Handler::getPollFDPtr()");
+    }
+    
+    Network::thread_params_t args;
+    Network::entry_t *ptr1 = hand.getEntry(3);
+    if (ptr1) {
+        ptr1(&args);
+        if (strcmp(result, "test1") == 0) {
+            runtest.pass ("test1()");
+        } else {
+            runtest.fail ("test1()");
+        }
+    } else {
+        runtest.unresolved ("test1()");
+    }
+
+    Network::entry_t *ptr2 = hand.getEntry(4);
+    if (ptr2) {
+        ptr2(&args);
+        if (strcmp(result, "test2") == 0) {
+            runtest.pass ("test2()");
+        } else {
+            runtest.fail ("test2()");
+        }
+    } else {
+        runtest.unresolved ("test2()");
+    }
+    
+}
+#endif
+
+#if 0
+FIXME: needs to be moved to qcue tests
+void
+test_que()
+{
     Handler que;
 
     boost::shared_ptr<amf::Buffer> buf(new Buffer);
@@ -129,5 +257,31 @@ main (int /*argc*/, char** /*argv*/) {
      }
      
 //     que.dump();
+}
+#endif
+
+void
+test1(Network::thread_params_t *args)
+{
+    result = "test1";
+}
+
+void
+test2(Network::thread_params_t *args)
+{
+    result = "test2";
+}
+
+
+static void
+usage (void)
+{
+    cerr << "This program tests diskstream support in the cygnal library." << endl
+         << endl
+         << _("Usage: test_diskstream [options...]") << endl
+         << _("  -h,  --help          Print this help and exit") << endl
+         << _("  -v,  --verbose       Output verbose debug info") << endl
+         << _("  -d,  --dump          Dump data structures") << endl
+         << endl;
 }
 

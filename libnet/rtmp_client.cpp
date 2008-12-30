@@ -46,6 +46,8 @@ using namespace gnash;
 using namespace std;
 using namespace amf;
 
+typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
+
 namespace gnash
 {
 
@@ -81,22 +83,22 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     
     AMF amf_obj;
 
-    Element connect;
-    connect.makeString("connect");
+    ElementSharedPtr connect(new amf::Element);
+    connect->makeString("connect");
 
-    Element connum;
+    ElementSharedPtr connum(new amf::Element);
     // update the counter for the number of connections. This number is used heavily
     // in RTMP to help keep communications clear when there are multiple streams.
     _connections++;
-    connum.makeNumber(_connections);
+    connum->makeNumber(_connections);
     
     // Make the top level object
-    Element obj;
-    obj.makeObject();
+    ElementSharedPtr obj(new amf::Element);
+    obj->makeObject();
     
-    boost::shared_ptr<amf::Element> appnode(new Element);
+    ElementSharedPtr appnode(new amf::Element);
     appnode->makeString("app", app);
-    obj.addProperty(appnode);
+    obj->addProperty(appnode);
 
     const char *version = 0;
     if (rcfile.getFlashVersionString().size() > 0) {
@@ -105,56 +107,56 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
         version = "LNX 9,0,31,0";
     }  
 
-    boost::shared_ptr<amf::Element> flashVer(new Element);
+    ElementSharedPtr flashVer(new amf::Element);
     flashVer->makeString("flashVer", "LNX 9,0,31,0");
-    obj.addProperty(flashVer);
+    obj->addProperty(flashVer);
     
-    boost::shared_ptr<amf::Element> swfUrlnode(new Element);
+    ElementSharedPtr swfUrlnode(new amf::Element);
 //    swfUrl->makeString("swfUrl", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf");
     swfUrlnode->makeString("swfUrl", swfUrl);
-    obj.addProperty(swfUrlnode);
+    obj->addProperty(swfUrlnode);
 
 //    filespec = "rtmp://localhost/oflaDemo";
-    boost::shared_ptr<amf::Element> tcUrlnode(new Element);
+    ElementSharedPtr tcUrlnode(new amf::Element);
     tcUrlnode->makeString("tcUrl", tcUrl);
-    obj.addProperty(tcUrlnode);
+    obj->addProperty(tcUrlnode);
 
-    boost::shared_ptr<amf::Element> fpad(new Element);
+    ElementSharedPtr fpad(new amf::Element);
     fpad->makeBoolean("fpad", false);
-    obj.addProperty(fpad);
+    obj->addProperty(fpad);
 
-    boost::shared_ptr<amf::Element> audioCodecsnode(new Element);
+    ElementSharedPtr audioCodecsnode(new Element);
 //    audioCodecsnode->makeNumber("audioCodecs", 615);
     audioCodecsnode->makeNumber("audioCodecs", audioCodecs);
-    obj.addProperty(audioCodecsnode);
+    obj->addProperty(audioCodecsnode);
     
-    boost::shared_ptr<amf::Element> videoCodecsnode(new Element);
+    ElementSharedPtr videoCodecsnode(new Element);
 //    videoCodecsnode->makeNumber("videoCodecs", 124);
     videoCodecsnode->makeNumber("videoCodecs", videoCodecs);
-    obj.addProperty(videoCodecsnode);
+    obj->addProperty(videoCodecsnode);
 
-    boost::shared_ptr<amf::Element> videoFunctionnode(new Element);
+    ElementSharedPtr videoFunctionnode(new Element);
 //    videoFunctionnode->makeNumber("videoFunction", 0x1);
     videoFunctionnode->makeNumber("videoFunction", videoFunction);
-    obj.addProperty(videoFunctionnode);
+    obj->addProperty(videoFunctionnode);
 
-    boost::shared_ptr<amf::Element> pageUrlnode(new Element);
+    ElementSharedPtr pageUrlnode(new Element);
 //    pageUrlnode->makeString("pageUrl", "http://x86-ubuntu/software/gnash/tests/");
     pageUrlnode->makeString("pageUrl", pageUrl);
-    obj.addProperty(pageUrlnode);
+    obj->addProperty(pageUrlnode);
 
-    boost::shared_ptr<amf::Element> objencodingnode(new Element);
+    ElementSharedPtr objencodingnode(new Element);
     objencodingnode->makeNumber("objectEncoding", 0.0);
-    obj.addProperty(objencodingnode);
+    obj->addProperty(objencodingnode);
     
 //    size_t total_size = 227;
 //     Buffer *out = encodeHeader(0x3, RTMP::HEADER_12, total_size,
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
 //     const char *rtmpStr = "03 00 00 04 00 01 1f 14 00 00 00 00";
 //     Buffer *rtmpBuf = hex2mem(rtmpStr);
-    boost::shared_ptr<Buffer> conobj = connect.encode();
-    boost::shared_ptr<Buffer> numobj = connum.encode();
-    boost::shared_ptr<Buffer> encobj = obj.encode();
+    boost::shared_ptr<Buffer> conobj = connect->encode();
+    boost::shared_ptr<Buffer> numobj = connum->encode();
+    boost::shared_ptr<Buffer> encobj = obj->encode();
 
     boost::shared_ptr<Buffer> buf(new Buffer(conobj->size() + numobj->size() + encobj->size()));
     *buf += conobj;
@@ -175,20 +177,22 @@ RTMPClient::encodeStream(double id)
     struct timespec now;
     clock_gettime (CLOCK_REALTIME, &now);
 
-    boost::shared_ptr<amf::Element> str(new Element);
+    boost::shared_ptr<amf::Element> str(new amf::Element);
     str->makeString("createStream");
     boost::shared_ptr<Buffer> strobj = str->encode();
   
-    boost::shared_ptr<amf::Element>  num(new Element);
+    boost::shared_ptr<amf::Element>  num(new amf::Element);
     num->makeNumber(id);
     boost::shared_ptr<Buffer> numobj = num->encode();
 
-    boost::shared_ptr<Buffer> buf(new Buffer(strobj->size() + numobj->size()));
-
     // Set the NULL object element that follows the stream ID
-    boost::shared_ptr<amf::Element> null;
+    boost::shared_ptr<amf::Element> null(new amf::Element);
     null->makeNull();
     boost::shared_ptr<Buffer> nullobj = null->encode();    
+
+    size_t totalsize = strobj->size() + numobj->size() + nullobj->size();
+
+    boost::shared_ptr<Buffer> buf(new Buffer(totalsize));
 
     *buf += strobj;
     *buf += numobj;
@@ -271,43 +275,47 @@ RTMPClient::encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string
     boost::shared_ptr<Buffer> nullobj = null.encode();    
 
     // Set the BOOLEAN object element that is the last field in the packet
-    Element boolean;
-    boolean.makeBoolean(flag);
-    boost::shared_ptr<Buffer> boolobj = boolean.encode();    
-    
-    // Calculate the packet size, rather than use the default as we want to
-    // to be concious of the memory usage. The command name and the optional
-    // file name are the only two dynamically sized fields.
-    size_t pktsize = strobj->size() + name.size();
-    // Add 2 bytes for the Boolean, and 16 bytes for the two doubles, which are
-    // 8 bytes apiece.
-    pktsize += (sizeof(double) * 2) + 2;
-    boost::shared_ptr<Buffer> buf(new Buffer(pktsize));    
-    *buf += strobj;
-    *buf += stridobj;
-    *buf += nullobj;
-    // Seek doesn't use the boolean flag
+    // (SEEK and PLAY don't use the boolean flag)
+    boost::shared_ptr<Buffer> boolobj;
     if ((op != STREAM_SEEK) && (op != STREAM_PLAY)) {
-	*buf += boolobj;
+        Element boolean;
+        boolean.makeBoolean(flag);
+        boolobj = boolean.encode();    
+    }
+
+    // The seek command also may have an optional location to seek to
+    boost::shared_ptr<Buffer> posobj;
+    if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
+        Element seek;
+        seek.makeNumber(pos);
+        posobj = seek.encode();
     }
 
     // The play command has an optional field, which is the name of the file
     // used for the stream. A Play command without this name set play an
     // existing stream that is already open.
+    boost::shared_ptr<Buffer> fileobj; 
     if (!name.empty()) {
-	Element filespec;
-	filespec.makeString(name);
-	boost::shared_ptr<Buffer> fileobj = filespec.encode();
-	*buf += fileobj;
+        Element filespec;
+        filespec.makeString(name);
+        fileobj = filespec.encode();
     }
-    
-    // The seek command also may have an optional location to seek to
-    if ((op == STREAM_PAUSE) || (op == STREAM_SEEK)) {
-	Element seek;
-	seek.makeNumber(pos);
-	boost::shared_ptr<Buffer> posobj = seek.encode();
-	*buf += posobj;
-    }
+
+    // Calculate the packet size, rather than use the default as we want to
+    // to be concious of the memory usage. The command name and the optional
+    // file name are the only two dynamically sized fields.
+    size_t pktsize = strobj->size() + stridobj->size() + nullobj->size();
+    if ( boolobj ) pktsize += boolobj->size();
+    if ( fileobj ) pktsize += fileobj->size();
+    if ( posobj ) pktsize += posobj->size();
+
+    boost::shared_ptr<Buffer> buf(new Buffer(pktsize));    
+    *buf += strobj;
+    *buf += stridobj;
+    *buf += nullobj;
+    if ( boolobj ) *buf += boolobj;
+    if ( fileobj ) *buf += fileobj;
+    if ( posobj ) *buf += posobj;
 
     return buf;
 }
@@ -331,7 +339,7 @@ RTMPClient::handShakeRequest()
     // Since we don't know what the format is, create a pattern we can
     // recognize if we stumble across it later on.
     for (int i=0; i<RTMP_BODY_SIZE; i++) {
-	Network::byte_t pad = i^256;
+	boost::uint8_t pad = i^256;
         *_handshake += pad;
     }
     
@@ -387,7 +395,8 @@ RTMPClient::clientFinish()
 	}
     }
 
-    writeNet(_handshake->reference(), RTMP_BODY_SIZE);
+    ret = writeNet(_handshake->reference(), RTMP_BODY_SIZE);
+    if ( ret <= 0 ) return false;
 
     return true;
 }

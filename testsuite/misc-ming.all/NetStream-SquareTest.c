@@ -86,7 +86,7 @@ main(int argc, char** argv)
   	"nc=new NetConnection();"
 	"check(!nc.isConnected, 'newly created NetConnection is not connected');"
 	"nc.connect(null);"
-	"xcheck(nc.isConnected, 'NetConnection is connected after .connect(null)');"
+	"check(nc.isConnected, 'NetConnection is connected after .connect(null)');"
 	"check(!NetStream.prototype.hasOwnProperty('currentFPS'));" // version 7 here
 	"xcheck(!NetStream.prototype.hasOwnProperty('currentFps'));"
 	"stream = new NetStream();"

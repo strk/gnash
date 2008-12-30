@@ -111,19 +111,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(321); // SWF5
+	check_totals(327); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(823); // SWF6
+	check_totals(829); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(840); // SWF7
+	check_totals(846); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(914); // SWF8+
+	check_totals(936); // SWF8+
 #endif
 
 	play();
@@ -2158,6 +2158,54 @@ vis._visible = "gibberish";
 check_equals(vis._visible, false);
 vis._visible = undefined;
 check_equals(vis._visible, false);
+#endif
+
+check_equals(_root.focusEnabled, undefined);
+_root.focusEnabled = 5;
+check_equals(_root.focusEnabled, 5);
+_root.focusEnabled = 0;
+check_equals(_root.focusEnabled, 0);
+_root.focusEnabled = true;
+check_equals(_root.focusEnabled, true);
+_root.focusEnabled = false;
+check_equals(_root.focusEnabled, false);
+_root.focusEnabled = "hello";
+check_equals(_root.focusEnabled, "hello");
+
+#if OUTPUT_VERSION > 7
+check_equals(_root.blendMode, "normal");
+check_equals(typeof(_root.blendMode), "string");
+_root.blendMode = 2;
+check_equals(_root.blendMode, "layer");
+_root.blendMode = "multiply";
+check_equals(_root.blendMode, "multiply");
+_root.blendMode = 0;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = 14;
+check_equals(_root.blendMode, "hardlight");
+_root.blendMode = 15;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = "scre";
+check_equals(_root.blendMode, undefined);
+_root.blendMode = "daRkEn";
+check_equals(_root.blendMode, undefined);
+_root.blendMode = "darken";
+check_equals(_root.blendMode, "darken");
+_root.blendMode = "Some rubbish";
+check_equals(_root.blendMode, "darken");
+_root.blendMode = -1;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = 5.5;
+check_equals(_root.blendMode, "lighten");
+_root.blendMode = "NORMAL";
+check_equals(_root.blendMode, "lighten");
+_root.blendMode = undefined;
+check_equals(_root.blendMode, "normal");
+
+// Set back to normal so we can see the results...
+_root.blendMode = "normal";
+check_equals(_root.blendMode, "normal");
+
 #endif
 
 //_root.loadVariables(MEDIA(vars.txt), "GET");

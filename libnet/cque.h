@@ -48,7 +48,7 @@ public:
     CQue(const std::string &str) { _name = str; };
     ~CQue();
     // Push data onto the que
-    bool push(gnash::Network::byte_t *data, int nbytes);
+    bool push(boost::uint8_t *data, int nbytes);
     bool push(boost::shared_ptr<amf::Buffer> data);
     // Pop the first date element off the que
     boost::shared_ptr<amf::Buffer> pop();
@@ -70,6 +70,8 @@ public:
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
     boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin);
+
+    boost::shared_ptr<amf::Buffer> operator[] (int index) { return _que[index]; };
     
     // Dump the data to the terminal
     void dump();
@@ -89,7 +91,7 @@ private:
     // This is the mutex used by the condition variable. It needs to be separate from the
     // one used to lock access to the que.
     boost::mutex	_cond_mutex;
-    // This is the mutex that control access to the que.
+    // This is the mutex that controls access to the que.
     boost::mutex	_mutex;
 #ifdef USE_STATS_QUEUE
     que_stats_t		_stats;

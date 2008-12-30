@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Klash, embedded Gnash player for KDE
+Comment=SWF player plugin
+X-KDE-Library=libklashpart
+# Keep in sync with the audio types in kmplayer.desktop
+MimeType=application/x-shockwave-flash;application/futuresplash;
+Type=Service
+Icon=www
+ServiceTypes=KParts/ReadOnlyPart,Browser/View
+X-KDE-BrowserView-PluginsInfo=klash/pluginsinfo
+InitialPreference=1

@@ -1,0 +1,57 @@
+# 
+#   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+#
+# Build the KDE gui
+# 
+if BUILD_KDE3_GUI
+
+klash3.moc: $(srcdir)/kdesup.h
+	@if test x"$(MOC3)" != x; then \
+	  echo "Generating MOC 3 file..."; \
+	  $(MOC3) $(srcdir)/kdesup.h -o klash3.moc; \
+	else  \
+	  echo "WARNING: Install QT 3.x moc tool! Linking to default MOC file"; \
+	  ln -sf $(srcdir)/klash3.moc.in klash3.moc; \
+	fi
+
+bin_PROGRAMS += kde3-gnash
+
+kde3_gnash_CPPFLAGS = -DGUI_KDE3 -DGUI_CONFIG=\"KDE3\" \
+	 $(AM_CPPFLAGS) $(KDE3_CFLAGS) $(QT3_CFLAGS)
+kde3_gnash_SOURCES = $(GUI_SRCS) gui_kde.cpp
+kde3_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+#kde_gnash_DEPENDENCIES = .configline
+kde3_gnash_LDADD = \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS)
+if BUILD_OGL_RENDERER
+kde3_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+kde3_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+	$(KDE3_LIBS) $(QT3_LIBS) $(OPENGL_LIBS)
+kde3_gnash_SOURCES += kde_glue_opengl.cpp kde_glue_opengl.h kde_glue.h \
+	 	kde.cpp kdesup.h kde_glue.h
+endif
+if BUILD_AGG_RENDERER
+kde3_gnash_CPPFLAGS += $(AGG_CFLAGS) $(QT3_CFLAGS)
+kde3_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+	$(KDE3_LIBS) $(QT3_LIBS) $(AGG_LIBS)
+kde3_gnash_SOURCES += kde_glue_agg.cpp kde_glue_agg.h \
+	 	kde.cpp kdesup.h kde_glue.h
+endif
+endif

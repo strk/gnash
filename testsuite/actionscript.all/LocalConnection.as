@@ -26,6 +26,8 @@
 rcsid="$Id: LocalConnection.as,v 1.21 2008/05/05 15:26:38 bwy Exp $";
 #include "check.as"
 
+snd = new LocalConnection();
+
 #if OUTPUT_VERSION < 6
 
 check_equals(LocalConnection, undefined);
@@ -33,10 +35,11 @@ totals(1);
 
 #else // OUTPUT_VERSION >= 6
 
-xcheck (LocalConnection.prototype.hasOwnProperty("send"));
-xcheck (LocalConnection.prototype.hasOwnProperty("connect"));
-xcheck (LocalConnection.prototype.hasOwnProperty("close"));
-xcheck (LocalConnection.prototype.hasOwnProperty("domain"));
+check_equals(LocalConnection.prototype.__proto__, Object.prototype);
+check (LocalConnection.prototype.hasOwnProperty("send"));
+check (LocalConnection.prototype.hasOwnProperty("connect"));
+check (LocalConnection.prototype.hasOwnProperty("close"));
+check (LocalConnection.prototype.hasOwnProperty("domain"));
 check (! LocalConnection.prototype.hasOwnProperty("allowDomain"));
 check (! LocalConnection.prototype.hasOwnProperty("onStatus"));
 
@@ -62,8 +65,7 @@ check_equals (typeof(rec.domain), 'function');
 // test the LocalConnection::send method
 check_equals (typeof(rec.send), 'function');
 
-// Get the domain. By default this should be "localhost" because we
-// haven't made any connections yet,
+// Get the domain. This should be based on the domain of the SWF.
 var domain = rec.domain();
 check_equals (domain, "localhost");
 
@@ -73,41 +75,126 @@ check_equals (domain, "localhost");
 // could always (in a normal application) check later for incoming
 // connections.
 
+// Test connect. Return based on argument, not result of connection.
+// Anything but a string returns false. The onStatus function is not called.
+statuses = new Array;
+
+rec.onStatus = function(obj) {
+    statuses.push(obj.code);
+};
+
+ret = rec.connect();
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+ret = rec.connect(3);
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+ret = rec.connect(undefined);
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+ret = rec.connect("");
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+ret = rec.connect("string", 7);
+check_equals(ret, true);
+check_equals(statuses.length, 0);
+
+ret = rec.connect("string");
+check_equals(ret, false);
+check_equals(statuses.length, 0);
+
+rec.close();
+
+ret = rec.connect("string");
+check_equals(ret, true);
+check_equals(statuses.length, 0);
+
 rec.close();
 result = rec.connect("lc_test");
-xcheck_equals (rec.domain(), "localhost");
+check_equals (rec.domain(), "localhost");
 
 // NOTE: This test will fail if a shared memory segment of the same
 // name exists. So the first time it'll pass, then it'll fail.
 check_equals (result, true);
 
 // Checks only for syntactical correctness, not success
+
+result = snd.send();
+check_equals (result, false);
+
+result = snd.send(3);
+check_equals (result, false);
+
+result = snd.send("string", "string", "string", "string");
+check_equals (result, true);
+
+
+
 result = snd.send("lc_test", "testfunc", "val");
-xcheck_equals (result, true);
+check_equals (result, true);
 
 // The function name may not be send or any other LC property.
 result = snd.send("lc_test", "send");
-xcheck_equals (result, false);
+check_equals (result, false);
 result = snd.send("lc_test", "onStatus");
-xcheck_equals (result, false);
+check_equals (result, false);
 // Numbers are also bad
 result = snd.send("lc_test", 1);
-xcheck_equals (result, false);
+check_equals (result, false);
 // undefined
 result = snd.send("lc_test", funcname);
-xcheck_equals (result, false);
+check_equals (result, false);
 
+result = snd.send("lc_test", "Send");
+ check_equals(result, false);
+
+result = snd.send("lc_test", "DOMAIn");
+ check_equals(result, false);
+
+result = snd.send("lc_test", "close");
+ check_equals(result, false);
+
+result = snd.send("lc_test", "conNeCt");
+ check_equals(result, false);
+
+result = snd.send("lc_test", "onStatus");
+ check_equals(result, false);
+
+result = snd.send("lc_test", "ALLOWDOMAIN");
+ check_equals(result, false);
+
+result = snd.send("lc_test", "");
+ check_equals(result, false);
 
 // But anything else is fine.
+result = snd.send("lc_test", "8");
+ check_equals(result, true);
+
+result = snd.send("lc_test", "ß");
+ check_equals(result, true);
+
+result = snd.send("lc_test", "&");
+ check_equals(result, true);
+
+result = snd.send("lc_test", ".");
+ check_equals(result, true);
+
+result = snd.send("lc_test", "g.");
+ check_equals(result, true);
+
 result = snd.send("lc_test", "getSeconds");
-xcheck_equals (result, true);
+check_equals (result, true);
 funcname = "onFullScreen";
 result = snd.send("lc_test", funcname);
-xcheck_equals (result, true);
+check_equals (result, true);
 
 rec.close();
 
-totals(22);
+totals(52);
 
 #endif // OUTPUT_VERSION >= 6
 

@@ -1,0 +1,5 @@
+Klash is a plugin for Konqueror, using the gnash binary from the Gnash
+project. As of this writing, you can only get it by checking it out their
+CVS repository. It should be newer than 2006-02-23, because that version
+has the -x option to embed in a window.
+You also need automake/autoconf and the SDL development.

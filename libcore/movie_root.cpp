@@ -109,7 +109,7 @@ movie_root::movie_root(const movie_definition& def,
 	m_mouse_y(0),
 	m_mouse_buttons(0),
 	_lastTimerId(0),
-	m_active_input_text(NULL),
+	_currentFocus(0),
 	m_time_remainder(0.0f),
 	m_drag_state(),
 	_movies(),
@@ -495,6 +495,20 @@ movie_root::clear()
 	setInvalidated();
 }
 
+as_object*
+movie_root::getSelectionObject() const
+{
+    as_object* global = _vm.getGlobal();
+    if (!global) return 0;
+
+    as_value s;
+    if (!global->get_member(NSV::CLASS_SELECTION, &s)) return 0;
+    
+    as_object* sel = s.to_object().get();
+   
+    return sel;
+}
+
 boost::intrusive_ptr<Stage_as>
 movie_root::getStageObject()
 {
@@ -795,35 +809,16 @@ movie_root::generate_mouse_button_events()
 	        {
 		        // onPress
 
-		        // set/kill focus for current root
-		        character* current_active_entity = getFocus();
+                // Try setting focus on the new character. This will handle
+                // all necessary events and removal of current focus.
+                // Do not set focus to NULL.
+                if (ms.activeEntity) {
+                    setFocus(ms.activeEntity);
 
-		        // It's another entity ?
-		        if (current_active_entity != ms.activeEntity.get())
-		        {
-			        // First to clean focus
-			        if (current_active_entity != NULL)
-			        {
-				        current_active_entity->on_event(event_id::KILLFOCUS);
-				        need_redisplay=true;
-				        setFocus(NULL);
-			        }
-
-			        // Then to set focus
-			        if (ms.activeEntity)
-			        {
-				        if (ms.activeEntity->on_event(event_id::SETFOCUS))
-				        {
-					        setFocus(ms.activeEntity.get());
-				        }
-			        }
-		        }
-
-		        if (ms.activeEntity)
-		        {
 			        ms.activeEntity->on_button_event(event_id::PRESS);
 			        need_redisplay=true;
 		        }
+
 		        ms.wasInsideActiveEntity = true;
 		        ms.previousButtonState = MouseButtonState::DOWN;
 	        }
@@ -1135,7 +1130,7 @@ movie_root::display()
 
 		movie->clear_invalidated();
 
-		if (movie->get_visible() == false) continue;
+		if (movie->isVisible() == false) continue;
 
 		// null frame size ? don't display !
 		const rect& sub_frame_size = movie->get_frame_size();
@@ -1156,7 +1151,7 @@ movie_root::display()
 
 		ch->clear_invalidated();
 
-		if (ch->get_visible() == false) continue;
+		if (ch->isVisible() == false) continue;
 
 		ch->display();
 
@@ -1252,7 +1247,8 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 }
 
 /* static private */
-void movie_root::add_listener(CharacterList& ll, character* listener)
+void
+movie_root::add_listener(CharacterList& ll, character* listener)
 {
 	assert(listener);
 	for(CharacterList::const_iterator i = ll.begin(), e = ll.end(); i != e; ++i)
@@ -1311,7 +1307,8 @@ movie_root::notify_mouse_listeners(const event_id& event)
             // Can throw an action limit exception if the stack limit is 0 or 1.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value(PROPNAME(event.get_function_name())));
+		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, 
+                    event.functionName());
 		}
 	    catch (ActionLimitException &e)
 	    {
@@ -1330,18 +1327,61 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	}
 }
 
-character*
+boost::intrusive_ptr<character>
 movie_root::getFocus()
 {
 	assert(testInvariant());
-	return m_active_input_text;
+	return _currentFocus;
 }
 
-void
-movie_root::setFocus(character* ch)
+bool
+movie_root::setFocus(boost::intrusive_ptr<character> to)
 {
-	m_active_input_text = ch;
+
+    // Nothing to do if current focus is the same as the new focus. 
+    // _level0 also seems unable to receive focus under any circumstances
+    // TODO: what about _level1 etc ?
+    if (to == _currentFocus || to == static_cast<character*>(getRootMovie())) {
+        return false;
+    }
+
+    if (to && !to->handleFocus()) {
+        // TODO: not clear whether to remove focus in this case.
+        return false;
+    }
+
+    // Undefined or NULL character removes current focus. Otherwise, try
+    // setting focus to the new character. If it fails, remove current
+    // focus anyway.
+
+    // Store previous focus, as the focus needs to change before onSetFocus
+    // is called and listeners are notified.
+    character* from = _currentFocus.get();
+
+    if (from) {
+
+        // Perform any actions required on killing focus (only TextField).
+        from->killFocus();
+        from->callMethod(NSV::PROP_ON_KILL_FOCUS, to.get());
+    }
+
+    _currentFocus = to;
+
+    if (to) {
+        to->callMethod(NSV::PROP_ON_SET_FOCUS, from);
+    }
+
+    as_object* sel = getSelectionObject();
+
+    /// Notify Selection listeners with previous and new focus as arguments.
+    if (sel) {
+        sel->callMethod(NSV::PROP_BROADCAST_MESSAGE, "onSetFocus",
+                from, to.get());
+    }
+
 	assert(testInvariant());
+
+    return true;
 }
 
 character*
@@ -1524,16 +1564,6 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 	}
 }
 
-void 
-movie_root::dump_character_tree() const 
-{
-    // @@ deprecated
-  for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-	{
-	  log_debug("--- movie at depth %d:", i->second->get_depth());
-		i->second->dump_character_tree("CTREE: ");
-	}
-}
 
 int
 movie_root::minPopulatedPriorityQueue() const
@@ -1785,13 +1815,15 @@ void
 movie_root::markReachableResources() const
 {
     // Mark movie levels as reachable
-    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
+            i!=e; ++i)
     {
         i->second->setReachable();
     }
 
     // Mark childs as reachable
-    for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+    for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend();
+            i!=e; ++i)
     {
         i->second->setReachable();
     }
@@ -1804,8 +1836,8 @@ movie_root::markReachableResources() const
     m_mouse_button_state.markReachableResources();
     
     // Mark timer targets
-    for (TimerMap::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
-            i != e; ++i)
+    for (TimerMap::const_iterator i=_intervalTimers.begin(),
+            e=_intervalTimers.end(); i != e; ++i)
     {
         i->second->markReachableResources();
     }
@@ -1827,6 +1859,8 @@ movie_root::markReachableResources() const
     // Mark global Mouse object
     if ( _mouseobject ) _mouseobject->setReachable();
 
+    if (_currentFocus) _currentFocus->setReachable();
+
     // Mark character being dragged, if any
     m_drag_state.markReachableResources();
 
@@ -1835,7 +1869,8 @@ movie_root::markReachableResources() const
     //       parent.
     //std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(&character::setReachable, _1));
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e; ++i)
+    for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
+            i!=e; ++i)
     {
         assert((*i)->isReachable());
     }
@@ -2338,9 +2373,6 @@ void
 movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 {
 
-    const std::string yes = _("yes");
-    const std::string no = _("no");
-
     tree<StringPair>::iterator localIter;
 
     //
@@ -2387,9 +2419,19 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     // Stage: scripts state (enabled/disabled)
     localIter = tr.append_child(it, StringPair("Scripts",
                 _disableScripts ? " disabled" : "enabled"));
-                
+     
+    getCharacterTree(tr, it);    
+}
+
+void
+movie_root::getCharacterTree(tree<StringPair>& tr,
+        tree<StringPair>::iterator it)
+{
+
+    tree<StringPair>::iterator localIter;
+
     /// Stage: number of live characters
-    os.str("");
+    std::ostringstream os;
     os << _liveChars.size();
     localIter = tr.append_child(it, StringPair(_("Live characters"), os.str()));
 
@@ -2401,6 +2443,7 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
 	}
 
 }
+
 #endif
 
 void

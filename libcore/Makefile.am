@@ -65,6 +65,7 @@ libgnashcore_la_SOURCES = \
 	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
+	Bitmap.cpp \
 	TextField.cpp \
         BlurFilter.cpp \
         GlowFilter.cpp \
@@ -104,7 +105,6 @@ libgnashcore_la_SOURCES = \
 	swf_function.cpp \
 	Video.cpp \
 	StreamProvider.cpp \
-	array.cpp \
 	Button.cpp \
 	DisplayList.cpp \
 	fill_style.cpp \
@@ -131,7 +131,6 @@ noinst_HEADERS = \
 	SystemClock.h \
 	ManualClock.h \
 	RunInfo.h \
-	array.h	\
 	as_environment.h \
 	as_function.h \
 	abc_function.h \
@@ -139,7 +138,8 @@ noinst_HEADERS = \
 	as_prop_flags.h	\
 	as_value.h \
 	asClass.h \
-	bitmap_info.h \
+	Bitmap.h \
+	BitmapInfo.h \
 	BitmapMovieInstance.h \
 	builtin_function.h \
 	Button.h \

@@ -51,6 +51,8 @@ namespace gnash {
     class LoadVariablesThread;
     class gradient_record;
     class TextField;
+    class BitmapData_as;
+    class BitmapInfo;
     namespace SWF {
         class PlaceObject2Tag;
     }
@@ -75,7 +77,6 @@ public:
     typedef movie_definition::PlayList PlayList;
 
     typedef std::vector<swf_event*> SWFEventsVector;
-
 
     /// Construct a MovieClip instance
     //
@@ -230,8 +231,7 @@ public:
 
     //float get_timer() const;
 
-    void    restart();
-
+    void restart();
 
     bool has_looped() const
     {
@@ -248,10 +248,12 @@ public:
     /// Return the topmost entity that the given point
     /// covers that can receive mouse events.  NULL if
     /// none.  Coords are in parent's frame.
-    virtual character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
+    virtual character* get_topmost_mouse_entity(boost::int32_t x,
+            boost::int32_t y);
 
     // see dox in character.h
-    const character* findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const;
+    const character* findDropTarget(boost::int32_t x, boost::int32_t y,
+            character* dragging) const;
 
     void setDropTarget(const std::string& tgt)
     {
@@ -268,16 +270,16 @@ public:
         return true; // sprites can be referenced 
     }
 
-    virtual void    advance();
+    virtual void advance();
 
-    void    advance_sprite();
+    void advance_sprite();
 
     /// Set the sprite state at the specified frame number.
     //
     /// 0-based frame numbers!! 
     ///(in contrast to ActionScript and Flash MX)
     ///
-    void    goto_frame(size_t target_frame_number);
+    void goto_frame(size_t target_frame_number);
 
     /// Parse frame spec and return a 0-based frame number.
     //
@@ -318,7 +320,7 @@ public:
     //
     /// This should only be used by the Color AS class
     ///
-    cxform  get_user_cxform() const
+    cxform get_user_cxform() const
     {
         return _userCxform;
     }
@@ -389,7 +391,7 @@ public:
 
     /// Proxy of DisplayList::remove_character()
     ///
-    /// @param ch
+    /// @
     /// new character to be used for replacing.
     ///
     /// @param depth
@@ -439,7 +441,7 @@ public:
     /// @return true on success, false on failure
     /// FIXME: currently never returns false !
     ///
-    bool attachCharacter(character& newch, int depth);
+    bool attachCharacter(character& newch, int depth, as_object* initObject);
 
     /// Handle placement event
     //
@@ -455,7 +457,7 @@ public:
     /// (1) Construct this instance as an ActionScript object.
     ///     See constructAsScriptObject() method.
     ///
-    virtual void stagePlacementCallback();
+    virtual void stagePlacementCallback(as_object* initObj = 0);
 
     /// Unload all contents in the displaylist and this instance
     /// See character::unload for more info
@@ -621,8 +623,6 @@ public:
 
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
-    void dump_character_tree(const std::string prefix) const;
-            
     const DisplayList& getDisplayList() const {
             return m_display_list;
     }
@@ -679,6 +679,19 @@ public:
     /// testsuite/misc-ming.all/displaylist_depths_test.swf
     ///
     void removeMovieClip();
+
+    /// Create a Bitmap DisplayObject at the specified depth.
+    void attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth);
+
+    /// Render this MovieClip to a GnashImage using the passed transform
+    //
+    /// @return     The GnashImage with the MovieClip drawn onto it.
+    virtual std::auto_ptr<GnashImage> drawToBitmap(
+            const SWFMatrix& mat = SWFMatrix(), 
+            const cxform& cx = cxform(),
+            character::BlendMode bm = character::BLENDMODE_NORMAL,
+            const rect& clipRect = rect(),
+            bool smooth = false);
 
     /// @name Drawing API
     /// @{ 
@@ -746,6 +759,11 @@ public:
         set_invalidated();
         _drawable->clear();
     }
+
+    /// Set focus to this MovieClip
+    //
+    /// @return true if this MovieClip can receive focus.
+    virtual bool handleFocus();
 
     /// @} Drawing API
     
@@ -1025,7 +1043,6 @@ protected:
 
 /// Initialize the global MovieClip class
 void movieclip_class_init(as_object& global);
-
 
 } // end of namespace gnash
 

@@ -85,6 +85,11 @@ a=[]; for (i in tmp) a.push(i);
 a.sort();
 check_equals(a.toString(), '0,1,2,custom'); // note: no 'length'
 
+// Test reading STRICT_ARRAY
+check_equals(typeof(so1.data.strictary), 'object');
+check_equals(so1.data.strictary.toString(), 'a,b,c');
+check_equals(so1.data.strictary.length, 3);
+
 // Test reading OBJECT
 check(so1.data.obj instanceOf Object);
 check_equals(typeof(so1.data.obj), 'object');
@@ -111,6 +116,19 @@ check_equals(so1.data.obj.c, true);
 check_equals(typeof(so1.data.ref), 'object');
 check_equals(so1.data.ref, so1.data.obj); 
 
+// Test reading DATE
+check_equals(typeof(so1.data.dat), 'object');
+check(so1.data.dat instanceof Date);
+check_equals(so1.data.dat.getYear(), 70);
+check_equals(so1.data.dat.getFullYear(), 1970);
+check_equals(so1.data.dat.getMonth(), 0);
+check_equals(so1.data.dat.getDate(), 1);
+check_equals(so1.data.dat.getDay(), 4);	// It was a Thursday
+check_equals(so1.data.dat.getHours(), 0);
+check_equals(so1.data.dat.getMinutes(), 0);
+check_equals(so1.data.dat.getSeconds(), 0);
+check_equals(so1.data.dat.getMilliseconds(), 0);
+
 // force writing the sol or the adobe player won't save it
 // again. This will also serve as a kind of reference for
 // how the sol file was produced in the first place
@@ -128,6 +146,13 @@ so1.data.aryns = [4,5,6];
 so1.data.aryns.fun = function() {}; // functions in arrays are simply skipped
 so1.data.aryns.custom = 7;
 so1.data.aryns.length = 8; // non-strict array (ECMA_ARRAY)
+
+// This member is an attempt to trigger encoding
+// of a STRICT array. The attempt seems to be
+// unsuccessful tough, but no way to test with 
+// ActionScript. Time to look at the binary differences
+// between the pp and gnash versions of the saved sol.
+so1.data.strictary = ['a','b','c'];
 
 so1.data.obj = {a:10,b:'20',c:true};
 so1.data.obj.fun = function() {}; // functions in objects are simply skipped
@@ -151,6 +176,8 @@ so1.data.mc = createEmptyMovieClip("mc2", 2); // movieclip values are skipped
 AsSetPropFlags(so1.data, '__constructor__', 0, 1); // unhide __constructor__ (it's a function so will be skipped anyway)
 AsSetPropFlags(so1.data, 'constructor', 0, 1); // unhide constructor (it's a function so will be skipped anyway)
 
+so1.data.dat = new Date(70,0); // 1 Jan 1970 00:00:00 localtime
+
 so1.flush();
 
 quit = function()
@@ -164,4 +191,4 @@ note();
 setInterval(quit, 5000);
 stop();
 
-check_totals(38);
+check_totals(52);

@@ -14,27 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
 //
-//
-
-// Implementation for ActionScript Number object.
+// Implementation for ActionScript Object.
 
 #ifndef GNASH_OBJECT_H
 #define GNASH_OBJECT_H
-
-#include <memory> // for auto_ptr
 
 namespace gnash {
 
 class as_object;
 
-/// Initialize the global Number class
+/// Initialize the global Object class
 void object_class_init(as_object& global);
 
 /// Return an Object instance
-std::auto_ptr<as_object> init_object_instance();
+as_object* init_object_instance();
 
 as_object* getObjectInterface();
 

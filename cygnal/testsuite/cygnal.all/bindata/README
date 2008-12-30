@@ -1,0 +1,5 @@
+These are binary captures made of the Red5 'echo_test' swf file. Since we can't use the Adobe player for testing Cygnal, as that would cause potential
+licensing issues for other Gnash work, this lets us use netcat and wget
+to send and receive RTMPT, which is AMF transferred using HTTP POST and GET
+commands.
+

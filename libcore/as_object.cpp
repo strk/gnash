@@ -32,7 +32,7 @@
 #include "fn_call.h" // for generic methods
 #include "Object.h" // for getObjectInterface
 #include "action.h" // for call_method
-#include "array.h" // for setPropFlags
+#include "Array_as.h" // for setPropFlags
 #include "as_function.h" // for inheritance of as_super
 
 #include <set>
@@ -249,7 +249,7 @@ public:
 
 namespace gnash {
 
-bool
+void
 as_object::add_property(const std::string& name, as_function& getter,
 		as_function* setter)
 {
@@ -262,25 +262,30 @@ as_object::add_property(const std::string& name, as_function& getter,
 	if ( prop )
 	{
 		cacheVal = prop->getCache();
-		return _members.addGetterSetter(k, getter, setter, cacheVal);
 
-		// NOTE: watch triggers not called when adding a new getter-setter property
+        // Used to return the return value of addGetterSetter, but this
+        // is always true.
+		_members.addGetterSetter(k, getter, setter, cacheVal);
+
+        return;
+		// NOTE: watch triggers not called when adding a new
+        // getter-setter property
 	}
 	else
 	{
 
-		bool ret = _members.addGetterSetter(k, getter, setter, cacheVal);
-		if (!ret) return false;
+		_members.addGetterSetter(k, getter, setter, cacheVal);
 
 #if 1
 		// check if we have a trigger, if so, invoke it
-		// and set val to it's return
+		// and set val to its return
 		TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(k, 0));
 		if ( trigIter != _trigs.end() )
 		{
 			Trigger& trig = trigIter->second;
 
-			log_debug("add_property: property %s is being watched, current val: %s", name, cacheVal);
+			log_debug("add_property: property %s is being watched, "
+                    "current val: %s", name, cacheVal);
 			cacheVal = trig.call(cacheVal, as_value(), *this);
 
 			// The trigger call could have deleted the property,
@@ -289,15 +294,14 @@ as_object::add_property(const std::string& name, as_function& getter,
 			prop = _members.getProperty(k);
 			if ( ! prop )
 			{
-				log_debug("Property %s deleted by trigger on create (getter-setter)", name);
-				return false; // or true ?
+				log_debug("Property %s deleted by trigger on create "
+                        "(getter-setter)", name);
+				return;
 			}
 			prop->setCache(cacheVal);
-			//prop->setValue(*this, cacheVal);
 		}
 #endif
-
-		return ret;
+		return;
 	}
 }
 
@@ -687,66 +691,6 @@ as_object::set_member(string_table::key key, const as_value& val,
 	return false;
 }
 
-#if 0
-std::pair<bool,bool>
-as_object::update_member(string_table::key key, const as_value& val,
-	string_table::key nsname)
-{
-	std::pair<bool,bool> ret; // first is found, second is updated
-
-	//log_debug(_("set_member_default(%s)"), key);
-	Property* prop = findUpdatableProperty(key, nsname);
-	if (prop)
-	{
-		if (prop->isReadOnly())
-		{
-			IF_VERBOSE_ASCODING_ERRORS(log_aserror(_(""
-				"Attempt to set read-only property '%s'"),
-				_vm.getStringTable().value(key)););
-			return std::make_pair(true, false);
-		}
-
-		try
-		{
-			as_value newVal = val;
-
-			// check if we have a trigger, if so, invoke it
-			// and set val to it's return
-			TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, nsname));
-			if ( trigIter != _trigs.end() )
-			{
-				Trigger& trig = trigIter->second;
-				// WARNING: getValue might itself invoke a trigger (getter-setter)... ouch ?
-				as_value curVal = prop->getCache(); // Value(*this); 
-				log_debug("Property %s is being watched: firing trigger on update (current val:%s, new val:%s",
-					_vm.getStringTable().value(key),
-					curVal, val);
-				newVal = trig.call(curVal, val, *this);
-				// The trigger call could have deleted the property,
-				// so we check for its existance again, and do NOT put
-				// it back in if it was deleted
-				prop = findUpdatableProperty(key, nsname);
-				if ( ! prop )
-				{
-					return std::make_pair(true, true);
-				}
-			}
-
-			prop->setValue(*this, newVal);
-			return std::make_pair(true, true);
-		}
-		catch (ActionTypeError& exc)
-		{
-			log_debug(_("%s: Exception %s. Will create a new member"),
-				_vm.getStringTable().value(key), exc.what());
-		}
-
-		return std::make_pair(true, false);
-	}
-
-	return std::make_pair(false, false);
-}
-#endif
 
 void
 as_object::init_member(const std::string& key1, const as_value& val, int flags,
@@ -794,17 +738,9 @@ as_object::init_property(string_table::key key, as_function& getter,
 {
 	as_value cacheValue;
 
-	bool success;
-	success = _members.addGetterSetter(key, getter, &setter, cacheValue, flags, nsname);
-
-	// We shouldn't attempt to initialize a property twice, should we ?
-	assert(success);
-
-	//log_debug(_("Initialized property '%s'"), name);
-
-	// TODO: optimize this, don't scan again !
-	//_members.setFlags(key, flags, nsname);
-
+    // PropertyList::addGetterSetter always returns true (used to be
+    // an assert).
+	_members.addGetterSetter(key, getter, &setter, cacheValue, flags, nsname);
 }
 
 void
@@ -819,38 +755,26 @@ void
 as_object::init_property(string_table::key key, as_c_function_ptr getter,
 		as_c_function_ptr setter, int flags, string_table::key nsname)
 {
-	bool success;
-	success = _members.addGetterSetter(key, getter, setter, nsname);
-
-	// We shouldn't attempt to initialize a property twice, should we ?
-	assert(success);
-
-	//log_debug(_("Initialized property '%s'"), name);
-
-	// TODO: optimize this, don't scan again !
-	_members.setFlags(key, flags, nsname);
-
+    // PropertyList::addGetterSetter always returns true (used to be
+    // an assert).
+	_members.addGetterSetter(key, getter, setter, flags, nsname);
 }
 
 bool
 as_object::init_destructive_property(string_table::key key, as_function& getter,
 	int flags, string_table::key nsname)
 {
-	bool success;
-
 	// No case check, since we've already got the key.
-	success = _members.addDestructiveGetter(key, getter, nsname, flags);
+	bool success = _members.addDestructiveGetter(key, getter, nsname, flags);
 	return success;
 }
 
 bool
-as_object::init_destructive_property(string_table::key key, as_c_function_ptr getter,
-	int flags, string_table::key nsname)
+as_object::init_destructive_property(string_table::key key,
+        as_c_function_ptr getter, int flags, string_table::key nsname)
 {
-	bool success;
-
 	// No case check, since we've already got the key.
-	success = _members.addDestructiveGetter(key, getter, nsname, flags);
+	bool success = _members.addDestructiveGetter(key, getter, nsname, flags);
 	return success;
 }
 
@@ -866,8 +790,8 @@ as_object::init_readonly_property(const std::string& key, as_function& getter,
 }
 
 void
-as_object::init_readonly_property(const string_table::key& k, as_function& getter,
-	int initflags, string_table::key nsname)
+as_object::init_readonly_property(const string_table::key& k,
+        as_function& getter, int initflags, string_table::key nsname)
 {
 	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
 		| as_prop_flags::isProtected, nsname);
@@ -875,8 +799,8 @@ as_object::init_readonly_property(const string_table::key& k, as_function& gette
 }
 
 void
-as_object::init_readonly_property(const std::string& key, as_c_function_ptr getter,
-	int initflags, string_table::key nsname)
+as_object::init_readonly_property(const std::string& key,
+        as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
 	string_table::key k = _vm.getStringTable().find(PROPNAME(key));
 
@@ -886,20 +810,12 @@ as_object::init_readonly_property(const std::string& key, as_c_function_ptr gett
 }
 
 void
-as_object::init_readonly_property(const string_table::key& k, as_c_function_ptr getter,
-	int initflags, string_table::key nsname)
+as_object::init_readonly_property(const string_table::key& k,
+        as_c_function_ptr getter, int initflags, string_table::key nsname)
 {
 	init_property(k, getter, getter, initflags | as_prop_flags::readOnly
 		| as_prop_flags::isProtected, nsname);
 	assert(_members.getProperty(k, nsname));
-}
-
-std::string
-as_object::asPropName(string_table::key name)
-{
-	std::string orig = _vm.getStringTable().value(name);
-
-	return PROPNAME(orig); // why is PROPNAME needed here ?
 }
 
 
@@ -1286,7 +1202,7 @@ as_object::on_event(const event_id& id )
 {
 	as_value event_handler;
 
-	if (get_member(id.get_function_key(), &event_handler) )
+	if (get_member(id.functionKey(), &event_handler) )
 	{
 		call_method0(event_handler, NULL, this);
 		return true;

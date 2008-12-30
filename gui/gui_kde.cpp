@@ -24,23 +24,23 @@
 #include "gui.h"
 #include "GnashException.h"
 
-#ifdef GUI_KDE
+#ifdef GUI_KDE3
 #include "kdesup.h"
 #endif
 
 namespace gnash {
 
-#ifdef GUI_KDE
+#ifdef GUI_KDE3
 std::auto_ptr<Gui> createKDEGui(unsigned long windowid, float scale, bool do_loop, unsigned int bit_depth)
 {
 	return std::auto_ptr<Gui>(new KdeGui(windowid, scale, do_loop, bit_depth));
 }
-#else // ! GUI_KDE
+#else // ! GUI_KDE3
 std::auto_ptr<Gui> createKDEGui(unsigned long , float , bool , unsigned int )
 {
 	throw GnashException("Support for KDE gui was not compiled in");
 }
-#endif // ! GUI_KDE
+#endif // ! GUI_KDE3
 
 } // namespace gnash
 

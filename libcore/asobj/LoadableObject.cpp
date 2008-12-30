@@ -19,7 +19,7 @@
 
 #include "LoadableObject.h"
 #include "log.h"
-#include "array.h"
+#include "Array_as.h"
 #include "as_object.h"
 #include "StreamProvider.h"
 #include "URL.h"
@@ -35,6 +35,11 @@
 
 namespace gnash {
 
+namespace {
+    as_value loadableobject_send(const fn_call& fn);
+    as_value loadableobject_load(const fn_call& fn);
+    as_value loadableobject_sendAndLoad(const fn_call& fn);
+}
 
 LoadableObject::LoadableObject()
     :
@@ -310,6 +315,16 @@ LoadableObject::checkLoads()
     }
 }
 
+void
+LoadableObject::registerNative(as_object& o)
+{
+    VM& vm = o.getVM();
+
+    vm.registerNative(loadableobject_load, 301, 0);
+    vm.registerNative(loadableobject_send, 301, 1);
+    vm.registerNative(loadableobject_sendAndLoad, 301, 2);
+}
+
 
 /// Can take either a two strings as arguments or an array of strings,
 /// alternately header and value.
@@ -317,7 +332,8 @@ as_value
 LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 {
     
-    boost::intrusive_ptr<LoadableObject> ptr = ensureType<LoadableObject>(fn.this_ptr);   
+    boost::intrusive_ptr<LoadableObject> ptr = 
+        ensureType<LoadableObject>(fn.this_ptr);   
 
     as_value customHeaders;
     as_object* array;
@@ -420,13 +436,17 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 }
 
 
+/// These methods are accessed through the ASnative interface, so they
+/// do not need to be public methods of the LoadableObject class.
+namespace {
+
 /// Returns true if the arguments are valid, otherwise false. The
 /// success of the connection is irrelevant.
 /// The second argument must be a loadable object (XML or LoadVars).
 /// An optional third argument specifies the method ("GET", or by default
 /// "POST"). The values are partly URL encoded if using GET.
 as_value
-LoadableObject::loadableobject_sendAndLoad(const fn_call& fn)
+loadableobject_sendAndLoad(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadableObject> ptr =
 	                ensureType<LoadableObject>(fn.this_ptr);
@@ -470,9 +490,10 @@ LoadableObject::loadableobject_sendAndLoad(const fn_call& fn)
 
 
 as_value
-LoadableObject::loadableobject_load(const fn_call& fn)
+loadableobject_load(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadableObject> obj = ensureType<LoadableObject>(fn.this_ptr);
+	boost::intrusive_ptr<LoadableObject> obj = 
+        ensureType<LoadableObject>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -498,7 +519,7 @@ LoadableObject::loadableobject_load(const fn_call& fn)
 
     
 as_value
-LoadableObject::loadableobject_send(const fn_call& fn)
+loadableobject_send(const fn_call& fn)
 {
     boost::intrusive_ptr<LoadableObject> ptr =
         ensureType<LoadableObject>(fn.this_ptr);
@@ -537,5 +558,5 @@ LoadableObject::loadableobject_send(const fn_call& fn)
     return as_value(true);
 }
 
-
-}
+} // anonymous namespace
+} // namespace gnash

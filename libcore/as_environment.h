@@ -19,7 +19,6 @@
 #define GNASH_AS_ENVIRONMENT_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "dsodefs.h" // DSOEXPORT
 #include "as_value.h" // for composition (vector + frame_slot)
 #include "StringPredicates.h" // for Variables 
 #include "as_object.h"
@@ -48,7 +47,7 @@ public:
     typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
     /// The variables container (case-insensitive)
-    typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
+    typedef std::map<std::string, as_value, StringNoCaseLessThan> Variables;
 
     typedef std::vector<as_value> Registers;
 
@@ -559,13 +558,13 @@ private:
     /// @param func
     /// The function being called
     ///
-    DSOEXPORT void pushCallFrame(as_function* func);
+    void pushCallFrame(as_function* func);
 
     /// Remove current call frame from the stack
     //
     /// This should happen when an ActionScript function returns.
     ///
-    DSOEXPORT void popCallFrame();
+    void popCallFrame();
     
     /// Return the (possibly UNDEFINED) value of the named variable.
     //

@@ -48,6 +48,8 @@
 
 #define xtotals(x) Dejagnu.xtotals(x, _INFO_)
 
-#define MEDIA(x) MEDIADIR/x
+#define _QUOTEME(x) #x
+#define QUOTEME(x) _QUOTEME(x)
+#define MEDIA(x) QUOTEME(MEDIADIR/x)
 
 #endif

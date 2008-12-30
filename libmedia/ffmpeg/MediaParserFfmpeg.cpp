@@ -17,22 +17,17 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
+#include "ffmpegHeaders.h"
 #include "MediaParserFfmpeg.h"
 #include "GnashException.h"
 #include "log.h"
-#include "IOChannel.h" // for use
-
-using namespace std;
-
-//#define PADDING_BYTES 64
-//#define READ_CHUNKS 64
+#include "IOChannel.h" 
 
 namespace gnash {
 namespace media {
 namespace ffmpeg {
 
-namespace { // anonymous namespace
+namespace { 
 
 	// Used to calculate a decimal value from a ffmpeg fraction
 	inline double as_double(AVRational time)
@@ -176,12 +171,24 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	//    pkt->pts can be AV_NOPTS_VALUE if the video format has B frames,
 	//    so it is better to rely on pkt->dts if you do not decompress the payload.
 	//
-	boost::uint64_t timestamp = static_cast<boost::uint64_t>(packet.dts * as_double(_audioStream->time_base) * 1000.0); 
 
-#if 0
-	LOG_ONCE( log_unimpl("%s", __PRETTY_FUNCTION__) );
-	return false;
-#else
+	boost::uint64_t dts = packet.dts;
+    if ( dts == static_cast<boost::uint64_t>(AV_NOPTS_VALUE) ) {
+        // We'll take 'nopts' value as zero.
+        // Would likely be better to make it use timestamp
+        // of previous frame, if any.
+        //
+        // For now, this handling fixes warnings like:
+        //   mdb:93, lastbuf:0 skiping granule 0
+        //   mdb:93, lastbuf:0 skiping granule 0
+        // When playing: http://downloads.bbc.co.uk/news/nol/shared/spl/hi/audio_slideshow/kenadamptw/slideshow_629.swf
+        //
+        log_error("FIXME: FFMPEG packet decompression timestamp has no value, taking as zero");
+        dts=0;
+    }
+	boost::uint64_t timestamp = static_cast<boost::uint64_t>(dts * as_double(_audioStream->time_base) * 1000.0); 
+    log_debug("On getting audio frame with timestamp %d, duration is %d", timestamp, _audioStream->duration);
+
 	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
 
 	// TODO: FIXME: *2 is an hack to avoid libavcodec reading past end of allocated space
@@ -198,7 +205,6 @@ MediaParserFfmpeg::parseAudioFrame(AVPacket& packet)
 	pushEncodedAudioFrame(frame); 
 
 	return true;
-#endif
 }
 
 bool
@@ -210,7 +216,8 @@ MediaParserFfmpeg::parseNextFrame()
 
 	if ( _parsingComplete )
 	{
-		//log_debug("MediaParserFfmpeg::parseNextFrame: parsing complete, nothing to do");
+		//log_debug("MediaParserFfmpeg::parseNextFrame: parsing "
+        //"complete, nothing to do");
 		return false;
 	}
 
@@ -225,6 +232,14 @@ MediaParserFfmpeg::parseNextFrame()
 
 	//log_debug("av_read_frame call");
   	int rc = av_read_frame(_formatCtx, &packet);
+
+	// Update _lastParsedPosition, even in case of error..
+	boost::uint64_t curPos = _stream->tell();
+	if ( curPos > _lastParsedPosition )
+	{
+		_lastParsedPosition = curPos;
+	}
+
 	//log_debug("av_read_frame returned %d", rc);
 	if ( rc < 0 )
 	{
@@ -236,7 +251,7 @@ MediaParserFfmpeg::parseNextFrame()
         return false;
 	}
 
-	bool ret=false;
+	bool ret = false;
 
 	if ( packet.stream_index == _videoStreamIndex )
 	{
@@ -249,7 +264,8 @@ MediaParserFfmpeg::parseNextFrame()
 	else
 	{
 		ret = false; // redundant..
-		log_debug("MediaParserFfmpeg::parseNextFrame: unknown stream index %d", packet.stream_index);
+		log_debug("MediaParserFfmpeg::parseNextFrame: unknown stream index %d",
+                packet.stream_index);
 	}
 
 	av_free_packet(&packet);
@@ -257,15 +273,9 @@ MediaParserFfmpeg::parseNextFrame()
 	// Check if EOF was reached
 	if ( _stream->eof() )
 	{
-		log_debug("MediaParserFfmpeg::parseNextFrame: at eof after av_read_frame");
+		log_debug("MediaParserFfmpeg::parseNextFrame: at eof after "
+                "av_read_frame");
 		_parsingComplete=true;
-	}
-
-	// Update _lastParsedPosition
-	boost::uint64_t curPos = _stream->tell();
-	if ( curPos > _lastParsedPosition )
-	{
-		_lastParsedPosition = curPos;
 	}
 
 	return ret;
@@ -406,6 +416,16 @@ MediaParserFfmpeg::initializeParser()
 #else
 		boost::uint64_t duration = _videoStream->duration;
 #endif
+        if ( duration == AV_NOPTS_VALUE )
+        {
+            log_error("Duration of video stream unknown");
+            duration=0; // TODO: guess!
+        }
+        else
+        {
+            duration = duration / as_double(_videoStream->time_base); // TODO: check this
+        }
+
 		_videoInfo.reset( new VideoInfo(codec, width, height, frameRate, duration, CUSTOM /*codec type*/) );
 		
 		_videoInfo->extra.reset(new ExtraVideoInfoFfmpeg(
@@ -428,6 +448,16 @@ MediaParserFfmpeg::initializeParser()
 #else
 		boost::uint64_t duration = _audioStream->duration;
 #endif
+        if ( duration == AV_NOPTS_VALUE )
+        {
+            log_error("Duration of audio stream unknown to ffmpeg");
+            duration=0; // TODO: guess!
+        }
+        else
+        {
+            duration = duration / as_double(_audioStream->time_base); // TODO: check this
+        }
+
 		_audioInfo.reset( new AudioInfo(codec, sampleRate, sampleSize, stereo, duration, CUSTOM /*codec type*/) );
 
 		_audioInfo->extra.reset(new ExtraAudioInfoFfmpeg(

@@ -25,6 +25,7 @@ class TestState
   void xpass(std::string s) { std::cout << "XPASSED: " << s << std::endl;  };
   void fail(std::string s) { std::cout << "FAILED: " << s << std::endl;  };
   void xfail(std::string s) { std::cout << "XFAILED: " << s << std::endl;  };
+  void unresolved(std::string s) { std::cout << "UNRESOLVED: " << s << std::endl;  };
 };
 
 #define info(x) { printf("NOTE: "); printf x; putchar('\n'); }

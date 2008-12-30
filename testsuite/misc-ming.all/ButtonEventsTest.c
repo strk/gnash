@@ -731,9 +731,17 @@ main(int argc, char **argv)
 	{
 
 		add_actions(mo,
+            "check_equals(square1.button.enabled, true);"
+			"square1.button.enabled = 6;"
+            "check_equals(square1.button.enabled, 6);"
+			"square1.button.enabled = 'string';"
+            "check_equals(square1.button.enabled, 'string');"
+            "square1.button._visible = false;"
+            "check_equals(square1.button.enabled, 'string');"
+            "square1.button._visible = true;"
 			"square1.button.enabled = false;"
 			"stop();"
-			"_root.totals(156);"
+			"_root.totals(160);"
 			"_root.note('-- Button disabled, try playing with it, nothing should happen --');"
 		);
 		SWFMovie_nextFrame(mo); /* showFrame */

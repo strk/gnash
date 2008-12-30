@@ -33,7 +33,6 @@
 #include "builtin_function.h"
 #include "VM.h"
 #include "namedStrings.h"
-#include "array.h"
 #include "StringPredicates.h"
 
 #include <string>
@@ -61,14 +60,15 @@ namespace {
     void attachXMLProperties(as_object& o);
 
     as_value xml_new(const fn_call& fn);
-    as_value xml_createelement(const fn_call& fn);
-    as_value xml_createtextnode(const fn_call& fn);
-    as_value xml_getbytesloaded(const fn_call& fn);
-    as_value xml_getbytestotal(const fn_call& fn);
-    as_value xml_parsexml(const fn_call& fn);
+    as_value xml_createElement(const fn_call& fn);
+    as_value xml_createTextNode(const fn_call& fn);
+    as_value xml_getBytesLoaded(const fn_call& fn);
+    as_value xml_getBytesTotal(const fn_call& fn);
+    as_value xml_parseXML(const fn_call& fn);
     as_value xml_ondata(const fn_call& fn);
     as_value xml_xmlDecl(const fn_call& fn);
     as_value xml_docTypeDecl(const fn_call& fn);
+    as_value xml_escape(const fn_call& fn);
 
     bool textAfterWhitespace(const std::string& xml,
             std::string::const_iterator& it);
@@ -250,7 +250,7 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     do {
         ++end;
         end = std::find(end, xml.end(), *it);
-    } while (end != xml.end() && *(end - 1) == '\'');
+    } while (end != xml.end() && *(end - 1) == '\\');
 
     if (end == xml.end()) {
         _status = XML_UNTERMINATED_ATTRIBUTE;
@@ -259,6 +259,10 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     ++it;
 
     std::string value(it, end);
+
+    // Replace entities in the value.
+    unescape(value);
+
     //log_debug("adding attribute to node %s: %s, %s", node->nodeName(),
     //        name, value);
 
@@ -267,9 +271,6 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     it = end;
     // Advance past the last attribute character
     ++it;
-
-    // Replace entities in the value.
-    escape(value);
 
     // Handle namespace. This is set once only for each node, and is also
     // pushed to the attributes list once.
@@ -291,15 +292,34 @@ void
 XML_as::parseDocTypeDecl(const std::string& xml,
         std::string::const_iterator& it)
 {
-    std::string content;
-    if (!parseNodeWithTerminator(xml, it, ">", content))
-    {
-        _status = XML_UNTERMINATED_DOCTYPE_DECL;
-        return;
+
+    std::string::const_iterator end;
+    std::string::const_iterator current = it; 
+
+    std::string::size_type count = 1;
+
+    // Look for angle brackets in the doctype declaration.
+    while (count) {
+
+        // Find the next closing bracket after the current position.
+        end = std::find(current, xml.end(), '>');
+        if (end == xml.end()) {
+            _status = XML_UNTERMINATED_DOCTYPE_DECL;
+            return;
+        }
+        --count;
+
+        // Count any opening brackets in between.
+        count += std::count(current, end, '<');
+        current = end;
+        ++current;
     }
+
+    const std::string content(it, end);
     std::ostringstream os;
     os << '<' << content << '>';
     _docTypeDecl = os.str();
+    it = end + 1;
 }
 
 
@@ -345,12 +365,10 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
 
     // Knock off the "/>" of a self-closing tag.
     if (std::equal(endName - 1, endName + 1, "/>")) {
-        //log_debug("self-closing tag");
         --endName;
     }
 
     std::string tagName(it, endName);
-    //log_debug("tagName : %s", tagName);
 
     if (!closing) {
 
@@ -465,7 +483,7 @@ void
 XML_as::parseComment(XMLNode_as* /*node*/, const std::string& xml, 
         std::string::const_iterator& it)
 {
-    log_debug("discarding comment node");
+    //log_debug("discarding comment node");
 
     std::string content;
 
@@ -510,7 +528,6 @@ XML_as::parseXML(const std::string& xml)
     // Clear current data
     clear(); 
     _status = XML_OK;
-    
 
     std::string::const_iterator it = xml.begin();
     XMLNode_as* node = this;
@@ -562,7 +579,6 @@ XML_as::clear()
 {
     // TODO: should set childs's parent to NULL ?
     _children.clear();
-    //_attributes.clear();
     _docTypeDecl.clear();
     _xmlDecl.clear();
 }
@@ -573,14 +589,16 @@ XML_as::ignoreWhite() const
 
     string_table::key propnamekey = _vm.getStringTable().find("ignoreWhite");
     as_value val;
-    if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val)) return false;
+    if (!const_cast<XML_as*>(this)->get_member(propnamekey, &val)) {
+        return false;
+    }
     return val.to_bool();
 }
 
 
 // extern (used by Global.cpp)
 void
-xml_class_init(as_object& global)
+XML_as::init(as_object& global)
 {
 
     static boost::intrusive_ptr<builtin_function> cl;
@@ -594,12 +612,21 @@ xml_class_init(as_object& global)
 
 }
 
+void
+XML_as::registerNative(as_object& global)
+{
+    VM& vm = global.getVM();
+    vm.registerNative(xml_escape, 100, 5);
+    vm.registerNative(xml_createElement, 253, 8);
+    vm.registerNative(xml_createTextNode, 253, 9);
+    vm.registerNative(xml_parseXML, 253, 10);
+}
+
 ///
 /// XML object AS interface.
 ///
 
 namespace {
-
 
 void
 attachXMLProperties(as_object& /*o*/)
@@ -609,29 +636,28 @@ attachXMLProperties(as_object& /*o*/)
     //o.init_member("status", as_value(XML::sOK));
 }
 
+
 void
 attachXMLInterface(as_object& o)
 {
+
+    VM& vm = o.getVM();
+
     const int flags = 0;
 
     // No flags:
     o.init_member("addRequestHeader", new builtin_function(
                 LoadableObject::loadableobject_addRequestHeader), flags);
-    o.init_member("createElement", 
-            new builtin_function(xml_createelement), flags);
-    o.init_member("createTextNode", 
-            new builtin_function(xml_createtextnode), flags);
+    o.init_member("createElement", vm.getNative(253, 8), flags);
+    o.init_member("createTextNode", vm.getNative(253, 9), flags);
     o.init_member("getBytesLoaded", 
-            new builtin_function(xml_getbytesloaded), flags);
+            new builtin_function(xml_getBytesLoaded), flags);
     o.init_member("getBytesTotal", 
-            new builtin_function(xml_getbytestotal), flags);
-    o.init_member("load", new builtin_function(
-                LoadableObject::loadableobject_load), flags);
-    o.init_member("parseXML", new builtin_function(xml_parsexml), flags);
-    o.init_member("send", new builtin_function(
-                LoadableObject::loadableobject_send), flags);
-    o.init_member("sendAndLoad", new builtin_function(
-                LoadableObject::loadableobject_sendAndLoad), flags);
+            new builtin_function(xml_getBytesTotal), flags);
+    o.init_member("load", vm.getNative(301, 0), flags);
+    o.init_member("parseXML", vm.getNative(253, 10), flags); 
+    o.init_member("send", vm.getNative(301, 1), flags);
+    o.init_member("sendAndLoad", vm.getNative(301, 2), flags);
     o.init_member("onData", new builtin_function(xml_ondata), flags);
 
     o.init_property("xmlDecl", &xml_xmlDecl, &xml_xmlDecl, flags);
@@ -644,7 +670,7 @@ getXMLInterface()
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL )
     {
-        o = new as_object(getXMLNodeInterface());
+        o = new as_object(XMLNode_as::getXMLNodeInterface());
         attachXMLInterface(*o);
     }
     return o.get();
@@ -653,7 +679,6 @@ getXMLInterface()
 as_value
 xml_new(const fn_call& fn)
 {
-    as_value inum;
     boost::intrusive_ptr<XML_as> xml_obj;
   
     if ( fn.nargs > 0 )
@@ -691,6 +716,17 @@ xml_new(const fn_call& fn)
 }
 
 
+/// Only available as ASnative.
+as_value
+xml_escape(const fn_call& fn)
+{
+    if (!fn.nargs) return as_value();
+
+    std::string escaped = fn.arg(0).to_string();
+    XML_as::escape(escaped);
+    return as_value(escaped);
+}
+
 /// \brief create a new XML element
 ///
 /// Method; creates a new XML element with the name specified in the
@@ -700,7 +736,7 @@ xml_new(const fn_call& fn)
 /// the XML.createTextNode() method are the constructor methods for
 /// creating nodes for an XML object. 
 as_value
-xml_createelement(const fn_call& fn)
+xml_createElement(const fn_call& fn)
 {
     
     if (fn.nargs > 0)
@@ -729,7 +765,7 @@ xml_createelement(const fn_call& fn)
 /// XML.createElement() method are the constructor methods for
 /// creating nodes for an XML object.
 as_value
-xml_createtextnode(const fn_call& fn)
+xml_createTextNode(const fn_call& fn)
 {
 
     if (fn.nargs > 0) {
@@ -747,7 +783,7 @@ xml_createtextnode(const fn_call& fn)
 
 
 as_value
-xml_getbytesloaded(const fn_call& fn)
+xml_getBytesLoaded(const fn_call& fn)
 {
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
     long int ret = ptr->getBytesLoaded();
@@ -757,7 +793,7 @@ xml_getbytesloaded(const fn_call& fn)
 
 
 as_value
-xml_getbytestotal(const fn_call& fn)
+xml_getBytesTotal(const fn_call& fn)
 {
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
     long int ret = ptr->getBytesTotal();
@@ -767,7 +803,7 @@ xml_getbytestotal(const fn_call& fn)
 
 
 as_value
-xml_parsexml(const fn_call& fn)
+xml_parseXML(const fn_call& fn)
 {
 
     boost::intrusive_ptr<XML_as> ptr = ensureType<XML_as>(fn.this_ptr);
@@ -857,7 +893,7 @@ xml_ondata(const fn_call& fn)
     return as_value();
 }
 
-/// Case insenstive match of a string, returning false if there too few
+/// Case insensitive match of a string, returning false if there too few
 /// characters left or if there is no match. If there is a match, and advance
 /// is not false, the iterator points to the character after the match.
 bool
@@ -900,8 +936,9 @@ textAfterWhitespace(const std::string& xml, std::string::const_iterator& it)
 ///                 the tag.
 /// @param xml      The complete XML string.
 bool
-parseNodeWithTerminator(const std::string& xml, std::string::const_iterator& it,
-        const std::string& terminator, std::string& content)
+parseNodeWithTerminator(const std::string& xml,
+        std::string::const_iterator& it, const std::string& terminator,
+        std::string& content)
 {
     std::string::const_iterator end = std::search(it, xml.end(),
             terminator.begin(), terminator.end());

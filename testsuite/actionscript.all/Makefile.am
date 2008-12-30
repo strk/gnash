@@ -25,7 +25,8 @@ AUTOMAKE_OPTIONS = dejagnu
 # so I take responsibility of dropping that for the moment...
 
 abs_mediadir = `cd $(srcdir)/../media; pwd`
-DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"'
+swfdir = `cd $(top_builddir)/testsuite/actionscript.all; pwd`
+DEF_MAKESWF_FLAGS=-DMING_VERSION_CODE=$(MING_VERSION_CODE) -DMEDIADIR='\"$(abs_mediadir)\"' -DSWFDIR='\"$(swfdir)\"'
 
 quickcheck_RUNNERS = \
 	alltests-v5-Runner \

@@ -19,10 +19,24 @@
 #ifndef __HANDLER_H__
 #define __HANDLER_H__ 1
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <boost/cstdint.hpp>
+#include <boost/thread/mutex.hpp>
 //#include <boost/thread/condition.hpp>
 #include <string>
 #include <deque>
+#include <map>
+
+#ifdef HAVE_POLL
+# include <sys/poll.h>
+#else 
+# ifdef HAVE_EPOLL
+#  include <sys/epoll.h>
+# endif
+#endif
 
 #include "log.h"
 #include "network.h"
@@ -35,9 +49,11 @@
 namespace gnash
 {
 
-class Handler : public gnash::Network
+
+class Handler
 {
 public:
+    
      DSOEXPORT Handler();
     ~Handler();
 
@@ -49,13 +65,6 @@ public:
 	INTERVAL,
 	QUIT,
     } admin_cmd_e;
-    // This is used to pass parameters to a thread using boost::bind
-    typedef struct {
-	int netfd;
-	int port;
-	void *handle;
-	std::string filespec;
-    } thread_params_t ;
     
     // Specify which queue should be used
     typedef enum { INCOMING, OUTGOING } fifo_e;
@@ -64,100 +73,118 @@ public:
     bool push(boost::shared_ptr<amf::Buffer> data)
 	{ return _incoming.push(data); };
     bool push(boost::shared_ptr<amf::Buffer> data, fifo_e direction);
-    bool push(gnash::Network::byte_t *data, int nbytes, fifo_e direction);
-    bool push(gnash::Network::byte_t *data, int nbytes)
+    bool push(boost::uint8_t *data, int nbytes, fifo_e direction);
+    bool push(boost::uint8_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
-    bool pushin(gnash::Network::byte_t *data, int nbytes)
+    bool pushin(boost::uint8_t *data, int nbytes)
 	{ return _incoming.push(data, nbytes); };
     bool pushin(boost::shared_ptr<amf::Buffer> data)
 	{ return _incoming.push(data); };
-    
+#if 0
     // Push bytes on the incoming FIFO, which must be specified
-    bool pushout(gnash::Network::byte_t *data, int nbytes)
+    bool pushout(boost::uint8_t *data, int nbytes)
 	{ return _outgoing.push(data, nbytes); };
     bool pushout(boost::shared_ptr<amf::Buffer> data)
 	{ return _outgoing.push(data); };
-    
+#endif
+
     // Pop the first date element off the incoming FIFO
     boost::shared_ptr<amf::Buffer> pop() { return _incoming.pop(); };
     boost::shared_ptr<amf::Buffer> pop(fifo_e direction);
     boost::shared_ptr<amf::Buffer> popin()
     	{ return _incoming.pop(); };
+#if 0
     // Pop the first date element off the outgoing FIFO
     boost::shared_ptr<amf::Buffer> popout()
     	{ return _outgoing.pop(); };
-    
+#endif
     // Peek at the first data element without removing it
     boost::shared_ptr<amf::Buffer> peek() { return _incoming.peek(); };
     boost::shared_ptr<amf::Buffer> peek(fifo_e direction);
     boost::shared_ptr<amf::Buffer> peekin()
     	{ return _incoming.peek(); };
     // Pop the first date element off the outgoing FIFO
-    boost::shared_ptr<amf::Buffer> peekout()
-    	{ return _outgoing.peek(); };    
+//    boost::shared_ptr<amf::Buffer> peekout() { return _outgoing.peek(); };    
 
     // Removes all the buffers from the queues
     boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin) { return _incoming.merge(begin); };
     boost::shared_ptr<amf::Buffer> mergein(boost::shared_ptr<amf::Buffer> begin) { return _incoming.merge(begin); };
-    boost::shared_ptr<amf::Buffer> mergeout(boost::shared_ptr<amf::Buffer> begin) { return _outgoing.merge(begin); };
+//    boost::shared_ptr<amf::Buffer> mergeout(boost::shared_ptr<amf::Buffer> begin) { return _outgoing.merge(begin); };
 
     // Removes all the buffers from the queues
     void clear() { _incoming.clear(); };
     void clear(fifo_e direction);
     void clearin() { _incoming.clear(); };
+#if 0
     void clearout() { _outgoing.clear(); };
     void clearall() { _outgoing.clear(); _incoming.clear(); };
-    
+#endif
     // Return the size of the queues, default to the incoming queue
     size_t size(fifo_e direction);
     size_t size() { return _incoming.size(); };
     size_t insize() { return _incoming.size(); };
-    size_t outsize() { return _outgoing.size(); };
+//    size_t outsize() { return _outgoing.size(); };
 
     // Notify the other thread a message is in the que
     void notify() { _incoming.notify(); };
     void notifyin() { _incoming.notify(); };
-    void notifyout() { _outgoing.notify(); };
+  //    void notifyout() { _outgoing.notify(); };
 
     // Wait for a message from the other thread
     void wait() { _incoming.wait(); };
     void waitin() { _incoming.wait(); };
-    void waitout() { _outgoing.wait(); };
+//    void waitout() { _outgoing.wait(); };
 
-    size_t readPacket(int fd);
+//    size_t readPacket(int fd);
     
     // start the two thread handlers for the queues
-    bool DSOEXPORT start(thread_params_t *args);
+    bool DSOEXPORT start(Network::thread_params_t *args);
 
-    // Take a buffer and write it to the network
-    int  DSOEXPORT writeNet(int fd, boost::shared_ptr<amf::Buffer> buf)
+#if 0
+    /// \brief Write a Buffer the network connection.
+    ///
+    /// @param fd The file descriptor to write the data too.
+    ///
+    /// @param buf A smart pointer to a Buffer class.
+    ///
+    /// @return The number of bytes sent
+    int  DSOEXPORT writeNet(int fd, boost::shared_ptr<amf::Buffer> &buf)
     	{ return Network::writeNet(fd, buf->reference(), buf->size()); };
     
-    int  DSOEXPORT writeNet(boost::shared_ptr<amf::Buffer> buf)
+    /// \brief Write a Buffer the network connection.
+    ///
+    /// @param buf A smart pointer to a Buffer class.
+    ///
+    /// @return The number of bytes sent
+    int  DSOEXPORT writeNet(boost::shared_ptr<amf::Buffer> &buf)
     	{ return Network::writeNet(buf->reference(), buf->size()); };
-    
+#endif
+
     // Dump internal data.
     void dump();
+    
 #ifdef USE_STATS_QUEUE
     CQue::que_stats_t *statsin()  { return _incoming.stats(); };
     CQue::que_stats_t *statsout() { return _outgoing.stats(); };
 #endif
-    void die() { _die = true; _outgoing.notify(); };
+    void die() { _die = true; };
+//    void die() { _die = true; _outgoing.notify(); };
+    void resetDie() { _die = false; };
     bool timetodie() { return _die; };
-    
+
 private:
-    bool _die;
-    int _netfd;
-    CQue _incoming;
-    CQue _outgoing;
+    bool	_die;
+    int		_netfd;
+    CQue	_incoming;
+    std::map<int, CQue>	_outgoing;
 };
 
 // This is the thread for all incoming network connections, which
 // has to be in C.
 extern "C" {
-    void netin_handler(Handler::thread_params_t *args);
-    void netout_handler(Handler::thread_params_t *args);
-    void start_handler(Handler::thread_params_t *args);
+    void netin_handler(Network::thread_params_t *args);
+    void netout_handler(Network::thread_params_t *args);
+    void start_handler(Network::thread_params_t *args);
 }
 
 } // end of gnash namespace
@@ -166,5 +193,6 @@ extern "C" {
 
 // local Variables:
 // mode: C++
+// tab-width: 8
 // indent-tabs-mode: t
 // End:

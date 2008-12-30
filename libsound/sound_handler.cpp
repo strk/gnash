@@ -29,7 +29,7 @@
 #include <boost/cstdint.hpp> // For C99 int types
 #include <vector> // for use
 
-// Debug create_sound/delete_sound/play_sound/stop_sound, loops
+// Debug create_sound/delete_sound/playSound/stop_sound, loops
 //#define GNASH_DEBUG_SOUNDS_MANAGEMENT
 
 // Debug samples fetching
@@ -333,13 +333,15 @@ sound_handler::create_sound(std::auto_ptr<SimpleBuffer> data,
 }
 
 void
-sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
-                          long start_position, const SoundEnvelopes* envelopes)
+sound_handler::playSound(int sound_handle, int loopCount, int offSecs,
+                            long start_position,
+                            const SoundEnvelopes* envelopes,
+                            bool allowMultiples)
 {
     // Check if the sound exists
     if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= _sounds.size())
     {
-        log_error("Invalid (%d) sound_handle passed to play_sound, "
+        log_error("Invalid (%d) sound_handle passed to playSound, "
                   "doing nothing", sound_handle);
         return;
     }
@@ -347,7 +349,7 @@ sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
     // parameter checking
     if (start_position < 0)
     {
-        log_error("Negative (%d) start_position passed to play_sound, "
+        log_error("Negative (%d) start_position passed to playSound, "
                   "taking as zero ", start_position);
         start_position=0;
     }
@@ -355,17 +357,26 @@ sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
     // parameter checking
     if (offSecs < 0)
     {
-        log_error("Negative (%d) seconds offset passed to play_sound, "
+        log_error("Negative (%d) seconds offset passed to playSound, "
                   "taking as zero ", offSecs);
         offSecs = 0;
     }
 
     EmbedSound& sounddata = *(_sounds[sound_handle]);
 
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("playSound %d called, SoundInfo format is %s",
+            sound_handle, sounddata.soundinfo->getFormat());
+#endif
+
     // When this is called from a StreamSoundBlockTag,
     // we only start if this sound isn't already playing.
-    if ( start_position && sounddata.isPlaying() )
+    if ( ! allowMultiples && sounddata.isPlaying() )
     {
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+        log_debug(" playSound: multiple instances not allowed, "
+                  "and sound %d is already playing", sound_handle);
+#endif
         // log_debug("Stream sound block play request, "
         //           "but an instance of the stream is "
         //           "already playing, so we do nothing");
@@ -381,10 +392,6 @@ sound_handler::play_sound(int sound_handle, int loopCount, int offSecs,
         );
         return;
     }
-
-#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
-    log_debug("play_sound %d called, SoundInfo format is %s", sound_handle, sounddata.soundinfo->getFormat());
-#endif
 
 
     // Make a "EmbedSoundInst" for this sound which is later placed
@@ -513,6 +520,11 @@ sound_handler::unplugCompletedInputStreams()
 {
     InputStreams::iterator it = _inputStreams.begin();
     InputStreams::iterator end = _inputStreams.end();
+
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+    log_debug("Scanning %d input streams for completion", _inputStreams.size());
+#endif
+
     while (it != end)
     {
         InputStream* is = *it;
@@ -531,6 +543,9 @@ sound_handler::unplugCompletedInputStreams()
             it = it2;
 
             //log_debug("fetchSamples: marking stopped InputStream %p (on EOF)", is);
+#ifdef GNASH_DEBUG_SOUNDS_MANAGEMENT
+            log_debug(" Input stream %p reached EOF, unplugging", is);
+#endif
 
             // WARNING! deleting the InputStream here means
             //          a lot of things will happen from a

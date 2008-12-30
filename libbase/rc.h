@@ -239,7 +239,7 @@ public:
         
     void dump();    
 
-private:
+protected:
 
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer< Sep > Tok;

@@ -58,67 +58,67 @@ private:
 
     const char* _errorOccurred;
 
-	jmp_buf _jmpBuf;
+    jmp_buf _jmpBuf;
 
-	// State needed for input.
-	jpeg::jpeg_decompress_struct m_cinfo;
-	jpeg::jpeg_error_mgr m_jerr;
+    // State needed for input.
+    jpeg::jpeg_decompress_struct m_cinfo;
+    jpeg::jpeg_error_mgr m_jerr;
 
-	bool _compressorOpened;
+    bool _compressorOpened;
 
 public:
 
-	/// Construct a JpegImageInput object to read from an IOChannel.
-	//
-	/// @param in   The stream to read JPEG data from. Ownership is shared
+    /// Construct a JpegImageInput object to read from an IOChannel.
+    //
+    /// @param in   The stream to read JPEG data from. Ownership is shared
     ///             between caller and JpegImageInput, so it is freed
     ///             automatically when the last owner is destroyed.
-	DSOEXPORT JpegImageInput(boost::shared_ptr<IOChannel> in);
+    DSOEXPORT JpegImageInput(boost::shared_ptr<IOChannel> in);
 
     /// Read the JPEG header information only.
     //
     /// @param maxHeaderBytes   The maximum number of bytes to read before
     ///                         Stopping. If the header is shorter, we stop
     ///                         early.
-	void DSOEXPORT readHeader(unsigned int maxHeaderBytes);
+    void DSOEXPORT readHeader(unsigned int maxHeaderBytes);
 
-	~JpegImageInput();
+    ~JpegImageInput();
 
     /// Begin processing the image data.
     void read();
 
-	/// Discard any data sitting in our input buffer.
+    /// Discard any data sitting in our input buffer.
     //
     /// Use this before/after reading headers or partial image
-	/// data, to avoid screwing up future reads.
-	DSOEXPORT void discardPartialBuffer();
+    /// data, to avoid screwing up future reads.
+    DSOEXPORT void discardPartialBuffer();
 
     /// Complete processing the image and clean up.
     //
     /// This should close / free all resources from libjpeg.
-	void finishImage();
+    void finishImage();
 
-	/// Get the image's height in pixels.
+    /// Get the image's height in pixels.
     //
     /// @return     The height of the image in pixels.
-	size_t getHeight() const;
+    size_t getHeight() const;
 
-	/// Get the image's width in pixels.
+    /// Get the image's width in pixels.
     //
     /// @return     The width of the image in pixels.
-	size_t getWidth() const;
+    size_t getWidth() const;
 
-	/// Get number of components (channels)
+    /// Get number of components (channels)
     //
-	/// @return     The number of components, e.g. 3 for RGB
-	size_t getComponents() const;
+    /// @return     The number of components, e.g. 3 for RGB
+    size_t getComponents() const;
 
-	/// Read a scanline's worth of image data into the given buffer.
+    /// Read a scanline's worth of image data into the given buffer.
     //
     /// The amount of data read is getWidth() * getComponents().
-	///
+    ///
     /// @param rgbData  The buffer for writing raw RGB data to.
-	void readScanline(unsigned char* rgbData);
+    void readScanline(unsigned char* rgbData);
 
     /// Create a JpegImageInput and transfer ownership to the caller.
     //
@@ -181,7 +181,7 @@ public:
     /// @param quality  The quality of the created image, from 1-100.
     JpegImageOutput(boost::shared_ptr<IOChannel> out, size_t width,
             size_t height, int quality);
-	
+    
     ~JpegImageOutput();
 
     /// Write RGB image data using the parameters supplied at construction.
@@ -197,12 +197,12 @@ public:
     /// @param quality  The quality of the created image, from 1-100.
     static std::auto_ptr<ImageOutput> create(boost::shared_ptr<IOChannel> out,
             size_t width, size_t height, int quality);
-	
+    
 private:
 
-	jpeg::jpeg_compress_struct m_cinfo;
-	jpeg::jpeg_error_mgr m_jerr;
-	
+    jpeg::jpeg_compress_struct m_cinfo;
+    jpeg::jpeg_error_mgr m_jerr;
+    
 };
 
 } // namespace gnash

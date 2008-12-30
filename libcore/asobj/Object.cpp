@@ -35,128 +35,27 @@
 namespace gnash {
 
 // Forward declarations
-static as_value object_addproperty(const fn_call&);
-static as_value object_registerClass(const fn_call& fn);
-static as_value object_hasOwnProperty(const fn_call&);
-static as_value object_isPropertyEnumerable(const fn_call&);
-static as_value object_isPrototypeOf(const fn_call&);
-static as_value object_watch(const fn_call&);
-static as_value object_unwatch(const fn_call&);
-static as_value object_toLocaleString(const fn_call&);
+namespace {
 
+    as_value object_addproperty(const fn_call&);
+    as_value object_registerClass(const fn_call& fn);
+    as_value object_hasOwnProperty(const fn_call&);
+    as_value object_isPropertyEnumerable(const fn_call&);
+    as_value object_isPrototypeOf(const fn_call&);
+    as_value object_watch(const fn_call&);
+    as_value object_unwatch(const fn_call&);
+    as_value object_toLocaleString(const fn_call&);
+    as_value object_ctor(const fn_call& fn);
 
-static void
-attachObjectInterface(as_object& o)
-{
-	VM& vm = o.getVM();
+    void attachObjectInterface(as_object& o);
 
-	// We register natives despite swf version,
-
-	vm.registerNative(object_watch, 101, 0); 
-	vm.registerNative(object_unwatch, 101, 1); 
-	vm.registerNative(object_addproperty, 101, 2); 
-	vm.registerNative(as_object::valueof_method, 101, 3); 
-	vm.registerNative(as_object::tostring_method, 101, 4); 
-	vm.registerNative(object_hasOwnProperty, 101, 5); 
-	vm.registerNative(object_isPrototypeOf, 101, 6); 
-	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
-
-	// Then will attach to the prototype based on version
-
-	//int target_version = vm.getSWFVersion();
-
-	// Object.valueOf()
-	o.init_member("valueOf", vm.getNative(101, 3));
-
-	// Object.toString()
-	o.init_member("toString", vm.getNative(101, 4));
-
-	// Object.toLocaleString()
-	o.init_member("toLocaleString", new builtin_function(object_toLocaleString));
-
-	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
-	//if ( target_version  < 6 ) return;
-
-	// Object.addProperty()
-	o.init_member("addProperty", vm.getNative(101, 2), swf6flags);
-
-	// Object.hasOwnProperty()
-	o.init_member("hasOwnProperty", vm.getNative(101, 5), swf6flags);
-
-	// Object.isPropertyEnumerable()
-	o.init_member("isPropertyEnumerable", vm.getNative(101, 7), swf6flags);
-
-	// Object.isPrototypeOf()
-	o.init_member("isPrototypeOf", vm.getNative(101, 6), swf6flags);
-
-	// Object.watch()
-	o.init_member("watch", vm.getNative(101, 0), swf6flags);
-
-	// Object.unwatch()
-	o.init_member("unwatch", vm.getNative(101, 1), swf6flags);
 }
+
 
 as_object*
-getObjectInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( o == NULL )
-	{
-		o = new as_object(); // end of the inheritance chain
-		attachObjectInterface(*o);
-		//o->set_prototype(o.get()); // proto is self ?
-	}
-	return o.get();
-}
-
-// FIXME: add some useful methods :)
-class object_as_object : public as_object
-{
-
-public:
-
-	object_as_object()
-		:
-		as_object(getObjectInterface())
-	{
-	}
-
-};
-
-static as_value
-object_ctor(const fn_call& fn)
-    // Constructor for ActionScript class Object.
-{
-	if ( fn.nargs == 1 ) // copy constructor
-	{
-		// just copy the reference
-		//
-		// WARNING: it is likely that fn.result and fn.arg(0)
-		// are the same location... so we might skip
-		// the set_as_object() call as a whole.
-		return as_value(fn.arg(0).to_object());
-	}
-
-	boost::intrusive_ptr<as_object> new_obj;
-	if ( fn.nargs == 0 )
-	{
-		new_obj = new object_as_object();
-	}
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_aserror(_("Too many args to Object constructor"));
-		)
-		new_obj = new object_as_object();
-	}
-
-	return as_value(new_obj.get()); // will keep alive
-}
-
-std::auto_ptr<as_object>
 init_object_instance()
 {
-	return std::auto_ptr<as_object>(new object_as_object);
+	return new as_object(getObjectInterface());
 }
 
 
@@ -172,29 +71,111 @@ void object_class_init(as_object& global)
 	{
 		cl=new builtin_function(&object_ctor, getObjectInterface());
 
-		// TODO: is this needed ?
-		//cl->init_member("prototype", as_value(getObjectInterface()));
-
-		// Object.registerClass() -- TODO: should this only be in SWF6 or higher ?
+		// Object.registerClass() --
+        // TODO: should this only be in SWF6 or higher ?
 		vm.registerNative(object_registerClass, 101, 8);
 		cl->init_member("registerClass", vm.getNative(101, 8));
-
 		     
 	}
 
 	// Register _global.Object (should only be visible in SWF5 up)
-	int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
+	int flags = as_prop_flags::dontEnum; 
 	global.init_member("Object", cl.get(), flags);
 
 }
 
-static as_value
+
+as_object*
+getObjectInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( o == NULL )
+	{
+		o = new as_object(); // end of the inheritance chain
+		attachObjectInterface(*o);
+	}
+	return o.get();
+}
+
+
+
+
+namespace {
+
+void
+attachObjectInterface(as_object& o)
+{
+	VM& vm = o.getVM();
+
+	// We register natives despite swf version,
+
+	vm.registerNative(object_watch, 101, 0); 
+	vm.registerNative(object_unwatch, 101, 1); 
+	vm.registerNative(object_addproperty, 101, 2); 
+	vm.registerNative(as_object::valueof_method, 101, 3); 
+	vm.registerNative(as_object::tostring_method, 101, 4); 
+	vm.registerNative(object_hasOwnProperty, 101, 5); 
+	vm.registerNative(object_isPrototypeOf, 101, 6); 
+	vm.registerNative(object_isPropertyEnumerable, 101, 7); 
+
+	o.init_member("valueOf", vm.getNative(101, 3));
+	o.init_member("toString", vm.getNative(101, 4));
+	o.init_member("toLocaleString", 
+            new builtin_function(object_toLocaleString));
+
+	int swf6flags = as_prop_flags::dontEnum | 
+        as_prop_flags::dontDelete | 
+        as_prop_flags::onlySWF6Up;
+
+	o.init_member("addProperty", vm.getNative(101, 2), swf6flags);
+	o.init_member("hasOwnProperty", vm.getNative(101, 5), swf6flags);
+	o.init_member("isPropertyEnumerable", vm.getNative(101, 7), swf6flags);
+	o.init_member("isPrototypeOf", vm.getNative(101, 6), swf6flags);
+	o.init_member("watch", vm.getNative(101, 0), swf6flags);
+	o.init_member("unwatch", vm.getNative(101, 1), swf6flags);
+}
+
+
+as_value
+object_ctor(const fn_call& fn)
+{
+	if ( fn.nargs == 1 ) // copy constructor
+	{
+		// just copy the reference
+		//
+		// WARNING: it is likely that fn.result and fn.arg(0)
+		// are the same location... so we might skip
+		// the set_as_object() call as a whole.
+		return as_value(fn.arg(0).to_object());
+	}
+
+	boost::intrusive_ptr<as_object> new_obj;
+	if ( fn.nargs == 0 )
+	{
+		new_obj = new as_object(getObjectInterface());
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_aserror(_("Too many args to Object constructor"));
+		)
+		new_obj = new as_object(getObjectInterface());
+	}
+
+	return as_value(new_obj.get()); // will keep alive
+}
+
+
+/// The return value is not dependent on the result of add_property (though
+/// this is always true anyway), but rather on the validity of the arguments.
+as_value
 object_addproperty(const fn_call& fn)
 {
 	assert(fn.this_ptr);
 	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
-	if ( fn.nargs != 3 )
+    /// Extra arguments are just ignored.
+	if ( fn.nargs < 3 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss;
@@ -213,7 +194,7 @@ object_addproperty(const fn_call& fn)
 	}
 
 	const std::string& propname = fn.arg(0).to_string();
-	if ( propname.empty() )
+	if (propname.empty())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to Object.addProperty() - "
@@ -223,7 +204,7 @@ object_addproperty(const fn_call& fn)
 	}
 
 	as_function* getter = fn.arg(1).to_as_function();
-	if ( ! getter )
+	if (!getter)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to Object.addProperty() - "
@@ -234,10 +215,10 @@ object_addproperty(const fn_call& fn)
 
 	as_function* setter = NULL;
 	const as_value& setterval = fn.arg(2);
-	if ( ! setterval.is_null() )
+	if (!setterval.is_null())
 	{
 		setter = setterval.to_as_function();
-		if ( ! setter )
+		if (!setter)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Invalid call to Object.addProperty() - "
@@ -248,17 +229,15 @@ object_addproperty(const fn_call& fn)
 		}
 	}
 
-
 	// Now that we checked everything, let's call the as_object
 	// interface for getter/setter properties :)
-	
-	bool result = obj->add_property(propname, *getter, setter);
+	obj->add_property(propname, *getter, setter);
 
-	//log_debug("Object.addProperty(): testing");
-	return as_value(result);
+	return as_value(true);
 }
 
-static as_value
+
+as_value
 object_registerClass(const fn_call& fn)
 {
 	assert(fn.this_ptr);
@@ -361,6 +340,7 @@ object_registerClass(const fn_call& fn)
 	return as_value(true);
 }
 
+
 as_value
 object_hasOwnProperty(const fn_call& fn)
 {
@@ -419,6 +399,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 	return as_value( ! prop->getFlags().get_dont_enum() );
 }
 
+
 as_value
 object_isPrototypeOf(const fn_call& fn)
 {
@@ -443,6 +424,7 @@ object_isPrototypeOf(const fn_call& fn)
 	return as_value(fn.this_ptr->prototypeOf(*obj));
 
 }
+
 
 as_value
 object_watch(const fn_call& fn)
@@ -481,6 +463,7 @@ object_watch(const fn_call& fn)
 	return as_value(obj->watch(propkey, *trig, cust));
 }
 
+
 as_value
 object_unwatch(const fn_call& fn)
 {
@@ -506,6 +489,7 @@ object_unwatch(const fn_call& fn)
 	return as_value(obj->unwatch(propkey));
 }
 
+
 as_value
 object_toLocaleString(const fn_call& fn)
 {
@@ -513,4 +497,5 @@ object_toLocaleString(const fn_call& fn)
 	return obj->callMethod(NSV::PROP_TO_STRING);
 }
   
+} // anonymous namespace
 } // namespace gnash

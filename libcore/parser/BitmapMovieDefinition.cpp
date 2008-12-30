@@ -34,13 +34,8 @@ BitmapMovieDefinition::getShapeDef()
 {
 	if ( _shapedef ) return _shapedef.get();
 
-    _bitmap = new bitmap_character_def(_image);
-
     // It's possible for this to fail.
     if (!_bitmap.get()) return 0;
-
-    // Ownership transferred.
-    assert (!_image.get());
 
 	// Create the shape definition
 	_shapedef = new DynamicShape();
@@ -90,8 +85,8 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 	_framecount(1),
 	_framerate(12),
 	_url(url),
-	_image(image),
-	_bytesTotal(_image->size())
+	_bytesTotal(image->size()),
+	_bitmap(render::createBitmapInfo(image))
 {
 	// Do not create shape_character_def now (why?)
 }

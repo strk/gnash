@@ -177,7 +177,7 @@ test_resize()
         mem->addStats(__LINE__);             // take a sample
     }
 #endif    
-    if (buf.size() == gnash::NETBUFSIZE) {
+    if (buf.size() == amf::NETBUFSIZE) {
         runtest.pass ("Buffer::size(NETBUFSIZE)");
     } else {
         runtest.fail ("Buffer::size(NETBUFSIZE)");
@@ -460,39 +460,39 @@ test_append()
 void
 test_remove()
 {
-    Network::byte_t *data1 = new Network::byte_t[12];
-    memset(data1, 0, 12);
-    Network::byte_t *data2 = new Network::byte_t[12];
-    memset(data2, 0, 12);
-    Network::byte_t *data3 = new Network::byte_t[12];
-    memset(data3, 0, 12);
+    Network::byte_t *data1 = new Network::byte_t[20];
+    memset(data1, 0, 20);
+    Network::byte_t *data2 = new Network::byte_t[20];
+    memset(data2, 0, 20);
+    Network::byte_t *data3 = new Network::byte_t[20];
+    memset(data3, 0, 20);
 
     // populate a buffer with some data
-    for (size_t i=0; i< 12; i++) {
+    for (size_t i=0; i< 19; i++) {
         data1[i] = i + 'a';
     }
 
     // Build identical buffer nissing one character
     memcpy(data2, data1, 6);
-    memcpy(data2 + 6, data1 + 7, 4);
+    memcpy(data2 + 6, data1 + 7, 20-7);
 
     // Remove a single byte
     Network::byte_t byte = 'g';
-    Buffer buf1(10);
+    Buffer buf1(20);
     buf1.clear();
-    buf1.copy(data1, 10);
+    buf1.copy(data1, 20);
     buf1.remove(byte);
-    if (memcmp(data2, buf1.reference(), 9) == 0) {
+    if (memcmp(data2, buf1.reference(), 19) == 0) {
          runtest.pass ("Buffer::remove(Network::byte_t)");
     } else {
          runtest.fail ("Buffer::remove(Network::byte_t)");
     }
     
-    Buffer buf2(10);
+    Buffer buf2(20);
     buf2.clear();
-    buf2.copy(data1, 10);
+    buf2.copy(data1, 20);
     buf2.remove(6);
-    if (memcmp(data2, buf2.reference(), 9) == 0) {
+    if (memcmp(data2, buf2.reference(), 18) == 0) {
          runtest.pass ("Buffer::remove(int)");
     } else {
          runtest.fail ("Buffer::remove(int)");
@@ -502,11 +502,11 @@ test_remove()
     memcpy(data3, data1, 6);
     memcpy(data3 + 6, data1 + 9, 1);
     
-    Buffer buf3(10);
+    Buffer buf3(20);
     buf3.clear();
-    buf3.copy(data1, 10);
+    buf3.copy(data1, 20);
     buf3.remove(6, 8);
-    if (memcmp(data3, buf3.reference(), 7) == 0) {
+    if (memcmp(data3, buf3.reference(), 6) == 0) {
          runtest.pass ("Buffer::remove(int, int)");
     } else {
          runtest.fail ("Buffer::remove(int, int)");
@@ -674,10 +674,12 @@ test_operators()
     buf6.clear();
     buf6 += 'D';
     buf6 += 'E';
-    buf6 += 'F';
+    buf6 += 'F';    
     buf5 += buf6;
     ptr3 = buf5.reference();    // refresh the pointer, as it changes
                                 // on a resize()
+    // when appending Buffers, this destination has enough space to hold
+    // the allocated bytes from the source.
     if ((memcmp(ptr3, "abcDEF", 6) == 0) && (buf5.size() == 10)) {
          runtest.pass ("Buffer::operator+=(Buffer &)");
     } else {
@@ -685,6 +687,11 @@ test_operators()
     }
 
     bool caught = false;
+
+    // make the source Buffer have more data
+    buf6 += 'A';
+    buf6 += 'B';
+    buf6 += 'C';
     try {
         buf5 += buf6;
     }
@@ -693,6 +700,9 @@ test_operators()
         caught = true;
 //        log_debug("Got exeception from operator+=: %s", ge.what());
     }
+    // when appending Buffers, this destination doesn't have enough space to
+    // hold the allocated bytes from the source, so is supposed to throw an
+    //exception.
     if (caught) {
          runtest.pass ("Buffer::operator+=(Buffer &) error");
     } else {

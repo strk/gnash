@@ -29,14 +29,19 @@
 #include "SimpleBuffer.h"
 
 #include "as_object.h"
-#include "array.h"
 #include "element.h"
 #include "VM.h"
 
 #include <string>
 #include <iosfwd>
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <io.h>
+#endif
 
-using namespace std;
 
 #define PADDING_BYTES 64
 #define READ_CHUNKS 64

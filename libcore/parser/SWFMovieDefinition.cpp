@@ -35,7 +35,6 @@
 #include "log.h"
 #include "MovieClip.h"
 #include "movie_instance.h"
-#include "bitmap_character_def.h"
 #include "swf/TagLoadersTable.h"
 #include "movie_root.h"
 #include "VM.h" // for assertions
@@ -278,25 +277,20 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic) co
     return 0;
 }
 
-bitmap_character_def* SWFMovieDefinition::get_bitmap_character_def(int character_id)
+BitmapInfo*
+SWFMovieDefinition::getBitmap(int character_id)
 {
-    BitmapMap::iterator it = m_bitmap_characters.find(character_id);
-    if ( it == m_bitmap_characters.end() ) return NULL;
+    Bitmaps::iterator it = _bitmaps.find(character_id);
+    if ( it == _bitmaps.end() ) return 0;
     else return it->second.get();
 }
 
 void
-SWFMovieDefinition::add_bitmap_character_def(int character_id,
-		bitmap_character_def* ch)
+SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<BitmapInfo> im)
 {
-    assert(ch);
-    //log_debug(_("Add bitmap character %d"), character_id);
-    //m_bitmap_characters.add(character_id, ch);
-    m_bitmap_characters.insert(std::make_pair(character_id, boost::intrusive_ptr<bitmap_character_def>(ch)));
+    assert(im);
+    _bitmaps.insert(std::make_pair(id, im));
 
-	// we can *NOT* generate bitmap_info until
-	// a renderer is present
-    add_bitmap_info(ch->get_bitmap_info());
 }
 
 sound_sample* SWFMovieDefinition::get_sound_sample(int character_id)
@@ -325,7 +319,8 @@ void SWFMovieDefinition::add_sound_sample(int character_id, sound_sample* sam)
 
 // Read header and assign url
 bool
-SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in, const std::string& url)
+SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
+        const std::string& url)
 {
 
 	_in = in;
@@ -879,14 +874,10 @@ SWFMovieDefinition::markReachableResources() const
 		i->second->setReachable();
 	}
 
-	for (BitmapMap::const_iterator i=m_bitmap_characters.begin(), e=m_bitmap_characters.end(); i!=e; ++i)
+	for (Bitmaps::const_iterator i = _bitmaps.begin(), e = _bitmaps.end();
+            i != e; ++i)
 	{
 		i->second->setReachable();
-	}
-
-	for (BitmapVect::const_iterator i=m_bitmap_list.begin(), e=m_bitmap_list.end(); i!=e; ++i)
-	{
-		(*i)->setReachable();
 	}
 
 	for (SoundSampleMap::const_iterator i=m_sound_samples.begin(), e=m_sound_samples.end(); i!=e; ++i)

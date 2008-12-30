@@ -29,34 +29,269 @@ rcsid="$Id: NetConnection.as,v 1.18 2008/03/11 19:31:47 strk Exp $";
 check_equals(NetConnection, undefined);
 check_totals(1);
 
-#else // OUTPUT_VERSION >= 7
+#else // OUTPUT_VERSION >= 6
+
+check(NetConnection.prototype.hasOwnProperty("call"));
+check(NetConnection.prototype.hasOwnProperty("connect"));
+check(NetConnection.prototype.hasOwnProperty("addHeader"));
+check(NetConnection.prototype.hasOwnProperty("close"));
+
+check(!NetConnection.prototype.hasOwnProperty("isConnected"));
+check(!NetConnection.prototype.hasOwnProperty("uri"));
 
 check_equals(typeof(NetConnection), 'function');
 check_equals(typeof(NetConnection.prototype), 'object');
 check_equals(typeof(NetConnection.prototype.isConnected), 'undefined');
 check_equals(typeof(NetConnection.prototype.connect), 'function');
-// TODO: add tests for all interfaces
 
 var tmp = new NetConnection;
 check_equals(typeof(tmp), 'object');
 check_equals(tmp.__proto__, NetConnection.prototype);
 check(tmp instanceof NetConnection);
-xcheck_equals(typeof(tmp.isConnected), 'boolean');
-xcheck_equals(tmp.isConnected, false);
-// TODO: add tests for all properties
+check_equals(typeof(tmp.isConnected), 'boolean');
+check_equals(typeof(tmp.uri), 'undefined');
+check_equals(tmp.uri, undefined);
+check_equals(tmp.isConnected, false);
+
+tmp.isConnected = true;
+check_equals(tmp.isConnected, false);
+
+tmp.isConnected = 56;
+check_equals(tmp.isConnected, false);
 
 // test the NetConnection::connect method
-tmp.connect();
 if ( ! tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv") )
 {
 	// FIXME: this would fail in the reference player too...
-	xfail("NetConnection::connect() didn't initialized correctly");
+	xfail("NetConnection::connect() didn't initialize correctly");
 }
 else
 {
 	pass("NetConnection::connect() initialized correctly");
 }
 
-check_totals(10);
+statuses = new Array;
+tmp.onStatus = function(info) {
+    result = info.code;
+    level = info.level;
+    statuses.push(info.code);
+};
+
+result = "";
+level = "";
+
+ret = tmp.connect();
+check_equals(ret, undefined);
+check_equals(tmp.isConnected, false);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = tmp.connect("");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "");
+
+ret = tmp.connect("null");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "null");
+
+ret = tmp.connect(null, "another argument");
+check_equals(ret, true);
+check_equals(tmp.isConnected, true);
+check_equals(result, "NetConnection.Connect.Success");
+check_equals(level, "status");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "null");
+
+// Can't set
+tmp.uri = 6;
+check_equals(tmp.uri, "null");
+
+
+statuses = new Array();
+ret = tmp.connect(1);
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "1");
+check_equals(statuses.toString(),
+            "NetConnection.Connect.Closed,NetConnection.Connect.Failed");
+
+statuses = new Array();
+ret = tmp.connect("string");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "string");
+check_equals(statuses.toString(),
+            "NetConnection.Connect.Failed");
+
+ret = tmp.connect(undefined);
+
+#if OUTPUT_VERSION > 6
+check_equals(ret, true);
+check_equals(tmp.isConnected, true);
+check_equals(result, "NetConnection.Connect.Success");
+check_equals(level, "status");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "undefined");
+#else
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+check_equals(typeof(tmp.uri), "string");
+check_equals(tmp.uri, "");
+#endif
+
+statuses = new Array;
+ret = tmp.connect(null);
+check_equals(ret, true);
+check_equals(tmp.isConnected, true);
+check_equals(result, "NetConnection.Connect.Success");
+check_equals(level, "status");
+
+// This depends on whether isConnected() was true or not.
+#if OUTPUT_VERSION > 6
+check_equals(statuses.toString(),
+        "NetConnection.Connect.Closed,NetConnection.Connect.Success");
+#else
+check_equals(statuses.toString(),
+        "NetConnection.Connect.Success");
+#endif
+// The pp and Gnash sandboxes behave differently. The pp rejects any
+// network connection from filesystem-loaded SWFs unless the SWF location
+// is added to the player configuration file. This server is blacklisted
+// in the testsuite gnashrc file, so Gnash should refuse to load this too.
+// The test should work on both players for a SWF loaded from anywhere but
+// www.blacklistedserver.org (domain still available, in case anyone wants to
+// mess up the test).
+ret = tmp.connect("http://www.blacklistedserver.org");
+check_equals(ret, false);
+check_equals(tmp.isConnected, false);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+
+
+// Close() doesn't reset uri
+tmp.close();
+check_equals(tmp.uri, "http://www.blacklistedserver.org");
+
+// Test call()
+
+statuses = new Array;
+// No Call onStatus event when not connected.
+ret = tmp.call("o");
+check_equals(ret, undefined);
+check_equals(statuses.length, 0);
+
+// No Call onStatus event when connected with null.
+tmp.connect(null);
+ret = tmp.call("o");
+check_equals(ret, undefined);
+check_equals(statuses.length, 1);
+check_equals(result, "NetConnection.Connect.Success");
+check_equals(typeof(tmp.uri), 'string');
+check_equals(tmp.uri, 'null');
+
+// Check onStatus object.
+
+nc = new NetConnection;
+nc.onStatus = function(info) {
+    infoObj = info;
+};
+
+nc.connect(6);
+nc.onStatus = undefined;
+check_equals(infoObj.code, "NetConnection.Connect.Failed");
+
+// It is a full object
+check(infoObj instanceof Object);
+check_equals(infoObj.toString(), "[object Object]");
+
+// Check whether the original object is modified on a new connect attempt.
+nc.connect(null);
+check_equals(infoObj.code, "NetConnection.Connect.Failed");
+
+/// Check call
+
+result = "";
+level = "";
+
+nc.onStatus = function(info) {
+    result = info.code;
+    level = info.level;
+    statuses.push(info.code);
+};
+
+// Sanity check
+check(nc.isConnected);
+
+ret = nc.call();
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = nc.call(1);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+ret = nc.call("string");
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "");
+check_equals(level, "");
+
+// NetConnection close
+
+statuses = new Array;
+check(nc.isConnected);
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Closed");
+check_equals(level, "status");
+
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Closed");
+check_equals(level, "status");
+
+// Only called once
+check_equals(statuses.toString(), "NetConnection.Connect.Closed");
+
+nc.connect(1);
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+ret = nc.close();
+check_equals(nc.isConnected, false);
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+check_equals(result, "NetConnection.Connect.Failed");
+check_equals(level, "error");
+
+check_totals(119);
+
+
 
 #endif // OUTPUT_VERSION >= 7

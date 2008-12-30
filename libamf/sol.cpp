@@ -30,7 +30,7 @@
 #include <fstream>
 #include <cassert>
 
-#include "network.h"
+//#include "network.h"
 #include "element.h"
 #include "amf.h"
 #include "buffer.h"
@@ -180,7 +180,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // so we swap it first.
     boost::uint16_t swapped = SOL_MAGIC;
     swapped = htons(swapped);
-    Network::byte_t *ptr = reinterpret_cast<Network::byte_t *>(&swapped);
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -191,7 +191,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     filesize += name.size() + 16;
     boost::uint32_t len = filesize;
     len = htonl(len);
-    ptr = reinterpret_cast<Network::byte_t *>(&len);
+    ptr = reinterpret_cast<boost::uint8_t *>(&len);
     for (i=0; i<sizeof(boost::uint32_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -207,7 +207,7 @@ SOL::formatHeader(const std::string &name, int filesize)
     // then the 0x0004 bytes, also a mystery
     swapped = SOL_BLOCK_MARK;
     swapped = htons(swapped);
-    ptr = reinterpret_cast<Network::byte_t *>(&swapped);
+    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
@@ -221,12 +221,12 @@ SOL::formatHeader(const std::string &name, int filesize)
     //  First the length in two bytes
     swapped = name.size();
     swapped = htons(swapped);
-    ptr = reinterpret_cast<Network::byte_t *>(&swapped);
+    ptr = reinterpret_cast<boost::uint8_t *>(&swapped);
     for (i=0; i<sizeof(boost::uint16_t); i++) {
         _header.push_back(ptr[i]);
     }
     // then the string itself
-    ptr = (Network::byte_t *)name.c_str();
+    ptr = (boost::uint8_t *)name.c_str();
     for (i=0; i<name.size(); i++) {
         _header.push_back(ptr[i]);
     }
@@ -265,7 +265,7 @@ SOL::writeFile(const string &filespec, const string &name)
         return false;
     }
     
-    vector<Network::byte_t>::iterator it;
+    vector<boost::uint8_t>::iterator it;
     vector<boost::shared_ptr<amf::Element> >::iterator ita; 
     AMF amf_obj;
     char *ptr;
@@ -282,14 +282,14 @@ SOL::writeFile(const string &filespec, const string &name)
     _filesize = size;
     
     boost::scoped_array<char> body ( new char[size + 20] );
-    memset(body.get(), 0, size);
+    std::fill_n(body.get(), size, 0);
     ptr = body.get();
     char* endPtr = ptr+size+20; // that's the amount we allocated..
 
     for (ita = _amfobjs.begin(); ita != _amfobjs.end(); ita++) {
         boost::shared_ptr<Element> el = (*(ita));
         boost::shared_ptr<amf::Buffer> var = amf_obj.encodeProperty(el); 
-        //  Network::byte_t *var = amf_obj.encodeProperty(el, outsize); 
+        //  boost::uint8_t *var = amf_obj.encodeProperty(el, outsize); 
         if (!var) {
             continue;
         }
@@ -348,14 +348,15 @@ SOL::writeFile(const string &filespec, const string &name)
     
     if ( ofs.write(head.get(), _header.size()).fail() )
     {
-        log_error("Error writing %d bytes of header to output file %s", _header.size(), filespec.c_str());
+        log_error("Error writing %d bytes of header to output file %s", 
+                _header.size(), filespec);
         return false;
     }
 
-//    ofs.write(body, (ptr - body));
     if ( ofs.write(body.get(), _filesize).fail() )
     {
-        log_error("Error writing %d bytes of body to output file %s", _filesize, filespec.c_str());
+        log_error("Error writing %d bytes of body to output file %s",
+                _filesize, filespec);
         return false;
     }
     ofs.close();
@@ -374,19 +375,23 @@ SOL::readFile(const std::string &filespec)
 //    GNASH_REPORT_FUNCTION;
     struct stat st;
     boost::uint16_t size;
-    Network::byte_t *buf = 0;
-    Network::byte_t *ptr = 0;
     size_t bodysize;
 
     // Make sure it's an SOL file
-    if (stat(filespec.c_str(), &st) == 0) {
+    if (stat(filespec.c_str(), &st) != 0)  return false;
 
 	try {
+
+        boost::uint8_t *ptr = 0;
+
 	    ifstream ifs(filespec.c_str(), ios::binary);
-	    _filesize = st.st_size;
-	    buf = new Network::byte_t[_filesize + sizeof(int)];
-	    ptr = buf;
-	    Network::byte_t* tooFar = buf+_filesize;
+
+        _filesize = st.st_size;
+        boost::scoped_array<boost::uint8_t> buf(
+                new boost::uint8_t[_filesize + sizeof(int)]);
+
+	    ptr = buf.get();
+	    boost::uint8_t* tooFar = buf.get() + _filesize;
 	    
 	    bodysize = st.st_size - 6;
 	    _filespec = filespec;
@@ -409,22 +414,25 @@ SOL::readFile(const std::string &filespec)
 	    
 	    // consistency check
 	    if ((buf[0] == 0) && (buf[1] == 0xbf)) {
-		if (bodysize == length) {
-		    log_debug("%s is an SOL file", filespec.c_str());
-		} else {
-		    log_error("%s looks like an SOL file, but the length is wrong. Should be %d, got %d",
-			      filespec.c_str(), (_filesize - 6), length);
-		}
-		
-        } else {
-		log_error("%s isn't an SOL file", filespec.c_str());
+            if (bodysize == length) {
+                log_debug("%s is an SOL file", filespec);
+            }
+            else {
+		    log_error("%s looks like an SOL file, but the length is wrong. "
+                    "Should be %d, got %d",
+                    filespec, (_filesize - 6), length);
+            }
+        }
+        else {
+            log_error("%s isn't an SOL file", filespec);
 	    }
 	    
 #ifndef GNASH_TRUST_AMF
 	    ENSUREBYTES(ptr, tooFar, 2); 
 #endif
 	    
-	    // 2 bytes for the length of the object name, but it's also null terminated
+	    // 2 bytes for the length of the object name, but it's also 
+        // null terminated
 	    size = *(reinterpret_cast<boost::uint16_t *>(ptr));
 	    size = ntohs(size);
 	    ptr += 2;
@@ -444,31 +452,24 @@ SOL::readFile(const std::string &filespec)
 	    AMF amf_obj;
 	    boost::shared_ptr<amf::Element> el;
 	    while ( ptr < tooFar) {
-		if (ptr) {
-		    el = amf_obj.extractProperty(ptr, tooFar);
-		    if (el != 0) {
-			ptr += amf_obj.totalsize() + 1;
-			_amfobjs.push_back(el);
-		    } else {
-			break;
-		    }
-//		log_debug("Bodysize is: %d size is: %d for %s", bodysize, size, el->getName());
-		} else {
-		    break;
-		}
+            if (ptr) {
+                el = amf_obj.extractProperty(ptr, tooFar);
+                if (el != 0) {
+                    ptr += amf_obj.totalsize() + 1;
+                    _amfobjs.push_back(el);
+                }
+                else break;
+            } else break;
 	    }
-	    delete[] buf;
 	    
 	    ifs.close();
 	    return true;
-	} catch (std::exception& e) {
+	}
+    catch (std::exception& e) {
 	    log_error("Reading SharedObject %s: %s", filespec, e.what());
 	    return false;
 	}
-    }
     
-//    log_error("Couldn't open file: %s", strerror(errno));
-    return false;
 }
 
 ///  \brief Dump the internal data of this class in a human readable form.

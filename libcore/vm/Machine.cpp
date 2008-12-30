@@ -21,7 +21,7 @@
 #include "as_object.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
-#include "array.h"
+#include "Array_as.h"
 #include "abc_block.h"
 #include "fn_call.h"
 #include "abc_function.h"

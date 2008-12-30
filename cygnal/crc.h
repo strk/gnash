@@ -25,35 +25,129 @@
 
 #include <string>
 #include <vector>
+#include <iostream> // for output operator
 
 #include "rc.h"
 
+/// \namespace cygnal
+///
+/// This namespace is for all the Cygnal specific classes not used by
+/// anything else in Gnash.
 namespace cygnal {
-  
+    
+/// \class cygnal::CRcInitFile
+///	This class handles reading values from the Cygnal
+///	configuration file, .cygnalrc, and into a form we can use in
+///	Cygnal.
 class DSOEXPORT CRcInitFile : public gnash::RcInitFile
 {
 public:
-
+    /// \brief Return the default instance of RC file,
+    static CRcInitFile& getDefaultInstance();
+    
+    /// \brief Load all the configuration files.
+    ///		This includes parsing the default .gnashrc file for
+    ///		Gnash settings that control the swf parser and virtual
+    ///		machine. These setting can be overridden in the
+    ///		.cygnalrc file, plus the Cygnal specific file has
+    ///		options only used by Cygnal.
     bool loadFiles();
+    
+    /// \brief Parse and load configuration file
+    ///
+    /// @param filespec The path and file name of the disk file to parse.
+    ///
+    /// @return True if the file was parsed sucessfully, false if not.
     bool parseFile(const std::string& filespec);
 
-    // Return the default instance of RC file,
-    static CRcInitFile& getDefaultInstance();
-    void dump();
+    /// Accessors
 
+    /// \brief Get the port offset.
     int getPortOffset() { return _port_offset; };
+
+    // \brief Set the port offset
     void setPortOffset(int x) { _port_offset = x; };
+
+    /// \brief Get the number of file descriptors per thread.
+    int getFDThread() { return _fdthread; };
+    /// \brief Set the number of file descriptors per thread.
+    void setFDThread(int x) { _fdthread = x; };
+
+    /// \brief Get the special testing output option.
+    bool getTestingFlag() { return _testing; };
+    /// \brief Set the special testing output option.
+    void setTestingFlag(bool x) { _testing = x; };
+
+    /// \brief Get the flag for whether to enable threading.
+    bool getThreadingFlag() { return _threading; };
+    /// \brief Set the flag for whether to enable threading.
+    void setThreadingFlag(bool x) { _threading = x; };
+
+    /// \brief Get the flag for whether to enable internal debugging messages.
+    bool getNetDebugFlag() const { return _netdebug; }
+    /// \brief Set the flag for whether to enable internal debugging messages.
+    void setNetDebugFlag(bool x) { _netdebug = x; }    
+
+    /// \brief Get the flag for whether to enable the administration thread.
+    bool getAdminFlag() const { return _admin; }
+    /// \brief Set the  flag for whether to enable the administration thread.
+    void setAdminFlag(bool x) { _admin = x; }
+
+    /// \brief Dump the internal data of this class in a human readable form.
+    /// @remarks This should only be used for debugging purposes.
+    void dump() const { dump(std::cerr); }
     
-private:
+    /// \overload dump(std::ostream& os) const
+    void dump(std::ostream& os) const;
+    
+  private:
     /// Construct only by getDefaultInstance()
     CRcInitFile();
     /// Never destroy (TODO: add a destroyDefaultInstance)
     ~CRcInitFile();
-
+    
+    /// \var _port_offset
+    ///		This is an offset applied to all priviledged tcp/ip
+    ///		ports. This enables the port number to be shifted into
+    ///		the unpriviledged range (anything about 1024) so one
+    ///		doesn't have to be root.
     int _port_offset;
+
+    /// \var _testing
+    ///		Turn on special output format to support Gnash
+    ///		testing.
+    bool _testing;
+
+    /// \var _threading
+    ///		Disable threading in the server I/O as much as
+    ///		possible to make debugging easier. This is to only be
+    ///		used by developers
+    bool _threading;
+
+    /// \var _fdthread
+    ///		The number of file descriptors to be watched by each
+    ///		dispatch thread. When threading is disabled, this is
+    ///		also disabled, as all the file descriptors are watched
+    ///		by one one thread as an aid to debugging.
+    size_t _fdthread;
+    
+    /// \var _netdebug
+    ///	Toggles very verbose debugging info from the network Network
+    ///	class.
+    bool _netdebug;
+
+    /// \var _admin
+    ///		This toggles whether the admin thread is started or
+    ///		not, also to reduce complecity when debugging.
+    bool _admin;
 };
 
-//extern DSOEXPORT CRcInitFile crcfile;
+/// \brief Dump to the specified output stream.
+inline std::ostream& operator << (std::ostream& os, const CRcInitFile& crcini)
+{
+	crcini.dump(os);
+	return os;
+}
 
 // End of gnash namespace 
 }

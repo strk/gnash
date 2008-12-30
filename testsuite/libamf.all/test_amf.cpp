@@ -34,7 +34,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "GnashException.h"
-#include "dejagnu.h"
+#include "check.h"
+//#include "dejagnu.h"
 #include "as_object.h"
 #include "arg_parser.h"
 #include "amf.h"
@@ -66,7 +67,7 @@ static bool memdebug = false;
 Memory *mem = 0;
 #endif
 
-TestState runtest;
+TestState& runtest=_runtest;
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -158,106 +159,144 @@ void
 test_encoding()
 {
     // This is a 8 byte wide double data type in hex
-    boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
-    double num = *(reinterpret_cast<double *>(buf1->reference()));
-    swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we alwasy encode in big endian format
+    {
+        boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
+        double num = *(reinterpret_cast<double *>(buf1->reference()));
+        swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we alwasy encode in big endian format
 
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif    
-    boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(num);
-    // A number AMF object has only one header byte, which is the type field.
+        boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(num);
+        // A number AMF object has only one header byte, which is the type field.
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    if ((*encnum->reference() == Element::NUMBER_AMF0) &&
-        (memcmp(buf1->reference(), encnum->reference()+1, amf::AMF0_NUMBER_SIZE) == 0)) {
-        runtest.pass("Encoded AMF Number");
-    } else {
-        runtest.fail("Encoded AMF Number");
+        if ((*encnum->reference() == Element::NUMBER_AMF0) &&
+            (memcmp(buf1->reference(), encnum->reference()+1, amf::AMF0_NUMBER_SIZE) == 0)) {
+            runtest.pass("Encoded AMF Number");
+        } else {
+            runtest.fail("Encoded AMF Number");
+        }
+
+        Element el(num);
+        boost::shared_ptr<Buffer> buf = AMF::encodeElement(el);
+        
+        check_equals(*buf->reference(), Element::NUMBER_AMF0);
+        check_equals(buf->size(), amf::AMF0_NUMBER_SIZE+1); // +1 for the type byte
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(memcmp(buf1->reference(), buf->reference()+1, amf::AMF0_NUMBER_SIZE), 0);
     }
     
     // Encode a boolean. Although we know a bool is only one character, for AMF,
     // it's actually a two byte short instead.
-    bool flag = true;
-    boost::shared_ptr<Buffer> buf2(new Buffer("01 01"));
-    boost::uint16_t sht = *(boost::uint16_t *)buf2->reference();
-    swapBytes(&sht, sizeof(boost::uint16_t)); // we always encode in big endian format
+    {
+        bool flag = true;
+        boost::shared_ptr<Buffer> buf2(new Buffer("01 01"));
+        boost::uint16_t sht = *(boost::uint16_t *)buf2->reference();
+        swapBytes(&sht, sizeof(boost::uint16_t)); // we always encode in big endian format
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(flag);
+        boost::shared_ptr<Buffer> encbool = AMF::encodeBoolean(flag);
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
     
-    // A boolean AMF object has only one header byte, which is the type field.
-    // AMF3 changes this to being two different type, FALSE & TRUE
-    // which are finally only one byte apiece.
-    if ((*encbool->reference() == Element::BOOLEAN_AMF0) &&
-        (encbool->size() == 2) &&
-        (memcmp(buf2->reference(), encbool->reference(), sizeof(boost::uint16_t)) == 0)) {
-        runtest.pass("Encoded AMF Boolean");
-    } else {
-        runtest.fail("Encoded AMF Boolean");
+        // A boolean AMF object has only one header byte, which is the type field.
+        // AMF3 changes this to being two different type, FALSE & TRUE
+        // which are finally only one byte apiece.
+        if ((*encbool->reference() == Element::BOOLEAN_AMF0) &&
+            (encbool->size() == 2) &&
+            (memcmp(buf2->reference(), encbool->reference(), sizeof(boost::uint16_t)) == 0)) {
+            runtest.pass("Encoded AMF Boolean");
+        } else {
+            runtest.fail("Encoded AMF Boolean");
+        }
+
+        Element el(true);
+        boost::shared_ptr<Buffer> buf = AMF::encodeElement(el);
+        
+        check_equals(*buf->reference(), Element::BOOLEAN_AMF0);
+        check_equals(buf->size(), 2);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(memcmp(buf->reference(), buf2->reference(), 2), 0);
+
+        Element el2(false);
+        buf = AMF::encodeElement(el2);
+        
+        check_equals(*buf->reference(), Element::BOOLEAN_AMF0);
+        check_equals(buf->size(), 2);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check_equals(*(buf->reference()+1), 0);
     }
-//     delete buf2;
-//     delete encbool;
     
     // Encode a String.
-    string str = "Jerry Garcia rules";
+    {
+        string str = "Jerry Garcia rules";
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::shared_ptr<Buffer> encstr = AMF::encodeString(str);
+        boost::shared_ptr<Buffer> buf = AMF::encodeString(str);
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), str.size()+AMF_HEADER_SIZE);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check((memcmp(buf->reference() + 3, str.c_str(), str.size()) == 0));
 
-    // A String AMF object has a 3 bytes head, the type, and a two byte length.
-    if ((*encstr->reference() == Element::STRING_AMF0) &&
-        (encstr->size() == str.size() + AMF_HEADER_SIZE) &&
-        (memcmp(encstr->reference() + 3, str.c_str(), str.size()) == 0)) {
-        runtest.pass("Encoded AMF String");
-    } else {
-        runtest.fail("Encoded AMF String");
+        Element el(str);
+        buf = AMF::encodeElement(el);
+        
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), str.size()+AMF_HEADER_SIZE);
+        // A String AMF object has a 3 bytes head, the type, and a two byte length.
+        check((memcmp(buf->reference() + 3, str.c_str(), str.size()) == 0));
     }
-//    delete encstr;
     
     // Encode a NULL String.
+    {
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::shared_ptr<Buffer> encnull = AMF::encodeNullString();
+        boost::shared_ptr<Buffer> buf = AMF::encodeNullString();
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-    if (memdebug) {
-        mem->addStats(__LINE__);             // take a sample
-    }
+        if (memdebug) {
+            mem->addStats(__LINE__);             // take a sample
+        }
 #endif
-    boost::uint16_t len = *(boost::uint16_t *)(encnull->reference() + 1);
-    // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
-    if ((*encnull->reference() == Element::STRING_AMF0) &&
-        (encnull->size() == AMF_HEADER_SIZE) && 
-        (len == 0)) {
-        runtest.pass("Encoded AMF NULL String");
-    } else {
-        runtest.fail("Encoded AMF NULL String");
+        boost::uint16_t len = *(boost::uint16_t *)(buf->reference() + 1);
+
+        // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), (size_t)AMF_HEADER_SIZE);
+        check_equals(len, 0);
+
+        Element el;
+        el.makeNullString();
+        buf = AMF::encodeElement(el);
+        len = *(boost::uint16_t *)(buf->reference() + 1);
+
+        // A NULL String AMF object has just 3 bytes, the type, and a two byte length, which is zero.
+        check_equals(*buf->reference(), Element::STRING_AMF0);
+        check_equals(buf->size(), (size_t)AMF_HEADER_SIZE);
+        check_equals(len, 0);
     }
-//    delete encnull;
 
 // amf::AMF::encodeECMAArray(unsigned char*, int)
 }
@@ -293,7 +332,7 @@ test_array()
     boost::shared_ptr<Buffer> hex2(new Buffer("0a 00 00 00 c8 00 3f a4 7a e1 47 ae 14 7b 00 40 03 d7 0a 3d 70 a3 d7 00 40 13 85 1e b8 51 eb 85 00 40 1d 1e b8 51 eb 85 1f 00 40 23 5c 28 f5 c2 8f 5c 00 40 28 28 f5 c2 8f 5c 29 00 40 2c f5 c2 8f 5c 28 f6 00 40 30 e1 47 ae 14 7a e1 00 40 33 47 ae 14 7a e1 48 00 40 35 ae 14 7a e1 47 ae 00 40 38 14 7a e1 47 ae 14 00 40 3a 7a e1 47 ae 14 7b 00 40 3c e1 47 ae 14 7a e1 00 40 3f 47 ae 14 7a e1 48 00 40 40 d7 0a 3d 70 a3 d7 00 40 42 0a 3d 70 a3 d7 0a 00 40 43 3d 70 a3 d7 0a 3d 00 40 44 70 a3 d7 0a 3d 71 00 40 45 a3 d7 0a 3d 70 a4 00 40 46 d7 0a 3d 70 a3 d7 00 40 48 0a 3d 70 a3 d7 0a 00 40 49 3d 70 a3 d7 0a 3d 00 40 4a 70 a3 d7 0a 3d 71 00 40 4b a3 d7 0a 3d 70 a4 00 40 4c d7 0a 3d 70 a3 d7 00 40 4e 0a 3d 70 a3 d7 0a 00 40 4f 3d 70 a3 d7 0a 3d 00 40 50 38 51 eb 85 1e b8 00 40 50 d1 eb 85 1e b8 52 00 40 51 6b 85 1e b8 51 ec 00 40 52 05 1e b8 51 eb 85 00 40 52 9e b8 51 eb 85 1f 00 40 53 38 51 eb 85 1e b8 00 40 53 d1 eb 85 1e b8 52 00 40 54 6b 85 1e b8 51 ec 00 40 55 05 1e b8 51 eb 85 00 40 55 9e b8 51 eb 85 1f 00 40 56 38 51 eb 85 1e b8 00 40 56 d1 eb 85 1e b8 52 00 40 57 6b 85 1e b8 51 ec 00 40 58 05 1e b8 51 eb 85 00 40 58 9e b8 51 eb 85 1f 00 40 59 38 51 eb 85 1e b8 00 40 59 d1 eb 85 1e b8 52 00 40 5a 6b 85 1e b8 51 ec 00 40 5b 05 1e b8 51 eb 85 00 40 5b 9e b8 51 eb 85 1f 00 40 5c 38 51 eb 85 1e b8 00 40 5c d1 eb 85 1e b8 52 00 40 5d 6b 85 1e b8 51 ec 00 40 5e 05 1e b8 51 eb 85 00 40 5e 9e b8 51 eb 85 1f 00 40 5f 38 51 eb 85 1e b8 00 40 5f d1 eb 85 1e b8 52 00 40 60 35 c2 8f 5c 28 f6 00 40 60 82 8f 5c 28 f5 c3 00 40 60 cf 5c 28 f5 c2 8f 00 40 61 1c 28 f5 c2 8f 5c 00 40 61 68 f5 c2 8f 5c 29 00 40 61 b5 c2 8f 5c 28 f6 00 40 62 02 8f 5c 28 f5 c3 00 40 62 4f 5c 28 f5 c2 8f 00 40 62 9c 28 f5 c2 8f 5c 00 40 62 e8 f5 c2 8f 5c 29 00 40 63 35 c2 8f 5c 28 f6 00 40 63 82 8f 5c 28 f5 c3 00 40 63 cf 5c 28 f5 c2 8f 00 40 64 1c 28 f5 c2 8f 5c 00 40 64 68 f5 c2 8f 5c 29 00 40 64 b5 c2 8f 5c 28 f6 00 40 65 02 8f 5c 28 f5 c3 00 40 65 4f 5c 28 f5 c2 8f 00 40 65 9c 28 f5 c2 8f 5c 00 40 65 e8 f5 c2 8f 5c 29 00 40 66 35 c2 8f 5c 28 f6 00 40 66 82 8f 5c 28 f5 c3 00 40 66 cf 5c 28 f5 c2 8f 00 40 67 1c 28 f5 c2 8f 5c 00 40 67 68 f5 c2 8f 5c 29 00 40 67 b5 c2 8f 5c 28 f6 00 40 68 02 8f 5c 28 f5 c3 00 40 68 4f 5c 28 f5 c2 8f 00 40 68 9c 28 f5 c2 8f 5c 00 40 68 e8 f5 c2 8f 5c 29 00 40 69 35 c2 8f 5c 28 f6 00 40 69 82 8f 5c 28 f5 c3 00 40 69 cf 5c 28 f5 c2 8f 00 40 6a 1c 28 f5 c2 8f 5c 00 40 6a 68 f5 c2 8f 5c 29 00 40 6a b5 c2 8f 5c 28 f6 00 40 6b 02 8f 5c 28 f5 c3 00 40 6b 4f 5c 28 f5 c2 8f 00 40 6b 9c 28 f5 c2 8f 5c 00 40 6b e8 f5 c2 8f 5c 29 00 40 6c 35 c2 8f 5c 28 f6 00 40 6c 82 8f 5c 28 f5 c3 00 40 6c cf 5c 28 f5 c2 8f 00 40 6d 1c 28 f5 c2 8f 5c 00 40 6d 68 f5 c2 8f 5c 29 00 40 6d b5 c2 8f 5c 28 f6 00 40 6e 02 8f 5c 28 f5 c3 00 40 6e 4f 5c 28 f5 c2 8f 00 40 6e 9c 28 f5 c2 8f 5c 00 40 6e e8 f5 c2 8f 5c 29 00 40 6f 35 c2 8f 5c 28 f6 00 40 6f 82 8f 5c 28 f5 c3 00 40 6f cf 5c 28 f5 c2 8f 00 40 70 0e 14 7a e1 47 ae 00 40 70 34 7a e1 47 ae 14 00 40 70 5a e1 47 ae 14 7b 00 40 70 81 47 ae 14 7a e1 00 40 70 a7 ae 14 7a e1 48 00 40 70 ce 14 7a e1 47 ae 00 40 70 f4 7a e1 47 ae 14 00 40 71 1a e1 47 ae 14 7b 00 40 71 41 47 ae 14 7a e1 00 40 71 67 ae 14 7a e1 48 00 40 71 8e 14 7a e1 47 ae 00 40 71 b4 7a e1 47 ae 14 00 40 71 da e1 47 ae 14 7b 00 40 72 01 47 ae 14 7a e1 00 40 72 27 ae 14 7a e1 48 00 40 72 4e 14 7a e1 47 ae 00 40 72 74 7a e1 47 ae 14 00 40 72 9a e1 47 ae 14 7b 00 40 72 c1 47 ae 14 7a e1 00 40 72 e7 ae 14 7a e1 48 00 40 73 0e 14 7a e1 47 ae 00 40 73 34 7a e1 47 ae 14 00 40 73 5a e1 47 ae 14 7b 00 40 73 81 47 ae 14 7a e1 00 40 73 a7 ae 14 7a e1 48 00 40 73 ce 14 7a e1 47 ae 00 40 73 f4 7a e1 47 ae 14 00 40 74 1a e1 47 ae 14 7b 00 40 74 41 47 ae 14 7a e1 00 40 74 67 ae 14 7a e1 48 00 40 74 8e 14 7a e1 47 ae 00 40 74 b4 7a e1 47 ae 14 00 40 74 da e1 47 ae 14 7b 00 40 75 01 47 ae 14 7a e1 00 40 75 27 ae 14 7a e1 48 00 40 75 4e 14 7a e1 47 ae 00 40 75 74 7a e1 47 ae 14 00 40 75 9a e1 47 ae 14 7b 00 40 75 c1 47 ae 14 7a e1 00 40 75 e7 ae 14 7a e1 48 00 40 76 0e 14 7a e1 47 ae 00 40 76 34 7a e1 47 ae 14 00 40 76 5a e1 47 ae 14 7b 00 40 76 81 47 ae 14 7a e1 00 40 76 a7 ae 14 7a e1 48 00 40 76 ce 14 7a e1 47 ae 00 40 76 f4 7a e1 47 ae 14 00 40 77 1a e1 47 ae 14 7b 00 40 77 41 47 ae 14 7a e1 00 40 77 67 ae 14 7a e1 48 00 40 77 8e 14 7a e1 47 ae 00 40 77 b4 7a e1 47 ae 14 00 40 77 da e1 47 ae 14 7b 00 40 78 01 47 ae 14 7a e1 00 40 78 27 ae 14 7a e1 48 00 40 78 4e 14 7a e1 47 ae 00 40 78 74 7a e1 47 ae 14 00 40 78 9a e1 47 ae 14 7b 00 40 78 c1 47 ae 14 7a e1 00 40 78 e7 ae 14 7a e1 48 00 40 79 0e 14 7a e1 47 ae 00 40 79 34 7a e1 47 ae 14 00 40 79 5a e1 47 ae 14 7b 00 40 79 81 47 ae 14 7a e1 00 40 79 a7 ae 14 7a e1 48 00 40 79 ce 14 7a e1 47 ae 00 40 79 f4 7a e1 47 ae 14 00 40 7a 1a e1 47 ae 14 7b 00 40 7a 41 47 ae 14 7a e1 00 40 7a 67 ae 14 7a e1 48 00 40 7a 8e 14 7a e1 47 ae 00 40 7a b4 7a e1 47 ae 14 00 40 7a da e1 47 ae 14 7b 00 40 7b 01 47 ae 14 7a e1 00 40 7b 27 ae 14 7a e1 48 00 40 7b 4e 14 7a e1 47 ae 00 40 7b 74 7a e1 47 ae 14 00 40 7b 9a e1 47 ae 14 7b 00 40 7b c1 47 ae 14 7a e1 00 40 7b e7 ae 14 7a e1 48 00 40 7c 0e 14 7a e1 47 ae 00 40 7c 34 7a e1 47 ae 14 00 40 7c 5a e1 47 ae 14 7b 00 40 7c 81 47 ae 14 7a e1 00 40 7c a7 ae 14 7a e1 48 00 40 7c ce 14 7a e1 47 ae 00 40 7c f4 7a e1 47 ae 14 00 40 7d 1a e1 47 ae 14 7b 00 40 7d 41 47 ae 14 7a e1 00 40 7d 67 ae 14 7a e1 48 00 40 7d 82 8f 5c 28 f5 c3 00 40 7d 83 33 33 33 33 33 00 40 7d a9 99 99 99 99 9a"));
     boost::shared_ptr<amf::Element> el2 = amf.extractAMF(hex2);
     if ((el2->getType() == Element::STRICT_ARRAY_AMF0)
-        && (el2->propertySize() == 22)) {
+        && (el2->propertySize() == 200)) {
         runtest.pass("Extracted Strict Array");
     } else {
         runtest.fail("Extracted Strict Array");

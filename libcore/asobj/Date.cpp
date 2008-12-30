@@ -1490,4 +1490,11 @@ void fillGnashTime(const double& t, GnashTime& gt)
 
 }
 
+// external
+as_object*
+init_date_instance(double val)
+{
+    return new Date(val);
+}
+
 } // end of gnash namespace

@@ -145,7 +145,7 @@ private:
 };
 
 
-class bitmap_info_ogl : public bitmap_info
+class bitmap_info_ogl : public BitmapInfo
 {
   public:
     bitmap_info_ogl(GnashImage* image, GLenum pixelformat,

@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __GNASH_URL_H__
-#define __GNASH_URL_H__
+#ifndef GNASH_URL_H
+#define GNASH_URL_H
 
 #include "dsodefs.h"
 
@@ -71,6 +71,8 @@ public:
 	const std::string& port() const { return _port; }
 
 	/// Return the 'path' member of this URL, as a string
+    //
+    /// The returned path starts with '/'
 	const std::string& path() const { return _path; }
 
 	/// Return the 'anchor' member of this URL, as a string

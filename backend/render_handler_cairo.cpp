@@ -47,7 +47,7 @@ namespace gnash {
 
 // Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
-rgb_to_cairo_rgb24(boost::uint8_t* dst, const ImageRGB* im)
+rgb_to_cairo_rgb24(boost::uint8_t* dst, const GnashImage* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -62,7 +62,7 @@ rgb_to_cairo_rgb24(boost::uint8_t* dst, const ImageRGB* im)
 
 // Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
 static void
-rgba_to_cairo_argb(boost::uint8_t* dst, const ImageRGBA* im)
+rgba_to_cairo_argb(boost::uint8_t* dst, const GnashImage* im)
 {
   boost::uint32_t* dst32 = reinterpret_cast<boost::uint32_t*>(dst);
   for (size_t y = 0;  y < im->height();  y++)
@@ -138,7 +138,7 @@ pattern_add_color_stops(const fill_style& style, cairo_pattern_t* pattern,
 }
 
 
-class bitmap_info_cairo : public bitmap_info, boost::noncopyable
+class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
 {
   public:
     bitmap_info_cairo(boost::uint8_t* data, int width, int height,
@@ -419,26 +419,34 @@ public:
   {
   }
 
-  virtual bitmap_info*  create_bitmap_info_rgb(ImageRGB* im) 
+  virtual BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im) 
   {
-    int buf_size = im->width() * im->height() * 4;
-    boost::uint8_t* buffer = new boost::uint8_t[buf_size];
-    
-    rgb_to_cairo_rgb24(buffer, im);
-    
-    return new bitmap_info_cairo(buffer, im->width(), im->height(), 4,
-                                 CAIRO_FORMAT_RGB24);
-  }
 
-  virtual bitmap_info*  create_bitmap_info_rgba(ImageRGBA* im)
-  {        
     int buf_size = im->width() * im->height() * 4;
     boost::uint8_t* buffer = new boost::uint8_t[buf_size];
+
+    switch (im->type())
+    {
     
-    rgba_to_cairo_argb(buffer, im);
+        case GNASH_IMAGE_RGB:
+        {
+            rgb_to_cairo_rgb24(buffer, im.get());
     
-    return new bitmap_info_cairo(buffer, im->width(), im->height(), 4,
+            return new bitmap_info_cairo(buffer, im->width(), im->height(), 4,
+                                 CAIRO_FORMAT_RGB24);
+        }
+        
+        case GNASH_IMAGE_RGBA:
+        {
+            rgba_to_cairo_argb(buffer, im.get());
+    
+            return new bitmap_info_cairo(buffer, im->width(), im->height(), 4,
                                  CAIRO_FORMAT_ARGB32);
+        }
+
+        default:
+            std::abort();
+    }
   }
 
   virtual void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m, const rect* bounds)

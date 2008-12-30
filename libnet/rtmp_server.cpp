@@ -80,7 +80,7 @@ RTMPServer::handShakeWait()
     boost::shared_ptr<amf::Buffer> buf = _handler->pop();
 
     if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
+	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }    
 
@@ -127,7 +127,7 @@ RTMPServer::handShakeResponse()
 //     std::copy(_handshake->begin(), _handshake->end(), (buf1->begin() + 1));    
 //     boost::shared_ptr<amf::Buffer> buf = new amf::Buffer(RTMP_BODY_SIZE + 1);
 //     std::copy(_handshake->begin(), _handshake->end(), buf->begin() + 1 + RTMP_BODY_SIZE);
-    _handler->notifyout();
+//    _handler->notifyout();
 
     log_debug("Sent RTMP Handshake response");
 
@@ -143,7 +143,7 @@ RTMPServer::serverFinish()
     boost::shared_ptr<amf::Buffer> obj = buf;
     
     if (buf == 0) {
-	log_debug("Que empty, net connection dropped for fd #%d", _handler->getFileFd());
+	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	return false;
     }
     
@@ -185,7 +185,7 @@ RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
     GNASH_REPORT_FUNCTION;
 
     unsigned int amf_index, headersize;
-    Network::byte_t *ptr = buf->reference();
+    boost::uint8_t *ptr = buf->reference();
     AMF amf;
     
     if (buf->reference() == 0) {
@@ -208,16 +208,16 @@ RTMPServer::packetRead(boost::shared_ptr<amf::Buffer> buf)
 //     }
 
 // #if 1
-//     Network::byte_t *end = buf->remove(0xc3);
+//     boost::uint8_t *end = buf->remove(0xc3);
 // #else
-//     Network::byte_t *end = buf->find(0xc3);
+//     boost::uint8_t *end = buf->find(0xc3);
 //     log_debug("END is %x", (void *)end);
 //     *end = '*';
 // #endif
     decodeHeader(ptr);
     ptr += headersize;
 
-    Network::byte_t* tooFar = ptr+300+sizeof(int); // FIXME:
+    boost::uint8_t* tooFar = ptr+300+sizeof(int); // FIXME:
     
     AMF amf_obj;
     boost::shared_ptr<amf::Element> el1 = amf_obj.extractAMF(ptr, tooFar);
@@ -369,7 +369,7 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
     GNASH_REPORT_FUNCTION;
     
 //    Buffer *buf = new Buffer;
-//     Network::byte_t *ptr = buf->reference();
+//     boost::uint8_t *ptr = buf->reference();
 //     buf->clear();		// default everything to zeros, real data gets optionally added.
 //    ptr += sizeof(boost::uint16_t); // go past the first short
 //     const char *capabilities = 0;
@@ -491,7 +491,7 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
     boost::shared_ptr<amf::Buffer> buf(new Buffer(strbuf->size() + numbuf->size() + topbuf->size()));
     *buf += strbuf;
     *buf += numbuf;
-    Network::byte_t byte = static_cast<Network::byte_t>(RTMP::SERVER & 0x000000ff);
+    boost::uint8_t byte = static_cast<boost::uint8_t>(RTMP::SERVER & 0x000000ff);
     *buf += byte;
     *buf += topbuf;
 
@@ -503,10 +503,10 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 
 // This is the thread for all incoming RTMP connections
 void
-rtmp_handler(Handler::thread_params_t *args)
+rtmp_handler(Network::thread_params_t *args)
 {
     GNASH_REPORT_FUNCTION;
-    Handler *hand = reinterpret_cast<Handler *>(args->handle);
+    Handler *hand = reinterpret_cast<Handler *>(args->handler);
     RTMPServer rtmp;
 
     rtmp.setHandler(hand);
@@ -539,7 +539,7 @@ rtmp_handler(Handler::thread_params_t *args)
 	clock_gettime (CLOCK_REALTIME, &start);
 #endif
 	if (!rtmp.handShakeWait()) {
-	    hand->clearout();	// remove all data from the outgoing que
+ //	    hand->clearout();	// remove all data from the outgoing que
 	    hand->die();	// tell all the threads for this connection to die
 	    hand->notifyin();
 	    log_debug("Net RTMP done for fd #%d...", args->netfd);
@@ -617,7 +617,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
     GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
-    Network::byte_t *ptr = buf->reference();
+    boost::uint8_t *ptr = buf->reference();
     buf->clear();	// default everything to zeros, real data gets optionally added.
 
     boost::uint16_t typefield = htons(type);
@@ -636,7 +636,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 	  ptr += sizeof(boost::uint16_t); // go past the second short
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append((Network::byte_t *)&swapped, sizeof(boost::uint32_t));
+	  buf->append((boost::uint8_t *)&swapped, sizeof(boost::uint32_t));
 	  break;
       }
       // reset doesn't have any parameters
@@ -649,7 +649,7 @@ RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 //	  swapped = htonl(milliseconds);
 	  swapped = milliseconds;
 	  swapBytes(&swapped, sizeof(boost::uint32_t));
-	  buf->append((Network::byte_t *)&swapped, sizeof(boost::uint32_t));
+	  buf->append((boost::uint8_t *)&swapped, sizeof(boost::uint32_t));
 	  break;
       }
       default:

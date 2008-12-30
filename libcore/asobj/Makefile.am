@@ -44,10 +44,11 @@ AM_CPPFLAGS = \
 libgnashasobjs_la_SOURCES = \
 	AsBroadcaster.cpp \
 	Accessibility_as.cpp \
-	Boolean.cpp \
+	Array_as.cpp \
+	Boolean_as.cpp \
 	Camera.cpp \
 	ClassHierarchy.cpp \
-	Color.cpp \
+	Color_as.cpp \
 	ContextMenu.cpp	\
 	CustomActions.cpp\
 	Date.cpp \
@@ -56,20 +57,21 @@ libgnashasobjs_la_SOURCES = \
 	int_as.cpp \
 	Key_as.cpp	\
 	LoadVars_as.cpp \
-	LocalConnection.cpp\
+	LocalConnection_as.cpp\
 	Math_as.cpp \
 	Microphone.cpp	\
-	Mouse.cpp \
-	NetConnection.cpp \
+	Mouse_as.cpp \
+	NetConnection_as.cpp \
 	NetStream_as.cpp \
 	Number_as.cpp \
 	Object.cpp \
-	Selection.cpp \
-	SharedObject.cpp\
-	Sound.cpp \
+	PlayHead.cpp \
+	Selection_as.cpp \
+	SharedObject_as.cpp\
+	Sound_as.cpp \
 	Stage_as.cpp \
 	System_as.cpp \
-	TextFormat.cpp \
+	TextFormat_as.cpp \
 	TextSnapshot_as.cpp \
 	MovieClipLoader.cpp\
 	String_as.cpp \
@@ -117,10 +119,11 @@ libgnashasobjs_la_SOURCES = \
 noinst_HEADERS = \
 	AsBroadcaster.h \
 	Accessibility_as.h \
-	Boolean.h \
+	Array_as.h \
+	Boolean_as.h \
 	Camera.h \
 	ClassHierarchy.h \
-	Color.h	\
+	Color_as.h	\
 	ContextMenu.h \
 	CustomActions.h	\
 	Date.h \
@@ -130,21 +133,22 @@ noinst_HEADERS = \
 	int_as.h \
 	Key_as.h \
 	LoadVars_as.h \
-	LocalConnection.h\
+	LocalConnection_as.h\
 	Microphone.h \
-	Mouse.h	\
+	Mouse_as.h	\
 	MovieClipLoader.h \
-	NetConnection.h	\
+	NetConnection_as.h	\
 	NetStream_as.h \
 	Number_as.h \
 	Object.h \
+	PlayHead.h \
 	prophelper.h \
-	Selection.h \
-	SharedObject.h \
-	Sound.h \
+	Selection_as.h \
+	SharedObject_as.h \
+	Sound_as.h \
 	Stage_as.h	\
 	System_as.h \
-	TextFormat.h \
+	TextFormat_as.h \
 	TextSnapshot_as.h \
 	String_as.h \
 	XML_as.h \

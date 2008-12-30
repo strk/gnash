@@ -101,7 +101,7 @@ enum primitive_types
 /// class. The instance keeps primitive types by value and
 /// composite types by reference (smart pointer).
 ///
-class DSOEXPORT as_value
+class as_value
 {
 
 public:
@@ -144,7 +144,7 @@ public:
 	};
 
 	/// Construct an UNDEFINED value
-	as_value();
+	DSOEXPORT as_value();
 
 	/// Copy constructor.
 	as_value(const as_value& value);
@@ -224,7 +224,7 @@ public:
 	/// @param vm
     ///     Virtual machine to use for initialization of the values (string_table)
 	///
-	bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType,
+	DSOEXPORT bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType,
             std::vector<as_object*>& objRefs, VM& vm);
 
     /// Serialize value in AMF0 format.
@@ -240,7 +240,11 @@ public:
     ///     Virtual machine to use for serialization of property names
     ///     (string_table)
     ///
-    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable, VM& vm) const;
+	/// @param allowStrictArray
+    ///     If true strict arrays will be encoded a STRICT_ARRAY types.
+    ///
+    bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable,
+                   VM& vm, bool allowStrictArray) const;
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
@@ -316,7 +320,7 @@ public:
 
     // Used for operator<< to give useful information about an
     // as_value object.
-	std::string toDebugString() const;
+	DSOEXPORT std::string toDebugString() const;
 
 	/// Get a string representation for this value.
 	//

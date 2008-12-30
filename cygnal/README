@@ -111,3 +111,33 @@ statistics.cpp, statistics.h:	Collect statistics on bandwidth,
 
 # transcode.cpp, transcode.h:	Convert between codecs using Gstreamer.
 # flash.cpp, flash.h:	SharedObject support using AMF.
+
+
+cpus	     4
+threads per cpu 1
+spawn limit 4
+
+
+connection_handler - start a server waiting for incoming
+    connections. This blocks waiting for new client requests. When a
+    client connects, a dispatch_handler is created.
+
+A new dispatch_handler is created for each incoming connection up to
+    the 'spawn_limit'. After the spawn_limit is reached, future
+    connections get added to the data each dispatch thread is waiting
+    for. Each dispatch_handler has a network connection.
+
+dispatch_handler - waits on a set of file descriptors, returning a set
+    of file descriptors with activity. When it sees activity, the
+    event handler for the appropriate protocol is called, but no data
+    is read.
+
+http_handler - gets invoked when there is data ready to be
+   processed. It is invoked directly by the dispatch handler when
+   there is data to be read. This controls all I/O for this file
+   descriptor.
+
+rtmp_handler - ditto.
+
+
+

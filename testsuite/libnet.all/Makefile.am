@@ -44,15 +44,32 @@ INCLUDES = \
 	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
+# this is a utility program used to generate binary AMF files for testing protocols.
+noinst_PROGRAMS = generate_amfbins
+
 check_PROGRAMS = \
 	test_cque \
 	test_handler \
-	test_http
+	test_http \
+	test_diskstream \
+	test_cache
 #	test_rtmp 
+
+generate_amfbins_SOURCES = generate_amfbins.cpp
+generate_amfbins_LDADD = $(AM_LDFLAGS) 
+generate_amfbins_DEPENDENCIES = site-update
 
 test_http_SOURCES = test_http.cpp
 test_http_LDADD = $(AM_LDFLAGS) 
 test_http_DEPENDENCIES = site-update
+
+test_cache_SOURCES = test_cache.cpp
+test_cache_LDADD = $(AM_LDFLAGS) 
+test_cache_DEPENDENCIES = site-update
+
+test_diskstream_SOURCES = test_diskstream.cpp
+test_diskstream_LDADD = $(AM_LDFLAGS) 
+test_diskstream_DEPENDENCIES = site-update
 
 #test_rtmp_SOURCES = test_rtmp.cpp
 #test_rtmp_LDADD = $(AM_LDFLAGS) 
@@ -75,7 +92,9 @@ TEST_DRIVERS = ../simple.exp
 
 CLEANFILES =  \
 	site.exp.bak \
-	testrun.* 
+	testrun.* \
+	fooBar* \
+	*.bin
 
 check-DEJAGNU: site-update
 	@runtest=$(RUNTEST); \

@@ -89,7 +89,7 @@ ButtonAction::triggeredBy(const event_id& ev) const
 		{
 			int keycode = getKeyCode();
 			if ( ! keycode ) return false; // not a keypress event
-			return key::codeMap[ev.keyCode][key::SWF] == keycode;
+			return key::codeMap[ev.keyCode()][key::SWF] == keycode;
 		}
 		default: return false;
 	}

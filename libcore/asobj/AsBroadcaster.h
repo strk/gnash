@@ -41,7 +41,7 @@ public:
 	/// can call this internally.
 	///
 	/// The AsBroadcaster_init will take care of registering
-	/// the _global.AsBroadcaster object and it's 'initialize'
+	/// the _global.AsBroadcaster object and its 'initialize'
 	/// method for user-defined broadcasters initialization
 	///
 	static void initialize(as_object& obj);
@@ -53,12 +53,6 @@ public:
 	/// (the native one, immune to any override)
 	///
 	static as_object* getAsBroadcaster();
-
-private:
-
-	static as_value addListener_method(const fn_call& fn);
-	static as_value removeListener_method(const fn_call& fn);
-	static as_value broadcastMessage_method(const fn_call& fn);
 
 };
 

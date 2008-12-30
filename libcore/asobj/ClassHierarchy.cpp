@@ -21,12 +21,11 @@
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
 #include "Button.h"
-#include "array.h"
 #include "AsBroadcaster.h"
 #include "Accessibility_as.h"
-#include "Boolean.h"
+#include "Boolean_as.h"
 #include "Camera.h"
-#include "Color.h"
+#include "Color_as.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
 #include "Date.h"
@@ -36,23 +35,23 @@
 #include "String_as.h"
 #include "Key_as.h"
 #include "LoadVars_as.h"
-#include "LocalConnection.h"
+#include "LocalConnection_as.h"
 #include "Microphone.h"
 #include "Number_as.h"
 #include "Object.h"
 #include "Math_as.h"
-#include "Mouse.h"
+#include "Mouse_as.h"
 #include "MovieClipLoader.h"
 #include "movie_definition.h"
-#include "NetConnection.h"
+#include "NetConnection_as.h"
 #include "NetStream_as.h"
-#include "Selection.h"
-#include "SharedObject.h"
-#include "Sound.h"
+#include "Selection_as.h"
+#include "SharedObject_as.h"
+#include "Sound_as.h"
 #include "Stage_as.h"
 #include "System_as.h"
 #include "TextSnapshot_as.h"
-#include "TextFormat.h"
+#include "TextFormat_as.h"
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
@@ -73,14 +72,27 @@ namespace gnash {
 
 namespace { // anonymous namespace
 
-static void
+void
 addVisibilityFlag(int& flags, int version)
 {
     // TODO: more visibility for swf10+?
-    if ( version >= 9 ) flags |= as_prop_flags::onlySWF9Up;
-    else if ( version >= 8 ) flags |= as_prop_flags::onlySWF8Up;
-    else if ( version >= 7 ) flags |= as_prop_flags::onlySWF7Up;
-    else if ( version >= 6 ) flags |= as_prop_flags::onlySWF6Up;
+    switch (version)
+    {
+        default:
+            return;
+        case 9:
+            flags |= as_prop_flags::onlySWF9Up;
+            break;
+        case 8:
+            flags |= as_prop_flags::onlySWF8Up;
+            break;
+        case 7:
+            flags |= as_prop_flags::onlySWF7Up;
+            break;
+        case 6:
+            flags |= as_prop_flags::onlySWF6Up;
+            break;
+    }
 }
 
 class declare_extension_function : public as_function
@@ -232,8 +244,7 @@ ClassHierarchy::~ClassHierarchy()
 bool
 ClassHierarchy::declareClass(extensionClass& c)
 {
-	if (mExtension == NULL)
-		return false; // Extensions can't be loaded.
+	if (mExtension == NULL) return false; 
 
 	mGlobalNamespace->stubPrototype(c.name);
 	mGlobalNamespace->getClass(c.name)->setDeclared();
@@ -253,8 +264,9 @@ ClassHierarchy::declareClass(const nativeClass& c)
 	// For AS2 and below, registering with mGlobal _should_ make it equivalent
 	// to being in the global namespace, since everything is global there.
 	asNamespace *nso = findNamespace(c.namespace_name);
-	if (!nso)
-		nso = addNamespace(c.namespace_name);
+
+	if (!nso) nso = addNamespace(c.namespace_name);
+
 	nso->stubPrototype(c.name);
 	nso->getClass(c.name)->setDeclared();
 	nso->getClass(c.name)->setSystem();
@@ -262,10 +274,9 @@ ClassHierarchy::declareClass(const nativeClass& c)
 	boost::intrusive_ptr<as_function> getter =
 		new declare_native_function(c, mGlobal, mExtension);
 
-	int flags=as_prop_flags::dontEnum;
+	int flags = as_prop_flags::dontEnum;
 	addVisibilityFlag(flags, c.version);
-	return mGlobal->init_destructive_property(c.name,
-		*getter, flags);
+	return mGlobal->init_destructive_property(c.name, *getter, flags);
 }
 
 static const ClassHierarchy::nativeClass knownClasses[] =
@@ -283,46 +294,50 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ textfield_class_init, NSV::CLASS_TEXT_FIELD, 0, NSV::NS_FLASH_TEXT, 3 },
 	{ math_class_init, NSV::CLASS_MATH, 0, NS_GLOBAL, 4 },
 	{ boolean_class_init, NSV::CLASS_BOOLEAN, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ button_class_init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ Button::init, NSV::CLASS_BUTTON, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ color_class_init, NSV::CLASS_COLOR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, NS_UNKNOWN, 5 },
-	{ sound_class_init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },
+	{ Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },
 	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
 	{ date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ xml_class_init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ xmlnode_class_init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT, NSV::NS_FLASH_XML, 5 },
-	{ mouse_class_init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
+	{ XML_as::init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ XMLNode_as::init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT,
+        NSV::NS_FLASH_XML, 5 },
+	{ Mouse_as::init, NSV::CLASS_MOUSE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 5 },
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ textformat_class_init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 6 },
 	{ video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 6 },
 	{ camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
 	{ microphone_class_init, NSV::CLASS_MICROPHONE, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },
-	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
+	{ sharedobject_class_init, NSV::CLASS_SHARED_OBJECT, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
 	{ loadvars_class_init, NSV::CLASS_LOAD_VARS, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
+	{ LocalConnection_as::init, NSV::CLASS_LOCAL_CONNECTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 },
 	{ customactions_class_init, NSV::CLASS_CUSTOM_ACTIONS, NSV::CLASS_OBJECT, NSV::NS_ADOBE_UTILS, 6 },
 	{ netconnection_class_init, NSV::CLASS_NET_CONNECTION, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
 	{ netstream_class_init, NSV::CLASS_NET_STREAM, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 6 },
 	{ contextmenu_class_init, NSV::CLASS_CONTEXT_MENU, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 7 },
 	{ moviecliploader_class_init, NSV::CLASS_MOVIE_CLIP_LOADER, NSV::CLASS_OBJECT, NS_GLOBAL, 7 },
 	{ Error_class_init, NSV::CLASS_ERROR, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ Accessibility_class_init, NSV::CLASS_ACCESSIBILITY, NSV::CLASS_OBJECT,
+        NS_GLOBAL, 5 },
 	{ int_class_init, NSV::CLASS_INT, NSV::CLASS_OBJECT, 9 },
 	{ TextFieldAutoSize_class_init, NSV::CLASS_TEXTFIELDAUTOSIZE, NSV::CLASS_OBJECT, 9 }
 
 // These classes are all implicitly constructed; that is, it is not necessary for
 // the class name to be used to construct the class, so they must always be available.
 //	{ object_class_init, NSV::CLASS_OBJECT, 0, NS_GLOBAL, 5 }
-//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT, NS_GLOBAL, 6 }
+//	{ function_class_init, NSV::CLASS_FUNCTION, NSV::CLASS_OBJECT,
+//	NS_GLOBAL, 6 }
 //	{ array_class_init, NSV::CLASS_ARRAY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
 //	{ string_class_init, NSV::CLASS_STRING, NSV::CLASS_OBJECT, NS_GLOBAL, 5 }
 
 };
 
 void
-ClassHierarchy::massDeclare(int /*version*/) // drop version...
+ClassHierarchy::massDeclare()
 {
 	// Natives get declared first. It doesn't make any sense for a native
 	// to depend on an extension, but it does make sense the other way
@@ -331,7 +346,6 @@ ClassHierarchy::massDeclare(int /*version*/) // drop version...
 	for (size_t i = 0; i < size; ++i)
 	{
 		const nativeClass& c = knownClasses[i];
-		//if (c.version > version) continue;
 
 		if ( ! declareClass(c) )
 		{

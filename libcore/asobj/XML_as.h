@@ -59,6 +59,9 @@ public:
     XML_as(const std::string& xml);
 
     ~XML_as() {};
+    
+    static void init(as_object& global);
+    static void registerNative(as_object& global);
 
     /// Convert the XML object to a string
     //
@@ -133,7 +136,7 @@ private:
 
     static const Entities& getEntities();
 
-    typedef std::map<std::string, std::string, StringNoCaseLessThen> Attributes;
+    typedef std::map<std::string, std::string, StringNoCaseLessThan> Attributes;
 
     void parseTag(XMLNode_as*& node, const std::string& xml, 
             std::string::const_iterator& it);
@@ -177,10 +180,7 @@ private:
 
 };
 
-
-DSOEXPORT void xml_class_init(as_object& global);
-
-}	// end namespace gnash
+}	// namespace gnash
 
 #endif
 

@@ -19,6 +19,10 @@
 #ifndef __BUFFER_H__
 #define __BUFFER_H__ 1
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <boost/cstdint.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -28,7 +32,6 @@
 #include "getclocktime.hpp"
 #include "amf.h"
 #include "element.h"
-#include "network.h"
 #include "dsodefs.h"
 
 // _definst_ is the default instance name
@@ -38,6 +41,10 @@
 /// This namespace is for all the AMF specific classes in libamf.
 namespace amf
 {
+
+// Adjust for the constant size
+const size_t NETBUFSIZE = 1448;	// 1500 appears to be the default size as used by FMS
+//const size_t NETBUFSIZE = 1357*2;	// 1500 appears to be the default size as used by FMS
 
 /// \class Buffer
 ///
@@ -82,7 +89,7 @@ public:
     /// \brief Test to see if the buffer has any data.
     ///
     /// @return true or false
-    bool empty() { return (_seekptr)?true:false; };
+    bool empty() { return (_seekptr) ? true : false; };
 
     /// \brief Resize the buffer that holds the data.
     ///		The new size of the current data is based on the
@@ -114,7 +121,7 @@ public:
     /// @param nbytes The number of bytes to copy.
     ///		
     /// @return A reference to a Buffer.
-    Buffer &copy(gnash::Network::byte_t *data, size_t nbytes);
+    Buffer &copy(boost::uint8_t *data, size_t nbytes);
     
     /// \brief Copy a Buffer class into the buffer.
     ///		This overwrites all data, and resets the seek ptr.
@@ -153,14 +160,14 @@ public:
     /// @param byte A single byte.
     /// 
     /// @return A reference to a Buffer.
-    Buffer &operator=(gnash::Network::byte_t byte);
+    Buffer &operator=(boost::uint8_t byte);
     /// \brief Copy a byte into the buffer.
     ///		This overwrites all data, and resets the seek ptr.
     ///
     /// @param byte A pointer to a single byte.
     /// 
     /// @return A reference to a Buffer.
-    Buffer &operator=(gnash::Network::byte_t *byte);
+    Buffer &operator=(boost::uint8_t *byte);
     /// \brief Copy a AMF0 type into the buffer.
     ///		This overwrites all data, and resets the seek ptr.
     ///
@@ -184,7 +191,7 @@ public:
     /// @param nbytes The number of bytes to append.
     ///		
     /// @return A reference to a Buffer.
-    Buffer &append(gnash::Network::byte_t *data, size_t nbytes);
+    Buffer &append(boost::uint8_t *data, size_t nbytes);
 
     /// \brief Append a Buffer class to existing data in the buffer.
     ///
@@ -208,6 +215,13 @@ public:
     /// 
     /// @return A reference to a Buffer.
     Buffer &operator+=(double num);
+
+    /// \brief Append an integer to existing data in the buffer.
+    /// 
+    /// @param num A numeric integer value.
+    /// 
+    /// @return A reference to a Buffer.
+    Buffer &operator+=(boost::uint32_t length);
     /// \brief Append a short to existing data in the buffer.
     /// 
     /// @param num A numeric short value.
@@ -219,7 +233,7 @@ public:
     /// @param byte A single byte.
     /// 
     /// @return A reference to a Buffer.
-    Buffer &operator+=(gnash::Network::byte_t byte);
+    Buffer &operator+=(boost::uint8_t byte);
     Buffer &operator+=(char byte);
     /// \brief Append an AMF0 type to existing data in the buffer.
     ///
@@ -242,7 +256,7 @@ public:
     /// @param byte The byte to remove from the buffer.
     ///
     /// @return A real pointer to the base address of the buffer.
-    gnash::Network::byte_t *remove(gnash::Network::byte_t c);
+    boost::uint8_t *remove(boost::uint8_t c);
     /// \brief Drop a byte without resizing.
     ///		This will remove the byte from the Buffer, and then
     ///		move the remaining data to be in the correct
@@ -252,7 +266,7 @@ public:
     ///		Buffer
     ///
     /// @return A real pointer to the base address of the Buffer.
-    gnash::Network::byte_t *remove(int index);
+    boost::uint8_t *remove(int index);
     /// \brief Drop bytes without resizing.
     ///		This will remove the bytes from the Buffer, and then
     ///		move the remaining data to be in the correct
@@ -267,20 +281,22 @@ public:
     /// @param range The amoiunt of bytes to remove from the Buffer.
     ///
     /// @return A real pointer to the base address of the Buffer.
-    gnash::Network::byte_t *remove(int start, int range);
+    boost::uint8_t *remove(int start, int range);
 //    Network::byte_t *remove(char c);
     
     /// \brief Return the base address of the Buffer.
     ///
     /// @return A real pointer to the base address of the Buffer.
-    gnash::Network::byte_t *begin() { return _data.get() ; };
-    gnash::Network::byte_t *reference() { return _data.get(); }
+    boost::uint8_t *begin() { return _data.get() ; };
+    boost::uint8_t *reference() { return _data.get(); }
+    const boost::uint8_t *reference() const { return _data.get(); }
+
     /// \brief Return the last address of the Buffer
     ///		Which is the base address plus the total size of the
     ///		Buffer.
     ///
-    /// @return A real pointer to the last address of the Buffer.
-    gnash::Network::byte_t *end() { return begin() + _nbytes; };
+    /// @return A real pointer to the last address of the Buffer with data.
+    boost::uint8_t *end() { return _seekptr; };
 
     /// \brief Get the size of the Buffer.
     ///
@@ -297,6 +313,9 @@ public:
     ///
     /// @return The size of the Buffer.
     void setSize(size_t nbytes) { _nbytes = nbytes; };
+
+    /// \brief Set the real pointer to a block of Memory.
+    void setPointer(boost::uint8_t *ptr) { _data.reset(ptr); };
     
     /// \brief Test equivalance against another Buffer.
     ///		This compares all the data on the current Buffer with
@@ -314,7 +333,7 @@ public:
     ///		get.
     ///
     /// @return The byte at the specified location.
-    gnash::Network::byte_t operator[](int index) { return _data[index]; };
+    boost::uint8_t operator[](int index) { return _data[index]; };
 
     /// \brief Get the byte at a specified location.
     ///
@@ -322,7 +341,7 @@ public:
     ///		get.
     ///
     /// @return A real pointer to the byte at the specified location.
-    gnash::Network::byte_t *at(int index) { return _data.get() + index; };
+    boost::uint8_t *at(int index) { return _data.get() + index; };
 
     /// \brief How much room is left in the buffer past the seek pointer.
     ///		This is primarily used to see if the buffer is fully
@@ -330,6 +349,21 @@ public:
     ///
     /// @return The amoount of unused bytes in the Buffer.
     size_t spaceLeft() { return (_nbytes - (_seekptr - _data.get())); };
+    
+    /// \brief How much room has been allocated before the seek pointer.
+    ///		This is primarily used to see if the buffer is fully
+    ///		populated with data before appending more.
+    ///
+    /// @return The amoount of unused bytes in the Buffer.
+    size_t allocated() { return (_seekptr - _data.get()); };
+
+    /// \brief Set the seek pointer
+    ///
+    /// @param ptr the real pointer to set the seek pointer to
+    ///
+    /// @return nothing
+    void setSeekPointer(boost::uint8_t *ptr) { _seekptr = ptr; };
+    void setSeekPointer(off_t offset) { _seekptr = _data.get() + offset; };
     
     ///  \brief Dump the internal data of this class in a human readable form.
     ///		This should only be used for debugging purposes.
@@ -341,12 +375,13 @@ public:
     /// \var _seekptr
     ///	\brief This is a pointer to the address in the Buffer to
     ///		write data to then next time some is appended.
-    gnash::Network::byte_t *_seekptr;
+    boost::uint8_t *_seekptr;
     
     /// \var _data
     ///	\brief This is the container of the actual data in this
     ///		Buffer.
-    boost::scoped_array<gnash::Network::byte_t> _data;
+    boost::scoped_array<boost::uint8_t> _data;
+    
     /// \var _nbytes
     ///	\brief This is the total allocated size of the Buffer.
     size_t         _nbytes;
@@ -373,7 +408,7 @@ public:
     /// @param digit The digit as a hex value
     ///
     /// @return The byte as a decimal value.
-    gnash::Network::byte_t hex2digit (gnash::Network::byte_t digit);
+    boost::uint8_t hex2digit (boost::uint8_t digit);
 };
 
 /// \brief Dump to the specified output stream.

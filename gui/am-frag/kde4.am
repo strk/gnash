@@ -1,0 +1,48 @@
+# 
+#   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+
+#
+# Build the KDE gui
+# 
+if BUILD_KDE4_GUI
+
+klash4.moc: $(srcdir)/Kde4Gui.h
+	@if test x"$(MOC4)" != x; then \
+	  echo "Generating MOC 4 file..."; \
+	  $(MOC4) $(srcdir)/Kde4Gui.h -o klash4.moc; \
+	else  \
+	  echo "WARNING: Install QT 4.x moc tool! Linking to default MOC file"; \
+	  ln -sf $(srcdir)/klash4.moc.in klash4.moc; \
+	fi
+
+endif
+
+bin_PROGRAMS += kde4-gnash
+
+kde4_gnash_CPPFLAGS = -DGUI_KDE4 -DGUI_CONFIG=\"KDE4\" $(AM_CPPFLAGS) $(KDE4_CFLAGS) $(QT4_CFLAGS)
+kde4_gnash_SOURCES = $(GUI_SRCS) GuiKde4.cpp
+kde4_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+kde4_gnash_LDADD = $(MYSQL_LIBS) $(GNASH_LIBS) $(AM_LDFLAGS) $(KDE4_LIBS)
+
+if BUILD_AGG_RENDERER
+kde4_gnash_CPPFLAGS += $(AGG_CFLAGS)
+kde4_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+	$(QT4_LIBS) $(AGG_LIBS)
+kde4_gnash_SOURCES += Kde4GlueAgg.cpp Kde4GlueAgg.h \
+	 	Kde4Gui.cpp Kde4Gui.h Kde4Glue.h
+
+endif

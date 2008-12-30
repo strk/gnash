@@ -22,18 +22,23 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
+#include <boost/scoped_array.hpp>
 #include <sstream>
 
 #include "amf.h"
+#include "cque.h"
 #include "rtmp.h"
 #include "handler.h"
 #include "network.h"
 #include "buffer.h"
+#include "diskstream.h"
 
 namespace gnash
 {
     
-class HTTP
+class HTTP : public gnash::Network
 {
 public:
 // as defined by the W3: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
@@ -91,6 +96,7 @@ public:
 	CLOSEPIPE = 1235
     } http_status_e;
     typedef enum {
+	HTTP_NONE,
         HTTP_OPTIONS,
         HTTP_GET,
         HTTP_HEAD,
@@ -110,16 +116,53 @@ public:
         const char *code;
         const char *msg;
     };
+    typedef struct {
+	int major;
+	int minor;
+    } http_version_t;
     HTTP();
     HTTP(Handler *hand);
     ~HTTP();
-    bool waitForGetRequest();
-    bool waitForGetRequest(gnash::Network &net);
+
+    // These are for the protocol itself
+    http_method_e processClientRequest(int fd);
+    bool processGetRequest(int fd);
+    bool processPostRequest(int fd);
+    bool processPutRequest(int fd);
+    bool processDeleteRequest(int fd);
+    bool processConnectRequest(int fd);
+    bool processOptionsRequest(int fd);
+    bool processHeadRequest(int fd);
+    bool processTraceRequest(int fd);
+
+    // Check the Header fields to make sure they're valid values.
+    bool checkRequestFields(amf::Buffer &buf);
+    bool checkEntityFields(amf::Buffer &buf);
+    bool checkGeneralFields(amf::Buffer &buf);
+
+    // Parse an Echo Request message coming from the Red5 echo_test.
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
+    std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
-    // Handle the GET request response
-    bool sendGetReply(http_status_e code);
-    bool sendPostReply(rtmpt_cmd_e code);
-//    bool sendGetReply(Network &net);
+    // process all the header fields in the Buffer, storing them internally
+    // in _fields. The address returned is the address where the Content data
+    // starts, and is "Content-Length" bytes long, of "Content-Type" data.
+    boost::uint8_t *processHeaderFields(amf::Buffer &buf);
+    
+    // Get the field for header 'name' that was stored by processHeaderFields()
+    std::string &getField(const std::string &name) { return _fields[name]; };
+    size_t NumOfFields() { return _fields.size(); };
+    void clearFields() { _fields.clear(); };
+
+    // Get an array of values for header field 'name'.
+    boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
+    
+    // Handle the response for the request.
+    boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
+    amf::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
+    amf::Buffer &formatGetReply(size_t size, http_status_e code); 
+    amf::Buffer &formatGetReply(http_status_e code); 
+    amf::Buffer &formatPostReply(rtmpt_cmd_e code);
 
     // Make copies of ourself
     HTTP &operator = (HTTP &obj);
@@ -127,156 +170,165 @@ public:
     // These methods extract data from an RTMPT message. RTMP is an
     // extension to HTTP that adds commands to manipulate the
     // connection's persistance.
-    rtmpt_cmd_e extractRTMPT(gnash::Network::byte_t *data);
-    rtmpt_cmd_e extractRTMPT(boost::shared_ptr<amf::Buffer> data)
-	{ return extractRTMPT(data->reference()); };
+    rtmpt_cmd_e extractRTMPT(boost::uint8_t *data);
+    rtmpt_cmd_e extractRTMPT(amf::Buffer &data)
+	{ return extractRTMPT(data.reference()); };
 
-    // These methods extract the fields in the HTTP header.
-    // These all return the number of items found, or 0
-    http_method_e extractCommand(gnash::Network::byte_t *data);
-    http_method_e extractCommand(boost::shared_ptr<amf::Buffer> data)
-	{ return extractCommand(data->reference()); };
-    int extractAccept(gnash::Network::byte_t *data);
-    int extractAccept(boost::shared_ptr<amf::Buffer> data)
-	{ return extractAccept(data->reference()); };
-    std::string &extractAcceptRanges(gnash::Network::byte_t *data);
-    std::string &extractAcceptRanges(boost::shared_ptr<amf::Buffer> data)
-	{ return extractAcceptRanges(data->reference()); };
-    int extractLanguage(gnash::Network::byte_t *data);
-    int extractLanguage(boost::shared_ptr<amf::Buffer> data)
-	{ return extractLanguage(data->reference()); };
-    int extractCharset(gnash::Network::byte_t *data);
-    int extractCharset(boost::shared_ptr<amf::Buffer> data)
-	{ return extractCharset(data->reference()); };
-    int extractEncoding(gnash::Network::byte_t *data);
-    int extractEncoding(boost::shared_ptr<amf::Buffer> data)
-	{ return extractEncoding(data->reference()); };
-    int extractTE(gnash::Network::byte_t *data);
-    int extractTE(boost::shared_ptr<amf::Buffer> data)
-	{ return extractTE(data->reference()); };
-    int extractConnection(gnash::Network::byte_t *data);
-    int extractConnection(boost::shared_ptr<amf::Buffer> data)
-	{ return extractConnection(data->reference()); };
-    int extractKeepAlive(gnash::Network::byte_t *data);
-    int extractKeepAlive(boost::shared_ptr<amf::Buffer> data)
-	{ return extractConnection(data->reference()); };
-
-    // These return the string that was found for this field.
-    std::string &extractMethod(gnash::Network::byte_t *data);
-    std::string &extractMethod(boost::shared_ptr<amf::Buffer> data)
-	{ return extractMethod(data->reference()); };
-    std::string &extractReferer(gnash::Network::byte_t *data);
-    std::string &extractReferer(boost::shared_ptr<amf::Buffer> data)
-	{ return extractReferer(data->reference()); };
-    std::string &extractHost(gnash::Network::byte_t *data);
-    std::string &extractHost(boost::shared_ptr<amf::Buffer> data)
-	{ return extractHost(data->reference()); };
-    std::string &extractAgent(gnash::Network::byte_t *data);
-    std::string &extractAgent(boost::shared_ptr<amf::Buffer> data)
-	{ return extractAgent(data->reference()); };
-
-    // These methods add data to the fields in the HTTP header.
-    // These return true if OK, false if error.
-    bool clearHeader();
-    bool formatHeader(int filesize, http_status_e type);
-    bool formatHeader(http_status_e type);
-    bool formatRequest(const std::string &url, http_method_e req);
-    bool formatMethod(const std::string &data);
-    bool formatDate();
-    bool formatServer();
-    bool formatServer(const std::string &data);
-    bool formatReferer(const std::string &data);
-    bool formatConnection(const std::string &data);
-    bool formatKeepAlive(const std::string &data);
-    bool formatContentLength();
-    bool formatContentLength(int filesize);
-    bool formatContentType();
-    bool formatContentType(amf::AMF::filetype_e type);
-    bool formatHost(const std::string &data);
-    bool formatAgent(const std::string &data);
-    bool formatAcceptRanges(const std::string &data);
-    bool formatLastModified();
-    bool formatLastModified(const std::string &data);
-    bool formatEtag(const std::string &data);
-    bool formatLanguage(const std::string &data);
-    bool formatCharset(const std::string &data);
-    bool formatEncoding(const std::string &data);
-    bool formatTE(const std::string &data);
-
-    bool formatErrorResponse(http_status_e err);
+    // Examine the beginning of the data for an HTTP request command
+    // like GET or POST, etc...
+    http_method_e extractCommand(boost::uint8_t *data);
+    http_method_e extractCommand(amf::Buffer &data)
+	{ return extractCommand(data.reference()); };    
     
+    /// @note These methods add data to the fields in the HTTP header.
+    /// \brief clear the data in the stored header
+    bool clearHeader();
+
+    /// \brief Start constructing a new HTTP header.
+    ///		As it's hard to predict how much storage to allocate,
+    ///		all of these methods for formatting  HTTP header
+    ///		fields store the header while adding data to it. It
+    ///		requires another function to actually send the data.
+    bool startHeader();
+    
+    /// \brief Format the common header fields that need no other processing.
+    ///		Most of these fields are purely ASCII based, and so
+    ///		chare a common constructor. A few require formatting
+    ///		of numerical data into string data, so they can't use
+    ///		the common form.
+    amf::Buffer &formatCommon(const std::string &data);
+
+    amf::Buffer &formatHeader(DiskStream::filetype_e type, size_t filesize,
+			    http_status_e code);
+    amf::Buffer &formatHeader(size_t filesize, http_status_e type);
+    amf::Buffer &formatHeader(http_status_e type);
+    amf::Buffer &formatRequest(const std::string &url, http_method_e req);
+    // format a response to the 'echo' test used for testing Gnash.
+    amf::Buffer &formatEchoResponse(const std::string &num, amf::Element &el);
+    amf::Buffer &formatEchoResponse(const std::string &num, amf::Buffer &data);
+    amf::Buffer &formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t size);
+
+    amf::Buffer &formatMethod(const std::string &data)
+ 	{return formatCommon("Method: " + data); };
+    amf::Buffer &formatDate();
+    amf::Buffer &formatServer();
+    amf::Buffer &formatServer(const std::string &data);
+    amf::Buffer &formatReferer(const std::string &data)
+ 	{return formatCommon("Referer: " + data); };
+    amf::Buffer &formatConnection(const std::string &data)
+ 	{return formatCommon("Connection: " + data); };
+    amf::Buffer &formatKeepAlive(const std::string &data)
+ 	{return formatCommon("Keep-Alive: " + data); };
+    amf::Buffer &formatContentLength();
+    amf::Buffer &formatContentLength(boost::uint32_t filesize);
+    amf::Buffer &formatContentType();
+    amf::Buffer &formatContentType(DiskStream::filetype_e type);
+    amf::Buffer &formatHost(const std::string &data)
+ 	{return formatCommon("Host: " + data); };
+    amf::Buffer &formatAgent(const std::string &data)
+ 	{return formatCommon("User-Agent: " + data); };
+    amf::Buffer &formatAcceptRanges(const std::string &data)
+ 	{return formatCommon("Accept-Ranges: " + data); };
+    amf::Buffer &formatLastModified();
+    amf::Buffer &formatLastModified(const std::string &data)
+ 	{return formatCommon("Last-Modified: " + data); }
+    amf::Buffer &formatEtag(const std::string &data)
+ 	{return formatCommon("Etag: " + data); };
+    amf::Buffer &formatLanguage(const std::string &data)
+ 	{return formatCommon("Accept-Language: " + data); };
+    amf::Buffer &formatCharset(const std::string &data)
+ 	{return formatCommon("Accept-Charset: " + data); };
+    amf::Buffer &formatEncoding(const std::string &data)
+ 	{return formatCommon("Accept-Encoding: " + data); };
+    amf::Buffer &formatTE(const std::string &data)
+ 	{return formatCommon("TE: " + data); };
     // All HTTP messages are terminated with a blank line
-    void terminateHeader() { _header << "\r\n"; };
+    void terminateHeader() { _buffer += "\r\n"; };    
+    
+    amf::Buffer &formatErrorResponse(http_status_e err);
     
     // Return the header that's been built up.
-    std::string getHeader() { return _header.str(); };
+    boost::uint8_t *getHeader() { return _buffer.reference(); };
 
-    // Return the body that's been built up.
-    std::string getBody() { return _body.str(); };
+    // Return the header that's been built up.
+    amf::Buffer &getBuffer() { return _buffer; };
+
+//     // Return the body that's been built up.
+//     std::string getBody() { return _body.str(); };
 
     // Get the file type, so we know how to set the
     // Content-type in the header.
 //    filetype_e getFileType(std::string &filespec);
-    amf::AMF::filetype_e getFileStats(std::string &filespec);
+//    amf::AMF::filetype_e getFileStats(std::string &filespec);
     void dump();
 
+    /// \brief Receive a message from the other end of the network connection.
+    ///
+    /// @param fd The file descriptor to read from
+    ///
+    /// @return The number of bytes sent
+    int DSOEXPORT recvMsg(int fd);
+
+    /// \brief Send a message to the other end of the network connection.
+    ///
+    /// @param data A real pointer to the data.
+    /// @param size The number of bytes of data stored.
+    /// @param buf A smart pointer to a Buffer class.
+    /// @param sstr A smart pointer to a Buffer class.
+    /// @param fd The file descriptor to use for writing to the network.
+    /// @param void Send the contents of the _header and _body.
+    ///
+    /// @return The number of bytes sent
+    int DSOEXPORT sendMsg();
+    int DSOEXPORT sendMsg(int fd);
+    int DSOEXPORT sendMsg(const boost::uint8_t *data, size_t size);
+    int DSOEXPORT sendMsg(boost::shared_ptr<amf::Buffer> &buf)
+	{ return sendMsg(buf->reference(), buf->size()); };
+    int DSOEXPORT sendMsg(std::stringstream &sstr)
+	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
+    
     // These accessors are used mostly just for debugging.
     bool keepAlive() { return _keepalive; }
+    int getMaxRequests() { return _max_requests; }
     int getFileSize() { return _filesize; }
     std::string &getFilespec() { return _filespec; }
-    std::string &getURL() { return _url; }
+  //    std::string &getURL() { return _url; }
     std::map<int, struct status_codes *> getStatusCodes()
 	{ return _status_codes; }
-    std::string getVersion() { return _version; }
-    std::string getMethod() { return _method; }
-    std::string getReferer() { return _referer; }
-    std::vector<std::string> getLanguage() { return _language;  }
-    std::vector<std::string> getConnection() { return _connections; }
-    std::vector<std::string> getKeepAlive() { return _kalive; }
-    std::vector<std::string> getTE() { return _te; }
-    std::vector<std::string> getCharset() { return _charset; }
-    std::vector<std::string> getEncoding() { return _encoding; }
-
-    int         getHostPort(){ return _port; }
-    std::string getHost() { return _host; }
-    std::string getUserAgent() { return _agent; }
-
+    http_version_t *getVersion() { return &_version; }
+    
     void setHandler(Handler *hand) { _handler = hand; };
+    void setDocRoot(const std::string &path) { _docroot = path; };
+    
 private:
-    std::stringstream _header;
-    std::stringstream _body;
-    std::string _command;
-    amf::AMF::filetype_e  _filetype;
-    std::string _filespec;
-    int         _filesize;
-    std::string _url;
+    typedef boost::char_separator<char> Sep;
+    typedef boost::tokenizer<Sep> Tok;
+    http_method_e	_cmd;
+
+    amf::Buffer		_buffer;
+    CQue		_que;
+    
+    DiskStream::filetype_e  _filetype;
+    std::string		_filespec;
+    boost::uint32_t     _filesize;
     std::map<int, struct status_codes *> _status_codes;
-    std::string _version;
-    std::string _method;
-    std::string _referer;
-    std::string _host;
-    int         _port;
-    std::string _agent;
-    std::string _acceptranges;
-    std::vector<std::string> _connections;
-    std::vector<std::string> _language;
-    std::vector<std::string> _charset;
-    std::vector<std::string> _encoding;
-    std::vector<std::string> _te;
-    std::vector<std::string> _accept;
-    std::vector<std::string> _kalive;
+    
+    std::map<std::string, std::string> DSOEXPORT _fields;
+    http_version_t	_version;
+    
     // Connection parameters we care about
-    bool	_keepalive;
-    Handler     *_handler;
+    bool		_keepalive;
+    Handler		*_handler;
     // These two field hold the data from an RTMPT message
-    int	        _clientid;
-    int	        _index;
-//    bool	_te;
+    int			_clientid;
+    int			_index;
+    int			_max_requests;
+    std::string		_docroot;
 };  
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    void httphandler(Handler::thread_params_t *args);
+    bool http_handler(Network::thread_params_t *args);
 }
 
 

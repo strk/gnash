@@ -37,54 +37,39 @@ namespace gnash {
 /// This is also the base class for the XML actionscript class (see
 /// XML_as.cpp, XML_as.h). Because XML_as also inherits from LoadableObject,
 /// this is a virtual base class.
-class XMLNode_as : public virtual as_object
+//
+/// Trivial copying and assignment are forbidden
+class XMLNode_as : public virtual as_object, boost::noncopyable
 {
 public:
 
     enum NodeType {
-
-        /// Element
         Element = 1,
-
-        /// Attribute
         Attribute = 2,
-
-        /// Text
         Text = 3,
-
-        /// CDATA section 
         Cdata = 4,
-
-        /// Entity reference
         EntityRef = 5,
-        
-        /// Entity
         Entity = 6,
-        
-        /// Processing instruction
         ProcInstr = 7,
-                
-        /// Comment
         Comment = 8,
-
-        /// Document
         Document = 9,
-
-        /// Document type
         DocType = 10,
-
-        /// Document fragment
         DocFragment = 11,
-
-        /// Notation
         Notation = 12
-
     };
 
     XMLNode_as();
 
-    XMLNode_as(const XMLNode_as &node, bool deep);
     virtual ~XMLNode_as();
+
+    // Initialize the global XMLNode class
+    static void init(as_object& global);
+
+    // Used by XML_as
+    static as_object* getXMLNodeInterface();
+
+    /// Register ASnative methods
+    static void registerNative(as_object& global);
 
     size_t length() const { return _children.size(); }
 
@@ -105,6 +90,8 @@ public:
     /// TODO: check if this is the correct behaviour
     ///
     void nodeNameSet(const std::string& name) { _name = name; }
+
+    bool extractPrefix(std::string& prefix);
 
     /// Set value of this node, overriding any previous value
     void nodeValueSet(const std::string& value) { _value = value; }
@@ -137,22 +124,6 @@ public:
 
     Children& childNodes() { return _children; }
 
-    XMLNode_as& operator = (XMLNode_as &node) {
-        log_debug("%s: \n", __PRETTY_FUNCTION__);
-        if (this == &node) return *this;
-        _name = node._name;
-        _value = node._value;
-        _children = node._children;
-        _attributes = node._attributes;
-        return *this;
-    }
-    
-    XMLNode_as& operator = (XMLNode_as *node)
-    {
-	    assert(node);
-	    return (*this = *node);
-    }
-
     XMLNode_as* previousSibling();
     XMLNode_as* nextSibling();
 
@@ -176,13 +147,18 @@ public:
     /// node is placed in the new tree structure after it is removed from
     /// its existing parent node. 
     ///
-    /// @param childNode
-    ///	   same as XMLNode_as::obj ?
-    ///
+    /// @param childNode    The XMLNode_as object to append as a child.
     void appendChild(boost::intrusive_ptr<XMLNode_as> childNode);
 
-    void setParent(XMLNode_as *node) { _parent = node; };
-    XMLNode_as *getParent() { return _parent.get(); };
+    /// Set the parent XMLNode_as of this node.
+    //
+    /// @param node     The new parent of this node. May be 0.
+    void setParent(XMLNode_as* node) { _parent = node; }
+
+    /// Get the parent XMLNode_as of this node. Can be 0.
+    XMLNode_as *getParent() const {
+        return _parent.get();
+    }
 
     /// Insert a node before a node
     //
@@ -205,10 +181,6 @@ public:
     /// Removes the specified XML object from its parent.
     //
     /// Also deletes all descendants of the node.
-    /// Make sure to keep an intrusive_ptr against
-    /// this instance during operation or the ref-counting
-    /// management might destroy it.
-    ///
     void removeNode();
 
     /// Convert the XMLNode to a string
@@ -219,10 +191,18 @@ public:
     ///                 for XML.sendAndLoad.
     virtual void toString(std::ostream& str, bool encode = false) const;
 
+    /// Return the attributes object associated with this node.
     as_object* getAttributes() { return _attributes; }
 
+    /// Return a read-only version of this node's attributes object.
     const as_object* getAttributes() const { return _attributes; }
 
+    /// Set a named attribute to a value.
+    //
+    /// @param name     The name of the attribute to set. If already present,
+    ///                 the value is changed. If not present, the attribute is
+    ///                 added.
+    /// @param value    The value to set the named attribute to.
     void setAttribute(const std::string& name, const std::string& value);
 
 protected:
@@ -242,6 +222,9 @@ protected:
 
 private:
 
+    /// A non-trivial copy-constructor for cloning nodes.
+    XMLNode_as(const XMLNode_as &node, bool deep);
+
     boost::intrusive_ptr<XMLNode_as> _parent;
 
     as_object* _attributes;
@@ -258,12 +241,6 @@ private:
             bool encode);
 
 };
-
-// Initialize the global XMLNode class
-void xmlnode_class_init(as_object& global);
-
-// Used by XML_as
-as_object* getXMLNodeInterface();
 
 } // gnash namespace
 

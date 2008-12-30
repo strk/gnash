@@ -75,7 +75,7 @@ class StartSoundTag : public ControlTag
         _soundInfo.read(in);
 	}
 
-    SoundInfo _soundInfo;
+    SoundInfoRecord _soundInfo;
 
 public:
 

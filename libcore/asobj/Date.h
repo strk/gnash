@@ -27,6 +27,8 @@ void registerDateNative(as_object& global);
 
 void date_class_init(as_object& global);
 
+as_object* init_date_instance(double value);
+
 } // end of gnash namespace
 
 #endif

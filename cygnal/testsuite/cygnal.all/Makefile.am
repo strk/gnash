@@ -1,3 +1,4 @@
+
 # 
 #   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 #
@@ -62,11 +63,15 @@ mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) $(MUDFLAP_OPT)" LIBS="$(LIBS) $(MUDFLAP_LIB)"
 
-TEST_DRIVERS = ../simple.exp
+TEST_DRIVERS = ../cygnal.exp
 
 CLEANFILES =  \
 	site.exp.bak \
-	testrun.* 
+	testrun.* \
+	foo* \
+	*.bin* \
+	wget-log* \
+	gateway*
 
 check-DEJAGNU: site-update
 	@runtest=$(RUNTEST); \

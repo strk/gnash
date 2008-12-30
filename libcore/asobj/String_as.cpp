@@ -26,10 +26,10 @@
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
 #include "log.h"
-#include "array.h"
+#include "Array_as.h"
 #include "as_value.h"
 #include "GnashException.h"
-#include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "VM.h" 
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
 #include "utf8.h"
@@ -42,86 +42,162 @@
 
 namespace gnash {
 
-/// Check the number of arguments, returning false if there
-/// aren't enough, or true if there are either enough or too many.
-/// Logs an error if the number isn't between min and max.
-inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
-        const std::string& function)
-{
+// Forward declarations
+namespace {
 
-    if (fn.nargs < min) {
-        IF_VERBOSE_ASCODING_ERRORS(
-            std::ostringstream os;
-            fn.dump_args(os);
-                log_aserror(_("%1%(%2%) needs %3% argument(s)"),
-                    function, os.str(), min);
-            )
-         return false;
-    }                          
-    IF_VERBOSE_ASCODING_ERRORS(
-        if (fn.nargs > max)
-        {
-            std::ostringstream os;
-            fn.dump_args(os);
-            log_aserror(_("%1%(%2%) has more than %3% argument(s)"),
-                function, os.str(), max);
-        }
-    );
-    return true;
+    as_value string_concat(const fn_call& fn);
+    as_value string_slice(const fn_call& fn);
+    as_value string_split(const fn_call& fn);
+    as_value string_lastIndexOf(const fn_call& fn);
+    as_value string_substr(const fn_call& fn);
+    as_value string_substring(const fn_call& fn);
+    as_value string_indexOf(const fn_call& fn);
+    as_value string_fromCharCode(const fn_call& fn);
+    as_value string_charCodeAt(const fn_call& fn);
+    as_value string_charAt(const fn_call& fn);
+    as_value string_toUpperCase(const fn_call& fn);
+    as_value string_toLowerCase(const fn_call& fn);
+    as_value string_toString(const fn_call& fn);
+    as_value string_oldToLower(const fn_call& fn);
+    as_value string_oldToUpper(const fn_call& fn);
+    as_value string_ctor(const fn_call& fn);
+
+    size_t validIndex(const std::wstring& subject, int index);
+    void attachStringInterface(as_object& o);
+    as_object* getStringInterface();
+    boost::intrusive_ptr<builtin_function> getStringConstructor();
+
+    inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
+            const std::string& function);
 }
 
-// Forward declarations
+class String_as : public as_object
+{
 
-static as_value string_concat(const fn_call& fn);
-static as_value string_slice(const fn_call& fn);
-static as_value string_split(const fn_call& fn);
-static as_value string_last_index_of(const fn_call& fn);
-static as_value string_sub_str(const fn_call& fn);
-static as_value string_sub_string(const fn_call& fn);
-static as_value string_index_of(const fn_call& fn);
-static as_value string_from_char_code(const fn_call& fn);
-static as_value string_char_code_at(const fn_call& fn);
-static as_value string_char_at(const fn_call& fn);
-static as_value string_to_upper_case(const fn_call& fn);
-static as_value string_to_lower_case(const fn_call& fn);
-static as_value string_to_string(const fn_call& fn);
-static as_value string_oldToLower(const fn_call& fn);
-static as_value string_oldToUpper(const fn_call& fn);
-static as_value string_ctor(const fn_call& fn);
+public:
 
-static void
+    String_as(const std::string& s)
+            :
+            as_object(getStringInterface()),
+            _string(s)
+    {
+        std::wstring wstr = utf8::decodeCanonicalString(
+                _string, _vm.getSWFVersion());
+        init_member(NSV::PROP_LENGTH, wstr.size(), 
+                as_prop_flags::dontDelete | as_prop_flags::dontEnum); 
+    }
+
+
+    bool useCustomToString() const { return false; }
+
+    std::string get_text_value() const {
+        return _string;
+    }
+
+    as_value get_primitive_value() const {
+        return as_value(_string);
+    }
+
+    const std::string& str() {
+        return _string;
+    }
+
+private:
+    std::string _string;
+};
+
+boost::intrusive_ptr<as_object>
+init_string_instance(const std::string& val)
+{
+	// TODO: get VM from the environment ?
+	VM& vm = VM::get();
+
+	// TODO: get the environment passed in !!
+	as_environment env(vm);
+
+	int swfVersion = vm.getSWFVersion();
+
+	boost::intrusive_ptr<as_function> cl;
+
+	if ( swfVersion < 6 ) {
+		cl = getStringConstructor();
+	}
+	else {
+		as_object* global = vm.getGlobal();
+		as_value clval;
+		if ( ! global->get_member(NSV::CLASS_STRING, &clval) ) {
+			log_debug("UNTESTED: String instantiation requested but "
+                    "_global doesn't contain a 'String' symbol. Returning "
+                    "the NULL object.");
+			return cl;
+		}
+		else if ( ! clval.is_function() ) {
+			log_debug("UNTESTED: String instantiation requested but "
+                    "_global.String is not a function (%s). Returning "
+                    "the NULL object.", clval);
+			return cl;
+		}
+		else {
+			cl = clval.to_as_function();
+			assert(cl);
+		}
+	}
+
+	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	args->push_back(val);
+	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
+
+	return ret;
+}
+
+// extern (used by Global.cpp)
+void string_class_init(as_object& global)
+{
+    // This is going to be the global String "class"/"function"
+    boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
+
+    // Register _global.String (should be only visible from SWF5 up)
+    // TODO: register as ASnative(251, 0)
+    // TODO: register as ASnative(3, 0) for SWF5 ?
+    int flags = as_prop_flags::dontEnum; 
+    global.init_member("String", cl.get(), flags);
+}
+
+
+/// String class interface
+namespace {
+
+void
 attachStringInterface(as_object& o)
 {
 	VM& vm = o.getVM();
-
-	// TODO fill in the rest
 
 	// ASnative(251, 1) - [String.prototype] valueOf
 	vm.registerNative(as_object::tostring_method, 251, 1);
 	o.init_member("valueOf", vm.getNative(251, 1));
 
 	// ASnative(251, 2) - [String.prototype] toString
-	vm.registerNative(string_to_string, 251, 2);
+	vm.registerNative(string_toString, 251, 2);
 	o.init_member("toString", vm.getNative(251, 2));
 
 	// ASnative(251, 3) - [String.prototype] toUpperCase
 	// ASnative(102, 0) - SWF5 to upper.
 	vm.registerNative(string_oldToUpper, 102, 0);
-	vm.registerNative(string_to_upper_case, 251, 3);
+	vm.registerNative(string_toUpperCase, 251, 3);
 	o.init_member("toUpperCase", vm.getNative(251, 3));
 
 	// ASnative(251, 4) - [String.prototype] toLowerCase
 	// ASnative(102, 1) - SWF5 to lower.
 	vm.registerNative(string_oldToLower, 102, 1);
-	vm.registerNative(string_to_lower_case, 251, 4);
+	vm.registerNative(string_toLowerCase, 251, 4);
 	o.init_member("toLowerCase", vm.getNative(251, 4));
 
 	// ASnative(251, 5) - [String.prototype] charAt
-	vm.registerNative(string_char_at, 251, 5);
+	vm.registerNative(string_charAt, 251, 5);
 	o.init_member("charAt", vm.getNative(251, 5));
 
 	// ASnative(251, 6) - [String.prototype] charCodeAt
-	vm.registerNative(string_char_code_at, 251, 6);
+	vm.registerNative(string_charCodeAt, 251, 6);
 	o.init_member("charCodeAt", vm.getNative(251, 6));
 
 	// ASnative(251, 7) - [String.prototype] concat
@@ -129,11 +205,11 @@ attachStringInterface(as_object& o)
 	o.init_member("concat", vm.getNative(251, 7));
 
 	// ASnative(251, 8) - [String.prototype] indexOf
-	vm.registerNative(string_index_of, 251, 8);
+	vm.registerNative(string_indexOf, 251, 8);
 	o.init_member("indexOf", vm.getNative(251, 8));
 
 	// ASnative(251, 9) - [String.prototype] lastIndexOf
-	vm.registerNative(string_last_index_of, 251, 9);
+	vm.registerNative(string_lastIndexOf, 251, 9);
 	o.init_member("lastIndexOf", vm.getNative(251, 9));
 
 	// ASnative(251, 10) - [String.prototype] slice
@@ -141,7 +217,7 @@ attachStringInterface(as_object& o)
 	o.init_member("slice", vm.getNative(251, 10));
 
 	// ASnative(251, 11) - [String.prototype] substring
-	vm.registerNative(string_sub_string, 251, 11);
+	vm.registerNative(string_substring, 251, 11);
 	o.init_member("substring", vm.getNative(251, 11));
 
 	// ASnative(251, 12) - [String.prototype] split
@@ -149,11 +225,11 @@ attachStringInterface(as_object& o)
 	o.init_member("split", vm.getNative(251, 12));
 
 	// ASnative(251, 13) - [String.prototype] substr
-	vm.registerNative(string_sub_str, 251, 13);
+	vm.registerNative(string_substr, 251, 13);
 	o.init_member("substr", vm.getNative(251, 13));
 }
 
-static as_object*
+as_object*
 getStringInterface()
 {
     static boost::intrusive_ptr<as_object> o;
@@ -169,51 +245,14 @@ getStringInterface()
     return o.get();
 }
 
-class String_as : public as_object
-{
-
-public:
-    String_as(const std::string& s)
-            :
-            as_object(getStringInterface()),
-            _string(s)
-    {
-	std::wstring wstr = utf8::decodeCanonicalString(_string, _vm.getSWFVersion());
-	init_member(NSV::PROP_LENGTH, wstr.size(), as_prop_flags::dontDelete|as_prop_flags::dontEnum); // can override though
-    }
-
-
-    bool useCustomToString() const { return false; }
-
-    std::string get_text_value() const
-    {
-        return _string;
-    }
-
-    as_value get_primitive_value() const
-
-    {
-        return as_value(_string);
-    }
-
-    const std::string& str()
-    {
-        return _string;
-    }
-
-private:
-    std::string _string;
-};
-
 // all the arguments will be converted to string and concatenated.
-// This can only be applied to String objects, unlike other methods.
-static as_value
+as_value
 string_concat(const fn_call& fn)
 {
-    boost::intrusive_ptr<String_as> obj = ensureType<String_as>(fn.this_ptr);
-
-    // Make a copy of our string.
-    std::string str = obj->str();
+    boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+    as_value val(fn.this_ptr);
+    
+    std::string str = val.to_string();
 
     for (unsigned int i = 0; i < fn.nargs; i++) {
         str += fn.arg(i).to_string();
@@ -223,21 +262,8 @@ string_concat(const fn_call& fn)
 }
 
 
-static size_t
-validIndex(const std::wstring& subject, int index)
-{
-
-    if (index < 0) {
-        index = subject.size() + index;
-    }
-
-    index = utility::clamp<int>(index, 0, subject.size());
-
-    return index;
-}
-
 // 1st param: start_index, 2nd param: end_index
-static as_value
+as_value
 string_slice(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
@@ -247,16 +273,17 @@ string_slice(const fn_call& fn)
 
     /// version to use is the one of the SWF containing caller code.
     /// If callerDef is null, this calls is spontaneous (system-event?)
-    /// in which case we should research on which version should drive behaviour.
+    /// in which case we should research on which version should drive
+    /// behaviour.
     /// NOTE: it is unlikely that a system event triggers string_split so
     ///       in most cases a null callerDef means the caller forgot to 
     ///       set the field (ie: a programmatic error)
     if ( ! fn.callerDef )
     {
         log_error("No fn_call::callerDef in string_slice call");
-        //abort();
     }
-    const int version = fn.callerDef ? fn.callerDef->get_version() : obj->getVM().getSWFVersion();
+    const int version = fn.callerDef ? fn.callerDef->get_version() :
+        obj->getVM().getSWFVersion();
 
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -281,7 +308,8 @@ string_slice(const fn_call& fn)
 
     log_debug("start: %d, end: %d, retlen: %d", start, end, retlen);
 
-    return as_value(utf8::encodeCanonicalString(wstr.substr(start, retlen), version));
+    return as_value(utf8::encodeCanonicalString(
+                wstr.substr(start, retlen), version));
 }
 
 // String.split(delimiter[, limit])
@@ -304,7 +332,7 @@ string_slice(const fn_call& fn)
 // Empty array returned:
 // 4. string and delimiter are empty but defined.
 // 5. non-empty string, non-empty delimiter; 0 or less elements required.
-static as_value
+as_value
 string_split(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
@@ -314,12 +342,17 @@ string_split(const fn_call& fn)
 
     /// version to use is the one of the SWF containing caller code.
     /// If callerDef is null, this calls is spontaneous (system-event?)
-    /// in which case we should research on which version should drive behaviour.
+    /// in which case we should research on which version should drive
+    /// behaviour.
     /// NOTE: it is unlikely that a system event triggers string_split so
     ///       in most cases a null callerDef means the caller forgot to 
     ///       set the field (ie: a programmatic error)
-    if ( ! fn.callerDef ) log_error("No fn_call::callerDef in string_split call");
-    const int version = fn.callerDef ? fn.callerDef->get_version() : obj->getVM().getSWFVersion();
+    if (!fn.callerDef ) {
+        log_error("No fn_call::callerDef in string_split call");
+    }
+
+    const int version = fn.callerDef ? fn.callerDef->get_version() :
+        obj->getVM().getSWFVersion();
     
     std::wstring wstr = utf8::decodeCanonicalString(str, version);
 
@@ -332,7 +365,8 @@ string_split(const fn_call& fn)
         return as_value(array.get());
     }
 
-    const std::wstring& delim = utf8::decodeCanonicalString(fn.arg(0).to_string(), version);
+    const std::wstring& delim = utf8::decodeCanonicalString(
+            fn.arg(0).to_string(), version);
     const size_t delimiterSize = delim.size();
 
     if ((version < 6 && delimiterSize == 0) ||
@@ -424,8 +458,8 @@ string_split(const fn_call& fn)
 //
 /// Performs a reverse search for the complete search string, optionally
 /// starting from pos. Returns -1 if not found.
-static as_value
-string_last_index_of(const fn_call& fn)
+as_value
+string_lastIndexOf(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -460,8 +494,8 @@ string_last_index_of(const fn_call& fn)
 // <start> is returned.
 // If start is more than string length or length is 0, empty string is returned.
 // If length is negative, the substring is taken from the *end* of the string.
-static as_value
-string_sub_str(const fn_call& fn)
+as_value
+string_substr(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -500,8 +534,8 @@ string_sub_str(const fn_call& fn)
 // The values are *then* swapped if end is before start.
 // Valid values for the start position are up to string 
 // length - 1.
-static as_value
-string_sub_string(const fn_call& fn)
+as_value
+string_substring(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -552,8 +586,8 @@ string_sub_string(const fn_call& fn)
     return as_value(utf8::encodeCanonicalString(wstr.substr(start, end), version));
 }
 
-static as_value
-string_index_of(const fn_call& fn)
+as_value
+string_indexOf(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -602,8 +636,8 @@ string_index_of(const fn_call& fn)
 // String.fromCharCode(code1[, code2[, code3[, code4[, ...]]]])
 // Makes a string out of any number of char codes.
 // The string is always UTF8, so SWF5 mangles it.
-static as_value
-string_from_char_code(const fn_call& fn)
+as_value
+string_fromCharCode(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
@@ -644,8 +678,8 @@ string_from_char_code(const fn_call& fn)
 
 }
 
-static as_value
-string_char_code_at(const fn_call& fn)
+as_value
+string_charCodeAt(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -682,8 +716,8 @@ string_char_code_at(const fn_call& fn)
     return as_value(wstr.at(index));
 }
 
-static as_value
-string_char_at(const fn_call& fn)
+as_value
+string_charAt(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -718,8 +752,8 @@ string_char_at(const fn_call& fn)
     return as_value("");
 }
 
-static as_value
-string_to_upper_case(const fn_call& fn)
+as_value
+string_toUpperCase(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -756,8 +790,8 @@ string_to_upper_case(const fn_call& fn)
 
 }
 
-static as_value
-string_to_lower_case(const fn_call& fn)
+as_value
+string_toLowerCase(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
@@ -793,7 +827,7 @@ string_to_lower_case(const fn_call& fn)
     return as_value(utf8::encodeCanonicalString(wstr, version));
 }
 
-static as_value
+as_value
 string_oldToLower(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
@@ -806,7 +840,7 @@ string_oldToLower(const fn_call& fn)
 }
 
 
-static as_value
+as_value
 string_oldToUpper(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
@@ -819,8 +853,8 @@ string_oldToUpper(const fn_call& fn)
 }
 
 
-static as_value
-string_to_string(const fn_call& fn)
+as_value
+string_toString(const fn_call& fn)
 {
     boost::intrusive_ptr<String_as> obj 
 	   = ensureType<String_as>(fn.this_ptr);
@@ -828,7 +862,7 @@ string_to_string(const fn_call& fn)
 }
 
 
-static as_value
+as_value
 string_ctor(const fn_call& fn)
 {
 	std::string str;
@@ -848,7 +882,7 @@ string_ctor(const fn_call& fn)
 	return as_value(obj.get());
 }
 
-static boost::intrusive_ptr<builtin_function>
+boost::intrusive_ptr<builtin_function>
 getStringConstructor()
 {
     // This is going to be the global String "class"/"function"
@@ -857,79 +891,62 @@ getStringConstructor()
 
     if ( cl == NULL )
     {
-	VM& vm = VM::get();
+	    VM& vm = VM::get();
 
         cl=new builtin_function(&string_ctor, getStringInterface());
-	vm.addStatic(cl.get());
+	    vm.addStatic(cl.get());
 
-	// ASnative(251, 14) - [String] fromCharCode 
-	vm.registerNative(string_from_char_code, 251, 14);
-	cl->init_member("fromCharCode", vm.getNative(251, 14)); 
+	    // ASnative(251, 14) - [String] fromCharCode 
+	    vm.registerNative(string_fromCharCode, 251, 14);
+	    cl->init_member("fromCharCode", vm.getNative(251, 14)); 
 
     }
 
     return cl;
 }
 
-// extern (used by Global.cpp)
-void string_class_init(as_object& global)
-{
-    // This is going to be the global String "class"/"function"
-    boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
 
-    // Register _global.String (should be only visible from SWF5 up)
-    // TODO: register as ASnative(251, 0)
-    // TODO: register as ASnative(3, 0) for SWF5 ?
-    int flags = as_prop_flags::dontEnum; // |as_prop_flags::onlySWF5Up; 
-    global.init_member("String", cl.get(), flags);
+/// Check the number of arguments, returning false if there
+/// aren't enough, or true if there are either enough or too many.
+/// Logs an error if the number isn't between min and max.
+inline bool checkArgs(const fn_call& fn, size_t min, size_t max,
+        const std::string& function)
+{
+
+    if (fn.nargs < min) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+                log_aserror(_("%1%(%2%) needs %3% argument(s)"),
+                    function, os.str(), min);
+            )
+         return false;
+    }
+
+    IF_VERBOSE_ASCODING_ERRORS(
+        if (fn.nargs > max)
+        {
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror(_("%1%(%2%) has more than %3% argument(s)"),
+                function, os.str(), max);
+        }
+    );
+    return true;
 }
 
-boost::intrusive_ptr<as_object>
-init_string_instance(const std::string& val)
+size_t
+validIndex(const std::wstring& subject, int index)
 {
-	// TODO: get VM from the environment ?
-	VM& vm = VM::get();
 
-	// TODO: get the environment passed in !!
-	as_environment env(vm);
+    if (index < 0) {
+        index = subject.size() + index;
+    }
 
-	int swfVersion = vm.getSWFVersion();
+    index = utility::clamp<int>(index, 0, subject.size());
 
-	boost::intrusive_ptr<as_function> cl;
-
-	if ( swfVersion < 6 )
-	{
-		cl = getStringConstructor();
-	}
-	else
-	{
-		as_object* global = vm.getGlobal();
-		as_value clval;
-		if ( ! global->get_member(NSV::CLASS_STRING, &clval) )
-		{
-			log_debug("UNTESTED: String instantiation requested but _global doesn't contain a 'String' symbol. Returning the NULL object.");
-			return cl;
-			//cl = getStringConstructor();
-		}
-		else if ( ! clval.is_function() )
-		{
-			log_debug("UNTESTED: String instantiation requested but _global.String is not a function (%s). Returning the NULL object.",
-				clval);
-			return cl;
-			//cl = getStringConstructor();
-		}
-		else
-		{
-			cl = clval.to_as_function();
-			assert(cl);
-		}
-	}
-
-	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
-	args->push_back(val);
-	boost::intrusive_ptr<as_object> ret = cl->constructInstance(env, args);
-
-	return ret;
+    return index;
 }
 
+} // anonymous namespace
 } // namespace gnash

@@ -27,6 +27,13 @@
 #include <vector>
 #include <cmath>
 #include <climits>
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <io.h>
+#endif
 
 #include "buffer.h"
 #include "log.h"
@@ -67,20 +74,20 @@ Flv::~Flv()
 
 // Encode the data into a Buffer
 boost::shared_ptr<amf::Buffer>
-Flv::encodeHeader(Network::byte_t type)
+Flv::encodeHeader(boost::uint8_t type)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(Flv::flv_header_t)));
     buf->clear();
     
-    Network::byte_t version = 0x1;
+    boost::uint8_t version = 0x1;
     *buf = "FLV";
     *buf += version;
 
     *buf += type;
 
     boost::uint32_t size = htonl(0x9);
-    buf->append((Network::byte_t *)&size, sizeof(boost::uint32_t));
+    buf->append((boost::uint8_t *)&size, sizeof(boost::uint32_t));
 
     return buf;
 }
@@ -140,12 +147,12 @@ Flv::decodeMetaData(boost::shared_ptr<amf::Buffer> buf)
 }
 
 boost::shared_ptr<amf::Element> 
-Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
+Flv::decodeMetaData(boost::uint8_t *buf, size_t size)
 {
 //    GNASH_REPORT_FUNCTION;
     AMF amf;
-    Network::byte_t *ptr = buf;
-    Network::byte_t *tooFar = ptr + size;
+    boost::uint8_t *ptr = buf;
+    boost::uint8_t *tooFar = ptr + size;
     
     // Extract the onMetaData object name
     // In disk files, I always see the 0x2 type field for
@@ -174,7 +181,7 @@ Flv::decodeMetaData(gnash::Network::byte_t *buf, size_t size)
 }
 
 boost::shared_ptr<Flv::flv_audio_t>
-Flv::decodeAudioData(gnash::Network::byte_t byte)
+Flv::decodeAudioData(boost::uint8_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<flv_audio_t> audio(new flv_audio_t);
@@ -233,7 +240,7 @@ Flv::decodeAudioData(gnash::Network::byte_t byte)
 }
 
 boost::shared_ptr<Flv::flv_video_t>
-Flv::decodeVideoData(gnash::Network::byte_t byte)
+Flv::decodeVideoData(boost::uint8_t byte)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<flv_video_t> video(new flv_video_t);

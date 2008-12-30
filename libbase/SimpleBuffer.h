@@ -148,7 +148,8 @@ public:
 	///
 	void append(const void* inData, size_t size)
 	{
-		const boost::uint8_t* newData = reinterpret_cast<const uint8_t*>(inData);
+		const boost::uint8_t* newData = 
+            reinterpret_cast<const boost::uint8_t*>(inData);
 		size_t curSize = _size;
 		resize(curSize+size);
 		std::copy(newData, newData+size, _data.get()+curSize);

@@ -45,8 +45,10 @@ class Button : public character
 {
 public:
 
-	typedef std::vector< character* > CharsVect;
-	typedef std::set<int> RecSet;
+	typedef std::vector< character* > DisplayObjects;
+	
+    /// A container for holding the id of active button records.
+    typedef std::set<int> ActiveRecords;
 
 	enum mouse_flags
 	{
@@ -77,6 +79,9 @@ public:
 
 	~Button();
 
+    /// Initialize the global Button class
+    static void init(as_object& global);
+
 	// See dox in as_object.h
 	bool get_member(string_table::key name, as_value* val, 
 		string_table::key nsname = 0);
@@ -98,7 +103,8 @@ public:
 	//
 	/// I.e. check against ourself.
 	///
-	virtual character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
+	virtual character* get_topmost_mouse_entity(boost::int32_t x,
+            boost::int32_t y);
 	
 	virtual bool wantsInstanceName() const
 	{
@@ -109,6 +115,8 @@ public:
 	virtual as_object* get_path_element(string_table::key key);
 
 	virtual void on_button_event(const event_id& event);
+
+    virtual bool handleFocus();
 
 	//
 	// ActionScript overrides
@@ -121,10 +129,7 @@ public:
 	// See dox in character.h
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
-	static as_value enabled_getset(const fn_call& fn);
-	
-	bool get_enabled();
-	void set_enabled(bool value);
+	bool isEnabled();
 	
 	/// Receive a stage placement notification
 	//
@@ -133,7 +138,7 @@ public:
 	/// (1) Register this button instance as a live character
 	/// (2) Setup the state characters calling stagePlacementCallback on all [WRONG]
 	///
-	virtual void stagePlacementCallback();
+	virtual void stagePlacementCallback(as_object* initObj = 0);
 
 	/// Properly unload contained characters
 	bool unload();
@@ -163,9 +168,9 @@ private:
 
     SWF::DefineButtonTag& _def;
 
-	CharsVect _stateCharacters;
+	DisplayObjects _stateCharacters;
 
-	CharsVect _hitCharacters;
+	DisplayObjects _hitCharacters;
 
 	/// Returns all characters that are active based on the current state.
 	//
@@ -188,7 +193,8 @@ private:
     /// @param list     The container to push unmodifiable characters into.
 	void getActiveCharacters(std::vector<const character*>& list) const;
 
-	/// Returns all characters (record nums) that should be active on the given state.
+	/// Returns all characters (record nums) that should be active on
+    /// the given state.
 	//
 	/// @param list
 	///	The set to push active characters record number into
@@ -196,7 +202,7 @@ private:
 	/// @param state
 	///	The state we're interested in
 	///
-	void get_active_records(RecSet& list, MouseState state);
+	void get_active_records(ActiveRecords& list, MouseState state);
 
 	/// Return any state character whose name matches the given string
 	//
@@ -213,12 +219,7 @@ private:
 	/// the button definition this is an instance of.
     int getSWFVersion() const;
 
-	bool m_enabled;
-
 };
-
-/// Initialize the global Button class
-void button_class_init(as_object& global);
 
 }	// end namespace gnash
 

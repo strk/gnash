@@ -28,7 +28,7 @@
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
-#include "array.h"
+#include "Array_as.h"
 #include "swf_function.h"
 #include "as_function.h"
 #include "fn_call.h"
@@ -164,32 +164,6 @@ SWFHandlers::SWFHandlers()
     {
         log_error(_("FIXME: VM not initialized at SWFHandlers construction time, can't set action handlers based on SWF version"));
     }
-
-    std::vector<std::string> & property_names = get_property_names();
-
-    property_names.reserve(32);
-    property_names.push_back("_x"); // 0
-    property_names.push_back("_y"); // 1
-    property_names.push_back("_xscale"); // 2
-    property_names.push_back("_yscale"); // 3
-    property_names.push_back("_currentframe"); // 4
-    property_names.push_back("_totalframes"); // 5
-    property_names.push_back("_alpha"); // 6
-    property_names.push_back("_visible"); // 7
-    property_names.push_back("_width"); // 8
-    property_names.push_back("_height"); // 9
-    property_names.push_back("_rotation"); // 10
-    property_names.push_back("_target"); // 11
-    property_names.push_back("_framesloaded"); // 12
-    property_names.push_back("_name"); // 13
-    property_names.push_back("_droptarget"); // 14
-    property_names.push_back("_url"); // 15
-    property_names.push_back("_highquality"); // 16
-    property_names.push_back("_focusrect"); // 17
-    property_names.push_back("_soundbuftime"); // 18
-    property_names.push_back("_quality"); // 19 - quality: what the quality is (0, 1 or 2)
-    property_names.push_back("_xmouse"); // 20
-    property_names.push_back("_ymouse"); // 21
 
     container_type & handlers = get_handlers();
 
@@ -411,11 +385,46 @@ SWFHandlers::get_handlers()
     return handlers;
 }
 
-std::vector<std::string> &
-SWFHandlers::get_property_names()
+/// @todo: make properties available outside, for
+///        example for Machine.cpp
+/// @todo: consider sorting named strings so that
+///        the first 22 or more elements have
+///        the corresponding property number (drops
+///        one level of indirection).
+///
+static const string_table::key&
+propertyKey(unsigned int val)
 {
-    static std::vector<std::string> prop_names;
-    return prop_names;
+    static const string_table::key invalidKey=0;
+
+    if ( val > 21u ) return invalidKey;
+
+    static const string_table::key props[22] = {
+        NSV::PROP_uX, // 0
+        NSV::PROP_uY, // 1
+        NSV::PROP_uXSCALE, // 2
+        NSV::PROP_uYSCALE, // 3
+        NSV::PROP_uCURRENTFRAME, // 4
+        NSV::PROP_uTOTALFRAMES, // 5
+        NSV::PROP_uALPHA, // 6
+        NSV::PROP_uVISIBLE, // 7
+        NSV::PROP_uWIDTH, // 8
+        NSV::PROP_uHEIGHT, // 9
+        NSV::PROP_uROTATION, // 10
+        NSV::PROP_uTARGET, // 11
+        NSV::PROP_uFRAMESLOADED, // 12
+        NSV::PROP_uNAME, // 13
+        NSV::PROP_uDROPTARGET, // 14
+        NSV::PROP_uURL, // 15
+        NSV::PROP_uHIGHQUALITY, // 16
+        NSV::PROP_uFOCUSRECT, // 17
+        NSV::PROP_uSOUNDBUFTIME, // 18
+        NSV::PROP_uQUALITY, // 19
+        NSV::PROP_uXMOUSE, // 20
+        NSV::PROP_uYMOUSE // 21
+    };
+
+    return props[val];
 }
 
 
@@ -995,6 +1004,16 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
     }
 
     top_value = thread.getVariable(var_string);
+    if ( env.get_version() < 5 && top_value.is_sprite() )
+    {
+        // See http://www.ferryhalim.com/orisinal/g2/penguin.htm
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("Can't assign a sprite/character to a variable in SWF%d. "
+                    "We'll return undefined instead of %s."),
+                    env.get_version(), top_value);
+        );
+        top_value.set_undefined();
+    }
 
     IF_VERBOSE_ACTION
     (
@@ -1014,6 +1033,15 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
     as_environment& env = thread.env;
 
     const std::string& name = env.top(1).to_string();
+    if ( name.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS (
+            // Invalid object, can't set.
+            log_aserror(_("ActionSetVariable: %s=%s: variable name evaluates to invalid (empty) string"),
+                env.top(1),
+                env.top(0));
+        );
+    }
     thread.setVariable(name, env.top(0));
 
     IF_VERBOSE_ACTION (
@@ -1093,22 +1121,18 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 
     if (target)
     {
-        if ( prop_number < get_property_names().size() )
-        {
-            as_value val;
-#if GNASH_PARANOIA_LEVEL > 1
-            assert( ! get_property_names().empty() );
-#endif
-            std::string propname = get_property_names()[prop_number];
-
-            thread.getObjectMember(*target, propname, val);
-            env.top(1) = val;
-        }
-        else
+        string_table::key propKey = propertyKey(prop_number);
+        if ( propKey == 0 )
         {
             log_error(_("invalid property query, property "
                 "number %d"), prop_number);
             env.top(1) = as_value();
+        }
+        else
+        {
+            as_value val;
+            target->get_member(propKey, &val);
+            env.top(1) = val;
         }
     }
     else
@@ -1133,32 +1157,30 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     // FIXME: what happens when it's an invalid number? This will cause
     // undefined behaviour on overflow.
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
+
     as_value prop_val = env.top(0);
 
-    if (target) {
-
-    if ( prop_number < get_property_names().size() )
+    if (target)
     {
-        // TODO: check if get_property_names() return a string&
-        std::string member_name = get_property_names()[prop_number];
-        thread.setObjectMember(*target, member_name, prop_val);
-    }
-    else
-    {
-        // Malformed SWF ? (don't think this is possible to do with syntactically valid ActionScript)
-        IF_VERBOSE_MALFORMED_SWF (
+        string_table::key propKey = propertyKey(prop_number);
+        if ( propKey == 0 )
+        {
+            // Malformed SWF ? (don't think this is possible to do with syntactically valid ActionScript)
+            IF_VERBOSE_MALFORMED_SWF (
             log_swferror(_("invalid set_property, property number %d"), prop_number);
-        )
-    }
-
+            )
+        }
+        else
+        {
+            target->set_member(propKey, prop_val);
+        }
     }
     else
     {
-    IF_VERBOSE_ASCODING_ERRORS (
-    log_aserror(_("ActionSetProperty: can't find target %s for setting property %s"),
-        env.top(2), get_property_names()[prop_number]);
-    )
-
+        IF_VERBOSE_ASCODING_ERRORS (
+        log_aserror(_("ActionSetProperty: can't find target %s for setting property %s"),
+            env.top(2), prop_number);
+        )
     }
     env.drop(3);
 }
@@ -1993,13 +2015,12 @@ SWFHandlers::ActionPushData(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     size_t pc = thread.getCurrentPC();
-    boost::int16_t length = code.read_int16(pc+1);
-    assert( length >= 0 ); // TODO: trigger this with a testcase !
+    boost::uint16_t length = code.read_uint16(pc+1);
 
     //---------------
     size_t i = pc;
     size_t count = 0;
-    while (i - pc < static_cast<size_t>(length)) {
+    while (i - pc < length) {
         int id=0; // for dict (constant pool) lookup
                   // declared here because also used
               // by verbose action output
@@ -2916,7 +2937,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
 
     const int nmembers = env.pop().to_int();
 
-    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance().release());
+    boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance());
 
     // Set provided members
     for (int i = 0; i < nmembers; ++i) {
@@ -3233,7 +3254,17 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
     const std::string& member_name = env.top(1).to_string();
     const as_value& member_value = env.top(0);
 
-    if (obj)
+    if ( member_name.empty() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS (
+            // Invalid object, can't set.
+            log_aserror(_("ActionSetMember: %s.%s=%s: member name evaluates to invalid (empty) string"),
+                env.top(2),
+                env.top(1),
+                env.top(0));
+        );
+    }
+    else if (obj)
     {
         thread.setObjectMember(*(obj.get()), member_name, member_value);
 

@@ -26,7 +26,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 
-#include "network.h"
+//#include "network.h"
 #include "dsodefs.h" // DSOEXPORT
 
 /// \namespace amf
@@ -221,8 +221,8 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeString(const char *str, size_t size);
-    /// \overload Element::makeString(gnash::Network::byte_t *data, size_t size)
-    Element &makeString(gnash::Network::byte_t *data, size_t size);
+    /// \overload Element::makeString(boost::uint8_t *data, size_t size)
+    Element &makeString(boost::uint8_t *data, size_t size);
 
     /// \brief Make this Element with an ASCII string value.
     ///
@@ -261,7 +261,7 @@ public:
     /// @param str The double to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeNumber(gnash::Network::byte_t *data);
+    Element &makeNumber(boost::uint8_t *data);
     
     /// \brief Make this Element a Property with a double value
     ///
@@ -269,9 +269,9 @@ public:
     ///
     /// @param num The double to use as the value of the property.
     Element &makeNumber(const std::string &name, double num) ;
-    /// \overload Element::makeNumber(const std::string &name, gnash::Network::byte_t *data);
+    /// \overload Element::makeNumber(const std::string &name, boost::uint8_t *data);
     ///		The size isn't needed as a double is always the same size.
-    Element &makeNumber(const std::string &name, gnash::Network::byte_t *data);
+    Element &makeNumber(const std::string &name, boost::uint8_t *data);
 
     /// \brief Make this Element with a boolean value.
     ///		The size isn't needed as a boolean is always the same size.
@@ -279,7 +279,7 @@ public:
     /// @param data A real pointer to the boolean use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeBoolean(gnash::Network::byte_t *data);
+    Element &makeBoolean(boost::uint8_t *data);
 
     /// \brief Make this Element with a boolean value.
     ///
@@ -383,6 +383,7 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeXMLObject(const std::string &name, const std::string &data);
+    Element &makeXMLObject(boost::uint8_t *data);
 
     /// \brief Make this Element a Property with an ECMA Array as the value.
     ///		This is a mixed array of any AMF types. These are stored
@@ -455,8 +456,9 @@ public:
     /// @param name The name of the Property
     ///
     /// @return A reference to this Element.    
+    Element &makeTypedObject();
     Element &makeTypedObject(const std::string &name);
-    
+
     /// \brief Make this Element a Property with an Typed Object as the value.
     ///
     /// @param data A real pointer to the raw data to use as the value.
@@ -464,7 +466,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeTypedObject(gnash::Network::byte_t *data, size_t size);
+    Element &makeTypedObject(boost::uint8_t *data);
     
     /// \brief Make this Element a Property with an Object Reference as the value.
     ///
@@ -478,7 +480,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeReference(gnash::Network::byte_t *data, size_t size);
+    Element &makeReference(boost::uint8_t *data, size_t size);
     
     /// \brief Make this Element a Property with a Movie Clip (SWF data) as the value.
     ///
@@ -492,7 +494,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeMovieClip(gnash::Network::byte_t *data, size_t size);
+    Element &makeMovieClip(boost::uint8_t *data, size_t size);
 
     /// \brief Make this Element a Property with a UTF8 String as the value.
     ///
@@ -506,7 +508,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeLongString(gnash::Network::byte_t *data, size_t size);
+    Element &makeLongString(boost::uint8_t *data);
     
     /// \brief Make this Element a Property with a Record Set as the value.
     ///
@@ -520,7 +522,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeRecordSet(gnash::Network::byte_t *data, size_t size);
+    Element &makeRecordSet(boost::uint8_t *data);
     
     /// \brief Make this Element a Property with a Date as the value.
     ///
@@ -532,7 +534,8 @@ public:
     /// @param data A real pointer to the raw data to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeDate(gnash::Network::byte_t *data);
+    Element &makeDate(boost::uint8_t *data);
+    Element &makeDate(double data);
     
     /// \brief Make this Element a Property with an Unsupported value.
     ///
@@ -546,7 +549,7 @@ public:
     /// @param size The number of bytes to use as the value.
     ///
     /// @return A reference to this Element.
-    Element &makeUnsupported(gnash::Network::byte_t *data, size_t size);
+    Element &makeUnsupported(boost::uint8_t *data);
     
     /// \brief Test equivalance against another Element.
     ///		This compares all the data and the data type in the
@@ -626,7 +629,8 @@ public:
     /// \brief Cast the data in this Element to an real pointer to data.
     ///
     /// @return A real pointer to the base address of the raw data in memory.
-    gnash::Network::byte_t *to_reference();
+    boost::uint8_t *to_reference();
+    const boost::uint8_t *to_reference() const;
 
     // Manipulate the name of a property
 
@@ -634,7 +638,7 @@ public:
     ///		Only top level Objects or properties have a name.
     ///
     /// @return The size of the name string.
-    size_t getNameSize();
+    size_t getNameSize() const;
     
     /// \brief Get the name of this Element.
     ///		Only top level Objects or properties have a name.
@@ -662,7 +666,7 @@ public:
     /// @return nothing.
     ///
     /// @remarks This add a NULL string terminator so the name can be printed.
-    void setName(gnash::Network::byte_t *name, size_t size);
+    void setName(boost::uint8_t *name, size_t size);
 
     // Manipulate the children Elements of an object
 
@@ -716,9 +720,12 @@ public:
     ///
     /// @remarks This is only intended to be used for testing and
     ///		debugging purposes.
-    std::vector<boost::shared_ptr<Element> > getProperties()
+    std::vector<boost::shared_ptr<Element> > getProperties() const
 			{ return _properties; };
-    
+
+    size_t calculateSize();
+    size_t calculateSize(amf::Element &el) const;
+
     ///  \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
     void dump() const { dump(std::cerr); }
@@ -744,7 +751,7 @@ private:
     /// \var _buffer
     ///		A smart pointer to the Buffer used to hold the data
     ///		for this Element.
-    boost::shared_ptr<Buffer> _buffer;
+    boost::shared_ptr<amf::Buffer> _buffer;
 
     /// \var _type
     ///		The AMF0 data type of this Element.

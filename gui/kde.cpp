@@ -25,13 +25,13 @@
 #include <qwidget.h>
 #include <qmessagebox.h>
 #include <qcursor.h>
-#ifdef HAVE_KDE
+#ifdef HAVE_KDE3
 #include <qxembed.h>
 #endif
 #include <qnamespace.h>
 #include <qtimer.h>
 #include <qcursor.h>
-#if GNASH_QT_VERSION > 2
+#if HAVE_QT3
 #include <qeventloop.h>
 #endif
 #include "Range2d.h"
@@ -42,7 +42,7 @@
 
 #include "gui.h"
 #include "kdesup.h"
-#include "klash.moc"
+#include "klash3.moc"
 #include "utility.h" // for PIXELS_TO_TWIPS 
 
 using namespace std;
@@ -67,7 +67,7 @@ KdeGui::init(int argc, char **argv[])
 //    GNASH_REPORT_FUNCTION;
     _qapp.reset(new QApplication(argc, *argv));
     _qwidget.reset(new qwidget(this)); 
-#ifdef HAVE_KDE
+#ifdef HAVE_KDE3
     if (_xid) {
         QXEmbed::initialize();
         QXEmbed::embedClientIntoWindow(_qwidget.get(), _xid);

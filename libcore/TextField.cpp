@@ -38,10 +38,10 @@
 #include "fontlib.h" // for searching or adding fonts the _font member
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
-#include "array.h" // for _listeners construction
+#include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
-#include "TextFormat.h" // for getTextFormat/setTextFormat
+#include "TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
 
@@ -154,7 +154,8 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
     _selectable(!def.noSelect()),
     _autoSize(autoSizeNone),
     _type(def.readOnly() ? typeDynamic : typeInput),
-    _bounds(def.get_bound())
+    _bounds(def.get_bound()),
+    _selection(0, 0)
 {
 
     // WARNING! remember to set the font *before* setting text value!
@@ -210,7 +211,8 @@ TextField::TextField(character* parent, const rect& bounds)
     _selectable(true),
     _autoSize(autoSizeNone),
     _type(typeDynamic),
-    _bounds(bounds)
+    _bounds(bounds),
+    _selection(0, 0)
 {
     // Use the default font (Times New Roman for Windows, Times for Mac
     // according to docs. They don't say what it is for Linux.
@@ -248,15 +250,6 @@ TextField::init()
 
 TextField::~TextField()
 {
-}
-
-bool
-TextField::unload()
-{
-    // TODO: unregisterTextVariable() ?
-    on_event(event_id::KILLFOCUS);
-
-    return character::unload(); 
 }
 
 void
@@ -387,21 +380,38 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
     ranges.add( bounds.getRange() );            
 }
 
+void
+TextField::setSelection(int start, int end)
+{
+
+    if (_text.empty()) {
+        _selection = std::make_pair(0, 0);
+        return;
+    }
+
+    const size_t textLength = _text.size();
+
+    if (start < 0) start = 0;
+    else start = std::min<size_t>(start, textLength);
+
+    if (end < 0) end = 0;
+    else end = std::min<size_t>(end, textLength);
+
+    // The cursor position is always set to the end value, even if the
+    // two values are swapped to obtain the selection. Equal values are
+    // fine.
+    m_cursor = end;
+    if (start > end) std::swap(start, end);
+
+    _selection = std::make_pair(start, end);
+}
 bool
-TextField::on_event(const event_id& id)
+TextField::on_event(const event_id& ev)
 {
     if (isReadOnly()) return false;
 
-    switch (id.m_id)
+    switch (ev.id())
     {
-        case event_id::SETFOCUS:
-            setFocus();
-            break;
-
-        case event_id::KILLFOCUS:
-            killFocus();
-            break;
-
         case event_id::KEY_PRESS:
         {
             if ( getType() != typeInput ) break; // not an input field
@@ -415,7 +425,7 @@ TextField::on_event(const event_id& id)
             // stored and displayed. See utf.h for more information.
             // This is a limit on the number of key codes, not on the
             // capacity of strings.
-            gnash::key::code c = id.keyCode;
+            gnash::key::code c = ev.keyCode();
 
             // maybe _text is changed in ActionScript
             m_cursor = std::min<size_t>(m_cursor, _text.size());
@@ -493,7 +503,7 @@ character*
 TextField::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
 
-    if (!get_visible()) return NULL;
+    if (!isVisible()) return 0;
     
     // shouldn't this be !can_handle_mouse_event() instead ?
     // not selectable, so don't catch mouse events!
@@ -761,7 +771,7 @@ TextField::get_member(string_table::key name, as_value* val,
         break;
     case NSV::PROP_uVISIBLE:
     {
-        val->set_bool(get_visible());
+        val->set_bool(isVisible());
         return true;
     }
     case NSV::PROP_uALPHA:
@@ -1820,7 +1830,7 @@ TextField::autoSizeValueName(AutoSizeValue val)
 TextField::TypeValue
 TextField::parseTypeValue(const std::string& val)
 {
-    StringNoCaseLessThen cmp;
+    StringNoCaseLessThan cmp;
 
     if ( ! cmp(val, "input") )
     {
@@ -1882,24 +1892,17 @@ TextField::onChanged()
     callMethod(NSV::PROP_BROADCAST_MESSAGE, met, targetVal);
 }
 
-void
-TextField::onSetFocus()
+/// This is called by movie_root when focus is applied to this TextField.
+//
+/// The return value is true if the TextField can recieve focus.
+bool
+TextField::handleFocus()
 {
-    callMethod(NSV::PROP_ON_SET_FOCUS);
-}
-
-void
-TextField::onKillFocus()
-{
-    callMethod(NSV::PROP_ON_KILL_FOCUS);
-}
-
-void
-TextField::setFocus()
-{
-    if ( m_has_focus ) return; // nothing to do
 
     set_invalidated();
+
+    /// Select the entire text on focus.
+    setSelection(0, _text.length());
 
     m_has_focus = true;
 
@@ -1909,25 +1912,23 @@ TextField::setFocus()
 
     m_cursor = _text.size();
     format_text();
-
-    onSetFocus();
+    return true;
 }
 
+/// This is called by movie_root when focus is removed from the
+/// current TextField.
 void
 TextField::killFocus()
 {
     if ( ! m_has_focus ) return; // nothing to do
 
     set_invalidated();
-
     m_has_focus = false;
 
     movie_root& root = _vm.getRoot();
-    root.setFocus(NULL);
     root.remove_key_listener(this);
     format_text(); // is this needed ?
 
-    onKillFocus();
 }
 
 void
@@ -2275,7 +2276,6 @@ textfield_autoSize(const fn_call& fn)
         {
             std::string strval = arg.to_string();
             TextField::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
-            //log_debug("%s => %d", strval, val);
             ptr->setAutoSize( val );
         }
     }
@@ -2379,7 +2379,7 @@ textfield_getTextFormat(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
-    boost::intrusive_ptr<TextFormat> tf = new TextFormat();
+    boost::intrusive_ptr<TextFormat_as> tf = new TextFormat_as;
     tf->alignSet(text->getTextAlignment());
     tf->sizeSet(text->getFontHeight());
     tf->indentSet(text->getIndent());
@@ -2442,7 +2442,7 @@ textfield_setTextFormat(const fn_call& fn)
         return as_value();
     }
 
-    TextFormat* tf = dynamic_cast<TextFormat*>(obj);
+    TextFormat_as* tf = dynamic_cast<TextFormat_as*>(obj);
     if ( ! tf )
     {
         IF_VERBOSE_ASCODING_ERRORS(

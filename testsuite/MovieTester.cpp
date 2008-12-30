@@ -240,10 +240,24 @@ MovieTester::advanceClock(unsigned long ms)
     // That is 44100 samples each second.
     // 44100/1000 = x/ms
     //  x = (44100*ms) / 1000
-    unsigned int nSamples = (44100*ms) / 1000;
-    log_debug("advanceClock(%d) needs to fetch %d samples", ms, nSamples);
-    boost::scoped_array<boost::int16_t> samples(new boost::int16_t[nSamples]);
-    _sound_handler->fetchSamples(samples.get(), nSamples);
+    unsigned int nSamples = (441*ms) / 10;
+    if ( ms%10 )
+    {
+        log_error("MovieTester::advanceClock: %d ms lost in sound advancement",
+            ms%10);
+    }
+
+    unsigned int toFetch = nSamples*2;
+
+    log_debug("advanceClock(%d) needs to fetch %d samples", ms, toFetch);
+
+    boost::int16_t samples[1024];
+    while (toFetch)
+    {
+        unsigned int n = std::min(toFetch, 1024u);
+        _sound_handler->fetchSamples((boost::int16_t*)&samples, n);
+        toFetch -= n;
+    }
     
 }
 

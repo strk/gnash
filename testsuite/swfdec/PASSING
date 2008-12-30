@@ -111,6 +111,7 @@ BlurFilter-construct-6.swf:9f183e7e0a35fbe488aa7c447dced20c
 BlurFilter-construct-7.swf:c38a6f916e3bc1a0141c9c78d23e0aa0
 blur-filter-properties-5.swf:4c29ecc04df379ced45039fdbb79eb9c
 blur-filter-properties-5.swf:f2e1d9ccc47765bd6c88095b19974c7b
+boolean-6.swf:5bd542a9133a3abd9a2c7bcd960e816b
 boolean-7.swf:4124413f55f405ad865a05403bc24662
 boolean-8.swf:c3c872988d25c8e49c11e5e337ea1e69
 boolean-properties-5.swf:d955b32271cf8a073de42566eb13a5d8
@@ -489,6 +490,7 @@ height1.swf:245da260d32dbc48a5f38566ee70171b
 height3.swf:2b7547493377ae1c0163c8273a4073f7
 height4.swf:8d36c180d196b49608f996db21a421bc
 if-5.swf:002715aadbca3abb464937342f878c74
+if-6.swf:5614cb54434514d009899dd41eadb610
 if-7.swf:18727241da6944c4f0127262353ab1c4
 implements-5.swf:92a657f3a89add44b1dd4f0e30632bc8
 implements-6.swf:280cde1bf92ae5c9358f30ae96e72016
@@ -524,6 +526,9 @@ loadobject-addrequestheader-7.swf:08fa4107345b54263b0df3aae95d9d8b
 loadobject-addrequestheader-8.swf:50ab764a31bff4a679a86e48d7000343
 loadvariables-5.swf:a24997be9ca59d8da2216f9527d0279a
 loadvars-5.swf:378a93e3fc7821a72f61332dcfa6cbf7
+local-connection-properties-6.swf:396dc9cb0b3a2228c835f2ac284116b5
+local-connection-properties-7.swf:cea39463c752388d55e00442b6c24e35
+local-connection-properties-8.swf:8181bc0d301a99df5bc3e20766a35c83
 local.swf:12135ef5103f1b0dcc428308511b9c07
 localToGlobal-propflags-5.swf:1c41fae7e9e502de76847c85e938d1a0
 localToGlobal-propflags-5.swf:bd4fb466f06dca96b047fc6b74083203
@@ -618,6 +623,7 @@ native-run-5.swf:fb576230e006ef1db800c6539df10a9e
 native-run-6.swf:fe6847111ffbbb1822c02af05448351b
 native-run-7.swf:597e61a37f11873f92e5f8147a186b92
 native-run-8.swf:4146625b4f8fef9926a324e8de306ead
+netconnection.swf:691d140eb395ca4094119c24ee9028d5
 netstream-fscommand-6.swf:7151ee0808f01d502171c4813d38d3fa
 netstream-fscommand-7.swf:ec9312835ba2e8a7347252bcaef7db0b
 netstream-fscommand-8.swf:38f05e4f8d3a4e2faae0ef9e18e7754b
@@ -914,7 +920,18 @@ scope-chain-with-and-scope-chain-6.swf:86bc3cec2ee04706be498f50cd17f5b1
 scope-chain-with-and-scope-chain-7.swf:6287e166df07684fc7b55fb19925280f
 scope-chain-with-and-scope-chain-8.swf:7185d1d16490d2daf41bb1fc444e5fd3
 scope.swf:09ecbb50f2ac03ebf401a1511d4b1334
+selection-focus-5.swf:70e26fec0c60ddb355392e873dd9363c
+selection-focus-6.swf:afb6fc45177ed23a3a862792a65d572a
+selection-focus-7.swf:a921151f59ae6746acfce846b2408111
+selection-focus-8.swf:65fed7eea65afbacd0ea030ac4799ce7
 selection-focus-events-5.swf:03ef025ff52765706b0154b972fce288
+selection-focus-events-6.swf:86fa669229be638ee97fe05b0f1dd6eb
+selection-focus-events-7.swf:19a92006c9abb7cce4780990db11a7a2
+selection-focus-events-8.swf:9d12f99e115d9f11bb65b7e8a8363b69
+selection-setFocus-textfields-5.swf:2caede2dd8e2f964bb61828ed26c4d28
+selection-setFocus-textfields-6.swf:77ced014dd1b15624cdfb77538b13631
+selection-setFocus-textfields-7.swf:f891bcaf4fa3b8ce7d0d22140e7674fb
+selection-setFocus-textfields-8.swf:fe44c7768eda9e43fc60210cfa2d9354
 setinterval2.swf:f2a17dbddcd0a72a672fbb9a63e0ea5b
 setinterval-arguments.swf:bf5653c905e58846b5a9ee8841c3bcb3
 setinterval-clear.swf:7897b1f201377d65dbffe1ae8182479a
@@ -998,6 +1015,9 @@ string-equals-old-5.swf:e7607dd394339e9f2f7d2480d08b21fe
 string-equals-old-6.swf:844e29987eed887d1544e1fbe6f60fa7
 string-equals-old-7.swf:bdcdb87e9b4458b6935e97f4f2714bf3
 string-equals-old-8.swf:3d1bb9216c301b464060f39b2be1eb41
+string-fake-5.swf:bb9f63e0726197e7ed3fc318f30acd1c
+string-fake-6.swf:586770ef07ba221bf025ba2dc182d352
+string-fake-7.swf:905bc581e468d939900f55564f82a8fc
 string-greater-5.swf:65006df9c02e79df2da9cc21307b7438
 string-greater-6.swf:7be0cfe46fbe3cb5275a2291b7606d8d
 string-greater-7.swf:939e14e917b0f0cce6bd7b2dd69c1c7f
@@ -1158,9 +1178,11 @@ undefinedtrace-v6.swf:
 undefinedtrace-v7.swf:
 undefinedtrace-v8.swf:
 unloadmovie-simple-5.swf:3b897f539cb7eb764692def6fcc62853
+video-enumerate.swf:5eced177f03fc88bccb99f0acd2d2f7d
 video-properties-6.swf:95109f25a5cac0fe2d18628dcea22633
 video-properties-7.swf:64f07e267ae93cdefec5c51c3fc9981d
 video-properties-8.swf:389ff730a73ec2c24f107abe9de0fa61
+waitforframe-huge-4.swf:6efc9f15d7945f38c23ede5f28dbbaed
 with-delete-5.swf:e4db8598315a7f70785e7e96af7f3c3f
 with-delete-6.swf:49de7093280168a4013377eaf7753fa0
 with-delete-7.swf:f7668d30827a77f415ec325f052125c6
@@ -1176,6 +1198,9 @@ with-prototypes-7.swf:20f1f3b8905c8a3f3a61cb18e7e59e76
 xml-cdata-6.swf:d7559375e07591033d7739671a8c4d42
 xml-cdata-7.swf:5e51dafbe7f6af8206041ecabf0016f8
 xml-cdata-8.swf:d5537f4fb83eaf49d615eecb89b2ae95
+xml-escape-6.swf:302349505514bd60239c7019355f6ab8
+xml-escape-7.swf:31cca7515723685cf0384bf7e059e8ac
+xml-escape-8.swf:cbd1f724a3dc3e73697535468443171d
 xml-init-5.swf:2ba1da174f2b1958749fede5667a60c4
 xml-init-5.swf:bb54cac64e38396084a147266f7d9711
 xml-node-init-5.swf:12fd3762a2bfa787b01fc0b8abfaa492

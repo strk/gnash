@@ -44,8 +44,11 @@
 using namespace std;
 using namespace gnash;
 
+/// \namespace cygnal
+///	This namespace is for all the Cygnal specific classes.
 namespace cygnal {
 
+/// \brief Return the default instance of RC file,
 CRcInitFile&
 CRcInitFile::getDefaultInstance()
 {
@@ -55,7 +58,13 @@ CRcInitFile::getDefaultInstance()
 	return crcfile;
 }
 
-CRcInitFile::CRcInitFile() : _port_offset(0)
+CRcInitFile::CRcInitFile()
+    : _port_offset(0),
+      _testing(false),
+      _threading(false),
+      _fdthread(100),
+      _netdebug(false),
+      _admin(false)
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
@@ -67,7 +76,12 @@ CRcInitFile::~CRcInitFile()
 //    GNASH_REPORT_FUNCTION;    
 }
 
-// Look for a config file in the likely places.
+/// \brief Load all the configuration files.
+///	This includes parsing the default .gnashrc file for
+///	Gnash settings that control the swf parser and virtual
+///	machine. These setting can be overridden in the
+///	.cygnalrc file, plus the Cygnal specific file has
+///	options only used by Cygnal.
 bool
 CRcInitFile::loadFiles()
 {
@@ -99,8 +113,11 @@ CRcInitFile::loadFiles()
     return false;
 }
 
-
-// Parse the config file and set the variables.
+/// \brief Parse and load configuration file
+///
+/// @param filespec The path and file name of the disk file to parse.
+///
+/// @return True if the file was parsed sucessfully, false if not.
 bool
 CRcInitFile::parseFile(const std::string& filespec)
 {
@@ -170,15 +187,32 @@ CRcInitFile::parseFile(const std::string& filespec)
             }
 
             bool test;
+            bool threads;
+	    bool netdebug;
+	    bool admin;
             uint32_t num;
 
+            // Get the standard options inherited froom Gnash's config file
             if ( extractSetting(test, "actionDump", variable, value) )
                 useParserDump(test);
             else if ( extractSetting(test, "parserDump", variable, value) )
                 useActionDump(test);
             else if ( extractNumber(num, "verbosity", variable, value) )
                 verbosityLevel(num);
-            else extractNumber((uint32_t&)_port_offset, "portOffset", variable, value);
+
+            // Get the options specific to Cygnal's config file.
+            else if ( extractSetting(admin, "admin", variable, value) )
+                setAdminFlag(admin);
+            else if ( extractSetting(netdebug, "netdebug", variable, value) )
+                setNetDebugFlag(netdebug);
+            else if ( extractSetting(test, "testing", variable, value) )
+                setTestingFlag(test);
+            else if ( extractSetting(threads, "threading", variable, value) )
+                setThreadingFlag(threads);
+	    else if (extractNumber(num, "fdThread", variable, value) )
+		setFDThread(num);
+            else if (extractNumber(num, "portOffset", variable, value) )
+		setPortOffset(num);;
 
         } while (!in.eof());
 
@@ -196,13 +230,32 @@ CRcInitFile::parseFile(const std::string& filespec)
     return true;
 }
 
+/// \brief Dump the internal data of this class in a human readable form.
+/// @remarks This should only be used for debugging purposes.
 void
-CRcInitFile::dump()
+CRcInitFile::dump(std::ostream& os) const
 {
     cerr << endl << "Dump CRcInitFile:" << endl;
+    cerr << "\tVerbosity Level: " << _verbosity << endl;
+    cerr << "\tDump ActionScript processing: "
+         << ((_actionDump)?"enabled":"disabled") << endl;
+    cerr << "\tDump parser info: "
+         << ((_parserDump)?"enabled":"disabled") << endl;
+    cerr << "\tActionScript coding errors verbosity: "
+         << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
     cerr << "\tPort Offset: " << _port_offset << endl;
+    cerr << "\tThreading support: "
+         << ((_threading)?"enabled":"disabled") << endl;
+    cerr << "\tSpecial Testing output for Gnash: "
+         << ((_testing)?"enabled":"disabled") << endl;
 
-    RcInitFile::dump();
+//    RcInitFile::dump();
 }
 
 } // end of namespace cygnal
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+

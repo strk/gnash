@@ -20,7 +20,7 @@
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2002
 
 #include <cstring>
-#include <memory>		// for auto_ptr
+#include <memory>        // for auto_ptr
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -140,7 +140,7 @@ void ImageRGBA::setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g,
     assert(x < _width);
     assert(y < _height);
 
-    boost::uint8_t*	data = scanline(y) + 4 * x;
+    boost::uint8_t* data = scanline(y) + 4 * x;
 
     data[0] = r;
     data[1] = g;
@@ -149,12 +149,26 @@ void ImageRGBA::setPixel(size_t x, size_t y, boost::uint8_t r, boost::uint8_t g,
 }
 
 
-void ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData, const size_t bufferLength)
+void
+ImageRGBA::mergeAlpha(const boost::uint8_t* alphaData,
+        const size_t bufferLength)
 {
     assert (bufferLength * 4 <= _size);
 
-    for (size_t i = 0; i < bufferLength; i++) {
-        data()[4 * i + 3] = alphaData[i];
+    // Point to the first alpha byte
+    boost::uint8_t* p = data();
+
+    // Set each 4th byte to the correct alpha value and adjust the
+    // other values.
+    for (size_t i = 0; i < bufferLength; ++i, ++alphaData) {
+        *p = std::min(*p, *alphaData);
+        ++p;
+        *p = std::min(*p, *alphaData);
+        ++p;
+        *p = std::min(*p, *alphaData);
+        ++p;
+        *p = *alphaData;
+        ++p;
     }
 }
 
@@ -291,7 +305,7 @@ std::auto_ptr<ImageRGBA>
 ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 {
 
-    std::auto_ptr<ImageRGBA> im(NULL);
+    std::auto_ptr<ImageRGBA> im;
 
     // Calling with headerBytes as 0 has a special effect...
     std::auto_ptr<JpegImageInput> j_in(
@@ -302,17 +316,19 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 
     j_in->read();
 
-    im.reset(new ImageRGBA(j_in->getWidth(), j_in->getHeight()));
+    const size_t height = j_in->getHeight();
+    const size_t width = j_in->getWidth();
 
-    boost::scoped_array<boost::uint8_t> line (
-            new boost::uint8_t[3 * j_in->getWidth()]);
+    im.reset(new ImageRGBA(width, height));
 
-    for (size_t y = 0; y < j_in->getHeight(); y++) 
+    boost::scoped_array<boost::uint8_t> line(new boost::uint8_t[3 * width]);
+
+    for (size_t y = 0; y < height; ++y) 
     {
         j_in->readScanline(line.get());
 
-        boost::uint8_t*	data = im->scanline(y);
-        for (size_t x = 0; x < j_in->getWidth(); x++) 
+        boost::uint8_t* data = im->scanline(y);
+        for (size_t x = 0; x < width; ++x) 
         {
             data[4*x+0] = line[3*x+0];
             data[4*x+1] = line[3*x+1];
@@ -326,9 +342,3 @@ ImageInput::readSWFJpeg3(boost::shared_ptr<IOChannel> in)
 
 } // namespace gnash
 
-// Local Variables:
-// mode: C++
-// c-basic-offset: 8 
-// tab-width: 8
-// indent-tabs-mode: t
-// End:

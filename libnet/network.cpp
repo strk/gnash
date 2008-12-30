@@ -14,15 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
+//xs
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
 #include <boost/thread/mutex.hpp>
-# include "GnashSystemIOHeaders.h" // read()
-
+#include <boost/shared_ptr.hpp>
+#include <vector>
 
 #include "utility.h"
 #include "log.h"
@@ -41,6 +41,7 @@
 # include <ws2tcpip.h>
 #else
 # include <sys/time.h>
+# include <unistd.h>
 # include <sys/select.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
@@ -49,9 +50,18 @@
 # include <netdb.h>
 # include <sys/param.h>
 # include <sys/select.h>
+#include <signal.h>
+#ifdef HAVE_POLL
+# include <poll.h>
+#else 
+# ifdef HAVE_EPOLL
+#  include <epoll.h>
+# endif
+#endif
 #endif
 
 #include "buffer.h"
+#include "GnashException.h"
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
@@ -59,6 +69,8 @@
 
 using namespace std;
 
+/// \namespace gnash
+///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
 
 static const char *DEFAULTPROTO = "tcp";
@@ -67,6 +79,10 @@ static const short DEFAULTPORT  = RTMP_PORT;
 #ifndef INADDR_NONE
 #define INADDR_NONE  0xffffffff
 #endif
+
+static void cntrlc_handler(int sig);
+// this is set when we get a signal during a pselect() or ppoll()
+static int  sig_number = 0;
 
 Network::Network()
 	:
@@ -247,12 +263,11 @@ Network::newConnection(bool block)
 int
 Network::newConnection(bool block, int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct sockaddr	newfsin;
     socklen_t		alen;
     int			ret;
-    struct timeval        tval;
     fd_set                fdset;
     int                   retries = 3;
 
@@ -265,6 +280,17 @@ Network::newConnection(bool block, int fd)
 	log_debug(_("Trying to accept net traffic on fd #%d for port %d"), fd, _port);
     }
 
+#ifdef HAVE_PSELECT
+	struct timespec tval;
+	sigset_t sigset, blockset, pending;
+	sigemptyset(&blockset);        
+//        sigaddset(&blockset, SIGINT); /* Block SIGINT */
+        sigaddset(&blockset, SIGPIPE); /* Block SIGPIPE */
+	sigprocmask(SIG_BLOCK, &blockset, &sigset);
+#else
+	struct timeval tval;
+#endif
+	
     while (retries--) {
         // We use select to wait for the read file descriptor to be
         // active, which means there is a client waiting to connect.
@@ -277,22 +303,45 @@ Network::newConnection(bool block, int fd)
 
         // Reset the timeout value, since select modifies it on return. To
         // block, set the timeout to zero.
+#ifdef HAVE_PSELECT
+	tval.tv_sec = _timeout;
+	tval.tv_nsec = 0;
+        if (block) {
+	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &blockset);
+	} else {
+	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
+	}
+	if (sig_number) {
+	    log_debug("Have a SIGINT interupt waiting!");
+	}
+	sigpending(&pending);
+	if (sigismember(&pending, SIGINT)) {
+	    log_debug("Have a pending SIGINT interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
+	}
+	if (sigismember(&pending, SIGPIPE)) {
+	    log_debug("Have a pending SIGPIPE interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
+	}
+#else
         tval.tv_sec = 1;
         tval.tv_usec = 0;
-
         if (block) {
             ret = select(fd+1, &fdset, NULL, NULL, NULL);
         } else {
             ret = select(fd+1, &fdset, NULL, NULL, &tval);
         }
+#endif
 
         if (FD_ISSET(0, &fdset)) {
 	    if (_debug) {
-		log_debug(_("There is data at the console for stdin"));
+		log_debug(_("There is a new network connection request."));
 	    }
             return 1;
         }
-
+	
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
             log_debug(_("The accept() socket for fd #%d was interupted by a system call"), fd);
@@ -308,6 +357,7 @@ Network::newConnection(bool block, int fd)
                 log_debug(_("The accept() socket for fd #%d timed out waiting to write"), fd);
             }
         }
+	
     }
 
 #ifndef HAVE_WINSOCK_H
@@ -460,7 +510,7 @@ Network::createClient(const string &hostname)
 bool
 Network::createClient(const string &hostname, short port)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     struct sockaddr_in  sock_in;
     fd_set              fdset;
@@ -594,7 +644,7 @@ Network::createClient(const string &hostname, short port)
 bool
 Network::closeNet()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if ((_sockfd > 0) && (_connected)) {
         closeNet(_sockfd);
@@ -608,7 +658,7 @@ Network::closeNet()
 bool
 Network::closeNet(int sockfd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int retries = 0;
 
@@ -649,7 +699,7 @@ Network::closeNet(int sockfd)
 #endif
                 retries++;
             } else {
-		log_debug(_("Closed the socket on fd #%d for port %d"), sockfd, _port);
+		log_debug(_("Closed the socket on fd #%d"), sockfd);
                 return true;
             }
         }
@@ -674,7 +724,7 @@ Network::closeConnection(void)
 bool
 Network::closeConnection(int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (fd > 0) {
         ::close(fd);
@@ -685,55 +735,85 @@ Network::closeConnection(int fd)
     return false;
 }
 
-amf::Buffer *
+boost::shared_ptr<amf::Buffer>
 Network::readNet()
 {
 //    GNASH_REPORT_FUNCTION;
-
-    amf::Buffer *buffer = new amf::Buffer;
-    int nbytes = readNet(buffer);
-    if (nbytes > 0) {
-	buffer->resize(nbytes);
-	return buffer;
+    boost::shared_ptr<amf::Buffer> buffer(new amf::Buffer);
+    int ret = readNet(*buffer);
+    if (ret > 0) {
+	buffer->resize(ret);
     }
-
-    return 0;
+    return buffer;
 }
 
 // Read from the connection
 int
-Network::readNet(amf::Buffer *buffer)
+Network::readNet(int fd, amf::Buffer &buffer)
 {
-//    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer->reference(), buffer->size(), _timeout);
+    int ret = readNet(fd, buffer.reference(), buffer.size(), _timeout);
+    if (ret > 0) {
+	buffer.resize(ret);
+    }
+
+    return ret;
 }
 
 int
-Network::readNet(amf::Buffer *buffer, int timeout)
+Network::readNet(amf::Buffer &buffer)
 {
 //    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer->reference(), buffer->size(), timeout);
+    int ret = readNet(_sockfd, buffer, _timeout);
+
+    return ret;
 }
 
 int
-Network::readNet(byte_t *buffer, int nbytes)
+Network::readNet(amf::Buffer &buffer, int timeout)
 {
 //    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer, nbytes, _timeout);
+    int ret = readNet(_sockfd, buffer.reference(), buffer.size(), timeout);
+    if (ret > 0) {
+	buffer.resize(ret);	// FIXME: why does this corrupt
+    }
+
+    return ret;
 }
 
 int
-Network::readNet(byte_t *buffer, int nbytes, int timeout)
+Network::readNet(int fd, amf::Buffer &buffer, int timeout)
 {
-//    GNASH_REPORT_FUNCTION;
-    return readNet(_sockfd, buffer, nbytes, timeout);
+    GNASH_REPORT_FUNCTION;
+    int ret = readNet(fd, buffer.reference(), buffer.size(), timeout);
+    buffer.setSeekPointer(ret);
+#if 0
+    if (ret > 0) {
+	buffer.resize(ret);	// FIXME: why does this corrupt
+    }
+#endif
+    
+    return ret;
 }
 
 int
-Network::readNet(int fd, byte_t *buffer, int nbytes)
+Network::readNet(byte_t *data, int nbytes)
 {
 //    GNASH_REPORT_FUNCTION;
-    return readNet(fd, buffer, nbytes, _timeout);
+    return readNet(_sockfd, data, nbytes, _timeout);
+}
+
+int
+Network::readNet(byte_t *data, int nbytes, int timeout)
+{
+//    GNASH_REPORT_FUNCTION;
+    return readNet(_sockfd, data, nbytes, timeout);
+}
+
+int
+Network::readNet(int fd, byte_t *data, int nbytes)
+{
+//    GNASH_REPORT_FUNCTION;
+    return readNet(fd, data, nbytes, _timeout);
 }
 
 int
@@ -743,7 +823,6 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 
     fd_set              fdset;
     int                 ret = -1;
-    struct timeval      tval;
 
     if (_debug) {
 	log_debug (_("Trying to read %d bytes from fd #%d"), nbytes, fd);
@@ -760,27 +839,67 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
+#ifdef HAVE_PSELECT
+	struct timespec tval;
+	sigset_t pending, blockset;
+	sigemptyset(&blockset);        
+        // sigaddset(&blockset, SIGINT); /* Block SIGINT */
+//        sigaddset(&blockset, SIGPIPE); /* Block SIGPIPE */
+        sigprocmask(SIG_BLOCK, &blockset, NULL);
+
+	// Trap ^C (SIGINT) so we can kill all the threads
+// 	struct sigaction  act;
+// 	act.sa_handler = cntrlc_handler;
+// 	act.sa_flags = 0;
+// 	sigemptyset(&act.sa_mask);
+// 	sigaction (SIGINT, &act, NULL);
+#else
+	struct timeval tval;
+#endif
         if (timeout == 0) {
+#ifdef HAVE_PSELECT
+	    ret = pselect(fd+1, &fdset, NULL, NULL, NULL, &blockset);
+#else
 	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
+#endif
 	} else {	
+#ifdef HAVE_PSELECT
+	    tval.tv_sec = timeout;
+	    tval.tv_nsec = 0;
+	    ret = pselect(fd+1, &fdset, NULL, NULL, &tval, &blockset);
+	    sigpending(&pending);
+	    if (sigismember(&pending, SIGINT)) {
+		log_debug("Have a pending SIGINT interupt waiting!");
+		int sig;
+		sigwait(&blockset, &sig);
+		cntrlc_handler(SIGINT);
+	    }
+	    if (sigismember(&pending, SIGPIPE)) {
+		log_debug("Have a pending SIGPIPE interupt waiting!");
+		int sig;
+		sigwait(&blockset, &sig);
+		cntrlc_handler(SIGINT);
+	    }
+#else
 	    tval.tv_sec = timeout;
 	    tval.tv_usec = 0;
 	    ret = select(fd+1, &fdset, NULL, NULL, &tval);
+#endif
 	}
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_error (_("The socket for fd %d was interupted by a system call"), fd);
+            log_error (_("The socket for fd #%d was interupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            log_error (_("The socket for fd %d was never available for reading"), fd);
+            log_error (_("The socket for fd #%d was never available for reading"), fd);
             return -1;
         }
 
         if (ret == 0) {
 	    if (_debug) {
-		log_debug (_("The socket for fd %d timed out waiting to read"), fd);
+		log_debug (_("The socket for #fd %d timed out waiting to read"), fd);
 	    }
             return 0;
         }
@@ -792,11 +911,11 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 	}
 	
 	if (_debug) {
-	    log_debug (_("read %d bytes from fd %d from port %d"), ret, fd, _port);
+	    log_debug (_("read %d bytes from fd #%d from port %d"), ret, fd, _port);
 	}
 #if 0
 	if (ret) {
-	    log_debug (_("%s: Read packet data from fd %d (%d bytes): \n%s"),
+	    log_debug (_("%s: Read packet data from fd #%d (%d bytes): \n%s"),
 		       __FUNCTION__, fd, ret, hexify(buffer, ret, true));
 	}
 #endif    
@@ -810,19 +929,44 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
 int
 Network::writeNet(amf::Buffer *buffer)
 {
-    return writeNet(buffer->reference(), buffer->size());
+//    GNASH_REPORT_FUNCTION;
+    return writeNet(buffer->reference(), buffer->allocated());
 };
 
 int
-Network::writeNet(const std::string& buffer)
+Network::writeNet(int fd, amf::Buffer *buffer)
 {
-    return writeNet(reinterpret_cast<const byte_t *>(buffer.c_str()), buffer.size());
+//    GNASH_REPORT_FUNCTION;
+    return writeNet(fd, buffer->reference(), buffer->allocated());
+};
+
+// Write to the connection
+int
+Network::writeNet(amf::Buffer &buffer)
+{
+//    GNASH_REPORT_FUNCTION;
+    return writeNet(buffer.reference(), buffer.allocated());
+};
+
+// Write to the connection
+int
+Network::writeNet(int fd, amf::Buffer &buffer)
+{
+//    GNASH_REPORT_FUNCTION;
+    return writeNet(fd, buffer.reference(), buffer.allocated());
+};
+
+int
+Network::writeNet(const std::string& data)
+{
+//    GNASH_REPORT_FUNCTION;
+    return writeNet(reinterpret_cast<const byte_t *>(data.c_str()), data.size());
 }
 
 int
-Network::writeNet(const byte_t *buffer, int nbytes)
+Network::writeNet(const byte_t *data, int nbytes)
 {
-    return writeNet(_sockfd, buffer, nbytes, _timeout);
+    return writeNet(_sockfd, data, nbytes, _timeout);
 }
 
 // int
@@ -838,9 +982,9 @@ Network::writeNet(const byte_t *buffer, int nbytes)
 // }
 
 int
-Network::writeNet(int fd, const byte_t *buffer, int nbytes)
+Network::writeNet(int fd, const byte_t *data, int nbytes)
 {
-    return writeNet(fd, buffer, nbytes, _timeout);
+    return writeNet(fd, data, nbytes, _timeout);
 }
 
 int
@@ -848,7 +992,6 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 {
     fd_set              fdset;
     int                 ret = -1;
-    struct timeval      tval;
 
     // We need a writable, and not const point for byte arithmetic.
     byte_t *bufptr = const_cast<byte_t *>(buffer);
@@ -864,37 +1007,60 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
+#ifdef HAVE_PSELECT
+	struct timespec tval;
+	sigset_t pending, blockset;
+	sigemptyset(&blockset);        
+        // sigaddset(&blockset, SIGINT); /* Block SIGINT */
+        sigaddset(&blockset, SIGPIPE);
+        sigprocmask(SIG_BLOCK, &blockset, NULL);
+#else
+	struct timeval tval;
+#endif
         // Reset the timeout value, since select modifies it on return
         if (timeout <= 0) {
             timeout = 5;
         }
-        tval.tv_sec = timeout;
+#ifdef HAVE_PSELECT
+	tval.tv_sec = timeout;
+	tval.tv_nsec = 0;
+	ret = pselect(fd+1, NULL, &fdset, NULL, &tval, &blockset);
+	sigpending(&pending);
+	if (sigismember(&pending, SIGINT)) {
+	    log_debug("Have a pending SIGINT interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
+	    cntrlc_handler(SIGINT);
+	}
+#else
+	tval.tv_sec = timeout;
         tval.tv_usec = 0;
         ret = select(fd+1, NULL, &fdset, NULL, &tval);
-
+#endif
+	
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_error (_("The socket for fd %d was interupted by a system call"), fd);
+            log_error (_("The socket for fd #%d was interupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            log_error (_("The socket for fd %d was never available for writing"), fd);
+            log_error (_("The socket for fd #%d was never available for writing"), fd);
         }
 
         if (ret == 0) {
-            log_debug (_("The socket for fd %d timed out waiting to write"), fd);
+            log_debug (_("The socket for fd #%d timed out waiting to write"), fd);
 	    return 0;
         }
 
         ret = write(fd, bufptr, nbytes);
 
         if (ret == 0) {
-            log_error (_("Wrote zero out of %d bytes to fd %d: %s"), 
+            log_error (_("Wrote zero out of %d bytes to fd #%d: %s"), 
 		nbytes, fd, strerror(errno));
             return ret;
         }
         if (ret < 0) {
-            log_error (_("Couldn't write %d bytes to fd %d: %s"), 
+            log_error (_("Couldn't write %d bytes to fd #%d: %s"), 
 		nbytes, fd, strerror(errno));
             return ret;
         }
@@ -902,12 +1068,12 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
             bufptr += ret;
             if (ret != nbytes) {
 		if (_debug) {
-		    log_debug (_("wrote %d bytes to fd %d, expected %d"),
+		    log_debug (_("wrote %d bytes to fd #%d, expected %d"),
 			       ret, fd, nbytes);
 		}
             } else {
 		if (_debug) {
-		    log_debug (_("wrote %d bytes to fd %d for port %d"),
+		    log_debug (_("wrote %d bytes to fd #%d for port %d"),
 			       ret, fd, _port);
 		}
 //                return ret;
@@ -915,7 +1081,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
         }
 #if 0
 	if (ret) {
-	    log_debug (_("%s: Wrote packet data to fd %d: \n%s"),
+	    log_debug (_("%s: Wrote packet data to fd #%d: \n%s"),
 		       __FUNCTION__, fd, hexify(buffer, ret, true));
 	}
 #endif    
@@ -940,18 +1106,301 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 }
 
 void
+Network::addPollFD(struct pollfd &fd, Network::entry_t *func)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    _handlers[fd.fd] = func;
+     _pollfds.push_back(fd);
+//     notify();
+}
+
+void
+Network::addPollFD(struct pollfd &fd)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_debug("%s: adding fd #%d to pollfds", __PRETTY_FUNCTION__, fd.fd);
+    boost::mutex::scoped_lock lock(_poll_mutex);
+     _pollfds.push_back(fd);
+//     notify();
+}
+
+struct pollfd
+&Network::getPollFD(int index)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return _pollfds[index];
+}
+
+struct pollfd *
+Network::getPollFDPtr()
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return &_pollfds[0];
+};
+
+void
+Network::erasePollFD(int fd)
+{
+//    GNASH_REPORT_FUNCTION;
+    log_debug("%s: erasing fd #%d from pollfds", __PRETTY_FUNCTION__, fd);
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    if (_pollfds.size() > 0) {
+	vector<struct pollfd>::iterator it;
+	for (it=_pollfds.begin(); it<_pollfds.end(); it++) {
+	    if ((*it).fd == fd) {
+		_pollfds.erase(it);
+		break;
+	    }
+	}
+    }
+}
+
+void
+Network::erasePollFD(vector<struct pollfd>::iterator &itt)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    if (_pollfds.size() == 1) {
+ 	_pollfds.clear();
+     } else {
+	_pollfds.erase(itt);
+    }
+}
+
+void
+Network::addEntry(int fd, Network::entry_t *func)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    _handlers[fd] = func;
+}
+
+Network::entry_t *
+Network::getEntry(int fd)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::mutex::scoped_lock lock(_poll_mutex);
+    return _handlers[fd];
+}
+
+boost::shared_ptr<std::vector<struct pollfd> >
+Network::waitForNetData(int limit, struct pollfd *fds)
+{
+  //    GNASH_REPORT_FUNCTION;
+
+    boost::shared_ptr<vector<struct pollfd> > hits(new vector<struct pollfd>);
+
+    log_debug("%s: waiting for %d fds", __FUNCTION__, limit);
+
+    if ((fds == 0) || (limit == 0)) {
+	return hits;
+    }
+    
+#ifdef HAVE_PPOLL
+	struct timespec tval;
+	sigset_t pending, emptyset, blockset;
+	sigemptyset(&blockset);         /* Block SIGINT */
+//        sigaddset(&blockset, SIGINT);
+//        sigaddset(&blockset, SIGPIPE);
+        sigprocmask(SIG_BLOCK, &blockset, NULL);
+
+	tval.tv_sec = 5; // FIXME: was _timeout;
+	tval.tv_nsec = 0;
+	int ret = ppoll(fds, limit, &tval, &blockset);
+	sigpending(&pending);
+	if (sigismember(&pending, SIGINT)) {
+	    log_debug("Have a pending SIGINT interupt waiting!");
+	    int sig;
+	    sigwait(&blockset, &sig);
+	}
+#else
+	int ret = poll(fds, limit, _timeout);
+#endif
+
+    log_debug("Poll returned: %d, timeout is: %d", ret, _timeout);
+
+    while (ret--) {
+	for (int i = 0; i<limit; i++) {
+	    // If we get this event, the other end of the connection has been shut down
+#if 0
+	    if (fds[i].revents &POLLPRI ) {
+		log_debug("%s: Revents has a POLLPRI  set 0x%x for fd #%d",
+			  __FUNCTION__, fds[i].revents, fds[i].fd);
+	    }
+	    if (fds[i].revents & POLLRDNORM) {
+		log_debug("%s: Revents has a POLLRDNORM set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+	    }
+	    if (fds[i].revents & POLLHUP) {
+		log_debug("%s: Revents has a POLLHUP set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+	    }
+
+
+	    if (fds[i].revents & POLLERR) {
+		log_debug("%s: Revents has a POLLERR set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+	    }
+	    if (fds[i].revents & POLLHUP) {
+		log_debug("%s: Revents has a POLLHUP set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+	    }
+	    if (fds[i].revents & POLLNVAL) {
+		log_debug("%s: Revents has a POLLNVAL set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+//		throw GnashException("Polling an invalid file descritor");
+	    }
+	    if (fds[i].revents & POLLIN) {
+		log_debug("%s: Revents has a POLLIN set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+	    }
+	    if (fds[i].revents & POLLMSG) {
+		log_debug("%s: Revents has a POLLMSG set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+	    }
+	    if (fds[i].revents & POLLREMOVE) {
+		log_debug("%s: Revents has a POLLREMOVE set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+	    }
+	    if (fds[i].revents & POLLRDHUP) {
+		log_debug("%s: Revents has a POLLRDHUP set 0x%x for fd #%d",
+			  __FUNCTION__,  fds[i].revents, fds[i].fd);
+//		throw GnashException("Connection dropped from client side.");
+	    }
+#endif    
+// 	    if ((fds[i].revents & POLLIN) || (fds[i].revents & POLLRDHUP))  {
+		hits->push_back(fds[i]);
+// 		// If we got as many matches as were seen by poll(), then
+// 		// stop searching the rest of the items in the array.
+// 		if (hits->size() == ret) {
+// 		    break;
+// 		}
+// 	    } else {
+// 		log_debug("No data on fd #%d, revents is 0x%x", fds[i].fd, fds[i].revents);
+// 	    }
+	}
+    }
+    
+    return hits;
+}
+
+fd_set
+Network::waitForNetData(vector<int> &data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    fd_set fdset;
+    FD_ZERO(&fdset);
+    
+    for (size_t i = 0; i<data.size(); i++) {
+	FD_SET(data[i], &fdset);
+    }
+
+    return waitForNetData(data.size(), fdset);
+}
+
+fd_set
+Network::waitForNetData(int limit, fd_set files)
+{
+    GNASH_REPORT_FUNCTION;
+
+    // select modifies this the set of file descriptors, and we don't
+    // want to modify the one passed as an argument, so we make a copy.
+    fd_set fdset = files;
+    
+    // Reset the timeout value, since select modifies it on return
+    int timeout = _timeout;
+    if (timeout <= 0) {
+	timeout = 5;
+    }
+#ifdef HAVE_PSELECT
+    struct timespec tval;
+    sigset_t pending, sigmask;
+    sigprocmask(SIG_BLOCK, &sigmask, NULL);
+
+    tval.tv_sec = timeout;
+    tval.tv_nsec = 0;
+    int ret = pselect(limit+1, &fdset, NULL, NULL, &tval, &sigmask);
+    sigpending(&pending);
+    if (sigismember(&pending, SIGINT)) {
+	log_debug("Have a pending SIGINT interupt waiting!");
+	int sig;
+	sigwait(&sigmask, &sig);
+    }
+    if (sigismember(&pending, SIGPIPE)) {
+	log_debug("Have a pending SIGPIPE interupt waiting!");
+	int sig;
+	sigwait(&sigmask, &sig);
+    }
+#else
+    struct timeval        tval;
+    tval.tv_sec = timeout;
+    tval.tv_usec = 0;
+    int ret = select(limit+1, &fdset, NULL, NULL, &tval);
+#endif
+    // If interupted by a system call, try again
+    if (ret == -1 && errno == EINTR) {
+	log_error (_("Waiting for data for fdset 0x%x was interupted by a system call"), reinterpret_cast<long>(fdset.fds_bits));
+    }
+    
+    if (ret == -1) {
+	log_error (_("Waiting for data for fdset  0x%x was never available for reading"), reinterpret_cast<long>(fdset.fds_bits));
+    }
+    
+    if (ret == 0) {
+	log_debug (_("Waiting for data for fdset  0x%x timed out waiting for data"), reinterpret_cast<long>(fdset.fds_bits));
+	FD_ZERO(&fdset);
+    }
+
+    return fdset;
+}
+
+Network &
+Network::operator = (Network &net)
+{
+    GNASH_REPORT_FUNCTION;
+    
+    // the file descriptor used for reading and writing
+    _sockfd= net.getFileFd();
+    // the file descriptor used to listen for new connections
+    _listenfd = net.getListenFd();
+    _port = net.getPort();
+    _portstr = net.getPortStr();
+    _url = net.getURL();
+    _protocol = net.getProtocol();
+    _host = net.getHost();
+    _path = net.getPath();
+    _connected = net.connected();
+    _debug = net.netDebug();
+    _timeout = net.getTimeout();
+    return *this;
+}
+
+void
 Network::toggleDebug(bool val)
 {
     // Turn on our own debugging
     _debug = val;
 
     // Turn on debugging for the utility methods
-		// recursive on all control paths,
-		// function will cause runtime stack overflow
-
-		// toggleDebug(true);
+    // recursive on all control paths,
+    // toggleDebug(true);
 }
 
+
+// Trap Control-C so we can cleanly exit
+static void
+cntrlc_handler (int sig)
+{
+    sig_number = sig;
+    log_debug(_("Got an %d interrupt while blocked on pselect()"), sig);
+    exit(-1);
+}
 
 } // end of gnash namespace
 

@@ -33,6 +33,9 @@ EXTRA_DIST = \
 	VarAndCharClashTest.as \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
+	remoting.as \
+	red5test.as \
+	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
@@ -150,7 +153,7 @@ check_PROGRAMS = \
 	action_execution_order_test11 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
-    loadImageTest \
+	loadImageTest \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -303,6 +306,15 @@ check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
 	FlashVarsTest-Runner \
 	SharedObjectTestRunner
+endif
+
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+if ENABLE_HTTP_TESTSUITE
+check_SCRIPTS += remotingTestRunner
+endif
+if ENABLE_RED5_TESTING
+check_SCRIPTS += red5testRunner
+endif
 endif
 
 if MING_VERSION_0_4
@@ -1717,6 +1729,21 @@ PrototypeEventListenersTestRunner_DEPENDENCIES = \
 	PrototypeEventListeners.swf	\
 	$(NULL)
 
+remoting.swf: $(srcdir)/remoting.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DHTTP_TESTSUITE='\"$(HTTP_TESTSUITE)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/remoting.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
+	sh $< $(top_builddir) remoting.swf > $@
+	chmod 755 $@
+
+red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/red5test.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+red5testRunner: $(srcdir)/../generic-testrunner.sh red5test.swf
+	sh $< $(top_builddir) red5test.swf > $@
+	chmod 755 $@
+	
+
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
 
@@ -1973,6 +2000,15 @@ TEST_CASES += VarAndCharClashTest-Runner \
 	SharedObjectTestRunner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner 
+endif
+
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+if ENABLE_HTTP_TESTSUITE
+TEST_CASES += remotingTestRunner
+endif
+if ENABLE_RED5_TESTING
+TEST_CASES += red5testRunner
+endif
 endif
 
 if MING_SUPPORTS_INIT_ACTIONS

@@ -17,7 +17,7 @@
 
 #include "log.h"
 #include "swf_function.h"
-#include "array.h"
+#include "Array_as.h"
 #include "fn_call.h"
 #include "MovieClip.h"
 #include "action_buffer.h"

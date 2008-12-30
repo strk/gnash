@@ -28,11 +28,47 @@
 #include "SWFMatrix.h"
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
+#include "utility.h"
 
 #include <cmath>
 #include <iomanip>
 
 namespace gnash {
+
+#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
+
+namespace {
+
+inline
+boost::int32_t DoubleToFixed16(double a)
+{
+#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
+    // truncate when overflow occurs.
+    return static_cast<boost::int32_t>(static_cast<boost::uint32_t>(a * 65536.0));
+#else
+    boost::int32_t  b;
+    if (a >= 0)
+    {
+        b = static_cast<boost::uint32_t>(std::fmod(a * 65536.0, 4294967296.0));
+    }
+    else
+    {
+        b = -static_cast<boost::uint32_t>(std::fmod(-a * 65536.0, 4294967296.0));
+    }
+    return b;
+#endif
+}
+
+inline boost::int32_t
+Fixed16Mul(boost::int32_t a, boost::int32_t b)
+{
+    // truncate when overflow occurs.
+    return static_cast<boost::int32_t>(
+            (static_cast<boost::int64_t>(a) *
+             static_cast<boost::int64_t>(b) + 0x8000) >> 16);
+}
+
+} // anonymous namepace
 
 SWFMatrix::SWFMatrix()
 {
@@ -89,6 +125,24 @@ SWFMatrix::is_valid() const
     // The integer SWFMatrix is always valid now from outside.
     // swallow it if anything wrong inside this class.
     return true;
+}
+
+void
+SWFMatrix::transform(geometry::Point2d& p) const
+{
+    boost::int32_t t0 = Fixed16Mul(sx, p.x) + Fixed16Mul(shy, p.y) + tx;
+    boost::int32_t t1 = Fixed16Mul(shx,p.x) + Fixed16Mul(sy,  p.y) + ty;
+    p.x = t0;
+    p.y = t1;
+}
+
+void
+SWFMatrix::transform(boost::int32_t& x, boost::int32_t& y) const
+{
+    boost::int32_t  t0 = Fixed16Mul(sx, x) + Fixed16Mul(shy, y) + tx;
+    boost::int32_t  t1 = Fixed16Mul(shx,x) + Fixed16Mul(sy,  y) + ty;
+    x = t0;
+    y = t1;
 }
 
 void
@@ -309,7 +363,8 @@ SWFMatrix::get_y_scale() const
 double
 SWFMatrix::get_rotation() const
 {
-    return atan2(shx, sx); // more successes in misc-ming.all/SWFMatrix_test.c
+    // more successes in misc-ming.all/SWFMatrix_test.c
+    return atan2(static_cast<double>(shx), sx); 
 }
 
 // private

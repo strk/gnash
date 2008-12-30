@@ -26,10 +26,6 @@
 #ifndef _AMF_H_
 #define _AMF_H_
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <vector>
 #include <string>
 #include <cstring>
@@ -37,7 +33,6 @@
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "network.h"
 #include "element.h"
 #include "dsodefs.h"
 
@@ -54,7 +49,7 @@ const size_t AMF0_NUMBER_SIZE = 0x08;
 /// \brief The header size in bytes of an common AMF object.
 ///	The size of an AMF header is a type field (1 byte), followed by a
 ///	length field. (short)
-const gnash::Network::byte_t AMF_HEADER_SIZE = 3;
+const boost::uint8_t AMF_HEADER_SIZE = 3;
 
 /// \brief  The header size of a property.
 ///	A property is a little different. It always assumes the the
@@ -62,13 +57,13 @@ const gnash::Network::byte_t AMF_HEADER_SIZE = 3;
 ///	type byte like a regular AMF object and length is used for the
 ///	data. So a property object header is then only 5 bytes instead
 ///	of the 6 that one assumes would be used.
-const gnash::Network::byte_t AMF_PROP_HEADER_SIZE = 5;
+const boost::uint8_t AMF_PROP_HEADER_SIZE = 5;
 
 /// AMF version 0 is supported by default
-const gnash::Network::byte_t AMF_VERSION = 0;
+const boost::uint8_t AMF_VERSION = 0;
 
 /// For terminating sequences, a byte with value 0x09 is used.
-const gnash::Network::byte_t TERMINATOR = 0x09;
+const boost::uint8_t TERMINATOR = 0x09;
 
 /// \brief The maximum size for a string.
 /// As if there is a parsing error, we'll often see the symptom of the length
@@ -151,7 +146,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeString(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeString(boost::uint8_t *data, size_t size);
 
     /// Encode a String object to its serialized representation.
     //
@@ -197,7 +192,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeXMLObject(gnash::Network::byte_t *data, size_t nbytes);
+    static boost::shared_ptr<Buffer> encodeXMLObject(const boost::uint8_t *data, size_t nbytes);
 
     /// Encode a Typed Object to its serialized representation.
     //
@@ -207,7 +202,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeTypedObject(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeTypedObject(const amf::Element &data);
 
     /// Encode a Reference to an object to its serialized representation.
     //
@@ -217,7 +212,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeReference(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeReference(const boost::uint8_t *data, size_t size);
 
     /// Encode a Movie Clip (swf data) to its serialized representation.
     //
@@ -227,7 +222,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeMovieClip(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeMovieClip(const boost::uint8_t *data, size_t size);
 
     /// Encode an ECMA Array to its serialized representation.
     //
@@ -240,7 +235,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeECMAArray(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeECMAArray(const amf::Element &data);
 
     /// Encode a Long String to its serialized representation.
     //
@@ -250,7 +245,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeLongString(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeLongString(const boost::uint8_t *data, size_t size);
 
     /// Encode a Record Set to its serialized representation.
     //
@@ -260,7 +255,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeRecordSet(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeRecordSet(const boost::uint8_t *data, size_t size);
 
     /// Encode a Date to its serialized representation.
     //
@@ -268,7 +263,7 @@ public:
     /// 
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeDate(gnash::Network::byte_t *data);
+    static boost::shared_ptr<Buffer> encodeDate(const boost::uint8_t *data);
 
     /// Encode a Strict Array to its serialized representation.
     //
@@ -281,7 +276,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeStrictArray(gnash::Network::byte_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeStrictArray(const amf::Element &data);
     
     /// Encode an object to its serialized representation.
     //
@@ -289,7 +284,7 @@ public:
     /// 
     /// @return a binary AMF packet in big endian format
     ///
-    static boost::shared_ptr<Buffer> encodeObject(boost::shared_ptr<amf::Element> el);
+    static boost::shared_ptr<Buffer> encodeObject(const amf::Element &data);
 
     /// Encode the end of an object to its serialized representation.
     //
@@ -313,6 +308,14 @@ public:
     ///
     static boost::shared_ptr<Buffer> encodeElement(boost::shared_ptr<amf::Element> el);
 
+    /// Encode an Element to its serialized representation.
+    //
+    /// @param el the Element to encode.
+    ///
+    /// @return a binary AMF packet in big endian format
+    ///
+    static boost::shared_ptr<Buffer> encodeElement(const amf::Element& el);
+
     /// Encode a variable to its serialized representation.
     //
     /// @param el A smart pointer to the Element to encode.
@@ -335,7 +338,7 @@ public:
     ///
     /// @return The data type from the header
     ///
-    static Element::amf0_type_e extractElementHeader(gnash::Network::byte_t *in)
+    static Element::amf0_type_e extractElementHeader(boost::uint8_t *in)
                          { return *(reinterpret_cast<Element::amf0_type_e *>(in)); };
 
     /// Extract an AMF object from an array of raw bytes.
@@ -351,7 +354,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    boost::shared_ptr<amf::Element> extractAMF(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+    boost::shared_ptr<amf::Element> extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar);
 
     /// Extract an AMF object from an array of raw bytes.
     //
@@ -378,7 +381,7 @@ public:
     ///
     /// @remarks May throw a ParserException
     ///
-    boost::shared_ptr<amf::Element> extractProperty(gnash::Network::byte_t *in, gnash::Network::byte_t* tooFar);
+    boost::shared_ptr<amf::Element> extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar);
 
     /// Extract a Property.
     //

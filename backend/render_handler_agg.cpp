@@ -392,39 +392,12 @@ public:
   };
 
 
-  gnash::bitmap_info* create_bitmap_info_rgb(ImageRGB* im)
+  gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_styleX_bitmap(), to set a
   // bitmap fill style.
   {    
-    return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (im->width(), im->height(),
-      im->pitch(), im->data(), 24);
-    abort(); 
-  }
-
-
-  gnash::bitmap_info* create_bitmap_info_rgba(ImageRGBA* im)
-  // Given an image, returns a pointer to a bitmap_info class
-  // that can later be passed to fill_style_bitmap(), to set a
-  // bitmap fill style.
-  //
-  // This version takes an image with an alpha channel.
-  {
-    return new agg_bitmap_info<agg::pixfmt_rgba32_pre> (im->width(), im->height(),
-      im->pitch(), im->data(), 32); 
-  }
-
-
-  gnash::bitmap_info* create_bitmap_info_empty()
-  // Create a placeholder bitmap_info.  Used when
-  // DO_NOT_LOAD_BITMAPS is set; then later on the host program
-  // can use movie_definition::get_bitmap_info_count() and
-  // movie_definition::get_bitmap_info() to stuff precomputed
-  // textures into these bitmap infos.
-  {
-    // bitmaps currently not supported! - return dummy for fontlib
-    unsigned char dummy=0;
-    return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
+    return new agg_bitmap_info(im);
   }
 
   void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
@@ -1340,7 +1313,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
 
-          sh.add_bitmap(dynamic_cast<agg_bitmap_info_base*> 
+          sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) || (fill_type==SWF::FILL_TILED_BITMAP_HARD),
             smooth && m_enable_antialias);
