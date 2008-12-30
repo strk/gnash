@@ -161,7 +161,7 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
     
             // Read the actions for event(s)
             // auto_ptr here prevents leaks on malformed swf
-            std::auto_ptr<action_buffer> action ( new action_buffer(_movie_def) );
+            std::auto_ptr<action_buffer> action(new action_buffer(_movie_def));
             action->read(in, in.tell()+event_length);
             _actionBuffers.push_back(action.release()); // take ownership
     
@@ -197,13 +197,15 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
                 event_id::CONSTRUCT
             };
     
-            // Let's see if the event flag we received is for an event that we know of
+            // Let's see if the event flag we received is for an event
+            // that we know of.
     
             // Integrity check: all reserved bits should be zero
             if( flags >> total_known_events ) 
             {
                 IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
+                log_swferror(_("swf_event::read() -- unknown / unhandled "
+                        "event type received, flags = 0x%x"), flags);
                 );
             }
     
@@ -212,11 +214,14 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
             {
                 if (flags & mask)
                 {
-                    /// Yes, swf_event stores a reference to an element in _actionBuffers.
-                    /// A case of remote ownership, but both swf_event and the actions
-                    /// are owned by this class, so shouldn't be a problem.
+                    // Yes, swf_event stores a reference to an element in
+                    // _actionBuffers. A case of remote ownership, but both
+                    // swf_event and the actions are owned by this class,
+                    // so shouldn't be a problem.
                     action_buffer* thisAction = _actionBuffers.back();
-                    std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], *thisAction) );
+                    std::auto_ptr<swf_event> ev(
+                            new swf_event(s_code_bits[i], *thisAction));
+
                     IF_VERBOSE_PARSE (
                     log_parse("---- actions for event %s", ev->event());
                     );
@@ -233,11 +238,12 @@ PlaceObject2Tag::readPlaceActions(SWFStream& in)
         catch (ParserException& what)
         {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Unexpected end of tag while parsing PlaceObject tag events"));
+            log_swferror(_("Unexpected end of tag while parsing PlaceObject "
+                    "tag events"));
             );
             break;
         }
-    } //end of for(;;)
+    }
 }
 
 // read SWF::PLACEOBJECT2
