@@ -29,11 +29,12 @@
 #include "network.h"
 #include "buffer.h"
 #include "diskstream.h"
+#include "rtmp_msg.h"
 
-namespace gnash
+namespace cygnal
 {
 
-class DSOEXPORT RTMPServer : public RTMP
+class DSOEXPORT RTMPServer : public gnash::RTMP
 {
 public:
     RTMPServer();
@@ -45,7 +46,7 @@ public:
     bool packetRead(amf::Buffer &buf);
     
     // These are handlers for the various types
-    boost::shared_ptr<amf::Buffer> encodeResult(RTMPMsg::rtmp_status_e status);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type);
 
@@ -61,13 +62,13 @@ public:
   private:
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
-    DiskStream::filetype_e  _filetype;
+    gnash::DiskStream::filetype_e  _filetype;
     std::string		_filespec;
     boost::uint32_t     _filesize;
 };
 
 // This is the thread for all incoming RTMP connections
-bool rtmp_handler(Network::thread_params_t *args);
+bool rtmp_handler(gnash::Network::thread_params_t *args);
 
 } // end of gnash namespace
 // end of _RTMP_SERVER_H_

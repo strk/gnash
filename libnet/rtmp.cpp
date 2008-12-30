@@ -261,7 +261,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
     head->head_size = headerSize(*tmpptr++);
     log_debug (_("The header size is %d"), head->head_size);
 
-    cerr << "FIXME3: " << hexify(in, head->head_size, false) << endl;    
+//     cerr << "FIXME3: " << hexify(in, head->head_size, false) << endl;    
     
     if (head->head_size >= 4) {
         _mystery_word = *tmpptr++;
@@ -821,7 +821,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
 	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     int ret = 0;
     
     // We got some bogus parameters
@@ -1031,7 +1031,7 @@ RTMP::sendRecvMsg(amf::Buffer &bufin)
 boost::shared_ptr<amf::Buffer> 
 RTMP::recvMsg()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return recvMsg(getFileFd());
 }
 
@@ -1042,7 +1042,7 @@ RTMP::recvMsg()
 boost::shared_ptr<amf::Buffer> 
 RTMP::recvMsg(int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     int ret = 0;
     bool nopacket = true;
@@ -1051,7 +1051,7 @@ RTMP::recvMsg(int fd)
     boost::shared_ptr<amf::Buffer> buf(new Buffer(7096));
     do {
 	ret = readNet(fd, buf->reference()+ret, buf->size()-ret, _timeout);
-	cerr << __PRETTY_FUNCTION__ << ": " << ret << endl;
+//	cerr << __PRETTY_FUNCTION__ << ": " << ret << endl;
 	// We got data. Resize the buffer if necessary.
 	if (ret > 0) {
 	    buf->setSeekPointer(buf->reference() + ret);

@@ -42,13 +42,21 @@
 #include "utility.h"
 #include "buffer.h"
 #include "GnashSleep.h"
+#include "crc.h"
+#include "cache.h"
 
 using namespace gnash;
 using namespace std;
 using namespace amf;
 
-namespace gnash
+namespace cygnal
 {
+
+// Get access to the global config data for Cygnal
+static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
+
+// Get access to the global Cygnal cache
+static Cache& cache = Cache::getDefaultInstance();
 
 extern map<int, Handler *> handlers;
 
@@ -687,9 +695,9 @@ rtmp_handler(Network::thread_params_t *args)
     // Adjust the timeout
     rtmp->setTimeout(10);
     
-    static boost::shared_ptr<amf::Buffer> pkt;
-    static boost::shared_ptr<amf::Element> tcurl;
-    static boost::shared_ptr<amf::Element> swfurl;
+    boost::shared_ptr<amf::Buffer> pkt;
+    boost::shared_ptr<amf::Element> tcurl;
+    boost::shared_ptr<amf::Element> swfurl;
     
     // This handler is called everytime there is RTMP data on a socket to process the
     // messsage. Unlike HTTP, RTMP always uses persistant network connections, so we
@@ -802,7 +810,7 @@ rtmp_handler(Network::thread_params_t *args)
 	boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
 	if (buf) {
 	    if (buf->allocated()) {
-		buf->dump();
+//		buf->dump();
 		boost::uint8_t *ptr = buf->reference();
 		if (ptr == 0) {
 		    log_debug("Que empty, net connection dropped for fd #%d", args->netfd);
@@ -813,11 +821,19 @@ rtmp_handler(Network::thread_params_t *args)
 		if (echo) {
 		    vector<boost::shared_ptr<amf::Element > > request = rtmp->parseEchoRequest(ptr, buf->allocated());
 		    boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[2]);
-		    result->dump();
 		    if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
 				      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
 			log_error("Sent echo test response response to client.");
-			done = false;
+			// If we're in single threaded mode, we Just want to stay in
+			// this thread for now and do everything all at once. Otherwise
+			// we're done, so we return to the dispatch handler waiting for
+			// the next packet. Single threaded mode is primarily used by
+			// developers for debugging protocols.
+			if (crcfile.getThreadingFlag()) {
+			    done = true;
+			} else {
+			    done = false;
+			}
 		    } else {
 			log_error("Couldn't send echo test response to client!");
 			done = true;
@@ -828,10 +844,12 @@ rtmp_handler(Network::thread_params_t *args)
 		}
 	    } else {
 		log_error("Never read any data from fd #%d", args->netfd);
+		initialize = true;
 		return false;
 	    }
 	} else {
 	    log_error("Communication error with client using fd #%d", args->netfd);
+	    initialize = true;
 	    return false;
 	}
     } while (!done);
