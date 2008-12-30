@@ -319,7 +319,7 @@ main(int argc, char *argv[])
     if ((only_port == 0) || (only_port == gnash::RTMP_PORT)) {
 	Network::thread_params_t rtmp_data;
 //	rtmp_data.port = port_offset + gnash::RTMP_PORT;
-	rtmp_data.port = gnash::RTMP_PORT;
+	rtmp_data.port = port_offset + gnash::RTMP_PORT;
 	rtmp_data.netfd = 0;
 	rtmp_data.filespec = docroot;
 	if (crcfile.getThreadingFlag()) {
@@ -609,7 +609,7 @@ connection_handler(Network::thread_params_t *args)
 	    log_debug("Single threaded mode for fd #%d", args->netfd);
 	    if (args->port == (port_offset + RTMPT_PORT)) {
 		http_handler(args);
-	    } else if (args->port == RTMP_PORT) {
+	    } else if (args->port == (port_offset + RTMP_PORT)) {
 		rtmp_handler(args);
 	    }
 	}
