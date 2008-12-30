@@ -39,7 +39,6 @@
 #include "sprite_definition.h"
 #include "MovieClip.h"
 #include "swf_function.h"
-#include "swf_event.h"
 #include "as_function.h"
 #include "SWFMovieDefinition.h"
 #include "swf.h"

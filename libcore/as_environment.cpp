@@ -22,7 +22,6 @@
 #include "MovieClip.h"
 #include "shape_character_def.h"
 #include "as_value.h"
-#include "with_stack_entry.h"
 #include "VM.h"
 #include "log.h"
 #include "Property.h"
