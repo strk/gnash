@@ -25,6 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <cerrno>
 #include <boost/detail/endian.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/format.hpp>
@@ -843,6 +844,10 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
     // First send the full header, afterwards we only use continuation
     // headers, which are only one byte.
     ret = writeNet(fd, head->reference(), head->size());
+    if (ret == -1) {
+	log_error("Couldn't write the RTMP header!");
+	return false;
+    }    
 
     // now send the data
     while (nbytes <= data.allocated()) {
@@ -858,6 +863,10 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	}
 	// write the data to the client
 	ret = writeNet(fd, data.reference() + nbytes, partial);
+	if (ret == -1) {
+	    log_error("Couldn't write the RTMP body!");
+	    return false;
+	}
 	// adjust the accumulator.
 	nbytes += _chunksize[channel];
     };
@@ -1056,14 +1065,11 @@ RTMP::recvMsg(int fd)
 	    log_debug("Got an empty packet from the server at line %d", __LINE__);
 	    continue;
 	}
-	if (ret < 0) {
-	    log_error("Never got any data at line %d", __LINE__);
-	    break;
-	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
 	if ((ret == static_cast<int>(string::npos)) || (ret == -1)) {
 	    log_debug("socket for fd #%d was closed...", fd);
+	    buf.reset();
 	    break;
 	}
     } while (ret);
