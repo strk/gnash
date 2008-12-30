@@ -62,7 +62,7 @@ echo "SOLDIR=${SOLDIR}"
 sleep 1
 
 export GNASHRC=${TOP_BUILDDIR}/testsuite/gnashrc
-export TZ=GMT-1
+export TZ=GMT
 
 #####################################################
 ##
@@ -90,10 +90,10 @@ for f in ${INPUTSOLDIR}/*.sol; do
 		continue
 	fi
 	if ! cmp ${INPUTSOLDIR}/${solname} ${SOLDIR}/${solname}; then
-		echo "XFAILED: ! cmp ${SOLDIR}/${solname} ${INPUTSOLDIR}/${solname}"
+		echo "FAILED: ! cmp ${SOLDIR}/${solname} ${INPUTSOLDIR}/${solname}"
 		continue
 	fi
-	echo "XPASSED: SharedObject ${solname} matches input"
+	echo "PASSED: SharedObject ${solname} matches input"
 done
 
 #####################################################

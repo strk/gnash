@@ -59,10 +59,10 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macto to make AMF parsing verbose
-#define GNASH_DEBUG_AMF_DESERIALIZE
+//#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
-#define GNASH_DEBUG_AMF_SERIALIZE
+//#define GNASH_DEBUG_AMF_SERIALIZE
 
 namespace {
 
@@ -2368,6 +2368,14 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 #endif
             as_object* obj = init_date_instance(dub);
 			ret.set_as_object(obj);
+
+			if (b + 2 > end) {
+				log_error(_("AMF0 read: premature end of input reading timezone from Date type"));
+				return false;
+			}
+            LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object ignored"));
+            b+=2;
+
 			return true;
         }
 
@@ -2463,8 +2471,14 @@ as_value::writeAMF0(SimpleBuffer& buf,
                                 "with index %d and value %g"), idx, d);
 #endif
                     buf.appendByte(amf::Element::DATE_AMF0);
+
                     amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
                     buf.append(&d, 8);
+
+                    // This should be timezone
+                    boost::uint16_t tz=0; 
+                    buf.appendNetworkShort(tz);
+
                     return true;
                 }
                 else
