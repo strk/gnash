@@ -37,6 +37,7 @@
 #include "Object.h"
 #include "amf.h"
 #include "Array_as.h"
+#include "Date.h" // for init_date_instance (readAMF0)
 #include "SimpleBuffer.h"
 
 #include <cmath> // std::fmod
@@ -58,10 +59,10 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macto to make AMF parsing verbose
-//#define GNASH_DEBUG_AMF_DESERIALIZE
+#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
-//#define GNASH_DEBUG_AMF_SERIALIZE
+#define GNASH_DEBUG_AMF_SERIALIZE
 
 namespace {
 
@@ -2351,6 +2352,25 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
                 return true;
         }
 
+		case amf::Element::DATE_AMF0:
+        {
+			if (b + 8 > end) {
+				log_error(_("AMF0 read: premature end of input reading Date type"));
+				return false;
+			}
+			double dub;
+            // TODO: may we avoid a copy and swapBytes call
+            //       by bitshifting b[0] trough b[7] ?
+            std::copy(b, b+8, (char*)&dub); b+=8; 
+			amf::swapBytes(&dub, 8);
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+			log_debug("amf0 read date: %e", dub);
+#endif
+            as_object* obj = init_date_instance(dub);
+			ret.set_as_object(obj);
+			return true;
+        }
+
 		// TODO define other types (function, sprite, etc)
 		default:
         {
@@ -2434,6 +2454,18 @@ as_value::writeAMF0(SimpleBuffer& buf,
                         buf.appendByte(amf::Element::ECMA_ARRAY_AMF0);
                         buf.appendNetworkLong(len);
                     }
+                }
+                else if ( obj->isDateObject() )
+                {
+                    double d = to_number(); // TODO: check effects of overridden valueOf !
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                    log_debug(_("writeAMF0: serializing date object "
+                                "with index %d and value %g"), idx, d);
+#endif
+                    buf.appendByte(amf::Element::DATE_AMF0);
+                    amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
+                    buf.append(&d, 8);
+                    return true;
                 }
                 else
                 {
