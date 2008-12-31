@@ -197,9 +197,9 @@ AMF::encodeObject(const amf::Element &data)
     }
     *buf = Element::OBJECT_AMF0;
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
+	vector<boost::shared_ptr<amf::Element> >::reverse_iterator ait;
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
-	for (ait = props.begin(); ait != props.end(); ait++) {
+	for (ait = props.rbegin(); ait != props.rend(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
@@ -429,13 +429,16 @@ AMF::encodeECMAArray(const amf::Element &data)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
+    bool sparse = false;
+    size_t counter = 0;
+
     length = data.propertySize();
     //    log_debug("Encoded data size has %d properties", length);
     boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
     if (length == 0) {
 	// an undefined array is only 5 bytes, 1 for the type and
 	// 4 for the length.
-	buf->resize(5);
+	buf.reset(new amf::Buffer(5));
     }
     *buf = Element::ECMA_ARRAY_AMF0;
     length = 1;
@@ -445,20 +448,37 @@ AMF::encodeECMAArray(const amf::Element &data)
     // At lest for red5, it seems to encode from the last item to the
     // first, so we do the same for now.
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::reverse_iterator ait;    
+	boost::shared_ptr<amf::Buffer> item;
+	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
-	for (ait = props.rbegin(); ait != props.rend(); ait++) {
+	for (ait = props.begin(); ait != props.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
-	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
-	    if (item) {
-		*buf += item;
-		item.reset();
+	    if (sparse) {
+		sparse = false;
+// 		char num[12];
+// 		sprintf(num, "%d", counter);
+// 		amf::Element elnum(num, el->to_number());
+// 		*buf += AMF::encodeElement(elnum);
+// 		double nodes = items;
+ 		amf::Element ellen("length");
+		ellen.makeNumber(data.propertySize());
+ 		*buf += AMF::encodeElement(ellen);
 	    } else {
-		break;
+		item = AMF::encodeElement(el);
+		if (item) {
+		    *buf += item;
+		    item.reset();
+		} else {
+		    break;
+		}
 	    }
-	    //el->dump();
 	}
     }
+
+    double count = data.propertySize();
+    amf::Element ellen("length", count);
+    boost::shared_ptr<amf::Buffer> buflen = ellen.encode();
+    *buf += buflen;
     
     // Terminate the object
     *buf += '\0';
@@ -534,7 +554,7 @@ AMF::encodeStrictArray(const amf::Element &data)
     if (data.propertySize() > 0) {
 	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;    
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
-	bool skip = false;
+	bool sparse = false;
 	size_t counter = 0;
 	for (ait = props.begin(); ait != props.end(); ait++) {
 	    counter++;
@@ -542,7 +562,7 @@ AMF::encodeStrictArray(const amf::Element &data)
 	    // If we see an undefined data item, then switch to an ECMA
 	    // array which is more compact. At least this is what Red5 does.
 	    if (el->getType() == Element::UNDEFINED_AMF0) {
-		if (!skip) {
+		if (!sparse) {
 		    log_debug("Encoding a strict array as an ecma array");
 		    *buf->reference() = Element::ECMA_ARRAY_AMF0;
 		    // When returning an ECMA array for a sparsely populated
@@ -552,12 +572,12 @@ AMF::encodeStrictArray(const amf::Element &data)
 		    swapBytes(&moreitems, sizeof(boost::uint32_t));
 		    boost::uint8_t *ptr = buf->reference() + 1;
 		    memcpy(ptr, &moreitems, sizeof(boost::uint32_t));
-		    skip = true;
+		    sparse = true;
 		}
 		continue;
 	    } else {
-		if (skip) {
-		    skip = false;
+		if (sparse) {
+		    sparse = false;
 		    char num[12];
 		    sprintf(num, "%d", counter);
 		    amf::Element elnum(num, el->to_number());
@@ -676,83 +696,6 @@ boost::shared_ptr<Buffer>
 AMF::encodeElement(const amf::Element& el)
 {
 //    GNASH_REPORT_FUNCTION;
-#if 0
-    size_t outsize = 0;
-
-    // Simple Elements have everything contained in just the class itself.
-    // If thr name is set, it's a property, so the length is
-    // prefixed to the name string.
-    if (el.getNameSize()) {
-	outsize += el.getNameSize() + sizeof(boost::uint16_t);
-    }
-    // If there is any data, then the size of the data plus the header
-    // of the type and the length is next.
-    if (el.getDataSize()) {
-	outsize += el.getDataSize() + AMF_HEADER_SIZE;
-    }
-
-    // More complex messages have child elements, either properties or
-    // the items in an array, If we have children, count up their size too.
-    // Calculate the total size of the message
-    vector<boost::shared_ptr<amf::Element> > props = el.getProperties();
-    for (size_t i=0; i<props.size(); i++) {
-	outsize += props[i]->getDataSize();
-	if (props[i]->getNameSize()) {
-	    outsize += props[i]->getNameSize();
-	    outsize += amf::AMF_PROP_HEADER_SIZE;
-	} else {
-	    outsize += amf::AMF_HEADER_SIZE;
-	}
-    }
-
-    // If an array has no data, it's undefined, so has a length of zero.
-    if (el.getType() == Element::STRICT_ARRAY_AMF0) {
-	if ((el.getDataSize() == 0) && (props.size() == 0)) {
-	    outsize += sizeof(boost::uint32_t) + 1;
-	}
-    }
-
-    // An encoded number is always 8 bytes (a double) plus one byte
-    // for the type field.
-    if (el.getType() == Element::NUMBER_AMF0) {
-	outsize = AMF0_NUMBER_SIZE + 1;
-    }
-    
-    // Several types have no data when encoded, like NULL, Undefined,
-    // and Unsupported, so we only need enough room to store the header
-    // type field, which is only 1 byte.
-    if (outsize == 0) {
-	outsize = 1;
-    }
-    // Arrays have an additional 4 byte long field to hold the
-    // number of items in the array.
-    if ((el.getType() == Element::STRICT_ARRAY_AMF0)
-	|| (el.getType() == Element::ECMA_ARRAY_AMF0)) {
-	log_debug("Array has %d items", props.size());
-	outsize += sizeof(boost::uint32_t);
-    }
-    if ((outsize <= 0) || (outsize > 0xffff)) {
-	log_error("Outsize is out of range!", outsize);
-	el.dump();
-    }
-    boost::shared_ptr<Buffer> buf(new Buffer(outsize));
-    log_debug("AMF::%s: Outsize is: %d", __FUNCTION__, outsize);
-
-    // If the name field is set, it's a property, followed by the data
-    if (el.getName()) {
-	// Add the length of the string for the name of the variable
-	size_t length = el.getNameSize();
-	boost::uint16_t enclength = length;
-	swapBytes(&enclength, 2);
-	*buf = enclength;
-	// Now the name itself
-	string name = el.getName();
-	if (name.size() > 0) {
-	    *buf += name;
-	}
-    }
-#endif
-
     boost::shared_ptr<Buffer> buf;
     // Encode the element's data
     switch (el.getType()) {
@@ -975,6 +918,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         return el;
     }
 
+    std::map<boost::uint16_t, amf::Element &> references;
+    
     // All elements look like this:
     // the first two bytes is the length of name of the element
     // Then the next bytes are the element name
@@ -1011,8 +956,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
 	  tmpptr += sizeof(boost::uint16_t);
 	  if (length >= SANE_STR_SIZE) {
-	      log_error("%d bytes for a string is over the safe limit of %d",
-			length, SANE_STR_SIZE);
+	      log_error("%d bytes for a string is over the safe limit of %d, line %d",
+			length, SANE_STR_SIZE, __LINE__);
 	      el.reset();
 	      return el;
 	  }
@@ -1030,7 +975,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       {
 	  el->makeObject();
 	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
-	      if (*tmpptr == TERMINATOR) {
+	      if (*tmpptr+3 == TERMINATOR) {
 //		  log_debug("No data associated with Property in object");
 		  tmpptr++;
 		  break;
@@ -1038,14 +983,14 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
-		  tmpptr += 4;
+//		  tmpptr += 3;
 		  break;
 	      }
 //	      child->dump();
 	      el->addProperty(child);
 	      tmpptr += amf_obj.totalsize();
 	  };
-//	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
 	  break;
       }
       case Element::MOVIECLIP_AMF0:
@@ -1062,6 +1007,8 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
 	  tmpptr += sizeof(boost::uint16_t);
 	  el->makeReference(length);
+	  // FIXME: connect reference Element to the object pointed to by the index.
+	  tmpptr += 3;
 	  break;
       }
       // An ECMA array is comprised of any of the data types. Much like an Object,
@@ -1231,7 +1178,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     }
     
     if (length + tmpptr > tooFar) {
-	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string", length, SANE_STR_SIZE);
+	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
 	length = tooFar - tmpptr;
     }    
     
