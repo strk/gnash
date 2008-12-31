@@ -28,7 +28,7 @@
 #include "Color_as.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
-#include "Date.h"
+#include "Date_as.h"
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
@@ -297,7 +297,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, NS_UNKNOWN, 5 },
 	{ Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },
 	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
-	{ date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XML_as::init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XMLNode_as::init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_XML, 5 },

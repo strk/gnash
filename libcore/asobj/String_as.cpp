@@ -76,7 +76,7 @@ class String_as : public as_object
 
 public:
 
-    String_as(const std::string& s)
+    explicit String_as(const std::string& s)
             :
             as_object(getStringInterface()),
             _string(s)

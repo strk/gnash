@@ -37,7 +37,7 @@
 #include "Object.h"
 #include "amf.h"
 #include "Array_as.h"
-#include "Date.h" // for init_date_instance (readAMF0)
+#include "Date_as.h" // for Date type (readAMF0)
 #include "SimpleBuffer.h"
 
 #include <cmath> // std::fmod
@@ -2366,7 +2366,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read date: %e", dub);
 #endif
-            as_object* obj = init_date_instance(dub);
+            as_object* obj = new Date_as(dub);
 			ret.set_as_object(obj);
 
 			if (b + 2 > end) {

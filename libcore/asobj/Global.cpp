@@ -33,7 +33,7 @@
 #include "Color_as.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
-#include "Date.h" // for registerDateNative
+#include "Date_as.h" // for registerDateNative
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
@@ -688,7 +688,6 @@ registerNatives(as_object& global)
     vm.registerNative(timer_clearinterval, 250, 1);
 
     registerSelectionNative(global);
-    registerDateNative(global);
     registerColorNative(global);
     registerMathNative(global);
     registerSystemNative(global);
@@ -696,6 +695,7 @@ registerNatives(as_object& global)
     registerSharedObjectNative(global);
 
     TextFormat_as::registerNative(global);
+    Date_as::registerNative(global);
     Mouse_as::registerNative(global);
 
     // LoadableObject has natives shared between LoadVars and XML, so 

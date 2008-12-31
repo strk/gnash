@@ -20,14 +20,34 @@
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h" // for inheritance
+#include "ClockTime.h"
 
 namespace gnash {
 
-void registerDateNative(as_object& global);
+class Date_as : public as_object
+{
+public:
 
-void date_class_init(as_object& global);
+    explicit Date_as(double value = clocktime::getTicks());
 
-as_object* init_date_instance(double value);
+    void setTimeValue(const double& value) { _value = value; }
+
+    double getTimeValue() const { return _value; }
+
+    static void registerNative(as_object& global);
+
+    static void init(as_object& where);
+
+    std::string toString() const;
+
+    bool isDateObject() { return true; }
+
+private:
+
+    double _value;
+
+};
+
 
 } // end of gnash namespace
 

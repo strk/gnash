@@ -51,7 +51,7 @@ libgnashasobjs_la_SOURCES = \
 	Color_as.cpp \
 	ContextMenu.cpp	\
 	CustomActions.cpp\
-	Date.cpp \
+	Date_as.cpp \
 	Error_as.cpp \
 	Global.cpp \
 	Key_as.cpp	\
@@ -117,7 +117,7 @@ noinst_HEADERS = \
 	Color_as.h	\
 	ContextMenu.h \
 	CustomActions.h	\
-	Date.h \
+	Date_as.h \
 	Error_as.h	\
 	Math_as.h	\
 	Global.h\

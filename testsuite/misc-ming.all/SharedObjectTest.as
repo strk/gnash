@@ -178,6 +178,11 @@ AsSetPropFlags(so1.data, 'constructor', 0, 1); // unhide constructor (it's a fun
 
 so1.data.dat = new Date(70,0); // 1 Jan 1970 00:00:00 localtime
 
+f = new Date(0);
+f.valueOf = function() { return "Overridden date"; };
+
+so1.data.fakedate = f;
+
 so1.flush();
 
 quit = function()
