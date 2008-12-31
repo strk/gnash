@@ -186,7 +186,6 @@ AGG ressources
 
 using namespace gnash;
 
-
 namespace gnash {
 
 
@@ -352,6 +351,9 @@ class render_handler_agg : public render_handler_agg_base
 {
 private:
   typedef agg::renderer_base<PixelFormat> renderer_base;
+
+  // renderer base
+  std::auto_ptr<renderer_base> m_rbase;
   
   typedef agg::conv_stroke< agg::conv_curve< agg::path_storage > > stroke_type;
   
@@ -465,7 +467,7 @@ public:
     img_source_type img_src(img_pixf);
     
     // renderer base for the stage buffer (not the frame image!)
-    renderer_base rbase(*m_pixf);
+    renderer_base& rbase = *m_rbase;
         
     // nearest neighbor method for scaling
     typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type>
@@ -582,9 +584,9 @@ public:
     
     m_rbuf.attach(memaddr, xres, yres, rowstride);
 
-    // allocate pixel format accessor   
+    // allocate pixel format accessor and renderer_base
     m_pixf.reset(new PixelFormat(m_rbuf));
-    //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
+    m_rbase.reset(new renderer_base(*m_pixf));  
     
     // by default allow drawing everywhere
     set_invalidated_region_world();
@@ -696,11 +698,12 @@ public:
 
     point pnt;
     
-    renderer_base rbase(*m_pixf);
+    renderer_base& rbase = *m_rbase;
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
-
     ras_type ras;    
+
+    // TODO: avoid reconstructing scanline_aa_solid ?
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
       
@@ -1405,9 +1408,11 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     if ( _clipbounds.empty() ) return;
 
     // AGG stuff
+    renderer_base& rbase = *m_rbase;
+
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
-    renderer_base rbase(*m_pixf);
     ras_type rasc;  // flash-like renderer
+
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
     agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
@@ -1651,7 +1656,9 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     // AGG stuff
     typedef agg::rasterizer_scanline_aa<> ras_type; 
     ras_type ras;  // anti alias
-    renderer_base rbase(*m_pixf);
+
+    renderer_base& rbase = *m_rbase;
+
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
       
@@ -1756,7 +1763,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     mat.concatenate(poly_mat);
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
-    renderer_base rbase(*m_pixf);
+    renderer_base& rbase = *m_rbase;
+
     ras_type ras;
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
