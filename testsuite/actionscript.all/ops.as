@@ -170,6 +170,12 @@ x=String("0.999");
 y=1.0;
 check(x<y);
 
+x='';
+y='0';
+r=(x<y);
+check_equals(typeof(r), 'boolean');
+check(!r);
+
 check(! (NaN < NaN) );
 check(! (undefined < undefined) );
 
@@ -195,6 +201,25 @@ r = null > undefined;
  check(r != true);
  check(r != false);
 #endif
+
+r = _level0 < _level0;
+check_equals(typeof(r), 'undefined');
+
+o1 = {};
+o2 = {};
+r = o1 < o2;
+check_equals(typeof(r), 'boolean');
+check(!r);
+r = o2 < o1;
+check_equals(typeof(r), 'boolean');
+check(!r);
+
+r = o2 < _level0;
+check_equals(typeof(r), 'boolean');
+check(!r);
+r = _level0 < o2;
+check_equals(typeof(r), 'boolean');
+check(!r);
 
 //------------------------------------------------
 // Logical AND operator (ACTION_LOGICALAND : 0x10)
@@ -801,14 +826,14 @@ check(!undefined);
 
 #if OUTPUT_VERSION < 7
 # ifndef MING_LOGICAL_ANDOR_BROKEN
- totals(239);
+ totals(250);
 # else
- totals(216);
+ totals(227);
 # endif
 #else
 # ifndef MING_LOGICAL_ANDOR_BROKEN
- totals(241);
+ totals(252);
 # else
- totals(218);
+ totals(229);
 # endif
 #endif

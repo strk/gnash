@@ -3081,29 +3081,48 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    as_value& op1_in = env.top(1);
-    as_value& op2_in = env.top(0);
+    as_value operand1 = env.top(1);
+    as_value operand2 = env.top(0);
 
-    as_value operand1;
-    as_value operand2;
-
-    try { operand1 = op1_in.to_primitive(); }
+    try { operand1 = operand1.to_primitive(); }
     catch (ActionTypeError& e)
     {
         log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewLessThen"), op1_in);
+                "ActionNewLessThan"), operand1);
+    }
+    if ( operand1.is_object() && !operand1.is_sprite() )
+    {
+        // comparison involving an object (NOT sprite!) is always false
+        env.top(1).set_bool(false);
+        env.drop(1);
+        return;
     }
 
-    try { operand2 = op2_in.to_primitive(); }
+    try { operand2 = operand2.to_primitive(); }
     catch (ActionTypeError& e)
     {
         log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewLessThen"), op2_in);
+                "ActionNewLessThan"), operand2);
+    }
+    if ( operand2.is_object() && !operand2.is_sprite() )
+    {
+        // comparison involving an object (NOT sprite!) is always false
+        env.top(1).set_bool(false);
+        env.drop(1);
+        return;
     }
 
     if ( operand1.is_string() && operand2.is_string() )
     {
-        env.top(1).set_bool(operand1.to_string() < operand2.to_string());
+        const std::string& s1 = operand1.to_string();
+        const std::string& s2 = operand2.to_string();
+        // Don't ask me why, but an empty string is not less than a non-empty one
+        if ( s1.empty() ) {
+            env.top(1).set_bool(false);
+        } else if ( s2.empty() ) {
+            env.top(1).set_bool(true);
+        }
+        else env.top(1).set_bool(s1 < s2);
     }
     else
     {
@@ -3687,32 +3706,12 @@ SWFHandlers::ActionStrictEq(ActionExec& thread)
 void
 SWFHandlers::ActionGreater(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
-
+    // Just swap the operator and invoke ActionNewLessThan
     as_environment& env = thread.env;
-
-    as_value& operand1 = env.top(1);
-    as_value& operand2 = env.top(0);
-
-    if ( operand1.is_string() && operand2.is_string() )
-    {
-        env.top(1).set_bool(operand1.to_string() > operand2.to_string());
-    }
-    else
-    {
-        const double op1 = operand1.to_number();
-        const double op2 = operand2.to_number();
-
-        if ( isNaN(op1) || isNaN(op2) )
-        {
-            env.top(1).set_undefined();
-        }
-        else
-        {
-            env.top(1).set_bool(op1 > op2);
-        }
-    }
-    env.drop(1);
+    as_value tmp = env.top(1);
+    env.top(1) = env.top(0);
+    env.top(0) = tmp;
+    ActionNewLessThan(thread);
 }
 
 void
