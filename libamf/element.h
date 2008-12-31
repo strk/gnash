@@ -472,6 +472,7 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeReference();
+    Element &makeReference(boost::uint16_t index);
 
     /// \brief Make this Element a Property with an Object Reference as the value.
     ///
@@ -620,6 +621,16 @@ public:
     ///
     /// @return double value.
     double to_number() const;
+
+    /// \brief Cast the data in this Element to a short (2 bytes) value.
+    ///
+    /// @return short (2 bytes) value.
+    boost::uint16_t to_short() const;
+
+    /// \brief Cast the data in this Element to an integer (4 bytes) value.
+    ///
+    /// @return integer (4 bytes) value.
+    boost::uint32_t to_integer() const;
 
     /// \brief Cast the data in this Element to an ASCII string value.
     ///
