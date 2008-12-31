@@ -921,6 +921,7 @@ public:
     std::vector< agg::path_storage > agg_paths_rounded;  
 
     apply_matrix_to_path(def->get_paths(), paths, mat);
+    //assert(def->get_paths().size() == paths.size());
 
     // Flash only aligns outlines. Probably this is done at rendering
     // level.
@@ -1020,14 +1021,14 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     mat.concatenate(stage_matrix);
     mat.concatenate(source_mat);
 
-    size_t pcnt = paths_in.size();
-    paths_out.resize(pcnt);
+    //size_t pcnt = paths_in.size();
+    paths_out = paths_in; // copy paths, then transform in place
     typedef std::vector<path> PathVect;
-    for (PathVect::const_iterator i=paths_in.begin(), e=paths_in.end(); i!=e; ++i)
+    for (PathVect::iterator i=paths_out.begin(), e=paths_out.end(); i!=e; ++i)
     {
-        path  p = *i;
+        path  &p = *i;
         p.transform(mat);
-        paths_out.push_back( p );
+        //paths_out.push_back( p );
     }
 } // apply_matrix
 
