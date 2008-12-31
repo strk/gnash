@@ -386,11 +386,14 @@ AMF::encodeTypedObject(const amf::Element &data)
 ///
 /// @return a binary AMF packet in big endian format (header,data)
 boost::shared_ptr<Buffer>
-AMF::encodeReference(const boost::uint8_t * /* data */, size_t /* size */)
+AMF::encodeReference(boost::uint16_t index)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<Buffer> buf;
-    log_unimpl("Reference AMF objects not supported yet");
+    boost::uint16_t num = index;
+    boost::shared_ptr<amf::Buffer> buf(new Buffer(3));
+    *buf = Element::REFERENCE_AMF0;
+    swapBytes(&num, sizeof(boost::uint16_t));
+    *buf += num;
     
     return buf;
 }
@@ -540,6 +543,7 @@ AMF::encodeStrictArray(const amf::Element &data)
 	    // array which is more compact. At least this is what Red5 does.
 	    if (el->getType() == Element::UNDEFINED_AMF0) {
 		if (!skip) {
+		    log_debug("Encoding a strict array as an ecma array");
 		    *buf->reference() = Element::ECMA_ARRAY_AMF0;
 		    // When returning an ECMA array for a sparsely populated
 		    // array, Red5 adds one more to the count to be 1 based,
@@ -796,7 +800,7 @@ AMF::encodeElement(const amf::Element& el)
 	  buf = encodeUndefined();
 	  break;
       case Element::REFERENCE_AMF0:
-	  buf = encodeReference(el.to_reference(), el.getDataSize());
+	  buf = encodeReference(el.to_short());
           break;
       case Element::ECMA_ARRAY_AMF0:
 	  buf = encodeECMAArray(el);
@@ -846,8 +850,14 @@ AMF::encodeElement(const amf::Element& el)
     };
 
     // If the name field is set, it's a property, followed by the data
+    boost::shared_ptr<Buffer> bigbuf;
     if (el.getName() && (el.getType() != Element::TYPED_OBJECT_AMF0)) {
-	boost::shared_ptr<Buffer> bigbuf(new amf::Buffer(el.getNameSize() + sizeof(boost::uint16_t) + buf->size()));
+	if (buf) {
+	    bigbuf.reset(new amf::Buffer(el.getNameSize() + sizeof(boost::uint16_t) + buf->size()));
+	} else {
+	    bigbuf.reset(new amf::Buffer(el.getNameSize() + sizeof(boost::uint16_t)));
+	}
+	
 	// Add the length of the string for the name of the variable
 	size_t length = el.getNameSize();
 	boost::uint16_t enclength = length;
@@ -858,7 +868,9 @@ AMF::encodeElement(const amf::Element& el)
 	if (name.size() > 0) {
 	    *bigbuf += name;
 	}
-	*bigbuf += buf;
+	if (buf) {
+	    *bigbuf += buf;
+	}
 	return bigbuf;
     }
     
@@ -1046,10 +1058,14 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  el->makeUndefined();
 	  break;
       case Element::REFERENCE_AMF0:
-	  el->makeReference();
+      {
+	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+	  tmpptr += sizeof(boost::uint16_t);
+	  el->makeReference(length);
 	  break;
-	  // An ECMA array is comprised of any of the data types. Much like an Object,
-	  // the ECMA array is terminated by the end of object bytes, so parse till then.
+      }
+      // An ECMA array is comprised of any of the data types. Much like an Object,
+      // the ECMA array is terminated by the end of object bytes, so parse till then.
       case Element::ECMA_ARRAY_AMF0:
       {
 	  el->makeECMAArray();

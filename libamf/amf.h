@@ -212,7 +212,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeReference(const boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeReference(boost::uint16_t index);
 
     /// Encode a Movie Clip (swf data) to its serialized representation.
     //
