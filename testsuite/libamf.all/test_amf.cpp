@@ -161,7 +161,7 @@ test_encoding()
     // This is a 8 byte wide double data type in hex
     boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
     double num = *(reinterpret_cast<double *>(buf1->reference()));
-    swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we alwasy encode in big endian format
+    swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we always encode in big endian format
 
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
     if (memdebug) {
@@ -272,7 +272,34 @@ test_encoding()
         check_equals(len, 0);
     }
 
-// amf::AMF::encodeECMAArray(unsigned char*, int)
+    AMF amf;
+    Element el1;
+    boost::uint16_t index = 1;
+    el1.makeReference(index);
+    if (el1.to_short() == 1) {
+        runtest.pass("Made Reference");
+    } else {
+        runtest.fail("Made Reference");
+    }    
+
+    boost::shared_ptr<amf::Buffer> buf2 = amf.encodeElement(el1);
+    if ((*buf2->reference() == Element::REFERENCE_AMF0)
+        && (*(buf2->reference() + 1) == 0)
+        && (*(buf2->reference() + 2) == 1)) {
+        runtest.pass("Encoded Reference");
+    } else {
+        runtest.fail("Encoded Reference");
+    }    
+
+    boost::shared_ptr<Buffer> buf3(new Buffer("07 00 01"));
+    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(buf3);
+    if ((el3->getType() == Element::REFERENCE_AMF0)
+        && (el3->to_short() == 1)) {
+        runtest.pass("Extracted Reference");
+    } else {
+        runtest.fail("Extracted Reference");
+    }  
+
 }
 // amf::encodeDate(unsigned char*)
 // amf::AMF::encodeLongString(unsigned char*, int)
