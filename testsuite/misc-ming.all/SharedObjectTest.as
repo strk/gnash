@@ -129,6 +129,12 @@ check_equals(so1.data.dat.getMinutes(), 0);
 check_equals(so1.data.dat.getSeconds(), 0);
 check_equals(so1.data.dat.getMilliseconds(), 0);
 
+// Test reading LONG STRING
+lstr = 'a';
+for (var i=0; i<16; ++i) lstr = lstr+lstr; // 65536 long
+check_equals(so1.data.lstr, lstr);
+
+
 // force writing the sol or the adobe player won't save it
 // again. This will also serve as a kind of reference for
 // how the sol file was produced in the first place
@@ -178,6 +184,8 @@ AsSetPropFlags(so1.data, 'constructor', 0, 1); // unhide constructor (it's a fun
 
 so1.data.dat = new Date(70,0); // 1 Jan 1970 00:00:00 localtime
 
+so1.data.lstr = lstr;
+
 so1.flush();
 
 quit = function()
@@ -191,4 +199,4 @@ note();
 setInterval(quit, 5000);
 stop();
 
-check_totals(52);
+check_totals(53);

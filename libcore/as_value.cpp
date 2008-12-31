@@ -2187,6 +2187,32 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			break;
         }
 
+		case amf::Element::LONG_STRING_AMF0:
+        {
+			if (b + 4 > end) {
+				log_error(_("AMF0 read: premature end of input "
+                            "reading Long String type"));
+				return false;
+			}
+            boost::uint32_t si = readNetworkLong(b); b += 4;
+			if (b + si > end) {
+				log_error(_("AMF0 read: premature end of input "
+                            "reading Long String type"));
+				return false;
+			}
+
+			{
+				std::string str(reinterpret_cast<char *>(b), si); b += si;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("amf0 read long string: %s", str);
+#endif
+				ret.set_string(str);
+				return true;
+
+			}
+			break;
+        }
+
 		case amf::Element::STRICT_ARRAY_AMF0:
         {
 				boost::intrusive_ptr<Array_as> array(new Array_as());
@@ -2517,13 +2543,26 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
         case STRING:
         {
-            buf.appendByte(amf::Element::STRING_AMF0);
             const std::string& str = getStr();
+            size_t strlen = str.size();
+            if ( strlen <= 65535 )
+            {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing string '%s'"), str);
+                log_debug(_("writeAMF0: serializing string '%s'"), str);
 #endif
-            buf.appendNetworkShort(str.size());
-            buf.append(str.c_str(), str.size());
+                buf.appendByte(amf::Element::STRING_AMF0);
+                buf.appendNetworkShort(strlen);
+                buf.append(str.c_str(), strlen);
+            }
+            else
+            {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                log_debug(_("writeAMF0: serializing long string '%s'"), str);
+#endif
+                buf.appendByte(amf::Element::LONG_STRING_AMF0);
+                buf.appendNetworkLong(strlen);
+                buf.append(str.c_str(), strlen);
+            }
             return true;
         }
 
