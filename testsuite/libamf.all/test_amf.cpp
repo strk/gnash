@@ -301,18 +301,6 @@ test_encoding()
     }  
 
 }
-// amf::encodeDate(unsigned char*)
-// amf::AMF::encodeLongString(unsigned char*, int)
-// amf::AMF::encodeStrictArray(unsigned char*, int)
-// amf::AMF::encodeTypedObject(unsigned char*, int)
-// amf::AMF::encodeUnsupported()
-// amf::AMF::encodeNull()
-// amf::AMF::encodeElement(amf::Element*)
-// amf::AMF::encodeMovieClip(unsigned char*, int)
-// amf::AMF::encodeRecordSet(unsigned char*, int)
-// amf::AMF::encodeReference(unsigned char*, int)
-// amf::AMF::encodeUndefined()
-// amf::AMF::encodeXMLObject(unsigned char*, int)
 
 void
 test_array()
