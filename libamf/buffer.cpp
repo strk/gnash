@@ -22,6 +22,8 @@
 
 #include <boost/cstdint.hpp>
 #include <iostream>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/mersenne_twister.hpp>
 
 #include "buffer.h"
 #include "amf.h"
@@ -731,14 +733,51 @@ void
 Buffer::dump(std::ostream& os) const
 {
     os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes at " << (void *)_data.get() << endl;
-    if (_nbytes < 0xffff) {
+    if (_data) {
 	const size_t bytes = _seekptr - _data.get();
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;
     } else {
 	os << "ERROR: Buffer size out of range!" << endl;
-	abort();
     }
+}
+
+/// \brief Corrupt a buffer with random errors.
+///		This is used only for testing to make sure we can cleanly
+///		handle corruption of the packets.
+///
+/// @param factor A divisor to adjust how many errors are created.
+///
+/// @return nothing
+int
+Buffer::corrupt()
+{
+    corrupt(10);
+}
+
+int
+Buffer::corrupt(int factor)
+{
+    boost::mt19937 seed;
+    // Pick the number of errors to create based on the Buffer's data size
+    boost::uniform_int<> errs(1, (_nbytes/factor));
+    int errors = errs(seed);
+    log_debug("Creating %d errors in the buffer", errors);
+    
+    for (int i=0; i<errors; i++) {
+	// find a location someplace within the file.
+	boost::uniform_int<> location(0, _nbytes);
+	int pos = location(seed);
+	
+	log_debug("Creating error at %d in the buffer", pos);
+	// Create a random new value for the byte
+	boost::uniform_int<> shift(1, 256);
+	int newval = shift(seed);
+	// stomp the old value for our new one.
+	_data[pos] = newval;
+    }
+
+    return errors;
 }
 
 } // end of amf namespace

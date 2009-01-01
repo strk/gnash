@@ -70,6 +70,16 @@ public:
     /// Delete the memory allocated for this Buffer
     ~Buffer();
 
+    /// \brief Corrupt a buffer with random errors.
+    ///		This is used only for testing to make sure we can cleanly
+    ///		handle corruption of the packets.
+    ///
+    /// @param factor A divisor to adjust how many errors are created.
+    ///
+    /// @return The number or errors that were created.
+    int corrupt();
+    int corrupt(int factor);
+    
     /// \brief Encode a Buffer from a hex string.
     ///
     /// @param str A hex string.
