@@ -37,7 +37,7 @@
 #include "Object.h"
 #include "amf.h"
 #include "Array_as.h"
-#include "Date.h" // for init_date_instance (readAMF0)
+#include "Date_as.h" // for Date type (readAMF0)
 #include "SimpleBuffer.h"
 
 #include <cmath> // std::fmod
@@ -2392,7 +2392,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 			log_debug("amf0 read date: %e", dub);
 #endif
-            as_object* obj = init_date_instance(dub);
+            as_object* obj = new Date_as(dub);
 			ret.set_as_object(obj);
 
 			if (b + 2 > end) {
@@ -2491,14 +2491,16 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 }
                 else if ( obj->isDateObject() )
                 {
-                    double d = to_number(); // TODO: check effects of overridden valueOf !
+                    const Date_as& date = dynamic_cast<const Date_as&>(*obj);
+                    double d = date.getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                     log_debug(_("writeAMF0: serializing date object "
                                 "with index %d and value %g"), idx, d);
 #endif
                     buf.appendByte(amf::Element::DATE_AMF0);
 
-                    amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
+                    // This actually only swaps on little-endian machines
+                    amf::swapBytes(&d, 8);
                     buf.append(&d, 8);
 
                     // This should be timezone

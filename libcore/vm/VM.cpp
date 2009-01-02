@@ -97,17 +97,13 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 
 VM::~VM()
 {
-    delete _shLib;
 }
 
-std::locale&
-VM::getLocale() const
+void
+VM::clear()
 {
-	// TODO: some research about what we should be using.
-	//       IIRC older SWF contained some tags for this,
-	//       while new SWF uses UNICODE...
-	static std::locale loc("C");
-	return loc;
+    /// Reset the SharedObjectLibrary, so that SOLs are flushed.
+    _shLib.reset();
 }
 
 int
@@ -241,7 +237,7 @@ VM::markReachableResources() const
 
 	mClassHierarchy->markReachableResources();
 
-    _shLib->markReachableResources();
+    if (_shLib.get()) _shLib->markReachableResources();
 #endif
 
 }

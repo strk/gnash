@@ -84,12 +84,12 @@ namespace {
     as_value sharedobject_getLocal(const fn_call& fn);
     as_value sharedobject_ctor(const fn_call& fn);
 
-    
     as_object* readSOL(VM& vm, const std::string& filespec);
 
     as_object* getSharedObjectInterface();
     void attachSharedObjectStaticInterface(as_object& o);
     bool createDirForFile(const std::string& filespec);
+    void flushSOL(SharedObjectLibrary::SoLib::value_type& sol);
     bool validateName(const std::string& solName);
 }
 
@@ -298,12 +298,9 @@ private:
     SOL _sol;
 };
 
+
 SharedObject_as::~SharedObject_as()
 {
-    /// This apparently used to cause problems if the VM no longer exists on
-    /// destruction. It certainly would. However, it *has* to be done, so if it
-    /// still causes problems, it must be fixed another way than not doing it.
-    flush();
 }
 
 
@@ -416,8 +413,7 @@ SharedObject_as::flush(int space) const
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
-    _vm(vm),
-    _soLib()
+    _vm(vm)
 {
     _solSafeDir = rcfile.getSOLSafeDir();
     if (_solSafeDir.empty()) {
@@ -486,6 +482,22 @@ SharedObjectLibrary::markReachableResources() const
         SharedObject_as* sh = it->second;
         sh->setReachable();
     }
+}
+
+/// The SharedObjectLibrary keeps all known SharedObjects alive. They must
+/// be flushed on clear(). This is called at the latest by the dtor, which
+/// is called at the latest by VM's dtor (currently earlier to avoid problems
+/// with the GC).
+void
+SharedObjectLibrary::clear()
+{
+    std::for_each(_soLib.begin(), _soLib.end(), &flushSOL);
+    _soLib.clear();
+}
+
+SharedObjectLibrary::~SharedObjectLibrary()
+{
+    clear();
 }
 
 SharedObject_as*
@@ -1092,6 +1104,14 @@ readSOL(VM& vm, const std::string& filespec)
     return true;
 #endif
 }
+
+
+void
+flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
+{
+    sol.second->flush();
+}
+
 
 bool
 createDirForFile(const std::string& filename)
