@@ -2465,7 +2465,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 }
                 else if ( obj->isDateObject() )
                 {
-                    Date_as* date = dynamic_cast<Date_as*>(obj);
+                    const Date_as& date = dynamic_cast<const Date_as&>(*obj);
                     double d = date->getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                     log_debug(_("writeAMF0: serializing date object "
@@ -2473,7 +2473,8 @@ as_value::writeAMF0(SimpleBuffer& buf,
 #endif
                     buf.appendByte(amf::Element::DATE_AMF0);
 
-                    amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
+                    // This actually only swaps on little-endian machines
+                    amf::swapBytes(&d, 8);
                     buf.append(&d, 8);
 
                     // This should be timezone
