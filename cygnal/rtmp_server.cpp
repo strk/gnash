@@ -524,14 +524,14 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 boost::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return encodePing(type, 0);
 }
 
 boost::shared_ptr<Buffer>
 RTMPServer::encodePing(rtmp_ping_e type, boost::uint32_t milliseconds)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     boost::shared_ptr<amf::Buffer> buf(new Buffer(sizeof(boost::uint16_t) * 3));
     boost::uint8_t *ptr = buf->reference();
@@ -612,6 +612,9 @@ RTMPServer::parseEchoRequest(boost::uint8_t *ptr, size_t size)
 
     // This one has always been an NULL or Undefined object from my tests
     boost::shared_ptr<amf::Element> el4 = amf.extractAMF(ptr, ptr+size);
+    if (!el4) {
+	log_error("Couldn't reliably extract the echo data!");
+    }
     ptr += amf.totalsize();
     headers.push_back(el4);
     
@@ -626,7 +629,7 @@ boost::shared_ptr<amf::Buffer>
 RTMPServer::formatEchoResponse(double num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data = el.encode(); // amf::AMF::encodeElement(el);
+    boost::shared_ptr<amf::Buffer> data = amf::AMF::encodeElement(el);
     return formatEchoResponse(num, data->reference(), data->allocated());
 }
 
@@ -738,7 +741,10 @@ rtmp_handler(Network::thread_params_t *args)
 	// The very first message after the handshake is the Invoke call of
 	// NetConnection::connect().
 	boost::shared_ptr<RTMP::rtmp_head_t> head = rtmp->decodeHeader(*pkt);
-	RTMP::queues_t *que = rtmp->split(*pkt);
+	boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
+	cerr << "FIXME Connect Que size is: " << que->size() << endl;
+	que->at(0)->dump();
+	que->at(1)->dump();
 //    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
 	if (que->size() > 0) {
 	    boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
@@ -804,42 +810,58 @@ rtmp_handler(Network::thread_params_t *args)
 // 	proto.resetBytesIn();
 // 	proto.resetBytesOut();	
     
-//	st.dump(); 
+//	st.dump();
+
     // See if we have any messages waiting
     do {
 	boost::shared_ptr<amf::Buffer> buf = rtmp->recvMsg(args->netfd);
 	if (buf) {
 	    if (buf->allocated()) {
-//		buf->dump();
+		buf->dump();
 		boost::uint8_t *ptr = buf->reference();
 		if (ptr == 0) {
 		    log_debug("Que empty, net connection dropped for fd #%d", args->netfd);
 		    return false;
 		}
 		boost::shared_ptr<RTMP::rtmp_head_t> rthead = rtmp->decodeHeader(ptr);
-		ptr += rthead->head_size;
+//    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
+		ptr += rthead->head_size; // skip past the header
 		if (echo) {
-		    vector<boost::shared_ptr<amf::Element > > request = rtmp->parseEchoRequest(ptr, buf->allocated());
-		    request[3]->dump();
-		    boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[3]);
-		    if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
-				      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
-			log_error("Sent echo test response response to client.");
-			// If we're in single threaded mode, we Just want to stay in
-			// this thread for now and do everything all at once. Otherwise
-			// we're done, so we return to the dispatch handler waiting for
-			// the next packet. Single threaded mode is primarily used by
-			// developers for debugging protocols.
-			if (crcfile.getThreadingFlag()) {
-			    done = true;
-			} else {
-			    done = false;
+		    boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*buf);
+		    boost::shared_ptr<amf::Buffer> bufptr;
+		    if (que->size() > 0) {
+			cerr << "FIXME echo Que size is: " << que->size() << endl;
+//  			que->at(0)->dump();
+// 			CQue *cque = que->at(0);
+// 			bufptr = cque->pop();
+ 			bufptr = que->at(0)->pop();
+//			bufptr->dump();
+		    }
+		    // process the echo test request
+		    vector<boost::shared_ptr<amf::Element> > request = rtmp->parseEchoRequest(
+			bufptr->reference() + rthead->head_size, bufptr->allocated() - rthead->head_size);
+		    // now build a result
+		    if (request[3]) {
+//			request[3]->dump();
+			boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[3]);
+			if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
+					  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
+			    log_debug("Sent echo test response response to client.");
+			    // If we're in single threaded mode, we Just want to stay in
+			    // this thread for now and do everything all at once. Otherwise
+			    // we're done, so we return to the dispatch handler waiting for
+			    // the next packet. Single threaded mode is primarily used by
+			    // developers for debugging protocols.
+			    if (crcfile.getThreadingFlag()) {
+				done = true;
+			    } else {
+				done = false;
+			    }
 			}
 		    } else {
 			log_error("Couldn't send echo test response to client!");
 			done = true;
 		    }
-		    
 		} else {
 		    body = rtmp->decodeMsgBody(*buf);
 		}
@@ -854,7 +876,7 @@ rtmp_handler(Network::thread_params_t *args)
 	    return false;
 	}
     } while (!done);
-
+    
     return true;
 }
 
