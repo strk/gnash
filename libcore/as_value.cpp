@@ -2465,7 +2465,8 @@ as_value::writeAMF0(SimpleBuffer& buf,
                 }
                 else if ( obj->isDateObject() )
                 {
-                    double d = to_number(); // TODO: check effects of overridden valueOf !
+                    Date_as* date = dynamic_cast<Date_as*>(obj);
+                    double d = date->getTimeValue(); 
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
                     log_debug(_("writeAMF0: serializing date object "
                                 "with index %d and value %g"), idx, d);
