@@ -437,13 +437,6 @@ as_value::convert_to_primitive()
 		hint = STRING;
 	}
 
-#if 0
-	else if ( m_type == MOVIECLIP && swfVersion > 5 )
-	{
-		throw ActionTypeError();
-	}
-#endif
-
 	return convert_to_primitive(hint);
 }
 
@@ -452,7 +445,6 @@ as_value
 as_value::to_primitive(AsType hint) const
 {
 	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
-	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
@@ -490,12 +482,10 @@ as_value::to_primitive(AsType hint) const
 	{
 		assert(hint==STRING);
 
-#if 1
 		if ( m_type == MOVIECLIP )
 		{
 			return as_value(getCharacterProxy().getTarget());
 		}
-#endif
 
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
@@ -516,17 +506,18 @@ as_value::to_primitive(AsType hint) const
 			return as_value(obj->get_text_value());
 		}
 
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
+                (!method.is_function()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" toString not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                    (!method.is_function()) ) // ECMA says ! is_object()
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" valueOf not found");
 #endif
-				//return as_value(obj->get_text_value());
 				throw ActionTypeError();
 			}
 		}
@@ -575,7 +566,8 @@ as_value::convert_to_primitive(AsType hint)
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
 
-		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                (!method.is_object()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" valueOf not found");
@@ -619,12 +611,14 @@ as_value::convert_to_primitive(AsType hint)
 			return *this;
 		}
 
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || 
+                (!method.is_function()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" toString not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || 
+                    (!method.is_function()) ) // ECMA says ! is_object()
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" valueOf not found");
@@ -654,7 +648,6 @@ as_value::convert_to_primitive(AsType hint)
 double
 as_value::to_number() const
 {
-    // TODO:  split in to_number_# (version based)
 
     int swfversion = VM::get().getSWFVersion();
 
