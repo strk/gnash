@@ -471,7 +471,10 @@ void  clear()
     //
     // See task task #6959 and depending items
     //
-    log_debug("Any segfault past this message is likely due to improper threads cleanup.");
+    log_debug("Any segfault past this message is likely due to improper "
+            "threads cleanup.");
+
+    VM::get().clear();
 
     clear_library();
     fontlib::clear();

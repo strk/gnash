@@ -35,7 +35,11 @@ class SharedObjectLibrary
 {
 public:
 
+    typedef std::map<std::string, SharedObject_as*> SoLib;
+
     SharedObjectLibrary(VM& vm);
+
+    ~SharedObjectLibrary();
 
     /// Return a local shared object with given name and with given root
     //
@@ -46,7 +50,7 @@ public:
     void markReachableResources() const;
 
     // Drop all library items
-    void clear() { _soLib.clear(); }
+    void clear();
 
 private:
 
@@ -60,8 +64,6 @@ private:
 
     /// Base SOL dir
     std::string _solSafeDir; 
-
-    typedef std::map<std::string, SharedObject_as*> SoLib;
 
     SoLib _soLib;
 };
