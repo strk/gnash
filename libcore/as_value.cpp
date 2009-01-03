@@ -59,7 +59,7 @@
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macro to make AMF parsing verbose
-#define GNASH_DEBUG_AMF_DESERIALIZE
+//#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE

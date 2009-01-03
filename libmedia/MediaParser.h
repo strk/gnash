@@ -572,6 +572,15 @@ public:
 	///
 	virtual bool parseNextChunk()=0;
 
+    /// Retrieve any parsed metadata tags up to a specified timestamp.
+    //
+    /// @param ts   The latest timestamp to retrieve metadata for.
+    /// @param tags This is filled with shared pointers to metatags in
+    ///             timestamp order. Ownership of the data is shared. It
+    ///             is destroyed automatically along with the last owner.
+    //
+    /// Metadata is currently only parsed from FLV streams. The default
+    /// is a no-op.
     virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
 
 protected:

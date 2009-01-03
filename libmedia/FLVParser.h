@@ -135,6 +135,18 @@ public:
 		return _indexingCompleted;
 	}
 
+    /// Retrieve any parsed metadata tags up to a specified timestamp.
+    //
+    /// This copies pointers to a SimpleBuffer of AMF data from _metaTags,
+    /// then removes those pointers from the MetaTags map. Any metadata later
+    /// than the timestamp is kept until fetchMetaTags is called again (or 
+    /// the dtor is called).
+    //
+    /// @param ts   The latest timestamp to retrieve metadata for.
+    /// @param tags This is filled with shared pointers to metatags in
+    ///             timestamp order. Ownership of the data is shared. It
+    ///             is destroyed automatically along with the last owner.
+    //
     virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
 
 private:

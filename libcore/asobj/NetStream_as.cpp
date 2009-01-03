@@ -45,7 +45,8 @@
 #include "StreamProvider.h"
 #include "sound_handler.h"
 
-#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
+// For ntohs in amf conversion. FIXME: do this somewhere
+// more appropriate. There's AMF code scattered all over the place.
 #if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 # include <sys/types.h>
 # include <arpa/inet.h>
@@ -81,6 +82,9 @@ namespace {
 
     as_object* getNetStreamInterface();
     void attachNetStreamInterface(as_object& o);
+    
+    // TODO: see where this can be done more centrally.
+    void executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm);
 }
 
 /// Contruct a NetStream object.
@@ -1265,44 +1269,6 @@ NetStream_as::videoWidth() const
     return _videoDecoder->width();
 }
 
-void
-executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm)
-{
-	const boost::uint8_t* ptr = _buffer.data();
-	const boost::uint8_t* endptr = ptr + _buffer.size();
-
-	if ( ptr + 2 > endptr ) {
-		log_error("Premature end of AMF in NetStream metatag");
-		return;
-	}
-	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
-	ptr += 2;
-
-	if ( ptr + length > endptr ) {
-		log_error("Premature end of AMF in NetStream metatag");
-		return;
-	}
-
-	std::string funcName(reinterpret_cast<const char*>(ptr), length); 
-	ptr += length;
-
-	log_debug("funcName: %s", funcName);
-
-	string_table& st = vm.getStringTable();
-	string_table::key funcKey = st.find(funcName);
-
-	as_value arg;
-	std::vector<as_object*> objRefs;
-	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
-	{
-		log_error("Could not convert FLV metatag to as_value, but will try "
-                "passing it anyway. It's an %s", arg);
-	}
-
-	log_debug("Calling %s(%s)", funcName, arg);
-	thisPtr->callMethod(funcKey, arg);
-}
-
 
 void
 NetStream_as::advance()
@@ -1967,6 +1933,44 @@ getNetStreamInterface()
     }
 
     return o.get();
+}
+
+void
+executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm)
+{
+	const boost::uint8_t* ptr = _buffer.data();
+	const boost::uint8_t* endptr = ptr + _buffer.size();
+
+	if ( ptr + 2 > endptr ) {
+		log_error("Premature end of AMF in NetStream metatag");
+		return;
+	}
+	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+	ptr += 2;
+
+	if ( ptr + length > endptr ) {
+		log_error("Premature end of AMF in NetStream metatag");
+		return;
+	}
+
+	std::string funcName(reinterpret_cast<const char*>(ptr), length); 
+	ptr += length;
+
+	log_debug("funcName: %s", funcName);
+
+	string_table& st = vm.getStringTable();
+	string_table::key funcKey = st.find(funcName);
+
+	as_value arg;
+	std::vector<as_object*> objRefs;
+	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
+	{
+		log_error("Could not convert FLV metatag to as_value, but will try "
+                "passing it anyway. It's an %s", arg);
+	}
+
+	log_debug("Calling %s(%s)", funcName, arg);
+	thisPtr->callMethod(funcKey, arg);
 }
 
 } // anonymous namespace
