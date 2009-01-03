@@ -20,8 +20,8 @@
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
-#ifndef __FLVPARSER_H__
-#define __FLVPARSER_H__
+#ifndef GNASH_FLVPARSER_H
+#define GNASH_FLVPARSER_H
 
 #include "dsodefs.h"
 #include "MediaParser.h" // for inheritance
@@ -111,6 +111,38 @@ public:
 class DSOEXPORT FLVParser : public MediaParser
 {
 
+public:
+
+	/// \brief
+	/// Create an FLV parser reading input from
+	/// the given IOChannel
+	//
+	/// @param lt
+	/// 	IOChannel to use for input.
+	/// 	Ownership transferred.
+	///
+	FLVParser(std::auto_ptr<IOChannel> lt);
+
+	/// Kills the parser...
+	~FLVParser();
+
+	// see dox in MediaParser.h
+	virtual bool seek(boost::uint32_t&);
+
+	// see dox in MediaParser.h
+	virtual bool parseNextChunk();
+
+	// see dox in MediaParser.h
+	boost::uint64_t getBytesLoaded() const;
+
+	// see dox in MediaParser.h
+	bool indexingCompleted() const
+	{
+		return _indexingCompleted;
+	}
+
+	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
+
 private:
 
 	enum tagType
@@ -177,40 +209,6 @@ private:
 		boost::uint8_t codec;
 	};
 
-public:
-
-	/// \brief
-	/// Create an FLV parser reading input from
-	/// the given IOChannel
-	//
-	/// @param lt
-	/// 	IOChannel to use for input.
-	/// 	Ownership transferred.
-	///
-	FLVParser(std::auto_ptr<IOChannel> lt);
-
-	/// Kills the parser...
-	~FLVParser();
-
-	// see dox in MediaParser.h
-	virtual bool seek(boost::uint32_t&);
-
-	// see dox in MediaParser.h
-	virtual bool parseNextChunk();
-
-	// see dox in MediaParser.h
-	boost::uint64_t getBytesLoaded() const;
-
-	// see dox in MediaParser.h
-	bool indexingCompleted() const
-	{
-		return _indexingCompleted;
-	}
-
-	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
-
-private:
-
 	/// Parses next tag from the file
 	//
 	/// Returns true if something was parsed, false otherwise.
@@ -218,11 +216,14 @@ private:
 	///
 	bool parseNextTag(bool index_only);
 
-	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
-	std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
+	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag,
+            const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
+	std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag,
+            const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
 
 	void indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos);
-	void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
+	void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag,
+            boost::uint32_t thisTagPos);
 
 	/// Parses the header of the file
 	bool parseHeader();
@@ -259,9 +260,11 @@ private:
 	/// Audio stream is present
 	bool _video;
 
-	std::auto_ptr<EncodedAudioFrame> readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+	std::auto_ptr<EncodedAudioFrame>
+        readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
-	std::auto_ptr<EncodedVideoFrame> readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+	std::auto_ptr<EncodedVideoFrame>
+        readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
 	/// Position in input stream for each cue point
 	/// first: timestamp
@@ -272,8 +275,10 @@ private:
 	bool _indexingCompleted;
 
 	class MetaTag {
-	public:
-		MetaTag(boost::uint64_t t, std::auto_ptr<SimpleBuffer> b)
+	
+    public:
+	
+        MetaTag(boost::uint64_t t, std::auto_ptr<SimpleBuffer> b)
 			:
 			_timestamp(t),
 			_buffer(b)
@@ -281,17 +286,22 @@ private:
 
 		void execute(as_object* thisPtr, VM& env);
 		boost::uint64_t timestamp() const { return _timestamp; }
-	private:
-		boost::uint64_t _timestamp;
+	
+    private:
+	
+        boost::uint64_t _timestamp;
 		std::auto_ptr<SimpleBuffer> _buffer;
-	};
+	
+    };
 
 	typedef std::deque<MetaTag*> MetaTags;
-	MetaTags _metaTags;
-	boost::mutex _metaTagsMutex;
+
+    MetaTags _metaTags;
+
+    boost::mutex _metaTagsMutex;
 };
 
 } // end of gnash::media namespace
 } // end of gnash namespace
 
-#endif // __FLVPARSER_H__
+#endif 
