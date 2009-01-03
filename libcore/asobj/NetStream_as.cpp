@@ -333,7 +333,9 @@ NetStream_as::markReachableResources() const
 as_value
 NetStream_as::advanceWrapper(const fn_call& fn)
 {
-        boost::intrusive_ptr<NetStream_as> ptr = ensureType<NetStream_as>(fn.this_ptr);
+        boost::intrusive_ptr<NetStream_as> ptr =
+            ensureType<NetStream_as>(fn.this_ptr);
+
         ptr->advance();
         return as_value();
 }
@@ -531,7 +533,7 @@ NetStream_as::startPlayback()
 
     inputPos = 0;
 
-    if ( ! _mediaHandler )
+    if (!_mediaHandler)
     {
         LOG_ONCE( log_error(_("No Media handler registered, can't "
             "parse NetStream input")) );
@@ -1284,7 +1286,7 @@ NetStream_as::advance()
     // Check decoding status 
     if ( decodingStatus() == DEC_DECODING && bufferLen == 0 )
     {
-        if ( ! parsingComplete )
+        if (!parsingComplete)
         {
 #ifdef GNASH_DEBUG_DECODING
             log_debug("%p.advance: buffer empty while decoding,"
@@ -1321,7 +1323,8 @@ NetStream_as::advance()
             // The very first video frame we want to provide
             // as soon as possible (if not paused),
             // reguardless bufferLength...
-            if ( ! m_imageframe.get() && _playHead.getState() != PlayHead::PLAY_PAUSED )
+            if (!m_imageframe.get() && 
+                    _playHead.getState() != PlayHead::PLAY_PAUSED)
             {
                 log_debug("refreshing video frame for the first time");
                 refreshVideoFrame(true);
@@ -1331,9 +1334,9 @@ NetStream_as::advance()
         }
 
 #ifdef GNASH_DEBUG_DECODING
-        log_debug("%p.advance: buffer full (or parsing completed), resuming playback clock"
-            " - position=%d, buffer=%d/%d",
-            this, _playHead.getPosition(), bufferLen, m_bufferTime);
+        log_debug("%p.advance: buffer full (or parsing completed), "
+                "resuming playback clock - position=%d, buffer=%d/%d",
+                this, _playHead.getPosition(), bufferLen, m_bufferTime);
 #endif // GNASH_DEBUG_DECODING
 
         setStatus(bufferFull);
@@ -1363,11 +1366,13 @@ NetStream_as::time()
     return _playHead.getPosition();
 }
 
-void NetStream_as::pausePlayback()
+void
+NetStream_as::pausePlayback()
 {
     GNASH_REPORT_FUNCTION;
 
-    PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PAUSED);
+    PlayHead::PlaybackStatus oldStatus = 
+        _playHead.setState(PlayHead::PLAY_PAUSED);
 
     // Disconnect the soundhandler if we were playing before
     if ( oldStatus == PlayHead::PLAY_PLAYING )
@@ -1376,11 +1381,13 @@ void NetStream_as::pausePlayback()
     }
 }
 
-void NetStream_as::unpausePlayback()
+void
+NetStream_as::unpausePlayback()
 {
     GNASH_REPORT_FUNCTION;
 
-    PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PLAYING);
+    PlayHead::PlaybackStatus oldStatus = 
+        _playHead.setState(PlayHead::PLAY_PLAYING);
 
     // Re-connect to the soundhandler if we were paused before
     if ( oldStatus == PlayHead::PLAY_PAUSED )
@@ -1441,10 +1448,12 @@ BufferedAudioStreamer::attachAuxStreamer()
     }
 
     try {
-        _auxStreamer = _soundHandler->attach_aux_streamer(BufferedAudioStreamer::fetchWrapper,
-            (void*)this);
-    } catch (SoundException& e) {
-        log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
+        _auxStreamer = _soundHandler->attach_aux_streamer(
+                BufferedAudioStreamer::fetchWrapper, (void*)this);
+    }
+    catch (SoundException& e) {
+        log_error("Could not attach NetStream aux streamer to sound handler: "
+                "%s", e.what());
     }
 }
 
@@ -1463,9 +1472,12 @@ BufferedAudioStreamer::detachAuxStreamer()
 
 // audio callback, possibly running in a separate thread
 unsigned int
-BufferedAudioStreamer::fetchWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& eof)
+BufferedAudioStreamer::fetchWrapper(void *owner, boost::int16_t* samples,
+        unsigned int nSamples, bool& eof)
 {
-    BufferedAudioStreamer* streamer = static_cast<BufferedAudioStreamer*>(owner);
+    BufferedAudioStreamer* streamer =
+        static_cast<BufferedAudioStreamer*>(owner);
+
     return streamer->fetch(samples, nSamples, eof);
 }
 
