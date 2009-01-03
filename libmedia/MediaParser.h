@@ -42,12 +42,6 @@
 namespace gnash {
 namespace media {
 
-/// A container for executable MetaTags contained in media streams.
-//
-/// Presently only known in FLV.
-typedef std::multimap<boost::uint64_t, boost::shared_ptr<SimpleBuffer> >
-    MetaTags;
-typedef std::vector<MetaTags::mapped_type> OrderedMetaTags;
 
 /// Video frame types
 enum videoFrameType
@@ -437,7 +431,14 @@ class MediaParser
 {
 public:
 
-	MediaParser(std::auto_ptr<IOChannel> stream);
+    /// A container for executable MetaTags contained in media streams.
+    //
+    /// Presently only known in FLV.
+    typedef std::multimap<boost::uint64_t, boost::shared_ptr<SimpleBuffer> >
+        MetaTags;
+    
+    typedef std::vector<MetaTags::mapped_type> OrderedMetaTags;
+        MediaParser(std::auto_ptr<IOChannel> stream);
 
 	// Classes with virtual methods (virtual classes)
 	// must have a virtual destructor, or the destructors

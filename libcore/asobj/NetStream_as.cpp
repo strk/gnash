@@ -1368,14 +1368,14 @@ NetStream_as::advance()
     // by all available consumers
     _playHead.advanceIfConsumed();
 
-    media::OrderedMetaTags tags;
+    media::MediaParser::OrderedMetaTags tags;
 
     m_parser->fetchMetaTags(tags, _playHead.getPosition());
 
     if (tags.empty()) return;
 
-    for (media::OrderedMetaTags::iterator i = tags.begin(), e = tags.end();
-            i != e; ++i) {
+    for (media::MediaParser::OrderedMetaTags::iterator i = tags.begin(),
+            e = tags.end(); i != e; ++i) {
         executeTag(**i, this, getVM());
     }
 }
