@@ -224,7 +224,8 @@ public:
 	/// @param vm
     ///     Virtual machine to use for initialization of the values (string_table)
 	///
-	DSOEXPORT bool readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType,
+	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
+            const boost::uint8_t* const end, int inType,
             std::vector<as_object*>& objRefs, VM& vm);
 
     /// Serialize value in AMF0 format.

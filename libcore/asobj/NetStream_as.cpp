@@ -45,7 +45,15 @@
 #include "StreamProvider.h"
 #include "sound_handler.h"
 
-#include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
+// For ntohs in amf conversion. FIXME: do this somewhere
+// more appropriate. There's AMF code scattered all over the place.
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <io.h>
+#endif
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -74,6 +82,9 @@ namespace {
 
     as_object* getNetStreamInterface();
     void attachNetStreamInterface(as_object& o);
+    
+    // TODO: see where this can be done more centrally.
+    void executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm);
 }
 
 /// Contruct a NetStream object.
@@ -333,7 +344,9 @@ NetStream_as::markReachableResources() const
 as_value
 NetStream_as::advanceWrapper(const fn_call& fn)
 {
-        boost::intrusive_ptr<NetStream_as> ptr = ensureType<NetStream_as>(fn.this_ptr);
+        boost::intrusive_ptr<NetStream_as> ptr =
+            ensureType<NetStream_as>(fn.this_ptr);
+
         ptr->advance();
         return as_value();
 }
@@ -531,7 +544,7 @@ NetStream_as::startPlayback()
 
     inputPos = 0;
 
-    if ( ! _mediaHandler )
+    if (!_mediaHandler)
     {
         LOG_ONCE( log_error(_("No Media handler registered, can't "
             "parse NetStream input")) );
@@ -1256,6 +1269,7 @@ NetStream_as::videoWidth() const
     return _videoDecoder->width();
 }
 
+
 void
 NetStream_as::advance()
 {
@@ -1284,7 +1298,7 @@ NetStream_as::advance()
     // Check decoding status 
     if ( decodingStatus() == DEC_DECODING && bufferLen == 0 )
     {
-        if ( ! parsingComplete )
+        if (!parsingComplete)
         {
 #ifdef GNASH_DEBUG_DECODING
             log_debug("%p.advance: buffer empty while decoding,"
@@ -1321,7 +1335,8 @@ NetStream_as::advance()
             // The very first video frame we want to provide
             // as soon as possible (if not paused),
             // reguardless bufferLength...
-            if ( ! m_imageframe.get() && _playHead.getState() != PlayHead::PLAY_PAUSED )
+            if (!m_imageframe.get() && 
+                    _playHead.getState() != PlayHead::PLAY_PAUSED)
             {
                 log_debug("refreshing video frame for the first time");
                 refreshVideoFrame(true);
@@ -1331,9 +1346,9 @@ NetStream_as::advance()
         }
 
 #ifdef GNASH_DEBUG_DECODING
-        log_debug("%p.advance: buffer full (or parsing completed), resuming playback clock"
-            " - position=%d, buffer=%d/%d",
-            this, _playHead.getPosition(), bufferLen, m_bufferTime);
+        log_debug("%p.advance: buffer full (or parsing completed), "
+                "resuming playback clock - position=%d, buffer=%d/%d",
+                this, _playHead.getPosition(), bufferLen, m_bufferTime);
 #endif // GNASH_DEBUG_DECODING
 
         setStatus(bufferFull);
@@ -1349,12 +1364,20 @@ NetStream_as::advance()
     // up to current playhead
     refreshAudioBuffer();
 
-    // Advance PlayeHead position if current one was consumed
+    // Advance PlayHead position if current one was consumed
     // by all available consumers
     _playHead.advanceIfConsumed();
 
-    // Process media tags
-    m_parser->processTags(_playHead.getPosition(), this, getVM());
+    media::MediaParser::OrderedMetaTags tags;
+
+    m_parser->fetchMetaTags(tags, _playHead.getPosition());
+
+    if (tags.empty()) return;
+
+    for (media::MediaParser::OrderedMetaTags::iterator i = tags.begin(),
+            e = tags.end(); i != e; ++i) {
+        executeTag(**i, this, getVM());
+    }
 }
 
 boost::int32_t
@@ -1363,11 +1386,13 @@ NetStream_as::time()
     return _playHead.getPosition();
 }
 
-void NetStream_as::pausePlayback()
+void
+NetStream_as::pausePlayback()
 {
     GNASH_REPORT_FUNCTION;
 
-    PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PAUSED);
+    PlayHead::PlaybackStatus oldStatus = 
+        _playHead.setState(PlayHead::PLAY_PAUSED);
 
     // Disconnect the soundhandler if we were playing before
     if ( oldStatus == PlayHead::PLAY_PLAYING )
@@ -1376,11 +1401,13 @@ void NetStream_as::pausePlayback()
     }
 }
 
-void NetStream_as::unpausePlayback()
+void
+NetStream_as::unpausePlayback()
 {
     GNASH_REPORT_FUNCTION;
 
-    PlayHead::PlaybackStatus oldStatus = _playHead.setState(PlayHead::PLAY_PLAYING);
+    PlayHead::PlaybackStatus oldStatus = 
+        _playHead.setState(PlayHead::PLAY_PLAYING);
 
     // Re-connect to the soundhandler if we were paused before
     if ( oldStatus == PlayHead::PLAY_PAUSED )
@@ -1441,10 +1468,12 @@ BufferedAudioStreamer::attachAuxStreamer()
     }
 
     try {
-        _auxStreamer = _soundHandler->attach_aux_streamer(BufferedAudioStreamer::fetchWrapper,
-            (void*)this);
-    } catch (SoundException& e) {
-        log_error("Could not attach NetStream aux streamer to sound handler: %s", e.what());
+        _auxStreamer = _soundHandler->attach_aux_streamer(
+                BufferedAudioStreamer::fetchWrapper, (void*)this);
+    }
+    catch (SoundException& e) {
+        log_error("Could not attach NetStream aux streamer to sound handler: "
+                "%s", e.what());
     }
 }
 
@@ -1463,9 +1492,12 @@ BufferedAudioStreamer::detachAuxStreamer()
 
 // audio callback, possibly running in a separate thread
 unsigned int
-BufferedAudioStreamer::fetchWrapper(void *owner, boost::int16_t* samples, unsigned int nSamples, bool& eof)
+BufferedAudioStreamer::fetchWrapper(void *owner, boost::int16_t* samples,
+        unsigned int nSamples, bool& eof)
 {
-    BufferedAudioStreamer* streamer = static_cast<BufferedAudioStreamer*>(owner);
+    BufferedAudioStreamer* streamer =
+        static_cast<BufferedAudioStreamer*>(owner);
+
     return streamer->fetch(samples, nSamples, eof);
 }
 
@@ -1901,6 +1933,44 @@ getNetStreamInterface()
     }
 
     return o.get();
+}
+
+void
+executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm)
+{
+	const boost::uint8_t* ptr = _buffer.data();
+	const boost::uint8_t* endptr = ptr + _buffer.size();
+
+	if ( ptr + 2 > endptr ) {
+		log_error("Premature end of AMF in NetStream metatag");
+		return;
+	}
+	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+	ptr += 2;
+
+	if ( ptr + length > endptr ) {
+		log_error("Premature end of AMF in NetStream metatag");
+		return;
+	}
+
+	std::string funcName(reinterpret_cast<const char*>(ptr), length); 
+	ptr += length;
+
+	log_debug("funcName: %s", funcName);
+
+	string_table& st = vm.getStringTable();
+	string_table::key funcKey = st.find(funcName);
+
+	as_value arg;
+	std::vector<as_object*> objRefs;
+	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
+	{
+		log_error("Could not convert FLV metatag to as_value, but will try "
+                "passing it anyway. It's an %s", arg);
+	}
+
+	log_debug("Calling %s(%s)", funcName, arg);
+	thisPtr->callMethod(funcKey, arg);
 }
 
 } // anonymous namespace

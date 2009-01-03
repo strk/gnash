@@ -130,7 +130,9 @@ protected:
     std::auto_ptr<AudioDecoder> createFlashAudioDecoder(const AudioInfo& info);
 
 	/// Return true if input stream is an FLV
-	bool isFLV(IOChannel& stream);
+    //
+    /// If this cannot read the necessary 3 bytes, it throws an IOException.
+	bool isFLV(IOChannel& stream) throw (IOException);
 
 	MediaHandler() {}
 

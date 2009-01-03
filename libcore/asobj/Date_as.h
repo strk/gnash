@@ -30,9 +30,9 @@ public:
 
     explicit Date_as(double value = clocktime::getTicks());
 
-    void setTimeValue(const double& value) { _value = value; }
+    void setTimeValue(const double& value) { _timeValue = value; }
 
-    double getTimeValue() const { return _value; }
+    double getTimeValue() const { return _timeValue; }
 
     static void registerNative(as_object& global);
 
@@ -44,7 +44,7 @@ public:
 
 private:
 
-    double _value;
+    double _timeValue;
 
 };
 

@@ -953,20 +953,20 @@ readSOL(VM& vm, const std::string& filespec)
     }
 
     boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
-    boost::uint8_t *buf = sbuf.get();
-    boost::uint8_t *end = buf + st.st_size;
+    const boost::uint8_t *buf = sbuf.get();
+    const boost::uint8_t *end = buf + st.st_size;
 
     try
     {
         std::ifstream ifs(filespec.c_str(), std::ios::binary);
-        ifs.read(reinterpret_cast<char *>(buf), st.st_size);
+        ifs.read(reinterpret_cast<char*>(sbuf.get()), st.st_size);
 
         // TODO check initial bytes, and print warnings if they are fishy
 
         buf += 16; // skip const-length headers
 
         // skip past name   TODO add sanity check
-        buf += ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
+        buf += ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
         buf += 2;
         
         buf += 4; // skip past padding
@@ -986,7 +986,7 @@ readSOL(VM& vm, const std::string& filespec)
                     "byte %s", buf - sbuf.get());
             // read property name
             boost::uint16_t len = 
-                ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
+                ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
             buf += 2;
 
             if( buf + len >= end )
@@ -998,7 +998,7 @@ readSOL(VM& vm, const std::string& filespec)
                 log_error("SharedObject::readSOL: empty property name");
                 break;
             }
-            std::string prop_name(reinterpret_cast<char*>(buf), len);
+            std::string prop_name(reinterpret_cast<const char*>(buf), len);
             buf += len;
 
             // read value

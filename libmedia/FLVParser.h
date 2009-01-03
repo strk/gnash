@@ -20,28 +20,22 @@
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
-#ifndef __FLVPARSER_H__
-#define __FLVPARSER_H__
+#ifndef GNASH_FLVPARSER_H
+#define GNASH_FLVPARSER_H
 
 #include "dsodefs.h"
 #include "MediaParser.h" // for inheritance
-#include "SimpleBuffer.h" // for MetaTag destructor
+#include "SimpleBuffer.h" 
 
+#include <set>
 #include <vector>
 #include <memory>
 #include <map>
 
 #include <boost/thread/mutex.hpp>
 
-// Forward declarations
-namespace gnash {
-	class as_object;
-	class VM;
-}
-
 namespace gnash {
 namespace media {
-
 
 /// Extra video info found in some FLV embedded streams
 //
@@ -94,11 +88,11 @@ public:
     /// @todo take a SimpleBuffer by auto_ptr
     ///
     ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
-                :
-                data(extradata),
-                size(datasize)
-        {
-        }
+        :
+        data(extradata),
+        size(datasize)
+    {
+    }
 
     /// Audio stream header
     boost::scoped_array<boost::uint8_t> data;
@@ -110,72 +104,6 @@ public:
 /// The FLVParser class parses FLV streams
 class DSOEXPORT FLVParser : public MediaParser
 {
-
-private:
-
-	enum tagType
-	{
-		FLV_AUDIO_TAG = 0x08,
-		FLV_VIDEO_TAG = 0x09,
-		FLV_META_TAG = 0x12
-	};
-
-	struct FLVTag : public boost::noncopyable
-	{
-		FLVTag(boost::uint8_t* stream)
-		: type(stream[0]),
-		  body_size(getUInt24(stream+1)),
-		  timestamp(getUInt24(stream+4) | (stream[7] << 24) )
-		{}
-
-		/// Equals tagType
-		boost::uint8_t type;
-		boost::uint32_t body_size;
-		boost::uint32_t timestamp;
-	};
-
-	struct FLVAudioTag : public boost::noncopyable
-	{
-		FLVAudioTag(const boost::uint8_t& byte)
-		: codec( (byte & 0xf0) >> 4 ),
-		  samplerate( flv_audio_rates[(byte & 0x0C) >> 2] ),
-		  samplesize( 1 + ((byte & 0x02) >> 1)),
-		  stereo( (byte & 0x01) )
-		{
-		}
-
-		/// Equals audioCodecType
-		boost::uint8_t codec;
-
-		boost::uint16_t samplerate;
-
-		/// Size of each sample, in bytes
-		boost::uint8_t samplesize;
-
-		bool stereo;
-	private:
-		static const boost::uint16_t flv_audio_rates[];
-	};
-
-	enum frameType
-	{
-		FLV_VIDEO_KEYFRAME = 1,
-		FLV_VIDEO_INTERLACED = 2,
-		FLV_VIDEO_DISPOSABLE = 3
-	};
-
-	struct FLVVideoTag : public boost::noncopyable
-	{
-		FLVVideoTag(const boost::uint8_t& byte)
-		: frametype( (byte & 0xf0) >> 4 ),
-		  codec( byte & 0x0f )
-		{}
-
-		/// Equals frameType
-		boost::uint8_t frametype;
-		/// Equals videoCodecType
-		boost::uint8_t codec;
-	};
 
 public:
 
@@ -207,9 +135,91 @@ public:
 		return _indexingCompleted;
 	}
 
-	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
+    /// Retrieve any parsed metadata tags up to a specified timestamp.
+    //
+    /// This copies pointers to a SimpleBuffer of AMF data from _metaTags,
+    /// then removes those pointers from the MetaTags map. Any metadata later
+    /// than the timestamp is kept until fetchMetaTags is called again (or 
+    /// the dtor is called).
+    //
+    /// @param ts   The latest timestamp to retrieve metadata for.
+    /// @param tags This is filled with shared pointers to metatags in
+    ///             timestamp order. Ownership of the data is shared. It
+    ///             is destroyed automatically along with the last owner.
+    //
+    virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
 
 private:
+
+	enum tagType
+	{
+		FLV_AUDIO_TAG = 0x08,
+		FLV_VIDEO_TAG = 0x09,
+		FLV_META_TAG = 0x12
+	};
+
+	struct FLVTag : public boost::noncopyable
+	{
+		FLVTag(boost::uint8_t* stream)
+		    :
+            type(stream[0]),
+            body_size(getUInt24(stream+1)),
+            timestamp(getUInt24(stream+4) | (stream[7] << 24) )
+		{}
+
+		/// Equals tagType
+		boost::uint8_t type;
+		boost::uint32_t body_size;
+		boost::uint32_t timestamp;
+	};
+
+	struct FLVAudioTag : public boost::noncopyable
+	{
+		FLVAudioTag(const boost::uint8_t& byte)
+		    :
+            codec( (byte & 0xf0) >> 4 ),
+		    samplerate( flv_audio_rates[(byte & 0x0C) >> 2] ),
+		    samplesize( 1 + ((byte & 0x02) >> 1)),
+		    stereo( (byte & 0x01) )
+		{
+		}
+
+		/// Equals audioCodecType
+		boost::uint8_t codec;
+
+		boost::uint16_t samplerate;
+
+		/// Size of each sample, in bytes
+		boost::uint8_t samplesize;
+
+		bool stereo;
+
+    private:
+	
+        static const boost::uint16_t flv_audio_rates[];
+	
+    };
+
+	enum frameType
+	{
+		FLV_VIDEO_KEYFRAME = 1,
+		FLV_VIDEO_INTERLACED = 2,
+		FLV_VIDEO_DISPOSABLE = 3
+	};
+
+	struct FLVVideoTag : public boost::noncopyable
+	{
+		FLVVideoTag(const boost::uint8_t& byte)
+            :
+            frametype( (byte & 0xf0) >> 4 ),
+		    codec( byte & 0x0f )
+		{}
+
+		/// Equals frameType
+		boost::uint8_t frametype;
+		/// Equals videoCodecType
+		boost::uint8_t codec;
+	};
 
 	/// Parses next tag from the file
 	//
@@ -218,11 +228,16 @@ private:
 	///
 	bool parseNextTag(bool index_only);
 
-	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
-	std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
+	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag,
+            const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
+	
+    std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag,
+            const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
 
 	void indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos);
-	void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
+	
+    void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag,
+            boost::uint32_t thisTagPos);
 
 	/// Parses the header of the file
 	bool parseHeader();
@@ -259,9 +274,11 @@ private:
 	/// Audio stream is present
 	bool _video;
 
-	std::auto_ptr<EncodedAudioFrame> readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+	std::auto_ptr<EncodedAudioFrame>
+        readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
-	std::auto_ptr<EncodedVideoFrame> readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
+	std::auto_ptr<EncodedVideoFrame>
+        readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp);
 
 	/// Position in input stream for each cue point
 	/// first: timestamp
@@ -271,27 +288,12 @@ private:
 
 	bool _indexingCompleted;
 
-	class MetaTag {
-	public:
-		MetaTag(boost::uint64_t t, std::auto_ptr<SimpleBuffer> b)
-			:
-			_timestamp(t),
-			_buffer(b)
-		{}
+    MetaTags _metaTags;
 
-		void execute(as_object* thisPtr, VM& env);
-		boost::uint64_t timestamp() const { return _timestamp; }
-	private:
-		boost::uint64_t _timestamp;
-		std::auto_ptr<SimpleBuffer> _buffer;
-	};
-
-	typedef std::deque<MetaTag*> MetaTags;
-	MetaTags _metaTags;
-	boost::mutex _metaTagsMutex;
+    boost::mutex _metaTagsMutex;
 };
 
 } // end of gnash::media namespace
 } // end of gnash namespace
 
-#endif // __FLVPARSER_H__
+#endif 

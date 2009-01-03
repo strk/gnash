@@ -58,7 +58,7 @@
 // Define this macro to make soft references activity verbose
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
-// Define this macto to make AMF parsing verbose
+// Define this macro to make AMF parsing verbose
 //#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
@@ -437,13 +437,6 @@ as_value::convert_to_primitive()
 		hint = STRING;
 	}
 
-#if 0
-	else if ( m_type == MOVIECLIP && swfVersion > 5 )
-	{
-		throw ActionTypeError();
-	}
-#endif
-
 	return convert_to_primitive(hint);
 }
 
@@ -452,7 +445,6 @@ as_value
 as_value::to_primitive(AsType hint) const
 {
 	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
-	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
@@ -490,12 +482,10 @@ as_value::to_primitive(AsType hint) const
 	{
 		assert(hint==STRING);
 
-#if 1
 		if ( m_type == MOVIECLIP )
 		{
 			return as_value(getCharacterProxy().getTarget());
 		}
-#endif
 
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
@@ -516,17 +506,18 @@ as_value::to_primitive(AsType hint) const
 			return as_value(obj->get_text_value());
 		}
 
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
+                (!method.is_function()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" toString not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                    (!method.is_function()) ) // ECMA says ! is_object()
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" valueOf not found");
 #endif
-				//return as_value(obj->get_text_value());
 				throw ActionTypeError();
 			}
 		}
@@ -575,7 +566,8 @@ as_value::convert_to_primitive(AsType hint)
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
 
-		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                (!method.is_object()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" valueOf not found");
@@ -619,12 +611,14 @@ as_value::convert_to_primitive(AsType hint)
 			return *this;
 		}
 
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || 
+                (!method.is_function()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" toString not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || 
+                    (!method.is_function()) ) // ECMA says ! is_object()
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" valueOf not found");
@@ -654,7 +648,6 @@ as_value::convert_to_primitive(AsType hint)
 double
 as_value::to_number() const
 {
-    // TODO:  split in to_number_# (version based)
 
     int swfversion = VM::get().getSWFVersion();
 
@@ -2110,7 +2103,7 @@ readNetworkLong(const boost::uint8_t* buf) {
 // TODO restore first parameter on parse errors
 //
 static bool
-amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, 
+amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end, 
         as_value& ret, int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	int amf_type;
@@ -2176,7 +2169,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			}
 
 			{
-				std::string str(reinterpret_cast<char *>(b), si); b += si;
+				std::string str(reinterpret_cast<const char*>(b), si); b += si;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 read string: %s", str);
 #endif
@@ -2202,7 +2195,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			}
 
 			{
-				std::string str(reinterpret_cast<char *>(b), si); b += si;
+				std::string str(reinterpret_cast<const char*>(b), si); b += si;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 read long string: %s", str);
 #endif
@@ -2284,7 +2277,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
                         break;
                     }
 
-					std::string name(reinterpret_cast<char*>(b), strlen);
+					std::string name(reinterpret_cast<const char*>(b), strlen);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
@@ -2381,7 +2374,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 		case amf::Element::DATE_AMF0:
         {
 			if (b + 8 > end) {
-				log_error(_("AMF0 read: premature end of input reading Date type"));
+				log_error(_("AMF0 read: premature end of input reading Date "
+                            "type"));
 				return false;
 			}
 			double dub;
@@ -2396,10 +2390,12 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			ret.set_as_object(obj);
 
 			if (b + 2 > end) {
-				log_error(_("AMF0 read: premature end of input reading timezone from Date type"));
+				log_error(_("AMF0 read: premature end of input reading "
+                            "timezone from Date type"));
 				return false;
 			}
-            LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object ignored"));
+            LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object "
+                        "ignored"));
             b+=2;
 
 			return true;
@@ -2418,7 +2414,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 }
 
 bool
-as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs, VM& vm)
+as_value::readAMF0(const boost::uint8_t *&b, const boost::uint8_t *end,
+        int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	return amf0_read_value(b, end, *this, inType, objRefs, vm);
 }
@@ -2575,7 +2572,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             log_debug(_("writeAMF0: serializing number '%g'"), d);
 #endif
             buf.appendByte(amf::Element::NUMBER_AMF0);
-            amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
+            amf::swapBytes(&d, 8); // this actually only swaps on little-endian machines
             buf.append(&d, 8);
             return true;
         }

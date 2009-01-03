@@ -28,19 +28,10 @@
 #include "IOChannel.h"
 #include "SimpleBuffer.h"
 
-#include "as_object.h"
 #include "element.h"
-#include "VM.h"
 
 #include <string>
 #include <iosfwd>
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-# include <sys/types.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <io.h>
-#endif
 
 
 #define PADDING_BYTES 64
@@ -67,6 +58,21 @@
 namespace gnash {
 namespace media {
 
+namespace {
+
+/// Functor for use when transforming a map into a vector of mapped values.
+template<typename T>
+struct SecondElement
+{
+    typedef typename T::second_type result_type;
+
+    const result_type& operator()(const T& pair) const
+    {
+        return pair.second;
+    }
+};
+
+}
 
 const boost::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] = {5500, 11000, 22050, 44100};
 
@@ -82,19 +88,16 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 	_cuePoints(),
 	_indexingCompleted(false)
 {
-	if ( ! parseHeader() ) 
-		throw GnashException("FLVParser couldn't parse header from input");
+	if (!parseHeader()) {
+		throw MediaException("FLVParser couldn't parse header from input");
+    }
+
 	startParserThread();
 }
 
 FLVParser::~FLVParser()
 {
 	stopParserThread();
-
-	for (MetaTags::iterator i=_metaTags.begin(), e=_metaTags.end(); i!=e; ++i)
-	{
-		delete *i;
-	}
 }
 
 
@@ -102,7 +105,6 @@ FLVParser::~FLVParser()
 bool
 FLVParser::seek(boost::uint32_t& time)
 {
-	//GNASH_REPORT_FUNCTION;
 
 	boost::mutex::scoped_lock streamLock(_streamMutex);
 	// we might obtain this lock while the parser is pushing the last
@@ -114,8 +116,6 @@ FLVParser::seek(boost::uint32_t& time)
 	// parsing, thus fixing the case in which streamLock was obtained
 	// while the parser was pushing to queue
 	_seekRequest = true;
-
-
 
 	if ( _cuePoints.empty() )
 	{
@@ -131,7 +131,8 @@ FLVParser::seek(boost::uint32_t& time)
 	}
 
 	long lowerBoundPosition = it->second;
-	log_debug("Seek requested to time %d triggered seek to cue point at position %d and time %d", time, it->second, it->first);
+	log_debug("Seek requested to time %d triggered seek to cue point at "
+            "position %d and time %d", time, it->second, it->first);
 	time = it->first;
 	_lastParsedPosition=lowerBoundPosition; 
 	_parsingComplete=false; // or NetStream will send the Play.Stop event...
@@ -201,7 +202,9 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 	std::auto_ptr<EncodedAudioFrame> frame;
 
 	if ( ! _audio ) {
-		log_error(_("Unexpected audio tag found at offset %d FLV stream advertising no audio in header. We'll warn only once for each FLV, expecting any further audio tag."), thisTagPos);
+		log_error(_("Unexpected audio tag found at offset %d FLV stream "
+                    "advertising no audio in header. We'll warn only once for "
+                    "each FLV, expecting any further audio tag."), thisTagPos);
 		_audio = true; // TOCHECK: is this safe ?
 	}
 
@@ -223,7 +226,8 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 	// audio format has been noted, so we do that now
 	if ( !_audioInfo.get() )
 	{
-		_audioInfo.reset( new AudioInfo(audiotag.codec, audiotag.samplerate, audiotag.samplesize, audiotag.stereo, 0, FLASH) );
+		_audioInfo.reset(new AudioInfo(audiotag.codec, audiotag.samplerate,
+                    audiotag.samplesize, audiotag.stereo, 0, FLASH) );
 		if (header) {
 			boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize];
 			memcpy(newbuf, frame->data.get(), frame->dataSize);
@@ -245,7 +249,9 @@ std::auto_ptr<EncodedVideoFrame>
 FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boost::uint32_t thisTagPos)
 {
 	if ( ! _video ) {
-		log_error(_("Unexpected video tag found at offset %d of FLV stream advertising no video in header. We'll warn only once per FLV, expecting any further video tag."), thisTagPos);
+		log_error(_("Unexpected video tag found at offset %d of FLV stream "
+                    "advertising no video in header. We'll warn only once per "
+                    "FLV, expecting any further video tag."), thisTagPos);
 		_video = true; // TOCHECK: is this safe ?
 	}
 
@@ -306,14 +312,10 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 }
 
 
-
-
-
 // would be called by parser thread
-bool FLVParser::parseNextTag(bool index_only)
+bool
+FLVParser::parseNextTag(bool index_only)
 {
-	//GNASH_REPORT_FUNCTION;
-
 	// lock the stream while reading from it, so actionscript
 	// won't mess with the parser on seek  or on getBytesLoaded
 	boost::mutex::scoped_lock streamLock(_streamMutex);
@@ -351,20 +353,22 @@ bool FLVParser::parseNextTag(bool index_only)
 	if ( actuallyRead < 12 )
 	{
 		if ( actuallyRead )
-			log_error("FLVParser::parseNextTag: can't read tag info (needed 12 bytes, only got %d)", actuallyRead);
+			log_error("FLVParser::parseNextTag: can't read tag info "
+                    "(needed 12 bytes, only got %d)", actuallyRead);
 		// else { assert(_stream->eof(); } ?
 
 		completed = true;
 
-                // update bytes loaded
-                boost::mutex::scoped_lock lock(_bytesLoadedMutex);
+        // update bytes loaded
+        boost::mutex::scoped_lock lock(_bytesLoadedMutex);
 		_bytesLoaded = _stream->tell(); 
 		return false;
 	}
 
 	FLVTag flvtag(chunk);
 
-        position += 15 + flvtag.body_size; // may be _lastParsedPosition OR _nextPosToIndex
+    // May be _lastParsedPosition OR _nextPosToIndex
+    position += 15 + flvtag.body_size; 
 
 	bool doIndex = (_lastParsedPosition+4 > _nextPosToIndex) || index_only;
 	if ( _lastParsedPosition > _nextPosToIndex )
@@ -463,19 +467,21 @@ bool FLVParser::parseNextTag(bool index_only)
 		}
 
 		boost::mutex::scoped_lock lock(_metaTagsMutex);
-		_metaTags.push_back(new MetaTag(flvtag.timestamp, metaTag));
+		_metaTags.insert(std::make_pair(flvtag.timestamp, metaTag.release()));
 	}
 	else
 	{
-		log_error(_("FLVParser::parseNextTag: unknown FLV tag type %d"), (int)chunk[0]);
+		log_error(_("FLVParser::parseNextTag: unknown FLV tag type %d"),
+                (int)chunk[0]);
 		return false;
 	}
 
 	_stream->read(chunk, 4);
-	boost::uint32_t prevtagsize = chunk[0] << 24 | chunk[1] << 16 | chunk[2] << 8 | chunk[3];
+	boost::uint32_t prevtagsize = chunk[0] << 24 | chunk[1] << 16 |
+        chunk[2] << 8 | chunk[3];
 	if (prevtagsize != flvtag.body_size + 11) {
-		log_error(_("Corrupt FLV: previous tag size record (%1%) unexpected (actual size: %2%)"), 
-			  prevtagsize, flvtag.body_size + 11);
+		log_error(_("Corrupt FLV: previous tag size record (%1%) unexpected "
+                    "(actual size: %2%)"), prevtagsize, flvtag.body_size + 11);
 	}
 
 	return true;
@@ -497,7 +503,7 @@ bool FLVParser::parseHeader()
 
 	_lastParsedPosition = _bytesLoaded = _nextPosToIndex = 9;
 
-	if (!std::equal(header, header+3, "FLV")) {
+	if (!std::equal(header, header + 3, "FLV")) {
 		return false;
 	}
 
@@ -513,7 +519,8 @@ bool FLVParser::parseHeader()
 	return true;
 }
 
-inline boost::uint32_t FLVParser::getUInt24(boost::uint8_t* in)
+inline boost::uint32_t
+FLVParser::getUInt24(boost::uint8_t* in)
 {
 	// The bits are in big endian order
 	return (in[0] << 16) | (in[1] << 8) | in[2];
@@ -537,18 +544,21 @@ FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	frame->dataSize = dataSize;
 	frame->timestamp = timestamp;
 
-	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
+	const size_t chunkSize = smallestMultipleContaining(READ_CHUNKS,
+            dataSize + PADDING_BYTES);
 
-	frame->data.reset( new boost::uint8_t[chunkSize] );
-	size_t bytesread = _stream->read(frame->data.get(), dataSize);
+	frame->data.reset(new boost::uint8_t[chunkSize]);
+
+	const size_t bytesread = _stream->read(frame->data.get(), dataSize);
 	if ( bytesread < dataSize )
 	{
-		log_error("FLVParser::readAudioFrame: could only read %d/%d bytes", bytesread, dataSize);
+		log_error("FLVParser::readAudioFrame: could only read %d/%d bytes",
+                bytesread, dataSize);
 	}
 
-	unsigned long int padding = chunkSize-dataSize;
+	const size_t padding = chunkSize - dataSize;
 	assert(padding);
-	memset(frame->data.get() + bytesread, 0, padding);
+    std::fill_n(frame->data.get() + bytesread, padding, 0);
 
 	return frame;
 }
@@ -560,76 +570,37 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
 	std::auto_ptr<EncodedVideoFrame> frame;
 
-	unsigned long int chunkSize = smallestMultipleContaining(READ_CHUNKS, dataSize+PADDING_BYTES);
+	const size_t chunkSize = smallestMultipleContaining(READ_CHUNKS,
+            dataSize + PADDING_BYTES);
 
 	boost::uint8_t* data = new boost::uint8_t[chunkSize];
 	size_t bytesread = _stream->read(data, dataSize);
 
-	unsigned long int padding = chunkSize-dataSize;
+	const size_t padding = chunkSize - dataSize;
 	assert(padding);
-	memset(data + bytesread, 0, padding);
+    std::fill_n(data + bytesread, padding, 0);
 
 	// We won't need frameNum, so will set to zero...
 	// TODO: fix this ?
 	// NOTE: ownership of 'data' is transferred here
 
-	frame.reset( new EncodedVideoFrame(data, dataSize, 0, timestamp) );
+	frame.reset(new EncodedVideoFrame(data, dataSize, 0, timestamp));
 	return frame;
 }
 
+
 void
-FLVParser::processTags(boost::uint64_t ts, as_object* thisPtr, VM& vm)
+FLVParser::fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts)
 {
 	boost::mutex::scoped_lock lock(_metaTagsMutex);
-	while (!_metaTags.empty())
+	if (!_metaTags.empty())
 	{
-		if ( _metaTags.front()->timestamp() > ts ) break;
-
-		std::auto_ptr<MetaTag> tag ( _metaTags.front() );
-		_metaTags.pop_front();
-		tag->execute(thisPtr, vm);
-		
+        MetaTags::iterator it = _metaTags.upper_bound(ts);
+        std::transform(_metaTags.begin(), it, std::back_inserter(tags),
+                SecondElement<MetaTags::value_type>());
+        _metaTags.erase(_metaTags.begin(), it);
+       
 	}
-}
-
-void
-FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
-{
-	boost::uint8_t* ptr = _buffer->data();
-	boost::uint8_t* endptr = ptr+_buffer->size();
-
-	//log_debug("FLV meta: %s", hexify(ptr, 32, 0));
-	//log_debug("FLV meta: %s", hexify(ptr, 32, 1));
-
-	if ( ptr + 2 > endptr ) {
-		log_error("Premature end of AMF in FLV metatag");
-		return;
-	}
-	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
-	ptr+=2;
-
-	if ( ptr + length > endptr ) {
-		log_error("Premature end of AMF in FLV metatag");
-		return;
-	}
-	std::string funcName((char*)ptr, length); // TODO: check for OOB !
-	ptr += length;
-
-	log_debug("funcName: %s", funcName);
-
-	string_table& st = vm.getStringTable();
-	string_table::key funcKey = st.find(funcName);
-
-	as_value arg;
-	std::vector<as_object*> objRefs;
-	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
-	{
-		log_error("Could not convert FLV metatag to as_value, but will try passing it anyway. It's an %s", arg);
-		//return;
-	}
-
-	log_debug("Calling %s(%s)", funcName, arg);
-	thisPtr->callMethod(funcKey, arg);
 }
 
 } // end of gnash::media namespace

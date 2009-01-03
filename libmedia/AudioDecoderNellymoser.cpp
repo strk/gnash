@@ -50,10 +50,9 @@
 #include "SoundInfo.h"
 #include "log.h"
 
-#include "VM.h" // for randonNumberGenerator
-
 #include <ctime>
 #include <cmath>
+#include <boost/random.hpp>
 
 namespace gnash {
 namespace media {
@@ -648,10 +647,13 @@ static int
 gimme_random()
 {
 	using namespace boost;
-	VM::RNG& rnd = VM::get().randomNumberGenerator();
+	
+    typedef boost::mt11213b RNG;
+
+    static RNG rnd;
 
 	uniform_int<> dist(0, std::numeric_limits<int>::max());
-	variate_generator<VM::RNG&, uniform_int<> > uni(rnd, dist);
+	variate_generator<RNG, uniform_int<> > uni(rnd, dist);
 
 	return uni();
 }

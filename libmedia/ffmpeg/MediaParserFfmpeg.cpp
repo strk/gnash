@@ -69,8 +69,9 @@ MediaParserFfmpeg::probeStream()
 
 	if (actuallyRead < 1)
 	{
- 		throw IOException(_("MediaParserFfmpeg could not read probe data from input"));
- 		return NULL;
+ 		throw IOException(_("MediaParserFfmpeg could not read probe data "
+                    "from input"));
+ 		return 0;
 	}
 
 	probe_data.buf_size = actuallyRead; // right ?
@@ -324,7 +325,8 @@ MediaParserFfmpeg::initializeParser()
 	_inputFmt = probeStream();
 	if ( ! _inputFmt )
 	{
-		throw GnashException("MediaParserFfmpeg couldn't figure out input format");
+		throw MediaException("MediaParserFfmpeg couldn't figure out input "
+                "format");
 	}
 
 	_formatCtx = av_alloc_format_context();

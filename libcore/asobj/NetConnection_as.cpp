@@ -394,8 +394,8 @@ HTTPRemotingHandler::advance()
 #endif
                 boost::int16_t si;
                 boost::uint16_t li;
-                boost::uint8_t *b = reply.data() + reply_start;
-                boost::uint8_t *end = reply.data() + reply.size();
+                const boost::uint8_t *b = reply.data() + reply_start;
+                const boost::uint8_t *end = reply.data() + reply.size();
 
                 // parse header
                 b += 2; // skip version indicator and client id
@@ -477,13 +477,19 @@ HTTPRemotingHandler::advance()
                             int ns = 1; // next slash position
                             while (ns<si-1 && *(b+ns) != '/') ++ns;
                             if ( ns >= si-1 ) {
-                                std::string msg(reinterpret_cast<char*>(b), si);
-                                log_error("NetConnection::call(): invalid reply message name (%s)", msg);
+                                std::string msg(
+                                        reinterpret_cast<const char*>(b), si);
+                                log_error("NetConnection::call(): invalid "
+                                        "reply message name (%s)", msg);
                                 break;
                             }
 
-                            std::string id(reinterpret_cast<char*>(b), ns);
-                            std::string methodName(reinterpret_cast<char*>(b+ns+1), si-ns-1);
+                            std::string id(reinterpret_cast<const char*>(b),
+                                    ns);
+
+                            std::string methodName(
+                                    reinterpret_cast<const char*>(b+ns+1),
+                                    si-ns-1);
 
                             b += si;
 

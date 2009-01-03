@@ -26,6 +26,7 @@
 
 #include "IOChannel.h" // for inlines
 #include "dsodefs.h" // DSOEXPORT
+#include "SimpleBuffer.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/thread/thread.hpp>
@@ -38,14 +39,9 @@
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
 
 
-// Forward declarations
-namespace gnash {
-	class as_object;
-	class VM;
-}
-
 namespace gnash {
 namespace media {
+
 
 /// Video frame types
 enum videoFrameType
@@ -435,7 +431,14 @@ class MediaParser
 {
 public:
 
-	MediaParser(std::auto_ptr<IOChannel> stream);
+    /// A container for executable MetaTags contained in media streams.
+    //
+    /// Presently only known in FLV.
+    typedef std::multimap<boost::uint64_t, boost::shared_ptr<SimpleBuffer> >
+        MetaTags;
+    
+    typedef std::vector<MetaTags::mapped_type> OrderedMetaTags;
+        MediaParser(std::auto_ptr<IOChannel> stream);
 
 	// Classes with virtual methods (virtual classes)
 	// must have a virtual destructor, or the destructors
@@ -570,7 +573,16 @@ public:
 	///
 	virtual bool parseNextChunk()=0;
 
-	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
+    /// Retrieve any parsed metadata tags up to a specified timestamp.
+    //
+    /// @param ts   The latest timestamp to retrieve metadata for.
+    /// @param tags This is filled with shared pointers to metatags in
+    ///             timestamp order. Ownership of the data is shared. It
+    ///             is destroyed automatically along with the last owner.
+    //
+    /// Metadata is currently only parsed from FLV streams. The default
+    /// is a no-op.
+    virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
 
 protected:
 

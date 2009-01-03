@@ -20,9 +20,9 @@
 
 #include "MediaParser.h"
 #include "log.h"
+#include "GnashSleep.h" // for usleep.
 
 #include <boost/bind.hpp>
-#include "GnashSleep.h" // for usleep.
 
 // Define this to get debugging output from MediaParser
 //#define GNASH_DEBUG_MEDIAPARSER
@@ -380,11 +380,13 @@ MediaParser::parserLoop()
 
 
 void
-MediaParser::processTags(boost::uint64_t /*ts*/, as_object* /*thisPtr*/, VM& /*env*/)
+MediaParser::fetchMetaTags(OrderedMetaTags& /*tags*/, boost::uint64_t /*ts*/)
 {
 }
 
-std::ostream& operator << (std::ostream& os, const VideoInfo& vi)
+
+std::ostream&
+operator<< (std::ostream& os, const VideoInfo& vi)
 {
 	os << "codec:" << vi.codec << " (type " << vi.type << ") - "
 	   << "size:" << vi.width << "x" << vi.height << " - "
