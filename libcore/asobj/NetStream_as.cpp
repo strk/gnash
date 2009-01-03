@@ -46,6 +46,13 @@
 #include "sound_handler.h"
 
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
+# include <sys/types.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <io.h>
+#endif
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS
@@ -1259,6 +1266,45 @@ NetStream_as::videoWidth() const
 }
 
 void
+executeTag(const SimpleBuffer& _buffer, as_object* thisPtr, VM& vm)
+{
+	const boost::uint8_t* ptr = _buffer.data();
+	const boost::uint8_t* endptr = ptr + _buffer.size();
+
+	if ( ptr + 2 > endptr ) {
+		log_error("Premature end of AMF in NetStream metatag");
+		return;
+	}
+	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
+	ptr += 2;
+
+	if ( ptr + length > endptr ) {
+		log_error("Premature end of AMF in NetStream metatag");
+		return;
+	}
+
+	std::string funcName(reinterpret_cast<const char*>(ptr), length); 
+	ptr += length;
+
+	log_debug("funcName: %s", funcName);
+
+	string_table& st = vm.getStringTable();
+	string_table::key funcKey = st.find(funcName);
+
+	as_value arg;
+	std::vector<as_object*> objRefs;
+	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
+	{
+		log_error("Could not convert FLV metatag to as_value, but will try "
+                "passing it anyway. It's an %s", arg);
+	}
+
+	log_debug("Calling %s(%s)", funcName, arg);
+	thisPtr->callMethod(funcKey, arg);
+}
+
+
+void
 NetStream_as::advance()
 {
     // Check if there are any new status messages, and if we should
@@ -1352,12 +1398,20 @@ NetStream_as::advance()
     // up to current playhead
     refreshAudioBuffer();
 
-    // Advance PlayeHead position if current one was consumed
+    // Advance PlayHead position if current one was consumed
     // by all available consumers
     _playHead.advanceIfConsumed();
 
-    // Process media tags
-    m_parser->processTags(_playHead.getPosition(), this, getVM());
+    media::OrderedMetaTags tags;
+
+    m_parser->fetchMetaTags(tags, _playHead.getPosition());
+
+    if (tags.empty()) return;
+
+    for (media::OrderedMetaTags::iterator i = tags.begin(), e = tags.end();
+            i != e; ++i) {
+        executeTag(**i, this, getVM());
+    }
 }
 
 boost::int32_t

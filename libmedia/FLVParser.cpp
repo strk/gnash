@@ -28,19 +28,10 @@
 #include "IOChannel.h"
 #include "SimpleBuffer.h"
 
-#include "as_object.h"
 #include "element.h"
-#include "VM.h"
 
 #include <string>
 #include <iosfwd>
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-# include <sys/types.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <io.h>
-#endif
 
 
 #define PADDING_BYTES 64
@@ -67,6 +58,21 @@
 namespace gnash {
 namespace media {
 
+namespace {
+
+/// Functor for use when transforming a map into a vector of mapped values.
+template<typename T>
+struct SecondElement
+{
+    typedef typename T::second_type result_type;
+
+    const result_type& operator()(const T& pair) const
+    {
+        return pair.second;
+    }
+};
+
+}
 
 const boost::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] = {5500, 11000, 22050, 44100};
 
@@ -91,14 +97,7 @@ FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 
 FLVParser::~FLVParser()
 {
-
 	stopParserThread();
-        
-    for (MetaTags::iterator i=_metaTags.begin(), e=_metaTags.end(); i!=e; ++i)
-	{
-		delete *i;
-	}
-	
 }
 
 
@@ -468,7 +467,7 @@ FLVParser::parseNextTag(bool index_only)
 		}
 
 		boost::mutex::scoped_lock lock(_metaTagsMutex);
-		_metaTags.push_back(new MetaTag(flvtag.timestamp, metaTag));
+		_metaTags.insert(std::make_pair(flvtag.timestamp, metaTag.release()));
 	}
 	else
 	{
@@ -589,57 +588,19 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 	return frame;
 }
 
+
 void
-FLVParser::processTags(boost::uint64_t ts, as_object* thisPtr, VM& vm)
+FLVParser::fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts)
 {
 	boost::mutex::scoped_lock lock(_metaTagsMutex);
-	while (!_metaTags.empty())
+	if (!_metaTags.empty())
 	{
-		if ( _metaTags.front()->timestamp() > ts ) break;
-
-		std::auto_ptr<MetaTag> tag (_metaTags.front());
-		_metaTags.pop_front();
-		tag->execute(thisPtr, vm);
+        MetaTags::iterator it = _metaTags.upper_bound(ts);
+        std::transform(_metaTags.begin(), it, std::back_inserter(tags),
+                SecondElement<MetaTags::value_type>());
+        _metaTags.erase(_metaTags.begin(), it);
+       
 	}
-
-}
-
-void
-FLVParser::MetaTag::execute(as_object* thisPtr, VM& vm)
-{
-	boost::uint8_t* ptr = _buffer->data();
-	boost::uint8_t* endptr = ptr + _buffer->size();
-
-	if ( ptr + 2 > endptr ) {
-		log_error("Premature end of AMF in FLV metatag");
-		return;
-	}
-	boost::uint16_t length = ntohs((*(boost::uint16_t *)ptr) & 0xffff);
-	ptr += 2;
-
-	if ( ptr + length > endptr ) {
-		log_error("Premature end of AMF in FLV metatag");
-		return;
-	}
-
-	std::string funcName(reinterpret_cast<char*>(ptr), length); 
-	ptr += length;
-
-	log_debug("funcName: %s", funcName);
-
-	string_table& st = vm.getStringTable();
-	string_table::key funcKey = st.find(funcName);
-
-	as_value arg;
-	std::vector<as_object*> objRefs;
-	if ( ! arg.readAMF0(ptr, endptr, -1, objRefs, vm) )
-	{
-		log_error("Could not convert FLV metatag to as_value, but will try "
-                "passing it anyway. It's an %s", arg);
-	}
-
-	log_debug("Calling %s(%s)", funcName, arg);
-	thisPtr->callMethod(funcKey, arg);
 }
 
 } // end of gnash::media namespace

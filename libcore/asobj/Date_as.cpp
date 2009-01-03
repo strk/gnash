@@ -163,7 +163,7 @@ namespace {
 Date_as::Date_as(double value)
     :
     as_object(getDateInterface()),
-    _value(value)
+    _timeValue(value)
 {
 }
 
@@ -179,7 +179,7 @@ Date_as::toString() const
                                    "Thu", "Fri", "Sat" };
   
     /// NaN and infinities all print as "Invalid Date"
-    if (isNaN(_value) || isInf(_value)) {
+    if (isNaN(_timeValue) || isInf(_timeValue)) {
         return "Invalid Date";
     }
   
@@ -187,7 +187,7 @@ Date_as::toString() const
     GnashTime gt;
     // Time zone offset (including DST) as hours and minutes east of GMT
 
-    localTime(_value, gt);
+    localTime(_timeValue, gt);
 
     int offsetHours = gt.timeZoneOffset / 60;
     int offsetMinutes = gt.timeZoneOffset % 60;    
@@ -393,6 +393,7 @@ getDateInterface()
     if ( !o )
     {
         o = new as_object(getObjectInterface());
+        VM::get().addStatic(o.get());
         attachDateInterface(*o);
     }
     return o.get();
@@ -486,7 +487,8 @@ date_new(const fn_call& fn)
         // due to shortcomings in the timezoneoffset calculation, but should
         // be internally consistent.
         double localTime = makeTimeValue(gt);
-        date = new Date_as(localTime - clocktime::getTimeZoneOffset(localTime) * 60000);
+        date = new Date_as(
+                localTime - clocktime::getTimeZoneOffset(localTime) * 60000);
     }
     
     return as_value(date.get());

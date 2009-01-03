@@ -25,23 +25,17 @@
 
 #include "dsodefs.h"
 #include "MediaParser.h" // for inheritance
-#include "SimpleBuffer.h" // for MetaTag destructor
+#include "SimpleBuffer.h" 
 
+#include <set>
 #include <vector>
 #include <memory>
 #include <map>
 
 #include <boost/thread/mutex.hpp>
 
-// Forward declarations
-namespace gnash {
-	class as_object;
-	class VM;
-}
-
 namespace gnash {
 namespace media {
-
 
 /// Extra video info found in some FLV embedded streams
 //
@@ -141,7 +135,7 @@ public:
 		return _indexingCompleted;
 	}
 
-	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
+    virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
 
 private:
 
@@ -281,28 +275,6 @@ private:
 	CuePointsMap _cuePoints;
 
 	bool _indexingCompleted;
-
-	class MetaTag {
-	
-    public:
-	
-        MetaTag(boost::uint64_t t, std::auto_ptr<SimpleBuffer> b)
-			:
-			_timestamp(t),
-			_buffer(b)
-		{}
-
-		void execute(as_object* thisPtr, VM& env);
-		boost::uint64_t timestamp() const { return _timestamp; }
-	
-    private:
-	
-        boost::uint64_t _timestamp;
-		std::auto_ptr<SimpleBuffer> _buffer;
-	
-    };
-
-	typedef std::deque<MetaTag*> MetaTags;
 
     MetaTags _metaTags;
 

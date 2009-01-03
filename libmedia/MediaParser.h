@@ -26,6 +26,7 @@
 
 #include "IOChannel.h" // for inlines
 #include "dsodefs.h" // DSOEXPORT
+#include "SimpleBuffer.h"
 
 #include <boost/scoped_array.hpp>
 #include <boost/thread/thread.hpp>
@@ -38,14 +39,15 @@
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
 
 
-// Forward declarations
-namespace gnash {
-	class as_object;
-	class VM;
-}
-
 namespace gnash {
 namespace media {
+
+/// A container for executable MetaTags contained in media streams.
+//
+/// Presently only known in FLV.
+typedef std::multimap<boost::uint64_t, boost::shared_ptr<SimpleBuffer> >
+    MetaTags;
+typedef std::vector<MetaTags::mapped_type> OrderedMetaTags;
 
 /// Video frame types
 enum videoFrameType
@@ -570,7 +572,7 @@ public:
 	///
 	virtual bool parseNextChunk()=0;
 
-	virtual void processTags(boost::uint64_t ts, as_object* thisPtr, VM& env);
+    virtual void fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts);
 
 protected:
 

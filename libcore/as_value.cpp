@@ -58,8 +58,8 @@
 // Define this macro to make soft references activity verbose
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
-// Define this macto to make AMF parsing verbose
-//#define GNASH_DEBUG_AMF_DESERIALIZE
+// Define this macro to make AMF parsing verbose
+#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
@@ -2103,7 +2103,7 @@ readNetworkLong(const boost::uint8_t* buf) {
 // TODO restore first parameter on parse errors
 //
 static bool
-amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, 
+amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end, 
         as_value& ret, int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	int amf_type;
@@ -2169,7 +2169,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			}
 
 			{
-				std::string str(reinterpret_cast<char *>(b), si); b += si;
+				std::string str(reinterpret_cast<const char*>(b), si); b += si;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 read string: %s", str);
 #endif
@@ -2195,7 +2195,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			}
 
 			{
-				std::string str(reinterpret_cast<char *>(b), si); b += si;
+				std::string str(reinterpret_cast<const char*>(b), si); b += si;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 read long string: %s", str);
 #endif
@@ -2277,7 +2277,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
                         break;
                     }
 
-					std::string name(reinterpret_cast<char*>(b), strlen);
+					std::string name(reinterpret_cast<const char*>(b), strlen);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
@@ -2374,7 +2374,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 		case amf::Element::DATE_AMF0:
         {
 			if (b + 8 > end) {
-				log_error(_("AMF0 read: premature end of input reading Date type"));
+				log_error(_("AMF0 read: premature end of input reading Date "
+                            "type"));
 				return false;
 			}
 			double dub;
@@ -2389,10 +2390,12 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			ret.set_as_object(obj);
 
 			if (b + 2 > end) {
-				log_error(_("AMF0 read: premature end of input reading timezone from Date type"));
+				log_error(_("AMF0 read: premature end of input reading "
+                            "timezone from Date type"));
 				return false;
 			}
-            LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object ignored"));
+            LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object "
+                        "ignored"));
             b+=2;
 
 			return true;
@@ -2411,7 +2414,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 }
 
 bool
-as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs, VM& vm)
+as_value::readAMF0(const boost::uint8_t *&b, const boost::uint8_t *end,
+        int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	return amf0_read_value(b, end, *this, inType, objRefs, vm);
 }
@@ -2568,7 +2572,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             log_debug(_("writeAMF0: serializing number '%g'"), d);
 #endif
             buf.appendByte(amf::Element::NUMBER_AMF0);
-            amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
+            amf::swapBytes(&d, 8); // this actually only swaps on little-endian machines
             buf.append(&d, 8);
             return true;
         }

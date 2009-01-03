@@ -32,11 +32,8 @@ pkglib_LTLIBRARIES =  libgnashmedia.la
 libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/libnet \
-	-I$(top_srcdir)/backend	\
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/libcore	\
-	-I$(top_srcdir)/libcore/vm \
-	-I$(top_srcdir)/libcore/parser \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(OPENGL_CFLAGS) \
@@ -170,8 +167,7 @@ libgnashmedia_la_LDFLAGS = -release $(VERSION)
 if WIN32
   libgnashmedia_la_LDFLAGS += -no-undefined
   libgnashmedia_la_LIBADD += \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/libcore/libgnashcore.la \
+	$(top_builddir)/libbase/libgnashbase.la
 	-lintl
 endif
 
