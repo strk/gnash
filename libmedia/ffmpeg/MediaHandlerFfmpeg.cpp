@@ -37,23 +37,22 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
 	std::auto_ptr<MediaParser> parser;
 
-	if ( isFLV(*stream) )
-	{
-		parser.reset( new FLVParser(stream) );
-	}
-	else
-	{
-		try
-		{
+    try {
+        if (isFLV(*stream))
+        {
+            parser.reset(new FLVParser(stream));
+        }
+        else
+        {
 			parser.reset(new MediaParserFfmpeg(stream));
 		}
-		catch (GnashException& ex)
-		{
-			log_error("Could not create FFMPEG based media parser for "
-                    "input stream: %s", ex.what());
-			assert(!parser.get());
-		}
-	}
+    }
+    catch (GnashException& ex)
+    {
+        log_error("Could not create FFMPEG based media parser for "
+                "input stream: %s", ex.what());
+        assert(!parser.get());
+    }
 
 	return parser;
 }

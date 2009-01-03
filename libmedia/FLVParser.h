@@ -94,11 +94,11 @@ public:
     /// @todo take a SimpleBuffer by auto_ptr
     ///
     ExtraAudioInfoFlv(boost::uint8_t* extradata, size_t datasize)
-                :
-                data(extradata),
-                size(datasize)
-        {
-        }
+        :
+        data(extradata),
+        size(datasize)
+    {
+    }
 
     /// Audio stream header
     boost::scoped_array<boost::uint8_t> data;
@@ -155,9 +155,10 @@ private:
 	struct FLVTag : public boost::noncopyable
 	{
 		FLVTag(boost::uint8_t* stream)
-		: type(stream[0]),
-		  body_size(getUInt24(stream+1)),
-		  timestamp(getUInt24(stream+4) | (stream[7] << 24) )
+		    :
+            type(stream[0]),
+            body_size(getUInt24(stream+1)),
+            timestamp(getUInt24(stream+4) | (stream[7] << 24) )
 		{}
 
 		/// Equals tagType
@@ -169,10 +170,11 @@ private:
 	struct FLVAudioTag : public boost::noncopyable
 	{
 		FLVAudioTag(const boost::uint8_t& byte)
-		: codec( (byte & 0xf0) >> 4 ),
-		  samplerate( flv_audio_rates[(byte & 0x0C) >> 2] ),
-		  samplesize( 1 + ((byte & 0x02) >> 1)),
-		  stereo( (byte & 0x01) )
+		    :
+            codec( (byte & 0xf0) >> 4 ),
+		    samplerate( flv_audio_rates[(byte & 0x0C) >> 2] ),
+		    samplesize( 1 + ((byte & 0x02) >> 1)),
+		    stereo( (byte & 0x01) )
 		{
 		}
 
@@ -185,9 +187,12 @@ private:
 		boost::uint8_t samplesize;
 
 		bool stereo;
-	private:
-		static const boost::uint16_t flv_audio_rates[];
-	};
+
+    private:
+	
+        static const boost::uint16_t flv_audio_rates[];
+	
+    };
 
 	enum frameType
 	{
@@ -199,8 +204,9 @@ private:
 	struct FLVVideoTag : public boost::noncopyable
 	{
 		FLVVideoTag(const boost::uint8_t& byte)
-		: frametype( (byte & 0xf0) >> 4 ),
-		  codec( byte & 0x0f )
+            :
+            frametype( (byte & 0xf0) >> 4 ),
+		    codec( byte & 0x0f )
 		{}
 
 		/// Equals frameType
@@ -218,11 +224,13 @@ private:
 
 	std::auto_ptr<EncodedAudioFrame> parseAudioTag(const FLVTag& flvtag,
             const FLVAudioTag& audiotag, boost::uint32_t thisTagPos);
-	std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag,
+	
+    std::auto_ptr<EncodedVideoFrame> parseVideoTag(const FLVTag& flvtag,
             const FLVVideoTag& videotag, boost::uint32_t thisTagPos);
 
 	void indexAudioTag(const FLVTag& tag, boost::uint32_t thisTagPos);
-	void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag,
+	
+    void indexVideoTag(const FLVTag& tag, const FLVVideoTag& videotag,
             boost::uint32_t thisTagPos);
 
 	/// Parses the header of the file
