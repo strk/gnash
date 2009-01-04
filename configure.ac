@@ -1608,8 +1608,8 @@ dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
 if test x$cross_compiling = xno; then
-  AC_PATH_PROG(SWFMILL, swfmill)
   AC_PATH_PROG(SWFC, swfc)
+  AC_PATH_SWFMILL
   AC_PATH_MTASC
   AC_PATH_HAXE
 fi
