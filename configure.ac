@@ -1226,7 +1226,7 @@ dnl Add KPARTS support, if specified or KDE gui is built
 dnl ----------------------------------------------------
 
 AC_ARG_ENABLE(kparts3,
-  AC_HELP_STRING([--disable-kparts3], [Disble support for Konqueror 3.x plugin (default: enabled if kde3 gui is)]),
+  AC_HELP_STRING([--disable-kparts3], [Disable support for Konqueror 3.x plugin (default: enabled if kde3 gui is)]),
 [case "${enableval}" in
   yes) build_kparts3=yes ;;
   no)  build_kparts3=no ;;
