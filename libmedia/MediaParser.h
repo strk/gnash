@@ -29,11 +29,14 @@
 #include "SimpleBuffer.h"
 
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
 #include <memory>
 #include <deque>
+#include <map>
+#include <vector>
 
 // Undefine this to load/parse media files in main thread
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1
