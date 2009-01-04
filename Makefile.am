@@ -373,10 +373,10 @@ else
 endif
 if KPARTS4
 	@echo "	KPARTS 4.x (KDE) plugin enabled"
-	@echo "	  KPARTS 4.x plugin install dir: $(KDE_PLUGINDIR)"
-	@echo "	  KPARTS 4.x service install dir: $(KDE_SERVICESDIR)"
-	@echo "	  KPARTS 4.x config dir: ${KDE_CONFIGDIR}"
-	@echo "	  KPARTS 4.x appsdata dir: ${KDE_APPSDATADIR}"
+	@echo "	  KPARTS 4.x plugin install dir: $(KDE4_PLUGINDIR)"
+	@echo "	  KPARTS 4.x service install dir: $(KDE4_SERVICESDIR)"
+	@echo "	  KPARTS 4.x config dir: ${KDE4_CONFIGDIR}"
+	@echo "	  KPARTS 4.x appsdata dir: ${KDE4_APPSDATADIR}"
 else
 	@echo "	KPARTS 4.x (KDE) plugin disabled"
 endif
