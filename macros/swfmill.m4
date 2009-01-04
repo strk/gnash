@@ -38,7 +38,7 @@ AC_DEFUN([AC_PATH_SWFMILL], [
     AC_PATH_PROG(SWFMILL, swfmill, ,[${pathlist}])
   fi
 
-  AC_SUBST(HAXE)
+  AC_SUBST(SWFMILL)
 ])
 
 # Local Variables:
