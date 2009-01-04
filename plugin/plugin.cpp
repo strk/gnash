@@ -921,7 +921,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 
 #ifdef GNASH_XPI_PLUGIN
 static int
-getHome(string& gnashpath)
+getHome(std::string& gnashpath)
 {
     nsresult rv;
 
