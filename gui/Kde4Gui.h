@@ -62,6 +62,7 @@ public:
 
 public slots:
 
+    void properties();
     void play();
     void pause();
     void stop();
@@ -106,6 +107,7 @@ public:
     virtual void unsetFullscreen();
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
+    void showProperties();
     void quit();
 
     bool want_multiple_regions() { return true; }
@@ -159,6 +161,7 @@ private:
 
     // File Menu
     QMenu* fileMenu;
+    QAction* propertiesAction;
     QAction* quitAction;
     
     // Movie Control Menu;

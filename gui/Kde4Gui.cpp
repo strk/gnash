@@ -37,6 +37,13 @@
 #include <QResizeEvent>
 #include <QTimer>
 #include <QEvent>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QLayout>
+#include <QPushButton>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QStack>
 
 #include "Range2d.h"
 
@@ -117,6 +124,7 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
     _drawingWidget->setMouseTracking(true);
     _drawingWidget->setFocusPolicy(Qt::StrongFocus);
     _window->setWindowTitle(windowtitle);
+    _window->setWindowIcon(QIcon(PKGDATADIR"/GnashG.png"));
     
     if(_xid) {
         _drawingWidget->embedInto(_xid);
@@ -368,6 +376,88 @@ Kde4Gui::resize(int width, int height)
     resize_view(width, height);
 }
 
+void
+Kde4Gui::showProperties()
+{
+    QDialog* propsDialog = new QDialog(_drawingWidget);
+    propsDialog->setWindowTitle(_("Movie properties"));
+    propsDialog->setAttribute(Qt::WA_DeleteOnClose);
+    propsDialog->resize(500, 300);
+
+    QDialogButtonBox *dialogButtons = new QDialogButtonBox(
+                 QDialogButtonBox::Close, Qt::Horizontal, propsDialog);
+    dialogButtons->button(QDialogButtonBox::Close)->setDefault(true);
+
+    QVBoxLayout* layout = new QVBoxLayout(propsDialog);
+    propsDialog->connect(dialogButtons->button(QDialogButtonBox::Close),
+            SIGNAL(clicked()), SLOT(close()));
+
+#ifdef USE_SWFTREE
+    std::auto_ptr<InfoTree> infoptr = getMovieInfo();
+    InfoTree& info = *infoptr;
+
+    QTreeWidget *tree = new QTreeWidget();
+    tree->setColumnCount(2);
+    QStringList treeHeader;
+    treeHeader.append(_("Variable"));
+    treeHeader.append(_("Value"));
+    tree->setHeaderLabels(treeHeader);
+
+    QList<QTreeWidgetItem *> items;
+
+    int prevDepth = 0;
+    QStack<QTreeWidgetItem*> stack;
+    for (InfoTree::iterator i=info.begin(), e=info.end(); i!=e; ++i) {
+        StringPair& p = *i;
+
+        QStringList cols;
+        cols.append(p.first.c_str());
+        cols.append(p.second.c_str());
+        QTreeWidgetItem* item = new QTreeWidgetItem(cols);
+
+        int newDepth = info.depth(i);
+
+        if (newDepth == 0) {
+            // Insert top level entries directly into the tree widget.
+            items.append(item);
+            stack.empty();
+        } else {
+            // The position to insert the new row.
+            QTreeWidgetItem* parent = NULL;
+
+            if (newDepth == prevDepth ) {
+                // Pop an extra time if there is a sibling on the stack.
+                int size = stack.size();
+                if (size + 1 > newDepth)
+                    stack.pop();
+
+                parent = stack.pop();
+            } else if (newDepth > prevDepth) {
+                parent = stack.pop();
+            } else if (newDepth < prevDepth) {
+                // Pop until the stack has the right depth.
+                int size = stack.size();
+                for (int j = 0; j < (size + 1) - newDepth; ++j) {
+                    parent = stack.pop();
+                }
+            }
+
+            parent->addChild(item);
+            stack.push(parent);
+        }
+
+        stack.push(item);
+        prevDepth = newDepth;
+    }
+    tree->insertTopLevelItems(0, items);
+    layout->addWidget(tree);
+
+#endif // USE_SWFTREE
+    layout->addWidget(dialogButtons);
+
+    propsDialog->show();
+    propsDialog->activateWindow();
+}
 
 void
 Kde4Gui::quit()
@@ -381,6 +471,10 @@ Kde4Gui::setupActions()
 {
 
     // File Menu actions
+    propertiesAction = new QAction(_("Properties"), _window.get());
+    _drawingWidget->connect(propertiesAction, SIGNAL(triggered()),
+                     _drawingWidget, SLOT(properties()));
+
     quitAction = new QAction(_("Quit Gnash"), _window.get());
     // This is connected directly to the QApplication's quit() slot
     _drawingWidget->connect(quitAction, SIGNAL(triggered()),
@@ -424,6 +518,7 @@ Kde4Gui::setupMenus()
 
     // Set up the File menu.
     fileMenu = new QMenu(_("File"), _window.get());
+    fileMenu->addAction(propertiesAction);
     fileMenu->addAction(quitAction);
 
     // Set up the Movie Control menu
@@ -562,6 +657,13 @@ DrawingWidget::resizeEvent(QResizeEvent *event)
 {
     _gui.resize(event->size().width(), event->size().height());
     update();
+}
+
+
+void
+DrawingWidget::properties()
+{
+    _gui.showProperties();
 }
 
 
