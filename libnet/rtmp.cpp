@@ -197,6 +197,7 @@ RTMP::RTMP()
 
         // each channel can have a different chunksize
 	    _chunksize[i] = RTMP_VIDEO_PACKET_SIZE;
+	    _lastsize[i] = 0;
     }
 }
 
@@ -250,7 +251,7 @@ RTMP::decodeHeader(amf::Buffer &buf)
 boost::shared_ptr<RTMP::rtmp_head_t>
 RTMP::decodeHeader(boost::uint8_t *in)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     boost::shared_ptr<RTMP::rtmp_head_t> head(new RTMP::rtmp_head_t);
     boost::uint8_t *tmpptr = in;
@@ -261,6 +262,11 @@ RTMP::decodeHeader(boost::uint8_t *in)
     head->head_size = headerSize(*tmpptr++);
     log_debug (_("The header size is %d"), head->head_size);
 
+    if (head->head_size > RTMP_MAX_HEADER_SIZE) {
+	head.reset();
+	return head;
+    }
+    
 //     cerr << "FIXME3: " << hexify(in, head->head_size, false) << endl;    
     
     if (head->head_size >= 4) {
@@ -358,7 +364,7 @@ RTMP::encodeHeader(int amf_index, rtmp_headersize_e head_size,
 		       size_t total_size, content_types_e type,
 		       RTMPMsg::rtmp_source_e routing)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     boost::shared_ptr<amf::Buffer> buf;
     switch(head_size) {
@@ -539,7 +545,7 @@ RTMP::dump()
 boost::shared_ptr<RTMP::rtmp_ping_t>
 RTMP::decodePing(boost::uint8_t *data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(data);
     boost::shared_ptr<rtmp_ping_t> ping(new rtmp_ping_t);
@@ -566,7 +572,7 @@ RTMP::decodePing(boost::uint8_t *data)
 boost::shared_ptr<RTMP::rtmp_ping_t>
 RTMP::decodePing(amf::Buffer &buf)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return decodePing(buf.reference());
 }
 
@@ -1042,7 +1048,7 @@ RTMP::recvMsg()
 boost::shared_ptr<amf::Buffer> 
 RTMP::recvMsg(int fd)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     int ret = 0;
     bool nopacket = true;
@@ -1087,14 +1093,14 @@ RTMP::recvMsg(int fd)
 // but RTMP uses a weird scheme of a standard header, and then every chunksize
 // bytes another 1 byte RTMP header. The header itself is not part of the byte
 // count.
-RTMP::queues_t *
+boost::shared_ptr<RTMP::queues_t>
 RTMP::split(amf::Buffer &buf)
 {
     GNASH_REPORT_FUNCTION;
     return split(buf.reference(), buf.allocated());
 }
 
-RTMP::queues_t *
+boost::shared_ptr<RTMP::queues_t>
 RTMP::split(boost::uint8_t *data, size_t size)
 {
     GNASH_REPORT_FUNCTION;
@@ -1102,7 +1108,9 @@ RTMP::split(boost::uint8_t *data, size_t size)
     if (data == 0) {
 	log_error("Buffer pointer is invalid.");
     }
-    
+
+    boost::shared_ptr<RTMP::queues_t> channels(new RTMP::queues_t);
+	
     // split the buffer at the chunksize boundary
     boost::uint8_t *ptr = 0;
     boost::shared_ptr<rtmp_head_t> rthead(new rtmp_head_t);
@@ -1132,6 +1140,9 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	    // Any packet with a header size greater than 1 is a
 	    // always a new RTMP message, so create a new Buffer to
 	    // hold all the data.
+	    if (rthead->head_size <= 4) {
+		rthead->bodysize = _lastsize[rthead->channel];
+	    }
 	    if ((rthead->head_size > 1)) {
  		cerr << "New packet for channel #" << rthead->channel << " of size "
  		     << (rthead->head_size + rthead->bodysize) << endl;
@@ -1142,6 +1153,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		// via the Buffer for processing later. All the data
 		// goes in a queue for each channel.
 		_queues[rthead->channel].push(chunk);
+//		rthead->head_size == 4
 	    } else {
 		// Use the existing Buffer for this packet, as it's a
 		// continuation messages for an existing packet. Leave
@@ -1210,12 +1222,13 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		}
 		// This is a queue of channels with active messages. This is a
 		// much smaller list to traverse when processing data than all 64 channels.
-		_channels.push_back(&_queues[rthead->channel]);
+		channels->push_back(&_queues[rthead->channel]);
 		if (pktsize < 0xffffff) {
 //		    cerr << "FIXME5: " << hexify(ptr, pktsize, true) << endl;
 		    // If the packet size is in range, then append the
 		    // data to the existing data to complete the message.
 		    chunk->append(ptr, pktsize);
+		    _lastsize[rthead->channel] = rthead->bodysize;
 		    cerr << "Adding data to existing packet for channel #" << rthead->channel
 			 << ", read " << pktsize << " bytes." << endl;
 		    ptr += pktsize;
@@ -1232,7 +1245,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	}
     }
 
-    return &_channels;
+    return channels;
 }
 
 

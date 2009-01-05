@@ -293,8 +293,8 @@ public:
     // but RTMP uses a weird scheme of a standard header, and then every chunksize
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
-    queues_t *split(amf::Buffer &buf);
-    queues_t *split(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<queues_t> split(amf::Buffer &buf);
+    boost::shared_ptr<queues_t> split(boost::uint8_t *data, size_t size);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();
@@ -306,9 +306,10 @@ public:
     int         _packet_size;
     int         _mystery_word;
     size_t	_chunksize[MAX_AMF_INDEXES];
+    size_t	_lastsize[MAX_AMF_INDEXES];
     int		_timeout;
     CQue	_queues[MAX_AMF_INDEXES];
-    queues_t    _channels;
+//    queues_t    _channels;
     amf::Buffer	_buffer;
 };
 
