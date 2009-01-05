@@ -24,7 +24,7 @@
 #include "DefineButtonTag.h"
 #include "Button.h" // for create_character_instance()
 #include "DefineButtonCxformTag.h"
-
+#include "swf.h"
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
 #include "action_buffer.h"
@@ -38,19 +38,19 @@ namespace SWF {
 //
 
 
-ButtonAction::ButtonAction(SWFStream& in, int tag_type, unsigned long endPos,
+ButtonAction::ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
         movie_definition& mdef)
 	:
 	m_actions(mdef)
 {
 	// Read condition flags.
-	if (tag_type == SWF::DEFINEBUTTON) // 7
+	if (t == SWF::DEFINEBUTTON)
 	{
 		m_conditions = OVER_DOWN_TO_OVER_UP;
 	}
 	else
 	{
-		assert(tag_type == SWF::DEFINEBUTTON2); // 34
+		assert(t == SWF::DEFINEBUTTON2);
 
 		if ( in.tell()+2 > endPos ) 
 		{
@@ -117,7 +117,7 @@ computeButtonStatesString(int flags)
 }
 
 bool
-ButtonRecord::read(SWFStream& in, int tag_type,
+ButtonRecord::read(SWFStream& in, TagType t,
 		movie_definition& m, unsigned long endPos)
 {
 	// caller should check this
@@ -192,7 +192,7 @@ ButtonRecord::read(SWFStream& in, int tag_type,
     // SWFMatrix::read() checks the length of the stream
 	m_button_matrix.read(in);
 
-	if (tag_type == SWF::DEFINEBUTTON2)
+	if (t == SWF::DEFINEBUTTON2)
 	{
 		// cxform::read_rgba() checks the length of the stream.
 		m_button_cxform.read_rgba(in);
@@ -219,7 +219,7 @@ ButtonRecord::read(SWFStream& in, int tag_type,
 }
 
 void
-DefineButtonTag::loader(SWFStream& in, tag_type tag, movie_definition& m, 
+DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& /*r*/)
 {
     assert(tag == DEFINEBUTTON);
@@ -236,7 +236,7 @@ DefineButtonTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 }
 
 void
-DefineButton2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m, 
+DefineButton2Tag::loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& /*r*/)
 {
     assert(tag == DEFINEBUTTON2);
@@ -257,7 +257,7 @@ DefineButton2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 //
 
 DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
-        tag_type tag)
+        TagType tag)
 	:
 	_soundTag(0),
 	_movieDef(m)

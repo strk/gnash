@@ -29,7 +29,7 @@ namespace gnash {
 namespace SWF {
 
 bool
-TagLoadersTable::get(SWF::tag_type t, loader_function* lf)
+TagLoadersTable::get(SWF::TagType t, loader_function* lf)
 {
 	container::iterator it = _tag_loaders.find(t);
 
@@ -42,7 +42,7 @@ TagLoadersTable::get(SWF::tag_type t, loader_function* lf)
 }
 
 bool
-TagLoadersTable::register_loader(SWF::tag_type t, loader_function lf)
+TagLoadersTable::register_loader(SWF::TagType t, loader_function lf)
 {
 	assert(lf != NULL);
 

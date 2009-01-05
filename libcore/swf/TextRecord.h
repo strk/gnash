@@ -75,7 +75,7 @@ public:
     /// @return             False if we have reached the end of the
     ///                     TextRecords, true if there are more to parse.
     bool read(SWFStream& in, movie_definition& m, int glyphBits,
-            int advanceBits, tag_type tag);
+            int advanceBits, TagType tag);
 
     static void displayRecords(const SWFMatrix& this_mat, character* inst,
         const std::vector<SWF::TextRecord>& records, bool useEmbeddedGlyphs);

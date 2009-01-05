@@ -19,7 +19,7 @@
 #ifndef GNASH_SWF_DEFINEBUTTONCXFORMTAG_H
 #define GNASH_SWF_DEFINEBUTTONCXFORMTAG_H
 
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 
 namespace gnash {
     class SWFStream;
@@ -38,7 +38,7 @@ class DefineButtonCxformTag
 {
 public:
 
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& /*r*/);
 
 };

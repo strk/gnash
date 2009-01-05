@@ -48,23 +48,23 @@ public:
 	/// 'm' a pointer to the movie (or sprite) being read
 	///
 	typedef void (*loader_function)(
-        SWFStream& input, tag_type type, movie_definition& m, const RunInfo& r);
+        SWFStream& input, TagType type, movie_definition& m, const RunInfo& r);
 
 	/// \brief
 	/// Get a pointer to the loader_function for the
-	/// specified SWF::tag_type.
+	/// specified SWF::TagType.
 	//
 	/// @return false if no loader is associated with the tag.
 	///
-	bool get(tag_type t, loader_function* lf);
+	bool get(TagType t, loader_function* lf);
 
 	/// \brief
-	/// Register a loader for the specified SWF::tag_type.
+	/// Register a loader for the specified SWF::TagType.
 	//
 	/// @return false if a loader is already registered
 	///               for the given tag
 	///
-	bool register_loader(tag_type t, loader_function lf);
+	bool register_loader(TagType t, loader_function lf);
 
 	/// \brief
 	/// Return a reference to the singleton instance

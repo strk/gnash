@@ -426,10 +426,10 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 }
 
 void
-PlaceObject2Tag::read(SWFStream& in, tag_type tag)
+PlaceObject2Tag::read(SWFStream& in, TagType tag)
 {
 
-    m_tag_type = tag;
+    m_TagType = tag;
 
     if (tag == SWF::PLACEOBJECT)
     {
@@ -489,7 +489,7 @@ PlaceObject2Tag::~PlaceObject2Tag()
 
 /* public static */
 void
-PlaceObject2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+PlaceObject2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);

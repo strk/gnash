@@ -567,11 +567,11 @@ SWFMovieDefinition::read_all_swf()
 
 		//log_debug(_("Loading thread iteration %u"), it++);
 
-		SWF::tag_type tag_type = str.open_tag();
+		SWF::TagType tag = str.open_tag();
 
 parse_tag:
 
-		if (tag_type == SWF::END)
+		if (tag == SWF::END)
                 {
 			if ((unsigned int) str.tell() != _swf_end_pos)
                         {
@@ -588,7 +588,7 @@ parse_tag:
 
 		SWF::TagLoadersTable::loader_function lf = NULL;
 
-		if (tag_type == SWF::SHOWFRAME)
+		if (tag == SWF::SHOWFRAME)
 		{
 			// show frame tag -- advance to the next frame.
 
@@ -600,30 +600,30 @@ parse_tag:
 			if ( floaded == m_frame_count )
 			{
 				str.close_tag();
-				tag_type = str.open_tag();
-				if ( tag_type != SWF::END )
+				tag = str.open_tag();
+				if (tag != SWF::END )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
 					log_swferror(_("last expected SHOWFRAME "
 						"in SWF stream '%s' isn't "
 						"followed by an END (%d)."),
-						get_url(), tag_type);
+						get_url(), tag);
 					);
 				}
 				goto parse_tag;
 			}
 
 		}
-		else if (_tag_loaders.get(tag_type, &lf))
+		else if (_tag_loaders.get(tag, &lf))
                 {
 			// call the tag loader.  The tag loader should add
 			// characters or tags to the movie data structure.
-			(*lf)(str, tag_type, *this, _runInfo);
+			(*lf)(str, tag, *this, _runInfo);
 		}
 		else
 		{
 			// no tag loader for this tag type.
-            log_error(_("*** no tag loader for type %d (movie)"), tag_type);
+            log_error(_("*** no tag loader for type %d (movie)"), tag);
             IF_VERBOSE_PARSE(
                 std::ostringstream ss;
                 dumpTagBytes(str, ss);

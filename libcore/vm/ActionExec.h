@@ -433,7 +433,7 @@ public:
 
 
     // TODO: cut down these accessors.
-    bool atActionTag(SWF::action_type t) { return code[pc] == t; }
+    bool atActionTag(SWF::ActionType t) { return code[pc] == t; }
 	
 	size_t getCurrentPC() const { return pc; }
 	

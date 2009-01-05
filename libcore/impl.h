@@ -35,7 +35,7 @@ namespace gnash {
 // to call this in order to handle special tag types.
 
 /// Register a tag loader for the given tag
-void register_tag_loader(SWF::tag_type t,
+void register_tag_loader(SWF::TagType t,
         SWF::TagLoadersTable::loader_function lf);
 	
 }	// end namespace gnash

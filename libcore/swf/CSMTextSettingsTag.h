@@ -39,7 +39,7 @@ public:
 
 	CSMTextSettingsTag(movie_definition& m, SWFStream& in);
 
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r);
+	static void loader(SWFStream& in, TagType tag, movie_definition& m, const RunInfo& r);
 
 private:
 

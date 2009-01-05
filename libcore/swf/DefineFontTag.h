@@ -52,7 +52,7 @@ public:
     /// Load a DefineFont tag.
     //
     /// A corresponding Font is created and added to the movie_definition.
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
     /// Return the glyphs read from the DefineFont tag.
@@ -103,7 +103,7 @@ public:
 
 private:
 
-    DefineFontTag(SWFStream& in, movie_definition& m, tag_type tag);
+    DefineFontTag(SWFStream& in, movie_definition& m, TagType tag);
 
     /// Read a DefineFont tag.
     void readDefineFont(SWFStream& in, movie_definition & m);
@@ -142,7 +142,7 @@ public:
     /// Adds a CodeTable and other information to a Font created by a
     /// DefineFont tag. The information is already contained in a 
     /// DefineFont2 or DefineFont3 tag.
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 };
 

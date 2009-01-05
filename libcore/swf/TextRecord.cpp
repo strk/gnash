@@ -34,7 +34,7 @@ namespace SWF {
 
 bool
 TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
-        int advanceBits, tag_type tag)
+        int advanceBits, TagType tag)
 {
     _glyphs.clear();
 

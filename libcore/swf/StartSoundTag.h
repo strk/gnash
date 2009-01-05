@@ -25,7 +25,7 @@
 #include "ControlTag.h" // for inheritance
 #include "sound_handler.h" // for sound_envelope (composition)
 #include "VM.h" // We only need this to get movie_root
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 #include "SoundInfoRecord.h"
 
 #include <vector> // for composition
@@ -82,7 +82,7 @@ public:
 	void execute(MovieClip* /* m */, DisplayList& /* dlist */) const;
 
 	/// Load a SWF::STARTSOUND tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
 };
@@ -96,7 +96,7 @@ class StartSound2Tag
 public:
 
 	/// Load a SWF::STARTSOUND2 tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 };
 

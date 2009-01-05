@@ -37,7 +37,7 @@ DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
 
 /* public static */
 void
-DefineFontAlignZonesTag::loader(SWFStream& in, tag_type tag,
+DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
         movie_definition& m, const RunInfo& /*r*/)
 {
 	assert(tag == SWF::DEFINEALIGNZONES);

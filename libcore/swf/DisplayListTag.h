@@ -25,7 +25,7 @@
 #endif
 
 #include "ControlTag.h" // for inheritance
-//#include "swf.h" // for tag_type definition
+//#include "swf.h" // for TagType definition
 
 
 // Forward declarations
