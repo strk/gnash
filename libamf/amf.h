@@ -70,7 +70,7 @@ const boost::uint8_t TERMINATOR = 0x09;
 /// for the following value is bogus. Although the length field is a short, it
 /// seems silly to assume we'll ever see a string 65,000 characters long. Still,
 /// it makes sense to make this an adjustable thing.
-const int SANE_STR_SIZE = 1024;
+const int SANE_STR_SIZE = 65536;
 
 /// Binary representation of an ActionScript object.
 //
