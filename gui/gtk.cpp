@@ -2537,7 +2537,7 @@ GtkGui::stopHook()
     // Assert they're either both initialised or both uninitialised
     assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
     if (_resumeButton) {
-        gtk_container_add(GTK_CONTAINER(_vbox), _resumeButton);
+        gtk_box_pack_start(GTK_BOX(_vbox), _resumeButton, FALSE, FALSE, 0);
     }
 }
 
