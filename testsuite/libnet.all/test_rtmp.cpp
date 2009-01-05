@@ -392,12 +392,27 @@ test_split()
         }
     }
 
-//    delete queues3;
+    // the oflaDemo connect packet, which currently core dumps
+    notest = false;
+    boost::shared_ptr<Buffer> buf4(new Buffer("03 00 00 00 00 01 0b 14 00 00 00 00 02 00 07 63 6f 6e 6e 65 63 74 00 3f f0 00 00 00 00 00 00 03 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f 00 08 66 6c 61 73 68 56 65 72 02 00 0e 4c 4e 58 20 31 30 2c 30 2c 31 32 2c 33 36 00 06 73 77 66 55 72 6c 02 00 29 68 74 74 70 3a 2f 2f 6c 6f 63 61 6c 68 6f 73 74 3a 35 30 38 30 2f 64 65 6d 6f 73 2f 6f 66 6c 61 5f 64 65 6d 6f 2e 73 77 66 00 05 74 63 55 72 6c 02 00 1e 72 74 6d c3 70 3a 2f 2f 6c 6f 63 61 6c 68 6f 73 74 3a 35 39 33 35 2f 6f 66 6c 61 44 65 6d 6f 00 04 66 70 61 64 01 00 00 0c 63 61 70 61 62 69 6c 69 74 69 65 73 00 40 2e 00 00 00 00 00 00 00 0b 61 75 64 69 6f 43 6f 64 65 63 73 00 40 a8 ee 00 00 00 00 00 00 0b 76 69 64 65 6f 43 6f 64 65 63 73 00 40 6f 80 00 00 00 00 00 00 0d 76 69 64 65 6f 46 75 6e 63 74 69 6f 6e 00 3f f0 00 00 00 00 00 00 00 07 c3 70 61 67 65 55 72 6c 06 00 00 09"));
+//    buf4->dump();
     
-//    delete que1;
+    boost::shared_ptr<RTMP::queues_t> queues4 = client.split(*buf4);
+    if (queues4->size() == 0) {
+        notest = true;
+    }    
+    if (notest) {
+        runtest.unresolved("RTMP::split(oflaDemo)");
+    } else {
+        queues4->at(0)->dump();
+        if (queues4->size() == 1) {
+            runtest.pass("RTMP::split(oflaDemo)");
+            notest = false;
+        } else {
+            runtest.fail("RTMP::split(oflaDemo)");
+        }
+    }
 
-//     delete buf2;
-//     delete que2;
 }
 
 void
