@@ -744,7 +744,6 @@ rtmp_handler(Network::thread_params_t *args)
 	boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
 	cerr << "FIXME Connect Que size is: " << que->size() << endl;
 	que->at(0)->dump();
-	que->at(1)->dump();
 //    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
 	if (que->size() > 0) {
 	    boost::shared_ptr<amf::Buffer> bufptr = que->at(0)->pop();
@@ -780,7 +779,6 @@ rtmp_handler(Network::thread_params_t *args)
 	// Read the handshake bytes sent by the client when requesting
 	// a connection.
 	pkt = rtmp->recvMsg(args->netfd);
-//	pkt->dump();
 	// See if we have data in the handshake, we should have 1537 bytes
 	if (pkt->allocated() == 0) {
 	    log_error("failed to read RTMP data from the client.");
@@ -824,34 +822,28 @@ rtmp_handler(Network::thread_params_t *args)
 		    return false;
 		}
 		boost::shared_ptr<RTMP::rtmp_head_t> rthead = rtmp->decodeHeader(ptr);
-//    RTMP::queues_t *que = rtmp->split(start->reference() + head->head_size, start->size());
 		ptr += rthead->head_size; // skip past the header
 		if (echo) {
 		    boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*buf);
 		    boost::shared_ptr<amf::Buffer> bufptr;
 		    if (que->size() > 0) {
-			cerr << "FIXME echo Que size is: " << que->size() << endl;
-//  			que->at(0)->dump();
-// 			CQue *cque = que->at(0);
-// 			bufptr = cque->pop();
+//			cerr << "FIXME echo Que size is: " << que->size() << endl;
  			bufptr = que->at(0)->pop();
-//			bufptr->dump();
 		    }
 		    // process the echo test request
 		    vector<boost::shared_ptr<amf::Element> > request = rtmp->parseEchoRequest(
 			bufptr->reference() + rthead->head_size, bufptr->allocated() - rthead->head_size);
 		    // now build a result
 		    if (request[3]) {
-//			request[3]->dump();
 			boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[3]);
 			if (rtmp->sendMsg(args->netfd, rthead->channel, RTMP::HEADER_8, result->allocated(),
 					  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
-			    log_debug("Sent echo test response response to client.");
 			    // If we're in single threaded mode, we Just want to stay in
 			    // this thread for now and do everything all at once. Otherwise
 			    // we're done, so we return to the dispatch handler waiting for
 			    // the next packet. Single threaded mode is primarily used by
 			    // developers for debugging protocols.
+			    log_debug("Sent echo test response response to client.");
 			    if (crcfile.getThreadingFlag()) {
 				done = true;
 			    } else {

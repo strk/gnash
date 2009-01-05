@@ -57,6 +57,8 @@ public:
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Element &el);
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, amf::Buffer &data);
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);    
+    void addReference(boost::uint16_t index, amf::Element &el) { _references[index] = el; };
+    amf::Element &getReference(boost::uint16_t index) { return _references[index]; };
     
     void dump();
   private:
@@ -65,6 +67,7 @@ public:
     gnash::DiskStream::filetype_e  _filetype;
     std::string		_filespec;
     boost::uint32_t     _filesize;
+    std::map<boost::uint16_t, amf::Element &> _references;
 };
 
 // This is the thread for all incoming RTMP connections
