@@ -323,39 +323,14 @@ AMF::encodeTypedObject(const amf::Element &data)
     GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
-//    log_debug("Encoded data size has %d properties", length);
-    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-    buf->clear();
-#if 0
-    size_t outsize = 0;
-    if (data.getName()) {
-	outsize = data.getNameSize() + sizeof(boost::uint16_t);
-    } else {
-	outsize == 1;
+    //    log_debug("Encoded data size has %d properties", length);
+    boost::shared_ptr<amf::Buffer> buf;
+    if (length) {
+	buf.reset(new amf::Buffer);
     }
-//     if (length <= 0) {
-// 	buf.reset();
-//  	return buf;
-//     }
-    //    buf.reset(new amf::Buffer);
-#endif
     *buf = Element::TYPED_OBJECT_AMF0;
-    // If the name field is set, it's a property, followed by the data
-    if (data.getName()) {
-	// Add the length of the string for the name of the variable
-	size_t namelength = data.getNameSize();
-	boost::uint16_t enclength = namelength;
-	swapBytes(&enclength, 2);
-	*buf += enclength;
-	// Now the name itself
-	string name = data.getName();
-	if (name.size() > 0) {
-	    *buf += name;
-	}
-    }
-
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::reverse_iterator ait;    
+	vector<boost::shared_ptr<amf::Element> >::reverse_iterator ait;
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
 	for (ait = props.rbegin(); ait != props.rend(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
@@ -369,7 +344,7 @@ AMF::encodeTypedObject(const amf::Element &data)
 	    //	    el->dump();
 	}
     }
-    
+
     // Terminate the object
     *buf += '\0';
     *buf += '\0';
@@ -474,11 +449,12 @@ AMF::encodeECMAArray(const amf::Element &data)
 	    }
 	}
     }
-
+#if 0
     double count = data.propertySize();
     amf::Element ellen("length", count);
     boost::shared_ptr<amf::Buffer> buflen = ellen.encode();
     *buf += buflen;
+#endif
     
     // Terminate the object
     *buf += '\0';
@@ -778,7 +754,8 @@ AMF::encodeElement(const amf::Element& el)
           // field. (which must be big-endian)
           break;
       case Element::TYPED_OBJECT_AMF0:
-	  buf = encodeTypedObject(el);
+//	  buf = encodeTypedObject(el);
+	  buf = encodeObject(el);
           break;
 // 	  // This is a Gnash specific value
 //       case Element::VARIABLE:
@@ -836,7 +813,7 @@ AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
     boost::shared_ptr<Buffer> buf(new Buffer(outsize));
     _totalsize += outsize;
 
-    // Add the length of the string for the name of the variable
+    // Add the length of the string for the name of the property
     size_t length = el->getNameSize();
     boost::uint16_t enclength = length;
     swapBytes(&enclength, 2);
@@ -849,7 +826,7 @@ AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
 	}
     }
 
-    // Add the type of the variable's data
+    // Add the type of the property's data
     *buf += el->getType();
     // Booleans appear to be encoded weird. Just a short after
     // the type byte that's the value.
@@ -869,7 +846,7 @@ AMF::encodeProperty(boost::shared_ptr<amf::Element> el)
 	  enclength = el->getDataSize();
 	  swapBytes(&enclength, 2);
 	  *buf += enclength;
-	  // Now the data for the variable
+	  // Now the data for the property
 	  buf->append(el->to_reference(), el->getDataSize());
     }
     
@@ -1019,17 +996,12 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  // get the number of elements in the array
 	  boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr) & 0xffffffff);
 	  tmpptr += sizeof(boost::uint32_t);
-	  while (tmpptr < (tooFar - AMF_HEADER_SIZE)) {
-	      if (*tmpptr == TERMINATOR) {
-//		  log_debug("No data associated with Property in object");
-		  tmpptr++;
-		  break;
-	      }
+	  while (items--) {
 	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
 		  break;
 	      }
-//	      child->dump();
+	      child->dump();
 	      el->addProperty(child);
 	      tmpptr += amf_obj.totalsize();
 	  };
@@ -1083,28 +1055,21 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       case Element::TYPED_OBJECT_AMF0:
       {
 	  el->makeTypedObject();
-	  // a Typed Object has a name
-	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-	  tmpptr += sizeof(boost::uint16_t);
-	  el->setName(tmpptr, length);
-	  tmpptr += length;
 	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
-	      if (*tmpptr == TERMINATOR) {
-//		  log_debug("No data associated with Property in object");
+	      if (*(tmpptr +3) == TERMINATOR) {
+		  log_debug("Found object terminator byte");
 		  tmpptr++;
 		  break;
 	      }
 	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
 	      if (child == 0) {
-		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
-		  tmpptr += AMF_HEADER_SIZE;
 		  break;
 	      }
-     //	      child->dump();
 	      el->addProperty(child);
 	      tmpptr += amf_obj.totalsize();
 	  };
-//	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+//	  el->dump();
+	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
 	  break;
       }
       case Element::AMF3_DATA:
@@ -1198,7 +1163,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     if (type == Element::NULL_AMF0) {
 	log_debug("No data associated with Property \"%s\"", name);
 	el.reset(new Element);
-	el->setName(name.c_str(), length);
+	el->setName(name.c_str(), name.size());
 	tmpptr += 1;
 	// Calculate the offset for the next read
     } else {
@@ -1208,9 +1173,9 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
 //	tmpptr += length;
 	el = extractAMF(tmpptr, tooFar);
 	if (el) {
-	    el->setName(name.c_str(), length);
-	    tmpptr += totalsize();
+	    el->setName(name.c_str(), name.size()); // FIXME: arg, overwrites the name for TypedObjects
 	}
+	tmpptr += totalsize();
     }
 
     //delete name;
