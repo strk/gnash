@@ -25,6 +25,7 @@
 #include "swf.h"
 
 #include <map>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -37,7 +38,7 @@ namespace gnash {
 namespace SWF {
 
 /// Table of SWF tags loaders
-class TagLoadersTable
+class TagLoadersTable : boost::noncopyable
 {
 public:
 
@@ -74,7 +75,7 @@ public:
 private:
 
 	/// The container being used for the table
-	typedef std::map<int, loader_function> container;
+	typedef std::map<SWF::TagType, loader_function> container;
 
 	container _tag_loaders;
 
@@ -85,17 +86,6 @@ private:
 	{}
 
 	~TagLoadersTable() {}
-
-	TagLoadersTable(const TagLoadersTable& tl)
-		:
-		_tag_loaders(tl._tag_loaders)
-	{}
-
-	TagLoadersTable& operator=(const TagLoadersTable& tl)
-	{
-		_tag_loaders = tl._tag_loaders;
-		return *this;
-	}
 
 };
 
