@@ -82,11 +82,11 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 
 	while ( in.tell() < tag_end )
 	{
-		SWF::tag_type tag_type = in.open_tag();
+		SWF::TagType tag = in.open_tag();
 
 		SWF::TagLoadersTable::loader_function lf = NULL;
 
-		if (tag_type == SWF::END)
+		if (tag == SWF::END)
                 {
 			if (in.tell() != tag_end)
                         {
@@ -101,7 +101,7 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 		    		break;
 			}
 		}
-		else if (tag_type == SWF::SHOWFRAME)
+		else if (tag == SWF::SHOWFRAME)
 		{
 			// show frame tag -- advance to the next frame.
 		    	++m_loading_frame;
@@ -131,18 +131,18 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 				}
 			}
 		}
-		else if (_tag_loaders.get(tag_type, &lf))
+		else if (_tag_loaders.get(tag, &lf))
 		{
 		    // call the tag loader.  The tag loader should add
 		    // characters or tags to the movie data structure.
-		    (*lf)(in, tag_type, *this, runInfo);
+		    (*lf)(in, tag, *this, runInfo);
 		}
 		else
 		{
 			// no tag loader for this tag type.
 			// FIXME, should this be a log_swferror instead?
                     log_error(_("*** no tag loader for type %d (sprite)"),
-                              tag_type);
+                              tag);
 		}
 
 		in.close_tag();

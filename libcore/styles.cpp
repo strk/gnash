@@ -40,16 +40,16 @@ line_style::line_style()
 }
 
 void
-line_style::read_morph(SWFStream& in, int tag_type, movie_definition& md,
+line_style::read_morph(SWFStream& in, SWF::TagType t, movie_definition& md,
     line_style *pOther)
 {
-    if (tag_type == SWF::DEFINEMORPHSHAPE)
+    if (t == SWF::DEFINEMORPHSHAPE)
     {
         in.ensureBytes(2 + 2);
         m_width = in.read_u16();
         pOther->m_width = in.read_u16();
-        m_color.read(in, tag_type);
-        pOther->m_color.read(in, tag_type);
+        m_color.read(in, t);
+        pOther->m_color.read(in, t);
         return;
     }
 
@@ -80,25 +80,25 @@ line_style::read_morph(SWFStream& in, int tag_type, movie_definition& md,
         // read fill styles for strokes.
         // TODO: don't throw away this information, should be passed to renderer.
         fill_style f, g;
-        f.read(in, tag_type, md, &g);
+        f.read(in, t, md, &g);
         m_color = f.get_color();
         pOther->m_color = g.get_color();
     }
     else
     {
-        m_color.read(in, tag_type);
-        pOther->m_color.read(in, tag_type);
+        m_color.read(in, t);
+        pOther->m_color.read(in, t);
     }
 }
 
 void
-line_style::read(SWFStream& in, int tag_type, movie_definition& md)
+line_style::read(SWFStream& in, SWF::TagType t, movie_definition& md)
 {
-    if (!(tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_))
+    if (!(t == SWF::DEFINESHAPE4 || t == SWF::DEFINESHAPE4_))
     {
         in.ensureBytes(2);
         m_width = in.read_u16();
-        m_color.read(in, tag_type);
+        m_color.read(in, t);
         return;
     }
 
@@ -128,12 +128,12 @@ line_style::read(SWFStream& in, int tag_type, movie_definition& md)
         // read fill styles for strokes.
         // TODO: don't throw away this information, should be passed to renderer.
         fill_style f;
-        f.read(in, tag_type, md);
+        f.read(in, t, md);
         m_color = f.get_color();
     }
     else
     {
-        m_color.read(in, tag_type);
+        m_color.read(in, t);
     }
 }
 

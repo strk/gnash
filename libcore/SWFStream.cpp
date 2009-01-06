@@ -520,7 +520,7 @@ SWFStream::get_tag_end_position()
 }
 
 
-SWF::tag_type
+SWF::TagType
 SWFStream::open_tag()
 {
     align();
@@ -593,7 +593,7 @@ SWFStream::open_tag()
         tagStart, tagType, tagLength, tagEnd);
     );
 
-    return static_cast<SWF::tag_type>(tagType);
+    return static_cast<SWF::TagType>(tagType);
 }
 
 

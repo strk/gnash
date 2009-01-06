@@ -37,11 +37,11 @@ namespace gnash {
 //
 
 void
-gradient_record::read(SWFStream& in, int tag_type)
+gradient_record::read(SWFStream& in, SWF::TagType tag)
 {
     in.ensureBytes(1);
     m_ratio = in.read_u8();
-    m_color.read(in, tag_type);
+    m_color.read(in, tag);
 }
 
 //
@@ -60,7 +60,7 @@ fill_style::fill_style()
 
 
 void
-fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
+fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     fill_style *pOther)
 {
     const bool is_morph = (pOther != NULL);
@@ -79,8 +79,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
     if (m_type == SWF::FILL_SOLID)
     {
         // 0x00: solid fill
-        if ( tag_type == SWF::DEFINESHAPE3 || tag_type == SWF::DEFINESHAPE4
-            || tag_type == SWF::DEFINESHAPE4_ || is_morph)
+        if ( t == SWF::DEFINESHAPE3 || t == SWF::DEFINESHAPE4
+            || t == SWF::DEFINESHAPE4_ || is_morph)
         {
             m_color.read_rgba(in);
             if (is_morph)   pOther->m_color.read_rgba(in);
@@ -88,8 +88,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
         else 
         {
             // For DefineMorphShape tags we should use morph_fill_style 
-            assert( tag_type == SWF::DEFINESHAPE ||
-                    tag_type == SWF::DEFINESHAPE2 );
+            assert( t == SWF::DEFINESHAPE ||
+                    t == SWF::DEFINESHAPE2 );
             m_color.read_rgb(in);
         }
 
@@ -144,8 +144,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
 
         uint8_t grad_props = in.read_u8();
     
-        if (tag_type == SWF::DEFINESHAPE4 ||
-            tag_type == SWF::DEFINESHAPE4_) {
+        if (t == SWF::DEFINESHAPE4 ||
+            t == SWF::DEFINESHAPE4_) {
             uint8_t spread_mode = grad_props >> 6;
             switch(spread_mode) {
                 case 0:
@@ -188,8 +188,8 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
             return;
         }
     
-        if ( num_gradients > 8 + ((tag_type == SWF::DEFINESHAPE4 ||
-            tag_type == SWF::DEFINESHAPE4_) ? 7 : 0))
+        if ( num_gradients > 8 + ((t == SWF::DEFINESHAPE4 ||
+            t == SWF::DEFINESHAPE4_) ? 7 : 0))
         {
            // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
             IF_VERBOSE_MALFORMED_SWF(
@@ -204,9 +204,9 @@ fill_style::read(SWFStream& in, int tag_type, movie_definition& md,
                 
         m_gradients.resize(num_gradients);
         for (unsigned int i = 0; i < num_gradients; i++) {
-            m_gradients[i].read(in, tag_type);
+            m_gradients[i].read(in, t);
             if (is_morph) {
-                pOther->m_gradients[i].read(in, tag_type);
+                pOther->m_gradients[i].read(in, t);
             }
         }
     

@@ -25,7 +25,7 @@
 #endif
 
 #include "DisplayListTag.h" // for inheritance
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 
 // Forward declarations
 namespace gnash {
@@ -57,12 +57,12 @@ public:
 	{}
 
 	/// Read SWF::REMOVEOBJECT or SWF::REMOVEOBJECT2 
-	void read(SWFStream& in, tag_type tag);
+	void read(SWFStream& in, TagType tag);
 
 	/// Remove object at specified depth from MovieClip DisplayList.
 	void execute(MovieClip* m, DisplayList& dlist) const;
 
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
 private:

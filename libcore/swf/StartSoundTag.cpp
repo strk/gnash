@@ -31,7 +31,7 @@ namespace SWF {
 
 
 void
-StartSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+StartSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& r)
 {
     assert(tag == STARTSOUND); 
@@ -107,7 +107,7 @@ StartSoundTag::execute(MovieClip* m, DisplayList& /* dlist */) const
 }
 
 void
-StartSound2Tag::loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+StartSound2Tag::loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
         const RunInfo& /*r*/)
 {
     assert(tag == STARTSOUND2);

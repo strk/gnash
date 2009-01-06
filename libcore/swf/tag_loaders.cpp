@@ -54,6 +54,7 @@
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
+#include "ExportableResource.h"
 
 // TODO: pass the render handler with RunInfo and use that.
 #include "render.h"
@@ -61,7 +62,7 @@
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
-#include <map>
+#include <set>
 #include <limits>
 #include <cassert>
 #include <utility> // for std::make_pair
@@ -170,14 +171,14 @@ public:
 
 
 // Silently ignore the contents of this tag.
-void null_loader(SWFStream& /*in*/, tag_type /*tag*/, movie_definition& /*m*/,
+void null_loader(SWFStream& /*in*/, TagType /*tag*/, movie_definition& /*m*/,
         const RunInfo& /*r*/)
 {
 }
 
 // Label the current frame of m with the name from the SWFStream.
 void
-frame_label_loader(SWFStream& in, tag_type tag, movie_definition& m,
+frame_label_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     assert(tag == SWF::FRAMELABEL); // 43
@@ -221,7 +222,7 @@ frame_label_loader(SWFStream& in, tag_type tag, movie_definition& m,
 // Load JPEG compression tables that can be used to load
 // images further along in the SWFStream.
 void
-jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition& m,
+jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     //GNASH_REPORT_FUNCTION;
@@ -256,7 +257,8 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition& m,
     // Anyway the actual reads are limited to currently opened tag as 
     // of gnash::SWFStream::read(), so this is not a problem.
     //
-        boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in, std::numeric_limits<unsigned long>::max()).release());
+        boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
+                    std::numeric_limits<unsigned long>::max()).release());
         //  transfer ownership to the JpegImageInput
         input = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 
@@ -278,7 +280,7 @@ jpeg_tables_loader(SWFStream& in, tag_type tag, movie_definition& m,
 // A JPEG image without included tables; those should be in an
 // existing JpegImageInput object stored in the movie.
 void
-define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m,
+define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINEBITS); // 6
@@ -330,13 +332,13 @@ define_bits_jpeg_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 
 void
-define_bits_jpeg2_loader(SWFStream& in, tag_type tag, movie_definition& m,
+define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINEBITSJPEG2); // 21
 
     in.ensureBytes(2);
-    boost::uint16_t    character_id = in.read_u16();
+    boost::uint16_t character_id = in.read_u16();
 
     IF_VERBOSE_PARSE
     (
@@ -388,18 +390,19 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
     d_stream.next_in  = 0;
     d_stream.avail_in = 0;
 
-    d_stream.next_out = (Byte*) buffer;
-    d_stream.avail_out = (uInt) buffer_bytes;
+    d_stream.next_out = static_cast<Byte*>(buffer);
+    d_stream.avail_out = static_cast<uInt>(buffer_bytes);
 
     int err = inflateInit(&d_stream);
     if (err != Z_OK) {
-    IF_VERBOSE_MALFORMED_SWF(
-    log_swferror(_("inflate_wrapper() inflateInit() returned %d (%s)"), err, d_stream.msg);
-    );
-    return;
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("inflate_wrapper() inflateInit() returned %d (%s)"),
+                err, d_stream.msg);
+        );
+        return;
     }
 
-#define CHUNKSIZE 256
+    const size_t CHUNKSIZE = 256;
 
     boost::uint8_t buf[CHUNKSIZE];
     unsigned long endTagPos = in.get_tag_end_position();
@@ -415,7 +418,8 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
             {
                 // nothing more to read
                 IF_VERBOSE_MALFORMED_SWF(
-                log_swferror(_("inflate_wrapper(): no end of zstream found within swf tag boundaries"));
+                log_swferror(_("inflate_wrapper(): no end of zstream found "
+                        "within swf tag boundaries"));
                 );
                 break;
             }
@@ -425,7 +429,7 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
         BOOST_STATIC_ASSERT(sizeof(char) == sizeof(boost::uint8_t));
 
         // Fill the buffer    
-        in.read((char*)buf, chunkSize);
+        in.read(reinterpret_cast<char*>(buf), chunkSize);
         d_stream.next_in = &buf[0];
         d_stream.avail_in = chunkSize;
 
@@ -439,7 +443,8 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
         if (err != Z_OK)
         {
             IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("inflate_wrapper() inflate() returned %d (%s)"), err, d_stream.msg);
+            log_swferror(_("inflate_wrapper() inflate() returned %d (%s)"),
+                err, d_stream.msg);
             );
             break;
         }
@@ -448,7 +453,8 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
     err = inflateEnd(&d_stream);
     if (err != Z_OK)
     {
-        log_error(_("inflate_wrapper() inflateEnd() return %d (%s)"), err, d_stream.msg);
+        log_error(_("inflate_wrapper() inflateEnd() return %d (%s)"),
+                err, d_stream.msg);
     }
 }
 #endif // HAVE_ZLIB_H
@@ -457,13 +463,13 @@ void inflate_wrapper(SWFStream& in, void* buffer, int buffer_bytes)
 // loads a define_bits_jpeg3 tag. This is a jpeg file with an alpha
 // channel using zlib compression.
 void
-define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition& m,
+define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINEBITSJPEG3); // 35
 
     in.ensureBytes(2);
-    boost::uint16_t    character_id = in.read_u16();
+    boost::uint16_t character_id = in.read_u16();
 
     IF_VERBOSE_PARSE
     (
@@ -517,7 +523,7 @@ define_bits_jpeg3_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 
 void
-define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
+define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     // tags 20 || 36
@@ -705,18 +711,16 @@ define_bits_lossless_2_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 // This is like null_loader except it prints a message to nag us to fix it.
 void
-fixme_loader(SWFStream& /*in*/, tag_type tag, movie_definition& /*m*/,
+fixme_loader(SWFStream& /*in*/, TagType tag, movie_definition& /*m*/,
 		const RunInfo& /*r*/)
 {
-    static std::map<tag_type, bool> warned;
-    if ( ! warned[tag] )
-    {
+    static std::set<TagType> warned;
+    if (warned.insert(tag).second) {
         log_unimpl(_("  FIXME: tagtype = %d"), tag);
-        warned[tag] = true;
     }
 }
 
-void define_shape_loader(SWFStream& in, tag_type tag, movie_definition& m,
+void define_shape_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINESHAPE
@@ -736,7 +740,7 @@ void define_shape_loader(SWFStream& in, tag_type tag, movie_definition& m,
     m.add_character(character_id, ch);
 }
 
-void define_shape_morph_loader(SWFStream& in, tag_type tag, movie_definition& m,
+void define_shape_morph_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINEMORPHSHAPE
@@ -755,14 +759,9 @@ void define_shape_morph_loader(SWFStream& in, tag_type tag, movie_definition& m,
     m.add_character(character_id, morph);
 }
 
-//
-// font loaders
-//
-
-
 // Create and initialize a sprite, and add it to the movie.
 void
-sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,
+sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& r)
 {
     assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
@@ -807,7 +806,7 @@ sprite_loader(SWFStream& in, tag_type tag, movie_definition& m,
 //
 
 
-void export_loader(SWFStream& in, tag_type tag, movie_definition& m,
+void export_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
     // Load an export tag (for exposing internal resources of m)
 {
@@ -838,7 +837,7 @@ void export_loader(SWFStream& in, tag_type tag, movie_definition& m,
     for (int i = 0; i < count; i++)
     {
         in.ensureBytes(2);
-        boost::uint16_t    id = in.read_u16();
+        boost::uint16_t id = in.read_u16();
         std::string symbolName;
         in.read_string(symbolName);
 
@@ -846,29 +845,21 @@ void export_loader(SWFStream& in, tag_type tag, movie_definition& m,
             log_parse(_("  export: id = %d, name = %s"), id, symbolName);
         );
 
-        if (Font* f = m.get_font(id))
-        {
-            // Expose this font for export.
+        // Fonts, characters and sounds can be exported.
+        ExportableResource* f;
+        if ((f = m.get_font(id)) ||
+            (f = m.get_character_def(id)) ||
+            (f = m.get_sound_sample(id))) {
+            
             m.export_resource(symbolName, f);
         }
-        else if (character_def* ch = m.get_character_def(id))
-        {
-            // Expose this movie/button/whatever for export.
-            m.export_resource(symbolName, ch);
-        }
-        else if (sound_sample* ch = m.get_sound_sample(id))
-        {
-            m.export_resource(symbolName, ch);
-        }
-        else
-        {
+        else {
             IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("don't know how to export resource '%s' "
                 "with id %d (can't find that id)"),
-                  symbolName, id);
-                );
+                symbolName, id);
+            );
         }
-
     }
 }
 
@@ -878,7 +869,7 @@ void export_loader(SWFStream& in, tag_type tag, movie_definition& m,
 //
 
 
-void import_loader(SWFStream& in, tag_type tag, movie_definition& m,
+void import_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& r)
 {
     assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
@@ -977,7 +968,7 @@ static unsigned int s_sample_rate_table_len = 4;
 
 // Load a DefineSound tag.
 void
-define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m,
+define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& r)
 {
     assert(tag == SWF::DEFINESOUND); // 14
@@ -1093,7 +1084,7 @@ define_sound_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 // Load a SoundStreamHead(2) tag.
 void
-sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m,
+sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& r)
 {
 
@@ -1232,18 +1223,18 @@ sound_stream_head_loader(SWFStream& in, tag_type tag, movie_definition& m,
 
 
 void
-file_attributes_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+file_attributes_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::FILEATTRIBUTES); // 69
 
-    typedef struct file_attrs_flags_t {
-    unsigned reserved1:3;
-    unsigned has_metadata:1;
-    unsigned reserved2:3;
-    unsigned use_network:1;
-    unsigned reserved3:24;
-    } file_attrs_flags;
+    struct file_attrs_flags {
+        unsigned reserved1;
+        unsigned has_metadata;
+        unsigned reserved2;
+        unsigned use_network;
+        unsigned reserved3;
+    };
 
     file_attrs_flags flags;
 
@@ -1279,7 +1270,7 @@ file_attributes_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
 
 
 void
-metadata_loader(SWFStream& in, tag_type tag, movie_definition& m,
+metadata_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
     assert(tag == SWF::METADATA); // 77
@@ -1320,7 +1311,7 @@ metadata_loader(SWFStream& in, tag_type tag, movie_definition& m,
 }
 
 void
-serialnumber_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/, 
+serialnumber_loader(SWFStream& in, TagType tag, movie_definition& /*m*/, 
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::SERIALNUMBER); // 41
@@ -1354,7 +1345,7 @@ serialnumber_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
 }
 
 void
-reflex_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::REFLEX); // 777
@@ -1374,7 +1365,7 @@ reflex_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
 }
 
 void
-abc_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
+abc_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::DOABC
@@ -1400,7 +1391,7 @@ abc_loader(SWFStream& in, tag_type tag, movie_definition& /*m*/,
 }
 
 void
-define_scene_frame_label_loader(SWFStream& /*in*/, tag_type tag,
+define_scene_frame_label_loader(SWFStream& /*in*/, TagType tag,
         movie_definition& /*m*/, const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86

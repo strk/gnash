@@ -44,11 +44,11 @@ namespace gnash
 // Read fill styles, and push them onto the given style array.
 static void
 read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
-                 int tag_type, movie_definition& m)
+                 SWF::TagType tag, movie_definition& m)
 {
     in.ensureBytes(1);
     boost::uint16_t  fill_style_count = in.read_u8();
-    if (tag_type > 2)
+    if (tag > 2)
     {
         if (fill_style_count == 0xFF)
         {
@@ -67,14 +67,14 @@ read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
     {
         // TODO: add a fill_style constructor directly reading from stream
         fill_style fs;
-        fs.read(in, tag_type, m);
+        fs.read(in, tag, m);
         styles.push_back(fs);
     }
 }
 
 // Read line styles and push them onto the back of the given array.
 static void
-read_line_styles(std::vector<line_style>& styles, SWFStream& in, int tag_type,
+read_line_styles(std::vector<line_style>& styles, SWFStream& in, SWF::TagType tag,
                  movie_definition& md)
 {
     in.ensureBytes(1);
@@ -97,7 +97,7 @@ read_line_styles(std::vector<line_style>& styles, SWFStream& in, int tag_type,
     for (int i = 0; i < line_style_count; i++)
     {
         styles.resize(styles.size() + 1);
-        styles.back().read(in, tag_type, md);
+        styles.back().read(in, tag, md);
     }
 }
 
@@ -125,7 +125,7 @@ shape_character_def::~shape_character_def()
 }
 
 void
-shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
+shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                           movie_definition& m)
 {
     if (with_style)
@@ -138,7 +138,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
         );
     
         // TODO: Store and use these. Unfinished.
-        if (tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_)
+        if (tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_)
         {
             rect tbound;
             tbound.read(in);
@@ -147,8 +147,8 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
             LOG_ONCE(log_unimpl("DEFINESHAPE4 edge boundaries and scales"));
         }
     
-        read_fill_styles(m_fill_styles, in, tag_type, m);
-        read_line_styles(m_line_styles, in, tag_type, m);
+        read_fill_styles(m_fill_styles, in, tag, m);
+        read_line_styles(m_line_styles, in, tag, m);
     }
 
     /// Adding a dummy fill style is just needed to make the
@@ -156,7 +156,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
     /// really used, as text rendering will use style information
     /// from TEXTRECORD tag instead.
     ///
-    if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
+    if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 )
     {
         assert(!with_style);
     }
@@ -188,11 +188,11 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
         /// Pretty ugly... till next bug report.
         ///
         ///
-        if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 || 
-                tag_type == SWF::DEFINEFONT3)
+        if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 || 
+                tag == SWF::DEFINEFONT3)
         {
             log_debug("Skipping glyph read, being fill and line bits zero. "
-                    "SWF tag is %d.", tag_type);
+                    "SWF tag is %d.", tag);
             return;
         }
     }
@@ -275,7 +275,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     style += fill_base;
                 }
     
-                if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2)
+                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2)
                 {
                     if ( style > 1 )          // 0:hide 1:renderer
                     {
@@ -326,7 +326,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                     style += fill_base;
                 }
     
-                if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2)
+                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2)
                 {
                     if ( style > 1 )          // 0:hide 1:renderer
                     {
@@ -375,7 +375,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                 {
                     style += line_base;
                 }
-                if (tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2)
+                if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2)
                 {
                     if ( style > 1 )          // 0:hide 1:renderer
                     {
@@ -414,7 +414,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
                 {
                     IF_VERBOSE_MALFORMED_SWF(
                          log_swferror("Unexpected HasNewStyle flag in tag "
-                             "%d shape record", tag_type);
+                             "%d shape record", tag);
                     );
                     continue;
                 }
@@ -437,8 +437,8 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
     
                 fill_base = m_fill_styles.size();
                 line_base = m_line_styles.size();
-                read_fill_styles(m_fill_styles, in, tag_type, m);
-                read_line_styles(m_line_styles, in, tag_type, m);
+                read_fill_styles(m_fill_styles, in, tag, m);
+                read_line_styles(m_line_styles, in, tag, m);
     
                 in.ensureBits(8);
                 num_fill_bits = in.read_uint(4);
@@ -532,7 +532,7 @@ shape_character_def::read(SWFStream& in, int tag_type, bool with_style,
         {
             log_debug("Shape character read for tag %d contained embedded "
                     "bounds %s, while we computed bounds %s",
-                    tag_type, m_bound, computedBounds);
+                    tag, m_bound, computedBounds);
         }
     }
 #endif

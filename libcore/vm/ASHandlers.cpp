@@ -118,7 +118,7 @@ ActionHandler::ActionHandler()
 {
 }
 
-ActionHandler::ActionHandler(action_type type, action_callback_t func)
+ActionHandler::ActionHandler(ActionType type, action_callback_t func)
     :
     _type(type),
     _callback(func),
@@ -127,7 +127,7 @@ ActionHandler::ActionHandler(action_type type, action_callback_t func)
 {
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
+ActionHandler::ActionHandler(ActionType type, std::string name,
                              action_callback_t func)
     :
     _type(type),
@@ -138,7 +138,7 @@ ActionHandler::ActionHandler(action_type type, std::string name,
 {
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
+ActionHandler::ActionHandler(ActionType type, std::string name,
                              action_callback_t func, as_arg_t format)
     :
     _type(type),
@@ -436,7 +436,7 @@ SWFHandlers::instance()
 }
 
 void
-SWFHandlers::execute(action_type type, ActionExec& thread) const
+SWFHandlers::execute(ActionType type, ActionExec& thread) const
 {
 //    It is very heavy operation
 //    if ( _handlers[type].getName() == "unsupported" ) return false;
@@ -4127,7 +4127,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 }
 
 const char*
-SWFHandlers::action_name(action_type x) const
+SWFHandlers::action_name(ActionType x) const
 {
     if ( static_cast<size_t>(x) > get_handlers().size() )
     {

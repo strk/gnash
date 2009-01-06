@@ -49,7 +49,7 @@ public:
 		m_color(color)
 	{}
 
-	void	read(SWFStream& in, int tag_type);
+	void read(SWFStream& in, SWF::TagType tag);
 	
 	//data:
 	boost::uint8_t	m_ratio;
@@ -129,11 +129,11 @@ public:
 	/// Throw a ParserException if there's no enough bytes in the
 	/// currently opened tag for reading. See stream::ensureBytes()
 	///
-	void	read(SWFStream& in, int tag_type, movie_definition& m,
+	void read(SWFStream& in, SWF::TagType t, movie_definition& m,
 		fill_style *pOther = NULL);
 
 	/// Read the fill style from a stream, morph version.
-	void read_morph(SWFStream& in, int tag_type, movie_definition& m,
+	void read_morph(SWFStream& in, SWF::TagType t, movie_definition& m,
 		fill_style *pOther);
 
 	/// \brief

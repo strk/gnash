@@ -24,7 +24,7 @@
 #endif
 
 #include "DisplayListTag.h" // for inheritance
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition 
 #include "character.h" // BlendMode enum
@@ -95,7 +95,7 @@ public:
     PlaceObject2Tag(const movie_definition& def)
         :
         DisplayListTag(0), // why is it 0 here and -1 for RemoveObjectTag ??
-        m_tag_type(0),
+        m_TagType(0),
         m_has_flags2(0),
         m_has_flags3(0),
         m_character_id(0),
@@ -109,12 +109,12 @@ public:
     ~PlaceObject2Tag();
 
     /// Read SWF::PLACEOBJECT or SWF::PLACEOBJECT2
-    void read(SWFStream& in, tag_type tag);
+    void read(SWFStream& in, TagType tag);
 
     /// Place/move/whatever our object in the given movie.
     void execute(MovieClip* m, DisplayList& dlist) const;
 
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
     int getPlaceType() const { 
@@ -163,7 +163,7 @@ public:
     }
 
 private:
-    int m_tag_type;
+    int m_TagType;
     boost::uint8_t m_has_flags2;
     boost::uint8_t m_has_flags3;
     boost::uint16_t m_character_id;

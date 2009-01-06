@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 #include "SWFStream.h" // for inlines
 #include "movie_definition.h"
 #include "DefineButtonTag.h"
@@ -27,7 +27,7 @@ namespace gnash {
 namespace SWF {
 
 void
-DefineButtonCxformTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
 

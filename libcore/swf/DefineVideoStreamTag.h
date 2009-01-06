@@ -83,7 +83,7 @@ public:
 	/// This function is allowed to be called only *once* for each
 	/// instance of this class.
 	///
-	static void loader(SWFStream& in, SWF::tag_type tag, movie_definition& m,
+	static void loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
             const RunInfo& r);
 
 
@@ -94,7 +94,7 @@ public:
 	///
 	/// This function is allowed to be called zero or more times, as long
 	/// as readDefineVideoStream was read before.
-	void readDefineVideoFrame(SWFStream& in, SWF::tag_type tag,
+	void readDefineVideoFrame(SWFStream& in, SWF::TagType tag,
             movie_definition& m);
 
 	/// Return local video bounds in twips

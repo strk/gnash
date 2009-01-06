@@ -24,7 +24,7 @@
 
 #include "rect.h"
 #include "character_def.h"
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 #include "RGBA.h"
 #include "TextField.h"
 
@@ -62,7 +62,7 @@ public:
     ~DefineEditTextTag() {}
 
 	/// Load an SWF::DEFINEEDITTEXT (37) tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
     const rect& get_bound() const { return _rect; }

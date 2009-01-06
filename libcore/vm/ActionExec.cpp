@@ -285,7 +285,7 @@ ActionExec::operator() ()
                 break;
             }
 
-            ash.execute(static_cast<SWF::action_type>(action_id), *this);
+            ash.execute(static_cast<SWF::ActionType>(action_id), *this);
 
 #if 1 // See bugs: #20974, #21069, #20996.
 

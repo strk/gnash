@@ -19,9 +19,9 @@ namespace gnash {
 	//
 
 	/// Can throw ParserException on premature end of input stream
-	void	rgba::read(SWFStream& in, int tag_type)
+	void rgba::read(SWFStream& in, SWF::TagType tag)
 	{
-		switch (tag_type)
+		switch (tag)
 		{
 			case SWF::DEFINESHAPE:
 			case SWF::DEFINESHAPE2:

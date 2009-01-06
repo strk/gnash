@@ -25,7 +25,7 @@ namespace gnash {
 namespace SWF {
 
 void
-DefineEditTextTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
 	assert(tag == SWF::DEFINEEDITTEXT); // 37

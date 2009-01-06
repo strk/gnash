@@ -15,6 +15,7 @@
 #include "rect.h"      // for composition
 #include "fill_style.h" // for fill style
 #include "styles.h"     // for line style
+#include "swf.h"
 
 #include <vector> // for composition
 
@@ -59,22 +60,22 @@ public:
     /// @param in
     ///	The stream to read the shape from
     ///
-    /// @param tag_type
-    ///	The SWF::tag_type this shape definition is read for.
-    ///	TODO: change to an actual SWF::tag_type type
+    /// @param TagType
+    ///	The SWF::TagType this shape definition is read for.
+    ///	TODO: change to an actual SWF::TagType type
     ///
     /// @param with_style
     ///	If true, this definition includes bounds, fill styles and line styles.
     ///	Tipically, this is only false for DEFINEFONT* tags.
     ///	NOTE: if with_style is false, bounds of the shape will be computed
     ///	      rather then read.
-    ///	TODO: drop this function, set based on tag_type ?
+    ///	TODO: drop this function, set based on TagType ?
     ///
     /// @param m
     ///	The movie definition corresponding to the SWF we/re parsing.
     ///	This is used to resolve bitmap characters for fill styles, never
     ///	used if with_style is false.
-    void read(SWFStream& in, int tag_type, bool with_style,
+    void read(SWFStream& in, SWF::TagType tag, bool with_style,
             movie_definition& m);
 
     void display(const SWFMatrix& mat, const cxform& cx,

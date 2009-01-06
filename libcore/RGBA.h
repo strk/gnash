@@ -10,6 +10,7 @@
 
 #include <string>
 #include <boost/cstdint.hpp> // for boost::?int??_t 
+#include "swf.h"
 
 namespace gnash {
 	class SWFStream;	// forward declaration
@@ -71,13 +72,13 @@ namespace gnash {
 			return (m_r<<16) + (m_g<<8) + m_b;
 		}
 
-		/// Initialize from intput stream.
+		/// Initialize from input stream.
 		//
 		///
 		/// @param in
 		///	The input (SWF) stream
 		///
-		/// @param tag_type 
+		/// @param t 
 		///	I don't know by which logic but
 		///	a value <= 22 makes it read RGB
 		///	and value > 22 makes it read RGBA
@@ -85,9 +86,9 @@ namespace gnash {
 		/// Throw a ParserException if there's no enough bytes in the
 		/// currently opened tag for reading. See stream::ensureBytes()
 		///
-		void read(SWFStream& in, int tag_type);
+		void read(SWFStream& in, SWF::TagType t);
 
-		/// Initialize from intput stream (reads RGBA)
+		/// Initialize from input stream (reads RGBA)
 		//
 		/// Throw a ParserException if there's no enough bytes in the
 		/// currently opened tag for reading. See stream::ensureBytes()

@@ -322,7 +322,7 @@ public:
 	//
 	/// aligned read
 	///
-	SWF::tag_type	open_tag();
+	SWF::TagType	open_tag();
 
 	/// Seek to the end of the most-recently-opened tag.
 	void	close_tag();

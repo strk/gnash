@@ -81,7 +81,7 @@ static void clear_library();
 // Associate the specified tag type with the given tag loader
 // function.
 void
-register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
+register_tag_loader(SWF::TagType t, SWF::TagLoadersTable::loader_function lf)
 {
   using SWF::TagLoadersTable;
 
