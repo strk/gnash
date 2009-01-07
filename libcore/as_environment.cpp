@@ -124,16 +124,16 @@ as_environment::get_variable(const std::string& varname) const
     return get_variable(varname, empty_scopeStack);
 }
 
-static bool validRawVariableName(const std::string& varname)
+static bool
+validRawVariableName(const std::string& varname)
 {
     
-    if (!varname.empty() && varname[0] == '.') return false;
-    
+    if (varname.empty() || varname[0] == '.') return false;
+   
     if (varname[0] == ':' &&
             varname.find_first_of(":.", 1) == std::string::npos) {
         return false;
     }
-    
     return (varname.find(":::") == std::string::npos);
 }
 
@@ -492,21 +492,18 @@ as_environment::parse_path(const std::string& var_path_in, std::string& path,
     // in particular)
     size_t pathlen = thePath.length();
     size_t i = pathlen-1;
-    size_t contiguouscolons = 0;
+    size_t consecutiveColons = 0;
     while ( i && thePath[i--] == ':' )
     {
-        if ( ++contiguouscolons > 1 )
+        if ( ++consecutiveColons > 1 )
         {
 #ifdef DEBUG_TARGET_FINDING 
-            log_debug("path '%s' ends with too many colon chars, not considering a path", thePath);
+            log_debug("path '%s' ends with too many colon chars, not "
+                    "considering a path", thePath);
 #endif
             return false;
         }
     }
-
-#ifdef DEBUG_TARGET_FINDING 
-    log_debug("contiguouscolons: %d", contiguouscolons);
-#endif
 
     path = thePath;
     var = theVar;
