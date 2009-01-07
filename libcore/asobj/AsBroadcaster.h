@@ -54,9 +54,11 @@ public:
 	///
 	static as_object* getAsBroadcaster();
 
-};
+    static void registerNative(as_object &global);
 
-void AsBroadcaster_init(as_object& global);
+    static void init(as_object& global);
+
+};
 
 } // end of gnash namespace
 
