@@ -71,6 +71,15 @@ namespace SWF {
 class DefineVideoStreamTag : public character_def
 {
 public:
+	
+    /// The undecoded video frames and its size, using the swf-frame number
+    /// as key
+	//
+	/// Elements of this vector are owned by this instance, and will be deleted 
+	/// at instance destruction time.
+	///
+	typedef std::vector<media::EncodedVideoFrame*> EmbeddedFrames;
+	
 
 	~DefineVideoStreamTag();
 
@@ -182,14 +191,6 @@ private:
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
 	rect m_bound;
 
-	/// The undecoded video frames and its size, using the swf-frame number
-    /// as key
-	//
-	/// Elements of this vector are owned by this instance, and will be deleted 
-	/// at instance destruction time.
-	///
-	typedef std::vector<media::EncodedVideoFrame*> EmbeddedFrames;
-	
 	boost::mutex _video_mutex;
 	
 	EmbeddedFrames _video_frames;

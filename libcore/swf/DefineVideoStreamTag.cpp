@@ -27,7 +27,33 @@
 namespace gnash {
 namespace SWF {
 
-DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t char_id)
+namespace {
+
+/// A Functor for comparing frames by frame number.
+//
+/// A comparison operator would avoid having two variants, but seems less
+/// intuitive, and could open up all sorts of unexpected behaviour due to
+/// type promotion.
+struct FrameFinder
+{
+
+    typedef DefineVideoStreamTag::EmbeddedFrames::value_type Frame;
+
+    bool operator()(const Frame& frame, size_t i)
+    {
+        return frame->frameNum() < i;
+    }
+    
+    bool operator()(size_t i, const Frame& frame)
+    {
+        return i < frame->frameNum();
+    }
+};
+
+}
+
+DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in,
+        boost::uint16_t char_id)
 	:
 	m_char_id(char_id),
 	_width(0),
@@ -119,6 +145,7 @@ has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
 	return frame->frameNum() == frameNumber;
 }
 
+
 void
 DefineVideoStreamTag::getEncodedFrameSlice(boost::uint32_t from,
         boost::uint32_t to, EmbeddedFrames& ret)
@@ -127,27 +154,19 @@ DefineVideoStreamTag::getEncodedFrameSlice(boost::uint32_t from,
 
 	boost::mutex::scoped_lock lock(_video_mutex);
 
-	EmbeddedFrames::iterator it=_video_frames.begin(), itEnd=_video_frames.end();
-	for (; it!=itEnd; ++it)
-	{
-		media::EncodedVideoFrame* frame = *it;
-		if ( frame->frameNum() >= from )
-		{
-			break;
-		}
-	}
+    // It's assumed that frame numbers are in order.
+    EmbeddedFrames::iterator lower = std::lower_bound(
+            _video_frames.begin(), _video_frames.end(), from, FrameFinder());
 
-	if (it==itEnd) return; // no element was >= from
+    EmbeddedFrames::iterator upper = std::upper_bound(
+            lower, _video_frames.end(), to, FrameFinder());
 
-	// push remaining frames 
-	for (; it!=itEnd; ++it)
-	{
-		media::EncodedVideoFrame* frame = *it;
-		if ( frame->frameNum() > to ) break; // went too far
-		ret.push_back(frame);
-	}
-
+    // This copies a pointer to the encoded video frames; the actual
+    // data is owned by this class for its entire lifetime.
+    std::copy(lower, upper, std::back_inserter(ret));
 }
+
+
 
 } // namespace SWF
 } // namespace gnash
