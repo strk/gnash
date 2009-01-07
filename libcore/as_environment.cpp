@@ -127,8 +127,9 @@ as_environment::get_variable(const std::string& varname) const
 static bool
 validRawVariableName(const std::string& varname)
 {
-    
-    if (varname.empty() || varname[0] == '.') return false;
+    if (varname.empty()) return false;
+
+    if (varname[0] == '.') return false;
    
     if (varname[0] == ':' &&
             varname.find_first_of(":.", 1) == std::string::npos) {
@@ -321,11 +322,9 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
     //log_debug(_("set_variable(%s, %s)"), varname, val);
     if ( parse_path(varname, path, var) )
     {
-        log_debug("Path parsed");
         target = find_object(path, &scopeStack); 
         if (target)
         {
-            log_debug("Object found");
             target->set_member(_vm.getStringTable().find(var), val);
         }
         else
@@ -337,7 +336,6 @@ as_environment::set_variable(const std::string& varname, const as_value& val,
         }
     }
     else {
-        log_debug("set var raw");
         set_variable_raw(varname, val, scopeStack);
     }
 }
