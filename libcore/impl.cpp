@@ -358,7 +358,7 @@ getFileType(IOChannel& in)
 
     char buf[3];
     
-    if (3 < in.read(buf, 3))
+    if (3 > in.read(buf, 3))
     {
         log_error(_("Can't read file header"));
         in.seek(0);
@@ -402,7 +402,7 @@ getFileType(IOChannel& in)
     // Check if it is an swf embedded in a player (.exe-file)
     if (std::equal(buf, buf + 2, "MZ")) {
 
-        if ( 3 < in.read(buf, 3) )
+        if ( 3 > in.read(buf, 3) )
         {
             log_error(_("Can't read 3 bytes after an MZ (.exe) header"));
             in.seek(0);
