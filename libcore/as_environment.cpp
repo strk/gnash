@@ -126,21 +126,27 @@ as_environment::get_variable(const std::string& varname) const
 
 static bool validRawVariableName(const std::string& varname)
 {
+    
+    if (!varname.empty() && varname[0] == '.') return false;
+    
+    if (varname[0] == ':' &&
+            varname.find_first_of(":.", 1) == std::string::npos) {
+        return false;
+    }
+    
     return (varname.find(":::") == std::string::npos);
 }
 
 as_value
-as_environment::get_variable_raw(
-    const std::string& varname,
+as_environment::get_variable_raw(const std::string& varname,
     const ScopeStack& scopeStack, as_object** retTarget) const
     // varname must be a plain variable name; no path parsing.
 {
 #ifdef GNASH_DEBUG_GET_VARIABLE
     log_debug(_("get_variable_raw(%s)"), varname);
 #endif
-    //assert(strchr(varname.c_str(), ':') == NULL);
 
-    if ( ! validRawVariableName(varname) )
+    if (!validRawVariableName(varname))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Won't get invalid raw variable name: %s"), varname);
@@ -164,7 +170,8 @@ as_environment::get_variable_raw(
         {
             // Found the var in with context.
 #ifdef GNASH_DEBUG_GET_VARIABLE
-            log_debug("Found %s in object %d/%d of scope stack (%p)", varname, i, scopeStack.size(), obj);
+            log_debug("Found %s in object %d/%d of scope stack (%p)",
+                    varname, i, scopeStack.size(), obj);
 #endif
             if ( retTarget ) *retTarget = obj;
             return val;
@@ -299,9 +306,7 @@ as_environment::get_variable_raw(const std::string& varname) const
 
 // Given a path to variable, set its value.
 void
-as_environment::set_variable(
-    const std::string& varname,
-    const as_value& val,
+as_environment::set_variable(const std::string& varname, const as_value& val,
     const ScopeStack& scopeStack)
 {
     IF_VERBOSE_ACTION (
@@ -316,29 +321,29 @@ as_environment::set_variable(
     //log_debug(_("set_variable(%s, %s)"), varname, val);
     if ( parse_path(varname, path, var) )
     {
-        //log_debug(_("Variable '%s' parsed into path='%s', var='%s'"), varname, path, var);
-    //target = find_target(path);
+        log_debug("Path parsed");
         target = find_object(path, &scopeStack); 
-    if (target)
-    {
-        target->set_member(_vm.getStringTable().find(var), val);
+        if (target)
+        {
+            log_debug("Object found");
+            target->set_member(_vm.getStringTable().find(var), val);
+        }
+        else
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Path target '%s' not found while setting %s=%s"),
+                path, varname, val);
+            );
+        }
     }
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Path target '%s' not found while setting %s=%s"),
-            path, varname, val);
-        );
-    }
-    } else {
-    set_variable_raw(varname, val, scopeStack);
+    else {
+        log_debug("set var raw");
+        set_variable_raw(varname, val, scopeStack);
     }
 }
 
 void
-as_environment::set_variable(
-        const std::string& varname,
-        const as_value& val)
+as_environment::set_variable(const std::string& varname, const as_value& val)
 {
     static ScopeStack empty_scopeStack;
     set_variable(varname, val, empty_scopeStack);
@@ -346,16 +351,14 @@ as_environment::set_variable(
 
 // No path rigamarole.
 void
-as_environment::set_variable_raw(
-    const std::string& varname,
-    const as_value& val,
-    const ScopeStack& scopeStack)
+as_environment::set_variable_raw(const std::string& varname,
+    const as_value& val, const ScopeStack& scopeStack)
 {
 
-    if ( ! validRawVariableName(varname) )
+    if (!validRawVariableName(varname))
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Won't set invalid raw variable name: %s"), varname);
+            log_aserror(_("Won't set invalid raw variable name: %s"), varname);
         );
         return;
     }
@@ -376,7 +379,7 @@ as_environment::set_variable_raw(
             as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
             if (obj && obj->set_member(varkey, val, 0, true) )
             {
-        return;
+                return;
             }
         }
 
@@ -415,8 +418,7 @@ as_environment::set_variable_raw(
 }
 
 void
-as_environment::set_variable_raw(
-        const std::string& varname,
+as_environment::set_variable_raw( const std::string& varname,
         const as_value& val)
 {
     static ScopeStack empty_scopeStack;
@@ -465,15 +467,15 @@ as_environment::declare_local(const std::string& varname)
 
 /* public static */
 bool
-as_environment::parse_path(const std::string& var_path_in,
-        std::string& path, std::string& var)
+as_environment::parse_path(const std::string& var_path_in, std::string& path,
+        std::string& var)
 {
 #ifdef DEBUG_TARGET_FINDING 
     log_debug("parse_path(%s)", var_path_in);
 #endif
 
     size_t lastDotOrColon = var_path_in.find_last_of(":.");
-    if ( lastDotOrColon == std::string::npos ) return false;
+    if (lastDotOrColon == std::string::npos) return false;
 
     std::string thePath, theVar;
 
@@ -486,13 +488,14 @@ as_environment::parse_path(const std::string& var_path_in,
 
     if ( thePath.empty() ) return false;
 
-    // this check should be performed by callers (getvariable/setvariable in particular)
+    // this check should be performed by callers (getvariable/setvariable
+    // in particular)
     size_t pathlen = thePath.length();
     size_t i = pathlen-1;
-    size_t contiguoscommas = 0;
+    size_t contiguouscolons = 0;
     while ( i && thePath[i--] == ':' )
     {
-        if ( ++contiguoscommas > 1 )
+        if ( ++contiguouscolons > 1 )
         {
 #ifdef DEBUG_TARGET_FINDING 
             log_debug("path '%s' ends with too many colon chars, not considering a path", thePath);
@@ -502,10 +505,8 @@ as_environment::parse_path(const std::string& var_path_in,
     }
 
 #ifdef DEBUG_TARGET_FINDING 
-    log_debug("contiguoscommas: %d", contiguoscommas);
+    log_debug("contiguouscolons: %d", contiguouscolons);
 #endif
-
-    //if ( var.empty() ) return false;
 
     path = thePath;
     var = theVar;
@@ -514,8 +515,8 @@ as_environment::parse_path(const std::string& var_path_in,
 }
 
 bool
-as_environment::parse_path(const std::string& var_path,
-        as_object** target, as_value& val)
+as_environment::parse_path(const std::string& var_path, as_object** target,
+        as_value& val)
 {
     std::string path;
     std::string var;
@@ -557,7 +558,8 @@ as_environment::find_target(const std::string& path_in) const
 }
 
 as_object*
-as_environment::find_object(const std::string& path_in, const ScopeStack* scopeStack) const
+as_environment::find_object(const std::string& path_in,
+        const ScopeStack* scopeStack) const
 {
 #ifdef DEBUG_TARGET_FINDING 
     log_debug(_("find_object(%s) called"), path_in);
