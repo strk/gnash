@@ -60,13 +60,15 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
 
 	// TODO: skip if there's no MediaHandler registered ?
 
+    const unsigned short padding = 8;
+
 	in.ensureBytes(2);
 	unsigned int frameNum = in.read_u16(); 
-
-	const unsigned int dataLength = in.get_tag_end_position() - in.tell();
 	
+	const unsigned int dataLength = in.get_tag_end_position() - in.tell();
+
     // FIXME: catch bad_alloc
-	boost::uint8_t* buffer = new uint8_t[dataLength + 8]; 
+	boost::uint8_t* buffer = new uint8_t[dataLength + padding]; 
 
 	const size_t bytesRead = in.read(reinterpret_cast<char*>(buffer),
             dataLength);
@@ -78,7 +80,7 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
                                 "end of the stream!"));
     }	
 	
-    std::fill_n(buffer + bytesRead, 8, 0);
+    std::fill_n(buffer + bytesRead, padding, 0);
 
 	using namespace media;
 

@@ -214,7 +214,7 @@ Video::getVideoFrame()
                 "object %s", from_frame, current_frame, getTarget());
 #endif
 
-		typedef std::vector<media::EncodedVideoFrame*> EncodedFrames;
+		typedef SWF::DefineVideoStreamTag::EmbeddedFrames EncodedFrames;
 
 		EncodedFrames toDecode;
 		m_def->getEncodedFrameSlice(from_frame, current_frame, toDecode);
