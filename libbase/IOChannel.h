@@ -102,6 +102,9 @@ public:
 
 	/// Read the given number of bytes from the stream
 	//
+	/// Return the number of bytes actually read. 
+	/// EOF might cause it to be < num.
+	///
 	/// Throw IOException on error
 	///
 	virtual int read(void* dst, int num)=0;
