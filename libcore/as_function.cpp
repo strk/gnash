@@ -197,7 +197,8 @@ function_apply(const fn_call& fn)
 	//int pushed=0; // new values we push on the stack
 
 	// Get function body 
-	boost::intrusive_ptr<as_function> function_obj = ensureType<as_function>(fn.this_ptr);
+	boost::intrusive_ptr<as_function> function_obj =
+        ensureType<as_function>(fn.this_ptr);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -369,39 +370,43 @@ as_function::constructInstance( as_environment& env,
 	as_value us;
 	bool has_proto = false;
 	get_member(NSV::PROP_PROTOTYPE, &us);
-	if (!us.is_undefined())
+	
+    if (!us.is_undefined())
 	{
 		has_proto = true;
 	}
 
-        // a built-in class takes care of assigning a prototype
-	// TODO: change this
-        if ( isBuiltin() )
-	{
-
+    // a built-in class takes care of assigning a prototype
+    // TODO: change this
+    if ( isBuiltin() )
+    {
 		IF_VERBOSE_ACTION (
-		log_action(_("it's a built-in class"));
+            log_action(_("it's a built-in class"));
 		);
 
-		fn_call fn(NULL, &env, args);
+		fn_call fn(0, &env, args);
 		as_value ret;
+
 		try {
 			ret = call(fn);
-			//newobj = ret.to_object();
-		} catch (std::exception& ex) {
-			log_debug("Native function called as constructor threw exception: %s", ex.what());
-			//newobj = new as_object();
+		}
+        catch (GnashException& ex) {
+            // Catching a std::exception here can mask all sorts of bad 
+            // behaviour, as (for instance) a poorly constructed string may
+            // smash the stack, throw and exception, but not abort.
+            // This is very effective at confusing debugging tools.
+            // We only throw GnashExceptions. A std::bad_alloc may also be
+            // reasonable, but anything else shouldn't be caught here.
+			log_debug("Native function called as constructor threw exception: "
+                    "%s", ex.what());
 		}
 
-		if ( ret.is_object() )
-		{
-			newobj = ret.to_object();
-		}
-		else 
-		{
+		if (ret.is_object()) newobj = ret.to_object();
+		else {
 			log_debug("Native function called as constructor returned %s", ret);
 			newobj = new as_object();
 		}
+
 		assert(newobj); // we assume builtin functions do return objects !!
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
@@ -410,12 +415,13 @@ as_function::constructInstance( as_environment& env,
 		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-		if ( swfversion < 7 ) // && swfversion > 5 ?
+        // Also for SWF5+ only?
+		if (swfversion < 7) 
 		{
 			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}
 
-        }
+    }
 	else
 	{
 		// Set up the prototype.

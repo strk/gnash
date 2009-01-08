@@ -366,6 +366,11 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
     // Knock off the "/>" of a self-closing tag.
     if (std::equal(endName - 1, endName + 1, "/>")) {
         --endName;
+        // This can leave endName before it, e.g when the tag is "</>".
+        if (it >= endName) {
+            _status = XML_UNTERMINATED_ELEMENT;
+            return;
+        }
     }
 
     std::string tagName(it, endName);
