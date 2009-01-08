@@ -221,6 +221,11 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
         return;
     }
     std::string name(it, end);
+    
+    if (name.empty()) {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
+    }
 
     // Point iterator to the character after the name.
     it = end;
@@ -409,6 +414,9 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
             }
         }
         
+        // Do nothing more if there was an error in attributes parsing.
+        if (_status != XML_OK) return;
+
         for (Attributes::const_reverse_iterator i = attributes.rbegin(),
                 e = attributes.rend(); i != e; ++i) {
             childNode->setAttribute(i->first, i->second);
@@ -423,7 +431,8 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
         return;
     }
 
-    // This may be xml.end(), which is okay.
+    // If we reach here, this is a closing tag.
+
     it = std::find(endName, xml.end(), '>');
 
     if (it == xml.end())

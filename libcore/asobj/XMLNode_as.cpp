@@ -388,24 +388,22 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
         enumerateAttributes(xml, attrs);
         if (!attrs.empty()) {
 
-            for (PropertyList::SortedPropertyList::const_iterator i = 
+            for (PropertyList::SortedPropertyList::iterator i = 
                     attrs.begin(), e = attrs.end(); i != e; ++i) { 
-
+                XML_as::escape(i->second);
                 xmlout << " " << i->first << "=\"" << i->second << "\"";
             }
         }
 
     	// If the node has no content, just close the tag now
-    	if ( nodeValue.empty() && xml._children.empty() )
-    	{
+    	if ( nodeValue.empty() && xml._children.empty() ) {
     		xmlout << " />";
-		return;
+            return;
     	}
-	else
-	{
-        // Will use a closing tag later
-        xmlout << ">";
-	}
+        else {
+            // Will use a closing tag later
+            xmlout << ">";
+        }
 
     }
 

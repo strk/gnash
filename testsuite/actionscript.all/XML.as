@@ -960,10 +960,10 @@ h = new XML("<open><open2></open>");
 check_equals(h.toString(), "<open><open2 /></open>");
 
 h = new XML("<open att='");
-xcheck_equals(h.toString(), "");
+check_equals(h.toString(), "");
 
 h = new XML("<open att      r='kk'");
-xcheck_equals(h.toString(), "");
+check_equals(h.toString(), "");
 
 h = new XML("<open>& ' \"<");
 check_equals(h.toString(), "<open>&amp; &apos; &quot;</open>");
