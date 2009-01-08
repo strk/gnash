@@ -370,12 +370,16 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
 
     // Knock off the "/>" of a self-closing tag.
     if (std::equal(endName - 1, endName + 1, "/>")) {
+        // This can leave endName before it, e.g when a self-closing tag is
+        // empty ("</>"). This must be checked before trying to construct
+        // a string!
         --endName;
-        // This can leave endName before it, e.g when the tag is "</>".
-        if (it >= endName) {
-            _status = XML_UNTERMINATED_ELEMENT;
-            return;
-        }
+    }
+    
+    // If the tag is empty, the XML counts as malformed. 
+    if (it >= endName) {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
     }
 
     std::string tagName(it, endName);
@@ -575,7 +579,7 @@ XML_as::parseXML(const std::string& xml)
         }
         else parseText(node, xml, it);
     }
-  
+
     return;
 }
 
