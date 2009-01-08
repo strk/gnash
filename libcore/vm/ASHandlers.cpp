@@ -752,6 +752,11 @@ SWFHandlers::ActionMultiply(ActionExec& thread)
     env.drop(1);
 }
 
+
+// Negative number / 0: -infinity
+// Positive number / 0: infinity
+// 0 / 0 : NaN
+// Either operand is NaN: NaN
 void
 SWFHandlers::ActionDivide(ActionExec& thread)
 {
@@ -761,10 +766,25 @@ SWFHandlers::ActionDivide(ActionExec& thread)
     const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
 
-    if (operand2 == 0 && env.get_version() < 5)
+    if (operand2 == 0)
     {
-        env.top(1).set_string("#ERROR#");
+        if (env.get_version() < 5) {
+            env.top(1).set_string("#ERROR#");
         }
+        else if (operand1 == 0 || isNaN(operand1) || isNaN(operand2)) {
+            env.top(1).set_nan();
+        }
+        else {
+            // Division by -0.0 is not possible in AS, so 
+            // the sign of the resulting infinity should match the 
+            // sign of operand1. Division by 0 in C++ is undefined
+            // behaviour.
+            env.top(1) = operand1 < 0 ?
+                - std::numeric_limits<double>::infinity() :
+                std::numeric_limits<double>::infinity();
+        }
+
+    }
     else
     {
         env.top(1) = operand1 / operand2;
