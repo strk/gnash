@@ -720,8 +720,8 @@ SWFHandlers::ActionAdd(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
     env.top(1) = operand1 + operand2;
     env.drop(1);
 }
@@ -730,12 +730,10 @@ void
 SWFHandlers::ActionSubtract(ActionExec& thread)
 {
 
-    // env.top(1) -= env.top(0); //original version
-
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
     env.top(1) = operand1 - operand2;
     env.drop(1);
 }
@@ -746,8 +744,8 @@ SWFHandlers::ActionMultiply(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
     env.top(1) = operand1 * operand2;
     env.drop(1);
 }
@@ -763,8 +761,8 @@ SWFHandlers::ActionDivide(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
 
     if (operand2 == 0)
     {
