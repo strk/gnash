@@ -580,7 +580,12 @@ XML_as::parseXML(const std::string& xml)
         else parseText(node, xml, it);
     }
 
-    return;
+    // If everything parsed correctly, check that we've got back to the
+    // parent node. If not, there is a missing closing tag.
+    if (_status == XML_OK && node != this) {
+        _status = XML_MISSING_CLOSE_TAG;
+    }
+
 }
 
 bool
