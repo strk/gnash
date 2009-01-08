@@ -49,8 +49,9 @@ main(int argc, char** argv)
   SWFDisplayItem item;
   SWFAction a;
   SWFAction b;
-  char buffer_a[1028];
-  char buffer_b[2048];
+  char buffer_a[1024];
+  char buffer_b[1024];
+  char buffer_c[1024];
 
   // This is different from the real video width to make sure that
   // Video.width returns the actual width (128).
@@ -126,7 +127,9 @@ main(int argc, char** argv)
 	"	pc.onEnterFrame = function() {"
 	"		pcp._xscale = 100*(this.stream.bytesLoaded/this.stream.bytesTotal);"
 	"	};"
-	"};"
+	"};");
+
+    sprintf(buffer_c,
 	"MovieClip.prototype.addBufferLoadedProgress = function(v, s) {"
 	"	var nam = 'blprogress_'+v;"
 	"	var dep = this.getNextHighestDepth();"
@@ -369,6 +372,9 @@ main(int argc, char** argv)
   b = newSWFAction(buffer_b);
   if(b == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)b);
+  b = newSWFAction(buffer_c);
+  if(b == NULL) return -1;
+  SWFMovie_add(mo, (SWFBlock)b);
  
   check_equals (mo, "stream.currentFps", "0" );
  
@@ -467,6 +473,8 @@ main(int argc, char** argv)
 		"};"
 		"Key.addListener(_root);"
 
+		"\n"
+
 		"stream.onStatus = function(info) {"
 
 		"  if ( ! _root.enumerableStatusInfoChecked ) {"
@@ -491,11 +499,15 @@ main(int argc, char** argv)
 		"    info.level = backup;"
 		"  }"
 
+		"\n"
+
 		// Ignore Buffer.Flush for now
 		"  if ( info.code == 'NetStream.Buffer.Flush' ) return; "
 
 		// Print some info
 		" _root.note('onStatus('+info.code+') called'); "
+
+		"\n"
 
 		" if ( info.code == 'NetStream.Play.Start' )"
 		" {"
@@ -553,7 +565,7 @@ main(int argc, char** argv)
 		" check(_root.startNotified, 'onMetaData should be notified after Play.Start');"
 		" check_equals(arguments.length, 1, 'single argument');"
 		" check(info instanceof Array, 'onMetaData argument sent from square.flv should be instanceof Array');"
-		" check_equals(info.length, 11);" // it's an array so we can check length. gnash fails by discarding the count element of ECMA_ARRAY AMF type
+		" check_equals(info.length, 11);" 
 
 		// Test enumeration
 		" var enu = new Array;"
