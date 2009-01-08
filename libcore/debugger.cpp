@@ -326,7 +326,7 @@ Debugger::disassemble(const unsigned char *data)
 {
 //    GNASH_REPORT_FUNCTION;
     as_arg_t fmt = ARG_HEX;
-    action_type	action_id = static_cast<action_type>(data[0]);
+    ActionType action_id = static_cast<ActionType>(data[0]);
     int val = 0;
     string str;
     unsigned char num[10];
