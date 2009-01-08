@@ -459,6 +459,10 @@ getvariable-dotdot-6.swf:becc7079e65bcf47fe2ab0293bbc2c29
 getvariable-dotdot-7.swf:efa5597fe3e61764b6ee937f87d8cf1b
 getvariable-dotdot-8.swf:2861d34a85b5de09f41af572e0b1a6a5
 getvariable-length-5.swf:2d07e2afdf45356cf2df5c1176ed29ad
+getvariable-setvariable-5.swf:6bdb4be98bfd34cf5c37d237c13a732a
+getvariable-setvariable-6.swf:eec9c92f5871136bdc444595aa26dbb9
+getvariable-setvariable-7.swf:ca4ed5a192fde844558b9b1b91b48a03
+getvariable-setvariable-8.swf:ec8318e00c7e44937c1996f10598887e
 getvariable-slashpath-5.swf:3067a6cdf4991af85520d7eb3bb51178
 getvariable-slashpath-6.swf:17d6ee6ddb15296e887944d7c7c45432
 getvariable-slashpath-7.swf:499213312255eba3746c4ff6b7b4782d
@@ -508,6 +512,9 @@ instance-name-loaded-7.swf:f4b4cf3a25a0010b7ff13a56a42d1aad
 instance-of-propflags-5.swf:1cab145faaa9544b3b1488c09f6639e5
 instance-of-propflags-8.swf:af7c2eee7fa1e572ff330d03d936d959
 instance-of-propflags-9.swf:b125071d54db67ae00035fc87ba37a9b
+invalid-variable-name-6.swf:1221e10f77fb8391cbff23a2b889ff70
+invalid-variable-name-7.swf:158fe803e0820e73bdc22eab51e76448
+invalid-variable-name-8.swf:8c86b479ef7a88282d126e3b3db6dd0f
 isnan-5.swf:b296bdcf5e062c7263bdeac1df3b08b3
 isnan-6.swf:115656233daa53cadfba0c85584567e7
 isnan-7.swf:68650298c0f014793884b2d7adea1356

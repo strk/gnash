@@ -1037,7 +1037,8 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
     {
         IF_VERBOSE_ASCODING_ERRORS (
             // Invalid object, can't set.
-            log_aserror(_("ActionSetVariable: %s=%s: variable name evaluates to invalid (empty) string"),
+            log_aserror(_("ActionSetVariable: %s=%s: variable name "
+                    "evaluates to invalid (empty) string"),
                 env.top(1),
                 env.top(0));
         );

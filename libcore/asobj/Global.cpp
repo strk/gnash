@@ -581,7 +581,8 @@ as_global_asnative(const fn_call& fn)
     if (fn.nargs < 2)
     {
         IF_VERBOSE_ASCODING_ERRORS(    
-        log_aserror(_("ASNative(%s): needs at least two arguments"), fn.dump_args());
+        log_aserror(_("ASNative(%s): needs at least two arguments"),
+            fn.dump_args());
         )
         return ret;
     }
@@ -694,6 +695,7 @@ registerNatives(as_object& global)
     registerStageNative(global);
     registerSharedObjectNative(global);
 
+    AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);
     Date_as::registerNative(global);
     Mouse_as::registerNative(global);
