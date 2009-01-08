@@ -61,7 +61,7 @@ class agg_style_solid : public agg_style_base
 {
 public:
 
-  agg_style_solid(const agg::rgba8 color) {
+  agg_style_solid(const agg::rgba8& color) {
     m_is_solid = true;
     m_color = color;
     
@@ -70,7 +70,8 @@ public:
 #endif    
   }
 
-  void generate_span(agg::rgba8* /*span*/, int /*x*/, int /*y*/, unsigned /*len*/)
+  void generate_span(agg::rgba8* /*span*/, int /*x*/, int /*y*/,
+        unsigned /*len*/)
   {
     abort(); // never call generate_span for solid fill styles
   }
@@ -112,8 +113,8 @@ class agg_style_bitmap : public agg_style_base
 public:
     
   agg_style_bitmap(int width, int height, int rowlen, boost::uint8_t* data, 
-    gnash::SWFMatrix mat, gnash::cxform cx) :
-    
+    const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    :
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
     m_img_src(m_pixf),
@@ -193,7 +194,10 @@ template <class color_type, class span_allocator_type, class interpolator_type,
 class agg_style_gradient : public agg_style_base {
 public:
 
-  agg_style_gradient(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx, int norm_size) :
+  agg_style_gradient(const gnash::fill_style& fs,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx,
+        int norm_size)
+    :
     m_tr(),
     m_span_interpolator(m_tr),
     m_gradient_func(),
@@ -318,14 +322,15 @@ public:
     }
     
     /// Adds a new solid fill color style
-    void add_color(const agg::rgba8 color) {
+    void add_color(const agg::rgba8& color) {
       agg_style_solid *st = new agg_style_solid(color);
       m_styles.push_back(st);
     }
     
     /// Adds a new bitmap fill style
-    void add_bitmap(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx, 
-      bool repeat, bool smooth) {
+    void add_bitmap(agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
+        const gnash::cxform& cx, bool repeat, bool smooth)
+    {
 
       if (bi==NULL) {
         // See server/styles.h comments about when NULL return is possible.
@@ -396,7 +401,9 @@ public:
     // === RGB24 ===
     
 
-    void add_bitmap_repeat_nn_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_repeat_nn_rgb24(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
 
       // tiled, nearest neighbor method (faster)   
 
@@ -419,7 +426,9 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_nn_rgb24(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
 
       // clipped, nearest neighbor method (faster)   
 
@@ -440,7 +449,9 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
+    void add_bitmap_repeat_aa_rgb24(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
 
       // tiled, bilinear method (better quality)   
 
@@ -461,7 +472,9 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgb24(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_aa_rgb24(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
 
       // clipped, bilinear method (better quality)   
 
@@ -484,7 +497,9 @@ public:
     
     // === RGBA32 ===    
 
-    void add_bitmap_repeat_nn_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_repeat_nn_rgba32(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
     
       // tiled, nearest neighbor method (faster)   
 
@@ -507,7 +522,9 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_nn_rgba32(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
 
       // clipped, nearest neighbor method (faster)   
 
@@ -528,7 +545,9 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {  
+    void add_bitmap_repeat_aa_rgba32(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
 
       // tiled, bilinear method (better quality)   
 
@@ -549,7 +568,9 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgba32(agg_bitmap_info* bi, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_bitmap_clip_aa_rgba32(agg_bitmap_info* bi,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
 
       // clipped, bilinear method (better quality)   
 
@@ -571,7 +592,9 @@ public:
     
     // === GRADIENT ===
 
-    void add_gradient_linear(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_gradient_linear(const gnash::fill_style& fs,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
     
       typedef agg::rgba8 color_type;            
       typedef agg::span_allocator<color_type> span_allocator_type;
@@ -598,7 +621,9 @@ public:
     }
     
 
-    void add_gradient_radial(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx) {
+    void add_gradient_radial(const gnash::fill_style& fs,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
+    {
     
       typedef agg::rgba8 color_type;            
       typedef agg::span_allocator<color_type> span_allocator_type;
@@ -628,7 +653,8 @@ public:
       m_styles.push_back(st);
     }
 
-    void add_gradient_focal(const gnash::fill_style& fs, gnash::SWFMatrix mat, gnash::cxform cx)
+    void add_gradient_focal(const gnash::fill_style& fs,
+        const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
       typedef agg::rgba8 color_type;
       typedef agg::span_allocator<color_type> span_allocator_type;
@@ -668,7 +694,8 @@ public:
     }
 
     /// Called by AGG to generate a scanline span for non-solid fills 
-    void generate_span(agg::rgba8* span, int x, int y, unsigned len, unsigned style)
+    void generate_span(agg::rgba8* span, int x, int y,
+        unsigned len, unsigned style)
     {
       m_styles[style]->generate_span(span,x,y,len);
     }
@@ -700,7 +727,8 @@ public:
     return m_color;
   }
   
-  void generate_span(agg::gray8* /*span*/, int /*x*/, int /*y*/, int /*len*/, unsigned /*style*/)
+  void generate_span(agg::gray8* /*span*/, int /*x*/, int /*y*/,
+        int /*len*/, unsigned /*style*/)
   {
     abort(); // never call generate_span for solid fill styles
   }
