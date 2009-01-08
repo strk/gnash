@@ -597,31 +597,24 @@ public:
   
 
   void begin_display(
-  const gnash::rgba& background_color,
-  int /*viewport_x0*/, int /*viewport_y0*/,
-  int /*viewport_width*/, int /*viewport_height*/,
-  float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
-  // Set up to render a full frame from a movie and fills the
-  // background.  Sets up necessary transforms, to scale the
-  // movie to fit within the given dimensions.  Call
-  // end_display() when you're done.
-  //
-  // The rectangle (viewport_x0, viewport_y0, viewport_x0 +
-  // viewport_width, viewport_y0 + viewport_height) defines the
-  // window coordinates taken up by the movie.
-  //
-  // The rectangle (x0, y0, x1, y1) defines the pixel
-  // coordinates of the movie that correspond to the viewport
-  // bounds.
+      const gnash::rgba& bg,
+      int /*viewport_x0*/, int /*viewport_y0*/,
+      int /*viewport_width*/, int /*viewport_height*/,
+      float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
     assert(m_pixf.get());
     
     assert(scale_set);
+
     // clear the stage using the background color
-    for (unsigned int i=0; i<_clipbounds.size(); ++i) 
-      clear_framebuffer(_clipbounds[i], agg::rgba8_pre(background_color.m_r,
-        background_color.m_g, background_color.m_b,
-        background_color.m_a));        
+    if ( ! _clipbounds.empty() )
+    {
+        const agg::rgba8& col = agg::rgba8_pre(bg.m_r, bg.m_g, bg.m_b, bg.m_a);
+        for (unsigned int i=0, n=_clipbounds.size(); i<n; ++i) 
+        {
+          clear_framebuffer(_clipbounds[i], col);
+        }
+    }
     
     // reset status variables
     m_drawing_mask = false;
@@ -633,7 +626,7 @@ public:
   /// This function clears only a certain portion of the screen, while /not/ 
   /// being notably slower for a fullscreen clear. 
   void clear_framebuffer(const geometry::Range2d<int>& region,
-        agg::rgba8 color)
+        const agg::rgba8& color)
   {
       assert(region.isFinite());
       
@@ -646,7 +639,7 @@ public:
       // region.width()==0 because in that case getMinX==getMaxX and we have
       // still a pixel to draw. 
 
-      unsigned int left=region.getMinX();
+      const unsigned int left=region.getMinX();
 
       for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
         y<=maxy; ++y) 
