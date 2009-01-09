@@ -250,12 +250,15 @@ as_value
 string_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+
+    const int swfVersion = fn.env().get_version();
+
     as_value val(fn.this_ptr);
     
     std::string str = val.to_string();
 
     for (unsigned int i = 0; i < fn.nargs; i++) {
-        str += fn.arg(i).to_string();
+        str += fn.arg(i).to_string_versioned(swfVersion);
     }
 
     return as_value(str);
