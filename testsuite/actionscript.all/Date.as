@@ -648,6 +648,23 @@ check_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
 check_equals ((Date.UTC(-1, 12).valueOf() < -2208988799999.5 &&
                Date.UTC(-1, 12).valueOf() > -2208988800000.5), true);
 
+pd = new Date();
+ret = (pd < 67);
+check_equals(typeof(ret), "boolean");
+
+ret = (pd > 67);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+ret = (pd < "a string");
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+
+ret = (pd > "a string");
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+
+
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 
 var foo = "foo "+d;   
@@ -670,7 +687,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(285);
+totals(292);
 #else
-totals (327);
+totals (334);
 #endif
