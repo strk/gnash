@@ -57,6 +57,7 @@ namespace {
 
     template<UnaryMathFunc Func> as_value unaryFunction(const fn_call& fn);
     template<BinaryMathFunc Func> as_value binaryFunction(const fn_call& fn);
+    template<> as_value binaryFunction<std::pow>(const fn_call& fn);
 
 }
 
@@ -118,16 +119,14 @@ unaryFunction(const fn_call& fn)
     return as_value(Func(arg));
 }
 
-// Two-argument functions.
+/// Two-argument functions.
 //
-// In general, two-argument functions called with no or one argument
-// return NaN.
-// This is always true for atan2, but there are the following exceptions:
-// pow(1) == 1, max() == -Infinity and min() == Infinity
+/// As a rule, two-argument functions called with no or one argument
+/// return NaN. However, three of the four functions break this rule in
+/// different ways. Exceptions are described below.
 //
-// Flash's pow() is clever cos it copes with negative numbers to an integral
-// power, and can do pow(-2, -1) == -0.5 and pow(-2, -2) == 0.25.
-// Fortunately, pow() in the cmath library works the same way.
+/// There is no real need for this template at present, as it only handles
+/// Math.atan2. But it might be 
 template<BinaryMathFunc Func>
 as_value
 binaryFunction(const fn_call& fn)
@@ -138,7 +137,30 @@ binaryFunction(const fn_call& fn)
     return as_value(Func(arg0, arg1));
 }
 
+/// Math.pow
+//
+/// Math.pow is odd in that Math.pow(1) returns 1. All other single-argument
+/// calls return NaN.
+template<>
+as_value
+binaryFunction<std::pow>(const fn_call& fn)
+{
+    if (!fn.nargs) return as_value(NaN);
+    
+    double arg0 = fn.arg(0).to_number();
 
+    if (fn.nargs < 2) {
+        if (arg0 == 1) return as_value(1);
+        return as_value(NaN);
+    }
+
+    double arg1 = fn.arg(1).to_number();
+    return as_value(std::pow(arg0, arg1));
+}
+
+/// Math.min
+//
+/// Math.min() returns Infinity
 as_value
 math_min(const fn_call& fn)
 {
@@ -158,6 +180,9 @@ math_min(const fn_call& fn)
 
 }
 
+/// Math.min
+//
+/// Math.max() returns -Infinity
 as_value
 math_max(const fn_call& fn)
 {

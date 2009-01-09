@@ -468,7 +468,7 @@ check_equals (Math.atan2(1,notanumber).toString(), "NaN");
 // Test Math.max
 //-----------------------------------------------------------------
 
-xcheck_equals (Math.max().toString(), "-Infinity");  // Heaven knows why!
+check_equals (Math.max().toString(), "-Infinity");  // Heaven knows why!
 check_equals (Math.max(1).toString(), "NaN");
 check_equals (Math.max(1,2), 2);
 check_equals (Math.max(2,1), 2);
@@ -489,7 +489,7 @@ check_equals (Math.max(0,notanumber).toString(), "NaN");
 // Test Math.min
 //-----------------------------------------------------------------
 
-xcheck_equals (Math.min().toString(), "Infinity");  // Heaven knows why!
+check_equals (Math.min().toString(), "Infinity");  // Heaven knows why!
 check_equals (Math.min(1).toString(), "NaN");
 check_equals (Math.min(1,2), 1);
 check_equals (Math.min(2,1), 1);
@@ -513,7 +513,7 @@ check_equals (Math.min(0,notanumber).toString(), "NaN");
 
 check_equals (Math.pow().toString(), "NaN");
 check_equals (Math.pow(0).toString(), "NaN");
-xcheck_equals (Math.pow(1), 1);			// !!
+check_equals (Math.pow(1), 1);			// !!
 check_equals (Math.pow(2).toString(), "NaN");
 check_equals (Math.pow(plusinf).toString(), "NaN");
 check_equals (Math.pow(minusinf).toString(), "NaN");
