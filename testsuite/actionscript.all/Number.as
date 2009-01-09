@@ -305,6 +305,8 @@ check_equals('00', 0);
  check_equals("0XFF0000", 0xFF0000);
  check_equals("0Xff0000", 0xFF0000);
  check("0Xff000000" != 0xFF000000);
+ check_equals("07700000000", 07700000000);
+ check("077000000000" != 077000000000);
 #else
  check("0xFF0000" != 0xFF0000);
  check("0XFF0000" != 0xFF0000);
@@ -595,29 +597,53 @@ a=new Number("0x2");
 #if OUTPUT_VERSION < 6
  check(isNaN(a));
 #else
- xcheck_equals(a, 2);
+ check_equals(a, 2);
 #endif
 
 a=Number("0x2"); 
 #if OUTPUT_VERSION < 6
  check(isNaN(a));
 #else
- xcheck_equals(a, 2);
+ check_equals(a, 2);
 #endif
 
 a=new Number(" 0x2");
 check(isNaN(a));
+
+a=Number("077");
+#if OUTPUT_VERSION < 6
+ check_equals(a, 77);
+#else
+ check_equals(a, 63);
+#endif
+
+a=Number("-077");
+#if OUTPUT_VERSION < 6
+ check_equals(a, -77);
+#else
+ check_equals(a, -63);
+#endif
+
+a=Number("+077");
+#if OUTPUT_VERSION < 6
+ check_equals(a, 77);
+#else
+ check_equals(a, 63);
+#endif
+
+a=Number(" 077");
+check_equals(a, 77);
 
 check( isNaN(0/0) );
 
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(223);
+ check_totals(227);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(216);
+ check_totals(222);
 #else
- check_totals(214);
+ check_totals(220);
 #endif
 #endif

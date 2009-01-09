@@ -712,7 +712,10 @@ parse-float-6.swf:f964f2977ba260d4e82f03eaa7c772a7
 parse-float-7.swf:59f1473e30db1f375f8c4734984ce9d6
 parse-int-5.swf:7917fb0d0cbb74bc8a54535af11e004f
 parse-int-6.swf:1645c51fb581cdb57070c243fc08554d
+parse-int-6.swf:b46dfcf60a6f1e94123daac657994681
 parse-int-7.swf:884940ca734ece1247966de88e974d6c
+parse-int-7.swf:a2d06192e9f2388546cd066e41b140d3
+parse-int-8.swf:40e2b74c8487204c9d955e8c19bdfe71
 place-object-6.swf:8c57ef22be77524807f9f2bec40af09b
 place-object-7.swf:1254ea2e2f8177b6a70ad712c73226a4
 place-object-button-5.swf:6e58db549a9aeb4f0092646b71affdb3
@@ -1089,6 +1092,9 @@ string-split-empty-7.swf:26ed7482148cffa6a9bedf657f44db77
 string-split-empty-7.swf:3be198e0f9277bf4749bddddf85dce33
 string-split-empty-8.swf:0fa43138d18306e83d7cccadd1e8c9e9
 string-to-number-5.swf:eda0a656d7daf433de63cdddb24019e8
+string-to-number-6.swf:35737c2ba0e8c518dd84c3ea6a29a9c3
+string-to-number-7.swf:071ca70d724a7e73da4f1085051a5ba3
+string-to-number-8.swf:a1b04f36557ef7f4fb0b57d4a37ffedb
 string-trace-5.swf:14759c53a46b39e873a3f928a3e992f5
 string-trace-6.swf:286e55256f525f4220a324a7417e4051
 string-trace-7.swf:f6eac71a2fc50323a5bd4a74eec99dca

@@ -649,17 +649,33 @@ as_value::to_number() const
         case STRING:
         {
             std::string s = getStr();
+            if ( s.empty() ) {
+                return static_cast<double>( swfversion >= 5 ? NaN : 0.0 );
+            }
 
             if ( swfversion > 5 )
             {
-                if ( s.length() == 8 && s[0] == '0' && ( s[1] == 'x' || s[1] == 'X' ) )
+                size_t slen = s.length();
+                if ( slen > 2 ) // "0#" would still be octal, but has the same value of the decimal equivalent
                 {
-                    try {
-                        boost::uint8_t r = (parseHex(s[2])<<4) + parseHex(s[3]);
-                        boost::uint8_t g = (parseHex(s[4])<<4) + parseHex(s[5]);
-                        boost::uint8_t b = (parseHex(s[6])<<4) + parseHex(s[7]);
-                        return (double)((r<<16)|(g<<8)|b);
-                    } catch (invalidHexDigit) { }
+                    if ( s[0] == '0' && (s[1] == 'x' || s[1] == 'X') )
+                    {
+                        // base 16
+                        const char* cs = s.c_str();
+                        char* end;
+                        boost::int32_t i = strtol (cs+2, &end, 16); // truncation to 32bit is intentional
+                        double d = (double)i;
+                        if ( *end == '\0' ) return d;
+                    }
+                    else if ( (s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0'))
+                         && s.find_first_not_of("01234567", 1) == std::string::npos )
+                    {
+                            // base 8
+                            const char* cs = s.c_str();
+                            char* end;
+                            double d = (double)strtol (cs, &end, 8); // include sign
+                            if ( *end == '\0' ) return d;
+                    }
                 }
             }
             else if (swfversion <= 4)

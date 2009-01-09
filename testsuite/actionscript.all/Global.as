@@ -429,8 +429,8 @@ check_equals(int("1.4e+7"), 14000000);
 check_equals(int("0123"), 123);
 check_equals(int("-0123"), -123);
 #else
-xcheck_equals(int("0123"), 83);
-xcheck_equals(int("-0123"), -83);
+check_equals(int("0123"), 83);
+check_equals(int("-0123"), -83);
 #endif
 check_equals(int("   0123"), 123);
 check_equals(int("-   0123"), 0);
@@ -444,8 +444,8 @@ check_equals(int("-0x10"), 0);
 check_equals(int("0x-10"), 0);
 check_equals(int("0X+10"), 0);
 #else
-xcheck_equals(int("0x-10"), -16);
-xcheck_equals(int("0X+10"), 16);
+check_equals(int("0x-10"), -16);
+check_equals(int("0X+10"), 16);
 #endif
 
 /// Extraneous characters
