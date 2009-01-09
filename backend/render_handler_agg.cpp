@@ -850,7 +850,7 @@ public:
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
     
-    rect ch_bounds = def->get_bound();
+    const rect& ch_bounds = def->get_bound();
 
     if (ch_bounds.is_null()) {
       log_debug(_("Warning: select_clipbounds encountered a character definition "
