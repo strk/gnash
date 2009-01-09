@@ -155,7 +155,7 @@ binaryFunction<std::pow>(const fn_call& fn)
     }
 
     double arg1 = fn.arg(1).to_number();
-    return as_value(std::pow(arg0, arg1));
+    return as_value( utility::isFinite(arg0) ? std::pow(arg0, arg1) : NaN );
 }
 
 /// Math.min
