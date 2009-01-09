@@ -3103,7 +3103,7 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
     as_value operand1 = env.top(1);
     as_value operand2 = env.top(0);
 
-    try { operand1 = operand1.to_primitive(); }
+    try { operand1 = operand1.to_primitive(as_value::NUMBER); }
     catch (ActionTypeError& e)
     {
         log_debug(_("%s.to_primitive() threw an error during "
@@ -3117,7 +3117,7 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
         return;
     }
 
-    try { operand2 = operand2.to_primitive(); }
+    try { operand2 = operand2.to_primitive(as_value::NUMBER); }
     catch (ActionTypeError& e)
     {
         log_debug(_("%s.to_primitive() threw an error during "

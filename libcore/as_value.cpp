@@ -414,13 +414,6 @@ as_value::to_primitive() const
 		hint = STRING;
 	}
 
-#if 0
-	else if ( m_type == MOVIECLIP && swfVersion > 5 )
-	{
-		throw ActionTypeError();
-	}
-#endif
-
 	return to_primitive(hint);
 }
 
