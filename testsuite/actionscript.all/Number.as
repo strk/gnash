@@ -41,7 +41,7 @@ xcheck_equals(Number.MAX_VALUE.toString(), "1.79769313486231e+308");
 
 check(Number.hasOwnProperty('MIN_VALUE'));
 check_equals(typeof(Number.MIN_VALUE), "number");
-check_equals(Number.MIN_VALUE.toString(), "4.94065645841247e-324"); 
+check_equals(Number.MIN_VALUE.toString(), "4.94065645841247e-324"); // LNX 10,0,12,10 gives 0 here, 9.0.115.0 succeeds
 
 check(Number.hasOwnProperty('NEGATIVE_INFINITY'));
 check_equals(Number.NEGATIVE_INFINITY, -Infinity);
@@ -570,16 +570,31 @@ check_equals(a.toString(), "0.00123456789123457"); // round abs up
 a=new Number(0.001234567891234564);
 check_equals(a.toString(), "0.00123456789123456"); // round abs down (obvious?)
 
+a=new Number(" 2");
+xcheck_equals(a, 2); 
+
+a=new Number("2a");
+check(isNaN(a));
+
+a=new Number("2e");
+check_equals(a, 2);
+
+a=new Number("2E");
+check_equals(a, 2);
+
+a=new Number(new String(" 2"));
+xcheck_equals(a, 2); 
+
 check( isNaN(0/0) );
 
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(213);
+ check_totals(218);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(206);
+ check_totals(211);
 #else
- check_totals(204);
+ check_totals(209);
 #endif
 #endif
