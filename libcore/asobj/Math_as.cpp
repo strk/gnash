@@ -50,7 +50,10 @@ namespace {
     as_value math_max(const fn_call& fn);
     as_value math_min(const fn_call& fn);
     as_value math_random(const fn_call& fn);
-    as_value math_round(const fn_call& fn);
+
+    // There's no std::round, but Math.round behaves like all the other
+    // unary functions.
+    inline double round(double d);
 
     template<UnaryMathFunc Func> as_value unaryFunction(const fn_call& fn);
     template<BinaryMathFunc Func> as_value binaryFunction(const fn_call& fn);
@@ -72,7 +75,7 @@ void registerMathNative(as_object& proto)
     vm.registerNative(unaryFunction<std::exp>, 200, 7);
     vm.registerNative(unaryFunction<std::log>, 200, 8);
     vm.registerNative(unaryFunction<std::sqrt>, 200, 9);
-    vm.registerNative(math_round, 200, 10);
+    vm.registerNative(unaryFunction<round>, 200, 10);
     vm.registerNative(math_random, 200, 11);
     vm.registerNative(unaryFunction<std::floor>, 200, 12);
     vm.registerNative(unaryFunction<std::ceil>, 200, 13);
@@ -139,6 +142,8 @@ binaryFunction(const fn_call& fn)
 as_value
 math_min(const fn_call& fn)
 {
+    if (!fn.nargs) return as_value(std::numeric_limits<double>::infinity());
+
 	if (fn.nargs < 2) return as_value(NaN);
 
 	double arg0 = fn.arg(0).to_number();
@@ -156,7 +161,9 @@ math_min(const fn_call& fn)
 as_value
 math_max(const fn_call& fn)
 {
-	if (fn.nargs < 2) return as_value(NaN);
+    if (!fn.nargs) return as_value(-std::numeric_limits<double>::infinity());
+	
+    if (fn.nargs < 2) return as_value(NaN);
 
 	double arg0 = fn.arg(0).to_number();
 	double arg1 = fn.arg(1).to_number();
@@ -185,19 +192,10 @@ math_random(const fn_call& /* fn */)
 
 }
 
-
-as_value
-math_round(const fn_call& fn)
+inline double
+round(double d)
 {
-	// round argument to nearest int. 0.5 goes to 1 and -0.5 goes to 0
-	double result;
-
-	if (fn.nargs < 1) result = NaN;
-	else {
-		double arg0 = fn.arg(0).to_number();
-		result = std::floor(arg0 + 0.5);
-	}
-	return as_value(result);
+    return std::floor(d + 0.5);
 }
 
 void
