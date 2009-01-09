@@ -2266,7 +2266,10 @@ MovieClip::stagePlacementCallback(as_object* initObj)
                 "INITIALIZE and CONSTRUCT events immediately"), getTarget());
 #endif
 
-        on_event(event_id::INITIALIZE);
+        // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
+        // testsuite/swfdec/clone-sprite-events.c not to call on_event
+        // immediately.
+        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
     }
 
 
