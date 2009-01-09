@@ -114,8 +114,8 @@ as_value
 unaryFunction(const fn_call& fn)
 {
     if (fn.nargs < 1) return as_value(NaN);
-    if (fn.nargs == 2) fn.arg(1).to_number();
     double arg = fn.arg(0).to_number();	
+    if (fn.nargs > 1) fn.arg(1).to_number();
     return as_value(Func(arg));
 }
 
@@ -132,8 +132,8 @@ as_value
 binaryFunction(const fn_call& fn)
 {
     if (fn.nargs < 2) return as_value(NaN);
-    double arg1 = fn.arg(1).to_number();
     double arg0 = fn.arg(0).to_number();	
+    double arg1 = fn.arg(1).to_number();
     return as_value(Func(arg0, arg1));
 }
 
@@ -201,10 +201,16 @@ math_max(const fn_call& fn)
 	return as_value(std::max(arg0, arg1));
 }
 
-// A couple of oddballs.
+/// Math.random()
+//
+/// The first two arguments are converted to numbers, even though
+/// neither is used.
 as_value
-math_random(const fn_call& /* fn */)
+math_random(const fn_call& fn)
 {
+
+    if (fn.nargs) fn.arg(0).to_number();
+    if (fn.nargs > 1) fn.arg(1).to_number();
 
 	VM::RNG& rnd = VM::get().randomNumberGenerator();
 
