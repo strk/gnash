@@ -2061,8 +2061,9 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
             case  pushString: // 0
             {
-                const char* str = code.read_string(i+3);
-                i += strlen(str) + 1;
+                const char* cstr = code.read_string(i+3);
+                const std::string str(cstr);
+                i += str.size() + 1; 
                 env.push(str);
                 break;
             }
