@@ -574,7 +574,7 @@ a=new Number(" 2");
 check_equals(a, 2); 
 
 a=new Number("	 2");
-xcheck_equals(a, 2); 
+check_equals(a, 2); 
 
 a=new Number("2 ");
 check(isNaN(a));

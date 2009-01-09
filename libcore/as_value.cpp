@@ -693,7 +693,7 @@ as_value::to_number() const
                 
                 const char* p = s.c_str();
                 // skip blanks
-                while (*p && isblank(*p)) ++p;
+                while (*p && isspace(*p)) ++p;
                 double d = boost::lexical_cast<double>(p);
                 return d;
             } 
