@@ -401,7 +401,7 @@ check_equals (int(-7.8), -7);
 check_equals (int(6.1), 6);
 check_equals (int("-7.8"), -7);
 check_equals (int("6.1"), 6);
-xcheck_equals (int("      -7.8"), -7);
+check_equals (int("      -7.8"), -7);
 
 /// Integer values
 check_equals (int(0), 0);
@@ -432,7 +432,7 @@ check_equals(int("-0123"), -123);
 xcheck_equals(int("0123"), 83);
 xcheck_equals(int("-0123"), -83);
 #endif
-xcheck_equals(int("   0123"), 123);
+check_equals(int("   0123"), 123);
 check_equals(int("-   0123"), 0);
 check_equals(int("   0-123"), 0);
 check_equals(int("01238"), 1238);

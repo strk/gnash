@@ -571,7 +571,7 @@ a=new Number(0.001234567891234564);
 check_equals(a.toString(), "0.00123456789123456"); // round abs down (obvious?)
 
 a=new Number(" 2");
-xcheck_equals(a, 2); 
+check_equals(a, 2); 
 
 a=new Number("	 2");
 xcheck_equals(a, 2); 
@@ -589,7 +589,7 @@ a=new Number("2E");
 check_equals(a, 2);
 
 a=new Number(new String(" 2"));
-xcheck_equals(a, 2); 
+check_equals(a, 2); 
 
 a=new Number("0x2");
 #if OUTPUT_VERSION < 6

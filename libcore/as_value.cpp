@@ -659,16 +659,15 @@ as_value::to_number() const
 
             if ( swfversion > 5 )
             {
-		if ( s.length() == 8 && s[0] == '0' && ( s[1] == 'x' || s[1] == 'X' ) )
-		{
-			try {
-			boost::uint8_t r = (parseHex(s[2])<<4) + parseHex(s[3]);
-			boost::uint8_t g = (parseHex(s[4])<<4) + parseHex(s[5]);
-			boost::uint8_t b = (parseHex(s[6])<<4) + parseHex(s[7]);
-			return (double)((r<<16)|(g<<8)|b);
-			} catch (invalidHexDigit) { }
-			
-		}
+                if ( s.length() == 8 && s[0] == '0' && ( s[1] == 'x' || s[1] == 'X' ) )
+                {
+                    try {
+                        boost::uint8_t r = (parseHex(s[2])<<4) + parseHex(s[3]);
+                        boost::uint8_t g = (parseHex(s[4])<<4) + parseHex(s[5]);
+                        boost::uint8_t b = (parseHex(s[6])<<4) + parseHex(s[7]);
+                        return (double)((r<<16)|(g<<8)|b);
+                    } catch (invalidHexDigit) { }
+                }
             }
             else if (swfversion <= 4)
             {
@@ -691,7 +690,11 @@ as_value::to_number() const
             // Fortunately, actionscript is equally inflexible.
             try 
             { 
-                double d = boost::lexical_cast<double>(getStr());
+                
+                const char* p = s.c_str();
+                // skip blanks
+                while (*p && isblank(*p)) ++p;
+                double d = boost::lexical_cast<double>(p);
                 return d;
             } 
             catch (boost::bad_lexical_cast &) 
@@ -706,11 +709,11 @@ as_value::to_number() const
 
         case NULLTYPE:
         case UNDEFINED: 
-	{
+        {
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
             return ( swfversion >= 7 ? NaN : 0 );
-	}
+        }
 
         case BOOLEAN: 
             // Evan: from my tests
