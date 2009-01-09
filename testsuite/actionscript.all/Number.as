@@ -573,6 +573,9 @@ check_equals(a.toString(), "0.00123456789123456"); // round abs down (obvious?)
 a=new Number(" 2");
 xcheck_equals(a, 2); 
 
+a=new Number("	 2");
+xcheck_equals(a, 2); 
+
 a=new Number("2 ");
 check(isNaN(a));
 
@@ -610,11 +613,11 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(222);
+ check_totals(223);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(215);
+ check_totals(216);
 #else
- check_totals(213);
+ check_totals(214);
 #endif
 #endif
