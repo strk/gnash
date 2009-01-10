@@ -348,7 +348,6 @@ as_global_parsefloat(const fn_call& fn)
 as_value
 as_global_parseint(const fn_call& fn)
 {
-    // assert(fn.nargs == 2 || fn.nargs == 1);
     if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%s needs at least one argument"), __FUNCTION__);
@@ -362,9 +361,21 @@ as_global_parseint(const fn_call& fn)
         }
     )
 
-    const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
     const std::string& expr = fn.arg(0).to_string();
+
+    if (fn.nargs == 1)
+    {
+        try {
+
+            // Try parsing as an octal or hexadecimal number.
+            double d;
+            if (as_value::parseInt(expr, d, false)) return d;
+        }
+        catch (boost::bad_lexical_cast&)
+        {
+            return as_value(NaN);
+        }
+    }
 
     bool negative = false;
     int base = 0;
@@ -405,12 +416,7 @@ as_global_parseint(const fn_call& fn)
         
         // Check for expectional case "-0x" or "+0x", which
         // return NaN
-        else if (std::toupper(*(it + 1)) == 'X')
-        {
-            as_value rv;
-            rv.set_nan();
-            return rv;
-        }
+        else if (std::toupper(*(it + 1)) == 'X') return as_value(NaN);
         
         // Check from the current position for non-octal characters;
         // it's decimal in that case.
@@ -460,6 +466,8 @@ as_global_parseint(const fn_call& fn)
     // Now we have the base, parse the digits. The iterator should
     // be pointing at the first digit.
     
+    const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
     // Check to see if the first digit is valid, otherwise 
     // return NaN.
     int digit = digits.find(toupper(*it));

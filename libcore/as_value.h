@@ -253,8 +253,7 @@ public:
 	///
 	static std::string doubleToString(double val, int radix=10);
 
-    /// Try to parse a string into a 32-bit signed int using base 8 or 16.
-    //
+    /// Try to parse a string into a 32-bit signed int using base 8 or 16.  //
     /// This function will throw a boost::bad_lexical_cast (or a derived
     /// exception) if the passed string cannot be converted.
     //
@@ -262,7 +261,7 @@ public:
     /// @param d    The 32-bit int represented as a double. This is only a
     ///             valid number if the return value is true.
     /// @return     True if the string was non-decimal and successfully parsed.
-    static bool parseNonDecimalInt(const std::string& s, double& d);
+    static bool parseInt(const std::string& s, double& d, bool whole = true);
 
 	/// Return the primitive type of this value, as a string.
 	const char* typeOf() const;

@@ -658,14 +658,13 @@ as_value::convert_to_primitive(AsType hint)
 
 enum Base
 {
-    DEC,
     OCT,
     HEX
 };
 
 
 boost::int32_t
-parsePositiveInt(const std::string& s, Base base = DEC)
+parsePositiveInt(const std::string& s, Base base, bool whole = true)
 {
 
     std::istringstream is(s);
@@ -679,23 +678,26 @@ parsePositiveInt(const std::string& s, Base base = DEC)
         case HEX:
             is >> std::hex;
             break;
-        default:
-            is >> std::dec;
-            break;
     }
 
     char c;
-    if (!(is >> target) || is.get(c)) throw boost::bad_lexical_cast();
+
+    // If the cast fails, or if the whole string must be convertible and
+    // some characters are left, throw an exception.
+    if (!(is >> target) || (whole && is.get(c))) {
+        throw boost::bad_lexical_cast();
+    }
+
     return target;
 }
 
 bool
-as_value::parseNonDecimalInt(const std::string& s, double& d)
+as_value::parseInt(const std::string& s, double& d, bool whole)
 {
     const std::string::size_type slen = s.length();
-    // "0#" would still be octal, but has the same value
-    // of the decimal equivalent
-    if (slen < 2) return false;
+
+    // "0#" would still be octal, but has the same value as a decimal.
+    if (slen < 3) return false;
 
     bool negative = false;
 
@@ -708,7 +710,7 @@ as_value::parseNonDecimalInt(const std::string& s, double& d)
             negative = true;
             ++start;
         }
-        d = parsePositiveInt(s.substr(start), HEX);
+        d = parsePositiveInt(s.substr(start), HEX, whole);
         if (negative) d = -d;
         return true;
     }
@@ -720,11 +722,13 @@ as_value::parseNonDecimalInt(const std::string& s, double& d)
             negative = true;
             ++start;
         }
-        d = parsePositiveInt(s.substr(start), OCT);
+        d = parsePositiveInt(s.substr(start), OCT, whole);
         if (negative) d = -d;
         return true;
     }
+
     return false;
+
 }
 
 double
@@ -757,13 +761,9 @@ as_value::to_number() const
 
                 if (swfversion > 5)
                 {
-                    
                     double d;
-
-                    // Can throw.
-                    if (parseNonDecimalInt(s, d)) {
-                        return d;
-                    }
+                    // Will throw if invalid.
+                    if (parseInt(s, d)) return d;
                 }
 
                 // @@ Moock says the rule here is: if the
@@ -816,8 +816,6 @@ as_value::to_number() const
             // method".
             //
             // Arrays and Movieclips should return NaN.
-
-            //as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
             try
             {
                 as_value ret = to_primitive(NUMBER);
@@ -826,33 +824,26 @@ as_value::to_number() const
             catch (ActionTypeError& e)
             {
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-                log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
-                        *this, e.what());
+                log_debug(_("to_primitive(%s, NUMBER) threw an "
+                            "ActionTypeError %s"), *this, e.what());
 #endif
-                if ( m_type == AS_FUNCTION && swfversion < 6 )
-                {
-                    return 0;
-                }
-                else
-                {
-                    return NaN;
-                }
+                if (m_type == AS_FUNCTION && swfversion < 6) return 0;
+                
+                return NaN;
             }
         }
 
         case MOVIECLIP:
-	{
+        {
             // This is tested, no valueOf is going
             // to be invoked for movieclips.
             return NaN; 
-	}
+        }
 
         default:
-            // Other object types should return NaN, but if we implement that,
-            // every GUI's movie canvas shrinks to size 0x0. No idea why.
-            return NaN; // 0.0;
+            // Other object types should return NaN.
+            return NaN;
     }
-    /* NOTREACHED */
 }
 
 std::auto_ptr<amf::Element>
