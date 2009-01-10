@@ -39,6 +39,7 @@
 #include "Array_as.h"
 #include "Date_as.h" // for Date type (readAMF0)
 #include "SimpleBuffer.h"
+#include "StringPredicates.h"
 
 #include <cmath> // std::fmod
 #include <boost/algorithm/string/case_conv.hpp>
@@ -90,6 +91,23 @@ boost::uint8_t parseHex(char c)
 		case 'f': case 'F': return 15;
 		default: throw invalidHexDigit();
 	}
+}
+
+/// Truncates a double to a 32-bit unsigned int.
+//
+/// In fact, it is a 32-bit unsigned int with an additional sign, cast
+/// to an unsigned int. Not sure what the sense is, but that's how it works:
+//
+/// 0xffffffff is interpreted as -1, -0xffffffff as 1.
+boost::int32_t
+truncateToInt(double d)
+{
+    if (d < 0)
+    {   
+	    return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+    }
+	
+    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
 }
 
 } // end of namespace
@@ -638,47 +656,93 @@ as_value::convert_to_primitive(AsType hint)
 	return *this;
 }
 
+enum Base
+{
+    DEC,
+    OCT,
+    HEX
+};
+
+
+boost::int32_t
+parsePositiveInt(const std::string& s, Base base = DEC)
+{
+
+    std::istringstream is(s);
+    boost::uint32_t target;
+
+    switch (base)
+    {
+        case OCT:
+            is >> std::oct;
+            break;
+        case HEX:
+            is >> std::hex;
+            break;
+        default:
+            is >> std::dec;
+            break;
+    }
+
+    char c;
+    if (!(is >> target) || is.get(c)) throw boost::bad_lexical_cast();
+    return target;
+}
+
+bool
+as_value::parseNonDecimalInt(const std::string& s, double& d)
+{
+    const std::string::size_type slen = s.length();
+    // "0#" would still be octal, but has the same value
+    // of the decimal equivalent
+    if (slen < 2) return false;
+
+    bool negative = false;
+
+    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+    {
+        // The only legitimate place for a '-' is after 0x. If it's a
+        // '+' we don't care.
+        std::string::size_type start = 2;
+        if (s[2] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), HEX);
+        if (negative) d = -d;
+        return true;
+    }
+    else if ((s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0')) &&
+            s.find_first_not_of("01234567", 1) == std::string::npos)
+    {
+        std::string::size_type start = 0;
+        if (s[0] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), OCT);
+        if (negative) d = -d;
+        return true;
+    }
+    return false;
+}
+
 double
 as_value::to_number() const
 {
 
-    int swfversion = VM::get().getSWFVersion();
+    const int swfversion = VM::get().getSWFVersion();
 
     switch (m_type)
     {
         case STRING:
         {
-            std::string s = getStr();
+            const std::string& s = getStr();
             if ( s.empty() ) {
-                return static_cast<double>( swfversion >= 5 ? NaN : 0.0 );
+                return swfversion >= 5 ? NaN : 0.0;
             }
-
-            if ( swfversion > 5 )
-            {
-                size_t slen = s.length();
-                if ( slen > 2 ) // "0#" would still be octal, but has the same value of the decimal equivalent
-                {
-                    if ( s[0] == '0' && (s[1] == 'x' || s[1] == 'X') )
-                    {
-                        // base 16
-                        const char* cs = s.c_str();
-                        char* end;
-                        boost::int32_t i = strtol (cs+2, &end, 16); // truncation to 32bit is intentional
-                        double d = (double)i;
-                        if ( *end == '\0' ) return d;
-                    }
-                    else if ( (s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0'))
-                         && s.find_first_not_of("01234567", 1) == std::string::npos )
-                    {
-                            // base 8
-                            const char* cs = s.c_str();
-                            char* end;
-                            double d = (double)strtol (cs, &end, 8); // include sign
-                            if ( *end == '\0' ) return d;
-                    }
-                }
-            }
-            else if (swfversion <= 4)
+            
+            if (swfversion <= 4)
             {
                 // For SWF4, any valid number before non-numerical
                 // characters is returned, including exponent, positive
@@ -689,30 +753,42 @@ as_value::to_number() const
                 return d;
             }
 
-            // @@ Moock says the rule here is: if the
-            // string is a valid float literal, then it
-            // gets converted; otherwise it is set to NaN.
-            // Valid for SWF5 and above.
-            //
-            // boost::lexical_cast is remarkably inflexible and 
-            // fails for anything that has non-numerical characters.
-            // Fortunately, actionscript is equally inflexible.
-            try 
-            { 
-                
-                const char* p = s.c_str();
-                // skip blanks
-                while (*p && isspace(*p)) ++p;
-                double d = boost::lexical_cast<double>(p);
-                return d;
-            } 
-            catch (boost::bad_lexical_cast &) 
-            // There is no standard textual representation of infinity in the
-            // C++ standard, so boost throws a bad_lexical_cast for 'inf',
-            // just like for any other non-numerical text. This is correct
-            // behaviour.
-            {
-            	return static_cast<double>(NaN);
+            try {
+
+                if (swfversion > 5)
+                {
+                    
+                    double d;
+
+                    // Can throw.
+                    if (parseNonDecimalInt(s, d)) {
+                        return d;
+                    }
+                }
+
+                // @@ Moock says the rule here is: if the
+                // string is a valid float literal, then it
+                // gets converted; otherwise it is set to NaN.
+                // Valid for SWF5 and above.
+                //
+                // boost::lexical_cast is remarkably inflexible and 
+                // fails for anything that has non-numerical characters.
+                // Fortunately, actionscript is equally inflexible.
+                std::string::size_type pos;
+                if ((pos = s.find_first_not_of(" \r\n\t")) 
+                        == std::string::npos) {
+                    return NaN;
+                }
+
+                return boost::lexical_cast<double>(s.substr(pos));
+ 
+            }
+            catch (boost::bad_lexical_cast&) {
+                // There is no standard textual representation of infinity
+                // in the C++ standard, so our conversion function an
+                // exception for 'inf', just like for any other
+                // non-numerical text. This is correct behaviour.
+                return NaN;
             }
         }
 
@@ -829,18 +905,17 @@ as_value::to_int() const
 
 	if ( ! utility::isFinite(d) ) return 0;
 
-	boost::int32_t i = 0;
-
+    boost::int32_t i = 0;
     if (d < 0)
     {   
-	    i = - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+        i = - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
     }
     else
     {
-	    i = static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
+        i = static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
     }
-    
     return i;
+
 }
 
 // Conversion to boolean for SWF7 and up
