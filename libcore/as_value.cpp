@@ -65,8 +65,9 @@
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
 
-namespace {
+namespace gnash {
 
+namespace {
 
 struct invalidHexDigit {};
 boost::uint8_t parseHex(char c)
@@ -110,12 +111,46 @@ truncateToInt(double d)
     return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
 }
 
-} // end of namespace
+enum Base
+{
+    BASE_OCT,
+    BASE_HEX
+};
 
 
-namespace gnash {
+/// Converts a string to a uint32_t cast to an int32_t.
+//
+/// @param whole    When true, any string that isn't wholly valid is rejected.
+/// @param base     The base (8 or 16) to use.
+/// @param s        The string to parse.
+/// @return         The converted number.
+boost::int32_t
+parsePositiveInt(const std::string& s, Base base, bool whole = true)
+{
 
-namespace { 
+    std::istringstream is(s);
+    boost::uint32_t target;
+
+    switch (base)
+    {
+        case BASE_OCT:
+            is >> std::oct;
+            break;
+        case BASE_HEX:
+            is >> std::hex;
+            break;
+    }
+
+    char c;
+
+    // If the cast fails, or if the whole string must be convertible and
+    // some characters are left, throw an exception.
+    if (!(is >> target) || (whole && is.get(c))) {
+        throw boost::bad_lexical_cast();
+    }
+
+    return target;
+}
 
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
@@ -336,7 +371,6 @@ as_value::to_string() const
 		case AS_FUNCTION:
 		case OBJECT:
 		{
-			//as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
 			try
 			{
 				as_value ret = to_primitive(STRING);
@@ -656,43 +690,9 @@ as_value::convert_to_primitive(AsType hint)
 	return *this;
 }
 
-enum Base
-{
-    OCT,
-    HEX
-};
-
-
-boost::int32_t
-parsePositiveInt(const std::string& s, Base base, bool whole = true)
-{
-
-    std::istringstream is(s);
-    boost::uint32_t target;
-
-    switch (base)
-    {
-        case OCT:
-            is >> std::oct;
-            break;
-        case HEX:
-            is >> std::hex;
-            break;
-    }
-
-    char c;
-
-    // If the cast fails, or if the whole string must be convertible and
-    // some characters are left, throw an exception.
-    if (!(is >> target) || (whole && is.get(c))) {
-        throw boost::bad_lexical_cast();
-    }
-
-    return target;
-}
 
 bool
-as_value::parseInt(const std::string& s, double& d, bool whole)
+as_value::parseNonDecimalInt(const std::string& s, double& d, bool whole)
 {
     const std::string::size_type slen = s.length();
 
@@ -704,13 +704,13 @@ as_value::parseInt(const std::string& s, double& d, bool whole)
     if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
     {
         // The only legitimate place for a '-' is after 0x. If it's a
-        // '+' we don't care.
+        // '+' we don't care, as it won't disturb the conversion.
         std::string::size_type start = 2;
         if (s[2] == '-') {
             negative = true;
             ++start;
         }
-        d = parsePositiveInt(s.substr(start), HEX, whole);
+        d = parsePositiveInt(s.substr(start), BASE_HEX, whole);
         if (negative) d = -d;
         return true;
     }
@@ -722,7 +722,7 @@ as_value::parseInt(const std::string& s, double& d, bool whole)
             negative = true;
             ++start;
         }
-        d = parsePositiveInt(s.substr(start), OCT, whole);
+        d = parsePositiveInt(s.substr(start), BASE_OCT, whole);
         if (negative) d = -d;
         return true;
     }
@@ -763,7 +763,7 @@ as_value::to_number() const
                 {
                     double d;
                     // Will throw if invalid.
-                    if (parseInt(s, d)) return d;
+                    if (parseNonDecimalInt(s, d)) return d;
                 }
 
                 // @@ Moock says the rule here is: if the
@@ -896,17 +896,7 @@ as_value::to_int() const
 
 	if ( ! utility::isFinite(d) ) return 0;
 
-    boost::int32_t i = 0;
-    if (d < 0)
-    {   
-        i = - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
-    }
-    else
-    {
-        i = static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
-    }
-    return i;
-
+    return truncateToInt(d);
 }
 
 // Conversion to boolean for SWF7 and up

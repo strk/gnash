@@ -261,7 +261,8 @@ public:
     /// @param d    The 32-bit int represented as a double. This is only a
     ///             valid number if the return value is true.
     /// @return     True if the string was non-decimal and successfully parsed.
-    static bool parseInt(const std::string& s, double& d, bool whole = true);
+    static bool parseNonDecimalInt(const std::string& s, double& d,
+            bool whole = true);
 
 	/// Return the primitive type of this value, as a string.
 	const char* typeOf() const;

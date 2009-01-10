@@ -368,7 +368,7 @@ as_global_parseint(const fn_call& fn)
         try {
             // Try parsing as an octal or hexadecimal number.
             double d;
-            if (as_value::parseInt(expr, d, false)) return d;
+            if (as_value::parseNonDecimalInt(expr, d, false)) return d;
         }
         catch (boost::bad_lexical_cast&)
         {
