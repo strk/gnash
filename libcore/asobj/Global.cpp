@@ -366,7 +366,6 @@ as_global_parseint(const fn_call& fn)
     if (fn.nargs == 1)
     {
         try {
-
             // Try parsing as an octal or hexadecimal number.
             double d;
             if (as_value::parseInt(expr, d, false)) return d;
@@ -426,7 +425,7 @@ as_global_parseint(const fn_call& fn)
 
     // Check to see if the first digit is valid, otherwise 
     // return NaN.
-    int digit = digits.find(toupper(*it));
+    std::string::size_type digit = digits.find(toupper(*it));
 
     if (digit >= base || digit < 0) return as_value(NaN);
 
@@ -438,7 +437,7 @@ as_global_parseint(const fn_call& fn)
     ++it;
     
     while (it != expr.end() && (digit = digits.find(toupper(*it))) < base
-            && digit >= 0)
+            && digit != std::string::npos)
     {
         result = result * base + digit;
         ++it;
