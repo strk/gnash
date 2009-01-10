@@ -3071,7 +3071,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
                 v1, v2);
 #endif
 
-    if (v1.is_string() || v2.is_string() )
+    if (v1.is_string() || v2.is_string())
     {
         // NOTE: I've tested that we should change behaviour
         //       based on code definition version, not top-level
