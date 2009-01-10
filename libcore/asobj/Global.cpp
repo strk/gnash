@@ -377,46 +377,40 @@ as_global_parseint(const fn_call& fn)
         }
     }
 
-    bool negative = false;
-    int base = 10;
-
     std::string::const_iterator it = expr.begin();
 
     // Check for expectional case "-0x" or "+0x", which
     // return NaN
-    if ((*it == '-' || *it == '+') && *(it + 1) == '0' &&
-            std::toupper(*(it + 2)) == 'X') {
+    if ((expr.length() > 2) && (*it == '-' || *it == '+') &&
+            *(it + 1) == '0' && std::toupper(*(it + 2)) == 'X') {
         return as_value(NaN);
     }
     
     // Try hexadecimal first
-    if (expr.substr(0, 2) == "0x" || expr.substr(0, 2) == "0X")
-    {
-        it += 2;
-    }   
-    else
-    {
+    if (expr.substr(0, 2) == "0x" || expr.substr(0, 2) == "0X") it += 2;
+    else {
         // Skip leading whitespace
-        while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r')
-        {
+        while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r') {
             ++it;
         }
         if (it == expr.end()) return as_value(NaN);
     }    
 
+    bool negative = false;
     if (*it == '-' || *it == '+')
     {
         if (*it == '-') negative = true;
         
         it++;
-        
+        if (it == expr.end()) return as_value(NaN);
     }
     
-    // After all that, a second argument specifies the base.
+    // A second argument specifies the base.
     // Parsing still starts after any positive/negative 
     // sign or hex identifier (parseInt("0x123", 8) gives
     // 83, not 0; parseInt(" 0x123", 8) is 0), which is
     // why we do this here.
+    int base = 10;
     if (fn.nargs > 1)
     {
         base = (fn.arg(1).to_int());
@@ -434,12 +428,7 @@ as_global_parseint(const fn_call& fn)
     // return NaN.
     int digit = digits.find(toupper(*it));
 
-    if (digit >= base || digit < 0)
-    {
-        as_value rv;
-        rv.set_nan();
-        return rv;
-    }
+    if (digit >= base || digit < 0) return as_value(NaN);
 
     // The first digit was valid, so continue from the present position
     // until we reach the end of the string or an invalid character,
@@ -455,11 +444,8 @@ as_global_parseint(const fn_call& fn)
         ++it;
     }
 
-    if (negative)
-    result = -result;
-    
     // Now return the parsed string as an integer.
-    return as_value(result);
+    return negative ? as_value(-result) : as_value(result);
 }
 
 // ASSetPropFlags function
