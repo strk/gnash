@@ -378,72 +378,40 @@ as_global_parseint(const fn_call& fn)
     }
 
     bool negative = false;
-    int base = 0;
+    int base = 10;
 
     std::string::const_iterator it = expr.begin();
 
+    // Check for expectional case "-0x" or "+0x", which
+    // return NaN
+    if ((*it == '-' || *it == '+') && *(it + 1) == '0' &&
+            std::toupper(*(it + 2)) == 'X') {
+        return as_value(NaN);
+    }
+    
     // Try hexadecimal first
     if (expr.substr(0, 2) == "0x" || expr.substr(0, 2) == "0X")
     {
-        base = 16;
         it += 2;
-        
-        if (*it == '-')
-        {
-            negative = true;
-            it++;
-        }
-        else if (*it == '+') 
-        {
-            it++;
-        }
-    }
-    // Either octal or decimal.
-    else if (*it == '0' || *it == '-' || *it == '+')
-    {
-
-        base = 8;
-
-        // Check for negative and move to the next digit
-        if (*it == '-')
-        {
-            negative = true;
-            it++;
-        }
-        else if (*it == '+') it++;
-        
-        if (*it != '0') base = 10;
-        
-        // Check for expectional case "-0x" or "+0x", which
-        // return NaN
-        else if (std::toupper(*(it + 1)) == 'X') return as_value(NaN);
-        
-        // Check from the current position for non-octal characters;
-        // it's decimal in that case.
-        else if (expr.find_first_not_of("01234567", it - expr.begin()) !=
-            std::string::npos)
-        {
-            base = 10;
-        }
-    }
-    // Everything else is decimal.
+    }   
     else
     {
-        base = 10;
-        
         // Skip leading whitespace
         while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r')
         {
             ++it;
         }
-        if (*it == '-')
-        {
-            negative = true;
-            it++;
-        }
-        else if (*it == '+') it++;
+        if (it == expr.end()) return as_value(NaN);
     }    
 
+    if (*it == '-' || *it == '+')
+    {
+        if (*it == '-') negative = true;
+        
+        it++;
+        
+    }
+    
     // After all that, a second argument specifies the base.
     // Parsing still starts after any positive/negative 
     // sign or hex identifier (parseInt("0x123", 8) gives
@@ -454,13 +422,7 @@ as_global_parseint(const fn_call& fn)
         base = (fn.arg(1).to_int());
     
         // Bases from 2 to 36 are valid, otherwise return NaN
-            if (base < 2 || base > 36)
-            {
-                as_value rv;
-                rv.set_nan();
-                return rv;
-            }
-          
+        if (base < 2 || base > 36) return as_value(NaN);
     }
     
     // Now we have the base, parse the digits. The iterator should
