@@ -2171,11 +2171,13 @@ SWFHandlers::ActionPushData(ActionExec& thread)
         IF_VERBOSE_ACTION (
         if ( type == pushDict8 || type == pushDict16 )
         {
-            log_action(_("\t%d) type=%s (%d), value=%s"), count, pushType[type], id, env.top(0));
+            log_action(_("\t%d) type=%s (%d), value=%s"),
+                count, pushType[type], id, env.top(0));
         }
         else
         {
-            log_action(_("\t%d) type=%s, value=%s"), count, pushType[type], env.top(0));
+            log_action(_("\t%d) type=%s, value=%s"),
+                count, pushType[type], env.top(0));
         }
         ++count;
         );
