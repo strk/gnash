@@ -967,21 +967,9 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	// Evan: it seems that if set_true == 0 and set_false == 0,
-	// this function acts as if the parameters were (object, null, 0x1, 0)
-#if 0 // bullshit, see actionscript.all/Global.as
-	if (set_false == 0 && set_true == 0)
-	{
-	    props_val.set_null();
-	    set_false = 0;
-	    set_true = 0x1;
-	}
-#endif
-
 	if (props_val.is_null())
 	{
 		// Take all the members of the object
-		//std::pair<size_t, size_t> result = 
 		_members.setFlagsAll(set_true, set_false);
 
 		// Are we sure we need to descend to __proto__ ?

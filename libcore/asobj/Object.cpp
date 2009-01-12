@@ -141,28 +141,30 @@ object_ctor(const fn_call& fn)
 {
 	if ( fn.nargs == 1 ) // copy constructor
 	{
-		// just copy the reference
+
+        as_object* obj = fn.arg(0).to_object().get();
+
+        /// If it's not an object, return an undefined object, not null.
+        if (!obj) return as_value(new as_object);
+
+        // just copy the reference
 		//
 		// WARNING: it is likely that fn.result and fn.arg(0)
 		// are the same location... so we might skip
 		// the set_as_object() call as a whole.
-		return as_value(fn.arg(0).to_object());
+		return as_value(obj);
 	}
 
-	boost::intrusive_ptr<as_object> new_obj;
-	if ( fn.nargs == 0 )
+	if (fn.nargs)
 	{
-		new_obj = new as_object(getObjectInterface());
-	}
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_aserror(_("Too many args to Object constructor"));
-		)
-		new_obj = new as_object(getObjectInterface());
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(_("Too many args to Object constructor"));
+		);
 	}
 
-	return as_value(new_obj.get()); // will keep alive
+    boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+
+	return as_value(obj.get()); 
 }
 
 

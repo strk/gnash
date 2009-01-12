@@ -3176,20 +3176,20 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     if ( swfVersion <= 5 )
     {
         as_value op1 = env.top(0);
-    try { op1 = op1.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                op1, e.what());
-    }
+        try { op1 = op1.to_primitive(); }
+        catch (ActionTypeError& e)
+        {
+            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                    op1, e.what());
+        }
 
         as_value op2 = env.top(1);
-    try { op2 = op2.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                op2, e.what());
-    }
+        try { op2 = op2.to_primitive(); }
+        catch (ActionTypeError& e)
+        {
+            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                    op2, e.what());
+        }
 
         env.top(1).set_bool(op1.equals(op2));
     }

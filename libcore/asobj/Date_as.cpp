@@ -737,8 +737,7 @@ date_setTime(const fn_call& fn)
         }
         else {
             // Knock off the decimal part.
-            d = (d < 0 ? std::ceil(d) : std::floor(d));
-            date->setTimeValue(d);
+            date->setTimeValue(d < 0 ? std::ceil(d) : std::floor(d));
         }
     }
 

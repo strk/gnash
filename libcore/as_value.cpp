@@ -1233,8 +1233,8 @@ as_value::equals(const as_value& v) const
     //    return the result of the comparison x == ToNumber(y).
     if (m_type == NUMBER && v.m_type == STRING)
     {
-	double n = v.to_number();
-	if ( ! utility::isFinite(n) ) return false;
+        double n = v.to_number();
+        if ( ! utility::isFinite(n) ) return false;
         return equalsSameType(n);
     }
 
@@ -1242,9 +1242,9 @@ as_value::equals(const as_value& v) const
     //     return the result of the comparison ToNumber(x) == y.
     if (v.m_type == NUMBER && m_type == STRING)
     {
-	double n = to_number();
-	if ( ! utility::isFinite(n) ) return false;
-        return v.equalsSameType(n); 
+        double n = to_number();
+        if ( ! utility::isFinite(n) ) return false;
+            return v.equalsSameType(n); 
     }
 
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
@@ -1261,7 +1261,8 @@ as_value::equals(const as_value& v) const
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
-    if ( (m_type == STRING || m_type == NUMBER ) && ( v.m_type == OBJECT || v.m_type == AS_FUNCTION ) )
+    if ( (m_type == STRING || m_type == NUMBER ) && 
+            (v.m_type == OBJECT || v.m_type == AS_FUNCTION ))
     {
         // convert this value to a primitive and recurse
 	try
@@ -1287,29 +1288,33 @@ as_value::equals(const as_value& v) const
 
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
-    if ( (v.m_type == STRING || v.m_type == NUMBER ) && ( m_type == OBJECT || m_type == AS_FUNCTION ) )
+    if ((v.m_type == STRING || v.m_type == NUMBER) && 
+            (m_type == OBJECT || m_type == AS_FUNCTION))
     {
         // convert this value to a primitive and recurse
         try
-	{
-        	as_value v2 = to_primitive(); 
-		if ( strictly_equals(v2) ) return false;
+        {
+            // Date objects default to primitive type STRING from SWF6 up,
+            // but we always prefer valueOf to toString in this case.
+        	as_value v2 = to_primitive(NUMBER); 
+            if ( strictly_equals(v2) ) return false;
 
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" 21: convertion to primitive : %s -> %s", *this, v2);
+            log_debug(" 21: convertion to primitive : %s -> %s", *this, v2);
 #endif
 
-		return v2.equals(v);
-	}
-	catch (ActionTypeError& e)
-	{
+            return v2.equals(v);
+        }
+        catch (ActionTypeError& e)
+        {
 
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" %s.to_primitive() threw an ActionTypeError %s", *this, e.what());
+            log_debug(" %s.to_primitive() threw an ActionTypeError %s",
+                    *this, e.what());
 #endif
 
-		return false; // no valid conversion
-	}
+            return false; // no valid conversion
+        }
 
     }
 
