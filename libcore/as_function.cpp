@@ -140,10 +140,10 @@ as_function::extends(as_function& superclass)
 	as_object* newproto = new as_object(superclass.getPrototype().get());
 	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
 
-	if ( VM::get().getSWFVersion() > 5 )
-	{
-		newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass); 
-	}
+    if (VM::get().getSWFVersion() > 5) {
+        const int flags = as_prop_flags::dontEnum;
+        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
+    }
 
 	init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
 }
