@@ -2555,9 +2555,10 @@ MovieClip::processCompletedLoadVariableRequests()
             it != _loadVariableRequests.end(); )
     {
         LoadVariablesThread& request = *(*it);
-        if ( request.completed() )
+        if (request.completed())
         {
             processCompletedLoadVariableRequest(request);
+            delete *it;
             it = _loadVariableRequests.erase(it);
         }
         else ++it;
