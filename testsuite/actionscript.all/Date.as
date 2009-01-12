@@ -629,9 +629,9 @@ d1 = Date(2008, 10, 10, 10, 10, 10, 10);
 d2 = new Date;
 check_equals(d1.toString(), d2.toString());
 
-xcheck_equals (Date.UTC(-1000, 20).valueOf(), -33713366400000);
-xcheck_equals (Date.UTC(-70, 0).toString(), "-4417977600000");
-xcheck_equals (Date.UTC(-70, 0).valueOf(), -4417977600000);
+check_equals (Date.UTC(-1000, 20).valueOf(), -33713366400000);
+check_equals (Date.UTC(-70, 0).toString(), "-4417977600000");
+check_equals (Date.UTC(-70, 0).valueOf(), -4417977600000);
 check_equals (Date.UTC(1969, 11).toString(), "-2678400000");
 check_equals (Date.UTC(1969, 11).valueOf(), -2678400000);
 check_equals (Date.UTC(1969, 12).toString(), "0");

@@ -289,10 +289,10 @@ isLeapYear(boost::int32_t year)
 }
 
 
-inline size_t
+inline boost::int32_t
 countLeapYears(boost::int32_t year)
 {
-    return (year - 70) / 4 - (year - 70) / 100 + (year - 70) / 400;
+    return year / 4 - year / 100 + year / 400;
 }
 
 
@@ -832,31 +832,36 @@ template<bool utc>
 as_value
 date_setfullyear(const fn_call& fn)
 {
-  boost::intrusive_ptr<Date_as> date = ensureType<Date_as>(fn.this_ptr);
+    boost::intrusive_ptr<Date_as> date = ensureType<Date_as>(fn.this_ptr);
 
-  if (fn.nargs < 1) {
-      IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror(_("Date.setFullYear needs one argument"));
-      )
-      date->setTimeValue(NaN);
-  } else if (rogue_date_args(fn, 3) != 0.0) {
-      date->setTimeValue(NaN);
-  } else {
-      GnashTime gt;
-
-      dateToGnashTime(*date, gt, utc);
-      gt.year = fn.arg(0).to_int() - 1900;
-      if (fn.nargs >= 2)
-        gt.month = fn.arg(1).to_int();
-      if (fn.nargs >= 3)
-        gt.monthday = fn.arg(2).to_int();
-      if (fn.nargs > 3) {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Date.set%sFullYear was called with "
-                        "more than three arguments"), utc ? "UTC" : "");
+            log_aserror(_("Date.setFullYear needs one argument"));
         )
-      }
-      gnashTimeToDate(gt, *date, utc);
+        date->setTimeValue(NaN);
+    }
+    else if (rogue_date_args(fn, 3) != 0.0) {
+        date->setTimeValue(NaN);
+    }
+    else {
+        GnashTime gt;
+
+        dateToGnashTime(*date, gt, utc);
+        gt.year = fn.arg(0).to_int() - 1900;
+        switch (fn.nargs)
+        {
+            default:
+                IF_VERBOSE_ASCODING_ERRORS(
+                    log_aserror(_("Date.set%sFullYear was called with "
+                        "more than three arguments"), utc ? "UTC" : "");
+                );
+    
+            case 3:
+                gt.monthday = fn.arg(2).to_int();
+            case 2:
+                gt.month = fn.arg(1).to_int();
+        }
+        gnashTimeToDate(gt, *date, utc);
   }
   return as_value(date->getTimeValue());
 }
@@ -896,8 +901,11 @@ date_setYear(const fn_call& fn)
         dateToGnashTime(*date, gt, false);
 
         // TODO: Should truncation be done before or after subtracting 1900?
-        truncateDouble(gt.year, fn.arg(0).to_number());
-        gt.year -= 1900;
+        
+        double year = fn.arg(0).to_number();
+        if (year < 0 || year > 100) year -= 1900;
+
+        truncateDouble(gt.year, year);
 
         if (fn.nargs >= 2) gt.month = fn.arg(1).to_int();
         if (fn.nargs >= 3) gt.monthday = fn.arg(2).to_int();
@@ -1374,22 +1382,24 @@ makeTimeValue(GnashTime& t)
 
     // Any negative remainder rolls back to the previous year.
     if (t.month < 0) {
-        t.year--;
+        --t.year;
         t.month += 12;
     }
 
     // Now work out the years from 1970 in days.
-    boost::int32_t day = t.monthday;    
 
-    // This works but is a bit clunky.
-    if (t.year < 70) {
-        day = countLeapYears(t.year - 2) + ((t.year - 70) * 365);
-        // Adds an extra leap year for the year 0.
-        if (t.year <= 0) day++;
-    }
-    else {
-        day = countLeapYears(t.year + 1) + ((t.year - 70) * 365);
-    }
+    // Use a temporary 1970-based year for clarity.
+    const int32_t ouryear = t.year - 70;
+    
+    // Count the leap years between 1970-1-1 and the beginning of our year.
+    // 1970 - 1972: no leap years
+    // 1970 - 1968: one leap year
+    // Adding one less than the required year gives this behaviour.
+    boost::int32_t day = countLeapYears(ouryear + 1969) - countLeapYears(1970);
+    day += ouryear * 365;
+
+    /// The year 0 was a leap year, but countLeapYears won't calculate it.
+    if (ouryear <= -1970) --day;
     
     // Add days for each month. Month must be 0 - 11;
     for (int i = 0; i < t.month; i++)
@@ -1402,7 +1412,7 @@ makeTimeValue(GnashTime& t)
     day += t.monthday - 1;
 
     /// Work out the timestamp
-    double ret = static_cast<double>(day) * 86400000.0;
+    double ret = day * 86400000.0;
     ret += t.hour * 3600000.0;
     ret += t.minute * 60000.0;
     ret += t.second * 1000.0;
