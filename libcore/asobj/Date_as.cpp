@@ -706,22 +706,40 @@ date_getTimezoneOffset(const fn_call& fn)
 //    =========    Functions to set dates in various ways    ========
 //
 
-/// \brief Date.setTime
+/// Date.setTime
+//
 /// sets a Date in milliseconds after January 1, 1970 00:00 UTC.
 /// The return value is the same as the parameter.
+//
+/// If no arguments are passed or the first argument is undefined, the time
+/// value is set to NaN.
+//
+/// Partial milliseconds are just ignored. The permissible range
+/// is +/- 8.64+e15 (magic numbers).
 as_value
 date_setTime(const fn_call& fn)
 {
     boost::intrusive_ptr<Date_as> date = ensureType<Date_as>(fn.this_ptr);
 
-    if (fn.nargs < 1) {
+    if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("Date.setTime needs one argument"));
-        )
+        );
+        date->setTimeValue(NaN);
     }
     else {
         // returns a double
-        date->setTimeValue(fn.arg(0).to_number());
+        const double magicMaxValue = 8.64e+15;
+        double d = fn.arg(0).to_number();
+
+        if (!utility::isFinite(d) || std::abs(d) > magicMaxValue) {
+            date->setTimeValue(NaN);
+        }
+        else {
+            // Knock off the decimal part.
+            d = (d < 0 ? std::ceil(d) : std::floor(d));
+            date->setTimeValue(d);
+        }
     }
 
     if (fn.nargs > 1) {

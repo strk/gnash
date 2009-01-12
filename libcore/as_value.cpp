@@ -1584,151 +1584,107 @@ as_value::as_value(boost::intrusive_ptr<as_object> obj)
 }
 
 
-// Convert numeric value to string value, following ECMA-262 specification
+/// Examples:
+//
+/// e.g. for 9*.1234567890123456789:
+/// 9999.12345678901
+/// 99999.123456789
+/// 999999.123456789
+/// 9999999.12345679
+/// [...]
+/// 999999999999.123
+/// 9999999999999.12
+/// 99999999999999.1
+/// 999999999999999
+/// 1e+16
+/// 1e+17
+//
+/// For 1*.111111111111111111111111111111111111:
+/// 1111111111111.11
+/// 11111111111111.1
+/// 111111111111111
+/// 1.11111111111111e+15
+/// 1.11111111111111e+16
+//
+/// For 1.234567890123456789 * 10^-i:
+/// 1.23456789012346
+/// 0.123456789012346
+/// 0.0123456789012346
+/// 0.00123456789012346
+/// 0.000123456789012346
+/// 0.0000123456789012346
+/// 0.00000123456789012346
+/// 1.23456789012346e-6
+/// 1.23456789012346e-7
 std::string
 as_value::doubleToString(double val, int radix)
 {
-	// Printing formats:
-	//
-	// If _val > 1, Print up to 15 significant digits, then switch
-	// to scientific notation, rounding at the last place and
-	// omitting trailing zeroes.
-	// e.g. for 9*.1234567890123456789
-	// ...
-	// 9999.12345678901
-	// 99999.123456789
-	// 999999.123456789
-	// 9999999.12345679
-	// 99999999.1234568
-	// 999999999.123457
-	// 9999999999.12346
-	// 99999999999.1235
-	// 999999999999.123
-	// 9999999999999.12
-	// 99999999999999.1
-	// 999999999999999
-	// 1e+16
-	// 1e+17
-	// ...
-	// e.g. for 1*.111111111111111111111111111111111111
-	// ...
-	// 1111111111111.11
-	// 11111111111111.1
-	// 111111111111111
-	// 1.11111111111111e+15
-	// 1.11111111111111e+16
-	// ...
-	// For values < 1, print up to 4 leading zeroes after the
-	// decimal point, then switch to scientific notation with up
-	// to 15 significant digits, rounding with no trailing zeroes
-	// e.g. for 1.234567890123456789 * 10^-i:
-	// 1.23456789012346
-	// 0.123456789012346
-	// 0.0123456789012346
-	// 0.00123456789012346
-	// 0.000123456789012346
-	// 0.0000123456789012346
-	// 0.00000123456789012346
-	// 1.23456789012346e-6
-	// 1.23456789012346e-7
-	// ...
-	//
-	// If the value is negative, just add a '-' to the start; this
-	// does not affect the precision of the printed value.
-	//
-	// This almost corresponds to iomanip's std::setprecision(15)
-	// format, except that iomanip switches to scientific notation
-	// at e-05 not e-06, and always prints at least two digits for the exponent.
-
-	// The C implementation had problems with the following cases:
-	// 9.99999999999999[39-61] e{-2,-3}. Adobe prints these as
-	// 0.0999999999999999 and 0.00999999999999 while we print them
-	// as 0.1 and 0.01
-	// These values are at the limit of a double's precision,
-	// for example, in C,
-	// .99999999999999938 printfs as
-	// .99999999999999933387 and
-	// .99999999999999939 printfs as
-	// .99999999999999944489
-	// so this behaviour is probably too compiler-dependent to
-	// reproduce exactly.
-	//
-	// There may be some milage in comparing against
-	// 0.00009999999999999995 and
-	// 0.000009999999999999995 instead.
-	//
-	// The stringstream implementation seems to have no problems with them,
-	// but that may just be a better compiler.
-
 	// Handle non-numeric values.
-	if (isNaN(val))
-	{
-		return "NaN";
-	}
-	else if (isInf(val))
-	{
-		return val < 0 ? "-Infinity" : "Infinity";
-	}
-	else if (val == 0.0 || val == -0.0)
-	{
-		return "0";
-	}
+	if (isNaN(val)) return "NaN";
+	
+    if (isInf(val)) return val < 0 ? "-Infinity" : "Infinity";
 
-	std::ostringstream ostr;
-	std::string str;
+    if (val == 0.0 || val == -0.0) return "0"; 
 
-	if ( radix == 10 )
+    std::ostringstream ostr;
+
+	if (radix == 10)
 	{
 		// ActionScript always expects dot as decimal point.
 		ostr.imbue(std::locale::classic()); 
 		
-		// force to decimal notation for this range (because the reference player does)
+		// force to decimal notation for this range (because the
+        // reference player does)
 		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001)
 		{
 			// All nineteen digits (4 zeros + up to 15 significant digits)
 			ostr << std::fixed << std::setprecision(19) << val;
 			
-			str = ostr.str();
+            std::string str = ostr.str();
 			
 			// Because 'fixed' also adds trailing zeros, remove them.
 			std::string::size_type pos = str.find_last_not_of('0');
 			if (pos != std::string::npos) {
 				str.erase(pos + 1);
 			}
+            return str;
 		}
-		else
-		{
-			ostr << std::setprecision(15) << val;
-			
-			str = ostr.str();
-			
-			// Remove a leading zero from 2-digit exponent if any
-			std::string::size_type pos = str.find("e", 0);
 
-			if (pos != std::string::npos && str.at(pos + 2) == '0') {
-				str.erase(pos + 2, 1);
-			}
-		}
+        ostr << std::setprecision(15) << val;
+        
+        std::string str = ostr.str();
+        
+        // Remove a leading zero from 2-digit exponent if any
+        std::string::size_type pos = str.find("e", 0);
+
+        if (pos != std::string::npos && str.at(pos + 2) == '0') {
+            str.erase(pos + 2, 1);
+        }
 
         return str;
-
 	}
 
     // Radix isn't 10
-
 	bool negative = (val < 0);
-	if ( negative ) val = -val;
+	if (negative) val = -val;
 
 	double left = std::floor(val);
-	if ( left < 1 ) return "0";
-	while ( left != 0 )
+	if (left < 1) return "0";
+
+    std::string str;
+    const std::string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+    // Construct the string backwards for speed, then reverse.
+    while (left)
 	{
 		double n = left;
 		left = std::floor(left / radix);
 		n -= (left * radix);
-		str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
+		str.push_back(digits[static_cast<int>(n)]);
 	}
-	if ( negative ) str.insert(0, 1, '-'); 
+	if (negative) str.push_back('-'); 
+
+    std::reverse(str.begin(), str.end());
 
 	return str;
 	

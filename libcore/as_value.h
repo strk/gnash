@@ -249,8 +249,20 @@ public:
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
-	/// TODO: move here some of the good comments found in the function definition.
-	///
+	// Printing formats:
+	//
+	// If _val > 1, Print up to 15 significant digits, then switch
+	// to scientific notation, rounding at the last place and
+	// omitting trailing zeroes.
+	// For values < 1, print up to 4 leading zeroes after the
+	// decimal point, then switch to scientific notation with up
+	// to 15 significant digits, rounding with no trailing zeroes
+	// If the value is negative, just add a '-' to the start; this
+	// does not affect the precision of the printed value.
+	//
+	// This almost corresponds to iomanip's std::setprecision(15)
+	// format, except that iomanip switches to scientific notation
+	// at e-05 not e-06, and always prints at least two digits for the exponent.
 	static std::string doubleToString(double val, int radix=10);
 
     /// Try to parse a string into a 32-bit signed int using base 8 or 16.  //
