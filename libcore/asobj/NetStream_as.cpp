@@ -478,13 +478,6 @@ NetStream_as::play(const std::string& c_url)
 
     _inputStream = _netCon->getStream(url); 
 
-    if ( ! _inputStream.get() )
-    {
-        log_error( _("Gnash could not get stream '%s' from NetConnection"), url );
-        setStatus(streamNotFound);
-        return;
-    }
-
     // We need to start playback
     if (!startPlayback())
     {
@@ -549,9 +542,20 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
 bool
 NetStream_as::startPlayback()
 {
-    assert(_inputStream.get());
-    assert(_inputStream->tell() == 0);
 
+    // Register advance callback. This must be registered in order for
+    // status notifications to be received (e.g. streamNotFound).
+    startAdvanceTimer();
+
+    if ( ! _inputStream.get() )
+    {
+        log_error(_("Gnash could not get stream '%s' from NetConnection"),
+                url);
+        setStatus(streamNotFound);
+        return false;
+    }
+
+    assert(_inputStream->tell() == 0);
     inputPos = 0;
 
     if (!_mediaHandler)
@@ -586,9 +590,6 @@ NetStream_as::startPlayback()
     _playbackClock->pause();
 
     _playHead.setState(PlayHead::PLAY_PLAYING);
-
-    // Register ::advance callback
-    startAdvanceTimer();
 
 #ifdef GNASH_DEBUG_STATUS
     log_debug("Setting playStart status");
@@ -1291,9 +1292,12 @@ NetStream_as::advance()
     // pass them to a event handler
     processStatusNotifications();
 
-    // Nothing to do if we don't have a parser
-    // TODO: should we stopAdvanceTimer() ?
-    if ( ! m_parser.get() ) return;
+    // Nothing to do if we don't have a parser. Unregister the timer, as
+    // all status notifications should have been processed.
+    if ( ! m_parser.get() ) {
+        stopAdvanceTimer();
+        return;
+    }
 
     if ( decodingStatus() == DEC_STOPPED )
     {
