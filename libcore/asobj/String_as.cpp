@@ -859,8 +859,7 @@ string_oldToUpper(const fn_call& fn)
 as_value
 string_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<String_as> obj 
-	   = ensureType<String_as>(fn.this_ptr);
+    boost::intrusive_ptr<String_as> obj = ensureType<String_as>(fn.this_ptr);
     return as_value(obj->str());
 }
 
