@@ -35,23 +35,44 @@
 
 namespace gnash {
 
-static as_value Error_toString(const fn_call& fn);
-static as_value Error_message_getset(const fn_call& fn);
-static as_value Error_name_getset(const fn_call& fn);
+namespace {
+    as_value error_toString(const fn_call& fn);
+    as_value error_ctor(const fn_call& fn);
 
-
-as_value Error_ctor(const fn_call& fn);
-
-static void
-attachErrorInterface(as_object& o)
-{
-    o.init_member("toString", new builtin_function(Error_toString));
-    o.init_property("message", Error_message_getset, Error_message_getset);
-    o.init_property("name", Error_name_getset, Error_name_getset);
+    as_object* getErrorInterface();
+    void attachErrorInterface(as_object& o);
 }
 
 
-static as_object*
+class Error_as: public as_object
+{
+
+public:
+
+	Error_as()
+		:
+		as_object(getErrorInterface())
+	{}
+
+};
+
+
+// extern 
+void Error_class_init(as_object& where)
+{
+	// This is going to be the Error "class"/"function"
+	// in the 'where' package
+	boost::intrusive_ptr<builtin_function> cl;
+	cl = new builtin_function(&error_ctor, getErrorInterface());
+
+	// Register _global.Error
+	where.init_member("Error", cl.get());
+}
+
+
+namespace {
+
+as_object*
 getErrorInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
@@ -68,97 +89,46 @@ getErrorInterface()
 	return o.get();
 }
 
-class Error_as: public as_object
+
+void
+attachErrorInterface(as_object& o)
 {
-
-public:
-
-	Error_as()
-		:
-		as_object(getErrorInterface()),
-		_name("Error"),
-		_message("Error")
-	{}
-
-    void setName(const std::string& n) { _name = n; }
-    const std::string& getName() const { return _name; }
-
-    void setMessage(const std::string& m) { _message = m; }
-    const std::string& getMessage() const { return _message; }
-
-private:
-    std::string _name;
-    std::string _message;
-};
-
-static as_value
-Error_toString(const fn_call& fn)
-{
- 	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
-	return as_value(ptr->getMessage());   
+    int flags = 0;
+    o.init_member("toString", new builtin_function(error_toString), flags);
+    o.init_member("message", "Error", flags);
+    o.init_member("name", "Error", flags);
 }
-
-static as_value
-Error_message_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
-	if (fn.nargs == 0)
-	{
-	    // Getter
-	    return as_value(ptr->getMessage());
-	}
-	else
-	{
-	    // Setter
-	    ptr->setMessage(fn.arg(0).to_string());
-	    return as_value();
-	}
-}
-
-static as_value
-Error_name_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
-	
-	if (fn.nargs == 0)
-	{
-	    // Getter
-	    return as_value(ptr->getName());
-	}
-	else
-	{
-	    // Setter
-	    ptr->setName(fn.arg(0).to_string());
-	    return as_value();
-	}
-	
-}
-
 
 
 as_value
-Error_ctor(const fn_call& fn)
+error_toString(const fn_call& fn)
 {
-	boost::intrusive_ptr<Error_as> err = new Error_as;
+ 	boost::intrusive_ptr<Error_as> ptr = ensureType<Error_as>(fn.this_ptr);
 
-	if ( fn.nargs > 0)
+    string_table& st = ptr->getVM().getStringTable();
+    as_value message;
+    ptr->get_member(st.find("message"), &message);
+
+	return as_value(message);   
+}
+
+/// "e = new Error();" returns an Error, "e = Error"; returns undefined.
+as_value
+error_ctor(const fn_call& fn)
+{
+
+    if (!fn.isInstantiation()) return as_value();
+
+	boost::intrusive_ptr<Error_as> err = new Error_as;
+	
+    string_table& st = err->getVM().getStringTable();
+    if (fn.nargs > 0)
 	{
-		err->setMessage(fn.arg(0).to_string());
+		err->set_member(st.find("message"), fn.arg(0));
 	}
 
 	return as_value(err.get()); // will keep alive
 }
 
-// extern 
-void Error_class_init(as_object& where)
-{
-	// This is going to be the Error "class"/"function"
-	// in the 'where' package
-	boost::intrusive_ptr<builtin_function> cl;
-	cl = new builtin_function(&Error_ctor, getErrorInterface());
-
-	// Register _global.Error
-	where.init_member("Error", cl.get());
 }
-
 } // end of gnash namespace

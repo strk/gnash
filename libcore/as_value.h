@@ -218,11 +218,12 @@ public:
 	/// @param objRefs
 	///     A vector of already-parsed objects to properly interpret references.
 	///     Pass an empty vector on first call as it will be used internally.
-	///     On return, the vector will be filled with pointers to every complex object
-	///     parsed from the stream.
+	///     On return, the vector will be filled with pointers to every
+    ///     complex object parsed from the stream.
     ///
 	/// @param vm
-    ///     Virtual machine to use for initialization of the values (string_table)
+    ///     Virtual machine to use for initialization of the values
+    ///     (string_table)
 	///
 	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
             const boost::uint8_t* const end, int inType,
@@ -249,9 +250,37 @@ public:
 
 	/// Convert numeric value to string value, following ECMA-262 specification
 	//
-	/// TODO: move here some of the good comments found in the function definition.
-	///
+	// Printing formats:
+	//
+	// If _val > 1, Print up to 15 significant digits, then switch
+	// to scientific notation, rounding at the last place and
+	// omitting trailing zeroes.
+	// For values < 1, print up to 4 leading zeroes after the
+	// decimal point, then switch to scientific notation with up
+	// to 15 significant digits, rounding with no trailing zeroes
+	// If the value is negative, just add a '-' to the start; this
+	// does not affect the precision of the printed value.
+	//
+	// This almost corresponds to iomanip's std::setprecision(15)
+	// format, except that iomanip switches to scientific notation
+	// at e-05 not e-06, and always prints at least two digits for the exponent.
 	static std::string doubleToString(double val, int radix=10);
+
+    /// Try to parse a string into a 32-bit signed int using base 8 or 16.  //
+    /// This function will throw a boost::bad_lexical_cast (or a derived
+    /// exception) if the passed string cannot be converted.
+    //
+    /// @param s      The string to parse
+    /// @param d      The 32-bit int represented as a double. This is only a
+    ///               valid number if the return value is true.
+    /// @param whole  If true, expect the whole string to be valid, i.e.
+    ///               throw if there are any invalid characters. If false,
+    ///               returns any valid number up to the first invalid
+    ///               character.
+    /// @return       True if the string was non-decimal and successfully
+    ///               parsed.
+    static bool parseNonDecimalInt(const std::string& s, double& d,
+            bool whole = true);
 
 	/// Return the primitive type of this value, as a string.
 	const char* typeOf() const;

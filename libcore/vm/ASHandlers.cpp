@@ -2171,11 +2171,13 @@ SWFHandlers::ActionPushData(ActionExec& thread)
         IF_VERBOSE_ACTION (
         if ( type == pushDict8 || type == pushDict16 )
         {
-            log_action(_("\t%d) type=%s (%d), value=%s"), count, pushType[type], id, env.top(0));
+            log_action(_("\t%d) type=%s (%d), value=%s"),
+                count, pushType[type], id, env.top(0));
         }
         else
         {
-            log_action(_("\t%d) type=%s, value=%s"), count, pushType[type], env.top(0));
+            log_action(_("\t%d) type=%s, value=%s"),
+                count, pushType[type], env.top(0));
         }
         ++count;
         );
@@ -3071,7 +3073,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
                 v1, v2);
 #endif
 
-    if (v1.is_string() || v2.is_string() )
+    if (v1.is_string() || v2.is_string())
     {
         // NOTE: I've tested that we should change behaviour
         //       based on code definition version, not top-level
@@ -3176,20 +3178,20 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     if ( swfVersion <= 5 )
     {
         as_value op1 = env.top(0);
-    try { op1 = op1.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                op1, e.what());
-    }
+        try { op1 = op1.to_primitive(); }
+        catch (ActionTypeError& e)
+        {
+            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                    op1, e.what());
+        }
 
         as_value op2 = env.top(1);
-    try { op2 = op2.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                op2, e.what());
-    }
+        try { op2 = op2.to_primitive(); }
+        catch (ActionTypeError& e)
+        {
+            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                    op2, e.what());
+        }
 
         env.top(1).set_bool(op1.equals(op2));
     }

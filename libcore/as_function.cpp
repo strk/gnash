@@ -140,10 +140,10 @@ as_function::extends(as_function& superclass)
 	as_object* newproto = new as_object(superclass.getPrototype().get());
 	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
 
-	if ( VM::get().getSWFVersion() > 5 )
-	{
-		newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass); 
-	}
+    if (VM::get().getSWFVersion() > 5) {
+        const int flags = as_prop_flags::dontEnum;
+        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
+    }
 
 	init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
 }
@@ -183,10 +183,13 @@ as_function::getFunctionConstructor()
 void
 function_class_init(as_object& global)
 {
-	boost::intrusive_ptr<builtin_function> func=as_function::getFunctionConstructor();
+	boost::intrusive_ptr<builtin_function> func = 
+        as_function::getFunctionConstructor();
 
 	// Register _global.Function, only visible for SWF6 up
-	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
+	int swf6flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::dontDelete | 
+                    as_prop_flags::onlySWF6Up;
 	global.init_member("Function", func.get(), swf6flags);
 
 }
@@ -194,7 +197,6 @@ function_class_init(as_object& global)
 as_value
 function_apply(const fn_call& fn)
 {
-	//int pushed=0; // new values we push on the stack
 
 	// Get function body 
 	boost::intrusive_ptr<as_function> function_obj =
@@ -210,20 +212,19 @@ function_apply(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror (_("Function.apply() called with no args"));
 		);
+        new_fn_call.this_ptr = new as_object;
 	}
 	else
 	{
 		// Get the object to use as 'this' reference
-		new_fn_call.this_ptr = fn.arg(0).to_object();
-		if (!new_fn_call.this_ptr )
-		{
-			// ... or recycle this function's call 'this' pointer
-			// (most likely the Function instance)
-			new_fn_call.this_ptr = fn.this_ptr;
-		}
+		as_object* obj = fn.arg(0).to_object().get();
 
+        if (!obj) obj = new as_object; 
+
+        new_fn_call.this_ptr = obj;
+
+		// Check for second argument ('arguments' array)
 		if ( fn.nargs > 1 )
-		// we have an 'arguments' array
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 				if ( fn.nargs > 2 )
@@ -248,7 +249,7 @@ function_apply(const fn_call& fn)
 				goto call_it;
 			}
 
-			boost::intrusive_ptr<Array_as> arg_array = \
+			boost::intrusive_ptr<Array_as> arg_array = 
 					boost::dynamic_pointer_cast<Array_as>(arg1);
 
 			if ( ! arg_array )
@@ -258,23 +259,18 @@ function_apply(const fn_call& fn)
 						" is of type %s, with value %s"
 						" (expected array)"
 						" - considering as call with no args"),
-						fn.arg(1).typeOf(),
-						fn.arg(1).to_string().c_str());
+						fn.arg(1).typeOf(), fn.arg(1).to_string());
 				);
 				goto call_it;
 			}
 
 			unsigned int nelems = arg_array->size();
 
-			//log_debug(_("Function.apply(this_ref, array[%d])"), nelems);
 			for (unsigned int i=0; i<nelems; ++i)
 			{
 				new_fn_call.pushArg(arg_array->at(i));
-				//pushed++;
 			}
 
-			//new_fn_call.set_offset(fn.env().get_top_index());
-			//new_fn_call.nargs=nelems;
 		}
 	}
 
@@ -283,10 +279,7 @@ function_apply(const fn_call& fn)
 	// Call the function 
 	as_value rv = function_obj->call(new_fn_call);
 
-	// Drop additional values we pushed on the stack 
-	//fn.env().drop(pushed);
-
-        return rv;
+    return rv;
 }
 
 as_value

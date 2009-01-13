@@ -610,6 +610,23 @@ a=Number("0x2");
 a=new Number(" 0x2");
 check(isNaN(a));
 
+a=Number("-0x2"); 
+check(isNaN(a));
+
+a=Number("0x-2"); 
+#if OUTPUT_VERSION < 6
+check(isNaN(a));
+#else
+check_equals(a, -2);
+#endif
+
+a=Number("0x-ffffffff"); 
+#if OUTPUT_VERSION < 6
+check(isNaN(a));
+#else
+check_equals(a, 1);
+#endif
+
 a=Number("077");
 #if OUTPUT_VERSION < 6
  check_equals(a, 77);
@@ -639,11 +656,11 @@ check( isNaN(0/0) );
 // END OF TEST
 
 #if OUTPUT_VERSION < 6
- check_totals(227);
+ check_totals(230);
 #else
 #if OUTPUT_VERSION < 7
- check_totals(222);
+ check_totals(225);
 #else
- check_totals(220);
+ check_totals(223);
 #endif
 #endif

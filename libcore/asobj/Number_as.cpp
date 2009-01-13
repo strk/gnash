@@ -81,7 +81,7 @@ number_toString(const fn_call& fn)
 	boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
 
 	double val = obj->get_numeric_value();
-	unsigned radix=10;
+	unsigned radix = 10;
 
 	if ( fn.nargs ) 
 	{

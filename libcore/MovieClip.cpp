@@ -539,7 +539,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 }
 
 character*
-MovieClip::add_empty_movieclip(const char* name, int depth)
+MovieClip::add_empty_movieclip(const std::string& name, int depth)
 {
     // empty_movieclip_def will be deleted during deleting movieclip
     sprite_definition* empty_sprite_def =
@@ -2197,14 +2197,14 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // See misc-ming.all/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if ( get_parent() == 0 )
+    if (!get_parent())
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
         execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
 
-        if ( _vm.getSWFVersion() > 5 )
+        if (_vm.getSWFVersion() > 5)
         {
 #ifdef GNASH_DEBUG
             log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
@@ -2215,7 +2215,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     }
     else
     {
-
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
@@ -2241,15 +2240,14 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     {
         assert(!initObj);
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
+        log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
+                getTarget());
 #endif
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
-#endif
         std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
         _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
+
     }
     else {
 
@@ -2261,10 +2259,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         }
 
         constructAsScriptObject(); 
-#ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s is dynamic, sending "
-                "INITIALIZE and CONSTRUCT events immediately"), getTarget());
-#endif
 
         // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
         // testsuite/swfdec/clone-sprite-events.c not to call on_event
@@ -3379,7 +3373,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
-    character* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string().c_str(),
+    character* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string(),
             fn.arg(1).to_int());
     return as_value(ch);
 }

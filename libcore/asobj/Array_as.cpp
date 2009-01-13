@@ -365,7 +365,7 @@ public:
         as_value cmp_method(&_comp);
         as_value ret(0.0);
 
-	    std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+	    std::auto_ptr<std::vector<as_value> > args (new std::vector<as_value>);
 	    args->push_back(b);
 	    args->push_back(a);
         ret = call_method(cmp_method, &_env, _object, args);
@@ -961,26 +961,34 @@ array_sort(const fn_call& fn)
     
     const int version = array->getVM().getSWFVersion();
     
-    boost::uint8_t flags = 0;
-
-    if ( fn.nargs == 0 )
+    if (!fn.nargs)
     {
         array->sort(as_value_lt(version));
         return as_value(array.get());
     }
-    else if ( fn.nargs == 1 && fn.arg(0).is_number() )
+    
+    if (fn.arg(0).is_undefined()) return as_value();
+
+    boost::uint8_t flags = 0;
+
+    if ( fn.nargs == 1 && fn.arg(0).is_number() )
     {
         flags=static_cast<boost::uint8_t>(fn.arg(0).to_number());
     }
-    else if ( fn.arg(0).is_as_function() )
+    else if (fn.arg(0).is_as_function())
     {
+
         // Get comparison function
         as_function* as_func = fn.arg(0).to_as_function();
+
+        assert(as_func);
+
         bool (*icmp)(int);
     
-        if ( fn.nargs == 2 && fn.arg(1).is_number() )
+        if (fn.nargs == 2 && fn.arg(1).is_number()) {
             flags=static_cast<boost::uint8_t>(fn.arg(1).to_number());
-        
+        }
+
         if (flags & Array_as::fDescending) icmp = &int_lt_or_eq;
         else icmp = &int_gt;
 
@@ -989,13 +997,12 @@ array_sort(const fn_call& fn)
         as_value_custom avc = 
             as_value_custom(*as_func, icmp, fn.this_ptr, env);
 
-        if ( (flags & Array_as::fReturnIndexedArray) )
+        if ((flags & Array_as::fReturnIndexedArray))
         {
             return as_value(array->sort_indexed(avc));
         }
-        //log_debug("Sorting %d-sized array with custom function", array->size());
+
         array->sort(avc);
-        //log_debug("After sorting, array is %d-sized", array->size());
         return as_value(array.get());
         // note: custom AS function sorting apparently ignores the 
         // UniqueSort flag which is why it is also ignored here
@@ -1005,7 +1012,6 @@ array_sort(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Sort called with invalid arguments."));
         )
-        if ( fn.arg(0).is_undefined() ) return as_value();
         return as_value(array.get());
     }
     bool do_unique, do_index;

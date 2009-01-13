@@ -349,7 +349,7 @@ public:
     ///
     character* get_character_at_depth(int depth);
 
-    character* add_empty_movieclip(const char* name, int depth);
+    character* add_empty_movieclip(const std::string& name, int depth);
 
     boost::intrusive_ptr<character> add_textfield(const std::string& name,
             int depth, int x, int y, float width, float height);
