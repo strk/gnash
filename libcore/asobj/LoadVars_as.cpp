@@ -93,8 +93,6 @@ private:
 
 	static as_value getBytesTotal_method(const fn_call& fn);
 
-	static as_value decode_method(const fn_call& fn);
-
 	static as_value onData_method(const fn_call& fn);
 
 	static as_value onLoad_method(const fn_call& fn);
@@ -118,8 +116,7 @@ LoadVars_as::toString(std::ostream& o, bool /*post*/) const
 	{
         if (it != vars.begin()) o << "&";
         const std::string& val = it->second;
-        o << URL::encode(it->first) << "="
-                    << URL::encode(val);
+        o << URL::encode(it->first) << "=" << URL::encode(val);
 	}
 
 }
@@ -140,7 +137,7 @@ LoadVars_as::attachLoadVarsInterface(as_object& o)
 
 	o.init_member("addRequestHeader", new builtin_function(
 	            LoadableObject::loadableobject_addRequestHeader));
-	o.init_member("decode", new builtin_function(LoadVars_as::decode_method));
+	o.init_member("decode", vm.getNative(301, 3));
 	o.init_member("getBytesLoaded", new builtin_function(
 	            LoadVars_as::getBytesLoaded_method));
 	o.init_member("getBytesTotal", new builtin_function(
@@ -167,29 +164,6 @@ LoadVars_as::getLoadVarsInterface()
 
 
 as_value
-LoadVars_as::decode_method(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
-
-	if ( ! fn.nargs ) return as_value(false);
-
-	typedef std::map<std::string, std::string> ValuesMap;
-
-	ValuesMap vals;
-
-	URL::parse_querystring(fn.arg(0).to_string(), vals);
-
-	string_table& st = ptr->getVM().getStringTable();
-	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();
-			it != itEnd; ++it)
-	{
-		ptr->set_member(st.find(it->first), as_value(it->second.c_str()));
-	}
-
-	return as_value(); 
-}
-
-as_value
 LoadVars_as::getBytesLoaded_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
@@ -199,14 +173,14 @@ LoadVars_as::getBytesLoaded_method(const fn_call& fn)
 as_value
 LoadVars_as::getBytesTotal_method(const fn_call& fn)
 {
-	boost::intrusive_ptr<LoadVars_as> ptr = ensureType<LoadVars_as>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars_as> ptr =
+        ensureType<LoadVars_as>(fn.this_ptr);
 	return as_value(ptr->getBytesTotal());
 }
 
 as_value
 LoadVars_as::onData_method(const fn_call& fn)
 {
-	//GNASH_REPORT_FUNCTION;
 
 	as_object* thisPtr = fn.this_ptr.get();
 	if ( ! thisPtr ) return as_value();

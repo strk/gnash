@@ -26,9 +26,6 @@ class as_object;
 /// Initialize the global LoadVars class
 void loadvars_class_init(as_object& global);
 
-/// Return a LoadVars instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_loadvars_instance();
-  
 } // end of gnash namespace
 
 #endif

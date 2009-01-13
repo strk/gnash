@@ -38,6 +38,7 @@ namespace gnash {
 namespace {
     as_value loadableobject_send(const fn_call& fn);
     as_value loadableobject_load(const fn_call& fn);
+    as_value loadableobject_decode(const fn_call& fn);
     as_value loadableobject_sendAndLoad(const fn_call& fn);
 }
 
@@ -323,6 +324,9 @@ LoadableObject::registerNative(as_object& o)
     vm.registerNative(loadableobject_load, 301, 0);
     vm.registerNative(loadableobject_send, 301, 1);
     vm.registerNative(loadableobject_sendAndLoad, 301, 2);
+
+    /// This is only automatically used in LoadVars.
+    vm.registerNative(loadableobject_decode, 301, 3);
 }
 
 
@@ -442,6 +446,30 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 /// These methods are accessed through the ASnative interface, so they
 /// do not need to be public methods of the LoadableObject class.
 namespace {
+
+/// Decode method (ASnative 301, 3) can be applied to any as_object.
+as_value
+loadableobject_decode(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+	if (!fn.nargs) return as_value(false);
+
+	typedef std::map<std::string, std::string> ValuesMap;
+
+	ValuesMap vals;
+
+	URL::parse_querystring(fn.arg(0).to_string(), vals);
+
+	string_table& st = ptr->getVM().getStringTable();
+	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();
+			it != itEnd; ++it)
+	{
+		ptr->set_member(st.find(it->first), as_value(it->second));
+	}
+
+	return as_value(); 
+}
 
 /// Returns true if the arguments are valid, otherwise false. The
 /// success of the connection is irrelevant.
