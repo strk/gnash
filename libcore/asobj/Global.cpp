@@ -348,7 +348,7 @@ as_global_parsefloat(const fn_call& fn)
 as_value
 as_global_parseint(const fn_call& fn)
 {
-    if (fn.nargs < 1) {
+    if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%s needs at least one argument"), __FUNCTION__);
         )
@@ -363,10 +363,23 @@ as_global_parseint(const fn_call& fn)
 
     const std::string& expr = fn.arg(0).to_string();
 
-    if (fn.nargs == 1)
+    // A second argument specifies the base.
+    // Parsing still starts after any positive/negative 
+    // sign or hex identifier (parseInt("0x123", 8) gives
+    // 83, not 0; parseInt(" 0x123", 8) is 0), which is
+    // why we do this here.
+    size_t base;
+    if (fn.nargs > 1)
     {
+        base = fn.arg(1).to_int();
+    
+        // Bases from 2 to 36 are valid, otherwise return NaN
+        if (base < 2 || base > 36) return as_value(NaN);
+    }
+    else
+    {
+        /// No radix specified, so try parsing as octal or hexadecimal
         try {
-            // Try parsing as an octal or hexadecimal number.
             double d;
             if (as_value::parseNonDecimalInt(expr, d, false)) return d;
         }
@@ -374,6 +387,10 @@ as_global_parseint(const fn_call& fn)
         {
             return as_value(NaN);
         }
+
+        /// The number is not hex or octal, so we'll assume it's base-10.
+        base = 10;
+
     }
 
     std::string::const_iterator it = expr.begin();
@@ -404,20 +421,6 @@ as_global_parseint(const fn_call& fn)
         if (it == expr.end()) return as_value(NaN);
     }
     
-    // A second argument specifies the base.
-    // Parsing still starts after any positive/negative 
-    // sign or hex identifier (parseInt("0x123", 8) gives
-    // 83, not 0; parseInt(" 0x123", 8) is 0), which is
-    // why we do this here.
-    int base = 10;
-    if (fn.nargs > 1)
-    {
-        base = (fn.arg(1).to_int());
-    
-        // Bases from 2 to 36 are valid, otherwise return NaN
-        if (base < 2 || base > 36) return as_value(NaN);
-    }
-    
     // Now we have the base, parse the digits. The iterator should
     // be pointing at the first digit.
     
@@ -427,7 +430,7 @@ as_global_parseint(const fn_call& fn)
     // return NaN.
     std::string::size_type digit = digits.find(toupper(*it));
 
-    if (digit >= base || digit < 0) return as_value(NaN);
+    if (digit >= base || digit == std::string::npos) return as_value(NaN);
 
     // The first digit was valid, so continue from the present position
     // until we reach the end of the string or an invalid character,
@@ -466,14 +469,8 @@ as_global_assetpropflags(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     if (fn.nargs > 4)
             log_aserror(_("%s has more than four arguments"), __FUNCTION__);
-#if 0 // it is perfectly legal to have 4 args in SWF5 it seems..
-    if (version == 5 && fn.nargs == 4)
-            log_aserror(_("%s has four arguments in a SWF version 5 movie"), __FUNCTION__);
-#endif
     )
     
-    // ASSetPropFlags(obj, props, n, allowFalse=false)
-
     // object
     boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
     if ( ! obj )
@@ -490,14 +487,14 @@ as_global_assetpropflags(const fn_call& fn)
 
     const as_value& props = fn.arg(1);
 
-    const int flagsMask = ( as_prop_flags::dontEnum |
-                            as_prop_flags::dontDelete |
-                            as_prop_flags::readOnly |
-                            as_prop_flags::onlySWF6Up |
-                            as_prop_flags::ignoreSWF6 |
-                            as_prop_flags::onlySWF7Up |
-                            as_prop_flags::onlySWF8Up |
-                            as_prop_flags::onlySWF9Up);
+    const int flagsMask = as_prop_flags::dontEnum |
+                          as_prop_flags::dontDelete |
+                          as_prop_flags::readOnly |
+                          as_prop_flags::onlySWF6Up |
+                          as_prop_flags::ignoreSWF6 |
+                          as_prop_flags::onlySWF7Up |
+                          as_prop_flags::onlySWF8Up |
+                          as_prop_flags::onlySWF9Up;
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,
@@ -509,9 +506,9 @@ as_global_assetpropflags(const fn_call& fn)
     // except it sets the attributes to false. The
     // set_false bitmask is applied before set_true is applied
 
-    // ASSetPropFlags was exposed in Flash 5, however the fourth argument 'set_false'
-    // was not required as it always defaulted to the value '~0'. 
-    const int setFalse = (fn.nargs < 4 ? 0 : int(fn.arg(3).to_number())) &
+    // ASSetPropFlags was exposed in Flash 5, however the fourth argument
+    // 'set_false' was not required as it always defaulted to the value '~0'. 
+    const int setFalse = (fn.nargs < 4 ? 0 : fn.arg(3).to_int()) &
         flagsMask;
 
     obj->setPropFlags(props, setFalse, setTrue);
