@@ -218,11 +218,12 @@ public:
 	/// @param objRefs
 	///     A vector of already-parsed objects to properly interpret references.
 	///     Pass an empty vector on first call as it will be used internally.
-	///     On return, the vector will be filled with pointers to every complex object
-	///     parsed from the stream.
+	///     On return, the vector will be filled with pointers to every
+    ///     complex object parsed from the stream.
     ///
 	/// @param vm
-    ///     Virtual machine to use for initialization of the values (string_table)
+    ///     Virtual machine to use for initialization of the values
+    ///     (string_table)
 	///
 	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
             const boost::uint8_t* const end, int inType,
@@ -269,10 +270,15 @@ public:
     /// This function will throw a boost::bad_lexical_cast (or a derived
     /// exception) if the passed string cannot be converted.
     //
-    /// @param s    The string to parse
-    /// @param d    The 32-bit int represented as a double. This is only a
-    ///             valid number if the return value is true.
-    /// @return     True if the string was non-decimal and successfully parsed.
+    /// @param s      The string to parse
+    /// @param d      The 32-bit int represented as a double. This is only a
+    ///               valid number if the return value is true.
+    /// @param whole  If true, expect the whole string to be valid, i.e.
+    ///               throw if there are any invalid characters. If false,
+    ///               returns any valid number up to the first invalid
+    ///               character.
+    /// @return       True if the string was non-decimal and successfully
+    ///               parsed.
     static bool parseNonDecimalInt(const std::string& s, double& d,
             bool whole = true);
 
