@@ -313,18 +313,23 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	int oldDepth = movie->get_depth();
 
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
-	log_debug("Before swapLevels (source depth %d, target depth %d) levels are: ", oldDepth, depth);
+	log_debug("Before swapLevels (source depth %d, target depth %d) "
+            "levels are: ", oldDepth, depth);
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget(), i->second->get_depth());
+		log_debug(" %d: %p (%s @ depth %d)", i->first,
+                (void*)(i->second.get()), i->second->getTarget(),
+                i->second->get_depth());
 	}
 #endif
 
 	if ( oldDepth < character::staticDepthOffset ) // should include _level0 !
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap its depth"),
-			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
+                "static depth zone (%d), won't swap its depth"),
+                movie->getTarget(), depth, oldDepth,
+                character::staticDepthOffset);
 		);
 		return;
 	}
@@ -332,8 +337,10 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	if ( oldDepth >= 0 ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap its depth"),
-			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
+                "static depth zone (%d), won't swap its depth"),
+                movie->getTarget(), depth, oldDepth,
+                character::staticDepthOffset);
 		);
 		return;
 	}
@@ -367,7 +374,9 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	log_debug("After swapLevels levels are: ");
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget(), i->second->get_depth());
+		log_debug(" %d: %p (%s @ depth %d)", i->first, 
+                (void*)(i->second.get()), i->second->getTarget(),
+                i->second->get_depth());
 	}
 #endif
 	
@@ -386,7 +395,8 @@ movie_root::dropLevel(int depth)
 	Levels::iterator it = _movies.find(depth);
 	if ( it == _movies.end() )
 	{
-		log_error("movie_root::dropLevel called against a movie not found in the levels container");
+		log_error("movie_root::dropLevel called against a movie not "
+                "found in the levels container");
 		return;
 	}
 
