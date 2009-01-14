@@ -363,7 +363,11 @@ public:
     ///
     /// Maps from our local space into "world" space
     /// (i.e. root movie space).
-    virtual SWFMatrix    getWorldMatrix() const;
+    //
+    /// @param includeRoot      Whether the transform of the Stage (_root)
+    ///                         should be concatenated. This is required to be
+    ///                         false for pointInBounds.
+    SWFMatrix getWorldMatrix(bool includeRoot = true) const;
 
     /// \brief
     /// Get our concatenated color transform (all our ancestor transforms,
@@ -443,12 +447,14 @@ public:
 
     /// Return true if the given point falls in this character's bounds
     //
-    /// Point coordinates are in world TWIPS
-    ///
+    /// @param x        Point x coordinate in world space
+    /// @param y        Point y coordinate in world space
+    /// @return         Whether (x, y) is within the character's bounds. This
+    ///                 ignores _root's transform. 
     bool pointInBounds(boost::int32_t x, boost::int32_t y) const
     {
         rect bounds = getBounds();
-        SWFMatrix wm = getWorldMatrix();
+        SWFMatrix wm = getWorldMatrix(false);
         wm.transform(bounds);
         return bounds.point_test(x, y);
     }

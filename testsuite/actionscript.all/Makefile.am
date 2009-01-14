@@ -91,6 +91,7 @@ ASTESTS =			\
 	ExternalInterface.as	\
 	Function.as		\
 	Global.as		\
+	HitTest.as		\
 	Inheritance.as		\
 	Instance.as \
 	Key.as			\
