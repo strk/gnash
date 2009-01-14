@@ -73,6 +73,7 @@
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
