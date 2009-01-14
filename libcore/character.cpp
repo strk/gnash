@@ -104,14 +104,14 @@ character::getNextUnnamedInstanceName()
 
 
 SWFMatrix
-character::getWorldMatrix() const
+character::getWorldMatrix(bool includeRoot) const
 {
 	SWFMatrix m;
-	if (m_parent != NULL)
+	if (m_parent)
 	{
-	    m = m_parent->getWorldMatrix();
+	    m = m_parent->getWorldMatrix(includeRoot);
 	}
-	m.concatenate(getMatrix());
+    if (m_parent || includeRoot) m.concatenate(getMatrix());
 
 	return m;
 }
