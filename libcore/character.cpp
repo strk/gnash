@@ -555,8 +555,7 @@ character::alpha_getset(const fn_call& fn)
 as_value
 character::blendMode(const fn_call& fn)
 {
-    boost::intrusive_ptr<character> ch =
-        ensureType<character>(fn.this_ptr);
+    boost::intrusive_ptr<character> ch = ensureType<character>(fn.this_ptr);
 
     // This is AS-correct, but doesn't do anything.
     // TODO: implement in the renderers!
@@ -591,14 +590,16 @@ character::blendMode(const fn_call& fn)
     if (bm.is_number()) {
         double mode = bm.to_number();
 
-        // hardlight is the last known value
+        // Hardlight is the last known value. This also performs range checking
+        // for float-to-int conversion.
         if (mode < 0 || mode > BLENDMODE_HARDLIGHT) {
 
             // An invalid numeric argument becomes undefined.
             ch->setBlendMode(BLENDMODE_UNDEFINED);
         }
         else {
-            ch->setBlendMode(static_cast<BlendMode>(mode));
+            /// The extra static cast is required to keep OpenBSD happy.
+            ch->setBlendMode(static_cast<BlendMode>(static_cast<int>(mode)));
         }
         return as_value();
     }
