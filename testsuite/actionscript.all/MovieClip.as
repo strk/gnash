@@ -123,7 +123,7 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(936); // SWF8+
+	check_totals(938); // SWF8+
 #endif
 
 	play();
@@ -2194,6 +2194,10 @@ check_equals(_root.blendMode, "darken");
 _root.blendMode = "Some rubbish";
 check_equals(_root.blendMode, "darken");
 _root.blendMode = -1;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = 0xffffffff;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = -0xffffffff;
 check_equals(_root.blendMode, undefined);
 _root.blendMode = 5.5;
 check_equals(_root.blendMode, "lighten");
