@@ -659,7 +659,8 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m, const rect* bounds)
+  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m,
+          const rect* bounds, bool /*smooth*/)
   {
     GLint index;
 
