@@ -372,26 +372,9 @@ private:
 
 public:
 
-  // Enable/disable antialiasing.
-  bool  m_enable_antialias;
-
   // Output size.
   float m_display_width;
   float m_display_height;
-
-  void set_antialiased(bool enable) {
-    // enable=false *forces* all bitmaps to be rendered in low quality
-    m_enable_antialias = enable;
-  }
-
-  // Style state.
-  enum style_index
-  {
-    LEFT_STYLE = 0,
-    RIGHT_STYLE,
-    LINE_STYLE,
-    STYLE_COUNT
-  };
 
 
   gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
@@ -548,7 +531,6 @@ public:
       /*xscale(1.0/20.0),
       yscale(1.0/20.0),*/
       scale_set(false),
-      m_enable_antialias(true),
       m_display_width(0.0),
       m_display_height(0.0),
       m_drawing_mask(false)
@@ -1312,8 +1294,9 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
           sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
-            (fill_type==SWF::FILL_TILED_BITMAP) || (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && m_enable_antialias);
+            (fill_type==SWF::FILL_TILED_BITMAP) ||
+            (fill_type==SWF::FILL_TILED_BITMAP_HARD),
+            smooth && _quality != QUALITY_LOW);
           break;
         } 
 
