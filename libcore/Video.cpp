@@ -362,12 +362,16 @@ attachVideoInterface(as_object& o)
 void
 attachPrototypeProperties(as_object& proto)
 {
+    const int protect = as_prop_flags::dontDelete;
+    
+    proto.init_property("deblocking", &video_deblocking, &video_deblocking,
+            protect);
+    proto.init_property("smoothing", &video_smoothing, &video_smoothing,
+            protect);
+    
     const int flags = as_prop_flags::dontDelete |
         as_prop_flags::readOnly;
 
-    proto.init_property("deblocking", &video_deblocking, &video_deblocking,
-            flags);
-    proto.init_property("smoothing", &video_smoothing, &video_smoothing, flags);
     proto.init_property("height", &video_height, &video_height, flags);
     proto.init_property("width", &video_width, &video_width, flags);
 }
@@ -463,6 +467,8 @@ video_smoothing(const fn_call& fn)
 	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
 
     if (!fn.nargs) return as_value(video->smoothing());
+
+    log_debug("Video.smoothing(%s): TESTING", fn.arg(0));
 
     bool smooth = fn.arg(0).to_bool();
 
