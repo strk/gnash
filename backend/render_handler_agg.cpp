@@ -349,6 +349,9 @@ private:
 template <class PixelFormat>
 class render_handler_agg : public render_handler_agg_base
 {
+  
+    typedef std::vector< geometry::Range2d<int> > ClipBounds;
+  
 private:
   typedef agg::renderer_base<PixelFormat> renderer_base;
 
@@ -503,7 +506,7 @@ public:
   
       for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {    
       
-        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
+        const ClipBounds::value_type& cbounds = _clipbounds[cno];
         apply_clip_box<ras_type> (ras, cbounds);
   
         // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
@@ -710,7 +713,7 @@ public:
       
       for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
       
-        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+        const ClipBounds::value_type& bounds = _clipbounds[cno];
               
         apply_clip_box<ras_type> (ras, bounds);
         
@@ -734,7 +737,7 @@ public:
       
       for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
       
-        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+        const ClipBounds::value_type& bounds = _clipbounds[cno];
               
         apply_clip_box<ras_type> (ras, bounds);
         
@@ -1777,7 +1780,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     // iterate through clipping bounds
     for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
     
-      const geometry::Range2d<int>& bounds = _clipbounds[cno];         
+      const ClipBounds::value_type& bounds = _clipbounds[cno];         
       apply_clip_box<ras_type> (ras, bounds);     
             
       
@@ -2000,7 +2003,7 @@ private:  // private variables
   std::auto_ptr<PixelFormat> m_pixf;
   
   /// clipping rectangle
-  std::vector< geometry::Range2d<int> > _clipbounds;
+  ClipBounds _clipbounds;
   std::vector< geometry::Range2d<int>* > _clipbounds_selected;
   
   // this flag is set while a mask is drawn
