@@ -1695,6 +1695,14 @@ public:
     
 
 private:
+  
+  /// Set line and fill styles for mesh & line_strip rendering.
+  enum bitmap_wrap_mode
+  {
+    WRAP_REPEAT,
+    WRAP_CLAMP
+  };
+    
   Tesselator _tesselator;
   float _xscale;
   float _yscale;
