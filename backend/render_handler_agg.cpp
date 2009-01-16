@@ -368,26 +368,28 @@ private:
 class VideoRenderer
 {
 
-    typedef agg::span_allocator<agg::rgba8> SpanAllocatorType;
-    typedef agg::rasterizer_scanline_aa<> RasterizerType;
-
 public:
+
+    typedef agg::span_interpolator_linear<> Interpolator;
+    typedef agg::pixfmt_rgb24_pre BaseFormat;
+    typedef agg::span_allocator<agg::rgba8> SpanAllocator;
+    typedef agg::rasterizer_scanline_aa<> Rasterizer;
 
     VideoRenderer(const ClipBounds& clipbounds)
         :
         _clipbounds(clipbounds)
     {}
 
-    template<typename ScanlineType, typename SpanGenerator>
+    template<typename Scanline, typename SpanGenerator>
     void renderScanlines(agg::path_storage& path, renderer_base& rbase,
-            ScanlineType& sc, SpanGenerator& sg)
+            Scanline& sc, SpanGenerator& sg)
     {
         for (ClipBounds::const_iterator i = _clipbounds.begin(),
             e = _clipbounds.end(); i != e; ++i)
         {
 
             const ClipBounds::value_type& cb = *i;
-            apply_clip_box<RasterizerType> (_ras, cb);
+            apply_clip_box<Rasterizer> (_ras, cb);
 
             // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
             // path), so there should be no problem with multiple clipbounds.
@@ -399,8 +401,8 @@ public:
 
 private:
     
-    RasterizerType _ras;
-    SpanAllocatorType _sa;
+    Rasterizer _ras;
+    SpanAllocator _sa;
     const ClipBounds& _clipbounds;
 };    
                 
@@ -434,8 +436,6 @@ public:
         LOG_ONCE(log_error(_("Can't render videos with alpha")));
         return;
     }
-      
-    typedef agg::pixfmt_rgb24_pre baseformat;
 
     assert(frame->type() == GNASH_IMAGE_RGB);
     
@@ -443,41 +443,34 @@ public:
     mat.concatenate(*source_mat);
     
     // compute video scaling relative to video obejct size
-    double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->width();
-    double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->height();
+    double vscaleX = bounds->width() / static_cast<double>(frame->width());
+    double vscaleY = bounds->height() / static_cast<double>(frame->height());
     
-    // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to pixel coordinates
-    // while we're at it
-    agg::trans_affine img_mtx(
-      mat.sx  / 65536.0, mat.shx / 65536.0, 
-      mat.shy / 65536.0, mat.sy / 65536.0, 
-      mat.tx, mat.ty
-    );    
+    // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
+    // pixel coordinates while we're at it
+    agg::trans_affine img_mtx(mat.sx  / 65536.0, mat.shx / 65536.0, 
+      mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);    
     
     // invert SWFMatrix since this is used for the image source
     img_mtx.invert();
     
     // convert TWIPS to pixels and apply video scale
-    img_mtx *= agg::trans_affine_scaling(1.0/(20.0*vscaleX), 1.0/(20.0*vscaleY));
+    img_mtx *= agg::trans_affine_scaling(
+            1.0/vscaleX, 1.0/vscaleY);
     
-    typedef agg::span_interpolator_linear<> interpolator_type;
-    interpolator_type interpolator(img_mtx);
-    
-    // cloning image accessor is used to avoid disturbing pixels at the edges
-    // for rotated video. 
-    typedef agg::image_accessor_clone<baseformat> img_source_type;
+    typename VideoRenderer::Interpolator interpolator(img_mtx);
     
     // rendering buffer is used to access the frame pixels here        
     agg::rendering_buffer img_buf(frame->data(), frame->width(),
             frame->height(), frame->pitch());
          
-    baseformat img_pixf(img_buf);
+    typename VideoRenderer::BaseFormat img_pixf(img_buf);
     
+    // cloning image accessor is used to avoid disturbing pixels at the edges
+    // for rotated video. 
+    typedef agg::image_accessor_clone<typename VideoRenderer::BaseFormat> img_source_type;
     img_source_type img_src(img_pixf);
     
-    // renderer base for the stage buffer (not the frame image!)
-    renderer_base& rbase = *m_rbase;
-        
     
     // make a path for the video outline
     point a, b, c, d;
@@ -493,13 +486,19 @@ public:
     path.line_to(d.x, d.y);
     path.line_to(a.x, a.y);
 
+    // renderer base for the stage buffer (not the frame image!)
+    renderer_base& rbase = *m_rbase;
+    
     // nearest neighbor method for scaling
-    typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type>
+
+    typedef agg::span_image_filter_rgb_nn<img_source_type,
+            typename VideoRenderer::Interpolator>
       span_gen_type;
     span_gen_type sg(img_src, interpolator);
       
     VideoRenderer vr(_clipbounds);
 
+        
     if (m_alpha_mask.empty()) {
       // No mask active
       agg::scanline_u8 sl;
@@ -508,8 +507,8 @@ public:
     else {
     
         // Untested.
-        typedef agg::scanline_u8_am<agg::alpha_mask_gray8> ScanlineType;
-        ScanlineType sl(m_alpha_mask.back()->get_amask());
+        typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
+        Scanline sl(m_alpha_mask.back()->get_amask());
 
           vr.renderScanlines(path, rbase, sl, sg);
     } 
