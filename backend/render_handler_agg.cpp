@@ -345,73 +345,129 @@ class render_handler_agg : public render_handler_agg_base
 {
   
     typedef typename std::vector<geometry::Range2d<int> > ClipBounds;
-  
+    typedef typename std::vector<agg_alpha_mask*>  AlphaMasks;
 private:
-  typedef agg::renderer_base<PixelFormat> renderer_base;
+    typedef agg::renderer_base<PixelFormat> renderer_base;
 
-  // renderer base
-  std::auto_ptr<renderer_base> m_rbase;
-  
-  typedef agg::conv_stroke< agg::conv_curve< agg::path_storage > > stroke_type;
-  
-  // TODO: Change these!!
-  unsigned char *memaddr;
-  int memsize;
-  int xres;
-  int yres;
-  int bpp;  // bits per pixel
-  gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
-  bool scale_set;
+    // renderer base
+    std::auto_ptr<renderer_base> m_rbase;
+
+    typedef agg::conv_stroke< agg::conv_curve<agg::path_storage> > stroke_type;
+
+    // TODO: Change these!!
+    unsigned char *memaddr;
+    int memsize;
+    int xres;
+    int yres;
+    int bpp;  // bits per pixel
+    gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
+    bool scale_set;
 
 
-/// Class for rendering video frames.
-class VideoRenderer
-{
-
-public:
-
-    typedef agg::span_interpolator_linear<> Interpolator;
-    typedef agg::pixfmt_rgb24_pre BaseFormat;
-    typedef agg::span_allocator<agg::rgba8> SpanAllocator;
-    typedef agg::rasterizer_scanline_aa<> Rasterizer;
-
-    VideoRenderer(const ClipBounds& clipbounds)
-        :
-        _clipbounds(clipbounds)
-    {}
-
-    template<typename Scanline, typename SpanGenerator>
-    void renderScanlines(agg::path_storage& path, renderer_base& rbase,
-            Scanline& sc, SpanGenerator& sg)
+    /// Class for rendering video frames.
+    //
+    /// Templated functions are used to allow using different types,
+    /// particularly for high and low quality rendering. 
+    //
+    /// At present, this is bound to the renderer's ClipBounds. In future it
+    /// may be useful to pass BlendMode, Cxform, and custom clipbounds as well
+    /// as a caller-provided rendering buffer. This also applies to the 
+    /// rest of the renderer API.
+    class VideoRenderer
     {
-        for (ClipBounds::const_iterator i = _clipbounds.begin(),
-            e = _clipbounds.end(); i != e; ++i)
+
+    public:
+
+        /// Fixed types for video frame rendering.
+        typedef agg::span_interpolator_linear<> Interpolator;
+        typedef agg::pixfmt_rgb24_pre BaseFormat;
+        typedef agg::span_allocator<agg::rgba8> SpanAllocator;
+        typedef agg::rasterizer_scanline_aa<> Rasterizer;
+        typedef agg::image_accessor_clone<BaseFormat> Accessor;
+
+        /// Types used for different quality settings.
+        typedef typename agg::span_image_filter_rgb_nn<Accessor,
+                Interpolator> LowQualitySpanGenerator;
+
+        typedef typename agg::span_image_filter_rgb_bilinear<Accessor,
+                Interpolator> HighQualitySpanGenerator;
+
+        typedef agg::trans_affine Matrix;
+
+        VideoRenderer(const ClipBounds& clipbounds, GnashImage* frame,
+                Matrix& mat)
+            :
+            _buf(frame->data(), frame->width(), frame->height(),
+                    frame->pitch()),
+            _pixf(_buf),
+            _accessor(_pixf),
+            _interpolator(mat),
+            _clipbounds(clipbounds)
+        {}
+
+        /// Render a frame with or without alpha masks active.
+        template<typename SpanGenerator>
+        void
+        renderFrame(agg::path_storage& path, renderer_base& rbase,
+                const AlphaMasks& masks)
         {
+            SpanGenerator sg(_accessor, _interpolator);
+            if (masks.empty()) {
+                // No mask active
+                agg::scanline_u8 sl;
+                renderScanlines(path, rbase, sl, sg);
+            }
+            else {
+                // Untested.
+                typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
+                Scanline sl(masks.back()->get_amask());
+                renderScanlines(path, rbase, sl, sg);
+            }
+        } 
 
-            const ClipBounds::value_type& cb = *i;
-            apply_clip_box<Rasterizer> (_ras, cb);
+    private:
 
-            // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
-            // path), so there should be no problem with multiple clipbounds.
-            _ras.add_path(path);
+        template<typename Scanline, typename SpanGenerator>
+        void renderScanlines(agg::path_storage& path, renderer_base& rbase,
+                Scanline& sc, SpanGenerator& sg)
+        {
+            for (ClipBounds::const_iterator i = _clipbounds.begin(),
+                e = _clipbounds.end(); i != e; ++i)
+            {
 
-            agg::render_scanlines_aa(_ras, sc, rbase, _sa, sg);
+                const ClipBounds::value_type& cb = *i;
+                apply_clip_box<Rasterizer> (_ras, cb);
+
+                // <Udo>: AFAIK add_path() rewinds the vertex list (clears
+                // previous path), so there should be no problem with
+                // multiple clipbounds.
+                _ras.add_path(path);
+
+                agg::render_scanlines_aa(_ras, sc, rbase, _sa, sg);
+            }
         }
-    }
-
-private:
-    
-    Rasterizer _ras;
-    SpanAllocator _sa;
-    const ClipBounds& _clipbounds;
-};    
+        
+        // rendering buffer is used to access the frame pixels here        
+        agg::rendering_buffer _buf;
+        BaseFormat _pixf;
+        
+        // cloning image accessor is used to avoid disturbing pixels at
+        // the edges for rotated video. 
+        Accessor _accessor;
+             
+        Interpolator _interpolator;
+        
+        Rasterizer _ras;
+        SpanAllocator _sa;
+        const ClipBounds& _clipbounds;
+    };    
                 
 public:
 
-  gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_styleX_bitmap(), to set a
   // bitmap fill style.
+  gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
   {    
     return new agg_bitmap_info(im);
   }
@@ -420,15 +476,7 @@ public:
     const rect* bounds) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
-    
-    // TODO: Currently only nearest-neighbor scaling is implemented here, since
-    // it's the fastest and Flash apparently uses this method most of the time.
-    // It would be easy to add other scaling methods (bilinear, bicubic, 
-    // whatever), but we'd need some way to tell the renderer the desired
-    // quality.
-    
     // TODO: keep heavy instances alive accross frames for performance!
-    
     // TODO: Maybe implement specialization for 1:1 scaled videos
     
     if (frame->type() == GNASH_IMAGE_RGBA)
@@ -454,24 +502,13 @@ public:
     // invert SWFMatrix since this is used for the image source
     img_mtx.invert();
     
-    // convert TWIPS to pixels and apply video scale
-    img_mtx *= agg::trans_affine_scaling(
-            1.0/vscaleX, 1.0/vscaleY);
+    // Apply video scale
+    img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
     
-    typename VideoRenderer::Interpolator interpolator(img_mtx);
-    
-    // rendering buffer is used to access the frame pixels here        
-    agg::rendering_buffer img_buf(frame->data(), frame->width(),
-            frame->height(), frame->pitch());
-         
-    typename VideoRenderer::BaseFormat img_pixf(img_buf);
-    
-    // cloning image accessor is used to avoid disturbing pixels at the edges
-    // for rotated video. 
-    typedef agg::image_accessor_clone<typename VideoRenderer::BaseFormat> img_source_type;
-    img_source_type img_src(img_pixf);
-    
-    
+    // TODO: keep this alive and only image / matrix? I've no idea how
+    // much reallocation that would save.
+    VideoRenderer vr(_clipbounds, frame, img_mtx);
+
     // make a path for the video outline
     point a, b, c, d;
     mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
@@ -490,29 +527,19 @@ public:
     renderer_base& rbase = *m_rbase;
     
     // nearest neighbor method for scaling
-
-    typedef agg::span_image_filter_rgb_nn<img_source_type,
-            typename VideoRenderer::Interpolator>
-      span_gen_type;
-    span_gen_type sg(img_src, interpolator);
-      
-    VideoRenderer vr(_clipbounds);
-
-        
-    if (m_alpha_mask.empty()) {
-      // No mask active
-      agg::scanline_u8 sl;
-      vr.renderScanlines(path, rbase, sl, sg);
+    switch (_quality)
+    {
+        case QUALITY_HIGH:
+            typedef typename VideoRenderer::HighQualitySpanGenerator HSG;
+            vr.template renderFrame<HSG>(path, rbase, m_alpha_mask);
+            break;
+        case QUALITY_MEDIUM:
+        case QUALITY_LOW:
+            typedef typename VideoRenderer::LowQualitySpanGenerator LSG;
+            vr.template renderFrame<LSG>(path, rbase, m_alpha_mask);
+            break;
     }
-    else {
-    
-        // Untested.
-        typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
-        Scanline sl(m_alpha_mask.back()->get_amask());
-
-          vr.renderScanlines(path, rbase, sl, sg);
-    } 
-    
+        
   } // drawVideoFrame
 
   // Constructor
@@ -2007,7 +2034,7 @@ private:  // private variables
   bool m_drawing_mask; 
   
   // Alpha mask stack
-  std::vector< agg_alpha_mask* > m_alpha_mask;
+  AlphaMasks m_alpha_mask;
 };  // end class render_handler_agg
 
 
