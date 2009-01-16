@@ -386,7 +386,10 @@ private:
         typedef agg::rasterizer_scanline_aa<> Rasterizer;
         typedef agg::image_accessor_clone<BaseFormat> Accessor;
 
-        /// Types used for different quality settings.
+        /// Types used for different quality.
+        //
+        /// This (affects scaling) should probably only be used when
+        /// Video.smoothing is true.
         typedef typename agg::span_image_filter_rgb_nn<Accessor,
                 Interpolator> LowQualitySpanGenerator;
 

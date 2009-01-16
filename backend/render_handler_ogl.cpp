@@ -505,7 +505,7 @@ bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height)
 
 void
 bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
-                       render_handler::bitmap_wrap_mode wrap_mode)
+                       bitmap_wrap_mode wrap_mode)
 {
   glEnable(_ogl_img_type);
 
@@ -526,7 +526,7 @@ bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
   
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   
-  if (wrap_mode == render_handler::WRAP_CLAMP) {  
+  if (wrap_mode == WRAP_CLAMP) {  
     glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   } else {
@@ -1206,7 +1206,7 @@ public:
           bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.need_gradient_bitmap());       
           SWFMatrix m = style.getGradientMatrix();
           
-          binfo->apply(m, render_handler::WRAP_CLAMP); 
+          binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
           
           break;
         }        
@@ -1215,7 +1215,7 @@ public:
         {
           bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.get_bitmap_info());
 
-          binfo->apply(style.getBitmapMatrix(), render_handler::WRAP_REPEAT);
+          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_REPEAT);
           break;
         }
                 
@@ -1227,7 +1227,7 @@ public:
           
           assert(binfo);
 
-          binfo->apply(style.getBitmapMatrix(), render_handler::WRAP_CLAMP);
+          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_CLAMP);
           
           break;
         } 
@@ -1696,13 +1696,6 @@ public:
 
 private:
   
-  /// Set line and fill styles for mesh & line_strip rendering.
-  enum bitmap_wrap_mode
-  {
-    WRAP_REPEAT,
-    WRAP_CLAMP
-  };
-    
   Tesselator _tesselator;
   float _xscale;
   float _yscale;
