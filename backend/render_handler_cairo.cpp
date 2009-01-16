@@ -449,7 +449,8 @@ public:
     }
   }
 
-  virtual void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m, const rect* bounds)
+  virtual void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
+          const rect* bounds, bool /*smooth*/)
   {
 
     if (baseframe->type() == GNASH_IMAGE_RGBA)

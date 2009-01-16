@@ -148,12 +148,20 @@ private:
 class bitmap_info_ogl : public BitmapInfo
 {
   public:
+  
+    /// Set line and fill styles for mesh & line_strip rendering.
+    enum bitmap_wrap_mode
+    {
+      WRAP_REPEAT,
+      WRAP_CLAMP
+    };
+    
     bitmap_info_ogl(GnashImage* image, GLenum pixelformat,
                     bool ogl_accessible);
     ~bitmap_info_ogl();
 
     void apply(const gnash::SWFMatrix& bitmap_matrix,
-               render_handler::bitmap_wrap_mode wrap_mode);
+               bitmap_wrap_mode wrap_mode);
   private:
     inline bool ogl_accessible() const;
     void setup();    

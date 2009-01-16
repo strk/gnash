@@ -1004,8 +1004,13 @@ public:
   /// Default is a no-op. TextField implements this function.
   virtual void killFocus() {}
 
-  // TODO: make protected:
+  /// Getter-setter for _highquality.
+  static as_value highquality(const fn_call& fn);
 
+  /// Getter-setter for _quality.
+  static as_value quality(const fn_call& fn);
+
+  /// Getter-setter for blendMode.
   static as_value blendMode(const fn_call& fn);
 
   /// Getter-setter for _x

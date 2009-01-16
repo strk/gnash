@@ -174,7 +174,7 @@ AGG ressources
 #include "render_handler_agg_bitmap.h"
 #include "render_handler_agg_style.h"
 
-//#include <boost/foreach.hpp>
+#include <boost/scoped_array.hpp>
 
 #ifndef round
 	#define round(x) rint(x)
@@ -262,81 +262,76 @@ class agg_cache_manager : private render_cache_manager
 class agg_alpha_mask 
 {
 
-  typedef agg::renderer_base<agg::pixfmt_gray8> renderer_base;
-  typedef agg::alpha_mask_gray8 amask_type;
+    typedef agg::renderer_base<agg::pixfmt_gray8> renderer_base;
+    typedef agg::alpha_mask_gray8 amask_type;
 
 public:
 
-  agg_alpha_mask(int width, int height) :
-    m_rbuf(NULL, width, height, width),    // *
-    m_pixf(m_rbuf),
-    m_rbase(m_pixf),
-    m_amask(m_rbuf)
-  {
-  
-    // * = m_rbuf is first initialized with a NULL buffer so that m_pixf and
-    // m_rbase initialize with the correct buffer extents
-  
-    m_buffer = new boost::uint8_t[width*height];
-    
-    m_rbuf.attach(m_buffer, width, height, width);
-    
-    // NOTE: The buffer is *not* cleared. The clear() function must be called
-    // to clear the buffer (alpha=0). The reason is to avoid clearing the 
-    // whole mask when only a small portion is really used.
-
-  }
-  
-  ~agg_alpha_mask() 
-  {
-    delete [] m_buffer;
-  }
-  
-  void clear(const geometry::Range2d<int>& region)
-  {
-    if (region.isNull()) return;
-    assert ( region.isFinite() );
-
-    const agg::gray8 black(0);
-        
-    // region can't be world as it should be intersected with 
-    // the visible rect
-    assert (! region.isWorld() );
-
-    unsigned int left=region.getMinX();
-    unsigned int width=region.width()+1;
-
-    const unsigned int max_y = region.getMaxY();
-          for (unsigned int y=region.getMinY(); y<=max_y; ++y) 
+    agg_alpha_mask(int width, int height)
+        :
+        m_rbuf(0, width, height, width),
+        m_pixf(m_rbuf),
+        m_rbase(m_pixf),
+        m_amask(m_rbuf),
+        _buffer(new boost::uint8_t[width * height])
     {
-       m_pixf.copy_hline(left, y, width, black);
+        m_rbuf.attach(_buffer.get(), width, height, width);
+        
+        // NOTE: The buffer is *not* cleared. The clear() function must
+        // be called to clear the buffer (alpha=0). The reason is to avoid
+        // clearing the whole mask when only a small portion is really used.
     }
-  }
-  
-  renderer_base& get_rbase() {
-    return m_rbase;
-  }
-  
-  amask_type& get_amask() {
-    return m_amask;
-  }  
-  
-  
+    
+    ~agg_alpha_mask() 
+    {
+    }
+    
+    void clear(const geometry::Range2d<int>& region)
+    {
+        if (region.isNull()) return;
+        assert(region.isFinite());
+
+        const agg::gray8 black(0);
+                
+        // region can't be world as it should be intersected with 
+        // the visible rect
+        assert(!region.isWorld());
+
+        unsigned int left = region.getMinX();
+        unsigned int width = region.width() + 1;
+
+        const unsigned int max_y = region.getMaxY();
+        for (unsigned int y=region.getMinY(); y <= max_y; ++y) 
+        {
+             m_pixf.copy_hline(left, y, width, black);
+        }
+    }
+    
+    renderer_base& get_rbase() {
+        return m_rbase;
+    }
+    
+    amask_type& get_amask() {
+        return m_amask;
+    }    
+    
 private:
-  // in-memory buffer
-  boost::uint8_t* m_buffer;
-  
-  // agg class to access the buffer
-  agg::rendering_buffer m_rbuf;
-  
-  // pixel access
-  agg::pixfmt_gray8 m_pixf;  
-  
-  // renderer base
-  renderer_base m_rbase;
-  
-  // alpha mask
-  amask_type m_amask;
+
+    // agg class to access the buffer
+    agg::rendering_buffer m_rbuf;
+    
+    // pixel access
+    agg::pixfmt_gray8 m_pixf;    
+    
+    // renderer base
+    renderer_base m_rbase;
+    
+    // alpha mask
+    amask_type m_amask;
+    
+    // in-memory buffer
+    boost::scoped_array<boost::uint8_t> _buffer;
+    
 };
 
 
@@ -349,72 +344,143 @@ private:
 template <class PixelFormat>
 class render_handler_agg : public render_handler_agg_base
 {
+  
+    typedef typename std::vector<geometry::Range2d<int> > ClipBounds;
+    typedef typename std::vector<agg_alpha_mask*>  AlphaMasks;
 private:
-  typedef agg::renderer_base<PixelFormat> renderer_base;
+    typedef agg::renderer_base<PixelFormat> renderer_base;
 
-  // renderer base
-  std::auto_ptr<renderer_base> m_rbase;
-  
-  typedef agg::conv_stroke< agg::conv_curve< agg::path_storage > > stroke_type;
-  
-  // TODO: Change these!!
-  unsigned char *memaddr;
-  int memsize;
-  int xres;
-  int yres;
-  int bpp;  // bits per pixel
-  // double xscale, yscale;  <-- deprecated, to be removed
-  gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
-  bool scale_set;
-  
-  
+    // renderer base
+    std::auto_ptr<renderer_base> m_rbase;
+
+    typedef agg::conv_stroke< agg::conv_curve<agg::path_storage> > stroke_type;
+
+    // TODO: Change these!!
+    unsigned char *memaddr;
+    int memsize;
+    int xres;
+    int yres;
+    int bpp;  // bits per pixel
+    gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
+    bool scale_set;
 
 
+    /// Class for rendering video frames.
+    //
+    /// Templated functions are used to allow using different types,
+    /// particularly for high and low quality rendering. 
+    //
+    /// At present, this is bound to the renderer's ClipBounds. In future it
+    /// may be useful to pass BlendMode, Cxform, and custom clipbounds as well
+    /// as a caller-provided rendering buffer. This also applies to the 
+    /// rest of the renderer API.
+    class VideoRenderer
+    {
+
+    public:
+
+        /// Fixed types for video frame rendering.
+        typedef agg::span_interpolator_linear<> Interpolator;
+        typedef agg::pixfmt_rgb24_pre BaseFormat;
+        typedef agg::span_allocator<agg::rgba8> SpanAllocator;
+        typedef agg::rasterizer_scanline_aa<> Rasterizer;
+        typedef agg::image_accessor_clone<BaseFormat> Accessor;
+
+        /// Types used for different quality.
+        //
+        /// This (affects scaling) should probably only be used when
+        /// Video.smoothing is true.
+        typedef typename agg::span_image_filter_rgb_nn<Accessor,
+                Interpolator> LowQualitySpanGenerator;
+
+        typedef typename agg::span_image_filter_rgb_bilinear<Accessor,
+                Interpolator> HighQualitySpanGenerator;
+
+        typedef agg::trans_affine Matrix;
+
+        VideoRenderer(const ClipBounds& clipbounds, GnashImage* frame,
+                Matrix& mat)
+            :
+            _buf(frame->data(), frame->width(), frame->height(),
+                    frame->pitch()),
+            _pixf(_buf),
+            _accessor(_pixf),
+            _interpolator(mat),
+            _clipbounds(clipbounds)
+        {}
+
+        /// Render a frame with or without alpha masks active.
+        template<typename SpanGenerator>
+        void
+        renderFrame(agg::path_storage& path, renderer_base& rbase,
+                const AlphaMasks& masks)
+        {
+            SpanGenerator sg(_accessor, _interpolator);
+            if (masks.empty()) {
+                // No mask active
+                agg::scanline_u8 sl;
+                renderScanlines(path, rbase, sl, sg);
+            }
+            else {
+                // Untested.
+                typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
+                Scanline sl(masks.back()->get_amask());
+                renderScanlines(path, rbase, sl, sg);
+            }
+        } 
+
+    private:
+
+        template<typename Scanline, typename SpanGenerator>
+        void renderScanlines(agg::path_storage& path, renderer_base& rbase,
+                Scanline& sc, SpanGenerator& sg)
+        {
+            for (ClipBounds::const_iterator i = _clipbounds.begin(),
+                e = _clipbounds.end(); i != e; ++i)
+            {
+
+                const ClipBounds::value_type& cb = *i;
+                apply_clip_box<Rasterizer> (_ras, cb);
+
+                // <Udo>: AFAIK add_path() rewinds the vertex list (clears
+                // previous path), so there should be no problem with
+                // multiple clipbounds.
+                _ras.add_path(path);
+
+                agg::render_scanlines_aa(_ras, sc, rbase, _sa, sg);
+            }
+        }
+        
+        // rendering buffer is used to access the frame pixels here        
+        agg::rendering_buffer _buf;
+        BaseFormat _pixf;
+        
+        // cloning image accessor is used to avoid disturbing pixels at
+        // the edges for rotated video. 
+        Accessor _accessor;
+             
+        Interpolator _interpolator;
+        
+        Rasterizer _ras;
+        SpanAllocator _sa;
+        const ClipBounds& _clipbounds;
+    };    
+                
 public:
 
-  // Enable/disable antialiasing.
-  bool  m_enable_antialias;
-
-  // Output size.
-  float m_display_width;
-  float m_display_height;
-
-  void set_antialiased(bool enable) {
-    // enable=false *forces* all bitmaps to be rendered in low quality
-    m_enable_antialias = enable;
-  }
-
-  // Style state.
-  enum style_index
-  {
-    LEFT_STYLE = 0,
-    RIGHT_STYLE,
-    LINE_STYLE,
-    STYLE_COUNT
-  };
-
-
-  gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
   // Given an image, returns a pointer to a bitmap_info class
   // that can later be passed to fill_styleX_bitmap(), to set a
   // bitmap fill style.
+  gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
   {    
     return new agg_bitmap_info(im);
   }
 
   void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
-    const rect* bounds) {
+    const rect* bounds, bool smooth) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
-    
-    // TODO: Currently only nearest-neighbor scaling is implemented here, since
-    // it's the fastest and Flash apparently uses this method most of the time.
-    // It would be easy to add other scaling methods (bilinear, bicubic, 
-    // whatever), but we'd need some way to tell the renderer the desired
-    // quality.
-    
     // TODO: keep heavy instances alive accross frames for performance!
-    
     // TODO: Maybe implement specialization for 1:1 scaled videos
     
     if (frame->type() == GNASH_IMAGE_RGBA)
@@ -422,8 +488,6 @@ public:
         LOG_ONCE(log_error(_("Can't render videos with alpha")));
         return;
     }
-      
-    typedef agg::pixfmt_rgb24_pre baseformat;
 
     assert(frame->type() == GNASH_IMAGE_RGB);
     
@@ -431,52 +495,24 @@ public:
     mat.concatenate(*source_mat);
     
     // compute video scaling relative to video obejct size
-    double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->width();
-    double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->height();
+    double vscaleX = bounds->width() / static_cast<double>(frame->width());
+    double vscaleY = bounds->height() / static_cast<double>(frame->height());
     
-    // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to pixel coordinates
-    // while we're at it
-    agg::trans_affine img_mtx(
-      mat.sx  / 65536.0, mat.shx / 65536.0, 
-      mat.shy / 65536.0, mat.sy / 65536.0, 
-      mat.tx, mat.ty
-    );    
+    // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
+    // pixel coordinates while we're at it
+    agg::trans_affine img_mtx(mat.sx  / 65536.0, mat.shx / 65536.0, 
+      mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);    
     
     // invert SWFMatrix since this is used for the image source
     img_mtx.invert();
     
-    // convert TWIPS to pixels and apply video scale
-    img_mtx *= agg::trans_affine_scaling(1.0/(20.0*vscaleX), 1.0/(20.0*vscaleY));
+    // Apply video scale
+    img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
     
-    // span allocator is used to apply the SWFMatrix
-    agg::span_allocator<agg::rgba8> sa;
-        
-    typedef agg::span_interpolator_linear<> interpolator_type;
-    interpolator_type interpolator(img_mtx);
-    
-    // cloning image accessor is used to avoid disturbing pixels at the edges
-    // for rotated video. 
-    typedef agg::image_accessor_clone<baseformat> img_source_type;
-    
-    // rendering buffer is used to access the frame pixels here        
-    agg::rendering_buffer img_buf(frame->data(), frame->width(), frame->height(),
-      frame->pitch());
-         
-    baseformat img_pixf(img_buf);
-    
-    img_source_type img_src(img_pixf);
-    
-    // renderer base for the stage buffer (not the frame image!)
-    renderer_base& rbase = *m_rbase;
-        
-    // nearest neighbor method for scaling
-    typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type>
-      span_gen_type;
-    span_gen_type sg(img_src, interpolator);
-      
-    typedef agg::rasterizer_scanline_aa<> ras_type;
-    ras_type ras;
-    
+    // TODO: keep this alive and only image / matrix? I've no idea how
+    // much reallocation that would save.
+    VideoRenderer vr(_clipbounds, frame, img_mtx);
+
     // make a path for the video outline
     point a, b, c, d;
     mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
@@ -491,50 +527,21 @@ public:
     path.line_to(d.x, d.y);
     path.line_to(a.x, a.y);
 
-    if (m_alpha_mask.empty()) {
+    // renderer base for the stage buffer (not the frame image!)
+    renderer_base& rbase = *m_rbase;
     
-      // No mask active
-
-      agg::scanline_u8 sl;
-  
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {    
-      
-        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
-        apply_clip_box<ras_type> (ras, cbounds);
-  
-        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
-        // path), so there should be no problem with multiple clipbounds.      
-        ras.add_path(path);     
-           
-        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
-      }
-      
-    } else {
-    
-      // Mask is active!
-      
-      // **** UNTESTED!!! ****
-      
-      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
-      scanline_type sl(m_alpha_mask.back()->get_amask());
-  
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {    
-      
-        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
-        apply_clip_box<ras_type> (ras, cbounds);
-  
-        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
-        // path), so there should be no problem with multiple clipbounds.      
-        ras.add_path(path);     
-           
-        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
-      }
-      
-    
-    } // if alpha mask
-    
-  } // drawVideoFrame
-  
+    // If smoothing is requested and _quality is set to HIGH or BEST,
+    // use high-quality interpolation.
+    if (smooth && _quality >= QUALITY_HIGH) {
+        typedef typename VideoRenderer::HighQualitySpanGenerator HSG;
+        vr.template renderFrame<HSG>(path, rbase, m_alpha_mask);
+    }
+    else {
+        typedef typename VideoRenderer::LowQualitySpanGenerator LSG;
+        vr.template renderFrame<LSG>(path, rbase, m_alpha_mask);
+    }
+        
+  } 
 
   // Constructor
   render_handler_agg(int bits_per_pixel)
@@ -548,7 +555,6 @@ public:
       /*xscale(1.0/20.0),
       yscale(1.0/20.0),*/
       scale_set(false),
-      m_enable_antialias(true),
       m_display_width(0.0),
       m_display_height(0.0),
       m_drawing_mask(false)
@@ -665,7 +671,7 @@ public:
   }
 
   template <class ras_type>
-  void apply_clip_box(ras_type& ras, 
+  static void apply_clip_box(ras_type& ras, 
     const geometry::Range2d<int>& bounds)
   {
     assert(bounds.isFinite());
@@ -678,9 +684,9 @@ public:
 
 
   
-  void  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
-                  const SWFMatrix& line_mat)
   // Draw the line strip formed by the sequence of points.
+  void draw_line_strip(const boost::int16_t* coords, int vertex_count,
+          const rgba& color, const SWFMatrix& line_mat)
   {
     assert(m_pixf.get());
 
@@ -728,7 +734,7 @@ public:
       
       for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
       
-        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+        const ClipBounds::value_type& bounds = _clipbounds[cno];
               
         apply_clip_box<ras_type> (ras, bounds);
         
@@ -752,7 +758,7 @@ public:
       
       for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
       
-        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+        const ClipBounds::value_type& bounds = _clipbounds[cno];
               
         apply_clip_box<ras_type> (ras, bounds);
         
@@ -1312,8 +1318,9 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
           sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
-            (fill_type==SWF::FILL_TILED_BITMAP) || (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && m_enable_antialias);
+            (fill_type==SWF::FILL_TILED_BITMAP) ||
+            (fill_type==SWF::FILL_TILED_BITMAP_HARD),
+            smooth && _quality <= QUALITY_MEDIUM);
           break;
         } 
 
@@ -1581,7 +1588,6 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
     // now render that thing!
     agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
-    //agg::render_scanlines(rasc, sl, ren_sl);
         
   } // draw_mask_shape
 
@@ -1794,7 +1800,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     // iterate through clipping bounds
     for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
     
-      const geometry::Range2d<int>& bounds = _clipbounds[cno];         
+      const ClipBounds::value_type& bounds = _clipbounds[cno];         
       apply_clip_box<ras_type> (ras, bounds);     
             
       
@@ -2012,19 +2018,23 @@ private:  // private methods
   
 private:  // private variables
 
+  // Output size.
+  float m_display_width;
+  float m_display_height;
+
   agg::rendering_buffer m_rbuf;  
 
   std::auto_ptr<PixelFormat> m_pixf;
   
   /// clipping rectangle
-  std::vector< geometry::Range2d<int> > _clipbounds;
+  ClipBounds _clipbounds;
   std::vector< geometry::Range2d<int>* > _clipbounds_selected;
   
   // this flag is set while a mask is drawn
   bool m_drawing_mask; 
   
   // Alpha mask stack
-  std::vector< agg_alpha_mask* > m_alpha_mask;
+  AlphaMasks m_alpha_mask;
 };  // end class render_handler_agg
 
 
