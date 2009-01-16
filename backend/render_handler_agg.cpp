@@ -477,7 +477,7 @@ public:
   }
 
   void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
-    const rect* bounds) {
+    const rect* bounds, bool smooth) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
     // TODO: keep heavy instances alive accross frames for performance!
@@ -530,22 +530,18 @@ public:
     // renderer base for the stage buffer (not the frame image!)
     renderer_base& rbase = *m_rbase;
     
-    // nearest neighbor method for scaling
-    switch (_quality)
-    {
-        case QUALITY_BEST:
-        case QUALITY_HIGH:
-            typedef typename VideoRenderer::HighQualitySpanGenerator HSG;
-            vr.template renderFrame<HSG>(path, rbase, m_alpha_mask);
-            break;
-        case QUALITY_MEDIUM:
-        case QUALITY_LOW:
-            typedef typename VideoRenderer::LowQualitySpanGenerator LSG;
-            vr.template renderFrame<LSG>(path, rbase, m_alpha_mask);
-            break;
+    // If smoothing is requested and _quality is set to HIGH or BEST,
+    // use high-quality interpolation.
+    if (smooth && _quality >= QUALITY_HIGH) {
+        typedef typename VideoRenderer::HighQualitySpanGenerator HSG;
+        vr.template renderFrame<HSG>(path, rbase, m_alpha_mask);
+    }
+    else {
+        typedef typename VideoRenderer::LowQualitySpanGenerator LSG;
+        vr.template renderFrame<LSG>(path, rbase, m_alpha_mask);
     }
         
-  } // drawVideoFrame
+  } 
 
   // Constructor
   render_handler_agg(int bits_per_pixel)
@@ -1592,7 +1588,6 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
     // now render that thing!
     agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
-    //agg::render_scanlines(rasc, sl, ren_sl);
         
   } // draw_mask_shape
 

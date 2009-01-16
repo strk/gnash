@@ -87,8 +87,12 @@ namespace render
 	}
 
 	// Draws the video frames
-	void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds){
-		if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);
+	void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
+            const rect* bounds, bool smooth)
+    {
+		if (s_render_handler) {
+            return s_render_handler->drawVideoFrame(frame, mat, bounds, smooth);
+        }
 	}
 
 

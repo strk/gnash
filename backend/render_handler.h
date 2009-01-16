@@ -257,8 +257,8 @@ public:
     ///   The width and height determine the size of the Flash video instance
     ///   on the stage (in TWIPS) prior to SWFMatrix transformations.         
     ///
-    virtual void drawVideoFrame(GnashImage* frame,
-                    const SWFMatrix* mat, const rect* bounds) = 0;
+    virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
+            const rect* bounds, bool smooth) = 0;
 
     /// Draw a line-strip directly, using a thin, solid line.
     //

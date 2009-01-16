@@ -60,7 +60,8 @@ Video::Video(SWF::DefineVideoStreamTag* def,
 	_ns(0),
 	_embeddedStream(m_def ? true : false),
 	_lastDecodedVideoFrameNum(-1),
-	_lastDecodedVideoFrame()
+	_lastDecodedVideoFrame(),
+    _smoothing(false)
 {
 
 	set_prototype(getVideoInterface(*this));
@@ -144,7 +145,7 @@ Video::display()
 	GnashImage* img = getVideoFrame();
 	if (img)
 	{
-		gnash::render::drawVideoFrame(img, &m, &bounds);
+		gnash::render::drawVideoFrame(img, &m, &bounds, _smoothing);
 	}
 
 	clear_invalidated();
@@ -460,9 +461,13 @@ as_value
 video_smoothing(const fn_call& fn)
 {
 	boost::intrusive_ptr<Video> video = ensureType<Video>(fn.this_ptr);
-    UNUSED(video);
 
-    log_unimpl("Video.smoothing");
+    if (!fn.nargs) return as_value(video->smoothing());
+
+    bool smooth = fn.arg(0).to_bool();
+
+    video->setSmoothing(smooth);
+
     return as_value();
 }
 

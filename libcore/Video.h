@@ -99,6 +99,12 @@ public:
     /// vary during playback.
     int width() const;
 
+    /// Whether this Video object should request smoothing when scaled.
+    bool smoothing() const { return _smoothing; }
+
+    /// Set whether smoothing is required.
+    void setSmoothing(bool b) { _smoothing = b; }
+
 protected:
 
 #ifdef GNASH_USE_GC
@@ -136,6 +142,9 @@ private:
 
 	/// The decoder used to decode the video frames
 	std::auto_ptr<media::VideoDecoder> _decoder;
+
+    /// Whether to request smoothing when the video is scaled
+    bool _smoothing;
 };
 
 void video_class_init(as_object& global);

@@ -57,7 +57,8 @@ namespace gnash {
 		BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im);
 
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
-		void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds);
+		void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
+                const rect* bounds, bool smooth);
 
 		/// See render_handler::begin_display (in backend/render_handler.h)
 		void	begin_display(
