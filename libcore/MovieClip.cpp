@@ -5206,25 +5206,6 @@ movieclip_url_getset(const fn_call& fn)
     return as_value(ptr->get_movie_definition()->get_url());
 }
 
-as_value
-movieclip_highquality_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // We don't support quality settings
-        return as_value(true);
-    }
-    else // setter
-    {
-        LOG_ONCE( log_unimpl("MovieClip._highquality setting") );
-    }
-    return as_value();
-}
-
 // TODO: move this to character class, _focusrect seems a generic property
 as_value
 movieclip_focusrect_getset(const fn_call& fn)
@@ -5399,7 +5380,7 @@ attachMovieClipProperties(character& o)
     gettersetter = movieclip_url_getset;
     o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
 
-    gettersetter = movieclip_highquality_getset;
+    gettersetter = character::highquality;
     o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
 
     gettersetter = movieclip_focusrect_getset;

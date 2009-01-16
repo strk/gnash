@@ -529,6 +529,7 @@ public:
     // nearest neighbor method for scaling
     switch (_quality)
     {
+        case QUALITY_BEST:
         case QUALITY_HIGH:
             typedef typename VideoRenderer::HighQualitySpanGenerator HSG;
             vr.template renderFrame<HSG>(path, rbase, m_alpha_mask);
@@ -683,9 +684,9 @@ public:
 
 
   
-  void  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
-                  const SWFMatrix& line_mat)
   // Draw the line strip formed by the sequence of points.
+  void draw_line_strip(const boost::int16_t* coords, int vertex_count,
+          const rgba& color, const SWFMatrix& line_mat)
   {
     assert(m_pixf.get());
 
@@ -1319,7 +1320,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && _quality != QUALITY_LOW);
+            smooth && _quality <= QUALITY_MEDIUM);
           break;
         } 
 

@@ -127,6 +127,8 @@ movie_root::movie_root(const movie_definition& def,
 	_movieAdvancementDelay(83), // ~12 fps by default
 	_lastMovieAdvancement(0)
 {
+    // This takes care of informing the renderer (if present) too.
+    setQuality(render_handler::QUALITY_HIGH);
 }
 
 void
@@ -1431,6 +1433,14 @@ movie_root::isMouseOverActiveEntity() const
     else {
         return true;
     }
+}
+
+void
+movie_root::setQuality(render_handler::Quality q)
+{
+    _quality = q;
+    render_handler* renderer = get_render_handler();
+    if (renderer) renderer->setQuality(_quality);
 }
 
 /// Get actionscript width of stage, in pixels. The width

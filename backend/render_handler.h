@@ -149,7 +149,6 @@
 #include "generic_character.h"
 #include "Range2d.h"
 
-
 // Forward declarations.
 namespace gnash {
     class BitmapInfo;
@@ -193,11 +192,14 @@ class DSOEXPORT render_handler
 {
 public:
 
+    /// The display quality.
+    //
     enum Quality
     {
         QUALITY_LOW,
         QUALITY_MEDIUM,
-        QUALITY_HIGH
+        QUALITY_HIGH,
+        QUALITY_BEST
     };
 
     render_handler()
@@ -218,9 +220,6 @@ public:
     virtual void set_translation(float /*xoff*/, float /*yoff*/) {}
 
     void setQuality(Quality q) { _quality = q; }
-
-    Quality getQuality() const { return _quality; }
-
         
     /// ==================================================================
     /// Caching utitilies for core.
@@ -626,6 +625,7 @@ protected:
 
     } 
 
+    /// Kept in parallel with movie_root's setting.
     Quality _quality;
 
 }; // class render_handler

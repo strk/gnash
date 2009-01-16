@@ -262,6 +262,51 @@ character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 //---------------------------------------------------------------------
 
 as_value
+character::highquality(const fn_call& fn)
+{
+    boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
+
+    movie_root& mr = ptr->getVM().getRoot();
+    
+    if (!fn.nargs)
+    {
+        switch (mr.getQuality())
+        {
+            case render_handler::QUALITY_BEST:
+                return as_value(2.0);
+            case render_handler::QUALITY_HIGH:
+                return as_value(1.0);
+            case render_handler::QUALITY_MEDIUM:
+            case render_handler::QUALITY_LOW:
+                return as_value(0.0);
+        }
+    }
+    
+    double q = fn.arg(0).to_number();
+
+    if (q < 0) mr.setQuality(render_handler::QUALITY_HIGH);
+    else if (q > 2) mr.setQuality(render_handler::QUALITY_BEST);
+    else {
+        int i = static_cast<int>(q);
+        switch(i)
+        {
+            case 0:
+                mr.setQuality(render_handler::QUALITY_LOW);
+                break;
+            case 1:
+                mr.setQuality(render_handler::QUALITY_HIGH);
+                break;
+            case 2:
+                mr.setQuality(render_handler::QUALITY_BEST);
+                break;
+        }
+    }
+
+    return as_value();
+}
+
+
+as_value
 character::x_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
