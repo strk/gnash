@@ -468,8 +468,6 @@ video_smoothing(const fn_call& fn)
 
     if (!fn.nargs) return as_value(video->smoothing());
 
-    log_debug("Video.smoothing(%s): TESTING", fn.arg(0));
-
     bool smooth = fn.arg(0).to_bool();
 
     video->setSmoothing(smooth);
