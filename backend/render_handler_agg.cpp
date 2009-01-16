@@ -317,9 +317,6 @@ public:
     
 private:
 
-    // in-memory buffer
-    boost::scoped_array<boost::uint8_t> _buffer;
-    
     // agg class to access the buffer
     agg::rendering_buffer m_rbuf;
     
@@ -331,6 +328,10 @@ private:
     
     // alpha mask
     amask_type m_amask;
+    
+    // in-memory buffer
+    boost::scoped_array<boost::uint8_t> _buffer;
+    
 };
 
 

@@ -262,6 +262,50 @@ character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 //---------------------------------------------------------------------
 
 as_value
+character::quality(const fn_call& fn)
+{
+    boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
+
+    movie_root& mr = ptr->getVM().getRoot();
+
+    if (!fn.nargs)
+    {
+        switch (mr.getQuality())
+        {
+            case render_handler::QUALITY_BEST:
+                return as_value("BEST");
+            case render_handler::QUALITY_HIGH:
+                return as_value("HIGH");
+            case render_handler::QUALITY_MEDIUM:
+                return as_value("MEDIUM");
+            case render_handler::QUALITY_LOW:
+                return as_value("LOW");
+        }
+    }
+
+    /// Setter
+
+    if (!fn.arg(0).is_string()) return as_value();
+
+    const std::string& q = fn.arg(0).to_string();
+
+    StringNoCaseEqual noCaseCompare;
+
+    if (noCaseCompare(q, "BEST")) mr.setQuality(render_handler::QUALITY_BEST);
+    else if (noCaseCompare(q, "HIGH")) {
+        mr.setQuality(render_handler::QUALITY_HIGH);
+    }
+    else if (noCaseCompare(q, "MEDIUM")) {
+        mr.setQuality(render_handler::QUALITY_MEDIUM);
+    }
+    else if (noCaseCompare(q, "LOW")) {
+            mr.setQuality(render_handler::QUALITY_LOW);
+    }
+
+    return as_value();
+}
+
+as_value
 character::highquality(const fn_call& fn)
 {
     boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);

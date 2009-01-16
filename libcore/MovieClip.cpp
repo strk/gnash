@@ -5380,6 +5380,9 @@ attachMovieClipProperties(character& o)
     gettersetter = movieclip_url_getset;
     o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
 
+    gettersetter = character::quality;
+    o.init_property(NSV::PROP_uQUALITY, gettersetter, gettersetter);
+    
     gettersetter = character::highquality;
     o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
 
