@@ -1078,7 +1078,7 @@ RTMP::recvMsg(int fd)
 	    buf.reset();
 	    break;
 	}
-    } while (ret);
+    } while (ret <= 0);
     
 //     if (netDebug()) {
 // 	buf->dump();
