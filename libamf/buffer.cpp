@@ -200,6 +200,7 @@ Buffer &
 Buffer::copy(boost::uint8_t *data, size_t nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
+    _seekptr =_data.get();
     if (_data) {
 	std::copy(data, data + nbytes, _data.get());
 	_seekptr = _data.get() + nbytes;
@@ -503,6 +504,7 @@ Buffer &
 Buffer::operator=(boost::uint8_t byte)
 {
 //    GNASH__FUNCTION;
+   
     return copy(&byte, 1);
 }
 
