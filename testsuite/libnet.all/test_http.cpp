@@ -363,25 +363,34 @@ tests()
 
 // User Agent: Lynx/2.8.6rel.2 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.8b
 
-#if 0
     boost::uint8_t *field1 = (boost::uint8_t *)"GET /index.html HTTP/1.1";
     HTTP http1;
-    http1.extractMethod(field1);
-    if ((http1.keepAlive() == true) && (http1.getVersion()->minor == 1)) {
-        runtest.pass ("HTTP::extractMethod(HTTP/1.1)");
+    http1.extractCommand(field1);
+    if ((http1.getVersion()->minor == 1) && (http1.getFilespec() == "/index.html")) {
+        runtest.pass ("HTTP::extractCommand(HTTP/1.1)");
     } else {
-        runtest.fail ("HTTP::extractMethod(HTTP/1.1)");
+        runtest.fail ("HTTP::extractCommand(HTTP/1.1)");
     }
 
     boost::uint8_t *field2 = (boost::uint8_t *)"GET /index.html HTTP/1.0";
     HTTP http2;
-    http2.extractMethod(field2);
-    if ((http2.keepAlive() == false) && (http2.getVersion()->minor == 0)) {
-        runtest.pass ("HTTP::extractMethod(HTTP/1.0)");
+    http2.extractCommand(field2);
+    if ((http1.getVersion()->minor == 0) && (http1.getFilespec() == "/index.html")) {
+        runtest.pass ("HTTP::extractCommand(HTTP/1.0)");
     } else {
-        runtest.fail ("HTTP::extractMethod(HTTP/1.0)");
+        runtest.fail ("HTTP::extractCommand(HTTP/1.0)");
     }
 
+    boost::uint8_t *field3 = (boost::uint8_t *)"GET /software/gnash/tests/flvplayer.swf?file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv HTTP/1.1\r\n";
+    HTTP http3;
+    http3.extractCommand(field3);
+    if ((http1.getVersion()->minor == 1) && (http1.getFilespec() == "/software/gnash/tests/flvplayer.swf") && (http1.getParams() == "file=http://localhost/software/gnash/tests/Ouray_Ice_Festival_Climbing_Competition.flv")) {
+        runtest.pass ("HTTP::extractCommand(params)");
+    } else {
+        runtest.fail ("HTTP::extractCommand(params)");
+    }
+
+#if 0
     boost::uint8_t *field3 = (boost::uint8_t *) "Keep-Alive: 300";
     HTTP http3;
     http3.extractKeepAlive(field3);
@@ -415,7 +424,7 @@ tests()
 "Content-Language: en-US,en;q=0.9\r\n"
 "Content-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1\r\n"
 "Content-Encoding: deflate, gzip, x-gzip, identity, *;q=0\r\n";
-//    http.extractMethod(buffer);
+//    http.extractCommand(buffer);
     string result;
     result = http.extractReferer(buffer);
     if (result == "http://localhost/software/gnash/tests/index.html") {
