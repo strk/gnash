@@ -183,7 +183,7 @@ HTTP::processClientRequest(int fd)
 	return _cmd;
     } else {
 	return HTTP::HTTP_NONE;
-    }
+   }
 }
 
 // A GET request asks the server to send a file to the client
@@ -1302,7 +1302,7 @@ HTTP::extractRTMPT(boost::uint8_t *data)
 HTTP::http_method_e
 HTTP::extractCommand(boost::uint8_t *data)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
 //    string body = reinterpret_cast<const char *>(data);
     HTTP::http_method_e cmd = HTTP::HTTP_NONE;
@@ -1335,9 +1335,16 @@ HTTP::extractCommand(boost::uint8_t *data)
     if (cmd != HTTP::HTTP_NONE) {
 	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
 	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
-	
-    // This is fine as long as end is within the buffer.
-    _filespec = std::string(start, end);
+	boost::uint8_t *params = std::find(start, end, '?');
+// 	cerr << "FIXME1: " << (const char *)params << endl;
+// 	cerr << "FIXME2: " << (const char *)start << endl;
+// 	cerr << "FIXME3: " << (const char *)end << endl;
+	if (params != end+1) {
+	    _params = std::string(params, end);
+	    end = params;
+	}
+	// This is fine as long as end is within the buffer.
+	_filespec = std::string(start, end);
     }
     
     return cmd;
