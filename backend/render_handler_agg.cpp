@@ -373,6 +373,52 @@ private:
     
 };
 
+template<typename PixelFormat>
+class LineRenderer
+{
+public:
+    typedef agg::renderer_base<PixelFormat> BaseRenderer;
+    typedef agg::renderer_scanline_aa_solid<BaseRenderer> Renderer;
+    typedef agg::rasterizer_scanline_aa<> Rasterizer;
+    typedef agg::conv_stroke<agg::path_storage> Stroke;
+
+    LineRenderer(const ClipBounds& clipbounds, BaseRenderer& baseRenderer)
+        :
+        _clipbounds(clipbounds),
+        _renderer(baseRenderer)
+    {}
+
+    template<typename ScanLine>
+    void render(ScanLine& sl, Stroke& stroke, const rgba& color)
+    {
+        for (ClipBounds::const_iterator i = _clipbounds.begin(),
+                e = _clipbounds.end(); i != e; ++i) {
+
+            const ClipBounds::value_type& bounds = *i;
+              
+            applyClipBox<Rasterizer> (_ras, bounds);
+
+            // The vectorial pipeline
+            _ras.add_path(stroke);
+
+            // Set the color and render the scanlines
+            _renderer.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+
+            agg::render_scanlines(_ras, sl, _renderer);
+
+        }
+    }
+
+    void operator() () {}
+
+private:
+
+    const ClipBounds& _clipbounds;
+    Rasterizer _ras;
+    Renderer _renderer;
+
+};
+
 /// Class for rendering video frames.
 //
 /// Templated functions are used to allow using different types,
@@ -436,7 +482,7 @@ public:
         _smoothing = b;
     }
 
-    void renderFrame(agg::path_storage& path, Renderer& rbase,
+    void render(agg::path_storage& path, Renderer& rbase,
             const AlphaMasks& masks)
     {
         switch (_quality)
@@ -599,7 +645,7 @@ public:
         
         // If smoothing is requested and _quality is set to HIGH or BEST,
         // use high-quality interpolation.
-        vr.renderFrame(path, rbase, _alphaMasks);
+        vr.render(path, rbase, _alphaMasks);
                 
     } 
 
@@ -718,97 +764,61 @@ public:
     }
 
   
-  // Draw the line strip formed by the sequence of points.
-  void draw_line_strip(const boost::int16_t* coords, int vertex_count,
-          const rgba& color, const SWFMatrix& line_mat)
-  {
-    assert(m_pixf.get());
 
-    SWFMatrix mat = stage_matrix;
-    mat.concatenate(line_mat);    
+    // Draw the line strip formed by the sequence of points.
+    void drawLine(const std::vector<point>& coords, const rgba& color,
+            const SWFMatrix& line_mat)
+    {
 
-    if ( _clipbounds.empty() ) return;
-
-    point pnt;
-    
-    renderer_base& rbase = *m_rbase;
-    
-    typedef agg::rasterizer_scanline_aa<> ras_type;
-    ras_type ras;    
-
-    // TODO: avoid reconstructing scanline_aa_solid ?
-    agg::renderer_scanline_aa_solid<
-      agg::renderer_base<PixelFormat> > ren_sl(rbase);
-      
-    // -- create path --
-    agg::path_storage path;
-    agg::conv_stroke<agg::path_storage> stroke(path);
-    stroke.width(1);
-    stroke.line_cap(agg::round_cap);
-    stroke.line_join(agg::round_join);
-    path.remove_all(); // Not obligatory in this case
-
-    const boost::int16_t *vertex = coords;
-    
-    mat.transform(&pnt, point(vertex[0], vertex[1]));
-    path.move_to(pnt.x, pnt.y);
-
-    for (vertex += 2; vertex_count > 1; --vertex_count, vertex += 2) {
-      mat.transform(&pnt, point(vertex[0], vertex[1]));
-      path.line_to(pnt.x, pnt.y);
-    }
-    
-    // -- render --
-    
-    if (_alphaMasks.empty()) {
-    
-      // No mask active
-      
-      agg::scanline_p8 sl;      
-      
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
-      
-        const ClipBounds::value_type& bounds = _clipbounds[cno];
-              
-        applyClipBox<ras_type> (ras, bounds);
+        assert(m_pixf.get());
         
-        // The vectorial pipeline
-        ras.add_path(stroke);
-    
-        // Set the color and render the scanlines
-        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-        
-        agg::render_scanlines(ras, sl, ren_sl);     
-        
-      }
-      
-    } else {
-    
-      // Mask is active!
+        if (_clipbounds.empty()) return;
+        if (coords.empty()) return;
 
-      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type;
-      
-      sl_type sl(_alphaMasks.back()->getMask());      
-      
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
-      
-        const ClipBounds::value_type& bounds = _clipbounds[cno];
-              
-        applyClipBox<ras_type> (ras, bounds);
-        
-        // The vectorial pipeline
-        ras.add_path(stroke);
-    
-        // Set the color and render the scanlines
-        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-        
-        agg::render_scanlines(ras, sl, ren_sl);     
-        
-      }
-    
-    }
+        SWFMatrix mat = stage_matrix;
+        mat.concatenate(line_mat);    
 
-  } // draw_line_strip
+        LineRenderer<PixelFormat> lr(_clipbounds, *m_rbase);
+
+        // -- create path --
+        agg::path_storage path;
+
+        typename LineRenderer<PixelFormat>::Stroke stroke(path);
+        stroke.width(1);
+        stroke.line_cap(agg::round_cap);
+        stroke.line_join(agg::round_join);
+
+        typedef std::vector<point> Points;
+        
+        // We've asserted that it has at least one element.
+        Points::const_iterator i = coords.begin();
+
+        point pnt;
+
+        mat.transform(&pnt, *i);
+        path.move_to(pnt.x, pnt.y);
+
+        ++i;
+
+        for (const Points::const_iterator e = coords.end(); i != e; ++i)
+        {
+            mat.transform(&pnt, *i);
+            path.line_to(pnt.x, pnt.y);
+        }
+
+        if (_alphaMasks.empty()) {
+            // No mask active
+            agg::scanline_p8 sl;      
+            lr.render(sl, stroke, color);
+        }
+        else {
+            // Mask is active!
+            typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type;
+            sl_type sl(_alphaMasks.back()->getMask());      
+            lr.render(sl, stroke, color);
+        }
+
+    } 
 
 
     void begin_submit_mask()
@@ -842,8 +852,22 @@ public:
   void draw_glyph(shape_character_def *def,
       const SWFMatrix& mat, const rgba& color) 
   {
+    
+    // select relevant clipping bounds
+    if (def->get_bound().is_null()) select_all_clipbounds();
+    else select_clipbounds(def, mat);
+    
+    if (_clipbounds_selected.empty()) return; 
+      
     GnashPaths paths;
     apply_matrix_to_path(def->get_paths(), paths, mat);
+
+    // If it's a mask, we don't need the rest.
+    if (m_drawing_mask) {
+      draw_mask_shape(paths, false);
+      return;
+    }
+
     // convert gnash paths to agg paths.
     std::vector<agg::path_storage> agg_paths;    
     buildPaths(agg_paths, paths);
@@ -855,20 +879,7 @@ public:
     agg_style_handler sh;
     build_agg_styles(sh, m_single_fill_styles, mat, m_neutral_cxform);
     
-    // select relevant clipping bounds
-    if (def->get_bound().is_null())   // can happen (spaces? to be investigated..)
-      select_all_clipbounds();
-    else
-      select_clipbounds(def, mat);
-    
-    
-    if (_clipbounds_selected.empty()) return; // nothing to draw
-      
-    // draw the shape
-    if (m_drawing_mask)
-      draw_mask_shape(paths, false);
-    else
-      draw_shape(-1, paths, agg_paths, sh, false);
+    draw_shape(-1, paths, agg_paths, sh, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
     

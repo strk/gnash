@@ -44,10 +44,12 @@
 #include "TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
+#include "Point2d.h"
 
 #include <algorithm> // std::min
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/list_of.hpp>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
@@ -290,13 +292,11 @@ TextField::show_cursor(const SWFMatrix& mat)
     boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
     boost::uint16_t h = getFontHeight();
 
-    boost::int16_t box[4];
-    box[0] = x;
-    box[1] = y;
-    box[2] = x;
-    box[3] = y + h;
+    const std::vector<point> box = boost::assign::list_of
+        (point(x, y))
+        (point(x, y + h));
     
-    render::draw_line_strip(box, 2, rgba(0,0,0,255), mat);    // draw line
+    render::drawLine(box, rgba(0,0,0,255), mat);
 }
 
 void

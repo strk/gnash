@@ -71,8 +71,8 @@ namespace gnash {
 		void	end_display();
 
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
-		void	draw_line_strip(const boost::int16_t coords[],
-				int vertex_count, const rgba& color, const SWFMatrix& mat);
+		void drawLine(const std::vector<point>& coords, const rgba& color,
+                const SWFMatrix& mat);
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)
 		DSOEXPORT void  draw_poly(const point* corners, int corner_count,

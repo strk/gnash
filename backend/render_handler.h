@@ -263,7 +263,7 @@ public:
     /// @color the color to be used to draw the line strip.
     ///
     /// @mat the SWFMatrix to be used to transform the vertices.
-    virtual void draw_line_strip(const boost::int16_t* coords, int vertex_count,
+    virtual void drawLine(const std::vector<point>& coords,
             const rgba& color, const SWFMatrix& mat) = 0;
         
     /// Draw a simple, solid filled polygon with a thin (~1 pixel) outline.

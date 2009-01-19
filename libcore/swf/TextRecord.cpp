@@ -27,6 +27,7 @@
 #include "fill_style.h"
 #include "Font.h"
 
+#include <boost/assign/list_of.hpp>
 #include <vector>
 
 namespace gnash {
@@ -223,16 +224,13 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
                 //       square is not hard-coded anymore but can be
                 //       queried from the font class
                 //
-                static const boost::int16_t s_empty_char_box[5 * 2] =
-                {
-                     32,   32,
-                    480,   32,
-                    480, -656,
-                     32, -656,
-                     32,   32
-                };
-                render::draw_line_strip(s_empty_char_box, 5,
-                        textColor, mat);  
+                static const std::vector<point> emptyCharBox = boost::assign::list_of
+                     (point(32, 32))
+                     (point(480, 32))
+                     (point(480, -656))
+                     (point(32, -656))
+                     (point(32,32));
+                render::drawLine(emptyCharBox, textColor, mat);  
 #endif
 
             }
@@ -271,13 +269,11 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
             // 1/4 the EM square offset far from baseline 
             boost::int16_t posY = int(y+int((unitsPerEM/4)*scale));
 
-            boost::int16_t underline[2 * 2] =
-            {
-                startX,   posY,
-                  endX,   posY,
-            };
-            render::draw_line_strip(underline, 2, textColor,
-                    base_matrix);
+            const std::vector<point> underline = boost::assign::list_of
+                (point(startX, posY))
+                (point(endX, posY));
+
+            render::drawLine(underline, textColor, base_matrix);
         }
     }
 }
