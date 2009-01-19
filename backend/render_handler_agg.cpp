@@ -952,12 +952,6 @@ public:
       if (have_shape)
         build_agg_styles(sh, fill_styles, mat, cx);
       
-      /*
-      // prepare strokes
-      std::vector<stroke_type*> strokes;
-      build_agg_strokes(strokes, agg_paths, paths, line_styles, mat);
-      */
-      
       // We need to separate sub-shapes during rendering. 
       const unsigned int subshape_count = count_sub_shapes(paths);
      
@@ -1258,7 +1252,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     const size_t fcount = fill_styles.size();
     for (size_t fno=0; fno<fcount; ++fno) {
     
-      bool smooth=false;
+      bool smooth = false;
       int fill_type = fill_styles[fno].get_type();
       
       switch (fill_type) {
@@ -1304,7 +1298,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-        smooth=true;  // continue with next case!
+            smooth= true;  // continue with next case!
         
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
@@ -1320,7 +1314,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && _quality <= QUALITY_MEDIUM);
+            smooth && _quality >= QUALITY_HIGH);
           break;
         } 
 
