@@ -188,6 +188,111 @@ using namespace gnash;
 
 namespace gnash {
 
+namespace {
+
+template <class Rasterizer>
+inline void applyClipBox(Rasterizer& ras, const geometry::Range2d<int>& bounds)
+{
+    assert(bounds.isFinite());
+    ras.clip_box(static_cast<double>(bounds.getMinX()),
+            static_cast<double>(bounds.getMinY()),
+            static_cast<double>(bounds.getMaxX() + 1), 
+            static_cast<double>(bounds.getMaxY()+1)
+            );  
+}
+
+// --- ALPHA MASK BUFFER CONTAINER ---------------------------------------------
+// How masks are implemented: A mask is basically a full alpha buffer. Each 
+// pixel in the alpha buffer defines the fraction of color values that are
+// copied to the main buffer. The alpha mask buffer has 256 alpha levels per
+// pixel, which is good as it allows anti-aliased masks. A full size buffer
+// is allocated for each mask even if the invalidated bounds may be much 
+// smaller. The advantage of this is that the alpha mask adaptor does not need
+// to do any clipping which results in better performance.
+// Masks can be nested, which means the intersection of all masks should be 
+// visible (logical AND). To allow this we hold a stack of alpha masks and the 
+// topmost mask is used itself as a mask to draw any new mask. When rendering 
+// visible shapes only the topmost mask must be used and when a mask should not 
+// be used anymore it's simply discarded so that the next mask becomes active 
+// again.
+// To be exact, Flash is a bit restrictive regarding to what can be a mask
+// (dynamic text, shapes, ...) but our renderer can build a mask from
+// anything we can draw otherwise (except lines, which are excluded 
+// explicitly).    
+
+class AlphaMask 
+{
+
+    typedef agg::renderer_base<agg::pixfmt_gray8> renderer_base;
+    typedef agg::alpha_mask_gray8 amask_type;
+
+public:
+
+    AlphaMask(int width, int height)
+        :
+        _rbuf(0, width, height, width),
+        _pixf(_rbuf),
+        _rbase(_pixf),
+        _amask(_rbuf),
+        _buffer(new boost::uint8_t[width * height])
+    {
+        _rbuf.attach(_buffer.get(), width, height, width);
+        
+        // NOTE: The buffer is *not* cleared. The clear() function must
+        // be called to clear the buffer (alpha=0). The reason is to avoid
+        // clearing the whole mask when only a small portion is really used.
+    }
+    
+    void clear(const geometry::Range2d<int>& region)
+    {
+        if (region.isNull()) return;
+        assert(region.isFinite());
+
+        const agg::gray8 black(0);
+                
+        // region can't be world as it should be intersected with 
+        // the visible rect
+        assert(!region.isWorld());
+
+        unsigned int left = region.getMinX();
+        unsigned int width = region.width() + 1;
+
+        const unsigned int max_y = region.getMaxY();
+        for (unsigned int y=region.getMinY(); y <= max_y; ++y) 
+        {
+             _pixf.copy_hline(left, y, width, black);
+        }
+    }
+    
+    renderer_base& get_rbase() {
+        return _rbase;
+    }
+    
+    amask_type& get_amask() {
+        return _amask;
+    }    
+    
+private:
+
+    // agg class to access the buffer
+    agg::rendering_buffer _rbuf;
+    
+    // pixel access
+    agg::pixfmt_gray8 _pixf;    
+    
+    // renderer base
+    renderer_base _rbase;
+    
+    // alpha mask
+    amask_type _amask;
+    
+    // in-memory buffer
+    boost::scoped_array<boost::uint8_t> _buffer;
+    
+};
+
+}
+
 
 // --- CACHE -------------------------------------------------------------------
 /// This class holds a completely transformed path (fixed position). Speeds
@@ -241,99 +346,6 @@ class agg_cache_manager : private render_cache_manager
 };
 
 
-// --- ALPHA MASK BUFFER CONTAINER ---------------------------------------------
-// How masks are implemented: A mask is basically a full alpha buffer. Each 
-// pixel in the alpha buffer defines the fraction of color values that are
-// copied to the main buffer. The alpha mask buffer has 256 alpha levels per
-// pixel, which is good as it allows anti-aliased masks. A full size buffer
-// is allocated for each mask even if the invalidated bounds may be much 
-// smaller. The advantage of this is that the alpha mask adaptor does not need
-// to do any clipping which results in better performance.
-// Masks can be nested, which means the intersection of all masks should be 
-// visible (logical AND). To allow this we hold a stack of alpha masks and the 
-// topmost mask is used itself as a mask to draw any new mask. When rendering 
-// visible shapes only the topmost mask must be used and when a mask should not 
-// be used anymore it's simply discarded so that the next mask becomes active 
-// again.
-// To be exact, Flash is a bit restrictive regarding to what can be a mask
-// (dynamic text, shapes, ...) but our rebderer can build a mask from everything 
-// we can draw otherwise (except lines, which are excluded explicitely).    
-
-class agg_alpha_mask 
-{
-
-    typedef agg::renderer_base<agg::pixfmt_gray8> renderer_base;
-    typedef agg::alpha_mask_gray8 amask_type;
-
-public:
-
-    agg_alpha_mask(int width, int height)
-        :
-        m_rbuf(0, width, height, width),
-        m_pixf(m_rbuf),
-        m_rbase(m_pixf),
-        m_amask(m_rbuf),
-        _buffer(new boost::uint8_t[width * height])
-    {
-        m_rbuf.attach(_buffer.get(), width, height, width);
-        
-        // NOTE: The buffer is *not* cleared. The clear() function must
-        // be called to clear the buffer (alpha=0). The reason is to avoid
-        // clearing the whole mask when only a small portion is really used.
-    }
-    
-    ~agg_alpha_mask() 
-    {
-    }
-    
-    void clear(const geometry::Range2d<int>& region)
-    {
-        if (region.isNull()) return;
-        assert(region.isFinite());
-
-        const agg::gray8 black(0);
-                
-        // region can't be world as it should be intersected with 
-        // the visible rect
-        assert(!region.isWorld());
-
-        unsigned int left = region.getMinX();
-        unsigned int width = region.width() + 1;
-
-        const unsigned int max_y = region.getMaxY();
-        for (unsigned int y=region.getMinY(); y <= max_y; ++y) 
-        {
-             m_pixf.copy_hline(left, y, width, black);
-        }
-    }
-    
-    renderer_base& get_rbase() {
-        return m_rbase;
-    }
-    
-    amask_type& get_amask() {
-        return m_amask;
-    }    
-    
-private:
-
-    // agg class to access the buffer
-    agg::rendering_buffer m_rbuf;
-    
-    // pixel access
-    agg::pixfmt_gray8 m_pixf;    
-    
-    // renderer base
-    renderer_base m_rbase;
-    
-    // alpha mask
-    amask_type m_amask;
-    
-    // in-memory buffer
-    boost::scoped_array<boost::uint8_t> _buffer;
-    
-};
-
 
 
 // --- RENDER HANDLER ----------------------------------------------------------
@@ -346,7 +358,8 @@ class render_handler_agg : public render_handler_agg_base
 {
   
     typedef typename std::vector<geometry::Range2d<int> > ClipBounds;
-    typedef typename std::vector<agg_alpha_mask*>  AlphaMasks;
+    typedef typename std::vector<AlphaMask*> AlphaMasks;
+
 private:
     typedef agg::renderer_base<PixelFormat> renderer_base;
 
@@ -355,9 +368,6 @@ private:
 
     typedef agg::conv_stroke< agg::conv_curve<agg::path_storage> > stroke_type;
 
-    // TODO: Change these!!
-    unsigned char *memaddr;
-    int memsize;
     int xres;
     int yres;
     int bpp;  // bits per pixel
@@ -388,31 +398,65 @@ private:
 
         /// Types used for different quality.
         //
-        /// This (affects scaling) should probably only be used when
-        /// Video.smoothing is true.
+        /// This (affects scaling) is only presently used when smoothing is
+        /// requested in high quality.
         typedef typename agg::span_image_filter_rgb_nn<Accessor,
-                Interpolator> LowQualitySpanGenerator;
+                Interpolator> LowQualityFilter;
 
         typedef typename agg::span_image_filter_rgb_bilinear<Accessor,
-                Interpolator> HighQualitySpanGenerator;
+                Interpolator> HighQualityFilter;
 
         typedef agg::trans_affine Matrix;
 
         VideoRenderer(const ClipBounds& clipbounds, GnashImage* frame,
-                Matrix& mat)
+                Matrix& mat, Quality quality)
             :
             _buf(frame->data(), frame->width(), frame->height(),
                     frame->pitch()),
             _pixf(_buf),
             _accessor(_pixf),
             _interpolator(mat),
-            _clipbounds(clipbounds)
+            _clipbounds(clipbounds),
+            _quality(quality)
         {}
+
+        /// Change the rendering quality required.
+        void setQuality(Quality quality)
+        {
+            _quality = quality;
+        }
+
+        /// Set whether smoothing is requested
+        void smooth(bool b)
+        {
+            _smoothing = b;
+        }
+
+        void renderFrame(agg::path_storage& path, renderer_base& rbase,
+                const AlphaMasks& masks)
+        {
+            switch (_quality)
+            {
+                case QUALITY_BEST:
+                case QUALITY_HIGH:
+                    if (_smoothing) {
+                        renderFrame<HighQualityFilter>(path, rbase, masks);
+                    }
+                    else renderFrame<LowQualityFilter>(path, rbase, masks);
+                    break;
+                case QUALITY_MEDIUM:
+                case QUALITY_LOW:
+                    // FIXME: Should this be still lower quality?
+                    renderFrame<LowQualityFilter>(path, rbase, masks);
+                    break;
+            }
+        }
+        
+    private:
 
         /// Render a frame with or without alpha masks active.
         template<typename SpanGenerator>
-        void
-        renderFrame(agg::path_storage& path, renderer_base& rbase,
+        void renderFrame(agg::path_storage& path, renderer_base& rbase,
                 const AlphaMasks& masks)
         {
             SpanGenerator sg(_accessor, _interpolator);
@@ -429,25 +473,20 @@ private:
             }
         } 
 
-    private:
-
         template<typename Scanline, typename SpanGenerator>
         void renderScanlines(agg::path_storage& path, renderer_base& rbase,
-                Scanline& sc, SpanGenerator& sg)
+                Scanline& sl, SpanGenerator& sg)
         {
+            Rasterizer _ras;
             for (ClipBounds::const_iterator i = _clipbounds.begin(),
                 e = _clipbounds.end(); i != e; ++i)
             {
-
                 const ClipBounds::value_type& cb = *i;
-                apply_clip_box<Rasterizer> (_ras, cb);
+                applyClipBox<Rasterizer> (_ras, cb);
 
-                // <Udo>: AFAIK add_path() rewinds the vertex list (clears
-                // previous path), so there should be no problem with
-                // multiple clipbounds.
                 _ras.add_path(path);
 
-                agg::render_scanlines_aa(_ras, sc, rbase, _sa, sg);
+                agg::render_scanlines_aa(_ras, sl, rbase, _sa, sg);
             }
         }
         
@@ -461,99 +500,98 @@ private:
              
         Interpolator _interpolator;
         
-        Rasterizer _ras;
         SpanAllocator _sa;
+ 
         const ClipBounds& _clipbounds;
+ 
+        /// Quality of renderering
+        Quality _quality;
+ 
+        /// Whether smoothing is required.
+        bool _smoothing;
     };    
                 
 public:
 
-  // Given an image, returns a pointer to a bitmap_info class
-  // that can later be passed to fill_styleX_bitmap(), to set a
-  // bitmap fill style.
-  gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
-  {    
-    return new agg_bitmap_info(im);
-  }
+    // Given an image, returns a pointer to a bitmap_info class
+    // that can later be passed to fill_styleX_bitmap(), to set a
+    // bitmap fill style.
+    gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
+    {        
+        return new agg_bitmap_info(im);
+    }
 
-  void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
-    const rect* bounds, bool smooth) {
-  
-    // NOTE: Assuming that the source image is RGB 8:8:8
-    // TODO: keep heavy instances alive accross frames for performance!
-    // TODO: Maybe implement specialization for 1:1 scaled videos
-    
-    if (frame->type() == GNASH_IMAGE_RGBA)
+    void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
+        const rect* bounds, bool smooth)
     {
-        LOG_ONCE(log_error(_("Can't render videos with alpha")));
-        return;
-    }
-
-    assert(frame->type() == GNASH_IMAGE_RGB);
     
-    SWFMatrix mat = stage_matrix;
-    mat.concatenate(*source_mat);
-    
-    // compute video scaling relative to video obejct size
-    double vscaleX = bounds->width() / static_cast<double>(frame->width());
-    double vscaleY = bounds->height() / static_cast<double>(frame->height());
-    
-    // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
-    // pixel coordinates while we're at it
-    agg::trans_affine img_mtx(mat.sx  / 65536.0, mat.shx / 65536.0, 
-      mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);    
-    
-    // invert SWFMatrix since this is used for the image source
-    img_mtx.invert();
-    
-    // Apply video scale
-    img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
-    
-    // TODO: keep this alive and only image / matrix? I've no idea how
-    // much reallocation that would save.
-    VideoRenderer vr(_clipbounds, frame, img_mtx);
-
-    // make a path for the video outline
-    point a, b, c, d;
-    mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
-    mat.transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
-    mat.transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
-    mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
-    
-    agg::path_storage path;
-    path.move_to(a.x, a.y);
-    path.line_to(b.x, b.y);
-    path.line_to(c.x, c.y);
-    path.line_to(d.x, d.y);
-    path.line_to(a.x, a.y);
-
-    // renderer base for the stage buffer (not the frame image!)
-    renderer_base& rbase = *m_rbase;
-    
-    // If smoothing is requested and _quality is set to HIGH or BEST,
-    // use high-quality interpolation.
-    if (smooth && _quality >= QUALITY_HIGH) {
-        typedef typename VideoRenderer::HighQualitySpanGenerator HSG;
-        vr.template renderFrame<HSG>(path, rbase, m_alpha_mask);
-    }
-    else {
-        typedef typename VideoRenderer::LowQualitySpanGenerator LSG;
-        vr.template renderFrame<LSG>(path, rbase, m_alpha_mask);
-    }
+        // NOTE: Assuming that the source image is RGB 8:8:8
+        // TODO: keep heavy instances alive accross frames for performance!
+        // TODO: Maybe implement specialization for 1:1 scaled videos
         
-  } 
+        if (frame->type() == GNASH_IMAGE_RGBA) {
+                LOG_ONCE(log_error(_("Can't render videos with alpha")));
+                return;
+        }
+
+        assert(frame->type() == GNASH_IMAGE_RGB);
+        
+        SWFMatrix mat = stage_matrix;
+        mat.concatenate(*source_mat);
+        
+        // compute video scaling relative to video obejct size
+        double vscaleX = bounds->width() /
+            static_cast<double>(frame->width());
+        
+        double vscaleY = bounds->height() /
+            static_cast<double>(frame->height());
+        
+        // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
+        // pixel coordinates while we're at it
+        agg::trans_affine img_mtx(mat.sx / 65536.0, mat.shx / 65536.0, 
+            mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);        
+        
+        // invert SWFMatrix since this is used for the image source
+        img_mtx.invert();
+        
+        // Apply video scale
+        img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
+        
+        // TODO: keep this alive and only update image / matrix? I've no
+        // idea how much reallocation that would save.
+        VideoRenderer vr(_clipbounds, frame, img_mtx, _quality);
+
+        vr.smooth(smooth);
+
+        // make a path for the video outline
+        point a, b, c, d;
+        mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
+        mat.transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
+        mat.transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
+        mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
+        
+        agg::path_storage path;
+        path.move_to(a.x, a.y);
+        path.line_to(b.x, b.y);
+        path.line_to(c.x, c.y);
+        path.line_to(d.x, d.y);
+        path.line_to(a.x, a.y);
+
+        // renderer base for the stage buffer (not the frame image!)
+        renderer_base& rbase = *m_rbase;
+        
+        // If smoothing is requested and _quality is set to HIGH or BEST,
+        // use high-quality interpolation.
+        vr.renderFrame(path, rbase, m_alpha_mask);
+                
+    } 
 
   // Constructor
   render_handler_agg(int bits_per_pixel)
       :
-      // Initialization list
-      memaddr(NULL),
-      memsize(0),
       xres(1),
       yres(1),
       bpp(bits_per_pixel),
-      /*xscale(1.0/20.0),
-      yscale(1.0/20.0),*/
       scale_set(false),
       m_display_width(0.0),
       m_display_height(0.0),
@@ -583,12 +621,10 @@ public:
         assert(x > 0);
         assert(y > 0);
 
-    memaddr = mem;
-    memsize = size;
     xres    = x;
     yres    = y;
     
-    m_rbuf.attach(memaddr, xres, yres, rowstride);
+    m_rbuf.attach(mem, xres, yres, rowstride);
 
     // allocate pixel format accessor and renderer_base
     m_pixf.reset(new PixelFormat(m_rbuf));
@@ -597,7 +633,8 @@ public:
     // by default allow drawing everywhere
     set_invalidated_region_world();
     
-    log_debug(_("Initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes"), 
+    log_debug(_("Initialized AGG buffer <%p>, %d bytes, %dx%d, "
+                "rowsize is %d bytes"), 
       (void*)mem, size, x, y, rowstride);
   }
   
@@ -670,19 +707,6 @@ public:
     // nothing to do
   }
 
-  template <class ras_type>
-  static void apply_clip_box(ras_type& ras, 
-    const geometry::Range2d<int>& bounds)
-  {
-    assert(bounds.isFinite());
-    ras.clip_box(
-      (double)bounds.getMinX(),
-      (double)bounds.getMinY(),
-      (double)bounds.getMaxX()+1,
-      (double)bounds.getMaxY()+1);  
-  }
-
-
   
   // Draw the line strip formed by the sequence of points.
   void draw_line_strip(const boost::int16_t* coords, int vertex_count,
@@ -736,7 +760,7 @@ public:
       
         const ClipBounds::value_type& bounds = _clipbounds[cno];
               
-        apply_clip_box<ras_type> (ras, bounds);
+        applyClipBox<ras_type> (ras, bounds);
         
         // The vectorial pipeline
         ras.add_path(stroke);
@@ -760,7 +784,7 @@ public:
       
         const ClipBounds::value_type& bounds = _clipbounds[cno];
               
-        apply_clip_box<ras_type> (ras, bounds);
+        applyClipBox<ras_type> (ras, bounds);
         
         // The vectorial pipeline
         ras.add_path(stroke);
@@ -782,7 +806,7 @@ public:
     // Set flag so that rendering of shapes is simplified (only solid fill) 
     m_drawing_mask = true;
     
-    agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
+    AlphaMask* new_mask = new AlphaMask(xres, yres);
     
     for (unsigned int cno=0; cno<_clipbounds.size(); ++cno)  
       new_mask->clear(_clipbounds[cno]);
@@ -951,12 +975,6 @@ public:
       agg_style_handler sh;
       if (have_shape)
         build_agg_styles(sh, fill_styles, mat, cx);
-      
-      /*
-      // prepare strokes
-      std::vector<stroke_type*> strokes;
-      build_agg_strokes(strokes, agg_paths, paths, line_styles, mat);
-      */
       
       // We need to separate sub-shapes during rendering. 
       const unsigned int subshape_count = count_sub_shapes(paths);
@@ -1258,7 +1276,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     const size_t fcount = fill_styles.size();
     for (size_t fno=0; fno<fcount; ++fno) {
     
-      bool smooth=false;
+      bool smooth = false;
       int fill_type = fill_styles[fno].get_type();
       
       switch (fill_type) {
@@ -1304,7 +1322,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-        smooth=true;  // continue with next case!
+            smooth= true;  // continue with next case!
         
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
@@ -1320,7 +1338,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && _quality <= QUALITY_MEDIUM);
+            smooth && _quality >= QUALITY_HIGH);
           break;
         } 
 
@@ -1429,7 +1447,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
       const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
       
-      apply_clip_box<ras_type> (rasc, *bounds);
+      applyClipBox<ras_type> (rasc, *bounds);
       
       int current_subshape=0;
         
@@ -1666,7 +1684,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
       const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
           
-      apply_clip_box<ras_type> (ras, *bounds);
+      applyClipBox<ras_type> (ras, *bounds);
       
       int current_subshape=0;
 
@@ -1801,7 +1819,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
     
       const ClipBounds::value_type& bounds = _clipbounds[cno];         
-      apply_clip_box<ras_type> (ras, bounds);     
+      applyClipBox<ras_type> (ras, bounds);     
             
       
       // fill polygon
@@ -2120,10 +2138,10 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
 }
 
 
-DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
-  unsigned int gofs, unsigned int gsize,
-  unsigned int bofs, unsigned int bsize,
-  unsigned int bpp) {
+DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs,
+        unsigned int rsize, unsigned int gofs, unsigned int gsize,
+        unsigned int bofs, unsigned int bsize, unsigned int bpp)
+{
   
   if (!is_little_endian_host() && (bpp>=24)) {
   

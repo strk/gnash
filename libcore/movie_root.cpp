@@ -35,6 +35,7 @@
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
 #include "GnashKey.h" // key::code
+#include "gnash.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -128,7 +129,7 @@ movie_root::movie_root(const movie_definition& def,
 	_lastMovieAdvancement(0)
 {
     // This takes care of informing the renderer (if present) too.
-    setQuality(render_handler::QUALITY_HIGH);
+    setQuality(QUALITY_HIGH);
 }
 
 void
@@ -1436,9 +1437,19 @@ movie_root::isMouseOverActiveEntity() const
 }
 
 void
-movie_root::setQuality(render_handler::Quality q)
+movie_root::setQuality(Quality q)
 {
-    _quality = q;
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+
+    /// Overridden quality if not negative.
+    if (rcfile.qualityLevel() >= 0) {
+        int ql = rcfile.qualityLevel();
+        ql = std::min<int>(ql, QUALITY_BEST);
+        _quality = static_cast<Quality>(ql);
+    }
+    else {
+        _quality = q;
+    }
     render_handler* renderer = get_render_handler();
     if (renderer) renderer->setQuality(_quality);
 }

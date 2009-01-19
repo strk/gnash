@@ -79,7 +79,7 @@
 #include "GnashKey.h" // key::code
 #include "movie_instance.h"
 #include "RunInfo.h" // for initialization
-#include "render_handler.h"
+#include "gnash.h" // Quality
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -510,10 +510,10 @@ public:
     };
 
     /// Set the current display quality of the entire SWF.
-    void setQuality(render_handler::Quality q);
+    void setQuality(Quality q);
 
     /// Get the current display quality.
-    render_handler::Quality getQuality() const { return _quality; }
+    Quality getQuality() const { return _quality; }
 
     /// Sets movie_root's horizontal and vertical alignment to one
     /// of the three possible positions for each dimension.
@@ -1140,7 +1140,7 @@ private:
     //
     /// This is here, not just in the render_handler, so that AS compatibility
     /// does not rely on the presence of a renderer.
-    render_handler::Quality _quality;
+    Quality _quality;
 
     std::bitset<4u> _alignMode;
     

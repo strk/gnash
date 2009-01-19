@@ -145,6 +145,7 @@
 
 #include "dsodefs.h" // for DSOEXPORT
 
+#include "gnash.h" // Quality
 #include "shape_character_def.h"    
 #include "generic_character.h"
 #include "Range2d.h"
@@ -191,16 +192,6 @@ public:
 class DSOEXPORT render_handler
 {
 public:
-
-    /// The display quality.
-    //
-    enum Quality
-    {
-        QUALITY_LOW,
-        QUALITY_MEDIUM,
-        QUALITY_HIGH,
-        QUALITY_BEST
-    };
 
     render_handler()
         :

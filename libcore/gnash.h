@@ -51,6 +51,17 @@ enum FileType {
     GNASH_FILETYPE_UNKNOWN
 };
 
+/// The display quality.
+//
+/// Required for rendering and core.
+enum Quality
+{
+    QUALITY_LOW,
+    QUALITY_MEDIUM,
+    QUALITY_HIGH,
+    QUALITY_BEST
+};
+
 // Sound callbacks stuff
 
 /// Set the render handler.  This is one of the first

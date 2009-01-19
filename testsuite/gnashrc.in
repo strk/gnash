@@ -31,6 +31,9 @@ set GstAudioSink fakesink
 # Open a can of worms by raising likelyhood of movie definition destruction
 set movieLibraryLimit 1
 
+# Allow override of quality, or tests will fail.
+set quality -1
+
 # No sense in starting stopped.
 set startStopped false
 
