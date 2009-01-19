@@ -32,6 +32,7 @@
 #include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
+#include "gnash.h" // Quality
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -272,13 +273,13 @@ character::quality(const fn_call& fn)
     {
         switch (mr.getQuality())
         {
-            case render_handler::QUALITY_BEST:
+            case QUALITY_BEST:
                 return as_value("BEST");
-            case render_handler::QUALITY_HIGH:
+            case QUALITY_HIGH:
                 return as_value("HIGH");
-            case render_handler::QUALITY_MEDIUM:
+            case QUALITY_MEDIUM:
                 return as_value("MEDIUM");
-            case render_handler::QUALITY_LOW:
+            case QUALITY_LOW:
                 return as_value("LOW");
         }
     }
@@ -291,15 +292,15 @@ character::quality(const fn_call& fn)
 
     StringNoCaseEqual noCaseCompare;
 
-    if (noCaseCompare(q, "BEST")) mr.setQuality(render_handler::QUALITY_BEST);
+    if (noCaseCompare(q, "BEST")) mr.setQuality(QUALITY_BEST);
     else if (noCaseCompare(q, "HIGH")) {
-        mr.setQuality(render_handler::QUALITY_HIGH);
+        mr.setQuality(QUALITY_HIGH);
     }
     else if (noCaseCompare(q, "MEDIUM")) {
-        mr.setQuality(render_handler::QUALITY_MEDIUM);
+        mr.setQuality(QUALITY_MEDIUM);
     }
     else if (noCaseCompare(q, "LOW")) {
-            mr.setQuality(render_handler::QUALITY_LOW);
+            mr.setQuality(QUALITY_LOW);
     }
 
     return as_value();
@@ -316,32 +317,32 @@ character::highquality(const fn_call& fn)
     {
         switch (mr.getQuality())
         {
-            case render_handler::QUALITY_BEST:
+            case QUALITY_BEST:
                 return as_value(2.0);
-            case render_handler::QUALITY_HIGH:
+            case QUALITY_HIGH:
                 return as_value(1.0);
-            case render_handler::QUALITY_MEDIUM:
-            case render_handler::QUALITY_LOW:
+            case QUALITY_MEDIUM:
+            case QUALITY_LOW:
                 return as_value(0.0);
         }
     }
     
     double q = fn.arg(0).to_number();
 
-    if (q < 0) mr.setQuality(render_handler::QUALITY_HIGH);
-    else if (q > 2) mr.setQuality(render_handler::QUALITY_BEST);
+    if (q < 0) mr.setQuality(QUALITY_HIGH);
+    else if (q > 2) mr.setQuality(QUALITY_BEST);
     else {
         int i = static_cast<int>(q);
         switch(i)
         {
             case 0:
-                mr.setQuality(render_handler::QUALITY_LOW);
+                mr.setQuality(QUALITY_LOW);
                 break;
             case 1:
-                mr.setQuality(render_handler::QUALITY_HIGH);
+                mr.setQuality(QUALITY_HIGH);
                 break;
             case 2:
-                mr.setQuality(render_handler::QUALITY_BEST);
+                mr.setQuality(QUALITY_BEST);
                 break;
         }
     }
