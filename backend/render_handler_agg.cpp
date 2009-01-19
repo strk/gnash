@@ -227,47 +227,60 @@ analyzePaths(const GnashPaths &paths, bool& have_shape,
 }
 
 /// In-place transformation of Gnash paths to AGG paths.
-struct GnashToAggPath
+class GnashToAggPath
 {
-    GnashToAggPath(std::vector<agg::path_storage>& dest, size_t size)
+public:
+
+    typedef std::vector<agg::path_storage> AggPaths;
+
+    GnashToAggPath(AggPaths& dest)
         :
         _dest(dest),
-        _pos(0)
+        _it(_dest.begin())
     {
-        _dest.resize(size);
     }
 
-    void operator()(const path& inPath)
+    class EdgeToPath
     {
-        agg::path_storage& new_path = _dest[_pos];
 
-        new_path.move_to(TWIPS_TO_SHIFTED_PIXELS(inPath.ap.x), 
-                            TWIPS_TO_SHIFTED_PIXELS(inPath.ap.y));
+    public:
+        EdgeToPath(AggPaths::value_type& path)
+            :
+            _path(path)
+        {}
 
-        const size_t ecnt = inPath.m_edges.size();
-        for (size_t eno=0; eno<ecnt; ++eno)
+        void operator()(const edge& edge)
         {
-            const edge& this_edge = inPath.m_edges[eno];                         
-            if (this_edge.is_straight())
-            {
-                new_path.line_to(TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
-                                    TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));
+            if (edge.is_straight()) {
+                _path.line_to(TWIPS_TO_SHIFTED_PIXELS(edge.ap.x), 
+                                    TWIPS_TO_SHIFTED_PIXELS(edge.ap.y));
             }
-            else
-            {
-                new_path.curve3(TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.x), 
-                         TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.y),
-                         TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
-                         TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));             
+            else {
+                _path.curve3(TWIPS_TO_SHIFTED_PIXELS(edge.cp.x), 
+                         TWIPS_TO_SHIFTED_PIXELS(edge.cp.y),
+                         TWIPS_TO_SHIFTED_PIXELS(edge.ap.x), 
+                         TWIPS_TO_SHIFTED_PIXELS(edge.ap.y));             
             }
         }
-        ++_pos;
-        
+
+    private:
+        agg::path_storage& _path;
+    };
+
+    void operator()(const path& in)
+    {
+        agg::path_storage& p = *_it;
+
+        p.move_to(TWIPS_TO_SHIFTED_PIXELS(in.ap.x), 
+                            TWIPS_TO_SHIFTED_PIXELS(in.ap.y));
+
+        std::for_each(in.m_edges.begin(), in.m_edges.end(), EdgeToPath(p));
+        ++_it;
     }
 
 private:
     std::vector<agg::path_storage>& _dest;
-    size_t _pos;
+    AggPaths::iterator _it;
 
 };
 
@@ -278,9 +291,8 @@ private:
 inline void
 buildPaths(std::vector<agg::path_storage>& dest, const GnashPaths& paths) 
 {
-    GnashToAggPath transformPaths(dest, paths.size());
-
-    std::for_each(paths.begin(), paths.end(), transformPaths);
+    dest.resize(paths.size());
+    std::for_each(paths.begin(), paths.end(), GnashToAggPath(dest));
 } 
 
 // --- ALPHA MASK BUFFER CONTAINER ---------------------------------------------
@@ -403,7 +415,8 @@ public:
             _ras.add_path(stroke);
 
             // Set the color and render the scanlines
-            _renderer.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+            _renderer.color(agg::rgba8_pre(color.m_r, color.m_g, 
+                        color.m_b, color.m_a));
 
             agg::render_scanlines(_ras, sl, _renderer);
 
@@ -602,7 +615,7 @@ public:
         SWFMatrix mat = stage_matrix;
         mat.concatenate(*source_mat);
         
-        // compute video scaling relative to video obejct size
+        // compute video scaling relative to video object size
         double vscaleX = bounds->width() /
             static_cast<double>(frame->width());
         
@@ -749,8 +762,7 @@ public:
         }
     }
 
-    // Clean up after rendering a frame.  Client program is still
-    // responsible for calling glSwapBuffers() or whatever.
+    // Clean up after rendering a frame. 
     void end_display()
     {
         if (m_drawing_mask) {
@@ -758,7 +770,8 @@ public:
         }
 
         while (! _alphaMasks.empty()) {
-            log_debug(_("Warning: rendering ended while masks were still active"));
+            log_debug(_("Warning: rendering ended while masks "
+                        "were still active"));
             disable_mask();      
         }
     }
@@ -1038,6 +1051,7 @@ public:
         // Copy paths for in-place transform
         paths_out = paths_in;
 
+        /// Transform all the paths using the matrix.
         std::for_each(paths_out.begin(), paths_out.end(), 
                 std::bind2nd(std::mem_fun_ref(&path::transform), mat));
     } 
@@ -1299,8 +1313,10 @@ public:
         {            
           rgba color = cx.transform(fill_styles[fno].get_color());
 
-          // add the color to our self-made style handler (basically just a list)
-          sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+          // add the color to our self-made style handler (basically
+          // just a list)
+          sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
+                      color.m_a));
         } 
         
       } // switch
@@ -1448,7 +1464,8 @@ public:
 
   // very similar to draw_shape but used for generating masks. There are no
   // fill styles nor subshapes and such. Just render plain solid shapes.
-  void draw_mask_shape(const GnashPaths &paths, int even_odd) {
+  void draw_mask_shape(const GnashPaths &paths, int even_odd)
+  {
 
     unsigned int mask_count = _alphaMasks.size();
     
@@ -1504,7 +1521,7 @@ public:
     
     // span allocator
     typedef agg::span_allocator<agg::gray8> alloc_type;
-    alloc_type alloc;   // why does gray8 not work?
+    alloc_type alloc; 
       
 
     // activate even-odd filling rule
