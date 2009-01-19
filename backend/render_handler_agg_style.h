@@ -186,9 +186,9 @@ public:
         int norm_size)
     :
     agg_style_base(false),
+    m_cx(cx),
     m_tr(mat.sx / 65536.0, mat.shx/65536.0, mat.shy / 65536.0,
             mat.sy / 65536.0, mat.tx, mat.ty),
-    m_cx(cx),
     m_span_interpolator(m_tr),
     m_gradient_func(),
     m_gradient_adaptor(m_gradient_func),
@@ -311,7 +311,7 @@ public:
         const gnash::cxform& cx, bool repeat, bool smooth)
     {
 
-      if (bi==NULL) {
+      if (!bi) {
         // See server/styles.h comments about when NULL return is possible.
         // Don't warn here, we already warn at parse-time
         //log_debug("WARNING: add_bitmap called with bi=NULL");
