@@ -285,9 +285,10 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
     // to NULL once it's been created?
     assert(_swsContext->getContext());
 
-    int rv = sws_scale(_swsContext->getContext(), const_cast<uint8_t**>(srcFrame.data),
-        const_cast<int*>(srcFrame.linesize), 0, height, picture.data,
-        picture.linesize);
+    int rv = sws_scale(_swsContext->getContext(), 
+            const_cast<uint8_t**>(srcFrame.data),
+            const_cast<int*>(srcFrame.linesize), 0, height, picture.data,
+            picture.linesize);
 
     if (rv == -1) {
         im.reset();
@@ -301,7 +302,8 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
 }
 
 std::auto_ptr<GnashImage>
-VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_size)
+VideoDecoderFfmpeg::decode(const boost::uint8_t* input,
+        boost::uint32_t input_size)
 {
     // This object shouldn't exist if there's no codec, as it can'
     // do anything anyway.
@@ -317,7 +319,8 @@ VideoDecoderFfmpeg::decode(const boost::uint8_t* input, boost::uint32_t input_si
 
     int bytes = 0;    
     // no idea why avcodec_decode_video wants a non-const input...
-    avcodec_decode_video(_videoCodecCtx->getContext(), frame, &bytes, const_cast<boost::uint8_t*>(input), input_size);
+    avcodec_decode_video(_videoCodecCtx->getContext(), frame, &bytes,
+            const_cast<boost::uint8_t*>(input), input_size);
     
     if (!bytes) {
         log_error("Decoding of a video frame failed");
