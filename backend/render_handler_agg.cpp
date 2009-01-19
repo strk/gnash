@@ -373,6 +373,7 @@ private:
     
 };
 
+/// Class for rendering lines.
 template<typename PixelFormat>
 class LineRenderer
 {
@@ -409,8 +410,6 @@ public:
         }
     }
 
-    void operator() () {}
-
 private:
 
     const ClipBounds& _clipbounds;
@@ -444,6 +443,9 @@ public:
     typedef agg::span_interpolator_linear<> Interpolator;
     typedef agg::span_allocator<agg::rgba8> SpanAllocator;
     typedef agg::rasterizer_scanline_aa<> Rasterizer;
+    
+    // cloning image accessor is used to avoid disturbing pixels at
+    // the edges for rotated video. 
     typedef agg::image_accessor_clone<SourceFormat> Accessor;
 
     /// Types used for different quality.
@@ -545,8 +547,6 @@ private:
 
     SourceFormat _pixf;
     
-    // cloning image accessor is used to avoid disturbing pixels at
-    // the edges for rotated video. 
     Accessor _accessor;
          
     Interpolator _interpolator;
