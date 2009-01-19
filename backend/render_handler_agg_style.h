@@ -40,18 +40,34 @@ namespace gnash {
 class agg_style_base 
 {
 public:
-  // for solid styles:
-  bool m_is_solid;   
-  agg::rgba8 m_color; // defined here for easy access
-  
-  // for non-solid styles:
-  virtual void generate_span(agg::rgba8* span, int x, int y, unsigned len)=0;
 
+  agg_style_base(bool solid, const agg::rgba8& color = agg::rgba8(0,0,0,0))
+    :
+    _solid(solid),
+    _color(color)
+  {
+  }
+  
   // Everytime a class has a virtual method it should
   // also have a virtual destructor. This will ensure
   // that the destructor for the *derived* class is invoked
   // when deleting a pointer to base class !!
   virtual ~agg_style_base() {}
+
+  bool solid() const { return _solid; }
+
+  agg::rgba8 color() const { return _color; }
+
+  // for non-solid styles:
+  virtual void generate_span(agg::rgba8* span, int x, int y, unsigned len) = 0;
+
+private:
+
+  // for solid styles:
+  bool _solid;
+
+  agg::rgba8 _color; 
+  
 };
 
 
@@ -61,10 +77,10 @@ class agg_style_solid : public agg_style_base
 {
 public:
 
-  agg_style_solid(const agg::rgba8& color) {
-    m_is_solid = true;
-    m_color = color;
-    
+  agg_style_solid(const agg::rgba8& color)
+    :
+    agg_style_base(true, color)
+  {
 #ifdef DEBUG_LIMIT_COLOR_ALPHA
     m_color.a = m_color.a>127 ? 127 : m_color.a;
 #endif    
@@ -78,27 +94,6 @@ public:
 };
 
 
-// Simple hack to get rid of that additional parameter for the 
-// image_accessor_clip constructor which breaks template usage. 
-/*
-template <class PixelFormat>
-class image_accessor_clip_transp : public agg::image_accessor_clip<PixelFormat>
-{
-public:
-  image_accessor_clip_transp(const PixelFormat& pixf)  
-  {
-    agg::image_accessor_clip<PixelFormat>::image_accessor_clip(pixf, 
-      agg::rgba8_pre(255, 0, 0, 0));
-  }
-};
-
-The image_accessor_clip_transp above does not work correctly. The alpha value
-for the background color supplied to image_accessor_clip seems to be ignored
-(at least for agg::pixfmt_rgb24). Even if alpha=0 you can see that red color
-tone at the borders. So the current workaround is to use image_accessor_clone
-which repeats the pixels at the edges. This should be no problem as the clipped
-bitmap format is most probably only used for rectangular bitmaps anyway. 
-*/
 #define image_accessor_clip_transp agg::image_accessor_clone
 
 
@@ -107,7 +102,7 @@ bitmap format is most probably only used for rectangular bitmaps anyway.
 /// It can have any transformation SWFMatrix and color transform. Any pixel format
 /// can be used, too. 
 template <class PixelFormat, class span_allocator_type, class img_source_type,
-  class interpolator_type, class sg_type>
+       class interpolator_type, class sg_type>
 class agg_style_bitmap : public agg_style_base
 {
 public:
@@ -115,47 +110,38 @@ public:
   agg_style_bitmap(int width, int height, int rowlen, boost::uint8_t* data, 
     const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     :
+    agg_style_base(false),
+    m_cx(cx),
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
     m_img_src(m_pixf),
-    m_tr(),       // initialize later
+    m_tr(mat.sx / 65535.0, mat.shx / 65535.0, mat.shy / 65535.0,
+            mat.sy / 65535.0, mat.tx, mat.ty),
     m_interpolator(m_tr),
     m_sg(m_img_src, m_interpolator)
   {
-  
-    m_is_solid = false;
     
     // Convert the transformation SWFMatrix to AGG's class. It's basically the
     // same and we could even use gnash::SWFMatrix since AGG does not require
     // a real AGG descendant (templates!). However, it's better to use AGG's
     // class as this should be faster (avoid type conversion).
-    m_tr=agg::trans_affine(
-      mat.sx/65536.0, mat.shx/65536.0, 
-      mat.shy/65536.0, mat.sy/65536.0, 
-      mat.tx, mat.ty);
-            
-    m_cx = cx;
-      
   }
   
   virtual ~agg_style_bitmap() {
   }
     
-  void generate_span(agg::rgba8* span, int x, int y, unsigned len)
-  {
-    m_sg.generate(span, x, y, len);
-    // Apply color transform
-    // TODO: Check if this can be optimized
-    if (!m_cx.is_identity()) {      
-      for (unsigned int i=0; i<len; i++) {
-        m_cx.transform(span->r, span->g, span->b, span->a);
-        span->premultiply();
-        ++span;
-      }
-    }  
-  }
-    
-  
+    void generate_span(agg::rgba8* span, int x, int y, unsigned len)
+    {
+        m_sg.generate(span, x, y, len);
+        // Apply color transform
+        // TODO: Check if this can be optimized
+        if (m_cx.is_identity()) return;
+        for (unsigned int i=0; i<len; i++) {
+            m_cx.transform(span->r, span->g, span->b, span->a);
+            span->premultiply();
+            ++span;
+        }  
+    }
   
 private:
 
@@ -191,30 +177,24 @@ private:
 template <class color_type, class span_allocator_type, class interpolator_type, 
   class gradient_func_type, class gradient_adaptor_type, class color_func_type, 
   class sg_type>
-class agg_style_gradient : public agg_style_base {
+class agg_style_gradient : public agg_style_base
+{
 public:
 
   agg_style_gradient(const gnash::fill_style& fs,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx,
         int norm_size)
     :
-    m_tr(),
+    agg_style_base(false),
+    m_tr(mat.sx / 65536.0, mat.shx/65536.0, mat.shy / 65536.0,
+            mat.sy / 65536.0, mat.tx, mat.ty),
+    m_cx(cx),
     m_span_interpolator(m_tr),
     m_gradient_func(),
     m_gradient_adaptor(m_gradient_func),
     m_sg(m_span_interpolator, m_gradient_adaptor, m_gradient_lut, 0, norm_size),
     m_need_premultiply(false)
   {
-  
-    m_is_solid = false;
-    
-    m_tr=agg::trans_affine(
-      mat.sx / 65536.0, mat.shx/65536.0, 
-      mat.shy / 65536.0, mat.sy / 65536.0, 
-      mat.tx, mat.ty);
-      
-    m_cx = cx;
-            
     // Build gradient lookup table
     m_gradient_lut.remove_all(); 
     
@@ -249,9 +229,9 @@ public:
   {
     m_sg.generate(span, x, y, len);
     
-    if (m_need_premultiply)
-      while (len--)
-        (span++)->premultiply();
+    if (!m_need_premultiply) return;
+      
+    while (len--) (span++)->premultiply();
   }
   
   // Provide access to our gradient adaptor to allow re-initialization of
@@ -263,7 +243,6 @@ public:
   }
   
 protected:
-
   
   // Color transform
   gnash::cxform m_cx;
@@ -318,7 +297,7 @@ public:
     /// Called by AGG to ask if a certain style is a solid color
     bool is_solid(unsigned style) const {
       assert(style < m_styles.size());
-      return m_styles[style]->m_is_solid; 
+      return m_styles[style]->solid(); 
     }
     
     /// Adds a new solid fill color style
@@ -685,10 +664,10 @@ public:
     }
 
     /// Returns the color of a certain fill style (solid)
-    const agg::rgba8& color(unsigned style) const 
+    agg::rgba8 color(unsigned style) const 
     {
         if (style < m_styles.size())
-            return m_styles[style]->m_color;
+            return m_styles[style]->color();
 
         return m_transparent;
     }
