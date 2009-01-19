@@ -170,12 +170,10 @@ RcInitFile::extractSetting(bool &var, const std::string &pattern,
     if ( noCaseCompare(variable, pattern) ) {
         if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") ||
              noCaseCompare(value, "true")) {
-            //cout <<  variable << ": enabled" << endl;
             var = true;
         }
         if (noCaseCompare(value, "off") || noCaseCompare(value, "no") ||
             noCaseCompare(value, "false")) {
-            //cout <<  variable << ": disabled" << endl;
             var = false;
         }
         return true;

@@ -1444,7 +1444,7 @@ movie_root::setQuality(Quality q)
     /// Overridden quality if not negative.
     if (rcfile.qualityLevel() >= 0) {
         int ql = rcfile.qualityLevel();
-        ql = std::min(q, QUALITY_BEST);
+        ql = std::min<int>(ql, QUALITY_BEST);
         _quality = static_cast<Quality>(ql);
     }
     else {
