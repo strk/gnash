@@ -68,22 +68,20 @@ rgba    cxform::transform(const rgba& in) const
 void    cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& b, boost::uint8_t& a) const
 {
     // force conversion to int16 first, kind of optimization.
-    int16_t rt = (int16_t)r;
-    int16_t gt = (int16_t)g;
-    int16_t bt = (int16_t)b;
-    int16_t at = (int16_t)a;
+    boost::uint16_t rt = r;
+    boost::uint16_t gt = g;
+    boost::uint16_t bt = b;
+    boost::uint16_t at = a;
     
     rt = (rt * ra >> 8) + rb;
     gt = (gt * ga >> 8) + gb;
     bt = (bt * ba >> 8) + bb;
     at = (at * aa >> 8) + ab;
 
-    using utility::clamp;
-    
-    r = (uint8_t)(clamp<int16_t>(rt, 0, 255));
-    g = (uint8_t)(clamp<int16_t>(gt, 0, 255));
-    b = (uint8_t)(clamp<int16_t>(bt, 0, 255));
-    a = (uint8_t)(clamp<int16_t>(at, 0, 255));
+    r = std::min<boost::uint16_t>(rt, 255);
+    g = std::min<boost::uint16_t>(gt, 255);
+    b = std::min<boost::uint16_t>(bt, 255);
+    a = std::min<boost::uint16_t>(at, 255);
 }
 
 void    cxform::read_rgb(SWFStream& in)
