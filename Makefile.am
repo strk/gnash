@@ -153,6 +153,8 @@ dumpconfig:
 	@echo "	JPEG_LIBS is $(JPEG_LIBS)"
 	@echo "	PNG_CFLAGS is $(PNG_CFLAGS)"
 	@echo "	PNG_LIBS is $(PNG_LIBS)"
+	@echo "	GIF_CFLAGS is $(GIF_CFLAGS)"
+	@echo "	GIF_LIBS is $(GIF_LIBS)"
 	@echo "Audio decoding support..."
 if USE_GST_ENGINE
 	@echo "	GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
