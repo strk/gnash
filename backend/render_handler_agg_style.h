@@ -198,17 +198,16 @@ public:
     // Build gradient lookup table
     m_gradient_lut.remove_all(); 
     
-    for (int i=0; i<fs.get_color_stop_count(); i++) {
+    for (int i = 0, e = fs.get_color_stop_count(); i != e; ++i) {
     
-      const gradient_record gr = fs.get_color_stop(i); 
+      const gradient_record& gr = fs.get_color_stop(i); 
       rgba trans_color = m_cx.transform(gr.m_color);
       
 #ifdef DEBUG_LIMIT_COLOR_ALPHA
       trans_color.m_a = trans_color.m_a>127 ? 127 : trans_color.m_a;
 #endif
 
-      if (trans_color.m_a < 255) 
-        m_need_premultiply=true;    
+      if (trans_color.m_a < 255) m_need_premultiply = true;    
       
       m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8(trans_color.m_r, 
         trans_color.m_g, trans_color.m_b, trans_color.m_a));
@@ -231,7 +230,10 @@ public:
     
     if (!m_need_premultiply) return;
       
-    while (len--) (span++)->premultiply();
+    while (len--) {
+        span->premultiply();
+        ++span;
+    }
   }
   
   // Provide access to our gradient adaptor to allow re-initialization of
