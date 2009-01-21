@@ -57,7 +57,6 @@ noinst_HEADERS = \
 	render_handler.h \
 	render_handler_agg.h \
 	render_handler_agg_bitmap.h \
-	render_handler_agg_compat.h \
 	render_handler_agg_style.h \
 	render_handler_cairo.h \
 	render_handler_ogl.h \

@@ -235,7 +235,27 @@ point middle(const point& a, const point& b)
   return point(0.5 * (a.x + b.x), 0.5 * (a.y + b.y));
 }
 
+namespace {
 
+class
+PointSerializer
+{
+public:
+    PointSerializer(std::vector<boost::int16_t>& dest)
+        :
+        _dest(dest)
+    {}
+    
+    void operator()(const point& p)
+    {
+        _dest.push_back(p.x);
+        _dest.push_back(p.y);
+    }
+private:
+    std::vector<boost::int16_t>& _dest;
+};
+
+}
 
 // Unfortunately, we can't use OpenGL as-is to interpolate the curve for us. It
 // is legal for Flash coordinates to be outside of the viewport, which will
@@ -866,26 +886,32 @@ public:
 
     glFlush(); // Make OpenGL execute all commands in the buffer.
   }
-    
+  
   /// Draw a line-strip directly, using a thin, solid line. 
   //
   /// Can be used to draw empty boxes and cursors.
-  virtual void
-  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
+  virtual void drawLine(const std::vector<point>& coords, const rgba& color,
                   const SWFMatrix& mat)
   {
     oglScopeMatrix scope_mat(mat);
 
+    const size_t numPoints = coords.size();
+
     glColor3ub(color.m_r, color.m_g, color.m_b);
+
+    std::vector<boost::int16_t> pointList;
+    pointList.reserve(numPoints * 2);
+    std::for_each(coords.begin(), coords.end(), PointSerializer(pointList));
 
     // Send the line-strip to OpenGL
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(2, GL_SHORT, 0 /* tight packing */, coords);
-    glDrawArrays(GL_LINE_STRIP, 0, vertex_count);
+    glVertexPointer(2, GL_SHORT, 0 /* tight packing */, &pointList.front());
+    glDrawArrays(GL_LINE_STRIP, 0, numPoints);
 
     // Draw a dot on the beginning and end coordinates to round lines.
-    //   glVertexPointer: skip all but the first and last coordinates in the line.
-    glVertexPointer(2, GL_SHORT, (sizeof(boost::int16_t) * 2) * (vertex_count - 1), coords);
+    // glVertexPointer: skip all but the first and last coordinates in the line.
+    glVertexPointer(2, GL_SHORT, (sizeof(boost::int16_t) * 2) *
+            (numPoints - 1), &pointList.front());
     glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
     glDrawArrays(GL_POINTS, 0, 2);
     glDisable(GL_POINT_SMOOTH);

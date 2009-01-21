@@ -628,25 +628,24 @@ public:
     _stage_mat.y0 = yoff;
   }
     
-  virtual void  draw_line_strip(const boost::int16_t coords[], int vertex_count,
-      const rgba& color, const SWFMatrix& mat)
+  virtual void drawLine(const std::vector<point>& coords, const rgba& color,
+          const SWFMatrix& mat)
   {
+    
+    if (coords.empty()) return;
+
     CairoScopeMatrix mat_transformer(_cr, mat);
 
-    if (vertex_count < 2) {
-      return;
-    }
-
-    double x, y;
-    x = coords[0];
-    y = coords[1];
+    std::vector<point>::const_iterator i = coords.begin();
+    
+    double x = i->x, y = i->y;
     snap_to_half_pixel(_cr, x, y);
 
     cairo_move_to(_cr, x, y);
 
-    for (int i = 2; i < vertex_count * 2; i += 2) {
-      x = coords[i];
-      y = coords[i+1];
+    for (std::vector<point>::const_iterator e = coords.end();
+            i != e; ++i) {
+      double x = i->x, y = i->y;
       snap_to_half_pixel(_cr, x, y);
       cairo_line_to(_cr, x, y);
     }

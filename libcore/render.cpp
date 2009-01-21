@@ -131,12 +131,12 @@ namespace render
 	}
 
 
-	void	draw_line_strip(const boost::int16_t coords[], int vertex_count, const rgba& color, const SWFMatrix& mat)
+	void drawLine(const std::vector<point>& coords, const rgba& color, const SWFMatrix& mat)
 	{
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->draw_line_strip(coords, vertex_count, color, mat);
+		if (s_render_handler) s_render_handler->drawLine(coords, color, mat);
 }
 
 
