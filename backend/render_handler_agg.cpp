@@ -735,11 +735,11 @@ public:
     m_drawing_mask = false;
   }
   
-    /// renderer_base.clear() does no clipping which clears the whole framebuffer
-    /// even if we update just a small portion of the screen. The result would be
-    /// still correct, but slower. 
-    /// This function clears only a certain portion of the screen, while /not/ 
-    /// being notably slower for a fullscreen clear. 
+    // renderer_base.clear() does no clipping which clears the
+    // whole framebuffer even if we update just a small portion
+    // of the screen. The result would be still correct, but slower. 
+    // This function clears only a certain portion of the screen, while /not/ 
+    // being notably slower for a fullscreen clear. 
     void clear_framebuffer(const geometry::Range2d<int>& region,
         const agg::rgba8& color)
     {
@@ -867,7 +867,14 @@ public:
   {
     
     // select relevant clipping bounds
-    if (def->get_bound().is_null()) select_all_clipbounds();
+    if (def->get_bound().is_null()) {
+
+          log_debug(_("Warning: draw_glyph called for definition with "
+                      "null bounds"));
+        return;
+        // Why would we want to do this?
+        //select_all_clipbounds();  
+    } 
     else select_clipbounds(def, mat);
     
     if (_clipbounds_selected.empty()) return; 
@@ -918,8 +925,8 @@ public:
     const rect& ch_bounds = def->get_bound();
 
     if (ch_bounds.is_null()) {
-      log_debug(_("Warning: select_clipbounds encountered a character definition "
-        "with null bounds"));
+      log_debug(_("Warning: select_clipbounds encountered a character "
+                  "definition with null bounds"));
       return;
     }   
 
@@ -950,16 +957,16 @@ public:
   
   void select_all_clipbounds() {
   
-    const unsigned int count = _clipbounds.size();
-
-    if (_clipbounds_selected.size() == count)
-      return; // already all selected
+    if (_clipbounds_selected.size() == _clipbounds.size()) return; 
   
     _clipbounds_selected.clear();
-    _clipbounds_selected.resize(count);
+    _clipbounds_selected.reserve(count);
     
-    for (unsigned int cno=0; cno<count; ++cno) 
-      _clipbounds_selected[cno] = &_clipbounds[cno];
+    for (ClipBounds::const_iterator i = _clipbounds.begin(),
+            e = _clipbounds.end(); i != e; ++i)
+    {
+      _clipbounds_selected.push_back(&(*i));
+    }
   }
 
     void draw_shape_character(shape_character_def *def, 

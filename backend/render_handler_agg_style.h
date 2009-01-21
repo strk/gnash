@@ -608,10 +608,12 @@ public:
     
       typedef agg::rgba8 color_type;            
       typedef agg::span_allocator<color_type> span_allocator_type;
-      typedef agg::span_interpolator_linear<agg::trans_affine> interpolator_type;
+      typedef agg::span_interpolator_linear<agg::trans_affine> 
+          interpolator_type;
       typedef agg::gradient_radial gradient_func_type;
       typedef gradient_func_type gradient_adaptor_type;
-      typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> color_func_type;
+      typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> 
+          color_func_type;
       typedef agg::span_gradient<color_type,
                                  interpolator_type,
                                  gradient_adaptor_type,
@@ -625,8 +627,9 @@ public:
       gnash::SWFMatrix transl;
       transl.set_translation(-32, -32);
       transl.concatenate(mat);    
-      
-      st_type* st = new st_type(fs, transl, cx, 64/2);  // div 2 because we need radius, not diameter     
+
+      // div 2 because we need radius, not diameter      
+      st_type* st = new st_type(fs, transl, cx, 64/2); 
         
       // NOTE: The value 64 is based on the bitmap texture used by other
       // Gnash renderers which is normally 64x64 pixels for radial gradients.       
@@ -650,7 +653,7 @@ public:
         interpolator_type, gradient_func_type, gradient_adaptor_type,
         color_func_type, sg_type> st_type;
             
-      // move the center of the focal fill (not it's focal point) to where it 
+      // move the center of the focal fill (not its focal point) to where it 
       // should be.
       gnash::SWFMatrix transl;      
       transl.set_translation(-32, -32);
