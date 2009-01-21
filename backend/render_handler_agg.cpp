@@ -633,12 +633,6 @@ public:
         // Apply video scale
         img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
         
-        // TODO: keep this alive and only update image / matrix? I've no
-        // idea how much reallocation that would save.
-        VideoRenderer<PixelFormat> vr(_clipbounds, frame, img_mtx, _quality);
-
-        vr.smooth(smooth);
-
         // make a path for the video outline
         point a, b, c, d;
         mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
@@ -656,6 +650,12 @@ public:
         // renderer base for the stage buffer (not the frame image!)
         renderer_base& rbase = *m_rbase;
         
+        // TODO: keep this alive and only update image / matrix? I've no
+        // idea how much reallocation that would save.
+        VideoRenderer<PixelFormat> vr(_clipbounds, frame, img_mtx, _quality);
+
+        vr.smooth(smooth);
+
         // If smoothing is requested and _quality is set to HIGH or BEST,
         // use high-quality interpolation.
         vr.render(path, rbase, _alphaMasks);
@@ -868,9 +868,6 @@ public:
     
     // select relevant clipping bounds
     if (def->get_bound().is_null()) {
-
-          log_debug(_("Warning: draw_glyph called for definition with "
-                      "null bounds"));
         return;
         // Why would we want to do this?
         //select_all_clipbounds();  
@@ -960,7 +957,7 @@ public:
     if (_clipbounds_selected.size() == _clipbounds.size()) return; 
   
     _clipbounds_selected.clear();
-    _clipbounds_selected.reserve(count);
+    _clipbounds_selected.reserve(_clipbounds.size());
     
     for (ClipBounds::const_iterator i = _clipbounds.begin(),
             e = _clipbounds.end(); i != e; ++i)
