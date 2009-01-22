@@ -167,6 +167,7 @@ AGG ressources
 #include "render_handler_agg_style.h"
 
 #include <boost/scoped_array.hpp>
+#include <boost/bind.hpp>
 
 #ifndef round
 	#define round(x) rint(x)
@@ -1061,7 +1062,7 @@ public:
 
         /// Transform all the paths using the matrix.
         std::for_each(paths_out.begin(), paths_out.end(), 
-                std::bind2nd(std::mem_fun_ref(&path::transform), mat));
+                boost::bind(&path::transform, _1, mat));
     } 
 
 
