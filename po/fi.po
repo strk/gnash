@@ -1,5 +1,5 @@
 # Finnish translation of GNU Gnash.
-# Copyright (C) 2008 Free Software Foundation, Inc.
+# Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gnash package.
 # Timo Jyrinki <timo.jyrinki@iki.fi>, 2008.
 #
@@ -5595,7 +5595,7 @@ msgstr ""
 
 #: utilities/rtmpget.cpp:512
 msgid ""
-"Copyright (C) 2008 Free Software Foundation, Inc.\n"
+"Copyright (C) 2008, 2009 Free Software Foundation, Inc.\n"
 "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Cygnal under the terms of the GNU General\n"
 "Public License.  For more information, see the file named COPYING.\n"
@@ -6009,7 +6009,7 @@ msgstr "  CTRL-L                   Pakota välitön uudelleenpiirto"
 
 #: gui/gnash.cpp:153
 msgid ""
-"Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.\n"
+"Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.\n"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Gnash under the terms of the GNU General\n"
 "Public License.  For more information, see the file named COPYING.\n"
