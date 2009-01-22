@@ -125,7 +125,6 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
     :
     character(parent, id),
     _tag(&def),
-    _text(L""),
     _textDefined(def.hasText()),
     _underlined(false),
     _leading(def.leading()),
@@ -183,7 +182,6 @@ TextField::TextField(character* parent, const rect& bounds)
     :
     // the id trick is to fool assertions in character ctor
     character(parent, parent ? 0 : -1),
-    _text(L""),
     _textDefined(false),
     _underlined(false),
     _leading(0),
@@ -378,6 +376,20 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
     bounds.expand_to_rect(m_text_bounding_box); 
     wm.transform(bounds);
     ranges.add( bounds.getRange() );            
+}
+
+void
+TextField::replaceSelection(const std::string& replace)
+{
+
+    const int version = _vm.getSWFVersion();
+    const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
+    
+    const size_t start = _selection.first;
+    const size_t replaceLength = wstr.size();
+
+    _text.replace(start, _selection.second - start, wstr);
+    _selection = std::make_pair(start + replaceLength, start + replaceLength);
 }
 
 void
@@ -2637,14 +2649,35 @@ textfield_htmlText(const fn_call& fn)
     return as_value();
 }
 
-
+/// TextField.replaceSel(newText)
+//
+/// Replaces the current selection with the new text, setting both
+/// begin and end of the selection to one after the inserted text.
+/// If an empty string is passed, SWF8 erases the selection; SWF7 and below
+/// is a no-op.
+/// If no argument is passed, this is a no-op.
 as_value
 textfield_replaceSel(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.replaceSel()"));
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror("TextField.replaceSel(%s) requires exactly one "
+                "argument", os.str());
+        );
+        return as_value();
+    }
+
+    const std::string& replace = fn.arg(0).to_string();
+
+    /// Do nothing if text is empty and version less than 8.
+    const int version = text->getVM().getSWFVersion();
+    if (version < 8 && replace.empty()) return as_value();
+
+    text->replaceSelection(replace);
 
     return as_value();
 }

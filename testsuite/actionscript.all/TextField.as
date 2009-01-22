@@ -956,6 +956,72 @@ check_equals(tf5._height, 2);
 createTextField("tf6", 103, 10, 10, 160);
 check_equals(typeof(tf6), 'undefined');
 
+/// Test TextField.replaceSel
+
+createTextField('repl1', 99, 10, 10, 10, 10);
+Selection.setFocus(repl1);
+check_equals(Selection.getFocus(), '_level0.repl1');
+repl1.text = "Text in a string";
+
+ret = repl1.replaceSel("More ");
+/// Check that the selection start and end indices are adjusted.
+check_equals(Selection.getBeginIndex(), 5);
+check_equals(Selection.getEndIndex(), 5);
+check_equals(repl1.text, "More Text in a string");
+
+ret = repl1.replaceSel("");
+check_equals(Selection.getEndIndex(), 5);
+check_equals(repl1.text, "More Text in a string");
+
+
+Selection.setSelection(0, 1);
+ret = repl1.replaceSel("HU");
+check_equals(ret, undefined);
+check_equals(repl1.text, "HUore Text in a string");
+
+check_equals(Selection.getBeginIndex(), 2);
+check_equals(Selection.getEndIndex(), 2);
+
+Selection.setSelection(2, 5);
+ret = repl1.replaceSel("HUU");
+check_equals(ret, undefined);
+check_equals(repl1.text, "HUHUU Text in a string");
+
+check_equals(Selection.getBeginIndex(), 5);
+check_equals(Selection.getEndIndex(), 5);
+
+Selection.setSelection(10, 13);
+repl1.replaceSel(7);
+check_equals(repl1.text, "HUHUU Text7 a string");
+check_equals(Selection.getBeginIndex(), 11);
+check_equals(Selection.getEndIndex(), 11);
+
+Selection.setSelection(10, 13);
+repl1.replaceSel(new Object());
+check_equals(repl1.text, "HUHUU Text[object Object] string");
+check_equals(Selection.getBeginIndex(), 25);
+check_equals(Selection.getEndIndex(), 25);
+
+Selection.setSelection(1, 20);
+repl1.replaceSel("");
+#if OUTPUT_VERSION < 8
+check_equals(repl1.text, "HUHUU Text[object Object] string");
+check_equals(Selection.getBeginIndex(), 1);
+check_equals(Selection.getEndIndex(), 20);
+#else
+check_equals(repl1.text, "Hject] string");
+check_equals(Selection.getBeginIndex(), 1);
+check_equals(Selection.getEndIndex(), 1);
+#endif
+
+repl1.text = "New text";
+
+Selection.setSelection(2, 5);
+repl1.replaceSel();
+check_equals(repl1.text, "New text");
+check_equals(Selection.getBeginIndex(), 2);
+check_equals(Selection.getEndIndex(), 5);
+
 //------------------------------------------------------------
 // Test properties
 //------------------------------------------------------------
@@ -1004,11 +1070,11 @@ _root._xscale = _root._yscale = 100;
 //------------------------------------------------------------
 
 #if OUTPUT_VERSION == 6
- check_totals(438);
+ check_totals(464);
 #elif OUTPUT_VERSION == 7
- check_totals(441);
+ check_totals(467);
 #elif OUTPUT_VERSION == 8
- check_totals(442);
+ check_totals(468);
 #endif
 
 #endif
