@@ -307,25 +307,16 @@ public:
                 return; // no need to draw
         }        
 
-        // TODO: I don't like that there is a draw_shape_character() version
-        // with arbitrary fill and line styles as this may break caching...
-
         // render the character
-        draw_shape_character(def, 
-                inst->getWorldMatrix(), 
-                inst->get_world_cxform(),
-                def->get_fill_styles(),
-                def->get_line_styles());
+        draw_shape_character(def, inst->getWorldMatrix(),
+                inst->get_world_cxform());
     }
     
     /// \brief
     /// Draws the given character definition with the given transformations and
     /// styles. 
     virtual void draw_shape_character(shape_character_def *def, 
-        const SWFMatrix& mat,
-        const cxform& cx,
-        const std::vector<fill_style>& fill_styles,
-        const std::vector<line_style>& line_styles) = 0;
+        const SWFMatrix& mat, const cxform& cx) = 0;
         
     /// \brief
     /// Draws a glyph (font character).

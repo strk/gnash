@@ -369,7 +369,14 @@ main(int /*argc*/, char** /*argv*/)
 	// Check hitdetector bounds and reactions on mouse movement 
 	//--------------------------------------------------------------
 
-	typedef struct IntPoint { int x; int y; IntPoint(int nx, int ny) : x(nx), y(ny) {} };
+	struct IntPoint {
+        int x;
+        int y;
+        IntPoint(int nx, int ny)
+            :
+            x(nx), y(ny)
+        {}
+    };
 
 	IntPoint c1s(6, 346); // top-right of first yellow circle (in when small)
 	IntPoint c1b(16, 329); // top-right of first yellow circle (in when big, out when small)
