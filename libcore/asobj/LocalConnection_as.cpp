@@ -26,6 +26,7 @@
 #include <cstring>
 #include <boost/cstdint.hpp> // for boost::?int??_t
 #include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
 
 #include "VM.h"
 #include "URLAccessManager.h"
