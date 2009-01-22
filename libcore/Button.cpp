@@ -241,9 +241,11 @@ attachButtonInterface(as_object& o)
 
     as_c_function_ptr gettersetter;
 
-    //
-    // Properties (TODO: move to appropriate SWF version section)
-    //
+    o.init_property(NSV::PROP_uQUALITY, character::quality,
+            character::quality);
+    
+    o.init_property(NSV::PROP_uHIGHQUALITY, character::highquality,
+            character::highquality);
 
     gettersetter = &character::x_getset;
     o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);

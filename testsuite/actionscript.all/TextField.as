@@ -297,10 +297,10 @@ check_equals(tf.embedFonts, false);
 
 // Check TextField._highquality
 
-xcheck_equals(typeof(tf._highquality), 'number');
+check_equals(typeof(tf._highquality), 'number');
 check(!tf.hasOwnProperty('_highquality'));
-check(!tf.__proto__.hasOwnProperty('_highquality'));
-xcheck_equals(tf._highquality, 1);
+xcheck(!tf.__proto__.hasOwnProperty('_highquality'));
+check_equals(tf._highquality, 1);
 tf._highquality = 0;
 check_equals(tf._highquality, 0);
 tf._highquality = 1;
@@ -486,14 +486,14 @@ tf.password = false;
 // Check TextField.quality
 
 // TODO: check this, might be a string
-xcheck_equals(typeof(tf._quality), 'string');
-check(!tf.hasOwnProperty('quality'));
-check(!tf.__proto__.hasOwnProperty('quality'));
-check(!tf.__proto__.__proto__.hasOwnProperty('quality'));
-check(!tf.__proto__.__proto__.__proto__.hasOwnProperty('quality'));
-xcheck_equals(tf._quality, "HIGH");
+check_equals(typeof(tf._quality), 'string');
+check(!tf.hasOwnProperty('_quality'));
+xcheck(!tf.__proto__.hasOwnProperty('_quality'));
+check(!tf.__proto__.__proto__.hasOwnProperty('_quality'));
+check(!tf.__proto__.__proto__.__proto__.hasOwnProperty('_quality'));
+check_equals(tf._quality, "HIGH");
 tf._quality = "FAKE VALUE";
-xcheck_equals(tf._quality, "HIGH");
+check_equals(tf._quality, "HIGH");
 tf._quality = "LOW";
 check_equals(tf._quality, "LOW");
 tf._quality = "HIGH";
