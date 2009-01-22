@@ -172,7 +172,6 @@ AGG ressources
 	#define round(x) rint(x)
 #endif
 
-#define TWIPS_TO_SHIFTED_PIXELS(x) (x*0.05f + 0.5f) 
 
 #include <boost/numeric/conversion/converter.hpp>
 
@@ -182,6 +181,8 @@ namespace {
 
 class AlphaMask;
 
+
+typedef std::vector<agg::path_storage> AggPaths;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
 typedef std::vector<AlphaMask*> AlphaMasks;
 typedef std::vector<path> GnashPaths;
@@ -193,7 +194,7 @@ inline void applyClipBox(Rasterizer& ras, const geometry::Range2d<int>& bounds)
     ras.clip_box(static_cast<double>(bounds.getMinX()),
             static_cast<double>(bounds.getMinY()),
             static_cast<double>(bounds.getMaxX() + 1), 
-            static_cast<double>(bounds.getMaxY()+1)
+            static_cast<double>(bounds.getMaxY() + 1)
             );  
 }
 
@@ -226,61 +227,64 @@ analyzePaths(const GnashPaths &paths, bool& have_shape,
     }
 }
 
+class EdgeToPath
+{
+
+public:
+    EdgeToPath(AggPaths::value_type& path, double shift = 0)
+        :
+        _path(path),
+        _shift(shift)
+    {}
+
+    void operator()(const edge& edge)
+    {
+        if (edge.is_straight()) {
+            _path.line_to(TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
+                          TWIPS_TO_PIXELS(edge.ap.y) + _shift);
+        }
+        else {
+            _path.curve3(TWIPS_TO_PIXELS(edge.cp.x) + _shift, 
+                     TWIPS_TO_PIXELS(edge.cp.y) + _shift,
+                     TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
+                     TWIPS_TO_PIXELS(edge.ap.y) + _shift);             
+        }
+    }
+
+private:
+    agg::path_storage& _path;
+    const double _shift;
+};
+
 /// In-place transformation of Gnash paths to AGG paths.
 class GnashToAggPath
 {
 public:
 
-    typedef std::vector<agg::path_storage> AggPaths;
-
-    GnashToAggPath(AggPaths& dest)
+    GnashToAggPath(AggPaths& dest, double shift = 0)
         :
         _dest(dest),
-        _it(_dest.begin())
+        _it(_dest.begin()),
+        _shift(shift)
     {
     }
-
-    class EdgeToPath
-    {
-
-    public:
-        EdgeToPath(AggPaths::value_type& path)
-            :
-            _path(path)
-        {}
-
-        void operator()(const edge& edge)
-        {
-            if (edge.is_straight()) {
-                _path.line_to(TWIPS_TO_SHIFTED_PIXELS(edge.ap.x), 
-                                    TWIPS_TO_SHIFTED_PIXELS(edge.ap.y));
-            }
-            else {
-                _path.curve3(TWIPS_TO_SHIFTED_PIXELS(edge.cp.x), 
-                         TWIPS_TO_SHIFTED_PIXELS(edge.cp.y),
-                         TWIPS_TO_SHIFTED_PIXELS(edge.ap.x), 
-                         TWIPS_TO_SHIFTED_PIXELS(edge.ap.y));             
-            }
-        }
-
-    private:
-        agg::path_storage& _path;
-    };
 
     void operator()(const path& in)
     {
         agg::path_storage& p = *_it;
 
-        p.move_to(TWIPS_TO_SHIFTED_PIXELS(in.ap.x), 
-                            TWIPS_TO_SHIFTED_PIXELS(in.ap.y));
+        p.move_to(TWIPS_TO_PIXELS(in.ap.x) + _shift, 
+                  TWIPS_TO_PIXELS(in.ap.y) + _shift);
 
-        std::for_each(in.m_edges.begin(), in.m_edges.end(), EdgeToPath(p));
+        std::for_each(in.m_edges.begin(), in.m_edges.end(),
+                EdgeToPath(p, _shift));
         ++_it;
     }
 
 private:
-    std::vector<agg::path_storage>& _dest;
+    AggPaths& _dest;
     AggPaths::iterator _it;
+    const double _shift;
 
 };
 
@@ -289,10 +293,10 @@ private:
 /// and shapes. Subshapes are ignored (ie. all paths are converted). Converts 
 /// TWIPS to pixels on the fly.
 inline void
-buildPaths(std::vector<agg::path_storage>& dest, const GnashPaths& paths) 
+buildPaths(AggPaths& dest, const GnashPaths& paths) 
 {
     dest.resize(paths.size());
-    std::for_each(paths.begin(), paths.end(), GnashToAggPath(dest));
+    std::for_each(paths.begin(), paths.end(), GnashToAggPath(dest, 0.05));
 } 
 
 // --- ALPHA MASK BUFFER CONTAINER ---------------------------------------------
@@ -886,7 +890,7 @@ public:
     }
 
     // convert gnash paths to agg paths.
-    std::vector<agg::path_storage> agg_paths;    
+    AggPaths agg_paths;    
     buildPaths(agg_paths, paths);
  
     // make sure m_single_fill_styles contains the required color 
@@ -994,8 +998,8 @@ public:
             return;
         }
 
-        std::vector<agg::path_storage> agg_paths;  
-        std::vector<agg::path_storage> agg_paths_rounded;  
+        AggPaths agg_paths;  
+        AggPaths agg_paths_rounded;  
 
         // Flash only aligns outlines. Probably this is done at rendering
         // level.
@@ -1097,7 +1101,7 @@ public:
   //
   // TODO: Flash never aligns lines that are wider than 1 pixel on *screen*,
   // but we currently don't check the width.  
-  void buildPaths_rounded(std::vector<agg::path_storage>& dest, 
+  void buildPaths_rounded(AggPaths& dest, 
     const GnashPaths& paths, const std::vector<line_style>& line_styles)
   {
 
@@ -1346,8 +1350,8 @@ public:
   ///    Defines which subshape to draw. -1 means all subshapes.
   ///
   void draw_shape(int subshape_id, const GnashPaths &paths,
-    const std::vector<agg::path_storage>& agg_paths,  
-    agg_style_handler& sh, int even_odd) {
+    const AggPaths& agg_paths,  
+    agg_style_handler& sh, bool even_odd) {
     
     if (_alphaMasks.empty()) {
     
@@ -1380,8 +1384,8 @@ public:
   /// much faster.  
   template <class scanline_type>
   void draw_shape_impl(int subshape_id, const GnashPaths &paths,
-    const std::vector<agg::path_storage>& agg_paths,
-    agg_style_handler& sh, int even_odd, scanline_type& sl) {
+    const AggPaths& agg_paths,
+    agg_style_handler& sh, bool even_odd, scanline_type& sl) {
     /*
     Fortunately, AGG provides a rasterizer that fits perfectly to the flash
     data model. So we just have to feed AGG with all data and we're done. :-)
@@ -1397,7 +1401,7 @@ public:
     
     if ( _clipbounds.empty() ) return;
 
-    // AGG stuff
+    // Target renderer
     renderer_base& rbase = *m_rbase;
 
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
@@ -1431,12 +1435,12 @@ public:
         const path &this_path_gnash = paths[pno];
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);
-        agg::conv_curve< agg::path_storage > curve(this_path_agg);        
         
-        if (this_path_gnash.m_new_shape)
-          ++current_subshape;
+        agg::conv_curve<agg::path_storage> curve(this_path_agg);        
+        
+        if (this_path_gnash.m_new_shape) ++current_subshape;
           
-        if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+        if ((subshape_id >= 0) && (current_subshape!=subshape_id)) {
           // Skip this path as it is not part of the requested sub-shape.
           continue;
         }
@@ -1468,10 +1472,10 @@ public:
 
   // very similar to draw_shape but used for generating masks. There are no
   // fill styles nor subshapes and such. Just render plain solid shapes.
-  void draw_mask_shape(const GnashPaths &paths, int even_odd)
+  void draw_mask_shape(const GnashPaths &paths, bool even_odd)
   {
 
-    unsigned int mask_count = _alphaMasks.size();
+    const size_t mask_count = _alphaMasks.size();
     
     if (mask_count < 2) {
     
@@ -1481,9 +1485,10 @@ public:
       
       scanline_type sl;
       
-      draw_mask_shape_impl<scanline_type> (paths, even_odd, sl);
+      draw_mask_shape_impl(paths, even_odd, sl);
         
-    } else {
+    }
+    else {
     
       // Woohoo! We're drawing a nested mask! Use the previous mask while 
       // drawing the new one, the result will be the intersection.
@@ -1492,7 +1497,7 @@ public:
       
       scanline_type sl(_alphaMasks[mask_count-2]->getMask());
       
-      draw_mask_shape_impl<scanline_type> (paths, even_odd, sl);
+      draw_mask_shape_impl(paths, even_odd, sl);
         
     }
     
@@ -1500,7 +1505,7 @@ public:
   
   
   template <class scanline_type>
-  void draw_mask_shape_impl(const GnashPaths &paths, int even_odd,
+  void draw_mask_shape_impl(const GnashPaths &paths, bool even_odd,
     scanline_type& sl) {
     
     typedef agg::pixfmt_gray8 pixfmt;
@@ -1529,15 +1534,12 @@ public:
       
 
     // activate even-odd filling rule
-    if (even_odd)
-      rasc.filling_rule(agg::fill_even_odd);
-    else
-      rasc.filling_rule(agg::fill_non_zero);
+    if (even_odd) rasc.filling_rule(agg::fill_even_odd);
+    else rasc.filling_rule(agg::fill_non_zero);
       
-    
     // push paths to AGG
-    agg::path_storage path; // be careful about this name 
-    agg::conv_curve< agg::path_storage > curve(path);
+    agg::path_storage path; 
+    agg::conv_curve<agg::path_storage> curve(path);
 
     for (size_t pno=0, pcount=paths.size(); pno < pcount; ++pno) {
 
@@ -1553,27 +1555,14 @@ public:
       path.move_to(TWIPS_TO_PIXELS(this_path.ap.x), 
                    TWIPS_TO_PIXELS(this_path.ap.y));
     
-      const unsigned int ecount = this_path.m_edges.size();
-      for (unsigned int eno=0; eno<ecount; ++eno) {
-
-        const edge &this_edge = this_path.m_edges[eno];
-
-        if (this_edge.is_straight())
-          path.line_to(TWIPS_TO_PIXELS(this_edge.ap.x), 
-                       TWIPS_TO_PIXELS(this_edge.ap.y));
-        else
-          path.curve3(TWIPS_TO_PIXELS(this_edge.cp.x), 
-                      TWIPS_TO_PIXELS(this_edge.cp.y),
-                      TWIPS_TO_PIXELS(this_edge.ap.x), 
-                      TWIPS_TO_PIXELS(this_edge.ap.y));
-        
-      } // for edge
+      // Add all edges to the path.
+      std::for_each(this_path.m_edges.begin(), this_path.m_edges.end(),
+              EdgeToPath(path));
       
       // add to rasterizer
       rasc.add_path(curve);
     
     } // for path
-    
     
     // now render that thing!
     agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
@@ -1584,7 +1573,7 @@ public:
 
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const GnashPaths &paths,
-    const std::vector<agg::path_storage>& agg_paths,
+    const AggPaths& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx,
     const SWFMatrix& linestyle_matrix) {
     
@@ -1618,14 +1607,14 @@ public:
   /// Template for draw_outlines(), see draw_shapes_impl().
   template <class scanline_type>
   void draw_outlines_impl(int subshape_id, const GnashPaths &paths,
-    const std::vector<agg::path_storage>& agg_paths,
+    const AggPaths& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx, 
     const SWFMatrix& linestyle_matrix, scanline_type& sl) {
     
     assert(m_pixf.get());
-    
-    if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
-      return;    
+
+    // Flash ignores lines in mask /definitions/ 
+    if (m_drawing_mask) return;    
     
     if ( _clipbounds.empty() ) return;
 
@@ -1690,9 +1679,12 @@ public:
         }
         else
         {
-          if ( (!lstyle.scaleThicknessVertically()) || (!lstyle.scaleThicknessHorizontally()) )
+          if ((!lstyle.scaleThicknessVertically()) ||
+                  (!lstyle.scaleThicknessHorizontally()))
           {
-             LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in AGG renderer (we'll scale by the scalable one)")) );
+             LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in "
+                             "AGG renderer (we'll scale by the "
+                             "scalable one)")) );
           }
           stroke.width(std::max(1.0f, thickness*stroke_scale));
         }
