@@ -78,10 +78,6 @@ public:
     void read(SWFStream& in, SWF::TagType tag, bool with_style,
             movie_definition& m);
 
-    void display(const SWFMatrix& mat, const cxform& cx,
-        const std::vector<fill_style>& fill_styles,
-        const std::vector<line_style>& line_styles) const;
-
     /// Get cached bounds of this shape.
     const rect&	get_bound() const { return m_bound; }
 

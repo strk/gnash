@@ -165,11 +165,6 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
         // chars that share a particular style.
         const TextRecord& rec = *i;
 
-        // Used to pass a color on to shape_character::display()
-        // FIXME: this isn't very good, especially the line style.
-        static std::vector<fill_style> s_dummy_style(1, fill_style());    
-        static std::vector<line_style> s_dummy_line_style;
-
         const Font* fnt = rec.getFont();
         if (!fnt) {
             IF_VERBOSE_MALFORMED_SWF(
@@ -191,8 +186,6 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
         if (rec.hasYOffset()) y = rec.yOffset();
 
         boost::int16_t startX = x; // for the underline, if any
-
-        s_dummy_style[0].set_color(rec.color());
 
         rgba textColor = cx.transform(rec.color());
 

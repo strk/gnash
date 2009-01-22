@@ -2765,10 +2765,15 @@ attachTextFieldInterface(as_object& o)
             character::xmouse_get, character::xmouse_get, propFlags);
     o.init_property(NSV::PROP_uYMOUSE,
             character::ymouse_get, character::ymouse_get, propFlags);
+    o.init_property(NSV::PROP_uHIGHQUALITY,
+            character::highquality, character::highquality);
+    o.init_property(NSV::PROP_uQUALITY,
+            character::quality, character::quality);
     o.init_property(NSV::PROP_uXSCALE,
             character::xscale_getset, character::xscale_getset);
     o.init_property(NSV::PROP_uYSCALE,
             character::yscale_getset, character::yscale_getset);
+ 
     // Standard flags.
     const int flags = as_prop_flags::dontDelete
         |as_prop_flags::dontEnum;
