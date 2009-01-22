@@ -2662,7 +2662,12 @@ textfield_replaceSel(const fn_call& fn)
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
     if (!fn.nargs) {
-        // Log error
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror("TextField.replaceSel(%s) requires exactly one "
+                "argument", os.str());
+        );
         return as_value();
     }
 
