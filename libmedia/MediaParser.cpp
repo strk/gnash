@@ -49,7 +49,8 @@ MediaParser::startParserThread()
 {
 #ifdef LOAD_MEDIA_IN_A_SEPARATE_THREAD
 	log_debug("Starting MediaParser thread");
-	_parserThread.reset( new boost::thread(boost::bind(parserLoopStarter, this)) );
+	_parserThread.reset(new boost::thread(
+                boost::bind(parserLoopStarter, this)));
 	_parserThreadStartBarrier.wait();
 #endif
 }
@@ -71,19 +72,15 @@ MediaParser::getBufferLengthNoLock() const
 
 	//log_debug("MediaParser::getBufferLength: %d video %d audio frames", _videoFrames.size(), _audioFrames.size());
 
-	if ( hasVideo && hasAudio )
-	{
+	if (hasVideo && hasAudio) {
 		return std::min(audioBufferLength(), videoBufferLength());
 	}
-	else if ( hasVideo )
-	{
-		return videoBufferLength();
-	}
-	else if ( hasAudio )
-	{
-		return audioBufferLength();
-	}
-	else return 0;
+	
+    if (hasVideo) return videoBufferLength();
+	
+    if (hasAudio) return audioBufferLength();
+	
+    return 0;
 }
 
 boost::uint64_t
@@ -275,7 +272,6 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
         for (AudioFrames::reverse_iterator e=_audioFrames.rend(); i!=e; ++i)
         {
             if ( (*i)->timestamp <= frame->timestamp ) break;
-            //log_debug("%d-to-last element has timestamp %d > %d", gap, (*i)->timestamp, frame->timestamp);
             ++gap;
         }
 
@@ -284,7 +280,8 @@ MediaParser::pushEncodedAudioFrame(std::auto_ptr<EncodedAudioFrame> frame)
         if ( gap ) {
             log_debug("Timestamp of last %d/%d audio frames in queue "
                 "greater then timestamp in the frame being "
-                "inserted to it (%d).", gap, _audioFrames.size(), frame->timestamp);
+                "inserted to it (%d).", gap, _audioFrames.size(),
+                frame->timestamp);
         }
     }
 
@@ -315,7 +312,6 @@ MediaParser::pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame)
         for (VideoFrames::reverse_iterator e=_videoFrames.rend(); i!=e; ++i)
         {
             if ( (*i)->timestamp() <= frame->timestamp() ) break;
-            //log_debug("%d-to-last element has timestamp() %d > %d", gap, (*i)->timestamp(), frame->timestamp());
             ++gap;
         }
 
@@ -324,7 +320,8 @@ MediaParser::pushEncodedVideoFrame(std::auto_ptr<EncodedVideoFrame> frame)
         if ( gap ) {
             log_debug("Timestamp of last %d/%d video frames in queue "
                 "greater then timestamp() in the frame being "
-                "inserted to it (%d).", gap, _videoFrames.size(), frame->timestamp());
+                "inserted to it (%d).", gap, _videoFrames.size(),
+                frame->timestamp());
         }
     }
 
