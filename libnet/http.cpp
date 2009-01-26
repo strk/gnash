@@ -144,45 +144,45 @@ HTTP::http_method_e
 HTTP::processClientRequest(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
-    bool result;
+    bool result = false;
     
     boost::shared_ptr<amf::Buffer> buf(_que.peek());
     if (buf) {
-	_cmd = extractCommand(buf->reference());
-	switch (_cmd) {
-	  case HTTP::HTTP_GET:
-	      result = processGetRequest(fd);
-	      break;
-	  case HTTP::HTTP_POST:
-	      result = processPostRequest(fd);
-	      break;
-	  case HTTP::HTTP_HEAD:
-	      result = processHeadRequest(fd);
-	      break;
-	  case HTTP::HTTP_CONNECT:
-	      result = processConnectRequest(fd);
-	      break;
-	  case HTTP::HTTP_TRACE:
-	      result = processTraceRequest(fd);
-	      break;
-	  case HTTP::HTTP_OPTIONS:
-	      result = processOptionsRequest(fd);
-	      break;
-	  case HTTP::HTTP_PUT:
-	      result = processPutRequest(fd);
-	      break;
-	  case HTTP::HTTP_DELETE:
-	      result = processDeleteRequest(fd);
-	      break;
-	  default:
-	      break;
-	}
+        _cmd = extractCommand(buf->reference());
+        switch (_cmd) {
+          case HTTP::HTTP_GET:
+              result = processGetRequest(fd);
+              break;
+          case HTTP::HTTP_POST:
+              result = processPostRequest(fd);
+              break;
+          case HTTP::HTTP_HEAD:
+              result = processHeadRequest(fd);
+              break;
+          case HTTP::HTTP_CONNECT:
+              result = processConnectRequest(fd);
+              break;
+          case HTTP::HTTP_TRACE:
+              result = processTraceRequest(fd);
+              break;
+          case HTTP::HTTP_OPTIONS:
+              result = processOptionsRequest(fd);
+              break;
+          case HTTP::HTTP_PUT:
+              result = processPutRequest(fd);
+              break;
+          case HTTP::HTTP_DELETE:
+              result = processDeleteRequest(fd);
+              break;
+          default:
+              break;
+        }
     }
 
     if (result) {
-	return _cmd;
+        return _cmd;
     } else {
-	return HTTP::HTTP_NONE;
+        return HTTP::HTTP_NONE;
     }
 }
 

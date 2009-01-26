@@ -367,7 +367,7 @@ public:
     /// @param includeRoot      Whether the transform of the Stage (_root)
     ///                         should be concatenated. This is required to be
     ///                         false for pointInBounds.
-    SWFMatrix getWorldMatrix(bool includeRoot = true) const;
+    DSOEXPORT SWFMatrix getWorldMatrix(bool includeRoot = true) const;
 
     /// \brief
     /// Get our concatenated color transform (all our ancestor transforms,

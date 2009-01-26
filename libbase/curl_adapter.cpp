@@ -661,22 +661,23 @@ CurlStreamFile::fillCache(long unsigned size)
 		{
 			// timeout
 #ifdef GNASH_CURL_VERBOSE
-                        gnash::log_debug("select() timed out, elapsed is %u", lastProgress.elapsed() );
+            gnash::log_debug("select() timed out, elapsed is %u",
+                    lastProgress.elapsed());
 #endif
-                        if ( userTimeout && lastProgress.elapsed() > userTimeout )
-                        {
-                                gnash::log_error(_("Timeout (%u milliseconds) while loading from url %s"),
-					userTimeout, _url);
+            if (userTimeout && lastProgress.elapsed() > userTimeout)
+            {
+                gnash::log_error(_("Timeout (%u milliseconds) while loading "
+                            "from url %s"), userTimeout, _url);
 				// TODO: should we set _error here ?
-                                return;
-                        }
+                return;
+            }
 		}
 		else
 		{
 #ifdef GNASH_CURL_VERBOSE
-                        gnash::log_debug("FD activity, resetting progress timer");
+            gnash::log_debug("FD activity, resetting progress timer");
 #endif
-                        lastProgress.restart();
+            lastProgress.restart();
 		}
 
 

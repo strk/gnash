@@ -1015,7 +1015,7 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
         float swfFPS = 25; // TODO: get this host app (gnash -d affects this)
         double msecsPerAdvance = 10000/swfFPS;
 
-        unsigned int bufferLimit = 20;
+        const unsigned int bufferLimit = 20;
         unsigned int bufferSize = _audioStreamer._audioQueue.size();
         if ( bufferSize > bufferLimit )
         {

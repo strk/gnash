@@ -2034,12 +2034,10 @@ textfield_background(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getDrawBackground());
     }
-    else // setter
-    {
+    else {
         ptr->setDrawBackground(fn.arg(0).to_bool());
     }
 
@@ -2051,12 +2049,10 @@ textfield_border(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getDrawBorder());
     }
-    else // setter
-    {
+    else {
         ptr->setDrawBorder(fn.arg(0).to_bool());
     }
 
@@ -2068,12 +2064,10 @@ textfield_backgroundColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getBackgroundColor().toRGB());
     }
-    else // setter
-    {
+    else {
         rgba newColor;
         newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_int()));
         ptr->setBackgroundColor(newColor);
@@ -2087,14 +2081,12 @@ textfield_borderColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getBorderColor().toRGB());
     }
-    else // setter
-    {
+    else {
         rgba newColor;
-        newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
+        newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
         ptr->setBorderColor(newColor);
     }
 
@@ -2107,8 +2099,7 @@ textfield_textColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         return as_value(ptr->getTextColor().toRGB());
     }
@@ -2126,14 +2117,13 @@ textfield_embedFonts(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         return as_value(ptr->getEmbedFonts());
     }
 
     // Setter
-    ptr->setEmbedFonts( fn.arg(0).to_bool() );
+    ptr->setEmbedFonts(fn.arg(0).to_bool());
     return as_value();
 }
 
@@ -2142,13 +2132,11 @@ textfield_wordWrap(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->doWordWrap());
     }
-    else // setter
-    {
-        ptr->setWordWrap( fn.arg(0).to_bool() );
+    else {
+        ptr->setWordWrap(fn.arg(0).to_bool());
     }
 
     return as_value();
@@ -2159,12 +2147,10 @@ textfield_html(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->doHtml());
     }
-    else // setter
-    {
+    else {
         ptr->setHtml( fn.arg(0).to_bool() );
     }
 

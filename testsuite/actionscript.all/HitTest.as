@@ -132,7 +132,9 @@ rcsid="$Id: HitTest.as,v 1.8 2008/04/29 10:23:50 bwy Exp $";
  check_equals(b.hitTest(151, 251, false), false);
  check_equals(b.hitTest(151, 252, false), false);
 
- /// (Where is it?!)
+ /// (Where is it?!) Checking every pixel in +/- _width by +/- _height
+ /// comes up with "true" in the shifted area, but doing it directly
+ /// returns false.
  check_equals(b.hitTest(99, 199, true), false);
  xcheck_equals(b.hitTest(100, 200, true), false);
  xcheck_equals(b.hitTest(101, 201, true), false);
