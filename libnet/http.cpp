@@ -175,6 +175,7 @@ HTTP::processClientRequest(int fd)
 	      result = processDeleteRequest(fd);
 	      break;
 	  default:
+          result = false;
 	      break;
 	}
     }
