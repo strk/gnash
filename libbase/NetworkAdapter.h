@@ -38,14 +38,16 @@ public:
     /// Custom headers for addRequestHeader. These are case insensitive, and
     /// subsequent addition of a header already there replaces any previous one.
     /// Some values are not allowed.
-    typedef std::map<std::string, std::string, StringNoCaseLessThan> RequestHeaders;
+    typedef std::map<std::string, std::string, StringNoCaseLessThan>
+        RequestHeaders;
 
     /// \brief
     /// Returns a read-only IOChannel that fetches data
     /// from an url.
     //
     /// @param url      The url to fetch data from.
-    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url);
+    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(
+            const std::string& url);
 
     /// \brief
     /// Returns a read-only IOChannel that fetches data
@@ -55,7 +57,8 @@ public:
     ///
     /// @param url      The url to post to.
     /// @param postdata The url-encoded post data
-    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata);
+    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(
+            const std::string& url, const std::string& postdata);
 
     /// \brief
     /// Returns a read-only IOChannel that fetches data
@@ -66,8 +69,8 @@ public:
     /// @param url      The url to post to.
     /// @param postdata The url-encoded post data
     /// @param headers  A RequestHeaders map of custom headers to send.
-    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url, const std::string& postdata,
-                                    const RequestHeaders& headers);
+    DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url,
+           const std::string& postdata, const RequestHeaders& headers);
 
 
     /// Check whether a RequestHeader is permitted.
