@@ -92,10 +92,8 @@ StreamProvider::getStream(const URL& url)
 	}
 	else
 	{
-		std::string url_str = url.str();
-		const char* c_url = url_str.c_str();
 		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(c_url);
+			stream = NetworkAdapter::makeStream(url.str());
 		}
 
         // Will return 0 auto_ptr if not allowed.
@@ -118,10 +116,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
         return getStream(url, postdata);
     }
 
-	std::string url_str = url.str();
-	const char* c_url = url_str.c_str();
 	if ( URLAccessManager::allow(url) ) {
-		return NetworkAdapter::makeStream(c_url, postdata, headers);
+		return NetworkAdapter::makeStream(url.str(), postdata, headers);
 	}
 
 	return std::auto_ptr<IOChannel>();
@@ -162,11 +158,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 	}
 	else
 	{
-		std::string url_str = url.str();
-		const char* c_url = url_str.c_str();
-
 		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(c_url, postdata);
+			stream = NetworkAdapter::makeStream(url.str(), postdata);
 		}
         // Will return 0 auto_ptr if not allowed.
 		return stream;		
