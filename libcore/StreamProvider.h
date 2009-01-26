@@ -22,6 +22,8 @@
 #include <memory>
 #include "NetworkAdapter.h"
 
+#include "dsodefs.h" // for DSOEXPORT
+
 // Forward declarations
 namespace gnash {
 	class URL;
@@ -32,7 +34,7 @@ namespace gnash {
 namespace gnash {
 
 /// Provide IOChannel streams for network or filesystem resources
-class StreamProvider
+class DSOEXPORT StreamProvider
 {
 
 public:
@@ -41,7 +43,7 @@ public:
 
 	virtual ~StreamProvider() {}
 
-	DSOEXPORT static StreamProvider& getDefaultInstance();
+	static StreamProvider& getDefaultInstance();
 
 	/// Returned stream ownership is transferred to caller.
 	//
@@ -64,10 +66,12 @@ public:
 	///	Post data in url-encoded form.
 	///
 	///
-	virtual std::auto_ptr<IOChannel> getStream(const URL& url, const std::string& postdata);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+            const std::string& postdata);
 	
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-	                    const std::string& postdata, const NetworkAdapter::RequestHeaders& headers);
+            const std::string& postdata,
+            const NetworkAdapter::RequestHeaders& headers);
 	
 };
 

@@ -51,7 +51,7 @@ public:
     bool push(boost::uint8_t *data, int nbytes);
     bool push(boost::shared_ptr<amf::Buffer> data);
     // Pop the first date element off the que
-    boost::shared_ptr<amf::Buffer> pop();
+    boost::shared_ptr<amf::Buffer> DSOEXPORT pop();
     // Peek at the first date element witjhout removing it from the que
     boost::shared_ptr<amf::Buffer> peek();
     // Get the number of elements in the que
