@@ -1468,7 +1468,7 @@ PreferencesDialog::addMediaTab()
     gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->saveMediaToggle, FALSE,
             FALSE, 0);
     // Align button state with rcfile
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->soundToggle),
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->saveMediaToggle),
             _rcfile.saveMedia());
 
     // Directory for saving media
