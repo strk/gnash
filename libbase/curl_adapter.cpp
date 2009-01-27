@@ -781,7 +781,7 @@ CurlStreamFile::init(const std::string& url, const std::string& cachefile)
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 	
-    if (rcfile.saveMedia() && !cachefile.empty()) {
+    if (!cachefile.empty()) {
         _cache = std::fopen(cachefile.c_str(), "w+b");
         if (!_cache) {
 

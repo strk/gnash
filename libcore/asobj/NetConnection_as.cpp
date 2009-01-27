@@ -589,7 +589,8 @@ HTTPRemotingHandler::advance()
 #endif
         queued_count = 0;
 
-        _connection.reset(StreamProvider::getDefaultInstance().getStream(_url, postdata_str, _headers).release());
+        _connection.reset(StreamProvider::getDefaultInstance().getStream(
+                    _url, postdata_str, _headers).release());
 
         _postdata.resize(6);
 #ifdef GNASH_DEBUG_REMOTING
@@ -960,7 +961,13 @@ NetConnection_as::getStream(const std::string& name)
     // must be constructed against the base URL, not the NetConnection uri,
     // which should always be null in this case.
     const URL url(name, ri.baseURL());
-    return streamProvider.getStream(url, StreamProvider::defaultNamingPolicy);
+
+    const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+    StreamProvider::NamingPolicy cacheNamer = rcfile.saveStreamingMedia() ? 
+        StreamProvider::defaultNamingPolicy : 0;
+
+    return streamProvider.getStream(url, cacheNamer);
 
 }
 

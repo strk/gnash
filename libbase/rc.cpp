@@ -102,7 +102,8 @@ RcInitFile::RcInitFile()
     _lcshmkey(0),
     _ignoreFSCommand(true),
     _quality(-1),
-    _saveMedia(false)
+    _saveStreamingMedia(false),
+    _saveLoadedMedia(false)
 {
     expandPath(_solsandbox);
 
@@ -513,8 +514,11 @@ RcInitFile::parseFile(const std::string& filespec)
             ||
                  extractNumber(_quality, "quality", variable, value)
             ||
-                 extractSetting(_saveMedia, "saveMedia", variable,
-                           value)
+                 extractSetting(_saveLoadedMedia, "saveLoadedMedia",
+                         variable, value)
+            ||
+                 extractSetting(_saveStreamingMedia, "saveStreamingMedia",
+                         variable, value)
             || 
                  extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable,
                          value)
@@ -666,7 +670,8 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
-    cmd << "saveMedia " << _saveMedia << endl <<    
+    cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
+    cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
    
     // Strings.
 

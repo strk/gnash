@@ -22,6 +22,7 @@
 #endif
 
 
+#include "GnashFileUtilities.h"
 #include "StreamProvider.h"
 #include "URL.h"
 #include "tu_file.h"
@@ -34,8 +35,6 @@
 #include <map>
 #include <string>
 #include <vector>
-
-#include "GnashSystemFileHeaders.h"
 
 namespace gnash
 {
@@ -53,7 +52,7 @@ StreamProvider::defaultNamingPolicy(const URL& url)
     assert(path[0] == '/');
     
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    const std::string& dir = rcfile.getMediaDir();
+    const std::string& dir = rcfile.getMediaDir() + "/" + url.hostname();
  
     // Create the user-specified directory if possible.
     // An alternative would be to use the 'host' part and create a 

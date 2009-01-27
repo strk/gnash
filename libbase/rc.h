@@ -269,9 +269,13 @@ public:
     
     void ignoreFSCommand(bool value) { _ignoreFSCommand = value; }
     
-    void saveMedia(bool value) { _saveMedia = value; }
+    void saveStreamingMedia(bool value) { _saveStreamingMedia = value; }
 
-    bool saveMedia() const { return _saveMedia; }
+    bool saveStreamingMedia() const { return _saveStreamingMedia; }
+
+    void saveLoadedMedia(bool value) { _saveLoadedMedia = value; }
+
+    bool saveLoadedMedia() const { return _saveLoadedMedia; }
 
     void setMediaDir(const std::string& value) { _mediaCacheDir = value; }
 
@@ -491,7 +495,9 @@ protected:
     /// The quality to display SWFs in. -1 to allow the SWF to override.
     int _quality;
 
-    bool _saveMedia;
+    bool _saveStreamingMedia;
+    
+    bool _saveLoadedMedia;
 
     std::string _mediaCacheDir;
 

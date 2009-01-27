@@ -969,7 +969,8 @@ private:
         GtkWidget *librarySize;
         GtkWidget *startStoppedToggle;
         GtkWidget *mediaDir;
-        GtkWidget *saveMediaToggle;
+        GtkWidget *saveStreamingMediaToggle;
+        GtkWidget *saveLoadedMediaToggle;
 #ifdef USE_DEBUGGER
         GtkWidget *DebuggerToggle;
 #endif
@@ -999,7 +1000,8 @@ private:
         	librarySize(0),
         	startStoppedToggle(0),
             mediaDir(0),
-            saveMediaToggle(0)
+            saveStreamingMediaToggle(0),
+            saveLoadedMediaToggle(0)
 #ifdef USE_DEBUGGER
         	,DebuggerToggle(0)
 #endif
@@ -1054,10 +1056,16 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
                         GTK_TOGGLE_BUTTON(prefs->soundToggle)));
         }
 
-        if (prefs->saveMediaToggle) {
-            _rcfile.saveMedia(
+        if (prefs->saveLoadedMediaToggle) {
+            _rcfile.saveLoadedMedia(
                 gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
-                        prefs->saveMediaToggle)));
+                        prefs->saveLoadedMediaToggle)));
+        }
+
+        if (prefs->saveStreamingMediaToggle) {
+            _rcfile.saveStreamingMedia(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->saveStreamingMediaToggle)));
         }
 
         if (prefs->mediaDir) {
@@ -1462,14 +1470,23 @@ PreferencesDialog::addMediaTab()
     gtk_label_set_use_markup(GTK_LABEL(savemedia), TRUE);
     gtk_box_pack_start(GTK_BOX(mediavbox), savemedia, FALSE, FALSE, 0);
    
-    // Save Media Toggle
-    _prefs->saveMediaToggle = gtk_check_button_new_with_mnemonic(
+    // Save streamed media Toggle
+    _prefs->saveStreamingMediaToggle = gtk_check_button_new_with_mnemonic(
             _("Save media streams to disk"));
-    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->saveMediaToggle, FALSE,
-            FALSE, 0);
+    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->saveStreamingMediaToggle,
+            FALSE, FALSE, 0);
     // Align button state with rcfile
-    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->saveMediaToggle),
-            _rcfile.saveMedia());
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+            _prefs->saveStreamingMediaToggle), _rcfile.saveStreamingMedia());
+
+    // Save loaded media Toggle
+    _prefs->saveLoadedMediaToggle = gtk_check_button_new_with_mnemonic(
+            _("Save dynamically loaded media to disk"));
+    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->saveLoadedMediaToggle,
+            FALSE, FALSE, 0);
+    // Align button state with rcfile
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                _prefs->saveLoadedMediaToggle), _rcfile.saveLoadedMedia());
 
     // Directory for saving media
     GtkWidget *mediastreamslabel = gtk_label_new(_("Saved media directory:"));
@@ -1531,7 +1548,7 @@ PreferencesDialog::addPlayerTab()
     					   "detect your OS</i>"));
     gtk_label_set_use_markup (GTK_LABEL (OSadvicelabel), TRUE);
     gtk_misc_set_alignment (GTK_MISC (OSadvicelabel), 0, 0.5);
-    gtk_box_pack_start(GTK_BOX(playervbox), OSadvicelabel, FALSE, FALSE, 0);     
+    gtk_box_pack_start(GTK_BOX(playervbox), OSadvicelabel, FALSE, FALSE, 0);
 
     // URL opener
     GtkWidget *urlopenerbox = gtk_hbox_new (FALSE, 2);
@@ -1542,9 +1559,11 @@ PreferencesDialog::addPlayerTab()
     gtk_box_pack_start(GTK_BOX(urlopenerbox), urlopenerlabel, FALSE, FALSE, 0);
     
     _prefs->urlOpenerText = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(urlopenerbox), _prefs->urlOpenerText, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(urlopenerbox), _prefs->urlOpenerText, FALSE,
+            FALSE, 0);
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(_prefs->urlOpenerText), _rcfile.getURLOpenerFormat().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->urlOpenerText),
+            _rcfile.getURLOpenerFormat().c_str());
 
     // Performance
     GtkWidget *performancelabel = gtk_label_new (_("<b>Performance</b>"));
@@ -1560,16 +1579,19 @@ PreferencesDialog::addPlayerTab()
     gtk_box_pack_start(GTK_BOX(libraryhbox), librarylabel, FALSE, FALSE, 0);
 
     _prefs->librarySize = gtk_spin_button_new_with_range(0, 100, 1);
-    gtk_box_pack_start(GTK_BOX(libraryhbox), _prefs->librarySize, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(libraryhbox), _prefs->librarySize, FALSE,
+            FALSE, 0);
     // Align to _rcfile value:
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize), _rcfile.getMovieLibraryLimit());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize),
+            _rcfile.getMovieLibraryLimit());
 
     _prefs->startStoppedToggle = gtk_check_button_new_with_mnemonic (
     				_("Start _Gnash in pause mode"));
-    gtk_box_pack_start (GTK_BOX(playervbox), _prefs->startStoppedToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->startStoppedToggle),
+    gtk_box_pack_start(GTK_BOX(playervbox), _prefs->startStoppedToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->startStoppedToggle),
     			_rcfile.startStopped());
-} // end of ::addPlayerTab
+} 
 
 
 
