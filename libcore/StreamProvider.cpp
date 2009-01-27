@@ -36,14 +36,19 @@
 #include <string>
 #include <vector>
 
-namespace gnash
-{
+namespace gnash {
 
 namespace {
+    
+    std::string urlToDirectory(const std::string& path);
+    
     /// Make a unique cachefile name from the supplied name.
-    //
-    /// If all possible filenames are taken, returns an empty string.
-    std::string defaultNamingPolicy(const URL& url);
+    /// If all possible filenames are taken, return an empty string.
+    std::string incrementalRename(const URL& url);
+    
+    /// Make a non-unique cachefile name from the supplied name.
+    /// If the directory cannot be created, return an empty string.
+    std::string overwriteExisting(const URL& url);
 }
 
 StreamProvider&
@@ -56,7 +61,8 @@ StreamProvider::getDefaultInstance()
 StreamProvider::NamingPolicy
 StreamProvider::currentNamingPolicy() const
 {
-    return defaultNamingPolicy;
+    //return overwriteExisting;
+    return incrementalRename;
 }
 
 std::auto_ptr<IOChannel>
@@ -179,29 +185,54 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 
 
 namespace {
-/// Make a unique cachefile name from the supplied name.
+
+/// Transform a URL into a directory and create it.
 //
-/// If all possible filenames are taken, returns an empty string.
+/// @return     an empty string if the directory cannot be created, otherwise
+///             the name of the created directory with a trailing slash.
+/// @param url  The path to transform. Anything after the last '/' is ignored.
 std::string
-defaultNamingPolicy(const URL& url)
+urlToDirectory(const std::string& path)
 {
 
-    const std::string& path = url.path();
-
-    assert(!path.empty());
-    assert(path[0] == '/');
-    
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    const std::string& dir = rcfile.getMediaDir() + "/" + url.hostname();
+    const std::string& dir = rcfile.getMediaDir() + "/" + path;
  
     // Create the user-specified directory if possible.
     // An alternative would be to use the 'host' part and create a 
     // directory tree.
-    if (!mkdirRecursive(dir + '/')) {
+    if (!mkdirRecursive(dir)) {
         // Error
         return std::string();
     }
 
+    return dir;
+
+}
+
+std::string
+overwriteExisting(const URL& url)
+{
+    std::string path = url.path().substr(1);
+    
+    // Replace all slashes with a _ for a flat directory structure.
+    boost::replace_all(path, "/", "_");
+
+    const std::string& dir = urlToDirectory(url.hostname() + "/");
+
+    if (dir.empty()) return std::string();
+
+    return dir + path;
+}
+
+std::string
+incrementalRename(const URL& url)
+{
+
+    const std::string& path = url.path();
+    assert(!path.empty());
+    assert(path[0] == '/');
+    
     // Find the last dot, but not if it's first in the path (after the
     // initial '/').
     std::string::size_type dot = path.rfind('.');
@@ -217,7 +248,11 @@ defaultNamingPolicy(const URL& url)
     const std::string& suffix = (dot == std::string::npos) ? "" : 
         path.substr(dot);
 
-    std::ostringstream s(dir + '/' + pre + suffix);
+    // Add a trailing slash.
+    const std::string& dir = urlToDirectory(url.hostname() + "/");
+    if (dir.empty()) return std::string();
+
+    std::ostringstream s(dir + pre + suffix);
 
     size_t i = 0;
 
@@ -226,7 +261,7 @@ defaultNamingPolicy(const URL& url)
     struct stat st;
     while (stat(s.str().c_str(), &st) >= 0 && i < m) {
         s.str("");
-        s << dir << "/" << pre << i << suffix;
+        s << dir << pre << i << suffix;
         ++i;
     }
 
@@ -239,7 +274,6 @@ defaultNamingPolicy(const URL& url)
 
 }
 
-}
-
+} // anonymous namespace
 } // namespace gnash
 
