@@ -102,6 +102,7 @@ libgnashbase_la_SOURCES = \
 	$(MALLOC) \
 	GnashImage.cpp \
 	GnashImageJpeg.cpp \
+	GnashFileUtilities.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -155,6 +156,7 @@ noinst_HEADERS = \
 	IOChannel.h \
 	tu_opengl_includes.h \
 	GnashSystemIOHeaders.h \
+	GnashFileUtilities.h \
 	ClockTime.h \
 	WallClockTimer.h \
 	utf8.h \

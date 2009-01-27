@@ -21,8 +21,6 @@
 #include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <boost/tokenizer.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -34,6 +32,7 @@
 # include <io.h>
 #endif
 
+#include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
 #include "amf.h"
@@ -88,7 +87,6 @@ namespace {
 
     as_object* getSharedObjectInterface();
     void attachSharedObjectStaticInterface(as_object& o);
-    bool createDirForFile(const std::string& filespec);
     void flushSOL(SharedObjectLibrary::SoLib::value_type& sol);
     bool validateName(const std::string& solName);
 }
@@ -322,7 +320,7 @@ SharedObject_as::flush(int space) const
 
     const std::string& filespec = _sol.getFilespec();
 
-    if ( ! createDirForFile(filespec) )
+    if (!mkdirRecursive(filespec))
     {
         log_error("Couldn't create dir for flushing SharedObject %s", filespec);
         return false;
@@ -1110,47 +1108,6 @@ void
 flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 {
     sol.second->flush();
-}
-
-
-bool
-createDirForFile(const std::string& filename)
-{
-    if (filename.find("/", 0) != std::string::npos)
-    {
-        typedef boost::tokenizer<boost::char_separator<char> > Tok;
-        boost::char_separator<char> sep("/");
-        Tok t(filename, sep);
-        Tok::iterator tit;
-        std::string newdir = "/";
-        for(tit=t.begin(); tit!=t.end();++tit){
-            //cout << *tit << "\n";
-            newdir += *tit;
-            if (newdir.find("..", 0) != std::string::npos) {
-		log_error("Invalid SharedObject path (contains '..'): %s", filename);
-                return false;
-            }
-            // Don't try to create a directory of the .sol file name!
-            // TODO: don't fail if the movie url has a component 
-            // ending with .sol (eh...)
-            //
-            if (newdir.rfind(".sol") != (newdir.size()-4)) {
-#ifndef _WIN32
-                int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
-#else
-                int ret = mkdir(newdir.c_str());
-#endif
-                if ((errno != EEXIST) && (ret != 0)) {
-                    log_error(_("Couldn't create SOL files directory %s: %s"),
-                              newdir, std::strerror(errno));
-                    return false;
-                }
-            } // else log_debug("newdir %s ends with .sol", newdir);
-            newdir += "/";
-        }
-    }
-    else log_debug("no slash in filespec %s", filename);
-    return true;
 }
 
 } // anonymous namespace
