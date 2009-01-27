@@ -420,6 +420,7 @@ RcInitFile::parseFile(const std::string& filespec)
             }
 
             if (noCaseCompare(variable, "mediaDir") ) {
+                expandPath(value);
                 _mediaCacheDir = value;
                 continue;
             }
@@ -512,7 +513,7 @@ RcInitFile::parseFile(const std::string& filespec)
             ||
                  extractNumber(_quality, "quality", variable, value)
             ||
-                 extractNumber(_saveMedia, "saveMedia", variable,
+                 extractSetting(_saveMedia, "saveMedia", variable,
                            value)
             || 
                  extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable,
@@ -665,6 +666,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
+    cmd << "saveMedia " << _saveMedia << endl <<    
    
     // Strings.
 
@@ -675,6 +677,7 @@ RcInitFile::updateFile(const std::string& filespec)
     // debuglog to nothing, only to find it returns to "gnash-debug.log"
     // at the next run (even though that's not the way to use it...)
 
+    cmd << "mediaDir " << _mediaCacheDir << endl <<    
     cmd << "debuglog " << _log << endl <<
     cmd << "documentroot " << _wwwroot << endl <<
     cmd << "flashSystemOS " << _flashSystemOS << endl <<

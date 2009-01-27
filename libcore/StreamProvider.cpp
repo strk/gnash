@@ -46,37 +46,52 @@ namespace gnash
 std::string
 StreamProvider::defaultNamingPolicy(const URL& url)
 {
-    struct stat st;
 
-    assert(!url.path().empty());
+    const std::string& path = url.path();
 
-    // Extra check in case the URL interface changes, and drop the first
-    // '/'
-    assert(url.path()[0] == '/');
-    const std::string& name = url.path().substr(1);
+    assert(!path.empty());
+    assert(path[0] == '/');
     
-    std::string::size_type dot = name.rfind('.');
+    const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    const std::string& dir = rcfile.getMediaDir();
+ 
+    // Create the user-specified directory if possible.
+    // An alternative would be to use the 'host' part and create a 
+    // directory tree.
+    if (!mkdirRecursive(dir + '/')) {
+        // Error
+        return std::string();
+    }
 
-    // If dot is npos, pre is the whole string.
-    std::string pre = name.substr(0, dot);
+    // Find the last dot, but not if it's first in the path (after the
+    // initial '/').
+    std::string::size_type dot = path.rfind('.');
+    if (dot == 1) dot = std::string::npos;
 
+    // Take the path from after the initial '/' to the last '.' for
+    // manipulation. It doesn't matter if dot is npos.
+    std::string pre = path.substr(1, dot - 1);
+
+    // Replace all slashes with a _ for a flat directory structure.
     boost::replace_all(pre, "/", "_");
 
     const std::string& suffix = (dot == std::string::npos) ? "" : 
-        name.substr(dot);
+        path.substr(dot);
 
-    std::ostringstream s(pre + suffix);
+    std::ostringstream s(dir + '/' + pre + suffix);
 
     size_t i = 0;
 
     const size_t m = std::numeric_limits<size_t>::max();
 
+    struct stat st;
     while (stat(s.str().c_str(), &st) >= 0 && i < m) {
         s.str("");
-        s << pre << i << suffix;
+        s << dir << "/" << pre << i << suffix;
         ++i;
     }
 
+    // If there are no options left, return an empty string.
     if (i == m) {
         return std::string();
     }
