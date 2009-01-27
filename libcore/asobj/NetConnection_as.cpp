@@ -965,7 +965,7 @@ NetConnection_as::getStream(const std::string& name)
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
     StreamProvider::NamingPolicy cacheNamer = rcfile.saveStreamingMedia() ? 
-        StreamProvider::defaultNamingPolicy : 0;
+        streamProvider.currentNamingPolicy() : 0;
 
     return streamProvider.getStream(url, cacheNamer);
 

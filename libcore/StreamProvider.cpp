@@ -39,64 +39,11 @@
 namespace gnash
 {
 
-/// Make a unique cachefile name from the supplied name.
-//
-/// If all possible filenames are taken, returns an empty string.
-std::string
-StreamProvider::defaultNamingPolicy(const URL& url)
-{
-
-    const std::string& path = url.path();
-
-    assert(!path.empty());
-    assert(path[0] == '/');
-    
-    const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-    const std::string& dir = rcfile.getMediaDir() + "/" + url.hostname();
- 
-    // Create the user-specified directory if possible.
-    // An alternative would be to use the 'host' part and create a 
-    // directory tree.
-    if (!mkdirRecursive(dir + '/')) {
-        // Error
-        return std::string();
-    }
-
-    // Find the last dot, but not if it's first in the path (after the
-    // initial '/').
-    std::string::size_type dot = path.rfind('.');
-    if (dot == 1) dot = std::string::npos;
-
-    // Take the path from after the initial '/' to the last '.' for
-    // manipulation. It doesn't matter if dot is npos.
-    std::string pre = path.substr(1, dot - 1);
-
-    // Replace all slashes with a _ for a flat directory structure.
-    boost::replace_all(pre, "/", "_");
-
-    const std::string& suffix = (dot == std::string::npos) ? "" : 
-        path.substr(dot);
-
-    std::ostringstream s(dir + '/' + pre + suffix);
-
-    size_t i = 0;
-
-    const size_t m = std::numeric_limits<size_t>::max();
-
-    struct stat st;
-    while (stat(s.str().c_str(), &st) >= 0 && i < m) {
-        s.str("");
-        s << dir << "/" << pre << i << suffix;
-        ++i;
-    }
-
-    // If there are no options left, return an empty string.
-    if (i == m) {
-        return std::string();
-    }
-
-    return s.str();
-
+namespace {
+    /// Make a unique cachefile name from the supplied name.
+    //
+    /// If all possible filenames are taken, returns an empty string.
+    std::string defaultNamingPolicy(const URL& url);
 }
 
 StreamProvider&
@@ -106,7 +53,11 @@ StreamProvider::getDefaultInstance()
 	return inst;
 }
 
-
+StreamProvider::NamingPolicy
+StreamProvider::currentNamingPolicy() const
+{
+    return defaultNamingPolicy;
+}
 
 std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, NamingPolicy np)
@@ -224,6 +175,70 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 		return stream;		
 
 	}
+}
+
+
+namespace {
+/// Make a unique cachefile name from the supplied name.
+//
+/// If all possible filenames are taken, returns an empty string.
+std::string
+defaultNamingPolicy(const URL& url)
+{
+
+    const std::string& path = url.path();
+
+    assert(!path.empty());
+    assert(path[0] == '/');
+    
+    const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    const std::string& dir = rcfile.getMediaDir() + "/" + url.hostname();
+ 
+    // Create the user-specified directory if possible.
+    // An alternative would be to use the 'host' part and create a 
+    // directory tree.
+    if (!mkdirRecursive(dir + '/')) {
+        // Error
+        return std::string();
+    }
+
+    // Find the last dot, but not if it's first in the path (after the
+    // initial '/').
+    std::string::size_type dot = path.rfind('.');
+    if (dot == 1) dot = std::string::npos;
+
+    // Take the path from after the initial '/' to the last '.' for
+    // manipulation. It doesn't matter if dot is npos.
+    std::string pre = path.substr(1, dot - 1);
+
+    // Replace all slashes with a _ for a flat directory structure.
+    boost::replace_all(pre, "/", "_");
+
+    const std::string& suffix = (dot == std::string::npos) ? "" : 
+        path.substr(dot);
+
+    std::ostringstream s(dir + '/' + pre + suffix);
+
+    size_t i = 0;
+
+    const size_t m = std::numeric_limits<size_t>::max();
+
+    struct stat st;
+    while (stat(s.str().c_str(), &st) >= 0 && i < m) {
+        s.str("");
+        s << dir << "/" << pre << i << suffix;
+        ++i;
+    }
+
+    // If there are no options left, return an empty string.
+    if (i == m) {
+        return std::string();
+    }
+
+    return s.str();
+
+}
+
 }
 
 } // namespace gnash

@@ -327,7 +327,7 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
   const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
   StreamProvider::NamingPolicy cacheNamer = rcfile.saveLoadedMedia() ? 
-      StreamProvider::defaultNamingPolicy : 0;
+      streamProvider.currentNamingPolicy() : 0;
 
   if ( postdata ) in = streamProvider.getStream(url, *postdata,
           cacheNamer);

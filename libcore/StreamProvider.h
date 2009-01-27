@@ -41,8 +41,6 @@ public:
 
     typedef std::string (*NamingPolicy) (const URL&);
 
-    static std::string defaultNamingPolicy(const URL& url);
-
 	StreamProvider() {}
 
 	virtual ~StreamProvider() {}
@@ -78,6 +76,9 @@ public:
             const std::string& postdata,
             const NetworkAdapter::RequestHeaders& headers, NamingPolicy np = 0);
 	
+    /// Return the currently selected policy for converting URL to filename
+    virtual NamingPolicy currentNamingPolicy() const;
+
 };
 
 } // namespace gnash
