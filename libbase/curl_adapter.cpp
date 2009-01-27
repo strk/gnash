@@ -782,9 +782,9 @@ CurlStreamFile::init(const std::string& url, const std::string& cachefile)
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 	
     if (rcfile.saveMedia() && !cachefile.empty()) {
-        log_debug("Using permanent file %s as cache", cachefile);
         _cache = std::fopen(cachefile.c_str(), "w+b");
         if (!_cache) {
+
             log_error("Could not open specified path as cache file. Using "
                     "a temporary file instead");
             _cache = std::tmpfile();
