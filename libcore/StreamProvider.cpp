@@ -35,16 +35,55 @@
 #include <string>
 #include <vector>
 
-
-#if defined(_WIN32) || defined(WIN32)
-#	include <io.h>
-#	define dup _dup
-#else
-#include <unistd.h> // dup
-#endif
+#include "GnashSystemFileHeaders.h"
 
 namespace gnash
 {
+
+/// Make a unique cachefile name from the supplied name.
+//
+/// If all possible filenames are taken, returns an empty string.
+std::string
+StreamProvider::defaultNamingPolicy(const URL& url)
+{
+    struct stat st;
+
+    assert(!url.path().empty());
+
+    // Extra check in case the URL interface changes, and drop the first
+    // '/'
+    assert(url.path()[0] == '/');
+    const std::string& name = url.path().substr(1);
+    
+    std::string::size_type dot = name.rfind('.');
+
+    // If dot is npos, pre is the whole string.
+    std::string pre = name.substr(0, dot);
+
+    boost::replace_all(pre, "/", "_");
+
+    const std::string& suffix = (dot == std::string::npos) ? "" : 
+        name.substr(dot);
+
+    std::ostringstream s(pre + suffix);
+
+    size_t i = 0;
+
+    const size_t m = std::numeric_limits<size_t>::max();
+
+    while (stat(s.str().c_str(), &st) >= 0 && i < m) {
+        s.str("");
+        s << pre << i << suffix;
+        ++i;
+    }
+
+    if (i == m) {
+        return std::string();
+    }
+
+    return s.str();
+
+}
 
 StreamProvider&
 StreamProvider::getDefaultInstance()
@@ -53,8 +92,10 @@ StreamProvider::getDefaultInstance()
 	return inst;
 }
 
+
+
 std::auto_ptr<IOChannel>
-StreamProvider::getStream(const URL& url)
+StreamProvider::getStream(const URL& url, NamingPolicy np)
 {
 
     std::auto_ptr<IOChannel> stream;
@@ -79,7 +120,7 @@ StreamProvider::getStream(const URL& url)
 		else
 		{
             // check security here !!
-		    if ( ! URLAccessManager::allow(url) ) return stream;
+		    if (!URLAccessManager::allow(url)) return stream;
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
@@ -92,8 +133,9 @@ StreamProvider::getStream(const URL& url)
 	}
 	else
 	{
-		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(url.str());
+		if (URLAccessManager::allow(url)) {
+			stream = NetworkAdapter::makeStream(url.str(),
+                    np ?  np(url) : std::string());
 		}
 
         // Will return 0 auto_ptr if not allowed.
@@ -103,7 +145,7 @@ StreamProvider::getStream(const URL& url)
 
 std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata,
-                          const NetworkAdapter::RequestHeaders& headers)
+        const NetworkAdapter::RequestHeaders& headers, NamingPolicy np)
 {
 
     if (url.protocol() == "file")
@@ -117,7 +159,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
     }
 
 	if ( URLAccessManager::allow(url) ) {
-		return NetworkAdapter::makeStream(url.str(), postdata, headers);
+		return NetworkAdapter::makeStream(url.str(), postdata, headers,
+                np ? np(url) : std::string());
 	}
 
 	return std::auto_ptr<IOChannel>();
@@ -125,7 +168,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 }
 
 std::auto_ptr<IOChannel>
-StreamProvider::getStream(const URL& url, const std::string& postdata)
+StreamProvider::getStream(const URL& url, const std::string& postdata,
+       NamingPolicy np)
 {
 
     std::auto_ptr<IOChannel> stream;
@@ -158,8 +202,9 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 	}
 	else
 	{
-		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(url.str(), postdata);
+		if (URLAccessManager::allow(url)) {
+			stream = NetworkAdapter::makeStream(url.str(), postdata,
+                    np ? np(url) : std::string());
 		}
         // Will return 0 auto_ptr if not allowed.
 		return stream;		

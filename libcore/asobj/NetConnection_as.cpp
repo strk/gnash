@@ -959,7 +959,8 @@ NetConnection_as::getStream(const std::string& name)
     // If name is a full or relative URL passed from NetStream.play(), it
     // must be constructed against the base URL, not the NetConnection uri,
     // which should always be null in this case.
-    return streamProvider.getStream(URL(name, ri.baseURL()));
+    const URL url(name, ri.baseURL());
+    return streamProvider.getStream(url, StreamProvider::defaultNamingPolicy);
 
 }
 

@@ -158,7 +158,9 @@ public:
     /// Sets the RcInitFile blacklist of domains to block
     //
     /// @param list a std::vector of strings containing domains without protocol
-    void setBlacklist (const std::vector<std::string>& list) { _blacklist = list; }
+    void setBlacklist (const std::vector<std::string>& list) { 
+        _blacklist = list;
+    }
 
     /// Return the list of directories to be used as the 'local' sandbox
     //
@@ -183,24 +185,42 @@ public:
         _localSandboxPath = path;
     }
 
-    const std::string& getFlashVersionString() const { return _flashVersionString; }
-    void setFlashVersionString(const std::string& value) { _flashVersionString = value; }
+    const std::string& getFlashVersionString() const {
+        return _flashVersionString;
+    }
+    
+    void setFlashVersionString(const std::string& value) {
+        _flashVersionString = value;
+    }
 
-    const std::string& getFlashSystemOS() const { return _flashSystemOS; }
-    void setFlashSystemOS(const std::string& value) { _flashSystemOS = value; }
+    const std::string& getFlashSystemOS() const {
+        return _flashSystemOS;
+    }
+    
+    void setFlashSystemOS(const std::string& value) {
+        _flashSystemOS = value;
+    }
 
-    const std::string& getFlashSystemManufacturer() const { return _flashSystemManufacturer; }
-    void setFlashSystemManufacturer(const std::string& value) { _flashSystemManufacturer = value; }
+    const std::string& getFlashSystemManufacturer() const {
+        return _flashSystemManufacturer;
+    }
+    
+    void setFlashSystemManufacturer(const std::string& value) {
+        _flashSystemManufacturer = value;
+    }
     
     const std::string& getGstAudioSink() const { return _gstaudiosink; }
+    
     void setGstAudioSink(const std::string& value) { _gstaudiosink = value; }
 
     int getRetries() const { return _retries; }
+    
     void setRetries(int x) { _retries = x; }
 
-    /// Return the number of seconds of inactivity before timing out streams downloads
+    /// The number of seconds of inactivity before timing out streams downloads
     double getStreamsTimeout() const { return _streamsTimeout; }
-    /// Set the number of seconds of inactivity before timing out streams downloads
+
+    /// Set seconds of inactivity before timing out streams downloads
     void setStreamsTimeout(const double &x) { _streamsTimeout = x; }
 
     /// Get the URL opener command format
@@ -225,25 +245,121 @@ public:
     void setSOLSafeDir(const std::string &x) { _solsandbox = x; }
 
     bool getSOLLocalDomain() const { return _sollocaldomain; }
+    
     void setSOLLocalDomain(bool x) { _sollocaldomain = x; }
+    
     bool getSOLReadOnly() const { return _solreadonly; }
+    
     void setSOLReadOnly(bool x) { _solreadonly = x; }
+    
     bool getLocalConnection() const { return _lcdisabled; }
+    
     void setLocalConnection(bool x) { _lcdisabled = x; }
+    
     // Enable tracing all LocalConnection traffic
     bool getLCTrace() const { return _lctrace; }
+    
     void setLCTrace(bool x) { _lctrace = x; }
 
-    // 
     key_t getLCShmKey() const { return static_cast<key_t>(_lcshmkey); }
+    
     void setLCShmKey(bool x) { _lcshmkey = x; }
 
     bool ignoreFSCommand() const { return _ignoreFSCommand; }
+    
     void ignoreFSCommand(bool value) { _ignoreFSCommand = value; }
-        
+    
+    void saveMedia(bool value) { _saveMedia = value; }
+
+    bool saveMedia() const { return _saveMedia; }
+
+    void setMediaDir(const std::string& value) { _mediaCacheDir = value; }
+
+    const std::string& getMediaDir() const { return _mediaCacheDir; }
+
     void dump();    
 
 protected:
+    
+    // A function only for writing path lists to an outstream.
+    void writeList(const PathList& list, std::ostream& o);
+
+    /// Construct only by getDefaultInstance()
+    RcInitFile();
+
+    /// Never destroy (TODO: add a destroyDefaultInstance)
+    ~RcInitFile();
+
+    /// Substitutes user's home directory for ~ on a path string
+    /// according to POSIX standard.
+    ///
+    /// @param path the path to expand.
+    static void expandPath(std::string& path);
+
+    /// \brief
+    /// If variable matches pattern (case-insensitive)
+    /// set var according to value
+    //
+    /// @return true if variable matches pattern, false otherwise
+    /// @param var the variable to change
+    /// @param pattern the pattern for matching
+    /// @variable the variable to match to pattern
+    /// @value the value to adopt if variable matches pattern.
+    static bool extractSetting(bool &var, const std::string& pattern,
+                        const std::string &variable, const std::string &value);
+
+    /// \brief
+    /// If variable matches pattern (case-insensitive)
+    /// set num according to value
+    //
+    /// @return true if variable matches pattern, false otherwise
+    /// @param num the variable to change
+    /// @param pattern the pattern for matching
+    /// @variable the variable to match to pattern
+    /// @value the value to adopt if variable matches pattern.
+    template<typename T>
+    static bool extractNumber(T& num, const std::string& pattern,
+                        const std::string &variable, const std::string &value)
+    {
+
+        StringNoCaseEqual noCaseCompare;
+
+        if (noCaseCompare(variable, pattern)) {
+            std::istringstream in(value);
+            if (in >> num) return true;
+            
+            // If conversion fails, set value to 0 rather than leaving
+            // it as the default.
+            std::cerr << "Conversion overflow in extractNumber: " << 
+                value << std::endl;
+            num = 0;
+            return true;
+        }
+        
+        return false;
+    }
+
+    /// \brief
+    /// If variable matches pattern (case-insensitive)
+    /// set out according to value
+    //
+    /// @return true if variable matches pattern, false otherwise
+    /// @param out the variable to change
+    /// @param pattern the pattern for matching
+    /// @variable the variable to match to pattern
+    /// @value the value to adopt if variable matches pattern.
+    static bool extractDouble(double &out, const std::string& pattern,
+                        const std::string &variable, const std::string &value);
+
+
+    /// \brief parses a space-separated list into std::vector list 
+    //
+    /// @param list the vector to modify or generate.
+    /// @param action either 'set' or 'append': whether to add to or
+    ///         clear the vector.
+    /// @param items string of space-separated values. This gets nuked.
+    void parseList(std::vector<std::string>& list, const std::string &action,
+			        const std::string &items);
 
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer< Sep > Tok;
@@ -375,87 +491,9 @@ protected:
     /// The quality to display SWFs in. -1 to allow the SWF to override.
     int _quality;
 
-protected:
-    
-    // A function only for writing path lists to an outstream.
-    void writeList(const PathList& list, std::ostream& o);
+    bool _saveMedia;
 
-    /// Construct only by getDefaultInstance()
-    RcInitFile();
-
-    /// Never destroy (TODO: add a destroyDefaultInstance)
-    ~RcInitFile();
-
-    /// Substitutes user's home directory for ~ on a path string
-    /// according to POSIX standard.
-    ///
-    /// @param path the path to expand.
-    static void expandPath(std::string& path);
-
-    /// \brief
-    /// If variable matches pattern (case-insensitive)
-    /// set var according to value
-    //
-    /// @return true if variable matches pattern, false otherwise
-    /// @param var the variable to change
-    /// @param pattern the pattern for matching
-    /// @variable the variable to match to pattern
-    /// @value the value to adopt if variable matches pattern.
-    static bool extractSetting(bool &var, const std::string& pattern,
-                        const std::string &variable, const std::string &value);
-
-    /// \brief
-    /// If variable matches pattern (case-insensitive)
-    /// set num according to value
-    //
-    /// @return true if variable matches pattern, false otherwise
-    /// @param num the variable to change
-    /// @param pattern the pattern for matching
-    /// @variable the variable to match to pattern
-    /// @value the value to adopt if variable matches pattern.
-    template<typename T>
-    static bool extractNumber(T& num, const std::string& pattern,
-                        const std::string &variable, const std::string &value)
-    {
-
-        StringNoCaseEqual noCaseCompare;
-
-        if (noCaseCompare(variable, pattern)) {
-            std::istringstream in(value);
-            if (in >> num) return true;
-            
-            // If conversion fails, set value to 0 rather than leaving
-            // it as the default.
-            std::cerr << "Conversion overflow in extractNumber: " << 
-                value << std::endl;
-            num = 0;
-            return true;
-        }
-        
-        return false;
-    }
-
-    /// \brief
-    /// If variable matches pattern (case-insensitive)
-    /// set out according to value
-    //
-    /// @return true if variable matches pattern, false otherwise
-    /// @param out the variable to change
-    /// @param pattern the pattern for matching
-    /// @variable the variable to match to pattern
-    /// @value the value to adopt if variable matches pattern.
-    static bool extractDouble(double &out, const std::string& pattern,
-                        const std::string &variable, const std::string &value);
-
-
-    /// \brief parses a space-separated list into std::vector list 
-    //
-    /// @param list the vector to modify or generate.
-    /// @param action either 'set' or 'append': whether to add to or
-    ///         clear the vector.
-    /// @param items string of space-separated values. This gets nuked.
-    void parseList(std::vector<std::string>& list, const std::string &action,
-			        const std::string &items);
+    std::string _mediaCacheDir;
 
 };
 

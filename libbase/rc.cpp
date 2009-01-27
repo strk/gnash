@@ -101,7 +101,8 @@ RcInitFile::RcInitFile()
     // TODO: give a  default value, and let 0 mean "disabled" -- 0 currently is overridden by libbase/shm.cpp 
     _lcshmkey(0),
     _ignoreFSCommand(true),
-    _quality(-1)
+    _quality(-1),
+    _saveMedia(false)
 {
     expandPath(_solsandbox);
 
@@ -418,6 +419,11 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
 
+            if (noCaseCompare(variable, "mediaDir") ) {
+                _mediaCacheDir = value;
+                continue;
+            }
+            
             if (noCaseCompare(variable, "documentroot") ) {
                 _wwwroot = value;
                 continue;
@@ -506,6 +512,9 @@ RcInitFile::parseFile(const std::string& filespec)
             ||
                  extractNumber(_quality, "quality", variable, value)
             ||
+                 extractNumber(_saveMedia, "saveMedia", variable,
+                           value)
+            || 
                  extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable,
                          value)
             ||

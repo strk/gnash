@@ -47,7 +47,7 @@ public:
     //
     /// @param url      The url to fetch data from.
     DSOEXPORT static std::auto_ptr<IOChannel> makeStream(
-            const std::string& url);
+            const std::string& url, const std::string& cachefile);
 
     /// \brief
     /// Returns a read-only IOChannel that fetches data
@@ -58,7 +58,8 @@ public:
     /// @param url      The url to post to.
     /// @param postdata The url-encoded post data
     DSOEXPORT static std::auto_ptr<IOChannel> makeStream(
-            const std::string& url, const std::string& postdata);
+            const std::string& url, const std::string& postdata,
+            const std::string& cachefile);
 
     /// \brief
     /// Returns a read-only IOChannel that fetches data
@@ -70,8 +71,11 @@ public:
     /// @param postdata The url-encoded post data
     /// @param headers  A RequestHeaders map of custom headers to send.
     DSOEXPORT static std::auto_ptr<IOChannel> makeStream(const std::string& url,
-           const std::string& postdata, const RequestHeaders& headers);
+           const std::string& postdata, const RequestHeaders& headers,
+           const std::string& cachefile);
 
+
+    typedef std::set<std::string, StringNoCaseLessThan> ReservedNames;
 
     /// Check whether a RequestHeader is permitted.
     //
@@ -80,12 +84,13 @@ public:
     /// @return true if the name is allowed.
     DSOEXPORT static bool isHeaderAllowed(const std::string& headerName)
     {
-        return (_reservedNames.find(headerName) == _reservedNames.end());
+        const ReservedNames& names = reservedNames();
+        return (names.find(headerName) == names.end());
     }
 
 private:
 
-    static std::set<std::string, StringNoCaseLessThan> _reservedNames;
+    static const ReservedNames& reservedNames();
 
 };
 

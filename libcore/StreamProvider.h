@@ -39,6 +39,10 @@ class DSOEXPORT StreamProvider
 
 public:
 
+    typedef std::string (*NamingPolicy) (const URL&);
+
+    static std::string defaultNamingPolicy(const URL& url);
+
 	StreamProvider() {}
 
 	virtual ~StreamProvider() {}
@@ -50,7 +54,8 @@ public:
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
 	///
-	virtual std::auto_ptr<IOChannel> getStream(const URL& url);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+            NamingPolicy np = 0);
 
 	/// Get a stream from the response of a POST operation
 	//
@@ -67,11 +72,11 @@ public:
 	///
 	///
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-            const std::string& postdata);
+            const std::string& postdata, NamingPolicy np = 0);
 	
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
             const std::string& postdata,
-            const NetworkAdapter::RequestHeaders& headers);
+            const NetworkAdapter::RequestHeaders& headers, NamingPolicy np = 0);
 	
 };
 

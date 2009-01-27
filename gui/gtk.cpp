@@ -931,7 +931,7 @@ void GtkGui::openFile (GtkWidget *widget, gpointer /* user_data */)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace { // anonimous
+namespace { // anonymous
 
 class PreferencesDialog {
 
@@ -968,6 +968,8 @@ private:
         GtkWidget *urlOpenerText;
         GtkWidget *librarySize;
         GtkWidget *startStoppedToggle;
+        GtkWidget *mediaDir;
+        GtkWidget *saveMediaToggle;
 #ifdef USE_DEBUGGER
         GtkWidget *DebuggerToggle;
 #endif
@@ -995,7 +997,9 @@ private:
         	versionText(0),
         	urlOpenerText(0),
         	librarySize(0),
-        	startStoppedToggle(0)
+        	startStoppedToggle(0),
+            mediaDir(0),
+            saveMediaToggle(0)
 #ifdef USE_DEBUGGER
         	,DebuggerToggle(0)
 #endif
@@ -1045,17 +1049,34 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
         // For getting from const gchar* to std::string&
         std::string tmp;
     
-        if ( prefs->soundToggle )
-            _rcfile.useSound(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->soundToggle)));
-    
-        if ( prefs->actionDumpToggle )
-            _rcfile.useActionDump(
-    		    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->actionDumpToggle)));
+        if (prefs->soundToggle) {
+            _rcfile.useSound(gtk_toggle_button_get_active(
+                        GTK_TOGGLE_BUTTON(prefs->soundToggle)));
+        }
 
-        if ( prefs->parserDumpToggle )
+        if (prefs->saveMediaToggle) {
+            _rcfile.saveMedia(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->saveMediaToggle)));
+        }
+
+        if (prefs->mediaDir) {
+    	    tmp = gtk_entry_get_text(GTK_ENTRY(prefs->mediaDir));
+            _rcfile.setMediaDir(tmp);
+        }
+
+        if (prefs->actionDumpToggle) {
+            _rcfile.useActionDump(
+    		    gtk_toggle_button_get_active(
+                    GTK_TOGGLE_BUTTON(prefs->actionDumpToggle)));
+        }
+        
+        if (prefs->parserDumpToggle) {
             _rcfile.useParserDump(
-    		    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->parserDumpToggle)));
-    	
+    		    gtk_toggle_button_get_active(
+                    GTK_TOGGLE_BUTTON(prefs->parserDumpToggle)));
+        }
+
         if ( prefs->logfileName ) {
     	    tmp = gtk_entry_get_text(GTK_ENTRY(prefs->logfileName));
             _rcfile.setDebugLog(tmp);
@@ -1063,7 +1084,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
         
         if ( prefs->writeLogToggle ) {
             _rcfile.useWriteLog(
-        	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->writeLogToggle)));
+        	    gtk_toggle_button_get_active(
+                    GTK_TOGGLE_BUTTON(prefs->writeLogToggle)));
         }
         	
         if ( prefs->verbosityScale ) {
@@ -1079,22 +1101,26 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->ASCodingErrorToggle ) {
             _rcfile.showASCodingErrors(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->ASCodingErrorToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->ASCodingErrorToggle)));
         }
 
         if ( prefs->malformedSWFToggle ) {
             _rcfile.showMalformedSWFErrors(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->malformedSWFToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->malformedSWFToggle)));
         }
 
         if ( prefs->localHostToggle ) {
             _rcfile.useLocalHost(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localHostToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->localHostToggle)));
         }
 
         if ( prefs->localDomainToggle ) {
             _rcfile.useLocalDomain(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localDomainToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->localDomainToggle)));
         }
 
         if ( prefs->solLocalDomainToggle ) {
@@ -1374,30 +1400,36 @@ PreferencesDialog::addSecurityTab()
     gtk_box_pack_start (GTK_BOX(securityvbox), privacylabel, FALSE, FALSE, 0);
 
     GtkWidget *solsandboxlabel = gtk_label_new (_("Shared objects directory:"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), solsandboxlabel, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX(securityvbox), solsandboxlabel, FALSE,
+            FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (solsandboxlabel), 0, 0.5);
 
     _prefs->solSandbox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(_prefs->solSandbox), _rcfile.getSOLSafeDir().c_str());
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solSandbox, FALSE, FALSE, 0);
+    gtk_entry_set_text(GTK_ENTRY(_prefs->solSandbox), 
+            _rcfile.getSOLSafeDir().c_str());
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solSandbox, FALSE,
+            FALSE, 0);
 
-    _prefs->solReadOnlyToggle = gtk_check_button_new_with_mnemonic ( 
+    _prefs->solReadOnlyToggle = gtk_check_button_new_with_mnemonic( 
     				_("Do _not write Shared Object files"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solReadOnlyToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->solReadOnlyToggle),
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solReadOnlyToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->solReadOnlyToggle),
     			_rcfile.getSOLReadOnly());
 
-    _prefs->solLocalDomainToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->solLocalDomainToggle = gtk_check_button_new_with_mnemonic(
     				_("Only _access local Shared Object files"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solLocalDomainToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->solLocalDomainToggle),
-    			_rcfile.getSOLLocalDomain());
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->solLocalDomainToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                _prefs->solLocalDomainToggle), _rcfile.getSOLLocalDomain());
 
     _prefs->localConnectionToggle = gtk_check_button_new_with_mnemonic (
     				_("Disable Local _Connection object"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localConnectionToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->localConnectionToggle),
-    			_rcfile.getLocalConnection()); 
+    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localConnectionToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                _prefs->localConnectionToggle), _rcfile.getLocalConnection()); 
 }
 
 void
@@ -1409,17 +1441,48 @@ PreferencesDialog::addMediaTab()
     // Media tab title
     GtkWidget *mediatablabel = gtk_label_new_with_mnemonic (_("_Media"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(mediavbox), mediatablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook),
+            GTK_WIDGET(mediavbox), mediatablabel); 
     
     // Sound
     GtkWidget *soundlabel = gtk_label_new (_("<b>Sound</b>"));
     gtk_label_set_use_markup (GTK_LABEL (soundlabel), TRUE);
     gtk_box_pack_start(GTK_BOX(mediavbox), soundlabel, FALSE, FALSE, 0);
    
-    _prefs->soundToggle = gtk_check_button_new_with_mnemonic (_("Use sound _handler"));
-    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->soundToggle, FALSE, FALSE, 0);
+    _prefs->soundToggle = gtk_check_button_new_with_mnemonic(
+            _("Use sound _handler"));
+    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->soundToggle, FALSE,
+            FALSE, 0);
     // Align button state with rcfile
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->soundToggle), _rcfile.useSound());
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->soundToggle),
+            _rcfile.useSound());
+
+    // Save Media
+    GtkWidget *savemedia = gtk_label_new(_("<b>Media Streams</b>"));
+    gtk_label_set_use_markup(GTK_LABEL(savemedia), TRUE);
+    gtk_box_pack_start(GTK_BOX(mediavbox), savemedia, FALSE, FALSE, 0);
+   
+    // Save Media Toggle
+    _prefs->saveMediaToggle = gtk_check_button_new_with_mnemonic(
+            _("Save media streams to disk"));
+    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->saveMediaToggle, FALSE,
+            FALSE, 0);
+    // Align button state with rcfile
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->soundToggle),
+            _rcfile.saveMedia());
+
+    // Directory for saving media
+    GtkWidget *mediastreamslabel = gtk_label_new(_("Saved media directory:"));
+    gtk_box_pack_start(GTK_BOX(mediavbox), mediastreamslabel, FALSE,
+            FALSE, 0);
+    gtk_misc_set_alignment (GTK_MISC (mediastreamslabel), 0, 0.5);
+
+    _prefs->mediaDir = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(_prefs->mediaDir), 
+            _rcfile.getMediaDir().c_str());
+    gtk_box_pack_start(GTK_BOX(mediavbox), _prefs->mediaDir, FALSE,
+            FALSE, 0);
+
 }
 
 void
