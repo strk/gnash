@@ -22,6 +22,7 @@
 #endif
 
 
+#include "GnashFileUtilities.h"
 #include "StreamProvider.h"
 #include "URL.h"
 #include "tu_file.h"
@@ -34,14 +35,6 @@
 #include <map>
 #include <string>
 #include <vector>
-
-
-#if defined(_WIN32) || defined(WIN32)
-#	include <io.h>
-#	define dup _dup
-#else
-#include <unistd.h> // dup
-#endif
 
 namespace gnash
 {
