@@ -27,6 +27,8 @@
 #define GNASH_FILE_UTILITIES_H
 
 #include "gnashconfig.h"
+#include "dsodefs.h"
+
 #if !defined(_MSC_VER)
 # include <unistd.h>
 # include <sys/stat.h>
@@ -55,7 +57,7 @@ namespace gnash {
     /// Create a directory for a given filename.
     //
     /// Everything after the last '/' is assumed to be the filename.
-    bool mkdirRecursive(const std::string& filename);
+    DSOEXPORT bool mkdirRecursive(const std::string& filename);
 
 } // namespace gnash
 

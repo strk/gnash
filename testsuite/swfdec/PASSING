@@ -913,9 +913,6 @@ round-direction-5.swf:3a69581d4483d995a04ab3a2aa005278
 round-direction-6.swf:2f7d7580490e0c4a3ddfb107849dc6d8
 round-direction-7.swf:66f77f46b6695bbb4d2a2e556ed737fa
 round-direction-8.swf:5e9afcedacd32a7438a21469f09cd853
-run_swfdec_testsuite_l running loadvars-decode-return-6.swf (expect pass: no)
-run_swfdec_testsuite_l running loadvars-decode-return-7.swf (expect pass: no)
-run_swfdec_testsuite_l running loadvars-decode-return-8.swf (expect pass: no)
 same-argument-name-5.swf:8a3048b2c4c143f3371caba918e3fa1b
 same-argument-name-6.swf:0814b0f0acc2abdc94f95972ec4db704
 same-argument-name-7.swf:a8db16910cb00b86ee7622e2d878ddc0
