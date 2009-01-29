@@ -41,7 +41,8 @@ namespace gnash {
 // Stub for warning about access when no libcurl is defined.
 
 std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& /*url*/)
+NetworkAdapter::makeStream(const std::string& /*url*/, const std::string&,
+        const std::string& /*cachefile*/)
 {
 	log_error(_("libcurl is not available, but "
 	            "Gnash has attempted to use the curl adapter"));
@@ -49,14 +50,15 @@ NetworkAdapter::makeStream(const std::string& /*url*/)
 }
 
 std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
+        const std::string& cachefile)
 {
     return makeStream(url);
 }
 
 std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
-                            const RequestHeaders& headers)
+        const RequestHeaders& headers, const std::string& cachefile)
 {
     return makeStream(url);
 }
@@ -168,23 +170,28 @@ private:
 	void exportCookies();
 
 	/// Shared handle data locking function
-	void lockSharedHandle(CURL* handle, curl_lock_data data, curl_lock_access access);
+	void lockSharedHandle(CURL* handle, curl_lock_data data,
+            curl_lock_access access);
 
 	/// Shared handle data unlocking function
 	void unlockSharedHandle(CURL* handle, curl_lock_data data);
 
 	/// Shared handle locking function
-	static void lockSharedHandleWrapper(CURL* handle, curl_lock_data data, curl_lock_access access, void* userptr)
+	static void lockSharedHandleWrapper(CURL* handle, curl_lock_data data,
+            curl_lock_access access, void* userptr)
 	{
 		CurlSession* ci = static_cast<CurlSession*>(userptr);
 		ci->lockSharedHandle(handle, data, access);
 	}
 
 	/// Shared handle unlocking function
-	static void unlockSharedHandleWrapper(CURL* handle, curl_lock_data data, void* userptr)
+	static void unlockSharedHandleWrapper(CURL* handle, curl_lock_data data,
+            void* userptr)
 	{
-		//data defines what data libcurl wants to unlock, and you must make sure that only one lick is given at any time for each kind of data.
-		//userptr is the pointer you set with CURLSHOPT_USERDATA. 
+		// data defines what data libcurl wants to unlock, and you must
+        // make sure that only one lock is given at any time for each kind
+        // of data.
+		// userptr is the pointer you set with CURLSHOPT_USERDATA. 
 		CurlSession* ci = static_cast<CurlSession*>(userptr);
 		ci->unlockSharedHandle(handle, data);
 	}
@@ -209,10 +216,12 @@ CurlSession::~CurlSession()
 	{
 		if ( ++retries > 10 )
 		{
-			log_error("Failed cleaning up share handle: %s. Giving up after %d retries.", curl_share_strerror(code), retries);
+			log_error("Failed cleaning up share handle: %s. Giving up after "
+                    "%d retries.", curl_share_strerror(code), retries);
 			break;
 		}
-		log_error("Failed cleaning up share handle: %s. Will try again in a second.", curl_share_strerror(code));
+		log_error("Failed cleaning up share handle: %s. Will try again in "
+                "a second.", curl_share_strerror(code));
 		gnashSleep(1000000);
 	}
 	_shandle = 0;
@@ -239,50 +248,55 @@ CurlSession::CurlSession()
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	_shandle = curl_share_init();
-	if ( ! _shandle )
-		throw gnash::GnashException("Failure initializing curl share handle");
+	if (! _shandle) {
+		throw GnashException("Failure initializing curl share handle");
+    }
 
 	CURLSHcode ccode;
 
 	// Register share locking function
-	ccode = curl_share_setopt(_shandle, CURLSHOPT_LOCKFUNC, lockSharedHandleWrapper);
+	ccode = curl_share_setopt(_shandle, CURLSHOPT_LOCKFUNC,
+            lockSharedHandleWrapper);
 	if ( ccode != CURLSHE_OK ) {
-		throw gnash::GnashException(curl_share_strerror(ccode));
+		throw GnashException(curl_share_strerror(ccode));
 	}
 
 	// Register share unlocking function
-	ccode = curl_share_setopt(_shandle, CURLSHOPT_UNLOCKFUNC, unlockSharedHandleWrapper);
+	ccode = curl_share_setopt(_shandle, CURLSHOPT_UNLOCKFUNC,
+            unlockSharedHandleWrapper);
 	if ( ccode != CURLSHE_OK ) {
-		throw gnash::GnashException(curl_share_strerror(ccode));
+		throw GnashException(curl_share_strerror(ccode));
 	}
 
 	// Activate sharing of cookies and DNS cache
 	ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_COOKIE);
 	if ( ccode != CURLSHE_OK ) {
-		throw gnash::GnashException(curl_share_strerror(ccode));
+		throw GnashException(curl_share_strerror(ccode));
 	}
 
 	// Activate sharing of DNS cache (since we're there..)
 	ccode = curl_share_setopt(_shandle, CURLSHOPT_SHARE, CURL_LOCK_DATA_DNS);
 	if ( ccode != CURLSHE_OK ) {
-		throw gnash::GnashException(curl_share_strerror(ccode));
+		throw GnashException(curl_share_strerror(ccode));
 	}
 
 	// Pass ourselves as the userdata
 	ccode = curl_share_setopt(_shandle, CURLSHOPT_USERDATA, this);
 	if ( ccode != CURLSHE_OK ) {
-		throw gnash::GnashException(curl_share_strerror(ccode));
+		throw GnashException(curl_share_strerror(ccode));
 	}
 
 	importCookies();
 }
 
 void
-CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data, curl_lock_access access)
+CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data,
+        curl_lock_access access)
 {
 	UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
 
-	// data defines what data libcurl wants to lock, and you must make sure that only one lock is given at any time for each kind of data.
+	// data defines what data libcurl wants to lock, and you must make
+    // sure that only one lock is given at any time for each kind of data.
 	// access defines what access type libcurl wants, shared or single.
 
 	// TODO: see if we may make use of the 'access' parameter
@@ -306,16 +320,17 @@ CurlSession::lockSharedHandle(CURL* handle, curl_lock_data data, curl_lock_acces
 			//log_debug("Share mutex locked");
 			break;
 		case CURL_LOCK_DATA_SSL_SESSION:
-			gnash::log_error("lockSharedHandle: SSL session locking unsupported");
+			log_error("lockSharedHandle: SSL session locking "
+                    "unsupported");
 			break;
 		case CURL_LOCK_DATA_CONNECT:
-			gnash::log_error("lockSharedHandle: connect locking unsupported");
+			log_error("lockSharedHandle: connect locking unsupported");
 			break;
 		case CURL_LOCK_DATA_LAST:
-			gnash::log_error("lockSharedHandle: last locking unsupported ?!");
+			log_error("lockSharedHandle: last locking unsupported ?!");
 			break;
 		default:
-			gnash::log_error("lockSharedHandle: unknown shared data %d", data);
+			log_error("lockSharedHandle: unknown shared data %d", data);
 			break;
 	}
 }
@@ -325,7 +340,8 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
 {
 	UNUSED(handle); // possibly being the 'easy' handle triggering the request ?
 
-	// data defines what data libcurl wants to lock, and you must make sure that only one lock is given at any time for each kind of data.
+	// data defines what data libcurl wants to lock, and you must make
+    // sure that only one lock is given at any time for each kind of data.
 	switch (data)
 	{
 		case CURL_LOCK_DATA_DNS:
@@ -341,16 +357,18 @@ CurlSession::unlockSharedHandle(CURL* handle, curl_lock_data data)
 			_shareMutexLock.unlock();
 			break;
 		case CURL_LOCK_DATA_SSL_SESSION:
-			gnash::log_error("unlockSharedHandle: SSL session locking unsupported");
+			log_error("unlockSharedHandle: SSL session locking "
+                    "unsupported");
 			break;
 		case CURL_LOCK_DATA_CONNECT:
-			gnash::log_error("unlockSharedHandle: connect locking unsupported");
+			log_error("unlockSharedHandle: connect locking unsupported");
 			break;
 		case CURL_LOCK_DATA_LAST:
-			gnash::log_error("unlockSharedHandle: last locking unsupported ?!");
+			log_error("unlockSharedHandle: last locking unsupported ?!");
 			break;
 		default:
-			std::cerr << "unlockSharedHandle: unknown shared data " << data << std::endl;
+			std::cerr << "unlockSharedHandle: unknown shared data " <<
+                data << std::endl;
 			break;
 	}
 }
@@ -371,7 +389,7 @@ public:
 	typedef std::map<std::string, std::string> PostData;
 
 	/// Open a stream from the specified URL
-	CurlStreamFile(const std::string& url);
+	CurlStreamFile(const std::string& url, const std::string& cachefile);
 
 	/// Open a stream from the specified URL posting the specified variables
 	//
@@ -381,10 +399,12 @@ public:
 	/// @param vars
 	///	The url-encoded post data.
 	///
-	CurlStreamFile(const std::string& url, const std::string& vars);
+	CurlStreamFile(const std::string& url, const std::string& vars,
+            const std::string& cachefile);
 	
 	CurlStreamFile(const std::string& url, const std::string& vars,
-	               const NetworkAdapter::RequestHeaders& headers);
+	               const NetworkAdapter::RequestHeaders& headers,
+                   const std::string& cachefile);
 
 	~CurlStreamFile();
 
@@ -424,7 +444,7 @@ public:
 
 private:
 
-	void init(const std::string& url);
+	void init(const std::string& url, const std::string& cachefile);
 
 	// Use this file to cache data
 	FILE* _cache;
@@ -501,7 +521,7 @@ CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb,
 	void *userp)
 {
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug("curl write callback called for (%d) bytes",
+	log_debug("curl write callback called for (%d) bytes",
 		size * nmemb);
 #endif
 	CurlStreamFile* stream = static_cast<CurlStreamFile*>(userp);
@@ -526,7 +546,7 @@ CurlStreamFile::cache(void *from, size_t size)
         boost::format fmt = boost::format("writing to cache file: requested "
                                           "%d, wrote %d (%s)") %
                                           size % wrote % std::strerror(errno);
-		throw gnash::GnashException(fmt.str());
+		throw GnashException(fmt.str());
 	}
 
 	// Set the size of cached data
@@ -545,7 +565,7 @@ CurlStreamFile::fillCacheNonBlocking()
 	if ( ! _running )
 	{
 #if GNASH_CURL_VERBOSE
-		gnash::log_debug("Not running: fillCacheNonBlocking returning");
+		log_debug("Not running: fillCacheNonBlocking returning");
 #endif
 		return;
 	}
@@ -559,7 +579,7 @@ CurlStreamFile::fillCacheNonBlocking()
 
 	if (mcode != CURLM_OK)
 	{
-		throw gnash::GnashException(curl_multi_strerror(mcode));
+		throw GnashException(curl_multi_strerror(mcode));
 	}
 
 	// handle 404
@@ -573,13 +593,13 @@ CurlStreamFile::fillCache(long unsigned size)
 {
 
 #if GNASH_CURL_VERBOSE
-    gnash::log_debug("fillCache(%d), called, currently cached: %d", size, _cached);
+    log_debug("fillCache(%d), called, currently cached: %d", size, _cached);
 #endif 
 
 	if ( ! _running || _cached >= size ) {
 #if GNASH_CURL_VERBOSE
-        if (!_running) gnash::log_debug("Not running: returning");
-        else gnash::log_debug("Already enough bytes cached: returning");
+        if (!_running) log_debug("Not running: returning");
+        else log_debug("Already enough bytes cached: returning");
 #endif
 	    return;
 	}
@@ -595,13 +615,13 @@ CurlStreamFile::fillCache(long unsigned size)
 	const long maxSleepUsec = 10000;  // 1/100 of a second
 
 	const unsigned int userTimeout = static_cast<unsigned int>(
-			gnash::RcInitFile::getDefaultInstance().getStreamsTimeout()*1000);
+			RcInitFile::getDefaultInstance().getStreamsTimeout()*1000);
 
 #ifdef GNASH_CURL_VERBOSE
-        gnash::log_debug("User timeout is %u milliseconds", userTimeout);
+        log_debug("User timeout is %u milliseconds", userTimeout);
 #endif
 
-	gnash::WallClockTimer lastProgress; // timer since last progress
+	WallClockTimer lastProgress; // timer since last progress
 	while (_running)
 	{
 
@@ -613,24 +633,24 @@ CurlStreamFile::fillCache(long unsigned size)
 		if (_cached >= size || !_running) break; // || _error ?
 
 #if GNASH_CURL_VERBOSE
-		//gnash::log_debug("cached: %d, size: %d", _cached, size);
+		//log_debug("cached: %d, size: %d", _cached, size);
 #endif
 
 		mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, &exceptfd, &maxfd);
 		if (mcode != CURLM_OK) {
 			// This is a serious error, not just a failure to add any
 			// fds.
-			throw gnash::GnashException(curl_multi_strerror(mcode));
+			throw GnashException(curl_multi_strerror(mcode));
 		}
 
 #ifdef GNASH_CURL_VERBOSE
-		gnash::log_debug("Max fd: %d", maxfd);
+		log_debug("Max fd: %d", maxfd);
 #endif
 
 		// A value of -1 means no file descriptors were added.
 		if (maxfd < 0) {
 #if GNASH_CURL_VERBOSE
-			gnash::log_debug("No filedescriptors; breaking");
+			log_debug("No filedescriptors; breaking");
 #endif
 			break;
 		}
@@ -643,7 +663,7 @@ CurlStreamFile::fillCache(long unsigned size)
 		tv.tv_usec = maxSleepUsec;
 
 #ifdef GNASH_CURL_VERBOSE
-		gnash::log_debug("select() with %d milliseconds timeout", maxSleepUsec*1000);
+		log_debug("select() with %d milliseconds timeout", maxSleepUsec*1000);
 #endif
 
 		// Wait for data on the filedescriptors until a timeout set
@@ -655,18 +675,18 @@ CurlStreamFile::fillCache(long unsigned size)
 			boost::format fmt = boost::format(
 				"error polling data from connection to %s: %s ")
 				% _url % strerror(errno);
-			throw gnash::GnashException(fmt.str());
+			throw GnashException(fmt.str());
 		}
 		if ( ! ret )
 		{
 			// timeout
 #ifdef GNASH_CURL_VERBOSE
-            gnash::log_debug("select() timed out, elapsed is %u",
+            log_debug("select() timed out, elapsed is %u",
                     lastProgress.elapsed());
 #endif
             if (userTimeout && lastProgress.elapsed() > userTimeout)
             {
-                gnash::log_error(_("Timeout (%u milliseconds) while loading "
+                log_error(_("Timeout (%u milliseconds) while loading "
                             "from url %s"), userTimeout, _url);
 				// TODO: should we set _error here ?
                 return;
@@ -675,7 +695,7 @@ CurlStreamFile::fillCache(long unsigned size)
 		else
 		{
 #ifdef GNASH_CURL_VERBOSE
-            gnash::log_debug("FD activity, resetting progress timer");
+            log_debug("FD activity, resetting progress timer");
 #endif
             lastProgress.restart();
 		}
@@ -718,13 +738,13 @@ CurlStreamFile::processMessages()
 						  CURLINFO_RESPONSE_CODE, &code);
 
 				if ( code >= 400 ) {
-					gnash::log_error ("HTTP response %ld from url %s",
+					log_error ("HTTP response %ld from url %s",
 							            code, _url);
 					_error = TU_FILE_OPEN_ERROR;
 					_running = false;
 				}
 				else {
-					gnash::log_debug ("HTTP response %ld from url %s",
+					log_debug ("HTTP response %ld from url %s",
 							            code, _url);
 				}
 
@@ -732,7 +752,7 @@ CurlStreamFile::processMessages()
 			else {
 
 				// Transaction failed, pass on curl error.
-				gnash::log_error("CURL: %s", curl_easy_strerror(
+				log_error("CURL: %s", curl_easy_strerror(
 						            curl_msg->data.result));
 				_error = TU_FILE_OPEN_ERROR;
 			}
@@ -745,7 +765,7 @@ CurlStreamFile::processMessages()
 
 /*private*/
 void
-CurlStreamFile::init(const std::string& url)
+CurlStreamFile::init(const std::string& url, const std::string& cachefile)
 {
     _customHeaders = 0;
 
@@ -759,11 +779,21 @@ CurlStreamFile::init(const std::string& url)
 	_handle = curl_easy_init();
 	_mhandle = curl_multi_init();
 
-	/// later on we might want to accept a filename
-	/// in the constructor
-	_cache = std::tmpfile();
+    const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+	
+    if (!cachefile.empty()) {
+        _cache = std::fopen(cachefile.c_str(), "w+b");
+        if (!_cache) {
+
+            log_error("Could not open specified path as cache file. Using "
+                    "a temporary file instead");
+            _cache = std::tmpfile();
+        }
+    }
+    else _cache = std::tmpfile();
+
 	if ( ! _cache ) {
-		throw gnash::GnashException("Could not create temporary cache file");
+		throw GnashException("Could not create temporary cache file");
 	}
 	_cachefd = fileno(_cache);
 
@@ -772,26 +802,28 @@ CurlStreamFile::init(const std::string& url)
 	// Override cURL's default verification of SSL certificates
 	// This is insecure, so log security warning.
 	// Equivalent to curl -k or curl --insecure.
-	if (gnash::RcInitFile::getDefaultInstance().insecureSSL())
+	if (rcfile.insecureSSL())
 	{
-                gnash::log_security(_("Allowing connections to SSL sites with invalid "
-				 "certificates"));		
+        log_security(_("Allowing connections to SSL sites with invalid "
+         "certificates"));		
 
 		ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYPEER, 0);
 		if ( ccode != CURLE_OK ) {
-			throw gnash::GnashException(curl_easy_strerror(ccode));
+			throw GnashException(curl_easy_strerror(ccode));
 		}
 
 		ccode = curl_easy_setopt(_handle, CURLOPT_SSL_VERIFYHOST, 0);
 		if ( ccode != CURLE_OK ) {
-			throw gnash::GnashException(curl_easy_strerror(ccode));
+			throw GnashException(curl_easy_strerror(ccode));
 		}
 	}
 
 	// Get shared data
-	ccode = curl_easy_setopt(_handle, CURLOPT_SHARE, CurlSession::get().getSharedHandle());
+	ccode = curl_easy_setopt(_handle, CURLOPT_SHARE,
+            CurlSession::get().getSharedHandle());
+
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// Set expiration time for DNS cache entries, in seconds
@@ -804,19 +836,19 @@ CurlStreamFile::init(const std::string& url)
 	//
 	ccode = curl_easy_setopt(_handle, CURLOPT_DNS_CACHE_TIMEOUT, 60);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 #ifdef GNASH_CURL_VERBOSE
 	// for verbose operations
 	ccode = curl_easy_setopt(_handle, CURLOPT_VERBOSE, 1);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 #endif
 
@@ -827,13 +859,13 @@ are not honored during the DNS lookup - which you can  work  around  by
 */
 	ccode = curl_easy_setopt(_handle, CURLOPT_NOSIGNAL, true);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// set url
 	ccode = curl_easy_setopt(_handle, CURLOPT_URL, _url.c_str());
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	//curl_easy_setopt(_handle, CURLOPT_NOPROGRESS, false);
@@ -842,18 +874,18 @@ are not honored during the DNS lookup - which you can  work  around  by
 	// set write data and function
 	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEDATA, this);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_WRITEFUNCTION,
 		CurlStreamFile::recv);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_FOLLOWLOCATION, 1);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	//fillCache(32); // pre-cache 32 bytes
@@ -861,23 +893,25 @@ are not honored during the DNS lookup - which you can  work  around  by
 }
 
 /*public*/
-CurlStreamFile::CurlStreamFile(const std::string& url)
+CurlStreamFile::CurlStreamFile(const std::string& url,
+        const std::string& cachefile)
 {
 	log_debug("CurlStreamFile %p created", this);
-	init(url);
+	init(url, cachefile);
 
 	// CURLMcode ret =
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
-		throw gnash::GnashException(curl_multi_strerror(mcode));
+		throw GnashException(curl_multi_strerror(mcode));
 	}
 }
 
 /*public*/
-CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
+CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
+       const std::string& cachefile)
 {
 	log_debug("CurlStreamFile %p created", this);
-	init(url);
+	init(url, cachefile);
 
 	_postdata = vars;
 
@@ -885,7 +919,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// libcurl needs to access the POSTFIELDS during 'perform' operations,
@@ -894,7 +928,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 	// The _postdata member should meet this requirement
 	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// This is to support binary strings as postdata
@@ -903,7 +937,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 	//
 	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
     // Disable sending an Expect: header, as some older HTTP/1.1
@@ -914,21 +948,23 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
     _customHeaders = curl_slist_append(_customHeaders, "Expect:");
     ccode = curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, _customHeaders);
     if ( ccode != CURLE_OK ) {
-        throw gnash::GnashException(curl_easy_strerror(ccode));
+        throw GnashException(curl_easy_strerror(ccode));
     }
 
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
-		throw gnash::GnashException(curl_multi_strerror(mcode));
+		throw GnashException(curl_multi_strerror(mcode));
 	}
 
 }
 
 /*public*/
-CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, const NetworkAdapter::RequestHeaders& headers)
+CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars,
+        const NetworkAdapter::RequestHeaders& headers,
+        const std::string& cachefile)
 {
 	log_debug("CurlStreamFile %p created", this);
-	init(url);
+	init(url, cachefile);
 
 	_postdata = vars;
 
@@ -957,12 +993,12 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
 
     ccode = curl_easy_setopt(_handle, CURLOPT_HTTPHEADER, _customHeaders);
     if ( ccode != CURLE_OK ) {
-        throw gnash::GnashException(curl_easy_strerror(ccode));
+        throw GnashException(curl_easy_strerror(ccode));
     }
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// libcurl needs to access the POSTFIELDS during 'perform' operations,
@@ -971,7 +1007,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
 	// The _postdata member should meet this requirement
 	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// This is to support binary strings as postdata
@@ -980,12 +1016,12 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars, 
 	//
 	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDSIZE, _postdata.size());
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
-		throw gnash::GnashException(curl_multi_strerror(mcode));
+		throw GnashException(curl_multi_strerror(mcode));
 	}
 
 }
@@ -1009,14 +1045,14 @@ CurlStreamFile::read(void *dst, int bytes)
 	if ( eof() || _error ) return 0;
 
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug ("read(%d) called", bytes);
+	log_debug ("read(%d) called", bytes);
 #endif
 
 	fillCache(tell() + bytes);
 	if ( _error ) return 0; // error can be set by fillCache
 
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug("_cache.tell = %d", tell());
+	log_debug("_cache.tell = %d", tell());
 #endif
 
 	return std::fread(dst, 1, bytes, _cache);
@@ -1035,7 +1071,7 @@ CurlStreamFile::readNonBlocking(void *dst, int bytes)
 	}
 
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug ("readNonBlocking(%d) called", bytes);
+	log_debug ("readNonBlocking(%d) called", bytes);
 #endif
 
 	fillCacheNonBlocking();
@@ -1065,7 +1101,7 @@ CurlStreamFile::eof() const
 	bool ret = ( ! _running && feof(_cache) );
 
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug("eof() returning %d", ret);
+	log_debug("eof() returning %d", ret);
 #endif
 	return ret;
 
@@ -1078,7 +1114,7 @@ CurlStreamFile::tell() const
 	int ret =  std::ftell(_cache);
 
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug("tell() returning %ld", ret);
+	log_debug("tell() returning %ld", ret);
 #endif
 
 	return ret;
@@ -1091,7 +1127,7 @@ CurlStreamFile::seek(int pos)
 {
 #ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
-		gnash::log_debug("Warning: seek backward requested (%ld from %ld)",
+		log_debug("Warning: seek backward requested (%ld from %ld)",
 			pos, tell());
 	}
 #endif
@@ -1101,12 +1137,12 @@ CurlStreamFile::seek(int pos)
 
 	if ( _cached < (unsigned int)pos )
 	{
-		gnash::log_error ("Warning: could not cache anough bytes on seek: %d requested, %d cached", pos, _cached);
+		log_error ("Warning: could not cache anough bytes on seek: %d requested, %d cached", pos, _cached);
 		return -1; // couldn't cache so many bytes
 	}
 
 	if (std::fseek(_cache, pos, SEEK_SET) == -1) {
-		gnash::log_error("Warning: fseek failed");
+		log_error("Warning: fseek failed");
 		return -1;
 	} else {
 		return 0;
@@ -1128,15 +1164,15 @@ CurlStreamFile::go_to_end()
 
 		if ( mcode != CURLM_OK )
 		{
-			throw gnash::IOException(curl_multi_strerror(mcode));
+			throw IOException(curl_multi_strerror(mcode));
 		}
 
                 long code;
                 curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
                 if ( code == 404 ) // file not found!
                 {
-			throw gnash::IOException("File not found");
-                        //gnash::log_error(_("404 response from url %s"), _url);
+			throw IOException("File not found");
+                        //log_error(_("404 response from url %s"), _url);
                         //_error = TU_FILE_OPEN_ERROR;
                         //return;
                 }
@@ -1144,8 +1180,8 @@ CurlStreamFile::go_to_end()
 	}
 
 	if (std::fseek(_cache, 0, SEEK_END) == -1) {
-		throw gnash::IOException("NetworkAdapter: fseek to end failed");
-		//gnash::log_error("Warning: fseek to end failed");
+		throw IOException("NetworkAdapter: fseek to end failed");
+		//log_error("Warning: fseek to end failed");
 		//return -1;
 	} 
 }
@@ -1162,7 +1198,7 @@ CurlStreamFile::size() const
 	}
 
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug("get_stream_size() returning %lu", _size);
+	log_debug("get_stream_size() returning %lu", _size);
 #endif
 
 	return _size;
@@ -1200,20 +1236,20 @@ CurlSession::importCookies()
 	// Configure the fake handle to use the share (shared cookies in particular..)
 	ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// Configure the fake handle to read cookies from the specified file
 	ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEFILE, cookiesIn);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// need to pass a non-zero URL string for COOKIEFILE to
 	// be really parsed
 	ccode = curl_easy_setopt(fakeHandle, CURLOPT_URL, "");
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// perform, to activate actual cookie file parsing
@@ -1257,13 +1293,13 @@ CurlSession::exportCookies()
 	// Configure the fake handle to use the share (shared cookies in particular..)
 	ccode = curl_easy_setopt(fakeHandle, CURLOPT_SHARE, getSharedHandle());
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// Configure the fake handle to write cookies to the specified file
 	ccode = curl_easy_setopt(fakeHandle, CURLOPT_COOKIEJAR , cookiesOut);
 	if ( ccode != CURLE_OK ) {
-		throw gnash::GnashException(curl_easy_strerror(ccode));
+		throw GnashException(curl_easy_strerror(ccode));
 	}
 
 	// Cleanup, to trigger actual cookie file flushing
@@ -1280,62 +1316,64 @@ CurlSession::exportCookies()
 //-------------------------------------------
 
 std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& url)
+NetworkAdapter::makeStream(const std::string& url, const std::string& cachefile)
 {
 #ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug("making curl stream for %s", url);
+	log_debug("making curl stream for %s", url);
 #endif
 
 	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream.reset(new CurlStreamFile(url));
+		stream.reset(new CurlStreamFile(url, cachefile));
 	}
 	catch (const std::exception& ex) {
-		gnash::log_error("curl stream: %s", ex.what());
-	}
-	return stream;
-}
-
-std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& url, const std::string& postdata)
-{
-#ifdef GNASH_CURL_VERBOSE
-	gnash::log_debug("making curl stream for %s", url);
-#endif
-
-	std::auto_ptr<IOChannel> stream;
-
-	try {
-		stream.reset(new CurlStreamFile(url, postdata));
-	}
-	catch (const std::exception& ex) {
-		gnash::log_error("curl stream: %s", ex.what());
+		log_error("curl stream: %s", ex.what());
 	}
 	return stream;
 }
 
 std::auto_ptr<IOChannel>
 NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
-                                const RequestHeaders& headers)
+        const std::string& cachefile)
+{
+#ifdef GNASH_CURL_VERBOSE
+	log_debug("making curl stream for %s", url);
+#endif
+
+	std::auto_ptr<IOChannel> stream;
+
+	try {
+		stream.reset(new CurlStreamFile(url, postdata, cachefile));
+	}
+	catch (const std::exception& ex) {
+		log_error("curl stream: %s", ex.what());
+	}
+	return stream;
+}
+
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
+        const RequestHeaders& headers, const std::string& cachefile)
 {
 
 	std::auto_ptr<IOChannel> stream;
 
 	try {
-		stream.reset(new CurlStreamFile(url, postdata, headers));
+		stream.reset(new CurlStreamFile(url, postdata, headers, cachefile));
 	}
 	catch (const std::exception& ex) {
-		gnash::log_error("curl stream: %s", ex.what());
+		log_error("curl stream: %s", ex.what());
 	}
 
     return stream;
 
 }
 
-/// Define static member.
-std::set<std::string, StringNoCaseLessThan>
-NetworkAdapter::_reservedNames = boost::assign::list_of
+const NetworkAdapter::ReservedNames&
+NetworkAdapter::reservedNames()
+{
+    static const ReservedNames names = boost::assign::list_of
     ("Accept-Ranges")
     ("Age")
     ("Allow")
@@ -1367,6 +1405,9 @@ NetworkAdapter::_reservedNames = boost::assign::list_of
     ("Via")
     ("Warning")
     ("WWW-Authenticate");
+
+    return names;
+}
 
 } // namespace gnash
 

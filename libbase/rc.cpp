@@ -101,7 +101,9 @@ RcInitFile::RcInitFile()
     // TODO: give a  default value, and let 0 mean "disabled" -- 0 currently is overridden by libbase/shm.cpp 
     _lcshmkey(0),
     _ignoreFSCommand(true),
-    _quality(-1)
+    _quality(-1),
+    _saveStreamingMedia(false),
+    _saveLoadedMedia(false)
 {
     expandPath(_solsandbox);
 
@@ -418,6 +420,12 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
 
+            if (noCaseCompare(variable, "mediaDir") ) {
+                expandPath(value);
+                _mediaCacheDir = value;
+                continue;
+            }
+            
             if (noCaseCompare(variable, "documentroot") ) {
                 _wwwroot = value;
                 continue;
@@ -506,6 +514,12 @@ RcInitFile::parseFile(const std::string& filespec)
             ||
                  extractNumber(_quality, "quality", variable, value)
             ||
+                 extractSetting(_saveLoadedMedia, "saveLoadedMedia",
+                         variable, value)
+            ||
+                 extractSetting(_saveStreamingMedia, "saveStreamingMedia",
+                         variable, value)
+            || 
                  extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable,
                          value)
             ||
@@ -656,6 +670,8 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
+    cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
+    cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
    
     // Strings.
 
@@ -666,6 +682,7 @@ RcInitFile::updateFile(const std::string& filespec)
     // debuglog to nothing, only to find it returns to "gnash-debug.log"
     // at the next run (even though that's not the way to use it...)
 
+    cmd << "mediaDir " << _mediaCacheDir << endl <<    
     cmd << "debuglog " << _log << endl <<
     cmd << "documentroot " << _wwwroot << endl <<
     cmd << "flashSystemOS " << _flashSystemOS << endl <<

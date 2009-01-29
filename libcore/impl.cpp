@@ -324,8 +324,15 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
 
   StreamProvider& streamProvider = runInfo.streamProvider();
 
-  if ( postdata ) in = streamProvider.getStream(url, *postdata);
-  else in = streamProvider.getStream(url);
+  const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+  StreamProvider::NamingPolicy cacheNamer = rcfile.saveLoadedMedia() ? 
+      streamProvider.currentNamingPolicy() : 0;
+
+  if ( postdata ) in = streamProvider.getStream(url, *postdata,
+          cacheNamer);
+  else in = streamProvider.getStream(url, cacheNamer);
+
   if ( ! in.get() )
   {
       log_error(_("failed to open '%s'; can't create movie"), url);
