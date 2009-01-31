@@ -229,14 +229,16 @@ HTTP::processGetRequest(int fd)
 	
 //	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
 	
-	// Oopen the file and read the furst chunk into memory
-	filestream->open(url);
-	
-	// Get the file size for the HTTP header
-	if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
+	// Oopen the file and read the first chunk into memory
+	if (filestream->open(url)) {
 	    formatErrorResponse(HTTP::NOT_FOUND);
 	} else {
-	    cache.addPath(_filespec, filestream->getFilespec());
+	    // Get the file size for the HTTP header
+	    if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
+		formatErrorResponse(HTTP::NOT_FOUND);
+	    } else {
+		cache.addPath(_filespec, filestream->getFilespec());
+	    }
 	}
     }
     
@@ -561,9 +563,11 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
 	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
 		break;
+#if 1
 	    } else {
-	      log_debug("Got a request, parsing \"%s\"", *i);
+		log_debug("Got a request, parsing \"%s\"", *i);
 		string::size_type start = i->find(" ");
+		string::size_type params = i->find("?");
 		string::size_type pos = i->find("HTTP/");
 		if (pos != string::npos) {
 		    // The version is the last field and is the protocol name
@@ -575,7 +579,13 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
 		    // the filespec in the request is the middle field, deliminated
 		    // by a space on each end.
-		    _filespec = i->substr(start+1, pos-start-2);
+		    if (params != string::npos) {
+			_params = i->substr(params+1, end);
+			_filespec = i->substr(start+1, params);
+			log_debug("Parameters for file: \"%s\"", _params);
+		    } else {
+			_filespec = i->substr(start+1, pos-start-2);
+		    }
 		    log_debug("Requesting file: \"%s\"", _filespec);
 
 		    // HTTP 1.1 enables persistant network connections
@@ -586,6 +596,7 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		    }
 		}
 	    }
+#endif
 	}
     }
     
@@ -1336,17 +1347,26 @@ HTTP::extractCommand(boost::uint8_t *data)
 	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
 	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
 	boost::uint8_t *params = std::find(start, end, '?');
-// 	cerr << "FIXME1: " << (const char *)params << endl;
-// 	cerr << "FIXME2: " << (const char *)start << endl;
-// 	cerr << "FIXME3: " << (const char *)end << endl;
-	if (params != end+1) {
-	    _params = std::string(params, end);
-	    end = params;
+	if (params != end) {
+	    _params = std::string(params+1, end);
+	    _filespec = std::string(start, params);
+	    log_debug("Parameters for file: \"%s\"", _params);
+	} else {
+	    // This is fine as long as end is within the buffer.
+	    _filespec = std::string(start, end);
 	}
-	// This is fine as long as end is within the buffer.
-	_filespec = std::string(start, end);
+	log_debug("Requesting file: \"%s\"", _filespec);
+
+	// The third field is always the HTTP version
+	// The version is the last field and is the protocol name
+	// followed by a slash, and the version number. Note that
+	// the version is not a double, even though it has a dot
+	// in it. It's actually two separate integers.
+	_version.major = *(end+6) - '0';
+	_version.minor = *(end+8) - '0';
+	log_debug (_("Version: %d.%d"), _version.major, _version.minor);
     }
-    
+
     return cmd;
 }
 
@@ -1497,7 +1517,7 @@ http_handler(Network::thread_params_t *args)
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.
-//    do {
+    do {
 	
 #ifdef USE_STATISTICS
 	struct timespec start;
@@ -1514,8 +1534,7 @@ http_handler(Network::thread_params_t *args)
 //	    hand->die();	// tell all the threads for this connection to die
 //	    hand->notifyin();
 	    log_debug("Net HTTP done for fd #%d...", args->netfd);
-// 	    hand->closeNet(args->netfd);
-	    done = true;
+//	    done = true;
 	}
 //	www.dump();
 	
@@ -1542,7 +1561,7 @@ http_handler(Network::thread_params_t *args)
 	} else {
 	    log_debug("Keep-Alive is on", www->keepAlive());
 	    result = true;
-	    done = true;
+//	    done = true;
 	}
 #ifdef USE_STATISTICS
 	struct timespec end;
@@ -1550,7 +1569,7 @@ http_handler(Network::thread_params_t *args)
 	log_debug("Processing time for GET request was %f seconds",
 		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
 #endif
-//    } while(done != true);
+    } while(done != true);
     
 //    hand->notify();
     
