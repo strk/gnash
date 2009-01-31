@@ -771,7 +771,7 @@ Buffer::corrupt(int factor)
 	boost::uniform_int<> location(0, _nbytes);
 	int pos = location(seed);
 	
-	log_debug("Creating error at %d in the buffer", pos);
+//	log_debug("Creating error at %d in the buffer", pos);
 	// Create a random new value for the byte
 	boost::uniform_int<> shift(1, 256);
 	int newval = shift(seed);
