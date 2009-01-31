@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
 #include "gettext.h"
 //#include "cvm.h"
 
@@ -64,6 +65,7 @@ extern "C"{
 #include "diskstream.h"
 #include "arg_parser.h"
 #include "GnashException.h"
+#include "GnashSleep.h" // for usleep comptibility.
 
 // classes internal to Cygnal
 #include "buffer.h"
@@ -280,16 +282,11 @@ main(int argc, char *argv[])
 
     boost::mutex::scoped_lock lk(alldone_mutex);
     
-//     struct thread_params rtmp_data;
-//     struct thread_params ssl_data;
-//     rtmp_data.port = port_offset + 1935;
-//     boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
     // Admin handler    
     if (admin) {
 	Network::thread_params_t admin_data;
 	admin_data.port = gnash::ADMIN_PORT;
 	boost::thread admin_thread(boost::bind(&admin_handler, &admin_data));
-//	admin_thread.join();
     }
 
 //    Cvm cvm;
@@ -301,31 +298,30 @@ main(int argc, char *argv[])
     // server. Since this port offset changes the constant to test
     // for which protocol, we pass the info to the start thread so
     // it knows which handler to invoke. 
+    Network::thread_params_t *http_data = new Network::thread_params_t;
     if ((only_port == 0) || (only_port == gnash::RTMPT_PORT)) {
-	Network::thread_params_t http_data;
-	http_data.port = port_offset + gnash::RTMPT_PORT;
-	http_data.netfd = 0;
-	http_data.filespec = docroot;
+	http_data->port = port_offset + gnash::RTMPT_PORT;
+	http_data->netfd = 0;
+	http_data->filespec = docroot;
 	if (crcfile.getThreadingFlag()) {
-	    boost::thread http_thread(boost::bind(&connection_handler, &http_data));
+	    boost::thread http_thread(boost::bind(&connection_handler, http_data));
 	} else {
-	    connection_handler(&http_data);
+	    connection_handler(http_data);
 	}
     }
     
     
-      // Incomming connection handler for port 1935, RTMP. As RTMP
-      // is not a priviledged port, we just open it without an offset.
+    Network::thread_params_t *rtmp_data = new Network::thread_params_t;
+    // Incomming connection handler for port 1935, RTMP. As RTMP
+    // is not a priviledged port, we just open it without an offset.
     if ((only_port == 0) || (only_port == gnash::RTMP_PORT)) {
-	Network::thread_params_t rtmp_data;
-//	rtmp_data.port = port_offset + gnash::RTMP_PORT;
-	rtmp_data.port = port_offset + gnash::RTMP_PORT;
-	rtmp_data.netfd = 0;
-	rtmp_data.filespec = docroot;
+	rtmp_data->port = port_offset + gnash::RTMP_PORT;
+	rtmp_data->netfd = 0;
+	rtmp_data->filespec = docroot;
 	if (crcfile.getThreadingFlag()) {
-	    boost::thread rtmp_thread(boost::bind(&connection_handler, &rtmp_data));
+	    boost::thread rtmp_thread(boost::bind(&connection_handler, rtmp_data));
 	} else {
-	    connection_handler(&rtmp_data);
+	    connection_handler(rtmp_data);
 	}
     }
     
@@ -338,6 +334,9 @@ main(int argc, char *argv[])
       
       log_debug (_("Cygnal done..."));
     
+      delete rtmp_data;
+      delete http_data;
+
       return(0);
 }
 
@@ -509,7 +508,12 @@ connection_handler(Network::thread_params_t *args)
     }
     // Start a server on this tcp/ip port.
     fd = net.createServer(args->port);
-    log_debug("Starting Connection Handler for fd #%d, port %hd", fd, args->port);
+    if (fd <= 0) {
+	log_error("Can't start Connection Handler for fd #%d, port %hd", fd, args->port);
+	return;
+    } else {
+	log_debug("Starting Connection Handler for fd #%d, port %hd", fd, args->port);
+    }
 
     // Get the number of cpus in this system. For multicore
     // systems we'll get better load balancing if we keep all the
@@ -540,6 +544,7 @@ connection_handler(Network::thread_params_t *args)
 //    Handler *hand = new Handler;
 
     args->handler = &net;
+    boost::thread handler;
     
     // FIXME: this may run forever, we probably want a cleaner way to
     // test for the end of time.
@@ -639,7 +644,7 @@ dispatch_handler(Network::thread_params_t *args)
     do {
 	int limit = net->getPollFDSize();
 	net->setTimeout(timeout);
-//	cerr << "LIMIT is: " << limit << endl;
+	cerr << "LIMIT is: " << limit << endl;
 	if (limit > 0) {
 	    struct pollfd *fds = net->getPollFDPtr();
 	    boost::shared_ptr< vector<struct pollfd> > hits;
@@ -670,9 +675,9 @@ dispatch_handler(Network::thread_params_t *args)
 			// of sending a file, since apache does too. This pretty much
 			// blows persistance,
 //			if (ret) {
-			networks[args->tid] = 0;
-			net->closeNet(it->fd);
-			net->erasePollFD(it->fd);
+			    networks[args->tid] = 0;
+			    net->closeNet(it->fd);
+			    net->erasePollFD(it->fd);
 //			}
 		    }
 		}
