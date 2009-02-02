@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,9 +26,6 @@ class as_object;
 /// Initialize the global LoadVars class
 void loadvars_class_init(as_object& global);
 
-/// Return a LoadVars instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_loadvars_instance();
-  
 } // end of gnash namespace
 
 #endif

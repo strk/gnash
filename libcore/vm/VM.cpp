@@ -1,6 +1,6 @@
 // VM.cpp: the Virtual Machine class, for Gnash
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -97,17 +97,13 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 
 VM::~VM()
 {
-    delete _shLib;
 }
 
-std::locale&
-VM::getLocale() const
+void
+VM::clear()
 {
-	// TODO: some research about what we should be using.
-	//       IIRC older SWF contained some tags for this,
-	//       while new SWF uses UNICODE...
-	static std::locale loc("C");
-	return loc;
+    /// Reset the SharedObjectLibrary, so that SOLs are flushed.
+    _shLib.reset();
 }
 
 int
@@ -241,7 +237,7 @@ VM::markReachableResources() const
 
 	mClassHierarchy->markReachableResources();
 
-    _shLib->markReachableResources();
+    if (_shLib.get()) _shLib->markReachableResources();
 #endif
 
 }

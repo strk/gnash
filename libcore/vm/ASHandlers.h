@@ -1,4 +1,4 @@
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -60,21 +60,21 @@ class ActionHandler
 {
 public:
     ActionHandler();
-    ActionHandler(action_type type, action_callback_t func);
-    ActionHandler(action_type type, std::string name, 
+    ActionHandler(ActionType type, action_callback_t func);
+    ActionHandler(ActionType type, std::string name, 
                   action_callback_t func);
-    ActionHandler(action_type type, std::string name, 
+    ActionHandler(ActionType type, std::string name, 
                   action_callback_t func, as_arg_t format);
 
     /// Execute the action
     void execute(ActionExec& thread) const;
 
     void toggleDebug(bool state) const { _debug = state; }
-    action_type getType()   const { return _type; }
+    ActionType getType()   const { return _type; }
     std::string getName()   const { return _name; }
     as_arg_t getArgFormat() const { return _arg_format; }
 private:
-    action_type       _type;
+    ActionType       _type;
     std::string       _name;
     action_callback_t _callback;
     mutable bool      _debug;
@@ -89,7 +89,7 @@ public:
 	/// TODO: use a vector as we can have at most 254 actions
 	/// (127 w/out length, 127 with length, the high bit is
 	///  used to distinguish the two types)
-	//typedef std::map<action_type, ActionHandler> container_type;
+	//typedef std::map<ActionType, ActionHandler> container_type;
 
 	// Indexed by action id
 	typedef std::vector<ActionHandler> container_type;
@@ -98,23 +98,23 @@ public:
 	static const SWFHandlers& instance();
 
 	/// Execute the action identified by 'type' action type
-	void execute(action_type type, ActionExec& thread) const;
+	void execute(ActionType type, ActionExec& thread) const;
 
 	void toggleDebug(bool state) { _debug = state; }
 
 	size_t size() const { return get_handlers().size(); }
 
-	action_type lastType() const
+	ActionType lastType() const
 	{
 		return ACTION_GOTOEXPRESSION;
 	}
 
-	const ActionHandler &operator[] (action_type x) const
+	const ActionHandler &operator[] (ActionType x) const
 	{
 		return get_handlers()[x];
 	}
 
-	const char* action_name(action_type x) const;
+	const char* action_name(ActionType x) const;
 
 private:
 

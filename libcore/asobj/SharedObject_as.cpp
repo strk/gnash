@@ -1,6 +1,6 @@
 // SharedObject_as.cpp:  ActionScript "SharedObject" class, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 #include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <boost/tokenizer.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/shared_ptr.hpp>
@@ -34,6 +32,7 @@
 # include <io.h>
 #endif
 
+#include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
 #include "amf.h"
@@ -84,12 +83,11 @@ namespace {
     as_value sharedobject_getLocal(const fn_call& fn);
     as_value sharedobject_ctor(const fn_call& fn);
 
-    
     as_object* readSOL(VM& vm, const std::string& filespec);
 
     as_object* getSharedObjectInterface();
     void attachSharedObjectStaticInterface(as_object& o);
-    bool createDirForFile(const std::string& filespec);
+    void flushSOL(SharedObjectLibrary::SoLib::value_type& sol);
     bool validateName(const std::string& solName);
 }
 
@@ -298,12 +296,9 @@ private:
     SOL _sol;
 };
 
+
 SharedObject_as::~SharedObject_as()
 {
-    /// This apparently used to cause problems if the VM no longer exists on
-    /// destruction. It certainly would. However, it *has* to be done, so if it
-    /// still causes problems, it must be fixed another way than not doing it.
-    flush();
 }
 
 
@@ -325,7 +320,7 @@ SharedObject_as::flush(int space) const
 
     const std::string& filespec = _sol.getFilespec();
 
-    if ( ! createDirForFile(filespec) )
+    if (!mkdirRecursive(filespec))
     {
         log_error("Couldn't create dir for flushing SharedObject %s", filespec);
         return false;
@@ -416,8 +411,7 @@ SharedObject_as::flush(int space) const
 
 SharedObjectLibrary::SharedObjectLibrary(VM& vm)
     :
-    _vm(vm),
-    _soLib()
+    _vm(vm)
 {
     _solSafeDir = rcfile.getSOLSafeDir();
     if (_solSafeDir.empty()) {
@@ -486,6 +480,22 @@ SharedObjectLibrary::markReachableResources() const
         SharedObject_as* sh = it->second;
         sh->setReachable();
     }
+}
+
+/// The SharedObjectLibrary keeps all known SharedObjects alive. They must
+/// be flushed on clear(). This is called at the latest by the dtor, which
+/// is called at the latest by VM's dtor (currently earlier to avoid problems
+/// with the GC).
+void
+SharedObjectLibrary::clear()
+{
+    std::for_each(_soLib.begin(), _soLib.end(), &flushSOL);
+    _soLib.clear();
+}
+
+SharedObjectLibrary::~SharedObjectLibrary()
+{
+    clear();
 }
 
 SharedObject_as*
@@ -941,20 +951,20 @@ readSOL(VM& vm, const std::string& filespec)
     }
 
     boost::scoped_array<boost::uint8_t> sbuf(new boost::uint8_t[st.st_size]);
-    boost::uint8_t *buf = sbuf.get();
-    boost::uint8_t *end = buf + st.st_size;
+    const boost::uint8_t *buf = sbuf.get();
+    const boost::uint8_t *end = buf + st.st_size;
 
     try
     {
         std::ifstream ifs(filespec.c_str(), std::ios::binary);
-        ifs.read(reinterpret_cast<char *>(buf), st.st_size);
+        ifs.read(reinterpret_cast<char*>(sbuf.get()), st.st_size);
 
         // TODO check initial bytes, and print warnings if they are fishy
 
         buf += 16; // skip const-length headers
 
         // skip past name   TODO add sanity check
-        buf += ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
+        buf += ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
         buf += 2;
         
         buf += 4; // skip past padding
@@ -974,7 +984,7 @@ readSOL(VM& vm, const std::string& filespec)
                     "byte %s", buf - sbuf.get());
             // read property name
             boost::uint16_t len = 
-                ntohs(*(reinterpret_cast<boost::uint16_t*>(buf)));
+                ntohs(*(reinterpret_cast<const boost::uint16_t*>(buf)));
             buf += 2;
 
             if( buf + len >= end )
@@ -986,7 +996,7 @@ readSOL(VM& vm, const std::string& filespec)
                 log_error("SharedObject::readSOL: empty property name");
                 break;
             }
-            std::string prop_name(reinterpret_cast<char*>(buf), len);
+            std::string prop_name(reinterpret_cast<const char*>(buf), len);
             buf += len;
 
             // read value
@@ -1093,44 +1103,11 @@ readSOL(VM& vm, const std::string& filespec)
 #endif
 }
 
-bool
-createDirForFile(const std::string& filename)
+
+void
+flushSOL(SharedObjectLibrary::SoLib::value_type& sol)
 {
-    if (filename.find("/", 0) != std::string::npos)
-    {
-        typedef boost::tokenizer<boost::char_separator<char> > Tok;
-        boost::char_separator<char> sep("/");
-        Tok t(filename, sep);
-        Tok::iterator tit;
-        std::string newdir = "/";
-        for(tit=t.begin(); tit!=t.end();++tit){
-            //cout << *tit << "\n";
-            newdir += *tit;
-            if (newdir.find("..", 0) != std::string::npos) {
-		log_error("Invalid SharedObject path (contains '..'): %s", filename);
-                return false;
-            }
-            // Don't try to create a directory of the .sol file name!
-            // TODO: don't fail if the movie url has a component 
-            // ending with .sol (eh...)
-            //
-            if (newdir.rfind(".sol") != (newdir.size()-4)) {
-#ifndef _WIN32
-                int ret = mkdir(newdir.c_str(), S_IRUSR|S_IWUSR|S_IXUSR);
-#else
-                int ret = mkdir(newdir.c_str());
-#endif
-                if ((errno != EEXIST) && (ret != 0)) {
-                    log_error(_("Couldn't create SOL files directory %s: %s"),
-                              newdir, std::strerror(errno));
-                    return false;
-                }
-            } // else log_debug("newdir %s ends with .sol", newdir);
-            newdir += "/";
-        }
-    }
-    else log_debug("no slash in filespec %s", filename);
-    return true;
+    sol.second->flush();
 }
 
 } // anonymous namespace

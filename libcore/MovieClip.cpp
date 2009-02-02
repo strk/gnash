@@ -1,6 +1,6 @@
 // MovieClip.cpp:  Stateful live Sprite instance, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -539,7 +539,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 }
 
 character*
-MovieClip::add_empty_movieclip(const char* name, int depth)
+MovieClip::add_empty_movieclip(const std::string& name, int depth)
 {
     // empty_movieclip_def will be deleted during deleting movieclip
     sprite_definition* empty_sprite_def =
@@ -657,7 +657,7 @@ MovieClip::on_event(const event_id& id)
 #endif
 
     // We do not execute ENTER_FRAME if unloaded
-    if ( id.m_id == event_id::ENTER_FRAME && isUnloaded() )
+    if ( id.id() == event_id::ENTER_FRAME && isUnloaded() )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"), getTarget());
@@ -692,7 +692,7 @@ MovieClip::on_event(const event_id& id)
 
 
     // user-defined onInitialize is never called
-    if ( id.m_id == event_id::INITIALIZE )
+    if ( id.id() == event_id::INITIALIZE )
     {
             testInvariant();
             return called;
@@ -713,7 +713,7 @@ MovieClip::on_event(const event_id& id)
     //
     //     TODO: test the case in which it's MovieClip.prototype.onLoad defined !
     //
-    if ( id.m_id == event_id::LOAD )
+    if ( id.id() == event_id::LOAD )
     {
         // TODO: we're likely making too much noise for nothing here,
         // there must be some action-execution-order related problem instead....
@@ -756,7 +756,7 @@ MovieClip::on_event(const event_id& id)
     if (! id.is_key_event ())
     {
         boost::intrusive_ptr<as_function> method = 
-            getUserDefinedEventHandler(id.get_function_key());
+            getUserDefinedEventHandler(id.functionKey());
 
         if ( method )
         {
@@ -1999,7 +1999,7 @@ MovieClip::can_handle_mouse_event() const
         }
 
         // Check user-defined event handlers
-        if ( getUserDefinedEventHandler(event.get_function_key()) )
+        if ( getUserDefinedEventHandler(event.functionKey()) )
         {
             return true;
         }
@@ -2197,14 +2197,14 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // See misc-ming.all/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if ( get_parent() == 0 )
+    if (!get_parent())
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
         execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
 
-        if ( _vm.getSWFVersion() > 5 )
+        if (_vm.getSWFVersion() > 5)
         {
 #ifdef GNASH_DEBUG
             log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
@@ -2215,7 +2215,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     }
     else
     {
-
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
@@ -2241,15 +2240,14 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     {
         assert(!initObj);
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
+        log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
+                getTarget());
 #endif
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
-#endif
         std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
         _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
+
     }
     else {
 
@@ -2261,12 +2259,11 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         }
 
         constructAsScriptObject(); 
-#ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s is dynamic, sending "
-                "INITIALIZE and CONSTRUCT events immediately"), getTarget());
-#endif
 
-        on_event(event_id::INITIALIZE);
+        // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
+        // testsuite/swfdec/clone-sprite-events.c not to call on_event
+        // immediately.
+        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
     }
 
 
@@ -2552,9 +2549,10 @@ MovieClip::processCompletedLoadVariableRequests()
             it != _loadVariableRequests.end(); )
     {
         LoadVariablesThread& request = *(*it);
-        if ( request.completed() )
+        if (request.completed())
         {
             processCompletedLoadVariableRequest(request);
+            delete *it;
             it = _loadVariableRequests.erase(it);
         }
         else ++it;
@@ -3375,7 +3373,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
-    character* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string().c_str(),
+    character* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string(),
             fn.arg(1).to_int());
     return as_value(ch);
 }
@@ -5208,25 +5206,6 @@ movieclip_url_getset(const fn_call& fn)
     return as_value(ptr->get_movie_definition()->get_url());
 }
 
-as_value
-movieclip_highquality_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // We don't support quality settings
-        return as_value(true);
-    }
-    else // setter
-    {
-        LOG_ONCE( log_unimpl("MovieClip._highquality setting") );
-    }
-    return as_value();
-}
-
 // TODO: move this to character class, _focusrect seems a generic property
 as_value
 movieclip_focusrect_getset(const fn_call& fn)
@@ -5401,7 +5380,10 @@ attachMovieClipProperties(character& o)
     gettersetter = movieclip_url_getset;
     o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
 
-    gettersetter = movieclip_highquality_getset;
+    gettersetter = character::quality;
+    o.init_property(NSV::PROP_uQUALITY, gettersetter, gettersetter);
+    
+    gettersetter = character::highquality;
     o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
 
     gettersetter = movieclip_focusrect_getset;

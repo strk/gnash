@@ -1,6 +1,6 @@
 // textformat.cpp:  ActionScript text formatting decorators, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -209,7 +209,7 @@ textformat_new(const fn_call& fn)
 as_value
 textformat_display(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl("TextField.display") );
+	LOG_ONCE( log_unimpl("TextFormat.display") );
 	return as_value();
 }
 
@@ -240,7 +240,7 @@ textformat_bullet(const fn_call& fn)
 as_value
 textformat_tabStops(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl("TextField.tabStops") );
+	LOG_ONCE( log_unimpl("TextFormat.tabStops") );
 	return as_value();
 }
 
@@ -436,14 +436,14 @@ textformat_bold(const fn_call& fn)
 as_value
 textformat_target(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl("TextField.target") );
+	LOG_ONCE( log_unimpl("TextFormat.target") );
 	return as_value();
 }
 
 as_value
 textformat_url(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl("TextField.url") );
+	LOG_ONCE( log_unimpl("TextFormat.url") );
 	return as_value();
 }
 
@@ -516,7 +516,7 @@ textformat_font(const fn_call& fn)
 as_value
 textformat_getTextExtent(const fn_call& /*fn*/)
 {
-	LOG_ONCE( log_unimpl("TextField.getTextExtent") );
+	LOG_ONCE( log_unimpl("TextFormat.getTextExtent") );
 	return as_value();
 }
 

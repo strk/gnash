@@ -1,6 +1,6 @@
 // RemoveObjectTag.cpp: RemoveObject* tag for Gnash.
 //
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 #include "RemoveObjectTag.h"
 #include "MovieClip.h"
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 #include "log.h"
 #include "SWFStream.h"
 
@@ -28,7 +28,7 @@ namespace gnash {
 namespace SWF {
 
 void
-RemoveObjectTag::read(SWFStream& in, tag_type tag)
+RemoveObjectTag::read(SWFStream& in, TagType tag)
 {
 	assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
@@ -54,7 +54,7 @@ RemoveObjectTag::execute(MovieClip* m, DisplayList& dlist) const
 
 /* public static */
 void
-RemoveObjectTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+RemoveObjectTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);

@@ -1,6 +1,6 @@
 // Button.cpp:  Mouse-sensitive buttons, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -241,9 +241,11 @@ attachButtonInterface(as_object& o)
 
     as_c_function_ptr gettersetter;
 
-    //
-    // Properties (TODO: move to appropriate SWF version section)
-    //
+    o.init_property(NSV::PROP_uQUALITY, character::quality,
+            character::quality);
+    
+    o.init_property(NSV::PROP_uHIGHQUALITY, character::highquality,
+            character::highquality);
 
     gettersetter = &character::x_getset;
     o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
@@ -344,10 +346,10 @@ Button::on_event(const event_id& id)
     }
 
     // We only respond keypress events
-    if ( id.m_id != event_id::KEY_PRESS ) return false;
+    if ( id.id() != event_id::KEY_PRESS ) return false;
 
     // We only respond to valid key code (should we assert here?)
-    if ( id.keyCode == key::INVALID ) return false;
+    if ( id.keyCode() == key::INVALID ) return false;
 
     ButtonActionPusher xec(getVM().getRoot(), this); 
     _def.forEachTrigger(id, xec);
@@ -465,7 +467,7 @@ Button::on_button_event(const event_id& event)
     MouseState new_state = m_mouse_state;
   
     // Set our mouse state (so we know how to render).
-    switch (event.m_id)
+    switch (event.id())
     {
         case event_id::ROLL_OUT:
         case event_id::RELEASE_OUTSIDE:
@@ -504,7 +506,7 @@ Button::on_button_event(const event_id& event)
 
         int bi; // button sound array index [0..3]
 
-        switch (event.m_id)
+        switch (event.id())
         {
             case event_id::ROLL_OUT:
                 bi = 0;
@@ -582,7 +584,7 @@ Button::on_button_event(const event_id& event)
 
     // Call conventional attached method.
     boost::intrusive_ptr<as_function> method =
-        getUserDefinedEventHandler(event.get_function_key());
+        getUserDefinedEventHandler(event.functionKey());
     if ( method )
     {
         mr.pushAction(method, this, movie_root::apDOACTION);

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -148,12 +148,20 @@ private:
 class bitmap_info_ogl : public BitmapInfo
 {
   public:
+  
+    /// Set line and fill styles for mesh & line_strip rendering.
+    enum bitmap_wrap_mode
+    {
+      WRAP_REPEAT,
+      WRAP_CLAMP
+    };
+    
     bitmap_info_ogl(GnashImage* image, GLenum pixelformat,
                     bool ogl_accessible);
     ~bitmap_info_ogl();
 
     void apply(const gnash::SWFMatrix& bitmap_matrix,
-               render_handler::bitmap_wrap_mode wrap_mode);
+               bitmap_wrap_mode wrap_mode);
   private:
     inline bool ogl_accessible() const;
     void setup();    

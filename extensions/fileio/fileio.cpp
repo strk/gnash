@@ -35,7 +35,7 @@
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
 #include "fileio.h"
-#include "array.h"  // used by scandir()
+#include "Array_as.h"  // used by scandir()
 
 using namespace std;
 

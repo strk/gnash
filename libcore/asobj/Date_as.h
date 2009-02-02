@@ -1,5 +1,5 @@
 // 
-//	Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//	Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,12 +20,34 @@
 
 #include "as_object.h" // for inheritance
 #include "fn_call.h" // for inheritance
+#include "ClockTime.h"
 
 namespace gnash {
 
-void registerDateNative(as_object& global);
+class Date_as : public as_object
+{
+public:
 
-void date_class_init(as_object& global);
+    explicit Date_as(double value = clocktime::getTicks());
+
+    void setTimeValue(const double& value) { _timeValue = value; }
+
+    double getTimeValue() const { return _timeValue; }
+
+    static void registerNative(as_object& global);
+
+    static void init(as_object& where);
+
+    std::string toString() const;
+
+    bool isDateObject() { return true; }
+
+private:
+
+    double _timeValue;
+
+};
+
 
 } // end of gnash namespace
 

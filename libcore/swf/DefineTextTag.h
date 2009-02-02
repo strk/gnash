@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ class DefineTextTag : public character_def
 {
 public:
 
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+    static void loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& r);
 
 	/// Draw the string.
@@ -65,7 +65,7 @@ private:
     /// Construct a DefineTextTag.
     //
     /// This should only be constructed using the loader() functions.
-	DefineTextTag(SWFStream& in, movie_definition& m, tag_type tag)
+	DefineTextTag(SWFStream& in, movie_definition& m, TagType tag)
     {
         read(in, m, tag);
     }
@@ -74,7 +74,7 @@ private:
 
     SWFMatrix _matrix;
 
-	void read(SWFStream& in, movie_definition& m, tag_type tag);
+	void read(SWFStream& in, movie_definition& m, TagType tag);
 	
     std::vector<TextRecord> _textRecords;
 };
@@ -85,7 +85,7 @@ private:
 class DefineText2Tag
 {
 public:
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+    static void loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& r);
 };
 

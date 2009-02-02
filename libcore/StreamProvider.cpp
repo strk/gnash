@@ -22,6 +22,7 @@
 #endif
 
 
+#include "GnashFileUtilities.h"
 #include "StreamProvider.h"
 #include "URL.h"
 #include "tu_file.h"
@@ -34,17 +35,22 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <boost/algorithm/string/replace.hpp>
 
+namespace gnash {
 
-#if defined(_WIN32) || defined(WIN32)
-#	include <io.h>
-#	define dup _dup
-#else
-#include <unistd.h> // dup
-#endif
-
-namespace gnash
-{
+namespace {
+    
+    std::string urlToDirectory(const std::string& path);
+    
+    /// Make a unique cachefile name from the supplied name.
+    /// If all possible filenames are taken, return an empty string.
+    std::string incrementalRename(const URL& url);
+    
+    /// Make a non-unique cachefile name from the supplied name.
+    /// If the directory cannot be created, return an empty string.
+    std::string overwriteExisting(const URL& url);
+}
 
 StreamProvider&
 StreamProvider::getDefaultInstance()
@@ -53,8 +59,15 @@ StreamProvider::getDefaultInstance()
 	return inst;
 }
 
+StreamProvider::NamingPolicy
+StreamProvider::currentNamingPolicy() const
+{
+    //return overwriteExisting;
+    return incrementalRename;
+}
+
 std::auto_ptr<IOChannel>
-StreamProvider::getStream(const URL& url)
+StreamProvider::getStream(const URL& url, NamingPolicy np)
 {
 
     std::auto_ptr<IOChannel> stream;
@@ -79,7 +92,7 @@ StreamProvider::getStream(const URL& url)
 		else
 		{
             // check security here !!
-		    if ( ! URLAccessManager::allow(url) ) return stream;
+		    if (!URLAccessManager::allow(url)) return stream;
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
@@ -92,10 +105,9 @@ StreamProvider::getStream(const URL& url)
 	}
 	else
 	{
-		std::string url_str = url.str();
-		const char* c_url = url_str.c_str();
-		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(c_url);
+		if (URLAccessManager::allow(url)) {
+			stream = NetworkAdapter::makeStream(url.str(),
+                    np ?  np(url) : std::string());
 		}
 
         // Will return 0 auto_ptr if not allowed.
@@ -105,7 +117,7 @@ StreamProvider::getStream(const URL& url)
 
 std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata,
-                          const NetworkAdapter::RequestHeaders& headers)
+        const NetworkAdapter::RequestHeaders& headers, NamingPolicy np)
 {
 
     if (url.protocol() == "file")
@@ -118,10 +130,9 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
         return getStream(url, postdata);
     }
 
-	std::string url_str = url.str();
-	const char* c_url = url_str.c_str();
 	if ( URLAccessManager::allow(url) ) {
-		return NetworkAdapter::makeStream(c_url, postdata, headers);
+		return NetworkAdapter::makeStream(url.str(), postdata, headers,
+                np ? np(url) : std::string());
 	}
 
 	return std::auto_ptr<IOChannel>();
@@ -129,7 +140,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 }
 
 std::auto_ptr<IOChannel>
-StreamProvider::getStream(const URL& url, const std::string& postdata)
+StreamProvider::getStream(const URL& url, const std::string& postdata,
+       NamingPolicy np)
 {
 
     std::auto_ptr<IOChannel> stream;
@@ -162,11 +174,9 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 	}
 	else
 	{
-		std::string url_str = url.str();
-		const char* c_url = url_str.c_str();
-
-		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(c_url, postdata);
+		if (URLAccessManager::allow(url)) {
+			stream = NetworkAdapter::makeStream(url.str(), postdata,
+                    np ? np(url) : std::string());
 		}
         // Will return 0 auto_ptr if not allowed.
 		return stream;		
@@ -174,5 +184,97 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 	}
 }
 
+
+namespace {
+
+/// Transform a URL into a directory and create it.
+//
+/// @return     an empty string if the directory cannot be created, otherwise
+///             the name of the created directory with a trailing slash.
+/// @param url  The path to transform. Anything after the last '/' is ignored.
+std::string
+urlToDirectory(const std::string& path)
+{
+
+    const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    const std::string& dir = rcfile.getMediaDir() + "/" + path;
+ 
+    // Create the user-specified directory if possible.
+    // An alternative would be to use the 'host' part and create a 
+    // directory tree.
+    if (!mkdirRecursive(dir)) {
+        // Error
+        return std::string();
+    }
+
+    return dir;
+
+}
+
+std::string
+overwriteExisting(const URL& url)
+{
+    std::string path = url.path().substr(1);
+    
+    // Replace all slashes with a _ for a flat directory structure.
+    boost::replace_all(path, "/", "_");
+
+    const std::string& dir = urlToDirectory(url.hostname() + "/");
+
+    if (dir.empty()) return std::string();
+
+    return dir + path;
+}
+
+std::string
+incrementalRename(const URL& url)
+{
+
+    const std::string& path = url.path();
+    assert(!path.empty());
+    assert(path[0] == '/');
+    
+    // Find the last dot, but not if it's first in the path (after the
+    // initial '/').
+    std::string::size_type dot = path.rfind('.');
+    if (dot == 1) dot = std::string::npos;
+
+    // Take the path from after the initial '/' to the last '.' for
+    // manipulation. It doesn't matter if dot is npos.
+    std::string pre = path.substr(1, dot - 1);
+
+    // Replace all slashes with a _ for a flat directory structure.
+    boost::replace_all(pre, "/", "_");
+
+    const std::string& suffix = (dot == std::string::npos) ? "" : 
+        path.substr(dot);
+
+    // Add a trailing slash.
+    const std::string& dir = urlToDirectory(url.hostname() + "/");
+    if (dir.empty()) return std::string();
+
+    std::ostringstream s(dir + pre + suffix);
+
+    size_t i = 0;
+
+    const size_t m = std::numeric_limits<size_t>::max();
+
+    struct stat st;
+    while (stat(s.str().c_str(), &st) >= 0 && i < m) {
+        s.str("");
+        s << dir << pre << i << suffix;
+        ++i;
+    }
+
+    // If there are no options left, return an empty string.
+    if (i == m) {
+        return std::string();
+    }
+
+    return s.str();
+
+}
+
+} // anonymous namespace
 } // namespace gnash
 

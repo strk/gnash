@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -519,6 +519,7 @@ private:
 /// Named constructors
 std::auto_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createKDE4Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
 std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, unsigned int depth);

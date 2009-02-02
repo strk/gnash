@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
 #include "Button.h"
-#include "array.h"
 #include "AsBroadcaster.h"
 #include "Accessibility_as.h"
 #include "Boolean_as.h"
@@ -29,7 +28,7 @@
 #include "Color_as.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
-#include "Date.h"
+#include "Date_as.h"
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
@@ -298,7 +297,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ selection_class_init, NSV::CLASS_SELECTION, NSV::CLASS_OBJECT, NS_UNKNOWN, 5 },
 	{ Sound_as::init, NSV::CLASS_SOUND, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 5 },
 	{ xmlsocket_class_init, NSV::CLASS_X_M_L_SOCKET, NSV::CLASS_OBJECT, NSV::NS_FLASH_NET, 5 },
-	{ date_class_init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ Date_as::init, NSV::CLASS_DATE, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XML_as::init, NSV::CLASS_X_M_L, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ XMLNode_as::init, NSV::CLASS_X_M_L_NODE, NSV::CLASS_OBJECT,
         NSV::NS_FLASH_XML, 5 },
@@ -306,7 +305,7 @@ static const ClassHierarchy::nativeClass knownClasses[] =
 	{ number_class_init, NSV::CLASS_NUMBER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ TextFormat_as::init, NSV::CLASS_TEXT_FORMAT, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ key_class_init, NSV::CLASS_KEY, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
-	{ AsBroadcaster_init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
+	{ AsBroadcaster::init, NSV::CLASS_AS_BROADCASTER, NSV::CLASS_OBJECT, NS_GLOBAL, 5 },
 	{ textsnapshot_class_init, NSV::CLASS_TEXT_SNAPSHOT, NSV::CLASS_OBJECT, NSV::NS_FLASH_TEXT, 6 },
 	{ video_class_init, NSV::CLASS_VIDEO, NSV::CLASS_OBJECT, NSV::NS_FLASH_MEDIA, 6 },
 	{ camera_class_init, NSV::CLASS_CAMERA, NSV::CLASS_OBJECT, NSV::NS_FLASH_UI, 6 },

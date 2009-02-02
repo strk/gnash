@@ -1,4 +1,4 @@
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(PTHREAD_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
-	$(GIF_CFLAG) \
+	$(GIF_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
@@ -102,6 +102,7 @@ libgnashbase_la_SOURCES = \
 	$(MALLOC) \
 	GnashImage.cpp \
 	GnashImageJpeg.cpp \
+	GnashFileUtilities.cpp \
 	log.cpp	\
 	memory.cpp \
 	rc.cpp \
@@ -155,6 +156,7 @@ noinst_HEADERS = \
 	IOChannel.h \
 	tu_opengl_includes.h \
 	GnashSystemIOHeaders.h \
+	GnashFileUtilities.h \
 	ClockTime.h \
 	WallClockTimer.h \
 	utf8.h \

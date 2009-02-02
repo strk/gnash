@@ -1,6 +1,6 @@
 // render.h Rendering interface for Gnash
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,7 +57,8 @@ namespace gnash {
 		BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im);
 
 		/// See render_handler::drawVideoFrame (in backend/render_handler.h)
-		void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds);
+		void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
+                const rect* bounds, bool smooth);
 
 		/// See render_handler::begin_display (in backend/render_handler.h)
 		void	begin_display(
@@ -70,8 +71,8 @@ namespace gnash {
 		void	end_display();
 
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
-		void	draw_line_strip(const boost::int16_t coords[],
-				int vertex_count, const rgba& color, const SWFMatrix& mat);
+		void drawLine(const std::vector<point>& coords, const rgba& color,
+                const SWFMatrix& mat);
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)
 		DSOEXPORT void  draw_poly(const point* corners, int corner_count,

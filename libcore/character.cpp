@@ -1,6 +1,6 @@
 // character.cpp:  ActionScript Character class, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
+#include "gnash.h" // Quality
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -104,14 +105,14 @@ character::getNextUnnamedInstanceName()
 
 
 SWFMatrix
-character::getWorldMatrix() const
+character::getWorldMatrix(bool includeRoot) const
 {
 	SWFMatrix m;
-	if (m_parent != NULL)
+	if (m_parent)
 	{
-	    m = m_parent->getWorldMatrix();
+	    m = m_parent->getWorldMatrix(includeRoot);
 	}
-	m.concatenate(getMatrix());
+    if (m_parent || includeRoot) m.concatenate(getMatrix());
 
 	return m;
 }
@@ -260,6 +261,95 @@ character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
 // Shared ActionScript getter-setters
 //
 //---------------------------------------------------------------------
+
+as_value
+character::quality(const fn_call& fn)
+{
+    boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
+
+    movie_root& mr = ptr->getVM().getRoot();
+
+    if (!fn.nargs)
+    {
+        switch (mr.getQuality())
+        {
+            case QUALITY_BEST:
+                return as_value("BEST");
+            case QUALITY_HIGH:
+                return as_value("HIGH");
+            case QUALITY_MEDIUM:
+                return as_value("MEDIUM");
+            case QUALITY_LOW:
+                return as_value("LOW");
+        }
+    }
+
+    /// Setter
+
+    if (!fn.arg(0).is_string()) return as_value();
+
+    const std::string& q = fn.arg(0).to_string();
+
+    StringNoCaseEqual noCaseCompare;
+
+    if (noCaseCompare(q, "BEST")) mr.setQuality(QUALITY_BEST);
+    else if (noCaseCompare(q, "HIGH")) {
+        mr.setQuality(QUALITY_HIGH);
+    }
+    else if (noCaseCompare(q, "MEDIUM")) {
+        mr.setQuality(QUALITY_MEDIUM);
+    }
+    else if (noCaseCompare(q, "LOW")) {
+            mr.setQuality(QUALITY_LOW);
+    }
+
+    return as_value();
+}
+
+as_value
+character::highquality(const fn_call& fn)
+{
+    boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
+
+    movie_root& mr = ptr->getVM().getRoot();
+    
+    if (!fn.nargs)
+    {
+        switch (mr.getQuality())
+        {
+            case QUALITY_BEST:
+                return as_value(2.0);
+            case QUALITY_HIGH:
+                return as_value(1.0);
+            case QUALITY_MEDIUM:
+            case QUALITY_LOW:
+                return as_value(0.0);
+        }
+    }
+    
+    double q = fn.arg(0).to_number();
+
+    if (q < 0) mr.setQuality(QUALITY_HIGH);
+    else if (q > 2) mr.setQuality(QUALITY_BEST);
+    else {
+        int i = static_cast<int>(q);
+        switch(i)
+        {
+            case 0:
+                mr.setQuality(QUALITY_LOW);
+                break;
+            case 1:
+                mr.setQuality(QUALITY_HIGH);
+                break;
+            case 2:
+                mr.setQuality(QUALITY_BEST);
+                break;
+        }
+    }
+
+    return as_value();
+}
+
 
 as_value
 character::x_getset(const fn_call& fn)
@@ -555,8 +645,7 @@ character::alpha_getset(const fn_call& fn)
 as_value
 character::blendMode(const fn_call& fn)
 {
-    boost::intrusive_ptr<character> ch =
-        ensureType<character>(fn.this_ptr);
+    boost::intrusive_ptr<character> ch = ensureType<character>(fn.this_ptr);
 
     // This is AS-correct, but doesn't do anything.
     // TODO: implement in the renderers!
@@ -591,14 +680,16 @@ character::blendMode(const fn_call& fn)
     if (bm.is_number()) {
         double mode = bm.to_number();
 
-        // hardlight is the last known value
+        // Hardlight is the last known value. This also performs range checking
+        // for float-to-int conversion.
         if (mode < 0 || mode > BLENDMODE_HARDLIGHT) {
 
             // An invalid numeric argument becomes undefined.
             ch->setBlendMode(BLENDMODE_UNDEFINED);
         }
         else {
-            ch->setBlendMode(static_cast<BlendMode>(mode));
+            /// The extra static cast is required to keep OpenBSD happy.
+            ch->setBlendMode(static_cast<BlendMode>(static_cast<int>(mode)));
         }
         return as_value();
     }
@@ -997,7 +1088,7 @@ character::hasEventHandler(const event_id& id) const
 	if ( it != _event_handlers.end() ) return true;
 
 	boost::intrusive_ptr<as_function> method = 
-        getUserDefinedEventHandler(id.get_function_key());
+        getUserDefinedEventHandler(id.functionKey());
 	if (method) return true;
 
 	return false;

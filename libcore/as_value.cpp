@@ -1,6 +1,6 @@
 // as_value.cpp:  ActionScript values, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,8 +36,10 @@
 #include "GnashException.h"
 #include "Object.h"
 #include "amf.h"
-#include "array.h"
+#include "Array_as.h"
+#include "Date_as.h" // for Date type (readAMF0)
 #include "SimpleBuffer.h"
+#include "StringPredicates.h"
 
 #include <cmath> // std::fmod
 #include <boost/algorithm/string/case_conv.hpp>
@@ -57,14 +59,15 @@
 // Define this macro to make soft references activity verbose
 //#define GNASH_DEBUG_SOFT_REFERENCES
 
-// Define this macto to make AMF parsing verbose
+// Define this macro to make AMF parsing verbose
 //#define GNASH_DEBUG_AMF_DESERIALIZE
 
 // Define this macto to make AMF writing verbose
 //#define GNASH_DEBUG_AMF_SERIALIZE
 
-namespace {
+namespace gnash {
 
+namespace {
 
 struct invalidHexDigit {};
 boost::uint8_t parseHex(char c)
@@ -91,12 +94,63 @@ boost::uint8_t parseHex(char c)
 	}
 }
 
-} // end of namespace
+/// Truncates a double to a 32-bit unsigned int.
+//
+/// In fact, it is a 32-bit unsigned int with an additional sign, cast
+/// to an unsigned int. Not sure what the sense is, but that's how it works:
+//
+/// 0xffffffff is interpreted as -1, -0xffffffff as 1.
+boost::int32_t
+truncateToInt(double d)
+{
+    if (d < 0)
+    {   
+	    return - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
+    }
+	
+    return static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
+}
+
+enum Base
+{
+    BASE_OCT,
+    BASE_HEX
+};
 
 
-namespace gnash {
+/// Converts a string to a uint32_t cast to an int32_t.
+//
+/// @param whole    When true, any string that isn't wholly valid is rejected.
+/// @param base     The base (8 or 16) to use.
+/// @param s        The string to parse.
+/// @return         The converted number.
+boost::int32_t
+parsePositiveInt(const std::string& s, Base base, bool whole = true)
+{
 
-namespace { 
+    std::istringstream is(s);
+    boost::uint32_t target;
+
+    switch (base)
+    {
+        case BASE_OCT:
+            is >> std::oct;
+            break;
+        case BASE_HEX:
+            is >> std::hex;
+            break;
+    }
+
+    char c;
+
+    // If the cast fails, or if the whole string must be convertible and
+    // some characters are left, throw an exception.
+    if (!(is >> target) || (whole && is.get(c))) {
+        throw boost::bad_lexical_cast();
+    }
+
+    return target;
+}
 
 // This class is used to iterate through all the properties of an AS object,
 // so we can change them to children of an AMF0 element.
@@ -317,7 +371,6 @@ as_value::to_string() const
 		case AS_FUNCTION:
 		case OBJECT:
 		{
-			//as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
 			try
 			{
 				as_value ret = to_primitive(STRING);
@@ -413,13 +466,6 @@ as_value::to_primitive() const
 		hint = STRING;
 	}
 
-#if 0
-	else if ( m_type == MOVIECLIP && swfVersion > 5 )
-	{
-		throw ActionTypeError();
-	}
-#endif
-
 	return to_primitive(hint);
 }
 
@@ -436,13 +482,6 @@ as_value::convert_to_primitive()
 		hint = STRING;
 	}
 
-#if 0
-	else if ( m_type == MOVIECLIP && swfVersion > 5 )
-	{
-		throw ActionTypeError();
-	}
-#endif
-
 	return convert_to_primitive(hint);
 }
 
@@ -451,7 +490,6 @@ as_value
 as_value::to_primitive(AsType hint) const
 {
 	if ( m_type != OBJECT && m_type != AS_FUNCTION ) return *this; 
-	//if ( ! is_object() ) return *this; // include MOVIECLIP !!
 
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 	log_debug("to_primitive(%s)", hint==NUMBER ? "NUMBER" : "STRING");
@@ -489,12 +527,10 @@ as_value::to_primitive(AsType hint) const
 	{
 		assert(hint==STRING);
 
-#if 1
 		if ( m_type == MOVIECLIP )
 		{
 			return as_value(getCharacterProxy().getTarget());
 		}
-#endif
 
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
@@ -515,17 +551,18 @@ as_value::to_primitive(AsType hint) const
 			return as_value(obj->get_text_value());
 		}
 
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) ||
+                (!method.is_function()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" toString not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                    (!method.is_function()) ) // ECMA says ! is_object()
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" valueOf not found");
 #endif
-				//return as_value(obj->get_text_value());
 				throw ActionTypeError();
 			}
 		}
@@ -574,7 +611,8 @@ as_value::convert_to_primitive(AsType hint)
 		if ( m_type == OBJECT ) obj = getObj().get();
 		else obj = getFun().get();
 
-		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_object()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) ||
+                (!method.is_object()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" valueOf not found");
@@ -618,12 +656,14 @@ as_value::convert_to_primitive(AsType hint)
 			return *this;
 		}
 
-		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+		if ( (!obj->get_member(NSV::PROP_TO_STRING, &method)) || 
+                (!method.is_function()) ) // ECMA says ! is_object()
 		{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 			log_debug(" toString not found");
 #endif
-			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || (!method.is_function()) ) // ECMA says ! is_object()
+			if ( (!obj->get_member(NSV::PROP_VALUE_OF, &method)) || 
+                    (!method.is_function()) ) // ECMA says ! is_object()
 			{
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
 				log_debug(" valueOf not found");
@@ -650,33 +690,63 @@ as_value::convert_to_primitive(AsType hint)
 	return *this;
 }
 
+
+bool
+as_value::parseNonDecimalInt(const std::string& s, double& d, bool whole)
+{
+    const std::string::size_type slen = s.length();
+
+    // "0#" would still be octal, but has the same value as a decimal.
+    if (slen < 3) return false;
+
+    bool negative = false;
+
+    if (s[0] == '0' && (s[1] == 'x' || s[1] == 'X'))
+    {
+        // The only legitimate place for a '-' is after 0x. If it's a
+        // '+' we don't care, as it won't disturb the conversion.
+        std::string::size_type start = 2;
+        if (s[2] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), BASE_HEX, whole);
+        if (negative) d = -d;
+        return true;
+    }
+    else if ((s[0] == '0' || ((s[0] == '-' || s[0] == '+') && s[1] == '0')) &&
+            s.find_first_not_of("01234567", 1) == std::string::npos)
+    {
+        std::string::size_type start = 0;
+        if (s[0] == '-') {
+            negative = true;
+            ++start;
+        }
+        d = parsePositiveInt(s.substr(start), BASE_OCT, whole);
+        if (negative) d = -d;
+        return true;
+    }
+
+    return false;
+
+}
+
 double
 as_value::to_number() const
 {
-    // TODO:  split in to_number_# (version based)
 
-    int swfversion = VM::get().getSWFVersion();
+    const int swfversion = VM::get().getSWFVersion();
 
     switch (m_type)
     {
         case STRING:
         {
-            std::string s = getStr();
-
-            if ( swfversion > 5 )
-            {
-		if ( s.length() == 8 && s[0] == '0' && ( s[1] == 'x' || s[1] == 'X' ) )
-		{
-			try {
-			boost::uint8_t r = (parseHex(s[2])<<4) + parseHex(s[3]);
-			boost::uint8_t g = (parseHex(s[4])<<4) + parseHex(s[5]);
-			boost::uint8_t b = (parseHex(s[6])<<4) + parseHex(s[7]);
-			return (double)((r<<16)|(g<<8)|b);
-			} catch (invalidHexDigit) { }
-			
-		}
+            const std::string& s = getStr();
+            if ( s.empty() ) {
+                return swfversion >= 5 ? NaN : 0.0;
             }
-            else if (swfversion <= 4)
+            
+            if (swfversion <= 4)
             {
                 // For SWF4, any valid number before non-numerical
                 // characters is returned, including exponent, positive
@@ -687,36 +757,48 @@ as_value::to_number() const
                 return d;
             }
 
-            // @@ Moock says the rule here is: if the
-            // string is a valid float literal, then it
-            // gets converted; otherwise it is set to NaN.
-            // Valid for SWF5 and above.
-            //
-            // boost::lexical_cast is remarkably inflexible and 
-            // fails for anything that has non-numerical characters.
-            // Fortunately, actionscript is equally inflexible.
-            try 
-            { 
-                double d = boost::lexical_cast<double>(getStr());
-                return d;
-            } 
-            catch (boost::bad_lexical_cast &) 
-            // There is no standard textual representation of infinity in the
-            // C++ standard, so boost throws a bad_lexical_cast for 'inf',
-            // just like for any other non-numerical text. This is correct
-            // behaviour.
-            {
-            	return static_cast<double>(NaN);
+            try {
+
+                if (swfversion > 5)
+                {
+                    double d;
+                    // Will throw if invalid.
+                    if (parseNonDecimalInt(s, d)) return d;
+                }
+
+                // @@ Moock says the rule here is: if the
+                // string is a valid float literal, then it
+                // gets converted; otherwise it is set to NaN.
+                // Valid for SWF5 and above.
+                //
+                // boost::lexical_cast is remarkably inflexible and 
+                // fails for anything that has non-numerical characters.
+                // Fortunately, actionscript is equally inflexible.
+                std::string::size_type pos;
+                if ((pos = s.find_first_not_of(" \r\n\t")) 
+                        == std::string::npos) {
+                    return NaN;
+                }
+
+                return boost::lexical_cast<double>(s.substr(pos));
+ 
+            }
+            catch (boost::bad_lexical_cast&) {
+                // There is no standard textual representation of infinity
+                // in the C++ standard, so our conversion function an
+                // exception for 'inf', just like for any other
+                // non-numerical text. This is correct behaviour.
+                return NaN;
             }
         }
 
         case NULLTYPE:
         case UNDEFINED: 
-	{
+        {
             // Evan: from my tests
             // Martin: FlashPlayer6 gives 0; FP9 gives NaN.
             return ( swfversion >= 7 ? NaN : 0 );
-	}
+        }
 
         case BOOLEAN: 
             // Evan: from my tests
@@ -734,8 +816,6 @@ as_value::to_number() const
             // method".
             //
             // Arrays and Movieclips should return NaN.
-
-            //as_object* obj = m_type == OBJECT ? getObj().get() : getFun().get();
             try
             {
                 as_value ret = to_primitive(NUMBER);
@@ -744,33 +824,26 @@ as_value::to_number() const
             catch (ActionTypeError& e)
             {
 #if GNASH_DEBUG_CONVERSION_TO_PRIMITIVE
-                log_debug(_("to_primitive(%s, NUMBER) threw an ActionTypeError %s"),
-                        *this, e.what());
+                log_debug(_("to_primitive(%s, NUMBER) threw an "
+                            "ActionTypeError %s"), *this, e.what());
 #endif
-                if ( m_type == AS_FUNCTION && swfversion < 6 )
-                {
-                    return 0;
-                }
-                else
-                {
-                    return NaN;
-                }
+                if (m_type == AS_FUNCTION && swfversion < 6) return 0;
+                
+                return NaN;
             }
         }
 
         case MOVIECLIP:
-	{
+        {
             // This is tested, no valueOf is going
             // to be invoked for movieclips.
             return NaN; 
-	}
+        }
 
         default:
-            // Other object types should return NaN, but if we implement that,
-            // every GUI's movie canvas shrinks to size 0x0. No idea why.
-            return NaN; // 0.0;
+            // Other object types should return NaN.
+            return NaN;
     }
-    /* NOTREACHED */
 }
 
 std::auto_ptr<amf::Element>
@@ -823,18 +896,7 @@ as_value::to_int() const
 
 	if ( ! utility::isFinite(d) ) return 0;
 
-	boost::int32_t i = 0;
-
-    if (d < 0)
-    {   
-	    i = - static_cast<boost::uint32_t>(std::fmod(-d, 4294967296.0));
-    }
-    else
-    {
-	    i = static_cast<boost::uint32_t>(std::fmod(d, 4294967296.0));
-    }
-    
-    return i;
+    return truncateToInt(d);
 }
 
 // Conversion to boolean for SWF7 and up
@@ -1171,8 +1233,8 @@ as_value::equals(const as_value& v) const
     //    return the result of the comparison x == ToNumber(y).
     if (m_type == NUMBER && v.m_type == STRING)
     {
-	double n = v.to_number();
-	if ( ! utility::isFinite(n) ) return false;
+        double n = v.to_number();
+        if ( ! utility::isFinite(n) ) return false;
         return equalsSameType(n);
     }
 
@@ -1180,9 +1242,9 @@ as_value::equals(const as_value& v) const
     //     return the result of the comparison ToNumber(x) == y.
     if (v.m_type == NUMBER && m_type == STRING)
     {
-	double n = to_number();
-	if ( ! utility::isFinite(n) ) return false;
-        return v.equalsSameType(n); 
+        double n = to_number();
+        if ( ! utility::isFinite(n) ) return false;
+            return v.equalsSameType(n); 
     }
 
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
@@ -1199,7 +1261,8 @@ as_value::equals(const as_value& v) const
 
     // 20. If Type(x) is either String or Number and Type(y) is Object,
     //     return the result of the comparison x == ToPrimitive(y).
-    if ( (m_type == STRING || m_type == NUMBER ) && ( v.m_type == OBJECT || v.m_type == AS_FUNCTION ) )
+    if ( (m_type == STRING || m_type == NUMBER ) && 
+            (v.m_type == OBJECT || v.m_type == AS_FUNCTION ))
     {
         // convert this value to a primitive and recurse
 	try
@@ -1225,29 +1288,33 @@ as_value::equals(const as_value& v) const
 
     // 21. If Type(x) is Object and Type(y) is either String or Number,
     //    return the result of the comparison ToPrimitive(x) == y.
-    if ( (v.m_type == STRING || v.m_type == NUMBER ) && ( m_type == OBJECT || m_type == AS_FUNCTION ) )
+    if ((v.m_type == STRING || v.m_type == NUMBER) && 
+            (m_type == OBJECT || m_type == AS_FUNCTION))
     {
         // convert this value to a primitive and recurse
         try
-	{
-        	as_value v2 = to_primitive(); 
-		if ( strictly_equals(v2) ) return false;
+        {
+            // Date objects default to primitive type STRING from SWF6 up,
+            // but we always prefer valueOf to toString in this case.
+        	as_value v2 = to_primitive(NUMBER); 
+            if ( strictly_equals(v2) ) return false;
 
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" 21: convertion to primitive : %s -> %s", *this, v2);
+            log_debug(" 21: convertion to primitive : %s -> %s", *this, v2);
 #endif
 
-		return v2.equals(v);
-	}
-	catch (ActionTypeError& e)
-	{
+            return v2.equals(v);
+        }
+        catch (ActionTypeError& e)
+        {
 
 #ifdef GNASH_DEBUG_EQUALITY
-		log_debug(" %s.to_primitive() threw an ActionTypeError %s", *this, e.what());
+            log_debug(" %s.to_primitive() threw an ActionTypeError %s",
+                    *this, e.what());
 #endif
 
-		return false; // no valid conversion
-	}
+            return false; // no valid conversion
+        }
 
     }
 
@@ -1522,151 +1589,107 @@ as_value::as_value(boost::intrusive_ptr<as_object> obj)
 }
 
 
-// Convert numeric value to string value, following ECMA-262 specification
+/// Examples:
+//
+/// e.g. for 9*.1234567890123456789:
+/// 9999.12345678901
+/// 99999.123456789
+/// 999999.123456789
+/// 9999999.12345679
+/// [...]
+/// 999999999999.123
+/// 9999999999999.12
+/// 99999999999999.1
+/// 999999999999999
+/// 1e+16
+/// 1e+17
+//
+/// For 1*.111111111111111111111111111111111111:
+/// 1111111111111.11
+/// 11111111111111.1
+/// 111111111111111
+/// 1.11111111111111e+15
+/// 1.11111111111111e+16
+//
+/// For 1.234567890123456789 * 10^-i:
+/// 1.23456789012346
+/// 0.123456789012346
+/// 0.0123456789012346
+/// 0.00123456789012346
+/// 0.000123456789012346
+/// 0.0000123456789012346
+/// 0.00000123456789012346
+/// 1.23456789012346e-6
+/// 1.23456789012346e-7
 std::string
 as_value::doubleToString(double val, int radix)
 {
-	// Printing formats:
-	//
-	// If _val > 1, Print up to 15 significant digits, then switch
-	// to scientific notation, rounding at the last place and
-	// omitting trailing zeroes.
-	// e.g. for 9*.1234567890123456789
-	// ...
-	// 9999.12345678901
-	// 99999.123456789
-	// 999999.123456789
-	// 9999999.12345679
-	// 99999999.1234568
-	// 999999999.123457
-	// 9999999999.12346
-	// 99999999999.1235
-	// 999999999999.123
-	// 9999999999999.12
-	// 99999999999999.1
-	// 999999999999999
-	// 1e+16
-	// 1e+17
-	// ...
-	// e.g. for 1*.111111111111111111111111111111111111
-	// ...
-	// 1111111111111.11
-	// 11111111111111.1
-	// 111111111111111
-	// 1.11111111111111e+15
-	// 1.11111111111111e+16
-	// ...
-	// For values < 1, print up to 4 leading zeroes after the
-	// decimal point, then switch to scientific notation with up
-	// to 15 significant digits, rounding with no trailing zeroes
-	// e.g. for 1.234567890123456789 * 10^-i:
-	// 1.23456789012346
-	// 0.123456789012346
-	// 0.0123456789012346
-	// 0.00123456789012346
-	// 0.000123456789012346
-	// 0.0000123456789012346
-	// 0.00000123456789012346
-	// 1.23456789012346e-6
-	// 1.23456789012346e-7
-	// ...
-	//
-	// If the value is negative, just add a '-' to the start; this
-	// does not affect the precision of the printed value.
-	//
-	// This almost corresponds to iomanip's std::setprecision(15)
-	// format, except that iomanip switches to scientific notation
-	// at e-05 not e-06, and always prints at least two digits for the exponent.
-
-	// The C implementation had problems with the following cases:
-	// 9.99999999999999[39-61] e{-2,-3}. Adobe prints these as
-	// 0.0999999999999999 and 0.00999999999999 while we print them
-	// as 0.1 and 0.01
-	// These values are at the limit of a double's precision,
-	// for example, in C,
-	// .99999999999999938 printfs as
-	// .99999999999999933387 and
-	// .99999999999999939 printfs as
-	// .99999999999999944489
-	// so this behaviour is probably too compiler-dependent to
-	// reproduce exactly.
-	//
-	// There may be some milage in comparing against
-	// 0.00009999999999999995 and
-	// 0.000009999999999999995 instead.
-	//
-	// The stringstream implementation seems to have no problems with them,
-	// but that may just be a better compiler.
-
 	// Handle non-numeric values.
-	if (isNaN(val))
-	{
-		return "NaN";
-	}
-	else if (isInf(val))
-	{
-		return val < 0 ? "-Infinity" : "Infinity";
-	}
-	else if (val == 0.0 || val == -0.0)
-	{
-		return "0";
-	}
+	if (isNaN(val)) return "NaN";
+	
+    if (isInf(val)) return val < 0 ? "-Infinity" : "Infinity";
 
-	std::ostringstream ostr;
-	std::string str;
+    if (val == 0.0 || val == -0.0) return "0"; 
 
-	if ( radix == 10 )
+    std::ostringstream ostr;
+
+	if (radix == 10)
 	{
 		// ActionScript always expects dot as decimal point.
 		ostr.imbue(std::locale::classic()); 
 		
-		// force to decimal notation for this range (because the reference player does)
+		// force to decimal notation for this range (because the
+        // reference player does)
 		if (std::abs(val) < 0.0001 && std::abs(val) >= 0.00001)
 		{
 			// All nineteen digits (4 zeros + up to 15 significant digits)
 			ostr << std::fixed << std::setprecision(19) << val;
 			
-			str = ostr.str();
+            std::string str = ostr.str();
 			
 			// Because 'fixed' also adds trailing zeros, remove them.
 			std::string::size_type pos = str.find_last_not_of('0');
 			if (pos != std::string::npos) {
 				str.erase(pos + 1);
 			}
+            return str;
 		}
-		else
-		{
-			ostr << std::setprecision(15) << val;
-			
-			str = ostr.str();
-			
-			// Remove a leading zero from 2-digit exponent if any
-			std::string::size_type pos = str.find("e", 0);
 
-			if (pos != std::string::npos && str.at(pos + 2) == '0') {
-				str.erase(pos + 2, 1);
-			}
-		}
+        ostr << std::setprecision(15) << val;
+        
+        std::string str = ostr.str();
+        
+        // Remove a leading zero from 2-digit exponent if any
+        std::string::size_type pos = str.find("e", 0);
+
+        if (pos != std::string::npos && str.at(pos + 2) == '0') {
+            str.erase(pos + 2, 1);
+        }
 
         return str;
-
 	}
 
     // Radix isn't 10
-
 	bool negative = (val < 0);
-	if ( negative ) val = -val;
+	if (negative) val = -val;
 
 	double left = std::floor(val);
-	if ( left < 1 ) return "0";
-	while ( left != 0 )
+	if (left < 1) return "0";
+
+    std::string str;
+    const std::string digits = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+    // Construct the string backwards for speed, then reverse.
+    while (left)
 	{
 		double n = left;
 		left = std::floor(left / radix);
 		n -= (left * radix);
-		str.insert(0, 1, (n < 10 ? ((int)n+'0') : ((int)n+('a'-10))));
+		str.push_back(digits[static_cast<int>(n)]);
 	}
-	if ( negative ) str.insert(0, 1, '-'); 
+	if (negative) str.push_back('-'); 
+
+    std::reverse(str.begin(), str.end());
 
 	return str;
 	
@@ -2109,7 +2132,7 @@ readNetworkLong(const boost::uint8_t* buf) {
 // TODO restore first parameter on parse errors
 //
 static bool
-amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end, 
+amf0_read_value(const boost::uint8_t *&b, const boost::uint8_t *end, 
         as_value& ret, int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	int amf_type;
@@ -2175,9 +2198,35 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 			}
 
 			{
-				std::string str(reinterpret_cast<char *>(b), si); b += si;
+				std::string str(reinterpret_cast<const char*>(b), si); b += si;
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 				log_debug("amf0 read string: %s", str);
+#endif
+				ret.set_string(str);
+				return true;
+
+			}
+			break;
+        }
+
+		case amf::Element::LONG_STRING_AMF0:
+        {
+			if (b + 4 > end) {
+				log_error(_("AMF0 read: premature end of input "
+                            "reading Long String type"));
+				return false;
+			}
+            boost::uint32_t si = readNetworkLong(b); b += 4;
+			if (b + si > end) {
+				log_error(_("AMF0 read: premature end of input "
+                            "reading Long String type"));
+				return false;
+			}
+
+			{
+				std::string str(reinterpret_cast<const char*>(b), si); b += si;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+				log_debug("amf0 read long string: %s", str);
 #endif
 				ret.set_string(str);
 				return true;
@@ -2257,7 +2306,7 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
                         break;
                     }
 
-					std::string name(reinterpret_cast<char*>(b), strlen);
+					std::string name(reinterpret_cast<const char*>(b), strlen);
 
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
 					log_debug("amf0 ECMA_ARRAY prop name is %s", name);
@@ -2351,6 +2400,36 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
                 return true;
         }
 
+		case amf::Element::DATE_AMF0:
+        {
+			if (b + 8 > end) {
+				log_error(_("AMF0 read: premature end of input reading Date "
+                            "type"));
+				return false;
+			}
+			double dub;
+            // TODO: may we avoid a copy and swapBytes call
+            //       by bitshifting b[0] trough b[7] ?
+            std::copy(b, b+8, (char*)&dub); b+=8; 
+			amf::swapBytes(&dub, 8);
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+			log_debug("amf0 read date: %e", dub);
+#endif
+            as_object* obj = new Date_as(dub);
+			ret.set_as_object(obj);
+
+			if (b + 2 > end) {
+				log_error(_("AMF0 read: premature end of input reading "
+                            "timezone from Date type"));
+				return false;
+			}
+            LOG_ONCE(log_unimpl("Timezone info from AMF0 encoded Date object "
+                        "ignored"));
+            b+=2;
+
+			return true;
+        }
+
 		// TODO define other types (function, sprite, etc)
 		default:
         {
@@ -2364,7 +2443,8 @@ amf0_read_value(boost::uint8_t *&b, boost::uint8_t *end,
 }
 
 bool
-as_value::readAMF0(boost::uint8_t *&b, boost::uint8_t *end, int inType, std::vector<as_object*>& objRefs, VM& vm)
+as_value::readAMF0(const boost::uint8_t *&b, const boost::uint8_t *end,
+        int inType, std::vector<as_object*>& objRefs, VM& vm)
 {
 	return amf0_read_value(b, end, *this, inType, objRefs, vm);
 }
@@ -2435,6 +2515,26 @@ as_value::writeAMF0(SimpleBuffer& buf,
                         buf.appendNetworkLong(len);
                     }
                 }
+                else if ( obj->isDateObject() )
+                {
+                    const Date_as& date = dynamic_cast<const Date_as&>(*obj);
+                    double d = date.getTimeValue(); 
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                    log_debug(_("writeAMF0: serializing date object "
+                                "with index %d and value %g"), idx, d);
+#endif
+                    buf.appendByte(amf::Element::DATE_AMF0);
+
+                    // This actually only swaps on little-endian machines
+                    amf::swapBytes(&d, 8);
+                    buf.append(&d, 8);
+
+                    // This should be timezone
+                    boost::uint16_t tz=0; 
+                    buf.appendNetworkShort(tz);
+
+                    return true;
+                }
                 else
                 {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
@@ -2471,13 +2571,26 @@ as_value::writeAMF0(SimpleBuffer& buf,
 
         case STRING:
         {
-            buf.appendByte(amf::Element::STRING_AMF0);
             const std::string& str = getStr();
+            size_t strlen = str.size();
+            if ( strlen <= 65535 )
+            {
 #ifdef GNASH_DEBUG_AMF_SERIALIZE
-            log_debug(_("writeAMF0: serializing string '%s'"), str);
+                log_debug(_("writeAMF0: serializing string '%s'"), str);
 #endif
-            buf.appendNetworkShort(str.size());
-            buf.append(str.c_str(), str.size());
+                buf.appendByte(amf::Element::STRING_AMF0);
+                buf.appendNetworkShort(strlen);
+                buf.append(str.c_str(), strlen);
+            }
+            else
+            {
+#ifdef GNASH_DEBUG_AMF_SERIALIZE
+                log_debug(_("writeAMF0: serializing long string '%s'"), str);
+#endif
+                buf.appendByte(amf::Element::LONG_STRING_AMF0);
+                buf.appendNetworkLong(strlen);
+                buf.append(str.c_str(), strlen);
+            }
             return true;
         }
 
@@ -2488,7 +2601,7 @@ as_value::writeAMF0(SimpleBuffer& buf,
             log_debug(_("writeAMF0: serializing number '%g'"), d);
 #endif
             buf.appendByte(amf::Element::NUMBER_AMF0);
-            amf::swapBytes(&d, 8); // this actually only swapps on little-endian machines
+            amf::swapBytes(&d, 8); // this actually only swaps on little-endian machines
             buf.append(&d, 8);
             return true;
         }

@@ -1,7 +1,8 @@
 /****************************************************************************
 ** gnash::qwidget meta object code from reading C++ file 'kdesup.h'
 **
-** Created: Thu Nov 22 19:07:28 2007
+** Created: Mon Dec 29 17:25:54 2008
+**      by: The Qt MOC ($Id: qt/moc_yacc.cpp   3.3.8   edited Feb 2 14:59 $)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
@@ -13,7 +14,7 @@
 
 #include <private/qucomextra_p.h>
 #if !defined(Q_MOC_OUTPUT_REVISION) || (Q_MOC_OUTPUT_REVISION != 26)
-#error "This file was generated using the moc from 3.3.7. It"
+#error "This file was generated using the moc from 3.3.8b. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -52,28 +53,30 @@ QMetaObject* gnash::qwidget::staticMetaObject()
 	return metaObj;
     QMetaObject* parentObject = WIDGETCLASS::staticMetaObject();
     static const QUMethod slot_0 = {"menuitem_restart_callback", 0, 0 };
-    static const QUMethod slot_1 = {"menuitem_quit_callback", 0, 0 };
-    static const QUMethod slot_2 = {"menuitem_play_callback", 0, 0 };
-    static const QUMethod slot_3 = {"menuitem_pause_callback", 0, 0 };
-    static const QUMethod slot_4 = {"menuitem_stop_callback", 0, 0 };
-    static const QUMethod slot_5 = {"menuitem_step_forward_callback", 0, 0 };
-    static const QUMethod slot_6 = {"menuitem_step_backward_callback", 0, 0 };
-    static const QUMethod slot_7 = {"menuitem_jump_forward_callback", 0, 0 };
-    static const QUMethod slot_8 = {"menuitem_jump_backward_callback", 0, 0 };
+    static const QUMethod slot_1 = {"menuitem_refresh_callback", 0, 0 };
+    static const QUMethod slot_2 = {"menuitem_quit_callback", 0, 0 };
+    static const QUMethod slot_3 = {"menuitem_play_callback", 0, 0 };
+    static const QUMethod slot_4 = {"menuitem_pause_callback", 0, 0 };
+    static const QUMethod slot_5 = {"menuitem_stop_callback", 0, 0 };
+    static const QUMethod slot_6 = {"menuitem_step_forward_callback", 0, 0 };
+    static const QUMethod slot_7 = {"menuitem_step_backward_callback", 0, 0 };
+    static const QUMethod slot_8 = {"menuitem_jump_forward_callback", 0, 0 };
+    static const QUMethod slot_9 = {"menuitem_jump_backward_callback", 0, 0 };
     static const QMetaData slot_tbl[] = {
 	{ "menuitem_restart_callback()", &slot_0, QMetaData::Public },
-	{ "menuitem_quit_callback()", &slot_1, QMetaData::Public },
-	{ "menuitem_play_callback()", &slot_2, QMetaData::Public },
-	{ "menuitem_pause_callback()", &slot_3, QMetaData::Public },
-	{ "menuitem_stop_callback()", &slot_4, QMetaData::Public },
-	{ "menuitem_step_forward_callback()", &slot_5, QMetaData::Public },
-	{ "menuitem_step_backward_callback()", &slot_6, QMetaData::Public },
-	{ "menuitem_jump_forward_callback()", &slot_7, QMetaData::Public },
-	{ "menuitem_jump_backward_callback()", &slot_8, QMetaData::Public }
+	{ "menuitem_refresh_callback()", &slot_1, QMetaData::Public },
+	{ "menuitem_quit_callback()", &slot_2, QMetaData::Public },
+	{ "menuitem_play_callback()", &slot_3, QMetaData::Public },
+	{ "menuitem_pause_callback()", &slot_4, QMetaData::Public },
+	{ "menuitem_stop_callback()", &slot_5, QMetaData::Public },
+	{ "menuitem_step_forward_callback()", &slot_6, QMetaData::Public },
+	{ "menuitem_step_backward_callback()", &slot_7, QMetaData::Public },
+	{ "menuitem_jump_forward_callback()", &slot_8, QMetaData::Public },
+	{ "menuitem_jump_backward_callback()", &slot_9, QMetaData::Public }
     };
     metaObj = QMetaObject::new_metaobject(
 	"gnash::qwidget", parentObject,
-	slot_tbl, 9,
+	slot_tbl, 10,
 	0, 0,
 #ifndef QT_NO_PROPERTIES
 	0, 0,
@@ -95,14 +98,15 @@ bool gnash::qwidget::qt_invoke( int _id, QUObject* _o )
 {
     switch ( _id - staticMetaObject()->slotOffset() ) {
     case 0: menuitem_restart_callback(); break;
-    case 1: menuitem_quit_callback(); break;
-    case 2: menuitem_play_callback(); break;
-    case 3: menuitem_pause_callback(); break;
-    case 4: menuitem_stop_callback(); break;
-    case 5: menuitem_step_forward_callback(); break;
-    case 6: menuitem_step_backward_callback(); break;
-    case 7: menuitem_jump_forward_callback(); break;
-    case 8: menuitem_jump_backward_callback(); break;
+    case 1: menuitem_refresh_callback(); break;
+    case 2: menuitem_quit_callback(); break;
+    case 3: menuitem_play_callback(); break;
+    case 4: menuitem_pause_callback(); break;
+    case 5: menuitem_stop_callback(); break;
+    case 6: menuitem_step_forward_callback(); break;
+    case 7: menuitem_step_backward_callback(); break;
+    case 8: menuitem_jump_forward_callback(); break;
+    case 9: menuitem_jump_backward_callback(); break;
     default:
 	return WIDGETCLASS::qt_invoke( _id, _o );
     }

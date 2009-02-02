@@ -16,8 +16,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GNASH_UTILITY_H
-#define _GNASH_UTILITY_H
+#ifndef GNASH_UTILITY_H
+#define GNASH_UTILITY_H
 
 // HAVE_FINITE, HAVE_PTHREADS, WIN32, NDEBUG etc.
 #ifdef HAVE_CONFIG_H
@@ -53,13 +53,6 @@
 #endif // _WIN32
 
 
-// Define this to enable fast float&double to uint32 conversion.
-// If the behaviour is undefined when overflow occurs with your 
-// compiler, disable this macro.
-#ifndef __APPLE__
-	#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
-#endif
-
 namespace gnash {
 
 // Using a possible built-in pi constant M_PI, which is not in
@@ -84,23 +77,28 @@ inline bool isFinite(double d)
 #endif
 }
 
-inline double infinite_to_zero(double x)
+inline double
+infinite_to_zero(double x)
 {
     return utility::isFinite(x) ? x : 0.0;
 }
 
-template <typename T> inline T clamp(T i, T min, T max)
+template <typename T>
+inline T
+clamp(T i, T min, T max)
 {
 	assert( min <= max );
 	return std::max<T>(min, std::min<T>(i, max));
 }
 
-inline float flerp(float a, float b, float f)
+inline float
+flerp(float a, float b, float f)
 {
     return (b - a) * f + a;
 }
 
-inline int frnd(float f) 
+inline int
+frnd(float f) 
 {
     return static_cast<int>(f + 0.5f);
 }
@@ -110,18 +108,16 @@ inline int frnd(float f)
 /// Some of these functions could also be in the gnash::utility namespace,
 /// although some are used so often that it would get annoying.
 
-inline double TWIPS_TO_PIXELS(int i) 
+inline double
+TWIPS_TO_PIXELS(int i) 
 { 
     return static_cast<double>(i / 20.0); 
 }
 
 // truncate when overflow occurs.
-inline boost::int32_t PIXELS_TO_TWIPS(double a) 
+inline boost::int32_t
+PIXELS_TO_TWIPS(double a) 
 { 
-#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
-    // truncate when overflow occurs.
-    return static_cast<boost::int32_t>(static_cast<boost::uint32_t>(a * 20)); 
-#else
 
     // This truncates large values without relying on undefined behaviour.
     // For very large values of 'a' it is noticeably slower than the UB
@@ -143,15 +139,10 @@ inline boost::int32_t PIXELS_TO_TWIPS(double a)
     }
 
     // This slow truncation happens only in very unlikely cases.
-    return a >= 0 ? static_cast<boost::uint32_t>(std::fmod(a * 20.0, upperUnsignedLimit))
-                : - static_cast<boost::uint32_t>(std::fmod( - a * 20.0, upperUnsignedLimit));
-#endif
-}
-
-inline boost::int32_t Fixed16Mul(boost::int32_t a, boost::int32_t b)
-{
-    // truncate when overflow occurs.
-    return static_cast<boost::int32_t>((static_cast<boost::int64_t>(a) * static_cast<boost::int64_t>(b) + 0x8000) >> 16);
+    return a >= 0 ?
+        static_cast<boost::uint32_t>(std::fmod(a * 20.0, upperUnsignedLimit))
+        : 
+        -static_cast<boost::uint32_t>(std::fmod(-a * 20.0, upperUnsignedLimit));
 }
 
 /// \brief

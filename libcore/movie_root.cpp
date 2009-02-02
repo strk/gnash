@@ -1,6 +1,6 @@
 // movie_root.cpp:  The root movie, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "sound_handler.h"
 #include "timers.h" // for Timer use
 #include "GnashKey.h" // key::code
+#include "gnash.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -127,6 +128,8 @@ movie_root::movie_root(const movie_definition& def,
 	_movieAdvancementDelay(83), // ~12 fps by default
 	_lastMovieAdvancement(0)
 {
+    // This takes care of informing the renderer (if present) too.
+    setQuality(QUALITY_HIGH);
 }
 
 void
@@ -199,18 +202,21 @@ movie_root::setRootMovie(movie_instance* movie)
 	{
 		setLevel(0, movie);
 
-		// actions in first frame of _level0 must execute now, before next advance,
+		// actions in first frame of _level0 must execute now,
+        // before next advance,
 		// or they'll be executed with _currentframe being set to 2
 		processActionQueue();
 	}
 	catch (ActionLimitException& al)
 	{
-		boost::format fmt = boost::format(_("ActionLimits hit during setRootMovie: %s. Disable scripts?")) % al.what();
+		boost::format fmt = boost::format(_("ActionLimits hit during "
+                    "setRootMovie: %s. Disable scripts?")) % al.what();
 		handleActionLimitHit(fmt.str());
 	}
     catch (ActionParserException& e)
     {
-        log_error("ActionParserException thrown during setRootMovie: %s", e.what());
+        log_error("ActionParserException thrown during setRootMovie: %s",
+                e.what());
     }
 
 	cleanupAndCollect();
@@ -310,18 +316,23 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	int oldDepth = movie->get_depth();
 
 #ifdef GNASH_DEBUG_LEVELS_SWAPPING
-	log_debug("Before swapLevels (source depth %d, target depth %d) levels are: ", oldDepth, depth);
+	log_debug("Before swapLevels (source depth %d, target depth %d) "
+            "levels are: ", oldDepth, depth);
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget(), i->second->get_depth());
+		log_debug(" %d: %p (%s @ depth %d)", i->first,
+                (void*)(i->second.get()), i->second->getTarget(),
+                i->second->get_depth());
 	}
 #endif
 
 	if ( oldDepth < character::staticDepthOffset ) // should include _level0 !
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap its depth"),
-			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
+                "static depth zone (%d), won't swap its depth"),
+                movie->getTarget(), depth, oldDepth,
+                character::staticDepthOffset);
 		);
 		return;
 	}
@@ -329,8 +340,10 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	if ( oldDepth >= 0 ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below static depth zone (%d), won't swap its depth"),
-			movie->getTarget(), depth, oldDepth, character::staticDepthOffset);
+		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
+                "static depth zone (%d), won't swap its depth"),
+                movie->getTarget(), depth, oldDepth,
+                character::staticDepthOffset);
 		);
 		return;
 	}
@@ -364,7 +377,9 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	log_debug("After swapLevels levels are: ");
 	for (Levels::const_iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		log_debug(" %d: %p (%s @ depth %d)", i->first, (void*)(i->second.get()), i->second->getTarget(), i->second->get_depth());
+		log_debug(" %d: %p (%s @ depth %d)", i->first, 
+                (void*)(i->second.get()), i->second->getTarget(),
+                i->second->get_depth());
 	}
 #endif
 	
@@ -383,7 +398,8 @@ movie_root::dropLevel(int depth)
 	Levels::iterator it = _movies.find(depth);
 	if ( it == _movies.end() )
 	{
-		log_error("movie_root::dropLevel called against a movie not found in the levels container");
+		log_error("movie_root::dropLevel called against a movie not "
+                "found in the levels container");
 		return;
 	}
 
@@ -1307,7 +1323,8 @@ movie_root::notify_mouse_listeners(const event_id& event)
             // Can throw an action limit exception if the stack limit is 0 or 1.
             // A stack limit like that is hardly of any use, but could be used
             // maliciously to crash Gnash.
-		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, as_value(PROPNAME(event.get_function_name())));
+		    mouseObj->callMethod(NSV::PROP_BROADCAST_MESSAGE, 
+                    event.functionName());
 		}
 	    catch (ActionLimitException &e)
 	    {
@@ -1417,6 +1434,24 @@ movie_root::isMouseOverActiveEntity() const
     else {
         return true;
     }
+}
+
+void
+movie_root::setQuality(Quality q)
+{
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+
+    /// Overridden quality if not negative.
+    if (rcfile.qualityLevel() >= 0) {
+        int ql = rcfile.qualityLevel();
+        ql = std::min<int>(ql, QUALITY_BEST);
+        _quality = static_cast<Quality>(ql);
+    }
+    else {
+        _quality = q;
+    }
+    render_handler* renderer = get_render_handler();
+    if (renderer) renderer->setQuality(_quality);
 }
 
 /// Get actionscript width of stage, in pixels. The width

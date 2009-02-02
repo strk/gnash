@@ -1,6 +1,6 @@
 // rc.cpp:  "Run Command" configuration file, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,7 +100,10 @@ RcInitFile::RcInitFile()
     _lctrace(true),
     // TODO: give a  default value, and let 0 mean "disabled" -- 0 currently is overridden by libbase/shm.cpp 
     _lcshmkey(0),
-    _ignoreFSCommand(true)
+    _ignoreFSCommand(true),
+    _quality(-1),
+    _saveStreamingMedia(false),
+    _saveLoadedMedia(false)
 {
     expandPath(_solsandbox);
 
@@ -162,19 +165,17 @@ RcInitFile::loadFiles()
 
 bool
 RcInitFile::extractSetting(bool &var, const std::string &pattern,
-                           const std::string &variable, const std::string &value)
+               const std::string &variable, const std::string &value)
 {
     
     StringNoCaseEqual noCaseCompare;
     if ( noCaseCompare(variable, pattern) ) {
         if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") ||
              noCaseCompare(value, "true")) {
-            //cout <<  variable << ": enabled" << endl;
             var = true;
         }
         if (noCaseCompare(value, "off") || noCaseCompare(value, "no") ||
             noCaseCompare(value, "false")) {
-            //cout <<  variable << ": disabled" << endl;
             var = false;
         }
         return true;
@@ -183,32 +184,11 @@ RcInitFile::extractSetting(bool &var, const std::string &pattern,
     return false;
 }
 
-bool
-RcInitFile::extractNumber(boost::uint32_t& num, const std::string& pattern,
-                            const std::string& variable, const std::string& value)
-{      
-
-    StringNoCaseEqual noCaseCompare;
-
-    if ( noCaseCompare(variable, pattern) ) {
-        std::istringstream in(value);
-        if (in >> num) return true;
-        
-        // If conversion fails, set value to 0 rather than leaving
-        // it as the default.
-        cerr << _("Conversion overflow in extractNumber: ") << value << endl;
-        num = 0;
-        return true;
-    }
-    
-    return false;
-}
 
 void
 RcInitFile::parseList(PathList &list, const std::string &action,
                      const std::string &items)
 {
-//    GNASH_REPORT_FUNCTION;
 
     if (action == "set") {
 
@@ -237,8 +217,7 @@ RcInitFile::parseList(PathList &list, const std::string &action,
 
 bool
 RcInitFile::extractDouble(double& out, const std::string &pattern,
-                          const std::string &variable,
-                          const std::string &value)
+                  const std::string &variable, const std::string &value)
 {
 
     StringNoCaseEqual noCaseCompare;
@@ -255,7 +234,6 @@ RcInitFile::extractDouble(double& out, const std::string &pattern,
     return false;
 }
 
-/* static protected */
 void
 RcInitFile::expandPath (std::string& path)
 {
@@ -380,9 +358,9 @@ RcInitFile::parseFile(const std::string& filespec)
             // Empty line 
             continue;
         }
-        //cout << " " << lineno << ": '" << action << "'" << endl;
-            
-        // 'action' should never be empty, or (ss >> action) above would have failed
+        
+        // 'action' should never be empty, or (ss >> action) 
+        // above would have failed
 
         if ( action[0] == '#' ) continue; // discard comments
 
@@ -399,8 +377,9 @@ RcInitFile::parseFile(const std::string& filespec)
              // The rest of the line is the value
             if (!std::getline (ss, value))
             {
-                cerr << boost::format(_("Warning: missing value for variable \"%s\" in rcfile %s,"
-                    " line %d")) % variable % filespec % lineno << endl;
+                cerr << boost::format(_("Warning: missing value for "
+                            "variable \"%s\" in rcfile %s, line %d"))
+                    % variable % filespec % lineno << endl;
                 continue;
             }
      
@@ -409,7 +388,6 @@ RcInitFile::parseFile(const std::string& filespec)
             // e.g. "set writelog ", value should be an empty string,
             // so value.erase(0, string::npos) is correct.
             value.erase(0, value.find_first_not_of(' '));
-
 
             if (noCaseCompare(variable, "urlOpenerFormat")) {
                 _urlOpenerFormat = value;
@@ -442,6 +420,12 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
 
+            if (noCaseCompare(variable, "mediaDir") ) {
+                expandPath(value);
+                _mediaCacheDir = value;
+                continue;
+            }
+            
             if (noCaseCompare(variable, "documentroot") ) {
                 _wwwroot = value;
                 continue;
@@ -516,7 +500,8 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_lctrace, "LCTrace", variable,
                            value)
             ||
-                 extractNumber(_movieLibraryLimit, "movieLibraryLimit", variable, value)
+                 extractNumber(_movieLibraryLimit, "movieLibraryLimit",
+                         variable, value)
             ||
                  extractNumber(_delay, "delay", variable, value)
             ||
@@ -524,12 +509,23 @@ RcInitFile::parseFile(const std::string& filespec)
             ||
                  extractNumber(_lcshmkey, "LCShmkey", variable, value)
             ||
-                 extractDouble(_streamsTimeout, "StreamsTimeout", variable, value)
+                 extractDouble(_streamsTimeout, "streamsTimeout", variable, 
+                         value)
             ||
-                 extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable, value)
+                 extractNumber(_quality, "quality", variable, value)
             ||
-                 cerr << boost::format(_("Warning: unrecognized directive \"%s\" "
-                    "in rcfile %s line %d")) % variable % filespec % lineno << endl;
+                 extractSetting(_saveLoadedMedia, "saveLoadedMedia",
+                         variable, value)
+            ||
+                 extractSetting(_saveStreamingMedia, "saveStreamingMedia",
+                         variable, value)
+            || 
+                 extractSetting(_ignoreFSCommand, "ignoreFsCommand", variable,
+                         value)
+            ||
+                 cerr << boost::format(_("Warning: unrecognized directive "
+                             "\"%s\" in rcfile %s line %d")) 
+                             % variable % filespec % lineno << endl;
             }
         }
         else if (noCaseCompare(action, "include") )
@@ -646,7 +642,8 @@ RcInitFile::updateFile(const std::string& filespec)
     // Bools and numbers. We want boolean values written as words, hex values
     // prefixed with '0x'.
     out << std::boolalpha << std::showbase <<
-    _("# Generated by Gnash. Manual changes to this file may be overridden.") << endl <<
+    _("# Generated by Gnash. Manual changes to this file may be overridden.") 
+    << endl <<
     cmd << "splashScreen " << _splashScreen << endl <<
     cmd << "localHost " << _localhostOnly << endl <<
     cmd << "localDomain " << _localdomainOnly << endl <<
@@ -664,6 +661,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "startStopped " << _startStopped << endl <<
     cmd << "streamsTimeout " << _streamsTimeout << endl <<
     cmd << "movieLibraryLimit " << _movieLibraryLimit << endl <<
+    cmd << "quality " << _quality << endl <<    
     cmd << "delay " << _delay << endl <<
     cmd << "verbosity " << _verbosity << endl <<
     cmd << "solReadOnly " << _solreadonly << endl <<
@@ -672,6 +670,8 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "LCTrace " << _lctrace << endl <<
     cmd << "LCShmkey " << std::hex << (boost::uint32_t) _lcshmkey << endl <<
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
+    cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
+    cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
    
     // Strings.
 
@@ -682,6 +682,7 @@ RcInitFile::updateFile(const std::string& filespec)
     // debuglog to nothing, only to find it returns to "gnash-debug.log"
     // at the next run (even though that's not the way to use it...)
 
+    cmd << "mediaDir " << _mediaCacheDir << endl <<    
     cmd << "debuglog " << _log << endl <<
     cmd << "documentroot " << _wwwroot << endl <<
     cmd << "flashSystemOS " << _flashSystemOS << endl <<

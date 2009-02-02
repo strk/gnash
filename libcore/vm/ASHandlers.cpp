@@ -1,6 +1,6 @@
 // ASHandlers.cpp:  ActionScript handlers, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "rc.h"
 #include "ASHandlers.h"
 #include "movie_definition.h"
-#include "array.h"
+#include "Array_as.h"
 #include "swf_function.h"
 #include "as_function.h"
 #include "fn_call.h"
@@ -118,7 +118,7 @@ ActionHandler::ActionHandler()
 {
 }
 
-ActionHandler::ActionHandler(action_type type, action_callback_t func)
+ActionHandler::ActionHandler(ActionType type, action_callback_t func)
     :
     _type(type),
     _callback(func),
@@ -127,7 +127,7 @@ ActionHandler::ActionHandler(action_type type, action_callback_t func)
 {
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
+ActionHandler::ActionHandler(ActionType type, std::string name,
                              action_callback_t func)
     :
     _type(type),
@@ -138,7 +138,7 @@ ActionHandler::ActionHandler(action_type type, std::string name,
 {
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
+ActionHandler::ActionHandler(ActionType type, std::string name,
                              action_callback_t func, as_arg_t format)
     :
     _type(type),
@@ -436,7 +436,7 @@ SWFHandlers::instance()
 }
 
 void
-SWFHandlers::execute(action_type type, ActionExec& thread) const
+SWFHandlers::execute(ActionType type, ActionExec& thread) const
 {
 //    It is very heavy operation
 //    if ( _handlers[type].getName() == "unsupported" ) return false;
@@ -720,8 +720,8 @@ SWFHandlers::ActionAdd(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
     env.top(1) = operand1 + operand2;
     env.drop(1);
 }
@@ -730,12 +730,10 @@ void
 SWFHandlers::ActionSubtract(ActionExec& thread)
 {
 
-    // env.top(1) -= env.top(0); //original version
-
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
     env.top(1) = operand1 - operand2;
     env.drop(1);
 }
@@ -746,25 +744,45 @@ SWFHandlers::ActionMultiply(ActionExec& thread)
 
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
     env.top(1) = operand1 * operand2;
     env.drop(1);
 }
 
+
+// Negative number / 0: -infinity
+// Positive number / 0: infinity
+// 0 / 0 : NaN
+// Either operand is NaN: NaN
 void
 SWFHandlers::ActionDivide(ActionExec& thread)
 {
 
     as_environment& env = thread.env;
     
-    const double operand1 = env.top(1).to_number();
     const double operand2 = env.top(0).to_number();
+    const double operand1 = env.top(1).to_number();
 
-    if (operand2 == 0 && env.get_version() < 5)
+    if (operand2 == 0)
     {
-        env.top(1).set_string("#ERROR#");
+        if (env.get_version() < 5) {
+            env.top(1).set_string("#ERROR#");
         }
+        else if (operand1 == 0 || isNaN(operand1) || isNaN(operand2)) {
+            env.top(1).set_nan();
+        }
+        else {
+            // Division by -0.0 is not possible in AS, so 
+            // the sign of the resulting infinity should match the 
+            // sign of operand1. Division by 0 in C++ is undefined
+            // behaviour.
+            env.top(1) = operand1 < 0 ?
+                - std::numeric_limits<double>::infinity() :
+                std::numeric_limits<double>::infinity();
+        }
+
+    }
     else
     {
         env.top(1) = operand1 / operand2;
@@ -1037,7 +1055,8 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
     {
         IF_VERBOSE_ASCODING_ERRORS (
             // Invalid object, can't set.
-            log_aserror(_("ActionSetVariable: %s=%s: variable name evaluates to invalid (empty) string"),
+            log_aserror(_("ActionSetVariable: %s=%s: variable name "
+                    "evaluates to invalid (empty) string"),
                 env.top(1),
                 env.top(0));
         );
@@ -2042,8 +2061,9 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 
             case  pushString: // 0
             {
-                const char* str = code.read_string(i+3);
-                i += strlen(str) + 1;
+                const char* cstr = code.read_string(i+3);
+                const std::string str(cstr);
+                i += str.size() + 1; 
                 env.push(str);
                 break;
             }
@@ -2151,11 +2171,13 @@ SWFHandlers::ActionPushData(ActionExec& thread)
         IF_VERBOSE_ACTION (
         if ( type == pushDict8 || type == pushDict16 )
         {
-            log_action(_("\t%d) type=%s (%d), value=%s"), count, pushType[type], id, env.top(0));
+            log_action(_("\t%d) type=%s (%d), value=%s"),
+                count, pushType[type], id, env.top(0));
         }
         else
         {
-            log_action(_("\t%d) type=%s, value=%s"), count, pushType[type], env.top(0));
+            log_action(_("\t%d) type=%s, value=%s"),
+                count, pushType[type], env.top(0));
         }
         ++count;
         );
@@ -3051,7 +3073,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
                 v1, v2);
 #endif
 
-    if (v1.is_string() || v2.is_string() )
+    if (v1.is_string() || v2.is_string())
     {
         // NOTE: I've tested that we should change behaviour
         //       based on code definition version, not top-level
@@ -3081,29 +3103,48 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 
     as_environment& env = thread.env;
 
-    as_value& op1_in = env.top(1);
-    as_value& op2_in = env.top(0);
+    as_value operand1 = env.top(1);
+    as_value operand2 = env.top(0);
 
-    as_value operand1;
-    as_value operand2;
-
-    try { operand1 = op1_in.to_primitive(); }
+    try { operand1 = operand1.to_primitive(as_value::NUMBER); }
     catch (ActionTypeError& e)
     {
         log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewLessThen"), op1_in);
+                "ActionNewLessThan"), operand1);
+    }
+    if ( operand1.is_object() && !operand1.is_sprite() )
+    {
+        // comparison involving an object (NOT sprite!) is always false
+        env.top(1).set_bool(false);
+        env.drop(1);
+        return;
     }
 
-    try { operand2 = op2_in.to_primitive(); }
+    try { operand2 = operand2.to_primitive(as_value::NUMBER); }
     catch (ActionTypeError& e)
     {
         log_debug(_("%s.to_primitive() threw an error during "
-                "ActionNewLessThen"), op2_in);
+                "ActionNewLessThan"), operand2);
+    }
+    if ( operand2.is_object() && !operand2.is_sprite() )
+    {
+        // comparison involving an object (NOT sprite!) is always false
+        env.top(1).set_bool(false);
+        env.drop(1);
+        return;
     }
 
     if ( operand1.is_string() && operand2.is_string() )
     {
-        env.top(1).set_bool(operand1.to_string() < operand2.to_string());
+        const std::string& s1 = operand1.to_string();
+        const std::string& s2 = operand2.to_string();
+        // Don't ask me why, but an empty string is not less than a non-empty one
+        if ( s1.empty() ) {
+            env.top(1).set_bool(false);
+        } else if ( s2.empty() ) {
+            env.top(1).set_bool(true);
+        }
+        else env.top(1).set_bool(s1 < s2);
     }
     else
     {
@@ -3137,20 +3178,20 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     if ( swfVersion <= 5 )
     {
         as_value op1 = env.top(0);
-    try { op1 = op1.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                op1, e.what());
-    }
+        try { op1 = op1.to_primitive(); }
+        catch (ActionTypeError& e)
+        {
+            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                    op1, e.what());
+        }
 
         as_value op2 = env.top(1);
-    try { op2 = op2.to_primitive(); }
-    catch (ActionTypeError& e)
-    {
-        log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
-                op2, e.what());
-    }
+        try { op2 = op2.to_primitive(); }
+        catch (ActionTypeError& e)
+        {
+            log_debug(_("to_primitive(%s) threw an ActionTypeError %s"),
+                    op2, e.what());
+        }
 
         env.top(1).set_bool(op1.equals(op2));
     }
@@ -3687,32 +3728,12 @@ SWFHandlers::ActionStrictEq(ActionExec& thread)
 void
 SWFHandlers::ActionGreater(ActionExec& thread)
 {
-    //GNASH_REPORT_FUNCTION;
-
+    // Just swap the operator and invoke ActionNewLessThan
     as_environment& env = thread.env;
-
-    as_value& operand1 = env.top(1);
-    as_value& operand2 = env.top(0);
-
-    if ( operand1.is_string() && operand2.is_string() )
-    {
-        env.top(1).set_bool(operand1.to_string() > operand2.to_string());
-    }
-    else
-    {
-        const double op1 = operand1.to_number();
-        const double op2 = operand2.to_number();
-
-        if ( isNaN(op1) || isNaN(op2) )
-        {
-            env.top(1).set_undefined();
-        }
-        else
-        {
-            env.top(1).set_bool(op1 > op2);
-        }
-    }
-    env.drop(1);
+    as_value tmp = env.top(1);
+    env.top(1) = env.top(0);
+    env.top(0) = tmp;
+    ActionNewLessThan(thread);
 }
 
 void
@@ -4128,7 +4149,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 }
 
 const char*
-SWFHandlers::action_name(action_type x) const
+SWFHandlers::action_name(ActionType x) const
 {
     if ( static_cast<size_t>(x) > get_handlers().size() )
     {

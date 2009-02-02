@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,13 +44,14 @@ AM_CPPFLAGS = \
 libgnashasobjs_la_SOURCES = \
 	AsBroadcaster.cpp \
 	Accessibility_as.cpp \
+	Array_as.cpp \
 	Boolean_as.cpp \
 	Camera.cpp \
 	ClassHierarchy.cpp \
 	Color_as.cpp \
 	ContextMenu.cpp	\
 	CustomActions.cpp\
-	Date.cpp \
+	Date_as.cpp \
 	Error_as.cpp \
 	Global.cpp \
 	Key_as.cpp	\
@@ -109,13 +110,14 @@ libgnashasobjs_la_SOURCES = \
 noinst_HEADERS = \
 	AsBroadcaster.h \
 	Accessibility_as.h \
+	Array_as.h \
 	Boolean_as.h \
 	Camera.h \
 	ClassHierarchy.h \
 	Color_as.h	\
 	ContextMenu.h \
 	CustomActions.h	\
-	Date.h \
+	Date_as.h \
 	Error_as.h	\
 	Math_as.h	\
 	Global.h\

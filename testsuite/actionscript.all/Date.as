@@ -629,9 +629,9 @@ d1 = Date(2008, 10, 10, 10, 10, 10, 10);
 d2 = new Date;
 check_equals(d1.toString(), d2.toString());
 
-xcheck_equals (Date.UTC(-1000, 20).valueOf(), -33713366400000);
-xcheck_equals (Date.UTC(-70, 0).toString(), "-4417977600000");
-xcheck_equals (Date.UTC(-70, 0).valueOf(), -4417977600000);
+check_equals (Date.UTC(-1000, 20).valueOf(), -33713366400000);
+check_equals (Date.UTC(-70, 0).toString(), "-4417977600000");
+check_equals (Date.UTC(-70, 0).valueOf(), -4417977600000);
 check_equals (Date.UTC(1969, 11).toString(), "-2678400000");
 check_equals (Date.UTC(1969, 11).valueOf(), -2678400000);
 check_equals (Date.UTC(1969, 12).toString(), "0");
@@ -647,6 +647,23 @@ check_equals (Date.UTC(1970, 1).valueOf(), 2678400000);
 check_equals (Date.UTC(-1, -12).toString(), "-2272060800000");
 check_equals ((Date.UTC(-1, 12).valueOf() < -2208988799999.5 &&
                Date.UTC(-1, 12).valueOf() > -2208988800000.5), true);
+
+pd = new Date();
+ret = (pd < 67);
+check_equals(typeof(ret), "boolean");
+
+ret = (pd > 67);
+check_equals(typeof(ret), "boolean");
+check_equals(ret, true);
+
+ret = (pd < "a string");
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+
+ret = (pd > "a string");
+check_equals(typeof(ret), "undefined");
+check_equals(ret, undefined);
+
 
 // Check if Date, concatenated to a string, is in human readable form
 d = new Date(2000, 1, 15, 0, 0, 0); 
@@ -670,7 +687,7 @@ check_equals(typeof(foo), 'string');
 #endif
 
 #if OUTPUT_VERSION == 5
-totals(285);
+totals(292);
 #else
-totals (327);
+totals (334);
 #endif

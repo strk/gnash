@@ -26,7 +26,6 @@
 #include "as_function.h" // for inheritance
 #include "as_object.h" // for composition (vector element)
 #include "VM.h" //fow SWF version
-//#include "with_stack_entry.h" // for composition (vector element)
 
 #include <boost/algorithm/string/case_conv.hpp> 
 #include <cassert>

@@ -8,7 +8,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "shape_character_def.h" // for inheritance of morph2_character_def
-
+#include "swf.h"
 
 namespace gnash {
 
@@ -30,7 +30,7 @@ public:
     ///	The stream to read the definition from.
     ///	Tag type is assumed to have been read already
     ///
-    /// @param tag_type
+    /// @param TagType
     ///	Type of the tag.
     ///	Need be SWF::DEFINEMORPHSHAPE or an assertion would fail.
     ///	TODO: drop ?
@@ -39,7 +39,7 @@ public:
     ///	Movie definition. Used to resolv character ids for fill styles.
     ///	Must be not-null or would segfault. 
     ///
-    void read(SWFStream& in, int tag_type, movie_definition& m);
+    void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
     virtual void display(character* inst);
     void lerp_matrix(SWFMatrix& t, const SWFMatrix& m1, const SWFMatrix& m2, const float ratio);

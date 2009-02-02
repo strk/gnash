@@ -30,7 +30,7 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = .configline
 
-EXTRA_DIST = gnash.in klash.moc.in
+EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in
 
 noinst_LTLIBRARIES = 
 AM_CPPFLAGS = \
@@ -181,14 +181,20 @@ EXTRA_DIST += Gnash.app am-frag
 endif
 
 # Build the QTOPIA gui
-if BUILD_QTOPIA_GUI
-include $(srcdir)/am-frag/qtopia.am
+if BUILD_QTOPIA3_GUI
+include $(srcdir)/am-frag/qtopia3.am
 endif
 
-# Build the KDE gui
-if BUILD_KDE_GUI
-BUILT_SOURCES += klash.moc 
-include $(srcdir)/am-frag/kde.am
+# Build the KDE3 gui
+if BUILD_KDE3_GUI
+BUILT_SOURCES += klash3.moc 
+include $(srcdir)/am-frag/kde3.am
+endif
+
+# Build the KDE4 gui
+if BUILD_KDE4_GUI
+BUILT_SOURCES += klash4.moc
+include $(srcdir)/am-frag/kde4.am
 endif
 
 # Build the SDL gui
@@ -241,7 +247,7 @@ if BUILD_RISCOS_GUI
 include $(srcdir)/am-frag/riscos.am
 endif
 
-CLEANFILES = klash.moc .configline gnash
+CLEANFILES = klash3.moc klash4.moc .configline gnash
 
 bundle: Info.plist
 	@echo " Building: $(bundle_name)" 
@@ -253,15 +259,6 @@ bundle: Info.plist
 	cp -f .libs/aqua-gnash $(bundle_name)/Contents/MacOS/Gnash
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
 
-
-klash.moc: $(srcdir)/kdesup.h
-	@if test x"$(MOC)" != x; then \
-	  echo "Generating MOC file..."; \
-	  $(MOC) $(srcdir)/kdesup.h -o klash.moc; \
-	else  \
-	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
-	  ln -sf $(srcdir)/klash.moc.in klash.moc; \
-	fi
 
 .configline: ../config.log
 	-@rm -f .configline

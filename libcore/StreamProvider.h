@@ -22,6 +22,8 @@
 #include <memory>
 #include "NetworkAdapter.h"
 
+#include "dsodefs.h" // for DSOEXPORT
+
 // Forward declarations
 namespace gnash {
 	class URL;
@@ -32,23 +34,26 @@ namespace gnash {
 namespace gnash {
 
 /// Provide IOChannel streams for network or filesystem resources
-class StreamProvider
+class DSOEXPORT StreamProvider
 {
 
 public:
+
+    typedef std::string (*NamingPolicy) (const URL&);
 
 	StreamProvider() {}
 
 	virtual ~StreamProvider() {}
 
-	DSOEXPORT static StreamProvider& getDefaultInstance();
+	static StreamProvider& getDefaultInstance();
 
 	/// Returned stream ownership is transferred to caller.
 	//
 	/// On error NULL is returned
 	/// Derive from this for a CachingStreamProvider
 	///
-	virtual std::auto_ptr<IOChannel> getStream(const URL& url);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+            NamingPolicy np = 0);
 
 	/// Get a stream from the response of a POST operation
 	//
@@ -64,11 +69,16 @@ public:
 	///	Post data in url-encoded form.
 	///
 	///
-	virtual std::auto_ptr<IOChannel> getStream(const URL& url, const std::string& postdata);
+	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
+            const std::string& postdata, NamingPolicy np = 0);
 	
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-	                    const std::string& postdata, const NetworkAdapter::RequestHeaders& headers);
+            const std::string& postdata,
+            const NetworkAdapter::RequestHeaders& headers, NamingPolicy np = 0);
 	
+    /// Return the currently selected policy for converting URL to filename
+    virtual NamingPolicy currentNamingPolicy() const;
+
 };
 
 } // namespace gnash

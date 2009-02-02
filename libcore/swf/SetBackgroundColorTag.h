@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #endif
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 #include "MovieClip.h" // for inlines (execute)
 #include "movie_definition.h" // for inlines (loader)
 #include "log.h" // for log_parse
@@ -96,7 +96,7 @@ public:
 	}
 
 	/// Set background color tag loader (SWF::SETBACKGROUNDCOLOR)
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+	static void loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& /*r*/)
 	{
 		assert(tag == SWF::SETBACKGROUNDCOLOR); // 9

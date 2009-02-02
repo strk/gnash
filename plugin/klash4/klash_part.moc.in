@@ -1,0 +1,213 @@
+/****************************************************************************
+** Meta object code from reading C++ file 'klash_part.h'
+**
+** Created: Thu Dec 4 10:00:51 2008
+**      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
+**
+** WARNING! All changes made in this file will be lost!
+*****************************************************************************/
+
+#if !defined(Q_MOC_OUTPUT_REVISION)
+#error "The header file 'klash_part.h' doesn't include <QObject>."
+#elif Q_MOC_OUTPUT_REVISION != 59
+#error "This file was generated using the moc from 4.4.3. It"
+#error "cannot be used with the include files from this version of Qt."
+#error "(The moc has changed too much.)"
+#endif
+
+QT_BEGIN_MOC_NAMESPACE
+static const uint qt_meta_data_KlashBrowserExtension[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       0,    0, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_KlashBrowserExtension[] = {
+    "KlashBrowserExtension\0"
+};
+
+const QMetaObject KlashBrowserExtension::staticMetaObject = {
+    { &KParts::BrowserExtension::staticMetaObject, qt_meta_stringdata_KlashBrowserExtension,
+      qt_meta_data_KlashBrowserExtension, 0 }
+};
+
+const QMetaObject *KlashBrowserExtension::metaObject() const
+{
+    return &staticMetaObject;
+}
+
+void *KlashBrowserExtension::qt_metacast(const char *_clname)
+{
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_KlashBrowserExtension))
+        return static_cast<void*>(const_cast< KlashBrowserExtension*>(this));
+    typedef KParts::BrowserExtension QMocSuperClass;
+    return QMocSuperClass::qt_metacast(_clname);
+}
+
+int KlashBrowserExtension::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    typedef KParts::BrowserExtension QMocSuperClass;
+    _id = QMocSuperClass::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    return _id;
+}
+static const uint qt_meta_data_KlashLiveConnectExtension[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       4,   10, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+ // signals: signature, parameters, type, tag, flags
+      30,   27,   26,   26, 0x05,
+
+ // slots: signature, parameters, type, tag, flags
+      97,   93,   26,   26, 0x0a,
+     114,   26,   26,   26, 0x0a,
+     124,   26,   26,   26, 0x0a,
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_KlashLiveConnectExtension[] = {
+    "KlashLiveConnectExtension\0\0,,\0"
+    "partEvent(ulong,QString,KParts::LiveConnectExtension::ArgList)\0"
+    "w,h\0setSize(int,int)\0started()\0"
+    "finished()\0"
+};
+
+const QMetaObject KlashLiveConnectExtension::staticMetaObject = {
+    { &KParts::LiveConnectExtension::staticMetaObject, qt_meta_stringdata_KlashLiveConnectExtension,
+      qt_meta_data_KlashLiveConnectExtension, 0 }
+};
+
+const QMetaObject *KlashLiveConnectExtension::metaObject() const
+{
+    return &staticMetaObject;
+}
+
+void *KlashLiveConnectExtension::qt_metacast(const char *_clname)
+{
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_KlashLiveConnectExtension))
+        return static_cast<void*>(const_cast< KlashLiveConnectExtension*>(this));
+    typedef KParts::LiveConnectExtension QMocSuperClass;
+    return QMocSuperClass::qt_metacast(_clname);
+}
+
+int KlashLiveConnectExtension::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    typedef KParts::LiveConnectExtension QMocSuperClass;
+    _id = QMocSuperClass::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: partEvent((*reinterpret_cast< const ulong(*)>(_a[1])),(*reinterpret_cast< const QString(*)>(_a[2])),(*reinterpret_cast< const KParts::LiveConnectExtension::ArgList(*)>(_a[3]))); break;
+        case 1: setSize((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
+        case 2: started(); break;
+        case 3: finished(); break;
+        }
+        _id -= 4;
+    }
+    return _id;
+}
+
+// SIGNAL 0
+void KlashLiveConnectExtension::partEvent(const unsigned long _t1, const QString & _t2, const KParts::LiveConnectExtension::ArgList & _t3)
+{
+    void *_a[] = { 0, const_cast<void*>(reinterpret_cast<const void*>(&_t1)), const_cast<void*>(reinterpret_cast<const void*>(&_t2)), const_cast<void*>(reinterpret_cast<const void*>(&_t3)) };
+    QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+static const uint qt_meta_data_KlashPart[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+      10,   10, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+ // slots: signature, parameters, type, tag, flags
+      20,   16,   11,   10, 0x0a,
+      34,   10,   11,   10, 0x0a,
+      45,   10,   10,   10, 0x0a,
+      52,   10,   10,   10, 0x0a,
+      59,   10,   10,   10, 0x0a,
+      71,   10,   67,   10, 0x0a,
+      79,   10,   67,   10, 0x0a,
+      88,   10,   10,   10, 0x09,
+     105,   10,   10,   10, 0x09,
+     124,  122,   10,   10, 0x09,
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_KlashPart[] = {
+    "KlashPart\0\0bool\0url\0openUrl(KUrl)\0"
+    "closeUrl()\0play()\0stop()\0pause()\0int\0"
+    "width()\0height()\0playingStarted()\0"
+    "playingStopped()\0,\0"
+    "processStopped(int,QProcess::ExitStatus)\0"
+};
+
+const QMetaObject KlashPart::staticMetaObject = {
+    { &KParts::ReadOnlyPart::staticMetaObject, qt_meta_stringdata_KlashPart,
+      qt_meta_data_KlashPart, 0 }
+};
+
+const QMetaObject *KlashPart::metaObject() const
+{
+    return &staticMetaObject;
+}
+
+void *KlashPart::qt_metacast(const char *_clname)
+{
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_KlashPart))
+        return static_cast<void*>(const_cast< KlashPart*>(this));
+    typedef KParts::ReadOnlyPart QMocSuperClass;
+    return QMocSuperClass::qt_metacast(_clname);
+}
+
+int KlashPart::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    typedef KParts::ReadOnlyPart QMocSuperClass;
+    _id = QMocSuperClass::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: { bool _r = openUrl((*reinterpret_cast< const KUrl(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 1: { bool _r = closeUrl();
+            if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = _r; }  break;
+        case 2: play(); break;
+        case 3: stop(); break;
+        case 4: pause(); break;
+        case 5: { int _r = width();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
+        case 6: { int _r = height();
+            if (_a[0]) *reinterpret_cast< int*>(_a[0]) = _r; }  break;
+        case 7: playingStarted(); break;
+        case 8: playingStopped(); break;
+        case 9: processStopped((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< QProcess::ExitStatus(*)>(_a[2]))); break;
+        }
+        _id -= 10;
+    }
+    return _id;
+}
+QT_END_MOC_NAMESPACE

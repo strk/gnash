@@ -1,6 +1,6 @@
 // DefineFontTag.cpp: read DefineFont2 and DefineFont tags.
 // 
-//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ namespace gnash {
 namespace SWF {
 
 void
-DefineFontTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+DefineFontTag::loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& /*r*/)
 {
     assert(tag == DEFINEFONT || tag == DEFINEFONT2 || tag == DEFINEFONT3);
@@ -94,7 +94,7 @@ DefineFontTag::markReachableResources() const
 #endif
 
 
-DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, tag_type tag)
+DefineFontTag::DefineFontTag(SWFStream& in, movie_definition& m, TagType tag)
     :
     _subpixelFont(tag == DEFINEFONT3 ? true : false),
     _unicodeChars(false),
@@ -372,7 +372,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
 }
 
 void
-DefineFontInfoTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+DefineFontInfoTag::loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& /*r*/)
 {
     assert(tag == DEFINEFONTINFO || tag == DEFINEFONTINFO2); 

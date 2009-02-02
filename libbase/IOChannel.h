@@ -1,6 +1,6 @@
 // IOChannel.h - a virtual IO channel, for Gnash
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -102,6 +102,9 @@ public:
 
 	/// Read the given number of bytes from the stream
 	//
+	/// Return the number of bytes actually read. 
+	/// EOF might cause it to be < num.
+	///
 	/// Throw IOException on error
 	///
 	virtual int read(void* dst, int num)=0;

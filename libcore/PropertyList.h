@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -116,8 +116,13 @@ public:
 	void visitValues(V& visitor, const as_object& this_ptr) const
 	{
         typedef container::nth_index<1>::type ContainerByOrder;
-        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); it != ie; ++it)
+        
+        // The template keyword is not required by the Standard here, but the
+        // OpenBSD compiler needs it. Use of the template keyword where it is
+        // not necessary is not an error.
+        for (ContainerByOrder::const_reverse_iterator
+                it = _props.template get<1>().rbegin(),
+                ie = _props.template get<1>().rend(); it != ie; ++it)
 		{
 			as_value val = it->getValue(this_ptr);
 			visitor.accept(it->mName, val);
@@ -142,8 +147,13 @@ public:
 	void visitNonHiddenValues(V& visitor, const as_object& this_ptr) const
 	{
         typedef container::nth_index<1>::type ContainerByOrder;
-        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); it != ie; ++it)
+        
+        // The template keyword is not required by the Standard here, but the
+        // OpenBSD compiler needs it. Use of the template keyword where it is
+        // not necessary is not an error.
+        for (ContainerByOrder::const_reverse_iterator it =
+                _props.template get<1>().rbegin(),
+                ie = _props.template get<1>().rend(); it != ie; ++it)
 		{
 	        if (it->getFlags().get_dont_enum()) continue;
 			as_value val = it->getValue(this_ptr);

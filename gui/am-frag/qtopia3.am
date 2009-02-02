@@ -18,11 +18,9 @@
 #
 # Build the QTOPIA gui
 # 
-if BUILD_QTOPIA_GUI
+if BUILD_QTOPIA3_GUI
 bin_PROGRAMS += qtopia-gnash
-if HAVE_QT_2
-QT_CFLAGS += -DQT_QWS_IPAQ -DQWS
-endif
+
 qtopia_gnash_CPPFLAGS = -DGUI_QTOPIA -DGUI_CONFIG=\"QTOPIA\" \
 	 $(AM_CPPFLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
 qtopia_gnash_SOURCES = $(GUI_SRCS) gui_kde.cpp

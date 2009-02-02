@@ -1,6 +1,6 @@
 // LoadableObject.cpp: abstraction of network-loadable AS object functions.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 
 #include "LoadableObject.h"
 #include "log.h"
-#include "array.h"
+#include "Array_as.h"
 #include "as_object.h"
 #include "StreamProvider.h"
 #include "URL.h"
@@ -38,6 +38,7 @@ namespace gnash {
 namespace {
     as_value loadableobject_send(const fn_call& fn);
     as_value loadableobject_load(const fn_call& fn);
+    as_value loadableobject_decode(const fn_call& fn);
     as_value loadableobject_sendAndLoad(const fn_call& fn);
 }
 
@@ -323,6 +324,9 @@ LoadableObject::registerNative(as_object& o)
     vm.registerNative(loadableobject_load, 301, 0);
     vm.registerNative(loadableobject_send, 301, 1);
     vm.registerNative(loadableobject_sendAndLoad, 301, 2);
+
+    /// This is only automatically used in LoadVars.
+    vm.registerNative(loadableobject_decode, 301, 3);
 }
 
 
@@ -355,7 +359,10 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
         array = new Array_as;
         // This property is always initialized on the first call to
         // addRequestHeaders.
-        ptr->set_member(NSV::PROP_uCUSTOM_HEADERS, array);
+        const int flags = as_prop_flags::dontEnum |
+                          as_prop_flags::dontDelete;
+
+        ptr->init_member(NSV::PROP_uCUSTOM_HEADERS, array, flags);
     }
 
     if (fn.nargs == 0)
@@ -439,6 +446,30 @@ LoadableObject::loadableobject_addRequestHeader(const fn_call& fn)
 /// These methods are accessed through the ASnative interface, so they
 /// do not need to be public methods of the LoadableObject class.
 namespace {
+
+/// Decode method (ASnative 301, 3) can be applied to any as_object.
+as_value
+loadableobject_decode(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
+
+	if (!fn.nargs) return as_value(false);
+
+	typedef std::map<std::string, std::string> ValuesMap;
+
+	ValuesMap vals;
+
+	URL::parse_querystring(fn.arg(0).to_string(), vals);
+
+	string_table& st = ptr->getVM().getStringTable();
+	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();
+			it != itEnd; ++it)
+	{
+		ptr->set_member(st.find(it->first), as_value(it->second));
+	}
+
+	return as_value(); 
+}
 
 /// Returns true if the arguments are valid, otherwise false. The
 /// success of the connection is irrelevant.

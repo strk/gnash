@@ -1,6 +1,6 @@
 // CSMTextSettingsTag.h: parse SWF CSMTextSettings tag
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ public:
 
 	CSMTextSettingsTag(movie_definition& m, SWFStream& in);
 
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m, const RunInfo& r);
+	static void loader(SWFStream& in, TagType tag, movie_definition& m, const RunInfo& r);
 
 private:
 

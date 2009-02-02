@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,16 +18,15 @@
 #ifndef GNASH_SWF_H
 #define GNASH_SWF_H
 
-//#include <iofwd.h>
-#include <iostream> // for std::ostream
+#include <iostream> 
 
 namespace gnash {
 
 /// SWF format parsing classes
-namespace SWF { // gnash::SWF
+namespace SWF { 
 
-/// SWF tag types. Symbolc names copied from Ming
-typedef enum
+/// SWF tag types. Symbolic names copied from Ming
+enum TagType
 {
     /// end of sprite or movie definition
     END                   =  0,
@@ -176,14 +175,14 @@ typedef enum
     REFLEX                = 777,
 
     DEFINEBITSPTR         = 1023
-} tag_type;
+};
 
 /// SWF action ids. Symbolic names copied from Ming.
 //
 /// For semantic of each action see:
 /// http://sswf.sourceforge.net/SWFalexref.html
 ///
-typedef enum
+enum ActionType
 {
     ACTION_END                     = 0x00,
     ACTION_NEXTFRAME               = 0x04,
@@ -541,9 +540,9 @@ typedef enum
 
     ACTION_SETREGISTER             = 0x87
 
-} action_type;
+};
 
-typedef enum
+enum abc_action_type
 {
     /// AS3 Actions go below here.
     ABC_ACTION_END                 = 0x00,
@@ -1716,7 +1715,7 @@ typedef enum
     /// NB: Error to appear in ABC
     ABC_ACTION_VERIFYOP             = 0xFE
 
-} abc_action_type;
+};
 
 /// Output operator for abc_action_type
 std::ostream& operator<< (std::ostream& os, const abc_action_type& typ);
@@ -1727,7 +1726,7 @@ std::ostream& operator<< (std::ostream& os, const abc_action_type& typ);
 /// For more info see:
 /// http://sswf.sourceforge.net/SWFalexref.html#swf_fill_style
 ///
-typedef enum {
+enum fill_style_type {
 	FILL_SOLID                   = 0x00,
 	FILL_LINEAR_GRADIENT         = 0x10,
 	FILL_RADIAL_GRADIENT         = 0x12,
@@ -1741,18 +1740,18 @@ typedef enum {
 	/// swf7, hard edges
 	FILL_CLIPPED_BITMAP_HARD     = 0x43
 
-} fill_style_type;
+};
 
-typedef enum {
+enum gradient_spread_mode {
         GRADIENT_SPREAD_PAD,
         GRADIENT_SPREAD_REFLECT,
         GRADIENT_SPREAD_REPEAT
-} gradient_spread_mode;
+};
 
-typedef enum {
+enum gradient_interpolation_mode {
         GRADIENT_INTERPOL_NORMAL,
         GRADIENT_INTERPOL_LINEAR
-} gradient_interpolation_mode;
+};
 
 
 

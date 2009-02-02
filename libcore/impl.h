@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ namespace gnash {
 // to call this in order to handle special tag types.
 
 /// Register a tag loader for the given tag
-void register_tag_loader(SWF::tag_type t,
+void register_tag_loader(SWF::TagType t,
         SWF::TagLoadersTable::loader_function lf);
 	
 }	// end namespace gnash

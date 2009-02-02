@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -79,6 +79,7 @@
 #include "GnashKey.h" // key::code
 #include "movie_instance.h"
 #include "RunInfo.h" // for initialization
+#include "gnash.h" // Quality
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -507,6 +508,12 @@ public:
         STAGE_ALIGN_R,
         STAGE_ALIGN_B
     };
+
+    /// Set the current display quality of the entire SWF.
+    void setQuality(Quality q);
+
+    /// Get the current display quality.
+    Quality getQuality() const { return _quality; }
 
     /// Sets movie_root's horizontal and vertical alignment to one
     /// of the three possible positions for each dimension.
@@ -1128,7 +1135,13 @@ private:
     //
     /// -1 if none
     int _hostfd;
-    
+
+    /// The display quality of the entire movie.
+    //
+    /// This is here, not just in the render_handler, so that AS compatibility
+    /// does not rely on the presence of a renderer.
+    Quality _quality;
+
     std::bitset<4u> _alignMode;
     
     ScaleMode _scaleMode;

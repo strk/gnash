@@ -28,7 +28,7 @@
 #include <vector>
 
 #include "log.h"
-#include "array.h"
+#include "Array_as.h"
 #include "as_value.h"
 #include "fn_call.h"
 #include "mysql_db.h"

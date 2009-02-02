@@ -1,5 +1,5 @@
 dnl  
-dnl  Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -448,21 +448,25 @@ esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
-has_kde=no
-has_gtk2=no
+has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
+
+build_kde3=no
+build_kde4=no
+build_qtopia3=no
+build_qtopia4=no
+build_gtk=no
+build_qt3=no
+build_qt4=no
 build_fb=no
 build_fltk=no
-build_kde=no
-build_gtk=no
 build_sdl=no
 build_riscos=no
 build_aqua=no
 build_hildon=no
 build_alp=no
-build_qtopia=no
 build_dump=no
 AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
+  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde3)]),
   if test -n ${enableval}; then
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
@@ -484,15 +488,27 @@ dnl        AC_DEFINE(USE_ALP, [1], [Use the ALP framework])
 dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_gtk=yes
         ;;
-      kde|KDE)
-        build_kde=yes
+      kde3|KDE3)
+        build_qt3=yes
+        build_kde3=yes
         ;;
-      qtopia|QTOPIA)
-        build_qtopia=yes
-        build_qt=yes
+      kde4|KDE4)
+        build_qt4=yes
+        build_kde4=yes
         ;;
-      qt|QT)
-        build_qt=yes
+      qtopia3|QTOPIA3)
+        build_qtopia3=yes
+        build_qt3=yes
+        ;;
+      qtopia4|QTOPIA4)
+        build_qtopia4=yes
+        build_qt4=yes
+        ;;
+      qt3|QT3)
+        build_qt3=yes
+        ;;
+      qt4|QT4)
+        build_qt4=yes
         ;;
       sdl|SDL)
         build_sdl=yes
@@ -516,7 +532,8 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_dump=yes
         build_fb=yes
         build_fltk=yes
-        build_kde=yes
+        build_kde3=yes
+        build_kde4=yes
         build_gtk=yes
         build_sdl=yes
 dnl        build_qtopia=yes
@@ -524,14 +541,14 @@ dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia|dump)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump)])
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
     if test "x$val" = "x$enableval"; then
       break;
     fi
-  done,build_gtk=yes;build_kde=yes;
+  done,build_gtk=yes;build_kde3=yes;build_qt3=yes;
 )
 
 add_renderer=
@@ -1117,7 +1134,7 @@ if test x"${build_alp}" = xyes; then
   fi
   cross_compiling=yes
 dnl  build_gtk=yes
-  build_kde=no
+  build_kde3=no
   build_ogl=no
   build_agg=yes
 fi
@@ -1158,7 +1175,7 @@ fi
 if test x$build_hildon = xyes; then
   GNASH_PATH_HILDON
   build_gtk=yes
-  build_kde=no
+  build_kde3=no
 dnl   build_ogl=no
 dnl   build_agg=yes
 fi
@@ -1208,13 +1225,25 @@ dnl ----------------------------------------------------
 dnl Add KPARTS support, if specified or KDE gui is built
 dnl ----------------------------------------------------
 
-AC_ARG_ENABLE(kparts,
-  AC_HELP_STRING([--disable-kparts], [Disble support for Konqueror plugin (default: enabled if kde gui is)]),
+AC_ARG_ENABLE(kparts3,
+  AC_HELP_STRING([--disable-kparts3], [Disable support for Konqueror 3.x plugin (default: enabled if kde3 gui is)]),
 [case "${enableval}" in
-  yes) kparts=yes ;;
-  no)  kparts=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kpart option]) ;;
-esac],kparts=$build_kde)
+  yes) build_kparts3=yes ;;
+  no)  build_kparts3=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kparts3 option]) ;;
+esac],build_kparts3=$build_kde3)
+
+dnl --------------------------------------------------------
+dnl Add KPARTS 4.x support, if specified or KDE gui is built
+dnl --------------------------------------------------------
+
+AC_ARG_ENABLE(kparts4,
+  AC_HELP_STRING([--disable-kparts4], [Disble support for Konqueror 4.x plugin (default: enabled if kde4 gui is)]),
+[case "${enableval}" in
+  yes) build_kparts4=yes ;;
+  no)  build_kparts4=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kparts4 option]) ;;
+esac],build_kparts4=$build_kde4)
 
 dnl ----------------------------------------------------
 dnl Add NPAPI support, if specified or GTK gui is built
@@ -1245,7 +1274,8 @@ AC_ARG_ENABLE(plugins,
 )
 if test x$plugins = xno; then
   npapi=no
-  kparts=no
+  build_kparts3=no
+  build_kparts4=no
 fi
 
 dnl
@@ -1578,8 +1608,8 @@ dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
 if test x$cross_compiling = xno; then
-  AC_PATH_PROG(SWFMILL, swfmill)
   AC_PATH_PROG(SWFC, swfc)
+  AC_PATH_SWFMILL
   AC_PATH_MTASC
   AC_PATH_HAXE
 fi
@@ -1610,27 +1640,32 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 
-dnl # Check KDE if kde gui or kparts were requested
-if test x$build_kde = xyes -o x$kparts = xyes; then
-  GNASH_PATH_KDE
-fi
-if test x$build_qt = xyes -o x$build_qtopia = xyes -o x$build_kde = xyes; then
-  GNASH_PATH_QT
-  if test x$build_qtopia = xyes; then
-    GNASH_PATH_QTOPIA
-  fi
-fi
-AM_CONDITIONAL(HAVE_QTOPIA, [test x$has_qtopia = xyes])
-AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
-AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
+GNASH_PATH_QT3
+GNASH_PATH_KDE3
 
-AM_CONDITIONAL(HAVE_QTOPIA_2, [test x"$gnash_qtopia_version" = x2])
-AM_CONDITIONAL(HAVE_QTOPIA_3, [test x"$gnash_qtopia_version" = x3])
-AM_CONDITIONAL(HAVE_QTOPIA_4, [test x"$gnash_qtopia_version" = x4])
+GNASH_PATH_QT4
+GNASH_PATH_KDE4
 
-AM_CONDITIONAL(HAVE_QT_2, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 2])
-AM_CONDITIONAL(HAVE_QT_3, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 3])
-AM_CONDITIONAL(HAVE_QT_4, [test x"${gnash_qt_version}" != x && test "${gnash_qt_version}" -eq 4])
+dnl Qtopia is a desktop environment for embedded devices.
+dnl GNASH_PATH_QTOPIA3
+dnl GNASH_PATH_QTOPIA4
+has_qtopia3=no
+has_qtopia4=no
+
+
+AM_CONDITIONAL(HAVE_QTOPIA3, [test x$has_qtopia3 = xyes])
+AM_CONDITIONAL(HAVE_QTOPIA4, [test x$has_qtopia4 = xyes])
+AM_CONDITIONAL(HAVE_KDE3, [test x$has_kde3 = xyes])
+AM_CONDITIONAL(HAVE_KDE4, [test x$has_kde4 = xyes])
+AM_CONDITIONAL(HAVE_QT3, [test x$has_qt3 = xyes])
+AM_CONDITIONAL(HAVE_QT4, [test x$has_qt4 = xyes])
+
+AM_CONDITIONAL(WITH_KDE4, test "$with_kde4" != "no")
+AM_CONDITIONAL([QT_X11], [test "$platform" = "X11"])
+AM_CONDITIONAL([QTOPIA], [test "$platform" = "Qtopia"])
+AM_CONDITIONAL([QT_OSX], [test "$platform" = "OSX"])
+AM_CONDITIONAL([QT_OS9], [test "$platform" = "OS9"])
+AM_CONDITIONAL([QT_WIN32], [test "$platform" = "Win32"])
 
 dnl Need GLIB for both GTK and GST
 if test x$build_gtk = xyes -o x${Media_handler} = "xgst"; then
@@ -1654,35 +1689,47 @@ fi
 
 dnl if kde isn't installed, even if it's specified, don't try to build
 dnl the KPARTS plugin, which is KDE based.
-if test x$has_kde = xno -a x$kparts = xyes; then
-  kparts=no
-dnl  build_kde=no
-  AC_MSG_WARN(["Disabling KPARTS plugin, no KDE development found"])
+if test x$has_kde3 = xno -a x$build_kparts3 = xyes; then
+  build_kparts3=no
+dnl  build_kde3=no
+  AC_MSG_WARN(["Disabling KPARTS 3.x plugin, no KDE development found"])
 fi
 
-if test x$build_kde = xno -a x$kparts = xyes; then
-  AC_MSG_WARN(["Enabled KPARTS plugin, but you aren't building a KDE based GUI!"])
+if test x$build_kde3 = xno -a x$build_kparts3 = xyes; then
+  AC_MSG_WARN(["Enabled KPARTS 3.x plugin, but you aren't building a KDE based GUI!"])
+fi
+if test x$has_kde4 = xno -a x$build_kparts4 = xyes; then
+  build_kparts4=no
+dnl  build_kde4=no
+  AC_MSG_WARN(["Disabling KPARTS 4.x plugin, no KDE 4.x development found"])
 fi
 
-AM_CONDITIONAL(BUILD_QTOPIA_GUI, [ test x$build_qtopia = xyes ])
-AM_CONDITIONAL(BUILD_ALP_GUI, [ test x$build_alp = xyes ])
-AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
-AM_CONDITIONAL(BUILD_HILDON_GUI, [ test x$build_hildon = xyes ])
-AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
-AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
-AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
-AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
-AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
-AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
-AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
-AM_CONDITIONAL(BUILD_DUMP_GUI, [ test x$build_dump = xyes ])
+if test x$build_kde4 = xno -a x$kparts4 = xyes; then
+  AC_MSG_WARN(["Enabled KPARTS 4.x plugin, but you aren't building a KDE 4.x based GUI!"])
+fi
+
+AM_CONDITIONAL(BUILD_QTOPIA3_GUI, [ test x$build_qtopia3 = xyes ])
+AM_CONDITIONAL(BUILD_QTOPIA4_GUI, [ test x$build_qtopia4 = xyes ])
+AM_CONDITIONAL(BUILD_QT3_GUI,     [ test x$build_qt3 = xyes ])
+AM_CONDITIONAL(BUILD_QT4_GUI,     [ test x$build_qt4 = xyes ])
+AM_CONDITIONAL(BUILD_KDE3_GUI,    [ test x$build_kde3 = xyes ])
+AM_CONDITIONAL(BUILD_KDE4_GUI,    [ test x$build_kde4 = xyes ])
+
+AM_CONDITIONAL(BUILD_ALP_GUI,     [ test x$build_alp = xyes ])
+AM_CONDITIONAL(BUILD_HILDON_GUI,  [ test x$build_hildon = xyes ])
+AM_CONDITIONAL(BUILD_GTK_GUI,     [ test x$build_gtk = xyes ])
+AM_CONDITIONAL(BUILD_FLTK_GUI,    [ test x$build_fltk = xyes ])
+AM_CONDITIONAL(BUILD_SDL_GUI,     [ test x$build_sdl = xyes ])
+AM_CONDITIONAL(BUILD_FB_GUI,      [ test x$build_fb = xyes ])
+AM_CONDITIONAL(BUILD_AQUA_GUI,    [ test x$build_aqua = xyes ])
+AM_CONDITIONAL(BUILD_RISCOS_GUI,  [ test x$build_riscos = xyes ])
+AM_CONDITIONAL(BUILD_DUMP_GUI,    [ test x$build_dump = xyes ])
 
 # plugin building flags
 AM_CONDITIONAL(NPAPI, [test x$npapi = xyes])
-AM_CONDITIONAL(KPARTS, [test x$kparts = xyes])
+AM_CONDITIONAL(KPARTS3, [test x$build_kparts3 = xyes])
+AM_CONDITIONAL(KPARTS4, [test x$build_kparts4 = xyes])
 
-AC_SUBST(KDE_CFLAGS)
-AC_SUBST(KDE_LIBS)
 if test x$build_ogl = xyes; then
   GNASH_PATH_OPENGL
 fi
@@ -1720,7 +1767,7 @@ dnl library, but this is the easy wind to find it.
 GNASH_PKG_FIND(expat, [expat.h], [Expat library], XML_ErrorString)
 
 dnl these conditionals were moved out of kde.m4
-AM_CONDITIONAL(HAS_KDE, [test x$has_kde = xyes])
+AM_CONDITIONAL(HAS_KDE3, [test x$has_kde3 = xyes])
 # used to disable x11-specific stuff on special platforms
 AM_CONDITIONAL(include_x11, test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_mac" = "no")
 AM_CONDITIONAL(include_ARTS, test "$build_arts" '!=' "no")
@@ -1814,7 +1861,7 @@ dnl   fi
   if test x$build_fltk = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
-  if test x$build_kde = xyes; then
+  if test x$build_kde3 = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
   if test x$build_dump = xyes; then
@@ -2071,8 +2118,11 @@ fi
 CYGNAL_PATHS
 
 SUPPORTED_GUIS=
-if test x$build_qtopia = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia"
+if test x$build_qtopia3 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia3"
+fi
+if test x$build_qtopia4 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},qtopia4"
 fi
 if test x$build_hildon = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},hildon"
@@ -2086,8 +2136,17 @@ fi
 if test x$build_fltk = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},fltk"
 fi
-if test x$build_kde = xyes; then
-  SUPPORTED_GUIS="${SUPPORTED_GUIS},kde"
+if test x$build_qt3 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},qt3"
+fi
+if test x$build_qt4 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},qt4"
+fi
+if test x$build_kde3 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},kde3"
+fi
+if test x$build_kde4 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},kde4"
 fi
 if test x$build_gtk = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},gtk"
@@ -2161,6 +2220,7 @@ extensions/metome/Makefile
 plugin/Makefile
 plugin/xpcom/Makefile
 plugin/klash/Makefile
+plugin/klash4/Makefile
 plugin/mozilla-sdk/Makefile
 plugin/win32/Makefile
 cygnal/Makefile
@@ -2214,14 +2274,24 @@ else
   echo "        NPAPI plugin disabled."
 fi
 
-if test x"$kparts" = x"yes"; then
-  echo "        KPARTS plugin enabled (default). Use --disable-kparts to disable"
-  echo "            KPARTS plugin will be installed in ${KDE_PLUGINDIR}"
-  echo "            KPARTS service will be installed in ${KDE_SERVICESDIR}"
-  echo "            KPARTS config dir will be in ${KDE_CONFIGDIR}"
-  echo "            KPARTS appsdata will be installed in ${KDE_APPSDATADIR}"
+if test x"$build_kparts3" = x"yes"; then
+  echo "        KPARTS 3.x plugin enabled (default). Use --disable-kparts3 to disable"
+  echo "            KPARTS 3.x plugin will be installed in ${KDE3_PLUGINDIR}"
+  echo "            KPARTS 3.x service will be installed in ${KDE3_SERVICESDIR}"
+  echo "            KPARTS 3.x config dir will be in ${KDE3_CONFIGDIR}"
+  echo "            KPARTS 3.x appsdata will be installed in ${KDE3_APPSDATADIR}"
 else
-  echo "        KPARTS plugin disabled."
+  echo "        KPARTS 3.x plugin disabled."
+fi
+
+if test x"$build_kparts4" = x"yes"; then
+  echo "        KPARTS 4.x plugin enabled (default). Use --disable-kparts4 to disable"
+  echo "            KPARTS 4.x plugin will be installed in ${KDE4_PLUGINDIR}"
+  echo "            KPARTS 4.x service will be installed in ${KDE4_SERVICESDIR}"
+  echo "            KPARTS 4.x config dir will be in ${KDE4_CONFIGDIR}"
+  echo "            KPARTS 4.x appsdata will be installed in ${KDE4_APPSDATADIR}"
+else
+  echo "        KPARTS 4.x plugin disabled."
 fi
 
 dnl -- if test x"${dynamic_gui}" = x"yes"; then
@@ -2300,59 +2370,101 @@ fi
 # out everything that is missing in one pass, hopefully making it
 # easy for new developers to get everything they need installed.
 
-if test x$build_kde = xyes -o x$kparts = xyes; then
-  if test x"$has_kde" = xyes; then
-    echo "        KDE flags are: $KDE_CFLAGS"
-    echo "        KDE libs are: $KDE_LIBS"
+dnl Dump QT3 options is the user specified a QT3 or KDE3 GUI
+if test x"${build_qt3}" = xyes; then
+  if test x"${has_qt3}" = xyes; then
+    echo "        QT3 flags are: ${QT3_CFLAGS}"
+    echo "        QT3 libs are: ${QT3_LIBS}"
   else
-      echo "        ERROR: No KDE development package installed!" >&3
-      echo "               To disable the KDE gui," >&3
-      echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
-      echo "               and omit "kde" from the list." >&3
-      echo "               When the option --enable-gui=... is omitted," >&3
-      echo "               the default is the same of --enable-gui=kde,gtk" >&3
-      echo "               To be able to build the kde gui," >&3
-      echo "               install the KDE development environment from http://kde.org" >&3
-      echo "               or .deb users: apt-get install kdelibs-dev" >&3
-      echo "               or .rpm users: yum install kdelibs-devel." >&3
-  fi
-  if test x"$has_qt" = xyes; then
-    echo "        QT flags are: $QT_CFLAGS"
-    echo "        QT libs are: $QT_LIBS"
-  else
-    if test x$build_kde = xyes -o x$kparts = xyes ; then
-      if test x"$has_kde" != xyes; then
-	# We have already moaned about KDE absence, so presumably they'll get
-	# QT-dev when they install KDE-dev
-	:
-      else
-	# This should never happen unless they have a very odd version of KDE
-        echo "        ERROR: No QT development package installed!" >&3
-        echo "               Install a QT development environment from http://trolltech.com" >&3
-        echo "               or .deb users: apt-get install libqt3-mt-dev" >&3
-	if test x$kparts = xyes; then
-          echo "               or reconfigure with --disable-kparts" >&3
-	fi
-	if test x$build_kde = xyes; then
-          echo "               or change to a different gui with --enable-gui=..." >&3
-	fi
-      fi
+    echo "        ERROR: No QT 3.x development package installed!" >&3
+    echo "               Install a QT 3.x development environment from http://trolltech.com" >&3
+    echo "               or .deb users: apt-get install libqt3-mt-dev" >&3
+    if test x$build_kde3 = xyes; then
+      echo "               or change to a different gui with --enable-gui=..." >&3
     fi
   fi
 fi
 
-if test x"$build_qtopia" = xyes; then
-  if test x"${QTOPIA_LIBS}" != x ; then
-    if test x"${QTOPIA_CFLAGS}" != x ; then
-      echo "        QTOPIA flags are: $QTOPIA_CFLAGS"
-    else
-      echo "        QTOPIA flags are: default include path"
-    fi
-    echo "        QTOPIA libs are: $QTOPIA_LIBS"
+if test x"${build_qt4}" = xyes; then
+  if test x"${has_qt4}" = xyes; then
+    echo "        QT4 flags are: ${QT4_CFLAGS}"
+    echo "        QT4 libs are: ${QT4_LIBS}"
   else
-    echo "        ERROR: No QTOPIA library development package installed!" >&3
+    echo "        ERROR: No QT 4.x development package installed!" >&3
+    echo "               Install a QT 4.x development environment from http://trolltech.com" >&3
+    echo "               or .deb users: apt-get install qt4-dev-tools" >&3
+    if test x$build_kde4 = xyes; then
+      echo "               or change to a different gui with --enable-gui=..." >&3
+    fi
+  fi
+fi
+
+if test x"$build_qtopia3" = xyes; then
+  if test x"${QTOPIA3_LIBS}" != x ; then
+    if test x"${QTOPIA3_CFLAGS}" != x ; then
+      echo "        QTOPIA 3.x flags are: $QTOPIA3_CFLAGS"
+    else
+      echo "        QTOPIA 3.x flags are: default include path"
+    fi
+    echo "        QTOPIA 3.x libs are: $QTOPIA3_LIBS"
+  else
+    echo "        ERROR: No QTOPIA 3.x library development package installed!" >&3
     echo "               Install it from http://trolltech.com/downloads/" >&3
     echo "               binary packages are not available." >&3
+  fi
+fi
+
+if test x"$build_qtopia4" = xyes; then
+  if test x"${QTOPIA4_LIBS}" != x ; then
+    if test x"${QTOPIA4_CFLAGS}" != x ; then
+      echo "        QTOPIA 4.x flags are: $QTOPIA4_CFLAGS"
+    else
+      echo "        QTOPIA 4.x flags are: default include path"
+    fi
+    echo "        QTOPIA 4.x libs are: $QTOPIA4_LIBS"
+  else
+    echo "        ERROR: No QTOPIA 4.x library development package installed!" >&3
+    echo "               Install it from http://trolltech.com/downloads/" >&3
+    echo "               binary packages are not available." >&3
+  fi
+fi
+
+
+# -o x$build_kparts3 = xyes
+if test x$build_kde3 = xyes; then
+  if test x"$has_kde3" = xyes; then
+    echo "        KDE 3.x flags are: $KDE3_CFLAGS"
+    echo "        KDE 3.x libs are: $KDE3_LIBS"
+  else
+      echo "        ERROR: No KDE 3.x development package installed!" >&3
+      echo "               To disable the KDE 3.x gui," >&3
+      echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
+      echo "               and omit "kde" from the list." >&3
+      echo "               When the option --enable-gui=... is omitted," >&3
+      echo "               the default is the same of --enable-gui=kde,gtk" >&3
+      echo "               To be able to build the kde 3.x gui," >&3
+      echo "               install version 3.x of the KDE development environment from http://kde.org" >&3
+      echo "               or .deb users: apt-get install kdelibs-dev" >&3
+      echo "               or .rpm users: yum install kdelibs-devel." >&3
+  fi
+fi
+
+# -o x$build_kparts4 = xyes
+if test x$build_kde4 = xyes; then
+  if test x"$has_kde4" = xyes; then
+    echo "        KDE 4.x flags are: $KDE4_CFLAGS"
+    echo "        KDE 4.x libs are: $KDE4_LIBS"
+  else
+      echo "        ERROR: No KDE 4.x development package installed!" >&3
+      echo "               To disable the KDE 4.x gui," >&3
+      echo "               reconfigure using --enable-gui=<list-of-guis>" >&3
+      echo "               and omit "kde" from the list." >&3
+      echo "               When the option --enable-gui=... is omitted," >&3
+      echo "               the default is the same of --enable-gui=kde,gtk" >&3
+      echo "               To be able to build the kde 4.x gui," >&3
+      echo "               install version 4.x of the KDE development environment from http://kde.org" >&3
+      echo "               or .deb users: apt-get install kdelibs-dev" >&3
+      echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
 fi
 

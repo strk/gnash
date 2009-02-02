@@ -1,6 +1,6 @@
 // DefineFontAlignZonesTag.cpp:  for Gnash.
 //
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
 
 /* public static */
 void
-DefineFontAlignZonesTag::loader(SWFStream& in, tag_type tag,
+DefineFontAlignZonesTag::loader(SWFStream& in, TagType tag,
         movie_definition& m, const RunInfo& /*r*/)
 {
 	assert(tag == SWF::DEFINEALIGNZONES);

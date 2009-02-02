@@ -1,6 +1,6 @@
 // AsBroadcaster.cpp - AsBroadcaster AS interface
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "array.h" // for _listeners construction
+#include "Array_as.h" // for _listeners construction
 #include "log.h"
 #include "AsBroadcaster.h"
 #include "fn_call.h"
@@ -161,7 +161,6 @@ AsBroadcaster::getAsBroadcaster()
 
         const int flags = as_prop_flags::dontEnum |
                           as_prop_flags::dontDelete |
-                          as_prop_flags::readOnly |
                           as_prop_flags::onlySWF6Up;
 
         // NOTE: we may add NSV::PROP_INITIALIZE, unavailable at
@@ -170,16 +169,12 @@ AsBroadcaster::getAsBroadcaster()
         // well save the string_table size in case we'll not load
         // the class.
         obj->init_member("initialize",
-                new builtin_function(asbroadcaster_initialize),
-                flags);
+                new builtin_function(asbroadcaster_initialize), flags);
         obj->init_member(NSV::PROP_ADD_LISTENER,
-                new builtin_function(asbroadcaster_addListener),
-                flags);
+                new builtin_function(asbroadcaster_addListener), flags);
         obj->init_member(NSV::PROP_REMOVE_LISTENER,
-                new builtin_function(asbroadcaster_removeListener),
-                flags);
-        obj->init_member(NSV::PROP_BROADCAST_MESSAGE,
-                new builtin_function(asbroadcaster_broadcastMessage),
+                new builtin_function(asbroadcaster_removeListener), flags);
+        obj->init_member(NSV::PROP_BROADCAST_MESSAGE, vm.getNative(101, 12),
                 flags);
 	}
 
@@ -188,7 +183,15 @@ AsBroadcaster::getAsBroadcaster()
 
 
 void
-AsBroadcaster_init(as_object& global)
+AsBroadcaster::registerNative(as_object& global)
+{
+    VM& vm = global.getVM();
+    vm.registerNative(asbroadcaster_broadcastMessage, 101, 12);
+}
+
+
+void
+AsBroadcaster::init(as_object& global)
 {
 	// _global.AsBroadcaster is NOT a class, but a simple object
 	global.init_member("AsBroadcaster", AsBroadcaster::getAsBroadcaster());
@@ -296,6 +299,7 @@ asbroadcaster_addListener(const fn_call& fn)
 
 }
 
+
 as_value
 asbroadcaster_removeListener(const fn_call& fn)
 {
@@ -385,7 +389,7 @@ asbroadcaster_broadcastMessage(const fn_call& fn)
 	as_value listenersValue;
 
 	// TODO: test if we're supposed to crawl the target object's 
-	//       inheritance chain in case it's own property _listeners 
+	//       inheritance chain in case its own property _listeners 
 	//       has been deleted while another one is found in any base
 	//       class.
 	if ( ! obj->get_member(NSV::PROP_uLISTENERS, &listenersValue) )

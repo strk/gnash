@@ -53,6 +53,8 @@ check(XML.prototype.hasOwnProperty("addRequestHeader") );
 check(XML.prototype.hasOwnProperty("createTextNode") );
 check(XML.prototype.hasOwnProperty("getBytesLoaded") );
 check(XML.prototype.hasOwnProperty("getBytesTotal") );
+check(!XML.prototype.hasOwnProperty("_bytesTotal") );
+check(!XML.prototype.hasOwnProperty("_bytesLoaded") );
 check(XML.prototype.hasOwnProperty("load") );
 check(XML.prototype.hasOwnProperty("parseXML") );
 check(XML.prototype.hasOwnProperty("send") );
@@ -286,7 +288,7 @@ var xml_out = '<TOPNODE tna1="tna1val" tna2="tna2val" tna3="tna3val"><SUBNODE1 s
 check(XML);
 tmp.checkParsed = function ()
 {
-	note("tmp.checkParsed called");
+	//note("tmp.checkParsed called");
 
 	// Since we didn't *load* the XML, but we
 	// just *parsed* it, expect getBytesLoaded 
@@ -306,11 +308,9 @@ tmp.checkParsed = function ()
 	check_equals(this.childNodes[0], this.firstChild);
 	check_equals(this.childNodes[0], this.lastChild);
 
-#if OUTPUT_VERSION > 5
 	check(this.childNodes.hasOwnProperty('length'));
 	check(this.childNodes[0] === this.firstChild);
 	check(this.childNodes[0] === this.lastChild);
-#endif
 
 	// childNodes is a read-only property !
 	this.childNodes = 5;
@@ -787,7 +787,7 @@ myxml.onLoadCalls = 0;
 
 myxml.onLoad = function(success)
 {
-	note("myxml.onLoad("+success+") called");
+	//note("myxml.onLoad("+success+") called");
 
 	check_equals(typeof(myxml.status), 'number');
 	check_equals(typeof(myxml.loaded), 'boolean');
@@ -798,13 +798,13 @@ myxml.onLoad = function(success)
 
 	if ( ! success )
 	{
-		note("No success loading gnash.xml");
+		//note("No success loading gnash.xml");
 		check_equals(myxml.status, 0);
 		check(! myxml.loaded);
 		return;
 	}
-	note("gnash.xml successfully loaded");
-	note("myxml status is "+myxml.status);
+	//note("gnash.xml successfully loaded");
+	//note("myxml status is "+myxml.status);
 
 	check_equals(myxml.status, 0);
 	check(myxml.loaded);
@@ -822,11 +822,11 @@ myxml.onLoad = function(success)
 	myxml.status = 'a string';
 	check_equals(typeof(myxml.status), 'number');
 	check(myxml.status != status_backup);
-	note("myxml.status is == "+myxml.status+" after being set to 'a string'");
+	//note("myxml.status is == "+myxml.status+" after being set to 'a string'");
 	myxml.status = status_backup;
 
 
-	note("myxml.toString(): "+myxml.toString());
+	//note("myxml.toString(): "+myxml.toString());
 	check_equals(typeof(myxml.attributes), 'object');
 	check(! myxml.attributes instanceof Object);
 	check_equals(typeof(myxml.attributes.__proto__), 'undefined');
@@ -860,13 +860,21 @@ myxml.onLoad = function(success)
 
 	// We're done
 	++this.onLoadCalls;
-	note("onLoad called "+this.onLoadCalls+" times");
+	//note("onLoad called "+this.onLoadCalls+" times");
+#if OUTPUT_VERSION < 8
 	if ( this.onLoadCalls == 2 )
+#else
+	if ( this.onLoadCalls == 1 )
+#endif
 	{
 #if OUTPUT_VERSION < 6
-		check_totals(387);
+		check_totals(400);
 #else
-		check_totals(427);
+# if OUTPUT_VERSION < 8
+		check_totals(435);
+# else
+		check_totals(416);
+# endif
 #endif
 		play();
 	}
@@ -879,13 +887,21 @@ check_equals(typeof(myxml.STATUS), 'number');
 #else // OUTPUT_VERSION >= 7
 check_equals(typeof(myxml.STATUS), 'undefined');
 #endif // OUTPUT_VERSION >= 7
+
 check_equals(typeof(myxml.__proto__.status), 'undefined');
 check_equals(typeof(myxml.loaded), 'undefined');
-#if OUTPUT_VERSION >= 6
+check_equals(typeof(myxml._bytesLoaded), 'undefined');
+check_equals(typeof(myxml._bytesTotal), 'undefined');
+
 check(!myxml.hasOwnProperty('status'));
 check(!myxml.hasOwnProperty('loaded'));
-#endif // OUTPUT_VERSION >= 6
+check(!myxml.hasOwnProperty('_bytesLoaded'));
+check(!myxml.hasOwnProperty('_bytesTotal'));
+
 ret = myxml.load( MEDIA(gnash.xml) );
+
+xcheck(myxml.hasOwnProperty('_bytesLoaded'));
+xcheck(myxml.hasOwnProperty('_bytesTotal'));
 
 check_equals(typeof(myxml.loaded), 'boolean');
 #if OUTPUT_VERSION < 7
@@ -896,8 +912,8 @@ check_equals(typeof(myxml.LOADED), 'undefined');
 check(! myxml.loaded ); // is really loaded in a background thread
 
 check_equals(myxml.loaded, false ); // is really loaded in a background thread
-note("myxml.loaded = "+myxml.loaded);
-note("myxml.load() returned "+ret);
+//note("myxml.loaded = "+myxml.loaded);
+//note("myxml.load() returned "+ret);
 
 // Load again, to verify new parsing doesn't get appended to the old
 ret = myxml.load( MEDIA(gnash.xml) );
@@ -960,10 +976,10 @@ h = new XML("<open><open2></open>");
 check_equals(h.toString(), "<open><open2 /></open>");
 
 h = new XML("<open att='");
-xcheck_equals(h.toString(), "");
+check_equals(h.toString(), "");
 
 h = new XML("<open att      r='kk'");
-xcheck_equals(h.toString(), "");
+check_equals(h.toString(), "");
 
 h = new XML("<open>& ' \"<");
 check_equals(h.toString(), "<open>&amp; &apos; &quot;</open>");

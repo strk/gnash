@@ -1,6 +1,6 @@
 // TextField.cpp:  User-editable text regions, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,16 +38,18 @@
 #include "fontlib.h" // for searching or adding fonts the _font member
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
-#include "array.h" // for _listeners construction
+#include "Array_as.h" // for _listeners construction
 #include "AsBroadcaster.h" // for initializing self as a broadcaster
 #include "StringPredicates.h"
 #include "TextFormat_as.h" // for getTextFormat/setTextFormat
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
+#include "Point2d.h"
 
 #include <algorithm> // std::min
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/assign/list_of.hpp>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
@@ -123,7 +125,6 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
     :
     character(parent, id),
     _tag(&def),
-    _text(L""),
     _textDefined(def.hasText()),
     _underlined(false),
     _leading(def.leading()),
@@ -181,7 +182,6 @@ TextField::TextField(character* parent, const rect& bounds)
     :
     // the id trick is to fool assertions in character ctor
     character(parent, parent ? 0 : -1),
-    _text(L""),
     _textDefined(false),
     _underlined(false),
     _leading(0),
@@ -290,13 +290,11 @@ TextField::show_cursor(const SWFMatrix& mat)
     boost::uint16_t y = static_cast<boost::uint16_t>(m_ycursor);
     boost::uint16_t h = getFontHeight();
 
-    boost::int16_t box[4];
-    box[0] = x;
-    box[1] = y;
-    box[2] = x;
-    box[3] = y + h;
+    const std::vector<point> box = boost::assign::list_of
+        (point(x, y))
+        (point(x, y + h));
     
-    render::draw_line_strip(box, 2, rgba(0,0,0,255), mat);    // draw line
+    render::drawLine(box, rgba(0,0,0,255), mat);
 }
 
 void
@@ -381,6 +379,20 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
 }
 
 void
+TextField::replaceSelection(const std::string& replace)
+{
+
+    const int version = _vm.getSWFVersion();
+    const std::wstring& wstr = utf8::decodeCanonicalString(replace, version);
+    
+    const size_t start = _selection.first;
+    const size_t replaceLength = wstr.size();
+
+    _text.replace(start, _selection.second - start, wstr);
+    _selection = std::make_pair(start + replaceLength, start + replaceLength);
+}
+
+void
 TextField::setSelection(int start, int end)
 {
 
@@ -406,11 +418,11 @@ TextField::setSelection(int start, int end)
     _selection = std::make_pair(start, end);
 }
 bool
-TextField::on_event(const event_id& id)
+TextField::on_event(const event_id& ev)
 {
     if (isReadOnly()) return false;
 
-    switch (id.m_id)
+    switch (ev.id())
     {
         case event_id::KEY_PRESS:
         {
@@ -425,7 +437,7 @@ TextField::on_event(const event_id& id)
             // stored and displayed. See utf.h for more information.
             // This is a limit on the number of key codes, not on the
             // capacity of strings.
-            gnash::key::code c = id.keyCode;
+            gnash::key::code c = ev.keyCode();
 
             // maybe _text is changed in ActionScript
             m_cursor = std::min<size_t>(m_cursor, _text.size());
@@ -2022,12 +2034,10 @@ textfield_background(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getDrawBackground());
     }
-    else // setter
-    {
+    else {
         ptr->setDrawBackground(fn.arg(0).to_bool());
     }
 
@@ -2039,12 +2049,10 @@ textfield_border(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getDrawBorder());
     }
-    else // setter
-    {
+    else {
         ptr->setDrawBorder(fn.arg(0).to_bool());
     }
 
@@ -2056,12 +2064,10 @@ textfield_backgroundColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getBackgroundColor().toRGB());
     }
-    else // setter
-    {
+    else {
         rgba newColor;
         newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_int()));
         ptr->setBackgroundColor(newColor);
@@ -2075,14 +2081,12 @@ textfield_borderColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->getBorderColor().toRGB());
     }
-    else // setter
-    {
+    else {
         rgba newColor;
-        newColor.parseRGB( static_cast<boost::uint32_t>(fn.arg(0).to_number()) );
+        newColor.parseRGB(static_cast<boost::uint32_t>(fn.arg(0).to_number()));
         ptr->setBorderColor(newColor);
     }
 
@@ -2095,8 +2099,7 @@ textfield_textColor(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         return as_value(ptr->getTextColor().toRGB());
     }
@@ -2114,14 +2117,13 @@ textfield_embedFonts(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if (!fn.nargs)
-    {
+    if (!fn.nargs) {
         // Getter
         return as_value(ptr->getEmbedFonts());
     }
 
     // Setter
-    ptr->setEmbedFonts( fn.arg(0).to_bool() );
+    ptr->setEmbedFonts(fn.arg(0).to_bool());
     return as_value();
 }
 
@@ -2130,13 +2132,11 @@ textfield_wordWrap(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->doWordWrap());
     }
-    else // setter
-    {
-        ptr->setWordWrap( fn.arg(0).to_bool() );
+    else {
+        ptr->setWordWrap(fn.arg(0).to_bool());
     }
 
     return as_value();
@@ -2147,12 +2147,10 @@ textfield_html(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> ptr = ensureType<TextField>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) // getter
-    {
+    if (fn.nargs == 0) {
         return as_value(ptr->doHtml());
     }
-    else // setter
-    {
+    else {
         ptr->setHtml( fn.arg(0).to_bool() );
     }
 
@@ -2637,14 +2635,35 @@ textfield_htmlText(const fn_call& fn)
     return as_value();
 }
 
-
+/// TextField.replaceSel(newText)
+//
+/// Replaces the current selection with the new text, setting both
+/// begin and end of the selection to one after the inserted text.
+/// If an empty string is passed, SWF8 erases the selection; SWF7 and below
+/// is a no-op.
+/// If no argument is passed, this is a no-op.
 as_value
 textfield_replaceSel(const fn_call& fn)
 {
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
-    UNUSED(text);
 
-    LOG_ONCE (log_unimpl("TextField.replaceSel()"));
+    if (!fn.nargs) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            std::ostringstream os;
+            fn.dump_args(os);
+            log_aserror("TextField.replaceSel(%s) requires exactly one "
+                "argument", os.str());
+        );
+        return as_value();
+    }
+
+    const std::string& replace = fn.arg(0).to_string();
+
+    /// Do nothing if text is empty and version less than 8.
+    const int version = text->getVM().getSWFVersion();
+    if (version < 8 && replace.empty()) return as_value();
+
+    text->replaceSelection(replace);
 
     return as_value();
 }
@@ -2765,10 +2784,15 @@ attachTextFieldInterface(as_object& o)
             character::xmouse_get, character::xmouse_get, propFlags);
     o.init_property(NSV::PROP_uYMOUSE,
             character::ymouse_get, character::ymouse_get, propFlags);
+    o.init_property(NSV::PROP_uHIGHQUALITY,
+            character::highquality, character::highquality);
+    o.init_property(NSV::PROP_uQUALITY,
+            character::quality, character::quality);
     o.init_property(NSV::PROP_uXSCALE,
             character::xscale_getset, character::xscale_getset);
     o.init_property(NSV::PROP_uYSCALE,
             character::yscale_getset, character::yscale_getset);
+ 
     // Standard flags.
     const int flags = as_prop_flags::dontDelete
         |as_prop_flags::dontEnum;

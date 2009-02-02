@@ -1,6 +1,6 @@
 // stream.cpp - SWF stream reading class, for Gnash
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -520,7 +520,7 @@ SWFStream::get_tag_end_position()
 }
 
 
-SWF::tag_type
+SWF::TagType
 SWFStream::open_tag()
 {
     align();
@@ -593,7 +593,7 @@ SWFStream::open_tag()
         tagStart, tagType, tagLength, tagEnd);
     );
 
-    return static_cast<SWF::tag_type>(tagType);
+    return static_cast<SWF::TagType>(tagType);
 }
 
 

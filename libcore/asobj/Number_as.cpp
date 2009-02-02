@@ -1,6 +1,6 @@
 // Number.cpp:  ActionScript Number class, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -81,7 +81,7 @@ number_toString(const fn_call& fn)
 	boost::intrusive_ptr<Number_as> obj = ensureType<Number_as>(fn.this_ptr);
 
 	double val = obj->get_numeric_value();
-	unsigned radix=10;
+	unsigned radix = 10;
 
 	if ( fn.nargs ) 
 	{

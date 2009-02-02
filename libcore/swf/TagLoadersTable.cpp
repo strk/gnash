@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ namespace gnash {
 namespace SWF {
 
 bool
-TagLoadersTable::get(SWF::tag_type t, loader_function* lf)
+TagLoadersTable::get(SWF::TagType t, loader_function* lf)
 {
 	container::iterator it = _tag_loaders.find(t);
 
@@ -42,15 +42,10 @@ TagLoadersTable::get(SWF::tag_type t, loader_function* lf)
 }
 
 bool
-TagLoadersTable::register_loader(SWF::tag_type t, loader_function lf)
+TagLoadersTable::register_loader(SWF::TagType t, loader_function lf)
 {
-	assert(lf != NULL);
-
-	// loader for given tag already registered
-	if (_tag_loaders.find(t) != _tag_loaders.end()) return false;
-    
-	_tag_loaders[t] = lf;
-	return true;
+	assert(lf);
+    return _tag_loaders.insert(std::make_pair(t, lf)).second;
 }
 
 TagLoadersTable&

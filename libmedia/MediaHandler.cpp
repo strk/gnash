@@ -1,6 +1,6 @@
 // MediaHandler.cpp:  Default MediaHandler implementation, for Gnash.
 //
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,9 +38,8 @@ namespace media {
 
 std::auto_ptr<MediaHandler> MediaHandler::_handler;
 
-/* public static */
 bool
-MediaHandler::isFLV(IOChannel& stream)
+MediaHandler::isFLV(IOChannel& stream) throw (IOException)
 {
 	char head[4] = {0, 0, 0, 0};
 	stream.seek(0);
@@ -49,11 +48,11 @@ MediaHandler::isFLV(IOChannel& stream)
 
 	if (actuallyRead < 3)
 	{
-		log_error(_("MediaHandler::isFLV: Could not read 3 bytes from input stream"));
-		return false;
+		throw IOException(_("MediaHandler::isFLV: Could not read 3 bytes "
+                    "from input stream"));
 	}
 
-	if (std::string(head) != "FLV") return false;
+    if (!std::equal(head, head + 3, "FLV")) return false;
 	return true;
 }
 
@@ -62,12 +61,18 @@ MediaHandler::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
 	std::auto_ptr<MediaParser> parser;
 
-	if ( ! isFLV(*stream) )
-	{
-		log_error(_("MediaHandler::createMediaParser: only FLV input is "
-                    "supported by this MediaHandler"));
-		return parser;
-	}
+    try {
+        if (!isFLV(*stream))
+        {
+            log_error(_("MediaHandler::createMediaParser: only FLV input is "
+                        "supported by this MediaHandler"));
+            return parser;
+        }
+    }
+    catch (IOException& m) {
+        log_error(_("Exception while reading from stream: %s"), m.what());
+        return parser;
+    }
 
 	parser.reset( new FLVParser(stream) );
 	assert(! stream.get() ); // TODO: when ownership will be transferred...

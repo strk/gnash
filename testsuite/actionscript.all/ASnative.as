@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ check_equals(a(func), false); // isNan
 a = ASnative(200, 19);
 check_equals(a(func), true); // isFinite
 
-xcheck_equals (countVO, 25); // calls to valueOf.
+check_equals (countVO, 25); // calls to valueOf.
 check_equals (countTS, 0); // calls to toString.
 
 // String functions (call toString)
@@ -260,7 +260,7 @@ check_equals (countTS, 4);
 check_equals (countTS, 2);
 #endif
 
-xcheck_equals (countVO, 25);
+check_equals (countVO, 25);
 
 /// SharedObject undocumented functions.
 

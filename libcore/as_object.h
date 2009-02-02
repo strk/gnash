@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@
 #include "smart_ptr.h"
 #include "as_prop_flags.h" // for enum
 #include "GnashException.h"
-#include "event_id.h" // for event_id
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -47,6 +46,7 @@ namespace gnash {
 	class VM;
 	class Machine;
 	class IOChannel;
+    class event_id;
 }
 
 namespace gnash {

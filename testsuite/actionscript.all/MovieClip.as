@@ -115,15 +115,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(829); // SWF6
+	check_totals(884); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(846); // SWF7
+	check_totals(901); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(936); // SWF8+
+	check_totals(993); // SWF8+
 #endif
 
 	play();
@@ -2195,6 +2195,10 @@ _root.blendMode = "Some rubbish";
 check_equals(_root.blendMode, "darken");
 _root.blendMode = -1;
 check_equals(_root.blendMode, undefined);
+_root.blendMode = 0xffffffff;
+check_equals(_root.blendMode, undefined);
+_root.blendMode = -0xffffffff;
+check_equals(_root.blendMode, undefined);
 _root.blendMode = 5.5;
 check_equals(_root.blendMode, "lighten");
 _root.blendMode = "NORMAL";
@@ -2208,6 +2212,94 @@ check_equals(_root.blendMode, "normal");
 
 #endif
 
+#if OUTPUT_VERSION > 5
+
+r = createEmptyMovieClip("r", getNextHighestDepth());
+check_equals(typeof(r._highquality), "number");
+check_equals(r._highquality, 1);
+r._highquality = 1;
+check_equals(r._quality, "HIGH");
+check_equals(r._highquality, 1);
+check_equals(_root._highquality, 1);
+
+r._highquality = 3;
+check_equals(r._quality, "BEST");
+check_equals(r._highquality, 2);
+check_equals(_root._highquality, 2);
+
+r._highquality = "1";
+check_equals(r._quality, "HIGH");
+check_equals(r._highquality, 1);
+check_equals(_root._highquality, 1);
+
+r._highquality = false;
+check_equals(r._quality, "LOW");
+check_equals(typeof(r._highquality), "number");
+check_equals(r._highquality, 0);
+check_equals(_root._highquality, 0);
+
+r._highquality = 0;
+check_equals(r._quality, "LOW");
+check_equals(typeof(r._highquality), "number");
+check_equals(r._highquality, 0);
+check_equals(_root._highquality, 0);
+
+r._highquality = -1;
+check_equals(r._quality, "HIGH");
+check_equals(typeof(r._highquality), "number");
+check_equals(r._highquality, 1);
+check_equals(_root._highquality, 1);
+
+r._highquality = -2;
+check_equals(r._quality, "HIGH");
+check_equals(typeof(r._highquality), "number");
+check_equals(r._highquality, 1);
+check_equals(_root._highquality, 1);
+
+/// Test setting _quality
+
+r._quality = "MEDIUM";
+check_equals(r._quality, "MEDIUM");
+check_equals(typeof(r._quality), "string");
+check_equals(r._highquality, 0);
+check_equals(_root._highquality, 0);
+
+r._quality = "HIGH";
+check_equals(r._quality, "HIGH");
+check_equals(typeof(r._quality), "string");
+check_equals(r._highquality, 1);
+check_equals(_root._highquality, 1);
+
+r._quality = "BEST";
+check_equals(r._quality, "BEST");
+check_equals(typeof(r._quality), "string");
+check_equals(r._highquality, 2);
+check_equals(_root._highquality, 2);
+
+r._quality = 1;
+check_equals(r._quality, "BEST");
+check_equals(typeof(r._quality), "string");
+check_equals(r._highquality, 2);
+check_equals(_root._highquality, 2);
+
+r._quality = false;
+check_equals(r._quality, "BEST");
+check_equals(typeof(r._quality), "string");
+check_equals(r._highquality, 2);
+check_equals(_root._highquality, 2);
+
+r._quality = "lOW";
+check_equals(r._quality, "LOW");
+check_equals(typeof(r._quality), "string");
+check_equals(r._highquality, 0);
+check_equals(_root._highquality, 0);
+
+r._quality = "high";
+check_equals(r._quality, "HIGH");
+check_equals(typeof(r._quality), "string");
+check_equals(r._highquality, 1);
+check_equals(_root._highquality, 1);
+#endif 
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 
 // Can't rely on this to call onData!

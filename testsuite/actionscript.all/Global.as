@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -401,7 +401,7 @@ check_equals (int(-7.8), -7);
 check_equals (int(6.1), 6);
 check_equals (int("-7.8"), -7);
 check_equals (int("6.1"), 6);
-xcheck_equals (int("      -7.8"), -7);
+check_equals (int("      -7.8"), -7);
 
 /// Integer values
 check_equals (int(0), 0);
@@ -429,10 +429,10 @@ check_equals(int("1.4e+7"), 14000000);
 check_equals(int("0123"), 123);
 check_equals(int("-0123"), -123);
 #else
-xcheck_equals(int("0123"), 83);
-xcheck_equals(int("-0123"), -83);
+check_equals(int("0123"), 83);
+check_equals(int("-0123"), -83);
 #endif
-xcheck_equals(int("   0123"), 123);
+check_equals(int("   0123"), 123);
 check_equals(int("-   0123"), 0);
 check_equals(int("   0-123"), 0);
 check_equals(int("01238"), 1238);
@@ -444,8 +444,8 @@ check_equals(int("-0x10"), 0);
 check_equals(int("0x-10"), 0);
 check_equals(int("0X+10"), 0);
 #else
-xcheck_equals(int("0x-10"), -16);
-xcheck_equals(int("0X+10"), 16);
+check_equals(int("0x-10"), -16);
+check_equals(int("0X+10"), 16);
 #endif
 
 /// Extraneous characters

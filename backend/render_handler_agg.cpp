@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
- 
-
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -146,11 +143,6 @@ AGG ressources
 #include <agg_scanline_bin.h>
 #include <agg_scanline_p.h>
 #include <agg_renderer_scanline.h>
-// must only include if render_scanlines_compound_layered is not defined
-//#if ! HAVE_AGG_SCANLINES_COMPOUND_LAYERED
-//#warning including compound
-//#include "render_handler_agg_compat.h"
-//#endif
 #include <agg_rasterizer_scanline_aa.h>
 #include <agg_rasterizer_compound_aa.h>
 #include <agg_span_allocator.h>
@@ -174,73 +166,139 @@ AGG ressources
 #include "render_handler_agg_bitmap.h"
 #include "render_handler_agg_style.h"
 
-//#include <boost/foreach.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/bind.hpp>
 
 #ifndef round
 	#define round(x) rint(x)
 #endif
 
-#define TWIPS_TO_SHIFTED_PIXELS(x) (x*0.05f + 0.5f) 
 
 #include <boost/numeric/conversion/converter.hpp>
 
-using namespace gnash;
-
-
 namespace gnash {
 
+namespace {
 
-// --- CACHE -------------------------------------------------------------------
-/// This class holds a completely transformed path (fixed position). Speeds
-/// up characters that stay fixed on a certain position on the stage. 
-// ***CURRENTLY***NOT***USED***
+class AlphaMask;
 
-class agg_transformed_path 
+
+typedef std::vector<agg::path_storage> AggPaths;
+typedef std::vector<geometry::Range2d<int> > ClipBounds;
+typedef std::vector<AlphaMask*> AlphaMasks;
+typedef std::vector<path> GnashPaths;
+
+template <class Rasterizer>
+inline void applyClipBox(Rasterizer& ras, const geometry::Range2d<int>& bounds)
+{
+    assert(bounds.isFinite());
+    ras.clip_box(static_cast<double>(bounds.getMinX()),
+            static_cast<double>(bounds.getMinY()),
+            static_cast<double>(bounds.getMaxX() + 1), 
+            static_cast<double>(bounds.getMaxY() + 1)
+            );  
+}
+
+/// Analyzes a set of paths to detect real presence of fills and/or outlines
+/// TODO: This should be something the character tells us and should be 
+/// cached. 
+void
+analyzePaths(const GnashPaths &paths, bool& have_shape,
+    bool& have_outline)
+{
+
+    have_shape = false;
+    have_outline = false;
+
+    const int pcount = paths.size();
+
+    for (int pno=0; pno<pcount; ++pno) {
+
+        const path &the_path = paths[pno];
+
+        if ((the_path.m_fill0 > 0) || (the_path.m_fill1 > 0)) {
+            have_shape = true;
+            if (have_outline) return; // have both
+        }
+
+        if (the_path.m_line > 0) {
+            have_outline = true;
+            if (have_shape) return; // have both
+        }
+    }
+}
+
+class EdgeToPath
+{
+
+public:
+    EdgeToPath(AggPaths::value_type& path, double shift = 0)
+        :
+        _path(path),
+        _shift(shift)
+    {}
+
+    void operator()(const edge& edge)
+    {
+        if (edge.is_straight()) {
+            _path.line_to(TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
+                          TWIPS_TO_PIXELS(edge.ap.y) + _shift);
+        }
+        else {
+            _path.curve3(TWIPS_TO_PIXELS(edge.cp.x) + _shift, 
+                     TWIPS_TO_PIXELS(edge.cp.y) + _shift,
+                     TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
+                     TWIPS_TO_PIXELS(edge.ap.y) + _shift);             
+        }
+    }
+
+private:
+    agg::path_storage& _path;
+    const double _shift;
+};
+
+/// In-place transformation of Gnash paths to AGG paths.
+class GnashToAggPath
 {
 public:
-  /// Original transformation SWFMatrix 
-  SWFMatrix m_mat;  
-  
-  /// Normal or rounded coordinates?
-  bool m_rounded;
-  
-  /// Number of cache hits 
-  int m_hits;
-  
-  /// Contents of this cache item (AGG path).  
-  std::vector <agg::path_storage> m_data;
-};
 
-class agg_cache_manager : private render_cache_manager
-{
-
-  std::vector <agg_transformed_path> m_items;
-
-  /// Looks for a matching pre-computed path in the cache list
-  /// Returns NULL if no cache item matches 
-  std::vector <agg::path_storage>* search(const SWFMatrix& mat, bool rounded) {
-  
-    const size_t ccount = m_items.size();
-    
-    for (size_t cno=0; cno<ccount; ++cno) {    
-      agg_transformed_path& item = m_items[cno];
-          
-      if ((item.m_mat == mat) && (item.m_rounded == rounded)) {
-      
-        // Found it!
-        return &item.m_data;
-      
-      }    
+    GnashToAggPath(AggPaths& dest, double shift = 0)
+        :
+        _dest(dest),
+        _it(_dest.begin()),
+        _shift(shift)
+    {
     }
-    
-    // could not find a matching item
-    return NULL;
-  
-  }
-  
+
+    void operator()(const path& in)
+    {
+        agg::path_storage& p = *_it;
+
+        p.move_to(TWIPS_TO_PIXELS(in.ap.x) + _shift, 
+                  TWIPS_TO_PIXELS(in.ap.y) + _shift);
+
+        std::for_each(in.m_edges.begin(), in.m_edges.end(),
+                EdgeToPath(p, _shift));
+        ++_it;
+    }
+
+private:
+    AggPaths& _dest;
+    AggPaths::iterator _it;
+    const double _shift;
 
 };
 
+
+/// Transposes Gnash paths to AGG paths, which can be used for both outlines
+/// and shapes. Subshapes are ignored (ie. all paths are converted). Converts 
+/// TWIPS to pixels on the fly.
+inline void
+buildPaths(AggPaths& dest, const GnashPaths& paths) 
+{
+    dest.resize(paths.size());
+    std::for_each(paths.begin(), paths.end(), GnashToAggPath(dest, 0.05));
+} 
 
 // --- ALPHA MASK BUFFER CONTAINER ---------------------------------------------
 // How masks are implemented: A mask is basically a full alpha buffer. Each 
@@ -257,89 +315,272 @@ class agg_cache_manager : private render_cache_manager
 // be used anymore it's simply discarded so that the next mask becomes active 
 // again.
 // To be exact, Flash is a bit restrictive regarding to what can be a mask
-// (dynamic text, shapes, ...) but our rebderer can build a mask from everything 
-// we can draw otherwise (except lines, which are excluded explicitely).    
+// (dynamic text, shapes, ...) but our renderer can build a mask from
+// anything we can draw otherwise (except lines, which are excluded 
+// explicitly).    
 
-class agg_alpha_mask 
+class AlphaMask 
 {
 
-  typedef agg::renderer_base<agg::pixfmt_gray8> renderer_base;
-  typedef agg::alpha_mask_gray8 amask_type;
+    typedef agg::renderer_base<agg::pixfmt_gray8> Renderer;
+    typedef agg::alpha_mask_gray8 Mask;
 
 public:
 
-  agg_alpha_mask(int width, int height) :
-    m_rbuf(NULL, width, height, width),    // *
-    m_pixf(m_rbuf),
-    m_rbase(m_pixf),
-    m_amask(m_rbuf)
-  {
-  
-    // * = m_rbuf is first initialized with a NULL buffer so that m_pixf and
-    // m_rbase initialize with the correct buffer extents
-  
-    m_buffer = new boost::uint8_t[width*height];
-    
-    m_rbuf.attach(m_buffer, width, height, width);
-    
-    // NOTE: The buffer is *not* cleared. The clear() function must be called
-    // to clear the buffer (alpha=0). The reason is to avoid clearing the 
-    // whole mask when only a small portion is really used.
-
-  }
-  
-  ~agg_alpha_mask() 
-  {
-    delete [] m_buffer;
-  }
-  
-  void clear(const geometry::Range2d<int>& region)
-  {
-    if (region.isNull()) return;
-    assert ( region.isFinite() );
-
-    const agg::gray8 black(0);
-        
-    // region can't be world as it should be intersected with 
-    // the visible rect
-    assert (! region.isWorld() );
-
-    unsigned int left=region.getMinX();
-    unsigned int width=region.width()+1;
-
-    const unsigned int max_y = region.getMaxY();
-          for (unsigned int y=region.getMinY(); y<=max_y; ++y) 
+    AlphaMask(int width, int height)
+        :
+        _rbuf(0, width, height, width),
+        _pixf(_rbuf),
+        _rbase(_pixf),
+        _amask(_rbuf),
+        _buffer(new boost::uint8_t[width * height])
     {
-       m_pixf.copy_hline(left, y, width, black);
+        _rbuf.attach(_buffer.get(), width, height, width);
+        
+        // NOTE: The buffer is *not* cleared. The clear() function must
+        // be called to clear the buffer (alpha=0). The reason is to avoid
+        // clearing the whole mask when only a small portion is really used.
     }
-  }
-  
-  renderer_base& get_rbase() {
-    return m_rbase;
-  }
-  
-  amask_type& get_amask() {
-    return m_amask;
-  }  
-  
-  
+    
+    void clear(const geometry::Range2d<int>& region)
+    {
+        if (region.isNull()) return;
+        assert(region.isFinite());
+
+        const agg::gray8 black(0);
+                
+        // region can't be world as it should be intersected with 
+        // the visible rect
+        assert(!region.isWorld());
+
+        unsigned int left = region.getMinX();
+        unsigned int width = region.width() + 1;
+
+        const unsigned int max_y = region.getMaxY();
+        for (unsigned int y=region.getMinY(); y <= max_y; ++y) 
+        {
+             _pixf.copy_hline(left, y, width, black);
+        }
+    }
+    
+    Renderer& get_rbase() {
+        return _rbase;
+    }
+    
+    const Mask& getMask() const {
+        return _amask;
+    }    
+    
 private:
-  // in-memory buffer
-  boost::uint8_t* m_buffer;
-  
-  // agg class to access the buffer
-  agg::rendering_buffer m_rbuf;
-  
-  // pixel access
-  agg::pixfmt_gray8 m_pixf;  
-  
-  // renderer base
-  renderer_base m_rbase;
-  
-  // alpha mask
-  amask_type m_amask;
+
+    // agg class to access the buffer
+    agg::rendering_buffer _rbuf;
+    
+    // pixel access
+    agg::pixfmt_gray8 _pixf;    
+    
+    // renderer base
+    Renderer _rbase;
+    
+    // alpha mask
+    Mask _amask;
+    
+    // in-memory buffer
+    boost::scoped_array<boost::uint8_t> _buffer;
+    
 };
 
+/// Class for rendering lines.
+template<typename PixelFormat>
+class LineRenderer
+{
+public:
+    typedef agg::renderer_base<PixelFormat> BaseRenderer;
+    typedef agg::renderer_scanline_aa_solid<BaseRenderer> Renderer;
+    typedef agg::rasterizer_scanline_aa<> Rasterizer;
+    typedef agg::conv_stroke<agg::path_storage> Stroke;
+
+    LineRenderer(const ClipBounds& clipbounds, BaseRenderer& baseRenderer)
+        :
+        _clipbounds(clipbounds),
+        _renderer(baseRenderer)
+    {}
+
+    template<typename ScanLine>
+    void render(ScanLine& sl, Stroke& stroke, const rgba& color)
+    {
+        for (ClipBounds::const_iterator i = _clipbounds.begin(),
+                e = _clipbounds.end(); i != e; ++i) {
+
+            const ClipBounds::value_type& bounds = *i;
+              
+            applyClipBox<Rasterizer> (_ras, bounds);
+
+            // The vectorial pipeline
+            _ras.add_path(stroke);
+
+            // Set the color and render the scanlines
+            _renderer.color(agg::rgba8_pre(color.m_r, color.m_g, 
+                        color.m_b, color.m_a));
+
+            agg::render_scanlines(_ras, sl, _renderer);
+
+        }
+    }
+
+private:
+
+    const ClipBounds& _clipbounds;
+    Rasterizer _ras;
+    Renderer _renderer;
+
+};
+
+/// Class for rendering video frames.
+//
+/// Templated functions are used to allow using different types,
+/// particularly for high and low quality rendering. 
+//
+/// At present, this is bound to the renderer's ClipBounds. In future it
+/// may be useful to pass BlendMode, Cxform, and custom clipbounds as well
+/// as a caller-provided rendering buffer. This also applies to the 
+/// rest of the renderer API.
+//
+/// @param SourceFormat     The format of the video frame to be rendered
+/// @param PixelFormat      The format to render to.
+template <typename PixelFormat, typename SourceFormat = agg::pixfmt_rgb24_pre>
+class VideoRenderer
+{
+
+public:
+
+    /// Fixed types for video frame rendering.
+
+    /// Render the pixels using this renderer
+    typedef typename agg::renderer_base<PixelFormat> Renderer;
+    typedef agg::span_interpolator_linear<> Interpolator;
+    typedef agg::span_allocator<agg::rgba8> SpanAllocator;
+    typedef agg::rasterizer_scanline_aa<> Rasterizer;
+    
+    // cloning image accessor is used to avoid disturbing pixels at
+    // the edges for rotated video. 
+    typedef agg::image_accessor_clone<SourceFormat> Accessor;
+
+    /// Types used for different quality.
+    //
+    /// This (affects scaling) is only presently used when smoothing is
+    /// requested in high quality.
+    typedef agg::span_image_filter_rgb_nn<Accessor, Interpolator>
+        LowQualityFilter;
+
+    typedef agg::span_image_filter_rgb_bilinear<Accessor, Interpolator>
+        HighQualityFilter;
+
+    typedef agg::trans_affine Matrix;
+
+    VideoRenderer(const ClipBounds& clipbounds, GnashImage* frame,
+            Matrix& mat, Quality quality)
+        :
+        _buf(frame->data(), frame->width(), frame->height(),
+                frame->pitch()),
+        _pixf(_buf),
+        _accessor(_pixf),
+        _interpolator(mat),
+        _clipbounds(clipbounds),
+        _quality(quality)
+    {}
+
+    /// Change the rendering quality required.
+    void setQuality(Quality quality)
+    {
+        _quality = quality;
+    }
+
+    /// Set whether smoothing is requested
+    void smooth(bool b)
+    {
+        _smoothing = b;
+    }
+
+    void render(agg::path_storage& path, Renderer& rbase,
+            const AlphaMasks& masks)
+    {
+        switch (_quality)
+        {
+            case QUALITY_BEST:
+            case QUALITY_HIGH:
+                if (_smoothing) {
+                    renderFrame<HighQualityFilter>(path, rbase, masks);
+                }
+                else renderFrame<LowQualityFilter>(path, rbase, masks);
+                break;
+            case QUALITY_MEDIUM:
+            case QUALITY_LOW:
+                // FIXME: Should this be still lower quality?
+                renderFrame<LowQualityFilter>(path, rbase, masks);
+                break;
+        }
+    }
+    
+private:
+
+    /// Render a frame with or without alpha masks active.
+    template<typename SpanGenerator>
+    void renderFrame(agg::path_storage& path, Renderer& rbase,
+            const AlphaMasks& masks)
+    {
+        SpanGenerator sg(_accessor, _interpolator);
+        if (masks.empty()) {
+            // No mask active
+            agg::scanline_u8 sl;
+            renderScanlines(path, rbase, sl, sg);
+        }
+        else {
+            // Untested.
+            typedef agg::scanline_u8_am<agg::alpha_mask_gray8> Scanline;
+            Scanline sl(masks.back()->getMask());
+            renderScanlines(path, rbase, sl, sg);
+        }
+    } 
+
+    template<typename Scanline, typename SpanGenerator>
+    void renderScanlines(agg::path_storage& path, Renderer& rbase,
+            Scanline& sl, SpanGenerator& sg)
+    {
+        Rasterizer _ras;
+        for (ClipBounds::const_iterator i = _clipbounds.begin(),
+            e = _clipbounds.end(); i != e; ++i)
+        {
+            const ClipBounds::value_type& cb = *i;
+            applyClipBox<Rasterizer> (_ras, cb);
+
+            _ras.add_path(path);
+
+            agg::render_scanlines_aa(_ras, sl, rbase, _sa, sg);
+        }
+    }
+    
+    // rendering buffer is used to access the frame pixels here        
+    agg::rendering_buffer _buf;
+
+    SourceFormat _pixf;
+    
+    Accessor _accessor;
+         
+    Interpolator _interpolator;
+    
+    SpanAllocator _sa;
+
+    const ClipBounds& _clipbounds;
+
+    /// Quality of renderering
+    Quality _quality;
+
+    /// Whether smoothing is required.
+    bool _smoothing;
+};    
+            
+}
 
 
 // --- RENDER HANDLER ----------------------------------------------------------
@@ -350,203 +591,89 @@ private:
 template <class PixelFormat>
 class render_handler_agg : public render_handler_agg_base
 {
-private:
-  typedef agg::renderer_base<PixelFormat> renderer_base;
   
-  typedef agg::conv_stroke< agg::conv_curve< agg::path_storage > > stroke_type;
-  
-  // TODO: Change these!!
-  unsigned char *memaddr;
-  int memsize;
-  int xres;
-  int yres;
-  int bpp;  // bits per pixel
-  // double xscale, yscale;  <-- deprecated, to be removed
-  gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
-  bool scale_set;
-  
-  
-
-
 public:
 
-  // Enable/disable antialiasing.
-  bool  m_enable_antialias;
-
-  // Output size.
-  float m_display_width;
-  float m_display_height;
-
-  void set_antialiased(bool enable) {
-    // enable=false *forces* all bitmaps to be rendered in low quality
-    m_enable_antialias = enable;
-  }
-
-  // Style state.
-  enum style_index
-  {
-    LEFT_STYLE = 0,
-    RIGHT_STYLE,
-    LINE_STYLE,
-    STYLE_COUNT
-  };
-
-
-  gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
-  // Given an image, returns a pointer to a bitmap_info class
-  // that can later be passed to fill_styleX_bitmap(), to set a
-  // bitmap fill style.
-  {    
-    return new agg_bitmap_info(im);
-  }
-
-  void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
-    const rect* bounds) {
-  
-    // NOTE: Assuming that the source image is RGB 8:8:8
-    
-    // TODO: Currently only nearest-neighbor scaling is implemented here, since
-    // it's the fastest and Flash apparently uses this method most of the time.
-    // It would be easy to add other scaling methods (bilinear, bicubic, 
-    // whatever), but we'd need some way to tell the renderer the desired
-    // quality.
-    
-    // TODO: keep heavy instances alive accross frames for performance!
-    
-    // TODO: Maybe implement specialization for 1:1 scaled videos
-    
-    if (frame->type() == GNASH_IMAGE_RGBA)
-    {
-        LOG_ONCE(log_error(_("Can't render videos with alpha")));
-        return;
+    // Given an image, returns a pointer to a bitmap_info class
+    // that can later be passed to fill_styleX_bitmap(), to set a
+    // bitmap fill style.
+    gnash::BitmapInfo* createBitmapInfo(std::auto_ptr<GnashImage> im)
+    {        
+        return new agg_bitmap_info(im);
     }
-      
-    typedef agg::pixfmt_rgb24_pre baseformat;
 
-    assert(frame->type() == GNASH_IMAGE_RGB);
+    void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
+        const rect* bounds, bool smooth)
+    {
     
-    SWFMatrix mat = stage_matrix;
-    mat.concatenate(*source_mat);
-    
-    // compute video scaling relative to video obejct size
-    double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->width();
-    double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->height();
-    
-    // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to pixel coordinates
-    // while we're at it
-    agg::trans_affine img_mtx(
-      mat.sx  / 65536.0, mat.shx / 65536.0, 
-      mat.shy / 65536.0, mat.sy / 65536.0, 
-      mat.tx, mat.ty
-    );    
-    
-    // invert SWFMatrix since this is used for the image source
-    img_mtx.invert();
-    
-    // convert TWIPS to pixels and apply video scale
-    img_mtx *= agg::trans_affine_scaling(1.0/(20.0*vscaleX), 1.0/(20.0*vscaleY));
-    
-    // span allocator is used to apply the SWFMatrix
-    agg::span_allocator<agg::rgba8> sa;
+        // NOTE: Assuming that the source image is RGB 8:8:8
+        // TODO: keep heavy instances alive accross frames for performance!
+        // TODO: Maybe implement specialization for 1:1 scaled videos
         
-    typedef agg::span_interpolator_linear<> interpolator_type;
-    interpolator_type interpolator(img_mtx);
-    
-    // cloning image accessor is used to avoid disturbing pixels at the edges
-    // for rotated video. 
-    typedef agg::image_accessor_clone<baseformat> img_source_type;
-    
-    // rendering buffer is used to access the frame pixels here        
-    agg::rendering_buffer img_buf(frame->data(), frame->width(), frame->height(),
-      frame->pitch());
-         
-    baseformat img_pixf(img_buf);
-    
-    img_source_type img_src(img_pixf);
-    
-    // renderer base for the stage buffer (not the frame image!)
-    renderer_base rbase(*m_pixf);
+        if (frame->type() == GNASH_IMAGE_RGBA) {
+                LOG_ONCE(log_error(_("Can't render videos with alpha")));
+                return;
+        }
+
+        assert(frame->type() == GNASH_IMAGE_RGB);
         
-    // nearest neighbor method for scaling
-    typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type>
-      span_gen_type;
-    span_gen_type sg(img_src, interpolator);
-      
-    typedef agg::rasterizer_scanline_aa<> ras_type;
-    ras_type ras;
-    
-    // make a path for the video outline
-    point a, b, c, d;
-    mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
-    mat.transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
-    mat.transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
-    mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
-    
-    agg::path_storage path;
-    path.move_to(a.x, a.y);
-    path.line_to(b.x, b.y);
-    path.line_to(c.x, c.y);
-    path.line_to(d.x, d.y);
-    path.line_to(a.x, a.y);
+        SWFMatrix mat = stage_matrix;
+        mat.concatenate(*source_mat);
+        
+        // compute video scaling relative to video object size
+        double vscaleX = bounds->width() /
+            static_cast<double>(frame->width());
+        
+        double vscaleY = bounds->height() /
+            static_cast<double>(frame->height());
+        
+        // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
+        // pixel coordinates while we're at it
+        agg::trans_affine img_mtx(mat.sx / 65536.0, mat.shx / 65536.0, 
+            mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);        
+        
+        // invert SWFMatrix since this is used for the image source
+        img_mtx.invert();
+        
+        // Apply video scale
+        img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
+        
+        // make a path for the video outline
+        point a, b, c, d;
+        mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
+        mat.transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
+        mat.transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
+        mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
+        
+        agg::path_storage path;
+        path.move_to(a.x, a.y);
+        path.line_to(b.x, b.y);
+        path.line_to(c.x, c.y);
+        path.line_to(d.x, d.y);
+        path.line_to(a.x, a.y);
 
-    if (m_alpha_mask.empty()) {
-    
-      // No mask active
+        // renderer base for the stage buffer (not the frame image!)
+        renderer_base& rbase = *m_rbase;
+        
+        // TODO: keep this alive and only update image / matrix? I've no
+        // idea how much reallocation that would save.
+        VideoRenderer<PixelFormat> vr(_clipbounds, frame, img_mtx, _quality);
 
-      agg::scanline_u8 sl;
-  
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {    
-      
-        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
-        apply_clip_box<ras_type> (ras, cbounds);
-  
-        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
-        // path), so there should be no problem with multiple clipbounds.      
-        ras.add_path(path);     
-           
-        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
-      }
-      
-    } else {
-    
-      // Mask is active!
-      
-      // **** UNTESTED!!! ****
-      
-      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
-      scanline_type sl(m_alpha_mask.back()->get_amask());
-  
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {    
-      
-        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
-        apply_clip_box<ras_type> (ras, cbounds);
-  
-        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
-        // path), so there should be no problem with multiple clipbounds.      
-        ras.add_path(path);     
-           
-        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
-      }
-      
-    
-    } // if alpha mask
-    
-  } // drawVideoFrame
-  
+        vr.smooth(smooth);
+
+        // If smoothing is requested and _quality is set to HIGH or BEST,
+        // use high-quality interpolation.
+        vr.render(path, rbase, _alphaMasks);
+                
+    } 
 
   // Constructor
   render_handler_agg(int bits_per_pixel)
       :
-      // Initialization list
-      memaddr(NULL),
-      memsize(0),
       xres(1),
       yres(1),
       bpp(bits_per_pixel),
-      /*xscale(1.0/20.0),
-      yscale(1.0/20.0),*/
       scale_set(false),
-      m_enable_antialias(true),
       m_display_width(0.0),
       m_display_height(0.0),
       m_drawing_mask(false)
@@ -559,11 +686,6 @@ public:
     set_scale(1.0f, 1.0f);
   }   
 
-  // Destructor
-  ~render_handler_agg()
-  {
-  }
-
   /// Initializes the rendering buffer. The memory pointed by "mem" is not
   /// owned by the renderer and init_buffer() may be called multiple times
   /// when the buffer size changes, for example. However, bits_per_pixel must
@@ -575,241 +697,202 @@ public:
         assert(x > 0);
         assert(y > 0);
 
-    memaddr = mem;
-    memsize = size;
     xres    = x;
     yres    = y;
     
-    m_rbuf.attach(memaddr, xres, yres, rowstride);
+    m_rbuf.attach(mem, xres, yres, rowstride);
 
-    // allocate pixel format accessor   
+    // allocate pixel format accessor and renderer_base
     m_pixf.reset(new PixelFormat(m_rbuf));
-    //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
+    m_rbase.reset(new renderer_base(*m_pixf));  
     
     // by default allow drawing everywhere
     set_invalidated_region_world();
     
-    log_debug(_("Initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes"), 
+    log_debug(_("Initialized AGG buffer <%p>, %d bytes, %dx%d, "
+                "rowsize is %d bytes"), 
       (void*)mem, size, x, y, rowstride);
   }
   
 
   void begin_display(
-  const gnash::rgba& background_color,
-  int /*viewport_x0*/, int /*viewport_y0*/,
-  int /*viewport_width*/, int /*viewport_height*/,
-  float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
-  // Set up to render a full frame from a movie and fills the
-  // background.  Sets up necessary transforms, to scale the
-  // movie to fit within the given dimensions.  Call
-  // end_display() when you're done.
-  //
-  // The rectangle (viewport_x0, viewport_y0, viewport_x0 +
-  // viewport_width, viewport_y0 + viewport_height) defines the
-  // window coordinates taken up by the movie.
-  //
-  // The rectangle (x0, y0, x1, y1) defines the pixel
-  // coordinates of the movie that correspond to the viewport
-  // bounds.
+      const gnash::rgba& bg,
+      int /*viewport_x0*/, int /*viewport_y0*/,
+      int /*viewport_width*/, int /*viewport_height*/,
+      float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
   {
     assert(m_pixf.get());
     
     assert(scale_set);
+
     // clear the stage using the background color
-    for (unsigned int i=0; i<_clipbounds.size(); ++i) 
-      clear_framebuffer(_clipbounds[i], agg::rgba8_pre(background_color.m_r,
-        background_color.m_g, background_color.m_b,
-        background_color.m_a));        
+    if ( ! _clipbounds.empty() )
+    {
+        const agg::rgba8& col = agg::rgba8_pre(bg.m_r, bg.m_g, bg.m_b, bg.m_a);
+        for (ClipBounds::const_iterator i = _clipbounds.begin(),
+                e = _clipbounds.end(); i!= e; ++i) 
+        {
+            clear_framebuffer(*i, col);
+        }
+    }
     
     // reset status variables
     m_drawing_mask = false;
   }
   
-  /// renderer_base.clear() does no clipping which clears the whole framebuffer
-  /// even if we update just a small portion of the screen. The result would be
-  /// still correct, but slower. 
-  /// This function clears only a certain portion of the screen, while /not/ 
-  /// being notably slower for a fullscreen clear. 
-  void clear_framebuffer(const geometry::Range2d<int>& region,
-        agg::rgba8 color)
-  {
-      assert(region.isFinite());
-      
-      // add 1 to width since we have still to draw a pixel when 
-      // getMinX==getMaxX     
-      unsigned int width=region.width()+1;
-      
-      // <Udo> Note: We don't need to check for width/height anymore because
-      // Range2d will take care that getMinX <= getMaxX and it's okay when
-      // region.width()==0 because in that case getMinX==getMaxX and we have
-      // still a pixel to draw. 
+    // renderer_base.clear() does no clipping which clears the
+    // whole framebuffer even if we update just a small portion
+    // of the screen. The result would be still correct, but slower. 
+    // This function clears only a certain portion of the screen, while /not/ 
+    // being notably slower for a fullscreen clear. 
+    void clear_framebuffer(const geometry::Range2d<int>& region,
+        const agg::rgba8& color)
+    {
+        assert(region.isFinite());
 
-      unsigned int left=region.getMinX();
+        // add 1 to width since we have still to draw a pixel when 
+        // getMinX==getMaxX     
+        unsigned int width=region.width()+1;
 
-      for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
-        y<=maxy; ++y) 
-      {
-        m_pixf->copy_hline(left, y, width, color);
-      }
-  }
+        // <Udo> Note: We don't need to check for width/height anymore because
+        // Range2d will take care that getMinX <= getMaxX and it's okay when
+        // region.width()==0 because in that case getMinX==getMaxX and we have
+        // still a pixel to draw. 
 
-  void  end_display()
-  // Clean up after rendering a frame.  Client program is still
-  // responsible for calling glSwapBuffers() or whatever.
-  {
-  
-    if (m_drawing_mask) 
-      log_debug(_("Warning: rendering ended while drawing a mask"));
-      
-    while (! m_alpha_mask.empty()) {
-      log_debug(_("Warning: rendering ended while masks were still active"));
-      disable_mask();      
-    }
-  
-    // nothing to do
-  }
+        const unsigned int left=region.getMinX();
 
-  template <class ras_type>
-  void apply_clip_box(ras_type& ras, 
-    const geometry::Range2d<int>& bounds)
-  {
-    assert(bounds.isFinite());
-    ras.clip_box(
-      (double)bounds.getMinX(),
-      (double)bounds.getMinY(),
-      (double)bounds.getMaxX()+1,
-      (double)bounds.getMaxY()+1);  
-  }
-
-
-  
-  void  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
-                  const SWFMatrix& line_mat)
-  // Draw the line strip formed by the sequence of points.
-  {
-    assert(m_pixf.get());
-
-    SWFMatrix mat = stage_matrix;
-    mat.concatenate(line_mat);    
-
-    if ( _clipbounds.empty() ) return;
-
-    point pnt;
-    
-    renderer_base rbase(*m_pixf);
-    
-    typedef agg::rasterizer_scanline_aa<> ras_type;
-
-    ras_type ras;    
-    agg::renderer_scanline_aa_solid<
-      agg::renderer_base<PixelFormat> > ren_sl(rbase);
-      
-    // -- create path --
-    agg::path_storage path;
-    agg::conv_stroke<agg::path_storage> stroke(path);
-    stroke.width(1);
-    stroke.line_cap(agg::round_cap);
-    stroke.line_join(agg::round_join);
-    path.remove_all(); // Not obligatory in this case
-
-    const boost::int16_t *vertex = coords;
-    
-    mat.transform(&pnt, point(vertex[0], vertex[1]));
-    path.move_to(pnt.x, pnt.y);
-
-    for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
-      mat.transform(&pnt, point(vertex[0], vertex[1]));
-      path.line_to(pnt.x, pnt.y);
-    }
-    
-    // -- render --
-    
-    if (m_alpha_mask.empty()) {
-    
-      // No mask active
-      
-      agg::scanline_p8 sl;      
-      
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
-      
-        const geometry::Range2d<int>& bounds = _clipbounds[cno];
-              
-        apply_clip_box<ras_type> (ras, bounds);
-        
-        // The vectorial pipeline
-        ras.add_path(stroke);
-    
-        // Set the color and render the scanlines
-        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-        
-        agg::render_scanlines(ras, sl, ren_sl);     
-        
-      }
-      
-    } else {
-    
-      // Mask is active!
-
-      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type;
-      
-      sl_type sl(m_alpha_mask.back()->get_amask());      
-      
-      for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
-      
-        const geometry::Range2d<int>& bounds = _clipbounds[cno];
-              
-        apply_clip_box<ras_type> (ras, bounds);
-        
-        // The vectorial pipeline
-        ras.add_path(stroke);
-    
-        // Set the color and render the scanlines
-        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-        
-        agg::render_scanlines(ras, sl, ren_sl);     
-        
-      }
-    
+        for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
+            y<=maxy; ++y) {
+              m_pixf->copy_hline(left, y, width, color);
+        }
     }
 
-  } // draw_line_strip
+    // Clean up after rendering a frame. 
+    void end_display()
+    {
+        if (m_drawing_mask) {
+            log_debug(_("Warning: rendering ended while drawing a mask"));
+        }
+
+        while (! _alphaMasks.empty()) {
+            log_debug(_("Warning: rendering ended while masks "
+                        "were still active"));
+            disable_mask();      
+        }
+    }
+
+  
+
+    // Draw the line strip formed by the sequence of points.
+    void drawLine(const std::vector<point>& coords, const rgba& color,
+            const SWFMatrix& line_mat)
+    {
+
+        assert(m_pixf.get());
+        
+        if (_clipbounds.empty()) return;
+        if (coords.empty()) return;
+
+        SWFMatrix mat = stage_matrix;
+        mat.concatenate(line_mat);    
+
+        LineRenderer<PixelFormat> lr(_clipbounds, *m_rbase);
+
+        // -- create path --
+        agg::path_storage path;
+
+        typename LineRenderer<PixelFormat>::Stroke stroke(path);
+        stroke.width(1);
+        stroke.line_cap(agg::round_cap);
+        stroke.line_join(agg::round_join);
+
+        typedef std::vector<point> Points;
+        
+        // We've asserted that it has at least one element.
+        Points::const_iterator i = coords.begin();
+
+        point pnt;
+
+        mat.transform(&pnt, *i);
+        path.move_to(pnt.x, pnt.y);
+
+        ++i;
+
+        for (const Points::const_iterator e = coords.end(); i != e; ++i)
+        {
+            mat.transform(&pnt, *i);
+            path.line_to(pnt.x, pnt.y);
+        }
+
+        if (_alphaMasks.empty()) {
+            // No mask active
+            agg::scanline_p8 sl;      
+            lr.render(sl, stroke, color);
+        }
+        else {
+            // Mask is active!
+            typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type;
+            sl_type sl(_alphaMasks.back()->getMask());      
+            lr.render(sl, stroke, color);
+        }
+
+    } 
 
 
-  void begin_submit_mask()
-  {
-    // Set flag so that rendering of shapes is simplified (only solid fill) 
-    m_drawing_mask = true;
-    
-    agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
-    
-    for (unsigned int cno=0; cno<_clipbounds.size(); ++cno)  
-      new_mask->clear(_clipbounds[cno]);
-    
-    m_alpha_mask.push_back(new_mask);
-    
-  }
+    void begin_submit_mask()
+    {
+        // Set flag so that rendering of shapes is simplified (only solid fill) 
+        m_drawing_mask = true;
 
-  void end_submit_mask()
-  {
-    m_drawing_mask = false;
-  }
+        AlphaMask* new_mask = new AlphaMask(xres, yres);
 
-  void disable_mask()
-  {
-      assert( ! m_alpha_mask.empty() );
-      delete m_alpha_mask.back();
-      m_alpha_mask.pop_back();
-  }
+        for (ClipBounds::const_iterator i = _clipbounds.begin(), 
+                e = _clipbounds.end(); i != e; ++i) {
+            new_mask->clear(*i);
+        }
+
+        _alphaMasks.push_back(new_mask);
+    }
+
+    void end_submit_mask()
+    {
+        m_drawing_mask = false;
+    }
+
+    void disable_mask()
+    {
+        assert( ! _alphaMasks.empty() );
+        delete _alphaMasks.back();
+        _alphaMasks.pop_back();
+    }
   
 
   void draw_glyph(shape_character_def *def,
       const SWFMatrix& mat, const rgba& color) 
   {
-    std::vector<path> paths;
+    
+    // select relevant clipping bounds
+    if (def->get_bound().is_null()) {
+        return;
+        // Why would we want to do this?
+        //select_all_clipbounds();  
+    } 
+    else select_clipbounds(def, mat);
+    
+    if (_clipbounds_selected.empty()) return; 
+      
+    GnashPaths paths;
     apply_matrix_to_path(def->get_paths(), paths, mat);
+
+    // If it's a mask, we don't need the rest.
+    if (m_drawing_mask) {
+      draw_mask_shape(paths, false);
+      return;
+    }
+
     // convert gnash paths to agg paths.
-    std::vector<agg::path_storage> agg_paths;    
-    build_agg_paths(agg_paths, paths);
+    AggPaths agg_paths;    
+    buildPaths(agg_paths, paths);
  
     // make sure m_single_fill_styles contains the required color 
     need_single_fill_style(color);
@@ -818,20 +901,7 @@ public:
     agg_style_handler sh;
     build_agg_styles(sh, m_single_fill_styles, mat, m_neutral_cxform);
     
-    // select relevant clipping bounds
-    if (def->get_bound().is_null())   // can happen (spaces? to be investigated..)
-      select_all_clipbounds();
-    else
-      select_clipbounds(def, mat);
-    
-    
-    if (_clipbounds_selected.empty()) return; // nothing to draw
-      
-    // draw the shape
-    if (m_drawing_mask)
-      draw_mask_shape(paths, false);
-    else
-      draw_shape(-1, paths, agg_paths, sh, false);
+    draw_shape(-1, paths, agg_paths, sh, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
     
@@ -854,11 +924,11 @@ public:
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
     
-    rect ch_bounds = def->get_bound();
+    const rect& ch_bounds = def->get_bound();
 
     if (ch_bounds.is_null()) {
-      log_debug(_("Warning: select_clipbounds encountered a character definition "
-        "with null bounds"));
+      log_debug(_("Warning: select_clipbounds encountered a character "
+                  "definition with null bounds"));
       return;
     }   
 
@@ -889,154 +959,118 @@ public:
   
   void select_all_clipbounds() {
   
-    const unsigned int count = _clipbounds.size();
-
-    if (_clipbounds_selected.size() == count)
-      return; // already all selected
+    if (_clipbounds_selected.size() == _clipbounds.size()) return; 
   
     _clipbounds_selected.clear();
-    _clipbounds_selected.resize(count);
+    _clipbounds_selected.reserve(_clipbounds.size());
     
-    for (unsigned int cno=0; cno<count; ++cno) 
-      _clipbounds_selected[cno] = &_clipbounds[cno];
+    for (ClipBounds::const_iterator i = _clipbounds.begin(),
+            e = _clipbounds.end(); i != e; ++i)
+    {
+      _clipbounds_selected.push_back(&(*i));
+    }
   }
 
-  void draw_shape_character(shape_character_def *def, 
-    const SWFMatrix& mat,
-    const cxform& cx,
-    const std::vector<fill_style>& fill_styles,
-    const std::vector<line_style>& line_styles) {
-    
-    bool have_shape, have_outline;
-
-    analyze_paths(def->get_paths(), have_shape, have_outline);
-
-    if (!have_shape && !have_outline)
+    void draw_shape_character(shape_character_def *def, 
+    const SWFMatrix& mat, const cxform& cx)
     {
-        return; // invisible character
-    }    
+    
+        const std::vector<fill_style>& fill_styles = def->get_fill_styles();
+        const std::vector<line_style>& line_styles = def->get_line_styles();
+        bool have_shape, have_outline;
 
-    std::vector< path > paths;
-    std::vector< agg::path_storage > agg_paths;  
-    std::vector< agg::path_storage > agg_paths_rounded;  
+        analyzePaths(def->get_paths(), have_shape, have_outline);
 
-    apply_matrix_to_path(def->get_paths(), paths, mat);
+        if (!have_shape && !have_outline) {
+            // Early return for invisible character.
+            return; 
+        }    
 
-    // Flash only aligns outlines. Probably this is done at rendering
-    // level.
-    if (have_outline)
-      build_agg_paths_rounded(agg_paths_rounded, paths, line_styles);   
-    if (have_shape)
-      build_agg_paths(agg_paths, paths);
-    
-    if (m_drawing_mask) {
-      
-      // Shape is drawn inside a mask, skip sub-shapes handling and outlines
-      draw_mask_shape(paths, false);   // never use even-odd for masks
-    
-    } else {
-    
-      // select ranges
-      select_clipbounds(def, mat);
-      
-      if (_clipbounds_selected.empty()) {
-        log_debug(_("Warning: AGG renderer skipping a whole character"));
-        return; // nothing to draw!?
-      }
-    
-      // prepare fill styles
-      agg_style_handler sh;
-      if (have_shape)
-        build_agg_styles(sh, fill_styles, mat, cx);
-      
-      /*
-      // prepare strokes
-      std::vector<stroke_type*> strokes;
-      build_agg_strokes(strokes, agg_paths, paths, line_styles, mat);
-      */
-      
-      // We need to separate sub-shapes during rendering. 
-      const unsigned int subshape_count = count_sub_shapes(paths);
-     
-      for (unsigned int subshape=0; subshape<subshape_count; ++subshape)
-      {
-        if (have_shape)
-        {
-          draw_shape(subshape, paths, agg_paths, sh, true);    
+        GnashPaths paths;
+        apply_matrix_to_path(def->get_paths(), paths, mat);
+
+        // Masks apparently do not use agg_paths, so return
+        // early
+        if (m_drawing_mask) {
+
+            // Shape is drawn inside a mask, skip sub-shapes handling and
+            // outlines
+            draw_mask_shape(paths, false); 
+            return;
         }
-        if (have_outline)      
-        {
-          draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
+
+        AggPaths agg_paths;  
+        AggPaths agg_paths_rounded;  
+
+        // Flash only aligns outlines. Probably this is done at rendering
+        // level.
+        if (have_outline) {
+            buildPaths_rounded(agg_paths_rounded, paths, line_styles);   
         }
-      }
-      
-    } // if not drawing mask
-    
-    // Clear selected clipbounds to ease debugging 
-    _clipbounds_selected.clear();
-    
-  } // draw_shape_character
+
+        if (have_shape) {
+            buildPaths(agg_paths, paths);
+        }
+        
+        // select ranges
+        select_clipbounds(def, mat);
+
+        if (_clipbounds_selected.empty()) {
+            log_debug(_("Warning: AGG renderer skipping a whole character"));
+            return; 
+        }
+
+        // prepare fill styles
+        agg_style_handler sh;
+        if (have_shape) build_agg_styles(sh, fill_styles, mat, cx);
+
+        // We need to separate sub-shapes during rendering. 
+        const unsigned int subshape_count = count_sub_shapes(paths);
+
+        for (unsigned int subshape=0; subshape<subshape_count; ++subshape)
+        {
+            if (have_shape) {
+                draw_shape(subshape, paths, agg_paths, sh, true);    
+            }
+            if (have_outline)      {
+                draw_outlines(subshape, paths, agg_paths_rounded,
+                        line_styles, cx, mat);
+            }
+        }
+
+        // Clear selected clipbounds to ease debugging 
+        _clipbounds_selected.clear();
+
+    } // draw_shape_character
   
   
-  /// Analyzes a set of paths to detect real presence of fills and/or outlines
-  /// TODO: This should be something the character tells us and should be 
-  /// cached. 
-  void analyze_paths(const std::vector<path> &paths, bool& have_shape,
-    bool& have_outline) {
-    
-    have_shape=false;
-    have_outline=false;
-    
-    const int pcount = paths.size();
-    
-    for (int pno=0; pno<pcount; ++pno) {
-    
-      const path &the_path = paths[pno];
-    
-      if ((the_path.m_fill0>0) || (the_path.m_fill1>0)) {
-        have_shape=true;
-        if (have_outline) return; // have both
-      }
-    
-      if (the_path.m_line>0) {
-        have_outline=true;
-        if (have_shape) return; // have both
-      }
-    
-    }
-    
-  }
-
-/// Takes a path and translates it using the given SWFMatrix. The new path
-/// is stored in paths_out. Both paths_in and paths_out are expected to
-/// be in TWIPS.
-void apply_matrix_to_path(const std::vector<path> &paths_in, 
-      std::vector<path>& paths_out, const SWFMatrix &source_mat) 
-{
-
-    SWFMatrix mat;
-    // make sure paths_out is also in TWIPS to keep accuracy.
-    mat.concatenate_scale(20.0,  20.0);
-    mat.concatenate(stage_matrix);
-    mat.concatenate(source_mat);
-
-    size_t pcnt = paths_in.size();
-    paths_out.resize(pcnt);
-    typedef std::vector<path> PathVect;
-    for (PathVect::const_iterator i=paths_in.begin(), e=paths_in.end(); i!=e; ++i)
+    /// Takes a path and translates it using the given SWFMatrix. The new path
+    /// is stored in paths_out. Both paths_in and paths_out are expected to
+    /// be in TWIPS.
+    void apply_matrix_to_path(const GnashPaths &paths_in, 
+          GnashPaths& paths_out, const SWFMatrix &source_mat) 
     {
-        path  p = *i;
-        p.transform(mat);
-        paths_out.push_back( p );
-    }
-} // apply_matrix
+
+        SWFMatrix mat;
+        // make sure paths_out is also in TWIPS to keep accuracy.
+        mat.concatenate_scale(20.0,  20.0);
+        mat.concatenate(stage_matrix);
+        mat.concatenate(source_mat);
+
+        // Copy paths for in-place transform
+        paths_out = paths_in;
+
+        /// Transform all the paths using the matrix.
+        std::for_each(paths_out.begin(), paths_out.end(), 
+                boost::bind(&path::transform, _1, mat));
+    } 
 
 
   /// A shape can have sub-shapes. This can happen when there are multiple
   /// layers of the same frame count. Flash combines them to one single shape.
   /// The problem with sub-shapes is, that outlines can be hidden by other
   /// layers so they must be rendered separately. 
-  unsigned int count_sub_shapes(const std::vector<path> &path_in)
+  unsigned int count_sub_shapes(const GnashPaths &path_in)
   {
     unsigned int sscount=1;
     const size_t pcnt = path_in.size();
@@ -1051,45 +1085,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     return sscount;
   }
 
-  /// Transposes Gnash paths to AGG paths, which can be used for both outlines
-  /// and shapes. Subshapes are ignored (ie. all paths are converted). Converts 
-  /// TWIPS to pixels on the fly.
-  void build_agg_paths(std::vector<agg::path_storage>& dest, const std::vector<path>& paths) 
-  {
-    //const double subpixel_offset = 0.5; // unused, should be ?
-    size_t pcnt = paths.size();
-    dest.resize(pcnt);
-    
-    for (size_t pno=0; pno<pcnt; ++pno)
-    {
-        const path& path_in_sub = paths[pno]; 
-        agg::path_storage& new_path = dest[pno];
-
-        new_path.move_to(TWIPS_TO_SHIFTED_PIXELS(path_in_sub.ap.x), 
-                          TWIPS_TO_SHIFTED_PIXELS(path_in_sub.ap.y));
-
-        const size_t ecnt = path_in_sub.m_edges.size();
-        for (size_t eno=0; eno<ecnt; ++eno)
-        {
-            const edge& this_edge = path_in_sub.m_edges[eno];             
-            if (this_edge.is_straight())
-            {
-                new_path.line_to(TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
-                                  TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));
-            }
-            else
-            {
-                new_path.curve3(TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.x), 
-                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.cp.y),
-                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.x), 
-                                 TWIPS_TO_SHIFTED_PIXELS(this_edge.ap.y));       
-            }
-        }// end of for    
-    } // end of for  
-    
-  } //build_agg_paths
-
-  // Version of build_agg_paths that uses rounded coordinates (pixel hinting)
+  // Version of buildPaths that uses rounded coordinates (pixel hinting)
   // for line styles that want it.  
   // This is used for outlines which are aligned to the pixel grid to avoid
   // anti-aliasing problems (a perfect horizontal line being drawn over two
@@ -1101,14 +1097,14 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   // Also, single segments of a path may be aligned or not depending on 
   // the segment properties (this matches MM player behaviour)
   //
-  // This function - in contrast to build_agg_paths() - also checks noClose 
+  // This function - in contrast to buildPaths() - also checks noClose 
   // flag and automatically closes polygons.
   //
   // TODO: Flash never aligns lines that are wider than 1 pixel on *screen*,
   // but we currently don't check the width.  
-  void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
-    const std::vector< path >& paths, 
-    const std::vector<line_style>& line_styles) {
+  void buildPaths_rounded(AggPaths& dest, 
+    const GnashPaths& paths, const std::vector<line_style>& line_styles)
+  {
 
     const float subpixel_offset = 0.5f;
     
@@ -1145,7 +1141,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
       // avoid extra edge when doing implicit close later
       if (closed && ecount && 
-        this_path.m_edges.back().is_straight()) ecount--;      
+        this_path.m_edges.back().is_straight()) --ecount;  
       
       for (size_t eno=0; eno<ecount; ++eno) {
         
@@ -1241,7 +1237,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         new_path.close_polygon();
     
     }
-  } //build_agg_paths_rounded
+  } //buildPaths_rounded
     
   // Initializes the internal styles class for AGG renderer
   void build_agg_styles(agg_style_handler& sh, 
@@ -1255,7 +1251,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     const size_t fcount = fill_styles.size();
     for (size_t fno=0; fno<fcount; ++fno) {
     
-      bool smooth=false;
+      bool smooth = false;
       int fill_type = fill_styles[fno].get_type();
       
       switch (fill_type) {
@@ -1301,7 +1297,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-        smooth=true;  // continue with next case!
+            smooth= true;  // continue with next case!
         
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
@@ -1315,8 +1311,9 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
           sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
-            (fill_type==SWF::FILL_TILED_BITMAP) || (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && m_enable_antialias);
+            (fill_type==SWF::FILL_TILED_BITMAP) ||
+            (fill_type==SWF::FILL_TILED_BITMAP_HARD),
+            smooth && _quality >= QUALITY_HIGH);
           break;
         } 
 
@@ -1325,8 +1322,10 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         {            
           rgba color = cx.transform(fill_styles[fno].get_color());
 
-          // add the color to our self-made style handler (basically just a list)
-          sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+          // add the color to our self-made style handler (basically
+          // just a list)
+          sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b,
+                      color.m_a));
         } 
         
       } // switch
@@ -1351,11 +1350,11 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   /// @param subshape_id
   ///    Defines which subshape to draw. -1 means all subshapes.
   ///
-  void draw_shape(int subshape_id, const std::vector<path> &paths,
-    const std::vector<agg::path_storage>& agg_paths,  
-    agg_style_handler& sh, int even_odd) {
+  void draw_shape(int subshape_id, const GnashPaths &paths,
+    const AggPaths& agg_paths,  
+    agg_style_handler& sh, bool even_odd) {
     
-    if (m_alpha_mask.empty()) {
+    if (_alphaMasks.empty()) {
     
       // No mask active, use normal scanline renderer
       
@@ -1372,7 +1371,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       
-      scanline_type sl(m_alpha_mask.back()->get_amask());
+      scanline_type sl(_alphaMasks.back()->getMask());
       
       draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
         sh, even_odd, sl);
@@ -1385,9 +1384,9 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   /// one with and one without an alpha mask. This makes drawing without masks
   /// much faster.  
   template <class scanline_type>
-  void draw_shape_impl(int subshape_id, const std::vector<path> &paths,
-    const std::vector<agg::path_storage>& agg_paths,
-    agg_style_handler& sh, int even_odd, scanline_type& sl) {
+  void draw_shape_impl(int subshape_id, const GnashPaths &paths,
+    const AggPaths& agg_paths,
+    agg_style_handler& sh, bool even_odd, scanline_type& sl) {
     /*
     Fortunately, AGG provides a rasterizer that fits perfectly to the flash
     data model. So we just have to feed AGG with all data and we're done. :-)
@@ -1403,10 +1402,12 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
     if ( _clipbounds.empty() ) return;
 
-    // AGG stuff
+    // Target renderer
+    renderer_base& rbase = *m_rbase;
+
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
-    renderer_base rbase(*m_pixf);
     ras_type rasc;  // flash-like renderer
+
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
     agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
@@ -1423,7 +1424,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
       const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
       
-      apply_clip_box<ras_type> (rasc, *bounds);
+      applyClipBox<ras_type> (rasc, *bounds);
       
       int current_subshape=0;
         
@@ -1435,12 +1436,12 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         const path &this_path_gnash = paths[pno];
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);
-        agg::conv_curve< agg::path_storage > curve(this_path_agg);        
         
-        if (this_path_gnash.m_new_shape)
-          ++current_subshape;
+        agg::conv_curve<agg::path_storage> curve(this_path_agg);        
+        
+        if (this_path_gnash.m_new_shape) ++current_subshape;
           
-        if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+        if ((subshape_id >= 0) && (current_subshape!=subshape_id)) {
           // Skip this path as it is not part of the requested sub-shape.
           continue;
         }
@@ -1461,8 +1462,6 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         rasc.add_path(curve);
       
       }
-      //log_debug("%d edges\n", edge_count);
-      
               
       agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
     }
@@ -1474,9 +1473,10 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
   // very similar to draw_shape but used for generating masks. There are no
   // fill styles nor subshapes and such. Just render plain solid shapes.
-  void draw_mask_shape(const std::vector<path> &paths, int even_odd) {
+  void draw_mask_shape(const GnashPaths &paths, bool even_odd)
+  {
 
-    unsigned int mask_count = m_alpha_mask.size();
+    const AlphaMasks::size_type mask_count = _alphaMasks.size();
     
     if (mask_count < 2) {
     
@@ -1486,18 +1486,19 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
       
       scanline_type sl;
       
-      draw_mask_shape_impl<scanline_type> (paths, even_odd, sl);
+      draw_mask_shape_impl(paths, even_odd, sl);
         
-    } else {
+    }
+    else {
     
       // Woohoo! We're drawing a nested mask! Use the previous mask while 
       // drawing the new one, the result will be the intersection.
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       
-      scanline_type sl(m_alpha_mask[mask_count-2]->get_amask());
+      scanline_type sl(_alphaMasks[mask_count-2]->getMask());
       
-      draw_mask_shape_impl<scanline_type> (paths, even_odd, sl);
+      draw_mask_shape_impl(paths, even_odd, sl);
         
     }
     
@@ -1505,13 +1506,13 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   
   
   template <class scanline_type>
-  void draw_mask_shape_impl(const std::vector<path> &paths, int even_odd,
+  void draw_mask_shape_impl(const GnashPaths &paths, bool even_odd,
     scanline_type& sl) {
     
     typedef agg::pixfmt_gray8 pixfmt;
     typedef agg::renderer_base<pixfmt> renderer_base;
     
-    assert(!m_alpha_mask.empty());
+    assert(!_alphaMasks.empty());
     
     // dummy style handler
     typedef agg_mask_style_handler sh_type;
@@ -1522,7 +1523,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     rasc_type rasc;
     
     // renderer base
-    renderer_base& rbase = m_alpha_mask.back()->get_rbase();
+    renderer_base& rbase = _alphaMasks.back()->get_rbase();
     
     // solid fills
     typedef agg::renderer_scanline_aa_solid< renderer_base > ren_sl_type;
@@ -1530,19 +1531,16 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
     // span allocator
     typedef agg::span_allocator<agg::gray8> alloc_type;
-    alloc_type alloc;   // why does gray8 not work?
+    alloc_type alloc; 
       
 
     // activate even-odd filling rule
-    if (even_odd)
-      rasc.filling_rule(agg::fill_even_odd);
-    else
-      rasc.filling_rule(agg::fill_non_zero);
+    if (even_odd) rasc.filling_rule(agg::fill_even_odd);
+    else rasc.filling_rule(agg::fill_non_zero);
       
-    
     // push paths to AGG
-    agg::path_storage path; // be carefull about this name 
-    agg::conv_curve< agg::path_storage > curve(path);
+    agg::path_storage path; 
+    agg::conv_curve<agg::path_storage> curve(path);
 
     for (size_t pno=0, pcount=paths.size(); pno < pcount; ++pno) {
 
@@ -1558,43 +1556,29 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
       path.move_to(TWIPS_TO_PIXELS(this_path.ap.x), 
                    TWIPS_TO_PIXELS(this_path.ap.y));
     
-      const unsigned int ecount = this_path.m_edges.size();
-      for (unsigned int eno=0; eno<ecount; ++eno) {
-
-        const edge &this_edge = this_path.m_edges[eno];
-
-        if (this_edge.is_straight())
-          path.line_to(TWIPS_TO_PIXELS(this_edge.ap.x), 
-                       TWIPS_TO_PIXELS(this_edge.ap.y));
-        else
-          path.curve3(TWIPS_TO_PIXELS(this_edge.cp.x), 
-                      TWIPS_TO_PIXELS(this_edge.cp.y),
-                      TWIPS_TO_PIXELS(this_edge.ap.x), 
-                      TWIPS_TO_PIXELS(this_edge.ap.y));
-        
-      } // for edge
+      // Add all edges to the path.
+      std::for_each(this_path.m_edges.begin(), this_path.m_edges.end(),
+              EdgeToPath(path));
       
       // add to rasterizer
       rasc.add_path(curve);
     
     } // for path
     
-    
     // now render that thing!
     agg::render_scanlines_compound_layered (rasc, sl, rbase, alloc, sh);
-    //agg::render_scanlines(rasc, sl, ren_sl);
         
   } // draw_mask_shape
 
 
 
   /// Just like draw_shapes() except that it draws an outline.
-  void draw_outlines(int subshape_id, const std::vector<path> &paths,
-    const std::vector<agg::path_storage>& agg_paths,
+  void draw_outlines(int subshape_id, const GnashPaths &paths,
+    const AggPaths& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx,
     const SWFMatrix& linestyle_matrix) {
     
-    if (m_alpha_mask.empty()) {
+    if (_alphaMasks.empty()) {
     
       // No mask active, use normal scanline renderer
       
@@ -1611,7 +1595,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
       
-      scanline_type sl(m_alpha_mask.back()->get_amask());
+      scanline_type sl(_alphaMasks.back()->getMask());
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths,
         line_styles, cx, linestyle_matrix, sl);
@@ -1623,15 +1607,15 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
 
   /// Template for draw_outlines(), see draw_shapes_impl().
   template <class scanline_type>
-  void draw_outlines_impl(int subshape_id, const std::vector<path> &paths,
-    const std::vector<agg::path_storage>& agg_paths,
+  void draw_outlines_impl(int subshape_id, const GnashPaths &paths,
+    const AggPaths& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx, 
     const SWFMatrix& linestyle_matrix, scanline_type& sl) {
     
     assert(m_pixf.get());
-    
-    if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
-      return;    
+
+    // Flash ignores lines in mask /definitions/ 
+    if (m_drawing_mask) return;    
     
     if ( _clipbounds.empty() ) return;
 
@@ -1640,17 +1624,16 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     // when there really are no outlines to draw...
     
     // use avg between x and y scale
-    const float stroke_scale =
-      (fabsf(linestyle_matrix.get_x_scale()) + 
-       fabsf(linestyle_matrix.get_y_scale())) 
-      / 2.0f
-      * get_stroke_scale();
+    const float stroke_scale = (std::abs(linestyle_matrix.get_x_scale()) + 
+       std::abs(linestyle_matrix.get_y_scale())) / 2.0f * get_stroke_scale();
     
     
     // AGG stuff
     typedef agg::rasterizer_scanline_aa<> ras_type; 
     ras_type ras;  // anti alias
-    renderer_base rbase(*m_pixf);
+
+    renderer_base& rbase = *m_rbase;
+
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
       
@@ -1659,7 +1642,7 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     
       const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
           
-      apply_clip_box<ras_type> (ras, *bounds);
+      applyClipBox<ras_type> (ras, *bounds);
       
       int current_subshape=0;
 
@@ -1697,9 +1680,12 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
         }
         else
         {
-          if ( (!lstyle.scaleThicknessVertically()) || (!lstyle.scaleThicknessHorizontally()) )
+          if ((!lstyle.scaleThicknessVertically()) ||
+                  (!lstyle.scaleThicknessHorizontally()))
           {
-             LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in AGG renderer (we'll scale by the scalable one)")) );
+             LOG_ONCE( log_unimpl(_("Unidirectionally scaled strokes in "
+                             "AGG renderer (we'll scale by the "
+                             "scalable one)")) );
           }
           stroke.width(std::max(1.0f, thickness*stroke_scale));
         }
@@ -1755,7 +1741,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     mat.concatenate(poly_mat);
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
-    renderer_base rbase(*m_pixf);
+    renderer_base& rbase = *m_rbase;
+
     ras_type ras;
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
@@ -1792,8 +1779,8 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     // iterate through clipping bounds
     for (unsigned int cno=0; cno<_clipbounds.size(); ++cno) {
     
-      const geometry::Range2d<int>& bounds = _clipbounds[cno];         
-      apply_clip_box<ras_type> (ras, bounds);     
+      const ClipBounds::value_type& bounds = _clipbounds[cno];         
+      applyClipBox<ras_type> (ras, bounds);     
             
       
       // fill polygon
@@ -1824,13 +1811,13 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
   void draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
     const rgba& outline, const SWFMatrix& mat, bool masked) {
     
-    if (masked && !m_alpha_mask.empty()) {
+    if (masked && !_alphaMasks.empty()) {
     
       // apply mask
       
       typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type; 
       
-      sl_type sl(m_alpha_mask.back()->get_amask());
+      sl_type sl(_alphaMasks.back()->getMask());
          
       draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl, mat);       
     
@@ -1994,36 +1981,37 @@ void apply_matrix_to_path(const std::vector<path> &paths_in,
     return bpp/8;
   }  
   
-private:  // private methods  
-
-  /// Returns the cache manager instance of the given character definition.
-  /// Allocates a new manager if necessary.
-  agg_cache_manager* get_cache_of(character_def* def) {
-  
-    if (def->m_render_cache == NULL) {
-      def->m_render_cache = new agg_cache_manager;
-    }
-    
-    return def->m_render_cache;
-  
-  }
-  
 private:  // private variables
 
-  agg::rendering_buffer m_rbuf;  
+    typedef agg::renderer_base<PixelFormat> renderer_base;
 
-  std::auto_ptr<PixelFormat> m_pixf;
-  
-  /// clipping rectangle
-  std::vector< geometry::Range2d<int> > _clipbounds;
-  std::vector< geometry::Range2d<int>* > _clipbounds_selected;
-  
-  // this flag is set while a mask is drawn
-  bool m_drawing_mask; 
-  
-  // Alpha mask stack
-  std::vector< agg_alpha_mask* > m_alpha_mask;
-};  // end class render_handler_agg
+    // renderer base
+    std::auto_ptr<renderer_base> m_rbase;
+
+    int xres;
+    int yres;
+    int bpp;  // bits per pixel
+    gnash::SWFMatrix stage_matrix;  // conversion from TWIPS to pixels
+    bool scale_set;
+
+    // Output size.
+    float m_display_width;
+    float m_display_height;
+
+    agg::rendering_buffer m_rbuf;  
+
+    std::auto_ptr<PixelFormat> m_pixf;
+
+    /// clipping rectangle
+    ClipBounds _clipbounds;
+    std::vector< geometry::Range2d<int>* > _clipbounds_selected;
+
+    // this flag is set while a mask is drawn
+    bool m_drawing_mask; 
+
+    // Alpha mask stack
+    AlphaMasks _alphaMasks;
+};
 
 
 
@@ -2108,10 +2096,10 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
 }
 
 
-DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
-  unsigned int gofs, unsigned int gsize,
-  unsigned int bofs, unsigned int bsize,
-  unsigned int bpp) {
+DSOEXPORT const char *agg_detect_pixel_format(unsigned int rofs,
+        unsigned int rsize, unsigned int gofs, unsigned int gsize,
+        unsigned int bofs, unsigned int bsize, unsigned int bpp)
+{
   
   if (!is_little_endian_host() && (bpp>=24)) {
   

@@ -1,6 +1,6 @@
 // DefineButtonSoundTag.cpp: sounds for Button characters.
 //
-//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,12 +18,13 @@
 //
 
 #include "DefineButtonSoundTag.h"
-#include <vector>
 #include "movie_definition.h"
 #include "SoundInfoRecord.h"
 #include "SWFStream.h"
 #include "DefineButtonTag.h"
+#include "utility.h"
 
+#include <vector>
 namespace gnash {
 namespace SWF {
 
@@ -35,7 +36,7 @@ DefineButtonSoundTag::DefineButtonSoundTag(SWFStream& in, movie_definition& m)
 }
 
 void
-DefineButtonSoundTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+DefineButtonSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINEBUTTONSOUND);
