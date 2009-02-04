@@ -196,7 +196,7 @@ main(int argc, char *argv[])
         { 'a', "admin",         Arg_parser::no  },
         { 'r', "root",          Arg_parser::yes },
         { 'o', "only-port",     Arg_parser::yes },
-        { 'm', "multithread",   Arg_parser::no }
+        { 's', "singlethreaded", Arg_parser::no }
         };
 
     Arg_parser parser(argc, argv, opts);
@@ -255,8 +255,8 @@ main(int argc, char *argv[])
 	  case 'r':
 	      docroot = parser.argument(i).c_str();
 	      break;
-	  case 'm':
-	      crcfile.setThreadingFlag(true);
+	  case 's':
+	      crcfile.setThreadingFlag(false);
 	      break;
 	  case 'n':
 	      netdebug = true;
