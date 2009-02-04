@@ -67,7 +67,7 @@ public:
     gnash::DiskStream::filetype_e  _filetype;
     std::string		_filespec;
     boost::uint32_t     _filesize;
-    std::map<boost::uint16_t, amf::Element &> _references;
+    std::map<boost::uint16_t, amf::Element> _references;
 };
 
 // This is the thread for all incoming RTMP connections
