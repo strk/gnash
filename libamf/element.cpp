@@ -1473,11 +1473,11 @@ Element::dump(std::ostream& os) const
     
     os << astype_str[_type] << ": ";
     if (_name) {
- 	os << " property name is: " << _name << ", ";
+ 	os << " property name is: \"" << _name << "\", ";
     } else {
  	os << "(no name)";
     }
-    os << endl << "data length is " << getDataSize() << endl;
+    os << "data length is " << getDataSize() << endl;
 
 
     switch (_type) {
