@@ -299,7 +299,7 @@ public:
     CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();
   protected:
-    std::map<const char *, amf::Element &> _properties;
+    std::map<const char *, amf::Element> _properties;
     amf::Buffer	*_handshake;
     Handler	*_handler;
     rtmp_head_t	_header;

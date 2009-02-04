@@ -50,7 +50,7 @@ RTMPMsg::RTMPMsg()
     : _routing(FROM_SERVER),
       _status(APP_SHUTDOWN),
       _streamid(0),
-      _channel(9)
+      _channel(0)
 {
 //    GNASH_REPORT_FUNCTION;
 //     _inbytes = 0;
@@ -249,6 +249,12 @@ RTMPMsg::checkStatus(boost::shared_ptr<amf::Element>  /* el */)
     }
     return _status;
 }
+
+// void
+// RTMPMsg::setHeaderData(RTMP::rtmp_head_t &qhead)
+// {
+    
+// }
 
 boost::shared_ptr<amf::Element>
 RTMPMsg::operator[](size_t index)

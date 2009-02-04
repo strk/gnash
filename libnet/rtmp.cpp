@@ -230,7 +230,7 @@ RTMP::getProperty(const std::string &name)
 {
 //    GNASH_REPORT_FUNCTION;
 //    return _properties[name.c_str()];
-    map<const char *, amf::Element &>::iterator it;
+    map<const char *, amf::Element>::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 	const char *title = it->first;
 	amf::Element &el = it->second;
@@ -512,15 +512,15 @@ void
 RTMP::dump()
 {
     cerr << "RTMP packet contains " << _properties.size() << " variables." << endl;
-    map<const char *, amf::Element &>::iterator it;
+    map<const char *, amf::Element>::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 //	const char *name = it->first;
-	amf::Element &el = it->second;
+	amf::Element el = it->second;
 	el.dump();
     }
 }
 
-// A Ping packet has two parameters that ae always specified, and 2 that are optional.
+// A Ping packet has two parameters that are always specified, and 2 that are optional.
 // The first two bytes are the ping type, as in rtmp_ping_e, the second is the ping
 // target, which is always zero as far as we can tell.
 //
@@ -649,8 +649,11 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
     // automatically deallocated.
     RTMPMsg *msg = new RTMPMsg;
 //    memset(msg, 0, sizeof(RTMPMsg));
+
+    if (name->to_string() != 0) {
+	msg->setMethodName(name->to_string());
+    }
     
-    msg->setMethodName(name->to_string());
     double swapped = streamid->to_number();
 //     swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
     msg->setStreamID(swapped);

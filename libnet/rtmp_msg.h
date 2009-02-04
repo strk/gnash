@@ -116,6 +116,8 @@ public:
     /// @return A smart pointer to the Element for this property.
     boost::shared_ptr<amf::Element> findProperty(const std::string &name);
 
+//    void setHeaderData(RTMP::rtmp_head_t &qhead);
+			
 // Dump internal status to the terminal
     void dump();
     
