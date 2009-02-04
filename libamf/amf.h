@@ -74,7 +74,7 @@ const int SANE_STR_SIZE = 65535;
 
 /// Binary representation of an ActionScript object.
 //
-/// AMF is used to send objects, wheather to a SharedObject .sol file,
+/// AMF is used to send objects, whether to a SharedObject .sol file,
 /// a memory based LocalConnection segment, or over an RTMP connection
 /// for streaming.
 ///

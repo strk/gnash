@@ -895,7 +895,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
         return el;
     }
 
-    std::map<boost::uint16_t, amf::Element &> references;
+    std::map<boost::uint16_t, amf::Element> references;
     
     // All elements look like this:
     // the first two bytes is the length of name of the element
@@ -993,6 +993,27 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       case Element::ECMA_ARRAY_AMF0:
       {
 	  el->makeECMAArray();
+	  tmpptr += sizeof(boost::uint32_t);
+#if 1
+	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
+	      if (*tmpptr+3 == TERMINATOR) {
+//		  log_debug("No data associated with Property in object");
+		  tmpptr++;
+		  break;
+	      }
+	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
+	      if (child == 0) {
+		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
+//		  tmpptr += 3;
+		  break;
+	      }
+//	      child->dump();
+	      el->addProperty(child);
+	      tmpptr += amf_obj.totalsize();
+	  };
+	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+	  break;
+#else
 	  // get the number of elements in the array
 	  boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr) & 0xffffffff);
 	  tmpptr += sizeof(boost::uint32_t);
@@ -1006,6 +1027,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	      tmpptr += amf_obj.totalsize();
 	  };
 	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+#endif
 	  break;
       }
       case Element::OBJECT_END_AMF0:
