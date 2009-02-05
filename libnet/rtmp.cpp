@@ -1099,14 +1099,14 @@ RTMP::recvMsg(int fd)
 boost::shared_ptr<RTMP::queues_t>
 RTMP::split(amf::Buffer &buf)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     return split(buf.reference(), buf.allocated());
 }
 
 boost::shared_ptr<RTMP::queues_t>
 RTMP::split(boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     if (data == 0) {
 	log_error("Buffer pointer is invalid.");
