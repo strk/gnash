@@ -261,7 +261,7 @@ main(int argc, char *argv[])
 	  case 'n':
 	      netdebug = true;
 	      break;
-	  case 'o':
+	  case 'o':	
 	      only_port = parser.argument<int>(i);
 	      break;
 	  case 'd':
@@ -271,6 +271,11 @@ main(int argc, char *argv[])
 	  default:
 	      log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
         }
+    }
+
+    // If a port is specified, we only want to run single threaded.
+    if (only_port) {
+	crcfile.setThreadingFlag(false);
     }
     
     // Trap ^C (SIGINT) so we can kill all the threads
