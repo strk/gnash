@@ -97,7 +97,8 @@ Player::Player()
     _fpsDebugTime(0.0),
 #endif
     _hostfd(-1),
-    _startFullscreen(false)
+    _startFullscreen(false),
+    _hideMenu(false)
 {
     init();
 }
@@ -460,6 +461,11 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     if (!_windowID && _startFullscreen) {
         _gui->setFullscreen();
     }
+
+    if (!_windowID && _hideMenu) {
+        _gui->hideMenu();
+    }
+    
     _gui->run();
 
     log_debug("Main loop ended, cleaning up");

@@ -71,6 +71,8 @@ class GtkGui : public Gui
     
     virtual void setFullscreen();
     virtual void unsetFullscreen();
+    
+    virtual void hideMenu();
 
     /// For System.capabilities information.
     virtual double getPixelAspectRatio();

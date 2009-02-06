@@ -351,6 +351,23 @@ GtkGui::unsetFullscreen()
     _fullscreen = false;
 }
 
+void
+GtkGui::hideMenu()
+{
+    if (_fullscreen) return;
+
+    // Plugin
+    if (_xid) {
+        return; // Not showing menu if it's a plugin anyway
+    }
+    
+    // Stand-alone
+    else {
+        showMenu(false);
+    }
+}
+
+
 void 
 GtkGui::setCursor(gnash_cursor_type newcursor)
 {

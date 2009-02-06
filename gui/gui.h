@@ -253,6 +253,10 @@ public:
     /// Return from fullscreen to normal mode.
     ///
     virtual void unsetFullscreen();
+
+    /// Hide the menu bar when using standalone player
+    ///
+    virtual void hideMenu();
     
     /// Sets whether the gui should show the system mouse pointer
     //

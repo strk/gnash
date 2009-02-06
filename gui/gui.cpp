@@ -178,6 +178,12 @@ Gui::unsetFullscreen()
     log_unimpl(_("Fullscreen not yet supported in this GUI"));
 }
 
+void
+Gui::hideMenu()
+{
+    log_unimpl(_("Menu hiding not yet supported in this GUI"));
+}
+
 bool
 Gui::showMouse(bool /* show */)
 {

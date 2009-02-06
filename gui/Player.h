@@ -137,6 +137,10 @@ public:
 	void setStartFullscreen(bool x) {
 	    _startFullscreen = x;
 	}
+	
+    void hideMenu(bool x) {
+	    _hideMenu = x;
+	}
 
     void setAudioDumpfile(const std::string& filespec) {
         _audioDump = filespec;
@@ -287,6 +291,7 @@ private:
 	// Whether to start Gnash in fullscreen mode.
 	// (Or what did you think it meant?)
 	bool _startFullscreen;
+	bool _hideMenu;
 
     // The filename to use for dumping audio.
     std::string _audioDump;
