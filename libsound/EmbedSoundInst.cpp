@@ -77,7 +77,7 @@ EmbedSoundInst::EmbedSoundInst(EmbedSound& soundData,
 void
 EmbedSoundInst::createDecoder(media::MediaHandler& mediaHandler)
 {
-    media::SoundInfo& si = *(_soundDef.soundinfo);
+    media::SoundInfo& si = *_soundDef.soundinfo;
 
     media::AudioInfo info(
         (int)si.getFormat(), // codeci
