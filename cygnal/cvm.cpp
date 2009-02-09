@@ -351,7 +351,7 @@ vm_main(int argc, char *argv[])
 #endif
     gnash::media::MediaHandler::set(handler);
 
-    std::auto_ptr<sound::sound_handler> soundHandler(
+    boost::shared_ptr<sound::sound_handler> soundHandler(
             new sound::NullSoundHandler());
 
     std::vector<movie_data>	data;
@@ -362,7 +362,7 @@ vm_main(int argc, char *argv[])
     {
 
         RunInfo runInfo(*i);
-        runInfo.setSoundHandler(soundHandler.get());
+        runInfo.setSoundHandler(soundHandler);
 
 	    boost::intrusive_ptr<gnash::movie_definition> m =
             play_movie(*i, runInfo);

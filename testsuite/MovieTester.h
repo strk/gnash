@@ -319,7 +319,7 @@ private:
 
 	gnash::movie_instance* _movie;
 
-	std::auto_ptr<sound::sound_handler> _sound_handler;
+    boost::shared_ptr<sound::sound_handler> _sound_handler;
 
     std::auto_ptr<RunInfo> _runInfo;
 	/// Current pointer position - X ordinate

@@ -34,6 +34,7 @@
 #include "MovieClip.h" // for setting FlashVars
 #include "movie_root.h" 
 #include "Player.h"
+#include "StreamProvider.h"
 
 #include "StringPredicates.h"
 #include "URL.h"
@@ -372,7 +373,9 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     /// The RunInfo should be populated before parsing.
     _runInfo.reset(new RunInfo(baseURL.str()));
-    _runInfo->setSoundHandler(_soundHandler.get());
+    _runInfo->setSoundHandler(_soundHandler);
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider);
+    _runInfo->setStreamProvider(sp);
 
     // Load the actual movie.
     _movieDef = load_movie();

@@ -27,12 +27,16 @@
 #include <exception>
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 
 #include "gnash.h"
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h"
 #include "gtk_glue_agg.h"
+#include "GnashImage.h"
+#include "IOChannel.h"
 
 namespace gnash
 {
@@ -51,7 +55,7 @@ GtkAggGlue::~GtkAggGlue()
 }
 
 bool
-GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
+GtkAggGlue::init(int /*argc*/, char ** /*argv*/[])
 {
     return true;
 }
@@ -130,6 +134,15 @@ void
 GtkAggGlue::render()
 {
     render(0, 0, _offscreenbuf->width, _offscreenbuf->height);
+}
+
+void
+GtkAggGlue::makeScreenshot(FileType type, boost::shared_ptr<IOChannel> out)
+{
+    boost::scoped_ptr<GnashImage> im(new ImageRGBA(_offscreenbuf->height,
+                _offscreenbuf->width));
+    im->update(reinterpret_cast<boost::uint8_t*>(_offscreenbuf));
+    ImageOutput::writeImageData(GNASH_FILETYPE_PNG, out, *im, 100);
 }
 
 void

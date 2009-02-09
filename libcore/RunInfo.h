@@ -20,8 +20,9 @@
 #ifndef GNASH_RUN_INFO_H
 #define GNASH_RUN_INFO_H
 
-#include <string>
 #include "StreamProvider.h"
+#include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace gnash {
 
@@ -50,9 +51,7 @@ public:
     ///                 construction.
     RunInfo(const std::string& baseURL)
         :
-        _baseURL(baseURL),
-        _streamProvider(StreamProvider::getDefaultInstance()),
-        _soundHandler(0)
+        _baseURL(baseURL)
     {
     }
 
@@ -61,13 +60,24 @@ public:
     /// @return     The base URL set at construction.
     const std::string& baseURL() const { return _baseURL; }
 
+    /// Set the StreamProvider.
+    //
+    /// This can probably be changed during a run without ill effects.
+    void setStreamProvider(boost::shared_ptr<StreamProvider> sp)
+    {
+        _streamProvider = sp;
+    }
+
     /// Get a StreamProvider instance.
     //
     /// This isn't optional. It must always be available, or nothing
     /// can be loaded.
     //
     /// @return     A StreamProvider (presently a global singleton).
-    StreamProvider& streamProvider() const { return _streamProvider; }
+    const StreamProvider& streamProvider() const {
+        assert (_streamProvider.get());
+        return *_streamProvider;
+    }
 
     /// Set the sound::sound_handler.
     //
@@ -76,7 +86,7 @@ public:
     //
     /// This is cached in various places, so changing it during a run will
     /// lead to unexpected behaviour.
-    void setSoundHandler(sound::sound_handler* s) {
+    void setSoundHandler(boost::shared_ptr<sound::sound_handler> s) {
         _soundHandler = s;
     } 
 
@@ -84,15 +94,17 @@ public:
     //
     /// @return     A pointer to a sound::sound_handler, or NULL if none
     ///             has yet been set.
-    sound::sound_handler* soundHandler() const { return _soundHandler; }
+    sound::sound_handler* soundHandler() const {
+        return _soundHandler.get();
+    }
 
 private:
 
-    std::string _baseURL;
+    const std::string _baseURL;
 
-    StreamProvider& _streamProvider;
+    boost::shared_ptr<StreamProvider> _streamProvider;
 
-    sound::sound_handler* _soundHandler;
+    boost::shared_ptr<sound::sound_handler> _soundHandler;
 
 };
 

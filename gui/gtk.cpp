@@ -112,9 +112,8 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 bool
 GtkGui::init(int argc, char **argv[])
 {
-    //GNASH_REPORT_FUNCTION;
 
-    gtk_init (&argc, argv);
+    gtk_init(&argc, argv);
 
 #ifdef GUI_HILDON
     _hildon_program = hildon_program_get_instance();

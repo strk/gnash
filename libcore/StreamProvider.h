@@ -18,11 +18,13 @@
 #ifndef GNASH_STREAMPROVIDER_H
 #define GNASH_STREAMPROVIDER_H
 
+#include "NetworkAdapter.h"
+#include "NamingPolicy.h"
+#include "dsodefs.h" // for DSOEXPORT
+
 #include <map>
 #include <memory>
-#include "NetworkAdapter.h"
-
-#include "dsodefs.h" // for DSOEXPORT
+#include <boost/shared_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -39,13 +41,10 @@ class DSOEXPORT StreamProvider
 
 public:
 
-    typedef std::string (*NamingPolicy) (const URL&);
-
-	StreamProvider() {}
+	StreamProvider(boost::shared_ptr<NamingPolicy> = 
+            boost::shared_ptr<NamingPolicy>(new NamingPolicy));
 
 	virtual ~StreamProvider() {}
-
-	static StreamProvider& getDefaultInstance();
 
 	/// Returned stream ownership is transferred to caller.
 	//
@@ -53,7 +52,7 @@ public:
 	/// Derive from this for a CachingStreamProvider
 	///
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-            NamingPolicy np = 0);
+            bool namedCacheFile = false) const;
 
 	/// Get a stream from the response of a POST operation
 	//
@@ -70,20 +69,35 @@ public:
 	///
 	///
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-            const std::string& postdata, NamingPolicy np = 0);
+            const std::string& postdata, bool namedCacheFile = false) const;
 	
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
             const std::string& postdata,
-            const NetworkAdapter::RequestHeaders& headers, NamingPolicy np = 0);
+            const NetworkAdapter::RequestHeaders& headers,
+            bool namedCacheFile = false) const;
 	
+    void setNamingPolicy(boost::shared_ptr<NamingPolicy> np)
+    {
+        _namingPolicy = np;
+    }
+
     /// Return the currently selected policy for converting URL to filename
-    virtual NamingPolicy currentNamingPolicy() const;
+    const NamingPolicy& namingPolicy() const
+    {
+        assert(_namingPolicy.get());
+        return *_namingPolicy;
+    }
+
+private:
+
+    /// The current naming policy for cache files.
+    boost::shared_ptr<NamingPolicy> _namingPolicy;
 
 };
 
 } // namespace gnash
 
-#endif // _GNASH_STREAMPROVIDER_H
+#endif 
 
 
 // Local Variables:

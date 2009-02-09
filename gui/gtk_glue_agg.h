@@ -24,7 +24,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gnash
 {
@@ -44,6 +44,9 @@ class GtkAggGlue : public GtkGlue
     void render(int minx, int miny, int maxx, int maxy);
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
     
+    virtual void makeScreenshot(FileType type, boost::shared_ptr<IOChannel>
+            out);
+
   private:
     GdkImage* _offscreenbuf;
     render_handler *_agg_renderer;

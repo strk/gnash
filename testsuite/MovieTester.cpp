@@ -81,7 +81,10 @@ MovieTester::MovieTester(const std::string& url)
 	initTestingSoundHandlers();
 
     _runInfo.reset(new RunInfo(url));
-    _runInfo->setSoundHandler(_sound_handler.get());
+    _runInfo->setSoundHandler(_sound_handler);
+
+    _runInfo->setStreamProvider(boost::shared_ptr<StreamProvider>(
+                new StreamProvider));
 
 	if ( url == "-" )
 	{
