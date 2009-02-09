@@ -19,12 +19,11 @@
 #define GNASH_STREAMPROVIDER_H
 
 #include "NetworkAdapter.h"
-#include "NamingPolicy.h"
 #include "dsodefs.h" // for DSOEXPORT
+#include "NamingPolicy.h"
 
 #include <map>
 #include <memory>
-#include <boost/shared_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -41,8 +40,8 @@ class DSOEXPORT StreamProvider
 
 public:
 
-	StreamProvider(boost::shared_ptr<NamingPolicy> = 
-            boost::shared_ptr<NamingPolicy>(new NamingPolicy));
+	StreamProvider(std::auto_ptr<NamingPolicy> = 
+            std::auto_ptr<NamingPolicy>(new NamingPolicy));
 
 	virtual ~StreamProvider() {}
 
@@ -76,7 +75,11 @@ public:
             const NetworkAdapter::RequestHeaders& headers,
             bool namedCacheFile = false) const;
 	
-    void setNamingPolicy(boost::shared_ptr<NamingPolicy> np)
+    /// Set the NamingPolicy for cache files
+    //
+    /// This is only used when cache file naming is requested in getStream()
+    /// This StreamProvider owns the NamingPolicy instance.
+    void setNamingPolicy(std::auto_ptr<NamingPolicy> np)
     {
         _namingPolicy = np;
     }
@@ -91,7 +94,7 @@ public:
 private:
 
     /// The current naming policy for cache files.
-    boost::shared_ptr<NamingPolicy> _namingPolicy;
+    std::auto_ptr<NamingPolicy> _namingPolicy;
 
 };
 

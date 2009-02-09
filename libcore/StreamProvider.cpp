@@ -30,6 +30,7 @@
 #include "URLAccessManager.h"
 #include "log.h"
 #include "rc.h" // for rcfile
+#include "NamingPolicy.h"
 
 #include <cstdio>
 #include <map>
@@ -39,7 +40,7 @@
 
 namespace gnash {
 
-StreamProvider::StreamProvider(boost::shared_ptr<NamingPolicy> np)
+StreamProvider::StreamProvider(std::auto_ptr<NamingPolicy> np)
     :
     _namingPolicy(np)
 {
