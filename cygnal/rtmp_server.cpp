@@ -879,6 +879,9 @@ rtmp_handler(Network::thread_params_t *args)
     // Adjust the timeout
     rtmp->setTimeout(30);
 //    boost::shared_ptr<amf::Buffer> buf;
+ 
+    // This is the main message processing loop for rtmp. All message received require
+    // a response.
     do {
 	// If there is no data left from the previous chunk, process that before
 	// reading more data.
@@ -893,7 +896,7 @@ rtmp_handler(Network::thread_params_t *args)
 	    if (pkt->allocated()) {
 		boost::shared_ptr<RTMP::queues_t> que = rtmp->split(*pkt);
 		boost::shared_ptr<RTMP::rtmp_head_t> qhead;
-		cerr << "FIXME1 Que size is: " << que->size() << endl;
+		cerr << "FIXME1 incoming Que has " << que->size() << " messages." << endl;
 		for (size_t i=0; i<que->size(); i++) {
 		    boost::shared_ptr<amf::Buffer> bufptr = que->at(i)->pop();
 //			que->at(i)->dump();
@@ -907,46 +910,97 @@ rtmp_handler(Network::thread_params_t *args)
 			    boost::shared_ptr<RTMP::rtmp_ping_t> ping = rtmp->decodePing(tmpptr);
 			    log_debug("Processed Ping message from client, type %d", ping->type);
 			} else {
-			    body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
-			    if (body) {
-				body->setChannel(qhead->channel);
-				// Invoke the NetConnection::connect() method
-				if (body->getMethodName() == "connect") {
-				    response_head_size = RTMP::HEADER_12;
-				    tcurl  = body->findProperty("tcUrl");
-				    if (tcurl) {
-					log_debug("Client request for remote file is: %s", tcurl->to_string());
+			    if (echo) {
+				log_debug("Got an echo request");
+				// process the echo test request
+				vector<boost::shared_ptr<amf::Element> > request = rtmp->parseEchoRequest(
+													  bufptr->reference() + qhead->head_size, bufptr->allocated() - qhead->head_size);
+				if (request[3]) {
+				    boost::shared_ptr<amf::Buffer> result = rtmp->formatEchoResponse(request[1]->to_number(), *request[3]);
+				    if (rtmp->sendMsg(args->netfd, qhead->channel, RTMP::HEADER_8, result->allocated(),
+						      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *result)) {
+					// If we're in single threaded mode, we Just want to stay in
+					// this thread for now and do everything all at once. Otherwise
+					// we're done, so we return to the dispatch handler waiting for
+					// the next packet. Single threaded mode is primarily used by
+					// developers for debugging protocols.
+					log_debug("Sent echo test response response to client.");
 				    }
-				    swfurl = body->findProperty("swfUrl");
-				    if (swfurl) {
-					log_debug("SWF filename making request is: %s", swfurl->to_string());
-				    }
-				    response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-				    
-				    // Send a ping to reset the new stream
-				    boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_RESET, 0);
-				    if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
-						      ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
-					log_debug("Sent Ping to client");
-				    } else {
-					log_error("Couldn't send Ping to client!");
-				    }
-				    
-				}
-				
-				// Invoke the NetStream::createStream() method
-				if (body->getMethodName() == "createStream") {
-				    double streamid  = body->getStreamID();
-				    log_debug("The streamID from NetStream::createStream() is: %d", streamid);
-				    response_head_size = RTMP::HEADER_8;
-				    response = rtmp->encodeResult(RTMPMsg::NS_DATA_START);
-				    body->dump();
-				}
-				if (rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
-						  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
-				    log_error("Sent response to client.");
 				} else {
-				    log_error("Couldn't send response to client!");
+				    log_error("Couldn't send echo test response to client!");
+				    done = true;
+				}
+			    } else {
+				body = rtmp->decodeMsgBody(tmpptr, qhead->bodysize);
+				if (body) {
+				    body->setChannel(qhead->channel);
+				    // Invoke the NetConnection::connect() method
+				    if (body->getMethodName() == "connect") {
+					response_head_size = RTMP::HEADER_12;
+					tcurl  = body->findProperty("tcUrl");
+					if (tcurl) {
+					    log_debug("Client request for remote file is: %s", tcurl->to_string());
+					}
+					swfurl = body->findProperty("swfUrl");
+					if (swfurl) {
+					    log_debug("SWF filename making request is: %s", swfurl->to_string());
+					    // See if this is a Red5 style echo test.
+					    string::size_type pos;
+					    filespec = swfurl->to_string();
+					    pos = filespec.rfind("/");
+					    if (pos != string::npos) {
+						if (filespec.substr(pos, filespec.size()-pos) == "/echo_test.swf") {
+						    log_debug("Red5 echo test request!");
+						    echo = true;
+						}
+					    }
+					}
+					
+					response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
+					
+					// Send a ping to reset the new stream
+					boost::shared_ptr<amf::Buffer> ping_reset = rtmp->encodePing(RTMP::PING_RESET, 0);
+					if (rtmp->sendMsg(args->netfd, RTMP_SYSTEM_CHANNEL, RTMP::HEADER_12,
+							  ping_reset->size(), RTMP::PING, RTMPMsg::FROM_SERVER, *ping_reset)) {
+					    log_debug("Sent Ping to client");
+					} else {
+					    log_error("Couldn't send Ping to client!");
+					}
+					
+				    }
+				    // Invoke the NetStream::createStream() method
+				    if (body->getMethodName() == "createStream") {
+					double streamid  = body->getStreamID();
+					log_debug("The streamID from NetStream::createStream() is: %d", streamid);
+					response_head_size = RTMP::HEADER_8;
+					response = rtmp->encodeResult(RTMPMsg::NS_DATA_START);
+					body->dump();
+				    }
+				    if (body->getMethodName() == "deleteStream") {
+					double streamid  = body->getStreamID();
+					log_debug("The streamID from NetStream::deleyeStream() is: %d", streamid);
+					response_head_size = RTMP::HEADER_8;
+					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_COMPLETE);
+					body->dump();
+				    }
+				    // Invoke the NetStream::play() method
+				    if (body->getMethodName() == "play") {
+					double streamid  = body->getStreamID();
+					log_debug("The streamID from NetStream::plays: %d", streamid);
+					response_head_size = RTMP::HEADER_8;
+					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START);
+					body->dump();
+				    }
+				    if (body->getMethodName() == "recData") {
+				    }
+				    if (body->getMethodName() == "onEchoonServ") {
+				    }
+				    if (rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
+						      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response)) {
+					log_error("Sent response to client.");
+				    } else {
+					log_error("Couldn't send response to client!");
+				    }
 				}
 			    }
 			}
@@ -986,11 +1040,6 @@ rtmp_handler(Network::thread_params_t *args)
 			    // the next packet. Single threaded mode is primarily used by
 			    // developers for debugging protocols.
 			    log_debug("Sent echo test response response to client.");
-			    if (crcfile.getThreadingFlag()) {
-				done = true;
-			    } else {
-				done = false;
-			    }
 			}
 		    } else {
 			log_error("Couldn't send echo test response to client!");
