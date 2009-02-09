@@ -983,7 +983,8 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
     connect(buttons, SIGNAL(rejected()), this, SLOT(reject()));
 }
 
-void PreferencesDialog::savePreferences()
+void
+PreferencesDialog::savePreferences()
 {
     // Logging tab widgets
     _rcfile.verbosityLevel(_verbositySlider->value());
