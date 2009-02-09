@@ -22,7 +22,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
-#include <boost/shared_ptr.hpp>
 
 namespace gnash
 {
@@ -48,10 +47,6 @@ class GtkGlue
             GdkEventConfigure *const event) = 0;
     
     virtual void beforeRendering() {};
-
-    virtual void makeScreenshot(FileType type, boost::shared_ptr<IOChannel> out)
-    {
-    }
 
   protected:
     GtkWidget *_drawing_area;
