@@ -364,6 +364,12 @@ public:
     /// Set the stage to advance/display
     void setStage(movie_root* stage);
 
+    /// Handle error message from the core
+    //
+    /// @param msg        The error message recieved
+    ///
+    virtual void error(const std::string& /*msg*/) {}
+
     /// Prompt user with a question she can answer with yes/no
     //
     /// @param question

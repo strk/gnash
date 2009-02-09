@@ -483,10 +483,17 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     return EXIT_SUCCESS;
 }
 
+
+void
+Player::CallbacksHandler::error(const std::string& msg)
+{
+    _gui->error(msg);
+}
+
 bool
 Player::CallbacksHandler::yesNo(const std::string& query)
 {
-    return _gui->yesno(query);
+return _gui->yesno(query);
 }
 
 std::string

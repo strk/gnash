@@ -129,6 +129,9 @@ public:
     bool usePluginSound() const { return _pluginSound; }
     void usePluginSound(bool value) { _pluginSound = value; }
 
+    bool popupMessages() const { return _popups; }
+    void interfacePopups(bool value) { _popups = value; }
+
     bool useLocalDomain() const { return _localdomainOnly; }
     void useLocalDomain(bool value);
  
@@ -500,6 +503,8 @@ protected:
     bool _saveLoadedMedia;
 
     std::string _mediaCacheDir;
+
+    bool _popups;
 
 };
 

@@ -103,7 +103,8 @@ RcInitFile::RcInitFile()
     _ignoreFSCommand(true),
     _quality(-1),
     _saveStreamingMedia(false),
-    _saveLoadedMedia(false)
+    _saveLoadedMedia(false),
+    _popups(true)
 {
     expandPath(_solsandbox);
 
@@ -473,6 +474,8 @@ RcInitFile::parseFile(const std::string& filespec)
             ||
                  extractSetting(_writeLog, "writelog", variable, value)
             ||
+                 extractSetting(_popups, "popupMessages", variable, value)
+            ||
                  extractSetting(_sound, "sound", variable, value)
             ||
                  extractSetting(_pluginSound, "pluginsound", variable, value)
@@ -653,6 +656,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "parserDump " << _parserDump << endl <<
     cmd << "writeLog " << _writeLog << endl <<
     cmd << "sound " << _sound << endl <<
+    cmd << "popupMessages " << _popups << endl <<
     cmd << "pluginSound " << _pluginSound << endl <<
     cmd << "ASCodingErrorsVerbosity " << _verboseASCodingErrors << endl <<
     cmd << "malformedSWFVerbosity " << _verboseMalformedSWF << endl <<

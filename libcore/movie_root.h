@@ -748,6 +748,12 @@ public:
         /// Ask the hosting application for a yes / no answer to
         /// a question.
         virtual bool yesNo(const std::string& cmd) = 0;
+
+        /// Send an error message to the hosting application.
+        //
+        /// This does not have to be implemented; the default is a no-op.
+        virtual void error(const std::string& /*msg*/) {}
+
         virtual ~AbstractIfaceCallback() {}
     };
 
@@ -766,7 +772,9 @@ public:
     ///
     /// Will use callback set with registerEventCallback
     DSOEXPORT std::string callInterface(const std::string& cmd,
-            const std::string& arg) const;
+            const std::string& arg = std::string()) const;
+
+    DSOEXPORT void errorInterface(const std::string& msg) const;
 
     /// Called from the ScriptLimits tag parser to set the
     /// global script limits. It is expected behaviour that
