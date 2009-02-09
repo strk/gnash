@@ -602,9 +602,10 @@ connection_handler(Network::thread_params_t *args)
 		tnet = networks[tid];
 	    }
 	    if (args->port == (port_offset + RTMPT_PORT)) {
-		boost::bind(http_handler, args);
+		boost::bind(http_handler, targs);
 		tnet->addPollFD(fds, http_handler);
-	    } else if (args->port == RTMP_PORT) {
+	    } else if (args->port == (port_offset + RTMP_PORT)) {
+		boost::bind(rtmp_handler, targs);
 		tnet->addPollFD(fds, rtmp_handler);
 	    }
 	    if (networks[tid] == 0) {
