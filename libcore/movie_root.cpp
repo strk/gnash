@@ -1488,7 +1488,7 @@ void
 movie_root::setStageAlignment(short s)
 {
     _alignMode = s;
-    callInterface("Stage.align", "");
+    callInterface("Stage.align");
 }
 
 /// Returns a pair of enum values giving the actual alignment
@@ -1549,7 +1549,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
     }
 
     _scaleMode = sm;
-    callInterface("Stage.align", "");    
+    callInterface("Stage.align");    
 
     if ( notifyResize )
     {
@@ -2484,6 +2484,12 @@ void
 movie_root::handleFsCommand(const std::string& cmd, const std::string& arg) const
 {
 	if ( _fsCommandHandler ) _fsCommandHandler->notify(cmd, arg);
+}
+
+void
+movie_root::errorInterface(const std::string& msg) const
+{
+	if (_interfaceHandler) _interfaceHandler->error(msg);
 }
 
 std::string

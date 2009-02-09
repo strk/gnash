@@ -193,6 +193,8 @@ class GtkGui : public Gui
 
     virtual void showMenu(bool show);
 
+    virtual void error(const std::string& msg);
+
     // Adds the gnash icon to a window.
     static void addGnashIcon(GtkWindow* window);
 

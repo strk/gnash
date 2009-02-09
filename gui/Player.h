@@ -149,9 +149,8 @@ public:
 	
 private:
 
-	class CallbacksHandler
-		: public movie_root::AbstractIfaceCallback,
-		  public movie_root::AbstractFsCallback
+	class CallbacksHandler : public movie_root::AbstractIfaceCallback,
+		                     public movie_root::AbstractFsCallback
 	{
 	public:
 		CallbacksHandler(Gui* gui)
@@ -161,7 +160,10 @@ private:
 
 		std::string call(const std::string& event,
 				const std::string& arg);
+
 		bool yesNo(const std::string& query);
+
+        void error(const std::string& msg);
 
 		// For handling notification callbacks from ActionScript.
 		// The callback is always sent to a hosting application

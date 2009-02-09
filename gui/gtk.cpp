@@ -265,6 +265,31 @@ GtkGui::addFDListener(int fd, callback_t callback, void* data)
 }
 
 void
+GtkGui::error(const std::string& msg)
+{
+    
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    
+    if (!rcfile.popupMessages()) return;
+
+    GtkWidget* popup = gtk_dialog_new_with_buttons("Gnash Error",
+            GTK_WINDOW(_window),
+            static_cast<GtkDialogFlags>(GTK_DIALOG_DESTROY_WITH_PARENT),
+            GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+
+
+    g_signal_connect_swapped(G_OBJECT(popup), "response",
+            G_CALLBACK(gtk_widget_destroy), popup);
+
+    GtkWidget* content = gtk_dialog_get_content_area(GTK_DIALOG(popup));
+    GtkWidget* label = gtk_label_new(msg.c_str());
+    gtk_widget_set_size_request(label, 400, 200);
+    gtk_label_set_line_wrap(GTK_LABEL(label), true);
+    gtk_box_pack_start(GTK_BOX(content), label, false, false, 0);
+    gtk_widget_show_all(popup);
+}
+
+void
 GtkGui::setFullscreen()
 {
 
@@ -315,7 +340,7 @@ GtkGui::unsetFullscreen()
     
     // Plugin
     if (_xid) {
-        gtk_widget_reparent (_vbox, _window);
+        gtk_widget_reparent(_vbox, _window);
         
         // Apply key event callbacks to the plugin instance.
         setupWindowEvents();
@@ -477,12 +502,12 @@ GtkGui::getScreenDPI()
 void
 GtkGui::setupWindowEvents()
 {
-    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "delete_event",
-                   G_CALLBACK(delete_event), this);
-    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "key_press_event",
-                   G_CALLBACK(key_press_event), this);
-    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "key_release_event",
-                   G_CALLBACK(key_release_event), this);
+    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)),
+            "delete_event", G_CALLBACK(delete_event), this);
+    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)),
+            "key_press_event", G_CALLBACK(key_press_event), this);
+    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)),
+            "key_release_event", G_CALLBACK(key_release_event), this);
 }
 
 // public virtual
@@ -569,7 +594,7 @@ GtkGui::createMenuBar()
 //     hildon_window_add_toolbar(HILDON_WINDOW(_window),
 //                               GTK_TOOLBAR(_hildon_toolbar));
 #else
-    gtk_box_pack_start(GTK_BOX (_vbox), _menubar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(_vbox), _menubar, FALSE, FALSE, 0);
 #endif
 
     createFileMenu(_menubar);
@@ -1045,10 +1070,10 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
     PrefWidgets *prefs = static_cast<PrefWidgets*>(data);
 
+    RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
+
     if (response == GTK_RESPONSE_OK) {
 
-        // If 'Save' was clicked, set all the values in _rcfile
-        RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
         // For getting from const gchar* to std::string&
         std::string tmp;
     

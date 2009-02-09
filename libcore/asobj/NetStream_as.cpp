@@ -510,6 +510,10 @@ NetStream_as::initVideoDecoder(const media::VideoInfo& info)
     }
     catch (MediaException& e) {
         log_error("NetStream: Could not create Video decoder: %s", e.what());
+
+        // This is important enough to let the user know.
+        movie_root& m = _vm.getRoot();
+        m.errorInterface(e.what());
     }
 
 }
@@ -534,6 +538,10 @@ NetStream_as::initAudioDecoder(const media::AudioInfo& info)
     }
     catch (MediaException& e) {
         log_error("Could not create Audio decoder: %s", e.what());
+
+        // This is important enough to let the user know.
+        movie_root& m = _vm.getRoot();
+        m.errorInterface(e.what());
     }
 
 }
