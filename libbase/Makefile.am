@@ -112,6 +112,7 @@ libgnashbase_la_SOURCES = \
 	tu_file.cpp \
 	IOChannel.cpp \
 	ClockTime.cpp \
+	NamingPolicy.cpp \
 	WallClockTimer.cpp \
 	utf8.cpp \
 	curl_adapter.cpp \
@@ -157,6 +158,7 @@ noinst_HEADERS = \
 	tu_opengl_includes.h \
 	GnashSystemIOHeaders.h \
 	GnashFileUtilities.h \
+	NamingPolicy.h \
 	ClockTime.h \
 	WallClockTimer.h \
 	utf8.h \

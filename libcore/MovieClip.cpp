@@ -2484,11 +2484,13 @@ MovieClip::loadVariables(const std::string& urlstr,
 
     try 
     {
+        const StreamProvider& sp = _vm.getRoot().runInfo().streamProvider();
+        
         if (sendVarsMethod == METHOD_POST)
         {
             // use POST method
             _loadVariableRequests.push_back(
-                    new LoadVariablesThread(url, postdata));
+                    new LoadVariablesThread(sp, url, postdata));
         }
         else
         {
@@ -2500,7 +2502,7 @@ MovieClip::loadVariables(const std::string& urlstr,
                 if (qs.empty()) url.set_querystring(postdata);
                 else url.set_querystring(qs + "&" + postdata);
             }
-            _loadVariableRequests.push_back(new LoadVariablesThread(url));
+            _loadVariableRequests.push_back(new LoadVariablesThread(sp, url));
         }
         _loadVariableRequests.back()->process();
     }

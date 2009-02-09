@@ -322,16 +322,14 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
 
   std::auto_ptr<IOChannel> in;
 
-  StreamProvider& streamProvider = runInfo.streamProvider();
+  const StreamProvider& streamProvider = runInfo.streamProvider();
 
   const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-  StreamProvider::NamingPolicy cacheNamer = rcfile.saveLoadedMedia() ? 
-      streamProvider.currentNamingPolicy() : 0;
-
-  if ( postdata ) in = streamProvider.getStream(url, *postdata,
-          cacheNamer);
-  else in = streamProvider.getStream(url, cacheNamer);
+  if (postdata) {
+      in = streamProvider.getStream(url, *postdata, rcfile.saveLoadedMedia());
+  }
+  else in = streamProvider.getStream(url, rcfile.saveLoadedMedia());
 
   if ( ! in.get() )
   {

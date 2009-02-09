@@ -33,6 +33,7 @@
 #include "RunInfo.h" // for passing handlers and other data to the core.
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include <map>
 
 // Forward declarations
@@ -252,7 +253,7 @@ private:
     /// @todo   This is hairy, and the core should be sorted out so that
     ///         sound_sample knows about its sound::sound_handler without
     ///         needing a RunInfo.
-    std::auto_ptr<sound::sound_handler> _soundHandler;
+    boost::shared_ptr<sound::sound_handler> _soundHandler;
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
 

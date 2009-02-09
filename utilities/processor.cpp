@@ -56,6 +56,7 @@
 #include "smart_ptr.h"
 #include "IOChannel.h" // for proper dtor call
 #include "GnashSleep.h" // for usleep comptibility.
+#include "StreamProvider.h"
 
 extern "C"{
 #ifdef HAVE_GETOPT_H
@@ -352,8 +353,10 @@ main(int argc, char *argv[])
 #endif
     gnash::media::MediaHandler::set(handler);
 
-    std::auto_ptr<sound::sound_handler> soundHandler(
+    boost::shared_ptr<sound::sound_handler> soundHandler(
             new sound::NullSoundHandler());
+
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 
     std::vector<movie_data>	data;
 
@@ -363,7 +366,8 @@ main(int argc, char *argv[])
     {
 
         RunInfo runInfo(*i);
-        runInfo.setSoundHandler(soundHandler.get());
+        runInfo.setSoundHandler(soundHandler);
+        runInfo.setStreamProvider(sp);
 
 	    boost::intrusive_ptr<gnash::movie_definition> m =
             play_movie(*i, runInfo);
