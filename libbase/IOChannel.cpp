@@ -83,7 +83,7 @@ IOChannel::write_string(const char* src)
 int
 IOChannel::read_string(char* dst, int max_length) 
 {
-	int i=0;
+	int i = 0;
 	while (i<max_length)
 	{
 		dst[i] = read_byte();
@@ -141,8 +141,8 @@ IOChannel::write_byte(boost::uint8_t u)
 	write(&u, 1); // will trhow on error it seems
 }
 
-int
-IOChannel::write(const void* /*src*/, int /*num*/)
+std::streamsize
+IOChannel::write(const void* /*src*/, std::streamsize /*num*/)
 {
 	throw IOException("This IOChannel implementation doesn't support output");
 }

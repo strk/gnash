@@ -122,8 +122,14 @@ LoadVariablesThread::completeLoad()
 		parse(toparse);
 	}
 
-	_stream->go_to_end();
-	_bytesLoaded = _stream->tell();
+	try {
+		_stream->go_to_end();
+	}
+    catch (IOException& ex) {
+		log_error("Stream couldn't seek to end: %s", ex.what());
+	}
+	
+    _bytesLoaded = _stream->tell();
 	if ( _bytesTotal !=  _bytesLoaded )
 	{
 		log_error("Size of 'variables' stream advertised to be %d bytes,"

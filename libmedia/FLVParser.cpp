@@ -338,7 +338,7 @@ FLVParser::parseNextTag(bool index_only)
 
 	// Seek to next frame and skip the tag size 
 	//log_debug("FLVParser::parseNextTag seeking to %d", thisTagPos+4);
-	if ( _stream->seek(thisTagPos+4) )
+	if (!_stream->seek(thisTagPos+4))
 	{
 		log_error("FLVParser::parseNextTag: can't seek to %d", thisTagPos+4);
 

@@ -10,13 +10,10 @@
 #endif
 
 #include "tu_file.h"
-#include "utility.h"
 #include "log.h"
 
 #include <cstdio>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include "GnashFileUtilities.h"
 
 //
 // tu_file functions using FILE
@@ -25,8 +22,8 @@
 namespace gnash {
 
 
-int
-tu_file::read(void* dst, int bytes) 
+std::streamsize
+tu_file::read(void* dst, std::streamsize bytes) 
 // Return the number of bytes actually read.  EOF or an error would
 // cause that to not be equal to "bytes".
 {
@@ -36,96 +33,79 @@ tu_file::read(void* dst, int bytes)
     return fread( dst, 1, bytes, static_cast<FILE*>(m_data) );
 }
 
-int
-tu_file::write(const void* src, int bytes)
+std::streamsize
+tu_file::write(const void* src, std::streamsize bytes)
 // Return the number of bytes actually written.
 {
     assert(src);
     return std::fwrite( src, 1, bytes, static_cast<FILE*>(m_data));
 }
 
-int
-tu_file::seek(int pos)
+bool
+tu_file::seek(std::streampos pos)
 {
 
     // TODO: optimize this by caching total stream size ?
-    if (pos > size())
-    {
-	    return TU_FILE_SEEK_ERROR;
-    }
+    if (pos > size()) return false;
 
     FILE* file = static_cast<FILE*>(m_data);
 
-    clearerr(file); // make sure EOF flag is cleared.
-    int	result = fseek(file, pos, SEEK_SET);
+    std::clearerr(file); // make sure EOF flag is cleared.
+    int	result = std::fseek(file, pos, SEEK_SET);
     if (result == EOF) {
-	// @@ TODO should set m_error to something relevant based on errno.
-	return TU_FILE_SEEK_ERROR;
+        // @@ TODO should set m_error to something relevant based on errno.
+        return false;
     }
 
-    assert ( ftell(file) == pos );
+    assert (std::ftell(file) == pos);
 
-    return 0;
+    return true;
 }
 
 void
 tu_file::go_to_end()
-// Return 0 on success, TU_FILE_SEEK_ERROR on failure.
 {
-
-    int	result = fseek(static_cast<FILE*>(m_data), 0, SEEK_END);
-    if (result == EOF) {
-	    // Can't do anything here
-    }
-
+    std::streampos s = std::fseek(static_cast<FILE*>(m_data), 0, SEEK_END);
+    if (s != EOF) throw IOException("Error while seeking to end");
 }
 
-int
+std::streampos
 tu_file::tell() const
-// Return the file position, or -1 on failure.
 {
     FILE* f = static_cast<FILE*>(m_data);
 
-    //if ( feof(f) )
-    //assert ( ! feof(f) ); // I guess it's legal to call tell() while at eof.
+    std::streampos ret = std::ftell(f);
+    if (ret < 0) throw IOException("Error getting stream position");
 
-    int ret = ftell(f);
     assert(ret <= size());
     return ret;
 }
 
 bool
 tu_file::eof() const
-// Return true if we're at EOF.
 {
-    if (feof((FILE*) m_data)) {
-	return true;
-    } else {
-	return false;
-    }
+    return std::feof(static_cast<FILE*>(m_data));
 }
 
-int
-tu_file::get_error() const
-// Return true if we're at EOF.
+bool
+tu_file::bad() const
 {
-    if ( ! m_data ) return TU_FILE_OPEN_ERROR;
-    return (ferror((FILE*) m_data));
+    if (!m_data) return true;
+    return std::ferror(static_cast<FILE*>(m_data));
 }
 
-int
+size_t
 tu_file::size() const
-// Return -1 on failure, or the size
 {
     assert(m_data);
 
     FILE* f = static_cast<FILE*>(m_data);
 
     struct stat statbuf;
-    if ( -1 == fstat(fileno(f), &statbuf) )
+    if (fstat(fileno(f), &statbuf) < 0)
     {
 	    log_error("Could not fstat file");
-	    return 0;
+	    return static_cast<size_t>(-1);
     }
     return statbuf.st_size;
 }

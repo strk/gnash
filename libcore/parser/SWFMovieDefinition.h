@@ -511,7 +511,7 @@ private:
 	std::auto_ptr<IOChannel> _in;
 
 	/// swf end position (as read from header)
-	unsigned int _swf_end_pos;
+    size_t _swf_end_pos;
 
 	/// asyncronous SWF loader and parser
 	MovieLoader _loader;

@@ -76,8 +76,6 @@ MovieLoader::MovieLoader(SWFMovieDefinition& md)
 
 MovieLoader::~MovieLoader()
 {
-	//cout << "MovieLoader dtor called" << endl;
-
 	// we should assert _movie_def._loadingCanceled
 	// but we're not friend yet (anyone introduce us ?)
 	if ( _thread.get() )
@@ -390,7 +388,8 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 	}
 
 	// It seems frame rate is limited to a max 
-	// 84 was found by testing the pp, might be turned into a compile-time define
+	// 84 was found by testing the pp, might be turned into a
+    // compile-time define
 	static const int maxfps = 84;
 	
 	_str->ensureBytes(2 + 2); // frame rate, frame count.
@@ -412,8 +411,6 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 	}
 
 	m_frame_count = _str->read_u16();
-
-	/* Markus: Probably this is better anyways */
 
 	// TODO: This seems dangerous, check closely
 	if(m_frame_count == 0) m_frame_count++;
@@ -556,7 +553,7 @@ SWFMovieDefinition::read_all_swf()
 
 	try {
 
-        while (static_cast<size_t>(str.tell()) < _swf_end_pos )
+        while (str.tell() < _swf_end_pos)
         {
             if (_loadingCanceled)
             {
@@ -570,7 +567,7 @@ SWFMovieDefinition::read_all_swf()
 parse_tag:
 
             if (tag == SWF::END) {
-                if (static_cast<size_t>(str.tell()) != _swf_end_pos) {
+                if (str.tell() != _swf_end_pos) {
 		    		IF_VERBOSE_MALFORMED_SWF(
                         // Safety break, so we don't read past
                         // the end of the  movie.
@@ -593,7 +590,7 @@ parse_tag:
                 );
 
                 size_t floaded = incrementLoadedFrames();
-                if ( floaded == m_frame_count )
+                if (floaded == m_frame_count)
                 {
                     str.close_tag();
                     tag = str.open_tag();
@@ -638,11 +635,16 @@ parse_tag:
 		//        and make sure any wait_for_frame call is
 		//        released (condition set and false result)
 		log_error(_("Parsing exception: %s"), e.what());
+
 	}
 
 	// Make sure we won't leave any pending writers
 	// on any eventual fd-based IOChannel.
 	str.consumeInput();
+    
+    // Set bytesLoaded to the current stream position unless it's greater
+    // than the reported length.
+    setBytesLoaded(std::min<size_t>(str.tell(), _swf_end_pos));
 
 	size_t floaded = get_loading_frame();
 	if (!m_playlist[floaded].empty())
@@ -656,8 +658,9 @@ parse_tag:
 	if ( m_frame_count > floaded )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("%d frames advertised in header, but only %d SHOWFRAME tags "
-			"found in stream. Pretending we loaded all advertised frames"), m_frame_count, floaded);
+		log_swferror(_("%d frames advertised in header, but only %d "
+                "SHOWFRAME tags found in stream. Pretending we loaded "
+                "all advertised frames"), m_frame_count, floaded);
 		);
 		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 		_frames_loaded = m_frame_count;
@@ -698,7 +701,7 @@ SWFMovieDefinition::incrementLoadedFrames()
 #endif
 
 	// signal load of frame if anyone requested it
-	// FIXME: _waiting_form_frame needs mutex ?
+	// FIXME: _waiting_for_frame needs mutex ?
 	if (_waiting_for_frame && _frames_loaded >= _waiting_for_frame )
 	{
 		// or should we notify_one ?
@@ -725,7 +728,8 @@ boost::intrusive_ptr<ExportableResource>
 SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 {
 #ifdef DEBUG_EXPORTS
-	log_debug("get_exported_resource(%s) called, loading frame:%u", symbol, m_frame_count);
+	log_debug("get_exported_resource(%s) called, loading frame:%u",
+            symbol, m_frame_count);
 #endif
 
 	// Don't call get_exported_resource() from this movie loader

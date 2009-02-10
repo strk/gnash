@@ -21,22 +21,10 @@
 #define GNASH_IOCHANNEL_H
 
 #include "dsodefs.h" // DSOEXPORT
-
 #include "GnashException.h" // for IOException inheritance
 
 #include <boost/cstdint.hpp> // for boost int types
-
-// temp hack to avoid changing all callers
-// TODO: update all callers ...
-enum
-{
-    TU_FILE_NO_ERROR = 0,
-    TU_FILE_OPEN_ERROR = -1,
-    TU_FILE_READ_ERROR = -1,
-    TU_FILE_WRITE_ERROR = -1,
-    TU_FILE_SEEK_ERROR = -1,
-    TU_FILE_CLOSE_ERROR = -1
-};
+#include <ios>
 
 namespace gnash {
 
@@ -107,7 +95,7 @@ public:
 	///
 	/// Throw IOException on error
 	///
-	virtual int read(void* dst, int num)=0;
+	virtual std::streamsize read(void* dst, std::streamsize num)=0;
 
 	/// Read at most the given number of bytes w/out blocking
 	//
@@ -120,7 +108,7 @@ public:
 	/// Default implementation proxies the call to the
 	/// blocking version.
 	///
-	virtual int readNonBlocking(void* dst, int num)
+	virtual std::streamsize readNonBlocking(void* dst, std::streamsize num)
 	{
 		return read(dst, num);
 	}
@@ -129,7 +117,7 @@ public:
 	//
 	/// Throw IOException on error/unsupported op.
 	///
-	virtual int write(const void* src, int num);
+	virtual std::streamsize write(const void* src, std::streamsize num);
 
 	/// \brief Write a 0-terminated string to a stream.
 	//
@@ -154,69 +142,65 @@ public:
 
 	/// Write a 32-bit float to a stream in little-endian order.
 	//
-	/// NOTE: this currently relies on host FP format being the same as the Flash one
-	///       (presumably IEEE 754).
+	/// NOTE: this currently relies on host FP format being the same
+    ///       as the Flash one (presumably IEEE 754).
 	///
 	/// Throw IOException on error
 	///
-	void	write_float32(float value);
+	void write_float32(float value);
 
 	/// Read a 32-bit float from a little-endian stream.
 	//
-	/// NOTE: this currently relies on host FP format being the same as the Flash one
-	/// (presumably IEEE 754).
+	/// NOTE: this currently relies on host FP format being the
+    ///       same as the Flash one (presumably IEEE 754).
 	///
 	/// Throw IOException on error
 	///
-	float	read_float32();
+	float read_float32();
 
 	/// Return current stream position
 	//
 	/// Throw IOException on error
 	///
-	virtual int tell() const=0;
+	virtual std::streampos tell() const = 0;
 
 	/// Seek to the specified position
 	//
 	/// 
 	/// Throw IOException on error
 	///
-	/// @return 0 on success, or -1 on failure.
+	/// @return true on success, or false on failure.
 	///
-	virtual int seek(int p)=0;
+	virtual bool seek(std::streampos p) = 0;
 
 	/// Seek to the end of the stream
 	//
 	/// Throw IOException on error
 	///
-	virtual void go_to_end()=0;
+	virtual void go_to_end() = 0;
 
 	/// Return true if the end of the stream has been reached.
 	//
 	/// Throw IOException on error
 	///
-	virtual bool eof() const=0;
+	virtual bool eof() const = 0;
     
-	/// Return non-zero if the stream is in an error state
+	/// Return true if the stream is in an error state
 	//
 	/// When the stream is in an error state there's nothing
 	/// you can do about it, just delete it and log the error.
-	///
-	/// There are some rough meaning for possible returned values
-	/// but I don't think they make much sense currently.
-	///
-	virtual int get_error() const=0;
+	virtual bool bad() const = 0;
     
 	/// Get the size of the stream (unreliably).
 	//
-	/// Size of steram is unreliable as not all input
+	/// Size of stream is unreliable as not all input
 	/// channels have a mechanism to advertise size,
 	/// and some have one but isn't necessarely truthful
 	/// (a few HTTP severs are bogus in this reguard).
 	///
-	/// @return unreliable input size, -1 if not known. 
+	/// @return unreliable input size, (size_t)-1 if not known. 
 	///
-	virtual int size() const { return -1; }
+	virtual size_t size() const { return static_cast<size_t>(-1); }
    
 };
 

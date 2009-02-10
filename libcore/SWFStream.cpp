@@ -500,7 +500,7 @@ SWFStream::seek(unsigned long pos)
     }
 
     // Do the seek.
-    if ( m_input->seek(pos) == -1 )
+    if (!m_input->seek(pos))
     {
         // TODO: should we throw an exception ?
         //       we might be called from an exception handler
@@ -604,12 +604,12 @@ SWFStream::close_tag()
 {
 
     assert(_tagBoundsStack.size() > 0);
-    unsigned long endPos = _tagBoundsStack.back().second;
+    std::streampos endPos = _tagBoundsStack.back().second;
     _tagBoundsStack.pop_back();
 
     //log_debug("Close tag called at %d, stream size: %d", endPos);
 
-    if ( m_input->seek(endPos) == -1 )
+    if (!m_input->seek(endPos))
     {
         // We'll go on reading right past the end of the stream
         // if we don't throw an exception.
@@ -626,9 +626,10 @@ SWFStream::consumeInput()
 	// to possibly throw an exception (!)
 	try {
 		m_input->go_to_end();
-	} catch (IOException& ex) {
-		log_error("SWFStream::consumeInput: underlying stream couldn't go_to_end: %s",
-			ex.what());
+	}
+    catch (IOException& ex) {
+		log_error("SWFStream::consumeInput: underlying stream couldn't "
+                "go_to_end: %s", ex.what());
 		// eh.. and now ?!
 	}
 }
