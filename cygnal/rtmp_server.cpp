@@ -373,6 +373,13 @@ RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 }
     
 boost::shared_ptr<amf::Buffer> 
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename)
+{
+//    GNASH_REPORT_FUNCTION;
+    return encodeResult(status, filename, 0.0);
+}
+
+boost::shared_ptr<amf::Buffer> 
 RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double clientid)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -483,31 +490,9 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  level->makeString("level", "status");
 	  top.addProperty(level);
 
-	  boost::shared_ptr<amf::Element> description(new Element);
-	  string field = "Started playing ";
-	  if (!filename.empty()) {
-	      field + filename;
-	  }
-	  description->makeString("description", "Started playing");
-	  top.addProperty(description);
-	  
-	  boost::shared_ptr<amf::Element> details(new Element);
-	  details->makeString("details", filename);
-	  top.addProperty(details);
-	  
 	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "NetStream.Play.Reset");
 	  top.addProperty(code);
-	  break;
-      }
-	  break;
-      case RTMPMsg::NS_PLAY_START:
-      {
-	  str->makeString("onStatus");
-//	  "clientid"
-	  boost::shared_ptr<amf::Element> level(new Element);
-	  level->makeString("level", "status");
-	  top.addProperty(level);
 
 	  boost::shared_ptr<amf::Element> description(new Element);
 	  string field = "Started playing ";
@@ -521,9 +506,40 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  details->makeString("details", filename);
 	  top.addProperty(details);
 	  
+	  boost::shared_ptr<amf::Element> cid(new Element);
+	  code->makeNumber("clientid", clientid);
+	  top.addProperty(cid);
+
+	  break;
+      }
+      case RTMPMsg::NS_PLAY_START:
+      {
+	  str->makeString("onStatus");
+//	  "clientid"
+	  boost::shared_ptr<amf::Element> level(new Element);
+	  level->makeString("level", "status");
+	  top.addProperty(level);
+
 	  boost::shared_ptr<amf::Element> code(new Element);
 	  code->makeString("code", "NetStream.Play.Start");
 	  top.addProperty(code);
+
+	  boost::shared_ptr<amf::Element> description(new Element);
+	  string field = "Started playing ";
+	  if (!filename.empty()) {
+	      field + filename;
+	  }
+	  description->makeString("description", "Started playing");
+	  top.addProperty(description);
+	  
+	  boost::shared_ptr<amf::Element> details(new Element);
+	  details->makeString("details", filename);
+	  top.addProperty(details);
+	  
+	  boost::shared_ptr<amf::Element> cid(new Element);
+	  code->makeNumber("clientid", clientid);
+	  top.addProperty(cid);
+
 	  break;
       }
       case RTMPMsg::NS_PLAY_STOP:
@@ -984,8 +1000,9 @@ rtmp_handler(Network::thread_params_t *args)
 				    if (body->getMethodName() == "play") {
 					double streamid  = body->getStreamID();
 					log_debug("The streamID from NetStream::plays: %d", streamid);
+					filespec = body->at(1)->to_string();
 					response_head_size = RTMP::HEADER_8;
-					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START);
+					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START, filespec);
 					body->dump();
 				    }
 				    if (body->getMethodName() == "recData") {

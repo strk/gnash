@@ -47,6 +47,7 @@ public:
     
     // These are handlers for the various types
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename);
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double clientid);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type);
