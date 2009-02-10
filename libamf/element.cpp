@@ -457,6 +457,14 @@ boost::shared_ptr<Buffer>
 Element::encode()
 {
 //    GNASH_REPORT_FUNCTION;
+
+    return encode(false);
+}
+
+boost::shared_ptr<Buffer>
+Element::encode(bool notobject)
+{
+//    GNASH_REPORT_FUNCTION;
     size_t size = 0;
     boost::shared_ptr<Buffer> buf;
     if (_type == Element::OBJECT_AMF0) {
@@ -468,7 +476,9 @@ Element::encode()
 	    size += AMF_PROP_HEADER_SIZE;
 	}
 	buf.reset(new Buffer(size+24)); // FIXME: why are we several bytes off ?
-	*buf = Element::OBJECT_AMF0;
+	if (!notobject) {
+	    *buf = Element::OBJECT_AMF0;
+	}
 	if (_name > 0) {
 	    size_t length = getNameSize();
 	    boost::uint16_t enclength = length;
@@ -493,10 +503,12 @@ Element::encode()
 	    }
 	}
 //	log_debug("FIXME: Terminating object");
-	boost::uint8_t pad = 0;
-	*buf += pad;
-	*buf += pad;
-	*buf += TERMINATOR;
+	if (!notobject) {
+	    boost::uint8_t pad = 0;
+	    *buf += pad;
+	    *buf += pad;
+	    *buf += TERMINATOR;
+	}
 	return buf;
     } else {
 	    return AMF::encodeElement(*this);
@@ -598,12 +610,19 @@ Element::makeString(boost::uint8_t *data, size_t size)
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
 
-    // Make room for an additional NULL terminator
-    try {
-	check_buffer(size+1);
-    } catch (std::exception& e) {
-	log_error("%s", e.what());
-	return *this;
+    // If there is an existing string, 
+    if (_buffer) {
+	if (_buffer->size() > size) {
+	    _buffer->resize(size);
+	}
+    } else {
+	// Make room for an additional NULL terminator
+	try {
+	    check_buffer(size+1);
+	} catch (std::exception& e) {
+	    log_error("%s", e.what());
+	    return *this;
+	}
     }
     _buffer->clear();		// FIXME: this could be a performance issue
     _buffer->copy(data, size);
@@ -1475,7 +1494,7 @@ Element::dump(std::ostream& os) const
     if (_name) {
  	os << " property name is: \"" << _name << "\", ";
     } else {
- 	os << "(no name)";
+ 	os << "(no name), ";
     }
     os << "data length is " << getDataSize() << endl;
 

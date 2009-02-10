@@ -722,8 +722,13 @@ public:
     ///		This encodes this Element and all of it's associated
     ///		properties into raw binary data in big endoan format.
     ///
+    /// @param notobject Flag to not encode the element as an object,
+    ///		instead it's just a list of properties. This is used when
+    ///		formatting onStatus response packets.
+    ///
     /// @return a smart pointer to a Buffer class.
     boost::shared_ptr<Buffer> encode();
+    boost::shared_ptr<Buffer> encode(bool notobject);
 
     /// \brief Get the array of properties for this Element.
     ///
