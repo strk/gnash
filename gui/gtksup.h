@@ -133,14 +133,6 @@ class GtkGui : public Gui
                                         gpointer instance);
     static void menuitem_stop_callback(GtkMenuItem *menuitem,
                                        gpointer instance);
-    static void menuitem_step_forward_callback(GtkMenuItem *menuitem,
-                                        gpointer instance);
-    static void menuitem_step_backward_callback(GtkMenuItem *menuitem,
-                                         gpointer instance);
-    static void menuitem_jump_forward_callback(GtkMenuItem *menuitem,
-                                        gpointer instance);
-    static void menuitem_jump_backward_callback(GtkMenuItem *menuitem,
-                                                gpointer instance);
     static void menuitem_about_callback(GtkMenuItem *menuitem,
                                         gpointer instance);
     static void menuitem_openfile_callback(GtkMenuItem *menuitem,

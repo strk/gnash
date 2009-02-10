@@ -422,34 +422,6 @@ Gui::resize_view(int width, int height)
 
 
 void
-Gui::menu_step_forward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()+1);
-}
-
-void
-Gui::menu_step_backward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()-1);
-}
-
-void
-Gui::menu_jump_forward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()+10);
-}
-
-void
-Gui::menu_jump_backward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()-10);
-}
-
-void
 Gui::toggleSound()
 {
     assert (_stage);
@@ -592,19 +564,13 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::F:
 					toggleFullscreen();
 					break;
-				case gnash::key::RIGHT_BRACKET:
-					menu_step_forward();
-					break;
-				case gnash::key::LEFT_BRACKET:
-					menu_step_backward();
-					break;
 				case gnash::key::MINUS:
 				{
 					// Max interval allowed: 1 second (1FPS)
 					unsigned int ni = std::min(_interval+2, 1000u);
 					setInterval(ni);
 					break;
-                                }
+                }
 				case gnash::key::PLUS:
 				{
 					// Min interval allowed: 1/100 second (100FPS)

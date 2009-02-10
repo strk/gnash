@@ -135,6 +135,10 @@ public:
 		_hostfd = fd;
 	}
 	
+    int getHostFD() const {
+        return _hostfd;
+    }
+
 	void setStartFullscreen(bool x) {
 	    _startFullscreen = x;
 	}
@@ -153,9 +157,10 @@ private:
 		                     public movie_root::AbstractFsCallback
 	{
 	public:
-		CallbacksHandler(Gui* gui)
+		CallbacksHandler(Gui& gui, const Player& player)
 			:
-			_gui(gui)
+			_gui(gui),
+            _player(player)
 		{}
 
 		std::string call(const std::string& event,
@@ -173,7 +178,9 @@ private:
 
 	private:
 
-		Gui* _gui;
+		Gui& _gui;
+
+        const Player& _player;
 	};
 
 	std::auto_ptr<CallbacksHandler> _callbacksHandler;

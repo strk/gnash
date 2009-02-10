@@ -2020,45 +2020,6 @@ GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     gui->stop();
 }
 
-/// \brief step forward 1 frame
-void
-GtkGui::menuitem_step_forward_callback(GtkMenuItem* /*menuitem*/,
-		gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_step_forward();
-}
-
-/// \brief step backward 1 frame
-void
-GtkGui::menuitem_step_backward_callback(GtkMenuItem* /*menuitem*/,
-		gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_step_backward();
-}
-
-/// \brief jump forward 10 frames
-void
-GtkGui::menuitem_jump_forward_callback(GtkMenuItem* /*menuitem*/,
-                               gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_jump_forward();
-}
-
-/// \brief jump backward 10 frames
-void
-GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
-                                gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_jump_backward();
-}
 
 /// \brief Force redraw
 void

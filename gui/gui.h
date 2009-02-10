@@ -319,11 +319,6 @@ public:
     /// state.
     void restart();
 
-    void menu_step_forward();
-    void menu_step_backward();
-    void menu_jump_forward();
-    void menu_jump_backward();
-
     /// Toggle sound state between muted and unmuted. If
     /// there is no active sound handler this does nothing.
     void toggleSound();

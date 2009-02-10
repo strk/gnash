@@ -363,6 +363,9 @@ public:
         return m_background_color.m_a / 255.0f;
     }
 
+    /// Return the VM used by this movie_root
+    VM& getVM() { return _vm; }
+ 
     /// Main and only callback from hosting application.
     /// Expected to be called at 10ms resolution.
     void advance();
