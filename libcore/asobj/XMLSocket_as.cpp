@@ -506,10 +506,11 @@ XMLSocket_as::checkForIncomingData()
 			std::string& s = *it;
 			as_value datain( s );
 
-			std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+			std::auto_ptr<std::vector<as_value> > args(
+                    new std::vector<as_value>);
 			args->push_back(datain);
 			
-			fn_call call(this, &env, args);
+			fn_call call(this, env, args);
 
 			onDataHandler->call(call);
 

@@ -1045,7 +1045,7 @@ Gui::getMovieInfo() const
     InfoTree::iterator topIter = tr->begin();
     InfoTree::iterator firstLevelIter;
 
-    VM& vm = VM::get();
+    VM& vm = _stage->getVM();
 
     std::ostringstream os;
 

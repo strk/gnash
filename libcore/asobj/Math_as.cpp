@@ -212,7 +212,7 @@ math_random(const fn_call& fn)
     if (fn.nargs) fn.arg(0).to_number();
     if (fn.nargs > 1) fn.arg(1).to_number();
 
-	VM::RNG& rnd = VM::get().randomNumberGenerator();
+	VM::RNG& rnd = fn.getVM().randomNumberGenerator();
 
 	// Produces double ( 0 <= n < 1)
 	boost::uniform_real<> uni_dist(0, 1);

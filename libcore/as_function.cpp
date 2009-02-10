@@ -78,7 +78,10 @@ static as_object* getFunctionPrototype()
 
 		VM::get().addStatic(proto.get());
 
-		int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; 
+		const int flags = as_prop_flags::dontDelete | 
+                          as_prop_flags::dontEnum | 
+                          as_prop_flags::onlySWF6Up; 
+
 		proto->init_member("apply", new builtin_function(function_apply), flags);
 		proto->init_member("call", new builtin_function(function_call), flags);
 	}
@@ -140,7 +143,7 @@ as_function::extends(as_function& superclass)
 	as_object* newproto = new as_object(superclass.getPrototype().get());
 	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
 
-    if (VM::get().getSWFVersion() > 5) {
+    if (_vm.getSWFVersion() > 5) {
         const int flags = as_prop_flags::dontEnum;
         newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
     }
@@ -314,7 +317,8 @@ function_call(const fn_call& fn)
 			// 'object' but when compared to undefined matches !!
 			// See actionscript.all/Function.as
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("First argument to Function.call(%s) doesn't cast to object. "
+			log_aserror(_("First argument to Function.call(%s) doesn't "
+                "cast to object. "
 				"Gnash will keep the current 'this' pointer as it is, "
 				"but this is known to not be the correct way to handle "
 				"such a malformed call."), this_val);
@@ -324,15 +328,16 @@ function_call(const fn_call& fn)
 		{
 			new_fn_call.this_ptr = this_ptr;
 			as_object* proto = this_ptr->get_prototype().get();
-                        if ( proto )
-                        {
-                                new_fn_call.super = this_ptr->get_super();
-                        }
-                        else
-                        {
-                                // TODO: check this !
-                                log_debug("No prototype in 'this' pointer passed to Function.call");
-                                new_fn_call.super = function_obj->get_super();
+            if ( proto )
+            {
+                    new_fn_call.super = this_ptr->get_super();
+            }
+            else
+            {
+                // TODO: check this !
+                log_debug("No prototype in 'this' pointer "
+                        "passed to Function.call");
+                new_fn_call.super = function_obj->get_super();
 			}
 		}
 		new_fn_call.drop_bottom();
@@ -341,16 +346,12 @@ function_call(const fn_call& fn)
 	// Call the function 
 	return (*function_obj)(new_fn_call);
 
-	//log_debug(_("at function_call exit, stack: \n")); fn.env->dump_stack();
-
-	//log_debug(_("%s: tocheck \n"), __FUNCTION__);
 }
 
 boost::intrusive_ptr<as_object>
 as_function::constructInstance( as_environment& env,
 	std::auto_ptr< std::vector<as_value> > args)
 {
-//	GNASH_REPORT_FUNCTION;
 
 #ifndef GNASH_USE_GC
 	assert(get_ref_count() > 0);
@@ -377,7 +378,7 @@ as_function::constructInstance( as_environment& env,
             log_action(_("it's a built-in class"));
 		);
 
-		fn_call fn(0, &env, args);
+		fn_call fn(0, env, args);
 		as_value ret;
 
 		try {
@@ -455,7 +456,7 @@ as_function::constructInstance( as_environment& env,
 		// Call the actual constructor function; new_obj is its 'this'.
 
 		// We don't need the function result.
-		fn_call fn(newobj.get(), &env, args, super);
+		fn_call fn(newobj.get(), env, args, super);
 		call(fn);
 	}
 

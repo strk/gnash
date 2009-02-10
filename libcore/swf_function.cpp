@@ -150,7 +150,7 @@ swf_function::operator()(const fn_call& fn)
 	log_debug("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
 	// Some features are version-dependant.
-	unsigned swfversion = VM::get().getSWFVersion();
+	unsigned swfversion = vm.getSWFVersion();
 	as_object *super = NULL;
 	if (swfversion > 5)
 	{
@@ -319,7 +319,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_GLOBAL)
 		{
 			// Put '_global' in a register.
-			as_object* global = VM::get().getGlobal();
+			as_object* global = vm.getGlobal();
 			//our_env->local_register(current_reg).set_as_object(global);
 			our_env->setRegister(current_reg, as_value(global));
 			current_reg++;

@@ -235,7 +235,7 @@ public:
 	void registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y);
 
 	/// Return a newly created builtin_function or null
-	builtin_function* getNative(unsigned int x, unsigned int y);
+	builtin_function* getNative(unsigned int x, unsigned int y) const;
 
 #ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)

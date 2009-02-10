@@ -2403,6 +2403,8 @@ Machine::immediateFunction(const as_function *to_call, as_object *pThis,
 	as_value& storage, unsigned char stack_in, short stack_out)
 {
 	// TODO: Set up the fn, or remove the need.
+
+#if 0
 	fn_call fn(NULL, NULL, 0, 0);
 	mStack.drop(stack_in - stack_out);
 	saveState();
@@ -2411,6 +2413,7 @@ Machine::immediateFunction(const as_function *to_call, as_object *pThis,
 	mStack.setDownstop(stack_in);
 	storage = const_cast<as_function*>(to_call)->call(fn);
 	restoreState();
+#endif
 }
 
 void

@@ -29,6 +29,7 @@
 #include "VM.h"
 #include "Object.h" // for getObjectInterface
 #include "namedStrings.h"
+#include "PropertyList.h"
 
 #include <list>
 #include <boost/algorithm/string/case_conv.hpp>

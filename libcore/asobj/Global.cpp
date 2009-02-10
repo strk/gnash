@@ -523,12 +523,6 @@ as_value
 as_global_asnative(const fn_call& fn)
 {
 
-    // Note: it's possible for 'this' to be undefined in ActionScript,
-    // which would make this call return undefined. TODO: test it in
-    // the testsuite! It's not even certain whether Gnash has implemented
-    // an undefined this pointer.
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-
     as_value ret;
 
     if (fn.nargs < 2)
@@ -561,7 +555,7 @@ as_global_asnative(const fn_call& fn)
     const unsigned int x = static_cast<unsigned int>(sx);
     const unsigned int y = static_cast<unsigned int>(sy);
 
-    VM& vm = ptr->getVM();
+    const VM& vm = fn.getVM();
     as_function* fun = vm.getNative(x, y);
     if ( ! fun ) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);

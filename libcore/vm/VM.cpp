@@ -258,9 +258,9 @@ VM::registerNative(as_c_function_ptr fun, unsigned int x, unsigned int y)
 }
 
 builtin_function*
-VM::getNative(unsigned int x, unsigned int y)
+VM::getNative(unsigned int x, unsigned int y) const
 {
-	as_c_function_ptr fun = _asNativeTable[x][y];
+	as_c_function_ptr fun = _asNativeTable.find(x)->second.find(y)->second;
 	if ( fun ) return new builtin_function(fun);
 	else return 0;
 }

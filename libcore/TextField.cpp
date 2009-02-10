@@ -2727,11 +2727,12 @@ textfield_removeTextField(const fn_call& fn)
 
 /// This is called for 'new TextField()' only
 as_value
-textfield_ctor(const fn_call& /* fn */)
+textfield_ctor(const fn_call& fn)
 {
-    as_object* proto = getTextFieldInterface(VM::get());
 
-    VM& vm = VM::get(); // TODO: ask fn about VM !
+    VM& vm = fn.getVM();
+
+    as_object* proto = getTextFieldInterface(vm);
 
     as_object* obj = 0;
 
