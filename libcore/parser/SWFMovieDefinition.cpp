@@ -644,7 +644,8 @@ parse_tag:
 	str.consumeInput();
     
     // Set bytesLoaded to the current stream position unless it's greater
-    // than the reported length.
+    // than the reported length. TODO: should we be trying to continue
+    // parsing after an exception?
     setBytesLoaded(std::min<size_t>(str.tell(), _swf_end_pos));
 
 	size_t floaded = get_loading_frame();
