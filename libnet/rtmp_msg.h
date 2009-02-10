@@ -110,6 +110,7 @@ public:
     boost::uint8_t getChannel()         { return _channel; } ;
 
     boost::shared_ptr<amf::Element> operator[](size_t x);
+    boost::shared_ptr<amf::Element> at(size_t x) { return _amfobjs[x]; };
 
     /// \brief Find the named property for this Object.
     ///
