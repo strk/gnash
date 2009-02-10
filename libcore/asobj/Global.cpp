@@ -555,7 +555,7 @@ as_global_asnative(const fn_call& fn)
     const unsigned int x = static_cast<unsigned int>(sx);
     const unsigned int y = static_cast<unsigned int>(sy);
 
-    const VM& vm = fn.getVM();
+    VM& vm = fn.getVM();
     as_function* fun = vm.getNative(x, y);
     if ( ! fun ) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);

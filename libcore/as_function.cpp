@@ -349,7 +349,7 @@ function_call(const fn_call& fn)
 }
 
 boost::intrusive_ptr<as_object>
-as_function::constructInstance( as_environment& env,
+as_function::constructInstance(as_environment& env,
 	std::auto_ptr< std::vector<as_value> > args)
 {
 
@@ -376,7 +376,7 @@ as_function::constructInstance( as_environment& env,
     {
 		IF_VERBOSE_ACTION (
             log_action(_("it's a built-in class"));
-		);
+		)
 
 		fn_call fn(0, env, args);
 		as_value ret;
