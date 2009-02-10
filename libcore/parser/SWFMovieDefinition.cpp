@@ -145,19 +145,22 @@ MovieLoader::start()
 /// Log the contents of the current tag, in hex to the output strream
 static void	dumpTagBytes(SWFStream& in, std::ostream& os)
 {
-    const unsigned int rowlength = 16;
+    const std::streamsize rowlength = 16;
     os << std::endl;
     
     // This decremented until we reach the end of the stream.
-    unsigned int toRead = in.get_tag_end_position() - in.tell();
+    std::streamsize toRead = in.get_tag_end_position() - in.tell();
     in.ensureBytes(toRead);
 
     unsigned char buf[rowlength];    
     while (toRead)
     {
         // Read in max row length or remainder of stream.
-        const unsigned int thisRow = std::min<unsigned int>(toRead, rowlength);
-        const unsigned int got = in.read(reinterpret_cast<char*>(&buf), thisRow);
+        const std::streamsize thisRow = 
+            std::min<std::streamsize>(toRead, rowlength);
+        
+        const std::streamsize got = 
+            in.read(reinterpret_cast<char*>(&buf), thisRow);
         
         // Check that we read all the bytes we expected.
         if (got < thisRow)
@@ -243,7 +246,7 @@ SWFMovieDefinition::get_character_def(int character_id)
         _dictionary.get_character(character_id);
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
+#endif 
 	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
 }
 
@@ -264,7 +267,8 @@ Font* SWFMovieDefinition::get_font(int font_id) const
 }
 
 Font*
-SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic) const
+SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
+    const
 {
 
     for (FontMap::const_iterator it=m_fonts.begin(), itEnd=m_fonts.end(); it != itEnd; ++it)
@@ -279,8 +283,9 @@ BitmapInfo*
 SWFMovieDefinition::getBitmap(int character_id)
 {
     Bitmaps::iterator it = _bitmaps.find(character_id);
-    if ( it == _bitmaps.end() ) return 0;
-    else return it->second.get();
+    if (it == _bitmaps.end()) return 0;
+    
+    return it->second.get();
 }
 
 void
@@ -299,7 +304,7 @@ sound_sample* SWFMovieDefinition::get_sound_sample(int character_id)
     boost::intrusive_ptr<sound_sample> ch = it->second;
 #ifndef GNASH_USE_GC
     assert(ch->get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
+#endif 
 
     return ch.get();
 }
@@ -310,7 +315,7 @@ void SWFMovieDefinition::add_sound_sample(int character_id, sound_sample* sam)
     IF_VERBOSE_PARSE(
     log_parse(_("Add sound sample %d assigning id %d"),
 		character_id, sam->m_sound_handler_id);
-    );
+    )
     m_sound_samples.insert(std::make_pair(character_id,
 			    boost::intrusive_ptr<sound_sample>(sam)));
 }
@@ -324,10 +329,9 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 	_in = in;
 
 	// we only read a movie once
-	assert(_str.get() == NULL);
+	assert(!_str.get());
 
-	if ( url == "" ) _url = "<anonymous>";
-	else _url = url;
+	_url = url.empty() ? "<anonymous>" : url;
 
 	boost::uint32_t file_start_pos = _in->tell();
 	boost::uint32_t header = _in->read_le32();
@@ -343,21 +347,19 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 			"file does not start with a SWF header"));
 		return false;
         }
-	bool	compressed = (header & 255) == 'C';
+	const bool compressed = (header & 255) == 'C';
 
 	IF_VERBOSE_PARSE(
-		log_parse(_("version = %d, file_length = %d"),
-			m_version, m_file_length);
-	);
+		log_parse(_("version: %d, file_length: %d"), m_version, m_file_length);
+    )
 
-	if ( m_version > 7 )
+	if (m_version > 7)
 	{
 		log_unimpl(_("SWF%d is not fully supported, trying anyway "
 			"but don't expect it to work"), m_version);
 	}
 
-	if (compressed)
-        {
+	if (compressed) {
 #ifndef HAVE_ZLIB_H
 		log_error(_("SWFMovieDefinition::read(): unable to read "
 			"zipped SWF data; gnash was compiled without zlib support"));
@@ -370,7 +372,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 		// Uncompress the input as we read it.
 		_in = zlib_adapter::make_inflater(_in);
 #endif
-        }
+    }
 
 	assert(_in.get());
 
@@ -413,7 +415,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 	m_frame_count = _str->read_u16();
 
 	// TODO: This seems dangerous, check closely
-	if(m_frame_count == 0) m_frame_count++;
+	if (!m_frame_count) ++m_frame_count;
 
 	IF_VERBOSE_PARSE(
 		log_parse(_("frame size = %s, frame rate = %f, frames = %d"),
@@ -437,7 +439,7 @@ SWFMovieDefinition::completeLoad()
 	assert ( VM::isInitialized() );
 
 	// should call readHeader before this
-	assert( _str.get() != NULL );
+	assert(_str.get());
 
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
@@ -472,18 +474,15 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum)
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	return ( framenum <= _frames_loaded );
+	return (framenum <= _frames_loaded);
 #endif
 
 	if ( framenum <= _frames_loaded ) return true;
 
 	_waiting_for_frame = framenum;
-        //log_debug(_("Waiting for frame %u to be loaded"), framenum);
 
 	// TODO: return false on timeout
 	_frame_reached_condition.wait(lock);
-
-        //log_debug(_("Condition reached (_frames_loaded=%u)"), _frames_loaded);
 
 	return ( framenum <= _frames_loaded );
 }
@@ -503,8 +502,8 @@ std::ostream&
 operator<<(std::ostream& o, const CharacterDictionary& cd)
 {
 
-   	for (CharacterDictionary::CharacterConstIterator it = cd.begin(), endIt = cd.end();
-   	        it != endIt; it++)
+   	for (CharacterDictionary::CharacterConstIterator it = cd.begin(), 
+            endIt = cd.end(); it != endIt; it++)
    	{
    	    o << std::endl
    	      << "Character: " << it->first
@@ -521,15 +520,17 @@ CharacterDictionary::get_character(int id)
 	if ( it == _map.end() )
 	{
 		IF_VERBOSE_PARSE(
-		log_parse(_("Could not find char %d, dump is: %s"), id, *this);
+            log_parse(_("Could not find char %d, dump is: %s"), id, *this);
 		);
 		return boost::intrusive_ptr<character_def>();
 	}
-	else return it->second;
+	
+    return it->second;
 }
 
 void
-CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c)
+CharacterDictionary::add_character(int id,
+        boost::intrusive_ptr<character_def> c)
 {
 	//log_debug(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
@@ -691,13 +692,11 @@ SWFMovieDefinition::incrementLoadedFrames()
 				"the advertised number in header (%d)."),
 				get_url(), _frames_loaded,
 				m_frame_count);
-		);
-		//m_playlist.resize(_frames_loaded+1);
+		)
 	}
 
 #ifdef DEBUG_FRAMES_LOAD
-	log_debug(_("Loaded frame %u/%u"),
-		_frames_loaded, m_frame_count);
+	log_debug(_("Loaded frame %u/%u"), _frames_loaded, m_frame_count);
 #endif
 
 	// signal load of frame if anyone requested it

@@ -43,6 +43,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
+#include <boost/scoped_ptr.hpp>
 
 //
 // Forward declarations
@@ -506,7 +507,8 @@ private:
 
 	std::string _url;
 
-	std::auto_ptr<SWFStream> _str;
+    /// Non transferable stream.
+    boost::scoped_ptr<SWFStream> _str;
 
 	std::auto_ptr<IOChannel> _in;
 
