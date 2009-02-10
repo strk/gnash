@@ -53,7 +53,8 @@
 //  1: fatal errors (errors preventing the plugin from working as it should)
 //  2: informational messages
 //
-#define GNASH_PLUGIN_DEBUG 1
+#define GNASH_PLUGIN_DEBUG 2
+#define WRITE_FILE
 
 #include <sys/param.h>
 #include "plugin.h" 
@@ -704,7 +705,9 @@ nsPluginInstance::Write(NPStream* /*stream*/, int32_t /*offset*/, int32_t len,
 #ifdef WRITE_FILE
     write(_filefd, buffer, len);
 #endif
-    return write(_streamfd, buffer, len);
+    int written = write(_streamfd, buffer, len);
+    std::cout << written << " bytes written" << std::endl;
+    return written;
 }
 
 bool

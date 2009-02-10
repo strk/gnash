@@ -556,87 +556,81 @@ SWFMovieDefinition::read_all_swf()
 
 	try {
 
-	//size_t it=0;
-	while ( (boost::uint32_t) str.tell() < _swf_end_pos )
-	{
-		if ( _loadingCanceled )
-		{
-			log_debug("Loading thread cancelation requested, returning from read_all_swf");
-			return;
-		}
+        while (static_cast<size_t>(str.tell()) < _swf_end_pos )
+        {
+            if (_loadingCanceled)
+            {
+                log_debug("Loading thread cancelation requested, "
+                        "returning from read_all_swf");
+                return;
+            }
 
-		//log_debug(_("Loading thread iteration %u"), it++);
-
-		SWF::TagType tag = str.open_tag();
+            SWF::TagType tag = str.open_tag();
 
 parse_tag:
 
-		if (tag == SWF::END)
-                {
-			if ((unsigned int) str.tell() != _swf_end_pos)
-                        {
+            if (tag == SWF::END) {
+                if (static_cast<size_t>(str.tell()) != _swf_end_pos) {
 		    		IF_VERBOSE_MALFORMED_SWF(
-				// Safety break, so we don't read past
-				// the end of the  movie.
-				log_swferror(_("Hit stream-end tag, "
-					"but not at the advertised SWF end; "
-					"stopping for safety."));
-		    		)
-		    		break;
-			}
-		}
+                        // Safety break, so we don't read past
+                        // the end of the  movie.
+                        log_swferror(_("Hit stream-end tag, "
+                            "but not at the advertised SWF end; "
+                            "stopping for safety."));
+                        )
+                        break;
+                }
+            }
 
-		SWF::TagLoadersTable::loader_function lf = NULL;
+            SWF::TagLoadersTable::loader_function lf = NULL;
 
-		if (tag == SWF::SHOWFRAME)
-		{
-			// show frame tag -- advance to the next frame.
+            if (tag == SWF::SHOWFRAME)
+            {
+                // show frame tag -- advance to the next frame.
 
-			IF_VERBOSE_PARSE(
-				log_parse("  show_frame");
-			);
+                IF_VERBOSE_PARSE(
+                    log_parse("  show_frame");
+                );
 
-			size_t floaded = incrementLoadedFrames();
-			if ( floaded == m_frame_count )
-			{
-				str.close_tag();
-				tag = str.open_tag();
-				if (tag != SWF::END )
-				{
-					IF_VERBOSE_MALFORMED_SWF(
-					log_swferror(_("last expected SHOWFRAME "
-						"in SWF stream '%s' isn't "
-						"followed by an END (%d)."),
-						get_url(), tag);
-					);
-				}
-				goto parse_tag;
-			}
-
-		}
-		else if (_tag_loaders.get(tag, &lf))
+                size_t floaded = incrementLoadedFrames();
+                if ( floaded == m_frame_count )
                 {
-			// call the tag loader.  The tag loader should add
-			// characters or tags to the movie data structure.
-			(*lf)(str, tag, *this, _runInfo);
-		}
-		else
-		{
-			// no tag loader for this tag type.
-            log_error(_("*** no tag loader for type %d (movie)"), tag);
-            IF_VERBOSE_PARSE(
-                std::ostringstream ss;
-                dumpTagBytes(str, ss);
-                log_error("tag dump follows: %s", ss.str());
-            );
-		}
+                    str.close_tag();
+                    tag = str.open_tag();
+                    if (tag != SWF::END )
+                    {
+                        IF_VERBOSE_MALFORMED_SWF(
+                        log_swferror(_("last expected SHOWFRAME "
+                            "in SWF stream '%s' isn't "
+                            "followed by an END (%d)."),
+                            get_url(), tag);
+                        );
+                    }
+                    goto parse_tag;
+                }
 
-		str.close_tag();
+            }
+            else if (_tag_loaders.get(tag, &lf)) {
+                // call the tag loader.  The tag loader should add
+                // characters or tags to the movie data structure.
+                (*lf)(str, tag, *this, _runInfo);
+            }
+            else {
+                // no tag loader for this tag type.
+                log_error(_("*** no tag loader for type %d (movie)"), tag);
+                IF_VERBOSE_PARSE(
+                    std::ostringstream ss;
+                    dumpTagBytes(str, ss);
+                    log_error("tag dump follows: %s", ss.str());
+                );
+            }
 
-		setBytesLoaded(str.tell());
-	}
+            str.close_tag();
 
-	} catch (const std::exception& e) {
+            setBytesLoaded(str.tell());
+        }
+
+	} catch (const ParserException& e) {
 		// FIXME: we should be setting some variable
 		//        so that it is possible for clients
 		//        to check the parser status
@@ -651,7 +645,7 @@ parse_tag:
 	str.consumeInput();
 
 	size_t floaded = get_loading_frame();
-	if ( ! m_playlist[floaded].empty() )
+	if (!m_playlist[floaded].empty())
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("%d control tags are NOT followed by"

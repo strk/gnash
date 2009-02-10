@@ -49,13 +49,15 @@ SWFStream::ensureBytes(unsigned long needed)
 {
 #ifndef GNASH_TRUST_SWF_INPUT
 
-    if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
+    // Not in a tag (should we check file length?)
+    if ( _tagBoundsStack.empty() ) return; 
 
     unsigned long int left = get_tag_end_position() - tell();
     if ( left < needed )
     {
         std::stringstream ss;
-        ss << "premature end of tag: need to read " << needed << " bytes, but only " << left << " left in this tag";
+        ss << "premature end of tag: need to read " << needed << 
+            " bytes, but only " << left << " left in this tag";
         throw ParserException(ss.str());
     }
 #endif
