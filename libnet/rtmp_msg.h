@@ -80,7 +80,10 @@ public:
 	SO_CREATION_FAILED,
 	SO_NO_READ_ACCESS,
 	SO_NO_WRITE_ACCESS,
-	SO_PERSISTENCE_MISMATCH
+	SO_PERSISTENCE_MISMATCH,
+	// Anything below here is specific to Gnash's implementation
+	NS_CREATE_STREAM,
+	NS_DELETE_STREAM
     } rtmp_status_e;
     typedef enum {
 	FROM_SERVER,                      // Flash com server
