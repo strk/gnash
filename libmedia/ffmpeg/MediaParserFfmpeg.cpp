@@ -63,7 +63,7 @@ MediaParserFfmpeg::probeStream()
 	probe_data.buf = buffer.get();
 	probe_data.buf_size = 2048;
 
-	assert(_stream->tell() == 0);
+	assert(_stream->tell() == static_cast<std::streampos>(0));
 	size_t actuallyRead = _stream->read(probe_data.buf, probe_data.buf_size);
 	_stream->seek(0);
 

@@ -202,8 +202,10 @@ NoSeekFile::fill_cache(std::streamsize size)
     std::cerr << boost::format(" fill_cache(%d) called") % size << std::endl;
 #endif
 
+	assert(size >= 0);
+
 	// See how big is the cache
-	while ( _cached < size ) 
+	while (_cached < static_cast<size_t>(size))
 	{
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
@@ -302,8 +304,7 @@ NoSeekFile::read(void *dst, std::streamsize bytes)
 		return 0;
 	}
 
-
-	fill_cache(tell() + bytes);
+	fill_cache(bytes + tell());
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	printInfo();

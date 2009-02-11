@@ -66,7 +66,9 @@ void
 tu_file::go_to_end()
 {
     std::streampos s = std::fseek(static_cast<FILE*>(m_data), 0, SEEK_END);
-    if (s != EOF) throw IOException("Error while seeking to end");
+    if (s != static_cast<std::streampos>(EOF)) {
+        throw IOException("Error while seeking to end");
+    }
 }
 
 std::streampos

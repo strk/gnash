@@ -490,7 +490,7 @@ FLVParser::parseNextTag(bool index_only)
 // would be called by MAIN thread
 bool FLVParser::parseHeader()
 {
-	assert(_stream->tell() == 0);
+	assert(_stream->tell() == static_cast<std::streampos>(0));
 
 	// We only use 5 bytes of the header, because the last 4 bytes represent
         // an integer which is always 1.

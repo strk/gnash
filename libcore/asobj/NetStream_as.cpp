@@ -563,7 +563,7 @@ NetStream_as::startPlayback()
         return false;
     }
 
-    assert(_inputStream->tell() == 0);
+    assert(_inputStream->tell() == static_cast<std::streampos>(0));
     inputPos = 0;
 
     if (!_mediaHandler)

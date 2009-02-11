@@ -1050,7 +1050,7 @@ CurlStreamFile::read(void *dst, std::streamsize bytes)
 	log_debug ("read(%d) called", bytes);
 #endif
 
-	fillCache(tell() + bytes);
+	fillCache(bytes + tell());
 	if ( _error ) return 0; // error can be set by fillCache
 
 #ifdef GNASH_CURL_VERBOSE
