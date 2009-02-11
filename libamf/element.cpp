@@ -612,8 +612,8 @@ Element::makeString(boost::uint8_t *data, size_t size)
 
     // If there is an existing string, 
     if (_buffer) {
-	if (_buffer->size() > size) {
-	    _buffer->resize(size);
+	if (_buffer->size() < size) {
+	    _buffer->resize(size+1); // add room for the NULL terminator
 	}
     } else {
 	// Make room for an additional NULL terminator
