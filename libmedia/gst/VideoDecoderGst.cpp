@@ -118,22 +118,36 @@ void
 VideoDecoderGst::setup(GstCaps* srccaps)
 {
     if (!srccaps) {
-        throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
+        throw MediaException(_("VideoDecoderGst: internal error "
+                    "(caps creation failed)"));      
     }
 
     bool success = GstUtil::check_missing_plugins(srccaps);
     if (!success) {
-        throw MediaException(_("Couldn't find a plugin for video type ..."));
+        std::string type(gst_caps_to_string(srccaps));
+        type = type.substr(0, type.find(','));
+        std::string msg = (boost::format(_("Couldn't find a plugin for "
+                    "video type %s!")) % type).str();
+
+        if (type == "video/x-flash-video" || type == "video/x-h264") {
+            msg += _(" Please make sure you have gstreamer-ffmpeg installed.");
+        }
+
+        throw MediaException(msg);
     }
 
-    GstCaps* sinkcaps = gst_caps_new_simple ("video/x-raw-rgb", "bpp", G_TYPE_INT, 24,
-                                             "depth", G_TYPE_INT, 24,
-                                             NULL);
+    GstCaps* sinkcaps = gst_caps_new_simple("video/x-raw-rgb", "bpp",
+            G_TYPE_INT, 24,
+            "depth", G_TYPE_INT, 24,
+            NULL);
+
     if (!sinkcaps) {
-        throw MediaException(_("VideoDecoderGst: internal error (caps creation failed)"));      
+        throw MediaException(_("VideoDecoderGst: internal error "
+                    "(caps creation failed)"));      
     }
 
-    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps, "ffmpegcolorspace", NULL);
+    bool rv = swfdec_gst_decoder_init (&_decoder, srccaps, sinkcaps,
+            "ffmpegcolorspace", NULL);
     if (!rv) {
         throw MediaException(_("VideoDecoderGst: initialisation failed."));      
     }
