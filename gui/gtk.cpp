@@ -119,19 +119,18 @@ namespace {
 
     void addPixmapDirectory(const gchar *directory);
     
-    static gchar* findPixmapFile(const gchar *filename);
+    void addGnashIcon(GtkWindow* window);
+
+    gchar* findPixmapFile(const gchar *filename);
+    
+    GdkPixbuf* createPixbuf(const gchar *filename);
 
     key::code gdk_to_gnash_key(guint key);
 
     int gdk_to_gnash_modifier(int key);
 
-    // Menu creation
-    bool createFileMenu(GtkWidget *obj);
-    bool createEditMenu(GtkWidget *obj);
-    bool createHelpMenu(GtkWidget *obj);
-    bool createControlMenu(GtkWidget *obj);
-
 }
+
 // This is global so it can be accessed by the evnt handler, which
 // isn't part of this class. 
 Lirc *lirc;
@@ -701,36 +700,6 @@ GtkGui::createWindow(const char *title, int width, int height)
     return ret;
 }
 
-static GList *pixmaps_directories = NULL;
-
-/* This is an internally used function to create pixmaps. */
-GdkPixbuf*
-GtkGui::createPixbuf (const gchar *filename)
-{
-    gchar *pathname = NULL;
-    GdkPixbuf *pixbuf;
-    GError *error = NULL;
-
-    if (!filename || !filename[0])
-       return NULL;
-
-    pathname = findPixmapFile (filename);
-
-    if (!pathname) {
-        log_error (_("Couldn't find pixmap file: %s"), filename);
-        g_warning (_("Couldn't find pixmap file: %s"), filename);
-        return NULL;
-    }
-
-    pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
-    if (!pixbuf) {
-        log_error (_("Failed to load pixbuf file: %s: %s"), pathname, error->message);
-        g_error_free (error);
-    }
-    g_free (pathname);
-    return pixbuf;
-}
-
 #ifdef USE_SWFTREE
 
 // This creates a GtkTree model for displaying movie info.
@@ -801,16 +770,6 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
 
 #endif
 
-// Adds the Gnash icon to a window.
-void
-GtkGui::addGnashIcon(GtkWindow* window)
-{
-    GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
-    if (window_icon_pixbuf) {
-        gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
-		gdk_pixbuf_unref (window_icon_pixbuf);
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -926,32 +885,6 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 namespace { 
 
-class SetQuality
-{
-public:
-   
-    SetQuality(Gui& gui, int quality)
-        :
-        _gui(gui),
-        _quality(quality)
-    {
-        GNASH_REPORT_FUNCTION;
-    }
-
-    void operator()()
-    {
-        log_debug("Setting quality to: %s", _quality);
-        _gui.getStage()->setQuality(static_cast<Quality>(_quality));
-    }
-
-private:
-
-    Gui& _gui;
-    int _quality;
-};
-
-
-
 class PreferencesDialog
 {
 
@@ -996,7 +929,7 @@ private:
 #endif
 
     	PrefWidgets()
-		:
+		    :
         	soundToggle(0),
         	actionDumpToggle(0),
         	parserDumpToggle(0),
@@ -1054,6 +987,7 @@ private:
     GtkWidget* _notebook;
 
 };
+
 
 // Callback to read values from the preferences dialogue and set rcfile
 // values accordingly.
@@ -1250,7 +1184,7 @@ PreferencesDialog::PreferencesDialog(GtkWidget* window)
     				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     				NULL);
     // Add Gnash icon
-    GtkGui::addGnashIcon(GTK_WINDOW(_prefsDialog));
+    addGnashIcon(GTK_WINDOW(_prefsDialog));
 
     // Add notebook (tabs) to dialogue's vbox
     _notebook = gtk_notebook_new ();
@@ -1600,7 +1534,8 @@ PreferencesDialog::addPlayerTab()
     _prefs->osText = gtk_entry_new ();
     gtk_box_pack_start(GTK_BOX(oshbox), _prefs->osText, FALSE, FALSE, 0);
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(_prefs->osText), _rcfile.getFlashSystemOS().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->osText),
+            _rcfile.getFlashSystemOS().c_str());
     
     GtkWidget *OSadvicelabel = gtk_label_new (_("<i>If blank, Gnash will "
     					   "detect your OS</i>"));
@@ -1609,7 +1544,7 @@ PreferencesDialog::addPlayerTab()
     gtk_box_pack_start(GTK_BOX(playervbox), OSadvicelabel, FALSE, FALSE, 0);
 
     // URL opener
-    GtkWidget *urlopenerbox = gtk_hbox_new (FALSE, 2);
+    GtkWidget *urlopenerbox = gtk_hbox_new(FALSE, 2);
     gtk_box_pack_start(GTK_BOX(playervbox), urlopenerbox, FALSE, FALSE, 0);
     
     GtkWidget *urlopenerlabel = gtk_label_new (_("URL opener:"));
@@ -1624,10 +1559,15 @@ PreferencesDialog::addPlayerTab()
             _rcfile.getURLOpenerFormat().c_str());
 
     // Performance
-    GtkWidget *performancelabel = gtk_label_new (_("<b>Performance</b>"));
+    GtkWidget *performancelabel = gtk_label_new(_("<b>Performance</b>"));
     gtk_label_set_use_markup (GTK_LABEL (performancelabel), TRUE);
     gtk_box_pack_start(GTK_BOX(playervbox), performancelabel, FALSE, FALSE, 0);
 
+    GtkWidget* qualitybox = gtk_hbox_new(FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), qualitybox, FALSE, FALSE, 0);
+
+    GtkWidget* qualityoptions = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(qualitybox), qualityoptions, FALSE, FALSE, 0);
 
     // Library size
     GtkWidget *libraryhbox = gtk_hbox_new (FALSE, 2);
@@ -2004,19 +1944,6 @@ GtkGui::createHelpMenu(GtkWidget *obj)
 }
 
 
-gboolean test(GtkWidget* w, gpointer p)
-{
-    if (!gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(w))) return false;
-
-    SetQuality* sq = static_cast<SetQuality*>(p);
-    (*sq)();
-
-    // Unfortunately we are responsible for deleting sq, but that's
-    // what you get from a C API.
-    //delete sq;
-    return true;
-}
-
 // Create a View menu that can be used from the menu bar or the popup.
 void
 GtkGui::createViewMenu(GtkWidget *obj)
@@ -2050,43 +1977,6 @@ GtkGui::createViewMenu(GtkWidget *obj)
     gtk_menu_append(menu, fullscreen);
     gtk_widget_show(GTK_WIDGET(fullscreen));
     g_signal_connect(fullscreen, "activate", G_CALLBACK(menuFullscreen), this);
-
-#if 1
-    // Quality
-    GSList* qualityGroup = 0;
-    GtkWidget *button = gtk_radio_menu_item_new_with_label(qualityGroup,
-            _("Best"));
-    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
-    gtk_menu_append(menu, button);
-    gtk_widget_show(button);
-    
-    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("High"));
-    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
-    gtk_menu_append(menu, button);
-    gtk_widget_show(button);
-    
-    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("Medium"));
-    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
-    g_signal_connect(button, "toggled", G_CALLBACK(test), 
-            new SetQuality(*this, QUALITY_MEDIUM));
-    gtk_menu_append(menu, button);
-    gtk_widget_show(button);
-    
-    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("Low"));
-    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
-    g_signal_connect(button, "toggled", G_CALLBACK(test), 
-            new SetQuality(*this, QUALITY_LOW));
-    gtk_menu_append(menu, button);
-    gtk_widget_show(button);
-    
-    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("Automatic"));
-    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
-    g_signal_connect(button, "toggled", G_CALLBACK(test),
-            new SetQuality(*this, -1));
-    gtk_menu_append(menu, button);
-    gtk_widget_show(button);
-
-#endif
 
 // Can be disabled at compile time.
 #ifndef DISABLE_REGION_UPDATES_DEBUGGING
@@ -2200,8 +2090,49 @@ GtkGui::playHook()
 
 
 
-/// Anonymous namespace for callbacks
+/// Anonymous namespace for callbacks, local functions, event handlers etc.
 namespace {
+
+static GList *pixmaps_directories = NULL;
+
+// Adds the Gnash icon to a window.
+void
+addGnashIcon(GtkWindow* window)
+{
+    GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
+    if (window_icon_pixbuf) {
+        gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
+		gdk_pixbuf_unref (window_icon_pixbuf);
+    }
+}
+
+/* This is an internally used function to create pixmaps. */
+GdkPixbuf*
+createPixbuf (const gchar *filename)
+{
+    gchar *pathname = NULL;
+    GdkPixbuf *pixbuf;
+    GError *error = NULL;
+
+    if (!filename || !filename[0])
+       return NULL;
+
+    pathname = findPixmapFile (filename);
+
+    if (!pathname) {
+        log_error (_("Couldn't find pixmap file: %s"), filename);
+        g_warning (_("Couldn't find pixmap file: %s"), filename);
+        return NULL;
+    }
+
+    pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
+    if (!pixbuf) {
+        log_error (_("Failed to load pixbuf file: %s: %s"), pathname, error->message);
+        g_error_free (error);
+    }
+    g_free (pathname);
+    return pixbuf;
+}
 
 key::code
 gdk_to_gnash_key(guint key)

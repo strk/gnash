@@ -41,20 +41,27 @@ extern "C" {
 namespace gnash
 {
 
-typedef bool (*callback_t)(void*, int, void *data);
 
 class GtkGui : public Gui
 {
 public:
+
+    /// For the Gtk GUI FD listener, whatever that might be for.
+    typedef bool (*callback_t)(void*, int, void *data);
+
     GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    
     virtual ~GtkGui();
+    
+    /// GUI interface implementation
+
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
     virtual bool createWindow(const char *title, int width, int height);
 
     virtual bool run();
 
-    void quit();
+    virtual void quit();
 
     virtual bool createMenu();
     
@@ -132,9 +139,6 @@ public:
 
     virtual void error(const std::string& msg);
 
-    // Adds the gnash icon to a window.
-    static void addGnashIcon(GtkWindow* window);
-
     GtkGlue& rendererGlue() { return *_glue; }
 
 private:
@@ -162,8 +166,6 @@ private:
     /// window, so this function must be called every time
     /// the drawing area is reparented.
     void setupWindowEvents();
-    
-    static GdkPixbuf* createPixbuf(const gchar *filename);
 
 #ifdef USE_SWFTREE
     // Create a tree model for displaying movie info
