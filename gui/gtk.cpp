@@ -1032,8 +1032,8 @@ private:
         	,DebuggerToggle(0)
 #endif
 	{}
+
     };
-    
 
     static void handlePrefs(GtkWidget* widget, gint response, gpointer data);
 
@@ -1058,7 +1058,6 @@ private:
     GtkWidget* _prefsDialog;
 
     GtkWidget* _notebook;
-
 
 };
 
@@ -1213,11 +1212,11 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
             _rcfile.setURLOpenerFormat(tmp);
         }
     	
-    	// Let _rcfile decide which file to update: generally the file being used if
-    	// specified in GNASHRC environment variable, or in the user's home directory
-    	// if that can be found.
-    	// TODO: We can also specify here which file should be written by passing
-    	// that instead. How might that best be done?
+    	// Let _rcfile decide which file to update: generally the file
+        // being used if specified in GNASHRC environment variable, or in
+        // the user's home directory if that can be found.
+    	// TODO: We can also specify here which file should be written
+        // by passing that instead. How might that best be done?
     	_rcfile.updateFile();
 
         // Close the window when 'ok' is clicked
@@ -1228,8 +1227,6 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
         // Close the window when 'cancel' is clicked
         gtk_widget_destroy(dialog);
     }
-    
-    // response == GTK_RESPONSE_DELETE_EVENT
 
     if (prefs) delete prefs;
 }
@@ -1537,7 +1534,8 @@ PreferencesDialog::addPlayerTab()
     // Player tab title
     GtkWidget *playertablabel = gtk_label_new_with_mnemonic (_("_Player"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(playervbox), playertablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook),
+            GTK_WIDGET(playervbox), playertablabel); 
 
     // Player description
     GtkWidget *descriptionlabel = gtk_label_new (_("<b>Player description</b>"));
@@ -1553,9 +1551,12 @@ PreferencesDialog::addPlayerTab()
     gtk_box_pack_start(GTK_BOX(versionhbox), versionlabel, FALSE, FALSE, 0);
 
     _prefs->versionText = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(versionhbox), _prefs->versionText, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(versionhbox), _prefs->versionText,
+            FALSE, FALSE, 0);
+
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(_prefs->versionText), _rcfile.getFlashVersionString().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->versionText),
+            _rcfile.getFlashVersionString().c_str());
 
     // OS label
     GtkWidget *oshbox = gtk_hbox_new (FALSE, 2);
@@ -1595,6 +1596,7 @@ PreferencesDialog::addPlayerTab()
     GtkWidget *performancelabel = gtk_label_new (_("<b>Performance</b>"));
     gtk_label_set_use_markup (GTK_LABEL (performancelabel), TRUE);
     gtk_box_pack_start(GTK_BOX(playervbox), performancelabel, FALSE, FALSE, 0);
+
 
     // Library size
     GtkWidget *libraryhbox = gtk_hbox_new (FALSE, 2);
@@ -1639,8 +1641,8 @@ GtkGui::showPropertiesDialog()
     GtkWidget *propsDialog = gtk_dialog_new_with_buttons(
     					_("Movie properties"),
     					GTK_WINDOW(_window),
-   					// The cast is necessary if there is more
-   					// than one option.
+                        // The cast is necessary if there is more
+                        // than one option.
     					GtkDialogFlags(
     					GTK_DIALOG_DESTROY_WITH_PARENT),
     					// Just a 'close' button
@@ -1649,8 +1651,7 @@ GtkGui::showPropertiesDialog()
 
     // Not too small... But I'd rather not have to specify
     // a size in pixels.
-    gtk_window_set_default_size (GTK_WINDOW(propsDialog),
-                                 500, 300);
+    gtk_window_set_default_size(GTK_WINDOW(propsDialog), 500, 300);
     
     // Suggest to the window manager to allow "maximize"
     // As there can be (will be) a lot of data.
@@ -1664,20 +1665,19 @@ GtkGui::showPropertiesDialog()
                G_CALLBACK(gtk_widget_destroy), NULL);
 
     GtkWidget *propsvbox = gtk_vbox_new (FALSE, 1);
-    gtk_container_add (GTK_CONTAINER (
+    gtk_container_add(GTK_CONTAINER(
                         GTK_DIALOG(propsDialog)->vbox), propsvbox);
 
 #ifdef USE_SWFTREE
 
     std::auto_ptr<InfoTree> infoptr = getMovieInfo();
 
-    GtkWidget *scrollwindow1 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrollwindow1),
+    GtkWidget *scrollwindow1 = gtk_scrolled_window_new(0, 0);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwindow1),
 				      GTK_POLICY_AUTOMATIC,
 				      GTK_POLICY_AUTOMATIC);
 
-    gtk_box_pack_start (
-            GTK_BOX (propsvbox), scrollwindow1, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (propsvbox), scrollwindow1, TRUE, TRUE, 0);
 
     enum
     {
@@ -1710,12 +1710,13 @@ GtkGui::showPropertiesDialog()
     // Add columns:
     
     // 'Variable' column:
-    renderer = gtk_cell_renderer_text_new ();
-    coloffset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-					       -1, _("Variable"),
-					       renderer, "text",
-					       STRING1_COLUMN,
-					       NULL);
+    renderer = gtk_cell_renderer_text_new();
+    coloffset = gtk_tree_view_insert_column_with_attributes(
+            GTK_TREE_VIEW(treeview),
+            -1, _("Variable"),
+            renderer, "text",
+            STRING1_COLUMN,
+            NULL);
     column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), coloffset - 1);
 
     // 'Value' column:
@@ -1723,19 +1724,20 @@ GtkGui::showPropertiesDialog()
     // copied; it can't actually be edited, though.
     renderer = gtk_cell_renderer_text_new ();
     g_object_set (renderer, "xalign", 0.0, "editable", TRUE, NULL);
-    coloffset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-					       -1, _("Value"),
-					       renderer, "text",
-					       STRING2_COLUMN,
-					       NULL);
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), coloffset - 1);
+    coloffset = gtk_tree_view_insert_column_with_attributes(
+            GTK_TREE_VIEW(treeview),
+            -1, _("Value"),
+            renderer, "text",
+            STRING2_COLUMN,
+            NULL);
+    column = gtk_tree_view_get_column(GTK_TREE_VIEW(treeview), coloffset - 1);
 
     //Add tree to scrollwindow.
-    gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
+    gtk_container_add(GTK_CONTAINER(scrollwindow1), treeview);
 
 #endif
 
-    gtk_widget_show_all (propsDialog);
+    gtk_widget_show_all(propsDialog);
 
 }
 
@@ -1829,8 +1831,8 @@ GtkGui::showAboutDialog()
     gtk_about_dialog_set_website(about, "http://www.gnu.org/software/gnash/");
 
     // Destroy the dialogue box when 'close' is clicked.
-    g_signal_connect(G_OBJECT(aboutWidget),
-            "response",  G_CALLBACK(gtk_widget_destroy), aboutWidget);
+    g_signal_connect(aboutWidget, "response", 
+            G_CALLBACK(gtk_widget_destroy), aboutWidget);
 
     gtk_widget_show (aboutWidget);
 
@@ -1860,7 +1862,8 @@ GtkGui::showAboutDialog()
         "GNU General Public License for more details.\n"
         "You should have received a copy of the GNU General Public License\n"
         "along with this program; if not, write to the Free Software\n"
-        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301"
+        "  USA",
         "website", "http://www.gnu.org/software/gnash/",
         NULL);
 #endif
@@ -1925,7 +1928,6 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 void
 GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-    
     GtkGui* gui = static_cast<GtkGui*>(data);
     gui->showPreferencesDialog();
 }
@@ -1942,10 +1944,8 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 gint
 GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 {
-//    GNASH_REPORT_FUNCTION;
-
     GtkMenu *menu = GTK_MENU(widget);
-//    printf("event type # %i\n", event->type);
+    
     if (event->type == GDK_BUTTON_PRESS) {
         GdkEventButton *event_button = (GdkEventButton *) event;
         if (event_button->button == 3) {
@@ -1961,7 +1961,6 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 void
 GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->toggleSound();
 }
@@ -1969,7 +1968,6 @@ GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 void
 GtkGui::menuitem_fullscreen_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->toggleFullscreen();
 }
@@ -1979,7 +1977,6 @@ GtkGui::menuitem_fullscreen_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 void
 GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->restart();
 }
@@ -1988,8 +1985,6 @@ GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 void
 GtkGui::menuitem_quit_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
-//    GNASH_REPORT_FUNCTION;
-
     gtk_main_quit();
 }
 
@@ -1997,7 +1992,6 @@ GtkGui::menuitem_quit_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 void
 GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->play();
 }
@@ -2006,7 +2000,6 @@ GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 void
 GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->pause();
 }
@@ -2015,7 +2008,6 @@ GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 void
 GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->stop();
 }
@@ -2024,9 +2016,8 @@ GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 /// \brief Force redraw
 void
 GtkGui::menuitem_refresh_view_callback(GtkMenuItem* /*menuitem*/,
-                                gpointer data)
+    gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->refreshView();
 }
@@ -2034,14 +2025,13 @@ GtkGui::menuitem_refresh_view_callback(GtkMenuItem* /*menuitem*/,
 /// \brief Force redraw
 void
 GtkGui::menuitem_show_updated_regions_callback(GtkMenuItem* /*menuitem*/,
-                                gpointer data)
+    gpointer data)
 {
     Gui* gui = static_cast<Gui*>(data);
-    gui->showUpdatedRegions(! (gui->showUpdatedRegions()) );
+    gui->showUpdatedRegions(!gui->showUpdatedRegions());
     
     // refresh to clear the remaining red lines...
-    if ( ! (gui->showUpdatedRegions()))
-      gui->refreshView();
+    if (!gui->showUpdatedRegions()) gui->refreshView();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2054,10 +2044,8 @@ GtkGui::menuitem_show_updated_regions_callback(GtkMenuItem* /*menuitem*/,
 
 gboolean
 GtkGui::expose_event(GtkWidget *const /*widget*/,
-             GdkEventExpose *const event,
-             const gpointer data)
+     GdkEventExpose *const event, const gpointer data)
 {
-//	GNASH_REPORT_FUNCTION;
 
     GtkGui* gui = static_cast<GtkGui*>(data);
 
@@ -2068,10 +2056,8 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 
 gboolean
 GtkGui::configure_event(GtkWidget *const widget,
-                GdkEventConfigure *const event,
-                const gpointer data)
+    GdkEventConfigure *const event, const gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
 
     GtkGui* obj = static_cast<GtkGui*>(data);
 
@@ -2087,8 +2073,6 @@ gboolean
 GtkGui::realize_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
 		gpointer /*data*/)
 {
-    //GNASH_REPORT_FUNCTION;
-
     return TRUE;
 }
 
@@ -2106,15 +2090,13 @@ GtkGui::delete_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
 
 gboolean
 GtkGui::key_press_event(GtkWidget *const /*widget*/,
-                GdkEventKey *const event,
-                const gpointer data)
+    GdkEventKey *const event, const gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
 
     Gui* gui = static_cast<Gui*>(data);
 
     /* Forward key event to gnash */
-    gnash::key::code	c = gdk_to_gnash_key(event->keyval);
+    gnash::key::code c = gdk_to_gnash_key(event->keyval);
     int mod = gdk_to_gnash_modifier(event->state);
     
     if (c != gnash::key::INVALID) {
@@ -2126,10 +2108,8 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
 
 gboolean
 GtkGui::key_release_event(GtkWidget *const /*widget*/,
-                GdkEventKey *const event,
-                const gpointer data)
+    GdkEventKey *const event, const gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
 
     Gui* gui = static_cast<Gui*>(data);
 
@@ -2146,8 +2126,7 @@ GtkGui::key_release_event(GtkWidget *const /*widget*/,
 
 gboolean
 GtkGui::button_press_event(GtkWidget *const /*widget*/,
-                           GdkEventButton *const event,
-                           const gpointer data)
+   GdkEventButton *const event, const gpointer data)
 {
 
     /// Double- and triple-clicks should not send an extra event!
@@ -2165,10 +2144,8 @@ GtkGui::button_press_event(GtkWidget *const /*widget*/,
 
 gboolean
 GtkGui::button_release_event(GtkWidget * const /*widget*/,
-                             GdkEventButton * const event,
-                             const gpointer data)
+     GdkEventButton * const event, const gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
 
     int	mask = 1 << (event->button - 1);
@@ -2178,10 +2155,8 @@ GtkGui::button_release_event(GtkWidget * const /*widget*/,
 
 gboolean
 GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
-                            GdkEventMotion *const event,
-                            const gpointer data)
+    GdkEventMotion *const event, const gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
 
     obj->notify_mouse_moved(event->x, event->y);
@@ -2201,62 +2176,58 @@ GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
 void
 GtkGui::createFileMenu(GtkWidget *obj)
 {
-//    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_File"));
-    gtk_widget_show (menuitem);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(_("_File"));
+    gtk_widget_show(menuitem);
+    gtk_container_add(GTK_CONTAINER(obj), menuitem);
     
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-// Open    
+    // Open    
     GtkWidget *open =
- 	gtk_image_menu_item_new_from_stock ("gtk-open", NULL);
-    gtk_widget_show (open);
-    gtk_container_add (GTK_CONTAINER (menu), open);
-    g_signal_connect ((gpointer) open, "activate",
-                      G_CALLBACK (&menuitem_openfile_callback),
-                      this);
+        gtk_image_menu_item_new_from_stock("gtk-open", 0);
+    gtk_widget_show(open);
+    gtk_container_add(GTK_CONTAINER(menu), open);
+    g_signal_connect(open, "activate",
+                      G_CALLBACK (menuitem_openfile_callback), this);
 
-// Save    
+    // Save    
     GtkWidget *save =
- 	gtk_image_menu_item_new_from_stock ("gtk-save", NULL);
-    gtk_widget_show (save);
-    gtk_container_add (GTK_CONTAINER (menu), save);
+        gtk_image_menu_item_new_from_stock("gtk-save", 0);
+    gtk_widget_show(save);
+    gtk_container_add(GTK_CONTAINER(menu), save);
     // Disabled until save functionality is implemented:
-    gtk_widget_set_sensitive(save,FALSE); 
+    gtk_widget_set_sensitive(save, FALSE); 
 
-// Save as
+    // Save as
     GtkWidget *save_as =
- 	gtk_image_menu_item_new_from_stock ("gtk-save-as", NULL);
-    gtk_widget_show (save_as);
-    gtk_container_add (GTK_CONTAINER (menu), save_as);
+        gtk_image_menu_item_new_from_stock("gtk-save-as", 0);
+    gtk_widget_show(save_as);
+    gtk_container_add(GTK_CONTAINER(menu), save_as);
     // Disabled until save-as functionality is implemented:
-    gtk_widget_set_sensitive(save_as,FALSE);
+    gtk_widget_set_sensitive(save_as, FALSE);
     
-    GtkWidget *separatormenuitem1 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separatormenuitem1);
-    gtk_container_add (GTK_CONTAINER (menu), separatormenuitem1);
+    GtkWidget *separatormenuitem1 = gtk_separator_menu_item_new();
+    gtk_widget_show(separatormenuitem1);
+    gtk_container_add(GTK_CONTAINER(menu), separatormenuitem1);
 
-// Properties
+    // Properties
     GtkWidget *properties =
- 	gtk_image_menu_item_new_from_stock ("gtk-properties", NULL);
-    gtk_widget_show (properties);
-    gtk_container_add (GTK_CONTAINER (menu), properties);
-    g_signal_connect ((gpointer) properties, "activate",
-                      G_CALLBACK (&menuitem_movieinfo_callback),
-                      this);
+        gtk_image_menu_item_new_from_stock("gtk-properties", 0);
+    gtk_widget_show(properties);
+    gtk_container_add(GTK_CONTAINER(menu), properties);
+    g_signal_connect(properties, "activate", 
+            G_CALLBACK(menuitem_movieinfo_callback), this);
 
-    GtkWidget *separator2 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator2);
-    gtk_container_add (GTK_CONTAINER (menu), separator2);
+    GtkWidget *separator2 = gtk_separator_menu_item_new();
+    gtk_widget_show(separator2);
+    gtk_container_add(GTK_CONTAINER(menu), separator2);
 
-    GtkWidget *quit = gtk_image_menu_item_new_from_stock ("gtk-quit", NULL);
-    gtk_widget_show (quit);
-    gtk_container_add (GTK_CONTAINER (menu), quit);
+    GtkWidget *quit = gtk_image_menu_item_new_from_stock("gtk-quit", 0);
+    gtk_widget_show(quit);
+    gtk_container_add(GTK_CONTAINER(menu), quit);
 
-    g_signal_connect ((gpointer) quit, "activate",
-                      G_CALLBACK (&menuitem_quit_callback),
+    g_signal_connect(quit, "activate", G_CALLBACK(menuitem_quit_callback),
                       this);
 }
 
@@ -2264,22 +2235,21 @@ GtkGui::createFileMenu(GtkWidget *obj)
 void
 GtkGui::createEditMenu(GtkWidget *obj)
 {
-//    GNASH_REPORT_FUNCTION;
     
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Edit"));
-    gtk_widget_show (menuitem);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(_("_Edit"));
+    gtk_widget_show(menuitem);
+    gtk_container_add(GTK_CONTAINER(obj), menuitem);
     
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+    GtkWidget *menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), menu);
 
     GtkWidget *preferences1 =
- 	gtk_image_menu_item_new_from_stock ("gtk-preferences", NULL);
-    gtk_widget_show (preferences1);
-    gtk_container_add (GTK_CONTAINER (menu), preferences1);
+        gtk_image_menu_item_new_from_stock("gtk-preferences", 0);
+    gtk_widget_show(preferences1);
+    gtk_container_add(GTK_CONTAINER(menu), preferences1);
 
-    g_signal_connect ((gpointer) preferences1, "activate",
-                      G_CALLBACK (&menuitem_preferences_callback),
+    g_signal_connect(preferences1, "activate",
+                      G_CALLBACK(menuitem_preferences_callback),
                       this);
 }
 
@@ -2287,22 +2257,21 @@ GtkGui::createEditMenu(GtkWidget *obj)
 void
 GtkGui::createHelpMenu(GtkWidget *obj)
 {
-//    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Help"));
-    gtk_widget_show (menuitem);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(_("_Help"));
+    gtk_widget_show(menuitem);
+    gtk_container_add(GTK_CONTAINER (obj), menuitem);
     
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+    GtkWidget *menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), menu);
 
-    GtkWidget *about = gtk_image_menu_item_new_from_stock ("gtk-about", NULL);
-    gtk_widget_show (about);
-    gtk_container_add (GTK_CONTAINER (menu), about);
+    GtkWidget *about = gtk_image_menu_item_new_from_stock("gtk-about", 0);
+    gtk_widget_show(about);
+    gtk_container_add (GTK_CONTAINER(menu), about);
     
-    g_signal_connect ((gpointer) about, "activate",
-                      G_CALLBACK (&menuitem_about_callback),
+    g_signal_connect(about, "activate", G_CALLBACK(menuitem_about_callback),
                       this);
 }
+
 
 // Create a View menu that can be used from the menu bar or the popup.
 void
@@ -2318,45 +2287,76 @@ GtkGui::createViewMenu(GtkWidget *obj)
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
     // Refresh
-    GtkImageMenuItem *menuitem_refresh =
- 	GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Redraw")));
-    gtk_image_menu_item_set_image (menuitem_refresh,
-				   gtk_image_new_from_stock("gtk-refresh",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_refresh));
-    gtk_widget_show(GTK_WIDGET(menuitem_refresh));
-    g_signal_connect ((gpointer) menuitem_refresh, "activate",
-        G_CALLBACK (&menuitem_refresh_view_callback), this);
+    GtkWidget *menuitem_refresh =
+	    gtk_image_menu_item_new_with_label(_("Redraw"));
+    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem_refresh),
+        gtk_image_new_from_stock("gtk-refresh", GTK_ICON_SIZE_MENU));
+    gtk_menu_append(menu, menuitem_refresh);
+    gtk_widget_show(menuitem_refresh);
+    g_signal_connect((gpointer)menuitem_refresh, "activate",
+        G_CALLBACK(&menuitem_refresh_view_callback), this);
 
     // Fullscreen
 #if GTK_CHECK_VERSION(2,8,0)
-    GtkImageMenuItem *menuitem_fullscreen = GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Toggle fullscreen")));
-    gtk_image_menu_item_set_image (menuitem_fullscreen,
+    GtkWidget *menuitem_fullscreen = 
+	    gtk_image_menu_item_new_with_label(_("Toggle fullscreen"));
+    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(menuitem_fullscreen),
 				   gtk_image_new_from_stock("gtk-fullscreen",
 						 	     GTK_ICON_SIZE_MENU));
 #else
-    GtkMenuItem *menuitem_fullscreen =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Toggle fullscreen")));
+    GtkWidget *menuitem_fullscreen = 
+        gtk_menu_item_new_with_label(_("Toggle fullscreen"));
 #endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_fullscreen));
+    gtk_menu_append(menu, menuitem_fullscreen);
     gtk_widget_show(GTK_WIDGET(menuitem_fullscreen));
     g_signal_connect(GTK_OBJECT(menuitem_fullscreen), "activate",
                          G_CALLBACK(&menuitem_fullscreen_callback), this);
 
+#if 0
+    // Quality
+    GSList* qualityGroup = 0;
+    GtkWidget *button = gtk_radio_menu_item_new_with_label(qualityGroup,
+            _("Best"));
+    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
+    gtk_menu_append(menu, button);
+    gtk_widget_show(button);
+    
+    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("High"));
+    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
+    gtk_menu_append(menu, button);
+    gtk_widget_show(button);
+    
+    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("Medium"));
+    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
+    gtk_menu_append(menu, button);
+    gtk_widget_show(button);
+    
+    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("Low"));
+    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
+    gtk_menu_append(menu, button);
+    gtk_widget_show(button);
+    
+    button = gtk_radio_menu_item_new_with_label(qualityGroup, _("Automatic"));
+    qualityGroup = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(button));
+
+    gtk_menu_append(menu, button);
+    gtk_widget_show(button);
+
+#endif
+
 // Can be disabled at compile time.
 #ifndef DISABLE_REGION_UPDATES_DEBUGGING
-    GtkCheckMenuItem *menuitem_show_updated_regions =
-        GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Show updated ranges")));
+    GtkWidget *menuitem_show_updated_regions =
+        gtk_check_menu_item_new_with_label(_("Show updated ranges"));
    
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_show_updated_regions),
-                                    showUpdatedRegions() );
+    gtk_check_menu_item_set_active(
+            GTK_CHECK_MENU_ITEM(menuitem_show_updated_regions),
+            showUpdatedRegions());
 
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_show_updated_regions));
-    gtk_widget_show(GTK_WIDGET(menuitem_show_updated_regions));
-    g_signal_connect(GTK_OBJECT(menuitem_show_updated_regions), "activate",
-                     G_CALLBACK(&menuitem_show_updated_regions_callback), this);
+    gtk_menu_append(menu, menuitem_show_updated_regions);
+    gtk_widget_show(menuitem_show_updated_regions);
+    g_signal_connect(menuitem_show_updated_regions, "activate",
+                     G_CALLBACK(menuitem_show_updated_regions_callback), this);
 #endif
 
 }
@@ -2365,123 +2365,68 @@ GtkGui::createViewMenu(GtkWidget *obj)
 void
 GtkGui::createControlMenu(GtkWidget *obj)
 {
-//    GNASH_REPORT_FUNCTION;
 
-// Movie Control Menu
+    // Movie Control Menu
     GtkWidget *menuitem_control =
-	gtk_menu_item_new_with_mnemonic (_("Movie _Control"));
-    gtk_widget_show (menuitem_control);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem_control);
+        gtk_menu_item_new_with_mnemonic(_("Movie _Control"));
+    gtk_widget_show(menuitem_control);
+    gtk_container_add(GTK_CONTAINER(obj), menuitem_control);
     
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem_control), menu);
+    GtkWidget *menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem_control), menu);
 
-// Play
+    // Play
 #if GTK_CHECK_VERSION(2,6,0)
-    GtkMenuItem *menuitem_play = GTK_MENU_ITEM(
- 	gtk_image_menu_item_new_from_stock ("gtk-media-play", NULL));
+    GtkWidget *menuitem_play = 
+        gtk_image_menu_item_new_from_stock("gtk-media-play", NULL);
 #else
-    GtkMenuItem *menuitem_play =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Play")));
+    GtkWidget *menuitem_play =
+        gtk_menu_item_new_with_label(_("Play"));
 #endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_play));
-    gtk_widget_show(GTK_WIDGET(menuitem_play));    
-    g_signal_connect ((gpointer) menuitem_play, "activate",
-        G_CALLBACK (&menuitem_play_callback), this);
+    gtk_menu_append(menu, menuitem_play);
+    gtk_widget_show(menuitem_play);    
+    g_signal_connect (menuitem_play, "activate",
+            G_CALLBACK(menuitem_play_callback), this);
 
-// Pause
+    // Pause
 #if GTK_CHECK_VERSION(2,6,0)
-    GtkMenuItem *menuitem_pause = GTK_MENU_ITEM(
- 	gtk_image_menu_item_new_from_stock ("gtk-media-pause", NULL));
+    GtkWidget *menuitem_pause = 
+        gtk_image_menu_item_new_from_stock ("gtk-media-pause", NULL);
 #else
-    GtkMenuItem *menuitem_pause =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Pause")));
+    GtkWidget *menuitem_pause =
+        gtk_menu_item_new_with_label(_("Pause"));
 #endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_pause));
-    gtk_widget_show(GTK_WIDGET(menuitem_pause));
-    g_signal_connect ((gpointer) menuitem_pause, "activate",
-        G_CALLBACK (&menuitem_pause_callback), this);
+    gtk_menu_append(menu, menuitem_pause);
+    gtk_widget_show(menuitem_pause);
+    g_signal_connect(menuitem_pause, "activate",
+        G_CALLBACK(menuitem_pause_callback), this);
 
-// Stop
+    // Stop
 #if GTK_CHECK_VERSION(2,6,0)
-    GtkMenuItem *menuitem_stop = GTK_MENU_ITEM(
- 	gtk_image_menu_item_new_from_stock ("gtk-media-stop", NULL));
+    GtkWidget *menuitem_stop = 
+        gtk_image_menu_item_new_from_stock("gtk-media-stop", 0);
 #else
-    GtkMenuItem *menuitem_stop =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Stop")));
+    GtkWidget *menuitem_stop = gtk_menu_item_new_with_label(_("Stop"));
 #endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_stop));
-    gtk_widget_show(GTK_WIDGET(menuitem_stop));
-    g_signal_connect ((gpointer) menuitem_stop, "activate",
-        G_CALLBACK (&menuitem_stop_callback), this);
+    gtk_menu_append(menu, menuitem_stop);
+    gtk_widget_show(menuitem_stop);
+    g_signal_connect(menuitem_stop, "activate",
+        G_CALLBACK(menuitem_stop_callback), this);
 
-    GtkWidget *separator1 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator1);
-    gtk_container_add (GTK_CONTAINER (menu), separator1);
+    GtkWidget *separator1 = gtk_separator_menu_item_new();
+    gtk_widget_show(separator1);
+    gtk_container_add(GTK_CONTAINER(menu), separator1);
 
-// Restart
-// 
-    GtkImageMenuItem *menuitem_restart =
- 	GTK_IMAGE_MENU_ITEM(
-	     gtk_image_menu_item_new_with_label(_("Restart Movie")));
-// Suitable image?
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_restart));
-    gtk_widget_show(GTK_WIDGET(menuitem_restart));
-    g_signal_connect ((gpointer) menuitem_restart, "activate",
-        G_CALLBACK (&menuitem_restart_callback), this);
+    // Restart
+    // 
+    GtkWidget *menuitem_restart = 
+        gtk_image_menu_item_new_with_label(_("Restart Movie"));
 
-#if 0 // Presently disabled
-
-    GtkWidget *separator2 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator1);
-    gtk_container_add (GTK_CONTAINER (menu), separator2);
-
-// Step Forward
-    GtkImageMenuItem *menuitem_step_forward =
- 	GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Step Forward Frame")));
-    gtk_image_menu_item_set_image (menuitem_step_forward,
-				   gtk_image_new_from_stock("gtk-go-forward",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_step_forward));
-    gtk_widget_show(GTK_WIDGET(menuitem_step_forward));
-//     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
-//                                 GDK_bracketleft, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-
-// Step Backward
-    GtkImageMenuItem *menuitem_step_backward =
- 	GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Step Backward Frame")));
-    gtk_image_menu_item_set_image (menuitem_step_backward,
-				   gtk_image_new_from_stock("gtk-go-back",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_step_backward));
-    gtk_widget_show(GTK_WIDGET(menuitem_step_backward));
-//     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
-//                                 GDK_bracketright, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-
-// Jump Forward
-// Stock image from Gtk-2.6 should be ignored in earlier versions.
-    GtkImageMenuItem *menuitem_jump_forward =
-        GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Jump Forward 10 Frames")));
-    gtk_image_menu_item_set_image (menuitem_jump_forward,
-				   gtk_image_new_from_stock("gtk-media-forward",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_forward));
-    gtk_widget_show(GTK_WIDGET(menuitem_jump_forward));
-
-// Jump Backward
-// Stock image from Gtk-2.6 should be ignored in earlier versions.
-    GtkImageMenuItem *menuitem_jump_backward =
- 	GTK_IMAGE_MENU_ITEM(gtk_image_menu_item_new_with_label(_("Jump Backward 10 Frames")));
-    gtk_image_menu_item_set_image (menuitem_jump_backward,
-				   gtk_image_new_from_stock("gtk-media-rewind",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
-    gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
-
-#endif
+    // Suitable image?
+    gtk_menu_append(menu, menuitem_restart);
+    gtk_widget_show(menuitem_restart);
+    g_signal_connect(menuitem_restart, "activate",
+        G_CALLBACK(menuitem_restart_callback), this);
 
 }
 
@@ -2496,7 +2441,7 @@ GtkGui::createControlMenu(GtkWidget *obj)
 gnash::key::code
 GtkGui::gdk_to_gnash_key(guint key)
 {
-    gnash::key::code  c(gnash::key::INVALID);
+    gnash::key::code c(gnash::key::INVALID);
 
     // ascii 32-126 in one range:    
     if (key >= GDK_space && key <= GDK_asciitilde) {
