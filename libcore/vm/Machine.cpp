@@ -2399,8 +2399,9 @@ Machine::findSuper(as_value &v, bool find_for_primitive)
 }
 
 void
-Machine::immediateFunction(const as_function *to_call, as_object *pThis,
-	as_value& storage, unsigned char stack_in, short stack_out)
+Machine::immediateFunction(const as_function * /*to_call*/,
+        as_object* /*pThis*/, as_value& /*storage*/,
+        unsigned char /*stack_in*/, short /*stack_out*/)
 {
 	// TODO: Set up the fn, or remove the need.
 
