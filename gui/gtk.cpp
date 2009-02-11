@@ -328,7 +328,12 @@ GtkGui::error(const std::string& msg)
     g_signal_connect_swapped(popup, "response", G_CALLBACK(gtk_widget_destroy),
             popup);
 
+#if GTK_CHECK_VERSION(2,14,0)
     GtkWidget* content = gtk_dialog_get_content_area(GTK_DIALOG(popup));
+#else
+    GtkWidget* content = GTK_DIALOG(popup)->vbox;
+#endif
+
     GtkWidget* label = gtk_label_new(msg.c_str());
     gtk_widget_set_size_request(label, 400, 200);
     gtk_label_set_line_wrap(GTK_LABEL(label), true);

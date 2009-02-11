@@ -38,7 +38,7 @@ tu_file::write(const void* src, std::streamsize bytes)
 // Return the number of bytes actually written.
 {
     assert(src);
-    return std::fwrite( src, 1, bytes, static_cast<FILE*>(m_data));
+    return std::fwrite(src, 1, bytes, static_cast<FILE*>(m_data));
 }
 
 bool
@@ -46,7 +46,7 @@ tu_file::seek(std::streampos pos)
 {
 
     // TODO: optimize this by caching total stream size ?
-    if (pos > size()) return false;
+    if (static_cast<size_t>(pos) > size()) return false;
 
     FILE* file = static_cast<FILE*>(m_data);
 
@@ -79,7 +79,7 @@ tu_file::tell() const
     std::streampos ret = std::ftell(f);
     if (ret < 0) throw IOException("Error getting stream position");
 
-    assert(ret <= size());
+    assert(static_cast<size_t>(ret) <= size());
     return ret;
 }
 
