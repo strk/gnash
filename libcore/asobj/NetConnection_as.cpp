@@ -370,7 +370,7 @@ HTTPRemotingHandler::advance()
         // the buffer is full, 2) when we have a "length in bytes" value
         // thas is satisfied
 
-        if(_connection->get_error())
+        if (_connection->bad())
         {
             log_debug("connection is in error condition, calling "
                     "NetConnection.onStatus");

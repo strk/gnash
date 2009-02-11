@@ -46,7 +46,6 @@
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
-#include "PropertyList.h"
 #include "Property.h"
 #include "string_table.h"
 #include "URLAccessManager.h"

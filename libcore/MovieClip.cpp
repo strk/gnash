@@ -262,7 +262,7 @@ public:
 } // anonymous namespace
 
 
-MovieClip::MovieClip( movie_definition* def, movie_instance* r,
+MovieClip::MovieClip(movie_definition* def, movie_instance* r,
         character* parent, int id)
     :
     character(parent, id),
@@ -831,14 +831,6 @@ bool
 MovieClip::set_member(string_table::key name,
         const as_value& val, string_table::key nsname, bool ifFound)
 {
-#ifdef DEBUG_DYNTEXT_VARIABLES
-    //log_debug(_("movieclip[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val);
-#endif
-
-    //if ( val.is_function() )
-    //{
-    //    checkForKeyOrMouseEvent(VM::get().getStringTable().value(name));
-    //}
 
     bool found = false;
 
@@ -2342,7 +2334,7 @@ MovieClip::constructAsScriptObject()
                 as_object* super = get_super();
 
                 as_environment& env = get_environment();
-                fn_call call(this, &env);
+                fn_call call(this, env);
                 call.super = super;
 
                     // we don't use the constructor return (should we?)
@@ -2915,13 +2907,8 @@ movieclip_class_init(as_object& global)
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&movieclip_ctor, getMovieClipInterface());
-        VM::get().addStatic(cl.get());
-
-        // replicate all interface to class, to be able to access
-        // all methods as static functions
-        //attachMovieClipInterface(*cl);
-                 
+        cl = new builtin_function(&movieclip_ctor, getMovieClipInterface());
+        global.getVM().addStatic(cl.get());
     }
 
     // Register _global.MovieClip
@@ -5318,10 +5305,10 @@ attachMovieClipProperties(character& o)
     //int target_version = o.getVM().getSWFVersion();
 
     // This is a normal property, can be overridden, deleted and enumerated
-    // See swfdec/test/trace/movieclip-version-#.swf for why we only initialize this
-    // if we don't have a parent
-    if ( ! o.get_parent() ) o.init_member( "$version",
-            VM::get().getPlayerVersion(), 0); 
+    // See swfdec/test/trace/movieclip-version-#.swf for why we only
+    // initialize this if we don't have a parent
+    if (!o.get_parent()) o.init_member("$version",
+            o.getVM().getPlayerVersion(), 0); 
 
     as_c_function_ptr gettersetter;
 

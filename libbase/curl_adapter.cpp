@@ -409,24 +409,24 @@ public:
 	~CurlStreamFile();
 
 	// See dox in IOChannel.h
-	virtual int read(void *dst, int bytes);
+	virtual std::streamsize read(void *dst, std::streamsize bytes);
 
 	// See dox in IOChannel.h
-	virtual int readNonBlocking(void *dst, int bytes);
+	virtual std::streamsize readNonBlocking(void *dst, std::streamsize bytes);
 
 	// See dox in IOChannel.h
 	virtual bool eof() const;
 
 	// See dox in IOChannel.h
-	virtual int get_error() const {
+	virtual bool bad() const {
 		return _error;
 	}
 
 	/// Report global position within the file
-	virtual int tell() const;
+	virtual std::streampos tell() const;
 
 	/// Put read pointer at given position
-	virtual int seek(int pos);
+	virtual bool seek(std::streampos pos);
 
 	/// Put read pointer at eof
 	virtual void go_to_end();
@@ -440,7 +440,7 @@ public:
 	/// Another approach might be filling the cache ourselves
 	/// aiming at obtaining a useful value.
 	///
-	virtual int size() const;
+	virtual size_t size() const;
 
 private:
 
@@ -467,27 +467,27 @@ private:
 	int _running;
 
 	// stream error
-	// 0 on no error.
+	// false on no error.
 	// Example of errors would be:
 	//	404 - file not found
 	//	timeout occurred
-	int _error;
+	bool _error;
 
 	// Post data. Empty if no POST has been requested
 	std::string _postdata;
 
 	// Current size of cached data
-	long unsigned _cached;
+    size_t _cached;
 
 	/// Total stream size.
 	//
 	/// This will be 0 until known
 	///
-	mutable int _size;
+	mutable size_t _size;
 
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
-	void fillCache(long unsigned size);
+	void fillCache(std::streamsize size);
 
 	// Process pending curl messages (handles 404)
 	void processMessages();
@@ -497,12 +497,11 @@ private:
 	void fillCacheNonBlocking();
 
 	// Append sz bytes to the cache
-	size_t cache(void *from, size_t sz);
+    std::streamsize cache(void *from, std::streamsize sz);
 
 	// Callback for libcurl, will be called
 	// by fillCache() and will call cache()
-	static size_t recv(void *buf, size_t  size,
-		size_t  nmemb, void *userp);
+	static size_t recv(void *buf, size_t size, size_t nmemb, void *userp);
 
     // List of custom headers for this stream.
     struct curl_slist *_customHeaders;
@@ -517,8 +516,7 @@ private:
 
 /*static private*/
 size_t
-CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb,
-	void *userp)
+CurlStreamFile::recv(void *buf, size_t size, size_t nmemb, void *userp)
 {
 #ifdef GNASH_CURL_VERBOSE
 	log_debug("curl write callback called for (%d) bytes",
@@ -530,8 +528,8 @@ CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb,
 
 
 /*private*/
-size_t
-CurlStreamFile::cache(void *from, size_t size)
+std::streamsize
+CurlStreamFile::cache(void *from, std::streamsize size)
 {
 	// take note of current position
 	long curr_pos = std::ftell(_cache);
@@ -539,7 +537,7 @@ CurlStreamFile::cache(void *from, size_t size)
 	// seek to the end
 	std::fseek(_cache, 0, SEEK_END);
 
-	size_t wrote = std::fwrite(from, 1, size, _cache);
+    std::streamsize wrote = std::fwrite(from, 1, size, _cache);
 	if ( wrote < 1 )
 	{
 
@@ -589,14 +587,16 @@ CurlStreamFile::fillCacheNonBlocking()
 
 /*private*/
 void
-CurlStreamFile::fillCache(long unsigned size)
+CurlStreamFile::fillCache(std::streamsize size)
 {
 
 #if GNASH_CURL_VERBOSE
     log_debug("fillCache(%d), called, currently cached: %d", size, _cached);
 #endif 
 
-	if ( ! _running || _cached >= size ) {
+    assert(size >= 0);
+
+	if ( ! _running || _cached >= static_cast<size_t>(size)) {
 #if GNASH_CURL_VERBOSE
         if (!_running) log_debug("Not running: returning");
         else log_debug("Already enough bytes cached: returning");
@@ -630,13 +630,15 @@ CurlStreamFile::fillCache(long unsigned size)
 		// Do this here to avoid calling select()
 		// when we have enough bytes anyway, or
 		// we reached EOF
-		if (_cached >= size || !_running) break; // || _error ?
+		if (_cached >= static_cast<size_t>(size) || !_running) break; 
 
 #if GNASH_CURL_VERBOSE
 		//log_debug("cached: %d, size: %d", _cached, size);
 #endif
 
-		mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, &exceptfd, &maxfd);
+		mcode = curl_multi_fdset(_mhandle, &readfd, &writefd, 
+                &exceptfd, &maxfd);
+
 		if (mcode != CURLM_OK) {
 			// This is a serious error, not just a failure to add any
 			// fds.
@@ -740,7 +742,7 @@ CurlStreamFile::processMessages()
 				if ( code >= 400 ) {
 					log_error ("HTTP response %ld from url %s",
 							            code, _url);
-					_error = TU_FILE_OPEN_ERROR;
+					_error = true;
 					_running = false;
 				}
 				else {
@@ -754,7 +756,7 @@ CurlStreamFile::processMessages()
 				// Transaction failed, pass on curl error.
 				log_error("CURL: %s", curl_easy_strerror(
 						            curl_msg->data.result));
-				_error = TU_FILE_OPEN_ERROR;
+				_error = true;
 			}
 
 		}
@@ -771,7 +773,7 @@ CurlStreamFile::init(const std::string& url, const std::string& cachefile)
 
 	_url = url;
 	_running = 1;
-	_error = 0;
+	_error = false;
 
 	_cached = 0;
 	_size = 0;
@@ -1039,8 +1041,8 @@ CurlStreamFile::~CurlStreamFile()
 }
 
 /*public*/
-int
-CurlStreamFile::read(void *dst, int bytes)
+std::streamsize
+CurlStreamFile::read(void *dst, std::streamsize bytes)
 {
 	if ( eof() || _error ) return 0;
 
@@ -1060,13 +1062,14 @@ CurlStreamFile::read(void *dst, int bytes)
 }
 
 /*public*/
-int
-CurlStreamFile::readNonBlocking(void *dst, int bytes)
+std::streamsize
+CurlStreamFile::readNonBlocking(void *dst, std::streamsize bytes)
 {
 	if ( eof() ) return 0;
 	if ( _error )
 	{
-		log_error("curl adaptor's readNonBlocking called while _error != 0 - should we throw an exception?");
+		log_error("curl adaptor's readNonBlocking called while _error != 0 "
+                "- should we throw an exception?");
 		return 0;
 	}
 
@@ -1078,11 +1081,12 @@ CurlStreamFile::readNonBlocking(void *dst, int bytes)
 	if ( _error )
 	{
 		// I guess an exception would be thrown in this case ?
-		log_error("curl adaptor's fillCacheNonBlocking set _error rather then throwing an exception");
-		return -1; // error can be set by fillCacheNonBlocking (shouldn't an exception be thrown an exception?)
+		log_error("curl adaptor's fillCacheNonBlocking set _error "
+                "rather then throwing an exception");
+		return -1; 
 	}
 
-	int actuallyRead = std::fread(dst, 1, bytes, _cache);
+    std::streamsize actuallyRead = std::fread(dst, 1, bytes, _cache);
 	if ( _running )
 	{
 		// if we're still running drop any eof flag
@@ -1108,10 +1112,10 @@ CurlStreamFile::eof() const
 }
 
 /*public*/
-int
+std::streampos
 CurlStreamFile::tell() const
 {
-	int ret =  std::ftell(_cache);
+    std::streampos ret = std::ftell(_cache);
 
 #ifdef GNASH_CURL_VERBOSE
 	log_debug("tell() returning %ld", ret);
@@ -1122,9 +1126,12 @@ CurlStreamFile::tell() const
 }
 
 /*public*/
-int
-CurlStreamFile::seek(int pos)
+bool
+CurlStreamFile::seek(std::streampos pos)
 {
+
+    assert(pos >= 0);
+
 #ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
 		log_debug("Warning: seek backward requested (%ld from %ld)",
@@ -1133,20 +1140,21 @@ CurlStreamFile::seek(int pos)
 #endif
 
 	fillCache(pos);
-	if ( _error ) return -1; // error can be set by fillCache
+	if (_error) return false; // error can be set by fillCache
 
-	if ( _cached < (unsigned int)pos )
+	if (_cached < static_cast<size_t>(pos))
 	{
-		log_error ("Warning: could not cache anough bytes on seek: %d requested, %d cached", pos, _cached);
-		return -1; // couldn't cache so many bytes
+		log_error ("Warning: could not cache anough bytes on seek: %d "
+                "requested, %d cached", pos, _cached);
+		return false; 
 	}
 
 	if (std::fseek(_cache, pos, SEEK_SET) == -1) {
 		log_error("Warning: fseek failed");
-		return -1;
-	} else {
-		return 0;
+		return false;
 	}
+   
+    return true;
 
 }
 
@@ -1167,34 +1175,33 @@ CurlStreamFile::go_to_end()
 			throw IOException(curl_multi_strerror(mcode));
 		}
 
-                long code;
-                curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
-                if ( code == 404 ) // file not found!
-                {
-			throw IOException("File not found");
-                        //log_error(_("404 response from url %s"), _url);
-                        //_error = TU_FILE_OPEN_ERROR;
-                        //return;
-                }
+        long code;
+        curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
+        if (code == 404) // file not found!
+        {
+            throw IOException("File not found");
+        }
 
 	}
 
 	if (std::fseek(_cache, 0, SEEK_END) == -1) {
 		throw IOException("NetworkAdapter: fseek to end failed");
-		//log_error("Warning: fseek to end failed");
-		//return -1;
 	} 
 }
 
 /*public*/
-int
+size_t
 CurlStreamFile::size() const
 {
 	if ( ! _size )
 	{
 		double size;
-		CURLcode ret = curl_easy_getinfo(_handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &size);
-		if ( ret == CURLE_OK ) _size = int(size);
+		CURLcode ret = curl_easy_getinfo(_handle,
+                CURLINFO_CONTENT_LENGTH_DOWNLOAD, &size);
+		if (ret == CURLE_OK) {
+            assert(size <= std::numeric_limits<size_t>::max());
+            _size = static_cast<size_t>(size);
+        }
 	}
 
 #ifdef GNASH_CURL_VERBOSE

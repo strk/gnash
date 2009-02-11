@@ -34,7 +34,7 @@ public:
     ///	returning it as a native-endian word.
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition.
     ///
     boost::uint32_t read_le32() 
     {
@@ -50,7 +50,7 @@ public:
 	/// returning it as a native-endian word.
 	//
 	/// TODO: define what happens when the stream is in
-	///       error condition, see get_error().
+	///       error condition, see bad().
 	/// TODO: define a platform-neutral type for 64 bits.
 	long double read_le_double64()
 	{
@@ -63,7 +63,7 @@ public:
     /// \brief Read a 16-bit word from a little-endian stream.
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
     boost::uint16_t read_le16()
     {
@@ -75,7 +75,7 @@ public:
     /// \brief Write a 32-bit word to a little-endian stream.
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
     void 	write_le32(boost::uint32_t u)
     {
@@ -88,7 +88,7 @@ public:
     /// \brief Write a 16-bit word to a little-endian stream.
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
     void write_le16(boost::uint16_t u)
     {
@@ -99,37 +99,37 @@ public:
     /// \brief Read a single byte from the stream
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
     boost::uint8_t read_byte() { return read8(); }
 
     /// \brief write a single byte to the stream
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
     void write_byte(boost::uint8_t u) { write8(u); }
     
     /// \brief Read the given number of bytes from the stream
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
-    int read(void* dst, int num);
+    std::streamsize read(void* dst, std::streamsize num);
 
     /// \brief Write the given number of bytes to the stream
     //
     /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
-    int write(const void* src, int num);
+    std::streamsize write(const void* src, std::streamsize num);
 
     /// \brief Return current stream position
     //
     /// TODO: define what to return when the stream
-    ///       is in error condition, see get_error().
+    ///       is in error condition, see bad().
     ///
-    int	tell() const;
+    std::streampos tell() const;
 
     /// \brief Seek to the specified position
     //
@@ -137,9 +137,9 @@ public:
     /// TODO: define what happens when an error occurs, or
     ///       when we're already in an error condition
     ///
-    /// @return 0 on success, or TU_FILE_SEEK_ERROR on failure.
+    /// @return true on success, or false on failure.
     ///
-    int	seek(int p);
+    bool seek(std::streampos p);
 
     /// \brief Seek to the end of the stream
     //
@@ -150,7 +150,7 @@ public:
     /// \brief Return true if the end of the stream has been reached.
     //
     /// TODO: define what to return when in error condition
-    /// see get_error().
+    /// see bad().
     ///
     bool eof() const;
     
@@ -162,11 +162,10 @@ public:
     /// There are some rough meaning for possible returned values
     /// but I don't think they make much sense currently.
     ///
-    int	get_error() const;
+    bool bad() const;
     
-
-    /// \brief Get the size of the stream
-    int size() const;
+    /// Get the size of the stream
+    size_t size() const;
     
 private:
 

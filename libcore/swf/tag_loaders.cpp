@@ -81,11 +81,11 @@ namespace {
 class StreamAdapter : public IOChannel
 {
     SWFStream& s;
-    unsigned long startPos;
-    unsigned long endPos;
-    unsigned long currPos;
+    std::streampos startPos;
+    std::streampos endPos;
+    std::streampos currPos;
 
-    StreamAdapter(SWFStream& str, unsigned long maxPos)
+    StreamAdapter(SWFStream& str, std::streampos maxPos)
         :
         s(str),
         startPos(s.tell()),
@@ -99,16 +99,16 @@ class StreamAdapter : public IOChannel
     {
     }
 
-    virtual int read(void* dst, int bytes) 
+    virtual std::streamsize read(void* dst, std::streamsize bytes) 
     {
-        unsigned bytesLeft = endPos - currPos;
-        if ( bytesLeft < (unsigned)bytes )
+        std::streamsize bytesLeft = endPos - currPos;
+        if ( bytesLeft < bytes )
         {
             if ( ! bytesLeft ) return 0;
             //log_debug("Requested to read past end of stream range");
             bytes = bytesLeft;
         }
-        unsigned actuallyRead = s.read((char*)dst, bytes);
+        std::streamsize actuallyRead = s.read(static_cast<char*>(dst), bytes);
         currPos += actuallyRead;
         return actuallyRead;
     }
@@ -123,38 +123,39 @@ class StreamAdapter : public IOChannel
         return (currPos == endPos);
     }
 
-    // Return -1 on failure, 0 on success
-    virtual int seek(int pos)
+    // Return false on failure, true on success
+    virtual bool seek(std::streampos pos)
     {
         // SWFStream::seek() returns true on success
         if (s.seek(pos))
         {
             currPos = pos;
-            return 0;
+            return true;
         }
-        return -1;
+        return false;
     }
 
-    virtual int size() const
+    virtual size_t size() const
     {
         return (endPos - startPos);
     }
 
-    virtual int tell() const
+    virtual std::streampos tell() const
     {
         return currPos;
     }
     
-    virtual int get_error() const
+    virtual bool bad() const
     {
         // Is there any point in this?
-        return TU_FILE_NO_ERROR;
+        return false;
     }
 
 public:
 
     /// Get an IOChannel from a gnash::SWFStream
-    static std::auto_ptr<IOChannel> getFile(SWFStream& str, unsigned long endPos)
+    static std::auto_ptr<IOChannel> getFile(SWFStream& str,
+            unsigned long endPos)
     {
         std::auto_ptr<IOChannel> ret (new StreamAdapter(str, endPos));
         return ret;
@@ -232,8 +233,8 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("  jpeg_tables_loader"));
     );
 
-    const unsigned long currPos = in.tell();
-    const unsigned long endPos = in.get_tag_end_position();
+    const std::streampos currPos = in.tell();
+    const std::streampos endPos = in.get_tag_end_position();
 
     assert(endPos >= currPos);
 
@@ -257,7 +258,7 @@ jpeg_tables_loader(SWFStream& in, TagType tag, movie_definition& m,
     // of gnash::SWFStream::read(), so this is not a problem.
     //
         boost::shared_ptr<IOChannel> ad(StreamAdapter::getFile(in,
-                    std::numeric_limits<unsigned long>::max()).release());
+                    std::numeric_limits<std::streamsize>::max()).release());
         //  transfer ownership to the JpegImageInput
         input = JpegImageInput::createSWFJpeg2HeaderOnly(ad, jpegHeaderSize);
 

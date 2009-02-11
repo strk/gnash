@@ -43,7 +43,8 @@ namespace gnash {
 
 PropertyList::PropertyList(const PropertyList& pl)
 	:
-	mDefaultOrder(pl.mDefaultOrder) // correct ?
+	mDefaultOrder(pl.mDefaultOrder),
+    _vm(pl._vm)
 {
 	import(pl);
 }
@@ -141,7 +142,7 @@ PropertyList::reserveSlot(unsigned short slotId, string_table::key name,
 	a.setOrder(slotId + 1);
 	_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = VM::get().getStringTable();
+	string_table& st = _vm.getStringTable();
 	log_debug("Slot for AS property %s in namespace %s inserted with flags %s",
 		st.value(name), st.value(nsId), a.getFlags());
 #endif
@@ -175,7 +176,7 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 		a.setOrder(- ++mDefaultOrder - 1);
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = VM::get().getStringTable();
+		string_table& st = _vm.getStringTable();
 		log_debug("Simple AS property %s in namespace %s inserted with flags %s",
 			st.value(key), st.value(nsId), a.getFlags());
 #endif
@@ -185,7 +186,7 @@ PropertyList::setValue(string_table::key key, const as_value& val,
 	const Property& prop = *found;
 	if (prop.isReadOnly() && ! prop.isDestructive())
 	{
-		string_table& st = VM::get().getStringTable();
+		string_table& st = _vm.getStringTable();
 		log_error(_("Property %s (key %d) in namespace %s (key %d) is read-only %s, not setting it to %s"), 
 			st.value(key), key, st.value(nsId), nsId, prop.getFlags(), val);
 		return false;
@@ -212,7 +213,7 @@ PropertyList::setFlags(string_table::key key,
 	return f.set_flags(setFlags, clearFlags);
 
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = VM::get().getStringTable();
+	string_table& st = _vm.getStringTable();
 	log_debug("Flags of property %s in namespace %s changed from %s to  %s",
 		st.value(key), st.value(nsId), oldFlags, found->getFlags());
 #endif
@@ -225,7 +226,7 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 	size_t failure=0;
 
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = VM::get().getStringTable();
+	string_table& st = _vm.getStringTable();
 #endif
 
 	for (container::iterator it=_props.begin(), far=_props.end(); it != far; ++it)
@@ -255,7 +256,6 @@ PropertyList::getProperty(string_table::key key, string_table::key nsId)
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found == _props.end())
 	{
-		//log_error("getProperty(%s): not found", VM::get().getStringTable().value(key));
 		return NULL;
 	}
 	return const_cast<Property*>(&(*found));
@@ -351,7 +351,7 @@ PropertyList::enumerateKeyValue(const as_object& this_ptr,
 void
 PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to) 
 {
-	string_table& st = VM::get().getStringTable();
+	string_table& st = _vm.getStringTable();
 
 	for (container::const_iterator i=_props.begin(), ie=_props.end();
             i != ie; ++i)
@@ -364,7 +364,7 @@ PropertyList::dump(as_object& this_ptr, std::map<std::string, as_value>& to)
 void
 PropertyList::dump(as_object& this_ptr)
 {
-	string_table& st = VM::get().getStringTable();
+	string_table& st = _vm.getStringTable();
 	for (container::const_iterator it=_props.begin(), itEnd=_props.end(); it != itEnd; ++it )
 	{
 		log_debug("  %s: %s", st.value(it->mName),
@@ -386,7 +386,7 @@ PropertyList::import(const PropertyList& o)
 			a.setOrder(found->getOrder());
 			_props.replace(found, a);
 #ifdef GNASH_DEBUG_PROPERTY
-			string_table& st = VM::get().getStringTable();
+			string_table& st = _vm.getStringTable();
 			log_debug("Property %s in namespace %s replaced on import: new flags %s",
 				st.value(a.getName()), st.value(a.getNamespace()), a.getFlags());
 #endif
@@ -397,7 +397,7 @@ PropertyList::import(const PropertyList& o)
 			a.setOrder(- ++mDefaultOrder - 1);
 			_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-			string_table& st = VM::get().getStringTable();
+			string_table& st = _vm.getStringTable();
 			log_debug("Property %s in namespace %s imported with flags %s",
 				st.value(a.getName()), st.value(a.getNamespace()), a.getFlags());
 #endif
@@ -423,7 +423,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 
 		_props.replace(found, a);
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = VM::get().getStringTable();
+		string_table& st = _vm.getStringTable();
 		log_debug("AS GetterSetter %s in namespace %s replaced copying "
                 "flags %s", st.value(key), st.value(nsId), a.getFlags());
 #endif
@@ -434,7 +434,7 @@ PropertyList::addGetterSetter(string_table::key key, as_function& getter,
 		a.setCache(cacheVal);
 		_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = VM::get().getStringTable();
+		string_table& st = _vm.getStringTable();
 		log_debug("AS GetterSetter %s in namespace %s inserted with flags %s",
 			st.value(key), st.value(nsId), a.getFlags());
 #endif
@@ -461,7 +461,7 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 		_props.replace(found, a);
 		//assert ( iterator_find(_props, key, nsId) != _props.end() );
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = VM::get().getStringTable();
+		string_table& st = _vm.getStringTable();
 		log_debug("Native GetterSetter %s in namespace %s replaced "
                 "copying flags %s", st.value(key), st.value(nsId),
                 a.getFlags());
@@ -473,7 +473,7 @@ PropertyList::addGetterSetter(string_table::key key, as_c_function_ptr getter,
 		_props.insert(a);
         	//assert ( iterator_find(_props, key, nsId) != _props.end() );
 #ifdef GNASH_DEBUG_PROPERTY
-		string_table& st = VM::get().getStringTable();
+		string_table& st = _vm.getStringTable();
 		log_debug("Native GetterSetter %s in namespace %s inserted with "
                 "flags %s", st.value(key), st.value(nsId), a.getFlags());
 #endif
@@ -490,7 +490,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 	container::iterator found = iterator_find(_props, key, nsId);
 	if (found != _props.end())
 	{
-		string_table& st = VM::get().getStringTable();
+		string_table& st = _vm.getStringTable();
 		log_error("Property %s in namespace %s already exists, "
                 "can't addDestructiveGetter", st.value(key), st.value(nsId));
 		return false; // Already exists.
@@ -502,7 +502,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 	_props.insert(a);
 
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = VM::get().getStringTable();
+	string_table& st = _vm.getStringTable();
 	log_debug("Destructive AS property %s (key %d) in namespace %s "
             "(key %d) inserted with flags %s",
 		    st.value(key), key, st.value(nsId), nsId, a.getFlags());
@@ -524,7 +524,7 @@ PropertyList::addDestructiveGetter(string_table::key key,
 	a.setOrder(- ++mDefaultOrder - 1);
 	_props.insert(a);
 #ifdef GNASH_DEBUG_PROPERTY
-	string_table& st = VM::get().getStringTable();
+	string_table& st = _vm.getStringTable();
 	log_debug("Destructive native property %s in namespace %s inserted "
             "with flags %s", st.value(key), st.value(nsId), a.getFlags());
 #endif

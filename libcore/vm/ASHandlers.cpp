@@ -2928,7 +2928,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     assert(array_size >= 0); // TODO: trigger this !!
 
     // Call the array constructor, to create an empty array.
-    as_value result = array_new(fn_call(NULL, &env));
+    as_value result = array_new(fn_call(NULL, env));
 
     boost::intrusive_ptr<as_object> ao = result.to_object();
     assert(ao);
@@ -2936,7 +2936,8 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     // Fill the elements with the initial values from the stack.
     for (int i = 0; i < array_size; i++) {
         // @@ TODO a set_member that takes an int or as_value?
-        thread.setObjectMember(*ao, boost::lexical_cast<std::string>(i), env.pop());
+        thread.setObjectMember(*ao, boost::lexical_cast<std::string>(i),
+                env.pop());
     }
 
     env.push(result);

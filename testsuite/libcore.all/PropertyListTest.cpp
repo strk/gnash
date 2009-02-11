@@ -66,12 +66,12 @@ main(int /*argc*/, char** /*argv*/)
 
     root.setRootMovie( md5->create_movie_instance() );
 
-    VM& vm = VM::get();
+    VM& vm = root.getVM();
 
 	log_debug("VM version %d", vm.getSWFVersion());
 
 	as_object obj;
-	PropertyList props;
+	PropertyList props(vm);
 
 	as_value val("value");
 	as_value val2("value2");

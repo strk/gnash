@@ -290,9 +290,8 @@ object_registerClass(const fn_call& fn)
 
 	// TODO: check to *which* definition should we ask the export
 	//       this code uses the *relative* root of current environment's target
-	//       and don't use VM::get() if this code is ever reactivated.
 #if 0
-	movie_definition* def = VM::get().getRoot().get_movie_definition();
+	movie_definition* def = _vm.getRoot().get_movie_definition();
 #else
 	// Using definition of current target fixes the youtube beta case
 	// https://savannah.gnu.org/bugs/index.php?23130

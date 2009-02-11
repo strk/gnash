@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _GNASH_FN_CALL_H_
-#define _GNASH_FN_CALL_H_
+#ifndef GNASH_FN_CALL_H
+#define GNASH_FN_CALL_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -61,26 +61,34 @@ public:
     /// Definition containing caller code. 0 if spontaneous (system event).
     const movie_definition* callerDef;
 
-public:
-	fn_call(const fn_call& fn) : this_ptr(fn.this_ptr), super(fn.super),
-		nargs(fn.nargs), callerDef(fn.callerDef), _env(fn._env)
+    fn_call(const fn_call& fn)
+        :
+        this_ptr(fn.this_ptr),
+        super(fn.super),
+		nargs(fn.nargs),
+        callerDef(fn.callerDef),
+        _env(fn._env)
 	{
-		if ( fn._args.get() )
+		if (fn._args.get()) {
 			_args.reset(new std::vector<as_value>(*fn._args));
+        }
 	}
 
-	fn_call(const fn_call& fn, as_object* this_in, as_object* sup=NULL)
-		: this_ptr(this_in), super(sup), nargs(fn.nargs),
+	fn_call(const fn_call& fn, as_object* this_in, as_object* sup = 0)
+		:
+        this_ptr(this_in),
+        super(sup),
+        nargs(fn.nargs),
         callerDef(fn.callerDef),
 		_env(fn._env)
 	{
-		if ( fn._args.get() )
+		if (fn._args.get()) {
 			_args.reset(new std::vector<as_value>(*fn._args));
+        }
 	}
 
-	fn_call(as_object* this_in,
-			as_environment* env_in,
-			int nargs_in, size_t first_in, as_object* sup=NULL)
+	fn_call(as_object* this_in, as_environment& env_in,
+			int nargs_in, size_t first_in, as_object* sup = 0)
 		:
 		this_ptr(this_in),
 		super(sup),
@@ -88,13 +96,12 @@ public:
         callerDef(0),
 		_env(env_in)
 	{
-		assert(first_in + 1 == env_in->stack_size());
+		assert(first_in + 1 == env_in.stack_size());
 		readArgs(env_in, first_in, nargs);
 	}
 
-	fn_call(as_object* this_in,
-			as_environment* env_in,
-			std::auto_ptr<std::vector<as_value> > args, as_object* sup=NULL)
+	fn_call(as_object* this_in, as_environment& env_in,
+			std::auto_ptr<std::vector<as_value> > args, as_object* sup = 0)
 		:
 		this_ptr(this_in),
 		super(sup),
@@ -105,8 +112,7 @@ public:
 	{
 	}
 
-	fn_call(as_object* this_in,
-			as_environment* env_in)
+	fn_call(as_object* this_in, as_environment& env_in)
 		:
 		this_ptr(this_in),
 		super(0),
@@ -116,6 +122,12 @@ public:
 		_args(0)
 	{
 	}
+
+    /// Return the VM this fn_call is running from
+    VM& getVM() const
+    {
+        return _env.getVM();
+    }
 
 	/// Return true if this call is an object instantiation
 	bool isInstantiation() const
@@ -133,7 +145,7 @@ public:
 	const as_value& arg(unsigned int n) const
 	{
 		assert(n < nargs);
-		return (*_args)[n]; // _env->bottom(_stack_offset - n);
+		return (*_args)[n]; 
 	}
 
     const std::vector<as_value>& getArgs() const {
@@ -153,7 +165,7 @@ public:
 
 	as_environment& env() const
 	{
-		return *_env;
+		return _env;
 	}
 
 	/// Dump arguments to given output stream
@@ -190,16 +202,16 @@ private:
 
 	/// The ActionScript environment in which the function call is taking
 	/// place. This contains, among other things, the function arguments.
-	as_environment* _env;
+	as_environment& _env;
 
 	/// The actual arguments
 	std::auto_ptr< std::vector<as_value> > _args;
 
-	void readArgs(as_environment* env, int first_in, int nargs)
+	void readArgs(as_environment& env, int first_in, int nargs)
 	{
 		_args.reset(new std::vector<as_value>);
 		for (int i=0; i<nargs; ++i)
-			_args->push_back(env->bottom(first_in - i));
+			_args->push_back(env.bottom(first_in - i));
 	}
 
 };
