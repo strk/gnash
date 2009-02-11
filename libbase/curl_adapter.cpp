@@ -477,13 +477,13 @@ private:
 	std::string _postdata;
 
 	// Current size of cached data
-    std::streamsize _cached;
+    size_t _cached;
 
 	/// Total stream size.
 	//
 	/// This will be 0 until known
 	///
-	mutable std::streamsize _size;
+	mutable size_t _size;
 
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
@@ -501,8 +501,7 @@ private:
 
 	// Callback for libcurl, will be called
 	// by fillCache() and will call cache()
-	static size_t recv(void *buf, size_t  size,
-		size_t  nmemb, void *userp);
+	static size_t recv(void *buf, size_t size, size_t nmemb, void *userp);
 
     // List of custom headers for this stream.
     struct curl_slist *_customHeaders;
@@ -595,7 +594,9 @@ CurlStreamFile::fillCache(std::streamsize size)
     log_debug("fillCache(%d), called, currently cached: %d", size, _cached);
 #endif 
 
-	if ( ! _running || _cached >= size ) {
+    assert(size >= 0);
+
+	if ( ! _running || _cached >= static_cast<size_t>(size)) {
 #if GNASH_CURL_VERBOSE
         if (!_running) log_debug("Not running: returning");
         else log_debug("Already enough bytes cached: returning");
@@ -629,7 +630,7 @@ CurlStreamFile::fillCache(std::streamsize size)
 		// Do this here to avoid calling select()
 		// when we have enough bytes anyway, or
 		// we reached EOF
-		if (_cached >= size || !_running) break; // || _error ?
+		if (_cached >= static_cast<size_t>(size) || !_running) break; 
 
 #if GNASH_CURL_VERBOSE
 		//log_debug("cached: %d, size: %d", _cached, size);
@@ -1128,6 +1129,9 @@ CurlStreamFile::tell() const
 bool
 CurlStreamFile::seek(std::streampos pos)
 {
+
+    assert(pos >= 0);
+
 #ifdef GNASH_CURL_WARN_SEEKSBACK
 	if ( pos < tell() ) {
 		log_debug("Warning: seek backward requested (%ld from %ld)",
@@ -1138,7 +1142,7 @@ CurlStreamFile::seek(std::streampos pos)
 	fillCache(pos);
 	if (_error) return false; // error can be set by fillCache
 
-	if (_cached < pos)
+	if (_cached < static_cast<size_t>(pos))
 	{
 		log_error ("Warning: could not cache anough bytes on seek: %d "
                 "requested, %d cached", pos, _cached);
