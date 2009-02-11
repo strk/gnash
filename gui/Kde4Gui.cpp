@@ -65,6 +65,8 @@
 #include "render_handler.h"
 #include "utility.h" // for PIXELS_TO_TWIPS 
 
+// Macro for using gettext strings where Qt expects QStrings
+#define _q(Str) QString::fromUtf8(_(Str))
 
 extern "C" {
 #include <X11/Xlib.h>
@@ -388,7 +390,7 @@ void
 Kde4Gui::showProperties()
 {
     QDialog* propsDialog = new QDialog(_drawingWidget);
-    propsDialog->setWindowTitle(_("Movie properties"));
+    propsDialog->setWindowTitle(_q("Movie properties"));
     propsDialog->setAttribute(Qt::WA_DeleteOnClose);
     propsDialog->resize(500, 300);
 
@@ -407,8 +409,8 @@ Kde4Gui::showProperties()
     QTreeWidget *tree = new QTreeWidget();
     tree->setColumnCount(2);
     QStringList treeHeader;
-    treeHeader.append(_("Variable"));
-    treeHeader.append(_("Value"));
+    treeHeader.append(_q("Variable"));
+    treeHeader.append(_q("Value"));
     tree->setHeaderLabels(treeHeader);
 
     QList<QTreeWidgetItem *> items;
@@ -493,43 +495,43 @@ Kde4Gui::setupActions()
 {
 
     // File Menu actions
-    propertiesAction = new QAction(_("Properties"), _window.get());
+    propertiesAction = new QAction(_q("Properties"), _window.get());
     _drawingWidget->connect(propertiesAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(properties()));
 
-    quitAction = new QAction(_("Quit Gnash"), _window.get());
+    quitAction = new QAction(_q("Quit Gnash"), _window.get());
     // This is connected directly to the QApplication's quit() slot
     _drawingWidget->connect(quitAction, SIGNAL(triggered()),
                      _application.get(), SLOT(quit()));
 
     // Edit Menu actions
-    preferencesAction = new QAction(_("Preferences"), _window.get());
+    preferencesAction = new QAction(_q("Preferences"), _window.get());
     _drawingWidget->connect(preferencesAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(preferences()));
 
     // Movie Control Menu actions
-    playAction = new QAction(_("Play"), _window.get());
+    playAction = new QAction(_q("Play"), _window.get());
     _drawingWidget->connect(playAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(play()));
 
-    pauseAction = new QAction(_("Pause"), _window.get());
+    pauseAction = new QAction(_q("Pause"), _window.get());
     _drawingWidget->connect(pauseAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(pause()));
 
-    stopAction = new QAction(_("Stop"), _window.get());
+    stopAction = new QAction(_q("Stop"), _window.get());
     _drawingWidget->connect(stopAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(stop()));
 
-    restartAction = new QAction(_("Restart"), _window.get());
+    restartAction = new QAction(_q("Restart"), _window.get());
     _drawingWidget->connect(restartAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(restart()));
 
     // View Menu actions
-    refreshAction = new QAction(_("Refresh"), _window.get());
+    refreshAction = new QAction(_q("Refresh"), _window.get());
     _drawingWidget->connect(refreshAction, SIGNAL(triggered()),
                      _drawingWidget, SLOT(refresh()));
 
-    fullscreenAction = new QAction(_("Fullscreen"), _window.get());
+    fullscreenAction = new QAction(_q("Fullscreen"), _window.get());
     fullscreenAction->setCheckable(true);
     _drawingWidget->connect(fullscreenAction, SIGNAL(toggled(bool)),
                            _drawingWidget, SLOT(fullscreen(bool)));
@@ -544,23 +546,23 @@ Kde4Gui::setupMenus()
     /// ownership of the main QMenuBar.
 
     // Set up the File menu.
-    fileMenu = new QMenu(_("File"), _window.get());
+    fileMenu = new QMenu(_q("File"), _window.get());
     fileMenu->addAction(propertiesAction);
     fileMenu->addAction(quitAction);
 
     // Set up the Edit menu.
-    editMenu = new QMenu(_("Edit"), _window.get());
+    editMenu = new QMenu(_q("Edit"), _window.get());
     editMenu->addAction(preferencesAction);
 
     // Set up the Movie Control menu
-    movieControlMenu = new QMenu(_("Movie Control"), _window.get());
+    movieControlMenu = new QMenu(_q("Movie Control"), _window.get());
     movieControlMenu->addAction(playAction);
     movieControlMenu->addAction(pauseAction);
     movieControlMenu->addAction(stopAction);
     movieControlMenu->addAction(restartAction);
 
     // Set up the View menu
-    viewMenu = new QMenu(_("View"), _window.get());
+    viewMenu = new QMenu(_q("View"), _window.get());
     viewMenu->addAction(refreshAction);
     viewMenu->addAction(fullscreenAction);
 }
@@ -758,7 +760,7 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
     QDialog(parent),
     _rcfile(RcInitFile::getDefaultInstance())
 {
-    setWindowTitle(_("Gnash preferences"));
+    setWindowTitle(_q("Gnash preferences"));
     setAttribute(Qt::WA_DeleteOnClose);
 
     QDialogButtonBox *buttons = new QDialogButtonBox(
@@ -773,13 +775,13 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 
     // Logging tab
     QFrame* loggingTab = new QFrame();
-    tabs->addTab(loggingTab, _("Logging"));
+    tabs->addTab(loggingTab, _q("Logging"));
     QVBoxLayout* layout = new QVBoxLayout (loggingTab);
 
-    tmpLabel = new QLabel(_("<b>Logging options</b>"), loggingTab);
+    tmpLabel = new QLabel(_q("<b>Logging options</b>"), loggingTab);
     layout->addWidget(tmpLabel);
 
-    tmpLabel = new QLabel(_("Verbosity level"), loggingTab);
+    tmpLabel = new QLabel(_q("Verbosity level"), loggingTab);
     layout->addWidget(tmpLabel);
 
     QLCDNumber* lcd = new QLCDNumber(loggingTab);
@@ -797,32 +799,32 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
             lcd, SLOT(display(int)));
     layout->addWidget(_verbositySlider);
 
-    _logToFileToggle = new QCheckBox(_("Log to file"), loggingTab);
+    _logToFileToggle = new QCheckBox(_q("Log to file"), loggingTab);
     _logToFileToggle->setChecked(_rcfile.useWriteLog());
     layout->addWidget(_logToFileToggle);
 
     _logFileName = new QLineEdit(_rcfile.getDebugLog().c_str(), loggingTab);
     layout->addWidget(_logFileName);
 
-    _parserDumpToggle = new QCheckBox(_("Log parser output"), loggingTab);
+    _parserDumpToggle = new QCheckBox(_q("Log parser output"), loggingTab);
     _parserDumpToggle->setChecked(_rcfile.useParserDump());
     layout->addWidget(_parserDumpToggle);
 
-    _actionDumpToggle = new QCheckBox(_("Log SWF actions"), loggingTab);
+    _actionDumpToggle = new QCheckBox(_q("Log SWF actions"), loggingTab);
     _actionDumpToggle->setChecked(_rcfile.useActionDump());
     layout->addWidget(_actionDumpToggle);
 
-    _malformedSWFToggle = new QCheckBox(_("Log malformed SWF errors"),
+    _malformedSWFToggle = new QCheckBox(_q("Log malformed SWF errors"),
                                         loggingTab);
     _malformedSWFToggle->setChecked(_rcfile.showMalformedSWFErrors());
     layout->addWidget(_malformedSWFToggle);
 
-    _ASCodingErrorToggle = new QCheckBox(_("Log ActionScript coding errors"),
+    _ASCodingErrorToggle = new QCheckBox(_q("Log ActionScript coding errors"),
                                         loggingTab);
     _ASCodingErrorToggle->setChecked(_rcfile.showASCodingErrors());
     layout->addWidget(_ASCodingErrorToggle);
 
-    _lcTraceToggle = new QCheckBox(_("Log Local Connection activity"),
+    _lcTraceToggle = new QCheckBox(_q("Log Local Connection activity"),
                                         loggingTab);
     _lcTraceToggle->setChecked(_rcfile.getLCTrace());
     layout->addWidget(_lcTraceToggle);
@@ -830,61 +832,61 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 
     // Security tab
     QFrame* securityTab = new QFrame(tabs);
-    tabs->addTab(securityTab, _("Security"));
+    tabs->addTab(securityTab, _q("Security"));
     layout = new QVBoxLayout (securityTab);
 
-    tmpLabel = new QLabel(_("<b>Network connections</b>"), securityTab);
+    tmpLabel = new QLabel(_q("<b>Network connections</b>"), securityTab);
     layout->addWidget(tmpLabel);
 
-    _localHostToggle = new QCheckBox(_("Connect only to local host"),
+    _localHostToggle = new QCheckBox(_q("Connect only to local host"),
                                      securityTab);
     _localHostToggle->setChecked(_rcfile.useLocalHost());
     layout->addWidget(_localHostToggle);
 
-    _localDomainToggle = new QCheckBox(_("Connect only to local domain"),
+    _localDomainToggle = new QCheckBox(_q("Connect only to local domain"),
                                        securityTab);
     _localDomainToggle->setChecked(_rcfile.useLocalDomain());
     layout->addWidget(_localDomainToggle);
 
-    _insecureSSLToggle = new QCheckBox(_("Disable SSL verification"),
+    _insecureSSLToggle = new QCheckBox(_q("Disable SSL verification"),
                                        securityTab);
     _insecureSSLToggle->setChecked(_rcfile.insecureSSL());
     layout->addWidget(_insecureSSLToggle);
 
-    tmpLabel = new QLabel(_("<b>Privacy</b>"), securityTab);
+    tmpLabel = new QLabel(_q("<b>Privacy</b>"), securityTab);
     layout->addWidget(tmpLabel);
 
-    tmpLabel = new QLabel(_("Shared objects directory:"), securityTab);
+    tmpLabel = new QLabel(_q("Shared objects directory:"), securityTab);
     layout->addWidget(tmpLabel);
     _solSandboxDir = new QLineEdit(_rcfile.getSOLSafeDir().c_str(),
                                    securityTab);
     layout->addWidget(_solSandboxDir);
 
-    _solReadOnlyToggle = new QCheckBox(_("Do not write Shared Object files"),
+    _solReadOnlyToggle = new QCheckBox(_q("Do not write Shared Object files"),
                                        securityTab);
     _solReadOnlyToggle->setChecked(_rcfile.getSOLReadOnly());
     layout->addWidget(_solReadOnlyToggle);
 
     _solLocalDomainToggle = new QCheckBox(
-            _("Only access local Shared Object files"), securityTab);
+            _q("Only access local Shared Object files"), securityTab);
     _solLocalDomainToggle->setChecked(_rcfile.getSOLLocalDomain());
     layout->addWidget(_solLocalDomainToggle);
 
     _localConnectionToggle = new QCheckBox(
-            _("Disable Local Connection object"), securityTab);
+            _q("Disable Local Connection object"), securityTab);
     _localConnectionToggle->setChecked(_rcfile.getLocalConnection());
     layout->addWidget(_localConnectionToggle);
     layout->addStretch();
 
     // Network tab
     QFrame* networkTab = new QFrame(tabs);
-    tabs->addTab(networkTab, _("Network"));
+    tabs->addTab(networkTab, _q("Network"));
     layout = new QVBoxLayout (networkTab);
 
-    tmpLabel = new QLabel(_("<b>Network preferences</b>"), networkTab);
+    tmpLabel = new QLabel(_q("<b>Network preferences</b>"), networkTab);
     layout->addWidget(tmpLabel);
 
-    tmpLabel = new QLabel(_("Network timeout in seconds"), networkTab);
+    tmpLabel = new QLabel(_q("Network timeout in seconds"), networkTab);
     layout->addWidget(tmpLabel);
 
     _streamsTimeoutScale = new QSpinBox(networkTab);
@@ -896,27 +898,27 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 
     // Network tab
     QFrame* mediaTab = new QFrame(tabs);
-    tabs->addTab(mediaTab, _("Media"));
+    tabs->addTab(mediaTab, _q("Media"));
     layout = new QVBoxLayout (mediaTab);
 
-    tmpLabel = new QLabel(_("<b>Sound</b>"), mediaTab);
+    tmpLabel = new QLabel(_q("<b>Sound</b>"), mediaTab);
     layout->addWidget(tmpLabel);
 
-    _soundToggle = new QCheckBox(_("Use sound handler"), mediaTab);
+    _soundToggle = new QCheckBox(_q("Use sound handler"), mediaTab);
     _soundToggle->setChecked(_rcfile.useSound());
     layout->addWidget(_soundToggle);
 
-    _saveStreamingMediaToggle = new QCheckBox(_("Save media streams to disk"),
+    _saveStreamingMediaToggle = new QCheckBox(_q("Save media streams to disk"),
                                               mediaTab);
     _saveStreamingMediaToggle->setChecked(_rcfile.saveStreamingMedia());
     layout->addWidget(_saveStreamingMediaToggle);
 
     _saveLoadedMediaToggle = new QCheckBox(
-                        _("Save dynamically loaded media to disk"), mediaTab);
+                        _q("Save dynamically loaded media to disk"), mediaTab);
     _saveLoadedMediaToggle->setChecked(_rcfile.saveLoadedMedia());
     layout->addWidget(_saveLoadedMediaToggle);
 
-    tmpLabel = new QLabel(_("Saved media directory:"), mediaTab);
+    tmpLabel = new QLabel(_q("Saved media directory:"), mediaTab);
     layout->addWidget(tmpLabel);
 
     _mediaDir = new QLineEdit(_rcfile.getMediaDir().c_str(), mediaTab);
@@ -925,40 +927,40 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
 
     // Player tab
     QFrame* playerTab = new QFrame(tabs);
-    tabs->addTab(playerTab, _("Player"));
+    tabs->addTab(playerTab, _q("Player"));
     layout = new QVBoxLayout (playerTab);
 
-    tmpLabel = new QLabel(_("<b>Player description</b>"), playerTab);
+    tmpLabel = new QLabel(_q("<b>Player description</b>"), playerTab);
     layout->addWidget(tmpLabel);
 
-    tmpLabel = new QLabel(_("Player version:"), playerTab);
+    tmpLabel = new QLabel(_q("Player version:"), playerTab);
     layout->addWidget(tmpLabel);
     _versionText = new QLineEdit(_rcfile.getFlashVersionString().c_str(),
                                  playerTab);
     layout->addWidget(_versionText);
 
-    tmpLabel = new QLabel(_("Operating system:"), playerTab);
+    tmpLabel = new QLabel(_q("Operating system:"), playerTab);
     layout->addWidget(tmpLabel);
 
     _osText = new QLineEdit(playerTab);
     if (_rcfile.getFlashSystemOS().empty()) {
-        _osText->setText(_("<Autodetect>"));
+        _osText->setText(_q("<Autodetect>"));
     } else {
         _osText->setText(_rcfile.getFlashSystemOS().c_str());
     }
     layout->addWidget(_osText);
 
-    tmpLabel = new QLabel(_("URL opener:"), playerTab);
+    tmpLabel = new QLabel(_q("URL opener:"), playerTab);
     layout->addWidget(tmpLabel);
 
     _urlOpenerText = new QLineEdit(_rcfile.getURLOpenerFormat().c_str(),
                                  playerTab);
     layout->addWidget(_urlOpenerText);
 
-    tmpLabel = new QLabel(_("<b>Performance</b>"), playerTab);
+    tmpLabel = new QLabel(_q("<b>Performance</b>"), playerTab);
     layout->addWidget(tmpLabel);
 
-    tmpLabel = new QLabel(_("Max size of movie library:"), playerTab);
+    tmpLabel = new QLabel(_q("Max size of movie library:"), playerTab);
     layout->addWidget(tmpLabel);
 
     _librarySize = new QSpinBox(playerTab);
@@ -967,7 +969,7 @@ PreferencesDialog::PreferencesDialog(QWidget* parent)
     _librarySize->setValue(_rcfile.getMovieLibraryLimit());
     layout->addWidget(_librarySize);
 
-    _startStoppedToggle = new QCheckBox(_("Start Gnash in pause mode"),
+    _startStoppedToggle = new QCheckBox(_q("Start Gnash in pause mode"),
                                         playerTab);
     _startStoppedToggle->setChecked(_rcfile.startStopped());
     layout->addWidget(_startStoppedToggle);
@@ -1016,7 +1018,7 @@ PreferencesDialog::savePreferences()
 
     // Player tab widgets
     _rcfile.setFlashVersionString(_versionText->text().toStdString());
-    if (_osText->text() != _("<Autodetect>")) {
+    if (_osText->text() != _q("<Autodetect>")) {
         _rcfile.setFlashSystemOS(_osText->text().toStdString());
     }
     _rcfile.setURLOpenerFormat(_urlOpenerText->text().toStdString());
