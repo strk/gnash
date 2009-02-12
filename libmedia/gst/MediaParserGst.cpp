@@ -173,7 +173,7 @@ MediaParserGst::pushGstBuffer()
 {
     GstBuffer* buffer = gst_buffer_new_and_alloc(PUSHBUF_SIZE);
 
-    std::streamsize ret = _stream->read(GST_BUFFER_DATA(buffer), PUSHBUF_SIZE);
+    std::streamoff ret = _stream->read(GST_BUFFER_DATA(buffer), PUSHBUF_SIZE);
 
     if (ret == 0) {
         if (!_stream->eof()) {
