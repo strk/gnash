@@ -400,7 +400,7 @@ test_object()
     // but this should have a more accurate test to make sure all
     // the child elements are correct all the time.
     if ((newtop->getType() == Element::OBJECT_AMF0)
-        && (newtop->propertySize() == 3)) {
+        && (newtop->propertySize() == 4)) {
         runtest.pass("Extracted Object");
     } else {
         runtest.fail("Extracted Object");
