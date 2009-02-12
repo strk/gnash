@@ -147,18 +147,21 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << endl;
 }
 
-static void version_and_copyright()
+static void
+version_and_copyright()
 {
     cout << "Gnash " << VERSION << endl
         << endl
-        << _("Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, "
-                "Inc.\nGnash comes with NO WARRANTY, to the extent permitted "
+        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009 "
+                "Free Software Foundation, Inc.\n"
+                "Gnash comes with NO WARRANTY, to the extent permitted "
                 "by law.\nYou may redistribute copies of Gnash under the "
                 "terms of the GNU General\nPublic License.  For more "
                 "information, see the file named COPYING.\n") << endl;
 }
 
-static void build_options()
+static void
+build_options()
 {
     cout << _("Build options ") << VERSION << endl
         << _("   Target: ") << TARGET_CONFIG << endl
