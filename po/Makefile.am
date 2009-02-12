@@ -67,7 +67,8 @@ gnash.pot:
 	for i in `find $(dirs) -name '*.cpp'`; do \
 	  echo "$$i" >> po/POTFILES;\
 	done; \
-	$(XGETTEXT) --language=C++ --files-from=po/POTFILES -o po/gnash.pot \
+	$(XGETTEXT) --language=C++ --files-from=po/POTFILES \
+	  -o $(srcdir)/gnash.pot \
 	  --default-domain=gnash --force \
 	  --flag=_:1:pass-c-format --keyword=_ \
 	  --copyright-holder='Free Software Foundation, Inc.';  \
