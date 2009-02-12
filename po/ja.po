@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnash cvs20080517\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-12 11:22+0100\n"
+"POT-Creation-Date: 2009-02-12 11:37+0100\n"
 "PO-Revision-Date: 2008-05-17 02:22+0900\n"
 "Last-Translator: Makoto Kato <m_kato@ga2.so-net.ne.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -5617,6 +5617,251 @@ msgstr ""
 msgid "FSCommand_callback(%p): %s %s"
 msgstr ""
 
+#: gui/Kde4Gui.cpp:393 gui/gtk.cpp:1617
+msgid "Movie properties"
+msgstr "動画プロパティ"
+
+#: gui/Kde4Gui.cpp:412 gui/gtk.cpp:1691
+msgid "Variable"
+msgstr "項目"
+
+#: gui/Kde4Gui.cpp:413 gui/gtk.cpp:1704
+msgid "Value"
+msgstr "値"
+
+#: gui/Kde4Gui.cpp:498
+#, fuzzy
+msgid "Properties"
+msgstr "動画プロパティ"
+
+#: gui/Kde4Gui.cpp:502 gui/kde.cpp:443 gui/gtk.cpp:672
+msgid "Quit Gnash"
+msgstr "Gnashを終了する"
+
+#: gui/Kde4Gui.cpp:508
+#, fuzzy
+msgid "Preferences"
+msgstr "Gnashの設定"
+
+#: gui/Kde4Gui.cpp:513 gui/gtk.cpp:2019
+msgid "Play"
+msgstr "再生"
+
+#: gui/Kde4Gui.cpp:517 gui/gtk.cpp:2030
+msgid "Pause"
+msgstr "一時停止"
+
+#: gui/Kde4Gui.cpp:521 gui/gtk.cpp:2040
+msgid "Stop"
+msgstr "停止"
+
+#: gui/Kde4Gui.cpp:525
+#, fuzzy
+msgid "Restart"
+msgstr "最初から再生する"
+
+#: gui/Kde4Gui.cpp:530 gui/kde.cpp:442
+msgid "Refresh"
+msgstr "再読込"
+
+#: gui/Kde4Gui.cpp:534
+#, fuzzy
+msgid "Fullscreen"
+msgstr "フルスクリーン表示の表示・非表示"
+
+#: gui/Kde4Gui.cpp:549
+#, fuzzy
+msgid "File"
+msgstr "ファイル(_F)"
+
+#: gui/Kde4Gui.cpp:554
+#, fuzzy
+msgid "Edit"
+msgstr "編集(_E)"
+
+#: gui/Kde4Gui.cpp:558
+#, fuzzy
+msgid "Movie Control"
+msgstr "動画コントロール(_C)"
+
+#: gui/Kde4Gui.cpp:565
+#, fuzzy
+msgid "View"
+msgstr "表示(_V)"
+
+#: gui/Kde4Gui.cpp:763 gui/gtk.cpp:1181
+msgid "Gnash preferences"
+msgstr "Gnashの設定"
+
+#: gui/Kde4Gui.cpp:778
+#, fuzzy
+msgid "Logging"
+msgstr "ログ(_L)"
+
+#: gui/Kde4Gui.cpp:781 gui/gtk.cpp:1252
+msgid "<b>Logging options</b>"
+msgstr "<b>ログオプション</b>"
+
+#: gui/Kde4Gui.cpp:784
+#, fuzzy
+msgid "Verbosity level"
+msgstr "出力レベル:"
+
+#: gui/Kde4Gui.cpp:802
+#, fuzzy
+msgid "Log to file"
+msgstr "ファイルへログを出力する(_F)"
+
+#: gui/Kde4Gui.cpp:809
+#, fuzzy
+msgid "Log parser output"
+msgstr "パーサーの出力をログする(_P)"
+
+#: gui/Kde4Gui.cpp:813
+#, fuzzy
+msgid "Log SWF actions"
+msgstr "SWFアクションをログする(_A)"
+
+#: gui/Kde4Gui.cpp:817
+#, fuzzy
+msgid "Log malformed SWF errors"
+msgstr "不正なSWFのエラーをログする(_E)"
+
+#: gui/Kde4Gui.cpp:822
+#, fuzzy
+msgid "Log ActionScript coding errors"
+msgstr "ActionScriptのエラーをログする(_C)"
+
+#: gui/Kde4Gui.cpp:827
+#, fuzzy
+msgid "Log Local Connection activity"
+msgstr "ローカル接続の状況をログする(_L)"
+
+#: gui/Kde4Gui.cpp:835
+#, fuzzy
+msgid "Security"
+msgstr "セキュリティ(_S)"
+
+#: gui/Kde4Gui.cpp:838 gui/gtk.cpp:1354
+msgid "<b>Network connections</b>"
+msgstr "<b>ネットワーク接続</b>"
+
+#: gui/Kde4Gui.cpp:841
+#, fuzzy
+msgid "Connect only to local host"
+msgstr "ローカルホストのみ接続を許可する(_H)"
+
+#: gui/Kde4Gui.cpp:846
+#, fuzzy
+msgid "Connect only to local domain"
+msgstr "ローカルドメインのみ接続を許可する(_D)"
+
+#: gui/Kde4Gui.cpp:851
+#, fuzzy
+msgid "Disable SSL verification"
+msgstr "SSL証明書の検証をしない(_V)"
+
+#: gui/Kde4Gui.cpp:856 gui/gtk.cpp:1399
+msgid "<b>Privacy</b>"
+msgstr "<b>プライバシー</b>"
+
+#: gui/Kde4Gui.cpp:859 gui/gtk.cpp:1403
+msgid "Shared objects directory:"
+msgstr "共有オブジェクトのディレクトリ:"
+
+#: gui/Kde4Gui.cpp:865
+#, fuzzy
+msgid "Do not write Shared Object files"
+msgstr "共有オブジェクトファイルを書き込まない(_N)"
+
+#: gui/Kde4Gui.cpp:871
+#, fuzzy
+msgid "Only access local Shared Object files"
+msgstr "ローカルの共有オブジェクトファイルのみをアクセスする(_A)"
+
+#: gui/Kde4Gui.cpp:876
+#, fuzzy
+msgid "Disable Local Connection object"
+msgstr "ローカル接続オブジェクトを無効にする(_C)"
+
+#: gui/Kde4Gui.cpp:883
+msgid "Network"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:886 gui/gtk.cpp:1220
+#, fuzzy
+msgid "<b>Network preferences</b>"
+msgstr "<b>ネットワーク接続</b>"
+
+#: gui/Kde4Gui.cpp:889
+msgid "Network timeout in seconds"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:901
+#, fuzzy
+msgid "Media"
+msgstr "メディア(_M)"
+
+#: gui/Kde4Gui.cpp:904 gui/gtk.cpp:1449
+msgid "<b>Sound</b>"
+msgstr "<b>サウンド</b>"
+
+#: gui/Kde4Gui.cpp:907
+#, fuzzy
+msgid "Use sound handler"
+msgstr "サウンドハンドラを使う(_H)"
+
+#: gui/Kde4Gui.cpp:911 gui/gtk.cpp:1468
+msgid "Save media streams to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:917 gui/gtk.cpp:1477
+msgid "Save dynamically loaded media to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:921 gui/gtk.cpp:1485
+#, fuzzy
+msgid "Saved media directory:"
+msgstr "共有オブジェクトのディレクトリ:"
+
+#: gui/Kde4Gui.cpp:930
+#, fuzzy
+msgid "Player"
+msgstr "プレーヤ(_P)"
+
+#: gui/Kde4Gui.cpp:933 gui/gtk.cpp:1511
+msgid "<b>Player description</b>"
+msgstr "<b>プレーヤの詳細</b>"
+
+#: gui/Kde4Gui.cpp:936 gui/gtk.cpp:1519
+msgid "Player version:"
+msgstr "プレーヤバージョン:"
+
+#: gui/Kde4Gui.cpp:942 gui/gtk.cpp:1535
+msgid "Operating system:"
+msgstr "オペレーティングシステム:"
+
+#: gui/Kde4Gui.cpp:947 gui/Kde4Gui.cpp:1021
+msgid "<Autodetect>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:953 gui/gtk.cpp:1555
+msgid "URL opener:"
+msgstr "URLを開くアプリケーション:"
+
+#: gui/Kde4Gui.cpp:960 gui/gtk.cpp:1567
+msgid "<b>Performance</b>"
+msgstr "<b>パフォーマンス</b>"
+
+#: gui/Kde4Gui.cpp:963 gui/gtk.cpp:1581
+msgid "Max size of movie library:"
+msgstr "動画ライブラリの最大サイズ:"
+
+#: gui/Kde4Gui.cpp:972
+#, fuzzy
+msgid "Start Gnash in pause mode"
+msgstr "_Gnashを一時停止モードで開始する"
+
 #: gui/kde.cpp:432
 msgid "Play Movie"
 msgstr "再生"
@@ -5648,14 +5893,6 @@ msgstr "進む"
 #: gui/kde.cpp:440
 msgid "Jump Backward"
 msgstr "戻る"
-
-#: gui/kde.cpp:442
-msgid "Refresh"
-msgstr "再読込"
-
-#: gui/kde.cpp:443 gui/gtk.cpp:672
-msgid "Quit Gnash"
-msgstr "Gnashを終了する"
 
 #: gui/fb.cpp:191
 msgid "Closing framebuffer device"
@@ -6012,18 +6249,9 @@ msgstr "LIRCデーモンが起動していません"
 msgid "Sound"
 msgstr "サウンド"
 
-#: gui/gtk.cpp:1181
-msgid "Gnash preferences"
-msgstr "Gnashの設定"
-
 #: gui/gtk.cpp:1216
 msgid "_Network"
 msgstr ""
-
-#: gui/gtk.cpp:1220
-#, fuzzy
-msgid "<b>Network preferences</b>"
-msgstr "<b>ネットワーク接続</b>"
 
 #: gui/gtk.cpp:1228
 msgid "Network timeout in seconds (0 for no timeout):"
@@ -6032,10 +6260,6 @@ msgstr ""
 #: gui/gtk.cpp:1247
 msgid "_Logging"
 msgstr "ログ(_L)"
-
-#: gui/gtk.cpp:1252
-msgid "<b>Logging options</b>"
-msgstr "<b>ログオプション</b>"
 
 #: gui/gtk.cpp:1256
 msgid "Verbosity level:"
@@ -6077,10 +6301,6 @@ msgstr "デバッガを有効にする(_D)"
 msgid "_Security"
 msgstr "セキュリティ(_S)"
 
-#: gui/gtk.cpp:1354
-msgid "<b>Network connections</b>"
-msgstr "<b>ネットワーク接続</b>"
-
 #: gui/gtk.cpp:1360
 msgid "Connect only to local _host"
 msgstr "ローカルホストのみ接続を許可する(_H)"
@@ -6101,14 +6321,6 @@ msgstr "ホワイトリスト(_W)"
 msgid "_Blacklist"
 msgstr "ブラックリスト(_B)"
 
-#: gui/gtk.cpp:1399
-msgid "<b>Privacy</b>"
-msgstr "<b>プライバシー</b>"
-
-#: gui/gtk.cpp:1403
-msgid "Shared objects directory:"
-msgstr "共有オブジェクトのディレクトリ:"
-
 #: gui/gtk.cpp:1415
 msgid "Do _not write Shared Object files"
 msgstr "共有オブジェクトファイルを書き込まない(_N)"
@@ -6125,10 +6337,6 @@ msgstr "ローカル接続オブジェクトを無効にする(_C)"
 msgid "_Media"
 msgstr "メディア(_M)"
 
-#: gui/gtk.cpp:1449
-msgid "<b>Sound</b>"
-msgstr "<b>サウンド</b>"
-
 #: gui/gtk.cpp:1454
 msgid "Use sound _handler"
 msgstr "サウンドハンドラを使う(_H)"
@@ -6137,66 +6345,17 @@ msgstr "サウンドハンドラを使う(_H)"
 msgid "<b>Media Streams</b>"
 msgstr ""
 
-#: gui/gtk.cpp:1468
-msgid "Save media streams to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1477
-msgid "Save dynamically loaded media to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1485
-#, fuzzy
-msgid "Saved media directory:"
-msgstr "共有オブジェクトのディレクトリ:"
-
 #: gui/gtk.cpp:1505
 msgid "_Player"
 msgstr "プレーヤ(_P)"
-
-#: gui/gtk.cpp:1511
-msgid "<b>Player description</b>"
-msgstr "<b>プレーヤの詳細</b>"
-
-#: gui/gtk.cpp:1519
-msgid "Player version:"
-msgstr "プレーヤバージョン:"
-
-#: gui/gtk.cpp:1535
-msgid "Operating system:"
-msgstr "オペレーティングシステム:"
 
 #: gui/gtk.cpp:1545
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr "<i>空の場合は、GnashはOSを自動認識します</i>"
 
-#: gui/gtk.cpp:1555
-msgid "URL opener:"
-msgstr "URLを開くアプリケーション:"
-
-#: gui/gtk.cpp:1567
-msgid "<b>Performance</b>"
-msgstr "<b>パフォーマンス</b>"
-
-#: gui/gtk.cpp:1581
-msgid "Max size of movie library:"
-msgstr "動画ライブラリの最大サイズ:"
-
 #: gui/gtk.cpp:1593
 msgid "Start _Gnash in pause mode"
 msgstr "_Gnashを一時停止モードで開始する"
-
-#: gui/gtk.cpp:1617
-msgid "Movie properties"
-msgstr "動画プロパティ"
-
-#: gui/gtk.cpp:1691
-msgid "Variable"
-msgstr "項目"
-
-#: gui/gtk.cpp:1704
-msgid "Value"
-msgstr "値"
 
 #: gui/gtk.cpp:1752
 #, fuzzy
@@ -6283,18 +6442,6 @@ msgstr "描画された領域を表示する"
 #: gui/gtk.cpp:2008
 msgid "Movie _Control"
 msgstr "動画コントロール(_C)"
-
-#: gui/gtk.cpp:2019
-msgid "Play"
-msgstr "再生"
-
-#: gui/gtk.cpp:2030
-msgid "Pause"
-msgstr "一時停止"
-
-#: gui/gtk.cpp:2040
-msgid "Stop"
-msgstr "停止"
 
 #: gui/gtk.cpp:2128 gui/gtk.cpp:2129
 #, c-format

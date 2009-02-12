@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-12 11:31+0100\n"
+"POT-Creation-Date: 2009-02-12 11:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5614,6 +5614,222 @@ msgstr ""
 msgid "FSCommand_callback(%p): %s %s"
 msgstr ""
 
+#: gui/Kde4Gui.cpp:393 gui/gtk.cpp:1617
+msgid "Movie properties"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:412 gui/gtk.cpp:1691
+msgid "Variable"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:413 gui/gtk.cpp:1704
+msgid "Value"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:498
+msgid "Properties"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:502 gui/kde.cpp:443 gui/gtk.cpp:672
+msgid "Quit Gnash"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:508
+msgid "Preferences"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:513 gui/gtk.cpp:2019
+msgid "Play"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:517 gui/gtk.cpp:2030
+msgid "Pause"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:521 gui/gtk.cpp:2040
+msgid "Stop"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:525
+msgid "Restart"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:530 gui/kde.cpp:442
+msgid "Refresh"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:534
+msgid "Fullscreen"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:549
+msgid "File"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:554
+msgid "Edit"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:558
+msgid "Movie Control"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:565
+msgid "View"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:763 gui/gtk.cpp:1181
+msgid "Gnash preferences"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:778
+msgid "Logging"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:781 gui/gtk.cpp:1252
+msgid "<b>Logging options</b>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:784
+msgid "Verbosity level"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:802
+msgid "Log to file"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:809
+msgid "Log parser output"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:813
+msgid "Log SWF actions"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:817
+msgid "Log malformed SWF errors"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:822
+msgid "Log ActionScript coding errors"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:827
+msgid "Log Local Connection activity"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:835
+msgid "Security"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:838 gui/gtk.cpp:1354
+msgid "<b>Network connections</b>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:841
+msgid "Connect only to local host"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:846
+msgid "Connect only to local domain"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:851
+msgid "Disable SSL verification"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:856 gui/gtk.cpp:1399
+msgid "<b>Privacy</b>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:859 gui/gtk.cpp:1403
+msgid "Shared objects directory:"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:865
+msgid "Do not write Shared Object files"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:871
+msgid "Only access local Shared Object files"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:876
+msgid "Disable Local Connection object"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:883
+msgid "Network"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:886 gui/gtk.cpp:1220
+msgid "<b>Network preferences</b>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:889
+msgid "Network timeout in seconds"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:901
+msgid "Media"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:904 gui/gtk.cpp:1449
+msgid "<b>Sound</b>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:907
+msgid "Use sound handler"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:911 gui/gtk.cpp:1468
+msgid "Save media streams to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:917 gui/gtk.cpp:1477
+msgid "Save dynamically loaded media to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:921 gui/gtk.cpp:1485
+msgid "Saved media directory:"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:930
+msgid "Player"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:933 gui/gtk.cpp:1511
+msgid "<b>Player description</b>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:936 gui/gtk.cpp:1519
+msgid "Player version:"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:942 gui/gtk.cpp:1535
+msgid "Operating system:"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:947 gui/Kde4Gui.cpp:1021
+msgid "<Autodetect>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:953 gui/gtk.cpp:1555
+msgid "URL opener:"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:960 gui/gtk.cpp:1567
+msgid "<b>Performance</b>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:963 gui/gtk.cpp:1581
+msgid "Max size of movie library:"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:972
+msgid "Start Gnash in pause mode"
+msgstr ""
+
 #: gui/kde.cpp:432
 msgid "Play Movie"
 msgstr ""
@@ -5644,14 +5860,6 @@ msgstr ""
 
 #: gui/kde.cpp:440
 msgid "Jump Backward"
-msgstr ""
-
-#: gui/kde.cpp:442
-msgid "Refresh"
-msgstr ""
-
-#: gui/kde.cpp:443 gui/gtk.cpp:672
-msgid "Quit Gnash"
 msgstr ""
 
 #: gui/fb.cpp:191
@@ -6009,16 +6217,8 @@ msgstr ""
 msgid "Sound"
 msgstr ""
 
-#: gui/gtk.cpp:1181
-msgid "Gnash preferences"
-msgstr ""
-
 #: gui/gtk.cpp:1216
 msgid "_Network"
-msgstr ""
-
-#: gui/gtk.cpp:1220
-msgid "<b>Network preferences</b>"
 msgstr ""
 
 #: gui/gtk.cpp:1228
@@ -6027,10 +6227,6 @@ msgstr ""
 
 #: gui/gtk.cpp:1247
 msgid "_Logging"
-msgstr ""
-
-#: gui/gtk.cpp:1252
-msgid "<b>Logging options</b>"
 msgstr ""
 
 #: gui/gtk.cpp:1256
@@ -6073,10 +6269,6 @@ msgstr ""
 msgid "_Security"
 msgstr ""
 
-#: gui/gtk.cpp:1354
-msgid "<b>Network connections</b>"
-msgstr ""
-
 #: gui/gtk.cpp:1360
 msgid "Connect only to local _host"
 msgstr ""
@@ -6097,14 +6289,6 @@ msgstr ""
 msgid "_Blacklist"
 msgstr ""
 
-#: gui/gtk.cpp:1399
-msgid "<b>Privacy</b>"
-msgstr ""
-
-#: gui/gtk.cpp:1403
-msgid "Shared objects directory:"
-msgstr ""
-
 #: gui/gtk.cpp:1415
 msgid "Do _not write Shared Object files"
 msgstr ""
@@ -6121,10 +6305,6 @@ msgstr ""
 msgid "_Media"
 msgstr ""
 
-#: gui/gtk.cpp:1449
-msgid "<b>Sound</b>"
-msgstr ""
-
 #: gui/gtk.cpp:1454
 msgid "Use sound _handler"
 msgstr ""
@@ -6133,64 +6313,16 @@ msgstr ""
 msgid "<b>Media Streams</b>"
 msgstr ""
 
-#: gui/gtk.cpp:1468
-msgid "Save media streams to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1477
-msgid "Save dynamically loaded media to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1485
-msgid "Saved media directory:"
-msgstr ""
-
 #: gui/gtk.cpp:1505
 msgid "_Player"
-msgstr ""
-
-#: gui/gtk.cpp:1511
-msgid "<b>Player description</b>"
-msgstr ""
-
-#: gui/gtk.cpp:1519
-msgid "Player version:"
-msgstr ""
-
-#: gui/gtk.cpp:1535
-msgid "Operating system:"
 msgstr ""
 
 #: gui/gtk.cpp:1545
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr ""
 
-#: gui/gtk.cpp:1555
-msgid "URL opener:"
-msgstr ""
-
-#: gui/gtk.cpp:1567
-msgid "<b>Performance</b>"
-msgstr ""
-
-#: gui/gtk.cpp:1581
-msgid "Max size of movie library:"
-msgstr ""
-
 #: gui/gtk.cpp:1593
 msgid "Start _Gnash in pause mode"
-msgstr ""
-
-#: gui/gtk.cpp:1617
-msgid "Movie properties"
-msgstr ""
-
-#: gui/gtk.cpp:1691
-msgid "Variable"
-msgstr ""
-
-#: gui/gtk.cpp:1704
-msgid "Value"
 msgstr ""
 
 #: gui/gtk.cpp:1752
@@ -6265,18 +6397,6 @@ msgstr ""
 
 #: gui/gtk.cpp:2008
 msgid "Movie _Control"
-msgstr ""
-
-#: gui/gtk.cpp:2019
-msgid "Play"
-msgstr ""
-
-#: gui/gtk.cpp:2030
-msgid "Pause"
-msgstr ""
-
-#: gui/gtk.cpp:2040
-msgid "Stop"
 msgstr ""
 
 #: gui/gtk.cpp:2128 gui/gtk.cpp:2129

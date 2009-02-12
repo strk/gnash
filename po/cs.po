@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnash nelson@crynwr.com-20081013214315-8ds70h58lxlkm14a\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-12 11:22+0100\n"
+"POT-Creation-Date: 2009-02-12 11:37+0100\n"
 "PO-Revision-Date: 2008-10-16 21:46+0200\n"
 "Last-Translator: Petr Pisar <petr.pisar@atlas.cz>\n"
 "Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
@@ -6016,6 +6016,250 @@ msgstr "\tCelkový počet bajtů: "
 msgid "FSCommand_callback(%p): %s %s"
 msgstr "FSCommand_callback(%p): %s %s"
 
+#: gui/Kde4Gui.cpp:393 gui/gtk.cpp:1617
+msgid "Movie properties"
+msgstr "Vlastnosti filmu"
+
+#: gui/Kde4Gui.cpp:412 gui/gtk.cpp:1691
+msgid "Variable"
+msgstr "Proměnná"
+
+#: gui/Kde4Gui.cpp:413 gui/gtk.cpp:1704
+msgid "Value"
+msgstr "Hodnota"
+
+#: gui/Kde4Gui.cpp:498
+#, fuzzy
+msgid "Properties"
+msgstr "Vlastnosti filmu"
+
+#: gui/Kde4Gui.cpp:502 gui/kde.cpp:443 gui/gtk.cpp:672
+msgid "Quit Gnash"
+msgstr "Ukončit Gnash"
+
+#: gui/Kde4Gui.cpp:508
+msgid "Preferences"
+msgstr "Nastavení"
+
+#: gui/Kde4Gui.cpp:513 gui/gtk.cpp:2019
+msgid "Play"
+msgstr "Přehrát"
+
+#: gui/Kde4Gui.cpp:517 gui/gtk.cpp:2030
+msgid "Pause"
+msgstr "Pozastavit"
+
+#: gui/Kde4Gui.cpp:521 gui/gtk.cpp:2040
+msgid "Stop"
+msgstr "Zastavit"
+
+#: gui/Kde4Gui.cpp:525
+#, fuzzy
+msgid "Restart"
+msgstr "Přehrát od začátku"
+
+#: gui/Kde4Gui.cpp:530 gui/kde.cpp:442
+msgid "Refresh"
+msgstr "Obnovit"
+
+#: gui/Kde4Gui.cpp:534
+#, fuzzy
+msgid "Fullscreen"
+msgstr "Přepnout celoobrazovkový režim"
+
+#: gui/Kde4Gui.cpp:549
+#, fuzzy
+msgid "File"
+msgstr "_Soubor"
+
+#: gui/Kde4Gui.cpp:554
+#, fuzzy
+msgid "Edit"
+msgstr "_Upravit"
+
+#: gui/Kde4Gui.cpp:558
+#, fuzzy
+msgid "Movie Control"
+msgstr "_Ovládání filmu"
+
+#: gui/Kde4Gui.cpp:565
+#, fuzzy
+msgid "View"
+msgstr "_Zobrazit"
+
+#: gui/Kde4Gui.cpp:763 gui/gtk.cpp:1181
+msgid "Gnash preferences"
+msgstr "Nastavení Gnashe"
+
+#: gui/Kde4Gui.cpp:778
+#, fuzzy
+msgid "Logging"
+msgstr "Protoko_lování"
+
+#: gui/Kde4Gui.cpp:781 gui/gtk.cpp:1252
+msgid "<b>Logging options</b>"
+msgstr "<b>Volby protokolování</b>"
+
+#: gui/Kde4Gui.cpp:784
+#, fuzzy
+msgid "Verbosity level"
+msgstr "Úroveň upovídanosti:"
+
+#: gui/Kde4Gui.cpp:802
+#, fuzzy
+msgid "Log to file"
+msgstr "Zaznamenávat do _souboru"
+
+#: gui/Kde4Gui.cpp:809
+#, fuzzy
+msgid "Log parser output"
+msgstr "Zaznamenávat výstup _parseru"
+
+#: gui/Kde4Gui.cpp:813
+#, fuzzy
+msgid "Log SWF actions"
+msgstr "Zaznamenávat _akce SWF"
+
+#: gui/Kde4Gui.cpp:817
+#, fuzzy
+msgid "Log malformed SWF errors"
+msgstr "Zaznamenávat _chyby poškozeného SWF"
+
+#: gui/Kde4Gui.cpp:822
+#, fuzzy
+msgid "Log ActionScript coding errors"
+msgstr "Zaznamenávat chyby v _kódu ActionScriptu"
+
+#: gui/Kde4Gui.cpp:827
+#, fuzzy
+msgid "Log Local Connection activity"
+msgstr "Zaznamenávat _místní spojení"
+
+#: gui/Kde4Gui.cpp:835
+#, fuzzy
+msgid "Security"
+msgstr "_Bezpečnost"
+
+#: gui/Kde4Gui.cpp:838 gui/gtk.cpp:1354
+msgid "<b>Network connections</b>"
+msgstr "<b>Síťová spojení</b>"
+
+#: gui/Kde4Gui.cpp:841
+#, fuzzy
+msgid "Connect only to local host"
+msgstr "Připojovat se jen na _tento stroj"
+
+#: gui/Kde4Gui.cpp:846
+#, fuzzy
+msgid "Connect only to local domain"
+msgstr "Připojovat se jen do místní _domény"
+
+#: gui/Kde4Gui.cpp:851
+#, fuzzy
+msgid "Disable SSL verification"
+msgstr "Vypnout o_věřování SSL"
+
+#: gui/Kde4Gui.cpp:856 gui/gtk.cpp:1399
+msgid "<b>Privacy</b>"
+msgstr "<b>Soukromí</b>"
+
+#: gui/Kde4Gui.cpp:859 gui/gtk.cpp:1403
+msgid "Shared objects directory:"
+msgstr "Adresář se sdílenými objekty:"
+
+#: gui/Kde4Gui.cpp:865
+#, fuzzy
+msgid "Do not write Shared Object files"
+msgstr "_Nezapisovat soubory sdílených objektů"
+
+#: gui/Kde4Gui.cpp:871
+#, fuzzy
+msgid "Only access local Shared Object files"
+msgstr "_Zpřístupnit jen soubory s místními sdílenými objekty"
+
+#: gui/Kde4Gui.cpp:876
+#, fuzzy
+msgid "Disable Local Connection object"
+msgstr "Zakázat objekty místních spojení"
+
+#: gui/Kde4Gui.cpp:883
+msgid "Network"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:886 gui/gtk.cpp:1220
+#, fuzzy
+msgid "<b>Network preferences</b>"
+msgstr "<b>Síťová spojení</b>"
+
+#: gui/Kde4Gui.cpp:889
+msgid "Network timeout in seconds"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:901
+#, fuzzy
+msgid "Media"
+msgstr "_Média"
+
+#: gui/Kde4Gui.cpp:904 gui/gtk.cpp:1449
+msgid "<b>Sound</b>"
+msgstr "<b>Zvuk</b>"
+
+#: gui/Kde4Gui.cpp:907
+#, fuzzy
+msgid "Use sound handler"
+msgstr "Použít obslu_hu zvuku"
+
+#: gui/Kde4Gui.cpp:911 gui/gtk.cpp:1468
+msgid "Save media streams to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:917 gui/gtk.cpp:1477
+msgid "Save dynamically loaded media to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:921 gui/gtk.cpp:1485
+#, fuzzy
+msgid "Saved media directory:"
+msgstr "Adresář se sdílenými objekty:"
+
+#: gui/Kde4Gui.cpp:930
+#, fuzzy
+msgid "Player"
+msgstr "_Přehrávač"
+
+#: gui/Kde4Gui.cpp:933 gui/gtk.cpp:1511
+msgid "<b>Player description</b>"
+msgstr "<b>Popis přehrávače</b>"
+
+#: gui/Kde4Gui.cpp:936 gui/gtk.cpp:1519
+msgid "Player version:"
+msgstr "Verze přehrávače:"
+
+#: gui/Kde4Gui.cpp:942 gui/gtk.cpp:1535
+msgid "Operating system:"
+msgstr "Operační systém:"
+
+#: gui/Kde4Gui.cpp:947 gui/Kde4Gui.cpp:1021
+msgid "<Autodetect>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:953 gui/gtk.cpp:1555
+msgid "URL opener:"
+msgstr "Otevírač URL:"
+
+#: gui/Kde4Gui.cpp:960 gui/gtk.cpp:1567
+msgid "<b>Performance</b>"
+msgstr "<b>Výkon</b>"
+
+#: gui/Kde4Gui.cpp:963 gui/gtk.cpp:1581
+msgid "Max size of movie library:"
+msgstr "Maximální velikost knihovny filmu:"
+
+#: gui/Kde4Gui.cpp:972
+#, fuzzy
+msgid "Start Gnash in pause mode"
+msgstr "Spouštět _Gnash v režimu pozastaveného přehrávání"
+
 #: gui/kde.cpp:432
 msgid "Play Movie"
 msgstr "Přehrát film"
@@ -6047,14 +6291,6 @@ msgstr "Skok vpřed"
 #: gui/kde.cpp:440
 msgid "Jump Backward"
 msgstr "Skok zpět"
-
-#: gui/kde.cpp:442
-msgid "Refresh"
-msgstr "Obnovit"
-
-#: gui/kde.cpp:443 gui/gtk.cpp:672
-msgid "Quit Gnash"
-msgstr "Ukončit Gnash"
 
 #: gui/fb.cpp:191
 msgid "Closing framebuffer device"
@@ -6419,18 +6655,9 @@ msgstr "LIRC démon neběží"
 msgid "Sound"
 msgstr "Zvuk"
 
-#: gui/gtk.cpp:1181
-msgid "Gnash preferences"
-msgstr "Nastavení Gnashe"
-
 #: gui/gtk.cpp:1216
 msgid "_Network"
 msgstr ""
-
-#: gui/gtk.cpp:1220
-#, fuzzy
-msgid "<b>Network preferences</b>"
-msgstr "<b>Síťová spojení</b>"
 
 #: gui/gtk.cpp:1228
 msgid "Network timeout in seconds (0 for no timeout):"
@@ -6439,10 +6666,6 @@ msgstr ""
 #: gui/gtk.cpp:1247
 msgid "_Logging"
 msgstr "Protoko_lování"
-
-#: gui/gtk.cpp:1252
-msgid "<b>Logging options</b>"
-msgstr "<b>Volby protokolování</b>"
 
 #: gui/gtk.cpp:1256
 msgid "Verbosity level:"
@@ -6484,10 +6707,6 @@ msgstr "Zapnout _ladění"
 msgid "_Security"
 msgstr "_Bezpečnost"
 
-#: gui/gtk.cpp:1354
-msgid "<b>Network connections</b>"
-msgstr "<b>Síťová spojení</b>"
-
 #: gui/gtk.cpp:1360
 msgid "Connect only to local _host"
 msgstr "Připojovat se jen na _tento stroj"
@@ -6508,14 +6727,6 @@ msgstr "Seznam _povolených"
 msgid "_Blacklist"
 msgstr "Seznam _zakázaných"
 
-#: gui/gtk.cpp:1399
-msgid "<b>Privacy</b>"
-msgstr "<b>Soukromí</b>"
-
-#: gui/gtk.cpp:1403
-msgid "Shared objects directory:"
-msgstr "Adresář se sdílenými objekty:"
-
 #: gui/gtk.cpp:1415
 msgid "Do _not write Shared Object files"
 msgstr "_Nezapisovat soubory sdílených objektů"
@@ -6532,10 +6743,6 @@ msgstr "Zakázat objekty místních spojení"
 msgid "_Media"
 msgstr "_Média"
 
-#: gui/gtk.cpp:1449
-msgid "<b>Sound</b>"
-msgstr "<b>Zvuk</b>"
-
 #: gui/gtk.cpp:1454
 msgid "Use sound _handler"
 msgstr "Použít obslu_hu zvuku"
@@ -6545,66 +6752,17 @@ msgstr "Použít obslu_hu zvuku"
 msgid "<b>Media Streams</b>"
 msgstr "<b>Vlastnosti virtuálního stroje</b>"
 
-#: gui/gtk.cpp:1468
-msgid "Save media streams to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1477
-msgid "Save dynamically loaded media to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1485
-#, fuzzy
-msgid "Saved media directory:"
-msgstr "Adresář se sdílenými objekty:"
-
 #: gui/gtk.cpp:1505
 msgid "_Player"
 msgstr "_Přehrávač"
-
-#: gui/gtk.cpp:1511
-msgid "<b>Player description</b>"
-msgstr "<b>Popis přehrávače</b>"
-
-#: gui/gtk.cpp:1519
-msgid "Player version:"
-msgstr "Verze přehrávače:"
-
-#: gui/gtk.cpp:1535
-msgid "Operating system:"
-msgstr "Operační systém:"
 
 #: gui/gtk.cpp:1545
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr "<i>Není-li uvedeno, Gnash váš OS odhadne.</i>"
 
-#: gui/gtk.cpp:1555
-msgid "URL opener:"
-msgstr "Otevírač URL:"
-
-#: gui/gtk.cpp:1567
-msgid "<b>Performance</b>"
-msgstr "<b>Výkon</b>"
-
-#: gui/gtk.cpp:1581
-msgid "Max size of movie library:"
-msgstr "Maximální velikost knihovny filmu:"
-
 #: gui/gtk.cpp:1593
 msgid "Start _Gnash in pause mode"
 msgstr "Spouštět _Gnash v režimu pozastaveného přehrávání"
-
-#: gui/gtk.cpp:1617
-msgid "Movie properties"
-msgstr "Vlastnosti filmu"
-
-#: gui/gtk.cpp:1691
-msgid "Variable"
-msgstr "Proměnná"
-
-#: gui/gtk.cpp:1704
-msgid "Value"
-msgstr "Hodnota"
 
 #: gui/gtk.cpp:1752
 msgid "Gnash is the GNU SWF Player based on GameSWF."
@@ -6689,18 +6847,6 @@ msgstr "Ukazovat změněné oblasti"
 #: gui/gtk.cpp:2008
 msgid "Movie _Control"
 msgstr "_Ovládání filmu"
-
-#: gui/gtk.cpp:2019
-msgid "Play"
-msgstr "Přehrát"
-
-#: gui/gtk.cpp:2030
-msgid "Pause"
-msgstr "Pozastavit"
-
-#: gui/gtk.cpp:2040
-msgid "Stop"
-msgstr "Zastavit"
 
 #: gui/gtk.cpp:2128 gui/gtk.cpp:2129
 #, c-format
@@ -8829,9 +8975,6 @@ msgstr " Jméno položky je: %s"
 #~ "Inc., 51 Fanklin St, Fifth Floor, Boston, MA 02110-1301,\n"
 #~ "USA. Český překlad naleznete na webové adrese\n"
 #~ "http://www.gnu.cz/licence.html."
-
-#~ msgid "Preferences"
-#~ msgstr "Nastavení"
 
 #~ msgid "About"
 #~ msgstr "O programu"

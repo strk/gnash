@@ -70,7 +70,7 @@ gnash.pot:
 	$(XGETTEXT) --language=C++ --files-from=po/POTFILES \
 	  -o $(srcdir)/gnash.pot \
 	  --default-domain=gnash --force \
-	  --flag=_:1:pass-c-format --keyword=_ \
+	  --flag=_:1:pass-c-format --keyword=_ --keyword=_q \
 	  --copyright-holder='Free Software Foundation, Inc.';  \
 	rm -f po/POTFILES
 

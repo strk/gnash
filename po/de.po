@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Gnash\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-12 11:22+0100\n"
+"POT-Creation-Date: 2009-02-12 11:37+0100\n"
 "PO-Revision-Date: 2008-03-19 09:54+0100\n"
 "Last-Translator: Alwin Meschede <ameschede@gmx.de>\n"
 "Language-Team: German <gnome-de@gnome.org>\n"
@@ -5684,6 +5684,252 @@ msgstr ""
 msgid "FSCommand_callback(%p): %s %s"
 msgstr ""
 
+#: gui/Kde4Gui.cpp:393 gui/gtk.cpp:1617
+msgid "Movie properties"
+msgstr "Film-Eigenschaften"
+
+#: gui/Kde4Gui.cpp:412 gui/gtk.cpp:1691
+msgid "Variable"
+msgstr "Variable"
+
+#: gui/Kde4Gui.cpp:413 gui/gtk.cpp:1704
+msgid "Value"
+msgstr "Wert"
+
+#: gui/Kde4Gui.cpp:498
+#, fuzzy
+msgid "Properties"
+msgstr "Film-Eigenschaften"
+
+#: gui/Kde4Gui.cpp:502 gui/kde.cpp:443 gui/gtk.cpp:672
+msgid "Quit Gnash"
+msgstr "Gnash beenden"
+
+#: gui/Kde4Gui.cpp:508
+#, fuzzy
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: gui/Kde4Gui.cpp:513 gui/gtk.cpp:2019
+msgid "Play"
+msgstr "Wiedergabe"
+
+#: gui/Kde4Gui.cpp:517 gui/gtk.cpp:2030
+msgid "Pause"
+msgstr "Pause"
+
+#: gui/Kde4Gui.cpp:521 gui/gtk.cpp:2040
+msgid "Stop"
+msgstr "Stopp"
+
+#: gui/Kde4Gui.cpp:525
+#, fuzzy
+msgid "Restart"
+msgstr "Neu starten"
+
+#: gui/Kde4Gui.cpp:530 gui/kde.cpp:442
+msgid "Refresh"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:534
+#, fuzzy
+msgid "Fullscreen"
+msgstr "Vollbild"
+
+#: gui/Kde4Gui.cpp:549
+#, fuzzy
+msgid "File"
+msgstr "_Datei"
+
+#: gui/Kde4Gui.cpp:554
+#, fuzzy
+msgid "Edit"
+msgstr "_Bearbeiten"
+
+# (Taken from Totem translation)
+#: gui/Kde4Gui.cpp:558
+#, fuzzy
+msgid "Movie Control"
+msgstr "_Gehe zu"
+
+#: gui/Kde4Gui.cpp:565
+#, fuzzy
+msgid "View"
+msgstr "_Ansicht"
+
+#: gui/Kde4Gui.cpp:763 gui/gtk.cpp:1181
+msgid "Gnash preferences"
+msgstr "Einstellungen"
+
+#: gui/Kde4Gui.cpp:778
+#, fuzzy
+msgid "Logging"
+msgstr "_Logging"
+
+#: gui/Kde4Gui.cpp:781 gui/gtk.cpp:1252
+msgid "<b>Logging options</b>"
+msgstr "<b>Logging-Optionen</b>"
+
+#: gui/Kde4Gui.cpp:784
+#, fuzzy
+msgid "Verbosity level"
+msgstr "Ausführlichkeit:"
+
+#: gui/Kde4Gui.cpp:802
+#, fuzzy
+msgid "Log to file"
+msgstr "Log in _Datei schreiben"
+
+#: gui/Kde4Gui.cpp:809
+#, fuzzy
+msgid "Log parser output"
+msgstr "Ausgabe des _Parsers loggen"
+
+#: gui/Kde4Gui.cpp:813
+#, fuzzy
+msgid "Log SWF actions"
+msgstr "SWF-A_ktionen loggen"
+
+#: gui/Kde4Gui.cpp:817
+#, fuzzy
+msgid "Log malformed SWF errors"
+msgstr "SWF-_Fehler loggen"
+
+#: gui/Kde4Gui.cpp:822
+#, fuzzy
+msgid "Log ActionScript coding errors"
+msgstr "_ActionScript-Fehler loggen"
+
+#: gui/Kde4Gui.cpp:827
+#, fuzzy
+msgid "Log Local Connection activity"
+msgstr "Local-_Connection loggen"
+
+#: gui/Kde4Gui.cpp:835
+#, fuzzy
+msgid "Security"
+msgstr "_Sicherheit"
+
+#: gui/Kde4Gui.cpp:838 gui/gtk.cpp:1354
+msgid "<b>Network connections</b>"
+msgstr "<b>Netzwerkverbindungen</b>"
+
+#: gui/Kde4Gui.cpp:841
+#, fuzzy
+msgid "Connect only to local host"
+msgstr "Nur mit Localhost verbinden"
+
+#: gui/Kde4Gui.cpp:846
+#, fuzzy
+msgid "Connect only to local domain"
+msgstr "Nur mit lokaler Domain verbinden"
+
+#: gui/Kde4Gui.cpp:851
+#, fuzzy
+msgid "Disable SSL verification"
+msgstr "SSL-Verbindungen nicht validieren"
+
+#: gui/Kde4Gui.cpp:856 gui/gtk.cpp:1399
+msgid "<b>Privacy</b>"
+msgstr "<b>Privatsphäre</b>"
+
+#: gui/Kde4Gui.cpp:859 gui/gtk.cpp:1403
+msgid "Shared objects directory:"
+msgstr "SharedObject-Ordner"
+
+#: gui/Kde4Gui.cpp:865
+#, fuzzy
+msgid "Do not write Shared Object files"
+msgstr "SharedObject-Dateien nicht schreiben"
+
+#: gui/Kde4Gui.cpp:871
+#, fuzzy
+msgid "Only access local Shared Object files"
+msgstr "Nur lokale SharedObject-Dateien öffnen"
+
+#: gui/Kde4Gui.cpp:876
+#, fuzzy
+msgid "Disable Local Connection object"
+msgstr "Local-_Connection-Object deaktivieren"
+
+#: gui/Kde4Gui.cpp:883
+msgid "Network"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:886 gui/gtk.cpp:1220
+#, fuzzy
+msgid "<b>Network preferences</b>"
+msgstr "<b>Netzwerkverbindungen</b>"
+
+#: gui/Kde4Gui.cpp:889
+msgid "Network timeout in seconds"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:901
+#, fuzzy
+msgid "Media"
+msgstr "_Media"
+
+#: gui/Kde4Gui.cpp:904 gui/gtk.cpp:1449
+msgid "<b>Sound</b>"
+msgstr "<b>Audio</b>"
+
+#: gui/Kde4Gui.cpp:907
+#, fuzzy
+msgid "Use sound handler"
+msgstr "Soundhandler verwenden"
+
+#: gui/Kde4Gui.cpp:911 gui/gtk.cpp:1468
+msgid "Save media streams to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:917 gui/gtk.cpp:1477
+msgid "Save dynamically loaded media to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:921 gui/gtk.cpp:1485
+#, fuzzy
+msgid "Saved media directory:"
+msgstr "SharedObject-Ordner"
+
+#: gui/Kde4Gui.cpp:930
+#, fuzzy
+msgid "Player"
+msgstr "_Player"
+
+#: gui/Kde4Gui.cpp:933 gui/gtk.cpp:1511
+msgid "<b>Player description</b>"
+msgstr "<b>Player-Beschreibung</b>"
+
+#: gui/Kde4Gui.cpp:936 gui/gtk.cpp:1519
+msgid "Player version:"
+msgstr "Player-Version:"
+
+#: gui/Kde4Gui.cpp:942 gui/gtk.cpp:1535
+msgid "Operating system:"
+msgstr "Betriebssystem:"
+
+#: gui/Kde4Gui.cpp:947 gui/Kde4Gui.cpp:1021
+msgid "<Autodetect>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:953 gui/gtk.cpp:1555
+msgid "URL opener:"
+msgstr "Befehl zum Öffnen von URLs:"
+
+#: gui/Kde4Gui.cpp:960 gui/gtk.cpp:1567
+msgid "<b>Performance</b>"
+msgstr "<b>Leistung</b>"
+
+#: gui/Kde4Gui.cpp:963 gui/gtk.cpp:1581
+msgid "Max size of movie library:"
+msgstr "Größe der Filmbibliothek:"
+
+#: gui/Kde4Gui.cpp:972
+#, fuzzy
+msgid "Start Gnash in pause mode"
+msgstr "_Gnash in Pausemodus starten"
+
 #: gui/kde.cpp:432
 msgid "Play Movie"
 msgstr "Wiedergabe"
@@ -5715,14 +5961,6 @@ msgstr "Vorwärts springen"
 #: gui/kde.cpp:440
 msgid "Jump Backward"
 msgstr "Zurück springen"
-
-#: gui/kde.cpp:442
-msgid "Refresh"
-msgstr ""
-
-#: gui/kde.cpp:443 gui/gtk.cpp:672
-msgid "Quit Gnash"
-msgstr "Gnash beenden"
 
 #: gui/fb.cpp:191
 msgid "Closing framebuffer device"
@@ -6086,18 +6324,9 @@ msgstr "Der LIRC-Dämon läuft nicht"
 msgid "Sound"
 msgstr "Audio"
 
-#: gui/gtk.cpp:1181
-msgid "Gnash preferences"
-msgstr "Einstellungen"
-
 #: gui/gtk.cpp:1216
 msgid "_Network"
 msgstr ""
-
-#: gui/gtk.cpp:1220
-#, fuzzy
-msgid "<b>Network preferences</b>"
-msgstr "<b>Netzwerkverbindungen</b>"
 
 #: gui/gtk.cpp:1228
 msgid "Network timeout in seconds (0 for no timeout):"
@@ -6106,10 +6335,6 @@ msgstr ""
 #: gui/gtk.cpp:1247
 msgid "_Logging"
 msgstr "_Logging"
-
-#: gui/gtk.cpp:1252
-msgid "<b>Logging options</b>"
-msgstr "<b>Logging-Optionen</b>"
 
 #: gui/gtk.cpp:1256
 msgid "Verbosity level:"
@@ -6151,10 +6376,6 @@ msgstr "_Debugger einschalten"
 msgid "_Security"
 msgstr "_Sicherheit"
 
-#: gui/gtk.cpp:1354
-msgid "<b>Network connections</b>"
-msgstr "<b>Netzwerkverbindungen</b>"
-
 #: gui/gtk.cpp:1360
 msgid "Connect only to local _host"
 msgstr "Nur mit Localhost verbinden"
@@ -6175,14 +6396,6 @@ msgstr ""
 msgid "_Blacklist"
 msgstr ""
 
-#: gui/gtk.cpp:1399
-msgid "<b>Privacy</b>"
-msgstr "<b>Privatsphäre</b>"
-
-#: gui/gtk.cpp:1403
-msgid "Shared objects directory:"
-msgstr "SharedObject-Ordner"
-
 #: gui/gtk.cpp:1415
 msgid "Do _not write Shared Object files"
 msgstr "SharedObject-Dateien nicht schreiben"
@@ -6199,10 +6412,6 @@ msgstr "Local-_Connection-Object deaktivieren"
 msgid "_Media"
 msgstr "_Media"
 
-#: gui/gtk.cpp:1449
-msgid "<b>Sound</b>"
-msgstr "<b>Audio</b>"
-
 #: gui/gtk.cpp:1454
 msgid "Use sound _handler"
 msgstr "Soundhandler verwenden"
@@ -6212,66 +6421,17 @@ msgstr "Soundhandler verwenden"
 msgid "<b>Media Streams</b>"
 msgstr "<b>VM-Eigenschaften</b>"
 
-#: gui/gtk.cpp:1468
-msgid "Save media streams to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1477
-msgid "Save dynamically loaded media to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1485
-#, fuzzy
-msgid "Saved media directory:"
-msgstr "SharedObject-Ordner"
-
 #: gui/gtk.cpp:1505
 msgid "_Player"
 msgstr "_Player"
-
-#: gui/gtk.cpp:1511
-msgid "<b>Player description</b>"
-msgstr "<b>Player-Beschreibung</b>"
-
-#: gui/gtk.cpp:1519
-msgid "Player version:"
-msgstr "Player-Version:"
-
-#: gui/gtk.cpp:1535
-msgid "Operating system:"
-msgstr "Betriebssystem:"
 
 #: gui/gtk.cpp:1545
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr "<i>Wenn leer, ermittelt Gnash das Betriebssystem</i>"
 
-#: gui/gtk.cpp:1555
-msgid "URL opener:"
-msgstr "Befehl zum Öffnen von URLs:"
-
-#: gui/gtk.cpp:1567
-msgid "<b>Performance</b>"
-msgstr "<b>Leistung</b>"
-
-#: gui/gtk.cpp:1581
-msgid "Max size of movie library:"
-msgstr "Größe der Filmbibliothek:"
-
 #: gui/gtk.cpp:1593
 msgid "Start _Gnash in pause mode"
 msgstr "_Gnash in Pausemodus starten"
-
-#: gui/gtk.cpp:1617
-msgid "Movie properties"
-msgstr "Film-Eigenschaften"
-
-#: gui/gtk.cpp:1691
-msgid "Variable"
-msgstr "Variable"
-
-#: gui/gtk.cpp:1704
-msgid "Value"
-msgstr "Wert"
 
 #: gui/gtk.cpp:1752
 #, fuzzy
@@ -6351,18 +6511,6 @@ msgstr ""
 #: gui/gtk.cpp:2008
 msgid "Movie _Control"
 msgstr "_Gehe zu"
-
-#: gui/gtk.cpp:2019
-msgid "Play"
-msgstr "Wiedergabe"
-
-#: gui/gtk.cpp:2030
-msgid "Pause"
-msgstr "Pause"
-
-#: gui/gtk.cpp:2040
-msgid "Stop"
-msgstr "Stopp"
 
 #: gui/gtk.cpp:2128 gui/gtk.cpp:2129
 #, c-format

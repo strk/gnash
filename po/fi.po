@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Gnash\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-12 11:22+0100\n"
+"POT-Creation-Date: 2009-02-12 11:37+0100\n"
 "PO-Revision-Date: 2009-01-11 13:01+0200\n"
 "Last-Translator: Timo Jyrinki <timo.jyrinki@iki.fi>\n"
 "Language-Team: Finnish <laatu@lokalisointi.org>\n"
@@ -5614,6 +5614,246 @@ msgstr ""
 msgid "FSCommand_callback(%p): %s %s"
 msgstr ""
 
+#: gui/Kde4Gui.cpp:393 gui/gtk.cpp:1617
+msgid "Movie properties"
+msgstr "Elokuvan ominaisuudet"
+
+#: gui/Kde4Gui.cpp:412 gui/gtk.cpp:1691
+msgid "Variable"
+msgstr "Muuttuja"
+
+#: gui/Kde4Gui.cpp:413 gui/gtk.cpp:1704
+msgid "Value"
+msgstr "Arvo"
+
+#: gui/Kde4Gui.cpp:498
+msgid "Properties"
+msgstr "Ominaisuudet"
+
+#: gui/Kde4Gui.cpp:502 gui/kde.cpp:443 gui/gtk.cpp:672
+msgid "Quit Gnash"
+msgstr "Lopeta Gnash"
+
+#: gui/Kde4Gui.cpp:508
+#, fuzzy
+msgid "Preferences"
+msgstr "Gnash-asetukset"
+
+#: gui/Kde4Gui.cpp:513 gui/gtk.cpp:2019
+msgid "Play"
+msgstr "Toista"
+
+#: gui/Kde4Gui.cpp:517 gui/gtk.cpp:2030
+msgid "Pause"
+msgstr "Tauko"
+
+#: gui/Kde4Gui.cpp:521 gui/gtk.cpp:2040
+msgid "Stop"
+msgstr "Pysäytä"
+
+#: gui/Kde4Gui.cpp:525
+msgid "Restart"
+msgstr "Käynnistä uudelleen"
+
+#: gui/Kde4Gui.cpp:530 gui/kde.cpp:442
+msgid "Refresh"
+msgstr "Päivitä"
+
+#: gui/Kde4Gui.cpp:534
+msgid "Fullscreen"
+msgstr "Kokonäyttötila"
+
+#: gui/Kde4Gui.cpp:549
+msgid "File"
+msgstr "Tiedosto"
+
+#: gui/Kde4Gui.cpp:554
+#, fuzzy
+msgid "Edit"
+msgstr "_Muokkaa"
+
+#: gui/Kde4Gui.cpp:558
+msgid "Movie Control"
+msgstr "Elokuvan hallinta"
+
+#: gui/Kde4Gui.cpp:565
+msgid "View"
+msgstr "Näytä"
+
+#: gui/Kde4Gui.cpp:763 gui/gtk.cpp:1181
+msgid "Gnash preferences"
+msgstr "Gnash-asetukset"
+
+#: gui/Kde4Gui.cpp:778
+#, fuzzy
+msgid "Logging"
+msgstr "_Lokiinkirjaus"
+
+#: gui/Kde4Gui.cpp:781 gui/gtk.cpp:1252
+msgid "<b>Logging options</b>"
+msgstr "<b>Lokivalinnat</b>"
+
+#: gui/Kde4Gui.cpp:784
+#, fuzzy
+msgid "Verbosity level"
+msgstr "Tulosteen määrä:"
+
+#: gui/Kde4Gui.cpp:802
+#, fuzzy
+msgid "Log to file"
+msgstr "Loki _tiedostoon"
+
+#: gui/Kde4Gui.cpp:809
+#, fuzzy
+msgid "Log parser output"
+msgstr "_Jäsentimen ulostulo lokiin"
+
+#: gui/Kde4Gui.cpp:813
+#, fuzzy
+msgid "Log SWF actions"
+msgstr "SWF-_toiminnot lokiin"
+
+#: gui/Kde4Gui.cpp:817
+#, fuzzy
+msgid "Log malformed SWF errors"
+msgstr "Väärin muodostetun SWF:n virh_eet lokiin"
+
+#: gui/Kde4Gui.cpp:822
+#, fuzzy
+msgid "Log ActionScript coding errors"
+msgstr "ActionScript-_ohjelmavirheet lokiin"
+
+#: gui/Kde4Gui.cpp:827
+#, fuzzy
+msgid "Log Local Connection activity"
+msgstr "Paika_llisyhteystapahtumat lokiin"
+
+#: gui/Kde4Gui.cpp:835
+#, fuzzy
+msgid "Security"
+msgstr "_Turvallisuus"
+
+#: gui/Kde4Gui.cpp:838 gui/gtk.cpp:1354
+msgid "<b>Network connections</b>"
+msgstr "<b>Verkkoyhteydet</b>"
+
+#: gui/Kde4Gui.cpp:841
+#, fuzzy
+msgid "Connect only to local host"
+msgstr "Yhdistä vain paikall_iseen isäntäkoneeseen"
+
+#: gui/Kde4Gui.cpp:846
+#, fuzzy
+msgid "Connect only to local domain"
+msgstr "Yhdistä vain paikalliseen _verkkoalueeseen"
+
+#: gui/Kde4Gui.cpp:851
+#, fuzzy
+msgid "Disable SSL verification"
+msgstr "Ota SSL-_tarkistus pois käytöstä"
+
+#: gui/Kde4Gui.cpp:856 gui/gtk.cpp:1399
+msgid "<b>Privacy</b>"
+msgstr "<b>Yksityisyys</b>"
+
+#: gui/Kde4Gui.cpp:859 gui/gtk.cpp:1403
+msgid "Shared objects directory:"
+msgstr "Jaettujen objektien hakemisto:"
+
+#: gui/Kde4Gui.cpp:865
+#, fuzzy
+msgid "Do not write Shared Object files"
+msgstr "Älä _kirjoita jaettujen objektien tiedostoja"
+
+#: gui/Kde4Gui.cpp:871
+#, fuzzy
+msgid "Only access local Shared Object files"
+msgstr "Saanti v_ain paikallisiin jaettujen objektien tiedostoihin"
+
+#: gui/Kde4Gui.cpp:876
+#, fuzzy
+msgid "Disable Local Connection object"
+msgstr "Ota paikallis_yhteyden objekti pois käytöstä"
+
+#: gui/Kde4Gui.cpp:883
+#, fuzzy
+msgid "Network"
+msgstr "_Verkko"
+
+#: gui/Kde4Gui.cpp:886 gui/gtk.cpp:1220
+msgid "<b>Network preferences</b>"
+msgstr "<b>Verkkoasetukset</b>"
+
+#: gui/Kde4Gui.cpp:889
+#, fuzzy
+msgid "Network timeout in seconds"
+msgstr "Verkon aikakatkaisu sekunneissa (0 - ei aikakatkaisua):"
+
+#: gui/Kde4Gui.cpp:901
+#, fuzzy
+msgid "Media"
+msgstr "_Media"
+
+#: gui/Kde4Gui.cpp:904 gui/gtk.cpp:1449
+msgid "<b>Sound</b>"
+msgstr "<b>Ääni</b>"
+
+#: gui/Kde4Gui.cpp:907
+#, fuzzy
+msgid "Use sound handler"
+msgstr "Käytä äänen_käsittelijää"
+
+#: gui/Kde4Gui.cpp:911 gui/gtk.cpp:1468
+msgid "Save media streams to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:917 gui/gtk.cpp:1477
+msgid "Save dynamically loaded media to disk"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:921 gui/gtk.cpp:1485
+#, fuzzy
+msgid "Saved media directory:"
+msgstr "Jaettujen objektien hakemisto:"
+
+#: gui/Kde4Gui.cpp:930
+#, fuzzy
+msgid "Player"
+msgstr "_Soitin"
+
+#: gui/Kde4Gui.cpp:933 gui/gtk.cpp:1511
+msgid "<b>Player description</b>"
+msgstr "<b>Soittimen kuvaus</b>"
+
+#: gui/Kde4Gui.cpp:936 gui/gtk.cpp:1519
+msgid "Player version:"
+msgstr "Soittimen versio:"
+
+#: gui/Kde4Gui.cpp:942 gui/gtk.cpp:1535
+msgid "Operating system:"
+msgstr "Käyttöjärjestelmä:"
+
+#: gui/Kde4Gui.cpp:947 gui/Kde4Gui.cpp:1021
+msgid "<Autodetect>"
+msgstr ""
+
+#: gui/Kde4Gui.cpp:953 gui/gtk.cpp:1555
+msgid "URL opener:"
+msgstr "URL-avaaja:"
+
+#: gui/Kde4Gui.cpp:960 gui/gtk.cpp:1567
+msgid "<b>Performance</b>"
+msgstr "<b>Suorituskyky</b>"
+
+#: gui/Kde4Gui.cpp:963 gui/gtk.cpp:1581
+msgid "Max size of movie library:"
+msgstr "Elokuvakirjaston suurin koko:"
+
+#: gui/Kde4Gui.cpp:972
+#, fuzzy
+msgid "Start Gnash in pause mode"
+msgstr "Käynnistä _Gnash pysäytetyssä tilassa"
+
 #: gui/kde.cpp:432
 msgid "Play Movie"
 msgstr "Toista elokuva"
@@ -5645,14 +5885,6 @@ msgstr "Hyppää eteenpäin"
 #: gui/kde.cpp:440
 msgid "Jump Backward"
 msgstr "Hyppää taaksepäin"
-
-#: gui/kde.cpp:442
-msgid "Refresh"
-msgstr "Päivitä"
-
-#: gui/kde.cpp:443 gui/gtk.cpp:672
-msgid "Quit Gnash"
-msgstr "Lopeta Gnash"
 
 #: gui/fb.cpp:191
 msgid "Closing framebuffer device"
@@ -6013,17 +6245,9 @@ msgstr "LIRC-palvelu ei käynnissä"
 msgid "Sound"
 msgstr "Ääni"
 
-#: gui/gtk.cpp:1181
-msgid "Gnash preferences"
-msgstr "Gnash-asetukset"
-
 #: gui/gtk.cpp:1216
 msgid "_Network"
 msgstr "_Verkko"
-
-#: gui/gtk.cpp:1220
-msgid "<b>Network preferences</b>"
-msgstr "<b>Verkkoasetukset</b>"
 
 #: gui/gtk.cpp:1228
 msgid "Network timeout in seconds (0 for no timeout):"
@@ -6032,10 +6256,6 @@ msgstr "Verkon aikakatkaisu sekunneissa (0 - ei aikakatkaisua):"
 #: gui/gtk.cpp:1247
 msgid "_Logging"
 msgstr "_Lokiinkirjaus"
-
-#: gui/gtk.cpp:1252
-msgid "<b>Logging options</b>"
-msgstr "<b>Lokivalinnat</b>"
 
 #: gui/gtk.cpp:1256
 msgid "Verbosity level:"
@@ -6077,10 +6297,6 @@ msgstr "Ota käyttöön _virheenjäljitin"
 msgid "_Security"
 msgstr "_Turvallisuus"
 
-#: gui/gtk.cpp:1354
-msgid "<b>Network connections</b>"
-msgstr "<b>Verkkoyhteydet</b>"
-
 #: gui/gtk.cpp:1360
 msgid "Connect only to local _host"
 msgstr "Yhdistä vain paikall_iseen isäntäkoneeseen"
@@ -6101,14 +6317,6 @@ msgstr "_Sallittujen luettelo"
 msgid "_Blacklist"
 msgstr "_Estettyjen luettelo"
 
-#: gui/gtk.cpp:1399
-msgid "<b>Privacy</b>"
-msgstr "<b>Yksityisyys</b>"
-
-#: gui/gtk.cpp:1403
-msgid "Shared objects directory:"
-msgstr "Jaettujen objektien hakemisto:"
-
 #: gui/gtk.cpp:1415
 msgid "Do _not write Shared Object files"
 msgstr "Älä _kirjoita jaettujen objektien tiedostoja"
@@ -6125,10 +6333,6 @@ msgstr "Ota paikallis_yhteyden objekti pois käytöstä"
 msgid "_Media"
 msgstr "_Media"
 
-#: gui/gtk.cpp:1449
-msgid "<b>Sound</b>"
-msgstr "<b>Ääni</b>"
-
 #: gui/gtk.cpp:1454
 msgid "Use sound _handler"
 msgstr "Käytä äänen_käsittelijää"
@@ -6138,66 +6342,17 @@ msgstr "Käytä äänen_käsittelijää"
 msgid "<b>Media Streams</b>"
 msgstr "<b>Virtuaalikoneen ominaisuudet</b>"
 
-#: gui/gtk.cpp:1468
-msgid "Save media streams to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1477
-msgid "Save dynamically loaded media to disk"
-msgstr ""
-
-#: gui/gtk.cpp:1485
-#, fuzzy
-msgid "Saved media directory:"
-msgstr "Jaettujen objektien hakemisto:"
-
 #: gui/gtk.cpp:1505
 msgid "_Player"
 msgstr "_Soitin"
-
-#: gui/gtk.cpp:1511
-msgid "<b>Player description</b>"
-msgstr "<b>Soittimen kuvaus</b>"
-
-#: gui/gtk.cpp:1519
-msgid "Player version:"
-msgstr "Soittimen versio:"
-
-#: gui/gtk.cpp:1535
-msgid "Operating system:"
-msgstr "Käyttöjärjestelmä:"
 
 #: gui/gtk.cpp:1545
 msgid "<i>If blank, Gnash will detect your OS</i>"
 msgstr "<i>Jos tyhjä, Gnash tunnistaa käyttöjärjestelmän</i>"
 
-#: gui/gtk.cpp:1555
-msgid "URL opener:"
-msgstr "URL-avaaja:"
-
-#: gui/gtk.cpp:1567
-msgid "<b>Performance</b>"
-msgstr "<b>Suorituskyky</b>"
-
-#: gui/gtk.cpp:1581
-msgid "Max size of movie library:"
-msgstr "Elokuvakirjaston suurin koko:"
-
 #: gui/gtk.cpp:1593
 msgid "Start _Gnash in pause mode"
 msgstr "Käynnistä _Gnash pysäytetyssä tilassa"
-
-#: gui/gtk.cpp:1617
-msgid "Movie properties"
-msgstr "Elokuvan ominaisuudet"
-
-#: gui/gtk.cpp:1691
-msgid "Variable"
-msgstr "Muuttuja"
-
-#: gui/gtk.cpp:1704
-msgid "Value"
-msgstr "Arvo"
 
 #: gui/gtk.cpp:1752
 msgid "Gnash is the GNU SWF Player based on GameSWF."
@@ -6282,18 +6437,6 @@ msgstr "Näytä päivitetyt vaihteluvälit"
 #: gui/gtk.cpp:2008
 msgid "Movie _Control"
 msgstr "Elokuvan _hallinta"
-
-#: gui/gtk.cpp:2019
-msgid "Play"
-msgstr "Toista"
-
-#: gui/gtk.cpp:2030
-msgid "Pause"
-msgstr "Tauko"
-
-#: gui/gtk.cpp:2040
-msgid "Stop"
-msgstr "Pysäytä"
 
 #: gui/gtk.cpp:2128 gui/gtk.cpp:2129
 #, c-format
@@ -6662,24 +6805,6 @@ msgstr "Kentän nimi on: %s: "
 
 #~ msgid "Jump Backward 10 Frames"
 #~ msgstr "Hyppää taaksepäin 10 kehystä"
-
-#~ msgid "Properties"
-#~ msgstr "Ominaisuudet"
-
-#~ msgid "Restart"
-#~ msgstr "Käynnistä uudelleen"
-
-#~ msgid "Fullscreen"
-#~ msgstr "Kokonäyttötila"
-
-#~ msgid "File"
-#~ msgstr "Tiedosto"
-
-#~ msgid "Movie Control"
-#~ msgstr "Elokuvan hallinta"
-
-#~ msgid "View"
-#~ msgstr "Näytä"
 
 #, fuzzy
 #~ msgid "GNASH flash movie player"
