@@ -46,6 +46,7 @@
 #include "GnashSleep.h"
 #include "crc.h"
 #include "cache.h"
+#include "diskstream.h"
 
 using namespace gnash;
 using namespace std;
@@ -63,7 +64,8 @@ static Cache& cache = Cache::getDefaultInstance();
 extern map<int, Handler *> handlers;
 
 RTMPServer::RTMPServer() 
-    : _filesize(0)
+    : _filesize(0),
+      _streamid(1)
 {
 //    GNASH_REPORT_FUNCTION;
 //     _inbytes = 0;
@@ -369,18 +371,34 @@ boost::shared_ptr<Buffer>
 RTMPServer::encodeResult(RTMPMsg::rtmp_status_e status)
 {
 //    GNASH_REPORT_FUNCTION;
-    return encodeResult(status, _filespec, 0.0);
+    return encodeResult(status, _filespec, _streamid);
 }
     
 boost::shared_ptr<amf::Buffer> 
 RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename)
 {
 //    GNASH_REPORT_FUNCTION;
-    return encodeResult(status, filename, 0.0);
+    double clientid = 0.0;
+    return encodeResult(status, filename, _streamid, clientid);
 }
 
 boost::shared_ptr<amf::Buffer> 
-RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double clientid)
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &clientid)
+{
+//    GNASH_REPORT_FUNCTION;
+    return encodeResult(status, filename, _streamid, clientid);
+}
+
+boost::shared_ptr<amf::Buffer> 
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &streamid)
+{
+//    GNASH_REPORT_FUNCTION;
+    double clientid = 0.0;
+    return encodeResult(status, "", streamid, clientid);
+}
+
+boost::shared_ptr<amf::Buffer> 
+RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid, double &clientid)
 {
 //    GNASH_REPORT_FUNCTION;
 //    Buffer *buf = new Buffer;
@@ -398,7 +416,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 
     Element *number = new Element;
     // add The server ID
-    number->makeNumber(1);	// FIXME: needs a real value, which should increment
+    number->makeNumber(streamid);	// FIXME: needs a real value, which should increment
 
     Element top;
 //    top.makeObject("application");
@@ -495,11 +513,11 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  top.addProperty(code);
 
 	  boost::shared_ptr<amf::Element> description(new Element);
-	  string field = "Started playing ";
+	  string field = "Playing and resetting ";
 	  if (!filename.empty()) {
-	      field + filename;
+	      field += filename;
 	  }
-	  description->makeString("description", "Started playing");
+	  description->makeString("description", field);
 	  top.addProperty(description);
 	  
 	  boost::shared_ptr<amf::Element> details(new Element);
@@ -507,7 +525,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  top.addProperty(details);
 	  
 	  boost::shared_ptr<amf::Element> cid(new Element);
-	  code->makeNumber("clientid", clientid);
+	  cid->makeNumber("clientid", clientid);
 	  top.addProperty(cid);
 
 	  break;
@@ -515,7 +533,7 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
       case RTMPMsg::NS_PLAY_START:
       {
 	  str->makeString("onStatus");
-//	  "clientid"
+
 	  boost::shared_ptr<amf::Element> level(new Element);
 	  level->makeString("level", "status");
 	  top.addProperty(level);
@@ -527,17 +545,17 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  boost::shared_ptr<amf::Element> description(new Element);
 	  string field = "Started playing ";
 	  if (!filename.empty()) {
-	      field + filename;
+	      field += filename;
 	  }
-	  description->makeString("description", "Started playing");
+	  description->makeString("description", field);
 	  top.addProperty(description);
 	  
 	  boost::shared_ptr<amf::Element> details(new Element);
 	  details->makeString("details", filename);
 	  top.addProperty(details);
-	  
+  
 	  boost::shared_ptr<amf::Element> cid(new Element);
-	  code->makeNumber("clientid", clientid);
+	  cid->makeNumber("clientid", clientid);
 	  top.addProperty(cid);
 
 	  break;
@@ -567,13 +585,9 @@ RTMPServer::encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string
 	  // Don't encode as an object, just the properties
 	  notobject = true;
 
-// 	  boost::shared_ptr<amf::Element> id1(new Element);
-// 	  id1->makeNumber(2);
-// 	  top.addProperty(id1);
-	  number->makeNumber(2);	// FIXME: needs a real value, which should increment
-
 	  boost::shared_ptr<amf::Element> id2(new Element);
-	  id2->makeNumber(1);
+	  double sid = createStreamID();
+	  id2->makeNumber(sid);
 	  top.addProperty(id2);
 	  
 	  break;
@@ -773,6 +787,7 @@ RTMPServer::formatEchoResponse(double num, boost::uint8_t *data, size_t size)
     return buf;
 }
 
+// Create a new client ID, which appears to be a random double.
 double 
 RTMPServer::createClientID()
 {
@@ -782,12 +797,89 @@ RTMPServer::createClientID()
     boost::uniform_real<> numbers(1, 65535);
 
     double id = numbers(seed);
-
     _clientids.push_back(id);
 
     return id;
 }
+
+// Get the next streamID
+double 
+RTMPServer::createStreamID()
+{
+//    GNASH_REPORT_FUNCTION;
+    return _streamid++;
+}
+
+bool
+RTMPServer::sendFile(int fd, const std::string &filespec)
+{
+    GNASH_REPORT_FUNCTION;
+    // See if the file is in the cache and already opened.
+    boost::shared_ptr<DiskStream> filestream(cache.findFile(filespec));
+    if (filestream) {
+	cerr << "FIXME: found file in cache!" << endl;
+    } else {
+	filestream.reset(new DiskStream);
+//	    cerr << "New Filestream at 0x" << hex << filestream.get() << endl;
+	
+//	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
+	
+	// Oopen the file and read the first chunk into memory
+	if (filestream->open(filespec)) {
+	    return false;
+	} else {
+	    // Get the file size for the HTTP header
+	    if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
+		return false;
+	    } else {
+		cache.addPath(filespec, filestream->getFilespec());
+	    }
+	}
+    }
     
+    size_t filesize = filestream->getFileSize();
+    size_t bytes_read = 0;
+    int ret;
+    size_t page = 0;
+    if (filesize) {
+#ifdef USE_STATS_CACHE
+	struct timespec start;
+	clock_gettime (CLOCK_REALTIME, &start);
+#endif
+	size_t getbytes = 0;
+	if (filesize <= filestream->getPagesize()) {
+	    getbytes = filesize;
+	} else {
+	    getbytes = filestream->getPagesize();
+	}
+	if (filesize >= CACHE_LIMIT) {
+	    do {
+		filestream->loadToMem(page);
+		ret = writeNet(fd, filestream->get(), getbytes);
+		if (ret <= 0) {
+		    break;
+		}
+		bytes_read += ret;
+		page += filestream->getPagesize();
+	    } while (bytes_read <= filesize);
+	} else {
+	    filestream->loadToMem(filesize, 0);
+	    ret = writeNet(fd, filestream->get(), filesize);
+	}
+	filestream->close();
+#ifdef USE_STATS_CACHE
+	struct timespec end;
+	clock_gettime (CLOCK_REALTIME, &end);
+	double time = (end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9);
+	cerr << "File " << _filespec
+	     << " transferred " << filesize << " bytes in: " << fixed
+	     << time << " seconds for net fd #" << fd << endl;
+#endif
+    }    
+
+    return true;
+}
+
 // This is the thread for all incoming RTMP connections
 bool
 rtmp_handler(Network::thread_params_t *args)
@@ -985,15 +1077,14 @@ rtmp_handler(Network::thread_params_t *args)
 					double streamid  = body->getStreamID();
 					log_debug("The streamID from NetStream::createStream() is: %d", streamid);
 					response_head_size = RTMP::HEADER_8;
-					double clientid = rtmp->createClientID();
-					response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, filespec, clientid);
-					body->dump();
+					response = rtmp->encodeResult(RTMPMsg::NS_CREATE_STREAM, streamid);
+//					body->dump();
 				    }
 				    if (body->getMethodName() == "deleteStream") {
 					double streamid  = body->getStreamID();
 					log_debug("The streamID from NetStream::deleyeStream() is: %d", streamid);
 					response_head_size = RTMP::HEADER_8;
-					response = rtmp->encodeResult(RTMPMsg::NS_DELETE_STREAM);
+					response = rtmp->encodeResult(RTMPMsg::NS_DELETE_STREAM, streamid);
 					body->dump();
 				    }
 				    // Invoke the NetStream::play() method
@@ -1002,8 +1093,18 @@ rtmp_handler(Network::thread_params_t *args)
 					log_debug("The streamID from NetStream::plays: %d", streamid);
 					filespec = body->at(1)->to_string();
 					response_head_size = RTMP::HEADER_8;
-					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START, filespec);
-					body->dump();
+					double clientid = rtmp->createClientID();
+//  					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_RESET, filespec);
+// //					body->setChannel(4);
+//  					rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
+//  							  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response);
+//  					response.reset();
+//					body->setChannel(4);
+					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START, filespec, clientid);
+  					rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
+						      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response);
+					rtmp->sendFile(args->netfd, filespec);
+//					body->dump();
 				    }
 				    if (body->getMethodName() == "recData") {
 				    }

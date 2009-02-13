@@ -48,7 +48,9 @@ public:
     // These are handlers for the various types
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status);
     boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename);
-    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double clientid);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, double &streamid);
+    boost::shared_ptr<amf::Buffer> encodeResult(gnash::RTMPMsg::rtmp_status_e status, const std::string &filename, double &streamid, double &clientid);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type, boost::uint32_t milliseconds);
     boost::shared_ptr<amf::Buffer> encodePing(rtmp_ping_e type);
 
@@ -61,8 +63,13 @@ public:
     boost::shared_ptr<amf::Buffer> formatEchoResponse(double num, boost::uint8_t *data, size_t size);    
     void addReference(boost::uint16_t index, amf::Element &el) { _references[index] = el; };
     amf::Element &getReference(boost::uint16_t index) { return _references[index]; };
-    
+
+    bool sendFile(int fd, const std::string &filespec);
+
     double createClientID();
+    double createStreamID();
+    void setStreamID(double id) { _streamid = id; };
+    double getStreamID() { return _streamid; };
 
     void dump();
   private:
@@ -72,7 +79,8 @@ public:
     std::string		_filespec;
     boost::uint32_t     _filesize;
     std::map<boost::uint16_t, amf::Element> _references;
-    std::vector<double> _clientids;
+    std::vector<double>	_clientids;
+    double		_streamid;
 };
 
 // This is the thread for all incoming RTMP connections
