@@ -24,14 +24,20 @@
 # for an xpi package, we have to configure with --enable-xpcom, which the plugin
 # uses to find the directory where Gnash lives.
 
-# build the xpi package
-xpi-bundle: # snapshot
+# Do the entire process to build an xpi package
+xpi: snapshot xpi-configure snapshot-build snapshot-install
+
+# build the xpi package bundle. snapshot-build and snapshot-install need to
+# have been run already. If you wish the automatic dependency checking, use
+# the 'xpi' target instead, as this is meant only to be called directly when
+# debugging package building.
+xpi-bundle:
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-${RELEASE}$${now}"; \
 	snapshot_dir="gnash-${RELEASE}$${now}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
 	snapshot_dest="/tmp/gnash_${RELEASE}$${now}"; \
-	snapshot_tmp="/tmp/gnash_${RELEASE}$${now}-tmp"; \
+	snapshot_tmp="/tmp/gnash_${RELEASE}$${now}-xpi"; \
 	if ! test -d $${snapshot_dest}/ ; then \
 	  mkdir $${snapshot_dest}; \
         else \
@@ -40,16 +46,21 @@ xpi-bundle: # snapshot
 	for i in install.rdf; do \
 	  cp -fr $(srcdir)/packaging/xpi/$$i $${snapshot_tmp}; \
 	done; \
+	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} install-pkglib DESTDIR=$${snapshot_tmp}; \
 	mkdir -p $${snapshot_dest}/plugins; \
 	cp -fr $${snapshot_dest}/$(bindir)/*gnash $${snapshot_tmp}/plugins; \
 	strip $${snapshot_dest}/plugins/gtk-gnash; \
 	cp -fr $${snapshot_dest}$(localedir) $${snapshot_tmp}/; \
 	cp -fr $${snapshot_dest}/tmp/plugin/libgnashplugin.so $${snapshot_tmp}/plugins; \
-	cp -fr $${snapshot_dest}/tmp/plugin/extensions/*.xpt $${snapshot_tmp}/plugins; \
-	cp -fr $${snapshot_dest}/tmp/plugin/extensions/*.so $${snapshot_tmp}/plugins; \
-	(cd $${snapshot_tmp}; $(ZIP) -r /tmp/gnash-$${snapshot_dir}.xpi *)
+	cp -fr $${snapshot_dest}/tmp/plugin/libgnashcomponent.so $${snapshot_tmp}/plugins; \
+	(cd $${snapshot_tmp}; $(ZIP) -r /tmp/$${snapshot_dir}.xpi *)
+#	cp -fr $${snapshot_dest}/tmp/plugin/extensions/*.xpt $${snapshot_tmp}/plugins;
+#	cp -fr $${snapshot_dest}/tmp/plugin/extensions/*.so $${snapshot_tmp}/plugins;
 
-xpi-configure: # snapshot
+# configure the xpi build. snapshot needs to have been run already. If you wish the
+# automatic dependency checking, use the 'xpi' target instead, as this is meant only
+# to be called directly when debugging package building.
+xpi-configure:
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-${RELEASE}$${now}"; \
 	snapshot_dir="$${pkgname}"; \
@@ -70,8 +81,7 @@ xpi-configure: # snapshot
 	  --infodir=/usr/share/info \
 	  --with-npapi-plugindir=/usr/lib/mozilla/plugins
 
-xpi: snapshot xpi-configure snapshot-build snapshot-install
-
+# remove files left from package building
 xpi-clean:
 	rm -fr xpi-* gnash-$(RELEASE)*.xpi
 
