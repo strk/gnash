@@ -163,6 +163,9 @@ uninstall-plugins: uninstall-plugin
 	$(MAKE) -C klash uninstall-plugins
 	$(MAKE) -C win32 uninstall-plugins
 
+install-pkglib:
+	$(MAKE) -C xpcom install-pkglib
+
 uninstall-plugin: 
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
 
