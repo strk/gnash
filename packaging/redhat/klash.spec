@@ -2,7 +2,6 @@ Name:           gnash
 Version:        20090213
 Release:        1
 Distribution:	fc10
-# Distribution:	ydl6
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
@@ -13,22 +12,19 @@ URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
+
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
-BuildRequires:  gtk2-devel libX11-devel libXt-devel glib2-devel
-BuildRequires:  atk-devel pango-devel
+BuildRequires:  libX11-devel libXt-devel
 BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
 BuildRequires:  xorg-x11-proto-devel SDL-devel
-%if %{distribution} != "ydl6"
+BuildRequires:  kdelibs-devel kdebase-devel qt-devel
 BuildRequires:  ffmpeg-devel
-%endif
 
 # Installation requirements
 Requires: libpng libjpeg libogg
-Requires: gtk2 libX11 libXt glib2 atk pango
+Requires: libX11 libXt
 Requires: agg boost libcurl libXt SDL
-%if %{distribution} != "ydl6"
 Requires: ffmpeg
-%endif
 
 # BuildRequires:  scrollkeeper
 
@@ -42,109 +38,50 @@ Requires(postun): /sbin/ldconfig
 %description
 Gnash is a GNU SWF movie player that supports many SWF v7 features, with growing support for swf v8 and v9.
 
-%package plugin
-Summary:   Web-client SWF player plugin 
+%package klash3
+Summary:   Konqueror SWF player plugin for KDE 3
 Requires:  %{name} = %{version}-%{release}
-Requires: gstreamer >= 0.10 gnash
-Group:     Applications/Internet
-
-%description plugin
-The gnash SWF player plugin for firefox or mozilla.
-
-%package cygnal
-Summary:   Streaming media server
-Requires:  %{name} = %{version}-%{release}
+Requires:  kdelibs kdelibs qt gnash
 Group:     Applications/Multimedia
 
-%description cygnal
-Cygnal is a streaming media server that's Flash aware.
+%description klash3
+The gnash SWF player plugin for Konqueror in KDE 3.
+
+%package klash4
+Summary:   Konqueror SWF player plugin for KDE 4
+Requires:  %{name} = %{version}-%{release}
+Requires:  kdelibs kdelibs qt gnash
+Group:     Applications/Multimedia
+
+%description klash4
+The gnash SWF player plugin for Konqueror in KDE4.
 
 %prep
 %setup -q
 
 %build
 
-# handle cross building rpms. This gets messy when building for two
-# archtectures with the same CPU type, like x86-Linux -> OLPC. We have
-# to do this because an OLPC requires RPMs to install software, but
-# doesn't have the resources to do native builds. So this hack lets us
-# build RPM packages on one host for the OLPC, or other RPM based
-# embedded distributions.
-%if %{_target_cpu} != %{_build_arch}
-%define cross_compile 1
-%else
-%define cross_compile 0
-%endif
-# if not defined, assume this is a native package.
-%{?do_cross_compile:%define cross_compile 0}
+[ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
 
-# FIXME: this ia a bad hack! Although all this does work correctly and
-# build an RPM, it's set for an geode-olpc, so the actual hardware
-# won't let us install it.
-# %define cross_compile 0
-# %define olpc 0
-
-# Build rpms for an ARM based processor, in our case the Nokia 770/800
-# tablet. 
-%ifarch arm
-RPM_TARGET=%{_target}
-%endif
-
-%if %{cross_compile}
-# cross building an RPM. This works as long as you have a good cross
-# compiler installed. We currently do want to cross compile the
-# Mozilla plugin, but not the Konqueror one till we make KDE work
-# better than it does now.
-  CROSS_OPTS="--build=%{_host} --host=$RPM_TARGET --target=$RPM_TARGET"
-  RENDERER="--enable-renderer=agg"		# could be opengl
-  %ifarch arm
-    SOUND="--enable-media=none --disable-nsapi --disable-kparts"
-  %else
-    SOUND="--enable-media=gst"			# could also be sdl
-  %endif
-# The OLPC is a weird case, it's basically an i386-linux toolchain
-# targeted towards Fedora Core 6. The machine itself is too limited to
-# build RPMs on, so we do it this way.
-  %if olpc
-    CROSS_OPTS="$CROSS_OPTS --disable-kparts --disable-menus"
-    SOUND="--enable-media=gst --enable-jemalloc"
-    GUI="--enable-gui=gtk"
-    RENDERER="$RENDERER --with-pixelformat=RGB565"
-  %endif
-%else
 # Native RPM build
-  CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
-  GUI="--enable-gui=gtk"
-  SOUND="--enable-media=ffmpeg --enable-jemalloc"
-  RENDERER="" # --enable-render=ogl
-%endif
-
-%if %{distribution} != "ydl6"
-  SOUND="--enable-media=gst" 
-%endif
+CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
+GUI="" # --enable-gui=gtk,kde3,kde4
+SOUND="--enable-media=ffmpeg --enable-jemalloc"
+RENDERER="" # --enable-render=ogl
+KDE3_OPTS="--with-kde3-plugindir=%{_libdir}/kde3/plugins \
+        --with-kde3-pluginprefix=%{_prefix} \
+        --with-kde3-servicesdir=%{_prefix}/share/services \
+        --with-kde3-appsdatadir=%{_prefix}/share/apps/klash \
+        --with-kde3-configdir=${_datadir}/config"
+KDE4_OPTS="--with-kde4-plugindir=%{_libdir}/kde4/plugins \
+        --with-kde4-pluginprefix=%{_prefix} \
+        --with-kde4-servicesdir=%{_prefix}/share/services \
+        --with-kde4-appsdatadir=%{_prefix}/share/apps/klash \
+        --with-kde4-configdir=${_datadir}/config"
 
 # we disable the testuites by default, as when building packages we
 # should have already been running the testsuites as part of the 
 # normal build & test development cycle.
-
-# The default options for the configure aren't suitable for
-# cross configuring, so we force them to be what we know is correct.
-# uncommenting these will produce huge volumes of debug info from the
-# shell, but sometimes that's what you need to do.
-# export CONFIG_SHELL="sh -x"
-# sh -x ./configure \
-%if %{cross_compile}
-%configure --enable-static \
-	$CROSS_OPTS \
-	$SOUND $GUI \
-	$RENDERER \
-	--disable-dependency-tracking \
-	--disable-testsuites \
-	--disable-rpath \
-	--with-plugindir=%{_libdir}/mozilla/plugins
-
-make $(MAKEFLAGS) dumpconfig all
-%else
 ./configure \
 	$CROSS_OPTS \
 	$SOUND $GUI \
@@ -156,17 +93,18 @@ make $(MAKEFLAGS) dumpconfig all
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
-	--with-npapi-plugindir=%{_libdir}/mozilla/plugins
+	--with-npapi-plugindir=%{_libdir}/mozilla/plugins \
+	$KDE3_OPTS \
+	$KDE$_OPTS
 
 make $(MAKEFLAGS) dumpconfig all
-%endif
 # When testing the spec file, try setting MAKEFLAGS to
 # "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
 # do that for release buulds, as the performance will suffer.
 
 %install
-strip gui/.libs/*-gnash
-strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper  utilities/.libs/rtmpget cygnal/.libs/cygnal
+strip gui/.libs/kde*-gnash
+strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
 make install install-plugins DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
@@ -202,15 +140,13 @@ scrollkeeper-update -q || :
 %dump
 %doc README AUTHORS COPYING NEWS 
 %{_bindir}/gnash
-%{_bindir}/gtk-gnash
+%{_bindir}/kde*-gnash
 %{_bindir}/gprocessor
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
 %{_bindir}/dumpshm
-%{_bindir}/rtmpget
 %{_bindir}/cygnal
 %{_libdir}/gnash/*.so*
-%{_libdir}/mozilla/plugins/*.so
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
 %{_datadir}/man/man1/*.1*
@@ -237,9 +173,30 @@ scrollkeeper-update -q || :
 %defattr(-,root,root,-)
 %{_bindir}/cygnal
 
+%files klash3
+%defattr(-,root,root,-)
+%if !%{cross_compile}
+%{_bindir}/kde3-gnash
+%{_libdir}/kde3/libklashpart.*
+%{_prefix}/share/apps/klash/klashpartui.rc
+%{_prefix}/share/apps/klash/pluginsinfo
+%{_prefix}/share/services/klash_part.desktop
+%endif
+
+%files klash4
+%defattr(-,root,root,-)
+%if !%{cross_compile}
+%{_bindir}/kde4-gnash
+%{_bindir}/gnash
+%{_libdir}/kde4/libklashpart.*
+%{_prefix}/share/apps/klash/klashpartui.rc
+%{_prefix}/share/apps/klash/pluginsinfo
+%{_prefix}/share/services/klash_part.desktop
+%endif
+
 %changelog
 * Sat Feb 13 2009 Rob Savoye <rob@welcomehome.org> - trunk
-- Split off klash into it's own spec file.
+- Split off from gnash.spec
 
 * Sat Oct 24 2008 Rob Savoye <rob@welcomehome.org> - trunk
 - Adjust dependencies for current bzr trunk

@@ -19,9 +19,9 @@ NOW = `date "+%Y%m%d"`
 
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
-SNAPSHOT_DIR = gnash-${NOW}
-SNAPSHOT_BUILD = gnash-${NOW}/_build
-SNAPSHOT_TMP = /tmp/gnash-$(NOW)
+SNAPSHOT_DIR = gnash-trunk_${NOW}
+SNAPSHOT_BUILD = gnash-trunk_${NOW}/_build
+SNAPSHOT_TMP = /tmp/gnash-trunk_$(NOW)
 
 #
 # build a binary snapshot from of Gnash for systems we don't have
@@ -36,7 +36,7 @@ SNAPSHOT_TMP = /tmp/gnash-$(NOW)
 snapshot: distdir
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-trunk_$${now}"; \
-	snapshot_dir="gnash-$${now}"; \
+	snapshot_dir="gnash-trunk_$${now}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
 	if test -d $${snapshot_dir}; then \
 	  rm -fr $${snapshot_dir}; \
@@ -54,7 +54,7 @@ snapshot: distdir
 
 snapshot-configure: snapshot
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}trunk"; \
+	pkgname="gnash-trunk_$${now}"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
 	if test ! -d $${snapshot_build}; then \
@@ -80,7 +80,7 @@ snapshot-configure: snapshot
 
 snapshot-build: snapshot-configure
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}trunk"; \
+	pkgname="gnash-trunk_$${now}"; \
 	snapshot_dir="$${pkgname}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
 	$(LN_S) -f $${snapshot_build}/packaging/doc $${snapshot_build}/packaging/; \
@@ -91,16 +91,16 @@ snapshot-build: snapshot-configure
 # DocBook and DocBook2X aren't installed on this machine.
 snapshot-install: #snapshot-build
 	now=`date "+%Y%m%d"`; \
-	snapshot_dir="gnash-$${now}trunk"; \
+	snapshot_dir="gnash-trunk_$${now}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
-	snapshot_dest="/tmp/gnash-$${now}trunk-tmp"; \
+	snapshot_dest="/tmp/gnash_trunk_$${now}-tmp"; \
 	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} install install-plugins DESTDIR=$${snapshot_dest}
 
 # We only want to bundle an installed gnash, so all the linker paths are
 # correct
 snapshot-bundle: #snapshot-install
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-$${now}trunk"; \
+	pkgname="gnash-trunk_$${now}"; \
 	snapshot_dest="/tmp/$${pkgname}-tmp"; \
 	snapshot_tmp="/tmp/$${pkgname}"; \
 	snapshot_tar="$${snapshot_tmp}-$(host_cpu)-$(host_os).tar.gz"; \

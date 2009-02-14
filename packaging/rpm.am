@@ -29,15 +29,22 @@ spec: $(srcdir)/packaging/redhat/gnash.spec
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-trunk_$${now}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
-	sed -e "s/Version.*/Version:	$${now}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
+	sed -e "s/Version.*/Version:	trunk_$${now}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
 
 # Build an Redhat/Fedora .rpm package
+# We do this by using the source snapshot that we know is 'distclean'.
+# After copying the source tarball to where rpmbuild expects it,
+# we can then build the binary package.
+# older versions of Fedora used /usr/src/redhat/{SOURCES, BUILD} for
+# everything, but the newer version appears to use one's hone directory
+# instead, so now you don't have to be root to build rpm packages.
 rpm redhat: snapshot spec
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-trunk_$${now}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
-	cp $${snapshot_tar} /usr/src/redhat/SOURCES/gnash_$${now}.tar.gz
+	cp $${snapshot_tar} $${HOME}/rpmbuild/SOURCES/
 	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
+
 
 .PHONY : rpm redhat
 
