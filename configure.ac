@@ -3052,6 +3052,7 @@ if test x$cross_compiling = xno; then
     echo "                 to have real fun." >&4
     echo "                 Install it from http://www.csounds.com/" >&4
     echo "                 or .deb users: apt-get install csound" >&4
+    echo "                 or .rpm users: yum install csound" >&4
   fi
 
 fi
@@ -3069,7 +3070,7 @@ else
   echo "                 and to display some kinds of JPEG files." >&4
   echo "                 Install it from http://www.zlib.net" >&4
   echo "                 or .deb users: apt-get install zlib1g-dev" >&4
-  echo "                 or .rpm users: yum install zlib-dev." >&4
+  echo "                 or .rpm users: yum install zlib-devel." >&4
   echo "                 It may still be possible to configure without zlib." >&4
 fi
 
@@ -3085,7 +3086,7 @@ else
   echo "                 to use device fonts." >&4
   echo "                 Install it from http://www.freetype.org" >&4
   echo "                 or .deb users: apt-get install libfreetype6-dev" >&4
-  echo "                 or .rpm users: yum install libfreetype6-dev (??)" >&4
+  echo "                 or .rpm users: yum install freetype-devel" >&4
   echo "                 It may still be possible to configure without freetype." >&4
 fi
 
@@ -3101,7 +3102,7 @@ else
   echo "                 to use device fonts." >&4
   echo "                 Install it from http://www.fontconfig.org" >&4
   echo "                 or .deb users: apt-get install libfontconfig1-dev" >&4
-  echo "                 or .rpm users: yum install ??" >&4
+  echo "                 or .rpm users: yum install fontconfig-devel" >&4
   echo "                 It may still be possible to configure without fontconfig." >&4
 fi
 
@@ -3115,6 +3116,7 @@ if test x$ext_mysql = xyes; then
       echo "               Either reconfigure without --enable-extensions=mysql" >&3
       echo "               or install MySQL header files from http://www.mysql.org" >&3
       echo "               or .deb users: apt-get install libmysqlclient-dev" >&3
+      echo "                 or .rpm users: yum install mysql-devel" >&4
     fi
   fi
 fi
@@ -3124,7 +3126,7 @@ if test "$GMSGFMT" = ":"; then
   echo "                 Required for building a package or 'make distcheck'" >&4
   echo "                 Install it from http://www.gnu.org/software/gettext/" >&4
   echo "                 or .deb users: apt-get install gettext" >&4
-  #echo "                or .rpm users: yum install gettext" >&4
+  echo "                 or .rpm users: yum install gettext" >&4
 fi
 
 if test x"${DEJAGNU}" != x""; then
@@ -3134,7 +3136,7 @@ else
   echo "                 report after running ''make check''" >&4
   echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
   echo "                 or .deb users: apt-get install dejagnu" >&4
-  #echo "                or .rpm users: yum install dejagnu" >&4
+  echo "                 or .rpm users: yum install dejagnu" >&4
 fi
 
 
@@ -3158,6 +3160,7 @@ if test x"$xpcom" = x"yes"; then
     echo "        ERROR: No XPCOM development package is installed." >&3
     echo "                Install it from http://www.mozilla.org/projects/xpcom/" >&3
     echo "                or .deb users: apt-get install xulrunner-1.9-dev" >&3
+   echo "                 or .rpm users: yum install xulrunner-devel" >&4
   fi
 fi
 if test x"$nspr4" = x"yes"; then
