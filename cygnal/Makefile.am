@@ -67,6 +67,7 @@ INCLUDES = -I.. \
 	$(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
+	cygnal.h \
 	crc.h
 
 bin_PROGRAMS = cygnal
