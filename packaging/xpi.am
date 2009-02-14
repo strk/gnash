@@ -24,6 +24,20 @@
 # for an xpi package, we have to configure with --enable-xpcom, which the plugin
 # uses to find the directory where Gnash lives.
 
+CONFIG_OPTS = \
+	-disable-dependency-tracking \
+	--disable-rpath \
+	--disable-cygnal \
+	--disable-testsuite \
+	--enable-xpcom \
+	--enable-media=ffmpeg \
+	--enable-jemalloc \
+	--enable-gui=gtk \
+	--prefix=/usr \
+	--mandir=/usr/share/man \
+	--infodir=/usr/share/info \
+	--with-npapi-plugindir=/usr/lib/mozilla/plugins
+
 # Do the entire process to build an xpi package
 xpi: snapshot xpi-configure snapshot-build snapshot-install
 
@@ -31,31 +45,32 @@ xpi: snapshot xpi-configure snapshot-build snapshot-install
 # have been run already. If you wish the automatic dependency checking, use
 # the 'xpi' target instead, as this is meant only to be called directly when
 # debugging package building.
+# This gets a little messy as we build the executable statically linked so we
+# don't have to do something uglier to find dynamically linked libraries, plus
+# this way the xpi installed libs won't conflict with andy package installed libs.
+# Anyway, so after installing the statically linked gnash into the bundle, we then
+# have to reconfigure to enable shared libraries to be built, and then rebuild
+# the plugins and the xpcom support as dynamically loadable modules.
 xpi-bundle:
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-${RELEASE}$${now}"; \
 	snapshot_dir="gnash-${RELEASE}$${now}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
-	snapshot_dest="/tmp/gnash_${RELEASE}$${now}"; \
-	snapshot_tmp="/tmp/gnash_${RELEASE}$${now}-xpi"; \
-	if ! test -d $${snapshot_dest}/ ; then \
-	  mkdir $${snapshot_dest}; \
-        else \
-          rm -rf $${snapshot_dest}/*; \
-	fi; \
+	snapshot_dest="/tmp/gnash_${RELEASE}$${now}-tmp"; \
+	snapshot_xpi="/tmp/gnash_${RELEASE}$${now}-pkg"; \
+	mkdir -p $${snapshot_xpi}/plugins; \
 	for i in install.rdf; do \
-	  cp -fr $(srcdir)/packaging/xpi/$$i $${snapshot_tmp}; \
+	  cp -fr $(srcdir)/packaging/xpi/$$i $${snapshot_xpi}; \
 	done; \
-	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} install-pkglib DESTDIR=$${snapshot_tmp}; \
-	mkdir -p $${snapshot_dest}/plugins; \
-	cp -fr $${snapshot_dest}/$(bindir)/*gnash $${snapshot_tmp}/plugins; \
-	strip $${snapshot_dest}/plugins/gtk-gnash; \
-	cp -fr $${snapshot_dest}$(localedir) $${snapshot_tmp}/; \
-	cp -fr $${snapshot_dest}/tmp/plugin/libgnashplugin.so $${snapshot_tmp}/plugins; \
-	cp -fr $${snapshot_dest}/tmp/plugin/libgnashcomponent.so $${snapshot_tmp}/plugins; \
-	(cd $${snapshot_tmp}; $(ZIP) -r /tmp/$${snapshot_dir}.xpi *)
-#	cp -fr $${snapshot_dest}/tmp/plugin/extensions/*.xpt $${snapshot_tmp}/plugins;
-#	cp -fr $${snapshot_dest}/tmp/plugin/extensions/*.so $${snapshot_tmp}/plugins;
+	strip  $${snapshot_dest}/$(bindir)/gtk-gnash; \
+	cd $${snapshot_build}; ../configure --enable-shared $(CONFIG_OPTS); \
+	$(MAKE) $(AM_MAKEFLAGS) -C plugin clean install-plugin DESTDIR=$${snapshot_dest}; \
+	$(MAKE) $(AM_MAKEFLAGS) -C plugin/xpcom all install-pkglib DESTDIR=$${snapshot_dest}; \
+	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/libgnashplugin.so $${snapshot_xpi}/plugins; \
+	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.xpt $${snapshot_xpi}/plugins; \
+	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.so $${snapshot_xpi}/plugins; \
+	cp -fr $${snapshot_dest}/usr/bin/gtk-gnash $${snapshot_xpi}; \
+	(cd $${snapshot_xpi}; $(ZIP) -r /tmp/$${snapshot_dir}.xpi *);
 
 # configure the xpi build. snapshot needs to have been run already. If you wish the
 # automatic dependency checking, use the 'xpi' target instead, as this is meant only
@@ -69,17 +84,9 @@ xpi-configure:
 	  $(MKINSTALLDIRS) $${snapshot_build}; \
 	fi; \
 	cd $${snapshot_build}; ../configure \
-	  --disable-dependency-tracking \
-	  --disable-rpath \
-	  --disable-testsuite \
-	  --enable-xpcom \
-	  --enable-media=ffmpeg \
-	  --enable-jemalloc \
-	  --enable-gui=gtk \
-	  --prefix=/usr \
-	  --mandir=/usr/share/man \
-	  --infodir=/usr/share/info \
-	  --with-npapi-plugindir=/usr/lib/mozilla/plugins
+	  --enable-static \
+	  --disable-shared \
+	  $(CONFIG_OPTS)
 
 # remove files left from package building
 xpi-clean:

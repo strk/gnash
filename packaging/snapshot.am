@@ -95,8 +95,8 @@ snapshot-install: #snapshot-build
 	now=`date "+%Y%m%d"`; \
 	snapshot_dir="gnash-${RELEASE}$${now}"; \
 	snapshot_build="$${snapshot_dir}/_build"; \
-	snapshot_tmp="/tmp/gnash_${RELEASE}$${now}-tmp"; \
-	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} install install-plugins DESTDIR=$${snapshot_tmp}
+	snapshot_dest="/tmp/gnash_${RELEASE}$${now}-tmp"; \
+	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} install DESTDIR=$${snapshot_dest}
 
 # We only want to bundle an installed gnash, so all the linker paths are
 # correct
@@ -107,7 +107,7 @@ snapshot-bundle: snapshot snapshot-build snapshot-install
 	snapshot_tmp="/tmp/$${pkgname}-tmp"; \
 	snapshot_tar="$${snapshot_tmp}-$(host_cpu)-$(host_os).tar.gz"; \
 	if test ! -d $${snapshot_tmp}; then \
-	  $(MKINSTALLDIRS) $${snapshot_tmp}; \
+	  $(mkinstalldirs) $${snapshot_tmp}; \
 	fi; \
 	rm -f $${snapshot_dest}/usr/lib/*.la; \
 	cp @srcdir@/COPYING $${snapshot_tmp}; \
@@ -129,5 +129,5 @@ snapshot-bundle: snapshot snapshot-build snapshot-install
 snapshot-clean:
 	-@rm -fr snapshot-* $(SNAPSHOT_BUILD) $(SNAPSHOT_TMP) gnash*$(VERSION)*.ipk
 
-# .PHONY : snapshot
+.PHONY : snapshot snapshot-build snapshot-install snapshot-clean
 
