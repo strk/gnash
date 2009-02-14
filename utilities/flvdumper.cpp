@@ -223,7 +223,7 @@ main(int argc, char *argv[])
 		 }
 		 ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_tag_t));
 		 tag  = flv.decodeTagHeader(buf);
-		 
+		 flv.dump();
 		 total -= sizeof(Flv::previous_size_t);
 		 size_t bodysize = flv.convert24(tag->bodysize);
 		 if (bodysize == 0) {

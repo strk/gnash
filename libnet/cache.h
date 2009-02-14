@@ -36,6 +36,9 @@
 ///	This is the main namespace for Gnash and it's libraries.
 namespace gnash {
 
+// max size of files to map enirely into the cache
+static const size_t CACHE_LIMIT = 102400000;
+
 // forward instatiate
 //class DiskStream;
 

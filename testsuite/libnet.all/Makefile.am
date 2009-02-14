@@ -49,11 +49,11 @@ noinst_PROGRAMS = generate_amfbins
 
 check_PROGRAMS = \
 	test_cque \
-	test_handler \
 	test_http \
 	test_diskstream \
 	test_cache \
 	test_rtmp 
+#	test_handler
 
 generate_amfbins_SOURCES = generate_amfbins.cpp
 generate_amfbins_LDADD = $(AM_LDFLAGS) 

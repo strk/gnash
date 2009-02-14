@@ -139,5 +139,36 @@ http_handler - gets invoked when there is data ready to be
 
 rtmp_handler - ditto.
 
+../../../rtmp-logs/red5-rtmpstream-test.log
+connect #3
+ping    #2
+_result #3
+createStream #3	-> streamid #2
+_result #3	-> streamid #2, #1
+_play   #8
+ping    #2
+onStatus #4	<- reset
+onStatus #4	<- play
+deleteStream #3
+
+.Reset 12 bytes
+.Play  8 bytes
+
+
+../../../rtmp-logs/ngrep-flowplayer-seek.log
+connect #3
+ping    #2
+_result #3
+createStream #3	-> streamid #3
+_result #3	-> streamid #d
+_play   #8
+ping    #2
+onStatus #4	<- reset -> streamid #1
+onStatus #5	<- play -> streamid #1
+onStatus #5	<- data start
+onMetaData #5	<- flv file
+
+.Reset 12 bytes
+.Play  8 bytes
 
 

@@ -79,9 +79,6 @@ extern map<int, Handler *> handlers;
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
 
-// max size of files to map enirely into the cache
-static const size_t CACHE_LIMIT = 102400000;
-
 static Cache& cache = Cache::getDefaultInstance();
 
 HTTP::HTTP() 

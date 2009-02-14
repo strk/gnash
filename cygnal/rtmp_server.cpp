@@ -825,7 +825,7 @@ RTMPServer::sendFile(int fd, const std::string &filespec)
 //	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
 	
 	// Oopen the file and read the first chunk into memory
-	if (filestream->open(filespec)) {
+	if (!filestream->open(filespec)) {
 	    return false;
 	} else {
 	    // Get the file size for the HTTP header
@@ -853,18 +853,31 @@ RTMPServer::sendFile(int fd, const std::string &filespec)
 	    getbytes = filestream->getPagesize();
 	}
 	if (filesize >= CACHE_LIMIT) {
+	    if (sendMsg(fd, getChannel(), RTMP::HEADER_12, filesize,
+			RTMP::NOTIFY, RTMPMsg::FROM_SERVER, filestream->get(),
+			filesize)) {
+	    }
 	    do {
 		filestream->loadToMem(page);
-		ret = writeNet(fd, filestream->get(), getbytes);
-		if (ret <= 0) {
-		    break;
+//		ret = writeNet(fd, filestream->get(), getbytes);
+// 		if (ret <= 0) {
+// 		    break;
+// 		}
+		if (sendMsg(fd, getChannel(), RTMP::HEADER_4, filesize,
+			    RTMP::NOTIFY, RTMPMsg::FROM_SERVER, filestream->get(),
+			    getbytes)) {
 		}
 		bytes_read += ret;
 		page += filestream->getPagesize();
 	    } while (bytes_read <= filesize);
 	} else {
 	    filestream->loadToMem(filesize, 0);
-	    ret = writeNet(fd, filestream->get(), filesize);
+//	    ret = writeNet(fd, filestream->get(), filesize);
+	    if (sendMsg(fd, getChannel(), RTMP::HEADER_12, filesize,
+			RTMP::NOTIFY, RTMPMsg::FROM_SERVER, filestream->get()+24,
+			filesize-24)) {
+	    }
+					
 	}
 	filestream->close();
 #ifdef USE_STATS_CACHE
@@ -894,7 +907,7 @@ rtmp_handler(Network::thread_params_t *args)
     RTMPMsg *body = 0;
     static bool initialize = true;
     static bool echo = false;
-    
+    bool sendfile = false;
     log_debug(_("Starting RTMP Handler for fd #%d, tid %ld"),
 	      args->netfd, get_thread_id());
     
@@ -910,6 +923,8 @@ rtmp_handler(Network::thread_params_t *args)
     boost::shared_ptr<amf::Element> tcurl;
     boost::shared_ptr<amf::Element> swfurl;
     boost::shared_ptr<amf::Buffer> response;
+
+    string basepath = docroot;
 
     RTMP::rtmp_headersize_e response_head_size = RTMP::HEADER_12;
     
@@ -1044,6 +1059,16 @@ rtmp_handler(Network::thread_params_t *args)
 					tcurl  = body->findProperty("tcUrl");
 					if (tcurl) {
 					    log_debug("Client request for remote file is: %s", tcurl->to_string());
+					    string path = tcurl->to_string();
+					    string::size_type start = path.find("://", 0) + 4;
+					    if (start != string::npos) {
+						string::size_type end = path.find("/", start);
+						if (end != string::npos) {
+						    basepath += path.substr(end, path.size());
+						}
+					    }
+					    log_debug("Base path to files from connect is: %s", basepath);
+										
 					}
 					swfurl = body->findProperty("swfUrl");
 					if (swfurl) {
@@ -1095,16 +1120,15 @@ rtmp_handler(Network::thread_params_t *args)
 					response_head_size = RTMP::HEADER_8;
 					double clientid = rtmp->createClientID();
 //  					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_RESET, filespec);
-// //					body->setChannel(4);
+					body->setChannel(4);
 //  					rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
 //  							  RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response);
 //  					response.reset();
-//					body->setChannel(4);
+// 					rtmp->setChannel(4);
+//  					rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
 					response = rtmp->encodeResult(RTMPMsg::NS_PLAY_START, filespec, clientid);
-  					rtmp->sendMsg(args->netfd, body->getChannel(), response_head_size, response->allocated(),
-						      RTMP::INVOKE, RTMPMsg::FROM_SERVER, *response);
-					rtmp->sendFile(args->netfd, filespec);
 //					body->dump();
+					sendfile = true;
 				    }
 				    if (body->getMethodName() == "recData") {
 				    }
@@ -1116,6 +1140,12 @@ rtmp_handler(Network::thread_params_t *args)
 				    } else {
 					log_error("Couldn't send response to client!");
 				    }
+				    if (sendfile) {
+					string fullspec = basepath;
+					fullspec += filespec;
+					rtmp->sendFile(args->netfd, fullspec);
+					sendfile = false;
+				    } 
 				}
 			    }
 			}
@@ -1179,7 +1209,8 @@ rtmp_handler(Network::thread_params_t *args)
 				if (body) {
 				    if (body->getMethodName() == "connect") {
 					response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-				    } else if (body->getMethodName() == "createStream") {
+				    } else if (body->getMethodName() == "createS
+tream") {
 					response = rtmp->encodeResult(RTMPMsg::NS_DATA_START);
 				    } else {
 					response = rtmp->encodeResult(RTMPMsg::NS_FAILED);

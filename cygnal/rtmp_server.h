@@ -76,6 +76,7 @@ public:
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
     gnash::DiskStream::filetype_e  _filetype;
+    std::string		_docroot;
     std::string		_filespec;
     boost::uint32_t     _filesize;
     std::map<boost::uint16_t, amf::Element> _references;

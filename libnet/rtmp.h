@@ -281,6 +281,9 @@ public:
     bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
 	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data);
+    bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+	      size_t total_size, content_types_e type,
+		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
     
 #if 0
     // Send a Msg, and expect a response back of some kind.

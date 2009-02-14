@@ -831,6 +831,15 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
+    return sendMsg(fd, channel, head_size, total_size, type, routing, data.reference(), data.allocated());
+}
+
+bool
+RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+	      size_t total_size, content_types_e type,
+	      RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size)
+{
+//  GNASH_REPORT_FUNCTION;
     int ret = 0;
     
     // We got some bogus parameters
@@ -859,11 +868,11 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
     }    
 
     // now send the data
-    while (nbytes <= data.allocated()) {
+    while (nbytes <= size) {
 	// The last bit of data is usually less than the packet size,
 	// so we write less data of course.
-	if ((data.allocated() - nbytes) < static_cast<signed int>(_chunksize[channel])) {
-	    partial = data.allocated() - nbytes;
+	if ((size - nbytes) < static_cast<signed int>(_chunksize[channel])) {
+	    partial = size - nbytes;
 	}
 	// After the first packet, only send the single byte
 	// continuation packet.
@@ -871,7 +880,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	    int ret = writeNet(fd, *cont_head);
 	}
 	// write the data to the client
-	ret = writeNet(fd, data.reference() + nbytes, partial);
+	ret = writeNet(fd, data + nbytes, partial);
 	if (ret == -1) {
 	    log_error("Couldn't write the RTMP body!");
 	    return false;
@@ -1099,14 +1108,14 @@ RTMP::recvMsg(int fd)
 boost::shared_ptr<RTMP::queues_t>
 RTMP::split(amf::Buffer &buf)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     return split(buf.reference(), buf.allocated());
 }
 
 boost::shared_ptr<RTMP::queues_t>
 RTMP::split(boost::uint8_t *data, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     if (data == 0) {
 	log_error("Buffer pointer is invalid.");
@@ -1225,7 +1234,6 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		}
 		// This is a queue of channels with active messages. This is a
 		// much smaller list to traverse when processing data than all 64 channels.
-		channels->push_back(&_queues[rthead->channel]);
 		if (pktsize < 0xffffff) {
 //		    cerr << "FIXME5: " << hexify(ptr, pktsize, true) << endl;
 		    // If the packet size is in range, then append the
@@ -1238,6 +1246,13 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		} else {
 		    log_error("Packet size out of range! %d, %d", rthead->bodysize, pktsize);
 		}
+		// add this packet to the list of active channels if we've gotten
+		// all the data.
+// 		if (chunk->allocated() - 5 >= rthead->bodysize) {
+// 		    cerr << "Bodysize: " << rthead->bodysize 
+// 			 << " Allocated Chunksize: " << chunk->allocated() << endl;
+		channels->push_back(&_queues[rthead->channel]);
+//		}
 	    } else {
 		log_error("RTMP packet size is out of range! %d, %d", rthead->bodysize, pktsize);
 		break;
