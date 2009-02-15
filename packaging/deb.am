@@ -16,26 +16,32 @@
 # 
 
 # Build a Debian/Ubuntu .deb GNU/Linux package
-deb debian: dist-bzip2 $(srcdir)/packaging/debian/rules
-	rm -rf gnash-${VERSION}
-	tar jxf gnash-${VERSION}.tar.bz2
-	cp -fr $(srcdir)/packaging/debian gnash-${VERSION}/
-	(cd gnash-${VERSION}; dpkg-buildpackage)
+deb debian: dist $(srcdir)/packaging/debian/rules
+	now=`date "+%Y%m%d"`; \
+	snapshot_dir="gnash-$(RELEASE)$${now}"; \
+	rm -rf gnash-${VERSION}; \
+	tar jxf gnash-${VERSION}.tar.gz; \
+	cp -fr $(srcdir)/packaging/debian gnash-$(RELEASE}${VERSION}/; \
+	(cd gnash-$(RELEASE)${VERSION}; dpkg-buildpackage)
 
 # Build a .deb snapshot, which means we have to munge the date
 # into the proper files to build a package with the version in
 # all the right places. This involves editing the debian/changelog
 # file. Configure.ac is edited by the snapshot target.
-snapshot-deb: # snapshot
-	now=`date "+%Y%m%d"`; \
-	snapshot_dir="gnash-$${now}trunk"; \
-	if test ! -d $${snapshot_dir}/debian; then \
-	  cp -rp $(srcdir)/packaging/debian $${snapshot_dir}/; \
+snapshot-deb: # distdir snapshot
+	-now=`date "+%Y%m%d"`; \
+	pkgname="gnash-${RELEASE}$${now}"; \
+	snapshot_dir="gnash-${RELEASE}$${now}"; \
+	snapshot_tar="$${pkgname}.tar.gz"; \
+	if test -d "gnash-trunk"; then \
+	  mv -f gnash-trunk $${snapshot_dir}; \
 	fi; \
+	mkdir -p $${snapshot_dir}/debian; \
+	cp -rfp $(srcdir)/packaging/debian/* $${snapshot_dir}/debian/; \
 	if test -e $${snapshot_dir}/debian/changelog; then \
 	  mv -f $${snapshot_dir}/debian/changelog $${snapshot_dir}/debian/changelog.orig; \
-	  sed -e "s:(.*):($${now}trunk):" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
+	  sed -e "s:trunk:trunk$${now}:" $${snapshot_dir}/debian/changelog.orig > $${snapshot_dir}/debian/changelog; \
 	fi; \
-	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot)
+	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot -j6)
 
 .PHONY : deb debian 

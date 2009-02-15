@@ -1,3 +1,4 @@
-usr/bin/kde-gnash
+usr/bin/kde4-gnash
+usr/bin/gnash
 usr/share/pixmaps/klash.xpm
 usr/share/applications/klash.desktop

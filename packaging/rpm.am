@@ -29,8 +29,8 @@ spec: $(srcdir)/packaging/redhat/gnash.spec $(srcdir)/packaging/redhat/klash.spe
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-trunk_$${now}"; \
 	snapshot_tar="$${pkgname}.tar.gz"; \
-	sed -e "s/Version.*/Version:	trunk_$${now}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec; \
-	sed -e "s/Version.*/Version:	trunk_$${now}/" $(srcdir)/packaging/redhat/klash.spec > klash.spec;
+	sed -e "s/Version.*/Version:	$(RELEASE)$${now}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec; \
+	sed -e "s/Version.*/Version:	$(RELEASE)$${now}/" $(srcdir)/packaging/redhat/klash.spec > klash.spec;
 
 # Build an Redhat/Fedora .rpm package
 # We do this by using the source snapshot that we know is 'distclean'.
