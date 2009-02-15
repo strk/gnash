@@ -28,7 +28,7 @@ deb debian: dist $(srcdir)/packaging/debian/rules
 # into the proper files to build a package with the version in
 # all the right places. This involves editing the debian/changelog
 # file. Configure.ac is edited by the snapshot target.
-snapshot-deb: # distdir snapshot
+snapshot-deb: distdir snapshot
 	-now=`date "+%Y%m%d"`; \
 	pkgname="gnash-${RELEASE}$${now}"; \
 	snapshot_dir="gnash-${RELEASE}$${now}"; \
@@ -44,4 +44,4 @@ snapshot-deb: # distdir snapshot
 	fi; \
 	(cd $${snapshot_dir}; dpkg-buildpackage -rfakeroot -j6)
 
-.PHONY : deb debian 
+.PHONY : deb debian snapshot-deb
