@@ -50,6 +50,8 @@ endif
 	./autogen.sh
 	@printf "\n -------------------------------------------- End of AUTOGEN ---- \n\n"
 
+	# for now, only build the kde4 support,as kde3 is being depreciated.
+
 	@printf "\n == CONFIGURE =================================================== \n\n"
 	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
@@ -62,12 +64,7 @@ endif
 		--enable-media=ffmpeg \
 		--enable-gui=gtk,kde4 \
 		--enable-renderer=agg \
-		--with-npapi-plugindir=/usr/lib/mozilla/plugins
-# 		--with-kde4-plugindir=/usr/lib/kde4/plugins \
-# 		--with-kde4-pluginprefix=/usr \
-# 		--with-kde4-servicesdir=/usr/share/kde4/services \
-# 		--with-kde4-appsdatadir=/usr/share/kde4/apps/klash \
-# 		--with-kde4-configdir=/usr/share/kde4/config
+		--with-plugins-install=system
 
 	@printf "\n ------------------------------------------- End of CONFIGURE ---- \n\n"
 
@@ -195,7 +192,7 @@ binary-arch: build install
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb
-	dh_shlibdeps
+#	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
