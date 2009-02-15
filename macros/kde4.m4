@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_KDE4],
              [Directory to install KDE 4.x plugin in]),
              with_kde4_plugindir=${withval})
   if test x"${with_kde4_plugindir}" != x ; then 
-    if test ! -d ${with_kde4_plugindir}/designer; then
+    if test ! -d ${with_kde4_plugindir}/imageformats; then
       AC_MSG_ERROR([${with_kde4_plugindir} directory doesn't contain any KDE 4.x plugins!])
     fi
   fi
@@ -204,9 +204,9 @@ AC_DEFUN([GNASH_PATH_KDE4],
     fi
 
     KDE4_PLUGINDIR="${KDE4_PREFIX}/lib/kde4"
-    KDE4_SERVICESDIR="${KDE4_PREFIX}/share/services"
-    KDE4_CONFIGDIR="${KDE4_PREFIX}/share/config"
-    KDE4_APPSDATADIR="${KDE4_PREFIX}/share/apps/klash"
+    KDE4_SERVICESDIR="${KDE4_PREFIX}/share/kde4/services"
+    KDE4_CONFIGDIR="${KDE4_PREFIX}/share/kde4/config"
+    KDE4_APPSDATADIR="${KDE4_PREFIX}/share/kde4/apps/klash"
   fi                            dnl end of build_kparts4
 
   if test x"${ac_cv_path_kde4_incl}" != x ; then
