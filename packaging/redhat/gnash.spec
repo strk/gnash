@@ -156,7 +156,8 @@ make $(MAKEFLAGS) dumpconfig all
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
-	--with-npapi-plugindir=%{_libdir}/mozilla/plugins
+        --with-npapi-install=system 
+#	--with-npapi-plugindir=%{_libdir}/mozilla/plugins
 
 make $(MAKEFLAGS) dumpconfig all
 %endif

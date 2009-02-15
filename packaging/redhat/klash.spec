@@ -68,16 +68,16 @@ CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
 GUI="" # --enable-gui=gtk,kde3,kde4
 SOUND="--enable-media=ffmpeg --enable-jemalloc"
 RENDERER="" # --enable-render=ogl
-KDE3_OPTS="--with-kde3-plugindir=%{_libdir}/kde3/plugins \
-        --with-kde3-pluginprefix=%{_prefix} \
-        --with-kde3-servicesdir=%{_prefix}/share/services \
-        --with-kde3-appsdatadir=%{_prefix}/share/apps/klash \
-        --with-kde3-configdir=${_datadir}/config"
-KDE4_OPTS="--with-kde4-plugindir=%{_libdir}/kde4/plugins \
-        --with-kde4-pluginprefix=%{_prefix} \
-        --with-kde4-servicesdir=%{_prefix}/share/services \
-        --with-kde4-appsdatadir=%{_prefix}/share/apps/klash \
-        --with-kde4-configdir=${_datadir}/config"
+# KDE3_OPTS="--with-kde3-plugindir=%{_libdir}/kde3/plugins \
+#         --with-kde3-pluginprefix=%{_prefix} \
+#         --with-kde3-servicesdir=%{_prefix}/share/services \
+#         --with-kde3-appsdatadir=%{_prefix}/share/apps/klash \
+#         --with-kde3-configdir=${_datadir}/config"
+# KDE4_OPTS="--with-kde4-plugindir=%{_libdir}/kde4/plugins \
+#         --with-kde4-pluginprefix=%{_prefix} \
+#         --with-kde4-servicesdir=%{_prefix}/share/services \
+#         --with-kde4-appsdatadir=%{_prefix}/share/apps/klash \
+#         --with-kde4-configdir=${_datadir}/config"
 
 # we disable the testuites by default, as when building packages we
 # should have already been running the testsuites as part of the 
@@ -93,9 +93,7 @@ KDE4_OPTS="--with-kde4-plugindir=%{_libdir}/kde4/plugins \
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
-	--with-npapi-plugindir=%{_libdir}/mozilla/plugins \
-	$KDE3_OPTS \
-	$KDE$_OPTS
+        --with-plugins-install=system
 
 make $(MAKEFLAGS) dumpconfig all
 # When testing the spec file, try setting MAKEFLAGS to
