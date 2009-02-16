@@ -323,14 +323,38 @@ boost::shared_ptr<Buffer>
 AMF::encodeTypedObject(const amf::Element &data)
 {
     GNASH_REPORT_FUNCTION;
-    boost::uint32_t length;
-    length = data.propertySize();
-    //    log_debug("Encoded data size has %d properties", length);
+
+    size_t size = 0;
+    boost::uint32_t props;
+    props = data.propertySize();
     boost::shared_ptr<amf::Buffer> buf;
-    if (length) {
-	buf.reset(new amf::Buffer);
+    //    log_debug("Encoded data size has %d properties", props);
+    if (props) {
+	// Calculate the total size of the output buffer
+	// needed to hold the encoded properties
+	for (size_t i=0; i<data.propertySize(); i++) {
+	    size += data.getProperty(i)->getDataSize();
+	    size += data.getProperty(i)->getNameSize();
+	    size += AMF_PROP_HEADER_SIZE;
+	}
+	size += data.getNameSize();
+	buf.reset(new Buffer(size+24)); // FIXME: why are we several words off ?
     }
+
     *buf = Element::TYPED_OBJECT_AMF0;
+
+    size_t length = data.getNameSize();
+    boost::uint16_t enclength = length;
+    swapBytes(&enclength, 2);
+    *buf += enclength;
+
+    if (data.getName()) {
+	string name = data.getName();
+	if (name.size() > 0) {
+	    *buf += name;
+	}
+    }
+    
     if (data.propertySize() > 0) {
 	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
@@ -1082,16 +1106,15 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
 	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
 	  tmpptr += sizeof(boost::uint16_t);
 	  if (length > 0) {
-	      el->setName(reinterpret_cast<const char *>(tmpptr));
 	      std::string name(reinterpret_cast<const char *>(tmpptr), length);
-	      log_debug("Typed object name is: %s", el->getName());
+     //	      log_debug("Typed object name is: %s", el->getName());
 	      el->setName(name.c_str(), name.size());
 	  }
 	  // Don't read past the end
 	  if (tmpptr + length < tooFar) {
 	      tmpptr += length;
 	  }
-	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
+	  while (tmpptr < tooFar - length) { // FIXME: was tooFar - AMF_HEADER_SIZE)
 	      if (*(tmpptr +3) == TERMINATOR) {
 		  log_debug("Found object terminator byte");
 		  tmpptr++;
