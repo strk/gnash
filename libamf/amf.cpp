@@ -197,9 +197,9 @@ AMF::encodeObject(const amf::Element &data)
     }
     *buf = Element::OBJECT_AMF0;
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::reverse_iterator ait;
+	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
-	for (ait = props.rbegin(); ait != props.rend(); ait++) {
+	for (ait = props.begin(); ait != props.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
@@ -269,12 +269,14 @@ AMF::encodeDate(const boost::uint8_t *date)
 {
 //    GNASH_REPORT_FUNCTION;
 //    boost::shared_ptr<Buffer> buf;
-    boost::shared_ptr<Buffer> buf(new Buffer(AMF0_NUMBER_SIZE+1));
-    *buf = Element::DATE_AMF0;
-    double num = *(reinterpret_cast<const double*>(date));
-    swapBytes(&num, AMF0_NUMBER_SIZE);
-    *buf += num;
-    
+    boost::shared_ptr<Buffer> buf;
+    if (date != 0) {
+	buf.reset(new Buffer(AMF0_NUMBER_SIZE+1));
+	*buf = Element::DATE_AMF0;
+	double num = *(reinterpret_cast<const double*>(date));
+	swapBytes(&num, AMF0_NUMBER_SIZE);
+	*buf += num;
+    }
     return buf;
 }
 
@@ -330,9 +332,9 @@ AMF::encodeTypedObject(const amf::Element &data)
     }
     *buf = Element::TYPED_OBJECT_AMF0;
     if (data.propertySize() > 0) {
-	vector<boost::shared_ptr<amf::Element> >::reverse_iterator ait;
+	vector<boost::shared_ptr<amf::Element> >::const_iterator ait;
 	vector<boost::shared_ptr<amf::Element> > props = data.getProperties();
-	for (ait = props.rbegin(); ait != props.rend(); ait++) {
+	for (ait = props.begin(); ait != props.end(); ait++) {
 	    boost::shared_ptr<amf::Element> el = (*(ait));
 	    boost::shared_ptr<amf::Buffer> item = AMF::encodeElement(el);
 	    if (item) {
@@ -754,8 +756,7 @@ AMF::encodeElement(const amf::Element& el)
           // field. (which must be big-endian)
           break;
       case Element::TYPED_OBJECT_AMF0:
-//	  buf = encodeTypedObject(el);
-	  buf = encodeObject(el);
+	  buf = encodeTypedObject(el);
           break;
 // 	  // This is a Gnash specific value
 //       case Element::VARIABLE:
@@ -1077,6 +1078,19 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
       case Element::TYPED_OBJECT_AMF0:
       {
 	  el->makeTypedObject();
+	  
+	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+	  tmpptr += sizeof(boost::uint16_t);
+	  if (length > 0) {
+	      el->setName(reinterpret_cast<const char *>(tmpptr));
+	      std::string name(reinterpret_cast<const char *>(tmpptr), length);
+	      log_debug("Typed object name is: %s", el->getName());
+	      el->setName(name.c_str(), name.size());
+	  }
+	  // Don't read past the end
+	  if (tmpptr + length < tooFar) {
+	      tmpptr += length;
+	  }
 	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
 	      if (*(tmpptr +3) == TERMINATOR) {
 		  log_debug("Found object terminator byte");
