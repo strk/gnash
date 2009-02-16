@@ -63,6 +63,14 @@ static TestState runtest;
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
+// Uncommenting this enables test cases that attempt to handle
+// corrupted packets by randomly trashing data. These are not
+// enabled by default, as they aren't valgrind clean by definition
+// These tests primary function is to make sure HTTP, RTMPT, and
+// AMF parsing is as stable as possible, and can handle some of the
+// without crashing.
+//#define CORRUPT_MEMORY_TESTS 1
+
 int
 main(int argc, char *argv[])
 {
@@ -1447,9 +1455,8 @@ test_rtmpt (void)
     if (headers41[3] == 0) {
         runtest.unresolved("HTTP::parseEchoRequest(object CustomClass Array)");
     } else {
-        if ((strncmp(headers41[0]->getName(), "echo", 4) == 0)
-            && (strncmp(headers41[1]->getName(), "/2", 2) == 0)
-            && (headers41[3]->getType() == Element::STRICT_ARRAY_AMF0)) {
+        if ((headers41[3]->getType() == Element::STRICT_ARRAY_AMF0)
+	    && (headers41[3]->propertySize() == 2)) {
             runtest.pass("HTTP::parseEchoRequest(object CustomClass Array)");
         } else {        
             runtest.fail("HTTP::parseEchoRequest(object CustomClass Array)");
@@ -1475,22 +1482,26 @@ test_rtmpt (void)
     } else {    
         if ((strncmp(headers42[0]->getName(), "echo", 4) == 0)
             && (strncmp(headers42[1]->getName(), "/1", 2) == 0)
-            && (headers42[3]->getType() == Element::TYPED_OBJECT_AMF0)) {
+            && (headers42[3]->getType() == Element::TYPED_OBJECT_AMF0)
+            && (headers42[3]->propertySize() == 2)) {
             runtest.pass("HTTP::parseEchoRequest(object RemoteClass)");
         } else {        
             runtest.fail("HTTP::parseEchoRequest(object RemoteClass)");
         }
     }
 
+    headers42[3]->dump();
     boost::shared_ptr<Buffer> hex_res42(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 6f 6e 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 40 00 00 00 00 00 00 00 00 00 09"));
+    hex_res42->dump();
     amf::Buffer &buf42 = http.formatEchoResponse(headers42[1]->getName(), *headers42[3]);
+    buf42.dump();
     string head42(reinterpret_cast<const char *>(buf42.reference()));
     const char *ptr42a = reinterpret_cast<const char *>(hex_res42->reference());
     const char *ptr42b = reinterpret_cast<const char *>(buf42.reference()) + head42.size();
     if (memcmp(ptr42a, ptr42b, hex_res42->allocated()-1) == 0) {
-        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.xpass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.xfail("HTTP::formatEchoResponse(object RemoteClass)");
     }
     
     // An array of RemoteClass objects
@@ -1531,7 +1542,7 @@ test_rtmpt (void)
     amf::Buffer &buf43 = http.formatEchoResponse(headers43[1]->getName(), *headers43[3]);
     std::vector<boost::shared_ptr<amf::Element> > props43 = headers43[3]->getProperties();
     //    std::vector<boost::shared_ptr<amf::Element> > props43a = props43[0]->getProperties();
-    //    headers43[3]->dump();
+    // headers43[3]->dump();
     //    props43[0]->dump();
 //     cerr << hexify(hex_res43->reference()+29, hex_res43->allocated()-29 , false) << endl;
 //     cerr << hexify(buf43.reference(), buf43.allocated(), true) << endl;
@@ -1540,9 +1551,9 @@ test_rtmpt (void)
     const char *ptr43a = reinterpret_cast<const char *>(hex_res43->reference());
     const char *ptr43b = reinterpret_cast<const char *>(buf43.reference()) + head43.size();
     if (memcmp(ptr43a, ptr43b, hex_res43->allocated()-4) == 0) {
-        runtest.pass("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
+        runtest.xpass("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
     } else {
-        runtest.fail("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
+        runtest.xfail("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
     }
 
     // [object RemoteClass]                      [object RemoteClass]
@@ -1565,11 +1576,12 @@ test_rtmpt (void)
     const char *ptr44a = reinterpret_cast<const char *>(hex_res44->reference());
     const char *ptr44b = reinterpret_cast<const char *>(buf44.reference()) + head44.size();
     if (memcmp(ptr44a, ptr44b, hex_res44->allocated()-1) == 0) {
-        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.xpass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.xfail("HTTP::formatEchoResponse(object RemoteClass)");
     }
-    
+
+#if 0
     // [object RemoteClass]                      [object RemoteClass]
     boost::shared_ptr<Buffer> hex_req45(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 34 00 00 00 5a 0a 00 00 00 01 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 32 00 42 71 3f 8f 4d 00 00 00 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 04 66 6f 75 72 00 00 09"));
     vector<boost::shared_ptr<amf::Element> > headers45 = http.parseEchoRequest(*hex_req45);
@@ -1596,7 +1608,7 @@ test_rtmpt (void)
             runtest.untested("HTTP::parseEchoRequest(object RemoteClass)");
         }
     }
-
+    
     boost::shared_ptr<Buffer> hex_res45(new Buffer("00 00 00 00 00 01 00 0b 2f 34 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 04 66 6f 75 72 00 0a 61 74 74 72 69 62 75 74 65 32 00 c1 9c 2c c0 00 00 00 00 00 00 09"));
     amf::Buffer &buf45 = http.formatEchoResponse(headers45[1]->getName(), *headers45[3]);
     string head45(reinterpret_cast<const char *>(buf45.reference()));
@@ -1606,15 +1618,17 @@ test_rtmpt (void)
 //     cerr << hexify(buf45.reference()+124, buf45.allocated()-124, true) << endl;
 //     cerr << hexify(buf45.reference()+123, buf45.allocated()-123, false) << endl;
     if (memcmp(ptr45a, ptr45b, hex_res45->allocated()-11) == 0) {
-        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.xpass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.xfail("HTTP::formatEchoResponse(object RemoteClass)");
     }
+#endif
     
     // String test with 40000 characters
     // String test with 70000 characters
     // String test with 1000000 characters
 
+#ifdef CORRUPT_MEMORY_TESTS
     // Use the existing binary data and see if we can survive decoding corupted
     // packets. While the data may be bogus in the returned Elements, we shouldn't
     // ever crash,. so these are primarily a stress test.
@@ -1658,7 +1672,6 @@ test_rtmpt (void)
         runtest.fail("Corrupted HTTP::parseEchoRequest(UNDEFINED Object)");
     }
     
-#if 0
     cerr << hexify(hex_req5->reference(), hex_req5->allocated(), false) << endl;
     hex_req5->corrupt(5);
     cerr << hexify(hex_req5->reference(), hex_req5->allocated(), false) << endl;
@@ -1668,7 +1681,6 @@ test_rtmpt (void)
     } else {
         runtest.fail("Corrupted HTTP::parseEchoRequest(DATE Object)");
     }
-#endif
 
 //    cerr << hexify(hex_req6->reference(), hex_req6->allocated(), false) << endl;
     hex_req6->corrupt(7);
@@ -1929,8 +1941,10 @@ test_rtmpt (void)
     } else {
         runtest.fail("Corrupted HTTP::parseEchoRequest(object RemoteClass");
     }
+#endif
 
 //    cerr << hexify(hex_req45->reference(), hex_req45->allocated(), false) << endl;
+#if 0
     hex_req45->corrupt(6);
 //    cerr << hexify(hex_req45->reference(), hex_req45->allocated(), false) << endl;
     vector<boost::shared_ptr<amf::Element> > corrupt45 = http.parseEchoRequest(*hex_req45);
@@ -1939,7 +1953,7 @@ test_rtmpt (void)
     } else {
         runtest.fail("Corrupted HTTP::parseEchoRequest(object RemoteClass");
     }
-
+#endif
 }
 
 static void
