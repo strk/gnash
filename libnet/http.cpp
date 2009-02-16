@@ -1115,6 +1115,16 @@ HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
     // Get the first name, which is a raw string, and not preceded by
     // a type byte.
     boost::shared_ptr<amf::Element > el1(new amf::Element);
+    
+    // If the length of the name field is corrupted, then we get out of
+    // range quick, and corrupt memory. This is a bit of a hack, but
+    // reduces memory errors caused by some of the corrupted tes cases.
+    boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
+    if (endstr != tmpptr+length) {
+	log_debug("Caught corrupted string! length was %d, null at %d",
+		  length,  endstr-tmpptr);
+	length = endstr-tmpptr;
+    }
     el1->setName(tmpptr, length);
     tmpptr += length;
     headers.push_back(el1);
@@ -1124,6 +1134,18 @@ HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     tmpptr += sizeof(boost::uint16_t);
     boost::shared_ptr<amf::Element > el2(new amf::Element);
+
+//     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
+//     el2->setName(name2.c_str(), name2.size());
+    // If the length of the name field is corrupted, then we get out of
+    // range quick, and corrupt memory. This is a bit of a hack, but
+    // reduces memory errors caused by some of the corrupted tes cases.
+    endstr = std::find(tmpptr, tmpptr+length, '\0');
+    if (endstr != tmpptr+length) {
+	log_debug("Caught corrupted string! length was %d, null at %d",
+		  length,  endstr-tmpptr);
+	length = endstr-tmpptr;
+    }
     el2->setName(tmpptr, length);
     headers.push_back(el2);
     tmpptr += length;
@@ -1148,7 +1170,35 @@ amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data = el.encode(); // amf::AMF::encodeElement(el);
+    boost::shared_ptr<amf::Buffer> data;
+    amf::Element nel = el;
+
+#if 0
+    if (el.getType() == amf::Element::STRICT_ARRAY_AMF0) {
+	if (el.propertySize()) {
+ 	    for (int i=0 ; i<el.propertySize(); i++) {
+		boost::shared_ptr<amf::Element> child = el.getProperty(i);
+		boost::shared_ptr<amf::Element> newprop(new amf::Element);
+		*newprop = child;
+		if (child->getType() == amf::Element::OBJECT_AMF0) {
+		    for (int j=child->propertySize()-1; j>=0; j--) {
+// 		    for (int j=0; j<child->propertySize(); j++) {
+			newprop->addProperty(child->getProperty(j));
+		    }
+		}
+		nel.addProperty(newprop);
+	    }
+	    data = nel.encode();
+	} else {
+	    data = el.encode();
+	}
+    } else {
+	data = el.encode();
+    }
+#else
+    data = el.encode();
+#endif
+
     return formatEchoResponse(num, data->reference(), data->allocated());
 }
 
