@@ -329,7 +329,9 @@ RcInitFile::parseFile(const std::string& filespec)
     
     if (stat(filespec.c_str(), &stats) != 0)
     {
-        cerr << _("RcInitFile: couldn't open file: ") << filespec << endl;
+//      This is a normal case, since we check many places for an RC file.
+//      So don't complain bitterly every time we run gnash!
+//      cerr << _("RcInitFile: couldn't open file: ") << filespec << endl;
         return false;
     }
 
