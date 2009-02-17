@@ -703,6 +703,8 @@ public:
     /// @return nothing.
     void addProperty(boost::shared_ptr<Element> el) { _properties.push_back(el); };
 
+    void clearProperties() { return _properties.clear(); };
+
     /// \brief Get a smart pointer to the Element for this Property.
     ///
     /// @return A smart pointer to the Element for this Property
