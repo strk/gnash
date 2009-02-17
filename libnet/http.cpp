@@ -1172,13 +1172,13 @@ HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> data;
 
-#if 1
     amf::Element nel;
     if (el.getType() == amf::Element::TYPED_OBJECT_AMF0) {
 	nel.makeTypedObject();
 	string name = el.getName();
 	nel.setName(name);
 	if (el.propertySize()) {
+	    // FIXME: see about using std::reverse() instead.
 	    for (int i=el.propertySize()-1; i>=0; i--) {
 // 	    for (int i=0 ; i<el.propertySize(); i++) {
 		boost::shared_ptr<amf::Element> child = el.getProperty(i);
@@ -1191,9 +1191,6 @@ HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
     } else {
 	data = el.encode();
     }
-#else
-    data = el.encode();
-#endif
 
     return formatEchoResponse(num, data->reference(), data->allocated());
 }
