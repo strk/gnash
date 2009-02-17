@@ -1171,22 +1171,18 @@ HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<amf::Buffer> data;
-    amf::Element nel = el;
 
-#if 0
-    if (el.getType() == amf::Element::STRICT_ARRAY_AMF0) {
+#if 1
+    amf::Element nel;
+    if (el.getType() == amf::Element::TYPED_OBJECT_AMF0) {
+	nel.makeTypedObject();
+	string name = el.getName();
+	nel.setName(name);
 	if (el.propertySize()) {
- 	    for (int i=0 ; i<el.propertySize(); i++) {
+	    for (int i=el.propertySize()-1; i>=0; i--) {
+// 	    for (int i=0 ; i<el.propertySize(); i++) {
 		boost::shared_ptr<amf::Element> child = el.getProperty(i);
-		boost::shared_ptr<amf::Element> newprop(new amf::Element);
-		*newprop = child;
-		if (child->getType() == amf::Element::OBJECT_AMF0) {
-		    for (int j=child->propertySize()-1; j>=0; j--) {
-// 		    for (int j=0; j<child->propertySize(); j++) {
-			newprop->addProperty(child->getProperty(j));
-		    }
-		}
-		nel.addProperty(newprop);
+		nel.addProperty(child);
 	    }
 	    data = nel.encode();
 	} else {
