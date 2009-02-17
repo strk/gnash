@@ -187,7 +187,7 @@ AMF::encodeBoolean(bool flag)
 boost::shared_ptr<Buffer>
 AMF::encodeObject(const amf::Element &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     length = data.propertySize();
     //    log_debug("Encoded data size has %d properties", length);
@@ -322,7 +322,7 @@ AMF::encodeXMLObject(const boost::uint8_t * /*data */, size_t /* size */)
 boost::shared_ptr<Buffer>
 AMF::encodeTypedObject(const amf::Element &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     size_t size = 0;
     boost::uint32_t props;
@@ -536,7 +536,7 @@ AMF::encodeRecordSet(const boost::uint8_t * /* data */, size_t /* size */)
 boost::shared_ptr<Buffer>
 AMF::encodeStrictArray(const amf::Element &data)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     boost::uint32_t items;
     items = data.propertySize();
     //    log_debug("Encoded data size has %d properties", items);
