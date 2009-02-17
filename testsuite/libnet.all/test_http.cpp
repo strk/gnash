@@ -1542,12 +1542,14 @@ test_rtmpt (void)
     string head43(reinterpret_cast<const char *>(buf43.reference()));
     const char *ptr43a = reinterpret_cast<const char *>(hex_res43->reference());
     const char *ptr43b = reinterpret_cast<const char *>(buf43.reference()) + head43.size();
+#if 0
     if (memcmp(ptr43a, ptr43b, hex_res43->allocated()-4) == 0) {
         runtest.xpass("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
     } else {
         runtest.xfail("HTTP::formatEchoResponse(object RemoteClass Array, 2 items)");
     }
-
+#endif
+    
     // [object RemoteClass]                      [object RemoteClass]
     boost::shared_ptr<Buffer> hex_req44(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 33 00 00 00 5b 0a 00 00 00 01 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 32 00 41 d2 65 80 b4 80 00 00 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 05 74 68 72 65 65 00 00 09"));
     vector<boost::shared_ptr<amf::Element> > headers44 = http.parseEchoRequest(*hex_req44);
