@@ -1322,7 +1322,6 @@ test_rtmpt (void)
     amf::Buffer &buf28 = http.formatEchoResponse(headers28[1]->getName(), *headers28[3]);
 //     cerr << hexify(hex_res28->reference()+30, hex_res28->allocated()-30, false) << endl;
 //     cerr << hexify(buf28.reference() + 124, buf28.allocated() - 124, false) << endl;
-    //    headers28[3]->dump();
     string head28(reinterpret_cast<const char *>(buf28.reference()));
     const char *ptr28a = reinterpret_cast<const char *>(hex_res28->reference());
     const char *ptr28b = reinterpret_cast<const char *>(buf28.reference()) + head28.size();
@@ -1490,18 +1489,15 @@ test_rtmpt (void)
         }
     }
 
-    headers42[3]->dump();
     boost::shared_ptr<Buffer> hex_res42(new Buffer("00 00 00 00 00 01 00 0b 2f 31 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 10 00 27 6f 72 67 2e 72 65 64 35 2e 73 65 72 76 65 72 2e 77 65 62 61 70 70 2e 65 63 68 6f 2e 52 65 6d 6f 74 65 43 6c 61 73 73 00 0a 61 74 74 72 69 62 75 74 65 31 02 00 03 6f 6e 65 00 0a 61 74 74 72 69 62 75 74 65 32 00 40 00 00 00 00 00 00 00 00 00 09"));
-    hex_res42->dump();
     amf::Buffer &buf42 = http.formatEchoResponse(headers42[1]->getName(), *headers42[3]);
-    buf42.dump();
     string head42(reinterpret_cast<const char *>(buf42.reference()));
     const char *ptr42a = reinterpret_cast<const char *>(hex_res42->reference());
     const char *ptr42b = reinterpret_cast<const char *>(buf42.reference()) + head42.size();
     if (memcmp(ptr42a, ptr42b, hex_res42->allocated()-1) == 0) {
-        runtest.xpass("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.xfail("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
     }
     
     // An array of RemoteClass objects
@@ -1512,11 +1508,9 @@ test_rtmpt (void)
     if (headers43[3] == 0) {
         runtest.unresolved("HTTP::parseEchoRequest(object RemoteClass Array, 2 items)");
     } else {
-	//	headers43[3]->dump();
 	std::vector<boost::shared_ptr<amf::Element> > props43 = headers43[3]->getProperties();
 	std::vector<boost::shared_ptr<amf::Element> > props43a = props43[0]->getProperties();
 	std::vector<boost::shared_ptr<amf::Element> > props43b = props43[1]->getProperties();
-	//	props43[1]->dump();
         if ((strncmp(headers43[0]->getName(), "echo", 4) == 0)
             && (strncmp(headers43[1]->getName(), "/2", 2) == 0)
             && (headers43[3]->getType() == Element::STRICT_ARRAY_AMF0)
@@ -1542,8 +1536,6 @@ test_rtmpt (void)
     amf::Buffer &buf43 = http.formatEchoResponse(headers43[1]->getName(), *headers43[3]);
     std::vector<boost::shared_ptr<amf::Element> > props43 = headers43[3]->getProperties();
     //    std::vector<boost::shared_ptr<amf::Element> > props43a = props43[0]->getProperties();
-    // headers43[3]->dump();
-    //    props43[0]->dump();
 //     cerr << hexify(hex_res43->reference()+29, hex_res43->allocated()-29 , false) << endl;
 //     cerr << hexify(buf43.reference(), buf43.allocated(), true) << endl;
 //     cerr << hexify(buf43.reference() + 124, buf43.allocated()-124, false) << endl;
@@ -1576,9 +1568,9 @@ test_rtmpt (void)
     const char *ptr44a = reinterpret_cast<const char *>(hex_res44->reference());
     const char *ptr44b = reinterpret_cast<const char *>(buf44.reference()) + head44.size();
     if (memcmp(ptr44a, ptr44b, hex_res44->allocated()-1) == 0) {
-        runtest.xpass("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.xfail("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
     }
 
 #if 0
@@ -1618,9 +1610,9 @@ test_rtmpt (void)
 //     cerr << hexify(buf45.reference()+124, buf45.allocated()-124, true) << endl;
 //     cerr << hexify(buf45.reference()+123, buf45.allocated()-123, false) << endl;
     if (memcmp(ptr45a, ptr45b, hex_res45->allocated()-11) == 0) {
-        runtest.xpass("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.pass("HTTP::formatEchoResponse(object RemoteClass)");
     } else {
-        runtest.xfail("HTTP::formatEchoResponse(object RemoteClass)");
+        runtest.fail("HTTP::formatEchoResponse(object RemoteClass)");
     }
 #endif
     
