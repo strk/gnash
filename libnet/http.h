@@ -292,6 +292,7 @@ public:
     int getMaxRequests() { return _max_requests; }
     int getFileSize() { return _filesize; }
     std::string &getFilespec() { return _filespec; }
+    std::string &getParams() { return _params; }
   //    std::string &getURL() { return _url; }
     std::map<int, struct status_codes *> getStatusCodes()
 	{ return _status_codes; }
@@ -310,6 +311,7 @@ private:
     
     DiskStream::filetype_e  _filetype;
     std::string		_filespec;
+    std::string		_params;
     boost::uint32_t     _filesize;
     std::map<int, struct status_codes *> _status_codes;
     

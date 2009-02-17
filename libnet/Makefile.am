@@ -55,7 +55,6 @@ noinst_HEADERS = \
 	rtmp.h \
 	rtmp_msg.h \
 	rtmp_client.h \
-	rtmp_server.h \
 	statistics.h \
 	diskstream.h \
 	cache.h
@@ -70,7 +69,6 @@ libgnashnet_la_SOURCES = \
 	rtmp.cpp \
 	rtmp_msg.cpp \
 	rtmp_client.cpp \
-	rtmp_server.cpp \
 	statistics.cpp \
 	diskstream.cpp \
 	cache.cpp

@@ -163,7 +163,7 @@ main(int argc, char *argv[])
         
         catch (Arg_parser::ArgParserException &e) {
             cerr << _("Error parsing command line options: ") << e.what() << endl;
-            cerr << _("This is a Gnash bug.") << endl;
+            cerr << _("This is a Gnash flvdumper bug.") << endl;
         }
     }
     
@@ -179,8 +179,6 @@ main(int argc, char *argv[])
     Flv flv; 
     struct stat st;
 
-    boost::uint8_t *buf = 0;
-    boost::uint8_t *ptr = 0;
 //    boost::shared_ptr<Flv::flv_header_t> head;
     Flv::previous_size_t   previous = 0;
     boost::shared_ptr<Flv::flv_tag_t> tag;
@@ -223,7 +221,7 @@ main(int argc, char *argv[])
 		 }
 		 ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_tag_t));
 		 tag  = flv.decodeTagHeader(buf);
-		 
+		 flv.dump();
 		 total -= sizeof(Flv::previous_size_t);
 		 size_t bodysize = flv.convert24(tag->bodysize);
 		 if (bodysize == 0) {

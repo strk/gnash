@@ -68,11 +68,12 @@ INCLUDES = -I.. \
 
 noinst_HEADERS = \
 	cygnal.h \
+	rtmp_server.h \
 	crc.h
 
 bin_PROGRAMS = cygnal
 
-cygnal_SOURCES = cygnal.cpp crc.cpp cvm.cpp
+cygnal_SOURCES = cygnal.cpp crc.cpp cvm.cpp rtmp_server.cpp
 cygnal_LDADD = $(AM_LDFLAGS)
 
 # Rebuild with GCC 4.x Mudflap support

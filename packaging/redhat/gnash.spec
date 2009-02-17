@@ -2,7 +2,7 @@ Name:           gnash
 Version:        20090213
 Release:        1
 Distribution:	fc10
-# Distribution:	ydl6
+#Distribution:	ydl6
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia

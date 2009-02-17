@@ -22,6 +22,8 @@
 
 #include <boost/cstdint.hpp>
 #include <iostream>
+#include <boost/random/uniform_int.hpp>
+#include <boost/random/mersenne_twister.hpp>
 
 #include "buffer.h"
 #include "amf.h"
@@ -72,7 +74,7 @@ Buffer::hex2mem(const string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t count = str.size();
-    size_t size = (count/3) + 1;
+    size_t size = (count/3) + 4;
     boost::uint8_t ch = 0;
     
     boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
@@ -93,6 +95,25 @@ Buffer::hex2mem(const string &str)
     resize(size);
     
     return *this;
+}
+
+// Convert each byte into its hex representation
+std::string
+Buffer::hexify ()
+{
+    return gnash::hexify(_data.get(), allocated(), false);
+}
+
+std::string
+Buffer::hexify (bool ascii)
+{
+    return gnash::hexify(_data.get(), allocated(), ascii);
+}
+
+std::string
+Buffer::hexify (amf::Buffer &buf, bool ascii)
+{
+    return gnash::hexify(buf.reference(), buf.allocated(), ascii);
 }
 
 /// \brief Initialize a block of memory for this buffer.
@@ -179,11 +200,19 @@ Buffer &
 Buffer::copy(boost::uint8_t *data, size_t nbytes)
 {    
 //    GNASH_REPORT_FUNCTION;
+    _seekptr =_data.get();
     if (_data) {
 	std::copy(data, data + nbytes, _data.get());
 	_seekptr = _data.get() + nbytes;
     } else {
-	throw GnashException("Not enough storage was allocated to hold the copied data!");
+	char num[12];
+	sprintf(num, "%d", nbytes);
+	string msg = "Not enough storage was allocated to hold the copied data! Needs ";
+	msg += num;
+	msg += " only has ";
+	sprintf(num, "%d", _nbytes);
+	msg += num;
+	throw GnashException(msg);
     }
     return *this;
 }
@@ -205,7 +234,14 @@ Buffer::append(boost::uint8_t *data, size_t nbytes)
 	    std::copy(data, data + nbytes, _seekptr);
 	    _seekptr += nbytes;
 	} else {
-	    throw GnashException("Not enough storage was allocated to hold the appended data!");
+	    char num[12];
+	    string msg = "Not enough storage was allocated to hold the appended data! Needs ";
+	    sprintf(num, "%d", nbytes);
+	    msg += num;
+	    msg += " only has ";
+	    sprintf(num, "%d", _nbytes - allocated());
+	    msg += num;
+	    throw GnashException(msg);
 	}
     }
 
@@ -468,6 +504,7 @@ Buffer &
 Buffer::operator=(boost::uint8_t byte)
 {
 //    GNASH__FUNCTION;
+   
     return copy(&byte, 1);
 }
 
@@ -697,15 +734,53 @@ Buffer::resize(size_t size)
 void
 Buffer::dump(std::ostream& os) const
 {
-    os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes at " << (void *)_data.get() << endl;
+    os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes: ";
+     // Skip in-memory address " at " << (void *)_data.get() << endl;
     if (_nbytes < 0xffff) {
 	const size_t bytes = _seekptr - _data.get();
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;
     } else {
 	os << "ERROR: Buffer size out of range!" << endl;
-	abort();
     }
+}
+
+/// \brief Corrupt a buffer with random errors.
+///		This is used only for testing to make sure we can cleanly
+///		handle corruption of the packets.
+///
+/// @param factor A divisor to adjust how many errors are created.
+///
+/// @return nothing
+int
+Buffer::corrupt()
+{
+    corrupt(10);
+}
+
+int
+Buffer::corrupt(int factor)
+{
+    boost::mt19937 seed;
+    // Pick the number of errors to create based on the Buffer's data size
+    boost::uniform_int<> errs(1, (_nbytes/factor));
+    int errors = errs(seed);
+    log_debug("Creating %d errors in the buffer", errors);
+    
+    for (int i=0; i<errors; i++) {
+	// find a location someplace within the file.
+	boost::uniform_int<> location(0, _nbytes);
+	int pos = location(seed);
+	
+//	log_debug("Creating error at %d in the buffer", pos);
+	// Create a random new value for the byte
+	boost::uniform_int<> shift(1, 256);
+	int newval = shift(seed);
+	// stomp the old value for our new one.
+	_data[pos] = newval;
+    }
+
+    return errors;
 }
 
 } // end of amf namespace

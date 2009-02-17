@@ -171,7 +171,8 @@ Element::Element(const string &name, bool indata)
 Element::Element(bool /* flag */, double /* unknown1 */, double /* unknown2 */,
 		 const string &/* methodname */)
     : _name(0),
-      _type(NOTYPE)
+      _type(NOTYPE),
+      _referenceid(0)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("Can't create remote function calls yet");
@@ -249,6 +250,34 @@ Element::to_number() const
     return -1.0;
 }
 
+/// \brief Cast the data in this Element to a short value.
+///
+/// @return short value.
+boost::uint16_t
+Element::to_short() const
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_buffer) {
+	return *(reinterpret_cast<boost::uint16_t *>(_buffer->reference()));
+    }
+//    return ::nan("NaN");
+    return -1;
+}
+
+/// \brief Cast the data in this Element to a short value.
+///
+/// @return short value.
+boost::uint32_t
+Element::to_integer() const
+{
+//    GNASH_REPORT_FUNCTION;
+    if (_buffer) {
+	return *(reinterpret_cast<boost::uint32_t *>(_buffer->reference()));
+    }
+//    return ::nan("NaN");
+    return -1;
+}
+
 /// \brief Cast the data in this Element to an ASCII string value.
 ///
 /// @return A NULL terminated ASCII string.
@@ -258,14 +287,7 @@ Element::to_string() const
 //    GNASH_REPORT_FUNCTION;
     if (_buffer) {
 	if (_buffer->size() > 0) {
-#if 0
-	    char *foo = new char[_buffer->size() + 1];
-	    memset(foo, 0, _buffer->size() + 1);
-	    memcpy(foo, _buffer->reference(), _buffer->size());
-	    return foo;
-#else
 	    return reinterpret_cast<const char *>(_buffer->reference());
-#endif
 	}
 	return "NULL";
     }
@@ -435,6 +457,14 @@ boost::shared_ptr<Buffer>
 Element::encode()
 {
 //    GNASH_REPORT_FUNCTION;
+
+    return encode(false);
+}
+
+boost::shared_ptr<Buffer>
+Element::encode(bool notobject)
+{
+//    GNASH_REPORT_FUNCTION;
     size_t size = 0;
     boost::shared_ptr<Buffer> buf;
     if (_type == Element::OBJECT_AMF0) {
@@ -445,8 +475,10 @@ Element::encode()
 	    size += _properties[i]->getNameSize();
 	    size += AMF_PROP_HEADER_SIZE;
 	}
-	buf.reset(new Buffer(size+1)); // FIXME: why are we one byte off ?
-	*buf = Element::OBJECT_AMF0;
+	buf.reset(new Buffer(size+24)); // FIXME: why are we several bytes off ?
+	if (!notobject) {
+	    *buf = Element::OBJECT_AMF0;
+	}
 	if (_name > 0) {
 	    size_t length = getNameSize();
 	    boost::uint16_t enclength = length;
@@ -471,10 +503,12 @@ Element::encode()
 	    }
 	}
 //	log_debug("FIXME: Terminating object");
-	boost::uint8_t pad = 0;
-	*buf += pad;
-	*buf += pad;
-	*buf += TERMINATOR;
+	if (!notobject) {
+	    boost::uint8_t pad = 0;
+	    *buf += pad;
+	    *buf += pad;
+	    *buf += TERMINATOR;
+	}
 	return buf;
     } else {
 	    return AMF::encodeElement(*this);
@@ -576,12 +610,19 @@ Element::makeString(boost::uint8_t *data, size_t size)
 //    GNASH_REPORT_FUNCTION;
     _type = Element::STRING_AMF0;
 
-    // Make room for an additional NULL terminator
-    try {
-	check_buffer(size+1);
-    } catch (std::exception& e) {
-	log_error("%s", e.what());
-	return *this;
+    // If there is an existing string, 
+    if (_buffer) {
+	if (_buffer->size() < size) {
+	    _buffer->resize(size+1); // add room for the NULL terminator
+	}
+    } else {
+	// Make room for an additional NULL terminator
+	try {
+	    check_buffer(size+1);
+	} catch (std::exception& e) {
+	    log_error("%s", e.what());
+	    return *this;
+	}
     }
     _buffer->clear();		// FIXME: this could be a performance issue
     _buffer->copy(data, size);
@@ -945,7 +986,7 @@ Element::makeXMLObject()
     return *this;
 }
 Element &
-Element::makeXMLObject(boost::uint8_t *data)
+Element::makeXMLObject(boost::uint8_t * /*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::XML_OBJECT_AMF0;
@@ -1028,7 +1069,7 @@ Element::makeTypedObject()
 ///
 /// @return A reference to this Element.
 Element &
-Element::makeTypedObject(boost::uint8_t *data)
+Element::makeTypedObject(boost::uint8_t */*data*/)
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::TYPED_OBJECT_AMF0;
@@ -1045,6 +1086,16 @@ Element::makeReference()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE_AMF0;
+}
+
+Element &
+Element::makeReference(boost::uint16_t index)
+{
+//    GNASH_REPORT_FUNCTION;
+    _type = Element::REFERENCE_AMF0;
+    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&index);
+    return makeReference(ptr, sizeof(boost::uint16_t));
+    
     return *this;
 }
 
@@ -1426,6 +1477,9 @@ Element::check_buffer(size_t size)
 	if (_buffer->size() < size) {
 	    throw ParserException("Buffer not big enough, try resizing!");
 	}
+	if (_buffer->size() == 0) {
+	    throw ParserException("Buffer has zero size, not initialized!");
+	}
     }
 }
 
@@ -1438,11 +1492,11 @@ Element::dump(std::ostream& os) const
     
     os << astype_str[_type] << ": ";
     if (_name) {
- 	os << " property name is: " << _name << ", ";
+ 	os << " property name is: \"" << _name << "\", ";
     } else {
- 	os << "(no name)";
+ 	os << "(no name), ";
     }
-    os << endl << "data length is " << getDataSize() << endl;
+    os << "data length is " << getDataSize() << endl;
 
 
     switch (_type) {
