@@ -785,7 +785,7 @@ test_client()
     boost::shared_ptr<amf::Buffer> buf2 = rtmp.encodeConnect("mp3_app/id3test", "http://renaun.com/flex2/posts/MP3Test.swf", "rtmp://renaun.com/mp3_app/id3test", 615, 124, 1, "http://renaun.com/flex2/posts/MP3Test.html");
 //     cerr << hexify(buf1->begin(), buf1->size(), false) << endl;
 //     cerr << hexify(buf2->begin(), buf1->size(), false) << endl;
-    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->allocated()) == 0)) {
         runtest.pass("Encoded RTMPClient::encodeConnect()");
     } else {
         runtest.fail("Encoded RTMPClient::encodeConnect()");
@@ -801,7 +801,7 @@ test_client()
 
     buf1->hex2mem("02 00 05 70 61 75 73 65 00 00 00 00 00 00 00 00 00 05 01 01 00 00 00 00 00 00 00 00 00");
     buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_PAUSE, true, 0);
-    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+    if ((memcmp(buf1->reference(), buf2->reference(), buf1->allocated()) == 0)) {
         runtest.pass("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PAUSE)");
     } else {
         runtest.fail("Encoded RTMPClient::encodeStreamOp(RTMP::STREAM_PAUSE)");
@@ -836,7 +836,7 @@ test_client()
 
     buf1->hex2mem("02 00 04 73 65 65 6b 00 00 00 00 00 00 00 00 00 05 00 40 c7 70 00 00 00 00 00");
     buf2 = rtmp.encodeStreamOp(0, RTMP::STREAM_SEEK, false, 12000);
-    if ((memcmp(buf1->reference(), buf2->reference(), buf1->size()) == 0)) {
+    if ((memcmp(buf1->reference(), buf2->reference(), buf2->allocated()) == 0)) {
         runtest.pass("Encoded RTMPClient::encodeStream(RTMP::SEEK, double)");
     } else {
         runtest.fail("Encoded RTMPClient::encodeStream(RTMP::SEEK, double)");
