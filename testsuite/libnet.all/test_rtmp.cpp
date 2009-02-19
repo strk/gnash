@@ -404,7 +404,7 @@ test_split()
     if (notest) {
         runtest.unresolved("RTMP::split(oflaDemo)");
     } else {
-        queues4->at(0)->dump();
+//        queues4->at(0)->dump();
         if (queues4->size() == 1) {
             runtest.pass("RTMP::split(oflaDemo)");
             notest = false;
