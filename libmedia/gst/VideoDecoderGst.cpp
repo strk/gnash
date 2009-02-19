@@ -124,14 +124,16 @@ VideoDecoderGst::setup(GstCaps* srccaps)
 
     bool success = GstUtil::check_missing_plugins(srccaps);
     if (!success) {
-        std::string type(gst_caps_to_string(srccaps));
-        type = type.substr(0, type.find(','));
+        GstStructure* sct = gst_caps_get_structure(srccaps, 0);
+        std::string type(gst_structure_get_name(sct));
         std::string msg = (boost::format(_("Couldn't find a plugin for "
                     "video type %s!")) % type).str();
 
         if (type == "video/x-flash-video" || type == "video/x-h264") {
             msg += _(" Please make sure you have gstreamer-ffmpeg installed.");
         }
+
+        gst_caps_unref(srccaps);
 
         throw MediaException(msg);
     }
@@ -161,7 +163,8 @@ VideoDecoderGst::push(const EncodedVideoFrame& frame)
 {
     GstBuffer* buffer;
     
-    EncodedExtraGstData* extradata = dynamic_cast<EncodedExtraGstData*>(frame.extradata.get());
+    EncodedExtraGstData* extradata = 
+        dynamic_cast<EncodedExtraGstData*>(frame.extradata.get());
     
     if (extradata) {
         buffer = extradata->buffer;
