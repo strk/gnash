@@ -943,7 +943,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
     switch (type) {
       case Element::NUMBER_AMF0:
       {
- 	  double swapped = *reinterpret_cast<const double*>(tmpptr);
+ 	  double swapped = *(reinterpret_cast<const double*>(tmpptr));
  	  swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
  	  el->makeNumber(swapped); 
 	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
