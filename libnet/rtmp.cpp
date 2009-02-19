@@ -171,7 +171,7 @@ RTMP::headerSize(boost::uint8_t header)
     
     int headersize = -1;
 
-    cerr << "Header size value: " << (void *)header << std::endl;
+//    cerr << "Header size value: " << (void *)header << std::endl;
     
     switch (header & RTMP_HEADSIZE_MASK) {
       case HEADER_12:
@@ -1172,8 +1172,8 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		rthead->bodysize = _lastsize[rthead->channel];
 	    }
 	    if ((rthead->head_size > 1)) {
- 		cerr << "New packet for channel #" << rthead->channel << " of size "
- 		     << (rthead->head_size + rthead->bodysize) << endl;
+//  		cerr << "New packet for channel #" << rthead->channel << " of size "
+//  		     << (rthead->head_size + rthead->bodysize) << endl;
 		// give it some memory to store data in. We store
 		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size));
 		// Each RTMP connection has 64 channels, so we store
@@ -1193,7 +1193,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	    // Red5 version 5 sends out PING messages with a 1 byte header. I think this
 	    // may be a bug in Red5, but we should handle it anyway.
 	    if (chunk == 0) {
-		cerr << "Chunk wasn't allocated! " << (rthead->bodysize + rthead->head_size) << endl;
+// 		cerr << "Chunk wasn't allocated! " << (rthead->bodysize + rthead->head_size) << endl;
 		chunk.reset(new Buffer(rthead->bodysize + rthead->head_size));
 		chunk->clear();	// FIXME: temporary debug only, should be unnecessary
 		_queues[rthead->channel].push(chunk);
@@ -1241,12 +1241,12 @@ RTMP::split(boost::uint8_t *data, size_t size)
 // 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
 // 		     << rthead->channel << endl;
 		if (rthead->head_size == 1){
- 		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
- 		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
- 			 << chunk->spaceLeft() << endl;
+//  		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
+//  		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
+//  			 << chunk->spaceLeft() << endl;
 		    ptr += rthead->head_size;
- 		} else {
- 		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
+//  		} else {
+//  		    cerr << "FIRST PACKET!" << " for channel " << rthead->channel << endl;
 		}
 		// This is a queue of channels with active messages. This is a
 		// much smaller list to traverse when processing data than all 64 channels.
@@ -1256,8 +1256,8 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		    // data to the existing data to complete the message.
 		    chunk->append(ptr, pktsize);
 		    _lastsize[rthead->channel] = rthead->bodysize;
-		    cerr << "Adding data to existing packet for channel #" << rthead->channel
-			 << ", read " << pktsize << " bytes." << endl;
+// 		    cerr << "Adding data to existing packet for channel #" << rthead->channel
+// 			 << ", read " << pktsize << " bytes." << endl;
 		    ptr += pktsize;
 		} else {
 		    log_error("Packet size out of range! %d, %d", rthead->bodysize, pktsize);
