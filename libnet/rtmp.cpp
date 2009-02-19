@@ -44,16 +44,34 @@
 #include "utility.h"
 #include "buffer.h"
 
-using namespace gnash;
-using namespace std;
+using std::cerr;
+using std::endl;
 using namespace amf;
 
 namespace gnash
 {
 
+namespace {
+
+    /// Function object for matching C strings alphabetically.
+    class MatchFirst
+    {
+    public:
+        MatchFirst(const char* match) : _match(match) {}
+
+        bool operator()(const RTMP::AMFProperties::value_type& a) {
+            return std::strcmp(a.first, _match) == 0;
+        }
+    private:
+        const char* _match;
+    };
+
+}
+
+
 CQue incoming;
 
-extern map<int, Handler *> handlers;
+extern std::map<int, Handler *> handlers;
 
 const char *content_str[] = {
     "None",
@@ -153,7 +171,7 @@ RTMP::headerSize(boost::uint8_t header)
     
     int headersize = -1;
 
-    cerr << "Header size value: " << (void *)header << endl;
+    cerr << "Header size value: " << (void *)header << std::endl;
     
     switch (header & RTMP_HEADSIZE_MASK) {
       case HEADER_12:
@@ -192,7 +210,7 @@ RTMP::RTMP()
     {
         // Name is only used for debugging
         boost::format fmt("channel #%s");
-	    string name = (fmt % i).str();
+        std::string name = (fmt % i).str();
 	    _queues[i].setName(name.c_str());
 
         // each channel can have a different chunksize
@@ -225,20 +243,18 @@ RTMP::addProperty(char *name, amf::Element &el)
     _properties[name] = el;
 }
 
+
 amf::Element &
 RTMP::getProperty(const std::string &name)
 {
-//    GNASH_REPORT_FUNCTION;
-//    return _properties[name.c_str()];
-    map<const char *, amf::Element>::iterator it;
-    for (it = _properties.begin(); it != _properties.end(); it++) {
-	const char *title = it->first;
-	amf::Element &el = it->second;
-	if (name == title) {
-// 	    log_debug("found variable in RTMP packet: %s", name);
-	    return el;
-	}
-    }
+    // Find without inserting.
+    AMFProperties::iterator it = std::find_if(_properties.begin(),
+            _properties.end(), MatchFirst(name.c_str()));
+
+    // If this fails and we return, it will corrupt memory, so either
+    // the assertion never fails or we'll have to return a pointer.
+    assert(it != _properties.end()); 
+    return it->second;
 }
 
 boost::shared_ptr<RTMP::rtmp_head_t>
@@ -512,7 +528,7 @@ void
 RTMP::dump()
 {
     cerr << "RTMP packet contains " << _properties.size() << " variables." << endl;
-    map<const char *, amf::Element>::iterator it;
+    AMFProperties::iterator it;
     for (it = _properties.begin(); it != _properties.end(); it++) {
 //	const char *name = it->first;
 	amf::Element el = it->second;
@@ -877,7 +893,7 @@ RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	// After the first packet, only send the single byte
 	// continuation packet.
 	if (nbytes > 0) {
-	    int ret = writeNet(fd, *cont_head);
+	    ret = writeNet(fd, *cont_head);
 	}
 	// write the data to the client
 	ret = writeNet(fd, data + nbytes, partial);
@@ -1063,7 +1079,7 @@ RTMP::recvMsg(int fd)
     GNASH_REPORT_FUNCTION;
 
     int ret = 0;
-    bool nopacket = true;
+    //bool nopacket = true;
 
     // Read really big packets, they get split into the smaller ones when 'split'
     boost::shared_ptr<amf::Buffer> buf(new Buffer(7096));
@@ -1085,7 +1101,7 @@ RTMP::recvMsg(int fd)
 	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
-	if ((ret == static_cast<int>(string::npos)) || (ret == -1)) {
+	if ((ret == static_cast<int>(std::string::npos)) || (ret == -1)) {
 	    log_debug("socket for fd #%d was closed...", fd);
 	    buf.reset();
 	    break;
@@ -1127,7 +1143,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
     boost::uint8_t *ptr = 0;
     boost::shared_ptr<rtmp_head_t> rthead(new rtmp_head_t);
     size_t pktsize = 0;
-    size_t nbytes = 0;
+    //size_t nbytes = 0;
     
     ptr = data;
     boost::shared_ptr<amf::Buffer> chunk;

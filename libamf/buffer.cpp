@@ -205,14 +205,10 @@ Buffer::copy(boost::uint8_t *data, size_t nbytes)
 	std::copy(data, data + nbytes, _data.get());
 	_seekptr = _data.get() + nbytes;
     } else {
-	char num[12];
-	sprintf(num, "%d", nbytes);
-	string msg = "Not enough storage was allocated to hold the copied data! Needs ";
-	msg += num;
-	msg += " only has ";
-	sprintf(num, "%d", _nbytes);
-	msg += num;
-	throw GnashException(msg);
+        boost::format msg("Not enough storage was allocated to hold the "
+        "copied data! Needs %1%, only has %2% bytes");
+        msg % nbytes % _nbytes;
+	    throw GnashException(msg.str());
     }
     return *this;
 }
@@ -234,14 +230,10 @@ Buffer::append(boost::uint8_t *data, size_t nbytes)
 	    std::copy(data, data + nbytes, _seekptr);
 	    _seekptr += nbytes;
 	} else {
-	    char num[12];
-	    string msg = "Not enough storage was allocated to hold the appended data! Needs ";
-	    sprintf(num, "%d", nbytes);
-	    msg += num;
-	    msg += " only has ";
-	    sprintf(num, "%d", _nbytes - allocated());
-	    msg += num;
-	    throw GnashException(msg);
+        boost::format msg("Not enough storage was allocated to hold the "
+        "appended data! Needs %1%, only has %2% bytes");
+        msg % nbytes % _nbytes;
+	    throw GnashException(msg.str());
 	}
     }
 
@@ -755,7 +747,7 @@ Buffer::dump(std::ostream& os) const
 int
 Buffer::corrupt()
 {
-    corrupt(10);
+    return corrupt(10);
 }
 
 int

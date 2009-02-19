@@ -1017,7 +1017,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t pending, blockset;
+	sigset_t pending, blockset; //, emptyset;
 	sigemptyset(&blockset);        
         // sigaddset(&blockset, SIGINT); /* Block SIGINT */
         sigaddset(&blockset, SIGPIPE);
@@ -1211,7 +1211,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
     
 #ifdef HAVE_PPOLL
 	struct timespec tval;
-	sigset_t pending, emptyset, blockset;
+	sigset_t pending, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
 //        sigaddset(&blockset, SIGINT);
 //        sigaddset(&blockset, SIGPIPE);
