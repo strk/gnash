@@ -141,7 +141,7 @@ HTTP::http_method_e
 HTTP::processClientRequest(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
-    bool result;
+    bool result = false;
     
     boost::shared_ptr<amf::Buffer> buf(_que.peek());
     if (buf) {

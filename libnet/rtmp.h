@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _RTMP_H_
-#define _RTMP_H_
+#ifndef GNASH_LIBNET_RTMP_H
+#define GNASH_LIBNET_RTMP_H
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
@@ -78,6 +78,7 @@ typedef enum {
 class DSOEXPORT RTMP : public Network
 {
 public:
+    typedef std::map<const char*, amf::Element> AMFProperties;
     typedef std::deque<CQue *> queues_t;
     typedef enum {
 	RAW=0x0,
@@ -302,7 +303,7 @@ public:
     CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();
   protected:
-    std::map<const char *, amf::Element> _properties;
+    AMFProperties _properties;
     amf::Buffer	*_handshake;
     Handler	*_handler;
     rtmp_head_t	_header;
