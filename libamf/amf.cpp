@@ -431,7 +431,7 @@ AMF::encodeECMAArray(const amf::Element &data)
 //    GNASH_REPORT_FUNCTION;
     boost::uint32_t length;
     bool sparse = false;
-    size_t counter = 0;
+    //size_t counter = 0;
 
     length = data.propertySize();
     //    log_debug("Encoded data size has %d properties", length);
@@ -580,9 +580,9 @@ AMF::encodeStrictArray(const amf::Element &data)
 	    } else {
 		if (sparse) {
 		    sparse = false;
-		    char num[12];
-		    sprintf(num, "%d", counter);
-		    amf::Element elnum(num, el->to_number());
+            std::ostringstream os;
+            os << counter;
+		    amf::Element elnum(os.str().c_str(), el->to_number());
 		    *buf += AMF::encodeElement(elnum);
 		    double nodes = items;
 		    amf::Element ellen("length", nodes);
