@@ -94,8 +94,8 @@ AC_DEFUN([GNASH_PATH_KDE3],
       if test x"${ac_cv_path_kde3_incl}" = x ; then
         AC_MSG_CHECKING([for KDE 3.x header path])
         dnl incllist is inherited from configure.ac, and lives in /macros
-        for i in ${kde3_prefix}/include ${incllist}; do
-          if test -f $i/kde/kapplication.h; then
+        for i in ${kde3_prefix}/include ${incllist}; do 
+         if test -f $i/kde/kapplication.h; then
             ac_cv_path_kde3_incl="-I$i/kde"
             kde3_prefix=`dirname $i`
             break
@@ -106,6 +106,10 @@ AC_DEFUN([GNASH_PATH_KDE3],
             break
           fi
         done
+        if test ! -f $i/kde/qxembed.h -a x"${build_kde4}" = x"no"; then
+          AC_MSG_ERROR([You specified building kde3, but you have kde4 installed!])
+          break
+        fi
       fi
       if test x"${ac_cv_path_kde3_incl}" != x ; then
         AC_MSG_RESULT(${ac_cv_path_kde3_incl})
