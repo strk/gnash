@@ -2444,8 +2444,8 @@ if test x$build_kde3 = xyes; then
       echo "               the default is the same of --enable-gui=kde,gtk" >&3
       echo "               To be able to build the kde 3.x gui," >&3
       echo "               install version 3.x of the KDE development environment from http://kde.org" >&3
-      echo "               or .deb users: apt-get install kdelibs-dev" >&3
-      echo "               or .rpm users: yum install kdelibs-devel." >&3
+      echo "               or .deb users: apt-get install kdelibs4-dev" >&3
+      echo "               or .rpm users: yum install kdelibs3-devel." >&3
   fi
 fi
 
@@ -2463,7 +2463,7 @@ if test x$build_kde4 = xyes; then
       echo "               the default is the same of --enable-gui=kde,gtk" >&3
       echo "               To be able to build the kde 4.x gui," >&3
       echo "               install version 4.x of the KDE development environment from http://kde.org" >&3
-      echo "               or .deb users: apt-get install kdelibs-dev" >&3
+      echo "               or .deb users: apt-get install kdelibs5-dev" >&3
       echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
 fi
