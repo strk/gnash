@@ -104,18 +104,20 @@ AC_DEFUN([GNASH_PATH_KDE4],
           if test -f $i/kde/kapplication.h; then
             ac_cv_path_kde4_incl="-I$i/kde"
             kde4_prefix=`dirname $i`
+            if test -f $i/kde/qxembed.h -a x"${build_kde3}" = x"no"; then
+              AC_MSG_ERROR([You specified building kde4, but you have kde3 installed!])
+            fi
             break
           fi
           if test -f $i/kapplication.h; then
             ac_cv_path_kde4_incl="-I$i"
             kde4_prefix=`dirname $i`
+            if test -f $i/qxembed.h -a x"${build_kde3}" = x"no"; then
+              AC_MSG_ERROR([You specified building kde4, but you have kde3 installed!])
+            fi
             break
           fi
         done
-        if test -f $i/kde/qxembed.h -a x"${build_kde3}" = x"no"; then
-          AC_MSG_ERROR([You specified building kde4, but you have kde3 installed!])
-          break
-        fi
       fi
       if test x"${ac_cv_path_kde4_incl}" != x ; then
         AC_MSG_RESULT(${ac_cv_path_kde4_incl})
