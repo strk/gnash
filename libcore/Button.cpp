@@ -1,6 +1,6 @@
 // Button.cpp:  Mouse-sensitive buttons, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -241,9 +241,11 @@ attachButtonInterface(as_object& o)
 
     as_c_function_ptr gettersetter;
 
-    //
-    // Properties (TODO: move to appropriate SWF version section)
-    //
+    o.init_property(NSV::PROP_uQUALITY, character::quality,
+            character::quality);
+    
+    o.init_property(NSV::PROP_uHIGHQUALITY, character::highquality,
+            character::highquality);
 
     gettersetter = &character::x_getset;
     o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);

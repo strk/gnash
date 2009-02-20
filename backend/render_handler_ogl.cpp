@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -235,7 +235,27 @@ point middle(const point& a, const point& b)
   return point(0.5 * (a.x + b.x), 0.5 * (a.y + b.y));
 }
 
+namespace {
 
+class
+PointSerializer
+{
+public:
+    PointSerializer(std::vector<boost::int16_t>& dest)
+        :
+        _dest(dest)
+    {}
+    
+    void operator()(const point& p)
+    {
+        _dest.push_back(p.x);
+        _dest.push_back(p.y);
+    }
+private:
+    std::vector<boost::int16_t>& _dest;
+};
+
+}
 
 // Unfortunately, we can't use OpenGL as-is to interpolate the curve for us. It
 // is legal for Flash coordinates to be outside of the viewport, which will
@@ -505,7 +525,7 @@ bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height)
 
 void
 bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
-                       render_handler::bitmap_wrap_mode wrap_mode)
+                       bitmap_wrap_mode wrap_mode)
 {
   glEnable(_ogl_img_type);
 
@@ -526,7 +546,7 @@ bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
   
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   
-  if (wrap_mode == render_handler::WRAP_CLAMP) {  
+  if (wrap_mode == WRAP_CLAMP) {  
     glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(_ogl_img_type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   } else {
@@ -659,7 +679,8 @@ public:
   // anti-aliased with the rest of the drawing. Since display lists cannot be
   // concatenated this means we'll add up with several display lists for normal
   // drawing operations.
-  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m, const rect* bounds)
+  virtual void drawVideoFrame(GnashImage* frame, const SWFMatrix* m,
+          const rect* bounds, bool /*smooth*/)
   {
     GLint index;
 
@@ -865,26 +886,32 @@ public:
 
     glFlush(); // Make OpenGL execute all commands in the buffer.
   }
-    
+  
   /// Draw a line-strip directly, using a thin, solid line. 
   //
   /// Can be used to draw empty boxes and cursors.
-  virtual void
-  draw_line_strip(const boost::int16_t* coords, int vertex_count, const rgba& color,
+  virtual void drawLine(const std::vector<point>& coords, const rgba& color,
                   const SWFMatrix& mat)
   {
     oglScopeMatrix scope_mat(mat);
 
+    const size_t numPoints = coords.size();
+
     glColor3ub(color.m_r, color.m_g, color.m_b);
+
+    std::vector<boost::int16_t> pointList;
+    pointList.reserve(numPoints * 2);
+    std::for_each(coords.begin(), coords.end(), PointSerializer(pointList));
 
     // Send the line-strip to OpenGL
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(2, GL_SHORT, 0 /* tight packing */, coords);
-    glDrawArrays(GL_LINE_STRIP, 0, vertex_count);
+    glVertexPointer(2, GL_SHORT, 0 /* tight packing */, &pointList.front());
+    glDrawArrays(GL_LINE_STRIP, 0, numPoints);
 
     // Draw a dot on the beginning and end coordinates to round lines.
-    //   glVertexPointer: skip all but the first and last coordinates in the line.
-    glVertexPointer(2, GL_SHORT, (sizeof(boost::int16_t) * 2) * (vertex_count - 1), coords);
+    // glVertexPointer: skip all but the first and last coordinates in the line.
+    glVertexPointer(2, GL_SHORT, (sizeof(boost::int16_t) * 2) *
+            (numPoints - 1), &pointList.front());
     glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
     glDrawArrays(GL_POINTS, 0, 2);
     glDisable(GL_POINT_SMOOTH);
@@ -1206,7 +1233,7 @@ public:
           bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.need_gradient_bitmap());       
           SWFMatrix m = style.getGradientMatrix();
           
-          binfo->apply(m, render_handler::WRAP_CLAMP); 
+          binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
           
           break;
         }        
@@ -1215,7 +1242,7 @@ public:
         {
           bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.get_bitmap_info());
 
-          binfo->apply(style.getBitmapMatrix(), render_handler::WRAP_REPEAT);
+          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_REPEAT);
           break;
         }
                 
@@ -1227,7 +1254,7 @@ public:
           
           assert(binfo);
 
-          binfo->apply(style.getBitmapMatrix(), render_handler::WRAP_CLAMP);
+          binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_CLAMP);
           
           break;
         } 
@@ -1581,11 +1608,8 @@ public:
 // 5. Profit!
 
   virtual void
-  draw_shape_character(shape_character_def *def, 
-    const SWFMatrix& mat,
-    const cxform& cx,
-    const std::vector<fill_style>& fill_styles,
-    const std::vector<line_style>& line_styles)
+  draw_shape_character(shape_character_def *def, const SWFMatrix& mat,
+    const cxform& cx)
   {
   
     const PathVec& path_vec = def->get_paths();
@@ -1614,6 +1638,9 @@ public:
     oglScopeMatrix scope_mat(mat);
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
+    
+    const std::vector<fill_style>& fill_styles = def->get_fill_styles();
+    const std::vector<line_style>& line_styles = def->get_line_styles();
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;
@@ -1695,6 +1722,7 @@ public:
     
 
 private:
+  
   Tesselator _tesselator;
   float _xscale;
   float _yscale;

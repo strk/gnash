@@ -19,58 +19,77 @@
 # Build a Firefox XPI package
 #
 
-# this is where the output of "make install" goes, which is what
-# we use to build the package.
-XPI_TMP=/tmp/gnash-$(BUILDDATE)
+# building an xpi is similar to building a binary snapshot, the main difference
+# being how it gets configured, and how the bundle of the package gets made.
+# for an xpi package, we have to configure with --enable-xpcom, which the plugin
+# uses to find the directory where Gnash lives.
 
-# this is where we build the bundle that goes in the xpi file
-XPI_BUNDLE=/tmp/gnash-$(BUILDDATE)-bundle
-
-# this is where the gnash gets compiled
-XPI_BUILD=gnash-${VERSION}
-
-# These are the options we want to use to build the standalone
-# gnash player to ship within the .xpi
 CONFIG_OPTS = \
-	--disable-kparts \
-    --disable-testsuite \
+	-disable-dependency-tracking \
+	--disable-rpath \
+	--disable-cygnal \
+	--disable-testsuite \
+	--enable-xpcom \
+	--enable-media=ffmpeg \
+	--enable-jemalloc \
 	--enable-gui=gtk \
-    --enable-xpcom \
-	--with-npapi-plugindir=/tmp/plugin
+	--prefix=/usr \
+	--mandir=/usr/share/man \
+	--infodir=/usr/share/info \
+	--with-npapi-plugindir=/usr/lib/mozilla/plugins
 
-xpi xpi-bundle:
-	rm -rf $(XPI_BUILD) # extract the tarball.
-	tar jxf $(XPI_BUILD).tar.bz2
+# Do the entire process to build an xpi package
+xpi: snapshot xpi-configure snapshot-build snapshot-install
 
-	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-shared --enable-static) # configure for standalone player.
-
-	$(MAKE) -C $(XPI_BUILD) all # build and install in temp
-	$(MAKE) -C $(XPI_BUILD) install DESTDIR=$(XPI_TMP)
-
-	(cd $(XPI_BUILD); ./configure $(CONFIG_OPTS) --disable-static --enable-shared) # configure for plugin.
-	$(MAKE) -C $(XPI_BUILD)/plugin clean all CXXFLAGS=-DGNASH_XPI_PLUGIN # build and get the plugin
-	$(MAKE) -C $(XPI_BUILD) install-plugin DESTDIR=$(XPI_TMP)
-	$(MAKE) -C $(XPI_BUILD)/plugin/xpcom install-pkglib DESTDIR=$(XPI_TMP)
-
-	if ! test -d $(XPI_BUNDLE)/ ; then \
-	  mkdir $(XPI_BUNDLE); \
-        else \
-          rm -rf $(XPI_BUNDLE)/*; \
-	fi
-	topdir=`cd ${top_srcdir}; pwd`; \
+# build the xpi package bundle. snapshot-build and snapshot-install need to
+# have been run already. If you wish the automatic dependency checking, use
+# the 'xpi' target instead, as this is meant only to be called directly when
+# debugging package building.
+# This gets a little messy as we build the executable statically linked so we
+# don't have to do something uglier to find dynamically linked libraries, plus
+# this way the xpi installed libs won't conflict with andy package installed libs.
+# Anyway, so after installing the statically linked gnash into the bundle, we then
+# have to reconfigure to enable shared libraries to be built, and then rebuild
+# the plugins and the xpcom support as dynamically loadable modules.
+xpi-bundle:
+	-@now=`date "+%Y%m%d"`; \
+	pkgname="gnash-${RELEASE}$${now}"; \
+	snapshot_dir="gnash-${RELEASE}$${now}"; \
+	snapshot_build="$${snapshot_dir}/_build"; \
+	snapshot_dest="/tmp/gnash_${RELEASE}$${now}-tmp"; \
+	snapshot_xpi="/tmp/gnash_${RELEASE}$${now}-pkg"; \
+	mkdir -p $${snapshot_xpi}/plugins; \
 	for i in install.rdf; do \
-	  cp -fr $${topdir}/packaging/xpi/$$i $(XPI_BUNDLE)/; \
-	done;
-	mkdir -p $(XPI_BUNDLE)/plugins
-	cp -fr $(XPI_TMP)$(bindir)/*gnash $(XPI_BUNDLE)/plugins
-	strip $(XPI_BUNDLE)/plugins/gtk-gnash
-	cp -fr $(XPI_TMP)$(localedir) $(XPI_BUNDLE)/
-	cp -fr $(XPI_TMP)/tmp/plugin/libgnashplugin.so $(XPI_BUNDLE)/plugins
-	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.xpt $(XPI_BUNDLE)/plugins
-	cp -fr $(XPI_TMP)/tmp/plugin/extensions/*.so $(XPI_BUNDLE)/plugins
-	(cd $(XPI_BUNDLE) ; $(ZIP) -r /tmp/gnash-$(VERSION).xpi *)
+	  cp -fr $(srcdir)/packaging/xpi/$$i $${snapshot_xpi}; \
+	done; \
+	strip  $${snapshot_dest}/$(bindir)/gtk-gnash; \
+	cd $${snapshot_build}; ../configure --enable-shared $(CONFIG_OPTS); \
+	$(MAKE) $(AM_MAKEFLAGS) -C plugin clean install-plugin DESTDIR=$${snapshot_dest}; \
+	$(MAKE) $(AM_MAKEFLAGS) -C plugin/xpcom all install-pkglib DESTDIR=$${snapshot_dest}; \
+	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/libgnashplugin.so $${snapshot_xpi}/plugins; \
+	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.xpt $${snapshot_xpi}/plugins; \
+	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.so $${snapshot_xpi}/plugins; \
+	cp -fr $${snapshot_dest}/usr/bin/gtk-gnash $${snapshot_xpi}; \
+	(cd $${snapshot_xpi}; $(ZIP) -r /tmp/$${snapshot_dir}.xpi *);
 
+# configure the xpi build. snapshot needs to have been run already. If you wish the
+# automatic dependency checking, use the 'xpi' target instead, as this is meant only
+# to be called directly when debugging package building.
+xpi-configure:
+	-@now=`date "+%Y%m%d"`; \
+	pkgname="gnash-${RELEASE}$${now}"; \
+	snapshot_dir="$${pkgname}"; \
+	snapshot_build="$${snapshot_dir}/_build"; \
+	if test ! -d $${snapshot_build}; then \
+	  $(MKINSTALLDIRS) $${snapshot_build}; \
+	fi; \
+	cd $${snapshot_build}; ../configure \
+	  --enable-static \
+	  --disable-shared \
+	  $(CONFIG_OPTS)
+
+# remove files left from package building
 xpi-clean:
-	rm -fr xpi-* $(XPI_BUILD) $(XPI_TMP) gnash-$(VERSION)*.xpi
+	rm -fr xpi-* gnash-$(RELEASE)*.xpi
 
-.PHONY : xpi xpi-bundle
+.PHONY : xpi xpi-bundle xpi-configure

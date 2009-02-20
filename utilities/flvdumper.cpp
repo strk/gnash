@@ -163,7 +163,7 @@ main(int argc, char *argv[])
         
         catch (Arg_parser::ArgParserException &e) {
             cerr << _("Error parsing command line options: ") << e.what() << endl;
-            cerr << _("This is a Gnash bug.") << endl;
+            cerr << _("This is a Gnash flvdumper bug.") << endl;
         }
     }
     
@@ -179,8 +179,6 @@ main(int argc, char *argv[])
     Flv flv; 
     struct stat st;
 
-    boost::uint8_t *buf = 0;
-    boost::uint8_t *ptr = 0;
 //    boost::shared_ptr<Flv::flv_header_t> head;
     Flv::previous_size_t   previous = 0;
     boost::shared_ptr<Flv::flv_tag_t> tag;
@@ -214,16 +212,23 @@ main(int argc, char *argv[])
 	    }
             // Extract all the Tags
             size_t total = st.st_size - sizeof(Flv::flv_header_t);
-             while (total) {
+             while (!ifs.eof()) {
 		 ifs.read(reinterpret_cast<char *>(&previous), sizeof(Flv::previous_size_t));
+		 if (ifs.gcount() != sizeof(Flv::previous_size_t)) {
+		     log_error("Couldn't read the entire header");
+		 }
+		 
 		 previous = ntohl(previous);
 		 total -= sizeof(Flv::previous_size_t);
 		 if (all) {   
 		     cout << "FLV Previous Tag Size was: " << previous << endl;
 		 }
 		 ifs.read(reinterpret_cast<char *>(buf->reference()), sizeof(Flv::flv_tag_t));
+		 if (ifs.gcount() != sizeof(Flv::flv_tag_t)) {
+		     log_error("Couldn't read the entire tag");
+		 }
 		 tag  = flv.decodeTagHeader(buf);
-		 
+		 flv.dump();
 		 total -= sizeof(Flv::previous_size_t);
 		 size_t bodysize = flv.convert24(tag->bodysize);
 		 if (bodysize == 0) {
@@ -236,11 +241,9 @@ main(int argc, char *argv[])
 		 }
 		 buf->resize(bodysize);
 		 ifs.read(reinterpret_cast<char *>(buf->reference()), bodysize);
-		 // Got to the end of the file
-		 if (ifs.eof()) {
-		     cerr << "end of file" << endl;
-		     break;
-		 }
+// 		 if (ifs.gcount() != bodysize) {
+// 		     log_error("Couldn't read the entire body");
+// 		 }
 		 total -= bodysize;
 		 switch (tag->type) {
 		   case Flv::TAG_AUDIO:

@@ -85,6 +85,9 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
           break
         fi
       done
+      if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
+	break
+      fi
     done
   fi
 

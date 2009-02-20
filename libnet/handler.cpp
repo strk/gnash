@@ -38,7 +38,6 @@
 #include "dsodefs.h" //For DSOEXPORT.
 
 #include "rtmp.h"
-#include "rtmp_server.h"
 #include "http.h"
 
 using namespace gnash;

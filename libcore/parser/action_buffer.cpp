@@ -1,6 +1,6 @@
 // action_buffer.cpp:  holds actions for later execution, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -174,7 +174,7 @@ disasm_instruction(const unsigned char* instruction_data, size_t maxBufferLength
     assert (maxBufferLength > 0);
 
     as_arg_t fmt = ARG_HEX;
-    action_type action_id = static_cast<action_type>(instruction_data[0]);
+    ActionType action_id = static_cast<ActionType>(instruction_data[0]);
 
     std::stringstream ss;
 

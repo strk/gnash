@@ -1,12 +1,13 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'Kde4Gui.h'
 **
-** Created: Thu Dec 4 10:02:08 2008
+** Created: Mon Feb 9 08:36:10 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include "Kde4Gui.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'Kde4Gui.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59
@@ -22,25 +23,27 @@ static const uint qt_meta_data_gnash__DrawingWidget[] = {
        1,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   10, // methods
+       8,   10, // methods
        0,    0, // properties
        0,    0, // enums/sets
 
  // slots: signature, parameters, type, tag, flags
       22,   21,   21,   21, 0x0a,
-      29,   21,   21,   21, 0x0a,
-      37,   21,   21,   21, 0x0a,
-      44,   21,   21,   21, 0x0a,
-      54,   21,   21,   21, 0x0a,
-      71,   64,   21,   21, 0x0a,
+      35,   21,   21,   21, 0x0a,
+      49,   21,   21,   21, 0x0a,
+      56,   21,   21,   21, 0x0a,
+      64,   21,   21,   21, 0x0a,
+      71,   21,   21,   21, 0x0a,
+      81,   21,   21,   21, 0x0a,
+      98,   91,   21,   21, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_gnash__DrawingWidget[] = {
-    "gnash::DrawingWidget\0\0play()\0pause()\0"
-    "stop()\0restart()\0refresh()\0isFull\0"
-    "fullscreen(bool)\0"
+    "gnash::DrawingWidget\0\0properties()\0"
+    "preferences()\0play()\0pause()\0stop()\0"
+    "restart()\0refresh()\0isFull\0fullscreen(bool)\0"
 };
 
 const QMetaObject gnash::DrawingWidget::staticMetaObject = {
@@ -68,14 +71,68 @@ int gnash::DrawingWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: play(); break;
-        case 1: pause(); break;
-        case 2: stop(); break;
-        case 3: restart(); break;
-        case 4: refresh(); break;
-        case 5: fullscreen((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 0: properties(); break;
+        case 1: preferences(); break;
+        case 2: play(); break;
+        case 3: pause(); break;
+        case 4: stop(); break;
+        case 5: restart(); break;
+        case 6: refresh(); break;
+        case 7: fullscreen((*reinterpret_cast< bool(*)>(_a[1]))); break;
         }
-        _id -= 6;
+        _id -= 8;
+    }
+    return _id;
+}
+static const uint qt_meta_data_gnash__Kde4GuiPrefs__PreferencesDialog[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       1,   10, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+ // slots: signature, parameters, type, tag, flags
+      40,   39,   39,   39, 0x08,
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_gnash__Kde4GuiPrefs__PreferencesDialog[] = {
+    "gnash::Kde4GuiPrefs::PreferencesDialog\0"
+    "\0savePreferences()\0"
+};
+
+const QMetaObject gnash::Kde4GuiPrefs::PreferencesDialog::staticMetaObject = {
+    { &QDialog::staticMetaObject, qt_meta_stringdata_gnash__Kde4GuiPrefs__PreferencesDialog,
+      qt_meta_data_gnash__Kde4GuiPrefs__PreferencesDialog, 0 }
+};
+
+const QMetaObject *gnash::Kde4GuiPrefs::PreferencesDialog::metaObject() const
+{
+    return &staticMetaObject;
+}
+
+void *gnash::Kde4GuiPrefs::PreferencesDialog::qt_metacast(const char *_clname)
+{
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_gnash__Kde4GuiPrefs__PreferencesDialog))
+        return static_cast<void*>(const_cast< PreferencesDialog*>(this));
+    return QDialog::qt_metacast(_clname);
+}
+
+int gnash::Kde4GuiPrefs::PreferencesDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QDialog::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: savePreferences(); break;
+        }
+        _id -= 1;
     }
     return _id;
 }

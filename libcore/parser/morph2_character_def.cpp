@@ -1,6 +1,6 @@
 // morph2_character_def.cpp:   Load and render morphing shapes, for Gnash.
 //
-//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -194,19 +194,19 @@ gnash::render::draw_shape_character(this, inst);
 }
 
 
-void morph2_character_def::read(SWFStream& in, int tag_type,
+void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
         movie_definition& md)
 {
-    assert(tag_type == SWF::DEFINEMORPHSHAPE
-        || tag_type == SWF::DEFINEMORPHSHAPE2
-        || tag_type == SWF::DEFINEMORPHSHAPE2_);
+    assert(tag == SWF::DEFINEMORPHSHAPE
+        || tag == SWF::DEFINEMORPHSHAPE2
+        || tag == SWF::DEFINEMORPHSHAPE2_);
 
     rect bound1, bound2;
     bound1.read(in);
     bound2.read(in);
 
-    if (tag_type == SWF::DEFINEMORPHSHAPE2 ||
-            tag_type == SWF::DEFINEMORPHSHAPE2_)
+    if (tag == SWF::DEFINEMORPHSHAPE2 ||
+            tag == SWF::DEFINEMORPHSHAPE2_)
     {
         // TODO: Use these values.
         rect inner_bound1, inner_bound2;
@@ -229,7 +229,7 @@ void morph2_character_def::read(SWFStream& in, int tag_type,
     fill_style fs1, fs2;
     for (i = 0; i < fill_style_count; ++i)
     {
-        fs1.read(in, tag_type, md, &fs2);
+        fs1.read(in, tag, md, &fs2);
         m_shape1->addFillStyle(fs1);
         m_shape2->addFillStyle(fs2);
     }
@@ -238,14 +238,14 @@ void morph2_character_def::read(SWFStream& in, int tag_type,
     line_style ls1, ls2;
     for (i = 0; i < line_style_count; ++i)
     {
-        ls1.read_morph(in, tag_type, md, &ls2);
+        ls1.read_morph(in, tag, md, &ls2);
         m_shape1->addLineStyle(ls1);
         m_shape2->addLineStyle(ls2);
     }
 
-    m_shape1->read(in, tag_type, false, md);
+    m_shape1->read(in, tag, false, md);
     in.align();
-    m_shape2->read(in, tag_type, false, md);
+    m_shape2->read(in, tag, false, md);
 
     // Set bounds as read in *this* tags rather then
     // the one computed from shape_character_def parser

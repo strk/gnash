@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "filter_factory.h" // for Filters (composition of button_record)
 #include "sound_handler.h" // for sound_handler::sound_envelope in a vector..
 #include "DefineButtonSoundTag.h"
+#include "swf.h"
 
 #include <boost/scoped_ptr.hpp>
 #include <boost/cstdint.hpp> // for boost::uint64_t typedef
@@ -99,7 +100,7 @@ public:
 	/// @param endPos
 	///	Last stream offset available for a valid read
 	///
-	bool read(SWFStream& in, int tag_type, movie_definition& m,
+	bool read(SWFStream& in, TagType t, movie_definition& m,
             unsigned long endPos);
 
 	/// Return true if the button_record is valid
@@ -137,7 +138,7 @@ public:
 	///	The movie_definition this button action was read from
 	///
 	///
-	ButtonAction(SWFStream& in, int tag_type, unsigned long endPos,
+	ButtonAction(SWFStream& in, TagType t, unsigned long endPos,
             movie_definition& mdef);
 
 	/// Return true if this action should be triggered by the given event.
@@ -183,7 +184,7 @@ class DefineButtonTag : public character_def
 public:
 
     /// Load a DefineButtonTag.
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+    static void loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& r);
 
 	typedef std::vector<ButtonRecord> ButtonRecords; 
@@ -284,7 +285,7 @@ private:
 	/// Construct a DefineButtonTag (DefinitionTag)
     //
     /// This can only be constructed using a loader() function.
-	DefineButtonTag(SWFStream& in, movie_definition& m, tag_type tag);
+	DefineButtonTag(SWFStream& in, movie_definition& m, TagType tag);
 
 	/// Read a DEFINEBUTTON tag
 	void readDefineButtonTag(SWFStream& in, movie_definition& m);
@@ -312,7 +313,7 @@ class DefineButton2Tag
 {
 public:
     /// Load a DefineButton2 tag.
-    static void loader(SWFStream& in, tag_type tag, movie_definition& m, 
+    static void loader(SWFStream& in, TagType tag, movie_definition& m, 
             const RunInfo& r);
 };
 

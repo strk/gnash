@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,6 +54,7 @@
 //  2: informational messages
 //
 #define GNASH_PLUGIN_DEBUG 1
+//#define WRITE_FILE
 
 #include <sys/param.h>
 #include "plugin.h" 
@@ -704,7 +705,8 @@ nsPluginInstance::Write(NPStream* /*stream*/, int32_t /*offset*/, int32_t len,
 #ifdef WRITE_FILE
     write(_filefd, buffer, len);
 #endif
-    return write(_streamfd, buffer, len);
+    int written = write(_streamfd, buffer, len);
+    return written;
 }
 
 bool
@@ -921,7 +923,7 @@ nsPluginInstance::processPlayerRequest(gchar* buf, gsize linelen)
 
 #ifdef GNASH_XPI_PLUGIN
 static int
-getHome(string& gnashpath)
+getHome(std::string& gnashpath)
 {
     nsresult rv;
 

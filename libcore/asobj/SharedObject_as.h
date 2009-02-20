@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,7 +35,11 @@ class SharedObjectLibrary
 {
 public:
 
+    typedef std::map<std::string, SharedObject_as*> SoLib;
+
     SharedObjectLibrary(VM& vm);
+
+    ~SharedObjectLibrary();
 
     /// Return a local shared object with given name and with given root
     //
@@ -46,7 +50,7 @@ public:
     void markReachableResources() const;
 
     // Drop all library items
-    void clear() { _soLib.clear(); }
+    void clear();
 
 private:
 
@@ -60,8 +64,6 @@ private:
 
     /// Base SOL dir
     std::string _solSafeDir; 
-
-    typedef std::map<std::string, SharedObject_as*> SoLib;
 
     SoLib _soLib;
 };

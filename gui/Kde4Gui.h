@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,8 +23,10 @@
 #endif
 
 #include "gui.h"
+#include "rc.h"
 
 #include <QX11EmbedWidget>
+#include <QDialog>
 
 #ifdef RENDERER_OPENGL
 # error "OGL not supported yet for KDE4!"
@@ -39,6 +41,10 @@ class QMainWindow;
 class QMenuBar;
 class QMenu;
 class QRect;
+class QCheckBox;
+class QSlider;
+class QLineEdit;
+class QSpinBox;
 
 namespace gnash {
     class Kde4Gui;
@@ -62,6 +68,8 @@ public:
 
 public slots:
 
+    void properties();
+    void preferences();
     void play();
     void pause();
     void stop();
@@ -106,6 +114,8 @@ public:
     virtual void unsetFullscreen();
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
+    void showProperties();
+    void showPreferences();
     void quit();
 
     bool want_multiple_regions() { return true; }
@@ -159,8 +169,13 @@ private:
 
     // File Menu
     QMenu* fileMenu;
+    QAction* propertiesAction;
     QAction* quitAction;
     
+    // Edit Menu
+    QMenu* editMenu;
+    QAction* preferencesAction;
+
     // Movie Control Menu;
     QMenu* movieControlMenu;
     QAction* playAction;
@@ -174,6 +189,63 @@ private:
     QAction* fullscreenAction;
 
 };
+
+namespace Kde4GuiPrefs
+{
+
+class PreferencesDialog : public QDialog
+{
+Q_OBJECT
+
+public:
+    PreferencesDialog(QWidget* parent);
+
+private slots:
+    void savePreferences();
+
+private:
+    PreferencesDialog(const PreferencesDialog&);
+
+    // Logging tab widgets
+    QSlider* _verbositySlider;
+    QCheckBox* _logToFileToggle;
+    QLineEdit* _logFileName;
+    QCheckBox* _parserDumpToggle;
+    QCheckBox* _actionDumpToggle;
+    QCheckBox* _malformedSWFToggle;
+    QCheckBox* _ASCodingErrorToggle;
+    QCheckBox* _lcTraceToggle;
+
+    // Security tab widgets
+    QCheckBox* _localHostToggle;
+    QCheckBox* _localDomainToggle;
+    QCheckBox* _insecureSSLToggle;
+    QLineEdit* _solSandboxDir;
+    QCheckBox* _solReadOnlyToggle;
+    QCheckBox* _solLocalDomainToggle;
+    QCheckBox* _localConnectionToggle;
+
+    // Network tab widgets
+    QSpinBox* _streamsTimeoutScale;
+
+    // Media tab widgets
+    QCheckBox* _soundToggle;
+    QCheckBox* _saveStreamingMediaToggle;
+    QCheckBox* _saveLoadedMediaToggle;
+    QLineEdit* _mediaDir;
+
+    // Player tab widgets
+    QLineEdit* _versionText;
+    QLineEdit* _osText;
+    QLineEdit* _urlOpenerText;
+    QSpinBox* _librarySize;
+    QCheckBox* _startStoppedToggle;
+
+    // The config storage.
+    RcInitFile& _rcfile;
+};
+
+}
 
 }
 

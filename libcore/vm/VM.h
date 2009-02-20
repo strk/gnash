@@ -1,6 +1,6 @@
 // VM.h: the Virtual Machine class, for Gnash
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -90,73 +90,6 @@ public:
 
 	typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
-private:
-
-	friend class VmGcRoot;
-
-	/// Use VM::get() to access the singleton
-	//
-	/// Initializes the GC singleton
-	///
-	VM(int version, movie_root& root, VirtualClock& clock);
-
-	/// Should deinitialize the GC singleton
-	/// If it doesn't is just because it corrupts memory :)
-	~VM();
-
-	// We use an auto_ptr here to allow constructing
-	// the singleton when the init() function is called.
-	friend class std::auto_ptr<VM>;
-	static std::auto_ptr<VM> _singleton;
-
-	/// Stage associated with this VM
-	movie_root& _rootMovie;
-
-	/// The _global ActionScript object
-	boost::intrusive_ptr<as_object> _global;
-
-	/// Target SWF version
-	int _swfversion;
-
-	/// Set the _global Object for actions run by Virtual Machine
-	//
-	/// Will be called by the init() function
-	/// 
-	void setGlobal(as_object*);
-
-#ifdef GNASH_USE_GC
-	/// A vector of static GcResources (tipically used for built-in class constructors)
-	//
-	/// The resources in this list will always be marked as reachable
-	///
-	typedef std::vector< boost::intrusive_ptr<GcResource> > ResVect;
-	ResVect _statics;
-#endif
-
-	typedef std::map<unsigned int, as_c_function_ptr> FuncMap;
-	typedef std::map<unsigned int, FuncMap> AsNativeTable;
-	AsNativeTable _asNativeTable;
-
-	/// Mutable since it should not affect how the VM runs.
-	mutable string_table mStringTable;
-
-	/// Not mutable since changing this changes behavior of the VM.
-	std::auto_ptr<ClassHierarchy> mClassHierarchy;
-
-	/// A running execution thread.
-	Machine *mMachine;
-
-	VirtualClock& _clock;
-
-	SafeStack<as_value>	_stack;
-
-	CallStack _callStack;
-
-	/// Library of SharedObjects. Owned by the VM.
-	SharedObjectLibrary* _shLib;
-
-public:
-
 	SafeStack<as_value>& getStack()
 	{
 		return _stack;
@@ -188,6 +121,17 @@ public:
 
 	/// Return true if the singleton VM has been initialized
 	static bool isInitialized();
+
+    /// Resets any VM members that must be cleared before the GC cleans up
+    //
+    /// At present, this is:
+    /// - SharedObjectLibrary
+    ///
+    /// Ideally, this would be left to the VM's dtor, but we have no control
+    /// over destruction order at present.
+    /// It is assumed that this is the last VM function called before the
+    /// dtor.
+    void clear();
 
 	/// Get the singleton instance of the virtual machine
 	//
@@ -263,7 +207,12 @@ public:
 	/// Get a pointer to this VM's Root movie (stage)
 	movie_root& getRoot() const;
 
+    /// Return the Shared Object Library
+    //
+    /// The Shared Object Library is assumed to exist until VM::clear()
+    /// is called.
     SharedObjectLibrary& getSharedObjectLibrary() const {
+        assert(_shLib.get());
         return *_shLib;
     }
 
@@ -273,9 +222,6 @@ public:
 	/// Get a pointer to this VM's global ClassHierarchy object.
 	ClassHierarchy* getClassHierarchy() const { return mClassHierarchy.get(); }
 	
-	/// Get the SWF locale to use 
-	std::locale& getLocale() const;
-
 	/// Mark all reachable resources (for GC)
 	//
 	/// - root movie / stage (_rootMovie)
@@ -301,6 +247,71 @@ public:
 	// compile-time switches in callers
 	void addStatic(as_object*) {}
 #endif
+
+private:
+
+	friend class VmGcRoot;
+
+	/// Use VM::get() to access the singleton
+	//
+	/// Initializes the GC singleton
+	///
+	VM(int version, movie_root& root, VirtualClock& clock);
+
+	/// Should deinitialize the GC singleton
+	/// If it doesn't is just because it corrupts memory :)
+	~VM();
+
+	// We use an auto_ptr here to allow constructing
+	// the singleton when the init() function is called.
+	friend class std::auto_ptr<VM>;
+	static std::auto_ptr<VM> _singleton;
+
+	/// Stage associated with this VM
+	movie_root& _rootMovie;
+
+	/// The _global ActionScript object
+	boost::intrusive_ptr<as_object> _global;
+
+	/// Target SWF version
+	int _swfversion;
+
+	/// Set the _global Object for actions run by Virtual Machine
+	//
+	/// Will be called by the init() function
+	/// 
+	void setGlobal(as_object*);
+
+#ifdef GNASH_USE_GC
+	/// A vector of static GcResources (tipically used for built-in class constructors)
+	//
+	/// The resources in this list will always be marked as reachable
+	///
+	typedef std::vector< boost::intrusive_ptr<GcResource> > ResVect;
+	ResVect _statics;
+#endif
+
+	typedef std::map<unsigned int, as_c_function_ptr> FuncMap;
+	typedef std::map<unsigned int, FuncMap> AsNativeTable;
+	AsNativeTable _asNativeTable;
+
+	/// Mutable since it should not affect how the VM runs.
+	mutable string_table mStringTable;
+
+	/// Not mutable since changing this changes behavior of the VM.
+	std::auto_ptr<ClassHierarchy> mClassHierarchy;
+
+	/// A running execution thread.
+	Machine *mMachine;
+
+	VirtualClock& _clock;
+
+	SafeStack<as_value>	_stack;
+
+	CallStack _callStack;
+
+	/// Library of SharedObjects. Owned by the VM.
+    std::auto_ptr<SharedObjectLibrary> _shLib;
 
 };
 

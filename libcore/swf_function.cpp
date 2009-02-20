@@ -37,15 +37,13 @@ swf_function::~swf_function()
 {
 #ifndef GNASH_USE_GC
 	if ( _properties ) _properties->drop_ref();
-#endif //ndef GNASH_USE_GC
+#endif 
 }
 
-swf_function::swf_function(const action_buffer* ab,
-			as_environment* env,
+swf_function::swf_function(const action_buffer* ab, as_environment* env,
 			size_t start, const ScopeStack& scopeStack)
 	:
 	as_function(new as_object(getObjectInterface())),
-	//ctor(0),
 	m_action_buffer(ab),
 	m_env(env),
 	_scopeStack(scopeStack),
@@ -58,12 +56,14 @@ swf_function::swf_function(const action_buffer* ab,
 	assert(m_action_buffer);
 	assert( m_start_pc < m_action_buffer->size() );
 
-	init_member("constructor", as_value(as_function::getFunctionConstructor().get()));
+	init_member("constructor", 
+            as_value(as_function::getFunctionConstructor().get()));
 }
 
 /*private static*/
 Array_as* 
-swf_function::getArguments(swf_function& callee, const fn_call& fn, as_object* caller)
+swf_function::getArguments(swf_function& callee, const fn_call& fn,
+        as_object* caller)
 { 
 #ifndef GNASH_USE_GC
 	// We'll be storing the callee as_object into an as_value
@@ -98,21 +98,22 @@ struct TargetGuard {
 	as_environment& env;
 	character* from;
 	character* from_orig;
+
 	// @param ch : target to set temporarely
 	// @param och : original target to set temporarely
 	TargetGuard(as_environment& e, character* ch, character* och)
 		:
-		env(e)
+		env(e),
+        from(env.get_target()),
+        from_orig(env.get_original_target())
 	{
-		from = env.get_target();
-		from_orig = env.get_original_target();
-		//log_debug("TargetGuard set target of env %p from %s to %s", &e, from ? from->getTarget() : "<null>", ch ? ch->getTarget() : "<null>");
 		env.set_target(ch);
 		env.set_original_target(och);
 	}
+
+
 	~TargetGuard()
 	{
-		//log_debug("TargetGuard reset target of env %p to %s", &env, from ? from->getTarget() : "<null>");
 		env.set_target(from);
 		env.set_original_target(from_orig);
 	}
@@ -149,7 +150,7 @@ swf_function::operator()(const fn_call& fn)
 	log_debug("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
 	// Some features are version-dependant.
-	unsigned swfversion = VM::get().getSWFVersion();
+	unsigned swfversion = vm.getSWFVersion();
 	as_object *super = NULL;
 	if (swfversion > 5)
 	{
@@ -318,7 +319,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_GLOBAL)
 		{
 			// Put '_global' in a register.
-			as_object* global = VM::get().getGlobal();
+			as_object* global = vm.getGlobal();
 			//our_env->local_register(current_reg).set_as_object(global);
 			our_env->setRegister(current_reg, as_value(global));
 			current_reg++;
@@ -370,7 +371,6 @@ swf_function::operator()(const fn_call& fn)
 	// in case of problems (most interesting action limits)
 	try 
 	{
-		//ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
 		ActionExec exec(*this, *our_env, &result, fn.this_ptr.get());
 		exec();
 	}
@@ -381,7 +381,8 @@ swf_function::operator()(const fn_call& fn)
 	}
 	catch (std::exception& ex) // unexpected but we can tell what it is
 	{
-		log_debug("Unexpected exception from swf_function execution: %s", ex.what());
+		log_debug("Unexpected exception from swf_function execution: %s",
+                ex.what());
 		throw;
 	}
 	catch (...) // unexpected, unknown, but why not cleaning up...
@@ -407,7 +408,8 @@ void
 swf_function::markReachableResources() const
 {
 	// Mark scope stack objects
-	for (ScopeStack::const_iterator i=_scopeStack.begin(), e=_scopeStack.end(); i!=e; ++i)
+	for (ScopeStack::const_iterator i = _scopeStack.begin(),
+            e = _scopeStack.end(); i != e; ++i)
 	{
 		(*i)->setReachable();
 	}

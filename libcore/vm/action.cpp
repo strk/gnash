@@ -53,7 +53,7 @@ call_method(const as_value& method, as_environment* env, as_object* this_ptr,
         const movie_definition* callerDef)
 {
 	as_value val;
-	fn_call call(this_ptr, env, args);
+	fn_call call(this_ptr, *env, args);
 	call.super = super;
     call.callerDef = callerDef;
 

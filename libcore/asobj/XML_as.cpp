@@ -1,6 +1,6 @@
 // xml.cpp:  XML markup language support, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -221,6 +221,11 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
         return;
     }
     std::string name(it, end);
+    
+    if (name.empty()) {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
+    }
 
     // Point iterator to the character after the name.
     it = end;
@@ -365,7 +370,16 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
 
     // Knock off the "/>" of a self-closing tag.
     if (std::equal(endName - 1, endName + 1, "/>")) {
+        // This can leave endName before it, e.g when a self-closing tag is
+        // empty ("</>"). This must be checked before trying to construct
+        // a string!
         --endName;
+    }
+    
+    // If the tag is empty, the XML counts as malformed. 
+    if (it >= endName) {
+        _status = XML_UNTERMINATED_ELEMENT;
+        return;
     }
 
     std::string tagName(it, endName);
@@ -404,6 +418,9 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
             }
         }
         
+        // Do nothing more if there was an error in attributes parsing.
+        if (_status != XML_OK) return;
+
         for (Attributes::const_reverse_iterator i = attributes.rbegin(),
                 e = attributes.rend(); i != e; ++i) {
             childNode->setAttribute(i->first, i->second);
@@ -418,7 +435,8 @@ XML_as::parseTag(XMLNode_as*& node, const std::string& xml,
         return;
     }
 
-    // This may be xml.end(), which is okay.
+    // If we reach here, this is a closing tag.
+
     it = std::find(endName, xml.end(), '>');
 
     if (it == xml.end())
@@ -561,8 +579,13 @@ XML_as::parseXML(const std::string& xml)
         }
         else parseText(node, xml, it);
     }
-  
-    return;
+
+    // If everything parsed correctly, check that we've got back to the
+    // parent node. If not, there is a missing closing tag.
+    if (_status == XML_OK && node != this) {
+        _status = XML_MISSING_CLOSE_TAG;
+    }
+
 }
 
 bool

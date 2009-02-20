@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #define GNASH_SWF_DOINITACTIONTAG_H
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 #include "action_buffer.h" // for composition
 #include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
@@ -64,7 +64,7 @@ public:
         return true;
     }
 
-    static void doInitActionLoader(SWFStream& in, tag_type tag,
+    static void doInitActionLoader(SWFStream& in, TagType tag,
             movie_definition& m, const RunInfo& /*r*/)
     {
         in.ensureBytes(2);

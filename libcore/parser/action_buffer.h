@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -66,11 +66,6 @@ public:
 	///
 	void read(SWFStream& in, unsigned long endPos);
 
-	bool is_null() const
-	{
-		return (m_buffer.size() < 1 || m_buffer[0] == 0);
-	}
-
 	size_t size() const { return m_buffer.size(); }
 
 	boost::uint8_t operator[] (size_t off) const
@@ -98,52 +93,6 @@ public:
                 "1 byte remains in the buffer"));
         }
 		return reinterpret_cast<const char*>(&m_buffer[pc]);
-	}
-
-	/// Get a variable length 32-bit integer from the stream.
-	/// Store its length in the passed boost::uint8_t.
-	boost::uint32_t read_V32(size_t pc, boost::uint8_t& length) const
-	{
-	    const size_t buflen = m_buffer.size();
-	    const std::string err = _("Attempt to read outside action buffer");
-	    
-	    if (pc >= buflen) throw ActionParserException(err);
-
-		boost::uint32_t res = m_buffer[pc];
-		if (!(res & 0x00000080))
-		{
-			length = 1;
-			return res;
-		}
-
-	    if (pc + 1 >= buflen) throw ActionParserException(err);
-		res = (res & 0x0000007F) | (m_buffer[pc + 1] << 7);
-		if (!(res & 0x00004000))
-		{
-			length = 2;
-			return res;
-		}
-
-	    if (pc + 2 >= buflen) throw ActionParserException(err);
-		res = (res & 0x00003FFF) | (m_buffer[pc + 2] << 14);
-		if (!(res & 0x00200000))
-		{
-			length = 3;
-			return res;
-		}
-
-	    if (pc + 3 >= buflen) throw ActionParserException(err);
-		res = (res & 0x001FFFFF) | (m_buffer[pc + 3] << 21);
-		if (!(res & 0x10000000))
-		{
-			length = 4;
-			return res;
-		}
-
-	    if (pc + 4 >= buflen) throw ActionParserException(err);
-		res = (res & 0x0FFFFFFF) | (m_buffer[pc + 4] << 28);
-		length = 5;
-		return res;
 	}
 
     /// Get a pointer to the current instruction within the code

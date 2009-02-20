@@ -22,6 +22,7 @@
 #endif
 
 
+#include "GnashFileUtilities.h"
 #include "StreamProvider.h"
 #include "URL.h"
 #include "tu_file.h"
@@ -29,32 +30,25 @@
 #include "URLAccessManager.h"
 #include "log.h"
 #include "rc.h" // for rcfile
+#include "NamingPolicy.h"
 
 #include <cstdio>
 #include <map>
 #include <string>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
+namespace gnash {
 
-#if defined(_WIN32) || defined(WIN32)
-#	include <io.h>
-#	define dup _dup
-#else
-#include <unistd.h> // dup
-#endif
-
-namespace gnash
+StreamProvider::StreamProvider(std::auto_ptr<NamingPolicy> np)
+    :
+    _namingPolicy(np)
 {
-
-StreamProvider&
-StreamProvider::getDefaultInstance()
-{
-	static StreamProvider inst;
-	return inst;
 }
 
+
 std::auto_ptr<IOChannel>
-StreamProvider::getStream(const URL& url)
+StreamProvider::getStream(const URL& url, bool namedCacheFile) const
 {
 
     std::auto_ptr<IOChannel> stream;
@@ -79,7 +73,7 @@ StreamProvider::getStream(const URL& url)
 		else
 		{
             // check security here !!
-		    if ( ! URLAccessManager::allow(url) ) return stream;
+		    if (!URLAccessManager::allow(url)) return stream;
 
 			FILE *newin = std::fopen(path.c_str(), "rb");
 			if (!newin)  { 
@@ -92,10 +86,9 @@ StreamProvider::getStream(const URL& url)
 	}
 	else
 	{
-		std::string url_str = url.str();
-		const char* c_url = url_str.c_str();
-		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(c_url);
+		if (URLAccessManager::allow(url)) {
+			stream = NetworkAdapter::makeStream(url.str(), 
+                    namedCacheFile ? namingPolicy()(url) : "");
 		}
 
         // Will return 0 auto_ptr if not allowed.
@@ -105,7 +98,8 @@ StreamProvider::getStream(const URL& url)
 
 std::auto_ptr<IOChannel>
 StreamProvider::getStream(const URL& url, const std::string& postdata,
-                          const NetworkAdapter::RequestHeaders& headers)
+        const NetworkAdapter::RequestHeaders& headers, bool namedCacheFile)
+        const
 {
 
     if (url.protocol() == "file")
@@ -118,10 +112,9 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
         return getStream(url, postdata);
     }
 
-	std::string url_str = url.str();
-	const char* c_url = url_str.c_str();
 	if ( URLAccessManager::allow(url) ) {
-		return NetworkAdapter::makeStream(c_url, postdata, headers);
+		return NetworkAdapter::makeStream(url.str(), postdata, headers,
+                    namedCacheFile ? namingPolicy()(url) : "");
 	}
 
 	return std::auto_ptr<IOChannel>();
@@ -129,7 +122,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata,
 }
 
 std::auto_ptr<IOChannel>
-StreamProvider::getStream(const URL& url, const std::string& postdata)
+StreamProvider::getStream(const URL& url, const std::string& postdata,
+       bool namedCacheFile) const
 {
 
     std::auto_ptr<IOChannel> stream;
@@ -162,17 +156,16 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 	}
 	else
 	{
-		std::string url_str = url.str();
-		const char* c_url = url_str.c_str();
-
-		if ( URLAccessManager::allow(url) ) {
-			stream = NetworkAdapter::makeStream(c_url, postdata);
+		if (URLAccessManager::allow(url)) {
+			stream = NetworkAdapter::makeStream(url.str(), postdata,
+                    namedCacheFile ? namingPolicy()(url) : "");
 		}
         // Will return 0 auto_ptr if not allowed.
 		return stream;		
 
 	}
 }
+
 
 } // namespace gnash
 

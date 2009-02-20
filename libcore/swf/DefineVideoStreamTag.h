@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -71,6 +71,15 @@ namespace SWF {
 class DefineVideoStreamTag : public character_def
 {
 public:
+	
+    /// The undecoded video frames and its size, using the swf-frame number
+    /// as key
+	//
+	/// Elements of this vector are owned by this instance, and will be deleted 
+	/// at instance destruction time.
+	///
+	typedef std::vector<media::EncodedVideoFrame*> EmbeddedFrames;
+	
 
 	~DefineVideoStreamTag();
 
@@ -83,7 +92,7 @@ public:
 	/// This function is allowed to be called only *once* for each
 	/// instance of this class.
 	///
-	static void loader(SWFStream& in, SWF::tag_type tag, movie_definition& m,
+	static void loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
             const RunInfo& r);
 
 
@@ -94,7 +103,7 @@ public:
 	///
 	/// This function is allowed to be called zero or more times, as long
 	/// as readDefineVideoStream was read before.
-	void readDefineVideoFrame(SWFStream& in, SWF::tag_type tag,
+	void readDefineVideoFrame(SWFStream& in, SWF::TagType tag,
             movie_definition& m);
 
 	/// Return local video bounds in twips
@@ -182,14 +191,6 @@ private:
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
 	rect m_bound;
 
-	/// The undecoded video frames and its size, using the swf-frame number
-    /// as key
-	//
-	/// Elements of this vector are owned by this instance, and will be deleted 
-	/// at instance destruction time.
-	///
-	typedef std::vector<media::EncodedVideoFrame*> EmbeddedFrames;
-	
 	boost::mutex _video_mutex;
 	
 	EmbeddedFrames _video_frames;

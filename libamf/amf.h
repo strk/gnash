@@ -70,11 +70,11 @@ const boost::uint8_t TERMINATOR = 0x09;
 /// for the following value is bogus. Although the length field is a short, it
 /// seems silly to assume we'll ever see a string 65,000 characters long. Still,
 /// it makes sense to make this an adjustable thing.
-const int SANE_STR_SIZE = 1024;
+const int SANE_STR_SIZE = 65535;
 
 /// Binary representation of an ActionScript object.
 //
-/// AMF is used to send objects, wheather to a SharedObject .sol file,
+/// AMF is used to send objects, whether to a SharedObject .sol file,
 /// a memory based LocalConnection segment, or over an RTMP connection
 /// for streaming.
 ///
@@ -212,7 +212,7 @@ public:
     ///
     /// @return a binary AMF packet in big endian format (header,data)
     ///
-    static boost::shared_ptr<Buffer> encodeReference(const boost::uint8_t *data, size_t size);
+    static boost::shared_ptr<Buffer> encodeReference(boost::uint16_t index);
 
     /// Encode a Movie Clip (swf data) to its serialized representation.
     //

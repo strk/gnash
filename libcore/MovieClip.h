@@ -1,6 +1,6 @@
 // MovieClip.h:  Stateful live Sprite instance, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -349,7 +349,7 @@ public:
     ///
     character* get_character_at_depth(int depth);
 
-    character* add_empty_movieclip(const char* name, int depth);
+    character* add_empty_movieclip(const std::string& name, int depth);
 
     boost::intrusive_ptr<character> add_textfield(const std::string& name,
             int depth, int x, int y, float width, float height);

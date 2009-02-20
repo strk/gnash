@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ StreamSoundBlockTag::execute(MovieClip* m, DisplayList& /*dlist*/) const
 
 /* public static */
 void
-StreamSoundBlockTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+StreamSoundBlockTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& r)
 {
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19

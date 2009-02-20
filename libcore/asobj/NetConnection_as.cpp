@@ -1,6 +1,6 @@
 // NetConnection_as.cpp:  Open local connections for FLV files or URLs.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -370,7 +370,7 @@ HTTPRemotingHandler::advance()
         // the buffer is full, 2) when we have a "length in bytes" value
         // thas is satisfied
 
-        if(_connection->get_error())
+        if (_connection->bad())
         {
             log_debug("connection is in error condition, calling "
                     "NetConnection.onStatus");
@@ -394,8 +394,8 @@ HTTPRemotingHandler::advance()
 #endif
                 boost::int16_t si;
                 boost::uint16_t li;
-                boost::uint8_t *b = reply.data() + reply_start;
-                boost::uint8_t *end = reply.data() + reply.size();
+                const boost::uint8_t *b = reply.data() + reply_start;
+                const boost::uint8_t *end = reply.data() + reply.size();
 
                 // parse header
                 b += 2; // skip version indicator and client id
@@ -477,13 +477,19 @@ HTTPRemotingHandler::advance()
                             int ns = 1; // next slash position
                             while (ns<si-1 && *(b+ns) != '/') ++ns;
                             if ( ns >= si-1 ) {
-                                std::string msg(reinterpret_cast<char*>(b), si);
-                                log_error("NetConnection::call(): invalid reply message name (%s)", msg);
+                                std::string msg(
+                                        reinterpret_cast<const char*>(b), si);
+                                log_error("NetConnection::call(): invalid "
+                                        "reply message name (%s)", msg);
                                 break;
                             }
 
-                            std::string id(reinterpret_cast<char*>(b), ns);
-                            std::string methodName(reinterpret_cast<char*>(b+ns+1), si-ns-1);
+                            std::string id(reinterpret_cast<const char*>(b),
+                                    ns);
+
+                            std::string methodName(
+                                    reinterpret_cast<const char*>(b+ns+1),
+                                    si-ns-1);
 
                             b += si;
 
@@ -583,7 +589,12 @@ HTTPRemotingHandler::advance()
 #endif
         queued_count = 0;
 
-        _connection.reset(StreamProvider::getDefaultInstance().getStream(_url, postdata_str, _headers).release());
+        // TODO: it might be useful for a Remoting Handler to have a 
+        // StreamProvider member
+        const StreamProvider& sp =
+            _nc.getVM().getRoot().runInfo().streamProvider();
+
+        _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
 
         _postdata.resize(6);
 #ifdef GNASH_DEBUG_REMOTING
@@ -946,14 +957,18 @@ NetConnection_as::getStream(const std::string& name)
 {
     const RunInfo& ri = _vm.getRoot().runInfo();
 
-    StreamProvider& streamProvider = ri.streamProvider();
+    const StreamProvider& streamProvider = ri.streamProvider();
 
     // Construct URL with base URL (assuming not connected to RTMP server..)
     // TODO: For RTMP return the named stream from an existing RTMP connection.
     // If name is a full or relative URL passed from NetStream.play(), it
     // must be constructed against the base URL, not the NetConnection uri,
     // which should always be null in this case.
-    return streamProvider.getStream(URL(name, ri.baseURL()));
+    const URL url(name, ri.baseURL());
+
+    const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+    return streamProvider.getStream(url, rcfile.saveStreamingMedia());
 
 }
 

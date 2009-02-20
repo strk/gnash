@@ -1,6 +1,6 @@
 // ActionExec.cpp:  ActionScript execution, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -285,7 +285,7 @@ ActionExec::operator() ()
                 break;
             }
 
-            ash.execute(static_cast<SWF::action_type>(action_id), *this);
+            ash.execute(static_cast<SWF::ActionType>(action_id), *this);
 
 #if 1 // See bugs: #20974, #21069, #20996.
 

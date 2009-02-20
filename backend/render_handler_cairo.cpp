@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -449,7 +449,8 @@ public:
     }
   }
 
-  virtual void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m, const rect* bounds)
+  virtual void drawVideoFrame(GnashImage* baseframe, const SWFMatrix* m,
+          const rect* bounds, bool /*smooth*/)
   {
 
     if (baseframe->type() == GNASH_IMAGE_RGBA)
@@ -627,25 +628,24 @@ public:
     _stage_mat.y0 = yoff;
   }
     
-  virtual void  draw_line_strip(const boost::int16_t coords[], int vertex_count,
-      const rgba& color, const SWFMatrix& mat)
+  virtual void drawLine(const std::vector<point>& coords, const rgba& color,
+          const SWFMatrix& mat)
   {
+    
+    if (coords.empty()) return;
+
     CairoScopeMatrix mat_transformer(_cr, mat);
 
-    if (vertex_count < 2) {
-      return;
-    }
-
-    double x, y;
-    x = coords[0];
-    y = coords[1];
+    std::vector<point>::const_iterator i = coords.begin();
+    
+    double x = i->x, y = i->y;
     snap_to_half_pixel(_cr, x, y);
 
     cairo_move_to(_cr, x, y);
 
-    for (int i = 2; i < vertex_count * 2; i += 2) {
-      x = coords[i];
-      y = coords[i+1];
+    for (std::vector<point>::const_iterator e = coords.end();
+            i != e; ++i) {
+      double x = i->x, y = i->y;
       snap_to_half_pixel(_cr, x, y);
       cairo_line_to(_cr, x, y);
     }
@@ -934,9 +934,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
                   
   virtual void draw_shape_character(shape_character_def *def, 
     const SWFMatrix& mat,
-    const cxform& cx,
-    const std::vector<fill_style>& fill_styles,
-    const std::vector<line_style>& line_styles)
+    const cxform& cx)
   {
         
     const PathVec& path_vec = def->get_paths();
@@ -959,6 +957,9 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
+    const std::vector<fill_style>& fill_styles = def->get_fill_styles();
+    const std::vector<line_style>& line_styles = def->get_line_styles();
+
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;
       

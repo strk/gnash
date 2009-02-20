@@ -236,7 +236,7 @@ public:
     virtual void execute()
     {
         as_environment env(func->getVM()); env.set_target(target.get());
-        func->call(fn_call(target.get(), &env));
+        func->call(fn_call(target.get(), env));
     }
 
 #ifdef GNASH_USE_GC

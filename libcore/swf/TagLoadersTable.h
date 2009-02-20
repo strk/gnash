@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include "swf.h"
 
 #include <map>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -37,7 +38,7 @@ namespace gnash {
 namespace SWF {
 
 /// Table of SWF tags loaders
-class TagLoadersTable
+class TagLoadersTable : boost::noncopyable
 {
 public:
 
@@ -48,23 +49,23 @@ public:
 	/// 'm' a pointer to the movie (or sprite) being read
 	///
 	typedef void (*loader_function)(
-        SWFStream& input, tag_type type, movie_definition& m, const RunInfo& r);
+        SWFStream& input, TagType type, movie_definition& m, const RunInfo& r);
 
 	/// \brief
 	/// Get a pointer to the loader_function for the
-	/// specified SWF::tag_type.
+	/// specified SWF::TagType.
 	//
 	/// @return false if no loader is associated with the tag.
 	///
-	bool get(tag_type t, loader_function* lf);
+	bool get(TagType t, loader_function* lf);
 
 	/// \brief
-	/// Register a loader for the specified SWF::tag_type.
+	/// Register a loader for the specified SWF::TagType.
 	//
 	/// @return false if a loader is already registered
 	///               for the given tag
 	///
-	bool register_loader(tag_type t, loader_function lf);
+	bool register_loader(TagType t, loader_function lf);
 
 	/// \brief
 	/// Return a reference to the singleton instance
@@ -74,7 +75,7 @@ public:
 private:
 
 	/// The container being used for the table
-	typedef std::map<int, loader_function> container;
+	typedef std::map<SWF::TagType, loader_function> container;
 
 	container _tag_loaders;
 
@@ -85,17 +86,6 @@ private:
 	{}
 
 	~TagLoadersTable() {}
-
-	TagLoadersTable(const TagLoadersTable& tl)
-		:
-		_tag_loaders(tl._tag_loaders)
-	{}
-
-	TagLoadersTable& operator=(const TagLoadersTable& tl)
-	{
-		_tag_loaders = tl._tag_loaders;
-		return *this;
-	}
 
 };
 

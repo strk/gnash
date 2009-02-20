@@ -31,8 +31,8 @@ check(Error.prototype.hasOwnProperty("toString"));
 check(Error.prototype.hasOwnProperty("message"));
 #endif
 
-xcheck_equals(typeof(Error.prototype.message), "string");
-xcheck_equals(typeof(Error.prototype.name), "string");
+check_equals(typeof(Error.prototype.message), "string");
+check_equals(typeof(Error.prototype.name), "string");
 
 var errorObj = new Error;
 
@@ -62,18 +62,23 @@ check_equals(e.message, "7.8898");
 
 // Is there any sense in this?
 e = new Error(new Color);
-xcheck_equals(typeof(e.toString()), "object");
+check_equals(typeof(e.toString()), "object");
 check_equals(e.toString().toString(), "[object Object]");
 check_equals(e.name, "Error");
-xcheck_equals(typeof(e.message), "object");
+check_equals(typeof(e.message), "object");
 
 e.name = "ANewName";
 check_equals(e.name, "ANewName");
 e.message = "New message";
 check_equals(e.message, "New message");
 
+e = new Error;
+e.message = "stringo";
+check_equals(e.message, "stringo");
+check_equals(e.name, "Error");
+
 
 e = Error("NameOfSecondError");
-xcheck_equals(typeof(e), "undefined");
+check_equals(typeof(e), "undefined");
 
 totals();

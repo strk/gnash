@@ -99,12 +99,14 @@ public:
 	{
 		if ( skipRebinding ) return _ptr;
 
-		checkDangling(); // set _ptr to NULL and _tgt to original target if destroyed
+        // set _ptr to NULL and _tgt to original target if destroyed
+		checkDangling(); 
 		if ( _ptr ) return _ptr;
 		else return find_character_by_target(_tgt);
 	}
 
-	/// Get the sprite target, either current (if not dangling) or bounded-to one.
+	/// Get the sprite target, either current (if not dangling) or
+    /// bound one.
 	std::string getTarget() const;
 
 	/// Return true if this sprite is dangling

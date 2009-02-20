@@ -1,6 +1,6 @@
 // as_function.cpp:  ActionScript Functions, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -78,7 +78,10 @@ static as_object* getFunctionPrototype()
 
 		VM::get().addStatic(proto.get());
 
-		int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; 
+		const int flags = as_prop_flags::dontDelete | 
+                          as_prop_flags::dontEnum | 
+                          as_prop_flags::onlySWF6Up; 
+
 		proto->init_member("apply", new builtin_function(function_apply), flags);
 		proto->init_member("call", new builtin_function(function_call), flags);
 	}
@@ -140,10 +143,10 @@ as_function::extends(as_function& superclass)
 	as_object* newproto = new as_object(superclass.getPrototype().get());
 	newproto->init_member(NSV::PROP_uuPROTOuu, superclass.getPrototype().get());
 
-	if ( VM::get().getSWFVersion() > 5 )
-	{
-		newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass); 
-	}
+    if (_vm.getSWFVersion() > 5) {
+        const int flags = as_prop_flags::dontEnum;
+        newproto->init_member(NSV::PROP_uuCONSTRUCTORuu, &superclass, flags); 
+    }
 
 	init_member(NSV::PROP_PROTOTYPE, as_value(newproto));
 }
@@ -183,10 +186,13 @@ as_function::getFunctionConstructor()
 void
 function_class_init(as_object& global)
 {
-	boost::intrusive_ptr<builtin_function> func=as_function::getFunctionConstructor();
+	boost::intrusive_ptr<builtin_function> func = 
+        as_function::getFunctionConstructor();
 
 	// Register _global.Function, only visible for SWF6 up
-	int swf6flags = as_prop_flags::dontEnum|as_prop_flags::dontDelete|as_prop_flags::onlySWF6Up;
+	int swf6flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::dontDelete | 
+                    as_prop_flags::onlySWF6Up;
 	global.init_member("Function", func.get(), swf6flags);
 
 }
@@ -194,10 +200,10 @@ function_class_init(as_object& global)
 as_value
 function_apply(const fn_call& fn)
 {
-	//int pushed=0; // new values we push on the stack
 
 	// Get function body 
-	boost::intrusive_ptr<as_function> function_obj = ensureType<as_function>(fn.this_ptr);
+	boost::intrusive_ptr<as_function> function_obj =
+        ensureType<as_function>(fn.this_ptr);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -209,20 +215,19 @@ function_apply(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror (_("Function.apply() called with no args"));
 		);
+        new_fn_call.this_ptr = new as_object;
 	}
 	else
 	{
 		// Get the object to use as 'this' reference
-		new_fn_call.this_ptr = fn.arg(0).to_object();
-		if (!new_fn_call.this_ptr )
-		{
-			// ... or recycle this function's call 'this' pointer
-			// (most likely the Function instance)
-			new_fn_call.this_ptr = fn.this_ptr;
-		}
+		as_object* obj = fn.arg(0).to_object().get();
 
+        if (!obj) obj = new as_object; 
+
+        new_fn_call.this_ptr = obj;
+
+		// Check for second argument ('arguments' array)
 		if ( fn.nargs > 1 )
-		// we have an 'arguments' array
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 				if ( fn.nargs > 2 )
@@ -247,7 +252,7 @@ function_apply(const fn_call& fn)
 				goto call_it;
 			}
 
-			boost::intrusive_ptr<Array_as> arg_array = \
+			boost::intrusive_ptr<Array_as> arg_array = 
 					boost::dynamic_pointer_cast<Array_as>(arg1);
 
 			if ( ! arg_array )
@@ -257,23 +262,18 @@ function_apply(const fn_call& fn)
 						" is of type %s, with value %s"
 						" (expected array)"
 						" - considering as call with no args"),
-						fn.arg(1).typeOf(),
-						fn.arg(1).to_string().c_str());
+						fn.arg(1).typeOf(), fn.arg(1).to_string());
 				);
 				goto call_it;
 			}
 
 			unsigned int nelems = arg_array->size();
 
-			//log_debug(_("Function.apply(this_ref, array[%d])"), nelems);
 			for (unsigned int i=0; i<nelems; ++i)
 			{
 				new_fn_call.pushArg(arg_array->at(i));
-				//pushed++;
 			}
 
-			//new_fn_call.set_offset(fn.env().get_top_index());
-			//new_fn_call.nargs=nelems;
 		}
 	}
 
@@ -282,10 +282,7 @@ function_apply(const fn_call& fn)
 	// Call the function 
 	as_value rv = function_obj->call(new_fn_call);
 
-	// Drop additional values we pushed on the stack 
-	//fn.env().drop(pushed);
-
-        return rv;
+    return rv;
 }
 
 as_value
@@ -320,7 +317,8 @@ function_call(const fn_call& fn)
 			// 'object' but when compared to undefined matches !!
 			// See actionscript.all/Function.as
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("First argument to Function.call(%s) doesn't cast to object. "
+			log_aserror(_("First argument to Function.call(%s) doesn't "
+                "cast to object. "
 				"Gnash will keep the current 'this' pointer as it is, "
 				"but this is known to not be the correct way to handle "
 				"such a malformed call."), this_val);
@@ -330,15 +328,16 @@ function_call(const fn_call& fn)
 		{
 			new_fn_call.this_ptr = this_ptr;
 			as_object* proto = this_ptr->get_prototype().get();
-                        if ( proto )
-                        {
-                                new_fn_call.super = this_ptr->get_super();
-                        }
-                        else
-                        {
-                                // TODO: check this !
-                                log_debug("No prototype in 'this' pointer passed to Function.call");
-                                new_fn_call.super = function_obj->get_super();
+            if ( proto )
+            {
+                    new_fn_call.super = this_ptr->get_super();
+            }
+            else
+            {
+                // TODO: check this !
+                log_debug("No prototype in 'this' pointer "
+                        "passed to Function.call");
+                new_fn_call.super = function_obj->get_super();
 			}
 		}
 		new_fn_call.drop_bottom();
@@ -347,16 +346,12 @@ function_call(const fn_call& fn)
 	// Call the function 
 	return (*function_obj)(new_fn_call);
 
-	//log_debug(_("at function_call exit, stack: \n")); fn.env->dump_stack();
-
-	//log_debug(_("%s: tocheck \n"), __FUNCTION__);
 }
 
 boost::intrusive_ptr<as_object>
-as_function::constructInstance( as_environment& env,
+as_function::constructInstance(as_environment& env,
 	std::auto_ptr< std::vector<as_value> > args)
 {
-//	GNASH_REPORT_FUNCTION;
 
 #ifndef GNASH_USE_GC
 	assert(get_ref_count() > 0);
@@ -369,39 +364,43 @@ as_function::constructInstance( as_environment& env,
 	as_value us;
 	bool has_proto = false;
 	get_member(NSV::PROP_PROTOTYPE, &us);
-	if (!us.is_undefined())
+	
+    if (!us.is_undefined())
 	{
 		has_proto = true;
 	}
 
-        // a built-in class takes care of assigning a prototype
-	// TODO: change this
-        if ( isBuiltin() )
-	{
-
+    // a built-in class takes care of assigning a prototype
+    // TODO: change this
+    if ( isBuiltin() )
+    {
 		IF_VERBOSE_ACTION (
-		log_action(_("it's a built-in class"));
-		);
+            log_action(_("it's a built-in class"));
+		)
 
-		fn_call fn(NULL, &env, args);
+		fn_call fn(0, env, args);
 		as_value ret;
+
 		try {
 			ret = call(fn);
-			//newobj = ret.to_object();
-		} catch (std::exception& ex) {
-			log_debug("Native function called as constructor threw exception: %s", ex.what());
-			//newobj = new as_object();
+		}
+        catch (GnashException& ex) {
+            // Catching a std::exception here can mask all sorts of bad 
+            // behaviour, as (for instance) a poorly constructed string may
+            // smash the stack, throw and exception, but not abort.
+            // This is very effective at confusing debugging tools.
+            // We only throw GnashExceptions. A std::bad_alloc may also be
+            // reasonable, but anything else shouldn't be caught here.
+			log_debug("Native function called as constructor threw exception: "
+                    "%s", ex.what());
 		}
 
-		if ( ret.is_object() )
-		{
-			newobj = ret.to_object();
-		}
-		else 
-		{
+		if (ret.is_object()) newobj = ret.to_object();
+		else {
 			log_debug("Native function called as constructor returned %s", ret);
 			newobj = new as_object();
 		}
+
 		assert(newobj); // we assume builtin functions do return objects !!
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
@@ -410,12 +409,13 @@ as_function::constructInstance( as_environment& env,
 		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-		if ( swfversion < 7 ) // && swfversion > 5 ?
+        // Also for SWF5+ only?
+		if (swfversion < 7) 
 		{
 			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}
 
-        }
+    }
 	else
 	{
 		// Set up the prototype.
@@ -456,7 +456,7 @@ as_function::constructInstance( as_environment& env,
 		// Call the actual constructor function; new_obj is its 'this'.
 
 		// We don't need the function result.
-		fn_call fn(newobj.get(), &env, args, super);
+		fn_call fn(newobj.get(), env, args, super);
 		call(fn);
 	}
 

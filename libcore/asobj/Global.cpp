@@ -1,6 +1,6 @@
 // Global.cpp:  Global ActionScript class setup, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 #include "Color_as.h"
 #include "ContextMenu.h"
 #include "CustomActions.h"
-#include "Date.h" // for registerDateNative
+#include "Date_as.h" // for registerDateNative
 #include "Error_as.h"
 #include "Global.h"
 #include "String_as.h"
@@ -73,6 +73,7 @@
 
 #include <limits> // for numeric_limits<double>::infinity
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
@@ -352,8 +353,7 @@ as_global_parsefloat(const fn_call& fn)
 as_value
 as_global_parseint(const fn_call& fn)
 {
-    // assert(fn.nargs == 2 || fn.nargs == 1);
-    if (fn.nargs < 1) {
+    if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("%s needs at least one argument"), __FUNCTION__);
         )
@@ -366,114 +366,76 @@ as_global_parseint(const fn_call& fn)
         }
     )
 
-    const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
     const std::string& expr = fn.arg(0).to_string();
 
-    bool negative = false;
-    int base = 0;
-
-    std::string::const_iterator it = expr.begin();
-
-    // Try hexadecimal first
-    if (expr.substr(0, 2) == "0x" || expr.substr(0, 2) == "0X")
-    {
-        base = 16;
-        it += 2;
-        
-        if (*it == '-')
-        {
-            negative = true;
-            it++;
-        }
-        else if (*it == '+') 
-        {
-            it++;
-        }
-    }
-    // Either octal or decimal.
-    else if (*it == '0' || *it == '-' || *it == '+')
-    {
-
-        base = 8;
-
-        // Check for negative and move to the next digit
-        if (*it == '-')
-        {
-            negative = true;
-            it++;
-        }
-        else if (*it == '+') it++;
-        
-        if (*it != '0') base = 10;
-        
-        // Check for expectional case "-0x" or "+0x", which
-        // return NaN
-        else if (std::toupper(*(it + 1)) == 'X')
-        {
-            as_value rv;
-            rv.set_nan();
-            return rv;
-        }
-        
-        // Check from the current position for non-octal characters;
-        // it's decimal in that case.
-        else if (expr.find_first_not_of("01234567", it - expr.begin()) !=
-            std::string::npos)
-        {
-            base = 10;
-        }
-    }
-    // Everything else is decimal.
-    else
-    {
-        base = 10;
-        
-        // Skip leading whitespace
-        while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r')
-        {
-            ++it;
-        }
-        if (*it == '-')
-        {
-            negative = true;
-            it++;
-        }
-        else if (*it == '+') it++;
-    }    
-
-    // After all that, a second argument specifies the base.
+    // A second argument specifies the base.
     // Parsing still starts after any positive/negative 
     // sign or hex identifier (parseInt("0x123", 8) gives
     // 83, not 0; parseInt(" 0x123", 8) is 0), which is
     // why we do this here.
+    size_t base;
     if (fn.nargs > 1)
     {
-        base = (fn.arg(1).to_int());
+        base = fn.arg(1).to_int();
     
         // Bases from 2 to 36 are valid, otherwise return NaN
-            if (base < 2 || base > 36)
-            {
-                as_value rv;
-                rv.set_nan();
-                return rv;
-            }
-          
+        if (base < 2 || base > 36) return as_value(NaN);
+    }
+    else
+    {
+        /// No radix specified, so try parsing as octal or hexadecimal
+        try {
+            double d;
+            if (as_value::parseNonDecimalInt(expr, d, false)) return d;
+        }
+        catch (boost::bad_lexical_cast&)
+        {
+            return as_value(NaN);
+        }
+
+        /// The number is not hex or octal, so we'll assume it's base-10.
+        base = 10;
+
+    }
+
+    std::string::const_iterator it = expr.begin();
+
+    // Check for expectional case "-0x" or "+0x", which
+    // return NaN
+    if ((expr.length() > 2) && (*it == '-' || *it == '+') &&
+            *(it + 1) == '0' && std::toupper(*(it + 2)) == 'X') {
+        return as_value(NaN);
+    }
+    
+    // Try hexadecimal first
+    if (expr.substr(0, 2) == "0x" || expr.substr(0, 2) == "0X") it += 2;
+    else {
+        // Skip leading whitespace
+        while(*it == ' ' || *it == '\n' || *it == '\t' || *it == '\r') {
+            ++it;
+        }
+        if (it == expr.end()) return as_value(NaN);
+    }    
+
+    bool negative = false;
+    if (*it == '-' || *it == '+')
+    {
+        if (*it == '-') negative = true;
+        
+        it++;
+        if (it == expr.end()) return as_value(NaN);
     }
     
     // Now we have the base, parse the digits. The iterator should
     // be pointing at the first digit.
     
+    const std::string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
     // Check to see if the first digit is valid, otherwise 
     // return NaN.
-    int digit = digits.find(toupper(*it));
+    std::string::size_type digit = digits.find(toupper(*it));
 
-    if (digit >= base || digit < 0)
-    {
-        as_value rv;
-        rv.set_nan();
-        return rv;
-    }
+    if (digit >= base || digit == std::string::npos) return as_value(NaN);
 
     // The first digit was valid, so continue from the present position
     // until we reach the end of the string or an invalid character,
@@ -483,17 +445,14 @@ as_global_parseint(const fn_call& fn)
     ++it;
     
     while (it != expr.end() && (digit = digits.find(toupper(*it))) < base
-            && digit >= 0)
+            && digit != std::string::npos)
     {
         result = result * base + digit;
         ++it;
     }
 
-    if (negative)
-    result = -result;
-    
     // Now return the parsed string as an integer.
-    return as_value(result);
+    return negative ? as_value(-result) : as_value(result);
 }
 
 // ASSetPropFlags function
@@ -515,14 +474,8 @@ as_global_assetpropflags(const fn_call& fn)
     IF_VERBOSE_ASCODING_ERRORS(
     if (fn.nargs > 4)
             log_aserror(_("%s has more than four arguments"), __FUNCTION__);
-#if 0 // it is perfectly legal to have 4 args in SWF5 it seems..
-    if (version == 5 && fn.nargs == 4)
-            log_aserror(_("%s has four arguments in a SWF version 5 movie"), __FUNCTION__);
-#endif
     )
     
-    // ASSetPropFlags(obj, props, n, allowFalse=false)
-
     // object
     boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
     if ( ! obj )
@@ -539,14 +492,14 @@ as_global_assetpropflags(const fn_call& fn)
 
     const as_value& props = fn.arg(1);
 
-    const int flagsMask = ( as_prop_flags::dontEnum |
-                            as_prop_flags::dontDelete |
-                            as_prop_flags::readOnly |
-                            as_prop_flags::onlySWF6Up |
-                            as_prop_flags::ignoreSWF6 |
-                            as_prop_flags::onlySWF7Up |
-                            as_prop_flags::onlySWF8Up |
-                            as_prop_flags::onlySWF9Up);
+    const int flagsMask = as_prop_flags::dontEnum |
+                          as_prop_flags::dontDelete |
+                          as_prop_flags::readOnly |
+                          as_prop_flags::onlySWF6Up |
+                          as_prop_flags::ignoreSWF6 |
+                          as_prop_flags::onlySWF7Up |
+                          as_prop_flags::onlySWF8Up |
+                          as_prop_flags::onlySWF9Up;
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,
@@ -558,9 +511,9 @@ as_global_assetpropflags(const fn_call& fn)
     // except it sets the attributes to false. The
     // set_false bitmask is applied before set_true is applied
 
-    // ASSetPropFlags was exposed in Flash 5, however the fourth argument 'set_false'
-    // was not required as it always defaulted to the value '~0'. 
-    const int setFalse = (fn.nargs < 4 ? 0 : int(fn.arg(3).to_number())) &
+    // ASSetPropFlags was exposed in Flash 5, however the fourth argument
+    // 'set_false' was not required as it always defaulted to the value '~0'. 
+    const int setFalse = (fn.nargs < 4 ? 0 : fn.arg(3).to_int()) &
         flagsMask;
 
     obj->setPropFlags(props, setFalse, setTrue);
@@ -574,18 +527,13 @@ as_value
 as_global_asnative(const fn_call& fn)
 {
 
-    // Note: it's possible for 'this' to be undefined in ActionScript,
-    // which would make this call return undefined. TODO: test it in
-    // the testsuite! It's not even certain whether Gnash has implemented
-    // an undefined this pointer.
-    boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
-
     as_value ret;
 
     if (fn.nargs < 2)
     {
         IF_VERBOSE_ASCODING_ERRORS(    
-        log_aserror(_("ASNative(%s): needs at least two arguments"), fn.dump_args());
+        log_aserror(_("ASNative(%s): needs at least two arguments"),
+            fn.dump_args());
         )
         return ret;
     }
@@ -611,7 +559,7 @@ as_global_asnative(const fn_call& fn)
     const unsigned int x = static_cast<unsigned int>(sx);
     const unsigned int y = static_cast<unsigned int>(sy);
 
-    VM& vm = ptr->getVM();
+    VM& vm = fn.getVM();
     as_function* fun = vm.getNative(x, y);
     if ( ! fun ) {
         log_debug(_("No ASnative(%d, %d) registered with the VM"), x, y);
@@ -799,14 +747,15 @@ registerNatives(as_object& global)
     vm.registerNative(timer_clearinterval, 250, 1);
 
     registerSelectionNative(global);
-    registerDateNative(global);
     registerColorNative(global);
     registerMathNative(global);
     registerSystemNative(global);
     registerStageNative(global);
     registerSharedObjectNative(global);
 
+    AsBroadcaster::registerNative(global);
     TextFormat_as::registerNative(global);
+    Date_as::registerNative(global);
     Mouse_as::registerNative(global);
 
     // LoadableObject has natives shared between LoadVars and XML, so 

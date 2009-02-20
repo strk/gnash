@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+ *   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -369,7 +369,14 @@ main(int /*argc*/, char** /*argv*/)
 	// Check hitdetector bounds and reactions on mouse movement 
 	//--------------------------------------------------------------
 
-	typedef struct IntPoint { int x; int y; IntPoint(int nx, int ny) : x(nx), y(ny) {} };
+	struct IntPoint {
+        int x;
+        int y;
+        IntPoint(int nx, int ny)
+            :
+            x(nx), y(ny)
+        {}
+    };
 
 	IntPoint c1s(6, 346); // top-right of first yellow circle (in when small)
 	IntPoint c1b(16, 329); // top-right of first yellow circle (in when big, out when small)
@@ -728,7 +735,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Upper-On_09_stroke
 	// AGG fails rendering a white stroke on the red background.
 	// Cairo succeeds.
-	xcheck_pixel(xo + (20*scale), yo + (15*scale), 2, red, 2);
+	check_pixel(xo + (20*scale), yo + (15*scale), 2, red, 2);
 	// Upper-Right
 	check_pixel(xo + (35*scale), yo + (15*scale), 2, red, 2);
 
@@ -749,7 +756,7 @@ main(int /*argc*/, char** /*argv*/)
 	// On the 0-9 stroke, out of fill 
 	// AGG fails rendering a white stroke on the red background.
 	// Cairo succeeds.
-	xcheck_pixel(xo + (20*scale), yo + (25*scale), 3, white, 2);
+	check_pixel(xo + (20*scale), yo + (25*scale), 3, white, 2);
 
 	//----------------------------------------------------------
 	// TODO: check startDrag/stopDrag on the hit detector

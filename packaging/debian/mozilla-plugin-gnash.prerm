@@ -5,7 +5,7 @@ set -e
 case "$1" in
         remove|upgrade|deconfigure)
                 for p in iceape iceweasel mozilla firefox xulrunner midbrowser; do 
-                       update-alternatives --remove "$p-flashplugin" /usr/lib/gnash/libgnashplugin.so;
+                       update-alternatives --remove "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so;
                         [ `update-alternatives --list "$p-flashplugin" | wc -l` = 0 ]  && \
                                 update-alternatives --remove-all "$p-flashplugin"
                 done
@@ -15,7 +15,7 @@ case "$1" in
 	           dpkg --compare-versions "$2" "<<" 0.8.1~trunk.070802-0ubuntu5
 		then 
 		   for p in iceape iceweasel mozilla firefox xulrunner midbrowser; do 
-                        update-alternatives --remove "$p-flashplugin" /usr/lib/gnash/libgnashplugin.so;
+                        update-alternatives --remove "$p-flashplugin" /usr/lib/mozilla/plugins/libgnashplugin.so;
                         [ `update-alternatives --list "$p-flashplugin" | wc -l` = 0 ]  && \
                                 update-alternatives --remove-all "$p-flashplugin"
 		   done

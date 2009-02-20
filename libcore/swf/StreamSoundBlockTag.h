@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #endif
 
 #include "ControlTag.h" // for inheritance
-#include "swf.h" // for tag_type definition
+#include "swf.h" // for TagType definition
 
 #include <boost/cstdint.hpp> // for boost::uint16_t and friends
  
@@ -67,7 +67,7 @@ public:
 	void execute(MovieClip* m, DisplayList& dlist) const;
 
 	/// Load an SWF::SOUNDSTREAMBLOCK (19) tag.
-	static void loader(SWFStream& in, tag_type tag, movie_definition& m,
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
 	/// Not a "state" (DisplayList?) tag, do doesn't need to provide

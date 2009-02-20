@@ -472,6 +472,7 @@ public:
     ///
     /// @return A reference to this Element.
     Element &makeReference();
+    Element &makeReference(boost::uint16_t index);
 
     /// \brief Make this Element a Property with an Object Reference as the value.
     ///
@@ -621,6 +622,16 @@ public:
     /// @return double value.
     double to_number() const;
 
+    /// \brief Cast the data in this Element to a short (2 bytes) value.
+    ///
+    /// @return short (2 bytes) value.
+    boost::uint16_t to_short() const;
+
+    /// \brief Cast the data in this Element to an integer (4 bytes) value.
+    ///
+    /// @return integer (4 bytes) value.
+    boost::uint32_t to_integer() const;
+
     /// \brief Cast the data in this Element to an ASCII string value.
     ///
     /// @return A NULL terminated ASCII string.
@@ -692,6 +703,8 @@ public:
     /// @return nothing.
     void addProperty(boost::shared_ptr<Element> el) { _properties.push_back(el); };
 
+    void clearProperties() { return _properties.clear(); };
+
     /// \brief Get a smart pointer to the Element for this Property.
     ///
     /// @return A smart pointer to the Element for this Property
@@ -711,8 +724,13 @@ public:
     ///		This encodes this Element and all of it's associated
     ///		properties into raw binary data in big endoan format.
     ///
+    /// @param notobject Flag to not encode the element as an object,
+    ///		instead it's just a list of properties. This is used when
+    ///		formatting onStatus response packets.
+    ///
     /// @return a smart pointer to a Buffer class.
     boost::shared_ptr<Buffer> encode();
+    boost::shared_ptr<Buffer> encode(bool notobject);
 
     /// \brief Get the array of properties for this Element.
     ///

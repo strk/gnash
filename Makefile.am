@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -153,6 +153,8 @@ dumpconfig:
 	@echo "	JPEG_LIBS is $(JPEG_LIBS)"
 	@echo "	PNG_CFLAGS is $(PNG_CFLAGS)"
 	@echo "	PNG_LIBS is $(PNG_LIBS)"
+	@echo "	GIF_CFLAGS is $(GIF_CFLAGS)"
+	@echo "	GIF_LIBS is $(GIF_LIBS)"
 	@echo "Audio decoding support..."
 if USE_GST_ENGINE
 	@echo "	GSTREAMER_CFLAGS is $(GSTREAMER_CFLAGS)"
@@ -373,10 +375,10 @@ else
 endif
 if KPARTS4
 	@echo "	KPARTS 4.x (KDE) plugin enabled"
-	@echo "	  KPARTS 4.x plugin install dir: $(KDE_PLUGINDIR)"
-	@echo "	  KPARTS 4.x service install dir: $(KDE_SERVICESDIR)"
-	@echo "	  KPARTS 4.x config dir: ${KDE_CONFIGDIR}"
-	@echo "	  KPARTS 4.x appsdata dir: ${KDE_APPSDATADIR}"
+	@echo "	  KPARTS 4.x plugin install dir: $(KDE4_PLUGINDIR)"
+	@echo "	  KPARTS 4.x service install dir: $(KDE4_SERVICESDIR)"
+	@echo "	  KPARTS 4.x config dir: ${KDE4_CONFIGDIR}"
+	@echo "	  KPARTS 4.x appsdata dir: ${KDE4_APPSDATADIR}"
 else
 	@echo "	KPARTS 4.x (KDE) plugin disabled"
 endif
@@ -408,7 +410,7 @@ endif
 	install-plugin \
 	apidoc
 
-install-plugins install-plugin uninstall-plugins:
+install-plugins install-plugin uninstall-plugins install-pkglib:
 	$(MAKE) -C plugin $@
 
 apidoc:

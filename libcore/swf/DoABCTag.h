@@ -98,13 +98,14 @@ public:
 	    return true;
 	}
 
-	void read(SWFStream* /*in*/)
+    void read(SWFStream* /*in*/)
     {
-	}
+    }
 	
-	static void doABCLoader(SWFStream& in,tag_type tag, movie_definition& m, const gnash::RunInfo&)
+	static void doABCLoader(SWFStream& in, TagType tag,
+			movie_definition& m, const gnash::RunInfo&)
 	{
-		if(tag == SWF::DOABCDEFINE){
+		if (tag == SWF::DOABCDEFINE) {
 			in.ensureBytes(4);
 			static_cast<void> (in.read_u32());
 			std::string name;

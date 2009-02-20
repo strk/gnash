@@ -48,8 +48,6 @@ namespace zlib_adapter
 namespace zlib_adapter
 {
 
-const int	ZBUF_SIZE = 4096;
-
 class InflaterIOChannel : public IOChannel 
 {
 public:
@@ -63,10 +61,10 @@ public:
 	}
 
 	// See dox in IOChannel
-	virtual int seek(int pos);
+	virtual bool seek(std::streampos pos);
 
 	// See dox in IOChannel
-	virtual int read(void* dst, int bytes)
+	virtual std::streamsize read(void* dst, std::streamsize bytes)
 	{
 		if (m_error) return 0;
 		return inflate_from_stream(dst, bytes);
@@ -76,7 +74,7 @@ public:
 	virtual void go_to_end();
 
 	// See dox in IOChannel
-	virtual int tell() const
+	virtual std::streampos tell() const
 	{
 		return m_logical_stream_pos;
 	}
@@ -88,23 +86,29 @@ public:
 	}
 
 	// See dox in IOChannel
-	virtual int get_error() const
+	virtual bool bad() const
 	{
 		return m_error;
 	}
 
 private:
 
-	std::auto_ptr<IOChannel>	m_in;
-	int		m_initial_stream_pos;	// position of the input stream where we started inflating.
-	unsigned char	m_rawdata[ZBUF_SIZE];
-	z_stream	m_zstream;
+    static const int ZBUF_SIZE = 4096;
+
+	std::auto_ptr<IOChannel> m_in;
+
+	// position of the input stream where we started inflating.
+    std::streampos m_initial_stream_pos;
+	
+    unsigned char m_rawdata[ZBUF_SIZE];
+	
+    z_stream m_zstream;
 
 	// current stream position of uncompressed data.
-	int		m_logical_stream_pos;
+    std::streampos m_logical_stream_pos;
 
-	bool		m_at_eof;
-	int		m_error;
+	bool m_at_eof;
+	bool m_error;
 
 	/// Discard current results and rewind to the beginning.
 	//
@@ -114,16 +118,17 @@ private:
 	/// might throw a ParserException if unable to reset the uderlying
 	/// stream to original position.
 	///
-	void	reset();
+	void reset();
 
-	int	inflate_from_stream(void* dst, int bytes);
+    std::streamsize inflate_from_stream(void* dst, std::streamsize bytes);
 
 	// If we have unused bytes in our input buffer, rewind
 	// to before they started.
-	void	rewind_unused_bytes();
-
+	void rewind_unused_bytes();
 
 };
+
+const int InflaterIOChannel::ZBUF_SIZE;
 
 void
 InflaterIOChannel::rewind_unused_bytes()
@@ -148,7 +153,7 @@ InflaterIOChannel::reset()
 	m_at_eof = 0;
 	int	err = inflateReset(&m_zstream);
 	if (err != Z_OK) {
-		gnash::log_error("inflater_impl::reset() inflateReset() returned %d", err);
+		log_error("inflater_impl::reset() inflateReset() returned %d", err);
 		m_error = 1;
 		return;
 	}
@@ -160,20 +165,20 @@ InflaterIOChannel::reset()
 	m_zstream.avail_out = 0;
 
 	// Rewind the underlying stream.
-	if ( m_in->seek(m_initial_stream_pos) == TU_FILE_SEEK_ERROR )
+	if (!m_in->seek(m_initial_stream_pos))
 	{
 		std::stringstream ss;
-		ss << "inflater_impl::reset: unable to seek underlying stream to position " <<  m_initial_stream_pos;
-		throw gnash::ParserException(ss.str());
+		ss << "inflater_impl::reset: unable to seek underlying "
+            "stream to position " <<  m_initial_stream_pos;
+		throw ParserException(ss.str());
 	}
 
 	m_logical_stream_pos = m_initial_stream_pos;
 }
 
-int
-InflaterIOChannel::inflate_from_stream(void* dst, int bytes)
+std::streamsize
+InflaterIOChannel::inflate_from_stream(void* dst, std::streamsize bytes)
 {
-	using gnash::ParserException;
 
 	assert(bytes);
 
@@ -210,8 +215,7 @@ InflaterIOChannel::inflate_from_stream(void* dst, int bytes)
 		{
 			std::ostringstream ss;
 			ss << __FILE__ << ":" << __LINE__ << ": " << m_zstream.msg;
-			// we should call inflate again... giving more input or output space !
-			gnash::log_error("%s", ss.str());
+			log_error("%s", ss.str());
 			break;
 		}
 		if (err == Z_DATA_ERROR)
@@ -270,7 +274,7 @@ InflaterIOChannel::go_to_end()
 	// Seek forwards.
 	for (;;)
 	{
-		int	bytes_read = inflate_from_stream(temp, ZBUF_SIZE);
+        std::streamsize bytes_read = inflate_from_stream(temp, ZBUF_SIZE);
 		if (bytes_read == 0)
 		{
 			// We've seeked as far as we can.
@@ -279,47 +283,48 @@ InflaterIOChannel::go_to_end()
 	}
 }
 
-int
-InflaterIOChannel::seek(int pos)
+bool
+InflaterIOChannel::seek(std::streampos pos)
 {
 	if (m_error)
 	{
-		gnash::log_debug("Inflater is in error condition");
-		return TU_FILE_SEEK_ERROR;
-		//return inf->m_logical_stream_pos;
+	    log_debug("Inflater is in error condition");
+		return false;
 	}
 
 	// If we're seeking backwards, then restart from the beginning.
 	if (pos < m_logical_stream_pos)
 	{
-		log_debug("inflater reset due to seek back from %d to %d", m_logical_stream_pos, pos );
+		log_debug("inflater reset due to seek back from %d to %d",
+                m_logical_stream_pos, pos );
 		reset();
 	}
 
-	unsigned char	temp[ZBUF_SIZE];
+	unsigned char temp[ZBUF_SIZE];
 
 	// Now seek forwards, by just reading data in blocks.
 	while (m_logical_stream_pos < pos)
 	{
-		int	to_read = pos - m_logical_stream_pos;
+        std::streamsize to_read = pos - m_logical_stream_pos;
 		assert(to_read > 0);
-		int	to_read_this_time = std::min<int>(to_read, ZBUF_SIZE);
-		assert(to_read_this_time > 0);
 
-		int	bytes_read = inflate_from_stream(temp, to_read_this_time);
-		assert(bytes_read <= to_read_this_time);
+        std::streamsize readNow = std::min<std::streamsize>(to_read, ZBUF_SIZE);
+		assert(readNow > 0);
+
+        std::streamsize bytes_read = inflate_from_stream(temp, readNow);
+		assert(bytes_read <= readNow);
 		if (bytes_read == 0)
 		{
 			// Trouble; can't seek any further.
-			gnash::log_debug("Trouble: can't seek any further.. ");
-			return TU_FILE_SEEK_ERROR;
+			log_debug("Trouble: can't seek any further.. ");
+			return false;
 			break;
 		}
 	}
 
 	assert(m_logical_stream_pos == pos);
 
-	return 0; // m_logical_stream_pos;
+	return true; 
 }
 
 InflaterIOChannel::InflaterIOChannel(std::auto_ptr<IOChannel> in)
@@ -344,7 +349,7 @@ InflaterIOChannel::InflaterIOChannel(std::auto_ptr<IOChannel> in)
 
 	int	err = inflateInit(&m_zstream);
 	if (err != Z_OK) {
-		gnash::log_error("inflater_impl::ctor() inflateInit() returned %d", err);
+		log_error("inflater_impl::ctor() inflateInit() returned %d", err);
 		m_error = 1;
 		return;
 	}

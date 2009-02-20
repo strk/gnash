@@ -1,6 +1,6 @@
 // Mouse.cpp:  ActionScript "Mouse" input device class, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -72,12 +72,16 @@ attachMouseInterface(as_object& o)
 {
     VM& vm = o.getVM();
 
-    o.init_member("show", vm.getNative(5, 0));
-    o.init_member("hide", vm.getNative(5, 1));
-    
-    if (vm.getSWFVersion() > 5) {
-        AsBroadcaster::initialize(o);
-    }
+    const int flags = as_prop_flags::dontEnum |
+                      as_prop_flags::dontDelete |
+                      as_prop_flags::readOnly;
+
+    o.init_member("show", vm.getNative(5, 0), flags);
+    o.init_member("hide", vm.getNative(5, 1), flags);
+ 
+    // Mouse is always initialized as an AsBroadcaster, even for
+    // SWF5.   
+    AsBroadcaster::initialize(o);
 }
 
 /// Returns whether the mouse was visible before the call.

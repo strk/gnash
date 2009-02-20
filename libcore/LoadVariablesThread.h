@@ -61,7 +61,7 @@ public:
 	/// @param url
 	///	URL to post to and fetch from
 	///
-	LoadVariablesThread(const URL& url);
+	LoadVariablesThread(const StreamProvider& sp, const URL& url);
 
 	/// \brief
 	/// Construct a LoadVariablesThread opening a stream for the given URL,
@@ -75,7 +75,8 @@ public:
 	/// @param postdata
 	///	Url-encoded post data.
 	///
-	LoadVariablesThread(const URL& url, const std::string& postdata);
+	LoadVariablesThread(const StreamProvider& sp, const URL& url,
+            const std::string& postdata);
 
 	/// Destroy the LoadVariablesThread, joining the thread if spawned
 	~LoadVariablesThread();
@@ -91,7 +92,8 @@ public:
 	{
 		assert(!_thread.get());
 		assert(_stream.get());
-		_thread.reset( new boost::thread(boost::bind(LoadVariablesThread::execLoadingThread, this)) );
+		_thread.reset(new boost::thread(
+                boost::bind(LoadVariablesThread::execLoadingThread, this)));
 	}
 
 	/// Cancel a download in progress

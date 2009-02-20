@@ -235,6 +235,7 @@ DiskStream::close()
     
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
+//  	delete[] _dataptr;
 	_dataptr = 0;
     }
      
@@ -463,6 +464,7 @@ DiskStream::open(const string &filespec, int netfd, Statistics &statistics)
 		 (long long int) _filesize);
     } else {
 	log_error (_("File %s doesn't exist"), _filespec);
+	return false;
     }
     
 #ifdef USE_STATS_CACHE
@@ -694,6 +696,7 @@ DiskStream::getFileStats(const std::string &filespec)
 	}
       } else {
 	_filetype = FILETYPE_NONE;
+	return false;
       } // end of stat()
       
       _filesize = st.st_size;

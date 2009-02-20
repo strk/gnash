@@ -1,6 +1,6 @@
 // string.cpp:  ActionScript "String" class, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ class String_as : public as_object
 
 public:
 
-    String_as(const std::string& s)
+    explicit String_as(const std::string& s)
             :
             as_object(getStringInterface()),
             _string(s)
@@ -250,12 +250,15 @@ as_value
 string_concat(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+
+    const int swfVersion = fn.env().get_version();
+
     as_value val(fn.this_ptr);
     
     std::string str = val.to_string();
 
     for (unsigned int i = 0; i < fn.nargs; i++) {
-        str += fn.arg(i).to_string();
+        str += fn.arg(i).to_string_versioned(swfVersion);
     }
 
     return as_value(str);
@@ -856,8 +859,7 @@ string_oldToUpper(const fn_call& fn)
 as_value
 string_toString(const fn_call& fn)
 {
-    boost::intrusive_ptr<String_as> obj 
-	   = ensureType<String_as>(fn.this_ptr);
+    boost::intrusive_ptr<String_as> obj = ensureType<String_as>(fn.this_ptr);
     return as_value(obj->str());
 }
 

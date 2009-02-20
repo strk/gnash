@@ -38,16 +38,18 @@ class SymbolClassTag : public ControlTag
 {
 public:
 
-	SymbolClassTag(std::string name):rootClass(name)
+	SymbolClassTag(std::string name) 
+        :
+        _rootClass(name)
 
 	{}
 
-	virtual void execute(MovieClip* m, DisplayList& /* dlist */) const
+	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
 	{
 		VM& vm = VM::get();
 		Machine *mach = vm.getMachine();
-		log_debug("SymbolClassTag: Creating class %s.",rootClass);
-		mach->instantiateClass(rootClass,vm.getGlobal());
+		log_debug("SymbolClassTag: Creating class %s.", _rootClass);
+		mach->instantiateClass(_rootClass, vm.getGlobal());
 	}
 
 	// Tell the caller that we are an action tag.
@@ -55,29 +57,31 @@ public:
 	{
 	    return true;
 	}
-	static void loader(SWFStream& in,tag_type tag, movie_definition& m, const RunInfo&)
+	static void loader(SWFStream& in, TagType tag,
+			movie_definition& m, const RunInfo& /*r*/)
 	{
 		assert(tag == SYMBOLCLASS); //76
 
 		log_unimpl(_("%s tag parsed but not yet used"), "SYMBOLCLASS");
 		in.ensureBytes(2);
 		boost::uint16_t num_symbols = in.read_u16();
-		log_debug("There are %u symbols.",num_symbols);
-		for(unsigned int i = 0;i<num_symbols;i++){
+		log_debug("There are %u symbols.", num_symbols);
+		for (unsigned int i = 0; i < num_symbols; ++i) {
 			in.ensureBytes(2);
 			boost::uint16_t character = in.read_u16();
 			std::string name;
 			in.read_string(name);
-			log_debug("Symbol %u name=%s tag=%u",i,name,character);
-			if(character == 0){
+			log_debug("Symbol %u name=%s tag=%u", i, name, character);
+			if (character == 0) {
 				SymbolClassTag *symbolClassTag = new SymbolClassTag(name);
 				m.addControlTag(symbolClassTag);
 			}
 		}
 	}
+
 private:
 
-std::string rootClass;
+    const std::string _rootClass;
 };
 
 } // namespace gnash::SWF

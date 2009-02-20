@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
 #include "gettext.h"
 //#include "cvm.h"
 
@@ -64,6 +65,7 @@ extern "C"{
 #include "diskstream.h"
 #include "arg_parser.h"
 #include "GnashException.h"
+#include "GnashSleep.h" // for usleep comptibility.
 
 // classes internal to Cygnal
 #include "buffer.h"
@@ -128,6 +130,10 @@ static bool admin = false;
 // Admin commands are small
 const int ADMINPKTSIZE = 80;
 
+// If set to a non zero value, this limits Cygnal to only one protocol
+// at a time. This is for debugging only.
+static int only_port = 0;
+
 // These keep track of the number of active threads.
 ThreadCounter tids;
 
@@ -158,12 +164,13 @@ usage()
 	<< _("  -h,  --help          Print this help and exit") << endl
 	<< _("  -V,  --version       Print version information and exit") << endl
 	<< _("  -v,  --verbose       Output verbose debug info") << endl
-	<< _("  -p   --port-offset   Port offset for debugging") << endl
+	<< _("  -m,  --multithread   Enable Multi Threading") << endl
 	<< _("  -n,  --netdebug      Turn on net debugging messages") << endl
+	<< _("  -o   --only-port     Only use port for debugging") << endl
+	<< _("  -p   --port-offset   Port offset for debugging") << endl
         << _("  -t,  --testing       Turn on special Gnash testing support") << endl
 	<< _("  -a,  --admin         Enable the administration thread") << endl
 	<< _("  -r,  --root          Document root for all files") << endl
-	<< _("  -c,  --threads       Enable Threading") << endl
 	<< endl;
 }
 
@@ -188,7 +195,8 @@ main(int argc, char *argv[])
         { 't', "testing",       Arg_parser::no  },
         { 'a', "admin",         Arg_parser::no  },
         { 'r', "root",          Arg_parser::yes },
-        { 'm', "multithreaded", Arg_parser::no }
+        { 'o', "only-port",     Arg_parser::yes },
+        { 's', "singlethreaded", Arg_parser::no }
         };
 
     Arg_parser parser(argc, argv, opts);
@@ -247,11 +255,14 @@ main(int argc, char *argv[])
 	  case 'r':
 	      docroot = parser.argument(i).c_str();
 	      break;
-	  case 'm':
-	      crcfile.setThreadingFlag(true);
+	  case 's':
+	      crcfile.setThreadingFlag(false);
 	      break;
 	  case 'n':
 	      netdebug = true;
+	      break;
+	  case 'o':	
+	      only_port = parser.argument<int>(i);
 	      break;
 	  case 'd':
 	      crcfile.dump();
@@ -260,6 +271,11 @@ main(int argc, char *argv[])
 	  default:
 	      log_error (_("Extraneous argument: %s"), parser.argument(i).c_str());
         }
+    }
+
+    // If a port is specified, we only want to run single threaded.
+    if (only_port) {
+	crcfile.setThreadingFlag(false);
     }
     
     // Trap ^C (SIGINT) so we can kill all the threads
@@ -271,16 +287,11 @@ main(int argc, char *argv[])
 
     boost::mutex::scoped_lock lk(alldone_mutex);
     
-//     struct thread_params rtmp_data;
-//     struct thread_params ssl_data;
-//     rtmp_data.port = port_offset + 1935;
-//     boost::thread rtmp_port(boost::bind(&rtmp_thread, &rtmp_data));
     // Admin handler    
     if (admin) {
 	Network::thread_params_t admin_data;
 	admin_data.port = gnash::ADMIN_PORT;
 	boost::thread admin_thread(boost::bind(&admin_handler, &admin_data));
-//	admin_thread.join();
     }
 
 //    Cvm cvm;
@@ -292,29 +303,32 @@ main(int argc, char *argv[])
     // server. Since this port offset changes the constant to test
     // for which protocol, we pass the info to the start thread so
     // it knows which handler to invoke. 
-    Network::thread_params_t http_data;
-    http_data.port = port_offset + gnash::RTMPT_PORT;
-    http_data.netfd = 0;
-    http_data.filespec = docroot;
-    if (crcfile.getThreadingFlag()) {
-      boost::thread http_thread(boost::bind(&connection_handler, &http_data));
-    } else {
-      connection_handler(&http_data);
+    Network::thread_params_t *http_data = new Network::thread_params_t;
+    if ((only_port == 0) || (only_port == gnash::RTMPT_PORT)) {
+	http_data->port = port_offset + gnash::RTMPT_PORT;
+	http_data->netfd = 0;
+	http_data->filespec = docroot;
+	if (crcfile.getThreadingFlag()) {
+	    boost::thread http_thread(boost::bind(&connection_handler, http_data));
+	} else {
+	    connection_handler(http_data);
+	}
     }
     
-#if 0  
-      // Incomming connection handler for port 1935, RTMP. As RTMP
-      // is not a priviledged port, we just open it without an offset.
-      Handler::thread_params_t rtmp_data;
-      rtmp_data.port = port_offset + gnash::RTMP_PORT;
-      rtmp_data.netfd = 0;
-      rtmp_data.filespec = docroot;
-      if (crcfile.getThreadingFlag()) {
-	  boost::thread rtmp_thread(boost::bind(&connection_handler, &rtmp_data));
-    } else {
-      connection_handler(&rtmp_data);
+    
+    Network::thread_params_t *rtmp_data = new Network::thread_params_t;
+    // Incomming connection handler for port 1935, RTMP. As RTMP
+    // is not a priviledged port, we just open it without an offset.
+    if ((only_port == 0) || (only_port == gnash::RTMP_PORT)) {
+	rtmp_data->port = port_offset + gnash::RTMP_PORT;
+	rtmp_data->netfd = 0;
+	rtmp_data->filespec = docroot;
+	if (crcfile.getThreadingFlag()) {
+	    boost::thread rtmp_thread(boost::bind(&connection_handler, rtmp_data));
+	} else {
+	    connection_handler(rtmp_data);
+	}
     }
-#endif
     
     // wait for the thread to finish
 //     http_thread.join();
@@ -325,6 +339,9 @@ main(int argc, char *argv[])
       
       log_debug (_("Cygnal done..."));
     
+      delete rtmp_data;
+      delete http_data;
+
       return(0);
 }
 
@@ -496,7 +513,12 @@ connection_handler(Network::thread_params_t *args)
     }
     // Start a server on this tcp/ip port.
     fd = net.createServer(args->port);
-    log_debug("Starting Connection Handler for fd #%d, port %hd", fd, args->port);
+    if (fd <= 0) {
+	log_error("Can't start Connection Handler for fd #%d, port %hd", fd, args->port);
+	return;
+    } else {
+	log_debug("Starting Connection Handler for fd #%d, port %hd", fd, args->port);
+    }
 
     // Get the number of cpus in this system. For multicore
     // systems we'll get better load balancing if we keep all the
@@ -527,6 +549,7 @@ connection_handler(Network::thread_params_t *args)
 //    Handler *hand = new Handler;
 
     args->handler = &net;
+    boost::thread handler;
     
     // FIXME: this may run forever, we probably want a cleaner way to
     // test for the end of time.
@@ -579,11 +602,11 @@ connection_handler(Network::thread_params_t *args)
 		tnet = networks[tid];
 	    }
 	    if (args->port == (port_offset + RTMPT_PORT)) {
-		boost::bind(http_handler, args);
+		boost::bind(http_handler, targs);
 		tnet->addPollFD(fds, http_handler);
-	    } else if (args->port == RTMP_PORT) {
-//		tnet->addPollFD(fds, rtmp_handler);
-		log_unimpl("Not ready for RTMP data yet.");
+	    } else if (args->port == (port_offset + RTMP_PORT)) {
+		boost::bind(rtmp_handler, targs);
+		tnet->addPollFD(fds, rtmp_handler);
 	    }
 	    if (networks[tid] == 0) {
 		networks[tid] = tnet;
@@ -597,9 +620,8 @@ connection_handler(Network::thread_params_t *args)
 	    log_debug("Single threaded mode for fd #%d", args->netfd);
 	    if (args->port == (port_offset + RTMPT_PORT)) {
 		http_handler(args);
-	    } else if (args->port == RTMP_PORT) {
-//  	    hand->addPollFD(fds, rtmp_handler);
-		log_unimpl("Not ready for RTMP data yet.");
+	    } else if (args->port == (port_offset + RTMP_PORT)) {
+		rtmp_handler(args);
 	    }
 	}
 	
@@ -653,14 +675,15 @@ dispatch_handler(Network::thread_params_t *args)
 			log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
 			// Call the protocol handler for this network connection
 			bool ret = net->getEntry(it->fd)(args);
+			
 //			log_debug("Handler returned %s", (ret) ? "true" : "false");
 			// FIXME: we currently force a 'close connection' at the end
 			// of sending a file, since apache does too. This pretty much
 			// blows persistance,
 //			if (ret) {
-			networks[args->tid] = 0;
-			net->closeNet(it->fd);
-			net->erasePollFD(it->fd);
+			    networks[args->tid] = 0;
+			    net->closeNet(it->fd);
+			    net->erasePollFD(it->fd);
 //			}
 		    }
 		}
@@ -670,8 +693,6 @@ dispatch_handler(Network::thread_params_t *args)
 		if (hits) {
 		    for (it = hits->begin(); it != hits->end(); it++) {
 			log_debug("Need to disconnect fd #%d, it got an error.", (*it).fd);
-//		    hand->erasePollFD(it);
-// 		    net.closeNet(it->fd);
 		    }
 		}
 	    }
@@ -682,8 +703,6 @@ dispatch_handler(Network::thread_params_t *args)
 	    }
         }
     } while (!done);
-
-//    network[];
     tids.decrement();
     
 } // end of dispatch_handler

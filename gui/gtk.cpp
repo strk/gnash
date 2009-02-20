@@ -1,6 +1,6 @@
 // gtk.cpp: Gnome ToolKit graphical user interface, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -74,13 +74,62 @@ extern "C" {
 # include <hildon/hildon.h>
 #endif
 
+
 namespace gnash 
 {
 
-bool createFileMenu(GtkWidget *obj);
-bool createEditMenu(GtkWidget *obj);
-bool createHelpMenu(GtkWidget *obj);
-bool createControlMenu(GtkWidget *obj);
+// Forward declarations
+namespace {
+
+    // Menu Item callbacks
+    void menuSound(GtkMenuItem *menuitem, gpointer instance);
+    void menuFullscreen(GtkMenuItem *menuitem, gpointer instance);
+    void menuRestart(GtkMenuItem *menuitem, gpointer instance);
+    void menuQuit(GtkMenuItem *menuitem, gpointer instance);
+    void menuPlay(GtkMenuItem *menuitem, gpointer instance);
+    void menuPause(GtkMenuItem *menuitem, gpointer instance);
+    void menuStop(GtkMenuItem *menuitem, gpointer instance);
+    void menuAbout(GtkMenuItem *menuitem, gpointer instance);
+    void menuOpenFile(GtkMenuItem *menuitem, gpointer instance);
+    void menuPreferences(GtkMenuItem *menuitem, gpointer instance);
+    void menuMovieInfo(GtkMenuItem *menuitem, gpointer instance);
+    void menuRefreshView(GtkMenuItem *menuitem, gpointer instance);
+    void menuShowUpdatedRegions(GtkMenuItem *menuitem, gpointer instance); 
+
+    // Event handlers
+    gboolean realizeEvent(GtkWidget *widget, GdkEvent *event, gpointer data);
+    gboolean deleteEvent(GtkWidget *widget, GdkEvent *event, gpointer data);
+    gboolean exposeEvent(GtkWidget *widget, GdkEventExpose *event,
+                                 gpointer data);
+    gboolean configureEvent(GtkWidget *widget, GdkEventConfigure *event,
+                                    gpointer data);
+    gboolean keyPressEvent(GtkWidget *widget, GdkEventKey *event,
+                                    gpointer data);
+    gboolean keyReleaseEvent(GtkWidget *widget, GdkEventKey *event,
+                                    gpointer data);
+    gboolean buttonPressEvent(GtkWidget *widget, GdkEventButton *event,
+                                       gpointer data);
+    gboolean buttonReleaseEvent(GtkWidget *widget, GdkEventButton *event,
+                                         gpointer data);
+    gboolean motionNotifyEvent(GtkWidget *widget, GdkEventMotion *event,
+                                        gpointer data);
+    gint popupHandler(GtkWidget *widget, GdkEvent *event);    
+
+    void openFile(GtkWidget *widget, gpointer data);
+
+    void addPixmapDirectory(const gchar *directory);
+    
+    void addGnashIcon(GtkWindow* window);
+
+    gchar* findPixmapFile(const gchar *filename);
+    
+    GdkPixbuf* createPixbuf(const gchar *filename);
+
+    key::code gdk_to_gnash_key(guint key);
+
+    int gdk_to_gnash_modifier(int key);
+
+}
 
 // This is global so it can be accessed by the evnt handler, which
 // isn't part of this class. 
@@ -112,9 +161,8 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 bool
 GtkGui::init(int argc, char **argv[])
 {
-    //GNASH_REPORT_FUNCTION;
 
-    gtk_init (&argc, argv);
+    gtk_init(&argc, argv);
 
 #ifdef GUI_HILDON
     _hildon_program = hildon_program_get_instance();
@@ -130,7 +178,7 @@ GtkGui::init(int argc, char **argv[])
 #endif
     _glue->init (argc, argv);
 
-    add_pixmap_directory (PKGDATADIR);
+    addPixmapDirectory (PKGDATADIR);
 
     if (_xid) {
         _window = gtk_plug_new(_xid);
@@ -162,8 +210,7 @@ GtkGui::init(int argc, char **argv[])
     g_object_ref(G_OBJECT(_resumeButton));
 
     // This callback indirectly results in playHook() being called.
-    g_signal_connect(G_OBJECT(_resumeButton), "clicked",
-            G_CALLBACK(menuitem_play_callback), this);
+    g_signal_connect(_resumeButton, "clicked", G_CALLBACK(menuPlay), this);
 
     // If we don't set this flag we won't be able to grab focus
     // ( grabFocus() would be a no-op )
@@ -232,22 +279,6 @@ GtkGui::run()
     // Kick-start before setting the interval timeout
     advance_movie(this);
     
-#if 0
-    // From http://www.idt.mdh.se/kurser/cd5040/ht02/gtk/glib/glib-the-main-event-loop.html#G-TIMEOUT-ADD-FULL
-    //
-    // Note that timeout functions may be delayed, due to the
-    // processing of other event sources. Thus they should not be
-    // relied on for precise timing. After each call to the timeout
-    // function, the time of the next timeout is recalculated based
-    // on the current time and the given interval (it does not try to
-    // 'catch up' time lost in delays).
-    //
-    // NOTE: this is OK (research on 'elastic frame rate').
-    //
-    _advanceSourceTimer = g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
-                        this, NULL);
-#endif
-
     gtk_main();
     return true;
 }
@@ -282,6 +313,35 @@ GtkGui::addFDListener(int fd, callback_t callback, void* data)
 }
 
 void
+GtkGui::error(const std::string& msg)
+{
+    
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    
+    if (!rcfile.popupMessages()) return;
+
+    GtkWidget* popup = gtk_dialog_new_with_buttons("Gnash Error",
+            GTK_WINDOW(_window),
+            static_cast<GtkDialogFlags>(GTK_DIALOG_DESTROY_WITH_PARENT),
+            GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+
+    g_signal_connect_swapped(popup, "response", G_CALLBACK(gtk_widget_destroy),
+            popup);
+
+#if GTK_CHECK_VERSION(2,14,0)
+    GtkWidget* content = gtk_dialog_get_content_area(GTK_DIALOG(popup));
+#else
+    GtkWidget* content = GTK_DIALOG(popup)->vbox;
+#endif
+
+    GtkWidget* label = gtk_label_new(msg.c_str());
+    gtk_widget_set_size_request(label, 400, 200);
+    gtk_label_set_line_wrap(GTK_LABEL(label), true);
+    gtk_box_pack_start(GTK_BOX(content), label, false, false, 0);
+    gtk_widget_show_all(popup);
+}
+
+void
 GtkGui::setFullscreen()
 {
 
@@ -294,7 +354,6 @@ GtkGui::setFullscreen()
         _overlay = gtk_window_new (GTK_WINDOW_TOPLEVEL);
         addGnashIcon(GTK_WINDOW(_overlay));
         gtk_window_fullscreen(GTK_WINDOW(_overlay));
-        //log_debug (_("Created fullscreen window"));
         
         // Reparent drawing area from GtkPlug to fullscreen window
         gtk_widget_realize(_overlay);      
@@ -311,11 +370,11 @@ GtkGui::setFullscreen()
     
         // This is a hack to fix another hack (see createWindow). If the minimum
         // size (size request) is larger than the screen, fullscreen messes up.
-        // This way allows the drawing area to be shrunk, which is what we really want,
-        // but not only after we've gone fullscreen.
+        // This way allows the drawing area to be shrunk, which is what we
+        // really want, but not only after we've gone fullscreen.
         // It could be a good hack if it were done earlier.
-        // There really doesn't seem to be a proper way of setting the starting size
-        // of a widget but allowing it to be shrunk.
+        // There really doesn't seem to be a proper way of setting the
+        // starting size of a widget but allowing it to be shrunk.
         gtk_widget_set_size_request(_drawingArea, -1, -1);
     	gtk_window_fullscreen(GTK_WINDOW(_window));
 
@@ -332,18 +391,16 @@ GtkGui::unsetFullscreen()
     
     // Plugin
     if (_xid) {
-        gtk_widget_reparent (_vbox, _window);
+        gtk_widget_reparent(_vbox, _window);
         
         // Apply key event callbacks to the plugin instance.
         setupWindowEvents();
         if (_overlay) {
             gtk_widget_destroy(_overlay);
-            //log_debug (_("Destroyed fullscreen window"));
         }        
     }
-    
-    // Stand-alone
     else {
+        // Stand-alone
 	    gtk_window_unfullscreen(GTK_WINDOW(_window));
 	    showMenu(true);
     }
@@ -351,16 +408,27 @@ GtkGui::unsetFullscreen()
     _fullscreen = false;
 }
 
+void
+GtkGui::hideMenu()
+{
+    // Not showing menu anyway if it's a plugin
+    if (_fullscreen || _xid) return;
+
+    // Stand-alone
+    showMenu(false);
+}
+
+
 void 
 GtkGui::setCursor(gnash_cursor_type newcursor)
 {
-  //GNASH_REPORT_FUNCTION;
 
-	if (! _mouseShown) return;
+	if (!_mouseShown) return;
 
     GdkCursorType cursortype;
 
-    switch(newcursor) {
+    switch (newcursor)
+    {
         case CURSOR_HAND:
             cursortype = GDK_HAND2;
             break;
@@ -378,7 +446,7 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     }
 
     // The parent of _drawingArea is different for the plugin in fullscreen
-    gdk_window_set_cursor (_drawingArea->window, gdkcursor);
+    gdk_window_set_cursor(_drawingArea->window, gdkcursor);
   
     if (gdkcursor) {
         gdk_cursor_unref(gdkcursor);
@@ -413,10 +481,7 @@ GtkGui::showMouse(bool show)
         _mouseShown = false;
 
     }
-	else if (show)
-    {
-        _mouseShown = true;	
-    }
+	else if (show) _mouseShown = true;
     
     return state;
 }
@@ -425,14 +490,8 @@ void
 GtkGui::showMenu(bool show)
 {
 #ifdef USE_MENUS
-if (_menubar)
-{
-    if (show) {
-        gtk_widget_show(_menubar);
-	    return;
-	}
-    gtk_widget_hide(_menubar);
-}
+    if (!_menubar) return;
+    if (show) gtk_widget_show(_menubar);
 #endif
 }
 
@@ -445,8 +504,8 @@ GtkGui::getPixelAspectRatio()
     // The physical size of the screen may be reported wrongly by gdk (from X),
     // but it's the best we have. This method agrees with the pp in my case.
     double pixelAspectRatio =
-            (gdk_screen_get_height_mm(screen) / static_cast<double>(getScreenResY())) / 
-            (gdk_screen_get_width_mm(screen) / static_cast<double>(getScreenResX()));
+        (gdk_screen_get_height_mm(screen) / static_cast<double>(getScreenResY())) / 
+        (gdk_screen_get_width_mm(screen) / static_cast<double>(getScreenResX()));
     return pixelAspectRatio;
 }
 
@@ -477,19 +536,18 @@ GtkGui::getScreenDPI()
 void
 GtkGui::setupWindowEvents()
 {
-    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "delete_event",
-                   G_CALLBACK(delete_event), this);
-    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "key_press_event",
-                   G_CALLBACK(key_press_event), this);
-    g_signal_connect(G_OBJECT(gtk_widget_get_toplevel(_drawingArea)), "key_release_event",
-                   G_CALLBACK(key_release_event), this);
+    g_signal_connect(gtk_widget_get_toplevel(_drawingArea),
+            "delete_event", G_CALLBACK(deleteEvent), this);
+    g_signal_connect(gtk_widget_get_toplevel(_drawingArea),
+            "key_press_event", G_CALLBACK(keyPressEvent), this);
+    g_signal_connect(gtk_widget_get_toplevel(_drawingArea),
+            "key_release_event", G_CALLBACK(keyReleaseEvent), this);
 }
 
 // public virtual
 bool
 GtkGui::setupEvents()
 {
-  //GNASH_REPORT_FUNCTION;
 
     setupWindowEvents();
 
@@ -500,24 +558,22 @@ GtkGui::setupEvents()
                         | GDK_KEY_PRESS_MASK        
                         | GDK_POINTER_MOTION_MASK);
   
-    g_signal_connect_swapped(G_OBJECT(_drawingArea),
-                            "button_press_event",
-                            G_CALLBACK(popup_handler),
-                            GTK_OBJECT(_popup_menu));
+    g_signal_connect_swapped(_drawingArea, "button_press_event",
+                            G_CALLBACK(popupHandler), _popup_menu);
   
-    g_signal_connect(G_OBJECT(_drawingArea), "button_press_event",
-                   G_CALLBACK(button_press_event), this);
-    g_signal_connect(G_OBJECT(_drawingArea), "button_release_event",
-                   G_CALLBACK(button_release_event), this);
-    g_signal_connect(G_OBJECT(_drawingArea), "motion_notify_event",
-                   G_CALLBACK(motion_notify_event), this);
+    g_signal_connect(_drawingArea, "button_press_event",
+                   G_CALLBACK(buttonPressEvent), this);
+    g_signal_connect(_drawingArea, "button_release_event",
+                   G_CALLBACK(buttonReleaseEvent), this);
+    g_signal_connect(_drawingArea, "motion_notify_event",
+                   G_CALLBACK(motionNotifyEvent), this);
   
-    g_signal_connect_after(G_OBJECT (_drawingArea), "realize",
-                         G_CALLBACK (realize_event), NULL);
-    g_signal_connect(G_OBJECT (_drawingArea), "configure_event",
-                   G_CALLBACK (configure_event), this);
-    g_signal_connect(G_OBJECT (_drawingArea), "expose_event",
-                    G_CALLBACK (expose_event), this);
+    g_signal_connect_after(_drawingArea, "realize",
+                         G_CALLBACK (realizeEvent), NULL);
+    g_signal_connect(_drawingArea, "configure_event",
+                   G_CALLBACK (configureEvent), this);
+    g_signal_connect(_drawingArea, "expose_event",
+                    G_CALLBACK (exposeEvent), this);
 
     return true;
 }
@@ -542,11 +598,12 @@ GtkGui::setInterval(unsigned int interval)
     {
         g_source_remove(_advanceSourceTimer);
     }
-#if 1
-    _advanceSourceTimer = g_timeout_add_full (G_PRIORITY_LOW, _interval, (GSourceFunc)advance_movie,
-                        this, NULL);
-    log_debug("Advance interval timer set to %d ms (~ %d FPS)", _interval, 1000/_interval);
-#endif
+    
+    _advanceSourceTimer = g_timeout_add_full(G_PRIORITY_LOW, _interval,
+            (GSourceFunc)advance_movie, this, NULL);
+
+    log_debug("Advance interval timer set to %d ms (~ %d FPS)",
+            _interval, 1000/_interval);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -568,7 +625,7 @@ GtkGui::createMenuBar()
 //     hildon_window_add_toolbar(HILDON_WINDOW(_window),
 //                               GTK_TOOLBAR(_hildon_toolbar));
 #else
-    gtk_box_pack_start(GTK_BOX (_vbox), _menubar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(_vbox), _menubar, FALSE, FALSE, 0);
 #endif
 
     createFileMenu(_menubar);
@@ -603,20 +660,20 @@ GtkGui::createMenu()
 
     /// The sound handler is initialized after the Gui is created, and
     /// may be disabled or enabled dynamically.
-    GtkCheckMenuItem *menuitem_sound =
+    GtkCheckMenuItem *menusound =
         GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Sound")));
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_sound), TRUE);
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_sound));
-    gtk_widget_show(GTK_WIDGET(menuitem_sound));
-    g_signal_connect(GTK_OBJECT(menuitem_sound), "activate",
-                     G_CALLBACK(&menuitem_sound_callback), this);
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menusound), TRUE);
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menusound));
+    gtk_widget_show(GTK_WIDGET(menusound));
+    g_signal_connect(menusound, "activate",
+                     G_CALLBACK(menusound), this);
 
-    GtkMenuItem *menuitem_quit =
+    GtkMenuItem *menuquit =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuitem_quit));
-    gtk_widget_show(GTK_WIDGET(menuitem_quit));
-    g_signal_connect(GTK_OBJECT(menuitem_quit), "activate",
-                     G_CALLBACK(&menuitem_quit_callback), this);
+    gtk_menu_append(_popup_menu, GTK_WIDGET(menuquit));
+    gtk_widget_show(GTK_WIDGET(menuquit));
+    g_signal_connect(menuquit, "activate",
+                     G_CALLBACK(menuquit), this);
 
 #ifdef GUI_HILDON
      hildon_window_set_menu(HILDON_WINDOW(_window),
@@ -646,64 +703,6 @@ GtkGui::createWindow(const char *title, int width, int height)
 
     }
     return ret;
-}
-
-static GList *pixmaps_directories = NULL;
-
-/* Use this function to set the directory containing installed pixmaps. */
-void
-GtkGui::add_pixmap_directory                   (const gchar     *directory)
-{
-    pixmaps_directories = g_list_prepend (pixmaps_directories, g_strdup (directory));
-}
-
-
-/* This is an internally used function to find pixmap files. */
-gchar*
-GtkGui::find_pixmap_file                       (const gchar     *filename)
-{
-    GList *elem;
-
-    /* We step through each of the pixmaps directory to find it. */
-    elem = pixmaps_directories;
-    while (elem) {
-        gchar *pathname = g_strdup_printf ("%s%s%s", (gchar*)elem->data,
-                G_DIR_SEPARATOR_S, filename);
-        if (g_file_test (pathname, G_FILE_TEST_EXISTS))
-            return pathname;
-        g_free (pathname);
-        elem = elem->next;
-    }
-    return NULL;
-}
-
-
-/* This is an internally used function to create pixmaps. */
-GdkPixbuf*
-GtkGui::createPixbuf (const gchar *filename)
-{
-    gchar *pathname = NULL;
-    GdkPixbuf *pixbuf;
-    GError *error = NULL;
-
-    if (!filename || !filename[0])
-       return NULL;
-
-    pathname = find_pixmap_file (filename);
-
-    if (!pathname) {
-        log_error (_("Couldn't find pixmap file: %s"), filename);
-        g_warning (_("Couldn't find pixmap file: %s"), filename);
-        return NULL;
-    }
-
-    pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
-    if (!pixbuf) {
-        log_error (_("Failed to load pixbuf file: %s: %s"), pathname, error->message);
-        g_error_free (error);
-    }
-    g_free (pathname);
-    return pixbuf;
 }
 
 #ifdef USE_SWFTREE
@@ -776,16 +775,6 @@ GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
 
 #endif
 
-// Adds the Gnash icon to a window.
-void
-GtkGui::addGnashIcon(GtkWindow* window)
-{
-    GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
-    if (window_icon_pixbuf) {
-        gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
-		gdk_pixbuf_unref (window_icon_pixbuf);
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -890,38 +879,6 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 }
 
-/// This method is called when the "OK" button is clicked in the open file
-/// dialog. For GTK <= 2.4.0, this is a callback called by GTK itself.
-void GtkGui::openFile (GtkWidget *widget, gpointer /* user_data */)
-{
-#if 0
-    // We'll need this when implementing file opening.
-    GtkGui* gui = static_cast<GtkGui*>(user_data);
-#endif
-   
-#if GTK_CHECK_VERSION(2,4,0)
-    char* filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (widget));
-#else   
-    GtkWidget* file_selector = gtk_widget_get_ancestor(widget,
-                                 g_type_from_name("GtkFileSelection"));
-
-    GtkFileSelection* filesel = GTK_FILE_SELECTION (file_selector);
-    const char* filename = gtk_file_selection_get_filename (filesel);
-#endif
-
-    // FIXME: we want to do something like calling gtk_main_quit here, so
-    // run() will return. If run() is then changed to return a pointer to the
-    // next file to be played, then the Player class can play the next file,
-    // unless run() returns NULL.
-    log_error (_("Attempting to open file %s.\n"
-               "NOTE: the file open functionality is not yet implemented!"),
-	       filename);
-
-#if GTK_CHECK_VERSION(2,4,0)
-    g_free(filename);
-#endif
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -931,9 +888,10 @@ void GtkGui::openFile (GtkWidget *widget, gpointer /* user_data */)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-namespace { // anonimous
+namespace { 
 
-class PreferencesDialog {
+class PreferencesDialog
+{
 
 public:
 
@@ -968,12 +926,15 @@ private:
         GtkWidget *urlOpenerText;
         GtkWidget *librarySize;
         GtkWidget *startStoppedToggle;
+        GtkWidget *mediaDir;
+        GtkWidget *saveStreamingMediaToggle;
+        GtkWidget *saveLoadedMediaToggle;
 #ifdef USE_DEBUGGER
         GtkWidget *DebuggerToggle;
 #endif
 
     	PrefWidgets()
-		:
+		    :
         	soundToggle(0),
         	actionDumpToggle(0),
         	parserDumpToggle(0),
@@ -995,13 +956,16 @@ private:
         	versionText(0),
         	urlOpenerText(0),
         	librarySize(0),
-        	startStoppedToggle(0)
+        	startStoppedToggle(0),
+            mediaDir(0),
+            saveStreamingMediaToggle(0),
+            saveLoadedMediaToggle(0)
 #ifdef USE_DEBUGGER
         	,DebuggerToggle(0)
 #endif
 	{}
+
     };
-    
 
     static void handlePrefs(GtkWidget* widget, gint response, gpointer data);
 
@@ -1027,35 +991,58 @@ private:
 
     GtkWidget* _notebook;
 
-
 };
+
 
 // Callback to read values from the preferences dialogue and set rcfile
 // values accordingly.
 void
-PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
+PreferencesDialog::handlePrefs(GtkWidget* dialog, gint response, gpointer data)
 {
 
     PrefWidgets *prefs = static_cast<PrefWidgets*>(data);
 
+    RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
+
     if (response == GTK_RESPONSE_OK) {
 
-        // If 'Save' was clicked, set all the values in _rcfile
-        RcInitFile& _rcfile = RcInitFile::getDefaultInstance();
         // For getting from const gchar* to std::string&
         std::string tmp;
     
-        if ( prefs->soundToggle )
-            _rcfile.useSound(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->soundToggle)));
-    
-        if ( prefs->actionDumpToggle )
-            _rcfile.useActionDump(
-    		    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->actionDumpToggle)));
+        if (prefs->soundToggle) {
+            _rcfile.useSound(gtk_toggle_button_get_active(
+                        GTK_TOGGLE_BUTTON(prefs->soundToggle)));
+        }
 
-        if ( prefs->parserDumpToggle )
+        if (prefs->saveLoadedMediaToggle) {
+            _rcfile.saveLoadedMedia(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->saveLoadedMediaToggle)));
+        }
+
+        if (prefs->saveStreamingMediaToggle) {
+            _rcfile.saveStreamingMedia(
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->saveStreamingMediaToggle)));
+        }
+
+        if (prefs->mediaDir) {
+    	    tmp = gtk_entry_get_text(GTK_ENTRY(prefs->mediaDir));
+            _rcfile.setMediaDir(tmp);
+        }
+
+        if (prefs->actionDumpToggle) {
+            _rcfile.useActionDump(
+    		    gtk_toggle_button_get_active(
+                    GTK_TOGGLE_BUTTON(prefs->actionDumpToggle)));
+        }
+        
+        if (prefs->parserDumpToggle) {
             _rcfile.useParserDump(
-    		    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->parserDumpToggle)));
-    	
+    		    gtk_toggle_button_get_active(
+                    GTK_TOGGLE_BUTTON(prefs->parserDumpToggle)));
+        }
+
         if ( prefs->logfileName ) {
     	    tmp = gtk_entry_get_text(GTK_ENTRY(prefs->logfileName));
             _rcfile.setDebugLog(tmp);
@@ -1063,7 +1050,8 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
         
         if ( prefs->writeLogToggle ) {
             _rcfile.useWriteLog(
-        	    gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->writeLogToggle)));
+        	    gtk_toggle_button_get_active(
+                    GTK_TOGGLE_BUTTON(prefs->writeLogToggle)));
         }
         	
         if ( prefs->verbosityScale ) {
@@ -1079,22 +1067,26 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
 
         if ( prefs->ASCodingErrorToggle ) {
             _rcfile.showASCodingErrors(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->ASCodingErrorToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->ASCodingErrorToggle)));
         }
 
         if ( prefs->malformedSWFToggle ) {
             _rcfile.showMalformedSWFErrors(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->malformedSWFToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->malformedSWFToggle)));
         }
 
         if ( prefs->localHostToggle ) {
             _rcfile.useLocalHost(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localHostToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->localHostToggle)));
         }
 
         if ( prefs->localDomainToggle ) {
             _rcfile.useLocalDomain(
-                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(prefs->localDomainToggle)));
+                gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
+                        prefs->localDomainToggle)));
         }
 
         if ( prefs->solLocalDomainToggle ) {
@@ -1153,11 +1145,11 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
             _rcfile.setURLOpenerFormat(tmp);
         }
     	
-    	// Let _rcfile decide which file to update: generally the file being used if
-    	// specified in GNASHRC environment variable, or in the user's home directory
-    	// if that can be found.
-    	// TODO: We can also specify here which file should be written by passing
-    	// that instead. How might that best be done?
+    	// Let _rcfile decide which file to update: generally the file
+        // being used if specified in GNASHRC environment variable, or in
+        // the user's home directory if that can be found.
+    	// TODO: We can also specify here which file should be written
+        // by passing that instead. How might that best be done?
     	_rcfile.updateFile();
 
         // Close the window when 'ok' is clicked
@@ -1168,17 +1160,14 @@ PreferencesDialog::handlePrefs (GtkWidget* dialog, gint response, gpointer data)
         // Close the window when 'cancel' is clicked
         gtk_widget_destroy(dialog);
     }
-    
-    // response == GTK_RESPONSE_DELETE_EVENT
 
     if (prefs) delete prefs;
 }
 
-
 void
 PreferencesDialog::show()
 {
-    gtk_widget_show_all (_prefsDialog);    
+    gtk_widget_show_all(_prefsDialog);
 }
 
 PreferencesDialog::PreferencesDialog(GtkWidget* window)
@@ -1200,7 +1189,7 @@ PreferencesDialog::PreferencesDialog(GtkWidget* window)
     				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
     				NULL);
     // Add Gnash icon
-    GtkGui::addGnashIcon(GTK_WINDOW(_prefsDialog));
+    addGnashIcon(GTK_WINDOW(_prefsDialog));
 
     // Add notebook (tabs) to dialogue's vbox
     _notebook = gtk_notebook_new ();
@@ -1241,9 +1230,11 @@ PreferencesDialog::addNetworkTab()
     gtk_misc_set_alignment (GTK_MISC (label), 0, 0.5);
 
     _prefs->streamsTimeoutScale = gtk_spin_button_new_with_range(0, 300, 1);
-    gtk_box_pack_start(GTK_BOX(timeoutbox), _prefs->streamsTimeoutScale, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(timeoutbox), _prefs->streamsTimeoutScale, FALSE,
+            FALSE, 0);
     // Align to _rcfile value:
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->streamsTimeoutScale), _rcfile.getStreamsTimeout());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->streamsTimeoutScale),
+            _rcfile.getStreamsTimeout());
 
 }
 
@@ -1254,7 +1245,8 @@ PreferencesDialog::addLoggingTab()
    
     // Tab label
     GtkWidget *loggingtablabel = gtk_label_new_with_mnemonic (_("_Logging"));
-    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(loggingvbox), loggingtablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(loggingvbox),
+            loggingtablabel); 
 
     // Logging options
     GtkWidget *logginglabel = gtk_label_new (_("<b>Logging options</b>"));
@@ -1265,64 +1257,81 @@ PreferencesDialog::addLoggingTab()
     gtk_box_pack_start(GTK_BOX(loggingvbox), verbositylabel, FALSE, FALSE, 0);
     gtk_misc_set_alignment (GTK_MISC (verbositylabel), 0, 0.5);
 
-    _prefs->verbosityScale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (_rcfile.verbosityLevel(), 0, 10, 1, 0, 0)));
-    gtk_scale_set_digits (GTK_SCALE (_prefs->verbosityScale), 0);
-    gtk_range_set_update_policy (GTK_RANGE (_prefs->verbosityScale), GTK_UPDATE_DISCONTINUOUS);
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->verbosityScale, FALSE, FALSE, 0);
+    _prefs->verbosityScale = gtk_hscale_new(GTK_ADJUSTMENT(
+                gtk_adjustment_new(_rcfile.verbosityLevel(), 0, 10, 1, 0, 0)));
+    gtk_scale_set_digits(GTK_SCALE(_prefs->verbosityScale), 0);
+    gtk_range_set_update_policy(GTK_RANGE(
+                _prefs->verbosityScale), GTK_UPDATE_DISCONTINUOUS);
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->verbosityScale, FALSE,
+            FALSE, 0);
     
-    _prefs->writeLogToggle = gtk_check_button_new_with_mnemonic (_("Log to _file"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->writeLogToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->writeLogToggle), _rcfile.useWriteLog());
+    _prefs->writeLogToggle = 
+        gtk_check_button_new_with_mnemonic(_("Log to _file"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->writeLogToggle, FALSE,
+            FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->writeLogToggle),
+            _rcfile.useWriteLog());
     
-    GtkWidget *logfilelabel = gtk_label_new (_("Logfile name:"));
+    GtkWidget *logfilelabel = gtk_label_new(_("Logfile name:"));
     gtk_box_pack_start(GTK_BOX(loggingvbox), logfilelabel, FALSE, FALSE, 0);
-    gtk_misc_set_alignment (GTK_MISC (logfilelabel), 0, 0.5);
+    gtk_misc_set_alignment(GTK_MISC(logfilelabel), 0, 0.5);
     
-    _prefs->logfileName = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->logfileName, FALSE, FALSE, 0);
+    _prefs->logfileName = gtk_entry_new();
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->logfileName, FALSE,
+            FALSE, 0);
+
     // Put debug filename in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(_prefs->logfileName), _rcfile.getDebugLog().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->logfileName),
+            _rcfile.getDebugLog().c_str());
     
-    _prefs->parserDumpToggle = gtk_check_button_new_with_mnemonic (_("Log _parser output"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->parserDumpToggle, FALSE, FALSE, 0);
+    _prefs->parserDumpToggle = 
+        gtk_check_button_new_with_mnemonic(_("Log _parser output"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->parserDumpToggle, FALSE,
+            FALSE, 0);
     // Align button state with _rcfile
-    gtk_toggle_button_set_active (
-    		GTK_TOGGLE_BUTTON (_prefs->parserDumpToggle),
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(_prefs->parserDumpToggle),
     		_rcfile.useParserDump());
 
-    _prefs->actionDumpToggle = gtk_check_button_new_with_mnemonic (_("Log SWF _actions"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->actionDumpToggle, FALSE, FALSE, 0);
+    _prefs->actionDumpToggle =
+        gtk_check_button_new_with_mnemonic(_("Log SWF _actions"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->actionDumpToggle, FALSE,
+            FALSE, 0);
     // Align button state with _rcfile
-    gtk_toggle_button_set_active (
-    		GTK_TOGGLE_BUTTON (_prefs->actionDumpToggle),
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->actionDumpToggle),
     		_rcfile.useActionDump());
 
-    _prefs->malformedSWFToggle = gtk_check_button_new_with_mnemonic (_("Log malformed SWF _errors"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->malformedSWFToggle, FALSE, FALSE, 0);
+    _prefs->malformedSWFToggle = 
+        gtk_check_button_new_with_mnemonic(_("Log malformed SWF _errors"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->malformedSWFToggle,
+            FALSE, FALSE, 0);
     // Align button state with _rcfile
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->malformedSWFToggle),
-    			_rcfile.showMalformedSWFErrors());
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->malformedSWFToggle),
+            _rcfile.showMalformedSWFErrors());
 
-    _prefs->ASCodingErrorToggle = gtk_check_button_new_with_mnemonic (_("Log ActionScript _coding errors"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->ASCodingErrorToggle, FALSE, FALSE, 0);
+    _prefs->ASCodingErrorToggle = gtk_check_button_new_with_mnemonic(
+            _("Log ActionScript _coding errors"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->ASCodingErrorToggle,
+            FALSE, FALSE, 0);
     // Align button state with _rcfile
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->ASCodingErrorToggle),
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->ASCodingErrorToggle),
     			_rcfile.showASCodingErrors());
 
-    _prefs->lcTraceToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->lcTraceToggle = gtk_check_button_new_with_mnemonic(
     				_("Log _Local Connection activity"));
-    gtk_box_pack_start (GTK_BOX(loggingvbox), _prefs->lcTraceToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->lcTraceToggle),
+    gtk_box_pack_start (GTK_BOX(loggingvbox), _prefs->lcTraceToggle, FALSE,
+            FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->lcTraceToggle),
     			_rcfile.getLCTrace()); 
 
 #ifdef USE_DEBUGGER
 
-    _prefs->DebuggerToggle = gtk_check_button_new_with_mnemonic (_("Enable _debugger"));
-    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->DebuggerToggle, FALSE, FALSE, 0);
+    _prefs->DebuggerToggle = 
+        gtk_check_button_new_with_mnemonic(_("Enable _debugger"));
+    gtk_box_pack_start(GTK_BOX(loggingvbox), _prefs->DebuggerToggle, FALSE,
+            FALSE, 0);
     // Align button state with _rcfile
-    gtk_toggle_button_set_active (
-    			GTK_TOGGLE_BUTTON (_prefs->DebuggerToggle),
-    			_rcfile.useDebugger());
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->DebuggerToggle),
+            _rcfile.useDebugger());
 
 #endif
 
@@ -1337,67 +1346,91 @@ PreferencesDialog::addSecurityTab()
     // Security tab title
     GtkWidget *securitytablabel = gtk_label_new_with_mnemonic (_("_Security"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(securityvbox), securitytablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook),
+            GTK_WIDGET(securityvbox), securitytablabel); 
     
     // Network connection
-    GtkWidget *netconnectionslabel = gtk_label_new (_("<b>Network connections</b>"));
-    gtk_label_set_use_markup (GTK_LABEL (netconnectionslabel), TRUE);
-    gtk_box_pack_start(GTK_BOX(securityvbox), netconnectionslabel, FALSE, FALSE, 0);
+    GtkWidget *netconnectionslabel = gtk_label_new(
+            _("<b>Network connections</b>"));
+    gtk_label_set_use_markup(GTK_LABEL(netconnectionslabel), TRUE);
+    gtk_box_pack_start(GTK_BOX(securityvbox), netconnectionslabel, FALSE,
+            FALSE, 0);
  
-    _prefs->localHostToggle = gtk_check_button_new_with_mnemonic (_("Connect only to local _host"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localHostToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->localHostToggle), _rcfile.useLocalHost());
+    _prefs->localHostToggle = gtk_check_button_new_with_mnemonic(
+            _("Connect only to local _host"));
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->localHostToggle, FALSE,
+            FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->localHostToggle),
+            _rcfile.useLocalHost());
     
-    _prefs->localDomainToggle = gtk_check_button_new_with_mnemonic (_("Connect only to local _domain"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localDomainToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->localDomainToggle), _rcfile.useLocalDomain());
+    _prefs->localDomainToggle = gtk_check_button_new_with_mnemonic(
+            _("Connect only to local _domain"));
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->localDomainToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->localDomainToggle),
+            _rcfile.useLocalDomain());
 
-    _prefs->insecureSSLToggle = gtk_check_button_new_with_mnemonic (_("Disable SSL _verification"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->insecureSSLToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->insecureSSLToggle), _rcfile.insecureSSL());
+    _prefs->insecureSSLToggle = gtk_check_button_new_with_mnemonic(
+            _("Disable SSL _verification"));
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->insecureSSLToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->insecureSSLToggle),
+            _rcfile.insecureSSL());
     
-    GtkWidget *whitelistexpander = gtk_expander_new_with_mnemonic (_("_Whitelist"));
-    gtk_box_pack_start (GTK_BOX (securityvbox), whitelistexpander, FALSE, FALSE, 0);
+    GtkWidget *whitelistexpander =
+        gtk_expander_new_with_mnemonic(_("_Whitelist"));
+    gtk_box_pack_start(GTK_BOX(securityvbox), whitelistexpander, FALSE,
+            FALSE, 0);
     
-    GtkWidget *whitelistcomboboxentry1 = gtk_combo_box_entry_new_text ();
-    gtk_container_add (GTK_CONTAINER(whitelistexpander), whitelistcomboboxentry1);
+    GtkWidget *whitelistcomboboxentry1 = gtk_combo_box_entry_new_text();
+    gtk_container_add(GTK_CONTAINER(whitelistexpander),
+            whitelistcomboboxentry1);
 
-    GtkWidget *blacklistexpander = gtk_expander_new_with_mnemonic (_("_Blacklist"));
-    gtk_box_pack_start (GTK_BOX (securityvbox), blacklistexpander, FALSE, FALSE, 0);
+    GtkWidget *blacklistexpander = 
+        gtk_expander_new_with_mnemonic(_("_Blacklist"));
+    gtk_box_pack_start(GTK_BOX (securityvbox), blacklistexpander, FALSE,
+            FALSE, 0);
     
-    GtkWidget *blacklistcomboboxentry2 = gtk_combo_box_entry_new_text ();
-    gtk_container_add (GTK_CONTAINER(blacklistexpander), blacklistcomboboxentry2);
+    GtkWidget *blacklistcomboboxentry2 = gtk_combo_box_entry_new_text();
+    gtk_container_add (GTK_CONTAINER(blacklistexpander),
+            blacklistcomboboxentry2);
 
     // Privacy
-    GtkWidget *privacylabel = gtk_label_new (_("<b>Privacy</b>"));
-    gtk_label_set_use_markup (GTK_LABEL (privacylabel), TRUE);
-    gtk_box_pack_start (GTK_BOX(securityvbox), privacylabel, FALSE, FALSE, 0);
+    GtkWidget *privacylabel = gtk_label_new(_("<b>Privacy</b>"));
+    gtk_label_set_use_markup(GTK_LABEL(privacylabel), TRUE);
+    gtk_box_pack_start(GTK_BOX(securityvbox), privacylabel, FALSE, FALSE, 0);
 
-    GtkWidget *solsandboxlabel = gtk_label_new (_("Shared objects directory:"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), solsandboxlabel, FALSE, FALSE, 0);
-    gtk_misc_set_alignment (GTK_MISC (solsandboxlabel), 0, 0.5);
+    GtkWidget *solsandboxlabel = gtk_label_new(_("Shared objects directory:"));
+    gtk_box_pack_start(GTK_BOX(securityvbox), solsandboxlabel, FALSE,
+            FALSE, 0);
+    gtk_misc_set_alignment(GTK_MISC (solsandboxlabel), 0, 0.5);
 
     _prefs->solSandbox = gtk_entry_new();
-    gtk_entry_set_text(GTK_ENTRY(_prefs->solSandbox), _rcfile.getSOLSafeDir().c_str());
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solSandbox, FALSE, FALSE, 0);
+    gtk_entry_set_text(GTK_ENTRY(_prefs->solSandbox), 
+            _rcfile.getSOLSafeDir().c_str());
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->solSandbox, FALSE,
+            FALSE, 0);
 
-    _prefs->solReadOnlyToggle = gtk_check_button_new_with_mnemonic ( 
+    _prefs->solReadOnlyToggle = gtk_check_button_new_with_mnemonic( 
     				_("Do _not write Shared Object files"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solReadOnlyToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->solReadOnlyToggle),
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->solReadOnlyToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->solReadOnlyToggle),
     			_rcfile.getSOLReadOnly());
 
-    _prefs->solLocalDomainToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->solLocalDomainToggle = gtk_check_button_new_with_mnemonic(
     				_("Only _access local Shared Object files"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->solLocalDomainToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->solLocalDomainToggle),
-    			_rcfile.getSOLLocalDomain());
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->solLocalDomainToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                _prefs->solLocalDomainToggle), _rcfile.getSOLLocalDomain());
 
-    _prefs->localConnectionToggle = gtk_check_button_new_with_mnemonic (
+    _prefs->localConnectionToggle = gtk_check_button_new_with_mnemonic(
     				_("Disable Local _Connection object"));
-    gtk_box_pack_start (GTK_BOX(securityvbox), _prefs->localConnectionToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->localConnectionToggle),
-    			_rcfile.getLocalConnection()); 
+    gtk_box_pack_start(GTK_BOX(securityvbox), _prefs->localConnectionToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                _prefs->localConnectionToggle), _rcfile.getLocalConnection()); 
 }
 
 void
@@ -1409,17 +1442,57 @@ PreferencesDialog::addMediaTab()
     // Media tab title
     GtkWidget *mediatablabel = gtk_label_new_with_mnemonic (_("_Media"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(mediavbox), mediatablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook),
+            GTK_WIDGET(mediavbox), mediatablabel); 
     
     // Sound
-    GtkWidget *soundlabel = gtk_label_new (_("<b>Sound</b>"));
-    gtk_label_set_use_markup (GTK_LABEL (soundlabel), TRUE);
+    GtkWidget *soundlabel = gtk_label_new(_("<b>Sound</b>"));
+    gtk_label_set_use_markup(GTK_LABEL(soundlabel), TRUE);
     gtk_box_pack_start(GTK_BOX(mediavbox), soundlabel, FALSE, FALSE, 0);
    
-    _prefs->soundToggle = gtk_check_button_new_with_mnemonic (_("Use sound _handler"));
-    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->soundToggle, FALSE, FALSE, 0);
+    _prefs->soundToggle = gtk_check_button_new_with_mnemonic(
+            _("Use sound _handler"));
+    gtk_box_pack_start(GTK_BOX(mediavbox), _prefs->soundToggle, FALSE,
+            FALSE, 0);
     // Align button state with rcfile
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->soundToggle), _rcfile.useSound());
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->soundToggle),
+            _rcfile.useSound());
+
+    // Save Media
+    GtkWidget *savemedia = gtk_label_new(_("<b>Media Streams</b>"));
+    gtk_label_set_use_markup(GTK_LABEL(savemedia), TRUE);
+    gtk_box_pack_start(GTK_BOX(mediavbox), savemedia, FALSE, FALSE, 0);
+   
+    // Save streamed media Toggle
+    _prefs->saveStreamingMediaToggle = gtk_check_button_new_with_mnemonic(
+            _("Save media streams to disk"));
+    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->saveStreamingMediaToggle,
+            FALSE, FALSE, 0);
+    // Align button state with rcfile
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+            _prefs->saveStreamingMediaToggle), _rcfile.saveStreamingMedia());
+
+    // Save loaded media Toggle
+    _prefs->saveLoadedMediaToggle = gtk_check_button_new_with_mnemonic(
+            _("Save dynamically loaded media to disk"));
+    gtk_box_pack_start (GTK_BOX(mediavbox), _prefs->saveLoadedMediaToggle,
+            FALSE, FALSE, 0);
+    // Align button state with rcfile
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(
+                _prefs->saveLoadedMediaToggle), _rcfile.saveLoadedMedia());
+
+    // Directory for saving media
+    GtkWidget *mediastreamslabel = gtk_label_new(_("Saved media directory:"));
+    gtk_box_pack_start(GTK_BOX(mediavbox), mediastreamslabel, FALSE,
+            FALSE, 0);
+    gtk_misc_set_alignment (GTK_MISC (mediastreamslabel), 0, 0.5);
+
+    _prefs->mediaDir = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(_prefs->mediaDir), 
+            _rcfile.getMediaDir().c_str());
+    gtk_box_pack_start(GTK_BOX(mediavbox), _prefs->mediaDir, FALSE,
+            FALSE, 0);
+
 }
 
 void
@@ -1431,7 +1504,8 @@ PreferencesDialog::addPlayerTab()
     // Player tab title
     GtkWidget *playertablabel = gtk_label_new_with_mnemonic (_("_Player"));
     
-    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook), GTK_WIDGET(playervbox), playertablabel); 
+    gtk_notebook_append_page(GTK_NOTEBOOK(_notebook),
+            GTK_WIDGET(playervbox), playertablabel); 
 
     // Player description
     GtkWidget *descriptionlabel = gtk_label_new (_("<b>Player description</b>"));
@@ -1447,9 +1521,12 @@ PreferencesDialog::addPlayerTab()
     gtk_box_pack_start(GTK_BOX(versionhbox), versionlabel, FALSE, FALSE, 0);
 
     _prefs->versionText = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(versionhbox), _prefs->versionText, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(versionhbox), _prefs->versionText,
+            FALSE, FALSE, 0);
+
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(_prefs->versionText), _rcfile.getFlashVersionString().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->versionText),
+            _rcfile.getFlashVersionString().c_str());
 
     // OS label
     GtkWidget *oshbox = gtk_hbox_new (FALSE, 2);
@@ -1462,16 +1539,17 @@ PreferencesDialog::addPlayerTab()
     _prefs->osText = gtk_entry_new ();
     gtk_box_pack_start(GTK_BOX(oshbox), _prefs->osText, FALSE, FALSE, 0);
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(_prefs->osText), _rcfile.getFlashSystemOS().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->osText),
+            _rcfile.getFlashSystemOS().c_str());
     
     GtkWidget *OSadvicelabel = gtk_label_new (_("<i>If blank, Gnash will "
     					   "detect your OS</i>"));
     gtk_label_set_use_markup (GTK_LABEL (OSadvicelabel), TRUE);
     gtk_misc_set_alignment (GTK_MISC (OSadvicelabel), 0, 0.5);
-    gtk_box_pack_start(GTK_BOX(playervbox), OSadvicelabel, FALSE, FALSE, 0);     
+    gtk_box_pack_start(GTK_BOX(playervbox), OSadvicelabel, FALSE, FALSE, 0);
 
     // URL opener
-    GtkWidget *urlopenerbox = gtk_hbox_new (FALSE, 2);
+    GtkWidget *urlopenerbox = gtk_hbox_new(FALSE, 2);
     gtk_box_pack_start(GTK_BOX(playervbox), urlopenerbox, FALSE, FALSE, 0);
     
     GtkWidget *urlopenerlabel = gtk_label_new (_("URL opener:"));
@@ -1479,14 +1557,22 @@ PreferencesDialog::addPlayerTab()
     gtk_box_pack_start(GTK_BOX(urlopenerbox), urlopenerlabel, FALSE, FALSE, 0);
     
     _prefs->urlOpenerText = gtk_entry_new ();
-    gtk_box_pack_start(GTK_BOX(urlopenerbox), _prefs->urlOpenerText, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(urlopenerbox), _prefs->urlOpenerText, FALSE,
+            FALSE, 0);
     // Put text in the entry box      
-    gtk_entry_set_text(GTK_ENTRY(_prefs->urlOpenerText), _rcfile.getURLOpenerFormat().c_str());
+    gtk_entry_set_text(GTK_ENTRY(_prefs->urlOpenerText),
+            _rcfile.getURLOpenerFormat().c_str());
 
     // Performance
-    GtkWidget *performancelabel = gtk_label_new (_("<b>Performance</b>"));
+    GtkWidget *performancelabel = gtk_label_new(_("<b>Performance</b>"));
     gtk_label_set_use_markup (GTK_LABEL (performancelabel), TRUE);
     gtk_box_pack_start(GTK_BOX(playervbox), performancelabel, FALSE, FALSE, 0);
+
+    GtkWidget* qualitybox = gtk_hbox_new(FALSE, 2);
+    gtk_box_pack_start(GTK_BOX(playervbox), qualitybox, FALSE, FALSE, 0);
+
+    GtkWidget* qualityoptions = gtk_vbox_new(FALSE, 5);
+    gtk_box_pack_start(GTK_BOX(qualitybox), qualityoptions, FALSE, FALSE, 0);
 
     // Library size
     GtkWidget *libraryhbox = gtk_hbox_new (FALSE, 2);
@@ -1497,20 +1583,22 @@ PreferencesDialog::addPlayerTab()
     gtk_box_pack_start(GTK_BOX(libraryhbox), librarylabel, FALSE, FALSE, 0);
 
     _prefs->librarySize = gtk_spin_button_new_with_range(0, 100, 1);
-    gtk_box_pack_start(GTK_BOX(libraryhbox), _prefs->librarySize, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(libraryhbox), _prefs->librarySize, FALSE,
+            FALSE, 0);
     // Align to _rcfile value:
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize), _rcfile.getMovieLibraryLimit());
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(_prefs->librarySize),
+            _rcfile.getMovieLibraryLimit());
 
     _prefs->startStoppedToggle = gtk_check_button_new_with_mnemonic (
     				_("Start _Gnash in pause mode"));
-    gtk_box_pack_start (GTK_BOX(playervbox), _prefs->startStoppedToggle, FALSE, FALSE, 0);
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (_prefs->startStoppedToggle),
+    gtk_box_pack_start(GTK_BOX(playervbox), _prefs->startStoppedToggle,
+            FALSE, FALSE, 0);
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(_prefs->startStoppedToggle),
     			_rcfile.startStopped());
-} // end of ::addPlayerTab
+} 
 
 
-
-} // end of anonimous namespace
+} // anonymous namespace
 
 
 void
@@ -1528,8 +1616,8 @@ GtkGui::showPropertiesDialog()
     GtkWidget *propsDialog = gtk_dialog_new_with_buttons(
     					_("Movie properties"),
     					GTK_WINDOW(_window),
-   					// The cast is necessary if there is more
-   					// than one option.
+                        // The cast is necessary if there is more
+                        // than one option.
     					GtkDialogFlags(
     					GTK_DIALOG_DESTROY_WITH_PARENT),
     					// Just a 'close' button
@@ -1538,8 +1626,7 @@ GtkGui::showPropertiesDialog()
 
     // Not too small... But I'd rather not have to specify
     // a size in pixels.
-    gtk_window_set_default_size (GTK_WINDOW(propsDialog),
-                                 500, 300);
+    gtk_window_set_default_size(GTK_WINDOW(propsDialog), 500, 300);
     
     // Suggest to the window manager to allow "maximize"
     // As there can be (will be) a lot of data.
@@ -1553,20 +1640,19 @@ GtkGui::showPropertiesDialog()
                G_CALLBACK(gtk_widget_destroy), NULL);
 
     GtkWidget *propsvbox = gtk_vbox_new (FALSE, 1);
-    gtk_container_add (GTK_CONTAINER (
+    gtk_container_add(GTK_CONTAINER(
                         GTK_DIALOG(propsDialog)->vbox), propsvbox);
 
 #ifdef USE_SWFTREE
 
     std::auto_ptr<InfoTree> infoptr = getMovieInfo();
 
-    GtkWidget *scrollwindow1 = gtk_scrolled_window_new (NULL, NULL);
-    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrollwindow1),
+    GtkWidget *scrollwindow1 = gtk_scrolled_window_new(0, 0);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollwindow1),
 				      GTK_POLICY_AUTOMATIC,
 				      GTK_POLICY_AUTOMATIC);
 
-    gtk_box_pack_start (
-            GTK_BOX (propsvbox), scrollwindow1, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX (propsvbox), scrollwindow1, TRUE, TRUE, 0);
 
     enum
     {
@@ -1599,12 +1685,13 @@ GtkGui::showPropertiesDialog()
     // Add columns:
     
     // 'Variable' column:
-    renderer = gtk_cell_renderer_text_new ();
-    coloffset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-					       -1, _("Variable"),
-					       renderer, "text",
-					       STRING1_COLUMN,
-					       NULL);
+    renderer = gtk_cell_renderer_text_new();
+    coloffset = gtk_tree_view_insert_column_with_attributes(
+            GTK_TREE_VIEW(treeview),
+            -1, _("Variable"),
+            renderer, "text",
+            STRING1_COLUMN,
+            NULL);
     column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), coloffset - 1);
 
     // 'Value' column:
@@ -1612,19 +1699,20 @@ GtkGui::showPropertiesDialog()
     // copied; it can't actually be edited, though.
     renderer = gtk_cell_renderer_text_new ();
     g_object_set (renderer, "xalign", 0.0, "editable", TRUE, NULL);
-    coloffset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
-					       -1, _("Value"),
-					       renderer, "text",
-					       STRING2_COLUMN,
-					       NULL);
-    column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), coloffset - 1);
+    coloffset = gtk_tree_view_insert_column_with_attributes(
+            GTK_TREE_VIEW(treeview),
+            -1, _("Value"),
+            renderer, "text",
+            STRING2_COLUMN,
+            NULL);
+    column = gtk_tree_view_get_column(GTK_TREE_VIEW(treeview), coloffset - 1);
 
     //Add tree to scrollwindow.
-    gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
+    gtk_container_add(GTK_CONTAINER(scrollwindow1), treeview);
 
 #endif
 
-    gtk_widget_show_all (propsDialog);
+    gtk_widget_show_all(propsDialog);
 
 }
 
@@ -1672,7 +1760,8 @@ GtkGui::showAboutDialog()
 #ifdef HAVE_GST_GST_H
     comments.append(_("\nBuilt against gstreamer version: "));
     std::ostringstream ss;
-    ss << GST_VERSION_MAJOR << "." << GST_VERSION_MINOR << "." << GST_VERSION_MICRO;
+    ss << GST_VERSION_MAJOR << "." << GST_VERSION_MINOR << "." <<
+        GST_VERSION_MICRO;
     comments.append(ss.str());
 #endif
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -1694,7 +1783,7 @@ GtkGui::showAboutDialog()
     gtk_about_dialog_set_name (about, "Gnash");
     gtk_about_dialog_set_version(about, VERSION);
     gtk_about_dialog_set_copyright(about, "Copyright (C) 2005, 2006, 2007, "
-            "2008 The Free Software Foundation");
+            "2008, 2009 The Free Software Foundation");
     gtk_about_dialog_set_comments (about, comments.c_str());
     gtk_about_dialog_set_authors(about, authors);
     gtk_about_dialog_set_documenters(about, documentors);
@@ -1718,8 +1807,8 @@ GtkGui::showAboutDialog()
     gtk_about_dialog_set_website(about, "http://www.gnu.org/software/gnash/");
 
     // Destroy the dialogue box when 'close' is clicked.
-    g_signal_connect(G_OBJECT(aboutWidget),
-            "response",  G_CALLBACK(gtk_widget_destroy), aboutWidget);
+    g_signal_connect(aboutWidget, "response", 
+            G_CALLBACK(gtk_widget_destroy), aboutWidget);
 
     gtk_widget_show (aboutWidget);
 
@@ -1730,7 +1819,7 @@ GtkGui::showAboutDialog()
         NULL,
         "program-name", _("Gnash"), 
         "version", VERSION,
-        "copyright", "Copyright (C) 2005, 2006, 2007, 2008 "
+        "copyright", "Copyright (C) 2005, 2006, 2007, 2008, 2009 "
                      "The Free Software Foundation",
         "comments", comments.c_str(),
         "authors", authors,
@@ -1749,7 +1838,8 @@ GtkGui::showAboutDialog()
         "GNU General Public License for more details.\n"
         "You should have received a copy of the GNU General Public License\n"
         "along with this program; if not, write to the Free Software\n"
-        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+        "Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301"
+        "  USA",
         "website", "http://www.gnu.org/software/gnash/",
         NULL);
 #endif
@@ -1757,8 +1847,591 @@ GtkGui::showAboutDialog()
 		gdk_pixbuf_unref(logo_pixbuf);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                                Menus                                    ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+// Create a File menu that can be used from the menu bar or the popup.
 void
-GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+GtkGui::createFileMenu(GtkWidget *obj)
+{
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(_("_File"));
+    gtk_widget_show(menuitem);
+    gtk_container_add(GTK_CONTAINER(obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), menu);
+
+    // Open    
+    GtkWidget *open = gtk_image_menu_item_new_from_stock("gtk-open", 0);
+    gtk_widget_show(open);
+    gtk_container_add(GTK_CONTAINER(menu), open);
+    g_signal_connect(open, "activate", G_CALLBACK(menuOpenFile), this);
+
+    // Save    
+    GtkWidget *save = gtk_image_menu_item_new_from_stock("gtk-save", 0);
+    gtk_widget_show(save);
+    gtk_container_add(GTK_CONTAINER(menu), save);
+    // Disabled until save functionality is implemented:
+    gtk_widget_set_sensitive(save, FALSE); 
+
+    // Save as
+    GtkWidget *saveAs = gtk_image_menu_item_new_from_stock("gtk-save-as", 0);
+    gtk_widget_show(saveAs);
+    gtk_container_add(GTK_CONTAINER(menu), saveAs);
+    // Disabled until save-as functionality is implemented:
+    gtk_widget_set_sensitive(saveAs, FALSE);
+    
+    GtkWidget *separatormenuitem1 = gtk_separator_menu_item_new();
+    gtk_widget_show(separatormenuitem1);
+    gtk_container_add(GTK_CONTAINER(menu), separatormenuitem1);
+
+    // Properties
+    GtkWidget *properties =
+        gtk_image_menu_item_new_from_stock("gtk-properties", 0);
+    gtk_widget_show(properties);
+    gtk_container_add(GTK_CONTAINER(menu), properties);
+    g_signal_connect(properties, "activate", G_CALLBACK(menuMovieInfo), this);
+
+    GtkWidget *separator2 = gtk_separator_menu_item_new();
+    gtk_widget_show(separator2);
+    gtk_container_add(GTK_CONTAINER(menu), separator2);
+
+    GtkWidget *quit = gtk_image_menu_item_new_from_stock("gtk-quit", 0);
+    gtk_widget_show(quit);
+    gtk_container_add(GTK_CONTAINER(menu), quit);
+
+    g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
+}
+
+// Create an Edit menu that can be used from the menu bar or the popup.
+void
+GtkGui::createEditMenu(GtkWidget *obj)
+{
+    
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(_("_Edit"));
+    gtk_widget_show(menuitem);
+    gtk_container_add(GTK_CONTAINER(obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), menu);
+
+    GtkWidget *preferences =
+        gtk_image_menu_item_new_from_stock("gtk-preferences", 0);
+    gtk_widget_show(preferences);
+    gtk_container_add(GTK_CONTAINER(menu), preferences);
+
+    g_signal_connect(preferences, "activate", G_CALLBACK(menuPreferences),
+                      this);
+}
+
+// Create a Help menu that can be used from the menu bar or the popup.
+void
+GtkGui::createHelpMenu(GtkWidget *obj)
+{
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic(_("_Help"));
+    gtk_widget_show(menuitem);
+    gtk_container_add(GTK_CONTAINER (obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), menu);
+
+    GtkWidget *about = gtk_image_menu_item_new_from_stock("gtk-about", 0);
+    gtk_widget_show(about);
+    gtk_container_add(GTK_CONTAINER(menu), about);
+    
+    g_signal_connect(about, "activate", G_CALLBACK(menuAbout), this);
+}
+
+
+// Create a View menu that can be used from the menu bar or the popup.
+void
+GtkGui::createViewMenu(GtkWidget *obj)
+{
+
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_View"));
+    gtk_widget_show (menuitem);
+    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+
+    // Refresh
+    GtkWidget *refresh = gtk_image_menu_item_new_with_label(_("Redraw"));
+    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(refresh),
+        gtk_image_new_from_stock("gtk-refresh", GTK_ICON_SIZE_MENU));
+    gtk_menu_append(menu, refresh);
+    gtk_widget_show(refresh);
+    g_signal_connect(refresh, "activate", G_CALLBACK(menuRefreshView), this);
+
+    // Fullscreen
+#if GTK_CHECK_VERSION(2,8,0)
+    GtkWidget *fullscreen = 
+	    gtk_image_menu_item_new_with_label(_("Toggle fullscreen"));
+    gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(fullscreen),
+               gtk_image_new_from_stock("gtk-fullscreen", GTK_ICON_SIZE_MENU));
+#else
+    GtkWidget *fullscreen = 
+        gtk_menu_item_new_with_label(_("Toggle fullscreen"));
+#endif
+    gtk_menu_append(menu, fullscreen);
+    gtk_widget_show(GTK_WIDGET(fullscreen));
+    g_signal_connect(fullscreen, "activate", G_CALLBACK(menuFullscreen), this);
+
+// Can be disabled at compile time.
+#ifndef DISABLE_REGION_UPDATES_DEBUGGING
+    GtkWidget *updated_regions =
+        gtk_check_menu_item_new_with_label(_("Show updated ranges"));
+   
+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(updated_regions),
+            showUpdatedRegions());
+
+    gtk_menu_append(menu, updated_regions);
+    gtk_widget_show(updated_regions);
+    g_signal_connect(updated_regions, "activate",
+                     G_CALLBACK(menuShowUpdatedRegions), this);
+#endif
+
+}
+
+// Create a Control menu that can be used from the menu bar or the popup.
+void
+GtkGui::createControlMenu(GtkWidget *obj)
+{
+
+    // Movie Control Menu
+    GtkWidget *control = gtk_menu_item_new_with_mnemonic(_("Movie _Control"));
+    gtk_widget_show(control);
+    gtk_container_add(GTK_CONTAINER(obj), control);
+    
+    GtkWidget *menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(control), menu);
+
+    // Play
+#if GTK_CHECK_VERSION(2,6,0)
+    GtkWidget *play = gtk_image_menu_item_new_from_stock("gtk-media-play", 0);
+#else
+    GtkWidget *play = gtk_menu_item_new_with_label(_("Play"));
+#endif
+    gtk_menu_append(menu, play);
+    gtk_widget_show(play);    
+    g_signal_connect (play, "activate", G_CALLBACK(menuPlay), this);
+
+    // Pause
+#if GTK_CHECK_VERSION(2,6,0)
+    GtkWidget *pause = 
+        gtk_image_menu_item_new_from_stock ("gtk-media-pause", 0);
+#else
+    GtkWidget *pause = gtk_menu_item_new_with_label(_("Pause"));
+#endif
+    gtk_menu_append(menu, pause);
+    gtk_widget_show(pause);
+    g_signal_connect(pause, "activate", G_CALLBACK(menuPause), this);
+
+    // Stop
+#if GTK_CHECK_VERSION(2,6,0)
+    GtkWidget *stop = gtk_image_menu_item_new_from_stock("gtk-media-stop", 0);
+#else
+    GtkWidget *stop = gtk_menu_item_new_with_label(_("Stop"));
+#endif
+    gtk_menu_append(menu, stop);
+    gtk_widget_show(stop);
+    g_signal_connect(stop, "activate", G_CALLBACK(menuStop), this);
+
+    GtkWidget *separator1 = gtk_separator_menu_item_new();
+    gtk_widget_show(separator1);
+    gtk_container_add(GTK_CONTAINER(menu), separator1);
+
+    // Restart
+    // 
+    GtkWidget *restart = gtk_image_menu_item_new_with_label(_("Restart Movie"));
+
+    // Suitable image?
+    gtk_menu_append(menu, restart);
+    gtk_widget_show(restart);
+    g_signal_connect(restart, "activate", G_CALLBACK(menuRestart), this);
+
+}
+
+bool
+lirc_handler(void*, int, void* /*data*/)
+{ 
+    
+    // want to remove this handler. You may want to close fd.
+    log_debug("%s\n", lirc->getButton());
+  
+    // Want to keep this handler
+    return true;
+}
+
+// This assumes that the parent of _drawingArea is _window, which
+// isn't the case in the plugin fullscreen (it's _overlay). Currently
+// we return from fullscreen when Gui::stop() is called, which
+// seems like a good idea, and also avoids this problem.
+void
+GtkGui::stopHook()
+{
+
+    // Assert they're either both initialised or both uninitialised
+    assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
+    if (_resumeButton) {
+        gtk_box_pack_start(GTK_BOX(_vbox), _resumeButton, FALSE, FALSE, 0);
+    }
+}
+
+void
+GtkGui::playHook()
+{
+    assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
+    if (_resumeButton) {
+        gtk_container_remove(GTK_CONTAINER(_vbox), _resumeButton);
+    }
+}
+
+
+
+/// Anonymous namespace for callbacks, local functions, event handlers etc.
+namespace {
+
+static GList *pixmaps_directories = NULL;
+
+// Adds the Gnash icon to a window.
+void
+addGnashIcon(GtkWindow* window)
+{
+    GdkPixbuf *window_icon_pixbuf = createPixbuf ("GnashG.png");
+    if (window_icon_pixbuf) {
+        gtk_window_set_icon (GTK_WINDOW (window), window_icon_pixbuf);
+		gdk_pixbuf_unref (window_icon_pixbuf);
+    }
+}
+
+/* This is an internally used function to create pixmaps. */
+GdkPixbuf*
+createPixbuf (const gchar *filename)
+{
+    gchar *pathname = NULL;
+    GdkPixbuf *pixbuf;
+    GError *error = NULL;
+
+    if (!filename || !filename[0])
+       return NULL;
+
+    pathname = findPixmapFile (filename);
+
+    if (!pathname) {
+        log_error (_("Couldn't find pixmap file: %s"), filename);
+        g_warning (_("Couldn't find pixmap file: %s"), filename);
+        return NULL;
+    }
+
+    pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
+    if (!pixbuf) {
+        log_error (_("Failed to load pixbuf file: %s: %s"), pathname, error->message);
+        g_error_free (error);
+    }
+    g_free (pathname);
+    return pixbuf;
+}
+
+key::code
+gdk_to_gnash_key(guint key)
+{
+    key::code c(key::INVALID);
+
+    // ascii 32-126 in one range:    
+    if (key >= GDK_space && key <= GDK_asciitilde) {
+        c = (key::code) ((key - GDK_space) + key::SPACE);
+    }
+
+    // Function keys:
+    else if (key >= GDK_F1 && key <= GDK_F15)	{
+        c = (key::code) ((key - GDK_F1) + key::F1);
+    }
+
+    // Keypad:
+    else if (key >= GDK_KP_0 && key <= GDK_KP_9) {
+        c = (key::code) ((key - GDK_KP_0) + key::KP_0);
+    }
+
+    // Extended ascii:
+    else if (key >= GDK_nobreakspace && key <= GDK_ydiaeresis) {
+        c = (key::code) ((key - GDK_nobreakspace) + 
+                key::NOBREAKSPACE);
+    }
+
+    // non-character keys don't correlate, so use a look-up table.
+    else {
+        struct {
+            guint             gdk;
+            key::code  gs;
+        } table[] = {
+            { GDK_BackSpace, key::BACKSPACE },
+            { GDK_Tab, key::TAB },
+            { GDK_Clear, key::CLEAR },
+            { GDK_Return, key::ENTER },
+            
+            { GDK_Shift_L, key::SHIFT },
+            { GDK_Shift_R, key::SHIFT },
+            { GDK_Control_L, key::CONTROL },
+            { GDK_Control_R, key::CONTROL },
+            { GDK_Alt_L, key::ALT },
+            { GDK_Alt_R, key::ALT },
+            { GDK_Caps_Lock, key::CAPSLOCK },
+            
+            { GDK_Escape, key::ESCAPE },
+            
+            { GDK_Page_Down, key::PGDN },
+            { GDK_Page_Up, key::PGUP },
+            { GDK_Home, key::HOME },
+            { GDK_End, key::END },
+            { GDK_Left, key::LEFT },
+            { GDK_Up, key::UP },
+            { GDK_Right, key::RIGHT },
+            { GDK_Down, key::DOWN },
+            { GDK_Insert, key::INSERT },
+            { GDK_Delete, key::DELETEKEY },
+            
+            { GDK_Help, key::HELP },
+            { GDK_Num_Lock, key::NUM_LOCK },
+
+            { GDK_VoidSymbol, key::INVALID }
+        };
+        
+        for (int i = 0; table[i].gdk != GDK_VoidSymbol; i++) {
+            if (key == table[i].gdk) {
+                c = table[i].gs;
+                break;
+            }
+        }
+    }
+    
+    return c;
+}
+
+int
+gdk_to_gnash_modifier(int state)
+{
+    int modifier = key::GNASH_MOD_NONE;
+
+    if (state & GDK_SHIFT_MASK) {
+      modifier = modifier | key::GNASH_MOD_SHIFT;
+    }
+    if (state & GDK_CONTROL_MASK) {
+      modifier = modifier | key::GNASH_MOD_CONTROL;
+    }
+    if (state & GDK_MOD1_MASK) {
+      modifier = modifier | key::GNASH_MOD_ALT;
+    }
+
+    return modifier;
+}
+
+/* Use this function to set the directory containing installed pixmaps. */
+void
+addPixmapDirectory(const gchar* directory)
+{
+    pixmaps_directories = 
+        g_list_prepend(pixmaps_directories, g_strdup (directory));
+}
+
+
+/* This is an internally used function to find pixmap files. */
+gchar*
+findPixmapFile(const gchar* filename)
+{
+    GList *elem;
+
+    /* We step through each of the pixmaps directory to find it. */
+    elem = pixmaps_directories;
+    while (elem) {
+        gchar *pathname = g_strdup_printf ("%s%s%s", (gchar*)elem->data,
+                G_DIR_SEPARATOR_S, filename);
+        if (g_file_test (pathname, G_FILE_TEST_EXISTS))
+            return pathname;
+        g_free (pathname);
+        elem = elem->next;
+    }
+    return NULL;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Event Handlers                              ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+
+gboolean
+exposeEvent(GtkWidget *const /*widget*/, GdkEventExpose *const event,
+        const gpointer data)
+{
+
+    GtkGui* gui = static_cast<GtkGui*>(data);
+
+    gui->expose(event->region);
+
+    return TRUE;
+}
+
+gboolean
+configureEvent(GtkWidget *const widget, GdkEventConfigure *const event,
+        const gpointer data)
+{
+    GtkGui* obj = static_cast<GtkGui*>(data);
+
+    GtkGlue& glue = obj->rendererGlue();
+
+    glue.configure(widget, event);
+    obj->resize_view(event->width, event->height);
+
+    return TRUE;
+}
+
+gboolean
+realizeEvent(GtkWidget* /*widget*/, GdkEvent* /*event*/, gpointer /*data*/)
+{
+    return TRUE;
+}
+
+// Shut everything down and exit when we're destroyed as a window
+gboolean
+deleteEvent(GtkWidget* /*widget*/, GdkEvent* /*event*/, gpointer /*data*/)
+{
+    GNASH_REPORT_FUNCTION;
+
+    gtk_main_quit();
+    return TRUE;
+}
+
+
+gboolean
+keyPressEvent(GtkWidget *const /*widget*/, GdkEventKey *const event,
+        const gpointer data)
+{
+
+    Gui* gui = static_cast<Gui*>(data);
+
+    /* Forward key event to gnash */
+    key::code c = gdk_to_gnash_key(event->keyval);
+    int mod = gdk_to_gnash_modifier(event->state);
+    
+    if (c != key::INVALID) {
+        gui->notify_key_event(c, mod, true);
+    }
+        
+    return true;
+}
+
+gboolean
+keyReleaseEvent(GtkWidget *const /*widget*/, GdkEventKey *const event,
+        const gpointer data)
+{
+
+    Gui* gui = static_cast<Gui*>(data);
+
+    /* Forward key event to gnash */
+    key::code	c = gdk_to_gnash_key(event->keyval);
+    int mod = gdk_to_gnash_modifier(event->state);
+    
+    if (c != key::INVALID) {
+        gui->notify_key_event(c, mod, false);
+    }
+    
+    return true;
+}
+
+gboolean
+buttonPressEvent(GtkWidget *const /*widget*/, GdkEventButton *const event,
+        const gpointer data)
+{
+
+    /// Double- and triple-clicks should not send an extra event!
+    /// Flash has no built-in double click.
+    if (event->type != GDK_BUTTON_PRESS) return false;
+
+    GtkGui *obj = static_cast<GtkGui*>(data);
+
+    obj->grabFocus();
+
+    int	mask = 1 << (event->button - 1);
+    obj->notify_mouse_clicked(true, mask);
+    return true;
+}
+
+gboolean
+buttonReleaseEvent(GtkWidget * const /*widget*/,
+     GdkEventButton * const event, const gpointer data)
+{
+    Gui *obj = static_cast<Gui*>(data);
+
+    int	mask = 1 << (event->button - 1);
+    obj->notify_mouse_clicked(false, mask);
+    return true;
+}
+
+gboolean
+motionNotifyEvent(GtkWidget *const /*widget*/, GdkEventMotion *const event,
+        const gpointer data)
+{
+    Gui *obj = static_cast<Gui *>(data);
+
+    obj->notify_mouse_moved(event->x, event->y);
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///                                                                         ///
+///                             Callbacks                                   ///
+///                                                                         ///
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/// This method is called when the "OK" button is clicked in the open file
+/// dialog. For GTK <= 2.4.0, this is a callback called by GTK itself.
+void
+openFile(GtkWidget *widget, gpointer /* user_data */)
+{
+#if 0
+    // We'll need this when implementing file opening.
+    GtkGui* gui = static_cast<GtkGui*>(user_data);
+#endif
+   
+#if GTK_CHECK_VERSION(2,4,0)
+    char* filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (widget));
+#else   
+    GtkWidget* file_selector = gtk_widget_get_ancestor(widget,
+                                 g_type_from_name("GtkFileSelection"));
+
+    GtkFileSelection* filesel = GTK_FILE_SELECTION (file_selector);
+    const char* filename = gtk_file_selection_get_filename (filesel);
+#endif
+
+    // FIXME: we want to do something like calling gtk_main_quit here, so
+    // run() will return. If run() is then changed to return a pointer to the
+    // next file to be played, then the Player class can play the next file,
+    // unless run() returns NULL.
+    log_error (_("Attempting to open file %s.\n"
+               "NOTE: the file open functionality is not yet implemented!"),
+	       filename);
+
+#if GTK_CHECK_VERSION(2,4,0)
+    g_free(filename);
+#endif
+}
+
+
+void
+menuOpenFile(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     GtkWidget* dialog;
     GtkGui* gui = static_cast<GtkGui*>(data);
@@ -1784,27 +2457,20 @@ GtkGui::menuitem_openfile_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     g_signal_connect (selector->ok_button, "clicked", G_CALLBACK (openFile),
                       gui);
 
-    g_signal_connect_swapped (selector->ok_button, "clicked", 
-                              G_CALLBACK (gtk_widget_destroy), dialog);
+    g_signal_connect_swapped(selector->ok_button, "clicked", 
+                              G_CALLBACK(gtk_widget_destroy), dialog);
 
-    g_signal_connect_swapped (selector->cancel_button, "clicked",
-                              G_CALLBACK (gtk_widget_destroy), dialog); 
+    g_signal_connect_swapped(selector->cancel_button, "clicked",
+                              G_CALLBACK(gtk_widget_destroy), dialog); 
    
     gtk_widget_show (dialog);
 #endif // GTK_CHECK_VERSION(2,4,0)
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///                                                                         ///
-///                             Callbacks                                   ///
-///                                                                         ///
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
 
 /// 'About' callback
 void
-GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuAbout(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     GtkGui* gui = static_cast<GtkGui*>(data);
     gui->showAboutDialog();
@@ -1812,16 +2478,15 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
 /// Preferences callback
 void
-GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuPreferences(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-    
     GtkGui* gui = static_cast<GtkGui*>(data);
     gui->showPreferencesDialog();
 }
 
 // Properties Callback
 void
-GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuMovieInfo(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     GtkGui* gui = static_cast<GtkGui*>(data);
     gui->showPropertiesDialog();
@@ -1829,14 +2494,12 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
 // This pops up the menu when the right mouse button is clicked
 gint
-GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
+popupHandler(GtkWidget *widget, GdkEvent *event)
 {
-//    GNASH_REPORT_FUNCTION;
-
     GtkMenu *menu = GTK_MENU(widget);
-//    printf("event type # %i\n", event->type);
+    
     if (event->type == GDK_BUTTON_PRESS) {
-        GdkEventButton *event_button = (GdkEventButton *) event;
+        GdkEventButton* event_button = reinterpret_cast<GdkEventButton*>(event);
         if (event_button->button == 3) {
             gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
                            event_button->button, event_button->time);
@@ -1848,17 +2511,15 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 
 /// \brief Toggle the sound on or off
 void
-GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuSound(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->toggleSound();
 }
 
 void
-GtkGui::menuitem_fullscreen_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuFullscreen(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->toggleFullscreen();
 }
@@ -1866,689 +2527,64 @@ GtkGui::menuitem_fullscreen_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
 /// \brief restart the movie from the beginning
 void
-GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuRestart(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-    //GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->restart();
 }
 
 /// \brief quit complete, and close the application
 void
-GtkGui::menuitem_quit_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+menuQuit(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 {
-//    GNASH_REPORT_FUNCTION;
-
     gtk_main_quit();
 }
 
 /// \brief Start the movie playing from the current frame.
 void
-GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuPlay(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->play();
 }
 
 /// \brief toggle between playing or paused.
 void
-GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuPause(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->pause();
 }
 
 /// \brief stop the movie that's playing.
 void
-GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+menuStop(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->stop();
 }
 
-/// \brief step forward 1 frame
-void
-GtkGui::menuitem_step_forward_callback(GtkMenuItem* /*menuitem*/,
-		gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_step_forward();
-}
-
-/// \brief step backward 1 frame
-void
-GtkGui::menuitem_step_backward_callback(GtkMenuItem* /*menuitem*/,
-		gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_step_backward();
-}
-
-/// \brief jump forward 10 frames
-void
-GtkGui::menuitem_jump_forward_callback(GtkMenuItem* /*menuitem*/,
-                               gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_jump_forward();
-}
-
-/// \brief jump backward 10 frames
-void
-GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
-                                gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui* gui = static_cast<Gui*>(data);
-    gui->menu_jump_backward();
-}
 
 /// \brief Force redraw
 void
-GtkGui::menuitem_refresh_view_callback(GtkMenuItem* /*menuitem*/,
-                                gpointer data)
+menuRefreshView(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->refreshView();
 }
 
 /// \brief Force redraw
 void
-GtkGui::menuitem_show_updated_regions_callback(GtkMenuItem* /*menuitem*/,
-                                gpointer data)
+menuShowUpdatedRegions(GtkMenuItem* /*menuitem*/, gpointer data)
 {
     Gui* gui = static_cast<Gui*>(data);
-    gui->showUpdatedRegions(! (gui->showUpdatedRegions()) );
+    gui->showUpdatedRegions(!gui->showUpdatedRegions());
     
     // refresh to clear the remaining red lines...
-    if ( ! (gui->showUpdatedRegions()))
-      gui->refreshView();
+    if (!gui->showUpdatedRegions()) gui->refreshView();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///                                                                         ///
-///                             Event Handlers                              ///
-///                                                                         ///
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-gboolean
-GtkGui::expose_event(GtkWidget *const /*widget*/,
-             GdkEventExpose *const event,
-             const gpointer data)
-{
-//	GNASH_REPORT_FUNCTION;
-
-    GtkGui* gui = static_cast<GtkGui*>(data);
-
-    gui->expose(event->region);
-
-    return TRUE;
-}
-
-gboolean
-GtkGui::configure_event(GtkWidget *const widget,
-                GdkEventConfigure *const event,
-                const gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    GtkGui* obj = static_cast<GtkGui*>(data);
-
-    GtkGlue& glue = *(obj->_glue);
-
-    glue.configure(widget, event);
-    obj->resize_view(event->width, event->height);
-
-    return TRUE;
-}
-
-gboolean
-GtkGui::realize_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
-		gpointer /*data*/)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    return TRUE;
-}
-
-// Shut everything down and exit when we're destroyed as a window
-gboolean
-GtkGui::delete_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
-			gpointer /*data*/)
-{
-    GNASH_REPORT_FUNCTION;
-
-    gtk_main_quit();
-    return TRUE;
-}
-
-
-gboolean
-GtkGui::key_press_event(GtkWidget *const /*widget*/,
-                GdkEventKey *const event,
-                const gpointer data)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    Gui* gui = static_cast<Gui*>(data);
-
-    /* Forward key event to gnash */
-    gnash::key::code	c = gdk_to_gnash_key(event->keyval);
-    int mod = gdk_to_gnash_modifier(event->state);
-    
-    if (c != gnash::key::INVALID) {
-        gui->notify_key_event(c, mod, true);
-    }
-        
-    return true;
-}
-
-gboolean
-GtkGui::key_release_event(GtkWidget *const /*widget*/,
-                GdkEventKey *const event,
-                const gpointer data)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    Gui* gui = static_cast<Gui*>(data);
-
-    /* Forward key event to gnash */
-    gnash::key::code	c = gdk_to_gnash_key(event->keyval);
-    int mod = gdk_to_gnash_modifier(event->state);
-    
-    if (c != gnash::key::INVALID) {
-        gui->notify_key_event(c, mod, false);
-    }
-    
-    return true;
-}
-
-gboolean
-GtkGui::button_press_event(GtkWidget *const /*widget*/,
-                           GdkEventButton *const event,
-                           const gpointer data)
-{
-
-    /// Double- and triple-clicks should not send an extra event!
-    /// Flash has no built-in double click.
-    if (event->type != GDK_BUTTON_PRESS) return false;
-
-    GtkGui *obj = static_cast<GtkGui *>(data);
-
-    obj->grabFocus();
-
-    int	mask = 1 << (event->button - 1);
-    obj->notify_mouse_clicked(true, mask);
-    return true;
-}
-
-gboolean
-GtkGui::button_release_event(GtkWidget * const /*widget*/,
-                             GdkEventButton * const event,
-                             const gpointer data)
-{
-    //GNASH_REPORT_FUNCTION;
-    Gui *obj = static_cast<Gui *>(data);
-
-    int	mask = 1 << (event->button - 1);
-    obj->notify_mouse_clicked(false, mask);
-    return true;
-}
-
-gboolean
-GtkGui::motion_notify_event(GtkWidget *const /*widget*/,
-                            GdkEventMotion *const event,
-                            const gpointer data)
-{
-//    GNASH_REPORT_FUNCTION;
-    Gui *obj = static_cast<Gui *>(data);
-
-    obj->notify_mouse_moved(event->x, event->y);
-    return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///                                                                         ///
-///                                Menus                                    ///
-///                                                                         ///
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-
-// Create a File menu that can be used from the menu bar or the popup.
-void
-GtkGui::createFileMenu(GtkWidget *obj)
-{
-//    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_File"));
-    gtk_widget_show (menuitem);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem);
-    
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
-
-// Open    
-    GtkWidget *open =
- 	gtk_image_menu_item_new_from_stock ("gtk-open", NULL);
-    gtk_widget_show (open);
-    gtk_container_add (GTK_CONTAINER (menu), open);
-    g_signal_connect ((gpointer) open, "activate",
-                      G_CALLBACK (&menuitem_openfile_callback),
-                      this);
-
-// Save    
-    GtkWidget *save =
- 	gtk_image_menu_item_new_from_stock ("gtk-save", NULL);
-    gtk_widget_show (save);
-    gtk_container_add (GTK_CONTAINER (menu), save);
-    // Disabled until save functionality is implemented:
-    gtk_widget_set_sensitive(save,FALSE); 
-
-// Save as
-    GtkWidget *save_as =
- 	gtk_image_menu_item_new_from_stock ("gtk-save-as", NULL);
-    gtk_widget_show (save_as);
-    gtk_container_add (GTK_CONTAINER (menu), save_as);
-    // Disabled until save-as functionality is implemented:
-    gtk_widget_set_sensitive(save_as,FALSE);
-    
-    GtkWidget *separatormenuitem1 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separatormenuitem1);
-    gtk_container_add (GTK_CONTAINER (menu), separatormenuitem1);
-
-// Properties
-    GtkWidget *properties =
- 	gtk_image_menu_item_new_from_stock ("gtk-properties", NULL);
-    gtk_widget_show (properties);
-    gtk_container_add (GTK_CONTAINER (menu), properties);
-    g_signal_connect ((gpointer) properties, "activate",
-                      G_CALLBACK (&menuitem_movieinfo_callback),
-                      this);
-
-    GtkWidget *separator2 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator2);
-    gtk_container_add (GTK_CONTAINER (menu), separator2);
-
-    GtkWidget *quit = gtk_image_menu_item_new_from_stock ("gtk-quit", NULL);
-    gtk_widget_show (quit);
-    gtk_container_add (GTK_CONTAINER (menu), quit);
-
-    g_signal_connect ((gpointer) quit, "activate",
-                      G_CALLBACK (&menuitem_quit_callback),
-                      this);
-}
-
-// Create an Edit menu that can be used from the menu bar or the popup.
-void
-GtkGui::createEditMenu(GtkWidget *obj)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Edit"));
-    gtk_widget_show (menuitem);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem);
-    
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
-
-    GtkWidget *preferences1 =
- 	gtk_image_menu_item_new_from_stock ("gtk-preferences", NULL);
-    gtk_widget_show (preferences1);
-    gtk_container_add (GTK_CONTAINER (menu), preferences1);
-
-    g_signal_connect ((gpointer) preferences1, "activate",
-                      G_CALLBACK (&menuitem_preferences_callback),
-                      this);
-}
-
-// Create a Help menu that can be used from the menu bar or the popup.
-void
-GtkGui::createHelpMenu(GtkWidget *obj)
-{
-//    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_Help"));
-    gtk_widget_show (menuitem);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem);
-    
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
-
-    GtkWidget *about = gtk_image_menu_item_new_from_stock ("gtk-about", NULL);
-    gtk_widget_show (about);
-    gtk_container_add (GTK_CONTAINER (menu), about);
-    
-    g_signal_connect ((gpointer) about, "activate",
-                      G_CALLBACK (&menuitem_about_callback),
-                      this);
-}
-
-// Create a View menu that can be used from the menu bar or the popup.
-void
-GtkGui::createViewMenu(GtkWidget *obj)
-{
-
-//    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("_View"));
-    gtk_widget_show (menuitem);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem);
-    
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
-
-    // Refresh
-    GtkImageMenuItem *menuitem_refresh =
- 	GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Redraw")));
-    gtk_image_menu_item_set_image (menuitem_refresh,
-				   gtk_image_new_from_stock("gtk-refresh",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_refresh));
-    gtk_widget_show(GTK_WIDGET(menuitem_refresh));
-    g_signal_connect ((gpointer) menuitem_refresh, "activate",
-        G_CALLBACK (&menuitem_refresh_view_callback), this);
-
-    // Fullscreen
-#if GTK_CHECK_VERSION(2,8,0)
-    GtkImageMenuItem *menuitem_fullscreen = GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Toggle fullscreen")));
-    gtk_image_menu_item_set_image (menuitem_fullscreen,
-				   gtk_image_new_from_stock("gtk-fullscreen",
-						 	     GTK_ICON_SIZE_MENU));
-#else
-    GtkMenuItem *menuitem_fullscreen =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Toggle fullscreen")));
-#endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_fullscreen));
-    gtk_widget_show(GTK_WIDGET(menuitem_fullscreen));
-    g_signal_connect(GTK_OBJECT(menuitem_fullscreen), "activate",
-                         G_CALLBACK(&menuitem_fullscreen_callback), this);
-
-// Can be disabled at compile time.
-#ifndef DISABLE_REGION_UPDATES_DEBUGGING
-    GtkCheckMenuItem *menuitem_show_updated_regions =
-        GTK_CHECK_MENU_ITEM(gtk_check_menu_item_new_with_label(_("Show updated ranges")));
-   
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menuitem_show_updated_regions),
-                                    showUpdatedRegions() );
-
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_show_updated_regions));
-    gtk_widget_show(GTK_WIDGET(menuitem_show_updated_regions));
-    g_signal_connect(GTK_OBJECT(menuitem_show_updated_regions), "activate",
-                     G_CALLBACK(&menuitem_show_updated_regions_callback), this);
-#endif
-
-}
-
-// Create a Control menu that can be used from the menu bar or the popup.
-void
-GtkGui::createControlMenu(GtkWidget *obj)
-{
-//    GNASH_REPORT_FUNCTION;
-
-// Movie Control Menu
-    GtkWidget *menuitem_control =
-	gtk_menu_item_new_with_mnemonic (_("Movie _Control"));
-    gtk_widget_show (menuitem_control);
-    gtk_container_add (GTK_CONTAINER (obj), menuitem_control);
-    
-    GtkWidget *menu = gtk_menu_new ();
-    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem_control), menu);
-
-// Play
-#if GTK_CHECK_VERSION(2,6,0)
-    GtkMenuItem *menuitem_play = GTK_MENU_ITEM(
- 	gtk_image_menu_item_new_from_stock ("gtk-media-play", NULL));
-#else
-    GtkMenuItem *menuitem_play =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Play")));
-#endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_play));
-    gtk_widget_show(GTK_WIDGET(menuitem_play));    
-    g_signal_connect ((gpointer) menuitem_play, "activate",
-        G_CALLBACK (&menuitem_play_callback), this);
-
-// Pause
-#if GTK_CHECK_VERSION(2,6,0)
-    GtkMenuItem *menuitem_pause = GTK_MENU_ITEM(
- 	gtk_image_menu_item_new_from_stock ("gtk-media-pause", NULL));
-#else
-    GtkMenuItem *menuitem_pause =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Pause")));
-#endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_pause));
-    gtk_widget_show(GTK_WIDGET(menuitem_pause));
-    g_signal_connect ((gpointer) menuitem_pause, "activate",
-        G_CALLBACK (&menuitem_pause_callback), this);
-
-// Stop
-#if GTK_CHECK_VERSION(2,6,0)
-    GtkMenuItem *menuitem_stop = GTK_MENU_ITEM(
- 	gtk_image_menu_item_new_from_stock ("gtk-media-stop", NULL));
-#else
-    GtkMenuItem *menuitem_stop =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Stop")));
-#endif
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_stop));
-    gtk_widget_show(GTK_WIDGET(menuitem_stop));
-    g_signal_connect ((gpointer) menuitem_stop, "activate",
-        G_CALLBACK (&menuitem_stop_callback), this);
-
-    GtkWidget *separator1 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator1);
-    gtk_container_add (GTK_CONTAINER (menu), separator1);
-
-// Restart
-// 
-    GtkImageMenuItem *menuitem_restart =
- 	GTK_IMAGE_MENU_ITEM(
-	     gtk_image_menu_item_new_with_label(_("Restart Movie")));
-// Suitable image?
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_restart));
-    gtk_widget_show(GTK_WIDGET(menuitem_restart));
-    g_signal_connect ((gpointer) menuitem_restart, "activate",
-        G_CALLBACK (&menuitem_restart_callback), this);
-
-#if 0 // Presently disabled
-
-    GtkWidget *separator2 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator1);
-    gtk_container_add (GTK_CONTAINER (menu), separator2);
-
-// Step Forward
-    GtkImageMenuItem *menuitem_step_forward =
- 	GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Step Forward Frame")));
-    gtk_image_menu_item_set_image (menuitem_step_forward,
-				   gtk_image_new_from_stock("gtk-go-forward",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_step_forward));
-    gtk_widget_show(GTK_WIDGET(menuitem_step_forward));
-//     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
-//                                 GDK_bracketleft, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-
-// Step Backward
-    GtkImageMenuItem *menuitem_step_backward =
- 	GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Step Backward Frame")));
-    gtk_image_menu_item_set_image (menuitem_step_backward,
-				   gtk_image_new_from_stock("gtk-go-back",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_step_backward));
-    gtk_widget_show(GTK_WIDGET(menuitem_step_backward));
-//     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
-//                                 GDK_bracketright, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
-
-// Jump Forward
-// Stock image from Gtk-2.6 should be ignored in earlier versions.
-    GtkImageMenuItem *menuitem_jump_forward =
-        GTK_IMAGE_MENU_ITEM(
-	    gtk_image_menu_item_new_with_label(_("Jump Forward 10 Frames")));
-    gtk_image_menu_item_set_image (menuitem_jump_forward,
-				   gtk_image_new_from_stock("gtk-media-forward",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_forward));
-    gtk_widget_show(GTK_WIDGET(menuitem_jump_forward));
-
-// Jump Backward
-// Stock image from Gtk-2.6 should be ignored in earlier versions.
-    GtkImageMenuItem *menuitem_jump_backward =
- 	GTK_IMAGE_MENU_ITEM(gtk_image_menu_item_new_with_label(_("Jump Backward 10 Frames")));
-    gtk_image_menu_item_set_image (menuitem_jump_backward,
-				   gtk_image_new_from_stock("gtk-media-rewind",
-						 	     GTK_ICON_SIZE_MENU));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
-    gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
-
-#endif
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-///                                                                         ///
-///                             Other stuff                                 ///
-///                                                                         ///
-///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
-
-gnash::key::code
-GtkGui::gdk_to_gnash_key(guint key)
-{
-    gnash::key::code  c(gnash::key::INVALID);
-
-    // ascii 32-126 in one range:    
-    if (key >= GDK_space && key <= GDK_asciitilde) {
-        c = (gnash::key::code) ((key - GDK_space) + gnash::key::SPACE);
-    }
-
-    // Function keys:
-    else if (key >= GDK_F1 && key <= GDK_F15)	{
-        c = (gnash::key::code) ((key - GDK_F1) + gnash::key::F1);
-    }
-
-    // Keypad:
-    else if (key >= GDK_KP_0 && key <= GDK_KP_9) {
-        c = (gnash::key::code) ((key - GDK_KP_0) + gnash::key::KP_0);
-    }
-
-    // Extended ascii:
-    else if (key >= GDK_nobreakspace && key <= GDK_ydiaeresis) {
-        c = (gnash::key::code) ((key - GDK_nobreakspace) + gnash::key::NOBREAKSPACE);
-    }
-
-    // non-character keys don't correlate, so use a look-up table.
-    else {
-        struct {
-            guint             gdk;
-            gnash::key::code  gs;
-        } table[] = {
-            { GDK_BackSpace, gnash::key::BACKSPACE },
-            { GDK_Tab, gnash::key::TAB },
-            { GDK_Clear, gnash::key::CLEAR },
-            { GDK_Return, gnash::key::ENTER },
-            
-            { GDK_Shift_L, gnash::key::SHIFT },
-            { GDK_Shift_R, gnash::key::SHIFT },
-            { GDK_Control_L, gnash::key::CONTROL },
-            { GDK_Control_R, gnash::key::CONTROL },
-            { GDK_Alt_L, gnash::key::ALT },
-            { GDK_Alt_R, gnash::key::ALT },
-            { GDK_Caps_Lock, gnash::key::CAPSLOCK },
-            
-            { GDK_Escape, gnash::key::ESCAPE },
-            
-            { GDK_Page_Down, gnash::key::PGDN },
-            { GDK_Page_Up, gnash::key::PGUP },
-            { GDK_Home, gnash::key::HOME },
-            { GDK_End, gnash::key::END },
-            { GDK_Left, gnash::key::LEFT },
-            { GDK_Up, gnash::key::UP },
-            { GDK_Right, gnash::key::RIGHT },
-            { GDK_Down, gnash::key::DOWN },
-            { GDK_Insert, gnash::key::INSERT },
-            { GDK_Delete, gnash::key::DELETEKEY },
-            
-            { GDK_Help, gnash::key::HELP },
-            { GDK_Num_Lock, gnash::key::NUM_LOCK },
-
-            { GDK_VoidSymbol, gnash::key::INVALID }
-        };
-        
-        for (int i = 0; table[i].gdk != GDK_VoidSymbol; i++) {
-            if (key == table[i].gdk) {
-                c = table[i].gs;
-                break;
-            }
-        }
-    }
-    
-    return c;
-}
-
-int
-GtkGui::gdk_to_gnash_modifier(int state)
-{
-    int modifier = gnash::key::GNASH_MOD_NONE;
-
-    if (state & GDK_SHIFT_MASK) {
-      modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
-    }
-    if (state & GDK_CONTROL_MASK) {
-      modifier = modifier | gnash::key::GNASH_MOD_CONTROL;
-    }
-    if (state & GDK_MOD1_MASK) {
-      modifier = modifier | gnash::key::GNASH_MOD_ALT;
-    }
-
-    return modifier;
-}
-
-bool
-lirc_handler(void*, int, void* /*data*/)
-{ 
-    GNASH_REPORT_FUNCTION;
-//    int* fd = static_cast<int*>(data);
-    
-    // want to remove this handler. You may want to close fd.
-    log_debug("%s\n", lirc->getButton());
-  
-    // Want to keep this handler
-    return true;
-}
-
-// This assumes that the parent of _drawingArea is _window, which
-// isn't the case in the plugin fullscreen (it's _overlay). Currently
-// we return from fullscreen when Gui::stop() is called, which
-// seems like a good idea, and also avoids this problem.
-void
-GtkGui::stopHook()
-{
-
-    // Assert they're either both initialised or both uninitialised
-    assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
-    if (_resumeButton) {
-        gtk_container_add(GTK_CONTAINER(_vbox), _resumeButton);
-    }
-}
-
-void
-GtkGui::playHook()
-{
-    assert ((_resumeButton && _vbox) || !(_resumeButton || _vbox));
-    if (_resumeButton) {
-        gtk_container_remove(GTK_CONTAINER(_vbox), _resumeButton);
-    }
-}
+} // anonymous namespace
 
 } // end of namespace gnash
 

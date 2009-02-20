@@ -905,10 +905,18 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
         }
 
         ret = read(fd, buffer, nbytes);
-	// If we read zero bytes, the network is closed, as we returned from the select()
-	if (ret == 0) {
-	    return -1;
-	}
+	// If we read zero bytes, the network may be closed, as we returned from the select()
+        if (ret == -1) {
+            log_error (_("The socket for fd #%d was never available for reading data"), fd);
+            return -1;
+        }
+
+        if (ret == 0) {
+	    if (_debug) {
+		log_debug (_("The socket for #fd %d timed out waiting to read data"), fd);
+	    }
+            return 0;
+        }
 	
 	if (_debug) {
 	    log_debug (_("read %d bytes from fd #%d from port %d"), ret, fd, _port);
@@ -1009,7 +1017,7 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
 
 #ifdef HAVE_PSELECT
 	struct timespec tval;
-	sigset_t pending, blockset;
+	sigset_t pending, blockset; //, emptyset;
 	sigemptyset(&blockset);        
         // sigaddset(&blockset, SIGINT); /* Block SIGINT */
         sigaddset(&blockset, SIGPIPE);
@@ -1203,7 +1211,7 @@ Network::waitForNetData(int limit, struct pollfd *fds)
     
 #ifdef HAVE_PPOLL
 	struct timespec tval;
-	sigset_t pending, emptyset, blockset;
+	sigset_t pending, blockset;
 	sigemptyset(&blockset);         /* Block SIGINT */
 //        sigaddset(&blockset, SIGINT);
 //        sigaddset(&blockset, SIGPIPE);

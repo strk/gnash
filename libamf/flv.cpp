@@ -353,6 +353,8 @@ Flv::dump()
                 log_debug("FLV MetaData: %s: %s", el->getName(), el->to_string());
             }
 	}
+    } else {
+	cerr << "No properties" << endl;
     }
 }
 

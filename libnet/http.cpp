@@ -79,9 +79,6 @@ extern map<int, Handler *> handlers;
 // FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
 
-// max size of files to map enirely into the cache
-static const size_t CACHE_LIMIT = 102400000;
-
 static Cache& cache = Cache::getDefaultInstance();
 
 HTTP::HTTP() 
@@ -144,7 +141,7 @@ HTTP::http_method_e
 HTTP::processClientRequest(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
-    bool result;
+    bool result = false;
     
     boost::shared_ptr<amf::Buffer> buf(_que.peek());
     if (buf) {
@@ -183,7 +180,7 @@ HTTP::processClientRequest(int fd)
 	return _cmd;
     } else {
 	return HTTP::HTTP_NONE;
-    }
+   }
 }
 
 // A GET request asks the server to send a file to the client
@@ -229,14 +226,16 @@ HTTP::processGetRequest(int fd)
 	
 //	    cache.addFile(url, filestream);	FIXME: always reload from disk for now.
 	
-	// Oopen the file and read the furst chunk into memory
-	filestream->open(url);
-	
-	// Get the file size for the HTTP header
-	if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
+	// Oopen the file and read the first chunk into memory
+	if (filestream->open(url)) {
 	    formatErrorResponse(HTTP::NOT_FOUND);
 	} else {
-	    cache.addPath(_filespec, filestream->getFilespec());
+	    // Get the file size for the HTTP header
+	    if (filestream->getFileType() == DiskStream::FILETYPE_NONE) {
+		formatErrorResponse(HTTP::NOT_FOUND);
+	    } else {
+		cache.addPath(_filespec, filestream->getFilespec());
+	    }
 	}
     }
     
@@ -561,9 +560,11 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
 	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
 		break;
+#if 1
 	    } else {
-	      log_debug("Got a request, parsing \"%s\"", *i);
+		log_debug("Got a request, parsing \"%s\"", *i);
 		string::size_type start = i->find(" ");
+		string::size_type params = i->find("?");
 		string::size_type pos = i->find("HTTP/");
 		if (pos != string::npos) {
 		    // The version is the last field and is the protocol name
@@ -575,7 +576,13 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
 		    // the filespec in the request is the middle field, deliminated
 		    // by a space on each end.
-		    _filespec = i->substr(start+1, pos-start-2);
+		    if (params != string::npos) {
+			_params = i->substr(params+1, end);
+			_filespec = i->substr(start+1, params);
+			log_debug("Parameters for file: \"%s\"", _params);
+		    } else {
+			_filespec = i->substr(start+1, pos-start-2);
+		    }
 		    log_debug("Requesting file: \"%s\"", _filespec);
 
 		    // HTTP 1.1 enables persistant network connections
@@ -586,6 +593,7 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		    }
 		}
 	    }
+#endif
 	}
     }
     
@@ -1107,6 +1115,16 @@ HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
     // Get the first name, which is a raw string, and not preceded by
     // a type byte.
     boost::shared_ptr<amf::Element > el1(new amf::Element);
+    
+    // If the length of the name field is corrupted, then we get out of
+    // range quick, and corrupt memory. This is a bit of a hack, but
+    // reduces memory errors caused by some of the corrupted tes cases.
+    boost::uint8_t *endstr = std::find(tmpptr, tmpptr+length, '\0');
+    if (endstr != tmpptr+length) {
+	log_debug("Caught corrupted string! length was %d, null at %d",
+		  length,  endstr-tmpptr);
+	length = endstr-tmpptr;
+    }
     el1->setName(tmpptr, length);
     tmpptr += length;
     headers.push_back(el1);
@@ -1116,6 +1134,18 @@ HTTP::parseEchoRequest(boost::uint8_t *data, size_t size)
     length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
     tmpptr += sizeof(boost::uint16_t);
     boost::shared_ptr<amf::Element > el2(new amf::Element);
+
+//     std::string name2(reinterpret_cast<const char *>(tmpptr), length);
+//     el2->setName(name2.c_str(), name2.size());
+    // If the length of the name field is corrupted, then we get out of
+    // range quick, and corrupt memory. This is a bit of a hack, but
+    // reduces memory errors caused by some of the corrupted tes cases.
+    endstr = std::find(tmpptr, tmpptr+length, '\0');
+    if (endstr != tmpptr+length) {
+	log_debug("Caught corrupted string! length was %d, null at %d",
+		  length,  endstr-tmpptr);
+	length = endstr-tmpptr;
+    }
     el2->setName(tmpptr, length);
     headers.push_back(el2);
     tmpptr += length;
@@ -1140,7 +1170,28 @@ amf::Buffer &
 HTTP::formatEchoResponse(const std::string &num, amf::Element &el)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<amf::Buffer> data = el.encode(); // amf::AMF::encodeElement(el);
+    boost::shared_ptr<amf::Buffer> data;
+
+    amf::Element nel;
+    if (el.getType() == amf::Element::TYPED_OBJECT_AMF0) {
+	nel.makeTypedObject();
+	string name = el.getName();
+	nel.setName(name);
+	if (el.propertySize()) {
+	    // FIXME: see about using std::reverse() instead.
+	    for (int i=el.propertySize()-1; i>=0; i--) {
+// 	    for (int i=0 ; i<el.propertySize(); i++) {
+		boost::shared_ptr<amf::Element> child = el.getProperty(i);
+		nel.addProperty(child);
+	    }
+	    data = nel.encode();
+	} else {
+	    data = el.encode();
+	}
+    } else {
+	data = el.encode();
+    }
+
     return formatEchoResponse(num, data->reference(), data->allocated());
 }
 
@@ -1302,7 +1353,7 @@ HTTP::extractRTMPT(boost::uint8_t *data)
 HTTP::http_method_e
 HTTP::extractCommand(boost::uint8_t *data)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
 //    string body = reinterpret_cast<const char *>(data);
     HTTP::http_method_e cmd = HTTP::HTTP_NONE;
@@ -1335,11 +1386,27 @@ HTTP::extractCommand(boost::uint8_t *data)
     if (cmd != HTTP::HTTP_NONE) {
 	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
 	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
-	
-    // This is fine as long as end is within the buffer.
-    _filespec = std::string(start, end);
+	boost::uint8_t *params = std::find(start, end, '?');
+	if (params != end) {
+	    _params = std::string(params+1, end);
+	    _filespec = std::string(start, params);
+	    log_debug("Parameters for file: \"%s\"", _params);
+	} else {
+	    // This is fine as long as end is within the buffer.
+	    _filespec = std::string(start, end);
+	}
+	log_debug("Requesting file: \"%s\"", _filespec);
+
+	// The third field is always the HTTP version
+	// The version is the last field and is the protocol name
+	// followed by a slash, and the version number. Note that
+	// the version is not a double, even though it has a dot
+	// in it. It's actually two separate integers.
+	_version.major = *(end+6) - '0';
+	_version.minor = *(end+8) - '0';
+	log_debug (_("Version: %d.%d"), _version.major, _version.minor);
     }
-    
+
     return cmd;
 }
 
@@ -1490,7 +1557,7 @@ http_handler(Network::thread_params_t *args)
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
 
     // Wait for data, and when we get it, process it.
-//    do {
+    do {
 	
 #ifdef USE_STATISTICS
 	struct timespec start;
@@ -1507,8 +1574,7 @@ http_handler(Network::thread_params_t *args)
 //	    hand->die();	// tell all the threads for this connection to die
 //	    hand->notifyin();
 	    log_debug("Net HTTP done for fd #%d...", args->netfd);
-// 	    hand->closeNet(args->netfd);
-	    done = true;
+//	    done = true;
 	}
 //	www.dump();
 	
@@ -1535,7 +1601,7 @@ http_handler(Network::thread_params_t *args)
 	} else {
 	    log_debug("Keep-Alive is on", www->keepAlive());
 	    result = true;
-	    done = true;
+//	    done = true;
 	}
 #ifdef USE_STATISTICS
 	struct timespec end;
@@ -1543,7 +1609,7 @@ http_handler(Network::thread_params_t *args)
 	log_debug("Processing time for GET request was %f seconds",
 		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
 #endif
-//    } while(done != true);
+    } while(done != true);
     
 //    hand->notify();
     

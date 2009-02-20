@@ -159,37 +159,27 @@ void
 test_encoding()
 {
     // This is a 8 byte wide double data type in hex
-    {
-        boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
-        double num = *(reinterpret_cast<double *>(buf1->reference()));
-        swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we alwasy encode in big endian format
+    boost::shared_ptr<Buffer> buf1(new Buffer("40 83 38 00 00 00 00 00"));
+    double num = *(reinterpret_cast<double *>(buf1->reference()));
+    swapBytes(&num, amf::AMF0_NUMBER_SIZE); // we always encode in big endian format
 
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-        if (memdebug) {
-            mem->addStats(__LINE__);             // take a sample
-        }
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
 #endif    
-        boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(num);
-        // A number AMF object has only one header byte, which is the type field.
+    boost::shared_ptr<Buffer> encnum = AMF::encodeNumber(num);
+    // A number AMF object has only one header byte, which is the type field.
 #if defined(HAVE_MALLINFO) && defined(USE_STATS_MEMORY)
-        if (memdebug) {
-            mem->addStats(__LINE__);             // take a sample
-        }
+    if (memdebug) {
+        mem->addStats(__LINE__);             // take a sample
+    }
 #endif
-        if ((*encnum->reference() == Element::NUMBER_AMF0) &&
-            (memcmp(buf1->reference(), encnum->reference()+1, amf::AMF0_NUMBER_SIZE) == 0)) {
-            runtest.pass("Encoded AMF Number");
-        } else {
-            runtest.fail("Encoded AMF Number");
-        }
-
-        Element el(num);
-        boost::shared_ptr<Buffer> buf = AMF::encodeElement(el);
-        
-        check_equals(*buf->reference(), Element::NUMBER_AMF0);
-        check_equals(buf->size(), amf::AMF0_NUMBER_SIZE+1); // +1 for the type byte
-        // A String AMF object has a 3 bytes head, the type, and a two byte length.
-        check_equals(memcmp(buf1->reference(), buf->reference()+1, amf::AMF0_NUMBER_SIZE), 0);
+    if ((*encnum->reference() == Element::NUMBER_AMF0) &&
+        (memcmp(buf1->reference(), encnum->reference()+1, amf::AMF0_NUMBER_SIZE) == 0)) {
+        runtest.pass("Encoded AMF Number");
+    } else {
+        runtest.fail("Encoded AMF Number");
     }
     
     // Encode a boolean. Although we know a bool is only one character, for AMF,
@@ -221,22 +211,6 @@ test_encoding()
         } else {
             runtest.fail("Encoded AMF Boolean");
         }
-
-        Element el(true);
-        boost::shared_ptr<Buffer> buf = AMF::encodeElement(el);
-        
-        check_equals(*buf->reference(), Element::BOOLEAN_AMF0);
-        check_equals(buf->size(), 2);
-        // A String AMF object has a 3 bytes head, the type, and a two byte length.
-        check_equals(memcmp(buf->reference(), buf2->reference(), 2), 0);
-
-        Element el2(false);
-        buf = AMF::encodeElement(el2);
-        
-        check_equals(*buf->reference(), Element::BOOLEAN_AMF0);
-        check_equals(buf->size(), 2);
-        // A String AMF object has a 3 bytes head, the type, and a two byte length.
-        check_equals(*(buf->reference()+1), 0);
     }
     
     // Encode a String.
@@ -298,20 +272,35 @@ test_encoding()
         check_equals(len, 0);
     }
 
-// amf::AMF::encodeECMAArray(unsigned char*, int)
+    AMF amf;
+    Element el1;
+    boost::uint16_t index = 1;
+    el1.makeReference(index);
+    if (el1.to_short() == 1) {
+        runtest.pass("Made Reference");
+    } else {
+        runtest.fail("Made Reference");
+    }    
+
+    boost::shared_ptr<amf::Buffer> buf2 = amf.encodeElement(el1);
+    if ((*buf2->reference() == Element::REFERENCE_AMF0)
+        && (*(buf2->reference() + 1) == 0)
+        && (*(buf2->reference() + 2) == 1)) {
+        runtest.pass("Encoded Reference");
+    } else {
+        runtest.fail("Encoded Reference");
+    }    
+
+    boost::shared_ptr<Buffer> buf3(new Buffer("07 00 01"));
+    boost::shared_ptr<amf::Element> el3 = amf.extractAMF(buf3);
+    if ((el3->getType() == Element::REFERENCE_AMF0)
+        && (el3->to_short() == 1)) {
+        runtest.pass("Extracted Reference");
+    } else {
+        runtest.fail("Extracted Reference");
+    }  
+
 }
-// amf::encodeDate(unsigned char*)
-// amf::AMF::encodeLongString(unsigned char*, int)
-// amf::AMF::encodeStrictArray(unsigned char*, int)
-// amf::AMF::encodeTypedObject(unsigned char*, int)
-// amf::AMF::encodeUnsupported()
-// amf::AMF::encodeNull()
-// amf::AMF::encodeElement(amf::Element*)
-// amf::AMF::encodeMovieClip(unsigned char*, int)
-// amf::AMF::encodeRecordSet(unsigned char*, int)
-// amf::AMF::encodeReference(unsigned char*, int)
-// amf::AMF::encodeUndefined()
-// amf::AMF::encodeXMLObject(unsigned char*, int)
 
 void
 test_array()
@@ -383,7 +372,7 @@ test_object()
     }
 
 //    encobj->dump();
-    boost::shared_ptr<Buffer> buf1(new Buffer("03 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72 6c 02 00 30 68 74 74 70 3a 2f 2f 77 77 77 2e 72 65 64 35 2e 6e 6c 2f 74 6f 6f 6c 73 2f 70 75 62 6c 69 73 68 65 72 2f 70 75 62 6c 69 73 68 65 72 2e 73 77 66 09"));
+    boost::shared_ptr<Buffer> buf1(new Buffer("03 00 03 61 70 70 02 00 08 6f 66 6c 61 44 65 6d 6f 00 08 66 6c 61 73 68 56 65 72 02 00 0c 4c 4e 58 20 39 2c 30 2c 33 31 2c 30 00 06 73 77 66 55 72 6c 02 00 30 68 74 74 70 3a 2f 2f 77 77 77 2e 72 65 64 35 2e 6e 6c 2f 74 6f 6f 6c 73 2f 70 75 62 6c 69 73 68 65 72 2f 70 75 62 6c 69 73 68 65 72 2e 73 77 66 00 00 09"));
     if ((*encobj->reference() == Element::OBJECT_AMF0) &&
         (memcmp(buf1->reference(), encobj->reference(), 101) == 0)) {
         runtest.pass("Encoded Object");
@@ -411,7 +400,7 @@ test_object()
     // but this should have a more accurate test to make sure all
     // the child elements are correct all the time.
     if ((newtop->getType() == Element::OBJECT_AMF0)
-        && (newtop->propertySize() == 3)) {
+        && (newtop->propertySize() >= 3)) {
         runtest.pass("Extracted Object");
     } else {
         runtest.fail("Extracted Object");

@@ -15,11 +15,12 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef _RTMP_H_
-#define _RTMP_H_
+#ifndef GNASH_LIBNET_RTMP_H
+#define GNASH_LIBNET_RTMP_H
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <string>
 #include <vector>
 
@@ -35,7 +36,7 @@ namespace gnash
 {
 
 const boost::uint8_t RTMP_HANDSHAKE = 0x3;
-const int  RTMP_BODY_SIZE = 1536;
+const int  RTMP_HANDSHAKE_SIZE = 1536;
 const int  MAX_AMF_INDEXES = 64;
 
 const int  RTMP_HEADSIZE_MASK = 0xc0;
@@ -77,6 +78,7 @@ typedef enum {
 class DSOEXPORT RTMP : public Network
 {
 public:
+    typedef std::map<const char*, amf::Element> AMFProperties;
     typedef std::deque<CQue *> queues_t;
     typedef enum {
 	RAW=0x0,
@@ -211,19 +213,16 @@ public:
     virtual ~RTMP();
 
     // Decode
-    rtmp_head_t *decodeHeader(boost::uint8_t *header);
-    rtmp_head_t *decodeHeader(boost::shared_ptr<amf::Buffer> data);
+    boost::shared_ptr<rtmp_head_t> decodeHeader(boost::uint8_t *header);
+    boost::shared_ptr<rtmp_head_t> decodeHeader(amf::Buffer &data);
     boost::shared_ptr<amf::Buffer> encodeHeader(int amf_index, rtmp_headersize_e head_size,
 			      size_t total_size, content_types_e type, RTMPMsg::rtmp_source_e routing);
     boost::shared_ptr<amf::Buffer> encodeHeader(int amf_index, rtmp_headersize_e head_size);
     
-    bool packetSend(boost::shared_ptr<amf::Buffer> buf);
-    bool packetRead(boost::shared_ptr<amf::Buffer> buf);
-
-    void addProperty(boost::shared_ptr<amf::Element> el);
-    void addProperty(char *name, boost::shared_ptr<amf::Element> el);
-    void addProperty(std::string &name, boost::shared_ptr<amf::Element> el);
-    boost::shared_ptr<amf::Element> getProperty(const std::string &name);
+    void addProperty(amf::Element &el);
+    void addProperty(char *name, amf::Element &el);
+    void addProperty(std::string &name, amf::Element &el);
+    amf::Element &getProperty(const std::string &name);
     void setHandler(Handler *hand) { _handler = hand; };
     int headerSize(boost::uint8_t header);
 
@@ -237,10 +236,10 @@ public:
 
     // Decode an RTMP message
     RTMPMsg *decodeMsgBody(boost::uint8_t *data, size_t size);
-    RTMPMsg *decodeMsgBody(boost::shared_ptr<amf::Buffer> buf);
+    RTMPMsg *decodeMsgBody(amf::Buffer &buf);
     
-    virtual rtmp_ping_t *decodePing(boost::uint8_t *data);
-    rtmp_ping_t *decodePing(boost::shared_ptr<amf::Buffer> buf);
+    virtual boost::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
+    boost::shared_ptr<rtmp_ping_t> decodePing(amf::Buffer &buf);
     
     // These are handlers for the various types
     virtual boost::shared_ptr<amf::Buffer> encodeChunkSize();
@@ -271,40 +270,51 @@ public:
 
     // Receive a message, which is a series of AMF elements, seperated
     // by a one byte header at regular byte intervals. (128 bytes for
-    // video data by default). Each message main contain multiple packets.
+    // video data by default). Each message may contain multiple packets.
     boost::shared_ptr<amf::Buffer> recvMsg();
-    boost::shared_ptr<amf::Buffer> recvMsg(int timeout);
+    boost::shared_ptr<amf::Buffer> recvMsg(int fd);
 
     // Send a message, usually a single ActionScript object. This message
     // may be broken down into a series of packets on a regular byte
     // interval. (128 bytes for video data by default). Each message main
     // contain multiple packets.
-    bool sendMsg(boost::shared_ptr<amf::Buffer> data);
+    bool sendMsg(amf::Buffer &data);
+    bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+	      size_t total_size, content_types_e type,
+	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data);
+    bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+	      size_t total_size, content_types_e type,
+		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
     
+#if 0
     // Send a Msg, and expect a response back of some kind.
     RTMPMsg *sendRecvMsg(int amf_index, rtmp_headersize_e head_size,
 			      size_t total_size, content_types_e type,
-			      RTMPMsg::rtmp_source_e routing, boost::shared_ptr<amf::Buffer> buf);
+			      RTMPMsg::rtmp_source_e routing, amf::Buffer &buf);
+#endif
     // Split a large buffer into multiple smaller ones of the default chunksize
     // of 128 bytes. We read network data in big chunks because it's more efficient,
     // but RTMP uses a weird scheme of a standard header, and then every chunksize
     // bytes another 1 byte RTMP header. The header itself is not part of the byte
     // count.
-    queues_t *split(boost::shared_ptr<amf::Buffer> buf);
+    boost::shared_ptr<queues_t> split(amf::Buffer &buf);
+    boost::shared_ptr<queues_t> split(boost::uint8_t *data, size_t size);
 
     CQue &operator[] (size_t x) { return _queues[x]; }
     void dump();
   protected:
-    std::map<const char *, boost::shared_ptr<amf::Element> > _properties;
+    AMFProperties _properties;
     amf::Buffer	*_handshake;
     Handler	*_handler;
     rtmp_head_t	_header;
     int         _packet_size;
     int         _mystery_word;
     size_t	_chunksize[MAX_AMF_INDEXES];
+    size_t	_lastsize[MAX_AMF_INDEXES];
     int		_timeout;
     CQue	_queues[MAX_AMF_INDEXES];
-    queues_t    _channels;
+//    queues_t    _channels;
+    amf::Buffer	_buffer;
 };
 
 } // end of gnash namespace

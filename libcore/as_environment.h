@@ -43,7 +43,6 @@ class as_environment
 public:
 
     /// A stack of objects used for variables/members lookup
-    //typedef std::vector<with_stack_entry> ScopeStack;
     typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
     /// The variables container (case-insensitive)

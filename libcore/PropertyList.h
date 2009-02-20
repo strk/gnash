@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -57,13 +57,13 @@ public:
     
 
     /// A tag type for multi-index
-	struct oType {/**/};
+	struct oType {};
 
 	/// The actual container
 	/// index 0 is the fully indexed name/namespace pairs, which are unique
-	/// Because of the way searching works, this index can also be used to search
-	/// for the names alone (composite keys are sorted lexographically, beginning
-	/// with the first element specified)
+	/// Because of the way searching works, this index can also be
+    /// used to search for the names alone (composite keys are sorted
+    /// lexographically, beginning with the first element specified)
 	///
 	/// index 1 is an ordered sequence, and it is used for the AS3 style
 	/// enumeration (which requires an order number for each property),
@@ -86,11 +86,17 @@ public:
 	> container;
 
 	/// Construct the PropertyList 
-	PropertyList()
+    //
+    /// The constructor takes a VM reference because PropertyList
+    /// conceptually needs access to Virtual Machine resources
+    /// (string_table) but not to the Stage.
+	PropertyList(VM& vm)
 		:
 		_props(),
-		mDefaultOrder(0) // correct ?
-	{/**/}
+		mDefaultOrder(0),
+        _vm(vm)
+	{
+    }
 
 	/// Copy constructor
 	PropertyList(const PropertyList& pl);
@@ -116,8 +122,13 @@ public:
 	void visitValues(V& visitor, const as_object& this_ptr) const
 	{
         typedef container::nth_index<1>::type ContainerByOrder;
-        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); it != ie; ++it)
+        
+        // The template keyword is not required by the Standard here, but the
+        // OpenBSD compiler needs it. Use of the template keyword where it is
+        // not necessary is not an error.
+        for (ContainerByOrder::const_reverse_iterator
+                it = _props.template get<1>().rbegin(),
+                ie = _props.template get<1>().rend(); it != ie; ++it)
 		{
 			as_value val = it->getValue(this_ptr);
 			visitor.accept(it->mName, val);
@@ -142,8 +153,13 @@ public:
 	void visitNonHiddenValues(V& visitor, const as_object& this_ptr) const
 	{
         typedef container::nth_index<1>::type ContainerByOrder;
-        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); it != ie; ++it)
+        
+        // The template keyword is not required by the Standard here, but the
+        // OpenBSD compiler needs it. Use of the template keyword where it is
+        // not necessary is not an error.
+        for (ContainerByOrder::const_reverse_iterator it =
+                _props.template get<1>().rbegin(),
+                ie = _props.template get<1>().rend(); it != ie; ++it)
 		{
 	        if (it->getFlags().get_dont_enum()) continue;
 			as_value val = it->getValue(this_ptr);
@@ -155,8 +171,9 @@ public:
     bool hasNonHiddenProperties() const
     {
         typedef container::nth_index<1>::type ContainerByOrder;
-        for (ContainerByOrder::const_reverse_iterator it=_props.get<1>().rbegin(),
-            ie=_props.get<1>().rend(); it != ie; ++it)
+        for (ContainerByOrder::const_reverse_iterator it = 
+                _props.get<1>().rbegin(), ie=_props.get<1>().rend();
+                it != ie; ++it)
 		{
 	        if (! it->getFlags().get_dont_enum()) return true;
         }
@@ -448,8 +465,7 @@ public:
 	///	    of keys in the props argument not found in
 	///	    this properties set.
 	///
-	std::pair<size_t,size_t> setFlagsAll(
-			const PropertyList& props,
+	std::pair<size_t,size_t> setFlagsAll( const PropertyList& props,
 			int setTrue, int setFalse);
 
 	/// \brief
@@ -541,8 +557,13 @@ public:
 	void setReachable() const;
 
 private:
-	container _props;
-	unsigned short mDefaultOrder;
+
+    container _props;
+
+    unsigned short mDefaultOrder;
+    
+    VM& _vm;
+
 };
 
 

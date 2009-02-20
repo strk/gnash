@@ -1,6 +1,6 @@
 // MediaParserFfmpeg.cpp: FFMPG media parsers, for Gnash
 //
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -63,14 +63,15 @@ MediaParserFfmpeg::probeStream()
 	probe_data.buf = buffer.get();
 	probe_data.buf_size = 2048;
 
-	assert(_stream->tell() == 0);
+	assert(_stream->tell() == static_cast<std::streampos>(0));
 	size_t actuallyRead = _stream->read(probe_data.buf, probe_data.buf_size);
 	_stream->seek(0);
 
 	if (actuallyRead < 1)
 	{
- 		throw IOException(_("MediaParserFfmpeg could not read probe data from input"));
- 		return NULL;
+ 		throw IOException(_("MediaParserFfmpeg could not read probe data "
+                    "from input"));
+ 		return 0;
 	}
 
 	probe_data.buf_size = actuallyRead; // right ?
@@ -324,7 +325,8 @@ MediaParserFfmpeg::initializeParser()
 	_inputFmt = probeStream();
 	if ( ! _inputFmt )
 	{
-		throw GnashException("MediaParserFfmpeg couldn't figure out input format");
+		throw MediaException("MediaParserFfmpeg couldn't figure out input "
+                "format");
 	}
 
 	_formatCtx = av_alloc_format_context();

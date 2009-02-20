@@ -1,6 +1,6 @@
 // stream.h - SWF stream reading class, for Gnash
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -322,7 +322,7 @@ public:
 	//
 	/// aligned read
 	///
-	SWF::tag_type	open_tag();
+	SWF::TagType	open_tag();
 
 	/// Seek to the end of the most-recently-opened tag.
 	void	close_tag();

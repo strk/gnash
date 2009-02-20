@@ -344,35 +344,6 @@ fltk_menu_restart(Widget*, void* ptr)
 }
 
 static void
-fltk_menu_step_forward(Widget*, void* ptr)
-{
-    FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_step_forward();
-}
-
-
-static void
-fltk_menu_step_backward(Widget*, void* ptr)
-{
-    FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_step_backward();
-}
-
-static void
-fltk_menu_jump_forward(Widget*, void* ptr)
-{
-    FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_jump_forward();
-}
-
-static void
-fltk_menu_jump_backward(Widget*, void* ptr)
-{
-    FltkGui* gui = static_cast<FltkGui*>(ptr);
-    gui->menu_jump_backward();
-}
-
-static void
 fltk_menu_toggle_sound(Widget*, void* ptr)
 {
     FltkGui* gui = static_cast<FltkGui*>(ptr);
@@ -408,10 +379,6 @@ FltkGui::addMenuItems()
     new Item("Pause Movie",             0, fltk_menu_pause, this);
     new Item("Stop Movie",              0, fltk_menu_stop, this);
     new Item("Restart Movie",           0, fltk_menu_restart, this);
-    new Item("Step Forward Frame",      0, fltk_menu_step_forward, this);
-    new Item("Step Backward Frame",     0, fltk_menu_step_backward, this);
-    new Item("Jump Forward 10 Frames",  0, fltk_menu_jump_forward, this);
-    new Item("Jump Backward 10 Frames", 0, fltk_menu_jump_backward, this);
     new Item("Toggle Sound",            0, fltk_menu_toggle_sound, this);
     movie_ctrl->end();
 

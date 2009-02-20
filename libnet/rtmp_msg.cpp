@@ -50,14 +50,14 @@ RTMPMsg::RTMPMsg()
     : _routing(FROM_SERVER),
       _status(APP_SHUTDOWN),
       _streamid(0),
-      _channel(9)
+      _channel(0)
 {
 //    GNASH_REPORT_FUNCTION;
 //     _inbytes = 0;
 //     _outbytes = 0;
     
-//    _body = new unsigned char(RTMP_BODY_SIZE+1);
-//    memset(_body, 0, RTMP_BODY_SIZE+1);
+//    _body = new unsigned char(RTMP_HANDSHAKE_SIZE+1);
+//    memset(_body, 0, RTMP_HANDSHAKE_SIZE+1);
 }
 
 RTMPMsg::~RTMPMsg()
@@ -250,6 +250,12 @@ RTMPMsg::checkStatus(boost::shared_ptr<amf::Element>  /* el */)
     return _status;
 }
 
+// void
+// RTMPMsg::setHeaderData(RTMP::rtmp_head_t &qhead)
+// {
+    
+// }
+
 boost::shared_ptr<amf::Element>
 RTMPMsg::operator[](size_t index)
 {
@@ -261,6 +267,31 @@ RTMPMsg::operator[](size_t index)
     boost::shared_ptr<amf::Element> el;
     return el;
 };
+
+/// \brief Find the named property for this Object.
+///
+/// @param name An ASCII string that is the name of the property to
+///	search for.
+///
+/// @return A smart pointer to the Element for this property.
+boost::shared_ptr<amf::Element> 
+RTMPMsg::findProperty(const std::string &name)
+{
+    if (_amfobjs.size() > 0) {
+	vector<boost::shared_ptr<Element> >::iterator ait;
+//	cerr << "# of Properties in object: " << _properties.size() << endl;
+	for (ait = _amfobjs.begin(); ait != _amfobjs.end(); ait++) {
+	    boost::shared_ptr<amf::Element> el = (*(ait));
+	    boost::shared_ptr<amf::Element> prop = el->findProperty(name);
+	    if (prop) {
+		return prop;
+	    }
+	}
+    }
+    boost::shared_ptr<Element> el;
+    return el;
+}
+
 
 void
 RTMPMsg::dump()

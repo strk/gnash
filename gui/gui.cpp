@@ -1,6 +1,6 @@
 // gui.cpp:  Top level GUI for SWF player, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -176,6 +176,12 @@ void
 Gui::unsetFullscreen()
 {
     log_unimpl(_("Fullscreen not yet supported in this GUI"));
+}
+
+void
+Gui::hideMenu()
+{
+    log_unimpl(_("Menu hiding not yet supported in this GUI"));
 }
 
 bool
@@ -390,7 +396,6 @@ Gui::updateStageMatrix()
 void
 Gui::resize_view(int width, int height)
 {
-	GNASH_REPORT_FUNCTION;
 
 	assert(width>0);
 	assert(height>0);
@@ -414,34 +419,6 @@ Gui::resize_view(int width, int height)
 	if ( _stage && _started ) display(_stage);
 }
 
-
-void
-Gui::menu_step_forward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()+1);
-}
-
-void
-Gui::menu_step_backward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()-1);
-}
-
-void
-Gui::menu_jump_forward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()+10);
-}
-
-void
-Gui::menu_jump_backward()
-{
-	movie_root& m = VM::get().getRoot();
-	m.goto_frame(m.get_current_frame()-10);
-}
 
 void
 Gui::toggleSound()
@@ -586,19 +563,13 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::F:
 					toggleFullscreen();
 					break;
-				case gnash::key::RIGHT_BRACKET:
-					menu_step_forward();
-					break;
-				case gnash::key::LEFT_BRACKET:
-					menu_step_backward();
-					break;
 				case gnash::key::MINUS:
 				{
 					// Max interval allowed: 1 second (1FPS)
 					unsigned int ni = std::min(_interval+2, 1000u);
 					setInterval(ni);
 					break;
-                                }
+                }
 				case gnash::key::PLUS:
 				{
 					// Min interval allowed: 1/100 second (100FPS)
@@ -1073,7 +1044,7 @@ Gui::getMovieInfo() const
     InfoTree::iterator topIter = tr->begin();
     InfoTree::iterator firstLevelIter;
 
-    VM& vm = VM::get();
+    VM& vm = _stage->getVM();
 
     std::ostringstream os;
 

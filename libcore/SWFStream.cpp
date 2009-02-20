@@ -1,6 +1,6 @@
 // stream.cpp - SWF stream reading class, for Gnash
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -50,13 +50,15 @@ SWFStream::ensureBytes(unsigned long needed)
 {
 #ifndef GNASH_TRUST_SWF_INPUT
 
-    if ( _tagBoundsStack.empty() ) return; // not in a tag (should we check file length ?)
+    // Not in a tag (should we check file length?)
+    if ( _tagBoundsStack.empty() ) return; 
 
     unsigned long int left = get_tag_end_position() - tell();
     if ( left < needed )
     {
         std::stringstream ss;
-        ss << "premature end of tag: need to read " << needed << " bytes, but only " << left << " left in this tag";
+        ss << "premature end of tag: need to read " << needed << 
+            " bytes, but only " << left << " left in this tag";
         throw ParserException(ss.str());
     }
 #endif
@@ -499,7 +501,7 @@ SWFStream::seek(unsigned long pos)
     }
 
     // Do the seek.
-    if ( m_input->seek(pos) == -1 )
+    if (!m_input->seek(pos))
     {
         // TODO: should we throw an exception ?
         //       we might be called from an exception handler
@@ -521,7 +523,7 @@ SWFStream::get_tag_end_position()
 }
 
 
-SWF::tag_type
+SWF::TagType
 SWFStream::open_tag()
 {
     align();
@@ -594,7 +596,7 @@ SWFStream::open_tag()
         tagStart, tagType, tagLength, tagEnd);
     );
 
-    return static_cast<SWF::tag_type>(tagType);
+    return static_cast<SWF::TagType>(tagType);
 }
 
 
@@ -603,12 +605,12 @@ SWFStream::close_tag()
 {
 
     assert(_tagBoundsStack.size() > 0);
-    unsigned long endPos = _tagBoundsStack.back().second;
+    std::streampos endPos = _tagBoundsStack.back().second;
     _tagBoundsStack.pop_back();
 
     //log_debug("Close tag called at %d, stream size: %d", endPos);
 
-    if ( m_input->seek(endPos) == -1 )
+    if (!m_input->seek(endPos))
     {
         // We'll go on reading right past the end of the stream
         // if we don't throw an exception.
@@ -625,9 +627,10 @@ SWFStream::consumeInput()
 	// to possibly throw an exception (!)
 	try {
 		m_input->go_to_end();
-	} catch (IOException& ex) {
-		log_error("SWFStream::consumeInput: underlying stream couldn't go_to_end: %s",
-			ex.what());
+	}
+    catch (IOException& ex) {
+		log_error("SWFStream::consumeInput: underlying stream couldn't "
+                "go_to_end: %s", ex.what());
 		// eh.. and now ?!
 	}
 }

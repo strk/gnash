@@ -1,5 +1,5 @@
 dnl  
-dnl  Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -1226,7 +1226,7 @@ dnl Add KPARTS support, if specified or KDE gui is built
 dnl ----------------------------------------------------
 
 AC_ARG_ENABLE(kparts3,
-  AC_HELP_STRING([--disable-kparts3], [Disble support for Konqueror 3.x plugin (default: enabled if kde3 gui is)]),
+  AC_HELP_STRING([--disable-kparts3], [Disable support for Konqueror 3.x plugin (default: enabled if kde3 gui is)]),
 [case "${enableval}" in
   yes) build_kparts3=yes ;;
   no)  build_kparts3=no ;;
@@ -1336,7 +1336,7 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
-AC_CHECK_LIB(lber, ber_free)
+#AC_CHECK_LIB(lber, ber_free)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
 dnl X11 is needed for fltk (at least),
@@ -1608,8 +1608,8 @@ dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
 if test x$cross_compiling = xno; then
-  AC_PATH_PROG(SWFMILL, swfmill)
   AC_PATH_PROG(SWFC, swfc)
+  AC_PATH_SWFMILL
   AC_PATH_MTASC
   AC_PATH_HAXE
 fi
@@ -2444,8 +2444,8 @@ if test x$build_kde3 = xyes; then
       echo "               the default is the same of --enable-gui=kde,gtk" >&3
       echo "               To be able to build the kde 3.x gui," >&3
       echo "               install version 3.x of the KDE development environment from http://kde.org" >&3
-      echo "               or .deb users: apt-get install kdelibs-dev" >&3
-      echo "               or .rpm users: yum install kdelibs-devel." >&3
+      echo "               or .deb users: apt-get install kdelibs4-dev" >&3
+      echo "               or .rpm users: yum install kdelibs3-devel." >&3
   fi
 fi
 
@@ -2463,7 +2463,7 @@ if test x$build_kde4 = xyes; then
       echo "               the default is the same of --enable-gui=kde,gtk" >&3
       echo "               To be able to build the kde 4.x gui," >&3
       echo "               install version 4.x of the KDE development environment from http://kde.org" >&3
-      echo "               or .deb users: apt-get install kdelibs-dev" >&3
+      echo "               or .deb users: apt-get install kdelibs5-dev" >&3
       echo "               or .rpm users: yum install kdelibs-devel." >&3
   fi
 fi
@@ -3052,6 +3052,7 @@ if test x$cross_compiling = xno; then
     echo "                 to have real fun." >&4
     echo "                 Install it from http://www.csounds.com/" >&4
     echo "                 or .deb users: apt-get install csound" >&4
+    echo "                 or .rpm users: yum install csound" >&4
   fi
 
 fi
@@ -3069,7 +3070,7 @@ else
   echo "                 and to display some kinds of JPEG files." >&4
   echo "                 Install it from http://www.zlib.net" >&4
   echo "                 or .deb users: apt-get install zlib1g-dev" >&4
-  echo "                 or .rpm users: yum install zlib-dev." >&4
+  echo "                 or .rpm users: yum install zlib-devel." >&4
   echo "                 It may still be possible to configure without zlib." >&4
 fi
 
@@ -3085,7 +3086,7 @@ else
   echo "                 to use device fonts." >&4
   echo "                 Install it from http://www.freetype.org" >&4
   echo "                 or .deb users: apt-get install libfreetype6-dev" >&4
-  echo "                 or .rpm users: yum install libfreetype6-dev (??)" >&4
+  echo "                 or .rpm users: yum install freetype-devel" >&4
   echo "                 It may still be possible to configure without freetype." >&4
 fi
 
@@ -3101,7 +3102,7 @@ else
   echo "                 to use device fonts." >&4
   echo "                 Install it from http://www.fontconfig.org" >&4
   echo "                 or .deb users: apt-get install libfontconfig1-dev" >&4
-  echo "                 or .rpm users: yum install ??" >&4
+  echo "                 or .rpm users: yum install fontconfig-devel" >&4
   echo "                 It may still be possible to configure without fontconfig." >&4
 fi
 
@@ -3115,6 +3116,7 @@ if test x$ext_mysql = xyes; then
       echo "               Either reconfigure without --enable-extensions=mysql" >&3
       echo "               or install MySQL header files from http://www.mysql.org" >&3
       echo "               or .deb users: apt-get install libmysqlclient-dev" >&3
+      echo "                 or .rpm users: yum install mysql-devel" >&4
     fi
   fi
 fi
@@ -3124,7 +3126,7 @@ if test "$GMSGFMT" = ":"; then
   echo "                 Required for building a package or 'make distcheck'" >&4
   echo "                 Install it from http://www.gnu.org/software/gettext/" >&4
   echo "                 or .deb users: apt-get install gettext" >&4
-  #echo "                or .rpm users: yum install gettext" >&4
+  echo "                 or .rpm users: yum install gettext" >&4
 fi
 
 if test x"${DEJAGNU}" != x""; then
@@ -3134,7 +3136,7 @@ else
   echo "                 report after running ''make check''" >&4
   echo "                 Install it from http://www.gnu.org/software/dejagnu/" >&4
   echo "                 or .deb users: apt-get install dejagnu" >&4
-  #echo "                or .rpm users: yum install dejagnu" >&4
+  echo "                 or .rpm users: yum install dejagnu" >&4
 fi
 
 
@@ -3158,6 +3160,7 @@ if test x"$xpcom" = x"yes"; then
     echo "        ERROR: No XPCOM development package is installed." >&3
     echo "                Install it from http://www.mozilla.org/projects/xpcom/" >&3
     echo "                or .deb users: apt-get install xulrunner-1.9-dev" >&3
+   echo "                 or .rpm users: yum install xulrunner-devel" >&4
   fi
 fi
 if test x"$nspr4" = x"yes"; then

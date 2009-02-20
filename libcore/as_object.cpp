@@ -1,6 +1,6 @@
 // as_object.cpp:  ActionScript Object class and its properties, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -458,7 +458,8 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 	if (key == NSV::PROP_uuPROTOuu && !nsname)
 	{
 		Property* prop = _members.getProperty(key, nsname);
-		// TODO: add ignoreVisibility parameter to allow using __proto__ even when not visible ?
+		// TODO: add ignoreVisibility parameter to allow using 
+        // __proto__ even when not visible ?
 		if (prop && prop->isVisible(swfVersion))
 		{
 			if (owner != NULL)
@@ -542,12 +543,11 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 void
 as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 {
-	static string_table::key key = NSV::PROP_uuPROTOuu;
-
 	// TODO: check what happens if __proto__ is set as a user-defined 
     // getter/setter
 	// TODO: check triggers !!
-	_members.setValue(key, as_value(proto.get()), *this, 0, flags);
+	_members.setValue(NSV::PROP_uuPROTOuu, as_value(proto.get()), *this, 0,
+            flags);
 }
 
 void
@@ -680,7 +680,8 @@ as_object::set_member(string_table::key key, const as_value& val,
 		Property* prop = _members.getProperty(key);
 		if ( ! prop )
 		{
-			log_debug("Property %s deleted by trigger on create", _vm.getStringTable().value(key));
+			log_debug("Property %s deleted by trigger on create", 
+                    _vm.getStringTable().value(key));
 		}
 		else
 		{
@@ -703,7 +704,6 @@ void
 as_object::init_member(string_table::key key, const as_value& val, int flags,
 	string_table::key nsname, int order)
 {
-	//log_debug(_("Initializing member %s for object %p"), _vm.getStringTable().value(key), (void*) this);
 
 	if (order >= 0 && !_members.
 		reserveSlot(static_cast<unsigned short>(order), key, nsname))
@@ -993,21 +993,9 @@ as_object::setPropFlags(const as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	// Evan: it seems that if set_true == 0 and set_false == 0,
-	// this function acts as if the parameters were (object, null, 0x1, 0)
-#if 0 // bullshit, see actionscript.all/Global.as
-	if (set_false == 0 && set_true == 0)
-	{
-	    props_val.set_null();
-	    set_false = 0;
-	    set_true = 0x1;
-	}
-#endif
-
 	if (props_val.is_null())
 	{
 		// Take all the members of the object
-		//std::pair<size_t, size_t> result = 
 		_members.setFlagsAll(set_true, set_false);
 
 		// Are we sure we need to descend to __proto__ ?
@@ -1093,30 +1081,34 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 
 }
 
+as_object::as_object(movie_root& mr)
+	:
+	_vm(mr.getVM()),
+	_members(_vm)
+{
+}
+
+
 as_object::as_object()
 	:
-	_members(),
-	_vm(VM::get())
-	//, m_prototype(NULL)
+	_vm(VM::get()),
+	_members(_vm)
 {
 }
 
 as_object::as_object(as_object* proto)
 	:
-	_members(),
-	_vm(VM::get())
-	//, m_prototype(proto)
+	_vm(VM::get()),
+	_members(_vm)
 {
 	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
-	_members(),
-	_vm(VM::get())
-	//, m_prototype(proto)
+	_vm(VM::get()),
+	_members(_vm)
 {
-	//set_prototype(proto);
 	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
 
@@ -1127,9 +1119,8 @@ as_object::as_object(const as_object& other)
 #else
 	GcResource(), 
 #endif
-	_members(other._members),
-	_vm(VM::get())
-	//, m_prototype(other.m_prototype) // done by _members copy
+	_vm(VM::get()),
+	_members(other._members)
 {
 }
 
@@ -1171,30 +1162,15 @@ as_object::valueof_method(const fn_call& fn)
 boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
-#if 0
-	as_value val;
-	if ( ! get_member(NSV::PROP_uuPROTOuu, &val) )
-	{
-		//log_debug("Object %p has no __proto__ member");
-		return NULL;
-	}
-	//log_debug("%p.__proto__ is %s", val);
-	return val.to_object().get();
-#else
-	static string_table::key key = NSV::PROP_uuPROTOuu;
-
 	int swfVersion = _vm.getSWFVersion();
 
-	boost::intrusive_ptr<as_object> nullRet = NULL;
-
-	Property* prop = _members.getProperty(key);
-	if ( ! prop ) return nullRet;
-	if ( ! prop->isVisible(swfVersion) ) return nullRet;
+	Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
+	if ( ! prop ) return 0;
+	if ( ! prop->isVisible(swfVersion) ) return 0;
 
 	as_value tmp = prop->getValue(*this);
 
 	return tmp.to_object();
-#endif
 }
 
 bool
@@ -1216,19 +1192,17 @@ as_object::getMember(string_table::key name, string_table::key nsname)
 {
 	as_value ret;
 	get_member(name, &ret, nsname);
-	//get_member(PROPNAME(name), &ret);
 	return ret;
 }
 
 as_value
 as_object::callMethod(string_table::key methodName)
 {
-	as_value ret;
 	as_value method;
 
 	if (! get_member(methodName, &method))
 	{
-		return ret;
+		return as_value();
 	}
 
 	as_environment env(_vm);
@@ -1239,12 +1213,11 @@ as_object::callMethod(string_table::key methodName)
 as_value
 as_object::callMethod(string_table::key methodName, const as_value& arg0)
 {
-	as_value ret;
 	as_value method;
 
 	if (!get_member(methodName, &method))
 	{
-		return ret;
+		return as_value();
 	}
 
 	as_environment env(_vm);
@@ -1252,21 +1225,18 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0)
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 
-	ret = call_method(method, &env, this, args);
-
-	return ret;
+	return call_method(method, &env, this, args);
 }
 
 as_value
-as_object::callMethod(string_table::key methodName,
-	const as_value& arg0, const as_value& arg1)
+as_object::callMethod(string_table::key methodName, const as_value& arg0,
+        const as_value& arg1)
 {
-	as_value ret;
 	as_value method;
 
 	if (! get_member(methodName, &method))
 	{
-		return ret;
+		return as_value();
 	}
 
 	as_environment env(_vm);
@@ -1275,9 +1245,7 @@ as_object::callMethod(string_table::key methodName,
 	args->push_back(arg0);
 	args->push_back(arg1);
 
-	ret = call_method(method, &env, this, args);
-
-	return ret;
+	return call_method(method, &env, this, args);
 }
 
 as_value
@@ -1305,16 +1273,14 @@ as_object::callMethod(string_table::key methodName,
 }
 
 as_value
-as_object::callMethod(string_table::key methodName,
-	const as_value& arg0, const as_value& arg1,
-	const as_value& arg2, const as_value& arg3)
+as_object::callMethod(string_table::key methodName, const as_value& arg0,
+        const as_value& arg1, const as_value& arg2, const as_value& arg3)
 {
-	as_value ret;
 	as_value method;
 
 	if (! get_member(methodName, &method))
 	{
-		return ret;
+		return as_value();
 	}
 
 	as_environment env(_vm);
@@ -1325,9 +1291,8 @@ as_object::callMethod(string_table::key methodName,
 	args->push_back(arg2);
 	args->push_back(arg3);
 
-	ret = call_method(method, &env, this, args);
+	return call_method(method, &env, this, args);
 
-	return ret;
 }
 
 as_object*
@@ -1392,7 +1357,8 @@ as_object::watch(string_table::key key, as_function& trig,
 	TriggerContainer::iterator it = _trigs.find(k);
 	if ( it == _trigs.end() )
 	{
-		return _trigs.insert(std::make_pair(k, Trigger(propname, trig, cust))).second;
+		return _trigs.insert(
+                std::make_pair(k, Trigger(propname, trig, cust))).second;
 	}
 	it->second = Trigger(propname, trig, cust);
 	return true;
@@ -1404,13 +1370,15 @@ as_object::unwatch(string_table::key key, string_table::key ns)
 	TriggerContainer::iterator trigIter = _trigs.find(std::make_pair(key, ns));
 	if ( trigIter == _trigs.end() )
 	{
-		log_debug("No watch for property %s", getVM().getStringTable().value(key));
+		log_debug("No watch for property %s",
+                getVM().getStringTable().value(key));
 		return false;
 	}
 	Property* prop = _members.getProperty(key, ns);
 	if ( prop && prop->isGetterSetter() )
 	{
-		log_debug("Watch on %s not removed (is a getter-setter)", getVM().getStringTable().value(key));
+		log_debug("Watch on %s not removed (is a getter-setter)",
+                getVM().getStringTable().value(key));
 		return false;
 	}
 	_trigs.erase(trigIter);
@@ -1448,13 +1416,13 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 	try {
 		as_environment env(VM::get()); // TODO: get VM in some other way 
 
-		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		std::auto_ptr<std::vector<as_value> > args (new std::vector<as_value>);
 		args->push_back(_propname);
 		args->push_back(oldval);
 		args->push_back(newval);
 		args->push_back(_customArg);
 
-		fn_call fn(&this_obj, &env, args);
+		fn_call fn(&this_obj, env, args);
 
 		as_value ret = _func->call(fn);
 
@@ -1463,7 +1431,7 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		return ret;
 
 	}
-	catch (...)
+	catch (GnashException&)
 	{
 		_executing = false;
 		throw;

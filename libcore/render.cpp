@@ -1,6 +1,6 @@
 // render.cpp Rendering interface for Gnash
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -87,8 +87,12 @@ namespace render
 	}
 
 	// Draws the video frames
-	void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat, const rect* bounds){
-		if (s_render_handler) return s_render_handler->drawVideoFrame(frame, mat, bounds);
+	void drawVideoFrame(GnashImage* frame, const SWFMatrix* mat,
+            const rect* bounds, bool smooth)
+    {
+		if (s_render_handler) {
+            return s_render_handler->drawVideoFrame(frame, mat, bounds, smooth);
+        }
 	}
 
 
@@ -127,12 +131,12 @@ namespace render
 	}
 
 
-	void	draw_line_strip(const boost::int16_t coords[], int vertex_count, const rgba& color, const SWFMatrix& mat)
+	void drawLine(const std::vector<point>& coords, const rgba& color, const SWFMatrix& mat)
 	{
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->draw_line_strip(coords, vertex_count, color, mat);
+		if (s_render_handler) s_render_handler->drawLine(coords, color, mat);
 }
 
 

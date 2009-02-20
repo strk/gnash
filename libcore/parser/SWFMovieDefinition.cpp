@@ -1,6 +1,6 @@
 // SWFMovieDefinition.cpp: load a SWF definition
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -76,8 +76,6 @@ MovieLoader::MovieLoader(SWFMovieDefinition& md)
 
 MovieLoader::~MovieLoader()
 {
-	//cout << "MovieLoader dtor called" << endl;
-
 	// we should assert _movie_def._loadingCanceled
 	// but we're not friend yet (anyone introduce us ?)
 	if ( _thread.get() )
@@ -147,19 +145,22 @@ MovieLoader::start()
 /// Log the contents of the current tag, in hex to the output strream
 static void	dumpTagBytes(SWFStream& in, std::ostream& os)
 {
-    const unsigned int rowlength = 16;
+    const std::streamsize rowlength = 16;
     os << std::endl;
     
     // This decremented until we reach the end of the stream.
-    unsigned int toRead = in.get_tag_end_position() - in.tell();
+    std::streamsize toRead = in.get_tag_end_position() - in.tell();
     in.ensureBytes(toRead);
 
     unsigned char buf[rowlength];    
     while (toRead)
     {
         // Read in max row length or remainder of stream.
-        const unsigned int thisRow = std::min<unsigned int>(toRead, rowlength);
-        const unsigned int got = in.read(reinterpret_cast<char*>(&buf), thisRow);
+        const std::streamsize thisRow = 
+            std::min<std::streamsize>(toRead, rowlength);
+        
+        const std::streamsize got = 
+            in.read(reinterpret_cast<char*>(&buf), thisRow);
         
         // Check that we read all the bytes we expected.
         if (got < thisRow)
@@ -245,7 +246,7 @@ SWFMovieDefinition::get_character_def(int character_id)
         _dictionary.get_character(character_id);
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
+#endif 
 	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
 }
 
@@ -266,7 +267,8 @@ Font* SWFMovieDefinition::get_font(int font_id) const
 }
 
 Font*
-SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic) const
+SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
+    const
 {
 
     for (FontMap::const_iterator it=m_fonts.begin(), itEnd=m_fonts.end(); it != itEnd; ++it)
@@ -281,8 +283,9 @@ BitmapInfo*
 SWFMovieDefinition::getBitmap(int character_id)
 {
     Bitmaps::iterator it = _bitmaps.find(character_id);
-    if ( it == _bitmaps.end() ) return 0;
-    else return it->second.get();
+    if (it == _bitmaps.end()) return 0;
+    
+    return it->second.get();
 }
 
 void
@@ -301,7 +304,7 @@ sound_sample* SWFMovieDefinition::get_sound_sample(int character_id)
     boost::intrusive_ptr<sound_sample> ch = it->second;
 #ifndef GNASH_USE_GC
     assert(ch->get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
+#endif 
 
     return ch.get();
 }
@@ -312,7 +315,7 @@ void SWFMovieDefinition::add_sound_sample(int character_id, sound_sample* sam)
     IF_VERBOSE_PARSE(
     log_parse(_("Add sound sample %d assigning id %d"),
 		character_id, sam->m_sound_handler_id);
-    );
+    )
     m_sound_samples.insert(std::make_pair(character_id,
 			    boost::intrusive_ptr<sound_sample>(sam)));
 }
@@ -326,10 +329,9 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 	_in = in;
 
 	// we only read a movie once
-	assert(_str.get() == NULL);
+	assert(!_str.get());
 
-	if ( url == "" ) _url = "<anonymous>";
-	else _url = url;
+	_url = url.empty() ? "<anonymous>" : url;
 
 	boost::uint32_t file_start_pos = _in->tell();
 	boost::uint32_t header = _in->read_le32();
@@ -345,21 +347,19 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 			"file does not start with a SWF header"));
 		return false;
         }
-	bool	compressed = (header & 255) == 'C';
+	const bool compressed = (header & 255) == 'C';
 
 	IF_VERBOSE_PARSE(
-		log_parse(_("version = %d, file_length = %d"),
-			m_version, m_file_length);
-	);
+		log_parse(_("version: %d, file_length: %d"), m_version, m_file_length);
+    )
 
-	if ( m_version > 7 )
+	if (m_version > 7)
 	{
 		log_unimpl(_("SWF%d is not fully supported, trying anyway "
 			"but don't expect it to work"), m_version);
 	}
 
-	if (compressed)
-        {
+	if (compressed) {
 #ifndef HAVE_ZLIB_H
 		log_error(_("SWFMovieDefinition::read(): unable to read "
 			"zipped SWF data; gnash was compiled without zlib support"));
@@ -372,7 +372,7 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 		// Uncompress the input as we read it.
 		_in = zlib_adapter::make_inflater(_in);
 #endif
-        }
+    }
 
 	assert(_in.get());
 
@@ -390,7 +390,8 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 	}
 
 	// It seems frame rate is limited to a max 
-	// 84 was found by testing the pp, might be turned into a compile-time define
+	// 84 was found by testing the pp, might be turned into a
+    // compile-time define
 	static const int maxfps = 84;
 	
 	_str->ensureBytes(2 + 2); // frame rate, frame count.
@@ -413,10 +414,8 @@ SWFMovieDefinition::readHeader(std::auto_ptr<IOChannel> in,
 
 	m_frame_count = _str->read_u16();
 
-	/* Markus: Probably this is better anyways */
-
 	// TODO: This seems dangerous, check closely
-	if(m_frame_count == 0) m_frame_count++;
+	if (!m_frame_count) ++m_frame_count;
 
 	IF_VERBOSE_PARSE(
 		log_parse(_("frame size = %s, frame rate = %f, frames = %d"),
@@ -440,7 +439,7 @@ SWFMovieDefinition::completeLoad()
 	assert ( VM::isInitialized() );
 
 	// should call readHeader before this
-	assert( _str.get() != NULL );
+	assert(_str.get());
 
 #ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 
@@ -475,18 +474,15 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum)
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	return ( framenum <= _frames_loaded );
+	return (framenum <= _frames_loaded);
 #endif
 
 	if ( framenum <= _frames_loaded ) return true;
 
 	_waiting_for_frame = framenum;
-        //log_debug(_("Waiting for frame %u to be loaded"), framenum);
 
 	// TODO: return false on timeout
 	_frame_reached_condition.wait(lock);
-
-        //log_debug(_("Condition reached (_frames_loaded=%u)"), _frames_loaded);
 
 	return ( framenum <= _frames_loaded );
 }
@@ -506,8 +502,8 @@ std::ostream&
 operator<<(std::ostream& o, const CharacterDictionary& cd)
 {
 
-   	for (CharacterDictionary::CharacterConstIterator it = cd.begin(), endIt = cd.end();
-   	        it != endIt; it++)
+   	for (CharacterDictionary::CharacterConstIterator it = cd.begin(), 
+            endIt = cd.end(); it != endIt; it++)
    	{
    	    o << std::endl
    	      << "Character: " << it->first
@@ -524,15 +520,17 @@ CharacterDictionary::get_character(int id)
 	if ( it == _map.end() )
 	{
 		IF_VERBOSE_PARSE(
-		log_parse(_("Could not find char %d, dump is: %s"), id, *this);
+            log_parse(_("Could not find char %d, dump is: %s"), id, *this);
 		);
 		return boost::intrusive_ptr<character_def>();
 	}
-	else return it->second;
+	
+    return it->second;
 }
 
 void
-CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c)
+CharacterDictionary::add_character(int id,
+        boost::intrusive_ptr<character_def> c)
 {
 	//log_debug(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
@@ -556,87 +554,81 @@ SWFMovieDefinition::read_all_swf()
 
 	try {
 
-	//size_t it=0;
-	while ( (boost::uint32_t) str.tell() < _swf_end_pos )
-	{
-		if ( _loadingCanceled )
-		{
-			log_debug("Loading thread cancelation requested, returning from read_all_swf");
-			return;
-		}
+        while (str.tell() < _swf_end_pos)
+        {
+            if (_loadingCanceled)
+            {
+                log_debug("Loading thread cancelation requested, "
+                        "returning from read_all_swf");
+                return;
+            }
 
-		//log_debug(_("Loading thread iteration %u"), it++);
-
-		SWF::tag_type tag_type = str.open_tag();
+            SWF::TagType tag = str.open_tag();
 
 parse_tag:
 
-		if (tag_type == SWF::END)
-                {
-			if ((unsigned int) str.tell() != _swf_end_pos)
-                        {
+            if (tag == SWF::END) {
+                if (str.tell() != _swf_end_pos) {
 		    		IF_VERBOSE_MALFORMED_SWF(
-				// Safety break, so we don't read past
-				// the end of the  movie.
-				log_swferror(_("Hit stream-end tag, "
-					"but not at the advertised SWF end; "
-					"stopping for safety."));
-		    		)
-		    		break;
-			}
-		}
+                        // Safety break, so we don't read past
+                        // the end of the  movie.
+                        log_swferror(_("Hit stream-end tag, "
+                            "but not at the advertised SWF end; "
+                            "stopping for safety."));
+                        )
+                        break;
+                }
+            }
 
-		SWF::TagLoadersTable::loader_function lf = NULL;
+            SWF::TagLoadersTable::loader_function lf = NULL;
 
-		if (tag_type == SWF::SHOWFRAME)
-		{
-			// show frame tag -- advance to the next frame.
+            if (tag == SWF::SHOWFRAME)
+            {
+                // show frame tag -- advance to the next frame.
 
-			IF_VERBOSE_PARSE(
-				log_parse("  show_frame");
-			);
+                IF_VERBOSE_PARSE(
+                    log_parse("  show_frame");
+                );
 
-			size_t floaded = incrementLoadedFrames();
-			if ( floaded == m_frame_count )
-			{
-				str.close_tag();
-				tag_type = str.open_tag();
-				if ( tag_type != SWF::END )
-				{
-					IF_VERBOSE_MALFORMED_SWF(
-					log_swferror(_("last expected SHOWFRAME "
-						"in SWF stream '%s' isn't "
-						"followed by an END (%d)."),
-						get_url(), tag_type);
-					);
-				}
-				goto parse_tag;
-			}
-
-		}
-		else if (_tag_loaders.get(tag_type, &lf))
+                size_t floaded = incrementLoadedFrames();
+                if (floaded == m_frame_count)
                 {
-			// call the tag loader.  The tag loader should add
-			// characters or tags to the movie data structure.
-			(*lf)(str, tag_type, *this, _runInfo);
-		}
-		else
-		{
-			// no tag loader for this tag type.
-            log_error(_("*** no tag loader for type %d (movie)"), tag_type);
-            IF_VERBOSE_PARSE(
-                std::ostringstream ss;
-                dumpTagBytes(str, ss);
-                log_error("tag dump follows: %s", ss.str());
-            );
-		}
+                    str.close_tag();
+                    tag = str.open_tag();
+                    if (tag != SWF::END )
+                    {
+                        IF_VERBOSE_MALFORMED_SWF(
+                        log_swferror(_("last expected SHOWFRAME "
+                            "in SWF stream '%s' isn't "
+                            "followed by an END (%d)."),
+                            get_url(), tag);
+                        );
+                    }
+                    goto parse_tag;
+                }
 
-		str.close_tag();
+            }
+            else if (_tag_loaders.get(tag, &lf)) {
+                // call the tag loader.  The tag loader should add
+                // characters or tags to the movie data structure.
+                (*lf)(str, tag, *this, _runInfo);
+            }
+            else {
+                // no tag loader for this tag type.
+                log_error(_("*** no tag loader for type %d (movie)"), tag);
+                IF_VERBOSE_PARSE(
+                    std::ostringstream ss;
+                    dumpTagBytes(str, ss);
+                    log_error("tag dump follows: %s", ss.str());
+                );
+            }
 
-		setBytesLoaded(str.tell());
-	}
+            str.close_tag();
 
-	} catch (const std::exception& e) {
+            setBytesLoaded(str.tell());
+        }
+
+	} catch (const ParserException& e) {
 		// FIXME: we should be setting some variable
 		//        so that it is possible for clients
 		//        to check the parser status
@@ -644,14 +636,20 @@ parse_tag:
 		//        and make sure any wait_for_frame call is
 		//        released (condition set and false result)
 		log_error(_("Parsing exception: %s"), e.what());
+
 	}
 
 	// Make sure we won't leave any pending writers
 	// on any eventual fd-based IOChannel.
 	str.consumeInput();
+    
+    // Set bytesLoaded to the current stream position unless it's greater
+    // than the reported length. TODO: should we be trying to continue
+    // parsing after an exception?
+    setBytesLoaded(std::min<size_t>(str.tell(), _swf_end_pos));
 
 	size_t floaded = get_loading_frame();
-	if ( ! m_playlist[floaded].empty() )
+	if (!m_playlist[floaded].empty())
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("%d control tags are NOT followed by"
@@ -662,8 +660,9 @@ parse_tag:
 	if ( m_frame_count > floaded )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("%d frames advertised in header, but only %d SHOWFRAME tags "
-			"found in stream. Pretending we loaded all advertised frames"), m_frame_count, floaded);
+		log_swferror(_("%d frames advertised in header, but only %d "
+                "SHOWFRAME tags found in stream. Pretending we loaded "
+                "all advertised frames"), m_frame_count, floaded);
 		);
 		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 		_frames_loaded = m_frame_count;
@@ -694,17 +693,15 @@ SWFMovieDefinition::incrementLoadedFrames()
 				"the advertised number in header (%d)."),
 				get_url(), _frames_loaded,
 				m_frame_count);
-		);
-		//m_playlist.resize(_frames_loaded+1);
+		)
 	}
 
 #ifdef DEBUG_FRAMES_LOAD
-	log_debug(_("Loaded frame %u/%u"),
-		_frames_loaded, m_frame_count);
+	log_debug(_("Loaded frame %u/%u"), _frames_loaded, m_frame_count);
 #endif
 
 	// signal load of frame if anyone requested it
-	// FIXME: _waiting_form_frame needs mutex ?
+	// FIXME: _waiting_for_frame needs mutex ?
 	if (_waiting_for_frame && _frames_loaded >= _waiting_for_frame )
 	{
 		// or should we notify_one ?
@@ -731,7 +728,8 @@ boost::intrusive_ptr<ExportableResource>
 SWFMovieDefinition::get_exported_resource(const std::string& symbol) const
 {
 #ifdef DEBUG_EXPORTS
-	log_debug("get_exported_resource(%s) called, loading frame:%u", symbol, m_frame_count);
+	log_debug("get_exported_resource(%s) called, loading frame:%u",
+            symbol, m_frame_count);
 #endif
 
 	// Don't call get_exported_resource() from this movie loader

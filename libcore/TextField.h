@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -137,6 +137,16 @@ public:
         return _selection;
     }
 
+    /// Replace the current selection with the new text.
+    void replaceSelection(const std::string& replace);
+
+    /// Set the current selection
+    //
+    /// @param start    The index of the beginning of the selection.
+    /// @param end      The index of the end of the selection.
+    //
+    /// If start is greater than end, the values are swapped, ensuring
+    /// end is never less than start.
     void setSelection(int start, int end);
 
 	/// We have a "text" member.
@@ -643,6 +653,8 @@ private:
 	///
 	rect _bounds;
 
+    /// Represents the selected part of the text. The second element must
+    /// never be less than the first.
     std::pair<size_t, size_t> _selection;
 
 protected:

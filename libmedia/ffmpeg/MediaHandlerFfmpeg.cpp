@@ -1,6 +1,6 @@
 // MediaHandlerFfmpeg.cpp: FFMPEG media handler, for Gnash
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -37,23 +37,22 @@ MediaHandlerFfmpeg::createMediaParser(std::auto_ptr<IOChannel> stream)
 {
 	std::auto_ptr<MediaParser> parser;
 
-	if ( isFLV(*stream) )
-	{
-		parser.reset( new FLVParser(stream) );
-	}
-	else
-	{
-		try
-		{
+    try {
+        if (isFLV(*stream))
+        {
+            parser.reset(new FLVParser(stream));
+        }
+        else
+        {
 			parser.reset(new MediaParserFfmpeg(stream));
 		}
-		catch (GnashException& ex)
-		{
-			log_error("Could not create FFMPEG based media parser for "
-                    "input stream: %s", ex.what());
-			assert(!parser.get());
-		}
-	}
+    }
+    catch (GnashException& ex)
+    {
+        log_error("Could not create FFMPEG based media parser for "
+                "input stream: %s", ex.what());
+        assert(!parser.get());
+    }
 
 	return parser;
 }

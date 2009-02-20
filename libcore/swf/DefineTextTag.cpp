@@ -17,7 +17,7 @@ namespace gnash {
 namespace SWF {
 
 void
-DefineTextTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
     assert(tag == DEFINETEXT);
@@ -34,7 +34,7 @@ DefineTextTag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 }
 
 void
-DefineText2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m,
+DefineText2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
     assert(tag == DEFINETEXT2);
@@ -51,7 +51,7 @@ DefineText2Tag::loader(SWFStream& in, tag_type tag, movie_definition& m,
 }
 
 void
-DefineTextTag::read(SWFStream& in, movie_definition&m, tag_type tag)
+DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 {
 	assert(tag == DEFINETEXT || tag == DEFINETEXT2);
 

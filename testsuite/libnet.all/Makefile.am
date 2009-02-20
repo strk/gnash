@@ -49,11 +49,11 @@ noinst_PROGRAMS = generate_amfbins
 
 check_PROGRAMS = \
 	test_cque \
-	test_handler \
 	test_http \
 	test_diskstream \
-	test_cache
-#	test_rtmp 
+	test_cache \
+	test_rtmp 
+#	test_handler
 
 generate_amfbins_SOURCES = generate_amfbins.cpp
 generate_amfbins_LDADD = $(AM_LDFLAGS) 
@@ -71,17 +71,17 @@ test_diskstream_SOURCES = test_diskstream.cpp
 test_diskstream_LDADD = $(AM_LDFLAGS) 
 test_diskstream_DEPENDENCIES = site-update
 
-#test_rtmp_SOURCES = test_rtmp.cpp
-#test_rtmp_LDADD = $(AM_LDFLAGS) 
-#test_rtmp_DEPENDENCIES = site-update
+test_rtmp_SOURCES = test_rtmp.cpp
+test_rtmp_LDADD = $(AM_LDFLAGS) 
+test_rtmp_DEPENDENCIES = site-update
 
 test_cque_SOURCES = test_cque.cpp
 test_cque_LDADD = $(AM_LDFLAGS) 
 test_cque_DEPENDENCIES = site-update
 
-test_handler_SOURCES = test_handler.cpp
-test_handler_LDADD = $(AM_LDFLAGS) 
-test_handler_DEPENDENCIES = site-update
+# test_handler_SOURCES = test_handler.cpp
+# test_handler_LDADD = $(AM_LDFLAGS) 
+# test_handler_DEPENDENCIES = site-update
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

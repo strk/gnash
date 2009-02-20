@@ -35,13 +35,19 @@ class GtkGlue
 
     virtual void prepDrawingArea(GtkWidget *drawing_area) = 0;
     virtual render_handler* createRenderHandler() = 0;
-    virtual void setRenderHandlerSize(int /*width*/, int /*height*/) { };
+    virtual void setRenderHandlerSize(int /*width*/, int /*height*/) {}
     virtual void render() = 0;
+    
     virtual void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/)
-			{ render();	};
+    {
+        render();	
+    }
+
     virtual void configure(GtkWidget *const widget,
-                           GdkEventConfigure *const event) = 0;
-    virtual void beforeRendering() { /* nop */ };
+            GdkEventConfigure *const event) = 0;
+    
+    virtual void beforeRendering() {};
+
   protected:
     GtkWidget *_drawing_area;
 };

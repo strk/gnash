@@ -80,7 +80,10 @@ public:
 	SO_CREATION_FAILED,
 	SO_NO_READ_ACCESS,
 	SO_NO_WRITE_ACCESS,
-	SO_PERSISTENCE_MISMATCH
+	SO_PERSISTENCE_MISMATCH,
+	// Anything below here is specific to Gnash's implementation
+	NS_CREATE_STREAM,
+	NS_DELETE_STREAM
     } rtmp_status_e;
     typedef enum {
 	FROM_SERVER,                      // Flash com server
@@ -107,8 +110,19 @@ public:
     boost::uint8_t getChannel()         { return _channel; } ;
 
     boost::shared_ptr<amf::Element> operator[](size_t x);
+    boost::shared_ptr<amf::Element> at(size_t x) { return _amfobjs[x]; };
 
-    // Dump internal status to the terminal
+    /// \brief Find the named property for this Object.
+    ///
+    /// @param name An ASCII string that is the name of the property to
+    ///		search for.
+    ///
+    /// @return A smart pointer to the Element for this property.
+    boost::shared_ptr<amf::Element> findProperty(const std::string &name);
+
+//    void setHeaderData(RTMP::rtmp_head_t &qhead);
+			
+// Dump internal status to the terminal
     void dump();
     
   protected:

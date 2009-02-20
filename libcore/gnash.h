@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,6 +49,17 @@ enum FileType {
     GNASH_FILETYPE_SWF,
     GNASH_FILETYPE_FLV,
     GNASH_FILETYPE_UNKNOWN
+};
+
+/// The display quality.
+//
+/// Required for rendering and core.
+enum Quality
+{
+    QUALITY_LOW,
+    QUALITY_MEDIUM,
+    QUALITY_HIGH,
+    QUALITY_BEST
 };
 
 // Sound callbacks stuff

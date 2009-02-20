@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "fill_style.h"
 #include "Font.h"
 
+#include <boost/assign/list_of.hpp>
 #include <vector>
 
 namespace gnash {
@@ -34,7 +35,7 @@ namespace SWF {
 
 bool
 TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
-        int advanceBits, tag_type tag)
+        int advanceBits, TagType tag)
 {
     _glyphs.clear();
 
@@ -119,7 +120,8 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
     if (!glyphCount) return false;
 
     IF_VERBOSE_PARSE(
-        log_parse(_("  GlyphEntries: count = %d"), glyphCount);
+        log_parse(_("  GlyphEntries: count = %d"),
+            static_cast<int>(glyphCount));
     );
 
     in.ensureBits(glyphCount * (glyphBits + advanceBits));
@@ -164,11 +166,6 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
         // chars that share a particular style.
         const TextRecord& rec = *i;
 
-        // Used to pass a color on to shape_character::display()
-        // FIXME: this isn't very good, especially the line style.
-        static std::vector<fill_style> s_dummy_style(1, fill_style());    
-        static std::vector<line_style> s_dummy_line_style;
-
         const Font* fnt = rec.getFont();
         if (!fnt) {
             IF_VERBOSE_MALFORMED_SWF(
@@ -190,8 +187,6 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
         if (rec.hasYOffset()) y = rec.yOffset();
 
         boost::int16_t startX = x; // for the underline, if any
-
-        s_dummy_style[0].set_color(rec.color());
 
         rgba textColor = cx.transform(rec.color());
 
@@ -223,16 +218,13 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
                 //       square is not hard-coded anymore but can be
                 //       queried from the font class
                 //
-                static const boost::int16_t s_empty_char_box[5 * 2] =
-                {
-                     32,   32,
-                    480,   32,
-                    480, -656,
-                     32, -656,
-                     32,   32
-                };
-                render::draw_line_strip(s_empty_char_box, 5,
-                        textColor, mat);  
+                static const std::vector<point> emptyCharBox = boost::assign::list_of
+                     (point(32, 32))
+                     (point(480, 32))
+                     (point(480, -656))
+                     (point(32, -656))
+                     (point(32,32));
+                render::drawLine(emptyCharBox, textColor, mat);  
 #endif
 
             }
@@ -271,13 +263,11 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
             // 1/4 the EM square offset far from baseline 
             boost::int16_t posY = int(y+int((unitsPerEM/4)*scale));
 
-            boost::int16_t underline[2 * 2] =
-            {
-                startX,   posY,
-                  endX,   posY,
-            };
-            render::draw_line_strip(underline, 2, textColor,
-                    base_matrix);
+            const std::vector<point> underline = boost::assign::list_of
+                (point(startX, posY))
+                (point(endX, posY));
+
+            render::drawLine(underline, textColor, base_matrix);
         }
     }
 }

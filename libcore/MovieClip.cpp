@@ -1,6 +1,6 @@
 // MovieClip.cpp:  Stateful live Sprite instance, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -262,7 +262,7 @@ public:
 } // anonymous namespace
 
 
-MovieClip::MovieClip( movie_definition* def, movie_instance* r,
+MovieClip::MovieClip(movie_definition* def, movie_instance* r,
         character* parent, int id)
     :
     character(parent, id),
@@ -539,7 +539,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 }
 
 character*
-MovieClip::add_empty_movieclip(const char* name, int depth)
+MovieClip::add_empty_movieclip(const std::string& name, int depth)
 {
     // empty_movieclip_def will be deleted during deleting movieclip
     sprite_definition* empty_sprite_def =
@@ -831,14 +831,6 @@ bool
 MovieClip::set_member(string_table::key name,
         const as_value& val, string_table::key nsname, bool ifFound)
 {
-#ifdef DEBUG_DYNTEXT_VARIABLES
-    //log_debug(_("movieclip[%p]::set_member(%s, %s)"), (void*)this, VM::get().getStringTable().value(name), val);
-#endif
-
-    //if ( val.is_function() )
-    //{
-    //    checkForKeyOrMouseEvent(VM::get().getStringTable().value(name));
-    //}
 
     bool found = false;
 
@@ -2197,14 +2189,14 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // See misc-ming.all/action_execution_order_test4.{c,swf}
     //
     assert(!_callingFrameActions); // or will not be queuing actions
-    if ( get_parent() == 0 )
+    if (!get_parent())
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
         execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
 
-        if ( _vm.getSWFVersion() > 5 )
+        if (_vm.getSWFVersion() > 5)
         {
 #ifdef GNASH_DEBUG
             log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
@@ -2215,7 +2207,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     }
     else
     {
-
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing ONLOAD event for movieclip %s"), getTarget());
 #endif
@@ -2241,15 +2232,14 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     {
         assert(!initObj);
 #ifdef GNASH_DEBUG
-        log_debug(_("Queuing INITIALIZE event for movieclip %s"), getTarget());
+        log_debug(_("Queuing INITIALIZE and CONSTRUCT events for movieclip %s"),
+                getTarget());
 #endif
         queueEvent(event_id::INITIALIZE, movie_root::apINIT);
 
-#ifdef GNASH_DEBUG
-        log_debug(_("Queuing CONSTRUCT event for movieclip %s"), getTarget());
-#endif
         std::auto_ptr<ExecutableCode> code ( new ConstructEvent(this) );
         _vm.getRoot().pushAction(code, movie_root::apCONSTRUCT);
+
     }
     else {
 
@@ -2261,12 +2251,11 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         }
 
         constructAsScriptObject(); 
-#ifdef GNASH_DEBUG
-        log_debug(_("Sprite %s is dynamic, sending "
-                "INITIALIZE and CONSTRUCT events immediately"), getTarget());
-#endif
 
-        on_event(event_id::INITIALIZE);
+        // Tested in testsuite/swfdec/duplicateMovieclip-events.c and
+        // testsuite/swfdec/clone-sprite-events.c not to call on_event
+        // immediately.
+        queueEvent(event_id::INITIALIZE, movie_root::apINIT);
     }
 
 
@@ -2345,7 +2334,7 @@ MovieClip::constructAsScriptObject()
                 as_object* super = get_super();
 
                 as_environment& env = get_environment();
-                fn_call call(this, &env);
+                fn_call call(this, env);
                 call.super = super;
 
                     // we don't use the constructor return (should we?)
@@ -2487,11 +2476,13 @@ MovieClip::loadVariables(const std::string& urlstr,
 
     try 
     {
+        const StreamProvider& sp = _vm.getRoot().runInfo().streamProvider();
+        
         if (sendVarsMethod == METHOD_POST)
         {
             // use POST method
             _loadVariableRequests.push_back(
-                    new LoadVariablesThread(url, postdata));
+                    new LoadVariablesThread(sp, url, postdata));
         }
         else
         {
@@ -2503,7 +2494,7 @@ MovieClip::loadVariables(const std::string& urlstr,
                 if (qs.empty()) url.set_querystring(postdata);
                 else url.set_querystring(qs + "&" + postdata);
             }
-            _loadVariableRequests.push_back(new LoadVariablesThread(url));
+            _loadVariableRequests.push_back(new LoadVariablesThread(sp, url));
         }
         _loadVariableRequests.back()->process();
     }
@@ -2552,9 +2543,10 @@ MovieClip::processCompletedLoadVariableRequests()
             it != _loadVariableRequests.end(); )
     {
         LoadVariablesThread& request = *(*it);
-        if ( request.completed() )
+        if (request.completed())
         {
             processCompletedLoadVariableRequest(request);
+            delete *it;
             it = _loadVariableRequests.erase(it);
         }
         else ++it;
@@ -2915,13 +2907,8 @@ movieclip_class_init(as_object& global)
 
     if ( cl == NULL )
     {
-        cl=new builtin_function(&movieclip_ctor, getMovieClipInterface());
-        VM::get().addStatic(cl.get());
-
-        // replicate all interface to class, to be able to access
-        // all methods as static functions
-        //attachMovieClipInterface(*cl);
-                 
+        cl = new builtin_function(&movieclip_ctor, getMovieClipInterface());
+        global.getVM().addStatic(cl.get());
     }
 
     // Register _global.MovieClip
@@ -3375,7 +3362,7 @@ movieclip_createEmptyMovieClip(const fn_call& fn)
     // Unlike other MovieClip methods, the depth argument of an empty movie clip
     // can be any number. All numbers are converted to an int32_t, and are valid
     // depths even when outside the usual bounds.
-    character* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string().c_str(),
+    character* ch = movieclip->add_empty_movieclip(fn.arg(0).to_string(),
             fn.arg(1).to_int());
     return as_value(ch);
 }
@@ -5208,25 +5195,6 @@ movieclip_url_getset(const fn_call& fn)
     return as_value(ptr->get_movie_definition()->get_url());
 }
 
-as_value
-movieclip_highquality_getset(const fn_call& fn)
-{
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-    UNUSED(ptr);
-
-    if ( fn.nargs == 0 ) // getter
-    {
-        // We don't support quality settings
-        return as_value(true);
-    }
-    else // setter
-    {
-        LOG_ONCE( log_unimpl("MovieClip._highquality setting") );
-    }
-    return as_value();
-}
-
 // TODO: move this to character class, _focusrect seems a generic property
 as_value
 movieclip_focusrect_getset(const fn_call& fn)
@@ -5337,10 +5305,10 @@ attachMovieClipProperties(character& o)
     //int target_version = o.getVM().getSWFVersion();
 
     // This is a normal property, can be overridden, deleted and enumerated
-    // See swfdec/test/trace/movieclip-version-#.swf for why we only initialize this
-    // if we don't have a parent
-    if ( ! o.get_parent() ) o.init_member( "$version",
-            VM::get().getPlayerVersion(), 0); 
+    // See swfdec/test/trace/movieclip-version-#.swf for why we only
+    // initialize this if we don't have a parent
+    if (!o.get_parent()) o.init_member("$version",
+            o.getVM().getPlayerVersion(), 0); 
 
     as_c_function_ptr gettersetter;
 
@@ -5401,7 +5369,10 @@ attachMovieClipProperties(character& o)
     gettersetter = movieclip_url_getset;
     o.init_property(NSV::PROP_uURL, gettersetter, gettersetter);
 
-    gettersetter = movieclip_highquality_getset;
+    gettersetter = character::quality;
+    o.init_property(NSV::PROP_uQUALITY, gettersetter, gettersetter);
+    
+    gettersetter = character::highquality;
     o.init_property(NSV::PROP_uHIGHQUALITY, gettersetter, gettersetter);
 
     gettersetter = movieclip_focusrect_getset;

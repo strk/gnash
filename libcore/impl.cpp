@@ -1,6 +1,6 @@
 // impl.cpp:  Implement ActionScript tags, movie loading, library, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ static void clear_library();
 // Associate the specified tag type with the given tag loader
 // function.
 void
-register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
+register_tag_loader(SWF::TagType t, SWF::TagLoadersTable::loader_function lf)
 {
   using SWF::TagLoadersTable;
 
@@ -323,16 +323,22 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
 
   std::auto_ptr<IOChannel> in;
 
-  StreamProvider& streamProvider = runInfo.streamProvider();
+  const StreamProvider& streamProvider = runInfo.streamProvider();
 
-  if ( postdata ) in = streamProvider.getStream(url, *postdata);
-  else in = streamProvider.getStream(url);
+  const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+  if (postdata) {
+      in = streamProvider.getStream(url, *postdata, rcfile.saveLoadedMedia());
+  }
+  else in = streamProvider.getStream(url, rcfile.saveLoadedMedia());
+
   if ( ! in.get() )
   {
       log_error(_("failed to open '%s'; can't create movie"), url);
       return NULL;
   }
-  else if ( in->get_error() )
+  
+  if (in->bad())
   {
       log_error(_("streamProvider opener can't open '%s'"), url);
       return NULL;
@@ -359,7 +365,7 @@ getFileType(IOChannel& in)
 
     char buf[3];
     
-    if (3 < in.read(buf, 3))
+    if (in.read(buf, 3) < 3)
     {
         log_error(_("Can't read file header"));
         in.seek(0);
@@ -403,7 +409,7 @@ getFileType(IOChannel& in)
     // Check if it is an swf embedded in a player (.exe-file)
     if (std::equal(buf, buf + 2, "MZ")) {
 
-        if ( 3 < in.read(buf, 3) )
+        if ( 3 > in.read(buf, 3) )
         {
             log_error(_("Can't read 3 bytes after an MZ (.exe) header"));
             in.seek(0);
@@ -422,7 +428,7 @@ getFileType(IOChannel& in)
                 return GNASH_FILETYPE_UNKNOWN;
             }
         }
-        in.seek(in.tell() - 3); // position to start of the swf itself
+        in.seek(in.tell() - static_cast<std::streamoff>(3));
         return GNASH_FILETYPE_SWF;
     }
 
@@ -472,7 +478,10 @@ void  clear()
     //
     // See task task #6959 and depending items
     //
-    log_debug("Any segfault past this message is likely due to improper threads cleanup.");
+    log_debug("Any segfault past this message is likely due to improper "
+            "threads cleanup.");
+
+    VM::get().clear();
 
     clear_library();
     fontlib::clear();

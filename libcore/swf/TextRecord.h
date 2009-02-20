@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ public:
     /// @return             False if we have reached the end of the
     ///                     TextRecords, true if there are more to parse.
     bool read(SWFStream& in, movie_definition& m, int glyphBits,
-            int advanceBits, tag_type tag);
+            int advanceBits, TagType tag);
 
     static void displayRecords(const SWFMatrix& this_mat, character* inst,
         const std::vector<SWF::TextRecord>& records, bool useEmbeddedGlyphs);

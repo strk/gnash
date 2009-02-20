@@ -68,11 +68,11 @@ struct ByteReader : public IOChannel
 		b=by;
 	}
 
-	int read(void* dst, int bytes) 
+    std::streamsize read(void* dst, std::streamsize bytes) 
 	{
 
 		unsigned char* ptr = static_cast<unsigned char*>(dst);
-		for (int i=0; i<bytes; ++i)
+		for (std::streamsize i=0; i<bytes; ++i)
 		{
 			memcpy(ptr+i, &b, sizeof(unsigned char));
 		}
@@ -81,15 +81,15 @@ struct ByteReader : public IOChannel
 		return bytes;
 	}
 
-	int tell() const
+    std::streampos tell() const
 	{
 		return pos;
 	}
 
-	int seek(int newPos)
+    bool seek(std::streampos newPos)
 	{
 		pos=newPos;
-		return 0; // ok, no error (urgh)
+		return true; 
 	}
 	
 	
@@ -99,9 +99,9 @@ struct ByteReader : public IOChannel
 
 	bool eof() const { abort(); return false; }
     
-	int get_error() const { return 0; }
+	bool bad() const { return false; }
 
-	int size() const { abort(); return -1; }
+    size_t size() const { abort(); return -1; }
 	
 };
 
