@@ -935,209 +935,242 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
     // complain about legit code when it comes to all this byte
     // manipulation stuff.
     AMF amf_obj;
+
     // Jump through hoops to get the type so valgrind stays happy
-//    char c = *(reinterpret_cast<char *>(tmpptr));
+    //    char c = *(reinterpret_cast<char *>(tmpptr));
+
+    if (tooFar - tmpptr < 1) {
+        log_error(_("AMF data too short to contain type field"));
+        return el;
+    }
+
     Element::amf0_type_e type = static_cast<Element::amf0_type_e>(*tmpptr);
-    tmpptr++;                        // skip past the header type field byte
+    // skip past the header type field byte 
+    ++tmpptr;
 
     switch (type) {
-      case Element::NUMBER_AMF0:
-      {
- 	  double swapped = *(reinterpret_cast<const double*>(tmpptr));
- 	  swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
- 	  el->makeNumber(swapped); 
-	  tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
-	  break;
-      }
-      case Element::BOOLEAN_AMF0:
-	  el->makeBoolean(tmpptr);
-	  tmpptr += 1;		// sizeof(bool) isn't always 1 for all compilers 
-	  break;
-      case Element::STRING_AMF0:
-	  // get the length of the name
-	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-	  tmpptr += sizeof(boost::uint16_t);
-	  if (length >= SANE_STR_SIZE) {
-	      log_error("%d bytes for a string is over the safe limit of %d, line %d",
-			length, SANE_STR_SIZE, __LINE__);
-	      el.reset();
-	      return el;
-	  }
-//	  log_debug(_("AMF String length is: %d"), length);
-	  if (length > 0) {
-	      // get the name of the element
-	      el->makeString(tmpptr, length);
-//	      log_debug(_("AMF String is: %s"), el->to_string());
-	      tmpptr += length;
-	  } else {
-	      el->setType(Element::STRING_AMF0);
-	  };
-	  break;
-      case Element::OBJECT_AMF0:
-      {
-	  el->makeObject();
-	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
-	      if (*tmpptr+3 == TERMINATOR) {
-//		  log_debug("No data associated with Property in object");
-		  tmpptr++;
-		  break;
-	      }
-	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
-	      if (child == 0) {
-		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
-//		  tmpptr += 3;
-		  break;
-	      }
-//	      child->dump();
-	      el->addProperty(child);
-	      tmpptr += amf_obj.totalsize();
-	  };
-	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
-	  break;
-      }
-      case Element::MOVIECLIP_AMF0:
-	  log_debug("AMF0 MovieClip frame");
-	  break;
-      case Element::NULL_AMF0:
-	  el->makeNull();
-	  break;
-      case Element::UNDEFINED_AMF0:
-	  el->makeUndefined();
-	  break;
-      case Element::REFERENCE_AMF0:
-      {
-	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-	  tmpptr += sizeof(boost::uint16_t);
-	  el->makeReference(length);
-	  // FIXME: connect reference Element to the object pointed to by the index.
-	  tmpptr += 3;
-	  break;
-      }
-      // An ECMA array is comprised of any of the data types. Much like an Object,
-      // the ECMA array is terminated by the end of object bytes, so parse till then.
-      case Element::ECMA_ARRAY_AMF0:
-      {
-	  el->makeECMAArray();
-	  tmpptr += sizeof(boost::uint32_t);
+        case Element::NUMBER_AMF0:
+        {
+            // Make sure this isn't less than 0. We check this above at
+            // the moment.
+            assert(tooFar >= tmpptr);
+            
+            if (static_cast<size_t>(tooFar - tmpptr) < sizeof(const double)) {
+                log_error(_("AMF data segment too short to contain"
+                            "type NUMBER"));
+                return el;
+            }
+            double swapped = *(reinterpret_cast<const double*>(tmpptr));
+            swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
+            el->makeNumber(swapped); 
+            tmpptr += AMF0_NUMBER_SIZE; // all numbers are 8 bit big endian
+            break;
+        }
+        case Element::BOOLEAN_AMF0:
+            el->makeBoolean(tmpptr);
+            tmpptr += 1;		// sizeof(bool) isn't always 1 for all compilers 
+            break;
+        case Element::STRING_AMF0:
+            // get the length of the name
+            length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+            tmpptr += sizeof(boost::uint16_t);
+            if (length >= SANE_STR_SIZE) {
+                log_error("%d bytes for a string is over the safe "
+                        "limit of %d, line %d", length,
+                        SANE_STR_SIZE, __LINE__);
+                el.reset();
+                return el;
+            }
+            //log_debug(_("AMF String length is: %d"), length);
+            if (length > 0) {
+                // get the name of the element
+                el->makeString(tmpptr, length);
+                //log_debug(_("AMF String is: %s"), el->to_string());
+                tmpptr += length;
+            } else {
+                el->setType(Element::STRING_AMF0);
+            }
+            break;
+        case Element::OBJECT_AMF0:
+        {
+            el->makeObject();
+            while (tmpptr < tooFar) { 
+                // FIXME: was tooFar - AMF_HEADER_SIZE) 
+                if (*tmpptr+3 == TERMINATOR) {
+                    //log_debug("No data associated with Property "
+                    //"in object");
+                    tmpptr++;
+                    break;
+                }
+                boost::shared_ptr<amf::Element> child =
+                    amf_obj.extractProperty(tmpptr, tooFar); 
+                if (child == 0) {
+                    // skip past zero length string (2 bytes), null
+                    // (1 byte) and end object (1 byte)
+                    //tmpptr += 3;
+                    break;
+                }
+                //child->dump();
+                el->addProperty(child);
+                tmpptr += amf_obj.totalsize();
+            }
+            tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+            break;
+        }
+        case Element::MOVIECLIP_AMF0:
+            log_debug("AMF0 MovieClip frame");
+            break;
+        case Element::NULL_AMF0:
+            el->makeNull();
+            break;
+        case Element::UNDEFINED_AMF0:
+            el->makeUndefined();
+            break;
+        case Element::REFERENCE_AMF0:
+        {
+            length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+            tmpptr += sizeof(boost::uint16_t);
+            el->makeReference(length);
+            // FIXME: connect reference Element to the object
+            // pointed to by the index.
+            tmpptr += 3;
+            break;
+        }
+        // An ECMA array is composed of any of the data types. Much
+        // like an Object, the ECMA array is terminated by the
+        // end of object bytes, so parse till then.
+        case Element::ECMA_ARRAY_AMF0:
+        {
+            el->makeECMAArray();
+            tmpptr += sizeof(boost::uint32_t);
 #if 1
-	  while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
-	      if (*tmpptr+3 == TERMINATOR) {
-//		  log_debug("No data associated with Property in object");
-		  tmpptr++;
-		  break;
-	      }
-	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
-	      if (child == 0) {
-		  // skip past zero length string (2 bytes), null (1 byte) and end object (1 byte)
-//		  tmpptr += 3;
-		  break;
-	      }
-//	      child->dump();
-	      el->addProperty(child);
-	      tmpptr += amf_obj.totalsize();
-	  };
-	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
-	  break;
+            while (tmpptr < tooFar) { // FIXME: was tooFar - AMF_HEADER_SIZE)
+                if (*tmpptr+3 == TERMINATOR) {
+          //		  log_debug("No data associated with Property in object");
+                    tmpptr++;
+                    break;
+                }
+                boost::shared_ptr<amf::Element> child =
+                    amf_obj.extractProperty(tmpptr, tooFar); 
+                if (child == 0) {
+                    // skip past zero length string (2 bytes),
+                    // null (1 byte) and end object (1 byte)
+                    //tmpptr += 3;
+                    break;
+                }
+      //	      child->dump();
+                el->addProperty(child);
+                tmpptr += amf_obj.totalsize();
+            }
+            tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+            break;
 #else
-	  // get the number of elements in the array
-	  boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr) & 0xffffffff);
-	  tmpptr += sizeof(boost::uint32_t);
-	  while (items--) {
-	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
-	      if (child == 0) {
-		  break;
-	      }
-	      child->dump();
-	      el->addProperty(child);
-	      tmpptr += amf_obj.totalsize();
-	  };
-	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+            // get the number of elements in the array
+            boost::uint32_t items = 
+                ntohl((*(boost::uint32_t *)tmpptr) & 0xffffffff);
+  
+            tmpptr += sizeof(boost::uint32_t);
+            while (items--) {
+                boost::shared_ptr<amf::Element> child =
+                    amf_obj.extractProperty(tmpptr, tooFar); 
+                if (child == 0) {
+                    break;
+                }
+                child->dump();
+                el->addProperty(child);
+                tmpptr += amf_obj.totalsize();
+            }
+            tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
 #endif
-	  break;
-      }
-      case Element::OBJECT_END_AMF0:
-	  // A strict array is only numbers
-	  break;
-      case Element::STRICT_ARRAY_AMF0:
-      {
-	  el->makeStrictArray();
-	  // get the number of numbers in the array
-	  boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr));
-	  // Skip past the length field to get to the start of the data
-	  tmpptr += sizeof(boost::uint32_t);
-	  while (items) {
-	      boost::shared_ptr<amf::Element> child = amf_obj.extractAMF(tmpptr, tooFar); 
-	      if (child == 0) {
-		  break;
-	      } else {
-// 		  child->dump();
-		  el->addProperty(child);
-		  tmpptr += amf_obj.totalsize();
-		  --items;
-	      }
-	  };
-	  break;
-      }
-      case Element::DATE_AMF0:
-      {
- 	  double swapped = *reinterpret_cast<const double*>(tmpptr);
- 	  swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
-	  el->makeDate(swapped);
-	  tmpptr += AMF0_NUMBER_SIZE; // all dates are 8 bit big endian numbers
-	  break;
-      }
-      case Element::LONG_STRING_AMF0:
-	  el->makeLongString(tmpptr);
-	  break;
-      case Element::UNSUPPORTED_AMF0:
-	  el->makeUnsupported(tmpptr);
-	  tmpptr += 1;
-	  break;
-      case Element::RECORD_SET_AMF0:
-	  el->makeRecordSet(tmpptr);
-	  break;
-      case Element::XML_OBJECT_AMF0:
-	  el->makeXMLObject(tmpptr);
-	  break;
-      case Element::TYPED_OBJECT_AMF0:
-      {
-	  el->makeTypedObject();
-	  
-	  length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
-	  tmpptr += sizeof(boost::uint16_t);
-	  if (length > 0) {
-	      std::string name(reinterpret_cast<const char *>(tmpptr), length);
-     //	      log_debug("Typed object name is: %s", el->getName());
-	      el->setName(name.c_str(), name.size());
-	  }
-	  // Don't read past the end
-	  if (tmpptr + length < tooFar) {
-	      tmpptr += length;
-	  }
-	  while (tmpptr < tooFar - length) { // FIXME: was tooFar - AMF_HEADER_SIZE)
-	      if (*(tmpptr +3) == TERMINATOR) {
-		  log_debug("Found object terminator byte");
-		  tmpptr++;
-		  break;
-	      }
-	      boost::shared_ptr<amf::Element> child = amf_obj.extractProperty(tmpptr, tooFar); 
-	      if (child == 0) {
-		  break;
-	      }
-	      el->addProperty(child);
-	      tmpptr += amf_obj.totalsize();
-	  };
-//	  el->dump();
-	  tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
-	  break;
-      }
-      case Element::AMF3_DATA:
-      default:
-	  log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
-	  el.reset();
-	  return el;
-      }
-    
+            break;
+        }
+        case Element::OBJECT_END_AMF0:
+            // A strict array is only numbers
+            break;
+        case Element::STRICT_ARRAY_AMF0:
+        {
+            el->makeStrictArray();
+            // get the number of numbers in the array
+            boost::uint32_t items = ntohl((*(boost::uint32_t *)tmpptr));
+            // Skip past the length field to get to the start of the data
+            tmpptr += sizeof(boost::uint32_t);
+            while (items) {
+                boost::shared_ptr<amf::Element> child =
+                    amf_obj.extractAMF(tmpptr, tooFar); 
+                if (child == 0) {
+                    break;
+                } else {
+                //child->dump();
+                    el->addProperty(child);
+                    tmpptr += amf_obj.totalsize();
+                    --items;
+                }
+            }
+            break;
+        }
+        case Element::DATE_AMF0:
+        {
+            double swapped = *reinterpret_cast<const double*>(tmpptr);
+            swapBytes(&swapped, amf::AMF0_NUMBER_SIZE);
+            el->makeDate(swapped);
+            tmpptr += AMF0_NUMBER_SIZE; // all dates are 8 bit big endian numbers
+            break;
+        }
+        case Element::LONG_STRING_AMF0:
+            el->makeLongString(tmpptr);
+            break;
+        case Element::UNSUPPORTED_AMF0:
+            el->makeUnsupported(tmpptr);
+            tmpptr += 1;
+            break;
+        case Element::RECORD_SET_AMF0:
+            el->makeRecordSet(tmpptr);
+            break;
+        case Element::XML_OBJECT_AMF0:
+            el->makeXMLObject(tmpptr);
+            break;
+        case Element::TYPED_OBJECT_AMF0:
+        {
+            el->makeTypedObject();
+            
+            length = ntohs((*(boost::uint16_t *)tmpptr) & 0xffff);
+            tmpptr += sizeof(boost::uint16_t);
+            if (length > 0) {
+                std::string name(reinterpret_cast<const char*>(tmpptr), length);
+                //log_debug("Typed object name is: %s", el->getName());
+                el->setName(name.c_str(), name.size());
+            }
+            // Don't read past the end
+            if (tmpptr + length < tooFar) {
+                tmpptr += length;
+            }
+          
+            while (tmpptr < tooFar - length) { 
+                // FIXME: was tooFar - AMF_HEADER_SIZE)
+                if (*(tmpptr +3) == TERMINATOR) {
+                    log_debug("Found object terminator byte");
+                    tmpptr++;
+                    break;
+                }
+                boost::shared_ptr<amf::Element> child =
+                    amf_obj.extractProperty(tmpptr, tooFar); 
+                if (child == 0) {
+                    break;
+                }
+                el->addProperty(child);
+                tmpptr += amf_obj.totalsize();
+            }
+            //	  el->dump();
+            tmpptr += AMF_HEADER_SIZE;		// skip past the terminator bytes
+            break;
+        }
+        case Element::AMF3_DATA:
+        default:
+            log_unimpl("%s: type %d", __PRETTY_FUNCTION__, (int)type);
+            el.reset();
+            return el;
+    }
+        
     // Calculate the offset for the next read
     _totalsize = (tmpptr - in);
 
@@ -1197,13 +1230,13 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     // length to a value, this is tottaly bogus, and I'm tired of
     // braindamaging code to keep valgrind happy.
     if (length <= 0) {
- 	log_debug("No Property name, object done");
- 	return el;
+    log_debug("No Property name, object done");
+    return el;
     }
     
     if (length + tmpptr > tooFar) {
-	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
-	length = tooFar - tmpptr;
+    log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
+    length = tooFar - tmpptr;
     }    
     
     // name is just debugging help to print cleaner, and should be removed later
@@ -1212,7 +1245,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
 //    log_debug(_("AMF property name is: %s"), name);
     // Don't read past the end
     if (tmpptr + length < tooFar) {
-	tmpptr += length;
+    tmpptr += length;
     }
     
     char c = *(reinterpret_cast<char *>(tmpptr));
@@ -1220,21 +1253,21 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     // If we get a NULL object, there is no data. In that case, we only return
     // the name of the property.
     if (type == Element::NULL_AMF0) {
-	log_debug("No data associated with Property \"%s\"", name);
-	el.reset(new Element);
-	el->setName(name.c_str(), name.size());
-	tmpptr += 1;
-	// Calculate the offset for the next read
+    log_debug("No data associated with Property \"%s\"", name);
+    el.reset(new Element);
+    el->setName(name.c_str(), name.size());
+    tmpptr += 1;
+    // Calculate the offset for the next read
     } else {
-	// process the data with associated with the property.
-	// Go past the data to the start of the next AMF object, which
-	// should be a type byte.
+    // process the data with associated with the property.
+    // Go past the data to the start of the next AMF object, which
+    // should be a type byte.
 //	tmpptr += length;
-	el = extractAMF(tmpptr, tooFar);
-	if (el) {
-	    el->setName(name.c_str(), name.size()); // FIXME: arg, overwrites the name for TypedObjects
-	}
-	tmpptr += totalsize();
+    el = extractAMF(tmpptr, tooFar);
+    if (el) {
+        el->setName(name.c_str(), name.size()); // FIXME: arg, overwrites the name for TypedObjects
+    }
+    tmpptr += totalsize();
     }
 
     //delete name;
