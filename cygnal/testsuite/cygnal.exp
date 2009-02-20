@@ -28,7 +28,7 @@ if $tracelevel {
 # This is to handle deadlocks. We don't reset the timeout when a match is
 # found to avoid hanging in case of a testcase sending matches in an infinite loops.
 # (not unlikely as it seems, think about flash movies...)
-set timeout 600
+set timeout 10
 set file all
 set params ""
 
@@ -36,7 +36,7 @@ set cport 6080;			# the port for the connection to Cygnal
 set chost "localhost";		# the host to connect to
 set sid 0;			# the server ID
 
-set server_dead false;	# toggle is Cygnal dies
+set server_dead "false";	# toggle is Cygnal dies
 
 proc delete_files {} {
     global chost
@@ -75,14 +75,16 @@ proc netcat { name } {
     global server_dead 
     spawn -noecho nc $chost $cport
     set nid $spawn_id
+    global timeout
+
     expect {
 	eof {
 	    verbose "Netcat all done..."
 	}
 	timeout {
 	    verbose "Netcat still running after ${timeout} seconds, killing it (deadlock?)"
-		catch close
-		continue;
+	    catch close
+	    set server_dead "true"
 	}
     }
 #verbose "Started NetCat $netcat -q 10"
@@ -96,11 +98,12 @@ proc wget { name options } {
     global cport
     global sid
     global server_dead 
+    global timeout
     set result false
 
     # --header="Content-Type: application/x-amf"
     verbose "Trying to wget from Cygnal -p -v --tries=3 --server-response $options http://$chost:$cport/$name" 2
-    spawn -noecho wget -p -v --tries=3 --server-response $options http://$chost:$cport/$name
+    spawn -noecho wget -p -v --tries=3 --server-response $options "http://$chost:$cport/$name"
     set wid $spawn_id
     expect {
 	-i $wid "*Saving to: *" {
@@ -112,7 +115,7 @@ proc wget { name options } {
 	    set result true
 	}
 	-i $wid "Giving up" {
-	    verbose "Giving up on file transfer"
+	    verbose "Giving up on file transfer via GET"
 	}
 # 	-i $wid "Retrying." {
 # 	    verbose "Retrying file"
@@ -120,6 +123,12 @@ proc wget { name options } {
 # 	}
 	-i $wid "Connection close" {
 	    verbose "Connection closed from other end"
+	}
+	-i $wid "Content-Type: application/x-amf" {
+	    exp_continue
+	}
+	-i $wid "HTTP/1.1 200 OK" {
+	    exp_continue
 	}
 	-i $wid "connected." {
 	    exp_continue
@@ -131,7 +140,8 @@ proc wget { name options } {
 	-i $wid "Connection closed at" {
 	}
 	-i $wid "*Connection refused" {
-	    set server_dead true
+	    set server_dead "true"
+	    set result false
 	    verbose "Wget failed..."
 	}
 	-i $wid "Content-Type: " {
@@ -144,14 +154,14 @@ proc wget { name options } {
 	}
 	-i $wid timeout {
 	    verbose "Wget still running after ${timeout} seconds, killing it (deadlock?)"
-	}
-    }
-    expect {
-	-i $wid "*" {
+	    catch close -i $sid	    
+	    set result false
+	    set server_dead "true"
 	}
     }
 
-    catch close -i $wid
+    catch {exec "kill -INT [exp_pid -i $wid]"}
+    catch {close -i $wid}
 
     return $result
 }
@@ -163,11 +173,12 @@ proc wpost { name options } {
     global chost
     global cport
     global sid
+    global timeout
     set result false
     # --header="Content-Type: application/x-amf"
     verbose "Trying to wget POST to Cygnal -p -v --tries=3 --server-response --header=\"Content-Type: application/x-amf\" $options --post-file=$name http://$chost:$cport/echo/gateway" 2
 #    set where "[pwd]/${name}_barfoo"
-    spawn  wget -p -v --tries=3 --server-response  --post-file=$name --header "Content-Type: application/x-amf" http://$chost:$cport/echo/gateway
+    spawn  wget -p -v --tries=3 --server-response  --post-file=$name --header "Content-Type: application/x-amf" "http://$chost:$cport/echo/gateway"
     set wid $spawn_id
     expect {
 	-i $wid "*Saving to: *" {
@@ -179,7 +190,9 @@ proc wpost { name options } {
 	    set result true
 	}
 	-i $wid "Giving up" {
-	    verbose "Giving up on file transfer"
+	    verbose "Giving up on file transfer via POST"
+	    set result false
+	    set server_dead true
 	}
 # 	-i $wid "Retrying." {
 # 	    verbose "Retrying file"
@@ -198,6 +211,9 @@ proc wpost { name options } {
 	-i $wid "Connection closed at" {
 	    set server_dead true
 	}
+	-i $wid "No data received" {
+	    set server_dead true
+	}
 	-i $wid "*Connection refused" {
 	    set server_dead true
 	    verbose "Wget failed..."
@@ -212,14 +228,14 @@ proc wpost { name options } {
 	}
 	-i $wid timeout {
 	    verbose "Wget still running after ${timeout} seconds, killing it (deadlock?)"
-	}
-    }
-    expect {
-	-i $wid "*" {
+	    catch close -i $sid
+	    set result false
+	    set server_dead "true"
 	}
     }
 
-    catch close -i $wid
+    catch {exec "kill -INT [exp_pid -i $wid]"}
+    catch {close -i $wid}
 
     return $result
 }
@@ -232,14 +248,25 @@ proc start_cygnal { } {
     global sid
     global objdir
     set result false
+    
+    # Kill any old ones still running
+    if {$sid > 0} {
+	catch exec "kill -QUIT [exp_pid -i $sid]"
+	catch {close -i $sid}
+    }
+
     # find the right cygnal in our build tree to run
     set server [lookfor_file $objdir cygnal]
     set options "-p 6000 -vv -n -t -r [pwd]"
     verbose "Starting Cygnal server \"$server $options\" for testing"
-    spawn $server $options
+    spawn  $server $options
     set sid $spawn_id
-#    set pid [exp_pid -i $sid]
+
+    send "\r\n"
     expect -timeout 1 {
+	-i $sid "\r\n\r\n" {
+	    verbose "Cygnal is trying to start..."
+	}
 	-i $sid "*Server bound to service" {
 	    verbose "Cygnal \"$server -vv -n\" bound to port"
 	    set result true
@@ -254,6 +281,7 @@ proc start_cygnal { } {
 	-i $sid "unable to bind to port" {
 	    log_error "Another Cygnal is already on this port!"
 	    set server_dead "true"
+	    catch close -i $sid
 	}
 	-i $sid "HTTP Handler" {
 	    verbose "Started HTTP Handler"
@@ -263,16 +291,18 @@ proc start_cygnal { } {
 	    #	    catch close
 	    verbose "${file} died prematurely"
 	}
-	timeout {
-	    fail "Test case ${server} still running after ${timeout} seconds, killing it (deadlock?)"
-	}
+ 	timeout {
+ 	    fail "Test case ${server} still running after ${timeout} seconds, killing it (deadlock?)"
+ 	}
 	-i $sid timeout {
 		fail "Test case ${server} still running after ${timeout} seconds, killing it (deadlock?)"
 	    verbose "Cygnal timed out, killing PID $pid"
-#	    exec kill -HUP $pid
-#	    catch close -i $sid
+	    catch exec "kill -INT [exp_pid -i $sid]"
+	    catch {close -i $sid}
 	}
     }
+
+    set server_dead "false"
 
     return $result
 }
@@ -299,16 +329,10 @@ create_file "foo" 320
 # get the test file
 set result [ wget "foo" "" ]
 if { $result == true } {
-    if { [file exists foo.1] } {
-	verbose "foo was transferred!" 2
-	pass "HTTP GET single file"
-    } else {
-	fail "HTTP GET single file"
-    }
+    pass "HTTP GET single file"
 } else {
-    unresolved "HTTP GET single file"
+    fail "HTTP GET single file"
 }
-
 
 #
 # Testing transferring multiple files in a nice tight loop for stress testing.
@@ -321,16 +345,14 @@ for { set i 1 } { $i <= $limit } { incr i } {
     create_file "foo$i" $size
     set result [ wget "foo$i" "" ]
     if { $result == true } {
-	# foo$i.1
-# 	if { [file exists foo$i.1] } {
-	    verbose "foo$i was transferred!" 2
-	    incr count
-	    verbose -n "."
-#	}
+	verbose "foo$i was transferred!" 2
+	incr count
+	verbose -n "."
     } else {
 	unresolved "HTTP GET multiple files"
     }
 }
+#catch close -i $sid
 
 verbose "."
 if { $count == $limit } {
@@ -338,42 +360,6 @@ if { $count == $limit } {
 } else {
     fail "HTTP GET multiple files"
 }
-
-
-#
-# Test transferring files from the client to the server using POST
-#
-
-# send the test file
-# set result [ wget "foo" "--post-file=foo.1" ]
-# if { $result == true } {
-#     verbose "foo was transferred!" 2
-#     pass "HTTP POST single file"
-# } else {
-#     fail "HTTP POST single file"
-# }
-# } else {
-#     unresolved "HTTP POST single file"
-# }
-
-
-# set binsdir "[file dirname [file dirname [file dirname $srcdir]]]/testsuite/libnet.all"
-# set bins [glob -nocomplain $binsdir/*.bin]
-# #set foo "amf0-number.bin amf0-undefined-object.bin amf0-null-object.bin"
-
-# foreach i $bins {
-#     set pos [string last  "/" $i]
-#     if { $pos > 0 } {
-# 	set j [string range $i $pos+1 end]
-#     }
-# #    set options { --header="Content-Type: application/x-amf" --post-file=$i }
-#     set result [ wpost $i "" ]
-#     if { $result == true } {
-#  	pass "HTTP POST single AMF0 $j"
-#     } else {
-#  	fail "HTTP POST single AMF0 $j"
-#     }
-# }
 
 # Red5, a java based RTMP server has a nice test case that lets one
 # bounce AMF data types off of a server using either RTMPT or RTMP,
@@ -403,8 +389,13 @@ set limit 10
 # get disconnected. So for single threaded mode, don't set the limit over
 # 10, it's just for testing protocol stuff anyway! Multi threaded testing
 # works mode works much better, I've had the limit set much higher.
+
 for { set k 0 } { $k <= $limit } { incr k } {
     foreach i $requests {
+	# Restart the server if it got hung or died running the previous test case.
+	if { $server_dead == "true" } {
+	    start_cygnal
+	}
 	set pos [string last  "/" $i]
 	if { $pos > 0 } {
 	    set j [string range $i $pos+1 end]
@@ -416,28 +407,36 @@ for { set k 0 } { $k <= $limit } { incr k } {
 		pass "HTTP POST AMF0 $j, sent"
 	    } else {
 		fail "HTTP POST AMF0 $j, sent"
+		set server_dead "true"
 	    }
 	} else {
 	    untested "HTTP POST AMF0 $j, sent"
 	    untested "HTTP POST AMF0 $j got no response, not saved to $chost:$cport/gateway"
-	    break;
+	    set server_dead "true"
 	}
-	
-	set gotback "[string trimright $i "-request.bin"]-response.bin"
-	puts $gotback
-	if {[file exists $chost:$cport/echo/gateway]} {
-	    pass "HTTP POST AMF0  got response, saved to $chost:$cport/gateway"
-	    # 	puts "[file size $chost:$cport/echo/gateway]"
-	    # set res [exec cmp $var $gotback]
+	# If the server is dead, kill the remnants
+	if { $server_dead == "true" } {
+	    puts "Server PID: [exp_pid -i $sid] appears to be dead"
+	    catch {exec "kill -INT [exp_pid -i $sid]"}
+	    catch {close -i $sid}
+	    catch {exec "kill -INT [exp_pid -i $wid]"}
+	    catch {close -i $wid}
 	} else {
-	    fail "HTTP POST AMF0 $j got response, saved to $chost:$cport/gateway"
+	    set gotback "[string trimright $i "-request.bin"]-response.bin"
+	    puts $gotback
+	    if {[file exists $chost:$cport/echo/gateway]} {
+		pass "HTTP POST AMF0  got response, saved to $chost:$cport/gateway"
+		# 	puts "[file size $chost:$cport/echo/gateway]"
+		# set res [exec cmp $var $gotback]
+	    } else {
+		fail "HTTP POST AMF0 $j got response, saved to $chost:$cport/gateway"
+	    }
 	}
     }
     # if we don't sleep here and give the poor host machine a rest, it can't handle
     # any more wget processes running at the same time. I was winding up with
     # hundreds of zombies that eat my quad xeon machine with 4 gig of RAM!
 #    sleep 1
-#    catch "exec pkill. wget"
 }
 
 delete_files
@@ -448,8 +447,8 @@ delete_files
 if {$sid > 0} {
     set pid [exp_pid -i $sid]
     verbose "Attempting to shut down Cygnal, PID is: $pid"
-    exec kill -INT $pid
-    catch "close -i $sid"
+    catch {exec kill -INT $pid}
+    catch {close -i $sid}
 }
 
 
