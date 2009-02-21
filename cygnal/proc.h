@@ -16,32 +16,45 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifndef __PROC_H__
+#define __PROC_H__ 1
+
 #include <string>
 #include <map>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 
-class Proc {
+#include "network.h"
+
+namespace cygnal
+{
+  
+class Proc : public gnash::Network {
 public:
     Proc (void);
     ~Proc (void);
-
+    
     // These flags control whether the stdout of the child process gets displayed
-    bool SetOutput (std::string, bool);
-    bool GetOutput (std::string);
+    bool setOutput (const std::string &output, bool outflag);
+    bool getOutput (const std::string &output);
 
-    // This starts the process
-    bool Start (void);
-    bool Start (std::string);
-    bool Start (std::string, bool);
+    // This starts the process running via the usual fork() & exec()
+    bool startCGI (void);
+    bool startCGI (const std::string &filespec);
+    bool startCGI (const std::string &filespec, boost::uint16_t port);
+    bool startCGI (const std::string &filespec, bool output);
+    bool startCGI (const std::string &filespec, bool output, boost::uint16_t port);
+
+    // This opens a network connection to the process
+    bool connectCGI (const std::string &host, boost::uint16_t port);
 
     // This finds the process
-    int Find (std::string);
+    int findCGI (const std::string &filespec);
 
     // This stop the process
-    bool Stop (void);
-    bool Stop (std::string);
+    bool stopCGI (void);
+    bool stopCGI (const std::string &filespec);
 private:
     std::map<std::string, bool> _output;
     std::map<std::string, int> _pids;
@@ -49,3 +62,12 @@ private:
     
     boost::mutex	_mutex;
 };
+
+} // end of cygnal namespace
+
+#endif  // end of __PROC_H__
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

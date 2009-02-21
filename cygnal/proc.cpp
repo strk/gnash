@@ -29,9 +29,15 @@
 
 #include "log.h"
 #include "proc.h"
+#include "network.h"
 
 using namespace std;
 using namespace gnash;
+
+LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+namespace cygnal
+{
 
 Proc::Proc (void)
 {
@@ -44,7 +50,7 @@ Proc::~Proc (void)
 }
 
 bool
-Proc::Start (void)
+Proc::startCGI(void)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("%s", __PRETTY_FUNCTION__);
@@ -52,35 +58,61 @@ Proc::Start (void)
 }
 
 bool
-Proc::Start (string procname)
+Proc::startCGI(const string &filespec, boost::uint16_t port)
 {
 //    GNASH_REPORT_FUNCTION;
-    return Start (procname, false);
+    return startCGI(filespec, false, port);
 }
 
 bool
-Proc::Start (string procname, bool b)
+Proc::startCGI(const string &filespec)
+{
+//    GNASH_REPORT_FUNCTION;
+    return startCGI(filespec, false, 0);
+}
+
+bool
+Proc::startCGI(const string &filespec, bool outflag)
+{
+
+    return startCGI(filespec, outflag, 0);
+}
+
+bool
+Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
 {
 //    GNASH_REPORT_FUNCTION;
     struct stat procstats;
     pid_t childpid;
     char *cmd_line[20];
     
-    _output[procname] = b;
+    _output[filespec] = outflag;
 
     // simple debug junk
-    log_debug("Starting \"%s\"", procname);
+    log_debug("Starting \"%s\"", filespec);
 
     // See if the file actually exists, otherwise we can't spawn it
-    if (stat(procname.c_str(), &procstats) == -1) {
-        log_error("Invalid filename \"%s\"", procname);
-//        perror(procname.c_str());
+    if (stat(filespec.c_str(), &procstats) == -1) {
+        log_error("Invalid filename \"%s\"", filespec);
+//        perror(filespec.c_str());
 	return (false);
     }
 
     // setup a command line. By default, argv[0] is the name of the process
-    cmd_line[0] = new char(50);
-    strcpy(cmd_line[0], procname.c_str());
+    cmd_line[0] = new char(filespec.size());
+    strcpy(cmd_line[0], filespec.c_str());
+
+    // When running multiple cgis, we prefer to specify the port it's using.
+    if (port > 0) {
+        cmd_line[1] = new char(10);
+        sprintf(cmd_line[1], "-p %d", port);
+    }
+
+    // If the parent has verbosity on, chances are the child should too.
+    if (dbglogfile.getVerbosity() > 0) {
+        cmd_line[2] = "-vv";
+    }
+    
 
     // fork ourselves silly
     childpid = fork();
@@ -89,29 +121,29 @@ Proc::Start (string procname, bool b)
     
     // childpid is a positive integer, if we are the parent, and fork() worked
     if (childpid > 0) {
-	_pids[procname] = childpid;
+	_pids[filespec] = childpid;
         return (true);
     }
     
     // childpid is -1, if the fork failed, so print out an error message
     if (childpid == -1) {
         // fork() failed
-	perror(procname.c_str());
+	perror(filespec.c_str());
 	return (false);
     }
 
     // If we are the child, exec the new process, then go away
     if (childpid == 0) {
 	// Turn off all output, if requested
-	if (b == false) {
+	if (outflag == false) {
 	    close(1);
 	    open("/dev/null", O_WRONLY);
 	    close(2);
 	    open("/dev/null", O_WRONLY);
 	}
 	// Start the desired executable
-	execv(procname.c_str(), cmd_line);
-	perror(procname.c_str());
+	execv(filespec.c_str(), cmd_line);
+	perror(filespec.c_str());
 	exit(0);
     }
     
@@ -119,17 +151,17 @@ Proc::Start (string procname, bool b)
 }
 
 int
-Proc::Find (string procname)
+Proc::findCGI(const string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_debug("Finding \"%s\"", procname);    
+    log_debug("Finding \"%s\"", filespec);    
     boost::mutex::scoped_lock lock(_mutex);
 
-    return _pids[procname];
+    return _pids[filespec];
 }
 
 bool
-Proc::Stop (void)
+Proc::stopCGI(void)
 {
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("%s", __PRETTY_FUNCTION__);
@@ -139,13 +171,13 @@ Proc::Stop (void)
 }
     
 bool
-Proc::Stop (string procname)
+Proc::stopCGI(const string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_debug("Stopping \"%s\"", procname);
+    log_debug("Stopping \"%s\"", filespec);
 
     boost::mutex::scoped_lock lock(_mutex);
-    pid_t pid = _pids[procname];
+    pid_t pid = _pids[filespec];
     
     if (kill (pid, SIGQUIT) == -1) {
 	return (false);
@@ -155,20 +187,30 @@ Proc::Stop (string procname)
 }
  
 bool
-Proc::SetOutput (string procname, bool b)
+Proc::setOutput(const string &filespec, bool outflag)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
-    _output[procname] = b;
+    _output[filespec] = outflag;
     
     return (true);
 }
 
 bool
-Proc::GetOutput (string procname)
+Proc::getOutput(const string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     
-    return _output[procname];
+    return _output[filespec];
 }
+
+bool
+Proc::connectCGI (const string &host, boost::uint16_t port)
+{
+//    GNASH_REPORT_FUNCTION;
+    return createClient(host, port);
+}
+
+
+} // end of cygnal namespace
