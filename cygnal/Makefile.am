@@ -74,6 +74,7 @@ INCLUDES = -I.. \
 noinst_HEADERS = \
 	cygnal.h \
 	rtmp_server.h \
+	http_server.h \
 	proc.h \
 	crc.h
 
@@ -83,7 +84,7 @@ lib_LTLIBRARIES = libcygnal.la
 cygnal_SOURCES = cygnal.cpp proc.cpp
 cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 
-libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp 
+libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp http_server.cpp 
 libcygnal_la_LIBADD = # $(AM_LDFLAGS) 
 
 
