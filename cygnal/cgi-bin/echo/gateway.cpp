@@ -130,7 +130,7 @@ main(int argc, char *argv[])
             if (!content) {
                 done = true;
             }
-            content->dump();
+//            content->dump();
             headers = net.parseEchoRequest(*content);
         } else {
             DiskStream filestream;
@@ -149,7 +149,8 @@ main(int argc, char *argv[])
                     amf::Buffer &reply = net.formatEchoResponse(headers[1]->getName(), *headers[3]);
                     if (infile.empty()) {
                         net.writeNet(netfd, reply);
-                        reply.dump();
+//                        reply.dump();
+                        // For now exit after only one packet
                         done = true;
                     } else {
                         cerr << hexify(reply.reference(), reply.allocated(), true) << endl;
