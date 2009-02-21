@@ -54,8 +54,7 @@ extern "C"{
 #include "log.h"
 #include "crc.h"
 #include "rtmp.h"
-#include "rtmp_server.h"
-#include "http.h"
+#include "buffer.h"
 #include "utility.h"
 #include "limits.h"
 #include "netstats.h"
@@ -68,7 +67,9 @@ extern "C"{
 #include "GnashSleep.h" // for usleep comptibility.
 
 // classes internal to Cygnal
-#include "buffer.h"
+#include "rtmp_server.h"
+#include "http_server.h"
+
 #include "handler.h"
 #include "cache.h"
 #include "gettext.h"
