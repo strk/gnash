@@ -667,25 +667,29 @@ dispatch_handler(Network::thread_params_t *args)
 		    if ((it->revents & POLLRDHUP) || (it->revents & POLLNVAL))  {
 			log_debug("Revents has a POLLRDHUP or POLLNVAL set to %d for fd #%d",
 				  it->revents, it->fd);
-			net->erasePollFD(it->fd);
- 			net->closeNet(it->fd);
+ 			if (it->fd > 0) {
+			    net->erasePollFD(it->fd);
+			    net->closeNet(it->fd);
+			}
 //			continue;
 			break;
 		    } else {
 			// We got some data, so process it
 			log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
-			// Call the protocol handler for this network connection
-			bool ret = net->getEntry(it->fd)(args);
+ 			if (it->fd > 0) {
+			    // Call the protocol handler for this network connection
+			    bool ret = net->getEntry(it->fd)(args);
 			
 //			log_debug("Handler returned %s", (ret) ? "true" : "false");
-			// FIXME: we currently force a 'close connection' at the end
-			// of sending a file, since apache does too. This pretty much
-			// blows persistance,
+			    // FIXME: we currently force a 'close connection' at the end
+			    // of sending a file, since apache does too. This pretty much
+			    // blows persistance,
 //			if (ret) {
 			    networks[args->tid] = 0;
 			    net->closeNet(it->fd);
 			    net->erasePollFD(it->fd);
 //			}
+			}
 		    }
 		}
 	    } catch (std::exception& e) {
