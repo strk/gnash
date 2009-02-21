@@ -43,13 +43,16 @@
 #include "amf.h"
 #include "element.h"
 #include "cque.h"
-#include "http_server.h"
 #include "log.h"
 #include "network.h"
 #include "handler.h"
 #include "utility.h"
 #include "buffer.h"
 #include "diskstream.h"
+
+// Cygnal specific headers
+#include "http_server.h"
+#include "proc.h"
 #include "cache.h"
 
 // Not POSIX, so best not rely on it if possible.
@@ -288,8 +291,17 @@ HTTPServer::processPostRequest(int fd)
     // NOTE: this is a "special" path we trap until we have real CGI support
     if ((_filespec == "/echo/gateway")
 	&& (getField("content-type") == "application/x-amf")) {
+#if 1
+	Proc echo;
+//	echo.startCGI("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin/echo/gateway", true, 1234);
+	echo.createClient("localhost", 1234);
+	echo.writeNet(*content);
+	boost::shared_ptr<amf::Buffer> reply = echo.readNet();
+	writeNet(fd, *reply);
+//	echo.stopCGI("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin/echo/gateway");
+#else
 //	const char *num = (const char *)buf->at(10);
-	log_debug("Got CGI echo request in POST");
+//	log_debug("Got CGI echo request in POST");
 //	cerr << "FIXME 2: " << hexify(content->reference(), content->allocated(), true) << endl;
 
 	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(*content);
@@ -297,7 +309,7 @@ HTTPServer::processPostRequest(int fd)
   	//boost::shared_ptr<amf::Element> &el1 = headers[1];
   	//boost::shared_ptr<amf::Element> &el3 = headers[3];
 	
-    if (headers.size() >= 4) {
+	if (headers.size() >= 4) {
 	    if (headers[3]) {
 		amf::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
 // 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), true) << endl;
@@ -305,6 +317,7 @@ HTTPServer::processPostRequest(int fd)
 		writeNet(fd, reply);
 	    }
  	}
+#endif
     } else {
 	amf::Buffer &reply = formatHeader(_filetype, _filesize, HTTPServer::OK);
 	writeNet(fd, reply);
