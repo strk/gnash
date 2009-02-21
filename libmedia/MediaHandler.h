@@ -26,6 +26,7 @@
 
 #include "MediaParser.h" // for videoCodecType and audioCodecType enums
 #include "dsodefs.h" // DSOEXPORT
+#include "VideoConverter.h"
 
 #include <memory>
 
@@ -105,6 +106,15 @@ public:
     /// @return     Will always return a valid AudioDecoder or throw a
     ///             gnash::MediaException if a fatal error occurs.
 	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info)=0;
+
+    /// Create an VideoConverter for converting between color spaces.
+    //
+    /// @param srcFormat The source image color space
+    /// @param dstFormat The destination image color space
+    ///
+    /// @return A valid VideoConverter or a NULL auto_ptr if a fatal error occurs.
+    virtual std::auto_ptr<VideoConverter>
+        createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)=0;
 
     /// Return the number of bytes padding needed for input buffers
     //

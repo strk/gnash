@@ -24,6 +24,7 @@
 #include "AudioDecoderFfmpeg.h"
 #include "GnashException.h"
 #include "FLVParser.h"
+#include "VideoConverterFfmpeg.h"
 
 #include "IOChannel.h" // for visibility of destructor
 #include "MediaParser.h" // for visibility of destructor
@@ -63,6 +64,26 @@ MediaHandlerFfmpeg::createVideoDecoder(const VideoInfo& info)
 	std::auto_ptr<VideoDecoder> ret(new VideoDecoderFfmpeg(info));
 	return ret;
 }
+
+std::auto_ptr<VideoConverter>
+MediaHandlerFfmpeg::createVideoConverter(ImgBuf::Type4CC srcFormat,
+                                         ImgBuf::Type4CC dstFormat)
+{
+    std::auto_ptr<VideoConverter> converter;
+
+    try
+    {
+        converter.reset(new VideoConverterFfmpeg(srcFormat, dstFormat));
+    }
+    catch (GnashException& ex)
+    {
+        log_error("Could not create Ffmpeg based video converter parser for "
+                "input format: %s", ex.what());
+    }
+    
+    return converter;
+}
+
 
 std::auto_ptr<AudioDecoder>
 MediaHandlerFfmpeg::createAudioDecoder(const AudioInfo& info)
