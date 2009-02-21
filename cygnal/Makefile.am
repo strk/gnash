@@ -24,12 +24,11 @@ if TESTSUITE
 TEST_DIR = testsuite
 endif
 
-# if USE_CGI
+if USE_CGI
 CGI_DIR = cgi-bin
-# endif
+endif
 
 SUBDIRS = \
-	$(CGI_DIR) \
 	$(TEST_DIR) \
 	.
 
@@ -85,7 +84,7 @@ cygnal_SOURCES = cygnal.cpp proc.cpp
 cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 
 libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp http_server.cpp 
-libcygnal_la_LIBADD = # $(AM_LDFLAGS) 
+libcygnal_la_LIBADD = 
 
 
 # Rebuild with GCC 4.x Mudflap support
