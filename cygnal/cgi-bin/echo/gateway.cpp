@@ -120,34 +120,43 @@ main(int argc, char *argv[])
     
     // Wait for data, and when we get it, process it.
     boost::shared_ptr<amf::Buffer> content;
+    vector<boost::shared_ptr<amf::Element> > headers;
+    int ret = 0;
+    net.setTimeout(30);
     do {
         // See if we have any messages waiting
         if (infile.empty()) {
-            content.reset(new amf::Buffer);
-            if (net.readNet(netfd, *content) == 0) {
+            boost::shared_ptr<amf::Buffer> content = net.readNet();
+            if (!content) {
                 done = true;
             }
+            content->dump();
+            headers = net.parseEchoRequest(*content);
         } else {
-            DiskStream filestream(infile);
+            DiskStream filestream;
+            filestream.open(infile);
             filestream.loadToMem(0);
-//            content.reset(new amf::Buffer(filestream.getPagesize()));
-//            content->copy(filestream.get(), filestream.getPagesize());
+            headers = net.parseEchoRequest(filestream.get(), filestream.getPagesize());
+            filestream.close();
+            done = true;
         }
         
-        log_debug("Got CGI echo request in POST");
-//	cerr << "FIXME 2: " << hexify(content->reference(), content->allocated(), true) << endl;
-
-	vector<boost::shared_ptr<amf::Element> > headers = net.parseEchoRequest(*content);
   	//boost::shared_ptr<amf::Element> &el0 = headers[0];
 	
-        if (headers.size() >= 4) {
-            if (headers[3]) {
-                amf::Buffer &reply = net.formatEchoResponse(headers[1]->getName(), *headers[3]);
-// 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), true) << endl;
-// 	    cerr << "FIXME 3: " << hexify(reply.reference(), reply.allocated(), false) << endl;
-		net.writeNet(netfd, reply);
-	    }
- 	}
+        if (!done) {
+            if (headers.size() >= 4) {
+                if (headers[3]) {
+                    amf::Buffer &reply = net.formatEchoResponse(headers[1]->getName(), *headers[3]);
+                    if (infile.empty()) {
+                        net.writeNet(netfd, reply);
+                        reply.dump();
+                        done = true;
+                    } else {
+                        cerr << hexify(reply.reference(), reply.allocated(), true) << endl;
+                    }
+                }
+            }
+        }
     } while(done != true);
 }
 
