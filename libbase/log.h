@@ -180,13 +180,13 @@ private:
     LogFile ();
 
     /// Mutex for locking I/O during logfile access.
-    boost::mutex _ioMutex;
+    boost::mutex	_ioMutex;
 
     /// Stream to write to stdout.
     std::ofstream	 _outstream;
 
     /// How much output is required: 2 or more gives debug output.
-    int		 _verbose;
+    int			_verbose;
 
     /// Whether to dump all SWF actions
     bool		 _actiondump;
@@ -195,18 +195,18 @@ private:
     bool		 _parserdump;
 
     /// The state of the log file.
-    FileState _state;
+    FileState		_state;
 
     bool		 _stamp;
 
     /// Whether to write the log file to disk.
     bool		 _write;
 
-    std::string _filespec;
+    std::string		_filespec;
 
-    std::string _logFilename;
+    std::string		_logFilename;
     
-    logListener _listener;
+    logListener		_listener;
 
 };
 

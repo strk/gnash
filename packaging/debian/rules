@@ -35,7 +35,8 @@ config.status: configure.ac
 	dh_testdir
 
 	@printf "\n == APPLYING PATCHES ============================================ \n\n"
-	$(MAKE) -f /usr/share/quilt/quilt.make patch
+	# we have no patches, we're the developers!
+#	$(MAKE) -f /usr/share/quilt/quilt.make patch
 	@printf "\n ----------------------------------- End of APPLYING PATCHES ---- \n\n"
 
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
@@ -49,17 +50,22 @@ endif
 	./autogen.sh
 	@printf "\n -------------------------------------------- End of AUTOGEN ---- \n\n"
 
+	# for now, only build the kde4 support,as kde3 is being depreciated.
+
 	@printf "\n == CONFIGURE =================================================== \n\n"
-	# In the future, I want to add LDFLAGS="-Wl,-z,defs"
-	./configure CFLAGS="$(CFLAGS)" \
+	./configure CFLAGS="$(CFLAGS)" CXXFLAGS="$(CXXFLAGS)" \
 		--host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) \
-		--prefix=/usr --mandir=\$${prefix}/share/man \
-		--infodir=\$${prefix}/share/info \
-		--enable-cygnal --enable-media=gst --enable-renderer=agg \
-		--with-npapi-plugindir=\$${prefix}/lib/gnash \
-		--with-kde-pluginprefix=\$${prefix} \
-		--enable-shared --disable-static --disable-testsuite \
-		--disable-rpath CXXFLAGS=-O0
+		--prefix=/usr \
+		--mandir=/usr/share/man \
+		--infodir=/usr/share/info \
+		--disable-testsuite \
+		--disable-rpath \
+		--enable-cygnal \
+		--enable-media=ffmpeg \
+		--enable-gui=gtk,kde4 \
+		--enable-renderer=agg \
+		--with-plugins-install=system
+
 	@printf "\n ------------------------------------------- End of CONFIGURE ---- \n\n"
 
 	cp libamf/README README.amf
@@ -71,7 +77,7 @@ build-stamp:  config.status
 	dh_testdir
 
 	@printf "\n == MAKE ======================================================== \n\n"
-	$(MAKE)
+	$(MAKE) 
 	@printf "\n ----------------------------------------------- End of MAKE ---- \n\n"
 
 #	@printf "\n == CHECK ======================================================= \n\n"
@@ -115,7 +121,8 @@ endif
 	-rm -f README.amf
 
 	@printf "\n == CLEANING PATCHES ============================================ \n\n"
-	$(MAKE) -f /usr/share/quilt/quilt.make unpatch
+	# we have no patches, we're the developers!
+#	$(MAKE) -f /usr/share/quilt/quilt.make unpatch
 	@printf "\n ----------------------------------- End of CLEANING PATCHES ---- \n\n"
 
 	dh_clean 
@@ -144,6 +151,8 @@ install: build
 
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
 	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libbase/
+	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libnet/
+	cp libbase/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libnet/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libamf/
 	cp libamf/*.h $(CURDIR)/debian/tmp/usr/include/gnash/libamf/
 	install -d $(CURDIR)/debian/tmp/usr/include/gnash/libcore/
@@ -183,13 +192,13 @@ binary-arch: build install
 	dh_fixperms
 	dh_makeshlibs
 	dh_installdeb
-	dh_shlibdeps
+#	dh_shlibdeps
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
 
 VERSION_DATE = $(shell /bin/date --utc +%0Y%0m%0d.%0k%0M)
-VERSION_ID = 0.7.2+cvs$(VERSION_DATE)
+VERSION_ID = trunk_$(VERSION_DATE)
 get-orig-source:
 	echo Downloading gnash $(VERSION_ID) from CVS...
 	#test -e gnashd && exit

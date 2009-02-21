@@ -184,8 +184,7 @@ DisplayList::place_character(character* ch, int depth, as_object* initObj)
   ch->set_depth(depth);
 
   container_type::iterator it = std::find_if(
-      _charsByDepth.begin(), _charsByDepth.end(),
-      DepthGreaterOrEqual(depth));
+      _charsByDepth.begin(), _charsByDepth.end(), DepthGreaterOrEqual(depth));
 
   if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
   {
@@ -230,8 +229,8 @@ DisplayList::add(character* ch, bool replace)
   int depth = ch->get_depth();
 
   container_type::iterator it = std::find_if(
-      _charsByDepth.begin(), _charsByDepth.end(),
-      DepthGreaterOrEqual(depth));
+      _charsByDepth.begin(), _charsByDepth.end(), DepthGreaterOrEqual(depth));
+
   if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
   {
     _charsByDepth.insert(it, DisplayItem(ch));
@@ -274,14 +273,15 @@ DisplayList::replace_character(
   ch->set_invalidated();
   ch->set_depth(depth);
 
-  // NOTE: currently, ::restart also cleans up all property, which include __proto__ !!
-  //       For this reason I commented it out. Since no tests in the testsuite are failing
-  //       I'm not sure what does this break. Udo: do you remember ? --strk;
+  // NOTE: currently, ::restart also cleans up all
+  // property, which include __proto__ !!
+  // For this reason I commented it out. Since no tests in
+  // the testsuite are failing
+  // I'm not sure what does this break. Udo: do you remember ? --strk;
   // ch->restart();
 
   container_type::iterator it = std::find_if(
-      _charsByDepth.begin(), _charsByDepth.end(),
-      DepthGreaterOrEqual(depth));
+      _charsByDepth.begin(), _charsByDepth.end(), DepthGreaterOrEqual(depth));
 
   DisplayItem di(ch);
 

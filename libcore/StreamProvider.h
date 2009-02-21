@@ -18,11 +18,12 @@
 #ifndef GNASH_STREAMPROVIDER_H
 #define GNASH_STREAMPROVIDER_H
 
+#include "NetworkAdapter.h"
+#include "dsodefs.h" // for DSOEXPORT
+#include "NamingPolicy.h"
+
 #include <map>
 #include <memory>
-#include "NetworkAdapter.h"
-
-#include "dsodefs.h" // for DSOEXPORT
 
 // Forward declarations
 namespace gnash {
@@ -39,13 +40,10 @@ class DSOEXPORT StreamProvider
 
 public:
 
-    typedef std::string (*NamingPolicy) (const URL&);
-
-	StreamProvider() {}
+	StreamProvider(std::auto_ptr<NamingPolicy> = 
+            std::auto_ptr<NamingPolicy>(new NamingPolicy));
 
 	virtual ~StreamProvider() {}
-
-	static StreamProvider& getDefaultInstance();
 
 	/// Returned stream ownership is transferred to caller.
 	//
@@ -53,7 +51,7 @@ public:
 	/// Derive from this for a CachingStreamProvider
 	///
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-            NamingPolicy np = 0);
+            bool namedCacheFile = false) const;
 
 	/// Get a stream from the response of a POST operation
 	//
@@ -70,20 +68,39 @@ public:
 	///
 	///
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
-            const std::string& postdata, NamingPolicy np = 0);
+            const std::string& postdata, bool namedCacheFile = false) const;
 	
 	virtual std::auto_ptr<IOChannel> getStream(const URL& url,
             const std::string& postdata,
-            const NetworkAdapter::RequestHeaders& headers, NamingPolicy np = 0);
+            const NetworkAdapter::RequestHeaders& headers,
+            bool namedCacheFile = false) const;
 	
+    /// Set the NamingPolicy for cache files
+    //
+    /// This is only used when cache file naming is requested in getStream()
+    /// This StreamProvider owns the NamingPolicy instance.
+    void setNamingPolicy(std::auto_ptr<NamingPolicy> np)
+    {
+        _namingPolicy = np;
+    }
+
     /// Return the currently selected policy for converting URL to filename
-    virtual NamingPolicy currentNamingPolicy() const;
+    const NamingPolicy& namingPolicy() const
+    {
+        assert(_namingPolicy.get());
+        return *_namingPolicy;
+    }
+
+private:
+
+    /// The current naming policy for cache files.
+    std::auto_ptr<NamingPolicy> _namingPolicy;
 
 };
 
 } // namespace gnash
 
-#endif // _GNASH_STREAMPROVIDER_H
+#endif 
 
 
 // Local Variables:

@@ -124,6 +124,7 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << endl
     << _("  --max-advances num       Exit after specified number of advances") << endl
     << _("  --fullscreen             Start in fullscreen mode") << endl
+    << _("  --hide-menubar           Start without displaying the menu bar ") << endl
     << endl
     << _("Keys:") << endl
     << endl
@@ -146,18 +147,21 @@ cout << _("Usage: gnash [options] movie_file.swf") << endl
     << endl;
 }
 
-static void version_and_copyright()
+static void
+version_and_copyright()
 {
     cout << "Gnash " << VERSION << endl
         << endl
-        << _("Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, "
-                "Inc.\nGnash comes with NO WARRANTY, to the extent permitted "
+        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009 "
+                "Free Software Foundation, Inc.\n"
+                "Gnash comes with NO WARRANTY, to the extent permitted "
                 "by law.\nYou may redistribute copies of Gnash under the "
                 "terms of the GNU General\nPublic License.  For more "
                 "information, see the file named COPYING.\n") << endl;
 }
 
-static void build_options()
+static void
+build_options()
 {
     cout << _("Build options ") << VERSION << endl
         << _("   Target: ") << TARGET_CONFIG << endl
@@ -194,9 +198,9 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         { 'p', 0,               Arg_parser::no  },
         { 's', "scale",         Arg_parser::yes },
         { 256, "max-advances",  Arg_parser::yes },
-        { 257, "fullscreen",    Arg_parser::no  },        
+        { 257, "fullscreen",    Arg_parser::no  },
+        { 258, "hide-menubar",  Arg_parser::no  },                
         { 'c', 0,               Arg_parser::no  },
-        { 'm', 0,               Arg_parser::yes }, // What is this for?
         { 'd', "delay",         Arg_parser::yes },
         { 'x', "xid",           Arg_parser::yes },
         { 'r', "render-mode",   Arg_parser::yes },
@@ -273,7 +277,10 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     break;
                 case 257:
                     player.setStartFullscreen(true);
-                    break;                    
+                    break;
+                case 258:
+                    player.hideMenu(true);
+                    break;
                 case 's':
                     player.setScale(gnash::utility::clamp<float>(
                                     parser.argument<float>(i),

@@ -20,7 +20,7 @@ AUTOMAKE_OPTIONS = -Wno-portability
 POFILES = AUTO
 
 
-translations = cs de es fi fr it ja sv
+translations = cs de es fi fr it ja 
 
 # This is GNU make specific, so if you are building Gnash on a BSD
 # machine, you probably want to install GNU make in additional to
@@ -67,9 +67,10 @@ gnash.pot:
 	for i in `find $(dirs) -name '*.cpp'`; do \
 	  echo "$$i" >> po/POTFILES;\
 	done; \
-	$(XGETTEXT) --language=C++ --files-from=po/POTFILES -o po/gnash.pot \
+	$(XGETTEXT) --language=C++ --files-from=po/POTFILES \
+	  -o $(srcdir)/gnash.pot \
 	  --default-domain=gnash --force \
-	  --flag=_:1:pass-c-format --keyword=_ \
+	  --flag=_:1:pass-c-format --keyword=_ --keyword=_q \
 	  --copyright-holder='Free Software Foundation, Inc.';  \
 	rm -f po/POTFILES
 

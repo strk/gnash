@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __KDESUP_H__
-#define __KDESUP_H__
+#ifndef GNASH_KDESUP_H
+#define GNASH_KDESUP_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -74,10 +74,6 @@ public slots:
     void menuitem_play_callback();
     void menuitem_pause_callback();
     void menuitem_stop_callback();
-    void menuitem_step_forward_callback();
-    void menuitem_step_backward_callback();
-    void menuitem_jump_forward_callback();
-    void menuitem_jump_backward_callback();
 private:
     QPopupMenu    _qmenu;
     KdeGui*       _godfather;

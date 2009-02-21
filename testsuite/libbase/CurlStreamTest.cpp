@@ -64,7 +64,7 @@ dump_tu_file(const char* url, ostream& os)
 {
 	tu_file* reader = new tu_file(url, "r");
 	assert(reader);
-	if (!reader->get_error() == TU_FILE_NO_ERROR) return;
+	if (reader->bad()) return;
 
 	char buf[CHUNK_SIZE];
 

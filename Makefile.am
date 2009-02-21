@@ -410,7 +410,7 @@ endif
 	install-plugin \
 	apidoc
 
-install-plugins install-plugin uninstall-plugins:
+install-plugins install-plugin uninstall-plugins install-pkglib:
 	$(MAKE) -C plugin $@
 
 apidoc:

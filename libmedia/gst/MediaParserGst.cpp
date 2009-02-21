@@ -173,7 +173,7 @@ MediaParserGst::pushGstBuffer()
 {
     GstBuffer* buffer = gst_buffer_new_and_alloc(PUSHBUF_SIZE);
 
-    size_t ret = _stream->read(GST_BUFFER_DATA(buffer), PUSHBUF_SIZE);
+    std::streamoff ret = _stream->read(GST_BUFFER_DATA(buffer), PUSHBUF_SIZE);
 
     if (ret == 0) {
         if (!_stream->eof()) {
@@ -201,7 +201,7 @@ MediaParserGst::pushGstBuffer()
     if (!GST_FLOW_IS_SUCCESS (rv)) {
         log_error(_("MediaParserGst failed to push more data into the demuxer! "
                     "Seeking back."));
-        _stream->seek(_stream->tell()-ret);
+        _stream->seek(_stream->tell() - ret);
         return false;
     }
     

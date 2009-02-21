@@ -33,6 +33,7 @@
 #include "RunInfo.h" // for passing handlers and other data to the core.
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include <map>
 
 // Forward declarations
@@ -134,8 +135,16 @@ public:
 		_hostfd = fd;
 	}
 	
+    int getHostFD() const {
+        return _hostfd;
+    }
+
 	void setStartFullscreen(bool x) {
 	    _startFullscreen = x;
+	}
+	
+    void hideMenu(bool x) {
+	    _hideMenu = x;
 	}
 
     void setAudioDumpfile(const std::string& filespec) {
@@ -144,19 +153,22 @@ public:
 	
 private:
 
-	class CallbacksHandler
-		: public movie_root::AbstractIfaceCallback,
-		  public movie_root::AbstractFsCallback
+	class CallbacksHandler : public movie_root::AbstractIfaceCallback,
+		                     public movie_root::AbstractFsCallback
 	{
 	public:
-		CallbacksHandler(Gui* gui)
+		CallbacksHandler(Gui& gui, const Player& player)
 			:
-			_gui(gui)
+			_gui(gui),
+            _player(player)
 		{}
 
 		std::string call(const std::string& event,
 				const std::string& arg);
+
 		bool yesNo(const std::string& query);
+
+        void error(const std::string& msg);
 
 		// For handling notification callbacks from ActionScript.
 		// The callback is always sent to a hosting application
@@ -166,7 +178,9 @@ private:
 
 	private:
 
-		Gui* _gui;
+		Gui& _gui;
+
+        const Player& _player;
 	};
 
 	std::auto_ptr<CallbacksHandler> _callbacksHandler;
@@ -248,7 +262,7 @@ private:
     /// @todo   This is hairy, and the core should be sorted out so that
     ///         sound_sample knows about its sound::sound_handler without
     ///         needing a RunInfo.
-    std::auto_ptr<sound::sound_handler> _soundHandler;
+    boost::shared_ptr<sound::sound_handler> _soundHandler;
 
 	std::auto_ptr<media::MediaHandler> _mediaHandler;
 
@@ -287,6 +301,7 @@ private:
 	// Whether to start Gnash in fullscreen mode.
 	// (Or what did you think it meant?)
 	bool _startFullscreen;
+	bool _hideMenu;
 
     // The filename to use for dumping audio.
     std::string _audioDump;

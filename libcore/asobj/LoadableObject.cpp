@@ -180,7 +180,7 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
 		return;
 		// TODO: check if this is correct
 		//as_value nullValue; nullValue.set_null();
-		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
+		//callMethod(_vm.getStringTable().find(PROPNAME("onData")), nullValue);
 	}
 
 	log_security(_("Loading from url: '%s'"), url.str());
@@ -207,7 +207,7 @@ LoadableObject::load(const std::string& urlstr)
 		return;
 		// TODO: check if this is correct
 		//as_value nullValue; nullValue.set_null();
-		//callMethod(VM::get().getStringTable().find(PROPNAME("onData")), nullValue);
+		//callMethod(_vm.getStringTable().find(PROPNAME("onData")), nullValue);
 	}
 
 	log_security(_("Loading from url: '%s'"), url.str());

@@ -74,7 +74,7 @@ Buffer::hex2mem(const string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t count = str.size();
-    size_t size = (count/3) + 1;
+    size_t size = (count/3) + 4;
     boost::uint8_t ch = 0;
     
     boost::uint8_t *ptr = const_cast<boost::uint8_t *>(reinterpret_cast<const boost::uint8_t *>(str.c_str()));
@@ -205,14 +205,10 @@ Buffer::copy(boost::uint8_t *data, size_t nbytes)
 	std::copy(data, data + nbytes, _data.get());
 	_seekptr = _data.get() + nbytes;
     } else {
-	char num[12];
-	sprintf(num, "%d", nbytes);
-	string msg = "Not enough storage was allocated to hold the copied data! Needs ";
-	msg += num;
-	msg += " only has ";
-	sprintf(num, "%d", _nbytes);
-	msg += num;
-	throw GnashException(msg);
+        boost::format msg("Not enough storage was allocated to hold the "
+        "copied data! Needs %1%, only has %2% bytes");
+        msg % nbytes % _nbytes;
+	    throw GnashException(msg.str());
     }
     return *this;
 }
@@ -234,14 +230,10 @@ Buffer::append(boost::uint8_t *data, size_t nbytes)
 	    std::copy(data, data + nbytes, _seekptr);
 	    _seekptr += nbytes;
 	} else {
-	    char num[12];
-	    string msg = "Not enough storage was allocated to hold the appended data! Needs ";
-	    sprintf(num, "%d", nbytes);
-	    msg += num;
-	    msg += " only has ";
-	    sprintf(num, "%d", _nbytes - allocated());
-	    msg += num;
-	    throw GnashException(msg);
+        boost::format msg("Not enough storage was allocated to hold the "
+        "appended data! Needs %1%, only has %2% bytes");
+        msg % nbytes % _nbytes;
+	    throw GnashException(msg.str());
 	}
     }
 
@@ -734,8 +726,9 @@ Buffer::resize(size_t size)
 void
 Buffer::dump(std::ostream& os) const
 {
-    os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes at " << (void *)_data.get() << endl;
-    if (_data) {
+    os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes: ";
+     // Skip in-memory address " at " << (void *)_data.get() << endl;
+    if (_nbytes < 0xffff) {
 	const size_t bytes = _seekptr - _data.get();
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;
@@ -754,7 +747,7 @@ Buffer::dump(std::ostream& os) const
 int
 Buffer::corrupt()
 {
-    corrupt(10);
+    return corrupt(10);
 }
 
 int

@@ -47,12 +47,13 @@ namespace gnash {
 	class Machine;
 	class IOChannel;
     class event_id;
+    class movie_root;
+    class asClass;
+    class asName;
 }
 
 namespace gnash {
 
-class asClass;
-class asName;
 
 /// An abstract property visitor
 class AbstractPropertyVisitor {
@@ -104,7 +105,8 @@ public:
 	/// @param this_obj
 	/// 	Object of which the property is being changed
 	///
-	as_value call(const as_value& oldval, const as_value& newval, as_object& this_obj);
+	as_value call(const as_value& oldval, const as_value& newval, 
+            as_object& this_obj);
 
 	void setReachable() const;
 
@@ -132,27 +134,6 @@ class as_object
         propNameSet;
 
     typedef PropertyList::SortedPropertyList SortedPropertyList;
-
-private:
-	/// Properties of this objects 
-	PropertyList _members;
-
-	/// Don't allow implicit copy, must think about behaviour
-	as_object& operator=(const as_object&);
-
-	/// \brief
-	/// Find an existing property for update, only scanning the
-    /// inheritance chain for getter/setters or statics.
-	//
-	/// NOTE: updatable here doesn't mean the property isn't protected
-    /// from update but only that a set_member will NOT create a new
-    /// property (either completely new or as an override).
-	///
-	/// @returns a property if found, NULL if not found
-	///          or not visible in current VM version
-	///
-	Property* findUpdatableProperty(string_table::key name, 
-		string_table::key nsname = 0);
 
 public:
 
@@ -203,6 +184,8 @@ public:
 	/// user code actually changing the object itsef.
 	///
 	void dump_members(std::map<std::string, as_value>& to);
+
+    as_object(movie_root& mr);
 
 	/// Construct an ActionScript object with no prototype associated.
 	as_object();
@@ -1083,13 +1066,29 @@ protected:
 
 private:
 
+    /// Properties of this objects 
+	PropertyList _members;
+
+	/// Don't allow implicit copy, must think about behaviour
+	as_object& operator=(const as_object&);
+
+	/// \brief
+	/// Find an existing property for update, only scanning the
+    /// inheritance chain for getter/setters or statics.
+	//
+	/// NOTE: updatable here doesn't mean the property isn't protected
+    /// from update but only that a set_member will NOT create a new
+    /// property (either completely new or as an override).
+	///
+	/// @returns a property if found, NULL if not found
+	///          or not visible in current VM version
+	///
+	Property* findUpdatableProperty(string_table::key name, 
+		string_table::key nsname = 0);
+
 	/// The constructors of the objects which are the interfaces
 	/// implemented by this one.
 	std::list<as_object*> mInterfaces;
-
-	/// Reference to this object's '__proto__'
-	//boost::intrusive_ptr<as_object> m_prototype;
-
 
 	typedef std::pair< string_table::key, string_table::key > FQkey;
 	typedef std::map< FQkey, Trigger > TriggerContainer;

@@ -1,18 +1,16 @@
 Source: gnash
 Priority: optional
-Maintainer: Alexander Sack <asac@ubuntu.com>
-XSBC-Original-Maintainer: Miriam Ruiz <little_miry@yahoo.es>
-Uploaders: Alexander Sack <asac@jwsdot.com>
-Build-Depends: dpkg-dev (>= 1.13.19), debhelper (>= 4.0.0), quilt, autoconf, automake1.9 | automake, libtool, libltdl3-dev, help2man, libxmu-dev, dejagnu, autotools-dev, libboost-dev, libboost-thread-dev, libxml2-dev, libjpeg-dev, libpng12-dev | libpng-dev, libagg-dev, libgstreamer0.10-dev, libpango1.0-dev | pango-devel, libgtkglext1-dev, libmad0-dev, libdirectfb-dev, libkonq4-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev | libcurl4-openssl-dev | libcurl3-openssl-dev, libcaca-dev, libboost-date-time-dev, libavcodec-dev, libavformat-dev, libming-dev, libming-util, mtasc, libgstreamer-plugins-base0.10-dev
+Maintainer: Rob Savoye <rob@welcomehome.org>
+XSBC-Original-Maintainer: Miriam Ruiz <little_miry@yahoo.es>, Alexander Sack <asac@jwsdot.com>
+Build-Depends: dpkg-dev (>= 1.13.19), debhelper (>= 4.0.0), autoconf, automake1.9 | automake, libtool, libltdl3-dev, libxmu-dev, dejagnu, autotools-dev, libboost-dev, libboost-thread-dev, libjpeg-dev, libpng12-dev | libpng-dev, libagg-dev, libpango1.0-dev | pango-devel, libgtkglext1-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev | libcurl4-openssl-dev | libcurl3-openssl-dev, libboost-date-time-dev, libavcodec-dev, libavformat-dev
 Standards-Version: 3.7.2
 Section: utils
-Xs-Vcs-Bzr: http://bazaar.launchpad.net/~ubuntu-core-dev/gnash/ubuntu
 
 Package: gnash-common
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, gstreamer0.10-plugins-base, gstreamer0.10-alsa
-Suggests: gstreamer0.10-fluendo-mp3, gstreamer0.10-ffmpeg
+# Suggests: gstreamer0.10-fluendo-mp3, gstreamer0.10-ffmpeg
 Conflicts: libgnash0 (<< 0.8.1~), gnash (<< 0.8.1~), libklash0 (<< 0.8.1~)
 Replaces: libgnash0 (<< 0.8.1~), gnash (<< 0.8.1~), libklash0 (<< 0.8.1~)
 Description: free SWF movie player - common files/libraries

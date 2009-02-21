@@ -1,7 +1,8 @@
 Name:           gnash
-Version:        20081024
+Version:        20090213
 Release:        1
-Distribution:	fc9
+Distribution:	fc10
+#Distribution:	ydl6
 Summary:        GNU SWF player
 
 Group:          Applications/Multimedia
@@ -9,27 +10,25 @@ Vendor:		Gnash Project
 Packager:	Rob Savoye <rob@welcomehome.org>
 License:        GPLv3
 URL:            http://www.gnu.org/software/gnash/
-Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}_%{version}.tar.gz
+Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
-
-
-#AutoReqProv: no
 
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
 BuildRequires:  gtk2-devel libX11-devel libXt-devel glib2-devel
-BuildRequires:  cairo-devel atk-devel pango-devel
-BuildRequires:  agg-devel libxml2-devel boost-devel curl-devel libXt-devel
+BuildRequires:  atk-devel pango-devel
+BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
 BuildRequires:  xorg-x11-proto-devel SDL-devel
-BuildRequires:  kdelibs3-devel kdebase3-devel qt3-devel
-BuildRequires:  gstreamer >= 0.10, gstreamer-ffmpeg
+%if %{distribution} != "ydl6"
+BuildRequires:  ffmpeg-devel
+%endif
 
 # Installation requirements
 Requires: libpng libjpeg libogg
-Requires: gtk2 libX11 libXt glib2 cairo atk pango
-Requires: agg libxml2 boost libcurl libXt SDL
-Requires: gstreamer >= 0.10  gstreamer-ffmpeg
-Requires: gstreamer-plugins-base
-#Requires: xorg-x11-proto kdelibs3 kdebase3 qt3
+Requires: gtk2 libX11 libXt glib2 atk pango
+Requires: agg boost libcurl libXt SDL
+%if %{distribution} != "ydl6"
+Requires: ffmpeg
+%endif
 
 # BuildRequires:  scrollkeeper
 
@@ -52,15 +51,6 @@ Group:     Applications/Internet
 %description plugin
 The gnash SWF player plugin for firefox or mozilla.
 
-%package klash
-Summary:   Konqueror SWF player plugin
-Requires:  %{name} = %{version}-%{release}
-Requires:  kdelibs kdelibs qt gnash
-Group:     Applications/Multimedia
-
-%description klash
-The gnash SWF player plugin for Konqueror.
-
 %package cygnal
 Summary:   Streaming media server
 Requires:  %{name} = %{version}-%{release}
@@ -73,8 +63,6 @@ Cygnal is a streaming media server that's Flash aware.
 %setup -q
 
 %build
-
-[ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
 
 # handle cross building rpms. This gets messy when building for two
 # archtectures with the same CPU type, like x86-Linux -> OLPC. We have
@@ -119,19 +107,30 @@ RPM_TARGET=%{_target}
 # build RPMs on, so we do it this way.
   %if olpc
     CROSS_OPTS="$CROSS_OPTS --disable-kparts --disable-menus"
-    SOUND="--enable-media=gst"
+    SOUND="--enable-media=gst --enable-jemalloc"
     GUI="--enable-gui=gtk"
     RENDERER="$RENDERER --with-pixelformat=RGB565"
   %endif
 %else
 # Native RPM build
   CROSS_OPTS="" # "--enable-ghelp --enable-docbook"
-  SOUND="--enable-media=gst"
-  RENDERER=""
+  GUI="--enable-gui=gtk"
+  SOUND="--enable-media=ffmpeg --enable-jemalloc"
+  RENDERER="" # --enable-render=ogl
 %endif
+
+%if %{distribution} != "ydl6"
+  SOUND="--enable-media=gst" 
+%endif
+
+# we disable the testuites by default, as when building packages we
+# should have already been running the testsuites as part of the 
+# normal build & test development cycle.
 
 # The default options for the configure aren't suitable for
 # cross configuring, so we force them to be what we know is correct.
+# uncommenting these will produce huge volumes of debug info from the
+# shell, but sometimes that's what you need to do.
 # export CONFIG_SHELL="sh -x"
 # sh -x ./configure \
 %if %{cross_compile}
@@ -140,36 +139,35 @@ RPM_TARGET=%{_target}
 	$SOUND $GUI \
 	$RENDERER \
 	--disable-dependency-tracking \
+	--disable-testsuites \
 	--disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
-make %{?_smp_mflags} $(MAKEFLAGS) dumpconfig all
+make $(MAKEFLAGS) dumpconfig all
 %else
 ./configure \
 	$CROSS_OPTS \
-	$SOUND \
+	$SOUND $GUI \
 	$RENDERER \
 	--disable-dependency-tracking \
 	--disable-rpath \
-	--disable-cygnal \
-	--enable-shared \
+	--enable-cygnal \
 	--disable-testsuite \
         --prefix=/usr \
 	--mandir=%{_prefix}/share/man \
 	--infodir=%{_prefix}/share/info \
-	--with-npapi-plugindir=%{_libdir}/mozilla/plugins \
-        --with-kde-plugindir=%{_libdir}/kde3 \
-        --with-kde-pluginprefix=%{_prefix} \
-        --with-kde-servicesdir=%{_prefix}/share/services \
-        --with-kde-appsdatadir=%{_prefix}/share/apps/klash \
-        --with-kde-configdir=${_datadir}/config
+        --with-npapi-install=system 
+#	--with-npapi-plugindir=%{_libdir}/mozilla/plugins
 
 make $(MAKEFLAGS) dumpconfig all
 %endif
+# When testing the spec file, try setting MAKEFLAGS to
+# "CXXFLAGS-O0 -j4" to speed up getting results. Note *don't*
+# do that for release buulds, as the performance will suffer.
 
 %install
 strip gui/.libs/*-gnash
-strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper
+strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper  utilities/.libs/rtmpget cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
 make install install-plugins DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
@@ -210,6 +208,8 @@ scrollkeeper-update -q || :
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
 %{_bindir}/dumpshm
+%{_bindir}/rtmpget
+%{_bindir}/cygnal
 %{_libdir}/gnash/*.so*
 %{_libdir}/mozilla/plugins/*.so
 %{_prefix}/share/gnash/GnashG.png
@@ -234,21 +234,14 @@ scrollkeeper-update -q || :
 %defattr(-,root,root,-)
 %{_libdir}/mozilla/plugins/libgnashplugin.so
 
-%files klash
+%files cygnal
 %defattr(-,root,root,-)
-%if !%{cross_compile}
-%{_bindir}/kde-gnash
-%{_libdir}/kde3/libklashpart.*
-%{_prefix}/share/apps/klash/klashpartui.rc
-%{_prefix}/share/apps/klash/pluginsinfo
-%{_prefix}/share/services/klash_part.desktop
-%endif
-
-# %files cygnal
-# %defattr(-,root,root,-)
-# %{_bindir}/cygnal
+%{_bindir}/cygnal
 
 %changelog
+* Sat Feb 13 2009 Rob Savoye <rob@welcomehome.org> - trunk
+- Split off klash into it's own spec file.
+
 * Sat Oct 24 2008 Rob Savoye <rob@welcomehome.org> - trunk
 - Adjust dependencies for current bzr trunk
 

@@ -120,7 +120,8 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
     if (!glyphCount) return false;
 
     IF_VERBOSE_PARSE(
-        log_parse(_("  GlyphEntries: count = %d"), glyphCount);
+        log_parse(_("  GlyphEntries: count = %d"),
+            static_cast<int>(glyphCount));
     );
 
     in.ensureBits(glyphCount * (glyphBits + advanceBits));

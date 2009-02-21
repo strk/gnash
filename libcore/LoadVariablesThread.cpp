@@ -122,8 +122,14 @@ LoadVariablesThread::completeLoad()
 		parse(toparse);
 	}
 
-	_stream->go_to_end();
-	_bytesLoaded = _stream->tell();
+	try {
+		_stream->go_to_end();
+	}
+    catch (IOException& ex) {
+		log_error("Stream couldn't seek to end: %s", ex.what());
+	}
+	
+    _bytesLoaded = _stream->tell();
 	if ( _bytesTotal !=  _bytesLoaded )
 	{
 		log_error("Size of 'variables' stream advertised to be %d bytes,"
@@ -138,9 +144,10 @@ LoadVariablesThread::completeLoad()
 	setCompleted();
 }
 
-LoadVariablesThread::LoadVariablesThread(const URL& url, const std::string& postdata)
+LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
+        const URL& url, const std::string& postdata)
 	:
-	_stream(StreamProvider::getDefaultInstance().getStream(url, postdata)),
+	_stream(sp.getStream(url, postdata)),
 	_completed(false),
 	_canceled(false)
 {
@@ -150,9 +157,10 @@ LoadVariablesThread::LoadVariablesThread(const URL& url, const std::string& post
 	}
 }
 
-LoadVariablesThread::LoadVariablesThread(const URL& url)
+LoadVariablesThread::LoadVariablesThread(const StreamProvider& sp,
+        const URL& url)
 	:
-	_stream(StreamProvider::getDefaultInstance().getStream(url)),
+	_stream(sp.getStream(url)),
 	_completed(false),
 	_canceled(false)
 {

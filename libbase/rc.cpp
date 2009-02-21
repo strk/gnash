@@ -103,7 +103,8 @@ RcInitFile::RcInitFile()
     _ignoreFSCommand(true),
     _quality(-1),
     _saveStreamingMedia(false),
-    _saveLoadedMedia(false)
+    _saveLoadedMedia(false),
+    _popups(true)
 {
     expandPath(_solsandbox);
 
@@ -328,7 +329,9 @@ RcInitFile::parseFile(const std::string& filespec)
     
     if (stat(filespec.c_str(), &stats) != 0)
     {
-        cerr << _("RcInitFile: couldn't open file: ") << filespec << endl;
+//      This is a normal case, since we check many places for an RC file.
+//      So don't complain bitterly every time we run gnash!
+//      cerr << _("RcInitFile: couldn't open file: ") << filespec << endl;
         return false;
     }
 
@@ -472,6 +475,8 @@ RcInitFile::parseFile(const std::string& filespec)
                  extractSetting(_parserDump, "parserDump", variable, value)
             ||
                  extractSetting(_writeLog, "writelog", variable, value)
+            ||
+                 extractSetting(_popups, "popupMessages", variable, value)
             ||
                  extractSetting(_sound, "sound", variable, value)
             ||
@@ -653,6 +658,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "parserDump " << _parserDump << endl <<
     cmd << "writeLog " << _writeLog << endl <<
     cmd << "sound " << _sound << endl <<
+    cmd << "popupMessages " << _popups << endl <<
     cmd << "pluginSound " << _pluginSound << endl <<
     cmd << "ASCodingErrorsVerbosity " << _verboseASCodingErrors << endl <<
     cmd << "malformedSWFVerbosity " << _verboseMalformedSWF << endl <<

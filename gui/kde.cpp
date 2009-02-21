@@ -379,38 +379,6 @@ qwidget::menuitem_stop_callback()
     _godfather->stop();
 }
 
-/// \brief step forward 1 frame
-void
-qwidget::menuitem_step_forward_callback()
-{
-//    GNASH_REPORT_FUNCTION;
-    _godfather->menu_step_forward();
-}
-
-/// \brief step backward 1 frame
-void
-qwidget::menuitem_step_backward_callback()
-{
-//    GNASH_REPORT_FUNCTION;
-    _godfather->menu_step_backward();
-}
-
-/// \brief jump forward 10 frames
-void
-qwidget::menuitem_jump_forward_callback()
-{
-//    GNASH_REPORT_FUNCTION;
-    _godfather->menu_jump_forward();
-}
-
-/// \brief jump backward 10 frames
-void
-qwidget::menuitem_jump_backward_callback()
-{
-//    GNASH_REPORT_FUNCTION;
-    _godfather->menu_jump_backward();
-}
-
 //
 // Event handlers
 //

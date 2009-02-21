@@ -235,6 +235,7 @@ DiskStream::close()
     
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
+//  	delete[] _dataptr;
 	_dataptr = 0;
     }
      

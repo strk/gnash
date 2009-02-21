@@ -301,7 +301,7 @@ public:
     void setHandler(Handler *hand) { _handler = hand; };
     void setDocRoot(const std::string &path) { _docroot = path; };
     
-private:
+protected:
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
     http_method_e	_cmd;

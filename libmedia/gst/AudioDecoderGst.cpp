@@ -164,15 +164,23 @@ void AudioDecoderGst::setup(GstCaps* srccaps)
 
     bool success = GstUtil::check_missing_plugins(srccaps);
     if (!success) {
+        GstStructure* sct = gst_caps_get_structure(srccaps, 0);
+        std::string type(gst_structure_get_name(sct));
+        std::string msg = (boost::format(_("Couldn't find a plugin for "
+                    "audio type %s!")) % type).str();
+
         gst_caps_unref(srccaps);
-	/// @todo print *which* codec 
-        throw MediaException(_("AudioDecoderGst: couldn't find a plugin for audio type ..."));
+
+        throw MediaException(msg);
     }
 
 
-    GstCaps* sinkcaps = gst_caps_from_string ("audio/x-raw-int, endianness=byte_order, signed=(boolean)true, width=16, depth=16, rate=44100, channels=2");
+    GstCaps* sinkcaps = gst_caps_from_string ("audio/x-raw-int, "
+            "endianness=byte_order, signed=(boolean)true, width=16, "
+            "depth=16, rate=44100, channels=2");
     if (!sinkcaps) {
-        throw MediaException(_("AudioDecoderGst: internal error (caps creation failed)"));      
+        throw MediaException(_("AudioDecoderGst: internal error "
+                    "(caps creation failed)"));      
     }
 
     std::string resampler = findResampler();

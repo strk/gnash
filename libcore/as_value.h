@@ -155,9 +155,11 @@ public:
 
 	/// Construct a BOOLEAN value
 	template <typename T>
-	as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type* dummy = 0)
-		: m_type(BOOLEAN),
-		  _value(val)
+	as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
+            dummy = 0)
+		:
+        m_type(BOOLEAN),
+		_value(val)
 	{
 		UNUSED(dummy);
 	}

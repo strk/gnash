@@ -21,25 +21,21 @@
 
 #include "noseek_fd_adapter.h"
 #include "IOChannel.h" // for inheritance
+#include "GnashSystemIOHeaders.h" // for read
 #include "utility.h"
 #include "log.h"
 
-#include "GnashSystemIOHeaders.h" // for ::read
-
 #include <boost/scoped_array.hpp>
+#include <cerrno>
+#include <cstdio>
+#include <string>
+#include <boost/format.hpp>
 
 //#define GNASH_NOSEEK_FD_VERBOSE 1
 
 // define this if you want seeks back to be reported (on stderr)
 //#define GNASH_NOSEEK_FD_WARN_SEEKSBACK 1
 
-#include <cerrno>
-#include <cstdio>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <string>
-#include <boost/format.hpp>
 
 namespace gnash {
 namespace noseek_fd_adapter {
@@ -74,19 +70,19 @@ public:
 	~NoSeekFile();
 
 	// See IOChannel.h for description
-	virtual int read(void *dst, int bytes);
+	virtual std::streamsize read(void *dst, std::streamsize bytes);
 
 	// See IOChannel for description
 	virtual bool eof() const;
 
 	// See IOChannel for description
-	virtual int get_error() const { return 0; }
+	virtual bool bad() const { return false; }
 
 	// See IOChannel for description
-	virtual int tell() const;
+	virtual std::streampos tell() const;
 
 	// See IOChannel for description
-	virtual int seek(int pos);
+	virtual bool seek(std::streampos pos);
 
 	// See IOChannel for description
 	virtual void go_to_end() {
@@ -96,7 +92,7 @@ public:
 private:
 
 	/// Read buffer size
-	static const unsigned int chunkSize = 512;
+	static const std::streamsize chunkSize = 512;
 
 	// Open either a temporary file or a named file
 	// (depending on value of _cachefilename)
@@ -115,20 +111,23 @@ private:
 	const char* _cachefilename;
 
 	// Current size of cached data
-	long unsigned _cached;
+    size_t _cached;
 
 	// Current read buffer
 	char _buf[chunkSize];
 
 	// Attempt at filling the cache up to the given size.
-	void fill_cache(size_t size);
+	void fill_cache(std::streamsize size);
 
 	// Append sz bytes to the cache
-	size_t cache(void *from, size_t sz);
+    std::streamsize cache(void *from, std::streamsize sz);
 
 	void printInfo();
 
 };
+
+
+const std::streamsize NoSeekFile::chunkSize;
 
 /***********************************************************************
  *
@@ -138,34 +137,36 @@ private:
 
 
 /*private*/
-size_t
-NoSeekFile::cache(void *from, size_t sz)
+std::streamsize
+NoSeekFile::cache(void *from, std::streamsize sz)
 {
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	std::cerr << boost::format("cache(%p, %d) called") % from % sz << std::endl;
 #endif
 	// take note of current position
-	long curr_pos = ftell(_cache);
+    std::streampos curr_pos = std::ftell(_cache);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	std::cerr << boost::format(" current position: %ld)") % curr_pos << std::endl;
 #endif
 
 	// seek to the end
-	fseek(_cache, 0, SEEK_END);
+    std::fseek(_cache, 0, SEEK_END);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format(" after SEEK_END, position: %ld") % ftell(_cache) << std::endl;
+	std::cerr << boost::format(" after SEEK_END, position: %ld") %
+        std::ftell(_cache) << std::endl;
 #endif
 
-	size_t wrote = fwrite(from, 1, sz, _cache);
+    std::streamsize wrote = std::fwrite(from, 1, sz, _cache);
 #ifdef GNASH_NOSEEK_FD_VERBOSE
     std::cerr << boost::format(" write %d bytes") % wrote;
 #endif
 	if ( wrote < 1 )
 	{
-        boost::format err = boost::format("writing to cache file: requested %d, wrote %d (%s)")
+        boost::format err = boost::format("writing to cache file: "
+                "requested %d, wrote %d (%s)")
             % sz % wrote % std::strerror(errno);
 			
 		std::cerr << err << std::endl;
@@ -175,17 +176,19 @@ NoSeekFile::cache(void *from, size_t sz)
 	_cached += sz;
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-    std::cerr << boost::format(" after write, position: %ld") % std::ftell(_cache) << std::endl;
+    std::cerr << boost::format(" after write, position: %ld") % 
+        std::ftell(_cache) << std::endl;
 #endif
 
 	// reset position for next read
-	fseek(_cache, curr_pos, SEEK_SET);
+    std::fseek(_cache, curr_pos, SEEK_SET);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-    std::cerr << boost::format(" after seek-back, position: %ld") % std::ftell(_cache) << std::endl;
+    std::cerr << boost::format(" after seek-back, position: %ld") % 
+        std::ftell(_cache) << std::endl;
 #endif
 
-	clearerr(_cache);
+    std::clearerr(_cache);
 
 	return wrote;
 }
@@ -193,50 +196,47 @@ NoSeekFile::cache(void *from, size_t sz)
 
 /*private*/
 void
-NoSeekFile::fill_cache(size_t size)
+NoSeekFile::fill_cache(std::streamsize size)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
     std::cerr << boost::format(" fill_cache(%d) called") % size << std::endl;
 #endif
 
+	assert(size >= 0);
+
 	// See how big is the cache
-	while ( _cached < size ) 
+	while (_cached < static_cast<size_t>(size))
 	{
 
-		// Let's see how many bytes are left to read
-		unsigned int bytesNeeded = size-_cached;
-		if ( bytesNeeded > chunkSize ) bytesNeeded = chunkSize;
-
-		bytesNeeded = chunkSize; // why read less ?
-
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-	std::cerr << boost::format(" bytes needed = %d") % bytesNeeded << std::endl;
+        size_t bytesNeeded = size - _cached;
+		bytesNeeded = std::min<size_t>(bytesNeeded, chunkSize);
+        std::cerr << boost::format(" bytes needed = %d") % bytesNeeded <<
+            std::endl;
 #endif
 
-		ssize_t bytesRead = ::read(_fd, (void*)_buf, bytesNeeded);
-		if ( bytesRead < 0 )
+        std::streamsize bytesRead = ::read(_fd, (void*)_buf, chunkSize);
+		if (bytesRead < 0)
 		{
-			std::cerr << boost::format(_("Error reading %d bytes from input stream")) % bytesNeeded;
+			std::cerr << boost::format(_("Error reading %d bytes from "
+                        "input stream")) % chunkSize << std::endl;
 			_running = false;
 			// this looks like a CRITICAL error (since we don't handle it..)
 			throw IOException("Error reading from input stream");
-			return;
 		}
 
-		if ( static_cast<size_t>(bytesRead) < bytesNeeded )
+		if (bytesRead < chunkSize)
 		{
-			if ( bytesRead == 0 )
+			if (bytesRead == 0)
 			{
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-    std::cerr << "EOF reached" << std::endl;
+                std::cerr << "EOF reached" << std::endl;
 #endif
 				_running = false;
 				return;
 			}
 		}
-
-		cache(_buf, static_cast<size_t>(bytesRead));
-
+		cache(_buf, bytesRead);
 	}
 }
 
@@ -256,7 +256,8 @@ NoSeekFile::openCacheFile()
 		_cache = fopen(_cachefilename, "w+b");
 		if ( ! _cache )
 		{
-			throw IOException("Could not create cache file " + std::string(_cachefilename));
+			throw IOException("Could not create cache file " + 
+                    std::string(_cachefilename));
 		}
 	}
 	else
@@ -284,18 +285,18 @@ NoSeekFile::NoSeekFile(int fd, const char* filename)
 /*public*/
 NoSeekFile::~NoSeekFile()
 {
-	fclose(_cache);
+    std::fclose(_cache);
 }
 
 /*public*/
-int
-NoSeekFile::read(void *dst, int bytes)
+std::streamsize
+NoSeekFile::read(void *dst, std::streamsize bytes)
 {
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	std::cerr << boost::format("read_cache(%d) called") % bytes << std::endl;
 #endif
 
-	if ( eof() )
+	if (eof())
 	{
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	    std::cerr << "read_cache: at eof!" << std::endl;
@@ -303,23 +304,23 @@ NoSeekFile::read(void *dst, int bytes)
 		return 0;
 	}
 
-
-	fill_cache(tell()+bytes);
+	fill_cache(bytes + tell());
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	printInfo();
 #endif
 
-	size_t ret = fread(dst, 1, bytes, _cache);
+    std::streamsize ret = std::fread(dst, 1, bytes, _cache);
 
-	if ( ret == 0 )
+	if (ret == 0)
 	{
-		if ( ferror(_cache) )
+		if (std::ferror(_cache))
 		{
-            std::cerr << "an error occurred while reading from cache" << std::endl;
+            std::cerr << "an error occurred while reading from cache" <<
+                std::endl;
 		}
 #if GNASH_NOSEEK_FD_VERBOSE
-		if ( feof(_cache) )
+		if (std::feof(_cache))
 		{
             std::cerr << "EOF reached while reading from cache" << std::endl;
 		}
@@ -327,7 +328,8 @@ NoSeekFile::read(void *dst, int bytes)
 	}
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
-    std::cerr << boost::format("fread from _cache returned %d") % ret << std::endl;
+    std::cerr << boost::format("fread from _cache returned %d") % ret <<
+        std::endl;
 #endif
 
 	return ret;
@@ -338,7 +340,7 @@ NoSeekFile::read(void *dst, int bytes)
 bool
 NoSeekFile::eof() const
 {
-	bool ret = ( ! _running && feof(_cache) );
+	bool ret = ( ! _running && std::feof(_cache) );
 	
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	std::cerr << boost::format("eof() returning %d") % ret << std::endl;
@@ -348,10 +350,10 @@ NoSeekFile::eof() const
 }
 
 /*public*/
-int
+std::streampos
 NoSeekFile::tell() const
 {
-	int ret = std::ftell(_cache);
+    std::streampos ret = std::ftell(_cache);
 
 #ifdef GNASH_NOSEEK_FD_VERBOSE
 	std::cerr << boost::format("tell() returning %ld") % ret << std::endl;
@@ -362,11 +364,11 @@ NoSeekFile::tell() const
 }
 
 /*public*/
-int
-NoSeekFile::seek(int pos)
+bool
+NoSeekFile::seek(std::streampos pos)
 {
 #ifdef GNASH_NOSEEK_FD_WARN_SEEKSBACK
-	if ( pos < tell() ) {
+	if (pos < tell()) {
 		std::cerr << boost::format("Warning: seek backward requested "
 		                "(%ld from %ld)") % pos % tell() << std::endl;
 	}
@@ -374,12 +376,12 @@ NoSeekFile::seek(int pos)
 
 	fill_cache(pos);
 
-	if ( std::fseek(_cache, pos, SEEK_SET) == -1 ) {
+	if (std::fseek(_cache, pos, SEEK_SET) == -1) {
 		std::cerr << "Warning: fseek failed" << std::endl;
-		return -1;
-	} else {
-		return 0;
-	}
+		return false;
+	} 
+    
+    return true;
 
 }
 

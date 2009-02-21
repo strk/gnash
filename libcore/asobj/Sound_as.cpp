@@ -211,7 +211,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     const movie_root& mr = _vm.getRoot();
     URL url(file, mr.runInfo().baseURL());
 
-    StreamProvider& streamProvider = mr.runInfo().streamProvider();
+    const StreamProvider& streamProvider = mr.runInfo().streamProvider();
     std::auto_ptr<IOChannel> inputStream(streamProvider.getStream(url));
     if ( ! inputStream.get() )
     {
@@ -222,7 +222,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     externalSound = true;
     isStreaming = streaming;
 
-    _mediaParser.reset( _mediaHandler->createMediaParser(inputStream).release() );
+    _mediaParser.reset(_mediaHandler->createMediaParser(inputStream).release());
     if ( ! _mediaParser )
     {
         log_error(_("Unable to create parser for Sound at %s"), url);
@@ -239,7 +239,8 @@ Sound_as::loadSound(const std::string& file, bool streaming)
     }
     else
     {
-        LOG_ONCE(log_unimpl("Non-streaming Sound.loadSound: will behave as a streaming one"));
+        LOG_ONCE(log_unimpl("Non-streaming Sound.loadSound: will behave "
+                    "as a streaming one"));
         // if not streaming, we'll probe on .start()
     }
 }

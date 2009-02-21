@@ -54,6 +54,7 @@
 //  2: informational messages
 //
 #define GNASH_PLUGIN_DEBUG 1
+//#define WRITE_FILE
 
 #include <sys/param.h>
 #include "plugin.h" 
@@ -704,7 +705,8 @@ nsPluginInstance::Write(NPStream* /*stream*/, int32_t /*offset*/, int32_t len,
 #ifdef WRITE_FILE
     write(_filefd, buffer, len);
 #endif
-    return write(_streamfd, buffer, len);
+    int written = write(_streamfd, buffer, len);
+    return written;
 }
 
 bool

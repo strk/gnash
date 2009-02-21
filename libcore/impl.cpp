@@ -322,23 +322,22 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
 
   std::auto_ptr<IOChannel> in;
 
-  StreamProvider& streamProvider = runInfo.streamProvider();
+  const StreamProvider& streamProvider = runInfo.streamProvider();
 
   const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-  StreamProvider::NamingPolicy cacheNamer = rcfile.saveLoadedMedia() ? 
-      streamProvider.currentNamingPolicy() : 0;
-
-  if ( postdata ) in = streamProvider.getStream(url, *postdata,
-          cacheNamer);
-  else in = streamProvider.getStream(url, cacheNamer);
+  if (postdata) {
+      in = streamProvider.getStream(url, *postdata, rcfile.saveLoadedMedia());
+  }
+  else in = streamProvider.getStream(url, rcfile.saveLoadedMedia());
 
   if ( ! in.get() )
   {
       log_error(_("failed to open '%s'; can't create movie"), url);
       return NULL;
   }
-  else if ( in->get_error() )
+  
+  if (in->bad())
   {
       log_error(_("streamProvider opener can't open '%s'"), url);
       return NULL;
@@ -365,7 +364,7 @@ getFileType(IOChannel& in)
 
     char buf[3];
     
-    if (3 > in.read(buf, 3))
+    if (in.read(buf, 3) < 3)
     {
         log_error(_("Can't read file header"));
         in.seek(0);
@@ -428,7 +427,7 @@ getFileType(IOChannel& in)
                 return GNASH_FILETYPE_UNKNOWN;
             }
         }
-        in.seek(in.tell() - 3); // position to start of the swf itself
+        in.seek(in.tell() - static_cast<std::streamoff>(3));
         return GNASH_FILETYPE_SWF;
     }
 

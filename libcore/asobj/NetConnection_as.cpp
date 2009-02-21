@@ -370,7 +370,7 @@ HTTPRemotingHandler::advance()
         // the buffer is full, 2) when we have a "length in bytes" value
         // thas is satisfied
 
-        if(_connection->get_error())
+        if (_connection->bad())
         {
             log_debug("connection is in error condition, calling "
                     "NetConnection.onStatus");
@@ -589,8 +589,12 @@ HTTPRemotingHandler::advance()
 #endif
         queued_count = 0;
 
-        _connection.reset(StreamProvider::getDefaultInstance().getStream(
-                    _url, postdata_str, _headers).release());
+        // TODO: it might be useful for a Remoting Handler to have a 
+        // StreamProvider member
+        const StreamProvider& sp =
+            _nc.getVM().getRoot().runInfo().streamProvider();
+
+        _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
 
         _postdata.resize(6);
 #ifdef GNASH_DEBUG_REMOTING
@@ -953,7 +957,7 @@ NetConnection_as::getStream(const std::string& name)
 {
     const RunInfo& ri = _vm.getRoot().runInfo();
 
-    StreamProvider& streamProvider = ri.streamProvider();
+    const StreamProvider& streamProvider = ri.streamProvider();
 
     // Construct URL with base URL (assuming not connected to RTMP server..)
     // TODO: For RTMP return the named stream from an existing RTMP connection.
@@ -964,10 +968,7 @@ NetConnection_as::getStream(const std::string& name)
 
     const RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
-    StreamProvider::NamingPolicy cacheNamer = rcfile.saveStreamingMedia() ? 
-        streamProvider.currentNamingPolicy() : 0;
-
-    return streamProvider.getStream(url, cacheNamer);
+    return streamProvider.getStream(url, rcfile.saveStreamingMedia());
 
 }
 

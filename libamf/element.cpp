@@ -1294,7 +1294,7 @@ Element::makeUnsupported()
 Element &
 Element::makeUnsupported(boost::uint8_t *data)
 {
-//    GNASH_REPORT_FUNCTION;    
+    UNUSED(data);
     _type = Element::UNSUPPORTED_AMF0;
     return *this;
 }
@@ -1320,7 +1320,7 @@ Element::makeLongString()
 Element &
 Element::makeLongString(boost::uint8_t *indata)
 {
-//    GNASH_REPORT_FUNCTION;    
+    UNUSED(indata);
     _type = Element::LONG_STRING_AMF0;
 //     check_buffer(size);
 //     _buffer->copy(indata, size);
@@ -1340,7 +1340,7 @@ Element::makeRecordSet()
 Element &
 Element::makeRecordSet(boost::uint8_t *data)
 {
-//    GNASH_REPORT_FUNCTION;
+    UNUSED(data);
     _type = Element::RECORD_SET_AMF0;
     return *this;
 }
@@ -1374,7 +1374,7 @@ Element &
 Element::makeDate(double date)
 {
 //    GNASH_REPORT_FUNCTION;
-    boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&date);
+    //boost::uint8_t *ptr = reinterpret_cast<boost::uint8_t *>(&date);
     _type = Element::DATE_AMF0;
     try {
 	check_buffer(AMF0_NUMBER_SIZE);

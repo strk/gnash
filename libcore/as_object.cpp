@@ -654,7 +654,8 @@ as_object::set_member(string_table::key key, const as_value& val,
 		Property* prop = _members.getProperty(key);
 		if ( ! prop )
 		{
-			log_debug("Property %s deleted by trigger on create", _vm.getStringTable().value(key));
+			log_debug("Property %s deleted by trigger on create", 
+                    _vm.getStringTable().value(key));
 		}
 		else
 		{
@@ -677,7 +678,6 @@ void
 as_object::init_member(string_table::key key, const as_value& val, int flags,
 	string_table::key nsname, int order)
 {
-	//log_debug(_("Initializing member %s for object %p"), _vm.getStringTable().value(key), (void*) this);
 
 	if (order >= 0 && !_members.
 		reserveSlot(static_cast<unsigned short>(order), key, nsname))
@@ -1055,25 +1055,33 @@ as_object::enumerateProperties(SortedPropertyList& to) const
 
 }
 
+as_object::as_object(movie_root& mr)
+	:
+	_vm(mr.getVM()),
+	_members(_vm)
+{
+}
+
+
 as_object::as_object()
 	:
-	_members(),
-	_vm(VM::get())
+	_vm(VM::get()),
+	_members(_vm)
 {
 }
 
 as_object::as_object(as_object* proto)
 	:
-	_members(),
-	_vm(VM::get())
+	_vm(VM::get()),
+	_members(_vm)
 {
 	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
-	_members(),
-	_vm(VM::get())
+	_vm(VM::get()),
+	_members(_vm)
 {
 	init_member(NSV::PROP_uuPROTOuu, as_value(proto));
 }
@@ -1085,9 +1093,8 @@ as_object::as_object(const as_object& other)
 #else
 	GcResource(), 
 #endif
-	_members(other._members),
-	_vm(VM::get())
-	//, m_prototype(other.m_prototype) // done by _members copy
+	_vm(VM::get()),
+	_members(other._members)
 {
 }
 
@@ -1389,7 +1396,7 @@ Trigger::call(const as_value& oldval, const as_value& newval, as_object& this_ob
 		args->push_back(newval);
 		args->push_back(_customArg);
 
-		fn_call fn(&this_obj, &env, args);
+		fn_call fn(&this_obj, env, args);
 
 		as_value ret = _func->call(fn);
 

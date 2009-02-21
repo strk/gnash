@@ -1,6 +1,6 @@
 // Player.cpp:  Top level SWF player, for gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,7 +34,9 @@
 #include "MovieClip.h" // for setting FlashVars
 #include "movie_root.h" 
 #include "Player.h"
+#include "StreamProvider.h"
 
+#include "NamingPolicy.h"
 #include "StringPredicates.h"
 #include "URL.h"
 #include "rc.h"
@@ -97,7 +99,8 @@ Player::Player()
     _fpsDebugTime(0.0),
 #endif
     _hostfd(-1),
-    _startFullscreen(false)
+    _startFullscreen(false),
+    _hideMenu(false)
 {
     init();
 }
@@ -297,7 +300,8 @@ Player::load_movie()
 
 /* \brief Run, used to open a new flash file. Using previous initialization */
 int
-Player::run(int argc, char* argv[], const std::string& infile, const std::string& url)
+Player::run(int argc, char* argv[], const std::string& infile,
+        const std::string& url)
 {
     
     // Call this at run() time, so the caller has
@@ -371,7 +375,12 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
 
     /// The RunInfo should be populated before parsing.
     _runInfo.reset(new RunInfo(baseURL.str()));
-    _runInfo->setSoundHandler(_soundHandler.get());
+    _runInfo->setSoundHandler(_soundHandler);
+
+    std::auto_ptr<NamingPolicy> np(new IncrementalRename(_baseurl));
+    boost::shared_ptr<StreamProvider> sp(new StreamProvider(np));
+
+    _runInfo->setStreamProvider(sp);
 
     // Load the actual movie.
     _movieDef = load_movie();
@@ -410,7 +419,7 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     SystemClock clock; // use system clock here...
     movie_root root(*_movieDef, clock, *_runInfo);
 
-    _callbacksHandler.reset(new CallbacksHandler(_gui.get())); 
+    _callbacksHandler.reset(new CallbacksHandler(*_gui, *this)); 
     
     // Register Player to receive events from the core (Mouse, Stage,
     // System etc)
@@ -460,6 +469,11 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     if (!_windowID && _startFullscreen) {
         _gui->setFullscreen();
     }
+
+    if (!_windowID && _hideMenu) {
+        _gui->hideMenu();
+    }
+    
     _gui->run();
 
     log_debug("Main loop ended, cleaning up");
@@ -470,49 +484,55 @@ Player::run(int argc, char* argv[], const std::string& infile, const std::string
     return EXIT_SUCCESS;
 }
 
+
+void
+Player::CallbacksHandler::error(const std::string& msg)
+{
+    _gui.error(msg);
+}
+
 bool
 Player::CallbacksHandler::yesNo(const std::string& query)
 {
-    return _gui->yesno(query);
+    return _gui.yesno(query);
 }
 
 std::string
 Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
 {
-    if (event == "Mouse.hide")
-    {
-        return _gui->showMouse(false) ? "true" : "false";
+    if (event == "Mouse.hide") {
+        return _gui.showMouse(false) ? "true" : "false";
     }
 
     if (event == "Mouse.show")
     {
-        return _gui->showMouse(true) ? "true" : "false";
+        return _gui.showMouse(true) ? "true" : "false";
     }
     
     if (event == "Stage.displayState")
     {
-        if (arg == "fullScreen") _gui->setFullscreen();
-        else if (arg == "normal") _gui->unsetFullscreen();
+        if (arg == "fullScreen") _gui.setFullscreen();
+        else if (arg == "normal") _gui.unsetFullscreen();
         return "";
     }
 
     if (event == "Stage.scaleMode" || event == "Stage.align" )
     {
-        _gui->updateStageMatrix();
+        _gui.updateStageMatrix();
         return "";
     }
     
     if (event == "System.capabilities.screenResolutionX")
     {
         std::ostringstream ss;
-        ss << _gui->getScreenResX();
+        ss << _gui.getScreenResX();
         return ss.str();
     }
 
     if (event == "System.capabilities.screenResolutionY")
     {
         std::ostringstream ss;
-        ss << _gui->getScreenResY();
+        ss << _gui.getScreenResY();
         return ss.str();
     }
 
@@ -521,25 +541,25 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
         std::ostringstream ss;
         // Whether the pp actively limits the precision or simply
         // gets a slightly different result isn't clear.
-        ss << std::setprecision(7) << _gui->getPixelAspectRatio();
+        ss << std::setprecision(7) << _gui.getPixelAspectRatio();
         return ss.str();
     }
 
     if (event == "System.capabilities.screenDPI")
     {
         std::ostringstream ss;
-        ss << _gui->getScreenDPI();
+        ss << _gui.getScreenDPI();
         return ss.str();
     }
 
     if (event == "System.capabilities.screenColor")
     {
-        return _gui->getScreenColor();
+        return _gui.getScreenColor();
     }
 
     if (event == "System.capabilities.playerType")
     {
-        return _gui->isPlugin() ? "PlugIn" : "StandAlone";
+        return _gui.isPlugin() ? "PlugIn" : "StandAlone";
     }
 
     log_error(_("Unhandled callback %s with arguments %s"), event, arg);
@@ -547,15 +567,16 @@ Player::CallbacksHandler::call(const std::string& event, const std::string& arg)
 }
 
 void
-Player::CallbacksHandler::notify(const std::string& command, const std::string& args)
+Player::CallbacksHandler::notify(const std::string& command,
+        const std::string& args)
 {
     //log_debug(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
     // it's _hostfd, but we're a static method...
-    int hostfd = VM::get().getRoot().getHostFD();
-    if ( hostfd != -1 )
+    const int hostfd = _player.getHostFD();
+    if (hostfd != -1)
     {
         //log_debug("user-provided host requests fd is %d", hostfd);
         std::stringstream request;
@@ -588,7 +609,7 @@ Player::CallbacksHandler::notify(const std::string& command, const std::string& 
 
     /// Fscommands can be ignored using an rcfile setting. As a 
     /// plugin they are always ignored.
-    if (_gui->isPlugin())
+    if (_gui.isPlugin())
     {
         // We log the request to the fd above
         log_debug(_("Running as plugin: skipping internal "
@@ -610,23 +631,23 @@ Player::CallbacksHandler::notify(const std::string& command, const std::string& 
     // FSCommand quit
     if (noCaseCompare(command, "quit"))
     {
-        _gui->quit();
+        _gui.quit();
         return;
     }
 
     // FSCommand fullscreen
     if (noCaseCompare(command, "fullscreen"))
     {
-        if (noCaseCompare(args, "true")) _gui->setFullscreen();
-        else if (noCaseCompare(args, "false")) _gui->unsetFullscreen();
+        if (noCaseCompare(args, "true")) _gui.setFullscreen();
+        else if (noCaseCompare(args, "false")) _gui.unsetFullscreen();
         return;
     }
        
     // FSCommand showmenu
     if (noCaseCompare(command, "showmenu"))
     {
-        if (noCaseCompare(args, "true")) _gui->showMenu(true);
-        else if (noCaseCompare(args, "false")) _gui->showMenu(false);
+        if (noCaseCompare(args, "true")) _gui.showMenu(true);
+        else if (noCaseCompare(args, "false")) _gui.showMenu(false);
         return;
     }
 
@@ -644,11 +665,11 @@ Player::CallbacksHandler::notify(const std::string& command, const std::string& 
     if (noCaseCompare(command, "allowscale"))
     {
         //log_debug("allowscale: %s", args);
-        if (noCaseCompare(args, "true")) _gui->allowScale(true);
+        if (noCaseCompare(args, "true")) _gui.allowScale(true);
         else
         {
-                if (strtol(args.c_str(), NULL, 0)) _gui->allowScale(true);
-                else _gui->allowScale(false);
+                if (strtol(args.c_str(), NULL, 0)) _gui.allowScale(true);
+                else _gui.allowScale(false);
         }
         return;
     }

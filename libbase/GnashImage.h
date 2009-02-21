@@ -394,9 +394,11 @@ public:
     /// @param type     The image format to write in (see libcore/gnash.h)
     /// @param out      The IOChannel to write to.
     /// @param image    The image to write.
-    /// @param quality  The quality of the image output (not used for all formats)
-    static void writeImageData(FileType type, boost::shared_ptr<gnash::IOChannel> out,
-                              const GnashImage& image, int quality);
+    /// @param quality  The quality of the image output (not used for all
+    ///                 formats)
+    static void writeImageData(FileType type,
+            boost::shared_ptr<gnash::IOChannel> out, const GnashImage& image,
+            int quality);
 
 
 protected:

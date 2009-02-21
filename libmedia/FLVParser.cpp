@@ -338,7 +338,7 @@ FLVParser::parseNextTag(bool index_only)
 
 	// Seek to next frame and skip the tag size 
 	//log_debug("FLVParser::parseNextTag seeking to %d", thisTagPos+4);
-	if ( _stream->seek(thisTagPos+4) )
+	if (!_stream->seek(thisTagPos+4))
 	{
 		log_error("FLVParser::parseNextTag: can't seek to %d", thisTagPos+4);
 
@@ -490,7 +490,7 @@ FLVParser::parseNextTag(bool index_only)
 // would be called by MAIN thread
 bool FLVParser::parseHeader()
 {
-	assert(_stream->tell() == 0);
+	assert(_stream->tell() == static_cast<std::streampos>(0));
 
 	// We only use 5 bytes of the header, because the last 4 bytes represent
         // an integer which is always 1.

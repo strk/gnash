@@ -24,7 +24,12 @@ if TESTSUITE
 TEST_DIR = testsuite
 endif
 
+# if USE_CGI
+CGI_DIR = cgi-bin
+# endif
+
 SUBDIRS = \
+	$(CGI_DIR) \
 	$(TEST_DIR) \
 	.
 
@@ -67,13 +72,20 @@ INCLUDES = -I.. \
 	$(PTHREAD_CFLAGS)
 
 noinst_HEADERS = \
+	cygnal.h \
 	rtmp_server.h \
+	proc.h \
 	crc.h
 
 bin_PROGRAMS = cygnal
+lib_LTLIBRARIES = libcygnal.la
 
-cygnal_SOURCES = cygnal.cpp crc.cpp cvm.cpp rtmp_server.cpp
-cygnal_LDADD = $(AM_LDFLAGS)
+cygnal_SOURCES = cygnal.cpp proc.cpp
+cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
+
+libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp 
+libcygnal_la_LIBADD = # $(AM_LDFLAGS) 
+
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

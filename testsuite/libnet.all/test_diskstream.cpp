@@ -154,7 +154,7 @@ test()
     }
 
     // close the currently opened file
-    ds1.close();
+//    ds1.close();
     if (ds1.getState() == DiskStream::CLOSED) {
         runtest.pass("close()");
     } else {

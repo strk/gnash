@@ -111,9 +111,9 @@ public:
 		init_member("constructor", as_function::getFunctionConstructor().get());
 	}
 
-	virtual as_value operator()(const fn_call& /*fn*/)
+	virtual as_value operator()(const fn_call& fn)
 	{
-		string_table& st = VM::get().getStringTable();
+		string_table& st = fn.getVM().getStringTable();
 		log_debug("Loading extension class %s", st.value(mDeclaration.name));
 
 		as_value super;
@@ -361,7 +361,8 @@ ClassHierarchy::markReachableResources() const
 	// TODO
 }
 
-std::ostream& operator << (std::ostream& os, const ClassHierarchy::nativeClass& c)
+std::ostream&
+operator<<(std::ostream& os, const ClassHierarchy::nativeClass& c)
 {
 	string_table& st = VM::get().getStringTable();
 
@@ -375,7 +376,8 @@ std::ostream& operator << (std::ostream& os, const ClassHierarchy::nativeClass& 
 	return os;
 }
 
-std::ostream& operator << (std::ostream& os, const ClassHierarchy::extensionClass& c)
+std::ostream&
+operator<<(std::ostream& os, const ClassHierarchy::extensionClass& c)
 {
 	string_table& st = VM::get().getStringTable();
 

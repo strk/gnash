@@ -79,9 +79,9 @@ test_cque_SOURCES = test_cque.cpp
 test_cque_LDADD = $(AM_LDFLAGS) 
 test_cque_DEPENDENCIES = site-update
 
-test_handler_SOURCES = test_handler.cpp
-test_handler_LDADD = $(AM_LDFLAGS) 
-test_handler_DEPENDENCIES = site-update
+# test_handler_SOURCES = test_handler.cpp
+# test_handler_LDADD = $(AM_LDFLAGS) 
+# test_handler_DEPENDENCIES = site-update
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

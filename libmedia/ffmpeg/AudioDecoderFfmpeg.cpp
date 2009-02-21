@@ -409,12 +409,16 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
 #endif
 
 		// all good so far, keep going..
-		// (we might do this immediately, as we'll override decodedBytes on error anyway)
+		// (we might do this immediately, as we'll override decodedBytes
+        // on error anyway)
 		decodedBytes += consumed;
 
         if ( ! framesize )
         {
-            assert(decodedBytes == inputSize);
+            // If nothing is consumed, this will fail. It can happen if a
+            // block is passed to the decoder when nothing can be 
+            // parsed from the block. This is probably a malformed SWF.
+            //assert(decodedBytes == inputSize);
 
             // NOTE: If this happens the caller sent us
             //       a block of data which is not composed
@@ -476,15 +480,20 @@ AudioDecoderFfmpeg::decode(const boost::uint8_t* input,
                     "capacity is only %d bytes",
                     retBufSize+(unsigned)outSize, retCapacity);
 #endif 
-			boost::uint8_t* tmp = retBuf;
-			retCapacity = std::max(retBufSize+static_cast<size_t>(outSize), retCapacity*2);
+
+            boost::uint8_t* tmp = retBuf;
+			retCapacity = std::max(retBufSize+static_cast<size_t>(outSize),
+                    retCapacity * 2);
+
 #ifdef GNASH_DEBUG_AUDIO_DECODING
-			log_debug("    reallocating it to hold up to %d bytes", retCapacity);
+			log_debug("    reallocating it to hold up to %d bytes",
+                    retCapacity);
 #endif // GNASH_DEBUG_AUDIO_DECODING
-			retBuf = new boost::uint8_t[retCapacity];
+
+            retBuf = new boost::uint8_t[retCapacity];
 			if ( retBufSize ) std::copy(tmp, tmp+retBufSize, retBuf);
 			delete [] tmp;
-		}
+        }
 		std::copy(outBuf.get(), outBuf.get()+outSize, retBuf+retBufSize);
 		retBufSize += static_cast<unsigned int>(outSize);
 	}

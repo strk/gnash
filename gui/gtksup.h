@@ -41,20 +41,27 @@ extern "C" {
 namespace gnash
 {
 
-typedef bool (*callback_t)(void*, int, void *data);
 
 class GtkGui : public Gui
 {
- public:
+public:
+
+    /// For the Gtk GUI FD listener, whatever that might be for.
+    typedef bool (*callback_t)(void*, int, void *data);
+
     GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    
     virtual ~GtkGui();
+    
+    /// GUI interface implementation
+
     virtual bool init(int argc, char **argv[]);
     virtual bool createWindow(int width, int height);
     virtual bool createWindow(const char *title, int width, int height);
 
     virtual bool run();
 
-    void quit();
+    virtual void quit();
 
     virtual bool createMenu();
     
@@ -71,6 +78,8 @@ class GtkGui : public Gui
     
     virtual void setFullscreen();
     virtual void unsetFullscreen();
+    
+    virtual void hideMenu();
 
     /// For System.capabilities information.
     virtual double getPixelAspectRatio();
@@ -116,69 +125,6 @@ class GtkGui : public Gui
     // Display an About dialogue
     void showAboutDialog();
 
-    // Menu Item callbacks
-    static void menuitem_sound_callback(GtkMenuItem *menuitem,
-                                   gpointer instance);
-    static void menuitem_fullscreen_callback(GtkMenuItem *menuitem,
-                                   gpointer instance);
-    static void menuitem_restart_callback(GtkMenuItem *menuitem,
-                                   gpointer instance);
-    static void menuitem_quit_callback(GtkMenuItem *menuitem,
-                                       gpointer instance);
-    static void menuitem_play_callback(GtkMenuItem *menuitem,
-                                       gpointer instance);
-    static void menuitem_pause_callback(GtkMenuItem *menuitem,
-                                        gpointer instance);
-    static void menuitem_stop_callback(GtkMenuItem *menuitem,
-                                       gpointer instance);
-    static void menuitem_step_forward_callback(GtkMenuItem *menuitem,
-                                        gpointer instance);
-    static void menuitem_step_backward_callback(GtkMenuItem *menuitem,
-                                         gpointer instance);
-    static void menuitem_jump_forward_callback(GtkMenuItem *menuitem,
-                                        gpointer instance);
-    static void menuitem_jump_backward_callback(GtkMenuItem *menuitem,
-                                                gpointer instance);
-    static void menuitem_about_callback(GtkMenuItem *menuitem,
-                                        gpointer instance);
-    static void menuitem_openfile_callback(GtkMenuItem *menuitem,
-                                           gpointer instance);
-    static void menuitem_preferences_callback(GtkMenuItem *menuitem,
-                                              gpointer instance);
-    static void menuitem_movieinfo_callback(GtkMenuItem *menuitem,
-                                              gpointer instance);
-
-    /// Force redraw (Ctrl-L)
-    static void menuitem_refresh_view_callback(GtkMenuItem *menuitem,
-                                   gpointer instance);
-    static void menuitem_show_updated_regions_callback(GtkMenuItem *menuitem,
-                                   gpointer instance); 
-
-    // GTK Event handlers
-    static gboolean realize_event(GtkWidget *widget, GdkEvent *event,
-                                  gpointer data);
-    static gboolean delete_event(GtkWidget *widget, GdkEvent *event,
-                                 gpointer data);
-    static gboolean expose_event(GtkWidget *widget, GdkEventExpose *event,
-                                 gpointer data);
-    static gboolean configure_event(GtkWidget *widget, GdkEventConfigure *event,
-                                    gpointer data);
-    static gboolean key_press_event(GtkWidget *widget, GdkEventKey *event,
-                                    gpointer data);
-    static gboolean key_release_event(GtkWidget *widget, GdkEventKey *event,
-                                    gpointer data);
-    static gboolean button_press_event(GtkWidget *widget, GdkEventButton *event,
-                                       gpointer data);
-    static gboolean button_release_event(GtkWidget *widget, GdkEventButton *event,
-                                         gpointer data);
-    static gboolean motion_notify_event(GtkWidget *widget, GdkEventMotion *event,
-                                        gpointer data);
-    static gint popup_handler(GtkWidget *widget, GdkEvent *event);    
-    
-    void add_pixmap_directory(const gchar *directory);
-
-    static gchar* find_pixmap_file(const gchar *filename);
-    
     void expose(const GdkRegion* region);
 
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
@@ -191,25 +137,28 @@ class GtkGui : public Gui
 
     virtual void showMenu(bool show);
 
-    // Adds the gnash icon to a window.
-    static void addGnashIcon(GtkWindow* window);
+    virtual void error(const std::string& msg);
 
- private:
+    GtkGlue& rendererGlue() { return *_glue; }
+
+private:
+
 #ifdef GUI_HILDON
     HildonProgram *_hildon_program;
 #endif
-    GtkWidget   *_window;
-    GtkWidget	*_resumeButton;
+
+    GtkWidget* _window;
+    GtkWidget* _resumeButton;
     
     // A window only for rendering the plugin as fullscreen.
-    GtkWidget	*_overlay;
+    GtkWidget* _overlay;
     
     // The area rendered into by Gnash
-    GtkWidget   *_drawingArea;    
+    GtkWidget* _drawingArea;    
 
-    GtkMenu     *_popup_menu;
-    GtkWidget   *_menubar;
-    GtkWidget   *_vbox;
+    GtkMenu* _popup_menu;
+    GtkWidget* _menubar;
+    GtkWidget* _vbox;
 
     /// Add key press events to the toplevel window.
     //
@@ -217,20 +166,13 @@ class GtkGui : public Gui
     /// window, so this function must be called every time
     /// the drawing area is reparented.
     void setupWindowEvents();
-    
-    static GdkPixbuf* createPixbuf(const gchar *filename);
 
 #ifdef USE_SWFTREE
     // Create a tree model for displaying movie info
     GtkTreeModel* makeTreeModel (std::auto_ptr<InfoTree> treepointer);
 #endif
 
-    std::auto_ptr<GtkGlue>     _glue;
-
-    static gnash::key::code gdk_to_gnash_key(guint key);
-    static int gdk_to_gnash_modifier(int state);
-
-    static void openFile(GtkWidget* dialog, gpointer data);
+    std::auto_ptr<GtkGlue> _glue;
 
     void stopHook();
     void playHook();
@@ -238,8 +180,6 @@ class GtkGui : public Gui
     guint _advanceSourceTimer;
 };
 
-// end of namespace gnash 
-}
+} // namespace gnash
 
-// end of __GTKSUP_H__
 #endif

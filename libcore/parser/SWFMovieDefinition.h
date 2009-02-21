@@ -43,6 +43,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/barrier.hpp>
+#include <boost/scoped_ptr.hpp>
 
 //
 // Forward declarations
@@ -506,12 +507,13 @@ private:
 
 	std::string _url;
 
-	std::auto_ptr<SWFStream> _str;
+    /// Non transferable stream.
+    boost::scoped_ptr<SWFStream> _str;
 
 	std::auto_ptr<IOChannel> _in;
 
 	/// swf end position (as read from header)
-	unsigned int _swf_end_pos;
+    size_t _swf_end_pos;
 
 	/// asyncronous SWF loader and parser
 	MovieLoader _loader;

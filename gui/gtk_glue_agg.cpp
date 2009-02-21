@@ -51,7 +51,7 @@ GtkAggGlue::~GtkAggGlue()
 }
 
 bool
-GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
+GtkAggGlue::init(int /*argc*/, char ** /*argv*/[])
 {
     return true;
 }
@@ -131,6 +131,7 @@ GtkAggGlue::render()
 {
     render(0, 0, _offscreenbuf->width, _offscreenbuf->height);
 }
+
 
 void
 GtkAggGlue::render(int minx, int miny, int maxx, int maxy)

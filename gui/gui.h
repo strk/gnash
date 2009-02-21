@@ -253,6 +253,10 @@ public:
     /// Return from fullscreen to normal mode.
     ///
     virtual void unsetFullscreen();
+
+    /// Hide the menu bar when using standalone player
+    ///
+    virtual void hideMenu();
     
     /// Sets whether the gui should show the system mouse pointer
     //
@@ -315,11 +319,6 @@ public:
     /// state.
     void restart();
 
-    void menu_step_forward();
-    void menu_step_backward();
-    void menu_jump_forward();
-    void menu_jump_backward();
-
     /// Toggle sound state between muted and unmuted. If
     /// there is no active sound handler this does nothing.
     void toggleSound();
@@ -360,6 +359,12 @@ public:
     /// Set the stage to advance/display
     void setStage(movie_root* stage);
 
+    /// Handle error message from the core
+    //
+    /// @param msg        The error message recieved
+    ///
+    virtual void error(const std::string& /*msg*/) {}
+
     /// Prompt user with a question she can answer with yes/no
     //
     /// @param question
@@ -371,6 +376,8 @@ public:
     /// The default implementation always returns true.
     ///
     virtual bool yesno(const std::string& question);
+
+    movie_root* getStage() const { return _stage; }
 
 protected:
 
