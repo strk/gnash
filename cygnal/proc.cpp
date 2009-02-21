@@ -99,25 +99,30 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
     }
 
     // setup a command line. By default, argv[0] is the name of the process
-    cmd_line[0] = new char(filespec.size());
-    strcpy(cmd_line[0], filespec.c_str());
-
-    // When running multiple cgis, we prefer to specify the port it's using.
-    if (port > 0) {
-        cmd_line[1] = new char(10);
-        sprintf(cmd_line[1], "-p %d", port);
-    }
+    cmd_line[0] = new char(filespec.size()+1);
+    strncpy(cmd_line[0], filespec.c_str(), filespec.size());
 
     // If the parent has verbosity on, chances are the child should too.
-    if (dbglogfile.getVerbosity() > 0) {
-        cmd_line[2] = "-vv";
-    }
+//     if (dbglogfile.getVerbosity() > 0) {
+    cmd_line[1] = new char(4);
+    strcpy(cmd_line[1], "-vv");
+    cmd_line[2] = 0;
+//     }
     
+    // When running multiple cgis, we prefer to specify the port it's using.
+    if (port > 0) {
+        cmd_line[2] = new char(3);
+        strcpy(cmd_line[2], "-p");
+        cmd_line[3] = new char(10);
+        sprintf(cmd_line[3], "%d", port);
+        cmd_line[4] = 0;
+    }
+
 
     // fork ourselves silly
     childpid = fork();
     
-    boost::mutex::scoped_lock lock(_mutex);
+//    boost::mutex::scoped_lock lock(_mutex);
     
     // childpid is a positive integer, if we are the parent, and fork() worked
     if (childpid > 0) {
