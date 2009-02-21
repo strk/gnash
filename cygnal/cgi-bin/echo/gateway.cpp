@@ -52,8 +52,9 @@ main(int argc, char *argv[])
 {
     int port = 1234;
     bool done = false;
+    bool gdb = false;
     
-    dbglogfile.setLogFilename("echo-test.log");
+    dbglogfile.setLogFilename("gateway-test.log");
 //    dbglogfile.setWriteDisk(true);
 
     const Arg_parser::Option opts[] =
@@ -62,6 +63,7 @@ main(int argc, char *argv[])
             { 'v', "verbose",       Arg_parser::no  },
             { 'n', "netdebug",      Arg_parser::no  },
             { 'p', "port",          Arg_parser::yes  },
+            { 'g', "gdb",           Arg_parser::no  },
             { 'd', "dump",          Arg_parser::no  },
         };
     
@@ -88,6 +90,9 @@ main(int argc, char *argv[])
               case 'n':
                   netdebug = true;
                   break;
+              case 'g':
+                  gdb = true;
+                  break;
               case 'p':
                   port = parser.argument<int>(i);
                   break;
@@ -103,6 +108,13 @@ main(int argc, char *argv[])
             log_error(_("Error parsing command line options: %s"), e.what());
         }
     }
+
+    // if set, wait for us to connectGDB for debugging
+    while (gdb) {
+        cout << "Waiting for GDB " << getpid() << endl;
+        sleep(5);
+    }
+    
     
     GatewayTest net;
 
@@ -110,25 +122,32 @@ main(int argc, char *argv[])
 	net.toggleDebug(true);
     }
 
+    int fd = 0;
     int netfd = 0;
     if (infile.empty()) {
-        int fd = net.createServer(port);
+        fd = net.createServer(port);
         // Only wait for a limited time.
         net.setTimeout(10);
-        netfd = net.newConnection(false, fd);
+//        netfd = net.newConnection(false, fd);
     }
     
     // Wait for data, and when we get it, process it.
     boost::shared_ptr<amf::Buffer> content;
     vector<boost::shared_ptr<amf::Element> > headers;
     int ret = 0;
-    net.setTimeout(30);
+    net.setTimeout(10);
     do {
+        netfd = net.newConnection(false, fd);
+        if (netfd <= 0) {
+            done = true;
+            break;
+        }
         // See if we have any messages waiting
         if (infile.empty()) {
             boost::shared_ptr<amf::Buffer> content = net.readNet();
             if (!content) {
                 done = true;
+                break;
             }
 //            content->dump();
             headers = net.parseEchoRequest(*content);
@@ -139,6 +158,7 @@ main(int argc, char *argv[])
             headers = net.parseEchoRequest(filestream.get(), filestream.getPagesize());
             filestream.close();
             done = true;
+            break;
         }
         
   	//boost::shared_ptr<amf::Element> &el0 = headers[0];
@@ -146,12 +166,20 @@ main(int argc, char *argv[])
         if (!done) {
             if (headers.size() >= 4) {
                 if (headers[3]) {
-                    amf::Buffer &reply = net.formatEchoResponse(headers[1]->getName(), *headers[3]);
+                    amf::Buffer reply;
+                    if (headers[1]->getNameSize()) {
+                        reply = net.formatEchoResponse(headers[1]->getName(), *headers[3]);
+                    } else {
+                        reply = net.formatEchoResponse("no name", *headers[3]);
+                    }
+                    
                     if (infile.empty()) {
-                        net.writeNet(netfd, reply);
+                        int ret = net.writeNet(netfd, reply);
+                        if (ret <= 0) {
 //                        reply.dump();
-                        // For now exit after only one packet
-                        done = true;
+                            // For now exit after only one packet
+                            done = true;
+                        }
                     } else {
                         cerr << hexify(reply.reference(), reply.allocated(), true) << endl;
                     }
@@ -159,6 +187,8 @@ main(int argc, char *argv[])
             }
         }
     } while(done != true);
+
+    net.closeNet();
 }
 
 GatewayTest::GatewayTest()
