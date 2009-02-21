@@ -1209,8 +1209,7 @@ rtmp_handler(Network::thread_params_t *args)
 				if (body) {
 				    if (body->getMethodName() == "connect") {
 					response = rtmp->encodeResult(RTMPMsg::NC_CONNECT_SUCCESS);
-				    } else if (body->getMethodName() == "createS
-tream") {
+				    } else if (body->getMethodName() == "createStream") {
 					response = rtmp->encodeResult(RTMPMsg::NS_DATA_START);
 				    } else {
 					response = rtmp->encodeResult(RTMPMsg::NS_FAILED);
