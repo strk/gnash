@@ -80,10 +80,10 @@ noinst_HEADERS = \
 bin_PROGRAMS = cygnal
 lib_LTLIBRARIES = libcygnal.la
 
-cygnal_SOURCES = cygnal.cpp proc.cpp
+cygnal_SOURCES = cygnal.cpp
 cygnal_LDADD = $(AM_LDFLAGS) libcygnal.la
 
-libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp http_server.cpp 
+libcygnal_la_SOURCES = crc.cpp cvm.cpp rtmp_server.cpp http_server.cpp  proc.cpp
 libcygnal_la_LIBADD = 
 
 
