@@ -124,30 +124,14 @@ public:
     HTTP(Handler *hand);
     ~HTTP();
 
-    // These are for the protocol itself
-    http_method_e processClientRequest(int fd);
-    bool processGetRequest(int fd);
-    bool processPostRequest(int fd);
-    bool processPutRequest(int fd);
-    bool processDeleteRequest(int fd);
-    bool processConnectRequest(int fd);
-    bool processOptionsRequest(int fd);
-    bool processHeadRequest(int fd);
-    bool processTraceRequest(int fd);
-
     // Check the Header fields to make sure they're valid values.
     bool checkRequestFields(amf::Buffer &buf);
     bool checkEntityFields(amf::Buffer &buf);
     bool checkGeneralFields(amf::Buffer &buf);
 
-    // Parse an Echo Request message coming from the Red5 echo_test.
+//     // Parse an Echo Request message coming from the Red5 echo_test.
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
-    
-    // process all the header fields in the Buffer, storing them internally
-    // in _fields. The address returned is the address where the Content data
-    // starts, and is "Content-Length" bytes long, of "Content-Type" data.
-    boost::uint8_t *processHeaderFields(amf::Buffer &buf);
     
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
@@ -156,30 +140,10 @@ public:
 
     // Get an array of values for header field 'name'.
     boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
-    
-    // Handle the response for the request.
-    boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
-    amf::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
-    amf::Buffer &formatGetReply(size_t size, http_status_e code); 
-    amf::Buffer &formatGetReply(http_status_e code); 
-    amf::Buffer &formatPostReply(rtmpt_cmd_e code);
 
     // Make copies of ourself
     HTTP &operator = (HTTP &obj);
 
-    // These methods extract data from an RTMPT message. RTMP is an
-    // extension to HTTP that adds commands to manipulate the
-    // connection's persistance.
-    rtmpt_cmd_e extractRTMPT(boost::uint8_t *data);
-    rtmpt_cmd_e extractRTMPT(amf::Buffer &data)
-	{ return extractRTMPT(data.reference()); };
-
-    // Examine the beginning of the data for an HTTP request command
-    // like GET or POST, etc...
-    http_method_e extractCommand(boost::uint8_t *data);
-    http_method_e extractCommand(amf::Buffer &data)
-	{ return extractCommand(data.reference()); };    
-    
     /// @note These methods add data to the fields in the HTTP header.
     /// \brief clear the data in the stored header
     bool clearHeader();
@@ -245,7 +209,7 @@ public:
     // All HTTP messages are terminated with a blank line
     void terminateHeader() { _buffer += "\r\n"; };    
     
-    amf::Buffer &formatErrorResponse(http_status_e err);
+//     amf::Buffer &formatErrorResponse(http_status_e err);
     
     // Return the header that's been built up.
     boost::uint8_t *getHeader() { return _buffer.reference(); };
@@ -328,10 +292,10 @@ protected:
     std::string		_docroot;
 };  
 
-// This is the thread for all incoming HTTP connections
-extern "C" {
-    bool http_handler(Network::thread_params_t *args);
-}
+// // This is the thread for all incoming HTTP connections
+// extern "C" {
+//     bool http_handler(Network::thread_params_t *args);
+// }
 
 
 } // end of gnash namespace

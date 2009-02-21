@@ -137,6 +137,7 @@ HTTP::operator = (HTTP& /*obj*/)
     return *this; 
 }
 
+#if 0				// FIXME:
 HTTP::http_method_e
 HTTP::processClientRequest(int fd)
 {
@@ -421,6 +422,7 @@ HTTP::processTraceRequest(int /* fd */)
     log_unimpl("TRACE request");
     return false;
 }
+#endif
 
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 (5.3 Request Header Fields)
 bool
@@ -503,101 +505,6 @@ HTTP::checkGeneralFields(amf::Buffer & /* buf */)
 	};
 #endif
     return false;
-}
-
-boost::uint8_t *
-HTTP::processHeaderFields(amf::Buffer &buf)
-{
-  //    GNASH_REPORT_FUNCTION;
-    string head(reinterpret_cast<const char *>(buf.reference()));
-
-    // The end of the header block is always followed by a blank line
-    string::size_type end = head.find("\r\n\r\n", 0);
-//    head.erase(end, buf.size()-end);
-    Tok t(head, Sep("\r\n"));
-    for (Tok::iterator i = t.begin(); i != t.end(); ++i) {
-	string::size_type pos = i->find(":", 0);
- 	if (pos != string::npos) {
-	    string name = i->substr(0, pos);
-	    string value = i->substr(pos+2, i->size());
- 	    std::transform(name.begin(), name.end(), name.begin(), 
- 			   (int(*)(int)) tolower);
- 	    std::transform(value.begin(), value.end(), value.begin(), 
- 			   (int(*)(int)) tolower);
- 	    _fields[name] = value;
-	    if (name == "keep-alive") {
-		_keepalive = true;
-		if ((value != "on") && (value != "off")) {
-		    _max_requests = strtol(value.c_str(), NULL, 0);
-		    log_debug("Setting Max Requests for Keep-Alive to %d", _max_requests);
-		}
-	    }
-	    if (name == "connection") {
-		if (value.find("keep-alive", 0) != string::npos) {
-		    _keepalive = true;
-		}
-	    }
-	    if (name == "content-length") {
-		_filesize = strtol(value.c_str(), NULL, 0);
-		log_debug("Setting Content Length to %d", _filesize);
-	    }
-	    if (name == "content-type") {
-		// This is the type used by flash when sending a AMF data via POST
-		if (value == "application/x-amf") {
-//		    log_debug("Got AMF data in the POST request!");
-		    _filetype = DiskStream::FILETYPE_AMF;
-		}
-		// This is the type used by wget when sending a file via POST
-		if (value == "application/x-www-form-urlencoded") {
-//		    log_debug("Got file data in the POST request");
-		    _filetype = DiskStream::FILETYPE_ENCODED;
-		}
-		log_debug("Setting Content Type to %d", _filetype);
-	    }
-	    
-//	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
-	} else {
-	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
-	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
-		break;
-#if 1
-	    } else {
-		log_debug("Got a request, parsing \"%s\"", *i);
-		string::size_type start = i->find(" ");
-		string::size_type params = i->find("?");
-		string::size_type pos = i->find("HTTP/");
-		if (pos != string::npos) {
-		    // The version is the last field and is the protocol name
-		    // followed by a slash, and the version number. Note that
-		    // the version is not a double, even though it has a dot
-		    // in it. It's actually two separate integers.
-		    _version.major = i->at(pos+5) - '0';
-		    _version.minor = i->at(pos+7) - '0';
-		    log_debug (_("Version: %d.%d"), _version.major, _version.minor);
-		    // the filespec in the request is the middle field, deliminated
-		    // by a space on each end.
-		    if (params != string::npos) {
-			_params = i->substr(params+1, end);
-			_filespec = i->substr(start+1, params);
-			log_debug("Parameters for file: \"%s\"", _params);
-		    } else {
-			_filespec = i->substr(start+1, pos-start-2);
-		    }
-		    log_debug("Requesting file: \"%s\"", _filespec);
-
-		    // HTTP 1.1 enables persistant network connections
-		    // by default.
-		    if (_version.minor > 0) {
-			log_debug("Enabling Keep Alive by default for HTTP > 1.0");
-			_keepalive = true;
-		    }
-		}
-	    }
-#endif
-	}
-    }
-    
-    return buf.reference() + end + 4;
 }
 
 boost::shared_ptr<std::vector<std::string> >
@@ -822,43 +729,6 @@ HTTP::formatHeader(DiskStream::filetype_e type, size_t size, http_status_e code)
 }
 
 amf::Buffer &
-HTTP::formatErrorResponse(http_status_e code)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    char num[12];
-    // First build the message body, so we know how to set Content-Length
-    _buffer += "<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\">\r\n";
-    _buffer += "<html><head>\r\n";
-    _buffer += "<title>";
-    sprintf(num, "%d", code);
-    _buffer += num;
-    _buffer += " Not Found</title>\r\n";
-    _buffer += "</head><body>\r\n";
-    _buffer += "<h1>Not Found</h1>\r\n";
-    _buffer += "<p>The requested URL ";
-    _buffer += _filespec;
-    _buffer += " was not found on this server.</p>\r\n";
-    _buffer += "<hr>\r\n";
-    _buffer += "<address>Cygnal (GNU/Linux) Server at ";
-    _buffer += getField("host");
-    _buffer += " </address>\r\n";
-    _buffer += "</body></html>\r\n";
-
-    // First build the header
-    formatDate();
-    formatServer();
-    formatContentLength(_filesize);
-    formatConnection("close");
-    formatContentType(_filetype);
-
-    // All HTTP messages are followed by a blank line.
-    terminateHeader();
-
-    return _buffer;
-}
-
-amf::Buffer &
 HTTP::formatDate()
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1028,72 +898,6 @@ HTTP::formatLastModified()
     date << " GMT";
 
     return formatLastModified(date.str());
-}
-
-amf::Buffer &
-HTTP::formatGetReply(http_status_e code)
-{
-
-//    GNASH_REPORT_FUNCTION;
-    
-    return formatHeader(_filesize, code);
-}
-
-amf::Buffer &
-HTTP::formatGetReply(size_t size, http_status_e code)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    formatHeader(size, code);
-    
-//    int ret = Network::writeNet(_header.str());    
-//    boost::uint8_t *ptr = (boost::uint8_t *)_body.str().c_str();
-//     buf->copy(ptr, _body.str().size());
-//    _handler->dump();
-
-#if 0
-    if (_header.str().size()) {
-        log_debug (_("Sent GET Reply"));
-	return _buffer;
-    } else {
-	clearHeader();
-	log_debug (_("Couldn't send GET Reply, no header data"));
-    }    
-#endif
-    
-    return _buffer;
-}
-
-amf::Buffer &
-HTTP::formatPostReply(rtmpt_cmd_e /* code */)
-{
-    GNASH_REPORT_FUNCTION;
-
-    formatDate();
-    formatServer();
-    formatContentType(DiskStream::FILETYPE_AMF);
-    // All HTTP messages are followed by a blank line.
-    terminateHeader();
-    return _buffer;
-
-#if 0
-    formatHeader(_filesize, code);
-    boost::shared_ptr<amf::Buffer> buf = new amf::Buffer;
-    if (_header.str().size()) {
-	buf->resize(_header.str().size());
-	string str = _header.str();
-	buf->copy(str);
-	_handler->pushout(buf);
-	_handler->notifyout();
-        log_debug (_("Sent GET Reply"));
-	return true; // Default to true
-    } else {
-	clearHeader();
-	log_debug (_("Couldn't send POST Reply, no header data"));
-    }
-#endif
-
-    return _buffer;
 }
 
 // Parse an Echo Request message coming from the Red5 echo_test. This
@@ -1283,133 +1087,6 @@ HTTP::formatRequest(const string & /* url */, http_method_e /* req */)
     return _buffer;
 }
 
-/// These methods extract data from an RTMPT message. RTMP is an
-/// extension to HTTP that adds commands to manipulate the
-/// connection's persistance.
-//
-/// The URL to be opened has the following form:
-/// http://server/<comand>/[<client>/]<index>
-/// <command>
-///    denotes the RTMPT request type, "OPEN", "SEND", "IDLE", "CLOSE")
-/// <client>
-///    specifies the id of the client that performs the requests
-///    (only sent for established sessions)
-/// <index>
-///    is a consecutive number that seems to be used to detect missing packages
-HTTP::rtmpt_cmd_e
-HTTP::extractRTMPT(boost::uint8_t *data)
-{
-    GNASH_REPORT_FUNCTION;
-
-    string body = reinterpret_cast<const char *>(data);
-    string tmp, cid, indx;
-    HTTP::rtmpt_cmd_e cmd;
-
-    // force the case to make comparisons easier
-    std::transform(body.begin(), body.end(), body.begin(), 
-               (int(*)(int)) toupper);
-    string::size_type start, end;
-
-    // Extract the command first
-    start = body.find("OPEN", 0);
-    if (start != string::npos) {
-        cmd = HTTP::OPEN;
-    }
-    start = body.find("SEND", 0);
-    if (start != string::npos) {
-        cmd = HTTP::SEND;
-    }
-    start = body.find("IDLE", 0);
-    if (start != string::npos) {
-        cmd = HTTP::IDLE;
-    }
-    start = body.find("CLOSE", 0);
-    if (start != string::npos) {
-        cmd = HTTP::CLOSE;
-    }
-
-    // Extract the optional client id
-    start = body.find("/", start+1);
-    if (start != string::npos) {
-	end = body.find("/", start+1);
-	if (end != string::npos) {
-	    indx = body.substr(end, body.size());
-	    cid = body.substr(start, (end-start));
-	} else {
-	    cid = body.substr(start, body.size());
-	}
-    }
-
-    _index = strtol(indx.c_str(), NULL, 0);
-    _clientid = strtol(cid.c_str(), NULL, 0);
-    end =  body.find("\r\n", start);
-//     if (end != string::npos) {
-//         cmd = HTTP::CLOSE;
-//     }
-
-    return cmd;
-}
-
-HTTP::http_method_e
-HTTP::extractCommand(boost::uint8_t *data)
-{
-    GNASH_REPORT_FUNCTION;
-
-//    string body = reinterpret_cast<const char *>(data);
-    HTTP::http_method_e cmd = HTTP::HTTP_NONE;
-
-    // force the case to make comparisons easier
-//     std::transform(body.begin(), body.end(), body.begin(), 
-//                (int(*)(int)) toupper);
-
-    // Extract the command
-    if (memcmp(data, "GET", 3) == 0) {
-        cmd = HTTP::HTTP_GET;
-    } else if (memcmp(data, "POST", 4) == 0) {
-        cmd = HTTP::HTTP_POST;
-    } else if (memcmp(data, "HEAD", 4) == 0) {
-        cmd = HTTP::HTTP_HEAD;
-    } else if (memcmp(data, "CONNECT", 7) == 0) {
-        cmd = HTTP::HTTP_CONNECT;
-    } else if (memcmp(data, "TRACE", 5) == 0) {
-        cmd = HTTP::HTTP_TRACE;
-    } else if (memcmp(data, "PUT", 3) == 0) {
-        cmd = HTTP::HTTP_PUT;
-    } else if (memcmp(data, "OPTIONS", 4) == 0) {
-        cmd = HTTP::HTTP_OPTIONS;
-    } else if (memcmp(data, "DELETE", 4) == 0) {
-        cmd = HTTP::HTTP_DELETE;
-    }
-
-    // For valid requests, the second argument, delimited by spaces
-    // is the filespec of the file being requested or transmitted.
-    if (cmd != HTTP::HTTP_NONE) {
-	boost::uint8_t *start = std::find(data, data+7, ' ') + 1;
-	boost::uint8_t *end   = std::find(start + 2, data+PATH_MAX, ' ');
-	boost::uint8_t *params = std::find(start, end, '?');
-	if (params != end) {
-	    _params = std::string(params+1, end);
-	    _filespec = std::string(start, params);
-	    log_debug("Parameters for file: \"%s\"", _params);
-	} else {
-	    // This is fine as long as end is within the buffer.
-	    _filespec = std::string(start, end);
-	}
-	log_debug("Requesting file: \"%s\"", _filespec);
-
-	// The third field is always the HTTP version
-	// The version is the last field and is the protocol name
-	// followed by a slash, and the version number. Note that
-	// the version is not a double, even though it has a dot
-	// in it. It's actually two separate integers.
-	_version.major = *(end+6) - '0';
-	_version.minor = *(end+8) - '0';
-	log_debug (_("Version: %d.%d"), _version.major, _version.minor);
-    }
-
-    return cmd;
-}
-
 /// \brief Send a message to the other end of the network connection.
 ///`	Sends the contents of the _header and _body private data to
 ///	the already opened network connection.
@@ -1533,92 +1210,6 @@ HTTP::dump() {
     log_debug("RTMPT optional client ID is: ", _clientid);
     log_debug (_("==== ==== ===="));
 }
-
-extern "C" {
-bool
-http_handler(Network::thread_params_t *args)
-{
-//    GNASH_REPORT_FUNCTION;
-//    struct thread_params thread_data;
-    string url, filespec, parameters;
-    HTTP *www = new HTTP;
-    bool result = false;
-    
-//    Network *net = reinterpret_cast<Network *>(args->handler);
-    bool done = false;
-//    www.setHandler(net);
-
-    log_debug(_("Starting HTTP Handler for fd #%d, tid %ld"),
-	      args->netfd, get_thread_id());
-    
-    string docroot = args->filespec;
-
-    www->setDocRoot(docroot);
-    log_debug("Starting to wait for data in net for fd #%d", args->netfd);
-
-    // Wait for data, and when we get it, process it.
-    do {
-	
-#ifdef USE_STATISTICS
-	struct timespec start;
-	clock_gettime (CLOCK_REALTIME, &start);
-#endif
-
-	// See if we have any messages waiting
-	if (www->recvMsg(args->netfd) == 0) {
-	    done = true;
-	}
-
-	// Process incoming messages
-	if (!www->processClientRequest(args->netfd)) {
-//	    hand->die();	// tell all the threads for this connection to die
-//	    hand->notifyin();
-	    log_debug("Net HTTP done for fd #%d...", args->netfd);
-//	    done = true;
-	}
-//	www.dump();
-	
-#if 0
-	string response = cache.findResponse(filestream->getFilespec());
-	if (response.empty()) {
-	    cerr << "FIXME no cache hit for: " << www.getFilespec() << endl;
-//	    www.clearHeader();
-// 	    amf::Buffer &ss = www.formatHeader(filestream->getFileSize(), HTTP::LIFE_IS_GOOD);
-// 	    www.writeNet(args->netfd, (boost::uint8_t *)www.getHeader().c_str(), www.getHeader().size());
-// 	    cache.addResponse(www.getFilespec(), www.getHeader());
-	} else {
-	    cerr << "FIXME cache hit on: " << www.getFilespec() << endl;
-	    www.writeNet(args->netfd, (boost::uint8_t *)response.c_str(), response.size());
-	}	
-#endif
-	
-	// Unless the Keep-Alive flag is set, this isn't a persisant network
-	// connection.
-	if (!www->keepAlive()) {
-	    log_debug("Keep-Alive is off", www->keepAlive());
-	    result = false;
-	    done = true;
-	} else {
-	    log_debug("Keep-Alive is on", www->keepAlive());
-	    result = true;
-//	    done = true;
-	}
-#ifdef USE_STATISTICS
-	struct timespec end;
-	clock_gettime (CLOCK_REALTIME, &end);
-	log_debug("Processing time for GET request was %f seconds",
-		  (float)((end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec)/1e9)));
-#endif
-    } while(done != true);
-    
-//    hand->notify();
-    
-    log_debug("http_handler all done now finally...");
-
-    return result;
-} // end of httphandler
-    
-} // end of extern C
 
 } // end of gnash namespace
 
