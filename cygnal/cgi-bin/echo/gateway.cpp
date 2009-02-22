@@ -126,6 +126,9 @@ main(int argc, char *argv[])
     int netfd = 0;
     if (infile.empty()) {
         fd = net.createServer(port);
+        if (fd <= 0) {
+            exit(1);
+        }
         // Only wait for a limited time.
         net.setTimeout(10);
 //        netfd = net.newConnection(false, fd);
