@@ -264,6 +264,7 @@ public:
     
     void setHandler(Handler *hand) { _handler = hand; };
     void setDocRoot(const std::string &path) { _docroot = path; };
+    std::string &getDocRoot() { return _docroot; };
     
 protected:
     typedef boost::char_separator<char> Sep;
