@@ -44,6 +44,7 @@
 #include "element.h"
 #include "cque.h"
 #include "log.h"
+#include "crc.h"
 #include "network.h"
 #include "handler.h"
 #include "utility.h"
@@ -68,7 +69,10 @@ static boost::mutex stl_mutex;
 namespace cygnal
 {
 
+// The rcfile is loaded and parsed here:
+static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 static Cache& cache = Cache::getDefaultInstance();
+// static Proc& cgis = Proc::getDefaultInstance();
 
 HTTPServer::HTTPServer() 
 {
@@ -289,25 +293,24 @@ HTTPServer::processPostRequest(int fd)
     // Send the reply
 
     // NOTE: this is a "special" path we trap until we have real CGI support
-    if ((_filespec == "/echo/gateway")
+    if ((getField("content-type") == "application/x-amf")
 	&& (getField("content-type") == "application/x-amf")) {
 #if 1
-	Proc echo;
-//	echo.startCGI("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin/echo/gateway", true, 1234);
-	echo.createClient("localhost", 1234);
-	echo.writeNet(*content);
-	boost::shared_ptr<amf::Buffer> reply = echo.readNet();
+	if (_filespec == "/echo/gateway") {
+	}
+	
+	Proc cgis;
+  	cgis.setDocroot(_docroot);
+//  	cgis.setDocroot("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin");
+  	cgis.startCGI("/echo/gateway", true, 1234);
+ 	cgis.createClient("localhost", 1234);
+	cgis.writeNet(*content);
+	boost::shared_ptr<amf::Buffer> reply = cgis.readNet();
 	writeNet(fd, *reply);
-//	echo.stopCGI("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin/echo/gateway");
+//	cgis.stopCGI("/echo/gateway");
 #else
-//	const char *num = (const char *)buf->at(10);
-//	log_debug("Got CGI echo request in POST");
-//	cerr << "FIXME 2: " << hexify(content->reference(), content->allocated(), true) << endl;
-
 	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(*content);
   	//boost::shared_ptr<amf::Element> &el0 = headers[0];
-  	//boost::shared_ptr<amf::Element> &el1 = headers[1];
-  	//boost::shared_ptr<amf::Element> &el3 = headers[3];
 	
 	if (headers.size() >= 4) {
 	    if (headers[3]) {
@@ -891,6 +894,8 @@ http_handler(Network::thread_params_t *args)
     
     string docroot = args->filespec;
 
+//     cgis.setDocroot(args->filespec);
+    
     www->setDocRoot(docroot);
     log_debug("Starting to wait for data in net for fd #%d", args->netfd);
 
