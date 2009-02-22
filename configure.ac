@@ -424,16 +424,6 @@ AC_ARG_ENABLE(cygnal,
 esac],cygnal=no)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
 
-dnl Build the cgibins server if specified.
-AC_ARG_ENABLE(cgibins,
-  AC_HELP_STRING([--enable-cgibin], [Enable building of the CGIs for Cygnal]),
-[case "${enableval}" in
-  yes) cgibin=yes ;;
-  no)  cgibin=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-cgibin option]) ;;
-esac],cgibin=yes)
-AM_CONDITIONAL(USE_CGI, test x$cgibin = xyes)
-
 dnl Fix the Intel 810 LOD bias problem
 AC_ARG_ENABLE(i810-lod-bias,
   AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
