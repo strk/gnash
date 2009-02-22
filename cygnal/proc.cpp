@@ -57,6 +57,15 @@ Proc::startCGI(void)
     return false;
 }
 
+Proc&
+Proc::getDefaultInstance()
+{
+//    GNASH_REPORT_FUNCTION;
+    static Proc c;
+    return c;
+}
+
+
 bool
 Proc::startCGI(const string &filespec, boost::uint16_t port)
 {
@@ -88,34 +97,39 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
     
     _output[filespec] = outflag;
 
+    string path = getDocroot();
+    path += filespec;
+        
     // simple debug junk
     log_debug("Starting \"%s\"", filespec);
 
     // See if the file actually exists, otherwise we can't spawn it
-    if (stat(filespec.c_str(), &procstats) == -1) {
-        log_error("Invalid filename \"%s\"", filespec);
+    if (stat(path.c_str(), &procstats) == -1) {
+        log_error("Invalid filename \"%s\"", path);
 //        perror(filespec.c_str());
 	return (false);
     }
 
     // setup a command line. By default, argv[0] is the name of the process
     cmd_line[0] = new char(filespec.size()+1);
-    strncpy(cmd_line[0], filespec.c_str(), filespec.size());
+    strcpy(cmd_line[0], filespec.c_str());
 
     // If the parent has verbosity on, chances are the child should too.
 //     if (dbglogfile.getVerbosity() > 0) {
-    cmd_line[1] = new char(4);
-    strcpy(cmd_line[1], "-vv");
-    cmd_line[2] = 0;
+    cmd_line[1] = new char(3);
+    strcpy(cmd_line[1], "-n");
+    cmd_line[2] = new char(4);
+    strcpy(cmd_line[2], "-vv");
+    cmd_line[3] = 0;
 //     }
     
     // When running multiple cgis, we prefer to specify the port it's using.
     if (port > 0) {
-        cmd_line[2] = new char(3);
-        strcpy(cmd_line[2], "-p");
-        cmd_line[3] = new char(10);
-        sprintf(cmd_line[3], "%d", port);
-        cmd_line[4] = 0;
+        cmd_line[3] = new char(3);
+        strcpy(cmd_line[3], "-p");
+        cmd_line[4] = new char(10);
+        sprintf(cmd_line[4], "%d", port);
+        cmd_line[5] = 0;
     }
 
 
@@ -147,8 +161,8 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
 	    open("/dev/null", O_WRONLY);
 	}
 	// Start the desired executable
-	execv(filespec.c_str(), cmd_line);
-	perror(filespec.c_str());
+	execv(path.c_str(), cmd_line);
+	perror(path.c_str());
 	exit(0);
     }
     

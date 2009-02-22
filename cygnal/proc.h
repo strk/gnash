@@ -34,6 +34,7 @@ class Proc : public gnash::Network {
 public:
     Proc (void);
     ~Proc (void);
+    static Proc& getDefaultInstance();
     
     // These flags control whether the stdout of the child process gets displayed
     bool setOutput (const std::string &output, bool outflag);
@@ -46,6 +47,9 @@ public:
     bool startCGI (const std::string &filespec, bool output);
     bool startCGI (const std::string &filespec, bool output, boost::uint16_t port);
 
+    void setDocroot(const std::string &path) { _docroot = path; } ;
+    std::string &getDocroot() { return _docroot; };
+    
     // This opens a network connection to the process
     bool connectCGI (const std::string &host, boost::uint16_t port);
 
@@ -57,8 +61,9 @@ public:
     bool stopCGI (const std::string &filespec);
 private:
     std::map<std::string, bool> _output;
-    std::map<std::string, int> _pids;
-    std::map<std::string, int> _cons;
+    std::map<std::string, int>  _pids;
+    std::map<std::string, int>  _cons;
+    std::string                 _docroot;
     
     boost::mutex	_mutex;
 };
