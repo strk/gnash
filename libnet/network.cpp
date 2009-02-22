@@ -355,6 +355,7 @@ Network::newConnection(bool block, int fd)
         if (ret == 0) {
             if (_debug) {
                 log_debug(_("The accept() socket for fd #%d timed out waiting to write"), fd);
+		return 0;
             }
         }
 	
@@ -520,7 +521,10 @@ Network::createClient(const string &hostname, short port)
     char                thishostname[MAXHOSTNAMELEN];
     struct protoent     *proto;
 
-    assert( ! connected() );
+//    assert( ! connected() );
+    if (connected()) {
+	return true;
+    }
 
     if (port < 1024) {
         log_error(_("Can't connect to privileged port %hd"), port);
