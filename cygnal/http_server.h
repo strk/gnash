@@ -40,7 +40,7 @@
 namespace cygnal
 {
     
-class DSOEXPORT HTTPServer : public gnash::HTTP
+class HTTPServer : public gnash::HTTP
 {
 public:
     HTTPServer();

@@ -35,7 +35,7 @@
 namespace cygnal
 {
 
-class DSOEXPORT RTMPServer : public gnash::RTMP
+class RTMPServer : public gnash::RTMP
 {
 public:
     RTMPServer();
