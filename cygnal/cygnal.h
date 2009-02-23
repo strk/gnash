@@ -27,7 +27,7 @@ namespace cygnal {
 /// \class cygnal::ThreadCounter of threads currently
 ///     active. This is primarily so the counter can be wrapped with a
 ///     mutex to be thread safe, as threads delete themseleves.
-class DSOEXPORT ThreadCounter
+class ThreadCounter
 {
   public:
     ThreadCounter() : _tids(0) {};
