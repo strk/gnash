@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -231,7 +231,7 @@ public:
     /// @param fd The file descriptor to read from
     ///
     /// @return The number of bytes sent
-    int DSOEXPORT recvMsg(int fd);
+    int recvMsg(int fd);
 
     /// \brief Send a message to the other end of the network connection.
     ///
@@ -248,7 +248,7 @@ public:
     int sendMsg(const boost::uint8_t *data, size_t size);
     int sendMsg(boost::shared_ptr<amf::Buffer> &buf)
 	{ return sendMsg(buf->reference(), buf->size()); };
-    int DSOEXPORT sendMsg(std::stringstream &sstr)
+    int sendMsg(std::stringstream &sstr)
 	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };
     
     // These accessors are used mostly just for debugging.
@@ -280,7 +280,7 @@ protected:
     boost::uint32_t     _filesize;
     std::map<int, struct status_codes *> _status_codes;
     
-    std::map<std::string, std::string> DSOEXPORT _fields;
+    std::map<std::string, std::string> _fields;
     http_version_t	_version;
     
     // Connection parameters we care about
