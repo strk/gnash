@@ -22,6 +22,7 @@
 #include "VideoDecoderGst.h"
 #include "AudioDecoderGst.h"
 #include "MediaParserGst.h"
+#include "VideoConverterGst.h"
 #include "FLVParser.h"
 
 #ifdef DECODING_SPEEX
@@ -130,6 +131,24 @@ MediaHandlerGst::createAudioDecoder(const AudioInfo& info)
 	}
 
 	return ret;
+}
+
+std::auto_ptr<VideoConverter>
+MediaHandlerGst::createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)
+{
+    std::auto_ptr<VideoConverter> converter;
+
+    try
+    {
+        converter.reset(new VideoConverterGst(srcFormat, dstFormat));
+    }
+    catch (GnashException& ex)
+    {
+        log_error("Could not create Gstreamer based video converter parser for "
+                "input format: %s", ex.what());
+    }
+    
+    return converter;
 }
 
 } // gnash.media.gst namespace

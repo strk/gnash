@@ -81,6 +81,7 @@ libgnashmedia_la_SOURCES = \
 noinst_HEADERS = \
 	AudioDecoder.h \
 	VideoDecoder.h \
+	VideoConverter.h \
 	MediaParser.h \
 	MediaHandler.h \
 	FLVParser.h \
@@ -97,6 +98,7 @@ if USE_GST_ENGINE
 		gst/VideoDecoderGst.cpp \
 		gst/AudioDecoderGst.cpp \
 		gst/MediaParserGst.cpp \
+		gst/VideoConverterGst.cpp \
 		gst/GstUtil.cpp \
 		gst/swfdec_codec_gst.c \
 		$(NULL)
@@ -106,6 +108,7 @@ if USE_GST_ENGINE
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
 		gst/MediaParserGst.h \
+		gst/VideoConverterGst.cpp \
 		gst/GstUtil.h \
 		gst/swfdec_codec_gst.h \
 		gst/gnash_gst_version.h \
@@ -129,6 +132,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/AudioDecoderFfmpeg.cpp \
 		ffmpeg/VideoDecoderFfmpeg.cpp \
 		ffmpeg/AudioResamplerFfmpeg.cpp \
+		ffmpeg/VideoConverterFfmpeg.cpp \
 		$(NULL)
 
    noinst_HEADERS += \
@@ -138,6 +142,7 @@ if USE_FFMPEG_ENGINE
 		ffmpeg/VideoDecoderFfmpeg.h \
 		ffmpeg/AudioResamplerFfmpeg.h \
 		ffmpeg/ffmpegHeaders.h \
+		ffmpeg/VideoConverterFfmpeg.h \
 		$(NULL)
 
    libgnashmedia_la_LIBADD += \
