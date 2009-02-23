@@ -225,6 +225,12 @@ main (int /*argc*/, char** /*argv*/) {
         }
     }
 
+    if (rc.useXv() == false) {
+        runtest.pass ("Xvideo off by default");
+    } else {
+        runtest.fail ("Xvideo is on by default!");
+    }
+
     // Parse a second file
     if (rc.parseFile("gnashrc-local")) {
 
@@ -263,6 +269,12 @@ main (int /*argc*/, char** /*argv*/) {
             {
                 runtest.fail ("rc.getLocalSandboxPath() doesn't have the correct last element after append");
             }
+        }
+
+        if (rc.useXv() == true) {
+            runtest.pass ("Xvideo on by local.rc");
+        } else {
+            runtest.fail ("Xvideo on by local.rc");
         }
     }
 

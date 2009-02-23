@@ -6,3 +6,6 @@ set whitelist off
 append blacklist www.gnashdev.org www.wikipedia.de
 
 append localSandboxPath /tmp/gnash
+
+# Use XVideo
+set XVideo true
