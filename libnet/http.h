@@ -243,10 +243,10 @@ public:
     /// @param void Send the contents of the _header and _body.
     ///
     /// @return The number of bytes sent
-    int DSOEXPORT sendMsg();
-    int DSOEXPORT sendMsg(int fd);
-    int DSOEXPORT sendMsg(const boost::uint8_t *data, size_t size);
-    int DSOEXPORT sendMsg(boost::shared_ptr<amf::Buffer> &buf)
+    int sendMsg();
+    int sendMsg(int fd);
+    int sendMsg(const boost::uint8_t *data, size_t size);
+    int sendMsg(boost::shared_ptr<amf::Buffer> &buf)
 	{ return sendMsg(buf->reference(), buf->size()); };
     int DSOEXPORT sendMsg(std::stringstream &sstr)
 	{ return sendMsg(reinterpret_cast<const boost::uint8_t *>(sstr.str().c_str()), sstr.str().size()); };

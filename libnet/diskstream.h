@@ -43,7 +43,7 @@ namespace gnash {
 ///	of using read() from the standard library, this uses mmap() to
 ///	map the file into memory in chunks of the memory pagesize,
 ///	which is much faster and less resource intensive.
-class DSOEXPORT DiskStream {
+class DiskStream {
 public:
     /// \enum DiskStream::state_e
     ///		This represents the state of the current stream.
@@ -83,15 +83,15 @@ public:
     FILETYPE_ENCODED
   } filetype_e;
 
-    DiskStream();
-    DiskStream(const std::string &filespec);
-    DiskStream(const std::string &filespec, amf::Buffer &buf);
-    DiskStream(const std::string &filespec, boost::uint8_t *data, size_t size);
-    DiskStream(const std::string &filespec, int netfd);
-    ~DiskStream();
+    DSOEXPORT DiskStream();
+    DSOEXPORT DiskStream(const std::string &filespec);
+    DSOEXPORT DiskStream(const std::string &filespec, amf::Buffer &buf);
+    DSOEXPORT DiskStream(const std::string &filespec, boost::uint8_t *data, size_t size);
+    DSOEXPORT DiskStream(const std::string &filespec, int netfd);
+    DSOEXPORT ~DiskStream();
 
     /// \brief Close the open disk file and it's associated stream.
-    void close();
+    DSOEXPORT void close();
 
     /// \brief Open a file to be streamed.
     ///
@@ -104,9 +104,9 @@ public:
     ///		collecting statistics on this stream.
     ///
     /// @return True if the file was opened sucessfully, false if not.
-    bool open(const std::string &filespec);
-    bool open(const std::string &filespec, int netfd);
-    bool open(const std::string &filespec, int netfd, gnash::Statistics  &statistics);
+    DSOEXPORT bool open(const std::string &filespec);
+    DSOEXPORT bool open(const std::string &filespec, int netfd);
+    DSOEXPORT bool open(const std::string &filespec, int netfd, gnash::Statistics  &statistics);
 
     /// \brief Stream the file that has been loaded,
     ///
@@ -179,9 +179,9 @@ public:
     ///
     /// @return A real pointer to the location of the data at the
     ///		location pointed to by the offset.
-    boost::uint8_t *loadToMem(size_t filesize, off_t offset);
-    boost::uint8_t *loadToMem(off_t offset);
-    boost::uint8_t *loadToMem() { return loadToMem(_offset); };
+    DSOEXPORT boost::uint8_t *loadToMem(size_t filesize, off_t offset);
+    DSOEXPORT boost::uint8_t *loadToMem(off_t offset);
+    DSOEXPORT boost::uint8_t *loadToMem() { return loadToMem(_offset); };
 
     /// \brief Write the data in memory to disk
     ///
@@ -193,10 +193,10 @@ public:
     /// @param size The amount of data in bytes to be written
     ///
     /// @return true if the operation suceeded, false if it failed.
-    bool writeToDisk(const std::string &filespec, boost::uint8_t *data, size_t size);
-    bool writeToDisk(const std::string &filespec, amf::Buffer &data);
-    bool writeToDisk(const std::string &filespec);
-    bool writeToDisk();
+    DSOEXPORT bool writeToDisk(const std::string &filespec, boost::uint8_t *data, size_t size);
+    DSOEXPORT bool writeToDisk(const std::string &filespec, amf::Buffer &data);
+    DSOEXPORT bool writeToDisk(const std::string &filespec);
+    DSOEXPORT bool writeToDisk();
 
     /// \brief Write the existing data to the Network.
     ///
