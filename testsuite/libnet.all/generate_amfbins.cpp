@@ -31,6 +31,8 @@
 #include <log.h>
 #include <iostream>
 #include <string>
+#include <unistd.h>
+
 #include "as_value.h"
 #include "as_object.h"
 
