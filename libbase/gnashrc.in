@@ -192,3 +192,10 @@
 # Default: false
 #
 set LocalConnection off
+
+# Enable support for the X Video extension. Note that this requires a
+# kernel/X11 driver, and compile-time gstreamer or ffmpeg and libXv .
+#
+# Default: false
+#
+#set XVideo false
