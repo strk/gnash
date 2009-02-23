@@ -128,7 +128,7 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
 #endif
 
 
-    AVPicture srcpicture = {{src.data, 0, 0, 0}, src.stride[0], 0, 0, 0};
+    AVPicture srcpicture = {{src.data, 0, 0, 0}, {src.stride[0], 0, 0, 0}};
     
     
     int bufsize = avpicture_get_size(dst_pixFmt, width, height);
@@ -140,7 +140,8 @@ VideoConverterFfmpeg::convert(const ImgBuf& src)
 
     AVPicture dstpicture;
     avpicture_fill(&dstpicture, dstbuffer, dst_pixFmt, width, height);
-
+    
+ 
 #ifndef HAVE_SWSCALE_H
     img_convert(&dstpicture, dst_pixFmt, &srcpicture, src_pixFmt, width,
                 height);

@@ -134,6 +134,9 @@ public:
 
     bool useLocalDomain() const { return _localdomainOnly; }
     void useLocalDomain(bool value);
+
+    bool useXv() const { return _useXv; }
+    void useXv(bool value);
  
     /// Whether to restrict access to the local host   
     bool useLocalHost() const { return _localhostOnly; }
@@ -505,6 +508,8 @@ protected:
     std::string _mediaCacheDir;
 
     bool _popups;
+
+    bool _useXv;
 
 };
 

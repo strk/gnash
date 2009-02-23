@@ -29,6 +29,8 @@ namespace gst {
 VideoConverterGst::VideoConverterGst(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat)
     : VideoConverter(srcFormat, dstFormat)
 {
+    _decoder.bin = 0;
+
     gst_init (NULL, NULL);
     
     GstElementFactory* colorspacefactory = gst_element_factory_find ("ffmpegcolorspace");
@@ -113,8 +115,10 @@ VideoConverterGst::init(const ImgBuf& src)
 
 VideoConverterGst::~VideoConverterGst()
 {
-    swfdec_gst_decoder_push_eos(&_decoder);
-    swfdec_gst_decoder_finish(&_decoder);
+    if (_decoder.bin) {
+        swfdec_gst_decoder_push_eos(&_decoder);
+        swfdec_gst_decoder_finish(&_decoder);
+    }
 }
 
 std::auto_ptr<ImgBuf>
