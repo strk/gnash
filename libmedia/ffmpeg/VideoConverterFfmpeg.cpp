@@ -23,31 +23,6 @@ namespace gnash {
 namespace media {
 namespace ffmpeg {
 
-#ifdef HAVE_SWSCALE_H
-/// A wrapper round an SwsContext that ensures it's
-/// freed on destruction.
-class SwsContextWrapper
-{
-public:
-
-    SwsContextWrapper(SwsContext* context)
-        :
-        _context(context)
-    {}
-
-    ~SwsContextWrapper()
-    {
-         sws_freeContext(_context);
-    }
-    
-    SwsContext* getContext() const { return _context; }
-
-private:
-    SwsContext* _context;
-
-};
-#endif
-
 // The lookup table in this function is adapted from chroma.c from the VLC
 // codebase; its license permits distribution under GPLv3 and later.
 PixelFormat

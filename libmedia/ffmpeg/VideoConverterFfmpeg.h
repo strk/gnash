@@ -29,7 +29,9 @@
 #include "log.h"
 
 #if HAVE_SWSCALE_H
+extern "C" {
 #include <libswscale/swscale.h>
+}
 #endif
 
 
@@ -38,6 +40,31 @@ namespace media {
 namespace ffmpeg {
 
 class SwsContextWrapper;
+
+#ifdef HAVE_SWSCALE_H
+/// A wrapper round an SwsContext that ensures it's
+/// freed on destruction.
+class SwsContextWrapper
+{
+public:
+
+    SwsContextWrapper(SwsContext* context)
+        :
+        _context(context)
+    {}
+
+    ~SwsContextWrapper()
+    {
+         sws_freeContext(_context);
+    }
+    
+    SwsContext* getContext() const { return _context; }
+
+private:
+    SwsContext* _context;
+
+};
+#endif
 
 class VideoConverterFfmpeg : public VideoConverter {
 
