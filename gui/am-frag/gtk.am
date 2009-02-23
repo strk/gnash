@@ -42,6 +42,10 @@ gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
 		gtk.cpp gtksup.h gtk_glue.h
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
+if HAVE_XV
+gtk_gnash_SOURCES += gtk_glue_agg_xv.cpp gtk_glue_agg_xv.h
+gtk_gnash_LDADD += $(X11_LIBS)
+endif               # HAVE_XV
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
