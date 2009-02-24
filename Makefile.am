@@ -37,7 +37,8 @@ noinst_SCRIPT = autogen.sh
 DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
-	--enable-gui=all 
+	--enable-gui=all \
+	--disable-testsuite
 #--enable-cygnal
 
 STD_DIRS = \
