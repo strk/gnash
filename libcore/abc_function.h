@@ -39,10 +39,6 @@ class Machine;
 class abc_function : public as_function
 {
 
-private:
-	asMethod *mMethodInfo;
-	Machine* mMachine;
-
 public:
 	abc_function(asMethod *methodInfo, Machine* mMachine);
 
@@ -52,7 +48,19 @@ public:
 
 	boost::uint32_t getMaxRegisters(){ return mMethodInfo->getMaxRegisters(); }
 
-	as_environment::ScopeStack* mScopeStack;
+    as_environment::ScopeStack* scopeStack() { return _scopeStack; }
+
+    void setScopeStack(as_environment::ScopeStack* stack) {
+        _scopeStack = stack;
+    }
+
+private:
+
+    asMethod *mMethodInfo;
+
+    Machine* mMachine;
+
+	as_environment::ScopeStack* _scopeStack;
 
 };
 

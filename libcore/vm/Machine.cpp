@@ -56,61 +56,62 @@ public:
 };
 
 // Functions for getting pool constants.
-static inline std::string& pool_string(boost::uint32_t index, abc_block *pool)
+static inline const std::string&
+pool_string(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
+	if (!pool) throw ASException();
 	return pool->mStringPool.at(index);
 }
 
-static inline int pool_int(boost::uint32_t index, abc_block *pool)
+static inline int
+pool_int(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool)
 		throw ASException();
 	return pool->mIntegerPool.at(index);
 }
 
-static inline unsigned int pool_uint(boost::uint32_t index, abc_block *pool)
+static inline unsigned int
+pool_uint(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
+	if (!pool) throw ASException();
 	return pool->mUIntegerPool.at(index);
 }
 
-static inline double pool_double(boost::uint32_t index, abc_block *pool)
+static inline double
+pool_double(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
+	if (!pool) throw ASException();
 	LOG_DEBUG_AVM("Getting double from pool at index %u",index);
 	return pool->mDoublePool.at(index);
 }
 
-static inline asNamespace* pool_namespace(boost::uint32_t index, abc_block *pool)
+static inline asNamespace*
+pool_namespace(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
+	if (!pool) throw ASException();
 	return pool->mNamespacePool.at(index);
 }
 
-static inline asMethod* pool_method(boost::uint32_t index, abc_block* pool)
+static inline asMethod*
+pool_method(boost::uint32_t index, abc_block* pool)
 {
-	if (!pool)
-		throw ASException();
+	if (!pool) throw ASException();
 	return pool->mMethods.at(index);
 }
 
-static inline asClass* pool_class(boost::uint32_t index, abc_block* pool)
+static inline asClass*
+pool_class(boost::uint32_t index, abc_block* pool)
 {
-	if (!pool)
-		throw ASException();
+	if (!pool) throw ASException();
 	return pool->mClasses.at(index);
 }
 
 // Don't make this a reference or you'll taint the pool.
-static inline asName pool_name(boost::uint32_t index, abc_block* pool)
+static inline asName
+pool_name(boost::uint32_t index, abc_block* pool)
 {
-	if (!pool)
-		throw ASException();
+	if (!pool) throw ASException();
 	asName multiname = pool->mMultinamePool.at(index);
 	LOG_DEBUG_AVM("Searching multiname pool for property id=%u abc name=%u global name = %u abc string=%s flags=0x%X name_space=%u",index,multiname.getABCName(),multiname.getGlobalName(),pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,multiname.getNamespace()->getURI());
 	return multiname;
@@ -348,7 +349,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_DXNS:
 	{
 		boost::uint32_t soffset = mStream->read_V32();
-		std::string& uri = pool_string(soffset, mPoolObject);
+		const std::string& uri = pool_string(soffset, mPoolObject);
 		mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
 		break;
 	}
@@ -470,7 +471,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_IFTRUE:
 	{
 		boost::int32_t bytes = mStream->read_S24();
-		if(pop_stack().to_bool()){
+		if (pop_stack().to_bool()) {
 			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
@@ -490,7 +491,7 @@ Machine::execute()
 	{
 		boost::int32_t bytes = mStream->read_S24();
 		bool truth = pop_stack().to_bool();
-		if(!truth){
+		if (!truth) {
 			LOG_DEBUG_AVM("Jumping...");
 			LOG_DEBUG_AVM("%d bytes.",bytes);
 			mStream->seekBy(bytes);
@@ -510,7 +511,7 @@ Machine::execute()
 		boost::int32_t bytes = mStream->read_S24();
 		as_value b = pop_stack();
 		as_value a = pop_stack();
-		if(a.equals(b)){
+		if (a.equals(b)) {
 			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
@@ -532,7 +533,7 @@ Machine::execute()
 		as_value a = pop_stack();
 		as_value b = pop_stack();
 		boost::int32_t bytes = mStream->read_S24();
-		if(!a.equals(b)){
+		if (!a.equals(b)) {
 			LOG_DEBUG_AVM("Jumping... %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
@@ -555,7 +556,7 @@ Machine::execute()
 		as_value a = pop_stack();
 		boost::int32_t bytes = mStream->read_S24();
 		bool jump = a.newLessThan(b).to_bool();
-		if(jump){
+		if (jump) {
 			LOG_DEBUG_AVM("Jumping... %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
@@ -595,7 +596,7 @@ Machine::execute()
 		// If b < a, then a > b, with undefined as false
 		ABSTRACT_COMPARE(truth, mStack.top(0), mStack.top(1), false);
 		mStack.drop(2);
-		if(truth){
+		if (truth) {
 			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
@@ -689,7 +690,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHSCOPE:
 	{
 		as_value scope_value = pop_stack();
-		if(!scope_value.to_object().get()){
+		if (!scope_value.to_object().get()) {
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Can't push a null value onto the scope stack (%s)."), scope_value);
 			);
@@ -1011,9 +1012,13 @@ Machine::execute()
 		LOG_DEBUG_AVM("Creating new abc_function: method index=%u",method_index);
 		asMethod *m = pool_method(method_index, mPoolObject);
 		abc_function* new_function = m->getPrototype();
-		//TODO: SafeStack contains all the scope objects in for all functions in the call stack.
-		//We should only copy the relevent scope objects to the function's scope stacks.
-		new_function->mScopeStack = getScopeStack();
+		// TODO: SafeStack contains all the scope objects
+        // in for all functions in the call stack.
+		// We should only copy the relevent scope objects
+        // to the function's scope stacks.
+        // Note: this doesn't copy any values, but rather assigns a pointer
+        // value.
+		new_function->setScopeStack(getScopeStack());
 		push_stack(as_value(new_function));
 		break;
 	}
@@ -1182,7 +1187,7 @@ Machine::execute()
 
 			as_value property = object->getMember(a.getGlobalName(),0);
 		
-			if(!property.is_undefined() && !property.is_null()){
+			if (!property.is_undefined() && !property.is_null()) {
 				LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object_val.toDebugString());
 				as_environment env = as_environment(_vm);
 				result = call_method(property,&env,object,args);
@@ -1197,7 +1202,7 @@ Machine::execute()
 			}
 
 		}
-			if(opcode == SWF::ABC_ACTION_CALLPROPERTY){
+			if (opcode == SWF::ABC_ACTION_CALLPROPERTY) {
 				push_stack(result);
 			}
 
@@ -1241,12 +1246,12 @@ Machine::execute()
 	case SWF::ABC_ACTION_RETURNVOID:
 	{
 		mStream->seekTo(0);
-		if(mStateStack.size() == 0){
+		if (mStateStack.size() == 0) {
 			return;
 		}
 		else{
 			restoreState();
-			if(mExitWithReturn){
+			if (mExitWithReturn) {
 				return;
 			}
 		}
@@ -1316,7 +1321,7 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		as_object* object = pop_stack().to_object().get();
-		if(!object){
+		if (!object) {
 			//TODO: Should this result in an exeception or an actionscript error?
 			LOG_DEBUG_AVM("Can't constructor property on a null object.  Property not constructed.");
 			push_stack(as_value());
@@ -1326,7 +1331,7 @@ Machine::execute()
 		
 		as_value constructor_val = object->getMember(a.getGlobalName());
 		boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
-		if(constructor){
+		if (constructor) {
 			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
 			push_stack(as_value(newobj));
 		}
@@ -1335,7 +1340,7 @@ Machine::execute()
 		// new objects to the Global object.
 		else{
  			LOG_DEBUG_AVM("Object %s is not a constructor",constructor_val.toDebugString());
-			if(constructor_val.is_null() || constructor_val.is_undefined()){
+			if (constructor_val.is_null() || constructor_val.is_undefined()) {
 				LOG_DEBUG_AVM("Constructor is undefined, will not construct property.");
 				push_stack(as_value());
 			}
@@ -1392,7 +1397,7 @@ Machine::execute()
 		Array_as *arr = new Array_as;
 		arr->resize(asize);
 		boost::uint32_t i = asize;
-		while (i--){
+		while (i--) {
 			arr->set_indexed(i, pop_stack());
 		}
 		push_stack(as_value(arr));
@@ -1555,7 +1560,7 @@ Machine::execute()
 
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
-		if(a.mFlags == asName::KIND_MultinameL){
+		if (a.mFlags == asName::KIND_MultinameL) {
 			as_value nameValue = pop_stack();
 			name = mST.find(nameValue.to_string());
 		}
@@ -1630,7 +1635,7 @@ Machine::execute()
 		string_table::key name = 0;
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
-		if(a.mFlags == asName::KIND_MultinameL){
+		if (a.mFlags == asName::KIND_MultinameL) {
 			as_value nameValue = pop_stack();
 			name = mST.find(nameValue.to_string());
 		}
@@ -1674,7 +1679,7 @@ Machine::execute()
 		as_value object_val = pop_stack();
 
 		as_object* object = object_val.to_object().get();
-		if(!object){
+		if (!object) {
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Can't initialize a property of a value that doesn't cast to an object (%s)."),
 				object_val);
@@ -1733,7 +1738,7 @@ Machine::execute()
 		as_value object = pop_stack();
 		//We use sindex + 1, because currently as_object sets a property at a slot index
 		//1 higher than the index the abc_block thinks the property is at.
-		if(!object.to_object().get()->set_member_slot(sindex+1,value)){
+		if (!object.to_object().get()->set_member_slot(sindex+1,value)) {
 			LOG_DEBUG_AVM("Failed to set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
 		}
 		else{
@@ -1894,7 +1899,7 @@ Machine::execute()
 		as_value value = pop_stack();
 
 		//TODO: Actually coerce the value.
-//		if(value.is_null()){
+//		if (value.is_null()) {
 //			as_value new_type = get_property_value(a);
 //			value->
 //			push_stack(new_type);
@@ -2555,26 +2560,22 @@ Machine::completeName(asName &name, int offset)
 asClass *
 Machine::findSuper(as_value &v, bool find_for_primitive)
 {
-	if (v.is_undefined() || v.is_null())
-		return NULL;
+	if (v.is_undefined() || v.is_null()) return NULL;
 
-	if (v.is_object())
-	{
+	if (v.is_object()) {
 		asClass *pProto = NULL; // TODO: v.to_object()->getClass();
 		return pProto ? pProto->getSuper() : NULL;
 	}
 
-	if (!find_for_primitive)
-		return NULL;
+	if (!find_for_primitive) return 0;
 
-	if (v.is_number())
-	{
+	if (v.is_number()) {
 		return NULL; // TODO: mCH->getClass(NSV::CLASS_NUMBER);
 	}
 
 	// And so on...
 	// TODO: Other primitives
-	return NULL;
+	return 0;
 }
 
 void
@@ -2599,11 +2600,9 @@ Machine::immediateFunction(const as_function * /*to_call*/,
 void
 Machine::pushGet(as_object *this_obj, as_value &return_slot, Property *prop)
 {
-	if (!prop)
-		return;
+	if (!prop) return;
 
-	if (prop->isGetterSetter())
-	{
+	if (prop->isGetterSetter()) {
 		//TODO pushCall(prop->getGetter(), this_obj, return_slot, 0);
 		return;
 	}
@@ -2614,11 +2613,9 @@ Machine::pushGet(as_object *this_obj, as_value &return_slot, Property *prop)
 void
 Machine::pushSet(as_object *this_obj, as_value &value, Property *prop)
 {
-	if (!prop)
-		return;
+	if (!prop) return;
 
-	if (prop->isGetterSetter())
-	{
+	if (prop->isGetterSetter()) {
 		mStack.push(value);
 		//TODO pushCall(prop->getSetter(), this_obj, mIgnoreReturn, 1);
 		return;
@@ -2698,7 +2695,8 @@ Machine::saveState()
 //	s.mThis = mThis;
 }
 
-void Machine::initMachine(abc_block* pool_block,as_object* global)
+void
+Machine::initMachine(abc_block* pool_block, as_object* global)
 {
 	mPoolObject = pool_block;
 	log_debug("Getting entry script.");
@@ -2716,22 +2714,28 @@ void Machine::initMachine(abc_block* pool_block,as_object* global)
 //This is called by abc_functions to execute their code stream.
 //TODO: There is probably a better way to do this, once we understand what the VM is supposed
 //todo, this should be fixed.
-as_value Machine::executeFunction(asMethod* function, const fn_call& fn){
+as_value
+Machine::executeFunction(asMethod* function, const fn_call& fn)
+{
 	
-//TODO: Figure out a good way to use the State object to handle returning values.
+    //TODO: Figure out a good way to use the State object to handle
+    //returning values.
 	mCurrentFunction = function->getPrototype();
 	bool prev_ext = mExitWithReturn;
 	CodeStream *stream = function->getBody();
 	load_function(stream, function->getMaxRegisters());
 	mExitWithReturn = true;
 	mRegisters[0] = as_value(fn.this_ptr);
-	for(unsigned int i=0;i<fn.nargs;i++){
+	for (unsigned int i=0;i<fn.nargs;i++) {
 		mRegisters[i+1] = fn.arg(i);
 	}
 	//TODO:  There is probably a better way to do this.
-	if(mCurrentFunction->mScopeStack){
-		for(unsigned int i=0;i<mCurrentFunction->mScopeStack->size();++i){
-			push_scope_stack(as_value(mCurrentFunction->mScopeStack->at(i)));
+    //
+    const as_environment::ScopeStack* const ss = mCurrentFunction->scopeStack();
+
+	if (ss) {
+		for (unsigned int i=0; i < ss->size(); ++i) {
+			push_scope_stack(as_value(ss->at(i)));
 		}
 	}
 	execute();
@@ -2741,14 +2745,16 @@ as_value Machine::executeFunction(asMethod* function, const fn_call& fn){
 	return mGlobalReturn;
 }
 
-void Machine::executeCodeblock(CodeStream* stream){
-
+void
+Machine::executeCodeblock(CodeStream* stream)
+{
 	mStream = stream;
 	execute();
-//	restoreState();
 }
 
-void Machine::instantiateClass(std::string className, as_object* global){
+void
+Machine::instantiateClass(std::string className, as_object* global)
+{
 
 	asClass* theClass = mPoolObject->locateClass(className);
 	
@@ -2768,7 +2774,6 @@ Machine::Machine(VM& vm)
         mRegisters(),
         mScopeStack(),
         mStream(0),
-        //mCH(0), // initialized in the body
         mST(vm.getStringTable()),
         mDefaultXMLNamespace(0),
         mCurrentScope(0),
@@ -2782,9 +2787,9 @@ Machine::Machine(VM& vm)
         mExitWithReturn(false),
         mPoolObject(0),
         mCurrentFunction(0),
-        _vm(vm)
+        _vm(vm),
+        mCH(_vm.getClassHierarchy())
 {
-	mCH = vm.getClassHierarchy();
 	//Local registers should be initialized at the beginning of each function call, but
 	//we don't currently parse the number of local registers for each function.
 //	mRegisters.resize(16);
@@ -2792,20 +2797,22 @@ Machine::Machine(VM& vm)
 //	mST = ST;
 }
 
-as_value Machine::find_prop_strict(asName multiname){
+as_value
+Machine::find_prop_strict(asName multiname) {
 	
 	as_value val;
 	mScopeStack.push(mGlobalObject);
-	for(size_t i=0;i<mScopeStack.size();i++)
+	for (size_t i = 0; i < mScopeStack.size(); ++i)
     {
 		as_object* scope_object = mScopeStack.top(i).get();
-		if(!scope_object){
+		if (!scope_object) {
 			LOG_DEBUG_AVM("Scope object is NULL.");
 			continue;
 		}
-		val = scope_object->getMember(multiname.getGlobalName(),multiname.getNamespace()->getURI());
+		val = scope_object->getMember(multiname.getGlobalName(),
+                multiname.getNamespace()->getURI());
 
-		if(!val.is_undefined()){
+		if (!val.is_undefined()) {
 			push_stack(mScopeStack.top(i));
 			mScopeStack.pop();
 			return val;
@@ -2824,89 +2831,105 @@ as_value Machine::find_prop_strict(asName multiname){
 	return val;
 }
 
-as_value Machine::get_property_value(asName multiname){
-	return get_property_value(NULL,multiname);
+as_value
+Machine::get_property_value(asName multiname)
+{
+	return get_property_value(0, multiname);
 }
 
-as_value Machine::get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname){
+as_value
+Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
+        asName multiname)
+{
 
-	std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
+	std::string ns = 
+        mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
 	std::string name = mPoolObject->mStringPool[multiname.getABCName()];
-	return get_property_value(obj,name,ns);
+	return get_property_value(obj, name, ns);
 }
 
-as_value Machine::get_property_value(boost::intrusive_ptr<as_object> obj, std::string name, std::string ns){
+as_value
+Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
+        std::string name, std::string ns)
+{
 
-as_environment::ScopeStack stack;
+    as_environment::ScopeStack stack;
 	as_environment env = as_environment(_vm);
-	if(obj == NULL){
-		stack = *getScopeStack();
-	}
-	else{
-		stack.push_back(obj);
-	}
-	std::string path;
-	if(ns.size() == 0){
-		path = name;
-	}
-	else{
-		path = ns + "." + name;
-	}
+	
+    if (!obj) stack = *getScopeStack();
+	else stack.push_back(obj);
 
-	return env.get_variable(path,stack,NULL);
+	std::string path;
+
+	if (ns.empty()) path = name;
+	else path = ns + "." + name;
+
+	return env.get_variable(path, stack, 0);
 }
 
-void Machine::print_stack(){
+void
+Machine::print_stack()
+{
 
 	std::stringstream ss;
 	ss << "Stack: ";
-	for(unsigned int i=0;i<mStack.size();++i){
+	for (unsigned int i = 0; i < mStack.size(); ++i) {
 		if (i!=0) ss << " | ";
 		ss << mStack.value(i).toDebugString();
 	}
 	LOG_DEBUG_AVM("%s", ss.str());
 }
 
-void Machine::print_scope_stack(){
+void
+Machine::print_scope_stack()
+{
 
 	std::stringstream ss;
 	ss << "ScopeStack: ";
-	for(unsigned int i=0;i<mScopeStack.size();++i){
+	for (unsigned int i=0;i<mScopeStack.size();++i) {
 		ss << as_value(mScopeStack.top(i).get()).toDebugString();
 	}
 	LOG_DEBUG_AVM("%s", ss.str());
 }	
 
-std::auto_ptr< std::vector<as_value> > Machine::get_args(unsigned int argc){
+std::auto_ptr<std::vector<as_value> >
+Machine::get_args(unsigned int argc)
+{
 	LOG_DEBUG_AVM("There are %u args",argc);
-	std::auto_ptr< std::vector<as_value> > args = std::auto_ptr< std::vector<as_value> >(new std::vector<as_value>);
+	std::auto_ptr<std::vector<as_value> > args = 
+        std::auto_ptr<std::vector<as_value> >(new std::vector<as_value>);
 	args->resize(argc);
-	for(unsigned int i=argc; i>0; --i){
+	for (unsigned int i = argc; i > 0; --i) {
 		args->at(i-1) = pop_stack();
 	}
 	return args;
 }
 
-void Machine::load_function(CodeStream* stream,boost::uint32_t maxRegisters){
+void
+Machine::load_function(CodeStream* stream, boost::uint32_t maxRegisters)
+{
 	saveState();
-	//TODO: Maybe this call should be part of saveState(), it returns the old downstop.
+	//TODO: Maybe this call should be part of saveState(), it
+    //returns the old downstop.
 	mScopeStack.fixDownstop();
 	mStream = stream;
 	clearRegisters(maxRegisters);
 }
 
-as_environment::ScopeStack* Machine::getScopeStack(){
+as_environment::ScopeStack*
+Machine::getScopeStack()
+{
 	as_environment::ScopeStack *stack = new as_environment::ScopeStack();
-	for(size_t i=0;i<mScopeStack.size();i++){
+	for (size_t i = 0; i < mScopeStack.size(); ++i) {
 		stack->push_back(mScopeStack.top(i));
 	}
 	return stack;
 }
 
 void
-Machine::clearRegisters(boost::uint32_t maxRegisters){
+Machine::clearRegisters(boost::uint32_t maxRegisters)
+{
 	mRegisters.clear();
-
 	mRegisters.resize(maxRegisters);
 }
 

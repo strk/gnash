@@ -312,7 +312,6 @@ private:
 	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
 	CodeStream *mStream;
 
-	ClassHierarchy *mCH;
 	string_table& mST;
 
 	asNamespace* mDefaultXMLNamespace;
@@ -333,6 +332,8 @@ private:
 	abc_function* mCurrentFunction;
 
 	VM& _vm;
+	
+    ClassHierarchy *mCH;
 };
 
 } // namespace gnash
