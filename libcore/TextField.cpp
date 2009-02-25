@@ -1679,14 +1679,12 @@ TextField::setWordWrap(bool on)
 cxform    
 TextField::get_world_cxform() const
 {
-  if ( ! getEmbedFonts() ) /* if using a device font (PP compatibility) */
-  {
-    return cxform();
-  }
-  else
-  {
-    return character::get_world_cxform();
-  }
+    // If using a device font (PP compatibility), do not take parent cxform
+    // into account.
+    if (!getEmbedFonts()) {
+        return cxform();
+    }
+    else return character::get_world_cxform();
 }
 
 void
