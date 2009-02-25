@@ -54,18 +54,6 @@
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
 
-// Define the following macro to maintain compatibility with the proprietary
-// player when it comes to opacity of textfields using device fonts.
-// See http://gnashdev.org/wiki/index.php/DeviceFonts#Differences_with_proprietary_player_implementation
-//
-// This is now disabled by default because INCOMPLETE and unclean
-// A clean implementation (IMHO) would warn user about the fact
-// it is doing a stupid thing for compatibilty reason.
-// Also, for good compatibility, we should skip rendering
-// of rotated or skewed text.
-//
-//#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
-
 // Define the following to get detailed log information about
 // textfield bounds and HTML tags:
 //#define GNASH_DEBUG_TEXTFIELDS 1
@@ -1691,22 +1679,15 @@ TextField::setWordWrap(bool on)
 cxform    
 TextField::get_world_cxform() const
 {
-  cxform cf = character::get_world_cxform();
-  
-#ifdef PP_COMPATIBLE_DEVICE_FONT_HANDLING
-  if ( ! getEmbedFonts() ) /* if using a device font (PP compatibility) */ 
-  {
-    // set alpha to default values to make the text field opaque
-    cf.m_[3][0] = 1.0f;
-    cf.m_[3][1] = 0.0f;
-    
-    // NOTE: Linux version of Adobe's player also ignores tint
-    // transform, so we should (or not) return an identity cxform
-    // here. This has to be discussed...
-  }
-#endif
-  
-  return cf;
+    // This is not automatically tested. See testsuite/samples/input-fields.swf
+    // for a manual check.
+
+    // If using a device font (PP compatibility), do not take parent cxform
+    // into account.
+    if (!getEmbedFonts()) {
+        return cxform();
+    }
+    else return character::get_world_cxform();
 }
 
 void
