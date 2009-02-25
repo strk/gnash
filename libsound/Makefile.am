@@ -40,14 +40,12 @@ libgnashsound_la_LIBADD = \
 	$(NULL)
 
 libgnashsound_la_SOURCES = \
-	sdl/sound_handler_sdl.cpp \
 	sound_handler.cpp \
 	EmbedSound.cpp \
 	EmbedSoundInst.cpp \
 	$(NULL)
 
 noinst_HEADERS = \
-	sdl/sound_handler_sdl.h \
 	NullSoundHandler.h \
 	sound_handler.h \
 	SoundEnvelope.h \
@@ -56,6 +54,11 @@ noinst_HEADERS = \
 	EmbedSoundInst.h \
     AuxStream.h
 	$(NULL)
+
+if USE_SOUND_SDL
+ libgnashsound_la_SOURCES += sdl/sound_handler_sdl.cpp 
+ noinst_HEADERS += sdl/sound_handler_sdl.h
+endif
 
 
 libgnashsound_la_LDFLAGS = -release $(VERSION)

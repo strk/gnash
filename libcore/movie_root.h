@@ -221,17 +221,6 @@ public:
     ///   after loading into it.
     void dropLevel(int depth);
 
-    /// @@ should this delegate to _level0?  probably !
-    void set_member(const std::string& /*name*/, const as_value& /*val*/)
-    {
-    }
-
-    /// @@ should this delegate to _level0?  probably !
-    bool get_member(const std::string& /*name*/, as_value* /*val*/)
-    {
-        return false;
-    }
-
     /// Change display viewport coordinates
     //
     /// This currently also change the display scale

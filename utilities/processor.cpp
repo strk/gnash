@@ -341,20 +341,20 @@ main(int argc, char *argv[])
     }
 
 
-#ifdef USE_FFMPEG
-    std::auto_ptr<media::MediaHandler> handler(
-            new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
-#elif defined(USE_GST)
-    std::auto_ptr<media::MediaHandler> handler(
-            new gnash::media::gst::MediaHandlerGst() );
-#else
-    std::cerr << "Neither SOUND_SDL nor SOUND_GST defined" << std::endl;
-    exit(1);
-#endif
-    gnash::media::MediaHandler::set(handler);
+    std::auto_ptr<gnash::media::MediaHandler> mediaHandler;
+    boost::shared_ptr<sound::sound_handler> soundHandler;
 
-    boost::shared_ptr<sound::sound_handler> soundHandler(
-            new sound::NullSoundHandler());
+#ifdef USE_FFMPEG
+    mediaHandler.reset( new gnash::media::ffmpeg::MediaHandlerFfmpeg() );
+#elif defined(USE_GST)
+    mediaHandler.reset( new gnash::media::gst::MediaHandlerGst() );
+#endif
+
+    if ( mediaHandler.get() )
+    {
+        gnash::media::MediaHandler::set(mediaHandler);
+        soundHandler.reset( new sound::NullSoundHandler() );
+    }
 
     boost::shared_ptr<StreamProvider> sp(new StreamProvider);
 

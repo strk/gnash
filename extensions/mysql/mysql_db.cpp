@@ -387,7 +387,8 @@ mysql_store(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-    return as_value(ptr->obj.store_result());
+    gnash::as_object *obj = reinterpret_cast<gnash::as_object	*>(ptr->obj.store_result());
+    return as_value(obj);
 }
 
 as_value

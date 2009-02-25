@@ -220,6 +220,7 @@ NS_PluginInitialize()
 #endif
     }
 
+#if 0 // Gtk is no longer required in the browser
     err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
                 NPNVToolkit,
                 (void *)&toolkit);
@@ -243,6 +244,7 @@ NS_PluginInitialize()
         std::cout << "GTK2 supported in this browser" << std::endl;
 #endif
     }
+#endif
 
     /*
     Check for environment variables.

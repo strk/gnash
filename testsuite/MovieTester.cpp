@@ -238,28 +238,31 @@ MovieTester::advanceClock(unsigned long ms)
 {
 	_clock.advance(ms);
 
-    // We need to fetch as many samples
-    // as needed for a theoretical 44100hz loop.
-    // That is 44100 samples each second.
-    // 44100/1000 = x/ms
-    //  x = (44100*ms) / 1000
-    unsigned int nSamples = (441*ms) / 10;
-    if ( ms%10 )
+    if ( _sound_handler )
     {
-        log_error("MovieTester::advanceClock: %d ms lost in sound advancement",
-            ms%10);
-    }
+        // We need to fetch as many samples
+        // as needed for a theoretical 44100hz loop.
+        // That is 44100 samples each second.
+        // 44100/1000 = x/ms
+        //  x = (44100*ms) / 1000
+        unsigned int nSamples = (441*ms) / 10;
+        if ( ms%10 )
+        {
+            log_error("MovieTester::advanceClock: %d ms lost in sound advancement",
+                ms%10);
+        }
 
-    unsigned int toFetch = nSamples*2;
+        unsigned int toFetch = nSamples*2;
 
-    log_debug("advanceClock(%d) needs to fetch %d samples", ms, toFetch);
+        log_debug("advanceClock(%d) needs to fetch %d samples", ms, toFetch);
 
-    boost::int16_t samples[1024];
-    while (toFetch)
-    {
-        unsigned int n = std::min(toFetch, 1024u);
-        _sound_handler->fetchSamples((boost::int16_t*)&samples, n);
-        toFetch -= n;
+        boost::int16_t samples[1024];
+        while (toFetch)
+        {
+            unsigned int n = std::min(toFetch, 1024u);
+            _sound_handler->fetchSamples((boost::int16_t*)&samples, n);
+            toFetch -= n;
+        }
     }
     
 }
@@ -573,8 +576,15 @@ MovieTester::canTestVideo() const
 void
 MovieTester::initTestingSoundHandlers()
 {
-
-    _sound_handler.reset( new sound::NullSoundHandler() );
+    // Currently, SoundHandler can't be constructed
+    // w/out a registered MediaHandler .
+    // Should be fixed though...
+    //
+    if ( gnash::media::MediaHandler::get() ) {
+        log_error("MediaHandler::get returns: %s",
+            gnash::media::MediaHandler::get());
+        _sound_handler.reset( new sound::NullSoundHandler() );
+    }
 }
 
 void
@@ -588,7 +598,7 @@ MovieTester::initTestingMediaHandlers()
 #elif defined(USE_GST)
         handler.reset( new gnash::media::gst::MediaHandlerGst() );
 #else
-	std::cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << std::endl;
+	std::cerr << "Neigther SOUND_SDL nor SOUND_GST defined" << std::endl;
 	return;
 #endif
 

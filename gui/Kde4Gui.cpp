@@ -173,6 +173,7 @@ Kde4Gui::popupMenu(const QPoint& point)
 {
     QMenu popupMenu(_drawingWidget);
     popupMenu.addMenu(fileMenu);
+    popupMenu.addMenu(editMenu);
     popupMenu.addMenu(movieControlMenu);
     popupMenu.addMenu(viewMenu);
     popupMenu.exec(point);
@@ -286,9 +287,9 @@ Kde4Gui::setFullscreen()
     _fullscreen = true;
     fullscreenAction->setChecked(_fullscreen);
 
-    _window->showFullScreen();
-    QMenuBar* mainMenu = _window->menuBar();
-    if (mainMenu) mainMenu->hide();
+    // Make the widget a top level window so it can be fullscreen
+    _drawingWidget->setWindowFlags(Qt::Window);
+    _drawingWidget->showFullScreen();
 }
 
 void
@@ -297,9 +298,15 @@ Kde4Gui::unsetFullscreen()
     _fullscreen = false;
     fullscreenAction->setChecked(_fullscreen);
 
-    _window->showNormal();
-    QMenuBar* mainMenu = _window->menuBar();
-    if (mainMenu) mainMenu->show();
+    // Re-embed the drawing wiget into the browser
+    if (_xid) {
+        _drawingWidget->embedInto(_xid);
+    }
+    else {
+        _drawingWidget->setWindowFlags(Qt::Widget);
+    }
+
+    _drawingWidget->showNormal();
 }
 
 gnash::key::code

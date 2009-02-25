@@ -31,7 +31,7 @@ INCLUDES =  \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/vm \
 	    -I$(top_srcdir)/libcore/parser \
-	    -I$(top_srcdir)/libcore/asobjs \
+	    -I$(top_srcdir)/libcore/asobj \
 	    $(BOOST_CFLAGS) \
 	    $(PTHREAD_CFLAGS) \
 	    $(INCLTDL)

@@ -37,7 +37,8 @@ noinst_SCRIPT = autogen.sh
 DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
-	--enable-gui=all 
+	--enable-gui=all \
+	--disable-testsuite
 #--enable-cygnal
 
 STD_DIRS = \
@@ -313,7 +314,11 @@ endif
 	@echo "	Renderer engine: $(RENDERER_CONFIG)"
 
 if BUILD_GTK_GUI
+if HAVE_XV
+	@echo "	Supported GUI: GTK (+XVideo)"
+else
 	@echo "	Supported GUI: GTK"
+endif
 endif
 if BUILD_HILDON_GUI
 	@echo "	Supported GUI: HILDON"

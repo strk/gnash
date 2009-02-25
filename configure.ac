@@ -534,7 +534,6 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_fltk=yes
         build_kde3=yes
         build_kde4=yes
-        build_gtk=yes
         build_sdl=yes
 dnl        build_qtopia=yes
 dnl        build_hildon=yes

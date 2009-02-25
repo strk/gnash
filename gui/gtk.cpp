@@ -68,6 +68,9 @@ extern "C" {
 
 #ifdef RENDERER_AGG
 #include "gtk_glue_agg.h"
+#ifdef HAVE_XV
+#include "gtk_glue_agg_xv.h"
+#endif // HAVE_XV
 #endif
 
 #ifdef GUI_HILDON
@@ -173,10 +176,28 @@ GtkGui::init(int argc, char **argv[])
     _glue.reset(new GtkCairoGlue);
 #elif defined(RENDERER_OPENGL)
     _glue.reset(new GtkGlExtGlue);
-#elif defined(RENDERER_AGG)
+#elif defined(RENDERER_AGG) && !defined(HAVE_XV)
     _glue.reset(new GtkAggGlue);
+#elif defined(RENDERER_AGG) && defined(HAVE_XV)
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+    if (rcfile.useXv()) {
+        _glue.reset(new GtkAggXvGlue);
+        if (!_glue->init (argc, argv)) {
+            _glue.reset(new GtkAggGlue);
+            _glue->init(argc, argv);
+        }
+    } else {
+        _glue.reset(new GtkAggGlue);
+        _glue->init(argc, argv);
+    }
 #endif
-    _glue->init (argc, argv);
+
+#if ! (defined(HAVE_XV) && defined(RENDERER_AGG))
+    if (!_glue->init (argc, argv)) {
+        return false;
+    }
+#endif
 
     addPixmapDirectory (PKGDATADIR);
 

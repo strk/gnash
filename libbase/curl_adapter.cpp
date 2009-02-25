@@ -673,11 +673,23 @@ CurlStreamFile::fillCache(std::streamsize size)
 		int ret = select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
 		if ( ret == -1 )
 		{
-			// something unexpected happened
-			boost::format fmt = boost::format(
-				"error polling data from connection to %s: %s ")
-				% _url % strerror(errno);
-			throw GnashException(fmt.str());
+            if ( errno == EINTR )
+            {
+                // we got interupted by a signal
+                // let's consider this as a timeout
+#ifdef GNASH_CURL_VERBOSE
+                log_debug("select() was interrupted by a signal");
+#endif
+                ret = 0;
+            }
+            else
+            {
+                // something unexpected happened
+                boost::format fmt = boost::format(
+                    "error polling data from connection to %s: %s ")
+                    % _url % strerror(errno);
+                throw GnashException(fmt.str());
+            }
 		}
 		if ( ! ret )
 		{

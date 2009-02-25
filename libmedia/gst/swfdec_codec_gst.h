@@ -37,6 +37,11 @@ gboolean	swfdec_gst_decoder_init		(SwfdecGstDecoder *	dec,
 						 GstCaps *		srccaps,
 						 GstCaps *		sinkcaps,
 						 ...) G_GNUC_NULL_TERMINATED;
+
+gboolean	swfdec_gst_colorspace_init	(SwfdecGstDecoder *	dec,
+						 GstCaps *		srccaps,
+						 GstCaps *		sinkcaps);
+						 
 void		swfdec_gst_decoder_push_eos	(SwfdecGstDecoder *	dec);
 GstBuffer *	swfdec_gst_decoder_pull		(SwfdecGstDecoder *	dec);
 gboolean	swfdec_gst_decoder_push		(SwfdecGstDecoder *	dec,
