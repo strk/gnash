@@ -26,7 +26,7 @@ AM_CPPFLAGS = \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/vm \
-            -I$(top_srcdir)/asobjs \
+            -I$(top_srcdir)/libcore/asobj \
             -I$(top_srcdir)/libltdl \
             $(MYSQL_CFLAGS)
 
