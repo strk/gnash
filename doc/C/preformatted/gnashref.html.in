@@ -1,6 +1,6 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash Reference Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash Reference Manual</h1></div><div><p class="releaseinfo">
       This manual describes version 0.8.3 of Gnash.
-    </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
+    </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008, 2009 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License"><em class="citetitle">GNU
     Free Documentation License</em></a>, Version 1.1 or any later

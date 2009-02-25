@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -730,17 +730,17 @@ check_equals (ord(""), 0);
 // Chars greater than 128
 #if OUTPUT_VERSION > 5
 check_equals (chr(246), "ö");
-check_equals (chr(486), "Ǧ");
-check_equals (chr(998), "Ϧ");
+check_equals (chr(486), "?");
+check_equals (chr(998), "?");
 check_equals (ord("ö"), 246);
-check_equals (ord("Ϧ"), 998);
+check_equals (ord("?"), 998);
 #else // version <= 5
 check_equals (typeof(chr(486)), 'string');
 check_equals (chr(865), "a");
 check_equals (ord("ö"), 195);
 check_equals (ord("Ö"), 195);
-check_equals (ord("ǵ"), 199);
-check_equals (ord("Ϧ"), 207);
+check_equals (ord("?"), 199);
+check_equals (ord("?"), 207);
 #endif
 
 //-------------------------------------------
@@ -751,7 +751,7 @@ check_equals (ord("Ϧ"), 207);
 // All versions, especially 5:
 var c;
 
-i = "Ǧ";
+i = "?";
 
 asm {
     push "c"   
@@ -767,7 +767,7 @@ check_equals (c, 486);
 xcheck_equals (c, 199);
 #endif
 
-i = "Ϧ";
+i = "?";
 
 asm {
     push "c"   
@@ -796,7 +796,7 @@ asm {
 };
 
 #if OUTPUT_VERSION > 5
-check_equals (c, "Ϧ");
+check_equals (c, "?");
 #else
 check_equals (typeof(c), "string"); 
 // c == "" fails, but when displayed it evaluates to the empty string
@@ -815,7 +815,7 @@ asm {
 };
 
 #if OUTPUT_VERSION > 5
-check_equals (c, "徐");
+check_equals (c, "?");
 #else
 check_equals (typeof(c), "string");
 // c == "" fails, but when displayed it evaluates to the empty string
