@@ -1691,22 +1691,14 @@ TextField::setWordWrap(bool on)
 cxform    
 TextField::get_world_cxform() const
 {
-  cxform cf = character::get_world_cxform();
-  
-#ifdef PP_COMPATIBLE_DEVICE_FONT_HANDLING
-  if ( ! getEmbedFonts() ) /* if using a device font (PP compatibility) */ 
+  if ( ! getEmbedFonts() ) /* if using a device font (PP compatibility) */
   {
-    // set alpha to default values to make the text field opaque
-    cf.m_[3][0] = 1.0f;
-    cf.m_[3][1] = 0.0f;
-    
-    // NOTE: Linux version of Adobe's player also ignores tint
-    // transform, so we should (or not) return an identity cxform
-    // here. This has to be discussed...
+    return cxform();
   }
-#endif
-  
-  return cf;
+  else
+  {
+    return character::get_world_cxform();
+  }
 }
 
 void
