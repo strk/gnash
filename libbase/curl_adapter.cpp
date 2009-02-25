@@ -671,6 +671,7 @@ CurlStreamFile::fillCache(std::streamsize size)
 		// Wait for data on the filedescriptors until a timeout set
 		// in gnashrc.
 		int ret = select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
+#ifndef __OS2__ // select will always fail here as we can't select on file descriptors, only on sockets
 		if ( ret == -1 )
 		{
             if ( errno == EINTR )
@@ -691,6 +692,7 @@ CurlStreamFile::fillCache(std::streamsize size)
                 throw GnashException(fmt.str());
             }
 		}
+#endif
 		if ( ! ret )
 		{
 			// timeout

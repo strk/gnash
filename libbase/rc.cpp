@@ -136,8 +136,10 @@ RcInitFile::loadFiles()
 
     // Check the default system location
     std::string loadfile = SYSCONFDIR;
+#ifndef __OS2__ // On OS/2 - only look in %HOME%
     loadfile.append("/gnashrc");
     parseFile(loadfile);
+#endif
     
     // Check the users home directory
     char *home = std::getenv("HOME");
