@@ -108,7 +108,7 @@ if USE_GST_ENGINE
 		gst/AudioDecoderGst.h \
 		gst/VideoDecoderGst.h \
 		gst/MediaParserGst.h \
-		gst/VideoConverterGst.cpp \
+		gst/VideoConverterGst.h \
 		gst/GstUtil.h \
 		gst/swfdec_codec_gst.h \
 		gst/gnash_gst_version.h \
