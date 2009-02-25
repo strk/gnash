@@ -195,30 +195,41 @@ error:
 }
 
 /*static*/ GstPad *
-swfdec_gst_connect_sinkpad (GstElement *element, GstCaps *caps)
+swfdec_gst_connect_sinkpad_by_pad (GstPad *srcpad, GstCaps *caps)
 {
   GstPadTemplate *tmpl;
-  GstPad *srcpad, *sinkpad;
+  GstPad *sinkpad;
 
-  srcpad = gst_element_get_pad (element, "src");
-  if (srcpad == NULL)
-    return NULL;
   gst_caps_ref (caps);
   tmpl = gst_pad_template_new ("sink", GST_PAD_SINK, GST_PAD_ALWAYS, caps);
   sinkpad = gst_pad_new_from_template (tmpl, "sink");
   g_object_unref (tmpl);
   if (gst_pad_link (srcpad, sinkpad) != GST_PAD_LINK_OK)
     goto error;
-  
-  gst_object_unref (srcpad);
+
   gst_pad_set_active (sinkpad, TRUE);
   return sinkpad;
 
 error:
   SWFDEC_ERROR ("failed to create or link sinkpad");
-  gst_object_unref (srcpad);
   gst_object_unref (sinkpad);
   return NULL;
+}
+
+/*static*/ GstPad *
+swfdec_gst_connect_sinkpad (GstElement *element, GstCaps *caps)
+{
+  GstPad* srcpad;
+  srcpad = gst_element_get_pad (element, "src");
+
+  if (srcpad == NULL)
+    return NULL;
+
+  GstPad* sinkpad = swfdec_gst_connect_sinkpad_by_pad (srcpad, caps);
+  
+  gst_object_unref (srcpad);
+  
+  return sinkpad;
 }
 
 /*** DECODER ***/

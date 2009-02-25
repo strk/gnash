@@ -59,6 +59,7 @@ GstElementFactory *
 GstPad *	swfdec_gst_connect_srcpad (GstElement *element, GstCaps *caps);
 
 GstPad *	swfdec_gst_connect_sinkpad (GstElement *element, GstCaps *caps);
+GstPad *    swfdec_gst_connect_sinkpad_by_pad (GstPad *srcpad, GstCaps *caps);
 
 G_END_DECLS
 #endif
