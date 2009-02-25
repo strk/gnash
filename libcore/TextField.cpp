@@ -54,18 +54,6 @@
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
 
-// Define the following macro to maintain compatibility with the proprietary
-// player when it comes to opacity of textfields using device fonts.
-// See http://gnashdev.org/wiki/index.php/DeviceFonts#Differences_with_proprietary_player_implementation
-//
-// This is now disabled by default because INCOMPLETE and unclean
-// A clean implementation (IMHO) would warn user about the fact
-// it is doing a stupid thing for compatibilty reason.
-// Also, for good compatibility, we should skip rendering
-// of rotated or skewed text.
-//
-//#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
-
 // Define the following to get detailed log information about
 // textfield bounds and HTML tags:
 //#define GNASH_DEBUG_TEXTFIELDS 1
