@@ -102,7 +102,7 @@ if USE_GST_ENGINE
 		gst/GstUtil.cpp \
 		gst/swfdec_codec_gst.c \
 		$(NULL)
-	
+
    noinst_HEADERS += \
 		gst/MediaHandlerGst.h \
 		gst/AudioDecoderGst.h \

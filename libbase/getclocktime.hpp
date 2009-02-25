@@ -25,6 +25,7 @@
 
 #include <ctime>
 
+#ifndef __OS2__
 #ifndef HAVE_CLOCK_GETTIME
 
 #include <sys/time.h>
@@ -52,4 +53,5 @@ static int clock_gettime(int, struct timespec *tp) {
 }
 
 #endif
+#endif /* __OS2__ */
 #endif /* GETCLOCKTIMER_HPP */
