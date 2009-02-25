@@ -1679,6 +1679,9 @@ TextField::setWordWrap(bool on)
 cxform    
 TextField::get_world_cxform() const
 {
+    // This is not automatically tested. See testsuite/samples/input-fields.swf
+    // for a manual check.
+
     // If using a device font (PP compatibility), do not take parent cxform
     // into account.
     if (!getEmbedFonts()) {
