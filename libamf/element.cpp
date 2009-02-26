@@ -1086,6 +1086,7 @@ Element::makeReference()
 {
 //    GNASH_REPORT_FUNCTION;
     _type = Element::REFERENCE_AMF0;
+    return *this;
 }
 
 Element &
