@@ -53,7 +53,7 @@ AudioDecoderSpeex::AudioDecoderSpeex()
         throw MediaException(_("AudioDecoderSpeex: initialization failed."));
     }
 
-    boost::uint32_t num = 0, den = 0;
+    spx_uint32_t num = 0, den = 0;
 
     speex_resampler_get_ratio (_resampler, &num, &den);
     assert(num && den);
@@ -111,14 +111,14 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
             break;
         }
 
-        boost::uint32_t conv_size = 0;
+        spx_uint32_t conv_size = 0;
         boost::int16_t* conv_data = 0;
 
 #ifdef RESAMPLING_SPEEX
         conv_data = new boost::int16_t[_target_frame_size];
         memset(conv_data, 0, _target_frame_size * 2);
 
-        boost::uint32_t in_size = _speex_framesize;
+        spx_uint32_t in_size = _speex_framesize;
 
         // Our input format is mono and we want to expand to stereo. Speex
         // won't do this for us, but we can ask it to skip a sample after
