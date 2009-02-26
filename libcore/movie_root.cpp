@@ -900,7 +900,8 @@ movie_root::fire_mouse_event()
 }
 
 void
-movie_root::get_mouse_state(int& x, int& y, int& buttons)
+movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y,
+        boost::int32_t& buttons)
 {
 //	    GNASH_REPORT_FUNCTION;
 
@@ -965,7 +966,7 @@ movie_root::doMouseDrag()
 		return; 
 	}
 
-	int	x, y, buttons;
+	boost::int32_t x, y, buttons;
 	get_mouse_state(x, y, buttons);
 
 	point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));

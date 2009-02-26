@@ -148,7 +148,7 @@ VM::getOSName()
 #ifdef HAVE_SYS_UTSNAME_H
 // For Linux- or UNIX-based systems (POSIX 4.4 conformant)
 
-		utsname osname;
+		struct utsname osname;
 		std::string tmp;
 		
 		uname (&osname);

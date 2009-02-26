@@ -286,7 +286,8 @@ public:
     //
     /// Coordinates are in PIXELS, NOT TWIPS.
     ///
-    void get_mouse_state(int& x, int& y, int& buttons);
+    void get_mouse_state(boost::int32_t& x, boost::int32_t& y,
+            boost::int32_t& buttons);
 
     void get_drag_state(drag_state& st);
 

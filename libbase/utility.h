@@ -24,6 +24,10 @@
 #include "gnashconfig.h"
 #endif
 
+#ifdef SOLARIS
+# include <ieeefp.h> // for finite()
+#endif
+
 #include <cassert>
 #include <string>
 #include <typeinfo>

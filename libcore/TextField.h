@@ -477,7 +477,7 @@ private:
     /// updated.
 	void updateText(const std::wstring& s);
 
-    void insertTab(SWF::TextRecord& rec, int& x, float scale);
+    void insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale);
 
 	/// What happens when setFocus() is called on this TextField.
     //
