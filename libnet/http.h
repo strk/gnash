@@ -315,7 +315,7 @@ private:
     boost::uint32_t     _filesize;
     std::map<int, struct status_codes *> _status_codes;
     
-    std::map<std::string, std::string> DSOEXPORT _fields;
+    std::map<std::string, std::string> _fields;
     http_version_t	_version;
     
     // Connection parameters we care about
@@ -330,7 +330,7 @@ private:
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    bool http_handler(Network::thread_params_t *args);
+    bool DSOEXPORT http_handler(Network::thread_params_t *args);
 }
 
 

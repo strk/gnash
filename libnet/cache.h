@@ -44,7 +44,7 @@ static const size_t CACHE_LIMIT = 102400000;
 
 /// \class Cache
 //
-class Cache {
+class DSOEXPORT Cache {
 public:
     Cache();
     ~Cache();
