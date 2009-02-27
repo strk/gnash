@@ -23,7 +23,6 @@ AM_LDFLAGS = \
 	../../libamf/libgnashamf.la \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(DEJAGNU_CFLAGS) \
@@ -37,8 +36,6 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/testsuite \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \

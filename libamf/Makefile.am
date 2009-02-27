@@ -44,8 +44,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libbase \
 	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS) \
-        $(LIBXML_CFLAGS)
+	$(PTHREAD_CFLAGS)
 
 AM_LDFLAGS = $(BOOST_LIBS)
 

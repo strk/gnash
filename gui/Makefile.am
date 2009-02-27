@@ -49,11 +49,9 @@ AM_CPPFLAGS = \
        -DLOCALEDIR=\"$(localedir)\" \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
-        $(LIBXML_CFLAGS) \
-        $(DMALLOC_CFLAGS) \
 	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
-        $(PTHREAD_CFLAGS) \
+	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
 GTK_CFLAGS = \
@@ -86,7 +84,6 @@ AM_LDFLAGS =  \
 	$(GLIB_LIBS) \
 	$(LIBLTDL) \
 	$(CURL_LIBS) \
-	$(LIBXML_LIBS) \
 	$(INCLTDL) \
 	$(LIRC_LIBS) \
 	$(MYSQL_LIBS) \

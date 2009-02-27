@@ -30,9 +30,7 @@ INCLUDES = \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/asobj \
-	$(LIBXML_CFLAGS) \
 	$(SDL_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(GTK2_CFLAGS) \

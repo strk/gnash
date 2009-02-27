@@ -40,7 +40,6 @@ AM_LDFLAGS = \
 	../libamf/libgnashamf.la \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(LIBINTL) \
@@ -61,7 +60,6 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/vm \
         -DLOCALEDIR=\"$(localedir)\" \
-        $(LIBXML_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)

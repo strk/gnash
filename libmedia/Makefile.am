@@ -35,9 +35,7 @@ libgnashmedia_la_CPPFLAGS = \
 	-I$(top_srcdir)/libbase	\
 	-I$(top_srcdir)/libcore	\
 	$(PTHREAD_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(OPENGL_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(CURL_CFLAGS) \
@@ -50,11 +48,6 @@ libgnashmedia_la_CPPFLAGS = \
 
 # These headers get installed
 # include_HEADERS = log.h err.h proc.h serial.h xantrex.h outback.h
-
-# Don't build Dmalloc support if it's not configured in
-if HAVE_DMALLOC
-DMALLOC_FILE = dlmalloc.c
-endif
 
 libgnashmedia_la_LIBADD = \
 	$(PNG_LIBS) \

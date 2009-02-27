@@ -54,7 +54,6 @@ AM_LDFLAGS = \
 	$(EXPAT_LIBS) \
 	$(FFMPEG_LIBS) \
 	$(JPEG_LIBS) \
-	$(LIBXML_LIBS) \
 	$(PNG_LIBS) \
 	$(SDL_LIBS) \
 	$(NSPR_LIBS) \

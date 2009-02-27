@@ -27,7 +27,6 @@ AM_LDFLAGS = \
 	../libamf/libgnashamf.la \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
@@ -39,8 +38,6 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)

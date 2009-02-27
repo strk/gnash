@@ -41,10 +41,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libamf \
 	$(PTHREAD_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(FREETYPE2_CFLAGS) \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
@@ -220,7 +218,6 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
-	$(LIBXML_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(FREETYPE2_LIBS) \

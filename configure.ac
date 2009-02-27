@@ -129,9 +129,9 @@ case "${host}" in
     darwin=yes
     AC_DEFINE([DARWIN], [1], [this is a Darwin platform])
     ;;
-    dnl Unfortunately, all BSD distributions are not identical, so as tacky as it is
-    dnl to look for the distribution name, we don't have much choice. The use of these
-    dnl should be avoid as much as possible.
+    dnl Unfortunately, all BSD distributions are not identical, so 
+    dnl as tacky as it is to look for the distribution name, we don't
+    dnl have much choice. The use of these should be avoid as much as possible.
   *-openbsd*)
     bsd=yes
     openbsd=yes
@@ -356,7 +356,7 @@ fi
 AM_CONDITIONAL(SWFTREE, test x$swftree = xyes)
 
 dnl Disable running any tests for "make check". This may sound stupid, but
-dnl this option is designed to soley be used by maintainers in the 
+dnl this option is designed to solely be used by maintainers in the 
 dnl DISTCHECK_CONFIGURE_FLAGS when building packages. Gnash's testing infrastructure
 dnl is complex, and often the the testsuites will work, but due to some obscure reason,
 dnl make distcheck fails.
@@ -1616,14 +1616,8 @@ fi
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
 dnl
-dnl NOTE: make sure to check for GLIB and LIBXML2 
-dnl before checking for gstreamer
+dnl gstreamer should take care of libxml2 and glib cflags/libs
 dnl
-
-AC_CHECK_SIZEOF(size_t) dnl set SIZEOF_SIZE_T.
-AC_CHECK_SIZEOF(long)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(short)
 
 GNASH_PATH_QT3
 GNASH_PATH_KDE3

@@ -34,9 +34,7 @@ AM_CPPFLAGS = \
     -I$(top_srcdir)/libltdl \
 	$(GLIB_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(FFMPEG_CFLAGS) \
 	$(NULL)
 

@@ -27,7 +27,6 @@ INCLUDES = \
         -I$(top_srcdir)/libcore  \
         -I$(top_srcdir)/testsuite \
         $(MING_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \
 	$(NULL)
