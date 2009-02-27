@@ -177,7 +177,8 @@ Rectangle_contains(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss;
 			fn.dump_args(ss);
-			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), _("missing arguments"));
+			log_aserror("flash.geom.Rectangle(%s): %s", ss.str(), 
+                _("missing arguments"));
 		);
 		return as_value();
 	}
@@ -415,7 +416,8 @@ Rectangle_bottom_getset(const fn_call& fn)
 static as_value
 Rectangle_bottomRight_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Rectangle_as> ptr = ensureType<Rectangle_as>(fn.this_ptr);
+	boost::intrusive_ptr<Rectangle_as> ptr = 
+        ensureType<Rectangle_as>(fn.this_ptr);
 
 	as_value ret;
 
@@ -434,7 +436,7 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 
 		as_environment& env = fn.env();
 
-		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(right);
 		args->push_back(bottom);
 
@@ -443,7 +445,8 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 	else // setter
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(_("Attempt to set read-only property %s"), "Rectangle.bottomRight");
+		log_aserror(_("Attempt to set read-only property %s"),
+            "Rectangle.bottomRight");
 		);
 	}
 
@@ -523,7 +526,7 @@ Rectangle_size_getset(const fn_call& fn)
 
 		as_environment& env = fn.env();
 
-		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(w);
 		args->push_back(h);
 

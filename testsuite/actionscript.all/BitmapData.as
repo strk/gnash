@@ -223,7 +223,7 @@ check_equals(bmp.height, -1);
 bmp = new Bitmap(20, 10, true);
 backup = flash.geom.Rectangle;
 flash.geom.Rectangle = 2;
-xcheck_equals(bmp.rectangle, -1);
+check_equals(bmp.rectangle, -1);
 
 flash.geom.Rectangle = function (x, y, w, h)
 {
@@ -232,17 +232,17 @@ flash.geom.Rectangle = function (x, y, w, h)
     this.width = h;
     this.height = w;
 };
-xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+check_equals(bmp.rectangle.toString(), "[object Object]");
 
 flash.geom.Rectangle = function (x, y, w, h)
 {
 };
-xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+check_equals(bmp.rectangle.toString(), "[object Object]");
 
 flash.geom.Rectangle = function ()
 {
 };
-xcheck_equals(bmp.rectangle.toString(), "[object Object]");
+check_equals(bmp.rectangle.toString(), "[object Object]");
 
 flash.geom.Rectangle = backup;
 check_equals(bmp.rectangle.toString(), "(x=0, y=0, w=20, h=10)");

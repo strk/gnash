@@ -94,14 +94,17 @@ attachMatrixInterface(as_object& o)
     o.init_member("clone", new builtin_function(Matrix_clone), fl);
     o.init_member("concat", new builtin_function(Matrix_concat), fl);
     o.init_member("createBox", new builtin_function(Matrix_createBox), fl);
-    o.init_member("createGradientBox", new builtin_function(Matrix_createGradientBox), fl);
-    o.init_member("deltaTransformPoint", new builtin_function(Matrix_deltaTransformPoint), fl);
+    o.init_member("createGradientBox",
+            new builtin_function(Matrix_createGradientBox), fl);
+    o.init_member("deltaTransformPoint",
+            new builtin_function(Matrix_deltaTransformPoint), fl);
     o.init_member("identity", new builtin_function(Matrix_identity), fl);
     o.init_member("invert", new builtin_function(Matrix_invert), fl);
     o.init_member("rotate", new builtin_function(Matrix_rotate), fl);
     o.init_member("scale", new builtin_function(Matrix_scale), fl);
     o.init_member("toString", new builtin_function(Matrix_toString), fl);
-    o.init_member("transformPoint", new builtin_function(Matrix_transformPoint), fl);
+    o.init_member("transformPoint",
+            new builtin_function(Matrix_transformPoint), fl);
     o.init_member("translate", new builtin_function(Matrix_translate), fl);
 }
 
@@ -389,7 +392,8 @@ Matrix_deltaTransformPoint(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.deltaTransformPoint(%s): needs one argument", ss.str());
+            log_aserror("Matrix.deltaTransformPoint(%s): needs one argument",
+                ss.str());
         );
         return as_value();
     }
@@ -402,7 +406,8 @@ Matrix_deltaTransformPoint(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Matrix.deltaTransformPoint(%s): needs an object", ss.str());
+            log_aserror("Matrix.deltaTransformPoint(%s): needs an object",
+                ss.str());
         );
         return as_value();
     }
@@ -658,12 +663,14 @@ Matrix_toString(const fn_call& fn)
     
     std::ostringstream ss;
     
-    ss << "(a=" << a.to_string() << ", "
-          "b="<< b.to_string() << ", "
-          "c="<< c.to_string() << ", "
-          "d="<< d.to_string() << ", "
-          "tx="<< tx.to_string() << ", "
-          "ty="<< ty.to_string() << ")";
+    const int version = fn.getVM().getSWFVersion();
+
+    ss << "(a=" << a.to_string_versioned(version) << ", "
+          "b="<< b.to_string_versioned(version) << ", "
+          "c="<< c.to_string_versioned(version) << ", "
+          "d="<< d.to_string_versioned(version) << ", "
+          "tx="<< tx.to_string_versioned(version) << ", "
+          "ty="<< ty.to_string_versioned(version) << ")";
     
     return as_value(ss.str());
 }

@@ -240,7 +240,8 @@ ColorTransform_toString(const fn_call& fn)
 {
 
     // Must be a ColorTransform
-	boost::intrusive_ptr<ColorTransform_as> ptr = ensureType<ColorTransform_as>(fn.this_ptr);
+	boost::intrusive_ptr<ColorTransform_as> ptr = 
+        ensureType<ColorTransform_as>(fn.this_ptr);
 
     // We need the as_value to_string method, but using ptr->get_member
     // is unnecessary when we can read directly from the object.

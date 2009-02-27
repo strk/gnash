@@ -564,20 +564,34 @@ BitmapData_height(const fn_call& fn)
 as_value
 BitmapData_rectangle(const fn_call& fn)
 {
-	boost::intrusive_ptr<BitmapData_as> ptr = ensureType<BitmapData_as>(fn.this_ptr);
+	boost::intrusive_ptr<BitmapData_as> ptr = 
+        ensureType<BitmapData_as>(fn.this_ptr);
 
     // Returns the immutable rectangle of the bitmap or -1 if dispose()
     // has been called.
     if (ptr->getBitmapData().empty()) return -1;
 
-	boost::intrusive_ptr<as_object> obj = init_Rectangle_instance();
+    // If it's not found construction will fail.
+    as_value rectangle(fn.env().find_object("flash.geom.Rectangle"));
+    boost::intrusive_ptr<as_function> rectCtor = rectangle.to_as_function();
 
-	obj->set_member(NSV::PROP_X, 0.0);
-	obj->set_member(NSV::PROP_Y, 0.0);
-	obj->set_member(NSV::PROP_WIDTH, ptr->getWidth());
-	obj->set_member(NSV::PROP_HEIGHT, ptr->getHeight());
+    if (!rectCtor) {
+        log_error("Failed to construct flash.geom.Rectangle!");
+        return -1;
+    }
 
-	return as_value(obj.get()); // will keep alive
+    // Construct a Rectangle from the data.
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    
+    args->push_back(0.0);
+    args->push_back(0.0);
+	args->push_back(ptr->getWidth());
+	args->push_back(ptr->getHeight());
+
+    boost::intrusive_ptr<as_object> newRect =
+            rectCtor->constructInstance(fn.env(), args);
+
+    return as_value(newRect.get());
 }
 
 as_value
