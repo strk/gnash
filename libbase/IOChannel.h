@@ -29,7 +29,7 @@
 namespace gnash {
 
 /// Exception signalling an IO error
-class IOException : public GnashException {
+class DSOEXPORT IOException : public GnashException {
 public:
 	IOException(const std::string& s) : GnashException(s) {}
 	IOException() : GnashException("IO error") {}
