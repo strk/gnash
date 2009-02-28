@@ -364,10 +364,10 @@ endif
 	  echo "	Extensions added are: $(EXTENSIONS_LIST)"; \
 	fi
 	@if test -n "$(SECURITY_LIST)" ; then \
-	  echo "	Security features enables are: $(SECURITY_LIST)"; \
+	  echo "	Security features enabled are: $(SECURITY_LIST)"; \
 	fi
 	@if test -n "$(STATISTICS_LIST)" ; then \
-	  echo "	Statistics features enables are: $(STATISTICS_LIST)"; \
+	  echo "	Statistics features enabled are: $(STATISTICS_LIST)"; \
 	fi
 if KPARTS3
 	@echo "	KPARTS 3.x (KDE) plugin enabled"
