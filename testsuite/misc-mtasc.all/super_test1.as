@@ -72,8 +72,8 @@ class Derived11 extends Derived1
      // when "apply()" is used to call the derived method.
      var method = derivedObj.viaApply;
      method.apply(derivedObj);
-     xcheck_equals(derivedObj.baseViaApplyCalled, true);
-     xcheck_equals(derivedObj.derived1ViaApplyCalled, true);
+     check_equals(derivedObj.baseViaApplyCalled, true);
+     check_equals(derivedObj.derived1ViaApplyCalled, true);
      check_equals(derivedObj.derived11ViaApplyCalled, true);
      
      // check this pointers. 

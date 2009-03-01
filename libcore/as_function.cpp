@@ -210,7 +210,7 @@ function_apply(const fn_call& fn)
 	fn_call new_fn_call(fn);
 	new_fn_call.resetArgs();
 
-	if ( ! fn.nargs )
+	if (!fn.nargs)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror (_("Function.apply() called with no args"));
@@ -225,13 +225,13 @@ function_apply(const fn_call& fn)
         if (!obj) obj = new as_object; 
 
         new_fn_call.this_ptr = obj;
+        new_fn_call.super = obj->get_super();
 
 		// Check for second argument ('arguments' array)
-		if ( fn.nargs > 1 )
+		if (fn.nargs > 1)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				if ( fn.nargs > 2 )
-				{
+				if (fn.nargs > 2) {
 					log_aserror(_("Function.apply() got %d"
 						" args, expected at most 2"
 						" -- discarding the ones in"
@@ -241,8 +241,7 @@ function_apply(const fn_call& fn)
 			);
 
 			boost::intrusive_ptr<as_object> arg1 = fn.arg(1).to_object();
-			if ( ! arg1 )
-			{
+			if (!arg1) {
 				IF_VERBOSE_ASCODING_ERRORS(
 					log_aserror(_("Second arg of Function.apply"
 						" is %s (expected array)"
@@ -267,10 +266,9 @@ function_apply(const fn_call& fn)
 				goto call_it;
 			}
 
-			unsigned int nelems = arg_array->size();
+			const size_t nelems = arg_array->size();
 
-			for (unsigned int i=0; i<nelems; ++i)
-			{
+			for (size_t i = 0; i < nelems; ++i) {
 				new_fn_call.pushArg(arg_array->at(i));
 			}
 
@@ -290,27 +288,24 @@ function_call(const fn_call& fn)
 {
 
 	// Get function body 
-	boost::intrusive_ptr<as_function> function_obj = ensureType<as_function>(fn.this_ptr);
+	boost::intrusive_ptr<as_function> function_obj = 
+        ensureType<as_function>(fn.this_ptr);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
 	fn_call new_fn_call(fn);
 
-	if ( ! fn.nargs )
-	{
-                log_debug (_("Function.call() with no args"));
-		new_fn_call.nargs=0;
+	if (!fn.nargs) {
+		new_fn_call.nargs = 0;
 	}
-	else
-	{
+	else {
 		// Get the object to use as 'this' reference
 		as_value this_val = fn.arg(0);
 		boost::intrusive_ptr<as_object> this_ptr = this_val.to_object();
 
-		if ( ! this_ptr )
-		{
+		if (!this_ptr) {
 			// If the first argument is not an object, we should
-			// not pass an object to the function, which I belive
+			// not pass an object to the function, which I believe
 			// should be allowed (but gnash code is not ready).
 			// Anyway, the 'this' label inside the function should 
 			// then be a strange object in that typeof() would return
@@ -324,16 +319,13 @@ function_call(const fn_call& fn)
 				"such a malformed call."), this_val);
 			);
 		}
-		else
-		{
+		else {
 			new_fn_call.this_ptr = this_ptr;
 			as_object* proto = this_ptr->get_prototype().get();
-            if ( proto )
-            {
-                    new_fn_call.super = this_ptr->get_super();
+            if (proto) {
+                new_fn_call.super = this_ptr->get_super();
             }
-            else
-            {
+            else {
                 // TODO: check this !
                 log_debug("No prototype in 'this' pointer "
                         "passed to Function.call");
@@ -350,7 +342,7 @@ function_call(const fn_call& fn)
 
 boost::intrusive_ptr<as_object>
 as_function::constructInstance(as_environment& env,
-	std::auto_ptr< std::vector<as_value> > args)
+	std::auto_ptr<std::vector<as_value> > args)
 {
 
 #ifndef GNASH_USE_GC
@@ -365,15 +357,11 @@ as_function::constructInstance(as_environment& env,
 	bool has_proto = false;
 	get_member(NSV::PROP_PROTOTYPE, &us);
 	
-    if (!us.is_undefined())
-	{
-		has_proto = true;
-	}
+    if (!us.is_undefined()) has_proto = true;
 
     // a built-in class takes care of assigning a prototype
     // TODO: change this
-    if ( isBuiltin() )
-    {
+    if (isBuiltin()) {
 		IF_VERBOSE_ACTION (
             log_action(_("it's a built-in class"));
 		)
@@ -410,16 +398,14 @@ as_function::constructInstance(as_environment& env,
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
         // Also for SWF5+ only?
-		if (swfversion < 7) 
-		{
+		if (swfversion < 7) {
 			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}
 
     }
-	else
-	{
+	else {
 		// Set up the prototype.
-		as_value	proto;
+		as_value proto;
 
 		// We can safely call as_object::get_member here as member name is 
 		// a literal string in lowercase. (we should likely avoid calling
@@ -431,8 +417,8 @@ as_function::constructInstance(as_environment& env,
 		// see construct-properties-#.swf from swfdec testsuite
 		//assert(func_has_prototype);
 
-		IF_VERBOSE_ACTION (
-		log_action(_("constructor prototype is %s"), proto);
+		IF_VERBOSE_ACTION(
+            log_action(_("constructor prototype is %s"), proto);
 		);
 
 		// Create an empty object, with a ref to the constructor's prototype.
@@ -443,8 +429,7 @@ as_function::constructInstance(as_environment& env,
 		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
-		if ( swfversion < 7 )
-		{
+		if (swfversion < 7) {
 			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
 		}
 
