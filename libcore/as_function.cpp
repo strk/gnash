@@ -354,10 +354,10 @@ as_function::constructInstance(as_environment& env,
 	boost::intrusive_ptr<as_object> newobj;
 
 	as_value us;
-	bool has_proto = false;
-	get_member(NSV::PROP_PROTOTYPE, &us);
 	
-    if (!us.is_undefined()) has_proto = true;
+    get_member(NSV::PROP_PROTOTYPE, &us);
+	
+    bool has_proto = !us.is_undefined();
 
     // a built-in class takes care of assigning a prototype
     // TODO: change this
@@ -375,7 +375,7 @@ as_function::constructInstance(as_environment& env,
         catch (GnashException& ex) {
             // Catching a std::exception here can mask all sorts of bad 
             // behaviour, as (for instance) a poorly constructed string may
-            // smash the stack, throw and exception, but not abort.
+            // smash the stack, throw an exception, but not abort.
             // This is very effective at confusing debugging tools.
             // We only throw GnashExceptions. A std::bad_alloc may also be
             // reasonable, but anything else shouldn't be caught here.
@@ -394,7 +394,9 @@ as_function::constructInstance(as_environment& env,
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked). NOTE that we assume the builtin constructors
 		// won't set __constructor__ to some other value...
-		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
+		int flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::onlySWF6Up; 
+
 		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
 
         // Also for SWF5+ only?
@@ -413,9 +415,8 @@ as_function::constructInstance(as_environment& env,
 		// method directly instead) TODO
 		/*bool func_has_prototype=*/ get_member(NSV::PROP_PROTOTYPE, &proto);
 
-		// user could have dropped the prototype..
+		// User could have dropped the prototype.
 		// see construct-properties-#.swf from swfdec testsuite
-		//assert(func_has_prototype);
 
 		IF_VERBOSE_ACTION(
             log_action(_("constructor prototype is %s"), proto);
@@ -426,11 +427,14 @@ as_function::constructInstance(as_environment& env,
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked)
-		int flags = as_prop_flags::dontEnum|as_prop_flags::onlySWF6Up; // can delete, hidden in swf5
-		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, as_value(this), flags);
+        // Can delete, hidden in swf5 
+		int flags = as_prop_flags::dontEnum | 
+                    as_prop_flags::onlySWF6Up; 
+
+		newobj->init_member(NSV::PROP_uuCONSTRUCTORuu, this, flags);
 
 		if (swfversion < 7) {
-			newobj->init_member(NSV::PROP_CONSTRUCTOR, as_value(this), flags);
+			newobj->init_member(NSV::PROP_CONSTRUCTOR, this, flags);
 		}
 
 		// Super is computed from the object we're constructing,
@@ -445,8 +449,7 @@ as_function::constructInstance(as_environment& env,
 		call(fn);
 	}
 
-	if (!has_proto)
-		set_member(NSV::PROP_PROTOTYPE, as_value(newobj));
+	if (!has_proto) set_member(NSV::PROP_PROTOTYPE, as_value(newobj));
     
 	return newobj;
 }
