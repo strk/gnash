@@ -468,8 +468,8 @@ public:
 
     /// The possible values of Stage.displayState
     enum DisplayState {
-        normal,
-        fullScreen
+        DISPLAYSTATE_NORMAL,
+        DISPLAYSTATE_FULLSCREEN
     };
 
     /// The possibile values of Stage.scaleMode

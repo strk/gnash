@@ -213,11 +213,12 @@ Gui::allowScale(bool allow)
 void
 Gui::toggleFullscreen()
 {
+    /// Sends request to Gnash core to change display state.
 	if (_fullscreen) {
-		unsetFullscreen();
+		_stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
 	}
 	else {
-		setFullscreen();
+		_stage->setStageDisplayState(movie_root::DISPLAYSTATE_FULLSCREEN);
 	} 
 }
 
@@ -524,16 +525,13 @@ Gui::refreshView()
 void
 Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed) 
 {
-	movie_root* m = _stage;
 
 	/* Handle GUI shortcuts */
 	if (pressed)
 	{
-		if (k == gnash::key::ESCAPE)
-		{
-			if (isFullscreen())
-			{
-				unsetFullscreen();
+		if (k == gnash::key::ESCAPE) {
+			if (isFullscreen()) {
+				_stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
 			}
 		}
 		
@@ -651,11 +649,11 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 
     if ( _stopped ) return;
 
-	if ( m->notify_key_event(k, pressed) )
+	if ( _stage->notify_key_event(k, pressed) )
 	{
 		// any action triggered by the
 		// event required screen refresh
-		display(m);
+		display(_stage);
 	}
 
 }
@@ -943,9 +941,9 @@ Gui::advanceMovie()
 
 		if ( displayTime > estimatedDisplayTime)
 		{
-			//log_debug("Display took %6.6g seconds over %6.6g available for each frame", displayTime, timeSlot);
 
-			// Don't update estimatedDisplayTime if it's bigger then timeSlot*0.8
+			// Don't update estimatedDisplayTime if it's bigger then 
+            // timeSlot*0.8
 			if (  displayTime < timeSlot*0.8 )
 			{
 				// TODO: check for absurdly high values, like we can't set

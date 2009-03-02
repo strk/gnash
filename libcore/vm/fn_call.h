@@ -67,11 +67,9 @@ public:
         super(fn.super),
 		nargs(fn.nargs),
         callerDef(fn.callerDef),
-        _env(fn._env)
+        _env(fn._env),
+        _args(fn._args.get() ? new std::vector<as_value>(*fn._args) : 0)
 	{
-		if (fn._args.get()) {
-			_args.reset(new std::vector<as_value>(*fn._args));
-        }
 	}
 
 	fn_call(const fn_call& fn, as_object* this_in, as_object* sup = 0)
@@ -80,11 +78,9 @@ public:
         super(sup),
         nargs(fn.nargs),
         callerDef(fn.callerDef),
-		_env(fn._env)
+		_env(fn._env),
+        _args(fn._args.get() ? new std::vector<as_value>(*fn._args) : 0)
 	{
-		if (fn._args.get()) {
-			_args.reset(new std::vector<as_value>(*fn._args));
-        }
 	}
 
 	fn_call(as_object* this_in, as_environment& env_in,
@@ -118,8 +114,7 @@ public:
 		super(0),
 		nargs(0),
         callerDef(0),
-		_env(env_in),
-		_args(0)
+		_env(env_in)
 	{
 	}
 
@@ -154,12 +149,8 @@ public:
 
 	void drop_bottom()
 	{
-		assert(_args.get() && !(*_args).empty());
-		for (size_t i=0; i<(*_args).size()-1; ++i)
-		{
-			(*_args)[i] = (*_args)[i+1];
-		}
-		_args->pop_back();
+		assert(_args.get() && !_args->empty());
+        _args->erase(_args->begin());
 		--nargs;
 	}
 
@@ -194,7 +185,7 @@ public:
 
 	void pushArg(const as_value& arg)
 	{
-		nargs++;
+		++nargs;
 		_args->push_back(arg);
 	}
 
