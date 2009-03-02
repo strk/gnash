@@ -618,6 +618,13 @@ NPError
 nsPluginInstance::NewStream(NPMIMEType /*type*/, NPStream* stream,
                             NPBool /*seekable*/, uint16_t* /*stype*/)
 {
+    if (_childpid) {
+        // Apparently the child process has already been started for this
+        // plugin instance. It is puzzling that this method gets called
+        // again. Starting a new process for the same movie will cause
+        // problems later, so we'll stop here.
+        return NPERR_GENERIC_ERROR;
+    }
     _swf_url = stream->url;
 
 #if GNASH_PLUGIN_DEBUG > 1
