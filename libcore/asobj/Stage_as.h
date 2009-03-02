@@ -65,6 +65,5 @@ void stage_class_init(as_object& global);
   
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_STAGE_H__
 #endif
 

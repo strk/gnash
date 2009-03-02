@@ -273,28 +273,22 @@ stage_displaystate_getset(const fn_call& fn)
 
     movie_root& m = obj->getVM().getRoot();
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(getDisplayStateString(m.getStageDisplayState()));
+	if (!fn.nargs) {
+		return getDisplayStateString(m.getStageDisplayState());
 	}
-	else // setter
-	{
 
-        StringNoCaseEqual noCaseCompare;
+    StringNoCaseEqual noCaseCompare;
 
-		const std::string& str = fn.arg(0).to_string();
-		if ( noCaseCompare(str, "normal") )
-		{
-		    m.setStageDisplayState(movie_root::normal);
-		}
-		else if ( noCaseCompare(str, "fullScreen") ) 
-		{
-		    m.setStageDisplayState(movie_root::fullScreen);
-        }
+    const std::string& str = fn.arg(0).to_string();
+    if (noCaseCompare(str, "normal")) {
+        m.setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
+    }
+    else if (noCaseCompare(str, "fullScreen")) {
+        m.setStageDisplayState(movie_root::DISPLAYSTATE_FULLSCREEN);
+    }
 
-        // If invalid, do nothing.
-		return as_value();
-	}
+    // If invalid, do nothing.
+    return as_value();
 }
 
 // extern (used by Global.cpp)
