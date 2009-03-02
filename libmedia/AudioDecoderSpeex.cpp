@@ -111,10 +111,11 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
             break;
         }
 
-        spx_uint32_t conv_size = 0;
+        
         boost::int16_t* conv_data = 0;
 
 #ifdef RESAMPLING_SPEEX
+		spx_uint32_t conv_size = 0;
         conv_data = new boost::int16_t[_target_frame_size];
         memset(conv_data, 0, _target_frame_size * 2);
 
@@ -149,7 +150,7 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
             _speex_framesize /* sample count*/, 2 /* sample size */,
             16000, false /* stereo */, 44100 /* new rate */,
             true /* convert to stereo */);
-        conv_size = outsize;
+        boost::int16_t conv_size = outsize;
 #endif
         total_size += conv_size;
 
