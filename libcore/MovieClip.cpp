@@ -65,7 +65,6 @@
 
 #include <vector>
 #include <string>
-#include <cmath>
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
@@ -152,7 +151,6 @@ namespace {
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
-    as_value movieclip_(const fn_call& fn);
 
 }
 
@@ -4036,8 +4034,6 @@ movieclip_getSWFVersion(const fn_call& fn)
 as_value
 movieclip_meth(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
 
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 

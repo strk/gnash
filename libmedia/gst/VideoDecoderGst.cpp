@@ -97,7 +97,8 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
       throw MediaException(_("Video codec is zero.  Streaming video expected later."));
       break;
     default:
-      boost::format msg = boost::format(_("No support for video codec %d.")) % (int)codec_type;
+      boost::format msg = boost::format(_("No support for video codec %s.")) %
+          codec_type;
       throw MediaException(msg.str());
 
       return;
