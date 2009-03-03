@@ -910,7 +910,6 @@ MovieClip::advance_sprite()
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
     queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
-    //queueEvent(event_id::ENTER_FRAME, apENTERFRAME);
 
     // Update current and next frames.
     if (m_play_state == PLAY)
@@ -3955,13 +3954,15 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 
 /// MovieClip.getURL(url:String[, window:String[, method:String]])
 //
-/// TODO: test this properly.
+/// Tested manually to function as a method of any as_object. Hard to
+/// test automatically as it doesn't return anything and only has external
+/// side-effects.
 /// Returns void.
 as_value
 movieclip_getURL(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip = 
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> movieclip =
+        ensureType<as_object>(fn.this_ptr);
 
     std::string urlstr;
     std::string target;
@@ -4006,8 +4007,7 @@ movieclip_getURL(const fn_call& fn)
 
     std::string vars;
 
-    if (method != MovieClip::METHOD_NONE)
-    {
+    if (method != MovieClip::METHOD_NONE) {
         // Get encoded vars.
         movieclip->getURLEncodedVars(vars);
     }
@@ -4023,8 +4023,8 @@ movieclip_getURL(const fn_call& fn)
 as_value
 movieclip_getSWFVersion(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     return as_value(movieclip->getSWFVersion());
 }
