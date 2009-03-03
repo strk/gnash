@@ -150,7 +150,7 @@ AudioDecoderSpeex::decode(const EncodedAudioFrame& input,
             _speex_framesize /* sample count*/, 2 /* sample size */,
             16000, false /* stereo */, 44100 /* new rate */,
             true /* convert to stereo */);
-        boost::int16_t conv_size = outsize;
+        boost::uint32_t conv_size = outsize;
 #endif
         total_size += conv_size;
 
