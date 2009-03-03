@@ -35,18 +35,26 @@ using namespace gnash;
 namespace amf 
 {
 
-boost::shared_ptr<amf::Buffer>
-AMF_msg::encodeContextHeader(AMF_msg::context_header_t *head)
+boost::shared_ptr<amf::Buffer> 
+AMF_msg::encodeContextHeader(boost::uint16_t version, boost::uint16_t headers,
+			     boost::uint16_t messages)
 {
 //    GNASH_REPORT_FUNCTION;
     size_t size = sizeof(AMF_msg::context_header_t);
     boost::shared_ptr<amf::Buffer> buf (new amf::Buffer(size));
 
-    *buf = htons(head->version);
-    *buf += htons(head->headers);
-    *buf += htons(head->messages);
+    *buf = htons(version);
+    *buf += htons(headers);
+    *buf += htons(messages);
         
     return buf;
+}
+
+boost::shared_ptr<amf::Buffer>
+AMF_msg::encodeContextHeader(AMF_msg::context_header_t *head)
+{
+//    GNASH_REPORT_FUNCTION;
+    return encodeContextHeader(head->version, head->headers, head->messages);
 }
 
 //  example message header::
@@ -72,8 +80,8 @@ AMF_msg::encodeMsgHeader(AMF_msg::message_header_t *head)
     *buf += length;
     *buf += head->target;
 
-    // Get the size of the encoded message
-    *buf += head->size;
+    // Encode the size of the encoded message
+    *buf += static_cast<boost::uint32_t>(head->size);
     
     return buf;
 }
@@ -212,6 +220,68 @@ AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
         
     return header;
 }
+
+boost::shared_ptr<amf::Buffer>
+AMF_msg::encodeAMFPacket(const std::string &target,
+                         const std::string &response, size_t size)
+{
+}
+
+boost::shared_ptr<amf::Buffer>
+AMF_msg::encodeAMFPacket()
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+
+    // Encode the packet header
+    boost::shared_ptr<amf::Buffer> buf1 = encodeContextHeader(0, 0, _messages.size());
+    *buf = buf1;
+
+    // Now encode all the messages
+
+    vector<boost::shared_ptr<AMF_msg::amf_message_t> >::iterator it;
+    for (it = _messages.begin(); it != _messages.end(); it++) {
+        boost::shared_ptr<AMF_msg::amf_message_t> msg = (*(it));
+
+        boost::shared_ptr<amf::Buffer> buf2 = encodeMsgHeader(msg->header.target,
+							     msg->header.response,
+							     msg->header.size);
+
+// 	AMF_msg::dump(msg->header);
+// 	msg->data->dump();
+        boost::shared_ptr<amf::Buffer> buf3 = msg->data->encode();
+	*buf += buf2;
+	*buf += buf3;
+    }
+
+    return buf;
+}
+
+boost::shared_ptr<amf::Buffer>
+AMF_msg::encodeMsgHeader(const std::string &target,
+                         const std::string &response, size_t size)
+{
+//    GNASH_REPORT_FUNCTION;
+    size_t total = target.size() + sizeof(boost::uint16_t);
+    total += response.size() + sizeof(boost::uint16_t);
+    total += sizeof(boost::uint32_t);
+    
+    boost::shared_ptr<amf::Buffer> buf (new amf::Buffer(total));
+    boost::uint16_t length = target.size();
+    swapBytes(&length, sizeof(boost::uint16_t));
+    *buf += length;
+    *buf += target;
+
+    length = response.size();
+    swapBytes(&length, sizeof(boost::uint16_t));
+    *buf += length;
+    *buf += response;
+
+    boost::uint32_t swapped = htonl(size);
+    *buf += swapped;
+    
+    return buf;
+}    
 
 void
 AMF_msg::dump(AMF_msg::message_header_t &data)

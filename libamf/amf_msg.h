@@ -80,17 +80,31 @@ class DSOEXPORT AMF_msg {
     
     // These methods create the raw data of the AMF packet from Elements
     static boost::shared_ptr<amf::Buffer> encodeContextHeader(context_header_t *head);
+    static boost::shared_ptr<amf::Buffer> encodeContextHeader(boost::uint16_t version,
+							      boost::uint16_t headers,
+							      boost::uint16_t messages);
+
     static boost::shared_ptr<amf::Buffer> encodeMsgHeader(message_header_t *head);
+    static boost::shared_ptr<amf::Buffer> encodeMsgHeader(const std::string &target,
+                                          const std::string &response, size_t size);
     
     // These methods parse the raw data of the AMF packet into data structures
     static boost::shared_ptr<context_header_t> parseContextHeader(amf::Buffer &data);
     static boost::shared_ptr<context_header_t> parseContextHeader(boost::uint8_t *data, size_t size);
+    
     static boost::shared_ptr<message_header_t> parseMessageHeader(amf::Buffer &data);
     static boost::shared_ptr<message_header_t> parseMessageHeader(boost::uint8_t *data, size_t size);
 
+    // These methods parse the entire packet. which consists of multiple messages
     boost::shared_ptr<context_header_t> parseAMFPacket(amf::Buffer &buf);
-    boost::shared_ptr<context_header_t> parseAMFPacket(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<context_header_t> parseAMFPacket(boost::uint8_t *data,
+						       size_t size);
 
+    // This methods create an entire packet from multiple messages, already parsed in
+    boost::shared_ptr<amf::Buffer> encodeAMFPacket();
+    boost::shared_ptr<amf::Buffer> encodeAMFPacket(const std::string &target,
+				     const std::string &response, size_t size);
+    
     static void dump(context_header_t &data);
     static void dump(message_header_t &data);
     void dump();

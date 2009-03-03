@@ -163,20 +163,81 @@ test_encoding()
 
 //    amsg.dump(*head1);
 //    amsg.dump();
+    double dub1 = amsg.getMessage(0)->data->getProperty(0)->to_number();
+    double dub2 = amsg.getMessage(1)->data->getProperty(0)->to_number();
+    double dub3 = amsg.getMessage(2)->data->getProperty(0)->to_number();
+    
     if ((amsg.messageCount() == 3)
         && (amsg.getMessage(0)->data->getType() == Element::STRICT_ARRAY_AMF0)
-        && (amsg.getMessage(0)->data->getProperty(0)->to_number() == 0x1043872)
+        && (dub1 == 0x1043872)
         && (amsg.getMessage(1)->data->getType() == Element::STRICT_ARRAY_AMF0)
-//        && (amsg.getMessage(2)->data->getProperty(0)->to_number() == 0x1043ba0)
         && (amsg.getMessage(2)->data->getType() == Element::STRICT_ARRAY_AMF0)
-        && (amsg.getMessage(2)->data->getProperty(0)->to_number() == 0x1043ace)
         ) {
         runtest.pass("AMF_msg::parseAMFPacket()");
     } else {
         runtest.fail("AMF_msg::parseAMFPacket()");
     }
-}
+
+    // Build a new message packet from scratch and make sure it matches the real one
+    AMF_msg top;
     
+    boost::shared_ptr<amf::Element> getway1(new Element);
+    getway1->makeStrictArray();
+    boost::shared_ptr<amf::Element> data1(new Element);
+    data1->makeNumber(dub1);
+    getway1->addProperty(data1);
+    boost::shared_ptr<AMF_msg::amf_message_t> msg1(new AMF_msg::amf_message_t);
+    msg1->header.target = "getway";
+    msg1->header.response = "/229";
+    msg1->header.size = 14;
+    msg1->data = getway1;
+    top.addMessage(msg1);
+    
+    boost::shared_ptr<amf::Element> getway2(new Element);
+    getway2->makeStrictArray();
+    boost::shared_ptr<amf::Element> data2(new Element);
+    data2->makeNumber(dub2);
+    getway2->addProperty(data2);
+    boost::shared_ptr<AMF_msg::amf_message_t> msg2(new AMF_msg::amf_message_t);
+    msg2->header.target = "getway";
+    msg2->header.response = "/230";
+    msg2->header.size = 14;
+    msg2->data = getway2;
+    top.addMessage(msg2);
+    
+    boost::shared_ptr<amf::Element> getway3(new Element);
+    getway3->makeStrictArray();
+    boost::shared_ptr<amf::Element> data3(new Element);
+    data3->makeNumber(dub3);
+    getway3->addProperty(data3);
+    boost::shared_ptr<AMF_msg::amf_message_t> msg3(new AMF_msg::amf_message_t);
+    msg3->header.target = "getway";
+    msg3->header.response = "/231";
+    msg3->header.size = 14;
+    msg3->data = getway3;
+    top.addMessage(msg3);
+
+    boost::shared_ptr<amf::Buffer> buf2 = top.encodeMsgHeader("getway", "/229", 14);
+    boost::uint8_t *ptr1 = buf1->reference() + sizeof(AMF_msg::context_header_t);
+
+
+    if (memcmp(ptr1, buf2->reference(), buf2->size()) == 0) {
+        runtest.pass("AMF_msg::encodeMsgHeader()");
+    } else {
+        runtest.fail("AMF_msg::encodeMsgHeader()");
+    }
+    
+    boost::shared_ptr<amf::Buffer> buf3 = top.encodeAMFPacket();
+    if (memcmp(buf1->reference(), buf3->reference(), buf3->allocated()) == 0) {
+        runtest.pass("AMF_msg::encodeAMFPacket()");
+    } else {
+        runtest.fail("AMF_msg::encodeAMFPacket()");
+    }
+    buf3->dump();
+//    top.dump();
+}
+
+
 static void
 usage (void)
 {
