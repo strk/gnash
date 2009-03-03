@@ -21,6 +21,7 @@ AUTOMAKE_OPTIONS =
 pkglib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = \
 	amf.cpp \
+	amf_msg.cpp \
 	buffer.cpp \
 	element.cpp \
 	lcshm.cpp \
@@ -51,6 +52,7 @@ AM_LDFLAGS = $(BOOST_LIBS)
 noinst_HEADERS = \
 	amfutf8.h \
 	amf.h \
+	amf_msg.h \
 	buffer.h \
 	element.h \
 	flv.h \
