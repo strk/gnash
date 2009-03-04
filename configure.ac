@@ -1544,8 +1544,6 @@ if test x"${GIF_LIBS}" = x ; then
  GIF_LIBS=${UNGIF_LIBS}
  GIF_CFLAGS=${UNGIF_CFLAGS}
 fi
-PNG_CFLAGS = ${LIBPNG_CFLAGS}
-PNG_LIBS = ${LIBPNG_LIBS}
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
@@ -2511,8 +2509,8 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${LIBPNG_LIBS}" != x ; then
-  if test x"${LIBPNG_CFLAGS}" != x ; then
+if test x"${PNG_LIBS}" != x ; then
+  if test x"${PNG_CFLAGS}" != x ; then
     echo "        PNG flags are: $PNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
