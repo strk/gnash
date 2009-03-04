@@ -20,42 +20,208 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
+// TextSnapshot works only on static text, so this test file only tests
+// AS compatibility (return, argument handling).
+
 
 rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
 #include "check.as"
 
-#if OUTPUT_VERSION > 5
+#if OUTPUT_VERSION < 6
 
-check_equals ( typeof(TextSnapshot), 'function' );
+ check_equals(typeof(TextSnapshot), "function");
+ totals(1);
 
-var textsnapshotObj = new TextSnapshot;
+#else
 
-// test the TextSnapshot constuctor
-check_equals ( typeof(textsnapshotObj), 'object' );
+ check(TextSnapshot.prototype.hasOwnProperty('findText'));
+ check(TextSnapshot.prototype.hasOwnProperty('getCount'));
+ check(TextSnapshot.prototype.hasOwnProperty('getSelected'));
+ check(TextSnapshot.prototype.hasOwnProperty('getSelectedText'));
+ check(TextSnapshot.prototype.hasOwnProperty('getText'));
+ check(TextSnapshot.prototype.hasOwnProperty('setSelectColor'));
+ check(TextSnapshot.prototype.hasOwnProperty('hitTestTextNearPos'));
+ check(TextSnapshot.prototype.hasOwnProperty('setSelected'));
 
-// test the TextSnapshot::findtext method
-check_equals (typeof(textsnapshotObj.findText), 'function');
+ check_equals( typeof(TextSnapshot), 'function' );
+ 
+ var textsnapshotObj = new TextSnapshot;
 
-// test the TextSnapshot::getcount method
-check_equals (typeof(textsnapshotObj.getCount), 'function');
+ check(textsnapshotObj instanceof TextSnapshot);
+ check(!textsnapshotObj.hasOwnProperty('findText'));
+ check(!textsnapshotObj.hasOwnProperty('getCount'));
+ check(!textsnapshotObj.hasOwnProperty('getSelected'));
+ check(!textsnapshotObj.hasOwnProperty('getSelectedText'));
+ check(!textsnapshotObj.hasOwnProperty('getText'));
+ check(!textsnapshotObj.hasOwnProperty('setSelectColor'));
+ check(!textsnapshotObj.hasOwnProperty('hitTestTextNearPos'));
+ check(!textsnapshotObj.hasOwnProperty('setSelected'));
 
-// test the TextSnapshot::getselected method
-check_equals (typeof(textsnapshotObj.getSelected), 'function');
+ // test the TextSnapshot constuctor
+ check_equals( typeof(textsnapshotObj), 'object' );
+ 
+ check_equals(typeof(textsnapshotObj.findText), 'function');
+ check_equals(typeof(textsnapshotObj.getCount), 'function');
+ check_equals(typeof(textsnapshotObj.getSelected), 'function');
+ check_equals(typeof(textsnapshotObj.getSelectedText), 'function');
+ check_equals (typeof(textsnapshotObj.getText), 'function');
+ check_equals (typeof(textsnapshotObj.hitTestTextNearPos), 'function');
+ check_equals (typeof(textsnapshotObj.setSelectColor), 'function');
+ check_equals (typeof(textsnapshotObj.setSelected), 'function');
 
-// test the TextSnapshot::getselectedtext method
-check_equals (typeof(textsnapshotObj.getSelectedText), 'function');
+ ts = _root.getTextSnapshot();
+ xcheck(ts instanceof TextSnapshot);
+ check(!ts.hasOwnProperty('findText'));
+ check(!ts.hasOwnProperty('getCount'));
+ check(!ts.hasOwnProperty('getSelected'));
+ check(!ts.hasOwnProperty('getSelectedText'));
+ check(!ts.hasOwnProperty('getText'));
+ check(!ts.hasOwnProperty('setSelectColor'));
+ check(!ts.hasOwnProperty('hitTestTextNearPos'));
+ check(!ts.hasOwnProperty('setSelected'));
 
-// test the TextSnapshot::gettext method
-check_equals (typeof(textsnapshotObj.getText), 'function');
+ // getText() and getCount()
 
-// test the TextSnapshot::hittesttextnearpos method
-check_equals (typeof(textsnapshotObj.hitTestTextNearPos), 'function');
+ xcheck_equals(typeof(ts.getCount()), "number");
+ check_equals(typeof(ts.getCount(0)), "undefined");
+ check_equals(typeof(ts.getCount("a")), "undefined");
+ check_equals(typeof(ts.getCount(true)), "undefined");
+ check_equals(typeof(ts.getCount(0, 1)), "undefined");
+ xcheck_equals(ts.getCount(), 0);
 
-// test the TextSnapshot::setselectcolor method
-check_equals (typeof(textsnapshotObj.setSelectColor), 'function');
+ check_equals(typeof(ts.findText()), "undefined");
+ check_equals(typeof(ts.findText("a")), "undefined");
+ check_equals(typeof(ts.findText(1)), "undefined");
+ check_equals(typeof(ts.findText(1, "a")), "undefined");
 
-// test the TextSnapshot::setselected method
-check_equals (typeof(textsnapshotObj.setSelected), 'function');
+ // Test with no text.
+ xcheck_equals(typeof(ts.findText(1, "a", true)), "number");
+ xcheck_equals(typeof(ts.findText(1, "a", 1)), "number");
+ xcheck_equals(typeof(ts.findText(1, "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText("6", "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText("b", "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText(-1, "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText(Infinity, "a", new Date())), "number");
+ check_equals(typeof(ts.findText(-1, "a", new Date(), "e")), "undefined");
+ check_equals(typeof(ts.findText(Infinity, "a", new Date(), 3)), "undefined");
+
+ xcheck_equals(ts.findText(1, "a", true), -1);
+ xcheck_equals(ts.findText(1, "a", 1), -1);
+ xcheck_equals(ts.findText(1, "a", new Date()), -1);
+ xcheck_equals(ts.findText("6", "a", false), -1);
+ xcheck_equals(ts.findText("b", "a", true), -1);
+ xcheck_equals(ts.findText(-1, "a", new Date()), -1);
+ xcheck_equals(ts.findText(Infinity, "a", new Date()), -1);
+
+ // Shouldn't work with dynamic text.
+ _root.createTextField("tf", 10, 30, 30, 100, 100);
+ _root.tf.text = "ghjkab";
+ ts = _root.getTextSnapshot();
+ xcheck_equals(ts.getCount(), 0);
+ xcheck_equals(ts.findText(1, "a", true), -1);
+ xcheck_equals(ts.findText(1, "a", false), -1);
+
+ // getSelected
+
+ check_equals(typeof(ts.getSelected()), "undefined");
+ check_equals(typeof(ts.getSelected(0)), "undefined");
+ check_equals(typeof(ts.getSelected("a")), "undefined");
+ check_equals(typeof(ts.getSelected(new Date())), "undefined");
+ check_equals(typeof(ts.getSelected([0, 1])), "undefined");
+ xcheck_equals(typeof(ts.getSelected([0, 1], 2)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(0, 1)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(1, 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(-1, 3)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(1, 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(1, 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(0, "a")), "boolean");
+ xcheck_equals(typeof(ts.getSelected("b", 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(true, false)), "boolean");
+ check_equals(typeof(ts.getSelected(0, 10, 10)), "undefined");
+ check_equals(typeof(ts.getSelected(0, 10, true)), "undefined");
+ check_equals(typeof(ts.getSelected(0, 10, "a")), "undefined");
+
+ xcheck_equals(typeof(ts.getSelectedText()), "string");
+ xcheck_equals(typeof(ts.getSelectedText(0)), "string");
+ xcheck_equals(typeof(ts.getSelectedText("a")), "string");
+ xcheck_equals(typeof(ts.getSelectedText(new Date())), "string");
+ xcheck_equals(typeof(ts.getSelectedText([0, 2])), "string");
+ check_equals(typeof(ts.getSelectedText(0, 1)), "undefined");
+ check_equals(typeof(ts.getSelectedText(1, 0)), "undefined");
+ check_equals(typeof(ts.getSelectedText(-1, 3)), "undefined");
+ check_equals(typeof(ts.getSelectedText(1, 0)), "undefined");
+ check_equals(typeof(ts.getSelectedText(1, 0)), "undefined");
+ check_equals(typeof(ts.getSelectedText(0, "a")), "undefined");
+ check_equals(typeof(ts.getSelectedText("b", 0)), "undefined");
+ check_equals(typeof(ts.getSelectedText(true, false)), "undefined");
+ check_equals(typeof(ts.getSelectedText(0, 10, 10)), "undefined");
+ check_equals(typeof(ts.getSelectedText(0, 10, true)), "undefined");
+ check_equals(typeof(ts.getSelectedText(0, 10, "a")), "undefined");
+
+ check_equals(typeof(ts.getText()), "undefined");
+ check_equals(typeof(ts.getText(0)), "undefined");
+ check_equals(typeof(ts.getText("a")), "undefined");
+ check_equals(typeof(ts.getText(new Date())), "undefined");
+ xcheck_equals(typeof(ts.getText(0, 1)), "string");
+ xcheck_equals(typeof(ts.getText(1, 0)), "string");
+ xcheck_equals(typeof(ts.getText(-1, 3)), "string");
+ xcheck_equals(typeof(ts.getText(1, 0)), "string");
+ xcheck_equals(typeof(ts.getText(1, 0)), "string");
+ xcheck_equals(typeof(ts.getText(0, "a")), "string");
+ xcheck_equals(typeof(ts.getText("b", 0)), "string");
+ xcheck_equals(typeof(ts.getText(true, false)), "string");
+ xcheck_equals(typeof(ts.getText(0, 10, 10)), "string");
+ xcheck_equals(typeof(ts.getText(0, 10, true)), "string");
+ check_equals(typeof(ts.getText(0, 10, "a", 11)), "undefined");
+ check_equals(typeof(ts.getText(0, 10, 10, "hello")), "undefined");
+ check_equals(typeof(ts.getText(0, 10, true, [3, 4])), "undefined");
+
+ // setSelectColor(). Returns void
+ check_equals(typeof(ts.setSelectColor()), "undefined");
+ check_equals(typeof(ts.setSelectColor(0)), "undefined");
+ check_equals(typeof(ts.setSelectColor(0, 4)), "undefined");
+ check_equals(typeof(ts.setSelectColor(0, 5, 6)), "undefined");
+ check_equals(typeof(ts.setSelectColor(0, 5, true)), "undefined");
+ check_equals(typeof(ts.setSelectColor(0, 5, 8, 5)), "undefined");
+
+ // hitTestTextNearPos()
+ check_equals(typeof(ts.hitTestTextNearPos()), "undefined");
+ check_equals(typeof(ts.hitTestTextNearPos(0)), "undefined");
+ check_equals(typeof(ts.hitTestTextNearPos("a")), "undefined");
+ check_equals(typeof(ts.hitTestTextNearPos(new Date())), "undefined");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, 1)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(-1, 3)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, "a")), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos("b", 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(true, false)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, 10, 10)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, 10, true)), "number");
+ check_equals(typeof(ts.hitTestTextNearPos(0, 10, "a", 11)), "undefined");
+ check_equals(typeof(ts.hitTestTextNearPos(0, 10, 10, "hello")), "undefined");
+ check_equals(typeof(ts.hitTestTextNearPos(0, 10, true, [3, 4])), "undefined");
+ 
+ // setSelected() // Three arguments, returns void.
+ check_equals(typeof(ts.setSelected()), "undefined");
+ check_equals(typeof(ts.setSelected(0)), "undefined");
+ check_equals(typeof(ts.setSelected("a")), "undefined");
+ check_equals(typeof(ts.setSelected(new Date())), "undefined");
+ check_equals(typeof(ts.setSelected(0, 1)), "undefined");
+ check_equals(typeof(ts.setSelected(1, 0)), "undefined");
+ check_equals(typeof(ts.setSelected(-1, 3)), "undefined");
+ check_equals(typeof(ts.setSelected(1, 0)), "undefined");
+ check_equals(typeof(ts.setSelected(1, 0)), "undefined");
+ check_equals(typeof(ts.setSelected(0, "a")), "undefined");
+ check_equals(typeof(ts.setSelected("b", 0)), "undefined");
+ check_equals(typeof(ts.setSelected(true, false)), "undefined");
+ check_equals(typeof(ts.setSelected(0, 10, 10)), "undefined");
+ check_equals(typeof(ts.setSelected(0, 10, true)), "undefined");
+ check_equals(typeof(ts.setSelected(0, 10, "a", 11)), "undefined");
+ check_equals(typeof(ts.setSelected(0, 10, 10, "hello")), "undefined");
+ check_equals(typeof(ts.setSelected(0, 10, true, [3, 4])), "undefined");
+
+ totals(155);
 
 #endif // OUTPUT_VERSION > 5
-totals();
