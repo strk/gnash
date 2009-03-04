@@ -249,15 +249,17 @@ if test x"${jemalloc}" = x"yes"; then
     jemalloc=no
   fi
 fi
-AC_TRY_COMPILE([#include <malloc.h>], [
-  struct mallinfo x = mallinfo(); ],
-  mallinfo=yes, mallinfo=no
-)
-if test x"${mallinfo}" = x"yes"; then
-  AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
-fi
+
+dnl We can search libs for mallinfo to decide whether we have it or not.
+dnl This is added to the linker flags when it's found. Usually it's -lc, but
+dnl on OpenSolaris it's -lmalloc, so this fixes the build.
+AC_SEARCH_LIBS([mallinfo], [c malloc],
+               AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
+               mallinfo=yes
+               )
+
+AM_CONDITIONAL([HAVE_MALLINFO], test x$mallinfo = xyes)
 AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
-AM_CONDITIONAL(HAVE_MALLINFO, [test x$mallinfo = xyes])
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
