@@ -1350,20 +1350,22 @@ dnl if test x$cross_compiling = xno; then
 AC_LANG_PUSH(C++)
 AC_MSG_CHECKING([to see if float formatting is broken])
 AC_RUN_IFELSE([
-  AC_LANG_PROGRAM([#include <cmath>], [
+  AC_LANG_PROGRAM([#include <cmath>
+    void testFloat(double d, double& s)
+    {
+        d /= 1000.0;
+        s = std::fmod(d, 86400.0);
+    }], [
      double d = 3.0935415006117e+23;
      double s;
-     d /= 1000.0;
-     s = std::fmod(d, 86400.0);
-//        testFloat(d, s);
+     testFloat(d, s);
      if (static_cast<int>(s) != 61440) {
          return 1;
-      }
-    ],                         dnl end of LANG_PROGRAM
-     broken_float=yes,          dnl true
-      broken_float=no,          dnl false
-      broken_float=no           dnl cross compiling
-)])
+     }])],                         dnl end of LANG_PROGRAM
+     broken_float=no,              dnl returns 0, works
+     broken_float=yes,             dnl returns 1, broken
+     broken_float=no               dnl cross compiling
+)                                  dnl end of RUN_IFELSE
 AC_LANG_POP(C++)
 dnl fi
 
@@ -1535,13 +1537,15 @@ AC_SUBST(WINDRES)
 
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PKG_FIND(png, [png.h], [png images], png_info_init)
+GNASH_PKG_FIND(libpng, [png.h], [png images], png_info_init)
 GNASH_PKG_FIND(gif, [gif_lib.h], [gif images], DGifOpen)
 if test x"${GIF_LIBS}" = x ; then
  GNASH_PKG_FIND(ungif, [gif_lib.h], [gif images], DGifOpen)
  GIF_LIBS=${UNGIF_LIBS}
  GIF_CFLAGS=${UNGIF_CFLAGS}
 fi
+PNG_CFLAGS = ${LIBPNG_CFLAGS}
+PNG_LIBS = ${LIBPNG_LIBS}
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 GNASH_PKG_FIND(speex, [speex.h], [speex audio codec], speex_decode_int)
@@ -2507,8 +2511,8 @@ else
   echo "               or .rpm users: yum install libungif-devel" >&3
 fi
 
-if test x"${PNG_LIBS}" != x ; then
-  if test x"${PNG_CFLAGS}" != x ; then
+if test x"${LIBPNG_LIBS}" != x ; then
+  if test x"${LIBPNG_CFLAGS}" != x ; then
     echo "        PNG flags are: $PNG_CFLAGS"
   else
     echo "        PNG flags are: default include path"
