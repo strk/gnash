@@ -29,7 +29,7 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
 
 #if OUTPUT_VERSION < 6
 
- check_equals(typeof(TextSnapshot), "function");
+ xcheck_equals(typeof(TextSnapshot), "function");
  totals(1);
 
 #else
@@ -70,7 +70,7 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals (typeof(textsnapshotObj.setSelected), 'function');
 
  ts = _root.getTextSnapshot();
- check(ts instanceof TextSnapshot);
+ xcheck(ts instanceof TextSnapshot);
  check(!ts.hasOwnProperty('findText'));
  check(!ts.hasOwnProperty('getCount'));
  check(!ts.hasOwnProperty('getSelected'));
@@ -82,12 +82,12 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
 
  // getText() and getCount()
 
- check_equals(typeof(ts.getCount()), "number");
+ xcheck_equals(typeof(ts.getCount()), "number");
  check_equals(typeof(ts.getCount(0)), "undefined");
  check_equals(typeof(ts.getCount("a")), "undefined");
  check_equals(typeof(ts.getCount(true)), "undefined");
  check_equals(typeof(ts.getCount(0, 1)), "undefined");
- check_equals(ts.getCount(), 0);
+ xcheck_equals(ts.getCount(), 0);
 
  check_equals(typeof(ts.findText()), "undefined");
  check_equals(typeof(ts.findText("a")), "undefined");
@@ -95,31 +95,31 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.findText(1, "a")), "undefined");
 
  // Test with no text.
- check_equals(typeof(ts.findText(1, "a", true)), "number");
- check_equals(typeof(ts.findText(1, "a", 1)), "number");
- check_equals(typeof(ts.findText(1, "a", new Date())), "number");
- check_equals(typeof(ts.findText("6", "a", new Date())), "number");
- check_equals(typeof(ts.findText("b", "a", new Date())), "number");
- check_equals(typeof(ts.findText(-1, "a", new Date())), "number");
- check_equals(typeof(ts.findText(Infinity, "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText(1, "a", true)), "number");
+ xcheck_equals(typeof(ts.findText(1, "a", 1)), "number");
+ xcheck_equals(typeof(ts.findText(1, "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText("6", "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText("b", "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText(-1, "a", new Date())), "number");
+ xcheck_equals(typeof(ts.findText(Infinity, "a", new Date())), "number");
  check_equals(typeof(ts.findText(-1, "a", new Date(), "e")), "undefined");
  check_equals(typeof(ts.findText(Infinity, "a", new Date(), 3)), "undefined");
 
- check_equals(ts.findText(1, "a", true), -1);
- check_equals(ts.findText(1, "a", 1), -1);
- check_equals(ts.findText(1, "a", new Date()), -1);
- check_equals(ts.findText("6", "a", false), -1);
- check_equals(ts.findText("b", "a", true), -1);
- check_equals(ts.findText(-1, "a", new Date()), -1);
- check_equals(ts.findText(Infinity, "a", new Date()), -1);
+ xcheck_equals(ts.findText(1, "a", true), -1);
+ xcheck_equals(ts.findText(1, "a", 1), -1);
+ xcheck_equals(ts.findText(1, "a", new Date()), -1);
+ xcheck_equals(ts.findText("6", "a", false), -1);
+ xcheck_equals(ts.findText("b", "a", true), -1);
+ xcheck_equals(ts.findText(-1, "a", new Date()), -1);
+ xcheck_equals(ts.findText(Infinity, "a", new Date()), -1);
 
  // Shouldn't work with dynamic text.
  _root.createTextField("tf", 10, 30, 30, 100, 100);
  _root.tf.text = "ghjkab";
  ts = _root.getTextSnapshot();
- check_equals(ts.getCount(), 0);
- check_equals(ts.findText(1, "a", true), -1);
- check_equals(ts.findText(1, "a", false), -1);
+ xcheck_equals(ts.getCount(), 0);
+ xcheck_equals(ts.findText(1, "a", true), -1);
+ xcheck_equals(ts.findText(1, "a", false), -1);
 
  // getSelected
 
@@ -128,24 +128,24 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.getSelected("a")), "undefined");
  check_equals(typeof(ts.getSelected(new Date())), "undefined");
  check_equals(typeof(ts.getSelected([0, 1])), "undefined");
- check_equals(typeof(ts.getSelected([0, 1], 2)), "boolean");
- check_equals(typeof(ts.getSelected(0, 1)), "boolean");
- check_equals(typeof(ts.getSelected(1, 0)), "boolean");
- check_equals(typeof(ts.getSelected(-1, 3)), "boolean");
- check_equals(typeof(ts.getSelected(1, 0)), "boolean");
- check_equals(typeof(ts.getSelected(1, 0)), "boolean");
- check_equals(typeof(ts.getSelected(0, "a")), "boolean");
- check_equals(typeof(ts.getSelected("b", 0)), "boolean");
- check_equals(typeof(ts.getSelected(true, false)), "boolean");
+ xcheck_equals(typeof(ts.getSelected([0, 1], 2)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(0, 1)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(1, 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(-1, 3)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(1, 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(1, 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(0, "a")), "boolean");
+ xcheck_equals(typeof(ts.getSelected("b", 0)), "boolean");
+ xcheck_equals(typeof(ts.getSelected(true, false)), "boolean");
  check_equals(typeof(ts.getSelected(0, 10, 10)), "undefined");
  check_equals(typeof(ts.getSelected(0, 10, true)), "undefined");
  check_equals(typeof(ts.getSelected(0, 10, "a")), "undefined");
 
- check_equals(typeof(ts.getSelectedText()), "string");
- check_equals(typeof(ts.getSelectedText(0)), "string");
- check_equals(typeof(ts.getSelectedText("a")), "string");
- check_equals(typeof(ts.getSelectedText(new Date())), "string");
- check_equals(typeof(ts.getSelectedText([0, 2])), "string");
+ xcheck_equals(typeof(ts.getSelectedText()), "string");
+ xcheck_equals(typeof(ts.getSelectedText(0)), "string");
+ xcheck_equals(typeof(ts.getSelectedText("a")), "string");
+ xcheck_equals(typeof(ts.getSelectedText(new Date())), "string");
+ xcheck_equals(typeof(ts.getSelectedText([0, 2])), "string");
  check_equals(typeof(ts.getSelectedText(0, 1)), "undefined");
  check_equals(typeof(ts.getSelectedText(1, 0)), "undefined");
  check_equals(typeof(ts.getSelectedText(-1, 3)), "undefined");
@@ -162,16 +162,16 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.getText(0)), "undefined");
  check_equals(typeof(ts.getText("a")), "undefined");
  check_equals(typeof(ts.getText(new Date())), "undefined");
- check_equals(typeof(ts.getText(0, 1)), "string");
- check_equals(typeof(ts.getText(1, 0)), "string");
- check_equals(typeof(ts.getText(-1, 3)), "string");
- check_equals(typeof(ts.getText(1, 0)), "string");
- check_equals(typeof(ts.getText(1, 0)), "string");
- check_equals(typeof(ts.getText(0, "a")), "string");
- check_equals(typeof(ts.getText("b", 0)), "string");
- check_equals(typeof(ts.getText(true, false)), "string");
- check_equals(typeof(ts.getText(0, 10, 10)), "string");
- check_equals(typeof(ts.getText(0, 10, true)), "string");
+ xcheck_equals(typeof(ts.getText(0, 1)), "string");
+ xcheck_equals(typeof(ts.getText(1, 0)), "string");
+ xcheck_equals(typeof(ts.getText(-1, 3)), "string");
+ xcheck_equals(typeof(ts.getText(1, 0)), "string");
+ xcheck_equals(typeof(ts.getText(1, 0)), "string");
+ xcheck_equals(typeof(ts.getText(0, "a")), "string");
+ xcheck_equals(typeof(ts.getText("b", 0)), "string");
+ xcheck_equals(typeof(ts.getText(true, false)), "string");
+ xcheck_equals(typeof(ts.getText(0, 10, 10)), "string");
+ xcheck_equals(typeof(ts.getText(0, 10, true)), "string");
  check_equals(typeof(ts.getText(0, 10, "a", 11)), "undefined");
  check_equals(typeof(ts.getText(0, 10, 10, "hello")), "undefined");
  check_equals(typeof(ts.getText(0, 10, true, [3, 4])), "undefined");
@@ -189,16 +189,16 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.hitTestTextNearPos(0)), "undefined");
  check_equals(typeof(ts.hitTestTextNearPos("a")), "undefined");
  check_equals(typeof(ts.hitTestTextNearPos(new Date())), "undefined");
- check_equals(typeof(ts.hitTestTextNearPos(0, 1)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(-1, 3)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(0, "a")), "number");
- check_equals(typeof(ts.hitTestTextNearPos("b", 0)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(true, false)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(0, 10, 10)), "number");
- check_equals(typeof(ts.hitTestTextNearPos(0, 10, true)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, 1)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(-1, 3)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(1, 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, "a")), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos("b", 0)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(true, false)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, 10, 10)), "number");
+ xcheck_equals(typeof(ts.hitTestTextNearPos(0, 10, true)), "number");
  check_equals(typeof(ts.hitTestTextNearPos(0, 10, "a", 11)), "undefined");
  check_equals(typeof(ts.hitTestTextNearPos(0, 10, 10, "hello")), "undefined");
  check_equals(typeof(ts.hitTestTextNearPos(0, 10, true, [3, 4])), "undefined");
