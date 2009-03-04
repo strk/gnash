@@ -1,6 +1,6 @@
 // Transform_as.cpp:  ActionScript "Transform" class, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -148,55 +148,16 @@ Transform_colorTransform_getset(const fn_call& fn)
 	boost::intrusive_ptr<Transform_as> ptr = 
         ensureType<Transform_as>(fn.this_ptr);
 
-    VM& vm = ptr->getVM();
-    string_table& st = vm.getStringTable();
+    if (!fn.nargs) {
 
-    if (!fn.nargs)
-    {
+        // If it's not found, construction will fail.
+        as_value colorTrans(fn.env().find_object("flash.geom.ColorTransform"));
 
-        // This is silly. Should be easier to do, even if it's necessary
-        // somewhere in the chain to go through all the objects.
+        boost::intrusive_ptr<as_function> colorTransformCtor =
+            colorTrans.to_as_function();
 
-        // Getter
-        as_value flash;
-        if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
-        {
-            log_error("No flash object found!");
-            return as_value();
-        }
-        boost::intrusive_ptr<as_object> flashObj = flash.to_object();
-
-        if (!flashObj)
-        {
-            log_error("flash isn't an object!");
-            return as_value();
-        }
-        
-        as_value geom;
-        if (!flashObj->get_member(st.find("geom"), &geom))
-        {
-            log_error("No flash.geom object found!");
-            return as_value();
-        }
-        boost::intrusive_ptr<as_object> geomObj = geom.to_object();
-
-        if (!geomObj)
-        {
-            log_error("flash.geom isn't an object!");
-            return as_value();
-        }
-       
-        as_value colorTransform;
-        if (!geomObj->get_member(st.find("ColorTransform"), &colorTransform))
-        {
-            log_error("No flash.geom.ColorTransform object found!");
-            return as_value();
-        }
-
-        boost::intrusive_ptr<as_function> colorTransformCtor = colorTransform.to_as_function();
-        if (!colorTransformCtor)
-        {
-            log_error("flash.geom.ColorTransform isn't a function!");
+        if (!colorTransformCtor) {
+            log_error("Failed to construct flash.geom.ColorTransform!");
             return as_value();
         }
 
@@ -306,55 +267,16 @@ Transform_matrix_getset(const fn_call& fn)
 	boost::intrusive_ptr<Transform_as> ptr = 
         ensureType<Transform_as>(fn.this_ptr);
 
-    VM& vm = ptr->getVM();
-    string_table& st = vm.getStringTable();
-
     if (!fn.nargs)
     {
 
-        // This is silly. Should be easier to do, even if it's necessary
-        // somewhere in the chain to go through all the objects.
+        // If it's not found, construction will fail.
+        as_value matrix(fn.env().find_object("flash.geom.Matrix"));
 
-        // Getter
-        as_value flash;
-        if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
-        {
-            log_error("No flash object found!");
-            return as_value();
-        }
-        boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+        boost::intrusive_ptr<as_function> matrixCtor = matrix.to_as_function();
 
-        if (!flashObj)
-        {
-            log_error("flash isn't an object!");
-            return as_value();
-        }
-        
-        as_value geom;
-        if (!flashObj->get_member(st.find("geom"), &geom))
-        {
-            log_error("No flash.geom object found!");
-            return as_value();
-        }
-        boost::intrusive_ptr<as_object> geomObj = geom.to_object();
-
-        if (!geomObj)
-        {
-            log_error("flash.geom isn't an object!");
-            return as_value();
-        }
-       
-        as_value matrixVal;
-        if (!geomObj->get_member(st.find("Matrix"), &matrixVal))
-        {
-            log_error("No flash.geom.Matrix object found!");
-            return as_value();
-        }
-
-        boost::intrusive_ptr<as_function> matrixCtor = matrixVal.to_as_function();
-        if (!matrixCtor)
-        {
-            log_error("flash.geom.Matrix isn't a function!");
+        if (!matrixCtor) {
+            log_error("Failed to construct flash.geom.Matrix!");
             return as_value();
         }
 
@@ -381,7 +303,8 @@ Transform_matrix_getset(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.matrix(%s): extra arguments discarded", ss.str());
+            log_aserror("Transform.matrix(%s): extra arguments discarded",
+                ss.str());
         );
     }
 
@@ -392,7 +315,8 @@ Transform_matrix_getset(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
             std::ostringstream ss;
             fn.dump_args(ss);
-            log_aserror("Transform.matrix(%s): argument is not an object", ss.str());
+            log_aserror("Transform.matrix(%s): argument is not an object",
+                ss.str());
         );
         return as_value();
     }
@@ -424,8 +348,10 @@ Transform_matrix_getset(const fn_call& fn)
 static as_value
 Transform_pixelBounds_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<Transform_as> ptr = ensureType<Transform_as>(fn.this_ptr);
-	UNUSED(ptr);
+	boost::intrusive_ptr<Transform_as> ptr = 
+        ensureType<Transform_as>(fn.this_ptr);
+
+    UNUSED(ptr);
 	LOG_ONCE( log_unimpl (__FUNCTION__) );
 	return as_value();
 }

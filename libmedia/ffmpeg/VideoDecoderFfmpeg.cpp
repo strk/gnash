@@ -17,24 +17,27 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_FFMPEG_SWSCALE_H
+extern "C" {
+#include <ffmpeg/swscale.h>
+}
+#define HAVE_SWSCALE_H 1
+#endif
+
+#ifdef HAVE_LIBSWSCALE_SWSCALE_H
+extern "C" {
+#include <libswscale/swscale.h>
+}
+#define HAVE_SWSCALE_H 1
+#endif
 
 #include "VideoDecoderFfmpeg.h"
 #include "MediaParserFfmpeg.h" // for ExtraVideoInfoFfmpeg 
 #include "GnashException.h" // for MediaException
-
-#ifdef HAVE_FFMPEG_SWSCALE_H
-#define HAVE_SWSCALE_H 1
-extern "C" {
-#include <ffmpeg/swscale.h>
-}
-#endif
-
-#ifdef HAVE_LIBSWSCALE_SWSCALE_H
-#define HAVE_SWSCALE_H 1
-extern "C" {
-#include <libswscale/swscale.h>
-}
-#endif
 
 #include <boost/scoped_array.hpp>
 #include <boost/format.hpp>

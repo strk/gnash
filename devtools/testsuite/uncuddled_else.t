@@ -84,7 +84,7 @@ L<http://http://dev.perl.org/perl6/> test suite.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007 Free Software Foundation, Inc.
+Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

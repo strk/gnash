@@ -1,6 +1,6 @@
 // levels.as - MTASC testcase for loading into _level targets
 //
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ class Derived11 extends Derived1
 {
   var derived11CtorCalled;
   var thisPtr;
+  var derived11DirectCalled;
+  var derived11ViaApplyCalled;
   
   // constructor
   function Derived11()
@@ -36,6 +38,18 @@ class Derived11 extends Derived1
     super();
     this.derived11CtorCalled = true;
     thisPtr = this;
+  }
+
+  function direct()
+  {
+    super.direct();
+    this.derived11DirectCalled = true;
+  }
+
+  function viaApply()
+  {
+    super.viaApply();
+    this.derived11ViaApplyCalled = true;
   }
 
   static function main()
@@ -47,13 +61,27 @@ class Derived11 extends Derived1
      check_equals(derivedObj.baseCtorCalled, true);
      check_equals(derivedObj.derived1CtorCalled, true);
      check_equals(derivedObj.derived11CtorCalled, true);
+ 
+     // check that all "super.method()" in the inheritance chain are called.    
+     derivedObj.direct();
+     check_equals(derivedObj.baseDirectCalled, true);
+     check_equals(derivedObj.derived1DirectCalled, true);
+     check_equals(derivedObj.derived11DirectCalled, true);
+     
+     // check that all "super.method()" in the inheritance chain are called
+     // when "apply()" is used to call the derived method.
+     var method = derivedObj.viaApply;
+     method.apply(derivedObj);
+     check_equals(derivedObj.baseViaApplyCalled, true);
+     check_equals(derivedObj.derived1ViaApplyCalled, true);
+     check_equals(derivedObj.derived11ViaApplyCalled, true);
      
      // check this pointers. 
      check_equals(derivedObj.thisPtr, derivedObj);
      check_equals(derivedObj.derivedThisPtr, derivedObj);
      check_equals(derivedObj.baseThisPtr, derivedObj);
 
-     check_totals(6);
+     check_totals(12);
      Dejagnu.done();
   }
 }

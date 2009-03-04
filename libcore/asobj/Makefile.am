@@ -18,6 +18,11 @@
 
 AUTOMAKE_OPTIONS = 
 
+# if the compiler has broken flaot support when optimized
+if BROKEN_FLOAT
+AM_CXXFLAGS = -ffloat-store
+endif
+
 noinst_LTLIBRARIES = libgnashasobjs.la 
 
 AM_CPPFLAGS = \
@@ -33,10 +38,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libmedia \
 	-I$(top_srcdir)/libsound \
 	$(PTHREAD_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(FREETYPE2_CFLAGS) \
 	$(NULL)
 
@@ -194,8 +197,7 @@ noinst_HEADERS = \
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(LIBXML_LIBS)
+	$(top_builddir)/libbase/libgnashbase.la
 
 if USE_FFMPEG_ENGINE
 AM_CPPFLAGS += $(FFMPEG_CFLAGS) \

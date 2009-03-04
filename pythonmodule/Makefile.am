@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ libgnashpython_la_LDFLAGS = \
 	$(FFMPEG_LIBS) \
 	$(GSTREAMER_LIBS) \
 	$(CURL_LIBS) \
-	$(LIBXML_LIBS) \
 	$(INCLTDL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
@@ -54,8 +53,6 @@ libgnashpython_la_CPPFLAGS = \
 	-I$(top_srcdir)/libmedia/gst \
 	-DLOCALEDIR=\"$(localedir)\" \
 	$(BOOSTPYTHON_CFLAGS) \
-        $(LIBXML_CFLAGS) \
-        $(DMALLOC_CFLAGS) \
 	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
         $(PTHREAD_CFLAGS) \
@@ -87,8 +84,6 @@ gnash_la_CPPFLAGS = -I.. \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DBOOST_PYTHON_DYNAMIC_LIB \
 	$(BOOSTPYTHON_CFLAGS) \
-        $(LIBXML_CFLAGS) \
-        $(DMALLOC_CFLAGS) \
 	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)

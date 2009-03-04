@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@
 
 #include <ctime>
 
-#ifndef HAVE_CLOCK_GETTIME
+// TODO: why doesn't OS2 define HAVE_CLOCK_GETTIME?
+#if !defined(HAVE_CLOCK_GETTIME) && !defined(__OS2__)
 
 #include <sys/time.h>
 
@@ -52,4 +53,4 @@ static int clock_gettime(int, struct timespec *tp) {
 }
 
 #endif
-#endif /* GETCLOCKTIMER_HPP */
+#endif 

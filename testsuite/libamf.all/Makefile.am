@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ AM_LDFLAGS = \
 	../../libamf/libgnashamf.la \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(DEJAGNU_CFLAGS) \
@@ -37,8 +36,6 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/testsuite \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(DEJAGNU_CFLAGS) \
@@ -49,6 +46,7 @@ INCLUDES = \
 
 check_PROGRAMS = \
 	test_amf \
+	test_amfmsg \
 	test_buffer \
 	test_el \
 	test_sol \
@@ -67,6 +65,9 @@ test_sol_DEPENDENCIES = $(solfiles)
 
 test_amf_SOURCES = test_amf.cpp
 test_amf_LDADD = $(AM_LDFLAGS)
+
+test_amfmsg_SOURCES = test_amfmsg.cpp
+test_amfmsg_LDADD = $(AM_LDFLAGS)
 
 test_lc_SOURCES = test_lc.cpp
 test_lc_LDADD = $(AM_LDFLAGS)

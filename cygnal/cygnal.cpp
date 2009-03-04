@@ -1,6 +1,6 @@
 // cygnal.cpp:  GNU streaming Flash media server, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -369,10 +369,10 @@ version_and_copyright()
 {
     cout << "Cygnal " << VERSION << endl
         << endl
-        << _("Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.\n"
+        << _("Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.\n"
         "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
         "You may redistribute copies of Cygnal under the terms of the GNU General\n"
-        "Public License.  For more information, see the file named COPYING.\n")
+        "Public License V3. For more information, see the file named COPYING.\n")
     << endl;
 }
 

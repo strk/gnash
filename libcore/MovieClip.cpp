@@ -65,7 +65,6 @@
 
 #include <vector>
 #include <string>
-#include <cmath>
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
@@ -152,7 +151,6 @@ namespace {
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
-    as_value movieclip_(const fn_call& fn);
 
 }
 
@@ -910,7 +908,6 @@ MovieClip::advance_sprite()
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
     queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
-    //queueEvent(event_id::ENTER_FRAME, apENTERFRAME);
 
     // Update current and next frames.
     if (m_play_state == PLAY)
@@ -3955,13 +3952,15 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 
 /// MovieClip.getURL(url:String[, window:String[, method:String]])
 //
-/// TODO: test this properly.
+/// Tested manually to function as a method of any as_object. Hard to
+/// test automatically as it doesn't return anything and only has external
+/// side-effects.
 /// Returns void.
 as_value
 movieclip_getURL(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip = 
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> movieclip =
+        ensureType<as_object>(fn.this_ptr);
 
     std::string urlstr;
     std::string target;
@@ -4006,8 +4005,7 @@ movieclip_getURL(const fn_call& fn)
 
     std::string vars;
 
-    if (method != MovieClip::METHOD_NONE)
-    {
+    if (method != MovieClip::METHOD_NONE) {
         // Get encoded vars.
         movieclip->getURLEncodedVars(vars);
     }
@@ -4023,8 +4021,8 @@ movieclip_getURL(const fn_call& fn)
 as_value
 movieclip_getSWFVersion(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     return as_value(movieclip->getSWFVersion());
 }
@@ -4036,8 +4034,6 @@ movieclip_getSWFVersion(const fn_call& fn)
 as_value
 movieclip_meth(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
 
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
@@ -5238,64 +5234,26 @@ movieclip_soundbuftime_getset(const fn_call& fn)
 as_value
 movieclip_transform(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-        
-    VM& vm = ptr->getVM();
-    string_table& st = ptr->getVM().getStringTable();
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
-    as_value flash;
-    if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
-    {
-        log_error("No flash object found!");
-        return as_value();
-    }
-    boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+    // If not found, construction fails.
+    as_value transform(fn.env().find_object("flash.geom.Transform"));
 
-    if (!flashObj)
-    {
-        log_error("flash isn't an object!");
-        return as_value();
-    }
-        
-    as_value geom;
-    if (!flashObj->get_member(st.find("geom"), &geom))
-    {
-        log_error("No flash.geom object found!");
-        return as_value();
-    }
-    boost::intrusive_ptr<as_object> geomObj = geom.to_object();
+    boost::intrusive_ptr<as_function> transCtor = transform.to_as_function();
 
-    if (!geomObj)
-    {
-        log_error("flash.geom isn't an object!");
-        return as_value();
-    }
-        
-    as_value transform;
-    if (!geomObj->get_member(st.find("Transform"), &transform))
-    {
-        log_error("No flash.geom.Transform object found!");
-        return as_value();
-    }        
-
-    boost::intrusive_ptr<as_function> transformCtor =
-        transform.to_as_function();
-
-    if (!transformCtor)
-    {
-        log_error("flash.geom.Transform isn't a function!");
+    if (!transCtor) {
+        log_error("Failed to construct flash.geom.Transform!");
         return as_value();
     }
 
     // Construct a flash.geom.Transform object with "this" as argument.
-    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
     args->push_back(ptr.get());
 
-    boost::intrusive_ptr<as_object> transformObj =
-        transformCtor->constructInstance(fn.env(), args);
+    boost::intrusive_ptr<as_object> newTrans =
+        transCtor->constructInstance(fn.env(), args);
 
-    return as_value(transformObj.get());
+    return as_value(newTrans.get());
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 

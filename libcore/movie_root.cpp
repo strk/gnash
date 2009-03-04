@@ -122,7 +122,7 @@ movie_root::movie_root(const movie_definition& def,
 	_hostfd(-1),
 	_alignMode(0),
 	_scaleMode(showAll),
-	_displayState(normal),
+	_displayState(DISPLAYSTATE_NORMAL),
 	_recursionLimit(256),
 	_timeoutLimit(15),
 	_movieAdvancementDelay(83), // ~12 fps by default
@@ -900,7 +900,8 @@ movie_root::fire_mouse_event()
 }
 
 void
-movie_root::get_mouse_state(int& x, int& y, int& buttons)
+movie_root::get_mouse_state(boost::int32_t& x, boost::int32_t& y,
+        boost::int32_t& buttons)
 {
 //	    GNASH_REPORT_FUNCTION;
 
@@ -965,7 +966,7 @@ movie_root::doMouseDrag()
 		return; 
 	}
 
-	int	x, y, buttons;
+	boost::int32_t x, y, buttons;
 	get_mouse_state(x, y, buttons);
 
 	point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
@@ -1564,17 +1565,20 @@ movie_root::setStageDisplayState(const DisplayState ds)
     _displayState = ds;
 
     boost::intrusive_ptr<Stage_as> stage = getStageObject();
-    if ( stage ) stage->notifyFullScreen( (_displayState == fullScreen) );
+    if (stage) {
+        stage->notifyFullScreen((_displayState == DISPLAYSTATE_FULLSCREEN));
+    }
 
 	if (!_interfaceHandler) return; // No registered callback
 	
-	if (_displayState == fullScreen)
-	{
-	    callInterface("Stage.displayState", "fullScreen");
-	}
-	else if (_displayState == normal)
-	{
-	    callInterface("Stage.displayState", "normal");
+    switch (_displayState)
+    {
+        case DISPLAYSTATE_FULLSCREEN:
+            callInterface("Stage.displayState", "fullScreen");
+            break;
+        case DISPLAYSTATE_NORMAL:
+	        callInterface("Stage.displayState", "normal");
+            break;
 	}   
 }
 

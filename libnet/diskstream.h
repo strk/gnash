@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ namespace gnash {
 ///	of using read() from the standard library, this uses mmap() to
 ///	map the file into memory in chunks of the memory pagesize,
 ///	which is much faster and less resource intensive.
-class DiskStream {
+class DSOEXPORT DiskStream {
 public:
     /// \enum DiskStream::state_e
     ///		This represents the state of the current stream.

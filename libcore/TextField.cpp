@@ -880,7 +880,7 @@ TextField::setFont(boost::intrusive_ptr<const Font> newfont)
 
 
 void
-TextField::insertTab(SWF::TextRecord& rec, int& x, float scale)
+TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
 {
     // tab (ASCII HT)
     const int space = 32;

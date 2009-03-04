@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -156,7 +156,7 @@ m1 = new Matrix(8);
 #if OUTPUT_VERSION > 6
 check_equals(m1.toString(), "(a=8, b=undefined, c=undefined, d=undefined, tx=undefined, ty=undefined)");
 #else
-xcheck_equals(m1.toString(), "(a=8, b=, c=, d=, tx=, ty=)");
+check_equals(m1.toString(), "(a=8, b=, c=, d=, tx=, ty=)");
 #endif
 
 m1 = new Matrix(1, 2, 3, 4, 5, 6);
@@ -336,7 +336,7 @@ m7 = new Matrix ("A string", undefined, new Object, true, NaN, new Point);
 #if OUTPUT_VERSION > 6
 check_equals("" + m7, "(a=A string, b=undefined, c=[object Object], d=true, tx=NaN, ty=(x=0, y=0))");
 #else
-xcheck_equals("" + m7, "(a=A string, b=, c=[object Object], d=true, tx=NaN, ty=(x=0, y=0))");
+check_equals("" + m7, "(a=A string, b=, c=[object Object], d=true, tx=NaN, ty=(x=0, y=0))");
 #endif
 
 m7.rotate(2);
