@@ -31,104 +31,31 @@
 
 namespace gnash {
 
-as_value textsnapshot_findtext(const fn_call& fn);
-as_value textsnapshot_getcount(const fn_call& fn);
-as_value textsnapshot_getselected(const fn_call& fn);
-as_value textsnapshot_getselectedtext(const fn_call& fn);
-as_value textsnapshot_gettext(const fn_call& fn);
-as_value textsnapshot_hittesttextnearpos(const fn_call& fn);
-as_value textsnapshot_setselectcolor(const fn_call& fn);
-as_value textsnapshot_setselected(const fn_call& fn);
-as_value textsnapshot_ctor(const fn_call& fn);
+// Forward declarations
+namespace {
 
-static void
-attachTextSnapshotInterface(as_object& o)
+    as_value textsnapshot_findText(const fn_call& fn);
+    as_value textsnapshot_getCount(const fn_call& fn);
+    as_value textsnapshot_getSelected(const fn_call& fn);
+    as_value textsnapshot_getSelectedText(const fn_call& fn);
+    as_value textsnapshot_getText(const fn_call& fn);
+    as_value textsnapshot_hitTestTextNearPos(const fn_call& fn);
+    as_value textsnapshot_setSelectColor(const fn_call& fn);
+    as_value textsnapshot_setSelected(const fn_call& fn);
+    as_value textsnapshot_ctor(const fn_call& fn);
+
+    void attachTextSnapshotInterface(as_object& o);
+    as_object* getTextSnapshotInterface();
+}
+
+TextSnapshot_as::TextSnapshot_as()
+    :
+    as_object(getTextSnapshotInterface())
 {
-	// FIXME: check name case of all methods, and only initialize
-	//        the ones expected to be found based on SWF version
-
-	o.init_member("findText", new builtin_function(textsnapshot_findtext));
-	o.init_member("getCount", new builtin_function(textsnapshot_getcount));
-	o.init_member("getSelected", new builtin_function(textsnapshot_getselected));
-	o.init_member("getSelectedText", new builtin_function(textsnapshot_getselectedtext));
-	o.init_member("getText", new builtin_function(textsnapshot_gettext));
-	o.init_member("hitTestTextNearPos", new builtin_function(textsnapshot_hittesttextnearpos));
-	o.init_member("setSelectColor", new builtin_function(textsnapshot_setselectcolor));
-	o.init_member("setSelected", new builtin_function(textsnapshot_setselected));
 }
 
-static as_object*
-getTextSnapshotInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
-	{
-		o = new as_object(getObjectInterface());
-		attachTextSnapshotInterface(*o);
-	}
-	return o.get();
-}
-
-class textsnapshot_as_object: public as_object
-{
-
-public:
-
-	textsnapshot_as_object()
-		:
-		as_object(getTextSnapshotInterface())
-	{}
-
-	// override from as_object ?
-	//std::string get_text_value() const { return "TextSnapshot"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-};
-
-as_value textsnapshot_findtext(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_getcount(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_getselected(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_getselectedtext(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_gettext(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_hittesttextnearpos(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_setselectcolor(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_setselected(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-
-as_value
-textsnapshot_ctor(const fn_call& /* fn */)
-{
-	boost::intrusive_ptr<as_object> obj = new textsnapshot_as_object;
-
-	return as_value(obj.get()); // will keep alive
-}
-
-// extern (used by Global.cpp)
-void textsnapshot_class_init(as_object& global)
+void
+TextSnapshot_as::init(as_object& global)
 {
 	// This is going to be the global TextSnapshot "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
@@ -145,4 +72,88 @@ void textsnapshot_class_init(as_object& global)
 	global.init_member("TextSnapshot", cl.get());
 }
 
+
+namespace {
+
+void
+attachTextSnapshotInterface(as_object& o)
+{
+
+    const int flags = as_prop_flags::dontDelete |
+                      as_prop_flags::readOnly |
+                      as_prop_flags::onlySWF6Up;
+
+	o.init_member("findText", new builtin_function(textsnapshot_findText),
+            flags);
+	o.init_member("getCount", new builtin_function(textsnapshot_getCount),
+            flags);
+	o.init_member("getSelected",
+            new builtin_function(textsnapshot_getSelected), flags);
+	o.init_member("getSelectedText",
+            new builtin_function(textsnapshot_getSelectedText), flags);
+	o.init_member("getText",
+            new builtin_function(textsnapshot_getText), flags);
+	o.init_member("hitTestTextNearPos",
+            new builtin_function(textsnapshot_hitTestTextNearPos), flags);
+	o.init_member("setSelectColor",
+            new builtin_function(textsnapshot_setSelectColor), flags);
+	o.init_member("setSelected",
+            new builtin_function(textsnapshot_setSelected), flags);
+}
+
+as_object*
+getTextSnapshotInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( ! o )
+	{
+		o = new as_object(getObjectInterface());
+		attachTextSnapshotInterface(*o);
+	}
+	return o.get();
+}
+
+as_value textsnapshot_findText(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value textsnapshot_getCount(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value textsnapshot_getSelected(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value textsnapshot_getSelectedText(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value textsnapshot_getText(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value textsnapshot_hitTestTextNearPos(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value textsnapshot_setSelectColor(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+as_value textsnapshot_setSelected(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+as_value
+textsnapshot_ctor(const fn_call& /* fn */)
+{
+	boost::intrusive_ptr<as_object> obj = new TextSnapshot_as;
+
+	return as_value(obj.get()); // will keep alive
+}
+
+
+} // anonymous namespace
 } // end of gnash namespace

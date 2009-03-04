@@ -29,7 +29,7 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
 
 #if OUTPUT_VERSION < 6
 
- xcheck_equals(typeof(TextSnapshot), "function");
+ check_equals(typeof(TextSnapshot), "function");
  totals(1);
 
 #else

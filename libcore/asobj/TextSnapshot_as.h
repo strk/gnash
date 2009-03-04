@@ -16,23 +16,24 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_TEXTSNAPSHOT_H__
-#define __GNASH_ASOBJ_TEXTSNAPSHOT_H__
+#ifndef GNASH_ASOBJ_TEXTSNAPSHOT_H
+#define GNASH_ASOBJ_TEXTSNAPSHOT_H
 
-#include <memory> // for auto_ptr
+#include "as_object.h"
 
 namespace gnash {
 
-class as_object;
+class TextSnapshot_as: public as_object
+{
 
-/// Initialize the global TextSnapshot_as class
-void textsnapshot_class_init(as_object& global);
+public:
 
-/// Return a TextSnapshot_as instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_textsnapshot_instance();
+	TextSnapshot_as();
+
+    static void init(as_object& global);
+};
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_TEXTSNAPSHOT_H__
 #endif
 
