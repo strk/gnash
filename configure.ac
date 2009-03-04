@@ -1346,6 +1346,35 @@ AC_TRY_COMPILE([#include <strings.h>], [
   AC_DEFINE(HAVE_STRINGCASECMP, [1], [Has strcasecmp])
 )
 
+dnl if test x$cross_compiling = xno; then
+AC_LANG_PUSH(C++)
+AC_MSG_CHECKING([to see if float formatting is broken])
+AC_RUN_IFELSE([
+  AC_LANG_PROGRAM([#include <cmath>], [
+     double d = 3.0935415006117e+23;
+     double s;
+     d /= 1000.0;
+     s = std::fmod(d, 86400.0);
+//        testFloat(d, s);
+     if (static_cast<int>(s) != 61440) {
+         return 1;
+      }
+    ],                         dnl end of LANG_PROGRAM
+     broken_float=yes,          dnl true
+      broken_float=no,          dnl false
+      broken_float=no           dnl cross compiling
+)])
+AC_LANG_POP(C++)
+dnl fi
+
+if test x${broken_float} = xyes; then
+  AC_MSG_RESULT([yes])
+  AC_DEFINE(HAVE_BROKEN_FLOAT, [1], [Has broken float support])
+else
+  AC_MSG_RESULT([no])
+fi
+AM_CONDITIONAL(BROKEN_FLOAT, [ test x$broken_float = xyes ])
+
 dnl See if ipc_perm structure has the ipc_perm.key field, and if so,
 dnl which variant of the name is used.
 ipc_key=no
