@@ -20,7 +20,7 @@ AUTOMAKE_OPTIONS =
 
 # if the compiler has broken flaot support when optimized
 if BROKEN_FLOAT
-AM_CXXFLAGS = $(AM_CXXFLAGS) -ffloat-store
+AM_CXXFLAGS = -ffloat-store
 endif
 
 noinst_LTLIBRARIES = libgnashasobjs.la 
@@ -195,12 +195,6 @@ AM_CPPFLAGS += $(GSTREAMER_CFLAGS) \
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS) \
 				$(SDL_LIBS)
 endif
-
-# if the compiler has broken flaot support when optimized
-# if BROKEN_FLOAT
-# Date.lo Date.o:
-# 	$(MAKE) CXXFLAGS=\"$(CXXFLAGS) -ffloat-store\"
-# endif
 
 #libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
