@@ -165,7 +165,7 @@ dnl   fi
       has_qt4="no"
     fi
 
-    AC_PATH_PROG(MOC4, moc-qt4, ,[${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])
+    AC_PATH_PROGS(MOC4, [moc-qt4 moc], ,[${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])
     AC_PATH_PROG(UIC4, uic-qt4, ,[${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])
 
 
