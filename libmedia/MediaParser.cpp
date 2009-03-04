@@ -416,7 +416,7 @@ operator<< (std::ostream& os, const videoCodecType& t)
             os << "H264";
             break;
         default:
-            os << "unknown/invalid";
+            os << "unknown/invalid codec " << static_cast<int>(t);
             break;
     }
     return os;
@@ -452,7 +452,7 @@ operator<< (std::ostream& os, const audioCodecType& t)
             os << "Speex";
             break;
         default:
-            os << "unknown/invalid";
+            os << "unknown/invalid codec " << static_cast<int>(t);
             break;
     }
     return os;
