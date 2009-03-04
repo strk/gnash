@@ -38,6 +38,7 @@ namespace {
     as_value textsnapshot_getCount(const fn_call& fn);
     as_value textsnapshot_getSelected(const fn_call& fn);
     as_value textsnapshot_getSelectedText(const fn_call& fn);
+    as_value textsnapshot_getTextRunInfo(const fn_call& fn);
     as_value textsnapshot_getText(const fn_call& fn);
     as_value textsnapshot_hitTestTextNearPos(const fn_call& fn);
     as_value textsnapshot_setSelectColor(const fn_call& fn);
@@ -63,9 +64,6 @@ TextSnapshot_as::init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&textsnapshot_ctor, getTextSnapshotInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachTextSnapshotInterface(*cl);
 	}
 
 	// Register _global.TextSnapshot
@@ -79,14 +77,14 @@ void
 attachTextSnapshotInterface(as_object& o)
 {
 
-    const int flags = as_prop_flags::dontDelete |
-                      as_prop_flags::readOnly |
-                      as_prop_flags::onlySWF6Up;
+    const int flags = as_prop_flags::onlySWF6Up;
 
 	o.init_member("findText", new builtin_function(textsnapshot_findText),
             flags);
 	o.init_member("getCount", new builtin_function(textsnapshot_getCount),
             flags);
+	o.init_member("getTextRunInfo",
+            new builtin_function(textsnapshot_getTextRunInfo), flags);
 	o.init_member("getSelected",
             new builtin_function(textsnapshot_getSelected), flags);
 	o.init_member("getSelectedText",
@@ -113,6 +111,10 @@ getTextSnapshotInterface()
 	return o.get();
 }
 
+as_value textsnapshot_getTextRunInfo(const fn_call& /*fn*/) {
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
 as_value textsnapshot_findText(const fn_call& /*fn*/) {
     log_unimpl (__FUNCTION__);
     return as_value();
