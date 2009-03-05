@@ -146,10 +146,25 @@ main(int argc, char** argv)
 
   add_actions(mo, "ts.setSelected(0, 30, true);");
 
-  //add_actions(mo, "TextSnapshot.prototype = undefined;");
-  //add_actions(mo, "ts = this.getTextSnapshot();");
- 
-  add_actions(mo, "trace(ts.getCount());");
+  add_actions(mo, "ts = this.getTextSnapshot();");
+  check_equals(mo, "typeof(ts)", "'object'");
+  add_actions(mo, "backup = TextSnapshot;");
+  add_actions(mo, "TextSnapshot = undefined;");
+  check_equals(mo, "typeof(TextSnapshot)", "'undefined'");
+  add_actions(mo, "ts = this.getTextSnapshot();");
+  check_equals(mo, "typeof(ts)", "'undefined'");
+  add_actions(mo, "TextSnapshot = backup;");
+  add_actions(mo, "ts = this.getTextSnapshot();");
+  check_equals(mo, "typeof(ts)", "'object'");
+  
+  add_actions(mo, "backup = TextSnapshot.prototype;");
+  add_actions(mo, "TextSnapshot.prototype = undefined;");
+  add_actions(mo, "ts = this.getTextSnapshot();");
+  check_equals(mo, "typeof(ts)", "'object'");
+  add_actions(mo, "TextSnapshot.prototype = backup;");
+  add_actions(mo, "ts = this.getTextSnapshot();");
+  check_equals(mo, "typeof(ts)", "'object'");
+  
   
   add_actions(mo, "totals(); stop();");
   
