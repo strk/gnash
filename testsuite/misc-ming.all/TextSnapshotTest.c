@@ -150,6 +150,9 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(ts)", "'object'");
   add_actions(mo, "backup = TextSnapshot;");
   add_actions(mo, "TextSnapshot = undefined;");
+  add_actions(mo, "t = new TextSnapshot();");
+  check_equals(mo, "typeof(t)", "'undefined'");
+
   check_equals(mo, "typeof(TextSnapshot)", "'undefined'");
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'undefined'");

@@ -4060,13 +4060,29 @@ movieclip_meth(const fn_call& fn)
 as_value
 movieclip_getTextSnapshot(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> obj = ensureType<MovieClip>(fn.this_ptr);
 
-    // TODO: generally implement a better way of constructing using
-    // prototype (if TextSnapshot.prototype is undefined, this should
-    // return undefined).
-    return as_value(new TextSnapshot_as(*movieclip));
+    // If not found, construction fails.
+    as_value textSnapshot(fn.env().find_object("TextSnapshot"));
+
+    boost::intrusive_ptr<as_function> tsCtor = textSnapshot.to_as_function();
+
+    if (!tsCtor) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("MovieClip.getTextSnapshot: failed to construct "
+                "TextSnapshot (object probably overridden)");
+        );
+        return as_value();
+    }
+
+    // Construct a flash.geom.Transform object with "this" as argument.
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->push_back(obj.get());
+
+    boost::intrusive_ptr<as_object> ts =
+        tsCtor->constructInstance(fn.env(), args);
+
+    return as_value(ts.get());
 }
 
 

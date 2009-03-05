@@ -31,6 +31,7 @@
 #include "generic_character.h"
 #include "DisplayList.h"
 #include "MovieClip.h"
+#include "VM.h"
 
 namespace gnash {
 
@@ -55,11 +56,7 @@ namespace {
 
 }
 
-TextSnapshot_as::TextSnapshot_as()
-    :
-    as_object(getTextSnapshotInterface())
-{
-}
+namespace {
 
 class TextFinder
 {
@@ -79,16 +76,19 @@ private:
         TextSnapshot_as::TextFields& _fields;
 };
 
+} // anonymous namespace
 
 
-TextSnapshot_as::TextSnapshot_as(const MovieClip& mc)
+TextSnapshot_as::TextSnapshot_as(const MovieClip* mc)
     :
     as_object(getTextSnapshotInterface())
 {
-    const DisplayList& dl = mc.getDisplayList();
+    if (mc) {
+        const DisplayList& dl = mc->getDisplayList();
 
-    TextFinder finder(_textFields);
-    dl.visitAll(finder);
+        TextFinder finder(_textFields);
+        dl.visitAll(finder);
+    }
 }
 
 void
@@ -143,7 +143,6 @@ TextSnapshot_as::init(as_object& global)
 		cl=new builtin_function(&textsnapshot_ctor, getTextSnapshotInterface());
 	}
 
-	// Register _global.TextSnapshot
 	global.init_member("TextSnapshot", cl.get());
 }
 
@@ -241,7 +240,7 @@ textsnapshot_getText(const fn_call& fn)
     boost::int32_t start = fn.arg(0).to_int();
     boost::int32_t end = fn.arg(1).to_int();
 
-    const bool newline = fn.nargs == 3 ? fn.arg(2).to_bool() : false;
+    const bool newline = (fn.nargs > 2) ? fn.arg(2).to_bool() : false;
 
     return ts->getText(start, end, newline);
 
@@ -262,11 +261,10 @@ as_value textsnapshot_setSelected(const fn_call& /*fn*/) {
 }
 
 as_value
-textsnapshot_ctor(const fn_call& /* fn */)
+textsnapshot_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new TextSnapshot_as;
-
-	return as_value(obj.get()); // will keep alive
+    MovieClip* mc = fn.nargs ? fn.arg(0).to_sprite() : 0;
+    return as_value(new TextSnapshot_as(mc));
 }
 
 void
@@ -276,4 +274,4 @@ setTextReachable(const TextSnapshot_as::TextFields::value_type& vt)
 }
 
 } // anonymous namespace
-} // end of gnash namespace
+} // gnash namespace

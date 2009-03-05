@@ -35,9 +35,7 @@ public:
     /// performance issue.
     typedef std::vector<std::pair<generic_character*, std::string> > TextFields;
 
-	TextSnapshot_as();
-    
-    TextSnapshot_as(const MovieClip& mc);
+    TextSnapshot_as(const MovieClip* mc);
 
     std::string::size_type getCount() {
         std::string snapshot;
