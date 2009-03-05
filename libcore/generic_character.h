@@ -72,6 +72,8 @@ public:
 		return false;
 	}
 
+    virtual void getStaticText(std::string& to);
+
 	virtual void display();
 
 	rect getBounds() const

@@ -201,23 +201,256 @@ private:
 
 };
 
-/// A DisplayList visitor used to compute its overall bounds.
-//
-class BoundsFinder {
+/// Search the DisplayList for static text.
+class StaticTextFinder
+{
 public:
-    rect& _bounds;
-    BoundsFinder(rect& b)
+    StaticTextFinder(std::string& to) : _to(to) {}
+
+    void operator()(character* ch) {
+        ch->getStaticText(_to);
+    }
+
+private:
+    std::string& _to;
+};
+
+/// Find a character hit by the given coordinates.
+//
+/// This class takes care about taking masks layers into
+/// account, but nested masks aren't properly tested yet.
+///
+class MouseEntityFinder
+{
+public:
+
+    /// @param wp
+    ///     Query point in world coordinate space
+    ///
+    /// @param pp
+    ///     Query point in parent coordinate space
+    ///
+MouseEntityFinder(point wp, point pp)
         :
-        _bounds(b)
+        _highestHiddenDepth(std::numeric_limits<int>::min()),
+        _m(NULL),
+        _candidates(),
+        _wp(wp),
+        _pp(pp),
+        _checked(false)
     {}
+
     void operator() (character* ch)
     {
+        assert(!_checked);
+        if ( ch->get_depth() <= _highestHiddenDepth )
+        {
+            if ( ch->isMaskLayer() )
+            {
+                log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
+                            "This mask is %s at depth %d outer mask masked "
+                            "up to depth %d."),
+                            ch->getTarget(), ch->get_depth(),
+                            _highestHiddenDepth);
+                // Hiding mask still in effect...
+            }
+            return;
+        }
+
+        if ( ch->isMaskLayer() )
+        {
+            if ( ! ch->pointInShape(_wp.x, _wp.y) )
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask not hitting "
+                        "the query point %g,%g and masking up to "
+                        "depth %d"), ch->getTarget(), ch->get_depth(), 
+                        _wp.x, _wp.y, ch->get_clip_depth());
+#endif
+                _highestHiddenDepth = ch->get_clip_depth();
+            }
+            else
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask hitting the "
+                        "query point %g,%g"),
+                        ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
+#endif 
+            }
+            return;
+        }
+        if (! ch->isVisible()) return;
+
+        _candidates.push_back(ch);
+    }
+
+    void checkCandidates()
+    {
+        if (_checked) return;
+        for (Candidates::reverse_iterator i=_candidates.rbegin(),
+                        e=_candidates.rend(); i!=e; ++i) {
+            character* ch = *i;
+            character* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
+            if (te) {
+                _m = te;
+                break;
+            }
+        }
+        _checked = true;
+    }
+
+    character* getEntity()
+    {
+        checkCandidates();
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+        if ( _m ) 
+        {
+            log_debug(_("MouseEntityFinder found character %s (depth %d) "
+                    "hitting point %g,%g"),
+                    _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
+        }
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+        return _m;
+    }
+
+private:
+
+    /// Highest depth hidden by a mask
+    //
+    /// This will be -1 initially, and set
+    /// the the depth of a mask when the mask
+    /// doesn't contain the query point, while
+    /// scanning a DisplayList bottom-up
+    ///
+    int _highestHiddenDepth;
+
+    character* _m;
+
+    typedef std::vector<character*> Candidates;
+    Candidates _candidates;
+
+    /// Query point in world coordinate space
+    point    _wp;
+
+    /// Query point in parent coordinate space
+    point    _pp;
+
+    bool _checked;
+
+};
+
+/// Find the first character whose shape contain the point
+//
+/// Point coordinates in world TWIPS
+///
+class ShapeContainerFinder
+{
+public:
+
+    ShapeContainerFinder(boost::int32_t x, boost::int32_t y)
+        :
+        _found(false),
+        _x(x),
+        _y(y)
+    {}
+
+    bool operator() (character* ch) {
+        if (ch->pointInShape(_x, _y)) {
+            _found = true;
+            return false;
+        }
+        return true;
+    }
+
+    bool hitFound() { return _found; }
+
+private:
+    bool _found;
+    boost::int32_t    _x;
+    boost::int32_t    _y;
+};
+
+/// Find the first visible character whose shape contain the point
+//
+/// Point coordinates in world TWIPS
+///
+class VisibleShapeContainerFinder
+{
+public:
+
+    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t    y)
+        :
+        _found(false),
+        _x(x),
+        _y(y)
+    {}
+
+    bool operator() (character* ch)
+    {
+        if (ch->pointInVisibleShape(_x, _y)) {
+            _found = true;
+            return false;
+        }
+        return true;
+    }
+
+    bool hitFound() { return _found; }
+
+private:
+    bool _found;
+    boost::int32_t    _x;
+    boost::int32_t    _y;
+};
+
+/// Find the first hitable character whose shape contain the point 
+// 
+/// Point coordinates in world TWIPS 
+/// 
+class HitableShapeContainerFinder
+{ 
+public: 
+    HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
+            : 
+    _found(false), 
+    _x(x), 
+    _y(y) 
+    {} 
+
+    bool operator() (character* ch) 
+    { 
+        if (ch->isDynamicMask()) return true; 
+        if (ch->pointInShape(_x, _y)) {
+            _found = true; 
+            return false; 
+        } 
+        return true; 
+    } 
+
+    bool hitFound() { return _found; } 
+
+private:
+    bool _found; 
+    boost::int32_t _x; // TWIPS
+    boost::int32_t _y; // TWIPS
+}; 
+
+/// A DisplayList visitor used to compute its overall bounds.
+//
+class BoundsFinder
+{
+public:
+    BoundsFinder(rect& b) : _bounds(b) {}
+
+    void operator() (character* ch) {
         // don't include bounds of unloaded characters
         if ( ch->isUnloaded() ) return;
         rect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
     }
+
+private:
+    rect& _bounds;
 };
 
 /// A DisplayList visitor used to extract script characters
@@ -225,9 +458,8 @@ public:
 /// Script characters are characters created or transformed
 /// by ActionScript. 
 ///
-class ScriptObjectsFinder {
-    std::vector<character*>& _dynamicChars;
-    std::vector<character*>& _staticChars;
+class ScriptObjectsFinder
+{
 public:
     ScriptObjectsFinder(std::vector<character*>& dynamicChars,
             std::vector<character*>& staticChars)
@@ -236,8 +468,7 @@ public:
         _staticChars(staticChars)
     {}
 
-    void operator() (character* ch) 
-    {
+    void operator() (character* ch) {
         // don't include bounds of unloaded characters
         if ( ch->isUnloaded() ) return;
 
@@ -246,15 +477,15 @@ public:
         //if ( ! ch->get_accept_anim_moves() )
         //if ( ch->isDynamic() )
         int depth = ch->get_depth();
-        if ( depth < character::lowerAccessibleBound || depth >= 0 )
-        {
+        if (depth < character::lowerAccessibleBound || depth >= 0) {
             _dynamicChars.push_back(ch);
         }
-        else
-        {
-            _staticChars.push_back(ch);
-        }
+        else _staticChars.push_back(ch);
     }
+
+private:
+    std::vector<character*>& _dynamicChars;
+    std::vector<character*>& _staticChars;
 };
 
 } // anonymous namespace
@@ -307,6 +538,13 @@ MovieClip::~MovieClip()
     {
         delete *it;
     }
+}
+
+void
+MovieClip::getTextSnapshot(std::string& snapshot) const
+{
+    StaticTextFinder finder(snapshot);
+    m_display_list.visitAll(finder);
 }
 
 // Execute the actions in the action list, in the given
@@ -1482,236 +1720,6 @@ MovieClip::handleFocus()
     // only if at least one mouse event handler is defined.
     return can_handle_mouse_event();
 }
-
-/// Find a character hit by the given coordinates.
-//
-/// This class takes care about taking masks layers into
-/// account, but nested masks aren't properly tested yet.
-///
-class MouseEntityFinder {
-
-    /// Highest depth hidden by a mask
-    //
-    /// This will be -1 initially, and set
-    /// the the depth of a mask when the mask
-    /// doesn't contain the query point, while
-    /// scanning a DisplayList bottom-up
-    ///
-    int _highestHiddenDepth;
-
-    character* _m;
-
-    typedef std::vector<character*> Candidates;
-    Candidates _candidates;
-
-    /// Query point in world coordinate space
-    point    _wp;
-
-    /// Query point in parent coordinate space
-    point    _pp;
-
-    bool _checked;
-
-public:
-
-    /// @param wp
-    ///     Query point in world coordinate space
-    ///
-    /// @param pp
-    ///     Query point in parent coordinate space
-    ///
- MouseEntityFinder(point    wp, point    pp)
-        :
-        _highestHiddenDepth(std::numeric_limits<int>::min()),
-        _m(NULL),
-        _candidates(),
-        _wp(wp),
-        _pp(pp),
-        _checked(false)
-    {}
-
-    void operator() (character* ch)
-    {
-        assert(!_checked);
-        if ( ch->get_depth() <= _highestHiddenDepth )
-        {
-            if ( ch->isMaskLayer() )
-            {
-                log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
-                            "This mask is %s at depth %d outer mask masked "
-                            "up to depth %d."),
-                            ch->getTarget(), ch->get_depth(),
-                            _highestHiddenDepth);
-                // Hiding mask still in effect...
-            }
-            return;
-        }
-
-        if ( ch->isMaskLayer() )
-        {
-            if ( ! ch->pointInShape(_wp.x, _wp.y) )
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting "
-                        "the query point %g,%g and masking up to "
-                        "depth %d"), ch->getTarget(), ch->get_depth(), 
-                        _wp.x, _wp.y, ch->get_clip_depth());
-#endif
-                _highestHiddenDepth = ch->get_clip_depth();
-            }
-            else
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask hitting the "
-                        "query point %g,%g"),
-                        ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
-#endif 
-            }
-
-            return;
-        }
-
-        if ( ! ch->isVisible() ) return;
-
-        _candidates.push_back(ch);
-
-    }
-
-    void checkCandidates()
-    {
-        if ( _checked ) return;
-        for (Candidates::reverse_iterator i=_candidates.rbegin(),
-                        e=_candidates.rend(); i!=e; ++i)
-        {
-            character* ch = *i;
-            character* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
-            if ( te )
-            {
-                _m = te;
-                break;
-            }
-        }
-        _checked = true;
-    }
-
-    character* getEntity()
-    {
-        checkCandidates();
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-        if ( _m ) 
-        {
-            log_debug(_("MouseEntityFinder found character %s (depth %d) "
-                    "hitting point %g,%g"),
-                    _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
-        }
-#endif // DEBUG_MOUSE_ENTITY_FINDING
-        return _m;
-    }
-        
-};
-
-/// Find the first character whose shape contain the point
-//
-/// Point coordinates in world TWIPS
-///
-class ShapeContainerFinder {
-
-    bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
-
-public:
-
-    ShapeContainerFinder(boost::int32_t x, boost::int32_t y)
-        :
-        _found(false),
-        _x(x),
-        _y(y)
-    { }
-
-    bool operator() (character* ch)
-    {
-        if ( ch->pointInShape(_x, _y) )
-        {
-            _found = true;
-            return false;
-        }
-        else return true;
-    }
-
-    bool hitFound() { return _found; }
-        
-};
-
-/// Find the first visible character whose shape contain the point
-//
-/// Point coordinates in world TWIPS
-///
-class VisibleShapeContainerFinder {
-
-    bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
-
-public:
-
-    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t    y)
-        :
-        _found(false),
-        _x(x),
-        _y(y)
-    {}
-
-    bool operator() (character* ch)
-    {
-        if ( ch->pointInVisibleShape(_x, _y) )
-        {
-            _found = true;
-            return false;
-        }
-        else return true;
-    }
-
-    bool hitFound() { return _found; }
-        
-};
-
-/// Find the first hitable character whose shape contain the point 
-// 
-/// Point coordinates in world TWIPS 
-/// 
-class HitableShapeContainerFinder { 
-    bool _found; 
-    boost::int32_t    _x; // TWIPS
-    boost::int32_t    _y; // TWIPS
-        
-public: 
-    HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
-            : 
-    _found(false), 
-    _x(x), 
-    _y(y) 
-    {} 
-
-    bool operator() (character* ch) 
-    { 
-        if( ch->isDynamicMask() ) 
-        { 
-            return true; 
-        } 
-        else if ( ch->pointInShape(_x, _y) ) 
-        {
-            _found = true; 
-            return false; 
-        } 
-        else 
-        { 
-            return true; 
-        }
-    } 
-
-    bool hitFound() { return _found; } 
-}; 
 
 bool
 MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
@@ -4061,6 +4069,10 @@ movieclip_getTextSnapshot(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> movieclip =
             ensureType<MovieClip>(fn.this_ptr);
+
+    std::string snapshot;
+    movieclip->getTextSnapshot(snapshot);
+    log_debug("Text snapshot: %s", snapshot);
 
     LOG_ONCE( log_unimpl("MovieClip.getTextSnapshot()") );
     return as_value();

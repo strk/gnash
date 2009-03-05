@@ -57,6 +57,9 @@ public:
         return _rect; 
     }
 
+    /// Extract static text from TextRecords.
+    void extractStaticText(std::string& to);
+
 private:
 
     /// DefineText2Tag::loader also constructs a DefineTextTag.

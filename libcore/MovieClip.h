@@ -153,6 +153,8 @@ public:
         return m_def->get_version();
     }
 
+    void getTextSnapshot(std::string& snapshot) const;
+
     /// Get the composite bounds of all component drawing elements
     rect getBounds() const;
 

@@ -408,7 +408,13 @@ public:
     void add_event_handler(const event_id& id, const action_buffer& code);
 
     /// Render this character
-    virtual void    display() {}
+    virtual void display() {}
+
+    /// Allow extraction of static text.
+    //
+    /// Default is a no-op, implemented only for DefineText though
+    /// generic_character.
+    virtual void getStaticText(std::string& /*to*/) {}
 
     /// Returns local, untransformed height of this character in TWIPS
     //
