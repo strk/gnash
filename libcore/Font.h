@@ -51,30 +51,22 @@ class kerning_pair
 public:
 	boost::uint16_t	m_char0, m_char1;
 
-	bool	operator==(const kerning_pair& k) const
+	bool operator==(const kerning_pair& k) const
 	{
 		return m_char0 == k.m_char0 && m_char1 == k.m_char1;
 	}
-
-
 };
 
 // for use in standard algorithms
-inline bool operator< (const kerning_pair& p1, const kerning_pair& p2)
+inline bool
+operator< (const kerning_pair& p1, const kerning_pair& p2)
 {
-	if ( p1.m_char0 < p2.m_char0 )
-	{
-		return true;
-	}
-	else if ( p1.m_char0 == p2.m_char0 )
-	{
-		if ( p1.m_char1 < p2.m_char1 ) return true;
-		else return false;
-	}
-	else
-	{
-		return false;
-	}
+	if (p1.m_char0 < p2.m_char0) return true;
+	if (p1.m_char0 == p2.m_char0) {
+		if (p1.m_char1 < p2.m_char1) return true;
+    }
+    
+    return false;
 }
 
 /// \brief
@@ -105,6 +97,8 @@ public:
 	Font(const std::string& name, bool bold=false, bool italic=false);
 
 	~Font();
+
+    boost::uint16_t codeTableLookup(int glyph, bool embedded) const;
 
 	/// Return true if this font matches given name and flags
 	//
@@ -137,7 +131,7 @@ public:
 	///	(would be a programming error most likely)
 	///
 	///
-	shape_character_def*	get_glyph(int glyph_index, bool embedded) const;
+	shape_character_def* get_glyph(int glyph_index, bool embedded) const;
 
 	/// Get name of this font. 
 	const std::string& get_name() const { return _name; }

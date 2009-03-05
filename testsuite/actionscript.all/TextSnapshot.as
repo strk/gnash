@@ -69,8 +69,29 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals (typeof(textsnapshotObj.setSelectColor), 'function');
  check_equals (typeof(textsnapshotObj.setSelected), 'function');
 
+ gh = new TextSnapshot("hello");
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
+ check_equals(gh.getCount(), undefined);
+
+ o = {};
+ gh = new TextSnapshot(o);
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
+ check_equals(gh.getCount(), undefined);
+
+ gh = new TextSnapshot(this);
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
+ check_equals(gh.getCount(), 0);
+
+ gh = new TextSnapshot(this, true);
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
+ check_equals(gh.getCount(), undefined);
+
  ts = _root.getTextSnapshot();
- xcheck(ts instanceof TextSnapshot);
+ check(ts instanceof TextSnapshot);
  check(!ts.hasOwnProperty('findText'));
  check(!ts.hasOwnProperty('getCount'));
  check(!ts.hasOwnProperty('getSelected'));
@@ -82,12 +103,12 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
 
  // getText() and getCount()
 
- xcheck_equals(typeof(ts.getCount()), "number");
+ check_equals(typeof(ts.getCount()), "number");
  check_equals(typeof(ts.getCount(0)), "undefined");
  check_equals(typeof(ts.getCount("a")), "undefined");
  check_equals(typeof(ts.getCount(true)), "undefined");
  check_equals(typeof(ts.getCount(0, 1)), "undefined");
- xcheck_equals(ts.getCount(), 0);
+ check_equals(ts.getCount(), 0);
 
  check_equals(typeof(ts.findText()), "undefined");
  check_equals(typeof(ts.findText("a")), "undefined");
@@ -117,7 +138,7 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  _root.createTextField("tf", 10, 30, 30, 100, 100);
  _root.tf.text = "ghjkab";
  ts = _root.getTextSnapshot();
- xcheck_equals(ts.getCount(), 0);
+ check_equals(ts.getCount(), 0);
  xcheck_equals(ts.findText(1, "a", true), -1);
  xcheck_equals(ts.findText(1, "a", false), -1);
 
@@ -162,16 +183,16 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.getText(0)), "undefined");
  check_equals(typeof(ts.getText("a")), "undefined");
  check_equals(typeof(ts.getText(new Date())), "undefined");
- xcheck_equals(typeof(ts.getText(0, 1)), "string");
- xcheck_equals(typeof(ts.getText(1, 0)), "string");
- xcheck_equals(typeof(ts.getText(-1, 3)), "string");
- xcheck_equals(typeof(ts.getText(1, 0)), "string");
- xcheck_equals(typeof(ts.getText(1, 0)), "string");
- xcheck_equals(typeof(ts.getText(0, "a")), "string");
- xcheck_equals(typeof(ts.getText("b", 0)), "string");
- xcheck_equals(typeof(ts.getText(true, false)), "string");
- xcheck_equals(typeof(ts.getText(0, 10, 10)), "string");
- xcheck_equals(typeof(ts.getText(0, 10, true)), "string");
+ check_equals(typeof(ts.getText(0, 1)), "string");
+ check_equals(typeof(ts.getText(1, 0)), "string");
+ check_equals(typeof(ts.getText(-1, 3)), "string");
+ check_equals(typeof(ts.getText(1, 0)), "string");
+ check_equals(typeof(ts.getText(1, 0)), "string");
+ check_equals(typeof(ts.getText(0, "a")), "string");
+ check_equals(typeof(ts.getText("b", 0)), "string");
+ check_equals(typeof(ts.getText(true, false)), "string");
+ check_equals(typeof(ts.getText(0, 10, 10)), "string");
+ check_equals(typeof(ts.getText(0, 10, true)), "string");
  check_equals(typeof(ts.getText(0, 10, "a", 11)), "undefined");
  check_equals(typeof(ts.getText(0, 10, 10, "hello")), "undefined");
  check_equals(typeof(ts.getText(0, 10, true, [3, 4])), "undefined");
@@ -222,6 +243,6 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.setSelected(0, 10, 10, "hello")), "undefined");
  check_equals(typeof(ts.setSelected(0, 10, true, [3, 4])), "undefined");
 
- totals(155);
+ totals(167);
 
 #endif // OUTPUT_VERSION > 5

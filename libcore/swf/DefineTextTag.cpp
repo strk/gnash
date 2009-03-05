@@ -12,6 +12,7 @@
 #include "log.h"
 #include "swf.h"
 #include "TextRecord.h"
+#include "Font.h"
 
 namespace gnash {
 namespace SWF {
@@ -31,6 +32,36 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     );
 
     m.add_character(id, t.release());
+}
+
+class DecodeRecord
+{
+public:
+
+    DecodeRecord(std::string& to) : _to(to) {}
+
+    void operator()(const TextRecord& tr) {
+
+        const Font* font = tr.getFont();
+        if (!font) return;
+        
+        const TextRecord::Glyphs& glyphs = tr.glyphs();
+
+        for (TextRecord::Glyphs::const_iterator it = glyphs.begin(),
+                e = glyphs.end(); it != e; ++it) {
+            _to += font->codeTableLookup(it->index, true);
+        }
+    }
+private:
+    std::string& _to;
+};
+
+
+bool
+DefineTextTag::extractStaticText(std::string& to)
+{
+    std::for_each(_textRecords.begin(), _textRecords.end(), DecodeRecord(to));
+    return true;
 }
 
 void
