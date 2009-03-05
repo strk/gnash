@@ -70,6 +70,24 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals (typeof(textsnapshotObj.setSelected), 'function');
 
  gh = new TextSnapshot("hello");
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
+ check_equals(gh.getCount(), undefined);
+
+ o = {};
+ gh = new TextSnapshot(o);
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
+ check_equals(gh.getCount(), undefined);
+
+ gh = new TextSnapshot(this);
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
+ check_equals(gh.getCount(), 0);
+
+ gh = new TextSnapshot(this, true);
+ check_equals(gh.toString(), "[object Object]");
+ check_equals(gh.getCount.toString(), "[type Function]");
  check_equals(gh.getCount(), undefined);
 
  ts = _root.getTextSnapshot();
@@ -225,6 +243,6 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.setSelected(0, 10, 10, "hello")), "undefined");
  check_equals(typeof(ts.setSelected(0, 10, true, [3, 4])), "undefined");
 
- totals(156);
+ totals(167);
 
 #endif // OUTPUT_VERSION > 5

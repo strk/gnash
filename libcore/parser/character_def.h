@@ -63,8 +63,9 @@ public:
     //
     /// This is used for MovieClip.getTextSnapshot() and should only be
     /// implemented in DefineTextTag. Default is a no-op
-    virtual void extractStaticText(std::string& /*to*/)
+    virtual bool extractStaticText(std::string& /*to*/)
     {
+        return false;
     }
 
    	/// Return true if the specified point is on the interior of our shape.

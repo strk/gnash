@@ -72,7 +72,7 @@ public:
 		return false;
 	}
 
-    virtual void getStaticText(std::string& to);
+    virtual generic_character* getStaticText(std::string& to);
 
 	virtual void display();
 

@@ -140,14 +140,16 @@ main(int argc, char** argv)
   check_equals(mo, "ss", "'h'");
   check_equals(mo, "ss.length", "1");
   
-  add_actions(mo, "TextSnapshot.prototype = undefined;");
-  add_actions(mo, "ts = this.getTextSnapshot();");
+  check_equals(mo, "ts.getText(0, 100, true)", 
+          "'First text\nZweites Textfeld\nSome more "
+		  "static text here... abcdefgh'");
+
+  add_actions(mo, "ts.setSelected(0, 30, true);");
+
+  //add_actions(mo, "TextSnapshot.prototype = undefined;");
+  //add_actions(mo, "ts = this.getTextSnapshot();");
  
   add_actions(mo, "trace(ts.getCount());");
-
-
-
-
   
   add_actions(mo, "totals(); stop();");
   

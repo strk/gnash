@@ -49,6 +49,7 @@ namespace gnash {
   class ExecutableCode;
   class action_buffer;
   class movie_definition;
+  class generic_character;
 }
 
 namespace gnash {
@@ -414,7 +415,9 @@ public:
     //
     /// Default is a no-op, implemented only for DefineText though
     /// generic_character.
-    virtual void getStaticText(std::string& /*to*/) {}
+    virtual generic_character* getStaticText(std::string& /*to*/) {
+        return 0;
+    }
 
     /// Returns local, untransformed height of this character in TWIPS
     //

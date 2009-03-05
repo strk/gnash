@@ -23,26 +23,44 @@
 
 namespace gnash {
 
+class generic_character;
+
 class TextSnapshot_as: public as_object
 {
 
 public:
 
+    /// Should remain in the order of insertion
+    /// We should only ever iterate from begin to end, so there's no
+    /// performance issue.
+    typedef std::vector<std::pair<generic_character*, std::string> > TextFields;
+
 	TextSnapshot_as();
     
-    TextSnapshot_as(const std::string& snapshot);
+    TextSnapshot_as(const MovieClip& mc);
 
     std::string::size_type getCount() {
-        return _snapshot.size();
+        std::string snapshot;
+        makeString(snapshot);
+        return snapshot.size();
     }
+
+    const std::string getText(boost::int32_t start, boost::int32_t end,
+            bool nl) const;
 
     static void init(as_object& global);
 
     static void construct(const std::string& snapshot);
 
+protected:
+
+    void markReachableResources() const;
+
 private:
-    
-    std::string _snapshot;
+
+    void makeString(std::string& to, bool newline = false) const;
+
+    TextFields _textFields;
 };
 
 } // end of gnash namespace

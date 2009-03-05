@@ -56,10 +56,12 @@ private:
     std::string& _to;
 };
 
-void
+
+bool
 DefineTextTag::extractStaticText(std::string& to)
 {
-    std::for_each(_textRecords.begin(), _textRecords.end(), DecodeRecord(to)); 
+    std::for_each(_textRecords.begin(), _textRecords.end(), DecodeRecord(to));
+    return true;
 }
 
 void

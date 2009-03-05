@@ -48,10 +48,11 @@ generic_character::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 }
 
 
-void
+generic_character*
 generic_character::getStaticText(std::string& to)
 {
-    m_def->extractStaticText(to);
+    if (m_def->extractStaticText(to)) return this;
+    return 0;
 }
 
 void  

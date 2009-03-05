@@ -540,13 +540,6 @@ MovieClip::~MovieClip()
     }
 }
 
-void
-MovieClip::getTextSnapshot(std::string& snapshot) const
-{
-    StaticTextFinder finder(snapshot);
-    m_display_list.visitAll(finder);
-}
-
 // Execute the actions in the action list, in the given
 // environment. The list of action will be consumed
 // starting from the first element. When the function returns
@@ -4070,14 +4063,10 @@ movieclip_getTextSnapshot(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
             ensureType<MovieClip>(fn.this_ptr);
 
-    std::string snapshot;
-
-    movieclip->getTextSnapshot(snapshot);
-
     // TODO: generally implement a better way of constructing using
     // prototype (if TextSnapshot.prototype is undefined, this should
     // return undefined).
-    return as_value(new TextSnapshot_as(snapshot));
+    return as_value(new TextSnapshot_as(*movieclip));
 }
 
 

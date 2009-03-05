@@ -58,7 +58,7 @@ public:
     }
 
     /// Extract static text from TextRecords.
-    void extractStaticText(std::string& to);
+    bool extractStaticText(std::string& to);
 
 private:
 
