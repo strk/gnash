@@ -50,6 +50,8 @@ public:
 
     static void construct(const std::string& snapshot);
 
+    bool valid() const { return _valid; }
+
 protected:
 
     void markReachableResources() const;
@@ -59,6 +61,13 @@ private:
     void makeString(std::string& to, bool newline = false) const;
 
     TextFields _textFields;
+
+    /// Whether the object is valid, i.e. it was constructed with a MovieClip.
+    //
+    /// This should be deducible from another member, but since there seems
+    /// to be no point in storing the MovieClip this bool will do instead.
+    bool _valid;
+
 };
 
 } // end of gnash namespace

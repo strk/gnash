@@ -31,7 +31,8 @@
 #include "generic_character.h"
 #include "DisplayList.h"
 #include "MovieClip.h"
-#include "VM.h"
+
+#include <algorithm>
 
 namespace gnash {
 
@@ -81,7 +82,8 @@ private:
 
 TextSnapshot_as::TextSnapshot_as(const MovieClip* mc)
     :
-    as_object(getTextSnapshotInterface())
+    as_object(getTextSnapshotInterface()),
+    _valid(mc)
 {
     if (mc) {
         const DisplayList& dl = mc->getDisplayList();
@@ -202,6 +204,8 @@ textsnapshot_getCount(const fn_call& fn)
     boost::intrusive_ptr<TextSnapshot_as> ts =
         ensureType<TextSnapshot_as>(fn.this_ptr);
     
+    if (!ts->valid()) return as_value();
+
     if (fn.nargs)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -229,6 +233,8 @@ textsnapshot_getText(const fn_call& fn)
     boost::intrusive_ptr<TextSnapshot_as> ts =
         ensureType<TextSnapshot_as>(fn.this_ptr);
 
+    if (!ts->valid()) return as_value();
+    
     if (fn.nargs < 2 || fn.nargs > 3)
     {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -263,7 +269,7 @@ as_value textsnapshot_setSelected(const fn_call& /*fn*/) {
 as_value
 textsnapshot_ctor(const fn_call& fn)
 {
-    MovieClip* mc = fn.nargs ? fn.arg(0).to_sprite() : 0;
+    MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).to_sprite() : 0;
     return as_value(new TextSnapshot_as(mc));
 }
 
