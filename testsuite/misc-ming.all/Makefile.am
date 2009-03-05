@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	SpriteButtonEventsTest-Runner \
 	DefineTextTest \
 	DefineTextTest-Runner \
+	TextSnapshotTest \
 	DefineEditTextTest \
 	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
@@ -390,6 +391,12 @@ DefineTextTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	DefineTextTest.swf      \
 	$(NULL)
+
+TextSnapshotTest.swf: TextSnapshotTest
+	./TextSnapshotTest $(top_srcdir)/testsuite/media
+
+TextSnapshotTest_SOURCES =  TextSnapshotTest.c
+TextSnapshotTest_LDADD = libgnashmingutils.la
 
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
