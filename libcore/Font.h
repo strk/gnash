@@ -55,12 +55,10 @@ public:
 	{
 		return m_char0 == k.m_char0 && m_char1 == k.m_char1;
 	}
-
-
 };
 
 // for use in standard algorithms
-inline boo
+inline bool
 operator< (const kerning_pair& p1, const kerning_pair& p2)
 {
 	if (p1.m_char0 < p2.m_char0) return true;
@@ -99,6 +97,8 @@ public:
 	Font(const std::string& name, bool bold=false, bool italic=false);
 
 	~Font();
+
+    boost::uint16_t codeTableLookup(int glyph, bool embedded) const;
 
 	/// Return true if this font matches given name and flags
 	//
