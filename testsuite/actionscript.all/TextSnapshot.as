@@ -69,6 +69,9 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals (typeof(textsnapshotObj.setSelectColor), 'function');
  check_equals (typeof(textsnapshotObj.setSelected), 'function');
 
+ gh = new TextSnapshot("hello");
+ check_equals(gh.getCount(), undefined);
+
  ts = _root.getTextSnapshot();
  xcheck(ts instanceof TextSnapshot);
  check(!ts.hasOwnProperty('findText'));
@@ -222,6 +225,6 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.setSelected(0, 10, 10, "hello")), "undefined");
  check_equals(typeof(ts.setSelected(0, 10, true, [3, 4])), "undefined");
 
- totals(155);
+ totals(156);
 
 #endif // OUTPUT_VERSION > 5
