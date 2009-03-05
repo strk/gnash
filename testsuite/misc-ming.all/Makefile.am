@@ -238,6 +238,7 @@ check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
+	TextSnapshotTest-Runner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
@@ -397,6 +398,10 @@ TextSnapshotTest.swf: TextSnapshotTest
 
 TextSnapshotTest_SOURCES =  TextSnapshotTest.c
 TextSnapshotTest_LDADD = libgnashmingutils.la
+
+TextSnapshotTest-Runner: $(srcdir)/../generic-testrunner.sh TextSnapshotTest.swf
+	sh $< $(top_builddir) TextSnapshotTest.swf > $@
+	chmod 755 $@
 
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
@@ -1935,6 +1940,7 @@ TEST_CASES = \
 	loadMovieTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	TextSnapshotTest-Runner \
 	action_execution_order_test1runner \
 	action_execution_order_test2runner \
 	action_execution_order_test3runner \
