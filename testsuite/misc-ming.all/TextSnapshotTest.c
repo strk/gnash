@@ -126,7 +126,6 @@ main(int argc, char** argv)
 		  "this.dynamictext1.text = 'Dynamic Text';");
   
   add_actions(mo, "ts = this.getTextSnapshot();");
-  add_actions(mo, "trace(this.dtext2);");
   check(mo, "ts instanceof TextSnapshot");
   check_equals(mo, "ts.getCount()", "64");
 
@@ -141,6 +140,14 @@ main(int argc, char** argv)
   check_equals(mo, "ss", "'h'");
   check_equals(mo, "ss.length", "1");
   
+  add_actions(mo, "TextSnapshot.prototype = undefined;");
+  add_actions(mo, "ts = this.getTextSnapshot();");
+ 
+  add_actions(mo, "trace(ts.getCount());");
+
+
+
+
   
   add_actions(mo, "totals(); stop();");
   

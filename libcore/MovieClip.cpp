@@ -57,7 +57,7 @@
 #include "flash/display/BitmapData_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
-
+#include "TextSnapshot_as.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -4071,11 +4071,13 @@ movieclip_getTextSnapshot(const fn_call& fn)
             ensureType<MovieClip>(fn.this_ptr);
 
     std::string snapshot;
-    movieclip->getTextSnapshot(snapshot);
-    log_debug("Text snapshot: %s", snapshot);
 
-    LOG_ONCE( log_unimpl("MovieClip.getTextSnapshot()") );
-    return as_value();
+    movieclip->getTextSnapshot(snapshot);
+
+    // TODO: generally implement a better way of constructing using
+    // prototype (if TextSnapshot.prototype is undefined, this should
+    // return undefined).
+    return as_value(new TextSnapshot_as(snapshot));
 }
 
 

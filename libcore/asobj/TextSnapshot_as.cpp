@@ -55,6 +55,14 @@ TextSnapshot_as::TextSnapshot_as()
 {
 }
 
+TextSnapshot_as::TextSnapshot_as(const std::string& snapshot)
+    :
+    as_object(getTextSnapshotInterface()),
+    _snapshot(snapshot)
+{
+}
+
+
 void
 TextSnapshot_as::init(as_object& global)
 {
@@ -119,10 +127,16 @@ as_value textsnapshot_findText(const fn_call& /*fn*/) {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
-as_value textsnapshot_getCount(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
+
+as_value
+textsnapshot_getCount(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    return ts->getCount();
 }
+
 as_value textsnapshot_getSelected(const fn_call& /*fn*/) {
     log_unimpl (__FUNCTION__);
     return as_value();

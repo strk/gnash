@@ -29,8 +29,20 @@ class TextSnapshot_as: public as_object
 public:
 
 	TextSnapshot_as();
+    
+    TextSnapshot_as(const std::string& snapshot);
+
+    std::string::size_type getCount() {
+        return _snapshot.size();
+    }
 
     static void init(as_object& global);
+
+    static void construct(const std::string& snapshot);
+
+private:
+    
+    std::string _snapshot;
 };
 
 } // end of gnash namespace
