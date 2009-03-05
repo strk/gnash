@@ -185,7 +185,7 @@ Font::get_glyph_index(boost::uint16_t code, bool embedded) const
         return glyph_index;
     }
 
-    // Try adding an os font, of possible
+    // Try adding an os font, if possible
     if ( ! embedded )
     {
         glyph_index = const_cast<Font*>(this)->add_os_glyph(code);
