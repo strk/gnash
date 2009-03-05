@@ -69,14 +69,6 @@ public:
 
     character* create_character_instance(character* parent, int id);
 
-    /// How many of these are necessary?
-
-	/// Get width of this definition in twips (by definition)
-	//float width() const { return _rect.width(); }
-
-	/// Get height of this definition in twips (by definition)
-	//float height() const { return _rect.height(); }
-
 	/// Return a reference to the default text associated
 	/// with this EditText definition.
 	const std::string& defaultText() const {
