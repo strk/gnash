@@ -245,8 +245,10 @@ public:
     void erasePollFD(std::vector<struct pollfd>::iterator &itt);
     struct pollfd &getPollFD(int fd);
     struct pollfd *getPollFDPtr();
+#ifdef HAVE_POLL_H
     size_t getPollFDSize() { return _pollfds.size(); };
     void clearPollFD() { _pollfds.clear(); };
+#endif
 
     // The entry point is an function pointer, which is the event
     // handler when there is data on a file descriptor.
