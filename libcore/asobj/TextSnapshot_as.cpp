@@ -139,7 +139,7 @@ TextSnapshot_as::findText(boost::int32_t start, const std::string& text,
         bool ignoreCase) const
 {
 
-    start = std::max(0, start);
+    if (start < 0 || text.empty()) return -1;
 
     std::string snapshot;
     makeString(snapshot);
@@ -150,7 +150,7 @@ TextSnapshot_as::findText(boost::int32_t start, const std::string& text,
     if (len < static_cast<size_t>(start)) return -1;
 
     if (ignoreCase) {
-        std::string::const_iterator it = std::search(snapshot.begin(),
+        std::string::const_iterator it = std::search(snapshot.begin() + start,
                 snapshot.end(), text.begin(), text.end(), boost::is_iequal());
         return (it == snapshot.end()) ? -1 : it - snapshot.begin();
     }
@@ -237,7 +237,10 @@ textsnapshot_findText(const fn_call& fn)
 
     boost::int32_t start = fn.arg(0).to_int();
     const std::string& text = fn.arg(1).to_string();
-    bool ignoreCase = fn.arg(2).to_bool();
+
+    /// Yes, the pp is case-insensitive by default. We don't write
+    /// functions like that here.
+    bool ignoreCase = !fn.arg(2).to_bool();
 
     return ts->findText(start, text, ignoreCase);
 }

@@ -143,6 +143,19 @@ main(int argc, char** argv)
   check_equals(mo, "ts.getText(0, 100, true)", 
           "'First text\nZweites Textfeld\nSome more "
 		  "static text here... abcdefgh'");
+  
+  xcheck_equals(mo, "ts.getText(0, 14, true)", "'First text\nZwei'");
+
+  check_equals(mo, "ts.findText(0, '', false)", "-1");
+  check_equals(mo, "ts.findText(0, 'f', false)", "0");
+  check_equals(mo, "ts.findText(0, 'f', true)", "22");
+  check_equals(mo, "ts.findText(1, 'Rst', false)", "2");
+  check_equals(mo, "ts.findText(3, 'RSt', false)", "-1");
+  check_equals(mo, "ts.findText(100, 'h', false)", "-1");
+  check_equals(mo, "ts.findText(64, 'h', false)", "-1");
+  check_equals(mo, "ts.findText(-5, 'Zwei', true)", "-1");
+  check_equals(mo, "ts.findText(-5, 'gh', true)", "-1");
+
 
   add_actions(mo, "ts.setSelected(0, 30, true);");
 
