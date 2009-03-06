@@ -31,6 +31,7 @@
 #include "generic_character.h"
 #include "DisplayList.h"
 #include "MovieClip.h"
+#include "StringPredicates.h"
 
 #include <algorithm>
 
@@ -133,6 +134,31 @@ TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
 
 }
 
+boost::int32_t
+TextSnapshot_as::findText(boost::int32_t start, const std::string& text,
+        bool ignoreCase) const
+{
+
+    start = std::max(0, start);
+
+    std::string snapshot;
+    makeString(snapshot);
+
+    const std::string::size_type len = snapshot.size();
+
+    // Don't try to search if start is past the end of the string.
+    if (len < static_cast<size_t>(start)) return -1;
+
+    if (ignoreCase) {
+        std::string::const_iterator it = std::search(snapshot.begin(),
+                snapshot.end(), text.begin(), text.end(), boost::is_iequal());
+        return (it == snapshot.end()) ? -1 : it - snapshot.begin();
+    }
+
+    std::string::size_type pos = snapshot.find(text, start);
+    return (pos == std::string::npos) ? -1 : pos;
+
+}
 
 void
 TextSnapshot_as::init(as_object& global)
@@ -193,9 +219,27 @@ as_value textsnapshot_getTextRunInfo(const fn_call& /*fn*/) {
     log_unimpl (__FUNCTION__);
     return as_value();
 }
-as_value textsnapshot_findText(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
+
+as_value
+textsnapshot_findText(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+    
+    if (!ts->valid()) return as_value();
+
+    if (fn.nargs != 3) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("TextSnapshot.findText() requires 3 arguments");
+        );
+        return as_value();
+    }
+
+    boost::int32_t start = fn.arg(0).to_int();
+    const std::string& text = fn.arg(1).to_string();
+    bool ignoreCase = fn.arg(2).to_bool();
+
+    return ts->findText(start, text, ignoreCase);
 }
 
 as_value
@@ -206,10 +250,9 @@ textsnapshot_getCount(const fn_call& fn)
     
     if (!ts->valid()) return as_value();
 
-    if (fn.nargs)
-    {
+    if (fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("TextSnapshot.getCount takes no arguments");
+            log_aserror("TextSnapshot.getCount() takes no arguments");
         );
         return as_value();
     }
