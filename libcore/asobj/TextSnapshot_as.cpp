@@ -31,8 +31,8 @@
 #include "generic_character.h"
 #include "DisplayList.h"
 #include "MovieClip.h"
-#include "StringPredicates.h"
 
+#include <boost/algorithm/string/compare.hpp>
 #include <algorithm>
 
 namespace gnash {
