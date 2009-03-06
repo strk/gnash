@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef _HTTP_H_
-#define _HTTP_H_
+#ifndef GNASH_LIBNET_HTTP_H
+#define GNASH_LIBNET_HTTP_H
 
 #include <string>
 #include <map>
@@ -27,6 +27,7 @@
 #include <boost/scoped_array.hpp>
 #include <sstream>
 
+#include "gnashconfig.h"
 #include "amf.h"
 #include "cque.h"
 #include "rtmp.h"
