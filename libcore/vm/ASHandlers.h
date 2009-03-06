@@ -33,7 +33,7 @@ namespace gnash {
 
 namespace SWF { // gnash::SWF
 
-typedef enum {
+enum ArgumentType {
     ARG_NONE = 0,
     ARG_STR,
     // default hex dump, in case the format is unknown or unsupported
@@ -44,27 +44,27 @@ typedef enum {
     ARG_PUSH_DATA,
     ARG_DECL_DICT,
     ARG_FUNCTION2
-} as_arg_t;
+};
 
-typedef enum {
+enum as_encoding_guess_t {
     ENCGUESS_UNICODE = 0,
     ENCGUESS_JIS = 1,
     ENCGUESS_OTHER = 2
-} as_encoding_guess_t;
+};
 
-// @@strk@@ should we move this to .cpp file ? it's only
-// use is within SWFHandlers, anyway...
-typedef void (*action_callback_t)(ActionExec& thread);
 
 class ActionHandler
 {
+    typedef void (*ActionCallback)(ActionExec& thread);
+
 public:
+
     ActionHandler();
-    ActionHandler(ActionType type, action_callback_t func);
+    ActionHandler(ActionType type, ActionCallback func);
     ActionHandler(ActionType type, std::string name, 
-                  action_callback_t func);
+                  ActionCallback func);
     ActionHandler(ActionType type, std::string name, 
-                  action_callback_t func, as_arg_t format);
+                  ActionCallback func, ArgumentType format);
 
     /// Execute the action
     void execute(ActionExec& thread) const;
@@ -72,13 +72,14 @@ public:
     void toggleDebug(bool state) const { _debug = state; }
     ActionType getType()   const { return _type; }
     std::string getName()   const { return _name; }
-    as_arg_t getArgFormat() const { return _arg_format; }
+    ArgumentType getArgFormat() const { return _arg_format; }
+
 private:
-    ActionType       _type;
-    std::string       _name;
-    action_callback_t _callback;
-    mutable bool      _debug;
-    as_arg_t          _arg_format;
+    ActionType _type;
+    std::string _name;
+    ActionCallback _callback;
+    mutable bool _debug;
+    ArgumentType _arg_format;
 };
 
 /// A singleton containing the supported SWF Action handlers.

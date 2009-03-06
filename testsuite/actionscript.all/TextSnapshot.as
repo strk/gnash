@@ -116,31 +116,31 @@ rcsid="$Id: TextSnapshot.as,v 1.12 2008/03/11 19:31:48 strk Exp $";
  check_equals(typeof(ts.findText(1, "a")), "undefined");
 
  // Test with no text.
- xcheck_equals(typeof(ts.findText(1, "a", true)), "number");
- xcheck_equals(typeof(ts.findText(1, "a", 1)), "number");
- xcheck_equals(typeof(ts.findText(1, "a", new Date())), "number");
- xcheck_equals(typeof(ts.findText("6", "a", new Date())), "number");
- xcheck_equals(typeof(ts.findText("b", "a", new Date())), "number");
- xcheck_equals(typeof(ts.findText(-1, "a", new Date())), "number");
- xcheck_equals(typeof(ts.findText(Infinity, "a", new Date())), "number");
+ check_equals(typeof(ts.findText(1, "a", true)), "number");
+ check_equals(typeof(ts.findText(1, "a", 1)), "number");
+ check_equals(typeof(ts.findText(1, "a", new Date())), "number");
+ check_equals(typeof(ts.findText("6", "a", new Date())), "number");
+ check_equals(typeof(ts.findText("b", "a", new Date())), "number");
+ check_equals(typeof(ts.findText(-1, "a", new Date())), "number");
+ check_equals(typeof(ts.findText(Infinity, "a", new Date())), "number");
  check_equals(typeof(ts.findText(-1, "a", new Date(), "e")), "undefined");
  check_equals(typeof(ts.findText(Infinity, "a", new Date(), 3)), "undefined");
 
- xcheck_equals(ts.findText(1, "a", true), -1);
- xcheck_equals(ts.findText(1, "a", 1), -1);
- xcheck_equals(ts.findText(1, "a", new Date()), -1);
- xcheck_equals(ts.findText("6", "a", false), -1);
- xcheck_equals(ts.findText("b", "a", true), -1);
- xcheck_equals(ts.findText(-1, "a", new Date()), -1);
- xcheck_equals(ts.findText(Infinity, "a", new Date()), -1);
+ check_equals(ts.findText(1, "a", true), -1);
+ check_equals(ts.findText(1, "a", 1), -1);
+ check_equals(ts.findText(1, "a", new Date()), -1);
+ check_equals(ts.findText("6", "a", false), -1);
+ check_equals(ts.findText("b", "a", true), -1);
+ check_equals(ts.findText(-1, "a", new Date()), -1);
+ check_equals(ts.findText(Infinity, "a", new Date()), -1);
 
  // Shouldn't work with dynamic text.
  _root.createTextField("tf", 10, 30, 30, 100, 100);
  _root.tf.text = "ghjkab";
  ts = _root.getTextSnapshot();
  check_equals(ts.getCount(), 0);
- xcheck_equals(ts.findText(1, "a", true), -1);
- xcheck_equals(ts.findText(1, "a", false), -1);
+ check_equals(ts.findText(1, "a", true), -1);
+ check_equals(ts.findText(1, "a", false), -1);
 
  // getSelected
 

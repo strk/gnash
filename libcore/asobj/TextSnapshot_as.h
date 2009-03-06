@@ -46,6 +46,9 @@ public:
     const std::string getText(boost::int32_t start, boost::int32_t end,
             bool nl) const;
 
+    boost::int32_t findText(boost::int32_t start, const std::string& text,
+            bool ignoreCase) const;
+
     static void init(as_object& global);
 
     static void construct(const std::string& snapshot);

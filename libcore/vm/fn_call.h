@@ -207,10 +207,6 @@ private:
 
 };
 
-/// Signature of a builtin function callable from ActionScript
-typedef as_value (*as_c_function_ptr)(const fn_call& fn);
-
-
 } // namespace gnash
 
 
