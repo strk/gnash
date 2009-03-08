@@ -123,7 +123,7 @@ TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
     if (len == 0) return std::string();
 
     // Start is always moved to between 0 and len - 1.
-    start = std::max(start, 0);
+    start = std::max<boost::int32_t>(start, 0);
     start = std::min<std::string::size_type>(len - 1, start);
 
     // End is always moved to between start and end. We don't really care
