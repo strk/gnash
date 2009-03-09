@@ -298,15 +298,18 @@ Kde4Gui::unsetFullscreen()
     _fullscreen = false;
     fullscreenAction->setChecked(_fullscreen);
 
-    // Re-embed the drawing wiget into the browser
-    if (_xid) {
-        _drawingWidget->embedInto(_xid);
-    }
-    else {
-        _drawingWidget->setWindowFlags(Qt::Widget);
+    if (_drawingWidget->isFullScreen()) {
+        // Re-embed the drawing wiget into the browser
+        if (_xid) {
+            _drawingWidget->showNormal();
+            _drawingWidget->embedInto(_xid);
+        }
+        else {
+            _drawingWidget->setWindowFlags(Qt::Widget);
+            _drawingWidget->showNormal();
+        }
     }
 
-    _drawingWidget->showNormal();
 }
 
 gnash::key::code

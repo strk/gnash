@@ -31,6 +31,26 @@
 
 namespace gnash {
 
+namespace {
+
+/// Reverse lookup of Glyph in CodeTable.
+//
+/// Inefficient, which is probably why TextSnapshot was designed like it
+/// is.
+class CodeLookup
+{
+public:
+    CodeLookup(const int glyph) : _glyph(glyph) {}
+
+    bool operator()(const std::pair<const boost::uint16_t, int>& p) {
+        return p.second == _glyph;
+    }
+
+private:
+    int _glyph;
+};
+
+}
 
 Font::GlyphInfo::GlyphInfo()
 	:
@@ -171,6 +191,19 @@ Font::setName(const std::string& name)
     _name = name;
 }
 
+
+boost::uint16_t
+Font::codeTableLookup(int glyph, bool embedded) const
+{
+    const CodeTable& ctable = (embedded && _embeddedCodeTable) ? 
+        *_embeddedCodeTable : _deviceCodeTable;
+    
+    CodeTable::const_iterator it = std::find_if(ctable.begin(), ctable.end(),
+            CodeLookup(glyph));
+    assert (it != ctable.end());
+    return it->first;
+}
+
 int
 Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 {
@@ -185,7 +218,7 @@ Font::get_glyph_index(boost::uint16_t code, bool embedded) const
         return glyph_index;
     }
 
-    // Try adding an os font, of possible
+    // Try adding an os font, if possible
     if ( ! embedded )
     {
         glyph_index = const_cast<Font*>(this)->add_os_glyph(code);

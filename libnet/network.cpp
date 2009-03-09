@@ -51,10 +51,10 @@
 # include <sys/param.h>
 # include <sys/select.h>
 #include <signal.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #else 
-# ifdef HAVE_EPOLL
+# ifdef HAVE_EPOLL_H
 #  include <epoll.h>
 # endif
 #endif

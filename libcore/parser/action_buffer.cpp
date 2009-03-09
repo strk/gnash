@@ -173,7 +173,7 @@ disasm_instruction(const unsigned char* instruction_data, size_t maxBufferLength
 
     assert (maxBufferLength > 0);
 
-    as_arg_t fmt = ARG_HEX;
+    ArgumentType fmt = ARG_HEX;
     ActionType action_id = static_cast<ActionType>(instruction_data[0]);
 
     std::stringstream ss;

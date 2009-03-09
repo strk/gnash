@@ -118,7 +118,7 @@ ActionHandler::ActionHandler()
 {
 }
 
-ActionHandler::ActionHandler(ActionType type, action_callback_t func)
+ActionHandler::ActionHandler(ActionType type, ActionCallback func)
     :
     _type(type),
     _callback(func),
@@ -128,7 +128,7 @@ ActionHandler::ActionHandler(ActionType type, action_callback_t func)
 }
 
 ActionHandler::ActionHandler(ActionType type, std::string name,
-                             action_callback_t func)
+                             ActionCallback func)
     :
     _type(type),
     _name(name),
@@ -139,7 +139,7 @@ ActionHandler::ActionHandler(ActionType type, std::string name,
 }
 
 ActionHandler::ActionHandler(ActionType type, std::string name,
-                             action_callback_t func, as_arg_t format)
+                             ActionCallback func, ArgumentType format)
     :
     _type(type),
     _name(name),

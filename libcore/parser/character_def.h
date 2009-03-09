@@ -43,18 +43,14 @@ class render_cache_manager;
 ///
 class character_def : public ExportableResource
 {
-private:
-	int	m_id;
-		
-	// don't assign-to
-	character_def& operator= (const character_def&);
 public:
-	character_def()
+
+    character_def()
 		:
-		m_id(-1),
-		m_render_cache(NULL)
-		{
-		}
+		m_render_cache(0),
+		_id(-1)
+    {
+    }
 
 	
 	virtual ~character_def();
@@ -63,7 +59,16 @@ public:
 	{
 	}
 
-    	/// Return true if the specified point is on the interior of our shape.
+    /// Return any text defined as static.
+    //
+    /// This is used for MovieClip.getTextSnapshot() and should only be
+    /// implemented in DefineTextTag. Default is a no-op
+    virtual bool extractStaticText(std::string& /*to*/)
+    {
+        return false;
+    }
+
+   	/// Return true if the specified point is on the interior of our shape.
 	//
 	/// Point coordinates are local coords (TWIPS)
 	///
@@ -87,15 +92,13 @@ public:
 	// Declared as virtual here because generic_character needs access to it
 	virtual const rect&	get_bound() const = 0;
 	
-public:  
-  
-  /// Cache holder for renderer (contents depend on renderer handler)
-  /// Will be deleted by destructor of the character_def.
-  /// We could store by auto_ptr, but I'm afraid that would mean
-  /// including render_handler.h in this header, which I don't like.
-  /// (REF: PIMPL)
-  ///
-  render_cache_manager* m_render_cache;
+    /// Cache holder for renderer (contents depend on renderer handler)
+    /// Will be deleted by destructor of the character_def.
+    /// We could store by auto_ptr, but I'm afraid that would mean
+    /// including render_handler.h in this header, which I don't like.
+    /// (REF: PIMPL)
+    ///
+    render_cache_manager* m_render_cache;
 
 protected:
 
@@ -124,18 +127,23 @@ protected:
 	character_def(const character_def& o)
 		:
         ExportableResource(),
-		m_id(o.m_id),
-		m_render_cache(NULL)
+		m_render_cache(0),
+		_id(o._id)
 	{}
 
+private:
+
+    int	_id;
+		
+	// don't assign-to
+	character_def& operator= (const character_def&);
 	
 };
 
 
 }	// namespace gnash
 
-#endif // GNASH_CHARACTER_DEF_H
-
+#endif 
 
 // Local Variables:
 // mode: C++
