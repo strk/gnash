@@ -27,7 +27,10 @@
 #include <boost/scoped_array.hpp>
 #include <sstream>
 
+#ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
+#endif
+
 #include "amf.h"
 #include "cque.h"
 #include "rtmp.h"

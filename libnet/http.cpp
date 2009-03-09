@@ -17,10 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
@@ -40,10 +36,10 @@
 #include <algorithm>
 #include "GnashSystemIOHeaders.h" // read()
 
+#include "http.h"
 #include "amf.h"
 #include "element.h"
 #include "cque.h"
-#include "http.h"
 #include "log.h"
 #include "network.h"
 #include "handler.h"
