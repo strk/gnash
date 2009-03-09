@@ -393,6 +393,10 @@ textsnapshot_getSelectedText(const fn_call& fn)
 
     if (!ts->valid()) return as_value();
 
+    if (fn.nargs > 1) {
+        return as_value();
+    }
+
     bool newlines = fn.nargs ? fn.arg(0).to_bool() : false;
 
     return as_value(ts->getSelectedText(newlines));
