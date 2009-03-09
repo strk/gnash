@@ -247,6 +247,15 @@ main(int /*argc*/, char** /*argv*/)
        check_equals (u2.path(), "/newpath");
     }
 
+    { // Relative url with port number 
+       URL u("rtmp://pms.youtube.com:443");
+       URL u2("http://newhost:554", u);
+       check_equals (u2.protocol(), "http");
+       check_equals (u2.hostname(), "newhost");
+       check_equals (u2.port(), "554");
+       check_equals (u2.path(), "/");
+    }
+
 
 	// TODO: Samba paths
 }
