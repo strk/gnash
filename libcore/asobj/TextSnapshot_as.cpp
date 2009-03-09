@@ -127,7 +127,7 @@ TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
     start = std::min<std::string::size_type>(len - 1, start);
 
     // End is always moved to between start and end. We don't really care
-    // about end.
+    // about the end of the string.
     end = std::max(start + 1, end);
 
     return snapshot.substr(start, end - start);
@@ -264,15 +264,33 @@ textsnapshot_getCount(const fn_call& fn)
     return ts->getCount();
 }
 
-as_value textsnapshot_getSelected(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_getSelectedText(const fn_call& /*fn*/) {
+/// Returns a boolean value, or undefined if not valid.
+as_value
+textsnapshot_getSelected(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    if (!ts->valid()) return as_value();
+
     log_unimpl (__FUNCTION__);
     return as_value();
 }
 
+/// Returns a string, or undefined if not valid.
+as_value
+textsnapshot_getSelectedText(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    if (!ts->valid()) return as_value();
+
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+/// Returns a string, or undefined if not valid.
 as_value
 textsnapshot_getText(const fn_call& fn)
 {
@@ -299,15 +317,38 @@ textsnapshot_getText(const fn_call& fn)
 }
 
 
-as_value textsnapshot_hitTestTextNearPos(const fn_call& /*fn*/) {
+/// Returns bool, or undefined if not valid.
+as_value
+textsnapshot_hitTestTextNearPos(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    if (!ts->valid()) return as_value();
+
     log_unimpl (__FUNCTION__);
     return as_value();
 }
-as_value textsnapshot_setSelectColor(const fn_call& /*fn*/) {
+
+/// Returns void.
+as_value
+textsnapshot_setSelectColor(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
     log_unimpl (__FUNCTION__);
     return as_value();
 }
-as_value textsnapshot_setSelected(const fn_call& /*fn*/) {
+
+
+/// Returns void.
+as_value
+textsnapshot_setSelected(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
     log_unimpl (__FUNCTION__);
     return as_value();
 }
