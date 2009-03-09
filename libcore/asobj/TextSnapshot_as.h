@@ -76,7 +76,9 @@ protected:
 
 private:
 
-    void makeString(std::string& to, bool newline = false) const;
+    void makeString(std::string& to, bool newline = false,
+            std::string::size_type start = 0,
+            std::string::size_type len = std::string::npos) const;
 
     TextFields _textFields;
 

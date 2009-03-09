@@ -144,7 +144,7 @@ main(int argc, char** argv)
           "'First text\nZweites Textfeld\nSome more "
 		  "static text here... abcdefgh'");
   
-  xcheck_equals(mo, "ts.getText(0, 14, true)", "'First text\nZwei'");
+  check_equals(mo, "ts.getText(0, 14, true)", "'First text\nZwei'");
 
   check_equals(mo, "ts.findText(0, '', false)", "-1");
   check_equals(mo, "ts.findText(0, 'f', false)", "0");

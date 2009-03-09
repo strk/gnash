@@ -67,31 +67,6 @@ namespace {
 
 namespace {
 
-/// Decodes a TextRecord to a std::string
-class RecordDecoder
-{
-public:
-
-    RecordDecoder(std::string& to) : _to(to) {}
-
-    void operator()(const SWF::TextRecord* rec) {
-
-        const SWF::TextRecord& tr = *rec;
-
-        const Font* font = tr.getFont();
-        if (!font) return;
-        
-        const SWF::TextRecord::Glyphs& glyphs = tr.glyphs();
-
-        for (SWF::TextRecord::Glyphs::const_iterator it = glyphs.begin(),
-                e = glyphs.end(); it != e; ++it) {
-            _to += font->codeTableLookup(it->index, true);
-        }
-    }
-private:
-    std::string& _to;
-};
-
 /// Accumulate the number of glyphs in a TextRecord.
 struct CountRecords
 {
@@ -180,14 +155,43 @@ TextSnapshot_as::markReachableResources() const
 }
 
 void
-TextSnapshot_as::makeString(std::string& to, bool newline) const
+TextSnapshot_as::makeString(std::string& to, bool newline,
+        std::string::size_type start, std::string::size_type len) const
 {
+
+    std::string::size_type pos = 0;
 
     for (TextFields::const_iterator it = _textFields.begin(),
             e = _textFields.end(); it != e; ++it)
     {
         if (newline && it != _textFields.begin()) to += '\n';
-        std::for_each(it->second.begin(), it->second.end(), RecordDecoder(to));
+
+        for (Records::const_iterator j = it->second.begin(),
+                end = it->second.end(); j != end; ++j) {
+        
+            const SWF::TextRecord* tr = *j;
+
+            const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
+
+            const SWF::TextRecord::Glyphs::size_type numGlyphs = glyphs.size();
+
+            if (pos + numGlyphs < start) {
+                pos += numGlyphs;
+                continue;
+            }
+
+            const Font* font = tr->getFont();
+            assert(font);
+
+            for (SWF::TextRecord::Glyphs::const_iterator it = glyphs.begin(),
+                    e = glyphs.end(); it != e; ++it) {
+                
+                if (pos++ < start) continue;
+                
+                to += font->codeTableLookup(it->index, true);
+                if (pos - start >= len) return;
+            }
+        }
     }
 }
 
@@ -195,22 +199,19 @@ const std::string
 TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
     const
 {
-    std::string snapshot;
-    makeString(snapshot, nl);
-
-    const std::string::size_type len = snapshot.size();
-
-    if (len == 0) return std::string();
 
     // Start is always moved to between 0 and len - 1.
     start = std::max<boost::int32_t>(start, 0);
-    start = std::min<std::string::size_type>(len - 1, start);
+    start = std::min<boost::int32_t>(start, _count - 1);
 
     // End is always moved to between start and end. We don't really care
     // about the end of the string.
     end = std::max(start + 1, end);
 
-    return snapshot.substr(start, end - start);
+    std::string snapshot;
+    makeString(snapshot, nl, start, end - start);
+
+    return snapshot;
 
 }
 
