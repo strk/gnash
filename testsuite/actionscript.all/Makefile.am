@@ -364,7 +364,7 @@ $(ASTESTS_V8_OUT) : $(ASTESTS) Dejagnu.swf
 	@mv ${@:-v8.swf=.swf} $@
 
 $(ASTESTS_V9_OUT) : $(ASTESTS) Dejagnu.swf
-	$(HAXE_CPP) ${@:-v9.swf=.as} | $(PERL) $(HAXE_DIR)/as_to_hx.pl ${@:-v9.swf=} > $(HAXE_DIR)/${@:-v9.swf=_as.hx}
+	$(HAXE_CPP) $(srcdir)/${@:-v9.swf=.as} | $(PERL) $(HAXE_DIR)/as_to_hx.pl ${@:-v9.swf=} > $(HAXE_DIR)/${@:-v9.swf=_as.hx}
 	$(HAXE) $(HAXE_FLAGS) -main $(@:-v9.swf=_as) -swf-version 9 -swf $(HAXE_DIR)/$@
 #	@$(MAKE) ${@:-v9.swf=.swf} SWFVERSION="9"
 #	@mv ${@:-v9.swf=.swf} $@
