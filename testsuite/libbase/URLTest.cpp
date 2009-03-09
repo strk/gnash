@@ -238,6 +238,15 @@ main(int /*argc*/, char** /*argv*/)
     check_equals (u29.port(), "443");
     check_equals (u29.path(), "/");
 
+    { // Relative url when base url has a port number
+       URL u("rtmp://pms.youtube.com:443");
+       URL u2("/newpath", u);
+       check_equals (u2.protocol(), "rtmp");
+       check_equals (u2.hostname(), "pms.youtube.com");
+       check_equals (u2.port(), "443");
+       check_equals (u2.path(), "/newpath");
+    }
+
 
 	// TODO: Samba paths
 }
