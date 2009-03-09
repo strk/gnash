@@ -48,12 +48,8 @@ DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to)
 {
     if (_textRecords.empty()) return false;
 
-    log_debug("to size before: %d", to.size());
-
     std::transform(_textRecords.begin(), _textRecords.end(),
             std::back_inserter(to), CreatePointer<TextRecord>());
-
-    log_debug("to size after: %d", to.size());
 
     return true;
 }

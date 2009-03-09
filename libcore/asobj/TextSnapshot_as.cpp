@@ -183,8 +183,6 @@ void
 TextSnapshot_as::makeString(std::string& to, bool newline) const
 {
 
-    log_debug("TextFields: %s", _textFields.size());
-
     for (TextFields::const_iterator it = _textFields.begin(),
             e = _textFields.end(); it != e; ++it)
     {
