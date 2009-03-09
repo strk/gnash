@@ -291,8 +291,9 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 
 		split_anchor_from_path();
 
-                // Extract the port number from the hostname, if any
-                split_port_from_host();
+        // Extract the port number from the hostname, if any
+        split_port_from_host();
+        _port= baseurl._port;
 
 		split_querystring_from_path();
 
