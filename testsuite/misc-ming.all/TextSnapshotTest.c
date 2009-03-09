@@ -161,18 +161,18 @@ main(int argc, char** argv)
   xcheck_equals(mo, "ts.getSelectedText(true)", "' text\nZweites "
           "Textfeld\nSome'");
   xcheck_equals(mo, "ts.getSelectedText(false)", "' textZweites TextfeldSome'");
-  xcheck_equals(mo, "ts.getSelected(0, 4)", "false");
-  xcheck_equals(mo, "ts.getSelected(1, 9)", "true");
-  xcheck_equals(mo, "ts.getSelected(-4, 10)", "true");
-  xcheck_equals(mo, "ts.getSelected(-4, 6)", "true");
-  xcheck_equals(mo, "ts.getSelected(28, 23)", "true");
-  xcheck_equals(mo, "ts.getSelected(20, 20)", "true");
-  xcheck_equals(mo, "ts.getSelected(20, 27)", "true");
-  xcheck_equals(mo, "ts.getSelected(-3, -1)", "false");
-  xcheck_equals(mo, "ts.getSelected(30, 31)", "false");
-  xcheck_equals(mo, "ts.getSelected(0, 5)", "false");
-  xcheck_equals(mo, "ts.getSelected(40, 45)", "false");
-  xcheck_equals(mo, "ts.getSelected(31, 34)", "false");
+  check_equals(mo, "ts.getSelected(0, 4)", "false");
+  check_equals(mo, "ts.getSelected(1, 9)", "true");
+  check_equals(mo, "ts.getSelected(-4, 10)", "true");
+  check_equals(mo, "ts.getSelected(-4, 6)", "true");
+  check_equals(mo, "ts.getSelected(28, 23)", "true");
+  check_equals(mo, "ts.getSelected(20, 20)", "true");
+  check_equals(mo, "ts.getSelected(20, 27)", "true");
+  check_equals(mo, "ts.getSelected(-3, -1)", "false");
+  check_equals(mo, "ts.getSelected(30, 31)", "false");
+  check_equals(mo, "ts.getSelected(0, 5)", "false");
+  check_equals(mo, "ts.getSelected(40, 45)", "false");
+  check_equals(mo, "ts.getSelected(31, 34)", "false");
 
   check_equals(mo, "ts.getSelected(0)", "undefined");
   check_equals(mo, "ts.getSelected(1)", "undefined");

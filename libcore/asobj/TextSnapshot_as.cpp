@@ -310,9 +310,7 @@ textsnapshot_getSelected(const fn_call& fn)
     }
 
     size_t start = std::max(0, fn.arg(0).to_int());
-    size_t end = std::max<int>(start, fn.arg(1).to_int());
-
-    end = std::max(start, end);
+    size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
 
     return as_value(ts->getSelected(start, end));
 }
