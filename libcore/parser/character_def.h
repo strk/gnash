@@ -27,6 +27,9 @@ namespace gnash {
 	class character;
 	class SWFMatrix;
 	class rect;
+    namespace SWF {
+        class TextRecord;
+    }
 }
 
 namespace gnash {
@@ -63,7 +66,7 @@ public:
     //
     /// This is used for MovieClip.getTextSnapshot() and should only be
     /// implemented in DefineTextTag. Default is a no-op
-    virtual bool extractStaticText(std::string& /*to*/)
+    virtual bool extractStaticText(std::vector<const SWF::TextRecord*>& /*to*/)
     {
         return false;
     }

@@ -144,7 +144,7 @@ main(int argc, char** argv)
           "'First text\nZweites Textfeld\nSome more "
 		  "static text here... abcdefgh'");
   
-  xcheck_equals(mo, "ts.getText(0, 14, true)", "'First text\nZwei'");
+  check_equals(mo, "ts.getText(0, 14, true)", "'First text\nZwei'");
 
   check_equals(mo, "ts.findText(0, '', false)", "-1");
   check_equals(mo, "ts.findText(0, 'f', false)", "0");
@@ -156,8 +156,43 @@ main(int argc, char** argv)
   check_equals(mo, "ts.findText(-5, 'Zwei', true)", "-1");
   check_equals(mo, "ts.findText(-5, 'gh', true)", "-1");
 
+  add_actions(mo, "ts.setSelected(5, 30, true);");
+  check_equals(mo, "ts.getSelectedText()", "' textZweites TextfeldSome'");
+  check_equals(mo, "ts.getSelectedText(true)", "' text\nZweites "
+          "Textfeld\nSome'");
+  check_equals(mo, "ts.getSelectedText(false)", "' textZweites TextfeldSome'");
+  check_equals(mo, "ts.getSelected(0, 4)", "false");
+  check_equals(mo, "ts.getSelected(1, 9)", "true");
+  check_equals(mo, "ts.getSelected(-4, 10)", "true");
+  check_equals(mo, "ts.getSelected(-4, 6)", "true");
+  check_equals(mo, "ts.getSelected(28, 23)", "true");
+  check_equals(mo, "ts.getSelected(20, 20)", "true");
+  check_equals(mo, "ts.getSelected(20, 27)", "true");
+  check_equals(mo, "ts.getSelected(-3, -1)", "false");
+  check_equals(mo, "ts.getSelected(30, 31)", "false");
+  check_equals(mo, "ts.getSelected(0, 5)", "false");
+  check_equals(mo, "ts.getSelected(40, 45)", "false");
+  check_equals(mo, "ts.getSelected(31, 34)", "false");
 
-  add_actions(mo, "ts.setSelected(0, 30, true);");
+  check_equals(mo, "ts.getSelected(0)", "undefined");
+  check_equals(mo, "ts.getSelected(1)", "undefined");
+  check_equals(mo, "ts.getSelected(-4)", "undefined");
+  check_equals(mo, "ts.getSelected(-4)", "undefined");
+  check_equals(mo, "ts.getSelected(28)", "undefined");
+  check_equals(mo, "ts.getSelected(20)", "undefined");
+
+  // Check that selected text is not a property of the text itself.
+  add_actions(mo, "ts2 = new TextSnapshot(this);");
+  check_equals(mo, "ts2.getCount()", "64");
+  check_equals(mo, "ts2.getSelectedText()", "''");
+  add_actions(mo, "ts2 = this.getTextSnapshot();");
+  check_equals(mo, "ts2.getCount()", "64");
+  check_equals(mo, "ts2.getSelectedText()", "''");
+
+  add_actions(mo, "ts2.setSelected(3, 10);");
+
+  add_actions(mo, "ts.setSelectedColor(0xffff00);");
+  add_actions(mo, "ts2.setSelectedColor(0x0000ff);");
 
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");
@@ -181,11 +216,7 @@ main(int argc, char** argv)
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");
   
-  
   add_actions(mo, "totals(); stop();");
-  
-
-
   
   SWFMovie_nextFrame(mo); 
 

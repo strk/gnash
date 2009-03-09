@@ -26,8 +26,16 @@
 
 namespace gnash {
 
-// Forward declarations
-class character_def;
+    // Forward declarations
+    class character_def;
+
+    namespace SWF {
+        class TextRecord;
+    }
+
+}
+
+namespace gnash {
 
 /// For characters that don't store unusual state in their instances.
 //
@@ -72,7 +80,8 @@ public:
 		return false;
 	}
 
-    virtual generic_character* getStaticText(std::string& to);
+    virtual generic_character* getStaticText(
+            std::vector<const SWF::TextRecord*>& /*to*/);
 
 	virtual void display();
 

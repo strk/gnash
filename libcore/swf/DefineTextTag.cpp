@@ -34,33 +34,23 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     m.add_character(id, t.release());
 }
 
-class DecodeRecord
+template<typename T>
+struct CreatePointer
 {
-public:
-
-    DecodeRecord(std::string& to) : _to(to) {}
-
-    void operator()(const TextRecord& tr) {
-
-        const Font* font = tr.getFont();
-        if (!font) return;
-        
-        const TextRecord::Glyphs& glyphs = tr.glyphs();
-
-        for (TextRecord::Glyphs::const_iterator it = glyphs.begin(),
-                e = glyphs.end(); it != e; ++it) {
-            _to += font->codeTableLookup(it->index, true);
-        }
+    const T* operator()(const T& t) { 
+        return &t;
     }
-private:
-    std::string& _to;
 };
 
 
 bool
-DefineTextTag::extractStaticText(std::string& to)
+DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to)
 {
-    std::for_each(_textRecords.begin(), _textRecords.end(), DecodeRecord(to));
+    if (_textRecords.empty()) return false;
+
+    std::transform(_textRecords.begin(), _textRecords.end(),
+            std::back_inserter(to), CreatePointer<TextRecord>());
+
     return true;
 }
 

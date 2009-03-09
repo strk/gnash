@@ -200,20 +200,6 @@ private:
 
 };
 
-/// Search the DisplayList for static text.
-class StaticTextFinder
-{
-public:
-    StaticTextFinder(std::string& to) : _to(to) {}
-
-    void operator()(character* ch) {
-        ch->getStaticText(_to);
-    }
-
-private:
-    std::string& _to;
-};
-
 /// Find a character hit by the given coordinates.
 //
 /// This class takes care about taking masks layers into
