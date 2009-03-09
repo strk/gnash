@@ -19,7 +19,9 @@
 #define GNASH_CHARACTER_DEF_H
 
 #include "ExportableResource.h"
+
 #include <boost/cstdint.hpp>
+#include <vector>
 
 // Forward declarations
 
