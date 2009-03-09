@@ -20,6 +20,7 @@
 #define GNASH_ASOBJ_TEXTSNAPSHOT_H
 
 #include "as_object.h"
+#include <boost/dynamic_bitset.hpp>
 
 namespace gnash {
 
@@ -35,13 +36,12 @@ public:
     /// performance issue.
     typedef std::vector<std::pair<generic_character*, std::string> > TextFields;
 
+    /// Construct a TextSnapshot_as from a MovieClip.
+    //
+    /// @param mc       The MovieClip to search for static text. If 0, the
+    ///                 TextSnapshot is invalid, which should be reflected in
+    ///                 AS return values.
     TextSnapshot_as(const MovieClip* mc);
-
-    std::string::size_type getCount() {
-        std::string snapshot;
-        makeString(snapshot);
-        return snapshot.size();
-    }
 
     const std::string getText(boost::int32_t start, boost::int32_t end,
             bool nl) const;
@@ -54,6 +54,12 @@ public:
     static void construct(const std::string& snapshot);
 
     bool valid() const { return _valid; }
+
+    size_t getCount() const { return _count; }
+
+    void setSelected(size_t start, size_t end, bool selected);
+    
+    bool getSelected(size_t start, size_t end);
 
 protected:
 
@@ -70,6 +76,21 @@ private:
     /// This should be deducible from another member, but since there seems
     /// to be no point in storing the MovieClip this bool will do instead.
     bool _valid;
+
+    /// The number of characters
+    //
+    /// There is no need to store this, but it is quicker than counting
+    /// afresh every time.
+    size_t _count;
+
+    /// Characters in the text run are selected individually.
+    //
+    /// Storing selection information along with the characters themselves
+    /// means that a separate object is necessary for each character.
+    /// Using a dynamic bitset prevents this, and generally
+    /// saves a lot of memory (32 bytes for boost's dynamic bitset against
+    /// one byte per character, possibly packed, for a bool in an object).
+    boost::dynamic_bitset<> _selected;
 
 };
 

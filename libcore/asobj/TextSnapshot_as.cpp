@@ -33,6 +33,7 @@
 #include "MovieClip.h"
 
 #include <boost/algorithm/string/compare.hpp>
+#include <boost/dynamic_bitset.hpp>
 #include <algorithm>
 
 namespace gnash {
@@ -54,7 +55,10 @@ namespace {
     void attachTextSnapshotInterface(as_object& o);
     as_object* getTextSnapshotInterface();
 
-    void setTextReachable( const TextSnapshot_as::TextFields::value_type& vt);
+    size_t getTextFields(const MovieClip* mc,
+            TextSnapshot_as::TextFields& fields);
+
+    void setTextReachable(const TextSnapshot_as::TextFields::value_type& vt);
 
 }
 
@@ -63,7 +67,11 @@ namespace {
 class TextFinder
 {
 public:
-    TextFinder(TextSnapshot_as::TextFields& fields) : _fields(fields) {}
+    TextFinder(TextSnapshot_as::TextFields& fields)
+        :
+        _fields(fields),
+        _count(0)
+    {}
 
     void operator()(character* ch) {
         if (ch->isUnloaded()) return;
@@ -71,27 +79,52 @@ public:
         generic_character* tf;
         if ((tf = ch->getStaticText(text))) {
             _fields.push_back(std::make_pair(tf, text));
+            _count += text.size();
         }
     }
 
+    size_t getCount() const { return _count; }
+
 private:
-        TextSnapshot_as::TextFields& _fields;
+    TextSnapshot_as::TextFields& _fields;
+    size_t _count;
 };
 
 } // anonymous namespace
 
-
+/// The member _textFields is initialized here unnecessarily to show
+/// that it is constructed before it is used.
 TextSnapshot_as::TextSnapshot_as(const MovieClip* mc)
     :
     as_object(getTextSnapshotInterface()),
-    _valid(mc)
+    _textFields(),
+    _valid(mc),
+    _count(getTextFields(mc, _textFields)),
+    _selected(_count)
 {
-    if (mc) {
-        const DisplayList& dl = mc->getDisplayList();
+}
 
-        TextFinder finder(_textFields);
-        dl.visitAll(finder);
+void
+TextSnapshot_as::setSelected(size_t start, size_t end, bool selected)
+{
+    start = std::min(start, _selected.size());
+    end = std::min(end, _selected.size());
+
+    for (size_t i = start; i < end; ++i) {
+        _selected.set(i, selected);
     }
+}
+
+bool
+TextSnapshot_as::getSelected(size_t start, size_t end)
+{
+    start = std::min(start, _selected.size());
+    end = std::min(end, _selected.size());
+
+    for (size_t i = start; i < end; ++i) {
+        if (_selected.test(i)) return true;
+    }
+    return false;
 }
 
 void
@@ -260,7 +293,6 @@ textsnapshot_getCount(const fn_call& fn)
         return as_value();
     }
 
-
     return ts->getCount();
 }
 
@@ -273,8 +305,16 @@ textsnapshot_getSelected(const fn_call& fn)
 
     if (!ts->valid()) return as_value();
 
-    log_unimpl (__FUNCTION__);
-    return as_value();
+    if (fn.nargs != 2) {
+        return as_value();
+    }
+
+    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t end = std::max<int>(start, fn.arg(1).to_int());
+
+    end = std::max(start, end);
+
+    return as_value(ts->getSelected(start, end));
 }
 
 /// Returns a string, or undefined if not valid.
@@ -349,7 +389,17 @@ textsnapshot_setSelected(const fn_call& fn)
     boost::intrusive_ptr<TextSnapshot_as> ts =
         ensureType<TextSnapshot_as>(fn.this_ptr);
 
-    log_unimpl (__FUNCTION__);
+    if (fn.nargs < 2 || fn.nargs > 3) {
+        return as_value();
+    }
+
+    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t end = std::max<int>(start, fn.arg(1).to_int());
+
+    bool selected = (fn.nargs > 2) ? fn.arg(2).to_bool() : true;
+
+    ts->setSelected(start, end, selected);
+
     return as_value();
 }
 
@@ -358,6 +408,19 @@ textsnapshot_ctor(const fn_call& fn)
 {
     MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).to_sprite() : 0;
     return as_value(new TextSnapshot_as(mc));
+}
+
+size_t
+getTextFields(const MovieClip* mc, TextSnapshot_as::TextFields& fields)
+{
+    if (mc) {
+        const DisplayList& dl = mc->getDisplayList();
+
+        TextFinder finder(fields);
+        dl.visitAll(finder);
+        return finder.getCount();
+    }
+    return 0;
 }
 
 void
