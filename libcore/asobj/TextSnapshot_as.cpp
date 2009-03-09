@@ -68,11 +68,11 @@ namespace {
 namespace {
 
 /// Decodes a TextRecord to a std::string
-class DecodeRecord
+class RecordDecoder
 {
 public:
 
-    DecodeRecord(std::string& to) : _to(to) {}
+    RecordDecoder(std::string& to) : _to(to) {}
 
     void operator()(const SWF::TextRecord* rec) {
 
@@ -187,7 +187,7 @@ TextSnapshot_as::makeString(std::string& to, bool newline) const
             e = _textFields.end(); it != e; ++it)
     {
         if (newline && it != _textFields.begin()) to += '\n';
-        std::for_each(it->second.begin(), it->second.end(), DecodeRecord(to));
+        std::for_each(it->second.begin(), it->second.end(), RecordDecoder(to));
     }
 }
 
