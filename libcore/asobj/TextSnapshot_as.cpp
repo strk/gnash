@@ -31,10 +31,13 @@
 #include "generic_character.h"
 #include "DisplayList.h"
 #include "MovieClip.h"
+#include "Font.h"
+#include "swf/TextRecord.h"
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <algorithm>
+#include <numeric>
 
 namespace gnash {
 
@@ -64,6 +67,46 @@ namespace {
 
 namespace {
 
+/// Decodes a TextRecord to a std::string
+class DecodeRecord
+{
+public:
+
+    DecodeRecord(std::string& to) : _to(to) {}
+
+    void operator()(const SWF::TextRecord* rec) {
+
+        const SWF::TextRecord& tr = *rec;
+
+        const Font* font = tr.getFont();
+        if (!font) return;
+        
+        const SWF::TextRecord::Glyphs& glyphs = tr.glyphs();
+
+        for (SWF::TextRecord::Glyphs::const_iterator it = glyphs.begin(),
+                e = glyphs.end(); it != e; ++it) {
+            _to += font->codeTableLookup(it->index, true);
+        }
+    }
+private:
+    std::string& _to;
+};
+
+/// Accumulate the number of glyphs in a TextRecord.
+struct CountRecords
+{
+    size_t operator()(size_t c, const TextSnapshot_as::Records::value_type t) {
+        const SWF::TextRecord::Glyphs& glyphs = t->glyphs();
+        size_t ret = c + glyphs.size();
+        return ret;
+    }
+};
+
+/// Locate static text in a character.
+//
+/// Static text (TextRecords) are added to a vector, which should 
+/// correspond to a single character. Also keeps count of the total number
+/// of glyphs.
 class TextFinder
 {
 public:
@@ -75,11 +118,14 @@ public:
 
     void operator()(character* ch) {
         if (ch->isUnloaded()) return;
-        std::string text;
+
+        TextSnapshot_as::Records text;
         generic_character* tf;
+
         if ((tf = ch->getStaticText(text))) {
             _fields.push_back(std::make_pair(tf, text));
-            _count += text.size();
+            _count = std::accumulate(text.begin(), text.end(), _count,
+                    CountRecords());
         }
     }
 
@@ -136,11 +182,14 @@ TextSnapshot_as::markReachableResources() const
 void
 TextSnapshot_as::makeString(std::string& to, bool newline) const
 {
+
+    log_debug("TextFields: %s", _textFields.size());
+
     for (TextFields::const_iterator it = _textFields.begin(),
             e = _textFields.end(); it != e; ++it)
     {
         if (newline && it != _textFields.begin()) to += '\n';
-        to += it->second;
+        std::for_each(it->second.begin(), it->second.end(), DecodeRecord(to));
     }
 }
 

@@ -22,19 +22,28 @@
 #include "as_object.h"
 #include <boost/dynamic_bitset.hpp>
 
-namespace gnash {
 
-class generic_character;
+// Forward declarations.
+namespace gnash {
+    class generic_character;
+    namespace SWF {
+        class TextRecord;
+    }
+}
+
+namespace gnash {
 
 class TextSnapshot_as: public as_object
 {
 
 public:
 
+    typedef std::vector<const SWF::TextRecord*> Records;
+
     /// Should remain in the order of insertion
     /// We should only ever iterate from begin to end, so there's no
     /// performance issue.
-    typedef std::vector<std::pair<generic_character*, std::string> > TextFields;
+    typedef std::vector<std::pair<generic_character*, Records> > TextFields;
 
     /// Construct a TextSnapshot_as from a MovieClip.
     //
