@@ -157,10 +157,10 @@ main(int argc, char** argv)
   check_equals(mo, "ts.findText(-5, 'gh', true)", "-1");
 
   add_actions(mo, "ts.setSelected(5, 30, true);");
-  xcheck_equals(mo, "ts.getSelectedText()", "' textZweites TextfeldSome'");
-  xcheck_equals(mo, "ts.getSelectedText(true)", "' text\nZweites "
+  check_equals(mo, "ts.getSelectedText()", "' textZweites TextfeldSome'");
+  check_equals(mo, "ts.getSelectedText(true)", "' text\nZweites "
           "Textfeld\nSome'");
-  xcheck_equals(mo, "ts.getSelectedText(false)", "' textZweites TextfeldSome'");
+  check_equals(mo, "ts.getSelectedText(false)", "' textZweites TextfeldSome'");
   check_equals(mo, "ts.getSelected(0, 4)", "false");
   check_equals(mo, "ts.getSelected(1, 9)", "true");
   check_equals(mo, "ts.getSelected(-4, 10)", "true");
@@ -184,10 +184,10 @@ main(int argc, char** argv)
   // Check that selected text is not a property of the text itself.
   add_actions(mo, "ts2 = new TextSnapshot(this);");
   check_equals(mo, "ts2.getCount()", "64");
-  xcheck_equals(mo, "ts2.getSelectedText()", "''");
+  check_equals(mo, "ts2.getSelectedText()", "''");
   add_actions(mo, "ts2 = this.getTextSnapshot();");
   check_equals(mo, "ts2.getCount()", "64");
-  xcheck_equals(mo, "ts2.getSelectedText()", "''");
+  check_equals(mo, "ts2.getSelectedText()", "''");
 
   add_actions(mo, "ts2.setSelected(3, 10);");
 

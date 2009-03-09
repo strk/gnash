@@ -164,15 +164,19 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
     for (TextFields::const_iterator it = _textFields.begin(),
             e = _textFields.end(); it != e; ++it)
     {
-        if (newline && it != _textFields.begin()) to += '\n';
+        // When newlines are requested, insert one after each individual
+        // text field is processed.
+        if (newline && pos > start) to += '\n';
 
-        for (Records::const_iterator j = it->second.begin(),
-                end = it->second.end(); j != end; ++j) {
+        const Records& rec = it->second;
+
+        for (Records::const_iterator j = rec.begin(), end = rec.end();
+                j != end; ++j) {
         
             const SWF::TextRecord* tr = *j;
+            assert(tr);
 
             const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
-
             const SWF::TextRecord::Glyphs::size_type numGlyphs = glyphs.size();
 
             if (pos + numGlyphs < start) {
@@ -183,12 +187,12 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
             const Font* font = tr->getFont();
             assert(font);
 
-            for (SWF::TextRecord::Glyphs::const_iterator it = glyphs.begin(),
-                    e = glyphs.end(); it != e; ++it) {
+            for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
+                    e = glyphs.end(); k != e; ++k) {
                 
                 if (pos++ < start) continue;
                 
-                to += font->codeTableLookup(it->index, true);
+                to += font->codeTableLookup(k->index, true);
                 if (pos - start >= len) return;
             }
         }
@@ -213,6 +217,23 @@ TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
 
     return snapshot;
 
+}
+
+std::string
+TextSnapshot_as::getSelectedText(bool newline) const
+{
+    std::string sel;
+    
+    for (size_t i = 0, e = _selected.size(); i != e; ++i) {
+        while (!_selected.test(i)) {
+            ++i;
+            if (i == e) return sel;
+        }
+        size_t start = i;
+        while (_selected.test(i) && i != e) ++i;
+        makeString(sel, newline, start, i - start);
+    }        
+    return sel;
 }
 
 boost::int32_t
@@ -372,8 +393,9 @@ textsnapshot_getSelectedText(const fn_call& fn)
 
     if (!ts->valid()) return as_value();
 
-    log_unimpl (__FUNCTION__);
-    return as_value();
+    bool newlines = fn.nargs ? fn.arg(0).to_bool() : false;
+
+    return as_value(ts->getSelectedText(newlines));
 }
 
 /// Returns a string, or undefined if not valid.

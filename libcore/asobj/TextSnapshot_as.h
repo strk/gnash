@@ -70,6 +70,8 @@ public:
     
     bool getSelected(size_t start, size_t end);
 
+    std::string getSelectedText(bool newlines) const;
+
 protected:
 
     void markReachableResources() const;
