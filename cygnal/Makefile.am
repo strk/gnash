@@ -20,10 +20,9 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-# only run the testsuite by hand for now till it's a bit more stable.
-# if TESTSUITE
-# TEST_DIR = testsuite
-# endif
+if TESTSUITE
+TEST_DIR = testsuite
+endif
 
 SUBDIRS = \
 	$(TEST_DIR) \
