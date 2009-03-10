@@ -256,6 +256,28 @@ main(int /*argc*/, char** /*argv*/)
        check_equals (u2.path(), "/");
     }
 
+    { // Relative url with query string
+       URL u("http://pms.youtube.com:443/index.php?query=1");
+       URL u2("/?query", u);
+       check_equals (u2.protocol(), "http");
+       check_equals (u2.hostname(), "pms.youtube.com");
+       check_equals (u2.port(), "443");
+       check_equals (u2.path(), "/");
+       check_equals (u2.querystring(), "query");
+       check_equals (u2.anchor(), "");
+    }
+
+    { // Relative url with anchor
+       URL u("http://pms.youtube.com:443/index.php?query=1");
+       URL u2("/#anchor", u);
+       check_equals (u2.protocol(), "http");
+       check_equals (u2.hostname(), "pms.youtube.com");
+       check_equals (u2.port(), "443");
+       check_equals (u2.path(), "/");
+       check_equals (u2.querystring(), "");
+       check_equals (u2.anchor(), "anchor");
+    }
+
 
 	// TODO: Samba paths
 }

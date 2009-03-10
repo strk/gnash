@@ -290,13 +290,14 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		// get dirname from basurl path
 		_path = basedir + in;
 
-		split_anchor_from_path();
-
-		split_querystring_from_path();
-
-		normalize_path(_path);
-
 	}
+
+    split_anchor_from_path();
+
+    split_querystring_from_path();
+
+    normalize_path(_path);
+
 
 }
 
