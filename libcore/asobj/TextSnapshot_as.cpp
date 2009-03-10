@@ -163,10 +163,11 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 
     std::string::size_type len = end - start;
 
-    for (TextFields::const_iterator it = _textFields.begin(),
-            e = _textFields.end(); it != e; ++it) {
+    for (TextFields::const_iterator field = _textFields.begin(),
+            e = _textFields.end(); field != e; ++field) {
 
-        const Records& rec = it->second;
+        const Records& rec = field->second;
+        const SWFMatrix& mat = field->first->getMatrix();
 
         for (Records::const_iterator j = rec.begin(), end = rec.end();
                 j != end; ++j) {
@@ -200,6 +201,16 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 el->init_member("font", font->name());
                 el->init_member("color", tr->color().toRGBA());
                 el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
+
+                const double factor = 65536.0;
+
+                el->init_member("matrix_a", mat.sx / factor);
+                el->init_member("matrix_b", mat.shx / factor);
+                el->init_member("matrix_c", mat.shy / factor);
+                el->init_member("matrix_d", mat.sy / factor);
+                el->init_member("matrix_tx", TWIPS_TO_PIXELS(mat.tx));
+                el->init_member("matrix_ty", TWIPS_TO_PIXELS(mat.ty));
+                    
                 ri.push(el);
 
                 ++pos;
@@ -217,16 +228,16 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
 
     std::string::size_type pos = 0;
 
-    for (TextFields::const_iterator it = _textFields.begin(),
-            e = _textFields.end(); it != e; ++it)
+    for (TextFields::const_iterator field = _textFields.begin(),
+            e = _textFields.end(); field != e; ++field)
     {
         // When newlines are requested, insert one after each individual
         // text field is processed.
         if (newline && pos > start) to += '\n';
 
-        const Records& rec = it->second;
+        const Records& records = field->second;
 
-        for (Records::const_iterator j = rec.begin(), end = rec.end();
+        for (Records::const_iterator j = records.begin(), end = records.end();
                 j != end; ++j) {
         
             const SWF::TextRecord* tr = *j;
