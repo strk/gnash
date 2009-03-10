@@ -134,7 +134,7 @@ public:
 	shape_character_def* get_glyph(int glyph_index, bool embedded) const;
 
 	/// Get name of this font. 
-	const std::string& get_name() const { return _name; }
+	const std::string& name() const { return _name; }
 
 	/// Return the glyph index for a given character code
 	//

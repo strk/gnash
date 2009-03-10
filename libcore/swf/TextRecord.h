@@ -51,7 +51,7 @@ public:
 
     TextRecord()
         :
-        _color(0, 0, 0, 255),
+        _color(0, 0, 0, 0),
         _textHeight(0),
         _hasXOffset(false),
         _hasYOffset(false),

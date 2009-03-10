@@ -33,6 +33,8 @@
 #include "MovieClip.h"
 #include "Font.h"
 #include "swf/TextRecord.h"
+#include "Array_as.h"
+#include "RGBA.h"
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>
@@ -155,8 +157,56 @@ TextSnapshot_as::markReachableResources() const
 }
 
 void
-TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
+TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 {
+    std::string::size_type pos = 0;
+
+    std::string::size_type len = end - start;
+
+    for (TextFields::const_iterator it = _textFields.begin(),
+            e = _textFields.end(); it != e; ++it) {
+
+        const Records& rec = it->second;
+
+        for (Records::const_iterator j = rec.begin(), end = rec.end();
+                j != end; ++j) {
+        
+            const SWF::TextRecord* tr = *j;
+            assert(tr);
+
+            const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
+            const SWF::TextRecord::Glyphs::size_type numGlyphs = glyphs.size();
+
+            if (pos + numGlyphs < start) {
+                pos += numGlyphs;
+                continue;
+            }
+
+            const Font* font = tr->getFont();
+            assert(font);
+
+            for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
+                    e = glyphs.end(); k != e; ++k) {
+                
+                if (pos < start) {
+                    ++pos;
+                    continue;
+                }
+                
+                as_object* el = new as_object;
+
+                el->init_member("indexInRun", pos);
+                el->init_member("selected", _selected.test(pos - 1));
+                el->init_member("font", font->name());
+                el->init_member("color", tr->color().toRGBA());
+                el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
+                ri.push(el);
+
+                ++pos;
+                if (pos - start > len) return;
+            }
+        }
+    }
     
 }
 
@@ -196,10 +246,14 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
             for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
                     e = glyphs.end(); k != e; ++k) {
                 
-                if (pos++ < start) continue;
+                if (pos < start) {
+                    ++pos;
+                    continue;
+                }
                 
                 to += font->codeTableLookup(k->index, true);
-                if (pos - start >= len) return;
+                ++pos;
+                if (pos - start == len) return;
             }
         }
     }
@@ -331,8 +385,18 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
     
     if (!ts->valid()) return as_value();
 
-    log_unimpl (__FUNCTION__);
-    return as_value();
+    if (fn.nargs != 2) {
+        return as_value();
+    }
+
+    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
+
+    Array_as* ri = new Array_as;
+
+    ts->getTextRunInfo(start, end, *ri);
+    
+    return as_value(ri);
 }
 
 as_value
