@@ -211,7 +211,7 @@ main(int argc, char** argv)
   check_equals(mo, "el.matrix_b", "0");
   check_equals(mo, "el.matrix_c", "0");
   check_equals(mo, "el.matrix_d", "1");
-  check_equals(mo, "el.matrix_ty", "200");
+  check_equals(mo, "el.matrix_tx", "25.95");
   check_equals(mo, "el.matrix_ty", "200");
   check_equals(mo, "el.corner0x", "25.95");
   check_equals(mo, "el.corner0y", "202.8");
@@ -229,6 +229,29 @@ main(int argc, char** argv)
   check_equals(mo, "ri[5].height", "12");
   check_equals(mo, "ri[6].height", "12");
 
+  check_equals(mo, "ri[2].selected", "false");
+  check_equals(mo, "ri[3].selected", "false");
+  check_equals(mo, "ri[4].selected", "false");
+  check_equals(mo, "ri[5].selected", "false");
+  check_equals(mo, "ri[6].selected", "false");
+
+  check_equals(mo, "ri[2].matrix_tx", "29.75");
+  check_equals(mo, "ri[2].matrix_ty", "200");
+  check_equals(mo, "ri[3].matrix_tx", "34.4");
+  check_equals(mo, "ri[3].matrix_ty", "200");
+  check_equals(mo, "ri[4].matrix_tx", "41.75");
+  check_equals(mo, "ri[4].matrix_ty", "200");
+
+  check_equals(mo, "ri[2].corner0x", "29.75");
+  check_equals(mo, "ri[2].corner0y", "202.8");
+  check_equals(mo, "ri[3].corner0x", "34.4");
+  check_equals(mo, "ri[3].corner0y", "202.8");
+  check_equals(mo, "ri[4].corner0x", "41.75");
+  check_equals(mo, "ri[4].corner0y", "202.8");
+  
+  check_equals(mo, "ri[2].corner2y", "188.85");
+  check_equals(mo, "ri[3].corner2y", "188.85");
+  check_equals(mo, "ri[4].corner2y", "188.85");
 
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");
