@@ -28,7 +28,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
-#include "generic_character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "MovieClip.h"
 #include "Font.h"
@@ -97,7 +97,7 @@ public:
         if (ch->isUnloaded()) return;
 
         TextSnapshot_as::Records text;
-        generic_character* tf;
+        DisplayObject* tf;
 
         if ((tf = ch->getStaticText(text))) {
             _fields.push_back(std::make_pair(tf, text));

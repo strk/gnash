@@ -67,7 +67,7 @@ public:
 
     const rect& get_bound() const { return _rect; }
 
-    character* create_character_instance(character* parent, int id);
+    character* createDisplayObject(character* parent, int id);
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.

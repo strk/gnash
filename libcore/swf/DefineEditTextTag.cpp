@@ -39,7 +39,7 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 character*
-DefineEditTextTag::create_character_instance(character* parent, int id)
+DefineEditTextTag::createDisplayObject(character* parent, int id)
 {
 	// Resolve the font, if possible
 	getFont();

@@ -102,8 +102,8 @@ public:
     ///     to be deprecated if every instance has a reference to its
     ///     definition, which should know its id...
     ///
-    MovieClip(movie_definition* def,
-        movie_instance* root, character* parent, int id);
+    MovieClip(movie_definition* def, movie_instance* root,
+            character* parent, int id);
 
     virtual ~MovieClip();
 

@@ -16,8 +16,8 @@
 //
 
 
-#ifndef GNASH_SHAPE_H
-#define GNASH_SHAPE_H
+#ifndef GNASH_GEOMETRY_H
+#define GNASH_GEOMETRY_H
 
 #include "dsodefs.h"
 #include "SWFMatrix.h" 

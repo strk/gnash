@@ -13,6 +13,7 @@
 #include "swf.h"
 #include "TextRecord.h"
 #include "Font.h"
+#include "StaticText.h"
 
 namespace gnash {
 namespace SWF {
@@ -41,6 +42,13 @@ struct CreatePointer
         return &t;
     }
 };
+
+
+character*
+DefineTextTag::createDisplayObject(character* parent, int id)
+{
+    return new StaticText(this, parent, id);
+}
 
 
 bool

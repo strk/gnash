@@ -22,7 +22,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DefineButtonTag.h"
-#include "Button.h" // for create_character_instance()
+#include "Button.h" // for createDisplayObject()
 #include "DefineButtonCxformTag.h"
 #include "swf.h"
 #include "SWFStream.h" // for read()
@@ -419,7 +419,7 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
 
 character*
-DefineButtonTag::create_character_instance(character* parent, int id)
+DefineButtonTag::createDisplayObject(character* parent, int id)
 {
 	character* ch = new Button(*this, parent, id);
 	return ch;

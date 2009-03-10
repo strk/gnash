@@ -11,7 +11,7 @@
 
 #include "character_def.h" // for inheritance of shape_character_def
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "shape.h"     // for path
+#include "Geometry.h"     // for path
 #include "rect.h"      // for composition
 #include "fill_style.h" // for fill style
 #include "styles.h"     // for line style
@@ -53,6 +53,8 @@ public:
     virtual bool point_test_local(boost::int32_t x, boost::int32_t y,
             const SWFMatrix& wm);
 
+	virtual character* createDisplayObject(character* parent, int id);
+	
     /// \brief
     /// Read a shape definition as included in DEFINEFONT*,
     /// DEFINESHAPE* or DEFINEMORPH* tag

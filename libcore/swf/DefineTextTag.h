@@ -60,6 +60,8 @@ public:
     /// Extract static text from TextRecords.
     bool extractStaticText(std::vector<const TextRecord*>& to);
 
+    virtual character* createDisplayObject(character* parent, int id);
+
 private:
 
     /// DefineText2Tag::loader also constructs a DefineTextTag.

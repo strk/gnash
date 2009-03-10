@@ -49,7 +49,7 @@ namespace gnash {
     class ExecutableCode;
     class action_buffer;
     class movie_definition;
-    class generic_character;
+    class DisplayObject;
     namespace SWF {
         class TextRecord;
     }
@@ -417,9 +417,8 @@ public:
     /// Allow extraction of static text.
     //
     /// Default is a no-op, implemented only for DefineText though
-    /// generic_character.
-    virtual generic_character* getStaticText(
-            std::vector<const SWF::TextRecord*>& /*to*/) {
+    /// DisplayObject.
+    virtual DisplayObject* getStaticText(std::vector<const SWF::TextRecord*>&) {
         return 0;
     }
 

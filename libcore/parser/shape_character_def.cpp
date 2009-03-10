@@ -28,10 +28,10 @@
 #include "impl.h"
 #include "log.h"
 #include "render.h"
+#include "Shape.h"
 #include "SWFStream.h"
 #include "MovieClip.h"
 
-#include <cfloat>
 #include <algorithm>
 
 // Define the macro below to always compute bounds for shape characters
@@ -40,6 +40,12 @@
 
 namespace gnash
 {
+
+character*
+shape_character_def::createDisplayObject(character* parent, int id)
+{
+	return new Shape(this, parent, id);
+}
 
 // Read fill styles, and push them onto the given style array.
 static void

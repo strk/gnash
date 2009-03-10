@@ -15,23 +15,56 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifndef GNASH_SHAPE_H
+#define GNASH_SHAPE_H
 
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
+#include "smart_ptr.h" // GNASH_USE_GC
+#include "DisplayObject.h"
+#include "shape_character_def.h"
+#include <cassert>
 
-#include "character_def.h"
-#include "render_handler.h" // for destruction of render_cache_manager
-
-namespace gnash
-{
-
-character_def::~character_def()
-{
-	delete m_render_cache;
+// Forward declarations
+namespace gnash {
+    class character_def;
 }
 
-} // end of namespace gnash
+namespace gnash {
+
+/// For characters that don't store unusual state in their instances.
+class Shape : public DisplayObject
+{
+
+public:
+
+	Shape(shape_character_def* def, character* parent, int id)
+		:
+		DisplayObject(parent, id),
+		_def(def)
+	{
+	    assert(_def);
+	}
+
+	virtual void display();
+
+protected:
+
+    character_def* getDefinition() const
+    {
+        return _def.get();
+    }
+
+private:
+	
+    const boost::intrusive_ptr<character_def> _def;
+
+};
+
+
+}	// end namespace gnash
+
+
+#endif // GNASH_GENERIC_CHARACTER_H
+
 
 // Local Variables:
 // mode: C++

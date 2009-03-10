@@ -15,13 +15,16 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_GENERIC_CHARACTER_H
-#define GNASH_GENERIC_CHARACTER_H
+#ifndef GNASH_STATIC_TEXT_H
+#define GNASH_STATIC_TEXT_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h" // for inheritance
 #include "shape_character_def.h" // for add_invalidated_bounds 
+#include "DisplayObject.h"
 
+#include <boost/scoped_ptr.hpp>
+#include <boost/dynamic_bitset.hpp>
 #include <cassert>
 
 namespace gnash {
@@ -41,12 +44,32 @@ namespace gnash {
 //
 /// @@AFAICT this is only used for shape characters
 ///
-class generic_character : public character
+class StaticText : public DisplayObject
 {
+public:
+
+	StaticText(character_def* def, character* parent, int id)
+		:
+        DisplayObject(parent, id),
+        _def(def)
+	{
+        assert(_def);
+	}
+
+    virtual DisplayObject* getStaticText(
+            std::vector<const SWF::TextRecord*>& to);
+
+	virtual void display();
+
+    const boost::dynamic_bitset<>& getSelected() const {
+        return _selectedText;
+    }
 
 protected:
 
-	boost::intrusive_ptr<character_def> m_def;
+    character_def* getDefinition() const {
+        return _def.get();
+    }
 
 #ifdef GNASH_USE_GC
 	/// Mark reachabe resources (for the GC)
@@ -57,57 +80,19 @@ protected:
 	void markReachableResources() const
 	{
 		assert(isReachable());
-		m_def->setReachable();
-
 		markCharacterReachable();
 	}
 #endif // GNASH_USE_GC
 
-public:
+private:
 
-	generic_character(character_def* def, character* parent, int id)
-		:
-		character(parent, id),
-		m_def(def)
-	{
-	    assert(m_def);
-	}
+    /// A bitmask indicating which static text characters are selected
+    //
+    /// This is only present for static text fields, and only after
+    /// a TextSnapshot has queried the character for text.
+    boost::dynamic_bitset<> _selectedText;
 
-	/// generic characters can not handle mouse events, so
-	/// the default implementation returns false.
-	/// override in your subclass to change this
-	virtual bool can_handle_mouse_event() const {
-		return false;
-	}
-
-    virtual generic_character* getStaticText(
-            std::vector<const SWF::TextRecord*>& /*to*/);
-
-	virtual void display();
-
-	rect getBounds() const
-	{
-		return m_def->get_bound();
-	}
-
-	/// Generic character is NEVER a mouse entity by default, so
-	/// the default implementation of this method always returns NULL.
-	/// Override it from subclasses that do can be mouse entities.
-	///
-	/// If you need to check for a generic character to contain a 
-	/// given point, use the pointInShape() function instead.
-	/// 
-	virtual character* get_topmost_mouse_entity(boost::int32_t /*x*/, 
-            boost::int32_t /*y*/)
-	{
-		return NULL;
-	}
-
-	// See dox in character.h
-	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
-
-	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
-    
+    const boost::intrusive_ptr<character_def> _def;
 
 };
 
