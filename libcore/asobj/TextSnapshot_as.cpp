@@ -168,7 +168,6 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 
         const Records& rec = field->second;
         const SWFMatrix& mat = field->first->getMatrix();
-        const rect& bounds = field->first->getBounds();
 
         for (Records::const_iterator j = rec.begin(), end = rec.end();
                 j != end; ++j) {
@@ -200,20 +199,19 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 as_object* el = new as_object;
 
                 el->init_member("indexInRun", pos);
-                el->init_member("selected", false);
+                el->init_member("selected", _selected.test(pos));
                 el->init_member("font", font->name());
                 el->init_member("color", tr->color().toRGBA());
                 el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
 
                 const double factor = 65536.0;
-
-                const double xpos = TWIPS_TO_PIXELS(mat.tx + x);
-                const double ypos = TWIPS_TO_PIXELS(mat.ty + tr->yOffset());
-
                 el->init_member("matrix_a", mat.sx / factor);
                 el->init_member("matrix_b", mat.shx / factor);
                 el->init_member("matrix_c", mat.shy / factor);
                 el->init_member("matrix_d", mat.sy / factor);
+
+                const double xpos = TWIPS_TO_PIXELS(mat.tx + x);
+                const double ypos = TWIPS_TO_PIXELS(mat.ty + tr->yOffset());
                 el->init_member("matrix_tx", xpos);
                 el->init_member("matrix_ty", ypos);
 
