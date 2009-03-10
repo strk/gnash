@@ -194,6 +194,34 @@ main(int argc, char** argv)
   add_actions(mo, "ts.setSelectedColor(0xffff00);");
   add_actions(mo, "ts2.setSelectedColor(0x0000ff);");
 
+  add_actions(mo, "ri = ts.getTextRunInfo(4, 10);");
+  check_equals(mo, "typeof(ri)", "'object'");
+  check(mo, "ri instanceof Array");
+  check_equals(mo, "ri.length", "7");
+
+  add_actions(mo, "el = ri[1];");
+  check_equals(mo, "typeof(el)", "'object'");
+  check(mo, "!el.hasOwnProperty('indexInRun')");
+  check_equals(mo, "el.indexInRun", "5");
+  check_equals(mo, "el.selected", "false");
+  check_equals(mo, "el.font", "'Bitstream Vera Sans'");
+  check_equals(mo, "el.color", "0");
+  check_equals(mo, "el.height", "12");
+  check_equals(mo, "el.matrix_a", "1");
+  check_equals(mo, "el.matrix_b", "0");
+  check_equals(mo, "el.matrix_c", "0");
+  check_equals(mo, "el.matrix_d", "1");
+  check_equals(mo, "el.matrix_ty", "200");
+  check_equals(mo, "el.matrix_ty", "200");
+  check_equals(mo, "el.corner0x", "25.95");
+  check_equals(mo, "el.corner0y", "202.8");
+  check_equals(mo, "el.corner1x", "29.75");
+  check_equals(mo, "el.corner1y", "202.8");
+  check_equals(mo, "el.corner2x", "29.75");
+  check_equals(mo, "el.corner2y", "188.85");
+  check_equals(mo, "el.corner3x", "25.95");
+  check_equals(mo, "el.corner3y", "188.85");
+
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");
   add_actions(mo, "backup = TextSnapshot;");

@@ -317,7 +317,14 @@ getTextSnapshotInterface()
 	return o.get();
 }
 
-as_value textsnapshot_getTextRunInfo(const fn_call& /*fn*/) {
+as_value
+textsnapshot_getTextRunInfo(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+    
+    if (!ts->valid()) return as_value();
+
     log_unimpl (__FUNCTION__);
     return as_value();
 }
