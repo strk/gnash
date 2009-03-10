@@ -213,14 +213,14 @@ main(int argc, char** argv)
   check_equals(mo, "el.matrix_d", "1");
   check_equals(mo, "el.matrix_tx", "25.95");
   check_equals(mo, "el.matrix_ty", "200");
-  check_equals(mo, "el.corner0x", "25.95");
-  check_equals(mo, "el.corner0y", "202.8");
-  check_equals(mo, "el.corner1x", "29.75");
-  check_equals(mo, "el.corner1y", "202.8");
-  check_equals(mo, "el.corner2x", "29.75");
-  check_equals(mo, "el.corner2y", "188.85");
-  check_equals(mo, "el.corner3x", "25.95");
-  check_equals(mo, "el.corner3y", "188.85");
+  xcheck_equals(mo, "el.corner0x", "25.95");
+  xcheck_equals(mo, "el.corner0y", "202.8");
+  xcheck_equals(mo, "el.corner1x", "29.75");
+  xcheck_equals(mo, "el.corner1y", "202.8");
+  xcheck_equals(mo, "el.corner2x", "29.75");
+  xcheck_equals(mo, "el.corner2y", "188.85");
+  xcheck_equals(mo, "el.corner3x", "25.95");
+  xcheck_equals(mo, "el.corner3y", "188.85");
 
   // Check properties individually
   check_equals(mo, "ri[2].height", "12");
@@ -242,16 +242,26 @@ main(int argc, char** argv)
   check_equals(mo, "ri[4].matrix_tx", "41.75");
   check_equals(mo, "ri[4].matrix_ty", "200");
 
-  check_equals(mo, "ri[2].corner0x", "29.75");
-  check_equals(mo, "ri[2].corner0y", "202.8");
-  check_equals(mo, "ri[3].corner0x", "34.4");
-  check_equals(mo, "ri[3].corner0y", "202.8");
-  check_equals(mo, "ri[4].corner0x", "41.75");
-  check_equals(mo, "ri[4].corner0y", "202.8");
+  xcheck_equals(mo, "ri[2].corner0x", "29.75");
+  xcheck_equals(mo, "ri[2].corner0y", "202.8");
+  xcheck_equals(mo, "ri[3].corner0x", "34.4");
+  xcheck_equals(mo, "ri[3].corner0y", "202.8");
+  xcheck_equals(mo, "ri[4].corner0x", "41.75");
+  xcheck_equals(mo, "ri[4].corner0y", "202.8");
   
-  check_equals(mo, "ri[2].corner2y", "188.85");
-  check_equals(mo, "ri[3].corner2y", "188.85");
-  check_equals(mo, "ri[4].corner2y", "188.85");
+  xcheck_equals(mo, "ri[2].corner2y", "188.85");
+  xcheck_equals(mo, "ri[3].corner2y", "188.85");
+  xcheck_equals(mo, "ri[4].corner2y", "188.85");
+
+  add_actions(mo, "ri2 = ts.getTextRunInfo(0, 100);");
+
+  xcheck_equals(mo, "ri2[50].corner2y", "388.85");
+  xcheck_equals(mo, "ri2[50].corner2x", "154.55");
+  xcheck_equals(mo, "ri2[51].corner2y", "388.85");
+  xcheck_equals(mo, "ri2[51].corner2x", "161.9");
+
+  check_equals(mo, "ri2[50].matrix_tx", "149.6");
+  check_equals(mo, "ri2[51].matrix_tx", "154.5");
 
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");

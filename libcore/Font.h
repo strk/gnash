@@ -187,10 +187,13 @@ public:
 	unsigned short int unitsPerEM(bool embedded) const;
 
     // TODO: what about device fonts?
-	float get_leading() const;
+    float ascent() const;
+        
+    // TODO: what about device fonts?
+	float leading() const;
  
     // TODO: what about device fonts?
-    float get_descent() const;
+    float descent() const;
         
 	bool is_subpixel_font() const;
 
@@ -307,11 +310,6 @@ private:
 
 	/// Code to index table for device glyphs
 	CodeTable _deviceCodeTable; 
-
-	// Layout stuff.
-	float m_ascent;
-	float m_descent;
-	float m_leading;
 
 	typedef std::map<kerning_pair, float> kernings_table;
 	kernings_table m_kerning_pairs;

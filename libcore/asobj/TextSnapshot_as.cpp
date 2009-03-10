@@ -168,6 +168,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 
         const Records& rec = field->second;
         const SWFMatrix& mat = field->first->getMatrix();
+        const rect& bounds = field->first->getBounds();
 
         for (Records::const_iterator j = rec.begin(), end = rec.end();
                 j != end; ++j) {
@@ -186,10 +187,12 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
             const Font* font = tr->getFont();
             assert(font);
 
+            double x = tr->xOffset();
             for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
                     e = glyphs.end(); k != e; ++k) {
                 
                 if (pos < start) {
+                    x += k->advance;
                     ++pos;
                     continue;
                 }
@@ -197,23 +200,27 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 as_object* el = new as_object;
 
                 el->init_member("indexInRun", pos);
-                el->init_member("selected", _selected.test(pos - 1));
+                el->init_member("selected", false);
                 el->init_member("font", font->name());
                 el->init_member("color", tr->color().toRGBA());
                 el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
 
                 const double factor = 65536.0;
 
+                const double xpos = TWIPS_TO_PIXELS(mat.tx + x);
+                const double ypos = TWIPS_TO_PIXELS(mat.ty + tr->yOffset());
+
                 el->init_member("matrix_a", mat.sx / factor);
                 el->init_member("matrix_b", mat.shx / factor);
                 el->init_member("matrix_c", mat.shy / factor);
                 el->init_member("matrix_d", mat.sy / factor);
-                el->init_member("matrix_tx", TWIPS_TO_PIXELS(mat.tx));
-                el->init_member("matrix_ty", TWIPS_TO_PIXELS(mat.ty));
-                    
+                el->init_member("matrix_tx", xpos);
+                el->init_member("matrix_ty", ypos);
+
                 ri.push(el);
 
                 ++pos;
+                x += k->advance;
                 if (pos - start > len) return;
             }
         }

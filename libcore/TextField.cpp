@@ -953,8 +953,8 @@ TextField::format_text()
 
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts); 
-    float fontDescent = _font->get_descent() * scale; 
-    float fontLeading = _font->get_leading() * scale;
+    float fontDescent = _font->descent() * scale; 
+    float fontLeading = _font->leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
     boost::uint16_t rightMargin = getRightMargin();
     boost::uint16_t indent = getIndent();
