@@ -222,6 +222,14 @@ main(int argc, char** argv)
   check_equals(mo, "el.corner3x", "25.95");
   check_equals(mo, "el.corner3y", "188.85");
 
+  // Check properties individually
+  check_equals(mo, "ri[2].height", "12");
+  check_equals(mo, "ri[3].height", "12");
+  check_equals(mo, "ri[4].height", "12");
+  check_equals(mo, "ri[5].height", "12");
+  check_equals(mo, "ri[6].height", "12");
+
+
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");
   add_actions(mo, "backup = TextSnapshot;");
