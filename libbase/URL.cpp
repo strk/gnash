@@ -227,9 +227,10 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		return;
 	}
 
-	// use protocol and host from baseurl
+	// use protocol, port and host from baseurl
 	_proto = baseurl._proto;
 	_host = baseurl._host;
+    _port = baseurl._port;
 
 	if ( relative_url.size() && relative_url[0] == '/' ) 
 	{
@@ -290,10 +291,6 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		_path = basedir + in;
 
 		split_anchor_from_path();
-
-        // Extract the port number from the hostname, if any
-        split_port_from_host();
-        _port= baseurl._port;
 
 		split_querystring_from_path();
 
