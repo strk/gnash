@@ -33,6 +33,8 @@
 #include "MovieClip.h"
 #include "Font.h"
 #include "swf/TextRecord.h"
+#include "Array_as.h"
+#include "RGBA.h"
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>
@@ -137,7 +139,7 @@ TextSnapshot_as::setSelected(size_t start, size_t end, bool selected)
 }
 
 bool
-TextSnapshot_as::getSelected(size_t start, size_t end)
+TextSnapshot_as::getSelected(size_t start, size_t end) const
 {
     start = std::min(start, _selected.size());
     end = std::min(end, _selected.size());
@@ -155,22 +157,92 @@ TextSnapshot_as::markReachableResources() const
 }
 
 void
+TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
+{
+    std::string::size_type pos = 0;
+
+    std::string::size_type len = end - start;
+
+    for (TextFields::const_iterator field = _textFields.begin(),
+            e = _textFields.end(); field != e; ++field) {
+
+        const Records& rec = field->second;
+        const SWFMatrix& mat = field->first->getMatrix();
+
+        for (Records::const_iterator j = rec.begin(), end = rec.end();
+                j != end; ++j) {
+        
+            const SWF::TextRecord* tr = *j;
+            assert(tr);
+
+            const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
+            const SWF::TextRecord::Glyphs::size_type numGlyphs = glyphs.size();
+
+            if (pos + numGlyphs < start) {
+                pos += numGlyphs;
+                continue;
+            }
+
+            const Font* font = tr->getFont();
+            assert(font);
+
+            double x = tr->xOffset();
+            for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
+                    e = glyphs.end(); k != e; ++k) {
+                
+                if (pos < start) {
+                    x += k->advance;
+                    ++pos;
+                    continue;
+                }
+                
+                as_object* el = new as_object;
+
+                el->init_member("indexInRun", pos);
+                el->init_member("selected", _selected.test(pos));
+                el->init_member("font", font->name());
+                el->init_member("color", tr->color().toRGBA());
+                el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
+
+                const double factor = 65536.0;
+                el->init_member("matrix_a", mat.sx / factor);
+                el->init_member("matrix_b", mat.shx / factor);
+                el->init_member("matrix_c", mat.shy / factor);
+                el->init_member("matrix_d", mat.sy / factor);
+
+                const double xpos = TWIPS_TO_PIXELS(mat.tx + x);
+                const double ypos = TWIPS_TO_PIXELS(mat.ty + tr->yOffset());
+                el->init_member("matrix_tx", xpos);
+                el->init_member("matrix_ty", ypos);
+
+                ri.push(el);
+
+                ++pos;
+                x += k->advance;
+                if (pos - start > len) return;
+            }
+        }
+    }
+    
+}
+
+void
 TextSnapshot_as::makeString(std::string& to, bool newline,
         std::string::size_type start, std::string::size_type len) const
 {
 
     std::string::size_type pos = 0;
 
-    for (TextFields::const_iterator it = _textFields.begin(),
-            e = _textFields.end(); it != e; ++it)
+    for (TextFields::const_iterator field = _textFields.begin(),
+            e = _textFields.end(); field != e; ++field)
     {
         // When newlines are requested, insert one after each individual
         // text field is processed.
         if (newline && pos > start) to += '\n';
 
-        const Records& rec = it->second;
+        const Records& records = field->second;
 
-        for (Records::const_iterator j = rec.begin(), end = rec.end();
+        for (Records::const_iterator j = records.begin(), end = records.end();
                 j != end; ++j) {
         
             const SWF::TextRecord* tr = *j;
@@ -190,16 +262,20 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
             for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
                     e = glyphs.end(); k != e; ++k) {
                 
-                if (pos++ < start) continue;
+                if (pos < start) {
+                    ++pos;
+                    continue;
+                }
                 
                 to += font->codeTableLookup(k->index, true);
-                if (pos - start >= len) return;
+                ++pos;
+                if (pos - start == len) return;
             }
         }
     }
 }
 
-const std::string
+std::string
 TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
     const
 {
@@ -317,9 +393,26 @@ getTextSnapshotInterface()
 	return o.get();
 }
 
-as_value textsnapshot_getTextRunInfo(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
+as_value
+textsnapshot_getTextRunInfo(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+    
+    if (!ts->valid()) return as_value();
+
+    if (fn.nargs != 2) {
+        return as_value();
+    }
+
+    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
+
+    Array_as* ri = new Array_as;
+
+    ts->getTextRunInfo(start, end, *ri);
+    
+    return as_value(ri);
 }
 
 as_value

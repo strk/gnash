@@ -891,7 +891,7 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
           log_error(_("TextField: missing glyph for space char (needed "
                   "for TAB). Make sure character shapes for font "
                   "%s are being exported into your SWF file."),
-                rec.getFont()->get_name());
+                rec.getFont()->name());
         );
     }
     else
@@ -953,8 +953,8 @@ TextField::format_text()
 
     boost::uint16_t fontHeight = getFontHeight();
     float scale = fontHeight / (float)_font->unitsPerEM(_embedFonts); 
-    float fontDescent = _font->get_descent() * scale; 
-    float fontLeading = _font->get_leading() * scale;
+    float fontDescent = _font->descent() * scale; 
+    float fontLeading = _font->leading() * scale;
     boost::uint16_t leftMargin = getLeftMargin();
     boost::uint16_t rightMargin = getRightMargin();
     boost::uint16_t indent = getIndent();
@@ -1130,14 +1130,14 @@ TextField::format_text()
                                     "glyph for char %d. Make sure character "
                                     "shapes for font %s are being exported "
                                     "into your SWF file"),
-                                    code, _font->get_name());
+                                    code, _font->name());
                             }
                             else
                             {
                                 log_swferror(_("TextField: missing device "
                                     "glyph for char %d. Maybe you don't have "
                                     "font '%s' installed in your system."),
-                                    code, _font->get_name());
+                                    code, _font->name());
                             }
                         }
 
@@ -2372,7 +2372,7 @@ textfield_getTextFormat(const fn_call& fn)
     const Font* font = text->getFont();
     if (font)
     {
-        tf->fontSet(font->get_name());
+        tf->fontSet(font->name());
         tf->italicedSet(font->isItalic());
         tf->boldSet(font->isBold());
     }

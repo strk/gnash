@@ -86,7 +86,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         IF_VERBOSE_PARSE(
             log_parse(_("  hasColor"));
         );
-    } 
+    }
 
     if (_hasXOffset)
     {

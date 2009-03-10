@@ -3102,7 +3102,7 @@ movieclip_forceSmoothing(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.forceSmoothing()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.forceSmoothing()")));
     return as_value();
 }
 
@@ -3113,7 +3113,7 @@ movieclip_opaqueBackground(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.opaqueBackground()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.opaqueBackground()")));
     return as_value();
 }
 
@@ -3124,7 +3124,7 @@ movieclip_scale9Grid(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.scale9Grid()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.scale9Grid()")));
     return as_value();
 }
 
@@ -3135,7 +3135,7 @@ movieclip_scrollRect(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.scrollRect()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.scrollRect()")));
     return as_value();
 }
 
@@ -3146,7 +3146,7 @@ movieclip_tabIndex(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.tabIndex()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.tabIndex()")));
     return as_value();
 }
 
