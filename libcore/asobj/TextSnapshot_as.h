@@ -52,15 +52,13 @@ public:
     ///                 AS return values.
     TextSnapshot_as(const MovieClip* mc);
 
-    const std::string getText(boost::int32_t start, boost::int32_t end,
+    static void init(as_object& global);
+
+    std::string getText(boost::int32_t start, boost::int32_t end,
             bool nl) const;
 
     boost::int32_t findText(boost::int32_t start, const std::string& text,
             bool ignoreCase) const;
-
-    static void init(as_object& global);
-
-    static void construct(const std::string& snapshot);
 
     bool valid() const { return _valid; }
 
@@ -68,9 +66,11 @@ public:
 
     void setSelected(size_t start, size_t end, bool selected);
     
-    bool getSelected(size_t start, size_t end);
+    bool getSelected(size_t start, size_t end) const;
 
     std::string getSelectedText(bool newlines) const;
+
+    void getTextRunInfo(size_t start, size_t end, as_object& ri) const;
 
 protected:
 
@@ -88,13 +88,13 @@ private:
     //
     /// This should be deducible from another member, but since there seems
     /// to be no point in storing the MovieClip this bool will do instead.
-    bool _valid;
+    const bool _valid;
 
     /// The number of characters
     //
     /// There is no need to store this, but it is quicker than counting
     /// afresh every time.
-    size_t _count;
+    const size_t _count;
 
     /// Characters in the text run are selected individually.
     //

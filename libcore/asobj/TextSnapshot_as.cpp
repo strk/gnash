@@ -137,7 +137,7 @@ TextSnapshot_as::setSelected(size_t start, size_t end, bool selected)
 }
 
 bool
-TextSnapshot_as::getSelected(size_t start, size_t end)
+TextSnapshot_as::getSelected(size_t start, size_t end) const
 {
     start = std::min(start, _selected.size());
     end = std::min(end, _selected.size());
@@ -152,6 +152,12 @@ void
 TextSnapshot_as::markReachableResources() const
 {
     std::for_each(_textFields.begin(), _textFields.end(), setTextReachable);
+}
+
+void
+TextSnapshot_as::getTextRunInfo(size_t start, size_t end, as_object& ri) const
+{
+    
 }
 
 void
@@ -199,7 +205,7 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
     }
 }
 
-const std::string
+std::string
 TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
     const
 {
