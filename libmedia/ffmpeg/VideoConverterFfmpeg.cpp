@@ -102,8 +102,10 @@ fourcc_to_ffmpeg(ImgBuf::Type4CC code)
         {GNASH_FOURCC('I','4','1','0'), PIX_FMT_YUV410P},
         {GNASH_FOURCC('Y','V','U','9'), PIX_FMT_YUV410P},
 
+#if LIBAVUTIL_VERSION_INT >= ((49<<16)+(0<<8)+1
         {GNASH_FOURCC('N','V','1','2'), PIX_FMT_NV12},
         {GNASH_FOURCC('N','V','2','1'), PIX_FMT_NV21},
+#endif
 
         {GNASH_FOURCC('Y','U','Y','2'), PIX_FMT_YUYV422},
         {GNASH_FOURCC('Y','U','Y','V'), PIX_FMT_YUYV422},
