@@ -1326,7 +1326,7 @@ nsPluginInstance::startProc(Window win)
     argv[argc++] = "-";
     argv[argc++] = 0;
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-    if ( saLauncher ) saLauncher << _swf_url << " ";
+    if ( saLauncher ) saLauncher << "'" << _swf_url << "' ";
 #endif
 
     assert(argc <= maxargc);
