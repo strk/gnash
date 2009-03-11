@@ -418,7 +418,8 @@ public:
     //
     /// Default is a no-op, implemented only for DefineText though
     /// DisplayObject.
-    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&) {
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
+            size_t&) {
         return 0;
     }
 

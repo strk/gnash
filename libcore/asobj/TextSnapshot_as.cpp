@@ -39,7 +39,6 @@
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <algorithm>
-#include <numeric>
 
 namespace gnash {
 
@@ -84,16 +83,17 @@ public:
     {}
 
     void operator()(character* ch) {
+
+        /// This is not tested.
         if (ch->isUnloaded()) return;
 
         TextSnapshot_as::Records text;
         StaticText* tf;
+        size_t numChars;
 
-        if ((tf = ch->getStaticText(text))) {
+        if ((tf = ch->getStaticText(text, numChars))) {
             _fields.push_back(std::make_pair(tf, text));
-
-            _count = std::accumulate(text.begin(), text.end(), _count,
-                    SWF::TextRecord::RecordCounter());
+            _count += numChars;
         }
     }
 
@@ -120,6 +120,7 @@ TextSnapshot_as::TextSnapshot_as(const MovieClip* mc)
 void
 TextSnapshot_as::setSelected(size_t start, size_t end, bool selected)
 {
+    /// If there are no TextFields, there is nothing to do.
     if (_textFields.empty()) return;
 
     start = std::min(start, _count);
@@ -127,22 +128,23 @@ TextSnapshot_as::setSelected(size_t start, size_t end, bool selected)
 
     TextFields::const_iterator field = _textFields.begin();
 
-    size_t charsSoFar = field->first->getSelected().size();
-    size_t lastOne = 0;
+    size_t totalChars = field->first->getSelected().size();
+    size_t fieldStartIndex = 0;
 
     for (size_t i = start; i < end; ++i) {
-        while (i >= charsSoFar && field != _textFields.end()) {
+
+        /// Find the field containing the start index.
+        while (totalChars <= i) {
+            fieldStartIndex = totalChars;
             ++field;
+
+            if (field == _textFields.end()) return;
+            
             const boost::dynamic_bitset<>& sel = field->first->getSelected();
-            lastOne = charsSoFar;
-            charsSoFar += sel.size();
-            log_debug("i: %s. Chars so far: %s. size: %s", i, charsSoFar,
-                    sel.size());
+            totalChars += sel.size();
             continue;
         }
-        if (field == _textFields.end()) break;
-        log_debug("i: %s, setting %d", i, i - lastOne);
-        field->first->setSelected(i - lastOne , selected);
+        field->first->setSelected(i - fieldStartIndex, selected);
     }
 }
 
@@ -157,25 +159,23 @@ TextSnapshot_as::getSelected(size_t start, size_t end) const
 
     TextFields::const_iterator field = _textFields.begin();
 
-    size_t charsSoFar = field->first->getSelected().size();
-    size_t lastOne = 0;
+    size_t totalChars = field->first->getSelected().size();
+    size_t fieldStartIndex = 0;
 
     for (size_t i = start; i < end; ++i) {
-        while (i >= charsSoFar && field != _textFields.end()) {
-            lastOne = charsSoFar;
+
+        /// Find the field containing the start index.
+        while (totalChars <= i) {
+            fieldStartIndex = totalChars;
             ++field;
+            if (field == _textFields.end()) return false;
+
             const boost::dynamic_bitset<>& sel = field->first->getSelected();
-            charsSoFar += sel.size();
-            log_debug("i: %s. Chars so far: %s. size: %s", i, charsSoFar,
-                    sel.size());
+            totalChars += sel.size();
             continue;
         }
 
-        if (field == _textFields.end()) break;
-
-        if (i >= end) break;
-        log_debug("i: %s, testing %d", i, i - lastOne);
-        if (field->first->getSelected().test(i - lastOne)) return true;
+        if (field->first->getSelected().test(i - fieldStartIndex)) return true;
     }
     
     return false;
@@ -201,7 +201,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
         const SWFMatrix& mat = field->first->getMatrix();
         const boost::dynamic_bitset<>& selected = field->first->getSelected();
 
-        const std::string::size_type mark = pos;
+        const std::string::size_type fieldStartIndex = pos;
 
         for (Records::const_iterator j = rec.begin(), end = rec.end();
                 j != end; ++j) {
@@ -233,7 +233,8 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 as_object* el = new as_object;
 
                 el->init_member("indexInRun", pos);
-                el->init_member("selected", selected.test(pos - mark));
+                el->init_member("selected",
+                        selected.test(pos - fieldStartIndex));
                 el->init_member("font", font->name());
                 el->init_member("color", tr->color().toRGBA());
                 el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
@@ -278,7 +279,7 @@ TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
         const boost::dynamic_bitset<>& selected = field->first->getSelected();
 
         /// Remember the position at the beginning of the StaticText.
-        const std::string::size_type mark = pos;
+        const std::string::size_type fieldStartIndex = pos;
 
         for (Records::const_iterator j = records.begin(), end = records.end();
                 j != end; ++j) {
@@ -305,7 +306,7 @@ TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
                     continue;
                 }
                 
-                if (!selectedOnly || selected.test(pos - mark)) {
+                if (!selectedOnly || selected.test(pos - fieldStartIndex)) {
                     to += font->codeTableLookup(k->index, true);
                 }
                 ++pos;

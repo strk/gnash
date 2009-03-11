@@ -71,7 +71,8 @@ public:
     /// If this is a StaticText object and contains SWF::TextRecords, these
     /// are written to the passed parameter.
     /// @ return    0 if this object is not a StaticText or contains no text.
-    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&)
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
+            size_t&)
     {
         return 0;
     }

@@ -49,7 +49,16 @@ public:
         assert(_def);
 	}
 
-    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>& to);
+    /// Return a pointer to this if our definition contains any static text.
+    //
+    /// This is non-const because a TextSnapshot needs to add selection and
+    /// color information to this StaticText
+    //
+    /// @param to       A vector of pointers to TextRecords containing text.
+    /// @param numChars The total number of characters in all TextRecords is
+    ///                 written to this variable.
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>& to,
+            size_t& numChars);
 
 	virtual void display();
 

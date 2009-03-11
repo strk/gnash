@@ -24,10 +24,10 @@ namespace gnash
 {
 
 StaticText*
-StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to)
+StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,
+        size_t& numChars)
 {
     _selectedText.clear();
-    size_t numChars;
 
     if (_def->extractStaticText(to, numChars)) {
         _selectedText.resize(numChars);
