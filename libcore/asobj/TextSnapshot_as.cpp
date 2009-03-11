@@ -69,16 +69,6 @@ namespace {
 
 namespace {
 
-/// Accumulate the number of glyphs in a TextRecord.
-struct CountRecords
-{
-    size_t operator()(size_t c, const TextSnapshot_as::Records::value_type t) {
-        const SWF::TextRecord::Glyphs& glyphs = t->glyphs();
-        size_t ret = c + glyphs.size();
-        return ret;
-    }
-};
-
 /// Locate static text in a character.
 //
 /// Static text (TextRecords) are added to a vector, which should 
@@ -101,8 +91,9 @@ public:
 
         if ((tf = ch->getStaticText(text))) {
             _fields.push_back(std::make_pair(tf, text));
+
             _count = std::accumulate(text.begin(), text.end(), _count,
-                    CountRecords());
+                    SWF::TextRecord::RecordCounter());
         }
     }
 
@@ -122,31 +113,71 @@ TextSnapshot_as::TextSnapshot_as(const MovieClip* mc)
     as_object(getTextSnapshotInterface()),
     _textFields(),
     _valid(mc),
-    _count(getTextFields(mc, _textFields)),
-    _selected(_count)
+    _count(getTextFields(mc, _textFields))
 {
 }
 
 void
 TextSnapshot_as::setSelected(size_t start, size_t end, bool selected)
 {
-    start = std::min(start, _selected.size());
-    end = std::min(end, _selected.size());
+    if (_textFields.empty()) return;
+
+    start = std::min(start, _count);
+    end = std::min(end, _count);
+
+    TextFields::const_iterator field = _textFields.begin();
+
+    size_t charsSoFar = field->first->getSelected().size();
+    size_t lastOne = 0;
 
     for (size_t i = start; i < end; ++i) {
-        _selected.set(i, selected);
+        while (i >= charsSoFar && field != _textFields.end()) {
+            ++field;
+            const boost::dynamic_bitset<>& sel = field->first->getSelected();
+            lastOne = charsSoFar;
+            charsSoFar += sel.size();
+            log_debug("i: %s. Chars so far: %s. size: %s", i, charsSoFar,
+                    sel.size());
+            continue;
+        }
+        if (field == _textFields.end()) break;
+        log_debug("i: %s, setting %d", i, i - lastOne);
+        field->first->setSelected(i - lastOne , selected);
     }
 }
 
 bool
 TextSnapshot_as::getSelected(size_t start, size_t end) const
 {
-    start = std::min(start, _selected.size());
-    end = std::min(end, _selected.size());
+
+    if (_textFields.empty()) return false;
+
+    start = std::min(start, _count);
+    end = std::min(end, _count);
+
+    TextFields::const_iterator field = _textFields.begin();
+
+    size_t charsSoFar = field->first->getSelected().size();
+    size_t lastOne = 0;
 
     for (size_t i = start; i < end; ++i) {
-        if (_selected.test(i)) return true;
+        while (i >= charsSoFar && field != _textFields.end()) {
+            lastOne = charsSoFar;
+            ++field;
+            const boost::dynamic_bitset<>& sel = field->first->getSelected();
+            charsSoFar += sel.size();
+            log_debug("i: %s. Chars so far: %s. size: %s", i, charsSoFar,
+                    sel.size());
+            continue;
+        }
+
+        if (field == _textFields.end()) break;
+
+        if (i >= end) break;
+        log_debug("i: %s, testing %d", i, i - lastOne);
+        if (field->first->getSelected().test(i - lastOne)) return true;
     }
+    
     return false;
 }
 
@@ -168,6 +199,9 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 
         const Records& rec = field->second;
         const SWFMatrix& mat = field->first->getMatrix();
+        const boost::dynamic_bitset<>& selected = field->first->getSelected();
+
+        const std::string::size_type mark = pos;
 
         for (Records::const_iterator j = rec.begin(), end = rec.end();
                 j != end; ++j) {
@@ -199,7 +233,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 as_object* el = new as_object;
 
                 el->init_member("indexInRun", pos);
-                el->init_member("selected", _selected.test(pos));
+                el->init_member("selected", selected.test(pos - mark));
                 el->init_member("font", font->name());
                 el->init_member("color", tr->color().toRGBA());
                 el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
@@ -227,7 +261,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 }
 
 void
-TextSnapshot_as::makeString(std::string& to, bool newline,
+TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
         std::string::size_type start, std::string::size_type len) const
 {
 
@@ -241,6 +275,10 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
         if (newline && pos > start) to += '\n';
 
         const Records& records = field->second;
+        const boost::dynamic_bitset<>& selected = field->first->getSelected();
+
+        /// Remember the position at the beginning of the StaticText.
+        const std::string::size_type mark = pos;
 
         for (Records::const_iterator j = records.begin(), end = records.end();
                 j != end; ++j) {
@@ -267,7 +305,9 @@ TextSnapshot_as::makeString(std::string& to, bool newline,
                     continue;
                 }
                 
-                to += font->codeTableLookup(k->index, true);
+                if (!selectedOnly || selected.test(pos - mark)) {
+                    to += font->codeTableLookup(k->index, true);
+                }
                 ++pos;
                 if (pos - start == len) return;
             }
@@ -289,7 +329,7 @@ TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
     end = std::max(start + 1, end);
 
     std::string snapshot;
-    makeString(snapshot, nl, start, end - start);
+    makeString(snapshot, nl, false, start, end - start);
 
     return snapshot;
 
@@ -300,15 +340,7 @@ TextSnapshot_as::getSelectedText(bool newline) const
 {
     std::string sel;
     
-    for (size_t i = 0, e = _selected.size(); i != e; ++i) {
-        while (!_selected.test(i)) {
-            ++i;
-            if (i == e) return sel;
-        }
-        size_t start = i;
-        while (_selected.test(i) && i != e) ++i;
-        makeString(sel, newline, start, i - start);
-    }        
+    makeString(sel, newline, true);
     return sel;
 }
 

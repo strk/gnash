@@ -26,7 +26,14 @@ namespace gnash
 StaticText*
 StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to)
 {
-    if (_def->extractStaticText(to)) return this;
+    _selectedText.clear();
+    size_t numChars;
+
+    if (_def->extractStaticText(to, numChars)) {
+        _selectedText.resize(numChars);
+        return this;
+    }
+    
     return 0;
 }
 

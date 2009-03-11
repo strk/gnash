@@ -53,9 +53,15 @@ public:
 
 	virtual void display();
 
+    void setSelected(size_t pos, bool selected) {
+        _selectedText.set(pos, selected);
+    }
+
     const boost::dynamic_bitset<>& getSelected() const {
         return _selectedText;
     }
+
+    void setSelectionColor(boost::uint32_t color);
 
 protected:
 
@@ -75,13 +81,18 @@ protected:
 
 private:
 
+    const boost::intrusive_ptr<SWF::DefineTextTag> _def;
+
     /// A bitmask indicating which static text characters are selected
     //
     /// This is only present for static text fields, and only after
     /// a TextSnapshot has queried the character for text.
     boost::dynamic_bitset<> _selectedText;
 
-    const boost::intrusive_ptr<SWF::DefineTextTag> _def;
+    /// The color of the background for selected characters.
+    //
+    /// This is alawys opaque.
+    rgba _selectionColor;
 
 };
 

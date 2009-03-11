@@ -20,7 +20,6 @@
 #define GNASH_ASOBJ_TEXTSNAPSHOT_H
 
 #include "as_object.h"
-#include <boost/dynamic_bitset.hpp>
 
 
 // Forward declarations.
@@ -80,6 +79,7 @@ protected:
 private:
 
     void makeString(std::string& to, bool newline = false,
+            bool selectedOnly = false,
             std::string::size_type start = 0,
             std::string::size_type len = std::string::npos) const;
 
@@ -96,15 +96,6 @@ private:
     /// There is no need to store this, but it is quicker than counting
     /// afresh every time.
     const size_t _count;
-
-    /// Characters in the text run are selected individually.
-    //
-    /// Storing selection information along with the characters themselves
-    /// means that a separate object is necessary for each character.
-    /// Using a dynamic bitset prevents this, and generally
-    /// saves a lot of memory (32 bytes for boost's dynamic bitset against
-    /// one byte per character, possibly packed, for a bool in an object).
-    boost::dynamic_bitset<> _selected;
 
 };
 
