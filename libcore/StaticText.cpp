@@ -23,7 +23,7 @@
 namespace gnash
 {
 
-DisplayObject*
+StaticText*
 StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to)
 {
     if (_def->extractStaticText(to)) return this;

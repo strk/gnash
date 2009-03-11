@@ -25,7 +25,7 @@
 
 // Forward declarations.
 namespace gnash {
-    class DisplayObject;
+    class StaticText;
     class Array_as;
     namespace SWF {
         class TextRecord;
@@ -44,7 +44,7 @@ public:
     /// Should remain in the order of insertion
     /// We should only ever iterate from begin to end, so there's no
     /// performance issue.
-    typedef std::vector<std::pair<DisplayObject*, Records> > TextFields;
+    typedef std::vector<std::pair<StaticText*, Records> > TextFields;
 
     /// Construct a TextSnapshot_as from a MovieClip.
     //

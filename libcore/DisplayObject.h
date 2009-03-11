@@ -25,6 +25,8 @@
 #include <cassert>
 
 namespace gnash {
+    class character_def;
+    class StaticText;
     namespace SWF {
         class TextRecord;
     }
@@ -32,10 +34,9 @@ namespace gnash {
 
 namespace gnash {
 
-/// For characters that don't store unusual state in their instances.
+/// The base class for all rendered objects on the Stage.
 //
-/// @@AFAICT this is only used for shape characters
-///
+/// Objects of type DisplayObject are non-interactive.
 class DisplayObject : public character
 {
 
@@ -49,18 +50,34 @@ public:
 
     virtual ~DisplayObject() {}
 
-	/// generic characters can not handle mouse events, so
-	/// the default implementation returns false.
-	/// override in your subclass to change this
-	virtual bool can_handle_mouse_event() const {
+    /// Render the DisplayObject.
+    //
+    /// All DisplayObjects must have a display() function.
+	virtual void display() = 0;
+
+    /// Whether the DisplayObject can handle a mouse event.
+    //
+    /// Normal DisplayObjects apparently cannot handle
+    /// mouse events.
+    /// @return     true if the DisplayObject can handle mouse
+    ///             events
+	virtual bool can_handle_mouse_event() const
+    {
 		return false;
 	}
 
-    virtual DisplayObject* getStaticText(std::vector<const SWF::TextRecord*>&);
+    /// Search for StaticText objects
+    //
+    /// If this is a StaticText object and contains SWF::TextRecords, these
+    /// are written to the passed parameter.
+    /// @ return    0 if this object is not a StaticText or contains no text.
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&)
+    {
+        return 0;
+    }
 
-	virtual void display() = 0;
-
-	rect getBounds() const {
+	rect getBounds() const
+    {
 		return getDefinition()->get_bound();
 	}
 
@@ -74,7 +91,7 @@ public:
 	virtual character* get_topmost_mouse_entity(boost::int32_t /*x*/, 
             boost::int32_t /*y*/)
 	{
-		return NULL;
+		return 0;
 	}
 
 	// See dox in character.h
@@ -84,30 +101,22 @@ public:
 
 protected:
 
+    /// Retrieve the immutable definition of this DisplayObject.
+    //
+    /// All subclasses must override this, but may return 0. In
+    /// this case, they must also override any functions that
+    /// call getDefinition().
+    /// @ return    The immutable character_def of this DisplayObject
+    ///             or 0 if none exists.
     virtual character_def* getDefinition() const = 0;
-
-#ifdef GNASH_USE_GC
-	/// Mark reachabe resources (for the GC)
-	//
-	/// These are:
-	///	- this char's definition (m_def)
-	///
-	void markReachableResources() const
-	{
-		assert(isReachable());
-		getDefinition()->setReachable();
-
-		markCharacterReachable();
-	}
-#endif // GNASH_USE_GC
 
 };
 
 
-}	// end namespace gnash
+} // namespace gnash
 
 
-#endif // GNASH_GENERIC_CHARACTER_H
+#endif 
 
 
 // Local Variables:

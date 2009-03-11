@@ -53,17 +53,27 @@ protected:
         return _def.get();
     }
 
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for the GC)
+	void markReachableResources() const
+	{
+		assert(isReachable());
+        _def->setReachable();
+		markCharacterReachable();
+	}
+#endif
+
 private:
 	
-    const boost::intrusive_ptr<character_def> _def;
+    const boost::intrusive_ptr<shape_character_def> _def;
 
 };
 
 
-}	// end namespace gnash
+} // namespace gnash
 
 
-#endif // GNASH_GENERIC_CHARACTER_H
+#endif 
 
 
 // Local Variables:

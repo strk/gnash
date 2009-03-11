@@ -48,14 +48,6 @@ DisplayObject::pointInShape(boost::int32_t  x, boost::int32_t  y) const
     return getDefinition()->point_test_local(lp.x, lp.y, wm);
 }
 
-
-DisplayObject*
-DisplayObject::getStaticText(std::vector<const SWF::TextRecord*>& to)
-{
-    if (getDefinition()->extractStaticText(to)) return this;
-    return 0;
-}
-
 } // namespace gnash
 
 // Local Variables:

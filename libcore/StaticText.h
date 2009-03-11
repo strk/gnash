@@ -20,35 +20,28 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h" // for inheritance
-#include "shape_character_def.h" // for add_invalidated_bounds 
 #include "DisplayObject.h"
+#include "swf/DefineTextTag.h"
 
-#include <boost/scoped_ptr.hpp>
 #include <boost/dynamic_bitset.hpp>
 #include <cassert>
 
+// Forward declarations
 namespace gnash {
-
-    // Forward declarations
     class character_def;
-
     namespace SWF {
         class TextRecord;
     }
-
 }
 
 namespace gnash {
 
-/// For characters that don't store unusual state in their instances.
-//
-/// @@AFAICT this is only used for shape characters
-///
+/// Static text fields, SWF-defined and read-only.
 class StaticText : public DisplayObject
 {
 public:
 
-	StaticText(character_def* def, character* parent, int id)
+	StaticText(SWF::DefineTextTag* def, character* parent, int id)
 		:
         DisplayObject(parent, id),
         _def(def)
@@ -56,8 +49,7 @@ public:
         assert(_def);
 	}
 
-    virtual DisplayObject* getStaticText(
-            std::vector<const SWF::TextRecord*>& to);
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>& to);
 
 	virtual void display();
 
@@ -72,17 +64,14 @@ protected:
     }
 
 #ifdef GNASH_USE_GC
-	/// Mark reachabe resources (for the GC)
-	//
-	/// These are:
-	///	- this char's definition (m_def)
-	///
+	/// Mark reachable resources (for the GC)
 	void markReachableResources() const
 	{
 		assert(isReachable());
+        _def->setReachable();
 		markCharacterReachable();
 	}
-#endif // GNASH_USE_GC
+#endif
 
 private:
 
@@ -92,7 +81,7 @@ private:
     /// a TextSnapshot has queried the character for text.
     boost::dynamic_bitset<> _selectedText;
 
-    const boost::intrusive_ptr<character_def> _def;
+    const boost::intrusive_ptr<SWF::DefineTextTag> _def;
 
 };
 

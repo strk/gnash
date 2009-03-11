@@ -64,15 +64,6 @@ public:
 	{
 	}
 
-    /// Return any text defined as static.
-    //
-    /// This is used for MovieClip.getTextSnapshot() and should only be
-    /// implemented in DefineTextTag. Default is a no-op
-    virtual bool extractStaticText(std::vector<const SWF::TextRecord*>& /*to*/)
-    {
-        return false;
-    }
-
    	/// Return true if the specified point is on the interior of our shape.
 	//
 	/// Point coordinates are local coords (TWIPS)

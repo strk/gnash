@@ -49,7 +49,7 @@ namespace gnash {
     class ExecutableCode;
     class action_buffer;
     class movie_definition;
-    class DisplayObject;
+    class StaticText;
     namespace SWF {
         class TextRecord;
     }
@@ -418,7 +418,7 @@ public:
     //
     /// Default is a no-op, implemented only for DefineText though
     /// DisplayObject.
-    virtual DisplayObject* getStaticText(std::vector<const SWF::TextRecord*>&) {
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&) {
         return 0;
     }
 
