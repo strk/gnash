@@ -1,3 +1,4 @@
+// Shape.cpp:  Mouse/Character handling, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -10,28 +11,41 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
-
-#include "character_def.h"
-#include "render_handler.h" // for destruction of render_cache_manager
+#include "StaticText.h"
+#include "swf/DefineTextTag.h"
 
 namespace gnash
 {
 
-character_def::~character_def()
+StaticText*
+StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,
+        size_t& numChars)
 {
-	delete m_render_cache;
+    _selectedText.clear();
+
+    if (_def->extractStaticText(to, numChars)) {
+        _selectedText.resize(numChars);
+        return this;
+    }
+    
+    return 0;
 }
 
-} // end of namespace gnash
+
+void  
+StaticText::display()
+{
+    _def->display(this); // pass in transform info
+    clear_invalidated();
+}
+
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

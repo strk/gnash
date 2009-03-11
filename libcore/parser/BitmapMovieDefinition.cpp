@@ -21,13 +21,12 @@
 #include "BitmapMovieInstance.h"
 #include "BitmapMovieDefinition.h"
 #include "fill_style.h"
-#include "shape.h" // for class path and class edge
+#include "Geometry.h" // for class path and class edge
 #include "render.h" // for ::display
 #include "GnashImage.h"
 #include "log.h"
 
 namespace gnash {
-
 
 shape_character_def*
 BitmapMovieDefinition::getShapeDef()

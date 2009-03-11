@@ -741,7 +741,7 @@ Button::set_current_state(MouseState new_state)
                     character::staticDepthOffset + 1;
                 int ch_id = bdef.m_character_id;
 
-                character* ch = bdef.m_character_def->create_character_instance(
+                character* ch = bdef.m_character_def->createDisplayObject(
                         this, ch_id);
                 ch->setMatrix(mat, true); // update caches
                 ch->set_cxform(cx); 
@@ -904,7 +904,7 @@ Button::stagePlacementCallback(as_object* initObj)
         int ch_id = bdef.m_character_id;
 
         character* ch =
-            bdef.m_character_def->create_character_instance(this, ch_id);
+            bdef.m_character_def->createDisplayObject(this, ch_id);
         ch->setMatrix(mat, true);  // update caches
     
         // TODO: who cares about color, depth etc.
@@ -937,7 +937,7 @@ Button::stagePlacementCallback(as_object* initObj)
         int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
         int ch_id = bdef.m_character_id;
 
-        character* ch = bdef.m_character_def->create_character_instance(
+        character* ch = bdef.m_character_def->createDisplayObject(
                 this, ch_id);
         ch->setMatrix(mat, true);  // update caches
         ch->set_cxform(cx); 

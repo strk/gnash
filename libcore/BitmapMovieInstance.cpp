@@ -18,7 +18,7 @@
 #include "BitmapMovieInstance.h"
 #include "BitmapMovieDefinition.h"
 #include "fill_style.h"
-#include "shape.h" // for class path and class edge
+#include "Geometry.h" // for class path and class edge
 #include "render.h" // for ::display
 
 namespace gnash {
@@ -34,7 +34,7 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
 	character_def* chdef = def->get_character_def(1); 
 	assert(chdef);
 	boost::intrusive_ptr<character> ch = 
-        chdef->create_character_instance(this, 1);
+        chdef->createDisplayObject(this, 1);
 	
 	const int depth = 1 + character::staticDepthOffset;
 	place_character(ch.get(), depth);

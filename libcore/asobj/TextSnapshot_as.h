@@ -20,12 +20,11 @@
 #define GNASH_ASOBJ_TEXTSNAPSHOT_H
 
 #include "as_object.h"
-#include <boost/dynamic_bitset.hpp>
 
 
 // Forward declarations.
 namespace gnash {
-    class generic_character;
+    class StaticText;
     class Array_as;
     namespace SWF {
         class TextRecord;
@@ -44,7 +43,7 @@ public:
     /// Should remain in the order of insertion
     /// We should only ever iterate from begin to end, so there's no
     /// performance issue.
-    typedef std::vector<std::pair<generic_character*, Records> > TextFields;
+    typedef std::vector<std::pair<StaticText*, Records> > TextFields;
 
     /// Construct a TextSnapshot_as from a MovieClip.
     //
@@ -79,7 +78,17 @@ protected:
 
 private:
 
+    /// Generate a string from the TextRecords in this TextSnapshot.
+    //
+    /// @param to           The string to write to
+    /// @param newline      If true, newlines are written after every
+    ///                     StaticText in this TextSnapshot
+    /// @param selectedOnly Only write character that are selected to.
+    /// @param start        The start index
+    /// @param len          The number of StaticText characters to traverse.
+    ///                     This includes non-selected characters.
     void makeString(std::string& to, bool newline = false,
+            bool selectedOnly = false,
             std::string::size_type start = 0,
             std::string::size_type len = std::string::npos) const;
 
@@ -96,15 +105,6 @@ private:
     /// There is no need to store this, but it is quicker than counting
     /// afresh every time.
     const size_t _count;
-
-    /// Characters in the text run are selected individually.
-    //
-    /// Storing selection information along with the characters themselves
-    /// means that a separate object is necessary for each character.
-    /// Using a dynamic bitset prevents this, and generally
-    /// saves a lot of memory (32 bytes for boost's dynamic bitset against
-    /// one byte per character, possibly packed, for a bool in an object).
-    boost::dynamic_bitset<> _selected;
 
 };
 

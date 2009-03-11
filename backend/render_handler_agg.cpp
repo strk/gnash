@@ -126,7 +126,7 @@ AGG ressources
 #include "Range2d.h"
 
 #include "shape_character_def.h" 
-#include "generic_character.h"
+#include "DisplayObject.h"
 
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>

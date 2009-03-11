@@ -64,15 +64,6 @@ public:
 	{
 	}
 
-    /// Return any text defined as static.
-    //
-    /// This is used for MovieClip.getTextSnapshot() and should only be
-    /// implemented in DefineTextTag. Default is a no-op
-    virtual bool extractStaticText(std::vector<const SWF::TextRecord*>& /*to*/)
-    {
-        return false;
-    }
-
    	/// Return true if the specified point is on the interior of our shape.
 	//
 	/// Point coordinates are local coords (TWIPS)
@@ -89,12 +80,11 @@ public:
 
 	/// Should stick the result in a boost::intrusive_ptr immediately.
 	//
-	/// default is to make a generic_character
+	/// default is to make a DisplayObject
 	///
-	virtual character* create_character_instance(character* parent,
-			int id);
+	virtual character* createDisplayObject(character* parent, int id) = 0;
 	
-	// Declared as virtual here because generic_character needs access to it
+	// Declared as virtual here because DisplayObject needs access to it
 	virtual const rect&	get_bound() const = 0;
 	
     /// Cache holder for renderer (contents depend on renderer handler)

@@ -30,7 +30,7 @@
 #include "fontlib.h"
 #include "log.h"
 #include "morph2_character_def.h"
-#include "shape.h"
+#include "Geometry.h"
 #include "SWFStream.h"
 #include "styles.h"
 #include "timers.h"

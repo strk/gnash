@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-#ifndef __PATH_PARSER_H
-#define __PATH_PARSER_H
+#ifndef GNASH_PATH_PARSER_H
+#define GNASH_PATH_PARSER_H
 
 
-#include "shape.h"
+#include "Geometry.h"
 #include <vector>
 #include <deque>
 #include "cxform.h"

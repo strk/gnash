@@ -13,6 +13,10 @@
 #include "swf.h"
 #include "TextRecord.h"
 #include "Font.h"
+#include "StaticText.h"
+
+#include <algorithm>
+#include <numeric>
 
 namespace gnash {
 namespace SWF {
@@ -43,13 +47,26 @@ struct CreatePointer
 };
 
 
+character*
+DefineTextTag::createDisplayObject(character* parent, int id)
+{
+    return new StaticText(this, parent, id);
+}
+
+
 bool
-DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to)
+DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to,
+        size_t& numChars)
 {
     if (_textRecords.empty()) return false;
 
+    /// Insert pointers to all our TextRecords into to.
     std::transform(_textRecords.begin(), _textRecords.end(),
             std::back_inserter(to), CreatePointer<TextRecord>());
+
+    /// Count the number of characters in this definition's text records.
+    numChars = std::accumulate(_textRecords.begin(), _textRecords.end(),
+            0, TextRecord::RecordCounter());
 
     return true;
 }

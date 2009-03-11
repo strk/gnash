@@ -133,7 +133,7 @@ DefineVideoStreamTag::addVideoFrameTag(
 }
 
 character*
-DefineVideoStreamTag::create_character_instance(character* parent, int id)
+DefineVideoStreamTag::createDisplayObject(character* parent, int id)
 {
 	character* ch = new Video(this, parent, id);
 	return ch;

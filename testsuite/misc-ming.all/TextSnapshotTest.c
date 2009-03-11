@@ -184,7 +184,7 @@ main(int argc, char** argv)
   // Selected text is stored in the textfield and reset when a new
   // snapshot is taken.
   add_actions(mo, "ts2 = new TextSnapshot(this);");
-  xcheck_equals(mo, "ts.getSelectedText(false)", "''");
+  check_equals(mo, "ts.getSelectedText(false)", "''");
   check_equals(mo, "ts2.getCount()", "64");
   check_equals(mo, "ts2.getSelectedText()", "''");
   add_actions(mo, "ts2 = this.getTextSnapshot();");
@@ -193,12 +193,12 @@ main(int argc, char** argv)
 
   add_actions(mo, "ts2.setSelected(3, 10, true);");
   check_equals(mo, "ts2.getSelectedText(false).length", "7");
-  xcheck_equals(mo, "ts.getSelectedText(false).length", "7");
+  check_equals(mo, "ts.getSelectedText(false).length", "7");
 
   add_actions(mo, "ts.setSelectedColor(0xffff00);");
   add_actions(mo, "ts2.setSelectedColor(0x0000ff);");
 
-  xcheck_equals(mo, "ts.getSelectedText(false)", "'st text'");
+  check_equals(mo, "ts.getSelectedText(false)", "'st text'");
   add_actions(mo, "ri = ts.getTextRunInfo(4, 10);");
   check_equals(mo, "typeof(ri)", "'object'");
   check(mo, "ri instanceof Array");
@@ -238,7 +238,7 @@ main(int argc, char** argv)
   check_equals(mo, "ri[3].selected", "true");
   check_equals(mo, "ri[4].selected", "true");
   check_equals(mo, "ri[5].selected", "true");
-  xcheck_equals(mo, "ri[6].selected", "false");
+  check_equals(mo, "ri[6].selected", "false");
 
   check_equals(mo, "ri[2].matrix_tx", "29.75");
   check_equals(mo, "ri[2].matrix_ty", "200");
@@ -260,7 +260,7 @@ main(int argc, char** argv)
 
   add_actions(mo, "ts.setSelected(0, 10, true);");
   add_actions(mo, "ts.setSelected(15, 20, false);");
-  xcheck_equals(mo, "ts2.getSelectedText().length", "10");
+  check_equals(mo, "ts2.getSelectedText().length", "10");
 
   add_actions(mo, "ri2 = ts.getTextRunInfo(0, 100);");
 

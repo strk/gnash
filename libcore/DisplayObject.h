@@ -15,79 +15,71 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_GENERIC_CHARACTER_H
-#define GNASH_GENERIC_CHARACTER_H
+#ifndef GNASH_DISPLAY_OBJECT_H
+#define GNASH_DISPLAY_OBJECT_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character.h" // for inheritance
-#include "shape_character_def.h" // for add_invalidated_bounds 
+#include "character_def.h"
 
 #include <cassert>
 
 namespace gnash {
-
-    // Forward declarations
     class character_def;
-
+    class StaticText;
     namespace SWF {
         class TextRecord;
     }
-
 }
 
 namespace gnash {
 
-/// For characters that don't store unusual state in their instances.
+/// The base class for all rendered objects on the Stage.
 //
-/// @@AFAICT this is only used for shape characters
-///
-class generic_character : public character
+/// Objects of type DisplayObject are non-interactive.
+class DisplayObject : public character
 {
-
-protected:
-
-	boost::intrusive_ptr<character_def> m_def;
-
-#ifdef GNASH_USE_GC
-	/// Mark reachabe resources (for the GC)
-	//
-	/// These are:
-	///	- this char's definition (m_def)
-	///
-	void markReachableResources() const
-	{
-		assert(isReachable());
-		m_def->setReachable();
-
-		markCharacterReachable();
-	}
-#endif // GNASH_USE_GC
 
 public:
 
-	generic_character(character_def* def, character* parent, int id)
+	DisplayObject(character* parent, int id)
 		:
-		character(parent, id),
-		m_def(def)
+		character(parent, id)
 	{
-	    assert(m_def);
 	}
 
-	/// generic characters can not handle mouse events, so
-	/// the default implementation returns false.
-	/// override in your subclass to change this
-	virtual bool can_handle_mouse_event() const {
+    virtual ~DisplayObject() {}
+
+    /// Render the DisplayObject.
+    //
+    /// All DisplayObjects must have a display() function.
+	virtual void display() = 0;
+
+    /// Whether the DisplayObject can handle a mouse event.
+    //
+    /// Normal DisplayObjects apparently cannot handle
+    /// mouse events.
+    /// @return     true if the DisplayObject can handle mouse
+    ///             events
+	virtual bool can_handle_mouse_event() const
+    {
 		return false;
 	}
 
-    virtual generic_character* getStaticText(
-            std::vector<const SWF::TextRecord*>& /*to*/);
-
-	virtual void display();
+    /// Search for StaticText objects
+    //
+    /// If this is a StaticText object and contains SWF::TextRecords, these
+    /// are written to the passed parameter.
+    /// @ return    0 if this object is not a StaticText or contains no text.
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
+            size_t&)
+    {
+        return 0;
+    }
 
 	rect getBounds() const
-	{
-		return m_def->get_bound();
+    {
+		return getDefinition()->get_bound();
 	}
 
 	/// Generic character is NEVER a mouse entity by default, so
@@ -100,22 +92,32 @@ public:
 	virtual character* get_topmost_mouse_entity(boost::int32_t /*x*/, 
             boost::int32_t /*y*/)
 	{
-		return NULL;
+		return 0;
 	}
 
 	// See dox in character.h
 	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
-    
+
+protected:
+
+    /// Retrieve the immutable definition of this DisplayObject.
+    //
+    /// All subclasses must override this, but may return 0. In
+    /// this case, they must also override any functions that
+    /// call getDefinition().
+    /// @ return    The immutable character_def of this DisplayObject
+    ///             or 0 if none exists.
+    virtual character_def* getDefinition() const = 0;
 
 };
 
 
-}	// end namespace gnash
+} // namespace gnash
 
 
-#endif // GNASH_GENERIC_CHARACTER_H
+#endif 
 
 
 // Local Variables:

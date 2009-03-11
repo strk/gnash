@@ -482,7 +482,7 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
     character(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
-    _drawable_inst(_drawable->create_character_instance(this, 0)),
+    _drawable_inst(_drawable->createDisplayObject(this, 0)),
     m_play_state(PLAY),
     m_current_frame(0),
     m_has_looped(false),
@@ -1528,7 +1528,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     if (existing_char) return NULL;
 
     boost::intrusive_ptr<character> ch =
-        cdef->create_character_instance(this, tag->getID());
+        cdef->createDisplayObject(this, tag->getID());
 
     if (tag->hasName()) ch->set_name(tag->getName());
     else if (ch->wantsInstanceName())
@@ -1600,7 +1600,7 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
         else
         {
             boost::intrusive_ptr<character> ch = 
-                cdef->create_character_instance(this, tag->getID());
+                cdef->createDisplayObject(this, tag->getID());
 
             // TODO: check if we can drop this for REPLACE!
             // should we rename the character when it's REPLACE tag?
@@ -3220,7 +3220,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
     boost::intrusive_ptr<character> newch =
-        exported_movie->create_character_instance(movieclip.get(), 0);
+        exported_movie->createDisplayObject(movieclip.get(), 0);
 
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);

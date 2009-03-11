@@ -39,14 +39,12 @@
 namespace gnash {
 
 character*
-sprite_definition::create_character_instance(character* parent,
-		int id)
+sprite_definition::createDisplayObject(character* parent, int id)
 {
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
-	MovieClip* si = new MovieClip(this,
-	parent->get_root(), parent, id);
+	MovieClip* si = new MovieClip(this, parent->get_root(), parent, id);
 	return si;
 }
 
