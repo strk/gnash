@@ -36,7 +36,9 @@ namespace gnash {
 
 namespace gnash {
 
-/// Static text fields, SWF-defined and read-only.
+/// Static text fields, SWF-defined with read-only text.
+//
+/// StaticText objects hold mutable selection and color information.
 class StaticText : public DisplayObject
 {
 public:
@@ -52,11 +54,13 @@ public:
     /// Return a pointer to this if our definition contains any static text.
     //
     /// This is non-const because a TextSnapshot needs to add selection and
-    /// color information to this StaticText
+    /// color information to this StaticText. It also resets selection.
     //
     /// @param to       A vector of pointers to TextRecords containing text.
     /// @param numChars The total number of characters in all TextRecords is
     ///                 written to this variable.
+    /// Note: This function always removes any existing selection and resizes
+    /// the bitset to the number of characters in all TextRecords.
     virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>& to,
             size_t& numChars);
 
@@ -66,6 +70,14 @@ public:
         _selectedText.set(pos, selected);
     }
 
+    /// Return a bitset showing which characters (by index) are selected.
+    //
+    /// Note: mutable information is meaningless until the StaticText is
+    /// queried with getStaticText(). This is because under normal
+    /// circumstances there is no need for it.
+    /// Note also: the size() member of boost::dynamic_bitset returns 0 before
+    /// getStaticText() is called; afterwards it is equivalent to the
+    /// number of characters in the StaticText's definition.
     const boost::dynamic_bitset<>& getSelected() const {
         return _selectedText;
     }
