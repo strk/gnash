@@ -171,8 +171,8 @@ morph2_character_def::display(character* inst)
     edge empty_edge;
 
     // shape
-    const Paths& paths1 = m_shape1->get_paths();
-    const Paths& paths2 = m_shape2->get_paths();
+    const Paths& paths1 = m_shape1->paths();
+    const Paths& paths2 = m_shape2->paths();
     for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++)
     {
         path& p = _paths[i];
@@ -239,12 +239,11 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     }
 
     in.ensureBytes(4);
-    boost::uint32_t offset = in.read_u32();
-
-    UNUSED(offset); // why?
+    // Offset. What is this for?
+    static_cast<void>(in.read_u32());
 
     // Next line will throw ParserException on malformed SWF
-    boost::uint16_t fillCount = in.read_variable_count();
+    const boost::uint16_t fillCount = in.read_variable_count();
     
     fill_style fs1, fs2;
     for (size_t i = 0; i < fillCount; ++i) {
@@ -253,7 +252,7 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
         m_shape2->addFillStyle(fs2);
     }
 
-    boost::uint16_t lineCount = in.read_variable_count();
+    const boost::uint16_t lineCount = in.read_variable_count();
     line_style ls1, ls2;
     for (size_t i = 0; i < lineCount; ++i) {
         ls1.read_morph(in, tag, md, &ls2);
@@ -288,30 +287,26 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     }
 
     _line_styles.resize(s1Lines.size());
-    _paths.resize(m_shape1->get_paths().size());
+    _paths.resize(m_shape1->paths().size());
 
-    const unsigned edges_count1 = PathList::computeNumberOfEdges(
-            m_shape1->get_paths());
-    const unsigned edges_count2 = PathList::computeNumberOfEdges(
-            m_shape2->get_paths());
+    const unsigned edges1 = PathList::computeNumberOfEdges(m_shape1->paths());
+    const unsigned edges2 = PathList::computeNumberOfEdges(m_shape2->paths());
 
     IF_VERBOSE_PARSE(
       log_parse("morph: "
           "startShape(paths:%d, edges:%u), "
           "endShape(paths:%d, edges:%u)",
-          m_shape1->get_paths().size(), edges_count1,
-          m_shape2->get_paths().size(), edges_count2);
+          m_shape1->paths().size(), edges1,
+          m_shape2->paths().size(), edges2);
     );
 
     IF_VERBOSE_MALFORMED_SWF(
         // It is perfectly legal to have a different number of paths,
         // edges count should be the same instead
-        if ( edges_count1 != edges_count2 )
-        {
+        if (edges1 != edges2) {
             log_swferror(_("Different number of edges "
                 "in start (%u) and end (%u) shapes "
-                "of a morph"),
-                edges_count1, edges_count1);
+                "of a morph"), edges1, edges1);
         }
 
     );

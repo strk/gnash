@@ -937,7 +937,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     const cxform& cx)
   {
         
-    const PathVec& path_vec = def->get_paths();
+    const PathVec& path_vec = def->paths();
     
     if (!path_vec.size()) {
       return;    
@@ -987,7 +987,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     
     glyph_fs.push_back(coloring);
     
-    const PathVec& path_vec = def->get_paths();
+    const PathVec& path_vec = def->paths();
     
     std::vector<line_style> dummy_ls;
     

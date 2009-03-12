@@ -1476,7 +1476,7 @@ public:
   }
   
   PathPtrVec
-  get_paths_by_style(const PathVec& path_vec, unsigned int style)
+  paths_by_style(const PathVec& path_vec, unsigned int style)
   {
     PathPtrVec paths;
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
@@ -1543,7 +1543,7 @@ public:
     PathPointMap pathpoints = getPathPoints(normalized);
     
     for (size_t i = 0; i < fill_styles.size(); ++i) {
-      PathPtrVec paths = get_paths_by_style(normalized, i+1);
+      PathPtrVec paths = paths_by_style(normalized, i+1);
       
       if (!paths.size()) {
         continue;
@@ -1612,7 +1612,7 @@ public:
     const cxform& cx)
   {
   
-    const PathVec& path_vec = def->get_paths();
+    const PathVec& path_vec = def->paths();
 
     if (!path_vec.size()) {
       // No paths. Nothing to draw...
@@ -1672,7 +1672,7 @@ public:
     
     oglScopeMatrix scope_mat(mat);
     
-    draw_subshape(def->get_paths(), mat, dummy_cx, glyph_fs, dummy_ls);
+    draw_subshape(def->paths(), mat, dummy_cx, glyph_fs, dummy_ls);
   }
 
   virtual void set_scale(float xscale, float yscale) {

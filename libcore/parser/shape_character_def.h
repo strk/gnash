@@ -89,7 +89,7 @@ public:
     const FillStyles& fillStyles() const { return _fill_styles; }
     const LineStyles& lineStyles() const { return _line_styles; }
 
-    const std::vector<path>& get_paths() const { return _paths; }
+    const Paths& paths() const { return _paths; }
 
     // morph uses this
     // Should this be verified?

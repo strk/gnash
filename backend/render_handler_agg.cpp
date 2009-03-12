@@ -882,7 +882,7 @@ public:
     if (_clipbounds_selected.empty()) return; 
       
     GnashPaths paths;
-    apply_matrix_to_path(def->get_paths(), paths, mat);
+    apply_matrix_to_path(def->paths(), paths, mat);
 
     // If it's a mask, we don't need the rest.
     if (m_drawing_mask) {
@@ -979,7 +979,7 @@ public:
         const std::vector<line_style>& line_styles = def->lineStyles();
         bool have_shape, have_outline;
 
-        analyzePaths(def->get_paths(), have_shape, have_outline);
+        analyzePaths(def->paths(), have_shape, have_outline);
 
         if (!have_shape && !have_outline) {
             // Early return for invisible character.
@@ -987,7 +987,7 @@ public:
         }    
 
         GnashPaths paths;
-        apply_matrix_to_path(def->get_paths(), paths, mat);
+        apply_matrix_to_path(def->paths(), paths, mat);
 
         // Masks apparently do not use agg_paths, so return
         // early
