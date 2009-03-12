@@ -385,7 +385,7 @@ public:
 	///
 	movie_instance* create_movie_instance(character* parent=0);
 
-    virtual character* createDisplayObject(character* parent, int id) {
+    virtual character* createDisplayObject(character*, int) {
         return 0;
     }
 
