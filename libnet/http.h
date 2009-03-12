@@ -108,7 +108,8 @@ public:
         HTTP_PUT,
         HTTP_DELETE,
         HTTP_TRACE,
-        HTTP_CONNECT
+        HTTP_CONNECT,
+	HTTP_RESPONSE		// unique to gnash
     } http_method_e;
     typedef enum {
 	OPEN,
@@ -116,10 +117,11 @@ public:
 	IDLE,
 	CLOSE
     } rtmpt_cmd_e;
-    struct status_codes {
-        const char *code;
-        const char *msg;
-    };
+    // A response from an FTTP request has a code an an error message
+    typedef struct {
+	http_status_e code;
+	std::string   msg;
+    } http_response_t;
     typedef struct {
 	int major;
 	int minor;
@@ -148,6 +150,9 @@ public:
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
+    // Convert the Content-Length field to a number we can use
+    size_t getContentLength();
+
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
@@ -160,7 +165,10 @@ public:
 
     // Get an array of values for header field 'name'.
     boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
-    
+
+    // Client side parsing of response message codes
+    boost::shared_ptr<http_response_t> parseStatus(const std::string &line);
+
     // Handle the response for the request.
     boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
     amf::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 

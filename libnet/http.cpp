@@ -133,6 +133,24 @@ HTTP::operator = (HTTP& /*obj*/)
     return *this; 
 }
 
+// Client side parsing of response message codes
+boost::shared_ptr<HTTP::http_response_t> 
+HTTP::parseStatus(const std::string &line)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    boost::shared_ptr<http_response_t> status;
+    // The respnse is a number followed by the error message.
+    string::size_type pos = line.find(" ", 0);
+    if (pos != string::npos) {
+	status.reset(new http_response_t);
+	status->code = static_cast<HTTP::http_status_e>(strtol(line.substr(0, pos).c_str(), NULL, 0));
+	status->msg = line.substr(pos+1, line.size());
+    }
+
+    return status;
+}
+
 HTTP::http_method_e
 HTTP::processClientRequest(int fd)
 {
@@ -418,6 +436,20 @@ HTTP::processTraceRequest(int /* fd */)
     return false;
 }
 
+// Convert the Content-Length field to a number we can use
+size_t
+HTTP::getContentLength()
+{
+    //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<std::vector<std::string> > length = getFieldItem("content-length");
+    if (length->size() > 0) {
+	return static_cast<size_t>(strtol(length->at(0).c_str(), NULL, 0));
+    }
+
+    return 0;
+}
+
+
 // http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html#sec5 (5.3 Request Header Fields)
 bool
 HTTP::checkRequestFields(amf::Buffer & /* buf */)
@@ -504,12 +536,16 @@ HTTP::checkGeneralFields(amf::Buffer & /* buf */)
 boost::uint8_t *
 HTTP::processHeaderFields(amf::Buffer &buf)
 {
-  //    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     string head(reinterpret_cast<const char *>(buf.reference()));
+    http_method_e cmd = HTTP::HTTP_NONE;
 
     // The end of the header block is always followed by a blank line
     string::size_type end = head.find("\r\n\r\n", 0);
-//    head.erase(end, buf.size()-end);
+    if (end == string::npos) {
+	end = buf.allocated();
+    }
+
     Tok t(head, Sep("\r\n"));
     for (Tok::iterator i = t.begin(); i != t.end(); ++i) {
 	string::size_type pos = i->find(":", 0);
@@ -551,10 +587,11 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		log_debug("Setting Content Type to %d", _filetype);
 	    }
 	    
-//	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
+	    //	    cerr << "FIXME: " << (void *)i << " : " << dec <<  end << endl;
 	} else {
-	    const boost::uint8_t *cmd = reinterpret_cast<const boost::uint8_t *>(i->c_str());
-	    if (extractCommand(const_cast<boost::uint8_t *>(cmd)) == HTTP::HTTP_NONE) {
+	    const boost::uint8_t *first = reinterpret_cast<const boost::uint8_t *>(i->c_str());
+	    cmd = extractCommand(const_cast<boost::uint8_t *>(first));
+	    if (cmd == HTTP::HTTP_NONE) {
 		break;
 #if 1
 	    } else {
@@ -579,7 +616,16 @@ HTTP::processHeaderFields(amf::Buffer &buf)
 		    } else {
 			_filespec = i->substr(start+1, pos-start-2);
 		    }
-		    log_debug("Requesting file: \"%s\"", _filespec);
+		    if (cmd == HTTP::HTTP_RESPONSE) {
+			log_debug("Got a Response header!");
+			// FIXME: process the result code and command
+			boost::shared_ptr<http_response_t> status = 
+			    parseStatus(i->substr(start+1, pos-start-2));
+			log_debug("Response code is: %d, message is: %s",
+				  status->code, status->msg);
+		    } else {
+			log_debug("Requesting file: \"%s\"", _filespec);
+		    }
 
 		    // HTTP 1.1 enables persistant network connections
 		    // by default.
@@ -1256,26 +1302,57 @@ HTTP::formatEchoResponse(const std::string &num, boost::uint8_t *data, size_t si
 }
 
 amf::Buffer &
-HTTP::formatRequest(const string & /* url */, http_method_e /* req */)
+HTTP::formatRequest(const string &url, http_method_e cmd)
 {
 //    GNASH_REPORT_FUNCTION;
-
-#if 0
-    _header.str("");
-
-    _header << req << " " << url << "HTTP/1.1" << "\r\n";
-    _header << "User-Agent: Opera/9.01 (X11; Linux i686; U; en)" << "\r\n";
-    _header << "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1" << "\r\n";
-
-    _header << "Accept-Language: en" << "\r\n";
-    _header << "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1" << "\r\n";
     
-    _header << "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0" << "\r\n";
-    _header << "Referer: " << url << "\r\n";
+    clearHeader();
 
-    _header << "TE: deflate, gzip, chunked, identity, trailers" << "\r\n";
-#endif
-    
+    char num[12];
+
+    switch (cmd) {
+    case HTTP::HTTP_GET:
+	_buffer = "GET ";
+	break;
+    case HTTP::HTTP_POST:
+	_buffer = "POST ";
+	break;
+    case HTTP::HTTP_HEAD:
+	_buffer = "HEAD ";
+	break;
+    case HTTP::HTTP_CONNECT:
+	_buffer = "CONNECT ";
+	break;
+    case HTTP::HTTP_TRACE:
+	_buffer = "TRACE ";
+	break;
+    case HTTP::HTTP_OPTIONS:
+	_buffer = "OPTIONS ";
+	break;
+    default:
+	break;
+    }
+    _buffer += url;
+
+    _buffer += " HTTP/1.1";
+//     sprintf(num, "%d.%d", _version.major, _version.minor);
+//     _buffer += num;
+    // end the line
+    _buffer += "\r\n";
+
+    formatHost("localhost");
+    formatAgent("Gnash");
+
+    // Post messages want a bunch more fields than a GET request
+    if (cmd == HTTP::HTTP_POST) {
+	formatContentType(DiskStream::FILETYPE_AMF);
+	formatEncoding("deflate, gzip, x-gzip, identity, *;q=0");
+	formatConnection("Keep-Alive");
+    }
+
+//     // All HTTP messages are followed by a blank line.
+//     terminateHeader();
+
     return _buffer;
 }
 
@@ -1375,6 +1452,8 @@ HTTP::extractCommand(boost::uint8_t *data)
         cmd = HTTP::HTTP_OPTIONS;
     } else if (memcmp(data, "DELETE", 4) == 0) {
         cmd = HTTP::HTTP_DELETE;
+    } else if (memcmp(data, "HTTP", 4) == 0) {
+        cmd = HTTP::HTTP_RESPONSE;
     }
 
     // For valid requests, the second argument, delimited by spaces

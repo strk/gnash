@@ -23,10 +23,6 @@
 #include "gnashconfig.h"
 #endif
 
-#include "dsodefs.h"
-#include "smart_ptr.h"
-#include "CharacterProxy.h"
-
 #include <cmath>
 #include <limits>
 #include <string>
@@ -36,24 +32,28 @@
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/shared_ptr.hpp>
 
+#include "dsodefs.h"
+#include "smart_ptr.h"
+#include "CharacterProxy.h"
 #include "utility.h" // UNUSED
 #include "string_table.h"
 
 // Forward declarations
 namespace gnash {
-    class VM;
-	class as_object;
-	class fn_call;
-	class as_function;
-	class MovieClip;
-	class character;
-	class asNamespace;
-	class asName;
-    class SimpleBuffer;
+class VM;
+class as_object;
+class fn_call;
+class as_function;
+class MovieClip;
+class character;
+class asNamespace;
+class asName;
+class SimpleBuffer;
 }
 namespace amf {
-	class Element;
+class Element;
 }
 
 namespace gnash {
@@ -68,15 +68,15 @@ template <typename T>
 inline bool
 isNaN(const T& num, typename boost::enable_if<boost::is_floating_point<T> >::type* dummy = 0)
 {
-	UNUSED(dummy);
-	return num != num;
+    UNUSED(dummy);
+    return num != num;
 }
 
 template <typename T>
 inline bool
 isInf(const T& num)
 {
-	return isNaN(num - num);
+    return isNaN(num - num);
 }
 
 
@@ -90,9 +90,9 @@ isInf(const T& num)
 /// These are the primitive types, see the ECMAScript reference.
 enum primitive_types
 {
-	PTYPE_STRING,
-	PTYPE_NUMBER,
-	PTYPE_BOOLEAN
+    PTYPE_STRING,
+    PTYPE_NUMBER,
+    PTYPE_BOOLEAN
 };
 
 /// ActionScript value type.
@@ -105,132 +105,132 @@ class as_value
 {
 
 public:
-
-	enum AsType
-	{
-		// Always make the exception type one greater than the normal type.
-		
-		/// Undefined value
-		UNDEFINED,
-		UNDEFINED_EXCEPT,
-
-		/// NULL value
-		NULLTYPE,
-		NULLTYPE_EXCEPT,
-
-		/// Boolean value
-		BOOLEAN,
-		BOOLEAN_EXCEPT,
-
-		/// String value
-		STRING,
-		STRING_EXCEPT,
-
-		/// Number value
-		NUMBER, 
-		NUMBER_EXCEPT,
-
-		/// Object reference
-		OBJECT,
-		OBJECT_EXCEPT,
-
-		/// ActionScript function reference
-		AS_FUNCTION,
-		AS_FUNCTION_EXCEPT,
-
-		/// MovieClip reference
-		MOVIECLIP,
-		MOVIECLIP_EXCEPT
-	};
-
-	/// Construct an UNDEFINED value
-	DSOEXPORT as_value();
-
-	/// Copy constructor.
-	as_value(const as_value& value);
-
-	/// Construct a STRING value 
-	as_value(const char* str);
-	as_value(const std::string& str);
-
-	/// Construct a BOOLEAN value
-	template <typename T>
-	as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
-            dummy = 0)
-		:
-        m_type(BOOLEAN),
-		_value(val)
-	{
-		UNUSED(dummy);
-	}
-
-	/// Construct a NUMBER value
-	as_value(double val);
-
-	/// Chad: Document this
-	as_value(asNamespace &);
-
-	/// Construct a value from an AMF element
-	as_value(const amf::Element& el);
+    
+    enum AsType
+    {
+        // Always make the exception type one greater than the normal type.
 	
-	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
-	//
-	/// See as_object::to_movie and as_object::to_function
-	///
-	/// Internally adds a reference to the ref-counted as_object, 
-	/// if not-null
-	///
-	as_value(as_object* obj);
+        /// Undefined value
+        UNDEFINED,
+        UNDEFINED_EXCEPT,
+        
+        /// NULL value
+        NULLTYPE,
+        NULLTYPE_EXCEPT,
+        
+        /// Boolean value
+        BOOLEAN,
+        BOOLEAN_EXCEPT,
+        
+        /// String value
+        STRING,
+        STRING_EXCEPT,
+        
+        /// Number value
+        NUMBER, 
+        NUMBER_EXCEPT,
+        
+        /// Object reference
+        OBJECT,
+        OBJECT_EXCEPT,
+        
+        /// ActionScript function reference
+        AS_FUNCTION,
+        AS_FUNCTION_EXCEPT,
+        
+        /// MovieClip reference
+        MOVIECLIP,
+        MOVIECLIP_EXCEPT
+    };
+    
+    /// Construct an UNDEFINED value
+    DSOEXPORT as_value();
+    
+    /// Copy constructor.
+    as_value(const as_value& value);
+    
+    /// Construct a STRING value 
+    as_value(const char* str);
+    as_value(const std::string& str);
+    
+    /// Construct a BOOLEAN value
+    template <typename T>
+    as_value(T val, typename boost::enable_if<boost::is_same<bool, T> >::type*
+             dummy = 0)
+        :
+        m_type(BOOLEAN),
+        _value(val)
+	{
+            UNUSED(dummy);
+	}
+    
+    /// Construct a NUMBER value
+    as_value(double val);
+    
+    /// Chad: Document this
+    as_value(asNamespace &);
+    
+    /// Construct a value from an AMF element
+    as_value(const amf::Element& el);
+    
+    /// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
+    //
+    /// See as_object::to_movie and as_object::to_function
+    ///
+    /// Internally adds a reference to the ref-counted as_object, 
+    /// if not-null
+    ///
+    as_value(as_object* obj);
+    
+    /// Construct an NULL, MOVIECLIP, AS_FUNCTION or OBJECT value
+    as_value(boost::intrusive_ptr<as_object> obj);
+    
+    /// Construct a NULL or AS_FUNCTION value
+    as_value(as_function* func);
 
-	/// Construct an NULL, MOVIECLIP, AS_FUNCTION or OBJECT value
-	as_value(boost::intrusive_ptr<as_object> obj);
-
-	/// Construct a NULL or AS_FUNCTION value
-	as_value(as_function* func);
-
-	/// Read AMF0 data from the given buffer
-	//
-	/// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
-	/// encoded data. Must start with a type byte unless third parameter is set.
-	///
-	/// On success, sets the given as_value and returns true.
-	/// On error (premature end of buffer, etc.) returns false and leaves the given
-	/// as_value untouched.
-	///
-	/// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
-	/// you passed instead.
-	///
-	/// The l-value you pass as the first parameter (buffer start) is updated to
-	/// point just past the last byte parsed
-	///
-	/// TODO restore first parameter on parse errors
-	///
-	/// @param b
+    /// Read AMF0 data from the given buffer
+    //
+    /// Pass pointer to buffer and pointer to end of buffer. Buffer is raw AMF
+    /// encoded data. Must start with a type byte unless third parameter is set.
+    ///
+    /// On success, sets the given as_value and returns true.
+    /// On error (premature end of buffer, etc.) returns false and leaves the given
+    /// as_value untouched.
+    ///
+    /// IF you pass a fourth parameter, it WILL NOT READ A TYPE BYTE, but use what
+    /// you passed instead.
+    ///
+    /// The l-value you pass as the first parameter (buffer start) is updated to
+    /// point just past the last byte parsed
+    ///
+    /// TODO restore first parameter on parse errors
+    ///
+    /// @param b
     ///     Pointer to buffer where to start reading.
     ///     Will be moved as data is read.
     ///
-	/// @param end
+    /// @param end
     ///     Pointer to end of buffer. Reading from this would
     ///     be invalid.
     ///
-	/// @param inType
+    /// @param inType
     ///     Type of the AMF object to read. If -1, type will be
     ///     read from a type byte.
     ///
-	/// @param objRefs
-	///     A vector of already-parsed objects to properly interpret references.
-	///     Pass an empty vector on first call as it will be used internally.
-	///     On return, the vector will be filled with pointers to every
+    /// @param objRefs
+    ///     A vector of already-parsed objects to properly interpret references.
+    ///     Pass an empty vector on first call as it will be used internally.
+    ///     On return, the vector will be filled with pointers to every
     ///     complex object parsed from the stream.
     ///
-	/// @param vm
+    /// @param vm
     ///     Virtual machine to use for initialization of the values
     ///     (string_table)
-	///
-	DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
-            const boost::uint8_t* const end, int inType,
-            std::vector<as_object*>& objRefs, VM& vm);
-
+    ///
+    DSOEXPORT bool readAMF0(const boost::uint8_t*& b,
+                            const boost::uint8_t* const end, int inType,
+                            std::vector<as_object*>& objRefs, VM& vm);
+    
     /// Serialize value in AMF0 format.
     //
     /// @param buf
@@ -249,24 +249,24 @@ public:
     ///
     bool writeAMF0(SimpleBuffer& buf, std::map<as_object*, size_t>& offsetTable,
                    VM& vm, bool allowStrictArray) const;
-
-	/// Convert numeric value to string value, following ECMA-262 specification
-	//
-	// Printing formats:
-	//
-	// If _val > 1, Print up to 15 significant digits, then switch
-	// to scientific notation, rounding at the last place and
-	// omitting trailing zeroes.
-	// For values < 1, print up to 4 leading zeroes after the
-	// decimal point, then switch to scientific notation with up
-	// to 15 significant digits, rounding with no trailing zeroes
-	// If the value is negative, just add a '-' to the start; this
-	// does not affect the precision of the printed value.
-	//
-	// This almost corresponds to iomanip's std::setprecision(15)
-	// format, except that iomanip switches to scientific notation
-	// at e-05 not e-06, and always prints at least two digits for the exponent.
-	static std::string doubleToString(double val, int radix=10);
+    
+    /// Convert numeric value to string value, following ECMA-262 specification
+    //
+    // Printing formats:
+    //
+    // If _val > 1, Print up to 15 significant digits, then switch
+    // to scientific notation, rounding at the last place and
+    // omitting trailing zeroes.
+    // For values < 1, print up to 4 leading zeroes after the
+    // decimal point, then switch to scientific notation with up
+    // to 15 significant digits, rounding with no trailing zeroes
+    // If the value is negative, just add a '-' to the start; this
+    // does not affect the precision of the printed value.
+    //
+    // This almost corresponds to iomanip's std::setprecision(15)
+    // format, except that iomanip switches to scientific notation
+    // at e-05 not e-06, and always prints at least two digits for the exponent.
+    static std::string doubleToString(double val, int radix=10);
 
     /// Try to parse a string into a 32-bit signed int using base 8 or 16.  //
     /// This function will throw a boost::bad_lexical_cast (or a derived
@@ -283,263 +283,263 @@ public:
     ///               parsed.
     static bool parseNonDecimalInt(const std::string& s, double& d,
             bool whole = true);
-
-	/// Return the primitive type of this value, as a string.
-	const char* typeOf() const;
-
-	/// Get the primitive type of this value
-	primitive_types ptype() const;
-
-	// Chad: Document
-	bool conforms_to(string_table::key name);
-
-	/// \brief
-	/// Return true if this value is callable
-	/// (AS_FUNCTION).
-	bool is_function() const
-	{
-		return m_type == AS_FUNCTION;
-	}
-
-	/// Return true if this value is a AS function
-	bool is_as_function() const
-	{
-		return m_type == AS_FUNCTION;
-	}
-
-	/// Return true if this value is strictly a string
-	//
-	/// Note that you usually DON'T need to call this
-	/// function, as if you really want a string you
-	/// can always call the to_string() or to_std_string()
-	/// method to perform a conversion.
-	///
-	bool is_string() const
-	{
-		return m_type == STRING;
-	}
-
-	/// Return true if this value is strictly a number
-	//
-	/// Note that you usually DON'T need to call this
-	/// function, as if you really want a number you
-	/// can always call the to_number()
-	/// method to perform a conversion.
-	///
-	bool is_number() const
-	{
-		return m_type == NUMBER;
-	}
-
-	/// \brief
-	/// Return true if this value is an object
-	/// (OBJECT, AS_FUNCTION or MOVIECLIP).
-	bool is_object() const
-	{
-		return m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP;
-	}
-
-	/// \brief
-	/// Return true if this value is a MOVIECLIP 
-	/// 
-	bool is_sprite() const
-	{
-		return m_type == MOVIECLIP;
-	}
-
-	/// Get a std::string representation for this value.
-	std::string to_string() const;
-
+    
+    /// Return the primitive type of this value, as a string.
+    const char* typeOf() const;
+    
+    /// Get the primitive type of this value
+    primitive_types ptype() const;
+    
+    // Chad: Document
+    bool conforms_to(string_table::key name);
+    
+    /// \brief
+    /// Return true if this value is callable
+    /// (AS_FUNCTION).
+    bool is_function() const
+    {
+	return m_type == AS_FUNCTION;
+    }
+    
+    /// Return true if this value is a AS function
+    bool is_as_function() const
+    {
+	return m_type == AS_FUNCTION;
+    }
+    
+    /// Return true if this value is strictly a string
+    //
+    /// Note that you usually DON'T need to call this
+    /// function, as if you really want a string you
+    /// can always call the to_string() or to_std_string()
+    /// method to perform a conversion.
+    ///
+    bool is_string() const
+    {
+	return m_type == STRING;
+    }
+    
+    /// Return true if this value is strictly a number
+    //
+    /// Note that you usually DON'T need to call this
+    /// function, as if you really want a number you
+    /// can always call the to_number()
+    /// method to perform a conversion.
+    ///
+    bool is_number() const
+    {
+	return m_type == NUMBER;
+    }
+    
+    /// \brief
+    /// Return true if this value is an object
+    /// (OBJECT, AS_FUNCTION or MOVIECLIP).
+    bool is_object() const
+    {
+	return m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP;
+    }
+    
+    /// \brief
+    /// Return true if this value is a MOVIECLIP 
+    /// 
+    bool is_sprite() const
+    {
+	return m_type == MOVIECLIP;
+    }
+    
+    /// Get a std::string representation for this value.
+    std::string to_string() const;
+    
     // Used for operator<< to give useful information about an
     // as_value object.
-	DSOEXPORT std::string toDebugString() const;
-
-	/// Get a string representation for this value.
-	//
-	/// This differs from to_string() in that returned
-	/// representation will depend on version of the SWF
-	/// source. 
-	/// @@ shouldn't this be the default ?
-	///
-	/// @param version
-    ///     SWF version for which the operation is desired.
-	///
-	std::string to_string_versioned(int version) const;
-
-	/// Get a number representation for this value
-	double	to_number() const;
-
-	/// Get an AMF element representation for this value
-	std::auto_ptr<amf::Element> to_element() const;
-
-	/// Conversion to 32bit integer
-	//
-	/// Use this conversion whenever an int is needed.
-	/// This is NOT the same as calling to_number<boost::int32_t>().
-	///
-	boost::int32_t	to_int() const;
-
-	/// Shorthand: casts the result of to_number() to the requested number
-	/// type.
-	//
-	/// Parameter identical to that of to_number().
-	///
-	/// TODO: deprecate this function, it gets confusing as when an integer
-	///       is needed the caller should invoke to_int() rather then to_number().
-	///       Implementing specializations for *all* integer types might be tedious
-	///
-	template <typename T>
-	T to_number () const
-	{
-		return static_cast<T>(to_number());
-	}
-
-	/// Conversion to boolean.
-	//
-	/// Will call version-dependent functions
-	/// based on current version.
-	///
-	/// See to_bool_v5(), to_bool_v6(), to_bool_v7() 
-	///
-	bool	to_bool() const;
-
-	/// Conversion to boolean for SWF7 and up
-	//
-	/// See to_bool()
-	///
-	bool	to_bool_v7() const;
-
-	/// Conversion to boolean for SWF6
-	//
-	/// See to_bool()
-	///
-	bool	to_bool_v6() const;
-
-	/// Conversion to boolean up to SWF5
-	//
-	/// See to_bool()
-	///
-	bool	to_bool_v5() const;
-
-	/// Return value as an object, converting primitive values as needed.
-	//
-	/// Make sure you don't break the intrusive_ptr chain
-	/// as the returned object might be a newly allocated one in case
-	/// of a conversion from a primitive string, number or boolean value.
-	///
-	/// string values will be converted to String objects,
-	/// numeric values will be converted to Number objects,
-	/// boolean values are currently NOT converted, but should (FIXME!)
-	///
-	/// If you want to avoid the conversion, check with is_object() before
-	/// calling this function.
-	///
-	boost::intrusive_ptr<as_object> to_object() const;
-
-	/// Return value as a sprite or NULL if this is not possible.
-	//
-	/// This is just a wrapper around to_character() performing 
-	/// an additional final cast.
-	///
-	MovieClip* to_sprite(bool skipRebinding=false) const;
-
-	/// Return value as a character or NULL if this is not possible.
-	//
-	/// If the value is a MOVIECLIP value, the stored character target
-	/// is evaluated using the root movie's environment.
-	/// If the target points to something that doesn't cast to a character,
-	/// NULL is returned.
-	///
-	/// Note that if the value is NOT a MOVIECLIP type, NULL is always
-	/// returned.
-	///
-	/// @param skipRebinding
-	/// 	If true a reference to a destroyed character is still returned
-	///	as such, rather then attempted to be resolved as a soft-reference.
-	///	Main use for this is during paths resolution, to avoid
-	///	infinite loops. See bug #21647.
-	///
-	character* to_character(bool skipRebinding=false) const;
-
-	/// \brief
-	/// Return value as an ActionScript function ptr
-	/// or NULL if it is not an ActionScript function.
-	as_function*	to_as_function() const;
-
-	/// Convert this value to a primitive type
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
-	as_value& convert_to_primitive();
-
-	/// Return value as a primitive type
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
-	as_value to_primitive() const;
-
-	/// Return value as a primitive type, with a preference
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @param hint
-	/// 	NUMBER or STRING, the preferred representation we're asking for.
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
-	as_value to_primitive(AsType hint) const;
-
-	/// Convert this value to a primitive type, with a preference
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
-	///
-	/// @param hint
-	/// 	NUMBER or STRING, the preferred representation we're asking for.
-	///
-	/// @throw ActionTypeError if an object can't be converted to a primitive
-	///
-	as_value& convert_to_primitive(AsType hint);
-
-	/// Force type to number.
-	void convert_to_number();
-
-	/// Force type to string.
-	void convert_to_string();
+    DSOEXPORT std::string toDebugString() const;
     
-	/// Force type to bool.
-	void convert_to_boolean();
-    
-	/// Force type to string.
-	//
-	/// uses swf-version-aware converter
+    /// Get a string representation for this value.
+    //
+    /// This differs from to_string() in that returned
+    /// representation will depend on version of the SWF
+    /// source. 
+    /// @@ shouldn't this be the default ?
     ///
-	/// @param version
+    /// @param version
     ///     SWF version for which the operation is desired.
-	///
-	/// @see to_string_versioned
-	///
-	void convert_to_string_versioned(int version);
+    ///
+    std::string to_string_versioned(int version) const;
+    
+    /// Get a number representation for this value
+    double	to_number() const;
+    
+    /// Get an AMF element representation for this value
+    boost::shared_ptr<amf::Element> to_element() const;
+    
+    /// Conversion to 32bit integer
+    //
+    /// Use this conversion whenever an int is needed.
+    /// This is NOT the same as calling to_number<boost::int32_t>().
+    ///
+    boost::int32_t	to_int() const;
 
-	// These set_*()'s are more type-safe; should be used
-	// in preference to generic overloaded set().  You are
-	// more likely to get a warning/error if misused.
-
-	void set_string(const std::string& str);
-
-	void set_double(double val);
-
-	void set_bool(bool val);
-
-	void set_sprite(MovieClip& sp);
-
+    /// Shorthand: casts the result of to_number() to the requested number
+    /// type.
+    //
+    /// Parameter identical to that of to_number().
+    ///
+    /// TODO: deprecate this function, it gets confusing as when an integer
+    ///       is needed the caller should invoke to_int() rather then to_number().
+    ///       Implementing specializations for *all* integer types might be tedious
+    ///
+    template <typename T>
+    T to_number () const
+    {
+	return static_cast<T>(to_number());
+    }
+    
+    /// Conversion to boolean.
+    //
+    /// Will call version-dependent functions
+    /// based on current version.
+    ///
+    /// See to_bool_v5(), to_bool_v6(), to_bool_v7() 
+    ///
+    bool	to_bool() const;
+    
+    /// Conversion to boolean for SWF7 and up
+    //
+    /// See to_bool()
+    ///
+    bool	to_bool_v7() const;
+    
+    /// Conversion to boolean for SWF6
+    //
+    /// See to_bool()
+    ///
+    bool	to_bool_v6() const;
+    
+    /// Conversion to boolean up to SWF5
+    //
+    /// See to_bool()
+    ///
+	bool	to_bool_v5() const;
+    
+    /// Return value as an object, converting primitive values as needed.
+    //
+    /// Make sure you don't break the intrusive_ptr chain
+    /// as the returned object might be a newly allocated one in case
+    /// of a conversion from a primitive string, number or boolean value.
+    ///
+    /// string values will be converted to String objects,
+    /// numeric values will be converted to Number objects,
+    /// boolean values are currently NOT converted, but should (FIXME!)
+    ///
+    /// If you want to avoid the conversion, check with is_object() before
+    /// calling this function.
+    ///
+    boost::intrusive_ptr<as_object> to_object() const;
+    
+    /// Return value as a sprite or NULL if this is not possible.
+    //
+    /// This is just a wrapper around to_character() performing 
+    /// an additional final cast.
+    ///
+    MovieClip* to_sprite(bool skipRebinding=false) const;
+    
+    /// Return value as a character or NULL if this is not possible.
+    //
+    /// If the value is a MOVIECLIP value, the stored character target
+    /// is evaluated using the root movie's environment.
+    /// If the target points to something that doesn't cast to a character,
+    /// NULL is returned.
+    ///
+    /// Note that if the value is NOT a MOVIECLIP type, NULL is always
+    /// returned.
+    ///
+    /// @param skipRebinding
+    /// 	If true a reference to a destroyed character is still returned
+    ///	as such, rather then attempted to be resolved as a soft-reference.
+    ///	Main use for this is during paths resolution, to avoid
+    ///	infinite loops. See bug #21647.
+    ///
+    character* to_character(bool skipRebinding=false) const;
+    
+    /// \brief
+    /// Return value as an ActionScript function ptr
+    /// or NULL if it is not an ActionScript function.
+    as_function*	to_as_function() const;
+    
+    /// Convert this value to a primitive type
+    //
+    /// Primitive types are: undefined, null, boolean, string, number.
+    /// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
+    ///
+    /// @throw ActionTypeError if an object can't be converted to a primitive
+    ///
+    as_value& convert_to_primitive();
+    
+    /// Return value as a primitive type
+    //
+    /// Primitive types are: undefined, null, boolean, string, number.
+    /// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
+    ///
+    /// @throw ActionTypeError if an object can't be converted to a primitive
+    ///
+    as_value to_primitive() const;
+    
+    /// Return value as a primitive type, with a preference
+    //
+    /// Primitive types are: undefined, null, boolean, string, number.
+    /// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
+    ///
+    /// @param hint
+    /// 	NUMBER or STRING, the preferred representation we're asking for.
+    ///
+    /// @throw ActionTypeError if an object can't be converted to a primitive
+    ///
+    as_value to_primitive(AsType hint) const;
+    
+    /// Convert this value to a primitive type, with a preference
+    //
+    /// Primitive types are: undefined, null, boolean, string, number.
+    /// See ECMA-2.6.2 (sections 4.3.2 and 8.6.2.6).
+    ///
+    /// @param hint
+    /// 	NUMBER or STRING, the preferred representation we're asking for.
+    ///
+    /// @throw ActionTypeError if an object can't be converted to a primitive
+    ///
+    as_value& convert_to_primitive(AsType hint);
+    
+    /// Force type to number.
+    void convert_to_number();
+    
+    /// Force type to string.
+    void convert_to_string();
+    
+    /// Force type to bool.
+    void convert_to_boolean();
+    
+    /// Force type to string.
+    //
+    /// uses swf-version-aware converter
+    ///
+    /// @param version
+    ///     SWF version for which the operation is desired.
+    ///
+    /// @see to_string_versioned
+    ///
+    void convert_to_string_versioned(int version);
+    
+    // These set_*()'s are more type-safe; should be used
+    // in preference to generic overloaded set().  You are
+    // more likely to get a warning/error if misused.
+    
+    void set_string(const std::string& str);
+    
+    void set_double(double val);
+    
+    void set_bool(bool val);
+    
+    void set_sprite(MovieClip& sp);
+    
 	void set_character(character& sp);
 
 	void set_int(int val) { set_double(val); }
