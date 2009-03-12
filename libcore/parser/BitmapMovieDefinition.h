@@ -57,7 +57,7 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
             const std::string& url);
 
-    virtual character* createDisplayObject(character* parent, int id) {
+    virtual character* createDisplayObject(character*, int) {
         return 0;
     }
 
