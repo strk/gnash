@@ -98,9 +98,9 @@ private:
 
 morph2_character_def::morph2_character_def()
     :
-    m_last_ratio(-1.0f),
     m_shape1(new shape_character_def),
-    m_shape2(new shape_character_def)
+    m_shape2(new shape_character_def),
+    m_last_ratio(-1.0f)
 {
 }
 
@@ -121,20 +121,20 @@ morph2_character_def::display(character* inst)
     set_bound(new_bound);
 
     // fill styles
-    for (size_t i = 0; i < m_fill_styles.size(); i++)
-    {
-        fill_style& fs = m_fill_styles[i];
+    FillStyles::const_iterator fs1 = m_shape1->get_fill_styles().begin();
+    FillStyles::const_iterator fs2 = m_shape2->get_fill_styles().begin();
 
-        const fill_style& fs1 = m_shape1->get_fill_styles()[i];
-        const fill_style& fs2 = m_shape2->get_fill_styles()[i];
+    for (FillStyles::iterator i = _fill_styles.begin(), e = _fill_styles.end();
+            i != e; ++i, ++fs1, ++fs2) {
 
-        fs.set_lerp(fs1, fs2, ratio);
+        fill_style& fs = *i;
+        fs.set_lerp(*fs1, *fs2, ratio);
     }
 
     // line styles
-    for (size_t i=0; i < m_line_styles.size(); i++)
+    for (size_t i=0; i < _line_styles.size(); i++)
     {
-        line_style& ls = m_line_styles[i];
+        line_style& ls = _line_styles[i];
 
         const line_style& ls1 = m_shape1->get_line_styles()[i];
         const line_style& ls2 = m_shape2->get_line_styles()[i];
@@ -149,22 +149,22 @@ morph2_character_def::display(character* inst)
     edge empty_edge;
 
     // shape
-    const std::vector<path>& paths1 = m_shape1->get_paths();
-    const std::vector<path>& paths2 = m_shape2->get_paths();
-    for (size_t i = 0, k = 0, n = 0; i < m_paths.size(); i++)
+    const Paths& paths1 = m_shape1->get_paths();
+    const Paths& paths2 = m_shape2->get_paths();
+    for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++)
     {
-        path& p = m_paths[i];
+        path& p = _paths[i];
         const path& p1 = i < paths1.size() ? paths1[i] : empty_path;
         const path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
-        float new_ax = utility::flerp(p1.ap.x, p2.ap.x, ratio);
-        float new_ay = utility::flerp(p1.ap.y, p2.ap.y, ratio);
+        const float new_ax = utility::flerp(p1.ap.x, p2.ap.x, ratio);
+        const float new_ay = utility::flerp(p1.ap.y, p2.ap.y, ratio);
 
         p.reset(new_ax, new_ay, p1.getLeftFill(),
                 p2.getRightFill(), p1.getLineStyle());
 
         //  edges;
-        size_t len = p1.size();
+        const size_t len = p1.size();
         p.m_edges.resize(len);
 
         for (size_t j=0; j < p.size(); j++)
@@ -177,10 +177,11 @@ morph2_character_def::display(character* inst)
             e.cp.y = static_cast<int>(utility::flerp(e1.cp.y, e2.cp.y, ratio));
             e.ap.x = static_cast<int>(utility::flerp(e1.ap.x, e2.ap.x, ratio));
             e.ap.y = static_cast<int>(utility::flerp(e1.ap.y, e2.ap.y, ratio));
-            k++;
+            ++k;
             if (p2.size() <= k)
             {
-                k=0; n++;
+                k = 0;
+                ++n;
             }
         }
     }
@@ -250,27 +251,27 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     m_shape1->set_bound(bound1);
     m_shape2->set_bound(bound2);
 
-    const shape_character_def::FillStyleVect& s1Fills = 
+    const shape_character_def::FillStyles& s1Fills = 
         m_shape1->get_fill_styles();
 
-    const shape_character_def::LineStyleVect& s1Lines = 
+    const shape_character_def::LineStyles& s1Lines = 
         m_shape1->get_line_styles();
 
     assert(s1Fills.size() == m_shape2->get_fill_styles().size());
     assert(s1Lines.size() == m_shape2->get_line_styles().size());
 
     // setup array size
-    m_fill_styles.resize(s1Fills.size());
+    _fill_styles.resize(s1Fills.size());
     unsigned int k;
-    for (k = 0; k < m_fill_styles.size(); k++)
+    for (k = 0; k < _fill_styles.size(); k++)
     {
-        fill_style& fs = m_fill_styles[k];
+        fill_style& fs = _fill_styles[k];
         const fill_style& fs1 = s1Fills[k];
         fs.m_gradients.resize(fs1.m_gradients.size());
     }
 
-    m_line_styles.resize(s1Lines.size());
-    m_paths.resize(m_shape1->get_paths().size());
+    _line_styles.resize(s1Lines.size());
+    _paths.resize(m_shape1->get_paths().size());
 
     unsigned edges_count1 = PathList::computeNumberOfEdges(
             m_shape1->get_paths());
