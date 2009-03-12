@@ -86,8 +86,8 @@ public:
     /// Compute bounds by looking at the component paths
     void compute_bound(rect& r, int swfVersion) const;
 
-    const FillStyles& get_fill_styles() const { return _fill_styles; }
-    const LineStyles& get_line_styles() const { return _line_styles; }
+    const FillStyles& fillStyles() const { return _fill_styles; }
+    const LineStyles& lineStyles() const { return _line_styles; }
 
     const std::vector<path>& get_paths() const { return _paths; }
 

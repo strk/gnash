@@ -1639,8 +1639,8 @@ public:
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-    const std::vector<fill_style>& fill_styles = def->get_fill_styles();
-    const std::vector<line_style>& line_styles = def->get_line_styles();
+    const std::vector<fill_style>& fill_styles = def->fillStyles();
+    const std::vector<line_style>& line_styles = def->lineStyles();
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;

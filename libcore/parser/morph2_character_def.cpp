@@ -31,12 +31,40 @@
 
 namespace gnash {
 
-// Facilities for working with list of paths.
-class PathList {
+/// Functors for path and style manipulation.
+namespace {
 
+template<typename T>
+class Lerp
+{
+public:
+    Lerp(typename T::const_iterator style1, typename T::const_iterator style2,
+            const double ratio)
+        :
+        _style1(style1),
+        _style2(style2),
+        _ratio(ratio)
+    {}
+
+    void operator()(typename T::value_type& st)
+    {
+        st.set_lerp(*_style1, *_style2, _ratio);
+        ++_style1, ++_style2;
+    }
+
+private:
+    typename T::const_iterator _style1;
+    typename T::const_iterator _style2;
+    const double _ratio;
+};
+
+// Facilities for working with list of paths.
+class PathList
+{
+    typedef shape_character_def::Paths Paths;
 public:
 
-	PathList(const std::vector<path>& paths)
+	PathList(const Paths& paths)
 		:
 		_paths(paths),
 		_currpath(0),
@@ -59,11 +87,11 @@ public:
 	const edge& getNextEdge()
 	{
 		const edge& ret = _paths[_currpath][_curredge];
-		if ( ++_curredge >= _paths[_currpath].size() )
+        if ( ++_curredge >= _paths[_currpath].size() )
 		{
 			if ( ++_currpath >= _paths.size() )
 			{
-				// this is not really needed,
+                // this is not really needed,
 				// but it's simpler to do so that
 				// to make next call fail or abort..
 				_currpath = 0;
@@ -74,19 +102,20 @@ public:
 	}
 
 	/// Compute total number of edges
-	static size_t computeNumberOfEdges(const std::vector<path>& paths)
+	static size_t computeNumberOfEdges(const Paths& paths)
 	{
 		size_t count=0;
-		for (size_t i = 0, e=paths.size(); i<e; ++i)
-		{
-			count += paths[i].size();
+		for (Paths::const_iterator i = paths.begin(), e = paths.end();
+                i != e; ++i) {
+
+			count += i->size();
 		}
 		return count;
 	}
 
 private:
 
-	const std::vector<path>& _paths;
+	const Paths& _paths;
 
 	size_t _currpath;
 
@@ -95,6 +124,8 @@ private:
 	size_t _nedges;
 
 };
+
+} // anonymous namespace
 
 morph2_character_def::morph2_character_def()
     :
@@ -113,7 +144,7 @@ void
 morph2_character_def::display(character* inst)
 {
 
-    float ratio = inst->get_ratio() / 65535.0;
+    const double ratio = inst->get_ratio() / 65535.0;
 
     // bounds
     rect new_bound;
@@ -121,26 +152,18 @@ morph2_character_def::display(character* inst)
     set_bound(new_bound);
 
     // fill styles
-    FillStyles::const_iterator fs1 = m_shape1->get_fill_styles().begin();
-    FillStyles::const_iterator fs2 = m_shape2->get_fill_styles().begin();
+    const FillStyles::const_iterator fs1 = m_shape1->fillStyles().begin();
+    const FillStyles::const_iterator fs2 = m_shape2->fillStyles().begin();
 
-    for (FillStyles::iterator i = _fill_styles.begin(), e = _fill_styles.end();
-            i != e; ++i, ++fs1, ++fs2) {
-
-        fill_style& fs = *i;
-        fs.set_lerp(*fs1, *fs2, ratio);
-    }
+    std::for_each(_fill_styles.begin(), _fill_styles.end(),
+            Lerp<FillStyles>(fs1, fs2, ratio));
 
     // line styles
-    for (size_t i=0; i < _line_styles.size(); i++)
-    {
-        line_style& ls = _line_styles[i];
+    const LineStyles::const_iterator ls1 = m_shape1->lineStyles().begin();
+    const LineStyles::const_iterator ls2 = m_shape2->lineStyles().begin();
 
-        const line_style& ls1 = m_shape1->get_line_styles()[i];
-        const line_style& ls2 = m_shape2->get_line_styles()[i];
-
-        ls.set_lerp(ls1, ls2, ratio);
-    }
+    std::for_each(_line_styles.begin(), _line_styles.end(),
+            Lerp<LineStyles>(ls1, ls2, ratio));
 
     // This is used for cases in which number
     // of paths in start shape and end shape are not
@@ -252,13 +275,13 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     m_shape2->set_bound(bound2);
 
     const shape_character_def::FillStyles& s1Fills = 
-        m_shape1->get_fill_styles();
+        m_shape1->fillStyles();
 
     const shape_character_def::LineStyles& s1Lines = 
-        m_shape1->get_line_styles();
+        m_shape1->lineStyles();
 
-    assert(s1Fills.size() == m_shape2->get_fill_styles().size());
-    assert(s1Lines.size() == m_shape2->get_line_styles().size());
+    assert(s1Fills.size() == m_shape2->fillStyles().size());
+    assert(s1Lines.size() == m_shape2->lineStyles().size());
 
     // setup array size
     _fill_styles.resize(s1Fills.size());

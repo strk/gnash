@@ -975,8 +975,8 @@ public:
     const SWFMatrix& mat, const cxform& cx)
     {
     
-        const std::vector<fill_style>& fill_styles = def->get_fill_styles();
-        const std::vector<line_style>& line_styles = def->get_line_styles();
+        const std::vector<fill_style>& fill_styles = def->fillStyles();
+        const std::vector<line_style>& line_styles = def->lineStyles();
         bool have_shape, have_outline;
 
         analyzePaths(def->get_paths(), have_shape, have_outline);
