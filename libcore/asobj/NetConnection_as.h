@@ -55,11 +55,6 @@ public:
 	NetConnection_as();
 	~NetConnection_as();
 
-    /// Process connection stuff
-    virtual void advance();
-
-    static as_value advanceWrapper(const fn_call& fn);
-
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;
 
@@ -101,34 +96,28 @@ private:
 
     void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
 
-	/// Extend the URL to be used for playing
-	void addToURL(const std::string& url);
+    /// Extend the URL to be used for playing
+    void addToURL(const std::string& url);
 
-    /// Queue of call groups
-    //
-    /// For HTTP based remoting, each element on this list
-    /// will perform a POST request containing all calls
-    /// to the same uri and dispatch results.
-    ///
-	std::list<ConnectionHandler*> _queuedConnections;
+//     /// Queue of call groups
+//     //
+//     /// For HTTP based remoting, each element on this list
+//     /// will perform a POST request containing all calls
+//     /// to the same uri and dispatch results.
+//     ///
+//     std::list<ConnectionHandler*> _queuedConnections;
 
-    /// Queue of calls gathered during a single movie advancement
-    //
-    /// For HTTP based remoting, these calls will be performed
-    /// by a single POST operation.
-    ///
-    std::auto_ptr<ConnectionHandler> _currentConnection; 
+//     /// Queue of calls gathered during a single movie advancement
+//     //
+//     /// For HTTP based remoting, these calls will be performed
+//     /// by a single POST operation.
+//     ///
+//     std::auto_ptr<ConnectionHandler> _currentConnection; 
 
-	/// the url prefix optionally passed to connect()
-	std::string _uri;
+    /// the url prefix optionally passed to connect()
+    std::string _uri;
 
     bool _isConnected;
-
-    void startAdvanceTimer();
-
-    void stopAdvanceTimer();
-
-    int _advanceTimer;
 };
 
 void netconnection_class_init(as_object& global);
