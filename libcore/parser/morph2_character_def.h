@@ -42,43 +42,37 @@ public:
     void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
     virtual void display(character* inst);
-    void lerp_matrix(SWFMatrix& t, const SWFMatrix& m1, const SWFMatrix& m2, const float ratio);
 
     // Question: What is the bound of a morph? Is this conceptually correct?
     /// TODO: optimize this by take ratio into consideration, to decrease some
     /// invalidated area when rendering morphs
     virtual const rect&	get_bound() const 
     { 
-        m_bound.expand_to_rect(m_shape1->get_bound());
-        m_bound.expand_to_rect(m_shape2->get_bound());
-        return m_bound;
+        _bound.expand_to_rect(m_shape1->get_bound());
+        _bound.expand_to_rect(m_shape2->get_bound());
+        return _bound;
     }
 
 protected:
 
 #ifdef GNASH_USE_GC
-/// Mark all reachable resources of a morph2_character_def, for the GC
-//
-/// Reachable resources are:
-///	- The start and end shapes (m_shape1, m_shape2)
-///
-virtual void markReachableResources() const
-{
-    if ( m_shape1 ) m_shape1->setReachable();
-    if ( m_shape2 ) m_shape2->setReachable();
-}
-#endif // GNASH_USE_GC
+    /// Reachable resources are:
+    ///	- The start and end shapes (m_shape1, m_shape2)
+    virtual void markReachableResources() const
+    {
+        if (m_shape1) m_shape1->setReachable();
+        if (m_shape2) m_shape2->setReachable();
+    }
+#endif 
 
 private:
     boost::intrusive_ptr<shape_character_def> m_shape1;
     boost::intrusive_ptr<shape_character_def> m_shape2;
-    unsigned int offset;
-    int fill_style_count;
-    int line_style_count;
-    float m_last_ratio;
-    mutable rect m_bound;
+    
+    mutable rect _bound;
+    
 };
-}
+} // namespace gnash
 
 
 #endif // GNASH_MORPH2_H

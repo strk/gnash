@@ -130,8 +130,7 @@ private:
 morph2_character_def::morph2_character_def()
     :
     m_shape1(new shape_character_def),
-    m_shape2(new shape_character_def),
-    m_last_ratio(-1.0f)
+    m_shape2(new shape_character_def)
 {
 }
 
@@ -201,8 +200,8 @@ morph2_character_def::display(character* inst)
             e.ap.x = static_cast<int>(utility::flerp(e1.ap.x, e2.ap.x, ratio));
             e.ap.y = static_cast<int>(utility::flerp(e1.ap.y, e2.ap.y, ratio));
             ++k;
-            if (p2.size() <= k)
-            {
+
+            if (p2.size() <= k) {
                 k = 0;
                 ++n;
             }
@@ -226,9 +225,7 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     bound1.read(in);
     bound2.read(in);
 
-    if (tag == SWF::DEFINEMORPHSHAPE2 ||
-            tag == SWF::DEFINEMORPHSHAPE2_)
-    {
+    if (tag == SWF::DEFINEMORPHSHAPE2 || tag == SWF::DEFINEMORPHSHAPE2_) {
         // TODO: Use these values.
         rect inner_bound1, inner_bound2;
         inner_bound1.read(in);
@@ -242,23 +239,23 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     }
 
     in.ensureBytes(4);
-    offset = in.read_u32();
+    boost::uint32_t offset = in.read_u32();
+
+    UNUSED(offset); // why?
 
     // Next line will throw ParserException on malformed SWF
-    fill_style_count = in.read_variable_count();
-    int i;
+    boost::uint16_t fillCount = in.read_variable_count();
+    
     fill_style fs1, fs2;
-    for (i = 0; i < fill_style_count; ++i)
-    {
+    for (size_t i = 0; i < fillCount; ++i) {
         fs1.read(in, tag, md, &fs2);
         m_shape1->addFillStyle(fs1);
         m_shape2->addFillStyle(fs2);
     }
 
-    line_style_count = in.read_variable_count();
+    boost::uint16_t lineCount = in.read_variable_count();
     line_style ls1, ls2;
-    for (i = 0; i < line_style_count; ++i)
-    {
+    for (size_t i = 0; i < lineCount; ++i) {
         ls1.read_morph(in, tag, md, &ls2);
         m_shape1->addLineStyle(ls1);
         m_shape2->addLineStyle(ls2);
@@ -274,31 +271,28 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     m_shape1->set_bound(bound1);
     m_shape2->set_bound(bound2);
 
-    const shape_character_def::FillStyles& s1Fills = 
-        m_shape1->fillStyles();
+    const shape_character_def::FillStyles& s1Fills = m_shape1->fillStyles();
 
-    const shape_character_def::LineStyles& s1Lines = 
-        m_shape1->lineStyles();
+    const shape_character_def::LineStyles& s1Lines = m_shape1->lineStyles();
 
     assert(s1Fills.size() == m_shape2->fillStyles().size());
     assert(s1Lines.size() == m_shape2->lineStyles().size());
 
     // setup array size
     _fill_styles.resize(s1Fills.size());
-    unsigned int k;
-    for (k = 0; k < _fill_styles.size(); k++)
-    {
-        fill_style& fs = _fill_styles[k];
-        const fill_style& fs1 = s1Fills[k];
-        fs.m_gradients.resize(fs1.m_gradients.size());
+    FillStyles::const_iterator s1 = s1Fills.begin();
+    for (FillStyles::iterator i = _fill_styles.begin(), e = _fill_styles.end();
+            i != e; ++i, ++s1) {
+
+        i->m_gradients.resize(s1->m_gradients.size());
     }
 
     _line_styles.resize(s1Lines.size());
     _paths.resize(m_shape1->get_paths().size());
 
-    unsigned edges_count1 = PathList::computeNumberOfEdges(
+    const unsigned edges_count1 = PathList::computeNumberOfEdges(
             m_shape1->get_paths());
-    unsigned edges_count2 = PathList::computeNumberOfEdges(
+    const unsigned edges_count2 = PathList::computeNumberOfEdges(
             m_shape2->get_paths());
 
     IF_VERBOSE_PARSE(
