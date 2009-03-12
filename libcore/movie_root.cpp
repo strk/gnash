@@ -1042,15 +1042,18 @@ movie_root::clear_interval_timer(unsigned int x)
 
 }
 
-void
+bool
 movie_root::advance()
 {
 	unsigned int now = _vm.getTime();
+
+    bool advanced = false;
 
     try {
 
 	    if ( (now - _lastMovieAdvancement) >= _movieAdvancementDelay )
 	    {
+            advanced = true;
 		    advanceMovie();
 		    // setting to 'now' discards time spent on actual rendering and
 		    // action processing.
@@ -1080,6 +1083,8 @@ movie_root::advance()
         log_error(_("Buffer overread during advance: %s"), e.what());
         clearActionQueue();
     }
+
+    return advanced;
 }
 	
 void

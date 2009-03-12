@@ -358,7 +358,11 @@ public:
  
     /// Main and only callback from hosting application.
     /// Expected to be called at 10ms resolution.
-    void advance();
+    //
+    /// @return true if the heart-beat resulted in actual
+    ///         SWF playhead advancement (frame advancement)
+    ///
+    bool advance();
 
     /// Entry point for movie advancement
     //

@@ -905,26 +905,33 @@ Gui::advanceMovie()
 
 	gnash::movie_root* m = _stage;
 	
-#ifdef GNASH_FPS_DEBUG
-	fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
-#endif
-
 // Define REVIEW_ALL_FRAMES to have *all* frames
 // consequencially displaied. Useful for debugging.
 //#define REVIEW_ALL_FRAMES 1
 
 #ifndef REVIEW_ALL_FRAMES
 	// Advance movie by one frame
-	m->advance();
+#ifdef GNASH_FPS_DEBUG
+	bool advanced = 
+#endif
+        m->advance();
 #else
 	size_t cur_frame = m->getRootMovie()->get_current_frame();
 	size_t tot_frames = m->getRootMovie()->get_frame_count();
-	m->advance();
+#ifdef GNASH_FPS_DEBUG
+	bool advanced = 
+#endif
+	    m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
     	m->set_play_state(gnash::MovieClip::PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
+
+#ifdef GNASH_FPS_DEBUG
+	if ( advanced ) fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
+#endif
+
 
 
 #ifdef SKIP_RENDERING_IF_LATE
