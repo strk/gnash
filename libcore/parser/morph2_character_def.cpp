@@ -96,11 +96,12 @@ private:
 
 };
 
-morph2_character_def::morph2_character_def():
-    m_last_ratio(-1.0f)
-{   /* Markus: No delete??? */
-    m_shape1 = new shape_character_def();
-    m_shape2 = new shape_character_def();
+morph2_character_def::morph2_character_def()
+    :
+    m_last_ratio(-1.0f),
+    m_shape1(new shape_character_def),
+    m_shape2(new shape_character_def)
+{
 }
 
 
@@ -108,19 +109,19 @@ morph2_character_def::~morph2_character_def()
 {
 }
 
-void	morph2_character_def::display(character* inst)
+void
+morph2_character_def::display(character* inst)
 {
-//		GNASH_REPORT_FUNCTION;
 
-    unsigned int i = 0;
     float ratio = inst->get_ratio() / 65535.0;
+
     // bounds
-    rect	new_bound;
+    rect new_bound;
     new_bound.set_lerp(m_shape1->get_bound(), m_shape2->get_bound(), ratio);
     set_bound(new_bound);
 
     // fill styles
-    for (; i < m_fill_styles.size(); i++)
+    for (size_t i = 0; i < m_fill_styles.size(); i++)
     {
         fill_style& fs = m_fill_styles[i];
 
@@ -131,7 +132,7 @@ void	morph2_character_def::display(character* inst)
     }
 
     // line styles
-    for (i=0; i < m_line_styles.size(); i++)
+    for (size_t i=0; i < m_line_styles.size(); i++)
     {
         line_style& ls = m_line_styles[i];
 
@@ -148,10 +149,9 @@ void	morph2_character_def::display(character* inst)
     edge empty_edge;
 
     // shape
-    unsigned int k=0, n=0;
     const std::vector<path>& paths1 = m_shape1->get_paths();
     const std::vector<path>& paths2 = m_shape2->get_paths();
-    for (i=0; i < m_paths.size(); i++)
+    for (size_t i = 0, k = 0, n = 0; i < m_paths.size(); i++)
     {
         path& p = m_paths[i];
         const path& p1 = i < paths1.size() ? paths1[i] : empty_path;
@@ -185,11 +185,8 @@ void	morph2_character_def::display(character* inst)
         }
     }
 
-//  display
-
-{
-gnash::render::draw_shape_character(this, inst);
-}
+    //  display
+    render::draw_shape_character(this, inst);
 
 }
 
@@ -302,7 +299,8 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     );
 
 }
-}
+
+} // namespace gnash
 
 // Local Variables:
 // mode: C++
