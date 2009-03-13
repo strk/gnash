@@ -25,13 +25,10 @@
 #include <iostream>
 #include <string>
 #include <boost/scoped_ptr.hpp>
-
-// FIXME: Get rid of this crap.
-#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
-# include <winsock.h>
-#else
-#include <arpa/inet.h> // for htons
-#endif
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "NetConnection_as.h"
 #include "log.h"
@@ -47,12 +44,19 @@
 // for NetConnection_as.call()
 #include "VM.h"
 #include "amf.h"
+#include "http.h"
 #include "SimpleBuffer.h"
-#include "timers.h"
+#include "amf_msg.h"
+#include "buffer.h"
 #include "namedStrings.h"
+#include "element.h"
+#include "network.h"
+#include "rtmp.h"
+#include "rtmp_client.h"
 
+using namespace std;
 
-//#define GNASH_DEBUG_REMOTING
+#define GNASH_DEBUG_REMOTING 1
 
 // Forward declarations.
 
@@ -90,8 +94,7 @@ netconnection_class_init(as_object& global)
     // This is going to be the global NetConnection "class"/"function"
     static boost::intrusive_ptr<builtin_function> cl;
 
-    if ( cl == NULL )
-    {
+    if (cl == NULL) {
         cl=new builtin_function(&netconnection_new,
                 getNetConnectionInterface());
         // replicate all interface to class, to be able to access
@@ -143,6 +146,7 @@ NetConnection_as::validateURL() const
 void
 NetConnection_as::notifyStatus(StatusCode code)
 {
+    GNASH_REPORT_FUNCTION;
     std::pair<std::string, std::string> info;
     getStatusCodeInfo(code, info);
 
@@ -208,6 +212,7 @@ NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 void
 NetConnection_as::connect()
 {
+    GNASH_REPORT_FUNCTION;
     // Close any current connections.
     close();
     _isConnected = true;
@@ -218,6 +223,7 @@ NetConnection_as::connect()
 void
 NetConnection_as::connect(const std::string& uri)
 {
+    GNASH_REPORT_FUNCTION;
     // Close any current connections. (why?) Because that's what happens.
     close();
 
@@ -231,22 +237,7 @@ NetConnection_as::connect(const std::string& uri)
     const movie_root& mr = _vm.getRoot();
     URL url(uri, mr.runInfo().baseURL());
 
-    if (url.protocol() == "rtmp") {
-        LOG_ONCE( log_unimpl("NetConnection.connect(%s): RTMP not yet supported", url) );
-        notifyStatus(CONNECT_FAILED);
-        return;
-    }
-
-    if ( url.protocol() != "http" ) {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("NetConnection.connect(%s): invalid connection protocol", url);
-        );
-        notifyStatus(CONNECT_FAILED);
-        return;
-    }
-
-    // This is for HTTP remoting
-
+    // This is for remoting
     if (!URLAccessManager::allow(url)) {
         log_security(_("Gnash is not allowed to NetConnection.connect to %s"), url);
         notifyStatus(CONNECT_FAILED);
@@ -262,6 +253,7 @@ NetConnection_as::connect(const std::string& uri)
 void
 NetConnection_as::close()
 {
+    GNASH_REPORT_FUNCTION;
 
     /// TODO: what should actually happen here? Should an attached
     /// NetStream object be interrupted?
@@ -278,10 +270,166 @@ NetConnection_as::setURI(const std::string& uri)
     _uri = uri;
 }
 
+//
 void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args, size_t firstArg)
 {
+    GNASH_REPORT_FUNCTION;
+
+    URL url(_uri);
+
+    // The values for the connect call were set in ::connect(), but according
+    // to documentation, the connection isn't actually started till the first
+    // ()call(). My guess is back in the days of non-persistant network
+    // connections, each ::call() made it's own connection.
+    if (_isConnected == false) {
+
+	// We're using RTMPT, which is AMF over HTTP
+	short port = strtol(url.port().c_str(), NULL, 0) & 0xffff;
+	if ((url.protocol() == "rtmpt")
+	    || (url.protocol() == "http")) {
+	    _http_client.reset(new HTTP);
+	    _http_client->toggleDebug(true);
+	    if (!_http_client->createClient(url.hostname(), port)) {
+		log_error("Can't connect to server %s on port %s",
+			  url.hostname(), url.port());
+		notifyStatus(CONNECT_FAILED);
+		return;
+	    } else {
+		log_debug("Connected to server %s on port %s",
+			  url.hostname(), url.port());
+		notifyStatus(CONNECT_SUCCESS);
+	    }
+	// We're using RTMP, Connect via RTMP
+	} else if (url.protocol() == "rtmp") {
+	    _rtmp_client.reset(new RTMPClient);
+	    _rtmp_client->toggleDebug(true);
+// 	    if (!_rtmp_client.createClient(url.hostname(), port)) {
+// 		log_error("Can't connect to RTMP server %s", url.hostname());
+// 		notifyStatus(CONNECT_FAILED);
+// 		return;
+// 	    }
+	    if (!_rtmp_client->handShakeRequest()) {
+		log_error("RTMP handshake request failed");
+		notifyStatus(CONNECT_FAILED);
+		return;
+	    }
+	    
+	    if (!_rtmp_client->clientFinish()) {
+		log_error("RTMP handshake completion failed");
+		notifyStatus(CONNECT_FAILED);
+		return;
+	    }
+	    string app;		// the application name
+	    string path;	// the path to the file on the server
+	    string tcUrl;	// the tcUrl field
+	    string swfUrl;	// the swfUrl field
+	    string filename;	// the filename to play
+	    string pageUrl;     // the pageUrl field
+	    tcUrl = url.protocol() + "://" + url.hostname();
+	    if (!url.querystring().empty()) {
+		tcUrl += "/" + url.querystring();
+	    } else {
+		tcUrl += "/" + url.path();
+	    }
+	    app = url.path();
+	    // FIXME: this should be the name of the refering swf file
+	    swfUrl = "mediaplayer.swf";
+	    // FIXME: This should be the URL for the referring web page
+	    pageUrl = "http://gnashdev.org";
+
+// 	    boost::shared_ptr<buf2> = _rtmp_client->encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
+// 	    size_t total_size = buf2->allocated();
+// 	    RTMPMsg *msg1 = _rtmp_client->sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf2);
+
+	    // the connectino process is complete
+// 	    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+// 		notifyStatus(CONNECT_SUCCESS);
+// 	    } else {
+// 		notifyStatus(CONNECT_FAILED);
+// 		return;
+// 	    }
+	} // end of 'if RTMP'
+#if 0
+	// FIXME: do a GET request for the crossdomain.xml file
+	// in a portable way!
+	HTTP http;
+	log_debug("Requesting crossdomain.xml file...");
+	amf::Buffer &request = http.formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
+	writeNet(request);
+#endif
+    }
+    static int numCalls = 0;
+    amf::AMF_msg top;
+    
+    boost::shared_ptr<amf::Element> name(new amf::Element);
+    name->makeString(methodName);
+
+    // make the result
+    std::ostringstream os;
+    os << "/";
+    // Call number is not used if the callback is undefined
+    if ( asCallback ) {
+        os << ++numCalls; 
+    }
+    boost::shared_ptr<amf::Element> response(new amf::Element);
+    name->makeString(os.str());
+
+    boost::shared_ptr<amf::Element> data(new amf::Element);
+    data->makeStrictArray();
+    for (size_t i=firstArg; i<args.size(); i++) {
+	boost::shared_ptr<amf::Element> el = args[i].to_element();
+	data->addProperty(el);
+    }
+    data->dump();
+
+    boost::shared_ptr<amf::AMF_msg::amf_message_t> msg(new amf::AMF_msg::amf_message_t);
+    msg->header.target = methodName;
+    msg->header.response = os.str();
+    msg->header.size = data->calculateSize(*data);
+    msg->data = data;
+    top.addMessage(msg);
+    
+    boost::shared_ptr<amf::Buffer> buf = top.encodeAMFPacket();
+//     top.dump();
+//     buf->dump();
+
+    // Send the request via HTTP
+    if ((url.protocol() == "rtmpt")
+	|| (url.protocol() == "http")) {
+	HTTP http;
+	log_debug("Requesting echo response file...");
+	// "/echo/gateway"
+	amf::Buffer &request = http.formatRequest(url.path(), HTTP::HTTP_POST);
+	http.formatContentLength(buf->allocated());
+	// All HTTP messages are followed by a blank line.
+	http.terminateHeader();
+	request += buf;
+	_http_client->writeNet(request);
+	
+    }
+
+    // Send the request via RTMP
+    if (url.protocol() == "rtmp") {
+// 	boost::shared_ptr<buf3> = _rtmp_client->encodeStream(0x2);
+// 	//    buf3->dump();
+// 	total_size = buf3->size();
+// 	RTMPMsg *msg2 = _rtmp_client->sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
+    }
+
+    NetConnection_as::thread_params_t tdata;
+    tdata.callback = asCallback;
+    tdata.network = reinterpret_cast<Network *>(this);
+//     tdata.vm = &vm;
+
+    //    this->test();
+
+    // Start a thread to wait for the response
+    boost::thread process_thread(boost::bind(&net_handler, &tdata));
+    
+//    _currentConnection.reset(new HTTPRemotingHandler(*this, url));
+
 }
 
 std::auto_ptr<IOChannel>
@@ -316,6 +464,7 @@ namespace {
 as_value
 netconnection_call(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetConnection_as> ptr = 
         ensureType<NetConnection_as>(fn.this_ptr); 
 
@@ -360,6 +509,7 @@ netconnection_call(const fn_call& fn)
 as_value
 netconnection_close(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetConnection_as> ptr =
         ensureType<NetConnection_as>(fn.this_ptr); 
 
@@ -447,12 +597,12 @@ netconnection_new(const fn_call& /* fn */)
 as_value
 netconnection_connect(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<NetConnection_as> ptr =
         ensureType<NetConnection_as>(fn.this_ptr); 
     
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("NetConnection.connect(): needs at least "
                     "one argument"));
@@ -471,10 +621,8 @@ netconnection_connect(const fn_call& fn)
     // Check first arg for validity 
     if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined())) {
         ptr->connect();
-    }
-    else {
-        if ( fn.nargs > 1 )
-        {
+    } else {
+        if ( fn.nargs > 1 ){
             std::stringstream ss; fn.dump_args(ss);
             log_unimpl("NetConnection.connect(%s): args after the first are "
                     "not supported", ss.str());
@@ -486,6 +634,122 @@ netconnection_connect(const fn_call& fn)
 
 }
 
+// This thread waits for data from the server, and executes the callback
+extern "C" {
+bool DSOEXPORT 
+net_handler(NetConnection_as::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+
+#ifdef USE_STATISTICS
+	struct timespec start;
+	clock_gettime (CLOCK_REALTIME, &start);
+#endif
+    bool result = false;
+    bool done = false;
+    int ret = 0;
+
+//    boost::mutex::scoped_lock lock(call_mutex);
+
+//    args->caller->test();
+
+    // Suck all the data waiting for us in the network
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+    do {
+	int ret = args->network->readNet(buf->reference() + buf->allocated(), 
+					 buf->size(), 10);
+	// The timeout expired
+ 	if (ret == 0) {
+	    log_debug("no data yet for fd #%d, continuing...",
+		      args->network->getFileFd());
+	    result = false;
+ 	    done = true;
+ 	}
+	// Something happened to the network connection
+	if ((ret == static_cast<int>(string::npos)) || (ret == -1)) {
+	    log_debug("socket for fd #%d was closed...",
+		      args->network->getFileFd());
+	    return false;
+	}
+	// We got data.
+	if (ret > 0) {
+	    // If we got less data than we tried to read, then we got the
+	    // whole packet most likely.
+	    if (ret < buf->size()) {
+		done = true;
+		result = true;
+	    }
+	    if (ret == buf->size()) {
+		// become larger by another default block size.
+		buf->resize(buf->size() + amf::NETBUFSIZE);
+		log_debug("Got a full packet, making the buffer larger to %d",
+			  buf->size());
+		result = true;
+	    }
+	    // manually set the seek pointer in the buffer, as we read
+	    // the data into the raw memory allocated to the buffer. We
+	    // only want to do this if we got data of course.
+	    buf->setSeekPointer(buf->end() + ret);
+	} else {
+	    log_debug("no more data for fd #%d, exiting...", 
+		      args->network->getFileFd());
+	    done = true;
+	}
+    } while(done != true);
+
+    // Now process the data
+    if (result) {
+	HTTP http;
+// 	http.dump();
+	amf::AMF amf;
+	boost::uint8_t *data = http.processHeaderFields(*buf);
+	boost::shared_ptr<std::vector<std::string> > encoding = http.getFieldItem("transfer-encoding");
+	size_t length = http.getContentLength();
+	if (http.getField("content-type") == "application/x-amf") {
+	    amf::AMF_msg amsg;
+	    boost::shared_ptr<amf::AMF_msg::context_header_t> head =
+		amsg.parseAMFPacket(data, length);
+	    
+ 	    amsg.dump();
+	    log_debug("%d messages in AMF packet", amsg.messageCount());
+	    for (size_t i=0; i<amsg.messageCount(); i++) {
+ 		amsg.getMessage(i)->data->dump();
+ 		boost::shared_ptr<amf::Element> el = amsg.getMessage(i)->data;
+ 		as_value tmp(*el);
+ 		NetConnection_as *obj = (NetConnection_as *)args->network;
+		log_debug("Calling NetConnection %s(%s)",
+			  amsg.getMessage(i)->header.target, tmp);
+		// The method name looks something like this: /17/onResult
+		// the first field is a sequence number so each response can
+		// be matched to the request that made it. We only want the
+		// name part, so we can call the method.
+		string::size_type pos = amsg.getMessage(i)->header.target.find('/', 1);
+		string methodName;
+		if (pos != string::npos) {
+		    methodName = amsg.getMessage(i)->header.target.substr(pos+1,  amsg.getMessage(i)->header.target.size());
+		}
+		VM& vm = args->callback->getVM();
+ 		string_table& st = vm.getStringTable();
+		string_table::key methodKey;
+		methodKey = st.find(methodName);
+  		args->callback->callMethod(methodKey, tmp);
+	    }
+	} else {// not AMF data
+	    log_debug("Content type is: %d", http.getField("content-type"));
+	    if ((http.getField("content-type") == "application/xml")
+		|| (http.getField("content-type") == "text/html")) {
+		log_debug("Textual Data is: %s", reinterpret_cast<char *>(data));
+	    } else {
+		log_debug("Binary Data is: %s", hexify(data, length, true));
+	    }
+	}
+    }
+
+    log_debug("net_handler all done...");
+
+    return result;
+}
+} // end of extern C
 
 as_value
 netconnection_addHeader(const fn_call& fn)
@@ -502,3 +766,7 @@ netconnection_addHeader(const fn_call& fn)
 
 } // end of gnash namespace
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
