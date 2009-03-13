@@ -57,7 +57,8 @@ static RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 extern map<int, Handler *> handlers;
 
 RTMPClient::RTMPClient()
-    : _connections(0)
+    : _connected(false),
+      _connections(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -65,6 +66,8 @@ RTMPClient::RTMPClient()
 RTMPClient::~RTMPClient()
 {
 //    GNASH_REPORT_FUNCTION;
+    _connected = false;
+
     _properties.clear();
 //    delete _body;
 }
@@ -396,7 +399,12 @@ RTMPClient::clientFinish()
     }
 
     ret = writeNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-    if ( ret <= 0 ) return false;
+    if ( ret <= 0 ) {
+	return false;
+    }
+
+    // Since the handshake completed sucessfully, we're connected.
+    _connected == true;
 
     return true;
 }
