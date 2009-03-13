@@ -354,12 +354,14 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 #if 0
 	// FIXME: do a GET request for the crossdomain.xml file
 	// in a portable way!
-	HTTP http;
 	log_debug("Requesting crossdomain.xml file...");
-	amf::Buffer &request = http.formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
-	writeNet(request);
+	amf::Buffer &request = _http_client->formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
+	_http_client->writeNet(request);
 #endif
     }
+    NetConnection_as::thread_params_t tdata;
+    tdata.callback = asCallback;
+
     static int numCalls = 0;
     amf::AMF_msg top;
     
@@ -407,21 +409,19 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	http.terminateHeader();
 	request += buf;
 	_http_client->writeNet(request);
-	
+	tdata.network = reinterpret_cast<Network *>(_http_client.get());
+	//     tdata.vm = &vm;
     }
 
     // Send the request via RTMP
     if (url.protocol() == "rtmp") {
+	tdata.network = reinterpret_cast<Network *>(_http_client.get());
 // 	boost::shared_ptr<buf3> = _rtmp_client->encodeStream(0x2);
 // 	//    buf3->dump();
 // 	total_size = buf3->size();
 // 	RTMPMsg *msg2 = _rtmp_client->sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
     }
 
-    NetConnection_as::thread_params_t tdata;
-    tdata.callback = asCallback;
-    tdata.network = reinterpret_cast<Network *>(this);
-//     tdata.vm = &vm;
 
     //    this->test();
 

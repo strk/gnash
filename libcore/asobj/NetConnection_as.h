@@ -47,8 +47,8 @@ public:
 
    // This is used to pass parameters to a thread using boost::bind
     typedef struct {
-	as_object *callback;
-	Network   *network;
+	as_object        *callback;
+	Network          *network;
     } thread_params_t;
 
     enum StatusCode
