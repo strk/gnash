@@ -182,7 +182,6 @@ namespace {
 
 class AlphaMask;
 
-
 typedef std::vector<agg::path_storage> AggPaths;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
 typedef std::vector<AlphaMask*> AlphaMasks;
@@ -478,29 +477,18 @@ public:
 
     typedef agg::trans_affine Matrix;
 
-    VideoRenderer(const ClipBounds& clipbounds, GnashImage* frame,
-            Matrix& mat, Quality quality)
+    VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
+            Matrix& mat, Quality quality, bool smooth)
         :
-        _buf(frame->data(), frame->width(), frame->height(),
-                frame->pitch()),
+        _buf(frame.data(), frame.width(), frame.height(),
+                frame.pitch()),
         _pixf(_buf),
         _accessor(_pixf),
         _interpolator(mat),
         _clipbounds(clipbounds),
-        _quality(quality)
+        _quality(quality),
+        _smoothing(smooth)
     {}
-
-    /// Change the rendering quality required.
-    void setQuality(Quality quality)
-    {
-        _quality = quality;
-    }
-
-    /// Set whether smoothing is requested
-    void smooth(bool b)
-    {
-        _smoothing = b;
-    }
 
     void render(agg::path_storage& path, Renderer& rbase,
             const AlphaMasks& masks)
@@ -563,7 +551,7 @@ private:
     // rendering buffer is used to access the frame pixels here        
     agg::rendering_buffer _buf;
 
-    SourceFormat _pixf;
+    const SourceFormat _pixf;
     
     Accessor _accessor;
          
@@ -574,7 +562,7 @@ private:
     const ClipBounds& _clipbounds;
 
     /// Quality of renderering
-    Quality _quality;
+    const Quality _quality;
 
     /// Whether smoothing is required.
     bool _smoothing;
@@ -602,6 +590,22 @@ public:
         return new agg_bitmap_info(im);
     }
 
+    template<typename SourceFormat, typename Matrix>
+    void renderVideo(GnashImage& frame, Matrix& img_mtx,
+            agg::path_storage path, bool smooth)
+    {
+
+        // renderer base for the stage buffer (not the frame image!)
+        renderer_base& rbase = *m_rbase;
+
+        VideoRenderer<PixelFormat, SourceFormat> vr(_clipbounds, frame,
+                img_mtx, _quality, smooth);
+
+        // If smoothing is requested and _quality is set to HIGH or BEST,
+        // use high-quality interpolation.
+        vr.render(path, rbase, _alphaMasks);
+    }
+
     void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
         const rect* bounds, bool smooth)
     {
@@ -609,14 +613,6 @@ public:
         // NOTE: Assuming that the source image is RGB 8:8:8
         // TODO: keep heavy instances alive accross frames for performance!
         // TODO: Maybe implement specialization for 1:1 scaled videos
-        
-        if (frame->type() == GNASH_IMAGE_RGBA) {
-                LOG_ONCE(log_error(_("Can't render videos with alpha")));
-                return;
-        }
-
-        assert(frame->type() == GNASH_IMAGE_RGB);
-        
         SWFMatrix mat = stage_matrix;
         mat.concatenate(*source_mat);
         
@@ -629,14 +625,14 @@ public:
         
         // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
         // pixel coordinates while we're at it
-        agg::trans_affine img_mtx(mat.sx / 65536.0, mat.shx / 65536.0, 
+        agg::trans_affine mtx(mat.sx / 65536.0, mat.shx / 65536.0, 
             mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);        
         
         // invert SWFMatrix since this is used for the image source
-        img_mtx.invert();
+        mtx.invert();
         
         // Apply video scale
-        img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
+        mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
         
         // make a path for the video outline
         point a, b, c, d;
@@ -652,19 +648,19 @@ public:
         path.line_to(d.x, d.y);
         path.line_to(a.x, a.y);
 
-        // renderer base for the stage buffer (not the frame image!)
-        renderer_base& rbase = *m_rbase;
-        
-        // TODO: keep this alive and only update image / matrix? I've no
-        // idea how much reallocation that would save.
-        VideoRenderer<PixelFormat> vr(_clipbounds, frame, img_mtx, _quality);
+        switch (frame->type())
+        {
+            case GNASH_IMAGE_RGBA:
+                renderVideo<agg::pixfmt_rgba32_pre>(*frame, mtx, path, smooth);
+                break;
+            case GNASH_IMAGE_RGB:
+                renderVideo<agg::pixfmt_rgb24_pre>(*frame, mtx, path, smooth);
+                break;
+            default:
+                log_error("Can't render this type of frame");
+                break;
+        }
 
-        vr.smooth(smooth);
-
-        // If smoothing is requested and _quality is set to HIGH or BEST,
-        // use high-quality interpolation.
-        vr.render(path, rbase, _alphaMasks);
-                
     } 
 
   // Constructor

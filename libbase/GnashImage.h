@@ -222,7 +222,8 @@ public:
     {}
 
     ImageRGB(boost::uint8_t* data, int width, int height, int stride)
-        : GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
+        :
+        GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
     {}
 
     ~ImageRGB();
@@ -247,6 +248,11 @@ public:
         GnashImage(o)
     {}
 
+    ImageRGBA(boost::uint8_t* data, int width, int height, int stride)
+        :
+        GnashImage(data, width, height, stride, GNASH_IMAGE_RGBA)
+    {}
+    
     ~ImageRGBA();
 
     /// Set pixel value 
