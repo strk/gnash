@@ -478,7 +478,7 @@ public:
     typedef agg::trans_affine Matrix;
 
     VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
-            Matrix& mat, Quality quality)
+            Matrix& mat, Quality quality, bool smooth)
         :
         _buf(frame.data(), frame.width(), frame.height(),
                 frame.pitch()),
@@ -486,20 +486,9 @@ public:
         _accessor(_pixf),
         _interpolator(mat),
         _clipbounds(clipbounds),
-        _quality(quality)
+        _quality(quality),
+        _smoothing(smooth)
     {}
-
-    /// Change the rendering quality required.
-    void setQuality(Quality quality)
-    {
-        _quality = quality;
-    }
-
-    /// Set whether smoothing is requested
-    void smooth(bool b)
-    {
-        _smoothing = b;
-    }
 
     void render(agg::path_storage& path, Renderer& rbase,
             const AlphaMasks& masks)
@@ -610,9 +599,7 @@ public:
         renderer_base& rbase = *m_rbase;
 
         VideoRenderer<PixelFormat, SourceFormat> vr(_clipbounds, frame,
-                img_mtx, _quality);
-
-        vr.smooth(smooth);
+                img_mtx, _quality, smooth);
 
         // If smoothing is requested and _quality is set to HIGH or BEST,
         // use high-quality interpolation.
