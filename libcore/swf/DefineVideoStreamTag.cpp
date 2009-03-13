@@ -23,6 +23,7 @@
 #include "VideoDecoder.h"
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
+#include "GnashAlgorithm.h"
 
 namespace gnash {
 namespace SWF {
@@ -63,8 +64,7 @@ DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t id)
 
 DefineVideoStreamTag::~DefineVideoStreamTag()
 {
-	std::for_each(_video_frames.begin(), _video_frames.end(),
-		      boost::checked_deleter<media::EncodedVideoFrame>());
+    deleteAllChecked(_video_frames);
 }
 
 

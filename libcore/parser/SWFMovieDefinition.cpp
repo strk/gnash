@@ -42,6 +42,7 @@
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
 #include "ExportableResource.h"
+#include "GnashAlgorithm.h"
 
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
@@ -217,11 +218,7 @@ SWFMovieDefinition::~SWFMovieDefinition()
             e = m_playlist.end(); i != e; ++i)
 	{
 		PlayList& pl = i->second;
-
-		for (PlayList::iterator j = pl.begin(), je = pl.end(); j!=je; ++j)
-		{
-            delete *j;
-        }
+        deleteAllChecked(pl);
     }
 
 	// It's supposed to be cleaned up in read()

@@ -20,6 +20,7 @@
 #ifndef GNASH_ALGORITHM_H
 #define GNASH_ALGORITHM_H
 
+#include <algorithm>
 #include <boost/checked_delete.hpp>
 
 namespace gnash {
@@ -91,6 +92,13 @@ struct CheckedDeleter<T*>
 		del(p);
 	}
 };
+
+template<typename T>
+void
+deleteAllChecked(const T& c)
+{
+    std::for_each(c.begin(), c.end(), CheckedDeleter<typename T::value_type>());
+}
 
 } // namespace gnash
 

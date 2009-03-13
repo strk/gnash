@@ -29,6 +29,7 @@
 #include "timers.h"
 #include "utf8.h"
 #include "fn_call.h"
+#include "GnashAlgorithm.h"
 
 #include <sstream>
 #include <map>
@@ -53,12 +54,8 @@ LoadableObject::LoadableObject()
 
 LoadableObject::~LoadableObject()
 {
-    for (LoadThreadList::iterator it = _loadThreads.begin(),
-            e = _loadThreads.end(); it != e; ++it)
-    {
-        // Joins the thread
-        delete *it;
-    }
+
+    deleteAllChecked(_loadThreads);
 
     if ( _loadCheckerTimer )
     {

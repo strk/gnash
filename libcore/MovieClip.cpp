@@ -42,6 +42,7 @@
 #include "VM.h"
 #include "Range2d.h" // for getBounds
 #include "GnashException.h"
+#include "GnashAlgorithm.h"
 #include "URL.h"
 #include "sound_handler.h"
 #include "StreamProvider.h"
@@ -518,11 +519,7 @@ MovieClip::~MovieClip()
     _vm.getRoot().remove_key_listener(this);
     _vm.getRoot().remove_mouse_listener(this);
 
-    for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
-            it != _loadVariableRequests.end(); ++it)
-    {
-        delete *it;
-    }
+    deleteAllChecked(_loadVariableRequests);
 }
 
 // Execute the actions in the action list, in the given

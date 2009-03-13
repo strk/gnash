@@ -39,18 +39,15 @@
 #include "builtin_function.h"
 #include "movie_root.h"
 #include "Object.h" // for getObjectInterface
-
 #include "StreamProvider.h"
 #include "URLAccessManager.h"
 #include "URL.h"
-
-// for NetConnection_as.call()
 #include "VM.h"
 #include "amf.h"
 #include "SimpleBuffer.h"
 #include "timers.h"
 #include "namedStrings.h"
-
+#include "GnashAlgorithm.h"
 
 //#define GNASH_DEBUG_REMOTING
 
@@ -718,12 +715,7 @@ netconnection_class_init(as_object& global)
 // here to have HTTPRemotingHandler definition available
 NetConnection_as::~NetConnection_as()
 {
-    for (std::list<ConnectionHandler*>::iterator
-            i=_queuedConnections.begin(), e=_queuedConnections.end();
-            i!=e; ++i)
-    {
-        delete *i;
-    }
+    deleteAllChecked(_queuedConnections);
 }
 
 
