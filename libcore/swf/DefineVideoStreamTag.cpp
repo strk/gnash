@@ -52,10 +52,9 @@ struct FrameFinder
 
 }
 
-DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in,
-        boost::uint16_t char_id)
+DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t id)
 	:
-	m_char_id(char_id),
+	m_char_id(id),
 	_width(0),
 	_height(0)
 {

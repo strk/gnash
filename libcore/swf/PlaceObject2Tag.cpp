@@ -28,6 +28,7 @@
 #include "log.h"
 #include "SWFStream.h"
 #include "filter_factory.h"
+#include "GnashAlgorithm.h"
 
 namespace gnash {
 namespace SWF {
@@ -487,10 +488,10 @@ static void deleterHelper(T p)
 PlaceObject2Tag::~PlaceObject2Tag()
 {
     std::for_each(_eventHandlers.begin(), _eventHandlers.end(),
-                 &deleterHelper<EventHandlers::value_type>);
+                 CheckedDeleter<EventHandlers::value_type>());
 
     std::for_each(_actionBuffers.begin(), _actionBuffers.end(),
-                 &deleterHelper<ActionBuffers::value_type>);
+                 CheckedDeleter<ActionBuffers::value_type>());
 }
 
 /* public static */

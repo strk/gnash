@@ -27,7 +27,7 @@
 #include "GnashException.h"
 #include "IOChannel.h"
 #include "SimpleBuffer.h"
-
+#include "GnashAlgorithm.h"
 #include "element.h"
 
 #include <string>
@@ -39,21 +39,6 @@
 namespace gnash {
 namespace media {
 
-namespace {
-
-/// Functor for use when transforming a map into a vector of mapped values.
-template<typename T>
-struct SecondElement
-{
-    typedef typename T::second_type result_type;
-
-    const result_type& operator()(const T& pair) const
-    {
-        return pair.second;
-    }
-};
-
-}
 
 const size_t FLVParser::paddingBytes;
 const boost::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] = 
