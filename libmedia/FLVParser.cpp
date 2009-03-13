@@ -33,23 +33,6 @@
 #include <string>
 #include <iosfwd>
 
-#define READ_CHUNKS 64
-
-// The amount of bytes to scan an FLV for
-// figuring availability of audio/video tags.
-// This is needed because we can't trust the FLV
-// header (youtube advertises audio w/out having it;
-// strk tested that FLV with bogus flags are still
-// supposed to show video).
-//
-// MediaParserFfmpeg.cpp uses 2048.
-//
-// TODO: let user tweak this ?
-//
-// See bug #24371 for pointers to FLV files needing so much.
-//
-#define PROBE_BYTES 8192
-
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1
 
@@ -612,5 +595,3 @@ FLVParser::fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts)
 
 } // end of gnash::media namespace
 } // end of gnash namespace
-
-#undef READ_CHUNKS 
