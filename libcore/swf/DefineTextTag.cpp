@@ -14,6 +14,7 @@
 #include "TextRecord.h"
 #include "Font.h"
 #include "StaticText.h"
+#include "GnashAlgorithm.h"
 
 #include <algorithm>
 #include <numeric>
@@ -37,15 +38,6 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     m.add_character(id, t.release());
 }
-
-template<typename T>
-struct CreatePointer
-{
-    const T* operator()(const T& t) { 
-        return &t;
-    }
-};
-
 
 character*
 DefineTextTag::createDisplayObject(character* parent, int id)

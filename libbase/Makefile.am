@@ -174,6 +174,7 @@ noinst_HEADERS = \
 	getclocktime.hpp \
 	Point2d.h \
 	Range2d.h \
+	GnashAlgorithm.h \
 	snappingrange.h \
 	$(NULL)
 

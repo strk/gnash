@@ -36,6 +36,7 @@
 #include "timers.h" // for Timer use
 #include "GnashKey.h" // key::code
 #include "gnash.h"
+#include "GnashAlgorithm.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -149,12 +150,8 @@ movie_root::clearActionQueue()
     for (int lvl=0; lvl<apSIZE; ++lvl)
     {
         ActionQueue& q = _actionQueue[lvl];
-	    for (ActionQueue::iterator it=q.begin(),
-	    		itE=q.end();
-	    		it != itE; ++it)
-	    {
-	    	delete *it;
-	    }
+
+        deleteAllChecked(q);
 	    q.clear();
     }
 }

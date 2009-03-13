@@ -26,6 +26,7 @@
 #include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
 #include "SWFStream.h" // for use
+#include "GnashAlgorithm.h"
 
 #include <vector>
 #include <string>
@@ -55,10 +56,7 @@ sprite_definition::~sprite_definition()
 	{
 		PlayList& pl = i->second;
 
-		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
-		{
-            delete *j;
-        }
+        deleteAllChecked(pl);
     }
 }
 

@@ -28,6 +28,7 @@
 #include "log.h"
 #include "SWFStream.h"
 #include "filter_factory.h"
+#include "GnashAlgorithm.h"
 
 namespace gnash {
 namespace SWF {
@@ -476,21 +477,10 @@ PlaceObject2Tag::execute(MovieClip* m, DisplayList& dlist) const
 }
 
 
-/// Use to delete pointers efficiently with std::for_each,
-/// making sure that the type is complete.
-template<typename T>
-static void deleterHelper(T p)
-{
-    delete p;
-}
-
 PlaceObject2Tag::~PlaceObject2Tag()
 {
-    std::for_each(_eventHandlers.begin(), _eventHandlers.end(),
-                 &deleterHelper<EventHandlers::value_type>);
-
-    std::for_each(_actionBuffers.begin(), _actionBuffers.end(),
-                 &deleterHelper<ActionBuffers::value_type>);
+    deleteAllChecked(_eventHandlers);
+    deleteAllChecked(_actionBuffers);
 }
 
 /* public static */

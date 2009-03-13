@@ -30,6 +30,7 @@
 #include "action_buffer.h"
 #include "filter_factory.h"
 #include "GnashKey.h" // for gnash::key::codeMap
+#include "GnashAlgorithm.h"
 
 namespace gnash {
 namespace SWF {
@@ -278,12 +279,7 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
 
 DefineButtonTag::~DefineButtonTag()
 {
-	for (ButtonActions::iterator i = _buttonActions.begin(),
-			ie = _buttonActions.end();
-			i != ie; ++i )
-	{
-		delete *i;
-	}
+    deleteAllChecked(_buttonActions);
 }
 
 
