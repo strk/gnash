@@ -49,13 +49,13 @@ struct CreatePointer
 template<typename T>
 struct RemovePointer
 {
-	typedef T value_type;
+    typedef T value_type;
 };
 
 template<typename T>
 struct RemovePointer<T*>
 {
-	typedef typename RemovePointer<T>::value_type value_type;
+    typedef typename RemovePointer<T>::value_type value_type;
 };
 
 /// Delete a pointer safely
@@ -73,31 +73,28 @@ struct CheckedDeleter
 template<typename T>
 struct CheckedDeleter<T**>
 {
-	typedef typename CheckedDeleter<T*>::value_type value_type;
-
-	void operator()(T** p) const {
-		CheckedDeleter<T*> del;
-		dp(*p);
-	}
+    void operator()(T** p) const {
+        CheckedDeleter<T*> del;
+        dp(*p);
+    }
 };
 
 template<typename T>
 struct CheckedDeleter<T*>
 {
-	typedef T* value_type;
-	void operator()(value_type p) const {
-
-		typename boost::template checked_deleter<
+    void operator()(T* p) const {
+        typename boost::template checked_deleter<
             typename RemovePointer<T>::value_type> del;
-		del(p);
-	}
+        del(p);
+    }
 };
 
 template<typename T>
 void
 deleteAllChecked(const T& c)
 {
-    std::for_each(c.begin(), c.end(), CheckedDeleter<typename T::value_type>());
+    std::for_each(c.begin(), c.end(),
+            CheckedDeleter<typename T::value_type>());
 }
 
 } // namespace gnash
