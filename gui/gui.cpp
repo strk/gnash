@@ -911,17 +911,11 @@ Gui::advanceMovie()
 
 #ifndef REVIEW_ALL_FRAMES
 	// Advance movie by one frame
-#ifdef GNASH_FPS_DEBUG
-	bool advanced = 
-#endif
-        m->advance();
+	bool advanced = m->advance();
 #else
 	size_t cur_frame = m->getRootMovie()->get_current_frame();
 	size_t tot_frames = m->getRootMovie()->get_frame_count();
-#ifdef GNASH_FPS_DEBUG
-	bool advanced = 
-#endif
-	    m->advance();
+	bool advanced = m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
     	m->set_play_state(gnash::MovieClip::PLAY);
@@ -986,7 +980,7 @@ Gui::advanceMovie()
 	}
 
     /// Quit if we've reached the advance limit.
-    if (_maxAdvances && (_advances++ > _maxAdvances))
+    if (_maxAdvances && advanced && (_advances++ > _maxAdvances))
     {
         quit();
     }
