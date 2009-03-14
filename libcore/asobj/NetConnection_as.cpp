@@ -300,6 +300,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		log_debug("Connected to server %s on port %s",
 			  url.hostname(), url.port());
 		notifyStatus(CONNECT_SUCCESS);
+		_isConnected = true;
 	    }
 	// We're using RTMP, Connect via RTMP
 	} else if (url.protocol() == "rtmp") {
@@ -334,14 +335,19 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		tcUrl += "/" + url.path();
 	    }
 	    app = url.path();
-	    // FIXME: this should be the name of the refering swf file
+	    // FIXME: this should be the name of the refering swf file,
+	    // although the value appears to be ignored by the server.
 	    swfUrl = "mediaplayer.swf";
 	    // FIXME: This should be the URL for the referring web page
+	    // although the value appears to be ignored by the server.
 	    pageUrl = "http://gnashdev.org";
 
-// 	    boost::shared_ptr<buf2> = _rtmp_client->encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
-// 	    size_t total_size = buf2->allocated();
-// 	    RTMPMsg *msg1 = _rtmp_client->sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf2);
+	    // FIXME: replace the "magic numbers" with intelligently
+	    // designed ones.
+	    boost::shared_ptr<amf::Buffer> buf2 = _rtmp_client->encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
+ 	    size_t total_size = buf2->allocated();
+//   	    _rtmp_client->sendMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf2);
+//   	    RTMPMsg *msg1 = _rtmp_client->recvMsg();
 
 	    // the connectino process is complete
 // 	    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
@@ -381,10 +387,12 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     boost::shared_ptr<amf::Element> data(new amf::Element);
     data->makeStrictArray();
     for (size_t i=firstArg; i<args.size(); i++) {
+	cerr << "FIXME: " << args[i].to_string() << endl;
 	boost::shared_ptr<amf::Element> el = args[i].to_element();
+	el->dump();
 	data->addProperty(el);
     }
-    data->dump();
+//     data->dump();
 
     boost::shared_ptr<amf::AMF_msg::amf_message_t> msg(new amf::AMF_msg::amf_message_t);
     msg->header.target = methodName;
@@ -426,7 +434,11 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     //    this->test();
 
     // Start a thread to wait for the response
+#if 0
     boost::thread process_thread(boost::bind(&net_handler, &tdata));
+#else
+    net_handler(&tdata);
+#endif
     
 //    _currentConnection.reset(new HTTPRemotingHandler(*this, url));
 

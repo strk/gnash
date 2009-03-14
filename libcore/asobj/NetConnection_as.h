@@ -23,11 +23,13 @@
 #include <string>
 #include <list>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+
 #include "IOChannel.h"
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include "VM.h"
 
 // Internal headers from libnet
 #include "network.h"
@@ -49,6 +51,7 @@ public:
     typedef struct {
 	as_object        *callback;
 	Network          *network;
+	string_table::key key;
     } thread_params_t;
 
     enum StatusCode
