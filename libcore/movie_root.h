@@ -325,8 +325,7 @@ public:
     ///         for subsequent call to clear_interval_timer.
     ///         It will NEVER be zero.
     ///
-    unsigned int add_interval_timer(std::auto_ptr<Timer> timer,
-            bool internal = false);
+    unsigned int add_interval_timer(std::auto_ptr<Timer> timer);
 
     void addAdvanceCallback(as_object* obj);
 
@@ -930,6 +929,9 @@ private:
     /// The list of advanceable character, in placement order
     LiveChars _liveChars;
 
+    /// Execute expired timers
+    void executeAdvanceCallbacks();
+    
     /// Execute expired timers
     void executeTimers();
 

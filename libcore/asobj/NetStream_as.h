@@ -613,9 +613,6 @@ private:
     /// Mutex protecting _statusQueue
     boost::mutex statusMutex;
 
-    /// Last status code (to avoid consecutively notifying the same event)
-    StatusCode _lastStatus;
-    
 };
 
 

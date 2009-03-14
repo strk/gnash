@@ -1001,19 +1001,12 @@ movie_root::doMouseDrag()
 
 
 unsigned int
-movie_root::add_interval_timer(std::auto_ptr<Timer> timer, bool internal)
+movie_root::add_interval_timer(std::auto_ptr<Timer> timer)
 {
 	assert(timer.get());
 	assert(testInvariant());
 			
 	int id = ++_lastTimerId;
-	if ( internal ) id = -id;
-
-	if ( _intervalTimers.size() >= 255 )
-	{
-		// TODO: Why this limitation ? 
-		log_error("FIXME: %d timers currently active, won't add another one", _intervalTimers.size());
-	}
 
 	assert(_intervalTimers.find(id) == _intervalTimers.end());
 	_intervalTimers[id] = timer.release(); 
@@ -1047,6 +1040,8 @@ movie_root::advance()
     bool advanced = false;
 
     try {
+
+        executeAdvanceCallbacks();
 
 	    if ( (now - _lastMovieAdvancement) >= _movieAdvancementDelay )
 	    {
@@ -1798,7 +1793,7 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 }
 
 void
-movie_root::executeTimers()
+movie_root::executeAdvanceCallbacks()
 {
     // Copy it, as the call can change the original.
     std::vector<as_object*> currentCallbacks;
@@ -1807,7 +1802,11 @@ movie_root::executeTimers()
 
     std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
             std::mem_fun(&as_object::advanceState));
+}
 
+void
+movie_root::executeTimers()
+{
 #ifdef GNASH_DEBUG_TIMERS_EXPIRATION
         log_debug("Checking %d timers for expiry", _intervalTimers.size());
 #endif

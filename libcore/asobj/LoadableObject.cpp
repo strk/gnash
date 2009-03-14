@@ -46,19 +46,15 @@ namespace {
 LoadableObject::LoadableObject()
     :
     _bytesLoaded(-1),
-    _bytesTotal(-1),
-    _loadCheckerTimer(0)
+    _bytesTotal(-1)
 {
 }    
 
 
 LoadableObject::~LoadableObject()
 {
-
     deleteAllChecked(_loadThreads);
-
     _vm.getRoot().removeAdvanceCallback(this);
-
 }
 
 
@@ -225,10 +221,9 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
     // 
     _loadThreads.push_front(lt.release());
 
-    if ( startTimer )
+    if (startTimer)
     {
         getVM().getRoot().addAdvanceCallback(this);
-        _loadCheckerTimer = 1;
     }
 
     _bytesLoaded = 0;
@@ -288,10 +283,9 @@ LoadableObject::advanceState()
         }
     }
 
-    if ( _loadThreads.empty() ) 
+    if (_loadThreads.empty()) 
     {
         _vm.getRoot().removeAdvanceCallback(this);
-        _loadCheckerTimer=0;
     }
 }
 

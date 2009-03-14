@@ -113,13 +113,13 @@ NetStream_as::NetStream_as()
     _playHead(_playbackClock.get()), 
     _soundHandler(_vm.getRoot().runInfo().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
-    _audioStreamer(_soundHandler),
-    _lastStatus(invalidStatus)
+    _audioStreamer(_soundHandler)
 {
 }
 
 // extern (used by Global.cpp)
-void netstream_class_init(as_object& global)
+void
+netstream_class_init(as_object& global)
 {
 
     // This is going to be the global NetStream "class"/"function"
@@ -143,13 +143,14 @@ void netstream_class_init(as_object& global)
 void
 NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
 {
-    // TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
+    // TODO: check for System.onStatus too ! use a private
+    // getStatusHandler() method for this.
 
 #ifdef GNASH_DEBUG_METADATA
   log_debug(" Invoking onMetaData");
 #endif
 
-    string_table::key func = getVM().getStringTable().find(PROPNAME(funcname));
+    string_table::key func = getVM().getStringTable().find(funcname);
 
     callMethod(func, as_value(info_obj));
 }
@@ -162,8 +163,8 @@ NetStream_as::processStatusNotifications()
     // getStatusHandler() method for this.
 
     StatusCode code;
-    while (1)
-    {
+    //while (1)
+    //{
         code = popNextPendingStatusNotification();
 
         // Nothing to do if no more valid notifications.
@@ -173,7 +174,7 @@ NetStream_as::processStatusNotifications()
         as_object* o = getStatusObject(code);
 
         callMethod(NSV::PROP_ON_STATUS, o);
-    }
+    //}
 }
 
 void
@@ -181,11 +182,6 @@ NetStream_as::setStatus(StatusCode status)
 {
     // Get a lock to avoid messing with statuses while processing them
     boost::mutex::scoped_lock lock(statusMutex);
-
-    // status unchanged
-    if ( _lastStatus == status) return;
-
-    _lastStatus = status;
     _statusQueue.push_back(status);
 }
 
@@ -1275,7 +1271,6 @@ NetStream_as::advanceState()
     // Nothing to do if we don't have a parser. Unregister the timer, as
     // all status notifications should have been processed.
     if (!m_parser.get()) {
-        stopAdvanceTimer();
         return;
     }
 
