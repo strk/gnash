@@ -74,8 +74,7 @@ template<typename T>
 struct CheckedDeleter<T**>
 {
     void operator()(T** p) const {
-        CheckedDeleter<T*> del;
-        dp(*p);
+        CheckedDeleter<T*>()(*p);
     }
 };
 
@@ -83,9 +82,7 @@ template<typename T>
 struct CheckedDeleter<T*>
 {
     void operator()(T* p) const {
-        typename boost::template checked_deleter<
-            typename RemovePointer<T>::value_type> del;
-        del(p);
+        boost::checked_delete<typename RemovePointer<T>::value_type>(p);
     }
 };
 
