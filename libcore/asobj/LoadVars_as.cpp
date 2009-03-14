@@ -204,7 +204,7 @@ LoadVars_as::onData_method(const fn_call& fn)
 	}
 	else
 	{
-		as_value tmp(true);
+		as_value tmp(false);
 		thisPtr->set_member(NSV::PROP_LOADED, tmp);
 		thisPtr->callMethod(NSV::PROP_ON_LOAD, tmp);
 	}

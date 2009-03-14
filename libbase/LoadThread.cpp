@@ -37,9 +37,10 @@ LoadThread::LoadThread(std::auto_ptr<IOChannel> stream)
 	_cacheSize(0),
 	_chunkSize(56),
 	_streamSize(0),
-	_needAccess(false)
+	_needAccess(false),
+    _failed(!_stream.get())
 {
-	assert(_stream.get());
+    if (_failed) return;
 
 	// Start the downloading.
 	setupCache(); // what for ??

@@ -164,15 +164,6 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
         str = ri.streamProvider().getStream(getURL);
     }
 
-	if (!str.get()) 
-	{
-		log_error(_("Can't load from %s (security?)"), url.str());
-		return;
-		// TODO: check if this is correct
-		//as_value nullValue; nullValue.set_null();
-		//callMethod(_vm.getStringTable().find(PROPNAME("onData")), nullValue);
-	}
-
 	log_security(_("Loading from url: '%s'"), url.str());
     target.queueLoad(str);
 	
@@ -190,15 +181,6 @@ LoadableObject::load(const std::string& urlstr)
 
     // Checks whether access is allowed.
     std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
-
-	if (!str.get()) 
-	{
-		log_error(_("Can't load variables from %s (security?)"), url.str());
-		return;
-		// TODO: check if this is correct
-		//as_value nullValue; nullValue.set_null();
-		//callMethod(_vm.getStringTable().find(PROPNAME("onData")), nullValue);
-	}
 
 	log_security(_("Loading from url: '%s'"), url.str());
     queueLoad(str);
@@ -242,7 +224,14 @@ LoadableObject::advanceState()
     {
         LoadThread* lt = *it;
 
-        if ( lt->completed() )
+        if (lt->failed()) {
+            as_value nullValue;
+            nullValue.set_null();
+            callMethod(NSV::PROP_ON_DATA, nullValue);
+            it = _loadThreads.erase(it);
+            delete lt; 
+        }
+        else if ( lt->completed() )
         {
             size_t dataSize = _bytesTotal = _bytesLoaded = lt->getBytesTotal();
 

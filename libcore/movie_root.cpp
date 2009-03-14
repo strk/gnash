@@ -1041,8 +1041,6 @@ movie_root::advance()
 
     try {
 
-        executeAdvanceCallbacks();
-
 	    if ( (now - _lastMovieAdvancement) >= _movieAdvancementDelay )
 	    {
             advanced = true;
@@ -1056,7 +1054,6 @@ movie_root::advance()
 		    //
 		    _lastMovieAdvancement = now; // or _vm.getTime(); ?
 	    }
-
 	    // TODO: execute timers ?
 	    executeTimers();
 	}
@@ -1087,11 +1084,13 @@ movie_root::advanceMovie()
 	// Do mouse drag, if needed
 	doMouseDrag();
 
-	// Advance all non-unloaded characters in the LiveChars list
+    // Advance all non-unloaded characters in the LiveChars list
 	// in reverse order (last added, first advanced)
 	// NOTE: can throw ActionLimitException
 	advanceLiveChars(); 
 
+    executeAdvanceCallbacks();
+	
 	// Process loadMovie requests
 	// 
 	// NOTE: should be done before executing timers,
