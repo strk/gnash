@@ -82,6 +82,7 @@ noinst_HEADERS = \
 	AudioDecoderSimple.h \
 	SoundInfo.h \
 	AudioResampler.h \
+    GnashAlgorithm.h \
 	$(NULL)
 
 
