@@ -561,6 +561,9 @@ AMF::encodeStrictArray(const amf::Element &data)
 	for (ait = props.begin(); ait != props.end(); ait++) {
 	    counter++;
 	    boost::shared_ptr<amf::Element> el = (*(ait));
+#if 0
+	    // FIXME: Red5's echo tests like to turn strict array's into ecma
+	    // arrays, but we shouldn't do that in the core.
 	    // If we see an undefined data item, then switch to an ECMA
 	    // array which is more compact. At least this is what Red5 does.
 	    if (el->getType() == Element::UNDEFINED_AMF0) {
@@ -578,10 +581,11 @@ AMF::encodeStrictArray(const amf::Element &data)
 		}
 		continue;
 	    } else {
+#endif
 		if (sparse) {
 		    sparse = false;
-            std::ostringstream os;
-            os << counter;
+		    std::ostringstream os;
+		    os << counter;
 		    amf::Element elnum(os.str().c_str(), el->to_number());
 		    *buf += AMF::encodeElement(elnum);
 		    double nodes = items;
@@ -597,7 +601,7 @@ AMF::encodeStrictArray(const amf::Element &data)
 			break;
 		    }
 		}
-	    }
+//	    }
 // 	    el->dump();
 	}
     }
