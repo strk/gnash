@@ -1697,11 +1697,22 @@ movie_root::flushHigherPriorityActionQueues()
 }
 
 void
+movie_root::addAdvanceCallback(as_object* obj)
+{
+    _objectCallbacks.insert(obj);
+}
+
+void
+movie_root::removeAdvanceCallback(as_object* obj)
+{
+    _objectCallbacks.erase(obj);
+}
+
+void
 movie_root::processActionQueue()
 {
 	if ( _disableScripts )
 	{
-		//log_debug(_("Scripts are disabled, global instance list has %d elements"), _liveChars.size());
 		/// cleanup anything pushed later..
 		clearActionQueue();
 		return;
@@ -1786,12 +1797,19 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 	_actionQueue[lvl].push_back(code.release());
 }
 
-/* private */
 void
 movie_root::executeTimers()
 {
+    // Copy it, as the call can change the original.
+    std::vector<as_object*> currentCallbacks;
+    std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
+            std::back_inserter(currentCallbacks));
+
+    std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
+            std::mem_fun(&as_object::advanceState));
+
 #ifdef GNASH_DEBUG_TIMERS_EXPIRATION
-        log_debug("Checking %d timers for expiration", _intervalTimers.size());
+        log_debug("Checking %d timers for expiry", _intervalTimers.size());
 #endif
 
 	unsigned long now = _vm.getTime();

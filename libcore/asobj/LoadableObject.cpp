@@ -57,10 +57,7 @@ LoadableObject::~LoadableObject()
 
     deleteAllChecked(_loadThreads);
 
-    if ( _loadCheckerTimer )
-    {
-        _vm.getRoot().clear_interval_timer(_loadCheckerTimer);
-    }
+    _vm.getRoot().removeAdvanceCallback(this);
 
 }
 
@@ -230,13 +227,8 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 
     if ( startTimer )
     {
-        boost::intrusive_ptr<builtin_function> loadsChecker = 
-            new builtin_function(&checkLoads_wrapper);
-
-        std::auto_ptr<Timer> timer(new Timer);
-        timer->setInterval(*loadsChecker, 50, this);
-        _loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
-
+        getVM().getRoot().addAdvanceCallback(this);
+        _loadCheckerTimer = 1;
     }
 
     _bytesLoaded = 0;
@@ -244,18 +236,8 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 
 }
 
-as_value
-LoadableObject::checkLoads_wrapper(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadableObject> ptr =
-        ensureType<LoadableObject>(fn.this_ptr);
-	ptr->checkLoads();
-	return as_value();
-}
-
-
 void
-LoadableObject::checkLoads()
+LoadableObject::advanceState()
 {
 
     if (_loadThreads.empty()) return; // nothing to do
@@ -308,7 +290,7 @@ LoadableObject::checkLoads()
 
     if ( _loadThreads.empty() ) 
     {
-        _vm.getRoot().clear_interval_timer(_loadCheckerTimer);
+        _vm.getRoot().removeAdvanceCallback(this);
         _loadCheckerTimer=0;
     }
 }

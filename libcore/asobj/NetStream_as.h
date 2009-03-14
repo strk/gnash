@@ -353,14 +353,14 @@ public:
     ///
     boost::int32_t time();
 
-    /// Called at the SWF framerate. Used to process queued status messages
+    /// Called at the SWF heart-beat. Used to process queued status messages
     /// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
-    /// used to find the next video frame to be shown, though this might change.
-    void advance();
+    /// used to find the next video frame to be shown, though this might
+    /// change.
+    void advanceState();
     
     /// Returns the current framerate in frames per second.
     double getCurrentFPS()  { return 0; }
-    
 
     /// Sets the NetConnection needed to access external files
     //
@@ -374,14 +374,16 @@ public:
     /// Return true if the NetStream has an associated NetConnection
     bool isConnected() const { return (_netCon); }
 
-    /// Specifies the number of milliseconds to buffer before starting to display the stream.
+    /// Specifies the number of milliseconds to buffer before starting
+    /// to display the stream.
     //
     /// @param time
     /// The time in milliseconds that should be buffered.
     ///
     void setBufferTime(boost::uint32_t time);
 
-    /// Returns what the buffer time has been set to. (100 miliseconds is default)
+    /// Returns what the buffer time has been set to. (100 milliseconds
+    /// is default)
     //
     /// @return The size of the buffer in milliseconds.
     ///
@@ -396,8 +398,8 @@ public:
     ///
     long bytesTotal();
 
-    /// Returns the number of millisecond of the media file that is buffered and 
-    /// yet to be played
+    /// Returns the number of millisecond of the media file that is
+    /// buffered and yet to be played
     //
     /// @return Returns the number of millisecond of the media file that is 
     /// buffered and yet to be played
@@ -411,7 +413,8 @@ public:
 
     /// Returns the video frame closest to current cursor. See time().
     //
-    /// @return a image containing the video frame, a NULL auto_ptr if none were ready
+    /// @return a image containing the video frame, a NULL auto_ptr if
+    /// none were ready
     ///
     std::auto_ptr<GnashImage> get_video();
     
@@ -420,8 +423,6 @@ public:
     {
         _invalidatedVideoCharacter = ch;
     }
-
-
 
     /// Callback used by sound_handler to get audio data
     //
@@ -442,6 +443,18 @@ private:
         DEC_BUFFERING
     };
 
+    typedef std::pair<std::string, std::string> NetStreamStatus;
+
+    /// Get 'status' (first) and 'level' (second) strings for given status code
+    //
+    /// Any invalid code, out of bound or explicitly invalid (invalidCode) 
+    /// returns two empty strings.
+    ///
+    void getStatusCodeInfo(StatusCode code, NetStreamStatus& info);
+
+    /// Return a newly allocated information object for the given status
+    as_object* getStatusObject(StatusCode code);
+
     /// Initialize video decoder and (if successful) PlayHead consumer 
     //
     /// @param info Video codec information
@@ -453,12 +466,6 @@ private:
     /// @param info Audio codec information
     ///
     void initAudioDecoder(const media::AudioInfo& parser);
-
-    DecodingState _decoding_state;
-
-    // Mutex protecting _playback_state and _decoding_state
-    // (not sure a single one is appropriate)
-    boost::mutex _state_mutex;
 
     // Setups the playback
     bool startPlayback();
@@ -484,7 +491,7 @@ private:
 
     /// Update the image/videoframe to be returned by next get_video() call.
     //
-    /// Uses by ::advance().
+    /// Used by advanceState().
     ///
     /// Note that get_video will be called by Video::display(), which
     /// is usually called right after Video::advance(), so the result
@@ -496,7 +503,7 @@ private:
     /// If true, video is consumed/refreshed even if playhead is paused.
     /// By default this is false, but will be used on ::seek (user-reguested)
     ///
-    void refreshVideoFrame(bool alsoIfPaused=false);
+    void refreshVideoFrame(bool alsoIfPaused = false);
 
     /// Refill audio buffers, so to contain new frames since last run
     /// and up to current timestamp
@@ -537,6 +544,17 @@ private:
 
     DecodingState decodingStatus(DecodingState newstate = DEC_NONE);
 
+    /// Parse a chunk of input
+    /// Currently blocks, ideally should parse as much
+    /// as possible w/out blocking
+    void parseNextChunk();
+
+    DecodingState _decoding_state;
+
+    // Mutex protecting _playback_state and _decoding_state
+    // (not sure a single one is appropriate)
+    boost::mutex _state_mutex;
+    
     /// Video decoder
     std::auto_ptr<media::VideoDecoder> _videoDecoder;
 
@@ -550,7 +568,7 @@ private:
     bool _audioInfoKnown;
 
     /// Virtual clock used as playback clock source
-    std::auto_ptr<InterruptableVirtualClock> _playbackClock;
+    boost::scoped_ptr<InterruptableVirtualClock> _playbackClock;
 
     /// Playback control device 
     PlayHead _playHead;
@@ -560,11 +578,6 @@ private:
 
     // Current media handler
     media::MediaHandler* _mediaHandler;
-
-    /// Parse a chunk of input
-    /// Currently blocks, ideally should parse as much
-    /// as possible w/out blocking
-    void parseNextChunk();
 
     /// Input stream
     //
@@ -602,24 +615,7 @@ private:
 
     /// Last status code (to avoid consecutively notifying the same event)
     StatusCode _lastStatus;
-
-    typedef std::pair<std::string, std::string> NetStreamStatus;
-
-    /// Get 'status' (first) and 'level' (second) strings for given status code
-    //
-    /// Any invalid code, out of bound or explicitly invalid (invalidCode) 
-    /// returns two empty strings.
-    ///
-    void getStatusCodeInfo(StatusCode code, NetStreamStatus& info);
-
-    /// Return a newly allocated information object for the given status
-    as_object* getStatusObject(StatusCode code);
-
-    /// hack for using a Timer to drive ::advance calls
-    static as_value advanceWrapper(const fn_call& fn);
-
-    /// Identifier of the advance timer
-    unsigned int _advanceTimer;
+    
 };
 
 

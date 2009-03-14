@@ -56,14 +56,13 @@ public:
 	~NetConnection_as();
 
     /// Process connection stuff
-    virtual void advance();
-
-    static as_value advanceWrapper(const fn_call& fn);
+    virtual void advanceState();
 
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;
 
-    void call(as_object* asCallback, const std::string& methodName, const std::vector<as_value>& args, size_t firstArg);
+    void call(as_object* asCallback, const std::string& methodName,
+            const std::vector<as_value>& args, size_t firstArg);
 
     /// Process the close() method.
     void close();

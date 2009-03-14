@@ -102,10 +102,8 @@ NetStream_as::NetStream_as()
     inputPos(0),
     _invalidatedVideoCharacter(0),
     _decoding_state(DEC_NONE),
-
     _videoDecoder(0),
     _videoInfoKnown(false),
-
     _audioDecoder(0),
     _audioInfoKnown(false),
 
@@ -113,14 +111,10 @@ NetStream_as::NetStream_as()
     // as additional source
     _playbackClock(new InterruptableVirtualClock(new SystemClock)),
     _playHead(_playbackClock.get()), 
-
     _soundHandler(_vm.getRoot().runInfo().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
-
     _audioStreamer(_soundHandler),
-
-    _lastStatus(invalidStatus),
-    _advanceTimer(0)
+    _lastStatus(invalidStatus)
 {
 }
 
@@ -343,38 +337,16 @@ NetStream_as::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
-as_value
-NetStream_as::advanceWrapper(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ptr =
-        ensureType<NetStream_as>(fn.this_ptr);
-
-    ptr->advance();
-    return as_value();
-}
-
 void
 NetStream_as::stopAdvanceTimer()
 {
-    if ( _advanceTimer )
-    {
-        VM& vm = getVM();
-        vm.getRoot().clear_interval_timer(_advanceTimer);
-        _advanceTimer = 0;
-    }
+    getVM().getRoot().removeAdvanceCallback(this);
 }
 
 void
 NetStream_as::startAdvanceTimer()
 {
-    boost::intrusive_ptr<builtin_function> advanceCallback = 
-        new builtin_function(&NetStream_as::advanceWrapper);
-    std::auto_ptr<Timer> timer(new Timer);
-
-    // TODO: base on media file FPS !!! 
-    unsigned long delayMS = 50;
-    timer->setInterval(*advanceCallback, delayMS, this);
-    _advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
+    getVM().getRoot().addAdvanceCallback(this);
 }
 
 
@@ -1294,7 +1266,7 @@ NetStream_as::videoWidth() const
 
 
 void
-NetStream_as::advance()
+NetStream_as::advanceState()
 {
     // Check if there are any new status messages, and if we should
     // pass them to a event handler
@@ -1302,7 +1274,7 @@ NetStream_as::advance()
 
     // Nothing to do if we don't have a parser. Unregister the timer, as
     // all status notifications should have been processed.
-    if ( ! m_parser.get() ) {
+    if (!m_parser.get()) {
         stopAdvanceTimer();
         return;
     }
@@ -1430,7 +1402,6 @@ NetStream_as::pausePlayback()
 void
 NetStream_as::unpausePlayback()
 {
-    GNASH_REPORT_FUNCTION;
 
     PlayHead::PlaybackStatus oldStatus = 
         _playHead.setState(PlayHead::PLAY_PLAYING);

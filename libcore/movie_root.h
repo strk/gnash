@@ -328,6 +328,10 @@ public:
     unsigned int add_interval_timer(std::auto_ptr<Timer> timer,
             bool internal = false);
 
+    void addAdvanceCallback(as_object* obj);
+
+    void removeAdvanceCallback(as_object* obj);
+
     /// Remove timer identified by given integer
     //
     /// @return true on success, false on error (no such timer)
@@ -983,6 +987,10 @@ private:
     int m_mouse_x, m_mouse_y, m_mouse_buttons;
 
     MouseButtonState  m_mouse_button_state;
+
+    /// Objects requesting a callback on every movie_root::advance()
+    typedef std::set<as_object*> ObjectCallbacks;
+    ObjectCallbacks _objectCallbacks;
 
     typedef std::map<int, Timer*> TimerMap;
 

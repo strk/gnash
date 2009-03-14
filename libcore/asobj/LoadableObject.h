@@ -114,11 +114,7 @@ protected:
 
     /// Scan the LoadThread queue (_loadThreads) to see if any of
     /// them completed. If any did, invoke the onData event
-    void checkLoads();
-
-private:
-
-    static as_value checkLoads_wrapper(const fn_call& fn);
+    virtual void advanceState();
 
 };
 
