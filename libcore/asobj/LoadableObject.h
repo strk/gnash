@@ -91,6 +91,10 @@ public:
     /// interchangeably with each object in ActionScript.
     static as_value loadableobject_addRequestHeader(const fn_call& fn);
 
+    /// Scan the LoadThread queue (_loadThreads) to see if any of
+    /// them completed. If any did, invoke the onData event
+    virtual void advanceState();
+
 protected:
 
     /// Convert the Loadable Object to a string.
@@ -108,13 +112,6 @@ protected:
     long _bytesLoaded;
     
     long _bytesTotal;
-
-    /// The load checker interval timer used to make loads async
-    unsigned int _loadCheckerTimer;
-
-    /// Scan the LoadThread queue (_loadThreads) to see if any of
-    /// them completed. If any did, invoke the onData event
-    virtual void advanceState();
 
 };
 

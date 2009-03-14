@@ -82,7 +82,7 @@ public:
     void close();
 
 
-    virtual void advanceStatus()
+    virtual void advanceState()
     {
         if (!_connected) return;
         checkForIncomingData();

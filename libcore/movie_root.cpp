@@ -1899,15 +1899,15 @@ movie_root::markReachableResources() const
         i->second->markReachableResources();
     }
 
+    std::for_each(_objectCallbacks.begin(), _objectCallbacks.end(),
+            std::mem_fun(&as_object::setReachable));
+
     // Mark resources reachable by queued action code
     for (int lvl=0; lvl<apSIZE; ++lvl)
     {
         const ActionQueue& q = _actionQueue[lvl];
-        for (ActionQueue::const_iterator i=q.begin(), e=q.end();
-                i != e; ++i)
-        {
-            (*i)->markReachableResources();
-        }
+        std::for_each(q.begin(), q.end(),
+                std::mem_fun(&ExecutableCode::markReachableResources));
     }
 
     // Mark global Key object

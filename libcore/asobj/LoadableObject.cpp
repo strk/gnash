@@ -211,7 +211,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 
     bool startTimer = _loadThreads.empty();
 
-    std::auto_ptr<LoadThread> lt ( new LoadThread(str) );
+    std::auto_ptr<LoadThread> lt (new LoadThread(str));
 
     // we push on the front to avoid invalidating
     // iterators when queueLoad is called as effect
@@ -235,7 +235,7 @@ void
 LoadableObject::advanceState()
 {
 
-    if (_loadThreads.empty()) return; // nothing to do
+    if (_loadThreads.empty()) return;
 
     for (LoadThreadList::iterator it=_loadThreads.begin();
             it != _loadThreads.end(); )
@@ -287,6 +287,7 @@ LoadableObject::advanceState()
     {
         _vm.getRoot().removeAdvanceCallback(this);
     }
+
 }
 
 void
