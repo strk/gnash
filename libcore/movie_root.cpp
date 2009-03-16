@@ -1041,7 +1041,7 @@ movie_root::advance()
 
     try {
 
-	    if ( (now - _lastMovieAdvancement) >= _movieAdvancementDelay )
+	    if ((now - _lastMovieAdvancement) >= _movieAdvancementDelay)
 	    {
             advanced = true;
 		    advanceMovie();
@@ -1053,22 +1053,21 @@ movie_root::advance()
 		    // and printing a warnign when we're later then tolerated...
 		    //
 		    _lastMovieAdvancement = now; // or _vm.getTime(); ?
-	    }
-	    // TODO: execute timers ?
-	    executeTimers();
-	}
-	catch (ActionLimitException& al)
-    {
-	    //log_error(_("ActionLimits hit during advance: %s. Disabling scripts"), al.what());
-	    //disableScripts();
 
+	    }
+        
+        executeAdvanceCallbacks();
+	    
+	    executeTimers();
+	
+	}
+	catch (ActionLimitException& al) {
         // The PP does not disable scripts when the stack limit is reached,
         // but rather struggles on. 
 	    log_error(_("Action limit hit during advance: %s"), al.what());
 	    clearActionQueue();
     }
-    catch (ActionParserException& e)
-    {
+    catch (ActionParserException& e) {
         log_error(_("Buffer overread during advance: %s"), e.what());
         clearActionQueue();
     }
@@ -1079,7 +1078,6 @@ movie_root::advance()
 void
 movie_root::advanceMovie()
 {
-	// GNASH_REPORT_FUNCTION;
 
 	// Do mouse drag, if needed
 	doMouseDrag();
@@ -1089,24 +1087,22 @@ movie_root::advanceMovie()
 	// NOTE: can throw ActionLimitException
 	advanceLiveChars(); 
 
-    executeAdvanceCallbacks();
-	
-	// Process loadMovie requests
-	// 
-	// NOTE: should be done before executing timers,
-	// 	 see swfdec's test/trace/loadmovie-case-{5,6}.swf 
-	// NOTE: processing loadMovie requests after advanceLiveChars
-	//       is known to fix more tests in misc-mtasc.all/levels.swf
-	//       to be checked if it keeps the swfdec testsuite safe
-	processLoadMovieRequests();
+    // Process loadMovie requests
+    // 
+    // NOTE: should be done before executing timers,
+    // 	 see swfdec's test/trace/loadmovie-case-{5,6}.swf 
+    // NOTE: processing loadMovie requests after advanceLiveChars
+    //       is known to fix more tests in misc-mtasc.all/levels.swf
+    //       to be checked if it keeps the swfdec testsuite safe
+    processLoadMovieRequests();
 
-	// Process queued actions
-	// NOTE: can throw ActionLimitException
-	processActionQueue();
+    // Process queued actions
+    // NOTE: can throw ActionLimitException
+    processActionQueue();
 
-	cleanupAndCollect();
+    cleanupAndCollect();
 
-	assert(testInvariant());
+    assert(testInvariant());
 }
 
 
@@ -1252,7 +1248,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 
     assert(testInvariant());
 
-    if( ! copy.empty() )
+    if ( ! copy.empty() )
 	{
 		// process actions queued in the above step
 		processActionQueue();
@@ -1275,21 +1271,13 @@ movie_root::add_listener(CharacterList& ll, character* listener)
 }
 
 
-/* static private */
-void movie_root::remove_listener(CharacterList& ll, character* listener)
+void
+movie_root::remove_listener(CharacterList& ll, character* listener)
 {
 	assert(listener);
 
-#if 0
-	for(CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
-	{
-		if(*iter == listener) iter = ll.erase(iter);
-		else ++iter;
-	}
-#else
-    // This should be faster.	
-	ll.remove_if(std::bind2nd(std::equal_to<boost::intrusive_ptr<character> >(), listener));
-#endif	
+	ll.remove_if(std::bind2nd(
+                std::equal_to<boost::intrusive_ptr<character> >(), listener));
 }
 
 void
@@ -1753,40 +1741,20 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 
 	std::auto_ptr<ExecutableCode> code ( new GlobalCode(buf, target) );
 
-#if 0
-	// Immediately execute code targetted at a lower level while processing
-	// an higher level.
-	if ( processingActions() && lvl < _processingActionLevel )
-	{
-		log_debug("Action pushed in level %d executed immediately (as we are currently executing level %d)", lvl, _processingActionLevel);
-		code->execute();
-		return;
-	}
-#endif
-
 	_actionQueue[lvl].push_back(code.release());
 }
 
 void
-movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target, int lvl)
+movie_root::pushAction(boost::intrusive_ptr<as_function> func,
+        boost::intrusive_ptr<character> target, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
-	log_debug("Pushed function (event hanlder?) with target %s", target->getTargetPath());
+	log_debug("Pushed function (event hanlder?) with target %s",
+            target->getTargetPath());
 #endif
 
 	std::auto_ptr<ExecutableCode> code ( new FunctionCode(func, target) );
-
-#if 0
-	// Immediately execute code targetted at a lower level while processing
-	// an higher level.
-	if ( processingActions() && lvl < _processingActionLevel )
-	{
-		log_debug("Action pushed in level %d executed immediately (as we are currently executing level %d)", lvl, _processingActionLevel);
-		code->execute();
-		return;
-	}
-#endif
 
 	_actionQueue[lvl].push_back(code.release());
 }
@@ -1794,13 +1762,19 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 void
 movie_root::executeAdvanceCallbacks()
 {
-    // Copy it, as the call can change the original.
+
+    if (_objectCallbacks.empty()) return;
+
+    // Copy it, as the call can change the original, which is not only 
+    // bad for invalidating iterators, but also allows infinite recursion.
     std::vector<as_object*> currentCallbacks;
     std::copy(_objectCallbacks.begin(), _objectCallbacks.end(),
             std::back_inserter(currentCallbacks));
 
     std::for_each(currentCallbacks.begin(), currentCallbacks.end(), 
             std::mem_fun(&as_object::advanceState));
+
+    processActionQueue();
 }
 
 void
@@ -1815,9 +1789,9 @@ movie_root::executeTimers()
 	typedef std::multimap<unsigned int, Timer*> ExpiredTimers;
 	ExpiredTimers expiredTimers;
 
-	for (TimerMap::iterator it=_intervalTimers.begin(), itEnd=_intervalTimers.end();
-			it != itEnd; )
-	{
+	for (TimerMap::iterator it=_intervalTimers.begin(),
+            itEnd=_intervalTimers.end(); it != itEnd; ) {
+
 		// Get an iterator to next element, as we'll use
 		// erase to drop cleared timers, and that would
 		// invalidate the current iterator.
@@ -1852,17 +1826,11 @@ movie_root::executeTimers()
 	}
 
 	for (ExpiredTimers::iterator it=expiredTimers.begin(),
-			itEnd=expiredTimers.end();
-		it != itEnd; ++it)
-	{
+            itEnd=expiredTimers.end(); it != itEnd; ++it) {
 		it->second->executeAndReset();
 	}
 
-	if ( ! expiredTimers.empty() )
-	{
-		// process actions queued when executing interval callbacks
-		processActionQueue();
-	}
+    if (!expiredTimers.empty()) processActionQueue();
 
 }
 
@@ -1923,31 +1891,28 @@ movie_root::markReachableResources() const
     // NOTE: we don't need to mark _liveChars as any elements in that list
     //       should be NOT unloaded and thus marked as reachable by their
     //       parent.
-    //std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(&character::setReachable, _1));
 #if GNASH_PARANOIA_LEVEL > 1
     for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
-            i!=e; ++i)
-    {
+            i!=e; ++i) {
         assert((*i)->isReachable());
     }
 #endif
     
-    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded key listeners 
-    //       the remaining ones should be marked by their parents
-    //std::for_each(m_key_listeners.begin(), m_key_listeners.end(), boost::bind(&character::setReachable, _1));
+    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded
+    // key listeners. The remaining ones should be marked by their parents
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i=m_key_listeners.begin(), e=m_key_listeners.end(); i!=e; ++i)
-    {
+    for (LiveChars::const_iterator i=m_key_listeners.begin(),
+            e=m_key_listeners.end(); i!=e; ++i) {
         assert((*i)->isReachable());
     }
 #endif
 
-    // NOTE: cleanupUnloadedListeners should have cleaned up all unloaded mouse listeners 
-    //       the remaining ones should be marked by their parents
-    //std::for_each(m_mouse_listeners.begin(), m_mouse_listeners.end(), boost::bind(&character::setReachable, _1));
+    // NOTE: cleanupUnloadedListeners should have cleaned up all
+    // unloaded mouse listeners. The remaining ones should be marked by
+    // their parents
 #if GNASH_PARANOIA_LEVEL > 1
-    for (LiveChars::const_iterator i=m_mouse_listeners.begin(), e=m_mouse_listeners.end(); i!=e; ++i)
-    {
+    for (LiveChars::const_iterator i = m_mouse_listeners.begin(),
+            e = m_mouse_listeners.end(); i!=e; ++i) {
         assert((*i)->isReachable());
     }
 #endif
