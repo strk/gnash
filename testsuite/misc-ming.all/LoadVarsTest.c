@@ -149,7 +149,7 @@ main(int argc, char** argv)
 
     SWFMovie_nextFrame(mo);
           
-    xcheck_equals(mo, "loadString",
+    check_equals(mo, "loadString",
                  "'1: onLoad called with boolean argument false'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onLoad = olB;");
@@ -194,7 +194,7 @@ main(int argc, char** argv)
 
     SWFMovie_nextFrame(mo);
     // check_equals is too braindead to do this without escaping.
-    xcheck_equals(mo, "escape(dataString)",
+    check_equals(mo, "escape(dataString)",
            "'3%3A%20onData%20called%20with%20string%20argument%20v2%5Fvar1%3D"
         "val1%26v2%5Fvar2%3Dval2%26%0A'");
     check_equals(mo, "l.loaded", "false");
@@ -215,15 +215,15 @@ main(int argc, char** argv)
     add_actions(mo, "stop();");
 
     SWFMovie_nextFrame(mo);
-    xcheck_equals(mo, "loadString",
+    check_equals(mo, "loadString",
                  "'4: onLoad called with boolean argument true'");
     add_actions(mo, "l.onLoad = olB;");
 
     /// decode is called from onData (i.e. it's called when we overwrite
     /// onLoad, not onData).
-    xcheck_equals(mo, "decodeCalled", "1");
+    check_equals(mo, "decodeCalled", "1");
     // check_equals is too braindead to do this without escaping.
-    xcheck_equals(mo, "escape(decodeString)",
+    check_equals(mo, "escape(decodeString)",
               "'decode%20called%20with%20string%20argument%20v2%5Fvar1%3D"
         "val1%26v2%5Fvar2%3Dval2%26%0A'");
 
@@ -252,7 +252,7 @@ main(int argc, char** argv)
     add_actions(mo, "l.onData = odatB;");
 
     // No more calls to decode.
-    xcheck_equals(mo, "decodeCalled", "1");
+    check_equals(mo, "decodeCalled", "1");
 
 
     /// End of tests.
