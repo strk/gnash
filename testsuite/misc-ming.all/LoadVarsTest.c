@@ -131,7 +131,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
    
     // Check result, restore state.
-    xcheck_equals(mo, "dataString",
+    check_equals(mo, "dataString",
                  "'0: onData called with undefined argument undefined'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onData = odatB;");
@@ -170,7 +170,7 @@ main(int argc, char** argv)
     SWFMovie_nextFrame(mo);
           
     check_equals(mo, "loadString", "''");
-    xcheck_equals(mo, "dataString",
+    check_equals(mo, "dataString",
                  "'2: onData called with undefined argument undefined'");
     check_equals(mo, "l.loaded", "false");
     add_actions(mo, "l.onLoad = olB;"
@@ -245,7 +245,7 @@ main(int argc, char** argv)
 
     SWFMovie_nextFrame(mo);
     // check_equals is too braindead to do this without escaping.
-    xcheck_equals(mo, "escape(dataString)",
+    check_equals(mo, "escape(dataString)",
            "'5%3A%20onData%20called%20with%20undefined%20"
            "argument%20undefined'");
     check_equals(mo, "l.loaded", "false");

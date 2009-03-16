@@ -224,15 +224,13 @@ LoadableObject::advanceState()
     {
         LoadThread* lt = *it;
 
-        if (lt->failed()) {
-            as_value nullValue;
-            nullValue.set_null();
-            callMethod(NSV::PROP_ON_DATA, nullValue);
+        /// An empty file is the same as a failure.
+        if (lt->failed() || (lt->completed() && !lt->size())) {
+            callMethod(NSV::PROP_ON_DATA, as_value());
             it = _loadThreads.erase(it);
             delete lt; 
         }
-        else if ( lt->completed() )
-        {
+        else if (lt->completed()) {
             size_t dataSize = _bytesTotal = _bytesLoaded = lt->getBytesTotal();
 
             boost::scoped_array<char> buf(new char[dataSize + 1]);
@@ -422,7 +420,9 @@ loadableobject_decode(const fn_call& fn)
 
 	ValuesMap vals;
 
-	URL::parse_querystring(fn.arg(0).to_string(), vals);
+    const int version = fn.getVM().getSWFVersion();
+
+	URL::parse_querystring(fn.arg(0).to_string_versioned(version), vals);
 
 	string_table& st = ptr->getVM().getStringTable();
 	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();

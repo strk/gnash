@@ -114,7 +114,8 @@ LoadThread::seek(size_t pos)
 	// true is the new position is equal the wanted,
 	// or else return false
 
-	while ( (!_completed) && (!cancelRequested()) && _loadPosition < static_cast<long>(pos) )
+	while ((!_completed) && (!cancelRequested()) && 
+            _loadPosition < static_cast<long>(pos))
 	{
 		gnashSleep(100000); // 1/10 second WATCH FOR TIMEOUTS !
 	}
@@ -127,14 +128,14 @@ LoadThread::seek(size_t pos)
 	else
 	{
 		// Completed (eof) or canceled 
-		if ( _completed )
-		{
-			log_error("LoadThread::seek(%d) : can't seek there, only %d bytes available", pos, _loadPosition);
+		if (_completed) {
+			log_error("LoadThread::seek(%d) : can't seek there, only "
+                    "%d bytes available", pos, _loadPosition);
 		}
-		else
-		{
+		else {
 			assert( _cancelRequested );
-			log_error("LoadThread::seek(%d) : load cancellation requested while seeking", pos);
+			log_error("LoadThread::seek(%d) : load cancellation "
+                    "requested while seeking", pos);
 		}
 		return -1;
 	}
@@ -144,8 +145,11 @@ size_t LoadThread::read(void *dst, size_t bytes)
 {
 
 	// If the data is in the cache we used it
-	if (_cacheStart <= _userPosition && static_cast<long>(bytes) + _userPosition <= _cacheStart + _cachedData) {
-		memcpy(dst, _cache.get() + (_userPosition - _cacheStart), bytes);
+	if (_cacheStart <= _userPosition && 
+            static_cast<long>(bytes) + _userPosition <= 
+            _cacheStart + _cachedData) {
+
+        memcpy(dst, _cache.get() + (_userPosition - _cacheStart), bytes);
 		_userPosition += bytes;
 		return bytes;
 
@@ -346,22 +350,26 @@ void LoadThread::fillCache()
 	// the "the edge", and "warm up" the remaining data.
 	int ret;
 	if (_cachedData + _chunkSize > _cacheSize) {
-		ret = _stream->read(_cache.get() + _cachedData, _cacheSize - _cachedData);
+		ret = _stream->read(_cache.get() + _cachedData, 
+                _cacheSize - _cachedData);
 
 		_cachedData += ret;
 		if (ret != _cacheSize - _cachedData) {
 #ifdef GNASH_DEBUG_LOAD_THREAD
-			log_debug("LoadThread completed during fillCache (read %d bytes when %d were requested)",
+			log_debug("LoadThread completed during fillCache (read %d "
+                    "bytes when %d were requested)",
 				ret, _cacheSize-_cachedData);
 #endif
 			_completed = true;
-		} else {
+		}
+        else {
 			_stream->seek(_loadPosition + _chunkSize);
 			long pos = _stream->tell();
 			if (pos != _loadPosition + _chunkSize) {
 #ifdef GNASH_DEBUG_LOAD_THREAD
-				log_debug("LoadThread completed during fillCache (attempted to go to position %d, but only got to %d",
-					_loadPosition+_chunkSize, pos);
+				log_debug("LoadThread completed during fillCache "
+                        "(attempted to go to position %d, but only got to %d",
+					    _loadPosition+_chunkSize, pos);
 #endif
 				_completed = true;
 			}

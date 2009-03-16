@@ -896,20 +896,18 @@ xml_ondata(const fn_call& fn)
     as_object* thisPtr = fn.this_ptr.get();
     assert(thisPtr);
 
-    // See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;a=blob;f=libswfdec/swfdec_initialize.as
+    // See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;
+    // a=blob;f=libswfdec/swfdec_initialize.as
 
     as_value src;
-    src.set_null();
     if (fn.nargs) src = fn.arg(0);
 
-    if (!src.is_null())
-    {
+    if (!src.is_undefined()) {
         thisPtr->set_member(NSV::PROP_LOADED, true);
         thisPtr->callMethod(NSV::PROP_PARSE_XML, src);
         thisPtr->callMethod(NSV::PROP_ON_LOAD, true);
     }
-    else
-    {
+    else {
         thisPtr->set_member(NSV::PROP_LOADED, false);
         thisPtr->callMethod(NSV::PROP_ON_LOAD, false);
     }

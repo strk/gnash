@@ -81,7 +81,7 @@ public:
 		return _bytesTotal;
 	}  
 
-    /// Overrides as_object::queueLoad to begin loading from a stream
+    /// Begin loading from a stream
     //
     /// @param str      The stream to load from. It is destroyed when
     ///                 we're finished with it.
