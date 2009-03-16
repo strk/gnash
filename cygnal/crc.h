@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 #include <vector>
 #include <iostream> // for output operator
 
-#include "dsodefs.h"
 #include "rc.h"
 
 /// \namespace cygnal
@@ -40,11 +39,11 @@ namespace cygnal {
 ///	This class handles reading values from the Cygnal
 ///	configuration file, .cygnalrc, and into a form we can use in
 ///	Cygnal.
-class CRcInitFile : public gnash::RcInitFile
+class DSOEXPORT CRcInitFile : public gnash::RcInitFile
 {
 public:
     /// \brief Return the default instance of RC file,
-    DSOEXPORT static CRcInitFile& getDefaultInstance();
+    static CRcInitFile& getDefaultInstance();
     
     /// \brief Load all the configuration files.
     ///		This includes parsing the default .gnashrc file for
@@ -96,17 +95,31 @@ public:
 
     /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
-    DSOEXPORT void dump() const { dump(std::cerr); }
+    void dump() const { dump(std::cerr); }
+    
+    void setDocumentRoot(const std::string &x) { _wwwroot = x; }
+    std::string getDocumentRoot() { return _wwwroot; }
+    
+    void setCgiRoot(const std::string &x) { _cgiroot = x; }
+    std::string getCgiRoot() { return _cgiroot; }
     
     /// \overload dump(std::ostream& os) const
-    DSOEXPORT void dump(std::ostream& os) const;
+    void dump(std::ostream& os) const;
     
-  private:
     /// Construct only by getDefaultInstance()
     CRcInitFile();
     /// Never destroy (TODO: add a destroyDefaultInstance)
     ~CRcInitFile();
     
+  private:
+    /// \var _wwwroot
+    ///		The root path for the streaming server to find al files.
+    std::string _wwwroot;
+    
+    /// \var _cgiroot;
+    ///		This specifies the default directory for all cgi (exeutables).
+    std::string _cgiroot;
+
     /// \var _port_offset
     ///		This is an offset applied to all priviledged tcp/ip
     ///		ports. This enables the port number to be shifted into
@@ -141,6 +154,7 @@ public:
     ///		This toggles whether the admin thread is started or
     ///		not, also to reduce complecity when debugging.
     bool _admin;
+
 };
 
 /// \brief Dump to the specified output stream.
