@@ -53,6 +53,7 @@ extern "C"{
 #include "network.h"
 #include "log.h"
 #include "crc.h"
+#include "proc.h"
 #include "rtmp.h"
 #include "buffer.h"
 #include "utility.h"
@@ -142,12 +143,17 @@ map<int, Network *> networks;
 
 // end of globals
 
+// The debug log used by all the gnash libraries.
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 
-// The rcfile is loaded and parsed here:
+// The user config for Cygnal is loaded and parsed here:
 static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
+// Cache support for responses and files.
 static Cache& cache = Cache::getDefaultInstance();
+
+// The list of active cgis beiung executed.
+static std::map<std::string, Proc> procs; // = proc::getDefaultInstance();
 
 // This mutex is used to signify when all the threads are done.
 static boost::condition	alldone;
