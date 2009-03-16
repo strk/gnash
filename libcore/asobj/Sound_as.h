@@ -171,10 +171,10 @@ private:
     /// Unregister the probe timer
     void stopProbeTimer();
 
+    virtual void advanceState();
+
     /// Probe audio
     void probeAudio();
-
-    static as_value probeAudioWrapper(const fn_call&);
 
     int _probeTimer;
 

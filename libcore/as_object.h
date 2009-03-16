@@ -86,7 +86,8 @@ class Trigger
 
 public:
 
-	Trigger(const std::string& propname, as_function& trig, const as_value& customArg)
+	Trigger(const std::string& propname, as_function& trig,
+            const as_value& customArg)
 		:
 		_propname(propname),
 		_func(&trig),
@@ -136,6 +137,12 @@ class as_object
     typedef PropertyList::SortedPropertyList SortedPropertyList;
 
 public:
+
+    /// A function to be called on movie_root::advance()
+    //
+    /// This is used for requesting an object to update its state and if
+    /// required to notify any AS callbacks. 
+    virtual void advanceState() { }
 
     /// Is any non-hidden property in this object ?
     bool hasNonHiddenProperties() const {

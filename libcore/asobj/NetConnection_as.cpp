@@ -964,16 +964,6 @@ NetConnection_as::getStream(const std::string& name)
 
 }
 
-as_value
-NetConnection_as::advanceWrapper(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetConnection_as> ptr = 
-        ensureType<NetConnection_as>(fn.this_ptr);
-    
-    ptr->advance();
-    return as_value();
-};
-
 void
 NetConnection_as::startAdvanceTimer() 
 {
@@ -984,13 +974,8 @@ NetConnection_as::startAdvanceTimer()
         return;
     }
 
-    boost::intrusive_ptr<builtin_function> ticker_as = 
-            new builtin_function(&NetConnection_as::advanceWrapper);
-
-    std::auto_ptr<Timer> timer(new Timer);
-    unsigned long delayMS = 50; 
-    timer->setInterval(*ticker_as, delayMS, this);
-    _advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
+    _advanceTimer = 1;
+    getVM().getRoot().addAdvanceCallback(this);
 
     log_debug("startAdvanceTimer: registered advance timer %d", _advanceTimer);
 }
@@ -1004,13 +989,13 @@ NetConnection_as::stopAdvanceTimer()
         return;
     }
 
-    getVM().getRoot().clear_interval_timer(_advanceTimer);
+    getVM().getRoot().removeAdvanceCallback(this);
     log_debug("stopAdvanceTimer: deregistered timer %d", _advanceTimer);
     _advanceTimer=0;
 }
 
 void
-NetConnection_as::advance()
+NetConnection_as::advanceState()
 {
     // Advance
 
