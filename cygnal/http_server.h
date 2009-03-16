@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,27 +35,26 @@
 #include "network.h"
 #include "buffer.h"
 #include "diskstream.h"
-#include "dsodefs.h"
 
 namespace cygnal
 {
     
-class HTTPServer : public gnash::HTTP
+class DSOEXPORT HTTPServer : public gnash::HTTP
 {
 public:
     HTTPServer();
     ~HTTPServer();
 
     // These are for the protocol itself
-    http_method_e processClientRequest(int fd);
-    bool processGetRequest(int fd);
-    bool processPostRequest(int fd);
-    bool processPutRequest(int fd);
-    bool processDeleteRequest(int fd);
-    bool processConnectRequest(int fd);
-    bool processOptionsRequest(int fd);
-    bool processHeadRequest(int fd);
-    bool processTraceRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processClientRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processGetRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processPostRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processPutRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processDeleteRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processConnectRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processOptionsRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processHeadRequest(int fd);
+    boost::shared_ptr<amf::Buffer> processTraceRequest(int fd);
 
     // Handle the response for the request.
     boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
@@ -102,7 +101,7 @@ private:
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    bool DSOEXPORT http_handler(gnash::Network::thread_params_t *args);
+    bool http_handler(gnash::Network::thread_params_t *args);
 }
 
 } // end of gnash namespace

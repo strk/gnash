@@ -1,6 +1,6 @@
 // http.cpp:  HyperText Transport Protocol handler for Cygnal, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -84,13 +84,13 @@ HTTPServer::~HTTPServer()
 //    GNASH_REPORT_FUNCTION;
 }
 
-HTTPServer::http_method_e
+boost::shared_ptr<amf::Buffer>
 HTTPServer::processClientRequest(int fd)
 {
 //    GNASH_REPORT_FUNCTION;
-    bool result = false;
-    
     boost::shared_ptr<amf::Buffer> buf(_que.peek());
+    boost::shared_ptr<amf::Buffer> result;
+    
     if (buf) {
 	_cmd = extractCommand(buf->reference());
 	switch (_cmd) {
@@ -123,15 +123,11 @@ HTTPServer::processClientRequest(int fd)
 	}
     }
 
-    if (result) {
-	return _cmd;
-    } else {
-	return HTTP::HTTP_NONE;
-   }
+    return result;
 }
 
 // A GET request asks the server to send a file to the client
-bool
+boost::shared_ptr<amf::Buffer> 
 HTTPServer::processGetRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
@@ -144,19 +140,20 @@ HTTPServer::processGetRequest(int fd)
 //    _handler->dump();
 
     cerr << "QUE = " << _que.size() << endl;
-
+    boost::shared_ptr<amf::Buffer> buf;
+    
     if (_que.size() == 0) {
-	return false;
+	return buf;
     }
     
-    boost::shared_ptr<amf::Buffer> buf(_que.pop());
+    buf = _que.pop();
 //    cerr << "YYYYYYY: " << (char *)buf->reference() << endl;
 //    cerr << hexify(buf->reference(), buf->allocated(), false) << endl;
     
     if (buf == 0) {
      //	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
 	log_debug("Que empty, net connection dropped for fd #%d", fd);
-	return false;
+	return buf;
     }
     
     clearHeader();
@@ -234,27 +231,29 @@ HTTPServer::processGetRequest(int fd)
 
     log_debug("http_handler all done transferring requested file \"%s\".", _filespec);
     
-    return true;
+    return buf;
 }
 
 // A POST request asks sends a data from the client to the server. After processing
 // the header like we normally do, we then read the amount of bytes specified by
 // the "content-length" field, and then write that data to disk, or decode the amf.
-bool
+boost::shared_ptr<amf::Buffer>
 HTTPServer::processPostRequest(int fd)
 {
     GNASH_REPORT_FUNCTION;
 
 //    cerr << "QUE1 = " << _que.size() << endl;
 
+    boost::shared_ptr<amf::Buffer> buf;
+    
     if (_que.size() == 0) {
-	return false;
+	return buf;
     }
     
-    boost::shared_ptr<amf::Buffer> buf(_que.pop());
+    buf = _que.pop();
     if (buf == 0) {
 	log_debug("Que empty, net connection dropped for fd #%d", getFileFd());
-	return false;
+	return buf;
     }
 //    cerr << __FUNCTION__ << buf->allocated() << " : " << hexify(buf->reference(), buf->allocated(), true) << endl;
     
@@ -300,18 +299,20 @@ HTTPServer::processPostRequest(int fd)
 	}
 	
 	Proc cgis;
-  	cgis.setDocroot(_docroot);
-//  	cgis.setDocroot("/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin");
-  	cgis.startCGI("/echo/gateway", true, 1234);
+	string path = _docroot;
+//  	string path = "/home/rob/projects/gnu/i686-pc-linux-gnu/gnash/rtmp/cygnal/cgi-bin";
+	path += _filespec;
+	
+  	cgis.startCGI(_filespec, true, 1234);
  	cgis.createClient("localhost", 1234);
 	cgis.writeNet(*content);
 	boost::shared_ptr<amf::Buffer> reply = cgis.readNet();
 	writeNet(fd, *reply);
-//	cgis.stopCGI("/echo/gateway");
+//	cgis.stopCGI(_filespec);
 #else
 	vector<boost::shared_ptr<amf::Element> > headers = parseEchoRequest(*content);
   	//boost::shared_ptr<amf::Element> &el0 = headers[0];
-	
+
 	if (headers.size() >= 4) {
 	    if (headers[3]) {
 		amf::Buffer &reply = formatEchoResponse(headers[1]->getName(), *headers[3]);
@@ -326,56 +327,67 @@ HTTPServer::processPostRequest(int fd)
 	writeNet(fd, reply);
     }
 
-    return true;
+    return buf;
 }
 
-bool
+boost::shared_ptr<amf::Buffer>
 HTTPServer::processPutRequest(int /* fd */)
 {
+    boost::shared_ptr<amf::Buffer> buf;
 //    GNASH_REPORT_FUNCTION;
     log_unimpl("PUT request");
 
-    return false;
+    return buf;
 }
 
-bool
+boost::shared_ptr<amf::Buffer> 
 HTTPServer::processDeleteRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf;
     log_unimpl("DELETE request");
-    return false;
+    
+    return buf;
 }
 
-bool
+boost::shared_ptr<amf::Buffer> 
 HTTPServer::processConnectRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf;
     log_unimpl("CONNECT request");
-    return false;
+
+    return buf;
 }
 
-bool
+boost::shared_ptr<amf::Buffer>
 HTTPServer::processOptionsRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf;
     log_unimpl("OPTIONS request");
-    return false;
+
+    return buf;
 }
 
-bool
+boost::shared_ptr<amf::Buffer>
 HTTPServer::processHeadRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf;
     log_unimpl("HEAD request");
-    return false;
+    
+    return buf;
 }
 
-bool
+boost::shared_ptr<amf::Buffer>
 HTTPServer::processTraceRequest(int /* fd */)
 {
 //    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Buffer> buf;
     log_unimpl("TRACE request");
-    return false;
+    
+    return buf;
 }
 
 amf::Buffer &
@@ -919,7 +931,12 @@ http_handler(Network::thread_params_t *args)
 	    log_debug("Net HTTP server done for fd #%d...", args->netfd);
 //	    done = true;
 	}
-//	www.dump();
+//	www->dump();
+	if ((www->getField("content-type") == "application/x-amf")
+	    && (www->getField("content-type") == "application/x-amf")
+	    && (www->getFilespec() == "/echo/gateway")) {
+	    cerr << "GOT A GATEWAY REQUEST" << endl;
+	}
 	
 #if 0
 	string response = cache.findResponse(filestream->getFilespec());
