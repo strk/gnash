@@ -28,16 +28,18 @@
 #include <cstdlib>
 
 #include "log.h"
+#include "crc.h"
 #include "proc.h"
 #include "network.h"
 
 using namespace std;
 using namespace gnash;
 
-LogFile& dbglogfile = LogFile::getDefaultInstance();
-
 namespace cygnal
 {
+
+LogFile& dbglogfile = LogFile::getDefaultInstance();
+static CRcInitFile& crcfile = CRcInitFile::getDefaultInstance();
 
 Proc::Proc (void)
 {
@@ -97,15 +99,23 @@ Proc::startCGI(const string &filespec, bool outflag, boost::uint16_t port)
     
     _output[filespec] = outflag;
 
-    string path = getDocroot();
+    string path;
+    if (crcfile.getCgiRoot().size() > 0) {
+        path = crcfile.getCgiRoot().c_str();
+        log_debug (_("Document Root for CGI files is: %s"), path);
+    } else {
+        // Yes, I know this is a hack.
+        path = "/var/www/html/cygnal/cgi-bin";
+    }
+//    string path = filespec;
     path += filespec;
         
     // simple debug junk
-    log_debug("Starting \"%s\"", filespec);
+    log_debug("Starting \"%s\"", path);
 
     // See if the file actually exists, otherwise we can't spawn it
     if (stat(path.c_str(), &procstats) == -1) {
-        log_error("Invalid filename \"%s\"", path);
+        log_error("Invalid filespec for CGI: \"%s\"", path);
 //        perror(filespec.c_str());
 	return (false);
     }
