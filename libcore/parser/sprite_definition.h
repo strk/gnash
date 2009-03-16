@@ -1,6 +1,6 @@
 // sprite_definition.h:  Holds immutable data for a sprite, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -243,8 +243,7 @@ public:
 	// the parent movie's display list.
 	//
 	// overloads from character_def
-	virtual character* create_character_instance(
-		character* parent, int id);
+	virtual character* createDisplayObject(character* parent, int id);
 
 
 private:
@@ -326,7 +325,7 @@ private:
 	const rect&	get_bound() const {
     // It is required that get_bound() is implemented in character definition
     // classes. However, it makes no sense to call it for sprite definitions.
-    // get_bound() is currently only used by generic_character which normally
+    // get_bound() is currently only used by DisplayObject which normally
     // is used only shape character definitions. See character_def.h to learn
     // why it is virtual anyway.
     abort(); // should not be called

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,10 +28,10 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <sys/select.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #else 
-# ifdef HAVE_EPOLL
+# ifdef HAVE_EPOLL_H
 #  include <epoll.h>
 # endif
 #endif
@@ -191,7 +191,7 @@ public:
     /// @param limit The max number of file descriptors to wait for.
     ///
     /// @return A vector of the file descriptors that have activity.
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
     boost::shared_ptr<std::vector<struct pollfd> > waitForNetData(int limit, struct pollfd *fds);
 #endif
     fd_set waitForNetData(int limit, fd_set data);
@@ -245,8 +245,10 @@ public:
     void erasePollFD(std::vector<struct pollfd>::iterator &itt);
     struct pollfd &getPollFD(int fd);
     struct pollfd *getPollFDPtr();
+#ifdef HAVE_POLL_H
     size_t getPollFDSize() { return _pollfds.size(); };
     void clearPollFD() { _pollfds.clear(); };
+#endif
 
     // The entry point is an function pointer, which is the event
     // handler when there is data on a file descriptor.
@@ -271,7 +273,7 @@ public:
     /// \var Handler::_handlers
     ///		Keep a list of all active network connections
     std::map<int, entry_t *> _handlers;
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
     std::vector<struct pollfd> _pollfds;
     // This is the mutex that controls access to the que.
     boost::mutex	_poll_mutex;

@@ -51,7 +51,7 @@ public:
 
     TextRecord()
         :
-        _color(0, 0, 0, 255),
+        _color(0, 0, 0, 0),
         _textHeight(0),
         _hasXOffset(false),
         _hasYOffset(false),
@@ -62,7 +62,16 @@ public:
     {}
           
     typedef std::vector<GlyphEntry> Glyphs;  
-    Glyphs _glyphs;
+
+    /// Accumulate the number of glyphs in a TextRecord.
+    struct RecordCounter
+    {
+        size_t operator()(size_t c, const TextRecord& t) {
+            const Glyphs& glyphs = t.glyphs();
+            size_t ret = c + glyphs.size();
+            return ret;
+        }
+    };
     
     /// Read a TextRecord from the stream
     //
@@ -154,6 +163,8 @@ public:
 
 private:
 
+    Glyphs _glyphs;
+    
     /// The text color.
     rgba _color;
 

@@ -1,6 +1,6 @@
 // MediaHandlerFfmpeg.h: FFMPEG media handler, for Gnash
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,6 +51,9 @@ public:
 	virtual std::auto_ptr<MediaParser> createMediaParser(std::auto_ptr<IOChannel> stream);
 
 	virtual std::auto_ptr<VideoDecoder> createVideoDecoder(const VideoInfo& info);
+	
+	virtual std::auto_ptr<VideoConverter>
+		createVideoConverter(ImgBuf::Type4CC srcFormat, ImgBuf::Type4CC dstFormat);
 
 	virtual std::auto_ptr<AudioDecoder> createAudioDecoder(const AudioInfo& info);
 

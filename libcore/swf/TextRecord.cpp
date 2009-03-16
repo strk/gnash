@@ -86,7 +86,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
         IF_VERBOSE_PARSE(
             log_parse(_("  hasColor"));
         );
-    } 
+    }
 
     if (_hasXOffset)
     {
@@ -235,11 +235,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
                 // Draw the character using the filled outline.
                 if (glyph)
                 {
-#ifdef GNASH_DEBUG_TEXT_RENDERING
-    log_debug(_("render shape glyph using filled outline (render::draw_glyph)"));
-#endif
-
-                    gnash::render::draw_glyph(glyph, mat, textColor);
+                    render::draw_glyph(glyph, mat, textColor);
                 }
             }
             x += ge.advance;

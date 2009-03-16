@@ -213,11 +213,12 @@ Gui::allowScale(bool allow)
 void
 Gui::toggleFullscreen()
 {
+    /// Sends request to Gnash core to change display state.
 	if (_fullscreen) {
-		unsetFullscreen();
+		_stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
 	}
 	else {
-		setFullscreen();
+		_stage->setStageDisplayState(movie_root::DISPLAYSTATE_FULLSCREEN);
 	} 
 }
 
@@ -524,16 +525,13 @@ Gui::refreshView()
 void
 Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed) 
 {
-	movie_root* m = _stage;
 
 	/* Handle GUI shortcuts */
 	if (pressed)
 	{
-		if (k == gnash::key::ESCAPE)
-		{
-			if (isFullscreen())
-			{
-				unsetFullscreen();
+		if (k == gnash::key::ESCAPE) {
+			if (isFullscreen()) {
+				_stage->setStageDisplayState(movie_root::DISPLAYSTATE_NORMAL);
 			}
 		}
 		
@@ -651,11 +649,11 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 
     if ( _stopped ) return;
 
-	if ( m->notify_key_event(k, pressed) )
+	if ( _stage->notify_key_event(k, pressed) )
 	{
 		// any action triggered by the
 		// event required screen refresh
-		display(m);
+		display(_stage);
 	}
 
 }
@@ -907,26 +905,27 @@ Gui::advanceMovie()
 
 	gnash::movie_root* m = _stage;
 	
-#ifdef GNASH_FPS_DEBUG
-	fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
-#endif
-
 // Define REVIEW_ALL_FRAMES to have *all* frames
 // consequencially displaied. Useful for debugging.
 //#define REVIEW_ALL_FRAMES 1
 
 #ifndef REVIEW_ALL_FRAMES
 	// Advance movie by one frame
-	m->advance();
+	bool advanced = m->advance();
 #else
 	size_t cur_frame = m->getRootMovie()->get_current_frame();
 	size_t tot_frames = m->getRootMovie()->get_frame_count();
-	m->advance();
+	bool advanced = m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
     	m->set_play_state(gnash::MovieClip::PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
+
+#ifdef GNASH_FPS_DEBUG
+	if ( advanced ) fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
+#endif
+
 
 
 #ifdef SKIP_RENDERING_IF_LATE
@@ -943,9 +942,9 @@ Gui::advanceMovie()
 
 		if ( displayTime > estimatedDisplayTime)
 		{
-			//log_debug("Display took %6.6g seconds over %6.6g available for each frame", displayTime, timeSlot);
 
-			// Don't update estimatedDisplayTime if it's bigger then timeSlot*0.8
+			// Don't update estimatedDisplayTime if it's bigger then 
+            // timeSlot*0.8
 			if (  displayTime < timeSlot*0.8 )
 			{
 				// TODO: check for absurdly high values, like we can't set
@@ -981,7 +980,7 @@ Gui::advanceMovie()
 	}
 
     /// Quit if we've reached the advance limit.
-    if (_maxAdvances && (_advances++ > _maxAdvances))
+    if (_maxAdvances && advanced && (_advances++ > _maxAdvances))
     {
         quit();
     }

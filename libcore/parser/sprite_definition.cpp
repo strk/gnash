@@ -26,6 +26,7 @@
 #include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
 #include "SWFStream.h" // for use
+#include "GnashAlgorithm.h"
 
 #include <vector>
 #include <string>
@@ -39,14 +40,12 @@
 namespace gnash {
 
 character*
-sprite_definition::create_character_instance(character* parent,
-		int id)
+sprite_definition::createDisplayObject(character* parent, int id)
 {
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
-	MovieClip* si = new MovieClip(this,
-	parent->get_root(), parent, id);
+	MovieClip* si = new MovieClip(this, parent->get_root(), parent, id);
 	return si;
 }
 
@@ -57,10 +56,7 @@ sprite_definition::~sprite_definition()
 	{
 		PlayList& pl = i->second;
 
-		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
-		{
-            delete *j;
-        }
+        deleteAllChecked(pl);
     }
 }
 

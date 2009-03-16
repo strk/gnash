@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -227,9 +227,10 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		return;
 	}
 
-	// use protocol and host from baseurl
+	// use protocol, port and host from baseurl
 	_proto = baseurl._proto;
 	_host = baseurl._host;
+    _port = baseurl._port;
 
 	if ( relative_url.size() && relative_url[0] == '/' ) 
 	{
@@ -289,16 +290,14 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		// get dirname from basurl path
 		_path = basedir + in;
 
-		split_anchor_from_path();
-
-                // Extract the port number from the hostname, if any
-                split_port_from_host();
-
-		split_querystring_from_path();
-
-		normalize_path(_path);
-
 	}
+
+    split_anchor_from_path();
+
+    split_querystring_from_path();
+
+    normalize_path(_path);
+
 
 }
 

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,12 +20,13 @@
 
 #include <exception>
 #include <string>
+#include "dsodefs.h"
 
 namespace gnash
 {
 
 /// Top-level gnash exception
-class GnashException: public std::exception
+class DSOEXPORT GnashException: public std::exception
 {
 
 public:
@@ -50,7 +51,7 @@ private:
 };
 
 /// An exception from MediaHandler subsystem
-class MediaException : public GnashException
+class DSOEXPORT MediaException : public GnashException
 {
 
 public:
@@ -70,7 +71,7 @@ public:
 };
 
 /// An exception from SoundHandler subsystem
-class SoundException : public GnashException
+class DSOEXPORT SoundException : public GnashException
 {
 
 public:
@@ -90,7 +91,7 @@ public:
 };
 
 /// An SWF parsing exception 
-class ParserException : public GnashException
+class DSOEXPORT ParserException : public GnashException
 {
 
 public:

@@ -21,17 +21,10 @@
 #endif
 
 #include "character_def.h"
-#include "generic_character.h"
 #include "render_handler.h" // for destruction of render_cache_manager
 
 namespace gnash
 {
-
-character*
-character_def::create_character_instance(character* parent, int id)
-{
-	return new generic_character(this, parent, id);
-}
 
 character_def::~character_def()
 {

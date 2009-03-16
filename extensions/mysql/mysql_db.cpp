@@ -1,6 +1,6 @@
 // mysql_db.cpp:  MySQL database interface ActionScript objects, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -387,7 +387,8 @@ mysql_store(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
-    return as_value(ptr->obj.store_result());
+    gnash::as_object *obj = reinterpret_cast<gnash::as_object	*>(ptr->obj.store_result());
+    return as_value(obj);
 }
 
 as_value

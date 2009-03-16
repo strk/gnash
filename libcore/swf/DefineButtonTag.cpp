@@ -22,7 +22,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DefineButtonTag.h"
-#include "Button.h" // for create_character_instance()
+#include "Button.h" // for createDisplayObject()
 #include "DefineButtonCxformTag.h"
 #include "swf.h"
 #include "SWFStream.h" // for read()
@@ -30,6 +30,7 @@
 #include "action_buffer.h"
 #include "filter_factory.h"
 #include "GnashKey.h" // for gnash::key::codeMap
+#include "GnashAlgorithm.h"
 
 namespace gnash {
 namespace SWF {
@@ -278,12 +279,7 @@ DefineButtonTag::DefineButtonTag(SWFStream& in, movie_definition& m,
 
 DefineButtonTag::~DefineButtonTag()
 {
-	for (ButtonActions::iterator i = _buttonActions.begin(),
-			ie = _buttonActions.end();
-			i != ie; ++i )
-	{
-		delete *i;
-	}
+    deleteAllChecked(_buttonActions);
 }
 
 
@@ -419,7 +415,7 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
 
 character*
-DefineButtonTag::create_character_instance(character* parent, int id)
+DefineButtonTag::createDisplayObject(character* parent, int id)
 {
 	character* ch = new Button(*this, parent, id);
 	return ch;

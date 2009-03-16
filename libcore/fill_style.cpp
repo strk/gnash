@@ -330,14 +330,14 @@ fill_style::get_bitmap_info() const
     }
 }
 
-SWFMatrix
+const SWFMatrix&
 fill_style::getBitmapMatrix() const 
 {
   assert(m_type != SWF::FILL_SOLID);
   return m_bitmap_matrix;
 }
 
-SWFMatrix
+const SWFMatrix&
 fill_style::getGradientMatrix() const 
 {
   // TODO: Why do we separate bitmap and gradient matrices? 

@@ -939,7 +939,8 @@ as_environment::pushCallFrame(as_function* func)
     // TODO: override from gnashrc.
     
     // A stack size of 0 is apparently legitimate.
-    const boost::uint16_t maxstacksize = func->getVM().getRoot().getRecursionLimit();
+    const boost::uint16_t maxstacksize = 
+        func->getVM().getRoot().getRecursionLimit();
 
     // Doesn't proceed if the stack size would reach the limit; should
     // this check be done somewhere after adding to the stack? Would
@@ -947,7 +948,8 @@ as_environment::pushCallFrame(as_function* func)
     if ( _localFrames.size() + 1 >= maxstacksize )
     {
         std::ostringstream ss;
-        ss << boost::format(_("Max stack count reached (%u)")) % _localFrames.size();
+        ss << boost::format(_("Max stack count reached (%u)")) % 
+            _localFrames.size();
 
         // throw something
         throw ActionLimitException(ss.str()); 

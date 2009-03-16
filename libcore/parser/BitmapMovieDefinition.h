@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,7 +54,12 @@ public:
 	///  - image->size() bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - provided url
 	///
-	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, const std::string& url);
+	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
+            const std::string& url);
+
+    virtual character* createDisplayObject(character*, int) {
+        return 0;
+    }
 
 	// Discard id, always return the only shape character we have 
 	virtual character_def* get_character_def(int /*id*/)

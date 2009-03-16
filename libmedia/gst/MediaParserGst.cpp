@@ -1,6 +1,6 @@
 // MediaParserFfmpeg.cpp: FFMPG media parsers, for Gnash
 //
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -377,60 +377,95 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
     MediaParserGst* parser = static_cast<MediaParserGst*>(data);
 
     GstCaps* caps = gst_pad_get_caps(new_pad);    
-    print_caps(caps);
-
-    GstElementFactory* parserfactory = swfdec_gst_get_parser_factory (caps);
-
-    if (!parserfactory) {
-        log_error(_("MediaParserGst: Failed to find a parser."));
-        parser->link_to_fakesink(new_pad);
-        return;
-    }
-        
-    GstElement* parserel = gst_element_factory_create (parserfactory, NULL);
-    gst_object_unref (parserfactory);
-    if (!parserel) {
-        log_error(_("MediaParserGst: Failed to find a parser. We'll continue, "
-                    "but either audio or video will not work!"));
-        parser->link_to_fakesink(new_pad);
-        return;
-    }
-                 
-    gboolean success = gst_bin_add(GST_BIN(parser->_bin), parserel);
-    if (!success) {
-        gst_object_unref(parserel);
-        log_error(_("MediaParserGst: couldn't add parser."));
-        return;
-    }    
-    
-    GstPad* sinkpad = gst_element_get_static_pad (parserel, "sink");
-    assert(sinkpad);
-    
-    GstPadLinkReturn ret = gst_pad_link(new_pad, sinkpad);
-    
-    gst_object_unref(GST_OBJECT(sinkpad));
-
-    if (!GST_PAD_LINK_SUCCESSFUL(ret)) {
-        log_error(_("MediaParserGst: couldn't link parser."));
-        return;
-    }
+    print_caps(caps);    
     
     GstStructure* str = gst_caps_get_structure (caps, 0);
     if (!str) {
         log_error(_("MediaParserGst: couldn't get structure name."));
+        parser->link_to_fakesink(new_pad);
         return;    
-    }
+    } 
     
-    const gchar* structure_name = gst_structure_get_name (str);
+    const gchar* caps_name = gst_structure_get_name (str);
+    
+    bool media_type_audio;
 
-    if (g_strrstr (structure_name, "audio")) {
+    if (std::equal(caps_name, caps_name+5, "audio")) {
+        media_type_audio = true;
+    } else if (std::equal(caps_name, caps_name+5, "video")) {
+        media_type_audio = false;
+    } else {
+        log_error(_("MediaParserGst: ignoring stream of type %s."),
+                  caps_name);
+        parser->link_to_fakesink(new_pad);
+        return;
+    }    
+    
+    gboolean parsed = false;
+    gboolean framed = false;
+    
+    gst_structure_get_boolean(str, "parsed", &parsed);
+    gst_structure_get_boolean(str, "framed", &framed);
+    
+    bool already_parsed = parsed || framed;
+    
+    GstPad* final_pad = 0;
+    
+    if (already_parsed) {
+        final_pad = new_pad;
+    } else {
+        // We'll try to find a parser, so that we will eventually receive
+        // timestamped buffers, on which the MediaParser system relies.
+        GstElementFactory* parserfactory = swfdec_gst_get_parser_factory (caps);
+
+        if (!parserfactory) {
+            log_error(_("MediaParserGst: Failed to find a parser (media: %s)."),
+                      caps_name);
+            parser->link_to_fakesink(new_pad);
+            return;
+        }
+
+        GstElement* parserel = gst_element_factory_create (parserfactory, NULL);
+        gst_object_unref (parserfactory);
+        if (!parserel) {
+            log_error(_("MediaParserGst: Failed to find a parser. We'll continue, "
+                        "but either audio or video will not work!"));
+            parser->link_to_fakesink(new_pad);
+            return;
+        }
+                     
+        gboolean success = gst_bin_add(GST_BIN(parser->_bin), parserel);
+        if (!success) {
+            gst_object_unref(parserel);
+            log_error(_("MediaParserGst: couldn't add parser."));
+            parser->link_to_fakesink(new_pad);
+            return;
+        }
+        
+        GstPad* sinkpad = gst_element_get_static_pad (parserel, "sink");
+        assert(sinkpad);
+        
+        GstPadLinkReturn ret = gst_pad_link(new_pad, sinkpad);
+        
+        gst_object_unref(GST_OBJECT(sinkpad));
+
+        if (!GST_PAD_LINK_SUCCESSFUL(ret)) {
+            log_error(_("MediaParserGst: couldn't link parser."));
+            parser->link_to_fakesink(new_pad);
+            return;
+        }
+        
+        final_pad = gst_element_get_static_pad (parserel, "src");
+    } 
+
+    if (media_type_audio) {
       
-        parser->_audiosink = swfdec_gst_connect_sinkpad (parserel, caps);
+        parser->_audiosink = swfdec_gst_connect_sinkpad_by_pad (final_pad, caps);
         if (!parser->_audiosink) {
             log_error(_("MediaParserGst: couldn't link \"fake\" sink."));
             return;        
         }
-        
+
         gst_pad_set_chain_function (parser->_audiosink, MediaParserGst::cb_chain_func_audio);
         
         g_object_set_data (G_OBJECT (parser->_audiosink), "mediaparser-obj", parser);
@@ -442,10 +477,10 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         audioinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_audioInfo.reset(audioinfo);
+        log_debug(_("MediaParserGst: Linked audio source (type: %s)"), caps_name); 
 
-    } else if (g_strrstr (structure_name, "video")) {
-    
-        parser->_videosink = swfdec_gst_connect_sinkpad (parserel, caps);
+    } else {
+        parser->_videosink = swfdec_gst_connect_sinkpad_by_pad (final_pad, caps);
         if (!parser->_videosink) {
             log_error(_("MediaParserGst: couldn't link \"fake\" sink."));
             return;        
@@ -459,12 +494,13 @@ void MediaParserGst::cb_pad_added(GstElement* /* element */, GstPad* new_pad,
         videoinfo->extra.reset(new ExtraInfoGst(caps));
 
         parser->_videoInfo.reset(videoinfo);
-
-    } else {
-        log_error(_("AudioDecoderGst can't handle streams of type %s."),
-                  structure_name);
-        parser->link_to_fakesink(new_pad);
-    }    
+        
+        log_debug(_("MediaParserGst: Linked video source (type: %s)"), caps_name); 
+    }
+    
+    if (!already_parsed) {
+        gst_object_unref(GST_OBJECT(final_pad));
+    } 
     
     if (!gst_element_set_state (parser->_bin, GST_STATE_PLAYING) == GST_STATE_CHANGE_SUCCESS) {
         throw GnashException(_("MediaParserGst could not change element state"));
@@ -541,7 +577,7 @@ MediaParserGst::cb_chain_func_audio (GstPad *pad, GstBuffer *buffer)
     frame->extradata.reset(new EncodedExtraGstData(buffer));
     
 #ifdef GNASH_DEBUG_DATAFLOW
-    log_debug("remembering video buffer with timestamp %d.", frame->timestamp);
+    log_debug("remembering audio buffer with timestamp %d.", frame->timestamp);
 #endif
 
     parser->rememberAudioFrame(frame);

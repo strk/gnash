@@ -11,7 +11,7 @@
 
 #include "character_def.h" // for inheritance of shape_character_def
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "shape.h"     // for path
+#include "Geometry.h"     // for path
 #include "rect.h"      // for composition
 #include "fill_style.h" // for fill style
 #include "styles.h"     // for line style
@@ -36,9 +36,9 @@ class shape_character_def : public character_def
 {
 public:
 
-    typedef std::vector<fill_style> FillStyleVect;
-    typedef std::vector<line_style> LineStyleVect;
-    typedef std::vector<path> PathVect;
+    typedef std::vector<fill_style> FillStyles;
+    typedef std::vector<line_style> LineStyles;
+    typedef std::vector<path> Paths;
 
     shape_character_def();
     virtual ~shape_character_def();
@@ -53,6 +53,8 @@ public:
     virtual bool point_test_local(boost::int32_t x, boost::int32_t y,
             const SWFMatrix& wm);
 
+	virtual character* createDisplayObject(character* parent, int id);
+	
     /// \brief
     /// Read a shape definition as included in DEFINEFONT*,
     /// DEFINESHAPE* or DEFINEMORPH* tag
@@ -79,27 +81,27 @@ public:
             movie_definition& m);
 
     /// Get cached bounds of this shape.
-    const rect&	get_bound() const { return m_bound; }
+    const rect&	get_bound() const { return _bound; }
 
     /// Compute bounds by looking at the component paths
-    void compute_bound(rect* r, int swfVersion) const;
+    void compute_bound(rect& r, int swfVersion) const;
 
-    const FillStyleVect& get_fill_styles() const { return m_fill_styles; }
-    const LineStyleVect& get_line_styles() const { return m_line_styles; }
+    const FillStyles& fillStyles() const { return _fill_styles; }
+    const LineStyles& lineStyles() const { return _line_styles; }
 
-    const std::vector<path>& get_paths() const { return m_paths; }
+    const Paths& paths() const { return _paths; }
 
     // morph uses this
     // Should this be verified?
-    void set_bound(const rect& r) { m_bound = r; }
+    void set_bound(const rect& r) { _bound = r; }
 
     // Morph uses this.
     void addFillStyle(const fill_style& fs) {
-        m_fill_styles.push_back(fs);
+        _fill_styles.push_back(fs);
     }
 
     void addLineStyle(const line_style& fs) {
-        m_line_styles.push_back(fs);
+        _line_styles.push_back(fs);
     }
 
 protected:
@@ -108,17 +110,17 @@ protected:
     /// Mark reachable resources (for the GC)
     //
     /// Reachable resources are:
-    ///	- Associated fill styles (m_fill_styles).
+    ///	- Associated fill styles (_fill_styles).
     ///	  These are not actual resources, but may contain some.
     ///
     virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
 
     // derived morph classes changes these
-    FillStyleVect m_fill_styles;
-    LineStyleVect m_line_styles;
-    PathVect m_paths;
-    rect	m_bound;
+    FillStyles _fill_styles;
+    LineStyles _line_styles;
+    Paths _paths;
+    rect _bound;
 
     /// Copy a shape character definition
     shape_character_def(const shape_character_def& o);

@@ -98,22 +98,24 @@ RcInitFile::RcInitFile()
     _sollocaldomain(false),
     _lcdisabled(false),
     _lctrace(true),
-    // TODO: give a  default value, and let 0 mean "disabled" -- 0 currently is overridden by libbase/shm.cpp 
+    // TODO: give a  default value, and let 0 mean "disabled" -- 0
+    // currently is overridden by libbase/shm.cpp 
     _lcshmkey(0),
     _ignoreFSCommand(true),
     _quality(-1),
     _saveStreamingMedia(false),
     _saveLoadedMedia(false),
-    _popups(true)
+    _popups(true),
+    _useXv(false)
 {
     expandPath(_solsandbox);
-
     loadFiles();
 
 #ifdef __OS2__x
-    _urlOpenerFormat = PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS",
+    _urlOpenerFormat = PrfQueryProfileString(HINI_USER, (PSZ)
+            "WPURLDEFAULTSETTINGS",
             (PSZ) "DefaultBrowserExe", NULL,
-            (PVOID) browserExe, (LONG)sizeof(browserExe) );
+            (PVOID) browserExe, (LONG)sizeof(browserExe));
     _urlOpenerFormat += " -remote 'openurl(%u)'";
 #endif
 
@@ -135,8 +137,12 @@ RcInitFile::loadFiles()
 
     // Check the default system location
     std::string loadfile = SYSCONFDIR;
+
+#ifndef __OS2__ 
+    // On OS/2 only look in %HOME%
     loadfile.append("/gnashrc");
     parseFile(loadfile);
+#endif
     
     // Check the users home directory
     char *home = std::getenv("HOME");
@@ -482,6 +488,8 @@ RcInitFile::parseFile(const std::string& filespec)
             ||
                  extractSetting(_pluginSound, "pluginsound", variable, value)
             ||
+                 extractSetting(_useXv, "xvideo", variable, value)
+            ||
                  extractSetting(_verboseASCodingErrors,
                            "ASCodingErrorsVerbosity", variable, value)
             ||
@@ -678,6 +686,7 @@ RcInitFile::updateFile(const std::string& filespec)
     cmd << "ignoreFSCommand " << _ignoreFSCommand << endl <<    
     cmd << "saveStreamingMedia " << _saveStreamingMedia << endl <<    
     cmd << "saveLoadedMedia " << _saveLoadedMedia << endl <<    
+    cmd << "XVideo " << _useXv << endl <<    
    
     // Strings.
 
@@ -741,6 +750,12 @@ void
 RcInitFile::useLocalDomain(bool value)
 {
     _localdomainOnly = value;
+}
+
+void
+RcInitFile::useXv(bool value)
+{
+    _useXv = value;
 }
 
 void

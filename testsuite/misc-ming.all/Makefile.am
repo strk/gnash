@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-# Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	SpriteButtonEventsTest-Runner \
 	DefineTextTest \
 	DefineTextTest-Runner \
+	TextSnapshotTest \
 	DefineEditTextTest \
 	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
@@ -237,6 +238,7 @@ check_PROGRAMS += EmbeddedSoundTest-Runner
 endif
 
 check_SCRIPTS = \
+	TextSnapshotTest-Runner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	place_object_test2runner \
@@ -390,6 +392,16 @@ DefineTextTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	DefineTextTest.swf      \
 	$(NULL)
+
+TextSnapshotTest.swf: TextSnapshotTest
+	./TextSnapshotTest $(top_srcdir)/testsuite/media
+
+TextSnapshotTest_SOURCES =  TextSnapshotTest.c
+TextSnapshotTest_LDADD = libgnashmingutils.la
+
+TextSnapshotTest-Runner: $(srcdir)/../generic-testrunner.sh TextSnapshotTest.swf
+	sh $< $(top_builddir) TextSnapshotTest.swf > $@
+	chmod 755 $@
 
 DefineEditTextTest.swf: DefineEditTextTest
 	./DefineEditTextTest $(top_srcdir)/testsuite/media
@@ -1928,6 +1940,7 @@ TEST_CASES = \
 	loadMovieTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	TextSnapshotTest-Runner \
 	action_execution_order_test1runner \
 	action_execution_order_test2runner \
 	action_execution_order_test3runner \

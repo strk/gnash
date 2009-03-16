@@ -72,3 +72,6 @@ set SOLSafeDir /tmp/SharedObjects
 
 # Set read-only SharedObjects
 set SOLReadOnly true
+
+# Don't use XVideo
+set XVideo false

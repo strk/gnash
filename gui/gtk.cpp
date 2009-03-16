@@ -68,6 +68,9 @@ extern "C" {
 
 #ifdef RENDERER_AGG
 #include "gtk_glue_agg.h"
+#ifdef HAVE_XV
+#include "gtk_glue_agg_xv.h"
+#endif // HAVE_XV
 #endif
 
 #ifdef GUI_HILDON
@@ -173,10 +176,28 @@ GtkGui::init(int argc, char **argv[])
     _glue.reset(new GtkCairoGlue);
 #elif defined(RENDERER_OPENGL)
     _glue.reset(new GtkGlExtGlue);
-#elif defined(RENDERER_AGG)
+#elif defined(RENDERER_AGG) && !defined(HAVE_XV)
     _glue.reset(new GtkAggGlue);
+#elif defined(RENDERER_AGG) && defined(HAVE_XV)
+    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+
+    if (rcfile.useXv()) {
+        _glue.reset(new GtkAggXvGlue);
+        if (!_glue->init (argc, argv)) {
+            _glue.reset(new GtkAggGlue);
+            _glue->init(argc, argv);
+        }
+    } else {
+        _glue.reset(new GtkAggGlue);
+        _glue->init(argc, argv);
+    }
 #endif
-    _glue->init (argc, argv);
+
+#if ! (defined(HAVE_XV) && defined(RENDERER_AGG))
+    if (!_glue->init (argc, argv)) {
+        return false;
+    }
+#endif
 
     addPixmapDirectory (PKGDATADIR);
 
@@ -665,15 +686,13 @@ GtkGui::createMenu()
     gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(menusound), TRUE);
     gtk_menu_append(_popup_menu, GTK_WIDGET(menusound));
     gtk_widget_show(GTK_WIDGET(menusound));
-    g_signal_connect(menusound, "activate",
-                     G_CALLBACK(menusound), this);
+    g_signal_connect(menusound, "activate", G_CALLBACK(menuSound), this);
 
     GtkMenuItem *menuquit =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));
+        GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));
     gtk_menu_append(_popup_menu, GTK_WIDGET(menuquit));
     gtk_widget_show(GTK_WIDGET(menuquit));
-    g_signal_connect(menuquit, "activate",
-                     G_CALLBACK(menuquit), this);
+    g_signal_connect(menuquit, "activate", G_CALLBACK(menuQuit), this);
 
 #ifdef GUI_HILDON
      hildon_window_set_menu(HILDON_WINDOW(_window),

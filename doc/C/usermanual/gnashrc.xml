@@ -248,7 +248,14 @@
 	    </programlisting>
 	  </entry>
 	</row>
-	
+	<row>
+	  <entry>XVideo</entry>
+	  <entry>on/off</entry>
+	  <entry>If set to <emphasis>on</emphasis>, &app; will attempt to render using the X Video Extension, if
+	         system support was found during compilation. By default, X Video rendering is disabled.
+	  </entry>
+	</row>
+
       </tbody>
     </tgroup>
   </table>

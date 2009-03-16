@@ -1,6 +1,6 @@
 // VideoDecoderGst.cpp: Video decoding using Gstreamer.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -97,7 +97,8 @@ VideoDecoderGst::VideoDecoderGst(videoCodecType codec_type,
       throw MediaException(_("Video codec is zero.  Streaming video expected later."));
       break;
     default:
-      boost::format msg = boost::format(_("No support for video codec %d.")) % (int)codec_type;
+      boost::format msg = boost::format(_("No support for video codec %s.")) %
+          codec_type;
       throw MediaException(msg.str());
 
       return;

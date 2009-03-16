@@ -175,10 +175,10 @@ public:
 	BitmapInfo* get_bitmap_info() const;
 	
 	/// Returns the bitmap transformation SWFMatrix
-	SWFMatrix getBitmapMatrix() const; 
+	const SWFMatrix& getBitmapMatrix() const; 
 	
 	/// Returns the gradient transformation SWFMatrix
-	SWFMatrix getGradientMatrix() const; 
+	const SWFMatrix& getGradientMatrix() const; 
 	
 	/// Returns the number of color stops in the gradient
 	int get_color_stop_count() const;

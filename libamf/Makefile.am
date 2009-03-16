@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ AUTOMAKE_OPTIONS =
 pkglib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = \
 	amf.cpp \
+	amf_msg.cpp \
 	buffer.cpp \
 	element.cpp \
 	lcshm.cpp \
@@ -44,14 +45,14 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libcore \
 	-I$(top_srcdir)/libbase \
 	$(BOOST_CFLAGS) \
-	$(PTHREAD_CFLAGS) \
-        $(LIBXML_CFLAGS)
+	$(PTHREAD_CFLAGS)
 
 AM_LDFLAGS = $(BOOST_LIBS)
 
 noinst_HEADERS = \
 	amfutf8.h \
 	amf.h \
+	amf_msg.h \
 	buffer.h \
 	element.h \
 	flv.h \

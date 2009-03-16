@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ endif
 
 if BUILD_GTK_EXT
 if BUILD_GTK_GUI
-OTHER_DIRS += gtk2
+OTHER_DIRS += # gtk2
 endif
 endif
 DIST_SUBDIRS = dejagnu fileio mysql gtk2 lirc dbus metome

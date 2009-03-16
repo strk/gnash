@@ -83,7 +83,7 @@ public:
 
 	~DefineVideoStreamTag();
 
-	character* create_character_instance(character* parent, int id);
+	character* createDisplayObject(character* parent, int id);
 
 	/// Read tag SWF::DEFINEVIDEOSTREAM 
 	//

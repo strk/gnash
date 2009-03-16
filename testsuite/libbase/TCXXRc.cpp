@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -225,6 +225,12 @@ main (int /*argc*/, char** /*argv*/) {
         }
     }
 
+    if (rc.useXv() == false) {
+        runtest.pass ("Xvideo off by default");
+    } else {
+        runtest.fail ("Xvideo is on by default!");
+    }
+
     // Parse a second file
     if (rc.parseFile("gnashrc-local")) {
 
@@ -263,6 +269,12 @@ main (int /*argc*/, char** /*argv*/) {
             {
                 runtest.fail ("rc.getLocalSandboxPath() doesn't have the correct last element after append");
             }
+        }
+
+        if (rc.useXv() == true) {
+            runtest.pass ("Xvideo on by local.rc");
+        } else {
+            runtest.fail ("Xvideo on by local.rc");
         }
     }
 

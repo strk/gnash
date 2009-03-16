@@ -28,10 +28,10 @@
 #include "impl.h"
 #include "log.h"
 #include "render.h"
+#include "Shape.h"
 #include "SWFStream.h"
 #include "MovieClip.h"
 
-#include <cfloat>
 #include <algorithm>
 
 // Define the macro below to always compute bounds for shape characters
@@ -40,6 +40,12 @@
 
 namespace gnash
 {
+
+character*
+shape_character_def::createDisplayObject(character* parent, int id)
+{
+	return new Shape(this, parent, id);
+}
 
 // Read fill styles, and push them onto the given style array.
 static void
@@ -104,19 +110,19 @@ read_line_styles(std::vector<line_style>& styles, SWFStream& in, SWF::TagType ta
 shape_character_def::shape_character_def()
     :
     character_def(),
-    m_fill_styles(),
-    m_line_styles(),
-    m_paths(),
-    m_bound()
+    _fill_styles(),
+    _line_styles(),
+    _paths(),
+    _bound()
 {  }
 
 shape_character_def::shape_character_def(const shape_character_def& o)
     :
     character_def(o),
-    m_fill_styles(o.m_fill_styles),
-    m_line_styles(o.m_line_styles),
-    m_paths(o.m_paths),
-    m_bound(o.m_bound)
+    _fill_styles(o._fill_styles),
+    _line_styles(o._line_styles),
+    _paths(o._paths),
+    _bound(o._bound)
     {
     }
 
@@ -130,10 +136,10 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
 {
     if (with_style)
     {
-        m_bound.read(in);
+        _bound.read(in);
     
         IF_VERBOSE_PARSE(
-            std::string b = m_bound.toString();
+            std::string b = _bound.toString();
             log_parse(_("  bound rect: %s"), b.c_str());
         );
     
@@ -147,8 +153,8 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
             LOG_ONCE(log_unimpl("DEFINESHAPE4 edge boundaries and scales"));
         }
     
-        read_fill_styles(m_fill_styles, in, tag, m);
-        read_line_styles(m_line_styles, in, tag, m);
+        read_fill_styles(_fill_styles, in, tag, m);
+        read_line_styles(_line_styles, in, tag, m);
     }
 
     /// Adding a dummy fill style is just needed to make the
@@ -226,7 +232,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 // Store the current path if any.
                 if (! current_path.is_empty())
                 {
-                    m_paths.push_back(current_path);
+                    _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                 }
                 break;
@@ -236,7 +242,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 // Store the current path if any, and prepare a fresh one.
                 if (! current_path.is_empty())
                 {
-                    m_paths.push_back(current_path);
+                    _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                 }
                 in.ensureBits(5);
@@ -263,7 +269,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 // fill_style_0_change = 1;
                 if (! current_path.is_empty())
                 {
-                    m_paths.push_back(current_path);
+                    _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
                     current_path.ap.y = y;
@@ -290,12 +296,12 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 else
                 {
                     // 1-based index
-                    if ( style > m_fill_styles.size() )
+                    if ( style > _fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
                              log_swferror(_("Invalid fill style %d in "
                                      "fillStyle0Change record - %d defined. "
-                                     "Set to 0."), style, m_fill_styles.size());
+                                     "Set to 0."), style, _fill_styles.size());
                         );
                         style = 0;
                     }
@@ -314,7 +320,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 // fill_style_1_change = 1;
                 if (! current_path.is_empty())
                 {
-                    m_paths.push_back(current_path);
+                    _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
                     current_path.ap.y = y;
@@ -341,12 +347,12 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 else
                 {
                     // 1-based index
-                    if ( style > m_fill_styles.size() )
+                    if ( style > _fill_styles.size() )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
                             log_swferror(_("Invalid fill style %d in "
                                     "fillStyle1Change record - %d defined. "
-                                    "Set to 0."), style, m_fill_styles.size());
+                                    "Set to 0."), style, _fill_styles.size());
                         );
                         style = 0;
                     }
@@ -364,7 +370,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 // line_style_change = 1;
                 if (! current_path.is_empty())
                 {
-                    m_paths.push_back(current_path);
+                    _paths.push_back(current_path);
                     current_path.m_edges.resize(0);
                     current_path.ap.x = x;
                     current_path.ap.y = y;
@@ -387,15 +393,13 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                         style = 0;
                     }
                 }
-                else
-                {
+                else {
                     // 1-based index
-                    if ( style > m_line_styles.size() )
-                    {
+                    if (style > _line_styles.size()) {
                         IF_VERBOSE_MALFORMED_SWF(
                             log_swferror(_("Invalid fill style %d in "
                                     "lineStyleChange record - %d defined. "
-                                    "Set to 0."), style, m_line_styles.size());
+                                    "Set to 0."), style, _line_styles.size());
                         );
                         style = 0;
                     }
@@ -425,20 +429,20 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 // Store the current path if any.
                 if (! current_path.is_empty())
                 {
-                    m_paths.push_back(current_path);
+                    _paths.push_back(current_path);
                     current_path.clear();
                 }
     
                 // Tack on an empty path signalling a new shape.
                 // @@ need better understanding of whether this is correct??!?!!
                 // @@ i.e., we should just start a whole new shape here, right?
-                m_paths.push_back(path());
-                m_paths.back().m_new_shape = true;
+                _paths.push_back(path());
+                _paths.back().m_new_shape = true;
     
-                fill_base = m_fill_styles.size();
-                line_base = m_line_styles.size();
-                read_fill_styles(m_fill_styles, in, tag, m);
-                read_line_styles(m_line_styles, in, tag, m);
+                fill_base = _fill_styles.size();
+                line_base = _line_styles.size();
+                read_fill_styles(_fill_styles, in, tag, m);
+                read_line_styles(_line_styles, in, tag, m);
     
                 in.ensureBits(8);
                 num_fill_bits = in.read_uint(4);
@@ -521,13 +525,13 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
     {
         // TODO: performance would be improved by computing
         //       the bounds as edges are parsed.
-        compute_bound(&m_bound, m.get_version());
+        compute_bound(_bound, m.get_version());
     }
 #ifdef GNASH_DEBUG_SHAPE_BOUNDS
     else
     {
         rect computedBounds;
-        compute_bound(&computedBounds, m->get_version());
+        compute_bound(computedBounds, m->get_version());
         if ( computedBounds != m_bounds )
         {
             log_debug("Shape character read for tag %d contained embedded "
@@ -674,18 +678,18 @@ bool  shape_character_def::point_test_local(boost::int32_t x,
     //       the collision detection find you inside a self-crossing
     //       shape).
     //
-    if (m_bound.point_test(x, y) == false)
+    if (_bound.point_test(x, y) == false)
     {
         return false;
     }
 
-    unsigned npaths = m_paths.size();
+    unsigned npaths = _paths.size();
     int counter = 0;
 
     // browse all paths
     for (unsigned pno=0; pno<npaths; pno++)
     {
-        const path& pth = m_paths[pno];
+        const path& pth = _paths[pno];
         unsigned nedges = pth.m_edges.size();
 
         float next_pen_x = pth.ap.x;
@@ -708,8 +712,8 @@ bool  shape_character_def::point_test_local(boost::int32_t x,
         // If the path has a line style, check for strokes there
         if (pth.m_line != 0 )
         {
-            assert(m_line_styles.size() >= pth.m_line);
-            line_style& ls = m_line_styles[pth.m_line-1];
+            assert(_line_styles.size() >= pth.m_line);
+            line_style& ls = _line_styles[pth.m_line-1];
             double thickness = ls.getThickness();
             if (! thickness )
             {
@@ -832,20 +836,20 @@ bool  shape_character_def::point_test_local(boost::int32_t x,
 
 // Find the bounds of this shape, and store them in the given rectangle.
 void
-shape_character_def::compute_bound(rect* r, int swfVersion) const
+shape_character_def::compute_bound(rect& r, int swfVersion) const
 {
-    r->set_null();
+    r.set_null();
 
-    for (unsigned int i = 0; i < m_paths.size(); i++)
+    for (unsigned int i = 0; i < _paths.size(); i++)
     {
-        const path& p = m_paths[i];
+        const path& p = _paths[i];
 
         unsigned thickness = 0;
         if ( p.m_line )
         {
             // For glyph shapes m_line is allowed to be 1
             // while no defined line styles are allowed.
-            if ( m_line_styles.empty() )
+            if ( _line_styles.empty() )
             {
                 // This is either a Glyph, for which m_line==1 is valid
                 // or a bug in the parser, which we have no way to
@@ -854,10 +858,10 @@ shape_character_def::compute_bound(rect* r, int swfVersion) const
             }
             else
             {
-                thickness = m_line_styles[p.m_line-1].getThickness();
+                thickness = _line_styles[p.m_line-1].getThickness();
             }
         }
-        p.expandBounds(*r, thickness, swfVersion);
+        p.expandBounds(r, thickness, swfVersion);
     }
 }
 
@@ -865,11 +869,8 @@ shape_character_def::compute_bound(rect* r, int swfVersion) const
 void  shape_character_def::markReachableResources() const
 {
     assert(isReachable());
-    for (FillStyleVect::const_iterator i=m_fill_styles.begin(),
-            e=m_fill_styles.end(); i != e; ++i)
-    {
-        i->markReachableResources();
-    }
+    std::for_each(_fill_styles.begin(), _fill_styles.end(),
+            std::mem_fun_ref(&fill_style::markReachableResources));
 }
 #endif
 

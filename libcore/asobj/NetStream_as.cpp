@@ -37,7 +37,7 @@
 #include "VM.h"
 #include "namedStrings.h"
 #include "movie_root.h"
-
+#include "GnashAlgorithm.h"
 #include "VirtualClock.h" // for PlayHead
 #include "SystemClock.h"
 
@@ -1610,11 +1610,9 @@ void
 BufferedAudioStreamer::cleanAudioQueue()
 {
     boost::mutex::scoped_lock lock(_audioQueueMutex);
-    for (AudioQueue::iterator i=_audioQueue.begin(), e=_audioQueue.end();
-            i!=e; ++i)
-    {
-        delete *i;
-    }
+
+    deleteAllChecked(_audioQueue);
+
     _audioQueue.clear();
 }
 

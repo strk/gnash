@@ -67,15 +67,7 @@ public:
 
     const rect& get_bound() const { return _rect; }
 
-    character* create_character_instance(character* parent, int id);
-
-    /// How many of these are necessary?
-
-	/// Get width of this definition in twips (by definition)
-	//float width() const { return _rect.width(); }
-
-	/// Get height of this definition in twips (by definition)
-	//float height() const { return _rect.height(); }
+    character* createDisplayObject(character* parent, int id);
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.

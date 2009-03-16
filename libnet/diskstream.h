@@ -43,7 +43,7 @@ namespace gnash {
 ///	of using read() from the standard library, this uses mmap() to
 ///	map the file into memory in chunks of the memory pagesize,
 ///	which is much faster and less resource intensive.
-class DiskStream {
+class DSOEXPORT DiskStream {
 public:
     /// \enum DiskStream::state_e
     ///		This represents the state of the current stream.

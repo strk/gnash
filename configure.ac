@@ -129,9 +129,9 @@ case "${host}" in
     darwin=yes
     AC_DEFINE([DARWIN], [1], [this is a Darwin platform])
     ;;
-    dnl Unfortunately, all BSD distributions are not identical, so as tacky as it is
-    dnl to look for the distribution name, we don't have much choice. The use of these
-    dnl should be avoid as much as possible.
+    dnl Unfortunately, all BSD distributions are not identical, so 
+    dnl as tacky as it is to look for the distribution name, we don't
+    dnl have much choice. The use of these should be avoid as much as possible.
   *-openbsd*)
     bsd=yes
     openbsd=yes
@@ -249,15 +249,17 @@ if test x"${jemalloc}" = x"yes"; then
     jemalloc=no
   fi
 fi
-AC_TRY_COMPILE([#include <malloc.h>], [
-  struct mallinfo x = mallinfo(); ],
-  mallinfo=yes, mallinfo=no
-)
-if test x"${mallinfo}" = x"yes"; then
-  AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
-fi
+
+dnl We can search libs for mallinfo to decide whether we have it or not.
+dnl This is added to the linker flags when it's found. Usually it's -lc, but
+dnl on OpenSolaris it's -lmalloc, so this fixes the build.
+AC_SEARCH_LIBS([mallinfo], [c malloc],
+               AC_DEFINE(HAVE_MALLINFO, [1], [Has mallinfo()])
+               mallinfo=yes
+               )
+
+AM_CONDITIONAL([HAVE_MALLINFO], test x$mallinfo = xyes)
 AM_CONDITIONAL(JEMALLOC, test x$jemalloc = xyes)
-AM_CONDITIONAL(HAVE_MALLINFO, [test x$mallinfo = xyes])
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
@@ -356,7 +358,7 @@ fi
 AM_CONDITIONAL(SWFTREE, test x$swftree = xyes)
 
 dnl Disable running any tests for "make check". This may sound stupid, but
-dnl this option is designed to soley be used by maintainers in the 
+dnl this option is designed to solely be used by maintainers in the 
 dnl DISTCHECK_CONFIGURE_FLAGS when building packages. Gnash's testing infrastructure
 dnl is complex, and often the the testsuites will work, but due to some obscure reason,
 dnl make distcheck fails.
@@ -542,9 +544,10 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
         build_dump=yes
         build_fb=yes
         build_fltk=yes
+        build_qt3=yes
         build_kde3=yes
         build_kde4=yes
-        build_gtk=yes
+        build_qt4=yes
         build_sdl=yes
 dnl        build_qtopia=yes
 dnl        build_hildon=yes
@@ -674,22 +677,6 @@ if test x$pixelformat = xall; then
       AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
     #fi
   fi
-fi
-
-dnl --------------------------------------------------------
-dnl  Toggle support for MIT-SHM extension to the X server
-dnl --------------------------------------------------------
-
-AC_ARG_ENABLE(mit-shm,
-  AC_HELP_STRING([--enable-mit-shm], [Enable support for the MIT-SHM X extension]),
-[case "${enableval}" in
-  yes) xmitshm=yes ;;
-  no)  xmitshm=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
-esac],xmitshm=no)
-dnl as windows doesn't run X11, don't enable this extension there.
-if test "x${xmitshm}" = "xyes" -a "x${windows}" != "xyes"; then
-	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
 dnl --------------------------------------------------------
@@ -1346,7 +1333,10 @@ AC_CHECK_HEADERS(sys/utsname.h)
 AC_CHECK_HEADERS(signal.h)
 AC_CHECK_HEADERS(unistd.h)
 AC_CHECK_HEADERS(sys/time.h)
-#AC_CHECK_LIB(lber, ber_free)
+dnl libcurl3-dev on Ubuntu has a dependency on lber, and Gnash won't link
+dnl on most machines without it. While it isn't diretly used by Gnash at all,
+dnl it's to work around an Ubuntu packaging bug.
+AC_CHECK_LIB(lber, ber_free)
 AC_CHECK_LIB(c, getpwnam, AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
 dnl X11 is needed for fltk (at least),
@@ -1368,6 +1358,37 @@ AC_TRY_COMPILE([#include <strings.h>], [
   strcasecmp(p1, p2); ],
   AC_DEFINE(HAVE_STRINGCASECMP, [1], [Has strcasecmp])
 )
+
+dnl if test x$cross_compiling = xno; then
+AC_LANG_PUSH(C++)
+AC_MSG_CHECKING([to see if float formatting is broken])
+AC_RUN_IFELSE([
+  AC_LANG_PROGRAM([#include <cmath>
+    void testFloat(double d, double& s)
+    {
+        d /= 1000.0;
+        s = std::fmod(d, 86400.0);
+    }], [
+     double d = 3.0935415006117e+23;
+     double s;
+     testFloat(d, s);
+     if (static_cast<int>(s) != 61440) {
+         return 1;
+     }])],                         dnl end of LANG_PROGRAM
+     broken_float=no,              dnl returns 0, works
+     broken_float=yes,             dnl returns 1, broken
+     broken_float=no               dnl cross compiling
+)                                  dnl end of RUN_IFELSE
+AC_LANG_POP(C++)
+dnl fi
+
+if test x${broken_float} = xyes; then
+  AC_MSG_RESULT([yes])
+  AC_DEFINE(HAVE_BROKEN_FLOAT, [1], [Has broken float support])
+else
+  AC_MSG_RESULT([no])
+fi
+AM_CONDITIONAL(BROKEN_FLOAT, [ test x$broken_float = xyes ])
 
 dnl See if ipc_perm structure has the ipc_perm.key field, and if so,
 dnl which variant of the name is used.
@@ -1641,14 +1662,8 @@ fi
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
 dnl
-dnl NOTE: make sure to check for GLIB and LIBXML2 
-dnl before checking for gstreamer
+dnl gstreamer should take care of libxml2 and glib cflags/libs
 dnl
-
-AC_CHECK_SIZEOF(size_t) dnl set SIZEOF_SIZE_T.
-AC_CHECK_SIZEOF(long)
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(short)
 
 GNASH_PATH_QT3
 GNASH_PATH_KDE3

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -275,7 +275,7 @@ check_equals(typeof(so4), "object");
 ourPath += "/";
 note ("checking getLocal with path: " + ourPath);
 so4 = SharedObject.getLocal("name", ourPath);
-check_equals(typeof(so4), "null");
+xcheck_equals(typeof(so4), "null");
 
 // Take the last slash off and add a bit of rubbish
 ourPath = ourPath.substr(0, ourPath.lastIndexOf("/"));

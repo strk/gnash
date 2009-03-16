@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -41,10 +41,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libsound \
 	-I$(top_srcdir)/libamf \
 	$(PTHREAD_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(GLIB_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(FREETYPE2_CFLAGS) \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
@@ -65,6 +63,8 @@ libgnashcore_la_SOURCES = \
 	cxform.cpp \
 	DynamicShape.cpp	\
 	Bitmap.cpp \
+	Shape.cpp \
+	StaticText.cpp \
 	TextField.cpp \
         BlurFilter.cpp \
         GlowFilter.cpp \
@@ -75,7 +75,7 @@ libgnashcore_la_SOURCES = \
         BevelFilter.cpp \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
-	generic_character.cpp \
+	DisplayObject.cpp \
 	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
@@ -163,7 +163,9 @@ noinst_HEADERS = \
         parser/filter_factory.h \
 	Font.h \
 	fontlib.h \
-	generic_character.h \
+	Shape.h \
+	StaticText.h \
+	DisplayObject.h \
 	gnash.h	\
 	GnashKey.h \
 	impl.h \
@@ -176,7 +178,7 @@ noinst_HEADERS = \
 	rect.h \
 	render.h \
 	ExportableResource.h \
-	shape.h	\
+	Geometry.h	\
 	MovieClip.h \
 	SWFStream.h \
 	styles.h \
@@ -220,7 +222,6 @@ libgnashcore_la_LIBADD = \
 	$(top_builddir)/libcore/asobj/libgnashasobjs.la \
 	$(top_builddir)/libcore/parser/libgnashparser.la \
 	$(top_builddir)/libcore/vm/libgnashvm.la \
-	$(LIBXML_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(FREETYPE2_LIBS) \

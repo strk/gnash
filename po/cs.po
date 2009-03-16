@@ -1,14 +1,14 @@
 # Czech translation of gnash.
-# Copyright (C) 2007 Free Software Foundation, Inc.
+# Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gnash package.
-# Petr Pisar <petr.pisar@atlas.cz>, 2007, 2008
+# Petr Pisar <petr.pisar@atlas.cz>, 2007, 2008, 2009.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnash nelson@crynwr.com-20081013214315-8ds70h58lxlkm14a\n"
+"Project-Id-Version: gnash rob@welcomehome.org-20090304192301-ufibprks1f4jmhjs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-02-12 11:37+0100\n"
-"PO-Revision-Date: 2008-10-16 21:46+0200\n"
+"PO-Revision-Date: 2009-03-05 13:24+0100\n"
 "Last-Translator: Petr Pisar <petr.pisar@atlas.cz>\n"
 "Language-Team: Czech <translation-team-cs@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -40,11 +40,10 @@ msgid "Cannot get requested timezone information"
 msgstr "Informace o požadované časové zóně nelze získat"
 
 #: libbase/curl_adapter.cpp:47
-#, fuzzy
 msgid ""
 "libcurl is not available, but Gnash has attempted to use the curl adapter"
 msgstr ""
-"CHYBA: libcurl není dostupný, ačkoliv Gnash zkusil použít adaptér pro curl"
+"libcurl není dostupný, avšak Gnash zkusil použít jeho adaptér"
 
 #: libbase/curl_adapter.cpp:691
 #, c-format
@@ -313,60 +312,54 @@ msgstr ""
 "%s"
 
 #: libmedia/AudioDecoderSpeex.cpp:40
-#, fuzzy
 msgid "AudioDecoderSpeex: state initialization failed."
-msgstr "AudioDecoderGst: inicializace selhala."
+msgstr "AudioDecoderSpeex: inicializace stavu selhala."
 
 #: libmedia/AudioDecoderSpeex.cpp:53
-#, fuzzy
 msgid "AudioDecoderSpeex: initialization failed."
-msgstr "AudioDecoderGst: inicializace selhala."
+msgstr "AudioDecoderSpeex: inicializace selhala."
 
 #: libmedia/AudioDecoderSpeex.cpp:108
 msgid "Corrupt Speex stream!"
-msgstr ""
+msgstr "Poškozený speexový proud!"
 
 #: libmedia/AudioDecoderSpeex.cpp:131
-#, fuzzy
 msgid "Failed to resample Speex frame."
-msgstr "Nastavení data selhalo."
+msgstr "Převzorkovaní speexového rámce selhalo."
 
 #: libmedia/gst/VideoDecoderGst.cpp:97
 msgid "Video codec is zero.  Streaming video expected later."
-msgstr ""
+msgstr "Kodek videa je nula. Proudované video je očekáváno později."
 
 #: libmedia/gst/VideoDecoderGst.cpp:100
-#, fuzzy, c-format
+#, c-format
 msgid "No support for video codec %d."
-msgstr "Nepodporovaný kodek videa %d"
+msgstr "Podpora kodeku videa %d chybí."
 
 #: libmedia/gst/VideoDecoderGst.cpp:121 libmedia/gst/VideoDecoderGst.cpp:145
-#, fuzzy
 msgid "VideoDecoderGst: internal error (caps creation failed)"
-msgstr "AudioDecoderGst: vnitřní chyba (tvorba caps selhala)"
+msgstr "VideoDecoderGst: vnitřní chyba (tvorba caps selhala)"
 
 #: libmedia/gst/VideoDecoderGst.cpp:129
-#, fuzzy, c-format
+#, c-format
 msgid "Couldn't find a plugin for video type %s!"
-msgstr "Nemohu najít dekodér pro typ proudu %s!"
+msgstr "Nemohu najít modul pro typ videa %s!"
 
 #: libmedia/gst/VideoDecoderGst.cpp:133
 msgid " Please make sure you have gstreamer-ffmpeg installed."
-msgstr ""
+msgstr " Ujistěte se, prosím, že máte nainstalován gstreamer-ffmpeg."
 
 #: libmedia/gst/VideoDecoderGst.cpp:152
-#, fuzzy
 msgid "VideoDecoderGst: initialisation failed."
-msgstr "AudioDecoderGst: inicializace selhala."
+msgstr "VideoDecoderGst: inicializace selhala."
 
 #: libmedia/gst/VideoDecoderGst.cpp:180
-#, fuzzy
 msgid "VideoDecoderGst: buffer push failed."
-msgstr "AudioDecoderGst: plnění bufferu selhalo."
+msgstr "VideoDecoderGst: plnění bufferu selhalo."
 
 #: libmedia/gst/GstUtil.cpp:75
 msgid "Unable to retrieve a valid audio sink from ~/.gnashrc"
-msgstr "Z ~.gnashrc nelze získat platný audio sink"
+msgstr "Z ~/.gnashrc nelze získat platný audio sink"
 
 #: libmedia/gst/GstUtil.cpp:81
 msgid "Unable to retrieve a valid audio sink from autoaudiosink"
@@ -395,147 +388,154 @@ msgid ""
 "Missing plugin, but plugin installing not supported. Will try anyway, but "
 "expect failure."
 msgstr ""
+"Chybí modul a instalace modulů není podporována. Zkusí se to i tak, ale "
+"očekávejte neúspěch. "
 
 #: libmedia/gst/GstUtil.cpp:121
 msgid "Missing plugin, but failed to convert it to gst missing plugin detail."
-msgstr ""
+msgstr "Chybí modul a získání podrobností o chybějícím modulu GST selhalo."
 
 #: libmedia/gst/GstUtil.cpp:134
 msgid ""
 "gst_update_registry failed. You'll need to restart Gnash to use the new "
 "plugins."
 msgstr ""
+"gst_update_registry selhala. Abyste mohli využít nové moduly, je třeba "
+"restartovat Gnash."
 
 #: libmedia/gst/GstUtil.cpp:141
 msgid "Missing plugin, but plugin installation not available."
-msgstr ""
+msgstr "Chybí modul a instalace modulů není dostupná."
 
 #: libmedia/gst/MediaParserGst.cpp:56
-#, fuzzy
 msgid "MediaParserGst couldn't create a bin"
-msgstr "MediaParserFfmpeg nemohl ze vstupu přečíst zkušební data"
+msgstr "MediaParserGst nemohl vytvořit bin"
 
 #: libmedia/gst/MediaParserGst.cpp:61
-#, fuzzy
 msgid "MediaParserGst couldn't create a typefind element."
-msgstr "Prvek pro gstreamerovou kolonu nemohl být vytvořen"
+msgstr "MediaParserGst nemohl vytvořit prvek typefind."
 
 #: libmedia/gst/MediaParserGst.cpp:73 libmedia/gst/MediaParserGst.cpp:95
 #: libmedia/gst/MediaParserGst.cpp:312 libmedia/gst/MediaParserGst.cpp:367
 #: libmedia/gst/MediaParserGst.cpp:470
 msgid "MediaParserGst could not change element state"
-msgstr ""
+msgstr "MediaParserGst nemohl změnit stav prvku"
 
 #: libmedia/gst/MediaParserGst.cpp:86
 #, c-format
 msgid "Needed %d dead iterations to detect audio type."
-msgstr ""
+msgstr "Pro rozpoznání typu zvuku je třeba %d prázdných iterací"
 
 #: libmedia/gst/MediaParserGst.cpp:90
 msgid "MediaParserGst failed to detect any stream types."
-msgstr ""
+msgstr "MediaParserGst nedokázal rozpoznat žádný druh proudu."
 
 #: libmedia/gst/MediaParserGst.cpp:146
 msgid "Stream EOF, emitting!"
-msgstr ""
+msgstr "EOF proudu, vysílám!"
 
 #: libmedia/gst/MediaParserGst.cpp:180 libmedia/gst/MediaParserGst.cpp:191
 msgid "MediaParserGst failed to read the stream, but did not reach EOF!"
-msgstr ""
+msgstr "MediaParserGst nedokázal načíst proud, aniž by dosáhl EOF!"
 
 #: libmedia/gst/MediaParserGst.cpp:202
 msgid "MediaParserGst failed to push more data into the demuxer! Seeking back."
-msgstr ""
+msgstr "MediaParserGst nedokázal natlačit více dat do demuxeru! Vracím se "
+"zpět."
 
 #: libmedia/gst/MediaParserGst.cpp:275
 #, c-format
 msgid "MediaParserGst/typefound: Detected media type %s"
-msgstr ""
+msgstr "MediaParserGst/typefound: Rozpoznán typ média %s"
 
 #: libmedia/gst/MediaParserGst.cpp:287 libmedia/gst/MediaParserGst.cpp:294
 msgid "MediaParserGst Failed to create fakesink."
-msgstr ""
+msgstr "MediaParserGst nedokázal vytvořit fakesink."
 
 #: libmedia/gst/MediaParserGst.cpp:300
 msgid "MediaParserGst: couldn't get the fakesink src element."
-msgstr ""
+msgstr "MediaParserGst: nedokázal získat zdrojový prvek fakesinku."
 
 #: libmedia/gst/MediaParserGst.cpp:308
 msgid "MediaParserGst: couln't link fakesink"
-msgstr ""
+msgstr "MediaParserGst: nedokázal propojit fakesink"
 
 #: libmedia/gst/MediaParserGst.cpp:332
 msgid "MediaParserGst: couldn't get the typefind src element."
-msgstr ""
+msgstr "MediaParserGst: nedokázal získat zdrojový prvek typefind."
 
 #: libmedia/gst/MediaParserGst.cpp:349
 msgid "MediaParserGst: couldn't create the demuxer"
-msgstr ""
+msgstr "MediaParserGst: nedokázal vytvořit demuxer"
 
 #: libmedia/gst/MediaParserGst.cpp:354 libmedia/gst/MediaParserGst.cpp:360
 msgid "MediaParserGst: failed adding demuxer to bin."
-msgstr ""
+msgstr "MediaParserGst: přidání demuxeru do binu selhalo."
 
 #: libmedia/gst/MediaParserGst.cpp:385
 msgid "MediaParserGst: Failed to find a parser."
-msgstr ""
+msgstr "MediaParserGst: Parser se nepodařilo najít."
 
 #: libmedia/gst/MediaParserGst.cpp:393
 msgid ""
 "MediaParserGst: Failed to find a parser. We'll continue, but either audio or "
 "video will not work!"
 msgstr ""
+"MediaParserGst: Nepodařilo se najít parser. Bude se pokračovat, ale ani "
+"zvuk, ani video nebude fungovat!"
 
 #: libmedia/gst/MediaParserGst.cpp:402
-#, fuzzy
 msgid "MediaParserGst: couldn't add parser."
-msgstr "MediaParserFfmpeg nemohl ze vstupu přečíst zkušební data"
+msgstr "MediaParserGst: nemohl přidat parser."
 
 #: libmedia/gst/MediaParserGst.cpp:414
 msgid "MediaParserGst: couldn't link parser."
-msgstr ""
+msgstr "MediaParserGst: nemohl propojit parser."
 
 #: libmedia/gst/MediaParserGst.cpp:420
 msgid "MediaParserGst: couldn't get structure name."
-msgstr ""
+msgstr "MediaParserGst: nemohl získat název struktury."
 
 #: libmedia/gst/MediaParserGst.cpp:430 libmedia/gst/MediaParserGst.cpp:450
 msgid "MediaParserGst: couldn't link \"fake\" sink."
-msgstr ""
+msgstr "MediaParserGst: nedokázal propojit „fake“ sink."
 
 #: libmedia/gst/MediaParserGst.cpp:464
 #, c-format
 msgid "AudioDecoderGst can't handle streams of type %s."
-msgstr ""
+msgstr "AudioDecoderGst nemůžu obsloužit proudy typu %s."
 
 #: libmedia/gst/AudioDecoderGst.cpp:95
 msgid "Creating AAC decoder without extra data. This will probably fail!"
-msgstr ""
+msgstr "Vytvářím dekodér AAC bez dalších dat. Toto pravděpodobně selže!"
 
 #: libmedia/gst/AudioDecoderGst.cpp:105
-#, fuzzy, c-format
+#, c-format
 msgid "AudioDecoderGst: cannot handle codec %d (%s)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr "AudioDecoderGst: neumím zacházet s kodekem %d (%s)"
 
 #: libmedia/gst/AudioDecoderGst.cpp:115
 #, c-format
 msgid "AudioDecoderGst: cannot handle codec %d (no ExtraInfoGst attached)"
-msgstr ""
+msgstr "AudioDecoderGst: neumím zacházet s kodekem %d (ExtraInfoGst "
+"nepřipojeno)"
 
 #: libmedia/gst/AudioDecoderGst.cpp:143
 msgid ""
 "The best available resampler is 'audioresample'. Please install gstreamer-"
 "ffmpeg 0.10.4 or newer, or you may experience long delays in audio playback!"
 msgstr ""
+"Nejlepší dostupné převzorkování je „audioresample“. Prosím, nainstalujte "
+"gstreamer-ffmpeg 0.10.4 nebo novější. V opačném případě se mohou při "
+"přehrávání zvuku objevit dlouhé pomlky"
 
 #: libmedia/gst/AudioDecoderGst.cpp:162 libmedia/gst/AudioDecoderGst.cpp:175
 msgid "AudioDecoderGst: internal error (caps creation failed)"
 msgstr "AudioDecoderGst: vnitřní chyba (tvorba caps selhala)"
 
 #: libmedia/gst/AudioDecoderGst.cpp:169
-#, fuzzy
 msgid "AudioDecoderGst: couldn't find a plugin for audio type ..."
-msgstr "AudioDecoderGst: inicializace selhala."
+msgstr "AudioDecoderGst: modul pro druh zvuku … se nepodařilo najít"
 
 #: libmedia/gst/AudioDecoderGst.cpp:183
 msgid "AudioDecoderGst: initialisation failed."
@@ -543,7 +543,7 @@ msgstr "AudioDecoderGst: inicializace selhala."
 
 #: libmedia/gst/AudioDecoderGst.cpp:208
 msgid "Pushed data, but there's nothing to pull (yet)"
-msgstr ""
+msgstr "Data tlačena, ale (ještě) tu není, co táhnout"
 
 #: libmedia/gst/AudioDecoderGst.cpp:244 libmedia/gst/AudioDecoderGst.cpp:272
 msgid "AudioDecoderGst: buffer push failed."
@@ -551,12 +551,12 @@ msgstr "AudioDecoderGst: plnění bufferu selhalo."
 
 #: libmedia/gst/MediaHandlerGst.cpp:74
 msgid "Wrong arguments given to GST VideoDecoder"
-msgstr ""
+msgstr "GST VideoDecoder předány chybné argumenty"
 
 #: libmedia/gst/MediaHandlerGst.cpp:123
 #, c-format
 msgid "MediaHandlerGst::createAudioDecoder: %s -- %s"
-msgstr ""
+msgstr "MediaHandlerGst::createAudioDecoder: %s – %s"
 
 #: libmedia/FLVParser.cpp:205
 #, c-format
@@ -579,9 +579,9 @@ msgstr ""
 "budou očekávány další video značky."
 
 #: libmedia/FLVParser.cpp:272
-#, fuzzy, c-format
+#, c-format
 msgid "AVC packet type: %d"
-msgstr " m_place_type: %d"
+msgstr "Typ AVC packetu: %d"
 
 #: libmedia/FLVParser.cpp:443
 #, c-format
@@ -590,17 +590,19 @@ msgstr "První bajt FLV_META_TAG je %d, očekáván 0x02 (typ STRING AFM0)"
 
 #: libmedia/FLVParser.cpp:466
 msgid "Corrupt FLV: Meta tag unterminated!"
-msgstr ""
+msgstr "Poškozený FLV: Meta značka neukončena!"
 
 #: libmedia/FLVParser.cpp:474
 #, c-format
 msgid "FLVParser::parseNextTag: unknown FLV tag type %d"
-msgstr ""
+msgstr "FLVParser::parseNextTag: neznámý typ %d značky FLV"
 
 #: libmedia/FLVParser.cpp:483
 msgid ""
 "Corrupt FLV: previous tag size record (%1%) unexpected (actual size: %2%)"
 msgstr ""
+"Poškozený FLV: předchozí záznam o velikosti značky (%1%) nebyl očekáván "
+"(současná velikost: %2%)"
 
 #: libmedia/MediaHandler.cpp:51
 msgid "MediaHandler::isFLV: Could not read 3 bytes from input stream"
@@ -615,9 +617,9 @@ msgstr ""
 "FLV"
 
 #: libmedia/MediaHandler.cpp:73
-#, fuzzy, c-format
+#, c-format
 msgid "Exception while reading from stream: %s"
-msgstr "Během stahovaní z URL %2$s vypršel časový limit (%1$u milisekund)"
+msgstr "Výjimka při čtení z proudu: %s"
 
 #: libmedia/MediaHandler.cpp:116
 #, c-format
@@ -625,23 +627,26 @@ msgid ""
 "MediaHandler::createFlashAudioDecoder: no available FLASH decoders for codec "
 "%d (%s)"
 msgstr ""
+"MediaHandler::createFlashAudioDecoder: pro codek %d (%s) není dostupný žádný "
+"FLASH dekodér"
 
 #: libmedia/AudioDecoderNellymoser.cpp:770
 #: libmedia/AudioDecoderNellymoser.cpp:784
-#, fuzzy, c-format
+#, c-format
 msgid "AudioDecoderNellymoser: initialized FLASH codec %s (%d)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr "AudioDecoderNellymoser: FLASH kodek %s (%d) inicializován"
 
 #: libmedia/AudioDecoderNellymoser.cpp:808
 #: libmedia/AudioDecoderNellymoser.cpp:835
 #, c-format
 msgid "AudioDecoderNellymoser: attempt to use with flash codec %d (%s)"
-msgstr ""
+msgstr "AudioDecoderNellymoser: pokus o použití s flash kodekem %d (%s)"
 
 #: libmedia/AudioDecoderNellymoser.cpp:819
 #, c-format
 msgid "AudioDecoderNellymoser: unable to intepret custom audio codec id %s"
-msgstr ""
+msgstr "AudioDecoderNellymoser: nejsem schopen interpretovat uživatelský "
+"zvukový kodek ID %s"
 
 #: libmedia/AudioDecoderNellymoser.cpp:898 libmedia/AudioDecoderSimple.cpp:470
 msgid "Error in sound sample conversion"
@@ -688,7 +693,7 @@ msgstr "  Komentář: „%s“"
 #: libmedia/ffmpeg/MediaParserFfmpeg.cpp:362
 #, c-format
 msgid "  Album:'%s'"
-msgstr "  Albym: „%s“"
+msgstr "  Album: „%s“"
 
 #: libmedia/ffmpeg/MediaParserFfmpeg.cpp:388
 #, c-format
@@ -734,15 +739,16 @@ msgid "Unsupported video codec %d"
 msgstr "Nepodporovaný kodek videa %d"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:52
-#, fuzzy, c-format
+#, c-format
 msgid "AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr "AudioDecoderFfmpeg: FFMPEG kodek %d (%s) inicializován"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:55
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "AudioDecoderFfmpeg: initialized FFMPEG codec %d (%s) for FLASH codec %d (%s)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr ""
+"AudioDecoderFfmpeg: FFMPEG kodek %d (%s) inicializován pro FLASH kodek %d (%s)"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:70
 #, c-format
@@ -755,14 +761,13 @@ msgid "Unsupported audio codec %d"
 msgstr "Nepodporovaný zvukový kodek %d"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:118
-#, fuzzy, c-format
+#, c-format
 msgid "libavcodec could not find a decoder for codec %d (%s)"
-msgstr "libavcodec nemohl nalézt dekodér"
+msgstr "libavcodec nemohl nalézt dekodér pro kodek %d (%s)"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:128
-#, fuzzy
 msgid "AudioDecoderFfmpeg can't initialize MP3 parser"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr "AudioDecoderFfmpeg: MP3 parser nemohl být inicializován"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:143
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:333
@@ -774,9 +779,9 @@ msgstr ""
 "d)"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:217
-#, fuzzy, c-format
+#, c-format
 msgid "AudioDecoderFfmpeg: unsupported FLASH audio codec %d (%s)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr "AudioDecoderFfmpeg: nepodporovaný FLASH zvukový kodek %d (%s)"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:226
 #, c-format
@@ -784,36 +789,37 @@ msgid "AudioDecoderFfmpeg: unknown codec type %d (should never happen)"
 msgstr "AudioDecoderFfmpeg: neznámý druh kodeku %d (nemělo by nikdy nastat)"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:236
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for codec %d (%s)"
 msgstr ""
-"AudioDecoderFfmpeg: avcodec_open selhal při inicializaci FFMPEG kodeku %s (%"
-"d)"
+"AudioDecoderFfmpeg: libavcodec nedokázal najít dekodér kodeku %d (%s)"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:242
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "AudioDecoderFfmpeg: libavcodec could not find a decoder for ffmpeg codec id %"
 "s"
-msgstr "AudioDecoderFfmpeg: libavcodec neumí rozebrat současný formát zvuku"
+msgstr ""
+"AudioDecoderFfmpeg: libavcodec nedokázal najít dekodér pro ffmpeg kodek ID %s"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:260
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not initialize a parser for flash codec id %d (%s)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr ""
+"AudioDecoderFfmpeg: parser pro flash kodek ID %d (%s) nemohl být inicializován"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:265
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "AudioDecoderFfmpeg: could not initialize a parser for ffmpeg codec id %s"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr ""
+"AudioDecoderFfmpeg: parser pro ffmpeg kodek ID %s nemohl být inicializován"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:278
-#, fuzzy
 msgid "AudioDecoderFfmpeg: libavcodec couldn't allocate context"
-msgstr "libavcodec nemohl alokovat kontext"
+msgstr "AudioDecoderFfmpeg: libavcodec nemohl alokovat kontext"
 
 #: libmedia/ffmpeg/AudioDecoderFfmpeg.cpp:387
 #, c-format
@@ -843,26 +849,27 @@ msgstr ""
 #: libmedia/ffmpeg/MediaHandlerFfmpeg.cpp:88
 #, c-format
 msgid "MediaHandlerFfmpeg::createAudioDecoder: %s -- %s"
-msgstr ""
+msgstr "MediaHandlerFfmpeg::createAudioDecoder: %s – %s"
 
 #: libmedia/AudioDecoderSimple.cpp:162
 msgid "corrupted ADPCM header"
 msgstr "hlavička ADPCM poškozena"
 
 #: libmedia/AudioDecoderSimple.cpp:293 libmedia/AudioDecoderSimple.cpp:306
-#, fuzzy, c-format
+#, c-format
 msgid "AudioDecoderSimple: initialized FLASH codec %s (%d)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr "AudioDecoderSimple: FLASG kodek %s (%d) inicializován"
 
 #: libmedia/AudioDecoderSimple.cpp:332 libmedia/AudioDecoderSimple.cpp:364
-#, fuzzy, c-format
+#, c-format
 msgid "AudioDecoderSimple: unsupported flash codec %d (%s)"
-msgstr "AudioDecoderFfmpeg: FFMPEG kodek %s (%d) inicializován"
+msgstr "AudioDecoderSimple: nepodporovaný flash kodek %d (%s)"
 
 #: libmedia/AudioDecoderSimple.cpp:344
 #, c-format
 msgid "AudioDecoderSimple: unable to intepret custom audio codec id %s"
-msgstr ""
+msgstr "AudioDecoderSimple: nejsem schopen interpretovat uživatelský zvukový "
+"kodek ID %s"
 
 #: libmedia/AudioDecoderSimple.cpp:441
 msgid "Host endianness not detected in AudioDecoderSimple"
@@ -879,68 +886,69 @@ msgstr ""
 "MovieClipu). Vracím NULL."
 
 #: libcore/character.cpp:376
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._x to %s, refused"
-msgstr "Pokus o nastavení _xscale na %g, odmítnuto"
+msgstr "Pokus o nastavení %s._x na %s, zamítnuto"
 
 #: libcore/character.cpp:388
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._x to %s (evaluating to number %g) refused"
-msgstr "Pokus nastavit _rotation na %g, odmítnuto"
+msgstr "Pokus nastavit %s._x na %s (číselná hodnota %g) zamítnut"
 
 #: libcore/character.cpp:427
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._y to %s, refused"
-msgstr "Pokus o nastavení _yscale na %g, odmítnuto"
+msgstr "Pokus o nastavení %s._y na %s, zamítnuto"
 
 #: libcore/character.cpp:439
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._y to %s (evaluating to number %g) refused"
-msgstr "Pokus nastavit _rotation na %g, odmítnuto"
+msgstr "Pokus nastavit %s.y na %s (číselní hodnota %g) zamítnut"
 
 #: libcore/character.cpp:477
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._xscale to %s, refused"
-msgstr "Pokus o nastavení _xscale na %g, odmítnuto"
+msgstr "Pokus o nastavení %s._xscale na %s, zamítnuto"
 
 #: libcore/character.cpp:489
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._xscale to %s (evaluating to number %g) refused"
-msgstr "Pokus o nastavení _xscale na %g, odmítnuto"
+msgstr "Pokus nastavit %s._xscale na %s (číselná hodnota %g) zamítnut"
 
 #: libcore/character.cpp:524
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._yscale to %s, refused"
-msgstr "Pokus o nastavení _yscale na %g, odmítnuto"
+msgstr "Pokus o nastavení %s_yscale na %s, zamítnuto"
 
 #: libcore/character.cpp:536
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._yscale to %s (evaluating to number %g) refused"
-msgstr "Pokus o nastavení _yscale na %g, odmítnuto"
+msgstr "Pokus nastavit %s._yscale na %s (číselná hodnota %g) zamítnut"
 
 #: libcore/character.cpp:603
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._alpha to %s, refused"
-msgstr "Pokus o nastavení _xscale na %g, odmítnuto"
+msgstr "Pokus o nastavení %s._alpha na %s, zamítnuto"
 
 #: libcore/character.cpp:618
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._alpha to %s (evaluating to number %g) refused"
-msgstr "Pokus nastavit _rotation na %g, odmítnuto"
+msgstr "Pokus nastavit %s._alpha na %s (číselná hodnota %g) zamítnut"
 
+# Function name
 #: libcore/character.cpp:652
 msgid "blendMode"
-msgstr ""
+msgstr "blendMode"
 
 #: libcore/character.cpp:738
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._visible to %s, refused"
-msgstr "Pokus o nastavení _xscale na %g, odmítnuto"
+msgstr "Pokus o nastavení %s._visible na %s, zamítnuto"
 
 #: libcore/character.cpp:754
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._visible to %s (evaluating to number %g) refused"
-msgstr "Pokus nastavit _rotation na %g, odmítnuto"
+msgstr "Pokus nastavit %s._visible na %s (číselná hodnota %g) zamítnut"
 
 #: libcore/character.cpp:790
 #, c-format
@@ -953,14 +961,14 @@ msgid "Setting _height=%g of character %s (%s)"
 msgstr "Nastavuji _height=%g znaku %s (%s)"
 
 #: libcore/character.cpp:912
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._rotation to %s, refused"
-msgstr "Pokus nastavit _rotation na %g, odmítnuto"
+msgstr "Pokus o nastavení %s._rotation na %s, zamítnuto"
 
 #: libcore/character.cpp:925
-#, fuzzy, c-format
+#, c-format
 msgid "Attempt to set %s._rotation to %s (evaluating to number %g) refused"
-msgstr "Pokus nastavit _rotation na %g, odmítnuto"
+msgstr "Pokus nastavit %s._rotation na %s (číselná hodnota %g) zamítnut"
 
 #: libcore/character.cpp:1460
 msgid "yes"
@@ -988,7 +996,7 @@ msgstr "Rozměry"
 
 #: libcore/character.cpp:1491
 msgid "Dynamic"
-msgstr "Dynamica"
+msgstr "Dynamika"
 
 #: libcore/character.cpp:1492
 msgid "Mask"
@@ -1004,15 +1012,15 @@ msgstr "Uvolněno"
 
 #: libcore/character.cpp:1498
 msgid "Blend mode"
-msgstr ""
+msgstr "Režim míšení barev"
 
 #: libcore/character.cpp:1501
 msgid "Invalidated"
-msgstr ""
+msgstr "Zneplatněno"
 
 #: libcore/character.cpp:1502
 msgid "Child invalidated"
-msgstr ""
+msgstr "Potomci zneplatněni"
 
 #: libcore/MovieClip.cpp:400 libcore/MovieClip.cpp:454
 #: libcore/as_object.cpp:344
@@ -1030,14 +1038,14 @@ msgid "Can't clone root of the movie"
 msgstr "Nemohu naklonovat kořen filmu"
 
 #: libcore/MovieClip.cpp:600
-#, fuzzy, c-format
+#, c-format
 msgid "%s parent is not a movieclip, can't clone"
-msgstr "rodič %s není sprite, nelze klonovat"
+msgstr "rodič %s není movieclip, nelze klonovat"
 
 #: libcore/MovieClip.cpp:656
-#, fuzzy, c-format
+#, c-format
 msgid "Event %s invoked for movieclip %s"
-msgstr "Událost %s vyvolána pro sprite %s"
+msgstr "Událost %s vyvolána pro movieclip %s"
 
 #: libcore/MovieClip.cpp:663
 #, c-format
@@ -1069,19 +1077,18 @@ msgid "it's NOT a Text Variable"
 msgstr "NENÍ Textová proměnná"
 
 #: libcore/MovieClip.cpp:893
-#, fuzzy, c-format
+#, c-format
 msgid "advance_movieclip: no frames loaded for movieclip/movie %s"
-msgstr "advance_sprite: pro sprite/film %s nejsou nahrané žádné snímky"
+msgstr "advance_movieclip: pro movieclip/film %s nejsou nahrané žádné snímky"
 
 #: libcore/MovieClip.cpp:906
-#, fuzzy, c-format
+#, c-format
 msgid "Advance_movieclip for movieclip '%s' - frame %u/%u "
-msgstr "Advance_sprite pro sprite „%s“ – snímek %u/%u "
+msgstr "Advance_movieclip pro movieclip „%s“ – snímek %u/%u "
 
 #: libcore/MovieClip.cpp:919
-#, fuzzy
 msgid "MovieClip::advance_movieclip we're in PLAY mode"
-msgstr "sprite_instance::advance_sprite jsme v režimu PLAY (přehrávání)"
+msgstr "MovieClip::advance_movieclip jsme v režimu PLAY (přehrávání)"
 
 #: libcore/MovieClip.cpp:925
 msgid "on_event_load called, incrementing"
@@ -1093,29 +1100,28 @@ msgid "after increment we are at frame %u/%u"
 msgstr "po navýšení jsme na snímku %u/%u"
 
 #: libcore/MovieClip.cpp:939
-#, fuzzy, c-format
+#, c-format
 msgid "Jumping back to frame 0 of movieclip %s"
-msgstr "Přeskakuji zpět na snímek 0 spritu %s"
+msgstr "Přeskakuji zpět na snímek 0 movieclip %s"
 
 #: libcore/MovieClip.cpp:947
-#, fuzzy, c-format
+#, c-format
 msgid "Executing frame%d (0-based) tags of movieclip %s"
-msgstr "Provádím značky snímku%d (začíná nulou) spritu %s"
+msgstr "Provádím značky snímku%d (začíná nulou) movieclipu %s"
 
 #: libcore/MovieClip.cpp:959
-#, fuzzy
 msgid "MovieClip::advance_movieclip we're in STOP mode"
-msgstr "sprite_instance::advance_sprite jsme v režimu STOP"
+msgstr "MovieClip::advance_movieclip jsme v režimu STOP"
 
 #: libcore/MovieClip.cpp:973
-#, fuzzy, c-format
+#, c-format
 msgid "Advance movieclip '%s' at frame %u/%u"
-msgstr "Krok spritu „%s“ na snímku %u/%u"
+msgstr "Krok movieclipu „%s“ na snímku %u/%u"
 
 #: libcore/MovieClip.cpp:993
-#, fuzzy, c-format
+#, c-format
 msgid "Queuing init actions in frame %d of movieclip %s"
-msgstr "Zařazuji do fronty inicializační akce ve snímku %d spritu %s"
+msgstr "Zařazuji do fronty inicializační akce pro snímek %d movieclipu %s"
 
 #: libcore/MovieClip.cpp:1005
 #, c-format
@@ -1123,14 +1129,14 @@ msgid "Init actions for character %d already executed"
 msgstr "Inicializační akce znaku %d již vykonány"
 
 #: libcore/MovieClip.cpp:1063
-#, fuzzy, c-format
+#, c-format
 msgid "Executing %d tags in frame %d/%d of movieclip %s"
-msgstr "Provádím %d značky ve snímku %d/%d spritu %s"
+msgstr "Provádím %d značky ve snímku %d/%d movieclipu %s"
 
 #: libcore/MovieClip.cpp:1099
-#, fuzzy, c-format
+#, c-format
 msgid "movieclip %s ::goto_frame(%d) - current frame is %d"
-msgstr "sprite %s ::goto_frame(%d) – současný snímek je %d"
+msgstr "movieclip %s ::goto_frame(%d) – současný snímek je %d"
 
 #: libcore/MovieClip.cpp:1114
 #, c-format
@@ -1160,27 +1166,27 @@ msgstr ""
 "v hlavičce (%d) říká, že bychom jej měli najít"
 
 #: libcore/MovieClip.cpp:1224
-#, fuzzy, c-format
+#, c-format
 msgid "MovieClip::goto_labeled_frame('%s') unknown label"
-msgstr "sprite_instance::goto_labeled_frame(„%s“) neznámá jmenovka"
+msgstr "MovieClip::goto_labeled_frame(„%s“) neznámá jmenovka"
 
 #: libcore/MovieClip.cpp:1307
-#, fuzzy, c-format
+#, c-format
 msgid "MovieClip::add_display_object(): unknown cid = %d"
-msgstr "sprite_instance::add_display_object(): neznámý cid = %d"
+msgstr "MovieClip::add_display_object(): neznámý cid = %d"
 
 #: libcore/MovieClip.cpp:1371
-#, fuzzy, c-format
+#, c-format
 msgid "movieclip::replace_display_object(): unknown cid = %d"
-msgstr "sprite::replace_display_object(): neznámý cid = %d"
+msgstr "movieclip::replace_display_object(): neznámý cid = %d"
 
 #: libcore/MovieClip.cpp:1424
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "MovieClip::replace_display_object: could not find any character at depth %d"
 msgstr ""
-"sprite_instance::replace_display_object: nebylo možné nalézt jakýkoliv znak "
-"v hloubce %d"
+"MovieClip::replace_display_object: v hloubce %d nebylo možné nalézt "
+"jakýkoliv znak"
 
 #: libcore/MovieClip.cpp:1543
 #, c-format
@@ -1247,34 +1253,34 @@ msgid "Sprite '%s' placed on stage"
 msgstr "Sprite „%s“ umístěn na scénu"
 
 #: libcore/MovieClip.cpp:2195 libcore/MovieClip.cpp:2216
-#, fuzzy, c-format
+#, c-format
 msgid "Executing tags of frame0 in movieclip %s"
-msgstr "Provádím značky snímku0 ve spritu %s"
+msgstr "Provádím značky snímku0 ve movieclipu %s"
 
 #: libcore/MovieClip.cpp:2202 libcore/MovieClip.cpp:2211
-#, fuzzy, c-format
+#, c-format
 msgid "Queuing ONLOAD event for movieclip %s"
-msgstr "Událost ONLOAD pro sprite %s zařazuji do fronty"
+msgstr "Událost ONLOAD pro movieclip %s zařazuji do fronty"
 
 #: libcore/MovieClip.cpp:2235
-#, fuzzy, c-format
+#, c-format
 msgid "Queuing INITIALIZE and CONSTRUCT events for movieclip %s"
-msgstr "Událost INITIALIZE pro sprite %s zařazuji do fronty"
+msgstr "Události INITIALIZE a CONSTRUCT pro movieclip %s zařazuji do fronty"
 
 #: libcore/MovieClip.cpp:2269
-#, fuzzy, c-format
+#, c-format
 msgid "constructAsScriptObject called for movieclip %s"
-msgstr "Zavoláno constructAsScriptObject pro sprite %s"
+msgstr "Zavoláno constructAsScriptObject pro movieclip %s"
 
 #: libcore/MovieClip.cpp:2294
-#, fuzzy, c-format
+#, c-format
 msgid "Attached movieclips %s registered class is %p"
-msgstr "Registrovaná třída připojených spritů %s je %p"
+msgstr "Registrovaná třída připojených movieclipů %s je %p"
 
 #: libcore/MovieClip.cpp:2358
-#, fuzzy, c-format
+#, c-format
 msgid "Unloading movieclip '%s'"
-msgstr "Uklízím sprite „%s“"
+msgstr "Uklízím movieclip „%s“"
 
 #: libcore/MovieClip.cpp:2390
 #, c-format
@@ -1302,12 +1308,12 @@ msgid "Setting variable '%s' to value '%s'"
 msgstr "Nastavuji proměnné „%s“ hodnotu „%s“"
 
 #: libcore/MovieClip.cpp:2576
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "removeMovieClip(%s): movieclip depth (%d) out of the 'dynamic' zone "
 "[0..1048575], won't remove"
 msgstr ""
-"removeMovieClip(%s): hloubka spritu (%d) mimo „dynamickou“ zónu "
+"removeMovieClip(%s): hloubka movieclipu (%d) mimo „dynamickou“ zónu "
 "[0..1048575], neodstraním"
 
 #: libcore/MovieClip.cpp:2830
@@ -1321,31 +1327,31 @@ msgstr "Potomci"
 
 #: libcore/MovieClip.cpp:3100
 msgid "MovieClip.cacheAsBitmap()"
-msgstr ""
+msgstr "MovieClip.cacheAsBitmap()"
 
 #: libcore/MovieClip.cpp:3111
 msgid "MovieClip.filters()"
-msgstr ""
+msgstr "MovieClip.filters()"
 
 #: libcore/MovieClip.cpp:3122
 msgid "MovieClip.forceSmoothing()"
-msgstr ""
+msgstr "MovieClip.forceSmoothing()"
 
 #: libcore/MovieClip.cpp:3133
 msgid "MovieClip.opaqueBackground()"
-msgstr ""
+msgstr "MovieClip.opaqueBackground()"
 
 #: libcore/MovieClip.cpp:3144
 msgid "MovieClip.scale9Grid()"
-msgstr ""
+msgstr "MovieClip.scale9Grid()"
 
 #: libcore/MovieClip.cpp:3155
 msgid "MovieClip.scrollRect()"
-msgstr ""
+msgstr "MovieClip.scrollRect()"
 
 #: libcore/MovieClip.cpp:3166
 msgid "MovieClip.tabIndex()"
-msgstr ""
+msgstr "MovieClip.tabIndex()"
 
 #: libcore/MovieClip.cpp:3182
 #, c-format
@@ -1445,10 +1451,11 @@ msgstr ""
 "d"
 
 #: libcore/MovieClip.cpp:3476
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%s.swapDepths(%s): first argument invalid (neither a movieclip nor a number)"
-msgstr "%s.swapDepths(%s): neplatný první argument (ani sprite ani číslo)"
+msgstr ""
+"%s.swapDepths(%s): neplatný první argument (ani movieclip ani číslo)"
 
 #: libcore/MovieClip.cpp:3493
 #, c-format
@@ -1465,24 +1472,22 @@ msgid "MovieClip.duplicateMovieClip: invalid depth %d passed; not duplicating"
 msgstr "MovieClip.duplicateMovieClip: předána neplatná hloubka %d; neduplikuji"
 
 #: libcore/MovieClip.cpp:3584
-#, fuzzy
 msgid "movieclip_goto_and_play needs one arg"
-msgstr "sprite_goto_and_play potřebuje jeden argument"
+msgstr "movieclip_goto_and_play potřebuje jeden argument"
 
 #: libcore/MovieClip.cpp:3594
-#, fuzzy, c-format
+#, c-format
 msgid "movieclip_goto_and_play('%s') -- invalid frame"
-msgstr "sprite_goto_and_play(„%s“) – neplatný snímek"
+msgstr "movieclip_goto_and_play(„%s“) – neplatný snímek"
 
 #: libcore/MovieClip.cpp:3614
-#, fuzzy
 msgid "movieclip_goto_and_stop needs one arg"
-msgstr "sprite_goto_and_stop potřebuje jeden argument"
+msgstr "movieclip_goto_and_stop potřebuje jeden argument"
 
 #: libcore/MovieClip.cpp:3624
-#, fuzzy, c-format
+#, c-format
 msgid "movieclip_goto_and_stop('%s') -- invalid frame"
-msgstr "sprite_goto_and_stop(„%s“) – neplatný snímek"
+msgstr "movieclip_goto_and_stop(„%s“) – neplatný snímek"
 
 #: libcore/MovieClip.cpp:3705
 #, c-format
@@ -1546,12 +1551,12 @@ msgstr "createTextField: záporná výška (%d) – obracím znaménko"
 
 #: libcore/MovieClip.cpp:3981
 msgid "No arguments passed to MovieClip.getURL()"
-msgstr ""
+msgstr "MovieClip.getURL() neobdržel žádné argumenty"
 
 #: libcore/MovieClip.cpp:3990
-#, fuzzy, c-format
+#, c-format
 msgid "MovieClip.getURL(%s): extra arguments dropped"
-msgstr "MovieClipLoader.getProgress(%s): první argument není sprite"
+msgstr "MovieClip.getURL(%s): nadbytečný argument zahozen"
 
 #: libcore/MovieClip.cpp:4048
 #, c-format
@@ -1851,44 +1856,43 @@ msgstr ""
 "k zarovnání"
 
 #: libcore/TextField.cpp:903
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "TextField: missing glyph for space char (needed for TAB). Make sure "
 "character shapes for font %s are being exported into your SWF file."
 msgstr ""
-"%s – postrádám kresbu pro znak mezery (potřeba pro TAB). Ujistěte se, že "
-"tvary pro font %s budou exportovány do vašeho SWF souboru."
+"TextField: postrádám kresbu pro znak mezery (potřeba pro TAB). Ujistěte se, "
+"že tvary znaků fontu %s se exportují do vašeho SWF souboru."
 
 #: libcore/TextField.cpp:962
 msgid "No font for TextField!"
-msgstr ""
+msgstr "Chybí font pro TextField!"
 
 #: libcore/TextField.cpp:1103
-#, fuzzy
 msgid ""
 "HTML in a text field is unsupported, gnash will just ignore the tags and "
 "print their content"
 msgstr ""
-"HTML v textovém poli není podporován, gnash prostě zapomene značky a vypíše "
-"jejich obsah"
+"HTML v textovém poli není podporován, gnash bude prostě ignorovat značky a "
+"vypíše jen jejich obsah"
 
 #: libcore/TextField.cpp:1141
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "TextField: missing embedded glyph for char %d. Make sure character shapes "
 "for font %s are being exported into your SWF file"
 msgstr ""
-"%s – postrádám vestavěnou kresbu pro znak %d. Ujistěte se, že tvary pro font "
-"%s budou exportovány do vašeho SWF souboru."
+"TextField: postrádám vestavěnou kresbu pro znak %d. Ujistěte se, že tvary "
+"znaků fontu %s se exportují do vašeho SWF souboru."
 
 #: libcore/TextField.cpp:1149
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "TextField: missing device glyph for char %d. Maybe you don't have font '%s' "
 "installed in your system."
 msgstr ""
-"%s – postrádám kresbu zařízení pro znak %d. Možná nemáte ve svém systému "
-"nainstalovaný font „%s“?"
+"TextField: postrádám kresbu zařízení pro znak %d. Možná nemáte ve svém "
+"systému nainstalovaný font „%s“."
 
 #: libcore/TextField.cpp:1332
 #, c-format
@@ -1910,15 +1914,15 @@ msgid "Variable text Path: %s, Var: %s"
 msgstr "Cesta s proměnným textem: %s, Proměnná: %s"
 
 #: libcore/TextField.cpp:1370
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "VariableName associated to text field refers to an unknown target (%s). It "
 "is possible that the character will be instantiated later in the SWF stream. "
 "Gnash will try to register again on next access."
 msgstr ""
 "VariableName spojená s textovým polem ukazuje na neznámý cíl (%s). Je možné, "
-"že znak bude instanciován později v proudu SWF. Gnash se pokusí o registraci "
-"při příštím přístupu."
+"že instance znaku bude vytvořena později v proudu SWF. Gnash se pokusí "
+"o registraci znovu při příštím přístupu."
 
 #: libcore/TextField.cpp:1391
 msgid "registerTextVariable() called"
@@ -1940,8 +1944,8 @@ msgid ""
 "Gnash will try to register again on next access."
 msgstr ""
 "VariableName spojená s textovým polem (%s) ukazuje na neznámý cíl. Je možné, "
-"že znak bude instanciován později v proudu SWF. Gnash se pokusí o registraci "
-"při příštím přístupu."
+"že instance znak bude vytvořena později v proudu SWF. Gnash se pokusí "
+"o registraci při příštím přístupu."
 
 #: libcore/TextField.cpp:1434
 #, c-format
@@ -2077,7 +2081,7 @@ msgid "Unhandled button event %s"
 msgstr "Neobsloužená událost tlačítka %s"
 
 #: libcore/Button.cpp:1104
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "A button member (%s) clashes with the name of an existing character in its "
 "display list.    The member will hide the character"
@@ -2271,9 +2275,9 @@ msgid "Date.setFullYear needs one argument"
 msgstr "Date.setFullYear potřebuje jeden argument"
 
 #: libcore/asobj/Date_as.cpp:854
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sFullYear was called with more than three arguments"
-msgstr "Date.setFullYear byl zavolán s více jak třemi argumenty"
+msgstr "Date.set%sFullYear byl zavolán s více jak třemi argumenty"
 
 #: libcore/asobj/Date_as.cpp:890
 msgid "Date.setYear needs one argument"
@@ -2284,54 +2288,54 @@ msgid "Date.setYear was called with more than three arguments"
 msgstr "Date.setYear byl zavolán s více jak třemi argumenty"
 
 #: libcore/asobj/Date_as.cpp:944
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sMonth needs one argument"
-msgstr "Date.setMonth potřebuje jeden argument"
+msgstr "Date.set%sMonth potřebuje jeden argument"
 
 #: libcore/asobj/Date_as.cpp:977
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sMonth was called with more than three arguments"
-msgstr "Date.setMonth byl zavolán s více jak třemi argumenty"
+msgstr "Date.set%sMonth byl zavolán s více jak třemi argumenty"
 
 #: libcore/asobj/Date_as.cpp:999
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sDate needs one argument"
-msgstr "Date.setDate potřebuje jeden argument"
+msgstr "Date.set%sDate potřebuje jeden argument"
 
 #: libcore/asobj/Date_as.cpp:1013
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sDate was called with more than one argument"
-msgstr "Date.setDate byl zavolán s více jak jedním argumentem"
+msgstr "Date.set%sDate byl zavolán s více jak jedním argumentem"
 
 #: libcore/asobj/Date_as.cpp:1040
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sHours needs one argument"
-msgstr "Date.setHours potřebuje jeden argument"
+msgstr "Date.set%sHours potřebuje jeden argument"
 
 #: libcore/asobj/Date_as.cpp:1059
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sHours was called with more than four arguments"
-msgstr "Date.setHours byl zavolán s více jak čtyřmi argumenty"
+msgstr "Date.set%sHours byl zavolán s více jak čtyřmi argumenty"
 
 #: libcore/asobj/Date_as.cpp:1085
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sMinutes needs one argument"
-msgstr "Date.setMinutes potřebuje jeden argument"
+msgstr "Date.set%sMinutes potřebuje jeden argument"
 
 #: libcore/asobj/Date_as.cpp:1103 libcore/asobj/Date_as.cpp:1146
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sMinutes was called with more than three arguments"
-msgstr "Date.setMinutes byl zavolán s více jak třemi argumenty"
+msgstr "Date.set%sMinutes byl zavolán s více jak třemi argumenty"
 
 #: libcore/asobj/Date_as.cpp:1126
-#, fuzzy, c-format
+#, c-format
 msgid "Date.set%sSeconds needs one argument"
-msgstr "Date.setSeconds potřebuje jeden argument"
+msgstr "Date.set%sSeconds potřebuje jeden argument"
 
 #: libcore/asobj/Date_as.cpp:1164
-#, fuzzy, c-format
+#, , c-format
 msgid "Date.set%sMilliseconds needs one argument"
-msgstr "Date.setMilliseconds potřebuje jeden argument"
+msgstr "Date.set%sMilliseconds potřebuje jeden argument"
 
 #: libcore/asobj/Date_as.cpp:1181
 msgid "Date.setMilliseconds was called with more than one argument"
@@ -2355,6 +2359,8 @@ msgstr "SharedObject %s nebyl uklizen (složen jen pro čtení)"
 msgid ""
 "SharedObject path %s is outside the SWF domain %s. Cannot access this object."
 msgstr ""
+"Cesta SharedObject %s je mimo SWF doménu %s. K tomuto objektu nelze "
+"přistoupit."
 
 #: libcore/asobj/SharedObject_as.cpp:551
 #, c-format
@@ -2362,6 +2368,8 @@ msgid ""
 "SharedObject path %s is not part of the SWF path %s. Cannot access this "
 "object."
 msgstr ""
+"Cesta SharedObject %s není součástí SWF cesty %s. K tomuto objektu nelze "
+"přistoupit."
 
 #: libcore/asobj/SharedObject_as.cpp:781
 #, c-format
@@ -2388,9 +2396,9 @@ msgid "Connection to movie: %s"
 msgstr "Spojení na film: %s"
 
 #: libcore/asobj/NetConnection_as.cpp:880
-#, fuzzy, c-format
+#, c-format
 msgid "Gnash is not allowed to NetConnection.connect to %s"
-msgstr "Gnash nemá dovoleno otevřít toto URL: %s"
+msgstr "Gnash nemá dovoleno NetConnection.connect na %s"
 
 #: libcore/asobj/NetConnection_as.cpp:1099
 msgid "NetConnection.call(): needs at least one argument"
@@ -2429,14 +2437,12 @@ msgstr ""
 "Nastavení národního prostředí na UTF-8 by to mohlo spravit."
 
 #: libcore/asobj/String_as.cpp:922
-#, fuzzy
 msgid "%1%(%2%) needs %3% argument(s)"
-msgstr "%s potřebuje jeden argument"
+msgstr "%1%%(%2%) potřebuje %3% argument(y)"
 
 #: libcore/asobj/String_as.cpp:933
-#, fuzzy
 msgid "%1%(%2%) has more than %3% argument(s)"
-msgstr "%s má více jak dva argumenty"
+msgstr "%1%(%2%) má více jak %3% argument(y)"
 
 #: libcore/asobj/LoadableObject.cpp:179
 #, c-format
@@ -2476,29 +2482,24 @@ msgid "XML.addRequestHeader(%s): both arguments must be a string"
 msgstr "XML.addRequestHeader(%s): oba argumenty musí být řetězec"
 
 #: libcore/asobj/LoadableObject.cpp:488
-#, fuzzy
 msgid "sendAndLoad() requires at least two arguments"
-msgstr "LoadVars.sendAndLoad() vyžaduje alespoň dva argumenty"
+msgstr "sendAndLoad() vyžaduje alespoň dva argumenty"
 
 #: libcore/asobj/LoadableObject.cpp:497
-#, fuzzy
 msgid "sendAndLoad(): invalid empty url"
-msgstr "LoadVars.sendAndLoad(): neplatné prázdné URL"
+msgstr "sendAndLoad(): neplatné prázdné URL"
 
 #: libcore/asobj/LoadableObject.cpp:505
-#, fuzzy
 msgid "sendAndLoad(): invalid target (must be an XML or LoadVars object)"
-msgstr "LoadVars.sendAndLoad(): neplatný cíl (musí být objektem)"
+msgstr "sendAndLoad(): neplatný cíl (musí být objektem XML nebo LoadVars)"
 
 #: libcore/asobj/LoadableObject.cpp:532
-#, fuzzy
 msgid "load() requires at least one argument"
-msgstr "LoadVars.load() vyžaduje alespoň jeden argument"
+msgstr "load() vyžaduje alespoň jeden argument"
 
 #: libcore/asobj/LoadableObject.cpp:541
-#, fuzzy
 msgid "load(): invalid empty url"
-msgstr "LoadVars.load(): neplatné prázdné URL"
+msgstr "load(): neplatné prázdné URL"
 
 #: libcore/asobj/Object.cpp:161
 msgid "Too many args to Object constructor"
@@ -2612,21 +2613,19 @@ msgid "Object.unwatch(%s): missing argument"
 msgstr "Object.unwatch(%s): postrádám argument"
 
 #: libcore/asobj/LocalConnection_as.cpp:251
-#, fuzzy
 msgid "LocalConnection.connect() expects exactly 1 argument"
-msgstr "NetConnection.connect(): potřebuji alespoň jeden argument"
+msgstr "LocalConnection.connect(): potřebuje právě jeden argument"
 
 #: libcore/asobj/LocalConnection_as.cpp:259
-#, fuzzy
 msgid "LocalConnection.connect(): first argument must be a string"
-msgstr "NetConnection.connect(): první argument by neměl být nedefinováno"
+msgstr "LocalConnection.connect(): první argument musí být řetězec"
 
 #: libcore/asobj/LocalConnection_as.cpp:301
 #: libcore/asobj/LocalConnection_as.cpp:312
 #: libcore/asobj/LocalConnection_as.cpp:324
-#, fuzzy, c-format
+#, c-format
 msgid "LocalConnection.send(%s): requires at least 2 arguments"
-msgstr "LoadVars.sendAndLoad() vyžaduje alespoň dva argumenty"
+msgstr "LocalConnection.send(%s): vyžaduje alespoň dva argumenty"
 
 #: libcore/asobj/LocalConnection_as.cpp:337
 #, c-format
@@ -2749,11 +2748,13 @@ msgid "AsBroadcaster.initialize(%s): first arg is not an object"
 msgstr "AsBroadcaster.initialize(%s): první argument není objekt"
 
 #: libcore/asobj/AsBroadcaster.cpp:230
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "AsBroadcaster.initialize(%s): first arg is an object but doesn't cast to one "
 "(dangling character ref?)"
-msgstr "AsBroadcaster.initialize(%s): první argument není objekt"
+msgstr ""
+"AsBroadcaster.initialize(%s): první argument je objekt, ale nelze jej na "
+"žádný převést (slepý odkaz znaku?)"
 
 #: libcore/asobj/AsBroadcaster.cpp:259 libcore/asobj/AsBroadcaster.cpp:317
 #: libcore/asobj/AsBroadcaster.cpp:398
@@ -2820,14 +2821,14 @@ msgid "\tCreating XMLNode data at %p"
 msgstr "\tVytvářím XMLNode data na %p"
 
 #: libcore/asobj/XMLNode_as.cpp:116
-#, fuzzy, c-format
+#, c-format
 msgid "\tDeleting XMLNode data %s with as_value %s at %p"
-msgstr "\tMažu XMLNode data %s s hodnotou %s na %p"
+msgstr "\tMažu XMLNode data %s s as_hodnotou %s na %p"
 
 #: libcore/asobj/XMLNode_as.cpp:145
-#, fuzzy, c-format
+#, c-format
 msgid "XMLNode_as %p has no children"
-msgstr "XMLNode %p nemá žádné přímé potomky"
+msgstr "XMLNode_as %p nemá žádné přímé potomky"
 
 #: libcore/asobj/XMLNode_as.cpp:182
 msgid ""
@@ -2836,11 +2837,11 @@ msgstr ""
 "XMLNode.insertBefore(): poziční parametr není přímým potomkem tohoto uzlu"
 
 #: libcore/asobj/XMLNode_as.cpp:376
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Stringifying node %p with name %s, as_value %s, %u attributes and %u children"
 msgstr ""
-"Vyrábím řetězec z uzlu %p se jménem %s, hodnotou %s, %u atributy a %u potomky"
+"Vyrábím řetězec z uzlu %p se jménem %s, as_hodnotou %s, %u atributy a %u potomky"
 
 #: libcore/asobj/XMLNode_as.cpp:576
 msgid "XMLNode::appendChild() needs at least one argument"
@@ -2851,7 +2852,7 @@ msgid "First argument to XMLNode::appendChild() is not an XMLNode"
 msgstr "První argument XMLNode::appendChild() není XMLNode"
 
 #: libcore/asobj/XMLNode_as.cpp:620
-#, fuzzy, c-format
+#, c-format
 msgid "XMLNode.insertBefore(%s) needs at least two arguments"
 msgstr "XMLNode.insertBefore(%s) potřebuje alespoň dva argumenty"
 
@@ -2871,13 +2872,13 @@ msgid "Gnash could not open this url: %s"
 msgstr "Gnash nemohl otevřít toto URL: %s"
 
 #: libcore/asobj/Sound_as.cpp:228
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to create parser for Sound at %s"
-msgstr "Nemohu vytvořit parser Sound vstupu"
+msgstr "Nemohu vytvořit parser pro Sound na %s"
 
 #: libcore/asobj/Sound_as.cpp:346
 msgid "Sound.start() has no effect on a streaming Sound"
-msgstr ""
+msgstr "Sound.start() neúčinkuje na proudovaném Sound"
 
 #: libcore/asobj/Sound_as.cpp:609
 msgid "-- start sound"
@@ -2963,12 +2964,10 @@ msgid "XMLSocket.connect() called while already connected, ignored"
 msgstr "XMLSocket.connect() zavoláno během spojení, ignorováno"
 
 #: libcore/asobj/XMLSocket_as.cpp:279
-#, fuzzy
 msgid "XMLSocket.connect(): connection failed"
-msgstr "XMLSocket.connect(%s) zrušeno"
+msgstr "XMLSocket.connect(): spojení selhalo"
 
 #: libcore/asobj/XMLSocket_as.cpp:292
-#, fuzzy
 msgid "XMLSocket.connect(): trying to call onConnect"
 msgstr "XMLSocket.connect(): zkouším zavolat onConnect"
 
@@ -3121,9 +3120,8 @@ msgid "No NetConnection associated with this NetStream, won't play"
 msgstr "Žádný NetConnection příslušející tomuto NetStreamu, nebudu přehrávat"
 
 #: libcore/asobj/NetStream_as.cpp:458
-#, fuzzy
 msgid "NetConnection is not connected. Won't play."
-msgstr "Žádný NetConnection příslušející tomuto NetStreamu, nebudu přehrávat"
+msgstr "NetConnection není spojeno. Nebudu přehrávat."
 
 #: libcore/asobj/NetStream_as.cpp:477
 #, c-format
@@ -3131,9 +3129,9 @@ msgid "Connecting to movie: %s"
 msgstr "Připojuji se na film: %s"
 
 #: libcore/asobj/NetStream_as.cpp:560
-#, fuzzy, c-format
+#, c-format
 msgid "Gnash could not get stream '%s' from NetConnection"
-msgstr "Gnash nemohl číst z URL filmu"
+msgstr "Gnash nemohl z NetConnection získat proud „%s“"
 
 #: libcore/asobj/NetStream_as.cpp:571
 msgid "No Media handler registered, can't parse NetStream input"
@@ -3156,9 +3154,8 @@ msgstr ""
 "První argument konstruktoru NetConnection nelze převést na NetConnection (%s)"
 
 #: libcore/asobj/NetStream_as.cpp:1689
-#, fuzzy
 msgid "NetStream_as play needs args"
-msgstr "Přehrávání NetStreamu potřebuje argumenty"
+msgstr "Přehrávání NetStream_as potřebuje argumenty"
 
 #: libcore/asobj/NetStream_as.cpp:1697
 #, c-format
@@ -3171,7 +3168,7 @@ msgid "Number.toString(%s): radix must be in the 2..36 range (%d is invalid)"
 msgstr "Number.toString(%s): základ musí být v rozsahu 2–36 (%d není platný)"
 
 #: libcore/movie_root.cpp:212
-#, fuzzy, c-format
+#, c-format
 msgid "ActionLimits hit during setRootMovie: %s. Disable scripts?"
 msgstr "Při setRootMovie dosaženy ActionLimits: %s. Vypnout skripty?"
 
@@ -3215,9 +3212,9 @@ msgid "ActionLimits hit notifying mouse events: %s."
 msgstr "Při oznamování události myši dosaženy ActionLimits: %s."
 
 #: libcore/movie_root.cpp:2224
-#, fuzzy, c-format
+#, c-format
 msgid "Launching URL: %s"
-msgstr "Spouštím URL… %s"
+msgstr "Spouštím URL: %s"
 
 #: libcore/movie_root.cpp:2262
 #, c-format
@@ -3467,19 +3464,17 @@ msgid "AMF0 read: premature end of input reading String type"
 msgstr "Čtení AMF0: předčasný konec vstupu při načítání typu String"
 
 #: libcore/as_value.cpp:2215 libcore/as_value.cpp:2221
-#, fuzzy
 msgid "AMF0 read: premature end of input reading Long String type"
-msgstr "Čtení AMF0: předčasný konec vstupu při načítání typu String"
+msgstr "Čtení AMF0: předčasný konec vstupu při načítání typu Long String"
 
 #: libcore/as_value.cpp:2406
-#, fuzzy
 msgid "AMF0 read: premature end of input reading Date type"
-msgstr "Čtení AMF0: předčasný konec vstupu při načítání typu Number"
+msgstr "Čtení AMF0: předčasný konec vstupu při načítání typu Date"
 
 #: libcore/as_value.cpp:2422
-#, fuzzy
 msgid "AMF0 read: premature end of input reading timezone from Date type"
-msgstr "Čtení AMF0: předčasný konec vstupu při načítání typu String"
+msgstr "Čtení AMF0: předčasný konec vstupu při načítání časového pásma "
+"z typu Date"
 
 #: libcore/as_value.cpp:2464
 #, c-format
@@ -3491,21 +3486,23 @@ msgid "serialization of as_value of type FUNCTION"
 msgstr "serializace as_value typu FUNCTION"
 
 #: libcore/as_value.cpp:2488
-#, fuzzy, c-format
+#, c-format
 msgid "writeAMF0: serializing array of %d elements as STRICT_ARRAY (index %d)"
-msgstr "writeAMF0: serializuji pole o %d prvcích jako ECMA_ARRAY (index %d)"
+msgstr "writeAMF0: serializuji pole o %d prvcích jako STRICT_ARRAY (index %d)"
 
 #: libcore/as_value.cpp:2510
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "writeAMF0: serializing array of %d elements as ECMA_ARRAY (index %d) "
 "[allowStrict:%d, isStrict:%d]"
-msgstr "writeAMF0: serializuji pole o %d prvcích jako ECMA_ARRAY (index %d)"
+msgstr ""
+"writeAMF0: serializuji pole o %d prvcích jako ECMA_ARRAY (index %d) "
+"[allowStrict:%d, isStrict:%d]"
 
 #: libcore/as_value.cpp:2523
-#, fuzzy, c-format
+#, c-format
 msgid "writeAMF0: serializing date object with index %d and value %g"
-msgstr "writeAMF0: serializuji objekt (nebo funkci) s indexem %d"
+msgstr "writeAMF0: serializuji datový objekt s indexem %d a hodnou %g"
 
 #: libcore/as_value.cpp:2541
 #, c-format
@@ -3518,17 +3515,17 @@ msgid "writeAMF0: serializing object (or function) as reference to %d"
 msgstr "writeAMF0: serializuji objekt (nebo funkci) jako odkaz na %d"
 
 #: libcore/as_value.cpp:2579
-#, fuzzy, c-format
+#, c-format
 msgid "writeAMF0: serializing string '%s'"
 msgstr "writeAMF0: serializuji řetězec „%s“"
 
 #: libcore/as_value.cpp:2588
-#, fuzzy, c-format
+#, c-format
 msgid "writeAMF0: serializing long string '%s'"
-msgstr "writeAMF0: serializuji řetězec „%s“"
+msgstr "writeAMF0: serializuji dlouhý řetězec „%s“"
 
 #: libcore/as_value.cpp:2601
-#, fuzzy, c-format
+#, c-format
 msgid "writeAMF0: serializing number '%g'"
 msgstr "writeAMF0: serializuji číslo „%g“"
 
@@ -3584,9 +3581,9 @@ msgid "Repeated kerning pair found - ignoring"
 msgstr "Nalezen opakující se kerningový pár – ignoruji"
 
 #: libcore/swf/DefineFontTag.cpp:387
-#, fuzzy, c-format
+#, c-format
 msgid "DefineFontInfo tag loader: can't find font with id %d"
-msgstr "define_font_info_loader: nelze nalézt font s identifikátorem %d"
+msgstr "Zavaděč značky DefineFontInfo: nelze nalézt font s identifikátorem %d"
 
 #: libcore/swf/DefineFontTag.cpp:396
 msgid "DefineFontInfo2 partially implemented"
@@ -3668,9 +3665,9 @@ msgid "  defbitslossless2: tag = %d, id = %d, fmt = %d, w = %d, h = %d"
 msgstr "  defbitslossless2: značka = %d, id = %d, fmt = %d š = %d, v = %d"
 
 #: libcore/swf/tag_loaders.cpp:549
-#, fuzzy, c-format
+#, c-format
 msgid "Bitmap character %d has a height or width of 0"
-msgstr "Bitmapový znak %d má výšku nebo šířku rovnu 0."
+msgstr "Bitmapový znak %d má výšku nebo šířku rovnu 0"
 
 #: libcore/swf/tag_loaders.cpp:560
 #, c-format
@@ -3685,7 +3682,7 @@ msgstr "gnash není slinkován se zlib – nelze nahrát komprimovaná obrazov�
 
 #: libcore/swf/tag_loaders.cpp:612
 msgid "Unknown bitmap format. Ignoring"
-msgstr ""
+msgstr "Neznámý formát bitmapy. Ignoruji."
 
 #: libcore/swf/tag_loaders.cpp:719
 #, c-format
@@ -3770,9 +3767,9 @@ msgid "DEFINESOUNDLOADER: sound sample rate %d (expected 0 to %u"
 msgstr "DEFINESOUNDLOADER: vzorkovací frekvence zvuku %d (očekáváno O až %u"
 
 #: libcore/swf/tag_loaders.cpp:1026
-#, fuzzy, c-format
+#, c-format
 msgid "define sound: ch=%d, format=%s, rate=%d, 16=%d, stereo=%d, ct=%d"
-msgstr "definovat zvuk: k=%d, formát=%d, frekvence=%d, 16=%d, stereo=%d, ct=%d"
+msgstr "definovat zvuk: kan=%d, formát=%s, frekvence=%d, 16=%d, stereo=%d, ct=%d"
 
 #: libcore/swf/tag_loaders.cpp:1055
 msgid "Tag boundary reported past end of SWFStream!"
@@ -3788,10 +3785,9 @@ msgstr ""
 "%d NEBUDE přidán do slovníku"
 
 #: libcore/swf/tag_loaders.cpp:1130
-#, fuzzy, c-format
+#, c-format
 msgid "SOUNDSTREAMHEAD: stream sample rate %d (expected 0 to %u)"
-msgstr ""
-"SOUNDSTREAMHEAD: vzorkovací frekvence SWFStreamu %d (očekáváno 0 až %u)"
+msgstr "SOUNDSTREAMHEAD: vzorkovací frekvence proudu %d (očekáváno 0 až %u)"
 
 #: libcore/swf/tag_loaders.cpp:1142
 #, c-format
@@ -3821,19 +3817,18 @@ msgstr ""
 "běžný jev, takže budeme varovat jen jednou."
 
 #: libcore/swf/tag_loaders.cpp:1178
-#, fuzzy
 msgid ""
 "No samples advertised for sound stream, pretty common so will warn only once"
 msgstr ""
-"Pro zvukový SWFStream nejsou oznámeny žádné vzorky. Celkem častý jev, takže "
+"Pro zvukový proud nejsou oznámeny žádné vzorky. Celkem častý jev, takže "
 "varujeme jen jednou"
 
 #: libcore/swf/tag_loaders.cpp:1209
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "sound stream head: format=%s, rate=%d, 16=%d, stereo=%d, ct=%d, latency=%d"
 msgstr ""
-"hlavička SWFStreamu: formát=%d, fekv.=%d, 16=%d, stereo=%d, čítač=%d, "
+"hlavička zvukového proudu: formát=%s, frekv.=%d, 16=%d, stereo=%d, počet=%d, "
 "zpoždění=%d"
 
 #: libcore/swf/tag_loaders.cpp:1250
@@ -3942,9 +3937,9 @@ msgid "  char id = %d"
 msgstr "  znak č. =  %d"
 
 #: libcore/swf/PlaceObject2Tag.cpp:310 libcore/swf/PlaceObject2Tag.cpp:421
-#, fuzzy, c-format
+#, c-format
 msgid "  SWFMatrix: %s"
-msgstr "  matice: %s"
+msgstr "  SWFMatrix: %s"
 
 #: libcore/swf/PlaceObject2Tag.cpp:316 libcore/swf/PlaceObject2Tag.cpp:423
 #, c-format
@@ -3983,7 +3978,7 @@ msgstr "  jméno třídy = %s"
 
 #: libcore/swf/PlaceObject2Tag.cpp:428
 msgid "   bitmapCaching enabled"
-msgstr ""
+msgstr "   bitmapCaching zapnuto"
 
 #: libcore/swf/DefineButtonSoundTag.cpp:50
 #, c-format
@@ -3991,13 +3986,12 @@ msgid "DEFINEBUTTONSOUND refers to an unknown character def %d"
 msgstr "DEFINEBUTTONSOUND odkazuje na definici neznámého znaku %d"
 
 #: libcore/swf/DefineButtonSoundTag.cpp:61
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "DEFINEBUTTONSOUND refers to character id %d, a %s (expected a button "
 "character)"
 msgstr ""
-"DEFINEBUTTONSOUND odkazuje na znak s id %d, avšak je %s (očekávána definice "
-"tlačítka)"
+"DEFINEBUTTONSOUND odkazuje na znak s id %d typu %s (očekáván znak tlačítka)"
 
 #: libcore/swf/DefineButtonSoundTag.cpp:71
 msgid "Attempt to redefine button sound ignored"
@@ -4009,9 +4003,9 @@ msgid "sound tag not found, sound_id=%d, button state #=%i"
 msgstr "zvuková značka nenalezena, sound_id=%d, číslo stavu tlačítka = %i"
 
 #: libcore/swf/VideoFrameTag.cpp:45
-#, fuzzy, c-format
+#, c-format
 msgid "VideoFrame tag refers to unknown video stream id %d"
-msgstr "VideoFrame značka odkazuje na video SWFStream neznámého id %d"
+msgstr "Značka VideoFrame odkazuje na videoproud neznámého id %d"
 
 #: libcore/swf/VideoFrameTag.cpp:55
 #, c-format
@@ -4027,26 +4021,26 @@ msgstr ""
 "jsme dosáhli konce proudu!"
 
 #: libcore/swf/DefineButtonCxformTag.cpp:47
-#, fuzzy, c-format
+#, c-format
 msgid "DefineButtonCxform refers to an unknown character %d"
-msgstr "DEFINEBUTTONSOUND odkazuje na definici neznámého znaku %d"
+msgstr "DefineButtonCxform odkazuje na neznámý znak %d"
 
 #: libcore/swf/DefineButtonCxformTag.cpp:58
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "DefineButtonCxform refers to character ID %d (%s). Expected a button "
 "definition"
 msgstr ""
-"DEFINEBUTTONSOUND odkazuje na znak s id %d, avšak je %s (očekávána definice "
-"tlačítka)"
+"DefineButtonCxform odkazuje na znak s ID %d (%s). Očekávána definice "
+"tlačítka."
 
 #: libcore/swf/SoundInfoRecord.cpp:47
 msgid "SoundInfo record with in point"
-msgstr ""
+msgstr "Záznam SoundInfo se vstupním bodem"
 
 #: libcore/swf/SoundInfoRecord.cpp:52
 msgid "SoundInfo record with out point"
-msgstr ""
+msgstr "Záznam SoundInfo s výstupním bodem"
 
 #: libcore/swf/TextRecord.cpp:49
 msgid "end text records"
@@ -4058,29 +4052,28 @@ msgid "  has_font: font id = %d (%p)"
 msgstr "  má_font: č. fontu = %d (%p)"
 
 #: libcore/swf/TextRecord.cpp:87
-#, fuzzy
 msgid "  hasColor"
-msgstr "  má_barvu"
+msgstr "  máBarvu"
 
 #: libcore/swf/TextRecord.cpp:96
-#, fuzzy, c-format
+#, c-format
 msgid "  xOffset = %g"
-msgstr "  má_posun_x = %g"
+msgstr "  xOffset = %g"
 
 #: libcore/swf/TextRecord.cpp:105
-#, fuzzy, c-format
+#, c-format
 msgid "  yOffset = %g"
-msgstr "  má_posun_y = %g"
+msgstr "  yOffset = %g"
 
 #: libcore/swf/TextRecord.cpp:114
-#, fuzzy, c-format
+#, c-format
 msgid "  textHeight = %g"
-msgstr "  výška_textu = %g"
+msgstr "  textHeight = %g"
 
 #: libcore/swf/TextRecord.cpp:123
-#, fuzzy, c-format
+#, c-format
 msgid "  GlyphEntries: count = %d"
-msgstr "  glyph_records: počet = %d"
+msgstr "  GlyphEntries: počet = %d"
 
 #: libcore/swf/TextRecord.cpp:135
 #, c-format
@@ -4096,14 +4089,14 @@ msgid "render shape glyph using filled outline (render::draw_glyph)"
 msgstr "vykreslit tvar znaku pomocí vyplnění obrysu (render::draw_glyph)"
 
 #: libcore/swf/DefineTextTag.cpp:30 libcore/swf/DefineTextTag.cpp:47
-#, fuzzy, c-format
+#, c-format
 msgid "Text character, id = %d"
-msgstr "text_character, id = %d"
+msgstr "Textový znak, id = %d"
 
 #: libcore/swf/DefineTextTag.cpp:66
-#, fuzzy, c-format
+#, c-format
 msgid "begin text records for DefineTextTag %p"
-msgstr "zahajuji záznamy texu pro text_character_def %p"
+msgstr "zahajuji záznamy texu pro DefineTextTag %p"
 
 #: libcore/swf/RemoveObjectTag.cpp:69
 #, c-format
@@ -4118,12 +4111,11 @@ msgstr "start_sound_loader: sound_id %d není definován"
 #: libcore/swf/StartSoundTag.cpp:66
 #, c-format
 msgid "StartSound: id=%d"
-msgstr ""
+msgstr "StartSound: id=%d"
 
 #: libcore/swf/StartSoundTag.cpp:117
-#, fuzzy
 msgid "STARTSOUND2 tag not parsed and not used"
-msgstr "Značka %s rozebrána, ale ještě nepoužita"
+msgstr "Značka STARTSOUND2 nerozebrána a nepoužita"
 
 #: libcore/swf/DefineFontAlignZonesTag.cpp:51
 #, c-format
@@ -4153,13 +4145,12 @@ msgid "CSMTextSettings"
 msgstr "CSMTextSettings"
 
 #: libcore/swf/StreamSoundBlockTag.cpp:81
-#, fuzzy
 msgid "Found SOUNDSTREAMBLOCK tag w/out preceding SOUNDSTREAMHEAD"
 msgstr "Nalezena značka SOUNDSTREAMBLOCK bez předcházející SOUNDSTREAMHEAD"
 
 #: libcore/swf/StreamSoundBlockTag.cpp:97
 msgid "MP3 soundblock seek samples"
-msgstr ""
+msgstr "Vzorky MP3 zvukových bloků pro převíjení"
 
 #: libcore/swf/StreamSoundBlockTag.cpp:116
 msgid "Tag boundary reported past end of stream!"
@@ -4209,14 +4200,14 @@ msgstr ""
 "vrstvu tlačítka (hloubka?)"
 
 #: libcore/swf/DefineButtonTag.cpp:230
-#, fuzzy, c-format
+#, c-format
 msgid "  DefineButton loader: chararacter id = %d"
-msgstr "  zavaděč znaku tlačítka: char_id = %d"
+msgstr "  zavaděč DefineButton: ID znaku = %d"
 
 #: libcore/swf/DefineButtonTag.cpp:247
-#, fuzzy, c-format
+#, c-format
 msgid "  DefineButton2 loader: chararacter id = %d"
-msgstr "  zavaděč znaku tlačítka: char_id = %d"
+msgstr "  zavaděč DefineButton2: ID znaku = %d"
 
 #: libcore/swf/DefineButtonTag.cpp:321
 msgid "Premature end of DEFINEBUTTON tag, won't read actions"
@@ -4407,9 +4398,9 @@ msgid ""
 msgstr "gnash::SWFMovieDefinition::read() – soubor nezačíná SWF hlavičkou"
 
 #: libcore/parser/SWFMovieDefinition.cpp:353
-#, fuzzy, c-format
+#, c-format
 msgid "version: %d, file_length: %d"
-msgstr "verze = %d, délka_soubor  = %d"
+msgstr "verze: %d, délka_souboru: %d"
 
 #: libcore/parser/SWFMovieDefinition.cpp:358
 #, c-format
@@ -4436,7 +4427,7 @@ msgstr "velikost snímku = %s, snímková frekvence = %f, snímků = %d"
 
 #: libcore/parser/SWFMovieDefinition.cpp:449
 msgid "Could not start loading thread"
-msgstr "Nemohu spustit načítací vlákno"
+msgstr "Nemohu spustit zaváděcí vlákno"
 
 #: libcore/parser/SWFMovieDefinition.cpp:523
 #, c-format
@@ -4459,7 +4450,7 @@ msgstr ""
 #: libcore/parser/SWFMovieDefinition.cpp:618
 #, c-format
 msgid "*** no tag loader for type %d (movie)"
-msgstr "*** chybí načítač značky typu %d (film)"
+msgstr "*** chybí zavaděč značky typu %d (film)"
 
 #: libcore/parser/SWFMovieDefinition.cpp:638
 #, c-format
@@ -4591,7 +4582,7 @@ msgstr ""
 #: libcore/parser/sprite_definition.cpp:144
 #, c-format
 msgid "*** no tag loader for type %d (sprite)"
-msgstr "*** žádný načítač značek typu %d (sprite)"
+msgstr "*** žádný zavaděč značek typu %d (sprite)"
 
 #: libcore/parser/sprite_definition.cpp:154
 #, c-format
@@ -4742,7 +4733,7 @@ msgstr "Pro font „%s“ nelze nalézt soubor s fontem"
 #: libcore/FreetypeGlyphsProvider.cpp:372
 #, c-format
 msgid "Font file '%s' has bad format"
-msgstr "Soubor s fontem „%s“ mý chybný formát"
+msgstr "Soubor s fontem „%s“ má chybný formát"
 
 #: libcore/FreetypeGlyphsProvider.cpp:381
 #, c-format
@@ -4854,7 +4845,7 @@ msgstr "Prověřuji bezpečnost URL „%s“"
 
 #: libcore/URLAccessManager.cpp:299
 msgid "Network connection without hostname requested"
-msgstr ""
+msgstr "Požadováno síťové spojení bez názvu stroje"
 
 #: libcore/vm/action.cpp:69
 #, c-format
@@ -4865,11 +4856,13 @@ msgstr ""
 "Pokus o zavolání hodnoty, která není funkcí ani z C, ani z ActionScriptu (%s)"
 
 #: libcore/vm/ActionExec.cpp:172
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "at ActionExec operator() start, pc=%d, stop_pc=%d, code.size=%d, func=%d, "
 "codeVersion=%d"
-msgstr "v zahájení operator() ActionExecu, pc=%d, stop_pc=%d, code.size=%d."
+msgstr ""
+"v zahájení operator() ActionExecu, pc=%d, stop_pc=%d, code.size=%d, func=%d, "
+"codeVersion=%d"
 
 #: libcore/vm/ActionExec.cpp:265
 #, c-format
@@ -4884,11 +4877,11 @@ msgid "After execution: PC %d, next PC %d, stack follows"
 msgstr "Po vykonání: PC %d, další PC %d, následuje zásobník"
 
 #: libcore/vm/ActionExec.cpp:356
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Loop iterations count exceeded limit of %d. Last branch was from pc %d to %d"
 msgstr ""
-"Čítač opakování smyčky překročil omezení %d. Poslední větev byka od pc %d do "
+"Počet opakování smyčky překročil omezení %d. Poslední větev byla od pc %d do "
 "%d."
 
 #: libcore/vm/ActionExec.cpp:614
@@ -4993,14 +4986,14 @@ msgstr "Délka značky ActionWaitForFrame (0x%X) == %d (očekáváno 3)"
 
 #: libcore/vm/ASHandlers.cpp:647 libcore/vm/ASHandlers.cpp:708
 #: libcore/vm/ASHandlers.cpp:1969
-#, fuzzy, c-format
+#, c-format
 msgid "%s: environment target is null or not a MovieClip"
-msgstr "%s: cíl prostředí je null nebo není sprite_instance"
+msgstr "%s: cíl prostředí je null nebo není MovieClip"
 
 #: libcore/vm/ASHandlers.cpp:656
-#, fuzzy, c-format
+#, c-format
 msgid "ActionWaitForFrame(%d): target (%s) has only %d frames"
-msgstr "Délka značky ActionWaitForFrame (0x%X) == %d (očekáváno 3)"
+msgstr "ActionWaitForFrame(%d): cíl (%s) má jen %d snímků"
 
 #: libcore/vm/ASHandlers.cpp:911
 msgid "Undefined or null string passed to ActionSubString, returning undefined"
@@ -5037,6 +5030,8 @@ msgid ""
 "Can't assign a sprite/character to a variable in SWF%d. We'll return "
 "undefined instead of %s."
 msgstr ""
+"Do proměnné v SWF%d nelze přiřadit sprite/znak. Vrátíme nedefinováno "
+"namísto %s."
 
 #: libcore/vm/ASHandlers.cpp:1038
 #, c-format
@@ -5048,6 +5043,8 @@ msgstr "– získat proměnnou: %s=%s"
 msgid ""
 "ActionSetVariable: %s=%s: variable name evaluates to invalid (empty) string"
 msgstr ""
+"ActionSetVariable: %s=%s: název proměnné byl vyhodnocen jako neplatný "
+"(prázdný) řetězec"
 
 #: libcore/vm/ASHandlers.cpp:1067
 #, c-format
@@ -5238,21 +5235,20 @@ msgid "Bogus empty GetUrl url in SWF file, skipping"
 msgstr "Padělané prázdné URL z GetUrl v SWF souboru, přeskakuji"
 
 #: libcore/vm/ASHandlers.cpp:2241
-#, fuzzy
 msgid ""
 "Bogus GetUrl2 send vars method  in SWF file (both GET and POST requested). "
 "Using GET"
 msgstr ""
 "Padělaná metoda GetUrl2 pro posílání proměnných v SWF souboru (požadován je "
-"jak GET, tak i POST), použiji GET."
+"jak GET, tak i POST). Použiji GET."
 
 #: libcore/vm/ASHandlers.cpp:2290
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "get url: target=%s, url=%s, method=%x (sendVars:%X, loadTarget:%d, "
 "loadVariable:%d)"
 msgstr ""
-"získat URL: cíl=%s, URL=%s (%s), metoda=%x (sendVars: %X, loadTarget: %d, "
+"získat URL: cíl=%s, URL=%s, metoda=%x (sendVars: %X, loadTarget: %d, "
 "loadVariable: %d)"
 
 #: libcore/vm/ASHandlers.cpp:2300
@@ -5260,14 +5256,14 @@ msgid "getURL2 loadVariable"
 msgstr "getURL2 loadVariable"
 
 #: libcore/vm/ASHandlers.cpp:2304
-#, fuzzy, c-format
+#, c-format
 msgid "getURL: target %s not found"
-msgstr "získat URL: nenalezen cíl %s"
+msgstr "getURL: cíl %s nenalezen"
 
 #: libcore/vm/ASHandlers.cpp:2311
-#, fuzzy, c-format
+#, c-format
 msgid "getURL: target %s is not a sprite"
-msgstr "získat URL: cíl %s není spritem"
+msgstr "getURL: cíl %s není spritem"
 
 #: libcore/vm/ASHandlers.cpp:2332
 msgid "CommonGetUrl: current target is undefined"
@@ -5341,12 +5337,11 @@ msgstr ""
 #: libcore/vm/ASHandlers.cpp:2666
 #, c-format
 msgid "delete %s.%s: no object found to delete"
-msgstr ""
+msgstr "smazat %s.%s: nebyl nalezen žádný objekt na smazání"
 
 #: libcore/vm/ASHandlers.cpp:2708
-#, fuzzy
 msgid "delete2 called with a path that does not resolve to an object"
-msgstr "getMember zavolán na hodnotu, kterou nelze převést na as_object: %s"
+msgstr "delete2 zavolán s cestou, kterou nelze převést na object"
 
 #: libcore/vm/ASHandlers.cpp:2730
 #, c-format
@@ -5414,7 +5409,7 @@ msgid "ActionNewAdd(%s, %s) [primitive conversion done]"
 msgstr "ActionNewAdd(%s, %s) [proveden převod primitiva]"
 
 #: libcore/vm/ASHandlers.cpp:3113 libcore/vm/ASHandlers.cpp:3127
-#, fuzzy, c-format
+#, c-format
 msgid "%s.to_primitive() threw an error during ActionNewLessThan"
 msgstr "%s.to_primitive() vyhodila chybu během ActionNewLessThen"
 
@@ -5443,6 +5438,8 @@ msgstr "− get_member %s.%s=%s"
 msgid ""
 "ActionSetMember: %s.%s=%s: member name evaluates to invalid (empty) string"
 msgstr ""
+"ActionSetMember: %s.%s=%s: název člena byl vyhodnocen jako neplatný "
+"(prázdný) řetězec"
 
 #: libcore/vm/ASHandlers.cpp:3314
 #, c-format
@@ -5631,9 +5628,9 @@ msgid "...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"
 msgstr "… ale get_variable_raw(%s, <scopeStack>) uspělo (%s)!"
 
 #: libcore/as_environment.cpp:148
-#, fuzzy, c-format
+#, c-format
 msgid "get_variable_raw(%s)"
-msgstr "get_variable(%s)"
+msgstr "get_variable_raw(%s)"
 
 #: libcore/as_environment.cpp:154
 #, c-format
@@ -5720,6 +5717,9 @@ msgid ""
 "is more than one DefineFontName tag referring to the same Font. Don't know "
 "what to do in this case, so ignoring."
 msgstr ""
+"Pokus o přenastavení fontu displeje nebo označení práv na kopírování. To by "
+"mohlo znamenat, že tu je více jak jedna značka DefineFontName odkazující na "
+"stejný Font. Nevím, co v takovém případě dělat, takže to ignoruji."
 
 #: libcore/Font.cpp:155
 msgid ""
@@ -5728,6 +5728,10 @@ msgid ""
 "tag refers to a font created by DefineFone2 or DefineFont3. Don't know what "
 "should happen in this case, so ignoring."
 msgstr ""
+"Pokus o přidání CodeTable vestavěných kreseb písma do fontu, který už jednu "
+"má. Toto by mohlo znamenat, že tu je více značek DefineFontInfo nebo že "
+"značka DefineFontInfo odkazuje na font vytvořený pomocí DefineFont2 nebo "
+"DefineFont3. Nevím, co by se v takovém případě mělo stát, takže to ignoruji."
 
 #: utilities/soldumper.cpp:83
 #, c-format
@@ -5918,9 +5922,8 @@ msgid "rtmpget -- a file downloaded that uses RTMP."
 msgstr "rtmpget – stahovač souborů, který používá RTMP."
 
 #: utilities/rtmpget.cpp:525
-#, fuzzy
 msgid "Usage: rtmpget [options...] <url>"
-msgstr "Použití: rtmpget     [PŘEPÍNAČE…]"
+msgstr "Použití: rtmpget [PŘEPÍNAČE…] <URL>"
 
 #: utilities/rtmpget.cpp:526
 msgid "  -h,  --help          Print this help and exit"
@@ -5947,17 +5950,14 @@ msgid "This program dumps the internal data of an FLV video file"
 msgstr "Tento program vypíše vnitřní data video souboru FLV"
 
 #: utilities/flvdumper.cpp:292
-#, fuzzy
 msgid "Usage: flvdumper [-h] [-m] [-a] filename"
-msgstr "Použití: flvdumper [h] SOUBOR"
+msgstr "Použití: flvdumper [-h] [-m] [-a] SOUBOR"
 
 #: utilities/flvdumper.cpp:294
-#, fuzzy
 msgid "-m\tPrint only Meta tags (default)"
 msgstr "-m\tVypisuje pouze Meta značky (implicitní)"
 
 #: utilities/flvdumper.cpp:295
-#, fuzzy
 msgid "-a\tPrint all tags."
 msgstr "-a\tVypisuje všechny značky"
 
@@ -6029,9 +6029,8 @@ msgid "Value"
 msgstr "Hodnota"
 
 #: gui/Kde4Gui.cpp:498
-#, fuzzy
 msgid "Properties"
-msgstr "Vlastnosti filmu"
+msgstr "Vlastnosti"
 
 #: gui/Kde4Gui.cpp:502 gui/kde.cpp:443 gui/gtk.cpp:672
 msgid "Quit Gnash"
@@ -6054,7 +6053,6 @@ msgid "Stop"
 msgstr "Zastavit"
 
 #: gui/Kde4Gui.cpp:525
-#, fuzzy
 msgid "Restart"
 msgstr "Přehrát od začátku"
 
@@ -6063,101 +6061,84 @@ msgid "Refresh"
 msgstr "Obnovit"
 
 #: gui/Kde4Gui.cpp:534
-#, fuzzy
 msgid "Fullscreen"
-msgstr "Přepnout celoobrazovkový režim"
+msgstr "Celoobrazovkový režim"
 
 #: gui/Kde4Gui.cpp:549
-#, fuzzy
 msgid "File"
-msgstr "_Soubor"
+msgstr "Soubor"
 
 #: gui/Kde4Gui.cpp:554
-#, fuzzy
 msgid "Edit"
-msgstr "_Upravit"
+msgstr "Upravit"
 
 #: gui/Kde4Gui.cpp:558
-#, fuzzy
 msgid "Movie Control"
-msgstr "_Ovládání filmu"
+msgstr "Ovládání filmu"
 
 #: gui/Kde4Gui.cpp:565
-#, fuzzy
 msgid "View"
-msgstr "_Zobrazit"
+msgstr "Zobrazit"
 
 #: gui/Kde4Gui.cpp:763 gui/gtk.cpp:1181
 msgid "Gnash preferences"
 msgstr "Nastavení Gnashe"
 
 #: gui/Kde4Gui.cpp:778
-#, fuzzy
 msgid "Logging"
-msgstr "Protoko_lování"
+msgstr "Protokolování"
 
 #: gui/Kde4Gui.cpp:781 gui/gtk.cpp:1252
 msgid "<b>Logging options</b>"
 msgstr "<b>Volby protokolování</b>"
 
 #: gui/Kde4Gui.cpp:784
-#, fuzzy
 msgid "Verbosity level"
-msgstr "Úroveň upovídanosti:"
+msgstr "Úroveň upovídanosti"
 
 #: gui/Kde4Gui.cpp:802
-#, fuzzy
 msgid "Log to file"
-msgstr "Zaznamenávat do _souboru"
+msgstr "Zaznamenávat do souboru"
 
 #: gui/Kde4Gui.cpp:809
-#, fuzzy
 msgid "Log parser output"
-msgstr "Zaznamenávat výstup _parseru"
+msgstr "Zaznamenávat výstup parseru"
 
 #: gui/Kde4Gui.cpp:813
-#, fuzzy
 msgid "Log SWF actions"
-msgstr "Zaznamenávat _akce SWF"
+msgstr "Zaznamenávat akce SWF"
 
 #: gui/Kde4Gui.cpp:817
-#, fuzzy
 msgid "Log malformed SWF errors"
-msgstr "Zaznamenávat _chyby poškozeného SWF"
+msgstr "Zaznamenávat chyby poškozeného SWF"
 
 #: gui/Kde4Gui.cpp:822
-#, fuzzy
 msgid "Log ActionScript coding errors"
-msgstr "Zaznamenávat chyby v _kódu ActionScriptu"
+msgstr "Zaznamenávat chyby v kódu ActionScriptu"
 
 #: gui/Kde4Gui.cpp:827
-#, fuzzy
 msgid "Log Local Connection activity"
-msgstr "Zaznamenávat _místní spojení"
+msgstr "Zaznamenávat místní spojení"
 
 #: gui/Kde4Gui.cpp:835
-#, fuzzy
 msgid "Security"
-msgstr "_Bezpečnost"
+msgstr "Bezpečnost"
 
 #: gui/Kde4Gui.cpp:838 gui/gtk.cpp:1354
 msgid "<b>Network connections</b>"
 msgstr "<b>Síťová spojení</b>"
 
 #: gui/Kde4Gui.cpp:841
-#, fuzzy
 msgid "Connect only to local host"
-msgstr "Připojovat se jen na _tento stroj"
+msgstr "Připojovat se jen na tento stroj"
 
 #: gui/Kde4Gui.cpp:846
-#, fuzzy
 msgid "Connect only to local domain"
-msgstr "Připojovat se jen do místní _domény"
+msgstr "Připojovat se jen do místní domény"
 
 #: gui/Kde4Gui.cpp:851
-#, fuzzy
 msgid "Disable SSL verification"
-msgstr "Vypnout o_věřování SSL"
+msgstr "Vypnout ověřování SSL"
 
 #: gui/Kde4Gui.cpp:856 gui/gtk.cpp:1399
 msgid "<b>Privacy</b>"
@@ -6168,64 +6149,56 @@ msgid "Shared objects directory:"
 msgstr "Adresář se sdílenými objekty:"
 
 #: gui/Kde4Gui.cpp:865
-#, fuzzy
 msgid "Do not write Shared Object files"
-msgstr "_Nezapisovat soubory sdílených objektů"
+msgstr "Nezapisovat soubory sdílených objektů"
 
 #: gui/Kde4Gui.cpp:871
-#, fuzzy
 msgid "Only access local Shared Object files"
-msgstr "_Zpřístupnit jen soubory s místními sdílenými objekty"
+msgstr "Zpřístupnit jen soubory s místními sdílenými objekty"
 
 #: gui/Kde4Gui.cpp:876
-#, fuzzy
 msgid "Disable Local Connection object"
 msgstr "Zakázat objekty místních spojení"
 
 #: gui/Kde4Gui.cpp:883
 msgid "Network"
-msgstr ""
+msgstr "Síť"
 
 #: gui/Kde4Gui.cpp:886 gui/gtk.cpp:1220
-#, fuzzy
 msgid "<b>Network preferences</b>"
-msgstr "<b>Síťová spojení</b>"
+msgstr "<b>Předvolby sítě</b>"
 
 #: gui/Kde4Gui.cpp:889
 msgid "Network timeout in seconds"
-msgstr ""
+msgstr "Časový limit sítě v sekundách"
 
 #: gui/Kde4Gui.cpp:901
-#, fuzzy
 msgid "Media"
-msgstr "_Média"
+msgstr "Média"
 
 #: gui/Kde4Gui.cpp:904 gui/gtk.cpp:1449
 msgid "<b>Sound</b>"
 msgstr "<b>Zvuk</b>"
 
 #: gui/Kde4Gui.cpp:907
-#, fuzzy
 msgid "Use sound handler"
-msgstr "Použít obslu_hu zvuku"
+msgstr "Použít obsluhu zvuku"
 
 #: gui/Kde4Gui.cpp:911 gui/gtk.cpp:1468
 msgid "Save media streams to disk"
-msgstr ""
+msgstr "Ukládat na disk proudy médií"
 
 #: gui/Kde4Gui.cpp:917 gui/gtk.cpp:1477
 msgid "Save dynamically loaded media to disk"
-msgstr ""
+msgstr "Ukládat na disk dynamicky nahrávaná média"
 
 #: gui/Kde4Gui.cpp:921 gui/gtk.cpp:1485
-#, fuzzy
 msgid "Saved media directory:"
-msgstr "Adresář se sdílenými objekty:"
+msgstr "Adresář s uloženými médii:"
 
 #: gui/Kde4Gui.cpp:930
-#, fuzzy
 msgid "Player"
-msgstr "_Přehrávač"
+msgstr "Přehrávač"
 
 #: gui/Kde4Gui.cpp:933 gui/gtk.cpp:1511
 msgid "<b>Player description</b>"
@@ -6241,11 +6214,11 @@ msgstr "Operační systém:"
 
 #: gui/Kde4Gui.cpp:947 gui/Kde4Gui.cpp:1021
 msgid "<Autodetect>"
-msgstr ""
+msgstr "<Automaticky rozpoznáno>"
 
 #: gui/Kde4Gui.cpp:953 gui/gtk.cpp:1555
 msgid "URL opener:"
-msgstr "Otevírač URL:"
+msgstr "URL otevírat pomocí:"
 
 #: gui/Kde4Gui.cpp:960 gui/gtk.cpp:1567
 msgid "<b>Performance</b>"
@@ -6256,9 +6229,8 @@ msgid "Max size of movie library:"
 msgstr "Maximální velikost knihovny filmu:"
 
 #: gui/Kde4Gui.cpp:972
-#, fuzzy
 msgid "Start Gnash in pause mode"
-msgstr "Spouštět _Gnash v režimu pozastaveného přehrávání"
+msgstr "Spouštět Gnash v režimu pozastaveného přehrávání"
 
 #: gui/kde.cpp:432
 msgid "Play Movie"
@@ -6481,7 +6453,7 @@ msgstr "Polohovací zařízení %s otevřeno"
 #: gui/fb.cpp:1035
 #, c-format
 msgid "Could not set non-blocking mode for pointing device: %s"
-msgstr "Neblokující režim pro polohovací zařízení nebolo možné nastavit: %s"
+msgstr "Neblokující režim pro polohovací zařízení nebylo možné nastavit: %s"
 
 #: gui/fb.cpp:1118
 msgid "WARNING: Error parsing calibration data!"
@@ -6534,7 +6506,7 @@ msgstr "Prodleva časovače nastaveno na %d milisekund(u/y)"
 #: gui/Player.cpp:181
 #, c-format
 msgid "Could not create sound handler: %s. Will continue w/out sound."
-msgstr ""
+msgstr "Nebylo možné vytvořit obsluhu zvuku: %s. Bude se pokračovat bez zvuku."
 
 #: gui/Player.cpp:193
 msgid "Sound requested but no sound support compiled in"
@@ -6657,11 +6629,11 @@ msgstr "Zvuk"
 
 #: gui/gtk.cpp:1216
 msgid "_Network"
-msgstr ""
+msgstr "_Síť"
 
 #: gui/gtk.cpp:1228
 msgid "Network timeout in seconds (0 for no timeout):"
-msgstr ""
+msgstr "Časový limit sítě v sekundách (0 pro žádný limit):"
 
 #: gui/gtk.cpp:1247
 msgid "_Logging"
@@ -6748,9 +6720,8 @@ msgid "Use sound _handler"
 msgstr "Použít obslu_hu zvuku"
 
 #: gui/gtk.cpp:1462
-#, fuzzy
 msgid "<b>Media Streams</b>"
-msgstr "<b>Vlastnosti virtuálního stroje</b>"
+msgstr "<b>Proudy médií</b>"
 
 #: gui/gtk.cpp:1505
 msgid "_Player"
@@ -6876,9 +6847,8 @@ msgid "Fullscreen not yet supported in this GUI"
 msgstr "Zobrazení přes celou obrazovku není v tomto GUI ještě podporováno"
 
 #: gui/gui.cpp:184
-#, fuzzy
 msgid "Menu hiding not yet supported in this GUI"
-msgstr "menushow není v tomto GUI ještě podporováno"
+msgstr "Skrývání nabídky není v tomto GUI ještě podporováno"
 
 #: gui/gui.cpp:190
 msgid "Mouse show/hide not yet supported in this GUI"
@@ -7041,7 +7011,7 @@ msgstr "  --fullscreen             Spustí se přes celou obrazovku"
 
 #: gui/gnash.cpp:127
 msgid "  --hide-menubar           Start without displaying the menu bar "
-msgstr ""
+msgstr "  --hide-menubar           Spustí se bez zobrazené lišty nabídek"
 
 #: gui/gnash.cpp:129
 msgid "Keys:"
@@ -7419,7 +7389,7 @@ msgstr " Jméno položky je: %s"
 #~ msgstr "POST s loadVariables ignorován"
 
 #~ msgid "POST with host-provided uri grabber"
-#~ msgstr "POST s serverem poskytnutým zachytávačem URI"
+#~ msgstr "POST se serverem poskytnutým zachytávačem URI"
 
 #~ msgid "delete %s.%s : first element is not an object"
 #~ msgstr "smazat %s.%s: první prvek není objektem"
@@ -7605,7 +7575,7 @@ msgstr " Jméno položky je: %s"
 #~ "Gstreamer plugin installation was at least partially successful. Will try "
 #~ "to restart the pipeline."
 #~ msgstr ""
-#~ "Instalace zásuvného modulu Gstreamer se alespn z části zdařila. Zkusím "
+#~ "Instalace zásuvného modulu Gstreamer se alespoň z části zdařila. Zkusím "
 #~ "znovu spustit kolonu."
 
 #~ msgid ""
@@ -7725,7 +7695,7 @@ msgstr " Jméno položky je: %s"
 #~ msgstr "process_decl_dict("
 
 #~ msgid "Could not create video decoder for codec id %d"
-#~ msgstr "Nelze vytvořit dokér videa pro kodek č. %d"
+#~ msgstr "Nelze vytvořit dekodér videa pro kodek č. %d"
 
 #~ msgid "Loading variables file from url: '%s'"
 #~ msgstr "Načítám soubor s proměnnými z URL: „%s“"
@@ -7833,13 +7803,11 @@ msgstr " Jméno položky je: %s"
 #~ msgid "Error while decoding audio data."
 #~ msgstr "Během dekódování zvukových dat došlo k chybě."
 
-#, fuzzy
 #~ msgid "AMF String is: %s"
-#~ msgstr "Řetězec je %s"
+#~ msgstr "Řetězec AMF je: %s"
 
-#, fuzzy
 #~ msgid "amf0_type_e of value: %x"
-#~ msgstr "astype_e hodnoty: %x"
+#~ msgstr "amf0_type_e o hodnotě: %x"
 
 #~ msgid "Problems decoding audio frame."
 #~ msgstr "Problémy s dekódováním zvukového rámce."
@@ -7890,12 +7858,6 @@ msgstr " Jméno položky je: %s"
 
 #~ msgid "Character %d @ %p"
 #~ msgstr "Znak %d na %p"
-
-#, fuzzy
-#~ msgid " frames advertised in header, but only "
-#~ msgstr ""
-#~ "V hlavičce oznámeno %d snímků, ale jen %d značek SHOWFRAME nalezeno "
-#~ "v define sprite."
 
 #~ msgid ""
 #~ "No frame progress in movie %s after %lu milliseconds (%lu microseconds = %"
@@ -7970,39 +7932,23 @@ msgstr " Jméno položky je: %s"
 #~ msgid "unable to bind to port %hd: %s"
 #~ msgstr "Nemohu se přichytit na port %hd: %s"
 
-#, fuzzy
 #~ msgid "Server bound to service on %s, port %hd, using fd #%d"
-#~ msgstr "Server přichycen ke službě na %s, portu %hd, deskriptoru %d"
+#~ msgstr "Server přichycen ke službě na %s, portu %hd, deskriptoru č. %d"
 
 #~ msgid "unable to listen on port: %hd: %s "
 #~ msgstr "na portu %hd nemohu poslouchat: %s"
 
-#, fuzzy
 #~ msgid "Trying to accept net traffic on fd #%d"
-#~ msgstr "Pokouším se přijmout síťové spojení na deskriptor %d"
+#~ msgstr "Pokouším se přijmout síťový provoz na deskriptoru č. %d"
 
 #~ msgid "There is data at the console for stdin"
 #~ msgstr "Na standardním vstupu konzole jsou data"
 
-#, fuzzy
 #~ msgid "The accept() socket for fd #%d was interupted by a system call"
 #~ msgstr "Volání accept() na socketu č. %d bylo přerušeno systémovým voláním"
 
-#, fuzzy
-#~ msgid "The accept() socket for fd #%d never was available for writing"
-#~ msgstr ""
-#~ "accept() socket na deskriptoru č. %d nikdy nebyl připraven pro zápis"
-
-#, fuzzy
-#~ msgid "The accept() socket for fd #%d timed out waiting to write"
-#~ msgstr "Limit čekání accept() socketu na deskriptoru č. %d na zápis vypršel"
-
 #~ msgid "unable to accept: %s"
 #~ msgstr "nemohu přijmout spojení: %s"
-
-#, fuzzy
-#~ msgid "Accepting tcp/ip connection on fd #%d"
-#~ msgstr "Přijímám TCP/IP spojení na deskriptoru %d"
 
 #~ msgid "The connect() socket for fd %d was interupted by a system call"
 #~ msgstr ""
@@ -8036,13 +7982,11 @@ msgstr " Jméno položky je: %s"
 #~ msgid "\tport %d at IP %s for fd %d"
 #~ msgstr "\tport %d na IP %s pro deskriptor %d"
 
-#, fuzzy
 #~ msgid "Unable to close the socket for fd #%d: %s"
-#~ msgstr "Nemohu zavřít socket deskriptoru %d: %s"
+#~ msgstr "Nemohu zavřít socket na deskriptoru č. %d: %s"
 
-#, fuzzy
 #~ msgid "Closed the socket on fd #%d"
-#~ msgstr "Socket na deskriptoru %d uzavřen"
+#~ msgstr "Socket na deskriptoru č. %d uzavřen"
 
 #~ msgid "The socket for fd %d was interupted by a system call"
 #~ msgstr "Socket na deskriptoru %d byl přerušen systémovým voláním"
@@ -8584,14 +8528,14 @@ msgstr " Jméno položky je: %s"
 #~ "(dotsyntax)"
 #~ msgstr ""
 #~ "Prvek „%s“ proměnné „%s“ nenalezen v objektu %p ani v _global (tečková "
-#~ "syntace)"
+#~ "syntaxe)"
 
 #~ msgid ""
 #~ "Member %s of object %p doesn't cast to an Object (%s) evaluating target "
 #~ "path %s (dotsyntax)"
 #~ msgstr ""
 #~ "Při vyhodnocování cílové cesty %4$s nelze přetypovat Člen %1$s objektu %2"
-#~ "$p na Object (%3$s) (tečková syntace)"
+#~ "$p na Object (%3$s) (tečková syntaxe)"
 
 #~ msgid "find_object_slashsyntax(%s) called"
 #~ msgstr "zavoláno find_object_slashsyntax(%s)"
@@ -8612,14 +8556,14 @@ msgstr " Jméno položky je: %s"
 #~ "(slashsyntax)"
 #~ msgstr ""
 #~ "Prvek „%s“ proměnné „%s“ nenalezen v objektu %p ani v _global (lomítková "
-#~ "syntace)"
+#~ "syntaxe)"
 
 #~ msgid ""
 #~ "Member %s of object %p doesn't cast to an Object (%s) evaluating target "
 #~ "path %s (slashsyntax)"
 #~ msgstr ""
 #~ "Při vyhodnocování cílové cesty %4$s nelze přetypovat Člen %1$s objektu %2"
-#~ "$p na Object (%3$s) (lomítková syntace)"
+#~ "$p na Object (%3$s) (lomítková syntaxe)"
 
 #~ msgid ""
 #~ "Exported interface of function %p has been overwritten (from %p to %p)"
@@ -8972,7 +8916,7 @@ msgstr " Jméno položky je: %s"
 #~ "JAKÝKOLIV účel. Více informací najdete v GNU GPL.\n"
 #~ "S tímto programem byste měli obdržet kopii GNU GPL. Pokud se\n"
 #~ "tak nestalo, obraťte se na Free Software Foundation,\n"
-#~ "Inc., 51 Fanklin St, Fifth Floor, Boston, MA 02110-1301,\n"
+#~ "Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301,\n"
 #~ "USA. Český překlad naleznete na webové adrese\n"
 #~ "http://www.gnu.cz/licence.html."
 
@@ -8985,6 +8929,5 @@ msgstr " Jméno položky je: %s"
 #~ msgid "Klash"
 #~ msgstr "Klash"
 
-#, fuzzy
 #~ msgid "The Gnash SWF player for KDE.\n"
-#~ msgstr "Přehrávač flashe Gnash pro KDE.\n"
+#~ msgstr "Přehrávač SWF Gnash pro KDE.\n"

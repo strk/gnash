@@ -1,6 +1,6 @@
 // GnashImage.h: Base class for reading image data in Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -222,7 +222,8 @@ public:
     {}
 
     ImageRGB(boost::uint8_t* data, int width, int height, int stride)
-        : GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
+        :
+        GnashImage(data, width, height, stride, GNASH_IMAGE_RGB)
     {}
 
     ~ImageRGB();
@@ -247,6 +248,11 @@ public:
         GnashImage(o)
     {}
 
+    ImageRGBA(boost::uint8_t* data, int width, int height, int stride)
+        :
+        GnashImage(data, width, height, stride, GNASH_IMAGE_RGBA)
+    {}
+    
     ~ImageRGBA();
 
     /// Set pixel value 

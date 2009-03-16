@@ -59,9 +59,7 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libcore/vm  \
         -I$(top_srcdir)/libcore/asobj \
 	-I$(top_srcdir)/testsuite \
-	$(LIBXML_CFLAGS)        \
 	$(OPENGL_CFLAGS)	\
-	$(DMALLOC_CFLAGS)	\
 	$(MP3_CFLAGS)		\
 	$(OGG_CFLAGS)		\
         $(MING_CFLAGS)		\

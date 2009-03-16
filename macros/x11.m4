@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2009 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -42,6 +42,14 @@ AC_DEFUN([GNASH_PATH_X11],
 
   if test x"${ac_cv_path_x11_incl}" = x ; then
     AC_CHECK_HEADERS(X11/X.h, [ac_cv_path_x11_incl=""])
+  fi
+  
+  dnl We want to know whether the headers for XShm exist.
+  if test x"${ac_cv_path_x11_incl}" != x ; then
+    includedirfound=`echo "${ac_cv_path_x11_incl}" | cut -b 3-`
+    if test -f "$includedirfound/X11/extensions/Xv.h"; then
+      xv_incl=yes
+    fi
   fi
 
   AC_MSG_CHECKING([for X11 headers])
@@ -88,7 +96,11 @@ AC_DEFUN([GNASH_PATH_X11],
           ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lSM"
         fi
         if test -f $i/libICE.a -o -f $i/libICE.${shlibext}; then
-         ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lICE"
+          ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lICE"
+        fi
+        if test -f $i/libXv.a -o -f $i/libXv.${shlibext}; then
+          ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXv"
+          xv_lib=yes
         fi
         break
       fi
@@ -126,6 +138,11 @@ AC_DEFUN([GNASH_PATH_X11],
   if test "x$x11" = xyes; then
     AC_DEFINE(HAVE_X11, [1], [X11 headers and libraries])
   fi
+  
+  if test x"$xv_incl" != x -a x"$xv_lib" != x; then
+    AC_DEFINE(HAVE_XV, [1], [X Video extension header and library])
+  fi
+  AM_CONDITIONAL(HAVE_XV, [ test x"$xv_incl" != x -a x"$xv_lib" != x ])
 
   AC_SUBST(X11_CFLAGS)
   AC_SUBST(X11_LIBS)

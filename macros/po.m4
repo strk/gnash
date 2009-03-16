@@ -1,5 +1,5 @@
 # po.m4 serial 7 (gettext-0.14.3)
-dnl Copyright (C) 1995-2005 Free Software Foundation, Inc.
+dnl Copyright (C) 1995-2005, 2009 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.

@@ -17,24 +17,27 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
 //
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#ifdef HAVE_FFMPEG_SWSCALE_H
+extern "C" {
+#include <ffmpeg/swscale.h>
+}
+#define HAVE_SWSCALE_H 1
+#endif
+
+#ifdef HAVE_LIBSWSCALE_SWSCALE_H
+extern "C" {
+#include <libswscale/swscale.h>
+}
+#define HAVE_SWSCALE_H 1
+#endif
 
 #include "VideoDecoderFfmpeg.h"
 #include "MediaParserFfmpeg.h" // for ExtraVideoInfoFfmpeg 
 #include "GnashException.h" // for MediaException
-
-#ifdef HAVE_FFMPEG_SWSCALE_H
-#define HAVE_SWSCALE_H 1
-extern "C" {
-#include <ffmpeg/swscale.h>
-}
-#endif
-
-#ifdef HAVE_LIBSWSCALE_SWSCALE_H
-#define HAVE_SWSCALE_H 1
-extern "C" {
-#include <libswscale/swscale.h>
-}
-#endif
 
 #include <boost/scoped_array.hpp>
 #include <boost/format.hpp>
@@ -213,41 +216,27 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
                                  const AVFrame& srcFrame)
 {
 
-    // Adjust to next highest 4-pixel value.
     const int width = srcCtx->width;
     const int height = srcCtx->height;
 
-    PixelFormat pixFmt;
-    std::auto_ptr<GnashImage> im;
-
 #ifdef FFMPEG_VP6A
-    if (srcCtx->codec->id == CODEC_ID_VP6A) {
-        // Expect RGBA data
-        //log_debug("alpha image");
-        pixFmt = PIX_FMT_RGBA;
-        im.reset(new ImageRGBA(width, height));        
-    } else {
-        // Expect RGB data
-        pixFmt = PIX_FMT_RGB24;
-        im.reset(new ImageRGB(width, height));
-    }
-#else // ndef FFMPEG_VPA6
-    // Expect RGB data
-    pixFmt = PIX_FMT_RGB24;
-    im.reset(new ImageRGB(width, height));
-#endif // def FFMPEG_VP6A
+    PixelFormat pixFmt = (srcCtx->codec->id == CODEC_ID_VP6A) ?
+        PIX_FMT_RGBA : PIX_FMT_RGB24;
+#else 
+    PixelFormat pixFmt = PIX_FMT_RGB24;
+#endif 
+
+    std::auto_ptr<GnashImage> im;
 
 #ifdef HAVE_SWSCALE_H
     // Check whether the context wrapper exists
     // already.
     if (!_swsContext.get()) {
 
-        _swsContext.reset(
-                        new SwsContextWrapper(
-                                sws_getContext(width, height, srcCtx->pix_fmt,
-                                width, height, pixFmt,
-                                SWS_BILINEAR, NULL, NULL, NULL)
-                        ));
+        _swsContext.reset(new SwsContextWrapper(
+            sws_getContext(width, height, srcCtx->pix_fmt, width, height,
+                pixFmt, SWS_BILINEAR, NULL, NULL, NULL)
+        ));
         
         // Check that the context was assigned.
         if (!_swsContext->getContext()) {
@@ -257,24 +246,33 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
             _swsContext.reset();
             
             // Can't do anything now, though.
-            im.reset();
             return im;
         }
     }
 #endif
 
     int bufsize = avpicture_get_size(pixFmt, width, height);
-            if (bufsize == -1) {
-                im.reset();
-                return im;
-            }
+    if (bufsize == -1) return im;
 
-    boost::scoped_array<boost::uint8_t> buffer ( new boost::uint8_t[bufsize] );
+    switch (pixFmt)
+    {
+        case PIX_FMT_RGBA:
+            im.reset(new ImageRGBA(width, height));
+            break;
+        case PIX_FMT_RGB24:
+            im.reset(new ImageRGB(width, height));
+            break;
+        default:
+            log_error("Pixel format not handled");
+            return im;
+    }
 
     AVPicture picture;
-    picture.data[0] = NULL;
 
-    avpicture_fill(&picture, buffer.get(), pixFmt, width, height);
+    // Let ffmpeg write directly to the GnashImage data. It is an uninitialized
+    // buffer here, so do not return the image if there is any error in
+    // conversion.
+    avpicture_fill(&picture, im->data(), pixFmt, width, height);
 
 #ifndef HAVE_SWSCALE_H
     img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) &srcFrame,
@@ -294,9 +292,9 @@ VideoDecoderFfmpeg::frameToImage(AVCodecContext* srcCtx,
         im.reset();
         return im;
     }
+
 #endif
 
-    im->update(picture.data[0]);
     return im;
 
 }

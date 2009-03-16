@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,10 +40,10 @@ void
 DynamicShape::clear()
 {
 	//clear_meshes();
-	m_paths.clear();
-	m_fill_styles.clear();
-	m_line_styles.clear();
-	m_bound.set_null();
+	_paths.clear();
+	_fill_styles.clear();
+	_line_styles.clear();
+	_bound.set_null();
 	_currpath=0; // or would point to invalid memory
 	_currfill = _currline = 0; // or would point to cleared m_fill_style and m_line_styles respectively
 
@@ -53,8 +53,8 @@ DynamicShape::clear()
 void
 DynamicShape::add_path(const path& pth)
 {
-	m_paths.push_back(pth);
-	_currpath = &(m_paths.back());
+	_paths.push_back(pth);
+	_currpath = &(_paths.back());
 	//compute_bound(&m_bound);
 }
 
@@ -147,8 +147,8 @@ DynamicShape::finalize()
 	// Close any pending filled path (_currpath should be last path)
 	if ( _currpath && _currfill)
 	{
-		assert( ! m_paths.empty() );
-		assert( _currpath == &(m_paths.back()) );
+		assert(!_paths.empty());
+		assert(_currpath == &(_paths.back()));
 		_currpath->close();
 	}
 
@@ -200,11 +200,11 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 	_currpath->drawLineTo(x, y);
 
 	// Update bounds 
-	unsigned thickness = _currline ? m_line_styles[_currline-1].getThickness() : 0;
+	unsigned thickness = _currline ? _line_styles[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(m_bound, thickness, swfVersion);
+		_currpath->expandBounds(_bound, thickness, swfVersion);
 	} else {
-		m_bound.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
+		_bound.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
 	}
     
 	// Update current pen position
@@ -225,13 +225,16 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 	_currpath->drawCurveTo(cx, cy, ax, ay);
 
 	// Update bounds 
-	unsigned thickness = _currline ? m_line_styles[_currline-1].getThickness() : 0;
+	unsigned thickness = _currline ? _line_styles[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(m_bound, thickness, swfVersion);
-	} else {
-		m_bound.expand_to_circle(ax, ay, swfVersion < 8 ? thickness : thickness/2.0);
-		m_bound.expand_to_circle(cx, cy, swfVersion < 8 ? thickness : thickness/2.0);
+		_currpath->expandBounds(_bound, thickness, swfVersion);
 	}
+    else {
+		_bound.expand_to_circle(ax, ay, 
+                swfVersion < 8 ? thickness : thickness/2.0);
+		_bound.expand_to_circle(cx, cy,
+                swfVersion < 8 ? thickness : thickness/2.0);
+    }
 
 	// Update current pen position
 	_x = ax;
@@ -244,8 +247,7 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 size_t
 DynamicShape::add_fill_style(const fill_style& stl)
 {
-	typedef FillStyleVect V;
-	V& v=m_fill_styles;
+	FillStyles& v = _fill_styles;
 
 	// TODO: check if the style is already in our list
 	//       (needs operator== defined for fill_style)
@@ -256,8 +258,7 @@ DynamicShape::add_fill_style(const fill_style& stl)
 size_t
 DynamicShape::add_line_style(const line_style& stl)
 {
-	typedef LineStyleVect V;
-	V& v=m_line_styles;
+	LineStyles& v = _line_styles;
 
 	// TODO: check if the style is already in our list
 	//       (needs operator== defined for line_style)

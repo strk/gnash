@@ -37,7 +37,8 @@ noinst_SCRIPT = autogen.sh
 DISTCHECK_CONFIGURE_FLAGS = \
 	--with-plugins-install=prefix \
 	--enable-extensions=all \
-	--enable-gui=all 
+	--enable-gui=all \
+	--disable-testsuite
 #--enable-cygnal
 
 STD_DIRS = \
@@ -313,7 +314,11 @@ endif
 	@echo "	Renderer engine: $(RENDERER_CONFIG)"
 
 if BUILD_GTK_GUI
-	@echo "	Supported GUI: GTK"
+if HAVE_XV
+	@echo "	Supported GUI: GTK (+XVideo)"
+else
+ 	@echo "	Supported GUI: GTK"
+endif
 endif
 if BUILD_HILDON_GUI
 	@echo "	Supported GUI: HILDON"
@@ -359,10 +364,10 @@ endif
 	  echo "	Extensions added are: $(EXTENSIONS_LIST)"; \
 	fi
 	@if test -n "$(SECURITY_LIST)" ; then \
-	  echo "	Security features enables are: $(SECURITY_LIST)"; \
+	  echo "	Security features enabled are: $(SECURITY_LIST)"; \
 	fi
 	@if test -n "$(STATISTICS_LIST)" ; then \
-	  echo "	Statistics features enables are: $(STATISTICS_LIST)"; \
+	  echo "	Statistics features enabled are: $(STATISTICS_LIST)"; \
 	fi
 if KPARTS3
 	@echo "	KPARTS 3.x (KDE) plugin enabled"

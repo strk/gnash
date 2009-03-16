@@ -31,6 +31,26 @@
 
 namespace gnash {
 
+namespace {
+
+/// Reverse lookup of Glyph in CodeTable.
+//
+/// Inefficient, which is probably why TextSnapshot was designed like it
+/// is.
+class CodeLookup
+{
+public:
+    CodeLookup(const int glyph) : _glyph(glyph) {}
+
+    bool operator()(const std::pair<const boost::uint16_t, int>& p) {
+        return p.second == _glyph;
+    }
+
+private:
+    int _glyph;
+};
+
+}
 
 Font::GlyphInfo::GlyphInfo()
 	:
@@ -97,15 +117,12 @@ Font::get_glyph(int index, bool embedded) const
     const GlyphInfoRecords& lookup = (embedded && _fontTag) ? 
             _fontTag->glyphTable() : _deviceGlyphTable;
 
-    if (index >= 0 && (size_t)index < lookup.size())
-    {
+    if (index >= 0 && (size_t)index < lookup.size()) {
         return lookup[index].glyph.get();
     }
-    else
-    {
-        // TODO: should we log an error here ?
-        return NULL;
-    }
+
+    // TODO: should we log an error here ?
+    return 0;
 }
 
 void
@@ -171,6 +188,19 @@ Font::setName(const std::string& name)
     _name = name;
 }
 
+
+boost::uint16_t
+Font::codeTableLookup(int glyph, bool embedded) const
+{
+    const CodeTable& ctable = (embedded && _embeddedCodeTable) ? 
+        *_embeddedCodeTable : _deviceCodeTable;
+    
+    CodeTable::const_iterator it = std::find_if(ctable.begin(), ctable.end(),
+            CodeLookup(glyph));
+    assert (it != ctable.end());
+    return it->first;
+}
+
 int
 Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 {
@@ -179,96 +209,82 @@ Font::get_glyph_index(boost::uint16_t code, bool embedded) const
 
     int glyph_index = -1;
     CodeTable::const_iterator it = ctable.find(code);
-    if ( it != ctable.end() )
-    {
+    if (it != ctable.end()) {
         glyph_index = it->second;
         return glyph_index;
     }
 
-    // Try adding an os font, of possible
-    if ( ! embedded )
-    {
+    // Try adding an os font, if possible
+    if (!embedded) {
         glyph_index = const_cast<Font*>(this)->add_os_glyph(code);
     }
     return glyph_index;
 }
 
-float Font::get_advance(int glyph_index, bool embedded) const
+float
+Font::get_advance(int glyph_index, bool embedded) const
 {
     // What to do if embedded is true and this is a
     // device-only font?
     const GlyphInfoRecords& lookup = (embedded && _fontTag) ? 
             _fontTag->glyphTable() : _deviceGlyphTable;
 
-    if (glyph_index < 0)
-    {
+    if (glyph_index < 0) {
         // Default advance.
         return 512.0f;
     }
 
-    if (static_cast<size_t>(glyph_index) < lookup.size())
-    {
-        assert(glyph_index >= 0);
-        return lookup[glyph_index].advance;
-    }
-    else
-    {
-        // Bad glyph index.  Due to bad data file?
-        abort();
-        return 0;
-    }
+    assert(static_cast<size_t>(glyph_index) < lookup.size());
+    assert(glyph_index >= 0);
+    
+    return lookup[glyph_index].advance;
 }
 
 
 // Return the adjustment in advance between the given two
 // characters.  Normally this will be 0; i.e. the 
-float	Font::get_kerning_adjustment(int last_code, int code) const
+float
+Font::get_kerning_adjustment(int last_code, int code) const
 {
     kerning_pair	k;
     k.m_char0 = last_code;
     k.m_char1 = code;
     kernings_table::const_iterator it = m_kerning_pairs.find(k);
-    if ( it != m_kerning_pairs.end() )
-    {
+    if (it != m_kerning_pairs.end()) {
         float adjustment = it->second;
         return adjustment;
     }
     return 0;
 }
 
-unsigned short int Font::unitsPerEM(bool embed) const
+unsigned short int
+Font::unitsPerEM(bool embed) const
 {
     // the EM square is 1024 x 1024 for DefineFont up to 2
     // and 20 as much for DefineFont3 up
-    if (embed)
-    {
+    if (embed) {
         // If this is not an embedded font, what should we do
         // here?
         if ( _fontTag && _fontTag->subpixelFont() ) return 1024 * 20;
         else return 1024;
     }
-    else
-    {
-        if ( ! _ftProvider.get() )
-        {
-            if ( ! initDeviceFontProvider() )
-            {
-                log_error("Device font provider was not initialized, "
-                        "can't get unitsPerEM");
-                return 0; // can't query it..
-            }
+    
+    if (!_ftProvider.get()) {
+        if (!initDeviceFontProvider()) {
+            log_error("Device font provider was not initialized, "
+                    "can't get unitsPerEM");
+            return 0; // can't query it..
         }
-        return _ftProvider->unitsPerEM();
     }
+
+    return _ftProvider->unitsPerEM();
 }
 
 int
 Font::add_os_glyph(boost::uint16_t code)
 {
-    if ( ! _ftProvider.get() )
-    {
-        if ( ! initDeviceFontProvider() )
-        {
+    if (!_ftProvider.get()) {
+        if (!initDeviceFontProvider()) {
             log_error("Device font provider was not initialized, can't "
                     "get unitsPerEM");
             return -1; // can't provide it...
@@ -283,8 +299,7 @@ Font::add_os_glyph(boost::uint16_t code)
     boost::intrusive_ptr<shape_character_def> sh = 
         _ftProvider->getGlyph(code, advance);
 
-    if ( ! sh )
-    {
+    if (!sh) {
         log_error("Could not create shape "
                 "glyph for character code %u (%c) with "
                 "device font %s (%p)", code, code, _name,
@@ -308,16 +323,14 @@ Font::add_os_glyph(boost::uint16_t code)
 bool
 Font::initDeviceFontProvider() const
 {
-    if ( _name.empty() )
-    {
+    if (_name.empty()) {
         log_error("No name associated with this font, can't use device "
                 "fonts (should I use a default one?)");
         return false;
     }
 
     _ftProvider = FreetypeGlyphsProvider::createFace(_name, _bold, _italic);
-    if ( ! _ftProvider.get() )
-    {
+    if (!_ftProvider.get()) {
         log_error("Could not create a freetype face %s", _name);
         return false;
     }
@@ -332,13 +345,19 @@ Font::matches(const std::string& name, bool bold, bool italic) const
 
 // TODO: what about device fonts?
 float
-Font::get_leading() const {
+Font::leading() const {
     return _fontTag ? _fontTag->leading() : 0.0f;
 }
 
 // TODO: what about device fonts?
 float
-Font::get_descent() const {
+Font::ascent() const {
+    return _fontTag ? _fontTag->ascent() : 0.0f;
+}
+    
+// TODO: what about device fonts?
+float
+Font::descent() const {
     return _fontTag ? _fontTag->descent() : 0.0f;
 }
     
@@ -359,8 +378,7 @@ Font::markReachableResources() const
 {
 	// Mark device glyphs (textured and vector)
 	for (GlyphInfoRecords::const_iterator i = _deviceGlyphTable.begin(),
-            e=_deviceGlyphTable.end(); i != e; ++i)
-	{
+            e=_deviceGlyphTable.end(); i != e; ++i) {
 		i->markReachableResources();
 	}
 

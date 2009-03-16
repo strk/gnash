@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,11 +15,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-#ifndef __PATH_PARSER_H
-#define __PATH_PARSER_H
+#ifndef GNASH_PATH_PARSER_H
+#define GNASH_PATH_PARSER_H
 
 
-#include "shape.h"
+#include "Geometry.h"
 #include <vector>
 #include <deque>
 #include "cxform.h"

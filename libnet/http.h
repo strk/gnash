@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef _HTTP_H_
-#define _HTTP_H_
+#ifndef GNASH_LIBNET_HTTP_H
+#define GNASH_LIBNET_HTTP_H
 
 #include <string>
 #include <map>
@@ -26,6 +26,10 @@
 #include <boost/shared_array.hpp>
 #include <boost/scoped_array.hpp>
 #include <sstream>
+
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
 
 #include "amf.h"
 #include "cque.h"
@@ -293,10 +297,10 @@ protected:
     std::string		_docroot;
 };  
 
-// // This is the thread for all incoming HTTP connections
-// extern "C" {
-//     bool http_handler(Network::thread_params_t *args);
-// }
+// This is the thread for all incoming HTTP connections for the server
+extern "C" {
+    bool DSOEXPORT http_handler(Network::thread_params_t *args);
+}
 
 
 } // end of gnash namespace

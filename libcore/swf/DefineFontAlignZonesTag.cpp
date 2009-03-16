@@ -20,7 +20,6 @@
 
 #include "Font.h"
 #include "log.h"
-#include "shape.h"
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "DefineFontAlignZonesTag.h"

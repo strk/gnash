@@ -671,14 +671,31 @@ CurlStreamFile::fillCache(std::streamsize size)
 		// Wait for data on the filedescriptors until a timeout set
 		// in gnashrc.
 		int ret = select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
+
+// select() will always fail on OS/2 as we can't select
+// on file descriptors, only on sockets
+#ifndef __OS2__ 
 		if ( ret == -1 )
 		{
-			// something unexpected happened
-			boost::format fmt = boost::format(
-				"error polling data from connection to %s: %s ")
-				% _url % strerror(errno);
-			throw GnashException(fmt.str());
+            if ( errno == EINTR )
+            {
+                // we got interupted by a signal
+                // let's consider this as a timeout
+#ifdef GNASH_CURL_VERBOSE
+                log_debug("select() was interrupted by a signal");
+#endif
+                ret = 0;
+            }
+            else
+            {
+                // something unexpected happened
+                boost::format fmt = boost::format(
+                    "error polling data from connection to %s: %s ")
+                    % _url % strerror(errno);
+                throw GnashException(fmt.str());
+            }
 		}
+#endif
 		if ( ! ret )
 		{
 			// timeout

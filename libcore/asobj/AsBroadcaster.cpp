@@ -79,7 +79,7 @@ public:
 		_fn(fn)
 	{
 		_eventName = fn.arg(0).to_string();
-		_eventKey = VM::get().getStringTable().find(_eventName);
+		_eventKey = fn.getVM().getStringTable().find(_eventName);
 		_fn.drop_bottom();
 	}
 
@@ -93,12 +93,9 @@ public:
 		o->get_member(_eventKey, &method);
         _fn.super = o->get_super(_eventName.c_str());
 
-		if ( method.is_function() )
-		{
-
+		if (method.is_function()) {
 			_fn.this_ptr = o.get();
 			method.to_as_function()->call(_fn);
-
 		}
 
 		++_dispatched;

@@ -42,6 +42,7 @@
 #include "VM.h"
 #include "Range2d.h" // for getBounds
 #include "GnashException.h"
+#include "GnashAlgorithm.h"
 #include "URL.h"
 #include "sound_handler.h"
 #include "StreamProvider.h"
@@ -58,14 +59,12 @@
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
 
-
 #ifdef USE_SWFTREE
 # include "tree.hh"
 #endif
 
 #include <vector>
 #include <string>
-#include <cmath>
 #include <algorithm> // for std::swap
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/lexical_cast.hpp>
@@ -152,7 +151,6 @@ namespace {
     as_value movieclip_meth(const fn_call& fn);
     as_value movieclip_getSWFVersion(const fn_call& fn);
     as_value movieclip_loadVariables(const fn_call& fn);
-    as_value movieclip_(const fn_call& fn);
 
 }
 
@@ -203,23 +201,242 @@ private:
 
 };
 
-/// A DisplayList visitor used to compute its overall bounds.
+/// Find a character hit by the given coordinates.
 //
-class BoundsFinder {
+/// This class takes care about taking masks layers into
+/// account, but nested masks aren't properly tested yet.
+///
+class MouseEntityFinder
+{
 public:
-    rect& _bounds;
-    BoundsFinder(rect& b)
+
+    /// @param wp
+    ///     Query point in world coordinate space
+    ///
+    /// @param pp
+    ///     Query point in parent coordinate space
+    ///
+MouseEntityFinder(point wp, point pp)
         :
-        _bounds(b)
+        _highestHiddenDepth(std::numeric_limits<int>::min()),
+        _m(NULL),
+        _candidates(),
+        _wp(wp),
+        _pp(pp),
+        _checked(false)
     {}
+
     void operator() (character* ch)
     {
+        assert(!_checked);
+        if ( ch->get_depth() <= _highestHiddenDepth )
+        {
+            if ( ch->isMaskLayer() )
+            {
+                log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
+                            "This mask is %s at depth %d outer mask masked "
+                            "up to depth %d."),
+                            ch->getTarget(), ch->get_depth(),
+                            _highestHiddenDepth);
+                // Hiding mask still in effect...
+            }
+            return;
+        }
+
+        if ( ch->isMaskLayer() )
+        {
+            if ( ! ch->pointInShape(_wp.x, _wp.y) )
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask not hitting "
+                        "the query point %g,%g and masking up to "
+                        "depth %d"), ch->getTarget(), ch->get_depth(), 
+                        _wp.x, _wp.y, ch->get_clip_depth());
+#endif
+                _highestHiddenDepth = ch->get_clip_depth();
+            }
+            else
+            {
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+                log_debug(_("Character %s at depth %d is a mask hitting the "
+                        "query point %g,%g"),
+                        ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
+#endif 
+            }
+            return;
+        }
+        if (! ch->isVisible()) return;
+
+        _candidates.push_back(ch);
+    }
+
+    void checkCandidates()
+    {
+        if (_checked) return;
+        for (Candidates::reverse_iterator i=_candidates.rbegin(),
+                        e=_candidates.rend(); i!=e; ++i) {
+            character* ch = *i;
+            character* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
+            if (te) {
+                _m = te;
+                break;
+            }
+        }
+        _checked = true;
+    }
+
+    character* getEntity()
+    {
+        checkCandidates();
+#ifdef DEBUG_MOUSE_ENTITY_FINDING
+        if ( _m ) 
+        {
+            log_debug(_("MouseEntityFinder found character %s (depth %d) "
+                    "hitting point %g,%g"),
+                    _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
+        }
+#endif // DEBUG_MOUSE_ENTITY_FINDING
+        return _m;
+    }
+
+private:
+
+    /// Highest depth hidden by a mask
+    //
+    /// This will be -1 initially, and set
+    /// the the depth of a mask when the mask
+    /// doesn't contain the query point, while
+    /// scanning a DisplayList bottom-up
+    ///
+    int _highestHiddenDepth;
+
+    character* _m;
+
+    typedef std::vector<character*> Candidates;
+    Candidates _candidates;
+
+    /// Query point in world coordinate space
+    point    _wp;
+
+    /// Query point in parent coordinate space
+    point    _pp;
+
+    bool _checked;
+
+};
+
+/// Find the first character whose shape contain the point
+//
+/// Point coordinates in world TWIPS
+///
+class ShapeContainerFinder
+{
+public:
+
+    ShapeContainerFinder(boost::int32_t x, boost::int32_t y)
+        :
+        _found(false),
+        _x(x),
+        _y(y)
+    {}
+
+    bool operator() (character* ch) {
+        if (ch->pointInShape(_x, _y)) {
+            _found = true;
+            return false;
+        }
+        return true;
+    }
+
+    bool hitFound() { return _found; }
+
+private:
+    bool _found;
+    boost::int32_t    _x;
+    boost::int32_t    _y;
+};
+
+/// Find the first visible character whose shape contain the point
+//
+/// Point coordinates in world TWIPS
+///
+class VisibleShapeContainerFinder
+{
+public:
+
+    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t    y)
+        :
+        _found(false),
+        _x(x),
+        _y(y)
+    {}
+
+    bool operator() (character* ch)
+    {
+        if (ch->pointInVisibleShape(_x, _y)) {
+            _found = true;
+            return false;
+        }
+        return true;
+    }
+
+    bool hitFound() { return _found; }
+
+private:
+    bool _found;
+    boost::int32_t    _x;
+    boost::int32_t    _y;
+};
+
+/// Find the first hitable character whose shape contain the point 
+// 
+/// Point coordinates in world TWIPS 
+/// 
+class HitableShapeContainerFinder
+{ 
+public: 
+    HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
+            : 
+    _found(false), 
+    _x(x), 
+    _y(y) 
+    {} 
+
+    bool operator() (character* ch) 
+    { 
+        if (ch->isDynamicMask()) return true; 
+        if (ch->pointInShape(_x, _y)) {
+            _found = true; 
+            return false; 
+        } 
+        return true; 
+    } 
+
+    bool hitFound() { return _found; } 
+
+private:
+    bool _found; 
+    boost::int32_t _x; // TWIPS
+    boost::int32_t _y; // TWIPS
+}; 
+
+/// A DisplayList visitor used to compute its overall bounds.
+//
+class BoundsFinder
+{
+public:
+    BoundsFinder(rect& b) : _bounds(b) {}
+
+    void operator() (character* ch) {
         // don't include bounds of unloaded characters
         if ( ch->isUnloaded() ) return;
         rect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
     }
+
+private:
+    rect& _bounds;
 };
 
 /// A DisplayList visitor used to extract script characters
@@ -227,9 +444,8 @@ public:
 /// Script characters are characters created or transformed
 /// by ActionScript. 
 ///
-class ScriptObjectsFinder {
-    std::vector<character*>& _dynamicChars;
-    std::vector<character*>& _staticChars;
+class ScriptObjectsFinder
+{
 public:
     ScriptObjectsFinder(std::vector<character*>& dynamicChars,
             std::vector<character*>& staticChars)
@@ -238,8 +454,7 @@ public:
         _staticChars(staticChars)
     {}
 
-    void operator() (character* ch) 
-    {
+    void operator() (character* ch) {
         // don't include bounds of unloaded characters
         if ( ch->isUnloaded() ) return;
 
@@ -248,15 +463,15 @@ public:
         //if ( ! ch->get_accept_anim_moves() )
         //if ( ch->isDynamic() )
         int depth = ch->get_depth();
-        if ( depth < character::lowerAccessibleBound || depth >= 0 )
-        {
+        if (depth < character::lowerAccessibleBound || depth >= 0) {
             _dynamicChars.push_back(ch);
         }
-        else
-        {
-            _staticChars.push_back(ch);
-        }
+        else _staticChars.push_back(ch);
     }
+
+private:
+    std::vector<character*>& _dynamicChars;
+    std::vector<character*>& _staticChars;
 };
 
 } // anonymous namespace
@@ -268,7 +483,7 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
     character(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
-    _drawable_inst(_drawable->create_character_instance(this, 0)),
+    _drawable_inst(_drawable->createDisplayObject(this, 0)),
     m_play_state(PLAY),
     m_current_frame(0),
     m_has_looped(false),
@@ -304,11 +519,7 @@ MovieClip::~MovieClip()
     _vm.getRoot().remove_key_listener(this);
     _vm.getRoot().remove_mouse_listener(this);
 
-    for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
-            it != _loadVariableRequests.end(); ++it)
-    {
-        delete *it;
-    }
+    deleteAllChecked(_loadVariableRequests);
 }
 
 // Execute the actions in the action list, in the given
@@ -910,7 +1121,6 @@ MovieClip::advance_sprite()
 
     // I'm not sure ENTERFRAME goes in a different queue then DOACTION...
     queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
-    //queueEvent(event_id::ENTER_FRAME, apENTERFRAME);
 
     // Update current and next frames.
     if (m_play_state == PLAY)
@@ -1315,7 +1525,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     if (existing_char) return NULL;
 
     boost::intrusive_ptr<character> ch =
-        cdef->create_character_instance(this, tag->getID());
+        cdef->createDisplayObject(this, tag->getID());
 
     if (tag->hasName()) ch->set_name(tag->getName());
     else if (ch->wantsInstanceName())
@@ -1387,7 +1597,7 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
         else
         {
             boost::intrusive_ptr<character> ch = 
-                cdef->create_character_instance(this, tag->getID());
+                cdef->createDisplayObject(this, tag->getID());
 
             // TODO: check if we can drop this for REPLACE!
             // should we rename the character when it's REPLACE tag?
@@ -1485,236 +1695,6 @@ MovieClip::handleFocus()
     // only if at least one mouse event handler is defined.
     return can_handle_mouse_event();
 }
-
-/// Find a character hit by the given coordinates.
-//
-/// This class takes care about taking masks layers into
-/// account, but nested masks aren't properly tested yet.
-///
-class MouseEntityFinder {
-
-    /// Highest depth hidden by a mask
-    //
-    /// This will be -1 initially, and set
-    /// the the depth of a mask when the mask
-    /// doesn't contain the query point, while
-    /// scanning a DisplayList bottom-up
-    ///
-    int _highestHiddenDepth;
-
-    character* _m;
-
-    typedef std::vector<character*> Candidates;
-    Candidates _candidates;
-
-    /// Query point in world coordinate space
-    point    _wp;
-
-    /// Query point in parent coordinate space
-    point    _pp;
-
-    bool _checked;
-
-public:
-
-    /// @param wp
-    ///     Query point in world coordinate space
-    ///
-    /// @param pp
-    ///     Query point in parent coordinate space
-    ///
- MouseEntityFinder(point    wp, point    pp)
-        :
-        _highestHiddenDepth(std::numeric_limits<int>::min()),
-        _m(NULL),
-        _candidates(),
-        _wp(wp),
-        _pp(pp),
-        _checked(false)
-    {}
-
-    void operator() (character* ch)
-    {
-        assert(!_checked);
-        if ( ch->get_depth() <= _highestHiddenDepth )
-        {
-            if ( ch->isMaskLayer() )
-            {
-                log_debug(_("CHECKME: nested mask in MouseEntityFinder. "
-                            "This mask is %s at depth %d outer mask masked "
-                            "up to depth %d."),
-                            ch->getTarget(), ch->get_depth(),
-                            _highestHiddenDepth);
-                // Hiding mask still in effect...
-            }
-            return;
-        }
-
-        if ( ch->isMaskLayer() )
-        {
-            if ( ! ch->pointInShape(_wp.x, _wp.y) )
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask not hitting "
-                        "the query point %g,%g and masking up to "
-                        "depth %d"), ch->getTarget(), ch->get_depth(), 
-                        _wp.x, _wp.y, ch->get_clip_depth());
-#endif
-                _highestHiddenDepth = ch->get_clip_depth();
-            }
-            else
-            {
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-                log_debug(_("Character %s at depth %d is a mask hitting the "
-                        "query point %g,%g"),
-                        ch->getTarget(), ch->get_depth(), _wp.x, _wp.y);
-#endif 
-            }
-
-            return;
-        }
-
-        if ( ! ch->isVisible() ) return;
-
-        _candidates.push_back(ch);
-
-    }
-
-    void checkCandidates()
-    {
-        if ( _checked ) return;
-        for (Candidates::reverse_iterator i=_candidates.rbegin(),
-                        e=_candidates.rend(); i!=e; ++i)
-        {
-            character* ch = *i;
-            character* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
-            if ( te )
-            {
-                _m = te;
-                break;
-            }
-        }
-        _checked = true;
-    }
-
-    character* getEntity()
-    {
-        checkCandidates();
-#ifdef DEBUG_MOUSE_ENTITY_FINDING
-        if ( _m ) 
-        {
-            log_debug(_("MouseEntityFinder found character %s (depth %d) "
-                    "hitting point %g,%g"),
-                    _m->getTarget(), _m->get_depth(), _wp.x, _wp.y);
-        }
-#endif // DEBUG_MOUSE_ENTITY_FINDING
-        return _m;
-    }
-        
-};
-
-/// Find the first character whose shape contain the point
-//
-/// Point coordinates in world TWIPS
-///
-class ShapeContainerFinder {
-
-    bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
-
-public:
-
-    ShapeContainerFinder(boost::int32_t x, boost::int32_t y)
-        :
-        _found(false),
-        _x(x),
-        _y(y)
-    { }
-
-    bool operator() (character* ch)
-    {
-        if ( ch->pointInShape(_x, _y) )
-        {
-            _found = true;
-            return false;
-        }
-        else return true;
-    }
-
-    bool hitFound() { return _found; }
-        
-};
-
-/// Find the first visible character whose shape contain the point
-//
-/// Point coordinates in world TWIPS
-///
-class VisibleShapeContainerFinder {
-
-    bool _found;
-    boost::int32_t    _x;
-    boost::int32_t    _y;
-
-public:
-
-    VisibleShapeContainerFinder(boost::int32_t x, boost::int32_t    y)
-        :
-        _found(false),
-        _x(x),
-        _y(y)
-    {}
-
-    bool operator() (character* ch)
-    {
-        if ( ch->pointInVisibleShape(_x, _y) )
-        {
-            _found = true;
-            return false;
-        }
-        else return true;
-    }
-
-    bool hitFound() { return _found; }
-        
-};
-
-/// Find the first hitable character whose shape contain the point 
-// 
-/// Point coordinates in world TWIPS 
-/// 
-class HitableShapeContainerFinder { 
-    bool _found; 
-    boost::int32_t    _x; // TWIPS
-    boost::int32_t    _y; // TWIPS
-        
-public: 
-    HitableShapeContainerFinder(boost::int32_t x, boost::int32_t y) 
-            : 
-    _found(false), 
-    _x(x), 
-    _y(y) 
-    {} 
-
-    bool operator() (character* ch) 
-    { 
-        if( ch->isDynamicMask() ) 
-        { 
-            return true; 
-        } 
-        else if ( ch->pointInShape(_x, _y) ) 
-        {
-            _found = true; 
-            return false; 
-        } 
-        else 
-        { 
-            return true; 
-        }
-    } 
-
-    bool hitFound() { return _found; } 
-}; 
 
 bool
 MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
@@ -3119,7 +3099,7 @@ movieclip_forceSmoothing(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.forceSmoothing()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.forceSmoothing()")));
     return as_value();
 }
 
@@ -3130,7 +3110,7 @@ movieclip_opaqueBackground(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.opaqueBackground()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.opaqueBackground()")));
     return as_value();
 }
 
@@ -3141,7 +3121,7 @@ movieclip_scale9Grid(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.scale9Grid()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.scale9Grid()")));
     return as_value();
 }
 
@@ -3152,7 +3132,7 @@ movieclip_scrollRect(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.scrollRect()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.scrollRect()")));
     return as_value();
 }
 
@@ -3163,7 +3143,7 @@ movieclip_tabIndex(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.tabIndex()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.tabIndex()")));
     return as_value();
 }
 
@@ -3237,7 +3217,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
     boost::intrusive_ptr<character> newch =
-        exported_movie->create_character_instance(movieclip.get(), 0);
+        exported_movie->createDisplayObject(movieclip.get(), 0);
 
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);
@@ -3955,13 +3935,15 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
 
 /// MovieClip.getURL(url:String[, window:String[, method:String]])
 //
-/// TODO: test this properly.
+/// Tested manually to function as a method of any as_object. Hard to
+/// test automatically as it doesn't return anything and only has external
+/// side-effects.
 /// Returns void.
 as_value
 movieclip_getURL(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip = 
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<as_object> movieclip =
+        ensureType<as_object>(fn.this_ptr);
 
     std::string urlstr;
     std::string target;
@@ -4006,8 +3988,7 @@ movieclip_getURL(const fn_call& fn)
 
     std::string vars;
 
-    if (method != MovieClip::METHOD_NONE)
-    {
+    if (method != MovieClip::METHOD_NONE) {
         // Get encoded vars.
         movieclip->getURLEncodedVars(vars);
     }
@@ -4023,8 +4004,8 @@ movieclip_getURL(const fn_call& fn)
 as_value
 movieclip_getSWFVersion(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> movieclip = 
+        ensureType<MovieClip>(fn.this_ptr);
 
     return as_value(movieclip->getSWFVersion());
 }
@@ -4036,8 +4017,6 @@ movieclip_getSWFVersion(const fn_call& fn)
 as_value
 movieclip_meth(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
 
     if (!fn.nargs) return as_value(MovieClip::METHOD_NONE); 
 
@@ -4063,11 +4042,29 @@ movieclip_meth(const fn_call& fn)
 as_value
 movieclip_getTextSnapshot(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip =
-            ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> obj = ensureType<MovieClip>(fn.this_ptr);
 
-    LOG_ONCE( log_unimpl("MovieClip.getTextSnapshot()") );
-    return as_value();
+    // If not found, construction fails.
+    as_value textSnapshot(fn.env().find_object("TextSnapshot"));
+
+    boost::intrusive_ptr<as_function> tsCtor = textSnapshot.to_as_function();
+
+    if (!tsCtor) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("MovieClip.getTextSnapshot: failed to construct "
+                "TextSnapshot (object probably overridden)");
+        );
+        return as_value();
+    }
+
+    // Construct a flash.geom.Transform object with "this" as argument.
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
+    args->push_back(obj.get());
+
+    boost::intrusive_ptr<as_object> ts =
+        tsCtor->constructInstance(fn.env(), args);
+
+    return as_value(ts.get());
 }
 
 
@@ -5238,64 +5235,26 @@ movieclip_soundbuftime_getset(const fn_call& fn)
 as_value
 movieclip_transform(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
-        
-    VM& vm = ptr->getVM();
-    string_table& st = ptr->getVM().getStringTable();
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
-    as_value flash;
-    if (!vm.getGlobal()->get_member(st.find("flash"), &flash))
-    {
-        log_error("No flash object found!");
-        return as_value();
-    }
-    boost::intrusive_ptr<as_object> flashObj = flash.to_object();
+    // If not found, construction fails.
+    as_value transform(fn.env().find_object("flash.geom.Transform"));
 
-    if (!flashObj)
-    {
-        log_error("flash isn't an object!");
-        return as_value();
-    }
-        
-    as_value geom;
-    if (!flashObj->get_member(st.find("geom"), &geom))
-    {
-        log_error("No flash.geom object found!");
-        return as_value();
-    }
-    boost::intrusive_ptr<as_object> geomObj = geom.to_object();
+    boost::intrusive_ptr<as_function> transCtor = transform.to_as_function();
 
-    if (!geomObj)
-    {
-        log_error("flash.geom isn't an object!");
-        return as_value();
-    }
-        
-    as_value transform;
-    if (!geomObj->get_member(st.find("Transform"), &transform))
-    {
-        log_error("No flash.geom.Transform object found!");
-        return as_value();
-    }        
-
-    boost::intrusive_ptr<as_function> transformCtor =
-        transform.to_as_function();
-
-    if (!transformCtor)
-    {
-        log_error("flash.geom.Transform isn't a function!");
+    if (!transCtor) {
+        log_error("Failed to construct flash.geom.Transform!");
         return as_value();
     }
 
     // Construct a flash.geom.Transform object with "this" as argument.
-    std::auto_ptr< std::vector<as_value> > args (new std::vector<as_value>);
+    std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
     args->push_back(ptr.get());
 
-    boost::intrusive_ptr<as_object> transformObj =
-        transformCtor->constructInstance(fn.env(), args);
+    boost::intrusive_ptr<as_object> newTrans =
+        transCtor->constructInstance(fn.env(), args);
 
-    return as_value(transformObj.get());
+    return as_value(newTrans.get());
 }
 
 /// Properties (and/or methods) attached to every *instance* of a MovieClip 

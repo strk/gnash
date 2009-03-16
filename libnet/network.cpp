@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -51,10 +51,10 @@
 # include <sys/param.h>
 # include <sys/select.h>
 #include <signal.h>
-#ifdef HAVE_POLL
+#ifdef HAVE_POLL_H
 # include <poll.h>
 #else 
-# ifdef HAVE_EPOLL
+# ifdef HAVE_EPOLL_H
 #  include <epoll.h>
 # endif
 #endif

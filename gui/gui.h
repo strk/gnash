@@ -377,8 +377,6 @@ public:
     ///
     virtual bool yesno(const std::string& question);
 
-    movie_root* getStage() const { return _stage; }
-
 protected:
 
     /// Default constructor. Initialises members to safe defaults.

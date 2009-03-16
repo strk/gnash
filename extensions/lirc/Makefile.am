@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ INCLUDES = \
             -I$(top_srcdir)/libbase \
             -I$(top_srcdir)/libcore \
             -I$(top_srcdir)/libcore/vm \
-	    -I$(top_srcdir)/asobjs \
+	    -I$(top_srcdir)/libcore/asobj \
 	    -I$(top_srcdir)/libnet \
 	    $(BOOST_CFLAGS) \
 	    $(INCLTDL)

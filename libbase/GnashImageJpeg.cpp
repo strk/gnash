@@ -1,6 +1,6 @@
 // GnashImageJpeg.cpp:  Jpeg reader, for Gnash.
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -517,7 +517,6 @@ public:
 		if (dest->m_out_stream.write(dest->m_buffer, IO_BUF_SIZE) != IO_BUF_SIZE)
 		{
 			// Error.
-			// @@ bah, exceptions suck.  TODO consider alternatives.
 			log_error(_("jpeg::rw_dest_IOChannel couldn't write data."));
 			return false;
 		}

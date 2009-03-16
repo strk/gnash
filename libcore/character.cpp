@@ -554,7 +554,7 @@ character::xmouse_get(const fn_call& fn)
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	// Local coord of mouse IN PIXELS.
-	int x, y, buttons;
+	boost::int32_t x, y, buttons;
 	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();
@@ -570,7 +570,7 @@ character::ymouse_get(const fn_call& fn)
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	// Local coord of mouse IN PIXELS.
-	int x, y, buttons;
+	boost::int32_t x, y, buttons;
 	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();

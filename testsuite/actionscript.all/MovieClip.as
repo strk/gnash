@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -111,19 +111,19 @@ check(!MovieClip.prototype.hasOwnProperty("_yscale"));
 endOfTest = function() 
 {
 #if OUTPUT_VERSION <= 5
-	check_totals(327); // SWF5
+	check_totals(334); // SWF5
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(884); // SWF6
+	check_totals(891); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(901); // SWF7
+	check_totals(908); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(993); // SWF8+
+	check_totals(1000); // SWF8+
 #endif
 
 	play();
@@ -2303,5 +2303,31 @@ check_equals(_root._highquality, 1);
 //_root.loadVariables(MEDIA(vars.txt), "GET");
 
 // Can't rely on this to call onData!
+
+//------------------------------------------
+// Check MovieClip methods on other objects.
+//------------------------------------------
+
+o = {};
+
+// getSWFVersion()
+
+check_equals(_root.getSWFVersion(), OUTPUT_VERSION);
+o.getSWFVersion = MovieClip.prototype.getSWFVersion;
+xcheck_equals(o.getSWFVersion(), -1);
+createTextField("t1", 3, 0, 100, 100, 100);
+#if OUTPUT_VERSION > 5
+check_equals(_level0.t1.getSWFVersion(), undefined);
+#else
+xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
+#endif
+xcheck_equals(_level0.t1.toString(), "[object Object]");
+_level0.t1.getSWFVersion = MovieClip.prototype.getSWFVersion;
+xcheck_equals(_level0.t1.getSWFVersion(), OUTPUT_VERSION);
+
+o.meth = MovieClip.prototype.meth;
+check_equals(o.meth("post"), 2);
+check_equals(o.meth(), 0);
+
 
 //endOfTest();

@@ -37,6 +37,11 @@ gboolean	swfdec_gst_decoder_init		(SwfdecGstDecoder *	dec,
 						 GstCaps *		srccaps,
 						 GstCaps *		sinkcaps,
 						 ...) G_GNUC_NULL_TERMINATED;
+
+gboolean	swfdec_gst_colorspace_init	(SwfdecGstDecoder *	dec,
+						 GstCaps *		srccaps,
+						 GstCaps *		sinkcaps);
+						 
 void		swfdec_gst_decoder_push_eos	(SwfdecGstDecoder *	dec);
 GstBuffer *	swfdec_gst_decoder_pull		(SwfdecGstDecoder *	dec);
 gboolean	swfdec_gst_decoder_push		(SwfdecGstDecoder *	dec,
@@ -54,6 +59,7 @@ GstElementFactory *
 GstPad *	swfdec_gst_connect_srcpad (GstElement *element, GstCaps *caps);
 
 GstPad *	swfdec_gst_connect_sinkpad (GstElement *element, GstCaps *caps);
+GstPad *    swfdec_gst_connect_sinkpad_by_pad (GstPad *srcpad, GstCaps *caps);
 
 G_END_DECLS
 #endif

@@ -39,21 +39,10 @@ dnl AM_COMPILER_LIB
 
 dnl Build the cgibins server if specified.
 AC_DEFUN([CYGNAL_PATHS],
-[dnl
+[
 
-  AC_ARG_ENABLE(cgibins,
-    AC_HELP_STRING([--enable-cgibin], [Enable building of the CGIs for Cygnal]),
-  [case "${enableval}" in
-    yes) cgibin=yes ;;
-    no)  cgibin=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-cgibin option]) ;;
-  esac],cgibin=yes)
-  AM_CONDITIONAL(USE_CGI, test x$cgibin = xyes)
+AC_CHECK_HEADERS(poll.h epoll.h)
 
-  dnl For Asynchronous I/O
-  dnl AC_CHECK_HEADERS(aio.h poll.h)
-
-  dnl Look for the various ways of blocking while waiting for I/O
-  AC_CHECK_FUNCS(pselect poll ppoll epoll)
- 
+dnl Look for the various ways of blocking while waiting for I/O
+AC_CHECK_FUNCS(pselect ppoll)
 ])

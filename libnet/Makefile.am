@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ AM_LDFLAGS = \
 	../libamf/libgnashamf.la \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
-	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
+	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 
@@ -39,8 +39,6 @@ INCLUDES = \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/libcore \
         -DLOCALEDIR=\"$(localedir)\" \
-        $(LIBXML_CFLAGS) \
-	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(PTHREAD_CFLAGS)

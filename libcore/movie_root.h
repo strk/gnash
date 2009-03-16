@@ -221,17 +221,6 @@ public:
     ///   after loading into it.
     void dropLevel(int depth);
 
-    /// @@ should this delegate to _level0?  probably !
-    void set_member(const std::string& /*name*/, const as_value& /*val*/)
-    {
-    }
-
-    /// @@ should this delegate to _level0?  probably !
-    bool get_member(const std::string& /*name*/, as_value* /*val*/)
-    {
-        return false;
-    }
-
     /// Change display viewport coordinates
     //
     /// This currently also change the display scale
@@ -297,7 +286,8 @@ public:
     //
     /// Coordinates are in PIXELS, NOT TWIPS.
     ///
-    void get_mouse_state(int& x, int& y, int& buttons);
+    void get_mouse_state(boost::int32_t& x, boost::int32_t& y,
+            boost::int32_t& buttons);
 
     void get_drag_state(drag_state& st);
 
@@ -368,7 +358,11 @@ public:
  
     /// Main and only callback from hosting application.
     /// Expected to be called at 10ms resolution.
-    void advance();
+    //
+    /// @return true if the heart-beat resulted in actual
+    ///         SWF playhead advancement (frame advancement)
+    ///
+    bool advance();
 
     /// Entry point for movie advancement
     //
@@ -478,8 +472,8 @@ public:
 
     /// The possible values of Stage.displayState
     enum DisplayState {
-        normal,
-        fullScreen
+        DISPLAYSTATE_NORMAL,
+        DISPLAYSTATE_FULLSCREEN
     };
 
     /// The possibile values of Stage.scaleMode

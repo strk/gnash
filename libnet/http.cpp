@@ -1,6 +1,6 @@
 // http.cpp:  HyperText Transport Protocol handler for Cygnal, for Gnash.
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,10 +16,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-
-#ifdef HAVE_CONFIG_H
-#include "gnashconfig.h"
-#endif
 
 #include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -40,10 +36,10 @@
 #include <algorithm>
 #include "GnashSystemIOHeaders.h" // read()
 
+#include "http.h"
 #include "amf.h"
 #include "element.h"
 #include "cque.h"
-#include "http.h"
 #include "log.h"
 #include "network.h"
 #include "handler.h"

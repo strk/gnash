@@ -44,11 +44,15 @@
 
 // Forward declarations
 namespace gnash {
-  class MovieClip;
-  class movie_instance;
-  class ExecutableCode;
-  class action_buffer;
-  class movie_definition;
+    class MovieClip;
+    class movie_instance;
+    class ExecutableCode;
+    class action_buffer;
+    class movie_definition;
+    class StaticText;
+    namespace SWF {
+        class TextRecord;
+    }
 }
 
 namespace gnash {
@@ -408,7 +412,16 @@ public:
     void add_event_handler(const event_id& id, const action_buffer& code);
 
     /// Render this character
-    virtual void    display() {}
+    virtual void display() {}
+
+    /// Allow extraction of static text.
+    //
+    /// Default is a no-op, implemented only for DefineText though
+    /// DisplayObject.
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
+            size_t&) {
+        return 0;
+    }
 
     /// Returns local, untransformed height of this character in TWIPS
     //

@@ -55,7 +55,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I$(top_srcdir)/libcore	\
 	-I$(top_srcdir)/libcore/swf	\
 	$(PTHREAD_CFLAGS) \
-	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(GIF_CFLAGS) \
 	$(GLIB_CFLAGS) \
@@ -79,6 +78,7 @@ libgnashbase_la_LIBADD = \
 	$(OPENGL_LIBS) \
 	$(LIBINTL) \
 	$(LIBLTDL) \
+	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -174,6 +174,7 @@ noinst_HEADERS = \
 	getclocktime.hpp \
 	Point2d.h \
 	Range2d.h \
+	GnashAlgorithm.h \
 	snappingrange.h \
 	$(NULL)
 

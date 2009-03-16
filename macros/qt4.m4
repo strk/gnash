@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007, 2009 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -165,8 +165,8 @@ dnl   fi
       has_qt4="no"
     fi
 
-    AC_PATH_PROG(MOC4, moc-qt4, ,[${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])
-    AC_PATH_PROG(UIC4, uic-qt4, ,[${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])
+    AC_PATH_PROGS(MOC4, [moc-qt4 moc], ,[${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])
+    AC_PATH_PROGS(UIC4, [uic-qt4 uic], ,[${QTDIR}/bin /usr/lib/qt4/bin /usr/share/qt4/bin/ ${pathlist}])
 
 
     AC_SUBST([QT4_CFLAGS])
