@@ -113,7 +113,8 @@ NetStream_as::NetStream_as()
     _playHead(_playbackClock.get()), 
     _soundHandler(_vm.getRoot().runInfo().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
-    _audioStreamer(_soundHandler)
+    _audioStreamer(_soundHandler),
+    _statusCode(invalidStatus)
 {
 }
 
@@ -161,11 +162,14 @@ NetStream_as::processStatusNotifications()
 {
     // TODO: check for System.onStatus too ! use a private
     // getStatusHandler() method for this.
+    // Copy it to prevent threads changing it.
+    StatusCode code = invalidStatus;
 
- 
-    // Just send one status notification?
-    StatusCode code;
-    code = popNextPendingStatusNotification();
+    {
+        boost::mutex::scoped_lock lock(statusMutex);
+
+        std::swap(code, _statusCode);
+    }
 
     // Nothing to do if no more valid notifications.
     if (code == invalidStatus) return; 
@@ -181,7 +185,7 @@ NetStream_as::setStatus(StatusCode status)
 {
     // Get a lock to avoid messing with statuses while processing them
     boost::mutex::scoped_lock lock(statusMutex);
-    _statusQueue.push_back(status);
+    _statusCode = status;
 }
 
 void
@@ -283,29 +287,6 @@ NetStream_as::getStatusObject(StatusCode code)
     o->init_member("level", info.second, flags);
 
     return o;
-}
-
-NetStream_as::StatusCode
-NetStream_as::popNextPendingStatusNotification()
-{
-    // Get an exclusive lock on the queue
-    boost::mutex::scoped_lock lock(statusMutex);
-
-    // No queued statuses to notify ...
-    if ( _statusQueue.empty() ) return invalidStatus;
-
-    StatusCode nextCode = _statusQueue.front();
-    _statusQueue.pop_front();
-    return nextCode;
-}
-
-void
-NetStream_as::clearStatusQueue()
-{
-    // Get an exclusive lock on the queue
-    boost::mutex::scoped_lock lock(statusMutex);
-
-    _statusQueue.clear();
 }
 
 void

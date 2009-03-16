@@ -589,26 +589,8 @@ private:
     /// The buffered audio streamer
     BufferedAudioStreamer _audioStreamer;
 
-    /// Pop next queued status notification from the queue
-    //
-    /// Lock the statusMutex during operations
-    ///
-    /// @return The status code to notify, or invalidStatus when
-    ///     the queue is empty
-    ///
-    StatusCode popNextPendingStatusNotification();
-
-    /// Clear status notification queue
-    //
-    /// Lock the statusMutex during operations
-    ///
-    void clearStatusQueue();
-
-    // Queue of status notifications.
-    typedef std::deque<StatusCode> StatusQueue;
-
     /// List of status messages to be processed
-    StatusQueue _statusQueue;
+    StatusCode _statusCode;
 
     /// Mutex protecting _statusQueue
     boost::mutex statusMutex;
