@@ -81,9 +81,6 @@ What could and should be /optimized/
     results in many large-size buffer allocations during a second. Maybe this
     should be optimized.
     
-  - Converted fill styles (for AGG) are recreated for each sub-shape, even if
-    they never change for a shape. This should be changed.
-    
   - Matrix-transformed paths (generated before drawing a shape) should be cached
     and re-used to avoid recalculation of the same coordinates.
     
@@ -102,8 +99,8 @@ What could and should be /optimized/
   - there are also a few TODO comments in the code!
   
   
-AGG ressources
---------------
+AGG resources
+-------------
   http://www.antigrain.com/    
   http://haiku-os.org/node/86
 
