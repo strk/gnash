@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 #include "statistics.h"
 #include "diskstream.h"
 #include "getclocktime.hpp"
+#include "dsodefs.h"
 
 /// \namespace gnash
 ///	This is the main namespace for Gnash and it's libraries.
@@ -48,9 +49,9 @@ class Cache {
 public:
     Cache();
     ~Cache();
-    static Cache& getDefaultInstance();
+    DSOEXPORT static Cache& getDefaultInstance();
     
-    void addPath(const std::string &name, const std::string &fullpath);
+    void DSOEXPORT addPath(const std::string &name, const std::string &fullpath);
     std::string &findPath(const std::string &name);
     void removePath(const std::string &name);
     
@@ -59,7 +60,7 @@ public:
     void removeResponse(const std::string &name);
     
     void addFile(const std::string &name, boost::shared_ptr<DiskStream > &file);
-    boost::shared_ptr<DiskStream> findFile(const std::string &name);
+    boost::shared_ptr<DiskStream> DSOEXPORT findFile(const std::string &name);
     void removeFile(const std::string &name);
     
     ///  \brief Dump the internal data of this class in a human readable form.
@@ -69,7 +70,7 @@ public:
     void dump(std::ostream& os) const;    
 
 #ifdef USE_STATS_CACHE
-    std::string stats(bool xml) const;
+    std::string DSOEXPORT stats(bool xml) const;
 #endif
 private:
     /// \var Cache::_pathnames

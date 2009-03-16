@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 namespace gnash
 {
 
-class DSOEXPORT RTMPMsg
+class RTMPMsg
 {
 public:
     typedef enum {
@@ -118,12 +118,12 @@ public:
     ///		search for.
     ///
     /// @return A smart pointer to the Element for this property.
-    boost::shared_ptr<amf::Element> findProperty(const std::string &name);
+    DSOEXPORT boost::shared_ptr<amf::Element> findProperty(const std::string &name);
 
 //    void setHeaderData(RTMP::rtmp_head_t &qhead);
 			
 // Dump internal status to the terminal
-    void dump();
+    DSOEXPORT void dump();
     
   protected:
     rtmp_source_e	  _routing;

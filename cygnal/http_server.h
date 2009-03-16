@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "network.h"
 #include "buffer.h"
 #include "diskstream.h"
+#include "dsodefs.h"
 
 namespace cygnal
 {
@@ -101,7 +102,7 @@ private:
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    bool http_handler(gnash::Network::thread_params_t *args);
+    bool DSOEXPORT http_handler(gnash::Network::thread_params_t *args);
 }
 
 } // end of gnash namespace

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 //
 
 #ifndef __CQUE_H__
-#define __CQUE_H__ 1
+#define __CQUE_H__
 
 #include <boost/cstdint.hpp>
 #include <boost/thread/mutex.hpp>
@@ -53,7 +53,7 @@ public:
     // Pop the first date element off the que
     boost::shared_ptr<amf::Buffer> DSOEXPORT pop();
     // Peek at the first date element witjhout removing it from the que
-    boost::shared_ptr<amf::Buffer> peek();
+    boost::shared_ptr<amf::Buffer> DSOEXPORT peek();
     // Get the number of elements in the que
     size_t DSOEXPORT size();
     // Wait for a condition variable to trigger

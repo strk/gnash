@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include <vector>
 #include <iostream> // for output operator
 
+#include "dsodefs.h"
 #include "rc.h"
 
 /// \namespace cygnal
@@ -39,11 +40,11 @@ namespace cygnal {
 ///	This class handles reading values from the Cygnal
 ///	configuration file, .cygnalrc, and into a form we can use in
 ///	Cygnal.
-class DSOEXPORT CRcInitFile : public gnash::RcInitFile
+class CRcInitFile : public gnash::RcInitFile
 {
 public:
     /// \brief Return the default instance of RC file,
-    static CRcInitFile& getDefaultInstance();
+    DSOEXPORT static CRcInitFile& getDefaultInstance();
     
     /// \brief Load all the configuration files.
     ///		This includes parsing the default .gnashrc file for
@@ -95,10 +96,10 @@ public:
 
     /// \brief Dump the internal data of this class in a human readable form.
     /// @remarks This should only be used for debugging purposes.
-    void dump() const { dump(std::cerr); }
+    DSOEXPORT void dump() const { dump(std::cerr); }
     
     /// \overload dump(std::ostream& os) const
-    void dump(std::ostream& os) const;
+    DSOEXPORT void dump(std::ostream& os) const;
     
   private:
     /// Construct only by getDefaultInstance()

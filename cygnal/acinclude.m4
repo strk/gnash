@@ -1,5 +1,5 @@
 dnl  
-dnl  Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+dnl  Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -38,22 +38,22 @@ dnl AC_PROG_INSTALL
 dnl AM_COMPILER_LIB
 
 dnl Build the cgibins server if specified.
-AC_ARG_ENABLE(cgibins,
-  AC_HELP_STRING([--enable-cgibin], [Enable building of the CGIs for Cygnal]),
-[case "${enableval}" in
-  yes) cgibin=yes ;;
-  no)  cgibin=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-cgibin option]) ;;
-esac],cgibin=yes)
-AM_CONDITIONAL(USE_CGI, test x$cgibin = xyes)
-
 AC_DEFUN([CYGNAL_PATHS],
-[
+[dnl
 
-dnl For Asynchronous I/O
-dnl AC_CHECK_HEADERS(aio.h poll.h)
+  AC_ARG_ENABLE(cgibins,
+    AC_HELP_STRING([--enable-cgibin], [Enable building of the CGIs for Cygnal]),
+  [case "${enableval}" in
+    yes) cgibin=yes ;;
+    no)  cgibin=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-cgibin option]) ;;
+  esac],cgibin=yes)
+  AM_CONDITIONAL(USE_CGI, test x$cgibin = xyes)
 
-dnl Look for the various ways of blocking while waiting for I/O
-AC_CHECK_FUNCS(pselect poll ppoll epoll)
+  dnl For Asynchronous I/O
+  dnl AC_CHECK_HEADERS(aio.h poll.h)
+
+  dnl Look for the various ways of blocking while waiting for I/O
+  AC_CHECK_FUNCS(pselect poll ppoll epoll)
  
 ])

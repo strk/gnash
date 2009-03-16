@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifndef _RTMP_CLIENT_H_
-#define _RTMP_CLIENT_H_ 1
+#define _RTMP_CLIENT_H_
 
 #include <boost/cstdint.hpp>
 #include <boost/shared_ptr.hpp>
@@ -30,11 +30,12 @@
 #include "handler.h"
 #include "network.h"
 #include "buffer.h"
+#include "dsodefs.h"
 
 namespace gnash
 {
 
-class DSOEXPORT RTMPClient : public RTMP
+class RTMPClient : public RTMP
 {
 public:
     RTMPClient();

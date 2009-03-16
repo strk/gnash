@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006, 2007, 2008 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ namespace cygnal {
 /// \class cygnal::ThreadCounter of threads currently
 ///     active. This is primarily so the counter can be wrapped with a
 ///     mutex to be thread safe, as threads delete themseleves.
-class DSOEXPORT ThreadCounter
+class ThreadCounter
 {
   public:
     ThreadCounter() : _tids(0) {};
