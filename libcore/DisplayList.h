@@ -73,29 +73,6 @@ public:
     /// Output operator
 	friend std::ostream& operator<< (std::ostream&, const DisplayList&);
 
-	void testInvariant() const
-	{
-#if GNASH_PARANOIA_LEVEL > 1
-#ifndef NDEBUG
-		DisplayList sorted = *this;
-
-        // check no duplicated depths above non-removed zone.
-		std::set<int> depths;
-		for (const_iterator it = beginNonRemoved(_charsByDepth),
-                itEnd = _charsByDepth.end(); it != itEnd; ++it) {
-
-			boost::intrusive_ptr<character> ch = *it;
-			int depth = ch->get_depth();
-			if (!depths.insert(depth).second) {
-				log_debug("Depth %d is duplicated in DisplayList %p",
-                        depth, (const void*)this);
-                std::abort();
-			}
-		}
-		assert(isSorted()); // check we didn't screw up ordering
-#endif
-#endif // GNASH_PARANOIA_LEVEL > 1
-	}
 
 	/// \brief
 	/// Place a new character at the specified depth,
@@ -345,6 +322,32 @@ public:
 	bool operator!=(const DisplayList& other) const {
         return _charsByDepth != other._charsByDepth;
     }
+	
+#if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
+    DisplayList::const_iterator nonRemoved() const;
+
+    void testInvariant() const
+	{
+		DisplayList sorted = *this;
+
+        // check no duplicated depths above non-removed zone.
+		std::set<int> depths;
+		for (const_iterator it = nonRemoved(),
+                itEnd = _charsByDepth.end(); it != itEnd; ++it) {
+
+			boost::intrusive_ptr<character> ch = *it;
+			int depth = ch->get_depth();
+			if (!depths.insert(depth).second) {
+				log_debug("Depth %d is duplicated in DisplayList %p",
+                        depth, (const void*)this);
+                std::abort();
+			}
+		}
+		assert(isSorted()); // check we didn't screw up ordering
+	}
+#else
+    void testInvariant() const {}
+#endif 
 
 private:
 
