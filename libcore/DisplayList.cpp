@@ -72,6 +72,13 @@ private:
     int _depth;
 };
 
+struct DepthGreaterThan
+{
+    bool operator()(const DisplayItem& a, const DisplayItem& b) {
+        return a->get_depth() > b->get_depth();
+    }
+};
+
 struct DepthLessThan
 {
     bool operator()(const DisplayItem& a, const DisplayItem& b) {
@@ -995,9 +1002,17 @@ DisplayList::isSorted() const
 {
     if (_charsByDepth.empty()) return true;
     return std::adjacent_find(_charsByDepth.begin(), _charsByDepth.end(),
-            DepthLessThan()) == _charsByDepth.end();
+            DepthGreaterThan()) == _charsByDepth.end();
 }
 
+
+#if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
+DisplayList::const_iterator
+DisplayList::nonRemoved() const
+{
+    return beginNonRemoved(_charsByDepth);
+}
+#endif
 
 namespace {
 
