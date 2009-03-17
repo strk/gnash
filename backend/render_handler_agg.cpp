@@ -1306,7 +1306,25 @@ public:
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && _quality >= QUALITY_HIGH);
+
+            smooth &&
+            // TODO:
+            //
+            // Non-HARD bitmap fills are smoothed or
+            // not depending on _quality and SWF version:
+            // - For SWF8 and up (where _HARD versions are available)
+            //   they are smoothed starting at quality MEDIUM.
+            // - For previous SWF versions they are only smoothed
+            //   with quality BEST
+            //
+            // NOTE: the SWF version to take into account here is
+            //       the one of the file containing the definition
+            //       of the fills, not the top-level file loaded.
+            //
+            // It needs to be checked behaviour for bitmap
+            // fills produced with ActionScript
+            //
+            _quality >= QUALITY_HIGH);
           break;
         } 
 
