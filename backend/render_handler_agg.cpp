@@ -239,14 +239,14 @@ public:
     void operator()(const edge& edge)
     {
         if (edge.is_straight()) {
-            _path.line_to(TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
-                          TWIPS_TO_PIXELS(edge.ap.y) + _shift);
+            _path.line_to(twipsToPixels(edge.ap.x) + _shift, 
+                          twipsToPixels(edge.ap.y) + _shift);
         }
         else {
-            _path.curve3(TWIPS_TO_PIXELS(edge.cp.x) + _shift, 
-                     TWIPS_TO_PIXELS(edge.cp.y) + _shift,
-                     TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
-                     TWIPS_TO_PIXELS(edge.ap.y) + _shift);             
+            _path.curve3(twipsToPixels(edge.cp.x) + _shift, 
+                     twipsToPixels(edge.cp.y) + _shift,
+                     twipsToPixels(edge.ap.x) + _shift, 
+                     twipsToPixels(edge.ap.y) + _shift);             
         }
     }
 
@@ -272,8 +272,8 @@ public:
     {
         agg::path_storage& p = *_it;
 
-        p.move_to(TWIPS_TO_PIXELS(in.ap.x) + _shift, 
-                  TWIPS_TO_PIXELS(in.ap.y) + _shift);
+        p.move_to(twipsToPixels(in.ap.x) + _shift, 
+                  twipsToPixels(in.ap.y) + _shift);
 
         std::for_each(in.m_edges.begin(), in.m_edges.end(),
                 EdgeToPath(p, _shift));
@@ -1127,8 +1127,8 @@ public:
           hairline = true;
       }
       
-      float prev_ax = TWIPS_TO_PIXELS(this_path.ap.x);
-      float prev_ay = TWIPS_TO_PIXELS(this_path.ap.y);  
+      float prev_ax = twipsToPixels(this_path.ap.x);
+      float prev_ay = twipsToPixels(this_path.ap.y);  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
@@ -1142,8 +1142,8 @@ public:
         
         const edge& this_edge = this_path.m_edges[eno];
         
-        float this_ax = TWIPS_TO_PIXELS(this_edge.ap.x);  
-        float this_ay = TWIPS_TO_PIXELS(this_edge.ap.y);  
+        float this_ax = twipsToPixels(this_edge.ap.x);  
+        float this_ay = twipsToPixels(this_edge.ap.y);  
         
         if (hinting || this_edge.is_straight()) {
         
@@ -1213,8 +1213,8 @@ public:
         
           // never align curves!
           new_path.curve3(
-            TWIPS_TO_PIXELS(this_edge.cp.x) + subpixel_offset, 
-            TWIPS_TO_PIXELS(this_edge.cp.y) + subpixel_offset,
+            twipsToPixels(this_edge.cp.x) + subpixel_offset, 
+            twipsToPixels(this_edge.cp.y) + subpixel_offset,
             this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
             
@@ -1548,8 +1548,8 @@ public:
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(TWIPS_TO_PIXELS(this_path.ap.x), 
-                   TWIPS_TO_PIXELS(this_path.ap.y));
+      path.move_to(twipsToPixels(this_path.ap.x), 
+                   twipsToPixels(this_path.ap.y));
     
       // Add all edges to the path.
       std::for_each(this_path.m_edges.begin(), this_path.m_edges.end(),
@@ -1671,7 +1671,7 @@ public:
         if (!thickness) stroke.width(1); // hairline
         else if ( (!lstyle.scaleThicknessVertically()) && (!lstyle.scaleThicknessHorizontally()) )
         {
-          stroke.width(TWIPS_TO_PIXELS(thickness));
+          stroke.width(twipsToPixels(thickness));
         }
         else
         {

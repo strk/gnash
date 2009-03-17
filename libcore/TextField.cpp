@@ -602,7 +602,7 @@ TextField::set_member(string_table::key name,
     {
         SWFMatrix m = getMatrix();
         double x = infinite_to_zero( val.to_number() );
-        m.tx = PIXELS_TO_TWIPS(x);    
+        m.tx = pixelsToTwips(x);    
         setMatrix(m); // no need to update caches when only changing translation
 
         // m_accept_anim_moves = false;
@@ -612,7 +612,7 @@ TextField::set_member(string_table::key name,
     {
         SWFMatrix m = getMatrix();
         double y = infinite_to_zero( val.to_number() );
-        m.ty = PIXELS_TO_TWIPS(y);
+        m.ty = pixelsToTwips(y);
         setMatrix(m); // no need to update caches when only changing translation
 
         // m_accept_anim_moves = false; 
@@ -640,7 +640,7 @@ TextField::set_member(string_table::key name,
             nw = -nw;
         }
 
-        if ( _bounds.width() == PIXELS_TO_TWIPS(nw) )
+        if ( _bounds.width() == pixelsToTwips(nw) )
         {
 #ifdef GNASH_DEBUG_TEXTFIELDS
             log_debug("TextField width already == %g, nothing to do to "
@@ -667,11 +667,11 @@ TextField::set_member(string_table::key name,
         boost::int32_t xmin = _bounds.get_x_min();
         boost::int32_t ymin = _bounds.get_y_min();
         boost::int32_t ymax = _bounds.get_y_max();
-        boost::int32_t xmax = xmin + PIXELS_TO_TWIPS(nw);
+        boost::int32_t xmax = xmin + pixelsToTwips(nw);
 
         assert(xmin <= xmax);
         _bounds.set_to_rect(xmin, ymin, xmax, ymax);
-        assert( _bounds.width() == PIXELS_TO_TWIPS(nw) );
+        assert( _bounds.width() == pixelsToTwips(nw) );
 
         // previously truncated text might get visible now
         // TODO: if nested masks were implemented we would 
@@ -702,7 +702,7 @@ TextField::set_member(string_table::key name,
             nh = -nh;
         }
 
-        if ( _bounds.height() == PIXELS_TO_TWIPS(nh) )
+        if ( _bounds.height() == pixelsToTwips(nh) )
         {
 #ifdef GNASH_DEBUG_TEXTFIELDS
             log_debug("TextField height already == %g, nothing to do to "
@@ -725,9 +725,9 @@ TextField::set_member(string_table::key name,
         boost::int32_t xmin = _bounds.get_x_min();
         boost::int32_t xmax = _bounds.get_x_max();
         boost::int32_t ymin = _bounds.get_y_min();
-        _bounds.set_to_rect(xmin, ymin, xmax, ymin + PIXELS_TO_TWIPS(nh) );
+        _bounds.set_to_rect(xmin, ymin, xmax, ymin + pixelsToTwips(nh) );
 
-        assert(_bounds.height() == PIXELS_TO_TWIPS(nh));
+        assert(_bounds.height() == pixelsToTwips(nh));
 
         // previously truncated text might get visible now
         // TODO: if nested masks were implemented we would 
@@ -785,18 +785,18 @@ TextField::get_member(string_table::key name, as_value* val,
     case NSV::PROP_uX:
     {
         SWFMatrix    m = getMatrix();    
-        val->set_double(TWIPS_TO_PIXELS(m.tx));
+        val->set_double(twipsToPixels(m.tx));
         return true;
     }
     case NSV::PROP_uY:
     {
         SWFMatrix    m = getMatrix();    
-        val->set_double(TWIPS_TO_PIXELS(m.ty));
+        val->set_double(twipsToPixels(m.ty));
         return true;
     }
     case NSV::PROP_uWIDTH:
     {
-        val->set_double(TWIPS_TO_PIXELS(get_width()));
+        val->set_double(twipsToPixels(get_width()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
         log_debug("Got TextField width == %s", *val);
 #endif // GNASH_DEBUG_TEXTFIELDS
@@ -804,7 +804,7 @@ TextField::get_member(string_table::key name, as_value* val,
     }
     case NSV::PROP_uHEIGHT:
     {
-        val->set_double(TWIPS_TO_PIXELS(get_height()));
+        val->set_double(twipsToPixels(get_height()));
 #ifdef GNASH_DEBUG_TEXTFIELDS
         log_debug("Got TextField height == %s", *val);
 #endif // GNASH_DEBUG_TEXTFIELDS
@@ -2189,7 +2189,7 @@ textfield_textHeight(const fn_call& fn)
         // bounding box.)
         //
         // In local coords.  Verified against Macromedia Flash.
-        return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().height()));
+        return as_value(twipsToPixels(ptr->getTextBoundingBox().height()));
 
     }
     else // setter
@@ -2215,7 +2215,7 @@ textfield_textWidth(const fn_call& fn)
         // bounding box.)
         //
         // In local coords.  Verified against Macromedia Flash.
-        return as_value(TWIPS_TO_PIXELS(ptr->getTextBoundingBox().width()));
+        return as_value(twipsToPixels(ptr->getTextBoundingBox().width()));
 
     }
     else // setter

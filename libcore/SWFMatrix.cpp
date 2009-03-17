@@ -377,14 +377,14 @@ std::ostream& operator<< (std::ostream& o, const SWFMatrix& m)
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.shy/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << TWIPS_TO_PIXELS(m.tx) << " |" 
+      << twipsToPixels(m.tx) << " |" 
       << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.shx/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.sy / 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << TWIPS_TO_PIXELS(m.ty) << " |";
+      << twipsToPixels(m.ty) << " |";
       
       return o;
 }

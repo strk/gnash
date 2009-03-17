@@ -195,12 +195,12 @@ public:
 
 	float get_width_pixels() const
 	{
-		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.width()));
+		return std::ceil(twipsToPixels(m_frame_size.width()));
 	}
 
 	float	get_height_pixels() const
 	{
-		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.height()));
+		return std::ceil(twipsToPixels(m_frame_size.height()));
 	}
 
 	virtual int	get_version() const { return m_version; }

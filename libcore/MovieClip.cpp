@@ -776,7 +776,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
     // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
     
     // Set textfield bounds
-    rect bounds(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height));
+    rect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
 
     // Create an instance
     boost::intrusive_ptr<character> txt_char = new TextField(this, bounds);
@@ -787,7 +787,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
 
     // Set _x and _y
     SWFMatrix txt_matrix;
-    txt_matrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    txt_matrix.set_translation(pixelsToTwips(x), pixelsToTwips(y));
     txt_char->setMatrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
 
     // Here we add the character to the displayList.    
@@ -3821,16 +3821,16 @@ movieclip_hitTest(const fn_call& fn)
 
         case 2: // x, y
         {
-            boost::int32_t x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-            boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+            boost::int32_t x = pixelsToTwips(fn.arg(0).to_number());
+            boost::int32_t y = pixelsToTwips(fn.arg(1).to_number());
 
             return movieclip->pointInBounds(x, y);
         }
 
         case 3: // x, y, shapeFlag
         {
-             boost::int32_t x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-             boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+             boost::int32_t x = pixelsToTwips(fn.arg(0).to_number());
+             boost::int32_t y = pixelsToTwips(fn.arg(1).to_number());
              bool shapeFlag = fn.arg(2).to_bool();
 
              if ( ! shapeFlag ) return movieclip->pointInBounds(x, y);
@@ -4107,10 +4107,10 @@ movieclip_getBounds(const fn_call& fn)
     if ( !bounds.is_null() )
     {
         // Round to the twip
-        xMin = TWIPS_TO_PIXELS(bounds.get_x_min());
-        yMin = TWIPS_TO_PIXELS(bounds.get_y_min());
-        xMax = TWIPS_TO_PIXELS(bounds.get_x_max());
-        yMax = TWIPS_TO_PIXELS(bounds.get_y_max());
+        xMin = twipsToPixels(bounds.get_x_min());
+        yMin = twipsToPixels(bounds.get_y_min());
+        xMax = twipsToPixels(bounds.get_x_max());
+        yMax = twipsToPixels(bounds.get_y_max());
     }
 
     boost::intrusive_ptr<as_object> bounds_obj(new as_object());
@@ -4162,7 +4162,7 @@ movieclip_globalToLocal(const fn_call& fn)
         );
         return ret;
     }
-    x = PIXELS_TO_TWIPS(tmp.to_number());
+    x = pixelsToTwips(tmp.to_number());
 
     if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
     {
@@ -4173,14 +4173,14 @@ movieclip_globalToLocal(const fn_call& fn)
         );
         return ret;
     }
-    y = PIXELS_TO_TWIPS(tmp.to_number());
+    y = pixelsToTwips(tmp.to_number());
 
     point    pt(x, y);
     SWFMatrix world_mat = movieclip->getWorldMatrix();
     world_mat.invert().transform(pt);
 
-    obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
-    obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(pt.y));
+    obj->set_member(NSV::PROP_X, twipsToPixels(pt.x));
+    obj->set_member(NSV::PROP_Y, twipsToPixels(pt.y));
 
     return ret;
 }
@@ -4225,7 +4225,7 @@ movieclip_localToGlobal(const fn_call& fn)
         );
         return ret;
     }
-    x = PIXELS_TO_TWIPS(tmp.to_number());
+    x = pixelsToTwips(tmp.to_number());
 
     if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
     {
@@ -4236,14 +4236,14 @@ movieclip_localToGlobal(const fn_call& fn)
         );
         return ret;
     }
-    y = PIXELS_TO_TWIPS(tmp.to_number());
+    y = pixelsToTwips(tmp.to_number());
 
     point    pt(x, y);
     SWFMatrix world_mat = movieclip->getWorldMatrix();
     world_mat.transform(pt);
 
-    obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
-    obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(pt.y));
+    obj->set_member(NSV::PROP_X, twipsToPixels(pt.x));
+    obj->set_member(NSV::PROP_Y, twipsToPixels(pt.y));
     return ret;
 
 }
@@ -4366,7 +4366,7 @@ movieclip_lineTo(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
     log_debug("%s.lineTo(%g,%g);", movieclip->getTarget(), x, y);
 #endif
-    movieclip->lineTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    movieclip->lineTo(pixelsToTwips(x), pixelsToTwips(y));
     return as_value();
 }
 
@@ -4421,7 +4421,7 @@ movieclip_moveTo(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
     log_debug(_("%s.moveTo(%g,%g);"), movieclip->getTarget(), x, y);
 #endif
-    movieclip->moveTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    movieclip->moveTo(pixelsToTwips(x), pixelsToTwips(y));
     return as_value();
 }
 
@@ -4563,7 +4563,7 @@ movieclip_lineStyle(const fn_call& fn)
             b = boost::uint8_t((rgbval & 0x0000FF) );
         }
         case 1:
-            thickness = boost::uint16_t(PIXELS_TO_TWIPS(clamp<float>(
+            thickness = boost::uint16_t(pixelsToTwips(clamp<float>(
                             fn.arg(0).to_number(), 0, 255)));
             break;
     }
@@ -4656,8 +4656,8 @@ movieclip_curveTo(const fn_call& fn)
     log_debug(_("%s.curveTo(%g,%g,%g,%g);"), movieclip->getTarget(),
             cx, cy, ax, ay);
 #endif
-    movieclip->curveTo(PIXELS_TO_TWIPS(cx), PIXELS_TO_TWIPS(cy),
-            PIXELS_TO_TWIPS(ax), PIXELS_TO_TWIPS(ay));
+    movieclip->curveTo(pixelsToTwips(cx), pixelsToTwips(cy),
+            pixelsToTwips(ax), pixelsToTwips(ay));
 
     return as_value();
 }
@@ -4816,13 +4816,13 @@ movieclip_beginGradientFill(const fn_call& fn)
     if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
     {
         
-        boost::int32_t valX = PIXELS_TO_TWIPS(
+        boost::int32_t valX = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_X).to_number()); 
-        boost::int32_t valY = PIXELS_TO_TWIPS(
+        boost::int32_t valY = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_Y).to_number()); 
-        boost::int32_t valW = PIXELS_TO_TWIPS(
+        boost::int32_t valW = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_W).to_number()); 
-        boost::int32_t valH = PIXELS_TO_TWIPS(
+        boost::int32_t valH = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_H).to_number()); 
         float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
 
@@ -4861,9 +4861,9 @@ movieclip_beginGradientFill(const fn_call& fn)
         float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
         float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
         float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
-        boost::int32_t valG = PIXELS_TO_TWIPS(
+        boost::int32_t valG = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_G).to_number()); // x0
-        boost::int32_t valH = PIXELS_TO_TWIPS(
+        boost::int32_t valH = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
         input_matrix.sx    = valA * 65536; // sx
@@ -5045,8 +5045,8 @@ movieclip_startDrag(const fn_call& fn)
                 }
             );
 
-            rect bounds(PIXELS_TO_TWIPS(x0), PIXELS_TO_TWIPS(y0),
-                    PIXELS_TO_TWIPS(x1), PIXELS_TO_TWIPS(y1));
+            rect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
+                    pixelsToTwips(x1), pixelsToTwips(y1));
             st.setBounds(bounds);
         }
     }

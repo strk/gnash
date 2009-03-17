@@ -288,8 +288,8 @@ Transform_matrix_getset(const fn_call& fn)
         args->push_back(m.shx / factor);
         args->push_back(m.shy / factor);
         args->push_back(m.sy / factor);
-        args->push_back(TWIPS_TO_PIXELS(m.tx));
-        args->push_back(TWIPS_TO_PIXELS(m.ty));                                
+        args->push_back(twipsToPixels(m.tx));
+        args->push_back(twipsToPixels(m.ty));                                
 
         boost::intrusive_ptr<as_object> matrixObj =
             matrixCtor->constructInstance(fn.env(), args);
@@ -337,8 +337,8 @@ Transform_matrix_getset(const fn_call& fn)
     m.shx = b.to_number() * factor;
     m.shy = c.to_number() * factor;
     m.sy = d.to_number() * factor;
-    m.set_x_translation(PIXELS_TO_TWIPS(tx.to_number()));
-    m.set_y_translation(PIXELS_TO_TWIPS(ty.to_number()));
+    m.set_x_translation(pixelsToTwips(tx.to_number()));
+    m.set_y_translation(pixelsToTwips(ty.to_number()));
 
     ptr->setMatrix(m);
 

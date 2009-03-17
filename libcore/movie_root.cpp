@@ -850,8 +850,8 @@ movie_root::fire_mouse_event()
 
 	assert(testInvariant());
 
-    boost::int32_t x = PIXELS_TO_TWIPS(m_mouse_x);
-    boost::int32_t y = PIXELS_TO_TWIPS(m_mouse_y);
+    boost::int32_t x = pixelsToTwips(m_mouse_x);
+    boost::int32_t y = pixelsToTwips(m_mouse_y);
 
     // Generate a mouse event
     m_mouse_button_state.topmostEntity = getTopmostMouseEntity(x, y);
@@ -940,7 +940,7 @@ movie_root::set_drag_state(const drag_state& st)
 		// Get current mouse coordinates
 		boost::int32_t x, y, buttons;
 		get_mouse_state(x, y, buttons);
-		point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+		point world_mouse(pixelsToTwips(x), pixelsToTwips(y));
 
 		boost::int32_t xoffset = world_mouse.x - world_origin.x;
 		boost::int32_t yoffset = world_mouse.y - world_origin.y;
@@ -966,7 +966,7 @@ movie_root::doMouseDrag()
 	boost::int32_t x, y, buttons;
 	get_mouse_state(x, y, buttons);
 
-	point world_mouse(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	point world_mouse(pixelsToTwips(x), pixelsToTwips(y));
 
 	SWFMatrix	parent_world_mat;
 	character* parent = dragChar->get_parent();
@@ -1400,8 +1400,8 @@ movie_root::getDraggingCharacter() const
 const character*
 movie_root::getEntityUnderPointer() const
 {
-	boost::int32_t x = PIXELS_TO_TWIPS(m_mouse_x);
-	boost::int32_t y = PIXELS_TO_TWIPS(m_mouse_y);
+	boost::int32_t x = pixelsToTwips(m_mouse_x);
+	boost::int32_t y = pixelsToTwips(m_mouse_y);
     const character* dropChar = findDropTarget(x, y, getDraggingCharacter()); 
 	return dropChar;
 }

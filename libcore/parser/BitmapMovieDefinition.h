@@ -73,11 +73,11 @@ public:
 	}
 
 	virtual float get_width_pixels() const {
-		return std::ceil(TWIPS_TO_PIXELS(_framesize.width()));
+		return std::ceil(twipsToPixels(_framesize.width()));
 	}
 
 	virtual float get_height_pixels() const {
-		return std::ceil(TWIPS_TO_PIXELS(_framesize.height()));
+		return std::ceil(twipsToPixels(_framesize.height()));
 	}
 
 	virtual size_t	get_frame_count() const {
