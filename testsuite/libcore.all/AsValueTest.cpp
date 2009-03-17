@@ -46,6 +46,7 @@
 #include "network.h"
 #include "amf.h"
 #include "element.h"
+#include "GnashNumeric.h"
 
 using namespace amf;
 using namespace gnash;
@@ -335,7 +336,7 @@ test_isnan()
         } else {
             runtest.fail("isNaN(9999999)");
         }
-	if(utility::isFinite(num)) {
+	if(isFinite(num)) {
             runtest.pass("isFinite(9999999)");
         } else {
             runtest.fail("isFinite(9999999)");
@@ -348,7 +349,7 @@ test_isnan()
         } else {
             runtest.fail("isNaN(quiet_NaN)");
         }
-	if(!utility::isFinite(num)) {
+	if(!isFinite(num)) {
             runtest.pass("isFinite(quiet_NaN)");
         } else {
             runtest.fail("isFinite(quiet_NaN)");
@@ -361,7 +362,7 @@ test_isnan()
         } else {
             runtest.fail("isNaN(infinity)");
         }
-	if(!utility::isFinite(num)) {
+	if(!isFinite(num)) {
             runtest.pass("isFinite(infinity)");
         } else {
             runtest.fail("isFinite(infinity)");
@@ -374,7 +375,7 @@ test_isnan()
         } else {
             runtest.fail("isNaN(1.0/0.0)");
         }
-	if(!utility::isFinite(num)) {
+	if(!isFinite(num)) {
             runtest.pass("isFinite(1.0/0.0)");
         } else {
             runtest.fail("isFinite(1.0/0.0)");
@@ -389,7 +390,7 @@ test_isnan()
         } else {
             runtest.fail("isNaN(int)");
         }
-	if(utility::isFinite(num)) {
+	if(isFinite(num)) {
             runtest.pass("isFinite(int)");
         } else {
             runtest.fail("isFinite(int)");
