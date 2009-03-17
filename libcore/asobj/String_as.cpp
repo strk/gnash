@@ -34,6 +34,7 @@
 #include "namedStrings.h"
 #include "utf8.h"
 #include "String_as.h"
+#include "GnashNumeric.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 #include <algorithm>
@@ -393,7 +394,7 @@ string_split(const fn_call& fn)
                 // Return empty array.
                 return as_value(array.get());
             }
-            max = utility::clamp<size_t>(limit, 0, max);
+            max = clamp<size_t>(limit, 0, max);
         }
 
         if (delimiterSize > 1 || fn.arg(0).is_undefined() || wstr.empty())
@@ -425,7 +426,7 @@ string_split(const fn_call& fn)
 	            // Return empty array if 
 	            return as_value(array.get());
 	        }
-            max = utility::clamp<size_t>(limit, 0, max);
+            max = clamp<size_t>(limit, 0, max);
         }
 
         // If the delimiter is empty, put each character in an
@@ -945,7 +946,7 @@ validIndex(const std::wstring& subject, int index)
         index = subject.size() + index;
     }
 
-    index = utility::clamp<int>(index, 0, subject.size());
+    index = clamp<int>(index, 0, subject.size());
 
     return index;
 }

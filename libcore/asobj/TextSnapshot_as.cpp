@@ -35,6 +35,7 @@
 #include "swf/TextRecord.h"
 #include "Array_as.h"
 #include "RGBA.h"
+#include "GnashNumeric.h"
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>

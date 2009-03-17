@@ -119,14 +119,13 @@ AGG ressources
 #include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
-#include "utility.h"
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h" 
 #include "Range2d.h"
-
 #include "shape_character_def.h" 
 #include "DisplayObject.h"
+#include "GnashNumeric.h"
 
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>

@@ -28,11 +28,12 @@
 #include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
-#include "GnashException.h" // for shared ActionScript getter-setters (ensure_character)
+#include "GnashException.h" 
 #include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 #include "gnash.h" // Quality
+#include "GnashNumeric.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -394,7 +395,7 @@ character::x_getset(const fn_call& fn)
 
 		SWFMatrix m = ptr->getMatrix();
         // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
-		m.set_x_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newx)));
+		m.set_x_translation(PIXELS_TO_TWIPS(infinite_to_zero(newx)));
 		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -446,7 +447,7 @@ character::y_getset(const fn_call& fn)
 		SWFMatrix m = ptr->getMatrix();
         // NOTE: infinite_to_zero is wrong here, 
         // see actionscript.all/setProperty.as
-		m.set_y_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newy)));
+		m.set_y_translation(PIXELS_TO_TWIPS(infinite_to_zero(newy)));
 		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}

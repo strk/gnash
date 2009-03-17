@@ -32,6 +32,7 @@
 #include "VM.h" // for addStatics
 #include "MovieClip.h" // For MovieClip
 #include "ColorTransform_as.h"
+#include "GnashNumeric.h"
 
 #include <sstream>
 #include <limits>

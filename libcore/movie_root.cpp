@@ -28,7 +28,6 @@
 #include "VM.h"
 #include "ExecutableCode.h"
 #include "Stage_as.h"
-#include "utility.h"
 #include "URL.h"
 #include "namedStrings.h"
 #include "GnashException.h"
@@ -37,6 +36,7 @@
 #include "GnashKey.h"
 #include "gnash.h"
 #include "GnashAlgorithm.h"
+#include "GnashNumeric.h"
 
 #include <boost/algorithm/string/replace.hpp>
 #include <utility>
@@ -2115,7 +2115,7 @@ movie_root::set_background_alpha(float alpha)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	boost::uint8_t newAlpha = utility::clamp<int>(utility::frnd(alpha * 255.0f), 0, 255);
+	boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
 
         if ( m_background_color.m_a != newAlpha )
 	{

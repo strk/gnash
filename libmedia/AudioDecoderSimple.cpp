@@ -23,7 +23,7 @@
 #include "BitsReader.h"
 #include "SoundInfo.h"
 #include "MediaParser.h" // for AudioInfo definition..
-#include "utility.h" // for clamp
+#include "GnashNumeric.h" // for clamp
 
 #include "log.h"
 
@@ -87,11 +87,11 @@ private:
 		if (code_sign_bit) delta = -delta;
 
 		sample += delta;
-		sample = utility::clamp<int>(sample, -32768, 32767);
+		sample = clamp<int>(sample, -32768, 32767);
 
 		/* Update our stepsize index.  Use a lookup table. */
 		stepsize_index += index_update_table[code_mag];
-		stepsize_index = utility::clamp<int>(stepsize_index, 0, STEPSIZE_CT - 1);
+		stepsize_index = clamp<int>(stepsize_index, 0, STEPSIZE_CT - 1);
 	}
 
 	/* Uncompress 4096 mono samples of ADPCM. */

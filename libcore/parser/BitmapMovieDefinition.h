@@ -25,6 +25,7 @@
 #include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
+#include "GnashNumeric.h"
 
 #include <string>
 #include <memory> // for auto_ptr

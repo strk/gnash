@@ -68,7 +68,7 @@
 #endif
 
 #include "log.h"
-#include "utility.h"
+#include "GnashNumeric.h"
 #include "Date_as.h"
 #include "fn_call.h"
 #include "GnashException.h"
@@ -732,7 +732,7 @@ date_setTime(const fn_call& fn)
         const double magicMaxValue = 8.64e+15;
         double d = fn.arg(0).to_number();
 
-        if (!utility::isFinite(d) || std::abs(d) > magicMaxValue) {
+        if (!isFinite(d) || std::abs(d) > magicMaxValue) {
             date->setTimeValue(NaN);
         }
         else {

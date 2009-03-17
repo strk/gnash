@@ -27,6 +27,7 @@
 #include "RGBA.h" // for rgba type
 #include "StringPredicates.h" // for parseAlignString
 #include "smart_ptr.h" // intrusive_ptr
+#include "GnashNumeric.h"
 
 namespace gnash {
 

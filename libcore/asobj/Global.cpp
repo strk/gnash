@@ -65,7 +65,7 @@
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
-#include "utility.h" // for isfinite replacement
+#include "GnashNumeric.h" // for isfinite replacement
 #include "flash_pkg.h"
 
 #include "fn_call.h"
@@ -276,7 +276,7 @@ global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return static_cast<bool>(utility::isFinite(fn.arg(0).to_number()));
+    return as_value(static_cast<bool>(isFinite(fn.arg(0).to_number())));
 }
 
 /// \brief Encode a string to URL-encoded format
@@ -664,7 +664,6 @@ global_setInterval(const fn_call& fn)
 
     std::auto_ptr<Timer> timer(new Timer);
 	if (as_func) {
-        // TODO: 'this_ptr' should be NULL/undefined in this case
 		timer->setInterval(*as_func, ms, fn.this_ptr, args);
 	}
 	else {
@@ -736,7 +735,6 @@ global_setTimeout(const fn_call& fn)
 
 	std::auto_ptr<Timer> timer(new Timer);
 	if (as_func) {
-		// TODO: 'this_ptr' should be NULL/undefined in this case
 		timer->setInterval(*as_func, ms, fn.this_ptr, args, true);
 	}
 	else {

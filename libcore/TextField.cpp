@@ -45,6 +45,7 @@
 #include "GnashKey.h" // key::code
 #include "TextRecord.h"
 #include "Point2d.h"
+#include "GnashNumeric.h"
 
 #include <algorithm> // std::min
 #include <string>
@@ -599,8 +600,8 @@ TextField::set_member(string_table::key name,
         break;
     case NSV::PROP_uX:
     {
-        SWFMatrix    m = getMatrix();
-        double x =  utility::infinite_to_zero( val.to_number() );
+        SWFMatrix m = getMatrix();
+        double x = infinite_to_zero( val.to_number() );
         m.tx = PIXELS_TO_TWIPS(x);    
         setMatrix(m); // no need to update caches when only changing translation
 
@@ -609,8 +610,8 @@ TextField::set_member(string_table::key name,
     }
     case NSV::PROP_uY:
     {
-        SWFMatrix    m = getMatrix();
-        double y =  utility::infinite_to_zero( val.to_number() );
+        SWFMatrix m = getMatrix();
+        double y = infinite_to_zero( val.to_number() );
         m.ty = PIXELS_TO_TWIPS(y);
         setMatrix(m); // no need to update caches when only changing translation
 
@@ -620,7 +621,7 @@ TextField::set_member(string_table::key name,
     case NSV::PROP_uWIDTH:
     {
         double nw = val.to_number(); 
-        if ( ! utility::isFinite(nw) )
+        if (!isFinite(nw) )
         {
             // might be our fault, see the TODO above 
             // (missing to pass as_environment out..)
@@ -682,7 +683,7 @@ TextField::set_member(string_table::key name,
     case NSV::PROP_uHEIGHT:
     {
         double nh = val.to_number(); 
-        if ( ! utility::isFinite(nh) )
+        if (!isFinite(nh) )
         {
             // might be our fault, see the TODO above (missing to pass
             // as_environment out..)

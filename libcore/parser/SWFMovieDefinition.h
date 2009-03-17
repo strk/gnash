@@ -32,9 +32,9 @@
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
-#include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
-#include "utility.h" // for TWIPS_TO_PIXELS 
+#include "StringPredicates.h" 
 #include "rect.h"
+#include "GnashNumeric.h"
 
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources

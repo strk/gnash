@@ -48,7 +48,8 @@
 #include "sound_handler.h"
 #include "namedStrings.h"
 #include "utf8.h"
-#include "StringPredicates.h" // StringNoCaseEqual
+#include "StringPredicates.h" 
+#include "GnashNumeric.h"
 
 #include <string>
 #include <vector>

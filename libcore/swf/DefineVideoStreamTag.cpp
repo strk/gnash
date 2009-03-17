@@ -24,6 +24,7 @@
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
 #include "GnashAlgorithm.h"
+#include "GnashNumeric.h"
 
 namespace gnash {
 namespace SWF {
