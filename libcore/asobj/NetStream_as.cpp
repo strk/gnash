@@ -30,7 +30,6 @@
 
 #include "fn_call.h"
 #include "builtin_function.h"
-#include "timers.h" // for registering the advance timer
 #include "GnashException.h"
 #include "NetConnection_as.h"
 #include "Object.h" // for getObjectInterface

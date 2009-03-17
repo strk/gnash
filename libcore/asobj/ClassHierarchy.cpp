@@ -54,7 +54,6 @@
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
-#include "timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
 #include "TextField.h"

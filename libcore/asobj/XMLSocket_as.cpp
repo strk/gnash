@@ -27,7 +27,6 @@
 #include "utility.h"
 #include "XML_as.h"
 #include "XMLSocket_as.h"
-#include "timers.h"
 #include "as_function.h"
 #include "fn_call.h"
 #include "VM.h"

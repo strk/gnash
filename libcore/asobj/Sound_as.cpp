@@ -34,7 +34,6 @@
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
-#include "timers.h" // for registering the probe timer
 #include "namedStrings.h"
 #include "ExportableResource.h"
 #include "StreamProvider.h"

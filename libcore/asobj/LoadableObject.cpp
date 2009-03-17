@@ -26,7 +26,6 @@
 #include "namedStrings.h"
 #include "VM.h"
 #include "builtin_function.h"
-#include "timers.h"
 #include "utf8.h"
 #include "fn_call.h"
 #include "GnashAlgorithm.h"

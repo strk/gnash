@@ -33,8 +33,8 @@
 #include "namedStrings.h"
 #include "GnashException.h"
 #include "sound_handler.h"
-#include "timers.h" // for Timer use
-#include "GnashKey.h" // key::code
+#include "Timers.h"
+#include "GnashKey.h"
 #include "gnash.h"
 #include "GnashAlgorithm.h"
 
