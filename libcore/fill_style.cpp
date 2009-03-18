@@ -28,7 +28,9 @@
 #include "movie_definition.h"
 #include "swf.h"
 #include "GnashException.h"
+
 #include <cmath> // sqrt, floor
+#include <iostream> // for output operator
 
 namespace gnash {
 
@@ -49,11 +51,12 @@ gradient_record::read(SWFStream& in, SWF::TagType tag)
 //
 fill_style::fill_style()
     :
-    m_type(SWF::FILL_SOLID),
-    m_color(), // FF.FF.FF.FF
     _bitmapInfo(0),
+    m_color(), // FF.FF.FF.FF
     m_spread_mode(SWF::GRADIENT_SPREAD_PAD),
-    m_interpolation(SWF::GRADIENT_INTERPOL_NORMAL)
+    m_interpolation(SWF::GRADIENT_INTERPOL_NORMAL),
+    m_type(SWF::FILL_SOLID),
+    _bitmapSmoothingPolicy(BITMAP_SMOOTHING_UNSPECIFIED)
 {
 }
 
@@ -250,11 +253,26 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         // 0x42: tiled bitmap fill with hard edges
         // 0x43: clipped bitmap fill with hard edges
 
+        if ( m_type == SWF::FILL_TILED_BITMAP_HARD ||
+             m_type == SWF::FILL_CLIPPED_BITMAP_HARD )
+        {
+            _bitmapSmoothingPolicy = BITMAP_SMOOTHING_OFF;
+        }
+        else if ( md.get_version() >= 8 )
+        {
+            _bitmapSmoothingPolicy = BITMAP_SMOOTHING_ON;
+        }
+        else
+        {
+            _bitmapSmoothingPolicy = BITMAP_SMOOTHING_UNSPECIFIED;
+        }
+
         in.ensureBytes(2);
         int bitmap_char_id = in.read_u16();
         IF_VERBOSE_PARSE
         (
-            log_parse("  bitmap_char = %d", bitmap_char_id);
+            log_parse("  bitmap_char = %d, smoothing_policy = %s",
+                bitmap_char_id, _bitmapSmoothingPolicy);
         );
 
         // Look up the bitmap character.
@@ -560,9 +578,10 @@ fill_style::get_color_stop(int index) const
 
 fill_style::fill_style(BitmapInfo* bitmap, const SWFMatrix& mat)
     :
-    m_type(SWF::FILL_CLIPPED_BITMAP),
+    _matrix(mat),
     _bitmapInfo(bitmap),
-    _matrix(mat)
+    m_type(SWF::FILL_CLIPPED_BITMAP),
+    _bitmapSmoothingPolicy(BITMAP_SMOOTHING_UNSPECIFIED)
 {
 }
 
@@ -591,6 +610,28 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
     m_gradients = gradients;
     _matrix = mat;
     _bitmapInfo = 0;
+}
+
+std::ostream& operator << (std::ostream& os,
+        const fill_style::BitmapSmoothingPolicy& p)
+{
+    switch (p)
+    {
+        case fill_style::BITMAP_SMOOTHING_UNSPECIFIED:
+            os << "unspecified";
+            break;
+        case fill_style::BITMAP_SMOOTHING_ON:
+            os << "on";
+            break;
+        case fill_style::BITMAP_SMOOTHING_OFF:
+            os << "off";
+            break;
+        default:
+            // cast to int required to avoid infinite recursion
+            os << "unknown " << (int)p;
+            break;
+    }
+    return os;
 }
 
 
