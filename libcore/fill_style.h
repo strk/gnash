@@ -151,7 +151,7 @@ public:
 	void	set_color(rgba new_color) { m_color = new_color; }
 
 	/// Get fill type, see SWF::fill_style_type
-	int	get_type() const { return m_type; }
+	uint8_t	get_type() const { return m_type; }
 
 	SWF::gradient_spread_mode get_gradient_spread_mode()
 	{ return m_spread_mode; }
@@ -213,19 +213,25 @@ private:
 	rgba sample_gradient(boost::uint8_t ratio) const;
 
 	friend class morph2_character_def;
-	
-	/// Fill type, see SWF::fill_style_type
-	int	m_type;
-	rgba	m_color;
-	SWFMatrix	m_gradient_matrix;
-    float m_focal_point; // For focal fill gradients.
-	std::vector<gradient_record> m_gradients;
-	boost::intrusive_ptr<BitmapInfo> _gradientBitmapInfo;
-	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
-	SWFMatrix	m_bitmap_matrix;
 
+	/// Fill type, see SWF::fill_style_type
+	uint8_t	m_type;
+	
+	// For BITMAP or GRADIENT types 
+	SWFMatrix	_matrix;
+
+	// For BITMAP or GRADIENT types
+	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
+
+	// For SOLID type (and arguably GRADIENT too)
+	rgba	m_color;
+
+	// Only for GRADIENT type
+	float m_focal_point; // For focal fill gradients.
+	std::vector<gradient_record> m_gradients;
 	SWF::gradient_spread_mode m_spread_mode;
 	SWF::gradient_interpolation_mode m_interpolation;
+
 };
 
 
