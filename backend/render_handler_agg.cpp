@@ -1244,7 +1244,6 @@ public:
     const size_t fcount = fill_styles.size();
     for (size_t fno=0; fno<fcount; ++fno) {
     
-      bool smooth = false;
       int fill_type = fill_styles[fno].get_type();
       
       switch (fill_type) {
@@ -1290,8 +1289,6 @@ public:
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-            smooth= true;  // continue with next case!
-        
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {    
@@ -1302,29 +1299,39 @@ public:
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
 
+          //
+          // Smoothing policy:
+          //
+          // - If unspecified, smooth when _quality >= BEST
+          // - If ON or forced, smooth when _quality > LOW
+          // - If OFF, don't smooth
+          //
+          // TODO: take a forceBitmapSmoothing parameter.
+          //       which should be computed by the VM looking
+          //       at MovieClip.forceSmoothing.
+          //
+          bool smooth = false;
+          if ( _quality > QUALITY_LOW ) // never smooth in LOW quality
+          {
+             // TODO: if forceSmoothing is true, smooth !
+             switch ( fill_styles[fno].getBitmapSmoothingPolicy() )
+             {
+                case fill_style::BITMAP_SMOOTHING_UNSPECIFIED:
+                    if ( _quality >= QUALITY_BEST ) smooth = true;
+                    break;
+                case fill_style::BITMAP_SMOOTHING_ON:
+                    smooth = true;
+                    break;
+                default: break;
+             }
+          }
+
           sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),
+            smooth);
 
-            smooth &&
-            // TODO:
-            //
-            // Non-HARD bitmap fills are smoothed or
-            // not depending on _quality and SWF version:
-            // - For SWF8 and up (where _HARD versions are available)
-            //   they are smoothed starting at quality MEDIUM.
-            // - For previous SWF versions they are only smoothed
-            //   with quality BEST
-            //
-            // NOTE: the SWF version to take into account here is
-            //       the one of the file containing the definition
-            //       of the fills, not the top-level file loaded.
-            //
-            // It needs to be checked behaviour for bitmap
-            // fills produced with ActionScript
-            //
-            _quality >= QUALITY_HIGH);
           break;
         } 
 
