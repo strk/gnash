@@ -184,6 +184,7 @@ check_PROGRAMS = \
 	new_child_in_unload_test \
 	instanceNameTest \
 	BitmapDataTest \
+	BitmapSmoothingTest \
 	$(NULL)
 
 if MING_VERSION_0_4_3
@@ -1499,6 +1500,22 @@ EmbeddedSoundTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	EmbeddedSoundTest.swf	\
 	$(NULL)
+
+BitmapSmoothingTest_SOURCES = \
+	BitmapSmoothingTest.c \
+	$(NULL)
+
+BitmapSmoothingTest_CFLAGS = \
+	-DMEDIADIR='"$(abs_mediadir)"' \
+	$(NULL)
+
+BitmapSmoothingTest_LDADD = libgnashmingutils.la
+
+BitmapSmoothingTest-v7.swf: BitmapSmoothingTest
+	./BitmapSmoothingTest 7
+
+BitmapSmoothingTest-v8.swf: BitmapSmoothingTest
+	./BitmapSmoothingTest 8
 
 registerClassTest_SOURCES =	\
 	registerClassTest.c	\
