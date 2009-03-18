@@ -66,5 +66,6 @@ main(int /*argc*/, char** /*argv*/)
 	std::cout << "sizeof(rgba): " << (sizeof(rgba)) << std::endl;
 	std::cout << "sizeof(line_style): " << (sizeof(line_style)) << std::endl;
 	std::cout << "sizeof(fill_style): " << (sizeof(fill_style)) << std::endl;
+	std::cout << "sizeof(SWFMatrix): " << (sizeof(SWFMatrix)) << std::endl;
 }
 
