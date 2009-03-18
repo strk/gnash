@@ -381,6 +381,10 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 #endif
 	
 	// TODO: invalidate self, not the movie
+    //       movie_root::setInvalidated() seems
+    //       to do just that, if anyone feels
+    //       like more closely research on this
+    //       (does level swapping require full redraw always?)
 	movie->set_invalidated();
 	
 	assert(testInvariant());
@@ -1426,6 +1430,8 @@ movie_root::setQuality(Quality q)
 {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
+    if ( _quality == q ) return; // no op
+
     /// Overridden quality if not negative.
     if (rcfile.qualityLevel() >= 0) {
         int ql = rcfile.qualityLevel();
@@ -1437,6 +1443,10 @@ movie_root::setQuality(Quality q)
     }
     render_handler* renderer = get_render_handler();
     if (renderer) renderer->setQuality(_quality);
+
+    // force a redraw
+    // TODO: check if the redraw should be immediate
+    setInvalidated();
 }
 
 /// Get actionscript width of stage, in pixels. The width
