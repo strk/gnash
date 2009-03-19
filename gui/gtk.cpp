@@ -688,11 +688,15 @@ GtkGui::createMenu()
     gtk_widget_show(GTK_WIDGET(menusound));
     g_signal_connect(menusound, "activate", G_CALLBACK(menuSound), this);
 
-    GtkMenuItem *menuquit =
-        GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Quit Gnash")));
-    gtk_menu_append(_popup_menu, GTK_WIDGET(menuquit));
-    gtk_widget_show(GTK_WIDGET(menuquit));
-    g_signal_connect(menuquit, "activate", G_CALLBACK(menuQuit), this);
+    GtkWidget *separator2 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separator2);
+    gtk_container_add (GTK_CONTAINER (_popup_menu), separator2);
+
+    gtk_container_add (GTK_CONTAINER (_popup_menu), separator1);
+    GtkWidget *quit = gtk_image_menu_item_new_from_stock("gtk-quit", 0);
+    gtk_widget_show(quit);
+    gtk_container_add(GTK_CONTAINER(_popup_menu), quit);
+    g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
 
 #ifdef GUI_HILDON
      hildon_window_set_menu(HILDON_WINDOW(_window),
@@ -1924,7 +1928,6 @@ GtkGui::createFileMenu(GtkWidget *obj)
     GtkWidget *quit = gtk_image_menu_item_new_from_stock("gtk-quit", 0);
     gtk_widget_show(quit);
     gtk_container_add(GTK_CONTAINER(menu), quit);
-
     g_signal_connect(quit, "activate", G_CALLBACK(menuQuit), this);
 }
 
