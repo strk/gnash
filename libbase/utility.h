@@ -28,13 +28,10 @@
 # include <ieeefp.h> // for finite()
 #endif
 
+#include <cstdlib>
 #include <cassert>
 #include <string>
 #include <typeinfo>
-#include <cmath>
-#include <boost/cstdint.hpp>
-#include <algorithm> // std::min, std::max
-#include <limits>
 
 #ifdef HAVE_PTHREADS
 #include <pthread.h>
