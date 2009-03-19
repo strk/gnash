@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <ming.h>
 
+#include "ming_utils.h"
+
 int
 main(int argc, char **argv)
 {
@@ -42,6 +44,8 @@ main(int argc, char **argv)
 	SWFMovieClip mc;
 	SWFDisplayItem it;
 	int swfversion;
+	SWFFont font;
+	SWFMovieClip dejagnuclip;
 	char outputFilename[256];
 
 	if ( argc < 2 ) {
@@ -96,11 +100,24 @@ main(int argc, char **argv)
 	****************************************************/
 
 	it = SWFMovie_add(mo, (SWFBlock)mc);
-	SWFDisplayItem_scaleTo(it, 24, 10);
+	SWFDisplayItem_scaleTo(it, 30, 10);
+
+	SWFMovie_setDimension(mo, SWFBitmap_getWidth(bitmap)*30, 500);
+
+	/****************************************************
+	* Add dejagnu clip
+	****************************************************/
+
+	font = get_default_font(MEDIADIR);
+	dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 200, 200);
+	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+	SWFDisplayItem_setDepth(it, 200); 
+	SWFDisplayItem_move(it, 0, 100); 
 
 	/****************************************************
 	* TODO: Add actions
 	****************************************************/
+
 
 	/****************************************************
 	* Save things up
