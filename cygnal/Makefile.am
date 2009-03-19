@@ -25,11 +25,10 @@ TEST_DIR = testsuite
 endif
 
 SUBDIRS = \
-	$(TEST_DIR) \
-	.
+	$(TEST_DIR)
 
 # we don't want these anymore
-#DIST_SUBDIRS  = ACT IO HTTP Net unit_tests 
+DIST_SUBDIRS  = testsuite
 
 AM_CPPFLAGS = # -Wall
 

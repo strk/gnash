@@ -50,7 +50,7 @@ class DummyMovieDefinition : public movie_definition
 
 public:
 
-    virtual character* createDisplayObject(character*, int id) { return 0; }
+        virtual character* createDisplayObject(character*, int /* id */) { return 0; }
 
 
 	/// Default constructor

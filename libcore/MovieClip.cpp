@@ -1489,8 +1489,9 @@ MovieClip::attachCharacter(character& newch, int depth, as_object* initObject)
 }
 
 std::auto_ptr<GnashImage>
-MovieClip::drawToBitmap(const SWFMatrix& mat, const cxform& cx,
-        character::BlendMode bm, const rect& clipRect, bool smooth)
+MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
+                        character::BlendMode /* bm */, const rect& /* clipRect */,
+                        bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }

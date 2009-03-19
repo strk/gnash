@@ -41,8 +41,9 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
 }
 
 std::auto_ptr<GnashImage>
-BitmapMovieInstance::drawToBitmap(const SWFMatrix& mat, const cxform& cx,
-        character::BlendMode bm, const rect& clipRect, bool smooth)
+BitmapMovieInstance::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
+                                  character::BlendMode /* bm */, const rect& /* clipRect */,
+                                  bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }

@@ -88,6 +88,10 @@ extern "C"{
 #include <boost/thread/condition.hpp>
 #include <boost/thread/tss.hpp>
 
+#ifndef POLLRDHUP
+#define POLLRDHUP 0
+#endif
+
 //using gnash::log_debug;
 using namespace std;
 using namespace gnash;
@@ -674,7 +678,7 @@ dispatch_handler(Network::thread_params_t *args)
 			// We got some data, so process it
 			log_debug("Got something on fd #%d, 0x%x", it->fd, it->revents);
 			// Call the protocol handler for this network connection
-			bool ret = net->getEntry(it->fd)(args);
+// 			bool ret = net->getEntry(it->fd)(args);
 			
 //			log_debug("Handler returned %s", (ret) ? "true" : "false");
 			// FIXME: we currently force a 'close connection' at the end
