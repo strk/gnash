@@ -1430,8 +1430,6 @@ movie_root::setQuality(Quality q)
 {
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
-    if ( _quality == q ) return; // no op
-
     /// Overridden quality if not negative.
     if (rcfile.qualityLevel() >= 0) {
         int ql = rcfile.qualityLevel();
