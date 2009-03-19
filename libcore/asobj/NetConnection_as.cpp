@@ -45,7 +45,6 @@
 #include "VM.h"
 #include "amf.h"
 #include "SimpleBuffer.h"
-#include "timers.h"
 #include "namedStrings.h"
 #include "GnashAlgorithm.h"
 

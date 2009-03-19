@@ -28,35 +28,19 @@
 #include "SWFMatrix.h"
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
-#include "utility.h"
+#include "GnashNumeric.h"
 
 #include <cmath>
 #include <iomanip>
 
 namespace gnash {
 
-#define TRUST_FLOAT_TO_UINT32_CONVERSION  1 
-
 namespace {
 
-inline
-boost::int32_t DoubleToFixed16(double a)
+inline boost::int32_t
+DoubleToFixed16(double a)
 {
-#ifdef TRUST_FLOAT_TO_UINT32_CONVERSION
-    // truncate when overflow occurs.
-    return static_cast<boost::int32_t>(static_cast<boost::uint32_t>(a * 65536.0));
-#else
-    boost::int32_t  b;
-    if (a >= 0)
-    {
-        b = static_cast<boost::uint32_t>(std::fmod(a * 65536.0, 4294967296.0));
-    }
-    else
-    {
-        b = -static_cast<boost::uint32_t>(std::fmod(-a * 65536.0, 4294967296.0));
-    }
-    return b;
-#endif
+    return truncateWithFactor<65536>(a);
 }
 
 inline boost::int32_t
@@ -195,7 +179,6 @@ void
 SWFMatrix::set_lerp(const SWFMatrix& m1, const SWFMatrix& m2, float t)
 // Set this SWFMatrix to a blend of m1 and m2, parameterized by t.
 {
-    using utility::flerp;
     sx = flerp(m1.sx, m2.sx, t);
     shx = flerp(m1.shx, m2.shx, t);
     shy = flerp(m1.shy, m2.shy, t);
@@ -394,14 +377,14 @@ std::ostream& operator<< (std::ostream& o, const SWFMatrix& m)
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.shy/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << TWIPS_TO_PIXELS(m.tx) << " |" 
+      << twipsToPixels(m.tx) << " |" 
       << std::endl << "|"
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.shx/ 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
       << m.sy / 65536.0 << " "
       << std::setw(fieldWidth) << std::fixed << std::setprecision(4) 
-      << TWIPS_TO_PIXELS(m.ty) << " |";
+      << twipsToPixels(m.ty) << " |";
       
       return o;
 }

@@ -33,7 +33,6 @@
 #include "Geometry.h"
 #include "SWFStream.h"
 #include "styles.h"
-#include "timers.h"
 #include "GnashImage.h"
 #include "zlib_adapter.h"
 #include "sprite_definition.h"

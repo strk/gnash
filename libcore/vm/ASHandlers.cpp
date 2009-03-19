@@ -48,7 +48,8 @@
 #include "sound_handler.h"
 #include "namedStrings.h"
 #include "utf8.h"
-#include "StringPredicates.h" // StringNoCaseEqual
+#include "StringPredicates.h" 
+#include "GnashNumeric.h"
 
 #include <string>
 #include <vector>
@@ -1340,10 +1341,10 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
         // we must remember to updated this as required
         
 
-        boost::int32_t y1 = PIXELS_TO_TWIPS(env.top(3).to_number());
-        boost::int32_t x1 = PIXELS_TO_TWIPS(env.top(4).to_number());
-        boost::int32_t y0 = PIXELS_TO_TWIPS(env.top(5).to_number());
-        boost::int32_t x0 = PIXELS_TO_TWIPS(env.top(6).to_number());
+        boost::int32_t y1 = pixelsToTwips(env.top(3).to_number());
+        boost::int32_t x1 = pixelsToTwips(env.top(4).to_number());
+        boost::int32_t y0 = pixelsToTwips(env.top(5).to_number());
+        boost::int32_t x0 = pixelsToTwips(env.top(6).to_number());
 
         // check for swapped values
         if ( y1 < y0 )

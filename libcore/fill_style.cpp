@@ -28,7 +28,7 @@
 #include "movie_definition.h"
 #include "swf.h"
 #include "GnashException.h"
-
+#include "GnashNumeric.h"
 #include <cmath> // sqrt, floor
 #include <iostream> // for output operator
 
@@ -546,8 +546,7 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     for (size_t j=0, nj=m_gradients.size(); j<nj; ++j)
     {
         m_gradients[j].m_ratio =
-            (boost::uint8_t) utility::frnd(
-                utility::flerp(a.m_gradients[j].m_ratio,
+            (boost::uint8_t) frnd( flerp(a.m_gradients[j].m_ratio,
                     b.m_gradients[j].m_ratio, t)
                 );
         m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color,

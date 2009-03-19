@@ -28,9 +28,8 @@
 #include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
-#include "utility.h"
+#include "GnashNumeric.h"
 #include "log.h"
-
 #include "GnashImage.h"
 #include "utility.h"
 #include "Range2d.h"
@@ -739,8 +738,8 @@ public:
     d.x = b.x + c.x - a.x;
     d.y = b.y + c.y - a.y;
 
-    float w_bounds = TWIPS_TO_PIXELS(b.x - a.x);
-    float h_bounds = TWIPS_TO_PIXELS(c.y - a.y);
+    float w_bounds = twipsToPixels(b.x - a.x);
+    float h_bounds = twipsToPixels(c.y - a.y);
 
     unsigned char*   ptr = frame->data();
     float xpos = a.x < 0 ? 0.0f : a.x;  //hack
@@ -778,7 +777,7 @@ public:
   pixel_to_world(int x, int y)
   {
     // TODO: verify this is correct
-    return point(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    return point(pixelsToTwips(x), pixelsToTwips(y));
   }
 
   virtual void  begin_display(
@@ -870,10 +869,10 @@ public:
     GLint box[4];
     glGetIntegerv(GL_SCISSOR_BOX, box);
     
-    int x = PIXELS_TO_TWIPS(box[0]),
-        y = PIXELS_TO_TWIPS(box[1]),
-        w = PIXELS_TO_TWIPS(box[2]),
-        h = PIXELS_TO_TWIPS(box[3]);
+    int x = pixelsToTwips(box[0]),
+        y = pixelsToTwips(box[1]),
+        w = pixelsToTwips(box[2]),
+        h = pixelsToTwips(box[3]);
 
     glRectd(x, y - h, x + w, y + h);
   #endif
@@ -1292,7 +1291,7 @@ public:
     }
     else if ( (!style.scaleThicknessVertically()) && (!style.scaleThicknessHorizontally()) )
     {
-      float pxThickness = TWIPS_TO_PIXELS(width);
+      float pxThickness = twipsToPixels(width);
       glLineWidth(pxThickness);
       glPointSize(pxThickness);
     }
@@ -1307,7 +1306,7 @@ public:
       stroke_scale /= 2.0f;
       stroke_scale *= (fabsf(_xscale) + fabsf(_yscale)) / 2.0f;
       width *= stroke_scale;
-      width = TWIPS_TO_PIXELS(width);
+      width = twipsToPixels(width);
 
       GLfloat width_info[2];
       
@@ -1692,8 +1691,8 @@ public:
     
     geometry::Range2d<float> area = ranges.getFullArea;
     
-    glScissor( (int)TWIPS_TO_PIXELS(area.getMinX()), window_height-(int)TWIPS_TO_PIXELS(area.getMaxY()),
-               (int)TWIPS_TO_PIXELS(area.width()), (int)TWIPS_TO_PIXELS(area.height()));
+    glScissor( (int)twipsToPixels(area.getMinX()), window_height-(int)twipsToPixels(area.getMaxY()),
+               (int)twipsToPixels(area.width()), (int)twipsToPixels(area.height()));
 #endif
   }
 

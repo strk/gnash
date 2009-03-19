@@ -27,6 +27,7 @@
 #include "RGBA.h" // for rgba type
 #include "StringPredicates.h" // for parseAlignString
 #include "smart_ptr.h" // intrusive_ptr
+#include "GnashNumeric.h"
 
 namespace gnash {
 
@@ -168,13 +169,13 @@ textformat_new(const fn_call& fn)
 	    default:
 	        log_error(_("Too many args (%d) passed to TextFormat"), args);
 	    case 13:
-	        tf->leadingSet(PIXELS_TO_TWIPS(fn.arg(12).to_int()));
+	        tf->leadingSet(pixelsToTwips(fn.arg(12).to_int()));
 	    case 12:
-	        tf->indentSet(PIXELS_TO_TWIPS(fn.arg(11).to_int()));
+	        tf->indentSet(pixelsToTwips(fn.arg(11).to_int()));
 	    case 11:
-	        tf->rightMarginSet(PIXELS_TO_TWIPS(fn.arg(10).to_int()));
+	        tf->rightMarginSet(pixelsToTwips(fn.arg(10).to_int()));
 	    case 10:
-	        tf->leftMarginSet(PIXELS_TO_TWIPS(fn.arg(9).to_int()));
+	        tf->leftMarginSet(pixelsToTwips(fn.arg(9).to_int()));
 	    case 9:
 	        tf->alignSet(fn.arg(8).to_string());
 	    case 8:
@@ -194,7 +195,7 @@ textformat_new(const fn_call& fn)
 	        tf->colorSet(col);
 	    }
 	    case 2:
-	        tf->sizeSet(PIXELS_TO_TWIPS(fn.arg(1).to_int()));
+	        tf->sizeSet(pixelsToTwips(fn.arg(1).to_int()));
 	    case 1:
 	        tf->fontSet(fn.arg(0).to_string());
 	        break;
@@ -253,12 +254,12 @@ textformat_blockIndent(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->blockIndentDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->blockIndent()));
+		if ( ptr->blockIndentDefined() ) ret.set_double(twipsToPixels(ptr->blockIndent()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->blockIndentSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+		ptr->blockIndentSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -273,12 +274,12 @@ textformat_leading(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->leadingDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->leading()));
+		if ( ptr->leadingDefined() ) ret.set_double(twipsToPixels(ptr->leading()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->leadingSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+		ptr->leadingSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -293,12 +294,12 @@ textformat_indent(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->indentDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->indent()));
+		if ( ptr->indentDefined() ) ret.set_double(twipsToPixels(ptr->indent()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->indentSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+		ptr->indentSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -313,12 +314,12 @@ textformat_rightMargin(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->rightMarginDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->rightMargin()));
+		if ( ptr->rightMarginDefined() ) ret.set_double(twipsToPixels(ptr->rightMargin()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->rightMarginSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+		ptr->rightMarginSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -335,13 +336,13 @@ textformat_leftMargin(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		if (ptr->leftMarginDefined()) {
-            ret.set_double(TWIPS_TO_PIXELS(ptr->leftMargin()));
+            ret.set_double(twipsToPixels(ptr->leftMargin()));
         }
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->leftMarginSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+		ptr->leftMarginSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;
@@ -480,12 +481,12 @@ textformat_size(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		if ( ptr->sizeDefined() ) ret.set_double(TWIPS_TO_PIXELS(ptr->size()));
+		if ( ptr->sizeDefined() ) ret.set_double(twipsToPixels(ptr->size()));
 		else ret.set_null();
 	}
 	else // setter
 	{
-		ptr->sizeSet(PIXELS_TO_TWIPS(fn.arg(0).to_int()));
+		ptr->sizeSet(pixelsToTwips(fn.arg(0).to_int()));
 	}
 
 	return ret;

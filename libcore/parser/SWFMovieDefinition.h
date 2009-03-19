@@ -32,9 +32,9 @@
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
-#include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
-#include "utility.h" // for TWIPS_TO_PIXELS 
+#include "StringPredicates.h" 
 #include "rect.h"
+#include "GnashNumeric.h"
 
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources
@@ -195,12 +195,12 @@ public:
 
 	float get_width_pixels() const
 	{
-		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.width()));
+		return std::ceil(twipsToPixels(m_frame_size.width()));
 	}
 
 	float	get_height_pixels() const
 	{
-		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.height()));
+		return std::ceil(twipsToPixels(m_frame_size.height()));
 	}
 
 	virtual int	get_version() const { return m_version; }

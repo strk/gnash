@@ -24,6 +24,7 @@
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
 #include "GnashAlgorithm.h"
+#include "GnashNumeric.h"
 
 namespace gnash {
 namespace SWF {
@@ -100,7 +101,7 @@ DefineVideoStreamTag::read(SWFStream& in)
 	_height = in.read_u16();
 
 	m_bound.set_to_point(0, 0);
-	m_bound.expand_to_point(PIXELS_TO_TWIPS(_width), PIXELS_TO_TWIPS(_height));
+	m_bound.expand_to_point(pixelsToTwips(_width), pixelsToTwips(_height));
 
 	m_reserved_flags = in.read_uint(5);
 	m_deblocking_flags = in.read_uint(2);

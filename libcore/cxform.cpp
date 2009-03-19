@@ -22,7 +22,7 @@
 #include "RGBA.h" 
 #include "SWFStream.h" // for reading from SWF
 #include "log.h"
-#include "utility.h" // for utility::clamp
+#include "GnashNumeric.h"
 #include <iomanip>
 
 namespace gnash {
@@ -78,8 +78,6 @@ void    cxform::transform(boost::uint8_t& r, boost::uint8_t& g, boost::uint8_t& 
     bt = (bt * ba >> 8) + bb;
     at = (at * aa >> 8) + ab;
 
-    using utility::clamp;
-    
     r = (uint8_t)(clamp<int16_t>(rt, 0, 255));
     g = (uint8_t)(clamp<int16_t>(gt, 0, 255));
     b = (uint8_t)(clamp<int16_t>(bt, 0, 255));

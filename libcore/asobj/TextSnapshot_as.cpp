@@ -35,6 +35,7 @@
 #include "swf/TextRecord.h"
 #include "Array_as.h"
 #include "RGBA.h"
+#include "GnashNumeric.h"
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>
@@ -237,7 +238,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                         selected.test(pos - fieldStartIndex));
                 el->init_member("font", font->name());
                 el->init_member("color", tr->color().toRGBA());
-                el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
+                el->init_member("height", twipsToPixels(tr->textHeight()));
 
                 const double factor = 65536.0;
                 el->init_member("matrix_a", mat.sx / factor);
@@ -245,8 +246,8 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 el->init_member("matrix_c", mat.shy / factor);
                 el->init_member("matrix_d", mat.sy / factor);
 
-                const double xpos = TWIPS_TO_PIXELS(mat.tx + x);
-                const double ypos = TWIPS_TO_PIXELS(mat.ty + tr->yOffset());
+                const double xpos = twipsToPixels(mat.tx + x);
+                const double ypos = twipsToPixels(mat.ty + tr->yOffset());
                 el->init_member("matrix_tx", xpos);
                 el->init_member("matrix_ty", ypos);
 
