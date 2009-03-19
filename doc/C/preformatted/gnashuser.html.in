@@ -1,5 +1,5 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash User Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash User Manual</h1></div><div><p class="releaseinfo">
-        This manual describes version 0.8.3 of Gnash.
+        This manual describes version 0.8.5 of Gnash.
     </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License"><em class="citetitle">GNU
@@ -401,6 +401,12 @@
 	      set urlOpenerFormat open %u
 	      set urlOpenerFormat kfmclient exec %u
 	    </pre>
+	  </td></tr><tr><td align="left">XVideo</td><td align="left">on/off</td><td align="left">If set to <span class="emphasis"><em>on</em></span>, <span class="application">Gnash</span> will attempt to render using the X Video Extension, if
+	         system support was found during compilation. By default, X Video rendering is disabled.
+	  </td></tr><tr><td align="left">quality</td><td align="left">[-1|0|1|2|3]</td><td align="left">
+      Set rendering quality.
+      If set to <span class="emphasis"><em>-1</em></span>, <span class="application">Gnash</span> will use whatever quality set by the movie being run.
+      If set to any value from <span class="emphasis"><em>0</em></span> to <span class="emphasis"><em>3</em></span> <span class="application">Gnash</span> will lock quality to the specified value (0=low, 1=medium, 2=high, 3=best). Defaults to -1.
 	  </td></tr></tbody></table></div></div><br class="table-break"><p>
     The following example <code class="filename">.gnashrc</code> file allows a user to only play Flash files saved locally to the machine on which <span class="application">Gnash</span> is running.  It also specifically forbids content from doubleclick.com and mochibot.com.  <span class="application">Gnash</span>'s error output is set to be fairly verbose, with the debug log placed in a location convenient for the user.  Finally, sound is turned on for both the standalone player and the plugin.
   </p><pre class="programlisting">
@@ -503,7 +509,7 @@
 	      </td></tr><tr><td align="left">Darwin (MacOS X)
 	      </td><td align="left">PowerPC and x86-32 
 	      </td></tr><tr><td align="left">Windows XP, Windows Vista</td><td align="left">x86-32</td></tr></tbody></table></div></div><br class="table-break"></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="software"></a>Software Requirements</h3></div></div></div><p>
-	The 0.8.3 release of Gnash has been designed to run on
+	The 0.8.5 release of Gnash has been designed to run on
 	UNIX/Linux variants, and has been run on most of the free ones.
 	However, Gnash has successfully run on Windows, Darwin (Mac OS X),
 	Irix, Solaris, BeOs, OS/2, and Haiku.  Gnash has also run on the
@@ -645,7 +651,7 @@
 	ActionScript
       </dt><dd><p>
 	  <span class="emphasis"><em>ActionScript</em></span>, or "AS", is the scripting 
-	  language for <span class="emphasis"><em>Flash</em></span>
+	  language for <span class="emphasis"><em>SWF</em></span>
 	  applications. It is compiled to bytecode, which is a subset of
 	  the <span class="emphasis"><em>SWF</em></span> format.
 	</p></dd><dt>
@@ -659,7 +665,7 @@
 	AMF
       </dt><dd><p>
 	  <span class="emphasis"><em>AMF</em></span> 
-	  is the object format used by <span class="emphasis"><em>Flash</em></span> 
+	  is the object format used by <span class="emphasis"><em>SWF</em></span> 
 	  for shared objects and streaming video.
 	</p></dd><dt>
 	as_environment
@@ -703,7 +709,7 @@
       </dt><dd><p>
 	  A <span class="application">Gnash</span> <span class="emphasis"><em>extension</em></span> is a plugin (not a
 	  browser plugin) which implements additional functionality
-	  beyond what is covered by <span class="emphasis"><em>Flash</em></span>
+	  beyond what is covered by the <span class="emphasis"><em>SWF</em></span>
 	  specification. These are shared libraries which are loaded
 	  at runtime. 
 	</p></dd></dl></div><div class="glossdiv"><h3 class="title">F</h3><dl><dt>
@@ -716,11 +722,8 @@
       </dt><dd><p>
 	  The term <span class="emphasis"><em>Flash</em></span> is used to describe both the 
 	  Adobe IDE for creating <span class="emphasis"><em>SWF</em></span>
-	  files, and the technology itself. Flash is a registered trademark
-	  belonging to Adobe.   Unfortunately, neither Macromedia nor
-          Adobe have done a good job creating a generic name for all
-          things having to do with Flash.  They risk
-          loss of their trademark.
+	  files, and Adobe's player.  Flash is a registered trademark
+	  belonging to Adobe.
 	</p></dd><dt>
 	FLV
       </dt><dd><p>
@@ -783,11 +786,6 @@
       </dt><dd><p>
 	  <span class="emphasis"><em>Kparts</em></span> is a plugin for Konqueror which is
 	  enabled with the configuration option --enable-kparts.
-	</p></dd></dl></div><div class="glossdiv"><h3 class="title">L</h3><dl><dt>
-	libmad
-      </dt><dd><p>
-	  libmad is a mp3-decoding library, which used to be an option for Gnash
-	  handling of sound (dropped since 0.8.2).
 	</p></dd></dl></div><div class="glossdiv"><h3 class="title">M</h3><dl><dt>
 	Mesa
       </dt><dd><p>
@@ -797,7 +795,7 @@
 	</p></dd><dt>
 	Ming
       </dt><dd><p>
-	  Ming is a C library for generating SWF ("Flash") format
+	  Ming is a C library for generating <span class="emphasis"><em>SWF</em></span> format
 	  movies, plus a set of wrappers for using the library. It is
 	  used by the Gnash project for generating testcases.  
 	</p></dd></dl></div><div class="glossdiv"><h3 class="title">N</h3><dl><dt>
@@ -910,7 +908,7 @@
 	</p></dd><dt>
 	SWF
       </dt><dd><p>
-	  <span class="emphasis"><em>SWF</em></span> is the file format for 
+	  <span class="emphasis"><em>SWF</em></span> is the generic name for
 	  <span class="emphasis"><em>Flash</em></span> movies.
 	</p></dd></dl></div><div class="glossdiv"><h3 class="title">T</h3><dl><dt>
 	Tamarin
