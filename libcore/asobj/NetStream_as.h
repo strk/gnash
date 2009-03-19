@@ -172,123 +172,6 @@ public:
 class NetStream_as : public as_object
 {
 
-protected:
-    
-    /// Status codes used for notifications
-    enum StatusCode {
-    
-        // Internal status, not a valid ActionScript value
-        invalidStatus,
-
-        /// NetStream.Buffer.Empty (level: status)
-        bufferEmpty,
-
-        /// NetStream.Buffer.Full (level: status)
-        bufferFull,
-
-        /// NetStream.Buffer.Flush (level: status)
-        bufferFlush,
-
-        /// NetStream.Play.Start (level: status)
-        playStart,
-
-        /// NetStream.Play.Stop  (level: status)
-        playStop,
-
-        /// NetStream.Seek.Notify  (level: status)
-        seekNotify,
-
-        /// NetStream.Play.StreamNotFound (level: error)
-        streamNotFound,
-
-        /// NetStream.Seek.InvalidTime (level: error)
-        invalidTime
-    };
-
-    boost::intrusive_ptr<NetConnection_as> _netCon;
-
-    boost::scoped_ptr<CharacterProxy> _audioController;
-
-    /// Set stream status.
-    //
-    /// Valid statuses are:
-    ///
-    /// Status level:
-    ///  - NetStream.Buffer.Empty
-    ///  - NetStream.Buffer.Full
-    ///  - NetStream.Buffer.Flush
-    ///  - NetStream.Play.Start
-    ///  - NetStream.Play.Stop 
-    ///  - NetStream.Seek.Notify 
-    ///
-    /// Error level:
-    ///  - NetStream.Play.StreamNotFound
-    ///  - NetStream.Seek.InvalidTime
-    ///
-    /// This method locks the statusMutex during operations
-    ///
-    void setStatus(StatusCode code);
-
-    /// \brief
-    /// Call any onStatus event handler passing it
-    /// any queued status change, see _statusQueue
-    //
-    /// Will NOT lock the statusMutex itself, rather it will
-    /// iteratively call the popNextPendingStatusNotification()
-    /// private method, which will take care of locking it.
-    /// This is to make sure onStatus handler won't call methods
-    /// possibly trying to obtain the lock again (::play, ::pause, ...)
-    ///
-    void processStatusNotifications();
-    
-    
-    void processNotify(const std::string& funcname, as_object* metadata_obj);
-
-    // The size of the buffer in milliseconds
-    boost::uint32_t m_bufferTime;
-
-    // Are a new frame ready to be returned?
-    volatile bool m_newFrameReady;
-
-    // Mutex to insure we don't corrupt the image
-    boost::mutex image_mutex;
-
-    // The image/videoframe which is given to the renderer
-    std::auto_ptr<GnashImage> m_imageframe;
-
-    // The video URL
-    std::string url;
-
-    // The input media parser
-    std::auto_ptr<media::MediaParser> m_parser;
-
-    // Are we playing a FLV?
-    // The handler which is invoked on status change
-    boost::intrusive_ptr<as_function> m_statusHandler;
-
-    // The position in the inputfile, only used when not playing a FLV
-    long inputPos;
-
-#ifdef GNASH_USE_GC
-    /// Mark all reachable resources of a NetStream_as, for the GC
-    //
-    /// Reachable resources are:
-    /// - associated NetConnection object (_netCon)
-    /// - character to invalidate on video updates (_invalidatedVideoCharacter)
-    /// - onStatus event handler (m_statusHandler)
-    ///
-    virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
-
-    /// Unplug the advance timer callback
-    void stopAdvanceTimer();
-
-    /// Register the advance timer callback
-    void startAdvanceTimer();
-
-    /// The character to invalidate on video updates
-    character* _invalidatedVideoCharacter;
-
 public:
 
     enum PauseMode {
@@ -300,6 +183,8 @@ public:
     NetStream_as();
 
     ~NetStream_as();
+
+    static void init(as_object& global);
 
     PlayHead::PlaybackStatus playbackState() const {
         return _playHead.getState();
@@ -428,11 +313,128 @@ public:
     //
     /// This is a sound_handler::aux_streamer_ptr type.
     ///
-    /// It might be invoked by a separate thread (neither main, nor decoder thread).
+    /// It might be invoked by a separate thread (neither main,
+    /// nor decoder thread).
     ///
     static unsigned int audio_streamer(void *udata, boost::int16_t* samples,
             unsigned int nSamples, bool& eof);
 
+protected:
+    
+    /// Status codes used for notifications
+    enum StatusCode {
+    
+        // Internal status, not a valid ActionScript value
+        invalidStatus,
+
+        /// NetStream.Buffer.Empty (level: status)
+        bufferEmpty,
+
+        /// NetStream.Buffer.Full (level: status)
+        bufferFull,
+
+        /// NetStream.Buffer.Flush (level: status)
+        bufferFlush,
+
+        /// NetStream.Play.Start (level: status)
+        playStart,
+
+        /// NetStream.Play.Stop  (level: status)
+        playStop,
+
+        /// NetStream.Seek.Notify  (level: status)
+        seekNotify,
+
+        /// NetStream.Play.StreamNotFound (level: error)
+        streamNotFound,
+
+        /// NetStream.Seek.InvalidTime (level: error)
+        invalidTime
+    };
+
+    boost::intrusive_ptr<NetConnection_as> _netCon;
+
+    boost::scoped_ptr<CharacterProxy> _audioController;
+
+    /// Set stream status.
+    //
+    /// Valid statuses are:
+    ///
+    /// Status level:
+    ///  - NetStream.Buffer.Empty
+    ///  - NetStream.Buffer.Full
+    ///  - NetStream.Buffer.Flush
+    ///  - NetStream.Play.Start
+    ///  - NetStream.Play.Stop 
+    ///  - NetStream.Seek.Notify 
+    ///
+    /// Error level:
+    ///  - NetStream.Play.StreamNotFound
+    ///  - NetStream.Seek.InvalidTime
+    ///
+    /// This method locks the statusMutex during operations
+    ///
+    void setStatus(StatusCode code);
+
+    /// \brief
+    /// Call any onStatus event handler passing it
+    /// any queued status change, see _statusQueue
+    //
+    /// Will NOT lock the statusMutex itself, rather it will
+    /// iteratively call the popNextPendingStatusNotification()
+    /// private method, which will take care of locking it.
+    /// This is to make sure onStatus handler won't call methods
+    /// possibly trying to obtain the lock again (::play, ::pause, ...)
+    ///
+    void processStatusNotifications();
+    
+    
+    void processNotify(const std::string& funcname, as_object* metadata_obj);
+
+    // The size of the buffer in milliseconds
+    boost::uint32_t m_bufferTime;
+
+    // Are a new frame ready to be returned?
+    volatile bool m_newFrameReady;
+
+    // Mutex to insure we don't corrupt the image
+    boost::mutex image_mutex;
+
+    // The image/videoframe which is given to the renderer
+    std::auto_ptr<GnashImage> m_imageframe;
+
+    // The video URL
+    std::string url;
+
+    // The input media parser
+    std::auto_ptr<media::MediaParser> m_parser;
+
+    // Are we playing a FLV?
+    // The handler which is invoked on status change
+    boost::intrusive_ptr<as_function> m_statusHandler;
+
+    // The position in the inputfile, only used when not playing a FLV
+    long inputPos;
+
+#ifdef GNASH_USE_GC
+    /// Mark all reachable resources of a NetStream_as, for the GC
+    //
+    /// Reachable resources are:
+    /// - associated NetConnection object (_netCon)
+    /// - character to invalidate on video updates (_invalidatedVideoCharacter)
+    /// - onStatus event handler (m_statusHandler)
+    ///
+    virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
+
+    /// Unplug the advance timer callback
+    void stopAdvanceTimer();
+
+    /// Register the advance timer callback
+    void startAdvanceTimer();
+
+    /// The character to invalidate on video updates
+    character* _invalidatedVideoCharacter;
 
 private:
 
@@ -597,12 +599,7 @@ private:
 
 };
 
+} // gnash namespace
 
-// Initialize the global NetStream class
-void netstream_class_init(as_object& global);
-
-} // end of gnash namespace
-
-// __NETSTREAM_H__
 #endif
 

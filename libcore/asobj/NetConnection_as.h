@@ -55,6 +55,8 @@ public:
 	NetConnection_as();
 	~NetConnection_as();
 
+    static void init(as_object& global);
+
     /// Process connection stuff
     virtual void advanceState();
 
@@ -126,8 +128,6 @@ private:
     void startAdvanceTimer();
 
     void stopAdvanceTimer();
-
-    int _advanceTimer;
 };
 
 void netconnection_class_init(as_object& global);
