@@ -1434,17 +1434,27 @@ movie_root::setQuality(Quality q)
     if (rcfile.qualityLevel() >= 0) {
         int ql = rcfile.qualityLevel();
         ql = std::min<int>(ql, QUALITY_BEST);
-        _quality = static_cast<Quality>(ql);
+        q = static_cast<Quality>(ql);
     }
-    else {
+
+    if ( _quality != q )
+    {
+        // Force a redraw if quality changes
+        //
+        // redraw should only happen on next
+        // frame advancement (tested)
+        //
+        setInvalidated();
+
         _quality = q;
     }
+
+
+    // We always tell the renderer, because it could
+    // be the first time we do
     render_handler* renderer = get_render_handler();
     if (renderer) renderer->setQuality(_quality);
 
-    // force a redraw
-    // TODO: check if the redraw should be immediate
-    setInvalidated();
 }
 
 /// Get actionscript width of stage, in pixels. The width
