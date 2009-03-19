@@ -136,6 +136,7 @@ noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	SimpleBuffer.h \
 	extension.h \
+	GnashNumeric.h \
 	GnashException.h \
 	gettext.h \
 	jemtree.h \
