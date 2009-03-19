@@ -214,9 +214,11 @@ process would be:
              make check
              make install
 
-   If you are compiling with GCC you will probably need to use a machine
-with at least 128 megabytes of physical RAM; 64MB is not enough for a
-couple of the files, even with swap enabled and optimisation turned off.
+   If you are compiling with GCC you will need to use a machine with at
+least 128 megabytes of physical RAM; 64MB is not enough for a couple of
+the files, even with swap enabled and optimisation turned off.  With
+less than 512 megabytes available, many build combinations can still be
+a long and painful experience.
 
    At present the Gnash source is about 30 MB extracted and configured
 and requires a total of about 125 megabytes to compile it.
@@ -233,10 +235,10 @@ File: gnash_ref.info,  Node: Getting The Source,  Next: Code Dependencies,  Prev
 * Menu:
 
 * Releases::
-* CVS Access::
+* Bzr Access::
 
 
-File: gnash_ref.info,  Node: Releases,  Next: CVS Access,  Up: Getting The Source
+File: gnash_ref.info,  Node: Releases,  Next: Bzr Access,  Up: Getting The Source
 
 2.2.1 Releases
 --------------
@@ -247,24 +249,26 @@ project's GNU Savannah page at http://savannah.gnu.org/projects/gnash
 http://ftp.gnu.org/gnu/gnash (http://ftp.gnu.org/gnu/gnash)
 
 
-File: gnash_ref.info,  Node: CVS Access,  Prev: Releases,  Up: Getting The Source
+File: gnash_ref.info,  Node: Bzr Access,  Prev: Releases,  Up: Getting The Source
 
-2.2.2 CVS Access
+2.2.2 Bzr Access
 ----------------
 
-The latest Gnash development sources are available via anonymous CVS.
-Use the following commands to check them out (just hit return when you
-are prompted for the password):
+The latest Gnash development sources are available via bzr.  Use the
+following commands to check them out:
 
 
-     	  export CVS_RSH=ssh
-     	  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+     	mkdir gnash
+     	cd gnash
+     	bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk
 
-You will then be able to update your copy from the repository using
+At any time, other temporary development branches may also be
+available. Replace _trunk_ with the branch name to check these out.
+You can update your copy from the main repository using:
 
 
-     	  cd gnash
-     	  cvs update -d
+     	  cd trunk
+     	  bzr pull
 
    If you only have access to the internet via a web proxy, you will
 find daily source snapshots of the latest CVS tree in
@@ -279,13 +283,13 @@ File: gnash_ref.info,  Node: Code Dependencies,  Next: Testing Dependencies,  Pr
 
 Gnash has a number of dependencies on other packages.  If you install
 the dependencies using a package manager, be certain to install the
-development versions of the packages.  The normal versions are often
-missing the headers Gnash needs to compile.
+development versions of the packages.  The normal versions often lack
+the headers Gnash needs to compile.
 
-   Some dependencies have other dependencies, like GTk also needs
-glib2, atk, and pango to produce a fully linked executable. Different
-distributions also use differing dependencies, sometimes a package will
-depend on libxml2 on one system, but libexpat on another.
+   Some dependencies have other dependencies: for instance, GTK also
+needs glib2, atk, and pango to produce a fully linked executable.
+Different distributions also use differing dependencies, sometimes a
+package will depend on libxml2 on one system, but libexpat on another.
 
 *Code Dependency Table*
 
@@ -306,18 +310,6 @@ Boost      Required   1.32 or     Boost is  In Gnash,  `libboost-thread-dev,`
                                             thread                
                                             and mutext            
                                             handling.             
-libxml2    Required               Libxml2   This       `libxml2-dev'`libxml2-devel'`libxml2'
-                                 is the     library               
-                                 GNOME XML  is used               
-                                 parser     to parse              
-                                 library    messages              
-                                 and is     for the               
-                                 available  XML                   
-                                 at         XMLNode,              
-                                 http://xmlsoft.orgor                    
-                                 (http://xmlsoft.org).XMLSocket             
-                                            ActionScript           
-                                            classes.              
 AGG        Possibly   2.4 or      AGG is    Gnash      `libagg-dev'`agg-devel'`agg'
            Required   higher     the        requires              
                                  AntiGrain  the                   
@@ -546,25 +538,44 @@ FFMPEG     Possibly               FFMPEG    If you     `ffmpeg-dev'`ffmpeg-devel
                                             can be                
                                             used                  
                                             directly.             
-JPEG       Optional              JPEG       This       `libjpeg62-dev'`libjpeg'`jpeg'
+JPEG       Required              JPEG       This       `libjpeg62-dev'`libjpeg'`jpeg'
                                  (http://www.ijg.org/)library               
                                  is a       is used               
                                  lossy      for                   
-                                 image      rendering             
-                                 format     JPEGs.                
-                                 which is                         
-                                 heavily                          
-                                 used for                         
-                                 images.                          
-PNG        Optional              PNG        This       `libpng12-dev'`libpng'`png'
+                                 image      reading               
+                                 format     external              
+                                 which is   JPEGs and             
+                                 heavily    JPEG data             
+                                 used for   embedded              
+                                 images.    in SWF                
+                                            files.                
+PNG        Required              PNG        This       `libpng12-dev'`libpng'`png'
                                  (http://www.libpng.org/pub/png/)library               
                                  is a       is used               
                                  patent-freefor                   
-                                 image      rendering             
-                                 format     PNGs.                 
-                                 which is                         
-                                 comparable                       
-                                 to _GIF_.                        
+                                 image      loading               
+                                 format     external              
+                                 which is   PNG                   
+                                 comparable images                
+                                 to _GIF_.  (part of              
+                                            the SWF8              
+                                            specification)           
+                                            and for               
+                                            writing               
+                                            images in             
+                                            the PNG               
+                                            format.               
+GIF        Required              GIF is a   This       `libungif-dev'`libungif-devel'`gif'
+                                 common     library               
+                                 image      is used               
+                                 format     for                   
+                                 that       loading               
+                                 should now external              
+                                 be free    GIF                   
+                                 of patent  images                
+                                 restrictions.(part of              
+                                 _GIF_.     the SWF8              
+                                            specification).           
 libcurl    Optional               libcurl   This       `libcurl4-gnutls'`libcurl'`curl'
                                  is the     library               
                                  multiprotocalis used               
@@ -1031,6 +1042,16 @@ Option                               Function
 `--enable-write'                     Makes the Mozilla plugin write the
                                      currently playing SWF movie to
                                      `/tmp'.
+`--disable-sa-launcher'              Drops the NPAPI plugin support for
+                                     writing a standalone executable
+                                     launcher script for the currently
+                                     playing SWF movie to `/tmp'. Note
+                                     that you'll still need to add a
+                                     'writelauncher' string to your
+                                     GNASH_OPTIONS environment variable
+                                     for the script to be created, even
+                                     if the compile-time support is
+                                     enabled.
 `--disable-mit-shm'                  Disable support for the MIT-SHM X
                                      extensions.  Currently support is
                                      only available using GTK gui and
@@ -1057,12 +1078,6 @@ configure test fails to find a component.  Please report the problem
 Option                               Function
 `--x-includes=DIR'                    X include files are in DIR.
 `--x-libraries=DIR'                   X library files are in DIR.
-`--with-libxml=PFX'                   Prefix to where libxml is
-                                     installed.
-`--with-libxml-libraries=DIR'         Directory where libxml library is
-                                     installed.
-`--with-libxml-includes=DIR'          Directory where libxml header
-                                     files are installed.
 `--with-docbook=DIR'                  Directory where the DocBook
                                      style-sheets are installed.
 `--with-sdl-prefix=PFX'               Prefix where SDL is installed.
@@ -1420,9 +1435,9 @@ File: gnash_ref.info,  Node: Movie tests,  Next: ActionScript Unit Tests,  Up: R
 2.9.2.1 Movie tests
 ...................
 
-This creates a Flash movie version of the test case, which can be run
-with a standalone Flash player.  For instance, the target for SWF
-version 6 could be run with Gnash:
+This creates a SWF movie version of the test case, which can be run
+with a standalone SWF player.  For instance, the target for SWF version
+6 could be run with Gnash:
 
 
      	    gnash -v XML-v6.swf
@@ -1630,8 +1645,8 @@ File: gnash_ref.info,  Node: A Tour of Gnash,  Next: Sound handling in Gnash,  U
 The top level of Gnash has several libraries, _libgnashbase_,
 _libgnashserver_, _libgnashmedia_, _libgnashamf_ and _libgnashbackend_.
 There are several utility programs included for debug parsing and
-processing of Flash movie files, and other useful utilities for
-examining local Shared Objects and sniffing LocalConnections.
+processing of SWF movie files, and other useful utilities for examining
+local Shared Objects and sniffing LocalConnections.
 
 * Menu:
 
@@ -1687,9 +1702,9 @@ File: gnash_ref.info,  Node: libgnashmedia,  Next: libgnashamf,  Prev: libgnashs
 
 Libgnashmedia handles Gnash's audio and video capabilities, dealing
 with streamed video and sound as well as decoding embedded media
-frames. Besides the standard Flash formats FLV, MPEG4, Nellymoser,
-ADPCM, MP3 and RAW, Gnash can decode other formats supports by
-gstreamer or ffmpeg, including the free OGG container and free codecs.
+frames. Besides the standard SWF formats FLV, MPEG4, Nellymoser, ADPCM,
+MP3 and RAW, Gnash can decode other formats supports by gstreamer or
+ffmpeg, including the free OGG container and free codecs.
 
 
 File: gnash_ref.info,  Node: libgnashamf,  Next: libgnashbackend,  Prev: libgnashmedia,  Up: The Libraries
@@ -1735,7 +1750,7 @@ File: gnash_ref.info,  Node: The Applications,  Next: The Plugin,  Prev: The Lib
 ----------------------
 
 There are currently a few standalone programs in Gnash, which serve
-either to assist with Gnash development or to play flash movies.
+either to assist with Gnash development or to play SWF movies.
 
 * Menu:
 
@@ -1760,7 +1775,7 @@ File: gnash_ref.info,  Node: Gprocessor,  Next: SOLdumper,  Prev: The Standalone
 ..................
 
 Gprocessor is used to print out the actions (using the -va option) or
-the parsing (using the -vp option) of a flash movie. It is also used to
+the parsing (using the -vp option) of a SWF movie. It is also used to
 produce the _.gsc_ files that Gnash uses to cache data, thereby
 speeding up the loading of files.
 
@@ -1866,8 +1881,8 @@ display. This enables one to then run the standalone player and display
 its output in the browser.
 
    While this is not an optimal solution, it does enable one to use
-Gnash as the flash player when browsing. The main issue appears to be
-that the Flash movie being played doesn't get any mouse or keyboard
+Gnash as the SWF player when browsing. The main issue appears to be
+that the SWF movie being played doesn't get any mouse or keyboard
 input. That may be a mozplugger configuration issue, however.
 
    Use of MozPlugger is obsolete now that the Gnash plugin works.
@@ -2128,19 +2143,18 @@ The current SDL sound backend has replaced the original sound handler,
 based on SDL_mixer, which by design had some limitations, making it
 difficult to implement needed features such as support for soundstreams.
 The SDL sound backend supports both event-sounds and soundstreams,
-using Gnash's internal ADPCM, and optionally MP3 support, using either
-FFMPEG or LIBMAD.  When it receives sound data it is stored without
-being decoded, unless it is ADPCM, which is decoded in the parser. When
-playing, backend relies on a function callback for retrieving output
-sound, which is decoded and re-sampled if needed, and all sound output
-is mixed together.  The current SDL sound backend was made since Gnash
-needed a working sound backend as soon as possible, and since the
-gstreamer backend at the time suffered from bugs and/or lack of
-features in gstreamer. The result was the most complete and best sound
-handler so far.  The advantages of the SDL sound handler is speed, and
-ease of use, while its only real disadvantage is that it has to be
-compiled with MP3 support, which some Linux distributions will probably
-not like...
+using Gnash's internal ADPCM, and optionally MP3 support, using FFMPEG.
+When it receives sound data it is stored without being decoded, unless
+it is ADPCM, which is decoded in the parser. When playing, backend
+relies on a function callback for retrieving output sound, which is
+decoded and re-sampled if needed, and all sound output is mixed
+together.  The current SDL sound backend was made since Gnash needed a
+working sound backend as soon as possible, and since the gstreamer
+backend at the time suffered from bugs and/or lack of features in
+gstreamer. The result was the most complete and best sound handler so
+far.  The advantages of the SDL sound handler is speed, and ease of use,
+while its only real disadvantage is that it has to be compiled with MP3
+support, which some Linux distributions will probably not like...
 
 
 File: gnash_ref.info,  Node: The Gstreamer backend,  Next: Future audio backends,  Prev: The SDL sound backend,  Up: Sound handling in Gnash
@@ -2251,9 +2265,9 @@ File: gnash_ref.info,  Node: Testing Tools,  Next: Test Cases,  Up: Testing
 -------------------
 
 Currently Gnash uses three other tools to help with testing. Two of
-these are free compilers for the Flash format. This lets us write
-simple test cases for Gnash to test specific features, and to see how
-the features operate.
+these are free compilers for the SWF format. This lets us write simple
+test cases for Gnash to test specific features, and to see how the
+features operate.
 
    The primary compiler used at this time is Ming (http://ming.sf.net).
 Since release 0.3, _Ming_ includes a command-line compiler, _makeswf_.
@@ -2325,7 +2339,7 @@ result was in case of a failure.
 
    Additionally, the check.as file provides a transparent way to send
 results to a TextField rather then using trace. This is very useful
-when you use a flash player without tracing support.
+when you use a SWF player without tracing support.
 
    Test units are built by running _make TestName-v#.swf_.  This will
 use TestName.as as source and the value of # as target version.
@@ -3096,23 +3110,23 @@ File: gnash_ref.info,  Node: Gnash Extensions,  Next: RTMP Protocol,  Prev: Repo
 5 Gnash Extensions
 ******************
 
-Gnash supports extending the Flash specification by creating custom
+Gnash supports extending the SWF specification by creating custom
 ActionScript classes that are compiled code, as opposed to the existing
 method of defining custom classes as ActionScript. Executing compiled
 code has many performance benefits over having to interpret the byte
 stream of the ActionScript opcodes.
 
    I can already hear people complaining now about the concept of
-extending Flash, so this in no way affects Gnash's ability to play
-Flash movies when functioning as a browser plugin.  Gnash's goal is
-still to function in a way that is compatible with the current
-proprietary Flash player.
+extending SWF, so this in no way affects Gnash's ability to play SWF
+movies when functioning as a browser plugin.  Gnash's goal is still to
+function in a way that is compatible with the current proprietary Flash
+player.
 
-   But at the same time, we see Flash as the ideal scripting language
-for a digital multi-media streaming environment. There are many
-resources for Flash movie creators for widgets, higher level APIs, all
-sorts of desirable things. But for those of use committed to using free
-software tools for Flash, our options are very limited.
+   But at the same time, we see SWF as the ideal scripting language for
+a digital multi-media streaming environment. There are many resources
+for SWF movie creators for widgets, higher level APIs, all sorts of
+desirable things. But for those of use committed to using free software
+tools for SWF, our options are very limited.
 
    Rather than launching a multi-year project to duplicate all classes
 in the commercial Flash IDE, it's much more efficient to use existing
@@ -3124,13 +3138,13 @@ support is moved to the player side. Movies with all of the goodies of
 the proprietary IDE in them play in Gnash just fine, as it's all just
 byte codes by then.
 
-   This trick works because until Flash player version 9, all the
-ActionScript class names and methods are passed as ASCII strings into
-the Flash movie. So the Gnash Virtual Machine just loads the extension
-file if that class name is invoked in the movie. All extension files
-specify the class name and methods it implements in an identical style
-as adding any new ActionScript class. The advantage is the class itself
-is compiled code, and runs much faster than the equivalent byte codes
+   This trick works because until SWF version 9, all the ActionScript
+class names and methods are passed as ASCII strings into the SWF movie.
+So the Gnash Virtual Machine just loads the extension file if that
+class name is invoked in the movie. All extension files specify the
+class name and methods it implements in an identical style as adding
+any new ActionScript class. The advantage is the class itself is
+compiled code, and runs much faster than the equivalent byte codes
 which all have to be interpreted..
 
 * Menu:
@@ -3191,7 +3205,7 @@ interface of the newly created object so that Gnash can find and use it.
 sets the other function callbacks for all the methods this class
 supports. The method callbacks are attached to the parent class by
 using _init_member()_ to set a C function pointer to the string value
-used in the Flash movie.
+used in the SWF movie.
 
 
      	// Attach DummyClass 'func1' and 'func2' methods to the given object
@@ -3333,8 +3347,8 @@ console.
            }
 
    Once you have set the breakpoints you want, reset the value of the
-_stall_ variable to break out of the loop, and the Flash movie will
-then continue playing.
+_stall_ variable to break out of the loop, and the SWF movie will then
+continue playing.
 
 
            (gdb) set variable stall = false;
@@ -3494,13 +3508,13 @@ This document is based mostly on my own reverse engineering of the RTMP
 protocol and AMF format. _tcpdump_ and _ethereal_ are your friend. Some
 additional info that got me started was from the Red5
 (http://www.osflash.org/red5) project. _Red5_ is the only other open
-source Flash server. So some details are still vague, but as the
+source SWF server. So some details are still vague, but as the
 implementation appears to work, we'll figure out what they are later.
 
    The Real Time Messaging Protocol was created by MacroMedia (now
-Adobe) for delivering Flash objects and video over a network
-connection. Currently the only servers which support this format are
-the MacroMedia Media sever, and the Open Source Red5 project.
+Adobe) for delivering SWF objects and video over a network connection.
+Currently the only servers which support this format are the MacroMedia
+Media sever, and the Open Source Red5 project.
 
    This is a simple protocol, optimized for poor bandwidth connections.
 It can support up to 64 concurrent streams over the same network
@@ -3513,8 +3527,6 @@ tunnel RTMP over an HTTP connection using port 80. Each AMF packet is
 
    The basics of the RTMP protocol are as follows. All communications
 are initiated by the client.
-
-Image of the RTMP protocol.
 
    The client starts the RTMP connection by sending a single byte with
 a value of 0x3. This byte is followed by a data block of 1536 bytes.
@@ -3536,8 +3548,8 @@ packet. This doesn't appear to do much but notify the server the client
 is happy with the handshake, and ready to start reading packets.
 
    The second packet is the _NetConnection_ object from the client.
-This ActionScript class is used by the Flash movie to create the
-network connection to the server.
+This ActionScript class is used by the SWF movie to create the network
+connection to the server.
 
    The third packet is the _NetStream_ object from the client. This is
 the ActionScript class used to specify the file to be streamed by the
@@ -3560,10 +3572,10 @@ message was read or not.
 
    The RTMP header is first, followed by the connect message as an
 ASCII string as the message body. The following AMF packet is the
-_NetConnection_ one, which specifies that this is coming from a Flash
+_NetConnection_ one, which specifies that this is coming from a SWF
 application. This also contains the file path the server can use to
 find the file to stream. This is then followed by the version number,
-which I assume is the version of the Flash player, so the server knows
+which I assume is the version of the SWF player, so the server knows
 what it is talking to.
 
    The third packet is the one from _NetStream_, which specifies the
@@ -3571,7 +3583,7 @@ URL used for the movie, followed by the user name for a semblance of
 security.
 
    For the next level of detail, we'll explain the format of AMF. AMF
-is used by the RTMP protocol to transfer data. Each Flash object is
+is used by the RTMP protocol to transfer data. Each SWF object is
 encapsulated in an AMF packet, including streaming audio or video.
 
    The first byte of the RTMP header determines two things about the
@@ -3642,7 +3654,7 @@ type of the AMF object.
 
 0x14
      This specifies the content type of the RTMP message is remote
-     procedure call. This invokes the method of a Flash class remotely.
+     procedure call. This invokes the method of a SWF class remotely.
 
    There are two sets of data types to consider. One set is used by the
 to specify the content type of the AMF object, the other is an
@@ -3653,7 +3665,7 @@ transferred.
 
 0x0
      This specifies the data in the AMF packet is a numeric value. All
-     numeric values in Flash are 64 bit, _big-endian_.
+     numeric values in SWF are 64 bit, _big-endian_.
 
 0x1
      This specifies the data in the AMF packet is a boolean value.
@@ -3662,21 +3674,21 @@ transferred.
      This specifies the data in the AMF packet is an _ASCII_ string.
 
 0x3
-     This specifies the data in the AMF packet is a Flash object. The
-     Flash object data type field further along in the message
-     specifies which type of ActionScript object it is.
+     This specifies the data in the AMF packet is a SWF object. The SWF
+     object data type field further along in the message specifies
+     which type of ActionScript object it is.
 
 0x4
-     This specifies the data in the AMF packet is a Flash movie, ie.
-     another Flash movie.
+     This specifies the data in the AMF packet is a SWF movie, ie.
+     another SWF movie.
 
 0x5
      This specifies the data in the AMF packet is a NULL value. NULL is
-     often used as the return code from calling Flash functions.
+     often used as the return code from calling SWF functions.
 
 0x6
      This specifies the data in the AMF packet is a undefined. This is
-     also used as the return code from calling Flash functions.
+     also used as the return code from calling SWF functions.
 
 0x7
      This specifies the data in the AMF packet is a reference.
@@ -3762,8 +3774,8 @@ File: gnash_ref.info,  Node: AMF Format,  Up: RTMP Protocol
 
 The AMF format is used in the LocalConnection, SharedObject,
 NetConnection, and NetStream ActionScript classes. This is a means of
-binary data interchange between Flash movies, or between a Flash player
-and a Flash server.
+binary data interchange between SWF movies, or between a SWF player and
+a SWF server.
 
    Like the RTMP messages, an AMF packet header can be of a variable
 size. The size is either the same as the initial header of the RTMP
@@ -4574,137 +4586,137 @@ Node: Audience2803
 Node: What Is Supported?3130
 Node: Building from Source5637
 Node: Overview6017
-Node: Getting The Source7059
-Node: Releases7265
-Node: CVS Access7633
-Node: Code Dependencies8345
-Ref: Code Dependency Table9042
-Node: Testing Dependencies34557
-Ref: Testing Dependency Table34866
-Node: Documentation Dependencies38790
-Ref: Documentation Dependency Table39059
-Node: Configuring Gnash48127
-Node: Features50421
-Ref: Configuration Options - Features51021
-Node: Specifying Custom Paths57418
-Ref: Custom Path Options57888
-Node: Compiling the Code69993
-Node: Creating the Documentation70934
-Node: Running the Tests72280
-Node: Using DejaGnu72734
-Node: Increasing Verbosity73097
-Node: Running Some Tests73633
-Node: Running The Tests Manually74453
-Node: Movie tests75115
-Node: ActionScript Unit Tests75469
-Node: Installation75786
-Node: Libraries77099
-Node: Executables77955
-Node: Documentation78825
-Node: Cross Configuring79580
-Node: Software Internals82660
-Node: A Tour of Gnash82929
-Node: The Libraries83497
-Node: libgnashbase83767
-Node: libgnashserver84194
-Node: libgnashmedia84565
-Node: libgnashamf85054
-Node: libgnashbackend85476
-Node: libgnashplugin85791
-Node: libklashpart85997
-Node: The Applications86167
-Node: The Standalone Player86537
-Node: Gprocessor86834
-Node: SOLdumper87228
-Node: Dumpshm87495
-Node: The Plugin87714
-Node: Current Implementation88204
-Node: GUI Support88745
-Node: Mozplugger90434
-Node: Klash92325
-Node: The Message Logging System92875
-Node: Logging System API94432
-Node: The LogFile Instance97266
-Node: Sound handling in Gnash98750
-Node: Sound types99493
-Node: Sound parsing100030
-Node: Sound playback100598
-Node: The SDL sound backend101128
-Node: The Gstreamer backend102447
-Node: Future audio backends103463
-Node: Detailed description of the Gstreamer backend103953
-Node: Testing106204
-Node: Testing Tools106675
-Node: Test Cases107507
-Node: Writing ActionScript Tests108086
-Node: Writing Ming-based self-contained SWF tests110589
-Node: Using Ming-based test generators facilities111746
-Node: Writing self-contained SWF tests with other compilers114106
-Node: Writing Test Runners117231
-Node: Using the generic test runner for self-contained SWF tests118980
-Node: Writing Movie testers121070
-Node: Adding New ActionScript Class122810
-Node: Prototype123990
-Node: Declaration125407
-Node: Instantiation125672
-Node: Methods126299
-Node: Accessing Arguments126690
-Node: Returning a Value to ActionScript127086
-Node: Additional fn_call Members127465
-Node: Dynamic Properties128319
-Node: The as_value Object Type129824
-Node: Data Types130262
-Node: Determining the Type130583
-Node: Fetching the Value131115
-Node: Setting the Value and Type131605
-Node: Further Reading132199
-Node: Object ActionScript Class132614
-Node: The Methods of the Class132954
-Node: The Properties of the Object Class133293
-Node: Object Class Conformance133608
-Node: Reporting Bugs135147
-Node: Get a Fresh Binary Package136130
-Node: Determine if the bug was previously reported136916
-Node: Review the bug writing guidelines137734
-Node: Filing a bug report138785
-Node: Gnash Extensions139068
-Node: Creating A New Extension141338
-Node: Crafting an Extension142756
-Node: Debugging An Extension147060
-Node: Included Extensions148752
-Node: Gtk Extension149196
-Node: File I/O Extension150183
-Node: MySQL Extension151369
-Node: RTMP Protocol152220
-Node: AMF Format162016
-Node: Mozilla/Firefox NPAPI Plugin162992
-Node: Plugin C API164010
-Node: Plugin C++ API165869
-Node: OpenGL and Threads169133
-Node: Plugin Event Handling170461
-Node: Appendix171430
-Node: Code Style171582
-Node: Authors175412
-Node: GNU Free Documentation License176121
-Node: 0_ PREAMBLE176884
-Node: 1_ APPLICABILITY AND DEFINITIONS178190
-Ref: fdl-document178415
-Ref: fdl-modified178706
-Ref: fdl-secondary178893
-Ref: fdl-invariant179538
-Ref: fdl-cover-texts179787
-Ref: fdl-transparent180000
-Ref: fdl-title-page181290
-Node: 2_ VERBATIM COPYING181679
-Node: 3_ COPYING IN QUANTITY182659
-Node: 4_ MODIFICATIONS185016
-Node: 5_ COMBINING DOCUMENTS191076
-Node: 6_ COLLECTIONS OF DOCUMENTS192573
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS193464
-Node: 8_ TRANSLATION194692
-Node: 9_ TERMINATION195595
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE196250
-Node: Addendum197390
+Node: Getting The Source7159
+Node: Releases7365
+Node: Bzr Access7733
+Node: Code Dependencies8482
+Ref: Code Dependency Table9181
+Node: Testing Dependencies35154
+Ref: Testing Dependency Table35463
+Node: Documentation Dependencies39387
+Ref: Documentation Dependency Table39656
+Node: Configuring Gnash48724
+Node: Features51018
+Ref: Configuration Options - Features51618
+Node: Specifying Custom Paths58693
+Ref: Custom Path Options59163
+Node: Compiling the Code70910
+Node: Creating the Documentation71851
+Node: Running the Tests73197
+Node: Using DejaGnu73651
+Node: Increasing Verbosity74014
+Node: Running Some Tests74550
+Node: Running The Tests Manually75370
+Node: Movie tests76032
+Node: ActionScript Unit Tests76382
+Node: Installation76699
+Node: Libraries78012
+Node: Executables78868
+Node: Documentation79738
+Node: Cross Configuring80493
+Node: Software Internals83573
+Node: A Tour of Gnash83842
+Node: The Libraries84408
+Node: libgnashbase84678
+Node: libgnashserver85105
+Node: libgnashmedia85476
+Node: libgnashamf85963
+Node: libgnashbackend86385
+Node: libgnashplugin86700
+Node: libklashpart86906
+Node: The Applications87076
+Node: The Standalone Player87444
+Node: Gprocessor87741
+Node: SOLdumper88133
+Node: Dumpshm88400
+Node: The Plugin88619
+Node: Current Implementation89109
+Node: GUI Support89650
+Node: Mozplugger91339
+Node: Klash93226
+Node: The Message Logging System93776
+Node: Logging System API95333
+Node: The LogFile Instance98167
+Node: Sound handling in Gnash99651
+Node: Sound types100394
+Node: Sound parsing100931
+Node: Sound playback101499
+Node: The SDL sound backend102029
+Node: The Gstreamer backend103330
+Node: Future audio backends104346
+Node: Detailed description of the Gstreamer backend104836
+Node: Testing107087
+Node: Testing Tools107558
+Node: Test Cases108388
+Node: Writing ActionScript Tests108967
+Node: Writing Ming-based self-contained SWF tests111468
+Node: Using Ming-based test generators facilities112625
+Node: Writing self-contained SWF tests with other compilers114985
+Node: Writing Test Runners118110
+Node: Using the generic test runner for self-contained SWF tests119859
+Node: Writing Movie testers121949
+Node: Adding New ActionScript Class123689
+Node: Prototype124869
+Node: Declaration126286
+Node: Instantiation126551
+Node: Methods127178
+Node: Accessing Arguments127569
+Node: Returning a Value to ActionScript127965
+Node: Additional fn_call Members128344
+Node: Dynamic Properties129198
+Node: The as_value Object Type130703
+Node: Data Types131141
+Node: Determining the Type131462
+Node: Fetching the Value131994
+Node: Setting the Value and Type132484
+Node: Further Reading133078
+Node: Object ActionScript Class133493
+Node: The Methods of the Class133833
+Node: The Properties of the Object Class134172
+Node: Object Class Conformance134487
+Node: Reporting Bugs136026
+Node: Get a Fresh Binary Package137009
+Node: Determine if the bug was previously reported137795
+Node: Review the bug writing guidelines138613
+Node: Filing a bug report139664
+Node: Gnash Extensions139947
+Node: Creating A New Extension142194
+Node: Crafting an Extension143612
+Node: Debugging An Extension147914
+Node: Included Extensions149604
+Node: Gtk Extension150048
+Node: File I/O Extension151035
+Node: MySQL Extension152221
+Node: RTMP Protocol153072
+Node: AMF Format162811
+Node: Mozilla/Firefox NPAPI Plugin163781
+Node: Plugin C API164799
+Node: Plugin C++ API166658
+Node: OpenGL and Threads169922
+Node: Plugin Event Handling171250
+Node: Appendix172219
+Node: Code Style172371
+Node: Authors176201
+Node: GNU Free Documentation License176910
+Node: 0_ PREAMBLE177673
+Node: 1_ APPLICABILITY AND DEFINITIONS178979
+Ref: fdl-document179204
+Ref: fdl-modified179495
+Ref: fdl-secondary179682
+Ref: fdl-invariant180327
+Ref: fdl-cover-texts180576
+Ref: fdl-transparent180789
+Ref: fdl-title-page182079
+Node: 2_ VERBATIM COPYING182468
+Node: 3_ COPYING IN QUANTITY183448
+Node: 4_ MODIFICATIONS185805
+Node: 5_ COMBINING DOCUMENTS191865
+Node: 6_ COLLECTIONS OF DOCUMENTS193362
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS194253
+Node: 8_ TRANSLATION195481
+Node: 9_ TERMINATION196384
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE197039
+Node: Addendum198179
 
 End Tag Table
 
