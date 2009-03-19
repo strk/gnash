@@ -54,9 +54,9 @@ CLEANFILES = \
 	$(NULL)
 
 GNASH_LIBS = \
-	$(top_builddir)/libcore/libgnashcore.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libcore/libgnashcore.la \
 	$(NULL)
 
 if USE_FFMPEG_ENGINE
