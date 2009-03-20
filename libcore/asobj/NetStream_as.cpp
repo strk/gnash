@@ -117,9 +117,8 @@ NetStream_as::NetStream_as()
 {
 }
 
-// extern (used by Global.cpp)
 void
-netstream_class_init(as_object& global)
+NetStream_as::init(as_object& global)
 {
 
     // This is going to be the global NetStream "class"/"function"
