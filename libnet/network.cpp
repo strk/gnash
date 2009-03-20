@@ -828,6 +828,8 @@ Network::readNet(int fd, byte_t *buffer, int nbytes, int timeout)
     fd_set              fdset;
     int                 ret = -1;
 
+//     boost::mutex::scoped_lock lock(_net_mutex);
+
     if (_debug) {
 	log_debug (_("Trying to read %d bytes from fd #%d"), nbytes, fd);
     }
@@ -1005,6 +1007,8 @@ Network::writeNet(int fd, const byte_t *buffer, int nbytes, int timeout)
     fd_set              fdset;
     int                 ret = -1;
 
+    boost::mutex::scoped_lock lock(_net_mutex);
+    
     // We need a writable, and not const point for byte arithmetic.
     byte_t *bufptr = const_cast<byte_t *>(buffer);
 

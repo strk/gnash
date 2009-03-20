@@ -842,12 +842,31 @@ RTMP::decodeInvoke()
 // interval. The byte boundary defaults to 128 bytes (video data), but can
 // be changed by the ChunkSize() command.
 bool
+RTMP::sendMsg(int channel, rtmp_headersize_e head_size,
+	      size_t total_size, content_types_e type,
+	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data)
+{
+//    GNASH_REPORT_FUNCTION;
+    return sendMsg(getFileFd(), channel, head_size, total_size, type, routing, data.reference(), data.allocated());
+}
+
+bool
 RTMP::sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
 	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data)
 {
 //    GNASH_REPORT_FUNCTION;
     return sendMsg(fd, channel, head_size, total_size, type, routing, data.reference(), data.allocated());
+}
+
+
+bool
+RTMP::sendMsg(int channel, rtmp_headersize_e head_size,
+	      size_t total_size, content_types_e type,
+	      RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size)
+{
+//  GNASH_REPORT_FUNCTION;
+    return sendMsg(getFileFd(), channel, head_size, total_size, type, routing, data, size);
 }
 
 bool

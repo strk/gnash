@@ -1621,6 +1621,7 @@ namespace {
 as_value
 netstream_new(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<NetStream_as> netstream_obj = new NetStream_as;
 
@@ -1650,6 +1651,7 @@ netstream_new(const fn_call& fn)
 as_value
 netstream_close(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetStream_as> ns =
         ensureType<NetStream_as>(fn.this_ptr);
     ns->close();
@@ -1659,6 +1661,7 @@ netstream_close(const fn_call& fn)
 as_value
 netstream_pause(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetStream_as> ns = 
         ensureType<NetStream_as>(fn.this_ptr);
     
@@ -1678,6 +1681,7 @@ netstream_pause(const fn_call& fn)
 as_value
 netstream_play(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetStream_as> ns =
         ensureType<NetStream_as>(fn.this_ptr);
 
@@ -1706,6 +1710,7 @@ netstream_play(const fn_call& fn)
 as_value
 netstream_seek(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetStream_as> ns = 
         ensureType<NetStream_as>(fn.this_ptr);
 
@@ -1770,6 +1775,7 @@ netstream_attachVideo(const fn_call& fn)
 as_value
 netstream_publish(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetStream_as> ns = 
         ensureType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);
@@ -1806,6 +1812,7 @@ netstream_receiveVideo(const fn_call& fn)
 as_value
 netstream_send(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetStream_as> ns =
         ensureType<NetStream_as>(fn.this_ptr);
     UNUSED(ns);

@@ -108,7 +108,8 @@ public:
         HTTP_PUT,
         HTTP_DELETE,
         HTTP_TRACE,
-        HTTP_CONNECT
+        HTTP_CONNECT,
+	HTTP_RESPONSE		// unique to gnash
     } http_method_e;
     typedef enum {
 	OPEN,
@@ -116,10 +117,11 @@ public:
 	IDLE,
 	CLOSE
     } rtmpt_cmd_e;
-    struct status_codes {
-        const char *code;
-        const char *msg;
-    };
+    // A response from an FTTP request has a code an an error message
+    typedef struct {
+	http_status_e code;
+	std::string   msg;
+    } http_response_t;
     typedef struct {
 	int major;
 	int minor;
@@ -137,6 +139,14 @@ public:
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(boost::uint8_t *buf, size_t size);
     
+    // Convert the Content-Length field to a number we can use
+    size_t getContentLength();
+
+    // process all the header fields in the Buffer, storing them internally
+    // in _fields. The address returned is the address where the Content data
+    // starts, and is "Content-Length" bytes long, of "Content-Type" data.
+    boost::uint8_t *processHeaderFields(amf::Buffer &buf);
+    
     // Get the field for header 'name' that was stored by processHeaderFields()
     std::string &getField(const std::string &name) { return _fields[name]; };
     size_t NumOfFields() { return _fields.size(); };
@@ -144,6 +154,16 @@ public:
 
     // Get an array of values for header field 'name'.
     boost::shared_ptr<std::vector<std::string> > getFieldItem(const std::string &name);
+
+    // Client side parsing of response message codes
+    boost::shared_ptr<http_response_t> parseStatus(const std::string &line);
+
+    // Handle the response for the request.
+    boost::shared_ptr<amf::Buffer> formatServerReply(http_status_e code);
+    amf::Buffer &formatGetReply(DiskStream::filetype_e type, size_t size, http_status_e code); 
+    amf::Buffer &formatGetReply(size_t size, http_status_e code); 
+    amf::Buffer &formatGetReply(http_status_e code); 
+    amf::Buffer &formatPostReply(rtmpt_cmd_e code);
 
     // Make copies of ourself
     HTTP &operator = (HTTP &obj);
@@ -271,6 +291,12 @@ public:
     std::string &getDocRoot() { return _docroot; };
     
 protected:
+    // Examine the beginning of the data for an HTTP request command
+    // like GET or POST, etc...
+    http_method_e extractCommand(boost::uint8_t *data);
+    http_method_e extractCommand(amf::Buffer &data)
+	{ return extractCommand(data.reference()); };    
+
     typedef boost::char_separator<char> Sep;
     typedef boost::tokenizer<Sep> Tok;
     http_method_e	_cmd;

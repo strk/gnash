@@ -658,6 +658,76 @@ HTTPServer::formatEchoResponse(const std::string &num, boost::uint8_t *data, siz
 }
 #endif
 
+#if 0
+/// These methods extract data from an RTMPT message. RTMP is an
+/// extension to HTTP that adds commands to manipulate the
+/// connection's persistance.
+//
+/// The URL to be opened has the following form:
+/// http://server/<comand>/[<client>/]<index>
+/// <command>
+///    denotes the RTMPT request type, "OPEN", "SEND", "IDLE", "CLOSE")
+/// <client>
+///    specifies the id of the client that performs the requests
+///    (only sent for established sessions)
+/// <index>
+///    is a consecutive number that seems to be used to detect missing packages
+HTTP::rtmpt_cmd_e
+HTTP::extractRTMPT(boost::uint8_t *data)
+{
+    GNASH_REPORT_FUNCTION;
+
+    string body = reinterpret_cast<const char *>(data);
+    string tmp, cid, indx;
+    HTTP::rtmpt_cmd_e cmd;
+
+    // force the case to make comparisons easier
+    std::transform(body.begin(), body.end(), body.begin(), 
+               (int(*)(int)) toupper);
+    string::size_type start, end;
+
+    // Extract the command first
+    start = body.find("OPEN", 0);
+    if (start != string::npos) {
+        cmd = HTTP::OPEN;
+    }
+    start = body.find("SEND", 0);
+    if (start != string::npos) {
+        cmd = HTTP::SEND;
+    }
+    start = body.find("IDLE", 0);
+    if (start != string::npos) {
+        cmd = HTTP::IDLE;
+    }
+    start = body.find("CLOSE", 0);
+    if (start != string::npos) {
+        cmd = HTTP::CLOSE;
+    }
+
+    // Extract the optional client id
+    start = body.find("/", start+1);
+    if (start != string::npos) {
+	end = body.find("/", start+1);
+	if (end != string::npos) {
+	    indx = body.substr(end, body.size());
+	    cid = body.substr(start, (end-start));
+	} else {
+	    cid = body.substr(start, body.size());
+	}
+    }
+
+    _index = strtol(indx.c_str(), NULL, 0);
+    _clientid = strtol(cid.c_str(), NULL, 0);
+    end =  body.find("\r\n", start);
+//     if (end != string::npos) {
+//         cmd = HTTP::CLOSE;
+//     }
+
+    return cmd;
+}
+
+#endif
+
 /// These methods extract data from an RTMPT message. RTMP is an
 /// extension to HTTPServer that adds commands to manipulate the
 /// connection's persistance.
@@ -725,6 +795,7 @@ HTTPServer::extractRTMPT(boost::uint8_t *data)
     return cmd;
 }
 
+#if 0
 HTTPServer::http_method_e
 HTTPServer::extractCommand(boost::uint8_t *data)
 {
@@ -879,6 +950,7 @@ HTTPServer::processHeaderFields(amf::Buffer &buf)
     
     return buf.reference() + end + 4;
 }
+#endif
 
 void
 HTTPServer::dump()

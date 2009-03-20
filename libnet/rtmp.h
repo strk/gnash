@@ -280,11 +280,17 @@ public:
     // interval. (128 bytes for video data by default). Each message main
     // contain multiple packets.
     bool sendMsg(amf::Buffer &data);
-    bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+    bool sendMsg(int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
 	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data);
     bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
 	      size_t total_size, content_types_e type,
+	      RTMPMsg::rtmp_source_e routing, amf::Buffer &data);
+    bool sendMsg(int channel, rtmp_headersize_e head_size,
+		 size_t total_size, content_types_e type,
+		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
+    bool sendMsg(int fd, int channel, rtmp_headersize_e head_size,
+		 size_t total_size, content_types_e type,
 		 RTMPMsg::rtmp_source_e routing, boost::uint8_t *data, size_t size);
     
 #if 0

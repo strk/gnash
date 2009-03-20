@@ -25,13 +25,10 @@
 #include <iostream>
 #include <string>
 #include <boost/scoped_ptr.hpp>
-
-// FIXME: Get rid of this crap.
-#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
-# include <winsock.h>
-#else
-#include <arpa/inet.h> // for htons
-#endif
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "NetConnection_as.h"
 #include "log.h"
@@ -39,21 +36,33 @@
 #include "builtin_function.h"
 #include "movie_root.h"
 #include "Object.h" // for getObjectInterface
+
 #include "StreamProvider.h"
 #include "URLAccessManager.h"
 #include "URL.h"
+
+// for NetConnection_as.call()
 #include "VM.h"
 #include "amf.h"
+#include "http.h"
 #include "SimpleBuffer.h"
-#include "timers.h"
+#include "amf_msg.h"
+#include "buffer.h"
 #include "namedStrings.h"
-#include "GnashAlgorithm.h"
+#include "element.h"
+#include "network.h"
+#include "rtmp.h"
+#include "rtmp_client.h"
 
-//#define GNASH_DEBUG_REMOTING
+using namespace std;
+
+#define GNASH_DEBUG_REMOTING 1
 
 // Forward declarations.
 
 namespace gnash {
+
+boost::mutex _nc_mutex;
 
 namespace {
     void attachProperties(as_object& o);
@@ -69,624 +78,13 @@ namespace {
 
 }
 
-namespace {
-
-    boost::uint16_t readNetworkShort(const boost::uint8_t* buf);
-    boost::uint32_t readNetworkLong(const boost::uint8_t* buf);
-
-}
-
-//---- ConnectionHandler --------------------------------------------------------------
-
-/// Abstract connection handler class
-//
-/// This class abstract operations on network connections,
-/// specifically RPC and streams fetching.
-///
-class ConnectionHandler
-{
-public:
-
-    /// @param methodName
-    ///     A string identifying the remote procedure to call
-    ///
-    /// @param responseHandler
-    ///     Object to invoke response methods on.
-    ///
-    /// @param args
-    ///     A vector of arguments
-    ///
-    /// @param firstArg
-    ///     Index of first argument in the args vector
-    ///
-    ///
-    /// @return true if the call is queued, false otherwise
-    ///
-    virtual void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg)=0;
-
-    /// Get an stream by name
-    //
-    /// @param name
-    ///     Stream identifier
-    ///
-    virtual std::auto_ptr<IOChannel> getStream(const std::string& name);
-
-    /// Process pending traffic, out or in bound
-    //
-    /// Handles all networking for NetConnection::call() and dispatches
-    /// callbacks when needed. 
-    ///
-    /// Return true if wants to be advanced again, false otherwise.
-    ///
-    virtual bool advance()=0;
-
-    /// Return true if the connection has pending calls 
-    //
-    /// This will be used on NetConnection.close(): if current
-    /// connection has pending calls to process it will be
-    /// queued and only really dropped when advance returns
-    /// false
-    ///
-    virtual bool hasPendingCalls() const=0;
-
-    /// Mark reachable resources, if any. 
-    virtual void setReachable() const
-    {
-        // NOTE: usually this function gets
-        //       called *by* the _nc's setReachable
-        //       but we do this just to be safe
-        //       in case the _nc object is deleted
-        //       and doesn't properly drops us
-        //
-        _nc.setReachable();
-    }
-
-    virtual ~ConnectionHandler() {}
-
-protected:
-
-    /// Construct a connection handler bound to the given NetConnection object
-    //
-    /// The binding is used to notify statuses and errors
-    ///
-    ConnectionHandler(NetConnection_as& nc)
-        :
-        _nc(nc)
-    {}
-
-    // Object handling connection status messages
-    NetConnection_as& _nc;
-};
-
-std::auto_ptr<IOChannel>
-ConnectionHandler::getStream(const std::string&)
-{
-    log_unimpl("%s doesn't support fetching streams", typeName(*this));
-    return std::auto_ptr<IOChannel>(0);
-}
-
-//---- HTTPRemotingHandler (HTTPConnectionHandler) -----------------------------------------------
-
-/// Queue of remoting calls 
-//
-/// This class in made to handle data and do defered processing for
-/// NetConnection::call()
-///
-/// Usage:
-///
-/// pass a URL to the constructor
-///
-/// call enqueue with a SimpleBuffer containing an encoded AMF call. If action
-/// script specified a callback function, use the optional parameters to specify
-/// the identifier (which must be unique) and the callback object as an as_value
-///
-class HTTPRemotingHandler : public ConnectionHandler {
-
-public:
-
-    /// Create an handler for HTTP remoting
-    //
-    /// @param nc
-    ///     The NetConnection AS object to send status/error events to
-    ///
-    /// @param url
-    ///     URL to post calls to
-    ///
-    HTTPRemotingHandler(NetConnection_as& nc, const URL& url);
-
-    // See dox in ConnectionHandler
-    virtual bool hasPendingCalls() const
-    {
-        return _connection || queued_count;
-    }
-
-    // See dox in ConnectionHandler
-    virtual bool advance();
-
-    // See dox in ConnectionHandler
-    virtual void setReachable() const
-    {
-        for (CallbacksMap::const_iterator i=callbacks.begin(),
-                e=callbacks.end(); i!=e; ++i)
-        {
-            i->second->setReachable();
-        }
-        ConnectionHandler::setReachable();
-    }
-
-    // See dox in NetworkHandler class
-    virtual void call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg);
-
-private:
-
-    static const int NCCALLREPLYCHUNK=1024*200;
-
-    typedef std::map<std::string, as_object* > CallbacksMap;
-    CallbacksMap callbacks;
-
-    SimpleBuffer _postdata;
-    URL _url;
-    boost::scoped_ptr<IOChannel> _connection;
-    SimpleBuffer reply;
-    int reply_start;
-    int queued_count;
-    unsigned int _numCalls; // === queued_count ?
-
-    // Quick hack to send Content-Type: application/x-amf
-    // TODO: check if we should take headers on a per-call basis
-    //       due to NetConnection.addHeader.
-    //
-    NetworkAdapter::RequestHeaders _headers;
-
-    void push_amf(const SimpleBuffer &amf) 
-    {
-        //GNASH_REPORT_FUNCTION;
-
-        _postdata.append(amf.data(), amf.size());
-        queued_count++;
-    }
-
-    void push_callback(const std::string& id, as_object* callback)
-    {
-        callbacks[id] = callback;
-    }
-
-    as_object* pop_callback(const std::string& id)
-    {
-        CallbacksMap::iterator it = callbacks.find(id);
-        if (it != callbacks.end()) {
-            as_object* callback = it->second;
-            callbacks.erase(it);
-            return callback;
-        }
-        else return 0;
-    }
-
-    void enqueue(const SimpleBuffer &amf, const std::string& identifier,
-                 as_object* callback)
-    {
-        push_amf(amf);
-        push_callback(identifier, callback);
-    };
-
-    void enqueue(const SimpleBuffer &amf)
-    {
-        push_amf(amf);
-    };
-    
-};
-
-HTTPRemotingHandler::HTTPRemotingHandler(NetConnection_as& nc, const URL& url)
-        :
-        ConnectionHandler(nc),
-        _postdata(),
-        _url(url),
-        _connection(0),
-        reply(),
-        reply_start(0),
-        queued_count(0),
-        _numCalls(0) // TODO: replace by queued count ?
-{
-    // leave space for header
-    _postdata.append("\000\000\000\000\000\000", 6);
-    assert(reply.size() == 0);
-
-    _headers["Content-Type"] = "application/x-amf";
-}
-
-bool
-HTTPRemotingHandler::advance()
-{
-
-#ifdef GNASH_DEBUG_REMOTING
-    log_debug("advancing HTTPRemotingHandler");
-#endif
-    if(_connection)
-    {
-
-        VM& vm = _nc.getVM();
-
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("have connection");
-#endif
-
-        // Fill last chunk before reading in the next
-        size_t toRead = reply.capacity()-reply.size();
-        if ( ! toRead ) toRead = NCCALLREPLYCHUNK;
-
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("Attempt to read %d bytes", toRead);
-#endif
-
-        //
-        // See if we need to allocate more bytes for the next
-        // read chunk
-        //
-        if ( reply.capacity() < reply.size()+toRead )
-        {
-            // if _connection->size() >= 0, reserve for it, so
-            // if HTTP Content-Length response header is correct
-            // we'll be allocating only once for all.
-            size_t newCapacity = reply.size()+toRead;
-
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("NetConnection.call: reply buffer capacity (%d) "
-                      "is too small to accept next %d bytes of chunk "
-                      "(current size is %d). Reserving %d bytes.",
-                reply.capacity(), toRead, reply.size(), newCapacity);
-#endif
-
-            reply.reserve(newCapacity);
-
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug(" after reserve, new capacity is %d", reply.capacity());
-#endif
-        }
-
-        int read = _connection->readNonBlocking(reply.data() + reply.size(), toRead);
-        if(read > 0) {
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("read '%1%' bytes: %2%", read, 
-                    hexify(reply.data() + reply.size(), read, false));
-#endif
-            reply.resize(reply.size()+read);
-        }
-
-        // There is no way to tell if we have a whole amf reply without
-        // parsing everything
-        //
-        // The reply format has a header field which specifies the
-        // number of bytes in the reply, but potlatch sends 0xffffffff
-        // and works fine in the proprietary player
-        //
-        // For now we just wait until we have the full reply.
-        //
-        // FIXME make this parse on other conditions, including: 1) when
-        // the buffer is full, 2) when we have a "length in bytes" value
-        // thas is satisfied
-
-        if (_connection->bad())
-        {
-            log_debug("connection is in error condition, calling "
-                    "NetConnection.onStatus");
-            reply.resize(0);
-            reply_start = 0;
-            // reset connection before calling the callback
-            _connection.reset();
-
-            // This is just a guess, but is better than sending
-            // 'undefined'
-            _nc.notifyStatus(NetConnection_as::CALL_FAILED);
-        }
-        else if(_connection->eof() )
-        {
-            if ( reply.size() > 8)
-            {
-                std::vector<as_object*> objRefs;
-
-#ifdef GNASH_DEBUG_REMOTING
-                log_debug("hit eof");
-#endif
-                boost::int16_t si;
-                boost::uint16_t li;
-                const boost::uint8_t *b = reply.data() + reply_start;
-                const boost::uint8_t *end = reply.data() + reply.size();
-
-                // parse header
-                b += 2; // skip version indicator and client id
-
-                // NOTE: this looks much like parsing of an OBJECT_AMF0
-                si = readNetworkShort(b); b += 2; // number of headers
-                uint8_t headers_ok = 1;
-                if (si != 0)
-                {
-#ifdef GNASH_DEBUG_REMOTING
-                    log_debug("NetConnection::call(): amf headers "
-                            "section parsing");
-#endif
-                    as_value tmp;
-                    for(int i = si; i > 0; --i)
-                    {
-                        if(b + 2 > end) {
-                            headers_ok = 0;
-                            break;
-                        }
-                        si = readNetworkShort(b); b += 2; // name length
-                        if(b + si > end) {
-                            headers_ok = 0;
-                            break;
-                        }
-                        std::string headerName((char*)b, si); // end-b);
-#ifdef GNASH_DEBUG_REMOTING
-                        log_debug("Header name %s", headerName);
-#endif
-                        b += si;
-                        if ( b + 5 > end ) {
-                            headers_ok = 0;
-                            break;
-                        }
-                        b += 5; // skip past bool and length long
-                        if( !tmp.readAMF0(b, end, -1, objRefs, vm) )
-                        {
-                            headers_ok = 0;
-                            break;
-                        }
-#ifdef GNASH_DEBUG_REMOTING
-                        log_debug("Header value %s", tmp);
-#endif
-
-                        { // method call for each header
-                          // FIXME: it seems to me that the call should happen
-                            VM& vm = _nc.getVM();
-                            string_table& st = vm.getStringTable();
-                            string_table::key key = st.find(headerName);
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("Calling NetConnection.%s(%s)",
-                                    headerName, tmp);
-#endif
-                            _nc.callMethod(key, tmp);
-                        }
-                    }
-                }
-
-                if(headers_ok == 1) {
-
-                    si = readNetworkShort(b); b += 2; // number of replies
-
-                    // TODO consider counting number of replies we
-                    // actually parse and doing something if it
-                    // doesn't match this value (does it matter?
-                    if(si > 0) {
-                        // parse replies until we get a parse error or we reach the end of the buffer
-                        while(b < end) {
-                            if(b + 2 > end) break;
-                            si = readNetworkShort(b); b += 2; // reply length
-                            if(si < 4) { // shorted valid response is '/1/a'
-                                log_error("NetConnection::call(): reply message name too short");
-                                break;
-                            }
-                            if(b + si > end) break;
-
-                            // Reply message is: '/id/methodName'
-
-                            int ns = 1; // next slash position
-                            while (ns<si-1 && *(b+ns) != '/') ++ns;
-                            if ( ns >= si-1 ) {
-                                std::string msg(
-                                        reinterpret_cast<const char*>(b), si);
-                                log_error("NetConnection::call(): invalid "
-                                        "reply message name (%s)", msg);
-                                break;
-                            }
-
-                            std::string id(reinterpret_cast<const char*>(b),
-                                    ns);
-
-                            std::string methodName(
-                                    reinterpret_cast<const char*>(b+ns+1),
-                                    si-ns-1);
-
-                            b += si;
-
-                            // parse past unused string in header
-                            if(b + 2 > end) break;
-                            si = readNetworkShort(b); b += 2; // reply length
-                            if(b + si > end) break;
-                            b += si;
-
-                            // this field is supposed to hold the
-                            // total number of bytes in the rest of
-                            // this particular reply value, but
-                            // openstreetmap.org (which works great
-                            // in the adobe player) sends
-                            // 0xffffffff. So we just ignore it
-                            if(b + 4 > end) break;
-                            li = readNetworkLong(b); b += 4; // reply length
-
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("about to parse amf value");
-#endif
-                            // this updates b to point to the next unparsed byte
-                            as_value reply_as_value;
-                            if ( ! reply_as_value.readAMF0(b, end, -1, objRefs, vm) )
-                            {
-                                log_error("parse amf failed");
-                                // this will happen if we get
-                                // bogus data, or if the data runs
-                                // off the end of the buffer
-                                // provided, or if we get data we
-                                // don't know how to parse
-                                break;
-                            }
-#ifdef GNASH_DEBUG_REMOTING
-                            log_debug("parsed amf");
-#endif
-
-                            // update variable to show how much we've parsed
-                            reply_start = b - reply.data();
-
-                            // if actionscript specified a callback object, call it
-                            boost::intrusive_ptr<as_object> callback = pop_callback(id);
-                            if(callback) {
-
-                                string_table::key methodKey;
-                                if ( methodName == "onResult" ) {
-                                    methodKey = NSV::PROP_ON_RESULT;
-                                } else if ( methodName == "onStatus" ) {
-                                    methodKey = NSV::PROP_ON_STATUS;
-                                } else {
-                                    // NOTE: the pp is known to actually invoke the custom
-                                    //       method, but with 7 undefined arguments (?)
-                                    //methodKey = _nc.getVM().getStringTable().find(methodName);
-                                    log_error("Unsupported HTTP Remoting response callback: '%s' (size %d)", methodName, methodName.size());
-                                    continue;
-                                }
-
-#ifdef GNASH_DEBUG_REMOTING
-                                log_debug("calling onResult callback");
-#endif
-                                // FIXME check if above line can fail and we have to react
-                                callback->callMethod(methodKey, reply_as_value);
-#ifdef GNASH_DEBUG_REMOTING
-                                log_debug("callback called");
-#endif
-                            } else {
-                                log_error("Unknown HTTP Remoting response identifier '%s'", id);
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                log_error("Response from remoting service < 8 bytes");
-            }
-
-#ifdef GNASH_DEBUG_REMOTING
-            log_debug("deleting connection");
-#endif
-            _connection.reset();
-            reply.resize(0);
-            reply_start = 0;
-        }
-    }
-
-    if(!_connection && queued_count > 0) {
-//#ifdef GNASH_DEBUG_REMOTING
-        log_debug("creating connection");
-//#endif
-        // set the "number of bodies" header
-
-        (reinterpret_cast<boost::uint16_t*>(_postdata.data() + 4))[0] = htons(queued_count);
-        std::string postdata_str(reinterpret_cast<char*>(_postdata.data()), _postdata.size());
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("NetConnection.call(): encoded args from %1% calls: %2%", queued_count, hexify(postdata.data(), postdata.size(), false));
-#endif
-        queued_count = 0;
-
-        // TODO: it might be useful for a Remoting Handler to have a 
-        // StreamProvider member
-        const StreamProvider& sp =
-            _nc.getVM().getRoot().runInfo().streamProvider();
-
-        _connection.reset(sp.getStream(_url, postdata_str, _headers).release());
-
-        _postdata.resize(6);
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("connection created");
-#endif
-    }
-
-    if (_connection == 0) {
-        // nothing more to do
-        return false;
-    }
-
-    return true;
-};
-
-void
-HTTPRemotingHandler::call(as_object* asCallback, const std::string& methodName,
-            const std::vector<as_value>& args, size_t firstArg)
-{
-    boost::scoped_ptr<SimpleBuffer> buf (new SimpleBuffer(32));
-
-    // method name
-    buf->appendNetworkShort(methodName.size());
-    buf->append(methodName.c_str(), methodName.size());
-
-    // client id (result number) as counted string
-    // the convention seems to be / followed by a unique (ascending) number
-    std::ostringstream os;
-    os << "/";
-    // Call number is not used if the callback is undefined
-    if ( asCallback )
-    {
-        os << ++_numCalls; 
-    }
-    const std::string callNumberString = os.str();
-
-    buf->appendNetworkShort(callNumberString.size());
-    buf->append(callNumberString.c_str(), callNumberString.size());
-
-    size_t total_size_offset = buf->size();
-    buf->append("\000\000\000\000", 4); // total size to be filled in later
-
-    std::map<as_object*, size_t> offsetTable;
-
-    // encode array of arguments to remote method
-    buf->appendByte(amf::Element::STRICT_ARRAY_AMF0);
-    buf->appendNetworkLong(args.size()-firstArg);
-
-    VM& vm = _nc.getVM();
-
-    for (unsigned int i = firstArg; i < args.size(); ++i)
-    {
-        const as_value& arg = args[i];
-        // STRICT_ARRAY encoding is allowed for remoting
-        if ( ! arg.writeAMF0(*buf, offsetTable, vm, true) )
-        {
-            log_error("Could not serialize NetConnection.call argument %d",
-                    i);
-        }
-    }
-
-    // Set the "total size" parameter.
-    *(reinterpret_cast<uint32_t*>(buf->data() + total_size_offset)) = 
-        htonl(buf->size() - 4 - total_size_offset);
-
-#ifdef GNASH_DEBUG_REMOTING
-    log_debug(_("NetConnection.call(): encoded args: %s"),
-            hexify(buf.data(), buf.size(), false));
-#endif
-
-    if (asCallback) {
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("calling enqueue with callback");
-#endif
-        enqueue(*buf, callNumberString, asCallback);
-    }
-    
-    else {
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("calling enqueue without callback");
-#endif
-        enqueue(*buf);
-    }
-}
-
 //----- NetConnection_as ----------------------------------------------------
 
 NetConnection_as::NetConnection_as()
     :
     as_object(getNetConnectionInterface()),
-    _queuedConnections(),
-    _currentConnection(0),
     _uri(),
-    _isConnected(false),
-    _advanceTimer(0)
+    _isConnected(false)
 {
     attachProperties(*this);
 }
@@ -698,8 +96,7 @@ netconnection_class_init(as_object& global)
     // This is going to be the global NetConnection "class"/"function"
     static boost::intrusive_ptr<builtin_function> cl;
 
-    if ( cl == NULL )
-    {
+    if (cl == NULL) {
         cl=new builtin_function(&netconnection_new,
                 getNetConnectionInterface());
         // replicate all interface to class, to be able to access
@@ -715,21 +112,11 @@ netconnection_class_init(as_object& global)
 // here to have HTTPRemotingHandler definition available
 NetConnection_as::~NetConnection_as()
 {
-    deleteAllChecked(_queuedConnections);
 }
-
 
 void
 NetConnection_as::markReachableResources() const
 {
-    if ( _currentConnection.get() ) _currentConnection->setReachable();
-    for (std::list<ConnectionHandler*>::const_iterator
-            i=_queuedConnections.begin(), e=_queuedConnections.end();
-            i!=e; ++i)
-    {
-        (*i)->setReachable();
-    }
-    markAsObjectReachable();
 }
 
 
@@ -761,6 +148,7 @@ NetConnection_as::validateURL() const
 void
 NetConnection_as::notifyStatus(StatusCode code)
 {
+    GNASH_REPORT_FUNCTION;
     std::pair<std::string, std::string> info;
     getStatusCodeInfo(code, info);
 
@@ -826,6 +214,7 @@ NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 void
 NetConnection_as::connect()
 {
+    GNASH_REPORT_FUNCTION;
     // Close any current connections.
     close();
     _isConnected = true;
@@ -836,12 +225,12 @@ NetConnection_as::connect()
 void
 NetConnection_as::connect(const std::string& uri)
 {
+    GNASH_REPORT_FUNCTION;
     // Close any current connections. (why?) Because that's what happens.
     close();
 
     // TODO: check for other kind of invalidities here...
-    if ( uri.empty() )
-    {
+    if (uri.empty()) {
         _isConnected = false;
         notifyStatus(CONNECT_FAILED);
         return;
@@ -850,45 +239,13 @@ NetConnection_as::connect(const std::string& uri)
     const movie_root& mr = _vm.getRoot();
     URL url(uri, mr.runInfo().baseURL());
 
-    if ( url.protocol() == "rtmp" )
-    {
-        LOG_ONCE( log_unimpl("NetConnection.connect(%s): RTMP not yet supported", url) );
-        notifyStatus(CONNECT_FAILED);
-        return;
-    }
-
-    if ( url.protocol() != "http" )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("NetConnection.connect(%s): invalid connection protocol", url);
-        );
-        notifyStatus(CONNECT_FAILED);
-        return;
-    }
-
-    // This is for HTTP remoting
-
+    // This is for remoting
     if (!URLAccessManager::allow(url)) {
         log_security(_("Gnash is not allowed to NetConnection.connect to %s"), url);
         notifyStatus(CONNECT_FAILED);
         return;
     }
 
-    _currentConnection.reset(new HTTPRemotingHandler(*this, url));
-
-
-    // FIXME: We should attempt a connection here (this is called when an
-    // argument is passed to NetConnection.connect(url).
-    // Would probably return true on success and set isConnected.
-    //
-    // Under certain circumstances, an an immediate failure notification
-    // happens. These are:
-    // a) sandbox restriction
-    // b) invalid URL? NetConnection.connect(5) fails straight away, but
-    //    could be either because a URL has to be absolute, perhaps including
-    //    a protocol, or because the load is attempted from the filesystem
-    //    and fails immediately.
-    // TODO: modify validateURL for doing this.
     _isConnected = false;
 }
 
@@ -898,22 +255,13 @@ NetConnection_as::connect(const std::string& uri)
 void
 NetConnection_as::close()
 {
-    bool needSendClosedStatus = _currentConnection.get() || _isConnected;
-
-    /// Queue the current call queue if it has pending calls
-    if ( _currentConnection.get() && _currentConnection->hasPendingCalls() )
-    {
-        _queuedConnections.push_back(_currentConnection.release());
-    }
+    GNASH_REPORT_FUNCTION;
 
     /// TODO: what should actually happen here? Should an attached
     /// NetStream object be interrupted?
     _isConnected = false;
 
-    if ( needSendClosedStatus )
-    {
-        notifyStatus(CONNECT_CLOSED);
-    }
+    notifyStatus(CONNECT_CLOSED);
 }
 
 
@@ -924,23 +272,178 @@ NetConnection_as::setURI(const std::string& uri)
     _uri = uri;
 }
 
+//
 void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args, size_t firstArg)
 {
-    if ( ! _currentConnection.get() )
-    {
-        log_aserror("NetConnection.call: can't call while not connected");
-        return;
+    GNASH_REPORT_FUNCTION;
+
+    URL url(_uri);
+
+    // The values for the connect call were set in ::connect(), but according
+    // to documentation, the connection isn't actually started till the first
+    // ()call(). My guess is back in the days of non-persistant network
+    // connections, each ::call() made it's own connection.
+    if (_isConnected == false) {
+
+	// We're using RTMPT, which is AMF over HTTP
+	short port = strtol(url.port().c_str(), NULL, 0) & 0xffff;
+	if ((url.protocol() == "rtmpt")
+	    || (url.protocol() == "http")) {
+	    _http_client.reset(new HTTP);
+	    _http_client->toggleDebug(true);
+	    if (!_http_client->createClient(url.hostname(), port)) {
+		log_error("Can't connect to server %s on port %s",
+			  url.hostname(), url.port());
+		notifyStatus(CONNECT_FAILED);
+		return;
+	    } else {
+		log_debug("Connected to server %s on port %s",
+			  url.hostname(), url.port());
+		notifyStatus(CONNECT_SUCCESS);
+		_isConnected = true;
+	    }
+	// We're using RTMP, Connect via RTMP
+	} else if (url.protocol() == "rtmp") {
+	    _rtmp_client.reset(new RTMPClient);
+	    _rtmp_client->toggleDebug(true);
+// 	    if (!_rtmp_client.createClient(url.hostname(), port)) {
+// 		log_error("Can't connect to RTMP server %s", url.hostname());
+// 		notifyStatus(CONNECT_FAILED);
+// 		return;
+// 	    }
+	    if (!_rtmp_client->handShakeRequest()) {
+		log_error("RTMP handshake request failed");
+		notifyStatus(CONNECT_FAILED);
+		return;
+	    }
+	    
+	    if (!_rtmp_client->clientFinish()) {
+		log_error("RTMP handshake completion failed");
+		notifyStatus(CONNECT_FAILED);
+		return;
+	    }
+	    string app;		// the application name
+	    string path;	// the path to the file on the server
+	    string tcUrl;	// the tcUrl field
+	    string swfUrl;	// the swfUrl field
+	    string filename;	// the filename to play
+	    string pageUrl;     // the pageUrl field
+	    tcUrl = url.protocol() + "://" + url.hostname();
+	    if (!url.querystring().empty()) {
+		tcUrl += "/" + url.querystring();
+	    } else {
+		tcUrl += "/" + url.path();
+	    }
+	    app = url.path();
+	    // FIXME: this should be the name of the refering swf file,
+	    // although the value appears to be ignored by the server.
+	    swfUrl = "mediaplayer.swf";
+	    // FIXME: This should be the URL for the referring web page
+	    // although the value appears to be ignored by the server.
+	    pageUrl = "http://gnashdev.org";
+
+	    // FIXME: replace the "magic numbers" with intelligently
+	    // designed ones.
+	    boost::shared_ptr<amf::Buffer> buf2 = _rtmp_client->encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
+// 	    size_t total_size = buf2->allocated();
+//   	    _rtmp_client->sendMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf2);
+//   	    RTMPMsg *msg1 = _rtmp_client->recvMsg();
+
+	    // the connectino process is complete
+// 	    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+// 		notifyStatus(CONNECT_SUCCESS);
+// 	    } else {
+// 		notifyStatus(CONNECT_FAILED);
+// 		return;
+// 	    }
+	} // end of 'if RTMP'
+#if 0
+	// FIXME: do a GET request for the crossdomain.xml file
+	// in a portable way!
+	log_debug("Requesting crossdomain.xml file...");
+	amf::Buffer &request = _http_client->formatRequest("/crossdomain.xml", HTTP::HTTP_GET);
+	_http_client->writeNet(request);
+#endif
+    }
+    boost::shared_ptr<NetConnection_as::thread_params_t> tdata(new NetConnection_as::thread_params_t);
+    tdata->callback = asCallback;
+
+    static int numCalls = 0;
+    amf::AMF_msg top;
+    
+    boost::shared_ptr<amf::Element> name(new amf::Element);
+    name->makeString(methodName);
+
+    // make the result
+    std::ostringstream os;
+    os << "/";
+    // Call number is not used if the callback is undefined
+    if ( asCallback ) {
+        os << ++numCalls; 
+    }
+    boost::shared_ptr<amf::Element> response(new amf::Element);
+    name->makeString(os.str());
+
+    boost::shared_ptr<amf::Element> data(new amf::Element);
+    data->makeStrictArray();
+    for (size_t i=firstArg; i<args.size(); i++) {
+	cerr << "FIXME: NetConnection::" << __FUNCTION__ << "(): " << args[i].to_string() << endl;
+	boost::shared_ptr<amf::Element> el = args[i].to_element();
+// 	el->dump();
+	data->addProperty(el);
+    }
+//     data->dump();
+
+    boost::shared_ptr<amf::AMF_msg::amf_message_t> msg(new amf::AMF_msg::amf_message_t);
+    msg->header.target = methodName;
+    msg->header.response = os.str();
+    msg->header.size = data->calculateSize(*data);
+    msg->data = data;
+    top.addMessage(msg);
+    
+    boost::shared_ptr<amf::Buffer> buf = top.encodeAMFPacket();
+//     top.dump();
+//     buf->dump();
+
+    // Send the request via HTTP
+    if ((url.protocol() == "rtmpt")
+	|| (url.protocol() == "http")) {
+	log_debug("Requesting echo response file...");
+	// "/echo/gateway"
+	amf::Buffer &request = _http_client->formatRequest(url.path(), HTTP::HTTP_POST);
+	_http_client->formatContentLength(buf->allocated());
+	// All HTTP messages are followed by a blank line.
+	_http_client->terminateHeader();
+	request += buf;
+	_http_client->writeNet(request);
+	tdata->network = reinterpret_cast<Network *>(_http_client.get());
+	VM& vm = asCallback->getVM();
+	tdata->st = &vm.getStringTable();
+// 	tdata->vm = vm;
     }
 
-    _currentConnection->call(asCallback, methodName, args, firstArg);
+    // Send the request via RTMP
+    if (url.protocol() == "rtmp") {
+	tdata->network = reinterpret_cast<Network *>(_rtmp_client.get());
+// 	boost::shared_ptr<buf3> = _rtmp_client->encodeStream(0x2);
+// 	//    buf3->dump();
+// 	total_size = buf3->size();
+// 	RTMPMsg *msg2 = _rtmp_client->sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
+    }
 
-#ifdef GNASH_DEBUG_REMOTING
-    log_debug("called enqueue");
+
+    //    this->test();
+
+    // Start a thread to wait for the response
+#if 0
+    boost::thread process_thread(boost::bind(&net_handler, tdata.get()));
+#else
+    net_handler(tdata.get());
 #endif
-
-    startAdvanceTimer();
+    
+//    _currentConnection.reset(new HTTPRemotingHandler(*this, url));
 
 }
 
@@ -964,112 +467,6 @@ NetConnection_as::getStream(const std::string& name)
 
 }
 
-as_value
-NetConnection_as::advanceWrapper(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetConnection_as> ptr = 
-        ensureType<NetConnection_as>(fn.this_ptr);
-    
-    ptr->advance();
-    return as_value();
-};
-
-void
-NetConnection_as::startAdvanceTimer() 
-{
-
-    if (_advanceTimer)
-    {
-        //log_debug("startAdvanceTimer: already running %d", _advanceTimer);
-        return;
-    }
-
-    boost::intrusive_ptr<builtin_function> ticker_as = 
-            new builtin_function(&NetConnection_as::advanceWrapper);
-
-    std::auto_ptr<Timer> timer(new Timer);
-    unsigned long delayMS = 50; 
-    timer->setInterval(*ticker_as, delayMS, this);
-    _advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
-
-    log_debug("startAdvanceTimer: registered advance timer %d", _advanceTimer);
-}
-
-void
-NetConnection_as::stopAdvanceTimer() 
-{
-    if (!_advanceTimer)
-    {
-        log_debug("stopAdvanceTimer: not running");
-        return;
-    }
-
-    getVM().getRoot().clear_interval_timer(_advanceTimer);
-    log_debug("stopAdvanceTimer: deregistered timer %d", _advanceTimer);
-    _advanceTimer=0;
-}
-
-void
-NetConnection_as::advance()
-{
-    // Advance
-
-#ifdef GNASH_DEBUG_REMOTING
-    log_debug("NetConnection_as::advance: %d calls to advance", _queuedConnections.size());
-#endif
-
-    while ( ! _queuedConnections.empty() )
-    {
-        ConnectionHandler* ch = _queuedConnections.front();
-        if ( ! ch->advance() )
-        {
-            log_debug("ConnectionHandler done, dropping");
-            _queuedConnections.pop_front();
-            delete ch;
-        }
-        else break; // queues handling is serialized
-    }
-
-    if ( _currentConnection.get() ) 
-    {
-        _currentConnection->advance();
-    }
-
-    // Advancement of a connection might trigger creation
-    // of a new connection, so we won't stop the advance
-    // timer in that case
-    if ( _queuedConnections.empty() && ! _currentConnection.get() )
-    {
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("stopping advance timer");
-#endif
-        stopAdvanceTimer();
-#ifdef GNASH_DEBUG_REMOTING
-        log_debug("advance timer stopped");
-#endif
-    }
-}
-
-/// Anonymous namespace for NetConnection AMF-reading helper functions
-/// (shouldn't be here).
-
-namespace {
-
-boost::uint16_t
-readNetworkShort(const boost::uint8_t* buf) {
-    boost::uint16_t s = buf[0] << 8 | buf[1];
-    return s;
-}
-
-boost::uint32_t
-readNetworkLong(const boost::uint8_t* buf) {
-    boost::uint32_t s = buf[0] << 24 | buf[1] << 16 | buf[2] << 8 | buf[3];
-    return s;
-}
-
-}
-
-
 /// Anonymous namespace for NetConnection interface implementation.
 
 namespace {
@@ -1082,6 +479,7 @@ namespace {
 as_value
 netconnection_call(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetConnection_as> ptr = 
         ensureType<NetConnection_as>(fn.this_ptr); 
 
@@ -1126,6 +524,7 @@ netconnection_call(const fn_call& fn)
 as_value
 netconnection_close(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetConnection_as> ptr =
         ensureType<NetConnection_as>(fn.this_ptr); 
 
@@ -1213,12 +612,12 @@ netconnection_new(const fn_call& /* fn */)
 as_value
 netconnection_connect(const fn_call& fn)
 {
+    GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<NetConnection_as> ptr =
         ensureType<NetConnection_as>(fn.this_ptr); 
     
-    if (fn.nargs < 1)
-    {
+    if (fn.nargs < 1) {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("NetConnection.connect(): needs at least "
                     "one argument"));
@@ -1237,10 +636,8 @@ netconnection_connect(const fn_call& fn)
     // Check first arg for validity 
     if (uri.is_null() || (vm.getSWFVersion() > 6 && uri.is_undefined())) {
         ptr->connect();
-    }
-    else {
-        if ( fn.nargs > 1 )
-        {
+    } else {
+        if ( fn.nargs > 1 ){
             std::stringstream ss; fn.dump_args(ss);
             log_unimpl("NetConnection.connect(%s): args after the first are "
                     "not supported", ss.str());
@@ -1252,6 +649,122 @@ netconnection_connect(const fn_call& fn)
 
 }
 
+// This thread waits for data from the server, and executes the callback
+extern "C" {
+bool DSOEXPORT 
+net_handler(NetConnection_as::thread_params_t *args)
+{
+    GNASH_REPORT_FUNCTION;
+
+#ifdef USE_STATISTICS
+	struct timespec start;
+	clock_gettime (CLOCK_REALTIME, &start);
+#endif
+    bool result = false;
+    bool done = false;
+
+//    boost::mutex::scoped_lock lock(call_mutex);
+
+//    args->caller->test();
+
+    // Suck all the data waiting for us in the network
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
+    do {
+	size_t ret = args->network->readNet(buf->reference() + buf->allocated(), 
+					 buf->size(), 10);
+	// The timeout expired
+ 	if (ret == 0) {
+	    log_debug("no data yet for fd #%d, continuing...",
+		      args->network->getFileFd());
+	    result = false;
+ 	    done = true;
+ 	}
+	// Something happened to the network connection
+	if ((ret == static_cast<size_t>(string::npos)) || (ret == static_cast<size_t>(-1))) {
+	    log_debug("socket for fd #%d was closed...",
+		      args->network->getFileFd());
+	    return false;
+	}
+	// We got data.
+	if (ret > 0) {
+	    // If we got less data than we tried to read, then we got the
+	    // whole packet most likely.
+	    if (ret < buf->size()) {
+		done = true;
+		result = true;
+	    }
+	    if (ret == buf->size()) {
+		// become larger by another default block size.
+		buf->resize(buf->size() + amf::NETBUFSIZE);
+		log_debug("Got a full packet, making the buffer larger to %d",
+			  buf->size());
+		result = true;
+	    }
+	    // manually set the seek pointer in the buffer, as we read
+	    // the data into the raw memory allocated to the buffer. We
+	    // only want to do this if we got data of course.
+	    buf->setSeekPointer(buf->end() + ret);
+	} else {
+	    log_debug("no more data for fd #%d, exiting...", 
+		      args->network->getFileFd());
+	    done = true;
+	}
+    } while(done != true);
+
+    // Now process the data
+    if (result) {
+	HTTP *http = reinterpret_cast<HTTP *>(args->network);;
+	amf::AMF amf;
+	boost::uint8_t *data = http->processHeaderFields(*buf);
+//   	http->dump();
+	boost::shared_ptr<std::vector<std::string> > encoding = http->getFieldItem("transfer-encoding");
+	size_t length = http->getContentLength();
+	if (http->getField("content-type") == "application/x-amf") {
+	    amf::AMF_msg amsg;
+	    boost::shared_ptr<amf::AMF_msg::context_header_t> head =
+		amsg.parseAMFPacket(data, length);
+	    
+//  	    amsg.dump();
+	    log_debug("%d messages in AMF packet", amsg.messageCount());
+	    for (size_t i=0; i<amsg.messageCount(); i++) {
+//  		amsg.getMessage(i)->data->dump();
+ 		boost::shared_ptr<amf::Element> el = amsg.getMessage(i)->data;
+ 		as_value tmp(*el);
+// 		NetConnection_as *obj = (NetConnection_as *)args->network;
+		log_debug("Calling NetConnection %s(%s)",
+			  amsg.getMessage(i)->header.target, tmp);
+		// The method name looks something like this: /17/onResult
+		// the first field is a sequence number so each response can
+		// be matched to the request that made it. We only want the
+		// name part, so we can call the method.
+		string::size_type pos = amsg.getMessage(i)->header.target.find('/', 1);
+		string methodName;
+		if (pos != string::npos) {
+		    methodName = amsg.getMessage(i)->header.target.substr(pos+1,  amsg.getMessage(i)->header.target.size());
+		}
+// 		VM& vm = args->callback->getVM();
+//  		string_table& st = vm.getStringTable();
+		string_table::key methodKey;
+		boost::mutex::scoped_lock lock(_nc_mutex);
+		methodKey = args->st->find(methodName);
+  		args->callback->callMethod(methodKey, tmp);
+	    }
+	} else {// not AMF data
+	    log_debug("Content type is: %d", http->getField("content-type"));
+	    if ((http->getField("content-type") == "application/xml")
+		|| (http->getField("content-type") == "text/html")) {
+		log_debug("Textual Data is: %s", reinterpret_cast<char *>(data));
+	    } else {
+		log_debug("Binary Data is: %s", hexify(data, length, true));
+	    }
+	}
+    }
+
+    log_debug("net_handler all done...");
+
+    return result;
+}
+} // end of extern C
 
 as_value
 netconnection_addHeader(const fn_call& fn)
@@ -1268,3 +781,7 @@ netconnection_addHeader(const fn_call& fn)
 
 } // end of gnash namespace
 
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

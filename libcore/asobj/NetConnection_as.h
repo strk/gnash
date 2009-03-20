@@ -19,17 +19,24 @@
 #ifndef GNASH_NETCONNECTION_H
 #define GNASH_NETCONNECTION_H
 
-#include "IOChannel.h"
-#include "as_object.h" // for inheritance
-#include "fn_call.h"
 
 #include <string>
 #include <list>
 
-// Forward declarations
-namespace gnash {
-	class ConnectionHandler;
-}
+#include <boost/shared_ptr.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+
+#include "IOChannel.h"
+#include "as_object.h" // for inheritance
+#include "fn_call.h"
+#include "VM.h"
+
+// Internal headers from libnet
+#include "network.h"
+#include "http.h"		// RTMPT & HTTP client side support
+#include "rtmp_client.h"	// RTMP client side support
+
 
 namespace gnash {
 
@@ -40,6 +47,14 @@ namespace gnash {
 class NetConnection_as: public as_object
 {
 public:
+
+   // This is used to pass parameters to a thread using boost::bind
+    typedef struct {
+	as_object        *callback;
+	Network          *network;
+	VM		 *vm;
+	string_table     *st;
+    } thread_params_t;
 
     enum StatusCode
     {
@@ -55,15 +70,11 @@ public:
 	NetConnection_as();
 	~NetConnection_as();
 
-    /// Process connection stuff
-    virtual void advance();
-
-    static as_value advanceWrapper(const fn_call& fn);
-
     /// Make the stored URI into a valid and checked URL.
-	std::string validateURL() const;
+    std::string validateURL() const;
 
-    void call(as_object* asCallback, const std::string& methodName, const std::vector<as_value>& args, size_t firstArg);
+    void call(as_object* asCallback, const std::string& methodName,
+              const std::vector<as_value>& args, size_t firstArg);
 
     /// Process the close() method.
     void close();
@@ -79,10 +90,7 @@ public:
     }
 
     void setURI(const std::string& uri);
-
-    const std::string& getURI() const {
-        return _uri;
-    }
+    const std::string& getURI() const { return _uri; }
 
     /// Notify the NetConnection onStatus handler of a change.
     void notifyStatus(StatusCode code);
@@ -96,43 +104,34 @@ protected:
 	void markReachableResources() const;
 
 private:
-
+    
     typedef std::pair<std::string, std::string> NetConnectionStatus;
 
     void getStatusCodeInfo(StatusCode code, NetConnectionStatus& info);
 
-	/// Extend the URL to be used for playing
-	void addToURL(const std::string& url);
+    /// Extend the URL to be used for playing
+    void addToURL(const std::string& url);
 
-    /// Queue of call groups
-    //
-    /// For HTTP based remoting, each element on this list
-    /// will perform a POST request containing all calls
-    /// to the same uri and dispatch results.
-    ///
-	std::list<ConnectionHandler*> _queuedConnections;
-
-    /// Queue of calls gathered during a single movie advancement
-    //
-    /// For HTTP based remoting, these calls will be performed
-    /// by a single POST operation.
-    ///
-    std::auto_ptr<ConnectionHandler> _currentConnection; 
-
-	/// the url prefix optionally passed to connect()
-	std::string _uri;
-
-    bool _isConnected;
-
-    void startAdvanceTimer();
-
-    void stopAdvanceTimer();
-
-    int _advanceTimer;
+    /// the url prefix optionally passed to connect()
+    std::string		_uri;
+    bool		_isConnected;
+    unsigned int	_numCalls;
+    boost::scoped_ptr<HTTP> _http_client;
+    boost::scoped_ptr<RTMPClient> _rtmp_client;
 };
+
+// This thread waits for data from the server, and executes the callback
+extern "C" {
+bool DSOEXPORT net_handler(NetConnection_as::thread_params_t *args);
+}
 
 void netconnection_class_init(as_object& global);
 
 } // end of gnash namespace
 
-#endif
+#endif  // GNASH_NETCONNECTION_AS_H
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

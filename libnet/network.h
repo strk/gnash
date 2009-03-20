@@ -227,10 +227,20 @@ public:
     int getListenFd() const { return _listenfd; };
     void setListenFd(int x) { _listenfd = x; };
     const std::string& getURL() const { return _url; }
+    void setURL(const std::string& url) { _url = url; }
+
     const std::string& getProtocol() const  { return _protocol; }
+    void setProtocol(const std::string& proto) { _protocol = proto; }
+
     const std::string& getHost() const { return _host; }
+    void setHost(const std::string& host) { _host = host; }
+
     const std::string& getPortStr() const { return _portstr; }
+    void setPortStr(const std::string& port) { _portstr = port; }
+
     const std::string& getPath() const { return _path; }
+    void setPath(const std::string& path) { _path = path; }
+
     void setTimeout(int x) { _timeout = x; }
     int getTimeout() const { return _timeout; }
 
@@ -270,6 +280,7 @@ public:
     bool        _connected;
     bool        _debug;
     int         _timeout;
+    size_t	_bytes_loaded;
     /// \var Handler::_handlers
     ///		Keep a list of all active network connections
     std::map<int, entry_t *> _handlers;
@@ -278,6 +289,7 @@ public:
     // This is the mutex that controls access to the que.
     boost::mutex	_poll_mutex;
 #endif
+    boost::mutex	_net_mutex;
 };
 
 } // end of gnash namespace

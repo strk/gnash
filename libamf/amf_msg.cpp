@@ -66,8 +66,8 @@ AMF_msg::encodeMsgHeader(AMF_msg::message_header_t *head)
 {
 //    GNASH_REPORT_FUNCTION;
     // The size of the buffer are the two strings, their lenght fields, and the integer.
-    size_t size = head->target.size() + head->response.size() + sizeof(boost::uint32_t)
-        + (sizeof(boost::uint16_t) * 2);
+//     size_t size = head->target.size() + head->response.size() + sizeof(boost::uint32_t)
+//         + (sizeof(boost::uint16_t) * 2);
     boost::shared_ptr<amf::Buffer> buf (new amf::Buffer(sizeof(AMF_msg::message_header_t)));
 
     // Encode the target URI, which usually looks something like ."getway"
@@ -95,7 +95,7 @@ AMF_msg::parseContextHeader(amf::Buffer &data)
 }
 
 boost::shared_ptr<AMF_msg::context_header_t>
-AMF_msg::parseContextHeader(boost::uint8_t *data, size_t size)
+AMF_msg::parseContextHeader(boost::uint8_t *data, size_t /* size */)
 {
 //    GNASH_REPORT_FUNCTION;
     boost::shared_ptr<AMF_msg::context_header_t> msg (new AMF_msg::context_header_t);
@@ -135,7 +135,7 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     tmpptr += sizeof(boost::uint16_t);
     string str1(reinterpret_cast<const char *>(tmpptr), length);
     msg->target = str1;
-    if ((tmpptr - data) > size) {
+    if ((tmpptr - data) > static_cast<int>(size)) {
         boost::format msg("Trying to read past the end of data! Wants %1% bytes, given %2% bytes");
         msg % length % size;
         throw GnashException(msg.str());
@@ -222,8 +222,8 @@ AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
 }
 
 boost::shared_ptr<amf::Buffer>
-AMF_msg::encodeAMFPacket(const std::string &target,
-                         const std::string &response, size_t size)
+AMF_msg::encodeAMFPacket(const std::string & /* target */,
+                         const std::string & /*response */, size_t /* size */)
 {
 }
 

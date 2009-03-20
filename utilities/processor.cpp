@@ -517,8 +517,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
         // We reached the end, done !
         if (curr_frame >= md->get_frame_count() - 1 )
         {
-            if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
-            {
+            if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits ) {
                 log_debug("exiting after %d" 
                        " times last frame was reached", end_hitcount);
                     break;
@@ -528,6 +527,13 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
         // We didn't advance 
         if (curr_frame == last_frame)
         {
+	    // We also want to exit if allowed_end_hits is set, and
+	    // we're not advancing.
+	    if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits ) {
+                log_debug("exiting after %d" 
+			  " times last frame was reached", end_hitcount);
+                    break;
+            }
             // Max stop counts reached, kick it
             if ( secondsSinceLastAdvance() > waitforadvance )
             {

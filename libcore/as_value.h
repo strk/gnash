@@ -36,6 +36,7 @@
 #include <boost/type_traits/is_floating_point.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/static_assert.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "utility.h" // UNUSED
 #include "string_table.h"
@@ -370,7 +371,7 @@ public:
 	double	to_number() const;
 
 	/// Get an AMF element representation for this value
-	std::auto_ptr<amf::Element> to_element() const;
+        boost::shared_ptr<amf::Element> to_element() const;
 
 	/// Conversion to 32bit integer
 	//

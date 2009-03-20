@@ -71,17 +71,19 @@ public:
     rtmpt_cmd_e extractRTMPT(amf::Buffer &data)
 	{ return extractRTMPT(data.reference()); };    
 
+#if 0
     // Examine the beginning of the data for an HTTP request command
     // like GET or POST, etc...
     http_method_e extractCommand(boost::uint8_t *data);
     http_method_e extractCommand(amf::Buffer &data)
 	{ return extractCommand(data.reference()); };    
-    
+
     // process all the header fields in the Buffer, storing them internally
     // in _fields. The address returned is the address where the Content data
     // starts, and is "Content-Length" bytes long, of "Content-Type" data.
     boost::uint8_t *processHeaderFields(amf::Buffer &buf);
-
+#endif
+    
 #if 0
     // Parse an Echo Request message coming from the Red5 echo_test.
     std::vector<boost::shared_ptr<amf::Element > > parseEchoRequest(gnash::amf::Buffer &buf) { return parseEchoRequest(buf.reference(), buf.size()); };

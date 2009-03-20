@@ -58,8 +58,15 @@ public:
     boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name);
     boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos);
 
+    bool isConnected() { return _connected; };
+
+    std::string &getPath() { return _path; };
+    void setPath(std::string &x) { _path = x; };
+
     void dump();
   private:
+    std::string _path;
+    bool   _connected;
     double _connections;
 };
 

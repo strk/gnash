@@ -597,7 +597,7 @@ test_post()
     ptr1 += *encstr;
     ptr1.resize();              // shrink the buffer to be the exact size of the data
 
-#if 0
+#if 1
     // FIXME: should be moved to server side only test case
     // Check the Server field
     AMF amf;
@@ -687,7 +687,6 @@ test_post()
         runtest.fail("HTTP::formatEchoResponse()");
     }
 #endif
-    
     if (dbglogfile.getVerbosity() > 0) {
         http.dump();
     }
