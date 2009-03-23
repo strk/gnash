@@ -1588,54 +1588,44 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
 
     character* existing_char = dlist.get_character_at_depth(tag->getDepth());
 
-    if (existing_char)
-    {
-        // if the existing character is not a shape, move it instead of replace
-        if ( existing_char->isActionScriptReferenceable() )
-        {
-            move_display_object(tag, dlist);
-            return;
-        }
-        else
-        {
-            boost::intrusive_ptr<character> ch = 
-                cdef->createDisplayObject(this, tag->getID());
-
-            // TODO: check if we can drop this for REPLACE!
-            // should we rename the character when it's REPLACE tag?
-            if(tag->hasName())
-            {
-                ch->set_name(tag->getName());
-            }
-            else if(ch->wantsInstanceName())
-            {
-                std::string instance_name = getNextUnnamedInstanceName();
-                ch->set_name(instance_name);
-            }
-            if(tag->hasRatio())
-            {
-                ch->set_ratio(tag->getRatio());
-            }
-            if(tag->hasCxform())
-            {
-                ch->set_cxform(tag->getCxform());
-            }
-            if(tag->hasMatrix())
-            {
-                ch->setMatrix(tag->getMatrix(), true); // update caches
-            }
-
-            // use SWFMatrix from the old character if tag doesn't provide one.
-            dlist.replace_character(ch.get(), tag->getDepth(), 
-                !tag->hasCxform(), 
-                !tag->hasMatrix());
-        }
-    }
-    else // non-existing character
-    {
+    if (!existing_char) {
         log_error(_("MovieClip::replace_display_object: could not "
-                "find any character at depth %d"), tag->getDepth());
-    } 
+                    "find any character at depth %d"), tag->getDepth());
+        return;
+    }
+
+    // if the existing character is not a shape, move it instead
+    // of replacing.
+    if (existing_char->isActionScriptReferenceable()) {
+        move_display_object(tag, dlist);
+        return;
+    }
+
+    boost::intrusive_ptr<character> ch = 
+        cdef->createDisplayObject(this, tag->getID());
+
+    // TODO: check if we can drop this for REPLACE!
+    // should we rename the character when it's REPLACE tag?
+    if(tag->hasName()) {
+        ch->set_name(tag->getName());
+    }
+    else if (ch->wantsInstanceName()) {
+        std::string instance_name = getNextUnnamedInstanceName();
+        ch->set_name(instance_name);
+    }
+    if (tag->hasRatio()) {
+        ch->set_ratio(tag->getRatio());
+    }
+    if (tag->hasCxform()) {
+        ch->set_cxform(tag->getCxform());
+    }
+    if (tag->hasMatrix()) {
+        ch->setMatrix(tag->getMatrix(), true); 
+    }
+
+    // use SWFMatrix from the old character if tag doesn't provide one.
+    dlist.replace_character(ch.get(), tag->getDepth(), 
+        !tag->hasCxform(), !tag->hasMatrix());
 }
 
 void
