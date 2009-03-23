@@ -620,15 +620,10 @@ parse_tag:
                 );
             }
 
-        } catch (const ParserException& e) {
-            // FIXME: we should be setting some variable
-            //        so that it is possible for clients
-            //        to check the parser status
-            //        Also, we should probably call _loader.unlock()
-            //        and make sure any wait_for_frame call is
-            //        released (condition set and false result)
+        }
+        catch (const ParserException& e) {
+            // Log and continue parsing...
             log_error(_("Parsing exception: %s"), e.what());
-
         }
 
         str.close_tag();
