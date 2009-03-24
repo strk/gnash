@@ -239,6 +239,14 @@ NetConnection_as::connect(const std::string& uri)
     const movie_root& mr = _vm.getRoot();
     URL url(uri, mr.runInfo().baseURL());
 
+    log_debug("%s: URI is %s, URL protocol is %s, path is %s, hostname is %s, port is %s", __PRETTY_FUNCTION__,
+	      _uri, 
+	      url.protocol(),
+              url.path(),
+	      url.hostname(),
+	      url.port()
+	);
+
     // This is for remoting
     if (!URLAccessManager::allow(url)) {
         log_security(_("Gnash is not allowed to NetConnection.connect to %s"), url);
@@ -268,7 +276,9 @@ NetConnection_as::close()
 void
 NetConnection_as::setURI(const std::string& uri)
 {
+//     GNASH_REPORT_FUNCTION;    
     init_readonly_property("uri", &netconnection_uri);
+//     log_debug("%s: URI is %s", __PRETTY_FUNCTION__, uri);
     _uri = uri;
 }
 
@@ -279,8 +289,17 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 {
     GNASH_REPORT_FUNCTION;
 
-    URL url(_uri);
+    const movie_root& mr = _vm.getRoot();
+    URL url(_uri, mr.runInfo().baseURL());
 
+    log_debug("%s: URI is %s, URL protocol is %s, path is %s, hostname is %s, port is %s", __PRETTY_FUNCTION__,
+	      _uri, 
+	      url.protocol(),
+              url.path(),
+	      url.hostname(),
+	      url.port()
+	);
+    
     // The values for the connect call were set in ::connect(), but according
     // to documentation, the connection isn't actually started till the first
     // ()call(). My guess is back in the days of non-persistant network
@@ -291,16 +310,19 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	short port = strtol(url.port().c_str(), NULL, 0) & 0xffff;
 	if ((url.protocol() == "rtmpt")
 	    || (url.protocol() == "http")) {
+	    if (port == 0) {
+		port = gnash::RTMPT_PORT;
+	    }
 	    _http_client.reset(new HTTP);
 	    _http_client->toggleDebug(true);
 	    if (!_http_client->createClient(url.hostname(), port)) {
-		log_error("Can't connect to server %s on port %s",
-			  url.hostname(), url.port());
+		log_error("Can't connect to server %s on port %hd",
+			  url.hostname(), port);
 		notifyStatus(CONNECT_FAILED);
 		return;
 	    } else {
-		log_debug("Connected to server %s on port %s",
-			  url.hostname(), url.port());
+		log_debug("Connected to server %s on port %hd",
+			  url.hostname(), port);
 		notifyStatus(CONNECT_SUCCESS);
 		_isConnected = true;
 	    }
@@ -589,7 +611,7 @@ getNetConnectionInterface()
 as_value
 netconnection_new(const fn_call& /* fn */)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     NetConnection_as* nc = new NetConnection_as;
 
@@ -612,7 +634,7 @@ netconnection_new(const fn_call& /* fn */)
 as_value
 netconnection_connect(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<NetConnection_as> ptr =
         ensureType<NetConnection_as>(fn.this_ptr); 
@@ -626,7 +648,7 @@ netconnection_connect(const fn_call& fn)
     }
 
     const as_value& uri = fn.arg(0);
-
+    
     const VM& vm = ptr->getVM();
     const std::string& uriStr = uri.to_string_versioned(vm.getSWFVersion());
     
