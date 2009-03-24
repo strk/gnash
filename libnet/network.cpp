@@ -141,13 +141,6 @@ Network::createServer(short port)
     int             retries = 0;
     in_addr_t       nodeaddr;
 
-#if 0
-    if (port < 1024) {
-	log_error(_("Can't connect to privileged port #%d"), port);
-	return -1;
-    }
-#endif
-    
     if (_listenfd >= 2) {
 	log_debug("already connected to port %hd", port);
 	return _listenfd;
@@ -524,12 +517,6 @@ Network::createClient(const string &hostname, short port)
 //    assert( ! connected() );
     if (connected()) {
 	return true;
-    }
-
-    if (port < 1024) {
-        log_error(_("Can't connect to privileged port %hd"), port);
-        _connected = false;
-        return false;
     }
 
     _port = port;    
