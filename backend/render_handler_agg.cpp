@@ -81,9 +81,6 @@ What could and should be /optimized/
     results in many large-size buffer allocations during a second. Maybe this
     should be optimized.
     
-  - Converted fill styles (for AGG) are recreated for each sub-shape, even if
-    they never change for a shape. This should be changed.
-    
   - Matrix-transformed paths (generated before drawing a shape) should be cached
     and re-used to avoid recalculation of the same coordinates.
     
@@ -102,8 +99,8 @@ What could and should be /optimized/
   - there are also a few TODO comments in the code!
   
   
-AGG ressources
---------------
+AGG resources
+-------------
   http://www.antigrain.com/    
   http://haiku-os.org/node/86
 
@@ -119,14 +116,13 @@ AGG ressources
 #include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
-#include "utility.h"
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h" 
 #include "Range2d.h"
-
 #include "shape_character_def.h" 
-#include "generic_character.h"
+#include "DisplayObject.h"
+#include "GnashNumeric.h"
 
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
@@ -181,7 +177,6 @@ namespace gnash {
 namespace {
 
 class AlphaMask;
-
 
 typedef std::vector<agg::path_storage> AggPaths;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
@@ -241,14 +236,14 @@ public:
     void operator()(const edge& edge)
     {
         if (edge.is_straight()) {
-            _path.line_to(TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
-                          TWIPS_TO_PIXELS(edge.ap.y) + _shift);
+            _path.line_to(twipsToPixels(edge.ap.x) + _shift, 
+                          twipsToPixels(edge.ap.y) + _shift);
         }
         else {
-            _path.curve3(TWIPS_TO_PIXELS(edge.cp.x) + _shift, 
-                     TWIPS_TO_PIXELS(edge.cp.y) + _shift,
-                     TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
-                     TWIPS_TO_PIXELS(edge.ap.y) + _shift);             
+            _path.curve3(twipsToPixels(edge.cp.x) + _shift, 
+                     twipsToPixels(edge.cp.y) + _shift,
+                     twipsToPixels(edge.ap.x) + _shift, 
+                     twipsToPixels(edge.ap.y) + _shift);             
         }
     }
 
@@ -274,8 +269,8 @@ public:
     {
         agg::path_storage& p = *_it;
 
-        p.move_to(TWIPS_TO_PIXELS(in.ap.x) + _shift, 
-                  TWIPS_TO_PIXELS(in.ap.y) + _shift);
+        p.move_to(twipsToPixels(in.ap.x) + _shift, 
+                  twipsToPixels(in.ap.y) + _shift);
 
         std::for_each(in.m_edges.begin(), in.m_edges.end(),
                 EdgeToPath(p, _shift));
@@ -478,29 +473,18 @@ public:
 
     typedef agg::trans_affine Matrix;
 
-    VideoRenderer(const ClipBounds& clipbounds, GnashImage* frame,
-            Matrix& mat, Quality quality)
+    VideoRenderer(const ClipBounds& clipbounds, GnashImage& frame,
+            Matrix& mat, Quality quality, bool smooth)
         :
-        _buf(frame->data(), frame->width(), frame->height(),
-                frame->pitch()),
+        _buf(frame.data(), frame.width(), frame.height(),
+                frame.pitch()),
         _pixf(_buf),
         _accessor(_pixf),
         _interpolator(mat),
         _clipbounds(clipbounds),
-        _quality(quality)
+        _quality(quality),
+        _smoothing(smooth)
     {}
-
-    /// Change the rendering quality required.
-    void setQuality(Quality quality)
-    {
-        _quality = quality;
-    }
-
-    /// Set whether smoothing is requested
-    void smooth(bool b)
-    {
-        _smoothing = b;
-    }
 
     void render(agg::path_storage& path, Renderer& rbase,
             const AlphaMasks& masks)
@@ -563,7 +547,7 @@ private:
     // rendering buffer is used to access the frame pixels here        
     agg::rendering_buffer _buf;
 
-    SourceFormat _pixf;
+    const SourceFormat _pixf;
     
     Accessor _accessor;
          
@@ -574,7 +558,7 @@ private:
     const ClipBounds& _clipbounds;
 
     /// Quality of renderering
-    Quality _quality;
+    const Quality _quality;
 
     /// Whether smoothing is required.
     bool _smoothing;
@@ -602,6 +586,22 @@ public:
         return new agg_bitmap_info(im);
     }
 
+    template<typename SourceFormat, typename Matrix>
+    void renderVideo(GnashImage& frame, Matrix& img_mtx,
+            agg::path_storage path, bool smooth)
+    {
+
+        // renderer base for the stage buffer (not the frame image!)
+        renderer_base& rbase = *m_rbase;
+
+        VideoRenderer<PixelFormat, SourceFormat> vr(_clipbounds, frame,
+                img_mtx, _quality, smooth);
+
+        // If smoothing is requested and _quality is set to HIGH or BEST,
+        // use high-quality interpolation.
+        vr.render(path, rbase, _alphaMasks);
+    }
+
     void drawVideoFrame(GnashImage* frame, const SWFMatrix* source_mat, 
         const rect* bounds, bool smooth)
     {
@@ -609,14 +609,6 @@ public:
         // NOTE: Assuming that the source image is RGB 8:8:8
         // TODO: keep heavy instances alive accross frames for performance!
         // TODO: Maybe implement specialization for 1:1 scaled videos
-        
-        if (frame->type() == GNASH_IMAGE_RGBA) {
-                LOG_ONCE(log_error(_("Can't render videos with alpha")));
-                return;
-        }
-
-        assert(frame->type() == GNASH_IMAGE_RGB);
-        
         SWFMatrix mat = stage_matrix;
         mat.concatenate(*source_mat);
         
@@ -629,14 +621,14 @@ public:
         
         // convert Gnash SWFMatrix to AGG SWFMatrix and scale down to
         // pixel coordinates while we're at it
-        agg::trans_affine img_mtx(mat.sx / 65536.0, mat.shx / 65536.0, 
+        agg::trans_affine mtx(mat.sx / 65536.0, mat.shx / 65536.0, 
             mat.shy / 65536.0, mat.sy / 65536.0, mat.tx, mat.ty);        
         
         // invert SWFMatrix since this is used for the image source
-        img_mtx.invert();
+        mtx.invert();
         
         // Apply video scale
-        img_mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
+        mtx *= agg::trans_affine_scaling(1.0 / vscaleX, 1.0 / vscaleY);
         
         // make a path for the video outline
         point a, b, c, d;
@@ -652,19 +644,19 @@ public:
         path.line_to(d.x, d.y);
         path.line_to(a.x, a.y);
 
-        // renderer base for the stage buffer (not the frame image!)
-        renderer_base& rbase = *m_rbase;
-        
-        // TODO: keep this alive and only update image / matrix? I've no
-        // idea how much reallocation that would save.
-        VideoRenderer<PixelFormat> vr(_clipbounds, frame, img_mtx, _quality);
+        switch (frame->type())
+        {
+            case GNASH_IMAGE_RGBA:
+                renderVideo<agg::pixfmt_rgba32_pre>(*frame, mtx, path, smooth);
+                break;
+            case GNASH_IMAGE_RGB:
+                renderVideo<agg::pixfmt_rgb24_pre>(*frame, mtx, path, smooth);
+                break;
+            default:
+                log_error("Can't render this type of frame");
+                break;
+        }
 
-        vr.smooth(smooth);
-
-        // If smoothing is requested and _quality is set to HIGH or BEST,
-        // use high-quality interpolation.
-        vr.render(path, rbase, _alphaMasks);
-                
     } 
 
   // Constructor
@@ -882,7 +874,7 @@ public:
     if (_clipbounds_selected.empty()) return; 
       
     GnashPaths paths;
-    apply_matrix_to_path(def->get_paths(), paths, mat);
+    apply_matrix_to_path(def->paths(), paths, mat);
 
     // If it's a mask, we don't need the rest.
     if (m_drawing_mask) {
@@ -975,11 +967,11 @@ public:
     const SWFMatrix& mat, const cxform& cx)
     {
     
-        const std::vector<fill_style>& fill_styles = def->get_fill_styles();
-        const std::vector<line_style>& line_styles = def->get_line_styles();
+        const std::vector<fill_style>& fill_styles = def->fillStyles();
+        const std::vector<line_style>& line_styles = def->lineStyles();
         bool have_shape, have_outline;
 
-        analyzePaths(def->get_paths(), have_shape, have_outline);
+        analyzePaths(def->paths(), have_shape, have_outline);
 
         if (!have_shape && !have_outline) {
             // Early return for invisible character.
@@ -987,7 +979,7 @@ public:
         }    
 
         GnashPaths paths;
-        apply_matrix_to_path(def->get_paths(), paths, mat);
+        apply_matrix_to_path(def->paths(), paths, mat);
 
         // Masks apparently do not use agg_paths, so return
         // early
@@ -1132,8 +1124,8 @@ public:
           hairline = true;
       }
       
-      float prev_ax = TWIPS_TO_PIXELS(this_path.ap.x);
-      float prev_ay = TWIPS_TO_PIXELS(this_path.ap.y);  
+      float prev_ax = twipsToPixels(this_path.ap.x);
+      float prev_ay = twipsToPixels(this_path.ap.y);  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
@@ -1147,8 +1139,8 @@ public:
         
         const edge& this_edge = this_path.m_edges[eno];
         
-        float this_ax = TWIPS_TO_PIXELS(this_edge.ap.x);  
-        float this_ay = TWIPS_TO_PIXELS(this_edge.ap.y);  
+        float this_ax = twipsToPixels(this_edge.ap.x);  
+        float this_ay = twipsToPixels(this_edge.ap.y);  
         
         if (hinting || this_edge.is_straight()) {
         
@@ -1218,8 +1210,8 @@ public:
         
           // never align curves!
           new_path.curve3(
-            TWIPS_TO_PIXELS(this_edge.cp.x) + subpixel_offset, 
-            TWIPS_TO_PIXELS(this_edge.cp.y) + subpixel_offset,
+            twipsToPixels(this_edge.cp.x) + subpixel_offset, 
+            twipsToPixels(this_edge.cp.y) + subpixel_offset,
             this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
             
@@ -1251,7 +1243,6 @@ public:
     const size_t fcount = fill_styles.size();
     for (size_t fno=0; fno<fcount; ++fno) {
     
-      bool smooth = false;
       int fill_type = fill_styles[fno].get_type();
       
       switch (fill_type) {
@@ -1297,8 +1288,6 @@ public:
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-            smooth= true;  // continue with next case!
-        
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {    
@@ -1309,11 +1298,39 @@ public:
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
 
+          //
+          // Smoothing policy:
+          //
+          // - If unspecified, smooth when _quality >= BEST
+          // - If ON or forced, smooth when _quality > LOW
+          // - If OFF, don't smooth
+          //
+          // TODO: take a forceBitmapSmoothing parameter.
+          //       which should be computed by the VM looking
+          //       at MovieClip.forceSmoothing.
+          //
+          bool smooth = false;
+          if ( _quality > QUALITY_LOW ) // never smooth in LOW quality
+          {
+             // TODO: if forceSmoothing is true, smooth !
+             switch ( fill_styles[fno].getBitmapSmoothingPolicy() )
+             {
+                case fill_style::BITMAP_SMOOTHING_UNSPECIFIED:
+                    if ( _quality >= QUALITY_BEST ) smooth = true;
+                    break;
+                case fill_style::BITMAP_SMOOTHING_ON:
+                    smooth = true;
+                    break;
+                default: break;
+             }
+          }
+
           sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && _quality >= QUALITY_HIGH);
+            smooth);
+
           break;
         } 
 
@@ -1553,8 +1570,8 @@ public:
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(TWIPS_TO_PIXELS(this_path.ap.x), 
-                   TWIPS_TO_PIXELS(this_path.ap.y));
+      path.move_to(twipsToPixels(this_path.ap.x), 
+                   twipsToPixels(this_path.ap.y));
     
       // Add all edges to the path.
       std::for_each(this_path.m_edges.begin(), this_path.m_edges.end(),
@@ -1676,7 +1693,7 @@ public:
         if (!thickness) stroke.width(1); // hairline
         else if ( (!lstyle.scaleThicknessVertically()) && (!lstyle.scaleThicknessHorizontally()) )
         {
-          stroke.width(TWIPS_TO_PIXELS(thickness));
+          stroke.width(twipsToPixels(thickness));
         }
         else
         {

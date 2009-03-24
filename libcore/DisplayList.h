@@ -56,34 +56,23 @@ typedef boost::intrusive_ptr<character> DisplayItem;
 /// tags instructing when to add or remove characters
 /// from the stage.
 ///
-class DisplayList {
+class DisplayList
+{
 
 public:
 
-	void testInvariant() const
-	{
-#if GNASH_PARANOIA_LEVEL > 1
-#ifndef NDEBUG
-		DisplayList sorted = *this;
-		// check no duplicated depths above non-removed zone.
-		std::set<int> depths;
-		for (const_iterator it=beginNonRemoved(_charsByDepth), itEnd=_charsByDepth.end(); it!=itEnd; ++it)
-		{
-			boost::intrusive_ptr<character> ch = *it;
-			int depth = ch->get_depth();
-			if ( ! depths.insert(depth).second )
-			{
-				log_debug("Depth %d is duplicated in DisplayList %p", depth, (const void*)this);
-				abort();
-			}
-		}
-		assert(isSorted()); // check we didn't screw up ordering
-#endif
-#endif // GNASH_PARANOIA_LEVEL > 1
-	}
+	typedef std::list<DisplayItem> container_type;
+	typedef container_type::iterator iterator;
+	typedef container_type::const_iterator const_iterator;
+	typedef container_type::reverse_iterator reverse_iterator;
+	typedef container_type::const_reverse_iterator const_reverse_iterator;
 
-	/// Output operator
+    DisplayList() {}
+    ~DisplayList() {}
+
+    /// Output operator
 	friend std::ostream& operator<< (std::ostream&, const DisplayList&);
+
 
 	/// \brief
 	/// Place a new character at the specified depth,
@@ -125,9 +114,7 @@ public:
 	/// @param use_old_matrix
 	/// true:  set the new character's transformation SWFMatrix to the old one.
 	/// false: keep the new character's transformation SWFMatrix.
-	///
-	void replace_character(character* ch, int depth, 
-		bool use_old_cxform,
+	void replace_character(character* ch, int depth, bool use_old_cxform,
 		bool use_old_matrix);
 
 	/// \brief
@@ -176,18 +163,13 @@ public:
 	/// @clip_depth
 	/// Not used at the moment.
 	/// 
-	void	move_character(
-		int depth,
-		const cxform* color_xform,
-		const SWFMatrix* mat,
-		int* ratio,
-		int* clip_depth);
+	void move_character( int depth, const cxform* color_xform,
+            const SWFMatrix* mat, int* ratio, int* clip_depth);
 
 	/// Removes the object at the specified depth.
 	//
 	/// Calls unload on the removed character.
-	///
-	void	remove_character(int depth);
+	void remove_character(int depth);
 
 	/// Remove all unloaded character from the list
 	//
@@ -197,7 +179,6 @@ public:
 	/// NOTE: we don't call the function recursively in the 
 	///       contained elements, as that should not be needed
 	///	  (ie: any inned thing will not be accessible anyway)
-	///
 	void removeUnloaded();
 
 	/// Unload the characters in this DisplayList removing
@@ -206,22 +187,10 @@ public:
 	/// the others, w/out depth-shifting them.
 	///
 	/// Return true if any child was kept (as they had onUnload defined)
-	///
 	bool unload();
 
 	/// destroy all characters in this DisplayList
 	void destroy();
-
-	/// Add all characters in the list, maintaining depth-order
-	//
-	/// @param chars
-	///	The characters to add
-	///
-	/// @param replace
-	///	If true the given characters would replace any
-	///	pre-existing character at the same depth.
-	///
-	void addAll(std::vector<character*>& chars, bool replace);
 
 	/// Add a character in the list, maintaining depth-order
 	//
@@ -232,7 +201,6 @@ public:
 	/// @param replace
 	///	If true the given character would replace any
 	///	pre-existing character at the same depth.
-	///
 	void add(character* ch, bool replace);
 
 	/// \brief
@@ -254,8 +222,7 @@ public:
 	/// If there are multiples, returns the *first* match only!
 	character* get_character_by_name(const std::string& name);
 
-	const character* get_character_by_name(const std::string& name) const
-	{
+	const character* get_character_by_name(const std::string& name) const {
 		return const_cast<DisplayList*>(this)->get_character_by_name(name);
 	}
 
@@ -275,9 +242,7 @@ public:
 	/// NOTE: all elements in the list are visited, even
 	///       the removed ones (unloaded)
 	/// TODO: inspect if worth providing an arg to skip removed
-	///
-	template <class V>
-	inline void visitForward(V& visitor);
+	template <class V> inline void visitForward(V& visitor);
 
 	/// \brief 
 	/// Visit each character in the list in reverse depth
@@ -291,11 +256,8 @@ public:
 	/// NOTE: all elements in the list are visited, even
 	///       the removed ones (unloaded)
 	/// TODO: inspect if worth providing an arg to skip removed
-	///
-	template <class V>
-	inline void visitBackward(V& visitor);
-	template <class V>
-	inline void visitBackward(V& visitor) const;
+	template <class V> inline void visitBackward(V& visitor);
+    template <class V> inline void visitBackward(V& visitor) const;
 
 	/// \brief 
 	/// Visit each and all character in the list.
@@ -309,29 +271,23 @@ public:
 	/// NOTE: all elements in the list are visited, even
 	///       the removed ones (unloaded)
 	/// TODO: inspect if worth providing an arg to skip removed
-	///
-	template <class V>
-	inline void visitAll(V& visitor);
-
-	template <class V>
-	inline void visitAll(V& visitor) const;
+	template <class V> inline void visitAll(V& visitor);
+	template <class V> inline void visitAll(V& visitor) const;
 
 	/// dump list to logfile/stderr
 	void dump() const;
 
-  /// Like character_instance::add_invalidated_bounds() this method calls the
-  /// method with the same name of all childs.	
+    /// Like character_instance::add_invalidated_bounds() this method calls the
+    /// method with the same name of all childs.	
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);	
 	
 	/// Return number of elements in the list
-	size_t size() const
-	{ 
+	size_t size() const { 
 		return _charsByDepth.size();
 	}
 
 	/// Return true if the list contains no elements 
-	bool empty() const 
-	{
+	bool empty() const {
 		return _charsByDepth.empty();
 	}
 
@@ -353,37 +309,47 @@ public:
 	/// A notable use for this is backing up a specific
 	/// state and restoring it later. Restore step would
 	/// need reordering.
-	///
-	void sort ();
+	void sort();
 	
 	/// \brief
 	/// merge the given display list
 	void mergeDisplayList(DisplayList& newList);
 
-	bool operator==(const DisplayList& other) const { return _charsByDepth == other._charsByDepth; }
+	bool operator==(const DisplayList& other) const {
+        return _charsByDepth == other._charsByDepth;
+    }
 
-	bool operator!=(const DisplayList& other) const { return _charsByDepth != other._charsByDepth; }
+	bool operator!=(const DisplayList& other) const {
+        return _charsByDepth != other._charsByDepth;
+    }
+	
+#if GNASH_PARANOIA_LEVEL > 1 && !defined(NDEBUG)
+    DisplayList::const_iterator nonRemoved() const;
+
+    void testInvariant() const
+	{
+		DisplayList sorted = *this;
+
+        // check no duplicated depths above non-removed zone.
+		std::set<int> depths;
+		for (const_iterator it = nonRemoved(),
+                itEnd = _charsByDepth.end(); it != itEnd; ++it) {
+
+			boost::intrusive_ptr<character> ch = *it;
+			int depth = ch->get_depth();
+			if (!depths.insert(depth).second) {
+				log_debug("Depth %d is duplicated in DisplayList %p",
+                        depth, (const void*)this);
+                std::abort();
+			}
+		}
+		assert(isSorted()); // check we didn't screw up ordering
+	}
+#else
+    void testInvariant() const {}
+#endif 
 
 private:
-
-	typedef std::list<DisplayItem> container_type;
-	typedef container_type::iterator iterator;
-	typedef container_type::const_iterator const_iterator;
-	typedef container_type::reverse_iterator reverse_iterator;
-	typedef container_type::const_reverse_iterator const_reverse_iterator;
-
-	/// Return an iterator to the first element of the container NOT in the "removed" depth zone
-	static iterator beginNonRemoved(container_type& c);
-
-	/// Return an constant iterator to the first element of the container NOT in the "removed" depth zone
-	static const_iterator beginNonRemoved(const container_type& c);
-
-	/// Return an iterator succeeding the last element in zone (-16384, 0xffff-16384)
-	static iterator dlistTagsEffectivZoneEnd(container_type& c);
-	
-	/// Return an constant iterator succeeding the last element in (-16384, 0xffff-16384)
-	static const_iterator dlistTagsEffectivZoneEnd(const container_type& c);
-
 
 	/// Re-insert a removed-from-stage character after appropriately
 	/// shifting its depth based on the character::removedDepthOffset
@@ -393,8 +359,8 @@ private:
 	///	- ch::isUnloaded() returns true (assertion fails otherwise)
 	///	- ch is not already in the list (assertion fails otherwise)
 	///
-	/// TODO: inspect what should happen if the target depth is already occupied
-	///
+	/// TODO: inspect what should happen if the target depth is already
+    /// occupied
 	void reinsertRemovedCharacter(boost::intrusive_ptr<character> ch);
 
 	container_type _charsByDepth;
@@ -407,12 +373,11 @@ template <class V>
 void
 DisplayList::visitForward(V& visitor)
 {
-	for (iterator it = _charsByDepth.begin(),
-			itEnd = _charsByDepth.end();
-		it != itEnd; ++it)
-	{
+	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
+		it != itEnd; ++it) {
+
 		DisplayItem& di = *it;
-		if ( ! visitor(di.get()) ) break;
+		if (!visitor(di.get())) break;
 	}
 }
 
@@ -421,11 +386,10 @@ void
 DisplayList::visitBackward(V& visitor)
 {
 	for (reverse_iterator it = _charsByDepth.rbegin(),
-			itEnd = _charsByDepth.rend();
-		it != itEnd; ++it)
-	{
+			itEnd = _charsByDepth.rend(); it != itEnd; ++it) {
+
 		DisplayItem& di = *it;
-		if ( ! visitor(di.get()) ) break;
+		if (!visitor(di.get())) break;
 	}
 }
 
@@ -434,11 +398,10 @@ void
 DisplayList::visitBackward(V& visitor) const
 {
 	for (const_reverse_iterator it = _charsByDepth.rbegin(),
-			itEnd = _charsByDepth.rend();
-		it != itEnd; ++it)
-	{
+			itEnd = _charsByDepth.rend(); it != itEnd; ++it) {
+
 		const DisplayItem& di = *it;
-		if ( ! visitor(di.get()) ) break;
+		if (!visitor(di.get())) break;
 	}
 }
 
@@ -446,10 +409,9 @@ template <class V>
 void
 DisplayList::visitAll(V& visitor)
 {
-	for (iterator it = _charsByDepth.begin(),
-			itEnd = _charsByDepth.end();
-		it != itEnd; ++it)
-	{
+	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
+		it != itEnd; ++it) {
+
 		visitor(it->get());
 	}
 }
@@ -459,9 +421,8 @@ void
 DisplayList::visitAll(V& visitor) const
 {
 	for (const_iterator it = _charsByDepth.begin(),
-			itEnd = _charsByDepth.end();
-		it != itEnd; ++it)
-	{
+            itEnd = _charsByDepth.end(); it != itEnd; ++it) {
+
 		visitor(it->get());
 	}
 }

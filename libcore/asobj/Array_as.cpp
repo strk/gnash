@@ -32,6 +32,7 @@
 #include "action.h" // for call_method
 #include "VM.h" // for PROPNAME, registerNative
 #include "Object.h" // for getObjectInterface()
+#include "GnashNumeric.h"
 
 #include <string>
 #include <algorithm>
@@ -591,7 +592,7 @@ Array_as::index_requested(string_table::key name)
     double value = temp.to_number();
 
     // if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
-    if (!utility::isFinite(value)) return -1;
+    if (!isFinite(value)) return -1;
 
     return int(value);
 }
@@ -914,7 +915,7 @@ array_splice(const fn_call& fn)
     unsigned startoffset;
     int start = fn.arg(0).to_int();
     if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
-    startoffset = utility::clamp<int>(start, 0, origlen);
+    startoffset = clamp<int>(start, 0, origlen);
 #ifdef GNASH_DEBUG
     if ( startoffset != start )
         log_debug(_("Array.splice: start:%d became %u"), start, startoffset);
@@ -935,7 +936,7 @@ array_splice(const fn_call& fn)
             );
             return as_value();
         }
-        len = utility::clamp<int>(lenval, 0, origlen-startoffset);
+        len = clamp<int>(lenval, 0, origlen-startoffset);
     }
 
     //----------------

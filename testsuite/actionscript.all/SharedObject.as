@@ -275,7 +275,7 @@ check_equals(typeof(so4), "object");
 ourPath += "/";
 note ("checking getLocal with path: " + ourPath);
 so4 = SharedObject.getLocal("name", ourPath);
-check_equals(typeof(so4), "null");
+xcheck_equals(typeof(so4), "null");
 
 // Take the last slash off and add a bit of rubbish
 ourPath = ourPath.substr(0, ourPath.lastIndexOf("/"));

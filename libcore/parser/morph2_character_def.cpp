@@ -27,16 +27,44 @@
 #include "render.h"
 #include "movie_definition.h"
 #include "MovieClip.h"
-
+#include "GnashNumeric.h"
 
 namespace gnash {
 
-// Facilities for working with list of paths.
-class PathList {
+/// Functors for path and style manipulation.
+namespace {
 
+template<typename T>
+class Lerp
+{
+public:
+    Lerp(typename T::const_iterator style1, typename T::const_iterator style2,
+            const double ratio)
+        :
+        _style1(style1),
+        _style2(style2),
+        _ratio(ratio)
+    {}
+
+    void operator()(typename T::value_type& st)
+    {
+        st.set_lerp(*_style1, *_style2, _ratio);
+        ++_style1, ++_style2;
+    }
+
+private:
+    typename T::const_iterator _style1;
+    typename T::const_iterator _style2;
+    const double _ratio;
+};
+
+// Facilities for working with list of paths.
+class PathList
+{
+    typedef shape_character_def::Paths Paths;
 public:
 
-	PathList(const std::vector<path>& paths)
+	PathList(const Paths& paths)
 		:
 		_paths(paths),
 		_currpath(0),
@@ -59,11 +87,11 @@ public:
 	const edge& getNextEdge()
 	{
 		const edge& ret = _paths[_currpath][_curredge];
-		if ( ++_curredge >= _paths[_currpath].size() )
+        if ( ++_curredge >= _paths[_currpath].size() )
 		{
 			if ( ++_currpath >= _paths.size() )
 			{
-				// this is not really needed,
+                // this is not really needed,
 				// but it's simpler to do so that
 				// to make next call fail or abort..
 				_currpath = 0;
@@ -74,19 +102,20 @@ public:
 	}
 
 	/// Compute total number of edges
-	static size_t computeNumberOfEdges(const std::vector<path>& paths)
+	static size_t computeNumberOfEdges(const Paths& paths)
 	{
 		size_t count=0;
-		for (size_t i = 0, e=paths.size(); i<e; ++i)
-		{
-			count += paths[i].size();
+		for (Paths::const_iterator i = paths.begin(), e = paths.end();
+                i != e; ++i) {
+
+			count += i->size();
 		}
 		return count;
 	}
 
 private:
 
-	const std::vector<path>& _paths;
+	const Paths& _paths;
 
 	size_t _currpath;
 
@@ -96,11 +125,13 @@ private:
 
 };
 
-morph2_character_def::morph2_character_def():
-    m_last_ratio(-1.0f)
-{   /* Markus: No delete??? */
-    m_shape1 = new shape_character_def();
-    m_shape2 = new shape_character_def();
+} // anonymous namespace
+
+morph2_character_def::morph2_character_def()
+    :
+    m_shape1(new shape_character_def),
+    m_shape2(new shape_character_def)
+{
 }
 
 
@@ -108,38 +139,30 @@ morph2_character_def::~morph2_character_def()
 {
 }
 
-void	morph2_character_def::display(character* inst)
+void
+morph2_character_def::display(character* inst)
 {
-//		GNASH_REPORT_FUNCTION;
 
-    unsigned int i = 0;
-    float ratio = inst->get_ratio() / 65535.0;
+    const double ratio = inst->get_ratio() / 65535.0;
+
     // bounds
-    rect	new_bound;
+    rect new_bound;
     new_bound.set_lerp(m_shape1->get_bound(), m_shape2->get_bound(), ratio);
     set_bound(new_bound);
 
     // fill styles
-    for (; i < m_fill_styles.size(); i++)
-    {
-        fill_style& fs = m_fill_styles[i];
+    const FillStyles::const_iterator fs1 = m_shape1->fillStyles().begin();
+    const FillStyles::const_iterator fs2 = m_shape2->fillStyles().begin();
 
-        const fill_style& fs1 = m_shape1->get_fill_styles()[i];
-        const fill_style& fs2 = m_shape2->get_fill_styles()[i];
-
-        fs.set_lerp(fs1, fs2, ratio);
-    }
+    std::for_each(_fill_styles.begin(), _fill_styles.end(),
+            Lerp<FillStyles>(fs1, fs2, ratio));
 
     // line styles
-    for (i=0; i < m_line_styles.size(); i++)
-    {
-        line_style& ls = m_line_styles[i];
+    const LineStyles::const_iterator ls1 = m_shape1->lineStyles().begin();
+    const LineStyles::const_iterator ls2 = m_shape2->lineStyles().begin();
 
-        const line_style& ls1 = m_shape1->get_line_styles()[i];
-        const line_style& ls2 = m_shape2->get_line_styles()[i];
-
-        ls.set_lerp(ls1, ls2, ratio);
-    }
+    std::for_each(_line_styles.begin(), _line_styles.end(),
+            Lerp<LineStyles>(ls1, ls2, ratio));
 
     // This is used for cases in which number
     // of paths in start shape and end shape are not
@@ -148,23 +171,22 @@ void	morph2_character_def::display(character* inst)
     edge empty_edge;
 
     // shape
-    unsigned int k=0, n=0;
-    const std::vector<path>& paths1 = m_shape1->get_paths();
-    const std::vector<path>& paths2 = m_shape2->get_paths();
-    for (i=0; i < m_paths.size(); i++)
+    const Paths& paths1 = m_shape1->paths();
+    const Paths& paths2 = m_shape2->paths();
+    for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++)
     {
-        path& p = m_paths[i];
+        path& p = _paths[i];
         const path& p1 = i < paths1.size() ? paths1[i] : empty_path;
         const path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
-        float new_ax = utility::flerp(p1.ap.x, p2.ap.x, ratio);
-        float new_ay = utility::flerp(p1.ap.y, p2.ap.y, ratio);
+        const float new_ax = flerp(p1.ap.x, p2.ap.x, ratio);
+        const float new_ay = flerp(p1.ap.y, p2.ap.y, ratio);
 
         p.reset(new_ax, new_ay, p1.getLeftFill(),
                 p2.getRightFill(), p1.getLineStyle());
 
         //  edges;
-        size_t len = p1.size();
+        const size_t len = p1.size();
         p.m_edges.resize(len);
 
         for (size_t j=0; j < p.size(); j++)
@@ -173,23 +195,21 @@ void	morph2_character_def::display(character* inst)
             const edge& e1 = j < p1.size() ? p1[j] : empty_edge;
             const edge& e2 = k < p2.size() ? p2[k] : empty_edge;
 
-            e.cp.x = static_cast<int>(utility::flerp(e1.cp.x, e2.cp.x, ratio));
-            e.cp.y = static_cast<int>(utility::flerp(e1.cp.y, e2.cp.y, ratio));
-            e.ap.x = static_cast<int>(utility::flerp(e1.ap.x, e2.ap.x, ratio));
-            e.ap.y = static_cast<int>(utility::flerp(e1.ap.y, e2.ap.y, ratio));
-            k++;
-            if (p2.size() <= k)
-            {
-                k=0; n++;
+            e.cp.x = static_cast<int>(flerp(e1.cp.x, e2.cp.x, ratio));
+            e.cp.y = static_cast<int>(flerp(e1.cp.y, e2.cp.y, ratio));
+            e.ap.x = static_cast<int>(flerp(e1.ap.x, e2.ap.x, ratio));
+            e.ap.y = static_cast<int>(flerp(e1.ap.y, e2.ap.y, ratio));
+            ++k;
+
+            if (p2.size() <= k) {
+                k = 0;
+                ++n;
             }
         }
     }
 
-//  display
-
-{
-gnash::render::draw_shape_character(this, inst);
-}
+    //  display
+    render::draw_shape_character(this, inst);
 
 }
 
@@ -205,9 +225,7 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     bound1.read(in);
     bound2.read(in);
 
-    if (tag == SWF::DEFINEMORPHSHAPE2 ||
-            tag == SWF::DEFINEMORPHSHAPE2_)
-    {
+    if (tag == SWF::DEFINEMORPHSHAPE2 || tag == SWF::DEFINEMORPHSHAPE2_) {
         // TODO: Use these values.
         rect inner_bound1, inner_bound2;
         inner_bound1.read(in);
@@ -221,23 +239,22 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     }
 
     in.ensureBytes(4);
-    offset = in.read_u32();
+    // Offset. What is this for?
+    static_cast<void>(in.read_u32());
 
     // Next line will throw ParserException on malformed SWF
-    fill_style_count = in.read_variable_count();
-    int i;
+    const boost::uint16_t fillCount = in.read_variable_count();
+    
     fill_style fs1, fs2;
-    for (i = 0; i < fill_style_count; ++i)
-    {
+    for (size_t i = 0; i < fillCount; ++i) {
         fs1.read(in, tag, md, &fs2);
         m_shape1->addFillStyle(fs1);
         m_shape2->addFillStyle(fs2);
     }
 
-    line_style_count = in.read_variable_count();
+    const boost::uint16_t lineCount = in.read_variable_count();
     line_style ls1, ls2;
-    for (i = 0; i < line_style_count; ++i)
-    {
+    for (size_t i = 0; i < lineCount; ++i) {
         ls1.read_morph(in, tag, md, &ls2);
         m_shape1->addLineStyle(ls1);
         m_shape2->addLineStyle(ls2);
@@ -253,56 +270,50 @@ void morph2_character_def::read(SWFStream& in, SWF::TagType tag,
     m_shape1->set_bound(bound1);
     m_shape2->set_bound(bound2);
 
-    const shape_character_def::FillStyleVect& s1Fills = 
-        m_shape1->get_fill_styles();
+    const shape_character_def::FillStyles& s1Fills = m_shape1->fillStyles();
 
-    const shape_character_def::LineStyleVect& s1Lines = 
-        m_shape1->get_line_styles();
+    const shape_character_def::LineStyles& s1Lines = m_shape1->lineStyles();
 
-    assert(s1Fills.size() == m_shape2->get_fill_styles().size());
-    assert(s1Lines.size() == m_shape2->get_line_styles().size());
+    assert(s1Fills.size() == m_shape2->fillStyles().size());
+    assert(s1Lines.size() == m_shape2->lineStyles().size());
 
     // setup array size
-    m_fill_styles.resize(s1Fills.size());
-    unsigned int k;
-    for (k = 0; k < m_fill_styles.size(); k++)
-    {
-        fill_style& fs = m_fill_styles[k];
-        const fill_style& fs1 = s1Fills[k];
-        fs.m_gradients.resize(fs1.m_gradients.size());
+    _fill_styles.resize(s1Fills.size());
+    FillStyles::const_iterator s1 = s1Fills.begin();
+    for (FillStyles::iterator i = _fill_styles.begin(), e = _fill_styles.end();
+            i != e; ++i, ++s1) {
+
+        i->m_gradients.resize(s1->m_gradients.size());
     }
 
-    m_line_styles.resize(s1Lines.size());
-    m_paths.resize(m_shape1->get_paths().size());
+    _line_styles.resize(s1Lines.size());
+    _paths.resize(m_shape1->paths().size());
 
-    unsigned edges_count1 = PathList::computeNumberOfEdges(
-            m_shape1->get_paths());
-    unsigned edges_count2 = PathList::computeNumberOfEdges(
-            m_shape2->get_paths());
+    const unsigned edges1 = PathList::computeNumberOfEdges(m_shape1->paths());
+    const unsigned edges2 = PathList::computeNumberOfEdges(m_shape2->paths());
 
     IF_VERBOSE_PARSE(
       log_parse("morph: "
           "startShape(paths:%d, edges:%u), "
           "endShape(paths:%d, edges:%u)",
-          m_shape1->get_paths().size(), edges_count1,
-          m_shape2->get_paths().size(), edges_count2);
+          m_shape1->paths().size(), edges1,
+          m_shape2->paths().size(), edges2);
     );
 
     IF_VERBOSE_MALFORMED_SWF(
         // It is perfectly legal to have a different number of paths,
         // edges count should be the same instead
-        if ( edges_count1 != edges_count2 )
-        {
+        if (edges1 != edges2) {
             log_swferror(_("Different number of edges "
                 "in start (%u) and end (%u) shapes "
-                "of a morph"),
-                edges_count1, edges_count1);
+                "of a morph"), edges1, edges1);
         }
 
     );
 
 }
-}
+
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

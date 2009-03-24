@@ -81,7 +81,7 @@ public:
 		return _bytesTotal;
 	}  
 
-    /// Overrides as_object::queueLoad to begin loading from a stream
+    /// Begin loading from a stream
     //
     /// @param str      The stream to load from. It is destroyed when
     ///                 we're finished with it.
@@ -90,6 +90,10 @@ public:
     /// Shared AS methods for XML and LoadVars, which can be used
     /// interchangeably with each object in ActionScript.
     static as_value loadableobject_addRequestHeader(const fn_call& fn);
+
+    /// Scan the LoadThread queue (_loadThreads) to see if any of
+    /// them completed. If any did, invoke the onData event
+    virtual void advanceState();
 
 protected:
 
@@ -108,17 +112,6 @@ protected:
     long _bytesLoaded;
     
     long _bytesTotal;
-
-    /// The load checker interval timer used to make loads async
-    unsigned int _loadCheckerTimer;
-
-    /// Scan the LoadThread queue (_loadThreads) to see if any of
-    /// them completed. If any did, invoke the onData event
-    void checkLoads();
-
-private:
-
-    static as_value checkLoads_wrapper(const fn_call& fn);
 
 };
 

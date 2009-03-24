@@ -27,30 +27,11 @@
 #include "GnashException.h"
 #include "IOChannel.h"
 #include "SimpleBuffer.h"
-
+#include "GnashAlgorithm.h"
 #include "element.h"
 
 #include <string>
 #include <iosfwd>
-
-
-#define PADDING_BYTES 64
-#define READ_CHUNKS 64
-
-// The amount of bytes to scan an FLV for
-// figuring availability of audio/video tags.
-// This is needed because we can't trust the FLV
-// header (youtube advertises audio w/out having it;
-// strk tested that FLV with bogus flags are still
-// supposed to show video).
-//
-// MediaParserFfmpeg.cpp uses 2048.
-//
-// TODO: let user tweak this ?
-//
-// See bug #24371 for pointers to FLV files needing so much.
-//
-#define PROBE_BYTES 8192
 
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1
@@ -58,23 +39,10 @@
 namespace gnash {
 namespace media {
 
-namespace {
 
-/// Functor for use when transforming a map into a vector of mapped values.
-template<typename T>
-struct SecondElement
-{
-    typedef typename T::second_type result_type;
-
-    const result_type& operator()(const T& pair) const
-    {
-        return pair.second;
-    }
-};
-
-}
-
-const boost::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] = {5500, 11000, 22050, 44100};
+const size_t FLVParser::paddingBytes;
+const boost::uint16_t FLVParser::FLVAudioTag::flv_audio_rates [] = 
+    { 5500, 11000, 22050, 44100 };
 
 FLVParser::FLVParser(std::auto_ptr<IOChannel> lt)
 	:
@@ -228,12 +196,20 @@ FLVParser::parseAudioTag(const FLVTag& flvtag, const FLVAudioTag& audiotag, boos
 	{
 		_audioInfo.reset(new AudioInfo(audiotag.codec, audiotag.samplerate,
                     audiotag.samplesize, audiotag.stereo, 0, FLASH) );
-		if (header) {
-			boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize];
-			memcpy(newbuf, frame->data.get(), frame->dataSize);
+
+        if (header) {
+
+            // The frame is 0-padded up to the end. It may be larger than
+            // this if fewer bytes were read than requested, but it is
+            // never smaller.
+            const size_t bufSize = frame->dataSize + paddingBytes;
+
+            boost::uint8_t* data = new boost::uint8_t[bufSize];
+
+            std::copy(frame->data.get(), frame->data.get() + bufSize, data);
 
 			_audioInfo->extra.reset( 
-				new ExtraAudioInfoFlv(newbuf, frame->dataSize)
+				new ExtraAudioInfoFlv(data, frame->dataSize)
 			);
 
 			// The FAAD decoder will reject us if we pass the header buffer.
@@ -294,14 +270,19 @@ FLVParser::parseVideoTag(const FLVTag& flvtag, const FLVVideoTag& videotag, boos
 	// If this is the first videoframe no info about the
 	// video format has been noted, so we do that now
 	if ( ! _videoInfo.get() ) {
-		_videoInfo.reset( new VideoInfo(videotag.codec, 0 /* width */, 0 /* height */, 0 /*frameRate*/, 0 /*duration*/, FLASH /*codec type*/) );
+		_videoInfo.reset(new VideoInfo(videotag.codec, 0, 0, 0, 0, FLASH));
 
 		if (header) {
-			boost::uint8_t* newbuf = new boost::uint8_t[frame->dataSize()];
-			memcpy(newbuf, frame->data(), frame->dataSize());
+            // The frame is 0-padded up to the end. It may be larger than
+            // this if fewer bytes were read than requested, but it is
+            // never smaller.
+            const size_t bufSize = frame->dataSize() + paddingBytes;
 
+            boost::uint8_t* data = new boost::uint8_t[bufSize];
+
+            std::copy(frame->data(), frame->data() + bufSize, data);
 			_videoInfo->extra.reset( 
-				new ExtraVideoInfoFlv(newbuf, frame->dataSize())
+				new ExtraVideoInfoFlv(data, frame->dataSize())
 			);
 
 			// Don't bother emitting the header buffer.
@@ -538,27 +519,24 @@ FLVParser::getBytesLoaded() const
 std::auto_ptr<EncodedAudioFrame>
 FLVParser::readAudioFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
-	//log_debug("Reading the %dth audio frame, with data size %d, from position %d", _audioFrames.size()+1, dataSize, _stream->tell());
 
-	std::auto_ptr<EncodedAudioFrame> frame ( new EncodedAudioFrame );
-	frame->dataSize = dataSize;
-	frame->timestamp = timestamp;
+	std::auto_ptr<EncodedAudioFrame> frame(new EncodedAudioFrame);
+    
+    const size_t bufSize = dataSize + paddingBytes;
 
-	const size_t chunkSize = smallestMultipleContaining(READ_CHUNKS,
-            dataSize + PADDING_BYTES);
+    boost::uint8_t* data = new boost::uint8_t[bufSize];
+	const size_t bytesRead = _stream->read(data, dataSize);
 
-	frame->data.reset(new boost::uint8_t[chunkSize]);
+    std::fill(data + bytesRead, data + bufSize, 0);
 
-	const size_t bytesread = _stream->read(frame->data.get(), dataSize);
-	if ( bytesread < dataSize )
-	{
+	if (bytesRead < dataSize) {
 		log_error("FLVParser::readAudioFrame: could only read %d/%d bytes",
-                bytesread, dataSize);
+                bytesRead, dataSize);
 	}
 
-	const size_t padding = chunkSize - dataSize;
-	assert(padding);
-    std::fill_n(frame->data.get() + bytesread, padding, 0);
+	frame->dataSize = bytesRead;
+	frame->timestamp = timestamp;
+	frame->data.reset(data);
 
 	return frame;
 }
@@ -570,21 +548,18 @@ FLVParser::readVideoFrame(boost::uint32_t dataSize, boost::uint32_t timestamp)
 {
 	std::auto_ptr<EncodedVideoFrame> frame;
 
-	const size_t chunkSize = smallestMultipleContaining(READ_CHUNKS,
-            dataSize + PADDING_BYTES);
+    const size_t bufSize = dataSize + paddingBytes;
 
-	boost::uint8_t* data = new boost::uint8_t[chunkSize];
-	size_t bytesread = _stream->read(data, dataSize);
+	boost::uint8_t* data = new boost::uint8_t[bufSize];
+	const size_t bytesRead = _stream->read(data, dataSize);
 
-	const size_t padding = chunkSize - dataSize;
-	assert(padding);
-    std::fill_n(data + bytesread, padding, 0);
+    std::fill(data + bytesRead, data + bufSize, 0);
 
 	// We won't need frameNum, so will set to zero...
 	// TODO: fix this ?
 	// NOTE: ownership of 'data' is transferred here
 
-	frame.reset(new EncodedVideoFrame(data, dataSize, 0, timestamp));
+	frame.reset(new EncodedVideoFrame(data, bytesRead, 0, timestamp));
 	return frame;
 }
 
@@ -605,6 +580,3 @@ FLVParser::fetchMetaTags(OrderedMetaTags& tags, boost::uint64_t ts)
 
 } // end of gnash::media namespace
 } // end of gnash namespace
-
-#undef PADDING_BYTES
-#undef READ_CHUNKS 

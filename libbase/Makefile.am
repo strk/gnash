@@ -78,6 +78,7 @@ libgnashbase_la_LIBADD = \
 	$(OPENGL_LIBS) \
 	$(LIBINTL) \
 	$(LIBLTDL) \
+	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -135,6 +136,7 @@ noinst_HEADERS = \
 	$(LIBLTDLHEAD) \
 	SimpleBuffer.h \
 	extension.h \
+	GnashNumeric.h \
 	GnashException.h \
 	gettext.h \
 	jemtree.h \
@@ -173,6 +175,7 @@ noinst_HEADERS = \
 	getclocktime.hpp \
 	Point2d.h \
 	Range2d.h \
+	GnashAlgorithm.h \
 	snappingrange.h \
 	$(NULL)
 

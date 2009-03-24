@@ -26,7 +26,7 @@
 #include "rc.h" // for use of rcfile
 #include "debugger.h"
 #include "arg_parser.h"
-#include "utility.h" // for clamp
+#include "GnashNumeric.h" // for clamp
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
@@ -282,7 +282,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.hideMenu(true);
                     break;
                 case 's':
-                    player.setScale(gnash::utility::clamp<float>(
+                    player.setScale(gnash::clamp<float>(
                                     parser.argument<float>(i),
                                     0.01f, 100.f));
                     break;

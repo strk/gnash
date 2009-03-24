@@ -27,7 +27,6 @@
 #include "utility.h"
 #include "XML_as.h"
 #include "XMLSocket_as.h"
-#include "timers.h"
 #include "as_function.h"
 #include "fn_call.h"
 #include "VM.h"
@@ -58,7 +57,6 @@ static as_value xmlsocket_new(const fn_call& fn);
 static as_value xmlsocket_close(const fn_call& fn);
 
 // These are the event handlers called for this object
-static as_value xmlsocket_inputChecker(const fn_call& fn);
 static as_value xmlsocket_onData(const fn_call& fn);
 
 static as_object* getXMLSocketInterface();
@@ -82,10 +80,17 @@ public:
     void send(std::string str);
     void close();
 
-	void checkForIncomingData();
+
+    virtual void advanceState()
+    {
+        if (!_connected) return;
+        checkForIncomingData();
+    }
 
 private:
 
+	void checkForIncomingData();
+    
     void fillMessageList(MessageList& msgs);
 
 	/// Return the as_function with given name, converting case if needed
@@ -107,6 +112,7 @@ XMLSocket_as::XMLSocket_as()
 
 XMLSocket_as::~XMLSocket_as()
 {
+    getVM().getRoot().removeAdvanceCallback(this);
 }
 
 bool
@@ -292,20 +298,7 @@ xmlsocket_connect(const fn_call& fn)
     log_debug(_("XMLSocket.connect(): trying to call onConnect"));
     ptr->callMethod(NSV::PROP_ON_CONNECT, true);
 	    
-
-    // This is bad and should be rewritten.
-    log_debug(_("Setting up timer for calling XMLSocket.onData()"));
-
-    std::auto_ptr<Timer> timer(new Timer);
-    boost::intrusive_ptr<builtin_function> ondata_handler =
-        new builtin_function(&xmlsocket_inputChecker, NULL);
-    // just make sure it's expired at every frame iteration (20 FPS used here)
-    unsigned interval = 50;
-    timer->setInterval(*ondata_handler, interval,
-            boost::dynamic_pointer_cast<as_object>(ptr));
-
-    VM& vm = ptr->getVM();
-    vm.getRoot().add_interval_timer(timer, true);
+    ptr->getVM().getRoot().addAdvanceCallback(ptr.get());
 
     log_debug(_("Timer set"));
 
@@ -321,7 +314,9 @@ xmlsocket_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr =
+        ensureType<XMLSocket_as>(fn.this_ptr);
+
     const std::string& str = fn.arg(0).to_string();
     ptr->send(str);
     return as_value();
@@ -336,7 +331,8 @@ xmlsocket_close(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     
-    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr =
+        ensureType<XMLSocket_as>(fn.this_ptr);
 
     // If we're not connected, there's nothing to do
     if (!ptr->connected()) return as_value();
@@ -361,22 +357,6 @@ xmlsocket_new(const fn_call& fn)
 #endif
 
     return as_value(xmlsock_obj);
-}
-
-
-as_value
-xmlsocket_inputChecker(const fn_call& fn)
-{
-    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
-    if ( ! ptr->connected() )
-    {
-        log_error(_("%s: not connected"), __FUNCTION__);
-        return as_value();
-    }
-
-    ptr->checkForIncomingData();
-
-    return as_value();
 }
 
 as_value

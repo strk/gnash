@@ -28,6 +28,7 @@ AM_LDFLAGS = \
 	$(LIBLTDL) \
 	$(GLIB_LIBS) \
 	$(CURL_LIBS) \
+	$(LIBADD_DL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 

@@ -325,8 +325,11 @@ public:
     ///         for subsequent call to clear_interval_timer.
     ///         It will NEVER be zero.
     ///
-    unsigned int add_interval_timer(std::auto_ptr<Timer> timer,
-            bool internal = false);
+    unsigned int add_interval_timer(std::auto_ptr<Timer> timer);
+
+    void addAdvanceCallback(as_object* obj);
+
+    void removeAdvanceCallback(as_object* obj);
 
     /// Remove timer identified by given integer
     //
@@ -358,7 +361,11 @@ public:
  
     /// Main and only callback from hosting application.
     /// Expected to be called at 10ms resolution.
-    void advance();
+    //
+    /// @return true if the heart-beat resulted in actual
+    ///         SWF playhead advancement (frame advancement)
+    ///
+    bool advance();
 
     /// Entry point for movie advancement
     //
@@ -923,6 +930,9 @@ private:
     LiveChars _liveChars;
 
     /// Execute expired timers
+    void executeAdvanceCallbacks();
+    
+    /// Execute expired timers
     void executeTimers();
 
     /// Notify the global Key ActionScript object about a key status change
@@ -979,6 +989,10 @@ private:
     int m_mouse_x, m_mouse_y, m_mouse_buttons;
 
     MouseButtonState  m_mouse_button_state;
+
+    /// Objects requesting a callback on every movie_root::advance()
+    typedef std::set<as_object*> ObjectCallbacks;
+    ObjectCallbacks _objectCallbacks;
 
     typedef std::map<int, Timer*> TimerMap;
 

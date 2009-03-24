@@ -55,15 +55,16 @@ public:
 	NetConnection_as();
 	~NetConnection_as();
 
-    /// Process connection stuff
-    virtual void advance();
+    static void init(as_object& global);
 
-    static as_value advanceWrapper(const fn_call& fn);
+    /// Process connection stuff
+    virtual void advanceState();
 
     /// Make the stored URI into a valid and checked URL.
 	std::string validateURL() const;
 
-    void call(as_object* asCallback, const std::string& methodName, const std::vector<as_value>& args, size_t firstArg);
+    void call(as_object* asCallback, const std::string& methodName,
+            const std::vector<as_value>& args, size_t firstArg);
 
     /// Process the close() method.
     void close();
@@ -127,8 +128,6 @@ private:
     void startAdvanceTimer();
 
     void stopAdvanceTimer();
-
-    int _advanceTimer;
 };
 
 void netconnection_class_init(as_object& global);

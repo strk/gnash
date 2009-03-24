@@ -42,6 +42,8 @@
 #include "VM.h"
 #include "Range2d.h" // for getBounds
 #include "GnashException.h"
+#include "GnashNumeric.h"
+#include "GnashAlgorithm.h"
 #include "URL.h"
 #include "sound_handler.h"
 #include "StreamProvider.h"
@@ -57,6 +59,7 @@
 #include "flash/display/BitmapData_as.h"
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
+#include "GnashNumeric.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -140,7 +143,6 @@ namespace {
     as_value movieclip_getNextHighestDepth(const fn_call& fn);
     as_value movieclip_getTextSnapshot(const fn_call& fn);
     as_value movieclip_tabIndex(const fn_call& fn);
-    as_value movieclip_forceSmoothing(const fn_call& fn);
     as_value movieclip_opaqueBackground(const fn_call& fn);
     as_value movieclip_filters(const fn_call& fn);
     as_value movieclip_forceSmoothing(const fn_call& fn);
@@ -198,20 +200,6 @@ private:
 
     MovieClip* _target;
 
-};
-
-/// Search the DisplayList for static text.
-class StaticTextFinder
-{
-public:
-    StaticTextFinder(std::string& to) : _to(to) {}
-
-    void operator()(character* ch) {
-        ch->getStaticText(_to);
-    }
-
-private:
-    std::string& _to;
 };
 
 /// Find a character hit by the given coordinates.
@@ -496,7 +484,7 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
     character(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
-    _drawable_inst(_drawable->create_character_instance(this, 0)),
+    _drawable_inst(_drawable->createDisplayObject(this, 0)),
     m_play_state(PLAY),
     m_current_frame(0),
     m_has_looped(false),
@@ -532,11 +520,7 @@ MovieClip::~MovieClip()
     _vm.getRoot().remove_key_listener(this);
     _vm.getRoot().remove_mouse_listener(this);
 
-    for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
-            it != _loadVariableRequests.end(); ++it)
-    {
-        delete *it;
-    }
+    deleteAllChecked(_loadVariableRequests);
 }
 
 // Execute the actions in the action list, in the given
@@ -703,7 +687,7 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 
     //log_debug("get_frame_number(%s), num: %g", frame_spec, num);
 
-    if ( ! utility::isFinite(num) || int(num) != num || num == 0)
+    if (!isFinite(num) || int(num) != num || num == 0)
     {
         bool ret = m_def->get_labeled_frame(fspecStr, frameno);
         //log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr, ret, frameno);
@@ -792,7 +776,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
     // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
     
     // Set textfield bounds
-    rect bounds(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height));
+    rect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
 
     // Create an instance
     boost::intrusive_ptr<character> txt_char = new TextField(this, bounds);
@@ -803,7 +787,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
 
     // Set _x and _y
     SWFMatrix txt_matrix;
-    txt_matrix.set_translation(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    txt_matrix.set_translation(pixelsToTwips(x), pixelsToTwips(y));
     txt_char->setMatrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
 
     // Here we add the character to the displayList.    
@@ -1505,8 +1489,9 @@ MovieClip::attachCharacter(character& newch, int depth, as_object* initObject)
 }
 
 std::auto_ptr<GnashImage>
-MovieClip::drawToBitmap(const SWFMatrix& mat, const cxform& cx,
-        character::BlendMode bm, const rect& clipRect, bool smooth)
+MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
+                        character::BlendMode /* bm */, const rect& /* clipRect */,
+                        bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }
@@ -1542,7 +1527,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     if (existing_char) return NULL;
 
     boost::intrusive_ptr<character> ch =
-        cdef->create_character_instance(this, tag->getID());
+        cdef->createDisplayObject(this, tag->getID());
 
     if (tag->hasName()) ch->set_name(tag->getName());
     else if (ch->wantsInstanceName())
@@ -1603,54 +1588,44 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
 
     character* existing_char = dlist.get_character_at_depth(tag->getDepth());
 
-    if (existing_char)
-    {
-        // if the existing character is not a shape, move it instead of replace
-        if ( existing_char->isActionScriptReferenceable() )
-        {
-            move_display_object(tag, dlist);
-            return;
-        }
-        else
-        {
-            boost::intrusive_ptr<character> ch = 
-                cdef->create_character_instance(this, tag->getID());
-
-            // TODO: check if we can drop this for REPLACE!
-            // should we rename the character when it's REPLACE tag?
-            if(tag->hasName())
-            {
-                ch->set_name(tag->getName());
-            }
-            else if(ch->wantsInstanceName())
-            {
-                std::string instance_name = getNextUnnamedInstanceName();
-                ch->set_name(instance_name);
-            }
-            if(tag->hasRatio())
-            {
-                ch->set_ratio(tag->getRatio());
-            }
-            if(tag->hasCxform())
-            {
-                ch->set_cxform(tag->getCxform());
-            }
-            if(tag->hasMatrix())
-            {
-                ch->setMatrix(tag->getMatrix(), true); // update caches
-            }
-
-            // use SWFMatrix from the old character if tag doesn't provide one.
-            dlist.replace_character(ch.get(), tag->getDepth(), 
-                !tag->hasCxform(), 
-                !tag->hasMatrix());
-        }
-    }
-    else // non-existing character
-    {
+    if (!existing_char) {
         log_error(_("MovieClip::replace_display_object: could not "
-                "find any character at depth %d"), tag->getDepth());
-    } 
+                    "find any character at depth %d"), tag->getDepth());
+        return;
+    }
+
+    // if the existing character is not a shape, move it instead
+    // of replacing.
+    if (existing_char->isActionScriptReferenceable()) {
+        move_display_object(tag, dlist);
+        return;
+    }
+
+    boost::intrusive_ptr<character> ch = 
+        cdef->createDisplayObject(this, tag->getID());
+
+    // TODO: check if we can drop this for REPLACE!
+    // should we rename the character when it's REPLACE tag?
+    if(tag->hasName()) {
+        ch->set_name(tag->getName());
+    }
+    else if (ch->wantsInstanceName()) {
+        std::string instance_name = getNextUnnamedInstanceName();
+        ch->set_name(instance_name);
+    }
+    if (tag->hasRatio()) {
+        ch->set_ratio(tag->getRatio());
+    }
+    if (tag->hasCxform()) {
+        ch->set_cxform(tag->getCxform());
+    }
+    if (tag->hasMatrix()) {
+        ch->setMatrix(tag->getMatrix(), true); 
+    }
+
+    // use SWFMatrix from the old character if tag doesn't provide one.
+    dlist.replace_character(ch.get(), tag->getDepth(), 
+        !tag->hasCxform(), !tag->hasMatrix());
 }
 
 void
@@ -3116,7 +3091,7 @@ movieclip_forceSmoothing(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.forceSmoothing()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.forceSmoothing()")));
     return as_value();
 }
 
@@ -3127,7 +3102,7 @@ movieclip_opaqueBackground(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.opaqueBackground()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.opaqueBackground()")));
     return as_value();
 }
 
@@ -3138,7 +3113,7 @@ movieclip_scale9Grid(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.scale9Grid()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.scale9Grid()")));
     return as_value();
 }
 
@@ -3149,7 +3124,7 @@ movieclip_scrollRect(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.scrollRect()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.scrollRect()")));
     return as_value();
 }
 
@@ -3160,7 +3135,7 @@ movieclip_tabIndex(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
     UNUSED(movieclip);
-    log_unimpl(_("MovieClip.tabIndex()"));
+    LOG_ONCE(log_unimpl(_("MovieClip.tabIndex()")));
     return as_value();
 }
 
@@ -3234,7 +3209,7 @@ movieclip_attachMovie(const fn_call& fn)
     boost::int32_t depthValue = static_cast<boost::int32_t>(depth);
 
     boost::intrusive_ptr<character> newch =
-        exported_movie->create_character_instance(movieclip.get(), 0);
+        exported_movie->createDisplayObject(movieclip.get(), 0);
 
 #ifndef GNASH_USE_GC
     assert(newch->get_ref_count() > 0);
@@ -3837,16 +3812,16 @@ movieclip_hitTest(const fn_call& fn)
 
         case 2: // x, y
         {
-            boost::int32_t x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-            boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+            boost::int32_t x = pixelsToTwips(fn.arg(0).to_number());
+            boost::int32_t y = pixelsToTwips(fn.arg(1).to_number());
 
             return movieclip->pointInBounds(x, y);
         }
 
         case 3: // x, y, shapeFlag
         {
-             boost::int32_t x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
-             boost::int32_t y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+             boost::int32_t x = pixelsToTwips(fn.arg(0).to_number());
+             boost::int32_t y = pixelsToTwips(fn.arg(1).to_number());
              bool shapeFlag = fn.arg(2).to_bool();
 
              if ( ! shapeFlag ) return movieclip->pointInBounds(x, y);
@@ -4123,10 +4098,10 @@ movieclip_getBounds(const fn_call& fn)
     if ( !bounds.is_null() )
     {
         // Round to the twip
-        xMin = TWIPS_TO_PIXELS(bounds.get_x_min());
-        yMin = TWIPS_TO_PIXELS(bounds.get_y_min());
-        xMax = TWIPS_TO_PIXELS(bounds.get_x_max());
-        yMax = TWIPS_TO_PIXELS(bounds.get_y_max());
+        xMin = twipsToPixels(bounds.get_x_min());
+        yMin = twipsToPixels(bounds.get_y_min());
+        xMax = twipsToPixels(bounds.get_x_max());
+        yMax = twipsToPixels(bounds.get_y_max());
     }
 
     boost::intrusive_ptr<as_object> bounds_obj(new as_object());
@@ -4178,7 +4153,7 @@ movieclip_globalToLocal(const fn_call& fn)
         );
         return ret;
     }
-    x = PIXELS_TO_TWIPS(tmp.to_number());
+    x = pixelsToTwips(tmp.to_number());
 
     if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
     {
@@ -4189,14 +4164,14 @@ movieclip_globalToLocal(const fn_call& fn)
         );
         return ret;
     }
-    y = PIXELS_TO_TWIPS(tmp.to_number());
+    y = pixelsToTwips(tmp.to_number());
 
     point    pt(x, y);
     SWFMatrix world_mat = movieclip->getWorldMatrix();
     world_mat.invert().transform(pt);
 
-    obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
-    obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(pt.y));
+    obj->set_member(NSV::PROP_X, twipsToPixels(pt.x));
+    obj->set_member(NSV::PROP_Y, twipsToPixels(pt.y));
 
     return ret;
 }
@@ -4241,7 +4216,7 @@ movieclip_localToGlobal(const fn_call& fn)
         );
         return ret;
     }
-    x = PIXELS_TO_TWIPS(tmp.to_number());
+    x = pixelsToTwips(tmp.to_number());
 
     if ( ! obj->get_member(NSV::PROP_Y, &tmp) )
     {
@@ -4252,14 +4227,14 @@ movieclip_localToGlobal(const fn_call& fn)
         );
         return ret;
     }
-    y = PIXELS_TO_TWIPS(tmp.to_number());
+    y = pixelsToTwips(tmp.to_number());
 
     point    pt(x, y);
     SWFMatrix world_mat = movieclip->getWorldMatrix();
     world_mat.transform(pt);
 
-    obj->set_member(NSV::PROP_X, TWIPS_TO_PIXELS(pt.x));
-    obj->set_member(NSV::PROP_Y, TWIPS_TO_PIXELS(pt.y));
+    obj->set_member(NSV::PROP_X, twipsToPixels(pt.x));
+    obj->set_member(NSV::PROP_Y, twipsToPixels(pt.y));
     return ret;
 
 }
@@ -4357,7 +4332,7 @@ movieclip_lineTo(const fn_call& fn)
     double x = fn.arg(0).to_number();
     double y = fn.arg(1).to_number();
         
-    if ( ! utility::isFinite(x) )
+    if (!isFinite(x) )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4368,7 +4343,7 @@ movieclip_lineTo(const fn_call& fn)
         x = 0;
     }
      
-    if ( ! utility::isFinite(y) )
+    if (!isFinite(y) )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4382,7 +4357,7 @@ movieclip_lineTo(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
     log_debug("%s.lineTo(%g,%g);", movieclip->getTarget(), x, y);
 #endif
-    movieclip->lineTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    movieclip->lineTo(pixelsToTwips(x), pixelsToTwips(y));
     return as_value();
 }
 
@@ -4412,7 +4387,7 @@ movieclip_moveTo(const fn_call& fn)
     double x = fn.arg(0).to_number();
     double y = fn.arg(1).to_number();
      
-    if ( ! utility::isFinite(x) )
+    if (!isFinite(x) )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4423,7 +4398,7 @@ movieclip_moveTo(const fn_call& fn)
         x = 0;
     }
      
-    if ( ! utility::isFinite(y) )
+    if (!isFinite(y) )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4437,7 +4412,7 @@ movieclip_moveTo(const fn_call& fn)
 #ifdef DEBUG_DRAWING_API
     log_debug(_("%s.moveTo(%g,%g);"), movieclip->getTarget(), x, y);
 #endif
-    movieclip->moveTo(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    movieclip->moveTo(pixelsToTwips(x), pixelsToTwips(y));
     return as_value();
 }
 
@@ -4496,7 +4471,7 @@ movieclip_lineStyle(const fn_call& fn)
                               "first eight will be discarded"), ss.str());
                 );
         case 8:
-            miterLimitFactor = utility::clamp<int>(fn.arg(7).to_int(), 1, 255);
+            miterLimitFactor = clamp<int>(fn.arg(7).to_int(), 1, 255);
         case 7:
         {
             std::string joinStyleStr = fn.arg(6).to_string();
@@ -4566,20 +4541,20 @@ movieclip_lineStyle(const fn_call& fn)
             pixelHinting = fn.arg(3).to_bool();
         case 3:
         {
-            const float alphaval = utility::clamp<float>(fn.arg(2).to_number(),
+            const float alphaval = clamp<float>(fn.arg(2).to_number(),
                                      0, 100);
             a = boost::uint8_t(255 * (alphaval / 100));
         }
         case 2:
         {
             boost::uint32_t rgbval = boost::uint32_t(
-            utility::clamp<float>(fn.arg(1).to_number(), 0, 16777216));
+                clamp<float>(fn.arg(1).to_number(), 0, 16777216));
             r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
             g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
             b = boost::uint8_t((rgbval & 0x0000FF) );
         }
         case 1:
-            thickness = boost::uint16_t(PIXELS_TO_TWIPS(utility::clamp<float>(
+            thickness = boost::uint16_t(pixelsToTwips(clamp<float>(
                             fn.arg(0).to_number(), 0, 255)));
             break;
     }
@@ -4624,7 +4599,7 @@ movieclip_curveTo(const fn_call& fn)
     double ax = fn.arg(2).to_number();
     double ay = fn.arg(3).to_number();
 
-    if ( ! utility::isFinite(cx) )
+    if (!isFinite(cx))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4635,7 +4610,7 @@ movieclip_curveTo(const fn_call& fn)
         cx = 0;
     }
      
-    if ( ! utility::isFinite(cy) )
+    if (!isFinite(cy))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4646,7 +4621,7 @@ movieclip_curveTo(const fn_call& fn)
         cy = 0;
     }
 
-    if ( ! utility::isFinite(ax) )
+    if (!isFinite(ax))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4657,7 +4632,7 @@ movieclip_curveTo(const fn_call& fn)
         ax = 0;
     }
      
-    if ( ! utility::isFinite(ay) )
+    if (!isFinite(ay))
     {
         IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
@@ -4672,8 +4647,8 @@ movieclip_curveTo(const fn_call& fn)
     log_debug(_("%s.curveTo(%g,%g,%g,%g);"), movieclip->getTarget(),
             cx, cy, ax, ay);
 #endif
-    movieclip->curveTo(PIXELS_TO_TWIPS(cx), PIXELS_TO_TWIPS(cy),
-            PIXELS_TO_TWIPS(ax), PIXELS_TO_TWIPS(ay));
+    movieclip->curveTo(pixelsToTwips(cx), pixelsToTwips(cy),
+            pixelsToTwips(ax), pixelsToTwips(ay));
 
     return as_value();
 }
@@ -4716,14 +4691,14 @@ movieclip_beginFill(const fn_call& fn)
     {
         // 2^24 is the max here
         boost::uint32_t rgbval = boost::uint32_t(
-                utility::clamp<float>(fn.arg(0).to_number(), 0, 16777216));
+                clamp<float>(fn.arg(0).to_number(), 0, 16777216));
         r = boost::uint8_t( (rgbval&0xFF0000) >> 16);
         g = boost::uint8_t( (rgbval&0x00FF00) >> 8);
         b = boost::uint8_t( (rgbval&0x0000FF) );
 
         if ( fn.nargs > 1 )
         {
-            a = 255 * utility::clamp<int>(fn.arg(1).to_int(), 0, 100) / 100;
+            a = 255 * clamp<int>(fn.arg(1).to_int(), 0, 100) / 100;
             IF_VERBOSE_ASCODING_ERRORS(
             if ( fn.nargs > 2 )
             {
@@ -4832,13 +4807,13 @@ movieclip_beginGradientFill(const fn_call& fn)
     if ( matrixArg->getMember(NSV::PROP_MATRIX_TYPE).to_string() == "box" )
     {
         
-        boost::int32_t valX = PIXELS_TO_TWIPS(
+        boost::int32_t valX = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_X).to_number()); 
-        boost::int32_t valY = PIXELS_TO_TWIPS(
+        boost::int32_t valY = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_Y).to_number()); 
-        boost::int32_t valW = PIXELS_TO_TWIPS(
+        boost::int32_t valW = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_W).to_number()); 
-        boost::int32_t valH = PIXELS_TO_TWIPS(
+        boost::int32_t valH = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_H).to_number()); 
         float valR = matrixArg->getMember(NSV::PROP_R).to_number(); 
 
@@ -4877,9 +4852,9 @@ movieclip_beginGradientFill(const fn_call& fn)
         float valB = matrixArg->getMember(NSV::PROP_B).to_number() ; // yx
         float valD = matrixArg->getMember(NSV::PROP_D).to_number() ; // xy
         float valE = matrixArg->getMember(NSV::PROP_E).to_number() ; // yy
-        boost::int32_t valG = PIXELS_TO_TWIPS(
+        boost::int32_t valG = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_G).to_number()); // x0
-        boost::int32_t valH = PIXELS_TO_TWIPS(
+        boost::int32_t valH = pixelsToTwips(
                 matrixArg->getMember(NSV::PROP_H).to_number()); // y0
 
         input_matrix.sx    = valA * 65536; // sx
@@ -4973,11 +4948,11 @@ movieclip_beginGradientFill(const fn_call& fn)
 
         as_value alpVal = alphas->getMember(key);
         boost::uint8_t alp = alpVal.is_number() ? 
-            utility::clamp<int>(alpVal.to_int(), 0, 255) : 0;
+            clamp<int>(alpVal.to_int(), 0, 255) : 0;
 
         as_value ratVal = ratios->getMember(key);
         boost::uint8_t rat = ratVal.is_number() ? 
-            utility::clamp<int>(ratVal.to_int(), 0, 255) : 0;
+            clamp<int>(ratVal.to_int(), 0, 255) : 0;
 
         rgba color;
         color.parseRGB(col);
@@ -5026,10 +5001,10 @@ movieclip_startDrag(const fn_call& fn)
 
             // check for infinite values
             bool gotinf = false;
-            if ( ! utility::isFinite(x0) ) { x0=0; gotinf=true; }
-            if ( ! utility::isFinite(y0) ) { y0=0; gotinf=true; }
-            if ( ! utility::isFinite(x1) ) { x1=0; gotinf=true; }
-            if ( ! utility::isFinite(y1) ) { y1=0; gotinf=true; }
+            if (!isFinite(x0) ) { x0=0; gotinf=true; }
+            if (!isFinite(y0) ) { y0=0; gotinf=true; }
+            if (!isFinite(x1) ) { x1=0; gotinf=true; }
+            if (!isFinite(y1) ) { y1=0; gotinf=true; }
 
             // check for swapped values
             bool swapped = false;
@@ -5061,8 +5036,8 @@ movieclip_startDrag(const fn_call& fn)
                 }
             );
 
-            rect bounds(PIXELS_TO_TWIPS(x0), PIXELS_TO_TWIPS(y0),
-                    PIXELS_TO_TWIPS(x1), PIXELS_TO_TWIPS(y1));
+            rect bounds(pixelsToTwips(x0), pixelsToTwips(y0),
+                    pixelsToTwips(x1), pixelsToTwips(y1));
             st.setBounds(bounds);
         }
     }

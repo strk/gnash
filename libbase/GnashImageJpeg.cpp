@@ -517,7 +517,6 @@ public:
 		if (dest->m_out_stream.write(dest->m_buffer, IO_BUF_SIZE) != IO_BUF_SIZE)
 		{
 			// Error.
-			// @@ bah, exceptions suck.  TODO consider alternatives.
 			log_error(_("jpeg::rw_dest_IOChannel couldn't write data."));
 			return false;
 		}

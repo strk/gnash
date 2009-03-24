@@ -23,6 +23,8 @@
 #include "VideoDecoder.h"
 #include "SWFStream.h" // for read()
 #include "movie_definition.h"
+#include "GnashAlgorithm.h"
+#include "GnashNumeric.h"
 
 namespace gnash {
 namespace SWF {
@@ -52,10 +54,9 @@ struct FrameFinder
 
 }
 
-DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in,
-        boost::uint16_t char_id)
+DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in, boost::uint16_t id)
 	:
-	m_char_id(char_id),
+	m_char_id(id),
 	_width(0),
 	_height(0)
 {
@@ -64,8 +65,7 @@ DefineVideoStreamTag::DefineVideoStreamTag(SWFStream& in,
 
 DefineVideoStreamTag::~DefineVideoStreamTag()
 {
-	std::for_each(_video_frames.begin(), _video_frames.end(),
-		      boost::checked_deleter<media::EncodedVideoFrame>());
+    deleteAllChecked(_video_frames);
 }
 
 
@@ -101,7 +101,7 @@ DefineVideoStreamTag::read(SWFStream& in)
 	_height = in.read_u16();
 
 	m_bound.set_to_point(0, 0);
-	m_bound.expand_to_point(PIXELS_TO_TWIPS(_width), PIXELS_TO_TWIPS(_height));
+	m_bound.expand_to_point(pixelsToTwips(_width), pixelsToTwips(_height));
 
 	m_reserved_flags = in.read_uint(5);
 	m_deblocking_flags = in.read_uint(2);
@@ -133,7 +133,7 @@ DefineVideoStreamTag::addVideoFrameTag(
 }
 
 character*
-DefineVideoStreamTag::create_character_instance(character* parent, int id)
+DefineVideoStreamTag::createDisplayObject(character* parent, int id)
 {
 	character* ch = new Video(this, parent, id);
 	return ch;

@@ -28,11 +28,12 @@
 #include "drag_state.h" // for do_mouse_drag (to be moved in movie_root)
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
-#include "GnashException.h" // for shared ActionScript getter-setters (ensure_character)
+#include "GnashException.h" 
 #include "render.h"  // for bounds_in_clipping_area()
 #include "ExecutableCode.h"
 #include "namedStrings.h"
 #include "gnash.h" // Quality
+#include "GnashNumeric.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -360,7 +361,7 @@ character::x_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		SWFMatrix m = ptr->getMatrix();
-		rv = as_value(TWIPS_TO_PIXELS(m.get_x_translation()));
+		rv = as_value(twipsToPixels(m.get_x_translation()));
 	}
 	else // setter
 	{
@@ -394,7 +395,7 @@ character::x_getset(const fn_call& fn)
 
 		SWFMatrix m = ptr->getMatrix();
         // NOTE: infinite_to_zero is wrong here, see actionscript.all/setProperty.as
-		m.set_x_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newx)));
+		m.set_x_translation(pixelsToTwips(infinite_to_zero(newx)));
 		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -411,7 +412,7 @@ character::y_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		SWFMatrix m = ptr->getMatrix();
-		rv = as_value(TWIPS_TO_PIXELS(m.get_y_translation()));
+		rv = as_value(twipsToPixels(m.get_y_translation()));
 	}
 	else // setter
 	{
@@ -446,7 +447,7 @@ character::y_getset(const fn_call& fn)
 		SWFMatrix m = ptr->getMatrix();
         // NOTE: infinite_to_zero is wrong here, 
         // see actionscript.all/setProperty.as
-		m.set_y_translation(PIXELS_TO_TWIPS(utility::infinite_to_zero(newy)));
+		m.set_y_translation(pixelsToTwips(infinite_to_zero(newy)));
 		ptr->setMatrix(m); // no need to update caches when only changing translation
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -558,10 +559,10 @@ character::xmouse_get(const fn_call& fn)
 	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();
-    point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    point a(pixelsToTwips(x), pixelsToTwips(y));
     
     m.invert().transform(a);
-    return as_value(TWIPS_TO_PIXELS(a.x));
+    return as_value(twipsToPixels(a.x));
 }
 
 as_value
@@ -574,9 +575,9 @@ character::ymouse_get(const fn_call& fn)
 	ptr->getVM().getRoot().get_mouse_state(x, y, buttons);
 
 	SWFMatrix m = ptr->getWorldMatrix();
-    point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+    point a(pixelsToTwips(x), pixelsToTwips(y));
     m.invert().transform(a);
-    return as_value(TWIPS_TO_PIXELS(a.y));
+    return as_value(twipsToPixels(a.y));
 }
 
 as_value
@@ -778,12 +779,12 @@ character::width_getset(const fn_call& fn)
 	{ 
 		SWFMatrix m = ptr->getMatrix();
 		m.transform(bounds);
-		double w = TWIPS_TO_PIXELS( bounds.width() );
+		double w = twipsToPixels( bounds.width() );
 		rv = as_value(w);
 	}
 	else // setter
 	{
-		const double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+		const double newwidth = pixelsToTwips(fn.arg(0).to_number());
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -845,13 +846,13 @@ character::height_getset(const fn_call& fn)
 	{
 		SWFMatrix m = ptr->getMatrix();
 		m.transform(bounds);
-		double h = TWIPS_TO_PIXELS(bounds.height());      
+		double h = twipsToPixels(bounds.height());      
 		rv = as_value(h);
 	}
 	else // setter
 	{
 
-		const double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+		const double newheight = pixelsToTwips(fn.arg(0).to_number());
 		if ( newheight <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(

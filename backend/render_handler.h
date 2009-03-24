@@ -147,7 +147,7 @@
 
 #include "gnash.h" // Quality
 #include "shape_character_def.h"    
-#include "generic_character.h"
+#include "DisplayObject.h"
 #include "Range2d.h"
 
 // Forward declarations.
@@ -159,7 +159,6 @@ namespace gnash {
     class cxform;
 
     class shape_character_def;
-    class generic_character;
 
     class GnashImage;
 }

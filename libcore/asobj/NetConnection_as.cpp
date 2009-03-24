@@ -39,18 +39,14 @@
 #include "builtin_function.h"
 #include "movie_root.h"
 #include "Object.h" // for getObjectInterface
-
 #include "StreamProvider.h"
 #include "URLAccessManager.h"
 #include "URL.h"
-
-// for NetConnection_as.call()
 #include "VM.h"
 #include "amf.h"
 #include "SimpleBuffer.h"
-#include "timers.h"
 #include "namedStrings.h"
-
+#include "GnashAlgorithm.h"
 
 //#define GNASH_DEBUG_REMOTING
 
@@ -688,15 +684,14 @@ NetConnection_as::NetConnection_as()
     _queuedConnections(),
     _currentConnection(0),
     _uri(),
-    _isConnected(false),
-    _advanceTimer(0)
+    _isConnected(false)
 {
     attachProperties(*this);
 }
 
 // extern (used by Global.cpp)
 void
-netconnection_class_init(as_object& global)
+NetConnection_as::init(as_object& global)
 {
     // This is going to be the global NetConnection "class"/"function"
     static boost::intrusive_ptr<builtin_function> cl;
@@ -718,12 +713,7 @@ netconnection_class_init(as_object& global)
 // here to have HTTPRemotingHandler definition available
 NetConnection_as::~NetConnection_as()
 {
-    for (std::list<ConnectionHandler*>::iterator
-            i=_queuedConnections.begin(), e=_queuedConnections.end();
-            i!=e; ++i)
-    {
-        delete *i;
-    }
+    deleteAllChecked(_queuedConnections);
 }
 
 
@@ -860,7 +850,8 @@ NetConnection_as::connect(const std::string& uri)
 
     if ( url.protocol() == "rtmp" )
     {
-        LOG_ONCE( log_unimpl("NetConnection.connect(%s): RTMP not yet supported", url) );
+        LOG_ONCE(log_unimpl("NetConnection.connect(%s): RTMP not "
+                    "yet supported", url) );
         notifyStatus(CONNECT_FAILED);
         return;
     }
@@ -868,7 +859,8 @@ NetConnection_as::connect(const std::string& uri)
     if ( url.protocol() != "http" )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("NetConnection.connect(%s): invalid connection protocol", url);
+        log_aserror("NetConnection.connect(%s): invalid connection "
+            "protocol", url);
         );
         notifyStatus(CONNECT_FAILED);
         return;
@@ -877,7 +869,8 @@ NetConnection_as::connect(const std::string& uri)
     // This is for HTTP remoting
 
     if (!URLAccessManager::allow(url)) {
-        log_security(_("Gnash is not allowed to NetConnection.connect to %s"), url);
+        log_security(_("Gnash is not allowed to NetConnection.connect "
+                    "to %s"), url);
         notifyStatus(CONNECT_FAILED);
         return;
     }
@@ -972,58 +965,28 @@ NetConnection_as::getStream(const std::string& name)
 
 }
 
-as_value
-NetConnection_as::advanceWrapper(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetConnection_as> ptr = 
-        ensureType<NetConnection_as>(fn.this_ptr);
-    
-    ptr->advance();
-    return as_value();
-};
-
 void
 NetConnection_as::startAdvanceTimer() 
 {
-
-    if (_advanceTimer)
-    {
-        //log_debug("startAdvanceTimer: already running %d", _advanceTimer);
-        return;
-    }
-
-    boost::intrusive_ptr<builtin_function> ticker_as = 
-            new builtin_function(&NetConnection_as::advanceWrapper);
-
-    std::auto_ptr<Timer> timer(new Timer);
-    unsigned long delayMS = 50; 
-    timer->setInterval(*ticker_as, delayMS, this);
-    _advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
-
-    log_debug("startAdvanceTimer: registered advance timer %d", _advanceTimer);
+    getVM().getRoot().addAdvanceCallback(this);
+    log_debug("startAdvanceTimer: registered NetConnection timer");
 }
 
 void
 NetConnection_as::stopAdvanceTimer() 
 {
-    if (!_advanceTimer)
-    {
-        log_debug("stopAdvanceTimer: not running");
-        return;
-    }
-
-    getVM().getRoot().clear_interval_timer(_advanceTimer);
-    log_debug("stopAdvanceTimer: deregistered timer %d", _advanceTimer);
-    _advanceTimer=0;
+    getVM().getRoot().removeAdvanceCallback(this);
+    log_debug("stopAdvanceTimer: deregistered NetConnection timer");
 }
 
 void
-NetConnection_as::advance()
+NetConnection_as::advanceState()
 {
     // Advance
 
 #ifdef GNASH_DEBUG_REMOTING
-    log_debug("NetConnection_as::advance: %d calls to advance", _queuedConnections.size());
+    log_debug("NetConnection_as::advance: %d calls to advance",
+            _queuedConnections.size());
 #endif
 
     while ( ! _queuedConnections.empty() )

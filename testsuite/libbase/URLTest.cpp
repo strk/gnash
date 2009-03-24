@@ -238,6 +238,46 @@ main(int /*argc*/, char** /*argv*/)
     check_equals (u29.port(), "443");
     check_equals (u29.path(), "/");
 
+    { // Relative url when base url has a port number
+       URL u("rtmp://pms.youtube.com:443");
+       URL u2("/newpath", u);
+       check_equals (u2.protocol(), "rtmp");
+       check_equals (u2.hostname(), "pms.youtube.com");
+       check_equals (u2.port(), "443");
+       check_equals (u2.path(), "/newpath");
+    }
+
+    { // Relative url with port number 
+       URL u("rtmp://pms.youtube.com:443");
+       URL u2("http://newhost:554", u);
+       check_equals (u2.protocol(), "http");
+       check_equals (u2.hostname(), "newhost");
+       check_equals (u2.port(), "554");
+       check_equals (u2.path(), "/");
+    }
+
+    { // Relative url with query string
+       URL u("http://pms.youtube.com:443/index.php?query=1");
+       URL u2("/?query", u);
+       check_equals (u2.protocol(), "http");
+       check_equals (u2.hostname(), "pms.youtube.com");
+       check_equals (u2.port(), "443");
+       check_equals (u2.path(), "/");
+       check_equals (u2.querystring(), "query");
+       check_equals (u2.anchor(), "");
+    }
+
+    { // Relative url with anchor
+       URL u("http://pms.youtube.com:443/index.php?query=1");
+       URL u2("/#anchor", u);
+       check_equals (u2.protocol(), "http");
+       check_equals (u2.hostname(), "pms.youtube.com");
+       check_equals (u2.port(), "443");
+       check_equals (u2.path(), "/");
+       check_equals (u2.querystring(), "");
+       check_equals (u2.anchor(), "anchor");
+    }
+
 
 	// TODO: Samba paths
 }

@@ -55,27 +55,32 @@ MediaParserFfmpeg::seekMediaWrapper(void *opaque, boost::int64_t offset, int whe
 AVInputFormat*
 MediaParserFfmpeg::probeStream()
 {
-	boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[2048]);
+    const size_t probeSize = 2048;
+    const size_t bufSize = probeSize + FF_INPUT_BUFFER_PADDING_SIZE;
 
-	// Probe the file to detect the format
-	AVProbeData probe_data;
-	probe_data.filename = "";
-	probe_data.buf = buffer.get();
-	probe_data.buf_size = 2048;
+	boost::scoped_array<boost::uint8_t> buffer(new boost::uint8_t[bufSize]);
 
 	assert(_stream->tell() == static_cast<std::streampos>(0));
-	size_t actuallyRead = _stream->read(probe_data.buf, probe_data.buf_size);
+	size_t actuallyRead = _stream->read(buffer.get(), probeSize);
+    
+    // Fill any padding with 0s.
+    std::fill(buffer.get() + actuallyRead, buffer.get() + bufSize, 0);
+
 	_stream->seek(0);
 
 	if (actuallyRead < 1)
 	{
  		throw IOException(_("MediaParserFfmpeg could not read probe data "
                     "from input"));
- 		return 0;
 	}
 
-	probe_data.buf_size = actuallyRead; // right ?
-	AVInputFormat* ret = av_probe_input_format(&probe_data, 1);
+	// Probe the file to detect the format
+	AVProbeData probe_data;
+	probe_data.filename = "";
+	probe_data.buf = buffer.get();
+    probe_data.buf_size = actuallyRead;
+	
+    AVInputFormat* ret = av_probe_input_format(&probe_data, 1);
 	return ret;
 }
 

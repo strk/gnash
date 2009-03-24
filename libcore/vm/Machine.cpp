@@ -2756,6 +2756,8 @@ void
 Machine::instantiateClass(std::string className, as_object* global)
 {
 
+    log_debug("instantiateClass: class name %s", className);
+
 	asClass* theClass = mPoolObject->locateClass(className);
 	
 	// TODO: what happens when it's not located?

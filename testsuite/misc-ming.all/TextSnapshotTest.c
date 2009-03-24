@@ -144,7 +144,7 @@ main(int argc, char** argv)
           "'First text\nZweites Textfeld\nSome more "
 		  "static text here... abcdefgh'");
   
-  xcheck_equals(mo, "ts.getText(0, 14, true)", "'First text\nZwei'");
+  check_equals(mo, "ts.getText(0, 14, true)", "'First text\nZwei'");
 
   check_equals(mo, "ts.findText(0, '', false)", "-1");
   check_equals(mo, "ts.findText(0, 'f', false)", "0");
@@ -156,8 +156,133 @@ main(int argc, char** argv)
   check_equals(mo, "ts.findText(-5, 'Zwei', true)", "-1");
   check_equals(mo, "ts.findText(-5, 'gh', true)", "-1");
 
+  add_actions(mo, "ts.setSelected(5, 30, true);");
+  check_equals(mo, "ts.getSelectedText()", "' textZweites TextfeldSome'");
+  check_equals(mo, "ts.getSelectedText(true)", "' text\nZweites "
+          "Textfeld\nSome'");
+  check_equals(mo, "ts.getSelectedText(false)", "' textZweites TextfeldSome'");
+  check_equals(mo, "ts.getSelected(0, 4)", "false");
+  check_equals(mo, "ts.getSelected(1, 9)", "true");
+  check_equals(mo, "ts.getSelected(-4, 10)", "true");
+  check_equals(mo, "ts.getSelected(-4, 6)", "true");
+  check_equals(mo, "ts.getSelected(28, 23)", "true");
+  check_equals(mo, "ts.getSelected(20, 20)", "true");
+  check_equals(mo, "ts.getSelected(20, 27)", "true");
+  check_equals(mo, "ts.getSelected(-3, -1)", "false");
+  check_equals(mo, "ts.getSelected(30, 31)", "false");
+  check_equals(mo, "ts.getSelected(0, 5)", "false");
+  check_equals(mo, "ts.getSelected(40, 45)", "false");
+  check_equals(mo, "ts.getSelected(31, 34)", "false");
 
-  add_actions(mo, "ts.setSelected(0, 30, true);");
+  check_equals(mo, "ts.getSelected(0)", "undefined");
+  check_equals(mo, "ts.getSelected(1)", "undefined");
+  check_equals(mo, "ts.getSelected(-4)", "undefined");
+  check_equals(mo, "ts.getSelected(-4)", "undefined");
+  check_equals(mo, "ts.getSelected(28)", "undefined");
+  check_equals(mo, "ts.getSelected(20)", "undefined");
+
+  // Selected text is stored in the textfield and reset when a new
+  // snapshot is taken.
+  add_actions(mo, "ts2 = new TextSnapshot(this);");
+  check_equals(mo, "ts.getSelectedText(false)", "''");
+  check_equals(mo, "ts2.getCount()", "64");
+  check_equals(mo, "ts2.getSelectedText()", "''");
+  add_actions(mo, "ts2 = this.getTextSnapshot();");
+  check_equals(mo, "ts2.getCount()", "64");
+  check_equals(mo, "ts2.getSelectedText()", "''");
+
+  add_actions(mo, "ts2.setSelected(3, 10, true);");
+  check_equals(mo, "ts2.getSelectedText(false).length", "7");
+  check_equals(mo, "ts.getSelectedText(false).length", "7");
+
+  add_actions(mo, "ts.setSelectedColor(0xffff00);");
+  add_actions(mo, "ts2.setSelectedColor(0x0000ff);");
+
+  check_equals(mo, "ts.getSelectedText(false)", "'st text'");
+  add_actions(mo, "ri = ts.getTextRunInfo(4, 10);");
+  check_equals(mo, "typeof(ri)", "'object'");
+  check(mo, "ri instanceof Array");
+  check_equals(mo, "ri.length", "7");
+
+  add_actions(mo, "el = ri[1];");
+  check_equals(mo, "typeof(el)", "'object'");
+  check(mo, "!el.hasOwnProperty('indexInRun')");
+  check_equals(mo, "el.indexInRun", "5");
+  check_equals(mo, "el.selected", "true");
+  check_equals(mo, "el.font", "'Bitstream Vera Sans'");
+  check_equals(mo, "el.color", "0");
+  check_equals(mo, "el.height", "12");
+  check_equals(mo, "el.matrix_a", "1");
+  check_equals(mo, "el.matrix_b", "0");
+  check_equals(mo, "el.matrix_c", "0");
+  check_equals(mo, "el.matrix_d", "1");
+  check_equals(mo, "el.matrix_tx", "25.95");
+  check_equals(mo, "el.matrix_ty", "200");
+  xcheck_equals(mo, "el.corner0x", "25.95");
+  xcheck_equals(mo, "el.corner0y", "202.8");
+  xcheck_equals(mo, "el.corner1x", "29.75");
+  xcheck_equals(mo, "el.corner1y", "202.8");
+  xcheck_equals(mo, "el.corner2x", "29.75");
+  xcheck_equals(mo, "el.corner2y", "188.85");
+  xcheck_equals(mo, "el.corner3x", "25.95");
+  xcheck_equals(mo, "el.corner3y", "188.85");
+
+  // Check properties individually
+  check_equals(mo, "ri[2].height", "12");
+  check_equals(mo, "ri[3].height", "12");
+  check_equals(mo, "ri[4].height", "12");
+  check_equals(mo, "ri[5].height", "12");
+  check_equals(mo, "ri[6].height", "12");
+
+  check_equals(mo, "ri[2].selected", "true");
+  check_equals(mo, "ri[3].selected", "true");
+  check_equals(mo, "ri[4].selected", "true");
+  check_equals(mo, "ri[5].selected", "true");
+  check_equals(mo, "ri[6].selected", "false");
+
+  check_equals(mo, "ri[2].matrix_tx", "29.75");
+  check_equals(mo, "ri[2].matrix_ty", "200");
+  check_equals(mo, "ri[3].matrix_tx", "34.4");
+  check_equals(mo, "ri[3].matrix_ty", "200");
+  check_equals(mo, "ri[4].matrix_tx", "41.75");
+  check_equals(mo, "ri[4].matrix_ty", "200");
+
+  xcheck_equals(mo, "ri[2].corner0x", "29.75");
+  xcheck_equals(mo, "ri[2].corner0y", "202.8");
+  xcheck_equals(mo, "ri[3].corner0x", "34.4");
+  xcheck_equals(mo, "ri[3].corner0y", "202.8");
+  xcheck_equals(mo, "ri[4].corner0x", "41.75");
+  xcheck_equals(mo, "ri[4].corner0y", "202.8");
+  
+  xcheck_equals(mo, "ri[2].corner2y", "188.85");
+  xcheck_equals(mo, "ri[3].corner2y", "188.85");
+  xcheck_equals(mo, "ri[4].corner2y", "188.85");
+
+  add_actions(mo, "ts.setSelected(0, 10, true);");
+  add_actions(mo, "ts.setSelected(15, 20, false);");
+  check_equals(mo, "ts2.getSelectedText().length", "10");
+
+  add_actions(mo, "ri2 = ts.getTextRunInfo(0, 100);");
+
+  check_equals(mo, "ri2[0].selected", "true");
+  check_equals(mo, "ri2[1].selected", "true");
+  check_equals(mo, "ri2[2].selected", "true");
+  check_equals(mo, "ri2[3].selected", "true");
+  check_equals(mo, "ri2[4].selected", "true");
+  check_equals(mo, "ri2[5].selected", "true");
+  check_equals(mo, "ri2[6].selected", "true");
+  check_equals(mo, "ri2[15].selected", "false");
+  check_equals(mo, "ri2[16].selected", "false");
+  check_equals(mo, "ri2[17].selected", "false");
+  check_equals(mo, "ri2[18].selected", "false");
+
+  xcheck_equals(mo, "ri2[50].corner2y", "388.85");
+  xcheck_equals(mo, "ri2[50].corner2x", "154.55");
+  xcheck_equals(mo, "ri2[51].corner2y", "388.85");
+  xcheck_equals(mo, "ri2[51].corner2x", "161.9");
+
+  check_equals(mo, "ri2[50].matrix_tx", "149.6");
+  check_equals(mo, "ri2[51].matrix_tx", "154.5");
 
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");
@@ -181,11 +306,7 @@ main(int argc, char** argv)
   add_actions(mo, "ts = this.getTextSnapshot();");
   check_equals(mo, "typeof(ts)", "'object'");
   
-  
   add_actions(mo, "totals(); stop();");
-  
-
-
   
   SWFMovie_nextFrame(mo); 
 

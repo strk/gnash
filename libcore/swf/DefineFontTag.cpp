@@ -204,7 +204,8 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
     // Next is language code, always 0 for SWF5 or previous
     int languageCode = in.read_u8();
     if (languageCode) {
-        LOG_ONCE(log_unimpl("LanguageCode in DefineFont (2 or 3)"));
+        LOG_ONCE(log_unimpl("LanguageCode (%d) in DefineFont tag",
+                    languageCode));
     }
 
     in.read_string_with_length(_name);

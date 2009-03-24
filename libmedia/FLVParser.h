@@ -107,6 +107,13 @@ class DSOEXPORT FLVParser : public MediaParser
 
 public:
 
+    /// The size of padding for all buffers that might be read by FFMPEG.
+    //
+    /// This possibly also applies to other media handlers (gst).
+    /// Ideally this would be taken from the current Handler, but we don't
+    /// know about it here.
+    static const size_t paddingBytes = 8;
+
 	/// \brief
 	/// Create an FLV parser reading input from
 	/// the given IOChannel

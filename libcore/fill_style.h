@@ -28,6 +28,7 @@
 #include "RGBA.h" // for rgba type
 
 #include <vector> // for composition
+#include <iosfwd> // for output operator forward declarations
 
 namespace gnash {
 
@@ -62,6 +63,42 @@ public:
 class DSOEXPORT fill_style 
 {
 public:
+
+    /// Bitmap smoothing policy
+    enum BitmapSmoothingPolicy {
+
+        /// Only smooth when _quality >= BEST
+        //
+        /// This is the policy for bitmap fills
+        /// defined by SWF up to version 7:
+        ///  - SWF::FILL_CLIPPED_BITMAP
+        ///  - SWF::FILL_TILED_BITMAP
+        ///
+        BITMAP_SMOOTHING_UNSPECIFIED,
+
+        /// Always smooth if _quality > LOW
+        //
+        /// This is the policy for non-hard bitmap fills
+        /// defined by SWF 8 and higher:
+        ///  - SWF::FILL_CLIPPED_BITMAP
+        ///  - SWF::FILL_TILED_BITMAP
+        ///
+        BITMAP_SMOOTHING_ON,
+
+        /// Never smooth
+        ///
+        /// MovieClip.forceSmoothing can force this to
+        /// behave like BITMAP_SMOOTHING_ON 
+        ///
+        /// This is the policy for hard bitmap fills
+        /// introduced in SWF 8:
+        ///  - SWF::FILL_CLIPPED_BITMAP_HARD
+        ///  - SWF::FILL_TILED_BITMAP_HARD
+        ///
+        ///
+        BITMAP_SMOOTHING_OFF
+    };
+    
 
 	/// Create a solid opaque white fill.
 	fill_style();
@@ -151,7 +188,7 @@ public:
 	void	set_color(rgba new_color) { m_color = new_color; }
 
 	/// Get fill type, see SWF::fill_style_type
-	int	get_type() const { return m_type; }
+	uint8_t	get_type() const { return m_type; }
 
 	SWF::gradient_spread_mode get_gradient_spread_mode()
 	{ return m_spread_mode; }
@@ -173,12 +210,16 @@ public:
 	///        (it happens..)
 	///
 	BitmapInfo* get_bitmap_info() const;
+
+    BitmapSmoothingPolicy getBitmapSmoothingPolicy() const {
+        return _bitmapSmoothingPolicy;
+    }
 	
 	/// Returns the bitmap transformation SWFMatrix
-	SWFMatrix getBitmapMatrix() const; 
+	const SWFMatrix& getBitmapMatrix() const; 
 	
 	/// Returns the gradient transformation SWFMatrix
-	SWFMatrix getGradientMatrix() const; 
+	const SWFMatrix& getGradientMatrix() const; 
 	
 	/// Returns the number of color stops in the gradient
 	int get_color_stop_count() const;
@@ -213,21 +254,36 @@ private:
 	rgba sample_gradient(boost::uint8_t ratio) const;
 
 	friend class morph2_character_def;
-	
-	/// Fill type, see SWF::fill_style_type
-	int	m_type;
-	rgba	m_color;
-	SWFMatrix	m_gradient_matrix;
-    float m_focal_point; // For focal fill gradients.
-	std::vector<gradient_record> m_gradients;
-	boost::intrusive_ptr<BitmapInfo> _gradientBitmapInfo;
-	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
-	SWFMatrix	m_bitmap_matrix;
 
+	// For BITMAP or GRADIENT types 
+	SWFMatrix	_matrix;
+
+	// For BITMAP or GRADIENT types
+	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
+
+	// For SOLID type (and arguably GRADIENT too)
+	rgba	m_color;
+
+	// Only for GRADIENT type
+	float m_focal_point; // For focal fill gradients.
+	std::vector<gradient_record> m_gradients;
 	SWF::gradient_spread_mode m_spread_mode;
 	SWF::gradient_interpolation_mode m_interpolation;
+
+	/// Fill type, see SWF::fill_style_type
+	uint8_t	m_type;
+
+	// Only for BITMAP type
+    //
+    // 0: unspecified (smooth with _quality >= BEST)
+    // 1: smooth (smooth with _quality >= MEDIUM)
+    // 2: don't smooth, can be forced with .forceSmoothing, in
+    //    which case it becomes as policy 1
+    BitmapSmoothingPolicy _bitmapSmoothingPolicy;
 };
 
+DSOEXPORT std::ostream& operator << (std::ostream& os,
+    const fill_style::BitmapSmoothingPolicy& p);
 
 } // namespace gnash
 

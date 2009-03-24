@@ -13,6 +13,11 @@
 #include "swf.h"
 #include "TextRecord.h"
 #include "Font.h"
+#include "StaticText.h"
+#include "GnashAlgorithm.h"
+
+#include <algorithm>
+#include <numeric>
 
 namespace gnash {
 namespace SWF {
@@ -34,33 +39,27 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     m.add_character(id, t.release());
 }
 
-class DecodeRecord
+character*
+DefineTextTag::createDisplayObject(character* parent, int id)
 {
-public:
-
-    DecodeRecord(std::string& to) : _to(to) {}
-
-    void operator()(const TextRecord& tr) {
-
-        const Font* font = tr.getFont();
-        if (!font) return;
-        
-        const TextRecord::Glyphs& glyphs = tr.glyphs();
-
-        for (TextRecord::Glyphs::const_iterator it = glyphs.begin(),
-                e = glyphs.end(); it != e; ++it) {
-            _to += font->codeTableLookup(it->index, true);
-        }
-    }
-private:
-    std::string& _to;
-};
+    return new StaticText(this, parent, id);
+}
 
 
 bool
-DefineTextTag::extractStaticText(std::string& to)
+DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to,
+        size_t& numChars)
 {
-    std::for_each(_textRecords.begin(), _textRecords.end(), DecodeRecord(to));
+    if (_textRecords.empty()) return false;
+
+    /// Insert pointers to all our TextRecords into to.
+    std::transform(_textRecords.begin(), _textRecords.end(),
+            std::back_inserter(to), CreatePointer<TextRecord>());
+
+    /// Count the number of characters in this definition's text records.
+    numChars = std::accumulate(_textRecords.begin(), _textRecords.end(),
+            0, TextRecord::RecordCounter());
+
     return true;
 }
 

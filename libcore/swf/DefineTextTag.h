@@ -58,7 +58,14 @@ public:
     }
 
     /// Extract static text from TextRecords.
-    bool extractStaticText(std::string& to);
+    //
+    /// @param to   Will be filled with pointers to TextRecords
+    ///             if any are present
+    /// @param size Will contain the number of characters in this
+    ///             StaticText definition.
+    bool extractStaticText(std::vector<const TextRecord*>& to, size_t& size);
+
+    virtual character* createDisplayObject(character* parent, int id);
 
 private:
 

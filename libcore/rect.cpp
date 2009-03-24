@@ -19,13 +19,13 @@
 #include "log.h"
 #include "SWFStream.h"
 #include "SWFMatrix.h"
-#include "utility.h" // for flerp, clamp...
+#include "GnashNumeric.h" // for flerp, clamp...
 
 #include <sstream> // for ::print and ::toString
 
 namespace gnash {
 
-void    rect::read(SWFStream& in)
+void rect::read(SWFStream& in)
 {
     in.align();
     in.ensureBits(5);
@@ -104,7 +104,8 @@ void    rect::enclose_transformed_rect(const SWFMatrix& m, const rect& r)
     expand_to(p3.x, p3.y);
 }
 
-void  rect::expand_to_rect(const rect& r) 
+void
+rect::expand_to_rect(const rect& r) 
 // Expand ourself to enclose the given rect.
 {    
     if( r.is_null() ) {
@@ -121,7 +122,8 @@ void  rect::expand_to_rect(const rect& r)
     }
 }   
 
-void    rect::expand_to_transformed_rect(const SWFMatrix& m, const rect& r)
+void
+rect::expand_to_transformed_rect(const SWFMatrix& m, const rect& r)
 // Expand ourself to a transformed rect.
 {   
     if ( r.is_null() )
@@ -160,7 +162,6 @@ void    rect::set_lerp(const rect& a, const rect& b, float t)
     assert( !a.is_null() );
     assert( !b.is_null() );
     
-    using utility::flerp;   
     _xMin = (boost::int32_t)(flerp(a.get_x_min(), b.get_x_min(), t));
     _yMin = (boost::int32_t)(flerp(a.get_y_min(), b.get_y_min(), t));
     _xMax = (boost::int32_t)(flerp(a.get_x_max(), b.get_x_max(), t));
@@ -171,8 +172,8 @@ void
 rect::clamp(point& p) const
 {
     assert( !is_null() );
-    p.x = utility::clamp<boost::int32_t>(p.x, _xMin, _xMax);
-    p.y = utility::clamp<boost::int32_t>(p.y, _yMin, _yMax);
+    p.x = gnash::clamp<boost::int32_t>(p.x, _xMin, _xMax);
+    p.y = gnash::clamp<boost::int32_t>(p.y, _yMin, _yMax);
 }
 
 std::string

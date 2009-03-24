@@ -72,6 +72,11 @@ namespace gnash {
 			return (m_r<<16) + (m_g<<8) + m_b;
 		}
 
+        boost::uint32_t toRGBA() const
+        {
+            return toRGB() + (m_a << 24);
+        }
+
 		/// Initialize from input stream.
 		//
 		///

@@ -64,6 +64,8 @@ libgnashcore_la_SOURCES = \
 	cxform.cpp \
 	DynamicShape.cpp	\
 	Bitmap.cpp \
+	Shape.cpp \
+	StaticText.cpp \
 	TextField.cpp \
         BlurFilter.cpp \
         GlowFilter.cpp \
@@ -74,7 +76,7 @@ libgnashcore_la_SOURCES = \
         BevelFilter.cpp \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
-	generic_character.cpp \
+	DisplayObject.cpp \
 	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
@@ -113,7 +115,7 @@ libgnashcore_la_SOURCES = \
 	render.cpp \
 	SWFStream.cpp \
 	styles.cpp \
-	timers.cpp \
+	Timers.cpp \
 	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
 	$(NULL)
@@ -163,7 +165,9 @@ noinst_HEADERS = \
         parser/filter_factory.h \
 	Font.h \
 	fontlib.h \
-	generic_character.h \
+	Shape.h \
+	StaticText.h \
+	DisplayObject.h \
 	gnash.h	\
 	GnashKey.h \
 	impl.h \
@@ -176,7 +180,7 @@ noinst_HEADERS = \
 	rect.h \
 	render.h \
 	ExportableResource.h \
-	shape.h	\
+	Geometry.h	\
 	MovieClip.h \
 	SWFStream.h \
 	styles.h \
@@ -209,7 +213,7 @@ noinst_HEADERS = \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
-	timers.h \
+	Timers.h \
 	RGBA.h	\
 	Video.h \
 	$(NULL)

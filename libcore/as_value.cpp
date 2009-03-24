@@ -30,7 +30,8 @@
 #include "Number_as.h" // for automatic as_value::NUMBER => Number
 #include "Boolean_as.h" // for automatic as_value::BOOLEAN => Boolean
 #include "action.h" // for call_method0
-#include "utility.h" // for typeName() and utility::isFinite
+#include "utility.h" // for typeName() 
+#include "GnashNumeric.h"
 #include "namedStrings.h"
 #include "element.h"
 #include "GnashException.h"
@@ -894,7 +895,7 @@ as_value::to_int() const
 {
 	double d = to_number();
 
-	if ( ! utility::isFinite(d) ) return 0;
+	if (!isFinite(d)) return 0;
 
     return truncateToInt(d);
 }
@@ -1234,7 +1235,7 @@ as_value::equals(const as_value& v) const
     if (m_type == NUMBER && v.m_type == STRING)
     {
         double n = v.to_number();
-        if ( ! utility::isFinite(n) ) return false;
+        if (!isFinite(n)) return false;
         return equalsSameType(n);
     }
 
@@ -1243,8 +1244,8 @@ as_value::equals(const as_value& v) const
     if (v.m_type == NUMBER && m_type == STRING)
     {
         double n = to_number();
-        if ( ! utility::isFinite(n) ) return false;
-            return v.equalsSameType(n); 
+        if (!isFinite(n)) return false;
+        return v.equalsSameType(n); 
     }
 
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.

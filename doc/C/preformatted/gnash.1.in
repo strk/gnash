@@ -5,7 +5,7 @@
 \\$2 \(la\\$1\(ra\\$3
 ..
 .if \n(.g .mso www.tmac
-.TH gnash 1 "20 June 2008" "" ""
+.TH gnash 1 "19 March 2009" "" ""
 .SH NAME
 gnash \- GNU Flash (SWF) Player
 .SH Synopsis

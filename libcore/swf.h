@@ -1734,10 +1734,10 @@ enum fill_style_type {
 	FILL_TILED_BITMAP            = 0x40,
 	FILL_CLIPPED_BITMAP          = 0x41,
 
-	/// swf7, hard edges
+	/// swf8 (alexis is wrong), non-smoothed / hard edges
 	FILL_TILED_BITMAP_HARD       = 0x42, 
 
-	/// swf7, hard edges
+	/// swf8 (alexis is wrong), non-smoothed / hard edges
 	FILL_CLIPPED_BITMAP_HARD     = 0x43
 
 };

@@ -118,8 +118,8 @@ static int
 swfdec_gst_compare_features (gconstpointer a_, gconstpointer b_)
 {
   int diff;
-  GstPluginFeature *a = GST_PLUGIN_FEATURE (a_);
-  GstPluginFeature *b = GST_PLUGIN_FEATURE (b_);
+  GstPluginFeature *a = (GstPluginFeature *)GST_PLUGIN_FEATURE (a_);
+  GstPluginFeature *b = (GstPluginFeature *)GST_PLUGIN_FEATURE (b_);
 
   diff = gst_plugin_feature_get_rank (b) - gst_plugin_feature_get_rank (a);
   if (diff != 0)

@@ -42,6 +42,7 @@
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
 #include "ExportableResource.h"
+#include "GnashAlgorithm.h"
 
 #include <boost/bind.hpp>
 #include <boost/version.hpp>
@@ -217,11 +218,7 @@ SWFMovieDefinition::~SWFMovieDefinition()
             e = m_playlist.end(); i != e; ++i)
 	{
 		PlayList& pl = i->second;
-
-		for (PlayList::iterator j = pl.begin(), je = pl.end(); j!=je; ++j)
-		{
-            delete *j;
-        }
+        deleteAllChecked(pl);
     }
 
 	// It's supposed to be cleaned up in read()
@@ -552,16 +549,16 @@ SWFMovieDefinition::read_all_swf()
 
 	SWFStream &str = *_str;
 
-	try {
-
-        while (str.tell() < _swf_end_pos)
+    while (str.tell() < _swf_end_pos)
+    {
+        if (_loadingCanceled)
         {
-            if (_loadingCanceled)
-            {
-                log_debug("Loading thread cancelation requested, "
-                        "returning from read_all_swf");
-                return;
-            }
+            log_debug("Loading thread cancelation requested, "
+                    "returning from read_all_swf");
+            return;
+        }
+
+        try {
 
             SWF::TagType tag = str.open_tag();
 
@@ -623,21 +620,16 @@ parse_tag:
                 );
             }
 
-            str.close_tag();
-
-            setBytesLoaded(str.tell());
+        }
+        catch (const ParserException& e) {
+            // Log and continue parsing...
+            log_error(_("Parsing exception: %s"), e.what());
         }
 
-	} catch (const ParserException& e) {
-		// FIXME: we should be setting some variable
-		//        so that it is possible for clients
-		//        to check the parser status
-		//        Also, we should probably call _loader.unlock()
-		//        and make sure any wait_for_frame call is
-		//        released (condition set and false result)
-		log_error(_("Parsing exception: %s"), e.what());
+        str.close_tag();
 
-	}
+        setBytesLoaded(str.tell());
+    }
 
 	// Make sure we won't leave any pending writers
 	// on any eventual fd-based IOChannel.

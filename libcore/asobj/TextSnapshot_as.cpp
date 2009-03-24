@@ -28,11 +28,17 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "Object.h" // for getObjectInterface
-#include "generic_character.h"
+#include "StaticText.h"
 #include "DisplayList.h"
 #include "MovieClip.h"
+#include "Font.h"
+#include "swf/TextRecord.h"
+#include "Array_as.h"
+#include "RGBA.h"
+#include "GnashNumeric.h"
 
 #include <boost/algorithm/string/compare.hpp>
+#include <boost/dynamic_bitset.hpp>
 #include <algorithm>
 
 namespace gnash {
@@ -54,44 +60,126 @@ namespace {
     void attachTextSnapshotInterface(as_object& o);
     as_object* getTextSnapshotInterface();
 
-    void setTextReachable( const TextSnapshot_as::TextFields::value_type& vt);
+    size_t getTextFields(const MovieClip* mc,
+            TextSnapshot_as::TextFields& fields);
+
+    void setTextReachable(const TextSnapshot_as::TextFields::value_type& vt);
 
 }
 
 namespace {
 
+/// Locate static text in a character.
+//
+/// Static text (TextRecords) are added to a vector, which should 
+/// correspond to a single character. Also keeps count of the total number
+/// of glyphs.
 class TextFinder
 {
 public:
-    TextFinder(TextSnapshot_as::TextFields& fields) : _fields(fields) {}
+    TextFinder(TextSnapshot_as::TextFields& fields)
+        :
+        _fields(fields),
+        _count(0)
+    {}
 
     void operator()(character* ch) {
+
+        /// This is not tested.
         if (ch->isUnloaded()) return;
-        std::string text;
-        generic_character* tf;
-        if ((tf = ch->getStaticText(text))) {
+
+        TextSnapshot_as::Records text;
+        StaticText* tf;
+        size_t numChars;
+
+        if ((tf = ch->getStaticText(text, numChars))) {
             _fields.push_back(std::make_pair(tf, text));
+            _count += numChars;
         }
     }
 
+    size_t getCount() const { return _count; }
+
 private:
-        TextSnapshot_as::TextFields& _fields;
+    TextSnapshot_as::TextFields& _fields;
+    size_t _count;
 };
 
 } // anonymous namespace
 
-
+/// The member _textFields is initialized here unnecessarily to show
+/// that it is constructed before it is used.
 TextSnapshot_as::TextSnapshot_as(const MovieClip* mc)
     :
     as_object(getTextSnapshotInterface()),
-    _valid(mc)
+    _textFields(),
+    _valid(mc),
+    _count(getTextFields(mc, _textFields))
 {
-    if (mc) {
-        const DisplayList& dl = mc->getDisplayList();
+}
 
-        TextFinder finder(_textFields);
-        dl.visitAll(finder);
+void
+TextSnapshot_as::setSelected(size_t start, size_t end, bool selected)
+{
+    /// If there are no TextFields, there is nothing to do.
+    if (_textFields.empty()) return;
+
+    start = std::min(start, _count);
+    end = std::min(end, _count);
+
+    TextFields::const_iterator field = _textFields.begin();
+
+    size_t totalChars = field->first->getSelected().size();
+    size_t fieldStartIndex = 0;
+
+    for (size_t i = start; i < end; ++i) {
+
+        /// Find the field containing the start index.
+        while (totalChars <= i) {
+            fieldStartIndex = totalChars;
+            ++field;
+
+            if (field == _textFields.end()) return;
+            
+            const boost::dynamic_bitset<>& sel = field->first->getSelected();
+            totalChars += sel.size();
+            continue;
+        }
+        field->first->setSelected(i - fieldStartIndex, selected);
     }
+}
+
+bool
+TextSnapshot_as::getSelected(size_t start, size_t end) const
+{
+
+    if (_textFields.empty()) return false;
+
+    start = std::min(start, _count);
+    end = std::min(end, _count);
+
+    TextFields::const_iterator field = _textFields.begin();
+
+    size_t totalChars = field->first->getSelected().size();
+    size_t fieldStartIndex = 0;
+
+    for (size_t i = start; i < end; ++i) {
+
+        /// Find the field containing the start index.
+        while (totalChars <= i) {
+            fieldStartIndex = totalChars;
+            ++field;
+            if (field == _textFields.end()) return false;
+
+            const boost::dynamic_bitset<>& sel = field->first->getSelected();
+            totalChars += sel.size();
+            continue;
+        }
+
+        if (field->first->getSelected().test(i - fieldStartIndex)) return true;
+    }
+    
+    return false;
 }
 
 void
@@ -101,37 +189,161 @@ TextSnapshot_as::markReachableResources() const
 }
 
 void
-TextSnapshot_as::makeString(std::string& to, bool newline) const
+TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
 {
-    for (TextFields::const_iterator it = _textFields.begin(),
-            e = _textFields.end(); it != e; ++it)
+    std::string::size_type pos = 0;
+
+    std::string::size_type len = end - start;
+
+    for (TextFields::const_iterator field = _textFields.begin(),
+            e = _textFields.end(); field != e; ++field) {
+
+        const Records& rec = field->second;
+        const SWFMatrix& mat = field->first->getMatrix();
+        const boost::dynamic_bitset<>& selected = field->first->getSelected();
+
+        const std::string::size_type fieldStartIndex = pos;
+
+        for (Records::const_iterator j = rec.begin(), end = rec.end();
+                j != end; ++j) {
+        
+            const SWF::TextRecord* tr = *j;
+            assert(tr);
+
+            const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
+            const SWF::TextRecord::Glyphs::size_type numGlyphs = glyphs.size();
+
+            if (pos + numGlyphs < start) {
+                pos += numGlyphs;
+                continue;
+            }
+
+            const Font* font = tr->getFont();
+            assert(font);
+
+            double x = tr->xOffset();
+            for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
+                    e = glyphs.end(); k != e; ++k) {
+                
+                if (pos < start) {
+                    x += k->advance;
+                    ++pos;
+                    continue;
+                }
+                
+                as_object* el = new as_object;
+
+                el->init_member("indexInRun", pos);
+                el->init_member("selected",
+                        selected.test(pos - fieldStartIndex));
+                el->init_member("font", font->name());
+                el->init_member("color", tr->color().toRGBA());
+                el->init_member("height", twipsToPixels(tr->textHeight()));
+
+                const double factor = 65536.0;
+                el->init_member("matrix_a", mat.sx / factor);
+                el->init_member("matrix_b", mat.shx / factor);
+                el->init_member("matrix_c", mat.shy / factor);
+                el->init_member("matrix_d", mat.sy / factor);
+
+                const double xpos = twipsToPixels(mat.tx + x);
+                const double ypos = twipsToPixels(mat.ty + tr->yOffset());
+                el->init_member("matrix_tx", xpos);
+                el->init_member("matrix_ty", ypos);
+
+                ri.push(el);
+
+                ++pos;
+                x += k->advance;
+                if (pos - start > len) return;
+            }
+        }
+    }
+    
+}
+
+void
+TextSnapshot_as::makeString(std::string& to, bool newline, bool selectedOnly,
+        std::string::size_type start, std::string::size_type len) const
+{
+
+    std::string::size_type pos = 0;
+
+    for (TextFields::const_iterator field = _textFields.begin(),
+            e = _textFields.end(); field != e; ++field)
     {
-        if (newline && it != _textFields.begin()) to += '\n';
-        to += it->second;
+        // When newlines are requested, insert one after each individual
+        // text field is processed.
+        if (newline && pos > start) to += '\n';
+
+        const Records& records = field->second;
+        const boost::dynamic_bitset<>& selected = field->first->getSelected();
+
+        /// Remember the position at the beginning of the StaticText.
+        const std::string::size_type fieldStartIndex = pos;
+
+        for (Records::const_iterator j = records.begin(), end = records.end();
+                j != end; ++j) {
+        
+            const SWF::TextRecord* tr = *j;
+            assert(tr);
+
+            const SWF::TextRecord::Glyphs& glyphs = tr->glyphs();
+            const SWF::TextRecord::Glyphs::size_type numGlyphs = glyphs.size();
+
+            if (pos + numGlyphs < start) {
+                pos += numGlyphs;
+                continue;
+            }
+
+            const Font* font = tr->getFont();
+            assert(font);
+
+            for (SWF::TextRecord::Glyphs::const_iterator k = glyphs.begin(),
+                    e = glyphs.end(); k != e; ++k) {
+                
+                if (pos < start) {
+                    ++pos;
+                    continue;
+                }
+                
+                if (!selectedOnly || selected.test(pos - fieldStartIndex)) {
+                    to += font->codeTableLookup(k->index, true);
+                }
+                ++pos;
+                if (pos - start == len) return;
+            }
+        }
     }
 }
 
-const std::string
+std::string
 TextSnapshot_as::getText(boost::int32_t start, boost::int32_t end, bool nl)
     const
 {
-    std::string snapshot;
-    makeString(snapshot, nl);
-
-    const std::string::size_type len = snapshot.size();
-
-    if (len == 0) return std::string();
 
     // Start is always moved to between 0 and len - 1.
     start = std::max<boost::int32_t>(start, 0);
-    start = std::min<std::string::size_type>(len - 1, start);
+    start = std::min<boost::int32_t>(start, _count - 1);
 
     // End is always moved to between start and end. We don't really care
-    // about end.
+    // about the end of the string.
     end = std::max(start + 1, end);
 
-    return snapshot.substr(start, end - start);
+    std::string snapshot;
+    makeString(snapshot, nl, false, start, end - start);
 
+    return snapshot;
+
+}
+
+std::string
+TextSnapshot_as::getSelectedText(bool newline) const
+{
+    std::string sel;
+    
+    makeString(sel, newline, true);
+    return sel;
 }
 
 boost::int32_t
@@ -215,9 +427,26 @@ getTextSnapshotInterface()
 	return o.get();
 }
 
-as_value textsnapshot_getTextRunInfo(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
+as_value
+textsnapshot_getTextRunInfo(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+    
+    if (!ts->valid()) return as_value();
+
+    if (fn.nargs != 2) {
+        return as_value();
+    }
+
+    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
+
+    Array_as* ri = new Array_as;
+
+    ts->getTextRunInfo(start, end, *ri);
+    
+    return as_value(ri);
 }
 
 as_value
@@ -260,19 +489,47 @@ textsnapshot_getCount(const fn_call& fn)
         return as_value();
     }
 
-
     return ts->getCount();
 }
 
-as_value textsnapshot_getSelected(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
-}
-as_value textsnapshot_getSelectedText(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
-    return as_value();
+/// Returns a boolean value, or undefined if not valid.
+as_value
+textsnapshot_getSelected(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    if (!ts->valid()) return as_value();
+
+    if (fn.nargs != 2) {
+        return as_value();
+    }
+
+    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
+
+    return as_value(ts->getSelected(start, end));
 }
 
+/// Returns a string, or undefined if not valid.
+as_value
+textsnapshot_getSelectedText(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    if (!ts->valid()) return as_value();
+
+    if (fn.nargs > 1) {
+        return as_value();
+    }
+
+    bool newlines = fn.nargs ? fn.arg(0).to_bool() : false;
+
+    return as_value(ts->getSelectedText(newlines));
+}
+
+/// Returns a string, or undefined if not valid.
 as_value
 textsnapshot_getText(const fn_call& fn)
 {
@@ -299,16 +556,49 @@ textsnapshot_getText(const fn_call& fn)
 }
 
 
-as_value textsnapshot_hitTestTextNearPos(const fn_call& /*fn*/) {
+/// Returns bool, or undefined if not valid.
+as_value
+textsnapshot_hitTestTextNearPos(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    if (!ts->valid()) return as_value();
+
     log_unimpl (__FUNCTION__);
     return as_value();
 }
-as_value textsnapshot_setSelectColor(const fn_call& /*fn*/) {
+
+/// Returns void.
+as_value
+textsnapshot_setSelectColor(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
     log_unimpl (__FUNCTION__);
     return as_value();
 }
-as_value textsnapshot_setSelected(const fn_call& /*fn*/) {
-    log_unimpl (__FUNCTION__);
+
+
+/// Returns void.
+as_value
+textsnapshot_setSelected(const fn_call& fn)
+{
+    boost::intrusive_ptr<TextSnapshot_as> ts =
+        ensureType<TextSnapshot_as>(fn.this_ptr);
+
+    if (fn.nargs < 2 || fn.nargs > 3) {
+        return as_value();
+    }
+
+    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t end = std::max<int>(start, fn.arg(1).to_int());
+
+    bool selected = (fn.nargs > 2) ? fn.arg(2).to_bool() : true;
+
+    ts->setSelected(start, end, selected);
+
     return as_value();
 }
 
@@ -317,6 +607,19 @@ textsnapshot_ctor(const fn_call& fn)
 {
     MovieClip* mc = (fn.nargs == 1) ? fn.arg(0).to_sprite() : 0;
     return as_value(new TextSnapshot_as(mc));
+}
+
+size_t
+getTextFields(const MovieClip* mc, TextSnapshot_as::TextFields& fields)
+{
+    if (mc) {
+        const DisplayList& dl = mc->getDisplayList();
+
+        TextFinder finder(fields);
+        dl.visitAll(finder);
+        return finder.getCount();
+    }
+    return 0;
 }
 
 void

@@ -44,7 +44,54 @@
 
 namespace gnash {
 
-/*private*/
+URL::URL(const std::string& relative_url, const URL& baseurl)
+{
+	init_relative(relative_url, baseurl);
+}
+
+// only for UNIX
+void
+URL::normalize_path(std::string& path)
+{
+
+#if defined(_WIN32) || defined(WIN32) || defined(__OS2__)
+	return;
+#endif
+
+	assert(path[0] == '/');
+
+    std::vector<std::string> components;
+
+    std::string::iterator prev=path.begin();
+	for (std::string::iterator curr = prev + 1;
+			curr != path.end();
+			++curr )
+	{
+		if ( *curr == '/')
+		{
+            std::string comp = std::string(prev+1, curr);
+			//cerr << "comp:" << comp << endl;
+			prev = curr;
+
+			if ( comp == "" || comp == "." ) continue;
+			if ( comp == ".." && components.size() )
+				 components.pop_back();
+			else components.push_back(comp);
+		}
+	}
+	// add last component 
+	components.push_back(std::string(prev+1, path.end()));
+
+	path = "";
+	for (std::vector<std::string>::const_iterator i=components.begin(),
+			e=components.end();
+			i!=e; ++i)
+	{
+		path += "/" + *i;
+	}
+
+}
+
 void
 URL::init_absolute(const std::string& in)
 {
@@ -100,7 +147,7 @@ URL::init_absolute(const std::string& in)
 	normalize_path(_path);
 }
 
-/*public*/
+
 URL::URL(const std::string& absolute_url)
 {
 	//cerr << "URL(" << absolute_url << ")" << endl;
@@ -144,66 +191,6 @@ URL::URL(const std::string& absolute_url)
 	}
 }
 
-class DupSlashes
-{
-public:
-	bool operator() (char a, char b) const
-	{
-		return ( a == '/' && b == '/' );
-	}
-};
-
-/*private*/
-// only for UNIX
-void
-URL::normalize_path(std::string& path)
-{
-
-#if defined(_WIN32) || defined(WIN32) || defined(__OS2__)
-	return;
-#endif
-
-	assert(path[0] == '/');
-
-    std::vector<std::string> components;
-
-    std::string::iterator prev=path.begin();
-	for (std::string::iterator curr = prev + 1;
-			curr != path.end();
-			++curr )
-	{
-		if ( *curr == '/')
-		{
-            std::string comp = std::string(prev+1, curr);
-			//cerr << "comp:" << comp << endl;
-			prev = curr;
-
-			if ( comp == "" || comp == "." ) continue;
-			if ( comp == ".." && components.size() )
-				 components.pop_back();
-			else components.push_back(comp);
-		}
-	}
-	// add last component 
-	components.push_back(std::string(prev+1, path.end()));
-
-	path = "";
-	for (std::vector<std::string>::const_iterator i=components.begin(),
-			e=components.end();
-			i!=e; ++i)
-	{
-		path += "/" + *i;
-	}
-
-}
-
-/*public*/
-URL::URL(const std::string& relative_url, const URL& baseurl)
-{
-	init_relative(relative_url, baseurl);
-}
-
-/*private*/
 void
 URL::init_relative(const std::string& relative_url, const URL& baseurl)
 {
@@ -227,9 +214,10 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		return;
 	}
 
-	// use protocol and host from baseurl
+	// use protocol, port and host from baseurl
 	_proto = baseurl._proto;
 	_host = baseurl._host;
+    _port = baseurl._port;
 
 	if ( relative_url.size() && relative_url[0] == '/' ) 
 	{
@@ -289,24 +277,21 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 		// get dirname from basurl path
 		_path = basedir + in;
 
-		split_anchor_from_path();
-
-                // Extract the port number from the hostname, if any
-                split_port_from_host();
-
-		split_querystring_from_path();
-
-		normalize_path(_path);
-
 	}
+
+    split_anchor_from_path();
+
+    split_querystring_from_path();
+
+    normalize_path(_path);
+
 
 }
 
-/*public*/
 std::string
 URL::str() const
 {
-        std::string ret = _proto + "://" + _host;
+    std::string ret = _proto + "://" + _host;
 	if ( _port != "" )
 	{
 		ret += ":" + _port;
@@ -324,7 +309,6 @@ URL::str() const
 	return ret;
 }
 	
-/*private*/
 void
 URL::split_anchor_from_path()
 {
@@ -339,7 +323,6 @@ URL::split_anchor_from_path()
 	}
 }
 
-/*private*/
 void
 URL::split_port_from_host()
 {
@@ -354,7 +337,6 @@ URL::split_port_from_host()
 	}
 }
 
-/*private*/
 void
 URL::split_querystring_from_path()
 {
@@ -376,7 +358,6 @@ URL::split_querystring_from_path()
 
 }
 
-/* public static */
 void
 URL::parse_querystring(const std::string& query_string,
 		 std::map<std::string, std::string>& target_map)
@@ -420,7 +401,6 @@ URL::parse_querystring(const std::string& query_string,
 	
 }
 
-/* public static */
 void
 URL::encode(std::string& input)
 {
@@ -445,14 +425,13 @@ URL::encode(std::string& input)
 }
 
 std::string
-URL::encode (const std::string& str)
+URL::encode(const std::string& str)
 {
 	std::string escapestring(str);
 	encode(escapestring);
 	return escapestring;
 }
 
-/* public static */
 void
 URL::decode(std::string& input)
 {
@@ -485,7 +464,8 @@ URL::decode(std::string& input)
 	}
 }
 
-std::ostream& operator<< (std::ostream& o, const URL& u)
+std::ostream&
+operator<< (std::ostream& o, const URL& u)
 {
 	return o << u.str();
 }

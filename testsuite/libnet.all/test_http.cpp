@@ -48,7 +48,7 @@ extern int optind, getopt(int, char *const *, const char *);
 #include "network.h"
 #include "amf.h"
 #include "buffer.h"
-#include "utility.h"
+#include "GnashNumeric.h"
 
 using namespace gnash;
 using namespace amf;
@@ -1201,7 +1201,7 @@ test_rtmpt (void)
     if ((strncmp(headers22x[0]->getName(), "echo", 4) == 0)
         && (strncmp(headers22x[1]->getName(), "/14", 2) == 0)
         && (headers22x[3]->getType() == Element::NUMBER_AMF0)
-        && (utility::isFinite(headers22x[3]->to_number()))) {
+        && (isFinite(headers22x[3]->to_number()))) {
         runtest.pass("HTTP::parseEchoRequest(Number Infinity)");
     } else {        
         runtest.fail("HTTP::parseEchoRequest(Number Infinity)");

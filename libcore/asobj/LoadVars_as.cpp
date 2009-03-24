@@ -184,29 +184,25 @@ LoadVars_as::onData_method(const fn_call& fn)
 {
 
 	as_object* thisPtr = fn.this_ptr.get();
-	if ( ! thisPtr ) return as_value();
+	if (!thisPtr) return as_value();
 
 	// See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;a=blob;f=libswfdec/swfdec_initialize.as
 
-	as_value src; src.set_null();
-	if ( fn.nargs ) src = fn.arg(0);
+	as_value src; 
+	if (fn.nargs) src = fn.arg(0);
 
-	if ( ! src.is_null() )
-	{
-		VM& vm = thisPtr->getVM();
+	if (src.is_undefined()) {
+		thisPtr->set_member(NSV::PROP_LOADED, false);
+		thisPtr->callMethod(NSV::PROP_ON_LOAD, false);
+    }
+    else {
+		VM& vm = fn.getVM();
 		string_table& st = vm.getStringTable();
-		string_table::key decodeKey = st.find("decode"); // add to namedStrings ?
+		string_table::key decodeKey = st.find("decode"); 
 
-		as_value tmp(true);
-		thisPtr->set_member(NSV::PROP_LOADED, tmp);
+		thisPtr->set_member(NSV::PROP_LOADED, true);
 		thisPtr->callMethod(decodeKey, src);
-		thisPtr->callMethod(NSV::PROP_ON_LOAD, tmp);
-	}
-	else
-	{
-		as_value tmp(true);
-		thisPtr->set_member(NSV::PROP_LOADED, tmp);
-		thisPtr->callMethod(NSV::PROP_ON_LOAD, tmp);
+		thisPtr->callMethod(NSV::PROP_ON_LOAD, true);
 	}
 
 	return as_value();

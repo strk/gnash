@@ -44,12 +44,15 @@
 
 // Forward declarations
 namespace gnash {
-  class MovieClip;
-  class movie_instance;
-  class ExecutableCode;
-  class action_buffer;
-  class movie_definition;
-  class generic_character;
+    class MovieClip;
+    class movie_instance;
+    class ExecutableCode;
+    class action_buffer;
+    class movie_definition;
+    class StaticText;
+    namespace SWF {
+        class TextRecord;
+    }
 }
 
 namespace gnash {
@@ -414,8 +417,9 @@ public:
     /// Allow extraction of static text.
     //
     /// Default is a no-op, implemented only for DefineText though
-    /// generic_character.
-    virtual generic_character* getStaticText(std::string& /*to*/) {
+    /// DisplayObject.
+    virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
+            size_t&) {
         return 0;
     }
 

@@ -26,6 +26,7 @@
 #include "ControlTag.h" // for dtor visibility
 #include "as_function.h" // for dtor visibility
 #include "SWFStream.h" // for use
+#include "GnashAlgorithm.h"
 
 #include <vector>
 #include <string>
@@ -39,14 +40,12 @@
 namespace gnash {
 
 character*
-sprite_definition::create_character_instance(character* parent,
-		int id)
+sprite_definition::createDisplayObject(character* parent, int id)
 {
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
 #endif
-	MovieClip* si = new MovieClip(this,
-	parent->get_root(), parent, id);
+	MovieClip* si = new MovieClip(this, parent->get_root(), parent, id);
 	return si;
 }
 
@@ -57,10 +56,7 @@ sprite_definition::~sprite_definition()
 	{
 		PlayList& pl = i->second;
 
-		for (PlayList::iterator j=pl.begin(), je=pl.end(); j!=je; ++j)
-		{
-            delete *j;
-        }
+        deleteAllChecked(pl);
     }
 }
 
@@ -80,31 +76,30 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 
 	m_loading_frame = 0;
 
-	while ( in.tell() < tag_end )
-	{
+	while (in.tell() < tag_end) {
+
 		SWF::TagType tag = in.open_tag();
 
-		SWF::TagLoadersTable::loader_function lf = NULL;
+		SWF::TagLoadersTable::loader_function lf = 0;
 
-		if (tag == SWF::END)
-                {
-			if (in.tell() != tag_end)
-                        {
-		    		IF_VERBOSE_MALFORMED_SWF(
-				// Safety break, so we don't read past
-				// the end of the  movie.
-				log_swferror(_("Hit end tag, "
-					"before the advertised DEFINESPRITE end; "
-					"stopping for safety."));
-		    		)
+		if (tag == SWF::END) {
+
+			if (in.tell() != tag_end) {
+                IF_VERBOSE_MALFORMED_SWF(
+                    // Safety break, so we don't read past
+                    // the end of the  movie.
+                    log_swferror(_("Hit end tag, "
+                        "before the advertised DEFINESPRITE end; "
+                        "stopping for safety."));
+                    );
 				in.close_tag();
-		    		break;
+                break;
 			}
 		}
-		else if (tag == SWF::SHOWFRAME)
-		{
+
+		else if (tag == SWF::SHOWFRAME) {
 			// show frame tag -- advance to the next frame.
-		    	++m_loading_frame;
+            ++m_loading_frame;
 
 			IF_VERBOSE_PARSE (
 				log_parse(_("  show_frame %d/%d"
@@ -113,32 +108,29 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 					m_frame_count);
 		    	);
 
-			if ( m_loading_frame == m_frame_count )
-			{
-				// better break then sorry
+			if (m_loading_frame == m_frame_count) {
 
+				// better break then sorry
 				in.close_tag();
-				if ( in.open_tag() != SWF::END )
+				if (in.open_tag() != SWF::END)
 				{
 					IF_VERBOSE_MALFORMED_SWF(
-					log_swferror(_("last SHOWFRAME of a "
-						"DEFINESPRITE tag "
-						"isn't followed by an END."
-						" Stopping for safety."));
-					);
+                        log_swferror(_("last SHOWFRAME of a "
+                            "DEFINESPRITE tag "
+                            "isn't followed by an END."
+                            " Stopping for safety."));
+                    );
 					in.close_tag();
 					return;
 				}
 			}
 		}
-		else if (_tag_loaders.get(tag, &lf))
-		{
+		else if (_tag_loaders.get(tag, &lf)) {
 		    // call the tag loader.  The tag loader should add
 		    // characters or tags to the movie data structure.
 		    (*lf)(in, tag, *this, runInfo);
 		}
-		else
-		{
+		else {
 			// no tag loader for this tag type.
 			// FIXME, should this be a log_swferror instead?
                     log_error(_("*** no tag loader for type %d (sprite)"),
@@ -148,23 +140,22 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 		in.close_tag();
 	}
 
-        if ( m_frame_count > m_loading_frame )
-        {
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("%d frames advertised in header, but only %d SHOWFRAME tags "
-			"found in define sprite."), m_frame_count, m_loading_frame );
-		);
+    if (m_frame_count > m_loading_frame) {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("%d frames advertised in header, but "
+                "only %d SHOWFRAME tags found in define "
+                "sprite."), m_frame_count, m_loading_frame );
+        );
 
-		// this should be safe 
-		m_loading_frame = m_frame_count;
-        }
+        // this should be safe 
+        m_loading_frame = m_frame_count;
+    }
 
-		IF_VERBOSE_PARSE (
-	log_parse(_("  -- sprite END --"));
-		);
+    IF_VERBOSE_PARSE(
+        log_parse(_("  -- sprite END --"));
+    );
 }
 
-/*virtual*/
 void
 sprite_definition::add_frame_name(const std::string& name)
 {
@@ -175,7 +166,8 @@ sprite_definition::add_frame_name(const std::string& name)
 }
 
 bool
-sprite_definition::get_labeled_frame(const std::string& label, size_t& frame_number)
+sprite_definition::get_labeled_frame(const std::string& label,
+        size_t& frame_number)
 {
     NamedFrameMap::const_iterator it = _namedFrames.find(label);
     if ( it == _namedFrames.end() ) return false;

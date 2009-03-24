@@ -25,6 +25,7 @@
 #include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
+#include "GnashNumeric.h"
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -54,7 +55,12 @@ public:
 	///  - image->size() bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - provided url
 	///
-	BitmapMovieDefinition(std::auto_ptr<GnashImage> image, const std::string& url);
+	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
+            const std::string& url);
+
+    virtual character* createDisplayObject(character*, int) {
+        return 0;
+    }
 
 	// Discard id, always return the only shape character we have 
 	virtual character_def* get_character_def(int /*id*/)
@@ -67,11 +73,11 @@ public:
 	}
 
 	virtual float get_width_pixels() const {
-		return std::ceil(TWIPS_TO_PIXELS(_framesize.width()));
+		return std::ceil(twipsToPixels(_framesize.width()));
 	}
 
 	virtual float get_height_pixels() const {
-		return std::ceil(TWIPS_TO_PIXELS(_framesize.height()));
+		return std::ceil(twipsToPixels(_framesize.height()));
 	}
 
 	virtual size_t	get_frame_count() const {

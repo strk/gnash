@@ -34,7 +34,6 @@
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
-#include "timers.h" // for registering the probe timer
 #include "namedStrings.h"
 #include "ExportableResource.h"
 #include "StreamProvider.h"
@@ -1018,25 +1017,8 @@ Sound_as::init(as_object& global)
 void
 Sound_as::startProbeTimer()
 {
-    boost::intrusive_ptr<builtin_function> cb = 
-        new builtin_function(&Sound_as::probeAudioWrapper);
-    std::auto_ptr<Timer> timer(new Timer);
-
-    // 2 times each second (83 would be 12 times each second)
-    unsigned long delayMS = 500; 
-    timer->setInterval(*cb, delayMS, this);
-    _probeTimer = getVM().getRoot().add_interval_timer(timer, true);
-}
-
-/*private static*/
-as_value
-Sound_as::probeAudioWrapper(const fn_call& fn)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<Sound_as> ptr = ensureType<Sound_as>(fn.this_ptr);
-    ptr->probeAudio();
-    return as_value();
+    _probeTimer = 1;
+    getVM().getRoot().addAdvanceCallback(this);
 }
 
 /*private*/
@@ -1050,10 +1032,16 @@ Sound_as::stopProbeTimer()
     if ( _probeTimer )
     {
         VM& vm = getVM();
-        vm.getRoot().clear_interval_timer(_probeTimer);
-        log_debug(" clear_interval_timer(%d) called", _probeTimer);
+        vm.getRoot().removeAdvanceCallback(this);
+        log_debug(" sound callback removed");
         _probeTimer = 0;
     }
+}
+
+void
+Sound_as::advanceState()
+{
+    probeAudio();
 }
 
 /*private*/

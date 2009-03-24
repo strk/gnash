@@ -192,7 +192,6 @@ NS_PluginInitialize()
 
     NPError err = NPERR_NO_ERROR;
     PRBool supportsXEmbed = PR_TRUE;
-    NPNToolkitType toolkit;
 
     /* 
     First, check for XEmbed support. The NPAPI Gnash plugin
@@ -221,6 +220,7 @@ NS_PluginInitialize()
     }
 
 #if 0 // Gtk is no longer required in the browser
+    NPNToolkitType toolkit;
     err = CallNPN_GetValueProc(NPNFuncs.getvalue, NULL,
                 NPNVToolkit,
                 (void *)&toolkit);
@@ -1326,7 +1326,7 @@ nsPluginInstance::startProc(Window win)
     argv[argc++] = "-";
     argv[argc++] = 0;
 #ifdef CREATE_STANDALONE_GNASH_LAUNCHER
-    if ( saLauncher ) saLauncher << _swf_url << " ";
+    if ( saLauncher ) saLauncher << "'" << _swf_url << "' ";
 #endif
 
     assert(argc <= maxargc);
