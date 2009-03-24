@@ -20,7 +20,7 @@ AUTOMAKE_OPTIONS = dejagnu
 
 # These will get executed and parsed for test output
 AS3TESTS = \
-	hello.as \
+	basic.as \
 	$(NULL)
 
 EXTRA_DIST = $(AS3TESTS) dejagnu.as
