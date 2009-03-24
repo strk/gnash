@@ -41,7 +41,9 @@ if ENABLE_SWFDEC_TESTSUITE
 DIR_SWFDEC_TESTSUITE = swfdec
 endif
 
+if ENABLE_AS3COMPILE
 DIR_AS3 = as3
+endif
 
 DIST_SUBDIRS = \
 	media \
