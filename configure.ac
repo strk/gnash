@@ -2212,6 +2212,7 @@ pythonmodule/Makefile
 testsuite/Makefile
 testsuite/media/Makefile
 testsuite/libbase/Makefile
+testsuite/as3/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
