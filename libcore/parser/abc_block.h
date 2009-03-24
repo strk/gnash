@@ -29,8 +29,6 @@
 #include "asClass.h"
 #include "asName.h"
 
-#define LOG_DEBUG_ABC(fmt,...) IF_VERBOSE_PARSE(log_parse("ABC Parser: " fmt, ## __VA_ARGS__));
-
 namespace gnash {
 	class SWFStream; // for read signature
 }
