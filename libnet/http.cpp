@@ -638,9 +638,9 @@ size_t
 HTTP::getContentLength()
 {
     //    GNASH_REPORT_FUNCTION;
-    boost::shared_ptr<std::vector<std::string> > length = getFieldItem("content-length");
-    if (length->size() > 0) {
-	return static_cast<size_t>(strtol(length->at(0).c_str(), NULL, 0));
+    std::string length = getField("content-length");
+    if (length.size() > 0) {
+	return static_cast<size_t>(strtol(length.c_str(), NULL, 0));
     }
 
     return 0;
