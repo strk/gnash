@@ -86,25 +86,29 @@ package dejagnu {
             }
         }
     
-        public function check_equals(obt, exp, msg = "") {
-            if(msg == null) msg = "";
-            if ( obt == exp ) 
-                pass(obt+' == '+exp+' '+msg);
-            else 
-                fail('expected: "'+exp+'" , obtained: "'+obt+'" '+msg);
-        }
-    
-        public function xcheck_equals(obt, exp, msg = "") {
+        public function check_equals(obt, exp, msg, expression) {
             if (msg == null) msg = "";
             if (obt == exp) { 
-                xpass(obt + ' == ' + exp + ' ' + msg);
+                pass(expression + ' == ' + exp + ' ' + msg);
             }
-            else {
-                xfail('expected: ' + exp + ' , obtained: ' + obt + " " + msg);
+            else { 
+                fail(expression + ': expected: "' + exp + 
+                        '" , obtained: "' + obt + '" ' + msg);
             }
         }
     
-        public function check(a, msg = "") {
+        public function xcheck_equals(obt, exp, msg, expression) {
+            if (msg == null) msg = "";
+            if (obt == exp) { 
+                xpass(expression + ' == ' + exp + ' ' + msg);
+            }
+            else {
+                xfail(expression + ': expected: "' + exp + 
+                        '" , obtained: "' + obt + '" ' + msg);
+            }
+        }
+    
+        public function check(a, msg) {
             if (a) {
                 pass(msg != undefined ? msg : a);
             }
@@ -113,7 +117,7 @@ package dejagnu {
             }
         }
     
-        public function xcheck(a, msg = "") {
+        public function xcheck(a, msg) {
             if (a) { 
                 xpass(msg != undefined ? msg : a);
             }
@@ -172,35 +176,3 @@ package dejagnu {
 
 }
 
-package hello {
-
-    import flash.display.MovieClip;
-    import dejagnu.Dejagnu;
-
-    public class Hello extends MovieClip {
-
-        var d:Dejagnu;
-
-        public function Hello() {
-            d = new Dejagnu(this);
-
-            var i = 1;
-            i++;
-            d.check_equals(i, 2);
-
-            i += 2;
-            d.check_equals(i, 4);
-
-            i *= 3;
-            d.check_equals(i, 12);
-        
-            i /= 8;
-            d.check_equals(i, 1.5);
-
-            i -= 14;
-            d.check_equals(i, -12.5);
-
-        }
-    }
-}
-         

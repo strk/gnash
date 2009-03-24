@@ -23,7 +23,7 @@
 #include "dejagnu.as"
 
 #define DEJAGNU_OBJ import dejagnu.Dejagnu; \
-		var DJ:Dejagnu;
+		var DJ:Dejagnu
 
 #define INIT_DEJAGNU DJ = new Dejagnu(this);
 

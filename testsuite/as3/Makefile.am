@@ -31,7 +31,7 @@ abs_mediadir = `cd $(srcdir)/../media; pwd`
 AS3COMPILE_FLAGS = 
 AS3COMPILE_CPP = $(CPP) -x c -P -I$(srcdir) -DMEDIADIR="$(abs_mediadir)"
 
-AS3TESTS_OUT = $(AS3TESTS:.sc=.swf)
+AS3TESTS_OUT = $(AS3TESTS:.as=.swf)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
@@ -39,10 +39,10 @@ TEST_CASES = \
 	$(check_PROGRAMS)
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(AS3TESTS_OUT) Makefile
-	sh $< -c __END_OF_TEST__ -f 50 -r 50 $(top_builddir) $(AS3TESTS_OUT) > $@
+	sh $< -f 50 -r 50 $(top_builddir) $(AS3TESTS_OUT) > $@
 	chmod 755 $@
 
-$(AS3TESTS_OUT): dejagnu.as check.sc
+$(AS3TESTS_OUT): dejagnu.as check.as
 
 SUFFIXES = .as .swf
 .as.swf:
