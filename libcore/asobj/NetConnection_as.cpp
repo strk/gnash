@@ -684,6 +684,7 @@ net_handler(NetConnection_as::thread_params_t *args)
 #endif
     bool result = false;
     bool done = false;
+    bool chunked = false;
 
 //    boost::mutex::scoped_lock lock(call_mutex);
 
@@ -738,15 +739,36 @@ net_handler(NetConnection_as::thread_params_t *args)
 	HTTP *http = reinterpret_cast<HTTP *>(args->network);;
 	amf::AMF amf;
 	boost::uint8_t *data = http->processHeaderFields(*buf);
-//   	http->dump();
-	boost::shared_ptr<std::vector<std::string> > encoding = http->getFieldItem("transfer-encoding");
+    	http->dump();
 	size_t length = http->getContentLength();
-	if (http->getField("content-type") == "application/x-amf") {
+	if (http->getField("transfer-encoding") == "chunked") {
+	    chunked = true;
+	}
+	// Make sure we have a sane length. If Chunked, then we don't have
+	// a length field, so we use the size of the data that
+	if (length == 0) {
+	    if (chunked) {
+		length = buf->end() - data;
+		// A chunked transfer sends a count of messages in ASCII hex first,
+		// and that line is terminated with the usual \r\n HTTP header field
+		// line number
+		boost::uint8_t *start = std::find(data, data+length, '\r') + 2;
+		if (start != data+length) {
+		    data = start;
+		}
+	    } else {
+		done = true;
+		result = false;
+	    }
+	}
+	
+	log_debug("Cookie is: \"%s\"", http->getField("cookie"));
+	log_debug("Content type is: \"%s\"", http->getField("content-type"));
+	if (http->getField("content-type").find("application/x-amf") != string::npos) {
 	    amf::AMF_msg amsg;
 	    boost::shared_ptr<amf::AMF_msg::context_header_t> head =
 		amsg.parseAMFPacket(data, length);
-	    
-//  	    amsg.dump();
+  	    amsg.dump();
 	    log_debug("%d messages in AMF packet", amsg.messageCount());
 	    for (size_t i=0; i<amsg.messageCount(); i++) {
 //  		amsg.getMessage(i)->data->dump();
@@ -772,9 +794,8 @@ net_handler(NetConnection_as::thread_params_t *args)
   		args->callback->callMethod(methodKey, tmp);
 	    }
 	} else {// not AMF data
-	    log_debug("Content type is: %d", http->getField("content-type"));
-	    if ((http->getField("content-type") == "application/xml")
-		|| (http->getField("content-type") == "text/html")) {
+	    if ((http->getField("content-type").find("application/xml") != string::npos)
+		|| (http->getField("content-type").find("text/html") != string::npos)) {
 		log_debug("Textual Data is: %s", reinterpret_cast<char *>(data));
 	    } else {
 		log_debug("Binary Data is: %s", hexify(data, length, true));
