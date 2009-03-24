@@ -15,12 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-//
-// Original author: David Rorex - drorex@gmail.com
-//
-//
-
 
 package dejagnu {
 
@@ -51,10 +45,10 @@ package dejagnu {
         } 
        
         public function fail (why) {
-                failed++;
-                var msg = 'FAILED: '+why;
-                xtrace(msg);
-            }
+            failed++;
+            var msg = 'FAILED: '+why;
+            xtrace(msg);
+        }
         
         public function xfail(why) {
             xfailed++;
@@ -150,7 +144,6 @@ package dejagnu {
         private function done() {
             printtotals();
             trace("__END_OF_TEST__");
-            loadMovie('fscommand:quit', _root);
         }
         
         private function testcount() {
@@ -186,12 +179,27 @@ package hello {
 
     public class Hello extends MovieClip {
 
-        var dj:Dejagnu;
+        var d:Dejagnu;
 
         public function Hello() {
-            var dj = new Dejagnu(this);
-            dj.check(1 == 1);
-            dj.check_equals(3, 4);
+            d = new Dejagnu(this);
+
+            var i = 1;
+            i++;
+            d.check_equals(i, 2);
+
+            i += 2;
+            d.check_equals(i, 4);
+
+            i *= 3;
+            d.check_equals(i, 12);
+        
+            i /= 8;
+            d.check_equals(i, 1.5);
+
+            i -= 14;
+            d.check_equals(i, -12.5);
+
         }
     }
 }
