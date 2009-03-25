@@ -1854,7 +1854,7 @@ as_value::as_value(const amf::Element& el)
 	:
 	m_type(UNDEFINED)
 {
-    el.dump();
+//     el.dump();
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
     
