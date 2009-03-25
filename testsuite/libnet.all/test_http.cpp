@@ -94,7 +94,7 @@ main(int argc, char *argv[])
 
     tests();
     test_post();
-    test_rtmpt();
+//    test_rtmpt();
 }
 
 
@@ -662,6 +662,7 @@ test_post()
         }
     }
 
+#if 0
     // Make sure we can parse the Red5 echo_test client messages.
     boost::shared_ptr<Buffer> hex1(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 32 00 00 00 14 0a 00 00 00 01 02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21"));
     boost::shared_ptr<Buffer> hex2(new Buffer("00 00 00 00 00 01 00 0b 2f 32 2f 6f 6e 52 65 73 75 6c 74 00 04 6e 75 6c 6c ff ff ff ff 02 00 0c 48 65 6c 6c 6f 20 77 6f 72 6c 64 21"));
@@ -687,16 +688,19 @@ test_post()
         runtest.fail("HTTP::formatEchoResponse()");
     }
 #endif
+#endif
+    
     if (dbglogfile.getVerbosity() > 0) {
         http.dump();
     }
 }
 
+#if 0
 void
 test_rtmpt (void)
 {
     HTTP http;
-    
+
     // Boolean True request
     boost::shared_ptr<Buffer> hex_req1(new Buffer("00 00 00 00 00 01 00 04 65 63 68 6f 00 02 2f 31 00 00 00 07 0a 00 00 00 01 01 01"));
     vector<boost::shared_ptr<amf::Element> > headers1 = http.parseEchoRequest(*hex_req1);
@@ -1961,6 +1965,7 @@ test_rtmpt (void)
     }
 #endif
 }
+#endif
 
 static void
 usage (void)
