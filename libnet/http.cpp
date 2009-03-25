@@ -34,8 +34,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <algorithm>
-#include "GnashSystemIOHeaders.h" // read()
 
+#include "GnashSystemIOHeaders.h" // read()
 #include "http.h"
 #include "amf.h"
 #include "element.h"
@@ -1349,18 +1349,147 @@ HTTP::sendMsg(const boost::uint8_t *data, size_t size)
     return Network::writeNet(data, size);
 }
 
+size_t
+HTTP::recvChunked(boost::uint8_t *data, size_t size)
+{
+    GNASH_REPORT_FUNCTION;
+    bool done = false;
+    bool chunks = true;
+    size_t total = 0;
+    size_t pktsize = 0;
+    
+    if (size == 0) {
+	return 0;
+    }
+    
+    // A chunked transfer sends a count of bytes in ASCII hex first,
+    // and that line is terminated with the usual \r\n HTTP header field
+    // line number. There is supposed to be a ';' before the \r\n, as this
+    // field can have other attributes, but the OpenStreetMap server doesn't
+    // use the semi-colon, as it's optional, and rarely used anyway.
+    boost::shared_ptr<amf::Buffer> buf;
+    boost::uint8_t *start = std::find(data, data+size, '\r') + 2;
+    if (start != data+size) {
+	// extract the total size of the chunk
+	std::string bytes(data, start-2);
+	size_t sizesize = start-data;
+	total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
+	log_debug("%s: Total size for first chunk is: %d, data size %d (%d)",
+		  __PRETTY_FUNCTION__, total, size, sizesize);
+	buf.reset(new amf::Buffer(total));
+	// Add the existing data from the previous packet
+	buf->copy(data, size - sizesize);
+    }
+
+    // The size of the packet we need to read has a 2 byte terminator "\r\n",
+    // like any other HTTP header field, so we have to read those bytes too
+    // so we can stay sychronized with the start of each chunk.
+    pktsize = total - buf->allocated() + 2;
+    log_debug("%s: Total Packet size for first chunk is: %d", __PRETTY_FUNCTION__,
+	      pktsize);
+    
+    done = false;
+    size_t ret = 0;
+
+    // Keep reading chunks as long as they arrive
+    while (chunks) {
+	do {
+	    if (!pktsize) {
+		total = 0;
+		// Only read a few bytes, as we have todo a resize, so the less
+		// data to copy the better. We only do this to get the total size
+		// of the chunk, which we need to know when it's done. As we can't
+		// tell we're done processing chunks till one has a length of
+		// "0\r\n", this is important.
+		pktsize = 12;
+		buf.reset(new amf::Buffer(pktsize));
+	    }
+	    ret = readNet(buf->reference() + buf->allocated(), pktsize, 60);
+	    // We got data.
+	    if (ret == 0) {
+		log_debug("no data yet for fd #%d, continuing...", getFileFd());
+		done = true;
+	    }
+	    if (ret) {
+		// manually set the seek pointer in the buffer, as we read
+		// the data into the raw memory allocated to the buffer. We
+		// only want to do this if we got data of course.
+		buf->setSeekPointer(buf->end() + ret);
+		if (!total) {
+		    start = std::find(buf->reference(), buf->reference()+ret, '\r') + 2;
+		    if (start != buf->reference()+ret) {
+			// extract the total size of the chunk
+			std::string bytes(buf->reference(), start-2);
+			total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
+			// The total size of the last chunk is always "0"
+			if (total == 0) {
+			    log_debug("%s: end of chunks!", __PRETTY_FUNCTION__);
+			    pktsize = 0;
+			    done = true;
+			    chunks = false;
+			} else {
+			    pktsize = total+8; // FIXME: why do we need an 8 here ?
+			    log_debug("%s: Total size for chunk is: %d (%s), adding %d bytes",
+				      __PRETTY_FUNCTION__, total, bytes, (start - buf->reference()));
+			    amf::Buffer tmpbuf(start - buf->reference());
+			    // don't forget the two bytes for the "\r\n"
+			    tmpbuf.copy(buf->reference() + bytes.size() + 2, (start - buf->reference()));
+			    buf->resize(total);
+ 			    buf->copy(tmpbuf.reference(), tmpbuf.size());
+			    tmpbuf. dump();
+			}
+		    }
+		}
+		if (ret < pktsize) {
+		    
+		}
+		
+		// If we got less data than specified, we need to keep reading data
+		if (ret < buf->size()) {
+		    pktsize -= ret;
+		    if (pktsize == 0) {
+			done = true;
+		    } else {
+			log_debug("Didn't get a full packet, reading more data");
+			continue;
+		    }
+		}
+	    }
+	} while (!done);
+	log_debug("%s: finished packet, ret is %d, pktsize is %d\r\n%s", __PRETTY_FUNCTION__, ret, pktsize,
+		  hexify(buf->reference(), buf->allocated(), true));
+	if (pktsize == 0) {
+	    _que.push(buf);
+	}
+	done = false;		// reset
+    } // end of while chunks
+    
+    return _que.size();
+}
+
 int
 HTTP::recvMsg(int fd)
 {
+//     GNASH_REPORT_FUNCTION;
+    return recvMsg(fd, 0);
+}
+
+int
+HTTP::recvMsg(int fd, size_t size)
+{
     GNASH_REPORT_FUNCTION;
-    int ret = 0;
+    size_t ret = 0;
+
+    if (size == 0) {
+	size = amf::NETBUFSIZE;
+    }
     
     log_debug("Starting to wait for data in net for fd #%d", fd);
     Network net;
 
     do {
-	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
-	int ret = net.readNet(fd, *buf, 5);
+	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(size));
+	ret = net.readNet(fd, *buf, 5);
 //	cerr << __PRETTY_FUNCTION__ << ret << " : " << (char *)buf->reference() << endl;
 
 	// the read timed out as there was no data, but the socket is still open.
@@ -1370,7 +1499,7 @@ HTTP::recvMsg(int fd)
  	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
-	if ((ret == static_cast<int>(string::npos)) || (ret == -1)) {
+	if ((ret == static_cast<size_t>(string::npos)) || (static_cast<int>(ret) == -1)) {
 	    log_debug("socket for fd #%d was closed...", fd);
 	    return 0;
 	}
@@ -1386,16 +1515,15 @@ HTTP::recvMsg(int fd)
  	    } else {
 		_que.push(buf);
 	    }
-
-        // ret must be more than 0 here
-	    if (static_cast<size_t>(ret) == buf->size()) {
+	    // ret must be more than 0 here
+	    if (ret == buf->size()) {
 		continue;
 	    }
 	} else {
 	    log_debug("no more data for fd #%d, exiting...", fd);
 	    return 0;
 	}
-	if (ret == -1) {
+	if (static_cast<int>(ret) == -1) {
 	  log_debug("Handler done for fd #%d, can't read any data...", fd);
 	  return -1;
 	}
