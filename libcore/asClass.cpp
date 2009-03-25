@@ -30,17 +30,17 @@
 namespace gnash {
 #define STV(x) VM::get().getStringTable().value(x).c_str()
 
-asMethod::asMethod():mBody()
+asMethod::asMethod()
+    :
+	_minArguments(0),
+	_maxArguments(0)
 {
-	//mArguments();
-	mMinArguments = 0;
-	mMaxArguments = 0;
 }
 
 void
 asMethod::print_body()
 {
-		if(!mBody){
+		if(!_body){
 			log_parse("Method has no body.");
 			return;
 		}
@@ -50,11 +50,11 @@ asMethod::print_body()
 //		ss.setf(std::ios::hex, std::ios::basefield);
 //		ss.setf (std::ios::showbase);
 		boost::uint32_t i;
-		for(i=0;i<mBodyLength;i++){
-			opcode = mBody->read_as3op();
+		for(i=0;i<_bodyLength;i++){
+			opcode = _body->read_as3op();
 			ss << "0x" << std::uppercase << std::hex << (opcode | 0x0) << " ";
 		}
-		mBody->seekTo(0);
+		_body->seekTo(0);
 		log_parse("%s",ss.str());
 }
 
@@ -62,11 +62,11 @@ void
 asMethod::setOwner(asClass *pOwner)
 {
 	log_debug("asMethod::setOwner");
-	if(!mPrototype){
-		log_debug("ERROR mPrototype is null.");
+	if(!_prototype){
+		log_debug("ERROR _prototype is null.");
 	}
-	log_debug("Prototype text value: %s",mPrototype->get_text_value());
-	mPrototype->set_member(NSV::PROP_PROTOTYPE, pOwner->getPrototype());
+	log_debug("Prototype text value: %s",_prototype->get_text_value());
+	_prototype->set_member(NSV::PROP_PROTOTYPE, pOwner->getPrototype());
 }
 
 void
@@ -92,10 +92,10 @@ asMethod::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slot
 
 
 	if(slotId == 0){
-		mPrototype->init_member(name, val, flags, nsname);
+		_prototype->init_member(name, val, flags, nsname);
 	}
 	else{
-		mPrototype->init_member(name, val, flags, nsname, slotId);
+		_prototype->init_member(name, val, flags, nsname, slotId);
 	}
 	return true;
 }
@@ -117,10 +117,10 @@ asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotI
 		flags |= as_prop_flags::staticProp;
 
 	if(slotId == 0){
-		mPrototype->init_member(name, val, flags, nsname);
+		_prototype->init_member(name, val, flags, nsname);
 	}
 	else{
-		mPrototype->init_member(name, val, flags, nsname, slotId);
+		_prototype->init_member(name, val, flags, nsname, slotId);
 	}
 	return true;
 }
@@ -146,7 +146,7 @@ asMethod::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotI
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 	int flags = as_prop_flags::dontDelete;
 
-	mPrototype->init_member(name, as_value(), flags, nsname, slotId);
+	_prototype->init_member(name, as_value(), flags, nsname, slotId);
 	return true;
 }
 
@@ -163,7 +163,7 @@ asMethod::addSlotFunction(string_table::key name, asNamespace *ns,
 void
 asMethod::initPrototype(Machine* machine)
 {
-	mPrototype = new abc_function(this,machine);
+	_prototype = new abc_function(this,machine);
 }
 
 bool
@@ -187,10 +187,10 @@ asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId
 //	log_debug("Before init_member.");
 	//TODO: Set flags.
 	if(slotId == 0){
-		mPrototype->init_member(name,as_value(), 0, nsname);
+		_prototype->init_member(name,as_value(), 0, nsname);
 	}
 	else{
-		mPrototype->init_member(name, as_value(), 0, nsname, slotId);
+		_prototype->init_member(name, as_value(), 0, nsname, slotId);
 	}
 	return true;
 }
@@ -200,8 +200,8 @@ asMethod::addMethod(string_table::key name, asNamespace* ns, asMethod* method)
 {
 //	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 //	as_value val(method->getPrototype());
-// 	as value val = new as_value(abc_function(asMethod->getBody,mPrototype->getVM().getMachine()));
-// 	mPrototype->init_member(name, val, as_prop_flags::readOnly |
+// 	as value val = new as_value(abc_function(asMethod->getBody,_prototype->getVM().getMachine()));
+// 	_prototype->init_member(name, val, as_prop_flags::readOnly |
 // 		as_prop_flags::dontDelete | as_prop_flags::dontEnum, nsname);
 // 	return true;
 return false;
@@ -211,8 +211,8 @@ bool
 asClass::addMethod(string_table::key name, asNamespace* ns, asMethod* method,
 	bool isstatic)
 {
-	as_value val = as_value(new abc_function(method,mPrototype->getVM().getMachine()));
-	mPrototype->init_member(name, val);
+	as_value val = as_value(new abc_function(method,_prototype->getVM().getMachine()));
+	_prototype->init_member(name, val);
 //	int flags = as_prop_flags::readOnly | as_prop_flags::dontDelete
 //		| as_prop_flags::dontEnum;
 //	if (isstatic)
@@ -227,7 +227,7 @@ asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	Property *getset = mPrototype->getOwnProperty(name, nsname);
+	Property *getset = _prototype->getOwnProperty(name, nsname);
 
 	if (getset)
 		getset->setGetter(method->getPrototype());
@@ -236,7 +236,7 @@ asClass::addGetter(string_table::key name, asNamespace *ns, asMethod *method,
 		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
 		if (isstatic)
 			flags |= as_prop_flags::staticProp;
-		mPrototype->init_property(name, *method->getPrototype(), 
+		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
 	return true;
@@ -248,7 +248,7 @@ asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	Property *getset = mPrototype->getOwnProperty(name, nsname);
+	Property *getset = _prototype->getOwnProperty(name, nsname);
 
 	if (getset)
 		getset->setSetter(method->getPrototype());
@@ -257,7 +257,7 @@ asClass::addSetter(string_table::key name, asNamespace *ns, asMethod *method,
 		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
 		if (isstatic)
 			flags |= as_prop_flags::staticProp;
-		mPrototype->init_property(name, *method->getPrototype(), 
+		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
 	return true;
@@ -268,14 +268,14 @@ asMethod::addGetter(string_table::key name, asNamespace *ns, asMethod *method)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	Property *getset = mPrototype->getOwnProperty(name, nsname);
+	Property *getset = _prototype->getOwnProperty(name, nsname);
 
 	if (getset)
 		getset->setGetter(method->getPrototype());
 	else
 	{
 		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
-		mPrototype->init_property(name, *method->getPrototype(), 
+		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
 	return true;
@@ -286,14 +286,14 @@ asMethod::addSetter(string_table::key name, asNamespace *ns, asMethod *method)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
-	Property *getset = mPrototype->getOwnProperty(name, nsname);
+	Property *getset = _prototype->getOwnProperty(name, nsname);
 
 	if (getset)
 		getset->setSetter(method->getPrototype());
 	else
 	{
 		int flags = as_prop_flags::dontDelete | as_prop_flags::dontEnum;
-		mPrototype->init_property(name, *method->getPrototype(), 
+		_prototype->init_property(name, *method->getPrototype(), 
 			*method->getPrototype(), flags, nsname);
 	}
 	return true;

@@ -30,8 +30,6 @@
 #include "abc_block.h"
 
 
-
-
 namespace gnash {
 
 class as_function;
@@ -49,7 +47,7 @@ class asName;
 class Machine;
 class abc_function;
 
-namespace abc_parsing{
+namespace abc_parsing {
 class abc_Trait;
 }
 
@@ -57,22 +55,22 @@ using namespace abc_parsing;
 class asException
 {
 public:
-	void setStart(boost::uint32_t i) { mStart = i; }
+	void setStart(boost::uint32_t i) { _start = i; }
 	void setEnd(boost::uint32_t i) { mEnd = i; }
 	void setCatch(boost::uint32_t i) { mCatch = i; }
 	void catchAny() { mCatchAny = true; }
 	void setCatchType(asClass* p) { mCatchType = p; }
-	void setNamespace(asNamespace* n) { mNamespace = n; }
-	void setName(string_table::key name) { mName = name; }
+	void setNamespace(asNamespace* n) { _namespace = n; }
+	void setName(string_table::key name) { _name = name; }
 
 private:
-	boost::uint32_t mStart;
+	boost::uint32_t _start;
 	boost::uint32_t mEnd;
 	boost::uint32_t mCatch;
 	bool mCatchAny;
 	asClass *mCatchType;
-	asNamespace *mNamespace;
-	string_table::key mName;
+	asNamespace *_namespace;
+	string_table::key _name;
 };
 #if 0
 /// An abstract binding for ActionScript.
@@ -85,15 +83,15 @@ public:
 	void unsetConst() { mConst = false; }
 	bool isConst() { return mConst; }
 
-	void setStatic() { mStatic = true; }
-	void unsetStatic() { mStatic = false; }
-	bool isStatic() { return mStatic; }
+	void setStatic() { _static = true; }
+	void unsetStatic() { _static = false; }
+	bool isStatic() { return _static; }
 
-	boost::uint32_t getSlotId() { return mSlotId; }
-	void setSlotId(boost::uint32_t s) { mSlotId = s; }
+	boost::uint32_t getSlotId() { return _slotId; }
+	void setSlotId(boost::uint32_t s) { _slotId = s; }
 
 	// Chad: Document
-	string_table::key getName() { return mName; }
+	string_table::key getName() { return _name; }
 	void setLexOnly(bool) { /* TODO */ }
 
 	/// If true, the attribute has a setter, but no getter.
@@ -110,37 +108,37 @@ public:
 
 	// As a member method.
 	asBinding(asNamespace *ns, asMethod *pMethod, bool isstatic = false) :
-		mNamespace(ns), mType(T_METHOD), mSlotId(0), mConst(true),
-		mStatic(isstatic),	mMethod(pMethod)
+		_namespace(ns), mType(T_METHOD), _slotId(0), mConst(true),
+		_static(isstatic),	_method(pMethod)
 	{/**/}
 
 	// As an assignable function.
 	asBinding(asNamespace *ns, asMethod *pMethod, boost::uint32_t sid, bool isstatic) :
-		mNamespace(ns), mType(T_METHOD), mSlotId(sid), mConst(false),
-		mStatic(isstatic),	mMethod(pMethod)
+		_namespace(ns), mType(T_METHOD), _slotId(sid), mConst(false),
+		_static(isstatic),	_method(pMethod)
 	{/**/}
 
 	asBinding(asNamespace *ns, asBoundValue *pValue, boost::uint32_t sid, bool isconstant,
-		bool isstatic) : mNamespace(ns), mType(T_VALUE), mSlotId(sid), mConst(isconstant),
-		mStatic(isstatic), mValue(pValue)
+		bool isstatic) : _namespace(ns), mType(T_VALUE), _slotId(sid), mConst(isconstant),
+		_static(isstatic), mValue(pValue)
 	{/**/}
 
 	asBinding(asNamespace *ns, asBoundValue *pValue, boost::uint32_t sid, bool isstatic) :
-		mNamespace(ns), mType(T_VALUE), mSlotId(sid), mConst(false), mStatic(isstatic),
+		_namespace(ns), mType(T_VALUE), _slotId(sid), mConst(false), _static(isstatic),
 		mValue(pValue)
 	{/**/}
 
 	asBinding(asNamespace *ns, asBoundAccessor *pAccess, bool isstatic) :
-		mNamespace(ns), mType(T_ACCESS), mSlotId(0), mConst(true), mStatic(isstatic),
-		mAccess(pAccess)
+		_namespace(ns), mType(T_ACCESS), _slotId(0), mConst(true), _static(isstatic),
+		_access(pAccess)
 	{/**/}
 
 	asBinding(asNamespace *ns, asClass *pClass, boost::uint32_t sid, bool isstatic) :
-		mNamespace(ns), mType(T_CLASS), mSlotId(sid), mConst(true), mStatic(isstatic),
+		_namespace(ns), mType(T_CLASS), _slotId(sid), mConst(true), _static(isstatic),
 		mClass(pClass)
 	{/**/}
 
-	asBinding() : mNamespace(NULL), mType(T_CLASS), mSlotId(0), mConst(false), mStatic(false),
+	asBinding() : _namespace(NULL), mType(T_CLASS), _slotId(0), mConst(false), _static(false),
 		mClass(NULL)
 	{/**/}
 
@@ -150,26 +148,26 @@ public:
 	void reset(asBoundAccessor *pAccess, bool isstatic)
 	{
 		mType = T_ACCESS;
-		mAccess = pAccess;
+		_access = pAccess;
 		mConst = true;
-		mStatic = isstatic;
+		_static = isstatic;
 	}
 
 	asBoundAccessor* getAccessor()
-	{ return mType == T_ACCESS ? mAccess : NULL; }
+	{ return mType == T_ACCESS ? _access : NULL; }
 
 	asBoundValue* getValue()
 	{ return mType == T_VALUE ? mValue : NULL; }
 
 	asMethod* getMethod()
-	{ return mType == T_METHOD ? mMethod : NULL; }
+	{ return mType == T_METHOD ? _method : NULL; }
 
 	asClass* getClass()
 	{ return mType == T_CLASS ? mClass : NULL; }
 
 	as_function* getASFunction();
 
-	asNamespace *mNamespace;
+	asNamespace *_namespace;
 
 	typedef enum
 	{
@@ -181,18 +179,18 @@ public:
 	} types;
 	types mType;
 
-	boost::uint32_t mSlotId;
+	boost::uint32_t _slotId;
 	bool mConst;
-	bool mStatic;
-	string_table::key mName;
-	as_object* mOwner;
+	bool _static;
+	string_table::key _name;
+	as_object* _owner;
 
 	union
 	{
 		asClass *mClass;
-		asMethod *mMethod;
+		asMethod *_method;
 		asBoundValue *mValue;
-		asBoundAccessor *mAccess;
+		asBoundAccessor *_access;
 	};
 };
 #endif // comment out of asBinding
@@ -204,9 +202,9 @@ public:
 	void markReachableResources() const { /* TODO */ }
 
 	/// Our parent (for protected)
-	void setParent(asNamespace* p) { mParent = p; }
+	void setParent(asNamespace* p) { _parent = p; }
 
-	asNamespace* getParent() { return mParent; }
+	asNamespace* getParent() { return _parent; }
 
 	/// Set the uri
 	void setURI(string_table::key name) { mUri = name; }
@@ -214,23 +212,23 @@ public:
 	/// What is the Uri of the namespace?
 	string_table::key getURI() const { return mUri; }
 
-	string_table::key getAbcURI() const {return mAbcURI;}
-	void setAbcURI(string_table::key n){ mAbcURI = n; }
+	string_table::key getAbcURI() const {return _abcURI;}
+	void setAbcURI(string_table::key n){ _abcURI = n; }
 
 	/// What is the XML prefix?
-	string_table::key getPrefix() const { return mPrefix; }
+	string_table::key getPrefix() const { return _prefix; }
 
 	/// Create an empty namespace
 	asNamespace()
         :
-        mParent(0),
+        _parent(0),
         mUri(0),
-        mPrefix(0),
-        mAbcURI(0),
+        _prefix(0),
+        _abcURI(0),
         mClasses(),
 		mRecursePrevent(false),
-        mPrivate(false),
-        mProtected(false)
+        _private(false),
+        _protected(false)
 	{/**/}
 
 	/// Add a class to the namespace. The namespace stores this, but
@@ -262,27 +260,27 @@ public:
 		return found;
 	}
 
-	void setPrivate() { mPrivate = true; }
-	void unsetPrivate() { mPrivate = false; }
-	bool isPrivate() { return mPrivate; }
+	void setPrivate() { _private = true; }
+	void unsetPrivate() { _private = false; }
+	bool isPrivate() { return _private; }
 
-	void setProtected() { mProtected = true; }
-	void unsetProtected() { mProtected = false; }
-	bool isProtected() { return mProtected; }
+	void setProtected() { _protected = true; }
+	void unsetProtected() { _protected = false; }
+	bool isProtected() { return _protected; }
 	
 private:
-	asNamespace *mParent;
+	asNamespace *_parent;
 	string_table::key mUri;
-	string_table::key mPrefix;
+	string_table::key _prefix;
 
-	string_table::key mAbcURI;
+	string_table::key _abcURI;
 
 	typedef std::map<string_table::key, asClass*> container;
 	container mClasses;
 	mutable bool mRecursePrevent;
 
-	bool mPrivate;
-	bool mProtected;
+	bool _private;
+	bool _protected;
 
 	asClass *getClassInternal(string_table::key name) const
 	{
@@ -303,16 +301,16 @@ class asBoundAccessor
 {
 public:
 	bool setGetter(asMethod *p) { mGetter = p; return true; }
-	bool setSetter(asMethod *p) { mSetter = p; return true; }
+	bool setSetter(asMethod *p) { _setter = p; return true; }
 	bool setValue(asBoundValue *p) { mValue = p; return true; }
 
 	asBoundValue* getValue() { return mValue; }
 	asMethod *getGetter() { return mGetter; }
-	asMethod *getSetter() { return mSetter; }
+	asMethod *getSetter() { return _setter; }
 
 private:
 	asMethod *mGetter;
-	asMethod *mSetter;
+	asMethod *_setter;
 	asBoundValue *mValue;
 };
 
@@ -338,66 +336,50 @@ private:
 /// Methods are unnamed until they are bound to an object.
 class asMethod
 {
-private:
-	abc_function* mPrototype;
-
-	typedef enum
-	{
-		FLAGS_FINAL = 0x01,
-		FLAGS_PROTECTED = 0x02,
-		FLAGS_PUBLIC = 0x04,
-		FLAGS_PRIVATE = 0x08
-	} flags;
-	/// A list of type identifiers
-	typedef std::list<asClass*> argumentList;
-	typedef std::map<string_table::key, asBinding> binding_container;
-
-	int mMinArguments;
-	int mMaxArguments;
-	boost::uint32_t mBodyLength;
-	bool mIsNative;
-	argumentList mArguments;
-	std::list<as_value> mOptionalArguments;
-	as_function *mImplementation;
-	unsigned char mFlags;
-	CodeStream *mBody;
-	boost::uint32_t mMaxRegisters;
-	bool addBinding(string_table::key name, asBinding b);
-
 public:
-
-	void initPrototype(Machine* machine);
-
-	boost::uint32_t getMaxRegisters(){ return mMaxRegisters;}
-
-	void setMaxRegisters(boost::uint32_t maxRegisters){ mMaxRegisters = maxRegisters;}
-
-	boost::uint32_t mMethodID;
-
-	boost::uint32_t getBodyLength(){ return mBodyLength;}
-
-	void setBodyLength(boost::uint32_t length){ mBodyLength = length;}
-
-	abc_function* getPrototype() { return mPrototype; }
-
-	asBinding* getBinding(string_table::key name);
+	
+    typedef std::list<asClass*> ArgumentList;
 
 	asMethod();
 
-	bool isNative() { return mIsNative; }
-	bool hasBody() const { return mBody != NULL; }
+    boost::uint32_t methodID() const {
+        return _methodID;
+    }
+
+    void setMethodID(boost::uint32_t m) {
+        _methodID = m;
+    }
+
+	void initPrototype(Machine* machine);
+
+	boost::uint32_t getMaxRegisters(){ return _maxRegisters;}
+
+	void setMaxRegisters(boost::uint32_t maxRegisters) { 
+        _maxRegisters = maxRegisters;
+    }
+
+	boost::uint32_t getBodyLength(){ return _bodyLength;}
+
+	void setBodyLength(boost::uint32_t length){ _bodyLength = length;}
+
+	abc_function* getPrototype() { return _prototype; }
+
+	asBinding* getBinding(string_table::key name);
+
+	bool isNative() { return _isNative; }
+	bool hasBody() const { return _body != NULL; }
 
 	as_object* construct(as_object* /*base_scope*/) { /* TODO */ return NULL; }
 
 	bool hasActivation();
 
-	CodeStream *getBody() { return mBody; }
-	void setBody(CodeStream *b) { mBody = b; }
+	CodeStream *getBody() { return _body; }
+	void setBody(CodeStream *b) { _body = b; }
 
-	bool addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
+	bool addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotID,
 		asClass *type, as_value& val, bool isconst);
 
-	bool addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
+	bool addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotID,
 		asClass *type);
 
 	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method);
@@ -407,10 +389,10 @@ public:
 	bool addSetter(string_table::key name, asNamespace *ns, asMethod *method);
 
 	bool addMemberClass(string_table::key name, asNamespace *ns,
-		boost::uint32_t slotId, asClass *type);
+		boost::uint32_t slotID, asClass *type);
 	
 	bool addSlotFunction(string_table::key name, asNamespace *ns,
-		boost::uint32_t slotId, asMethod *method);
+		boost::uint32_t slotID, asMethod *method);
 
 	/// \brief
 	/// Set the owner of this method.
@@ -431,80 +413,85 @@ public:
 
 	/// \brief
 	/// Is the method final? If so, it may not be overridden.
-	bool isFinal() const { return mFlags & FLAGS_FINAL; }
+	bool isFinal() const { return _flags & FLAGS_FINAL; }
 
 	/// \brief
 	/// Set the method as final.
-	void setFinal() { mFlags = mFlags | FLAGS_FINAL; }
+	void setFinal() { _flags = _flags | FLAGS_FINAL; }
 
 	/// \brief
 	/// Unset the method as final. Not final anymore.
-	void unsetFinal() { mFlags = mFlags & ~FLAGS_FINAL; }
+	void unsetFinal() { _flags = _flags & ~FLAGS_FINAL; }
 
 	/// \brief
 	/// Is the method private?
-	bool isPrivate() const { return mFlags & FLAGS_PRIVATE; }
+	bool isPrivate() const { return _flags & FLAGS_PRIVATE; }
 
 	/// \brief
 	/// Make the method private.
-	void setPrivate()
-	{ mFlags = (mFlags & ~(FLAGS_PUBLIC | FLAGS_PROTECTED)) | FLAGS_PRIVATE; }
+	void setPrivate() {
+        _flags = (_flags & ~(FLAGS_PUBLIC | FLAGS_PROTECTED)) | FLAGS_PRIVATE;
+    }
 
 	/// \brief
 	/// Is the method protected?
-	bool isProtected() const { return mFlags & FLAGS_PROTECTED; }
+	bool isProtected() const {
+        return _flags & FLAGS_PROTECTED;
+    }
 
 	/// \brief
 	/// Make the method protected.
-	void setProtected()
-	{ mFlags = (mFlags & ~(FLAGS_PUBLIC | FLAGS_PRIVATE)) | FLAGS_PROTECTED; }
+	void setProtected() {
+        _flags = (_flags & ~(FLAGS_PUBLIC | FLAGS_PRIVATE)) | FLAGS_PROTECTED; }
 
 	/// \brief
 	/// Is the method public?
-	bool isPublic() const { return mFlags & FLAGS_PUBLIC; }
+	bool isPublic() const { return _flags & FLAGS_PUBLIC; }
 
 	/// \brief
 	/// Make the method public.
-	void setPublic()
-	{ mFlags = (mFlags & ~(FLAGS_PRIVATE | FLAGS_PROTECTED)) | FLAGS_PUBLIC; }
+	void setPublic() {
+        _flags = (_flags & ~(FLAGS_PRIVATE | FLAGS_PROTECTED)) | FLAGS_PUBLIC;
+    }
 
 	/// \brief
 	/// How many arguments are required? -1 means unknown.
-	int minArgumentCount() const { return mMinArguments; }
+	int minArgumentCount() const { return _minArguments; }
 
 	/// \brief
 	/// Set the required minimum arguments.
-	void setMinArgumentCount(int i) { mMinArguments = i; }
+	void setMinArgumentCount(int i) { _minArguments = i; }
 
 	/// \brief
 	/// How many arguments are allowed? -1 means unknown.
-	int maxArgumentCount() const { return mMaxArguments; }
+	int maxArgumentCount() const { return _maxArguments; }
 
 	/// Set the required maximum arguments.
-	void setMaxArgumentCount(int i) { mMaxArguments = i; }
+	void setMaxArgumentCount(int i) { _maxArguments = i; }
 
 	/// \brief
 	/// Push an argument of type t into the method definition
-	void pushArgument(asClass *t) { mArguments.push_back(t); }
+	void pushArgument(asClass *t) { _arguments.push_back(t); }
 
 	/// \brief
 	/// Push an optional argument's default value.
-	void pushOptional(const as_value& v) { mOptionalArguments.push_back(v); }
+	void pushOptional(const as_value& v) { _optionalArguments.push_back(v); }
 
 	/// \brief
 	/// Are any of the arguments optional?
-	bool optionalArguments() const
-	{ return minArgumentCount() != maxArgumentCount(); }
+	bool optionalArguments() const {
+        return minArgumentCount() != maxArgumentCount();
+    }
 
 	/// \brief
 	/// Get a reference to a list of argument types.
-	argumentList& getArgumentList() { return mArguments; }
+	ArgumentList& getArgumentList() { return _arguments; }
 
 	/// \brief
 	/// Get an object capable of executing this function.
 	/// Note: This may be NULL, because we might have information about this
 	/// function but not actually have it yet.
-	as_function* getImplementation() { return mImplementation; }
+	as_function* getImplementation() { return _implementation; }
 
 	/// \brief
 	/// Print the opcodes that define a method using log_parse.
@@ -513,6 +500,36 @@ public:
 	void print_static_constructor(){
 
 	}
+
+private:
+
+	enum Flag
+	{
+		FLAGS_FINAL = 0x01,
+		FLAGS_PROTECTED = 0x02,
+		FLAGS_PUBLIC = 0x04,
+		FLAGS_PRIVATE = 0x08
+	};
+
+	/// A list of type identifiers
+	typedef std::map<string_table::key, asBinding> BindingContainer;
+
+	bool addBinding(string_table::key name, asBinding b);
+	
+    boost::uint32_t _methodID;
+
+    abc_function* _prototype;
+	int _minArguments;
+	int _maxArguments;
+	boost::uint32_t _bodyLength;
+	bool _isNative;
+	ArgumentList _arguments;
+	std::list<as_value> _optionalArguments;
+	as_function* _implementation;
+	unsigned char _flags;
+	CodeStream* _body;
+	boost::uint32_t _maxRegisters;
+
 };
 
 /// A class to represent, abstractly, ActionScript prototypes.
@@ -524,15 +541,37 @@ public:
 class asClass
 {
 public:
-	as_object* getPrototype() { return mPrototype; }
+
+	asClass()
+        :
+        _prototype(0),
+        _final(false),
+        _sealed(false),
+        _dynamic(false),
+		_interface(false),
+        _name(0),
+        _interfaces(),
+        _protectedNs(0),
+		_super(0),
+        _constructor(0),
+        _staticConstructor(0),
+		_bindings(),
+        _staticBindings(),
+        _declared(false),
+        _inherited(false),
+		_system(false)
+	{}
+
+	as_object* getPrototype() { return _prototype; }
 
 	void dump();
 
-	bool addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
-		asClass *type, as_value& val, bool isconst, bool isstatic);
+	bool addValue(string_table::key name, asNamespace *ns,
+            boost::uint32_t slotID, asClass *type, as_value& val,
+            bool isconst, bool isstatic);
 
-	bool addSlot(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
-		asClass *type, bool isstatic);
+	bool addSlot(string_table::key name, asNamespace *ns,
+            boost::uint32_t slotID, asClass *type, bool isstatic);
 
 	bool addMethod(string_table::key name, asNamespace *ns, asMethod *method,
 		bool isstatic);
@@ -544,119 +583,97 @@ public:
 		bool isstatic);
 
 	bool addMemberClass(string_table::key name, asNamespace *ns,
-		boost::uint32_t slotId, asClass *type, bool isstatic);
+		boost::uint32_t slotID, asClass *type, bool isstatic);
 
 	// TODO: Figure out how this differs from addMethod
 	bool addSlotFunction(string_table::key name, asNamespace *ns,
-		boost::uint32_t slotId, asMethod *method, bool isstatic);
+		boost::uint32_t slotID, asMethod *method, bool isstatic);
 
 	/// Is the class final?
-	bool isFinal() const { return mFinal; }
+	bool isFinal() const { return _final; }
 
 	/// Set the class as final.
-	void setFinal() { mFinal = true; }
+	void setFinal() { _final = true; }
 
 	/// Set the class as not final.
-	void unsetFinal() { mFinal = false; }
+	void unsetFinal() { _final = false; }
 
 	/// Is the class sealed?
-	bool isSealed() const { return mSealed; }
+	bool isSealed() const { return _sealed; }
 
 	/// Set the class as sealed.
-	void setSealed() { mSealed = true; }
+	void setSealed() { _sealed = true; }
 
 	// Set the class as not sealed.
-	void unsetSealed() { mSealed = false; }
+	void unsetSealed() { _sealed = false; }
 
 	/// Is the class an interface type?
-	bool isInterface() const { return mInterface; }
+	bool isInterface() const { return _interface; }
 
 	/// Set the class as an interface.
-	void setInterface() { mInterface = true; }
+	void setInterface() { _interface = true; }
 
 	/// Set the class as not an interface.
-	void unsetInterface() { mInterface = false; }
+	void unsetInterface() { _interface = false; }
 
 	/// Is the class dynamic?
-	bool isDynamic() const { return mDynamic; }
+	bool isDynamic() const { return _dynamic; }
 
 	/// Set the class as dynamic.
-	void setDynamic() { mDynamic = true; }
+	void setDynamic() { _dynamic = true; }
 
 	/// Set the class as not dynamic.
-	void unsetDynamic() { mDynamic = false; }
+	void unsetDynamic() { _dynamic = false; }
 
 	/// Does the class have a protected namespace to be inherited?
-	bool hasProtectedNs() const { return mProtectedNs != NULL; }
+	bool hasProtectedNs() const { return _protectedNs; }
 
 	/// Get the protected namespace.
-	asNamespace *getProtectedNs() { return mProtectedNs; }
+	asNamespace *getProtectedNs() { return _protectedNs; }
 
 	/// Set the protected namespace.
-	void setProtectedNs(asNamespace *n) { mProtectedNs = n; }
+	void setProtectedNs(asNamespace *n) { _protectedNs = n; }
 
-	string_table::key getName() const { return mName; }
+	string_table::key getName() const { return _name; }
 
-	void initPrototype(){ mPrototype = new as_object();}
+	void initPrototype(){ _prototype = new as_object();}
 
 	/// Set our Name
-	void setName(string_table::key name) { mName = name; }
+	void setName(string_table::key name) { _name = name; }
 
 	/// What is the type of our parent class?
-	asClass* getSuper() const { return mSuper; }
+	asClass* getSuper() const { return _super; }
 
 	/// We implement this interface.
-	void pushInterface(asClass* p) { mInterfaces.push_back(p); }
+	void pushInterface(asClass* p) { _interfaces.push_back(p); }
 
 	/// This is our constructor.
-	void setConstructor(asMethod *m) { mConstructor = m; }
-	asMethod *getConstructor() { return mConstructor; }
+	void setConstructor(asMethod *m) { _constructor = m; }
+	asMethod *getConstructor() { return _constructor; }
 
-	void setStaticConstructor(asMethod *m) { mStaticConstructor = m; }
-	asMethod *getStaticConstructor(){return mStaticConstructor;}
-	void setSuper(asClass *p) { mSuper = p; }
+	void setStaticConstructor(asMethod *m) { _staticConstructor = m; }
+	asMethod *getStaticConstructor(){return _staticConstructor;}
+	void setSuper(asClass *p) { _super = p; }
 
 	/// Try to build an asClass object from just a prototype.
-	void buildFromPrototype(as_object *o, string_table::key name,
+	void buildFro_prototype(as_object *o, string_table::key name,
 		ClassHierarchy *);
 
-	void setDeclared() { mDeclared = true; }
-	bool isDeclared() { return mDeclared; }
-	void setInherited() { mInherited = true; }
-	bool isInherited() { return mInherited; }
+	void setDeclared() { _declared = true; }
+	bool isDeclared() { return _declared; }
+	void setInherited() { _inherited = true; }
+	bool isInherited() { return _inherited; }
 
-	void setSystem() { mSystem = true; }
-	void unsetSystem() { mSystem = false; }
-	bool isSystem() { return mSystem; }
-
-	asClass()
-        :
-        mPrototype(0),
-        mFinal(false),
-        mSealed(false),
-        mDynamic(false),
-		mInterface(false),
-        mName(0),
-        mInterfaces(),
-        mProtectedNs(0),
-		mSuper(0),
-        mConstructor(0),
-        mStaticConstructor(0),
-		mBindings(),
-        mStaticBindings(),
-        mDeclared(false),
-        mInherited(false),
-		mSystem(false)/*,mTraits()*/
-	{/**/}
-
+	void setSystem() { _system = true; }
+	void unsetSystem() { _system = false; }
+	bool isSystem() { return _system; }
 
 	asBinding *getBinding(string_table::key name)
 	{
-		binding_container::iterator i;
-		if (mBindings.empty())
-			return NULL;
-		i = mBindings.find(name);
-		if (i == mBindings.end())
+		BindingContainer::iterator i;
+		if (_bindings.empty()) return NULL;
+		i = _bindings.find(name);
+		if (i == _bindings.end())
 			return NULL;
 		return &i->second;
 	}
@@ -664,45 +681,46 @@ public:
 	asBinding* getGetBinding(as_value& v, asName& n);
 	asBinding* getSetBinding(as_value& v, asName& n);
 
-	std::vector<abc_Trait> mTraits;
+	std::vector<abc_Trait> _traits;
 
 private:
-	as_object *mPrototype;
+
+	typedef std::map<string_table::key, asBinding> BindingContainer;
+
+    as_object *_prototype;
 
 	bool addBinding(string_table::key name, asBinding b)
-	{ mBindings[name] = b; return true; }
+	{ _bindings[name] = b; return true; }
 	bool addStaticBinding(string_table::key name, asBinding b)
-	{ mStaticBindings[name] = b; return true; }
+	{ _staticBindings[name] = b; return true; }
 
 	asBinding *getStaticBinding(string_table::key name)
 	{
-		binding_container::iterator i;
-		if (mStaticBindings.empty())
+		BindingContainer::iterator i;
+		if (_staticBindings.empty())
 			return NULL;
-		i = mStaticBindings.find(name);
-		if (i == mStaticBindings.end())
+		i = _staticBindings.find(name);
+		if (i == _staticBindings.end())
 			return NULL;
 		return &i->second;
 	}
 
-	bool mFinal;
-	bool mSealed;
-	bool mDynamic;
-	bool mInterface;
-	string_table::key mName;
-	std::list<asClass*> mInterfaces;
-	asNamespace *mProtectedNs;
-	asClass *mSuper;
-	asMethod *mConstructor;
-	asMethod *mStaticConstructor;
+	bool _final;
+	bool _sealed;
+	bool _dynamic;
+	bool _interface;
+	string_table::key _name;
+	std::list<asClass*> _interfaces;
+	asNamespace* _protectedNs;
+	asClass* _super;
+	asMethod* _constructor;
+	asMethod* _staticConstructor;
 
-	typedef std::map<string_table::key, asBinding> binding_container;
-
-	binding_container mBindings;
-	binding_container mStaticBindings;
-	bool mDeclared;
-	bool mInherited;
-	bool mSystem;
+	BindingContainer _bindings;
+	BindingContainer _staticBindings;
+	bool _declared;
+	bool _inherited;
+	bool _system;
 };
 
 } /* namespace gnash */

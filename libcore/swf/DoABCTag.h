@@ -45,13 +45,6 @@ public:
 
 	{}
 
-	/// Read a DoAction block from the stream
-	//
-// 	void read(SWFStream* in)
-// 	{
-//             m_buf.read(*in, in->get_tag_end_position());
-// 	}
-
 	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
 	{
 		VM& vm = VM::get();
@@ -59,28 +52,8 @@ public:
 		Machine *mach = vm.getMachine();
 		as_object* global = vm.getGlobal();
 		
-		std::vector<asClass*>::iterator ci = mABC->mClasses.begin();
-		for(; ci != mABC->mClasses.end(); ++ci){
-			(*ci)->initPrototype();
-		}
-		
-		std::vector<asClass*>::iterator si = mABC->mScripts.begin();
-		for(; si != mABC->mScripts.end(); ++si){
-			(*si)->initPrototype();
-		}
+        mABC->prepare(mach);
 
-		std::vector<asMethod*>::iterator mi = mABC->mMethods.begin();
-		for(; mi != mABC->mMethods.end(); ++mi){
-			(*mi)->initPrototype(mach);
-		}
-
-		std::vector<abc_Trait*>::iterator i = mABC->mTraits.begin();
-		
-		for ( ; i != mABC->mTraits.end(); ++i)
-		{
-			(*i)->finalize(mABC);
-		}
-		mABC->mTraits.clear();
 		log_debug("Begin execute abc_block.");
 //		log_debug("Getting entry script.");
 //		asClass* start_script = a.mScripts.back();
