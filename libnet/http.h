@@ -299,6 +299,8 @@ public:
     boost::shared_ptr<amf::Buffer> DSOEXPORT peekChunk() { return _que.peek(); };
     // Get the number of elements in the que
     size_t DSOEXPORT sizeChunks() { return _que.size(); };
+
+    boost::shared_ptr<amf::Buffer> DSOEXPORT mergeChunks() { return _que.merge(); };
     
 protected:
     // Examine the beginning of the data for an HTTP request command

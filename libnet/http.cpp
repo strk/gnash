@@ -1378,7 +1378,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 		  __PRETTY_FUNCTION__, total, size, sizesize);
 	buf.reset(new amf::Buffer(total));
 	// Add the existing data from the previous packet
-	buf->copy(data, size - sizesize);
+	buf->copy(data+sizesize, size-sizesize);
     }
 
     // The size of the packet we need to read has a 2 byte terminator "\r\n",
@@ -1405,6 +1405,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 		buf.reset(new amf::Buffer(pktsize));
 	    }
 	    ret = readNet(buf->reference() + buf->allocated(), pktsize, 60);
+// 	    buf->dump();
 	    // We got data.
 	    if (ret == 0) {
 		log_debug("no data yet for fd #%d, continuing...", getFileFd());
@@ -1436,7 +1437,6 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 			    tmpbuf.copy(buf->reference() + bytes.size() + 2, (start - buf->reference()));
 			    buf->resize(total);
  			    buf->copy(tmpbuf.reference(), tmpbuf.size());
-			    tmpbuf. dump();
 			}
 		    }
 		}
@@ -1450,14 +1450,14 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 		    if (pktsize == 0) {
 			done = true;
 		    } else {
-			log_debug("Didn't get a full packet, reading more data");
+// 			log_debug("Didn't get a full packet, reading more data");
 			continue;
 		    }
 		}
 	    }
 	} while (!done);
-	log_debug("%s: finished packet, ret is %d, pktsize is %d\r\n%s", __PRETTY_FUNCTION__, ret, pktsize,
-		  hexify(buf->reference(), buf->allocated(), true));
+//  	log_debug("%s: finished packet, ret is %d, pktsize is %d\r\n%s", __PRETTY_FUNCTION__, ret, pktsize,
+//  		  hexify(buf->reference(), buf->allocated(), true));
 	if (pktsize == 0) {
 	    _que.push(buf);
 	}
