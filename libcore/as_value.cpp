@@ -1147,6 +1147,13 @@ as_value::set_null()
 }
 
 void
+as_value::set_unsupported()
+{
+	m_type = UNSUPPORTED;
+	_value = boost::blank();
+}
+
+void
 as_value::set_as_object(as_object* obj)
 {
 	if ( ! obj )
@@ -1912,7 +1919,15 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
             log_debug("as_value(Element&) : AMF type STRING");
 #endif
-            std::string str = el.to_string();
+	    std::string str;
+	    // If there is data, convert it to a string for the as_value
+	    if (el.getDataSize() != 0) {
+		str = el.to_string();
+		// Element's store the property name as the name, not as data.
+	    } else if (el.getNameSize() != 0) {
+		str = el.getName();
+	    }
+	    
             set_string(str);
             break;
       }
@@ -1997,10 +2012,15 @@ as_value::as_value(const amf::Element& el)
         //if (swfVersion > 5) m_type = STRING;
         break;
       }
-
+      
       case amf::Element::UNSUPPORTED_AMF0:
-          log_unimpl("Unsupported data type is not supported yet");
-          break;
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type UNSUPPORTED");
+#endif
+	  set_unsupported();
+	  break;
+      }
       case amf::Element::RECORD_SET_AMF0:
           log_unimpl("Record Set data type is not supported yet");
           break;
