@@ -256,7 +256,10 @@ public:
     ///
     /// @return The number of bytes sent
     int recvMsg(int fd);
+    int recvMsg(int fd, size_t size);
 
+    size_t recvChunked(boost::uint8_t *data, size_t size);
+    
     /// \brief Send a message to the other end of the network connection.
     ///
     /// @param data A real pointer to the data.
@@ -289,6 +292,13 @@ public:
     void setHandler(Handler *hand) { _handler = hand; };
     void setDocRoot(const std::string &path) { _docroot = path; };
     std::string &getDocRoot() { return _docroot; };
+    
+    // Pop the first date element off the que
+    boost::shared_ptr<amf::Buffer> DSOEXPORT popChunk() { return _que.pop(); };
+    // Peek at the first date element witjhout removing it from the que
+    boost::shared_ptr<amf::Buffer> DSOEXPORT peekChunk() { return _que.peek(); };
+    // Get the number of elements in the que
+    size_t DSOEXPORT sizeChunks() { return _que.size(); };
     
 protected:
     // Examine the beginning of the data for an HTTP request command
