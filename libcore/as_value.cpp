@@ -1866,6 +1866,13 @@ as_value::as_value(const amf::Element& el)
     string_table& st = vm.getStringTable();
     
     switch (el.getType()) {
+      case amf::Element::NOTYPE:
+      {
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type NO TYPE!");
+#endif
+	  break;
+      }
       case amf::Element::NULL_AMF0:
       {
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
@@ -2008,10 +2015,14 @@ as_value::as_value(const amf::Element& el)
 
       case amf::Element::DATE_AMF0:
       {
-        log_unimpl("DATE Element to as_value");
-        //if (swfVersion > 5) m_type = STRING;
-        break;
+#ifdef GNASH_DEBUG_AMF_DESERIALIZE
+	  log_debug("as_value(Element&) : AMF type DATE");
+#endif
+	  double num = el.to_number();
+	  set_double(num);
+	  break;
       }
+      //if (swfVersion > 5) m_type = STRING;
       
       case amf::Element::UNSUPPORTED_AMF0:
       {
