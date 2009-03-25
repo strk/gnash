@@ -733,7 +733,7 @@ Buffer::dump(std::ostream& os) const
 {
     os << "Buffer is " << _seekptr-_data.get() << "/" << _nbytes << " bytes: ";
      // Skip in-memory address " at " << (void *)_data.get() << endl;
-    if (_nbytes < 0xffff) {
+    if (_nbytes > 0) {
 	const size_t bytes = _seekptr - _data.get();
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, false) << endl;
 	os << gnash::hexify((unsigned char *)_data.get(), bytes, true) << endl;
