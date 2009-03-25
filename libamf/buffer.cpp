@@ -668,6 +668,11 @@ Buffer::resize(size_t size)
 //    GNASH_REPORT_FUNCTION;
     boost::scoped_array<boost::uint8_t> tmp;
 
+    // If there is no size, don't do anything
+    if (size == 0) {
+	return *this;
+    }
+    
     // If we don't have any data yet in this buffer, resizing is cheap, as
     // we don't havce to copy any data.
     if (_seekptr == _data.get()) {
