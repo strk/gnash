@@ -752,25 +752,34 @@ net_handler(NetConnection_as::thread_params_t *args)
 	    if (chunked) {
 		size_t count = http->recvChunked(data, (buf->end() - data));
 		log_debug("Got %d chunked data messages", count);
-		chunk = http->popChunk();
 	    } else {
 		done = true;
 		result = false;
 	    }
 	}
 	
+// 	for (size_t i=0; i<http->sizeChunks(); i++) {
 	log_debug("Cookie is: \"%s\"", http->getField("cookie"));
 	log_debug("Content type is: \"%s\"", http->getField("content-type"));
 	if (http->getField("content-type").find("application/x-amf") != string::npos) {
+	    if (chunked) {
+		chunk = http->mergeChunks();
+	    } else {
+		chunk.reset(new amf::Buffer(buf->end() - data));
+		chunk->copy(data,(buf->end() - data));
+	    }
+	    
+//   	    chunk = http->popChunk();
+//  	    chunk->dump();
 	    amf::AMF_msg amsg;
 	    boost::shared_ptr<amf::AMF_msg::context_header_t> head =
-		amsg.parseAMFPacket(*chunk);
-  	    amsg.dump();
+		amsg.parseAMFPacket(chunk->reference(), chunk->allocated());
+// 	    amsg.dump();
 	    log_debug("%d messages in AMF packet", amsg.messageCount());
 	    for (size_t i=0; i<amsg.messageCount(); i++) {
-//  		amsg.getMessage(i)->data->dump();
- 		boost::shared_ptr<amf::Element> el = amsg.getMessage(i)->data;
- 		as_value tmp(*el);
+//   		amsg.getMessage(i)->data->dump();
+		boost::shared_ptr<amf::Element> el = amsg.getMessage(i)->data;
+		as_value tmp(*el);
 // 		NetConnection_as *obj = (NetConnection_as *)args->network;
 		log_debug("Calling NetConnection %s(%s)",
 			  amsg.getMessage(i)->header.target, tmp);
@@ -788,7 +797,7 @@ net_handler(NetConnection_as::thread_params_t *args)
 		string_table::key methodKey;
 		boost::mutex::scoped_lock lock(_nc_mutex);
 		methodKey = args->st->find(methodName);
-  		args->callback->callMethod(methodKey, tmp);
+		args->callback->callMethod(methodKey, tmp);
 	    }
 	} else {	// not AMF data
 	    if ((http->getField("content-type").find("application/xml") != string::npos)
