@@ -489,6 +489,7 @@ NetConnection_as::getStream(const std::string& name)
 
 }
 
+
 /// Anonymous namespace for NetConnection interface implementation.
 
 namespace {
@@ -688,13 +689,13 @@ net_handler(NetConnection_as::thread_params_t *args)
 
 //    boost::mutex::scoped_lock lock(call_mutex);
 
-//    args->caller->test();
-
+    args->network->setTimeout(50);
+    
     // Suck all the data waiting for us in the network
     boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);
     do {
 	size_t ret = args->network->readNet(buf->reference() + buf->allocated(), 
-					 buf->size(), 10);
+					 buf->size(), 60);
 	// The timeout expired
  	if (ret == 0) {
 	    log_debug("no data yet for fd #%d, continuing...",
@@ -733,7 +734,7 @@ net_handler(NetConnection_as::thread_params_t *args)
 	    done = true;
 	}
     } while(done != true);
-
+    
     // Now process the data
     if (result) {
 	HTTP *http = reinterpret_cast<HTTP *>(args->network);;
@@ -746,16 +747,12 @@ net_handler(NetConnection_as::thread_params_t *args)
 	}
 	// Make sure we have a sane length. If Chunked, then we don't have
 	// a length field, so we use the size of the data that
+	boost::shared_ptr<amf::Buffer> chunk;
 	if (length == 0) {
 	    if (chunked) {
-		length = buf->end() - data;
-		// A chunked transfer sends a count of messages in ASCII hex first,
-		// and that line is terminated with the usual \r\n HTTP header field
-		// line number
-		boost::uint8_t *start = std::find(data, data+length, '\r') + 2;
-		if (start != data+length) {
-		    data = start;
-		}
+		size_t count = http->recvChunked(data, (buf->end() - data));
+		log_debug("Got %d chunked data messages", count);
+		chunk = http->popChunk();
 	    } else {
 		done = true;
 		result = false;
@@ -767,7 +764,7 @@ net_handler(NetConnection_as::thread_params_t *args)
 	if (http->getField("content-type").find("application/x-amf") != string::npos) {
 	    amf::AMF_msg amsg;
 	    boost::shared_ptr<amf::AMF_msg::context_header_t> head =
-		amsg.parseAMFPacket(data, length);
+		amsg.parseAMFPacket(*chunk);
   	    amsg.dump();
 	    log_debug("%d messages in AMF packet", amsg.messageCount());
 	    for (size_t i=0; i<amsg.messageCount(); i++) {
@@ -793,7 +790,7 @@ net_handler(NetConnection_as::thread_params_t *args)
 		methodKey = args->st->find(methodName);
   		args->callback->callMethod(methodKey, tmp);
 	    }
-	} else {// not AMF data
+	} else {	// not AMF data
 	    if ((http->getField("content-type").find("application/xml") != string::npos)
 		|| (http->getField("content-type").find("text/html") != string::npos)) {
 		log_debug("Textual Data is: %s", reinterpret_cast<char *>(data));
