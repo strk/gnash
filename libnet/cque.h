@@ -69,7 +69,8 @@ public:
     void remove(boost::shared_ptr<amf::Buffer> it);
     // Merge sucessive buffers into one single larger buffer. This is for some
     // protocols, than have very long headers.
-    boost::shared_ptr<amf::Buffer> merge(boost::shared_ptr<amf::Buffer> begin);
+    boost::shared_ptr<amf::Buffer> DSOEXPORT merge(boost::shared_ptr<amf::Buffer> begin);
+    boost::shared_ptr<amf::Buffer> DSOEXPORT merge();
 
     boost::shared_ptr<amf::Buffer> operator[] (int index) { return _que[index]; };
     
