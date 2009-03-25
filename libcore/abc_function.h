@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __GNASH_ABC_FUNCTION_H__
-#define __GNASH_ABC_FUNCTION_H__
+#ifndef GNASH_ABC_FUNCTION_H
+#define GNASH_ABC_FUNCTION_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // GNASH_USE_GC

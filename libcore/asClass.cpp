@@ -28,12 +28,12 @@
 #include "abc_function.h"
 
 namespace gnash {
-#define STV(x) VM::get().getStringTable().value(x).c_str()
 
 asMethod::asMethod()
     :
 	_minArguments(0),
-	_maxArguments(0)
+	_maxArguments(0),
+    _body(0)
 {
 }
 
