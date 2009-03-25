@@ -113,10 +113,10 @@ private:
     void addToURL(const std::string& url);
 
     /// the url prefix optionally passed to connect()
-    std::string		_uri;
-    bool		_isConnected;
-    unsigned int	_numCalls;
-    boost::scoped_ptr<HTTP> _http_client;
+    std::string		          _uri;
+    bool		          _isConnected;
+    unsigned int		  _numCalls;
+    boost::scoped_ptr<HTTP>	  _http_client;
     boost::scoped_ptr<RTMPClient> _rtmp_client;
 };
 
