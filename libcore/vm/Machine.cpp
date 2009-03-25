@@ -52,7 +52,7 @@ class ASTypeError : public ASException
 {
 public:
 	ASTypeError() : ASException()
-	{/**/}
+	{}
 };
 
 // Functions for getting pool constants.
@@ -60,22 +60,21 @@ static inline const std::string&
 pool_string(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	return pool->mStringPool.at(index);
+	return pool->stringPoolAt(index);
 }
 
 static inline int
 pool_int(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mIntegerPool.at(index);
+	if (!pool) throw ASException();
+	return pool->integerPoolAt(index);
 }
 
 static inline unsigned int
 pool_uint(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	return pool->mUIntegerPool.at(index);
+	return pool->uIntegerPoolAt(index);
 }
 
 static inline double
@@ -83,28 +82,28 @@ pool_double(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
 	LOG_DEBUG_AVM("Getting double from pool at index %u",index);
-	return pool->mDoublePool.at(index);
+	return pool->doublePoolAt(index);
 }
 
 static inline asNamespace*
 pool_namespace(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	return pool->mNamespacePool.at(index);
+	return pool->namespacePoolAt(index);
 }
 
 static inline asMethod*
 pool_method(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
-	return pool->mMethods.at(index);
+	return pool->methodPoolAt(index);
 }
 
 static inline asClass*
 pool_class(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
-	return pool->mClasses.at(index);
+	return pool->classPoolAt(index);
 }
 
 // Don't make this a reference or you'll taint the pool.
@@ -112,8 +111,14 @@ static inline asName
 pool_name(boost::uint32_t index, abc_block* pool)
 {
 	if (!pool) throw ASException();
-	asName multiname = pool->mMultinamePool.at(index);
-	LOG_DEBUG_AVM("Searching multiname pool for property id=%u abc name=%u global name = %u abc string=%s flags=0x%X name_space=%u",index,multiname.getABCName(),multiname.getGlobalName(),pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,multiname.getNamespace()->getURI());
+	asName multiname = pool->multinamePoolAt(index);
+#if 0
+    LOG_DEBUG_AVM("Searching multiname pool for property id=%u abc name=%u "
+            "global name = %u abc string=%s flags=0x%X name_space=%u",
+            index, multiname.getABCName(), multiname.getGlobalName(),
+            pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,
+            multiname.getNamespace()->getURI());
+#endif
 	return multiname;
 }
 
@@ -1188,16 +1193,18 @@ Machine::execute()
 			as_value property = object->getMember(a.getGlobalName(),0);
 		
 			if (!property.is_undefined() && !property.is_null()) {
-				LOG_DEBUG_AVM("Calling method %s on object %s",property.toDebugString(),object_val.toDebugString());
+				LOG_DEBUG_AVM("Calling method %s on object %s",
+                        property.toDebugString(),object_val.toDebugString());
 				as_environment env = as_environment(_vm);
 				result = call_method(property,&env,object,args);
 
 			}
 			else{
                 IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror(_("Property '%s' of object '%s' is '%s', cannot call as method"),
-                    mPoolObject->mStringPool[a.getABCName()],
-                    object_val, property);
+				log_aserror(_("Property '%s' of object '%s' is '%s', "
+                        "cannot call as method"),
+                        mPoolObject->stringPoolAt(a.getABCName()),
+                        object_val, property);
                 )
 			}
 
@@ -1426,7 +1433,8 @@ Machine::execute()
 	{
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
-		LOG_DEBUG_AVM("Creating new class id=%u name=%s",c->getName(),mPoolObject->mStringPool[c->getName()]);
+		LOG_DEBUG_AVM("Creating new class id=%u name=%s", c->getName(),
+                mPoolObject->stringPoolAt(c->getName()));
 		
 		as_object* base_class = pop_stack().to_object().get();
 		as_object* new_class = c->getPrototype();
@@ -1559,8 +1567,9 @@ Machine::execute()
 		string_table::key name = 0;
 
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
-		if (a.mFlags == asName::KIND_MultinameL) {
+		// TODO: If multiname is runtime we need to also pop namespace
+        // and name values of the stack.
+		if (a.flags() == asName::KIND_MultinameL) {
 			as_value nameValue = pop_stack();
 			name = mST.find(nameValue.to_string());
 		}
@@ -1635,7 +1644,7 @@ Machine::execute()
 		string_table::key name = 0;
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
-		if (a.mFlags == asName::KIND_MultinameL) {
+		if (a.flags() == asName::KIND_MultinameL) {
 			as_value nameValue = pop_stack();
 			name = mST.find(nameValue.to_string());
 		}
@@ -2700,7 +2709,7 @@ Machine::initMachine(abc_block* pool_block, as_object* global)
 {
 	mPoolObject = pool_block;
 	log_debug("Getting entry script.");
-	asClass* start_script = pool_block->mScripts.back();
+	asClass* start_script = pool_block->scripts().back();
 	log_debug("Getting constructor.");
 	asMethod* constructor = start_script->getConstructor();
 	clearRegisters(constructor->getMaxRegisters());
@@ -2824,8 +2833,9 @@ Machine::find_prop_strict(asName multiname) {
 	LOG_DEBUG_AVM("Cannot find property in scope stack.  Trying again using as_environment.");
 	as_object *target = NULL;
 	as_environment env = as_environment(_vm);
-	std::string name = mPoolObject->mStringPool[multiname.getABCName()];
-	std::string ns = mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
+	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
+	std::string ns = mPoolObject->stringPoolAt(
+            multiname.getNamespace()->getAbcURI());
 	std::string path = ns.size() == 0 ? name : ns + "." + name;
 	val = env.get_variable(path,*getScopeStack(),&target);
 	push_stack(as_value(target));	
@@ -2845,8 +2855,8 @@ Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
 {
 
 	std::string ns = 
-        mPoolObject->mStringPool[multiname.getNamespace()->getAbcURI()];
-	std::string name = mPoolObject->mStringPool[multiname.getABCName()];
+        mPoolObject->stringPoolAt(multiname.getNamespace()->getAbcURI());
+	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
 	return get_property_value(obj, name, ns);
 }
 

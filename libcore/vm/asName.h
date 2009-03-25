@@ -26,31 +26,8 @@ class as_object;
 class asName
 {
 public:
-	/// If true, the name needs a run-time string value to complete it.
-	bool isRuntime() { return (mFlags & FLAG_RTNAME) != 0; }
-
-	/// If true, the name needs a run-time namespace to complete it.
-	bool isRtns() { return (mFlags & FLAG_RTNS) != 0; }
-
-	bool isQName() { return (mFlags & FLAG_QNAME) != 0; }
-	void setQName() { mFlags |= FLAG_QNAME; }
-
-	void setNamespace(asNamespace *ns) { mNamespace = ns; }
-	asNamespace* getNamespace() const { return mNamespace; }
-
-	string_table::key getABCName() const { return mABCName; }
-	void setABCName(string_table::key n) { mABCName = n;}
-
-	string_table::key getGlobalName() const { return mGlobalName;}
-	void setGlobalName(string_table::key n) {mGlobalName = n;}
 	
-	void setAttr() { mFlags |= FLAG_ATTR; }
-
-	void fill(as_object*) {/*TODO*/}
-
-	Property* findProperty();
-
-	typedef enum
+	enum Kind
 	{
 		KIND_Qname = 0x07,
 		KIND_QnameA = 0x0D,
@@ -62,27 +39,77 @@ public:
 		KIND_MultinameA = 0x0E,
 		KIND_MultinameL = 0x1B,
 		KIND_MultinameLA = 0x1C
-	} kinds;
-	typedef enum
+	};
+
+	asName()
+        :
+        _flags(0),
+        _namespaceSet(0),
+        _abcName(0),
+        _globalName(0),
+		_namespace(0)
+	{}
+
+    void setFlags(Kind kind) {
+        _flags = kind;
+    }
+
+    boost::uint8_t flags() const {
+        return _flags;
+    }
+
+    /// If true, the name needs a run-time string value to complete it.
+	bool isRuntime() { return _flags & FLAG_RTNAME; }
+
+	/// If true, the name needs a run-time namespace to complete it.
+	bool isRtns() { return _flags & FLAG_RTNS; }
+
+	bool isQName() { return _flags & FLAG_QNAME; }
+	void setQName() { _flags |= FLAG_QNAME; }
+
+	void setNamespace(asNamespace *ns) { _namespace = ns; }
+	asNamespace* getNamespace() const { return _namespace; }
+
+	string_table::key getABCName() const { return _abcName; }
+	void setABCName(string_table::key n) { _abcName = n;}
+
+	string_table::key getGlobalName() const { return _globalName;}
+	void setGlobalName(string_table::key n) { _globalName = n;}
+	
+	void setAttr() { _flags |= FLAG_ATTR; }
+
+	void fill(as_object*) {}
+
+	Property* findProperty();
+    
+    void namespaceSet(std::vector<asNamespace*>* v) {
+        _namespaceSet = v;
+    }
+
+    const std::vector<asNamespace*>* namespaceSet() const {
+        return _namespaceSet;
+    }
+
+private:
+
+	enum Flag
 	{
 		FLAG_ATTR = 0x01,
 		FLAG_QNAME = 0x02,
 		FLAG_RTNS = 0x04,
 		FLAG_RTNAME = 0x08,
 		FLAG_NSSET = 0x10
-	} flags;
+	};
 
-	boost::uint8_t mFlags;
-	std::vector<asNamespace*> *mNamespaceSet;
+    boost::uint8_t _flags;
 
-	asName() : mFlags(0), mNamespaceSet(NULL), mABCName(0), mGlobalName(0),
-		mNamespace(NULL)
-	{/**/}
-private:
-	string_table::key mABCName;
-	string_table::key mGlobalName;
-	asNamespace* mNamespace;
+    std::vector<asNamespace*>* _namespaceSet;
+
+	string_table::key _abcName;
+	string_table::key _globalName;
+	asNamespace* _namespace;
+
 };
 
-} // end of namespace gnash
-#endif /* GNASH_AS_NAME_H */
+} // namespace gnash
+#endif 

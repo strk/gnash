@@ -6,7 +6,7 @@
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
-// This program is distributed in the hope that it will be useful,
+// This program is distributed in the hope that it will be useful, 
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
@@ -29,79 +29,77 @@
 #include "CodeStream.h"
 #include "action_buffer.h"
 
-//#define ERR(x) IF_VERBOSE_MALFORMED_SWF(log_swferror x;);
-#define ERR(x) printf x; fflush(stdout);
-
 namespace gnash {
-
 
 namespace abc_parsing {
 
 bool
 abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 {
-	LOG_DEBUG_ABC("In finalize class name=%s trait kind=0x%X",pBlock->mStringPool[pClass->getName()],mKind | 0x0);
-	switch (mKind)
+	log_abc("In finalize class name=%s trait kind=0x%X", 
+            pBlock->_stringPool[pClass->getName()], _kind | 0x0);
+	switch (_kind)
 	{
 	case KIND_SLOT:
 	case KIND_CONST:
 	{
 		// Validate the type.
 		asClass *pType;
-		if (mTypeIndex){
-			LOG_DEBUG_ABC("Trait type is %s",pBlock->mStringPool[pBlock->mMultinamePool[mTypeIndex].getABCName()]);
-			pType = pBlock->locateClass(pBlock->mMultinamePool[mTypeIndex]);
+		if (_typeIndex) {
+			log_abc("Trait type is %s", 
+                    pBlock->_stringPool[pBlock->_multinamePool[_typeIndex].getABCName()]);
+			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
 		}
-		else{
+		else {
 			pType = pBlock->mTheObject;
 		}
-		if (!pType)
-		{
-			ERR((_("ABC: Finalizing trait yielded bad type for slot.\n")));
+
+		if (!pType) {
+			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
 			return false;
 		}
 		// The name has been validated in read.
 		// TODO: Find a better way to initialize trait values.
-		if (!mHasValue){
-			mValue = as_value((as_object*)0); // NULL value, right ?
+		if (!_hasValue) {
+			_value = as_value((as_object*)0); // NULL value, right ?
 		}
-		LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
-		pClass->addValue(mGlobalName, mNamespace, mSlotId, pType, 
-			mValue, mKind == KIND_CONST, do_static);
+		log_abc("Adding property=%s with value=%s slot=%u", pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
+		pClass->addValue(_globalName, _namespace, _slotID, pType, 
+			_value, _kind == KIND_CONST, do_static);
 		break;
 	}
 	case KIND_METHOD:
 	{
-		pClass->addMethod(mGlobalName, mNamespace, mMethod, false);
+		pClass->addMethod(_globalName, _namespace, _method, false);
 		break;
 	}
 	case KIND_GETTER:
 	{
-		LOG_DEBUG_ABC("Finalize getter not implemented.");
+		log_abc("Finalize getter not implemented.");
 		break;
-		pClass->addGetter(mName, mNamespace, mMethod, do_static);
+		pClass->addGetter(_name, _namespace, _method, do_static);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		LOG_DEBUG_ABC("Finalize setter not implemented.");
+		log_abc("Finalize setter not implemented.");
 		break;
-		pClass->addSetter(mName, mNamespace, mMethod, do_static);
+		pClass->addSetter(_name, _namespace, _method, do_static);
 		break;
 	}
 	case KIND_CLASS:
 	{
-		LOG_DEBUG_ABC("Finalize class not implemented.");
+		log_abc("Finalize class not implemented.");
 		break;
-		pClass->addMemberClass(mName, mNamespace, mSlotId,
-			pBlock->mClasses[mClassInfoIndex], do_static);
+		pClass->addMemberClass(_name, _namespace, _slotID, 
+			pBlock->_classes[_classInfoIndex], do_static);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
-		LOG_DEBUG_ABC("Finalize function not implemented.");
+		log_abc("Finalize function not implemented.");
 		break;
-		pClass->addSlotFunction(mName, mNamespace, mSlotId, mMethod, do_static);
+		pClass->addSlotFunction(_name, _namespace, _slotID, _method, do_static);
 		break;
 	}
 	default:
@@ -115,67 +113,67 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 bool
 abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 {
-	LOG_DEBUG_ABC("Finalizing method");
-	switch (mKind)
+	log_abc("Finalizing method");
+	switch (_kind)
 	{
 	case KIND_SLOT:
 	case KIND_CONST:
 	{
 		// Validate the type.
 		asClass *pType;
-		if (mTypeIndex)
-			pType = pBlock->locateClass(pBlock->mMultinamePool[mTypeIndex]);
+		if (_typeIndex)
+			pType = pBlock->locateClass(pBlock->_multinamePool[_typeIndex]);
 		else
 			pType = pBlock->mTheObject;
 		if (!pType)
 		{
-			ERR((_("ABC: Finalizing trait yielded bad type for slot.\n")));
+			log_error(_("ABC: Finalizing trait yielded bad type for slot."));
 			return false;
 		}
 		// The name has been validated in read.
 		// TODO: Find a better way to initialize trait values.
-		if (!mHasValue){
-			mValue = as_value((as_object*)0); // NULL value, right ?
+		if (!_hasValue) {
+			_value = as_value((as_object*)0); // NULL value, right ?
 		}
-		LOG_DEBUG_ABC("Adding property=%s with value=%s slot=%u",pBlock->mStringPool[mName],mValue.toDebugString(),mSlotId);
-		pMethod->addValue(mGlobalName, mNamespace, mSlotId, pType, 
-			mValue, mKind == KIND_CONST);
+		log_abc("Adding property=%s with value=%s slot=%u", pBlock->_stringPool[_name], _value.toDebugString(), _slotID);
+		pMethod->addValue(_globalName, _namespace, _slotID, pType, 
+			_value, _kind == KIND_CONST);
 		break;
 	}
 	case KIND_METHOD:
 	{
-		LOG_DEBUG_ABC("Finalize method trait not implemented.  Returning");
+		log_abc("Finalize method trait not implemented.  Returning");
 		break;
-		pMethod->addMethod(mName, mNamespace, mMethod);
+		pMethod->addMethod(_name, _namespace, _method);
 		break;
 	}
 	case KIND_GETTER:
 	{
-		LOG_DEBUG_ABC("Finalize getter trait not implemented.  Returning");
+		log_abc("Finalize getter trait not implemented.  Returning");
 		break;
-		pMethod->addGetter(mName, mNamespace, mMethod);
+		pMethod->addGetter(_name, _namespace, _method);
 		break;
 	}
 	case KIND_SETTER:
 	{
-		LOG_DEBUG_ABC("Finalize setter trait not implemented.  Returning");
+		log_abc("Finalize setter trait not implemented.  Returning");
 		break;
-		pMethod->addSetter(mName, mNamespace, mMethod);
+		pMethod->addSetter(_name, _namespace, _method);
 		break;
 	}
 	case KIND_CLASS:
 	{
-		LOG_DEBUG_ABC("Finalize class trait not implemented.  Returning");
+		log_abc("Finalize class trait not implemented.  Returning");
 		break;
-		pMethod->addMemberClass(mName, mNamespace, mSlotId,
-			pBlock->mClasses[mClassInfoIndex]);
+		pMethod->addMemberClass(_name, _namespace, _slotID, 
+			pBlock->_classes[_classInfoIndex]);
 		break;
 	}
 	case KIND_FUNCTION:
 	{
-		LOG_DEBUG_ABC("Finalize function trait not implemented.  Returning");
+		log_abc("Finalize function trait not implemented.  Returning");
 		break;
-		pMethod->addSlotFunction(mName, mNamespace, mSlotId, mMethod);
+		pMethod->addSlotFunction(_name, _namespace, _slotID, _method);
 		break;
 	}
 	default:
@@ -191,42 +189,42 @@ bool
 abc_Trait::read(SWFStream* in, abc_block *pBlock)
 {
 	boost::uint32_t name = in->read_V32();
-	if (name >= pBlock->mMultinamePool.size())
+	if (name >= pBlock->_multinamePool.size())
 	{
-		ERR((_("ABC: Bad name for trait.\n")));
+		log_error(_("ABC: Bad name for trait."));
 		return false;
 	}
-	if (!pBlock->mMultinamePool[name].isQName())
+	if (!pBlock->_multinamePool[name].isQName())
 	{
-		ERR((_("ABC: Trait name must be fully qualified.\n")));
+		log_error(_("ABC: Trait name must be fully qualified."));
 		return false;
 	}
-	asName multiname = pBlock->mMultinamePool[name];
-	mName = pBlock->mMultinamePool[name].getABCName();
-	mGlobalName = pBlock->mMultinamePool[name].getGlobalName();
-	mNamespace = pBlock->mMultinamePool[name].getNamespace();
+	asName multiname = pBlock->_multinamePool[name];
+	_name = pBlock->_multinamePool[name].getABCName();
+	_globalName = pBlock->_multinamePool[name].getGlobalName();
+	_namespace = pBlock->_multinamePool[name].getNamespace();
 
 	boost::uint8_t kind = in->read_u8();
-	mKind = static_cast<kinds> (kind & 0x0F);
+	_kind = static_cast<Kind>(kind & 0x0F);
 
-	LOG_DEBUG_ABC("Trai name=%s Trait kind is 0x%X", pBlock->mStringPool[multiname.getABCName()],kind | 0x0);
-	switch (mKind)
+	log_abc("Trai name=%s Trait kind is 0x%X", pBlock->_stringPool[multiname.getABCName()], kind | 0x0);
+	switch (_kind)
 	{
 	case KIND_SLOT:
 	case KIND_CONST:
 	{
-		mSlotId = in->read_V32();
-		mTypeIndex = in->read_V32();
+		_slotID = in->read_V32();
+		_typeIndex = in->read_V32();
 		boost::uint32_t vindex = in->read_V32();
-		LOG_DEBUG_ABC("Slot ID=%u Type=%s Pool index=%u",mSlotId,pBlock->mStringPool[pBlock->mMultinamePool[mTypeIndex].getABCName()],vindex);
+		log_abc("Slot ID=%u Type=%s Pool index=%u", _slotID, pBlock->_stringPool[pBlock->_multinamePool[_typeIndex].getABCName()], vindex);
 		if (vindex)
 		{
-			if (!pBlock->pool_value(vindex, in->read_u8(), mValue))
+			if (!pBlock->pool_value(vindex, in->read_u8(), _value))
 				return false; // Message done by pool_value
-			mHasValue = true;
+			_hasValue = true;
 		}
 		else
-			mHasValue = false;
+			_hasValue = false;
 		break;
 	}
 	case KIND_METHOD:
@@ -236,43 +234,46 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 		// Ignore the 'disp_id'
 		in->skip_V32();
 
-		boost::uint32_t moffset = in->read_V32();
-		LOG_DEBUG_ABC("Method index=%u",moffset);
-		if (moffset >= pBlock->mMethods.size())
+		boost::uint32_t offset = in->read_V32();
+		log_abc("Method index=%u", offset);
+		if (offset >= pBlock->_methods.size())
 		{
-			ERR((_("Bad method id in trait.\n")));
+			log_error(_("Bad method id in trait."));
 			return false;
 		}
-		mMethod = pBlock->mMethods[moffset];
+		_method = pBlock->_methods[offset];
 		break;
 	}
 	case KIND_CLASS:
 	{
-		mSlotId = in->read_V32();
-		mClassInfoIndex = in->read_V32();
-		LOG_DEBUG_ABC("Slot id: %u Class index: %u Class Name: %s",mSlotId,mClassInfoIndex,pBlock->mStringPool[pBlock->mClasses[mClassInfoIndex]->getName()]);
-		if (mClassInfoIndex >= pBlock->mClasses.size())
-		{
-			ERR((_("Bad Class id in trait.\n")));
+		_slotID = in->read_V32();
+		_classInfoIndex = in->read_V32();
+		log_abc("Slot id: %u Class index: %u Class Name: %s", _slotID, 
+                _classInfoIndex, 
+                pBlock->_stringPool[pBlock->
+                        _classes[_classInfoIndex]->getName()]);
+
+        if (_classInfoIndex >= pBlock->_classes.size()) {
+			log_error(_("Bad Class id in trait."));
 			return false;
 		}
 		break;
 	}
 	case KIND_FUNCTION:
 	{
-		mSlotId = in->read_V32();
-		boost::uint32_t moffset = in->read_V32();
-		if (moffset >= pBlock->mMethods.size())
+		_slotID = in->read_V32();
+		boost::uint32_t offset = in->read_V32();
+		if (offset >= pBlock->_methods.size())
 		{
-			ERR((_("Bad method id in trait.\n")));
+			log_error(_("Bad method id in trait."));
 			return false;
 		}
-		mMethod = pBlock->mMethods[moffset];
+		_method = pBlock->_methods[offset];
 		break;
 	}
 	default:
 	{
-		ERR((_("ABC: Unknown type of trait.\n")));
+		log_error(_("ABC: Unknown type of trait."));
 //		return false;
 	}
 	} // end of switch statement
@@ -289,54 +290,90 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 	return true;
 }
 
-} // namespace abc_parsing
+} // abc_parsing
 
 using namespace abc_parsing;
 
-void
-abc_block::check_multiname_name(boost::uint32_t name){
+abc_block::abc_block()
+    :
+    _stringTable(&VM::get().getStringTable())
+{
+	mCH = VM::get().getClassHierarchy();
+	// TODO: Make this the real 'Object' prototype.
+	mCH->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
+	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
+}
 
-	if (name >= mStringPool.size()){
-		throw ParserException("ABC: Out of bounds string for Multiname.\n");
+void
+abc_block::prepare(Machine* mach)
+{
+    std::for_each(_classes.begin(), _classes.end(),
+            std::mem_fun(&asClass::initPrototype));
+
+    std::for_each(_scripts.begin(), _scripts.end(),
+            std::mem_fun(&asClass::initPrototype));
+ 
+    std::for_each(_methods.begin(), _methods.end(),
+            boost::bind(&asMethod::initPrototype, _1, mach));
+
+    std::for_each(_traits.begin(), _traits.end(),
+            boost::bind(&abc_Trait::finalize, _1, this));
+
+    _traits.clear();
+
+}
+
+void
+abc_block::check_multiname_name(boost::uint32_t name)
+{
+
+	if (name >= _stringPool.size()) {
+		throw ParserException("ABC: Out of bounds string for Multiname.");
 	}
 }
 
 void
-abc_block::check_multiname_namespace(boost::uint32_t ns){
-	if (ns >= mNamespacePool.size()){
-		throw ParserException("ABC: Out of bounds namespace for Multiname.\n");
+abc_block::check_multiname_namespace(boost::uint32_t ns)
+{
+	if (ns >= _namespacePool.size()) {
+		throw ParserException("ABC: Out of bounds namespace for Multiname.");
 	}
 }
 
 void
-abc_block::check_multiname_namespaceset(boost::uint32_t nsset){
-	if (!nsset){
-		throw ParserException("ABC: 0 selection for namespace set is invalid.\n");
+abc_block::check_multiname_namespaceset(boost::uint32_t nsset)
+{
+	if (!nsset)
+    {
+		throw ParserException("ABC: 0 selection for namespace set is invalid.");
 	}
-	if (nsset >= mNamespaceSetPool.size()){
-		throw ParserException("ABC: Out of bounds namespace set for Multiname.\n");
+	if (nsset >= _namespaceSetPool.size())
+    {
+		throw ParserException("ABC: Out of bounds namespace set for Multiname.");
 	}
 }
 
 void
-abc_block::setMultinameNames(asName *n,string_table::key ABCName){
+abc_block::setMultinameNames(asName *n, string_table::key ABCName)
+{
 	
 	n->setABCName(ABCName);
-	std::string name = mStringPool[ABCName];
-	string_table::key global_key = mStringTable->find(name,true);
-	LOG_DEBUG_ABC("Global key %u",global_key);
+	std::string name = _stringPool[ABCName];
+	string_table::key global_key = _stringTable->find(name, true);
+	log_abc("Global key %u", global_key);
 	n->setGlobalName(global_key);
-	LOG_DEBUG_ABC("Multiname: %s ABCName set to %u global name set to %u",name,n->getABCName(),n->getGlobalName());
+	log_abc("Multiname: %s ABCName set to %u global name set to %u", name, n->getABCName(), n->getGlobalName());
 }
 
 void
-abc_block::setNamespaceURI(asNamespace *ns,string_table::key ABCName){
+abc_block::setNamespaceURI(asNamespace *ns, string_table::key ABCName)
+{
 	
 	ns->setAbcURI(ABCName);
-	std::string name = mStringPool[ABCName];
-	string_table::key global_key = mStringTable->find(name,false);
+	std::string name = _stringPool[ABCName];
+	string_table::key global_key = _stringTable->find(name, false);
 	ns->setURI(global_key);
-	LOG_DEBUG_ABC("Namespace: %s AbcURI=%u URI=%u.",name,ABCName,global_key);
+	log_abc("Namespace: %s AbcURI=%u URI=%u.", name, ABCName, global_key);
 }
 
 asClass *
@@ -350,10 +387,10 @@ abc_block::locateClass(asName &m)
 		if (found)
 			return found;
 	}
-	if (m.mNamespaceSet && !m.mNamespaceSet->empty())
+	if (m.namespaceSet() && !m.namespaceSet()->empty())
 	{
-		std::vector<asNamespace*>::iterator i;
-		for (i = m.mNamespaceSet->begin(); i != m.mNamespaceSet->end(); ++i)
+		std::vector<asNamespace*>::const_iterator i;
+		for (i = m.namespaceSet()->begin(); i != m.namespaceSet()->end(); ++i)
 		{
 			found = (*i)->getClass(m.getABCName());
 			if (found)
@@ -388,8 +425,8 @@ abc_block::read_version()
 {
 	// Minor version, major version.
 	mVersion = (mS->read_u16()) | (mS->read_u16() << 16);
-	ERR((_("Abc Version: %d.%d\n"), (mVersion & 0xFFFF0000) >> 16,
-		(mVersion & 0x0000FFFF)));
+	log_error(_("Abc Version: %d.%d"), (mVersion & 0xFFFF0000) >> 16, 
+		(mVersion & 0x0000FFFF));
 	return true;
 }
 
@@ -399,12 +436,12 @@ abc_block::read_integer_constants()
 {
 	// count overestimates by 1.
 	boost::uint32_t count = mS->read_V32();
-	mIntegerPool.resize(count);
+	_integerPool.resize(count);
 	if (count)
-		mIntegerPool[0] = 0;
+		_integerPool[0] = 0;
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		mIntegerPool[i] = static_cast<boost::int32_t> (mS->read_V32());
+		_integerPool[i] = static_cast<boost::int32_t> (mS->read_V32());
 	}
 	return true;
 }
@@ -415,12 +452,12 @@ abc_block::read_unsigned_integer_constants()
 {
 	// count overestimates by 1.
 	boost::uint32_t count = mS->read_V32();
-	mUIntegerPool.resize(count);
+	_uIntegerPool.resize(count);
 	if (count)
-		mUIntegerPool[0] = 0;
+		_uIntegerPool[0] = 0;
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		mUIntegerPool[i] = mS->read_V32();
+		_uIntegerPool[i] = mS->read_V32();
 	}
 	return true;
 }
@@ -430,13 +467,13 @@ bool
 abc_block::read_double_constants()
 {
 	boost::uint32_t count = mS->read_V32();
-	mDoublePool.resize(count);
+	_doublePool.resize(count);
 	if (count)
-		mDoublePool[0] = 0.0;
+		_doublePool[0] = 0.0;
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		mDoublePool[i] = mS->read_d64();
-		LOG_DEBUG_ABC("Double %u=%lf",i,mDoublePool[i]);
+		_doublePool[i] = mS->read_d64();
+		log_abc("Double %u=%lf", i, _doublePool[i]);
 	}
 	return true;
 }
@@ -445,69 +482,69 @@ abc_block::read_double_constants()
 bool
 abc_block::read_string_constants()
 {
-	LOG_DEBUG_ABC("Begin reading string constants.");
+	log_abc("Begin reading string constants.");
 	boost::uint32_t count = mS->read_V32();
-	LOG_DEBUG_ABC("There are %u string constants.",count);
-	mStringPool.resize(count);
-	mStringPoolTableIds.resize(count);
+	log_abc("There are %u string constants.", count);
+	_stringPool.resize(count);
+	_stringPoolTableIDs.resize(count);
 	if (count)
 	{
-		mStringPool[0] = "";
-		mStringPoolTableIds[0] = 0;
+		_stringPool[0] = "";
+		_stringPoolTableIDs[0] = 0;
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
 		boost::uint32_t length = mS->read_V32();
-		mS->read_string_with_length(length, mStringPool[i]);
-		LOG_DEBUG_ABC("Adding string constant to string pool: index=%u %s",i,mStringPool[i]);
-		mStringPoolTableIds[i] = 0;
+		mS->read_string_with_length(length, _stringPool[i]);
+		log_abc("Adding string constant to string pool: index=%u %s", i, _stringPool[i]);
+		_stringPoolTableIDs[i] = 0;
 	}
 	return true;
 }
 
 /// Read the pool of namespaces
-/// Any two namespaces with the same uri here are the same namespace,
+/// Any two namespaces with the same uri here are the same namespace, 
 /// excepting private namespaces.
 bool
 abc_block::read_namespaces()
 {	
-	LOG_DEBUG_ABC("Begin reading namespaces.");
+	log_abc("Begin reading namespaces.");
 	boost::uint32_t count = mS->read_V32();
-	LOG_DEBUG_ABC("There are %u namespaces.",count);
-	mNamespacePool.resize(count);
+	log_abc("There are %u namespaces.", count);
+	_namespacePool.resize(count);
 	if (count)
 	{
-		mNamespacePool[0] = mCH->getGlobalNs();
+		_namespacePool[0] = mCH->getGlobalNs();
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
 		boost::uint8_t kind = mS->read_u8();
 		boost::uint32_t nameIndex = mS->read_V32();
-		LOG_DEBUG_ABC("Namespace %u kind=0x%X index=%u name=%s",i,kind | 0x0,nameIndex,mStringPool[nameIndex]);
+		log_abc("Namespace %u kind=0x%X index=%u name=%s", i, kind | 0x0, nameIndex, _stringPool[nameIndex]);
 
-		if (nameIndex >= mStringPool.size())
+		if (nameIndex >= _stringPool.size())
 		{
-			ERR((_("ABC: Out of bounds string given for namespace.\n")));
+			log_error(_("ABC: Out of bounds string given for namespace."));
 			return false;
 		}
 		
 		if (kind == PRIVATE_NS)
 		{
-			mNamespacePool[i] = mCH->anonNamespace(nameIndex);
-			mNamespacePool[i]->setPrivate();
+			_namespacePool[i] = mCH->anonNamespace(nameIndex);
+			_namespacePool[i]->setPrivate();
 		}
 		else
 		{
 			asNamespace *n = mCH->findNamespace(nameIndex);
 			if (n == NULL)
 				n = mCH->addNamespace(nameIndex);
-			mNamespacePool[i] = n;
+			_namespacePool[i] = n;
 		}
 		if (kind == PROTECTED_NS)
 		{
-			mNamespacePool[i]->setProtected();
+			_namespacePool[i]->setProtected();
 		}
-		setNamespaceURI(mNamespacePool[i],nameIndex);
+		setNamespaceURI(_namespacePool[i], nameIndex);
 	}
 	return true;
 }
@@ -517,24 +554,24 @@ bool
 abc_block::read_namespace_sets()
 {
 	boost::uint32_t count = mS->read_V32();
-	mNamespaceSetPool.resize(count);
+	_namespaceSetPool.resize(count);
 	if (count)
 	{
-		mNamespaceSetPool[0].resize(0);
+		_namespaceSetPool[0].resize(0);
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
 		boost::uint32_t icount = mS->read_V32();
-		mNamespaceSetPool[i].resize(icount);
+		_namespaceSetPool[i].resize(icount);
 		for (unsigned int j = 0; j < icount; ++j)
 		{
 			boost::uint32_t selection = mS->read_V32();
-			if (!selection || selection >= mNamespacePool.size())
+			if (!selection || selection >= _namespacePool.size())
 			{
-				ERR((_("ABC: Out of bounds namespace for namespace set.\n")));
+				log_error(_("ABC: Out of bounds namespace for namespace set."));
 				return false;
 			}
-			mNamespaceSetPool[i][j] = mNamespacePool[selection];
+			_namespaceSetPool[i][j] = _namespacePool[selection];
 		}
 	}
 	return true;
@@ -545,22 +582,22 @@ bool
 abc_block::read_multinames()
 {
 	boost::uint32_t count = mS->read_V32();
-	LOG_DEBUG_ABC("There are %u multinames.",count);
-	mMultinamePool.resize(count);
+	log_abc("There are %u multinames.", count);
+	_multinamePool.resize(count);
 	if (count)
 	{
-//		mMultinamePool[0].setABCName(0);
-		setMultinameNames(&mMultinamePool[0],0);
-		mMultinamePool[0].setNamespace(mCH->getGlobalNs());
+//		_multinamePool[0].setABCName(0);
+		setMultinameNames(&_multinamePool[0], 0);
+		_multinamePool[0].setNamespace(mCH->getGlobalNs());
 	}
 	for (unsigned int i = 1; i < count; ++i)
 	{
-		boost::uint8_t kind = mS->read_u8();
+        asName::Kind kind = static_cast<asName::Kind>(mS->read_u8());
 		boost::uint32_t ns = 0;
 		boost::uint32_t name = 0;
 		boost::uint32_t nsset = 0;
 
-		LOG_DEBUG_ABC("Multiname %u has kind=0x%X",i,kind | 0x0);
+		log_abc("Multiname %u has kind=0x%X", i, kind | 0x0);
 
 		// Read, but don't upper validate until after the switch.
 		switch (kind)
@@ -572,7 +609,7 @@ abc_block::read_multinames()
 	    check_multiname_namespace(ns);
             name = mS->read_V32();
 		check_multiname_name(name);
-		LOG_DEBUG_ABC("\tnamespace_index=%u name_index=%u name=%s",ns,name,mStringPool[name]);
+		log_abc("\tnamespace_index=%u name_index=%u name=%s", ns, name, _stringPool[name]);
             break;
         }
         case asName::KIND_RTQname:
@@ -607,18 +644,22 @@ abc_block::read_multinames()
         default:
         {
             // Unknown type.
-            ERR((_("Action Block: Unknown multiname type (%d).\n"), kind));
+            log_error(_("Action Block: Unknown multiname type (%d)."), kind);
             return false;
         } // End of cases.
         } // End of switch.
 
-		mMultinamePool[i].mFlags = kind;
-		setMultinameNames(&mMultinamePool[i],name);
-		LOG_DEBUG_ABC("Done setting multinames: abc=%u global=%u",mMultinamePool[i].getABCName(),mMultinamePool[i].getGlobalName());
-		mMultinamePool[i].setNamespace(mNamespacePool[ns]);
+		_multinamePool[i].setFlags(kind);
+		setMultinameNames(&_multinamePool[i], name);
+		log_abc("Done setting multinames: abc=%u global=%u",
+               _multinamePool[i].getABCName(),
+               _multinamePool[i].getGlobalName());
 
-		if (nsset)
-			mMultinamePool[i].mNamespaceSet = &mNamespaceSetPool[nsset];
+        _multinamePool[i].setNamespace(_namespacePool[ns]);
+
+		if (nsset) {
+			_multinamePool[i].namespaceSet(&_namespaceSetPool[nsset]);
+        }
 	} // End of main loop.
 	return true;
 }
@@ -629,54 +670,54 @@ abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
 	if (!index)
 		return true;
 
-	LOG_DEBUG_ABC("Pool value: index is %u type is 0x%X",index,type | 0x0);
+	log_abc("Pool value: index is %u type is 0x%X", index, type | 0x0);
 	switch (type)
 	{
 	case POOL_STRING: 
 	{
-		if (index >= mStringPool.size())
+		if (index >= _stringPool.size())
 		{
-			ERR((_("Action Block: Bad index in optional argument.\n")));
+			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_string(mStringPool[index]);
+		v.set_string(_stringPool[index]);
 		break;
 	}
 	case POOL_INTEGER: 
 	{
-		if (index >= mIntegerPool.size())
+		if (index >= _integerPool.size())
 	    {
-			ERR((_("Action Block: Bad index in optional argument.\n")));
+			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_int(mIntegerPool[index]);
+		v.set_int(_integerPool[index]);
 		break;
 	}
 	case POOL_UINTEGER:
 	{
-		if (index >= mUIntegerPool.size())
+		if (index >= _uIntegerPool.size())
 		{
-			ERR((_("Action Block: Bad index in optional argument.\n")));
+			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_int(mUIntegerPool[index]);
+		v.set_int(_uIntegerPool[index]);
 		break;
 	}
 	case POOL_DOUBLE: 
 	{
-		if (index >= mDoublePool.size())
+		if (index >= _doublePool.size())
 		{
-			ERR((_("Action Block: Bad index in optional argument.\n")));
+			log_error(_("Action Block: Bad index in optional argument."));
 			return false;
 		}
-		v.set_double(static_cast<double>(mDoublePool[index]));
+		v.set_double(static_cast<double>(_doublePool[index]));
 		break;
 	}
 	case POOL_NAMESPACE: // Namespace
 	{
-		if (index >= mNamespacePool.size())
+		if (index >= _namespacePool.size())
 		{
-			ERR((_("ABC: Bad index in optional argument, namespaces.\n")));
+			log_error(_("ABC: Bad index in optional argument, namespaces."));
 			return false;
 		}
 		break;
@@ -698,7 +739,7 @@ abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
 	}
 	default: // All others are bogus.
 	{
-		ERR((_("ABC: Bad default value type (%X), but continuing.\n"), type));
+		log_error(_("ABC: Bad default value type (%X), but continuing."), type);
 		return true;
 		break;
 	}
@@ -710,35 +751,35 @@ abc_block::pool_value(boost::uint32_t index, boost::uint8_t type, as_value &v)
 bool
 abc_block::read_method_infos()
 {
-	LOG_DEBUG_ABC("Begin read_method_infos.\n");
+	log_abc("Begin read_method_infos.");
 
 	boost::uint32_t count = mS->read_V32();
-    LOG_DEBUG_ABC("Method count: %u", count);
+    log_abc("Method count: %u", count);
 
-	mMethods.resize(count);
+	_methods.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		LOG_DEBUG_ABC(" Reading method %u",i);
+		log_abc(" Reading method %u", i);
 		asMethod *pMethod = mCH->newMethod();
-		pMethod->mMethodID = i;
-//		LOG_DEBUG_ABC("Min arg count: %d max: %d",pMethod->minArgumentCount(),pMethod->maxArgumentCount());
-		mMethods[i] = pMethod;
+		pMethod->setMethodID(i);
+//		log_abc("Min arg count: %d max: %d", pMethod->minArgumentCount(), pMethod->maxArgumentCount());
+		_methods[i] = pMethod;
 		boost::uint32_t param_count = mS->read_V32();
 		boost::uint32_t return_type = mS->read_V32();
 
-		LOG_DEBUG_ABC("  Param count: %u return type(index): %s(%u)",param_count,mStringPool[mMultinamePool[return_type].getABCName()],return_type);
+		log_abc("  Param count: %u return type(index): %s(%u)", param_count, _stringPool[_multinamePool[return_type].getABCName()], return_type);
 		pMethod->setMinArgumentCount(param_count);
 		pMethod->setMaxArgumentCount(param_count);
 
-		if (return_type >= mMultinamePool.size())
+		if (return_type >= _multinamePool.size())
 		{
-			ERR((_("ABC: Out of bounds return type for method info.\n")));
+			log_error(_("ABC: Out of bounds return type for method info."));
 			return false;
 		}
-		asClass *rtClass = locateClass(mMultinamePool[return_type]);
+		asClass *rtClass = locateClass(_multinamePool[return_type]);
 		if (!rtClass)
 		{
-			ERR((_("ABC: Unknown return type.\n")));
+			log_error(_("ABC: Unknown return type."));
 			return false;
 		}
 
@@ -746,55 +787,55 @@ abc_block::read_method_infos()
 
 		for (unsigned int j = 0; j < param_count; ++j)
 		{
-			LOG_DEBUG_ABC("  Reading parameter %u",j);
+			log_abc("  Reading parameter %u", j);
 			// The parameter type.
 			boost::uint32_t ptype = mS->read_V32();
-			LOG_DEBUG_ABC("   Parameter type(index): %s(%u)",mStringPool[mMultinamePool[ptype].getABCName()],ptype);
-			if (ptype >= mMultinamePool.size())
+			log_abc("   Parameter type(index): %s(%u)", _stringPool[_multinamePool[ptype].getABCName()], ptype);
+			if (ptype >= _multinamePool.size())
 			{
-				ERR((_("ABC: Out of bounds parameter type in method.\n")));
+				log_error(_("ABC: Out of bounds parameter type in method."));
 				return false;
 			}
-			asClass *param_type = locateClass(mMultinamePool[ptype]);
-//			LOG_DEBUG_ABC("Done creating asClass object.\n");
+			asClass *param_type = locateClass(_multinamePool[ptype]);
+//			log_abc("Done creating asClass object.");
 			if (!param_type)
 			{
-				ERR((_("ABC: Unknown parameter type.\n")));
+				log_error((_("ABC: Unknown parameter type.")));
 				return false;
 			}
-//			LOG_DEBUG_ABC("Trying to add argument to method.\n");
+//			log_abc("Trying to add argument to method.");
 			pMethod->pushArgument(param_type);
-//			LOG_DEBUG_ABC("Done adding argument to method object.");
+//			log_abc("Done adding argument to method object.");
 		}
-//		LOG_DEBUG_ABC("End loop j.\n");
+//		log_abc("End loop j.");
 		// A skippable name index.
 //		mS->skip_V32();
 		boost::uint32_t method_name = mS->read_V32();
-		LOG_DEBUG_ABC(  "Method name=%s %d",mStringPool[method_name],method_name);
+		log_abc(  "Method name=%s %d", _stringPool[method_name], method_name);
 		boost::uint8_t flags = mS->read_u8();
-		LOG_DEBUG_ABC("  Flags: %X",flags | 0x0);
-//		LOG_DEBUG_ABC("Check if flags and optional args.");
+		log_abc("  Flags: %X", flags | 0x0);
+//		log_abc("Check if flags and optional args.");
 		// If there are default parameters, read them now.
 		// Runtime will do validation of whether or not these can actually
 		// be assigned to the corresponding parameters.
 		if (flags & METHOD_OPTIONAL_ARGS)
 		{
-//			LOG_DEBUG_ABC("We have flags and optional args.");
+//			log_abc("We have flags and optional args.");
 			boost::uint32_t ocount = mS->read_V32();
-			LOG_DEBUG_ABC("  Optional args: %u",ocount);
+			log_abc("  Optional args: %u", ocount);
 			pMethod->setMinArgumentCount(pMethod->maxArgumentCount() - ocount);
 			for (unsigned int j = 0; j < ocount; ++j)
 			{
-				LOG_DEBUG_ABC("  Reading optional arg: %u",j);
+				log_abc("  Reading optional arg: %u", j);
 				boost::uint32_t index = mS->read_V32();
 				boost::uint8_t kindof = mS->read_u8();
-				LOG_DEBUG_ABC("   Index: %u Kindof: %u",index,kindof);
+				log_abc("   Index: %u Kindof: %u", index, kindof);
 				as_value v;
 				if (!pool_value(index, kindof, v))
 					return false; // message done by pool_value
 				pMethod->pushOptional(v);
 			}
-			LOG_DEBUG_ABC("Done handling optional args.");
+			log_abc("Done handling optional args.");
 		}
 
 		// If there are names present for the parameters, skip them.
@@ -833,47 +874,47 @@ bool
 abc_block::read_instances()
 {
 	boost::uint32_t count = mS->read_V32();
-	LOG_DEBUG_ABC("There are %u instances.",count);
-	mClasses.resize(count);
+	log_abc("There are %u instances.", count);
+	_classes.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		asClass *pClass;
 		//Read multiname index.
 		boost::uint32_t index = mS->read_V32();
 		// 0 is allowed as a name, typically for the last entry.
-		if (index >= mMultinamePool.size())
+		if (index >= _multinamePool.size())
 		{
-			ERR((_("ABC: Out of bounds instance name.\n")));
+			log_error(_("ABC: Out of bounds instance name."));
 			return false;
 		}
 		// This must be a QName.
-		if (!mMultinamePool[index].isQName())
+		if (!_multinamePool[index].isQName())
 		{
-			ERR((_("ABC: QName required for instance.\n")));
+			log_error(_("ABC: QName required for instance."));
 			return false;
 		}
-		if (mMultinamePool[index].getNamespace() == NULL)
+		if (_multinamePool[index].getNamespace() == NULL)
 		{
-			ERR((_("ABC: No namespace to use for storing class.\n")));
+			log_error(_("ABC: No namespace to use for storing class."));
 			return false;
 		}
-		pClass = locateClass(mMultinamePool[index]);
+		pClass = locateClass(_multinamePool[index]);
 		if (!pClass)
 		{
 			pClass = mCH->newClass();
-			if (!mMultinamePool[index].getNamespace()->addClass(
-				mMultinamePool[index].getABCName(), pClass))
+			if (!_multinamePool[index].getNamespace()->addClass(
+				_multinamePool[index].getABCName(), pClass))
 			{
-				ERR((_("Duplicate class registration.\n")));
+				log_error(_("Duplicate class registration."));
 				return false;
 			}
 		}
 		pClass->setDeclared();
-		mClasses[i] = pClass;
+		_classes[i] = pClass;
 		boost::uint32_t super_index = mS->read_V32();;
-		if (super_index && super_index >= mMultinamePool.size())
+		if (super_index && super_index >= _multinamePool.size())
 		{
-			ERR((_("ABC: Out of bounds super type.\n")));
+			log_error(_("ABC: Out of bounds super type."));
 			return false;
 		}
 		if (!super_index)
@@ -882,33 +923,33 @@ abc_block::read_instances()
 		}
 		else
 		{
-			asClass *pSuper = locateClass(mMultinamePool[super_index]);
+			asClass *pSuper = locateClass(_multinamePool[super_index]);
 			if (!pSuper)
 			{
-				ERR((_("ABC: Super type not found (%s), faking.\n"),
-					mStringTable->value(mMultinamePool[super_index].getABCName()).c_str()));
+				log_error(_("ABC: Super type not found (%s), faking."), 
+					_stringTable->value(_multinamePool[super_index].getABCName()));
 				// While testing, we will add a fake type, rather than abort.
 				pSuper = mCH->newClass();
-				pSuper->setName(mMultinamePool[super_index].getABCName());
-				mCH->getGlobalNs()->addClass(mMultinamePool[super_index].getABCName(), pSuper);
+				pSuper->setName(_multinamePool[super_index].getABCName());
+				mCH->getGlobalNs()->addClass(_multinamePool[super_index].getABCName(), pSuper);
 				// return false;
 			}
 
 			if (pSuper->isFinal())
 			{
-				ERR((_("ABC: Can't extend a class which is final.\n")));
+				log_error(_("ABC: Can't extend a class which is final."));
 				return false;
 			}
 
 			if (pSuper->isInterface())
 			{
-				ERR((_("ABC: Can't extend an interface type.\n")));
+				log_error(_("ABC: Can't extend an interface type."));
 				return false;
 			}
 
 			if (pSuper == pClass)
 			{
-				ERR((_("ABC: Class cannot be its own supertype.\n")));
+				log_error(_("ABC: Class cannot be its own supertype."));
 				return false;
 			}
 			pClass->setSuper(pSuper);
@@ -916,7 +957,7 @@ abc_block::read_instances()
 		}
 
 		boost::uint8_t flags = mS->read_u8();
-		LOG_DEBUG_ABC("Instance %u multiname index=%u name=%s super index=%u flags=%X",i,index,mStringPool[mMultinamePool[index].getABCName()],super_index,flags | 0x0);
+		log_abc("Instance %u multiname index=%u name=%s super index=%u flags=%X", i, index, _stringPool[_multinamePool[index].getABCName()], super_index, flags | 0x0);
 
 		if (flags & INSTANCE_SEALED)
 			pClass->setSealed();
@@ -930,36 +971,36 @@ abc_block::read_instances()
 		if (flags & INSTANCE_PROTECTED_NS) // Protected Namespace
 		{
 			boost::uint32_t ns_index = mS->read_V32();
-			if (ns_index >= mNamespacePool.size())
+			if (ns_index >= _namespacePool.size())
 			{
-				ERR((_("ABC: Out of bounds namespace for protected.\n")));
+				log_error(_("ABC: Out of bounds namespace for protected."));
 				return false;
 			}
 			// Set the protected namespace's parent, if it exists.
 			if (pClass->getSuper()->hasProtectedNs())
-				mNamespacePool[ns_index]->setParent(pClass->getSuper()->getProtectedNs());
-			pClass->setProtectedNs(mNamespacePool[ns_index]);
+				_namespacePool[ns_index]->setParent(pClass->getSuper()->getProtectedNs());
+			pClass->setProtectedNs(_namespacePool[ns_index]);
 		}
 
 		// This is the list of interfaces which the instances has agreed to
 		// implement. They must be interfaces, and they must exist.
 		boost::uint32_t intcount = mS->read_V32();
-		LOG_DEBUG_ABC("This instance has %u interfaces.",intcount);
+		log_abc("This instance has %u interfaces.", intcount);
 		for (unsigned int j = 0; j < intcount; ++j)
 		{
 			boost::uint32_t i_index = mS->read_V32();
-			LOG_DEBUG_ABC("Interface %u has multiname index=%u",i,i_index);
+			log_abc("Interface %u has multiname index=%u", i, i_index);
 			// 0 is allowed as an interface, typically for the last one.
-			if (i_index >= mMultinamePool.size())
+			if (i_index >= _multinamePool.size())
 			{
-				ERR((_("ABC: Out of bounds name for interface.\n")));
+				log_error(_("ABC: Out of bounds name for interface."));
 				return false;
 			}
-			asClass *pInterface = locateClass(mMultinamePool[i_index]);
+			asClass *pInterface = locateClass(_multinamePool[i_index]);
 			// These may be undefined still, so don't check interface just yet.
 			if (0) //!pInterface || !pInterface->isInterface())
 			{
-				ERR((_("ABC: Can't implement a non-interface type.\n")));
+				log_error(_("ABC: Can't implement a non-interface type."));
 				return false;
 			}
 			pClass->pushInterface(pInterface);
@@ -967,24 +1008,24 @@ abc_block::read_instances()
 		// The next thing should be the constructor.
 		// TODO: What does this mean exactly? How does it differ from the one in
 		// the class info block?
-		boost::uint32_t moffset = mS->read_V32();
-		LOG_DEBUG_ABC("Moffset: %u",moffset);
-		if (moffset >= mMethods.size())
+		boost::uint32_t offset = mS->read_V32();
+		log_abc("Moffset: %u", offset);
+		if (offset >= _methods.size())
 		{
-			ERR((_("ABC: Out of bounds method for initializer.\n")));
+			log_error(_("ABC: Out of bounds method for initializer."));
 			return false;
 		}
 		// Don't validate for previous owner.
-		pClass->setConstructor(mMethods[moffset]);
+		pClass->setConstructor(_methods[offset]);
 
 		/*	Calling the asMethod::setOwner always results in a segmentation fault, 
 		since it tries to modify asMethod.mPrototype, which is never
 		initialized.  The parser seems to work ok without this call.*/
-//		mMethods[moffset]->setOwner(pClass);
+//		_methods[offset]->setOwner(pClass);
 
 		// Next come the 'traits' of the instance. (The members.)
 		boost::uint32_t tcount = mS->read_V32();
-		LOG_DEBUG_ABC("Trait count: %u",tcount);
+		log_abc("Trait count: %u", tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
@@ -1001,29 +1042,29 @@ bool
 abc_block::read_classes()
 {
 	// Count was found in read_instances().
-	LOG_DEBUG_ABC("Begin reading classes.");
-	boost::uint32_t count = mClasses.size();
-	LOG_DEBUG_ABC("There are %u classes.",count);
+	log_abc("Begin reading classes.");
+	boost::uint32_t count = _classes.size();
+	log_abc("There are %u classes.", count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		asClass *pClass = mClasses[i];
-		boost::uint32_t moffset = mS->read_V32();
-		LOG_DEBUG_ABC("Class %u static constructor index=%u",i,moffset);
-		if (moffset >= mMethods.size())
+		asClass *pClass = _classes[i];
+		boost::uint32_t offset = mS->read_V32();
+		log_abc("Class %u static constructor index=%u", i, offset);
+		if (offset >= _methods.size())
 		{
-			ERR((_("ABC: Out of bound static constructor for class.\n")));
+			log_error(_("ABC: Out of bound static constructor for class."));
 			return false;
 		}
 		// Don't validate for previous owner.
-		pClass->setStaticConstructor(mMethods[moffset]);
+		pClass->setStaticConstructor(_methods[offset]);
 
 		/*	Calling the asMethod::setOwner always results in a segmentation fault, 
 		since it tries to modify asMethod.mPrototype, which is never
 		initialized.  The parser seems to work ok without this call.*/
-//		mMethods[moffset]->setOwner(pClass);
+//		_methods[offset]->setOwner(pClass);
 		
 		boost::uint32_t tcount = mS->read_V32();
-		LOG_DEBUG_ABC("This class has %u traits.",tcount);
+		log_abc("This class has %u traits.", tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
@@ -1040,30 +1081,30 @@ abc_block::read_classes()
 bool
 abc_block::read_scripts()
 {
-	LOG_DEBUG_ABC("Begin reading scripts.");
+	log_abc("Begin reading scripts.");
 	boost::uint32_t count = mS->read_V32();
-	LOG_DEBUG_ABC("There are %u scripts.",count);
-	mScripts.resize(count);
+	log_abc("There are %u scripts.", count);
+	_scripts.resize(count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
 		asClass *pScript = mCH->newClass();
-		mScripts[i] = pScript;
+		_scripts[i] = pScript;
 
-		boost::uint32_t moffset = mS->read_V32();
-		LOG_DEBUG_ABC("Reading script %u initializer method index=%u",i,moffset);
-		if (moffset >= mMethods.size())
+		boost::uint32_t offset = mS->read_V32();
+		log_abc("Reading script %u initializer method index=%u", i, offset);
+		if (offset >= _methods.size())
 		{
-			ERR((_("ABC: Out of bounds method for script.\n")));
+			log_error(_("ABC: Out of bounds method for script."));
 			return false;
 		}
 
-		/*Calling the asMethod::setOwner always results in a segmentation fault,
-		since it tries to modify asMethod.mPrototype, which is never
-		initialized.  The parser seems to work ok without this call.*/
+		// Calling the asMethod::setOwner always results in a segmentation
+        // fault, since it tries to modify asMethod.mPrototype, which is never
+		// initialized.  The parser seems to work ok without this call.
 		// Don't validate for previous owner.
-//		mMethods[moffset]->setOwner(pScript);
+//		_methods[offset]->setOwner(pScript);
 
-		pScript->setConstructor(mMethods[moffset]);
+		pScript->setConstructor(_methods[offset]);
 		pScript->setSuper(mTheObject);
 
 		boost::uint32_t tcount = mS->read_V32();
@@ -1072,10 +1113,14 @@ abc_block::read_scripts()
 			
 			abc_Trait &aTrait = newTrait();
 			aTrait.set_target(pScript, false);
-			if (!(aTrait.read(mS, this)))
+			if (!(aTrait.read(mS, this))) {
 				return false;
-			LOG_DEBUG_ABC("Trait: %u name: %s(%u) kind: %u value: %s ",j,mStringPool[aTrait.mName],aTrait.mName,aTrait.mKind,aTrait.mValue.to_string());
-			pScript->mTraits.push_back(aTrait);
+            }
+			log_abc("Trait: %u name: %s(%u) kind: %u value: %s ", j, 
+                    _stringPool[aTrait._name], aTrait._name, aTrait._kind,
+                    aTrait._value.to_string());
+
+			pScript->_traits.push_back(aTrait);
 		}
 	} // end of scripts loop
 	return true;
@@ -1086,19 +1131,19 @@ bool
 abc_block::read_method_bodies()
 {
 	boost::uint32_t count = mS->read_V32();
-	LOG_DEBUG_ABC("There are %u method bodies.",count);
+	log_abc("There are %u method bodies.", count);
 	for (unsigned int i = 0; i < count; ++i)
 	{
-		boost::uint32_t moffset = mS->read_V32();
-		LOG_DEBUG_ABC("Method body %u method offset=%u",i,moffset);
-		if (moffset >= mMethods.size())
+		boost::uint32_t offset = mS->read_V32();
+		log_abc("Method body %u method offset=%u", i, offset);
+		if (offset >= _methods.size())
 		{
-			ERR((_("ABC: Out of bounds for method body.\n")));
+			log_error(_("ABC: Out of bounds for method body."));
 			return false;
 		}
-		if (mMethods[moffset]->getBody())
+		if (_methods[offset]->getBody())
 		{
-			ERR((_("ABC: Only one body per method.\n")));
+			log_error(_("ABC: Only one body per method."));
 			return false;
 		}
 		//TODO: Read values.
@@ -1106,20 +1151,20 @@ abc_block::read_method_bodies()
 		// Maximum stack size.
 		mS->skip_V32();
 		// Maximum register size.
-		mMethods[moffset]->setMaxRegisters(mS->read_V32());
+		_methods[offset]->setMaxRegisters(mS->read_V32());
 		// Scope depth.
 		mS->skip_V32();
 		// Max scope depth.
 		mS->skip_V32();
 		// Code length
 		boost::uint32_t clength = mS->read_V32();
-		mMethods[moffset]->setBodyLength(clength);
+		_methods[offset]->setBodyLength(clength);
 		// The code.
 		//TODO: Clean this up.
 		std::string body;
-		mS->read_string_with_length(clength,body);
+		mS->read_string_with_length(clength, body);
 
-		mMethods[moffset]->setBody(new CodeStream(body));
+		_methods[offset]->setBody(new CodeStream(body));
 		
 		boost::uint32_t ecount = mS->read_V32();
 		for (unsigned int j = 0; j < ecount; ++j)
@@ -1135,9 +1180,9 @@ abc_block::read_method_bodies()
 
 			// What types should be caught.
 			boost::uint32_t catch_type = mS->read_V32();
-			if (catch_type >= mMultinamePool.size())
+			if (catch_type >= _multinamePool.size())
 			{
-				ERR((_("ABC: Out of bound type for exception.\n")));
+				log_error(_("ABC: Out of bound type for exception."));
 //				return false;
 			}
 			if (!catch_type)
@@ -1146,11 +1191,11 @@ abc_block::read_method_bodies()
 			}
 			else
 			{
-				asClass *pType = locateClass(mMultinamePool[catch_type]);
+				asClass *pType = locateClass(_multinamePool[catch_type]);
 				if (!pType)
 				{
-					ERR((_("ABC: Unknown type of object to catch. (%s)\n"),
-						mStringTable->value(mMultinamePool[catch_type].getABCName()).c_str()));
+					log_error(_("ABC: Unknown type of object to catch. (%s)"), 
+						_stringTable->value(_multinamePool[catch_type].getABCName()));
 					// return false;
 					// Fake it, for now:
 					pExcept->catchAny();
@@ -1166,13 +1211,13 @@ abc_block::read_method_bodies()
 			if (mVersion != ((46 << 16) | 15))
 			{
 				boost::uint32_t cvn = mS->read_V32();
-				if (cvn >= mMultinamePool.size())
+				if (cvn >= _multinamePool.size())
 				{
-					ERR((_("ABC: Out of bound name for caught exception.\n")));
+					log_error(_("ABC: Out of bound name for caught exception."));
 //					return false;
 				}
-				pExcept->setName(mMultinamePool[cvn].getABCName());
-				pExcept->setNamespace(mMultinamePool[cvn].getNamespace());
+				pExcept->setName(_multinamePool[cvn].getABCName());
+				pExcept->setNamespace(_multinamePool[cvn].getNamespace());
 			}
 		} // end of exceptions
 
@@ -1180,10 +1225,14 @@ abc_block::read_method_bodies()
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			abc_Trait &aTrait = newTrait();
-			aTrait.set_target(mMethods[moffset]);
-			if (!aTrait.read(mS, this)) // TODO: 'method body activation traits'
+			aTrait.set_target(_methods[offset]);
+			if (!aTrait.read(mS, this)) {
+                // TODO: 'method body activation traits'
 				return false;
-			LOG_DEBUG_ABC("Trait: %u name: %s kind: %u value: %s ",j,mStringPool[aTrait.mName],aTrait.mKind,aTrait.mValue.to_string());
+            }
+			log_abc("Trait: %u name: %s kind: %u value: %s ", j, 
+                    _stringPool[aTrait._name], aTrait._kind, 
+                    aTrait._value.to_string());
 		}
 	} // end of bodies loop
 	return true;
@@ -1199,33 +1248,33 @@ abc_block::read(SWFStream& in)
 	if (!read_version()) return false;
 	if (!read_integer_constants()) return false;
 	if (!read_unsigned_integer_constants()) return false;
-	LOG_DEBUG_ABC("Done reading unsigned integer constants.\n");
+	log_abc("Done reading unsigned integer constants.");
 	if (!read_double_constants()) return false;
-	LOG_DEBUG_ABC("Done reading double constants.\n");
+	log_abc("Done reading double constants.");
 	if (!read_string_constants()) return false;
-	LOG_DEBUG_ABC("Done reading string constants.\n");
+	log_abc("Done reading string constants.");
 	if (!read_namespaces()) return false;
-	LOG_DEBUG_ABC("Done reading namespaces.\n");
+	log_abc("Done reading namespaces.");
 	if (!read_namespace_sets()) return false;
-	LOG_DEBUG_ABC("Done reading namespace sets.\n");
+	log_abc("Done reading namespace sets.");
 	if (!read_multinames()) return false;
-	LOG_DEBUG_ABC("Done reading multinames.\n");
+	log_abc("Done reading multinames.");
 	if (!read_method_infos()) return false;
-	LOG_DEBUG_ABC("Done reading method infos.\n");
+	log_abc("Done reading method infos.");
 	if (!skip_metadata()) return false;
-	LOG_DEBUG_ABC("Done reading metadata.\n");
+	log_abc("Done reading metadata.");
 	if (!read_instances()) return false;
-	LOG_DEBUG_ABC("Done reading instances.\n");
+	log_abc("Done reading instances.");
 	if (!read_classes()) return false;
-	LOG_DEBUG_ABC("Done reading classes.\n");
+	log_abc("Done reading classes.");
 	if (!read_scripts()) return false;
-	LOG_DEBUG_ABC("Done reading scripts.\n");
+	log_abc("Done reading scripts.");
 	if (!read_method_bodies()) return false;
-	LOG_DEBUG_ABC("Done reading stuff.\n");
+	log_abc("Done reading stuff.");
 
-	for(unsigned int i=0;i<mMethods.size();i++){
-		LOG_DEBUG_ABC("Method %d body:",i);
-		IF_VERBOSE_PARSE(mMethods[i]->print_body());
+	for(unsigned int i=0;i<_methods.size();i++) {
+		log_abc("Method %d body:", i);
+		IF_VERBOSE_PARSE(_methods[i]->print_body());
 	}
 /*	The loop below causes a segmentation fault, because it tries to modify 
 	asMethod.mPrototype, which is never initialized.  The parser seems 
@@ -1242,30 +1291,27 @@ abc_block::read(SWFStream& in)
 	return true;
 }
 
-asClass *abc_block::locateClass(const std::string& className){
+asClass*
+abc_block::locateClass(const std::string& className)
+{
 	
-	std::vector<asClass*>::iterator i = mClasses.begin();
-	for( ; i!=mClasses.end(); ++i){
-		if(mStringPool[(*i)->getName()].compare(className) == 0){
+	std::vector<asClass*>::iterator i = _classes.begin();
+	for( ; i!=_classes.end(); ++i) {
+		if (_stringPool[(*i)->getName()] == className) {
 			return *i;
 		}
 	}	
 	return NULL;
 }
 
-void abc_block::update_global_name(unsigned int multiname_index){
-	
-	asName* multiname = &mMultinamePool[multiname_index];
-	string_table::key new_key = mStringTable->find(mStringPool[multiname->getABCName()],false);
-	multiname->setGlobalName(new_key);	
-}
-
-abc_block::abc_block() : mStringTable(&VM::get().getStringTable())
+void
+abc_block::update_global_name(unsigned int multiname_index)
 {
-	mCH = VM::get().getClassHierarchy();
-	// TODO: Make this the real 'Object' prototype.
-	mCH->getGlobalNs()->stubPrototype(NSV::CLASS_OBJECT);
-	mTheObject = mCH->getGlobalNs()->getClass(NSV::CLASS_OBJECT);
+	
+	asName* multiname = &_multinamePool[multiname_index];
+	string_table::key new_key = 
+        _stringTable->find(_stringPool[multiname->getABCName()], false);
+	multiname->setGlobalName(new_key);	
 }
 
 } /* namespace gnash */

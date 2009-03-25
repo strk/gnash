@@ -129,6 +129,13 @@ processLog_debug(const boost::format& fmt)
 }
 
 void
+processLog_abc(const boost::format& fmt)
+{
+	if (dbglogfile.getVerbosity() < GNASH_DEBUG_LEVEL) return;
+	dbglogfile.log(N_("ABC"), fmt.str());
+}
+
+void
 processLog_parse(const boost::format& fmt)
 {
 	dbglogfile.log(fmt.str());
