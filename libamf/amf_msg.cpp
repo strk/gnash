@@ -189,10 +189,12 @@ AMF_msg::parseAMFPacket(amf::Buffer &data)
 boost::shared_ptr<AMF_msg::context_header_t>
 AMF_msg::parseAMFPacket(boost::uint8_t *data, size_t size)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 //    _messages.push_back();
     boost::uint8_t *ptr = data + sizeof(AMF_msg::context_header_t);
     boost::shared_ptr<context_header_t> header = AMF_msg::parseContextHeader(data, size);
+
+//     log_debug("%s: %s", __PRETTY_FUNCTION__, hexify(data, size, true));
     
     AMF amf;
     /// Read all the messages from the AMF packet

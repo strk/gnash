@@ -314,7 +314,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		port = gnash::RTMPT_PORT;
 	    }
 	    _http_client.reset(new HTTP);
-	    _http_client->toggleDebug(true);
+// 	    _http_client->toggleDebug(true);
 	    if (!_http_client->createClient(url.hostname(), port)) {
 		log_error("Can't connect to server %s on port %hd",
 			  url.hostname(), port);
@@ -740,7 +740,7 @@ net_handler(NetConnection_as::thread_params_t *args)
 	HTTP *http = reinterpret_cast<HTTP *>(args->network);;
 	amf::AMF amf;
 	boost::uint8_t *data = http->processHeaderFields(*buf);
-    	http->dump();
+//     	http->dump();
 	size_t length = http->getContentLength();
 	if (http->getField("transfer-encoding") == "chunked") {
 	    chunked = true;

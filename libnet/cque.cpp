@@ -93,7 +93,7 @@ CQue::size()
 bool
 CQue::push(boost::shared_ptr<amf::Buffer> data)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     boost::mutex::scoped_lock lock(_mutex);
     _que.push_back(data);
 #ifdef USE_STATS_QUEUE
@@ -233,7 +233,7 @@ CQue::merge(boost::shared_ptr<amf::Buffer> start)
     for (que_t::iterator i=from; i!=to; ++i) {
 //  	log_debug("%s: copying %d bytes, space left is %d, totalsize is %d", __PRETTY_FUNCTION__,
 //  		  (*i)->allocated(), newbuf->spaceLeft(), totalsize);
-// 	(*i)->dump();
+//  	(*i)->dump();
 // 	if (newbuf->spaceLeft() >= (*i)->allocated()) {
 	    *newbuf += *i;
 // 	}
