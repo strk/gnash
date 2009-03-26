@@ -675,9 +675,9 @@ GtkGui::createMenu()
 #endif
     createHelpMenu(GTK_WIDGET(_popup_menu));
 
-    GtkWidget *separator1 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator1);
-    gtk_container_add (GTK_CONTAINER (_popup_menu), separator1);
+    GtkWidget *separator1 = gtk_separator_menu_item_new();
+    gtk_widget_show(separator1);
+    gtk_container_add (GTK_CONTAINER(_popup_menu), separator1);
 
     /// The sound handler is initialized after the Gui is created, and
     /// may be disabled or enabled dynamically.
@@ -688,11 +688,10 @@ GtkGui::createMenu()
     gtk_widget_show(GTK_WIDGET(menusound));
     g_signal_connect(menusound, "activate", G_CALLBACK(menuSound), this);
 
-    GtkWidget *separator2 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separator2);
-    gtk_container_add (GTK_CONTAINER (_popup_menu), separator2);
+    GtkWidget *separator2 = gtk_separator_menu_item_new();
+    gtk_widget_show(separator2);
+    gtk_container_add (GTK_CONTAINER(_popup_menu), separator2);
 
-    gtk_container_add (GTK_CONTAINER (_popup_menu), separator1);
     GtkWidget *quit = gtk_image_menu_item_new_from_stock("gtk-quit", 0);
     gtk_widget_show(quit);
     gtk_container_add(GTK_CONTAINER(_popup_menu), quit);
