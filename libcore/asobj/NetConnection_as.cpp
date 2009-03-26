@@ -62,7 +62,7 @@ using namespace std;
 
 namespace gnash {
 
-boost::mutex _nc_mutex;
+// boost::mutex _nc_mutex;
 
 namespace {
     void attachProperties(as_object& o);
@@ -795,7 +795,7 @@ net_handler(NetConnection_as::thread_params_t *args)
 // 		VM& vm = args->callback->getVM();
 //  		string_table& st = vm.getStringTable();
 		string_table::key methodKey;
-		boost::mutex::scoped_lock lock(_nc_mutex);
+// 		boost::mutex::scoped_lock lock(_nc_mutex);
 		methodKey = args->st->find(methodName);
 		args->callback->callMethod(methodKey, tmp);
 	    }

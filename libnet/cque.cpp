@@ -205,7 +205,7 @@ CQue::merge()
 boost::shared_ptr<amf::Buffer> 
 CQue::merge(boost::shared_ptr<amf::Buffer> start)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     // Find iterator to first element to merge
     que_t::iterator from = std::find(_que.begin(), _que.end(), start); 
     if (from == _que.end()) {
