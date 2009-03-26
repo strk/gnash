@@ -953,6 +953,11 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
     ++tmpptr;
 
     switch (type) {
+        case Element::NOTYPE:
+        {
+	    log_error("Element has no type!");
+	    break;
+	}
         case Element::NUMBER_AMF0:
         {
             // Make sure this isn't less than 0. We check this above at
@@ -1234,13 +1239,13 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     // length to a value, this is tottaly bogus, and I'm tired of
     // braindamaging code to keep valgrind happy.
     if (length <= 0) {
-    log_debug("No Property name, object done");
-    return el;
+// 	log_debug("No Property name, object done %x, %x", (void *)in, (void *)tooFar);
+	return el;
     }
     
     if (length + tmpptr > tooFar) {
-    log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
-    length = tooFar - tmpptr;
+	log_error("%d bytes for a string is over the safe limit of %d. Putting the rest of the buffer into the string, line %d", length, SANE_STR_SIZE, __LINE__);
+	length = tooFar - tmpptr;
     }    
     
     // name is just debugging help to print cleaner, and should be removed later
@@ -1249,7 +1254,7 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
 //    log_debug(_("AMF property name is: %s"), name);
     // Don't read past the end
     if (tmpptr + length < tooFar) {
-    tmpptr += length;
+	tmpptr += length;
     }
     
     char c = *(reinterpret_cast<char *>(tmpptr));
@@ -1257,21 +1262,21 @@ AMF::extractProperty(boost::uint8_t *in, boost::uint8_t* tooFar)
     // If we get a NULL object, there is no data. In that case, we only return
     // the name of the property.
     if (type == Element::NULL_AMF0) {
-    log_debug("No data associated with Property \"%s\"", name);
-    el.reset(new Element);
-    el->setName(name.c_str(), name.size());
-    tmpptr += 1;
-    // Calculate the offset for the next read
+	log_debug("No data associated with Property \"%s\"", name);
+	el.reset(new Element);
+	el->setName(name.c_str(), name.size());
+	tmpptr += 1;
+	// Calculate the offset for the next read
     } else {
-    // process the data with associated with the property.
-    // Go past the data to the start of the next AMF object, which
-    // should be a type byte.
+	// process the data with associated with the property.
+	// Go past the data to the start of the next AMF object, which
+	// should be a type byte.
 //	tmpptr += length;
-    el = extractAMF(tmpptr, tooFar);
-    if (el) {
-        el->setName(name.c_str(), name.size()); // FIXME: arg, overwrites the name for TypedObjects
-    }
-    tmpptr += totalsize();
+	el = extractAMF(tmpptr, tooFar);
+	if (el) {
+	    el->setName(name.c_str(), name.size()); // FIXME: arg, overwrites the name for TypedObjects
+	}
+	tmpptr += totalsize();
     }
 
     //delete name;
