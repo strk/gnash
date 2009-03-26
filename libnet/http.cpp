@@ -1352,7 +1352,7 @@ HTTP::sendMsg(const boost::uint8_t *data, size_t size)
 size_t
 HTTP::recvChunked(boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     bool done = false;
     bool chunks = true;
     size_t total = 0;
@@ -1376,7 +1376,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 	total = static_cast<size_t>(strtol(bytes.c_str(), NULL, 16));
 	log_debug("%s: Total size for first chunk is: %d, data size %d (%d)",
 		  __PRETTY_FUNCTION__, total, size, sizesize);
-	buf.reset(new amf::Buffer(total));
+	buf.reset(new amf::Buffer(total+2));
 	// Add the existing data from the previous packet
 	buf->copy(data+sizesize, size-sizesize);
     }
@@ -1385,8 +1385,8 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
     // like any other HTTP header field, so we have to read those bytes too
     // so we can stay sychronized with the start of each chunk.
     pktsize = total - buf->allocated() + 2;
-    log_debug("%s: Total Packet size for first chunk is: %d", __PRETTY_FUNCTION__,
-	      pktsize);
+//     log_debug("%s: Total Packet size for first chunk is: %d", __PRETTY_FUNCTION__,
+// 	      pktsize);
     
     done = false;
     size_t ret = 0;
@@ -1402,7 +1402,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 		// tell we're done processing chunks till one has a length of
 		// "0\r\n", this is important.
 		pktsize = 12;
-		buf.reset(new amf::Buffer(pktsize));
+		buf.reset(new amf::Buffer(pktsize+2));
 	    }
 	    ret = readNet(buf->reference() + buf->allocated(), pktsize, 60);
  	    //buf->dump();
@@ -1430,8 +1430,8 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 			    chunks = false;
 			} else {
 			    pktsize = total+8; // FIXME: why do we need an 8 here ?
-			    log_debug("%s: Total size for chunk is: %d (%s), adding %d bytes",
-				      __PRETTY_FUNCTION__, total, bytes, (start - buf->reference()));
+// 			    log_debug("%s: Total size for chunk is: %d (%s), adding %d bytes",
+// 				      __PRETTY_FUNCTION__, total, bytes, (start - buf->reference()));
 			    amf::Buffer tmpbuf(start - buf->reference());
 			    // don't forget the two bytes for the "\r\n"
 			    tmpbuf.copy(buf->reference() + bytes.size() + 2, (start - buf->reference()));
@@ -1459,9 +1459,11 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 	if (pktsize == 0) {
 	    // The last two bytes of the chunk are always "\r\n", which we remove so it
 	    // doesn't become part of the binary data being sent in the chunk.
-	    *(buf->end()-1) = 0;
-	    *(buf->end()-2) = 0;
-	    buf->setSeekPointer(buf->end() - 2);
+	    if ((*(buf->end()-2) == '\r') && (*(buf->end()-1) == '\n')) {
+		*(buf->end()-2) = 0; // '\r'
+		*(buf->end()-1) = 0; // '\n'
+		buf->setSeekPointer(buf->end() - 2);
+	    }
 	    _que.push(buf);
 	}
 	done = false;		// reset
