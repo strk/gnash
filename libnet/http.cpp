@@ -1405,7 +1405,7 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 		buf.reset(new amf::Buffer(pktsize));
 	    }
 	    ret = readNet(buf->reference() + buf->allocated(), pktsize, 60);
-// 	    buf->dump();
+ 	    //buf->dump();
 	    // We got data.
 	    if (ret == 0) {
 		log_debug("no data yet for fd #%d, continuing...", getFileFd());
@@ -1435,13 +1435,11 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 			    amf::Buffer tmpbuf(start - buf->reference());
 			    // don't forget the two bytes for the "\r\n"
 			    tmpbuf.copy(buf->reference() + bytes.size() + 2, (start - buf->reference()));
+			    buf->clear(); // FIXME: debug only
 			    buf->resize(total);
  			    buf->copy(tmpbuf.reference(), tmpbuf.size());
 			}
 		    }
-		}
-		if (ret < pktsize) {
-		    
 		}
 		
 		// If we got less data than specified, we need to keep reading data
@@ -1459,6 +1457,11 @@ HTTP::recvChunked(boost::uint8_t *data, size_t size)
 //  	log_debug("%s: finished packet, ret is %d, pktsize is %d\r\n%s", __PRETTY_FUNCTION__, ret, pktsize,
 //  		  hexify(buf->reference(), buf->allocated(), true));
 	if (pktsize == 0) {
+	    // The last two bytes of the chunk are always "\r\n", which we remove so it
+	    // doesn't become part of the binary data being sent in the chunk.
+	    *(buf->end()-1) = 0;
+	    *(buf->end()-2) = 0;
+	    buf->setSeekPointer(buf->end() - 2);
 	    _que.push(buf);
 	}
 	done = false;		// reset
