@@ -877,7 +877,6 @@ Gui::start()
     mr->setVariables(_flashVars);
 
     _stage->setRootMovie( mr.release() ); // will construct the instance
-    resize_view(_width, _height); // to properly update stageMatrix if scaling is given 
 
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
@@ -887,6 +886,9 @@ Gui::start()
     sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->unpause();
     _started = true;
+    
+    // to properly update stageMatrix if scaling is given  
+    resize_view(_width, _height); 
 }
 
 bool
