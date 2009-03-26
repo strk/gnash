@@ -61,7 +61,7 @@
 #define GNASH_DEBUG_SOFT_REFERENCES
 
 // Define this macro to make AMF parsing verbose
-// #define GNASH_DEBUG_AMF_DESERIALIZE 1
+#define GNASH_DEBUG_AMF_DESERIALIZE 1
 
 // Define this macto to make AMF writing verbose
 // #define GNASH_DEBUG_AMF_SERIALIZE 1
@@ -1861,10 +1861,12 @@ as_value::as_value(const amf::Element& el)
 	:
 	m_type(UNDEFINED)
 {
+//     GNASH_REPORT_FUNCTION;    
 //     el.dump();
+    
     VM& vm = VM::get();
     string_table& st = vm.getStringTable();
-    
+
     switch (el.getType()) {
       case amf::Element::NOTYPE:
       {
@@ -1935,7 +1937,7 @@ as_value::as_value(const amf::Element& el)
 		str = el.getName();
 	    }
 	    
-            set_string(str);
+	    set_string(str);
             break;
       }
 
@@ -1945,18 +1947,22 @@ as_value::as_value(const amf::Element& el)
 #ifdef GNASH_DEBUG_AMF_DESERIALIZE
           log_debug("as_value(Element&) : AMF type OBJECT");
 #endif
-          as_object* obj = new as_object(getObjectInterface());
+	  as_object* obj = new as_object(getObjectInterface());
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
 		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
 		  if (prop == 0) {
 		      break;
 		  } else {
-		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		      if (prop->getNameSize() == 0) {
+			  log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		      } else {
+			  obj->set_member(st.find(prop->getName()), as_value(*prop));
+		      }
 		  }
               }
           }
-          set_as_object(obj);
+	  set_as_object(obj);
           break;
       }
 
@@ -1972,12 +1978,12 @@ as_value::as_value(const amf::Element& el)
           Array_as* obj = new Array_as;
           if (el.propertySize()) {
               for (size_t i=0; i < el.propertySize(); i++) {
-              const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
-              if (prop == 0) {
-                  break;
-              } else {
-                  obj->set_member(st.find(prop->getName()), as_value(*prop));
-              }
+		  const boost::shared_ptr<amf::Element> prop = el.getProperty(i);
+		  if (prop == 0) {
+		      break;
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
               }
           }
           set_as_object(obj);
@@ -1999,7 +2005,11 @@ as_value::as_value(const amf::Element& el)
               if (prop == 0) {
                   break;
               } else {
-                  obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  if (prop->getNameSize() == 0) {
+		      log_debug("%s:(%d) Property has no name!", __PRETTY_FUNCTION__, __LINE__);
+		  } else {
+		      obj->set_member(st.find(prop->getName()), as_value(*prop));
+		  }
               }
           }
           
