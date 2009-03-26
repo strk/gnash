@@ -513,6 +513,7 @@ GtkGui::showMenu(bool show)
 #ifdef USE_MENUS
     if (!_menubar) return;
     if (show) gtk_widget_show(_menubar);
+    else gtk_widget_hide(_menubar);
 #endif
 }
 
