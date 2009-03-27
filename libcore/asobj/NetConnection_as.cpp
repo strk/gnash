@@ -495,8 +495,9 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	tdata->network = reinterpret_cast<Network *>(_rtmp_client.get());
 	tdata->network->setProtocol(url.protocol());
 	boost::shared_ptr<amf::Element> el = args[2].to_element();
-// 	el->dump();
-	boost::shared_ptr<amf::Buffer> request = _rtmp_client->encodeEchoRequest(app, 2.0, *el);
+//  	el->dump();
+	boost::shared_ptr<amf::Buffer> request = _rtmp_client->encodeEchoRequest(methodName, 2.0, *el);
+	request->dump();
 	_rtmp_client->sendMsg(0x3, RTMP::HEADER_12, request->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *request);
 
 	
