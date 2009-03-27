@@ -86,8 +86,8 @@ public:
 	NS_DELETE_STREAM
     } rtmp_status_e;
     typedef enum {
-	FROM_SERVER,                      // Flash com server
-	FROM_CLIENT			  // SWF player
+	FROM_CLIENT,			  // SWF player
+	FROM_SERVER                      // Flash com server
     } rtmp_source_e;
     RTMPMsg();
     ~RTMPMsg();
