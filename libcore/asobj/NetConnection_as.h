@@ -40,6 +40,8 @@
 
 namespace gnash {
 
+class NetConnection_as;
+
 /// NetConnection ActionScript class
 //
 /// Provides interfaces to load data from an URL
@@ -54,6 +56,7 @@ public:
 	Network          *network;
 	VM		 *vm;
 	string_table     *st;
+ 	NetConnection_as *nas;
     } thread_params_t;
 
     enum StatusCode
