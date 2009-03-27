@@ -546,11 +546,11 @@ ncrtmp.onStatus = function()
     this.statuses.push(arguments);
     note('NetConnection.onStatus called with args: '+dumpObject(arguments));
     lastStatusArgs = ncrtmp.statuses[ncrtmp.statuses.length-1];
-//     if ((lastStatusArgs[0].level == "error") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
-//         pass("RTMP connection - status");
-//     } else {
-//         fail("RTMP connection - status");        
-//     }
+    if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
+        pass("RTMP connection - status Success");
+    } else {
+        fail("RTMP connection - status Success");
+    }
 };
 
 nc.onResult = function()
