@@ -79,8 +79,7 @@ nc.connect(rtmpuri);
 check_equals(nc.isConnected, false);
 check_equals(nc.statuses.length, 0);
 
-o=new ResultHandler();
-o.onResult = function()
+nc.onResult = function()
 {
     note("Got a result back from the server.");
     check_equals(nc.isConnected, true); // now it is connected
@@ -98,6 +97,7 @@ o.onResult = function()
 
 // This call starts the actual network connection
 result1=false;;
+o=new ResultHandler();
 o.onResult = function()
 {
     note("Got a null result back from the server."+dumpObject(arguments));
@@ -535,3 +535,102 @@ if (result20) {
 } else {
     fail("Echo sparse array");
 }
+
+//
+// do the same thing for RTMP
+//
+ncrtmp = new NetConnection;
+ncrtmp.statuses = new Array();
+ncrtmp.onStatus = function()
+{
+    this.statuses.push(arguments);
+    note('NetConnection.onStatus called with args: '+dumpObject(arguments));
+    lastStatusArgs = ncrtmp.statuses[ncrtmp.statuses.length-1];
+//     if ((lastStatusArgs[0].level == "error") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
+//         pass("RTMP connection - status");
+//     } else {
+//         fail("RTMP connection - status");        
+//     }
+};
+
+nc.onResult = function()
+{
+    this.statuses.push(arguments);
+    note('NetConnection.onResult called with args: '+dumpObject(arguments));
+};
+
+
+rtmpuri = "rtmp://"+host+":1935/echo";
+note("Connecting to "+rtmpuri);
+ncrtmp.connect(rtmpuri);
+
+// The network connection is not opened at connect() time, but when
+// the first call() is made.
+if ((ncrtmp.isConnected == false)  && (ncrtmp.statuses.length == 0)) {
+    pass("RTMP connection - connect");
+} else {
+    fail("RTMP connection - connect");
+}
+
+o=new ResultHandler();
+o.onResult = function()
+{
+    note("Got a result back from the server.");
+    
+    // now it is connected
+    if ((ncrtmp.isConnected == true) && (ncrtmp.statuses.length == 1)) {
+        pass("RTMP connection - result");
+    } else {
+        fail("RTMP connection - result");        
+    }
+    
+    lastStatusArgs = ncrtmp.statuses[ncrtmp.statuses.length-1];
+    if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
+        pass("RTMP connection - status");
+    } else {
+        fail("RTMP connection - status");        
+    }
+    
+};
+
+// This call starts the actual network connection
+result1=false;;
+o.onResult = function()
+{
+    note("Got a null result back from the server."+dumpObject(arguments));
+    note(arguments[0]);
+    if (arguments.length == 1) {
+ 	if (arguments[0] == null) {
+	    result1=true;
+ 	}
+    }
+};
+ncrtmp.call("echo", o, null);
+
+// Empty String
+result3=false;
+tstr = new String();
+o=new ResultHandler();
+o.onResult = function()
+{
+    note("Got a string result back from the server."+dumpObject(arguments));
+    if (arguments.length == 1) {
+	if (arguments[0].length == 0) {
+	    result3 = true;
+	}
+    }
+};
+ncrtmp.call("echo", o, tstr);
+
+if (result1) {
+    pass("RTMP: Echo NULL Object");
+} else {
+    fail("RTMP: Echo NULL Object");
+}
+
+if (result3) {
+    pass("RTMP: Echo empty String");
+} else {
+    fail("RTMP: Echo empty String");
+}
+
