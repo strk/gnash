@@ -597,7 +597,7 @@ o.onResult = function()
 result1=false;;
 o.onResult = function()
 {
-    note("Got a null result back from the server."+dumpObject(arguments));
+    note("Got a null result back from the RTMP server."+dumpObject(arguments));
     note(arguments[0]);
     if (arguments.length == 1) {
  	if (arguments[0] == null) {
@@ -613,7 +613,7 @@ tstr = new String();
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a string result back from the server."+dumpObject(arguments));
+    note("Got a string result back from the RTMP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0].length == 0) {
 	    result3 = true;
