@@ -75,7 +75,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     }
         
     IF_VERBOSE_PARSE(
-        log_parse("  fill_style read type = 0x%X", m_type);
+        log_parse("  fill_style read type = 0x%X", (int)m_type);
     );
 
     if (m_type == SWF::FILL_SOLID)
