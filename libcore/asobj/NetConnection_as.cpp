@@ -330,22 +330,27 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	} else if (url.protocol() == "rtmp") {
 	    _rtmp_client.reset(new RTMPClient);
 	    _rtmp_client->toggleDebug(true);
-// 	    if (!_rtmp_client.createClient(url.hostname(), port)) {
-// 		log_error("Can't connect to RTMP server %s", url.hostname());
-// 		notifyStatus(CONNECT_FAILED);
-// 		return;
-// 	    }
+ 	    if (!_rtmp_client->createClient(url.hostname(), port)) {
+ 		log_error("Can't connect to RTMP server %s", url.hostname());
+ 		notifyStatus(CONNECT_FAILED);
+ 		return;
+ 	    }
 	    if (!_rtmp_client->handShakeRequest()) {
 		log_error("RTMP handshake request failed");
 		notifyStatus(CONNECT_FAILED);
 		return;
 	    }
-	    
+#if 0
 	    if (!_rtmp_client->clientFinish()) {
 		log_error("RTMP handshake completion failed");
 		notifyStatus(CONNECT_FAILED);
 		return;
+	    } else {
+		log_debug("RTMP handshake completed");
+		notifyStatus(CONNECT_SUCCESS);
+		_isConnected = true;
 	    }
+#endif
 	    string app;		// the application name
 	    string path;	// the path to the file on the server
 	    string tcUrl;	// the tcUrl field
@@ -353,33 +358,65 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	    string filename;	// the filename to play
 	    string pageUrl;     // the pageUrl field
 	    tcUrl = url.protocol() + "://" + url.hostname();
-	    if (!url.querystring().empty()) {
-		tcUrl += "/" + url.querystring();
-	    } else {
-		tcUrl += "/" + url.path();
+	    if (!url.port().empty()) {
+		tcUrl += ":" + url.port();
 	    }
-	    app = url.path();
+	    if (!url.querystring().empty()) {
+		tcUrl += url.querystring();
+	    } else {
+		tcUrl += url.path();
+	    }
+	    // Drop a loeading slash if it exists.
+	    if (url.path().at(0) == '/') {
+		app = url.path().substr(1, url.path().size());
+	    } else {
+		app = url.path();
+	    }
+	    
 	    // FIXME: this should be the name of the refering swf file,
 	    // although the value appears to be ignored by the server.
-	    swfUrl = "mediaplayer.swf";
+	    swfUrl = "file:///tmp/red5test.swf";
 	    // FIXME: This should be the URL for the referring web page
 	    // although the value appears to be ignored by the server.
 	    pageUrl = "http://gnashdev.org";
 
-	    // FIXME: replace the "magic numbers" with intelligently
-	    // designed ones.
+	    // FIXME: replace the "magic numbers" with intelligently designed ones.
+	    // the magic numbers are the audio and videocodec fields.
 	    boost::shared_ptr<amf::Buffer> buf2 = _rtmp_client->encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
-// 	    size_t total_size = buf2->allocated();
-//   	    _rtmp_client->sendMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf2);
-//   	    RTMPMsg *msg1 = _rtmp_client->recvMsg();
-
+ 	    size_t total_size = buf2->allocated();
+	    boost::shared_ptr<amf::Buffer> head2 = _rtmp_client->encodeHeader(0x3, RTMP::HEADER_12,
+							buf2->allocated(), RTMP::INVOKE,
+							RTMPMsg::FROM_CLIENT);
+	    head2->resize(head2->size() + buf2->size() + 1);
+	    head2->append(buf2->reference(), 128);
+	    boost::uint8_t c = 0xc3;
+	    *head2 += c;
+	    head2->append(buf2->reference() + 128, buf2->allocated()-128);
+  	    if (!_rtmp_client->clientFinish(*head2)) {
+		log_error("RTMP handshake completion failed");
+		notifyStatus(CONNECT_FAILED);
+		return;
+	    } else {
+		log_debug("RTMP handshake completed");
+		notifyStatus(CONNECT_SUCCESS);
+		_isConnected = true;
+	    }
+#if 0
+	    boost::shared_ptr<amf::Buffer> head2 = _rtmp_client->encodeHeader(0x3, RTMP::HEADER_12, total_size,
+								RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
+	    head2->dump();
+	    boost::shared_ptr<amf::Buffer> buf3(new amf::Buffer(head2->allocated() + buf2->allocated()));
+	    *buf3 = *head2;
+	    *buf3 += *buf2;
+   	    boost::shared_ptr<amf::Buffer> msg1 = _rtmp_client->recvMsg();
 	    // the connectino process is complete
-// 	    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-// 		notifyStatus(CONNECT_SUCCESS);
-// 	    } else {
-// 		notifyStatus(CONNECT_FAILED);
-// 		return;
-// 	    }
+ 	    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+ 		notifyStatus(CONNECT_SUCCESS);
+ 	    } else {
+ 		notifyStatus(CONNECT_FAILED);
+ 		return;
+ 	    }
+#endif
 	} // end of 'if RTMP'
 #if 0
 	// FIXME: do a GET request for the crossdomain.xml file
