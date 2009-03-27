@@ -292,6 +292,13 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     const movie_root& mr = _vm.getRoot();
     URL url(_uri, mr.runInfo().baseURL());
 
+    string app;		// the application name
+    string path;	// the path to the file on the server
+    string tcUrl;	// the tcUrl field
+    string swfUrl;	// the swfUrl field
+    string filename;	// the filename to play
+    string pageUrl;     // the pageUrl field
+    
     log_debug("%s: URI is %s, URL protocol is %s, path is %s, hostname is %s, port is %s", __PRETTY_FUNCTION__,
 	      _uri, 
 	      url.protocol(),
@@ -351,12 +358,6 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		_isConnected = true;
 	    }
 #endif
-	    string app;		// the application name
-	    string path;	// the path to the file on the server
-	    string tcUrl;	// the tcUrl field
-	    string swfUrl;	// the swfUrl field
-	    string filename;	// the filename to play
-	    string pageUrl;     // the pageUrl field
 	    tcUrl = url.protocol() + "://" + url.hostname();
 	    if (!url.port().empty()) {
 		tcUrl += ":" + url.port();
@@ -383,11 +384,12 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	    // FIXME: replace the "magic numbers" with intelligently designed ones.
 	    // the magic numbers are the audio and videocodec fields.
 	    boost::shared_ptr<amf::Buffer> buf2 = _rtmp_client->encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
- 	    size_t total_size = buf2->allocated();
+//  	    size_t total_size = buf2->allocated();
 	    boost::shared_ptr<amf::Buffer> head2 = _rtmp_client->encodeHeader(0x3, RTMP::HEADER_12,
 							buf2->allocated(), RTMP::INVOKE,
 							RTMPMsg::FROM_CLIENT);
 	    head2->resize(head2->size() + buf2->size() + 1);
+	    // FIXME: ugly hack! Should be a single byte header. Do this in Element::encode() instead!
 	    head2->append(buf2->reference(), 128);
 	    boost::uint8_t c = 0xc3;
 	    *head2 += c;
@@ -464,8 +466,11 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     
     boost::shared_ptr<amf::Buffer> buf = top.encodeAMFPacket();
 //     top.dump();
-//     buf->dump();
 
+    VM& vm = asCallback->getVM();
+    tdata->st = &vm.getStringTable();
+// 	tdata->vm = vm;
+    
     // Send the request via HTTP
     if ((url.protocol() == "rtmpt")
 	|| (url.protocol() == "http")) {
@@ -478,18 +483,26 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	request += buf;
 	_http_client->writeNet(request);
 	tdata->network = reinterpret_cast<Network *>(_http_client.get());
-	VM& vm = asCallback->getVM();
-	tdata->st = &vm.getStringTable();
-// 	tdata->vm = vm;
     }
 
     // Send the request via RTMP
     if (url.protocol() == "rtmp") {
 	tdata->network = reinterpret_cast<Network *>(_rtmp_client.get());
-// 	boost::shared_ptr<buf3> = _rtmp_client->encodeStream(0x2);
-// 	//    buf3->dump();
-// 	total_size = buf3->size();
-// 	RTMPMsg *msg2 = _rtmp_client->sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
+	boost::shared_ptr<amf::Element> el = args[2].to_element();
+// 	el->dump();
+	boost::shared_ptr<amf::Buffer> request = _rtmp_client->encodeEchoRequest(app, 2.0, *el);
+	_rtmp_client->sendMsg(0x3, RTMP::HEADER_12, request->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *request);
+	boost::shared_ptr<amf::Buffer> response = _rtmp_client->recvMsg();
+  	response->dump();
+	boost::shared_ptr<RTMP::rtmp_head_t> rthead = _rtmp_client->decodeHeader(*response);
+	RTMPMsg *msg = _rtmp_client->decodeMsgBody(response->reference() + rthead->head_size, rthead->bodysize);
+	if (msg->getElements().size() > 0) {
+	    msg->at(0)->dump();
+	    as_value tmp(*msg->at(0));
+	    string_table::key methodKey = tdata->st->find(methodName);
+	    asCallback->callMethod(methodKey, tmp);
+	}
+	
     }
 
 
