@@ -244,26 +244,21 @@ main(int argc, char *argv[])
         if (protocol == "rtmp") {
             port = RTMP_PORT;
         }
-    }
-    else
-    {
+    } else {
         port = strtol(portstr.c_str(), NULL, 0) & 0xffff;
     }
 
 
-    if ( path.empty() )
-    {
+    if (path.empty()) {
         path = url.path();
     }
 
-    if ( filename.empty() )
-    {
+    if (filename.empty()) {
         string::size_type end = path.rfind('/');
         if (end != string::npos) {
             filename = path.substr(end + 1);
         }
     }
-
 
     if (tcUrl.empty()) {
         tcUrl = protocol + "://" + hostname;
@@ -277,8 +272,7 @@ main(int argc, char *argv[])
         }
     }
     
-    if (app.empty())
-    {
+    if (app.empty()) {
 
         // Get the application name
         // rtmp://localhost/application/resource
@@ -351,39 +345,75 @@ main(int argc, char *argv[])
     // RTMP::rtmp_head_t *rthead = 0;
     // int ret = 0;
     log_debug("Sending NetConnection Connect message,");
-    BufferSharedPtr buf2 = client.encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
-//    BufferSharedPtr buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
-//    BufferSharedPtr buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
+    boost::shared_ptr<amf::Buffer> buf2 = client.encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
+//  boost::shared_ptr<amf::Buffer> buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
+//  boost::shared_ptr<amf::Buffer> buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
     //buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
-    size_t total_size = buf2->size();    
-    RTMPMsg *msg1 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf2);
+    boost::shared_ptr<amf::Buffer> head2 = client.encodeHeader(0x3, RTMP::HEADER_12,
+								      buf2->allocated(), RTMP::INVOKE,
+								      RTMPMsg::FROM_CLIENT);
+    head2->resize(head2->size() + buf2->size() + 1);
+    if (!client.clientFinish(*head2)) {
+	log_error("RTMP handshake completion failed");
+    }
     
-    if (!msg1) {
+    boost::shared_ptr<amf::Buffer> response = client.recvMsg();
+    if (!response) {
+	log_error("Got no response from the RTMP server");
+    }
+    boost::shared_ptr<RTMP::rtmp_head_t> rthead;
+    boost::shared_ptr<RTMP::queues_t> que = client.split(*response);
+
+    if (!que->size()) {
         log_error("No response from INVOKE of NetConnection connect");
         exit(-1);
     }
-
-    msg1->dump();
-    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-        log_debug("Sent NetConnection Connect message sucessfully");
-    } else {
-        log_error("Couldn't send NetConnection Connect message,");
-        //exit(-1);
+    
+    while (que->size()) {
+	boost::shared_ptr<amf::Buffer> ptr = que->front()->pop();
+	log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
+	if (ptr) {		// If there is legit data
+	    rthead = client.decodeHeader(ptr->reference());
+	    RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+	    msg->dump();
+	    if (msg->getMethodName() == "_error") {
+		log_error("Got an error: %s", msg->getMethodName());
+		msg->at(0)->dump();
+	    }
+	    if (msg->getMethodName() == "_result") {
+		log_debug("Got a result: %s", msg->getMethodName());
+		if (msg->getElements().size() > 0) {
+		    msg->at(0)->dump();
+		}
+	    }
+//  	    que.front()->pop_front();
+	    ptr.reset();
+	    break;
+	}
     }
+	
+//     if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+//         log_debug("Sent NetConnection Connect message sucessfully");
+//     } else {
+//         log_error("Couldn't send NetConnection Connect message,");
+//         //exit(-1);
+//     }
 
     // make the createStream for ID 3 encoded object
     log_debug("Sending NetStream::createStream message,");
     BufferSharedPtr buf3 = client.encodeStream(0x2);
 //    buf3->dump();
-    total_size = buf3->size();
-    RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, total_size, RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
+    client.sendMsg(0x3, RTMP::HEADER_12, buf3->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf3);
+    
+//     RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, buf3->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
     double streamID = 0.0;
 
-    if (!msg2) {
-        log_error("No response from INVOKE of NetStream::createStream");
-        exit(-1);
-    }
+//     if (!msg2) {
+//         log_error("No response from INVOKE of NetStream::createStream");
+//         exit(-1);
+//     }
 
+#if 0
     log_debug("Sent NetStream::createStream message successfully:"); msg2->dump();
     std::vector<ElementSharedPtr> hell = msg2->getElements();
     if (hell.size() > 0) {
@@ -454,7 +484,7 @@ main(int argc, char *argv[])
             }
         }
     } while(loop--);
-
+#endif
 //     std::vector<amf::Element *> hell = msg2->getElements();
 //     std::vector<amf::Element *> props = hell[0]->getProperties();
 
