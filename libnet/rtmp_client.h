@@ -64,6 +64,8 @@ public:
     std::string &getPath() { return _path; };
     void setPath(std::string &x) { _path = x; };
 
+    boost::shared_ptr<amf::Buffer> encodeEchoRequest(const std::string &method, double id, amf::Element &el);
+    
     void dump();
   private:
     std::string _path;

@@ -170,6 +170,38 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     return buf;
 }
 
+boost::shared_ptr<amf::Buffer>
+RTMPClient::encodeEchoRequest(const std::string &method, double id, amf::Element &el)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::shared_ptr<amf::Element> str(new amf::Element);
+    str->makeString(method);
+    boost::shared_ptr<Buffer> strobj = str->encode();
+
+    // Encod ethe stream ID
+    boost::shared_ptr<amf::Element>  num(new amf::Element);
+    num->makeNumber(id);
+    boost::shared_ptr<Buffer> numobj = num->encode();
+
+    // Set the NULL object element that follows the stream ID
+    boost::shared_ptr<amf::Element> null(new amf::Element);
+    null->makeNull();
+    boost::shared_ptr<Buffer> nullobj = null->encode();
+
+    boost::shared_ptr<Buffer> elobj = el.encode();
+
+    size_t totalsize = strobj->size() + numobj->size() + nullobj->size() + elobj->size();
+
+    boost::shared_ptr<Buffer> buf(new Buffer(totalsize));
+    
+    *buf += strobj;
+    *buf += numobj;
+    *buf += nullobj;
+    *buf += elobj;
+
+    return buf;
+}
+
 // 43 00 1a 21 00 00 19 14 02 00 0c 63 72 65 61 74  C..!.......creat
 // 65 53 74 72 65 61 6d 00 40 08 00 00 00 00 00 00  eStream.@.......
 // 05                                                    .               
