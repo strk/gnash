@@ -403,6 +403,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		notifyStatus(CONNECT_SUCCESS);
 		_isConnected = true;
 	    }
+   	    boost::shared_ptr<amf::Buffer> msg1 = _rtmp_client->recvMsg();
 #if 0
 	    boost::shared_ptr<amf::Buffer> head2 = _rtmp_client->encodeHeader(0x3, RTMP::HEADER_12, total_size,
 								RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
@@ -411,6 +412,8 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	    *buf3 = *head2;
 	    *buf3 += *buf2;
    	    boost::shared_ptr<amf::Buffer> msg1 = _rtmp_client->recvMsg();
+	    RTMP::queues_t *que = split(msg1);
+
 	    // the connectino process is complete
  	    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
  		notifyStatus(CONNECT_SUCCESS);
@@ -494,17 +497,33 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	_rtmp_client->sendMsg(0x3, RTMP::HEADER_12, request->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *request);
 	boost::shared_ptr<amf::Buffer> response = _rtmp_client->recvMsg();
   	response->dump();
-	boost::shared_ptr<RTMP::rtmp_head_t> rthead = _rtmp_client->decodeHeader(*response);
-	RTMPMsg *msg = _rtmp_client->decodeMsgBody(response->reference() + rthead->head_size, rthead->bodysize);
-	if (msg->getElements().size() > 0) {
-	    msg->at(0)->dump();
-	    as_value tmp(*msg->at(0));
-	    string_table::key methodKey = tdata->st->find(methodName);
-	    asCallback->callMethod(methodKey, tmp);
+	boost::shared_ptr<RTMP::rtmp_head_t> rthead;
+	boost::shared_ptr<RTMP::queues_t> que = _rtmp_client->split(*response);
+	log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
+	while (que->size()) {
+	    boost::shared_ptr<amf::Buffer> ptr = que->front()->pop();
+	    if (ptr) {		// If there is legit data
+		rthead = _rtmp_client->decodeHeader(ptr->reference());
+		RTMPMsg *msg = _rtmp_client->decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		msg->dump();
+		if (msg->getMethodName() == "_error") {
+		    log_error("Got an error: %s", msg->getMethodName());
+		    msg->at(0)->dump();
+		    notifyStatus(CALL_FAILED);
+		}
+		if (msg->getMethodName() == "_result") {
+		    log_debug("Got a result: %s", msg->getMethodName());
+		    if (msg->getElements().size() > 0) {
+			msg->at(0)->dump();
+			as_value tmp(*msg->at(0));
+//		string_table::key methodKey = tdata->st->find(methodName);
+			string_table::key methodKey = tdata->st->find("onResult");
+			asCallback->callMethod(methodKey, tmp);
+		    }
+		}
+	    }
 	}
-	
     }
-
 
     //    this->test();
 
