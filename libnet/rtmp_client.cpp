@@ -119,7 +119,7 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     swfUrlnode->makeString("swfUrl", swfUrl);
     obj->addProperty(swfUrlnode);
 
-//    filespec = "rtmp://localhost/oflaDemo";
+//    filespec = "rtmp://localhost:5935/oflaDemo";
     ElementSharedPtr tcUrlnode(new amf::Element);
     tcUrlnode->makeString("tcUrl", tcUrl);
     obj->addProperty(tcUrlnode);
@@ -148,10 +148,11 @@ RTMPClient::encodeConnect(const char *app, const char *swfUrl, const char *tcUrl
     pageUrlnode->makeString("pageUrl", pageUrl);
     obj->addProperty(pageUrlnode);
 
+#if 0
     ElementSharedPtr objencodingnode(new Element);
     objencodingnode->makeNumber("objectEncoding", 0.0);
     obj->addProperty(objencodingnode);
-    
+#endif
 //    size_t total_size = 227;
 //     Buffer *out = encodeHeader(0x3, RTMP::HEADER_12, total_size,
 //                                      RTMP::INVOKE, RTMP::FROM_CLIENT);
@@ -360,13 +361,21 @@ bool
 RTMPClient::clientFinish()
 {
     GNASH_REPORT_FUNCTION;
+    amf::Buffer data;
+    return clientFinish(data);
+}
+
+bool
+RTMPClient::clientFinish(amf::Buffer &data)
+{
+    GNASH_REPORT_FUNCTION;
 
     int ret = 0;
-    _handshake->clear();
     
-    gnashSleep(1000000); // FIXME: why do we still need a delay here, when readNet() does a select ?
+//     gnashSleep(1000000); // FIXME: why do we still need a delay here, when readNet() does a select ?
     ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
     if (ret == RTMP_HANDSHAKE_SIZE) {
+	_handshake->setSeekPointer(_handshake->reference() + ret);
         log_debug (_("Read first data block in handshake"));
     } else {
         log_error (_("Couldn't read first data block in handshake"));
@@ -375,6 +384,7 @@ RTMPClient::clientFinish()
     if (ret > RTMP_HANDSHAKE_SIZE) {
 	ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
 	if (ret == RTMP_HANDSHAKE_SIZE) {        
+	    _handshake->setSeekPointer(_handshake->reference() + ret);
 	    log_debug (_("Read second data block in handshake"));
 	} else {
 	    log_error (_("Couldn't read second data block in handshake"));
@@ -383,26 +393,28 @@ RTMPClient::clientFinish()
     }
     ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
     if (ret == RTMP_HANDSHAKE_SIZE) {        
+	_handshake->setSeekPointer(_handshake->reference() + ret);
         log_debug (_("Read second data block in handshake"));
     } else {
         log_error (_("Couldn't read second data block in handshake"));
 //        return false;
     }
-    if (ret > RTMP_HANDSHAKE_SIZE) {
-	ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-	if (ret == RTMP_HANDSHAKE_SIZE) {        
-	    log_debug (_("Read second data block in handshake"));
-	} else {
-	    log_error (_("Couldn't read second data block in handshake"));
-//        return false;
-	}
-    }
-
-    ret = writeNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
+    
+    // For some reason, Red5 won't connect unless the connect packet is
+    // part of the final handshake packet. Sending the identical data with
+    // two writeNet()s won't connect. Go figure...
+    _handshake->resize(RTMP_HANDSHAKE_SIZE + data.size());
+    // FIXME: unless the handshake is all zeros, Gnash won't connect to
+    // Red5 for some reason. Cygnal isn't so picky.
+    _handshake->clear();
+    _handshake->setSeekPointer(_handshake->reference() + RTMP_HANDSHAKE_SIZE);
+    // Add the NetConnection::connect() packet
+    _handshake->append(data.reference(), data.allocated());
+    ret = writeNet(_handshake->reference(), _handshake->allocated());
     if ( ret <= 0 ) {
 	return false;
     }
-
+    
     // Since the handshake completed sucessfully, we're connected.
     _connected == true;
 

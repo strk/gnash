@@ -44,6 +44,7 @@ public:
     bool handShakeWait();
 //    bool handShakeResponse();
     bool clientFinish();
+    bool clientFinish(amf::Buffer &data);
     bool handShakeRequest();
     
     // These are used for creating the primary objects
