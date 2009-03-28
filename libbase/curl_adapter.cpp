@@ -41,7 +41,7 @@ namespace gnash {
 // Stub for warning about access when no libcurl is defined.
 
 std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& /*url*/, const std::string&,
+NetworkAdapter::makeStream(const std::string& /*url*/, 
         const std::string& /*cachefile*/)
 {
 	log_error(_("libcurl is not available, but "
@@ -50,17 +50,13 @@ NetworkAdapter::makeStream(const std::string& /*url*/, const std::string&,
 }
 
 std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
-        const std::string& cachefile)
+NetworkAdapter::makeStream(const std::string& /*url*/,
+        const std::string& /*postdata*/,
+        const std::string& /*cachefile*/)
 {
-    return makeStream(url);
-}
-
-std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& url, const std::string& postdata,
-        const RequestHeaders& headers, const std::string& cachefile)
-{
-    return makeStream(url);
+	log_error(_("libcurl is not available, but "
+	            "Gnash has attempted to use the curl adapter"));
+	return std::auto_ptr<IOChannel>();
 }
 
 } // namespace gnash
