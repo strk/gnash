@@ -106,7 +106,7 @@ NetStream_as::NetStream_as()
     _audioInfoKnown(false),
 
     // TODO: figure out if we should take another path to get to the clock
-    _playbackClock(new InterruptableVirtualClock(&(getVM().getClock()))),
+    _playbackClock(new InterruptableVirtualClock(getVM().getClock())),
     _playHead(_playbackClock.get()), 
     _soundHandler(_vm.getRoot().runInfo().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),

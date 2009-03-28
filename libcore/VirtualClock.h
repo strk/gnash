@@ -63,16 +63,19 @@ public:
 
 	/// Construct an InterruptableVirtualClock from a VirtualClock source
 	//
-	/// The interruptable virtual clock starts in 'stop' mode
+	/// The interruptable virtual clock starts in 'stop' mode,
+    /// use resume() to start.
 	///
 	/// @param src
-	///	A VirtualClock to use as source, ownership transferred
+	///	A VirtualClock to use as source, ownership is retained by caller
+    /// which should guarantee to keep the source alive for the whole
+    /// lifetime of this instance.
 	///
-	InterruptableVirtualClock(VirtualClock* src)
+	InterruptableVirtualClock(VirtualClock& src)
 		:
 		_src(src),
 		_elapsed(0),
-		_offset(_src->elapsed()),
+		_offset(_src.elapsed()),
 		_paused(true)
 	{
 	}
@@ -81,14 +84,14 @@ public:
 	unsigned long int elapsed() const
 	{
 		if ( ! _paused ) // query source if not stopped
-			_elapsed = _src->elapsed()-_offset;
+			_elapsed = _src.elapsed()-_offset;
 		return _elapsed;
 	}
 
 	void restart()
 	{
 		_elapsed = 0;
-		_offset = _src->elapsed();
+		_offset = _src.elapsed();
 	}
 
 	void pause()
@@ -102,14 +105,14 @@ public:
 		if ( ! _paused ) return; // nothing to do
 		_paused = false;
 
-		unsigned long now = _src->elapsed();
+		unsigned long now = _src.elapsed();
 		_offset = ( now - _elapsed );
 		assert( now-_offset == _elapsed ); // check if we did the right thing
 	}
 
 private:
 
-	std::auto_ptr<VirtualClock> _src;
+	VirtualClock& _src;
 
 	mutable unsigned long int _elapsed;
 

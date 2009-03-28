@@ -103,7 +103,12 @@ Gui::Gui() :
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
-    ,_virtualClock(&_systemClock)
+
+    // NOTE: it's important that _systemClock is constructed
+    //       before and destroyed after _virtualClock !
+    ,_systemClock()
+    ,_virtualClock(_systemClock)
+
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -146,7 +151,12 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
-    ,_virtualClock(&_systemClock)
+
+    // NOTE: it's important that _systemClock is constructed
+    //       before and destroyed after _virtualClock !
+    ,_systemClock()
+    ,_virtualClock(_systemClock)
+
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
