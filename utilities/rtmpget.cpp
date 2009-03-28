@@ -102,6 +102,17 @@ std::vector<std::string> infiles;
 typedef boost::shared_ptr<amf::Buffer> BufferSharedPtr;
 typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
 
+const char *ping_str[] = {
+    "PING_CLEAR",
+    "PING_PLAY",
+    "Unknown Ping 2",
+    "PING_TIME",
+    "PING_RESET",
+    "Unknown Ping 2",
+    "PING_CLIENT",
+    "PONG_CLIENT"
+};
+
 // end of globals
 
 int
@@ -413,7 +424,16 @@ main(int argc, char *argv[])
 		    log_error("Couldn't decode RTMP message header");
 		    continue;
 		}
+		if (rthead->type == RTMP::SERVER) {
+		    log_debug("Got a unknown server message");
+		    continue;
+		}
 		
+		if (rthead->type == RTMP::PING) {
+		    boost::shared_ptr<RTMP::rtmp_ping_t> ping = client.decodePing(ptr->reference() + rthead->head_size);
+		    log_debug("Got a Ping, type %s", ping_str[ping->type]);
+		    continue;
+		}
 		RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		if (msg) {
 // 		    msg->dump();
@@ -450,16 +470,10 @@ main(int argc, char *argv[])
     // make the createStream
     log_debug("Sending NetStream::createStream message,");
     BufferSharedPtr buf3 = client.encodeStream(0x2);
-//    buf3->dump();
-    client.sendMsg(0x3, RTMP::HEADER_12, buf3->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf3);
+    buf3->dump();
+    client.sendMsg(0x3, RTMP::HEADER_8, buf3->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf3);
     
-//     RTMPMsg *msg2 = client.sendRecvMsg(0x3, RTMP::HEADER_12, buf3->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, buf3);
     double streamID = 0.0;
-
-//     if (!msg2) {
-//         log_error("No response from INVOKE of NetStream::createStream");
-//         exit(-1);
-//     }
 
     // Read the responses back from the server.  This is usually a series of system
     // messages on channel 2, and the response message on channel 3 from our request.
@@ -485,7 +499,7 @@ main(int argc, char *argv[])
 
     // If we got no responses, something obviously went wrong.
     if (!que->size()) {
-        log_error("No response from INVOKE of NetConnection connect");
+        log_error("No response from INVOKE of NetStream::createStream");
         exit(-1);
     }
 
@@ -544,175 +558,142 @@ main(int argc, char *argv[])
 	}
     }    
     
-#if 1
-    boost::shared_ptr<amf::Buffer> blob(new Buffer("08 00 00 02 00 00 22 14 01 00 00 00 02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 02 00 0e 44 61 72 6b 4b 6e 69 67 68 74 2e 66 6c 76 82 00 00 00 00 03 00 00 00 01 00 00 27 10"));
-    blob->dump();
+//     boost::shared_ptr<amf::Buffer> blob(new Buffer("08 00 00 02 00 00 22 14 01 00 00 00 02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 02 00 0e 44 61 72 6b 4b 6e 69 67 68 74 2e 66 6c 76 82 00 00 00 00 03 00 00 00 01 00 00 27 10"));
+// //     boost::shared_ptr<amf::Buffer> blob(new Buffer("02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 02 00 0e 44 61 72 6b 4b 6e 69 67 68 74 2e 66 6c 76 82 00 00 00 00 03 00 00 00 01 00 00 27 10"));
+//     blob->dump();
 //     client.writeNet(*blob);
+//     client.sendMsg(0x8, RTMP::HEADER_12, blob->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *blob);
     
     // We need the streamID for all folowing operations on this stream
     int id = int(streamID);
     
     // make the NetStream::play() operations for ID 2 encoded object
     log_debug("Sending NetStream play message,");
-    BufferSharedPtr buf4 = client.encodeStreamOp(id, RTMP::STREAM_PLAY, false, filename.c_str());
-//    BufferSharedPtr buf4 = client.encodeStreamOp(0, RTMP::STREAM_PLAY, false, "gate06_tablan_bcueu_01");
-//     log_debug("TRACE: buf4: %s", hexify(buf4->reference(), buf4->size(), true));
+    BufferSharedPtr buf4 = client.encodeStreamOp(id-1.0, RTMP::STREAM_PLAY, false, filename.c_str());
     buf4->dump();
-    client.sendMsg(0x8, RTMP::HEADER_12, buf4->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf4);
+    client.sendMsg(0x3, RTMP::HEADER_12, buf4->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf4);
 
-    // Read the responses back from the server.  This is usually a series of system
-    // messages on channel 2, and the response message on channel 3 from our request.
-    response.reset();
-    response = client.recvMsg();
-    if (!response) {
-	log_error("Got no response from the RTMP server");
-    }
-
-    // when doing remoting calls I don't see this problem with an empty packet from Red5,
-    // but when I do streaming, it's always there, so we need to remove it.
-    pktstart = response->reference();
-    if (*pktstart == 0xff) {
-	log_debug("Got empty packet in buffer.");
-	pktstart++;
-    }
-
-    // The response packet contains multiple messages for multiple channels, so we
-    // we have to split the Buffer into seperate messages on a chunksize boundary.
-    rthead.reset();
-    que.reset();
-    que = client.split(pktstart, response->allocated()-1);
-
-    // If we got no responses, something obviously went wrong.
-    if (!que->size()) {
-        log_error("No response from INVOKE of NetConnection connect");
-        exit(-1);
-    }
-
-    // There is a queue of queues used to hold all the messages. The first queue
-    // is indexed by the channel number, the second queue is all the messages that
-    // have arrived for that channel.
-    while (que->size()) {	// see if there are any messages at all
-	// Get the CQue for the first channel
-	CQue *channel_q = que->front();
-	que->pop_front();	// remove this Cque from the top level que
-
-	while (channel_q->size()) {
-	    // Get the first message in the channel queue
-	    boost::shared_ptr<amf::Buffer> ptr = channel_q->pop();
-// 	    channel_q->pop_front();	// remove this Buffer from the Cque
-	    ptr->dump();
+    // Read the responses back from the server.
+    bool done = false;
+    int fd = 0 ;
+    do {
+	response.reset();
+	response = client.recvMsg();
+	if (!response) {
+	    log_error("Got no response from the RTMP server");
+	}
+	
+	// when doing remoting calls I don't see this problem with an empty packet from Red5,
+	// but when I do streaming, it's always there, so we need to remove it.
+	pktstart = response->reference();
+	if (*pktstart == 0xff) {
+	    log_debug("Got empty packet in buffer.");
+	    pktstart++;
+	}
+	
+	// The response packet contains multiple messages for multiple channels, so we
+	// we have to split the Buffer into seperate messages on a chunksize boundary.
+	rthead.reset();
+	que.reset();
+	que = client.split(pktstart, response->allocated()-1);
+	
+	// If we got no responses, something obviously went wrong.
+	if (!que->size()) {
+	    log_error("No response from INVOKE of NetStream::play");
+	    exit(-1);
+	}	
+	
+	// There is a queue of queues used to hold all the messages. The first queue
+	// is indexed by the channel number, the second queue is all the messages that
+	// have arrived for that channel.
+	while (que->size()) {	// see if there are any messages at all
+	    // Get the CQue for the first channel
+	    CQue *channel_q = que->front();
+	    que->pop_front();	// remove this Cque from the top level que
 	    
-	    log_debug("%s: There are %d messages in the RTMP input queue, %d",
-		      __PRETTY_FUNCTION__, que->size(), que->front()->size());
-	    if (ptr) {		// If there is legit data
-		rthead = client.decodeHeader(ptr->reference());
-		if (!rthead) {
-		    log_error("Couldn't decode RTMP message header");
-		    continue;
-		}
+	    while (channel_q->size()) {
+		// Get the first message in the channel queue
+		boost::shared_ptr<amf::Buffer> ptr = channel_q->pop();
+// 		ptr->dump();
 		
-		RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
-		if (msg) {
+		log_debug("%s: There are %d messages in the RTMP input queue, %d",
+			  __PRETTY_FUNCTION__, que->size(), que->front()->size());
+		if (ptr) {		// If there is legit data
+		    rthead = client.decodeHeader(ptr->reference());
+		    if (!rthead) {
+			log_error("Couldn't decode RTMP message header");
+			continue;
+		    }
+		    // The first chunk of data in an FLV file is the onMetaData.
+		    // If we get this type, open the file. Occasionally there are
+		    // multiple onMetaData blocks in an FLV, so keep going
+		    if (rthead->type == RTMP::NOTIFY) {
+			log_debug("Got a NOTIFY message in FLV file!");
+			if (!fd) {
+			    log_debug("Opening output file %s", filename);
+			    fd = open(filename.c_str(), O_WRONLY|O_CREAT, S_IRWXU);
+			}
+			write(fd, ptr->reference(), ptr->allocated());
+			continue;
+		    }
+		    if (rthead->type == RTMP::AUDIO_DATA) {
+			log_debug("Got a AUDIO message in FLV file!");
+			if (fd) {
+			    write(fd, ptr->reference(), ptr->allocated());
+			}
+			continue;
+		    }
+		    if (rthead->type == RTMP::VIDEO_DATA) {
+			log_debug("Got a VIDEO message in FLV file!");
+			if (fd) {
+			    write(fd, ptr->reference(), ptr->allocated());
+			}
+			continue;
+		    }
+
+		    RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		    if (msg) {
 // 		    msg->dump();
-		    if (msg->getMethodName() == "onStatus") {
-			log_error("Got a status message: %s", msg->getMethodName());
+			if (msg->getMethodName() == "onStatus") {
+			    log_error("Got a status message: %s", msg->getMethodName());
 // 			msg->at(0)->dump();
-			boost::shared_ptr<amf::Element> level = msg->findProperty("level");
-			if ((level->getType() == amf::Element::STRING_AMF0) && (strcmp(level->to_string(), "error") == 0)) {
-			    boost::shared_ptr<amf::Element> description = msg->findProperty("description");
-			    if (description) {
-				log_debug("Got an error from NetStream::play()! %s", description->to_string());
+			    boost::shared_ptr<amf::Element> level = msg->findProperty("level");
+			    if ((level->getType() == amf::Element::STRING_AMF0) && (strcmp(level->to_string(), "error") == 0)) {
+				boost::shared_ptr<amf::Element> description = msg->findProperty("description");
+				if (description) {
+				    log_error("Got an error status from NetStream::play()! %s", description->to_string());
+				} else {
+				    log_debug("Got a status message: %s", msg->getMethodName());
+				}
 			    }
 			}
-		    }
-		    if (msg->getMethodName() == "_error") {
-			log_error("Got an error message: %s", msg->getMethodName());
-//  			msg->at(0)->dump();
-		    }
-		    if (msg->getMethodName() == "_result") {
-			log_debug("Got a result message: %s", msg->getMethodName());
-			if (msg->getElements().size() > 0) {
-// 			    msg->at(0)->dump();
+			if (msg->getMethodName() == "_error") {
+			    boost::shared_ptr<amf::Element> description = msg->findProperty("description");
+			    if (description) {
+				log_error("Got an error from NetStream::play()! %s", description->to_string());
+ 			    } else {
+				log_error("Got an error message: %s", msg->getMethodName());
+			    }
 			}
+			if (msg->getMethodName() == "_result") {
+			    log_debug("Got a result message: %s", msg->getMethodName());
+			    if (msg->getElements().size() > 0) {
+// 			    msg->at(0)->dump();
+			    }
+			}
+		    } else {
+			log_error("Couldn't decode RTMP message Body");
+			continue;
 		    }
-		} else {
-		    log_error("Couldn't decode RTMP message Body");
-		    continue;
 		}
 	    }
 	}
+    } while (!done);
+
+    if (fd) {
+	close(fd);
     }
     
-#if 0
-    if (msg3) {
-        msg3->dump();
-        if (msg3->getStatus() ==  RTMPMsg::NS_PLAY_START) {
-            log_debug("Sent NetStream::play message sucessfully.");
-        } else {
-            log_error("Couldn't send NetStream::play message,");
-//          exit(-1);
-        }
-    }
-
-    int loop = 20;
-    do {
-        BufferSharedPtr msgs = client.recvMsg(1);   // use a 1 second timeout
-        if (msgs == 0) {
-            log_error("Never got any data!");
-            exit(-1);
-        }
-        RTMP::queues_t *que = client.split(msgs);
-        if (que == 0) {
-            log_error("Never got any messages!");
-            exit(-1);
-        }
-        deque<CQue *>::iterator it;
-        for (it = que->begin(); it != que->end(); it++) {
-            CQue *q = *(it);
-            q->dump();
-        }
-        while (que->size()) {
-            cerr << "QUE SIZE: " << que->size() << endl;
-            BufferSharedPtr ptr = que->front()->pop();
-            if (!ptr->empty()) {
-                que->pop_front();   // delete the item from the queue
-                /* RTMP::rtmp_head_t *rthead = */ client.decodeHeader(ptr);
-                msg2 = client.decodeMsgBody(ptr);
-                if (msg2 == 0) {
-    //              log_error("Couldn't process the RTMP message!");
-                    continue;
-                }
-            } else {
-                log_error("Buffer size (%d) out of range at %d", ptr->size(), __LINE__);
-                break;
-            }
-        }
-    } while(loop--);
-#endif
-#endif
-//     std::vector<amf::Element *> hell = msg2->getElements();
-//     std::vector<amf::Element *> props = hell[0]->getProperties();
-
-//     cerr << "HELL Elements: " << hell.size() << endl;
-//     cerr << "HELL Properties: " << props.size() << endl;
-
-// //     cerr << props[0]->getName() << endl;
-// //     cerr << props[0]->to_string() << endl;
-//     cerr << props[0]->getName() << endl;
-// //    cerr << props[0]->to_number() << endl;
-//     cerr << props[1]->getName() << ": " << props[1]->to_string() << endl;
-//     cerr << props[2]->getName() << ": " << props[3]->to_string() << endl;
-//     cerr << props[3]->getName() << ": " << props[3]->to_string() << endl;
-
-//     Element *eell = hell[0]->findProperty("level");
-//     if (eell) {
-//  eell->dump();
-//     }
-//     *eell = hell[0]->findProperty("code");
-//     if (eell) {
-//  eell->dump();
-//     }
-
 #if 0
     // Write the packet to disk so we can anaylze it with other tools
     int fd = open("outbuf.raw",O_WRONLY|O_CREAT, S_IRWXU);
