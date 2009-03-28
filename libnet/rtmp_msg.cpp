@@ -140,6 +140,10 @@ RTMPMsg::checkStatus(boost::shared_ptr<amf::Element>  /* el */)
 				_status = RTMPMsg::NS_PLAY_FAILED;
 				return _status;
 			    }
+			    if (value == "NetStream.InvalidArg") {
+				_status = RTMPMsg::NS_INVALID_ARGUMENT;
+				return _status;
+			    }
 			    if (value == "NetStream.Play.File.Structure.Invalid") {
 				_status = RTMPMsg::NS_PLAY_FILE_STRUCTURE_INVALID;
 				return _status;
