@@ -624,9 +624,8 @@ main(int argc, char *argv[])
 			log_error("Couldn't decode RTMP message header");
 			continue;
 		    }
-		    // The first chunk of data in an FLV file is the onMetaData.
-		    // If we get this type, open the file. Occasionally there are
-		    // multiple onMetaData blocks in an FLV, so keep going
+		    // The first chunk of data in an FLV file is the onMetaData data block.
+		    // If we get this type, open the file.
 		    if (rthead->type == RTMP::NOTIFY) {
 			log_debug("Got a NOTIFY message in FLV file!");
 			if (!fd) {
@@ -651,6 +650,9 @@ main(int argc, char *argv[])
 			continue;
 		    }
 
+		    // If it's not a Notify, Audio, or Video message, then we're still processing
+		    // responses from the NetStream::play() messages. We get several before the
+		    // the video starts.
 		    RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		    if (msg) {
 // 		    msg->dump();
