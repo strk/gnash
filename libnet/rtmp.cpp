@@ -273,10 +273,10 @@ RTMP::decodeHeader(boost::uint8_t *in)
     boost::uint8_t *tmpptr = in;
 
     head->channel = *tmpptr & RTMP_INDEX_MASK;
-    log_debug (_("The AMF channel index is %d"), head->channel);
+//     log_debug (_("The AMF channel index is %d"), head->channel);
     
     head->head_size = headerSize(*tmpptr++);
-    log_debug (_("The header size is %d"), head->head_size);
+//     log_debug (_("The header size is %d"), head->head_size);
 
     if (head->head_size > RTMP_MAX_HEADER_SIZE) {
 	head.reset();
@@ -290,7 +290,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
         _mystery_word = (_mystery_word << 8) + *tmpptr++;
 
-        log_debug(_("The mystery word is: %d"), _mystery_word);
+//         log_debug(_("The mystery word is: %d"), _mystery_word);
     }
 
     if (head->head_size >= 8) {
@@ -298,30 +298,32 @@ RTMP::decodeHeader(boost::uint8_t *in)
         head->bodysize = (head->bodysize << 8) + *tmpptr++;
         head->bodysize = (head->bodysize << 8) + *tmpptr++;
         head->bodysize = head->bodysize & 0xffffff;
-        log_debug(_("The body size is: %d"), head->bodysize);
+//         log_debug(_("The body size is: %d"), head->bodysize);
     }
 
     if (head->head_size >= 8) {
 	boost::uint8_t byte = *tmpptr;
         head->type = (content_types_e)byte;
         tmpptr++;
-	if (head->type <= RTMP::INVOKE ) {
-	    log_debug(_("The type is: %s"), content_str[head->type]);
-	} else {
-	    log_debug(_("The type is: 0x%x"), head->type);
-	}
+// 	if (head->type <= RTMP::INVOKE ) {
+// 	    log_debug(_("The type is: %s"), content_str[head->type]);
+// 	} else {
+// 	    log_debug(_("The type is: 0x%x"), head->type);
+// 	}
     }
 
     if (head->head_size == 1) {
 	if (head->channel == RTMP_SYSTEM_CHANNEL) {
 	    head->bodysize = sizeof(boost::uint16_t) * 3;
-	    log_debug("Got a one byte header system message: %s", hexify(in, head->bodysize, false));
+// 	    log_debug("Got a one byte header system message: %s", hexify(in, head->bodysize, false));
 	} else {
-	    log_debug("Got a continuation packet for channel #%d", head->channel);
+// 	    log_debug("Got a continuation packet for channel #%d", head->channel);
 	    head->bodysize = 0;
 	}
     }
-    
+
+    log_debug("RTMP %s: channel: %d, type: %s, header_size %d, bodysize: %d",
+	      content_str[head->type], head->channel, head->head_size, head->bodysize);
 //     switch(head->type) {
 //       case CHUNK_SIZE:
 //       case BYTES_READ:
@@ -345,7 +347,7 @@ RTMP::decodeHeader(boost::uint8_t *in)
     if (head->head_size == 12) {
         head->src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
-        log_debug(_("The source/destination is: %x"), head->src_dest);
+//         log_debug(_("The source/destination is: %x"), head->src_dest);
     }
 
     return head;
@@ -632,7 +634,7 @@ RTMP::decodePing(amf::Buffer &buf)
 RTMPMsg *
 RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     AMF amf_obj;
     boost::uint8_t *ptr = data;
     boost::uint8_t* tooFar = ptr + size;
@@ -1117,7 +1119,9 @@ RTMP::recvMsg(int fd)
  	}
 	if ((ret == 1) && (*(buf->reference()) == 0xff)) {
 	    log_debug("Got an empty packet from the server at line %d", __LINE__);
-	    continue;
+	    ret = 0;
+	    buf->clear();
+ 	    continue;
 	}
 	// ret is "no position" when the socket is closed from the other end of the connection,
 	// so we're done.
@@ -1144,14 +1148,14 @@ RTMP::recvMsg(int fd)
 boost::shared_ptr<RTMP::queues_t>
 RTMP::split(amf::Buffer &buf)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     return split(buf.reference(), buf.allocated());
 }
 
 boost::shared_ptr<RTMP::queues_t>
 RTMP::split(boost::uint8_t *data, size_t size)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     if (data == 0) {
 	log_error("Buffer pointer is invalid.");
@@ -1177,9 +1181,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	// processed differently.
 	// FIXME: skip system messages for now!
 	if (rthead->channel == RTMP_SYSTEM_CHANNEL) {
-	    log_debug("FIXME: %s: Got a message on the system channel!", __FUNCTION__);
-//	    ptr += rthead->head_size + rthead->bodysize;
-//	    continue;
+// 	    log_debug("FIXME: %s: Got a message on the system channel!", __FUNCTION__);
 	}
 	// Make sure the header size we just got is in range. We can
 	// proceed as long as it is in range, but if it is out of
