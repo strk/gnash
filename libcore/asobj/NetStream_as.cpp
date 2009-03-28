@@ -38,7 +38,6 @@
 #include "movie_root.h"
 #include "GnashAlgorithm.h"
 #include "VirtualClock.h" // for PlayHead
-#include "SystemClock.h"
 
 #include "MediaHandler.h"
 #include "StreamProvider.h"
@@ -106,9 +105,8 @@ NetStream_as::NetStream_as()
     _audioDecoder(0),
     _audioInfoKnown(false),
 
-    // TODO: if audio is available, use _audioClock instead of SystemClock
-    // as additional source
-    _playbackClock(new InterruptableVirtualClock(new SystemClock)),
+    // TODO: figure out if we should take another path to get to the clock
+    _playbackClock(new InterruptableVirtualClock(&(getVM().getClock()))),
     _playHead(_playbackClock.get()), 
     _soundHandler(_vm.getRoot().runInfo().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
@@ -1060,7 +1058,8 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
         // this one we might avoid :) -- a less intrusive logging could
         // be take note about how many things we're pushing over
         log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with "
-                "timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
+                "timestamp %d", ts, _audioStreamer._audioQueue.size()+1,
+                nextTimestamp); 
 #endif
 
         _audioStreamer.push(audio);

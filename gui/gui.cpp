@@ -103,6 +103,7 @@ Gui::Gui() :
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
+    ,_virtualClock(&_systemClock)
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -145,6 +146,7 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
+    ,_virtualClock(&_systemClock)
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -820,6 +822,9 @@ Gui::play()
         //       already what it is ?!
         sound::sound_handler* s = _stage->runInfo().soundHandler();
         if ( s ) s->unpause();
+
+        log_debug("Starting virtual clock");
+        _virtualClock.resume();
     }
 
     playHook ();
@@ -841,6 +846,9 @@ Gui::stop()
     sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->pause();
 
+    log_debug("Pausing virtual clock");
+    _virtualClock.pause();
+
     stopHook();
 }
 
@@ -853,11 +861,18 @@ Gui::pause()
     }
     else
     {
+        // TODO: call stop() instead ?
+        // The only thing I see is that ::stop exits full-screen,
+        // but I'm not sure that's intended behaviour
+
         // @todo since we registered the sound handler, shouldn't we know
         //       already what it is ?!
     	sound::sound_handler* s = _stage->runInfo().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
+
+        log_debug("Pausing virtual clock");
+        _virtualClock.pause();
 
         stopHook();
     }
@@ -889,6 +904,10 @@ Gui::start()
     
     // to properly update stageMatrix if scaling is given  
     resize_view(_width, _height); 
+
+    log_debug("Starting virtual clock");
+    _virtualClock.resume();
+
 }
 
 bool

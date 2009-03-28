@@ -26,6 +26,8 @@
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "GnashKey.h" // for gnash::key::code type
 #include "smart_ptr.h"
+#include "VirtualClock.h"
+#include "SystemClock.h"
 
 #ifdef USE_SWFTREE
 #include "tree.hh" // for tree
@@ -100,6 +102,13 @@ public:
     virtual void setInterval(unsigned int interval) {
       _interval = interval;
     }
+
+    /// Return the clock provided by this Gui.
+    //
+    /// The Gui clock will be paused when the gui is put
+    /// in pause mode and resumed when gui playback is resumed.
+    ///
+    VirtualClock& getClock() { return _virtualClock; }
 
     /// Set the time in milliseconds after which the programme should exit.
     virtual void setTimeout(unsigned int timeout) = 0;
@@ -511,6 +520,9 @@ private:
 
     /// If true, updated regions (invalidated ranges) are visibly outlined.
     bool _showUpdatedRegions;
+
+    SystemClock _systemClock;
+    InterruptableVirtualClock _virtualClock;
     
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
 	int _xpointer;
