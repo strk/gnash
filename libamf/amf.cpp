@@ -967,6 +967,7 @@ AMF::extractAMF(boost::uint8_t *in, boost::uint8_t* tooFar)
             if (static_cast<size_t>(tooFar - tmpptr) < sizeof(const double)) {
                 log_error(_("AMF data segment too short to contain"
                             "type NUMBER"));
+		el.reset();
                 return el;
             }
             double swapped = *(reinterpret_cast<const double*>(tmpptr));
