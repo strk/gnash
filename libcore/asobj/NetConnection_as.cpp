@@ -347,17 +347,6 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		notifyStatus(CONNECT_FAILED);
 		return;
 	    }
-#if 0
-	    if (!_rtmp_client->clientFinish()) {
-		log_error("RTMP handshake completion failed");
-		notifyStatus(CONNECT_FAILED);
-		return;
-	    } else {
-		log_debug("RTMP handshake completed");
-		notifyStatus(CONNECT_SUCCESS);
-		_isConnected = true;
-	    }
-#endif
 	    tcUrl = url.protocol() + "://" + url.hostname();
 	    if (!url.port().empty()) {
 		tcUrl += ":" + url.port();
