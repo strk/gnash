@@ -631,6 +631,7 @@ main(int argc, char *argv[])
 			if (!fd) {
 			    log_debug("Opening output file %s", filename);
 			    fd = open(filename.c_str(), O_WRONLY|O_CREAT, S_IRWXU);
+			    write(fd, "FLV", 3);
 			}
 			write(fd, ptr->reference(), ptr->allocated());
 			continue;
