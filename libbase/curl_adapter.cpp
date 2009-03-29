@@ -50,13 +50,20 @@ NetworkAdapter::makeStream(const std::string& /*url*/,
 }
 
 std::auto_ptr<IOChannel>
-NetworkAdapter::makeStream(const std::string& /*url*/,
+NetworkAdapter::makeStream(const std::string& url,
         const std::string& /*postdata*/,
-        const std::string& /*cachefile*/)
+        const std::string& cachefile)
 {
-	log_error(_("libcurl is not available, but "
-	            "Gnash has attempted to use the curl adapter"));
-	return std::auto_ptr<IOChannel>();
+    return makeStream(url, cachefile);
+}
+
+std::auto_ptr<IOChannel>
+NetworkAdapter::makeStream(const std::string& url,
+           const std::string& /*postdata*/,
+            const RequestHeaders& /*headers*/,
+           const std::string& cachefile)
+{
+    return makeStream(url, cachefile);
 }
 
 } // namespace gnash
