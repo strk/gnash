@@ -201,7 +201,7 @@ Network::createServer(short port)
 
     retries = 0;
 
-    nodeaddr = inet_lnaof(*thisaddr);
+//     nodeaddr = inet_lnaof(*thisaddr);
     while (retries < 5) {
         if (bind(_listenfd, reinterpret_cast<struct sockaddr *>(&sock_in),
                  sizeof(sock_in)) == -1) {
