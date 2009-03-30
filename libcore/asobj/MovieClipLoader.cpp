@@ -46,41 +46,54 @@
 
 namespace gnash {
 
-  /// This class is used to queue a function call action
-  //
-  /// Exact use is to queue onLoadInit, which should be invoked
-  /// after actions of in first frame of a loaded movie are executed.
-  /// Since those actions are queued the only way to execute something
-  /// after them is to queue the function call as well.
-  ///
-  /// The class might be made more general and accessible outside
-  /// of the MovieClipLoader class. For now it only works for
-  /// calling a function with a two argument.
-  ///
-  class DelayedFunctionCall: public ExecutableCode {
 
-  public:
+// Forward declarations
+namespace {
+    as_value moviecliploader_loadclip(const fn_call& fn);
+    as_value moviecliploader_unloadclip(const fn_call& fn);
+    as_value moviecliploader_getprogress(const fn_call& fn);
+    as_value moviecliploader_new(const fn_call& fn);
+    void attachMovieClipLoaderInterface(as_object& o);
+    as_object* getMovieClipLoaderInterface();
+}
 
-    DelayedFunctionCall(as_object* target, string_table::key name, const as_value& arg1, const as_value& arg2)
-      :
-      _target(target),
-      _name(name),
-      _arg1(arg1),
-      _arg2(arg2)
+/// This class is used to queue a function call action
+//
+/// Exact use is to queue onLoadInit, which should be invoked
+/// after actions of in first frame of a loaded movie are executed.
+/// Since those actions are queued the only way to execute something
+/// after them is to queue the function call as well.
+///
+/// The class might be made more general and accessible outside
+/// of the MovieClipLoader class. For now it only works for
+/// calling a function with a two argument.
+///
+class DelayedFunctionCall : public ExecutableCode
+{
+
+public:
+
+    DelayedFunctionCall(as_object* target, string_table::key name,
+            const as_value& arg1, const as_value& arg2)
+        :
+        _target(target),
+        _name(name),
+        _arg1(arg1),
+        _arg2(arg2)
     {}
 
 
     ExecutableCode* clone() const
     {
-      return new DelayedFunctionCall(*this);
+        return new DelayedFunctionCall(*this);
     }
 
     virtual void execute()
     {
-      _target->callMethod(_name, _arg1, _arg2);
+        _target->callMethod(_name, _arg1, _arg2);
     }
 
-  #ifdef GNASH_USE_GC
+#ifdef GNASH_USE_GC
     /// Mark reachable resources (for the GC)
     //
     /// Reachable resources are:
@@ -92,50 +105,15 @@ namespace gnash {
       _arg1.setReachable();
       _arg2.setReachable();
     }
-  #endif // GNASH_USE_GC
+#endif // GNASH_USE_GC
 
-  private:
+private:
 
     as_object* _target;
     string_table::key _name;
     as_value _arg1, _arg2;
 
-  };
-
-// Forward declarations
-static as_value moviecliploader_loadclip(const fn_call& fn);
-static as_value moviecliploader_unloadclip(const fn_call& fn);
-static as_value moviecliploader_getprogress(const fn_call& fn);
-static as_value moviecliploader_new(const fn_call& fn);
-
-static void
-attachMovieClipLoaderInterface(as_object& o)
-{
-  	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
-	o.init_member("unloadClip",
-            new builtin_function(moviecliploader_unloadclip));
-	o.init_member("getProgress",
-            new builtin_function(moviecliploader_getprogress));
-
-	// NOTE: we want addListener/removeListener/broadcastMessage
-	//       but don't what the _listeners property here...
-	// TODO: add an argument to AsBroadcaster::initialize skip listeners ?
-	AsBroadcaster::initialize(o);
-	o.delProperty(NSV::PROP_uLISTENERS);
-  
-}
-
-static as_object*
-getMovieClipLoaderInterface()
-{
-	static boost::intrusive_ptr<as_object> o;
-	if ( o == NULL )
-	{
-		o = new as_object(getObjectInterface());
-		attachMovieClipLoaderInterface(*o);
-	}
-	return o.get();
-}
+};
 
 class MovieClipLoader: public as_object
 {
@@ -152,11 +130,6 @@ public:
 
 private:
 
-	bool          _started;
-	bool          _completed;
-	std::string     _filespec;
-	int           _progress;
-	bool          _error;
 };
 
 MovieClipLoader::MovieClipLoader()
@@ -249,7 +222,54 @@ MovieClipLoader::unloadClip()
   GNASH_REPORT_FUNCTION;
 }
 
-static as_value
+/// Extern.
+void
+moviecliploader_class_init(as_object& global)
+{
+	// This is going to be the global Number "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl=NULL;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&moviecliploader_new,
+                getMovieClipLoaderInterface());
+	}
+	global.init_member("MovieClipLoader", cl.get()); 
+}
+
+
+namespace {
+
+void
+attachMovieClipLoaderInterface(as_object& o)
+{
+  	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
+	o.init_member("unloadClip",
+            new builtin_function(moviecliploader_unloadclip));
+	o.init_member("getProgress",
+            new builtin_function(moviecliploader_getprogress));
+
+	// NOTE: we want addListener/removeListener/broadcastMessage
+	//       but don't what the _listeners property here...
+	// TODO: add an argument to AsBroadcaster::initialize skip listeners ?
+	AsBroadcaster::initialize(o);
+	o.delProperty(NSV::PROP_uLISTENERS);
+  
+}
+
+as_object*
+getMovieClipLoaderInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( o == NULL )
+	{
+		o = new as_object(getObjectInterface());
+		attachMovieClipLoaderInterface(*o);
+	}
+	return o.get();
+}
+
+as_value
 moviecliploader_loadclip(const fn_call& fn)
 {
 
@@ -303,7 +323,7 @@ moviecliploader_loadclip(const fn_call& fn)
 
 }
 
-static as_value
+as_value
 moviecliploader_unloadclip(const fn_call& fn)
 {
   const std::string filespec = fn.arg(0).to_string();
@@ -311,7 +331,7 @@ moviecliploader_unloadclip(const fn_call& fn)
   return as_value();
 }
 
-static as_value
+as_value
 moviecliploader_new(const fn_call& /* fn */)
 {
 
@@ -322,7 +342,7 @@ moviecliploader_new(const fn_call& /* fn */)
 
 // Invoked every time the loading content is written to disk during
 // the loading process.
-static as_value
+as_value
 moviecliploader_getprogress(const fn_call& fn)
 {
 
@@ -373,18 +393,5 @@ moviecliploader_getprogress(const fn_call& fn)
 	return as_value(mcl_obj.get()); // will keep alive
 }
 
-void
-moviecliploader_class_init(as_object& global)
-{
-	// This is going to be the global Number "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl=NULL;
-
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&moviecliploader_new,
-                getMovieClipLoaderInterface());
-	}
-	global.init_member("MovieClipLoader", cl.get()); 
-}
-
+} // anonymous namespace
 } // end of gnash namespace
