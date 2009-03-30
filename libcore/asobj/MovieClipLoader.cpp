@@ -131,6 +131,7 @@ public:
 protected:
 
     void markReachableResources() const {
+        markAsObjectReachable();
     }
 
 private:
