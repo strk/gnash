@@ -124,12 +124,16 @@ public:
 	~MovieClipLoader();
 
 	/// MovieClip
-	bool loadClip(const std::string& url, MovieClip& target);
+	bool loadClip(const std::string& url, MovieClip* target);
 
 	void unloadClip();
 
-private:
+protected:
 
+    void markReachableResources() const {
+    }
+
+private:
 };
 
 MovieClipLoader::MovieClipLoader()
@@ -147,7 +151,7 @@ MovieClipLoader::~MovieClipLoader()
 }
 
 bool
-MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
+MovieClipLoader::loadClip(const std::string& url_str, MovieClip* target)
 {
     
     movie_root& mr = _vm.getRoot();
@@ -158,10 +162,10 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 	log_debug(_(" resolved url: %s"), url.str());
 #endif
 			 
-	as_value targetVal(&target);
+	as_value targetVal(target);
 	log_debug("Target is %s", targetVal);
 
-	bool ret = target.loadMovie(url);
+	bool ret = target->loadMovie(url);
 	if ( ! ret ) 
 	{
 
@@ -219,7 +223,7 @@ MovieClipLoader::loadClip(const std::string& url_str, MovieClip& target)
 void
 MovieClipLoader::unloadClip()
 {
-  GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 }
 
 /// Extern.
@@ -227,9 +231,9 @@ void
 moviecliploader_class_init(as_object& global)
 {
 	// This is going to be the global Number "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl=NULL;
+	static boost::intrusive_ptr<builtin_function> cl = NULL;
 
-	if ( cl == NULL )
+	if (cl == NULL)
 	{
 		cl=new builtin_function(&moviecliploader_new,
                 getMovieClipLoaderInterface());
@@ -316,7 +320,7 @@ moviecliploader_loadclip(const fn_call& fn)
 		str_url, (void*)sprite);
 #endif
 
-	ptr->loadClip(str_url, *sprite);
+	ptr->loadClip(str_url, sprite);
 
 	// We always want to return true unless something went wrong
 	return as_value(true);
