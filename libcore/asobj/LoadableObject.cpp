@@ -190,7 +190,11 @@ void
 LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 {
 
-    bool startTimer = _loadThreads.empty();
+    // We don't need to check before adding a timer, but
+    // this may optimize slightly (it was already in the code).
+    if (_loadThreads.empty()) {
+        getVM().getRoot().addAdvanceCallback(this);
+    }
 
     std::auto_ptr<LoadThread> lt (new LoadThread(str));
 
@@ -199,13 +203,7 @@ LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
     // of onData invocation.
     // Doing so also avoids processing queued load
     // request immediately
-    // 
     _loadThreads.push_front(lt.release());
-
-    if (startTimer)
-    {
-        getVM().getRoot().addAdvanceCallback(this);
-    }
 
     _bytesLoaded = 0;
     _bytesTotal = -1;
