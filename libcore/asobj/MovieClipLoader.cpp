@@ -121,7 +121,7 @@ public:
 
 	MovieClipLoader();
 
-	~MovieClipLoader();
+	~MovieClipLoader() {}
 
 	/// MovieClip
 	bool loadClip(const std::string& url, MovieClip* target);
@@ -144,10 +144,6 @@ MovieClipLoader::MovieClipLoader()
 	Array_as* ar = new Array_as();
 	ar->push(this);
 	set_member(NSV::PROP_uLISTENERS, ar);
-}
-
-MovieClipLoader::~MovieClipLoader()
-{
 }
 
 bool
