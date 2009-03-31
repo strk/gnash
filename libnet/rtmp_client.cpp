@@ -387,7 +387,7 @@ RTMPClient::handShakeRequest()
     }
 }
 
-// The client finished the handshake process by sending the second
+// The client finishes the handshake process by sending the second
 // data block we get from the server as the response
 bool
 RTMPClient::clientFinish()
@@ -401,36 +401,49 @@ bool
 RTMPClient::clientFinish(amf::Buffer &data)
 {
     GNASH_REPORT_FUNCTION;
-
+    bool done = false;
     int ret = 0;
+    int offset = 0;
+
     
-//     gnashSleep(1000000); // FIXME: why do we still need a delay here, when readNet() does a select ?
-    ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-    if (ret == RTMP_HANDSHAKE_SIZE) {
-	_handshake->setSeekPointer(_handshake->reference() + ret);
-        log_debug (_("Read first data block in handshake"));
-    } else {
-        log_error (_("Couldn't read first data block in handshake"));
-//        return false;
-    }
-    if (ret > RTMP_HANDSHAKE_SIZE) {
-	ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-	if (ret == RTMP_HANDSHAKE_SIZE) {        
-	    _handshake->setSeekPointer(_handshake->reference() + ret);
-	    log_debug (_("Read second data block in handshake"));
-	} else {
-	    log_error (_("Couldn't read second data block in handshake"));
-//        return false;
+    // The total size of incoming bytes is twice the handshake size, plus the handshake
+    // header byte. Then we append the NetConnection::connect packet as well.
+    size_t maxsize = (RTMP_HANDSHAKE_SIZE*2)+1+data.size();
+    boost::shared_ptr<amf::Buffer> buf(new amf::Buffer(maxsize));
+    do {
+	ret = readNet(buf->reference() + offset, buf->size() - offset);
+	offset += ret;
+	buf->setSeekPointer(buf->reference() + offset);
+	if (offset == (RTMP_HANDSHAKE_SIZE*2)+1) {
+	    done = true;
 	}
-    }
-    ret = readNet(_handshake->reference(), RTMP_HANDSHAKE_SIZE);
-    if (ret == RTMP_HANDSHAKE_SIZE) {        
-	_handshake->setSeekPointer(_handshake->reference() + ret);
-        log_debug (_("Read second data block in handshake"));
+	if (ret < 0) {
+	    log_error (_("Couldn't read data block in handshake!"));
+	    done = true;
+	}
+    } while (!done);    
+    
+    if (buf->allocated() > RTMP_HANDSHAKE_SIZE) {
+	log_debug (_("Read first data block in handshake"));
     } else {
-        log_error (_("Couldn't read second data block in handshake"));
-//        return false;
+	log_error (_("Couldn't read first data block in handshake"));
     }
+    if (buf->allocated() > RTMP_HANDSHAKE_SIZE*2) {
+	log_debug (_("Read second data block in handshake"));
+    } else {
+	log_error (_("Couldn't read second data block in handshake"));
+	return false;
+    }
+
+#if 1
+    if (memcmp(buf->reference() + RTMP_HANDSHAKE_SIZE + 1, _handshake->reference(), RTMP_HANDSHAKE_SIZE) == 0) {
+	log_debug("Handshake matched");
+    } else {
+	log_debug("Handshake didn't match");
+// 	return false;
+    }
+    *buf += data;
+#endif
     
     // For some reason, Red5 won't connect unless the connect packet is
     // part of the final handshake packet. Sending the identical data with
