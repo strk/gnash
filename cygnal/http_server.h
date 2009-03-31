@@ -103,7 +103,7 @@ private:
 
 // This is the thread for all incoming HTTP connections
 extern "C" {
-    bool http_handler(gnash::Network::thread_params_t *args);
+    DSOEXPORT bool http_handler(gnash::Network::thread_params_t *args);
 }
 
 } // end of gnash namespace

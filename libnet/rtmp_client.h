@@ -53,10 +53,10 @@ public:
                                    double audioCodecs, double videoCodecs, double videoFunction,
                                    const char *pageUrl);
     // Create the second object sent to the server, which is NetStream():;NetStream()
-    boost::shared_ptr<amf::Buffer> encodeStream(double id);
+    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeStream(double id);
     boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag);
     boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, double pos);
-    boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name);
+    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name);
     boost::shared_ptr<amf::Buffer> encodeStreamOp(double id, rtmp_op_e op, bool flag, const std::string &name, double pos);
 
     bool isConnected() { return _connected; };
