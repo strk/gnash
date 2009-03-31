@@ -33,8 +33,20 @@ endOfTest = function()
     play();
 };
 
-if ( ! _root.hasOwnProperty('host') ) {
-    host="localhost";
+// -P FlashVars='hostname=localhost,rtmptport5080=rtmpport=1935'
+if (hostname == undefined) {
+    hostname="localhost";
+    note("No hostname specified, defaulting to "+hostname);
+}
+
+if (rtmptport == undefined) {
+    rtmptport = 5080;
+    note("No RTMPT port specified, defaulting to "+rtmptport);
+}
+
+if (rtmpport == undefined) {
+    rtmpport = 1935;
+    note("No RTMP port specified, defaulting to "+rtmpport);
 }
 
 nc = new NetConnection;
@@ -42,7 +54,7 @@ nc.statuses = new Array();
 nc.onStatus = function()
 {
     this.statuses.push(arguments);
-    note('NetConnection.onStatus called with args: '+dumpObject(arguments));
+    note('NetConnection.onStatus called with args: ');
 };
 
 nc.onResult = function()
@@ -66,12 +78,9 @@ function ResultHandler() {
 //     };
 };
 
-// nc.onStatus: level:error, code:NetConnection.Connect.InvalidApp
-// nc.onStatus: level:status, code:NetConnection.Connect.Closed
-//nc.connect("rtmp://localhost/");
 
-// nc.onStatus: level:status, code:NetConnection.Connect.Success
-rtmpuri = "http://"+host+":5080/echo/gateway";
+
+rtmpuri = "http://"+hostname+":"+rtmptport+"/echo/gateway";
 note("Connecting to "+rtmpuri);
 nc.connect(rtmpuri);
 // The network connection is not opened at connect() time, but when
@@ -560,7 +569,7 @@ nc.onResult = function()
 };
 
 
-rtmpuri = "rtmp://"+host+":1935/echo";
+rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/echo";
 note("Connecting to "+rtmpuri);
 ncrtmp.connect(rtmpuri);
 
