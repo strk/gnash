@@ -2768,9 +2768,15 @@ Machine::instantiateClass(std::string className, as_object* global)
     log_debug("instantiateClass: class name %s", className);
 
 	asClass* theClass = mPoolObject->locateClass(className);
+    if ( ! theClass )
+    {
+        // TODO: check how the pp would handle this
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("Could not locate class '%s' for instantiation", className);
+        );
+        return;
+    }
 	
-	// TODO: what happens when it's not located?
-	assert (theClass);
 	clearRegisters(theClass->getConstructor()->getMaxRegisters());
 	mCurrentFunction = theClass->getConstructor()->getPrototype();
 	mStack.clear();
