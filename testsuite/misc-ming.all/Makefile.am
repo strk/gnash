@@ -35,6 +35,7 @@ EXTRA_DIST = \
 	DragDropTest.as \
 	remoting.as \
 	red5test.as \
+	netstream.as \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
@@ -318,6 +319,8 @@ if ENABLE_RED5_TESTING
 check_SCRIPTS += red5testRunner
 endif
 endif
+
+check_SCRIPTS += netstreamTestRunner
 
 if MING_VERSION_0_4
 check_SCRIPTS += \
@@ -1754,7 +1757,14 @@ red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/che
 red5testRunner: $(srcdir)/../generic-testrunner.sh red5test.swf
 	sh $< $(top_builddir) red5test.swf > $@
 	chmod 755 $@
-	
+
+netstream.swf: $(srcdir)/netstream.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
+	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/netstream.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
+
+netstreamRunner: $(srcdir)/../generic-testrunner.sh netstream.swf
+	sh $< $(top_builddir) netstream.swf > $@
+	chmod 755 $@
+
 
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as

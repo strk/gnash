@@ -43,9 +43,15 @@ AMF_msg::encodeContextHeader(boost::uint16_t version, boost::uint16_t headers,
     size_t size = sizeof(AMF_msg::context_header_t);
     boost::shared_ptr<amf::Buffer> buf (new amf::Buffer(size));
 
-    *buf = htons(version);
-    *buf += htons(headers);
-    *buf += htons(messages);
+    // use a short as a temporary, as it turns out htons() returns a 32bit int
+    // instead when compiling with -O2. This forces appending bytes to get the
+    // right size.
+    boost::uint16_t swapped = htons(version);
+    *buf = swapped;
+    swapped = htons(headers);
+    *buf += swapped;
+    swapped = htons(messages);
+    *buf += swapped;
         
     return buf;
 }
@@ -154,7 +160,7 @@ AMF_msg::parseMessageHeader(boost::uint8_t *data, size_t size)
     string str2(reinterpret_cast<const char *>(tmpptr), length);
     msg->response = str2;
     tmpptr += length;
-    if ((tmpptr - data) > size) {
+    if ((tmpptr - data) > static_cast<int>(size)) {
         boost::format msg("Trying to read past the end of data! Wants %1% bytes, given %2% bytes");
         msg % length % size;
         throw GnashException(msg.str());
@@ -227,6 +233,7 @@ boost::shared_ptr<amf::Buffer>
 AMF_msg::encodeAMFPacket(const std::string & /* target */,
                          const std::string & /*response */, size_t /* size */)
 {
+    return encodeAMFPacket();
 }
 
 boost::shared_ptr<amf::Buffer>

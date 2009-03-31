@@ -26,14 +26,15 @@
 #include <boost/thread/condition.hpp>
 
 #include "network.h"
+#include "dsodefs.h"
 
 namespace cygnal
 {
   
 class Proc : public gnash::Network {
 public:
-    Proc (void);
-    ~Proc (void);
+    DSOEXPORT Proc (void);
+    DSOEXPORT ~Proc (void);
     static Proc& getDefaultInstance();
     
     // These flags control whether the stdout of the child process gets displayed

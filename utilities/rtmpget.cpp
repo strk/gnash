@@ -697,20 +697,6 @@ main(int argc, char *argv[])
 	close(fd);
     }
     
-#if 0
-    // Write the packet to disk so we can anaylze it with other tools
-    int fd = open("outbuf.raw",O_WRONLY|O_CREAT, S_IRWXU);
-    if (fd < 0) {
-        perror("open");
-    }
-    cout << "Writing packet to disk: \"outbuf.raw\"" << endl;
-//     write(fd, out, 12);
-//     write(fd, outbuf.begin(), amf_obj.totalsize());
-    write(fd, buf2->reference(), buf2->size());
-    write(fd, buf3->reference(), buf3->size());
-    close(fd);
-#endif    
-
     exit(0);
 }
 
