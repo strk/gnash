@@ -319,7 +319,7 @@ main(int argc, char *argv[])
 	swfUrl = "file://rtmpget.swf";
     }
     if (pageUrl.empty()) {
-        pageUrl = ".http://gnashdev.org";
+        pageUrl = "http://www.gnashdev.org";
     }
     
     log_debug("URL is %s", url);
@@ -354,8 +354,7 @@ main(int argc, char *argv[])
     log_debug("Sending NetConnection Connect message,");
     boost::shared_ptr<amf::Buffer> buf2 = client.encodeConnect(app.c_str(), swfUrl.c_str(), tcUrl.c_str(), 615, 124, 1, pageUrl.c_str());
 //  rtmpget -vv -n rtmp://localhost/oflaDemo/DarkKnight.flv
-//  boost::shared_ptr<amf::Buffer> buf2 = client.encodeConnect("video/2006/sekt/gate06/tablan_valentin", "mediaplayer.swf", "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin", 615, 124, 1, "http://gnashdev.org");
-//  boost::shared_ptr<amf::Buffer> buf2 = client.encodeConnect("oflaDemo", "http://192.168.1.70/software/gnash/tests/ofla_demo.swf", "rtmp://localhost/oflaDemo/stream", 615, 124, 1, "http://192.168.1.70/software/gnash/tests/index.html");
+//  "rtmp://velblod.videolectures.net/video/2006/sekt/gate06/tablan_valentin"
     //buf2->resize(buf2->size() - 6); // FIXME: encodeConnect returns the wrong size for the buffer!
     boost::shared_ptr<amf::Buffer> head2 = client.encodeHeader(0x3, RTMP::HEADER_12,
 								      buf2->allocated(), RTMP::INVOKE,
@@ -369,8 +368,10 @@ main(int argc, char *argv[])
 
     // Finish the handshake process, which has to have the NetConnection::connect() as part
     // of the buffer, or Red5 refuses to answer.
+    client.setTimeout(20);
     if (!client.clientFinish(*head2)) {
-	log_error("RTMP handshake completion failed");
+	log_error("RTMP handshake completion failed!");
+	exit(-1);
     }
     
     // give the server time to process our NetConnection::connect() request
@@ -470,7 +471,7 @@ main(int argc, char *argv[])
     // make the createStream
     log_debug("Sending NetStream::createStream message,");
     BufferSharedPtr buf3 = client.encodeStream(0x2);
-    buf3->dump();
+//     buf3->dump();
     client.sendMsg(0x3, RTMP::HEADER_8, buf3->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *buf3);
     
     double streamID = 0.0;
@@ -517,8 +518,8 @@ main(int argc, char *argv[])
 // 	    channel_q->pop_front();	// remove this Buffer from the Cque
 // 	    ptr->dump();
 	    
-	    log_debug("%s: There are %d messages in the RTMP input queue, %d",
-		      __PRETTY_FUNCTION__, que->size(), que->front()->size());
+// 	    log_debug("%s: There are %d messages in the RTMP input queue, %d",
+// 		      __PRETTY_FUNCTION__, que->size(), que->front()->size());
 	    if (ptr) {		// If there is legit data
 		rthead = client.decodeHeader(ptr->reference());
 		if (!rthead) {
