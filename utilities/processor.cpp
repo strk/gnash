@@ -112,9 +112,7 @@ struct movie_data
 };
 
 // This is so we can use -P to set FlashVars
-typedef std::map<std::string, std::string> VariableMap;
-VariableMap flashVars;
-std::map<std::string, std::string> params;
+std::map<std::string, std::string> flashVars;
 
 static boost::intrusive_ptr<gnash::movie_definition> play_movie(
         const std::string& filename, const RunInfo& runInfo);
@@ -240,6 +238,7 @@ main(int argc, char *argv[])
         { 'd', "delay",         Arg_parser::yes },
         { 'r', "runs",          Arg_parser::yes },
         { 'w', "waits",         Arg_parser::yes },
+        { 'P', "param",         Arg_parser::yes },
         { 'g', "gdb",           Arg_parser::no },
         { 'w', "waits",         Arg_parser::yes },
         { 'f', "frames",        Arg_parser::yes }
@@ -326,7 +325,7 @@ main(int argc, char *argv[])
 		      name = param.substr(0, eq);
 		      value = param.substr(eq + 1);
 		  }
-		  params[name] = value;
+		  flashVars[name] = value;
 		  break;
 	      }
 	      case 'r':
@@ -499,7 +498,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
 
     std::auto_ptr<movie_instance> mi ( md->create_movie_instance() );
 
-    mi->setVariables(flashVars); // set the variables passed as -P FLashVars
+    mi->setVariables(flashVars); // set the variables passed as -P FlashVars
 
     m.setRootMovie( mi.release() );
     if ( quitrequested )  // setRootMovie would execute actions in first frame
@@ -647,6 +646,7 @@ usage (const char *name)
 	"  --help(-h)  Print this info.\n"	
 	"  --version   Print the version numbers.\n"	
 	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"	
+	"  -P,  --param <param>     Set parameter (e.g. \"FlashVars=A=1&b=2\")"
 	"  -v          Be verbose; i.e. print log messages to stdout\n"
           ),
 #if VERBOSE_PARSE
