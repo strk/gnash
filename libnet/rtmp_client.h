@@ -38,18 +38,18 @@ namespace gnash
 class RTMPClient : public RTMP
 {
 public:
-    RTMPClient();
-    ~RTMPClient();
+    DSOEXPORT RTMPClient();
+    DSOEXPORT ~RTMPClient();
 
     bool handShakeWait();
 //    bool handShakeResponse();
     bool clientFinish();
-    bool clientFinish(amf::Buffer &data);
-    bool handShakeRequest();
+    DSOEXPORT bool clientFinish(amf::Buffer &data);
+    DSOEXPORT bool handShakeRequest();
     
     // These are used for creating the primary objects
     // Create the initial object sent to the server, which is NetConnection::connect()
-    boost::shared_ptr<amf::Buffer> encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
+    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeConnect(const char *app, const char *swfUrl, const char *tcUrl,
                                    double audioCodecs, double videoCodecs, double videoFunction,
                                    const char *pageUrl);
     // Create the second object sent to the server, which is NetStream():;NetStream()
@@ -64,7 +64,7 @@ public:
     std::string &getPath() { return _path; };
     void setPath(std::string &x) { _path = x; };
 
-    boost::shared_ptr<amf::Buffer> encodeEchoRequest(const std::string &method, double id, amf::Element &el);
+    DSOEXPORT boost::shared_ptr<amf::Buffer> encodeEchoRequest(const std::string &method, double id, amf::Element &el);
     
     void dump();
   private:
