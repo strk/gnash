@@ -2266,12 +2266,6 @@ else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
 
-if test x"$xmitshm" = x"yes"; then
-  echo "        MIT-SHM X extension support enabled"
-else
-  echo "        MIT-SHM X extension support disabled (default). Use --enable-mit-shm to enable."
-fi
-
 if test x"$pthreads" = x"yes"; then
   echo "        POSIX Threads support enabled (default)"
 else

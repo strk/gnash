@@ -558,9 +558,12 @@ SWFMovieDefinition::read_all_swf()
             return;
         }
 
+        bool tagOpened=false;
+
         try {
 
             SWF::TagType tag = str.open_tag();
+            tagOpened=true;
 
 parse_tag:
 
@@ -591,7 +594,9 @@ parse_tag:
                 if (floaded == m_frame_count)
                 {
                     str.close_tag();
+                    tagOpened=false;
                     tag = str.open_tag();
+                    tagOpened=true;
                     if (tag != SWF::END )
                     {
                         IF_VERBOSE_MALFORMED_SWF(
@@ -626,7 +631,7 @@ parse_tag:
             log_error(_("Parsing exception: %s"), e.what());
         }
 
-        str.close_tag();
+        if ( tagOpened ) str.close_tag();
 
         setBytesLoaded(str.tell());
     }

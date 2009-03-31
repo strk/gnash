@@ -416,8 +416,7 @@ Player::run(int argc, char* argv[], const std::string& infile,
     // Now that we know about movie size, create gui window.
     _gui->createWindow(_url.c_str(), _width, _height);
 
-    SystemClock clock; // use system clock here...
-    movie_root root(*_movieDef, clock, *_runInfo);
+    movie_root root(*_movieDef, _gui->getClock(), *_runInfo);
 
     _callbacksHandler.reset(new CallbacksHandler(*_gui, *this)); 
     

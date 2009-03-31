@@ -122,7 +122,10 @@ enum TagType
     /// See http://sswf.sourceforge.net/SWFalexref.html#tag_scriptlimits
     SCRIPTLIMITS          = 65, 
 
-    SETTABINDEX           = 66, // SWF 9
+    /// SWF_version  >= 7 
+    /// See http://www.m2osw.com/en/swf_alexref.html#tag_settabindex
+    SETTABINDEX           = 66, 
+
     DEFINESHAPE4_         = 67, // SWF 9
     DEFINEMORPHSHAPE2_    = 68, // SWF 9
 

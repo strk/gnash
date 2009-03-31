@@ -19,9 +19,14 @@
 AUTOMAKE_OPTIONS = dejagnu
 
 # These will get executed and parsed for test output
-AS3TESTS = \
+SANE_AS3TESTS = \
+	$(NULL)
+
+BOGUS_AS3TESTS = \
 	basic.as \
 	$(NULL)
+
+AS3TESTS=$(SANE_AS3TESTS) $(BOGUS_AS3TESTS)
 
 EXTRA_DIST = $(AS3TESTS) dejagnu.as
 
@@ -31,15 +36,22 @@ abs_mediadir = `cd $(srcdir)/../media; pwd`
 AS3COMPILE_FLAGS = 
 AS3COMPILE_CPP = $(CPP) -x c -P -I$(srcdir) -DMEDIADIR="$(abs_mediadir)"
 
-AS3TESTS_OUT = $(AS3TESTS:.as=.swf)
+SANE_AS3TESTS_OUT = $(SANE_AS3TESTS:.as=.swf)
+BOGUS_AS3TESTS_OUT = $(BOGUS_AS3TESTS:.as=.swf)
+AS3TESTS_OUT = $(SANE_AS3TESTS_OUT) $(BOGUS_AS3TESTS_OUT)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	sanetests-runner \
+	bogustests-runner \
 	$(check_PROGRAMS)
 
-sanetests-runner: $(srcdir)/../generic-testrunner.sh $(AS3TESTS_OUT) Makefile
-	sh $< -f 50 -r 50 $(top_builddir) $(AS3TESTS_OUT) > $@
+sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_AS3TESTS_OUT) Makefile
+	sh $< -c "__END_OF_TEST__" -r 50 $(top_builddir) $(SANE_AS3TESTS_OUT) > $@
+	chmod 755 $@
+
+bogustests-runner: $(srcdir)/../generic-testrunner.sh $(BOGUS_AS3TESTS_OUT) Makefile
+	sh $< -C __END_OF_TEST__ -r 50 $(top_builddir) $(BOGUS_AS3TESTS_OUT) > $@
 	chmod 755 $@
 
 $(AS3TESTS_OUT): dejagnu.as check.as

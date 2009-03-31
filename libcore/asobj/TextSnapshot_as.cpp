@@ -439,7 +439,7 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t start = std::max(0, static_cast<int>(fn.arg(0).to_int()));
     size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
 
     Array_as* ri = new Array_as;
@@ -505,7 +505,7 @@ textsnapshot_getSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t start = std::max(0, static_cast<int>(fn.arg(0).to_int()));
     size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
 
     return as_value(ts->getSelected(start, end));
@@ -592,7 +592,7 @@ textsnapshot_setSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max(0, fn.arg(0).to_int());
+    size_t start = std::max(0, static_cast<int>(fn.arg(0).to_int()));
     size_t end = std::max<int>(start, fn.arg(1).to_int());
 
     bool selected = (fn.nargs > 2) ? fn.arg(2).to_bool() : true;

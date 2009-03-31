@@ -100,6 +100,17 @@ public:
 		return _callStack;
 	}
 
+    /// Get the VM clock
+    //
+    /// NOTE: this clock should drive all internal operations
+    /// but maybe accessing it trough VM isn't the best idea.
+    /// TODO: consider making this accessible trough RunInfo
+    /// instead.
+    ///
+    VirtualClock& getClock() {
+        return _clock;
+    }
+
 	/// \brief
 	/// Initialize the virtual machine singleton with the given
 	/// movie definition and return a reference to it.

@@ -33,13 +33,6 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
   pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
   pushdef([UPHEADER], translit([$2], [a-z./], [A-Z__]))dnl Uppercase header
 
-dnl   AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]), [
-dnl     case "${enableval}" in
-dnl       yes) $1=yes ;;	
-dnl       no)  $1=no ;;
-dnl       *)   AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
-dnl     esac], $1=yes)
-
     $1=yes
     if test x$4 = x; then
       name=$1 
@@ -152,20 +145,6 @@ pushdef([UP], translit([$1], [a-z], [A-Z]))dnl Uppercase
 pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
 
 has_$1=no
-
-AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]),
-[case "${enableval}" in
-	yes) $1=yes ;;	
-	no)  $1=no ;;
-	*)   
-	AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
-esac], $1=yes)
-
-if test x$4 = x; then
-	name=$1 
-else
-	name=$1-$4
-fi
 
 if test x"${$1}" = x"yes"; then
 	dnl Look for the library

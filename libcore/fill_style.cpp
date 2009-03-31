@@ -75,7 +75,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     }
         
     IF_VERBOSE_PARSE(
-        log_parse("  fill_style read type = 0x%X", m_type);
+        log_parse("  fill_style read type = 0x%X", (int)m_type);
     );
 
     if (m_type == SWF::FILL_SOLID)
@@ -530,36 +530,54 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     m_type = a.get_type();
     assert(m_type == b.get_type());
 
-    // fill style color
+    // fill style color (TODO: only for solid fills ?)
     m_color.set_lerp(a.get_color(), b.get_color(), t);
 
-    // fill style gradient SWFMatrix
-    //
-    // @@ TODO morphed gradients don't come out exactly
-    // right; they shift around some.  Not sure where the
-    // problem is.
-    _matrix.set_lerp(a._matrix, b._matrix, t);
+    bool usesMatrix = false;
 
-    // fill style gradients
-    assert(m_gradients.size() == a.m_gradients.size());
-    assert(m_gradients.size() == b.m_gradients.size());
-    for (size_t j=0, nj=m_gradients.size(); j<nj; ++j)
+    switch (m_type)
     {
-        m_gradients[j].m_ratio =
-            (boost::uint8_t) frnd( flerp(a.m_gradients[j].m_ratio,
-                    b.m_gradients[j].m_ratio, t)
-                );
-        m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color,
-                b.m_gradients[j].m_color, t);
+        case SWF::FILL_LINEAR_GRADIENT:
+        case SWF::FILL_RADIAL_GRADIENT:
+        case SWF::FILL_FOCAL_GRADIENT:
+        {
+            usesMatrix = true;
+
+            // fill style gradients
+            assert(m_gradients.size() == a.m_gradients.size());
+            assert(m_gradients.size() == b.m_gradients.size());
+            for (size_t j=0, nj=m_gradients.size(); j<nj; ++j)
+            {
+                m_gradients[j].m_ratio =
+                    (boost::uint8_t) frnd( flerp(a.m_gradients[j].m_ratio,
+                            b.m_gradients[j].m_ratio, t)
+                        );
+                m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color,
+                        b.m_gradients[j].m_color, t);
+            }
+            _bitmapInfo = NULL;
+            break;
+        }
+
+        case SWF::FILL_TILED_BITMAP:
+        case SWF::FILL_CLIPPED_BITMAP:
+        case SWF::FILL_TILED_BITMAP_HARD:
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+        {
+            usesMatrix = true;
+
+            // fill style bitmap ID
+            _bitmapInfo = a._bitmapInfo;
+            assert(_bitmapInfo == b._bitmapInfo);
+            break;
+        }
+
+        default:
+            break;
     }
-    _bitmapInfo = NULL;
 
-    // fill style bitmap ID
-    _bitmapInfo = a._bitmapInfo;
-    assert(_bitmapInfo == b._bitmapInfo);
-
-    // fill style bitmap SWFMatrix
-    _matrix.set_lerp(a._matrix, b._matrix, t);
+    // fill style bitmap or gradient SWFMatrix
+    if ( usesMatrix ) _matrix.set_lerp(a._matrix, b._matrix, t);
 }
 
 
