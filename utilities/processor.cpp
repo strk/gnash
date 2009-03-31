@@ -33,6 +33,8 @@
 #include <cstdlib>
 #include <sys/time.h>
 #include <ctime>
+#include <map>
+#include <string>
 
 #ifdef ENABLE_NLS
 #include <locale>
@@ -57,6 +59,7 @@
 #include "IOChannel.h" // for proper dtor call
 #include "GnashSleep.h" // for usleep comptibility.
 #include "StreamProvider.h"
+#include "arg_parser.h"
 
 extern "C"{
 #ifdef HAVE_GETOPT_H
@@ -107,6 +110,11 @@ struct movie_data
     gnash::movie_definition* m_movie;
     std::string	m_filename;
 };
+
+// This is so we can use -P to set FlashVars
+typedef std::map<std::string, std::string> VariableMap;
+VariableMap flashVars;
+std::map<std::string, std::string> params;
 
 static boost::intrusive_ptr<gnash::movie_definition> play_movie(
         const std::string& filename, const RunInfo& runInfo);
@@ -220,21 +228,29 @@ main(int argc, char *argv[])
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
 #endif
-    int c;
 
-    // scan for the two main standard GNU options
-    for (c = 0; c < argc; c++) {
-      if (strcmp("--help", argv[c]) == 0) {
-        usage(argv[0]);
-        exit(0);
-      }
-      if (strcmp("--version", argv[c]) == 0) {
-        printf (_("Gnash gprocessor version: %s, Gnash version: %s\n"),
-		   GPROC_VERSION, VERSION);
-        exit(0);
-      }
+    const Arg_parser::Option opts[] =
+        {
+        { 'h', "help",          Arg_parser::no  },
+        { 'V', "version",       Arg_parser::no  },
+        { 'p', "port-offset",   Arg_parser::yes },
+        { 'a', 0,               Arg_parser::no  },
+        { 'p', 0,               Arg_parser::no  },
+        { 'v', "verbose",       Arg_parser::no  },
+        { 'd', "delay",         Arg_parser::yes },
+        { 'r', "runs",          Arg_parser::yes },
+        { 'w', "waits",         Arg_parser::yes },
+        { 'g', "gdb",           Arg_parser::no },
+        { 'w', "waits",         Arg_parser::yes },
+        { 'f', "frames",        Arg_parser::yes }
+        };
+
+    Arg_parser parser(argc, argv, opts);
+    if(! parser.error().empty()) {
+        cout << parser.error() << endl;
+        exit(EXIT_FAILURE);
     }
- 
+
     std::vector<std::string> infiles;
  
     //RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -260,69 +276,89 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
 
-    while ((c = getopt (argc, argv, ":hwvapr:gf:d:")) != -1) {
-	switch (c) {
-	  case 'h':
-	      usage (argv[0]);
-              dbglogfile.removeLog();
-	      exit(0);
-	  case 'w':
-	      s_do_output = true;
-	      break;
-	  case 'v':
-	      dbglogfile.setVerbosity();
-	      log_debug (_("Verbose output turned on"));
-	      break;
-          case 'g':
-#ifdef USE_DEBUGGER
-              debugger.enabled(true);
-              debugger.console();
-              log_debug (_("Setting debugger ON"));
-#else
-              log_error (_("The debugger has been disabled at configuration time"));
-#endif
-	  case 'a':
+    for( int i = 0; i < parser.arguments(); ++i ) {
+        const int code = parser.code(i);
+        try {
+            switch(code) {
+	      case 'h':
+		  usage (argv[0]);
+		  dbglogfile.removeLog();
+		  exit(0);
+	      case 'w':
+		  s_do_output = true;
+		  break;
+	      case 'v':
+		  dbglogfile.setVerbosity();
+		  log_debug (_("Verbose output turned on"));
+		  break;
+	      case 'a':
 #if VERBOSE_ACTION
-	      dbglogfile.setActionDump(true); 
+		  dbglogfile.setActionDump(true); 
 #else
-              log_error (_("Verbose actions disabled at compile time"));
+		  log_error (_("Verbose actions disabled at compile time"));
 #endif
-	      break;
-	  case 'p':
+		  break;
+	      case 'p':
 #if VERBOSE_PARSE
-	      dbglogfile.setParserDump(true); 
+		  dbglogfile.setParserDump(true); 
 #else
-              log_error (_("Verbose parsing disabled at compile time"));
+		  log_error (_("Verbose parsing disabled at compile time"));
 #endif
-	      break;
-	  case 'r':
-              allowed_end_hits = strtol(optarg, NULL, 0);
-	      break;
-	  case 'd':
-              delay = strtol(optarg, NULL, 0)*1000; // delay is in microseconds
-              // this will be recognized as a request to run at FPS speed
-              if ( delay < 0 ) delay = -1;
-	      break;
-	  case 'f':
-              limit_advances = strtol(optarg, NULL, 0);
-	      break;
-	  case ':':
-              fprintf(stderr, "Missing argument for switch ``%c''\n", optopt); 
-	      exit(1);
-	  case '?':
-	  default:
-              fprintf(stderr, "Unknown switch ``%c''\n", optopt); 
-	      exit(1);
+		  break;
+	      case 'g':
+#ifdef USE_DEBUGGER
+		  debugger.enabled(true);
+		  debugger.console();
+		  log_debug (_("Setting debugger ON"));
+#else
+		  log_error (_("The debugger has been disabled at configuration time"));
+#endif
+		  // Support the -P FlashVars=a=b option like the GUI does.
+	      case 'P':
+	      {
+		  std::string param = parser.argument(i);
+		  size_t eq = param.find("=");
+		  std::string name, value;
+		  if ( eq == std::string::npos ) {
+		      name = param;
+		      value = "true";
+		  } else {
+		      name = param.substr(0, eq);
+		      value = param.substr(eq + 1);
+		  }
+		  params[name] = value;
+		  break;
+	      }
+	      case 'r':
+		  allowed_end_hits = parser.argument<long>(i);
+		  break;
+	      case 'd':
+		  delay = parser.argument<long>(i)*1000; // delay is in microseconds
+		  // this will be recognized as a request to run at FPS speed
+		  if ( delay < 0 ) delay = -1;
+		  break;
+	      case 'f':
+		  limit_advances = parser.argument<long>(i);;
+		  break;
+	      case ':':
+		  fprintf(stderr, "Missing argument for switch ``%c''\n",
+			  parser.argument<char>(i)); 
+		  exit(1);
+	      case 0:
+		  infiles.push_back(parser.argument(i));
+		  break;
+	      default:
+		  fprintf(stderr, "Unknown switch ``%c''\n",
+			  parser.argument<char>(i)); 
+		  exit(1);
+	    }
+	} catch (Arg_parser::ArgParserException &e) {
+	    cerr << _("Error parsing command line options: ") << e.what() 
+		 << endl;
+	    cerr << _("This is a Gnash bug.") << endl;
 	}
-    }
-    
-    
-    // get the file name from the command line
-    while (optind < argc) {
-        infiles.push_back(argv[optind]);
-	    optind++;
-    }
-
+    };
+	
     // No file names were supplied
     if (infiles.empty()) {
 	    std::cerr << "no input files" << std::endl;
@@ -462,6 +498,8 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
     md->completeLoad();
 
     std::auto_ptr<movie_instance> mi ( md->create_movie_instance() );
+
+    mi->setVariables(flashVars); // set the variables passed as -P FLashVars
 
     m.setRootMovie( mi.release() );
     if ( quitrequested )  // setRootMovie would execute actions in first frame
