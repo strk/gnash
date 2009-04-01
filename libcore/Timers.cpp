@@ -156,7 +156,7 @@ Timer::execute()
     std::auto_ptr<std::vector<as_value> > args(
             new std::vector<as_value>(_args));
 
-    call_method(timer_method, &env, _object.get(), args, super);
+    call_method(timer_method, env, _object.get(), args, super);
 
 }
 
