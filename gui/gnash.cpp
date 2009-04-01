@@ -444,6 +444,8 @@ int
 gnash_main(int argc, char *argv[])
 {
 
+    std::ios::sync_with_stdio(false);
+
     gnash::Player player;
 
     // Enable native language support, i.e. internationalization
