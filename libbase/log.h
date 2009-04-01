@@ -66,7 +66,7 @@ public:
         LOG_SILENT,
         LOG_NORMAL,
         LOG_DEBUG,
-        LOG_EXTRA,
+        LOG_EXTRA
     };
 
     enum FileState {
