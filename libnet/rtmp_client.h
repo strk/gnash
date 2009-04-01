@@ -25,6 +25,7 @@
 #include <time.h>
 
 #include "rtmp.h"
+#include "rtmp_msg.h"
 #include "amf.h"
 #include "element.h"
 #include "handler.h"
@@ -65,7 +66,9 @@ public:
     void setPath(std::string &x) { _path = x; };
 
     DSOEXPORT boost::shared_ptr<amf::Buffer> encodeEchoRequest(const std::string &method, double id, amf::Element &el);
-    
+
+    boost::shared_ptr<RTMPMsg> recvResponse();
+
     void dump();
   private:
     std::string _path;

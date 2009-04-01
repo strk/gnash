@@ -51,6 +51,8 @@ typedef boost::shared_ptr<amf::Element> ElementSharedPtr;
 namespace gnash
 {
 
+extern const char *ping_str[];
+
 // The rcfile is loaded and parsed here:
 static RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 
@@ -465,6 +467,144 @@ RTMPClient::clientFinish(amf::Buffer &data)
 
     return true;
 }
+
+// Get and process an RTMP response. After reading all the data, then we have
+// split it up on the chunksize boudaries, and into the respective queues
+// for each channel.
+boost::shared_ptr<RTMPMsg>
+RTMPClient::recvResponse()
+{
+    GNASH_REPORT_FUNCTION;
+    // Read the responses back from the server.  This is usually a series of system
+    // messages on channel 2, and the response message on channel 3 from our request.
+    boost::shared_ptr<amf::Buffer> response = recvMsg();
+    if (!response) {
+	log_error("Got no response from the RTMP server");
+    }
+
+    // when doing remoting calls I don't see this problem with an empty packet from Red5,
+    // but when I do streaming, it's always there, so we need to remove it.
+    boost::uint8_t *pktstart = response->reference();
+    if (*pktstart == 0xff) {
+	log_debug("Got empty packet in buffer.");
+	pktstart++;
+    }
+
+    // The response packet contains multiple messages for multiple channels, so we
+    // we have to split the Buffer into seperate messages on a chunksize boundary.
+    boost::shared_ptr<RTMP::rtmp_head_t> rthead;
+    boost::shared_ptr<RTMP::queues_t> que = split(pktstart, response->allocated()-1);
+
+    // If we got no responses, something obviously went wrong.
+    if (!que->size()) {
+        log_error("No response from INVOKE of NetConnection connect");
+        exit(-1);
+    }
+
+    // There is a queue of queues used to hold all the messages. The first queue
+    // is indexed by the channel number, the second queue is all the messages that
+    // have arrived for that channel.
+    while (que->size()) {	// see if there are any messages at all
+	// Get the CQue for the first channel
+	CQue *channel_q = que->front();
+	que->pop_front();	// remove this Cque from the top level que
+
+	while (channel_q->size()) {
+	    // Get the first message in the channel queue
+	    boost::shared_ptr<amf::Buffer> ptr = channel_q->pop();
+// 	    channel_q->pop_front();	// remove this Buffer from the Cque
+// 	    ptr->dump();
+	    
+	    log_debug("%s: There are %d messages in the RTMP input queue, %d",
+		      __PRETTY_FUNCTION__, que->size(), que->front()->size());
+	    if (ptr) {		// If there is legit data
+		rthead = decodeHeader(ptr->reference());
+		if (!rthead) {
+		    log_error("Couldn't decode RTMP message header");
+		    continue;
+		}
+		switch (rthead->type) {
+		  case RTMP::NONE:
+		      log_error("RTMP packet can't be of none type!");
+		      break;
+		  case RTMP::CHUNK_SIZE:
+		      log_unimpl("Server message data packet");
+		      break;
+		  case RTMP::UNKNOWN:	
+		      log_unimpl("Unknown data packet");
+		      break;
+		  case RTMP::BYTES_READ:
+		      log_unimpl("Bytes Read data packet");
+		      break;
+		  case RTMP::PING:
+		  {
+		      boost::shared_ptr<RTMP::rtmp_ping_t> ping = decodePing(ptr->reference() + rthead->head_size);
+		      log_debug("Got a Ping type %s", ping_str[ping->type]);
+		      break;
+		  }
+		  case RTMP::SERVER:
+		      log_unimpl("Server message data packet");
+		      break;
+		  case RTMP::CLIENT:
+		      log_unimpl("Client message data packet");
+		      break;
+		  case RTMP::UNKNOWN2:
+		      log_unimpl("Unknown2 data packet");
+		      break;
+		  case RTMP::AUDIO_DATA:
+		      log_unimpl("Audio data packet message");
+		      break;
+		  case RTMP::VIDEO_DATA:
+		      log_unimpl("Video data packet message");
+		      break;
+		  case RTMP::UNKNOWN3:
+		      log_unimpl("Unknown3 data packet message");
+		      break;
+		  case RTMP::NOTIFY:
+		      log_unimpl("Notify data packet message");
+		      break;
+		  case RTMP::SHARED_OBJ:
+		      log_unimpl("Shared Object data packet message");
+		      break;
+		  case RTMP::INVOKE:
+		  {
+		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      if (msg) {
+// 		    msg->dump();
+			  if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+			      if (msg->getMethodName() == "_result") {
+#if 0
+				  log_debug("Sent NetConnection Connect message sucessfully");
+				  log_debug("Got a result: %s", msg->getMethodName());
+				  if (msg->getElements().size() > 0) {
+				      msg->at(0)->dump();
+				  }
+#endif
+			      }
+			  }		    
+			  if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
+			      if (msg->getMethodName() == "_error") {
+#if 0
+				  log_error("Couldn't send NetConnection Connect message,");
+				  log_error("Got an error: %s", msg->getMethodName());
+				  if (msg->getElements().size() > 0) {
+				      msg->at(0)->dump();
+				  }
+#endif
+			      }
+			  }
+		      }
+		  }
+		  case RTMP::FLV_DATA:
+		  default :
+		      log_error("Couldn't decode RTMP message Body");
+		      break;
+		}
+	    }
+	}
+    }	
+}
+
 
 // bool
 // RTMPClient::packetRequest()
