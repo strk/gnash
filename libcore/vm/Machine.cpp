@@ -1576,9 +1576,17 @@ Machine::execute()
 		else{
 			name = a.getGlobalName();
 		}
-		as_object *object = pop_stack().to_object().get();
-		object->set_member(name,value,ns,false);
 
+        as_value val = pop_stack();
+		as_object *object = val.to_object().get();
+
+        if (!object) {
+            log_error("Expected object on stack, but none found (%s)!",
+                    val);
+            break;
+        }
+
+		object->set_member(name, value, ns, false);
 		break;
 	}
 /// 0x62 ABC_ACTION_GETLOCAL
