@@ -52,15 +52,21 @@
 
 namespace gnash {
 
-#define GNASH_DEBUG_LEVEL 2
-
 // This is a basic file logging class
-class DSOEXPORT LogFile {
+class DSOEXPORT LogFile
+{
 public:
 
     static LogFile& getDefaultInstance();
 
     ~LogFile();
+
+    enum LogLevel {
+        LOG_SILENT,
+        LOG_NORMAL,
+        LOG_DEBUG,
+        LOG_EXTRA
+    };
 
     enum FileState {
         CLOSED,
@@ -262,7 +268,7 @@ private:
 //
 /// The preprocessor generates templates with 1..ARG_NUMBER
 /// arguments.
-#define ARG_NUMBER 16
+#define ARG_NUMBER 10
 
 /// Calls the macro LOG_TEMPLATES an ARG_NUMBER number
 /// of times, each time adding an extra typename argument to the
@@ -387,7 +393,7 @@ public:
     }
 
     ~__Host_Function_Report__(void) {
-	if (LogFile::getDefaultInstance().getVerbosity() >= GNASH_DEBUG_LEVEL + 1) {
+	if (LogFile::getDefaultInstance().getVerbosity() > LogFile::LOG_NORMAL) {
 	    log_debug("%s returning", func);
 	}
     }

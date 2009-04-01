@@ -124,14 +124,14 @@ processLog_trace(const boost::format& fmt)
 void
 processLog_debug(const boost::format& fmt)
 {
-	if (dbglogfile.getVerbosity() < GNASH_DEBUG_LEVEL) return;
+	if (dbglogfile.getVerbosity() < LogFile::LOG_NORMAL) return;
 	dbglogfile.log(N_("DEBUG"), fmt.str());
 }
 
 void
 processLog_abc(const boost::format& fmt)
 {
-	if (dbglogfile.getVerbosity() < GNASH_DEBUG_LEVEL) return;
+	if (dbglogfile.getVerbosity() < LogFile::LOG_EXTRA) return;
 	dbglogfile.log(N_("ABC"), fmt.str());
 }
 
@@ -198,18 +198,18 @@ LogFile::log(const std::string& msg)
 	{
 		if (_stamp) {
 			std::string ts = timestamp();
-			_outstream << ts << ": " << msg << endl;
+			_outstream << ts << ": " << msg << "\n";
 		} else {
-			_outstream << msg << endl;
+			_outstream << msg << "\n";
 		}
 	}
 	else // log to stdout
 	{
 		if (_stamp) {
 			std::string ts = timestamp();
-			cout << ts << " " << msg << endl;
+			cout << ts << " " << msg << "\n";
 		} else {
-			cout << msg << endl;
+			cout << msg << "\n";
 		}
 	}
 	
@@ -330,7 +330,7 @@ LogFile::removeLog (void)
 }
 
 boost::format
-logFormat (const std::string &str)
+logFormat(const std::string &str)
 {
 
 	using namespace boost::io;
