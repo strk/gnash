@@ -192,9 +192,9 @@ LogFile::log(const std::string& msg)
 	else // log to stdout
 	{
 		if (_stamp) {
-			cout << timestamp << " " << msg << "\n";
+			cout << timestamp << " " << msg << endl;
 		} else {
-			cout << msg << "\n";
+			cout << msg << endl;
 		}
 	}
 	
