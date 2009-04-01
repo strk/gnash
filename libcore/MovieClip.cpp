@@ -972,7 +972,7 @@ MovieClip::on_event(const event_id& id)
 
         if ( method )
         {
-            call_method0(as_value(method.get()), &m_as_environment, this);
+            call_method0(as_value(method.get()), m_as_environment, this);
             called = true;
         }
     }

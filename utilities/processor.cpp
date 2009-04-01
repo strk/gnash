@@ -28,6 +28,7 @@
 # include "gst/MediaHandlerGst.h"
 #endif
 
+#include <ios>
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
@@ -211,6 +212,8 @@ FsCommandExecutor execFsCommand;
 int
 main(int argc, char *argv[])
 {
+    std::ios::sync_with_stdio(false);
+
     /// Initialize gnash core library
     gnashInit();
 

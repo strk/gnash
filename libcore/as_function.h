@@ -88,7 +88,7 @@ public:
 	/// @param args
 	///	Arguments for the constructor invocation
 	///
-	boost::intrusive_ptr<as_object> constructInstance( as_environment& env,
+	boost::intrusive_ptr<as_object> constructInstance(const as_environment& env,
 			std::auto_ptr< std::vector<as_value> > args);
 
 	/// Get this function's "prototype" member (exported interface).

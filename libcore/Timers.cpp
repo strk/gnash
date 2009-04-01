@@ -46,11 +46,11 @@ Timer::~Timer()
 
 void
 Timer::setInterval(as_function& method, unsigned long ms,
-                boost::intrusive_ptr<as_object> this_ptr, 
+        boost::intrusive_ptr<as_object> this_ptr, 
         ArgsContainer& args, bool runOnce)
 {
     _function = &method;
-    _interval = ms; // keep as milliseconds
+    _interval = ms; 
     _object = this_ptr;
     _args = args;
     _runOnce = runOnce;
@@ -62,7 +62,7 @@ Timer::setInterval(as_function& method, unsigned long ms,
         boost::intrusive_ptr<as_object> this_ptr, bool runOnce)
 {
     _function = &method;
-    _interval = ms; // keep as milliseconds
+    _interval = ms; 
     _object = this_ptr;
     _runOnce = runOnce;
     start();
@@ -75,7 +75,7 @@ Timer::setInterval(boost::intrusive_ptr<as_object> this_ptr,
 {
     _object = this_ptr;
     _methodName = methodName;
-    _interval = ms; // keep as milliseconds
+    _interval = ms; 
     _args = args;
     _runOnce = runOnce;
     start();
@@ -98,9 +98,9 @@ Timer::start()
 bool
 Timer::expired(unsigned long now, unsigned long& elapsed)
 {
-    if ( cleared() ) return false;
+    if (cleared()) return false;
     long unsigned expTime = _start + _interval;
-    if ( now < expTime ) return false;
+    if (now < expTime) return false;
     elapsed = expTime-now;
     return true;
 }
@@ -108,9 +108,9 @@ Timer::expired(unsigned long now, unsigned long& elapsed)
 void
 Timer::executeAndReset()
 {
-    if ( cleared() ) return;
+    if (cleared()) return;
     execute();
-    if ( _runOnce ) clearInterval();
+    if (_runOnce) clearInterval();
     else _start += _interval; // reset the timer
 }
 
@@ -129,17 +129,18 @@ Timer::execute()
     else {
         string_table::key k = vm.getStringTable().find(_methodName);
         as_value tmp;
-        if ( ! _object->get_member(k, &tmp) )
-        {
+
+        if ( ! _object->get_member(k, &tmp) ) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("object %p has no member named %s (interval method)",
                      _object, _methodName);
             );
             return;
         }
+
         as_function* f = tmp.to_as_function();
-        if ( ! f )
-        {
+
+        if (!f) {
             IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("member %s of object %p (interval method) is not "
                 "a function (%s)", _methodName, (void*)_object.get(), tmp);
@@ -151,16 +152,11 @@ Timer::execute()
 
     as_environment env(vm); 
 
-    // Prepare args 
-    std::auto_ptr<std::vector<as_value> > args ( new std::vector<as_value> );
-    for ( ArgsContainer::iterator it=_args.begin(), itEnd=_args.end();
-            it != itEnd; ++it )
-    {
-        //log_debug("Env-pushing %s", *it);
-        args->push_back(*it);
-    }
+    // Copy args 
+    std::auto_ptr<std::vector<as_value> > args(
+            new std::vector<as_value>(_args));
 
-    call_method(timer_method, &env, _object.get(), args, super);
+    call_method(timer_method, env, _object.get(), args, super);
 
 }
 
