@@ -17,8 +17,14 @@
 
 AUTOMAKE_OPTIONS = 
 
+DIR_MING=
+
 if ENABLE_MING
-DIR_MING = misc-ming.all actionscript.all network.all
+DIR_MING += misc-ming.all actionscript.all
+endif
+
+if HAS_NETCAT
+DIR_MING += network.all
 endif
 
 if ENABLE_MTASC
