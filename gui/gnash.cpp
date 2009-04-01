@@ -47,6 +47,7 @@ extern "C" {
 
 #include <string>
 #include <iostream>
+#include <ios>
 
 #ifdef ENABLE_NLS
 # include <locale>
