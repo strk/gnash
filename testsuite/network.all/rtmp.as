@@ -49,18 +49,10 @@ if (rtmpport == undefined) {
     note("No RTMP port specified, defaulting to "+rtmpport);
 }
 
-nc = new NetConnection;
 nc.statuses = new Array();
 nc.onStatus = function()
 {
-    this.statuses.push(arguments);
     note('NetConnection.onStatus called with args: ');
-};
-
-nc.onResult = function()
-{
-    this.statuses.push(arguments);
-    note('NetConnection.onResult called with args: '+dumpObject(arguments));
 };
 
 function ResultHandler() {
@@ -85,22 +77,15 @@ ncrtmp = new NetConnection;
 ncrtmp.statuses = new Array();
 ncrtmp.onStatus = function()
 {
-    this.statuses.push(arguments);
     note('NetConnection.onStatus called with args: '+dumpObject(arguments));
-    lastStatusArgs = ncrtmp.statuses[ncrtmp.statuses.length-1];
-    if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
-        pass("RTMP connection - status Success");
-    } else {
-        fail("RTMP connection - status Success");
-    }
+    
+//     lastStatusArgs = ncrtmp.statuses[ncrtmp.statuses.length-1];
+//     if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
+//         pass("RTMP connection - status Success");
+//     } else {
+//         fail("RTMP connection - status Success");
+//     }
 };
-
-nc.onResult = function()
-{
-    this.statuses.push(arguments);
-    note('NetConnection.onResult called with args: '+dumpObject(arguments));
-};
-
 
 rtmpuri = "rtmp://"+hostname+":"+rtmpport+"/echo";
 note("Connecting to "+rtmpuri);
@@ -108,14 +93,29 @@ ncrtmp.connect(rtmpuri);
 
 // The network connection is not opened at connect() time, but when
 // the first call() is made.
-if ((ncrtmp.isConnected == false)  && (ncrtmp.statuses.length == 0)) {
-    pass("RTMP connection - connect");
+if (ncrtmp.isConnected == false) {
+    pass("RTMP connection - isConnected");
 } else {
-    fail("RTMP connection - connect");
+    fail("RTMP connection - isConnected");
 }
 
+ncrtmp.onResult = function()
+{
+    note('NetConnection.onResult called with args: '+dumpObject(arguments));
+    if (nc.isConnected == true) { // now it is connected
+        pass("HTTP connection - status isConnected");
+    } else {
+        fail("HTTP connection - status isConnected");
+    }
+    if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
+        pass("HTTP connection - status Success");
+    } else {
+        fail("HTTP connection - status Success");
+    }
+};
+
 o=new ResultHandler();
-o.onResult = function()
+ncrtmp.onResult = function()
 {
     note("Got a result back from the  RTMP server.");
     
@@ -125,14 +125,6 @@ o.onResult = function()
     } else {
         fail("RTMP connection - result");        
     }
-    
-    lastStatusArgs = ncrtmp.statuses[ncrtmp.statuses.length-1];
-    if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
-        pass("RTMP connection - status");
-    } else {
-        fail("RTMP connection - status");        
-    }
-    
 };
 
 // This call starts the actual network connection
@@ -149,20 +141,28 @@ o.onResult = function()
 };
 ncrtmp.call("echo", o, null);
 
-// Empty String
-result3=false;
-tstr = new String();
-o=new ResultHandler();
-o.onResult = function()
-{
-    note("Got a string result back from the RTMP server."+dumpObject(arguments));
-    if (arguments.length == 1) {
-	if (arguments[0].length == 0) {
-	    result3 = true;
-	}
-    }
-};
-ncrtmp.call("echo", o, tstr);
+// The network connection is not opened at connect() time, but should
+// be now that we've made a ::call().
+if (ncrtmp.isConnected == true) {
+    pass("RTMP connection - isConnected");
+} else {
+    fail("RTMP connection - isConnected");
+}
+
+// // Empty String
+// result3=false;
+// tstr = new String();
+// o=new ResultHandler();
+// o.onResult = function()
+// {
+//     note("Got a string result back from the RTMP server."+dumpObject(arguments));
+//     if (arguments.length == 1) {
+// 	if (arguments[0].length == 0) {
+// 	    result3 = true;
+// 	}
+//     }
+// };
+// ncrtmp.call("echo", o, tstr);
 
 // Hello World!
 result4=false;
@@ -509,7 +509,7 @@ if (result13) {
 if (result14) {
     pass("RTMP: Echo Number NaN");
 } else {
-    fail("Echo Number NaN");
+    fail("RTMP: Echo Number NaN");
 }
 if (result15) {
     pass("RTMP: Echo Number Infinity");
