@@ -2197,8 +2197,8 @@ AC_SUBST(MEDIA_CONFIG)
 dnl AC_CONFIG_LINKS(doc/C/images)
 dnl AC_CONFIG_LINKS(gnashconfig.h,libltdl/config.h)
 AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
-AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
-AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)
+AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc:testsuite/libbase.all/gnashrc.in)
+AC_CONFIG_LINKS(testsuite/libbase.all/gnashrc-local:testsuite/libbase.all/gnashrc-local.in)
 
 AC_OUTPUT(Makefile
 po/Makefile
@@ -2219,7 +2219,7 @@ doc/Doxyfile
 pythonmodule/Makefile
 testsuite/Makefile
 testsuite/media/Makefile
-testsuite/libbase/Makefile
+testsuite/libbase.all/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
@@ -2228,6 +2228,7 @@ testsuite/misc-mtasc.all/Makefile
 testsuite/misc-haxe.all/Makefile
 testsuite/misc-swfmill.all/Makefile
 testsuite/misc-swfc.all/Makefile
+testsuite/network.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/libcore.all/Makefile
 testsuite/libamf.all/Makefile

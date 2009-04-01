@@ -1,0 +1,51 @@
+Test for remoting trough NetConnection and http.
+
+SERVER
+------
+
+The server part of the test is a PHP file.
+There's one copy available at
+http://www.gnashdev.org/testcases/remoting.php
+
+If you want to test offline you can copy remoting.php
+somewhere in your web server directories and specify 
+the base url at configure time, for example:
+
+ $ ./configure --enable-http-testsuite=http://localhost/gnashtests/
+ $ cp remoting.php /var/www/gnashtests/
+
+Note that in order for the php file to work you might need to 
+add the following line to your .htaccess file:
+
+  php_flag always_populate_raw_post_data on in place
+
+Also, if you run the client (remote.swf) from a different domain
+then the one the server is on, you'll need a crossdomain.xml file
+on the web root of the server.
+
+The most open version of a crossdomain.xml only contains this line:
+
+ <cross-domain-policy> <allow-access-from domain="*" /> </cross-domain-policy>
+
+CLIENT
+------
+
+The client part is an SWF, compiled by Ming from remoting.as.
+The SWF will embed the url to the remoting.php file.
+This is for convenience to allow testing it with the proprietary
+player to verify it expects the correct behaviour.
+
+The embedded url is set at configure time (--enable-http-testsuite)
+but can be overridden by a query string, for example:
+
+    $ gnash -v remoting.swf?url=remoting.php # relative url
+
+The generated remoting.swf is set to have "network" sandbox so
+you'll be able to run it from the filesystem and have it access
+network resources (as long as crossdomain.xml file is in place).
+
+Note that the proprietary player doesn't let you specify a query
+string for a filesystem-loaded file, so use --enable-http-testsuite
+to specify the embedded (default) url.
+
+

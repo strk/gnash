@@ -18,7 +18,7 @@
 AUTOMAKE_OPTIONS = 
 
 if ENABLE_MING
-DIR_MING = misc-ming.all actionscript.all
+DIR_MING = misc-ming.all actionscript.all network.all
 endif
 
 if ENABLE_MTASC
@@ -44,10 +44,11 @@ endif
 DIST_SUBDIRS = \
 	media \
 	actionscript.all \
-	libbase	\
+	libbase.all	\
 	libamf.all \
 	libnet.all \
 	libcore.all \
+	network.all \
 	samples	\
 	swfdec \
 	misc-ming.all \
@@ -63,7 +64,8 @@ SUBDIRS = \
 	media \
 	$(DIR_SWFDEC_TESTSUITE) \
 	libnet.all \
-	libbase	\
+	libbase.all	\
+	network.all \
 	libamf.all \
 	libcore.all \
 	samples	\
