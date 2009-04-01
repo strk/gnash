@@ -34,12 +34,14 @@ set file all
 set params ""
 
 # specify a default name and port for the RTMPT (AMF over HTTP) tests
-set http_hostname localhost
-set http_portnum 5080
+set http_hostname ""
+set http_portnum ""
+set http_dead false
 
 # specify a default name and port for the RTMP  tests
-set rtmp_hostname localhost
-set rtmp_portnum 1935
+set rtmp_hostname ""
+set rtmp_portnum ""
+set rtmp_dead false
 
 #
 # These are lists of hostname and port combinations 'probed'
@@ -127,6 +129,13 @@ foreach {index target} [array get http_targets] {
      }
 }
 
+# Make sure somebody responded, or we can't run the tests
+if {[string length $http_hostname] == 0} {
+    perror "No HTTP servers appear to be alive"
+    set http_dead true
+    exit
+}
+
 foreach {index target} [array get rtmp_targets] {
     set host [lindex $target 0]
     set port [lindex $target 1]
@@ -138,6 +147,11 @@ foreach {index target} [array get rtmp_targets] {
      } else {
  	verbose "$host:$port has no RTMP service attached!"
      }
+}
+if {[string length $rtmp_hostname] == 0} {
+    perror "No RTMP servers appear to be alive"
+    set rtmp_dead true
+    exit
 }
 
 global env
