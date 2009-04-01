@@ -434,7 +434,7 @@ main(int argc, char *argv[])
 		    log_debug("Got a Ping, type %s", ping_str[ping->type]);
 		    continue;
 		}
-		RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		boost::shared_ptr<RTMPMsg> msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		if (msg) {
 // 		    msg->dump();
  		    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
@@ -459,7 +459,6 @@ main(int argc, char *argv[])
 #endif
 			}
 		    }
-		    delete msg;
 		} else {
 		    log_error("Couldn't decode RTMP message Body");
 		    continue;
@@ -527,7 +526,7 @@ main(int argc, char *argv[])
 		    continue;
 		}
 		
-		RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		boost::shared_ptr<RTMPMsg> msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		if (msg) {
 // 		    msg->dump();
 		    if (msg->getMethodName() == "_result") {
@@ -655,7 +654,7 @@ main(int argc, char *argv[])
 		    // If it's not a Notify, Audio, or Video message, then we're still processing
 		    // responses from the NetStream::play() messages. We get several before the
 		    // the video starts.
-		    RTMPMsg *msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		    boost::shared_ptr<RTMPMsg> msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		    if (msg) {
 // 		    msg->dump();
 			if (msg->getMethodName() == "onStatus") {
@@ -685,7 +684,6 @@ main(int argc, char *argv[])
 // 			    msg->at(0)->dump();
 			    }
 			}
-			delete msg;
 		    } else {
 			log_error("Couldn't decode RTMP message Body");
 			continue;

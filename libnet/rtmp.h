@@ -236,8 +236,8 @@ public:
     int getMysteryWord()        { return _mystery_word; };
 
     // Decode an RTMP message
-    RTMPMsg *decodeMsgBody(boost::uint8_t *data, size_t size);
-    RTMPMsg *decodeMsgBody(amf::Buffer &buf);
+    boost::shared_ptr<RTMPMsg> decodeMsgBody(boost::uint8_t *data, size_t size);
+    boost::shared_ptr<RTMPMsg> decodeMsgBody(amf::Buffer &buf);
     
     virtual boost::shared_ptr<rtmp_ping_t> decodePing(boost::uint8_t *data);
     boost::shared_ptr<rtmp_ping_t> decodePing(amf::Buffer &buf);

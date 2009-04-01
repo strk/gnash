@@ -298,6 +298,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     string swfUrl;	// the swfUrl field
     string filename;	// the filename to play
     string pageUrl;     // the pageUrl field
+    boost::shared_ptr<RTMP::rtmp_head_t> rthead;
     
     log_debug("%s: URI is %s, URL protocol is %s, path is %s, hostname is %s, port is %s", __PRETTY_FUNCTION__,
 	      _uri, 
@@ -389,28 +390,21 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		return;
 	    } else {
 		log_debug("RTMP handshake completed");
-		notifyStatus(CONNECT_SUCCESS);
+ 		notifyStatus(CONNECT_SUCCESS);
 		_isConnected = true;
 	    }
-   	    boost::shared_ptr<amf::Buffer> msg1 = _rtmp_client->recvMsg();
-#if 0
-	    boost::shared_ptr<amf::Buffer> head2 = _rtmp_client->encodeHeader(0x3, RTMP::HEADER_12, total_size,
-								RTMP::INVOKE, RTMPMsg::FROM_CLIENT);
-	    head2->dump();
-	    boost::shared_ptr<amf::Buffer> buf3(new amf::Buffer(head2->allocated() + buf2->allocated()));
-	    *buf3 = *head2;
-	    *buf3 += *buf2;
-   	    boost::shared_ptr<amf::Buffer> msg1 = _rtmp_client->recvMsg();
-	    RTMP::queues_t *que = split(msg1);
+	    // although recvMsg() does a select() while waiting for data,
+	    // We've found things work better if we pause a second to let
+	    // the server response. Not doing this means we sometimes get
+	    // a fragemented first packet. Luckily we only have to wait
+	    // when making the initial connection.
+	    sleep(1);
 
-	    // the connectino process is complete
- 	    if (msg1->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
- 		notifyStatus(CONNECT_SUCCESS);
- 	    } else {
- 		notifyStatus(CONNECT_FAILED);
- 		return;
- 	    }
-#endif
+	    // Usually after waiting we get a PING Clear message, and sometimes
+	    // several other system channe messages which should
+	    // then be followed by the result of the connection being made
+	    // to the server.
+	    boost::shared_ptr<RTMPMsg> msg = _rtmp_client->recvResponse();
 	} // end of 'if RTMP'
 #if 0
 	// FIXME: do a GET request for the crossdomain.xml file
@@ -442,7 +436,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     boost::shared_ptr<amf::Element> data(new amf::Element);
     data->makeStrictArray();
     for (size_t i=firstArg; i<args.size(); i++) {
-	cerr << "FIXME: NetConnection::" << __FUNCTION__ << "(): " << args[i].to_string() << endl;
+	log_debug("%s: Converting AS Object to Element %s", __PRETTY_FUNCTION__, args[i].to_string());
 	boost::shared_ptr<amf::Element> el = args[i].to_element();
 // 	el->dump();
 	data->addProperty(el);
@@ -490,38 +484,36 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	_rtmp_client->sendMsg(0x3, RTMP::HEADER_12, request->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *request);
 
 	
-#if 0
-	boost::shared_ptr<amf::Buffer> response = _rtmp_client->recvMsg();
-  	response->dump();
-	boost::shared_ptr<RTMP::rtmp_head_t> rthead;
-	boost::shared_ptr<RTMP::queues_t> que = _rtmp_client->split(*response);
-	log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
-	while (que->size()) {
-	    boost::shared_ptr<amf::Buffer> ptr = que->front()->pop();
-	    if (ptr) {		// If there is legit data
-		rthead = _rtmp_client->decodeHeader(ptr->reference());
-		RTMPMsg *msg = _rtmp_client->decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
-		msg->dump();
-		if (msg->getMethodName() == "_error") {
-		    log_error("Got an error: %s", msg->getMethodName());
-		    msg->at(0)->dump();
-		    notifyStatus(CALL_FAILED);
-		}
-		if (msg->getMethodName() == "_result") {
-		    log_debug("Got a result: %s", msg->getMethodName());
-		    if (msg->getElements().size() > 0) {
-			msg->at(0)->dump();
-			as_value tmp(*msg->at(0));
-//		string_table::key methodKey = tdata->st->find(methodName);
-			string_table::key methodKey = tdata->st->find("onResult");
-			asCallback->callMethod(methodKey, tmp);
-		    }
-		}
-	    }
-	}
-#endif
-
-	
+// #if 0
+// 	boost::shared_ptr<amf::Buffer> response = _rtmp_client->recvMsg();
+//   	response->dump();
+// 	boost::shared_ptr<RTMP::rtmp_head_t> rthead;
+// 	boost::shared_ptr<RTMP::queues_t> que = _rtmp_client->split(*response);
+// 	log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
+// 	while (que->size()) {
+// 	    boost::shared_ptr<amf::Buffer> ptr = que->front()->pop();
+// 	    if (ptr) {		// If there is legit data
+// 		rthead = _rtmp_client->decodeHeader(ptr->reference());
+// 		RTMPMsg *msg = _rtmp_client->decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+// 		msg->dump();
+// 		if (msg->getMethodName() == "_error") {
+// 		    log_error("Got an error: %s", msg->getMethodName());
+// 		    msg->at(0)->dump();
+// 		    notifyStatus(CALL_FAILED);
+// 		}
+// 		if (msg->getMethodName() == "_result") {
+// 		    log_debug("Got a result: %s", msg->getMethodName());
+// 		    if (msg->getElements().size() > 0) {
+// 			msg->at(0)->dump();
+// 			as_value tmp(*msg->at(0));
+// //		string_table::key methodKey = tdata->st->find(methodName);
+// 			string_table::key methodKey = tdata->st->find("onResult");
+// 			asCallback->callMethod(methodKey, tmp);
+// 		    }
+// 		}
+// 	    }
+// 	}
+// #endif	
     }
 
     // Start a thread to wait for the response
@@ -659,8 +651,7 @@ getNetConnectionInterface()
 {
 
     static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
+    if ( o == NULL ) {
         o = new as_object(getObjectInterface());
         attachNetConnectionInterface(*o);
     }
@@ -754,11 +745,10 @@ net_handler(NetConnection_as::thread_params_t *args)
 
     args->network->setTimeout(50);
     if (args->network->getProtocol() == "rtmp") {
-#if 1
 	do {
 	    RTMPClient *client = reinterpret_cast<RTMPClient *>(args->network);
 	    boost::shared_ptr<amf::Buffer> response = client->recvMsg();
-	    response->dump();
+// 	    response->dump();
 	    boost::shared_ptr<RTMP::rtmp_head_t> rthead;
 	    boost::shared_ptr<RTMP::queues_t> que = client->split(*response);
 	    
@@ -768,8 +758,8 @@ net_handler(NetConnection_as::thread_params_t *args)
 		log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
 		if (ptr) {		// If there is legit data
 		    rthead = client->decodeHeader(ptr->reference());
-		    RTMPMsg *msg = client->decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
-		    msg->dump();
+		    boost::shared_ptr<RTMPMsg> msg = client->decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+// 		    msg->dump();
 		    if (msg->getMethodName() == "_error") {
 			log_error("Got an error: %s", msg->getMethodName());
 			msg->at(0)->dump();
@@ -778,8 +768,8 @@ net_handler(NetConnection_as::thread_params_t *args)
 		    if (msg->getMethodName() == "_result") {
 			log_debug("Got a result: %s", msg->getMethodName());
 			if (msg->getElements().size() > 0) {
-			    msg->at(0)->dump();
-			    as_value tmp(*msg->at(0));
+			    msg->at(1)->dump();
+			    as_value tmp(*msg->at(1));
 //		        string_table::key methodKey = tdata->st->find(methodName);
 			    string_table::key methodKey = args->st->find("onResult");
 			    args->callback->callMethod(methodKey, tmp);
@@ -791,7 +781,6 @@ net_handler(NetConnection_as::thread_params_t *args)
 		}
 	    }
 	} while (!done);
-#endif
     } else if (args->network->getProtocol() == "http") {
 	// Suck all the data waiting for us in the network
 	boost::shared_ptr<amf::Buffer> buf(new amf::Buffer);

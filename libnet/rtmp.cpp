@@ -94,7 +94,8 @@ const char *content_str[] = {
     "Blank 0x11",
     "Notify",
     "Shared object",
-    "Invoke"
+    "Invoke",
+    "FLV Data"
 };
 
 const char *ping_str[] = {
@@ -322,8 +323,9 @@ RTMP::decodeHeader(boost::uint8_t *in)
 	}
     }
 
-    log_debug("RTMP %s: channel: %d, type: %s, header_size %d, bodysize: %d",
-	      content_str[head->type], head->channel, head->head_size, head->bodysize);
+//     log_debug("RTMP %s: channel: %d, type: %s, header_size %d, bodysize: %d",
+// 	      content_str[head->type], head->channel, head->head_size, head->bodysize);
+
 //     switch(head->type) {
 //       case CHUNK_SIZE:
 //       case BYTES_READ:
@@ -631,7 +633,7 @@ RTMP::decodePing(amf::Buffer &buf)
 // 10629:3086592224] 20:01:20 DEBUG: read 29 bytes from fd 3 from port 0
 // C^^^^^^^^^^onBWDone^@^^^^^^^^
 // 43 00 00 00 00 00 15 14 02 00 08 6f 6e 42 57 44 6f 6e 65 00 40 00 00 00 00 00 00 00 05
-RTMPMsg *
+boost::shared_ptr<RTMPMsg>
 RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 {
 //     GNASH_REPORT_FUNCTION;
@@ -639,6 +641,7 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
     boost::uint8_t *ptr = data;
     boost::uint8_t* tooFar = ptr + size;
     bool status = false;
+    boost::shared_ptr<RTMPMsg> msg(new RTMPMsg);
 
     // The first data object is the method name of this object.
     boost::shared_ptr<amf::Element> name = amf_obj.extractAMF(ptr, tooFar);
@@ -646,7 +649,8 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 	ptr += name->getDataSize() + AMF_HEADER_SIZE; // skip the length bytes too
     } else {
 	log_error("Name field of RTMP Message corrupted!");
-	return 0;
+	msg.reset();
+	return msg;
     }
 
     // The stream ID is the second data object. All messages have these two objects
@@ -660,13 +664,9 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
 	}
     } else {
 	log_error("Stream ID field of RTMP Message corrupted!");
-	return 0;
+	msg.reset();
+	return msg;
     }
-
-    // This will need to be deleted manually later after usage, it is not
-    // automatically deallocated.
-    RTMPMsg *msg = new RTMPMsg;
-//    memset(msg, 0, sizeof(RTMPMsg));
 
     if (name->to_string() != 0) {
 	msg->setMethodName(name->to_string());
@@ -698,7 +698,7 @@ RTMP::decodeMsgBody(boost::uint8_t *data, size_t size)
     return msg;
 }
 
-RTMPMsg *
+boost::shared_ptr<RTMPMsg> 
 RTMP::decodeMsgBody(amf::Buffer &buf)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1098,7 +1098,7 @@ RTMP::recvMsg()
 boost::shared_ptr<amf::Buffer> 
 RTMP::recvMsg(int fd)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     int ret = 0;
     //bool nopacket = true;
@@ -1138,7 +1138,6 @@ RTMP::recvMsg(int fd)
 
     return buf;
 }
-
 
 // Split a large buffer into multiple smaller ones of the default chunksize
 // of 128 bytes. We read network data in big chunks because it's more efficient,
