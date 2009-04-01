@@ -149,8 +149,7 @@ main(int argc, char *argv[])
         };
 
     Arg_parser parser(argc, argv, opts);
-    if( ! parser.error().empty() )  
-    {
+    if(! parser.error().empty()) {
         cout << parser.error() << endl;
         exit(EXIT_FAILURE);
     }
@@ -226,7 +225,7 @@ main(int argc, char *argv[])
         usage();
         return EXIT_FAILURE;
     }
-
+    
     RTMPClient client;    
     short port = 0;
     string protocol;        // the network protocol, rtmp or http
@@ -460,6 +459,7 @@ main(int argc, char *argv[])
 #endif
 			}
 		    }
+		    delete msg;
 		} else {
 		    log_error("Couldn't decode RTMP message Body");
 		    continue;
@@ -685,6 +685,7 @@ main(int argc, char *argv[])
 // 			    msg->at(0)->dump();
 			    }
 			}
+			delete msg;
 		    } else {
 			log_error("Couldn't decode RTMP message Body");
 			continue;
