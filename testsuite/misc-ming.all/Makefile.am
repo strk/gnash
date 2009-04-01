@@ -34,8 +34,6 @@ EXTRA_DIST = \
 	PrototypeEventListeners.as \
 	DragDropTest.as \
 	remoting.as \
-	red5test.as \
-	netstream.as \
 	remoting.php \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
@@ -315,12 +313,9 @@ if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 check_SCRIPTS += remotingTestRunner
 endif
-if ENABLE_RED5_TESTING
-check_SCRIPTS += red5testRunner
-endif
 endif
 
-check_SCRIPTS += netstreamTestRunner
+# check_SCRIPTS += netstreamTestRunner
 
 if MING_VERSION_0_4
 check_SCRIPTS += \
@@ -464,7 +459,7 @@ new_child_in_unload_test.swf: new_child_in_unload_test
 new_child_in_unload_testrunner: $(srcdir)/../generic-testrunner.sh new_child_in_unload_test.swf
 	sh $< $(top_builddir) new_child_in_unload_test.swf > $@
 	chmod 755 $@
-		
+
 PlaceObject2Test_SOURCES =	\
 	PlaceObject2Test.c	\
 	$(NULL)
@@ -705,7 +700,7 @@ loop_test10.swf: loop_test10
 loop_test10runner: $(srcdir)/../generic-testrunner.sh loop_test10.swf Makefile
 	sh $<  -f10 -c "#total tests" $(top_builddir) loop_test10.swf > $@
 	chmod 755 $@
-		
+
 shape_test_SOURCES = shape_test.c
 shape_test_LDADD = libgnashmingutils.la
 
@@ -736,7 +731,7 @@ morph_test1runner_DEPENDENCIES = \
 	morph_test1.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
-	
+
 key_event_test_SOURCES = key_event_test.c
 key_event_test_LDADD = libgnashmingutils.la
 
@@ -757,7 +752,7 @@ key_event_testrunner_DEPENDENCIES = \
 	key_event_test.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
-	
+
 place_object_test_SOURCES = place_object_test.c	
 place_object_test_LDADD = libgnashmingutils.la
 
@@ -768,7 +763,7 @@ place_object_testrunner: $(srcdir)/../generic-testrunner.sh place_object_test.sw
 	sh $< -r5 $(top_builddir) place_object_test.swf > $@
 	chmod 755 $@
 
-	
+
 place_object_test2_SOURCES = place_object_test2.c	
 place_object_test2_LDADD = libgnashmingutils.la
 
@@ -969,7 +964,7 @@ DepthLimitsTestrunner: $(srcdir)/../generic-testrunner.sh DepthLimitsTest.swf
 	sh $< -r5 $(top_builddir) DepthLimitsTest.swf > $@
 	chmod 755 $@
 
-	
+
 replace_shapes1test_SOURCES = replace_shapes1test.c	
 replace_shapes1test_LDADD = libgnashmingutils.la
 
@@ -1173,7 +1168,7 @@ event_handler_scope_test.swf: event_handler_scope_test
 event_handler_scope_testrunner: $(srcdir)/../generic-testrunner.sh event_handler_scope_test.swf
 	sh $< -r5 $(top_builddir) event_handler_scope_test.swf > $@
 	chmod 755 $@
-		
+
 attachMovieTest_SOURCES =	\
 	attachMovieTest.c	\
 	$(NULL)
@@ -1751,21 +1746,6 @@ remotingTestRunner: $(srcdir)/../generic-testrunner.sh remoting.swf
 	sh $< $(top_builddir) remoting.swf > $@
 	chmod 755 $@
 
-red5test.swf: $(srcdir)/red5test.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/red5test.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
-
-red5testRunner: $(srcdir)/../generic-testrunner.sh red5test.swf
-	sh $< $(top_builddir) red5test.swf > $@
-	chmod 755 $@
-
-netstream.swf: $(srcdir)/netstream.as Dejagnu.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
-	$(MAKESWF) -n network -r12 -o $@ -v7 -DRED5_HOST='\"$(RED5_HOST)\"' -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=7 Dejagnu.swf $(srcdir)/netstream.as $(srcdir)/../actionscript.all/dejagnu_so_fini.as
-
-netstreamRunner: $(srcdir)/../generic-testrunner.sh netstream.swf
-	sh $< $(top_builddir) netstream.swf > $@
-	chmod 755 $@
-
-
 DragDropTest.swf: $(srcdir)/DragDropTest.as Dejagnu.swf DragDropTestLoaded.swf Makefile ../actionscript.all/check.as ../actionscript.all/utils.as
 	$(MAKESWF) -r12 -o $@ -v6 -DUSE_DEJAGNU_MODULE -DOUTPUT_VERSION=6 Dejagnu.swf $(srcdir)/DragDropTest.as
 
@@ -2028,9 +2008,6 @@ endif
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 if ENABLE_HTTP_TESTSUITE
 TEST_CASES += remotingTestRunner
-endif
-if ENABLE_RED5_TESTING
-TEST_CASES += red5testRunner
 endif
 endif
 
