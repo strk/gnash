@@ -602,52 +602,46 @@ abc_block::read_multinames()
 		// Read, but don't upper validate until after the switch.
 		switch (kind)
 		{
-        case asName::KIND_Qname:
-        case asName::KIND_QnameA:
-        {
-	    ns = mS->read_V32();
-	    check_multiname_namespace(ns);
-            name = mS->read_V32();
-		check_multiname_name(name);
-		log_abc("\tnamespace_index=%u name_index=%u name=%s", ns, name, _stringPool[name]);
-            break;
-        }
-        case asName::KIND_RTQname:
-        case asName::KIND_RTQnameA:
-        {
-            name = mS->read_V32();
-            check_multiname_name(name);
-            break;
-        }
-        case asName::KIND_RTQnameL:
-        case asName::KIND_RTQnameLA:
-        {
-
-            break;
-        }
-        case asName::KIND_Multiname:
-        case asName::KIND_MultinameA:
-        {
-            name = mS->read_V32();
-            check_multiname_name(name);
-            nsset = mS->read_V32();
-            check_multiname_namespaceset(nsset);
-            break;
-        }
-        case asName::KIND_MultinameL:
-        case asName::KIND_MultinameLA:
-        {
-            nsset = mS->read_V32();
-            check_multiname_namespaceset(nsset);
-            break;
-        }
-        default:
-        {
-            // Unknown type.
-            log_error(_("Action Block: Unknown multiname type (%d)."), kind);
-            return false;
-        } // End of cases.
-        } // End of switch.
+            case asName::KIND_Qname:
+            case asName::KIND_QnameA:
+                ns = mS->read_V32();
+                check_multiname_namespace(ns);
+                name = mS->read_V32();
+                check_multiname_name(name);
+                log_abc("\tnamespace_index=%u name_index=%u name=%s",
+                        ns, name, _stringPool[name]);
+                break;
+            
+            case asName::KIND_RTQname:
+            case asName::KIND_RTQnameA:
+                name = mS->read_V32();
+                check_multiname_name(name);
+                break;
+            
+            case asName::KIND_RTQnameL:
+            case asName::KIND_RTQnameLA:
+                break;
+            
+            case asName::KIND_Multiname:
+            case asName::KIND_MultinameA:
+                name = mS->read_V32();
+                check_multiname_name(name);
+                nsset = mS->read_V32();
+                check_multiname_namespaceset(nsset);
+                break;
+            
+            case asName::KIND_MultinameL:
+            case asName::KIND_MultinameLA:
+                nsset = mS->read_V32();
+                check_multiname_namespaceset(nsset);
+                break;
+            
+            default:
+                // Unknown type.
+                log_error(_("Action Block: Unknown multiname type (%d)."),
+                        kind);
+                return false;
+        } 
 
 		_multinamePool[i].setFlags(kind);
 		setMultinameNames(&_multinamePool[i], name);
