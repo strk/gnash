@@ -41,26 +41,29 @@ if (hostname == undefined) {
 
 if (rtmptport == undefined) {
     rtmptport = 5080;
-    note("No RTMPT port specified, defaulting to "+rtmptport);
+    note("No HTTP port specified, defaulting to "+rtmptport);
 }
 
 if (rtmpport == undefined) {
     rtmpport = 1935;
-    note("No RTMP port specified, defaulting to "+rtmpport);
+    note("No HTTP port specified, defaulting to "+rtmpport);
 }
 
 nc = new NetConnection;
 nc.statuses = new Array();
 nc.onStatus = function()
 {
-    this.statuses.push(arguments);
-    note('NetConnection.onStatus called with args: ');
+    note('NetConnection.onStatus called with args: '+dumpObject(arguments));
 };
 
 nc.onResult = function()
 {
-    this.statuses.push(arguments);
     note('NetConnection.onResult called with args: '+dumpObject(arguments));
+    if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
+        pass("HTTP connection - status Success");
+    } else {
+        fail("HTTP connection - status Success");
+    }
 };
 
 function ResultHandler() {
@@ -85,16 +88,27 @@ note("Connecting to "+rtmpuri);
 nc.connect(rtmpuri);
 // The network connection is not opened at connect() time, but when
 // the first call() is made.
-check_equals(nc.isConnected, false);
+
+if (nc.isConnected == false) { // now it is connected
+    pass("HTTP connection - status isConnected");
+} else {
+    fail("HTTP connection - status isConnected");
+}
 
 nc.onResult = function()
 {
     note("Got a connection result back from the server.");
-    check_equals(nc.isConnected, true); // now it is connected
-    check_equals(nc.statuses.length, 1);
+    if (nc.isConnected == true) { // now it is connected
+        pass("HTTP connection - status isConnected");
+    } else {
+        fail("HTTP connection - status isConnected");
+    }
     lastStatusArgs = nc.statuses[nc.statuses.length-1];
-    check_equals(lastStatusArgs[0].level, 'status');
-    check_equals(lastStatusArgs[0].code, 'NetConnection.Connect.Success');
+    if ((lastStatusArgs[0].level == "status") && (lastStatusArgs[0].code == "NetConnection.Connect.Success")) {
+        pass("HTTP connection - status Success");
+    } else {
+        fail("HTTP connection - status Success");
+    }
 };
 
 
@@ -117,6 +131,11 @@ o.onResult = function()
     }
 };
 nc.call("echo", o, null);
+if (nc.isConnected == true) { // now it is connected
+    pass("HTTP connection - status isConnected");
+} else {
+    fail("HTTP connection - status isConnected");
+}
 
 result2=false;
 o=new ResultHandler();
