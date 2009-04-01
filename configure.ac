@@ -1203,7 +1203,6 @@ dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
-AC_PATH_TOOL([NETCAT], [netcat])
 AC_HEADER_DIRENT
 
 dnl -----------------------------------------------------------------
@@ -1634,6 +1633,11 @@ if test x$cross_compiling = xno; then
   AC_SUBST(RED5_HOST)
 fi
 AM_CONDITIONAL(ENABLE_RED5_TESTING, [ test x"$RED5_HOST" != x ])
+
+AC_PATH_PROG(NETCAT, nc)
+AM_CONDITIONAL(HAS_NETCAT, [ test x"$NETCAT" != x ])
+AC_PATH_PROG(WGET, wget)
+AM_CONDITIONAL(HAS_WGET, [ test x"$WGET" != x ])
 
 dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
@@ -3198,6 +3202,17 @@ if test x"$nspr4" = x"yes"; then
   else
     echo "        ERROR: No NSPR development package is installed." >&3
   fi
+fi
+
+if test x"$NETCAT" != x; then
+    echo "        You have netcat installed, which is only used for testing"
+else
+    echo "        Install netcat for networking test support"
+fi
+if test x"$WGET" != x; then
+    echo "        You have wget installed, which is only used for testing"
+else
+    echo "        Install wget for networking test support"
 fi
 
 if test x$cross_compiling = xyes; then
