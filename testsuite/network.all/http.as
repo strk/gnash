@@ -86,11 +86,10 @@ nc.connect(rtmpuri);
 // The network connection is not opened at connect() time, but when
 // the first call() is made.
 check_equals(nc.isConnected, false);
-check_equals(nc.statuses.length, 0);
 
 nc.onResult = function()
 {
-    note("Got a result back from the server.");
+    note("Got a connection result back from the server.");
     check_equals(nc.isConnected, true); // now it is connected
     check_equals(nc.statuses.length, 1);
     lastStatusArgs = nc.statuses[nc.statuses.length-1];
@@ -109,7 +108,7 @@ result1=false;;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a null result back from the server."+dumpObject(arguments));
+    note("Got a null result back from the HTTP server."+dumpObject(arguments));
     note(arguments[0]);
     if (arguments.length == 1) {
  	if (arguments[0] == null) {
@@ -123,7 +122,7 @@ result2=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got an undefined result back from the server."+dumpObject(arguments));
+    note("Got an undefined result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == undefined) {
 	    result2=true;
@@ -149,7 +148,7 @@ tstr = new String();
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a string result back from the server."+dumpObject(arguments));
+    note("Got a string result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0].length == 0) {
 	    result3 = true;
@@ -164,7 +163,7 @@ tstr2 = "Hello World!";
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a string result back from the server."+dumpObject(arguments));
+    note("Got a string result back from the HTTP server."+dumpObject(arguments));
 //     note("ARG4 is: " +dumpObject(arguments[0]));
     str = arguments[0].toString();
     if (arguments.length == 1) {
@@ -183,7 +182,7 @@ result5=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical 0 result back from the server."+dumpObject(arguments));
+    note("Got a numerical 0 result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == 0) {
 	    result5 = true;
@@ -197,7 +196,7 @@ result6=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical 1 result back from the server."+dumpObject(arguments));
+    note("Got a numerical 1 result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == 1) {
 	    result6 = true;
@@ -211,7 +210,7 @@ result7=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical -1 result back from the server."+dumpObject(arguments));
+    note("Got a numerical -1 result back from the HTTP server."+dumpObject(arguments));
     if ((arguments.length == 1)) {
 	note("FIXME: "+arguments[0].to_number());
 	result7 = true;
@@ -224,7 +223,7 @@ result8=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical 256 result back from the server."+dumpObject(arguments));
+    note("Got a numerical 256 result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == 256) {
 	    result8 = true;
@@ -238,7 +237,7 @@ result9=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical -256 result back from the server."+dumpObject(arguments));
+    note("Got a numerical -256 result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == -256) {
 	    result9 = true;
@@ -252,7 +251,7 @@ result10=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical 65536 result back from the server."+dumpObject(arguments));
+    note("Got a numerical 65536 result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == 65536) {
 	    result10 = true;
@@ -266,7 +265,7 @@ result11=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical -65536 result back from the server."+dumpObject(arguments));
+    note("Got a numerical -65536 result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == -65536) {
 	    result11 = true;
@@ -280,7 +279,7 @@ result12=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical 1.5 result back from the server."+dumpObject(arguments));
+    note("Got a numerical 1.5 result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == 1.5) {
 	    result12 = true;
@@ -294,7 +293,7 @@ result13=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical -1.5 result back from the server."+dumpObject(arguments));
+    note("Got a numerical -1.5 result back from the  HTTPserver."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == -1.5) {
 	    result13 = true;
@@ -308,7 +307,7 @@ result14=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical NaN result back from the server."+dumpObject(arguments));
+    note("Got a numerical NaN result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == NaN) {
 	    result14 = true;
@@ -322,7 +321,7 @@ result15=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got an numerical infinity result back from the server."+dumpObject(arguments));
+    note("Got an numerical infinity result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == infinity) {
 	    result15 = true;
@@ -336,7 +335,7 @@ result16=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a numerical -infinity result back from the server."+dumpObject(arguments));
+    note("Got a numerical -infinity result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0] == -infinity) {
 	    result16 = true;
@@ -369,7 +368,7 @@ result17=false;
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got an empty array result back from the server."+dumpObject(arguments));
+    note("Got an empty array result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
 	if (arguments[0].length == 0) {
 	    result17 = true;
@@ -385,7 +384,7 @@ tar.push(1);
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a single item array result back from the server."+dumpObject(arguments));
+    note("Got a single item array result back from the HTTP server."+dumpObject(arguments));
     if (arguments.length == 1) {
  	if (arguments[0][0] == 1) {
  	    result18 = true;
@@ -403,7 +402,7 @@ tar.push(3);
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got an 3 item array result back from the server."+dumpObject(arguments));
+    note("Got an 3 item array result back from the HTTP server."+dumpObject(arguments));
     if ((arguments.length == 1) && (arguments[0].length == 3)) {
 	if ((arguments[0][0] == 1) && (arguments[0][1] == 2) && (arguments[0][2] == 3))  {
 	    result19 = true;
@@ -425,7 +424,7 @@ tar2.push(5);
 o=new ResultHandler();
 o.onResult = function()
 {
-    note("Got a sparse result back from the server."+dumpObject(arguments));
+    note("Got a sparse result back from the HTTP server."+dumpObject(arguments));
     if ((arguments.length == 1) && (arguments[0].length == 2)) {
 	if ((arguments[0][0] == 1) && (arguments[0][1] == 5))  {
 	    result20 = true;
@@ -535,7 +534,7 @@ if (result18) {
     fail("RTMPT: Echo 1 item array");
 }
 if (result19) {
-    pass("ERTMPT: cho 3 item array");
+    pass("RTMPT: Echo 3 item array");
 } else {
     fail("RTMPT: Echo 3 item array");
 }
