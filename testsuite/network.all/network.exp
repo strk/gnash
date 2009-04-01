@@ -33,47 +33,111 @@ set timeout 100
 set file all
 set params ""
 
-# Send something to the copy of Cygnal we started
-# See if a remote service has a server answering on that port.
-# echo "xxx " | telnet localhost 5080
+# specify a default name and port for the RTMPT (AMF over HTTP) tests
+set http_hostname localhost
+set http_portnum 5080
 
-set chost localhost
-set cport 5080
-set server_dead "true"
+# specify a default name and port for the RTMP  tests
+set rtmp_hostname localhost
+set rtmp_portnum 1935
 
-proc probe {  } {
-    global chost
-    global cport
-    verbose "Trying to ping $chost to see if the host is alive"
+#
+# These are lists of hostname and port combinations 'probed'
+# to see if there is a service for that connection. Later each
+# is probed to see if there is a functioning service for that
+# port on the specified host
+#
+
+array set http_targets {
+    {0} {localhost    4080}
+    {1} {localhost    5080}
+    {2} {gnashdev.org 5080}
+    {3} {gnashdev.org 4080}
+}
+
+array set rtmp_targets {
+    {0} {localhost    1935}
+    {1} {localhost    5935}
+    {2} {gnashdev.org 1935}
+    {3} {gnashdev.org 5935}
+}
+
+#
+# Probe a hostname:port usig netcat to see if there is a service available
+#
+proc probe { host port } {
+    verbose "Trying to probe $host:$port to see if there is an available service"
     global server_dead 
-    spawn -noecho ping -c 1 $chost
+    spawn -noecho nc -z $host $port
     set nid $spawn_id
     global timeout
 
     expect {
+	"Connection to *port * succeeded" {
+	    verbose "Got probe response, $host is alive on port $port..." 2
+	    set targets(host.name) $host
+	    set targets(host.port) $port
+	}
 	"packets transmitted, 1 received" {
-	    verbose "Got ping resposne, $chost is alive..."
-	    set server_dead "false"
+	    verbose "Got probe response, $host is alive on port $port..." 2
 	}
 	eof {
-	    verbose "Ping all done..."
-	    set server_dead "false"
+	    verbose "Probe all done, no service..." 2
+	    return false
 	}
 	timeout {
-	    verbose "Ping still running after ${timeout} seconds, killing it (deadlock?)"
+	    verbose "Probe still running after ${timeout} seconds, killing it (deadlock?)" 2
 	    catch close
-	    set server_dead "true"
+	    return false
 	}
     }
 
     return true
 }
 
-# Make sure we can access the resource on the specified host,m which won't always
-# be localhost.
-if { [probe] != true } {
-    verbose "$chost is Dead!"
-    exit
+
+proc checkhosts { targets } {
+    global http_hostname
+    global http_portnum
+    global rtmp_hostname
+    global rtmp_portnum
+
+    # Make sure we can access the resource on the specified host, which won't always
+    # be default.
+    foreach {host port} targets {
+	if { [probe $host $port] != true } {
+	    verbose "$x is Dead!"
+	}
+    }
+}
+
+# See if the specified hosts are alive
+#checkhosts [array get http_targets]
+#checkhosts rtmp_targets
+foreach {index target} [array get http_targets] {
+    set host [lindex $target 0]
+    set port [lindex $target 1]
+     if { [probe $host $port] == true } {
+ 	set http_hostname $host
+ 	set http_portnum $port
+ 	verbose "$host:$port has HTTP service"
+ 	break
+     } else {
+ 	verbose "$host:$port has no HTTP service attached!"
+     }
+}
+
+foreach {index target} [array get rtmp_targets] {
+    set host [lindex $target 0]
+    set port [lindex $target 1]
+     if { [probe $host $port] == true } {
+ 	set rtmp_hostname $host
+ 	set rtmp_portnum $port
+ 	verbose "$host:$port has RTMP service"
+ 	break
+     } else {
+ 	verbose "$host:$port has no RTMP service attached!"
+     }
 }
 
 global env
@@ -81,9 +145,13 @@ set env(LANG) en_US.UTF-8
 set env(LANGUAGE) en_US.UTF-8
 set env(LC_ALL) en_US.UTF-8
 
+# Look fo rthe gprocess utility we in this build tree
 set gproc [lookfor_file $objdir utilities/gprocessor]
 set goptions "-vv"
 verbose "Starting gprocessor \"$gproc $goptions\" for testing"
+
+set test_targets(http.swf) [list $http_hostname $http_portnum]
+set test_targets(rtmp.swf) [list $rtmp_hostname $rtmp_portnum]
 
 # testcases is set by the Makefile in the site.exp data file.
 foreach file $testcases {
@@ -96,9 +164,13 @@ foreach file $testcases {
     # this version of the call allows use of 'wait' to check return code
     # -open [open "|cmd" "r"] doesn't work for that
   
+    set host [lindex $test_targets($file) 0]
+    set port [lindex $test_targets($file) 1]
+    set params "-P flashVars=\"hostname=$host,port=$port\""
+
     # Ignore SIGHUP or we'd get a lot of them on Debian stable
-    verbose "Starting gprocessor \"$gproc $goptions $file\" for testing"
-    spawn -noecho -ignore SIGHUP $gproc $goptions $file 
+    verbose "Starting gprocessor $gproc $goptions $file $params for testing"
+    spawn -noecho -ignore SIGHUP $gproc $goptions $file $params
 
     expect {
 	-re "^\[^\n]*NOTE:\[^\n]*\n" {
