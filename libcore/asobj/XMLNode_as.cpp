@@ -98,20 +98,18 @@ XMLNode_as::XMLNode_as(const XMLNode_as& tpl, bool deep)
     _type(tpl._type)
 {
     // only clone children if in deep mode
-    if ( deep ) 
-    {
+    if (deep) {
         const Children& from=tpl._children;
         for (Children::const_iterator it=from.begin(), itEnd=from.end();
-                        it != itEnd; ++it)
-        {
-                _children.push_back(new XMLNode_as(*(*it), deep));
+                        it != itEnd; ++it) {
+
+            _children.push_back(new XMLNode_as(*(*it), deep));
         }
     }
 }
 
 XMLNode_as::~XMLNode_as()
 {
-    //log_debug("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_debug(_("\tDeleting XMLNode data %s with as_value %s at %p"),
             this->_name, this->as_value, this);
@@ -121,17 +119,13 @@ XMLNode_as::~XMLNode_as()
 bool
 XMLNode_as::hasChildNodes()
 {
-    //GNASH_REPORT_FUNCTION;
-    if (_children.size()) {
-        return true;
-    }
+    if (_children.size()) return true;
     return false;
 }
 
 boost::intrusive_ptr<XMLNode_as>
 XMLNode_as::firstChild()
 {
-    //GNASH_REPORT_FUNCTION;
     if ( _children.empty() ) return NULL;
     return _children.front();
 }
@@ -139,11 +133,9 @@ XMLNode_as::firstChild()
 boost::intrusive_ptr<XMLNode_as>
 XMLNode_as::lastChild()
 {
-	//GNASH_REPORT_FUNCTION;
-	if ( _children.empty() )
-	{
+	if (_children.empty()) {
 			log_debug(_("XMLNode_as %p has no children"), (void*)this);
-			return NULL;
+			return 0;
 	}
 	return _children.back();
 }
@@ -176,10 +168,10 @@ XMLNode_as::insertBefore(boost::intrusive_ptr<XMLNode_as> newnode,
 {
     // find iterator for positional parameter
     Children::iterator it = std::find(_children.begin(), _children.end(), pos);
-    if ( it == _children.end() )
-    {
+    if (it == _children.end()) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("XMLNode.insertBefore(): positional parameter is not a child of this node"));
+        log_aserror(_("XMLNode.insertBefore(): positional parameter "
+                "is not a child of this node"));
         );
         return;
     }
@@ -187,8 +179,7 @@ XMLNode_as::insertBefore(boost::intrusive_ptr<XMLNode_as> newnode,
     _children.insert(it, newnode);
     boost::intrusive_ptr<XMLNode_as> oldparent = newnode->getParent();
     newnode->setParent(this);
-    if ( oldparent )
-    {
+    if (oldparent) {
         oldparent->_children.remove(newnode);
     }
 }
@@ -198,72 +189,48 @@ XMLNode_as::insertBefore(boost::intrusive_ptr<XMLNode_as> newnode,
 void
 XMLNode_as::removeNode()
 {
-#ifndef GNASH_USE_GC
-    assert(get_ref_count() > 1);
-#endif
     boost::intrusive_ptr<XMLNode_as> oldparent = getParent();
-    if ( oldparent )
-    {
+    if (oldparent) {
         oldparent->_children.remove(this);
     }
-    _parent = NULL;
-#ifndef GNASH_USE_GC
-    assert(get_ref_count() > 0);
-#endif
+    _parent = 0;
 }
 
 XMLNode_as *
 XMLNode_as::previousSibling()
 {
-    //GNASH_REPORT_FUNCTION;
+    if (!_parent) return 0;
+ 	if (_parent->_children.size() <= 1) return 0;
 
-    if ( ! _parent) return NULL;
- 	if (_parent->_children.size() <= 1) return NULL;
+    XMLNode_as *previous_node = 0;
+    for (Children::iterator itx = _parent->_children.begin();
+            itx != _parent->_children.end(); itx++) {
 
-    XMLNode_as *previous_node = NULL;
-    Children::iterator itx;
-    for (itx = _parent->_children.begin(); itx != _parent->_children.end(); itx++)
-    {
-        if (itx->get() == this)
-        {
-            // log_debug("Found the previous XMLNode_as child !!!! %s <%p>", (*itx)->nodeName(), (void*)*itx);
-		    return previous_node;
-		}
-		previous_node = itx->get();
+        if (itx->get() == this) return previous_node;
+		
+        previous_node = itx->get();
     }
 
-    return NULL;
+    return 0;
 }
 
 XMLNode_as *
 XMLNode_as::nextSibling()
 {
-    //GNASH_REPORT_FUNCTION;
 
-    if ( ! _parent)
-    {
-            //log_debug("Node %p has no parent, returning NULL", this);
-            return NULL;
-    }
-    if (_parent->_children.size() <= 1)
-    {
-            //log_debug("Node %p parent has only this node, returning NULL", this);
-            return NULL;
-    }
+    if (!_parent) return 0;
 
-    XMLNode_as *previous_node = NULL;
-    Children::reverse_iterator itx;
-    for (itx = _parent->_children.rbegin(); itx != _parent->_children.rend();
-            itx++)
-    {
-        if (itx->get() == this)
-        {
-		    return previous_node;
-		}
+    if (_parent->_children.size() <= 1) return 0;
+
+    XMLNode_as *previous_node = 0;
+    for (Children::reverse_iterator itx = _parent->_children.rbegin();
+            itx != _parent->_children.rend(); ++itx) {
+
+        if (itx->get() == this) return previous_node;
 		previous_node = itx->get();
     }
 
-    return NULL;
+    return 0;
 }
 
 void
@@ -288,8 +255,7 @@ XMLNode_as::getPrefixForNamespace(const std::string& ns, std::string& prefix)
     PropertyList::SortedPropertyList::const_iterator it; 
     PropertyList::SortedPropertyList attrs;
     
-    while (node)
-    {
+    while (node) {
         enumerateAttributes(*node, attrs);
         if (!attrs.empty())
         {
@@ -327,11 +293,12 @@ XMLNode_as::getNamespaceForPrefix(const std::string& prefix, std::string& ns)
     PropertyList::SortedPropertyList::const_iterator it; 
     PropertyList::SortedPropertyList attrs;
     
-    while (node)
-    {
+    while (node) {
+
         enumerateAttributes(*node, attrs);
-        if (!attrs.empty())
-        {
+
+        if (!attrs.empty()) {
+
             it = std::find_if(attrs.begin(), attrs.end(), 
                         boost::bind(prefixMatches, _1, prefix));
             if (it != attrs.end()) break;
@@ -379,8 +346,8 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 #endif
 
     // Create the beginning of the tag
-    if (!nodeName.empty())
-    {
+    if (!nodeName.empty()) {
+
         xmlout << "<" << nodeName;
     
         // Process the attributes, if any
@@ -408,7 +375,7 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     }
 
     // Node as_value first, then children
-    if ( type == Text )
+    if (type == Text)
     {
         // Insert entities.
         std::string escaped(nodeValue);
@@ -419,14 +386,13 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     }
 
     // Childs, after node as_value.
-    Children::const_iterator itx;
-    for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
-    {
+    for (Children::const_iterator itx = xml._children.begin(); 
+            itx != xml._children.end(); ++itx) {
+
         (*itx)->toString(xmlout, encode);
     }
 
-    if (!nodeName.empty())
-    {
+    if (!nodeName.empty()) {
 	    xmlout << "</" << nodeName << ">";
     }
 }
@@ -436,15 +402,12 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
 void
 XMLNode_as::markReachableResources() const
 {
-	// Mark childs
-	for (Children::const_iterator i=_children.begin(),
-            e=_children.end(); i!=e; ++i)
-	{
-		(*i)->setReachable();
-	}
+	// Mark children
+    std::for_each(_children.begin(), _children.end(),
+            boost::mem_fn(&as_object::setReachable));
 
 	// Mark parent
-	if ( _parent ) _parent->setReachable();
+	if (_parent) _parent->setReachable();
 
 	// Mark attributes object
 	if (_attributes) _attributes->setReachable();
@@ -625,8 +588,8 @@ xmlnode_insertBefore(const fn_call& fn)
 
 	boost::intrusive_ptr<XMLNode_as> newnode = 
         boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(0).to_object());
-	if ( ! newnode )
-	{
+
+	if (!newnode) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("First argument to XMLNode.insertBefore(%s) is not "
@@ -637,8 +600,8 @@ xmlnode_insertBefore(const fn_call& fn)
 
 	boost::intrusive_ptr<XMLNode_as> pos = 
         boost::dynamic_pointer_cast<XMLNode_as>(fn.arg(1).to_object());
-	if ( ! pos )
-	{
+
+	if (!pos) {
 		IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
 		log_aserror(_("Second argument to XMLNode.insertBefore(%s) is not "

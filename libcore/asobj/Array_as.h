@@ -160,18 +160,10 @@ public:
 
 	/// @param separator
     ///     String to use as separator between elements
-    ///
-	/// @param env
-	///	If not-null will be used to properl invoke the toString()
-	///	method against member values.
-	///
-	std::string join(const std::string& separator, as_environment* env) const;
+	std::string join(const std::string& separator) const;
 
-	/// @param env
-	///	If not-null will be used to properly invoke the toString()
-	///	method against member values.
-	///
-	std::string toString(as_environment* env=NULL) const;
+    /// Convert array to string.
+	std::string toString() const;
 
 	// override from as_object
 	std::string get_text_value() const

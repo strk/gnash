@@ -49,18 +49,18 @@ namespace gnash {
 
 // Convert each byte into its hex representation
 std::string
-hexify (const unsigned char *p, size_t length, bool ascii)
+hexify(const unsigned char *p, size_t length, bool ascii)
 {
 
-	const std::vector<unsigned char> bytes (p, p + length);
+	const std::vector<unsigned char> bytes(p, p + length);
 
 	std::ostringstream ss;
 	
 	// For hex output, fill single-digit numbers with a leading 0.
 	if (!ascii) ss << std::hex << std::setfill('0');
 	
-	for (std::vector<unsigned char>::const_iterator i = bytes.begin(), e = bytes.end();
-	     i != e; ++i)
+	for (std::vector<unsigned char>::const_iterator i = bytes.begin(),
+            e = bytes.end(); i != e; ++i)
 	    {
 		if (ascii) {
 		    if (std::isprint(*i) || *i == 0xd) {
@@ -78,29 +78,23 @@ hexify (const unsigned char *p, size_t length, bool ascii)
 
 }
 
-std::string
-timestamp()
+std::ostream&
+timestamp(std::ostream& o)
 {
 
+    const char fmt[] = "%H:%M:%S";
+
 	time_t t;
-	char buf[10];
+	char buf[sizeof(fmt)];
 
-	std::memset (buf, '0', 10); // this terminates the string
-	std::time (&t); // get the current time
-	std::strftime (buf, sizeof(buf), "%H:%M:%S", std::localtime (&t));
+	std::time(&t);
+	std::strftime(buf, sizeof(buf), fmt, std::localtime(&t));
 
-	std::stringstream ss;
-	ss << getpid() << ":" << get_thread_id() << "] " << buf;
-	return ss.str();
+	o << getpid() << ":" << get_thread_id() << "] " << buf;
+	return o;
 
 }
 
-// This is a bit of a hack. We implement wrappers for the old
-// functions so we don't have to change files everywhere, but get the
-// new behaviours, like logging to disk.
-// THIS IS DANGEROUS AS TIME OF INITIALIZATION IS UNPREDICTABLE,
-// THUS WE NOW HAVE A LogFile::getDefaultInstance() TO MAKE SURE
-// INITIALIZATION OF THE GLOBAL data HAPPENS BEFORE USE
 LogFile&
 LogFile::getDefaultInstance()
 {
@@ -124,7 +118,7 @@ processLog_trace(const boost::format& fmt)
 void
 processLog_debug(const boost::format& fmt)
 {
-	if (dbglogfile.getVerbosity() < LogFile::LOG_NORMAL) return;
+	if (dbglogfile.getVerbosity() < LogFile::LOG_DEBUG) return;
 	dbglogfile.log(N_("DEBUG"), fmt.str());
 }
 
@@ -197,8 +191,7 @@ LogFile::log(const std::string& msg)
 	if (openLogIfNeeded())
 	{
 		if (_stamp) {
-			std::string ts = timestamp();
-			_outstream << ts << ": " << msg << "\n";
+			_outstream << timestamp << ": " << msg << "\n";
 		} else {
 			_outstream << msg << "\n";
 		}
@@ -206,8 +199,7 @@ LogFile::log(const std::string& msg)
 	else // log to stdout
 	{
 		if (_stamp) {
-			std::string ts = timestamp();
-			cout << ts << " " << msg << "\n";
+			cout << timestamp << " " << msg << "\n";
 		} else {
 			cout << msg << "\n";
 		}
@@ -219,10 +211,10 @@ LogFile::log(const std::string& msg)
 	}
 }
 
-void
+inline void
 LogFile::log(const std::string& label, const std::string& msg)
 {
-	log(label+std::string(": ")+msg);
+	log(label + ": " + msg);
 }
 
 void
@@ -235,12 +227,12 @@ LogFile::setLogFilename(const std::string& fname)
 void
 LogFile::setWriteDisk(bool use)
 {
-	if ( ! use ) closeLog();
+	if (!use) closeLog();
 	_write = use;
 }
 
 // Default constructor
-LogFile::LogFile ()
+LogFile::LogFile()
 	:
 	_verbose(0),
 	_actiondump(false),
@@ -258,7 +250,7 @@ LogFile::~LogFile()
 }
 
 bool
-LogFile::openLogIfNeeded ()
+LogFile::openLogIfNeeded()
 {
     if (_state != CLOSED) return true;
     if (!_write) return false;
@@ -271,7 +263,7 @@ LogFile::openLogIfNeeded ()
 }
 
 bool
-LogFile::openLog (const std::string& filespec)
+LogFile::openLog(const std::string& filespec)
 {
 
     // NOTE:
@@ -282,28 +274,27 @@ LogFile::openLog (const std::string& filespec)
 
     if (_state != CLOSED) {
 	cout << "Closing previously opened stream" << endl;
-        _outstream.close ();
+        _outstream.close();
         _state = CLOSED;
     }
 
     // Append, don't truncate, the log file
-    _outstream.open (filespec.c_str(), std::ios::app|std::ios::out); // ios::out
+    _outstream.open(filespec.c_str(), std::ios::app|std::ios::out); // ios::out
     if( _outstream.fail() ) {
 	// Can't use log_error here...
-        cout << "ERROR: can't open debug log file " << filespec << " for appending." << endl;
+        cout << "ERROR: can't open debug log file " << filespec << 
+            " for appending." << endl;
         return false;
     }       
 
 	_filespec = filespec;
 	_state = OPEN;
 
-  // LogFile::outstream << "Opened " << filespec << endl;
-
     return true;
 }
 
 bool
-LogFile::closeLog (void)
+LogFile::closeLog()
 {
 	boost::mutex::scoped_lock lock(_ioMutex);
 	if (_state == OPEN) {
@@ -316,10 +307,10 @@ LogFile::closeLog (void)
 }
 
 bool
-LogFile::removeLog (void)
+LogFile::removeLog()
 {
 	if (_state == OPEN) {
-		_outstream.close ();
+		_outstream.close();
 	}
 
     // Ignore the error, we don't care
@@ -327,28 +318,6 @@ LogFile::removeLog (void)
     _filespec.clear();
 
 	return true;
-}
-
-boost::format
-logFormat(const std::string &str)
-{
-
-	using namespace boost::io;
-
-	boost::format fmt(str);
-	
-	// Don't throw exception if the wrong number of 
-	// arguments is passed or the format string is 
-	// bad. This might lead to strings being mangled,
-	// but the alternative is that a careless format
-	// string would cause Gnash to abort; and some
-	// strings don't appear very often. The same holds
-	// for translations.
-	fmt.exceptions(all_error_bits ^ (
-							too_many_args_bit |
-							too_few_args_bit |
-							bad_format_string_bit));
-	return fmt;
 }
 
 } // end of gnash namespace

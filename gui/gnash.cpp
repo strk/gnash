@@ -47,6 +47,7 @@ extern "C" {
 
 #include <string>
 #include <iostream>
+#include <ios>
 
 #ifdef ENABLE_NLS
 # include <locale>
@@ -443,6 +444,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 int
 gnash_main(int argc, char *argv[])
 {
+
+    std::ios::sync_with_stdio(false);
 
     gnash::Player player;
 
