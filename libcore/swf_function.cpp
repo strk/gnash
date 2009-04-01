@@ -129,26 +129,16 @@ swf_function::operator()(const fn_call& fn)
     CallStack& cs = vm.getCallStack();
     if ( ! cs.empty() ) caller = cs.back().func;
 
+	assert(m_env);
+
 	// Set up local stack frame, for parameters and locals.
-	as_environment::FrameGuard guard(fn.env(), this);
+	as_environment::FrameGuard guard(*m_env, this);
 
 	as_environment*	our_env = m_env;
-	assert(our_env);
-
-	// if(our_env->get_original_target()->isDestroyed())
-        if (our_env == NULL)
-	{
-		log_error("swf_function own environment is null (possible?)");
-		our_env = &fn.env();
-	}
 
 	character* target = our_env->get_target();
 	character* orig_target = our_env->get_original_target();
 
-#if 0
-	log_debug("swf_function() stack:\n"); fn.env().dump_stack();
-	log_debug("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
-#endif
 	// Some features are version-dependant.
 	unsigned swfversion = vm.getSWFVersion();
 	as_object *super = NULL;

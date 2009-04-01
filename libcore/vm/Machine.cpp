@@ -1196,7 +1196,7 @@ Machine::execute()
 				LOG_DEBUG_AVM("Calling method %s on object %s",
                         property.toDebugString(),object_val.toDebugString());
 				as_environment env = as_environment(_vm);
-				result = call_method(property,&env,object,args);
+				result = call_method(property,env,object,args);
 
 			}
 			else{
@@ -1353,7 +1353,7 @@ Machine::execute()
 			}
 			else{
 				as_value val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
-				as_value result = call_method(val,&env,constructor_val.to_object().get(),args);
+				as_value result = call_method(val,env,constructor_val.to_object().get(),args);
 				push_stack(result);
 			}
 		}
@@ -1450,7 +1450,7 @@ Machine::execute()
 		//Call the class's static constructor.
 		as_environment env = as_environment(_vm);
 		as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu,0);
-		as_value value = call_method(property,&env,new_class,get_args(0));
+		as_value value = call_method(property,env,new_class,get_args(0));
 
 		break;
 	}
@@ -1576,9 +1576,17 @@ Machine::execute()
 		else{
 			name = a.getGlobalName();
 		}
-		as_object *object = pop_stack().to_object().get();
-		object->set_member(name,value,ns,false);
 
+        as_value val = pop_stack();
+		as_object *object = val.to_object().get();
+
+        if (!object) {
+            log_error("Expected object on stack, but none found (%s)!",
+                    val);
+            break;
+        }
+
+		object->set_member(name, value, ns, false);
 		break;
 	}
 /// 0x62 ABC_ACTION_GETLOCAL

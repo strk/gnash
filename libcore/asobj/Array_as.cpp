@@ -349,10 +349,10 @@ public:
     as_function& _comp;
     as_object* _object;
     bool (*_zeroCmp)(const int);
-    as_environment& _env;
+    const as_environment& _env;
 
     as_value_custom(as_function& comparator, bool (*zc)(const int), 
-        boost::intrusive_ptr<as_object> this_ptr, as_environment& env)
+        boost::intrusive_ptr<as_object> this_ptr, const as_environment& env)
         :
         _comp(comparator),
         _zeroCmp(zc),
@@ -369,7 +369,7 @@ public:
 	    std::auto_ptr<std::vector<as_value> > args (new std::vector<as_value>);
 	    args->push_back(b);
 	    args->push_back(a);
-        ret = call_method(cmp_method, &_env, _object, args);
+        ret = call_method(cmp_method, _env, _object, args);
 
         return (*_zeroCmp)(ret.to_int());
     }
@@ -672,7 +672,7 @@ Array_as::reverse()
 }
 
 std::string
-Array_as::join(const std::string& separator, as_environment*) const
+Array_as::join(const std::string& separator) const
 {
     // TODO - confirm this is the right format!
     // Reportedly, flash version 7 on linux, and Flash 8 on IE look like
@@ -710,9 +710,9 @@ Array_as::concat(const Array_as& other)
 }
 
 std::string
-Array_as::toString(as_environment* env) const
+Array_as::toString() const
 {
-    return join(",", env);
+    return join(",");
 }
 
 unsigned int
@@ -993,7 +993,7 @@ array_sort(const fn_call& fn)
         if (flags & Array_as::fDescending) icmp = &int_lt_or_eq;
         else icmp = &int_gt;
 
-        as_environment& env = fn.env();
+        const as_environment& env = fn.env();
 
         as_value_custom avc = 
             as_value_custom(*as_func, icmp, fn.this_ptr, env);
@@ -1259,15 +1259,14 @@ array_join(const fn_call& fn)
     boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     std::string separator = ",";
-    int version = array->getVM().getSWFVersion();
-    as_environment* env = &(fn.env());
+    int version = fn.getVM().getSWFVersion();
 
     if (fn.nargs > 0)
     {
         separator = fn.arg(0).to_string_versioned(version);
     }
 
-    std::string ret = array->join(separator, env);
+    std::string ret = array->join(separator);
 
     return as_value(ret);
 }

@@ -29,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-	class as_function;
+    class as_function;
 }
 
 namespace gnash {
@@ -64,43 +64,43 @@ public:
     /// Setup the Timer, enabling it.
     //
     /// @param method
-    ///	The function to call from execution operator.
-    ///	Will be stored in an intrusive_ptr.
+    ///    The function to call from execution operator.
+    ///    Will be stored in an intrusive_ptr.
     ///
     /// @param ms
-    ///	The number of milliseconds between expires.
+    ///    The number of milliseconds between expires.
     ///
     /// @param this_ptr
-    ///	The object to be used as 'this' pointer when calling the
-    ///	associated function. Will be stored in an intrusive_ptr.
-    ///	It is allowed to be NULL as long as fn_call is allowed
-    ///	a NULL as 'this_ptr' (we might want to change this).
+    ///    The object to be used as 'this' pointer when calling the
+    ///    associated function. Will be stored in an intrusive_ptr.
+    ///    It is allowed to be NULL as long as fn_call is allowed
+    ///    a NULL as 'this_ptr' (we might want to change this).
     ///
     /// @param runOnce
-    /// 	If true the interval will run only once. False if omitted.
+    ///     If true the interval will run only once. False if omitted.
     void setInterval(as_function& method, unsigned long ms,
             boost::intrusive_ptr<as_object> this_ptr, bool runOnce = false);
 
     /// Setup the Timer, enabling it.
     //
     /// @param method
-    ///	The function to call from execution operator.
-    ///	Will be stored in an intrusive_ptr.
+    ///    The function to call from execution operator.
+    ///    Will be stored in an intrusive_ptr.
     ///
     /// @param ms
-    ///	The number of milliseconds between expires.
+    ///    The number of milliseconds between expires.
     ///
     /// @param this_ptr
-    ///	The object to be used as 'this' pointer when calling the
-    ///	associated function. Will be stored in an intrusive_ptr.
-    ///	It is allowed to be NULL as long as fn_call is allowed
-    ///	a NULL as 'this_ptr' (we might want to change this).
+    ///    The object to be used as 'this' pointer when calling the
+    ///    associated function. Will be stored in an intrusive_ptr.
+    ///    It is allowed to be NULL as long as fn_call is allowed
+    ///    a NULL as 'this_ptr' (we might want to change this).
     ///
     /// @param args
-    /// 	The list of arguments to pass to the function being invoked.
+    ///     The list of arguments to pass to the function being invoked.
     ///
     /// @param runOnce
-    /// 	If true the interval will run only once. False if omitted.
+    ///     If true the interval will run only once. False if omitted.
     void setInterval(as_function& method, unsigned long ms,
             boost::intrusive_ptr<as_object> this_ptr,
             std::vector<as_value>& args, bool runOnce = false);
@@ -108,22 +108,22 @@ public:
     /// Setup the Timer to call a late-evaluated object method, enabling it.
     //
     /// @param this_ptr
-    ///	The object to be used as 'this' pointer when calling the
-    ///	associated function. Will be stored in an intrusive_ptr.
-    ///	It is allowed to be NULL as long as fn_call is allowed
-    ///	a NULL as 'this_ptr' (we might want to change this).
+    ///    The object to be used as 'this' pointer when calling the
+    ///    associated function. Will be stored in an intrusive_ptr.
+    ///    It is allowed to be NULL as long as fn_call is allowed
+    ///    a NULL as 'this_ptr' (we might want to change this).
     ///
     /// @param methodName
-    ///	The method name to call from execution operator.
+    ///    The method name to call from execution operator.
     ///
     /// @param ms
-    ///	The number of milliseconds between expires.
+    ///    The number of milliseconds between expires.
     ///
     /// @param args
-    /// 	The list of arguments to pass to the function being invoked.
+    ///     The list of arguments to pass to the function being invoked.
     ///
     /// @param runOnce
-    /// 	If true the interval will run only once. False if omitted.
+    ///     If true the interval will run only once. False if omitted.
     void setInterval(boost::intrusive_ptr<as_object> obj,
             const std::string& methodName, unsigned long ms,
             std::vector<as_value>& args, bool runOnce = false);
@@ -169,15 +169,15 @@ public:
     void executeAndReset();
 
 #ifdef GNASH_USE_GC
-  /// Mark all reachable resources (for GC)
-  //
-  /// Resources reachable from Timer are:
-  ///
-  ///	- Arguments list (_args)
-  ///	- Associated function (_function)
-  ///	- Target object (_object)
-  ///
-  void markReachableResources() const;
+    /// Mark all reachable resources (for GC)
+    //
+    /// Resources reachable from Timer are:
+    ///
+    ///    - Arguments list (_args)
+    ///    - Associated function (_function)
+    ///    - Target object (_object)
+    ///
+    void markReachableResources() const;
 #endif // GNASH_USE_GC
 
 private:

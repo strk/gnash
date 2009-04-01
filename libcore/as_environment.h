@@ -52,9 +52,9 @@ public:
 
     as_environment(VM& vm);
 
-    VM& getVM() { return _vm; }
+    VM& getVM() const { return _vm; }
 
-    character* get_target() { return m_target; }
+    character* get_target() const { return m_target; }
 
     /// Set default target for timeline opcodes
     //
@@ -120,7 +120,7 @@ public:
     ///
     /// Throw StackException if index is out of range
     ///
-    as_value& bottom(size_t index)
+    as_value& bottom(size_t index) const
     {
         try {
             return _stack.value(index);

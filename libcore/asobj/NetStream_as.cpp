@@ -298,7 +298,7 @@ NetStream_as::markReachableResources() const
 
     if (_netCon) _netCon->setReachable();
 
-    if (m_statusHandler) m_statusHandler->setReachable();
+    if (_statusHandler) _statusHandler->setReachable();
 
     if (_audioController) _audioController->setReachable();
 

@@ -2801,8 +2801,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
     args->reserve(nargs);
     for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
-    //log_debug("ActionCallFunction calling call_method with %p as this_ptr", this_ptr);
-    as_value result = call_method(function, &env, this_ptr,
+    as_value result = call_method(function, env, this_ptr,
                   args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
@@ -3477,7 +3476,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     args->reserve(nargs);
     for (size_t i=0; i<nargs; ++i) args->push_back(env.pop()); 
 
-    as_value result = call_method(method_val, &env, this_ptr, 
+    as_value result = call_method(method_val, env, this_ptr, 
             args, super, &(thread.code.getMovieDefinition()));
 
     env.push(result);
