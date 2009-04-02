@@ -20,9 +20,14 @@
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
 
+#include "Range2d.h"
+
 #include <list>
 #include <vector>
-#include "Range2d.h"
+#include <boost/bind.hpp>
+#include <iterator>
+#include <algorithm>
+#include <iostream>
 
 namespace gnash {
 
@@ -62,7 +67,15 @@ namespace geometry {
 /// Merging these two ranges would create a much bigger range which in some
 /// situations means that rendering is notably slower (for example, when 
 /// there is a scaled bitmap behind these shapes).
-///
+
+// Forward declarations.
+namespace {
+
+    /// returns true when two ranges should be merged together
+    template<typename T> inline bool snaptest(
+            const geometry::Range2d<T>& range1,
+            const geometry::Range2d<T>& range2, const float snapFactor);
+}
 
 template <typename T>
 class SnappingRanges2d
@@ -72,8 +85,7 @@ public:
     typedef std::vector<RangeType> RangeList; 
     typedef typename RangeList::size_type size_type;    
 
-    template <typename U>
-    friend std::ostream& operator<<(std::ostream& os,
+    template<typename U> friend std::ostream& operator<<(std::ostream& os,
                     const SnappingRanges2d<U>& r);
     
     SnappingRanges2d() 
@@ -111,7 +123,7 @@ public:
     
     /// Sets the snapping factor (which must be > 1.0). Higher factors make
     /// the ranges more attractive for snapping. A good value is usually 1.3.
-    void setSnapFactor(float factor) {
+    void setSnapFactor(const float factor) {
         assert(factor > 1.0f);
         _snapFactor = factor;
     }
@@ -121,7 +133,7 @@ public:
     }
     
     /// if mode==true, then the snapping ranges will act like a normal Range2d
-    void setSingleMode(bool mode) {
+    void setSingleMode(const bool mode) {
         _singleMode = mode;
     }
     
@@ -131,20 +143,41 @@ public:
     
     /// Sets the maximum number of ranges allowed (to avoid lots of small
     /// ranges)
-    void setRangeCountLimit(unsigned limit) {
+    void setRangeCountLimit(const size_type limit) {
         _rangesLimit = limit;
     }
     
-    unsigned getRangeCountLimit() const {
+    size_type getRangeCountLimit() const {
         return _rangesLimit;
     }
     
     /// Copy the snapping settings from another ranges list, without
     /// copying the ranges itself
     void inheritConfig(const SnappingRanges2d<T>& from) {
-     _snapFactor = from._snapFactor;
-     _singleMode = from._singleMode;
+        _snapFactor = from._snapFactor;
+        _singleMode = from._singleMode;
     }
+    
+    struct ExpandToIfSnap
+    {
+    public:
+        ExpandToIfSnap(const RangeType& rt, const float snapFactor)
+            :
+            _rt(rt),
+            _snapFactor(snapFactor)
+        {}
+        
+        bool operator()(RangeType& r) {
+            if (snaptest(r, _rt, _snapFactor)) {
+                r.expandTo(_rt);
+                return true;
+            }
+            return false;
+        }
+    private:
+        const RangeType& _rt;
+        const float _snapFactor;
+    };
     
     /// Add a Range to the set, merging when possible and appropriate
     void add(const RangeType& range) {
@@ -156,63 +189,55 @@ public:
         if (range.isNull()) return;
         
         if (_singleMode) {
-        
-            // single range mode
-        
-            if (_ranges.empty()) {
-                RangeType temp;
-                _ranges.push_back(temp);
-            }
-            
+            if (_ranges.empty()) _ranges.resize(1);
             _ranges[0].expandTo(range);
-        
-        } else {    
-        
-            // multi range mode
-        
-            for (unsigned int rno=0; rno<_ranges.size(); rno++) {
-                if (snaptest(_ranges[rno], range)) {
-                    _ranges[rno].expandTo(range);
-                    return;
-                }
-            }
-            
-            // reached this point we need a new range 
-            _ranges.push_back(range);
-            
-            combine_ranges_lazy();
+            return;
         }
+        
+        ExpandToIfSnap exp(range, _snapFactor);
+        if (visit(exp)) return;
+
+        // reached this point we need a new range 
+        _ranges.push_back(range);
+        
+        combine_ranges_lazy();
     }
     
-    
     /// combines two snapping ranges
-    void add(SnappingRanges2d<T> other_ranges) {
-        for (unsigned int rno=0; rno<other_ranges.size(); rno++)
-            add(other_ranges.getRange(rno));
+    void add(const SnappingRanges2d<T>& other) {
+        
+        // For resolution of the overloaded add function.
+        void (SnappingRanges2d<T>::*add)(const RangeType&) =
+            &SnappingRanges2d<T>::add;
+        
+        const RangeList& rl = other._ranges;
+        std::for_each(rl.begin(), rl.end(), boost::bind(add, this, _1));
     }
     
     /// Grows all ranges by the specified amount 
-    void growBy(T amount) {
+    void growBy(const T amount) {
     
         if (isWorld() || isNull()) return;
         
-        unsigned rcount = _ranges.size();
-        
-        for (unsigned int rno=0; rno<rcount; rno++)
-            _ranges[rno].growBy(amount);
+        // For resolution of the overloaded add function.
+	    RangeType& (RangeType::*growBy)(T factor) = &RangeType::growBy;
+
+        std::for_each(_ranges.begin(), _ranges.end(),
+                boost::bind(growBy, _1, amount));
             
         combine_ranges_lazy();
     }
 
     /// Scale all ranges by the specified factor
-    void scale(float factor) {
+    void scale(const float factor) {
     
         if (isWorld() || isNull()) return;
         
-        unsigned rcount = _ranges.size();
-        
-        for (unsigned int rno=0; rno<rcount; rno++)
-            _ranges[rno].scale(factor);
+        // For resolution of the overloaded scale function.
+	    RangeType& (RangeType::*scale)(float factor) = &RangeType::scale;
+
+        std::for_each(_ranges.begin(), _ranges.end(),
+                boost::bind(scale, _1, factor));
             
         combine_ranges_lazy();
     }
@@ -238,7 +263,7 @@ public:
             
                 for (int j=i+1; j<rcount; j++) {
                 
-                    if (snaptest(_ranges[i], _ranges[j])) {
+                    if (snaptest(_ranges[i], _ranges[j], _snapFactor)) {
                         // merge i + j
                         _ranges[i].expandTo(_ranges[j]);
                         
@@ -283,22 +308,6 @@ public:
         if (_combineCounter > max) combine_ranges();
     }
             
-    /// returns true, when two ranges should be merged together
-    inline bool snaptest(const RangeType& range1, const RangeType& range2) const {
-    
-        // when they intersect anyway, they should of course be merged! 
-        // TODO: not really, a "+" style ranges list might be worth to 
-        // remain unmerged (but needs special handling, i.e. create three
-        // ranges out of two)...
-        if (range1.intersects(range2)) return true;
-            
-        RangeType temp = range1;
-        temp.expandTo(range2);
-        
-        return (range1.getArea() + range2.getArea()) * _snapFactor > temp.getArea();
-
-    } 
-        
     /// Resets to NULL range
     void setNull() {
         _ranges.clear();
@@ -460,7 +469,7 @@ public:
         // then update ourselves with the *union* of these ranges.
         // Anybody knows a better method (in terms of efficieny) ?    
      
-        std::vector< SnappingRanges2d<T> > list;
+        std::vector<SnappingRanges2d<T> > list;
         list.reserve(o.size());
     
         //TODO: use a visitor !
@@ -517,23 +526,21 @@ public:
         }
     }
     
-    
     /// Visit the current Ranges set
     //
     /// Visitor functor will be invoked
     /// for each RangeType in the current set.
     /// 
     /// The visitor functor will 
-    /// receive a RangeType reference; must return true if
-    /// it wants next item or false to exit the loop.
+    /// receive a RangeType reference; must return false if
+    /// it wants next item or true to exit the loop.
     ///
-    template <class V>
-    inline void visit(V& visitor) const
+    /// @return false if the visitor reached the end.
+    template <class V> inline bool visit(V& visitor) const
     {
-        for (typename RangeList::const_iterator it = _ranges.begin(),
-                itEnd = _ranges.end(); it != itEnd; ++it) {
-            if (!visitor(*it)) break;
-        }
+        typename RangeList::const_iterator it = 
+            std::find_if(_ranges.begin(), _ranges.end(), visitor);
+        return it != _ranges.end();
     }
 
     /// Visit the current Ranges set
@@ -576,26 +583,49 @@ private:
 }; //class SnappingRanges2d
 
 template <class T>
-std::ostream& operator<< (std::ostream& os, const SnappingRanges2d<T>& r)
+std::ostream&
+operator<< (std::ostream& os, const SnappingRanges2d<T>& r)
 {
     if ( r.isNull() ) return os << "NULL";
     if ( r.isWorld() ) return os << "WORLD";
 
-    for (typename SnappingRanges2d<T>::RangeList::const_iterator
-        it = r._ranges.begin(), itEnd = r._ranges.end();
-        it != itEnd; ++it)
-    {
-        if ( it != r._ranges.begin() ) os << ", ";
-        os << *it;
-    }
+    typedef typename SnappingRanges2d<T>::RangeList R;
+
+    const R& ranges = r._ranges;
+
+    std::copy(ranges.begin(), ranges.end(),
+            std::ostream_iterator<typename R::value_type>(os, ","));
+
     return os;
 }
+    
+namespace {
 
-} //namespace gnash.geometry
+template<typename T>
+inline bool snaptest(const geometry::Range2d<T>& range1,
+        const geometry::Range2d<T>& range2, const float snapFactor)
+{
+
+    // when they intersect anyway, they should of course be merged! 
+    // TODO: not really, a "+" style ranges list might be worth to 
+    // remain unmerged (but needs special handling, i.e. create three
+    // ranges out of two)...
+    if (range1.intersects(range2)) return true;
+        
+    geometry::Range2d<T> temp = range1;
+    temp.expandTo(range2);
+    
+    return (range1.getArea() + range2.getArea()) * snapFactor >
+        temp.getArea();
+
+} 
+    
+} // anonymous namespace
+
+} // namespace geometry
 
 /// Standard snapping 2d ranges type for invalidated bounds calculation    
 typedef geometry::SnappingRanges2d<float> InvalidatedRanges;
-
 
 } //namespace gnash
 
