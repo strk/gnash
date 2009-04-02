@@ -471,10 +471,13 @@ RTMPClient::clientFinish(amf::Buffer &data)
 // Get and process an RTMP response. After reading all the data, then we have
 // split it up on the chunksize boudaries, and into the respective queues
 // for each channel.
-boost::shared_ptr<RTMPMsg>
+RTMPClient::msgque_t
 RTMPClient::recvResponse()
 {
     GNASH_REPORT_FUNCTION;
+
+    RTMPClient::msgque_t msgque;
+    
     // Read the responses back from the server.  This is usually a series of system
     // messages on channel 2, and the response message on channel 3 from our request.
     boost::shared_ptr<amf::Buffer> response = recvMsg();
@@ -498,13 +501,15 @@ RTMPClient::recvResponse()
     // If we got no responses, something obviously went wrong.
     if (!que->size()) {
         log_error("No response from INVOKE of NetConnection connect");
-        exit(-1);
+	
     }
 
     // There is a queue of queues used to hold all the messages. The first queue
     // is indexed by the channel number, the second queue is all the messages that
     // have arrived for that channel.
     while (que->size()) {	// see if there are any messages at all
+	log_debug("%s: There are %d channel queues in the RTMP input queue, %d messages in front queue",
+		  __PRETTY_FUNCTION__, que->size(), que->front()->size());
 	// Get the CQue for the first channel
 	CQue *channel_q = que->front();
 	que->pop_front();	// remove this Cque from the top level que
@@ -512,11 +517,7 @@ RTMPClient::recvResponse()
 	while (channel_q->size()) {
 	    // Get the first message in the channel queue
 	    boost::shared_ptr<amf::Buffer> ptr = channel_q->pop();
-// 	    channel_q->pop_front();	// remove this Buffer from the Cque
-// 	    ptr->dump();
-	    
-	    log_debug("%s: There are %d messages in the RTMP input queue, %d",
-		      __PRETTY_FUNCTION__, que->size(), que->front()->size());
+  	    ptr->dump();
 	    if (ptr) {		// If there is legit data
 		rthead = decodeHeader(ptr->reference());
 		if (!rthead) {
@@ -552,11 +553,21 @@ RTMPClient::recvResponse()
 		      log_unimpl("Unknown2 data packet");
 		      break;
 		  case RTMP::AUDIO_DATA:
-		      log_unimpl("Audio data packet message");
+		  {
+		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      if (msg) {
+			  msgque.push_back(msg);
+		      }
 		      break;
+		  }
 		  case RTMP::VIDEO_DATA:
-		      log_unimpl("Video data packet message");
+		  {
+		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
+		      if (msg) {
+			  msgque.push_back(msg);
+		      }
 		      break;
+		  }
 		  case RTMP::UNKNOWN3:
 		      log_unimpl("Unknown3 data packet message");
 		      break;
@@ -570,39 +581,22 @@ RTMPClient::recvResponse()
 		  {
 		      boost::shared_ptr<RTMPMsg> msg = decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
 		      if (msg) {
-// 		    msg->dump();
-			  if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-			      if (msg->getMethodName() == "_result") {
-#if 0
-				  log_debug("Sent NetConnection Connect message sucessfully");
-				  log_debug("Got a result: %s", msg->getMethodName());
-				  if (msg->getElements().size() > 0) {
-				      msg->at(0)->dump();
-				  }
-#endif
-			      }
-			  }		    
-			  if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
-			      if (msg->getMethodName() == "_error") {
-#if 0
-				  log_error("Couldn't send NetConnection Connect message,");
-				  log_error("Got an error: %s", msg->getMethodName());
-				  if (msg->getElements().size() > 0) {
-				      msg->at(0)->dump();
-				  }
-#endif
-			      }
-			  }
+			  msgque.push_back(msg);
 		      }
+		      break;
 		  }
 		  case RTMP::FLV_DATA:
+		      log_unimpl("Flv data packet message");
+		      break;
 		  default :
 		      log_error("Couldn't decode RTMP message Body");
 		      break;
 		}
 	    }
 	}
-    }	
+    }
+    
+    return msgque;
 }
 
 
