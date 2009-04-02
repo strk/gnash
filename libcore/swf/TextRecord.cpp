@@ -152,7 +152,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
     mat.concatenate(this_mat);
 
     cxform cx = inst->get_world_cxform();
-    SWFMatrix base_matrix = mat;
+    const SWFMatrix base_matrix = mat;
 
     // Starting positions.
     float x = 0.0f;

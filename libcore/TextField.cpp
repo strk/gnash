@@ -292,15 +292,15 @@ TextField::display()
 
     registerTextVariable();
 
-    bool drawBorder = getDrawBorder();
-    bool drawBackground = getDrawBackground();
+    const bool drawBorder = getDrawBorder();
+    const bool drawBackground = getDrawBackground();
 
-    SWFMatrix wmat = getWorldMatrix();
+    const SWFMatrix& wmat = getWorldMatrix();
 
     if ((drawBorder || drawBackground) && !_bounds.is_null())
     {
 
-        point coords[4];
+        std::vector<point> coords(4);
 
         boost::int32_t xmin = _bounds.get_x_min();
         boost::int32_t xmax = _bounds.get_x_max();
@@ -326,7 +326,7 @@ TextField::display()
     log_debug("rendering a Pol composed by corners %s", _bounds);
 #endif
 
-        render::draw_poly( &coords[0], 4, backgroundColor, 
+        render::draw_poly(&coords.front(), 4, backgroundColor, 
                 borderColor, wmat, true);
         
     }
@@ -359,12 +359,12 @@ TextField::add_invalidated_bounds(InvalidatedRanges& ranges,
     
     ranges.add(m_old_invalidated_ranges);
 
-    SWFMatrix wm = getWorldMatrix();
+    const SWFMatrix& wm = getWorldMatrix();
 
     rect bounds = getBounds();
     bounds.expand_to_rect(m_text_bounding_box); 
     wm.transform(bounds);
-    ranges.add( bounds.getRange() );            
+    ranges.add(bounds.getRange());            
 }
 
 void
@@ -1685,10 +1685,9 @@ TextField::get_world_cxform() const
 
     // If using a device font (PP compatibility), do not take parent cxform
     // into account.
-    if (!getEmbedFonts()) {
-        return cxform();
-    }
-    else return character::get_world_cxform();
+    if (!getEmbedFonts()) return cxform();
+
+    return character::get_world_cxform();
 }
 
 void
