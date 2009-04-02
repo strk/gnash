@@ -203,41 +203,61 @@ public:
         combine_ranges_lazy();
     }
     
+    class Add
+    {
+    public:
+        Add(SnappingRanges2d<T>& us) : _this(us) {}
+        void operator()(const RangeType& r) {
+            _this.add(r);
+        }
+    private:
+        SnappingRanges2d<T>& _this;
+    };
+
+
     /// combines two snapping ranges
     void add(const SnappingRanges2d<T>& other) {
-        
-        // For resolution of the overloaded add function.
-        void (SnappingRanges2d<T>::*add)(const RangeType&) =
-            &SnappingRanges2d<T>::add;
-        
         const RangeList& rl = other._ranges;
-        std::for_each(rl.begin(), rl.end(), boost::bind(add, this, _1));
+        std::for_each(rl.begin(), rl.end(), Add(*this));
     }
     
+    class GrowBy
+    {
+    public:
+        GrowBy(const float factor) : _factor(factor) {}
+        void operator()(RangeType& r) {
+            r.growBy(_factor);
+        }
+    private:
+        const float _factor;
+    };
+
     /// Grows all ranges by the specified amount 
     void growBy(const T amount) {
     
         if (isWorld() || isNull()) return;
         
-        // For resolution of the overloaded add function.
-	    RangeType& (RangeType::*growBy)(T factor) = &RangeType::growBy;
-
-        std::for_each(_ranges.begin(), _ranges.end(),
-                boost::bind(growBy, _1, amount));
-            
+        std::for_each(_ranges.begin(), _ranges.end(), GrowBy(amount));
         combine_ranges_lazy();
     }
+
+    class Scale
+    {
+    public:
+        Scale(const float scale) : _scale(scale) {}
+        void operator()(RangeType& r) {
+            r.scale(_scale);
+        }
+    private:
+        const float _scale;
+    };
 
     /// Scale all ranges by the specified factor
     void scale(const float factor) {
     
         if (isWorld() || isNull()) return;
         
-        // For resolution of the overloaded scale function.
-	    RangeType& (RangeType::*scale)(float factor) = &RangeType::scale;
-
-        std::for_each(_ranges.begin(), _ranges.end(),
-                boost::bind(scale, _1, factor));
+        std::for_each(_ranges.begin(), _ranges.end(), Scale(factor));
             
         combine_ranges_lazy();
     }
