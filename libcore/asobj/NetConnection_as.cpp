@@ -218,7 +218,7 @@ NetConnection_as::connect()
     // Close any current connections.
     close();
     _isConnected = true;
-    notifyStatus(CONNECT_SUCCESS);
+//     notifyStatus(CONNECT_SUCCESS);
 }
 
 
@@ -232,13 +232,14 @@ NetConnection_as::connect(const std::string& uri)
     // TODO: check for other kind of invalidities here...
     if (uri.empty()) {
         _isConnected = false;
-        notifyStatus(CONNECT_FAILED);
+	notifyStatus(CONNECT_FAILED);
         return;
     }
 
     const movie_root& mr = _vm.getRoot();
     URL url(uri, mr.runInfo().baseURL());
 
+#if 0
     log_debug("%s: URI is %s, URL protocol is %s, path is %s, hostname is %s, port is %s", __PRETTY_FUNCTION__,
 	      _uri, 
 	      url.protocol(),
@@ -246,7 +247,8 @@ NetConnection_as::connect(const std::string& uri)
 	      url.hostname(),
 	      url.port()
 	);
-
+#endif
+    
     // This is for remoting
     if (!URLAccessManager::allow(url)) {
         log_security(_("Gnash is not allowed to NetConnection.connect to %s"), url);
@@ -299,7 +301,8 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     string filename;	// the filename to play
     string pageUrl;     // the pageUrl field
     boost::shared_ptr<RTMP::rtmp_head_t> rthead;
-    
+
+#if 0
     log_debug("%s: URI is %s, URL protocol is %s, path is %s, hostname is %s, port is %s", __PRETTY_FUNCTION__,
 	      _uri, 
 	      url.protocol(),
@@ -307,6 +310,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	      url.hostname(),
 	      url.port()
 	);
+ #endif
     
     // The values for the connect call were set in ::connect(), but according
     // to documentation, the connection isn't actually started till the first
@@ -331,7 +335,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	    } else {
 		log_debug("Connected to server %s on port %hd",
 			  url.hostname(), port);
-		notifyStatus(CONNECT_SUCCESS);
+// 		notifyStatus(CONNECT_SUCCESS);
 		_isConnected = true;
 	    }
 	// We're using RTMP, Connect via RTMP
@@ -390,21 +394,33 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 		return;
 	    } else {
 		log_debug("RTMP handshake completed");
- 		notifyStatus(CONNECT_SUCCESS);
+//  		notifyStatus(CONNECT_SUCCESS);
 		_isConnected = true;
 	    }
 	    // although recvMsg() does a select() while waiting for data,
 	    // We've found things work better if we pause a second to let
-	    // the server response. Not doing this means we sometimes get
+	    // the server respond. Not doing this means we sometimes get
 	    // a fragemented first packet. Luckily we only have to wait
-	    // when making the initial connection.
+	    // once when making the initial connection.
 	    sleep(1);
 
 	    // Usually after waiting we get a PING Clear message, and sometimes
 	    // several other system channe messages which should
 	    // then be followed by the result of the connection being made
 	    // to the server.
-	    boost::shared_ptr<RTMPMsg> msg = _rtmp_client->recvResponse();
+	    RTMPClient::msgque_t msgque = _rtmp_client->recvResponse();
+	    while (msgque.size()) {
+		boost::shared_ptr<RTMPMsg> msg = msgque.front();
+		msgque.pop_front();
+		if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+		    notifyStatus(CONNECT_SUCCESS);
+		    log_debug("Sent NetConnection Connect message sucessfully");
+		}		    
+		if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
+		    log_error("Couldn't send NetConnection Connect message,");
+		    notifyStatus(CONNECT_FAILED);
+		}
+	    }
 	} // end of 'if RTMP'
 #if 0
 	// FIXME: do a GET request for the crossdomain.xml file
@@ -480,7 +496,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 	boost::shared_ptr<amf::Element> el = args[2].to_element();
 //  	el->dump();
 	boost::shared_ptr<amf::Buffer> request = _rtmp_client->encodeEchoRequest(methodName, 2.0, *el);
-	request->dump();
+// 	request->dump();
 	_rtmp_client->sendMsg(0x3, RTMP::HEADER_12, request->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *request);
 
 	
@@ -557,7 +573,7 @@ namespace {
 as_value
 netconnection_call(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetConnection_as> ptr = 
         ensureType<NetConnection_as>(fn.this_ptr); 
 
@@ -602,7 +618,7 @@ netconnection_call(const fn_call& fn)
 as_value
 netconnection_close(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<NetConnection_as> ptr =
         ensureType<NetConnection_as>(fn.this_ptr); 
 
@@ -755,20 +771,20 @@ net_handler(NetConnection_as::thread_params_t *args)
 	    log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
 	    while (que->size()) {
 		boost::shared_ptr<amf::Buffer> ptr = que->front()->pop();
-		log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
+// 		ptr->dump();
 		if (ptr) {		// If there is legit data
 		    rthead = client->decodeHeader(ptr->reference());
 		    boost::shared_ptr<RTMPMsg> msg = client->decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
-// 		    msg->dump();
+//  		    msg->dump();
 		    if (msg->getMethodName() == "_error") {
 			log_error("Got an error: %s", msg->getMethodName());
-			msg->at(0)->dump();
+// 			msg->at(0)->dump();
 			args->nas->notifyStatus(NetConnection_as::CALL_FAILED);
 		    }
 		    if (msg->getMethodName() == "_result") {
 			log_debug("Got a result: %s", msg->getMethodName());
 			if (msg->getElements().size() > 0) {
-			    msg->at(1)->dump();
+// 			    msg->at(1)->dump();
 			    as_value tmp(*msg->at(1));
 //		        string_table::key methodKey = tdata->st->find(methodName);
 			    string_table::key methodKey = args->st->find("onResult");
