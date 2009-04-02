@@ -319,33 +319,13 @@ RTMP::decodeHeader(boost::uint8_t *in)
 // 	    log_debug("Got a one byte header system message: %s", hexify(in, head->bodysize, false));
 	} else {
 // 	    log_debug("Got a continuation packet for channel #%d", head->channel);
-	    head->bodysize = 0;
+	    head->bodysize = _lastsize[head->channel];
 	}
     }
 
-//     log_debug("RTMP %s: channel: %d, type: %s, header_size %d, bodysize: %d",
-// 	      content_str[head->type], head->channel, head->head_size, head->bodysize);
+    log_debug("RTMP %s: channel: %d, header_size %d, bodysize: %d",
+ 	      content_str[head->type], head->channel, head->head_size, head->bodysize);
 
-//     switch(head->type) {
-//       case CHUNK_SIZE:
-//       case BYTES_READ:
-//       case PING:
-//       case SERVER:
-//       case CLIENT:
-//       case VIDEO_DATA:
-//       case NOTIFY:
-//       case SHARED_OBJ:
-//       case INVOKE:
-//           _packet_size = RTMP_VIDEO_PACKET_SIZE;
-//           break;
-//       case AUDIO_DATA:
-//           _packet_size = RTMP_AUDIO_PACKET_SIZE;
-//           break;
-//       default:
-//           log_error (_("ERROR: Unidentified AMF header data type 0x%x"), _type);
-//           break;
-//     };
-    
     if (head->head_size == 12) {
         head->src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
         tmpptr += sizeof(unsigned int);
@@ -1192,7 +1172,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 	    if (rthead->head_size <= 4) {
 		rthead->bodysize = _lastsize[rthead->channel];
 	    }
-	    if ((rthead->head_size > 1)) {
+	    if ((rthead->head_size > 1) || (ptr == data)) {
 //  		cerr << "New packet for channel #" << rthead->channel << " of size "
 //  		     << (rthead->head_size + rthead->bodysize) << endl;
 		// give it some memory to store data in. We store
@@ -1261,7 +1241,7 @@ RTMP::split(boost::uint8_t *data, size_t size)
 		// complete all the data up to the body size from the header.
 // 		cerr << _queues[rthead->channel].size() << " messages in queue for channel "
 // 		     << rthead->channel << endl;
-		if (rthead->head_size == 1){
+		if ((rthead->head_size == 1) && (ptr != data)) {
 //  		    cerr << "FOLLOWING PACKET!" << " for channel " << rthead->channel << endl;
 //  		    cerr << "Space Left in buffer for channel " << rthead->channel << " is: "
 //  			 << chunk->spaceLeft() << endl;
