@@ -734,7 +734,8 @@ public:
             const std::string& arg) const;
 
     /// Abstract base class for hosting app handler
-    class AbstractIfaceCallback {
+    class AbstractIfaceCallback
+    {
     public:
 
         /// Get Gui-related information for the core.
@@ -743,7 +744,7 @@ public:
         /// Mouse.hide, System.capabilities etc. The return can be
         /// various types, so it is passed as a string.
         virtual std::string call(const std::string& cmd,
-                const std::string& arg) = 0;
+                const std::string& arg = std::string()) = 0;
 
         /// Ask the hosting application for a yes / no answer to
         /// a question.

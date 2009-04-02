@@ -27,25 +27,44 @@
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
 
-inline std::string
-trueFalse(bool x)
-{
-    return x ? "t" : "f";
-}
-
 namespace gnash {
 
-static const std::string& systemLanguage(as_object& proto);
+// Forward declarations.
+namespace {
 
-static as_value system_security_allowdomain(const fn_call& fn);
-static as_value system_security_allowinsecuredomain(const fn_call& fn);
-static as_value system_security_loadpolicyfile(const fn_call& fn);
-static as_value system_setclipboard(const fn_call& fn);
-static as_value system_showsettings(const fn_call& fn);
-static as_value system_exactsettings(const fn_call& fn);
-static as_value system_usecodepage(const fn_call& fn);
+    inline std::string trueFalse(bool x) { return x ? "t" : "f"; }
 
-void registerSystemNative(as_object& global)
+    template<typename T> inline void convertValue(const std::string& in,
+            T& val);
+
+    const std::string& systemLanguage(as_object& proto);
+
+    as_value system_security_allowdomain(const fn_call& fn);
+    as_value system_security_allowinsecuredomain(const fn_call& fn);
+    as_value system_security_loadpolicyfile(const fn_call& fn);
+    as_value system_setclipboard(const fn_call& fn);
+    as_value system_showsettings(const fn_call& fn);
+    as_value system_exactsettings(const fn_call& fn);
+    as_value system_usecodepage(const fn_call& fn);
+    as_object* getSystemSecurityInterface(as_object& o);
+    as_object* getSystemCapabilitiesInterface(as_object& o);
+    void attachSystemInterface(as_object& proto);
+}
+
+
+void
+system_class_init(as_object& global)
+{
+	// _global.System is NOT a class, but a simple object, see System.as
+
+	boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
+	attachSystemInterface(*obj);
+	global.init_member("System", obj.get());
+}
+
+
+void
+registerSystemNative(as_object& global)
 {
     VM& vm = global.getVM();
     
@@ -63,7 +82,9 @@ void registerSystemNative(as_object& global)
     // System.Product.download 2201, 3    
 }
 
-static as_object*
+namespace {
+
+as_object*
 getSystemSecurityInterface(as_object& o)
 {
     VM& vm = o.getVM();
@@ -75,14 +96,16 @@ getSystemSecurityInterface(as_object& o)
 		proto->init_member("allowDomain", vm.getNative(12, 0));
 
 		// TODO: only available when SWF >= 7 
-		proto->init_member("allowInsecureDomain", new builtin_function(system_security_allowinsecuredomain));
+		proto->init_member("allowInsecureDomain",
+                new builtin_function(system_security_allowinsecuredomain));
 
-		proto->init_member("loadPolicyFile", new builtin_function(system_security_loadpolicyfile));
+		proto->init_member("loadPolicyFile",
+                new builtin_function(system_security_loadpolicyfile));
 	}
 	return proto.get();
 }
 
-static as_object*
+as_object*
 getSystemCapabilitiesInterface(as_object& o)
 {
 	RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -120,44 +143,34 @@ getSystemCapabilitiesInterface(as_object& o)
     // Display information (needs active GUI)
     //
 
-    // Documented to be a number, but is in fact a string.
-    std::string pixelAspectRatio;
-
-    // "StandAlone", "External", "PlugIn", "ActiveX" (get from GUI)
-    std::string playerType;
-    
-    std::string screenColor;
-    
-    int screenDPI = 0;
-
-    int screenResolutionX = 0;
-    int screenResolutionY = 0;
-
-    std::istringstream ss;
-
     const movie_root& m = vm.getRoot();
 
-    ss.str(m.callInterface("System.capabilities.screenResolutionX", ""));
-    ss >> screenResolutionX;
+    int screenResolutionX;
+    convertValue(m.callInterface("System.capabilities.screenResolutionX"),
+            screenResolutionX);
+    int screenResolutionY;
+    convertValue(m.callInterface("System.capabilities.screenResolutionY"),
+            screenResolutionY);
+    int screenDPI;
+    convertValue(m.callInterface("System.capabilities.screenDPI"), screenDPI);
         
-    ss.clear();
-    ss.str(m.callInterface("System.capabilities.screenResolutionY", ""));
-    ss >> screenResolutionY;
+    // Documented to be a number, but is in fact a string.
+    const std::string pixelAspectRatio = 
+        m.callInterface("System.capabilities.pixelAspectRatio");
 
-    ss.clear();
-    ss.str(m.callInterface("System.capabilities.screenDPI", ""));
-    ss >> screenDPI;
-        
-    pixelAspectRatio = m.callInterface("System.capabilities.pixelAspectRatio", "");
-    playerType = m.callInterface("System.capabilities.playerType", "");
-    screenColor = m.callInterface("System.capabilities.screenColor", "");
+    // "StandAlone", "External", "PlugIn", "ActiveX" (get from GUI)
+    const std::string playerType =
+        m.callInterface("System.capabilities.playerType");
+
+    const std::string screenColor =
+        m.callInterface("System.capabilities.screenColor");
 
     //
     // Media
     //
         
     // Is audio available?
-    const bool hasAudio = (vm.getRoot().runInfo().soundHandler() != NULL);
+    const bool hasAudio = (vm.getRoot().runInfo().soundHandler());
 
     // FIXME: these need to be implemented properly. They are mostly
     // self-explanatory.
@@ -272,22 +285,38 @@ getSystemCapabilitiesInterface(as_object& o)
 	return proto.get();
 }
 
-static void
+/// Convert a string to the type passed in, making sure the target variable
+/// is initialized.
+template<typename T>
+inline void
+convertValue(const std::string& in, T& val)
+{
+    val = T();
+    std::istringstream is(in);
+    is >> val;
+} 
+
+void
 attachSystemInterface(as_object& proto)
 {
 	VM& vm = proto.getVM();
-    const int version = vm.getSWFVersion();
 
 	proto.init_member("security", getSystemSecurityInterface(proto));
 	proto.init_member("capabilities", getSystemCapabilitiesInterface(proto));
-	proto.init_member("setClipboard", new builtin_function(system_setclipboard));
+	proto.init_member("setClipboard", 
+            new builtin_function(system_setclipboard));
 	proto.init_member("showSettings", vm.getNative(2107, 0));
 
-	proto.init_property("useCodepage", &system_usecodepage, &system_usecodepage);
+	proto.init_property("useCodepage", &system_usecodepage,
+            &system_usecodepage);
 
-    if (version < 6) return;
+    const int flags = as_prop_flags::dontDelete
+                    | as_prop_flags::dontEnum
+                    | as_prop_flags::readOnly
+                    | as_prop_flags::onlySWF6Up;
 
-    proto.init_property("exactSettings", &system_exactsettings, &system_exactsettings);
+    proto.init_property("exactSettings", &system_exactsettings,
+            &system_exactsettings, flags);
 
 }
 
@@ -339,7 +368,8 @@ system_showsettings(const fn_call& /*fn*/)
 as_value
 system_exactsettings(const fn_call& fn)
 {
-	static boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+	static boost::intrusive_ptr<as_object> obj =
+        ensureType<as_object>(fn.this_ptr);
 
     // Getter
     if (fn.nargs == 0)
@@ -363,7 +393,8 @@ system_exactsettings(const fn_call& fn)
 as_value
 system_usecodepage(const fn_call& fn)
 {
-	static boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = 
+        ensureType<as_object>(fn.this_ptr);
 
     // Getter
     if (fn.nargs == 0)
@@ -381,23 +412,14 @@ system_usecodepage(const fn_call& fn)
 }
 
 
-void
-system_class_init(as_object& global)
-{
-	// _global.System is NOT a class, but a simple object, see System.as
-
-	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
-	attachSystemInterface(*obj);
-	global.init_member("System", obj.get());
-}
-
 
 const std::string&
 systemLanguage(as_object& proto)
 {
 	// Two-letter language code ('en', 'de') corresponding to ISO 639-1
 	// Chinese can be either zh-CN or zh-TW. English used to have a 
-	// country (GB, US) qualifier, but that was dropped in version 7 of the player.
+	// country (GB, US) qualifier, but that was dropped in version 7 of
+    // the player.
  	// This method relies on getting a POSIX-style language code of the form
 	// "zh_TW.utf8", "zh_CN" or "it" from the VM.
 	// It is obviously very easy to extend support to all language codes, but
@@ -441,4 +463,5 @@ systemLanguage(as_object& proto)
 
 }
 
-} // end of gnash namespace
+} // anonymous namespace
+} // gnash namespace
