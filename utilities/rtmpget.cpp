@@ -364,7 +364,6 @@ main(int argc, char *argv[])
     boost::uint8_t c = 0xc3;
     *head2 += c;
     head2->append(buf2->reference() + 128, buf2->allocated()-128);
-
     // Finish the handshake process, which has to have the NetConnection::connect() as part
     // of the buffer, or Red5 refuses to answer.
     client.setTimeout(20);
@@ -374,99 +373,25 @@ main(int argc, char *argv[])
     }
     
     // give the server time to process our NetConnection::connect() request
-    sleep(1); 
-
-    // Read the responses back from the server.  This is usually a series of system
-    // messages on channel 2, and the response message on channel 3 from our request.
-    boost::shared_ptr<amf::Buffer> response = client.recvMsg();
-    if (!response) {
-	log_error("Got no response from the RTMP server");
-    }
-
-    // when doing remoting calls I don't see this problem with an empty packet from Red5,
-    // but when I do streaming, it's always there, so we need to remove it.
-    boost::uint8_t *pktstart = response->reference();
-    if (*pktstart == 0xff) {
-	log_debug("Got empty packet in buffer.");
-	pktstart++;
-    }
-
-    // The response packet contains multiple messages for multiple channels, so we
-    // we have to split the Buffer into seperate messages on a chunksize boundary.
+    sleep(1);
+    
+    boost::shared_ptr<amf::Buffer> response;
     boost::shared_ptr<RTMP::rtmp_head_t> rthead;
-    boost::shared_ptr<RTMP::queues_t> que = client.split(pktstart, response->allocated()-1);
-
-    // If we got no responses, something obviously went wrong.
-    if (!que->size()) {
-        log_error("No response from INVOKE of NetConnection connect");
-        exit(-1);
-    }
-
-    // There is a queue of queues used to hold all the messages. The first queue
-    // is indexed by the channel number, the second queue is all the messages that
-    // have arrived for that channel.
-    while (que->size()) {	// see if there are any messages at all
-	// Get the CQue for the first channel
-	CQue *channel_q = que->front();
-	que->pop_front();	// remove this Cque from the top level que
-
-	while (channel_q->size()) {
-	    // Get the first message in the channel queue
-	    boost::shared_ptr<amf::Buffer> ptr = channel_q->pop();
-// 	    channel_q->pop_front();	// remove this Buffer from the Cque
-// 	    ptr->dump();
-	    
-	    log_debug("%s: There are %d messages in the RTMP input queue, %d",
-		      __PRETTY_FUNCTION__, que->size(), que->front()->size());
-	    if (ptr) {		// If there is legit data
-		rthead = client.decodeHeader(ptr->reference());
-		if (!rthead) {
-		    log_error("Couldn't decode RTMP message header");
-		    continue;
-		}
-		if (rthead->type == RTMP::SERVER) {
-		    log_debug("Got a unknown server message");
-		    continue;
-		}
-		
-		if (rthead->type == RTMP::PING) {
-		    boost::shared_ptr<RTMP::rtmp_ping_t> ping = client.decodePing(ptr->reference() + rthead->head_size);
-		    log_debug("Got a Ping, type %s", ping_str[ping->type]);
-		    continue;
-		}
-		boost::shared_ptr<RTMPMsg> msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
-		if (msg) {
-// 		    msg->dump();
- 		    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
-			if (msg->getMethodName() == "_result") {
-			    log_debug("Sent NetConnection Connect message sucessfully");
-#if 0
- 			    log_debug("Got a result: %s", msg->getMethodName());
-			    if (msg->getElements().size() > 0) {
-				msg->at(0)->dump();
-			    }
-#endif
-			}
- 		    }		    
- 		    if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
-			if (msg->getMethodName() == "_error") {
-			    log_error("Couldn't send NetConnection Connect message,");
-#if 0
-			    log_error("Got an error: %s", msg->getMethodName());
-			    if (msg->getElements().size() > 0) {
-				msg->at(0)->dump();
-			    }
-#endif
-			}
-		    }
-		} else {
-		    log_error("Couldn't decode RTMP message Body");
-		    continue;
-		}
-	    }
+    boost::shared_ptr<RTMP::queues_t> que;
+    boost::uint8_t *pktstart = 0;
+    
+    RTMPClient::msgque_t msgque = client.recvResponse();
+    while (msgque.size()) {
+	boost::shared_ptr<RTMPMsg> msg = msgque.front();
+	msgque.pop_front();
+	if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_SUCCESS) {
+	    log_debug("Sent NetConnection Connect message sucessfully");
+	}		    
+	if (msg->getStatus() ==  RTMPMsg::NC_CONNECT_FAILED) {
+	    log_error("Couldn't send NetConnection Connect message,");
 	}
     }
-	
+    
     // make the createStream
     log_debug("Sending NetStream::createStream message,");
     BufferSharedPtr buf3 = client.encodeStream(0x2);
@@ -475,88 +400,18 @@ main(int argc, char *argv[])
     
     double streamID = 0.0;
 
-    // Read the responses back from the server.  This is usually a series of system
-    // messages on channel 2, and the response message on channel 3 from our request.
-    response.reset();
-    response = client.recvMsg();
-    if (!response) {
-	log_error("Got no response from the RTMP server");
-    }
-
-    // when doing remoting calls I don't see this problem with an empty packet from Red5,
-    // but when I do streaming, it's always there, so we need to remove it.
-    pktstart = response->reference();
-    if (*pktstart == 0xff) {
-	log_debug("Got empty packet in buffer.");
-	pktstart++;
-    }
-
-    // The response packet contains multiple messages for multiple channels, so we
-    // we have to split the Buffer into seperate messages on a chunksize boundary.
-    rthead.reset();
-    que.reset();
-    que = client.split(pktstart, response->allocated()-1);
-
-    // If we got no responses, something obviously went wrong.
-    if (!que->size()) {
-        log_error("No response from INVOKE of NetStream::createStream");
-        exit(-1);
-    }
-
-    // There is a queue of queues used to hold all the messages. The first queue
-    // is indexed by the channel number, the second queue is all the messages that
-    // have arrived for that channel.
-    while (que->size()) {	// see if there are any messages at all
-	// Get the CQue for the first channel
-	CQue *channel_q = que->front();
-	que->pop_front();	// remove this Cque from the top level que
-
-	while (channel_q->size()) {
-	    // Get the first message in the channel queue
-	    boost::shared_ptr<amf::Buffer> ptr = channel_q->pop();
-// 	    channel_q->pop_front();	// remove this Buffer from the Cque
-// 	    ptr->dump();
-	    
-// 	    log_debug("%s: There are %d messages in the RTMP input queue, %d",
-// 		      __PRETTY_FUNCTION__, que->size(), que->front()->size());
-	    if (ptr) {		// If there is legit data
-		rthead = client.decodeHeader(ptr->reference());
-		if (!rthead) {
-		    log_error("Couldn't decode RTMP message header");
-		    continue;
-		}
-		
-		boost::shared_ptr<RTMPMsg> msg = client.decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
-		if (msg) {
-// 		    msg->dump();
-		    if (msg->getMethodName() == "_result") {
-			log_debug("Sent NetConnection createStream message sucessfully");
-			if (msg->at(1)->getType() == amf::Element::NUMBER_AMF0) {
-			    streamID = msg->at(1)->to_number();
-			}
-			log_debug("Stream ID returned from createStream is: %g", streamID);
-#if 0
-			if (msg->getElements().size() > 0) {
-			    msg->at(1)->dump();
-			}
-#endif
-		    }
-		    if (msg->getMethodName() == "_error") {
-			log_error("Couldn't send NetConnection createStream message,");
-#if 0
-			log_error("Got an error: %s", msg->getMethodName());
-			if (msg->getElements().size() > 0) {
-			    msg->at(0)->dump();
-			}
-#endif
-		    }
-		} else {
-		    log_error("Couldn't decode RTMP message Body");
-		    continue;
-		}
+    msgque = client.recvResponse();
+    while (msgque.size()) {
+	boost::shared_ptr<RTMPMsg> msg = msgque.front();
+	msgque.pop_front();
+	if (msg->getMethodName() == "_result") {
+	    log_debug("Sent NetConnection createStream message sucessfully");
+	    if (msg->at(1)->getType() == amf::Element::NUMBER_AMF0) {
+		streamID = msg->at(1)->to_number();
 	    }
+	    log_debug("Stream ID returned from createStream is: %g", streamID);
 	}
-    }    
+    }
     
 //     boost::shared_ptr<amf::Buffer> blob(new Buffer("08 00 00 02 00 00 22 14 01 00 00 00 02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 02 00 0e 44 61 72 6b 4b 6e 69 67 68 74 2e 66 6c 76 82 00 00 00 00 03 00 00 00 01 00 00 27 10"));
 // //     boost::shared_ptr<amf::Buffer> blob(new Buffer("02 00 04 70 6c 61 79 00 00 00 00 00 00 00 00 00 05 02 00 0e 44 61 72 6b 4b 6e 69 67 68 74 2e 66 6c 76 82 00 00 00 00 03 00 00 00 01 00 00 27 10"));
