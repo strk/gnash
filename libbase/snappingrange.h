@@ -278,7 +278,7 @@ public:
     /// Calls combine_ranges() once in a while, but not always. Avoids too many
     /// combine_ranges() checks, which could slow down everything.
     void combine_ranges_lazy() {
-        const int max = 5;
+        const size_type max = 5;
         ++_combineCounter;
         if (_combineCounter > max) combine_ranges();
     }
