@@ -77,9 +77,9 @@ public:
   
   SnappingRanges2d() 
     :
-    snap_factor(1.3f),
-    single_mode(false),
-    ranges_limit(50),
+    _snapFactor(1.3f),
+    _singleMode(false),
+    _rangesLimit(50),
     _combine_counter(0)
   {
   }
@@ -88,9 +88,9 @@ public:
   template <typename U>
   SnappingRanges2d(const SnappingRanges2d<U>& from)
     :
-    snap_factor(from.getSnapFactor()), 
-    single_mode(from.getSingleMode()),
-    ranges_limit(from.getRangeCountLimit()),
+    _snapFactor(from.getSnapFactor()), 
+    _singleMode(from.getSingleMode()),
+    _rangesLimit(from.getRangeCountLimit()),
     _combine_counter(0)
   {
     if ( from.isWorld() ) {
@@ -117,37 +117,37 @@ public:
   /// the ranges more attractive for snapping. A good value is usually 1.3.
   void setSnapFactor(float factor) {
     assert(factor > 1.0f);
-    snap_factor = factor;
+    _snapFactor = factor;
   }
   
   float getSnapFactor() const {
-    return snap_factor;
+    return _snapFactor;
   }
   
   /// if mode==true, then the snapping ranges will act like a normal Range2d
   void setSingleMode(bool mode) {
-    single_mode = mode;
+    _singleMode = mode;
   }
   
   bool getSingleMode() const {
-    return single_mode;
+    return _singleMode;
   }  
   
   /// Sets the maximum number of ranges allowed (to avoid lots of small
   /// ranges)
   void setRangeCountLimit(unsigned limit) {
-    ranges_limit = limit;
+    _rangesLimit = limit;
   }
   
   unsigned getRangeCountLimit() const {
-    return ranges_limit;
+    return _rangesLimit;
   }
   
   /// Copy the snapping settings from another ranges list, without
   /// copying the ranges itself
   void inheritConfig(const SnappingRanges2d<T>& from) {
-   snap_factor = from.snap_factor;
-   single_mode = from.single_mode;
+   _snapFactor = from._snapFactor;
+   _singleMode = from._singleMode;
   }
   
   /// Add a Range to the set, merging when possible and appropriate
@@ -159,7 +159,7 @@ public:
     
     if (range.isNull()) return;
     
-    if (single_mode) {
+    if (_singleMode) {
     
       // single range mode
     
@@ -225,14 +225,14 @@ public:
   
   /// Combines known ranges. Previously merged ranges may have come close
   /// to other ranges. Algorithm could be optimized. 
-  void combine_ranges() {
+  void combine_ranges() const {
   
-    if (single_mode)  // makes no sense in single mode
-      return;
+    // makes no sense in single mode
+    if (_singleMode) return;
   
-    bool restart=true;
+    bool restart = true;
     
-    _combine_counter=0;
+    _combine_counter = 0;
     
     while (restart) {
     
@@ -266,7 +266,7 @@ public:
     
     
     // limit number of ranges
-    if (_ranges.size() > ranges_limit) {
+    if (_ranges.size() > _rangesLimit) {
     
       // We found way too much ranges, so reduce to just one single range.
       // We could also double the factor and try again, but that probably
@@ -284,52 +284,25 @@ public:
   /// Calls combine_ranges() once in a while, but not always. Avoids too many
   /// combine_ranges() checks, which could slow down everything.
   void combine_ranges_lazy() {
-    _combine_counter++;
-    if (_combine_counter > 5) 
+    const int max = 5;
+    ++_combine_counter;
+    if (_combine_counter > max) 
       combine_ranges();
   }
       
   /// returns true, when two ranges should be merged together
-  inline bool snaptest(const RangeType& range1, const RangeType& range2) {
+  inline bool snaptest(const RangeType& range1, const RangeType& range2) const {
   
     // when they intersect anyway, they should of course be merged! 
     // TODO: not really, a "+" style ranges list might be worth to 
     // remain unmerged (but needs special handling, i.e. create three
     // ranges out of two)...
-    if (range1.intersects(range2)) 
-      return true;
+    if (range1.intersects(range2)) return true;
       
-    // simply search for the minimum x or y distances
-    /*
-  
-    T xdist = 99999999;
-    T ydist = 99999999;
-    T xa1 = range1.getMinX();
-    T xa2 = range2.getMinX();
-    T xb1 = range1.getMaxX();
-    T xb2 = range2.getMaxX();
-    T ya1 = range1.getMinY();
-    T ya2 = range2.getMinY();
-    T yb1 = range1.getMaxY();
-    T yb2 = range2.getMaxY();
-    
-    xdist = absmin(xdist, xa1-xa2);
-    xdist = absmin(xdist, xa1-xb2);
-    xdist = absmin(xdist, xb1-xa2);
-    xdist = absmin(xdist, xb1-xb2);
-
-    ydist = absmin(ydist, ya1-ya2);
-    ydist = absmin(ydist, ya1-yb2);
-    ydist = absmin(ydist, yb1-ya2);
-    ydist = absmin(ydist, yb1-yb2);
-    
-    return (xdist + ydist) <= snap_distance;
-    */
-    
     RangeType temp = range1;
     temp.expandTo(range2);
     
-    return (range1.getArea() + range2.getArea()) * snap_factor > temp.getArea();
+    return (range1.getArea() + range2.getArea()) * _snapFactor > temp.getArea();
 
   } 
     
@@ -596,33 +569,27 @@ public:
   
 private:
 
-  // Unused...
-  inline T absmin(T a, T b) {
-    if (b<0) b*=-1;
-    return std::min<T>(a,b);
-  }
-  
   void finalize() const {
-    if (_combine_counter > 0) {
-      SnappingRanges2d<T>* me_nonconst = const_cast< SnappingRanges2d<T>* > (this); 
-      me_nonconst->combine_ranges();
-    }
+    if (_combine_counter > 0) combine_ranges();
   } 
-  
     
-  // The current Ranges list
-  RangeList _ranges;
+  /// The current Ranges list.
+  //
+  /// Mutable due to lazy finalization. This isn't very nice, but better than
+  /// const_cast.
+  mutable RangeList _ranges;
 
   /// snapping factor - see setSnapFactor() 
-  float snap_factor;
+  float _snapFactor;
   
   /// if set, only a single, outer range is maintained (extended). 
-  bool single_mode;
+  bool _singleMode;
   
   /// maximum number of ranges allowed
-  unsigned ranges_limit;   
+  size_type _rangesLimit;   
   
-  unsigned int _combine_counter;
+  /// Counter used in finalizing ranges.
+  mutable size_type _combine_counter;
     
 }; //class SnappingRanges2d
 
