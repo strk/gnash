@@ -92,11 +92,9 @@ mouse_hide(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
 
-    int success = 0;
-
     movie_root& m = obj->getVM().getRoot();
 
-    success = (m.callInterface("Mouse.hide", "") == "true") ? 1 : 0;
+    const int success = (m.callInterface("Mouse.hide") == "true") ? 1 : 0;
 
     // returns 1 if mouse was visible before call.
     return as_value(success);
@@ -110,11 +108,9 @@ mouse_show(const fn_call& fn)
 {
     boost::intrusive_ptr<as_object> obj=ensureType<as_object>(fn.this_ptr);
 
-    int success = 0;
-
     movie_root& m = obj->getVM().getRoot();
 
-    success = (m.callInterface("Mouse.show", "") == "true") ? 1 : 0;
+    const int success = (m.callInterface("Mouse.show") == "true") ? 1 : 0;
 
     // returns 1 if Mouse was visible before call.
     return as_value(success);
