@@ -608,18 +608,6 @@ public:
     // Return true if this DisplayObject should be rendered
     bool isVisible() const { return _visible; }
 
-    /// Return mouse state in given variables
-    //
-    /// Use this to retrieve the last state of the mouse, as set via
-    /// notify_mouse_state().    Coordinates are in PIXELS, NOT TWIPS.
-    ///
-    /// The default implementation calls get_mouse_state against
-    /// the DisplayObject's parent. The final parent (a MovieClip)
-    /// will delegate the call to it's associated movie_root, which
-    /// does all the work.
-    ///
-    //virtual void get_mouse_state(int& x, int& y, int& buttons);
-
     /// These have been moved down from movie.h to remove that file
     /// from the inheritance chain. It is probably still a misdesign
     /// to require these functions for all DisplayObjects.
@@ -887,18 +875,18 @@ public:
             const std::string& name) const;
 #endif
 
-  /// Return true if this DisplayObject is a selectable TextField
-  //
-  /// This method is used by Gui to set up an appropriate cursor
-  /// for input textfields.
-  ///
-  virtual bool isSelectableTextField() const { return false; }
+    /// Return true if this DisplayObject is a selectable TextField
+    //
+    /// This method is used by Gui to set up an appropriate cursor
+    /// for input textfields.
+    ///
+    virtual bool isSelectableTextField() const { return false; }
 
-  /// \brief
-  /// Return true if this DisplayObject allows turning the cursor
-  /// into an hand shape when it happens to be the one receiving
-  /// mouse events.
-  virtual bool allowHandCursor() const { return true; }
+    /// \brief
+    /// Return true if this DisplayObject allows turning the cursor
+    /// into an hand shape when it happens to be the one receiving
+    /// mouse events.
+    virtual bool allowHandCursor() const { return true; }
 
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair; 
@@ -949,76 +937,76 @@ public:
     typedef std::vector<const action_buffer*> BufferList;
     typedef std::map<event_id, BufferList> Events;
 
-  /// Set the current focus to this DisplayObject.
-  //
-  /// @return false if the DisplayObject cannot receive focus, true if it can
-  ///         (and does).
-  //
-  /// Button, Textfield and MovieClip can receive focus. In SWF6 and above,
-  /// MovieClip can only receive focus if the focusEnabled property
-  /// evaluates to true.
-  virtual bool handleFocus() { 
-      return false;
-  }
+    /// Set the current focus to this DisplayObject.
+    //
+    /// @return false if the DisplayObject cannot receive focus, true if it can
+    ///         (and does).
+    //
+    /// Button, Textfield and MovieClip can receive focus. In SWF6 and above,
+    /// MovieClip can only receive focus if the focusEnabled property
+    /// evaluates to true.
+    virtual bool handleFocus() { 
+        return false;
+    }
 
-  /// Some DisplayObjects require actions on losing focus.
-  //
-  /// Default is a no-op. TextField implements this function.
-  virtual void killFocus() {}
-
-  /// Getter-setter for _highquality.
-  static as_value highquality(const fn_call& fn);
-
-  /// Getter-setter for _quality.
-  static as_value quality(const fn_call& fn);
-
-  /// Getter-setter for blendMode.
-  static as_value blendMode(const fn_call& fn);
-
-  /// Getter-setter for _x
-  static as_value x_getset(const fn_call& fn);
-
-  /// Getter-setter for _y
-  static as_value y_getset(const fn_call& fn);
-
-  /// Getter-setter for _xscale
-  static as_value xscale_getset(const fn_call& fn);
-
-  /// Getter-setter for _yscale
-  static as_value yscale_getset(const fn_call& fn);
-
-  /// Getter-setter for _xmouse
-  static as_value xmouse_get(const fn_call& fn);
-
-  /// Getter-setter for _ymouse
-  static as_value ymouse_get(const fn_call& fn);
-
-  /// Getter-setter for _alpha
-  static as_value alpha_getset(const fn_call& fn);
-
-  /// Getter-setter for _visible
-  static as_value visible_getset(const fn_call& fn);
-
-  /// Getter-setter for _width
-  static as_value width_getset(const fn_call& fn);
-
-  /// Getter-setter for _height
-  static as_value height_getset(const fn_call& fn);
-
-  /// Getter-setter for _rotation
-  static as_value rotation_getset(const fn_call& fn);
-
-  /// Getter-setter for _parent 
-  static as_value parent_getset(const fn_call& fn);
-
-  /// Getter-setter for _target 
-  static as_value target_getset(const fn_call& fn);
-
-  /// Getter-setter for _name
-  static as_value name_getset(const fn_call& fn);
-
-  /// @} Common ActionScript getter-setters for DisplayObjects
-
+    /// Some DisplayObjects require actions on losing focus.
+    //
+    /// Default is a no-op. TextField implements this function.
+    virtual void killFocus() {}
+  
+    /// Getter-setter for _highquality.
+    static as_value highquality(const fn_call& fn);
+  
+    /// Getter-setter for _quality.
+    static as_value quality(const fn_call& fn);
+  
+    /// Getter-setter for blendMode.
+    static as_value blendMode(const fn_call& fn);
+  
+    /// Getter-setter for _x
+    static as_value x_getset(const fn_call& fn);
+  
+    /// Getter-setter for _y
+    static as_value y_getset(const fn_call& fn);
+  
+    /// Getter-setter for _xscale
+    static as_value xscale_getset(const fn_call& fn);
+  
+    /// Getter-setter for _yscale
+    static as_value yscale_getset(const fn_call& fn);
+  
+    /// Getter-setter for _xmouse
+    static as_value xmouse_get(const fn_call& fn);
+  
+    /// Getter-setter for _ymouse
+    static as_value ymouse_get(const fn_call& fn);
+  
+    /// Getter-setter for _alpha
+    static as_value alpha_getset(const fn_call& fn);
+  
+    /// Getter-setter for _visible
+    static as_value visible_getset(const fn_call& fn);
+  
+    /// Getter-setter for _width
+    static as_value width_getset(const fn_call& fn);
+  
+    /// Getter-setter for _height
+    static as_value height_getset(const fn_call& fn);
+  
+    /// Getter-setter for _rotation
+    static as_value rotation_getset(const fn_call& fn);
+  
+    /// Getter-setter for _parent 
+    static as_value parent_getset(const fn_call& fn);
+  
+    /// Getter-setter for _target 
+    static as_value target_getset(const fn_call& fn);
+  
+    /// Getter-setter for _name
+    static as_value name_getset(const fn_call& fn);
+  
+    /// @} Common ActionScript getter-setters for DisplayObjects
+  
 protected:
 
     /// Register currently computable target as
