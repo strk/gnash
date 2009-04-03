@@ -158,6 +158,7 @@ public:
         _singleMode = from._singleMode;
     }
     
+    /// Merge two ranges based on snaptest.
     struct ExpandToIfSnap
     {
     public:
@@ -170,15 +171,82 @@ public:
         bool operator()(RangeType& r) {
             if (snaptest(r, _rt, _snapFactor)) {
                 r.expandTo(_rt);
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
     private:
         const RangeType& _rt;
         const float _snapFactor;
     };
+
+    class Scale
+    {
+    public:
+        Scale(const float scale) : _scale(scale) {}
+        void operator()(RangeType& r) {
+            r.scale(_scale);
+        }
+    private:
+        const float _scale;
+    };
+
+    class GrowBy
+    {
+    public:
+        GrowBy(const float factor) : _factor(factor) {}
+        void operator()(RangeType& r) {
+            r.growBy(_factor);
+        }
+    private:
+        const float _factor;
+    };
+
+    class AddTo
+    {
+    public:
+        AddTo(SnappingRanges2d<T>& us) : _this(us) {}
+        void operator()(const RangeType& r) {
+            _this.add(r);
+        }
+    private:
+        SnappingRanges2d<T>& _this;
+    };
     
+    class IntersectsRange
+    {
+    public:
+        IntersectsRange(const RangeType& range) : _range(range) {}
+        bool operator()(const RangeType& us) {
+            return us.intersects(_range);
+        }
+    private:
+        const RangeType& _range;
+    };
+    
+    class ContainsPoint
+    {
+    public:
+        ContainsPoint(const T x, const T y) : _x(x), _y(y) {}
+        bool operator()(const RangeType& us) {
+            return us.contains(_x, _y);
+        }
+    private:
+        const T _x, _y;
+    };
+    
+    class ContainsRange
+    {
+    public:
+        ContainsRange(const RangeType& range) : _range(range) {}
+        bool operator()(const RangeType& us) {
+            return us.contains(_range);
+        }
+    private:
+        const RangeType& _range;
+    };
+
+
     /// Add a Range to the set, merging when possible and appropriate
     void add(const RangeType& range) {
         if (range.isWorld()) {
@@ -200,37 +268,14 @@ public:
         // reached this point we need a new range 
         _ranges.push_back(range);
         
-        combine_ranges_lazy();
+        combineRangesLazy();
     }
     
-    class Add
-    {
-    public:
-        Add(SnappingRanges2d<T>& us) : _this(us) {}
-        void operator()(const RangeType& r) {
-            _this.add(r);
-        }
-    private:
-        SnappingRanges2d<T>& _this;
-    };
-
-
     /// combines two snapping ranges
     void add(const SnappingRanges2d<T>& other) {
         const RangeList& rl = other._ranges;
-        std::for_each(rl.begin(), rl.end(), Add(*this));
+        std::for_each(rl.begin(), rl.end(), AddTo(*this));
     }
-    
-    class GrowBy
-    {
-    public:
-        GrowBy(const float factor) : _factor(factor) {}
-        void operator()(RangeType& r) {
-            r.growBy(_factor);
-        }
-    private:
-        const float _factor;
-    };
 
     /// Grows all ranges by the specified amount 
     void growBy(const T amount) {
@@ -238,19 +283,8 @@ public:
         if (isWorld() || isNull()) return;
         
         std::for_each(_ranges.begin(), _ranges.end(), GrowBy(amount));
-        combine_ranges_lazy();
+        combineRangesLazy();
     }
-
-    class Scale
-    {
-    public:
-        Scale(const float scale) : _scale(scale) {}
-        void operator()(RangeType& r) {
-            r.scale(_scale);
-        }
-    private:
-        const float _scale;
-    };
 
     /// Scale all ranges by the specified factor
     void scale(const float factor) {
@@ -258,76 +292,9 @@ public:
         if (isWorld() || isNull()) return;
         
         std::for_each(_ranges.begin(), _ranges.end(), Scale(factor));
-            
-        combine_ranges_lazy();
+        combineRangesLazy();
     }
     
-    /// Combines known ranges. Previously merged ranges may have come close
-    /// to other ranges. Algorithm could be optimized. 
-    void combine_ranges() const {
-    
-        // makes no sense in single mode
-        if (_singleMode) return;
-    
-        bool restart = true;
-        
-        _combineCounter = 0;
-        
-        while (restart) {
-        
-            int rcount = _ranges.size();
-
-            restart=false;
-        
-            for (int i=0; i<rcount; i++) {
-            
-                for (int j=i+1; j<rcount; j++) {
-                
-                    if (snaptest(_ranges[i], _ranges[j], _snapFactor)) {
-                        // merge i + j
-                        _ranges[i].expandTo(_ranges[j]);
-                        
-                        _ranges.erase(_ranges.begin() + j);
-                        
-                        restart=true; // restart from beginning
-                        break;
-                        
-                    } //if
-                
-                } //for
-                
-                if (restart)
-                    break;
-            
-            } //for
-        
-        } //while
-        
-        
-        // limit number of ranges
-        if (_ranges.size() > _rangesLimit) {
-        
-            // We found way too much ranges, so reduce to just one single range.
-            // We could also double the factor and try again, but that probably
-            // won't make much difference, so we avoid the trouble...
-            
-            RangeType single = getFullArea();            
-            _ranges.resize(1);
-            _ranges[0] = single;
-        
-        }
-    
-    }
-    
-    
-    /// Calls combine_ranges() once in a while, but not always. Avoids too many
-    /// combine_ranges() checks, which could slow down everything.
-    void combine_ranges_lazy() {
-        const size_type max = 5;
-        ++_combineCounter;
-        if (_combineCounter > max) combine_ranges();
-    }
-            
     /// Resets to NULL range
     void setNull() {
         _ranges.clear();
@@ -342,7 +309,7 @@ public:
     
     /// Returns true, when the ranges equal world range
     bool isWorld() const {
-        return ( (size()==1) && (_ranges.front().isWorld()) );
+        return ((size()==1) && (_ranges.front().isWorld()));
     }
     
     /// Returns true, when there is no range
@@ -357,13 +324,9 @@ public:
     }
     
     /// Returns the range at the specified index
-    //
-    /// TODO: return by reference ?
-    ///
-    RangeType getRange(unsigned int index) const {
+    const RangeType& getRange(size_type index) const {
         finalize();
         assert(index<size());
-        
         return _ranges[index];
     }
     
@@ -382,18 +345,25 @@ public:
         return range;     
     }
     
+
+    /// Returns true if any of the ranges intersect the given range
+    //
+    /// Note that a NULL range doesn't intersect anything
+    /// and a WORLD range intersects everything except a NULL Range.
+    ///
+    bool intersects(const RangeType& r) const {
+    
+        finalize();
+        return std::find_if(_ranges.begin(), _ranges.end(), IntersectsRanges(r))
+            != _ranges.end();
+    }
     
     /// Returns true if any of the ranges contains the point
     bool contains(T x, T y) const {
     
         finalize();
-    
-        for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
-        if (_ranges[rno].contains(x,y))
-            return true;
-            
-        return false;
-    
+        return std::find_if(_ranges.begin(), _ranges.end(), ContainsPoint(x, y))
+            != _ranges.end();
     }
 
     /// Returns true if any of the ranges contains the range
@@ -404,30 +374,8 @@ public:
     bool contains(const RangeType& r) const {
     
         finalize();
-    
-        for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
-        if (_ranges[rno].contains(r))
-            return true;
-            
-        return false;
-    
-    }
-
-    /// Returns true if any of the ranges intersect the given range
-    //
-    /// Note that a NULL range doesn't intersect anything
-    /// and a WORLD range intersects everything except a NULL Range.
-    ///
-    bool intersects(const RangeType& r) const {
-    
-        finalize();
-    
-        for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
-        if (_ranges[rno].intersects(r))
-            return true;
-            
-        return false;
-    
+        return std::find_if(_ranges.begin(), _ranges.end(), ContainsRange(r))
+            != _ranges.end();
     }
 
     /// \brief
@@ -456,7 +404,6 @@ public:
         // first iteration would return false
         //
         /// TODO: use a visitor !
-        ///
         for (unsigned rno=0, rcount=o.size(); rno<rcount; rno++) 
         {
             RangeType r = o.getRange(rno);
@@ -505,8 +452,9 @@ public:
         
         // update ourselves with the union of the "list"
         setNull();
-        for (unsigned lno=0, lcount=list.size(); lno<lcount; lno++) 
-            add(list.at(lno));
+        for (size_type lno=0, lcount=list.size(); lno<lcount; lno++) {
+            add(list[lno]);
+        }
                             
     }
     
@@ -533,7 +481,6 @@ public:
         
         if (r.isWorld()) return;    // X intersection with WORLD = X
         
-        
         // TODO: use a vector (remember to walk in reverse dir.)
         for (int rno=_ranges.size()-1; rno>=0; rno--) {     
         
@@ -546,20 +493,74 @@ public:
         }
     }
     
+    /// Combines known ranges. Previously merged ranges may have come close
+    /// to other ranges. Algorithm could be optimized. 
+    void combineRanges() const {
+    
+        // makes no sense in single mode
+        if (_singleMode) return;
+    
+        bool restart = true;
+        
+        _combineCounter = 0;
+        
+        while (restart) {
+        
+            int rcount = _ranges.size();
+
+            restart=false;
+        
+            for (int i=0; i<rcount; i++) {
+            
+                for (int j=i+1; j<rcount; j++) {
+                
+                    if (snaptest(_ranges[i], _ranges[j], _snapFactor)) {
+                        // merge i + j
+                        _ranges[i].expandTo(_ranges[j]);
+                        
+                        _ranges.erase(_ranges.begin() + j);
+                        
+                        restart=true; // restart from beginning
+                        break;
+                        
+                    } 
+                } 
+                
+                if (restart) break;
+            } 
+        } 
+        
+        // limit number of ranges
+        if (_ranges.size() > _rangesLimit) {
+        
+            // We found way too much ranges, so reduce to just one single range.
+            // We could also double the factor and try again, but that probably
+            // won't make much difference, so we avoid the trouble...
+            
+            RangeType single = getFullArea();            
+            _ranges.resize(1);
+            _ranges[0] = single;
+        
+        }
+    
+    }
+    
     /// Visit the current Ranges set
     //
     /// Visitor functor will be invoked
     /// for each RangeType in the current set.
     /// 
     /// The visitor functor will 
-    /// receive a RangeType reference; must return false if
+    /// receive a RangeType reference; must return true if
     /// it wants next item or true to exit the loop.
     ///
     /// @return false if the visitor reached the end.
-    template <class V> inline bool visit(V& visitor) const
+    template<class V> inline bool visit(V& visitor) const
     {
-        typename RangeList::const_iterator it = 
-            std::find_if(_ranges.begin(), _ranges.end(), visitor);
+        typename RangeList::iterator it, e;
+        for (it = _ranges.begin(), e = _ranges.end(); it != e; ++it) {
+            if (!visitor(*it)) break;
+        }
         return it != _ranges.end();
     }
 
@@ -570,16 +571,24 @@ public:
     /// 
     /// The visitor functor will receive a RangeType reference.
     ///
-    template <class V>
-    inline void visitAll(V& visitor) const
+    template<class V> inline void visitAll(V& visitor) const
     {
         for_each(_ranges.begin(), _ranges.end(), visitor);
     }
     
 private:
 
+    
+    /// Calls combineRanges() once in a while, but not always. Avoids too many
+    /// combineRanges() checks, which could slow down everything.
+    void combineRangesLazy() {
+        const size_type max = 5;
+        ++_combineCounter;
+        if (_combineCounter > max) combineRanges();
+    }
+            
     void finalize() const {
-        if (_combineCounter > 0) combine_ranges();
+        if (_combineCounter > 0) combineRanges();
     } 
         
     /// The current Ranges list.
@@ -600,7 +609,7 @@ private:
     /// Counter used in finalizing ranges.
     mutable size_type _combineCounter;
         
-}; //class SnappingRanges2d
+};
 
 template <class T>
 std::ostream&
@@ -641,7 +650,6 @@ inline bool snaptest(const geometry::Range2d<T>& range1,
 } 
     
 } // anonymous namespace
-
 } // namespace geometry
 
 /// Standard snapping 2d ranges type for invalidated bounds calculation    
