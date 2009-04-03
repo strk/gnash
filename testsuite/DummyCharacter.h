@@ -51,6 +51,11 @@ public:
 	{
 	}
 
+    InteractiveDisplayObject* topmostMouseEntity(boost::int32_t, boost::int32_t)
+    {
+        return 0;
+    }
+
 	void add_invalidated_bounds(InvalidatedRanges& /*bounds*/, bool /*force*/) {}
 
 };
