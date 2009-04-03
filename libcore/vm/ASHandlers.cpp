@@ -1298,9 +1298,10 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     const std::string val = env.pop().to_string();
     
-    /// Logging with a std::string here fails the swfdec testsuite, probably because
-    /// the first 0 DisplayObject terminates the output with a c_str, whereas a std::string
-    /// outputs the entire length of the string.
+    // Logging with a std::string here fails the swfdec testsuite,
+    // probably because the first 0 character terminates the output
+    // with a c_str, whereas a std::string outputs the entire length
+    // of the string.
     log_trace("%s", val.c_str());
 }
 
@@ -1321,7 +1322,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
     DisplayObject* tgt = env.find_target(env.top(0).to_string());
     if ( tgt )
     {
-        // mark this DisplayObject is script transformed.
+        // mark this DisplayObject as script transformed.
         tgt->transformedByScript();
         st.setCharacter( tgt );
     }
@@ -1643,7 +1644,7 @@ SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>
 
     if (it == e && is_sought)
     {
-        // No DisplayObjects left, so it's almost certainly UTF8.
+        // No characters left, so it's almost certainly UTF8.
         return ENCGUESS_UNICODE;
     }
 
@@ -1750,8 +1751,8 @@ SWFHandlers::ActionOrd(ActionExec& thread)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, swfVersion);
 
-    // decodeCanonicalString should correctly work out what the first DisplayObject
-    // is according to version.
+    // decodeCanonicalString should correctly work out what the first
+    // character is according to version.
     env.top(0).set_int(wstr.at(0));
 }
 
@@ -1781,7 +1782,7 @@ SWFHandlers::ActionChr(ActionExec& thread)
 
     // SWF 5 only:
     // This casts to unsigned char to a string, giving
-    // IS0-8859-1 8-bit DisplayObjects.
+    // IS0-8859-1 8-bit characters.
     // Values above 256 evaluate to value % 256, 
     // through the cast, which is expected behaviour.
     const unsigned char uc = static_cast<unsigned char>(c);
@@ -1898,7 +1899,7 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
 void
 SWFHandlers::ActionMbOrd(ActionExec& thread)
 {
-    /// This only deals with UTF-8 DisplayObjects.
+    /// This only deals with UTF-8 characters.
     /// TODO: what else is possible?
     /// TODO: fix for SWF5
 
@@ -1923,7 +1924,7 @@ SWFHandlers::ActionMbOrd(ActionExec& thread)
 void
 SWFHandlers::ActionMbChr(ActionExec& thread)
 {
-    /// This only generates UTF-8 DisplayObjects. No idea
+    /// This only generates UTF-8 characters. No idea
     /// what difference user locale might make, but UTF-8
     /// is generally GOOD.
     
@@ -1936,7 +1937,7 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
         // No need to return.
     }
 
-    // Cut to uint16, as DisplayObjects above 65535 'wrap around'
+    // Cut to uint16, as characters above 65535 'wrap around'
     const boost::uint16_t i = static_cast<boost::uint16_t> (env.top(0).to_int());
     
     std::string out = utf8::encodeUnicodeCharacter(i);
