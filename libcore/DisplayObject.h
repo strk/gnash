@@ -608,16 +608,6 @@ public:
     // Return true if this DisplayObject should be rendered
     bool isVisible() const { return _visible; }
 
-    /// These have been moved down from movie.h to remove that file
-    /// from the inheritance chain. It is probably still a misdesign
-    /// to require these functions for all DisplayObjects.
-    /// @{
-
-    virtual movie_definition *get_movie_definition()
-    {
-        return NULL;
-    }
-
     /// ActionScript event handler.    Returns true if a handler was called.
     //
     /// Must be overridden or will always return false.
