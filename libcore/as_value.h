@@ -47,7 +47,7 @@ namespace gnash {
 	class fn_call;
 	class as_function;
 	class MovieClip;
-	class character;
+	class DisplayObject;
 	class asNamespace;
 	class asName;
     class SimpleBuffer;
@@ -276,9 +276,9 @@ public:
     /// @param d      The 32-bit int represented as a double. This is only a
     ///               valid number if the return value is true.
     /// @param whole  If true, expect the whole string to be valid, i.e.
-    ///               throw if there are any invalid characters. If false,
+    ///               throw if there are any invalid DisplayObjects. If false,
     ///               returns any valid number up to the first invalid
-    ///               character.
+    ///               DisplayObject.
     /// @return       True if the string was non-decimal and successfully
     ///               parsed.
     static bool parseNonDecimalInt(const std::string& s, double& d,
@@ -438,28 +438,28 @@ public:
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
-	/// This is just a wrapper around to_character() performing 
+	/// This is just a wrapper around to_DisplayObject() performing 
 	/// an additional final cast.
 	///
 	MovieClip* to_sprite(bool skipRebinding=false) const;
 
-	/// Return value as a character or NULL if this is not possible.
+	/// Return value as a DisplayObject or NULL if this is not possible.
 	//
-	/// If the value is a MOVIECLIP value, the stored character target
+	/// If the value is a MOVIECLIP value, the stored DisplayObject target
 	/// is evaluated using the root movie's environment.
-	/// If the target points to something that doesn't cast to a character,
+	/// If the target points to something that doesn't cast to a DisplayObject,
 	/// NULL is returned.
 	///
 	/// Note that if the value is NOT a MOVIECLIP type, NULL is always
 	/// returned.
 	///
 	/// @param skipRebinding
-	/// 	If true a reference to a destroyed character is still returned
+	/// 	If true a reference to a destroyed DisplayObject is still returned
 	///	as such, rather then attempted to be resolved as a soft-reference.
 	///	Main use for this is during paths resolution, to avoid
 	///	infinite loops. See bug #21647.
 	///
-	character* to_character(bool skipRebinding=false) const;
+	DisplayObject* to_DisplayObject(bool skipRebinding=false) const;
 
 	/// \brief
 	/// Return value as an ActionScript function ptr
@@ -540,7 +540,7 @@ public:
 
 	void set_sprite(MovieClip& sp);
 
-	void set_character(character& sp);
+	void set_DisplayObject(DisplayObject& sp);
 
 	void set_int(int val) { set_double(val); }
 
@@ -655,7 +655,7 @@ private:
 	AsType m_type;
 
 	typedef MovieClip* SpritePtr;
-	typedef character* CharacterPtr;
+	typedef DisplayObject* CharacterPtr;
 	typedef boost::intrusive_ptr<as_function> AsFunPtr;
 	typedef boost::intrusive_ptr<as_object> AsObjPtr;
 	
@@ -685,7 +685,7 @@ private:
 	///
 	SpritePtr getSprite(bool skipRebinding=false) const;
 
-	/// Get the character pointer variant member (we assume m_type == MOVIECLIP)
+	/// Get the DisplayObject pointer variant member (we assume m_type == MOVIECLIP)
 	//
 	/// NOTE: this is possibly NULL !
 	///

@@ -28,6 +28,7 @@
 #include "sound_handler.h"
 #include "movie_root.h"
 #include "VM.h"
+#include "DisplayObject.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
@@ -474,7 +475,7 @@ Gui::notify_mouse_moved(int ux, int uy)
 		display(m);
 	}
     
-	character* activeEntity = m->getActiveEntityUnderPointer();
+	DisplayObject* activeEntity = m->getActiveEntityUnderPointer();
 	if ( activeEntity )
 	{
 		if ( activeEntity->isSelectableTextField() )
@@ -1103,7 +1104,7 @@ Gui::getMovieInfo() const
     //
     topIter = tr->insert(topIter, StringPair("Mouse Entities", ""));
 
-    const character* ch;
+    const DisplayObject* ch;
     ch = stage.getActiveEntityUnderPointer();
     if ( ch )
     {

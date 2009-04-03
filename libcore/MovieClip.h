@@ -27,6 +27,7 @@
 
 #include "movie_definition.h" // for inlines
 #include "DisplayList.h" // DisplayList 
+#include "InteractiveDisplayObject.h"
 #include "log.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
@@ -67,7 +68,7 @@ namespace gnash
 /// This means that they define a variable scope (see
 /// the as_environment member) and are divided into "frames"
 ///
-class MovieClip : public character, boost::noncopyable
+class MovieClip : public InteractiveDisplayObject, boost::noncopyable
 {
 
 public:
@@ -97,13 +98,13 @@ public:
     ///     May be 0 for top-level movies (_level#).
     ///
     /// @param id
-    ///     Identifier of the character definition this is an instance
-    ///     of. This is required by character class, but probably
+    ///     Identifier of the DisplayObject definition this is an instance
+    ///     of. This is required by DisplayObject class, but probably
     ///     to be deprecated if every instance has a reference to its
     ///     definition, which should know its id...
     ///
     MovieClip(movie_definition* def, movie_instance* root,
-            character* parent, int id);
+            DisplayObject* parent, int id);
 
     virtual ~MovieClip();
 
@@ -156,16 +157,16 @@ public:
     /// Get the composite bounds of all component drawing elements
     rect getBounds() const;
 
-    // See dox in character.h
+    // See dox in DisplayObject.h
     bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
-    // See dox in character.h
+    // See dox in DisplayObject.h
     bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const;
 
     /// return true if the given point is located in a(this) hitable sprite.
     ///
     /// all sprites except mouse-insensitive dynamic masks are hitable.
-    /// _visible property is ignored for hitable characters.
+    /// _visible property is ignored for hitable DisplayObjects.
     ///
     bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
 
@@ -218,7 +219,7 @@ public:
 
     play_state get_play_state() const { return m_play_state; }
 
-    character* get_character(int character_id);
+    DisplayObject* get_DisplayObject(int DisplayObject_id);
 
     // delegates to movie_root (possibly wrong)
     virtual float get_background_alpha() const;
@@ -248,12 +249,12 @@ public:
     /// Return the topmost entity that the given point
     /// covers that can receive mouse events.  NULL if
     /// none.  Coords are in parent's frame.
-    virtual character* get_topmost_mouse_entity(boost::int32_t x,
+    virtual DisplayObject* get_topmost_mouse_entity(boost::int32_t x,
             boost::int32_t y);
 
-    // see dox in character.h
-    const character* findDropTarget(boost::int32_t x, boost::int32_t y,
-            character* dragging) const;
+    // see dox in DisplayObject.h
+    const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
+            DisplayObject* dragging) const;
 
     void setDropTarget(const std::string& tgt)
     {
@@ -334,33 +335,33 @@ public:
     
     void omit_display();
 
-    /// Swap depth of the given characters in the DisplayList
+    /// Swap depth of the given DisplayObjects in the DisplayList
     //
     /// See DisplayList::swapDepths for more info
     ///
-    void swapDepths(character* ch1, int newdepth)
+    void swapDepths(DisplayObject* ch1, int newdepth)
     {
         m_display_list.swapDepths(ch1, newdepth);
     }
 
-    /// Return the character at given depth in our DisplayList.
+    /// Return the DisplayObject at given depth in our DisplayList.
     //
     /// @return NULL if the specified depth is available (no chars there)
     ///
-    character* get_character_at_depth(int depth);
+    DisplayObject* get_DisplayObject_at_depth(int depth);
 
-    character* add_empty_movieclip(const std::string& name, int depth);
+    DisplayObject* add_empty_movieclip(const std::string& name, int depth);
 
-    boost::intrusive_ptr<character> add_textfield(const std::string& name,
+    boost::intrusive_ptr<DisplayObject> add_textfield(const std::string& name,
             int depth, int x, int y, float width, float height);
 
-    /// Place a character or mask to the DisplayList.
+    /// Place a DisplayObject or mask to the DisplayList.
     //
-    /// This method instantiates the given character definition
+    /// This method instantiates the given DisplayObject definition
     /// and places it on the stage at the given depth.
     ///
     /// If the specified depth is already occupied, it results a no-ops.
-    /// Otherwise, a new character will be created and onload handler will be triggerred.
+    /// Otherwise, a new DisplayObject will be created and onload handler will be triggerred.
     ///
     /// @param tag
     ///     A swf defined placement tag (PlaceObject, or PlaceObject2,
@@ -369,45 +370,45 @@ public:
     ///     movie_definition class.
     ///
     /// @param dlist
-    ///     The display list to add the character to.
+    ///     The display list to add the DisplayObject to.
     ///
     /// @return
-    ///     A pointer to the character being added or NULL
+    ///     A pointer to the DisplayObject being added or NULL
     ///
-    character* add_display_object(const SWF::PlaceObject2Tag* tag,
+    DisplayObject* add_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::move_character()
+    /// Proxy of DisplayList::move_DisplayObject()
     void move_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::replace_character()
+    /// Proxy of DisplayList::replace_DisplayObject()
     void replace_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::remove_character()
+    /// Proxy of DisplayList::remove_DisplayObject()
     void remove_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::remove_character()
+    /// Proxy of DisplayList::remove_DisplayObject()
     ///
     /// @
-    /// new character to be used for replacing.
+    /// new DisplayObject to be used for replacing.
     ///
     /// @param depth
-    /// depth at which the old character is to be replaced.
+    /// depth at which the old DisplayObject is to be replaced.
     ///
     /// @param use_old_cxform
-    /// if true, the cxform of the new character will be set to the old one.
-    /// if false, the cxform of the new character will be untouched.
+    /// if true, the cxform of the new DisplayObject will be set to the old one.
+    /// if false, the cxform of the new DisplayObject will be untouched.
     ///
     /// @param use_old_matrix
-    /// if true, the transformation SWFMatrix of the new character 
+    /// if true, the transformation SWFMatrix of the new DisplayObject 
     /// will be set to the old one.
-    /// if false, the transformation SWFMatrix of the new character will
+    /// if false, the transformation SWFMatrix of the new DisplayObject will
     /// be untouched.
     ///
-    void replace_display_object(character* ch,  int depth,
+    void replace_display_object(DisplayObject* ch,  int depth,
         bool use_old_cxform,
         bool use_old_matrix);
 
@@ -418,22 +419,22 @@ public:
     /// NOTE: 
     /// (1)the id parameter is currently unused, but 
     /// required to avoid breaking of inheritance from movie.h.
-    /// (2)the id might be used for specifying a character
-    /// in the depth(think about multiple characters within the same
+    /// (2)the id might be used for specifying a DisplayObject
+    /// in the depth(think about multiple DisplayObjects within the same
     /// depth, not tested and a rare case)
     ///
     void remove_display_object(int depth, int /* id */)
     {
         set_invalidated();
-        m_display_list.remove_character(depth);
+        m_display_list.remove_DisplayObject(depth);
     }
 
     void unloadMovie();
 
-    /// Attach the given character instance to current display list
+    /// Attach the given DisplayObject instance to current display list
     //
     /// @param newch
-    /// The character instance to attach.
+    /// The DisplayObject instance to attach.
     ///
     /// @param depth
     /// The depth to assign to the instance.
@@ -441,7 +442,7 @@ public:
     /// @return true on success, false on failure
     /// FIXME: currently never returns false !
     ///
-    bool attachCharacter(character& newch, int depth, as_object* initObject);
+    bool attachCharacter(DisplayObject& newch, int depth, as_object* initObject);
 
     /// Handle placement event
     //
@@ -460,12 +461,12 @@ public:
     virtual void stagePlacementCallback(as_object* initObj = 0);
 
     /// Unload all contents in the displaylist and this instance
-    /// See character::unload for more info
+    /// See DisplayObject::unload for more info
     bool unload();
 
     /// Mark this sprite as destroyed
     //
-    /// This is an override of character::destroy()
+    /// This is an override of DisplayObject::destroy()
     ///
     /// A sprite should be destroyed when is removed from the display
     /// list and is not more needed for names (target) resolutions.
@@ -493,7 +494,7 @@ public:
     
     /// \brief
     /// Execute the given init action buffer, if not done yet
-    /// for the target character id.
+    /// for the target DisplayObject id.
     //
     /// The action will normally be pushed on queue, but will
     /// be executed immediately if we are executing actions
@@ -503,14 +504,14 @@ public:
     /// The action buffer to execute
     ///
     /// @param cid
-    /// The referenced character id
+    /// The referenced DisplayObject id
     ///
     void execute_init_action_buffer(const action_buffer& a, int cid);
 
     /// Execute a single action buffer (DOACTION block)
     void execute_action(const action_buffer& ab);
 
-    /// For debugging -- return the id of the character
+    /// For debugging -- return the id of the DisplayObject
     /// at the specified depth.
     /// Return -1 if nobody's home.
     int get_id_at_depth(int depth);
@@ -584,12 +585,12 @@ public:
 
     /// Duplicate this sprite in its timeline
     //
-    /// Add the new character at a the given depth to this sprite
+    /// Add the new DisplayObject at a the given depth to this sprite
     /// parent displaylist.
     ///
     /// NOTE: the call will fail for the root movie (no parent).
-    /// NOTE2: any character at the given target depth will be
-    ///        replaced by the new character
+    /// NOTE2: any DisplayObject at the given target depth will be
+    ///        replaced by the new DisplayObject
     /// NOTE3: event handlers will also be copied
     ///
     /// @param newname
@@ -608,7 +609,7 @@ public:
     /// Dispatch event handler(s), if any.
     virtual bool on_event(const event_id& id);
 
-    // inherited from character class, see dox in character.h
+    // inherited from DisplayObject class, see dox in DisplayObject.h
     as_environment& get_environment() {
         return m_as_environment;
     }
@@ -630,7 +631,7 @@ public:
     /// Return the next highest available depth
     //
     /// Placing an object at the depth returned by
-    /// this function should result in a character
+    /// this function should result in a DisplayObject
     /// that is displayd above all others
     ///
     int getNextHighestDepth() const {
@@ -669,7 +670,7 @@ public:
     /// - The MovieClip.removeMovieClip() method.
     ///
     /// The removal will not occur if the depth of this
-    /// characters is not in the "dynamic" range [0..1048575]
+    /// DisplayObjects is not in the "dynamic" range [0..1048575]
     /// as described at the following URL:
     /// 
     /// http://www.senocular.com/flash/tutorials/depths/?page=2
@@ -689,7 +690,7 @@ public:
     virtual std::auto_ptr<GnashImage> drawToBitmap(
             const SWFMatrix& mat = SWFMatrix(), 
             const cxform& cx = cxform(),
-            character::BlendMode bm = character::BLENDMODE_NORMAL,
+            DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
             const rect& clipRect = rect(),
             bool smooth = false);
 
@@ -773,13 +774,13 @@ public:
     /// Set all variables in the given map with their corresponding values
     DSOEXPORT void setVariables(VariableMap& vars);
 
-    /// Enumerate child characters
+    /// Enumerate child DisplayObjects
     //
     /// See as_object::enumerateNonProperties(as_environment&) for more info.
     ///
     virtual void enumerateNonProperties(as_environment&) const;
 
-    /// Delete characters removed from the stage
+    /// Delete DisplayObjects removed from the stage
     /// from the display lists
     void cleanupDisplayList();
 
@@ -813,7 +814,7 @@ public:
     static as_value lockroot_getset(const fn_call& fn);
 
 #ifdef USE_SWFTREE
-    // Override to append display list info, see dox in character.h
+    // Override to append display list info, see dox in DisplayObject.h
     virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
 #endif
 
@@ -840,7 +841,7 @@ private:
     ///
     bool isEnabled() const;
 
-    // See dox in character.h
+    // See dox in DisplayObject.h
     bool allowHandCursor() const;
 
     /// Advance to a previous frame.
@@ -919,7 +920,7 @@ private:
     /// insising on availability a shape_character_def instance
     /// that has a parent (why?)
     ///
-    boost::intrusive_ptr<character> _drawable_inst;
+    boost::intrusive_ptr<DisplayObject> _drawable_inst;
 
     // this is deprecated, we'll be pushing gotoframe target
     // actions to the global action queue
@@ -983,9 +984,9 @@ private:
 
 protected:
 
-    void place_character(character* ch, int depth)  
+    void place_DisplayObject(DisplayObject* ch, int depth)  
     {       
-        m_display_list.place_character(ch, depth);  
+        m_display_list.place_DisplayObject(ch, depth);  
     }
 
     /// Execute the tags associated with the specified frame.
@@ -1026,7 +1027,7 @@ protected:
 
 #ifdef GNASH_USE_GC
     /// Mark sprite-specific reachable resources and invoke
-    /// the parent's class version (markCharacterReachable)
+    /// the parent's class version (markDisplayObjectReachable)
     //
     /// sprite-specific reachable resources are:
     ///     - DisplayList items (current, backup and frame0 ones)

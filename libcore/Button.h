@@ -23,7 +23,7 @@
 #define GNASH_BUTTON_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "character.h" // for inheritance
+#include "InteractiveDisplayObject.h" // for inheritance
 
 #include <vector>
 #include <set>
@@ -41,11 +41,11 @@ namespace gnash {
 // Button
 //
 
-class Button : public character
+class Button : public InteractiveDisplayObject
 {
 public:
 
-	typedef std::vector< character* > DisplayObjects;
+	typedef std::vector<DisplayObject*> DisplayObjects;
 	
     /// A container for holding the id of active button records.
     typedef std::set<int> ActiveRecords;
@@ -75,7 +75,7 @@ public:
 
 	MouseState m_mouse_state;
 
-	Button(SWF::DefineButtonTag& def, character* parent, int id);
+	Button(SWF::DefineButtonTag& def, DisplayObject* parent, int id);
 
 	~Button();
 
@@ -103,7 +103,7 @@ public:
 	//
 	/// I.e. check against ourself.
 	///
-	virtual character* get_topmost_mouse_entity(boost::int32_t x,
+	virtual DisplayObject* get_topmost_mouse_entity(boost::int32_t x,
             boost::int32_t y);
 	
 	virtual bool wantsInstanceName() const
@@ -126,7 +126,7 @@ public:
 	
 	rect getBounds() const;
 	
-	// See dox in character.h
+	// See dox in DisplayObject.h
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 	bool isEnabled();
@@ -135,19 +135,19 @@ public:
 	//
 	/// This callback will:
 	///
-	/// (1) Register this button instance as a live character
-	/// (2) Setup the state characters calling stagePlacementCallback on all [WRONG]
+	/// (1) Register this button instance as a live DisplayObject
+	/// (2) Setup the state DisplayObjects calling stagePlacementCallback on all [WRONG]
 	///
 	virtual void stagePlacementCallback(as_object* initObj = 0);
 
-	/// Properly unload contained characters
+	/// Properly unload contained DisplayObjects
 	bool unload();
 
-	/// Properly destroy contained characters
+	/// Properly destroy contained DisplayObjects
 	void destroy();
 
 #ifdef USE_SWFTREE
-	// Override to append button characters info, see dox in character.h
+	// Override to append button DisplayObjects info, see dox in DisplayObject.h
 	virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
 #endif
 
@@ -158,8 +158,8 @@ protected:
 	//
 	/// These are:
 	///	- this char's definition (m_def)
-	///	- the vector of state characters (_stateCharacters)
-	///	- the vector of hit characters (_hitCharacters)
+	///	- the vector of state DisplayObjects (_stateCharacters)
+	///	- the vector of hit DisplayObjects (_hitCharacters)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
@@ -172,39 +172,39 @@ private:
 
 	DisplayObjects _hitCharacters;
 
-	/// Returns all characters that are active based on the current state.
+	/// Returns all DisplayObjects that are active based on the current state.
 	//
 	/// The "_visible" property does not matter here. 
 	///
 	/// @param list
-	///	The container to push active characters into
+	///	The container to push active DisplayObjects into
 	///
 	/// @param includeUnloaded
 	///	If true, include unloaded but still reachable chars in the records slot.
 	///
-	void getActiveCharacters(std::vector<character*>& list,
+	void getActiveCharacters(std::vector<DisplayObject*>& list,
 			bool includeUnloaded=false);
 
-    /// Returns all characters that are active based on the current state.
+    /// Returns all DisplayObjects that are active based on the current state.
     //
-    /// This is a const method because the returned characters cannot be
+    /// This is a const method because the returned DisplayObjects cannot be
     /// modified.
     ///
-    /// @param list     The container to push unmodifiable characters into.
-	void getActiveCharacters(std::vector<const character*>& list) const;
+    /// @param list     The container to push unmodifiable DisplayObjects into.
+	void getActiveCharacters(std::vector<const DisplayObject*>& list) const;
 
-	/// Returns all characters (record nums) that should be active on
+	/// Returns all DisplayObjects (record nums) that should be active on
     /// the given state.
 	//
 	/// @param list
-	///	The set to push active characters record number into
+	///	The set to push active DisplayObjects record number into
 	///
 	/// @param state
 	///	The state we're interested in
 	///
 	void get_active_records(ActiveRecords& list, MouseState state);
 
-	/// Return any state character whose name matches the given string
+	/// Return any state DisplayObject whose name matches the given string
 	//
 	/// NOTE: both active and inactive childs are scanned for
 	///
@@ -212,7 +212,7 @@ private:
 	///	Name to match, search is case sensitive for SWF7 and higher,
 	///     case insensitive up to SWF6.
 	///
-	character * getChildByName(const std::string& name);
+	DisplayObject * getChildByName(const std::string& name);
 
 	/// \brief
 	/// Return version of the SWF containing

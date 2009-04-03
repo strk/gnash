@@ -123,7 +123,7 @@ struct DepthComparator
     }
 };
 
-/// The movie stage (absolute top level node in the characters hierarchy)
+/// The movie stage (absolute top level node in the DisplayObjects hierarchy)
 //
 /// This is a wrapper around the set of loaded levels being played.
 ///
@@ -174,7 +174,7 @@ public:
     /// Return the movie at the given level (0 if unloaded level).
     //
     /// POST CONDITIONS:
-    /// - The returned character has a depth equal to 'num'
+    /// - The returned DisplayObject has a depth equal to 'num'
     ///
     boost::intrusive_ptr<movie_instance> getLevel(unsigned int num) const;
 
@@ -204,7 +204,7 @@ public:
     ///        and the call would result in a no-op.
     ///
     /// @param depth
-    ///        New depth to assign to the character. If another level exists at 
+    ///        New depth to assign to the DisplayObject. If another level exists at 
     ///        the target depth the latter is moved in place of the former, with
     ///        its depth also updated.
     ///
@@ -214,7 +214,7 @@ public:
     //
     /// @param depth
     ///   Depth of the level to drop. Note that this is 
-    ///   -character::staticDepthOffset for the root movie. Must be >=0 and
+    ///   -DisplayObject::staticDepthOffset for the root movie. Must be >=0 and
     ///   <= 1048575 or an assertion will fail. Note that if the depth
     ///   evaluates to the original root movie nothing happens (not allowed
     ///   to remove that). It is not tested if it's allowed to remove _level0
@@ -372,10 +372,10 @@ public:
     /// This function does:
     ///     - Execute all timers
     ///     - Reset the next Random number
-    ///     - Advance all advanceable characters in reverse-placement order
+    ///     - Advance all advanceable DisplayObjects in reverse-placement order
     ///     - Cleanup key listeners
     ///     - Process all queued actions
-    ///     - Remove unloaded characters from the advanceable characters list.
+    ///     - Remove unloaded DisplayObjects from the advanceable DisplayObjects list.
     ///     - Run the GC collector
     void advanceMovie();
 
@@ -397,53 +397,53 @@ public:
         getRootMovie()->set_play_state(s);
     }
 
-    /// Notify still loaded character listeners for key events
+    /// Notify still loaded DisplayObject listeners for key events
     DSOEXPORT void notify_key_listeners(key::code k, bool down);
 
-    /// Push a new character listener for key events
-    void add_key_listener(character* listener)
+    /// Push a new DisplayObject listener for key events
+    void add_key_listener(DisplayObject* listener)
     {
         add_listener(m_key_listeners, listener);
     }
 
-    /// Remove a character listener for key events
-    void remove_key_listener(character* listener)
+    /// Remove a DisplayObject listener for key events
+    void remove_key_listener(DisplayObject* listener)
     {
         remove_listener(m_key_listeners, listener);
     }
 
-    /// Notify still loaded character listeners for mouse events
+    /// Notify still loaded DisplayObject listeners for mouse events
     DSOEXPORT void notify_mouse_listeners(const event_id& event);
 
-    /// Push a new character listener for mouse events
-    void add_mouse_listener(character* listener)
+    /// Push a new DisplayObject listener for mouse events
+    void add_mouse_listener(DisplayObject* listener)
     {
         add_listener(m_mouse_listeners, listener);
     }
 
-    /// Remove a character listener for mouse events
-    void remove_mouse_listener(character* listener)
+    /// Remove a DisplayObject listener for mouse events
+    void remove_mouse_listener(DisplayObject* listener)
     {
         remove_listener(m_mouse_listeners, listener);
     }
 
-    /// Get the character having focus
+    /// Get the DisplayObject having focus
     //
-    /// The character having focus will receive mouse button
+    /// The DisplayObject having focus will receive mouse button
     /// and key presses/releases.
     ///
-    /// @return the character having focus or NULL of none.
+    /// @return the DisplayObject having focus or NULL of none.
     ///
-    boost::intrusive_ptr<character> getFocus();
+    boost::intrusive_ptr<DisplayObject> getFocus();
 
-    /// Set the character having focus
+    /// Set the DisplayObject having focus
     //
     /// @param to
-    /// The character to receive focus. NULL to kill focus.
+    /// The DisplayObject to receive focus. NULL to kill focus.
     /// @return true if the focus operation succeeded, false if the passed
-    /// character cannot receive focus. setFocus(0) is a valid operation, so
+    /// DisplayObject cannot receive focus. setFocus(0) is a valid operation, so
     /// returns true (always succeeds).
-    bool setFocus(boost::intrusive_ptr<character> to);
+    bool setFocus(boost::intrusive_ptr<DisplayObject> to);
     
     DSOEXPORT void add_invalidated_bounds(InvalidatedRanges& ranges,
             bool force);
@@ -456,17 +456,17 @@ public:
     /// currently implmented).
     ///
     /// @return the topmost active entity under pointer or NULL if none.
-    character* getActiveEntityUnderPointer() const;
+    DisplayObject* getActiveEntityUnderPointer() const;
 
     /// Return the topmost non-dragging entity under the pointer
     //
     /// This method triggers a displaylist scan
     ///
     /// @return the topmost non-dragging entity under pointer or NULL if none
-    const character* getEntityUnderPointer() const;
+    const DisplayObject* getEntityUnderPointer() const;
 
-    /// Return the character currently being dragged, if any
-    character* getDraggingCharacter() const;
+    /// Return the DisplayObject currently being dragged, if any
+    DisplayObject* getDraggingCharacter() const;
 
     /// Return true if the mouse pointer is over an active entity
     bool isMouseOverActiveEntity() const;
@@ -565,11 +565,11 @@ public:
 
     /// Push an executable code to the ActionQueue
     void pushAction(const action_buffer& buf,
-            boost::intrusive_ptr<character> target, int lvl=apDOACTION);
+            boost::intrusive_ptr<DisplayObject> target, int lvl=apDOACTION);
 
     /// Push a function code to the ActionQueue
     void pushAction(boost::intrusive_ptr<as_function> func,
-            boost::intrusive_ptr<character> target, int lvl=apDOACTION);
+            boost::intrusive_ptr<DisplayObject> target, int lvl=apDOACTION);
 
 #ifdef GNASH_USE_GC
     /// Mark all reachable resources (for GC)
@@ -585,20 +585,20 @@ public:
     /// - Mouse listeners (m_mouse_listeners)
     /// - global Key object (_keyobject)
     /// - global Mouse object (_mouseobject)
-    /// - Any character being dragged 
+    /// - Any DisplayObject being dragged 
     ///
     void markReachableResources() const;
 #endif // GNASH_USE_GC
 
     /// \brief
-    /// Register a newly born advanceable character to the
-    /// list of characters to be advanced on next ::advance call.
+    /// Register a newly born advanceable DisplayObject to the
+    /// list of DisplayObjects to be advanced on next ::advance call.
     //
-    /// The character will only be advanced if not unloaded when
+    /// The DisplayObject will only be advanced if not unloaded when
     /// its turn comes. Characters are advanced in reverse-placement
     /// order (first registered is advanced last)
     ///
-    void addLiveChar(boost::intrusive_ptr<character> ch)
+    void addLiveChar(boost::intrusive_ptr<DisplayObject> ch)
     {
         // Don't register the object in the list twice 
 #if GNASH_PARANOIA_LEVEL > 1
@@ -644,7 +644,7 @@ public:
     ///
     void flushHigherPriorityActionQueues();
 
-    character* findCharacterByTarget(const std::string& tgtstr) const;
+    DisplayObject* findCharacterByTarget(const std::string& tgtstr) const;
 
     /// Queue a request for loading a movie
     //
@@ -822,21 +822,21 @@ public:
 
     const RunInfo& runInfo() const { return _runInfo; }
 
-    /// Add a character child on top depth
+    /// Add a DisplayObject child on top depth
     //
     /// @param ch
-    ///     The child character to add
-    void addChild(character* ch);
+    ///     The child DisplayObject to add
+    void addChild(DisplayObject* ch);
 
-    /// Add a character child at given depth
+    /// Add a DisplayObject child at given depth
     //
     /// @param ch
-    ///     The child character to add
+    ///     The child DisplayObject to add
     ///
     /// @param depth
     ///     The depth to add the child to
     ///
-    void addChildAt(character* ch, int depth);
+    void addChildAt(DisplayObject* ch, int depth);
 
 private:
 
@@ -901,7 +901,7 @@ private:
     void processLoadMovieRequest(const LoadMovieRequest& r);
 
     /// Listeners container
-    typedef std::list< boost::intrusive_ptr<character> > CharacterList;
+    typedef std::list< boost::intrusive_ptr<DisplayObject> > CharacterList;
 
     /// key and mouse listeners container
     typedef CharacterList KeyListeners;
@@ -916,18 +916,18 @@ private:
     /// Delete all elements on the timers list
     void clearIntervalTimers();
 
-    /// An element of the advanceable characters
-    typedef boost::intrusive_ptr<character> AdvanceableCharacter;
+    /// An element of the advanceable DisplayObjects
+    typedef boost::intrusive_ptr<DisplayObject> AdvanceableCharacter;
 
     /// A list of AdvanceableCharacters
     //
     /// This is a list (not a vector) as we want to allow
-    /// ::advance of each element to insert new characters before
+    /// ::advance of each element to insert new DisplayObjects before
     /// the start w/out invalidating iterators scanning the
     /// list forward for proper movie advancement
     typedef std::list<AdvanceableCharacter> LiveChars;
 
-    /// The list of advanceable character, in placement order
+    /// The list of advanceable DisplayObject, in placement order
     LiveChars _liveChars;
 
     /// Execute expired timers
@@ -946,18 +946,18 @@ private:
         cleanupUnloadedListeners(m_mouse_listeners);
     }
 
-    /// Erase unloaded characters from the given listeners list
+    /// Erase unloaded DisplayObjects from the given listeners list
     static void cleanupUnloadedListeners(CharacterList& ll);
 
-    /// Cleanup references to unloaded characters and run the garbage collector.
+    /// Cleanup references to unloaded DisplayObjects and run the garbage collector.
     void cleanupAndCollect();
 
-    /// Push a character listener to the front of given container, if not
+    /// Push a DisplayObject listener to the front of given container, if not
     /// already present
-    static void add_listener(CharacterList& ll, character* elem);
+    static void add_listener(CharacterList& ll, DisplayObject* elem);
 
     /// Remove a listener from the list
-    static void remove_listener(CharacterList& ll, character* elem);
+    static void remove_listener(CharacterList& ll, DisplayObject* elem);
 
     /// Return the current Stage object
     //
@@ -1010,8 +1010,8 @@ private:
     /// Objects listening for mouse events (down,up,move)
     MouseListeners m_mouse_listeners;
 
-    /// The character currently holding focus, or 0 if no focus.
-    boost::intrusive_ptr<character> _currentFocus;
+    /// The DisplayObject currently holding focus, or 0 if no focus.
+    boost::intrusive_ptr<DisplayObject> _currentFocus;
 
     float m_time_remainder;
 
@@ -1028,8 +1028,7 @@ private:
     /// interface to the movie_instance class definition
     Levels _movies;
 
-    typedef character* DisplayObject;
-    typedef std::map<int, DisplayObject> Childs;
+    typedef std::map<int, DisplayObject*> Childs;
 
     /// The stage childs
     Childs _childs;
@@ -1061,18 +1060,18 @@ private:
     /// @param y
     ///     Y ordinate of the pointer, in world coordiante space (twips).
     ///
-    character* getTopmostMouseEntity(boost::int32_t x, boost::int32_t y);
+    DisplayObject* getTopmostMouseEntity(boost::int32_t x, boost::int32_t y);
 
-    /// Delete characters removed from the stage
+    /// Delete DisplayObjects removed from the stage
     /// from the display lists
     void cleanupDisplayList();
 
-    /// Advance a live character
+    /// Advance a live DisplayObject
     //
     /// @param ch
-    ///     The character to advance, will NOT be advanced if unloaded
+    ///     The DisplayObject to advance, will NOT be advanced if unloaded
     ///
-    static void advanceLiveChar(boost::intrusive_ptr<character> ch);
+    static void advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch);
 
     /// Advance all non-unloaded live chars
     void advanceLiveChars();
@@ -1082,7 +1081,7 @@ private:
     /// @param movie
     /// The movie_instance to store at the given level.
     /// Will be stored in an intrusive_ptr.
-    /// Its depth will be set to <num>+character::staticDepthOffset and
+    /// Its depth will be set to <num>+DisplayObject::staticDepthOffset and
     /// its name to _level<num>
     void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
 
@@ -1144,8 +1143,8 @@ private:
         return (_processingActionLevel < apSIZE);
     }
 
-    const character* findDropTarget(boost::int32_t x, boost::int32_t y,
-            character* dragging) const;
+    const DisplayObject* findDropTarget(boost::int32_t x, boost::int32_t y,
+            DisplayObject* dragging) const;
 
     /// filedescriptor to write to for host application requests
     //

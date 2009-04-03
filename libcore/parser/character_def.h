@@ -26,7 +26,7 @@
 // Forward declarations
 
 namespace gnash {
-	class character;
+	class DisplayObject;
 	class SWFMatrix;
 	class rect;
     namespace SWF {
@@ -60,7 +60,7 @@ public:
 	
 	virtual ~character_def();
 	
-	virtual void display(character* /*instance_info*/)
+	virtual void display(DisplayObject* /*instance_info*/)
 	{
 	}
 
@@ -82,7 +82,7 @@ public:
 	//
 	/// default is to make a DisplayObject
 	///
-	virtual character* createDisplayObject(character* parent, int id) = 0;
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id) = 0;
 	
 	// Declared as virtual here because DisplayObject needs access to it
 	virtual const rect&	get_bound() const = 0;
@@ -97,7 +97,7 @@ public:
 
 protected:
 
-	/// Copy a character definition
+	/// Copy a DisplayObject definition
 	//
 	/// The copy will have a NULL render cache object.
 	/// The only known use of copy constructor is from

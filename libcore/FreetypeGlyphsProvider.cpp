@@ -440,7 +440,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 	//FT_BBox	glyphBox;
 	//FT_Outline_Get_BBox(outline, &glyphBox);
 	//rect r(glyphBox.xMin, glyphBox.yMin, glyphBox.xMax, glyphBox.yMax);
-	//log_debug("Glyph for character '%c' has computed bounds %s", code, r.toString().c_str());
+	//log_debug("Glyph for DisplayObject '%c' has computed bounds %s", code, r.toString().c_str());
 
 	sh = new DynamicShape();
 	sh->beginFill(rgba(255, 255, 255, 255));
@@ -454,7 +454,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 	walk.delta = 0; // ?
 
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_debug("Decomposing glyph outline for character %u", code);
+	log_debug("Decomposing glyph outline for DisplayObject %u", code);
 #endif
 
 	OutlineWalker walker(*sh, scale);
@@ -462,7 +462,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 	FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 	rect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
-	log_debug("Decomposed glyph for character '%c' has bounds %s",
+	log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
 			code, bound.toString());
 #endif
 

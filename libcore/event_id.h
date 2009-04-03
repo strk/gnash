@@ -167,7 +167,7 @@ private:
     
     // keyCode must be the unique gnash key identifier
     // gnash::key::code.
-    // edit_text_character has to be able to work out the
+    // edit_text_DisplayObject has to be able to work out the
     // ASCII value from keyCode, while other users need 
     // the SWF code or the Flash key code.
     key::code _keyCode;

@@ -68,7 +68,7 @@ public:
     int get_last_key() const;
 
     /// Responsible for user defined key events handlers only;
-    /// take over both characters and non-characters object.
+    /// take over both DisplayObjects and non-DisplayObjects object.
     void notify_listeners(const event_id& key_event_type);
 
 private:

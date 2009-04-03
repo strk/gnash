@@ -142,7 +142,7 @@ DisplayList::getNextHighestDepth() const
     for (const_iterator it = _charsByDepth.begin(),
             itEnd = _charsByDepth.end(); it != itEnd; ++it) {
 
-        character* ch = it->get();
+        DisplayObject* ch = it->get();
 
         int chdepth = ch->get_depth();
         if (chdepth >= nexthighestdepth) {
@@ -152,15 +152,15 @@ DisplayList::getNextHighestDepth() const
     return nexthighestdepth;
 }
 
-character*
-DisplayList::get_character_at_depth(int depth)
+DisplayObject*
+DisplayList::get_DisplayObject_at_depth(int depth)
 {
     testInvariant();
 
     for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end();
         it != itEnd; ++it) {
 
-        character* ch = it->get();
+        DisplayObject* ch = it->get();
 
         // found
         if (ch->get_depth() == depth) return ch;
@@ -174,8 +174,8 @@ DisplayList::get_character_at_depth(int depth)
 }
 
 
-character*
-DisplayList::get_character_by_name(const std::string& name)
+DisplayObject*
+DisplayList::get_DisplayObject_by_name(const std::string& name)
 {
     testInvariant();
 
@@ -190,8 +190,8 @@ DisplayList::get_character_by_name(const std::string& name)
 
 }
 
-character*
-DisplayList::get_character_by_name_i(const std::string& name)
+DisplayObject*
+DisplayList::get_DisplayObject_by_name_i(const std::string& name)
 {
     testInvariant();
 
@@ -206,7 +206,7 @@ DisplayList::get_character_by_name_i(const std::string& name)
 }
 
 void
-DisplayList::place_character(character* ch, int depth, as_object* initObj)
+DisplayList::place_DisplayObject(DisplayObject* ch, int depth, as_object* initObj)
 {
     assert(!ch->isUnloaded());
     ch->set_invalidated();
@@ -226,13 +226,13 @@ DisplayList::place_character(character* ch, int depth, as_object* initObj)
         (*it)->add_invalidated_bounds(old_ranges, true);    
 
         // make a copy (before replacing)
-        boost::intrusive_ptr<character> oldCh = *it;
+        boost::intrusive_ptr<DisplayObject> oldCh = *it;
 
         // replace existing char (before calling unload!)
         *it = DisplayItem(ch);
     
         if (oldCh->unload()) {
-            // reinsert removed character if needed
+            // reinsert removed DisplayObject if needed
             reinsertRemovedCharacter(oldCh);
         }
         else oldCh->destroy();
@@ -248,7 +248,7 @@ DisplayList::place_character(character* ch, int depth, as_object* initObj)
 }
 
 void
-DisplayList::add(character* ch, bool replace)
+DisplayList::add(DisplayObject* ch, bool replace)
 {
     int depth = ch->get_depth();
 
@@ -265,7 +265,7 @@ DisplayList::add(character* ch, bool replace)
 }
 
 void
-DisplayList::replace_character(character* ch, int depth, bool use_old_cxform,
+DisplayList::replace_DisplayObject(DisplayObject* ch, int depth, bool use_old_cxform,
 	bool use_old_matrix)
 {
     testInvariant();
@@ -294,17 +294,17 @@ DisplayList::replace_character(character* ch, int depth, bool use_old_cxform,
     }
     else {
         // Make a copy (before replacing)
-        boost::intrusive_ptr<character> oldch = *it;
+        boost::intrusive_ptr<DisplayObject> oldch = *it;
 
         InvalidatedRanges old_ranges;
     
         if (use_old_cxform) {
-            // Use the cxform from the old character.
+            // Use the cxform from the old DisplayObject.
             ch->set_cxform(oldch->get_cxform());
         }
 
         if (use_old_matrix) {
-            // Use the SWFMatrix from the old character.
+            // Use the SWFMatrix from the old DisplayObject.
             ch->copyMatrix(*oldch); // copy SWFMatrix and caches
         }
         
@@ -316,15 +316,15 @@ DisplayList::replace_character(character* ch, int depth, bool use_old_cxform,
 
         // Unload old char
         if (oldch->unload()) {
-            // reinsert removed character if needed
+            // reinsert removed DisplayObject if needed
             reinsertRemovedCharacter(oldch);
         }
         else oldch->destroy();
         
         // extend invalidated bounds
-        // WARNING: when a new Button character is added,
+        // WARNING: when a new Button DisplayObject is added,
         //          the invalidated bounds computation will likely
-        //          be bogus, as the actual character shown is not instantiated
+        //          be bogus, as the actual DisplayObject shown is not instantiated
         //          until ::stagePlacementCallback for buttons (I'd
         //          say this is a bug in Button). 
         ch->extend_invalidated_bounds(old_ranges);                
@@ -338,32 +338,32 @@ DisplayList::replace_character(character* ch, int depth, bool use_old_cxform,
 }
     
     
-// Updates the transform properties of the character at
+// Updates the transform properties of the DisplayObject at
 // the specified depth.
 void
-DisplayList::move_character( int depth, const cxform* color_xform,
+DisplayList::move_DisplayObject( int depth, const cxform* color_xform,
         const SWFMatrix* mat, int* ratio, int* /* clip_depth */)
 {
     testInvariant();
 
-    character* ch = get_character_at_depth(depth);
+    DisplayObject* ch = get_DisplayObject_at_depth(depth);
     if (! ch) {
         // FIXME, should this be log_aserror?
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("move_character() -- can't find object at depth %d"),
+        log_swferror(_("move_DisplayObject() -- can't find object at depth %d"),
             depth);
         );
         return;
     }
 
     if (ch->isUnloaded()) {
-        log_error("Request to move an unloaded character");
+        log_error("Request to move an unloaded DisplayObject");
         assert(!ch->isUnloaded());
     }
 
     // TODO: is sign of depth related to accepting anim moves ?
     if (!ch->get_accept_anim_moves()) {
-        // This character is rejecting anim moves.    This happens after it
+        // This DisplayObject is rejecting anim moves.    This happens after it
         // has been manipulated by ActionScript.
         return;
     }
@@ -378,7 +378,7 @@ DisplayList::move_character( int depth, const cxform* color_xform,
     
 // Removes the object at the specified depth.
 void
-DisplayList::remove_character(int depth)
+DisplayList::remove_DisplayObject(int depth)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -388,7 +388,7 @@ DisplayList::remove_character(int depth)
     container_type::size_type size = _charsByDepth.size();
 #endif
 
-    // TODO: would it be legal to call remove_character with a depth
+    // TODO: would it be legal to call remove_DisplayObject with a depth
     //             in the "removed" zone ?
     // TODO: optimize to take by-depth order into account
     container_type::iterator it = 
@@ -397,13 +397,13 @@ DisplayList::remove_character(int depth)
 
     if (it != _charsByDepth.end()) {
         // Make a copy (before erasing)
-        boost::intrusive_ptr<character> oldCh = *it;
+        boost::intrusive_ptr<DisplayObject> oldCh = *it;
 
         // Erase (before calling unload)
         _charsByDepth.erase(it);
 
         if (oldCh->unload()) {
-            // reinsert removed character if needed
+            // reinsert removed DisplayObject if needed
             // NOTE: could be optimized if we knew exactly how
             //             to handle the case in which the target depth
             //             (after the shift) is occupied already
@@ -419,17 +419,17 @@ DisplayList::remove_character(int depth)
 
 }
 
-// TODO: take character by ref ?
+// TODO: take DisplayObject by ref ?
 void
-DisplayList::swapDepths(character* ch1, int newdepth)
+DisplayList::swapDepths(DisplayObject* ch1, int newdepth)
 {
     testInvariant();
 
-    if (newdepth < character::staticDepthOffset) {
+    if (newdepth < DisplayObject::staticDepthOffset) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("%s.swapDepth(%d) : ignored call with target depth "
             "less then %d", ch1->getTarget(), newdepth,
-            character::staticDepthOffset);
+            DisplayObject::staticDepthOffset);
         );
         return;
     }
@@ -437,7 +437,7 @@ DisplayList::swapDepths(character* ch1, int newdepth)
     const int srcdepth = ch1->get_depth();
 
     // what if source char is at a lower depth ?
-    assert(srcdepth >= character::staticDepthOffset);
+    assert(srcdepth >= DisplayObject::staticDepthOffset);
 
     assert(srcdepth != newdepth);
 
@@ -452,11 +452,11 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 
     if (it1 == _charsByDepth.end()) {
         log_error("First argument to DisplayList::swapDepth() "
-                "is NOT a character in the list. Call ignored.");
+                "is NOT a DisplayObject in the list. Call ignored.");
         return;
     }
 
-    // Found another character at the given depth
+    // Found another DisplayObject at the given depth
     if (it2 != _charsByDepth.end() && (*it2)->get_depth() == newdepth)
     {
         DisplayItem ch2 = *it2;
@@ -474,17 +474,17 @@ DisplayList::swapDepths(character* ch1, int newdepth)
         std::iter_swap(it1, it2);
     }
 
-    // No character found at the given depth
+    // No DisplayObject found at the given depth
     else {
-        // Move the character to the new position
+        // Move the DisplayObject to the new position
         // NOTE: insert *before* erasing, in case the list is
-        //             the only referer of the ref-counted character
+        //             the only referer of the ref-counted DisplayObject
         _charsByDepth.insert(it2, ch1);
         _charsByDepth.erase(it1);
     }
 
     // don't change depth before the iter_swap case above, as
-    // we'll need it to assign to the new character
+    // we'll need it to assign to the new DisplayObject
     ch1->set_depth(newdepth);
 
     // TODO: we're not actually invalidated ourselves, rather our parent is...
@@ -562,7 +562,7 @@ DisplayList::destroy()
     testInvariant();
 }
 
-// Display the referenced characters. Lower depths
+// Display the referenced DisplayObjects. Lower depths
 // are obscured by higher depths.
 void
 DisplayList::display()
@@ -571,14 +571,14 @@ DisplayList::display()
 
     std::stack<int> clipDepthStack;
     
-    // We only display characters which are out of the "removed" zone
+    // We only display DisplayObjects which are out of the "removed" zone
     // (or should we check isUnloaded?)
     iterator it = beginNonRemoved(_charsByDepth);
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
-        character* ch = it->get();
+        DisplayObject* ch = it->get();
 
-        character* mask = ch->getMask();
+        DisplayObject* mask = ch->getMask();
         if (mask && ch->isVisible() && ! mask->isUnloaded())
         {
             render::begin_submit_mask();
@@ -605,7 +605,7 @@ DisplayList::display()
         // Characters acting as masks should always be rendered to the
         // mask buffer despite their visibility.
         //
-        character* parent = ch->get_parent();
+        DisplayObject* parent = ch->get_parent();
         bool renderAsMask = ch->isMaskLayer();
 
         while (!renderAsMask && parent) {
@@ -613,10 +613,10 @@ DisplayList::display()
             parent = parent->get_parent();
         }
         
-        // check for non-mask hiden characters
+        // check for non-mask hiden DisplayObjects
         if (!renderAsMask && (!ch->isVisible())) {
             ch->omit_display();
-            // Don't display non-mask hidden characters
+            // Don't display non-mask hidden DisplayObjects
             continue;
         }
     
@@ -655,7 +655,7 @@ DisplayList::omit_display()
 {
     iterator it = beginNonRemoved(_charsByDepth);
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it) {
-        character* ch = it->get();
+        DisplayObject* ch = it->get();
         ch->omit_display();
     }
 }
@@ -686,8 +686,8 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     // This function generally has nothing else to do than calling the 
     // add_invalidated_bounds() function of all items in the display list.
     // However, special optimization is included for masks, which makes it 
-    // look a bit more complicated. We want to avoid that a masked character
-    // invalidates an area where the character is invisible because of it's
+    // look a bit more complicated. We want to avoid that a masked DisplayObject
+    // invalidates an area where the DisplayObject is invisible because of it's
     // mask (which is quite common). For example, think of a large bitmap that
     // covers the entire stage and is masked by a very small circle in the
     // middle of the stage (ie. it's only visible there). Changes in the 
@@ -696,7 +696,7 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     // 
     // So, like display(), we keep a stack of masks. Instead of drawing the
     // mask we keep a separate list of InvalidatedRanges for the masks which
-    // later are intersected with the masked characters' InvalidatedRanges.
+    // later are intersected with the masked DisplayObjects' InvalidatedRanges.
     // 
     // The code is much based on the display() function, so some references
     // in comments have been added for convenience.
@@ -769,13 +769,13 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
             
             if (rangesStack.empty()) {
             
-                // --> normal case for unmasked characters
+                // --> normal case for unmasked DisplayObjects
                 dobj->add_invalidated_bounds(ranges, force);
                 
             }
             else {
             
-                // --> character is masked, so intersect with "mask"
+                // --> DisplayObject is masked, so intersect with "mask"
                 
                 // first get the ranges of the child in a separate list
                 InvalidatedRanges childRanges;
@@ -830,20 +830,20 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     {
         iterator itOldBackup = itOld;
         
-        boost::intrusive_ptr<character> chOld = itOldBackup->get();
+        boost::intrusive_ptr<DisplayObject> chOld = itOldBackup->get();
         int depthOld = chOld->get_depth();
 
         while (itNew != itNewEnd) {
             iterator itNewBackup = itNew;
             
-            boost::intrusive_ptr<character> chNew = itNewBackup->get();
+            boost::intrusive_ptr<DisplayObject> chNew = itNewBackup->get();
             int depthNew = chNew->get_depth();
             
             // depth in old list is occupied, and empty in new list.
             if (depthOld < depthNew) {
 
                 itOld++;
-                // unload the character if it's in static zone(-16384,0)
+                // unload the DisplayObject if it's in static zone(-16384,0)
                 if (depthOld < 0) {
                     _charsByDepth.erase(itOldBackup);
 
@@ -864,12 +864,12 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
                 if (!is_ratio_compatible || chOld->isDynamic() ||
                         !chOld->isActionScriptReferenceable()) {
-                    // replace the character in old list with
-                    // corresponding character in new list
+                    // replace the DisplayObject in old list with
+                    // corresponding DisplayObject in new list
                     _charsByDepth.insert(itOldBackup, *itNewBackup);
                     _charsByDepth.erase(itOldBackup);
                     
-                    // unload the old character
+                    // unload the old DisplayObject
                     if (chOld->unload()) reinsertRemovedCharacter(chOld); 
                     else chOld->destroy();
                 }
@@ -877,7 +877,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
                     newList._charsByDepth.erase(itNewBackup);
 
                     // replace the transformation SWFMatrix if the old
-                    // character accepts static transformation.
+                    // DisplayObject accepts static transformation.
                     if (chOld->get_accept_anim_moves()) {
                         chOld->copyMatrix(*chNew); // copy SWFMatrix and caches 
                         chOld->set_cxform(chNew->get_cxform());
@@ -891,7 +891,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
             // depth in old list is empty, but occupied in new list.
             ++ itNew;
-            // add the new character to the old list.
+            // add the new DisplayObject to the old list.
             _charsByDepth.insert(itOldBackup, *itNewBackup );
         }
 
@@ -901,10 +901,10 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
     // step2(only required if scanning of new list finished earlier in step1).
     // continue to scan the static zone of the old list.
-    // unload remaining characters directly.
+    // unload remaining DisplayObjects directly.
     while((itOld != itOldEnd) && ((*itOld)->get_depth() < 0)) {
 
-        boost::intrusive_ptr<character> chOld = itOld->get();
+        boost::intrusive_ptr<DisplayObject> chOld = itOld->get();
         itOld = _charsByDepth.erase(itOld);
 
         if (chOld->unload()) reinsertRemovedCharacter(chOld);
@@ -913,15 +913,15 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
     // step3(only required if scanning of old list finished earlier in step1).
     // continue to scan the new list.
-    // add remaining characters directly.
+    // add remaining DisplayObjects directly.
     if (itNew != itNewEnd) _charsByDepth.insert(itOld, itNew, itNewEnd);
 
     // step4.
-    // Copy all unloaded characters from the new display list to the
+    // Copy all unloaded DisplayObjects from the new display list to the
     // old display list, and clear the new display list
     for (itNew = newList._charsByDepth.begin(); itNew != itNewEnd; ++itNew) {
 
-        boost::intrusive_ptr<character> chNew = itNew->get();
+        boost::intrusive_ptr<DisplayObject> chNew = itNew->get();
         int depthNew = chNew->get_depth();
 
         if (chNew->isUnloaded()) {
@@ -941,7 +941,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
     for (iterator i = newList._charsByDepth.begin(),
             e = newList._charsByDepth.end(); i != e; ++i) {
 
-        character* ch = (*i).get();
+        DisplayObject* ch = (*i).get();
         if (!ch->isUnloaded()) {
 
             iterator found =
@@ -949,12 +949,12 @@ DisplayList::mergeDisplayList(DisplayList & newList)
             
             if (found == _charsByDepth.end())
             {
-                log_error("mergeDisplayList: character %s (%s at depth "
+                log_error("mergeDisplayList: DisplayObject %s (%s at depth "
                         "%d [%d]) about to be discarded in given display list"
                         " is not marked as unloaded and not found in the"
                         " merged current displaylist",
                         ch->getTarget(), typeName(*ch), ch->get_depth(),
-                        ch->get_depth()-character::staticDepthOffset);
+                        ch->get_depth()-DisplayObject::staticDepthOffset);
                 std::abort();
             }
         }
@@ -967,14 +967,14 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 
 
 void
-DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<character> ch)
+DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<DisplayObject> ch)
 {
     assert(ch->isUnloaded());
     testInvariant();
 
-    // TODO: have this done by character::unload() instead ?
+    // TODO: have this done by DisplayObject::unload() instead ?
     int oldDepth = ch->get_depth();
-    int newDepth = character::removedDepthOffset - oldDepth;
+    int newDepth = DisplayObject::removedDepthOffset - oldDepth;
     ch->set_depth(newDepth);
 
     // TODO: optimize this by searching from the end(lowest depth).
@@ -992,7 +992,7 @@ DisplayList::removeUnloaded()
 {
     testInvariant();
 
-    _charsByDepth.remove_if(boost::mem_fn(&character::isUnloaded));
+    _charsByDepth.remove_if(boost::mem_fn(&DisplayObject::isUnloaded));
 
     testInvariant();
 }
@@ -1019,8 +1019,8 @@ namespace {
 DisplayList::iterator
 beginNonRemoved(DisplayList::container_type& c)
 {
-    const int depth = character::removedDepthOffset -
-        character::staticDepthOffset;
+    const int depth = DisplayObject::removedDepthOffset -
+        DisplayObject::staticDepthOffset;
     
     return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(depth));
 }
@@ -1028,8 +1028,8 @@ beginNonRemoved(DisplayList::container_type& c)
 DisplayList::const_iterator
 beginNonRemoved(const DisplayList::container_type& c)
 {
-    const int depth = character::removedDepthOffset -
-        character::staticDepthOffset;
+    const int depth = DisplayObject::removedDepthOffset -
+        DisplayObject::staticDepthOffset;
 
     return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(depth));
 }
@@ -1038,14 +1038,14 @@ DisplayList::iterator
 dlistTagsEffectiveZoneEnd(DisplayList::container_type& c)
 {
     return std::find_if(c.begin(), c.end(), 
-             DepthGreaterOrEqual(0xffff + character::staticDepthOffset));
+             DepthGreaterOrEqual(0xffff + DisplayObject::staticDepthOffset));
 }
 
 DisplayList::const_iterator
 dlistTagsEffectiveZoneEnd(const DisplayList::container_type& c)
 {
     return std::find_if(c.begin(), c.end(), 
-             DepthGreaterOrEqual(0xffff + character::staticDepthOffset));
+             DepthGreaterOrEqual(0xffff + DisplayObject::staticDepthOffset));
 }
 
 } // anonymous namespace

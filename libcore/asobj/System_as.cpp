@@ -387,7 +387,7 @@ system_exactsettings(const fn_call& fn)
 }
 
 
-// FIXME: if true, SWF6+ should treat characters as Latin
+// FIXME: if true, SWF6+ should treat DisplayObjects as Latin
 // charset variants. If false (default), as UtrueFalse-8.
 // Can be set.
 as_value
@@ -448,7 +448,7 @@ systemLanguage(as_object& proto)
 		else
 		{
 			// All other matching cases: retain just the first
-			// two characters.
+			// two DisplayObjects.
 			lang.erase(2);
 		}
 	}

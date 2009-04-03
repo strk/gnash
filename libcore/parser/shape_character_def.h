@@ -43,7 +43,7 @@ public:
     shape_character_def();
     virtual ~shape_character_def();
 
-    virtual void display(character* inst);
+    virtual void display(DisplayObject* inst);
 
     /// Return true if the specified point is on the interior of our shape.
     //
@@ -53,7 +53,7 @@ public:
     virtual bool point_test_local(boost::int32_t x, boost::int32_t y,
             const SWFMatrix& wm);
 
-	virtual character* createDisplayObject(character* parent, int id);
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 	
     /// \brief
     /// Read a shape definition as included in DEFINEFONT*,
@@ -75,7 +75,7 @@ public:
     ///
     /// @param m
     ///	The movie definition corresponding to the SWF we/re parsing.
-    ///	This is used to resolve bitmap characters for fill styles, never
+    ///	This is used to resolve bitmap DisplayObjects for fill styles, never
     ///	used if with_style is false.
     void read(SWFStream& in, SWF::TagType tag, bool with_style,
             movie_definition& m);
@@ -122,7 +122,7 @@ protected:
     Paths _paths;
     rect _bound;
 
-    /// Copy a shape character definition
+    /// Copy a shape DisplayObject definition
     shape_character_def(const shape_character_def& o);
 
 private:
@@ -137,7 +137,7 @@ private:
         flagHasNewStyles = 0x10
     };
     
-    // Don't assign to a shape character definition
+    // Don't assign to a shape DisplayObject definition
     shape_character_def& operator= (const shape_character_def&);
 
 };

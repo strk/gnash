@@ -165,7 +165,7 @@ MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions)
 	// What we're particularly interested about is 
 	// proper computation of invalidated bounds, which
 	// needs clear_invalidated() to be called.
-	// display() will call clear_invalidated() on characters
+	// display() will call clear_invalidated() on DisplayObjects
 	// actually modified so we're fine with that.
 	//
 	// Directly calling _movie->clear_invalidated() here
@@ -219,7 +219,7 @@ MovieTester::render()
 		// What we're particularly interested about is 
 		// proper computation of invalidated bounds, which
 		// needs clear_invalidated() to be called.
-		// display() will call clear_invalidated() on characters
+		// display() will call clear_invalidated() on DisplayObjects
 		// actually modified so we're fine with that.
 		//
 		// Directly calling _movie->clear_invalidated() here
@@ -313,20 +313,20 @@ MovieTester::resizeStage(int x, int y)
 
 }
 
-const character*
+const DisplayObject*
 MovieTester::findDisplayItemByName(const MovieClip& mc,
 		const std::string& name) 
 {
 	const DisplayList& dlist = mc.getDisplayList();
-	return dlist.get_character_by_name(name);
+	return dlist.get_DisplayObject_by_name(name);
 }
 
-const character*
+const DisplayObject*
 MovieTester::findDisplayItemByDepth(const MovieClip& mc,
 		int depth)
 {
 	const DisplayList& dlist = mc.getDisplayList();
-	return dlist.get_character_at_depth(depth);
+	return dlist.get_DisplayObject_at_depth(depth);
 }
 
 void

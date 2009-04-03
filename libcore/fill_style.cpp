@@ -275,15 +275,15 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                 bitmap_char_id, _bitmapSmoothingPolicy);
         );
 
-        // Look up the bitmap character.
+        // Look up the bitmap DisplayObject.
         _bitmapInfo = md.getBitmap(bitmap_char_id);
         IF_VERBOSE_MALFORMED_SWF(
             if (!_bitmapInfo)
             {
                 LOG_ONCE(
                     log_swferror(_("Bitmap fill specifies '%d' as associated"
-                        " bitmap character id,"
-                        " but that character is not found"
+                        " bitmap DisplayObject id,"
+                        " but that DisplayObject is not found"
                         " in the Characters Dictionary."
                         " It seems common to find such "
                         " malformed SWF, so we'll only warn once "

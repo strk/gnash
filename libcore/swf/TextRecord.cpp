@@ -20,7 +20,7 @@
 #include "SWFMatrix.h"
 #include "cxform.h"
 #include "movie_definition.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "swf.h"
 #include "log.h"
 #include "render.h"
@@ -144,7 +144,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 
 // Render the given glyph records.
 void
-TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
+TextRecord::displayRecords(const SWFMatrix& this_mat, DisplayObject* inst,
     const std::vector<SWF::TextRecord>& records, bool embedded)
 {
 
@@ -162,7 +162,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
             e = records.end(); i !=e; ++i)
     {
 
-        // Draw the characters within the current record; i.e. consecutive
+        // Draw the DisplayObjects within the current record; i.e. consecutive
         // chars that share a particular style.
         const TextRecord& rec = *i;
 
@@ -232,7 +232,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, character* inst,
             {
                 shape_character_def* glyph = fnt->get_glyph(index, embedded);
 
-                // Draw the character using the filled outline.
+                // Draw the DisplayObject using the filled outline.
                 if (glyph)
                 {
                     render::draw_glyph(glyph, mat, textColor);

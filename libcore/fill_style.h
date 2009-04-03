@@ -104,13 +104,13 @@ public:
 	fill_style();
 
 	/// Construct a clipped bitmap fill style, for
-	/// use by bitmap shape character.
+	/// use by bitmap shape DisplayObject.
 	///
 	/// TODO: use a subclass for this
 	/// TODO: provide a setBitmap, for consisteny with other setType() methods
 	///
 	/// @param bitmap
-	///	The bitmap character definition to use with this bitmap fill.
+	///	The bitmap DisplayObject definition to use with this bitmap fill.
 	///
 	/// @param mat
 	///	The SWFMatrix to apply to the bitmap.
@@ -204,9 +204,9 @@ public:
 	/// NOTE: calling this method against a solid fill style will
 	///       result in a failed assertion.
 	/// 
-	/// NOTE2: this function can return NULL if the character_id
+	/// NOTE2: this function can return NULL if the DisplayObject_id
 	///        specified for the style in the SWF does not resolve
-	///        to a character defined in the characters dictionary.
+	///        to a DisplayObject defined in the DisplayObjects dictionary.
 	///        (it happens..)
 	///
 	BitmapInfo* get_bitmap_info() const;
@@ -239,7 +239,7 @@ public:
 	/// fill_style specific reachable resources are:
 	///
 	///	- gradient bitmap info (_gradientBitmapInfo)
-	///	- bitmap character (m_bitmap_character)
+	///	- bitmap DisplayObject (m_bitmap_DisplayObject)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC

@@ -225,7 +225,7 @@ asbroadcaster_initialize(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("AsBroadcaster.initialize(%s): first arg is an object"
-            " but doesn't cast to one (dangling character ref?)"), tgtval); 
+            " but doesn't cast to one (dangling DisplayObject ref?)"), tgtval); 
 		);
 		return as_value();
 	}

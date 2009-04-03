@@ -286,7 +286,7 @@ NetStream_as::getStatusObject(StatusCode code)
 }
 
 void
-NetStream_as::setAudioController(character* ch)
+NetStream_as::setAudioController(DisplayObject* ch)
 {
     _audioController.reset(new CharacterProxy(ch));
 }
@@ -713,7 +713,7 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
         // TODO: let the sound_handler do this .. sounds cleaner
         if ( _audioController ) 
         {
-            character* ch = _audioController->get();
+            DisplayObject* ch = _audioController->get();
             if ( ch )
             {
                 int vol = ch->getWorldVolume();
@@ -1213,7 +1213,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 
             // NOTE: setting the newFrameReady flag this is not needed anymore,
             // we don't realy on newFrameReady() call anyore to invalidate
-            // the video character
+            // the video DisplayObject
         }
     }
 

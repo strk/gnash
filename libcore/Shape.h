@@ -30,13 +30,13 @@ namespace gnash {
 
 namespace gnash {
 
-/// For characters that don't store unusual state in their instances.
+/// For DisplayObjects that don't store unusual state in their instances.
 class Shape : public DisplayObject
 {
 
 public:
 
-	Shape(shape_character_def* def, character* parent, int id)
+	Shape(shape_character_def* def, DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id),
 		_def(def)
@@ -59,7 +59,7 @@ protected:
 	{
 		assert(isReachable());
         _def->setReachable();
-		markCharacterReachable();
+		markDisplayObjectReachable();
 	}
 #endif
 

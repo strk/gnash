@@ -1607,7 +1607,7 @@ public:
 // 5. Profit!
 
   virtual void
-  draw_shape_character(shape_character_def *def, const SWFMatrix& mat,
+  drawShape(shape_character_def *def, const SWFMatrix& mat,
     const cxform& cx)
   {
   

@@ -21,13 +21,13 @@
 #define GNASH_DRAG_STATE_H
 
 #include "rect.h" // for composition
-#include "smart_ptr.h" // we keep character being dragged by intrusive_ptr
+#include "smart_ptr.h" // we keep DisplayObject being dragged by intrusive_ptr
 
 namespace gnash
 {
 
 // Forward declarations
-class character;
+class DisplayObject;
 
 
 /// What is being dragged and how
@@ -41,11 +41,11 @@ class drag_state
 	/// TODO: use Range2d<float> directly ?
 	rect _bounds;
 
-	boost::intrusive_ptr<character> _character;
+	boost::intrusive_ptr<DisplayObject> _DisplayObject;
 
 	bool	_lock_centered;
 
-	/// Offsets of displacement from character origin
+	/// Offsets of displacement from DisplayObject origin
 	/// at time of drag start. These are used for non
 	/// lock-centered dragging.
 	/// Coordinates are in stage space (TWIPS)
@@ -103,19 +103,19 @@ public:
 	}
 
 	/// May return NULL !!
-	character* getCharacter() const {
-		return _character.get();
+	DisplayObject* getCharacter() const {
+		return _DisplayObject.get();
 	}
 
-	/// Stores character in an intrusive pointer
-	void setCharacter(character* ch) {
-		_character = ch;
+	/// Stores DisplayObject in an intrusive pointer
+	void setCharacter(DisplayObject* ch) {
+		_DisplayObject = ch;
 	}
 
 	/// Reset drag state to its initial condition
 	void reset()
 	{
-		_character = NULL;
+		_DisplayObject = NULL;
 		_hasbounds = false;
 		_bounds.set_null();
 		_lock_centered = false;
@@ -125,15 +125,15 @@ public:
 		:
 		_hasbounds(false),
 		_bounds(),
-		_character(0),
+		_DisplayObject(0),
 		_lock_centered(false)
 	{
 	}
 
-	/// Mark character as reachable (if any)
+	/// Mark DisplayObject as reachable (if any)
 	void markReachableResources() const
 	{
-		if ( _character ) _character->setReachable();
+		if ( _DisplayObject ) _DisplayObject->setReachable();
 	}
 };
 

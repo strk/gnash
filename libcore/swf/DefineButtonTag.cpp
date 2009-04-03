@@ -151,32 +151,32 @@ ButtonRecord::read(SWFStream& in, TagType t,
 	if (in.tell()+2 > endPos)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("   premature end of button record input stream, can't read character id"));
+		log_swferror(_("   premature end of button record input stream, can't read DisplayObject id"));
 		);
 		return false;
 	}
 	in.ensureBytes(2);
-	m_character_id = in.read_u16();
+	m_DisplayObject_id = in.read_u16();
 
-	// Get character definition now (safer)
-	m_character_def = m.get_character_def(m_character_id);
+	// Get DisplayObject definition now (safer)
+	m_character_def = m.get_character_def(m_DisplayObject_id);
 
-	// If no character with given ID is found in the movie
+	// If no DisplayObject with given ID is found in the movie
 	// definition, we print an error, but keep parsing.
 	if (!m_character_def)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   button record for states [%s] refer to "
-			"character with id %d, which is not found "
-			"in the chars dictionary"), computeButtonStatesString(flags), m_character_id);
+			"DisplayObject with id %d, which is not found "
+			"in the chars dictionary"), computeButtonStatesString(flags), m_DisplayObject_id);
 		);
 	}
 	else
 	{
 		IF_VERBOSE_PARSE(
 		log_parse(_("   button record for states [%s] contain "
-			"character %d (%s)"), computeButtonStatesString(flags),
-            m_character_id, typeName(*m_character_def));
+			"DisplayObject %d (%s)"), computeButtonStatesString(flags),
+            m_DisplayObject_id, typeName(*m_character_def));
 		);
 	}
 
@@ -233,7 +233,7 @@ DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
 
-    m.add_character(id, bt.release());
+    m.add_DisplayObject(id, bt.release());
 }
 
 void
@@ -250,7 +250,7 @@ DefineButton2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
 
-    m.add_character(id, bt.release());
+    m.add_DisplayObject(id, bt.release());
 }
 
 //
@@ -293,7 +293,7 @@ DefineButtonTag::readDefineButtonTag(SWFStream& in, movie_definition& m)
 
 	unsigned long endTagPos = in.get_tag_end_position();
 
-	// Read button character records.
+	// Read button DisplayObject records.
 	for (;;)
 	{
 		ButtonRecord r;
@@ -414,10 +414,10 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 }
 
 
-character*
-DefineButtonTag::createDisplayObject(character* parent, int id)
+DisplayObject*
+DefineButtonTag::createDisplayObject(DisplayObject* parent, int id)
 {
-	character* ch = new Button(*this, parent, id);
+	DisplayObject* ch = new Button(*this, parent, id);
 	return ch;
 }
 

@@ -27,7 +27,7 @@
 #include "swf.h" // for TagType definition
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition 
-#include "character.h" // BlendMode enum
+#include "DisplayObject.h" // BlendMode enum
 #include <vector>
 
 // Forward declarations
@@ -48,17 +48,17 @@ namespace SWF {
 /// This tag is owned by the movie_definiton class
 ///
 /// The PlaceObject tags can be used to:
-/// - Place a character to a depth. See isPlace().
-/// - Transform the character placed at a depth. See isMove().
-/// - Replace a character at a depth. See isReplace().
+/// - Place a DisplayObject to a depth. See isPlace().
+/// - Transform the DisplayObject placed at a depth. See isMove().
+/// - Replace a DisplayObject at a depth. See isReplace().
 ///
 /// In any case a single Timeline depth is affected.
 /// Postcondition of this tag execution is presence of an instance
 /// at the affected depth. See getDepth().
 ///
 ///
-/// m_character_id:
-/// The ID of the character to be added.
+/// m_DisplayObject_id:
+/// The ID of the DisplayObject to be added.
 /// It will be seeked in the CharacterDictionary.
 ///
 /// m_name:
@@ -81,8 +81,8 @@ namespace SWF {
 /// m_ratio
 ///
 /// m_clip_depth:
-/// If != character::noClipDepthValue, mark the created instance
-/// as a clipping layer. The shape of the placed character will be
+/// If != DisplayObject::noClipDepthValue, mark the created instance
+/// as a clipping layer. The shape of the placed DisplayObject will be
 /// used as a mask for all higher depths up to this value.
 ///
 class PlaceObject2Tag : public DisplayListTag
@@ -98,7 +98,7 @@ public:
         m_TagType(0),
         m_has_flags2(0),
         m_has_flags3(0),
-        m_character_id(0),
+        m_DisplayObject_id(0),
         m_ratio(0),
         m_clip_depth(0),
         _blendMode(0),
@@ -122,7 +122,7 @@ public:
     } 
     int getRatio()     const { return m_ratio; }
     int getClipDepth() const { return m_clip_depth; }
-    int getID()        const { return m_character_id; }
+    int getID()        const { return m_DisplayObject_id; }
     const std::string& getName() const { return m_name; }
     const SWFMatrix& getMatrix()    const { return m_matrix; }
     const cxform& getCxform()    const { return m_color_transform; }
@@ -166,7 +166,7 @@ private:
     int m_TagType;
     boost::uint8_t m_has_flags2;
     boost::uint8_t m_has_flags3;
-    boost::uint16_t m_character_id;
+    boost::uint16_t m_DisplayObject_id;
     cxform  m_color_transform;
     SWFMatrix  m_matrix;
     int     m_ratio;

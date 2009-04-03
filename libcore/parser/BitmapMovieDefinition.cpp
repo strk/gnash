@@ -52,7 +52,7 @@ BitmapMovieDefinition::getShapeDef()
 	// Define a rectangle filled with the bitmap style
 
 	// We use one twip for each pixel in the image
-	// The character will be scaled * 20
+	// The DisplayObject will be scaled * 20
 	// when placed in BitmapMovieInstance's DisplayList
 	boost::int32_t w = _framesize.width(); 
 	boost::int32_t h = _framesize.height(); 

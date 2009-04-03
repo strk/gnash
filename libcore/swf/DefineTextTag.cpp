@@ -1,4 +1,4 @@
-// DefineTextTag.cpp:  Read text character definitions, for Gnash.
+// DefineTextTag.cpp:  Read text DisplayObject definitions, for Gnash.
 
 // Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -33,14 +33,14 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineTextTag> t(new DefineTextTag(in, m, tag));
     IF_VERBOSE_PARSE(
-        log_parse(_("Text character, id = %d"), id);
+        log_parse(_("Text DisplayObject, id = %d"), id);
     );
 
-    m.add_character(id, t.release());
+    m.add_DisplayObject(id, t.release());
 }
 
-character*
-DefineTextTag::createDisplayObject(character* parent, int id)
+DisplayObject*
+DefineTextTag::createDisplayObject(DisplayObject* parent, int id)
 {
     return new StaticText(this, parent, id);
 }
@@ -56,7 +56,7 @@ DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to,
     std::transform(_textRecords.begin(), _textRecords.end(),
             std::back_inserter(to), CreatePointer<TextRecord>());
 
-    /// Count the number of characters in this definition's text records.
+    /// Count the number of DisplayObjects in this definition's text records.
     numChars = std::accumulate(_textRecords.begin(), _textRecords.end(),
             0, TextRecord::RecordCounter());
 
@@ -74,10 +74,10 @@ DefineText2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineTextTag> t(new DefineTextTag(in, m, tag));
     IF_VERBOSE_PARSE(
-        log_parse(_("Text character, id = %d"), id);
+        log_parse(_("Text DisplayObject, id = %d"), id);
     );
 
-    m.add_character(id, t.release());
+    m.add_DisplayObject(id, t.release());
 }
 
 void
@@ -107,7 +107,7 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 }
 
 void
-DefineTextTag::display(character* inst)
+DefineTextTag::display(DisplayObject* inst)
 {
 
 	const bool useEmbeddedGlyphs = true;

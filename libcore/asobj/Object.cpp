@@ -295,7 +295,7 @@ object_registerClass(const fn_call& fn)
 #else
 	// Using definition of current target fixes the youtube beta case
 	// https://savannah.gnu.org/bugs/index.php?23130
-	character* tgt = fn.env().get_target();
+	DisplayObject* tgt = fn.env().get_target();
 	if ( ! tgt ) {
 		log_error("current environment has no target, wouldn't know where to look for symbol required for registerClass"); 
 		return as_value(false);

@@ -472,7 +472,7 @@ SWFHandlers::ActionNextFrame(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_NEXTFRAME));
 #endif
 
-    character* tgtch = env.get_target();
+    DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if ( tgt ) tgt->goto_frame(tgt->get_current_frame() + 1);
     else log_debug(_("ActionNextFrame: as_environment target is null or not a sprite"));
@@ -488,7 +488,7 @@ SWFHandlers::ActionPrevFrame(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_PREVFRAME));
 #endif
 
-    character* tgtch = env.get_target();
+    DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if ( tgt ) tgt->goto_frame(tgt->get_current_frame() - 1);
     else log_debug(_("ActionPrevFrame: as_environment target is null or not a sprite"));
@@ -504,7 +504,7 @@ SWFHandlers::ActionPlay(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_PLAY));
 #endif
 
-    character* tgtch = env.get_target();
+    DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if ( tgt ) tgt->set_play_state(MovieClip::PLAY);
     else log_debug(_("ActionPlay: as_environment target is null or not a sprite"));
@@ -520,7 +520,7 @@ SWFHandlers::ActionStop(ActionExec& thread)
     assert(thread.atActionTag(SWF::ACTION_STOP));
 #endif
 
-    character* tgtch = env.get_target();
+    DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
     if ( tgt ) tgt->set_play_state(MovieClip::STOP);
     else log_debug(_("ActionStop: as_environment target is null or not a sprite"));
@@ -570,7 +570,7 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 
     size_t frame = code.read_int16(thread.getCurrentPC()+3);
 
-    character* tgtch = env.get_target();
+    DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
 
     // frame number within this tag is hard-coded and 0-based
@@ -641,7 +641,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     unsigned int framenum = code.read_int16(thread.getCurrentPC()+3);
     boost::uint8_t skip = code[thread.getCurrentPC()+5];
 
-    character* target = env.get_target();
+    DisplayObject* target = env.get_target();
     MovieClip* target_sprite = target ? target->to_movie() : 0;
     if ( ! target_sprite )
     {
@@ -702,7 +702,7 @@ SWFHandlers::ActionGotoLabel(ActionExec& thread)
     const action_buffer& code = thread.code;
 
     const char* frame_label = code.read_string(thread.getCurrentPC()+3);
-    character *target = env.get_target();
+    DisplayObject *target = env.get_target();
     MovieClip *target_sprite = target ? target->to_movie() : 0;
     if ( ! target_sprite )
     {
@@ -1027,7 +1027,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
     {
         // See http://www.ferryhalim.com/orisinal/g2/penguin.htm
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Can't assign a sprite/character to a variable in SWF%d. "
+        log_aserror(_("Can't assign a sprite/DisplayObject to a variable in SWF%d. "
                     "We'll return undefined instead of %s."),
                     env.get_version(), top_value);
         );
@@ -1117,16 +1117,16 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 
     as_value& tgt_val = env.top(1);
     std::string tgt_str = tgt_val.to_string();
-    character *target = NULL;
+    DisplayObject *target = NULL;
     if ( tgt_str.empty() )
     {
         as_object* obj = thread.getTarget();
 
-        target = dynamic_cast<character*>(obj);
+        target = dynamic_cast<DisplayObject*>(obj);
         if ( ! target )
         {
             log_error(_("ActionGetProperty(<empty>) called, but current "
-                        "target is not a character"));
+                        "target is not a DisplayObject"));
         }
     }
     else
@@ -1173,7 +1173,7 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     
     as_environment& env = thread.env;
 
-    character *target = env.find_target(env.top(2).to_string());
+    DisplayObject *target = env.find_target(env.top(2).to_string());
     // FIXME: what happens when it's an invalid number? This will cause
     // undefined behaviour on overflow.
     unsigned int prop_number = (unsigned int)env.top(1).to_number();
@@ -1213,12 +1213,12 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 
     // Movies should be attachable from -16384 to 2130690044. See
     // Tests in misc-ming.all/DepthLimitsTest.c.
-    const double depth = env.top(0).to_number() + character::staticDepthOffset;
+    const double depth = env.top(0).to_number() + DisplayObject::staticDepthOffset;
   
     // This also checks for overflow, as both numbers are expressible as
     // boost::int32_t.
-    if (depth < character::lowerAccessibleBound ||
-      depth > character::upperAccessibleBound)
+    if (depth < DisplayObject::lowerAccessibleBound ||
+      depth > DisplayObject::upperAccessibleBound)
     {
         IF_VERBOSE_ASCODING_ERRORS(
             log_aserror(_("duplicateMovieClip: invalid depth %d passed; not duplicating"), depth);
@@ -1232,11 +1232,11 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
     const std::string& newname = env.top(1).to_string();
     const std::string& path = env.top(2).to_string();
 
-    character* ch = env.find_target(path);
+    DisplayObject* ch = env.find_target(path);
     if ( ! ch )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("Path given to duplicateMovieClip(%s) doesn't point to a character"),
+            log_aserror(_("Path given to duplicateMovieClip(%s) doesn't point to a DisplayObject"),
                 path);
         );
         env.drop(3);
@@ -1266,11 +1266,11 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 
     const std::string path = env.pop().to_string();
 
-    character* ch = env.find_target(path);
+    DisplayObject* ch = env.find_target(path);
     if ( ! ch )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Path given to removeMovieClip(%s) doesn't point to a character"),
+        log_aserror(_("Path given to removeMovieClip(%s) doesn't point to a DisplayObject"),
             path);
         );
         return;
@@ -1299,7 +1299,7 @@ SWFHandlers::ActionTrace(ActionExec& thread)
     const std::string val = env.pop().to_string();
     
     /// Logging with a std::string here fails the swfdec testsuite, probably because
-    /// the first 0 character terminates the output with a c_str, whereas a std::string
+    /// the first 0 DisplayObject terminates the output with a c_str, whereas a std::string
     /// outputs the entire length of the string.
     log_trace("%s", val.c_str());
 }
@@ -1318,10 +1318,10 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 
     drag_state st;
 
-    character* tgt = env.find_target(env.top(0).to_string());
+    DisplayObject* tgt = env.find_target(env.top(0).to_string());
     if ( tgt )
     {
-        // mark this character is script transformed.
+        // mark this DisplayObject is script transformed.
         tgt->transformedByScript();
         st.setCharacter( tgt );
     }
@@ -1384,7 +1384,7 @@ SWFHandlers::ActionStopDragMovie(ActionExec& thread)
 {
     
     as_environment& env = thread.env;
-    character* tgtch = env.get_target();
+    DisplayObject* tgtch = env.get_target();
     MovieClip *root_movie = tgtch ? tgtch->get_root() : 0;
     if ( root_movie ) root_movie->stop_drag();
     else log_debug(_("ActionStopDragMovie: as_environment target is null or not a sprite"));
@@ -1643,7 +1643,7 @@ SWFHandlers::guessEncoding(const std::string &str, int &length, std::vector<int>
 
     if (it == e && is_sought)
     {
-        // No characters left, so it's almost certainly UTF8.
+        // No DisplayObjects left, so it's almost certainly UTF8.
         return ENCGUESS_UNICODE;
     }
 
@@ -1750,7 +1750,7 @@ SWFHandlers::ActionOrd(ActionExec& thread)
 
     std::wstring wstr = utf8::decodeCanonicalString(str, swfVersion);
 
-    // decodeCanonicalString should correctly work out what the first character
+    // decodeCanonicalString should correctly work out what the first DisplayObject
     // is according to version.
     env.top(0).set_int(wstr.at(0));
 }
@@ -1781,7 +1781,7 @@ SWFHandlers::ActionChr(ActionExec& thread)
 
     // SWF 5 only:
     // This casts to unsigned char to a string, giving
-    // IS0-8859-1 8-bit characters.
+    // IS0-8859-1 8-bit DisplayObjects.
     // Values above 256 evaluate to value % 256, 
     // through the cast, which is expected behaviour.
     const unsigned char uc = static_cast<unsigned char>(c);
@@ -1898,7 +1898,7 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
 void
 SWFHandlers::ActionMbOrd(ActionExec& thread)
 {
-    /// This only deals with UTF-8 characters.
+    /// This only deals with UTF-8 DisplayObjects.
     /// TODO: what else is possible?
     /// TODO: fix for SWF5
 
@@ -1923,7 +1923,7 @@ SWFHandlers::ActionMbOrd(ActionExec& thread)
 void
 SWFHandlers::ActionMbChr(ActionExec& thread)
 {
-    /// This only generates UTF-8 characters. No idea
+    /// This only generates UTF-8 DisplayObjects. No idea
     /// what difference user locale might make, but UTF-8
     /// is generally GOOD.
     
@@ -1936,7 +1936,7 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
         // No need to return.
     }
 
-    // Cut to uint16, as characters above 65535 'wrap around'
+    // Cut to uint16, as DisplayObjects above 65535 'wrap around'
     const boost::uint16_t i = static_cast<boost::uint16_t> (env.top(0).to_int());
     
     std::string out = utf8::encodeUnicodeCharacter(i);
@@ -1963,7 +1963,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
     // evaluated as for ActionGotoExpression
     as_value framespec = env.pop();
 
-    character* tgtch = env.get_target();
+    DisplayObject* tgtch = env.get_target();
     MovieClip* target_sprite = tgtch ? tgtch->to_movie() : 0;
     if ( ! target_sprite )
     {
@@ -2293,7 +2293,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
             target_string, url, static_cast<int>(method),
             sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
-    character* target_ch = env.find_target(target.to_string());
+    DisplayObject* target_ch = env.find_target(target.to_string());
     MovieClip* target_movie = target_ch ? target_ch->to_movie() : 0;
 
     if (loadVariableFlag)
@@ -2327,7 +2327,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
         //         no matter the target found on stack (which
         //         is the target to load the resource into).
         //
-        character* curtgt = env.get_target();
+        DisplayObject* curtgt = env.get_target();
         if ( ! curtgt )
         {
             log_error(_("CommonGetUrl: current target is undefined"));
@@ -2413,7 +2413,7 @@ SWFHandlers::CommonSetTarget(ActionExec& thread, const std::string& target_name)
     // see swfdec's settarget-relative-*.swf
     env.reset_target();
 
-    character *new_target;
+    DisplayObject *new_target;
 
     // if the string is blank, we reset the target to its original value
     if ( target_name.empty() ) return;
@@ -2504,7 +2504,7 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
     std::string target_path;
     std::string frame_var;
 
-    character * target = NULL;
+    DisplayObject * target = NULL;
     if( env.parse_path(target_frame, target_path, frame_var) )
     {
         target = env.find_target(target_path);
@@ -2560,7 +2560,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
     std::string target_path;
     std::string frame_var;
 
-    character * target = NULL;
+    DisplayObject * target = NULL;
     if( env.parse_path(target_frame, target_path, frame_var) )
     {
         target = env.find_target(target_path);

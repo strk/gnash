@@ -31,15 +31,15 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 	assert(tag == SWF::DEFINEEDITTEXT); // 37
 
     in.ensureBytes(2);
-    boost::uint16_t characterID = in.read_u16();
+    boost::uint16_t DisplayObjectID = in.read_u16();
 
     std::auto_ptr<DefineEditTextTag> editText(new DefineEditTextTag(in, m));
 
-    m.add_character(characterID, editText.release());
+    m.add_DisplayObject(DisplayObjectID, editText.release());
 }
 
-character*
-DefineEditTextTag::createDisplayObject(character* parent, int id)
+DisplayObject*
+DefineEditTextTag::createDisplayObject(DisplayObject* parent, int id)
 {
 	// Resolve the font, if possible
 	getFont();

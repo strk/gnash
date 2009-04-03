@@ -118,7 +118,7 @@ selection_getBeginIndex(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
     
     movie_root& mr = ptr->getVM().getRoot();
-    character* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 
@@ -131,7 +131,7 @@ selection_getBeginIndex(const fn_call& fn)
 /// Return -1 if focus is not a TextField, otherwise the 0-based index of the
 /// selection.
 //
-/// An alternative implementation would have a getCaretIndex in the character
+/// An alternative implementation would have a getCaretIndex in the DisplayObject
 /// base class, with a default implementation returning -1. We would still
 /// have to check for no-focus events here, though.
 as_value
@@ -140,7 +140,7 @@ selection_getCaretIndex(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     movie_root& mr = ptr->getVM().getRoot();
-    character* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 
@@ -156,7 +156,7 @@ selection_getEndIndex(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     movie_root& mr = ptr->getVM().getRoot();
-    character* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 
@@ -166,7 +166,7 @@ selection_getEndIndex(const fn_call& fn)
 }
 
 /// Returns null when there is no focus, otherwise the target of the
-/// character.
+/// DisplayObject.
 as_value
 selection_getFocus(const fn_call& fn)
 {
@@ -174,7 +174,7 @@ selection_getFocus(const fn_call& fn)
     
     movie_root& mr = ptr->getVM().getRoot();
 
-    boost::intrusive_ptr<character> ch = mr.getFocus();
+    boost::intrusive_ptr<DisplayObject> ch = mr.getFocus();
     if (!ch.get()) {
         as_value null;
         null.set_null();
@@ -200,7 +200,7 @@ selection_getFocus(const fn_call& fn)
 // focusEnabled has no effect in SWF5.
 //
 // Any number of arguments other than one returns false and does nothing. The
-// single argument can be a character or a full target path, otherwise it's
+// single argument can be a DisplayObject or a full target path, otherwise it's
 // a no-op and returns false.
 as_value
 selection_setFocus(const fn_call& fn)
@@ -228,18 +228,18 @@ selection_setFocus(const fn_call& fn)
         return as_value(true);
     }
 
-    boost::intrusive_ptr<character> ch;
+    boost::intrusive_ptr<DisplayObject> ch;
 
     if (focus.is_string()) {
         const std::string& target = focus.to_string();
         ch = fn.env().find_target(target);
     }
     else {
-        /// Try converting directly to character.
-        ch = dynamic_cast<character*>(focus.to_object().get());
+        /// Try converting directly to DisplayObject.
+        ch = dynamic_cast<DisplayObject*>(focus.to_object().get());
     }
 
-    // If the argument does not resolve to a character, do nothing.
+    // If the argument does not resolve to a DisplayObject, do nothing.
     if (!ch) return as_value(false);
 
     // Will handle whether to set focus or not.
@@ -255,7 +255,7 @@ selection_setSelection(const fn_call& fn)
     boost::intrusive_ptr<as_object> ptr = ensureType<as_object>(fn.this_ptr);
 
     movie_root& mr = ptr->getVM().getRoot();
-    character* focus = mr.getFocus().get();
+    DisplayObject* focus = mr.getFocus().get();
 
     TextField* tf = dynamic_cast<TextField*>(focus);
 

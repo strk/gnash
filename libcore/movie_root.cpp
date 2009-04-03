@@ -194,7 +194,7 @@ movie_root::setRootMovie(movie_instance* movie)
 	m_viewport_height = static_cast<int>(md->get_height_pixels());
 
 	// assert(movie->get_depth() == 0); ?
-	movie->set_depth(character::staticDepthOffset);
+	movie->set_depth(DisplayObject::staticDepthOffset);
 
 	try
 	{
@@ -252,7 +252,7 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 {
 	assert(movie != NULL);
 	assert(static_cast<unsigned int>(movie->get_depth()) ==
-	                        num + character::staticDepthOffset);
+	                        num + DisplayObject::staticDepthOffset);
 
 
 	Levels::iterator it = _movies.find(movie->get_depth());
@@ -324,13 +324,13 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 	}
 #endif
 
-	if ( oldDepth < character::staticDepthOffset ) // should include _level0 !
+	if ( oldDepth < DisplayObject::staticDepthOffset ) // should include _level0 !
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
                 "static depth zone (%d), won't swap its depth"),
                 movie->getTarget(), depth, oldDepth,
-                character::staticDepthOffset);
+                DisplayObject::staticDepthOffset);
 		);
 		return;
 	}
@@ -341,12 +341,12 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 		log_aserror(_("%s.swapDepth(%d): movie has a depth (%d) below "
                 "static depth zone (%d), won't swap its depth"),
                 movie->getTarget(), depth, oldDepth,
-                character::staticDepthOffset);
+                DisplayObject::staticDepthOffset);
 		);
 		return;
 	}
 
-	int oldNum = oldDepth; // -character::staticDepthOffset;
+	int oldNum = oldDepth; // -DisplayObject::staticDepthOffset;
 	Levels::iterator oldIt = _movies.find(oldNum);
 	if ( oldIt == _movies.end() )
 	{
@@ -355,7 +355,7 @@ movie_root::swapLevels(boost::intrusive_ptr<MovieClip> movie, int depth)
 		return;
 	}
 
-	int newNum = depth; // -character::staticDepthOffset;
+	int newNum = depth; // -DisplayObject::staticDepthOffset;
 	movie->set_depth(depth);
 	Levels::iterator targetIt = _movies.find(newNum);
 	if ( targetIt == _movies.end() )
@@ -448,8 +448,8 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	url.parse_querystring(url.querystring(), vars);
 	extern_movie->setVariables(vars);
 
-	character* ch = extern_movie.get();
-	ch->set_depth(num+character::staticDepthOffset);
+	DisplayObject* ch = extern_movie.get();
+	ch->set_depth(num+DisplayObject::staticDepthOffset);
 
 	setLevel(num, extern_movie);
 
@@ -459,7 +459,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 boost::intrusive_ptr<movie_instance>
 movie_root::getLevel(unsigned int num) const
 {
-	Levels::const_iterator i = _movies.find(num+character::staticDepthOffset);
+	Levels::const_iterator i = _movies.find(num+DisplayObject::staticDepthOffset);
 	if ( i == _movies.end() ) return 0;
 
 	assert(boost::dynamic_pointer_cast<movie_instance>(i->second));
@@ -651,10 +651,10 @@ movie_root::notify_key_event(key::code k, bool down)
 	//
 	Key_as * global_key = notify_global_key(k, down);
 
-	// Notify character key listeners for clip key events
+	// Notify DisplayObject key listeners for clip key events
 	notify_key_listeners(k, down);
 
-	// Notify both character and non-character Key listeners
+	// Notify both DisplayObject and non-DisplayObject Key listeners
 	//	for user defined handerlers.
 	if (global_key)
 	{
@@ -827,7 +827,7 @@ movie_root::generate_mouse_button_events()
 	        {
 		        // onPress
 
-                // Try setting focus on the new character. This will handle
+                // Try setting focus on the new DisplayObject. This will handle
                 // all necessary events and removal of current focus.
                 // Do not set focus to NULL.
                 if (ms.activeEntity) {
@@ -864,16 +864,16 @@ movie_root::fire_mouse_event()
 
     // Set _droptarget if dragging a sprite
     MovieClip* dragging = 0;
-    character* draggingChar = getDraggingCharacter();
+    DisplayObject* draggingChar = getDraggingCharacter();
     if ( draggingChar ) dragging = draggingChar->to_movie();
     if ( dragging )
     {
 	// TODO: optimize making findDropTarget and getTopmostMouseEntity
 	//       use a single scan.
-        const character* dropChar = findDropTarget(x, y, dragging);
+        const DisplayObject* dropChar = findDropTarget(x, y, dragging);
         if ( dropChar )
         {
-            // Use target of closest script character containing this
+            // Use target of closest script DisplayObject containing this
 	    dropChar = dropChar->getClosestASReferenceableAncestor();
             dragging->setDropTarget(dropChar->getTargetPath());
         }
@@ -933,10 +933,10 @@ void
 movie_root::set_drag_state(const drag_state& st)
 {
 	m_drag_state = st;
-	character* ch = st.getCharacter();
+	DisplayObject* ch = st.getCharacter();
 	if ( ch && ! st.isLockCentered() )
 	{
-		// Get coordinates of the character's origin
+		// Get coordinates of the DisplayObject's origin
 		point origin(0, 0);
 		SWFMatrix chmat = ch->getWorldMatrix();
 		point world_origin;
@@ -958,7 +958,7 @@ movie_root::set_drag_state(const drag_state& st)
 void
 movie_root::doMouseDrag()
 {
-	character* dragChar = getDraggingCharacter(); 
+	DisplayObject* dragChar = getDraggingCharacter(); 
 	if ( ! dragChar ) return; // nothing to do
 
 	if ( dragChar->isUnloaded() )
@@ -974,7 +974,7 @@ movie_root::doMouseDrag()
 	point world_mouse(pixelsToTwips(x), pixelsToTwips(y));
 
 	SWFMatrix	parent_world_mat;
-	character* parent = dragChar->get_parent();
+	DisplayObject* parent = dragChar->get_parent();
 	if (parent != NULL)
 	{
 	    parent_world_mat = parent->getWorldMatrix();
@@ -998,7 +998,7 @@ movie_root::doMouseDrag()
     parent_world_mat.invert().transform(world_mouse);			
 	// Place our origin so that it coincides with the mouse coords
 	// in our parent frame.
-	// TODO: add a character::set_translation ?
+	// TODO: add a DisplayObject::set_translation ?
 	SWFMatrix	local = dragChar->getMatrix();
 	local.set_translation(world_mouse.x, world_mouse.y);
 	dragChar->setMatrix(local); //no need to update caches when only changing translation
@@ -1087,7 +1087,7 @@ movie_root::advanceMovie()
 	// Do mouse drag, if needed
 	doMouseDrag();
 
-    // Advance all non-unloaded characters in the LiveChars list
+    // Advance all non-unloaded DisplayObjects in the LiveChars list
 	// in reverse order (last added, first advanced)
 	// NOTE: can throw ActionLimitException
 	advanceLiveChars(); 
@@ -1161,7 +1161,7 @@ movie_root::display()
 
 	for (Childs::iterator i=_childs.begin(), e=_childs.end(); i!=e; ++i)
 	{
-		character* ch = i->second;
+		DisplayObject* ch = i->second;
 
 		ch->clear_invalidated();
 
@@ -1194,10 +1194,10 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 
       needScan=false;
 
-      // remove unloaded character listeners from movie_root
+      // remove unloaded DisplayObject listeners from movie_root
       for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
       {
-          character* ch = iter->get();
+          DisplayObject* ch = iter->get();
           if ( ch->isUnloaded() )
           {
             if ( ! ch->isDestroyed() )
@@ -1226,15 +1226,15 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-	// log_debug("Notifying %d character Key listeners", 
+	// log_debug("Notifying %d DisplayObject Key listeners", 
 	//  m_key_listeners.size());
 
 	KeyListeners copy = m_key_listeners;
 	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
-		// sprite, button & input_edit_text characters
-		character* ch = iter->get();
+		// sprite, button & input_edit_text DisplayObjects
+		DisplayObject* ch = iter->get();
 		if ( ! ch->isUnloaded() )
 		{
 			if(down)
@@ -1262,13 +1262,13 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 
 /* static private */
 void
-movie_root::add_listener(CharacterList& ll, character* listener)
+movie_root::add_listener(CharacterList& ll, DisplayObject* listener)
 {
 	assert(listener);
 	for(CharacterList::const_iterator i = ll.begin(), e = ll.end(); i != e; ++i)
 	{
-		// Conceptually, we don't need to add the same character twice.
-		// but see edit_text_character::setFocus()...
+		// Conceptually, we don't need to add the same DisplayObject twice.
+		// but see edit_text_DisplayObject::setFocus()...
 		if(*i == listener)  return;
 	}
 
@@ -1277,12 +1277,12 @@ movie_root::add_listener(CharacterList& ll, character* listener)
 
 
 void
-movie_root::remove_listener(CharacterList& ll, character* listener)
+movie_root::remove_listener(CharacterList& ll, DisplayObject* listener)
 {
 	assert(listener);
 
 	ll.remove_if(std::bind2nd(
-                std::equal_to<boost::intrusive_ptr<character> >(), listener));
+                std::equal_to<boost::intrusive_ptr<DisplayObject> >(), listener));
 }
 
 void
@@ -1295,7 +1295,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
-		character* ch = iter->get();
+		DisplayObject* ch = iter->get();
 		if ( ! ch->isUnloaded() )
 		{
 			ch->on_event(event);
@@ -1333,7 +1333,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 	}
 }
 
-boost::intrusive_ptr<character>
+boost::intrusive_ptr<DisplayObject>
 movie_root::getFocus()
 {
 	assert(testInvariant());
@@ -1341,13 +1341,13 @@ movie_root::getFocus()
 }
 
 bool
-movie_root::setFocus(boost::intrusive_ptr<character> to)
+movie_root::setFocus(boost::intrusive_ptr<DisplayObject> to)
 {
 
     // Nothing to do if current focus is the same as the new focus. 
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
-    if (to == _currentFocus || to == static_cast<character*>(getRootMovie())) {
+    if (to == _currentFocus || to == static_cast<DisplayObject*>(getRootMovie())) {
         return false;
     }
 
@@ -1356,13 +1356,13 @@ movie_root::setFocus(boost::intrusive_ptr<character> to)
         return false;
     }
 
-    // Undefined or NULL character removes current focus. Otherwise, try
-    // setting focus to the new character. If it fails, remove current
+    // Undefined or NULL DisplayObject removes current focus. Otherwise, try
+    // setting focus to the new DisplayObject. If it fails, remove current
     // focus anyway.
 
     // Store previous focus, as the focus needs to change before onSetFocus
     // is called and listeners are notified.
-    character* from = _currentFocus.get();
+    DisplayObject* from = _currentFocus.get();
 
     if (from) {
 
@@ -1390,24 +1390,24 @@ movie_root::setFocus(boost::intrusive_ptr<character> to)
     return true;
 }
 
-character*
+DisplayObject*
 movie_root::getActiveEntityUnderPointer() const
 {
 	return m_mouse_button_state.activeEntity.get();
 }
 
-character*
+DisplayObject*
 movie_root::getDraggingCharacter() const
 {
 	return m_drag_state.getCharacter();
 }
 
-const character*
+const DisplayObject*
 movie_root::getEntityUnderPointer() const
 {
 	boost::int32_t x = pixelsToTwips(m_mouse_x);
 	boost::int32_t y = pixelsToTwips(m_mouse_y);
-    const character* dropChar = findDropTarget(x, y, getDraggingCharacter()); 
+    const DisplayObject* dropChar = findDropTarget(x, y, getDraggingCharacter()); 
 	return dropChar;
 }
 
@@ -1417,7 +1417,7 @@ movie_root::isMouseOverActiveEntity() const
 {
 	assert(testInvariant());
 
-	boost::intrusive_ptr<character> entity ( m_mouse_button_state.activeEntity );
+	boost::intrusive_ptr<DisplayObject> entity ( m_mouse_button_state.activeEntity );
 	if ( ! entity.get() ) {
         return false;
     }
@@ -1750,7 +1750,7 @@ movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 }
 
 void
-movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target, int lvl)
+movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<DisplayObject> target, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
@@ -1765,7 +1765,7 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character>
 
 void
 movie_root::pushAction(boost::intrusive_ptr<as_function> func,
-        boost::intrusive_ptr<character> target, int lvl)
+        boost::intrusive_ptr<DisplayObject> target, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
 #ifdef GNASH_DEBUG
@@ -1904,7 +1904,7 @@ movie_root::markReachableResources() const
 
     if (_currentFocus) _currentFocus->setReachable();
 
-    // Mark character being dragged, if any
+    // Mark DisplayObject being dragged, if any
     m_drag_state.markReachableResources();
 
     // NOTE: we don't need to mark _liveChars as any elements in that list
@@ -1939,36 +1939,36 @@ movie_root::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
-character *
+DisplayObject *
 movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
 
 	for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
 	{
-		character* ret = i->second->get_topmost_mouse_entity(x, y);
+		DisplayObject* ret = i->second->get_topmost_mouse_entity(x, y);
 		if ( ret ) return ret;
 	}
 
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
-		character* ret = i->second->get_topmost_mouse_entity(x, y);
+		DisplayObject* ret = i->second->get_topmost_mouse_entity(x, y);
 		if ( ret ) return ret;
 	}
 
 	return NULL;
 }
 
-const character *
-movie_root::findDropTarget(boost::int32_t x, boost::int32_t y, character* dragging) const
+const DisplayObject *
+movie_root::findDropTarget(boost::int32_t x, boost::int32_t y, DisplayObject* dragging) const
 {
 	for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
 	{
-		const character* ret = i->second->findDropTarget(x, y, dragging);
+		const DisplayObject* ret = i->second->findDropTarget(x, y, dragging);
 		if ( ret ) return ret;
 	}
 	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
-		const character* ret = i->second->findDropTarget(x, y, dragging);
+		const DisplayObject* ret = i->second->findDropTarget(x, y, dragging);
 		if ( ret ) return ret;
 	}
 	return NULL;
@@ -1996,7 +1996,7 @@ movie_root::cleanupDisplayList()
         //       of cleaning up unloaded... but that will likely
         //       introduce problems when allowing the GC to run
         //       at arbitrary times.
-        //       The invariant to keep is that cleanup of unloaded characters
+        //       The invariant to keep is that cleanup of unloaded DisplayObjects
         //       in local display lists must happen at the *end* of global action
         //       queue processing.
         //
@@ -2010,14 +2010,14 @@ movie_root::cleanupDisplayList()
                 i->second->cleanupDisplayList();
         }
 
-	// Now remove from the instance list any unloaded character
-	// Note that some characters may be unloaded but not yet destroyed,
+	// Now remove from the instance list any unloaded DisplayObject
+	// Note that some DisplayObjects may be unloaded but not yet destroyed,
 	// in this case we'll also destroy them, which in turn might unload
-	// further characters, maybe already scanned, so we keep scanning
-	// the list until no more unloaded-but-non-destroyed characters
+	// further DisplayObjects, maybe already scanned, so we keep scanning
+	// the list until no more unloaded-but-non-destroyed DisplayObjects
 	// are found.
-	// Keeping unloaded-but-non-destroyed characters wouldn't really hurt
-	// in that ::advanceLiveChars would skip any unloaded characters.
+	// Keeping unloaded-but-non-destroyed DisplayObjects wouldn't really hurt
+	// in that ::advanceLiveChars would skip any unloaded DisplayObjects.
 	// Still, the more we remove the less work GC has to do...
 	//
 
@@ -2032,7 +2032,7 @@ movie_root::cleanupDisplayList()
 #endif
 		needScan=false;
 
-		// Remove unloaded characters from the _liveChars list
+		// Remove unloaded DisplayObjects from the _liveChars list
 		for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
 		{
 			AdvanceableCharacter ch = *i;
@@ -2041,7 +2041,7 @@ movie_root::cleanupDisplayList()
 				// the sprite might have been destroyed already
 				// by effect of an unload() call with no onUnload
 				// handlers available either in self or child
-				// characters
+				// DisplayObjects
 				if ( ! ch->isDestroyed() )
 				{
 #ifdef GNASH_DEBUG_DLIST_CLEANUP
@@ -2086,19 +2086,19 @@ movie_root::cleanupDisplayList()
 
 /*static private*/
 void
-movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch)
+movie_root::advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch)
 {
 
 	if ( ! ch->isUnloaded() )
 	{
 #ifdef GNASH_DEBUG
-		log_debug("    advancing character %s", ch->getTarget());
+		log_debug("    advancing DisplayObject %s", ch->getTarget());
 #endif
 		ch->advance();
 	}
 #ifdef GNASH_DEBUG
 	else {
-		log_debug("    character %s is unloaded, not advancing it", ch->getTarget());
+		log_debug("    DisplayObject %s is unloaded, not advancing it", ch->getTarget());
 	}
 #endif
 }
@@ -2108,7 +2108,7 @@ movie_root::advanceLiveChars()
 {
 
 #ifdef GNASH_DEBUG
-	log_debug("---- movie_root::advance: %d live characters in the global list", _liveChars.size());
+	log_debug("---- movie_root::advance: %d live DisplayObjects in the global list", _liveChars.size());
 #endif
 
 	std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(advanceLiveChar, _1));
@@ -2143,7 +2143,7 @@ movie_root::set_background_alpha(float alpha)
 	}
 }
 
-character*
+DisplayObject*
 movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 {
 	if ( tgtstr_orig.empty() ) return NULL;
@@ -2165,7 +2165,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 		o = o->get_path_element(st.find(part));
 		if ( ! o ) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
-			log_debug("Evaluating character target path: element '%s' of path '%s' not found",
+			log_debug("Evaluating DisplayObject target path: element '%s' of path '%s' not found",
 				part, tgtstr);
 #endif
 			return NULL;
@@ -2173,7 +2173,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 		if ( to == std::string::npos ) break;
 		from = to+1;
 	}
-	return o->to_character();
+	return o->to_DisplayObject();
 }
 
 void
@@ -2333,7 +2333,7 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
         return;
     }
 
-    character* ch = findCharacterByTarget(target);
+    DisplayObject* ch = findCharacterByTarget(target);
     if (!ch)
     {
         log_debug("Target %s of a loadMovie request doesn't exist at "
@@ -2344,7 +2344,7 @@ movie_root::processLoadMovieRequest(const LoadMovieRequest& r)
     MovieClip* sp = ch->to_movie();
     if (!sp)
     {
-        log_unimpl("loadMovie against a %s character", typeName(*ch));
+        log_unimpl("loadMovie against a %s DisplayObject", typeName(*ch));
         return;
     }
 
@@ -2470,12 +2470,12 @@ movie_root::getCharacterTree(tree<StringPair>& tr,
 
     tree<StringPair>::iterator localIter;
 
-    /// Stage: number of live characters
+    /// Stage: number of live DisplayObjects
     std::ostringstream os;
     os << _liveChars.size();
-    localIter = tr.append_child(it, StringPair(_("Live characters"), os.str()));
+    localIter = tr.append_child(it, StringPair(_("Live DisplayObjects"), os.str()));
 
-	/// Live characters tree
+	/// Live DisplayObjects tree
 	for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
 	                                                           i != e; ++i)
 	{
@@ -2509,7 +2509,7 @@ movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 }
 
 void
-movie_root::addChild(character* ch)
+movie_root::addChild(DisplayObject* ch)
 {
     int newDepth = _childs.empty() ? 0 : _childs.rbegin()->second->get_depth()+1;
     ch->set_depth(newDepth);
@@ -2525,11 +2525,11 @@ movie_root::addChild(character* ch)
 }
 
 void
-movie_root::addChildAt(character* ch, int depth)
+movie_root::addChildAt(DisplayObject* ch, int depth)
 {
     setInvalidated();
 
-    // If this character already exist
+    // If this DisplayObject already exist
     // as a child, drop it first.
 	Childs::iterator existing = _childs.begin();
     for (Childs::iterator end=_childs.end(); existing!=end; ++existing)

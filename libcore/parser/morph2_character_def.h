@@ -36,12 +36,12 @@ public:
     ///	TODO: drop ?
     ///
     /// @param md
-    ///	Movie definition. Used to resolv character ids for fill styles.
+    ///	Movie definition. Used to resolv DisplayObject ids for fill styles.
     ///	Must be not-null or would segfault. 
     ///
     void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
-    virtual void display(character* inst);
+    virtual void display(DisplayObject* inst);
 
     // Question: What is the bound of a morph? Is this conceptually correct?
     /// TODO: optimize this by take ratio into consideration, to decrease some

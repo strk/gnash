@@ -285,13 +285,13 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINEBITS); // 6
 
     in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
+    boost::uint16_t DisplayObject_id = in.read_u16();
 
-    if (m.getBitmap(character_id))
+    if (m.getBitmap(DisplayObject_id))
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character "
-                "- discarding it"), character_id);
+        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap DisplayObject "
+                "- discarding it"), DisplayObject_id);
         );
         return;
     }
@@ -302,7 +302,7 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("DEFINEBITS: No jpeg loader registered in movie "
-                "definition - discarding bitmap character %d"), character_id);
+                "definition - discarding bitmap DisplayObject %d"), DisplayObject_id);
         );
         return;
     }
@@ -317,16 +317,16 @@ define_bits_jpeg_loader(SWFStream& in, TagType tag, movie_definition& m,
     catch (std::exception& e)
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror("Error reading jpeg2 with headers for character "
-            "id %d: %s", character_id, e.what());
+        log_swferror("Error reading jpeg2 with headers for DisplayObject "
+            "id %d: %s", DisplayObject_id, e.what());
         );
         return;
     }
     
     boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
 
-    // add bitmap to movie under character id.
-    m.addBitmap(character_id, bi);
+    // add bitmap to movie under DisplayObject id.
+    m.addBitmap(DisplayObject_id, bi);
 }
 
 
@@ -337,20 +337,20 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINEBITSJPEG2); // 21
 
     in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
+    boost::uint16_t DisplayObject_id = in.read_u16();
 
     IF_VERBOSE_PARSE
     (
     log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %ld"),
-          character_id, in.tell());
+          DisplayObject_id, in.tell());
     );
 
     
-    if ( m.getBitmap(character_id) )
+    if ( m.getBitmap(DisplayObject_id) )
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap "
-                "character - discarding it"), character_id);
+                "DisplayObject - discarding it"), DisplayObject_id);
         );
         return;
     }
@@ -365,8 +365,8 @@ define_bits_jpeg2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(im);
 
-    // add bitmap to movie under character id.
-    m.addBitmap(character_id, bi);
+    // add bitmap to movie under DisplayObject id.
+    m.addBitmap(DisplayObject_id, bi);
 
 }
 
@@ -468,12 +468,12 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINEBITSJPEG3); // 35
 
     in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
+    boost::uint16_t DisplayObject_id = in.read_u16();
 
     IF_VERBOSE_PARSE
     (
     log_parse(_("  define_bits_jpeg3_loader: charid = %d pos = %lx"),
-          character_id, in.tell());
+          DisplayObject_id, in.tell());
     );
 
     in.ensureBytes(4);
@@ -515,8 +515,8 @@ define_bits_jpeg3_loader(SWFStream& in, TagType tag, movie_definition& m,
     boost::intrusive_ptr<BitmapInfo> bi =
         render::createBitmapInfo(static_cast<std::auto_ptr<GnashImage> >(im));
 
-    // add bitmap to movie under character id.
-    m.addBitmap(character_id, bi);
+    // add bitmap to movie under DisplayObject id.
+    m.addBitmap(DisplayObject_id, bi);
 #endif
 }
 
@@ -530,7 +530,7 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     in.ensureBytes(2+2+2+1); // the initial header 
 
-    boost::uint16_t character_id = in.read_u16();
+    boost::uint16_t DisplayObject_id = in.read_u16();
 
     // 3 == 8 bit, 4 == 16 bit, 5 == 32 bit
     boost::uint8_t bitmap_format = in.read_u8();
@@ -540,25 +540,25 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
     IF_VERBOSE_PARSE(
         log_parse(_("  defbitslossless2: tag = %d, id = %d, "
             "fmt = %d, w = %d, h = %d"),
-            tag, character_id, bitmap_format, width, height);
+            tag, DisplayObject_id, bitmap_format, width, height);
     );
 
     if (!width || !height) {
          IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("Bitmap character %d has a height or width of 0"),
-                character_id);
+            log_swferror(_("Bitmap DisplayObject %d has a height or width of 0"),
+                DisplayObject_id);
         );   
         return;  
     }
 
     // No need to parse any further if it already exists, as we aren't going
     // to add it.
-    if (m.getBitmap(character_id))
+    if (m.getBitmap(DisplayObject_id))
     {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("DEFINEBITSLOSSLESS: Duplicate id (%d) "
-                           "for bitmap character - discarding it"),
-                character_id);
+                           "for bitmap DisplayObject - discarding it"),
+                DisplayObject_id);
         );
     }
 
@@ -702,8 +702,8 @@ define_bits_lossless_2_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     boost::intrusive_ptr<BitmapInfo> bi = render::createBitmapInfo(image);
 
-    // add bitmap to movie under character id.
-    m.addBitmap(character_id, bi);
+    // add bitmap to movie under DisplayObject id.
+    m.addBitmap(DisplayObject_id, bi);
 #endif // HAVE_ZLIB_H
 
 }
@@ -728,15 +728,15 @@ void define_shape_loader(SWFStream& in, TagType tag, movie_definition& m,
        || tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_);
 
     in.ensureBytes(2);
-    boost::uint16_t    character_id = in.read_u16();
+    boost::uint16_t    DisplayObject_id = in.read_u16();
     IF_VERBOSE_PARSE(
-        log_parse(_("  shape_loader: id = %d"), character_id);
+        log_parse(_("  shape_loader: id = %d"), DisplayObject_id);
     );
 
     shape_character_def* ch = new shape_character_def;
     ch->read(in, tag, true, m);
 
-    m.add_character(character_id, ch);
+    m.add_DisplayObject(DisplayObject_id, ch);
 }
 
 void define_shape_morph_loader(SWFStream& in, TagType tag, movie_definition& m,
@@ -747,15 +747,15 @@ void define_shape_morph_loader(SWFStream& in, TagType tag, movie_definition& m,
         || tag == SWF::DEFINEMORPHSHAPE2_); 
 
     in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
+    boost::uint16_t DisplayObject_id = in.read_u16();
 
     IF_VERBOSE_PARSE(
-        log_parse(_("  shape_morph_loader: id = %d"), character_id);
+        log_parse(_("  shape_morph_loader: id = %d"), DisplayObject_id);
     );
 
     morph2_character_def* morph = new morph2_character_def;
     morph->read(in, tag, m);
-    m.add_character(character_id, morph);
+    m.add_DisplayObject(DisplayObject_id, morph);
 }
 
 // Create and initialize a sprite, and add it to the movie.
@@ -766,11 +766,11 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
     assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
 
     in.ensureBytes(2);
-    int    character_id = in.read_u16();
+    int    DisplayObject_id = in.read_u16();
 
     IF_VERBOSE_PARSE
     (
-    log_parse(_("  sprite:  char id = %d"), character_id);
+    log_parse(_("  sprite:  char id = %d"), DisplayObject_id);
     );
 
     // A DEFINESPRITE tag as part of a DEFINESPRITE
@@ -782,7 +782,7 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
         }
         catch (std::bad_cast& e) {
             log_swferror(_("Nested DEFINESPRITE tags. Will add to "
-                           "top-level characters dictionary."));
+                           "top-level DisplayObjects dictionary."));
         }
     );
 
@@ -791,12 +791,12 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     IF_VERBOSE_MALFORMED_SWF(
         if (!ch->get_frame_count()) {
-            log_swferror(_("Sprite %d advertise no frames"), character_id);
+            log_swferror(_("Sprite %d advertise no frames"), DisplayObject_id);
         }
     );
 
 
-    m.add_character(character_id, ch);
+    m.add_DisplayObject(DisplayObject_id, ch);
 }
 
 
@@ -844,7 +844,7 @@ void export_loader(SWFStream& in, TagType tag, movie_definition& m,
             log_parse(_("  export: id = %d, name = %s"), id, symbolName);
         );
 
-        // Fonts, characters and sounds can be exported.
+        // Fonts, DisplayObjects and sounds can be exported.
         ExportableResource* f;
         if ((f = m.get_font(id)) ||
             (f = m.get_character_def(id)) ||
@@ -974,9 +974,9 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     sound::sound_handler* handler = r.soundHandler();
 
-    in.ensureBytes(2+4+1+4); // character id + flags + sample count
+    in.ensureBytes(2+4+1+4); // DisplayObject id + flags + sample count
 
-    boost::uint16_t    character_id = in.read_u16();
+    boost::uint16_t    DisplayObject_id = in.read_u16();
 
     media::audioCodecType format = static_cast<media::audioCodecType>(
             in.read_uint(4));
@@ -1024,7 +1024,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
     (
         log_parse(_("define sound: ch=%d, format=%s, "
             "rate=%d, 16=%d, stereo=%d, ct=%d"),
-              character_id, format, sample_rate,
+              DisplayObject_id, format, sample_rate,
               int(sample_16bit), int(stereo), sample_count);
     );
 
@@ -1067,7 +1067,7 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
         if (handler_id >= 0)
         {
         sound_sample* sam = new sound_sample(handler_id, r);
-        m.add_sound_sample(character_id, sam);
+        m.add_sound_sample(DisplayObject_id, sam);
         }
 
     }
@@ -1075,9 +1075,9 @@ define_sound_loader(SWFStream& in, TagType tag, movie_definition& m,
     {
         // is this nice to do?
         log_error(_("There is no sound handler currently active, "
-            "so character with id %d will NOT be added to "
+            "so DisplayObject with id %d will NOT be added to "
             "the dictionary"),
-              character_id);
+              DisplayObject_id);
     }
 }
 
@@ -1096,7 +1096,7 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
     if (!handler) return;
 
     // FIXME:
-    // no character id for soundstreams... so we make one up...
+    // no DisplayObject id for soundstreams... so we make one up...
     // This only works if there is only one SWFStream in the movie...
     // The right way to do it is to make seperate structures for streams
     // in SWFMovieDefinition.

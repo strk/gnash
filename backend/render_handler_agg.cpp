@@ -963,7 +963,7 @@ public:
     }
   }
 
-    void draw_shape_character(shape_character_def *def, 
+    void drawShape(shape_character_def *def, 
     const SWFMatrix& mat, const cxform& cx)
     {
     
@@ -1033,7 +1033,7 @@ public:
         // Clear selected clipbounds to ease debugging 
         _clipbounds_selected.clear();
 
-    } // draw_shape_character
+    } // drawShape
   
   
     /// Takes a path and translates it using the given SWFMatrix. The new path
