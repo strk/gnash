@@ -120,7 +120,7 @@
     //   Target of the sprite pointed to by mcRef is
     //   not the one used on creation (_level0.mc1) but the one
     //   subsequently changed to by effect of _name assignment: _level0.mc2.
-    //   Thus, when finding a *new* character (the old one was unloaded)
+    //   Thus, when finding a *new* DisplayObject (the old one was unloaded)
     //   we find the *new* _level0.mc2.
     //   Should be fixed in the same way as for the bug exposed in frame 5
     check(mcRef.valueOf() == null) 

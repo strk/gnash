@@ -8,7 +8,7 @@
   |  defined sprite is placed.
   |
   |  Also, this file tests that of multiple DOINITACTION tags referring to
-  |  the *same* character only the first executed gets trough, no matter in
+  |  the *same* DisplayObject only the first executed gets trough, no matter in
   |  which timeline the DOINITACTION tag is.
   |
   |  Expected output is just an 'END OF TEST' trace.
