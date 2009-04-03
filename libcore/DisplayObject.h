@@ -133,14 +133,6 @@ public:
     ///
     static const int noClipDepthValue = -1000000;
 
-    /// This value is used for m_clip_depth when 
-    /// the DisplayObject is a dynamic mask.
-    //
-    /// Depths below -16384 are illegal, so this
-    /// value should not collide with real depths.  
-    ///
-    static const int dynClipDepthValue = -2000000;
-
     /// Return a reference to the variable scope of this DisplayObject.
     //
     /// TODO: make const/return const& ?
@@ -303,8 +295,7 @@ public:
     {
         // TODO: is dynClipDepthValue still needed ?
         //       since we have a _maskee member now, we may use that instead..
-        return (m_clip_depth != noClipDepthValue && 
-                m_clip_depth != dynClipDepthValue);
+        return (m_clip_depth != noClipDepthValue && !_maskee);
     }
 
     /// Returns true when the DisplayObject (and it's childs) is used as a mask
@@ -318,7 +309,7 @@ public:
     ///     
     bool isDynamicMask() const
     {
-        return (m_clip_depth==dynClipDepthValue);
+        return _maskee;
     }
 
     DisplayObject* toDisplayObject() { return this; }
