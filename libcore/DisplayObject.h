@@ -73,6 +73,8 @@ public:
 
     DisplayObject(DisplayObject* parent, int id);
 
+    virtual ~DisplayObject() {}
+
     /// The lowest placeable and accessible depth for a DisplayObject.
     /// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
     ///
@@ -83,7 +85,6 @@ public:
     /// The only way to exceed these bounds is with createEmptyMoveClip(),
     /// which can be placed at any depth within +/- 2**31.
     static const int lowerAccessibleBound = -16384;
-    
     
     /// This is the maximum depth a MovieClip DisplayObject can be placed
     /// at (attachMovie). Kirupa (see above) says 2130690045, but this
@@ -357,14 +358,6 @@ public:
 
     const std::string& get_name() const { return _name; }
 
-    /// Return true if this DisplayObject can handle mouse events.
-    //
-    /// The default implementation returns false.
-    ///
-    virtual bool can_handle_mouse_event() const {
-        return false;
-    }
-
     /// \brief
     /// Get our concatenated SWFMatrix (all our ancestor transforms,
     /// times our SWFMatrix). 
@@ -382,15 +375,15 @@ public:
     /// times our cxform). 
     ///
     /// Maps from our local space into normal color space.
-    virtual cxform    get_world_cxform() const;
+    virtual cxform get_world_cxform() const;
 
     /// Get the built-in function handlers code for the given event
     //
     /// NOTE: this function is only for getting statically-defined
-    ///             event handlers, which are the ones attached to a DisplayObject
-    ///             with a PlaceObject2. It's the DisplayObject's responsibility
-    ///             to properly fetch any user-defined event handler, which 
-    ///             are the ones attached to a DisplayObject with ActionScript code.
+    ///       event handlers, which are the ones attached to a DisplayObject
+    ///       with a PlaceObject2. It's the DisplayObject's responsibility
+    ///       to properly fetch any user-defined event handler, which 
+    ///       are the ones attached to a DisplayObject with ActionScript code.
     ///
     std::auto_ptr<ExecutableCode> get_event_handler(const event_id& id) const;
 
@@ -400,10 +393,10 @@ public:
     /// handlers if this is the case.
     ///
     /// NOTE: this function is only for registering statically-defined
-    ///             event handlers, which are the ones attached to a DisplayObject
-    ///             with a PlaceObject2. It's the DisplayObject's responsibility
-    ///             to properly invoke any user-defined event handler, which 
-    ///             are the ones attached to a DisplayObject with ActionScript code.
+    ///       event handlers, which are the ones attached to a DisplayObject
+    ///       with a PlaceObject2. It's the DisplayObject's responsibility
+    ///       to properly invoke any user-defined event handler, which 
+    ///       are the ones attached to a DisplayObject with ActionScript code.
     ///
     /// @param id
     /// The event triggering the handler.
@@ -550,9 +543,6 @@ public:
     {
         // GNASH_REPORT_FUNCTION 
     }
-
-    // TODO: verify if this is really needed (I guess not)
-    virtual void    goto_frame(size_t /*target_frame*/) {}
 
     /// \brief
     /// Return true if PlaceObjects tag are allowed to move
