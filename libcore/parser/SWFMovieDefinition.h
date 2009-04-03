@@ -130,13 +130,13 @@ public:
 	//
 	/// returns a NULL if the id is unknown.
 	///
-	boost::intrusive_ptr<character_def> get_DisplayObject(int id);
+	boost::intrusive_ptr<character_def> getDisplayObject(int id);
 
 	/// Add a Character assigning it the given id
 	//
 	/// replaces any existing DisplayObject with the same id
 	///
-	void add_DisplayObject(int id, boost::intrusive_ptr<character_def> c);
+	void addDisplayObject(int id, boost::intrusive_ptr<character_def> c);
 
 	/// Return an iterator to the first dictionary element
 	CharacterIterator begin() { return _map.begin(); }
@@ -246,7 +246,7 @@ public:
 	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             Imports& imports);
 
-	void add_DisplayObject(int DisplayObject_id, character_def* c);
+	void addDisplayObject(int DisplayObject_id, character_def* c);
 
 	/// \brief
 	/// Return a DisplayObject from the dictionary

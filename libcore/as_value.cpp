@@ -1020,7 +1020,7 @@ as_value::to_object() const
 		case MOVIECLIP:
 			// FIXME: update when to_sprite will return
 			//        an intrusive_ptr directly
-			return ptr(to_DisplayObject());
+			return ptr(toDisplayObject());
 
 		case STRING:
 			return init_string_instance(getStr());
@@ -1048,7 +1048,7 @@ as_value::to_sprite(bool allowUnloaded) const
 }
 
 DisplayObject*
-as_value::to_DisplayObject(bool allowUnloaded) const
+as_value::toDisplayObject(bool allowUnloaded) const
 {
 	if ( m_type != MOVIECLIP ) return NULL;
 
@@ -1058,11 +1058,11 @@ as_value::to_DisplayObject(bool allowUnloaded) const
 void
 as_value::set_sprite(MovieClip& sprite)
 {
-	set_DisplayObject(sprite);
+	setDisplayObject(sprite);
 }
 
 void
-as_value::set_DisplayObject(DisplayObject& sprite)
+as_value::setDisplayObject(DisplayObject& sprite)
 {
 	m_type = MOVIECLIP;
 	_value = CharacterProxy(&sprite);
@@ -1137,10 +1137,10 @@ as_value::set_as_object(as_object* obj)
 		set_null();
 		return;
 	}
-	DisplayObject* sp = obj->to_DisplayObject();
+	DisplayObject* sp = obj->toDisplayObject();
 	if ( sp )
 	{
-		set_DisplayObject(*sp);
+		setDisplayObject(*sp);
 		return;
 	}
 	as_function* func = obj->to_function();
@@ -1460,7 +1460,7 @@ as_value::equalsSameType(const as_value& v) const
 			return _value == v._value;
 
 		case MOVIECLIP:
-			return to_DisplayObject() == v.to_DisplayObject(); 
+			return toDisplayObject() == v.toDisplayObject(); 
 
 		case NUMBER:
 		{

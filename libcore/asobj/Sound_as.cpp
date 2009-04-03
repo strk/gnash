@@ -583,7 +583,7 @@ sound_new(const fn_call& fn)
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
         {
             as_object* obj = arg0.to_object().get();
-            DisplayObject* ch = obj ? obj->to_DisplayObject() : 0;
+            DisplayObject* ch = obj ? obj->toDisplayObject() : 0;
             IF_VERBOSE_ASCODING_ERRORS(
             if ( ! ch )
             {

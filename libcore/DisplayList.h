@@ -93,7 +93,7 @@ public:
 	///
     /// @param initObj
     /// an object to initialize the new DisplayObject's properties with.
-	void place_DisplayObject(DisplayObject* ch, int depth, as_object* initObj = 0);
+	void placeDisplayObject(DisplayObject* ch, int depth, as_object* initObj = 0);
 
 	/// \brief
 	/// Replace the old DisplayObject at the specified depth with
@@ -114,7 +114,7 @@ public:
 	/// @param use_old_matrix
 	/// true:  set the new DisplayObject's transformation SWFMatrix to the old one.
 	/// false: keep the new DisplayObject's transformation SWFMatrix.
-	void replace_DisplayObject(DisplayObject* ch, int depth, bool use_old_cxform,
+	void replaceDisplayObject(DisplayObject* ch, int depth, bool use_old_cxform,
 		bool use_old_matrix);
 
 	/// \brief
@@ -163,13 +163,13 @@ public:
 	/// @clip_depth
 	/// Not used at the moment.
 	/// 
-	void move_DisplayObject( int depth, const cxform* color_xform,
+	void moveDisplayObject( int depth, const cxform* color_xform,
             const SWFMatrix* mat, int* ratio, int* clip_depth);
 
 	/// Removes the object at the specified depth.
 	//
 	/// Calls unload on the removed DisplayObject.
-	void remove_DisplayObject(int depth);
+	void removeDisplayObject(int depth);
 
 	/// Remove all unloaded DisplayObject from the list
 	//
@@ -211,25 +211,25 @@ public:
 	void omit_display();
 
 	/// May return NULL.
-	DisplayObject* get_DisplayObject_at_depth(int depth);
+	DisplayObject* getDisplayObjectAtDepth(int depth);
 
-	const DisplayObject* get_DisplayObject_at_depth(int depth) const {
-		return const_cast<DisplayList*>(this)->get_DisplayObject_at_depth(depth);
+	const DisplayObject* getDisplayObjectAtDepth(int depth) const {
+		return const_cast<DisplayList*>(this)->getDisplayObjectAtDepth(depth);
 	}
 
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
-	DisplayObject* get_DisplayObject_by_name(const std::string& name);
+	DisplayObject* getDisplayObjectByName(const std::string& name);
 
-	const DisplayObject* get_DisplayObject_by_name(const std::string& name) const {
-		return const_cast<DisplayList*>(this)->get_DisplayObject_by_name(name);
+	const DisplayObject* getDisplayObjectByName(const std::string& name) const {
+		return const_cast<DisplayList*>(this)->getDisplayObjectByName(name);
 	}
 
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
-	DisplayObject* get_DisplayObject_by_name_i(const std::string& name);
+	DisplayObject* getDisplayObjectByName_i(const std::string& name);
 
 	/// \brief 
 	/// Visit each DisplayObject in the list in depth order

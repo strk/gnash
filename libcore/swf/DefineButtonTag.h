@@ -75,7 +75,7 @@ public:
 	bool	m_down;
 	bool	m_over;
 	bool	m_up;
-	int	m_DisplayObject_id;
+	int	_id;
 
 	// Who owns this ?
 	character_def* m_character_def;

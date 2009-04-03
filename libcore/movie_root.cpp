@@ -1268,7 +1268,7 @@ movie_root::add_listener(CharacterList& ll, DisplayObject* listener)
 	for(CharacterList::const_iterator i = ll.begin(), e = ll.end(); i != e; ++i)
 	{
 		// Conceptually, we don't need to add the same DisplayObject twice.
-		// but see edit_text_DisplayObject::setFocus()...
+		// but see TextField::setFocus()...
 		if(*i == listener)  return;
 	}
 
@@ -2173,7 +2173,7 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 		if ( to == std::string::npos ) break;
 		from = to+1;
 	}
-	return o->to_DisplayObject();
+	return o->toDisplayObject();
 }
 
 void

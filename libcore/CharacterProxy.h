@@ -40,7 +40,7 @@ class CharacterProxy {
 
 	mutable std::string _tgt;
 
-	static DisplayObject* find_DisplayObject_by_target(const std::string& target);
+	static DisplayObject* findDisplayObjectByTarget(const std::string& target);
 
 	/// If we still have a sprite pointer check if it was destroyed
 	/// in which case we drop the pointer and only keep the target.
@@ -102,7 +102,7 @@ public:
         // set _ptr to NULL and _tgt to original target if destroyed
 		checkDangling(); 
 		if ( _ptr ) return _ptr;
-		else return find_DisplayObject_by_target(_tgt);
+		else return findDisplayObjectByTarget(_tgt);
 	}
 
 	/// Get the sprite target, either current (if not dangling) or

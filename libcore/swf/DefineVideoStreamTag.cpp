@@ -80,7 +80,7 @@ DefineVideoStreamTag::loader(SWFStream& in, SWF::TagType tag,
 
     std::auto_ptr<DefineVideoStreamTag> vs(new DefineVideoStreamTag(in, id));
 
-    m.add_DisplayObject(id, vs.release());
+    m.addDisplayObject(id, vs.release());
 
 }
 

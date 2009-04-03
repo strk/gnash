@@ -156,7 +156,7 @@ swf_function::operator()(const fn_call& fn)
 		// 
 		if ( fn.this_ptr )
 		{
-			DisplayObject* ch = fn.this_ptr->to_DisplayObject();
+			DisplayObject* ch = fn.this_ptr->toDisplayObject();
 			if ( ch )
 			{
 				target = ch;

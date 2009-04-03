@@ -233,9 +233,9 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual void add_DisplayObject(int id, character_def* ch)
+	virtual void addDisplayObject(int id, character_def* ch)
 	{
-		m_movie_def.add_DisplayObject(id, ch);
+		m_movie_def.addDisplayObject(id, ch);
 	}
 
 	// Create a (mutable) instance of our definition.  The

@@ -232,7 +232,7 @@ public:
 	/// This method is here to be called by DEFINE tags loaders.
 	/// The default implementation does nothing.
 	///
-	virtual void add_DisplayObject(int /*id*/, character_def* /*ch*/)
+	virtual void addDisplayObject(int /*id*/, character_def* /*ch*/)
 	{
 	}
 

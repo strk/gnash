@@ -239,7 +239,7 @@ public:
 	/// fill_style specific reachable resources are:
 	///
 	///	- gradient bitmap info (_gradientBitmapInfo)
-	///	- bitmap DisplayObject (m_bitmap_DisplayObject)
+	///	- bitmap DisplayObject (_bitmap)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC

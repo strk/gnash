@@ -316,7 +316,7 @@ public:
         return (m_clip_depth==dynClipDepthValue);
     }
 
-    DisplayObject* to_DisplayObject() { return this; }
+    DisplayObject* toDisplayObject() { return this; }
 
     /// Return the DisplayObject masking this instance (if any)
     DisplayObject* getMask() const
@@ -528,7 +528,7 @@ public:
     ///
     virtual as_object* get_path_element(string_table::key key)
     {
-        return get_path_element_DisplayObject(key);
+        return getPathElementSeparator(key);
     }
 
     /// Restart the DisplayObject
@@ -1122,7 +1122,7 @@ protected:
     //
     /// NOTE: case insensitive up to SWF6, sensitive from SWF7 up
     ///
-    as_object* get_path_element_DisplayObject(string_table::key key);
+    as_object* getPathElementSeparator(string_table::key key);
 
     /// \brief
     /// Set when the visual aspect of this particular DisplayObject or movie

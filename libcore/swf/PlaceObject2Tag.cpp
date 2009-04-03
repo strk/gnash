@@ -38,7 +38,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
 {
     // Original place_object tag; very simple.
     in.ensureBytes(2 + 2);
-    m_DisplayObject_id = in.read_u16();
+    _id = in.read_u16();
     m_depth = in.read_u16() + DisplayObject::staticDepthOffset;
 
     // PlaceObject doesn't know about masks.
@@ -63,7 +63,7 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
     (
             log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
             	m_depth, m_depth - DisplayObject::staticDepthOffset,
-            	m_DisplayObject_id);
+            	_id);
             if (hasMatrix()) log_parse("  SWFMatrix: %s", m_matrix);
             if (hasCxform()) log_parse(_("  cxform: %s"), m_color_transform);
     );
@@ -263,7 +263,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
     if ( hasCharacter( ))
     {
         in.ensureBytes(2);
-        m_DisplayObject_id = in.read_u16();
+        _id = in.read_u16();
     }
 
     if ( hasMatrix() )
@@ -305,7 +305,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
     IF_VERBOSE_PARSE (
         log_parse(_("  PLACEOBJECT2: depth = %d (%d)"),
             m_depth, m_depth-DisplayObject::staticDepthOffset);
-        if ( hasCharacter() ) log_parse(_("  char id = %d"), m_DisplayObject_id);
+        if ( hasCharacter() ) log_parse(_("  char id = %d"), _id);
         if ( hasMatrix() )
         {
             log_parse(_("  SWFMatrix: %s"), m_matrix);
@@ -352,7 +352,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 
     if (hasCharacter()) {
         in.ensureBytes(2);
-        m_DisplayObject_id = in.read_u16();
+        _id = in.read_u16();
     }
 
     if (hasMatrix()) {
@@ -418,7 +418,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 
         log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth,
             m_depth - DisplayObject::staticDepthOffset);
-        if (hasCharacter()) log_parse(_("  char id = %d"), m_DisplayObject_id);
+        if (hasCharacter()) log_parse(_("  char id = %d"), _id);
         if (hasMatrix()) log_parse(_("  SWFMatrix: %s"), m_matrix);
         if (hasCxform()) log_parse(_("  cxform: %d"), m_color_transform);
         if (hasRatio()) log_parse(_("  ratio: %d"), m_ratio);

@@ -153,7 +153,7 @@ DisplayList::getNextHighestDepth() const
 }
 
 DisplayObject*
-DisplayList::get_DisplayObject_at_depth(int depth)
+DisplayList::getDisplayObjectAtDepth(int depth)
 {
     testInvariant();
 
@@ -175,7 +175,7 @@ DisplayList::get_DisplayObject_at_depth(int depth)
 
 
 DisplayObject*
-DisplayList::get_DisplayObject_by_name(const std::string& name)
+DisplayList::getDisplayObjectByName(const std::string& name)
 {
     testInvariant();
 
@@ -191,7 +191,7 @@ DisplayList::get_DisplayObject_by_name(const std::string& name)
 }
 
 DisplayObject*
-DisplayList::get_DisplayObject_by_name_i(const std::string& name)
+DisplayList::getDisplayObjectByName_i(const std::string& name)
 {
     testInvariant();
 
@@ -206,7 +206,7 @@ DisplayList::get_DisplayObject_by_name_i(const std::string& name)
 }
 
 void
-DisplayList::place_DisplayObject(DisplayObject* ch, int depth, as_object* initObj)
+DisplayList::placeDisplayObject(DisplayObject* ch, int depth, as_object* initObj)
 {
     assert(!ch->isUnloaded());
     ch->set_invalidated();
@@ -265,7 +265,7 @@ DisplayList::add(DisplayObject* ch, bool replace)
 }
 
 void
-DisplayList::replace_DisplayObject(DisplayObject* ch, int depth, bool use_old_cxform,
+DisplayList::replaceDisplayObject(DisplayObject* ch, int depth, bool use_old_cxform,
 	bool use_old_matrix)
 {
     testInvariant();
@@ -341,16 +341,16 @@ DisplayList::replace_DisplayObject(DisplayObject* ch, int depth, bool use_old_cx
 // Updates the transform properties of the DisplayObject at
 // the specified depth.
 void
-DisplayList::move_DisplayObject( int depth, const cxform* color_xform,
+DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
         const SWFMatrix* mat, int* ratio, int* /* clip_depth */)
 {
     testInvariant();
 
-    DisplayObject* ch = get_DisplayObject_at_depth(depth);
+    DisplayObject* ch = getDisplayObjectAtDepth(depth);
     if (! ch) {
         // FIXME, should this be log_aserror?
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("move_DisplayObject() -- can't find object at depth %d"),
+        log_swferror(_("moveDisplayObject() -- can't find object at depth %d"),
             depth);
         );
         return;
@@ -378,7 +378,7 @@ DisplayList::move_DisplayObject( int depth, const cxform* color_xform,
     
 // Removes the object at the specified depth.
 void
-DisplayList::remove_DisplayObject(int depth)
+DisplayList::removeDisplayObject(int depth)
 {
     //GNASH_REPORT_FUNCTION;
 
@@ -388,7 +388,7 @@ DisplayList::remove_DisplayObject(int depth)
     container_type::size_type size = _charsByDepth.size();
 #endif
 
-    // TODO: would it be legal to call remove_DisplayObject with a depth
+    // TODO: would it be legal to call removeDisplayObject with a depth
     //             in the "removed" zone ?
     // TODO: optimize to take by-depth order into account
     container_type::iterator it = 

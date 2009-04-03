@@ -517,7 +517,7 @@ private:
 	typedef std::vector<SWF::TextRecord> TextRecords;
 	TextRecords _textRecords;
 
-	/// used to pass a color on to shape_DisplayObject::display()
+	/// used to pass a color on to Shape::display()
 	std::vector<fill_style>	m_dummy_style;
 
 	std::vector<line_style>	m_dummy_line_style;

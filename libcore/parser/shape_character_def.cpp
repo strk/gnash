@@ -260,7 +260,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
     
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE(
-                    log_parse(_("  shape_DisplayObject read: moveto %d %d"), x, y);
+                    log_parse(_("  Shape read: moveto %d %d"), x, y);
                 );
 #endif
             }
@@ -310,7 +310,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 current_path.setLeftFill(style);
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE(
-                     log_parse(_("  shape_DisplayObject read: fill0 (left) = %d"),
+                     log_parse(_("  Shape read: fill0 (left) = %d"),
                          current_path.getLeftFill());
                 );
 #endif
@@ -360,7 +360,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 current_path.setRightFill(style);
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                    log_parse(_("  shape_DisplayObject read: fill1 (right) = %d"),
+                    log_parse(_("  Shape read: fill1 (right) = %d"),
                         current_path.getRightFill());
                 );
 #endif
@@ -407,7 +407,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                 current_path.setLineStyle(style);
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE(
-                    log_parse(_("  shape_DisplayObject_read: line = %d"), 
+                    log_parse(_("  Shape_read: line = %d"), 
                         current_path.getLineStyle());
                 )
 #endif
@@ -423,7 +423,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                     continue;
                 }
                 IF_VERBOSE_PARSE (
-                    log_parse(_("  shape_DisplayObject read: more fill styles"));
+                    log_parse(_("  Shape read: more fill styles"));
                 );
     
                 // Store the current path if any.
@@ -467,7 +467,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
     
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                    log_parse(_("  shape_DisplayObject read: curved edge   = "
+                    log_parse(_("  Shape read: curved edge   = "
                             "%d %d - %d %d - %d %d"), x, y, cx, cy, ax, ay);
                 );
 #endif
@@ -509,7 +509,7 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
     
 #if SHAPE_LOG
                 IF_VERBOSE_PARSE (
-                     log_parse(_("  shape_DisplayObject_read: straight edge = "
+                     log_parse(_("  Shape_read: straight edge = "
                              "%d %d - %d %d"), x, y, x + dx, y + dy);
                 );
 #endif

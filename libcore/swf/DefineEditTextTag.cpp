@@ -35,7 +35,7 @@ DefineEditTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineEditTextTag> editText(new DefineEditTextTag(in, m));
 
-    m.add_DisplayObject(DisplayObjectID, editText.release());
+    m.addDisplayObject(DisplayObjectID, editText.release());
 }
 
 DisplayObject*

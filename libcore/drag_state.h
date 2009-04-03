@@ -41,7 +41,7 @@ class drag_state
 	/// TODO: use Range2d<float> directly ?
 	rect _bounds;
 
-	boost::intrusive_ptr<DisplayObject> _DisplayObject;
+	boost::intrusive_ptr<DisplayObject> _displayObject;
 
 	bool	_lock_centered;
 
@@ -104,18 +104,18 @@ public:
 
 	/// May return NULL !!
 	DisplayObject* getCharacter() const {
-		return _DisplayObject.get();
+		return _displayObject.get();
 	}
 
 	/// Stores DisplayObject in an intrusive pointer
 	void setCharacter(DisplayObject* ch) {
-		_DisplayObject = ch;
+		_displayObject = ch;
 	}
 
 	/// Reset drag state to its initial condition
 	void reset()
 	{
-		_DisplayObject = NULL;
+		_displayObject = NULL;
 		_hasbounds = false;
 		_bounds.set_null();
 		_lock_centered = false;
@@ -125,7 +125,7 @@ public:
 		:
 		_hasbounds(false),
 		_bounds(),
-		_DisplayObject(0),
+		_displayObject(0),
 		_lock_centered(false)
 	{
 	}
@@ -133,7 +133,7 @@ public:
 	/// Mark DisplayObject as reachable (if any)
 	void markReachableResources() const
 	{
-		if ( _DisplayObject ) _DisplayObject->setReachable();
+		if ( _displayObject ) _displayObject->setReachable();
 	}
 };
 

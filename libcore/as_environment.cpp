@@ -549,7 +549,7 @@ DisplayObject*
 as_environment::find_target(const std::string& path_in) const
 {
     as_object* o = find_object(path_in);
-    if ( o ) return o->to_DisplayObject(); // can be NULL (not a DisplayObject)...
+    if ( o ) return o->toDisplayObject(); // can be NULL (not a DisplayObject)...
     else return NULL;
 }
 

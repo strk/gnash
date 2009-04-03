@@ -71,16 +71,16 @@ main(int /*argc*/, char** /*argv*/)
 	boost::intrusive_ptr<DisplayObject> ch1 ( new DummyCharacter(root) );
 	boost::intrusive_ptr<DisplayObject> ch2 ( new DummyCharacter(root) );
 
-	dlist1.place_DisplayObject( ch1.get(), 1);
-	dlist1.place_DisplayObject( ch2.get(), 2);
+	dlist1.placeDisplayObject( ch1.get(), 1);
+	dlist1.placeDisplayObject( ch2.get(), 2);
 
 	check(dlist1 != dlist2);
 
-	dlist2.place_DisplayObject( ch2.get(), 1);
-	dlist2.place_DisplayObject( ch1.get(), 2);
+	dlist2.placeDisplayObject( ch2.get(), 1);
+	dlist2.placeDisplayObject( ch1.get(), 2);
 
 	// Resort dlist1 as depth of it's chars has been changed
-	// by place_DisplayObject calls above :/
+	// by placeDisplayObject calls above :/
 	dlist1.sort();
 
 	check_equals(dlist1, dlist2);

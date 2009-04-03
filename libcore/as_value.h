@@ -438,7 +438,7 @@ public:
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
-	/// This is just a wrapper around to_DisplayObject() performing 
+	/// This is just a wrapper around toDisplayObject() performing 
 	/// an additional final cast.
 	///
 	MovieClip* to_sprite(bool skipRebinding=false) const;
@@ -459,7 +459,7 @@ public:
 	///	Main use for this is during paths resolution, to avoid
 	///	infinite loops. See bug #21647.
 	///
-	DisplayObject* to_DisplayObject(bool skipRebinding=false) const;
+	DisplayObject* toDisplayObject(bool skipRebinding=false) const;
 
 	/// \brief
 	/// Return value as an ActionScript function ptr
@@ -540,7 +540,7 @@ public:
 
 	void set_sprite(MovieClip& sp);
 
-	void set_DisplayObject(DisplayObject& sp);
+	void setDisplayObject(DisplayObject& sp);
 
 	void set_int(int val) { set_double(val); }
 

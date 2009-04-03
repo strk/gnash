@@ -736,7 +736,7 @@ void define_shape_loader(SWFStream& in, TagType tag, movie_definition& m,
     shape_character_def* ch = new shape_character_def;
     ch->read(in, tag, true, m);
 
-    m.add_DisplayObject(DisplayObject_id, ch);
+    m.addDisplayObject(DisplayObject_id, ch);
 }
 
 void define_shape_morph_loader(SWFStream& in, TagType tag, movie_definition& m,
@@ -755,7 +755,7 @@ void define_shape_morph_loader(SWFStream& in, TagType tag, movie_definition& m,
 
     morph2_character_def* morph = new morph2_character_def;
     morph->read(in, tag, m);
-    m.add_DisplayObject(DisplayObject_id, morph);
+    m.addDisplayObject(DisplayObject_id, morph);
 }
 
 // Create and initialize a sprite, and add it to the movie.
@@ -796,7 +796,7 @@ sprite_loader(SWFStream& in, TagType tag, movie_definition& m,
     );
 
 
-    m.add_DisplayObject(DisplayObject_id, ch);
+    m.addDisplayObject(DisplayObject_id, ch);
 }
 
 

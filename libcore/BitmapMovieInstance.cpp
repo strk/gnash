@@ -37,7 +37,7 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
         chdef->createDisplayObject(this, 1);
 	
 	const int depth = 1 + DisplayObject::staticDepthOffset;
-	place_DisplayObject(ch.get(), depth);
+	placeDisplayObject(ch.get(), depth);
 }
 
 std::auto_ptr<GnashImage>

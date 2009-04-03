@@ -545,9 +545,9 @@ MovieClip::execute_actions(MovieClip::ActionList& action_list)
 }
 
 DisplayObject*
-MovieClip::get_DisplayObject_at_depth(int depth)
+MovieClip::getDisplayObjectAtDepth(int depth)
 {
-    return m_display_list.get_DisplayObject_at_depth(depth);
+    return m_display_list.getDisplayObjectAtDepth(depth);
 }
 
 // Set *val to the value of the named member and
@@ -560,7 +560,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     // FIXME: use addProperty interface for these !!
     // TODO: or at least have a DisplayObject:: protected method take
     //             care of these ?
-    //             Duplicates code in DisplayObject::get_path_element_DisplayObject too..
+    //             Duplicates code in DisplayObject::getPathElementSeparator too..
     //
     if (getSWFVersion() > 4 && name_key == NSV::PROP_uROOT)
     {
@@ -618,9 +618,9 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     // Try items on our display list.
     DisplayObject* ch;
     if ( _vm.getSWFVersion() >= 7 ) {
-        ch = m_display_list.get_DisplayObject_by_name(name);
+        ch = m_display_list.getDisplayObjectByName(name);
     }
-    else ch = m_display_list.get_DisplayObject_by_name_i(name);
+    else ch = m_display_list.getDisplayObjectByName_i(name);
     if (ch) {
             // Found object.
 
@@ -765,7 +765,7 @@ MovieClip::add_empty_movieclip(const std::string& name, int depth)
     //             an existing one !
     set_invalidated(); 
 
-    m_display_list.place_DisplayObject(movieclip, depth);     
+    m_display_list.placeDisplayObject(movieclip, depth);     
 
     return movieclip;
 }
@@ -791,7 +791,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
     txt_char->setMatrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
 
     // Here we add the DisplayObject to the displayList.    
-    m_display_list.place_DisplayObject(txt_char.get(), depth); 
+    m_display_list.placeDisplayObject(txt_char.get(), depth); 
 
     return txt_char;
 }
@@ -835,7 +835,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
-    parent->m_display_list.place_DisplayObject(newmovieclip.get(), depth, 
+    parent->m_display_list.placeDisplayObject(newmovieclip.get(), depth, 
             initObject);
     
     return newmovieclip; 
@@ -991,7 +991,7 @@ as_object*
 MovieClip::get_path_element(string_table::key key)
 {
     //log_debug("%s.get_path_element(%s) called", getTarget(), _vm.getStringTable().value(key));
-    as_object* obj = get_path_element_DisplayObject(key);
+    as_object* obj = getPathElementSeparator(key);
     if ( obj )
     {
         return obj;
@@ -1002,9 +1002,9 @@ MovieClip::get_path_element(string_table::key key)
     // See if we have a match on the display list.
     DisplayObject* ch;
     if ( _vm.getSWFVersion() >= 7 ) ch = 
-        m_display_list.get_DisplayObject_by_name(name);
+        m_display_list.getDisplayObjectByName(name);
 
-    else ch = m_display_list.get_DisplayObject_by_name_i(name);
+    else ch = m_display_list.getDisplayObjectByName_i(name);
 
             // TODO: should we check for isActionScriptReferenceable here ?
     if ( ch )
@@ -1482,9 +1482,9 @@ void MovieClip::omit_display()
 bool
 MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObject)
 { 
-    m_display_list.place_DisplayObject(&newch, depth, initObject);    
+    m_display_list.placeDisplayObject(&newch, depth, initObject);    
 
-    // FIXME: check return from place_DisplayObject above ?
+    // FIXME: check return from placeDisplayObject above ?
     return true; 
 }
 
@@ -1522,7 +1522,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         return NULL;
     }
     
-    DisplayObject* existing_char = dlist.get_DisplayObject_at_depth(tag->getDepth());
+    DisplayObject* existing_char = dlist.getDisplayObjectAtDepth(tag->getDepth());
     
     if (existing_char) return NULL;
 
@@ -1555,7 +1555,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     ch->set_ratio(tag->getRatio());
     ch->set_clip_depth(tag->getClipDepth());
     
-    dlist.place_DisplayObject(ch.get(), tag->getDepth());
+    dlist.placeDisplayObject(ch.get(), tag->getDepth());
     return ch.get();
 }
 
@@ -1564,7 +1564,7 @@ MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dli
 {    
     int ratio = tag->getRatio();
     // clip_depth is not used in MOVE tag(at least no related tests). 
-    dlist.move_DisplayObject(
+    dlist.moveDisplayObject(
         tag->getDepth(), 
         tag->hasCxform() ? &tag->getCxform() : NULL,
         tag->hasMatrix() ? &tag->getMatrix() : NULL,
@@ -1586,7 +1586,7 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
     }
     assert(cdef);
 
-    DisplayObject* existing_char = dlist.get_DisplayObject_at_depth(tag->getDepth());
+    DisplayObject* existing_char = dlist.getDisplayObjectAtDepth(tag->getDepth());
 
     if (!existing_char) {
         log_error(_("MovieClip::replace_display_object: could not "
@@ -1624,7 +1624,7 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
     }
 
     // use SWFMatrix from the old DisplayObject if tag doesn't provide one.
-    dlist.replace_DisplayObject(ch.get(), tag->getDepth(), 
+    dlist.replaceDisplayObject(ch.get(), tag->getDepth(), 
         !tag->hasCxform(), !tag->hasMatrix());
 }
 
@@ -1633,7 +1633,7 @@ MovieClip::remove_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
 {
     set_invalidated();
-    dlist.remove_DisplayObject(tag->getDepth());
+    dlist.removeDisplayObject(tag->getDepth());
 }
 
 void
@@ -1641,14 +1641,14 @@ MovieClip::replace_display_object(DisplayObject* ch, int depth,
         bool use_old_cxform, bool use_old_matrix)
 {
     assert(ch);
-    m_display_list.replace_DisplayObject(ch, depth,
+    m_display_list.replaceDisplayObject(ch, depth,
             use_old_cxform, use_old_matrix);
 }
 
 int
 MovieClip::get_id_at_depth(int depth)
 {
-    DisplayObject* ch = m_display_list.get_DisplayObject_at_depth(depth);
+    DisplayObject* ch = m_display_list.getDisplayObjectAtDepth(depth);
     if ( ! ch ) return -1;
     return ch->get_id();
 }
@@ -1990,7 +1990,7 @@ void MovieClip::restart()
 }
 
 DisplayObject*
-MovieClip::get_DisplayObject(int /* DisplayObject_id */)
+MovieClip::getDisplayObject(int /* DisplayObject_id */)
 {
     //return m_def->get_character_def(DisplayObject_id);
     // @@ TODO -- look through our dlist for a match
@@ -3235,7 +3235,7 @@ movieclip_attachMovie(const fn_call& fn)
         }
     }
 
-    // place_DisplayObject() will set depth on newch
+    // placeDisplayObject() will set depth on newch
     if (!movieclip->attachCharacter(*newch, depthValue, initObj.get()))
     {
         log_error(_("Could not attach DisplayObject at depth %d"), depthValue);
@@ -3920,7 +3920,7 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
     }
 
     int depth = fn.arg(0).to_int();
-    boost::intrusive_ptr<DisplayObject> ch = movieclip->get_DisplayObject_at_depth(depth);
+    boost::intrusive_ptr<DisplayObject> ch = movieclip->getDisplayObjectAtDepth(depth);
     if ( ! ch ) return as_value(); // we want 'undefined', not 'null'
     return as_value(ch.get());
 }
@@ -4071,7 +4071,7 @@ movieclip_getBounds(const fn_call& fn)
 
     if ( fn.nargs > 0 )
     {
-        DisplayObject* target = fn.arg(0).to_DisplayObject();
+        DisplayObject* target = fn.arg(0).toDisplayObject();
         if ( ! target )
         {
             IF_VERBOSE_ASCODING_ERRORS(

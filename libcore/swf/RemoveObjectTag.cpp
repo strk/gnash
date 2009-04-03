@@ -49,7 +49,7 @@ void
 RemoveObjectTag::execute(MovieClip* m, DisplayList& dlist) const
 {
     m->set_invalidated();
-	dlist.remove_DisplayObject(m_depth);
+	dlist.removeDisplayObject(m_depth);
 }
 
 /* public static */

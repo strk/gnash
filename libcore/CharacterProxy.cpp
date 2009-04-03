@@ -35,7 +35,7 @@ namespace gnash
 
 /* static private */
 DisplayObject*
-CharacterProxy::find_DisplayObject_by_target(const std::string& tgtstr)
+CharacterProxy::findDisplayObjectByTarget(const std::string& tgtstr)
 {
 	if ( tgtstr.empty() ) return NULL;
 

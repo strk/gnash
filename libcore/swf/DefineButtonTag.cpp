@@ -156,10 +156,10 @@ ButtonRecord::read(SWFStream& in, TagType t,
 		return false;
 	}
 	in.ensureBytes(2);
-	m_DisplayObject_id = in.read_u16();
+	_id = in.read_u16();
 
 	// Get DisplayObject definition now (safer)
-	m_character_def = m.get_character_def(m_DisplayObject_id);
+	m_character_def = m.get_character_def(_id);
 
 	// If no DisplayObject with given ID is found in the movie
 	// definition, we print an error, but keep parsing.
@@ -168,7 +168,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   button record for states [%s] refer to "
 			"DisplayObject with id %d, which is not found "
-			"in the chars dictionary"), computeButtonStatesString(flags), m_DisplayObject_id);
+			"in the chars dictionary"), computeButtonStatesString(flags), _id);
 		);
 	}
 	else
@@ -176,7 +176,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
 		IF_VERBOSE_PARSE(
 		log_parse(_("   button record for states [%s] contain "
 			"DisplayObject %d (%s)"), computeButtonStatesString(flags),
-            m_DisplayObject_id, typeName(*m_character_def));
+            _id, typeName(*m_character_def));
 		);
 	}
 
@@ -233,7 +233,7 @@ DefineButtonTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
 
-    m.add_DisplayObject(id, bt.release());
+    m.addDisplayObject(id, bt.release());
 }
 
 void
@@ -250,7 +250,7 @@ DefineButton2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineButtonTag> bt(new DefineButtonTag(in, m, tag));
 
-    m.add_DisplayObject(id, bt.release());
+    m.addDisplayObject(id, bt.release());
 }
 
 //

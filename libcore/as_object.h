@@ -851,10 +851,10 @@ public:
 	virtual as_function* to_function() { return NULL; }
 
 	/// Cast to a DisplayObject, or return NULL
-	virtual DisplayObject* to_DisplayObject() { return NULL; }
+	virtual DisplayObject* toDisplayObject() { return NULL; }
 
-	const DisplayObject* to_DisplayObject() const {
-        return const_cast<as_object*>(this)->to_DisplayObject();
+	const DisplayObject* toDisplayObject() const {
+        return const_cast<as_object*>(this)->toDisplayObject();
     }
 
 	/// Return true if this is a Date object.

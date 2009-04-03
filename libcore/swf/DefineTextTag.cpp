@@ -36,7 +36,7 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("Text DisplayObject, id = %d"), id);
     );
 
-    m.add_DisplayObject(id, t.release());
+    m.addDisplayObject(id, t.release());
 }
 
 DisplayObject*
@@ -77,7 +77,7 @@ DefineText2Tag::loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("Text DisplayObject, id = %d"), id);
     );
 
-    m.add_DisplayObject(id, t.release());
+    m.addDisplayObject(id, t.release());
 }
 
 void

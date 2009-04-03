@@ -739,7 +739,7 @@ Button::set_current_state(MouseState new_state)
                 const cxform& cx = bdef.m_button_cxform;
                 int ch_depth = bdef.m_button_layer + 
                     DisplayObject::staticDepthOffset + 1;
-                int ch_id = bdef.m_DisplayObject_id;
+                int ch_id = bdef._id;
 
                 DisplayObject* ch = bdef.m_character_def->createDisplayObject(
                         this, ch_id);
@@ -839,7 +839,7 @@ Button::pointInShape(boost::int32_t x, boost::int32_t y) const
 as_object*
 Button::get_path_element(string_table::key key)
 {
-    as_object* ch = get_path_element_DisplayObject(key);
+    as_object* ch = getPathElementSeparator(key);
     if ( ch ) return ch;
 
     const std::string& name = _vm.getStringTable().value(key);
@@ -901,7 +901,7 @@ Button::stagePlacementCallback(as_object* initObj)
         const SWFMatrix& mat = bdef.m_button_matrix;
         const cxform& cx = bdef.m_button_cxform;
         int ch_depth = bdef.m_button_layer+DisplayObject::staticDepthOffset+1;
-        int ch_id = bdef.m_DisplayObject_id;
+        int ch_id = bdef._id;
 
         DisplayObject* ch =
             bdef.m_character_def->createDisplayObject(this, ch_id);
@@ -935,7 +935,7 @@ Button::stagePlacementCallback(as_object* initObj)
         const SWFMatrix& mat = bdef.m_button_matrix;
         const cxform& cx = bdef.m_button_cxform;
         int ch_depth = bdef.m_button_layer+DisplayObject::staticDepthOffset+1;
-        int ch_id = bdef.m_DisplayObject_id;
+        int ch_id = bdef._id;
 
         DisplayObject* ch = bdef.m_character_def->createDisplayObject(
                 this, ch_id);
@@ -1051,7 +1051,7 @@ Button::get_member(string_table::key name_key, as_value* val,
     // FIXME: use addProperty interface for these !!
     // TODO: or at least have a DisplayObject:: protected method take
     //       care of these ?
-    //       Duplicates code in DisplayObject::get_path_element_DisplayObject too..
+    //       Duplicates code in DisplayObject::getPathElementSeparator too..
     //
     if (name_key == NSV::PROP_uROOT) {
         // getAsRoot() will take care of _lockroot

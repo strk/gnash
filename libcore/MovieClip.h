@@ -219,7 +219,7 @@ public:
 
     play_state get_play_state() const { return m_play_state; }
 
-    DisplayObject* get_DisplayObject(int DisplayObject_id);
+    DisplayObject* getDisplayObject(int DisplayObject_id);
 
     // delegates to movie_root (possibly wrong)
     virtual float get_background_alpha() const;
@@ -348,7 +348,7 @@ public:
     //
     /// @return NULL if the specified depth is available (no chars there)
     ///
-    DisplayObject* get_DisplayObject_at_depth(int depth);
+    DisplayObject* getDisplayObjectAtDepth(int depth);
 
     DisplayObject* add_empty_movieclip(const std::string& name, int depth);
 
@@ -378,19 +378,19 @@ public:
     DisplayObject* add_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::move_DisplayObject()
+    /// Proxy of DisplayList::moveDisplayObject()
     void move_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::replace_DisplayObject()
+    /// Proxy of DisplayList::replaceDisplayObject()
     void replace_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::remove_DisplayObject()
+    /// Proxy of DisplayList::removeDisplayObject()
     void remove_display_object(const SWF::PlaceObject2Tag* tag,
             DisplayList& dlist);
 
-    /// Proxy of DisplayList::remove_DisplayObject()
+    /// Proxy of DisplayList::removeDisplayObject()
     ///
     /// @
     /// new DisplayObject to be used for replacing.
@@ -426,7 +426,7 @@ public:
     void remove_display_object(int depth, int /* id */)
     {
         set_invalidated();
-        m_display_list.remove_DisplayObject(depth);
+        m_display_list.removeDisplayObject(depth);
     }
 
     void unloadMovie();
@@ -984,9 +984,9 @@ private:
 
 protected:
 
-    void place_DisplayObject(DisplayObject* ch, int depth)  
+    void placeDisplayObject(DisplayObject* ch, int depth)  
     {       
-        m_display_list.place_DisplayObject(ch, depth);  
+        m_display_list.placeDisplayObject(ch, depth);  
     }
 
     /// Execute the tags associated with the specified frame.

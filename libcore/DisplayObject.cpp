@@ -145,7 +145,7 @@ DisplayObject::get_world_cxform() const
 
 
 as_object*
-DisplayObject::get_path_element_DisplayObject(string_table::key key)
+DisplayObject::getPathElementSeparator(string_table::key key)
 {
 	if (_vm.getSWFVersion() > 4 && key == NSV::PROP_uROOT)
 	{

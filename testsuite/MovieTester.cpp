@@ -318,7 +318,7 @@ MovieTester::findDisplayItemByName(const MovieClip& mc,
 		const std::string& name) 
 {
 	const DisplayList& dlist = mc.getDisplayList();
-	return dlist.get_DisplayObject_by_name(name);
+	return dlist.getDisplayObjectByName(name);
 }
 
 const DisplayObject*
@@ -326,7 +326,7 @@ MovieTester::findDisplayItemByDepth(const MovieClip& mc,
 		int depth)
 {
 	const DisplayList& dlist = mc.getDisplayList();
-	return dlist.get_DisplayObject_at_depth(depth);
+	return dlist.getDisplayObjectAtDepth(depth);
 }
 
 void
