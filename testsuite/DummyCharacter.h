@@ -51,6 +51,10 @@ public:
 	{
 	}
 
+    virtual void display() {}
+
+    virtual rect getBounds() const { return rect(); }
+
     InteractiveDisplayObject* topmostMouseEntity(boost::int32_t, boost::int32_t)
     {
         return 0;
