@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -51,9 +51,9 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.advance();  // advance to the second frame.
 
-	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
+	const DisplayObject* mc1 = tester.findDisplayItemByName(*root, "square1");
 	check(mc1);
-	const character* mc2 = tester.findDisplayItemByName(*root, "square2");
+	const DisplayObject* mc2 = tester.findDisplayItemByName(*root, "square2");
 	check(mc2);
 
 	check_equals(mc1->isVisible(), true);

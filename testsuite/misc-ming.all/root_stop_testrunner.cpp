@@ -24,7 +24,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -48,7 +48,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->get_play_state(), MovieClip::STOP);
 
-	const character* ch = tester.findDisplayItemByName(*root, "mc_in_root");
+	const DisplayObject* ch = tester.findDisplayItemByName(*root, "mc_in_root");
 	check(ch);
 	const MovieClip* mc = dynamic_cast<const MovieClip*>(ch);
 	check(mc);

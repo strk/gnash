@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 #include "URL.h"
@@ -43,7 +43,7 @@ boost::intrusive_ptr<MovieClip> root;
 MovieClip*
 getCoverArt()
 {
-	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
+	DisplayObject* coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	MovieClip* coverart = coverartch->to_movie();
 
 	//log_debug("Coverart is %p, displaylist is:", coverart);
@@ -103,7 +103,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 1);
 
 	// Verify that 'coverart' exists and is empty
-	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
+	DisplayObject* coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	MovieClip* coverart = coverartch->to_movie();
 	check(coverart);
 	url = coverart->get_movie_definition()->get_url();
@@ -118,7 +118,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester->pressMouseButton();
 	tester->advance(); // loads (should) happen on next advance
 	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
-	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
+	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	check(coverart != coverartch->to_movie());
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), lynchURL.str());
@@ -137,7 +137,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester->click();
 	tester->advance(); // loads (should) happen on next advance
 	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
-	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
+	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), greenURL.str());
 	// TODO: find a way to test if the jpeg is really displayed
@@ -156,7 +156,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester->click();
 	tester->advance(); // loads (should) happen on next advance
 	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
-	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
+	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
 

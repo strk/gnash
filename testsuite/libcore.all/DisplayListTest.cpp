@@ -21,7 +21,7 @@
 
 #include "DisplayList.h"
 #include "as_value.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "log.h"
 #include "VM.h"
 #include "DummyMovieDefinition.h"
@@ -67,20 +67,20 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(dlist1, dlist2);
 
-	// just a couple of characters
-	boost::intrusive_ptr<character> ch1 ( new DummyCharacter(root) );
-	boost::intrusive_ptr<character> ch2 ( new DummyCharacter(root) );
+	// just a couple of DisplayObjects
+	boost::intrusive_ptr<DisplayObject> ch1 ( new DummyCharacter(root) );
+	boost::intrusive_ptr<DisplayObject> ch2 ( new DummyCharacter(root) );
 
-	dlist1.place_character( ch1.get(), 1);
-	dlist1.place_character( ch2.get(), 2);
+	dlist1.place_DisplayObject( ch1.get(), 1);
+	dlist1.place_DisplayObject( ch2.get(), 2);
 
 	check(dlist1 != dlist2);
 
-	dlist2.place_character( ch2.get(), 1);
-	dlist2.place_character( ch1.get(), 2);
+	dlist2.place_DisplayObject( ch2.get(), 1);
+	dlist2.place_DisplayObject( ch1.get(), 2);
 
 	// Resort dlist1 as depth of it's chars has been changed
-	// by place_character calls above :/
+	// by place_DisplayObject calls above :/
 	dlist1.sort();
 
 	check_equals(dlist1, dlist2);

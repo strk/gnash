@@ -37,7 +37,7 @@
  * Description:
  * 
  *  frame2: shape 1 placed at depth -16381 and position 100,300
- *  frame3: instance at depth -16381 replaced by character 2 at position 130,330
+ *  frame3: instance at depth -16381 replaced by DisplayObject 2 at position 130,330
  *  frame4: jump back to frame 2 and stop
  * 
  * Expected behaviour:
@@ -133,7 +133,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: place character at depth 3 (-16381)
+  // Frame 2: place DisplayObject at depth 3 (-16381)
   it1 = SWFMovie_add(mo, (SWFBlock)static1);
   SWFDisplayItem_setDepth(it1, 3);
   SWFDisplayItem_moveTo(it1, 100, 300);
@@ -155,14 +155,14 @@ main(int argc, char** argv)
   check_equals(mo, "static1.name", "'static1'");
   check_equals(mo, "_root.name", "'static1'");
 
-  // Gnash allows custom members to shape characters...
+  // Gnash allows custom members to shape DisplayObjects...
   // this is important to verify, see next check for it after REPLACE
   check_equals(mo, "static1.name", "'static1'");
 
   check_equals(mo, "static1._target", "'/'");
   SWFMovie_nextFrame(mo); 
 
-  // Frame 3: replace instance at depth -16381 with character 2
+  // Frame 3: replace instance at depth -16381 with DisplayObject 2
   if ( SWFMovie_replace(mo, it1, (SWFBlock)static2) )
   {
 	  abort(); // grace and beauty...
@@ -181,7 +181,7 @@ main(int argc, char** argv)
 			), SWFACTION_CONSTRUCT);
 
 
-  // Can still reference the old character and it's variables, after replace
+  // Can still reference the old DisplayObject and it's variables, after replace
   xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
   xcheck_equals(mo, "static1", "_root");
   xcheck_equals(mo, "static1.name", "'static1'");
@@ -210,7 +210,7 @@ main(int argc, char** argv)
     // Shapes don't get their onConstruct event invoked !
     "check_equals(typeof(_root.depth3Constructed), 'undefined');"
 
-    // Original character name is still referenceable
+    // Original DisplayObject name is still referenceable
     "check_equals(typeof(static1), 'movieclip');"
 
     // And it still has it's user-provided property

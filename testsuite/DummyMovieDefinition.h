@@ -50,7 +50,7 @@ class DummyMovieDefinition : public movie_definition
 
 public:
 
-        virtual character* createDisplayObject(character*, int /* id */) { return 0; }
+        virtual DisplayObject* createDisplayObject(DisplayObject*, int /* id */) { return 0; }
 
 
 	/// Default constructor
@@ -129,7 +129,7 @@ public:
 	}
 	
 	/// Create a playable movie instance from a def.
-	virtual movie_instance* create_movie_instance(character* parent=NULL)
+	virtual movie_instance* create_movie_instance(DisplayObject* parent=NULL)
 	{
 		return new movie_instance(this, parent);
 	}

@@ -47,7 +47,7 @@
  *
  * Deduction:
  *
- *   (1) different characters in the removed depths zone could share the same depth.
+ *   (1) different DisplayObjects in the removed depths zone could share the same depth.
  *   (2) DisplayList::testInvariant() probably fails.
  *
  */

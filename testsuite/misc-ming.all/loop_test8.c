@@ -19,7 +19,7 @@
 /*
  * zou lunkai  zoulunkai@gmail.com
  *
- * Test " Jumping backward to the middle of a character's lifetime after removal and replacement(3)"
+ * Test " Jumping backward to the middle of a DisplayObject's lifetime after removal and replacement(3)"
  *
  * Timeline:
  * 

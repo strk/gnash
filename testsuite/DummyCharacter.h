@@ -18,7 +18,7 @@
 #ifndef GNASH_DUMMYCHARACTER_H
 #define GNASH_DUMMYCHARACTER_H
 
-#include "character.h" // for inheritance
+#include "InteractiveDisplayObject.h" // for inheritance
 #include "rect.h" // for composition
 #include "movie_instance.h" // for create_movie_instance
 #include "snappingrange.h" // for InvalidatedRanges typedef (don't like it)
@@ -40,14 +40,14 @@ namespace gnash
 /// values for XXXXXXXXXXXXXXXXXXXXXXXXXX etc..
 ///
 ///
-class DummyCharacter : public character
+class DummyCharacter : public InteractiveDisplayObject
 {
 
 public:
 
-	DummyCharacter(character* parent)
+	DummyCharacter(DisplayObject* parent)
 		:
-		character(parent, parent ? 0 : -1)
+		InteractiveDisplayObject(parent, parent ? 0 : -1)
 	{
 	}
 

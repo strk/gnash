@@ -36,9 +36,9 @@
  * 
  * Description:
  * 
- *  frame2: character 1 placed at depth -16381 
- *  frame3: remove character -16381 
- *  frame4: character 1 placed at depth -16381 (same character id)
+ *  frame2: DisplayObject 1 placed at depth -16381 
+ *  frame3: remove DisplayObject -16381 
+ *  frame4: DisplayObject 1 placed at depth -16381 (same DisplayObject id)
  *  frame5: jump back to frame 2 and stop
  * 
  * Expected behaviour:
@@ -121,7 +121,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: place a static character at depth 3 (-16381)
+  // Frame 2: place a static DisplayObject at depth 3 (-16381)
   it1 = SWFMovie_add(mo, (SWFBlock)static3);
   SWFDisplayItem_setDepth(it1, 3);
   SWFDisplayItem_setName(it1, "static1");
@@ -137,12 +137,12 @@ main(int argc, char** argv)
 			), SWFACTION_CONSTRUCT);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 3: remove character at depth -16381 
+  // Frame 3: remove DisplayObject at depth -16381 
   SWFDisplayItem_remove(it1);
   add_actions(mo, "check_equals(typeof(static1), 'undefined');"); // the replacement failed
   SWFMovie_nextFrame(mo); 
  
-  // Frame 4: place same static character at depth 3 (-16381)
+  // Frame 4: place same static DisplayObject at depth 3 (-16381)
   it1 = SWFMovie_add(mo, (SWFBlock)static3);
   SWFDisplayItem_setDepth(it1, 3);
   SWFDisplayItem_setName(it1, "static2");

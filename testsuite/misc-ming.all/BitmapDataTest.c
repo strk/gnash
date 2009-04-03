@@ -122,11 +122,11 @@ main(int argc, char** argv)
 
     SWFMovie_nextFrame(mo);
     
-    // Place a dynamic character at depth 4
+    // Place a dynamic DisplayObject at depth 4
     add_actions(mo, "mc.removeMovieClip();"
             "_root.attachMovie('redsquare', 'rs', 4);");
 
-    // Place a static character at depth 3
+    // Place a static DisplayObject at depth 3
     staticSquare = newSWFMovieClip();
     shape = make_fill_square (300, 0, 60, 60, 255, 0, 255, 255, 0, 255);
     SWFMovieClip_add(staticSquare, (SWFBlock)shape);  

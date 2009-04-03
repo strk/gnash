@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 #include "GnashException.h"
@@ -80,7 +80,7 @@ main(int /*argc*/, char** /*argv*/)
 	{
 		check_equals(root->get_current_frame(), i%framecount);
 
-		// Out of any character
+		// Out of any DisplayObject
 		check_pixel(317, 430, 2, white, 2);
 
 		// Fully on the red square: 317,330
@@ -113,7 +113,7 @@ main(int /*argc*/, char** /*argv*/)
 		{
 			blackOverRed = !blackOverRed;
 			
-			// Check the intersection of the two characters to
+			// Check the intersection of the two DisplayObjects to
 			// be invalidated
 			check( tester.getInvalidatedRanges().contains(343, 330) );
 		}
