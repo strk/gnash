@@ -429,8 +429,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
             create_library_movie(url, _runInfo));
 	if (!md)
 	{
-		log_error(_("can't create movie_definition for %s"),
-			url.str());
+		log_error(_("can't create movie_definition for %s"), url.str());
 		return false;
 	}
 
@@ -438,8 +437,8 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	extern_movie = md->create_movie_instance();
 	if (extern_movie == NULL)
 	{
-		log_error(_("can't create extern movie_instance "
-			"for %s"), url.str());
+		log_error(_("can't create extern movie_instance for %s"),
+                url.str());
 		return false;
 	}
 
@@ -565,7 +564,7 @@ movie_root::notify_mouse_moved(int x, int y)
 
     m_mouse_x = x;
     m_mouse_y = y;
-    notify_mouse_listeners(event_id(event_id::MOUSE_MOVE));
+    notify_mouse_listeners(event_id::MOUSE_MOVE);
     return fire_mouse_event();
 
 }
@@ -586,11 +585,9 @@ movie_root::getKeyObject()
 		as_value kval;
 		as_object* global = _vm.getGlobal();
 
-		if (global->get_member(NSV::CLASS_KEY, &kval) )
-		{
-			//log_debug("Found member 'Key' in _global: %s", kval.to_string());
+		if (global->get_member(NSV::CLASS_KEY, &kval)) {
+
 			boost::intrusive_ptr<as_object> obj = kval.to_object();
-			//log_debug("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
 			_keyobject = boost::dynamic_pointer_cast<Key_as>( obj );
 		}
 	}
@@ -619,7 +616,7 @@ movie_root::getMouseObject()
 }
 
 
-Key_as *
+Key_as*
 movie_root::notify_global_key(key::code k, bool down)
 {
     // NOTE: we don't check SWF version here
@@ -706,21 +703,6 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 
 	return fire_mouse_event();
 }
-
-#if 0
-void
-movie_root::notify_mouse_state(int x, int y, int buttons)
-{
-	assert(testInvariant());
-
-    m_mouse_x = x;
-    m_mouse_y = y;
-    m_mouse_buttons = buttons;
-    fire_mouse_event();
-
-	assert(testInvariant());
-}
-#endif
 
 // Return whether any action triggered by this event requires display redraw.
 // See page about events_handling (in movie_interface.h)
@@ -857,16 +839,16 @@ movie_root::fire_mouse_event()
     if ( draggingChar ) dragging = draggingChar->to_movie();
     if ( dragging )
     {
-	// TODO: optimize making findDropTarget and getTopmostMouseEntity
-	//       use a single scan.
+        // TODO: optimize making findDropTarget and getTopmostMouseEntity
+        //       use a single scan.
         const DisplayObject* dropChar = findDropTarget(x, y, dragging);
         if ( dropChar )
         {
             // Use target of closest script DisplayObject containing this
-	    dropChar = dropChar->getClosestASReferenceableAncestor();
+            dropChar = dropChar->getClosestASReferenceableAncestor();
             dragging->setDropTarget(dropChar->getTargetPath());
         }
-	else dragging->setDropTarget("");
+        else dragging->setDropTarget("");
 
     }
 

@@ -644,18 +644,13 @@ public:
     ///
     bool hasEventHandler(const event_id& id) const;
 
-	/// DisplayObject is NEVER a mouse entity by default, so
-	/// the default implementation of this method always returns NULL.
-	/// Override it from subclasses that do can be mouse entities.
-	///
-	/// If you need to check for a generic DisplayObject to contain a 
-	/// given point, use the pointInShape() function instead.
-	/// 
+	/// DisplayObjects are not a mouse entity by default.
+    //
+    /// Override this function for InteractiveDisplayObjects.
 	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t, 
-            boost::int32_t)
-	{
-		return 0;
-	}
+            boost::int32_t) {
+        return 0;
+    }
 	
     /// Find highest depth DisplayObject whose shape contains the given
     /// point and is not the DisplayObject being dragged or any of its childs.
