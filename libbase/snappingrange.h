@@ -1,5 +1,5 @@
 // 
-//     Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
 // 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
-// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA    02110-1301    USA
-
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
 #ifndef GNASH_SNAPPINGRANGE_H
@@ -54,14 +53,14 @@ namespace geometry {
 /// shapes, don't get merged, like in the following example:
 ///
 ///                    +---+
-///                    |     |        
-///                    |     |        
-///                    |     |        
-///                    |     |        
-///                    |     |
+///                    |   |        
+///                    |   |        
+///                    |   |        
+///                    |   |        
+///                    |   |
 ///                    +---+
 ///     +-----------------------------------+
-///     |                                                                     |
+///     |                                   |
 ///     +-----------------------------------+        
 ///
 /// Merging these two ranges would create a much bigger range which in some
