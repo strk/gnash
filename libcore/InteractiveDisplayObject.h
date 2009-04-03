@@ -113,7 +113,7 @@ public:
     /// @param y
     ///     Y ordinate of the pointer, in parent's coordiante space.
     ///
-    virtual DisplayObject* get_topmost_mouse_entity(boost::int32_t /*x*/,
+    virtual InteractiveDisplayObject* get_topmost_mouse_entity(boost::int32_t /*x*/,
             boost::int32_t /*y*/)
     {
         return 0;

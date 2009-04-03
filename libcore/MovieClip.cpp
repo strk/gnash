@@ -217,7 +217,7 @@ public:
     /// @param pp
     ///     Query point in parent coordinate space
     ///
-MouseEntityFinder(point wp, point pp)
+    MouseEntityFinder(point wp, point pp)
         :
         _highestHiddenDepth(std::numeric_limits<int>::min()),
         _m(NULL),
@@ -277,7 +277,7 @@ MouseEntityFinder(point wp, point pp)
         for (Candidates::reverse_iterator i=_candidates.rbegin(),
                         e=_candidates.rend(); i!=e; ++i) {
             DisplayObject* ch = *i;
-            DisplayObject* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
+            InteractiveDisplayObject* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
             if (te) {
                 _m = te;
                 break;
@@ -286,7 +286,7 @@ MouseEntityFinder(point wp, point pp)
         _checked = true;
     }
 
-    DisplayObject* getEntity()
+    InteractiveDisplayObject* getEntity()
     {
         checkCandidates();
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
@@ -311,7 +311,7 @@ private:
     ///
     int _highestHiddenDepth;
 
-    DisplayObject* _m;
+    InteractiveDisplayObject* _m;
 
     typedef std::vector<DisplayObject*> Candidates;
     Candidates _candidates;
@@ -1753,7 +1753,7 @@ MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
     }
 }
 
-DisplayObject*
+InteractiveDisplayObject*
 MovieClip::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
@@ -1785,12 +1785,12 @@ MovieClip::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 
     MouseEntityFinder finder(wp, pp);
     m_display_list.visitAll(finder);
-    DisplayObject* ch = finder.getEntity();
+    InteractiveDisplayObject* ch = finder.getEntity();
 
     // It doesn't make any sense to query _drawable_inst, as it's
     // a generic DisplayObject and not a referencable DisplayObject.
 
-    return ch; // might be NULL
+    return ch; 
 }
 
 /// Find the first visible DisplayObject whose shape contain the point

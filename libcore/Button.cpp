@@ -387,7 +387,7 @@ Button::display()
 }
 
 
-DisplayObject*
+InteractiveDisplayObject*
 Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
@@ -418,7 +418,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
         {
             DisplayObject* ch = *it;
             if ( ! ch->isVisible() ) continue;
-            DisplayObject *hit = ch->get_topmost_mouse_entity(p.x, p.y);
+            InteractiveDisplayObject *hit = ch->get_topmost_mouse_entity(p.x, p.y);
             if ( hit ) return hit;
         }
     }

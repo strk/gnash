@@ -500,7 +500,7 @@ TextField::on_event(const event_id& ev)
     return true;
 }
 
-DisplayObject*
+InteractiveDisplayObject*
 TextField::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 {
 
@@ -508,7 +508,7 @@ TextField::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
     
     // shouldn't this be !can_handle_mouse_event() instead ?
     // not selectable, so don't catch mouse events!
-    if (!_selectable) return NULL;
+    if (!_selectable) return 0;
 
     SWFMatrix m = getMatrix();
     point p(x, y);
@@ -516,7 +516,7 @@ TextField::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 
     if ( _bounds.point_test(p.x, p.y) )    return this;
 
-    return NULL;
+    return 0;
 }
 
 void

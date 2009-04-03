@@ -51,6 +51,7 @@ namespace gnash {
     class action_buffer;
     class movie_definition;
     class StaticText;
+    class InteractiveDisplayObject;
     namespace SWF {
         class TextRecord;
     }
@@ -673,8 +674,8 @@ public:
 	/// If you need to check for a generic DisplayObject to contain a 
 	/// given point, use the pointInShape() function instead.
 	/// 
-	virtual DisplayObject* get_topmost_mouse_entity(boost::int32_t /*x*/, 
-            boost::int32_t /*y*/)
+	virtual InteractiveDisplayObject* get_topmost_mouse_entity(boost::int32_t, 
+            boost::int32_t)
 	{
 		return 0;
 	}

@@ -249,7 +249,7 @@ public:
     /// Return the topmost entity that the given point
     /// covers that can receive mouse events.  NULL if
     /// none.  Coords are in parent's frame.
-    virtual DisplayObject* get_topmost_mouse_entity(boost::int32_t x,
+    virtual InteractiveDisplayObject* get_topmost_mouse_entity(boost::int32_t x,
             boost::int32_t y);
 
     // see dox in DisplayObject.h
