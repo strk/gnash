@@ -712,12 +712,12 @@ Gui::display(movie_root* m)
 		changed_ranges.growBy(40.0f / _xscale);
 		
 		// optimize ranges
-		changed_ranges.combine_ranges();
+		changed_ranges.combineRanges();
 		
 	}
-
-	if (redraw_flag)     // TODO: Remove this and want_redraw to avoid confusion!?
-	{
+    
+    // TODO: Remove this and want_redraw to avoid confusion!?
+	if (redraw_flag)  {
 		changed_ranges.setWorld();
 	}
 	

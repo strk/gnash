@@ -775,6 +775,12 @@ public:
     DSOEXPORT std::string callInterface(const std::string& cmd,
             const std::string& arg = std::string()) const;
 
+    /// Send an error message to the hosting application.
+    //
+    /// @param msg  A message to send describing the error.
+    //
+    /// The hosting app decides what to do with the message, or whether it
+    /// wants to do anything at all. It may show a popup box.
     DSOEXPORT void errorInterface(const std::string& msg) const;
 
     /// Called from the ScriptLimits tag parser to set the
