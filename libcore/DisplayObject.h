@@ -59,9 +59,13 @@ namespace gnash {
 
 namespace gnash {
 
-/// Character is a live, stateful instance of a character_def.
+/// DisplayObject is the base class for all DisplayList objects.
 //
-/// It represents a single active element in a movie.
+/// It represents a single active element in a movie. This class does not
+/// provide any interactivity.
+//
+/// Derived classes include InteractiveDisplayObject, StaticText, Bitmap,
+/// Video, and Shape.
 class DisplayObject : public as_object
 {
 
@@ -87,8 +91,8 @@ public:
     static const int upperAccessibleBound = 2130690044;
 
     /// This is the amount added to displaylist tag defined depths.
-    /// Character placed by tags (vs. DisplayObjects instantiated by ActionScript)
-    /// always have negative depths by effect of this offset.
+    /// DisplayObjects placed by tags (vs. DisplayObjects instantiated by
+    /// ActionScript) always have negative depths by effect of this offset.
     static const int staticDepthOffset = lowerAccessibleBound;
 
     /// This is the offset at which DisplayObject's depth is
@@ -106,8 +110,6 @@ public:
     ///   3:  Max depth for a PlaceoObject call is 16384 (which becomes 
     ///       0 in the statics)
     /// (all of the above correct?)
-    ///
-    ///
     static const int removedDepthOffset = -32769; 
 
     /// Return true if the given depth is in the removed zone

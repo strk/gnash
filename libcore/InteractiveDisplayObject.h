@@ -34,9 +34,12 @@ namespace gnash {
 
 namespace gnash {
 
-/// The base class for all rendered objects on the Stage.
+/// The base class for interactive objects.
 //
-/// Objects of type DisplayObject are non-interactive.
+/// Objects of type InteractiveDisplayObject can receive focus, mouse events,
+/// and key events for user interaction.
+//
+/// Derived classes include TextField, Button, and MovieClip.
 class InteractiveDisplayObject : public DisplayObject
 {
 
