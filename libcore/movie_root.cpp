@@ -735,7 +735,7 @@ movie_root::generate_mouse_button_events()
 	// Did this event trigger any action that needs redisplay ?
 	bool need_redisplay = false;
 
-    // TODO: have on_button_event return
+    // TODO: have mouseEvent return
     // whether the action must trigger
     // a redraw.
 
@@ -745,51 +745,44 @@ movie_root::generate_mouse_button_events()
 	    {
 		    // TODO: Handle trackAsMenu dragOver
 		    // Handle onDragOut, onDragOver
-		    if (!ms.wasInsideActiveEntity)
-		    {
-			    if (ms.topmostEntity == ms.activeEntity)
-			    {
+		    if (!ms.wasInsideActiveEntity) {
+
+			    if (ms.topmostEntity == ms.activeEntity) {
+
 				    // onDragOver
-				    if (ms.activeEntity)
-				    {
-					    ms.activeEntity->on_button_event(event_id::DRAG_OVER);
+				    if (ms.activeEntity) {
+					    ms.activeEntity->mouseEvent(event_id::DRAG_OVER);
 					    need_redisplay=true;
 				    }
 				    ms.wasInsideActiveEntity = true;
 			    }
 		    }
-		    else if (ms.topmostEntity != ms.activeEntity)
-		    {
+		    else if (ms.topmostEntity != ms.activeEntity) {
 			    // onDragOut
-			    if (ms.activeEntity)
-			    {
-				    ms.activeEntity->on_button_event(event_id::DRAG_OUT);
+			    if (ms.activeEntity) {
+				    ms.activeEntity->mouseEvent(event_id::DRAG_OUT);
 				    need_redisplay=true;
 			    }
 			    ms.wasInsideActiveEntity = false;
 		    }
 
 		    // Handle onRelease, onReleaseOutside
-		    if (ms.currentButtonState == MouseButtonState::UP)
-		    {
+		    if (ms.currentButtonState == MouseButtonState::UP) {
 			    // Mouse button just went up.
 			    ms.previousButtonState = MouseButtonState::UP;
 
-			    if (ms.activeEntity)
-			    {
-				    if (ms.wasInsideActiveEntity)
-				    {
+			    if (ms.activeEntity) {
+				    if (ms.wasInsideActiveEntity) {
 					    // onRelease
-					    ms.activeEntity->on_button_event(event_id::RELEASE);
+					    ms.activeEntity->mouseEvent(event_id::RELEASE);
 					    need_redisplay = true;
 				    }
-				    else
-				    {
+				    else {
 					    // TODO: Handle trackAsMenu 
 					    // onReleaseOutside
-					    ms.activeEntity->on_button_event(event_id::RELEASE_OUTSIDE);
+					    ms.activeEntity->mouseEvent(event_id::RELEASE_OUTSIDE);
 					    // We got out of active entity
-					    ms.activeEntity = NULL; // so we don't get RollOut next...
+					    ms.activeEntity = 0; // so we don't get RollOut next...
 					    need_redisplay = true;
 				    }
 			    }
@@ -797,25 +790,22 @@ movie_root::generate_mouse_button_events()
 	        return need_redisplay;
 	    }
 
-
 	    case MouseButtonState::UP:
         {
 	        // New active entity is whatever is below the mouse right now.
 	        if (ms.topmostEntity != ms.activeEntity)
 	        {
 		        // onRollOut
-		        if (ms.activeEntity != NULL)
-		        {
-			        ms.activeEntity->on_button_event(event_id::ROLL_OUT);
+		        if (ms.activeEntity) {
+			        ms.activeEntity->mouseEvent(event_id::ROLL_OUT);
 			        need_redisplay=true;
 		        }
 
 		        ms.activeEntity = ms.topmostEntity;
 
 		        // onRollOver
-		        if (ms.activeEntity != NULL)
-		        {
-			        ms.activeEntity->on_button_event(event_id::ROLL_OVER);
+		        if (ms.activeEntity) {
+			        ms.activeEntity->mouseEvent(event_id::ROLL_OVER);
 			        need_redisplay=true;
 		        }
 
@@ -823,8 +813,7 @@ movie_root::generate_mouse_button_events()
 	        }
 
 	        // mouse button press
-	        if (ms.currentButtonState == MouseButtonState::DOWN )
-	        {
+	        if (ms.currentButtonState == MouseButtonState::DOWN) {
 		        // onPress
 
                 // Try setting focus on the new DisplayObject. This will handle
@@ -833,7 +822,7 @@ movie_root::generate_mouse_button_events()
                 if (ms.activeEntity) {
                     setFocus(ms.activeEntity);
 
-			        ms.activeEntity->on_button_event(event_id::PRESS);
+			        ms.activeEntity->mouseEvent(event_id::PRESS);
 			        need_redisplay=true;
 		        }
 
@@ -1943,14 +1932,14 @@ InteractiveDisplayObject*
 movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
 {
 
-	for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend();
+	for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend();
             i != e; ++i)
 	{
 		InteractiveDisplayObject* ret = i->second->topmostMouseEntity(x, y);
 		if (ret) return ret;
 	}
 
-	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend();
+	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
             i != e; ++i)
 	{
 		InteractiveDisplayObject* ret = i->second->topmostMouseEntity(x, y);

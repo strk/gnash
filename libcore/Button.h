@@ -114,7 +114,7 @@ public:
 	/// Overridden to look in button records for a match
 	virtual as_object* get_path_element(string_table::key key);
 
-	virtual void on_button_event(const event_id& event);
+	virtual void mouseEvent(const event_id& event);
 
     virtual bool handleFocus();
 

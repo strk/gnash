@@ -454,7 +454,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
 
 void
-Button::on_button_event(const event_id& event)
+Button::mouseEvent(const event_id& event)
 {
     if ( isUnloaded() )
     {

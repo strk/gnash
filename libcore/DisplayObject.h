@@ -662,11 +662,6 @@ public:
     ///
     bool hasEventHandler(const event_id& id) const;
 
-    virtual void on_button_event(const event_id& id)
-    {
-        on_event(id);
-    }
-
 	/// DisplayObject is NEVER a mouse entity by default, so
 	/// the default implementation of this method always returns NULL.
 	/// Override it from subclasses that do can be mouse entities.
