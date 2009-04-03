@@ -293,8 +293,6 @@ public:
     ///     
     bool isMaskLayer() const
     {
-        // TODO: is dynClipDepthValue still needed ?
-        //       since we have a _maskee member now, we may use that instead..
         return (m_clip_depth != noClipDepthValue && !_maskee);
     }
 
