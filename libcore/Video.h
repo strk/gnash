@@ -59,7 +59,7 @@ public:
 		return pointInBounds(x, y);
 	}
 
-	rect getBounds() const;
+	virtual rect getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
 	virtual void advance();
@@ -106,10 +106,6 @@ public:
 
 protected:
     
-    virtual character_def* getDefinition() const {
-        return m_def.get();
-    }
-
 #ifdef GNASH_USE_GC
 	/// Mark video-specific reachable resources and invoke
 	/// the parent's class version (markDisplayObjectReachable)

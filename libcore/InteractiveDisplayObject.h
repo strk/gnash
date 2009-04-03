@@ -84,7 +84,7 @@ public:
     ///
     virtual rect getBounds() const
     {
-        log_error("FIXME: DisplayObject %s did not override the "
+        log_error("FIXME: InteractiveDisplayObject %s did not override the "
                 "getBounds() method", typeName(*this));
         return rect();
     }
@@ -136,14 +136,6 @@ public:
 
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force) = 0;
-
-protected:
-
-    /// Retrieve the immutable definition of this InteractiveDisplayObject.
-    //
-    /// @ return    The immutable character_def of this DisplayObject
-    ///             or 0 if none exists.
-    virtual character_def* getDefinition() const { return 0; };
 
 };
 

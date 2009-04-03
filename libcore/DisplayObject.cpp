@@ -209,7 +209,6 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
 	// needs to be re-drawn.
 	if ( m_parent ) m_parent->set_child_invalidated(); 
   
-  
 	// Ok, at this point the instance will change it's
 	// visual aspect after the
 	// call to set_invalidated(). We save the *current*
@@ -240,28 +239,14 @@ DisplayObject::set_invalidated(const char* debug_file, int debug_line)
 
 }
 
-bool
-DisplayObject::pointInShape(boost::int32_t  x, boost::int32_t  y) const
-{
-    SWFMatrix wm = getWorldMatrix();
-    SWFMatrix wm_inverse = wm.invert();
-    point lp(x, y);
-    wm_inverse.transform(lp);
-    return getDefinition()->point_test_local(lp.x, lp.y, wm);
-}
-
-
 void
-DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges,
-        bool force)
+DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
     ranges.add(m_old_invalidated_ranges);
     if (isVisible() && (m_invalidated||force))
     {
         rect bounds;        
-        bounds.expand_to_transformed_rect(getWorldMatrix(),
-                        getDefinition()->get_bound());
-
+        bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
         ranges.add(bounds.getRange());                        
     }        
 }

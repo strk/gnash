@@ -46,12 +46,13 @@ public:
 
 	virtual void display();
 
-protected:
-
-    character_def* getDefinition() const
-    {
-        return _def.get();
+    virtual rect getBounds() const {
+        return _def->get_bound();
     }
+    
+    virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+
+protected:
 
 #ifdef GNASH_USE_GC
 	/// Mark reachable resources (for the GC)

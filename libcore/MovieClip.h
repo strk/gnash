@@ -155,7 +155,7 @@ public:
     }
 
     /// Get the composite bounds of all component drawing elements
-    rect getBounds() const;
+    virtual rect getBounds() const;
 
     // See dox in DisplayObject.h
     bool pointInShape(boost::int32_t x, boost::int32_t y) const;

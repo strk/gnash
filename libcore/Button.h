@@ -124,7 +124,7 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 	
-	rect getBounds() const;
+	virtual rect getBounds() const;
 	
 	// See dox in DisplayObject.h
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;

@@ -161,7 +161,7 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-	rect getBounds() const
+	virtual rect getBounds() const
 	{
 		return _bounds;
 	}

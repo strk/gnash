@@ -433,8 +433,7 @@ public:
     ///
     boost::int32_t get_height() const
     {
-        rect bounds = getBounds();
-        return bounds.height();
+        return getBounds().height();
     }
 
     /// Returns local, untransformed width of this DisplayObject in TWIPS
@@ -443,22 +442,17 @@ public:
     ///
     boost::int32_t get_width() const
     {
-        rect bounds = getBounds();
-        return bounds.width();
+        return getBounds().width();
     }
 
-	virtual rect getBounds() const
-    {
-        assert(getDefinition());
-		return getDefinition()->get_bound();
-	}
+	virtual rect getBounds() const = 0;
 
     /// Return true if the given point falls in this DisplayObject's bounds
     //
     /// @param x        Point x coordinate in world space
     /// @param y        Point y coordinate in world space
-    /// @return         Whether (x, y) is within the DisplayObject's bounds. This
-    ///                 ignores _root's transform. 
+    /// @return         Whether (x, y) is within the DisplayObject's bounds.
+    ///                 This ignores _root's transform. 
     bool pointInBounds(boost::int32_t x, boost::int32_t y) const
     {
         rect bounds = getBounds();
@@ -467,9 +461,9 @@ public:
         return bounds.point_test(x, y);
     }
 
-	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const = 0;
 
-    /// Return true if the given point falls in this DisplayObject's visible shape
+    /// true if the given point falls in this DisplayObject's visible shape
     //
     /// Point coordinates are in world TWIPS
     ///
@@ -1036,15 +1030,6 @@ public:
   /// @} Common ActionScript getter-setters for DisplayObjects
 
 protected:
-
-    /// Retrieve the immutable definition of this DisplayObject.
-    //
-    /// All subclasses must override this, but may return 0. In
-    /// this case, they must also override any functions that
-    /// call getDefinition().
-    /// @ return    The immutable character_def of this DisplayObject
-    ///             or 0 if none exists.
-    virtual character_def* getDefinition() const = 0;
 
     /// Register currently computable target as
     /// the "original" one. This will be used by
