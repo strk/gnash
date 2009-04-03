@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -46,13 +46,13 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
-	const character* mc1 = tester.findDisplayItemByName(*root, "mc1");
+	const DisplayObject* mc1 = tester.findDisplayItemByName(*root, "mc1");
 	check(mc1);
 
-	const character* mc2 = tester.findDisplayItemByName(*root, "mc2");
+	const DisplayObject* mc2 = tester.findDisplayItemByName(*root, "mc2");
 	check(mc2);
 
-	const character* mc3 = tester.findDisplayItemByName(*root, "mc3");
+	const DisplayObject* mc3 = tester.findDisplayItemByName(*root, "mc3");
 	check(mc3);
 
 	check_equals(root->get_current_frame(), 0);

@@ -24,7 +24,7 @@
 #include "VM.h"
 #include "string_table.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 #include "GnashSleep.h"

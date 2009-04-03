@@ -74,11 +74,11 @@ main(int argc, char** argv)
 	
 	it = SWFMovie_add(mo, (SWFBlock)sh1);  
 	SWFDisplayItem_setName(it, "sh1"); 
-	SWFDisplayItem_setDepth(it, 3); //place the sh1 character at depth 3
+	SWFDisplayItem_setDepth(it, 3); //place the sh1 DisplayObject at depth 3
 	
 	it = SWFMovie_add(mo, (SWFBlock)sh2);  
 	SWFDisplayItem_setName(it, "sh2"); 
-	SWFDisplayItem_setDepth(it, 3); //place the sh2 character at depth 3 again!
+	SWFDisplayItem_setDepth(it, 3); //place the sh2 DisplayObject at depth 3 again!
 
 	add_actions(mo, "note('Placed red shape sh1 and black shape sh2 at the same depth 3. Should both be visible, red on top.');");
 
@@ -116,7 +116,7 @@ main(int argc, char** argv)
 	check_equals(mo, "mc1.getDepth()", "mc2.getDepth()");
 
 	// TODO: use SWFMovie_replace and see if it would replace
-	//       only one or both characters at target depth
+	//       only one or both DisplayObjects at target depth
 	//       (not that we can trust Ming stability here..)
 
 	add_actions(mo, "_root.totals(7); stop();");

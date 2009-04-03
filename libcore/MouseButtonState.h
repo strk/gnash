@@ -10,7 +10,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "character_def.h"
 #include "smart_ptr.h" // for composition and inlines
-#include "character.h" // for use in intrusive_ptr
+#include "InteractiveDisplayObject.h" // for use in intrusive_ptr
 
 // Forward declarations
 namespace gnash {
@@ -32,10 +32,10 @@ public:
     };  
 
 	/// entity that currently owns the mouse pointer
-	boost::intrusive_ptr<character>	activeEntity;
+	boost::intrusive_ptr<InteractiveDisplayObject> activeEntity;
 
 	/// what's underneath the mouse right now
-	boost::intrusive_ptr<character>	topmostEntity;
+	boost::intrusive_ptr<InteractiveDisplayObject> topmostEntity;
 
 	/// previous state of mouse button
 	bool previousButtonState;	

@@ -932,7 +932,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
                   boost::bind(&path::transform, _1, boost::ref(mat)));
   }
                   
-  virtual void draw_shape_character(shape_character_def *def, 
+  virtual void drawShape(shape_character_def *def, 
     const SWFMatrix& mat,
     const cxform& cx)
   {

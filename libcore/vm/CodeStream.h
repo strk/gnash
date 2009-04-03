@@ -27,10 +27,10 @@ namespace gnash {
 /// violations.
 class CodeStreamException { };
 
-/// A checked read character array
+/// A checked read DisplayObject array
 ///
 /// CodeStream provides a safe interface to read various things from a
-/// character array of known size.  Any attempt to access memory outside
+/// DisplayObject array of known size.  Any attempt to access memory outside
 /// of the given array will throw an exception of type CodeStreamException
 class CodeStream : private boost::noncopyable
 {
@@ -38,7 +38,7 @@ public:
 	/// Construct a CodeStream
 	///
 	/// @param pStart
-	/// The beginning of the character array
+	/// The beginning of the DisplayObject array
 	///
 	/// @param length
 	/// The length of the array. Memory in [pStart, pStart + length) may
@@ -177,7 +177,7 @@ public:
 		return static_cast<boost::int32_t>(result);
 	}
 
-	/// Read a signed 8-bit character.
+	/// Read a signed 8-bit DisplayObject.
     boost::int8_t read_s8()
 	{
 		if (mCurrent == mEnd)
@@ -185,7 +185,7 @@ public:
 		return static_cast<boost::int8_t> (*mCurrent++);
 	}
 
-	/// Read an unsigned 8-bit character.
+	/// Read an unsigned 8-bit DisplayObject.
 	boost::uint8_t read_u8()
 	{
 		if (mCurrent == mEnd)

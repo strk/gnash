@@ -208,8 +208,8 @@ public:
     /// except the FLV-parser (this might not be correct).
     void close();
 
-    /// Make audio controlled by given character
-    void setAudioController(character* controller);
+    /// Make audio controlled by given DisplayObject
+    void setAudioController(DisplayObject* controller);
  
     /// Pauses/starts the playback of the media played by the current instance
     //
@@ -303,8 +303,8 @@ public:
     ///
     std::auto_ptr<GnashImage> get_video();
     
-    /// Register the character to invalidate on video updates
-    void setInvalidatedVideo(character* ch)
+    /// Register the DisplayObject to invalidate on video updates
+    void setInvalidatedVideo(DisplayObject* ch)
     {
         _invalidatedVideoCharacter = ch;
     }
@@ -421,7 +421,7 @@ protected:
     //
     /// Reachable resources are:
     /// - associated NetConnection object (_netCon)
-    /// - character to invalidate on video updates (_invalidatedVideoCharacter)
+    /// - DisplayObject to invalidate on video updates (_invalidatedVideoCharacter)
     /// - onStatus event handler (m_statusHandler)
     ///
     virtual void markReachableResources() const;
@@ -433,8 +433,8 @@ protected:
     /// Register the advance timer callback
     void startAdvanceTimer();
 
-    /// The character to invalidate on video updates
-    character* _invalidatedVideoCharacter;
+    /// The DisplayObject to invalidate on video updates
+    DisplayObject* _invalidatedVideoCharacter;
 
 private:
 

@@ -23,7 +23,7 @@
  *
  *  expected behaviour:
  *     onButtonAction also respects opcode guard. It is guarded by its parent sprite,
- *     not the button character itself(button._target).
+ *     not the button DisplayObject itself(button._target).
  *
  *  TODO: 
  *    write a testrunner to support mouse and key presses.

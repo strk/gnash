@@ -291,11 +291,11 @@ ActionExec::operator() ()
 
 #if 0
             // curveball.swf and feed.swf break with this
-            character* guardedChar = env.get_original_target(); // watch out : _originalTarget is not necessarely the same
+            DisplayObject* guardedChar = env.get_original_target(); // watch out : _originalTarget is not necessarely the same
 #else
             // curveball.swf and feed.swf suggest that it is the *current* target,
             // not the *original* one that matters.
-            character* guardedChar = env.get_target();
+            DisplayObject* guardedChar = env.get_target();
 #endif
 
             if ( _abortOnUnload && guardedChar && guardedChar->isUnloaded() )

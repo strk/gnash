@@ -40,7 +40,7 @@ namespace SWF {
 //
 /// DisplayList tags are all versions of PlaceObject and RemoveObject.
 /// They modify the DisplayList of a movie or sprite by
-/// placing, moving, replacing or removing characters at depths.
+/// placing, moving, replacing or removing DisplayObjects at depths.
 ///
 ///
 class DisplayListTag : public ControlTag
@@ -64,7 +64,7 @@ public:
 	/// Return the depth affected by this DisplayList tag
 	//
 	/// NOTE: the returned depth is always in the
-	///       static depth zone (character::staticDepthOffset .. -1)
+	///       static depth zone (DisplayObject::staticDepthOffset .. -1)
 	///
 	int getDepth() const { return m_depth; }
 

@@ -36,16 +36,16 @@
  * visual traces of failures and a final visual report
  * or successes and failures.
  *
- * The first TextField characters is stored inside a MovieClip,
+ * The first TextField DisplayObjects is stored inside a MovieClip,
  * and its variables is set on the root. 
  *
- * The second TextField characters is stored inside a MovieClip,
+ * The second TextField DisplayObjects is stored inside a MovieClip,
  * and its variables is set on a third MovieClip which is placed
  * *after* the definition of the TextField. Things should still work.
  *
- * Note that the ActionScript code also tries to *move* the character trough
+ * Note that the ActionScript code also tries to *move* the DisplayObject trough
  * the VariableName (incdement varname._x).
- * The correct behaviour is for the character to NOT move
+ * The correct behaviour is for the DisplayObject to NOT move
  *
  * run as ./DefineEditTextVariableNameTest
  */

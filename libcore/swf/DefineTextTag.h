@@ -36,7 +36,7 @@ namespace gnash {
 namespace SWF {
 
 
-/// Text character 
+/// Text DisplayObject 
 //
 /// This is either read from SWF stream 
 /// or (hopefully) created with scripting
@@ -49,7 +49,7 @@ public:
             const RunInfo& r);
 
 	/// Draw the string.
-	void display(character* inst);
+	void display(DisplayObject* inst);
 	
 	const rect&	get_bound() const {
         // TODO: There is a _matrix field in the definition(!) that's
@@ -61,11 +61,11 @@ public:
     //
     /// @param to   Will be filled with pointers to TextRecords
     ///             if any are present
-    /// @param size Will contain the number of characters in this
+    /// @param size Will contain the number of DisplayObjects in this
     ///             StaticText definition.
     bool extractStaticText(std::vector<const TextRecord*>& to, size_t& size);
 
-    virtual character* createDisplayObject(character* parent, int id);
+    virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
 private:
 

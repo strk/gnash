@@ -109,10 +109,10 @@ namespace {
     as_value textfield_textHeight(const fn_call& fn);
 }
 
-TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
+TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
         int id)
     :
-    character(parent, id),
+    InteractiveDisplayObject(parent, id),
     _tag(&def),
     _textDefined(def.hasText()),
     _underlined(false),
@@ -167,10 +167,10 @@ TextField::TextField(character* parent, const SWF::DefineEditTextTag& def,
 
 }
 
-TextField::TextField(character* parent, const rect& bounds)
+TextField::TextField(DisplayObject* parent, const rect& bounds)
     :
-    // the id trick is to fool assertions in character ctor
-    character(parent, parent ? 0 : -1),
+    // the id trick is to fool assertions in DisplayObject ctor
+    InteractiveDisplayObject(parent, parent ? 0 : -1),
     _textDefined(false),
     _underlined(false),
     _leading(0),
@@ -255,7 +255,7 @@ TextField::removeTextField()
         return;
     }
 
-    character* parent = get_parent();
+    DisplayObject* parent = get_parent();
     assert(parent); // every TextField must have a parent, right ?
 
     MovieClip* parentSprite = parent->to_movie();
@@ -418,10 +418,10 @@ TextField::on_event(const event_id& ev)
             if ( getType() != typeInput ) break; // not an input field
             std::wstring s = _text;
 
-            // id.keyCode is the unique gnash::key::code for a character/key.
+            // id.keyCode is the unique gnash::key::code for a DisplayObject/key.
             // The maximum value is about 265, including function keys.
-            // It seems that typing in characters outside the Latin-1 set
-            // (256 character codes, identical to the first 256 of UTF-8)
+            // It seems that typing in DisplayObjects outside the Latin-1 set
+            // (256 DisplayObject codes, identical to the first 256 of UTF-8)
             // is not supported, though a much greater number UTF-8 codes can be
             // stored and displayed. See utf.h for more information.
             // This is a limit on the number of key codes, not on the
@@ -483,7 +483,7 @@ TextField::on_event(const event_id& ev)
                             gnash::key::codeMap[c][key::ASCII]);
                     if (t != 0)
                     {
-                        // Insert one copy of the character
+                        // Insert one copy of the DisplayObject
                         // at the cursor position.
                           s.insert(m_cursor, 1, t);
                         m_cursor++;
@@ -500,23 +500,23 @@ TextField::on_event(const event_id& ev)
     return true;
 }
 
-character*
-TextField::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
+InteractiveDisplayObject*
+TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
 
     if (!isVisible()) return 0;
     
     // shouldn't this be !can_handle_mouse_event() instead ?
     // not selectable, so don't catch mouse events!
-    if (!_selectable) return NULL;
+    if (!_selectable) return 0;
 
     SWFMatrix m = getMatrix();
     point p(x, y);
     m.invert().transform(p);
 
-    if ( _bounds.point_test(p.x, p.y) )    return this;
+    if (_bounds.point_test(p.x, p.y)) return this;
 
-    return NULL;
+    return 0;
 }
 
 void
@@ -743,7 +743,7 @@ TextField::set_member(string_table::key name,
     }
     case NSV::PROP_uALPHA:
     {
-        // @@ TODO this should be generic to class character!
+        // @@ TODO this should be generic to class DisplayObject!
         // Arg is in percent.
         cxform    cx = get_cxform();
         cx.aa = (boost::int16_t)(val.to_number() * 2.56);
@@ -777,7 +777,7 @@ TextField::get_member(string_table::key name, as_value* val,
     }
     case NSV::PROP_uALPHA:
     {
-        // @@ TODO this should be generic to class character!
+        // @@ TODO this should be generic to class DisplayObject!
         const cxform&    cx = get_cxform();
         val->set_double(cx.aa / 2.56);
         return true;
@@ -890,7 +890,7 @@ TextField::insertTab(SWF::TextRecord& rec, boost::int32_t& x, float scale)
     {
         IF_VERBOSE_MALFORMED_SWF (
           log_error(_("TextField: missing glyph for space char (needed "
-                  "for TAB). Make sure character shapes for font "
+                  "for TAB). Make sure DisplayObject shapes for font "
                   "%s are being exported into your SWF file."),
                 rec.getFont()->name());
         );
@@ -987,7 +987,7 @@ TextField::format_text()
     int    last_space_glyph = -1;
     int    last_line_start_record = 0;
 
-    unsigned int character_idx = 0;
+    unsigned int DisplayObject_idx = 0;
     m_xcursor = x;
     m_ycursor = y;
 
@@ -1033,7 +1033,7 @@ TextField::format_text()
                 // newline.
 
                 // Frigging Flash seems to use '\r' (13) as its
-                // default newline character.  If we get DOS-style \r\n
+                // default newline DisplayObject.  If we get DOS-style \r\n
                 // sequences, it'll show up as double newlines, so maybe we
                 // need to detect \r\n and treat it as one newline.
 
@@ -1066,12 +1066,12 @@ TextField::format_text()
                 // Backspace 
 
                 // This is a limited hack to enable overstrike effects.
-                // It backs the cursor up by one character and then continues
+                // It backs the cursor up by one DisplayObject and then continues
                 // the layout.  E.g. you can use this to display an underline
                 // cursor inside a simulated text-entry box.
                 //
                 // ActionScript understands the '\b' escape sequence
-                // for inserting a BS character.
+                // for inserting a BS DisplayObject.
                 //
                 // ONLY WORKS FOR BACKSPACING OVER ONE CHARACTER, WON'T BS
                 // OVER NEWLINES, ETC.
@@ -1111,7 +1111,7 @@ TextField::format_text()
 
                 // The font table holds up to 65535 glyphs. Casting
                 // from uint32_t would, in the event that the code
-                // is higher than 65535, result in the wrong character
+                // is higher than 65535, result in the wrong DisplayObject
                 // being chosen. Flash can currently only handle 16-bit
                 // values.
                 int index = rec.getFont()->get_glyph_index(
@@ -1128,7 +1128,7 @@ TextField::format_text()
                             if (_embedFonts)
                             {
                                 log_swferror(_("TextField: missing embedded "
-                                    "glyph for char %d. Make sure character "
+                                    "glyph for char %d. Make sure DisplayObject "
                                     "shapes for font %s are being exported "
                                     "into your SWF file"),
                                     code, _font->name());
@@ -1286,12 +1286,12 @@ TextField::format_text()
         }
 
 
-        if (m_cursor > character_idx)
+        if (m_cursor > DisplayObject_idx)
         {
             m_xcursor = x;
             m_ycursor = y;
         }
-        character_idx++;
+        DisplayObject_idx++;
 
         // TODO: HTML markup
     }
@@ -1358,7 +1358,7 @@ TextField::parseTextVariableRef(const std::string& variableName) const
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("VariableName associated to text field refers "
                     "to an unknown target (%s). It is possible that the "
-                    "character will be instantiated later in the SWF "
+                    "DisplayObject will be instantiated later in the SWF "
                     "stream. Gnash will try to register again on next "
                     "access."), path);
         );
@@ -1402,7 +1402,7 @@ TextField::registerTextVariable()
     if ( ! target )
     {
         log_debug(_("VariableName associated to text field (%s) refer to "
-                    "an unknown target. It is possible that the character "
+                    "an unknown target. It is possible that the DisplayObject "
                     "will be instantiated later in the SWF stream. "
                     "Gnash will try to register again on next access."),
                 _variable_name);
@@ -1485,7 +1485,7 @@ TextField::parseHTML(std::wstring& tag, std::wstring::const_iterator& it,
             break;
         }
 
-        // Check for NULL character
+        // Check for NULL DisplayObject
         if (*it == 0) break;
 
         tag.push_back(*it++);
@@ -1687,7 +1687,7 @@ TextField::get_world_cxform() const
     // into account.
     if (!getEmbedFonts()) return cxform();
 
-    return character::get_world_cxform();
+    return DisplayObject::get_world_cxform();
 }
 
 void
@@ -1933,7 +1933,7 @@ TextField::markReachableResources() const
     if (_font) _font->setReachable();
 
     // recurse to parent...
-    markCharacterReachable();
+    markDisplayObjectReachable();
 }
 
 /// TextField interface functions
@@ -2322,7 +2322,7 @@ textfield_variable(const fn_call& fn)
 as_value
 textfield_getDepth(const fn_call& fn)
 {
-    // TODO: make this a character::getDepth_method function...
+    // TODO: make this a DisplayObject::getDepth_method function...
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
     int n = text->get_depth();
@@ -2552,7 +2552,7 @@ textfield_maxhscroll(const fn_call& fn)
 /// TextField.maxChars().
 //
 /// This does not limit the length of the text, but rather the
-/// number of characters that can be entered in the TextField.
+/// number of DisplayObjects that can be entered in the TextField.
 //
 /// Returns null when the value is 0.
 as_value
@@ -2751,29 +2751,29 @@ attachTextFieldInterface(as_object& o)
         |as_prop_flags::isProtected;
 
     // Parent seems to not be a normal property
-    getset = new builtin_function(&character::parent_getset, NULL);
+    getset = new builtin_function(&DisplayObject::parent_getset, NULL);
     o.init_property(NSV::PROP_uPARENT, *getset, *getset);
 
     // Target seems to not be a normal property
-    getset = new builtin_function(&character::target_getset, NULL);
+    getset = new builtin_function(&DisplayObject::target_getset, NULL);
     o.init_property(NSV::PROP_uTARGET, *getset, *getset);
 
     // _name should be a property of the instance, not the prototype
-    getset = new builtin_function(&character::name_getset, NULL);
+    getset = new builtin_function(&DisplayObject::name_getset, NULL);
     o.init_property(NSV::PROP_uNAME, *getset, *getset);
 
     o.init_property(NSV::PROP_uXMOUSE,
-            character::xmouse_get, character::xmouse_get, propFlags);
+            DisplayObject::xmouse_get, DisplayObject::xmouse_get, propFlags);
     o.init_property(NSV::PROP_uYMOUSE,
-            character::ymouse_get, character::ymouse_get, propFlags);
+            DisplayObject::ymouse_get, DisplayObject::ymouse_get, propFlags);
     o.init_property(NSV::PROP_uHIGHQUALITY,
-            character::highquality, character::highquality);
+            DisplayObject::highquality, DisplayObject::highquality);
     o.init_property(NSV::PROP_uQUALITY,
-            character::quality, character::quality);
+            DisplayObject::quality, DisplayObject::quality);
     o.init_property(NSV::PROP_uXSCALE,
-            character::xscale_getset, character::xscale_getset);
+            DisplayObject::xscale_getset, DisplayObject::xscale_getset);
     o.init_property(NSV::PROP_uYSCALE,
-            character::yscale_getset, character::yscale_getset);
+            DisplayObject::yscale_getset, DisplayObject::yscale_getset);
  
     // Standard flags.
     const int flags = as_prop_flags::dontDelete

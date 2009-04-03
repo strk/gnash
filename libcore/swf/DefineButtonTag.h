@@ -75,7 +75,7 @@ public:
 	bool	m_down;
 	bool	m_over;
 	bool	m_up;
-	int	m_character_id;
+	int	_id;
 
 	// Who owns this ?
 	character_def* m_character_def;
@@ -105,7 +105,7 @@ public:
 
 	/// Return true if the button_record is valid
 	//
-	/// A button record is invalid if it refers to a character
+	/// A button record is invalid if it refers to a DisplayObject
 	/// which has not been defined.
 	bool is_valid();
 
@@ -193,14 +193,14 @@ public:
 	virtual ~DefineButtonTag();
 
 	/// Create a mutable instance of our definition.
-	character* createDisplayObject(character* parent, int id);
+	DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
 	const rect&	get_bound() const {
-		// It is required that get_bound() is implemented in character
-        // definition classes. However, button character definitions do
+		// It is required that get_bound() is implemented in DisplayObject
+        // definition classes. However, button DisplayObject definitions do
         // not have shape definitions themselves. Instead, they hold a list
         // of shape_character_def. get_bound() is currently only used
-        // by DisplayObject which normally is used only shape character
+        // by DisplayObject which normally is used only shape DisplayObject
         // definitions. See character_def.h to learn why it is virtual anyway.
 		// get_button_bound() is used for buttons.
 		abort(); // should not be called  

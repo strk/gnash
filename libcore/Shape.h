@@ -30,13 +30,13 @@ namespace gnash {
 
 namespace gnash {
 
-/// For characters that don't store unusual state in their instances.
+/// For DisplayObjects that don't store unusual state in their instances.
 class Shape : public DisplayObject
 {
 
 public:
 
-	Shape(shape_character_def* def, character* parent, int id)
+	Shape(shape_character_def* def, DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id),
 		_def(def)
@@ -46,12 +46,13 @@ public:
 
 	virtual void display();
 
-protected:
-
-    character_def* getDefinition() const
-    {
-        return _def.get();
+    virtual rect getBounds() const {
+        return _def->get_bound();
     }
+    
+    virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+
+protected:
 
 #ifdef GNASH_USE_GC
 	/// Mark reachable resources (for the GC)
@@ -59,7 +60,7 @@ protected:
 	{
 		assert(isReachable());
         _def->setReachable();
-		markCharacterReachable();
+		markDisplayObjectReachable();
 	}
 #endif
 

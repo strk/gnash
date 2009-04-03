@@ -292,8 +292,7 @@ public:
     /// render handler implementations. Instead, see the version without
     /// character instance.
     ///
-    virtual void draw_shape_character(shape_character_def *def, 
-        character *inst)
+    virtual void drawShape(shape_character_def *def, DisplayObject *inst)
     {
         // check if the character needs to be rendered at all
         rect cur_bounds;
@@ -307,14 +306,14 @@ public:
         }        
 
         // render the character
-        draw_shape_character(def, inst->getWorldMatrix(),
+        drawShape(def, inst->getWorldMatrix(),
                 inst->get_world_cxform());
     }
     
     /// \brief
     /// Draws the given character definition with the given transformations and
     /// styles. 
-    virtual void draw_shape_character(shape_character_def *def, 
+    virtual void drawShape(shape_character_def *def, 
         const SWFMatrix& mat, const cxform& cx) = 0;
         
     /// \brief

@@ -19,7 +19,7 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Test "Jumping backward to the midle of a character's lifetime after swap to same depth"
+ * Test "Jumping backward to the midle of a DisplayObject's lifetime after swap to same depth"
  *
  * run as ./displaylist_depths_test7
  *
@@ -37,10 +37,10 @@
  * 
  * Description:
  * 
- *  frame2: character placed at depth -16381 at position (10,200);
- *          swap the character to depth -16381 (YES: SAME DEPTH!)
- *  frame4: try to transform the character to the right (50,200)
- *  frame5: try to transform the character to the right (200,200)
+ *  frame2: DisplayObject placed at depth -16381 at position (10,200);
+ *          swap the DisplayObject to depth -16381 (YES: SAME DEPTH!)
+ *  frame4: try to transform the DisplayObject to the right (50,200)
+ *  frame5: try to transform the DisplayObject to the right (200,200)
  *  frame7: jump back to frame 4 and stop
  * 
  * Expected behaviour:
@@ -128,7 +128,7 @@ main(int argc, char** argv)
   // Frame 3: nothing new
   SWFMovie_nextFrame(mo); 
 
-  // Frame 4: move character at depth 3 to position 50,200
+  // Frame 4: move DisplayObject at depth 3 to position 50,200
   SWFDisplayItem_moveTo(it1, 50, 200); 
   add_actions(mo,
     "check_equals(static3._x, 50);" 
@@ -136,7 +136,7 @@ main(int argc, char** argv)
     );
   SWFMovie_nextFrame(mo); 
 
-  // Frame 5: move character at depth 3 to position 100,200
+  // Frame 5: move DisplayObject at depth 3 to position 100,200
   SWFDisplayItem_moveTo(it1, 200, 200); 
   SWFMovie_nextFrame(mo); 
 

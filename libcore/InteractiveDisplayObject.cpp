@@ -1,4 +1,4 @@
-// Shape.cpp:  Mouse/Character handling, for Gnash.
+// DisplayObject.cpp:  Mouse/Character handling, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -17,43 +17,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "StaticText.h"
-#include "swf/DefineTextTag.h"
+#include "InteractiveDisplayObject.h"
 
 namespace gnash
 {
-
-StaticText*
-StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,
-        size_t& numChars)
-{
-    _selectedText.clear();
-
-    if (_def->extractStaticText(to, numChars)) {
-        _selectedText.resize(numChars);
-        return this;
-    }
-    
-    return 0;
-}
-
-bool
-StaticText::pointInShape(boost::int32_t  x, boost::int32_t  y) const
-{
-    SWFMatrix wm = getWorldMatrix();
-    SWFMatrix wm_inverse = wm.invert();
-    point lp(x, y);
-    wm_inverse.transform(lp);
-    return _def->point_test_local(lp.x, lp.y, wm);
-}
-
-
-void  
-StaticText::display()
-{
-    _def->display(this); // pass in transform info
-    clear_invalidated();
-}
 
 } // namespace gnash
 

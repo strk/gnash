@@ -201,8 +201,8 @@ main(int argc, char** argv)
 	check(mo, "dynamicmc5.hitTest(280, 350, true)");
 
 	add_actions(mo,
-		"note('Placed staticmc2 (red), staticmc3 (yellow), staticmc4 (green), staticmc5 (cyan) characters');"
-		"note('Placed dynamicmc2 (blue), dynamicmc3 (violet), dynamicmc4 (dark green), dynamicmc5 (light blue) characters');"
+		"note('Placed staticmc2 (red), staticmc3 (yellow), staticmc4 (green), staticmc5 (cyan) DisplayObjects');"
+		"note('Placed dynamicmc2 (blue), dynamicmc3 (violet), dynamicmc4 (dark green), dynamicmc5 (light blue) DisplayObjects');"
 		"note(' - Press any key to continue -');"
 		"stop();"
 		"l = new Object();"
@@ -477,7 +477,7 @@ main(int argc, char** argv)
 		" clips[i].onRollOver = function() { this._alpha = 50; };"
 		" clips[i].onRollOut = function() { this._alpha = 100; };"
 		"}"
-		"note('Made all characters mouse-sensitive');"
+		"note('Made all DisplayObjects mouse-sensitive');"
 	);
 
 	// Red rect is a mask, but has mouse events !

@@ -24,10 +24,10 @@
 
 namespace gnash {
 
-Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, character* parent,
+Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
         int id)
     :
-    character(parent, id),
+    DisplayObject(parent, id),
     _bitmapData(bd),
     _bitmapInfo(0),
     _shapeDef(new DynamicShape),

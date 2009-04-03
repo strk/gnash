@@ -88,8 +88,8 @@ namespace gnash
 /// to the base class to act on (consider PLACEOBJECT tags...).
 ///
 /// This design is uncomfortable when it comes to programmatically
-/// created characters, in that they do NOT have any *fixed* definition.
-/// A possible workaround to this would be not *requiring* character
+/// created DisplayObjects, in that they do NOT have any *fixed* definition.
+/// A possible workaround to this would be not *requiring* DisplayObject
 /// instances to have an associated character_def. I'll work on this
 /// --strk 2006-12-05.
 ///
@@ -132,7 +132,7 @@ public:
 	/// SWFMovieDefinition is one such example, future examples
 	/// should include jpeg_movie_def and similar..
 	///
-	virtual movie_instance* create_movie_instance(character* /*parent*/=0)
+	virtual movie_instance* create_movie_instance(DisplayObject* /*parent*/=0)
 	{
 		return NULL;
 	}
@@ -185,14 +185,14 @@ public:
 
 
 	/// \brief
-	/// Get a character from the dictionary.
+	/// Get a DisplayObject from the dictionary.
 	//
 	/// Note that only top-level movies (those belonging to a single
-	/// SWF stream) have a characters dictionary, thus our
+	/// SWF stream) have a DisplayObjects dictionary, thus our
 	/// SWFMovieDefinition. The other derived class, sprite_definition
-	/// will seek for characters in it's base SWFMovieDefinition.
+	/// will seek for DisplayObjects in it's base SWFMovieDefinition.
 	///
-	/// @return NULL if no character with the given ID is found
+	/// @return NULL if no DisplayObject with the given ID is found
 	///         (this is the default)
 	///
 	virtual character_def*	get_character_def(int /*id*/)
@@ -227,16 +227,16 @@ public:
 	/// Returns 1 based index. Ex: if 1 then 1st frame as been fully loaded
 	virtual size_t	get_loading_frame() const = 0;
 
-	/// Add a character with given ID to the CharactersDictionary.
+	/// Add a DisplayObject with given ID to the CharactersDictionary.
 	//
 	/// This method is here to be called by DEFINE tags loaders.
 	/// The default implementation does nothing.
 	///
-	virtual void add_character(int /*id*/, character_def* /*ch*/)
+	virtual void addDisplayObject(int /*id*/, character_def* /*ch*/)
 	{
 	}
 
-	/// Add a font character with given ID to the CharacterDictionary.
+	/// Add a font DisplayObject with given ID to the CharacterDictionary.
 	//
 	/// This method is here to be called by DEFINEFONT tags loaders.
 	/// The default implementation does nothing.
@@ -245,7 +245,7 @@ public:
 	{
 	}
 
-	/// Return the font with given character id
+	/// Return the font with given DisplayObject id
 	//
 	/// @returns NULL if the given id doesn't correspond
 	///          to any registered font (default).
@@ -325,21 +325,21 @@ public:
 	/// Note that only top-level movies (those belonging to a single
 	/// SWF stream) have a bitmap dictionary, thus our
 	/// SWFMovieDefinition. The other derived class, sprite_definition
-	/// will seek for characters in its base SWFMovieDefinition.
+	/// will seek for DisplayObjects in its base SWFMovieDefinition.
 	///
-	/// @return 0 if no character with the given ID is found, or
-	///	    if the corresponding character is not a bitmap.
+	/// @return 0 if no DisplayObject with the given ID is found, or
+	///	    if the corresponding DisplayObject is not a bitmap.
 	///
 	/// The default implementation returns 0.
 	///
-	virtual BitmapInfo* getBitmap(int /*character_id*/)
+	virtual BitmapInfo* getBitmap(int /*DisplayObject_id*/)
 	{
 		return 0;
 	}
 
 	/// \brief
-	/// Add a bitmap character in the dictionary, with the specified
-	/// character id.
+	/// Add a bitmap DisplayObject in the dictionary, with the specified
+	/// DisplayObject id.
 	//
 	/// The default implementation is a no-op (deletes the image data).
 	///
@@ -349,23 +349,23 @@ public:
 
 	/// Get the sound sample with given ID.
 	//
-	/// @return NULL if the given character ID isn't found in the
+	/// @return NULL if the given DisplayObject ID isn't found in the
 	///         dictionary or it is not a sound sample.
 	///
 	/// The default implementation always returns NULL
 	///
-	virtual sound_sample* get_sound_sample(int /*character_id*/)
+	virtual sound_sample* get_sound_sample(int /*DisplayObject_id*/)
 	{
 		return NULL;
 	}
 
 	/// \brief
-	/// Add a sound sample character in the dictionary, with the specified
-	/// character id.
+	/// Add a sound sample DisplayObject in the dictionary, with the specified
+	/// DisplayObject id.
 	//
 	/// The default implementation is a no-op
 	///
-	virtual void add_sound_sample(int /*character_id*/, sound_sample* /*sam*/)
+	virtual void add_sound_sample(int /*DisplayObject_id*/, sound_sample* /*sam*/)
 	{
 	}
 

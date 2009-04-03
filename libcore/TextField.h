@@ -18,7 +18,7 @@
 #ifndef GNASH_TEXTFIELD_H
 #define GNASH_TEXTFIELD_H
 
-#include "character.h" // for inheritance
+#include "InteractiveDisplayObject.h" // for inheritance
 #include "styles.h" // for line_style
 #include "fill_style.h"
 #include "Range2d.h"
@@ -36,7 +36,7 @@ namespace gnash {
 namespace gnash {
 
 /// An instance of a DefineEditTextTag 
-class TextField : public character
+class TextField : public InteractiveDisplayObject
 {
 
 public:
@@ -81,19 +81,20 @@ public:
 	};
 
     /// Constructs a TextField as specified in a DefineEditText tag.
-	TextField(character* parent, const SWF::DefineEditTextTag& def, int id);
+	TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def, int id);
 
     /// Constructs a TextField with default values and the specified bounds.
     //
     /// Notably, the default textHeight is 12pt (240 twips).
-    TextField(character* parent, const rect& bounds);
+    TextField(DisplayObject* parent, const rect& bounds);
 
 	~TextField();
 
 	// TODO: should this return isSelectable() ?
 	bool can_handle_mouse_event() const { return true; }
 
-	character* get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y);
+	InteractiveDisplayObject* topmostMouseEntity(boost::int32_t x,
+            boost::int32_t y);
 
 	bool wantsInstanceName() const
 	{
@@ -161,12 +162,12 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-	rect getBounds() const
+	virtual rect getBounds() const
 	{
 		return _bounds;
 	}
 
-	// See dox in character.h
+	// See dox in DisplayObject.h
 	bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
 	/// Return true if the 'background' should be drawn
@@ -366,7 +367,7 @@ public:
 		_selectable = v;
 	}
 
-	// See character::isActiveTextField
+	// See DisplayObject::isActiveTextField
 	virtual bool isSelectableTextField() const
 	{
 		return isSelectable();
@@ -493,7 +494,7 @@ private:
 
 	/// The actual text.
     //
-    /// Because we have to deal with non-ascii characters (129-255), this
+    /// Because we have to deal with non-ascii DisplayObjects (129-255), this
     /// is a wide string; the cursor position and the position within the
     /// string are then the same, which makes manipulating the string much
     /// easier.
@@ -517,20 +518,20 @@ private:
 	typedef std::vector<SWF::TextRecord> TextRecords;
 	TextRecords _textRecords;
 
-	/// used to pass a color on to shape_character::display()
+	/// used to pass a color on to Shape::display()
 	std::vector<fill_style>	m_dummy_style;
 
 	std::vector<line_style>	m_dummy_line_style;
 
-	/// Convert the characters in _text into a series of
+	/// Convert the DisplayObjects in _text into a series of
 	/// text_glyph_records to be rendered.
 	void format_text();
 	
 	/// Extracts an HTML tag.
 	///
 	/// @param tag  This string is filled with the extracted HTML tag.
-	/// @param it   An iterator pointing to the first character of the
-	///             HTML tag. It is left pointing to the character after the
+	/// @param it   An iterator pointing to the first DisplayObject of the
+	///             HTML tag. It is left pointing to the DisplayObject after the
 	///             closing tag or the end of the string.
 	/// @param e    An iterator pointing to the end of the string.
 	/// @return     Whether the tag is complete or not (i.e. whether a '>'
@@ -579,7 +580,7 @@ private:
     /// Corresponds to the maxChars property.
     boost::int32_t _maxChars;
 
-	/// Associate a variable to the text of this character
+	/// Associate a variable to the text of this DisplayObject
 	//
 	/// Setting the associated variable actually changes the
 	/// displayed text. Getting the variable would return the
@@ -589,7 +590,7 @@ private:
 	/// current text before overriding it.
 	///
 	/// Since the variable target may be undefined at time
-	/// of instantiation of this EditText character, the
+	/// of instantiation of this EditText DisplayObject, the
 	/// class keeps track of wheter it succeeded registering
 	/// the variable and this function will do nothing in this
 	/// case. Thus it is safe to call it multiple time, using
@@ -664,7 +665,7 @@ protected:
 	/// Reachable resources are:
 	///  - The font being used (m_font) 
 	///  - Our definition
-	///  - Common character resources
+	///  - Common DisplayObject resources
 	///
 	void markReachableResources() const;
 };

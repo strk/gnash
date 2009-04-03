@@ -37,7 +37,7 @@ enum modifier
     GNASH_MOD_ALT = 4
 };
 
-// Gnash character codes. Each code represents a single character on the keyboard.
+// Gnash DisplayObject codes. Each code represents a single DisplayObject on the keyboard.
 // The first 128 code are ordered by their correspond ASCII value.
 enum code
 {
@@ -320,7 +320,7 @@ enum code
   thorn = 263,
   yDIAERESIS = 264,
   
-  // TODO: add other function keys and characters not yet known.
+  // TODO: add other function keys and DisplayObjects not yet known.
   HELP = 265,
   KEYCOUNT
 };

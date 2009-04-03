@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 #include "Point2d.h"
@@ -95,12 +95,12 @@ main(int /*argc*/, char** /*argv*/)
 		// if _root displaylist contains loadedTarget and loadedTarget
 		// contains target100, we've loaded it
 		const MovieClip* loadedTarget = 0;
-		//const character* ch = tester.findDisplayItemByName(*root, "loadedTarget");
-		const character* ch = tester.findDisplayItemByDepth(*root, 30);
+		//const DisplayObject* ch = tester.findDisplayItemByName(*root, "loadedTarget");
+		const DisplayObject* ch = tester.findDisplayItemByDepth(*root, 30);
 		if ( ch ) loadedTarget = ch->to_movie();
 		if ( loadedTarget )
 		{
-			const character* target100 = tester.findDisplayItemByName(*loadedTarget, "target100");
+			const DisplayObject* target100 = tester.findDisplayItemByName(*loadedTarget, "target100");
 			if ( target100 ) break;
 			else cerr << "target100 not yet found in loadedTarget" << endl;
 		}

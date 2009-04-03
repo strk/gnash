@@ -58,7 +58,7 @@ libgnashcore_la_SOURCES = \
 	as_object.cpp \
 	as_value.cpp \
 	asClass.cpp \
-	character.cpp \
+	DisplayObject.cpp \
 	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
@@ -75,7 +75,7 @@ libgnashcore_la_SOURCES = \
         BevelFilter.cpp \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
-	DisplayObject.cpp \
+	InteractiveDisplayObject.cpp \
 	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
@@ -141,7 +141,7 @@ noinst_HEADERS = \
 	BitmapMovieInstance.h \
 	builtin_function.h \
 	Button.h \
-	character.h \
+	DisplayObject.h \
 	CharacterProxy.h \
 	cxform.h \
 	debugger.h \
@@ -165,7 +165,7 @@ noinst_HEADERS = \
 	fontlib.h \
 	Shape.h \
 	StaticText.h \
-	DisplayObject.h \
+	InteractiveDisplayObject.h \
 	gnash.h	\
 	GnashKey.h \
 	impl.h \

@@ -1,4 +1,4 @@
-// DefineButtonSoundTag.h: sounds for Button characters.
+// DefineButtonSoundTag.h: sounds for Button DisplayObjects.
 //
 //   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //

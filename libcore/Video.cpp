@@ -53,9 +53,9 @@ namespace {
 }
 
 Video::Video(SWF::DefineVideoStreamTag* def,
-		character* parent, int id)
+		DisplayObject* parent, int id)
 	:
-	character(parent, id),
+	DisplayObject(parent, id),
 	m_def(def),
 	_ns(0),
 	_embeddedStream(m_def ? true : false),
@@ -254,7 +254,7 @@ Video::stagePlacementCallback(as_object* initObj)
 
     saveOriginalTarget(); // for softref
 
-    // Register this video instance as a live character
+    // Register this video instance as a live DisplayObject
     _vm.getRoot().addLiveChar(this);
 }
 
@@ -330,8 +330,8 @@ Video::markReachableResources() const
 {
 	if ( _ns ) _ns->setReachable();
 
-	// Invoke character's version of reachability mark
-	markCharacterReachable();
+	// Invoke DisplayObject's version of reachability mark
+	markDisplayObjectReachable();
 }
 #endif // GNASH_USE_GC
 
@@ -382,43 +382,43 @@ attachVideoProperties(as_object& o)
 
 	as_c_function_ptr gettersetter;
 
-	gettersetter = &character::x_getset;
+	gettersetter = &DisplayObject::x_getset;
 	o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
 
-	gettersetter = &character::y_getset;
+	gettersetter = &DisplayObject::y_getset;
 	o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
 
-	gettersetter = &character::xscale_getset;
+	gettersetter = &DisplayObject::xscale_getset;
 	o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
 
-	gettersetter = &character::yscale_getset;
+	gettersetter = &DisplayObject::yscale_getset;
 	o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
 
-	gettersetter = &character::xmouse_get;
+	gettersetter = &DisplayObject::xmouse_get;
 	o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
 
-	gettersetter = &character::ymouse_get;
+	gettersetter = &DisplayObject::ymouse_get;
 	o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
 
-	gettersetter = &character::alpha_getset;
+	gettersetter = &DisplayObject::alpha_getset;
 	o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
 
-	gettersetter = &character::visible_getset;
+	gettersetter = &DisplayObject::visible_getset;
 	o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
 
-	gettersetter = &character::width_getset;
+	gettersetter = &DisplayObject::width_getset;
 	o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
 
-	gettersetter = &character::height_getset;
+	gettersetter = &DisplayObject::height_getset;
 	o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
 
-	gettersetter = &character::rotation_getset;
+	gettersetter = &DisplayObject::rotation_getset;
 	o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
 
-	gettersetter = &character::parent_getset;
+	gettersetter = &DisplayObject::parent_getset;
 	o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
 
-	gettersetter = &character::target_getset;
+	gettersetter = &DisplayObject::target_getset;
 	o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
 }
 
@@ -505,7 +505,7 @@ video_ctor(const fn_call& /* fn */)
 
 	// I'm not sure We can rely on the def and parent values being accepted 
     // as NULL. Not till we add some testing...
-	boost::intrusive_ptr<character> obj = new Video(NULL, NULL, -1);
+	boost::intrusive_ptr<DisplayObject> obj = new Video(NULL, NULL, -1);
 	obj->setDynamic();
 	return as_value(obj.get()); // will keep alive
 }

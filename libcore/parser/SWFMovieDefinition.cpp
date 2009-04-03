@@ -226,21 +226,21 @@ SWFMovieDefinition::~SWFMovieDefinition()
 	//assert(m_jpeg_in->get() == NULL);
 }
 
-void SWFMovieDefinition::add_character(int character_id, character_def* c)
+void SWFMovieDefinition::addDisplayObject(int DisplayObject_id, character_def* c)
 {
 	assert(c);
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
-	_dictionary.add_character(character_id, c);
+	_dictionary.addDisplayObject(DisplayObject_id, c);
 }
 
 character_def*
-SWFMovieDefinition::get_character_def(int character_id)
+SWFMovieDefinition::get_character_def(int DisplayObject_id)
 {
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 
 	boost::intrusive_ptr<character_def> ch = 
-        _dictionary.get_character(character_id);
+        _dictionary.getDisplayObject(DisplayObject_id);
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
 #endif 
@@ -277,9 +277,9 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
 }
 
 BitmapInfo*
-SWFMovieDefinition::getBitmap(int character_id)
+SWFMovieDefinition::getBitmap(int DisplayObject_id)
 {
-    Bitmaps::iterator it = _bitmaps.find(character_id);
+    Bitmaps::iterator it = _bitmaps.find(DisplayObject_id);
     if (it == _bitmaps.end()) return 0;
     
     return it->second.get();
@@ -293,9 +293,9 @@ SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<BitmapInfo> im)
 
 }
 
-sound_sample* SWFMovieDefinition::get_sound_sample(int character_id)
+sound_sample* SWFMovieDefinition::get_sound_sample(int DisplayObject_id)
 {
-    SoundSampleMap::iterator it = m_sound_samples.find(character_id);
+    SoundSampleMap::iterator it = m_sound_samples.find(DisplayObject_id);
     if ( it == m_sound_samples.end() ) return NULL;
 
     boost::intrusive_ptr<sound_sample> ch = it->second;
@@ -306,14 +306,14 @@ sound_sample* SWFMovieDefinition::get_sound_sample(int character_id)
     return ch.get();
 }
 
-void SWFMovieDefinition::add_sound_sample(int character_id, sound_sample* sam)
+void SWFMovieDefinition::add_sound_sample(int DisplayObject_id, sound_sample* sam)
 {
     assert(sam);
     IF_VERBOSE_PARSE(
     log_parse(_("Add sound sample %d assigning id %d"),
-		character_id, sam->m_sound_handler_id);
+		DisplayObject_id, sam->m_sound_handler_id);
     )
-    m_sound_samples.insert(std::make_pair(character_id,
+    m_sound_samples.insert(std::make_pair(DisplayObject_id,
 			    boost::intrusive_ptr<sound_sample>(sam)));
 }
 
@@ -485,7 +485,7 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum)
 }
 
 movie_instance*
-SWFMovieDefinition::create_movie_instance(character* parent)
+SWFMovieDefinition::create_movie_instance(DisplayObject* parent)
 {
 	return new movie_instance(this, parent);
 }
@@ -511,7 +511,7 @@ operator<<(std::ostream& o, const CharacterDictionary& cd)
 }
 
 boost::intrusive_ptr<character_def>
-CharacterDictionary::get_character(int id)
+CharacterDictionary::getDisplayObject(int id)
 {
 	CharacterIterator it = _map.find(id);
 	if ( it == _map.end() )
@@ -526,7 +526,7 @@ CharacterDictionary::get_character(int id)
 }
 
 void
-CharacterDictionary::add_character(int id,
+CharacterDictionary::addDisplayObject(int id,
         boost::intrusive_ptr<character_def> c)
 {
 	//log_debug(_("CharacterDictionary: add char %d"), id);
@@ -612,7 +612,7 @@ parse_tag:
             }
             else if (_tag_loaders.get(tag, &lf)) {
                 // call the tag loader.  The tag loader should add
-                // characters or tags to the movie data structure.
+                // DisplayObjects or tags to the movie data structure.
                 (*lf)(str, tag, *this, _runInfo);
             }
             else {
@@ -929,8 +929,8 @@ SWFMovieDefinition::importResources(
         }
         else if (character_def* ch = dynamic_cast<character_def*>(res.get()))
         {
-            // Add this character to the loading movie.
-            add_character(id, ch);
+            // Add this DisplayObject to the loading movie.
+            addDisplayObject(id, ch);
             ++importedSyms;
         }
         else

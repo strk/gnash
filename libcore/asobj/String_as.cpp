@@ -321,7 +321,7 @@ string_slice(const fn_call& fn)
 // element containing the entire string is returned:
 // 1. No arguments are passed.
 // 2. The delimiter is empty.
-// 3. The delimiter has more than one character or is undefined and limit is not 0.
+// 3. The delimiter has more than one DisplayObject or is undefined and limit is not 0.
 // 4. The delimiter is not present in the string and the limit is not 0.
 //
 // Accordingly, an empty array is returned only when the limit is less
@@ -429,7 +429,7 @@ string_split(const fn_call& fn)
             max = clamp<size_t>(limit, 0, max);
         }
 
-        // If the delimiter is empty, put each character in an
+        // If the delimiter is empty, put each DisplayObject in an
         // array element.
         if ( delim.empty() ) {
             for (size_t i = 0, e = wstr.size(); i < e; ++i) {
@@ -652,7 +652,7 @@ string_fromCharCode(const fn_call& fn)
         std::string str;
         for (unsigned int i = 0; i < fn.nargs; i++)
         {
-            // Maximum 65535, as with all character codes.
+            // Maximum 65535, as with all DisplayObject codes.
             boost::uint16_t c = static_cast<boost::uint16_t>(fn.arg(i).to_int());
             
             // If more than 255, push 'overflow' byte.
@@ -784,7 +784,7 @@ string_toUpperCase(const fn_call& fn)
     {
         LOG_ONCE(
             log_error(_("Your locale probably can't convert non-ascii "
-            "characters to upper case. Using a UTF8 locale may fix this."));
+            "DisplayObjects to upper case. Using a UTF8 locale may fix this."));
         );
     }
 
@@ -822,7 +822,7 @@ string_toLowerCase(const fn_call& fn)
     {
         LOG_ONCE( 
             log_error(_("Your locale probably can't convert non-ascii "
-                "characters to lower case. Using a UTF8 locale may fix this"));
+                "DisplayObjects to lower case. Using a UTF8 locale may fix this"));
         );
     }
 
@@ -837,7 +837,7 @@ string_oldToLower(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
 
-    // This should use the C locale; extended characters are
+    // This should use the C locale; extended DisplayObjects are
     // left alone. FIXME: SWF5 should garble the output.
     std::string str = boost::to_lower_copy(val.to_string());
     return as_value(str);
@@ -850,7 +850,7 @@ string_oldToUpper(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = ensureType<as_object>(fn.this_ptr);
     as_value val(fn.this_ptr);
 
-    // This should use the C locale; extended characters are
+    // This should use the C locale; extended DisplayObjects are
     // left alone. FIXME: SWF5 should garble the output.
     std::string str = boost::to_upper_copy(val.to_string());
     return as_value(str);

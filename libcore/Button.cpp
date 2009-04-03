@@ -192,7 +192,7 @@ private:
 
 class ButtonActionPusher {
 public:
-    ButtonActionPusher(movie_root& mr, character* this_ptr)
+    ButtonActionPusher(movie_root& mr, DisplayObject* this_ptr)
         :
         called(false),
         _mr(mr),
@@ -201,7 +201,7 @@ public:
 
     void operator() (const action_buffer& ab)
     {
-        _mr.pushAction(ab, boost::intrusive_ptr<character>(_tp));
+        _mr.pushAction(ab, boost::intrusive_ptr<DisplayObject>(_tp));
         called = true;
     }
 
@@ -209,7 +209,7 @@ public:
 
 private:
     movie_root& _mr;
-    character* _tp;
+    DisplayObject* _tp;
 };
 
 }
@@ -219,18 +219,18 @@ static as_object* getButtonInterface();
 
 /// Predicates for standard algorithms.
 
-/// Depth comparator for characters.
-static bool charDepthLessThen(const character* ch1, const character* ch2) 
+/// Depth comparator for DisplayObjects.
+static bool charDepthLessThen(const DisplayObject* ch1, const DisplayObject* ch2) 
 {
     return ch1->get_depth() < ch2->get_depth();
 }
 
-/// Predicate for finding active characters.
+/// Predicate for finding active DisplayObjects.
 //
-/// Returns true if the character should be skipped:
+/// Returns true if the DisplayObject should be skipped:
 /// 1) if it is NULL, or 
-/// 2) if we don't want unloaded characters and the character is unloaded.
-static bool isCharacterNull(character* ch, bool includeUnloaded)
+/// 2) if we don't want unloaded DisplayObjects and the DisplayObject is unloaded.
+static bool isCharacterNull(DisplayObject* ch, bool includeUnloaded)
 {
     return (!ch || (!includeUnloaded && ch->isUnloaded()));
 }
@@ -241,52 +241,52 @@ attachButtonInterface(as_object& o)
 
     as_c_function_ptr gettersetter;
 
-    o.init_property(NSV::PROP_uQUALITY, character::quality,
-            character::quality);
+    o.init_property(NSV::PROP_uQUALITY, DisplayObject::quality,
+            DisplayObject::quality);
     
-    o.init_property(NSV::PROP_uHIGHQUALITY, character::highquality,
-            character::highquality);
+    o.init_property(NSV::PROP_uHIGHQUALITY, DisplayObject::highquality,
+            DisplayObject::highquality);
 
-    gettersetter = &character::x_getset;
+    gettersetter = &DisplayObject::x_getset;
     o.init_property(NSV::PROP_uX, *gettersetter, *gettersetter);
 
-    gettersetter = &character::y_getset;
+    gettersetter = &DisplayObject::y_getset;
     o.init_property(NSV::PROP_uY, *gettersetter, *gettersetter);
 
-    gettersetter = &character::xscale_getset;
+    gettersetter = &DisplayObject::xscale_getset;
     o.init_property(NSV::PROP_uXSCALE, *gettersetter, *gettersetter);
 
-    gettersetter = &character::yscale_getset;
+    gettersetter = &DisplayObject::yscale_getset;
     o.init_property(NSV::PROP_uYSCALE, *gettersetter, *gettersetter);
 
-    gettersetter = &character::xmouse_get;
+    gettersetter = &DisplayObject::xmouse_get;
     o.init_readonly_property(NSV::PROP_uXMOUSE, *gettersetter);
 
-    gettersetter = &character::ymouse_get;
+    gettersetter = &DisplayObject::ymouse_get;
     o.init_readonly_property(NSV::PROP_uYMOUSE, *gettersetter);
 
-    gettersetter = &character::alpha_getset;
+    gettersetter = &DisplayObject::alpha_getset;
     o.init_property(NSV::PROP_uALPHA, *gettersetter, *gettersetter);
 
-    gettersetter = &character::visible_getset;
+    gettersetter = &DisplayObject::visible_getset;
     o.init_property(NSV::PROP_uVISIBLE, *gettersetter, *gettersetter);
 
-    gettersetter = &character::width_getset;
+    gettersetter = &DisplayObject::width_getset;
     o.init_property(NSV::PROP_uWIDTH, *gettersetter, *gettersetter);
 
-    gettersetter = &character::height_getset;
+    gettersetter = &DisplayObject::height_getset;
     o.init_property(NSV::PROP_uHEIGHT, *gettersetter, *gettersetter);
 
-    gettersetter = &character::rotation_getset;
+    gettersetter = &DisplayObject::rotation_getset;
     o.init_property(NSV::PROP_uROTATION, *gettersetter, *gettersetter);
 
-    gettersetter = &character::parent_getset;
+    gettersetter = &DisplayObject::parent_getset;
     o.init_property(NSV::PROP_uPARENT, *gettersetter, *gettersetter);
     
-    gettersetter = &character::target_getset;
+    gettersetter = &DisplayObject::target_getset;
     o.init_property(NSV::PROP_uTARGET, *gettersetter, *gettersetter);
 
-    gettersetter = character::name_getset;
+    gettersetter = DisplayObject::name_getset;
     o.init_property(NSV::PROP_uNAME, gettersetter, gettersetter);
     
     const int unprotected = 0;
@@ -294,9 +294,9 @@ attachButtonInterface(as_object& o)
 
 }
 
-Button::Button(SWF::DefineButtonTag& def, character* parent, int id)
+Button::Button(SWF::DefineButtonTag& def, DisplayObject* parent, int id)
     :
-    character(parent, id),
+    InteractiveDisplayObject(parent, id),
     m_last_mouse_flags(IDLE),
     m_mouse_flags(IDLE),
     m_mouse_state(UP),
@@ -374,23 +374,23 @@ void
 Button::display()
 {
 
-    std::vector<character*> actChars;
+    std::vector<DisplayObject*> actChars;
     getActiveCharacters(actChars);
 
     // TODO: by keeping chars sorted by depth we'd avoid the sort on display
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
     std::for_each(actChars.begin(), actChars.end(),
-            std::mem_fun(&character::display)); 
+            std::mem_fun(&DisplayObject::display)); 
 
     clear_invalidated();
 }
 
 
-character*
-Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
+InteractiveDisplayObject*
+Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
     if (!isVisible() || !isEnabled())
     {
@@ -401,7 +401,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
     // Check our active and visible children first
     //-------------------------------------------------
 
-    typedef std::vector<character*> Chars;
+    typedef std::vector<DisplayObject*> Chars;
     Chars actChars;
     getActiveCharacters(actChars);
 
@@ -416,9 +416,9 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
         for (Chars::reverse_iterator it=actChars.rbegin(), itE=actChars.rend();
                 it!=itE; ++it)
         {
-            character* ch = *it;
+            DisplayObject* ch = *it;
             if ( ! ch->isVisible() ) continue;
-            character *hit = ch->get_topmost_mouse_entity(p.x, p.y);
+            InteractiveDisplayObject *hit = ch->topmostMouseEntity(p.x, p.y);
             if ( hit ) return hit;
         }
     }
@@ -427,13 +427,13 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
     // If that failed, check our hit area
     //-------------------------------------------------
 
-    // Find hit characters
+    // Find hit DisplayObjects
     if ( _hitCharacters.empty() ) return 0;
 
     // point is in parent's space,
     // we need to convert it in world space
     point  wp(x,y);
-    character* parent = get_parent();
+    DisplayObject* parent = get_parent();
     if ( parent )
     {
         parent->getWorldMatrix().transform(wp);
@@ -454,7 +454,7 @@ Button::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
 
 
 void
-Button::on_button_event(const event_id& event)
+Button::mouseEvent(const event_id& event)
 {
     if ( isUnloaded() )
     {
@@ -531,7 +531,7 @@ Button::on_button_event(const event_id& event)
         const SWF::DefineButtonSoundTag::ButtonSound& bs = 
             _def.buttonSound(bi);
 
-        // character zero is considered as null character
+        // DisplayObject zero is considered as null DisplayObject
         if (!bs.soundID) break;
 
         // No actual sound ?
@@ -594,12 +594,12 @@ Button::on_button_event(const event_id& event)
 
 void
 Button::getActiveCharacters(
-        std::vector<const character*>& list) const
+        std::vector<const DisplayObject*>& list) const
 {
     list.clear();
 
-    // Copy all the characters to the new list, skipping NULL and unloaded
-    // characters.
+    // Copy all the DisplayObjects to the new list, skipping NULL and unloaded
+    // DisplayObjects.
     std::remove_copy_if(_stateCharacters.begin(), _stateCharacters.end(),
             std::back_inserter(list),
             boost::bind(&isCharacterNull, _1, false));
@@ -609,12 +609,12 @@ Button::getActiveCharacters(
 
 void 
 Button::getActiveCharacters(
-        std::vector<character*>& list, bool includeUnloaded)
+        std::vector<DisplayObject*>& list, bool includeUnloaded)
 {
     list.clear();
 
-    // Copy all the characters to the new list, skipping NULL
-    // characters, optionally including unloaded characters.
+    // Copy all the DisplayObjects to the new list, skipping NULL
+    // DisplayObjects, optionally including unloaded DisplayObjects.
     std::remove_copy_if(_stateCharacters.begin(), _stateCharacters.end(),
             std::back_inserter(list),
             boost::bind(&isCharacterNull, _1, includeUnloaded));
@@ -646,17 +646,17 @@ Button::get_active_records(ActiveRecords& list, MouseState state)
 }
 
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
-static void dump(std::vector< character* >& chars, std::stringstream& ss)
+static void dump(std::vector< DisplayObject* >& chars, std::stringstream& ss)
 {
     for (size_t i=0, e=chars.size(); i<e; ++i)
     {
         ss << "Record" << i << ": ";
-        character* ch = chars[i];
+        DisplayObject* ch = chars[i];
         if ( ! ch ) ss << "NULL.";
         else
         {
             ss << ch->getTarget() << " (depth:" << 
-                ch->get_depth()-character::staticDepthOffset-1
+                ch->get_depth()-DisplayObject::staticDepthOffset-1
                 << " unloaded:" << ch->isUnloaded() <<
                 " destroyed:" << ch->isDestroyed() << ")";
         }
@@ -685,7 +685,7 @@ Button::set_current_state(MouseState new_state)
     // For each possible record, check if it should still be there
     for (size_t i=0, e=_stateCharacters.size(); i<e; ++i)
     {
-        character* oldch = _stateCharacters[i];
+        DisplayObject* oldch = _stateCharacters[i];
         bool shouldBeThere = ( newChars.find(i) != newChars.end() );
 
         if ( ! shouldBeThere )
@@ -712,7 +712,7 @@ Button::set_current_state(MouseState new_state)
                 {
                     // onUnload handler: shift depth and keep slot
                     int oldDepth = oldch->get_depth();
-                    int newDepth = character::removedDepthOffset - oldDepth;
+                    int newDepth = DisplayObject::removedDepthOffset - oldDepth;
 #ifdef GNASH_DEBUG_BUTTON_DISPLAYLIST
                     log_debug("Removed button record shifted from depth %d to depth %d", oldDepth, newDepth);
 #endif
@@ -738,10 +738,10 @@ Button::set_current_state(MouseState new_state)
                 const SWFMatrix& mat = bdef.m_button_matrix;
                 const cxform& cx = bdef.m_button_cxform;
                 int ch_depth = bdef.m_button_layer + 
-                    character::staticDepthOffset + 1;
-                int ch_id = bdef.m_character_id;
+                    DisplayObject::staticDepthOffset + 1;
+                int ch_id = bdef._id;
 
-                character* ch = bdef.m_character_def->createDisplayObject(
+                DisplayObject* ch = bdef.m_character_def->createDisplayObject(
                         this, ch_id);
                 ch->setMatrix(mat, true); // update caches
                 ch->set_cxform(cx); 
@@ -760,7 +760,7 @@ Button::set_current_state(MouseState new_state)
                 set_invalidated();
 
                 _stateCharacters[i] = ch;
-                ch->stagePlacementCallback(); // give this character a life
+                ch->stagePlacementCallback(); // give this DisplayObject a life
 
             }
         }
@@ -794,10 +794,10 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges,
 
     ranges.add(m_old_invalidated_ranges);  
 
-    std::vector<character*> actChars;
+    std::vector<DisplayObject*> actChars;
     getActiveCharacters(actChars);
     std::for_each(actChars.begin(), actChars.end(),
-            boost::bind(&character::add_invalidated_bounds, _1,
+            boost::bind(&DisplayObject::add_invalidated_bounds, _1,
                 boost::ref(ranges), force||m_invalidated)
     );
 }
@@ -807,12 +807,12 @@ Button::getBounds() const
 {
     rect allBounds;
 
-    typedef std::vector<const character*> CharVect;
+    typedef std::vector<const DisplayObject*> CharVect;
     CharVect actChars;
     getActiveCharacters(actChars);
     for(CharVect::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
     {
-        const character* ch = *i;
+        const DisplayObject* ch = *i;
         // Child bounds need be transformed in our coordinate space
         rect lclBounds = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
@@ -825,12 +825,12 @@ Button::getBounds() const
 bool
 Button::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
-    typedef std::vector<const character*> CharVect;
+    typedef std::vector<const DisplayObject*> CharVect;
     CharVect actChars;
     getActiveCharacters(actChars);
     for(CharVect::const_iterator i=actChars.begin(),e=actChars.end(); i!=e; ++i)
     {
-        const character* ch = *i;
+        const DisplayObject* ch = *i;
         if ( ch->pointInShape(x,y) ) return true;
     }
     return false; 
@@ -839,17 +839,17 @@ Button::pointInShape(boost::int32_t x, boost::int32_t y) const
 as_object*
 Button::get_path_element(string_table::key key)
 {
-    as_object* ch = get_path_element_character(key);
+    as_object* ch = getPathElementSeparator(key);
     if ( ch ) return ch;
 
     const std::string& name = _vm.getStringTable().value(key);
     return getChildByName(name); // possibly NULL
 }
 
-character *
+DisplayObject *
 Button::getChildByName(const std::string& name)
 {
-    // Get all currently active characters, including unloaded
+    // Get all currently active DisplayObjects, including unloaded
     DisplayObjects actChars;
     getActiveCharacters(actChars, true);
 
@@ -859,7 +859,7 @@ Button::getChildByName(const std::string& name)
     for (DisplayObjects::iterator i=actChars.begin(), e=actChars.end(); i!=e; ++i)
     {
 
-        character* const child = *i;
+        DisplayObject* const child = *i;
         const std::string& childname = child->get_name();
  
         if ( _vm.getSWFVersion() >= 7 )
@@ -889,9 +889,9 @@ Button::stagePlacementCallback(as_object* initObj)
 
     saveOriginalTarget(); // for soft refs
 
-    // Don't register this button instance as a live character.
+    // Don't register this button instance as a live DisplayObject.
 
-    // Instantiate the hit characters
+    // Instantiate the hit DisplayObjects
     ActiveRecords hitChars;
     get_active_records(hitChars, HIT);
     for (ActiveRecords::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
@@ -900,10 +900,10 @@ Button::stagePlacementCallback(as_object* initObj)
 
         const SWFMatrix& mat = bdef.m_button_matrix;
         const cxform& cx = bdef.m_button_cxform;
-        int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
-        int ch_id = bdef.m_character_id;
+        int ch_depth = bdef.m_button_layer+DisplayObject::staticDepthOffset+1;
+        int ch_id = bdef._id;
 
-        character* ch =
+        DisplayObject* ch =
             bdef.m_character_def->createDisplayObject(this, ch_id);
         ch->setMatrix(mat, true);  // update caches
     
@@ -916,14 +916,14 @@ Button::stagePlacementCallback(as_object* initObj)
         _hitCharacters.push_back(ch);
     }
 
-    // Setup the state characters container
-    // It will have a slot for each character record.
+    // Setup the state DisplayObjects container
+    // It will have a slot for each DisplayObject record.
     // Some slots will probably be never used (consider HIT-only records)
     // but for now this direct corrispondence between record number
-    // and active character will be handy.
+    // and active DisplayObject will be handy.
     _stateCharacters.resize(_def.buttonRecords().size());
 
-    // Instantiate the default state characters 
+    // Instantiate the default state DisplayObjects 
     ActiveRecords upChars;
     get_active_records(upChars, UP);
 
@@ -934,10 +934,10 @@ Button::stagePlacementCallback(as_object* initObj)
 
         const SWFMatrix& mat = bdef.m_button_matrix;
         const cxform& cx = bdef.m_button_cxform;
-        int ch_depth = bdef.m_button_layer+character::staticDepthOffset+1;
-        int ch_id = bdef.m_character_id;
+        int ch_depth = bdef.m_button_layer+DisplayObject::staticDepthOffset+1;
+        int ch_id = bdef._id;
 
-        character* ch = bdef.m_character_def->createDisplayObject(
+        DisplayObject* ch = bdef.m_character_def->createDisplayObject(
                 this, ch_id);
         ch->setMatrix(mat, true);  // update caches
         ch->set_cxform(cx); 
@@ -952,7 +952,7 @@ Button::stagePlacementCallback(as_object* initObj)
         }
 
         _stateCharacters[rno] = ch;
-        ch->stagePlacementCallback(); // give this character a life
+        ch->stagePlacementCallback(); // give this DisplayObject a life
     }
 
     // There is no INITIALIZE/CONSTRUCT/LOAD/ENTERFRAME/UNLOAD event 
@@ -967,25 +967,25 @@ Button::markReachableResources() const
 
     _def.setReachable();
 
-    // Mark state characters as reachable
+    // Mark state DisplayObjects as reachable
     for (DisplayObjects::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
             i!=e; ++i)
     {
-        character* ch = *i;
+        DisplayObject* ch = *i;
         if ( ch ) ch->setReachable();
     }
 
-    // Mark hit characters as reachable
+    // Mark hit DisplayObjects as reachable
     for (DisplayObjects::const_iterator i = _hitCharacters.begin(),
             e=_hitCharacters.end(); i != e; ++i)
     {
-        character* ch = *i;
+        DisplayObject* ch = *i;
         assert ( ch );
         ch->setReachable();
     }
 
-    // character class members
-    markCharacterReachable();
+    // DisplayObject class members
+    markDisplayObjectReachable();
 }
 #endif // GNASH_USE_GC
 
@@ -1000,7 +1000,7 @@ Button::unload()
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
             e = _stateCharacters.end(); i != e; ++i)
     {
-        character* ch = *i;
+        DisplayObject* ch = *i;
         if ( ! ch ) continue;
         if ( ch->isUnloaded() ) continue;
         if ( ch->unload() ) childsHaveUnload = true;
@@ -1014,7 +1014,7 @@ Button::unload()
     //       hit instance off the GC).
     _hitCharacters.clear();
 
-    bool hasUnloadEvent = character::unload();
+    bool hasUnloadEvent = DisplayObject::unload();
 
     return hasUnloadEvent || childsHaveUnload;
 }
@@ -1026,7 +1026,7 @@ Button::destroy()
     for (DisplayObjects::iterator i = _stateCharacters.begin(),
             e=_stateCharacters.end(); i != e; ++i)
     {
-        character* ch = *i;
+        DisplayObject* ch = *i;
         if ( ! ch ) continue;
         if ( ch->isDestroyed() ) continue;
         ch->destroy();
@@ -1041,7 +1041,7 @@ Button::destroy()
     //       hit instance off the GC).
     _hitCharacters.clear();
 
-    character::destroy();
+    DisplayObject::destroy();
 }
 
 bool
@@ -1049,9 +1049,9 @@ Button::get_member(string_table::key name_key, as_value* val,
     string_table::key nsname)
 {
     // FIXME: use addProperty interface for these !!
-    // TODO: or at least have a character:: protected method take
+    // TODO: or at least have a DisplayObject:: protected method take
     //       care of these ?
-    //       Duplicates code in character::get_path_element_character too..
+    //       Duplicates code in DisplayObject::getPathElementSeparator too..
     //
     if (name_key == NSV::PROP_uROOT) {
         // getAsRoot() will take care of _lockroot
@@ -1102,10 +1102,10 @@ Button::get_member(string_table::key name_key, as_value* val,
         if ( getChildByName(name) )
         {
             log_aserror(_("A button member (%s) clashes with "
-                    "the name of an existing character "
+                    "the name of an existing DisplayObject "
                     "in its display list.    "
                     "The member will hide the "
-                    "character"), name);
+                    "DisplayObject"), name);
         }
         );
 #endif
@@ -1114,7 +1114,7 @@ Button::get_member(string_table::key name_key, as_value* val,
     }
 
     // Try items on our display list.
-    character* ch = getChildByName(name);
+    DisplayObject* ch = getChildByName(name);
 
     if (ch) {
         // Found object.
@@ -1179,19 +1179,19 @@ Button::init(as_object& global)
 }
 
 #ifdef USE_SWFTREE
-character::InfoTree::iterator 
+DisplayObject::InfoTree::iterator 
 Button::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
-    InfoTree::iterator selfIt = character::getMovieInfo(tr, it);
+    InfoTree::iterator selfIt = DisplayObject::getMovieInfo(tr, it);
     std::ostringstream os;
 
-    std::vector<character*> actChars;
+    std::vector<DisplayObject*> actChars;
     getActiveCharacters(actChars, true);
     std::sort(actChars.begin(), actChars.end(), charDepthLessThen);
 
-    os << actChars.size() << " active characters for state " << mouseStateName(m_mouse_state);
+    os << actChars.size() << " active DisplayObjects for state " << mouseStateName(m_mouse_state);
     InfoTree::iterator localIter = tr.append_child(selfIt, StringPair(_("Button state"), os.str()));        
-    std::for_each(actChars.begin(), actChars.end(), boost::bind(&character::getMovieInfo, _1, tr, localIter)); 
+    std::for_each(actChars.begin(), actChars.end(), boost::bind(&DisplayObject::getMovieInfo, _1, tr, localIter)); 
 
     return selfIt;
 

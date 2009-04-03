@@ -22,7 +22,7 @@
 #include "as_object.h"
 #include "as_function.h" // for as_function
 #include "MovieClip.h" // for MOVIECLIP values
-#include "character.h" // for MOVIECLIP values
+#include "DisplayObject.h" // for MOVIECLIP values
 #include "as_environment.h" // for MOVIECLIP values
 #include "VM.h" // for MOVIECLIP values
 #include "movie_root.h" // for MOVIECLIP values
@@ -145,7 +145,7 @@ parsePositiveInt(const std::string& s, Base base, bool whole = true)
     char c;
 
     // If the cast fails, or if the whole string must be convertible and
-    // some characters are left, throw an exception.
+    // some DisplayObjects are left, throw an exception.
     if (!(is >> target) || (whole && is.get(c))) {
         throw boost::bad_lexical_cast();
     }
@@ -750,7 +750,7 @@ as_value::to_number() const
             if (swfversion <= 4)
             {
                 // For SWF4, any valid number before non-numerical
-                // characters is returned, including exponent, positive
+                // DisplayObjects is returned, including exponent, positive
                 // and negative signs and whitespace before.
                 double d = 0;
                 std::istringstream is(s);
@@ -773,7 +773,7 @@ as_value::to_number() const
                 // Valid for SWF5 and above.
                 //
                 // boost::lexical_cast is remarkably inflexible and 
-                // fails for anything that has non-numerical characters.
+                // fails for anything that has non-numerical DisplayObjects.
                 // Fortunately, actionscript is equally inflexible.
                 std::string::size_type pos;
                 if ((pos = s.find_first_not_of(" \r\n\t")) 
@@ -1020,7 +1020,7 @@ as_value::to_object() const
 		case MOVIECLIP:
 			// FIXME: update when to_sprite will return
 			//        an intrusive_ptr directly
-			return ptr(to_character());
+			return ptr(toDisplayObject());
 
 		case STRING:
 			return init_string_instance(getStr());
@@ -1042,13 +1042,13 @@ as_value::to_sprite(bool allowUnloaded) const
 {
 	if ( m_type != MOVIECLIP ) return 0;
 
-	character *ch = getCharacter(allowUnloaded);
+	DisplayObject *ch = getCharacter(allowUnloaded);
 	if ( ! ch ) return 0;
 	return ch->to_movie();
 }
 
-character*
-as_value::to_character(bool allowUnloaded) const
+DisplayObject*
+as_value::toDisplayObject(bool allowUnloaded) const
 {
 	if ( m_type != MOVIECLIP ) return NULL;
 
@@ -1058,11 +1058,11 @@ as_value::to_character(bool allowUnloaded) const
 void
 as_value::set_sprite(MovieClip& sprite)
 {
-	set_character(sprite);
+	setDisplayObject(sprite);
 }
 
 void
-as_value::set_character(character& sprite)
+as_value::setDisplayObject(DisplayObject& sprite)
 {
 	m_type = MOVIECLIP;
 	_value = CharacterProxy(&sprite);
@@ -1137,10 +1137,10 @@ as_value::set_as_object(as_object* obj)
 		set_null();
 		return;
 	}
-	character* sp = obj->to_character();
+	DisplayObject* sp = obj->toDisplayObject();
 	if ( sp )
 	{
-		set_character(*sp);
+		setDisplayObject(*sp);
 		return;
 	}
 	as_function* func = obj->to_function();
@@ -1415,10 +1415,10 @@ as_value::typeOf() const
 
 		case as_value::MOVIECLIP:
 		{
-			character* ch = getCharacter();
+			DisplayObject* ch = getCharacter();
 			if ( ! ch ) return "movieclip"; // dangling
 			if ( ch->to_movie() ) return "movieclip"; // bound to movieclip
-			return "object"; // bound to some other character
+			return "object"; // bound to some other DisplayObject
 		}
 
 		case as_value::NULLTYPE:
@@ -1460,7 +1460,7 @@ as_value::equalsSameType(const as_value& v) const
 			return _value == v._value;
 
 		case MOVIECLIP:
-			return to_character() == v.to_character(); 
+			return toDisplayObject() == v.toDisplayObject(); 
 
 		case NUMBER:
 		{
@@ -1534,7 +1534,7 @@ as_value::toDebugString() const
 			const CharacterProxy& sp = getCharacterProxy();
 			if ( sp.isDangling() )
 			{
-				character* rebound = sp.get();
+				DisplayObject* rebound = sp.get();
 				if ( rebound )
 				{
 				    ret = boost::format("[rebound %s(%s):%p]") % 
@@ -1543,13 +1543,13 @@ as_value::toDebugString() const
 				}
 				else
 				{
-				    ret = boost::format("[dangling character:%s]") % 
+				    ret = boost::format("[dangling DisplayObject:%s]") % 
 					    sp.getTarget();
 				}
 			}
 			else
 			{
-				character* ch = sp.get();
+				DisplayObject* ch = sp.get();
 				ret = boost::format("[%s(%s):%p]") % typeName(*ch) %
 				                sp.getTarget() % static_cast<void*>(ch);
 			}
@@ -1758,7 +1758,7 @@ as_value::SpritePtr
 as_value::getSprite(bool allowUnloaded) const
 {
 	assert(m_type == MOVIECLIP);
-	character* ch = getCharacter(allowUnloaded);
+	DisplayObject* ch = getCharacter(allowUnloaded);
 	if ( ! ch ) return 0;
 	return ch->to_movie();
 }

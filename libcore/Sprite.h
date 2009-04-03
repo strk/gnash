@@ -24,8 +24,8 @@
 ///
 /// A Sprite, or MovieClip, is a mini movie-within-a-movie. 
 ///
-/// It doesn't define its own characters;
-/// it uses the characters from the parent
+/// It doesn't define its own DisplayObjects;
+/// it uses the DisplayObjects from the parent
 /// movie, but it has its own frame counter, display list, etc.
 ///
 /// @@ are we sure it doesn't define its own chars ?

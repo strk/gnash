@@ -140,7 +140,7 @@ morph2_character_def::~morph2_character_def()
 }
 
 void
-morph2_character_def::display(character* inst)
+morph2_character_def::display(DisplayObject* inst)
 {
 
     const double ratio = inst->get_ratio() / 65535.0;
@@ -209,7 +209,7 @@ morph2_character_def::display(character* inst)
     }
 
     //  display
-    render::draw_shape_character(this, inst);
+    render::drawShape(this, inst);
 
 }
 

@@ -31,7 +31,7 @@
 // Forward declarations
 namespace gnash {
 	class movie_root; 
-	class character; 
+	class DisplayObject; 
 }
 
 namespace gnash
@@ -45,7 +45,7 @@ public:
 
 	// We take a generic movie_definition to allow
 	// for subclasses for other then SWF movies
-	movie_instance(movie_definition* def, character* parent);
+	movie_instance(movie_definition* def, DisplayObject* parent);
 
 	virtual ~movie_instance() {}
 
@@ -60,7 +60,7 @@ public:
 	///
 	void stagePlacementCallback(as_object* initObj = 0);
 
-	/// Set a character in the dictionary as initialized, returning
+	/// Set a DisplayObject in the dictionary as initialized, returning
 	/// true if not already initialized.
 	bool setCharacterInitialized(int cid)
 	{
@@ -71,7 +71,7 @@ private:
 
 	/// A map to track execution of init actions
 	//
-	/// Elements of this set are ids of characters
+	/// Elements of this set are ids of DisplayObjects
 	/// in our definition's CharacterDictionary.
 	///
 	std::set<int> _initializedCharacters;

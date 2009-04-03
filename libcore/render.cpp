@@ -151,13 +151,12 @@ void  draw_poly(const point* corners, int corner_count, const rgba& fill,
 }
 
 
-void draw_shape_character(shape_character_def *def, 
-  character *inst) 
+void drawShape(shape_character_def *def, DisplayObject *inst) 
 {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->draw_shape_character(def, inst);
+		if (s_render_handler) s_render_handler->drawShape(def, inst);
 }
 
 void draw_glyph(shape_character_def *def,

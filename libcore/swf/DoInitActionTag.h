@@ -92,7 +92,7 @@ private:
 
     action_buffer _buf;
 
-    // id of referenced character definition
+    // id of referenced DisplayObject definition
     int _cid;
 };
 

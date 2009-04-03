@@ -280,7 +280,7 @@ main(int argc, char** argv)
 
 	for (i=0; i<10; ++i) SWFMovie_nextFrame(mo); 
 
-	// Try removing all characters
+	// Try removing all DisplayObjects
 	add_actions(mo, "removeMovieClip(staticmc);"
 			"removeMovieClip(dynamicmc);"
 			"removeMovieClip(dynamicmc_2000);"

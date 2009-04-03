@@ -280,14 +280,14 @@ global_isfinite(const fn_call& fn)
 }
 
 /// \brief Encode a string to URL-encoded format
-/// converting all dodgy characters to %AB hex sequences
+/// converting all dodgy DisplayObjects to %AB hex sequences
 //
 /// Characters that need escaping are:
-/// - ASCII control characters: 0-31 and 127
+/// - ASCII control DisplayObjects: 0-31 and 127
 /// - Non-ASCII chars: 128-255
-/// - URL syntax characters: $ & + , / : ; = ? @
-/// - Unsafe characters: SPACE " < > # % { } | \ ^ ~ [ ] `
-/// Encoding is a % followed by two hexadecimal characters, case insensitive.
+/// - URL syntax DisplayObjects: $ & + , / : ; = ? @
+/// - Unsafe DisplayObjects: SPACE " < > # % { } | \ ^ ~ [ ] `
+/// Encoding is a % followed by two hexadecimal DisplayObjects, case insensitive.
 /// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
 /// Section 2.2 "URL Character Encoding Issues"
 as_value
@@ -301,10 +301,10 @@ global_escape(const fn_call& fn)
 }
 
 /// \brief Decode a string from URL-encoded format
-/// converting all hexadecimal sequences to ASCII characters.
+/// converting all hexadecimal sequences to ASCII DisplayObjects.
 //
 /// A sequence to convert is % followed by two case-independent hexadecimal
-/// digits, which is replaced by the equivalent ASCII character.
+/// digits, which is replaced by the equivalent ASCII DisplayObject.
 /// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
 /// Section 2.2 "URL Character Encoding Issues"
 as_value
@@ -341,9 +341,9 @@ global_parsefloat(const fn_call& fn)
 // 1. If the string starts with 0x or 0X, the number is hex.
 // 2. The 0x or 0X may be *followed* by '-' or '+' to indicate sign. A number
 //    with no sign is positive.
-// 3. If the string starts with 0, -0 or +0 and contains only the characters
+// 3. If the string starts with 0, -0 or +0 and contains only the DisplayObjects
 //    0-7.
-// 4. If the string starts with *any* other sequence of characters, including
+// 4. If the string starts with *any* other sequence of DisplayObjects, including
 //    whitespace, it is decimal.
 as_value
 global_parseint(const fn_call& fn)
@@ -432,9 +432,9 @@ global_parseint(const fn_call& fn)
     if (digit >= base || digit == std::string::npos) return as_value(NaN);
 
     // The first digit was valid, so continue from the present position
-    // until we reach the end of the string or an invalid character,
-    // adding valid characters to our result.
-    // Which characters are invalid depends on the base. 
+    // until we reach the end of the string or an invalid DisplayObject,
+    // adding valid DisplayObjects to our result.
+    // Which DisplayObjects are invalid depends on the base. 
     double result = digit;
     ++it;
     
