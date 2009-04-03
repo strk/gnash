@@ -354,7 +354,7 @@ public:
     bool intersects(const RangeType& r) const {
     
         finalize();
-        return std::find_if(_ranges.begin(), _ranges.end(), IntersectsRanges(r))
+        return std::find_if(_ranges.begin(), _ranges.end(), IntersectsRange(r))
             != _ranges.end();
     }
     
