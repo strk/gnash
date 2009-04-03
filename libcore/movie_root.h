@@ -1060,7 +1060,8 @@ private:
     /// @param y
     ///     Y ordinate of the pointer, in world coordiante space (twips).
     ///
-    DisplayObject* getTopmostMouseEntity(boost::int32_t x, boost::int32_t y);
+    InteractiveDisplayObject* getTopmostMouseEntity(boost::int32_t x,
+            boost::int32_t y) const;
 
     /// Delete DisplayObjects removed from the stage
     /// from the display lists

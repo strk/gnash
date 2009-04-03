@@ -1939,23 +1939,25 @@ movie_root::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
-DisplayObject *
-movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y)
+InteractiveDisplayObject*
+movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
 {
 
-	for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+	for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend();
+            i != e; ++i)
 	{
-		DisplayObject* ret = i->second->topmostMouseEntity(x, y);
-		if ( ret ) return ret;
+		InteractiveDisplayObject* ret = i->second->topmostMouseEntity(x, y);
+		if (ret) return ret;
 	}
 
-	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend();
+            i != e; ++i)
 	{
-		DisplayObject* ret = i->second->topmostMouseEntity(x, y);
-		if ( ret ) return ret;
+		InteractiveDisplayObject* ret = i->second->topmostMouseEntity(x, y);
+		if (ret) return ret;
 	}
 
-	return NULL;
+	return 0;
 }
 
 const DisplayObject *
