@@ -1482,7 +1482,7 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     }	    
 
     /// Don't add if it's not a real clipping depth
-    if (int cd = get_clip_depth() != noClipDepthValue )
+    if (int cd = get_clip_depth() != noClipDepthValue)
     {
 		os.str("");
 		if (_maskee) os << "Dynamic mask";
