@@ -103,7 +103,7 @@ public:
 	//
 	/// I.e. check against ourself.
 	///
-	virtual InteractiveDisplayObject* get_topmost_mouse_entity(boost::int32_t x,
+	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 	
 	virtual bool wantsInstanceName() const

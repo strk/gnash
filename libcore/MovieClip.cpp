@@ -87,7 +87,7 @@ namespace gnash {
 //#define DEBUG_DRAWING_API 1
 
 // Define this to make mouse entity finding verbose
-// This includes get_topmost_mouse_entity and findDropTarget
+// This includes topmostMouseEntity and findDropTarget
 //
 //#define DEBUG_MOUSE_ENTITY_FINDING 1
 
@@ -277,7 +277,7 @@ public:
         for (Candidates::reverse_iterator i=_candidates.rbegin(),
                         e=_candidates.rend(); i!=e; ++i) {
             DisplayObject* ch = *i;
-            InteractiveDisplayObject* te = ch->get_topmost_mouse_entity(_pp.x, _pp.y);
+            InteractiveDisplayObject* te = ch->topmostMouseEntity(_pp.x, _pp.y);
             if (te) {
                 _m = te;
                 break;
@@ -1754,7 +1754,7 @@ MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
 }
 
 InteractiveDisplayObject*
-MovieClip::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
+MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
 

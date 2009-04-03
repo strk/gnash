@@ -501,7 +501,7 @@ TextField::on_event(const event_id& ev)
 }
 
 InteractiveDisplayObject*
-TextField::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
+TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
 
     if (!isVisible()) return 0;
@@ -514,7 +514,7 @@ TextField::get_topmost_mouse_entity(boost::int32_t x, boost::int32_t y)
     point p(x, y);
     m.invert().transform(p);
 
-    if ( _bounds.point_test(p.x, p.y) )    return this;
+    if (_bounds.point_test(p.x, p.y)) return this;
 
     return 0;
 }

@@ -1945,13 +1945,13 @@ movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
 	for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
 	{
-		DisplayObject* ret = i->second->get_topmost_mouse_entity(x, y);
+		DisplayObject* ret = i->second->topmostMouseEntity(x, y);
 		if ( ret ) return ret;
 	}
 
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
-		DisplayObject* ret = i->second->get_topmost_mouse_entity(x, y);
+		DisplayObject* ret = i->second->topmostMouseEntity(x, y);
 		if ( ret ) return ret;
 	}
 

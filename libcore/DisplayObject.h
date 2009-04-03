@@ -674,7 +674,7 @@ public:
 	/// If you need to check for a generic DisplayObject to contain a 
 	/// given point, use the pointInShape() function instead.
 	/// 
-	virtual InteractiveDisplayObject* get_topmost_mouse_entity(boost::int32_t, 
+	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t, 
             boost::int32_t)
 	{
 		return 0;
