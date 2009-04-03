@@ -34,9 +34,12 @@ namespace gnash {
 
 namespace gnash {
 
-/// The base class for all rendered objects on the Stage.
+/// The base class for interactive objects.
 //
-/// Objects of type DisplayObject are non-interactive.
+/// Objects of type InteractiveDisplayObject can receive focus, mouse events,
+/// and key events for user interaction.
+//
+/// Derived classes include TextField, Button, and MovieClip.
 class InteractiveDisplayObject : public DisplayObject
 {
 
@@ -50,17 +53,14 @@ public:
 
     virtual ~InteractiveDisplayObject() {}
 
-    /// Render this DisplayObject
-    virtual void display() {}
+    /// Render this InteractiveDisplayObject
+    virtual void display() = 0;
 
     /// Whether the DisplayObject can handle a mouse event.
     //
-    /// Normal DisplayObjects apparently cannot handle
-    /// mouse events.
     /// @return     true if the DisplayObject can handle mouse
     ///             events
-	virtual bool can_handle_mouse_event() const
-    {
+	virtual bool can_handle_mouse_event() const {
 		return false;
 	}
 
@@ -69,25 +69,16 @@ public:
     /// Default returns 0, implemented only for DefineText though
     /// DisplayObject.
     virtual StaticText* getStaticText(std::vector<const SWF::TextRecord*>&,
-            size_t&)
-    {
+            size_t&) {
         return 0;
     }
 
     /// Returns local, untransformed bounds of this DisplayObject in TWIPS
     //
-    /// The default implementation prints an error and returns a NULL rect.
-    ///
     /// Container DisplayObjects (sprite and buttons) return the composite
-    /// bounds of all their childrens, appropriaterly transformed with
+    /// bounds of all their children, appropriately transformed with
     /// their local SWFMatrix.
-    ///
-    virtual rect getBounds() const
-    {
-        log_error("FIXME: InteractiveDisplayObject %s did not override the "
-                "getBounds() method", typeName(*this));
-        return rect();
-    }
+    virtual rect getBounds() const = 0;
 
     /// \brief
     /// Return the topmost entity covering the given point
@@ -134,8 +125,7 @@ public:
         log_error("Character %s did not override pointInShape() - "
                 "using pointInBounds() instead", typeid(*this).name());
         return pointInBounds(x, y);
-    }	// See dox in DisplayObject.h
-
+    }
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force) = 0;
 

@@ -59,15 +59,21 @@ namespace gnash {
 
 namespace gnash {
 
-/// Character is a live, stateful instance of a character_def.
+/// DisplayObject is the base class for all DisplayList objects.
 //
-/// It represents a single active element in a movie.
+/// It represents a single active element in a movie. This class does not
+/// provide any interactivity.
+//
+/// Derived classes include InteractiveDisplayObject, StaticText, Bitmap,
+/// Video, and Shape.
 class DisplayObject : public as_object
 {
 
 public:
 
     DisplayObject(DisplayObject* parent, int id);
+
+    virtual ~DisplayObject() {}
 
     /// The lowest placeable and accessible depth for a DisplayObject.
     /// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
@@ -80,15 +86,14 @@ public:
     /// which can be placed at any depth within +/- 2**31.
     static const int lowerAccessibleBound = -16384;
     
-    
     /// This is the maximum depth a MovieClip DisplayObject can be placed
     /// at (attachMovie). Kirupa (see above) says 2130690045, but this
     /// seems not to be included in the range.
     static const int upperAccessibleBound = 2130690044;
 
     /// This is the amount added to displaylist tag defined depths.
-    /// Character placed by tags (vs. DisplayObjects instantiated by ActionScript)
-    /// always have negative depths by effect of this offset.
+    /// DisplayObjects placed by tags (vs. DisplayObjects instantiated by
+    /// ActionScript) always have negative depths by effect of this offset.
     static const int staticDepthOffset = lowerAccessibleBound;
 
     /// This is the offset at which DisplayObject's depth is
@@ -106,8 +111,6 @@ public:
     ///   3:  Max depth for a PlaceoObject call is 16384 (which becomes 
     ///       0 in the statics)
     /// (all of the above correct?)
-    ///
-    ///
     static const int removedDepthOffset = -32769; 
 
     /// Return true if the given depth is in the removed zone
@@ -129,14 +132,6 @@ public:
     /// value should not collide with real depths.  
     ///
     static const int noClipDepthValue = -1000000;
-
-    /// This value is used for m_clip_depth when 
-    /// the DisplayObject is a dynamic mask.
-    //
-    /// Depths below -16384 are illegal, so this
-    /// value should not collide with real depths.  
-    ///
-    static const int dynClipDepthValue = -2000000;
 
     /// Return a reference to the variable scope of this DisplayObject.
     //
@@ -253,7 +248,7 @@ public:
 
     void  set_cxform(const cxform& cx) 
     {       
-        if (!(cx == m_color_transform)) {
+        if (cx != m_color_transform) {
             set_invalidated(__FILE__, __LINE__);
             m_color_transform = cx;
         }
@@ -269,13 +264,14 @@ public:
 
     void set_ratio(int r)
     {
-      if (r!=m_ratio) set_invalidated(__FILE__, __LINE__); 
-      m_ratio = r;       
+        if (r != m_ratio) set_invalidated(__FILE__, __LINE__); 
+        m_ratio = r;       
     }
 
-    /// Returns the clipping depth (if any) of this DisplayObject. The parameter is 
-    /// tells us to use the DisplayObject as a mask for all the objects contained 
-    /// in the display list from m_depth to m_clipping_depth inclusive.
+    /// Returns the clipping depth (if any) of this DisplayObject.
+    /// The parameter tells us to use the DisplayObject as a mask for
+    /// all the objects contained in the display list from m_depth
+    /// to m_clipping_depth inclusive.
     /// 
     /// The value returned by get_clip_depth() is only valid when isMaskLayer()
     /// returns true!
@@ -297,10 +293,7 @@ public:
     ///     
     bool isMaskLayer() const
     {
-        // TODO: is dynClipDepthValue still needed ?
-        //       since we have a _maskee member now, we may use that instead..
-        return (m_clip_depth != noClipDepthValue && 
-                m_clip_depth != dynClipDepthValue);
+        return (m_clip_depth != noClipDepthValue && !_maskee);
     }
 
     /// Returns true when the DisplayObject (and it's childs) is used as a mask
@@ -314,7 +307,7 @@ public:
     ///     
     bool isDynamicMask() const
     {
-        return (m_clip_depth==dynClipDepthValue);
+        return _maskee;
     }
 
     DisplayObject* toDisplayObject() { return this; }
@@ -341,7 +334,8 @@ public:
     ///
     void setMask(DisplayObject* mask);
 
-    /// Returns true if this DisplayObject is a mask (either layer or dynamic mask)
+    /// Returns true if this DisplayObject is a mask (either layer or
+    /// dynamic mask)
     bool isMask() const
     {
         return isDynamicMask() || isMaskLayer();
@@ -354,14 +348,6 @@ public:
     }
 
     const std::string& get_name() const { return _name; }
-
-    /// Return true if this DisplayObject can handle mouse events.
-    //
-    /// The default implementation returns false.
-    ///
-    virtual bool can_handle_mouse_event() const {
-        return false;
-    }
 
     /// \brief
     /// Get our concatenated SWFMatrix (all our ancestor transforms,
@@ -380,15 +366,15 @@ public:
     /// times our cxform). 
     ///
     /// Maps from our local space into normal color space.
-    virtual cxform    get_world_cxform() const;
+    virtual cxform get_world_cxform() const;
 
     /// Get the built-in function handlers code for the given event
     //
     /// NOTE: this function is only for getting statically-defined
-    ///             event handlers, which are the ones attached to a DisplayObject
-    ///             with a PlaceObject2. It's the DisplayObject's responsibility
-    ///             to properly fetch any user-defined event handler, which 
-    ///             are the ones attached to a DisplayObject with ActionScript code.
+    ///       event handlers, which are the ones attached to a DisplayObject
+    ///       with a PlaceObject2. It's the DisplayObject's responsibility
+    ///       to properly fetch any user-defined event handler, which 
+    ///       are the ones attached to a DisplayObject with ActionScript code.
     ///
     std::auto_ptr<ExecutableCode> get_event_handler(const event_id& id) const;
 
@@ -398,10 +384,10 @@ public:
     /// handlers if this is the case.
     ///
     /// NOTE: this function is only for registering statically-defined
-    ///             event handlers, which are the ones attached to a DisplayObject
-    ///             with a PlaceObject2. It's the DisplayObject's responsibility
-    ///             to properly invoke any user-defined event handler, which 
-    ///             are the ones attached to a DisplayObject with ActionScript code.
+    ///       event handlers, which are the ones attached to a DisplayObject
+    ///       with a PlaceObject2. It's the DisplayObject's responsibility
+    ///       to properly invoke any user-defined event handler, which 
+    ///       are the ones attached to a DisplayObject with ActionScript code.
     ///
     /// @param id
     /// The event triggering the handler.
@@ -549,9 +535,6 @@ public:
         // GNASH_REPORT_FUNCTION 
     }
 
-    // TODO: verify if this is really needed (I guess not)
-    virtual void    goto_frame(size_t /*target_frame*/) {}
-
     /// \brief
     /// Return true if PlaceObjects tag are allowed to move
     /// this DisplayObject.
@@ -614,28 +597,6 @@ public:
     // Return true if this DisplayObject should be rendered
     bool isVisible() const { return _visible; }
 
-    /// Return mouse state in given variables
-    //
-    /// Use this to retrieve the last state of the mouse, as set via
-    /// notify_mouse_state().    Coordinates are in PIXELS, NOT TWIPS.
-    ///
-    /// The default implementation calls get_mouse_state against
-    /// the DisplayObject's parent. The final parent (a MovieClip)
-    /// will delegate the call to it's associated movie_root, which
-    /// does all the work.
-    ///
-    //virtual void get_mouse_state(int& x, int& y, int& buttons);
-
-    /// These have been moved down from movie.h to remove that file
-    /// from the inheritance chain. It is probably still a misdesign
-    /// to require these functions for all DisplayObjects.
-    /// @{
-
-    virtual movie_definition *get_movie_definition()
-    {
-        return NULL;
-    }
-
     /// ActionScript event handler.    Returns true if a handler was called.
     //
     /// Must be overridden or will always return false.
@@ -662,18 +623,13 @@ public:
     ///
     bool hasEventHandler(const event_id& id) const;
 
-	/// DisplayObject is NEVER a mouse entity by default, so
-	/// the default implementation of this method always returns NULL.
-	/// Override it from subclasses that do can be mouse entities.
-	///
-	/// If you need to check for a generic DisplayObject to contain a 
-	/// given point, use the pointInShape() function instead.
-	/// 
+	/// DisplayObjects are not a mouse entity by default.
+    //
+    /// Override this function for InteractiveDisplayObjects.
 	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t, 
-            boost::int32_t)
-	{
-		return 0;
-	}
+            boost::int32_t) {
+        return 0;
+    }
 	
     /// Find highest depth DisplayObject whose shape contains the given
     /// point and is not the DisplayObject being dragged or any of its childs.
@@ -893,18 +849,18 @@ public:
             const std::string& name) const;
 #endif
 
-  /// Return true if this DisplayObject is a selectable TextField
-  //
-  /// This method is used by Gui to set up an appropriate cursor
-  /// for input textfields.
-  ///
-  virtual bool isSelectableTextField() const { return false; }
+    /// Return true if this DisplayObject is a selectable TextField
+    //
+    /// This method is used by Gui to set up an appropriate cursor
+    /// for input textfields.
+    ///
+    virtual bool isSelectableTextField() const { return false; }
 
-  /// \brief
-  /// Return true if this DisplayObject allows turning the cursor
-  /// into an hand shape when it happens to be the one receiving
-  /// mouse events.
-  virtual bool allowHandCursor() const { return true; }
+    /// \brief
+    /// Return true if this DisplayObject allows turning the cursor
+    /// into an hand shape when it happens to be the one receiving
+    /// mouse events.
+    virtual bool allowHandCursor() const { return true; }
 
 #ifdef USE_SWFTREE
     typedef std::pair<std::string, std::string> StringPair; 
@@ -955,76 +911,76 @@ public:
     typedef std::vector<const action_buffer*> BufferList;
     typedef std::map<event_id, BufferList> Events;
 
-  /// Set the current focus to this DisplayObject.
-  //
-  /// @return false if the DisplayObject cannot receive focus, true if it can
-  ///         (and does).
-  //
-  /// Button, Textfield and MovieClip can receive focus. In SWF6 and above,
-  /// MovieClip can only receive focus if the focusEnabled property
-  /// evaluates to true.
-  virtual bool handleFocus() { 
-      return false;
-  }
+    /// Set the current focus to this DisplayObject.
+    //
+    /// @return false if the DisplayObject cannot receive focus, true if it can
+    ///         (and does).
+    //
+    /// Button, Textfield and MovieClip can receive focus. In SWF6 and above,
+    /// MovieClip can only receive focus if the focusEnabled property
+    /// evaluates to true.
+    virtual bool handleFocus() { 
+        return false;
+    }
 
-  /// Some DisplayObjects require actions on losing focus.
-  //
-  /// Default is a no-op. TextField implements this function.
-  virtual void killFocus() {}
-
-  /// Getter-setter for _highquality.
-  static as_value highquality(const fn_call& fn);
-
-  /// Getter-setter for _quality.
-  static as_value quality(const fn_call& fn);
-
-  /// Getter-setter for blendMode.
-  static as_value blendMode(const fn_call& fn);
-
-  /// Getter-setter for _x
-  static as_value x_getset(const fn_call& fn);
-
-  /// Getter-setter for _y
-  static as_value y_getset(const fn_call& fn);
-
-  /// Getter-setter for _xscale
-  static as_value xscale_getset(const fn_call& fn);
-
-  /// Getter-setter for _yscale
-  static as_value yscale_getset(const fn_call& fn);
-
-  /// Getter-setter for _xmouse
-  static as_value xmouse_get(const fn_call& fn);
-
-  /// Getter-setter for _ymouse
-  static as_value ymouse_get(const fn_call& fn);
-
-  /// Getter-setter for _alpha
-  static as_value alpha_getset(const fn_call& fn);
-
-  /// Getter-setter for _visible
-  static as_value visible_getset(const fn_call& fn);
-
-  /// Getter-setter for _width
-  static as_value width_getset(const fn_call& fn);
-
-  /// Getter-setter for _height
-  static as_value height_getset(const fn_call& fn);
-
-  /// Getter-setter for _rotation
-  static as_value rotation_getset(const fn_call& fn);
-
-  /// Getter-setter for _parent 
-  static as_value parent_getset(const fn_call& fn);
-
-  /// Getter-setter for _target 
-  static as_value target_getset(const fn_call& fn);
-
-  /// Getter-setter for _name
-  static as_value name_getset(const fn_call& fn);
-
-  /// @} Common ActionScript getter-setters for DisplayObjects
-
+    /// Some DisplayObjects require actions on losing focus.
+    //
+    /// Default is a no-op. TextField implements this function.
+    virtual void killFocus() {}
+  
+    /// Getter-setter for _highquality.
+    static as_value highquality(const fn_call& fn);
+  
+    /// Getter-setter for _quality.
+    static as_value quality(const fn_call& fn);
+  
+    /// Getter-setter for blendMode.
+    static as_value blendMode(const fn_call& fn);
+  
+    /// Getter-setter for _x
+    static as_value x_getset(const fn_call& fn);
+  
+    /// Getter-setter for _y
+    static as_value y_getset(const fn_call& fn);
+  
+    /// Getter-setter for _xscale
+    static as_value xscale_getset(const fn_call& fn);
+  
+    /// Getter-setter for _yscale
+    static as_value yscale_getset(const fn_call& fn);
+  
+    /// Getter-setter for _xmouse
+    static as_value xmouse_get(const fn_call& fn);
+  
+    /// Getter-setter for _ymouse
+    static as_value ymouse_get(const fn_call& fn);
+  
+    /// Getter-setter for _alpha
+    static as_value alpha_getset(const fn_call& fn);
+  
+    /// Getter-setter for _visible
+    static as_value visible_getset(const fn_call& fn);
+  
+    /// Getter-setter for _width
+    static as_value width_getset(const fn_call& fn);
+  
+    /// Getter-setter for _height
+    static as_value height_getset(const fn_call& fn);
+  
+    /// Getter-setter for _rotation
+    static as_value rotation_getset(const fn_call& fn);
+  
+    /// Getter-setter for _parent 
+    static as_value parent_getset(const fn_call& fn);
+  
+    /// Getter-setter for _target 
+    static as_value target_getset(const fn_call& fn);
+  
+    /// Getter-setter for _name
+    static as_value name_getset(const fn_call& fn);
+  
+    /// @} Common ActionScript getter-setters for DisplayObjects
+  
 protected:
 
     /// Register currently computable target as

@@ -64,7 +64,6 @@ const int DisplayObject::upperAccessibleBound;
 const int DisplayObject::staticDepthOffset;
 const int DisplayObject::removedDepthOffset;
 const int DisplayObject::noClipDepthValue;
-const int DisplayObject::dynClipDepthValue;
 
 // Initialize unnamed instance count
 unsigned int DisplayObject::_lastUnnamedInstanceNum = 0;
@@ -1443,11 +1442,7 @@ DisplayObject::setMaskee(DisplayObject* maskee)
 
 	_maskee = maskee;
 
-	if ( maskee )
-	{
-		set_clip_depth(dynClipDepthValue);
-	}
-	else
+	if (!maskee)
 	{
 		// TODO: should we reset any original clip depth
 		//       specified by PlaceObject tag ?
@@ -1487,10 +1482,10 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
     }	    
 
     /// Don't add if it's not a real clipping depth
-    if (int cd = get_clip_depth() != noClipDepthValue )
+    if (int cd = get_clip_depth() != noClipDepthValue)
     {
 		os.str("");
-		if (cd == dynClipDepthValue) os << "Dynamic mask";
+		if (_maskee) os << "Dynamic mask";
 		else os << cd;
 
 		tr.append_child(it, StringPair(_("Clipping depth"), os.str()));	    
