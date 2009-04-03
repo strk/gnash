@@ -256,7 +256,7 @@ public:
 
     void  set_cxform(const cxform& cx) 
     {       
-        if (!(cx == m_color_transform)) {
+        if (cx != m_color_transform) {
             set_invalidated(__FILE__, __LINE__);
             m_color_transform = cx;
         }
@@ -272,13 +272,14 @@ public:
 
     void set_ratio(int r)
     {
-      if (r!=m_ratio) set_invalidated(__FILE__, __LINE__); 
-      m_ratio = r;       
+        if (r != m_ratio) set_invalidated(__FILE__, __LINE__); 
+        m_ratio = r;       
     }
 
-    /// Returns the clipping depth (if any) of this DisplayObject. The parameter is 
-    /// tells us to use the DisplayObject as a mask for all the objects contained 
-    /// in the display list from m_depth to m_clipping_depth inclusive.
+    /// Returns the clipping depth (if any) of this DisplayObject.
+    /// The parameter tells us to use the DisplayObject as a mask for
+    /// all the objects contained in the display list from m_depth
+    /// to m_clipping_depth inclusive.
     /// 
     /// The value returned by get_clip_depth() is only valid when isMaskLayer()
     /// returns true!
@@ -344,7 +345,8 @@ public:
     ///
     void setMask(DisplayObject* mask);
 
-    /// Returns true if this DisplayObject is a mask (either layer or dynamic mask)
+    /// Returns true if this DisplayObject is a mask (either layer or
+    /// dynamic mask)
     bool isMask() const
     {
         return isDynamicMask() || isMaskLayer();
