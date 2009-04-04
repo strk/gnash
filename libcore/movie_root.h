@@ -605,7 +605,7 @@ public:
         assert(std::find(_liveChars.begin(), _liveChars.end(), ch) ==
             _liveChars.end());
 #endif
-        _liveChars.push_front(ch);
+        _liveChars.push_front(ch.get());
     }
 
     /// Cleanup all resources and run the GC collector
@@ -922,16 +922,13 @@ private:
     /// Delete all elements on the timers list
     void clearIntervalTimers();
 
-    /// An element of the advanceable DisplayObjects
-    typedef boost::intrusive_ptr<DisplayObject> AdvanceableCharacter;
-
     /// A list of AdvanceableCharacters
     //
     /// This is a list (not a vector) as we want to allow
     /// ::advance of each element to insert new DisplayObjects before
     /// the start w/out invalidating iterators scanning the
     /// list forward for proper movie advancement
-    typedef std::list<AdvanceableCharacter> LiveChars;
+    typedef std::list<DisplayObject*> LiveChars;
 
     /// The list of advanceable DisplayObject, in placement order
     LiveChars _liveChars;
