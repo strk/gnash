@@ -52,7 +52,7 @@ namespace gnash {
     class action_buffer;
     class movie_definition;
     class StaticText;
-    class InteractiveDisplayObject;
+    class InteractiveObject;
     namespace SWF {
         class TextRecord;
     }
@@ -65,7 +65,7 @@ namespace gnash {
 /// It represents a single active element in a movie. This class does not
 /// provide any interactivity.
 //
-/// Derived classes include InteractiveDisplayObject, StaticText, Bitmap,
+/// Derived classes include InteractiveObject, StaticText, Bitmap,
 /// Video, and Shape.
 class DisplayObject : public as_object
 {
@@ -626,8 +626,8 @@ public:
 
 	/// DisplayObjects are not a mouse entity by default.
     //
-    /// Override this function for InteractiveDisplayObjects.
-	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t, 
+    /// Override this function for InteractiveObjects.
+	virtual InteractiveObject* topmostMouseEntity(boost::int32_t, 
             boost::int32_t) {
         return 0;
     }

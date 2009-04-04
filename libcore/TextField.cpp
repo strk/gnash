@@ -112,7 +112,7 @@ namespace {
 TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
         int id)
     :
-    InteractiveDisplayObject(parent, id),
+    InteractiveObject(parent, id),
     _tag(&def),
     _textDefined(def.hasText()),
     _underlined(false),
@@ -170,7 +170,7 @@ TextField::TextField(DisplayObject* parent, const SWF::DefineEditTextTag& def,
 TextField::TextField(DisplayObject* parent, const rect& bounds)
     :
     // the id trick is to fool assertions in DisplayObject ctor
-    InteractiveDisplayObject(parent, parent ? 0 : -1),
+    InteractiveObject(parent, parent ? 0 : -1),
     _textDefined(false),
     _underlined(false),
     _leading(0),
@@ -500,7 +500,7 @@ TextField::on_event(const event_id& ev)
     return true;
 }
 
-InteractiveDisplayObject*
+InteractiveObject*
 TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
 

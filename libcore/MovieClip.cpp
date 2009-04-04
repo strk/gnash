@@ -277,7 +277,7 @@ public:
         for (Candidates::reverse_iterator i=_candidates.rbegin(),
                         e=_candidates.rend(); i!=e; ++i) {
             DisplayObject* ch = *i;
-            InteractiveDisplayObject* te = ch->topmostMouseEntity(_pp.x, _pp.y);
+            InteractiveObject* te = ch->topmostMouseEntity(_pp.x, _pp.y);
             if (te) {
                 _m = te;
                 break;
@@ -286,7 +286,7 @@ public:
         _checked = true;
     }
 
-    InteractiveDisplayObject* getEntity()
+    InteractiveObject* getEntity()
     {
         checkCandidates();
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
@@ -311,7 +311,7 @@ private:
     ///
     int _highestHiddenDepth;
 
-    InteractiveDisplayObject* _m;
+    InteractiveObject* _m;
 
     typedef std::vector<DisplayObject*> Candidates;
     Candidates _candidates;
@@ -481,7 +481,7 @@ private:
 MovieClip::MovieClip(movie_definition* def, movie_instance* r,
         DisplayObject* parent, int id)
     :
-    InteractiveDisplayObject(parent, id),
+    InteractiveObject(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
     _drawable_inst(_drawable->createDisplayObject(this, 0)),
@@ -1753,7 +1753,7 @@ MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
     }
 }
 
-InteractiveDisplayObject*
+InteractiveObject*
 MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
@@ -1785,7 +1785,7 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
     MouseEntityFinder finder(wp, pp);
     m_display_list.visitAll(finder);
-    InteractiveDisplayObject* ch = finder.getEntity();
+    InteractiveObject* ch = finder.getEntity();
 
     // It doesn't make any sense to query _drawable_inst, as it's
     // a generic DisplayObject and not a referencable DisplayObject.

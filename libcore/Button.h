@@ -23,7 +23,7 @@
 #define GNASH_BUTTON_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "InteractiveDisplayObject.h" // for inheritance
+#include "InteractiveObject.h" // for inheritance
 
 #include <vector>
 #include <set>
@@ -41,7 +41,7 @@ namespace gnash {
 // Button
 //
 
-class Button : public InteractiveDisplayObject
+class Button : public InteractiveObject
 {
 public:
 
@@ -103,7 +103,7 @@ public:
 	//
 	/// I.e. check against ourself.
 	///
-	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t x,
+	virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 	
 	virtual bool wantsInstanceName() const
