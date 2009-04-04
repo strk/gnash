@@ -907,7 +907,7 @@ private:
     void processLoadMovieRequest(const LoadMovieRequest& r);
 
     /// Listeners container
-    typedef std::list< boost::intrusive_ptr<DisplayObject> > CharacterList;
+    typedef std::list<DisplayObject*> CharacterList;
 
     /// key and mouse listeners container
     typedef CharacterList KeyListeners;
