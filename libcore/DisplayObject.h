@@ -40,6 +40,7 @@
 #include <map>
 #include <string>
 #include <cassert>
+#include <boost/cstdint.hpp> // For C99 int types
 
 //#define DEBUG_SET_INVALIDATED 1
 
