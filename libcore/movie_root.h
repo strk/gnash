@@ -907,7 +907,7 @@ private:
     void processLoadMovieRequest(const LoadMovieRequest& r);
 
     /// Listeners container
-    typedef std::list< boost::intrusive_ptr<DisplayObject> > CharacterList;
+    typedef std::list<DisplayObject*> CharacterList;
 
     /// key and mouse listeners container
     typedef CharacterList KeyListeners;
@@ -1066,7 +1066,7 @@ private:
     /// @param y
     ///     Y ordinate of the pointer, in world coordiante space (twips).
     ///
-    InteractiveDisplayObject* getTopmostMouseEntity(boost::int32_t x,
+    InteractiveObject* getTopmostMouseEntity(boost::int32_t x,
             boost::int32_t y) const;
 
     /// Delete DisplayObjects removed from the stage

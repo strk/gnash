@@ -1168,7 +1168,7 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
       // remove unloaded DisplayObject listeners from movie_root
       for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
       {
-          DisplayObject* ch = iter->get();
+          DisplayObject* const ch = *iter;
           if ( ch->isUnloaded() )
           {
             if ( ! ch->isDestroyed() )
@@ -1205,7 +1205,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 			iter != itEnd; ++iter)
 	{
 		// sprite, button & input_edit_text DisplayObjects
-		DisplayObject* ch = iter->get();
+		DisplayObject* const ch = *iter;
 		if ( ! ch->isUnloaded() )
 		{
 			if(down)
@@ -1231,17 +1231,13 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 	}
 }
 
-/* static private */
 void
 movie_root::add_listener(CharacterList& ll, DisplayObject* listener)
 {
 	assert(listener);
-	for(CharacterList::const_iterator i = ll.begin(), e = ll.end(); i != e; ++i)
-	{
-		// Conceptually, we don't need to add the same DisplayObject twice.
-		// but see TextField::setFocus()...
-		if(*i == listener)  return;
-	}
+
+    // Don't add the same listener twice (why not use a set?)
+    if (std::find(ll.begin(), ll.end(), listener) != ll.end()) return;
 
 	ll.push_front(listener);
 }
@@ -1251,23 +1247,19 @@ void
 movie_root::remove_listener(CharacterList& ll, DisplayObject* listener)
 {
 	assert(listener);
-
-	ll.remove_if(std::bind2nd(
-                std::equal_to<boost::intrusive_ptr<DisplayObject> >(), listener));
+	ll.remove_if(std::bind2nd(std::equal_to<DisplayObject*>(), listener));
 }
 
 void
 movie_root::notify_mouse_listeners(const event_id& event)
 {
-	//log_debug("Notifying %d listeners about %s",
-	//		m_mouse_listeners.size(), event);
 
 	CharacterList copy = m_mouse_listeners;
 	for (CharacterList::iterator iter = copy.begin(), itEnd=copy.end();
 			iter != itEnd; ++iter)
 	{
-		DisplayObject* ch = iter->get();
-		if ( ! ch->isUnloaded() )
+		DisplayObject* const ch = *iter;
+		if (!ch->isUnloaded())
 		{
 			ch->on_event(event);
 		}
@@ -1289,7 +1281,8 @@ movie_root::notify_mouse_listeners(const event_id& event)
 		}
 	    catch (ActionLimitException &e)
 	    {
-            log_error(_("ActionLimits hit notifying mouse events: %s."), e.what());
+            log_error(_("ActionLimits hit notifying mouse events: %s."),
+                    e.what());
             clearActionQueue();
 	    }
 	    
@@ -1297,8 +1290,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 
 	assert(testInvariant());
 
-    if( ! copy.empty() )
-	{
+    if (!copy.empty()) {
 		// process actions queued in the above step
 		processActionQueue();
 	}
@@ -1318,7 +1310,8 @@ movie_root::setFocus(boost::intrusive_ptr<DisplayObject> to)
     // Nothing to do if current focus is the same as the new focus. 
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
-    if (to == _currentFocus || to == static_cast<DisplayObject*>(getRootMovie())) {
+    if (to == _currentFocus ||
+            to == static_cast<DisplayObject*>(getRootMovie())) {
         return false;
     }
 
@@ -1387,14 +1380,7 @@ bool
 movie_root::isMouseOverActiveEntity() const
 {
 	assert(testInvariant());
-
-	boost::intrusive_ptr<DisplayObject> entity ( m_mouse_button_state.activeEntity );
-	if ( ! entity.get() ) {
-        return false;
-    }
-    else {
-        return true;
-    }
+    return (m_mouse_button_state.activeEntity);
 }
 
 void
@@ -1654,7 +1640,6 @@ movie_root::flushHigherPriorityActionQueues()
 
 	if ( _disableScripts )
 	{
-		//log_debug(_("Scripts are disabled, global instance list has %d elements"), _liveChars.size());
 		/// cleanup anything pushed later..
 		clearActionQueue();
 		return;
@@ -1705,18 +1690,6 @@ void
 movie_root::pushAction(std::auto_ptr<ExecutableCode> code, int lvl)
 {
 	assert(lvl >= 0 && lvl < apSIZE);
-
-#if 0
-	// Immediately execute code targetted at a lower level while processing
-	// an higher level.
-	if ( processingActions() && lvl < _processingActionLevel )
-	{
-		log_debug("Action pushed in level %d executed immediately (as we are currently executing level %d)", lvl, _processingActionLevel);
-		code->execute();
-		return;
-	}
-#endif
-
 	_actionQueue[lvl].push_back(code.release());
 }
 
@@ -1910,21 +1883,21 @@ movie_root::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
-InteractiveDisplayObject*
+InteractiveObject*
 movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
 {
 
 	for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend();
             i != e; ++i)
 	{
-		InteractiveDisplayObject* ret = i->second->topmostMouseEntity(x, y);
+		InteractiveObject* ret = i->second->topmostMouseEntity(x, y);
 		if (ret) return ret;
 	}
 
 	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
             i != e; ++i)
 	{
-		InteractiveDisplayObject* ret = i->second->topmostMouseEntity(x, y);
+		InteractiveObject* ret = i->second->topmostMouseEntity(x, y);
 		if (ret) return ret;
 	}
 
@@ -1932,19 +1905,23 @@ movie_root::getTopmostMouseEntity(boost::int32_t x, boost::int32_t y) const
 }
 
 const DisplayObject *
-movie_root::findDropTarget(boost::int32_t x, boost::int32_t y, DisplayObject* dragging) const
+movie_root::findDropTarget(boost::int32_t x, boost::int32_t y,
+        DisplayObject* dragging) const
 {
-	for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
-	{
+	for (Childs::const_reverse_iterator i=_childs.rbegin(), e=_childs.rend();
+            i!=e; ++i) {
+
 		const DisplayObject* ret = i->second->findDropTarget(x, y, dragging);
 		if ( ret ) return ret;
 	}
-	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
-	{
-		const DisplayObject* ret = i->second->findDropTarget(x, y, dragging);
+
+    for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend();
+            i!=e; ++i) {
+		
+        const DisplayObject* ret = i->second->findDropTarget(x, y, dragging);
 		if ( ret ) return ret;
 	}
-	return NULL;
+	return 0;
 }
 
 void
@@ -1959,29 +1936,29 @@ movie_root::cleanupDisplayList()
 #endif
 
 	// Let every sprite cleanup the local DisplayList
-        //
-        // TODO: we might skip this additinal scan by delegating
-        //       cleanup of the local DisplayLists in the ::display
-        //       method of each sprite, but that will introduce 
-        //       problems when we'll implement skipping ::display()
-        //       when late on FPS. Alternatively we may have the
-        //       MovieClip::markReachableResources take care
-        //       of cleaning up unloaded... but that will likely
-        //       introduce problems when allowing the GC to run
-        //       at arbitrary times.
-        //       The invariant to keep is that cleanup of unloaded DisplayObjects
-        //       in local display lists must happen at the *end* of global action
-        //       queue processing.
-        //
-        for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
-        {
-                MovieClip* mc = dynamic_cast<MovieClip*>(i->second);
-                if ( mc ) mc->cleanupDisplayList();
-        }
-        for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
-        {
-                i->second->cleanupDisplayList();
-        }
+    //
+    // TODO: we might skip this additinal scan by delegating
+    //       cleanup of the local DisplayLists in the ::display
+    //       method of each sprite, but that will introduce 
+    //       problems when we'll implement skipping ::display()
+    //       when late on FPS. Alternatively we may have the
+    //       MovieClip::markReachableResources take care
+    //       of cleaning up unloaded... but that will likely
+    //       introduce problems when allowing the GC to run
+    //       at arbitrary times.
+    //       The invariant to keep is that cleanup of unloaded DisplayObjects
+    //       in local display lists must happen at the *end* of global action
+    //       queue processing.
+    //
+    for (Childs::reverse_iterator i=_childs.rbegin(), e=_childs.rend(); i!=e; ++i)
+    {
+        MovieClip* mc = dynamic_cast<MovieClip*>(i->second);
+        if ( mc ) mc->cleanupDisplayList();
+    }
+    for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+    {
+        i->second->cleanupDisplayList();
+    }
 
 	// Now remove from the instance list any unloaded DisplayObject
 	// Note that some DisplayObjects may be unloaded but not yet destroyed,
@@ -2057,7 +2034,6 @@ movie_root::cleanupDisplayList()
 
 }
 
-/*static private*/
 void
 movie_root::advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch)
 {
@@ -2071,7 +2047,8 @@ movie_root::advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch)
 	}
 #ifdef GNASH_DEBUG
 	else {
-		log_debug("    DisplayObject %s is unloaded, not advancing it", ch->getTarget());
+		log_debug("    DisplayObject %s is unloaded, not advancing it",
+                ch->getTarget());
 	}
 #endif
 }
@@ -2081,24 +2058,24 @@ movie_root::advanceLiveChars()
 {
 
 #ifdef GNASH_DEBUG
-	log_debug("---- movie_root::advance: %d live DisplayObjects in the global list", _liveChars.size());
+	log_debug("---- movie_root::advance: %d live DisplayObjects in "
+            "the global list", _liveChars.size());
 #endif
 
-	std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(advanceLiveChar, _1));
+	std::for_each(_liveChars.begin(), _liveChars.end(),
+            boost::bind(advanceLiveChar, _1));
 }
 
 void
 movie_root::set_background_color(const rgba& color)
 {
-	//GNASH_REPORT_FUNCTION;
 
 	if ( m_background_color_set ) return;
 	m_background_color_set = true;
 
-        if ( m_background_color != color )
-	{
+    if ( m_background_color != color ) {
 		setInvalidated();
-        	m_background_color = color;
+        m_background_color = color;
 	}
 }
 
@@ -2109,19 +2086,16 @@ movie_root::set_background_alpha(float alpha)
 
 	boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
 
-        if ( m_background_color.m_a != newAlpha )
-	{
+    if (m_background_color.m_a != newAlpha) {
 		setInvalidated();
-        	m_background_color.m_a = newAlpha;
+        m_background_color.m_a = newAlpha;
 	}
 }
 
 DisplayObject*
-movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
+movie_root::findCharacterByTarget(const std::string& tgtstr) const
 {
-	if ( tgtstr_orig.empty() ) return NULL;
-
-	std::string tgtstr = PROPNAME(tgtstr_orig);
+	if (tgtstr.empty()) return 0;
 
 	string_table& st = _vm.getStringTable();
 
@@ -2132,19 +2106,19 @@ movie_root::findCharacterByTarget(const std::string& tgtstr_orig) const
 	as_object* o = _movies.begin()->second.get();
 
 	std::string::size_type from = 0;
-	while ( std::string::size_type to=tgtstr.find_first_of('.', from) )
+	while (std::string::size_type to = tgtstr.find('.', from))
 	{
-		std::string part(tgtstr, from, to-from);
+		std::string part(tgtstr, from, to - from);
 		o = o->get_path_element(st.find(part));
-		if ( ! o ) {
+		if (!o) {
 #ifdef GNASH_DEBUG_TARGET_RESOLUTION
-			log_debug("Evaluating DisplayObject target path: element '%s' of path '%s' not found",
-				part, tgtstr);
+			log_debug("Evaluating DisplayObject target path: element "
+                    "'%s' of path '%s' not found", part, tgtstr);
 #endif
 			return NULL;
 		}
-		if ( to == std::string::npos ) break;
-		from = to+1;
+		if (to == std::string::npos) break;
+		from = to + 1;
 	}
 	return o->toDisplayObject();
 }
@@ -2446,7 +2420,8 @@ movie_root::getCharacterTree(tree<StringPair>& tr,
     /// Stage: number of live DisplayObjects
     std::ostringstream os;
     os << _liveChars.size();
-    localIter = tr.append_child(it, StringPair(_("Live DisplayObjects"), os.str()));
+    localIter = tr.append_child(it, StringPair(_("Live DisplayObjects"),
+                os.str()));
 
 	/// Live DisplayObjects tree
 	for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
@@ -2484,7 +2459,9 @@ movie_root::callInterface(const std::string& cmd, const std::string& arg) const
 void
 movie_root::addChild(DisplayObject* ch)
 {
-    int newDepth = _childs.empty() ? 0 : _childs.rbegin()->second->get_depth()+1;
+    int newDepth = _childs.empty() ? 0 : 
+        _childs.rbegin()->second->get_depth()+1;
+    
     ch->set_depth(newDepth);
 
     assert(!_childs[newDepth]);

@@ -27,7 +27,7 @@
 
 #include "movie_definition.h" // for inlines
 #include "DisplayList.h" // DisplayList 
-#include "InteractiveDisplayObject.h"
+#include "InteractiveObject.h"
 #include "log.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
@@ -68,7 +68,7 @@ namespace gnash
 /// This means that they define a variable scope (see
 /// the as_environment member) and are divided into "frames"
 ///
-class MovieClip : public InteractiveDisplayObject, boost::noncopyable
+class MovieClip : public InteractiveObject, boost::noncopyable
 {
 
 public:
@@ -243,13 +243,13 @@ public:
     //
     /// NOTE: this function currently does not consider
     ///       general mouse event handlers MOUSE_MOVE, MOUSE
-    virtual bool can_handle_mouse_event() const;
+    virtual bool mouseEnabled() const;
 
     /// \brief
     /// Return the topmost entity that the given point
     /// covers that can receive mouse events.  NULL if
     /// none.  Coords are in parent's frame.
-    virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t x,
+    virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 
     // see dox in DisplayObject.h

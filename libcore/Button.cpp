@@ -296,7 +296,7 @@ attachButtonInterface(as_object& o)
 
 Button::Button(SWF::DefineButtonTag& def, DisplayObject* parent, int id)
     :
-    InteractiveDisplayObject(parent, id),
+    InteractiveObject(parent, id),
     m_last_mouse_flags(IDLE),
     m_mouse_flags(IDLE),
     m_mouse_state(UP),
@@ -389,7 +389,7 @@ Button::display()
 
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
-InteractiveDisplayObject*
+InteractiveObject*
 Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
     if (!isVisible() || !isEnabled())
@@ -418,7 +418,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         {
             DisplayObject* ch = *it;
             if ( ! ch->isVisible() ) continue;
-            InteractiveDisplayObject *hit = ch->topmostMouseEntity(p.x, p.y);
+            InteractiveObject *hit = ch->topmostMouseEntity(p.x, p.y);
             if ( hit ) return hit;
         }
     }

@@ -23,7 +23,7 @@
 #define GNASH_BUTTON_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "InteractiveDisplayObject.h" // for inheritance
+#include "InteractiveObject.h" // for inheritance
 
 #include <vector>
 #include <set>
@@ -41,7 +41,7 @@ namespace gnash {
 // Button
 //
 
-class Button : public InteractiveDisplayObject
+class Button : public InteractiveObject
 {
 public:
 
@@ -86,7 +86,7 @@ public:
 	bool get_member(string_table::key name, as_value* val, 
 		string_table::key nsname = 0);
 
-	bool can_handle_mouse_event() const { return true; }
+	bool mouseEnabled() const { return true; }
 
 	// called from keypress listener only
 	bool on_event(const event_id& id);
@@ -103,7 +103,7 @@ public:
 	//
 	/// I.e. check against ourself.
 	///
-	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t x,
+	virtual InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 	
 	virtual bool wantsInstanceName() const

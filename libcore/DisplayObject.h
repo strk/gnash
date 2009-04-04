@@ -52,7 +52,7 @@ namespace gnash {
     class action_buffer;
     class movie_definition;
     class StaticText;
-    class InteractiveDisplayObject;
+    class InteractiveObject;
     namespace SWF {
         class TextRecord;
     }
@@ -65,7 +65,7 @@ namespace gnash {
 /// It represents a single active element in a movie. This class does not
 /// provide any interactivity.
 //
-/// Derived classes include InteractiveDisplayObject, StaticText, Bitmap,
+/// Derived classes include InteractiveObject, StaticText, Bitmap,
 /// Video, and Shape.
 class DisplayObject : public as_object
 {
@@ -308,7 +308,7 @@ public:
     ///     
     bool isDynamicMask() const
     {
-        return _maskee;
+        return (_maskee);
     }
 
     DisplayObject* toDisplayObject() { return this; }
@@ -626,8 +626,8 @@ public:
 
 	/// DisplayObjects are not a mouse entity by default.
     //
-    /// Override this function for InteractiveDisplayObjects.
-	virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t, 
+    /// Override this function for InteractiveObjects.
+	virtual InteractiveObject* topmostMouseEntity(boost::int32_t, 
             boost::int32_t) {
         return 0;
     }
@@ -727,9 +727,8 @@ public:
     /// clear_invalidated() even if display() is not necessary.
     ///
     /// Not doing so will result in a stale invalidated flag which in turn will
-    /// prevent the parent to be informed when this DisplayObject (or a child) is
-    /// invalidated again (see set_invalidated() recursion).
-    ///    
+    /// prevent the parent to be informed when this DisplayObject (or a
+    /// child) is invalidated again (see set_invalidated() recursion).
     void clear_invalidated() {
         m_invalidated = false;
         m_child_invalidated = false;        
@@ -755,10 +754,10 @@ public:
     /// Only instances with m_invalidated flag set are checked unless
     /// force is set.
     ///
-    virtual void add_invalidated_bounds(InvalidatedRanges& ranges, 
-            bool force);
+    virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-    /// Called instead of display() when the DisplayObject is not visible on stage.
+    /// Called instead of display() when the DisplayObject is not visible
+    /// on stage.
     /// Used to clear the invalidated flags.
     virtual void omit_display() { clear_invalidated(); }; 
     
@@ -844,11 +843,6 @@ public:
     /// e.g. "_level0.sprite1.sprite2.ourSprite"
     ///
     std::string DSOEXPORT getTarget() const;
-
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-    boost::intrusive_ptr<as_function> getUserDefinedEventHandler(
-            const std::string& name) const;
-#endif
 
     /// Return true if this DisplayObject is a selectable TextField
     //
@@ -1019,7 +1013,7 @@ protected:
 
     const Events& get_event_handlers() const
     {
-            return _event_handlers;
+        return _event_handlers;
     }
 
     /// Return a user defined event handler, if any
@@ -1033,7 +1027,8 @@ protected:
     /// A function if a member with the given name exists and
     /// casts to an as_function. A NULL pointer otherwise.
     ///
-    boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
+    boost::intrusive_ptr<as_function> getUserDefinedEventHandler(
+            const std::string& name) const;
 
     /// Return a user defined event handler, if any
     //
@@ -1044,7 +1039,8 @@ protected:
     /// A function if a member with the given key exists and
     /// casts to an as_function. A NULL pointer otherwise.
     ///
-    boost::intrusive_ptr<as_function> getUserDefinedEventHandler(string_table::key key) const;
+    boost::intrusive_ptr<as_function> getUserDefinedEventHandler(
+            string_table::key key) const;
 
     void set_event_handlers(const Events& copyfrom);
 
@@ -1081,17 +1077,17 @@ protected:
     /// Bounds of this DisplayObject instance before first invalidation
     /// since last call to clear_invalidated().
     ///
-    /// This stores the bounds of the DisplayObject before it has been changed, ie. 
-    /// the position when set_invalidated() is being called. While drawing, both 
-    /// the old and the new bounds are updated (rendered). When moving a 
-    /// DisplayObject A to B then both the position A needs to be re-rendered (to 
-    /// reveal the backgrond) and the position B needs to be re-rendered (to
-    /// show the DisplayObject in its new position). The bounds may be identical or 
-    /// overlap, but SnappingRanges takes care of that.
+    /// This stores the bounds of the DisplayObject before it has been
+    /// changed, ie. the position when set_invalidated() is being called.
+    /// While drawing, both the old and the new bounds are updated (rendered).
+    /// When moving a DisplayObject A to B then both the position A needs
+    /// to be re-rendered (to reveal the backgrond) and the position B
+    /// needs to be re-rendered (to show the DisplayObject in its new
+    /// position). The bounds may be identical or overlap, but
+    /// SnappingRanges takes care of that.
     /// 
     /// Will be set by set_invalidated() and used by
     /// get_invalidated_bounds().
-    ///
     InvalidatedRanges m_old_invalidated_ranges;
 
 private:
@@ -1105,8 +1101,8 @@ private:
     int m_id;
 
     int m_depth;
-    cxform  m_color_transform;
-    SWFMatrix  m_matrix;
+    cxform m_color_transform;
+    SWFMatrix m_matrix;
 
     /// Cache values for ActionScript access.
     /// NOTE: not all DisplayObjects need this, just the
@@ -1121,11 +1117,11 @@ private:
     ///       need this (assuming soft ref don't rebind to other
     ///       kind of DisplayObjects).
     ///
-    int  _volume;
+    int _volume;
 
-    int   m_ratio;
+    int m_ratio;
     int m_clip_depth;
-    Events  _event_handlers;
+    Events _event_handlers;
 
     /// Used to assign a name to unnamed instances
     static unsigned int _lastUnnamedInstanceNum;

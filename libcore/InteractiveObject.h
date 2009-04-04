@@ -36,33 +36,31 @@ namespace gnash {
 
 /// The base class for interactive objects.
 //
-/// Objects of type InteractiveDisplayObject can receive focus, mouse events,
+/// Objects of type InteractiveObject can receive focus, mouse events,
 /// and key events for user interaction.
 //
 /// Derived classes include TextField, Button, and MovieClip.
-class InteractiveDisplayObject : public DisplayObject
+class InteractiveObject : public DisplayObject
 {
 
 public:
 
-	InteractiveDisplayObject(DisplayObject* parent, int id)
+	InteractiveObject(DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id)
 	{
 	}
 
-    virtual ~InteractiveDisplayObject() {}
+    virtual ~InteractiveObject() {}
 
-    /// Render this InteractiveDisplayObject
+    /// Render this InteractiveObject
     virtual void display() = 0;
 
     /// Whether the DisplayObject can handle a mouse event.
     //
     /// @return     true if the DisplayObject can handle mouse
     ///             events
-	virtual bool can_handle_mouse_event() const {
-		return false;
-	}
+	virtual bool mouseEnabled() const = 0;
 
     /// Allow extraction of static text.
     //
@@ -104,7 +102,7 @@ public:
     /// @param y
     ///     Y ordinate of the pointer, in parent's coordiante space.
     ///
-    virtual InteractiveDisplayObject* topmostMouseEntity(boost::int32_t /*x*/,
+    virtual InteractiveObject* topmostMouseEntity(boost::int32_t /*x*/,
             boost::int32_t /*y*/) = 0;
 
     virtual void mouseEvent(const event_id& id)

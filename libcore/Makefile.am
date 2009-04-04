@@ -75,7 +75,7 @@ libgnashcore_la_SOURCES = \
         BevelFilter.cpp \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
-	InteractiveDisplayObject.cpp \
+	InteractiveObject.cpp \
 	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
@@ -165,7 +165,7 @@ noinst_HEADERS = \
 	fontlib.h \
 	Shape.h \
 	StaticText.h \
-	InteractiveDisplayObject.h \
+	InteractiveObject.h \
 	gnash.h	\
 	GnashKey.h \
 	impl.h \

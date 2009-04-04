@@ -277,7 +277,7 @@ public:
         for (Candidates::reverse_iterator i=_candidates.rbegin(),
                         e=_candidates.rend(); i!=e; ++i) {
             DisplayObject* ch = *i;
-            InteractiveDisplayObject* te = ch->topmostMouseEntity(_pp.x, _pp.y);
+            InteractiveObject* te = ch->topmostMouseEntity(_pp.x, _pp.y);
             if (te) {
                 _m = te;
                 break;
@@ -286,7 +286,7 @@ public:
         _checked = true;
     }
 
-    InteractiveDisplayObject* getEntity()
+    InteractiveObject* getEntity()
     {
         checkCandidates();
 #ifdef DEBUG_MOUSE_ENTITY_FINDING
@@ -311,7 +311,7 @@ private:
     ///
     int _highestHiddenDepth;
 
-    InteractiveDisplayObject* _m;
+    InteractiveObject* _m;
 
     typedef std::vector<DisplayObject*> Candidates;
     Candidates _candidates;
@@ -481,7 +481,7 @@ private:
 MovieClip::MovieClip(movie_definition* def, movie_instance* r,
         DisplayObject* parent, int id)
     :
-    InteractiveDisplayObject(parent, id),
+    InteractiveObject(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
     _drawable_inst(_drawable->createDisplayObject(this, 0)),
@@ -1685,7 +1685,7 @@ MovieClip::handleFocus()
         
     // If focusEnabled doesn't evaluate to true or for SWF5, return true
     // only if at least one mouse event handler is defined.
-    return can_handle_mouse_event();
+    return mouseEnabled();
 }
 
 bool
@@ -1701,7 +1701,7 @@ bool
 MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 {
     if ( ! isVisible() ) return false;
-    if ( isDynamicMask() && ! can_handle_mouse_event() )
+    if ( isDynamicMask() && ! mouseEnabled() )
     {
         // see testsuite/misc-ming.all/masks_test.swf
 #ifdef GNASH_DEBUG_HITTEST
@@ -1729,7 +1729,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 bool
 MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
 {
-    if ( isDynamicMask() && !can_handle_mouse_event() )
+    if ( isDynamicMask() && !mouseEnabled() )
     {
         return false;
     }
@@ -1753,7 +1753,7 @@ MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
     }
 }
 
-InteractiveDisplayObject*
+InteractiveObject*
 MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
@@ -1773,7 +1773,7 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         parent->getWorldMatrix().transform(wp);
     }
 
-    if ( can_handle_mouse_event() )
+    if ( mouseEnabled() )
     {
         if ( pointInVisibleShape(wp.x, wp.y) ) return this;
         else return NULL;
@@ -1785,7 +1785,7 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 
     MouseEntityFinder finder(wp, pp);
     m_display_list.visitAll(finder);
-    InteractiveDisplayObject* ch = finder.getEntity();
+    InteractiveObject* ch = finder.getEntity();
 
     // It doesn't make any sense to query _drawable_inst, as it's
     // a generic DisplayObject and not a referencable DisplayObject.
@@ -1934,7 +1934,7 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 }
 
 bool
-MovieClip::can_handle_mouse_event() const
+MovieClip::mouseEnabled() const
 {
     if ( ! isEnabled() ) return false;
 

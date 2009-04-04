@@ -18,7 +18,7 @@
 #ifndef GNASH_TEXTFIELD_H
 #define GNASH_TEXTFIELD_H
 
-#include "InteractiveDisplayObject.h" // for inheritance
+#include "InteractiveObject.h" // for inheritance
 #include "styles.h" // for line_style
 #include "fill_style.h"
 #include "Range2d.h"
@@ -36,7 +36,7 @@ namespace gnash {
 namespace gnash {
 
 /// An instance of a DefineEditTextTag 
-class TextField : public InteractiveDisplayObject
+class TextField : public InteractiveObject
 {
 
 public:
@@ -91,9 +91,9 @@ public:
 	~TextField();
 
 	// TODO: should this return isSelectable() ?
-	bool can_handle_mouse_event() const { return true; }
+	bool mouseEnabled() const { return true; }
 
-	InteractiveDisplayObject* topmostMouseEntity(boost::int32_t x,
+	InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 
 	bool wantsInstanceName() const
