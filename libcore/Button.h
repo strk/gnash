@@ -86,7 +86,7 @@ public:
 	bool get_member(string_table::key name, as_value* val, 
 		string_table::key nsname = 0);
 
-	bool can_handle_mouse_event() const { return true; }
+	bool mouseEnabled() const { return true; }
 
 	// called from keypress listener only
 	bool on_event(const event_id& id);

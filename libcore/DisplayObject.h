@@ -308,7 +308,7 @@ public:
     ///     
     bool isDynamicMask() const
     {
-        return _maskee;
+        return (_maskee);
     }
 
     DisplayObject* toDisplayObject() { return this; }

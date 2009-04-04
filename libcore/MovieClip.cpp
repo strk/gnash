@@ -1685,7 +1685,7 @@ MovieClip::handleFocus()
         
     // If focusEnabled doesn't evaluate to true or for SWF5, return true
     // only if at least one mouse event handler is defined.
-    return can_handle_mouse_event();
+    return mouseEnabled();
 }
 
 bool
@@ -1701,7 +1701,7 @@ bool
 MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 {
     if ( ! isVisible() ) return false;
-    if ( isDynamicMask() && ! can_handle_mouse_event() )
+    if ( isDynamicMask() && ! mouseEnabled() )
     {
         // see testsuite/misc-ming.all/masks_test.swf
 #ifdef GNASH_DEBUG_HITTEST
@@ -1729,7 +1729,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 bool
 MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
 {
-    if ( isDynamicMask() && !can_handle_mouse_event() )
+    if ( isDynamicMask() && !mouseEnabled() )
     {
         return false;
     }
@@ -1773,7 +1773,7 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         parent->getWorldMatrix().transform(wp);
     }
 
-    if ( can_handle_mouse_event() )
+    if ( mouseEnabled() )
     {
         if ( pointInVisibleShape(wp.x, wp.y) ) return this;
         else return NULL;
@@ -1934,7 +1934,7 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 }
 
 bool
-MovieClip::can_handle_mouse_event() const
+MovieClip::mouseEnabled() const
 {
     if ( ! isEnabled() ) return false;
 

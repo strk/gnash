@@ -60,9 +60,7 @@ public:
     //
     /// @return     true if the DisplayObject can handle mouse
     ///             events
-	virtual bool can_handle_mouse_event() const {
-		return false;
-	}
+	virtual bool mouseEnabled() const = 0;
 
     /// Allow extraction of static text.
     //

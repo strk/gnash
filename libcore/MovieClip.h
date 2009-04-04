@@ -243,7 +243,7 @@ public:
     //
     /// NOTE: this function currently does not consider
     ///       general mouse event handlers MOUSE_MOVE, MOUSE
-    virtual bool can_handle_mouse_event() const;
+    virtual bool mouseEnabled() const;
 
     /// \brief
     /// Return the topmost entity that the given point

@@ -91,7 +91,7 @@ public:
 	~TextField();
 
 	// TODO: should this return isSelectable() ?
-	bool can_handle_mouse_event() const { return true; }
+	bool mouseEnabled() const { return true; }
 
 	InteractiveDisplayObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
