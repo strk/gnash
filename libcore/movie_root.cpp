@@ -1985,7 +1985,7 @@ movie_root::cleanupDisplayList()
 		// Remove unloaded DisplayObjects from the _liveChars list
 		for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
 		{
-			AdvanceableCharacter ch = *i;
+			DisplayObject* ch = *i;
 			if ( ch->isUnloaded() )
 			{
 				// the sprite might have been destroyed already
