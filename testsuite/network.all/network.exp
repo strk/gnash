@@ -70,11 +70,16 @@ array set rtmp_targets {
 proc probe { host port } {
     verbose "Trying to probe $host:$port to see if there is an available service"
     global server_dead 
-    spawn -noecho nc -z $host $port
+    spawn -noecho nc -zv $host $port
     set nid $spawn_id
     global timeout
 
     expect {
+	"$host * open" {
+	    verbose "Got probe response, $host is alive on port $port..." 2
+	    set targets(host.name) $host
+	    set targets(host.port) $port
+	}
 	"Connection to *port * succeeded" {
 	    verbose "Got probe response, $host is alive on port $port..." 2
 	    set targets(host.name) $host
