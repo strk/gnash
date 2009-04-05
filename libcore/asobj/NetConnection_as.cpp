@@ -127,6 +127,7 @@ NetConnection_as::markReachableResources() const
 std::string
 NetConnection_as::validateURL() const
 {
+//     GNASH_REPORT_FUNCTION;
 
     const movie_root& mr = _vm.getRoot();
     URL uri(_uri, mr.runInfo().baseURL());
@@ -148,7 +149,7 @@ NetConnection_as::validateURL() const
 void
 NetConnection_as::notifyStatus(StatusCode code)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     std::pair<std::string, std::string> info;
     getStatusCodeInfo(code, info);
 
@@ -167,6 +168,7 @@ NetConnection_as::notifyStatus(StatusCode code)
 void
 NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 {
+//      GNASH_REPORT_FUNCTION;
     /// The Call statuses do exist, but this implementation is a guess.
     switch (code)
     {
@@ -214,7 +216,7 @@ NetConnection_as::getStatusCodeInfo(StatusCode code, NetConnectionStatus& info)
 void
 NetConnection_as::connect()
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     // Close any current connections.
     close();
     _isConnected = true;
@@ -225,7 +227,7 @@ NetConnection_as::connect()
 void
 NetConnection_as::connect(const std::string& uri)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
     // Close any current connections. (why?) Because that's what happens.
     close();
 
@@ -265,7 +267,7 @@ NetConnection_as::connect(const std::string& uri)
 void
 NetConnection_as::close()
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     /// TODO: what should actually happen here? Should an attached
     /// NetStream object be interrupted?
@@ -289,7 +291,7 @@ void
 NetConnection_as::call(as_object* asCallback, const std::string& methodName,
         const std::vector<as_value>& args, size_t firstArg)
 {
-    GNASH_REPORT_FUNCTION;
+//     GNASH_REPORT_FUNCTION;
 
     const movie_root& mr = _vm.getRoot();
     URL url(_uri, mr.runInfo().baseURL());
@@ -477,7 +479,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
     // Send the request via HTTP
     if ((url.protocol() == "rtmpt")
 	|| (url.protocol() == "http")) {
-	log_debug("Requesting echo response file...");
+ 	log_debug("Requesting HTTP response...");
 	// "/echo/gateway"
 	amf::Buffer &request = _http_client->formatRequest(url.path(), HTTP::HTTP_POST);
 	_http_client->formatContentLength(buf->allocated());
@@ -497,39 +499,7 @@ NetConnection_as::call(as_object* asCallback, const std::string& methodName,
 //  	el->dump();
 	boost::shared_ptr<amf::Buffer> request = _rtmp_client->encodeEchoRequest(methodName, 2.0, *el);
 // 	request->dump();
-	_rtmp_client->sendMsg(0x3, RTMP::HEADER_12, request->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *request);
-
-	
-// #if 0
-// 	boost::shared_ptr<amf::Buffer> response = _rtmp_client->recvMsg();
-//   	response->dump();
-// 	boost::shared_ptr<RTMP::rtmp_head_t> rthead;
-// 	boost::shared_ptr<RTMP::queues_t> que = _rtmp_client->split(*response);
-// 	log_debug("%s: There are %d messages in the RTMP input queue", __PRETTY_FUNCTION__, que->size());
-// 	while (que->size()) {
-// 	    boost::shared_ptr<amf::Buffer> ptr = que->front()->pop();
-// 	    if (ptr) {		// If there is legit data
-// 		rthead = _rtmp_client->decodeHeader(ptr->reference());
-// 		RTMPMsg *msg = _rtmp_client->decodeMsgBody(ptr->reference() + rthead->head_size, rthead->bodysize);
-// 		msg->dump();
-// 		if (msg->getMethodName() == "_error") {
-// 		    log_error("Got an error: %s", msg->getMethodName());
-// 		    msg->at(0)->dump();
-// 		    notifyStatus(CALL_FAILED);
-// 		}
-// 		if (msg->getMethodName() == "_result") {
-// 		    log_debug("Got a result: %s", msg->getMethodName());
-// 		    if (msg->getElements().size() > 0) {
-// 			msg->at(0)->dump();
-// 			as_value tmp(*msg->at(0));
-// //		string_table::key methodKey = tdata->st->find(methodName);
-// 			string_table::key methodKey = tdata->st->find("onResult");
-// 			asCallback->callMethod(methodKey, tmp);
-// 		    }
-// 		}
-// 	    }
-// 	}
-// #endif	
+	_rtmp_client->sendMsg(0x3, RTMP::HEADER_12, request->allocated(), RTMP::INVOKE, RTMPMsg::FROM_CLIENT, *request);	
     }
 
     // Start a thread to wait for the response
@@ -887,7 +857,6 @@ net_handler(NetConnection_as::thread_params_t *args)
 //   		amsg.getMessage(i)->data->dump();
 		    boost::shared_ptr<amf::Element> el = amsg.getMessage(i)->data;
 		    as_value tmp(*el);
-// 		NetConnection_as *obj = (NetConnection_as *)args->network;
 		    log_debug("Calling NetConnection %s(%s)",
 			      amsg.getMessage(i)->header.target, tmp);
 		    // The method name looks something like this: /17/onResult
@@ -899,11 +868,14 @@ net_handler(NetConnection_as::thread_params_t *args)
 		    if (pos != string::npos) {
 			methodName = amsg.getMessage(i)->header.target.substr(pos+1,  amsg.getMessage(i)->header.target.size());
 		    }
-// 		VM& vm = args->callback->getVM();
-//  		string_table& st = vm.getStringTable();
 		    string_table::key methodKey;
-// 		boost::mutex::scoped_lock lock(_nc_mutex);
+#if 0
+		    VM& vm = args->callback->getVM();
+		    string_table& st = vm.getStringTable();
+		    methodKey = st.find(methodName);
+#else
 		    methodKey = args->st->find(methodName);
+#endif
 		    args->callback->callMethod(methodKey, tmp);
 		}
 	    } else {	// not AMF data
