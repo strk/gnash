@@ -319,10 +319,9 @@ public:
 
     /// Look up the labeled frame, and jump to it.
     bool goto_labeled_frame(const std::string& label);
-
         
     /// Display (render?) this Sprite/MovieClip, unless invisible
-    void    display();
+    void display();
     
     void omit_display();
 
@@ -352,7 +351,8 @@ public:
     /// and places it on the stage at the given depth.
     ///
     /// If the specified depth is already occupied, it results a no-ops.
-    /// Otherwise, a new DisplayObject will be created and onload handler will be triggerred.
+    /// Otherwise, a new DisplayObject will be created and onload handler
+    /// will be triggerred.
     ///
     /// @param tag
     ///     A swf defined placement tag (PlaceObject, or PlaceObject2,
@@ -399,9 +399,8 @@ public:
     /// if false, the transformation SWFMatrix of the new DisplayObject will
     /// be untouched.
     ///
-    void replace_display_object(DisplayObject* ch,  int depth,
-        bool use_old_cxform,
-        bool use_old_matrix);
+    void replace_display_object(DisplayObject* ch, int depth,
+        bool use_old_cxform, bool use_old_matrix);
 
 
     /// \brief
