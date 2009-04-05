@@ -123,7 +123,7 @@ private:
 }	// end namespace gnash
 
 
-#endif // GNASH_GENERIC_CHARACTER_H
+#endif 
 
 
 // Local Variables:

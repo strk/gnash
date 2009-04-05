@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef GNASH_CHARACTER_H
-#define GNASH_CHARACTER_H
+#ifndef GNASH_DISPLAY_OBJECT_H
+#define GNASH_DISPLAY_OBJECT_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // USE_SWFTREE
