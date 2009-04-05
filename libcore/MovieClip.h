@@ -224,15 +224,8 @@ public:
     // delegates to movie_root (possibly wrong)
     virtual float get_background_alpha() const;
 
-    // delegates to movie_root 
-    //virtual void get_mouse_state(int& x, int& y, int& buttons);
-
     // delegates to movie_root (possibly wrong)
-    void    set_background_color(const rgba& color);
-
-    //float get_timer() const;
-
-    void restart();
+    void set_background_color(const rgba& color);
 
     bool has_looped() const
     {
@@ -272,8 +265,6 @@ public:
     }
 
     virtual void advance();
-
-    void advance_sprite();
 
     /// Set the sprite state at the specified frame number.
     //
@@ -983,6 +974,11 @@ private:
     bool _lockroot;
 
 protected:
+
+    /// Used both by this class and movie_instance.
+    //
+    /// TODO: do this with proper Sprite -> MovieClip inheritance.
+    void advance_sprite();
 
     void placeDisplayObject(DisplayObject* ch, int depth)  
     {       

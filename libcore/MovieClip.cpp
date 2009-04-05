@@ -1971,23 +1971,6 @@ MovieClip::mouseEnabled() const
 
     return false;
 }
-        
-void MovieClip::restart()
-{
-// see Whack-a-doc.swf, we tried to restart an unloaded DisplayObject.
-// It shouldn't happen anyway.
-// TODO: drop this function.
-
-    // Stop any streaming sound associated with us
-    stopStreamSound();
-
-    if( ! isUnloaded() )
-    {
-        restoreDisplayList(0); 
-    }
-
-    m_play_state = PLAY;
-}
 
 DisplayObject*
 MovieClip::getDisplayObject(int /* DisplayObject_id */)

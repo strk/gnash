@@ -513,16 +513,6 @@ public:
         return getPathElementSeparator(key);
     }
 
-    /// Restart the DisplayObject
-    //
-    /// This is only meaningful for sprite instances, but default
-    /// it's a no-op.
-    ///
-    /// It is needed by Button
-    /// TODO: have Button cast to_movie()
-    ///             and drop this one
-    virtual void restart() { }
-
     /// Advance this DisplayObject to next frame.
     //
     /// Character advancement is only meaningful for sprites
@@ -533,7 +523,6 @@ public:
     /// 
     virtual void advance()
     {
-        // GNASH_REPORT_FUNCTION 
     }
 
     /// \brief

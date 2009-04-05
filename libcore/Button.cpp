@@ -365,12 +365,6 @@ Button::handleFocus() {
 
 
 void
-Button::restart()
-{
-    log_error("Button::restart called, from whom??");
-}
-
-void
 Button::display()
 {
 
