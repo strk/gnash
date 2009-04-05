@@ -32,14 +32,14 @@
  *
  * Description:
  *
- *  frame1: two static characters are placed
- *  frame3: the two characters are depth-swapped
+ *  frame1: two static DisplayObjects are placed
+ *  frame3: the two DisplayObjects are depth-swapped
  *
  * Expected behaviour:
  *
  *  Normally, you can see both the red and black squares overlap each
  *  other with equal time.
- *  A single instance of the two characters is created.
+ *  A single instance of the two DisplayObjects is created.
  *
  * run as ./loop_test
  */

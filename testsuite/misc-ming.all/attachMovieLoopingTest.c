@@ -140,7 +140,7 @@ main(int argc, char** argv)
 		"			'square'+counter, 70+counter, initObj);"
 		"	} else {"
 		/* We don't use an initObject for the first attachMovie call
-		 * to verify that the character will be kept in DisplayList
+		 * to verify that the DisplayObject will be kept in DisplayList
 		 * at loopback time anyway
 		 */
 		"		attachMovie('redsquare', "

@@ -43,7 +43,7 @@
 #include "gui.h"
 #include "kdesup.h"
 #include "klash3.moc"
-#include "utility.h" // for PIXELS_TO_TWIPS 
+#include "GnashNumeric.h" // for pixelsToTwips 
 
 using namespace std;
 
@@ -473,10 +473,10 @@ qwidget::paintEvent(QPaintEvent *event)
     const QRegion& region = event->region();
     QRect rect = region.boundingRect();
 
-    int xmin = static_cast<int> (PIXELS_TO_TWIPS(rect.x()-1)),
-        ymin = static_cast<int> (PIXELS_TO_TWIPS(rect.y()-1)),
-        xmax = static_cast<int> (PIXELS_TO_TWIPS(rect.right()+1)),
-        ymax = static_cast<int> (PIXELS_TO_TWIPS(rect.bottom()+1));
+    int xmin = static_cast<int> (pixelsToTwips(rect.x()-1)),
+        ymin = static_cast<int> (pixelsToTwips(rect.y()-1)),
+        xmax = static_cast<int> (pixelsToTwips(rect.right()+1)),
+        ymax = static_cast<int> (pixelsToTwips(rect.bottom()+1));
 
     geometry::Range2d<int> range(xmin, ymin, xmax, ymax);
     InvalidatedRanges ranges;

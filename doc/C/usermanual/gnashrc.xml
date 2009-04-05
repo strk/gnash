@@ -255,6 +255,15 @@
 	         system support was found during compilation. By default, X Video rendering is disabled.
 	  </entry>
 	</row>
+	<row>
+	  <entry>quality</entry>
+	  <entry>[-1|0|1|2|3]</entry>
+	  <entry>
+      Set rendering quality.
+      If set to <emphasis>-1</emphasis>, &app; will use whatever quality set by the movie being run.
+      If set to any value from <emphasis>0</emphasis> to <emphasis>3</emphasis> &app; will lock quality to the specified value (0=low, 1=medium, 2=high, 3=best). Defaults to -1.
+	  </entry>
+	</row>
 
       </tbody>
     </tgroup>

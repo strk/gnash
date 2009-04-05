@@ -80,7 +80,7 @@ main(int argc, char** argv)
 
   //
   // Place mc1 at depth 3, place mc1 at depth3 again with a different name;
-  // Observed behaviour:  later place does not create a new character
+  // Observed behaviour:  later place does not create a new DisplayObject
   //
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  
   SWFDisplayItem_setDepth(it1, 3); 
@@ -123,7 +123,7 @@ main(int argc, char** argv)
   
   //
   // Place mc2 at depth 3 again.
-  // Observed behaviour: no new character gets created
+  // Observed behaviour: no new DisplayObject gets created
   //
   it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
   SWFDisplayItem_setDepth(it2, 3); 
@@ -144,7 +144,7 @@ main(int argc, char** argv)
   
   //
   // Place mc1 at depth 3 again with ratio set to 0.2
-  // Observed behaviour: no new character get placed(created).
+  // Observed behaviour: no new DisplayObject get placed(created).
   //
   it2 = SWFMovie_add(mo, (SWFBlock)mc1); 
   SWFDisplayItem_setDepth(it2, 3); 
@@ -166,7 +166,7 @@ main(int argc, char** argv)
   
   //
   // Place mc2 at depth 3 again with ratio set to 0.2
-  // Observed behaviour: no new character get placed(created).
+  // Observed behaviour: no new DisplayObject get placed(created).
   //
   it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
   SWFDisplayItem_setDepth(it2, 3); 

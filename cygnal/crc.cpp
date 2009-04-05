@@ -245,18 +245,18 @@ CRcInitFile::parseFile(const std::string& filespec)
 void
 CRcInitFile::dump(std::ostream& os) const
 {
-    cerr << endl << "Dump CRcInitFile:" << endl;
-    cerr << "\tVerbosity Level: " << _verbosity << endl;
-    cerr << "\tDump ActionScript processing: "
+    os << endl << "Dump CRcInitFile:" << endl;
+    os << "\tVerbosity Level: " << _verbosity << endl;
+    os << "\tDump ActionScript processing: "
          << ((_actionDump)?"enabled":"disabled") << endl;
-    cerr << "\tDump parser info: "
+    os << "\tDump parser info: "
          << ((_parserDump)?"enabled":"disabled") << endl;
-    cerr << "\tActionScript coding errors verbosity: "
+    os << "\tActionScript coding errors verbosity: "
          << ((_verboseASCodingErrors)?"enabled":"disabled") << endl;
-    cerr << "\tPort Offset: " << _port_offset << endl;
-    cerr << "\tThreading support: "
+    os << "\tPort Offset: " << _port_offset << endl;
+    os << "\tThreading support: "
          << ((_threading)?"enabled":"disabled") << endl;
-    cerr << "\tSpecial Testing output for Gnash: "
+    os << "\tSpecial Testing output for Gnash: "
          << ((_testing)?"enabled":"disabled") << endl;
 
 //    RcInitFile::dump();

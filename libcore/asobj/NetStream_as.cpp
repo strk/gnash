@@ -30,7 +30,6 @@
 
 #include "fn_call.h"
 #include "builtin_function.h"
-#include "timers.h" // for registering the advance timer
 #include "GnashException.h"
 #include "NetConnection_as.h"
 #include "Object.h" // for getObjectInterface
@@ -39,7 +38,6 @@
 #include "movie_root.h"
 #include "GnashAlgorithm.h"
 #include "VirtualClock.h" // for PlayHead
-#include "SystemClock.h"
 
 #include "MediaHandler.h"
 #include "StreamProvider.h"
@@ -102,30 +100,23 @@ NetStream_as::NetStream_as()
     inputPos(0),
     _invalidatedVideoCharacter(0),
     _decoding_state(DEC_NONE),
-
     _videoDecoder(0),
     _videoInfoKnown(false),
-
     _audioDecoder(0),
     _audioInfoKnown(false),
 
-    // TODO: if audio is available, use _audioClock instead of SystemClock
-    // as additional source
-    _playbackClock(new InterruptableVirtualClock(new SystemClock)),
+    // TODO: figure out if we should take another path to get to the clock
+    _playbackClock(new InterruptableVirtualClock(getVM().getClock())),
     _playHead(_playbackClock.get()), 
-
     _soundHandler(_vm.getRoot().runInfo().soundHandler()),
     _mediaHandler(media::MediaHandler::get()),
-
     _audioStreamer(_soundHandler),
-
-    _lastStatus(invalidStatus),
-    _advanceTimer(0)
+    _statusCode(invalidStatus)
 {
 }
 
-// extern (used by Global.cpp)
-void netstream_class_init(as_object& global)
+void
+NetStream_as::init(as_object& global)
 {
 
     // This is going to be the global NetStream "class"/"function"
@@ -149,13 +140,14 @@ void netstream_class_init(as_object& global)
 void
 NetStream_as::processNotify(const std::string& funcname, as_object* info_obj)
 {
-    // TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
+    // TODO: check for System.onStatus too ! use a private
+    // getStatusHandler() method for this.
 
 #ifdef GNASH_DEBUG_METADATA
   log_debug(" Invoking onMetaData");
 #endif
 
-    string_table::key func = getVM().getStringTable().find(PROPNAME(funcname));
+    string_table::key func = getVM().getStringTable().find(funcname);
 
     callMethod(func, as_value(info_obj));
 }
@@ -166,20 +158,22 @@ NetStream_as::processStatusNotifications()
 {
     // TODO: check for System.onStatus too ! use a private
     // getStatusHandler() method for this.
+    // Copy it to prevent threads changing it.
+    StatusCode code = invalidStatus;
 
-    StatusCode code;
-    while (1)
     {
-        code = popNextPendingStatusNotification();
+        boost::mutex::scoped_lock lock(statusMutex);
 
-        // Nothing to do if no more valid notifications.
-        if (code == invalidStatus) return; 
-
-        // Must be a new object every time.
-        as_object* o = getStatusObject(code);
-
-        callMethod(NSV::PROP_ON_STATUS, o);
+        std::swap(code, _statusCode);
     }
+
+    // Nothing to do if no more valid notifications.
+    if (code == invalidStatus) return; 
+
+    // Must be a new object every time.
+    as_object* o = getStatusObject(code);
+
+    callMethod(NSV::PROP_ON_STATUS, o);
 }
 
 void
@@ -187,12 +181,7 @@ NetStream_as::setStatus(StatusCode status)
 {
     // Get a lock to avoid messing with statuses while processing them
     boost::mutex::scoped_lock lock(statusMutex);
-
-    // status unchanged
-    if ( _lastStatus == status) return;
-
-    _lastStatus = status;
-    _statusQueue.push_back(status);
+    _statusCode = status;
 }
 
 void
@@ -296,31 +285,8 @@ NetStream_as::getStatusObject(StatusCode code)
     return o;
 }
 
-NetStream_as::StatusCode
-NetStream_as::popNextPendingStatusNotification()
-{
-    // Get an exclusive lock on the queue
-    boost::mutex::scoped_lock lock(statusMutex);
-
-    // No queued statuses to notify ...
-    if ( _statusQueue.empty() ) return invalidStatus;
-
-    StatusCode nextCode = _statusQueue.front();
-    _statusQueue.pop_front();
-    return nextCode;
-}
-
 void
-NetStream_as::clearStatusQueue()
-{
-    // Get an exclusive lock on the queue
-    boost::mutex::scoped_lock lock(statusMutex);
-
-    _statusQueue.clear();
-}
-
-void
-NetStream_as::setAudioController(character* ch)
+NetStream_as::setAudioController(DisplayObject* ch)
 {
     _audioController.reset(new CharacterProxy(ch));
 }
@@ -332,7 +298,7 @@ NetStream_as::markReachableResources() const
 
     if (_netCon) _netCon->setReachable();
 
-    if (m_statusHandler) m_statusHandler->setReachable();
+    if (_statusHandler) _statusHandler->setReachable();
 
     if (_audioController) _audioController->setReachable();
 
@@ -343,38 +309,16 @@ NetStream_as::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
-as_value
-NetStream_as::advanceWrapper(const fn_call& fn)
-{
-    boost::intrusive_ptr<NetStream_as> ptr =
-        ensureType<NetStream_as>(fn.this_ptr);
-
-    ptr->advance();
-    return as_value();
-}
-
 void
 NetStream_as::stopAdvanceTimer()
 {
-    if ( _advanceTimer )
-    {
-        VM& vm = getVM();
-        vm.getRoot().clear_interval_timer(_advanceTimer);
-        _advanceTimer = 0;
-    }
+    getVM().getRoot().removeAdvanceCallback(this);
 }
 
 void
 NetStream_as::startAdvanceTimer()
 {
-    boost::intrusive_ptr<builtin_function> advanceCallback = 
-        new builtin_function(&NetStream_as::advanceWrapper);
-    std::auto_ptr<Timer> timer(new Timer);
-
-    // TODO: base on media file FPS !!! 
-    unsigned long delayMS = 50;
-    timer->setInterval(*advanceCallback, delayMS, this);
-    _advanceTimer = getVM().getRoot().add_interval_timer(timer, true);
+    getVM().getRoot().addAdvanceCallback(this);
 }
 
 
@@ -394,7 +338,7 @@ NetStream_as::~NetStream_as()
 }
 
 
-void NetStream_as::pause( PauseMode mode )
+void NetStream_as::pause(PauseMode mode)
 {
     log_debug("::pause(%d) called ", mode);
     switch ( mode )
@@ -659,187 +603,187 @@ NetStream_as::getDecodedVideoFrame(boost::uint32_t ts)
     }
 
     // Loop until a good frame is found
-    while ( 1 )
-    {
-        video = decodeNextVideoFrame();
-        if ( ! video.get() )
+        while ( 1 )
         {
-            log_error("nextVideoFrameTimestamp returned true (%d), "
-                "but decodeNextVideoFrame returned null, "
-                "I don't think this should ever happen", nextTimestamp);
-            break;
+            video = decodeNextVideoFrame();
+            if ( ! video.get() )
+            {
+                log_error("nextVideoFrameTimestamp returned true (%d), "
+                    "but decodeNextVideoFrame returned null, "
+                    "I don't think this should ever happen", nextTimestamp);
+                break;
+            }
+
+            if ( ! m_parser->nextVideoFrameTimestamp(nextTimestamp) )
+            {
+                // the one we decoded was the last one
+#ifdef GNASH_DEBUG_DECODING
+                log_debug("%p.getDecodedVideoFrame(%d): last video frame decoded "
+                    "(should set playback status to STOP?)", this, ts);
+#endif 
+                break;
+            }
+            if ( nextTimestamp > ts )
+            {
+                // the next one is in the future, we'll return this one.
+#ifdef GNASH_DEBUG_DECODING
+                log_debug("%p.getDecodedVideoFrame(%d): "
+                    "next video frame is in the future, "
+                    "we'll return this one",
+                    this, ts);
+#endif 
+                break; 
+            }
         }
 
-        if ( ! m_parser->nextVideoFrameTimestamp(nextTimestamp) )
-        {
-            // the one we decoded was the last one
-#ifdef GNASH_DEBUG_DECODING
-            log_debug("%p.getDecodedVideoFrame(%d): last video frame decoded "
-                "(should set playback status to STOP?)", this, ts);
-#endif 
-            break;
-        }
-        if ( nextTimestamp > ts )
-        {
-            // the next one is in the future, we'll return this one.
-#ifdef GNASH_DEBUG_DECODING
-            log_debug("%p.getDecodedVideoFrame(%d): "
-                "next video frame is in the future, "
-                "we'll return this one",
-                this, ts);
-#endif 
-            break; 
-        }
-    }
-
-    return video;
-}
-
-std::auto_ptr<GnashImage> 
-NetStream_as::decodeNextVideoFrame()
-{
-    std::auto_ptr<GnashImage> video;
-
-    if ( ! m_parser.get() )
-    {
-        log_error("decodeNextVideoFrame: no parser available");
-        return video; 
-    }
-
-    std::auto_ptr<media::EncodedVideoFrame> frame = m_parser->nextVideoFrame(); 
-    if ( ! frame.get() )
-    {
-#ifdef GNASH_DEBUG_DECODING
-        log_debug("%p.decodeNextVideoFrame(): "
-            "no more video frames in input",
-            this);
-#endif 
         return video;
     }
 
-#if 0 // TODO: check if the video is a cue point, if so, call processNotify(onCuePoint, object..)
-      // NOTE: should only be done for SWF>=8 ?
-    if ( 1 ) // frame->isKeyFrame() )
+    std::auto_ptr<GnashImage> 
+    NetStream_as::decodeNextVideoFrame()
     {
-        as_object* infoObj = new as_object();
-        string_table& st = getVM().getStringTable();
-        infoObj->set_member(st.find("time"), as_value(double(frame->timestamp())));
-        infoObj->set_member(st.find("type"), as_value("navigation"));
-        processNotify("onCuePoint", infoObj);
-    }
-#endif
+        std::auto_ptr<GnashImage> video;
 
-    assert( _videoDecoder.get() ); 
-    
-    // everything we push, we'll pop too..
-    assert( ! _videoDecoder->peek() ); 
-
-    _videoDecoder->push(*frame);
-    video = _videoDecoder->pop();
-    if ( ! video.get() )
-    {
-        // TODO: tell more about the failure
-        log_error(_("Error decoding encoded video frame in NetStream input"));
-    }
-
-    return video;
-}
-
-BufferedAudioStreamer::CursoredBuffer*
-NetStream_as::decodeNextAudioFrame()
-{
-    assert ( m_parser.get() );
-
-    std::auto_ptr<media::EncodedAudioFrame> frame = m_parser->nextAudioFrame(); 
-    if ( ! frame.get() )
-    {
-#ifdef GNASH_DEBUG_DECODING
-        log_debug("%p.decodeNextAudioFrame: "
-            "no more video frames in input",
-            this);
-#endif
-        return 0;
-    }
-
-    // TODO: make the buffer cursored later ?
-    BufferedAudioStreamer::CursoredBuffer* raw =
-        new BufferedAudioStreamer::CursoredBuffer();
-    raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
-
-    // TODO: let the sound_handler do this .. sounds cleaner
-    if ( _audioController ) 
-    {
-        character* ch = _audioController->get();
-        if ( ch )
+        if ( ! m_parser.get() )
         {
-            int vol = ch->getWorldVolume();
-            if ( vol != 100 )
+            log_error("decodeNextVideoFrame: no parser available");
+            return video; 
+        }
+
+        std::auto_ptr<media::EncodedVideoFrame> frame = m_parser->nextVideoFrame(); 
+        if ( ! frame.get() )
+        {
+#ifdef GNASH_DEBUG_DECODING
+            log_debug("%p.decodeNextVideoFrame(): "
+                "no more video frames in input",
+                this);
+#endif 
+            return video;
+        }
+
+#if 0 // TODO: check if the video is a cue point, if so, call processNotify(onCuePoint, object..)
+          // NOTE: should only be done for SWF>=8 ?
+        if ( 1 ) // frame->isKeyFrame() )
+        {
+            as_object* infoObj = new as_object();
+            string_table& st = getVM().getStringTable();
+            infoObj->set_member(st.find("time"), as_value(double(frame->timestamp())));
+            infoObj->set_member(st.find("type"), as_value("navigation"));
+            processNotify("onCuePoint", infoObj);
+        }
+#endif
+
+        assert( _videoDecoder.get() ); 
+        
+        // everything we push, we'll pop too..
+        assert( ! _videoDecoder->peek() ); 
+
+        _videoDecoder->push(*frame);
+        video = _videoDecoder->pop();
+        if ( ! video.get() )
+        {
+            // TODO: tell more about the failure
+            log_error(_("Error decoding encoded video frame in NetStream input"));
+        }
+
+        return video;
+    }
+
+    BufferedAudioStreamer::CursoredBuffer*
+    NetStream_as::decodeNextAudioFrame()
+    {
+        assert ( m_parser.get() );
+
+        std::auto_ptr<media::EncodedAudioFrame> frame = m_parser->nextAudioFrame(); 
+        if ( ! frame.get() )
+        {
+#ifdef GNASH_DEBUG_DECODING
+            log_debug("%p.decodeNextAudioFrame: "
+                "no more video frames in input",
+                this);
+#endif
+            return 0;
+        }
+
+        // TODO: make the buffer cursored later ?
+        BufferedAudioStreamer::CursoredBuffer* raw =
+            new BufferedAudioStreamer::CursoredBuffer();
+        raw->m_data = _audioDecoder->decode(*frame, raw->m_size);
+
+        // TODO: let the sound_handler do this .. sounds cleaner
+        if ( _audioController ) 
+        {
+            DisplayObject* ch = _audioController->get();
+            if ( ch )
             {
-                // NOTE: adjust_volume assumes samples 
-                // are 16 bits in size, and signed.
-                // Size is still given in bytes..
-                adjust_volume(reinterpret_cast<boost::int16_t*>(raw->m_data),
-                        raw->m_size, vol);
+                int vol = ch->getWorldVolume();
+                if ( vol != 100 )
+                {
+                    // NOTE: adjust_volume assumes samples 
+                    // are 16 bits in size, and signed.
+                    // Size is still given in bytes..
+                    adjust_volume(reinterpret_cast<boost::int16_t*>(raw->m_data),
+                            raw->m_size, vol);
+                }
             }
         }
-    }
 
 #ifdef GNASH_DEBUG_DECODING
-    log_debug("NetStream_as::decodeNextAudioFrame: "
-        "%d bytes of encoded audio "
-        "decoded to %d bytes",
-        frame->dataSize,
-        raw->m_size);
+        log_debug("NetStream_as::decodeNextAudioFrame: "
+            "%d bytes of encoded audio "
+            "decoded to %d bytes",
+            frame->dataSize,
+            raw->m_size);
 #endif 
 
-    raw->m_ptr = raw->m_data;
+        raw->m_ptr = raw->m_data;
 
-    return raw;
-}
-
-bool NetStream_as::decodeMediaFrame()
-{
-    return false;
-}
-
-void
-NetStream_as::seek(boost::uint32_t posSeconds)
-{
-    GNASH_REPORT_FUNCTION;
-
-    // We'll mess with the input here
-    if ( ! m_parser.get() )
-    {
-        log_debug("NetStream_as::seek(%d): no parser, no party", posSeconds);
-        return;
+        return raw;
     }
 
-    // Don't ask me why, but NetStream_as::seek() takes seconds...
-    boost::uint32_t pos = posSeconds*1000;
-
-    // We'll pause the clock source and mark decoders as buffering.
-    // In this way, next advance won't find the source time to 
-    // be a lot of time behind and chances to get audio buffer
-    // overruns will reduce.
-    // ::advance will resume the playbackClock if DEC_BUFFERING...
-    //
-    _playbackClock->pause();
-
-    // Seek to new position
-    boost::uint32_t newpos = pos;
-    if ( ! m_parser->seek(newpos) )
+    bool NetStream_as::decodeMediaFrame()
     {
+        return false;
+    }
+
+    void
+    NetStream_as::seek(boost::uint32_t posSeconds)
+    {
+        GNASH_REPORT_FUNCTION;
+
+        // We'll mess with the input here
+        if ( ! m_parser.get() )
+        {
+            log_debug("NetStream_as::seek(%d): no parser, no party", posSeconds);
+            return;
+        }
+
+        // Don't ask me why, but NetStream_as::seek() takes seconds...
+        boost::uint32_t pos = posSeconds*1000;
+
+        // We'll pause the clock source and mark decoders as buffering.
+        // In this way, next advance won't find the source time to 
+        // be a lot of time behind and chances to get audio buffer
+        // overruns will reduce.
+        // ::advance will resume the playbackClock if DEC_BUFFERING...
+        //
+        _playbackClock->pause();
+
+        // Seek to new position
+        boost::uint32_t newpos = pos;
+        if ( ! m_parser->seek(newpos) )
+        {
 #ifdef GNASH_DEBUG_STATUS
-        log_debug("Setting invalidTime status");
+            log_debug("Setting invalidTime status");
 #endif
-        setStatus(invalidTime);
-        // we won't be *BUFFERING*, so resume now
-        _playbackClock->resume(); 
-        return;
-    }
-    log_debug("m_parser->seek(%d) returned %d", pos, newpos);
+            setStatus(invalidTime);
+            // we won't be *BUFFERING*, so resume now
+            _playbackClock->resume(); 
+            return;
+        }
+        log_debug("m_parser->seek(%d) returned %d", pos, newpos);
 
-    // cleanup audio queue, so won't be consumed while seeking
+        // cleanup audio queue, so won't be consumed while seeking
     _audioStreamer.cleanAudioQueue();
     
     // 'newpos' will always be on a keyframe (supposedly)
@@ -1114,7 +1058,8 @@ NetStream_as::pushDecodedAudioFrames(boost::uint32_t ts)
         // this one we might avoid :) -- a less intrusive logging could
         // be take note about how many things we're pushing over
         log_debug("pushDecodedAudioFrames(%d) pushing %dth frame with "
-                "timestamp %d", ts, _audioQueue.size()+1, nextTimestamp); 
+                "timestamp %d", ts, _audioStreamer._audioQueue.size()+1,
+                nextTimestamp); 
 #endif
 
         _audioStreamer.push(audio);
@@ -1268,7 +1213,7 @@ NetStream_as::refreshVideoFrame(bool alsoIfPaused)
 
             // NOTE: setting the newFrameReady flag this is not needed anymore,
             // we don't realy on newFrameReady() call anyore to invalidate
-            // the video character
+            // the video DisplayObject
         }
     }
 
@@ -1294,16 +1239,14 @@ NetStream_as::videoWidth() const
 
 
 void
-NetStream_as::advance()
+NetStream_as::advanceState()
 {
     // Check if there are any new status messages, and if we should
     // pass them to a event handler
     processStatusNotifications();
 
-    // Nothing to do if we don't have a parser. Unregister the timer, as
-    // all status notifications should have been processed.
-    if ( ! m_parser.get() ) {
-        stopAdvanceTimer();
+    // Nothing to do if we don't have a parser.
+    if (!m_parser.get()) {
         return;
     }
 
@@ -1430,7 +1373,6 @@ NetStream_as::pausePlayback()
 void
 NetStream_as::unpausePlayback()
 {
-    GNASH_REPORT_FUNCTION;
 
     PlayHead::PlaybackStatus oldStatus = 
         _playHead.setState(PlayHead::PLAY_PLAYING);

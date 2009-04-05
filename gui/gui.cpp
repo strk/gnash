@@ -28,6 +28,7 @@
 #include "sound_handler.h"
 #include "movie_root.h"
 #include "VM.h"
+#include "DisplayObject.h"
 
 #ifdef GNASH_FPS_DEBUG
 #include "ClockTime.h"
@@ -103,6 +104,12 @@ Gui::Gui() :
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
+
+    // NOTE: it's important that _systemClock is constructed
+    //       before and destroyed after _virtualClock !
+    ,_systemClock()
+    ,_virtualClock(_systemClock)
+
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -145,6 +152,12 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     ,_stopped(false)
     ,_started(false)
     ,_showUpdatedRegions(false)
+
+    // NOTE: it's important that _systemClock is constructed
+    //       before and destroyed after _virtualClock !
+    ,_systemClock()
+    ,_virtualClock(_systemClock)
+
 #ifdef ENABLE_KEYBOARD_MOUSE_MOVEMENTS 
     ,_xpointer(0)
     ,_ypointer(0)
@@ -462,7 +475,7 @@ Gui::notify_mouse_moved(int ux, int uy)
 		display(m);
 	}
     
-	character* activeEntity = m->getActiveEntityUnderPointer();
+	DisplayObject* activeEntity = m->getActiveEntityUnderPointer();
 	if ( activeEntity )
 	{
 		if ( activeEntity->isSelectableTextField() )
@@ -699,12 +712,12 @@ Gui::display(movie_root* m)
 		changed_ranges.growBy(40.0f / _xscale);
 		
 		// optimize ranges
-		changed_ranges.combine_ranges();
+		changed_ranges.combineRanges();
 		
 	}
-
-	if (redraw_flag)     // TODO: Remove this and want_redraw to avoid confusion!?
-	{
+    
+    // TODO: Remove this and want_redraw to avoid confusion!?
+	if (redraw_flag)  {
 		changed_ranges.setWorld();
 	}
 	
@@ -820,6 +833,9 @@ Gui::play()
         //       already what it is ?!
         sound::sound_handler* s = _stage->runInfo().soundHandler();
         if ( s ) s->unpause();
+
+        log_debug("Starting virtual clock");
+        _virtualClock.resume();
     }
 
     playHook ();
@@ -841,6 +857,9 @@ Gui::stop()
     sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->pause();
 
+    log_debug("Pausing virtual clock");
+    _virtualClock.pause();
+
     stopHook();
 }
 
@@ -853,11 +872,18 @@ Gui::pause()
     }
     else
     {
+        // TODO: call stop() instead ?
+        // The only thing I see is that ::stop exits full-screen,
+        // but I'm not sure that's intended behaviour
+
         // @todo since we registered the sound handler, shouldn't we know
         //       already what it is ?!
     	sound::sound_handler* s = _stage->runInfo().soundHandler();
     	if ( s ) s->pause();
         _stopped = true;
+
+        log_debug("Pausing virtual clock");
+        _virtualClock.pause();
 
         stopHook();
     }
@@ -877,7 +903,6 @@ Gui::start()
     mr->setVariables(_flashVars);
 
     _stage->setRootMovie( mr.release() ); // will construct the instance
-    resize_view(_width, _height); // to properly update stageMatrix if scaling is given 
 
     bool background = true; // ??
     _stage->set_background_alpha(background ? 1.0f : 0.05f);
@@ -887,6 +912,13 @@ Gui::start()
     sound::sound_handler* s = _stage->runInfo().soundHandler();
     if ( s ) s->unpause();
     _started = true;
+    
+    // to properly update stageMatrix if scaling is given  
+    resize_view(_width, _height); 
+
+    log_debug("Starting virtual clock");
+    _virtualClock.resume();
+
 }
 
 bool
@@ -1072,7 +1104,7 @@ Gui::getMovieInfo() const
     //
     topIter = tr->insert(topIter, StringPair("Mouse Entities", ""));
 
-    const character* ch;
+    const DisplayObject* ch;
     ch = stage.getActiveEntityUnderPointer();
     if ( ch )
     {

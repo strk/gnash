@@ -1,12 +1,13 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'klash_part.h'
 **
-** Created: Thu Dec 4 10:00:51 2008
+** Created: Tue Mar 17 12:54:45 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include "../../../../work/plugin/klash4/klash_part.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'klash_part.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 59

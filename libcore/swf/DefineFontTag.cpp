@@ -313,7 +313,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
         _descent = static_cast<float>(in.read_s16());
         _leading = static_cast<float>(in.read_s16());
         
-        // Advance table; i.e. how wide each character is.
+        // Advance table; i.e. how wide each DisplayObject is.
         size_t nGlyphs = _glyphTable.size();
         in.ensureBytes(nGlyphs*2);
         for (size_t i = 0; i < nGlyphs; i++)
@@ -360,7 +360,7 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
             k.m_char1 = char1;
 
             // Remember this adjustment; we can look it up quickly
-            // later using the character pair as the key.
+            // later using the DisplayObject pair as the key.
             if ( ! m_kerning_pairs.insert(std::make_pair(k, adjustment)).second )
             {
                 IF_VERBOSE_MALFORMED_SWF(

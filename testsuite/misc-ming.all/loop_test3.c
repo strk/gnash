@@ -17,7 +17,7 @@
  */ 
 
 /*
- * Test "Jumping backward to the start of a character's lifetime after being swapped to the depth of a subsequently placed character"
+ * Test "Jumping backward to the start of a DisplayObject's lifetime after being swapped to the depth of a subsequently placed DisplayObject"
  *
  * Timeline:
  * 
@@ -32,16 +32,16 @@
  *
  * Description:
  *
- *  frame2: a static characters is placed at depth 2 (-16381) [ a red square ]
- *  frame3: a static character is placed at depth 3 (-16380) [ a black square ]
- *          the two characters are depth-swapped
+ *  frame2: a static DisplayObjects is placed at depth 2 (-16381) [ a red square ]
+ *  frame3: a static DisplayObject is placed at depth 3 (-16380) [ a black square ]
+ *          the two DisplayObjects are depth-swapped
  *  frame4: jump to frame 2 and stop.
  *
  * Expected behaviour:
  *
- *  A single instance of each characters is created.
- *  After loop-back only the character placed in frame 3 is still alive (the black square),
- *  at depth -16381. The character placed in frame 2 has been destroyed !
+ *  A single instance of each DisplayObjects is created.
+ *  After loop-back only the DisplayObject placed in frame 3 is still alive (the black square),
+ *  at depth -16381. The DisplayObject placed in frame 2 has been destroyed !
  *
  * run as ./loop_test3
  */
@@ -89,7 +89,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: Place red static movieClip1 character at depth 3 (-16381)
+  // Frame 2: Place red static movieClip1 DisplayObject at depth 3 (-16381)
 
   sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();
@@ -106,7 +106,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
   
-  // Frame 3: Place black static movieClip2 character at depth 4 (-16380), swap depths
+  // Frame 3: Place black static movieClip2 DisplayObject at depth 4 (-16380), swap depths
 
   sh2 = make_fill_square (330, 270, 120, 120, 0, 0, 0, 0, 0, 0);
   mc2 = newSWFMovieClip();
@@ -145,7 +145,7 @@ main(int argc, char** argv)
       // Character placed in frame 3 at depth (-16380) was destroyed (placed *after* target frame)
       "check_equals(typeof(movieClip1), 'undefined');" 
       
-      // Depth of character at depth -16380 isn't restored (there's no character at that depth)
+      // Depth of DisplayObject at depth -16380 isn't restored (there's no DisplayObject at that depth)
       // (gnash fails because create new instances instead)
       "check_equals(movieClip2.getDepth(), -16381);"
 

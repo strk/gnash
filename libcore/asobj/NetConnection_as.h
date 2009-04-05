@@ -73,6 +73,8 @@ public:
 	NetConnection_as();
 	~NetConnection_as();
 
+    static void init(as_object& global);
+
     /// Make the stored URI into a valid and checked URL.
     std::string validateURL() const;
 

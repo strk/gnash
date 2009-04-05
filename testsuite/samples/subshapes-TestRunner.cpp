@@ -23,7 +23,7 @@
 #include "MovieTester.h"
 #include "GnashException.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 

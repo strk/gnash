@@ -20,7 +20,7 @@
  *  Test that instance name are syntezed only if a name isn't given
  *  at all (empty name is still a name).
  *  TODO: we may test other name syntesis here, in particular for other
- *  kind of characters..
+ *  kind of DisplayObjects..
  */
 
 

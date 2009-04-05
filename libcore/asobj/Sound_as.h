@@ -61,12 +61,12 @@ public:
 
     static void init(as_object& global);
 
-    /// Make this sound control the given character
+    /// Make this sound control the given DisplayObject
     //
     /// NOTE: 0 is accepted, to implement an "invalid"
     ///       controller type.
     ///
-    void attachCharacter(character* attachedChar);
+    void attachCharacter(DisplayObject* attachedChar);
 
     void attachSound(int si, const std::string& name);
 
@@ -86,7 +86,7 @@ public:
     //
     /// @return true of volume was obtained, false
     ///         otherwise (for example if the associated
-    ///         character was unloaded).
+    ///         DisplayObject was unloaded).
     ///
     bool getVolume(int& volume);
     void setVolume(int volume);
@@ -107,7 +107,7 @@ private:
     /// Mark all reachable resources of a Sound, for the GC
     //
     /// Reachable resources are:
-    /// - attached character object (attachedCharacter)
+    /// - attached DisplayObject object (attachedCharacter)
     ///
     void markReachableResources() const;
 #endif // GNASH_USE_GC
@@ -171,10 +171,10 @@ private:
     /// Unregister the probe timer
     void stopProbeTimer();
 
+    virtual void advanceState();
+
     /// Probe audio
     void probeAudio();
-
-    static as_value probeAudioWrapper(const fn_call&);
 
     int _probeTimer;
 

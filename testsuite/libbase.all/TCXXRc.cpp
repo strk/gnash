@@ -67,6 +67,13 @@ main (int /*argc*/, char** /*argv*/) {
 
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity();
+
+    // Default rendering quality is driven by SWF
+    if (rc.qualityLevel() == -1) {
+        runtest.pass ("rc.qualityLevel() == -1");
+    } else {
+        runtest.fail ("rc.qualityLevel() != -1");
+    }
     
     // Parse the test config file
     if (rc.parseFile("gnashrc")) {
@@ -182,6 +189,13 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.pass ("getSOLSafeDir");
     } else {
         runtest.fail ("getSOLSafeDir");
+    }
+
+    // Parsed gnashrc sets qualityLevel to 0 (low)
+    if (rc.qualityLevel() == 0) {
+        runtest.pass ("rc.qualityLevel() == 0");
+    } else {
+        runtest.fail ("rc.qualityLevel() != 0");
     }
 
     std::vector<std::string> whitelist = rc.getWhiteList();

@@ -28,6 +28,7 @@
 #include "RGBA.h" // for rgba type
 
 #include <vector> // for composition
+#include <iosfwd> // for output operator forward declarations
 
 namespace gnash {
 
@@ -63,17 +64,53 @@ class DSOEXPORT fill_style
 {
 public:
 
+    /// Bitmap smoothing policy
+    enum BitmapSmoothingPolicy {
+
+        /// Only smooth when _quality >= BEST
+        //
+        /// This is the policy for bitmap fills
+        /// defined by SWF up to version 7:
+        ///  - SWF::FILL_CLIPPED_BITMAP
+        ///  - SWF::FILL_TILED_BITMAP
+        ///
+        BITMAP_SMOOTHING_UNSPECIFIED,
+
+        /// Always smooth if _quality > LOW
+        //
+        /// This is the policy for non-hard bitmap fills
+        /// defined by SWF 8 and higher:
+        ///  - SWF::FILL_CLIPPED_BITMAP
+        ///  - SWF::FILL_TILED_BITMAP
+        ///
+        BITMAP_SMOOTHING_ON,
+
+        /// Never smooth
+        ///
+        /// MovieClip.forceSmoothing can force this to
+        /// behave like BITMAP_SMOOTHING_ON 
+        ///
+        /// This is the policy for hard bitmap fills
+        /// introduced in SWF 8:
+        ///  - SWF::FILL_CLIPPED_BITMAP_HARD
+        ///  - SWF::FILL_TILED_BITMAP_HARD
+        ///
+        ///
+        BITMAP_SMOOTHING_OFF
+    };
+    
+
 	/// Create a solid opaque white fill.
 	fill_style();
 
 	/// Construct a clipped bitmap fill style, for
-	/// use by bitmap shape character.
+	/// use by bitmap shape DisplayObject.
 	///
 	/// TODO: use a subclass for this
 	/// TODO: provide a setBitmap, for consisteny with other setType() methods
 	///
 	/// @param bitmap
-	///	The bitmap character definition to use with this bitmap fill.
+	///	The bitmap DisplayObject definition to use with this bitmap fill.
 	///
 	/// @param mat
 	///	The SWFMatrix to apply to the bitmap.
@@ -151,7 +188,7 @@ public:
 	void	set_color(rgba new_color) { m_color = new_color; }
 
 	/// Get fill type, see SWF::fill_style_type
-	int	get_type() const { return m_type; }
+	uint8_t	get_type() const { return m_type; }
 
 	SWF::gradient_spread_mode get_gradient_spread_mode()
 	{ return m_spread_mode; }
@@ -167,12 +204,16 @@ public:
 	/// NOTE: calling this method against a solid fill style will
 	///       result in a failed assertion.
 	/// 
-	/// NOTE2: this function can return NULL if the character_id
+	/// NOTE2: this function can return NULL if the DisplayObject_id
 	///        specified for the style in the SWF does not resolve
-	///        to a character defined in the characters dictionary.
+	///        to a DisplayObject defined in the DisplayObjects dictionary.
 	///        (it happens..)
 	///
 	BitmapInfo* get_bitmap_info() const;
+
+    BitmapSmoothingPolicy getBitmapSmoothingPolicy() const {
+        return _bitmapSmoothingPolicy;
+    }
 	
 	/// Returns the bitmap transformation SWFMatrix
 	const SWFMatrix& getBitmapMatrix() const; 
@@ -198,7 +239,7 @@ public:
 	/// fill_style specific reachable resources are:
 	///
 	///	- gradient bitmap info (_gradientBitmapInfo)
-	///	- bitmap character (m_bitmap_character)
+	///	- bitmap DisplayObject (_bitmap)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
@@ -213,21 +254,36 @@ private:
 	rgba sample_gradient(boost::uint8_t ratio) const;
 
 	friend class morph2_character_def;
-	
-	/// Fill type, see SWF::fill_style_type
-	int	m_type;
-	rgba	m_color;
-	SWFMatrix	m_gradient_matrix;
-    float m_focal_point; // For focal fill gradients.
-	std::vector<gradient_record> m_gradients;
-	boost::intrusive_ptr<BitmapInfo> _gradientBitmapInfo;
-	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
-	SWFMatrix	m_bitmap_matrix;
 
+	// For BITMAP or GRADIENT types 
+	SWFMatrix	_matrix;
+
+	// For BITMAP or GRADIENT types
+	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
+
+	// For SOLID type (and arguably GRADIENT too)
+	rgba	m_color;
+
+	// Only for GRADIENT type
+	float m_focal_point; // For focal fill gradients.
+	std::vector<gradient_record> m_gradients;
 	SWF::gradient_spread_mode m_spread_mode;
 	SWF::gradient_interpolation_mode m_interpolation;
+
+	/// Fill type, see SWF::fill_style_type
+	uint8_t	m_type;
+
+	// Only for BITMAP type
+    //
+    // 0: unspecified (smooth with _quality >= BEST)
+    // 1: smooth (smooth with _quality >= MEDIUM)
+    // 2: don't smooth, can be forced with .forceSmoothing, in
+    //    which case it becomes as policy 1
+    BitmapSmoothingPolicy _bitmapSmoothingPolicy;
 };
 
+DSOEXPORT std::ostream& operator << (std::ostream& os,
+    const fill_style::BitmapSmoothingPolicy& p);
 
 } // namespace gnash
 

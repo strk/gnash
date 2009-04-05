@@ -17,7 +17,7 @@
  */ 
 
 /*
- * Test "Jumping backward to the end of a character's lifetime (with events: onConstruct)"
+ * Test "Jumping backward to the end of a DisplayObject's lifetime (with events: onConstruct)"
  *
  * Timeline:
  * 
@@ -32,12 +32,12 @@
  *
  * Description:
  *
- *  frame2: (1)a static character(movieclip1) is placed at depth 3 (-16381) [ a red square ]
+ *  frame2: (1)a static DisplayObject(movieclip1) is placed at depth 3 (-16381) [ a red square ]
  *             onInitialize and onConstruct event handlers defined, onUnload event handler NOT defined.
- *          (2)a static character(movieclip2) is placed at depth 4 [a green square]
+ *          (2)a static DisplayObject(movieclip2) is placed at depth 4 [a green square]
  *             onInitialize and onConstruct event handlers defined, onUnload event handler also defined.
- *  frame3: (1)character at depth 3 (-16381) removed.
- *          (2)character at depth 4 removed.
+ *  frame3: (1)DisplayObject at depth 3 (-16381) removed.
+ *          (2)DisplayObject at depth 4 removed.
  *  frame5: jump back to frame 4 and stop
  *
  * Expected behaviour:
@@ -97,8 +97,8 @@ main(int argc, char** argv)
   
   //
   // Frame 2: 
-  //   Place red static movieClip1 character at depth 3 (-16381)
-  //   Place green static movieClip2 character at depth 4 (-16380)
+  //   Place red static movieClip1 DisplayObject at depth 3 (-16381)
+  //   Place green static movieClip2 DisplayObject at depth 4 (-16380)
   //
   sh1 = make_fill_square (100, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();

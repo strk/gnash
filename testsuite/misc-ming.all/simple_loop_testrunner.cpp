@@ -24,7 +24,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -78,7 +78,7 @@ void testAll(MovieTester& tester)
 	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 1);
-	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 2+DisplayObject::staticDepthOffset) );
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(0, 0, 60, 60)) );
 
@@ -87,8 +87,8 @@ void testAll(MovieTester& tester)
 	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 2);
 	check_equals(root->getDisplayList().size(), 2);
-	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
-	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 2+DisplayObject::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset) );
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(60, 0, 120, 60)) );
 
@@ -97,9 +97,9 @@ void testAll(MovieTester& tester)
 	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 3);
 	check_equals(root->getDisplayList().size(), 3);
-	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
-	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
-	check( tester.findDisplayItemByDepth(*root, 4+character::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 2+DisplayObject::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 4+DisplayObject::staticDepthOffset) );
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(120, 0, 180, 60)) );
 
@@ -116,7 +116,7 @@ void testAll(MovieTester& tester)
 	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 1);
-	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 2+DisplayObject::staticDepthOffset) );
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(0, 0, 60, 60)) );
 
@@ -125,8 +125,8 @@ void testAll(MovieTester& tester)
 	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 2);
 	check_equals(root->getDisplayList().size(), 2);
-	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
-	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 2+DisplayObject::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset) );
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(60, 0, 120, 60)) );
 
@@ -135,9 +135,9 @@ void testAll(MovieTester& tester)
 	check_equals(root->get_play_state(), MovieClip::PLAY);
 	check_equals(root->get_current_frame(), 3);
 	check_equals(root->getDisplayList().size(), 3);
-	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
-	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
-	check( tester.findDisplayItemByDepth(*root, 4+character::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 2+DisplayObject::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset) );
+	check( tester.findDisplayItemByDepth(*root, 4+DisplayObject::staticDepthOffset) );
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(120, 0, 180, 60)) );
 }

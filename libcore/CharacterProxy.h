@@ -1,4 +1,4 @@
-// CharacterProxy.h - rebindable character reference, for Gnash
+// CharacterProxy.h - rebindable DisplayObject reference, for Gnash
 //
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -23,24 +23,24 @@
 
 // Forward declarations
 namespace gnash {
-	class character;
+	class DisplayObject;
 }
 
 namespace gnash {
 
-/// A proxy for character pointers.
+/// A proxy for DisplayObject pointers.
 //
-/// The proxy will store a pointer to a character until the 
-/// character is destroyed, in which case it will only store the original
+/// The proxy will store a pointer to a DisplayObject until the 
+/// DisplayObject is destroyed, in which case it will only store the original
 /// target path of it and always use that for rebinding when needed.
 ///
 class CharacterProxy {
 
-	mutable character* _ptr;
+	mutable DisplayObject* _ptr;
 
 	mutable std::string _tgt;
 
-	static character* find_character_by_target(const std::string& target);
+	static DisplayObject* findDisplayObjectByTarget(const std::string& target);
 
 	/// If we still have a sprite pointer check if it was destroyed
 	/// in which case we drop the pointer and only keep the target.
@@ -49,7 +49,7 @@ class CharacterProxy {
 public:
 
 	/// Construct a CharacterProxy pointing to the given sprite
-	CharacterProxy(character* sp)
+	CharacterProxy(DisplayObject* sp)
 		:
 		_ptr(sp)
 	{
@@ -63,7 +63,7 @@ public:
 	///	NOTE: if the given proxy is dangling, this proxy
 	///	      will also be dangling. If you want to 
 	///	      create a non-dangling proxy you can
-	///           use the constructor taking a character
+	///           use the constructor taking a DisplayObject
 	///	      as in CharacterProxy newProxy(oldProxy.get())
 	///
 	CharacterProxy(const CharacterProxy& sp)
@@ -80,7 +80,7 @@ public:
 	///	NOTE: if the given proxy is dangling, this proxy
 	///	      will also be dangling. If you want to 
 	///	      create a non-dangling proxy you can
-	///           use the constructor taking a character
+	///           use the constructor taking a DisplayObject
 	///	      as in CharacterProxy newProxy(oldProxy.get())
 	///
 	CharacterProxy& operator=(const CharacterProxy& sp)
@@ -95,14 +95,14 @@ public:
 	//
 	/// @return the currently bound sprite, NULL if none
 	///
-	character* get(bool skipRebinding=false) const
+	DisplayObject* get(bool skipRebinding=false) const
 	{
 		if ( skipRebinding ) return _ptr;
 
         // set _ptr to NULL and _tgt to original target if destroyed
 		checkDangling(); 
 		if ( _ptr ) return _ptr;
-		else return find_character_by_target(_tgt);
+		else return findDisplayObjectByTarget(_tgt);
 	}
 
 	/// Get the sprite target, either current (if not dangling) or

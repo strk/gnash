@@ -45,7 +45,7 @@ DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("DefineButtonCxform refers to an unknown "
-                "character %d"), buttonID);
+                "DisplayObject %d"), buttonID);
         );
         return;
     }
@@ -55,7 +55,7 @@ DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     if (!ch)
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("DefineButtonCxform refers to character ID %d (%s)."
+        log_swferror(_("DefineButtonCxform refers to DisplayObject ID %d (%s)."
                   " Expected a button definition"),
                   buttonID, typeName(*chdef));
         );

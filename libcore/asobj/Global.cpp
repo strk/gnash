@@ -58,14 +58,14 @@
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
-#include "timers.h"
+#include "Timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
 #include "TextField.h"
 #include "rc.h"
 #include "ClassHierarchy.h"
 #include "namedStrings.h"
-#include "utility.h" // for isfinite replacement
+#include "GnashNumeric.h" // for isfinite replacement
 #include "flash_pkg.h"
 
 #include "fn_call.h"
@@ -92,22 +92,26 @@
 namespace gnash {
 
 // Forward declarations
-static as_value as_global_trace(const fn_call& fn);
-static as_value as_global_isNaN(const fn_call& fn);
-static as_value as_global_isfinite(const fn_call& fn);
-static as_value as_global_unescape(const fn_call& fn);
-static as_value as_global_escape(const fn_call& fn);
-static as_value as_global_parsefloat(const fn_call& fn);
-static as_value as_global_parseint(const fn_call& fn);
-static as_value as_global_assetpropflags(const fn_call& fn);
-static as_value as_global_asnative(const fn_call& fn);
-static as_value as_global_asnew(const fn_call& /*fn*/);
-static as_value as_global_assetnative(const fn_call& /*fn*/);
-static as_value as_global_assetnativeaccessor(const fn_call& /*fn*/);
-static as_value as_global_asconstructor(const fn_call& /*fn*/);
-static as_value as_global_updateAfterEvent(const fn_call& /*fn*/);
-
 namespace {
+    as_value global_trace(const fn_call& fn);
+    as_value global_isNaN(const fn_call& fn);
+    as_value global_isfinite(const fn_call& fn);
+    as_value global_unescape(const fn_call& fn);
+    as_value global_escape(const fn_call& fn);
+    as_value global_parsefloat(const fn_call& fn);
+    as_value global_parseint(const fn_call& fn);
+    as_value global_assetpropflags(const fn_call& fn);
+    as_value global_asnative(const fn_call& fn);
+    as_value global_asnew(const fn_call& fn);
+    as_value global_assetnative(const fn_call& fn);
+    as_value global_assetnativeaccessor(const fn_call& fn);
+    as_value global_asconstructor(const fn_call& fn);
+    as_value global_updateAfterEvent(const fn_call& fn);
+    as_value global_setTimeout(const fn_call& fn);
+    as_value global_clearTimeout(const fn_call& fn);
+    as_value global_clearInterval(const fn_call& fn);
+    as_value global_setInterval(const fn_call& fn);
+    
     void registerNatives(as_object& global);
 }
 
@@ -130,19 +134,18 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     // These functions are only available in SWF6+, but this is just
     // because SWF5 or lower did not have a "_global"
     // reference at all.
-    init_member("ASnative", new builtin_function(as_global_asnative));
-    init_member("ASconstructor", new builtin_function(as_global_asconstructor));
+    init_member("ASnative", new builtin_function(global_asnative));
+    init_member("ASconstructor", new builtin_function(global_asconstructor));
     init_member("ASSetPropFlags", vm.getNative(1, 0));
     init_member("ASSetNative", vm.getNative(4, 0));
     init_member("ASSetNativeAccessor", vm.getNative(4, 1));
     init_member("updateAfterEvent", vm.getNative(9, 0));
     init_member("trace", vm.getNative(100, 4));
 
-    // Defined in timers.h
     init_member("setInterval", vm.getNative(250, 0));
     init_member("clearInterval", vm.getNative(250, 1));
-    init_member("setTimeout", new builtin_function(timer_settimeout));
-    init_member("clearTimeout", new builtin_function(timer_clearinterval));
+    init_member("setTimeout", new builtin_function(global_setTimeout));
+    init_member("clearTimeout", new builtin_function(global_clearInterval));
 
     ch->setGlobal(this);
 
@@ -240,9 +243,10 @@ Global::loadExtensions()
 #endif
 
 
+namespace {
 
 as_value
-as_global_trace(const fn_call& fn)
+global_trace(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
@@ -259,35 +263,35 @@ as_global_trace(const fn_call& fn)
 
 
 as_value
-as_global_isNaN(const fn_call& fn)
+global_isNaN(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( static_cast<bool>(isNaN(fn.arg(0).to_number()) ));
+    return as_value(static_cast<bool>(isNaN(fn.arg(0).to_number())));
 }
 
 
 as_value
-as_global_isfinite(const fn_call& fn)
+global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( static_cast<bool>(utility::isFinite(fn.arg(0).to_number())) );
+    return as_value(static_cast<bool>(isFinite(fn.arg(0).to_number())));
 }
 
 /// \brief Encode a string to URL-encoded format
-/// converting all dodgy characters to %AB hex sequences
+/// converting all dodgy DisplayObjects to %AB hex sequences
 //
 /// Characters that need escaping are:
-/// - ASCII control characters: 0-31 and 127
+/// - ASCII control DisplayObjects: 0-31 and 127
 /// - Non-ASCII chars: 128-255
-/// - URL syntax characters: $ & + , / : ; = ? @
-/// - Unsafe characters: SPACE " < > # % { } | \ ^ ~ [ ] `
-/// Encoding is a % followed by two hexadecimal characters, case insensitive.
+/// - URL syntax DisplayObjects: $ & + , / : ; = ? @
+/// - Unsafe DisplayObjects: SPACE " < > # % { } | \ ^ ~ [ ] `
+/// Encoding is a % followed by two hexadecimal DisplayObjects, case insensitive.
 /// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
 /// Section 2.2 "URL Character Encoding Issues"
 as_value
-as_global_escape(const fn_call& fn)
+global_escape(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
@@ -297,14 +301,14 @@ as_global_escape(const fn_call& fn)
 }
 
 /// \brief Decode a string from URL-encoded format
-/// converting all hexadecimal sequences to ASCII characters.
+/// converting all hexadecimal sequences to ASCII DisplayObjects.
 //
 /// A sequence to convert is % followed by two case-independent hexadecimal
-/// digits, which is replaced by the equivalent ASCII character.
+/// digits, which is replaced by the equivalent ASCII DisplayObject.
 /// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
 /// Section 2.2 "URL Character Encoding Issues"
 as_value
-as_global_unescape(const fn_call& fn)
+global_unescape(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
@@ -315,23 +319,18 @@ as_global_unescape(const fn_call& fn)
 
 // parseFloat (string)
 as_value
-as_global_parsefloat(const fn_call& fn)
+global_parsefloat(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
-
-    as_value rv;
-    double result;
     
     std::istringstream s(fn.arg(0).to_string());
+    double result;
     
-    if ( ! (s >> result)  )
-    {
-        rv.set_nan();
-        return rv;   
+    if (!(s >> result)) {
+        return as_value(NaN);   
     }    
 
-    rv = result;
-    return rv;
+    return as_value(result);
 }
 
 // parseInt(string[, base])
@@ -342,12 +341,12 @@ as_global_parsefloat(const fn_call& fn)
 // 1. If the string starts with 0x or 0X, the number is hex.
 // 2. The 0x or 0X may be *followed* by '-' or '+' to indicate sign. A number
 //    with no sign is positive.
-// 3. If the string starts with 0, -0 or +0 and contains only the characters
+// 3. If the string starts with 0, -0 or +0 and contains only the DisplayObjects
 //    0-7.
-// 4. If the string starts with *any* other sequence of characters, including
+// 4. If the string starts with *any* other sequence of DisplayObjects, including
 //    whitespace, it is decimal.
 as_value
-as_global_parseint(const fn_call& fn)
+global_parseint(const fn_call& fn)
 {
     if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
@@ -384,8 +383,7 @@ as_global_parseint(const fn_call& fn)
             double d;
             if (as_value::parseNonDecimalInt(expr, d, false)) return d;
         }
-        catch (boost::bad_lexical_cast&)
-        {
+        catch (boost::bad_lexical_cast&) {
             return as_value(NaN);
         }
 
@@ -434,15 +432,14 @@ as_global_parseint(const fn_call& fn)
     if (digit >= base || digit == std::string::npos) return as_value(NaN);
 
     // The first digit was valid, so continue from the present position
-    // until we reach the end of the string or an invalid character,
-    // adding valid characters to our result.
-    // Which characters are invalid depends on the base. 
+    // until we reach the end of the string or an invalid DisplayObject,
+    // adding valid DisplayObjects to our result.
+    // Which DisplayObjects are invalid depends on the base. 
     double result = digit;
     ++it;
     
     while (it != expr.end() && (digit = digits.find(toupper(*it))) < base
-            && digit != std::string::npos)
-    {
+            && digit != std::string::npos) {
         result = result * base + digit;
         ++it;
     }
@@ -453,29 +450,25 @@ as_global_parseint(const fn_call& fn)
 
 // ASSetPropFlags function
 as_value
-as_global_assetpropflags(const fn_call& fn)
+global_assetpropflags(const fn_call& fn)
 {
-    //log_debug(_("ASSetPropFlags called with %d args"), fn.nargs);
-
-    // Check the arguments
-    // assert(fn.nargs == 3 || fn.nargs == 4);
-    // assert((version == 5) ? (fn.nargs == 3) : true);
 
     if (fn.nargs < 3) {
-    IF_VERBOSE_ASCODING_ERRORS(    
+        IF_VERBOSE_ASCODING_ERRORS(    
             log_aserror(_("%s needs at least three arguments"), __FUNCTION__);
-            )
-         return as_value();
+        )
+        return as_value();
     }
+    
     IF_VERBOSE_ASCODING_ERRORS(
-    if (fn.nargs > 4)
-            log_aserror(_("%s has more than four arguments"), __FUNCTION__);
-    )
+        if (fn.nargs > 4) {
+            log_aserror(_("%s has more than four arguments"), "AsSetPropFlags");
+        }
+    );
     
     // object
     boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
-    if ( ! obj )
-    {
+    if ( ! obj ) {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Invalid call to ASSetPropFlags: "
             "first argument is not an object: %s"),
@@ -520,7 +513,7 @@ as_global_assetpropflags(const fn_call& fn)
 // ASNative function
 // See: http://osflash.org/flashcoders/undocumented/asnative?s=asnative
 as_value
-as_global_asnative(const fn_call& fn)
+global_asnative(const fn_call& fn)
 {
 
     as_value ret;
@@ -568,7 +561,7 @@ as_global_asnative(const fn_call& fn)
 
 // Obsolete ASnew function (exists only as ASnative(2, 0))
 as_value
-as_global_asnew(const fn_call& /*fn*/)
+global_asnew(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("ASNative (2, 0) - old ASnew"));
     return as_value();
@@ -577,7 +570,7 @@ as_global_asnew(const fn_call& /*fn*/)
 // ASSetNative function
 // TODO: find dox 
 as_value
-as_global_assetnative(const fn_call& /*fn*/)
+global_assetnative(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("ASSetNative"));
     return as_value();
@@ -586,7 +579,7 @@ as_global_assetnative(const fn_call& /*fn*/)
 // ASSetNativeAccessor function
 // TODO: find dox 
 as_value
-as_global_assetnativeaccessor(const fn_call& /*fn*/)
+global_assetnativeaccessor(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("ASSetNativeAccessor"));
     return as_value();
@@ -595,7 +588,7 @@ as_global_assetnativeaccessor(const fn_call& /*fn*/)
 // ASconstructor function
 // TODO: find dox 
 as_value
-as_global_asconstructor(const fn_call& /*fn*/)
+global_asconstructor(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("ASconstructor"));
     return as_value();
@@ -604,13 +597,170 @@ as_global_asconstructor(const fn_call& /*fn*/)
 
 // updateAfterEvent function
 as_value
-as_global_updateAfterEvent(const fn_call& /*fn*/)
+global_updateAfterEvent(const fn_call& /*fn*/)
 {
     LOG_ONCE(log_unimpl("updateAfterEvent()"));
     return as_value();
 }
 
-namespace {
+as_value
+global_setInterval(const fn_call& fn)
+{
+    
+	if (fn.nargs < 2) {
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- need at least 2 arguments",
+				ss.str());
+		);
+		return as_value();
+	}
+
+	unsigned timer_arg = 1;
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- first argument is not an object or function",
+				ss.str());
+		);
+		return as_value();
+	}
+
+	std::string methodName;
+
+	// Get interval function
+	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
+	if (!as_func) {
+		methodName = fn.arg(1).to_string();
+		timer_arg = 2;
+	}
+
+
+	if (fn.nargs < timer_arg + 1) {
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- missing timeout argument",
+				ss.str());
+        );
+		return as_value();
+	}
+
+	// Get interval time
+	unsigned long ms =
+        static_cast<unsigned long>(fn.arg(timer_arg).to_number());
+	// TODO: check validity of interval time number ?
+
+	// Parse arguments 
+	Timer::ArgsContainer args;
+	for (unsigned i=timer_arg+1; i<fn.nargs; ++i) {
+		args.push_back(fn.arg(i));
+	}
+
+    std::auto_ptr<Timer> timer(new Timer);
+	if (as_func) {
+		timer->setInterval(*as_func, ms, fn.this_ptr, args);
+	}
+	else {
+		timer->setInterval(obj, methodName, ms, args);
+	}
+    
+    
+	movie_root& root = fn.env().getVM().getRoot();
+	int id = root.add_interval_timer(timer);
+	return as_value(id);
+}
+
+// TODO: move to Global.cpp
+as_value
+global_setTimeout(const fn_call& fn)
+{
+    
+	if (fn.nargs < 2) {
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setTimeout(%s) "
+			"- need at least 2 arguments",
+			ss.str());
+		);
+		return as_value();
+	}
+
+	unsigned timer_arg = 1;
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if (!obj) {
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- first argument is not an object or function",
+				ss.str());
+		);
+		return as_value();
+	}
+
+	std::string methodName;
+
+	// Get interval function
+	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
+	if (!as_func) {
+		methodName = fn.arg(1).to_string();
+		timer_arg = 2;
+	}
+
+
+	if (fn.nargs < timer_arg + 1) {
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setTimeout(%s): missing "
+                "timeout argument", ss.str());
+		);
+		return as_value();
+	}
+
+	// Get interval time
+	unsigned long ms =
+        static_cast<unsigned long>(fn.arg(timer_arg).to_number());
+
+	// Parse arguments 
+	Timer::ArgsContainer args;
+	for (unsigned i=timer_arg+1; i<fn.nargs; ++i) {
+		args.push_back(fn.arg(i));
+	}
+
+	std::auto_ptr<Timer> timer(new Timer);
+	if (as_func) {
+		timer->setInterval(*as_func, ms, fn.this_ptr, args, true);
+	}
+	else {
+		timer->setInterval(obj, methodName, ms, args, true);
+	}
+    
+    
+	movie_root& root = fn.env().getVM().getRoot();
+
+	int id = root.add_interval_timer(timer);
+	return as_value(id);
+}
+  
+as_value
+global_clearInterval(const fn_call& fn)
+{
+	//log_debug("%s: nargs = %d", __FUNCTION__, fn.nargs);
+
+	int id = int(fn.arg(0).to_number());
+
+	movie_root& root = fn.env().getVM().getRoot();
+	bool ret = root.clear_interval_timer(id);
+	return as_value(ret);
+}
+
+
 
 void
 registerNatives(as_object& global)
@@ -620,20 +770,20 @@ registerNatives(as_object& global)
 
     // ASNew was dropped as a builtin function but exists
     // as ASnative.
-    vm.registerNative(as_global_assetpropflags, 1, 0);
-    vm.registerNative(as_global_asnew, 2, 0);    
-    vm.registerNative(as_global_assetnative, 4, 0);    
-    vm.registerNative(as_global_assetnativeaccessor, 4, 1);
-    vm.registerNative(as_global_updateAfterEvent, 9, 0);    
-    vm.registerNative(as_global_escape, 100, 0);
-    vm.registerNative(as_global_unescape, 100, 1);
-    vm.registerNative(as_global_parseint, 100, 2);
-    vm.registerNative(as_global_parsefloat, 100, 3);
-    vm.registerNative(as_global_trace, 100, 4);
-    vm.registerNative(as_global_isNaN, 200, 18);
-    vm.registerNative(as_global_isfinite, 200, 19);
-    vm.registerNative(timer_setinterval, 250, 0);
-    vm.registerNative(timer_clearinterval, 250, 1);
+    vm.registerNative(global_assetpropflags, 1, 0);
+    vm.registerNative(global_asnew, 2, 0);    
+    vm.registerNative(global_assetnative, 4, 0);    
+    vm.registerNative(global_assetnativeaccessor, 4, 1);
+    vm.registerNative(global_updateAfterEvent, 9, 0);    
+    vm.registerNative(global_escape, 100, 0);
+    vm.registerNative(global_unescape, 100, 1);
+    vm.registerNative(global_parseint, 100, 2);
+    vm.registerNative(global_parsefloat, 100, 3);
+    vm.registerNative(global_trace, 100, 4);
+    vm.registerNative(global_isNaN, 200, 18);
+    vm.registerNative(global_isfinite, 200, 19);
+    vm.registerNative(global_setInterval, 250, 0);
+    vm.registerNative(global_clearInterval, 250, 1);
 
     registerSelectionNative(global);
     registerColorNative(global);

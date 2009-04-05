@@ -83,7 +83,7 @@ public:
 	{
 	}
 
-	fn_call(as_object* this_in, as_environment& env_in,
+	fn_call(as_object* this_in, const as_environment& env_in,
 			int nargs_in, size_t first_in, as_object* sup = 0)
 		:
 		this_ptr(this_in),
@@ -96,7 +96,7 @@ public:
 		readArgs(env_in, first_in, nargs);
 	}
 
-	fn_call(as_object* this_in, as_environment& env_in,
+	fn_call(as_object* this_in, const as_environment& env_in,
 			std::auto_ptr<std::vector<as_value> > args, as_object* sup = 0)
 		:
 		this_ptr(this_in),
@@ -108,7 +108,7 @@ public:
 	{
 	}
 
-	fn_call(as_object* this_in, as_environment& env_in)
+	fn_call(as_object* this_in, const as_environment& env_in)
 		:
 		this_ptr(this_in),
 		super(0),
@@ -154,7 +154,7 @@ public:
 		--nargs;
 	}
 
-	as_environment& env() const
+	const as_environment& env() const
 	{
 		return _env;
 	}
@@ -193,12 +193,12 @@ private:
 
 	/// The ActionScript environment in which the function call is taking
 	/// place. This contains, among other things, the function arguments.
-	as_environment& _env;
+	const as_environment& _env;
 
 	/// The actual arguments
 	std::auto_ptr< std::vector<as_value> > _args;
 
-	void readArgs(as_environment& env, int first_in, int nargs)
+	void readArgs(const as_environment& env, int first_in, int nargs)
 	{
 		_args.reset(new std::vector<as_value>);
 		for (int i=0; i<nargs; ++i)

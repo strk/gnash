@@ -32,9 +32,9 @@
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
 #include "character_def.h" // for boost::intrusive_ptr visibility of dtor
-#include "StringPredicates.h" // for case-insensitive string comparision (ExportMap)
-#include "utility.h" // for TWIPS_TO_PIXELS 
+#include "StringPredicates.h" 
 #include "rect.h"
+#include "GnashNumeric.h"
 
 #include <map> // for CharacterDictionary
 #include <set> // for _importSources
@@ -130,13 +130,13 @@ public:
 	//
 	/// returns a NULL if the id is unknown.
 	///
-	boost::intrusive_ptr<character_def> get_character(int id);
+	boost::intrusive_ptr<character_def> getDisplayObject(int id);
 
 	/// Add a Character assigning it the given id
 	//
-	/// replaces any existing character with the same id
+	/// replaces any existing DisplayObject with the same id
 	///
-	void add_character(int id, boost::intrusive_ptr<character_def> c);
+	void addDisplayObject(int id, boost::intrusive_ptr<character_def> c);
 
 	/// Return an iterator to the first dictionary element
 	CharacterIterator begin() { return _map.begin(); }
@@ -195,12 +195,12 @@ public:
 
 	float get_width_pixels() const
 	{
-		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.width()));
+		return std::ceil(twipsToPixels(m_frame_size.width()));
 	}
 
 	float	get_height_pixels() const
 	{
-		return std::ceil(TWIPS_TO_PIXELS(m_frame_size.height()));
+		return std::ceil(twipsToPixels(m_frame_size.height()));
 	}
 
 	virtual int	get_version() const { return m_version; }
@@ -246,14 +246,14 @@ public:
 	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             Imports& imports);
 
-	void add_character(int character_id, character_def* c);
+	void addDisplayObject(int DisplayObject_id, character_def* c);
 
 	/// \brief
-	/// Return a character from the dictionary
+	/// Return a DisplayObject from the dictionary
 	/// NOTE: call add_ref() on the return or put in a boost::intrusive_ptr<>
 	/// TODO: return a boost::intrusive_ptr<> directly...
 	///
-	character_def*	get_character_def(int character_id);
+	character_def*	get_character_def(int DisplayObject_id);
 
 	// See dox in movie_definition
 	//
@@ -268,16 +268,16 @@ public:
 	Font* get_font(const std::string& name, bool bold, bool italic) const;
 
 	// See dox in movie_definition.h
-	BitmapInfo* getBitmap(int character_id);
+	BitmapInfo* getBitmap(int DisplayObject_id);
 
 	// See dox in movie_definition.h
-	void addBitmap(int character_id, boost::intrusive_ptr<BitmapInfo> im);
+	void addBitmap(int DisplayObject_id, boost::intrusive_ptr<BitmapInfo> im);
 
 	// See dox in movie_definition.h
-	sound_sample*	get_sound_sample(int character_id);
+	sound_sample*	get_sound_sample(int DisplayObject_id);
 
 	// See dox in movie_definition.h
-	virtual void	add_sound_sample(int character_id, sound_sample* sam);
+	virtual void	add_sound_sample(int DisplayObject_id, sound_sample* sam);
 
 	// See dox in movie_definition.h
 	virtual void	set_loading_sound_stream_id(int id) { m_loading_sound_stream = id; }
@@ -383,19 +383,19 @@ public:
 	/// The _root reference of the newly created movie_root
 	/// will be set to a newly created movie_instance.
 	///
-	movie_instance* create_movie_instance(character* parent=0);
+	movie_instance* create_movie_instance(DisplayObject* parent=0);
 
-    virtual character* createDisplayObject(character*, int) {
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
         return 0;
     }
 
 	virtual const std::string& get_url() const { return _url; }
 	
 	const rect&	get_bound() const {
-    // It is required that get_bound() is implemented in character definition
+    // It is required that get_bound() is implemented in DisplayObject definition
     // classes. However, it makes no sense to call it for movie interfaces.
     // get_bound() is currently only used by DisplayObject which normally
-    // is used only shape character definitions. See character_def.h to learn
+    // is used only shape DisplayObject definitions. See character_def.h to learn
     // why it is virtual anyway.
     abort(); // should not be called  
 		static rect unused;
@@ -558,11 +558,11 @@ protected:
 	///	- fonts (m_fonts)
 	///	- bitmaps (_bitmaps)
 	///	- bitmaps (m_bitmap_list) [ what's the difference with bitmap
-    ///   characters ?? ]
+    ///   DisplayObjects ?? ]
 	///	- sound samples (m_sound_samples)
 	///	- exports (m_exports)
 	///	- imported movies (m_import_source_movies)
-	///	- character dictionary (_dictionary)
+	///	- DisplayObject dictionary (_dictionary)
 	///
 	/// TODO: do we really need all this stuff to be a GcResource ??
 	///

@@ -57,7 +57,7 @@ namespace gnash {
 	class movie_definition;
 	class movie_root;
 	class MovieClip;
-	class character;
+	class DisplayObject;
 	class FuzzyPixel;
 	class VirtualClock;
 	class rgba;
@@ -138,20 +138,20 @@ public:
 	///
 	geometry::SnappingRanges2d<int> getInvalidatedRanges() const;
 
-	/// Find a character in the display list of a sprite by name.
+	/// Find a DisplayObject in the display list of a sprite by name.
 	//
-	/// Return NULL if there's no character with that name in
+	/// Return NULL if there's no DisplayObject with that name in
 	/// the sprite's display list.
 	///
-	const character* findDisplayItemByName(const MovieClip& mc,
+	const DisplayObject* findDisplayItemByName(const MovieClip& mc,
 			const std::string& name);
 
-	/// Find a character in the display list of a sprite by depth.
+	/// Find a DisplayObject in the display list of a sprite by depth.
 	//
-	/// Return NULL if there's no character at that depth in
+	/// Return NULL if there's no DisplayObject at that depth in
 	/// the sprite's display list.
 	///
-	const character* findDisplayItemByDepth(const MovieClip& mc,
+	const DisplayObject* findDisplayItemByDepth(const MovieClip& mc,
 			int depth);
 
 	/// Get the topmost sprite instance of this movie
@@ -225,7 +225,7 @@ public:
 	void releaseKey(key::code k);
 
 	/// Return true if the currently active 
-	/// character is over a character that
+	/// DisplayObject is over a DisplayObject that
 	/// handles mouse events
 	bool isMouseOverMouseEntity();
 

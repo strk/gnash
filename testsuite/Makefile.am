@@ -47,8 +47,13 @@ if ENABLE_SWFDEC_TESTSUITE
 DIR_SWFDEC_TESTSUITE = swfdec
 endif
 
+if ENABLE_AS3COMPILE
+DIR_AS3 = as3
+endif
+
 DIST_SUBDIRS = \
 	media \
+	as3 \
 	actionscript.all \
 	libbase.all	\
 	libamf.all \
@@ -68,6 +73,7 @@ DIST_SUBDIRS = \
 SUBDIRS = \
 	.	\
 	media \
+	$(DIR_AS3) \
 	$(DIR_SWFDEC_TESTSUITE) \
 	libnet.all \
 	libbase.all	\

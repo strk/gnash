@@ -36,12 +36,12 @@
  * 
  * Description:
  * 
- *  frame2: place a static character at depth -16381 at position (10,200);
- *          place a static character at depth -16380 at position (100,200);
- *          replace the character at depth -16380 with a dynamic character;
- *  frame3: create a script character at depth -10;
- *  frame4: create a script character at depth -20;
- *  frame6: create a script character at depth -30;
+ *  frame2: place a static DisplayObject at depth -16381 at position (10,200);
+ *          place a static DisplayObject at depth -16380 at position (100,200);
+ *          replace the DisplayObject at depth -16380 with a dynamic DisplayObject;
+ *  frame3: create a script DisplayObject at depth -10;
+ *  frame4: create a script DisplayObject at depth -20;
+ *  frame6: create a script DisplayObject at depth -30;
  *  frame7: jump back to frame 5 and stop
  * 
  * Expected behaviour:

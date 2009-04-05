@@ -242,7 +242,7 @@ Font::get_advance(int glyph_index, bool embedded) const
 
 
 // Return the adjustment in advance between the given two
-// characters.  Normally this will be 0; i.e. the 
+// DisplayObjects.  Normally this will be 0; i.e. the 
 float
 Font::get_kerning_adjustment(int last_code, int code) const
 {
@@ -301,7 +301,7 @@ Font::add_os_glyph(boost::uint16_t code)
 
     if (!sh) {
         log_error("Could not create shape "
-                "glyph for character code %u (%c) with "
+                "glyph for DisplayObject code %u (%c) with "
                 "device font %s (%p)", code, code, _name,
                 _ftProvider.get());
         return -1;

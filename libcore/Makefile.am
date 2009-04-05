@@ -58,7 +58,7 @@ libgnashcore_la_SOURCES = \
 	as_object.cpp \
 	as_value.cpp \
 	asClass.cpp \
-	character.cpp \
+	DisplayObject.cpp \
 	CharacterProxy.cpp \
 	cxform.cpp \
 	DynamicShape.cpp	\
@@ -75,7 +75,7 @@ libgnashcore_la_SOURCES = \
         BevelFilter.cpp \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
-	DisplayObject.cpp \
+	InteractiveObject.cpp \
 	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
@@ -114,7 +114,7 @@ libgnashcore_la_SOURCES = \
 	render.cpp \
 	SWFStream.cpp \
 	styles.cpp \
-	timers.cpp \
+	Timers.cpp \
 	RGBA.cpp 	\
 	$(FREETYPE_SOURCES) \
 	$(NULL)
@@ -141,7 +141,7 @@ noinst_HEADERS = \
 	BitmapMovieInstance.h \
 	builtin_function.h \
 	Button.h \
-	character.h \
+	DisplayObject.h \
 	CharacterProxy.h \
 	cxform.h \
 	debugger.h \
@@ -165,7 +165,7 @@ noinst_HEADERS = \
 	fontlib.h \
 	Shape.h \
 	StaticText.h \
-	DisplayObject.h \
+	InteractiveObject.h \
 	gnash.h	\
 	GnashKey.h \
 	impl.h \
@@ -210,7 +210,7 @@ noinst_HEADERS = \
 	swf/ScriptLimitsTag.h \
 	swf_event.h \
 	swf_function.h \
-	timers.h \
+	Timers.h \
 	RGBA.h	\
 	Video.h \
 	$(NULL)

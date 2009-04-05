@@ -17,7 +17,7 @@
  */ 
 
 /*
- * Test "Jumping backward to the start of two character's lifetime after depth swap"
+ * Test "Jumping backward to the start of two DisplayObject's lifetime after depth swap"
  *
  * Timeline:
  * 
@@ -32,13 +32,13 @@
  *
  * Description:
  *
- *  frame2: two static characters are placed
- *  frame3: the two characters are depth-swapped
+ *  frame2: two static DisplayObjects are placed
+ *  frame3: the two DisplayObjects are depth-swapped
  *  frame4: jump to frame 2 and stop.
  *
  * Expected behaviour:
  *
- *  A single instance of each characters is created.
+ *  A single instance of each DisplayObjects is created.
  *  First time in frame1 depths are the original ones,
  *  second time depths are swapped.
  *
@@ -87,7 +87,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: Place two static characters
+  // Frame 2: Place two static DisplayObjects
 
   sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();

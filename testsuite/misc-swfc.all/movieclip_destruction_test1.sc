@@ -34,16 +34,16 @@
  * 
  * Description:
  * 
- *  frame2: character mc1 placed at depth -16381.
+ *  frame2: DisplayObject mc1 placed at depth -16381.
  *          mc1 has two frames, _root.gotoAndPlay(6) get executed in it's 2nd frame.
  *  frame3: 
- *  frame4: remove character -16381 
+ *  frame4: remove DisplayObject -16381 
  *  frame6: 
  * 
  * Expected behaviour:
  *    (1) only part of the AS in a single action_buffer(in the 2nd frame of mc1) 
  *        get executed;
- *    (2) character mc1 get destroied at frame 4.
+ *    (2) DisplayObject mc1 get destroied at frame 4.
  *    (3) init actions defined in a passing-by frame get executed (while normal actions don't)
  * 
  */

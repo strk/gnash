@@ -91,7 +91,7 @@ NetConnection_as::NetConnection_as()
 
 // extern (used by Global.cpp)
 void
-netconnection_class_init(as_object& global)
+NetConnection_as::init(as_object& global)
 {
     // This is going to be the global NetConnection "class"/"function"
     static boost::intrusive_ptr<builtin_function> cl;
@@ -112,11 +112,22 @@ netconnection_class_init(as_object& global)
 // here to have HTTPRemotingHandler definition available
 NetConnection_as::~NetConnection_as()
 {
+    _http_client->close();
+    _rtmp_client->close(); 
 }
 
 void
 NetConnection_as::markReachableResources() const
 {
+#if 0
+    if ( _currentConnection.get() ) _currentConnection->setReachable();
+    for (std::list<ConnectionHandler*>::const_iterator
+	     i=_queuedConnections.begin(), e=_queuedConnections.end();
+	 i!=e; ++i) {
+        (*i)->setReachable();
+    }
+    markAsObjectReachable();
+#endif
 }
 
 

@@ -28,7 +28,9 @@
 #include "movie_definition.h"
 #include "swf.h"
 #include "GnashException.h"
+#include "GnashNumeric.h"
 #include <cmath> // sqrt, floor
+#include <iostream> // for output operator
 
 namespace gnash {
 
@@ -49,12 +51,12 @@ gradient_record::read(SWFStream& in, SWF::TagType tag)
 //
 fill_style::fill_style()
     :
-    m_type(SWF::FILL_SOLID),
-    m_color(), // FF.FF.FF.FF
-    _gradientBitmapInfo(0),
     _bitmapInfo(0),
+    m_color(), // FF.FF.FF.FF
     m_spread_mode(SWF::GRADIENT_SPREAD_PAD),
-    m_interpolation(SWF::GRADIENT_INTERPOL_NORMAL)
+    m_interpolation(SWF::GRADIENT_INTERPOL_NORMAL),
+    m_type(SWF::FILL_SOLID),
+    _bitmapSmoothingPolicy(BITMAP_SMOOTHING_UNSPECIFIED)
 {
 }
 
@@ -73,7 +75,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
     }
         
     IF_VERBOSE_PARSE(
-        log_parse("  fill_style read type = 0x%X", m_type);
+        log_parse("  fill_style read type = 0x%X", (int)m_type);
     );
 
     if (m_type == SWF::FILL_SOLID)
@@ -110,16 +112,16 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         input_matrix.read(in);
 
         // shouldn't this be in initializer's list ?
-        m_gradient_matrix.set_identity();
+        _matrix.set_identity();
         if (m_type == SWF::FILL_LINEAR_GRADIENT)
         {
-            m_gradient_matrix.set_translation(128, 0);
-            m_gradient_matrix.set_scale(1.0/128, 1.0/128);
+            _matrix.set_translation(128, 0);
+            _matrix.set_scale(1.0/128, 1.0/128);
         }
         else // FILL_RADIAL_GRADIENT or FILL_FOCAL_GRADIENT
         {
-            m_gradient_matrix.set_translation(32, 32);
-            m_gradient_matrix.set_scale(1.0/512, 1.0/512);
+            _matrix.set_translation(32, 32);
+            _matrix.set_scale(1.0/512, 1.0/512);
         }
 
         SWFMatrix m = input_matrix;
@@ -127,16 +129,16 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
         if (is_morph)
         {
-            pOther->m_gradient_matrix = m_gradient_matrix;
+            pOther->_matrix = _matrix;
         }
-        m_gradient_matrix.concatenate(m);
+        _matrix.concatenate(m);
         
         if (is_morph)
         {
             input_matrix.read(in);
             m = input_matrix;
             m.invert();
-            pOther->m_gradient_matrix.concatenate(m);
+            pOther->_matrix.concatenate(m);
         }
         
         // GRADIENT
@@ -235,10 +237,10 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
                pOther->m_color = pOther->m_gradients[0].m_color;
         }
     
-        _gradientBitmapInfo = create_gradient_bitmap();
+        _bitmapInfo = create_gradient_bitmap();
         if (is_morph)
         {
-            pOther->_gradientBitmapInfo = pOther->need_gradient_bitmap();
+            pOther->_bitmapInfo = pOther->need_gradient_bitmap();
         }
     }
     else if (m_type == SWF::FILL_TILED_BITMAP
@@ -251,22 +253,37 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
         // 0x42: tiled bitmap fill with hard edges
         // 0x43: clipped bitmap fill with hard edges
 
+        if ( m_type == SWF::FILL_TILED_BITMAP_HARD ||
+             m_type == SWF::FILL_CLIPPED_BITMAP_HARD )
+        {
+            _bitmapSmoothingPolicy = BITMAP_SMOOTHING_OFF;
+        }
+        else if ( md.get_version() >= 8 )
+        {
+            _bitmapSmoothingPolicy = BITMAP_SMOOTHING_ON;
+        }
+        else
+        {
+            _bitmapSmoothingPolicy = BITMAP_SMOOTHING_UNSPECIFIED;
+        }
+
         in.ensureBytes(2);
         int bitmap_char_id = in.read_u16();
         IF_VERBOSE_PARSE
         (
-            log_parse("  bitmap_char = %d", bitmap_char_id);
+            log_parse("  bitmap_char = %d, smoothing_policy = %s",
+                bitmap_char_id, _bitmapSmoothingPolicy);
         );
 
-        // Look up the bitmap character.
+        // Look up the bitmap DisplayObject.
         _bitmapInfo = md.getBitmap(bitmap_char_id);
         IF_VERBOSE_MALFORMED_SWF(
             if (!_bitmapInfo)
             {
                 LOG_ONCE(
                     log_swferror(_("Bitmap fill specifies '%d' as associated"
-                        " bitmap character id,"
-                        " but that character is not found"
+                        " bitmap DisplayObject id,"
+                        " but that DisplayObject is not found"
                         " in the Characters Dictionary."
                         " It seems common to find such "
                         " malformed SWF, so we'll only warn once "
@@ -280,16 +297,16 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 
         // For some reason, it looks like they store the inverse of the
         // TWIPS-to-texcoords SWFMatrix.
-        m_bitmap_matrix = m.invert();
+        _matrix = m.invert();
 
         if (is_morph)
         {
             pOther->_bitmapInfo = _bitmapInfo;
             m.read(in);
-            pOther->m_bitmap_matrix = m.invert();
+            pOther->_matrix = m.invert();
         }
         IF_VERBOSE_PARSE(
-           log_parse("SWFMatrix: %s", m_bitmap_matrix);
+           log_parse("SWFMatrix: %s", _matrix);
         );
     }
     else
@@ -334,14 +351,14 @@ const SWFMatrix&
 fill_style::getBitmapMatrix() const 
 {
   assert(m_type != SWF::FILL_SOLID);
-  return m_bitmap_matrix;
+  return _matrix;
 }
 
 const SWFMatrix&
 fill_style::getGradientMatrix() const 
 {
   // TODO: Why do we separate bitmap and gradient matrices? 
-  return m_gradient_matrix;
+  return _matrix;
 }
 
 rgba
@@ -493,12 +510,12 @@ BitmapInfo*
 fill_style::need_gradient_bitmap() const 
 {
 
-  if (!_gradientBitmapInfo) {
+  if (!_bitmapInfo) {
     fill_style* this_non_const = const_cast<fill_style*>(this);
-    this_non_const->_gradientBitmapInfo = create_gradient_bitmap();
+    this_non_const->_bitmapInfo = create_gradient_bitmap();
   }
   
-  return _gradientBitmapInfo.get();
+  return _bitmapInfo.get();
 
 }
 
@@ -513,37 +530,54 @@ fill_style::set_lerp(const fill_style& a, const fill_style& b, float t)
     m_type = a.get_type();
     assert(m_type == b.get_type());
 
-    // fill style color
+    // fill style color (TODO: only for solid fills ?)
     m_color.set_lerp(a.get_color(), b.get_color(), t);
 
-    // fill style gradient SWFMatrix
-    //
-    // @@ TODO morphed gradients don't come out exactly
-    // right; they shift around some.  Not sure where the
-    // problem is.
-    m_gradient_matrix.set_lerp(a.m_gradient_matrix, b.m_gradient_matrix, t);
+    bool usesMatrix = false;
 
-    // fill style gradients
-    assert(m_gradients.size() == a.m_gradients.size());
-    assert(m_gradients.size() == b.m_gradients.size());
-    for (size_t j=0, nj=m_gradients.size(); j<nj; ++j)
+    switch (m_type)
     {
-        m_gradients[j].m_ratio =
-            (boost::uint8_t) utility::frnd(
-                utility::flerp(a.m_gradients[j].m_ratio,
-                    b.m_gradients[j].m_ratio, t)
-                );
-        m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color,
-                b.m_gradients[j].m_color, t);
+        case SWF::FILL_LINEAR_GRADIENT:
+        case SWF::FILL_RADIAL_GRADIENT:
+        case SWF::FILL_FOCAL_GRADIENT:
+        {
+            usesMatrix = true;
+
+            // fill style gradients
+            assert(m_gradients.size() == a.m_gradients.size());
+            assert(m_gradients.size() == b.m_gradients.size());
+            for (size_t j=0, nj=m_gradients.size(); j<nj; ++j)
+            {
+                m_gradients[j].m_ratio =
+                    (boost::uint8_t) frnd( flerp(a.m_gradients[j].m_ratio,
+                            b.m_gradients[j].m_ratio, t)
+                        );
+                m_gradients[j].m_color.set_lerp(a.m_gradients[j].m_color,
+                        b.m_gradients[j].m_color, t);
+            }
+            _bitmapInfo = NULL;
+            break;
+        }
+
+        case SWF::FILL_TILED_BITMAP:
+        case SWF::FILL_CLIPPED_BITMAP:
+        case SWF::FILL_TILED_BITMAP_HARD:
+        case SWF::FILL_CLIPPED_BITMAP_HARD:
+        {
+            usesMatrix = true;
+
+            // fill style bitmap ID
+            _bitmapInfo = a._bitmapInfo;
+            assert(_bitmapInfo == b._bitmapInfo);
+            break;
+        }
+
+        default:
+            break;
     }
-    _gradientBitmapInfo = NULL;
 
-    // fill style bitmap ID
-    _bitmapInfo = a._bitmapInfo;
-    assert(_bitmapInfo == b._bitmapInfo);
-
-    // fill style bitmap SWFMatrix
-    m_bitmap_matrix.set_lerp(a.m_bitmap_matrix, b.m_bitmap_matrix, t);
+    // fill style bitmap or gradient SWFMatrix
+    if ( usesMatrix ) _matrix.set_lerp(a._matrix, b._matrix, t);
 }
 
 
@@ -561,9 +595,10 @@ fill_style::get_color_stop(int index) const
 
 fill_style::fill_style(BitmapInfo* bitmap, const SWFMatrix& mat)
     :
-    m_type(SWF::FILL_CLIPPED_BITMAP),
+    _matrix(mat),
     _bitmapInfo(bitmap),
-    m_bitmap_matrix(mat)
+    m_type(SWF::FILL_CLIPPED_BITMAP),
+    _bitmapSmoothingPolicy(BITMAP_SMOOTHING_UNSPECIFIED)
 {
 }
 
@@ -580,8 +615,8 @@ fill_style::setLinearGradient(const std::vector<gradient_record>& gradients,
 {
     m_type = SWF::FILL_LINEAR_GRADIENT;
     m_gradients = gradients;
-    m_gradient_matrix = mat;
-    _gradientBitmapInfo = 0;
+    _matrix = mat;
+    _bitmapInfo = 0;
 }
 
 void
@@ -590,8 +625,30 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
 {
     m_type = SWF::FILL_RADIAL_GRADIENT;
     m_gradients = gradients;
-    m_gradient_matrix = mat;
-    _gradientBitmapInfo = 0;
+    _matrix = mat;
+    _bitmapInfo = 0;
+}
+
+std::ostream& operator << (std::ostream& os,
+        const fill_style::BitmapSmoothingPolicy& p)
+{
+    switch (p)
+    {
+        case fill_style::BITMAP_SMOOTHING_UNSPECIFIED:
+            os << "unspecified";
+            break;
+        case fill_style::BITMAP_SMOOTHING_ON:
+            os << "on";
+            break;
+        case fill_style::BITMAP_SMOOTHING_OFF:
+            os << "off";
+            break;
+        default:
+            // cast to int required to avoid infinite recursion
+            os << "unknown " << (int)p;
+            break;
+    }
+    return os;
 }
 
 
@@ -599,7 +656,6 @@ fill_style::setRadialGradient(const std::vector<gradient_record>& gradients,
 void
 fill_style::markReachableResources() const
 {
-    if ( _gradientBitmapInfo ) _gradientBitmapInfo->setReachable();
     if ( _bitmapInfo ) _bitmapInfo->setReachable();
 }
 #endif // GNASH_USE_GC

@@ -26,7 +26,7 @@
 #include "GnashException.h" // for ActionException
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
-#include "utility.h" // isFinite
+#include "GnashNumeric.h"
 
 #include <sstream>
 
@@ -263,9 +263,9 @@ Point_normalize(const fn_call& fn)
 	ptr->get_member(NSV::PROP_Y, &yval);
 
 	double x = xval.to_number();
-	if ( ! utility::isFinite(x) ) return as_value();
+	if (!isFinite(x)) return as_value();
 	double y = yval.to_number();
-	if ( ! utility::isFinite(y) ) return as_value();
+	if (!isFinite(y)) return as_value();
 
 	if ( x == 0 && y == 0 ) return as_value();
 
@@ -462,17 +462,17 @@ Point_distance(const fn_call& fn)
 	as_value x1val;
 	o1->get_member(NSV::PROP_X, &x1val);
 	double x1 = x1val.to_number();
-	//if ( ! utility::isFinite(x1) ) return as_value(NaN);
+	//if ( ! isFinite(x1) ) return as_value(NaN);
 
 	as_value y1val;
 	o1->get_member(NSV::PROP_Y, &y1val);
 	double y1 = y1val.to_number();
-	//if ( ! utility::isFinite(y1) ) return as_value(NaN);
+	//if ( ! isFinite(y1) ) return as_value(NaN);
 
 	as_value x2val;
 	o2->get_member(NSV::PROP_X, &x2val);
 	double x2 = x2val.to_number();
-	//if ( ! utility::isFinite(x2) ) return as_value(NaN);
+	//if ( ! isFinite(x2) ) return as_value(NaN);
 
 	as_value y2val;
 	o2->get_member(NSV::PROP_Y, &y2val);

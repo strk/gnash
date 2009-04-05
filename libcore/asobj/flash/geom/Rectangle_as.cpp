@@ -33,7 +33,7 @@
 #include "VM.h" // for addStatics
 #include "as_value.h"
 #include "namedStrings.h"
-#include "utility.h" // isFinite
+#include "GnashNumeric.h" // isFinite
 
 #include <sstream>
 
@@ -318,10 +318,10 @@ Rectangle_isEmpty(const fn_call& fn)
 	if ( h.is_undefined() || h.is_null() ) return as_value(true);
 
 	double wn = w.to_number();
-	if ( ! utility::isFinite(wn) || wn <= 0 ) return as_value(true);
+	if (!isFinite(wn) || wn <= 0) return as_value(true);
 
 	double hn = h.to_number();
-	if ( ! utility::isFinite(hn) || hn <= 0 ) return as_value(true);
+	if (!isFinite(hn) || hn <= 0) return as_value(true);
 
 	log_debug("Width: %g, Height: %g", wn, hn);
 
@@ -434,13 +434,11 @@ Rectangle_bottomRight_getset(const fn_call& fn)
 
 		as_function* pointCtor = getFlashGeomPointConstructor();
 
-		as_environment& env = fn.env();
-
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(right);
 		args->push_back(bottom);
 
-		ret = pointCtor->constructInstance(env, args);
+		ret = pointCtor->constructInstance(fn.env(), args);
 	}
 	else // setter
 	{
@@ -524,13 +522,11 @@ Rectangle_size_getset(const fn_call& fn)
 
 		as_function* pointCtor = getFlashGeomPointConstructor();
 
-		as_environment& env = fn.env();
-
 		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(w);
 		args->push_back(h);
 
-		ret = pointCtor->constructInstance(env, args);
+		ret = pointCtor->constructInstance(fn.env(), args);
 	}
 	else // setter
 	{
@@ -586,13 +582,11 @@ Rectangle_topLeft_getset(const fn_call& fn)
 
 		as_function* pointCtor = getFlashGeomPointConstructor();
 
-		as_environment& env = fn.env();
-
-		std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
+		std::auto_ptr<std::vector<as_value> > args(new std::vector<as_value>);
 		args->push_back(x);
 		args->push_back(y);
 
-		ret = pointCtor->constructInstance(env, args);
+		ret = pointCtor->constructInstance(fn.env(), args);
 
 	}
 	else // setter

@@ -151,8 +151,8 @@ private:
 			const std::string& target_name);
 
     /// Common code for guessing at the encoding of random text, between
-    // Shift-Jis, UTF8, and other. Puts the character count in length,
-    // and the offsets to the characters in offsets, if offsets is not NULL.
+    // Shift-Jis, UTF8, and other. Puts the DisplayObject count in length,
+    // and the offsets to the DisplayObjects in offsets, if offsets is not NULL.
     // If not NULL, offsets should be at least s.length().
     // offsets are not accurate if the return value is GUESSENC_OTHER
     static as_encoding_guess_t guessEncoding(const std::string& s, int& length,

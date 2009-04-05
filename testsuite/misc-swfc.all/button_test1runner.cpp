@@ -23,7 +23,7 @@
 #include "MovieTester.h"
 #include "GnashException.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 #include "Point2d.h"
@@ -157,7 +157,9 @@ main(int /*argc*/, char** /*argv*/)
 	//----------------------------------------
 
 	as_value eot;
-	bool endOfTestFound = root->get_member(st.find("testcompleted"), &eot);
+        
+        root->get_member(st.find("testcompleted"), &eot);
+        
 	//cerr << "EOT is " << eot.to_debug_string() << endl;
 	check(eot.to_bool());
 }

@@ -23,7 +23,7 @@
 #include "MovieTester.h"
 #include "GnashException.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -78,7 +78,7 @@ main(int /*argc*/, char** /*argv*/)
 	rgba cyan(0, 255, 204, 255);
 	rgba green(0,255,102,255);
 
-	const character* text = tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset);
+	const DisplayObject* text = tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset);
 	check(text);
 	check_equals(string(text->get_text_value()), msg_empty);
 	check(!tester.isMouseOverMouseEntity());

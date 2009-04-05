@@ -47,7 +47,7 @@ public:
 
 	/// Read tag SWF::VIDEOFRAME
 	//
-	/// The character_id (used to find this instance in the character's
+	/// The DisplayObject_id (used to find this instance in the DisplayObject's
     /// dictionary) is assumed to have been already read.
 	///
 	/// This function is allowed to be called zero or more times, as long

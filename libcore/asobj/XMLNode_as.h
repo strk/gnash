@@ -120,7 +120,7 @@ public:
     boost::intrusive_ptr<XMLNode_as> lastChild();
     
     // Use a list for quick erasing
-    typedef std::list< boost::intrusive_ptr<XMLNode_as> > Children;
+    typedef std::list<boost::intrusive_ptr<XMLNode_as> > Children;
 
     Children& childNodes() { return _children; }
 

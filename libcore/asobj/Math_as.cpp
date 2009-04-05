@@ -38,6 +38,7 @@
 #include "log.h"
 #include "builtin_function.h" 
 #include "Object.h" // for getObjectInterface
+#include "GnashNumeric.h"
 
 namespace gnash {
 
@@ -155,7 +156,7 @@ binaryFunction<std::pow>(const fn_call& fn)
     }
 
     double arg1 = fn.arg(1).to_number();
-    return as_value( utility::isFinite(arg0) ? std::pow(arg0, arg1) : NaN );
+    return as_value(isFinite(arg0) ? std::pow(arg0, arg1) : NaN );
 }
 
 /// Math.min

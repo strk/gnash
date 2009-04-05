@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -34,7 +34,7 @@ using namespace gnash;
 using namespace std;
 
 void
-test_mouse_activity(MovieTester& tester, const character* text, const character* text2, bool covered, bool enabled)
+test_mouse_activity(MovieTester& tester, const DisplayObject* text, const DisplayObject* text2, bool covered, bool enabled)
 {
 	rgba red(255,0,0,255);
 	rgba dark_red(128,0,0,255);
@@ -208,7 +208,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 
 	tester.movePointerTo(39, 60);
 
-	// The following might be correct, as the character still catches releaseOutside events
+	// The following might be correct, as the DisplayObject still catches releaseOutside events
 	//check(tester.isMouseOverMouseEntity());
 	tester.depressMouseButton();
 
@@ -237,13 +237,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_current_frame(), 0);
 
-	const character* text = tester.findDisplayItemByName(*root, "textfield");
+	const DisplayObject* text = tester.findDisplayItemByName(*root, "textfield");
 	check(text);
 
-	const character* text2 = tester.findDisplayItemByName(*root, "textfield2");
+	const DisplayObject* text2 = tester.findDisplayItemByName(*root, "textfield2");
 	check(text2);
 
-	const character* text3 = tester.findDisplayItemByName(*root, "textfield3");
+	const DisplayObject* text3 = tester.findDisplayItemByName(*root, "textfield3");
 	check(text3);
 
 	check_equals(string(text->get_text_value()), idleString);
@@ -253,9 +253,9 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance();
 	check_equals(root->get_current_frame(), 1);
 
-	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
+	const DisplayObject* mc1 = tester.findDisplayItemByName(*root, "square1");
 	check(mc1);
-	check_equals(mc1->get_depth(), 2+character::staticDepthOffset);
+	check_equals(mc1->get_depth(), 2+DisplayObject::staticDepthOffset);
 
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
@@ -274,8 +274,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	for (size_t fno=root->get_current_frame(); fno<root->get_frame_count(); fno++)
 	{
-		const character* square_back = tester.findDisplayItemByDepth(*root, 1+character::staticDepthOffset);
-		const character* square_front = tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset);
+		const DisplayObject* square_back = tester.findDisplayItemByDepth(*root, 1+DisplayObject::staticDepthOffset);
+		const DisplayObject* square_front = tester.findDisplayItemByDepth(*root, 3+DisplayObject::staticDepthOffset);
 
 		switch (fno)
 		{

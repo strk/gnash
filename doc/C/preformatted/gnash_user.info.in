@@ -1,7 +1,7 @@
-START-INFO-DIR-ENTRY
-This is gnash_user.info, produced by makeinfo version 4.11 from gnash_user.texi.
+This is gnash_user.info, produced by makeinfo version 4.11 from stdin.
 
-* Gnash User Manual: (gnash_user).   Gnash
+START-INFO-DIR-ENTRY
+* Gnash User Manual: (gnash_user).   [MISSING TEXT]
 END-INFO-DIR-ENTRY
 
 
@@ -603,6 +603,25 @@ URLOpenerFormat          string                    Set the format of an
                                                   Examples: ?
                                                   [undisplayable block
                                                   object]
+XVideo                   on/off                   If set to _on_, Gnash
+                                                  will attempt to render
+                                                  using the X Video
+                                                  Extension, if system
+                                                  support was found
+                                                  during compilation. By
+                                                  default, X Video
+                                                  rendering is disabled.
+quality                  [-1|0|1|2|3]              Set rendering quality.
+                                                  If set to _-1_, Gnash
+                                                  will use whatever
+                                                  quality set by the
+                                                  movie being run.  If
+                                                  set to any value from
+                                                  _0_ to _3_Gnash will
+                                                  lock quality to the
+                                                  specified value (0=low,
+                                                  1=medium, 2=high,
+                                                  3=best). Defaults to -1.
 
    The following example `.gnashrc' file allows a user to only play
 Flash files saved locally to the machine on which Gnash is running.  It
@@ -747,7 +766,7 @@ File: gnash_user.info,  Node: Software Requirements,  Prev: Hardware Requirement
 3.1.2 Software Requirements
 ---------------------------
 
-The 0.8.3 release of Gnash has been designed to run on UNIX/Linux
+The 0.8.5 release of Gnash has been designed to run on UNIX/Linux
 variants, and has been run on most of the free ones.  However, Gnash
 has successfully run on Windows, Darwin (Mac OS X), Irix, Solaris,
 BeOs, OS/2, and Haiku.  Gnash has also run on the following 64-bit
@@ -973,7 +992,7 @@ A
 =
 
 ActionScript
-     _ActionScript_, or "AS", is the scripting language for _Flash_
+     _ActionScript_, or "AS", is the scripting language for _SWF_
      applications. It is compiled to bytecode, which is a subset of the
      _SWF_ format.
 
@@ -984,7 +1003,7 @@ AGG
      the more feature complete renderer.
 
 AMF
-     _AMF_ is the object format used by _Flash_ for shared objects and
+     _AMF_ is the object format used by _SWF_ for shared objects and
      streaming video.
 
 as_environment
@@ -1028,8 +1047,8 @@ E
 
 extensions
      A Gnash _extension_ is a plugin (not a browser plugin) which
-     implements additional functionality beyond what is covered by
-     _Flash_ specification. These are shared libraries which are loaded
+     implements additional functionality beyond what is covered by the
+     _SWF_ specification. These are shared libraries which are loaded
      at runtime.
 
 
@@ -1042,11 +1061,8 @@ ffmpeg
 
 Flash
      The term _Flash_ is used to describe both the Adobe IDE for
-     creating _SWF_ files, and the technology itself. Flash is a
-     registered trademark belonging to Adobe.   Unfortunately, neither
-     Macromedia nor Adobe have done a good job creating a generic name
-     for all things having to do with Flash.  They risk loss of their
-     trademark.
+     creating _SWF_ files, and Adobe's player.  Flash is a registered
+     trademark belonging to Adobe.
 
 FLV
      FLV is a proprietary file format used to deliver Flash video. It
@@ -1105,14 +1121,6 @@ Kparts
      configuration option -enable-kparts.
 
 
-L
-=
-
-libmad
-     libmad is a mp3-decoding library, which used to be an option for
-     Gnash handling of sound (dropped since 0.8.2).
-
-
 M
 =
 
@@ -1122,9 +1130,9 @@ Mesa
      'Mesa' interchangeably.
 
 Ming
-     Ming is a C library for generating SWF ("Flash") format movies,
-     plus a set of wrappers for using the library. It is used by the
-     Gnash project for generating testcases.
+     Ming is a C library for generating _SWF_ format movies, plus a set
+     of wrappers for using the library. It is used by the Gnash project
+     for generating testcases.
 
 
 N
@@ -1237,7 +1245,7 @@ Stage
      analogy. Graphical elements are referred to as characters.
 
 SWF
-     _SWF_ is the file format for _Flash_ movies.
+     _SWF_ is the generic name for _Flash_ movies.
 
 
 T
@@ -1286,8 +1294,8 @@ Kokke, Vitaly Alexeev, Alexander Streit, and Rob Savoye.
 
 File: gnash_user.info,  Node: GNU Free Documentation License,  Prev: Authors,  Up: Top
 
-Anhang A GNU Free Documentation License
-***************************************
+Appendix A GNU Free Documentation License
+*****************************************
 
 * Menu:
 
@@ -1713,7 +1721,7 @@ To use this License in a document you have written, include a copy of
 the License in the document and put the following copyright and license
 notices just after the title page:
 
-     Copyright 2008, 2009 Free Software Foundation.
+     Copyright 2008, Free Software Foundation.
 
      Permission is granted to copy, distribute and/or modify this
      document under the terms of the GNU Free Documentation License,
@@ -1733,72 +1741,71 @@ software.
 
 
 Tag Table:
-Node: Top166
-Node: Introduction1471
-Node: Audience2268
-Node: What Is Supported?2596
-Node: Using Gnash5104
-Node: Gnash Command Line Options6540
-Ref: Gnash Command Line Options <1>6894
-Node: Gnash Interactive Control Keys12935
-Ref: Gnash Interactive Control Keys <1>13302
-Node: User Configuration File14051
-Ref: User Configuration Variables14836
-Node: Installing and Configuring Gnash34619
-Node: Requirements34980
-Node: Hardware Requirements35301
-Ref: Build Matrix36078
-Node: Software Requirements37308
-Node: Downloading Gnash38141
-Node: Getting the Source38776
-Node: Releases39136
-Node: Snapshot39694
-Node: Repository40165
-Node: Getting Codec Support40986
-Node: Reporting Bugs41703
-Node: Get a Fresh Binary Package42693
-Node: Determine if the bug was previously reported43480
-Node: Review the bug writing guidelines44299
-Node: Filing a bug report45351
-Node: Glossary45635
-Ref: A45749
-Ref: C46573
-Ref: D46859
-Ref: E47271
-Ref: F47511
-Ref: G48584
-Ref: K49569
-Ref: L49929
-Ref: M50065
-Ref: N50424
-Ref: O50581
-Ref: P51196
-Ref: Q51483
-Ref: R51667
-Ref: S52908
-Ref: T54394
-Ref: X55102
-Node: Authors55195
-Node: GNU Free Documentation License55905
-Node: 0_ PREAMBLE56665
-Node: 1_ APPLICABILITY AND DEFINITIONS57972
-Ref: fdl-document58198
-Ref: fdl-modified58489
-Ref: fdl-secondary58676
-Ref: fdl-invariant59321
-Ref: fdl-cover-texts59570
-Ref: fdl-transparent59783
-Ref: fdl-title-page61073
-Node: 2_ VERBATIM COPYING61462
-Node: 3_ COPYING IN QUANTITY62443
-Node: 4_ MODIFICATIONS64801
-Node: 5_ COMBINING DOCUMENTS70862
-Node: 6_ COLLECTIONS OF DOCUMENTS72360
-Node: 7_ AGGREGATION WITH INDEPENDENT WORKS73252
-Node: 8_ TRANSLATION74481
-Node: 9_ TERMINATION75385
-Node: 10_ FUTURE REVISIONS OF THIS LICENSE76041
-Node: Addendum77182
+Node: Top165
+Node: Introduction1470
+Node: Audience2267
+Node: What Is Supported?2595
+Node: Using Gnash5103
+Node: Gnash Command Line Options6539
+Ref: Gnash Command Line Options <1>6893
+Node: Gnash Interactive Control Keys12934
+Ref: Gnash Interactive Control Keys <1>13301
+Node: User Configuration File14050
+Ref: User Configuration Variables14835
+Node: Installing and Configuring Gnash35967
+Node: Requirements36328
+Node: Hardware Requirements36649
+Ref: Build Matrix37426
+Node: Software Requirements38656
+Node: Downloading Gnash39489
+Node: Getting the Source40124
+Node: Releases40484
+Node: Snapshot41042
+Node: Repository41513
+Node: Getting Codec Support42334
+Node: Reporting Bugs43051
+Node: Get a Fresh Binary Package44041
+Node: Determine if the bug was previously reported44828
+Node: Review the bug writing guidelines45647
+Node: Filing a bug report46699
+Node: Glossary46983
+Ref: A47097
+Ref: C47917
+Ref: D48203
+Ref: E48615
+Ref: F48857
+Ref: G49742
+Ref: K50727
+Ref: M51087
+Ref: N51438
+Ref: O51595
+Ref: P52210
+Ref: Q52497
+Ref: R52681
+Ref: S53922
+Ref: T55409
+Ref: X56117
+Node: Authors56210
+Node: GNU Free Documentation License56920
+Node: 0_ PREAMBLE57684
+Node: 1_ APPLICABILITY AND DEFINITIONS58991
+Ref: fdl-document59217
+Ref: fdl-modified59508
+Ref: fdl-secondary59695
+Ref: fdl-invariant60340
+Ref: fdl-cover-texts60589
+Ref: fdl-transparent60802
+Ref: fdl-title-page62092
+Node: 2_ VERBATIM COPYING62481
+Node: 3_ COPYING IN QUANTITY63462
+Node: 4_ MODIFICATIONS65820
+Node: 5_ COMBINING DOCUMENTS71881
+Node: 6_ COLLECTIONS OF DOCUMENTS73379
+Node: 7_ AGGREGATION WITH INDEPENDENT WORKS74271
+Node: 8_ TRANSLATION75500
+Node: 9_ TERMINATION76404
+Node: 10_ FUTURE REVISIONS OF THIS LICENSE77060
+Node: Addendum78201
 
 End Tag Table
 

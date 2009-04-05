@@ -59,6 +59,13 @@ dnl which is a program returning the flags for the Pth emulation library.
 
 pthread_flags="pthreads none -Kthread -kthread lthread -pthread -pthreads -mthreads pthread --thread-safe -mt pthread-config pth-config"
 
+dnl When cross configuring, we're always using GCC, and we always have a platform
+dnl with pthreads in that case, but it's often sonewhere non-standard, so
+dnl unless this is a problem, assume we don't need any special flags.
+if test x$cross_compiling = xyes; then
+    pthread_flags="none"
+fi
+
 dnl The ordering *is* (sometimes) important.  Some notes on the
 dnl individual items follow:
 

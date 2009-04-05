@@ -37,8 +37,8 @@ AM_COMPILER_LIB
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
 dnl recognize Gnash as a SWF Player.
-DEFAULT_FLASH_MAJOR_VERSION="9"
-DEFAULT_FLASH_MINOR_VERSION="0"
+DEFAULT_FLASH_MAJOR_VERSION="10"
+DEFAULT_FLASH_MINOR_VERSION="1"
 DEFAULT_FLASH_REV_NUMBER="999"
 AC_SUBST(DEFAULT_FLASH_MAJOR_VERSION)
 AC_SUBST(DEFAULT_FLASH_MINOR_VERSION)
@@ -1643,11 +1643,13 @@ dnl
 dnl See if we can use the swfmill, mtasc, swfc and haxe based testsuites 
 dnl
 if test x$cross_compiling = xno; then
+  AC_PATH_PROG(AS3COMPILE, as3compile)
   AC_PATH_PROG(SWFC, swfc)
   AC_PATH_SWFMILL
   AC_PATH_MTASC
   AC_PATH_HAXE
 fi
+AM_CONDITIONAL(ENABLE_AS3COMPILE, [ test x"$AS3COMPILE" != x ])
 AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
 AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 AM_CONDITIONAL(ENABLE_HAXE, [ test x"$HAXE" != x ])
@@ -2224,6 +2226,7 @@ pythonmodule/Makefile
 testsuite/Makefile
 testsuite/media/Makefile
 testsuite/libbase.all/Makefile
+testsuite/as3/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
@@ -2278,12 +2281,6 @@ if test x"$i810lodbias" = x"yes"; then
   echo "        Intel 810 LOD bias hack enabled"
 else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
-fi
-
-if test x"$xmitshm" = x"yes"; then
-  echo "        MIT-SHM X extension support enabled"
-else
-  echo "        MIT-SHM X extension support disabled (default). Use --enable-mit-shm to enable."
 fi
 
 if test x"$pthreads" = x"yes"; then
@@ -3053,6 +3050,14 @@ if test x$cross_compiling = xno; then
     echo "                 to run some of the tests in Gnash testsuite." >&4
     echo "                 You can install it from http://www.swftools.org/" >&4
     echo "                 or .deb users: apt-get install swftools" >&4
+  fi
+
+  if test x"$AS3COMPILE" != x; then
+      echo "        AS3COMPILE is $AS3COMPILE"
+  else
+    echo "        WARNING: you need as3compile from SWFTools" >&4
+    echo "                 to run some of the tests in Gnash testsuite." >&4
+    echo "                 You can install it from http://www.swftools.org/" >&4
   fi
 
   if test x"$HTTP_TESTSUITE" != x; then

@@ -20,10 +20,10 @@
  * create(by tag) "mc1" in static depth;
  * create(by AS) "dup" in dynamic depth;
  * swap them;
- * try to move and remove the character in static depth;
+ * try to move and remove the DisplayObject in static depth;
  *
  * TODO: add test for REPLACE.
- * Question: how to REPLACE a character?
+ * Question: how to REPLACE a DisplayObject?
  */
   
 

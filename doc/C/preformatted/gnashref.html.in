@@ -1,6 +1,6 @@
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"><title>Gnash Reference Manual</title><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="book" lang="en"><div class="titlepage"><div><div><h1 class="title"><a name="index"></a>Gnash Reference Manual</h1></div><div><p class="releaseinfo">
-      This manual describes version 0.8.3 of Gnash.
-    </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008, 2009 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
+      This manual describes version 0.8.5 of Gnash.
+    </p></div><div><p class="copyright">Copyright © 2005, 2006, 2007, 2008 Free Software Foundation</p></div><div><div class="legalnotice"><a name="legalnotice"></a><p>
     Permission is granted to copy, distribute and/or modify this document
     under the terms of the <a class="link" href="#fdl" title="Appendix A. GNU Free Documentation License"><em class="citetitle">GNU
     Free Documentation License</em></a>, Version 1.1 or any later
@@ -18,7 +18,7 @@
       </p>
       
       <p class="publisher">Open Media Now! Foundation</p>
-    </td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#intro">1. Introduction</a></span></dt><dd><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#build">2. Building from Source</a></span></dt><dd><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">CVS Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#internals">3. Software Internals</a></span></dt><dd><dl><dt><span class="sect1"><a href="#tour">A Tour of Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#The%20Libraries">The Libraries</a></span></dt><dt><span class="sect2"><a href="#apps">The Applications</a></span></dt><dt><span class="sect2"><a href="#plugin">The Plugin</a></span></dt><dt><span class="sect2"><a href="#logging">The Message Logging System</a></span></dt></dl></dd><dt><span class="sect1"><a href="#soundhandlers">Sound handling in Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#soundtypes">Sound types</a></span></dt><dt><span class="sect2"><a href="#soundparsing">Sound parsing</a></span></dt><dt><span class="sect2"><a href="#soundplayback">Sound playback</a></span></dt><dt><span class="sect2"><a href="#sdlsound">The SDL sound backend</a></span></dt><dt><span class="sect2"><a href="#gstreamer">The Gstreamer backend</a></span></dt><dt><span class="sect2"><a href="#audio-future">Future audio backends</a></span></dt><dt><span class="sect2"><a href="#gstreamer-details">Detailed description of the Gstreamer backend</a></span></dt></dl></dd><dt><span class="sect1"><a href="#testing">Testing </a></span></dt><dd><dl><dt><span class="sect2"><a href="#testtools">Testing Tools</a></span></dt><dt><span class="sect2"><a href="#testcases">Test Cases</a></span></dt><dt><span class="sect2"><a href="#writeastests">Writing ActionScript Tests</a></span></dt><dt><span class="sect2"><a href="#writemingtests">Writing Ming-based self-contained SWF tests</a></span></dt><dt><span class="sect2"><a href="#writing_dejagnu_so_tests">Writing self-contained SWF tests with other compilers</a></span></dt><dt><span class="sect2"><a href="#writing_test_runners">Writing Test Runners</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#bugreport">5. Reporting Bugs</a></span></dt><dd><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></dd><dt><span class="chapter"><a href="#extensions">6. Gnash Extensions</a></span></dt><dd><dl><dt><span class="sect1"><a href="#newext">Creating A New Extension</a></span></dt><dd><dl><dt><span class="sect2"><a href="#craftext">Crafting an Extension</a></span></dt></dl></dd><dt><span class="sect1"><a href="#debuext">Debugging An Extension</a></span></dt><dt><span class="sect1"><a href="#inclext">Included Extensions</a></span></dt></dl></dd><dt><span class="chapter"><a href="#rtmp">7. RTMP Protocol</a></span></dt><dd><dl><dt><span class="sect1"><a href="#amf">AMF Format</a></span></dt></dl></dd><dt><span class="chapter"><a href="#nsapi">8. Mozilla/Firefox NPAPI Plugin</a></span></dt><dd><dl><dt><span class="sect1"><a href="#plugincapi">Plugin C API</a></span></dt><dt><span class="sect1"><a href="#plugincppapi">Plugin C++ API</a></span></dt><dt><span class="sect1"><a href="#glthread">OpenGL and Threads</a></span></dt><dt><span class="sect1"><a href="#eventhandle">Plugin Event Handling</a></span></dt></dl></dd><dt><span class="chapter"><a href="#authors">9. Authors</a></span></dt><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>2.1. <a href="#codedeps">Code Dependency Table</a></dt><dt>2.2. <a href="#testdeps">Testing Dependency Table</a></dt><dt>2.3. <a href="#docdeps">Documentation Dependency Table</a></dt><dt>2.4. <a href="#tb-config-features">Configuration Options - Features</a></dt><dt>2.5. <a href="#tb-configure-paths">Custom Path Options</a></dt></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="intro"></a>Chapter 1. Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></div><p>
+    </td></tr></table></div></div></div><hr></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="chapter"><a href="#intro">1. Introduction</a></span></dt><dd><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></dd><dt><span class="chapter"><a href="#build">2. Building from Source</a></span></dt><dd><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">Bzr Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#internals">3. Software Internals</a></span></dt><dd><dl><dt><span class="sect1"><a href="#tour">A Tour of Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#The%20Libraries">The Libraries</a></span></dt><dt><span class="sect2"><a href="#apps">The Applications</a></span></dt><dt><span class="sect2"><a href="#plugin">The Plugin</a></span></dt><dt><span class="sect2"><a href="#logging">The Message Logging System</a></span></dt></dl></dd><dt><span class="sect1"><a href="#soundhandlers">Sound handling in Gnash</a></span></dt><dd><dl><dt><span class="sect2"><a href="#soundtypes">Sound types</a></span></dt><dt><span class="sect2"><a href="#soundparsing">Sound parsing</a></span></dt><dt><span class="sect2"><a href="#soundplayback">Sound playback</a></span></dt><dt><span class="sect2"><a href="#sdlsound">The SDL sound backend</a></span></dt><dt><span class="sect2"><a href="#gstreamer">The Gstreamer backend</a></span></dt><dt><span class="sect2"><a href="#audio-future">Future audio backends</a></span></dt><dt><span class="sect2"><a href="#gstreamer-details">Detailed description of the Gstreamer backend</a></span></dt></dl></dd><dt><span class="sect1"><a href="#testing">Testing </a></span></dt><dd><dl><dt><span class="sect2"><a href="#testtools">Testing Tools</a></span></dt><dt><span class="sect2"><a href="#testcases">Test Cases</a></span></dt><dt><span class="sect2"><a href="#writeastests">Writing ActionScript Tests</a></span></dt><dt><span class="sect2"><a href="#writemingtests">Writing Ming-based self-contained SWF tests</a></span></dt><dt><span class="sect2"><a href="#writing_dejagnu_so_tests">Writing self-contained SWF tests with other compilers</a></span></dt><dt><span class="sect2"><a href="#writing_test_runners">Writing Test Runners</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#bugreport">5. Reporting Bugs</a></span></dt><dd><dl><dt><span class="sect1"><a href="#bugstep_package">Get a Fresh Binary Package</a></span></dt><dt><span class="sect1"><a href="#bugstep_search">Determine if the bug was previously reported</a></span></dt><dt><span class="sect1"><a href="#bugstep_guidelines">Review the bug writing guidelines</a></span></dt><dt><span class="sect1"><a href="#bugstep_file">Filing a bug report</a></span></dt></dl></dd><dt><span class="chapter"><a href="#extensions">6. Gnash Extensions</a></span></dt><dd><dl><dt><span class="sect1"><a href="#newext">Creating A New Extension</a></span></dt><dd><dl><dt><span class="sect2"><a href="#craftext">Crafting an Extension</a></span></dt></dl></dd><dt><span class="sect1"><a href="#debuext">Debugging An Extension</a></span></dt><dt><span class="sect1"><a href="#inclext">Included Extensions</a></span></dt></dl></dd><dt><span class="chapter"><a href="#rtmp">7. RTMP Protocol</a></span></dt><dd><dl><dt><span class="sect1"><a href="#amf">AMF Format</a></span></dt></dl></dd><dt><span class="chapter"><a href="#nsapi">8. Mozilla/Firefox NPAPI Plugin</a></span></dt><dd><dl><dt><span class="sect1"><a href="#plugincapi">Plugin C API</a></span></dt><dt><span class="sect1"><a href="#plugincppapi">Plugin C++ API</a></span></dt><dt><span class="sect1"><a href="#glthread">OpenGL and Threads</a></span></dt><dt><span class="sect1"><a href="#eventhandle">Plugin Event Handling</a></span></dt></dl></dd><dt><span class="chapter"><a href="#authors">9. Authors</a></span></dt><dt><span class="appendix"><a href="#fdl">A. GNU Free Documentation License</a></span></dt><dd><dl><dt><span class="sect1"><a href="#fdl-preamble">0. PREAMBLE</a></span></dt><dt><span class="sect1"><a href="#fdl-section1">1. APPLICABILITY AND DEFINITIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section2">2. VERBATIM COPYING</a></span></dt><dt><span class="sect1"><a href="#fdl-section3">3. COPYING IN QUANTITY</a></span></dt><dt><span class="sect1"><a href="#fdl-section4">4. MODIFICATIONS</a></span></dt><dt><span class="sect1"><a href="#fdl-section5">5. COMBINING DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section6">6. COLLECTIONS OF DOCUMENTS</a></span></dt><dt><span class="sect1"><a href="#fdl-section7">7. AGGREGATION WITH INDEPENDENT WORKS</a></span></dt><dt><span class="sect1"><a href="#fdl-section8">8. TRANSLATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section9">9. TERMINATION</a></span></dt><dt><span class="sect1"><a href="#fdl-section10">10. FUTURE REVISIONS OF THIS LICENSE</a></span></dt><dt><span class="sect1"><a href="#fdl-using">Addendum</a></span></dt></dl></dd></dl></div><div class="list-of-tables"><p><b>List of Tables</b></p><dl><dt>2.1. <a href="#codedeps">Code Dependency Table</a></dt><dt>2.2. <a href="#testdeps">Testing Dependency Table</a></dt><dt>2.3. <a href="#docdeps">Documentation Dependency Table</a></dt><dt>2.4. <a href="#tb-config-features">Configuration Options - Features</a></dt><dt>2.5. <a href="#tb-configure-paths">Custom Path Options</a></dt></dl></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="intro"></a>Chapter 1. Introduction</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#audience">Audience</a></span></dt><dt><span class="sect1"><a href="#runs-on">What Is Supported?</a></span></dt></dl></div><p>
     <span class="application">Gnash</span> is a free SWF movie player.  It is available as a
     stand-alone application or as a plugin for several popular
     web browsers. It supports playing media from a disk or streaming
@@ -84,7 +84,7 @@
       while work is being done to support these codecs when embedded
       in a SWF file. Ffmpeg contains the codecs used by the current
       SWF defintion, FLV, VP6 (ON2), H.263, H.264, and MP3.
-    </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="build"></a>Chapter 2. Building from Source</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">CVS Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="building_overview"></a>Overview</h2></div></div></div><p>
+    </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="build"></a>Chapter 2. Building from Source</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#building_overview">Overview</a></span></dt><dt><span class="sect1"><a href="#gettingsource">Getting The Source</a></span></dt><dd><dl><dt><span class="sect2"><a href="#sourcereleases">Releases</a></span></dt><dt><span class="sect2"><a href="#sourcecvs">Bzr Access</a></span></dt></dl></dd><dt><span class="sect1"><a href="#dependencies">Code Dependencies</a></span></dt><dt><span class="sect1"><a href="#testdep">Testing Dependencies</a></span></dt><dt><span class="sect1"><a href="#docdepend">Documentation Dependencies</a></span></dt><dt><span class="sect1"><a href="#configure">Configuring Gnash</a></span></dt><dt><span class="sect1"><a href="#compile">Compiling the Code</a></span></dt><dt><span class="sect1"><a href="#processdoc">Creating the Documentation</a></span></dt><dt><span class="sect1"><a href="#runtests">Running the Tests</a></span></dt><dd><dl><dt><span class="sect2"><a href="#dejagnu">Using DejaGnu</a></span></dt><dt><span class="sect2"><a href="#manually">Running The Tests Manually</a></span></dt></dl></dd></dl></div><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="building_overview"></a>Overview</h2></div></div></div><p>
       The typical process of building from source will involve 
       <a class="link" href="#gettingsource" title="Getting The Source">getting the source</a>,
       <a class="link" href="#dependencies" title="Code Dependencies">build dependencies</a>,
@@ -101,11 +101,13 @@
         make install
       </pre><p>
     </p><p>
-      If you are compiling with GCC you will probably need to use a machine
+      If you are compiling with GCC you will need to use a machine
       with at least 128 megabytes of physical RAM; 64MB is not enough for a
       couple of the files, even with swap enabled and optimisation turned off.
+      With less than 512 megabytes available, many build combinations can 
+      still be a long and painful experience.
     </p><p>
-      At present the Gnash source is about 30 MB extracted and configured
+      At present the <span class="application">Gnash</span> source is about 30 MB extracted and configured
       and requires a total of about 125 megabytes to compile it.
     </p><p>
       Continue reading for detailed step-by-step instructions 
@@ -120,18 +122,22 @@
 	<a class="ulink" href="http://ftp.gnu.org/gnu/gnash" target="_top">
 		    http://ftp.gnu.org/gnu/gnash
 	</a> 
-      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sourcecvs"></a>CVS Access</h3></div></div></div><p>
-	The latest Gnash development sources are available via anonymous CVS.
-	Use the following commands to check them out
-	(just hit return when you are prompted for the password):
+      </p></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="sourcecvs"></a>Bzr Access</h3></div></div></div><p>
+	The latest <span class="application">Gnash</span> development sources are available via bzr.
+	Use the following commands to check them out:
 	</p><pre class="programlisting">
-	  export CVS_RSH=ssh
-	  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	mkdir gnash
+	cd gnash
+	bzr branch http://bzr.savannah.gnu.org/r/gnash/trunk
 	</pre><p>
-	You will then be able to update your copy from the repository using
+	At any time, other temporary development branches may also
+	be available. Replace <span class="emphasis"><em>trunk</em></span> with the
+	branch name to check these out.
+	You can update your copy from the main 
+	repository using:
 	</p><pre class="programlisting">
-	  cd gnash
-	  cvs update -d
+	  cd trunk
+	  bzr pull
 	</pre><p>
       </p><p>
 	If you only have access to the internet via a web proxy,
@@ -143,10 +149,10 @@
     <span class="application">Gnash</span> has a number of dependencies on other packages.
     If you install the dependencies using a package
     manager, be certain to install the development versions
-    of the packages.  The normal versions are often missing
+    of the packages.  The normal versions often lack
     the headers <span class="application">Gnash</span> needs to compile.
   </p><p>
-    Some dependencies have other dependencies, like GTk also needs
+    Some dependencies have other dependencies: for instance, GTK also needs
     glib2, atk, and pango to produce a fully linked
     executable. Different distributions also use differing
     dependencies, sometimes a package will depend on libxml2 on one
@@ -168,13 +174,7 @@
 	  </td><td align="left">
 	    <code class="filename">
 	      boost-headers, boost-libs, or just boost
-	  </code></td></tr><tr><td align="left">libxml2</td><td align="left">Required</td><td align="left"> </td><td align="left">
-	    Libxml2 is the GNOME XML parser library and
-	    is available at <a class="ulink" href="http://xmlsoft.org" target="_top">http://xmlsoft.org</a>.
-	  </td><td align="left">
-	    This library is used to parse messages for the
-	    XML XMLNode, or XMLSocket ActionScript classes.
-	  </td><td align="left"><code class="filename">libxml2-dev</code></td><td align="left"><code class="filename">libxml2-devel</code></td><td align="left"><code class="filename">libxml2</code></td></tr><tr><td align="left">AGG</td><td align="left">Possibly Required</td><td align="left">2.4 or higher</td><td align="left">
+	  </code></td></tr><tr><td align="left">AGG</td><td align="left">Possibly Required</td><td align="left">2.4 or higher</td><td align="left">
 	    AGG is the AntiGrain low-level 2D graphics
 	    library.  
 	  </td><td align="left">
@@ -268,18 +268,27 @@
 	    gstreamer-ffmpeg plugin, ffmpeg doesn't need to be
 	    installed, as it's part of the plugin. For systems
 	    without Gstreamer support, ffmpeg can be used directly.
-	  </td><td align="left"><code class="filename">ffmpeg-dev</code></td><td align="left"><code class="filename">ffmpeg-devel</code></td><td align="left"><code class="filename">ffmpeg</code></td></tr><tr><td align="left">JPEG</td><td align="left">Optional</td><td align="left"> </td><td align="left">
+	  </td><td align="left"><code class="filename">ffmpeg-dev</code></td><td align="left"><code class="filename">ffmpeg-devel</code></td><td align="left"><code class="filename">ffmpeg</code></td></tr><tr><td align="left">JPEG</td><td align="left">Required</td><td align="left"> </td><td align="left">
 	    <a class="ulink" href="http://www.ijg.org/" target="_top">JPEG</a>
 	    is a lossy image format which is heavily used for images.
 	  </td><td align="left">
-	    This library is used for rendering JPEGs.
-	  </td><td align="left"><code class="filename">libjpeg62-dev</code></td><td align="left"><code class="filename">libjpeg</code></td><td align="left"><code class="filename">jpeg</code></td></tr><tr><td align="left">PNG</td><td align="left">Optional</td><td align="left"> </td><td align="left">
+		  This library is used for reading external JPEGs and JPEG
+		  data embedded in SWF files.
+	  </td><td align="left"><code class="filename">libjpeg62-dev</code></td><td align="left"><code class="filename">libjpeg</code></td><td align="left"><code class="filename">jpeg</code></td></tr><tr><td align="left">PNG</td><td align="left">Required</td><td align="left"> </td><td align="left">
 	    <a class="ulink" href="http://www.libpng.org/pub/png/" target="_top">PNG</a> is
 	    a patent-free image format which is comparable to
 	    <span class="emphasis"><em>GIF</em></span>.
 	  </td><td align="left">
-	    This library is used for rendering PNGs.
-	  </td><td align="left"><code class="filename">libpng12-dev</code></td><td align="left"><code class="filename">libpng</code></td><td align="left"><code class="filename">png</code></td></tr><tr><td align="left">libcurl</td><td align="left">Optional</td><td align="left"> </td><td align="left">
+		  This library is used for loading external PNG
+		  images (part of the SWF8 specification) and for writing
+		  images in the PNG format.
+	  </td><td align="left"><code class="filename">libpng12-dev</code></td><td align="left"><code class="filename">libpng</code></td><td align="left"><code class="filename">png</code></td></tr><tr><td align="left">GIF</td><td align="left">Required</td><td align="left"> </td><td align="left">GIF is a common image format that should now
+		      be free of patent restrictions.
+               <span class="emphasis"><em>GIF</em></span>.
+                </td><td align="left">
+                This library is used for loading external GIF
+                images (part of the SWF8 specification).
+	        </td><td align="left"><code class="filename">libungif-dev</code></td><td align="left"><code class="filename">libungif-devel</code></td><td align="left"><code class="filename">gif</code></td></tr><tr><td align="left">libcurl</td><td align="left">Optional</td><td align="left"> </td><td align="left">
 	    libcurl is the multiprotocal file transfer library.
 	  </td><td align="left">
 	    This library is used for URL downloading.
@@ -584,6 +593,7 @@
 	  <code class="option">-Wall</code> is used with GCC.</td></tr><tr><td align="left"><code class="option">--enable-fps-debug</code>
 	  </td><td align="left">Enable FPS debugging code. When this feature is compiled in you can use the -f switch of <span class="application">Gnash</span>
 	  to have FPS printed at regular intervals.</td></tr><tr><td align="left"><code class="option">--enable-write</code></td><td align="left">Makes the Mozilla plugin write the currently playing SWF movie to <code class="filename">/tmp</code>.
+	  </td></tr><tr><td align="left"><code class="option">--disable-sa-launcher</code></td><td align="left">Drops the NPAPI plugin support for writing a standalone executable launcher script for the currently playing SWF movie to <code class="filename">/tmp</code>. Note that you'll still need to add a 'writelauncher' string to your GNASH_OPTIONS environment variable for the script to be created, even if the compile-time support is enabled.
 	  </td></tr><tr><td align="left"><code class="option">--disable-mit-shm</code>
 	  </td><td align="left">Disable support for the MIT-SHM X extensions.
 	  Currently support is only available using GTK gui and AGG renderer.
@@ -605,18 +615,6 @@
 	    <code class="option">--x-libraries=DIR</code>
 	  </td><td align="left">
 	    X library files are in DIR.
-	  </td></tr><tr><td align="left">
-	    <code class="option">--with-libxml=PFX</code>
-	  </td><td align="left">
-	    Prefix to where libxml is installed.
-	  </td></tr><tr><td align="left">
-	    <code class="option">--with-libxml-libraries=DIR</code>
-	  </td><td align="left">
-	    Directory where libxml library is installed.
-	  </td></tr><tr><td align="left">
-	    <code class="option">--with-libxml-includes=DIR</code>
-	  </td><td align="left">
-	    Directory where libxml header files are installed.
 	  </td></tr><tr><td align="left">
 	    <code class="option">--with-docbook=DIR</code>
 	  </td><td align="left">
@@ -966,8 +964,8 @@
 	  make XML-v{5,6,7,8}.swf
 	</pre><p>
       </p><div class="sect4" lang="en"><div class="titlepage"><div><div><h5 class="title"><a name="manual_compiled_tests"></a>Movie tests</h5></div></div></div><p>
-	  This creates a Flash movie version of the test case, which
-	  can be run with a standalone Flash player.  For instance,
+	  This creates a SWF movie version of the test case, which
+	  can be run with a standalone SWF player.  For instance,
 	  the target for SWF version 6 could be run with <span class="application">Gnash</span>:
 	  </p><pre class="programlisting">
 	    gnash -v XML-v6.swf
@@ -1135,7 +1133,7 @@
       <span class="emphasis"><em>libgnashmedia</em></span>,
       <span class="emphasis"><em>libgnashamf</em></span> and
       <span class="emphasis"><em>libgnashbackend</em></span>. There are several utility programs 
-      included for debug parsing and processing of Flash movie files,
+      included for debug parsing and processing of SWF movie files,
       and other useful utilities for examining local Shared Objects and
       sniffing LocalConnections.
     </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="The%20Libraries"></a>The Libraries</h3></div></div></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libbase"></a>libgnashbase</h4></div></div></div><p>
@@ -1154,7 +1152,7 @@
 	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="libgnashmedia"></a>libgnashmedia</h4></div></div></div><p>
 		Libgnashmedia handles Gnash's audio and video capabilities,
 		dealing with streamed video and sound as well as decoding
-		embedded media frames. Besides the standard Flash formats
+		embedded media frames. Besides the standard SWF formats
 		FLV, MPEG4, Nellymoser, ADPCM, MP3 and RAW, <span class="application">Gnash</span> can 
 		decode other formats supports by gstreamer or ffmpeg, 
 		including the free OGG container and free codecs.
@@ -1174,7 +1172,7 @@
 	  Libklashpart is the Konqueror plugin.
 	</p></div></div><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="apps"></a>The Applications</h3></div></div></div><p>
 	    There are currently a few standalone programs in Gnash,
-        which serve either to assist with Gnash development or to play flash
+        which serve either to assist with Gnash development or to play SWF
         movies.
       </p><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="Gnash"></a>The Standalone Player</h4></div></div></div><p>
 	  This is the standalone OpenGL backend used to play
@@ -1182,7 +1180,7 @@
 	  control keys used by Gnash.
 	</p></div><div class="sect3" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="processor"></a>Gprocessor</h4></div></div></div><p>
 	  Gprocessor is used to print out the actions (using the -va
-	  option) or the parsing (using the -vp option) of a flash
+	  option) or the parsing (using the -vp option) of a SWF
 	  movie. It is also used to produce the <span class="emphasis"><em>.gsc</em></span>
 	  files that Gnash uses to cache data, thereby speeding up the
 	  loading of files.
@@ -1255,8 +1253,8 @@
 	  standalone player and display its output in the browser.
 	</p><p>
 	  While this is not an optimal solution, it does enable one to
-	  use Gnash as the flash player when browsing. The main issue
-	  appears to be that the Flash movie being played doesn't get
+	  use Gnash as the SWF player when browsing. The main issue
+	  appears to be that the SWF movie being played doesn't get
 	  any mouse or keyboard input. That may be a mozplugger
 	  configuration issue, however.
 	</p><p>
@@ -1449,7 +1447,7 @@
 	for soundstreams. 
 	The SDL sound backend supports both event-sounds and soundstreams,
 	using Gnash's internal ADPCM, and optionally MP3 support, using
-	either FFMPEG or LIBMAD.
+	FFMPEG.
 	When it receives sound data it is stored without being decoded, unless
 	it is ADPCM, which is decoded in the parser. When playing, backend
 	relies on a function callback for retrieving output sound, which is 
@@ -1532,7 +1530,7 @@
        can be found in the section on building Gnash.
      </p><div class="sect2" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="testtools"></a>Testing Tools</h3></div></div></div><p>
 	Currently Gnash uses three other tools to help with
-	testing. Two of these are free compilers for the Flash
+	testing. Two of these are free compilers for the SWF
 	format. This lets us write simple test cases for Gnash to test
 	specific features, and to see how the features operate.
       </p><p>
@@ -1599,7 +1597,7 @@
       </p><p>
 	Additionally, the check.as file provides a transparent way to send
 	results to a TextField rather then using trace. This is very useful
-	when you use a flash player without tracing support.
+	when you use a SWF player without tracing support.
       </p><p>
 	Test units are built by running <span class="emphasis"><em>make TestName-v#.swf</em></span>.
 	This will use TestName.as as source and the value of # as target version.
@@ -2278,7 +2276,7 @@
       After following the steps described above, you can file a bug report at 
       <a class="ulink" href="https://savannah.gnu.org/bugs/?group=gnash" target="_top">https://savannah.gnu.org/bugs/?group=gnash</a>.
     </p></div></div><div class="chapter" lang="en"><div class="titlepage"><div><div><h2 class="title"><a name="extensions"></a>Chapter 6. Gnash Extensions</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="sect1"><a href="#newext">Creating A New Extension</a></span></dt><dd><dl><dt><span class="sect2"><a href="#craftext">Crafting an Extension</a></span></dt></dl></dd><dt><span class="sect1"><a href="#debuext">Debugging An Extension</a></span></dt><dt><span class="sect1"><a href="#inclext">Included Extensions</a></span></dt></dl></div><p>
-    Gnash supports extending the Flash specification by creating
+    Gnash supports extending the SWF specification by creating
     custom ActionScript classes that are compiled code, as opposed to
     the existing method of defining custom classes as
     ActionScript. Executing compiled code has many performance
@@ -2286,16 +2284,16 @@
     ActionScript opcodes.
   </p><p>
     I can already hear people complaining now about the concept of
-    extending Flash, so this in no way affects Gnash's ability to play
-    Flash movies when functioning as a browser plugin.
+    extending SWF, so this in no way affects Gnash's ability to play
+    SWF movies when functioning as a browser plugin.
     Gnash's goal is still to function in a way that is compatible
     with the current proprietary Flash player.
   </p><p>
-    But at the same time, we see Flash as the ideal scripting language
+    But at the same time, we see SWF as the ideal scripting language
     for a digital multi-media streaming environment. There are many
-    resources for Flash movie creators for widgets, higher level APIs,
+    resources for SWF movie creators for widgets, higher level APIs,
     all sorts of desirable things. But for those of use committed to
-    using free software tools for Flash, our options are very
+    using free software tools for SWF, our options are very
     limited. 
   </p><p>
     Rather than launching a multi-year project to duplicate all
@@ -2308,9 +2306,9 @@
     with all of the goodies of the proprietary IDE in them play in
     Gnash just fine, as it's all just byte codes by then.
   </p><p>
-    This trick works because until Flash player version 9, all the
+    This trick works because until SWF version 9, all the
     ActionScript class names and methods are passed as ASCII strings
-    into the Flash movie. So the Gnash Virtual Machine just loads the
+    into the SWF movie. So the Gnash Virtual Machine just loads the
     extension file if that class name is invoked in the movie. All
     extension files specify the class name and methods it implements
     in an identical style as adding any new ActionScript class. The
@@ -2359,7 +2357,7 @@
 	function callbacks for all the methods this class
 	supports. The method callbacks are attached to the parent
 	class by using <span class="emphasis"><em>init_member()</em></span> to set a C
-	function pointer to the string value used in the Flash movie.
+	function pointer to the string value used in the SWF movie.
       </p><pre class="programlisting">
 	// Attach DummyClass 'func1' and 'func2' methods to the given object
 	static void
@@ -2496,7 +2494,7 @@
     </pre><p>
       Once you have set the breakpoints you want, reset the value of
       the <span class="emphasis"><em>stall</em></span> variable to break out of the
-      loop, and the Flash movie will then continue playing.
+      loop, and the SWF movie will then continue playing.
     </p><pre class="programlisting">
       (gdb) set variable stall = false;
       continue
@@ -2590,12 +2588,12 @@
     RTMP protocol and AMF format. <span class="emphasis"><em>tcpdump</em></span> and
     <span class="emphasis"><em>ethereal</em></span> are your friend. Some additional info that got
     me started was from the <a class="ulink" href="http://www.osflash.org/red5" target="_top">Red5</a>
-    project. <span class="emphasis"><em>Red5</em></span> is the only other open source Flash
+    project. <span class="emphasis"><em>Red5</em></span> is the only other open source SWF
     server. So some details are still vague, but as the implementation
     appears to work, we'll figure out what they are later.
   </p><p>
     The Real Time Messaging Protocol was created by MacroMedia (now
-    Adobe) for delivering Flash objects and video over a network
+    Adobe) for delivering SWF objects and video over a network
     connection. Currently the only servers which support this format
     are the MacroMedia Media sever, and the Open Source Red5 project.
   </p><p>
@@ -2635,7 +2633,7 @@
     handshake, and ready to start reading packets.
   </p><p>
     The second packet is the <span class="emphasis"><em>NetConnection</em></span> object from
-    the client. This ActionScript class is used by the Flash movie to
+    the client. This ActionScript class is used by the SWF movie to
     create the network connection to the server.
   </p><p>
     The third packet is the <span class="emphasis"><em>NetStream</em></span> object from the
@@ -2661,9 +2659,9 @@
     The RTMP header is first, followed by the connect message as an
     ASCII string as the message body. The following AMF packet is the
     <span class="emphasis"><em>NetConnection</em></span> one, which specifies that this is coming
-    from a Flash application. This also contains the file path the server
+    from a SWF application. This also contains the file path the server
     can use to find the file to stream. This is then followed by the
-    version number, which I assume is the version of the Flash player,
+    version number, which I assume is the version of the SWF player,
     so the server knows what it is talking to.
   </p><p>
     The third packet is the one from <span class="emphasis"><em>NetStream</em></span>, which
@@ -2671,7 +2669,7 @@
     for a semblance of security.
   </p><p>
     For the next level of detail, we'll explain the format of AMF. AMF
-    is used by the RTMP protocol to transfer data. Each Flash object
+    is used by the RTMP protocol to transfer data. Each SWF object
     is encapsulated in an AMF packet, including streaming audio or
     video.
   </p><p>
@@ -2738,7 +2736,7 @@
 	    shared object.
 	  </p></dd><dt><span class="term">0x14</span></dt><dd><p>
 	    This specifies the content type of the RTMP message is
-	    remote procedure call. This invokes the method of a Flash
+	    remote procedure call. This invokes the method of a SWF
 	    class remotely.
 	  </p></dd></dl></div><p>     
   
@@ -2751,7 +2749,7 @@
     The values of the initial type byte are:
     </p><div class="variablelist"><dl><dt><span class="term">0x0</span></dt><dd><p>
 	    This specifies the data in the AMF packet is a numeric
-	    value. All numeric values in Flash are 64 bit,
+	    value. All numeric values in SWF are 64 bit,
 	    <span class="emphasis"><em>big-endian</em></span>.
 	  </p></dd><dt><span class="term">0x1</span></dt><dd><p>
 	    This specifies the data in the AMF packet is a boolean
@@ -2760,21 +2758,21 @@
 	    This specifies the data in the AMF packet is an
 	    <span class="emphasis"><em>ASCII</em></span> string. 
 	  </p></dd><dt><span class="term">0x3</span></dt><dd><p>
-	    This specifies the data in the AMF packet is a Flash
-	    object. The Flash object data type field further along in
+	    This specifies the data in the AMF packet is a SWF
+	    object. The SWF object data type field further along in
 	    the message specifies which type of ActionScript object it
 	    is.
 	  </p></dd><dt><span class="term">0x4</span></dt><dd><p>
-	    This specifies the data in the AMF packet is a Flash
-	    movie, ie. another Flash movie.
+	    This specifies the data in the AMF packet is a SWF
+	    movie, ie. another SWF movie.
 	  </p></dd><dt><span class="term">0x5</span></dt><dd><p>
 	    This specifies the data in the AMF packet is a NULL
 	    value. NULL is often used as the return code from calling
-	    Flash functions.
+	    SWF functions.
 	  </p></dd><dt><span class="term">0x6</span></dt><dd><p>
 	    This specifies the data in the AMF packet is a
 	    undefined. This is also used as the return code from
-	    calling Flash functions.
+	    calling SWF functions.
 	  </p></dd><dt><span class="term">0x7</span></dt><dd><p>
 	    This specifies the data in the AMF packet is a reference.
 	  </p></dd><dt><span class="term">0x8</span></dt><dd><p>
@@ -2849,8 +2847,8 @@
   </p><div class="sect1" lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="amf"></a>AMF Format</h2></div></div></div><p>
     The AMF format is used in the LocalConnection, SharedObject,
     NetConnection, and NetStream ActionScript classes. This is a means
-    of binary data interchange between Flash movies, or between a
-    Flash player and a Flash server.
+    of binary data interchange between SWF movies, or between a
+    SWF player and a SWF server.
   </p><p>
     Like the RTMP messages, an AMF packet header can be of a variable
     size. The size is either the same as the initial header of the

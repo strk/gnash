@@ -19,7 +19,7 @@
 /*
  * Sandro Santilli, strk@keybit.net
  *
- * Test "Jumping backward to the start of a character's lifetime after dynamic transformation"
+ * Test "Jumping backward to the start of a DisplayObject's lifetime after dynamic transformation"
  *
  * run as ./displaylist_depths_test8
  *
@@ -38,9 +38,9 @@
  * 
  * Description:
  * 
- *  frame2: character placed at depth -16381 at position (10,200);
+ *  frame2: DisplayObject placed at depth -16381 at position (10,200);
  *          increment _y += 2 using ActionScript.
- *  frame4: try to transform the character to the right (50,200)
+ *  frame4: try to transform the DisplayObject to the right (50,200)
  *  frame7: jump back to frame 2 
  * 
  * Expected behaviour:
@@ -138,7 +138,7 @@ main(int argc, char** argv)
     "}"
     );
 
-  // Frame 4: move character at depth 3 to position 50,200
+  // Frame 4: move DisplayObject at depth 3 to position 50,200
   SWFDisplayItem_moveTo(it1, 50, 200); 
   add_actions(mo,
     // immune to MOVE after _y set by AS

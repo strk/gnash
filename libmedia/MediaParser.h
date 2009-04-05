@@ -37,6 +37,7 @@
 #include <deque>
 #include <map>
 #include <vector>
+#include <iosfwd> // for output operator forward declarations
 
 // Undefine this to load/parse media files in main thread
 #define LOAD_MEDIA_IN_A_SEPARATE_THREAD 1

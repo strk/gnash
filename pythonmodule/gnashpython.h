@@ -30,13 +30,16 @@
 #include "movie_root.h"
 #include "movie_definition.h"
 #include "render_handler.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "log.h"
+#include "RunInfo.h" // for composition
+#include "IOChannel.h"
 
 #include <string>
 #include <memory>
 #include <deque>
 #include <boost/python.hpp>
+#include <boost/cstdint.hpp> // For C99 int types
 
 // Because the Python bindings are there to allow flexible access
 // to Gnash in an interpreted language, there need to be many
@@ -66,6 +69,9 @@ public:
     GnashPlayer();
     ~GnashPlayer();
 
+    // This seems required by BOOST_PYTHON_MODULE ?
+    GnashPlayer(const GnashPlayer&) {};
+
     // For exiting
     void close();
 
@@ -73,7 +79,6 @@ public:
     
     /// Takes a python file object
     bool loadMovie(PyObject& pf);
-    bool initVM();
 
     // Renderer
     bool setRenderer(const std::string& r);
@@ -123,7 +128,7 @@ public:
     
 private:
     void init();
-    void setBaseURL(std::string url);
+    void setBaseURL(const std::string& url);
     bool addRenderer(gnash::render_handler* handler);
 
     gnash::movie_definition* _movieDef;
@@ -145,42 +150,43 @@ private:
 
     static void receiveLogMessages(const std::string& s);
 
+    std::auto_ptr<RunInfo> _runInfo;
 };
 
 class GnashCharacter
 {
 public:
     GnashCharacter();
-    GnashCharacter(gnash::character* c);
+    GnashCharacter(gnash::DisplayObject* c);
     ~GnashCharacter();
 
     // The only constant aspect of a character?
-    const int id() { return _character->get_id(); }
+    int id() { return _character->get_id(); }
 
-    std::string name() { return _character->get_name(); }
+    const std::string& name() { return _character->get_name(); }
 
-    const char* textName() { return _character->get_text_name(); }
+    //const char* textName() { return _character->get_text_name(); }
 
     std::string target() { return _character->getTarget(); }
 
-    float ratio() { return _character->get_ratio(); }
+    int ratio() { return _character->get_ratio(); }
 
     int depth() { return _character->get_depth(); }
     
     int clipDepth() { return _character->get_clip_depth(); }
     
-    float height() { return _character->get_height(); }
+    boost::uint32_t height() { return _character->get_height(); }
     
-    float width() { return _character->get_width(); }
+    boost::uint32_t width() { return _character->get_width(); }
 
-    bool visible() { return _character->get_visible(); }
+    bool visible() { return _character->isVisible(); }
     
     void advance() { _character->advance(); }
     
     GnashCharacter* getParent();
     
 private:
-    gnash::character*  _character;
+    gnash::DisplayObject*  _character;
 };
 
 }

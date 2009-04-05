@@ -1,4 +1,4 @@
-// CharacterProxy.cpp - rebindable character reference, for Gnash
+// CharacterProxy.cpp - rebindable DisplayObject reference, for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -24,7 +24,7 @@
 #include "CharacterProxy.h"
 
 #include "utility.h" // for typeName
-#include "character.h" // for isDestroyed, getOrigTarget, ...
+#include "DisplayObject.h" // for isDestroyed, getOrigTarget, ...
 #include "VM.h" // for VM::getRoot()
 #include "movie_root.h" // for findCharacterByTarget
 
@@ -34,8 +34,8 @@ namespace gnash
 {
 
 /* static private */
-character*
-CharacterProxy::find_character_by_target(const std::string& tgtstr)
+DisplayObject*
+CharacterProxy::findDisplayObjectByTarget(const std::string& tgtstr)
 {
 	if ( tgtstr.empty() ) return NULL;
 

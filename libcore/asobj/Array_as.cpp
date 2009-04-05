@@ -32,6 +32,7 @@
 #include "action.h" // for call_method
 #include "VM.h" // for PROPNAME, registerNative
 #include "Object.h" // for getObjectInterface()
+#include "GnashNumeric.h"
 
 #include <string>
 #include <algorithm>
@@ -348,10 +349,10 @@ public:
     as_function& _comp;
     as_object* _object;
     bool (*_zeroCmp)(const int);
-    as_environment& _env;
+    const as_environment& _env;
 
     as_value_custom(as_function& comparator, bool (*zc)(const int), 
-        boost::intrusive_ptr<as_object> this_ptr, as_environment& env)
+        boost::intrusive_ptr<as_object> this_ptr, const as_environment& env)
         :
         _comp(comparator),
         _zeroCmp(zc),
@@ -368,7 +369,7 @@ public:
 	    std::auto_ptr<std::vector<as_value> > args (new std::vector<as_value>);
 	    args->push_back(b);
 	    args->push_back(a);
-        ret = call_method(cmp_method, &_env, _object, args);
+        ret = call_method(cmp_method, _env, _object, args);
 
         return (*_zeroCmp)(ret.to_int());
     }
@@ -591,7 +592,7 @@ Array_as::index_requested(string_table::key name)
     double value = temp.to_number();
 
     // if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
-    if (!utility::isFinite(value)) return -1;
+    if (!isFinite(value)) return -1;
 
     return int(value);
 }
@@ -671,7 +672,7 @@ Array_as::reverse()
 }
 
 std::string
-Array_as::join(const std::string& separator, as_environment*) const
+Array_as::join(const std::string& separator) const
 {
     // TODO - confirm this is the right format!
     // Reportedly, flash version 7 on linux, and Flash 8 on IE look like
@@ -709,9 +710,9 @@ Array_as::concat(const Array_as& other)
 }
 
 std::string
-Array_as::toString(as_environment* env) const
+Array_as::toString() const
 {
-    return join(",", env);
+    return join(",");
 }
 
 unsigned int
@@ -914,7 +915,7 @@ array_splice(const fn_call& fn)
     unsigned startoffset;
     int start = fn.arg(0).to_int();
     if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
-    startoffset = utility::clamp<int>(start, 0, origlen);
+    startoffset = clamp<int>(start, 0, origlen);
 #ifdef GNASH_DEBUG
     if ( startoffset != start )
         log_debug(_("Array.splice: start:%d became %u"), start, startoffset);
@@ -935,7 +936,7 @@ array_splice(const fn_call& fn)
             );
             return as_value();
         }
-        len = utility::clamp<int>(lenval, 0, origlen-startoffset);
+        len = clamp<int>(lenval, 0, origlen-startoffset);
     }
 
     //----------------
@@ -992,7 +993,7 @@ array_sort(const fn_call& fn)
         if (flags & Array_as::fDescending) icmp = &int_lt_or_eq;
         else icmp = &int_gt;
 
-        as_environment& env = fn.env();
+        const as_environment& env = fn.env();
 
         as_value_custom avc = 
             as_value_custom(*as_func, icmp, fn.this_ptr, env);
@@ -1258,15 +1259,14 @@ array_join(const fn_call& fn)
     boost::intrusive_ptr<Array_as> array = ensureType<Array_as>(fn.this_ptr);
 
     std::string separator = ",";
-    int version = array->getVM().getSWFVersion();
-    as_environment* env = &(fn.env());
+    int version = fn.getVM().getSWFVersion();
 
     if (fn.nargs > 0)
     {
         separator = fn.arg(0).to_string_versioned(version);
     }
 
-    std::string ret = array->join(separator, env);
+    std::string ret = array->join(separator);
 
     return as_value(ret);
 }

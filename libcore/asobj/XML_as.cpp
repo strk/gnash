@@ -227,7 +227,7 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
         return;
     }
 
-    // Point iterator to the character after the name.
+    // Point iterator to the DisplayObject after the name.
     it = end;
 
     // Skip any whitespace before the '='. If we reach the end of the string
@@ -237,7 +237,7 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
         return;
     }
 
-    // Point to the character after the '='
+    // Point to the DisplayObject after the '='
     ++it;
 
     // Skip any whitespace. If we reach the end of the string, or don't find
@@ -247,9 +247,9 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
         return;
     }
 
-    // Find the end of the attribute, looking for the opening character,
+    // Find the end of the attribute, looking for the opening DisplayObject,
     // as long as it's not escaped. We begin one after the present position,
-    // which should be the opening character. We want to remember what the
+    // which should be the opening DisplayObject. We want to remember what the
     // iterator is pointing to for a while, so don't advance it.
     end = it;
     do {
@@ -274,7 +274,7 @@ XML_as::parseAttribute(XMLNode_as* node, const std::string& xml,
     // We've already checked that end != xml.end(), so we can advance at 
     // least once.
     it = end;
-    // Advance past the last attribute character
+    // Advance past the last attribute DisplayObject
     ++it;
 
     // Handle namespace. This is set once only for each node, and is also
@@ -896,29 +896,28 @@ xml_ondata(const fn_call& fn)
     as_object* thisPtr = fn.this_ptr.get();
     assert(thisPtr);
 
-    // See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;a=blob;f=libswfdec/swfdec_initialize.as
+    // See http://gitweb.freedesktop.org/?p=swfdec/swfdec.git;
+    // a=blob;f=libswfdec/swfdec_initialize.as
 
-    as_value src; src.set_null();
-    if ( fn.nargs ) src = fn.arg(0);
+    as_value src;
+    if (fn.nargs) src = fn.arg(0);
 
-    if ( ! src.is_null() )
-    {
+    if (!src.is_undefined()) {
         thisPtr->set_member(NSV::PROP_LOADED, true);
         thisPtr->callMethod(NSV::PROP_PARSE_XML, src);
         thisPtr->callMethod(NSV::PROP_ON_LOAD, true);
     }
-    else
-    {
-        thisPtr->set_member(NSV::PROP_LOADED, true);
-        thisPtr->callMethod(NSV::PROP_ON_LOAD, true);
+    else {
+        thisPtr->set_member(NSV::PROP_LOADED, false);
+        thisPtr->callMethod(NSV::PROP_ON_LOAD, false);
     }
 
     return as_value();
 }
 
 /// Case insensitive match of a string, returning false if there too few
-/// characters left or if there is no match. If there is a match, and advance
-/// is not false, the iterator points to the character after the match.
+/// DisplayObjects left or if there is no match. If there is a match, and advance
+/// is not false, the iterator points to the DisplayObject after the match.
 bool
 textMatch(const std::string& xml, std::string::const_iterator& it,
         const std::string& match, bool advance)
@@ -953,7 +952,7 @@ textAfterWhitespace(const std::string& xml, std::string::const_iterator& it)
 /// @return     false if we reach the end of the text before finding the
 ///             terminator.
 /// @param it   The current position of the iterator. If the return is true,
-///             this points to the first character after the terminator 
+///             this points to the first DisplayObject after the terminator 
 ///             after return
 /// @param content  If the return is true, this is filled with the content of
 ///                 the tag.

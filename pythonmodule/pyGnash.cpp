@@ -44,7 +44,7 @@ BOOST_PYTHON_MODULE(gnash) {
  
         .def("loadMovie", &pythonwrapper::GnashPlayer::loadMovie, 
                     "Load the file object passed")
-        .def("initVM", &pythonwrapper::GnashPlayer::initVM)
+        //.def("initVM", &pythonwrapper::GnashPlayer::initVM)
 
         .def("setRenderer", &pythonwrapper::GnashPlayer::setRenderer,
         			"Sets the renderer to use. Pass a string naming the "
@@ -105,7 +105,7 @@ BOOST_PYTHON_MODULE(gnash) {
 
         .def("id", &pythonwrapper::GnashCharacter::id)
         .def("depth", &pythonwrapper::GnashCharacter::depth)
-        .def("textName", &pythonwrapper::GnashCharacter::textName)
+        //.def("textName", &pythonwrapper::GnashCharacter::textName)
         .def("clipDepth", &pythonwrapper::GnashCharacter::clipDepth)
         .def("height", &pythonwrapper::GnashCharacter::height)
         .def("width", &pythonwrapper::GnashCharacter::height)    

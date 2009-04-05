@@ -80,7 +80,7 @@ Key_as::set_key_down(key::code code)
     // the unique gnash::key::code.
     _lastKeyEvent = code;
 
-    // Key.isDown() only cares about flash keycode, not character, so
+    // Key.isDown() only cares about flash keycode, not DisplayObject, so
     // we lookup keycode to add to _unreleasedKeys.   
     size_t keycode = key::codeMap[code][key::KEY];
 
@@ -104,7 +104,7 @@ Key_as::set_key_up(key::code code)
     // the unique gnash::key::code.    
     _lastKeyEvent = code;
 
-    // Key.isDown() only cares about flash keycode, not character, so
+    // Key.isDown() only cares about flash keycode, not DisplayObject, so
     // we lookup keycode to add to _unreleasedKeys.
     size_t keycode = key::codeMap[code][key::KEY];
 

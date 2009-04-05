@@ -341,7 +341,7 @@ function_call(const fn_call& fn)
 }
 
 boost::intrusive_ptr<as_object>
-as_function::constructInstance(as_environment& env,
+as_function::constructInstance(const as_environment& env,
 	std::auto_ptr<std::vector<as_value> > args)
 {
 

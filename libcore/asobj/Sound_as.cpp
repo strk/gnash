@@ -34,7 +34,6 @@
 #include "builtin_function.h"
 #include "Object.h" // for getObjectInterface
 #include "VM.h"
-#include "timers.h" // for registering the probe timer
 #include "namedStrings.h"
 #include "ExportableResource.h"
 #include "StreamProvider.h"
@@ -99,7 +98,7 @@ Sound_as::~Sound_as()
 }
 
 void
-Sound_as::attachCharacter(character* attachTo) 
+Sound_as::attachCharacter(DisplayObject* attachTo) 
 {
     _attachedCharacter.reset(new CharacterProxy(attachTo));
 }
@@ -141,13 +140,13 @@ bool
 Sound_as::getVolume(int& volume)
 {
     // TODO: check what takes precedence in case we
-    //       have both an attached character *and*
+    //       have both an attached DisplayObject *and*
     //       some other sound...
     //
     if ( _attachedCharacter )
     {
-        //log_debug("Sound has an attached character");
-        character* ch = _attachedCharacter->get();
+        //log_debug("Sound has an attached DisplayObject");
+        DisplayObject* ch = _attachedCharacter->get();
         if ( ! ch )
         {
             log_debug("Character attached to Sound was unloaded and "
@@ -157,9 +156,9 @@ Sound_as::getVolume(int& volume)
         volume = ch->getVolume();
         return true;
     }
-    //else log_debug("Sound has NO attached character, _soundHandler is %p, soundId is %d", _soundHandler, soundId);
+    //else log_debug("Sound has NO attached DisplayObject, _soundHandler is %p, soundId is %d", _soundHandler, soundId);
 
-    // If we're not attached to a character we'll need to query
+    // If we're not attached to a DisplayObject we'll need to query
     // sound_handler for volume. If we have no sound handler, we
     // can't do much, so we'll return false
     if (!_soundHandler)
@@ -230,7 +229,7 @@ Sound_as::loadSound(const std::string& file, bool streaming)
         return;
     }
 
-    // TODO: use associated character's _soundbuftime, if any
+    // TODO: use associated DisplayObject's _soundbuftime, if any
     _mediaParser->setBufferTime(60000); // one minute buffer... should be fine
 
     if ( isStreaming )
@@ -277,12 +276,12 @@ void
 Sound_as::setVolume(int volume)
 {
     // TODO: check what takes precedence in case we
-    //       have both an attached character *and*
+    //       have both an attached DisplayObject *and*
     //       some other sound...
     //
     if ( _attachedCharacter )
     {
-        character* ch = _attachedCharacter->get();
+        DisplayObject* ch = _attachedCharacter->get();
         if ( ! ch )
         {
             log_debug("Character attached to Sound was unloaded and "
@@ -293,7 +292,7 @@ Sound_as::setVolume(int volume)
         return;
     }
 
-    // If we're not attached to a character we'll need to use
+    // If we're not attached to a DisplayObject we'll need to use
     // sound_handler for volume. If we have no sound handler, we
     // can't do much, so we'll just return
     if (!_soundHandler)
@@ -584,14 +583,14 @@ sound_new(const fn_call& fn)
         if ( ! arg0.is_null() && ! arg0.is_undefined() )
         {
             as_object* obj = arg0.to_object().get();
-            character* ch = obj ? obj->to_character() : 0;
+            DisplayObject* ch = obj ? obj->toDisplayObject() : 0;
             IF_VERBOSE_ASCODING_ERRORS(
             if ( ! ch )
             {
                 std::stringstream ss; fn.dump_args(ss);
                 log_aserror("new Sound(%s) : first argument isn't null "
-                    "nor undefined, and doesn't cast to a character. "
-                    "We'll take as an invalid character ref.",
+                    "nor undefined, and doesn't cast to a DisplayObject. "
+                    "We'll take as an invalid DisplayObject ref.",
                     ss.str());
             }
             );
@@ -1018,25 +1017,8 @@ Sound_as::init(as_object& global)
 void
 Sound_as::startProbeTimer()
 {
-    boost::intrusive_ptr<builtin_function> cb = 
-        new builtin_function(&Sound_as::probeAudioWrapper);
-    std::auto_ptr<Timer> timer(new Timer);
-
-    // 2 times each second (83 would be 12 times each second)
-    unsigned long delayMS = 500; 
-    timer->setInterval(*cb, delayMS, this);
-    _probeTimer = getVM().getRoot().add_interval_timer(timer, true);
-}
-
-/*private static*/
-as_value
-Sound_as::probeAudioWrapper(const fn_call& fn)
-{
-    //GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<Sound_as> ptr = ensureType<Sound_as>(fn.this_ptr);
-    ptr->probeAudio();
-    return as_value();
+    _probeTimer = 1;
+    getVM().getRoot().addAdvanceCallback(this);
 }
 
 /*private*/
@@ -1050,10 +1032,16 @@ Sound_as::stopProbeTimer()
     if ( _probeTimer )
     {
         VM& vm = getVM();
-        vm.getRoot().clear_interval_timer(_probeTimer);
-        log_debug(" clear_interval_timer(%d) called", _probeTimer);
+        vm.getRoot().removeAdvanceCallback(this);
+        log_debug(" sound callback removed");
         _probeTimer = 0;
     }
+}
+
+void
+Sound_as::advanceState()
+{
+    probeAudio();
 }
 
 /*private*/

@@ -103,6 +103,8 @@ public:
 	///
 	long getBytesTotal() const;
 
+    bool failed() { return _failed; }
+
 	// alias for getBytesTotal()
 	long size() const { return getBytesTotal(); }
 
@@ -180,6 +182,9 @@ private:
 
 	/// Reset all values to original state
 	void reset();
+
+    bool _failed;
+
 };
 
 } // namespace gnash

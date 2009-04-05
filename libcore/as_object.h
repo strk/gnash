@@ -41,7 +41,7 @@
 namespace gnash {
 	class as_function;
 	class MovieClip;
-	class character;
+	class DisplayObject;
 	class as_environment;
 	class VM;
 	class Machine;
@@ -86,7 +86,8 @@ class Trigger
 
 public:
 
-	Trigger(const std::string& propname, as_function& trig, const as_value& customArg)
+	Trigger(const std::string& propname, as_function& trig,
+            const as_value& customArg)
 		:
 		_propname(propname),
 		_func(&trig),
@@ -136,6 +137,12 @@ class as_object
     typedef PropertyList::SortedPropertyList SortedPropertyList;
 
 public:
+
+    /// A function to be called on movie_root::advance()
+    //
+    /// This is used for requesting an object to update its state and if
+    /// required to notify any AS callbacks. 
+    virtual void advanceState() { }
 
     /// Is any non-hidden property in this object ?
     bool hasNonHiddenProperties() const {
@@ -843,11 +850,11 @@ public:
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
 
-	/// Cast to a character, or return NULL
-	virtual character* to_character() { return NULL; }
+	/// Cast to a DisplayObject, or return NULL
+	virtual DisplayObject* toDisplayObject() { return NULL; }
 
-	const character* to_character() const {
-        return const_cast<as_object*>(this)->to_character();
+	const DisplayObject* toDisplayObject() const {
+        return const_cast<as_object*>(this)->toDisplayObject();
     }
 
 	/// Return true if this is a Date object.
@@ -1022,7 +1029,7 @@ public:
 	void set_prototype(boost::intrusive_ptr<as_object> proto,
             int flags=as_prop_flags::dontDelete | as_prop_flags::dontEnum);
 
-	/// @{ Common ActionScript methods for characters
+	/// @{ Common ActionScript methods for DisplayObjects
 	/// TODO: make protected
 
 	static as_value tostring_method(const fn_call& fn);

@@ -146,7 +146,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: place character at depth 3 (-16381)
+  // Frame 2: place DisplayObject at depth 3 (-16381)
   it1 = SWFMovie_add(mo, (SWFBlock)static1);
   SWFDisplayItem_setDepth(it1, 3);
   SWFDisplayItem_moveTo(it1, 100, 300);
@@ -169,7 +169,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo); 
 
-  // Frame 3: replace instance at depth -16381 with character 2
+  // Frame 3: replace instance at depth -16381 with DisplayObject 2
   if ( SWFMovie_replace(mo, it1, (SWFBlock)static2) )
   {
 	  abort(); // grace and beauty...
@@ -188,7 +188,7 @@ main(int argc, char** argv)
 			), SWFACTION_CONSTRUCT);
 
 
-  // Can still reference the old character and it's variables, after replace
+  // Can still reference the old DisplayObject and it's variables, after replace
   check_equals(mo, "typeof(static2)", "'undefined'"); 
   check_equals(mo, "typeof(static1)", "'object'"); 
   check_equals(mo, "static1._target", "'/static1'");
@@ -218,7 +218,7 @@ main(int argc, char** argv)
     // Buttons don't get their onConstruct event invoked ...
     "check_equals(typeof(_root.depth3Constructed), 'undefined');"
 
-    // Original character name is still referenceable
+    // Original DisplayObject name is still referenceable
     "check_equals(typeof(static1), 'object');"
 
     // But it's a new instance !!

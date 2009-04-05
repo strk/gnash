@@ -78,7 +78,7 @@ class Font : public ExportableResource
 {
 public:
 
-    // This table maps from Unicode character number to glyph index.
+    // This table maps from Unicode DisplayObject number to glyph index.
 	typedef std::map<boost::uint16_t, int> CodeTable;
 
 	Font(std::auto_ptr<SWF::DefineFontTag> ft);
@@ -120,7 +120,7 @@ public:
 	/// Get glyph by index.
 	//
 	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by character code.
+	///	Index of the glyph. See get_glyph_index() to obtain by DisplayObject code.
 	///
 	/// @param embedded
 	///	If true, queries the 'embedded' glyphs table, 
@@ -136,7 +136,7 @@ public:
 	/// Get name of this font. 
 	const std::string& name() const { return _name; }
 
-	/// Return the glyph index for a given character code
+	/// Return the glyph index for a given DisplayObject code
 	//
 	/// @param code
 	///	Character code to fetch the corresponding glyph index of.
@@ -158,7 +158,7 @@ public:
 	/// Return the advance value for the given glyph index
 	//
 	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by character code.
+	///	Index of the glyph. See get_glyph_index() to obtain by DisplayObject code.
 	///
 	/// @param embedded
 	///	If true, queries the 'embedded' glyphs table, 
@@ -168,7 +168,7 @@ public:
 
 	/// \brief
 	/// Return the adjustment in advance between the given two
-	/// characters (makes sense for embedded glyphs only)
+	/// DisplayObjects (makes sense for embedded glyphs only)
 	//
 	/// Normally this will be 0
 	///

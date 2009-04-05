@@ -17,9 +17,6 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include <boost/shared_ptr.hpp>
-#include <string>
-
 #include "log.h"
 #include "GnashException.h"
 #include "buffer.h"
@@ -27,7 +24,11 @@
 #include "amf_msg.h"
 #include "element.h"
 #include "network.h"
-#include <boost/cstdint.hpp> // for boost::?int??_t
+
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <boost/cstdint.hpp> // For C99 int types
+#include <arpa/inet.h> // for htons
 
 using namespace std;
 using namespace gnash;
@@ -233,6 +234,8 @@ boost::shared_ptr<amf::Buffer>
 AMF_msg::encodeAMFPacket(const std::string & /* target */,
                          const std::string & /*response */, size_t /* size */)
 {
+//    GNASH_REPORT_FUNCTION;
+
     return encodeAMFPacket();
 }
 

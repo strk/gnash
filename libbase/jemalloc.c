@@ -3328,6 +3328,7 @@ static inline void *
 arena_bin_malloc_easy(arena_t *arena, arena_bin_t *bin, arena_run_t *run)
 {
 	void *ret;
+        arena = 0;              /* this is just to quiet a compiler warning */
 
 	assert(run->magic == ARENA_RUN_MAGIC);
 	assert(run->nfree > 0);
@@ -4046,6 +4047,7 @@ arena_dalloc_large(arena_t *arena, arena_chunk_t *chunk, void *ptr)
 	/* Large allocation. */
 	malloc_spin_lock(&arena->lock);
 
+        chunk = 0;              /* this is just to quiet a compiler warning */
 #ifdef MALLOC_FILL
 #ifndef MALLOC_STATS
 	if (opt_junk)

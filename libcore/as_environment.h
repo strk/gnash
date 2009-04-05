@@ -33,7 +33,7 @@
 namespace gnash {
 
 // Forward declarations
-class character;
+class DisplayObject;
 class VM;
 
 /// ActionScript execution environment.
@@ -52,22 +52,22 @@ public:
 
     as_environment(VM& vm);
 
-    VM& getVM() { return _vm; }
+    VM& getVM() const { return _vm; }
 
-    character* get_target() { return m_target; }
+    DisplayObject* get_target() const { return m_target; }
 
     /// Set default target for timeline opcodes
     //
     /// @param target
-    /// A character to apply timeline opcodes on.
+    /// A DisplayObject to apply timeline opcodes on.
     /// Zero is a valid target, disabling timeline
     /// opcodes (would get ignored).
     ///
-    void set_target(character* target);
+    void set_target(DisplayObject* target);
 
-    void set_original_target(character* target) { _original_target = target; }
+    void set_original_target(DisplayObject* target) { _original_target = target; }
 
-    character* get_original_target() { return _original_target; }
+    DisplayObject* get_original_target() { return _original_target; }
 
     // Reset target to its original value
     void reset_target() { m_target = _original_target; }
@@ -120,7 +120,7 @@ public:
     ///
     /// Throw StackException if index is out of range
     ///
-    as_value& bottom(size_t index)
+    as_value& bottom(size_t index) const
     {
         try {
             return _stack.value(index);
@@ -404,7 +404,7 @@ public:
     /// Supports both /slash/syntax and dot.syntax
     /// Case insensitive for SWF up to 6, sensitive from 7 up
     ///
-    character* find_target(const std::string& path) const;
+    DisplayObject* find_target(const std::string& path) const;
 
     /// Find the object referenced by the given path.
     //
@@ -541,10 +541,10 @@ private:
     as_value m_global_register[numGlobalRegisters];
 
     /// Movie target. 
-    character* m_target;
+    DisplayObject* m_target;
 
     /// Movie target. 
-    character* _original_target;
+    DisplayObject* _original_target;
 
     /// Push a frame on the calls stack.
     //

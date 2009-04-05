@@ -139,7 +139,6 @@ Network::createServer(short port)
     struct sockaddr_in sock_in;
     int             on, type;
     int             retries = 0;
-    in_addr_t       nodeaddr;
 
     if (_listenfd >= 2) {
 	log_debug("already connected to port %hd", port);
@@ -194,7 +193,8 @@ Network::createServer(short port)
 
     retries = 0;
 
-    nodeaddr = inet_lnaof(*thisaddr);
+//     in_addr_t       nodeaddr;
+//     nodeaddr = inet_lnaof(*thisaddr);
     while (retries < 5) {
         if (bind(_listenfd, reinterpret_cast<struct sockaddr *>(&sock_in),
                  sizeof(sock_in)) == -1) {

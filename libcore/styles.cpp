@@ -15,6 +15,7 @@
 #include "swf.h"
 #include "GnashException.h"
 #include "fill_style.h"
+#include "GnashNumeric.h"
 
 namespace gnash {
 
@@ -141,7 +142,7 @@ void
 line_style::set_lerp(const line_style& ls1, const line_style& ls2, float ratio)
 {
     m_width = static_cast<boost::uint16_t>(
-        utility::frnd(utility::flerp(ls1.getThickness(), ls2.getThickness(), ratio)));
+        frnd(flerp(ls1.getThickness(), ls2.getThickness(), ratio)));
     m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
     if ( ls1._scaleVertically != ls2._scaleVertically )
     {

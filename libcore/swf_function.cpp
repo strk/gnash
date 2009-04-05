@@ -96,12 +96,12 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn,
 ///
 struct TargetGuard {
 	as_environment& env;
-	character* from;
-	character* from_orig;
+	DisplayObject* from;
+	DisplayObject* from_orig;
 
 	// @param ch : target to set temporarely
 	// @param och : original target to set temporarely
-	TargetGuard(as_environment& e, character* ch, character* och)
+	TargetGuard(as_environment& e, DisplayObject* ch, DisplayObject* och)
 		:
 		env(e),
         from(env.get_target()),
@@ -129,26 +129,16 @@ swf_function::operator()(const fn_call& fn)
     CallStack& cs = vm.getCallStack();
     if ( ! cs.empty() ) caller = cs.back().func;
 
+	assert(m_env);
+
 	// Set up local stack frame, for parameters and locals.
-	as_environment::FrameGuard guard(fn.env(), this);
+	as_environment::FrameGuard guard(*m_env, this);
 
 	as_environment*	our_env = m_env;
-	assert(our_env);
 
-	// if(our_env->get_original_target()->isDestroyed())
-        if (our_env == NULL)
-	{
-		log_error("swf_function own environment is null (possible?)");
-		our_env = &fn.env();
-	}
+	DisplayObject* target = our_env->get_target();
+	DisplayObject* orig_target = our_env->get_original_target();
 
-	character* target = our_env->get_target();
-	character* orig_target = our_env->get_original_target();
-
-#if 0
-	log_debug("swf_function() stack:\n"); fn.env().dump_stack();
-	log_debug("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
-#endif
 	// Some features are version-dependant.
 	unsigned swfversion = vm.getSWFVersion();
 	as_object *super = NULL;
@@ -160,13 +150,13 @@ swf_function::operator()(const fn_call& fn)
 	}
 	else
 	{
-		// In SWF5, when 'this' is a character it becomes
+		// In SWF5, when 'this' is a DisplayObject it becomes
 		// the target for this function call.
 		// See actionscript.all/setProperty.as
 		// 
 		if ( fn.this_ptr )
 		{
-			character* ch = fn.this_ptr->to_character();
+			DisplayObject* ch = fn.this_ptr->toDisplayObject();
 			if ( ch )
 			{
 				target = ch;
@@ -297,7 +287,7 @@ swf_function::operator()(const fn_call& fn)
 		if (m_function2_flags & PRELOAD_ROOT) 
 		{
 			// Put '_root' (if any) in a register.
-			character* tgtch = our_env->get_target();
+			DisplayObject* tgtch = our_env->get_target();
 			if ( tgtch )
 			{
 				// NOTE: _lockroot will be hanlded by getAsRoot()

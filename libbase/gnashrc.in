@@ -191,11 +191,24 @@
 #
 # Default: false
 #
-set LocalConnection off
+#set LocalConnection on
 
 # Enable support for the X Video extension. Note that this requires a
 # kernel/X11 driver, and compile-time gstreamer or ffmpeg and libXv .
 #
 # Default: false
 #
-#set XVideo false
+#set XVideo true
+
+# Force rendering quality to "BEST".
+#
+# Possible values:
+#	-1 : let SWF code drive it
+#	 0 : low quality
+#	 1 : medium quality
+#	 3 : high quality
+#	 4 : best quality
+#
+# Default: -1 
+#
+#set quality 4

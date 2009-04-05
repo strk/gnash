@@ -227,22 +227,22 @@ main(int argc, char** argv)
   // create a movieclip to use as sound controller
   add_actions(mo, "createEmptyMovieClip('dv1', 1);");
 
-  // attach Sound s1 to character dv1
+  // attach Sound s1 to DisplayObject dv1
   add_actions(mo, "s1 = new Sound(dv1);");
   // Sound.getVolume fetches volume from dv1 (see s2 below)
   check_equals(mo, "s1.getVolume()", "100");
 
-  // Change volume of Sound s1 (will change volume of attached character, see below)
+  // Change volume of Sound s1 (will change volume of attached DisplayObject, see below)
   add_actions(mo, "s1.setVolume(1000);");
   check_equals(mo, "s1.getVolume()", "1000"); 
 
-  // attach Sound s2 to character dv2
+  // attach Sound s2 to DisplayObject dv2
   add_actions(mo, "s2 = new Sound(dv1);");
   // Sound s2 finds volume of dv1 being 1000
   check_equals(mo, "s2.getVolume()", "1000");
 
   // This shows that setVolume/getVolume make callbacks
-  // to attached character as changing volume of one Sound
+  // to attached DisplayObject as changing volume of one Sound
   // influence the other attached sound...
   add_actions(mo, "s2.setVolume(5);");
   check_equals(mo, "s2.getVolume()", "5"); 
@@ -255,7 +255,7 @@ main(int argc, char** argv)
   check_equals(mo, "s2.getVolume()", "-20"); 
   check_equals(mo, "s1.getVolume()", "-20");
 
-  // If the attached-to character gets unloaded,
+  // If the attached-to DisplayObject gets unloaded,
   // getVolume returns undefined...
   add_actions(mo, "dv1.removeMovieClip();");
   check_equals(mo, "typeof(s2.getVolume())", "'undefined'"); 
@@ -272,7 +272,7 @@ main(int argc, char** argv)
   check_equals(mo, "s2.getVolume()", "80"); 
   check_equals(mo, "s1.getVolume()", "80");
 
-  // And you can attach a Sound to any character, not
+  // And you can attach a Sound to any DisplayObject, not
   // just MovieClip ones.
   // This is against a video instance
   add_actions(mo, "s1 = new Sound(video); s2 = new Sound(video);");
@@ -299,7 +299,7 @@ main(int argc, char** argv)
                 );
 
   //------------------------------------------
-  // Now attach video to the video characters
+  // Now attach video to the video DisplayObjects
   //------------------------------------------
   check(mo, "Video.prototype.hasOwnProperty('attachVideo')");
   check(mo, "Video.prototype.hasOwnProperty('smoothing')");

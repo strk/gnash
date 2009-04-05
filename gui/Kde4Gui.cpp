@@ -63,7 +63,7 @@
 #include "Kde4Gui.h"
 #include "klash4.moc"
 #include "render_handler.h"
-#include "utility.h" // for PIXELS_TO_TWIPS 
+#include "utility.h" // for pixelsToTwips 
 
 // Macro for using gettext strings where Qt expects QStrings
 #define _q(Str) QString::fromUtf8(_(Str))

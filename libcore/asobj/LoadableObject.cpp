@@ -26,7 +26,6 @@
 #include "namedStrings.h"
 #include "VM.h"
 #include "builtin_function.h"
-#include "timers.h"
 #include "utf8.h"
 #include "fn_call.h"
 #include "GnashAlgorithm.h"
@@ -46,22 +45,15 @@ namespace {
 LoadableObject::LoadableObject()
     :
     _bytesLoaded(-1),
-    _bytesTotal(-1),
-    _loadCheckerTimer(0)
+    _bytesTotal(-1)
 {
 }    
 
 
 LoadableObject::~LoadableObject()
 {
-
     deleteAllChecked(_loadThreads);
-
-    if ( _loadCheckerTimer )
-    {
-        _vm.getRoot().clear_interval_timer(_loadCheckerTimer);
-    }
-
+    _vm.getRoot().removeAdvanceCallback(this);
 }
 
 
@@ -171,15 +163,6 @@ LoadableObject::sendAndLoad(const std::string& urlstr,
         str = ri.streamProvider().getStream(getURL);
     }
 
-	if (!str.get()) 
-	{
-		log_error(_("Can't load from %s (security?)"), url.str());
-		return;
-		// TODO: check if this is correct
-		//as_value nullValue; nullValue.set_null();
-		//callMethod(_vm.getStringTable().find(PROPNAME("onData")), nullValue);
-	}
-
 	log_security(_("Loading from url: '%s'"), url.str());
     target.queueLoad(str);
 	
@@ -198,15 +181,6 @@ LoadableObject::load(const std::string& urlstr)
     // Checks whether access is allowed.
     std::auto_ptr<IOChannel> str(ri.streamProvider().getStream(url));
 
-	if (!str.get()) 
-	{
-		log_error(_("Can't load variables from %s (security?)"), url.str());
-		return;
-		// TODO: check if this is correct
-		//as_value nullValue; nullValue.set_null();
-		//callMethod(_vm.getStringTable().find(PROPNAME("onData")), nullValue);
-	}
-
 	log_security(_("Loading from url: '%s'"), url.str());
     queueLoad(str);
 }
@@ -216,57 +190,44 @@ void
 LoadableObject::queueLoad(std::auto_ptr<IOChannel> str)
 {
 
-    bool startTimer = _loadThreads.empty();
+    // We don't need to check before adding a timer, but
+    // this may optimize slightly (it was already in the code).
+    if (_loadThreads.empty()) {
+        getVM().getRoot().addAdvanceCallback(this);
+    }
 
-    std::auto_ptr<LoadThread> lt ( new LoadThread(str) );
+    std::auto_ptr<LoadThread> lt (new LoadThread(str));
 
     // we push on the front to avoid invalidating
     // iterators when queueLoad is called as effect
     // of onData invocation.
     // Doing so also avoids processing queued load
     // request immediately
-    // 
     _loadThreads.push_front(lt.release());
-
-    if ( startTimer )
-    {
-        boost::intrusive_ptr<builtin_function> loadsChecker = 
-            new builtin_function(&checkLoads_wrapper);
-
-        std::auto_ptr<Timer> timer(new Timer);
-        timer->setInterval(*loadsChecker, 50, this);
-        _loadCheckerTimer = getVM().getRoot().add_interval_timer(timer, true);
-
-    }
 
     _bytesLoaded = 0;
     _bytesTotal = -1;
 
 }
 
-as_value
-LoadableObject::checkLoads_wrapper(const fn_call& fn)
-{
-	boost::intrusive_ptr<LoadableObject> ptr =
-        ensureType<LoadableObject>(fn.this_ptr);
-	ptr->checkLoads();
-	return as_value();
-}
-
-
 void
-LoadableObject::checkLoads()
+LoadableObject::advanceState()
 {
 
-    if (_loadThreads.empty()) return; // nothing to do
+    if (_loadThreads.empty()) return;
 
     for (LoadThreadList::iterator it=_loadThreads.begin();
             it != _loadThreads.end(); )
     {
         LoadThread* lt = *it;
 
-        if ( lt->completed() )
-        {
+        /// An empty file is the same as a failure.
+        if (lt->failed() || (lt->completed() && !lt->size())) {
+            callMethod(NSV::PROP_ON_DATA, as_value());
+            it = _loadThreads.erase(it);
+            delete lt; 
+        }
+        else if (lt->completed()) {
             size_t dataSize = _bytesTotal = _bytesLoaded = lt->getBytesTotal();
 
             boost::scoped_array<char> buf(new char[dataSize + 1]);
@@ -306,11 +267,11 @@ LoadableObject::checkLoads()
         }
     }
 
-    if ( _loadThreads.empty() ) 
+    if (_loadThreads.empty()) 
     {
-        _vm.getRoot().clear_interval_timer(_loadCheckerTimer);
-        _loadCheckerTimer=0;
+        _vm.getRoot().removeAdvanceCallback(this);
     }
+
 }
 
 void
@@ -456,7 +417,9 @@ loadableobject_decode(const fn_call& fn)
 
 	ValuesMap vals;
 
-	URL::parse_querystring(fn.arg(0).to_string(), vals);
+    const int version = fn.getVM().getSWFVersion();
+
+	URL::parse_querystring(fn.arg(0).to_string_versioned(version), vals);
 
 	string_table& st = ptr->getVM().getStringTable();
 	for  (ValuesMap::const_iterator it=vals.begin(), itEnd=vals.end();

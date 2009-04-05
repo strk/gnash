@@ -24,8 +24,9 @@
 #include "Property.h"
 #include "PropertyList.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "RGBA.h"
+#include "movie_root.h"
 
 #include <iostream>
 #include <sstream>
@@ -60,11 +61,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	std::cout << "sizeof(GcResource): " << (sizeof(GcResource)) << std::endl;
 	std::cout << "sizeof(as_object): " << (sizeof(as_object)) << std::endl;
-	std::cout << "sizeof(character): " << (sizeof(character)) << std::endl;
+	std::cout << "sizeof(DisplayObject): " << (sizeof(DisplayObject)) << std::endl;
 	std::cout << "sizeof(MovieClip): " << (sizeof(MovieClip)) << std::endl;
 
 	std::cout << "sizeof(rgba): " << (sizeof(rgba)) << std::endl;
 	std::cout << "sizeof(line_style): " << (sizeof(line_style)) << std::endl;
 	std::cout << "sizeof(fill_style): " << (sizeof(fill_style)) << std::endl;
+	std::cout << "sizeof(SWFMatrix): " << (sizeof(SWFMatrix)) << std::endl;
+	std::cout << "sizeof(movie_root): " << (sizeof(movie_root)) << std::endl;
 }
 

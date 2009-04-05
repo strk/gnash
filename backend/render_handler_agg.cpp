@@ -81,9 +81,6 @@ What could and should be /optimized/
     results in many large-size buffer allocations during a second. Maybe this
     should be optimized.
     
-  - Converted fill styles (for AGG) are recreated for each sub-shape, even if
-    they never change for a shape. This should be changed.
-    
   - Matrix-transformed paths (generated before drawing a shape) should be cached
     and re-used to avoid recalculation of the same coordinates.
     
@@ -102,8 +99,8 @@ What could and should be /optimized/
   - there are also a few TODO comments in the code!
   
   
-AGG ressources
---------------
+AGG resources
+-------------
   http://www.antigrain.com/    
   http://haiku-os.org/node/86
 
@@ -119,14 +116,13 @@ AGG ressources
 #include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
-#include "utility.h"
 #include "log.h"
 #include "render_handler.h"
 #include "render_handler_agg.h" 
 #include "Range2d.h"
-
 #include "shape_character_def.h" 
 #include "DisplayObject.h"
+#include "GnashNumeric.h"
 
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
@@ -240,14 +236,14 @@ public:
     void operator()(const edge& edge)
     {
         if (edge.is_straight()) {
-            _path.line_to(TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
-                          TWIPS_TO_PIXELS(edge.ap.y) + _shift);
+            _path.line_to(twipsToPixels(edge.ap.x) + _shift, 
+                          twipsToPixels(edge.ap.y) + _shift);
         }
         else {
-            _path.curve3(TWIPS_TO_PIXELS(edge.cp.x) + _shift, 
-                     TWIPS_TO_PIXELS(edge.cp.y) + _shift,
-                     TWIPS_TO_PIXELS(edge.ap.x) + _shift, 
-                     TWIPS_TO_PIXELS(edge.ap.y) + _shift);             
+            _path.curve3(twipsToPixels(edge.cp.x) + _shift, 
+                     twipsToPixels(edge.cp.y) + _shift,
+                     twipsToPixels(edge.ap.x) + _shift, 
+                     twipsToPixels(edge.ap.y) + _shift);             
         }
     }
 
@@ -273,8 +269,8 @@ public:
     {
         agg::path_storage& p = *_it;
 
-        p.move_to(TWIPS_TO_PIXELS(in.ap.x) + _shift, 
-                  TWIPS_TO_PIXELS(in.ap.y) + _shift);
+        p.move_to(twipsToPixels(in.ap.x) + _shift, 
+                  twipsToPixels(in.ap.y) + _shift);
 
         std::for_each(in.m_edges.begin(), in.m_edges.end(),
                 EdgeToPath(p, _shift));
@@ -967,7 +963,7 @@ public:
     }
   }
 
-    void draw_shape_character(shape_character_def *def, 
+    void drawShape(shape_character_def *def, 
     const SWFMatrix& mat, const cxform& cx)
     {
     
@@ -1037,7 +1033,7 @@ public:
         // Clear selected clipbounds to ease debugging 
         _clipbounds_selected.clear();
 
-    } // draw_shape_character
+    } // drawShape
   
   
     /// Takes a path and translates it using the given SWFMatrix. The new path
@@ -1128,8 +1124,8 @@ public:
           hairline = true;
       }
       
-      float prev_ax = TWIPS_TO_PIXELS(this_path.ap.x);
-      float prev_ay = TWIPS_TO_PIXELS(this_path.ap.y);  
+      float prev_ax = twipsToPixels(this_path.ap.x);
+      float prev_ay = twipsToPixels(this_path.ap.y);  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
@@ -1143,8 +1139,8 @@ public:
         
         const edge& this_edge = this_path.m_edges[eno];
         
-        float this_ax = TWIPS_TO_PIXELS(this_edge.ap.x);  
-        float this_ay = TWIPS_TO_PIXELS(this_edge.ap.y);  
+        float this_ax = twipsToPixels(this_edge.ap.x);  
+        float this_ay = twipsToPixels(this_edge.ap.y);  
         
         if (hinting || this_edge.is_straight()) {
         
@@ -1214,8 +1210,8 @@ public:
         
           // never align curves!
           new_path.curve3(
-            TWIPS_TO_PIXELS(this_edge.cp.x) + subpixel_offset, 
-            TWIPS_TO_PIXELS(this_edge.cp.y) + subpixel_offset,
+            twipsToPixels(this_edge.cp.x) + subpixel_offset, 
+            twipsToPixels(this_edge.cp.y) + subpixel_offset,
             this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
             
@@ -1247,7 +1243,6 @@ public:
     const size_t fcount = fill_styles.size();
     for (size_t fno=0; fno<fcount; ++fno) {
     
-      bool smooth = false;
       int fill_type = fill_styles[fno].get_type();
       
       switch (fill_type) {
@@ -1293,8 +1288,6 @@ public:
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
-            smooth= true;  // continue with next case!
-        
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {    
@@ -1305,11 +1298,39 @@ public:
           m.concatenate(cm);
           m.concatenate(inv_stage_matrix);
 
+          //
+          // Smoothing policy:
+          //
+          // - If unspecified, smooth when _quality >= BEST
+          // - If ON or forced, smooth when _quality > LOW
+          // - If OFF, don't smooth
+          //
+          // TODO: take a forceBitmapSmoothing parameter.
+          //       which should be computed by the VM looking
+          //       at MovieClip.forceSmoothing.
+          //
+          bool smooth = false;
+          if ( _quality > QUALITY_LOW ) // never smooth in LOW quality
+          {
+             // TODO: if forceSmoothing is true, smooth !
+             switch ( fill_styles[fno].getBitmapSmoothingPolicy() )
+             {
+                case fill_style::BITMAP_SMOOTHING_UNSPECIFIED:
+                    if ( _quality >= QUALITY_BEST ) smooth = true;
+                    break;
+                case fill_style::BITMAP_SMOOTHING_ON:
+                    smooth = true;
+                    break;
+                default: break;
+             }
+          }
+
           sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),
-            smooth && _quality >= QUALITY_HIGH);
+            smooth);
+
           break;
         } 
 
@@ -1549,8 +1570,8 @@ public:
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(TWIPS_TO_PIXELS(this_path.ap.x), 
-                   TWIPS_TO_PIXELS(this_path.ap.y));
+      path.move_to(twipsToPixels(this_path.ap.x), 
+                   twipsToPixels(this_path.ap.y));
     
       // Add all edges to the path.
       std::for_each(this_path.m_edges.begin(), this_path.m_edges.end(),
@@ -1672,7 +1693,7 @@ public:
         if (!thickness) stroke.width(1); // hairline
         else if ( (!lstyle.scaleThicknessVertically()) && (!lstyle.scaleThicknessHorizontally()) )
         {
-          stroke.width(TWIPS_TO_PIXELS(thickness));
+          stroke.width(twipsToPixels(thickness));
         }
         else
         {

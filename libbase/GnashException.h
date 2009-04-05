@@ -16,9 +16,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifndef GNASH_GNASHEXCEPTION_H
-#define GNASH_GNASHEXCEPTION_H 1
+#define GNASH_GNASHEXCEPTION_H
 
-#include <exception>
+#include <stdexcept>
 #include <string>
 #include "dsodefs.h"
 
@@ -26,28 +26,22 @@ namespace gnash
 {
 
 /// Top-level gnash exception
-class DSOEXPORT GnashException: public std::exception
+class DSOEXPORT GnashException: public std::runtime_error
 {
 
 public:
 
 	GnashException(const std::string& s)
 		:
-		_msg(s)
+        std::runtime_error(s)
 	{}
 
 	GnashException()
 		:
-		_msg("Generic error")
+        std::runtime_error("Generic error")
 	{}
 
 	virtual ~GnashException() throw() {}
-
-	const char* what() const throw() { return _msg.c_str(); }
-
-private:
-
-	std::string _msg;
 };
 
 /// An exception from MediaHandler subsystem

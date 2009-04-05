@@ -75,3 +75,6 @@ set SOLReadOnly true
 
 # Don't use XVideo
 set XVideo false
+
+# Lock-set quality to low
+set quality 0

@@ -115,6 +115,11 @@ See the generic installation instructions in the file called "INSTALL".
 (If you are building from a fresh bzr checkout, first see the file
 "README_bzr" for additional instructions.)
 
+Depending on chosen functionality, CPU architecture, and OS the temporary
+files needed when Gnash compiles require as much as 1 GB of storage space.
+Approximately 400MB of virtual memory(RAM + swap) is also needed for linking.
+After installation, the temporary files may be removed with "make clean".
+
 Gnash has three main options: choice of renderer (graphics library used
 to render the SWF movie), choice(s) of GUI toolkit (gtk, kde, etc), and choice
 of multimedia backend (audio and video decoder).

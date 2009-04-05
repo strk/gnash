@@ -25,6 +25,7 @@
 #include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
+#include "GnashNumeric.h"
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -57,11 +58,11 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
             const std::string& url);
 
-    virtual character* createDisplayObject(character*, int) {
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
         return 0;
     }
 
-	// Discard id, always return the only shape character we have 
+	// Discard id, always return the only shape DisplayObject we have 
 	virtual character_def* get_character_def(int /*id*/)
 	{
 		return getShapeDef();
@@ -72,11 +73,11 @@ public:
 	}
 
 	virtual float get_width_pixels() const {
-		return std::ceil(TWIPS_TO_PIXELS(_framesize.width()));
+		return std::ceil(twipsToPixels(_framesize.width()));
 	}
 
 	virtual float get_height_pixels() const {
-		return std::ceil(TWIPS_TO_PIXELS(_framesize.height()));
+		return std::ceil(twipsToPixels(_framesize.height()));
 	}
 
 	virtual size_t	get_frame_count() const {
@@ -113,7 +114,7 @@ public:
 	}
 	
 	/// Create a playable movie_instance from this def.
-	virtual movie_instance* create_movie_instance(character* parent=0)
+	virtual movie_instance* create_movie_instance(DisplayObject* parent=0)
 	{
 		return new BitmapMovieInstance(this, parent);
 	}
@@ -161,7 +162,7 @@ private:
 
 	boost::intrusive_ptr<DynamicShape> _shapedef;
 
-	/// Get the shape character definition for this bitmap movie
+	/// Get the shape DisplayObject definition for this bitmap movie
 	//
 	/// It will create the definition the first time it's called
 	///

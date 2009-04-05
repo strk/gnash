@@ -35,6 +35,7 @@
 #include "swf/TextRecord.h"
 #include "Array_as.h"
 #include "RGBA.h"
+#include "GnashNumeric.h"
 
 #include <boost/algorithm/string/compare.hpp>
 #include <boost/dynamic_bitset.hpp>
@@ -68,10 +69,10 @@ namespace {
 
 namespace {
 
-/// Locate static text in a character.
+/// Locate static text in a DisplayObject.
 //
 /// Static text (TextRecords) are added to a vector, which should 
-/// correspond to a single character. Also keeps count of the total number
+/// correspond to a single DisplayObject. Also keeps count of the total number
 /// of glyphs.
 class TextFinder
 {
@@ -82,7 +83,7 @@ public:
         _count(0)
     {}
 
-    void operator()(character* ch) {
+    void operator()(DisplayObject* ch) {
 
         /// This is not tested.
         if (ch->isUnloaded()) return;
@@ -185,6 +186,7 @@ void
 TextSnapshot_as::markReachableResources() const
 {
     std::for_each(_textFields.begin(), _textFields.end(), setTextReachable);
+    markAsObjectReachable();
 }
 
 void
@@ -237,7 +239,7 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                         selected.test(pos - fieldStartIndex));
                 el->init_member("font", font->name());
                 el->init_member("color", tr->color().toRGBA());
-                el->init_member("height", TWIPS_TO_PIXELS(tr->textHeight()));
+                el->init_member("height", twipsToPixels(tr->textHeight()));
 
                 const double factor = 65536.0;
                 el->init_member("matrix_a", mat.sx / factor);
@@ -245,8 +247,8 @@ TextSnapshot_as::getTextRunInfo(size_t start, size_t end, Array_as& ri) const
                 el->init_member("matrix_c", mat.shy / factor);
                 el->init_member("matrix_d", mat.sy / factor);
 
-                const double xpos = TWIPS_TO_PIXELS(mat.tx + x);
-                const double ypos = TWIPS_TO_PIXELS(mat.ty + tr->yOffset());
+                const double xpos = twipsToPixels(mat.tx + x);
+                const double ypos = twipsToPixels(mat.ty + tr->yOffset());
                 el->init_member("matrix_tx", xpos);
                 el->init_member("matrix_ty", ypos);
 
@@ -438,8 +440,8 @@ textsnapshot_getTextRunInfo(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max(0, fn.arg(0).to_int());
-    size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
+    size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
+    size_t end = std::max<boost::int32_t>(start + 1, fn.arg(1).to_int());
 
     Array_as* ri = new Array_as;
 
@@ -504,8 +506,8 @@ textsnapshot_getSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max(0, fn.arg(0).to_int());
-    size_t end = std::max<int>(start + 1, fn.arg(1).to_int());
+    size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
+    size_t end = std::max<boost::int32_t>(start + 1, fn.arg(1).to_int());
 
     return as_value(ts->getSelected(start, end));
 }
@@ -591,8 +593,8 @@ textsnapshot_setSelected(const fn_call& fn)
         return as_value();
     }
 
-    size_t start = std::max(0, fn.arg(0).to_int());
-    size_t end = std::max<int>(start, fn.arg(1).to_int());
+    size_t start = std::max<boost::int32_t>(0, fn.arg(0).to_int());
+    size_t end = std::max<boost::int32_t>(start, fn.arg(1).to_int());
 
     bool selected = (fn.nargs > 2) ? fn.arg(2).to_bool() : true;
 

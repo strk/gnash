@@ -175,7 +175,7 @@ GtkAggXvGlue::render()
 }
 
 void
-GtkAggXvGlue::render(int minx, int miny, int maxx, int maxy)
+GtkAggXvGlue::render(int /* minx */, int /* miny */, int /* maxx */, int /* maxy */)
 {
     if (!_drawing_area || !_xv_image) {
         return;

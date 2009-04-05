@@ -83,7 +83,7 @@ public:
 
 
 	/// \brief
-	/// Return the given character glyph as a shape character definition
+	/// Return the given DisplayObject glyph as a shape DisplayObject definition
 	/// in unitsPerEM() coordinates.
 	//
 	///
@@ -97,7 +97,7 @@ public:
 	///     glyph to the next, in unitsPerEM() units.
 	///
 	/// @return A shape_character_def in unitsPerEM() coordinates,
-	///         or a NULL pointer if the given character code
+	///         or a NULL pointer if the given DisplayObject code
 	///         doesn't exist in this font.
 	///
 	boost::intrusive_ptr<shape_character_def> getGlyph(boost::uint16_t code, float& advance);

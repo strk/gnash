@@ -1154,7 +1154,7 @@ as_object::on_event(const event_id& id )
 
 	if (get_member(id.functionKey(), &event_handler) )
 	{
-		call_method0(event_handler, NULL, this);
+		call_method0(event_handler, as_environment(_vm), this);
 		return true;
 	}
 
@@ -1181,7 +1181,7 @@ as_object::callMethod(string_table::key methodName)
 
 	as_environment env(_vm);
 
-	return call_method0(method, &env, this);
+	return call_method0(method, env, this);
 }
 
 as_value
@@ -1199,7 +1199,7 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0)
 	std::auto_ptr< std::vector<as_value> > args ( new std::vector<as_value> );
 	args->push_back(arg0);
 
-	return call_method(method, &env, this, args);
+	return call_method(method, env, this, args);
 }
 
 as_value
@@ -1219,7 +1219,7 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0,
 	args->push_back(arg0);
 	args->push_back(arg1);
 
-	return call_method(method, &env, this, args);
+	return call_method(method, env, this, args);
 }
 
 as_value
@@ -1241,7 +1241,7 @@ as_object::callMethod(string_table::key methodName,
 	args->push_back(arg1);
 	args->push_back(arg2);
 
-	ret = call_method(method, &env, this, args);
+	ret = call_method(method, env, this, args);
 
 	return ret;
 }
@@ -1265,7 +1265,7 @@ as_object::callMethod(string_table::key methodName, const as_value& arg0,
 	args->push_back(arg2);
 	args->push_back(arg3);
 
-	return call_method(method, &env, this, args);
+	return call_method(method, env, this, args);
 
 }
 
