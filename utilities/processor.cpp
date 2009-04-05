@@ -501,8 +501,7 @@ play_movie(const std::string& filename, const RunInfo& runInfo)
     mi->setVariables(flashVars); // set the variables passed as -P FlashVars
 
     m.setRootMovie( mi.release() );
-    if ( quitrequested )  // setRootMovie would execute actions in first frame
-    {
+    if (quitrequested) { // setRootMovie would execute actions in first frame
         quitrequested = false;
         return md;
     }
