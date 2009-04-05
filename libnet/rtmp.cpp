@@ -324,7 +324,8 @@ RTMP::decodeHeader(boost::uint8_t *in)
     }
 
     log_debug("RTMP %s: channel: %d, header_size %d, bodysize: %d",
- 	      content_str[head->type], head->channel, head->head_size, head->bodysize);
+  	      ((head->head_size == 1) ? "same" : content_str[head->type]),
+	      head->channel, head->head_size, head->bodysize);
 
     if (head->head_size == 12) {
         head->src_dest = *(reinterpret_cast<RTMPMsg::rtmp_source_e *>(tmpptr));
