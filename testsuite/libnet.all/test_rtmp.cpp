@@ -603,7 +603,7 @@ test_results()
 //   63 74 2e 53 75 63 63 65    73 73 00 00 c3 09          ct.Success....
     boost::shared_ptr<amf::Buffer> hex2(new Buffer("02 00 07 5f 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 15 43 6f 6e 6e 65 63 74 69 6f 6e 20 73 75 63 63 65 65 64 65 64 2e 00 04 63 6f 64 65 02 00 1d 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 53 75 63 63 65 73 73 00 00 09"));
 
-    RTMPMsg *msg1 = rtmp.decodeMsgBody(*hex2);
+    boost::shared_ptr<RTMPMsg> msg1 = rtmp.decodeMsgBody(*hex2);
     if (msg1) {
         std::vector<boost::shared_ptr<amf::Element> > hell = msg1->getElements();
         std::vector<boost::shared_ptr<amf::Element> > props = hell[0]->getProperties();        
@@ -620,7 +620,6 @@ test_results()
     } else {
         runtest.untested("Decoded RTMP Result(NC_CONNECT_SUCCESS) message");
     }
-    delete msg1;
 
 #if 0
     RTMPServer rtmpserv;
@@ -635,7 +634,7 @@ test_results()
 #endif
     
     boost::shared_ptr<amf::Buffer> hex3(new Buffer("02 00 07 5f 72 65 73 75 6c 74 00 3f f0 00 00 00 00 00 00 05 03 00 0b 61 70 70 6c 69 63 61 74 69 6f 6e 05 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 00 00 04 63 6f 64 65 02 00 1c 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 46 61 69 6c 65 64 00 00 09"));
-    RTMPMsg *msg2 = rtmp.decodeMsgBody(*hex3);
+    boost::shared_ptr<RTMPMsg> msg2 = rtmp.decodeMsgBody(*hex3);
     std::vector<boost::shared_ptr<amf::Element> > hell = msg2->getElements();
     std::vector<boost::shared_ptr<amf::Element> > props = hell[0]->getProperties();        
 //     printf("FIXME: %d, %d, %s:%s\n", props.size(), msg1->getStatus(),
@@ -653,8 +652,6 @@ test_results()
         runtest.untested("Decoded RTMP result(NC_CONNECT_FAILED(as result)");
     }
 
-    delete msg2;
-    
 //     Buffer hex4 = "43 00 00 00 00 00 48 14 02 00 06 5f 65 72 72 6f 72 00 40 00 00 00 00 00 00 00 05 03 00 04 63 6f 64 65 02 00 19 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 61 6c 6c 2e 46 61 69 6c 65 64 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 00 09";
 //     if ((memcmp(hex4->reference(), buf4->reference(), hex4->size()) == 0)) {
 //         runtest.pass("Encoded RTMP result(NC_CONNECT_FAILED(as result)");
@@ -675,7 +672,7 @@ test_results()
 //     clientid
 //         dsLgYohb
     boost::shared_ptr<amf::Buffer> hex4(new Buffer("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 52 65 73 65 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 2a 50 6c 61 79 69 6e 67 20 61 6e 64 20 72 65 73 65 74 74 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09"));
-    RTMPMsg *msg4 = rtmp.decodeMsgBody(*hex4);
+    boost::shared_ptr<RTMPMsg> msg4 = rtmp.decodeMsgBody(*hex4);
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg4->getStatus() ==  RTMPMsg::NS_PLAY_RESET)
         && (msg4->getMethodName() == "onStatus")
@@ -685,14 +682,13 @@ test_results()
     } else {
         runtest.fail("Encoded/Decoded RTMP onStatus(Play Reset)");
     }
-    delete msg4;
     
 // onStatus
 // code
 //     NetStream
 // Data.Start
     boost::shared_ptr<amf::Buffer> hex5(new Buffer("02 00 08 6f 6e 53 74 61 74 75 73 03 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 44 61 74 61 2e 53 74 61 72 74 00 00 09"));
-    RTMPMsg *msg5 = rtmp.decodeMsgBody(*hex5);
+    boost::shared_ptr<RTMPMsg> msg5 = rtmp.decodeMsgBody(*hex5);
     if ((msg5->getStatus() ==  RTMPMsg::NS_DATA_START)
         && (msg5->getMethodName() == "onStatus")
         && (msg5->getStreamID() == -1)
@@ -701,7 +697,6 @@ test_results()
     } else {
         runtest.fail("Encoded/Decoded RTMP onStatus(Data Start)");
     }
-    delete msg5;
 
 // onStatus
 //     level
@@ -713,7 +708,7 @@ test_results()
 //     details
 //         PD_English_Low@20..clientid...dsLgYohb.
     boost::shared_ptr<amf::Buffer> hex6(new Buffer("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 14 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 53 74 61 72 74 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 24 53 74 61 72 74 65 64 20 70 6c 61 79 69 6e 67 20 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 2e 00 07 64 65 74 61 69 6c 73 02 00 13 50 44 5f 45 6e 67 6c 69 73 68 5f 4c 6f 77 40 32 30 30 31 00 08 63 6c 69 65 6e 74 69 64 02 00 08 64 73 4c 67 59 6f 68 62 00 00 09"));
-    RTMPMsg *msg6 = rtmp.decodeMsgBody(*hex6);
+    boost::shared_ptr<RTMPMsg> msg6 = rtmp.decodeMsgBody(*hex6);
     if ((msg6->getStatus() ==  RTMPMsg::NS_PLAY_START)
         && (msg6->getMethodName() == "onStatus")
         && (msg6->getStreamID() == 0)
@@ -722,11 +717,10 @@ test_results()
     } else {
         runtest.fail("Encoded/Decoded RTMP onStatus(Play Start)");
     }
-    delete msg6;
 
 // ..............._error.?......... ..level...error..code...NetConnection.Connect.Rejected..description..A[ Server.Reject ] : Virtual host _defa.ultVHost_ is not available....
     boost::shared_ptr<amf::Buffer> hex7(new Buffer("02 00 06 5f 65 72 72 6f 72 00 3f f0 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 04 63 6f 64 65 02 00 1e 4e 65 74 43 6f 6e 6e 65 63 74 69 6f 6e 2e 43 6f 6e 6e 65 63 74 2e 52 65 6a 65 63 74 65 64 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 41 5b 20 53 65 72 76 65 72 2e 52 65 6a 65 63 74 20 5d 20 3a 20 56 69 72 74 75 61 6c 20 68 6f 73 74 20 5f 64 65 66 61 c3 75 6c 74 56 48 6f 73 74 5f 20 69 73 20 6e 6f 74 20 61 76 61 69 6c 61 62 6c 65 2e 00 00 09"));
-    RTMPMsg *msg7 = rtmp.decodeMsgBody(*hex7);
+    boost::shared_ptr<RTMPMsg> msg7 = rtmp.decodeMsgBody(*hex7);
     if ((msg7->getStatus() ==  RTMPMsg::NC_CONNECT_REJECTED)
         && (msg7->getMethodName() == "_error")
         && (msg7->size() >= 1)) {
@@ -734,11 +728,10 @@ test_results()
     } else {
         runtest.fail("Decoded RTMP _error(NC_CONNECT_REJECTED)");
     }
-    delete msg7;
 
 //.onStatus.............level...error..code...NetStream.Play.StreamNotFound..description..6Failed to play gate06_tablan_bcueu_; .stream not found...details...gate06_tablan_bcueu_..clientid.A.;..
     boost::shared_ptr<amf::Buffer> hex8(new Buffer("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 05 65 72 72 6f 72 00 04 63 6f 64 65 02 00 1d 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 53 74 72 65 61 6d 4e 6f 74 46 6f 75 6e 64 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 36 46 61 69 6c 65 64 20 74 6f 20 70 6c 61 79 20 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 3b 20 c4 73 74 72 65 61 6d 20 6e 6f 74 20 66 6f 75 6e 64 2e 00 07 64 65 74 61 69 6c 73 02 00 14 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 00 08 63 6c 69 65 6e 74 69 64 00 41 d8 3b b4 e4 00 00 00 00 00 09"));
-    RTMPMsg *msg8 = rtmp.decodeMsgBody(*hex8);
+    boost::shared_ptr<RTMPMsg> msg8 = rtmp.decodeMsgBody(*hex8);
 //    msg4->dump();
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg8->getStatus() ==  RTMPMsg::NS_PLAY_STREAMNOTFOUND)
@@ -748,12 +741,11 @@ test_results()
     } else {
         runtest.fail("Encoded/Decoded RTMP onStatus(Play Stream Not Found)");
     }
-    delete msg8;
 
 
 //.....onStatus.............level...status..code...NetStream.Play.Stop..description..%Stopped playing gate06_tablan_bcueu_...details....gate06_tablan_bcueu_..clientid.A.;.......reason......     
     boost::shared_ptr<amf::Buffer> hex9(new Buffer("02 00 08 6f 6e 53 74 61 74 75 73 00 00 00 00 00 00 00 00 00 05 03 00 05 6c 65 76 65 6c 02 00 06 73 74 61 74 75 73 00 04 63 6f 64 65 02 00 13 4e 65 74 53 74 72 65 61 6d 2e 50 6c 61 79 2e 53 74 6f 70 00 0b 64 65 73 63 72 69 70 74 69 6f 6e 02 00 25 53 74 6f 70 70 65 64 20 70 6c 61 79 69 6e 67 20 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 2e 00 07 64 65 74 61 69 6c 73 c4 02 00 14 67 61 74 65 30 36 5f 74 61 62 6c 61 6e 5f 62 63 75 65 75 5f 00 08 63 6c 69 65 6e 74 69 64 00 41 d8 3b b4 e4 00 00 00 00 06 72 65 61 73 6f 6e 02 00 00 00 00 09"));
-    RTMPMsg *msg9 = rtmp.decodeMsgBody(*hex9);
+    boost::shared_ptr<RTMPMsg> msg9 = rtmp.decodeMsgBody(*hex9);
 //    msg4->dump();
 //    std::vector<amf::Element *> hell4 = msg4->getElements();
     if ((msg9->getStatus() ==  RTMPMsg::NS_PLAY_STOP)
@@ -763,7 +755,6 @@ test_results()
     } else {
         runtest.fail("Encoded/Decoded RTMP onStatus(Play Stream Stop)");
     }
-    delete msg9;
 }
 
 void
