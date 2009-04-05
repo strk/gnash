@@ -445,7 +445,7 @@ public:
 
 	virtual const std::string& getDescriptiveMetadata() const
 	{
-	    static const std::string s("");
+	    static const std::string s;
 	    return s;
 	}	
 
