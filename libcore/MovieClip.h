@@ -224,15 +224,8 @@ public:
     // delegates to movie_root (possibly wrong)
     virtual float get_background_alpha() const;
 
-    // delegates to movie_root 
-    //virtual void get_mouse_state(int& x, int& y, int& buttons);
-
     // delegates to movie_root (possibly wrong)
-    void    set_background_color(const rgba& color);
-
-    //float get_timer() const;
-
-    void restart();
+    void set_background_color(const rgba& color);
 
     bool has_looped() const
     {
@@ -272,8 +265,6 @@ public:
     }
 
     virtual void advance();
-
-    void advance_sprite();
 
     /// Set the sprite state at the specified frame number.
     //
@@ -328,10 +319,9 @@ public:
 
     /// Look up the labeled frame, and jump to it.
     bool goto_labeled_frame(const std::string& label);
-
         
     /// Display (render?) this Sprite/MovieClip, unless invisible
-    void    display();
+    void display();
     
     void omit_display();
 
@@ -361,7 +351,8 @@ public:
     /// and places it on the stage at the given depth.
     ///
     /// If the specified depth is already occupied, it results a no-ops.
-    /// Otherwise, a new DisplayObject will be created and onload handler will be triggerred.
+    /// Otherwise, a new DisplayObject will be created and onload handler
+    /// will be triggerred.
     ///
     /// @param tag
     ///     A swf defined placement tag (PlaceObject, or PlaceObject2,
@@ -408,9 +399,8 @@ public:
     /// if false, the transformation SWFMatrix of the new DisplayObject will
     /// be untouched.
     ///
-    void replace_display_object(DisplayObject* ch,  int depth,
-        bool use_old_cxform,
-        bool use_old_matrix);
+    void replace_display_object(DisplayObject* ch, int depth,
+        bool use_old_cxform, bool use_old_matrix);
 
 
     /// \brief
@@ -983,6 +973,11 @@ private:
     bool _lockroot;
 
 protected:
+
+    /// Used both by this class and movie_instance.
+    //
+    /// TODO: do this with proper Sprite -> MovieClip inheritance.
+    void advance_sprite();
 
     void placeDisplayObject(DisplayObject* ch, int depth)  
     {       

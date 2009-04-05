@@ -61,7 +61,6 @@ public:
 		OVER_UP = FLAG_OVER,
 		OUT_DOWN = FLAG_DOWN
 	};
-	int	m_last_mouse_flags, m_mouse_flags;
 
 	enum MouseState
 	{
@@ -71,13 +70,11 @@ public:
 		HIT
 	};
 
-	static const char* mouseStateName(MouseState s);
-
-	MouseState m_mouse_state;
-
 	Button(SWF::DefineButtonTag& def, DisplayObject* parent, int id);
 
 	~Button();
+	
+    static const char* mouseStateName(MouseState s);
 
     /// Initialize the global Button class
     static void init(as_object& global);
@@ -90,8 +87,6 @@ public:
 
 	// called from keypress listener only
 	bool on_event(const event_id& id);
-
-	void restart();
 
 	void display();
 	
@@ -166,6 +161,10 @@ protected:
 
 private:
 
+	int	m_last_mouse_flags, m_mouse_flags;
+
+	MouseState m_mouse_state;
+    
     SWF::DefineButtonTag& _def;
 
 	DisplayObjects _stateCharacters;
