@@ -122,7 +122,6 @@ libgnashcore_la_SOURCES = \
 noinst_HEADERS = \
 	Property.h \
 	PropertyList.h \
-	Sprite.h \
 	StreamProvider.h \
 	StringPredicates.h \
 	URLAccessManager.h \
