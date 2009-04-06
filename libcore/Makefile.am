@@ -61,6 +61,7 @@ libgnashcore_la_SOURCES = \
 	DisplayObject.cpp \
 	CharacterProxy.cpp \
 	cxform.cpp \
+	Geometry.cpp \
 	DynamicShape.cpp	\
 	Bitmap.cpp \
 	Shape.cpp \

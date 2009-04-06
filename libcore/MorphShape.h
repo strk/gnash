@@ -20,6 +20,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
+#include "Geometry.h"
 #include "morph2_character_def.h"
 #include <cassert>
 
@@ -37,7 +38,7 @@ public:
     
     typedef std::vector<fill_style> FillStyles;
     typedef std::vector<line_style> LineStyles;
-    typedef std::vector<path> Paths;
+    typedef std::vector<Path> Paths;
 
     MorphShape(morph_character_def* def, DisplayObject* parent, int id);
 

@@ -146,7 +146,7 @@ Bitmap::finalize()
     const size_t fillLeft = _shapeDef->add_fill_style(fill);
 
 
-    path bmpath(w, h, fillLeft, 0, 0, false);
+    Path bmpath(w, h, fillLeft, 0, 0, false);
     bmpath.drawLineTo(w, 0);
     bmpath.drawLineTo(0, 0);
     bmpath.drawLineTo(0, h);

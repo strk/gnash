@@ -184,7 +184,7 @@ class AlphaMask;
 typedef std::vector<agg::path_storage> AggPaths;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
 typedef std::vector<AlphaMask*> AlphaMasks;
-typedef std::vector<path> GnashPaths;
+typedef std::vector<Path> GnashPaths;
 
 template <class Rasterizer>
 inline void applyClipBox(Rasterizer& ras, const geometry::Range2d<int>& bounds)
@@ -212,7 +212,7 @@ analyzePaths(const GnashPaths &paths, bool& have_shape,
 
     for (int pno=0; pno<pcount; ++pno) {
 
-        const path &the_path = paths[pno];
+        const Path &the_path = paths[pno];
 
         if ((the_path.m_fill0 > 0) || (the_path.m_fill1 > 0)) {
             have_shape = true;
@@ -236,9 +236,9 @@ public:
         _shift(shift)
     {}
 
-    void operator()(const edge& edge)
+    void operator()(const Edge& edge)
     {
-        if (edge.is_straight()) {
+        if (edge.straight()) {
             _path.line_to(twipsToPixels(edge.ap.x) + _shift, 
                           twipsToPixels(edge.ap.y) + _shift);
         }
@@ -268,7 +268,7 @@ public:
     {
     }
 
-    void operator()(const path& in)
+    void operator()(const Path& in)
     {
         agg::path_storage& p = *_it;
 
@@ -981,7 +981,7 @@ public:
         const std::vector<line_style>& line_styles = def.lineStyles();
         const SWFMatrix& mat = inst.getWorldMatrix();
         const cxform& cx = inst.get_world_cxform();
-        const std::vector<path>& paths = def.paths();
+        const std::vector<Path>& paths = def.paths();
         
         // select ranges
         select_clipbounds(def.get_bound(), mat);
@@ -996,7 +996,7 @@ public:
         const std::vector<line_style>& line_styles = inst.lineStyles();
         const SWFMatrix& mat = inst.getWorldMatrix();
         const cxform& cx = inst.get_world_cxform();
-        const std::vector<path>& paths = inst.paths();
+        const std::vector<Path>& paths = inst.paths();
 
         // select ranges
         select_clipbounds(inst.getBounds(), mat);
@@ -1007,7 +1007,7 @@ public:
 
     void drawShape(const std::vector<fill_style>& fill_styles,
         const std::vector<line_style>& line_styles,
-        const std::vector<path>& objpaths, const SWFMatrix& mat,
+        const std::vector<Path>& objpaths, const SWFMatrix& mat,
         const cxform& cx)
     {
 
@@ -1092,7 +1092,7 @@ public:
 
         /// Transform all the paths using the matrix.
         std::for_each(paths_out.begin(), paths_out.end(), 
-                boost::bind(&path::transform, _1, mat));
+                boost::bind(&Path::transform, _1, mat));
     } 
 
 
@@ -1106,7 +1106,7 @@ public:
     const size_t pcnt = path_in.size();
     
     for (size_t pno=0; pno<pcnt; ++pno) {
-      const path& this_path = path_in[pno];
+      const Path& this_path = path_in[pno];
       
       if (this_path.m_new_shape)
         sscount++;
@@ -1144,7 +1144,7 @@ public:
     
     for (size_t pno=0; pno<pcount; ++pno) {
       
-      const path& this_path = paths[pno];
+      const Path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
       bool hinting=false, closed=false, hairline=false;
@@ -1171,16 +1171,16 @@ public:
 
       // avoid extra edge when doing implicit close later
       if (closed && ecount && 
-        this_path.m_edges.back().is_straight()) --ecount;  
+        this_path.m_edges.back().straight()) --ecount;  
       
       for (size_t eno=0; eno<ecount; ++eno) {
         
-        const edge& this_edge = this_path.m_edges[eno];
+        const Edge& this_edge = this_path.m_edges[eno];
         
         float this_ax = twipsToPixels(this_edge.ap.x);  
         float this_ay = twipsToPixels(this_edge.ap.y);  
         
-        if (hinting || this_edge.is_straight()) {
+        if (hinting || this_edge.straight()) {
         
           // candidate for alignment?
           bool align_x = hinting || (hairline && (prev_ax == this_ax));
@@ -1488,7 +1488,7 @@ public:
   
       for (size_t pno=0; pno<pcount; ++pno) {
           
-        const path &this_path_gnash = paths[pno];
+        const Path &this_path_gnash = paths[pno];
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);
         
@@ -1528,7 +1528,7 @@ public:
 
   // very similar to draw_shape but used for generating masks. There are no
   // fill styles nor subshapes and such. Just render plain solid shapes.
-  void draw_mask_shape(const GnashPaths &paths, bool even_odd)
+  void draw_mask_shape(const GnashPaths& paths, bool even_odd)
   {
 
     const AlphaMasks::size_type mask_count = _alphaMasks.size();
@@ -1561,7 +1561,7 @@ public:
   
   
   template <class scanline_type>
-  void draw_mask_shape_impl(const GnashPaths &paths, bool even_odd,
+  void draw_mask_shape_impl(const GnashPaths& paths, bool even_odd,
     scanline_type& sl) {
     
     typedef agg::pixfmt_gray8 pixfmt;
@@ -1703,7 +1703,7 @@ public:
 
       for (size_t pno=0, pcount=paths.size(); pno<pcount; ++pno) {
 
-        const path& this_path_gnash = paths[pno];
+        const Path& this_path_gnash = paths[pno];
 
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);

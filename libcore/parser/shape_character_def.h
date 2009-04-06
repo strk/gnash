@@ -39,21 +39,13 @@ public:
 
     typedef std::vector<fill_style> FillStyles;
     typedef std::vector<line_style> LineStyles;
-    typedef std::vector<path> Paths;
+    typedef std::vector<Path> Paths;
 
     shape_character_def();
     virtual ~shape_character_def() {};
 
     // This is currently used for non-Shape objects (e.g. Bitmap)
     virtual void display(const DisplayObject& inst);
-
-    /// Return true if the specified point is on the interior of our shape.
-    //
-    /// Incoming coords are local coords (twips).
-    /// The SWFMatrix will be used for lines with non-scalable strokes.
-    ///
-    virtual bool point_test_local(boost::int32_t x, boost::int32_t y,
-            const SWFMatrix& wm);
 
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 	

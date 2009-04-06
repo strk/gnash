@@ -29,7 +29,20 @@ Shape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
     SWFMatrix wm_inverse = wm.invert();
     point lp(x, y);
     wm_inverse.transform(lp);
-    return _def->point_test_local(lp.x, lp.y, wm);
+    
+    // FIXME: if the shape contains non-scaled strokes
+    //        we can't rely on boundary itself for a quick
+    //        way out. Bounds supposedly already include
+    //        thickness, so we might keep a flag telling us
+    //        whether *non_scaled* strokes are present
+    //        and if not still use the boundary check.
+    // NOTE: just skipping this test breaks a corner-case
+    //       in DrawingApiTest (kind of a fill-leakage making
+    //       the collision detection find you inside a self-crossing
+    //       shape).
+    if (_def->get_bound().point_test(x, y)) return false;
+    return geometry::pointTestLocal(_def->paths(), _def->lineStyles(),
+            lp.x, lp.y, wm);
 }
 
 void  

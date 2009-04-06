@@ -20,6 +20,7 @@
 #include "MorphShape.h"
 #include "GnashNumeric.h"
 #include "fill_style.h"
+#include "Geometry.h"
 
 namespace gnash
 {
@@ -77,9 +78,9 @@ public:
     /// next call to this function will return first
     /// edge again.
     ///
-    const edge& getNextEdge()
+    const Edge& getNextEdge()
     {
-        const edge& ret = _paths[_currpath][_curredge];
+        const Edge& ret = _paths[_currpath][_curredge];
         if ( ++_curredge >= _paths[_currpath].size() )
         {
             if ( ++_currpath >= _paths.size() )
@@ -152,8 +153,20 @@ MorphShape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
     SWFMatrix wm_inverse = wm.invert();
     point lp(x, y);
     wm_inverse.transform(lp);
-    return true;
-    //return _def->point_test_local(lp.x, lp.y, wm);
+    
+    // FIXME: if the shape contains non-scaled strokes
+    //        we can't rely on boundary itself for a quick
+    //        way out. Bounds supposedly already include
+    //        thickness, so we might keep a flag telling us
+    //        whether *non_scaled* strokes are present
+    //        and if not still use the boundary check.
+    // NOTE: just skipping this test breaks a corner-case
+    //       in DrawingApiTest (kind of a fill-leakage making
+    //       the collision detection find you inside a self-crossing
+    //       shape).
+    if (!_bounds.point_test(x, y)) return false;
+
+    return geometry::pointTestLocal(_paths, _lineStyles, lp.x, lp.y, wm);
 }
 
 void  
@@ -192,17 +205,17 @@ MorphShape::advance()
     // This is used for cases in which number
     // of paths in start shape and end shape are not
     // the same.
-    path empty_path;
-    edge empty_edge;
+    const Path empty_path;
+    const Edge empty_edge;
 
     // shape
     const Paths& paths1 = shape1.paths();
     const Paths& paths2 = shape2.paths();
     for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++)
     {
-        path& p = _paths[i];
-        const path& p1 = i < paths1.size() ? paths1[i] : empty_path;
-        const path& p2 = n < paths2.size() ? paths2[n] : empty_path;
+        Path& p = _paths[i];
+        const Path& p1 = i < paths1.size() ? paths1[i] : empty_path;
+        const Path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
         const float new_ax = flerp(p1.ap.x, p2.ap.x, ratio);
         const float new_ay = flerp(p1.ap.y, p2.ap.y, ratio);
@@ -216,10 +229,10 @@ MorphShape::advance()
 
         for (size_t j=0; j < p.size(); j++)
         {
-            edge& e = p[j];
-            const edge& e1 = j < p1.size() ? p1[j] : empty_edge;
+            Edge& e = p[j];
+            const Edge& e1 = j < p1.size() ? p1[j] : empty_edge;
 
-            const edge& e2 = k < p2.size() ? p2[k] : empty_edge;
+            const Edge& e2 = k < p2.size() ? p2[k] : empty_edge;
 
             e.cp.x = static_cast<int>(flerp(e1.cp.x, e2.cp.x, ratio));
             e.cp.y = static_cast<int>(flerp(e1.cp.y, e2.cp.y, ratio));

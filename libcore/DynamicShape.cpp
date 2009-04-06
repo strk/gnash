@@ -51,7 +51,7 @@ DynamicShape::clear()
 }
 
 void
-DynamicShape::add_path(const path& pth)
+DynamicShape::add_path(const Path& pth)
 {
 	_paths.push_back(pth);
 	_currpath = &(_paths.back());
@@ -86,7 +86,7 @@ DynamicShape::beginFill(const rgba& color)
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
 	add_path(newPath);
 }
 
@@ -102,7 +102,7 @@ DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
 	add_path(newPath);
 }
 
@@ -118,7 +118,7 @@ DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
 	add_path(newPath);
 }
 
@@ -134,7 +134,7 @@ DynamicShape::startNewPath(bool newShape)
 
 	// A quick test shows that *left* always work fine !
 	// More than that, using a *right* fill seems to break the tests !
-	path newPath(_x, _y, _currfill, 0, _currline, newShape);
+	Path newPath(_x, _y, _currfill, 0, _currline, newShape);
 	add_path(newPath);
 }
 

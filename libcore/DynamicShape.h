@@ -143,7 +143,7 @@ public:
             const SWFMatrix& wm)
 	{
 		finalize();
-		return shape_character_def::point_test_local(x, y, wm);
+		return geometry::pointTestLocal(_paths, _line_styles, x, y, wm);
 	}
 
 	/// Add a path, updating _currpath and recomputing bounds
@@ -152,7 +152,7 @@ public:
 	///       It needs this function unless we provide a mean to add a
 	///	  Bitmap-Filled path	
 	///
-	void add_path(const path& pth);
+	void add_path(const Path& pth);
 
 	/// Always call this function before displaying !
 	//
@@ -173,7 +173,7 @@ private:
 	///
 	void startNewPath(bool newShape);
 
-	path* _currpath;
+	Path* _currpath;
 
 	size_t _currfill;
 
