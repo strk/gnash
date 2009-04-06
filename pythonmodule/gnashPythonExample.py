@@ -104,12 +104,12 @@ player.pressKey(65)
 # Move the pointer to the specified co-ordinates. Returns true if the
 # action requires a redraw.
 if player.movePointer(10,20):
-    render(False)
+    player.render(False)
 
 # Click the mouse at the current pointer position. True if the action
 # requires a redraw.
 if player.mouseClick():
-    render(False)
+    player.render(False)
 
 
 
