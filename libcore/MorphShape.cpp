@@ -138,6 +138,7 @@ void
 MorphShape::stagePlacementCallback(as_object* initObj)
 {
     assert(!initObj);
+    if (get_ratio()) morph();
     _vm.getRoot().addLiveChar(this);
 }
 
@@ -171,11 +172,14 @@ MorphShape::display()
     clear_invalidated();
 }
 
-void
-MorphShape::advance()
-{
+rect
+MorphShape::getBounds() const {
+    return _bounds;
+}
 
-    set_invalidated();
+void
+MorphShape::morph()
+{
     
     const double ratio = get_ratio() / 65535.0;
 
@@ -243,6 +247,13 @@ MorphShape::advance()
             }
         }
     }
+}
+
+void
+MorphShape::advance()
+{
+    set_invalidated();
+    morph();
 }
 
 } // namespace gnash

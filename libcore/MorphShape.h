@@ -46,12 +46,10 @@ public:
 
 	virtual void display();
 
-    virtual rect getBounds() const {
-        return _bounds;
-    }
+    virtual rect getBounds() const;
     
     virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
-
+    
     /// Advances the morphing process.
     virtual void advance();
     
@@ -81,6 +79,8 @@ protected:
 
 private:
     
+    void morph();
+
     const boost::intrusive_ptr<morph_character_def> _def;
 	
     FillStyles _fillStyles;
