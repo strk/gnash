@@ -63,7 +63,7 @@ Bitmap::display()
 {
     assert(_shapeDef);
 
-    _shapeDef->display(this);
+    _shapeDef->display(*this);
 
     clear_invalidated();
 }

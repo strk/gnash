@@ -35,7 +35,7 @@ Shape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 void  
 Shape::display()
 {
-    _def->display(this); // pass in transform info
+    _def->display(*this); // pass in transform info
     clear_invalidated();
 }
 

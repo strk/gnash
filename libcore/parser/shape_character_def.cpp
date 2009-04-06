@@ -539,10 +539,10 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
 }
 
 void
-shape_character_def::display(DisplayObject* inst)
+shape_character_def::display(const DisplayObject& inst)
 {
     // Draw the shape using our own inherent styles.
-    render::drawShape(this, inst);
+    render::drawShape(*this, inst);
 }
 
 

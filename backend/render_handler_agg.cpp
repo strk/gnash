@@ -872,7 +872,7 @@ public:
         // Why would we want to do this?
         //select_all_clipbounds();  
     } 
-    else select_clipbounds(def, mat);
+    else select_clipbounds(def->get_bound(), mat);
     
     if (_clipbounds_selected.empty()) return; 
       
@@ -910,18 +910,16 @@ public:
   /// rendering of characters outside a particular clipping range.
   /// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
   /// *must* be initialized prior to using those function.
-  void select_clipbounds(const shape_character_def *def, 
-    const SWFMatrix& source_mat) {
+  void select_clipbounds(const rect& objectBounds, const SWFMatrix& source_mat)
+  {
     
     SWFMatrix mat = stage_matrix;
     mat.concatenate(source_mat);
   
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
-    
-    const rect& ch_bounds = def->get_bound();
 
-    if (ch_bounds.is_null()) {
+    if (objectBounds.is_null()) {
       log_debug(_("Warning: select_clipbounds encountered a character "
                   "definition with null bounds"));
       return;
@@ -929,7 +927,7 @@ public:
 
     rect bounds;    
     bounds.set_null();
-    bounds.expand_to_transformed_rect(mat, ch_bounds);
+    bounds.expand_to_transformed_rect(mat, objectBounds);
     
     const geometry::Range2d<float>& range_float = bounds.getRange();
     
@@ -965,101 +963,65 @@ public:
       _clipbounds_selected.push_back(&(*i));
     }
   }
-  
-  void drawShape(const shape_character_def& def, const Shape& inst) {}
-    
-  void drawMorph(const morph_character_def& def, const MorphShape& inst)
-  {
-    const std::vector<fill_style>& fill_styles = inst.fillStyles();
-    const std::vector<line_style>& line_styles = inst.lineStyles();
-    const SWFMatrix& mat = inst.getWorldMatrix();
-    const cxform& cx = inst.get_world_cxform();
 
-    bool have_shape, have_outline;
-
-    analyzePaths(inst.paths(), have_shape, have_outline);
-
-    if (!have_shape && !have_outline) {
-        // Early return for invisible character.
-        return; 
-    }    
-
-    GnashPaths paths;
-    apply_matrix_to_path(inst.paths(), paths, mat);
-
-    // Masks apparently do not use agg_paths, so return
-    // early
-    if (m_drawing_mask) {
-
-        // Shape is drawn inside a mask, skip sub-shapes handling and
-        // outlines
-        draw_mask_shape(paths, false); 
-        return;
-    }
-
-    AggPaths agg_paths;  
-    AggPaths agg_paths_rounded;  
-
-    // Flash only aligns outlines. Probably this is done at rendering
-    // level.
-    if (have_outline) {
-        buildPaths_rounded(agg_paths_rounded, paths, line_styles);   
-    }
-
-    if (have_shape) {
-        buildPaths(agg_paths, paths);
-    }
-    
-    // select ranges
-    //select_clipbounds(def, mat);
-
-    select_all_clipbounds();
-
-    if (_clipbounds_selected.empty()) {
-        log_debug(_("Warning: AGG renderer skipping a whole character"));
-        return; 
-    }
-
-    // prepare fill styles
-    agg_style_handler sh;
-    if (have_shape) build_agg_styles(sh, fill_styles, mat, cx);
-
-    // We need to separate sub-shapes during rendering. 
-    const unsigned int subshape_count = count_sub_shapes(paths);
-
-    for (unsigned int subshape=0; subshape<subshape_count; ++subshape)
+    void drawShape(const shape_character_def& def, const DisplayObject& inst)
     {
-        if (have_shape) {
-            draw_shape(subshape, paths, agg_paths, sh, true);    
-        }
-        if (have_outline)      {
-            draw_outlines(subshape, paths, agg_paths_rounded,
-                    line_styles, cx, mat);
-        }
+        // check if the character needs to be rendered at all
+        rect cur_bounds;
+
+        cur_bounds.expand_to_transformed_rect(inst.getWorldMatrix(), 
+                def.get_bound());
+                
+        if (!render_handler::bounds_in_clipping_area(cur_bounds))
+        {
+            return; // no need to draw
+        }        
+        
+        const std::vector<fill_style>& fill_styles = def.fillStyles();
+        const std::vector<line_style>& line_styles = def.lineStyles();
+        const SWFMatrix& mat = inst.getWorldMatrix();
+        const cxform& cx = inst.get_world_cxform();
+        const std::vector<path>& paths = def.paths();
+        
+        // select ranges
+        select_clipbounds(def.get_bound(), mat);
+
+        // render the DisplayObject's shape.
+        drawShape(fill_styles, line_styles, paths, mat, cx);
+    }
+    
+    void drawMorph(const morph_character_def& def, const MorphShape& inst)
+    {
+        const std::vector<fill_style>& fill_styles = inst.fillStyles();
+        const std::vector<line_style>& line_styles = inst.lineStyles();
+        const SWFMatrix& mat = inst.getWorldMatrix();
+        const cxform& cx = inst.get_world_cxform();
+        const std::vector<path>& paths = inst.paths();
+
+        // select ranges
+        select_clipbounds(inst.getBounds(), mat);
+
+        // Render the morph's current shape.
+        drawShape(fill_styles, line_styles, paths, mat, cx);
     }
 
-    // Clear selected clipbounds to ease debugging 
-    _clipbounds_selected.clear();
-  }
-
-
-    void drawShape(shape_character_def *def, 
-    const SWFMatrix& mat, const cxform& cx)
+    void drawShape(const std::vector<fill_style>& fill_styles,
+        const std::vector<line_style>& line_styles,
+        const std::vector<path>& objpaths, const SWFMatrix& mat,
+        const cxform& cx)
     {
-    
-        const std::vector<fill_style>& fill_styles = def->fillStyles();
-        const std::vector<line_style>& line_styles = def->lineStyles();
+
         bool have_shape, have_outline;
 
-        analyzePaths(def->paths(), have_shape, have_outline);
+        analyzePaths(objpaths, have_shape, have_outline);
 
         if (!have_shape && !have_outline) {
             // Early return for invisible character.
             return; 
-        }    
+        }        
 
         GnashPaths paths;
-        apply_matrix_to_path(def->paths(), paths, mat);
+        apply_matrix_to_path(objpaths, paths, mat);
 
         // Masks apparently do not use agg_paths, so return
         // early
@@ -1071,21 +1033,19 @@ public:
             return;
         }
 
-        AggPaths agg_paths;  
-        AggPaths agg_paths_rounded;  
+        AggPaths agg_paths;    
+        AggPaths agg_paths_rounded;    
 
         // Flash only aligns outlines. Probably this is done at rendering
         // level.
         if (have_outline) {
-            buildPaths_rounded(agg_paths_rounded, paths, line_styles);   
+            buildPaths_rounded(agg_paths_rounded, paths, line_styles);     
         }
 
         if (have_shape) {
             buildPaths(agg_paths, paths);
         }
         
-        // select ranges
-        select_clipbounds(def, mat);
 
         if (_clipbounds_selected.empty()) {
             log_debug(_("Warning: AGG renderer skipping a whole character"));
@@ -1102,9 +1062,9 @@ public:
         for (unsigned int subshape=0; subshape<subshape_count; ++subshape)
         {
             if (have_shape) {
-                draw_shape(subshape, paths, agg_paths, sh, true);    
+                draw_shape(subshape, paths, agg_paths, sh, true);        
             }
-            if (have_outline)      {
+            if (have_outline)            {
                 draw_outlines(subshape, paths, agg_paths_rounded,
                         line_styles, cx, mat);
             }
@@ -1112,10 +1072,8 @@ public:
 
         // Clear selected clipbounds to ease debugging 
         _clipbounds_selected.clear();
+    }
 
-    } // drawShape
-  
-  
     /// Takes a path and translates it using the given SWFMatrix. The new path
     /// is stored in paths_out. Both paths_in and paths_out are expected to
     /// be in TWIPS.

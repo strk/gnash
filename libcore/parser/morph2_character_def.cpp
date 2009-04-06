@@ -50,7 +50,7 @@ void
 morph_character_def::display(const MorphShape& inst)
 {
     // display
-    get_render_handler()->drawMorph(*this, inst);
+    render::drawMorph(*this, inst);
 }
 
 

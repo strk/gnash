@@ -23,6 +23,7 @@
 namespace gnash {
 	class SWFStream;
 	class cxform;
+    class Shape;
 	class SWFMatrix;
 }
 
@@ -43,7 +44,8 @@ public:
     shape_character_def();
     virtual ~shape_character_def() {};
 
-    virtual void display(DisplayObject* inst);
+    // This is currently used for non-Shape objects (e.g. Bitmap)
+    virtual void display(const DisplayObject& inst);
 
     /// Return true if the specified point is on the interior of our shape.
     //

@@ -150,8 +150,18 @@ void  draw_poly(const point* corners, int corner_count, const rgba& fill,
     fill, outline, mat, masked);
 }
 
+void
+drawMorph(const morph_character_def& def, const MorphShape& inst) 
+{
+#ifdef DEBUG_RENDER_CALLS
+		GNASH_REPORT_FUNCTION;
+#endif
+		if (s_render_handler) s_render_handler->drawMorph(def, inst);
+}
 
-void drawShape(shape_character_def *def, DisplayObject *inst) 
+
+void
+drawShape(const shape_character_def& def, const DisplayObject& inst) 
 {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;

@@ -288,40 +288,8 @@ public:
         bool masked) = 0;
         
         
-    /// \brief
-    /// Draws the given character definition with the stateful properties
-    /// of the given instance.
-    //
-    /// Normally this does not need to be re-implemented in 
-    /// render handler implementations. Instead, see the version without
-    /// character instance.
-    ///
-    virtual void drawShape(shape_character_def *def, DisplayObject *inst)
-    {
-        // check if the character needs to be rendered at all
-        rect cur_bounds;
-
-        cur_bounds.expand_to_transformed_rect(inst->getWorldMatrix(), 
-                def->get_bound());
-                
-        if (!bounds_in_clipping_area(cur_bounds))
-        {
-                return; // no need to draw
-        }        
-
-        // render the character
-        drawShape(def, inst->getWorldMatrix(),
-                inst->get_world_cxform());
-    }
-    
-    /// \brief
-    /// Draws the given character definition with the given transformations and
-    /// styles. 
-    virtual void drawShape(shape_character_def *def, 
-        const SWFMatrix& mat, const cxform& cx) = 0;
- 
-    //virtual void drawShape(const shape_character_def& def,
-    //        const Shape& inst);
+    virtual void drawShape(const shape_character_def& def,
+            const DisplayObject& inst) = 0;
     
     virtual void drawMorph(const morph_character_def& def,
             const MorphShape& inst) = 0;

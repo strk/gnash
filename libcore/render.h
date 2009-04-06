@@ -79,8 +79,10 @@ namespace gnash {
 				const rgba& fill, const rgba& outline, const SWFMatrix& mat,
 				bool masked);
       
-		/// See render_handler::draw_Shape (in backend/render_handler.h)
-		void drawShape(shape_character_def *def, DisplayObject *inst);
+		void drawShape(const shape_character_def& def,
+                const DisplayObject& inst);
+		
+        void drawMorph(const morph_character_def& def, const MorphShape& inst);
       
 		/// See render_handler::draw_glyph (in backend/render_handler.h)
 		void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
