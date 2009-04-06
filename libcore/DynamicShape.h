@@ -125,8 +125,8 @@ public:
 	// Override from shape_character_def to call ::finalize
 	// NOTE: this is not correct in that a call to hitTest should
 	//       not force closing the path being drawn.
-	//       Instead, the closeup should be "temporary" and int
-	//       the point_test_local itself (but only for dynamic drawing).
+	//       Instead, the closeup should be "temporary" and in
+	//       the pointTestLocal itself (but only for dynamic drawing).
 	//       We need to add a testcase for this as we currently have none.
 	//       The testcase would look like this:
 	//
@@ -139,11 +139,11 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	bool point_test_local(boost::int32_t x, boost::int32_t y,
+	virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y,
             const SWFMatrix& wm)
 	{
 		finalize();
-		return geometry::pointTestLocal(_paths, _line_styles, x, y, wm);
+		return geometry::pointTest(_paths, _line_styles, x, y, wm);
 	}
 
 	/// Add a path, updating _currpath and recomputing bounds

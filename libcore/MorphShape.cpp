@@ -127,24 +127,11 @@ MorphShape::MorphShape(morph_character_def* def, DisplayObject* parent, int id)
     :
     DisplayObject(parent, id),
     _def(def),
-    _bounds(def->get_bound())
+    _fillStyles(_def->shape1().fillStyles()),
+    _lineStyles(_def->shape1().lineStyles()),
+    _paths(_def->shape1().paths()),
+    _bounds(def->shape1().get_bound())
 {
-    
-    const shape_character_def& shape1 = _def->shape1();
-    const FillStyles& s1Fills = shape1.fillStyles();
-
-    // setup array size
-    _fillStyles.resize(s1Fills.size());
-    FillStyles::const_iterator s1 = s1Fills.begin();
-    for (FillStyles::iterator i = _fillStyles.begin(), e = _fillStyles.end();
-            i != e; ++i, ++s1) {
-
-        i->m_gradients.resize(s1->m_gradients.size());
-    }
-
-    _lineStyles.resize(shape1.lineStyles().size());
-    _paths.resize(shape1.paths().size());
-
 }
 
 void
@@ -155,7 +142,7 @@ MorphShape::stagePlacementCallback(as_object* initObj)
 }
 
 bool
-MorphShape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
+MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
     SWFMatrix wm = getWorldMatrix();
     SWFMatrix wm_inverse = wm.invert();
@@ -172,9 +159,9 @@ MorphShape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
     //       in DrawingApiTest (kind of a fill-leakage making
     //       the collision detection find you inside a self-crossing
     //       shape).
-    if (!_bounds.point_test(x, y)) return false;
+    if (!_bounds.point_test(lp.x, lp.y)) return false;
 
-    return geometry::pointTestLocal(_paths, _lineStyles, lp.x, lp.y, wm);
+    return geometry::pointTest(_paths, _lineStyles, lp.x, lp.y, wm);
 }
 
 void  
@@ -187,6 +174,7 @@ MorphShape::display()
 void
 MorphShape::advance()
 {
+
     set_invalidated();
     
     const double ratio = get_ratio() / 65535.0;

@@ -46,6 +46,14 @@ shape_character_def::createDisplayObject(DisplayObject* parent, int id)
 {
 	return new Shape(this, parent, id);
 }
+    
+bool
+shape_character_def::pointTestLocal(boost::int32_t x, boost::int32_t y, 
+     const SWFMatrix& wm)
+{
+    return geometry::pointTest(_paths, _line_styles, x, y, wm);
+}
+
 
 // Read fill styles, and push them onto the given style array.
 static void

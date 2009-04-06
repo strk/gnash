@@ -60,20 +60,6 @@ public:
 	
 	virtual ~character_def();
 	
-   	/// Return true if the specified point is on the interior of our shape.
-	//
-	/// Point coordinates are local coords (TWIPS)
-	///
-	/// @param wm
-	///	Current world SWFMatrix of the instance we want to check.
-	///	This is needed to properly scale non-scalable strokes.
-	///
-	virtual bool point_test_local(boost::int32_t /*x*/, boost::int32_t /*y*/,
-            const SWFMatrix& /*wm*/)
-	{
-		return false;
-	}
-
 	/// Should stick the result in a boost::intrusive_ptr immediately.
 	//
 	/// default is to make a DisplayObject

@@ -569,7 +569,7 @@ public:
 namespace geometry
 {
 
-bool pointTestLocal(const std::vector<Path>& paths,
+bool pointTest(const std::vector<Path>& paths,
     const std::vector<line_style>& lineStyles, boost::int32_t x,
     boost::int32_t y, const SWFMatrix& wm);
 

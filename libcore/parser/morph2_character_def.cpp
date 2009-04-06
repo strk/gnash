@@ -110,10 +110,8 @@ void morph_character_def::read(SWFStream& in, SWF::TagType tag,
     _shape1->set_bound(bound1);
     _shape2->set_bound(bound2);
     
-    // Update bounds.
-    // TODO: is this necessary?
-    _bounds.expand_to_rect(_shape1->get_bound());
-    _bounds.expand_to_rect(_shape2->get_bound());
+    // Starting bounds are the same as shape1
+    _bounds = _shape1->get_bound();
 
     assert(_shape1->fillStyles().size() == _shape2->fillStyles().size());
     assert(_shape1->lineStyles().size() == _shape2->lineStyles().size());

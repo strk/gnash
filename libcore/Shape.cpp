@@ -40,9 +40,8 @@ Shape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
     //       in DrawingApiTest (kind of a fill-leakage making
     //       the collision detection find you inside a self-crossing
     //       shape).
-    if (_def->get_bound().point_test(x, y)) return false;
-    return geometry::pointTestLocal(_def->paths(), _def->lineStyles(),
-            lp.x, lp.y, wm);
+    if (!_def->get_bound().point_test(lp.x, lp.y)) return false;
+    return _def->pointTestLocal(lp.x, lp.y, wm);
 }
 
 void  
