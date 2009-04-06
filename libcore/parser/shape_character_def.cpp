@@ -61,8 +61,8 @@ read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
                  SWF::TagType tag, movie_definition& m)
 {
     in.ensureBytes(1);
-    boost::uint16_t  fill_style_count = in.read_u8();
-    if (tag > 2)
+    boost::uint16_t fill_style_count = in.read_u8();
+    if (tag != SWF::DEFINESHAPE)
     {
         if (fill_style_count == 0xFF)
         {
@@ -88,8 +88,8 @@ read_fill_styles(std::vector<fill_style>& styles, SWFStream& in,
 
 // Read line styles and push them onto the back of the given array.
 static void
-read_line_styles(std::vector<line_style>& styles, SWFStream& in, SWF::TagType tag,
-                 movie_definition& md)
+read_line_styles(std::vector<line_style>& styles, SWFStream& in,
+        SWF::TagType tag, movie_definition& md)
 {
     in.ensureBytes(1);
     int line_style_count = in.read_u8();
@@ -161,11 +161,6 @@ shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
         read_line_styles(_line_styles, in, tag, m);
     }
 
-    /// Adding a dummy fill style is just needed to make the
-    /// parser somewhat more robust. This fill style is not
-    /// really used, as text rendering will use style information
-    /// from TEXTRECORD tag instead.
-    ///
     if (tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 )
     {
         assert(!with_style);
