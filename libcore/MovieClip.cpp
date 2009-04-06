@@ -326,6 +326,11 @@ private:
 
 };
 
+struct AdvanceVisitor
+{
+    void operator()(DisplayObject* d) { d->advance(); }
+};
+
 /// Find the first DisplayObject whose shape contain the point
 //
 /// Point coordinates in world TWIPS
@@ -1163,6 +1168,10 @@ MovieClip::advance_sprite()
                         TAG_DLIST|TAG_ACTION);
             }
         }
+        
+        AdvanceVisitor av;
+        m_display_list.visitAll(av);
+
     }
 #ifdef GNASH_DEBUG
     else
@@ -2813,13 +2822,15 @@ MovieClip::set_play_state(play_state s)
 
 #ifdef USE_SWFTREE
 
-class MovieInfoVisitor {
+class MovieInfoVisitor
+{
 
     DisplayObject::InfoTree& _tr;
     DisplayObject::InfoTree::iterator _it;
 
 public:
-    MovieInfoVisitor(DisplayObject::InfoTree& tr, DisplayObject::InfoTree::iterator it)
+    MovieInfoVisitor(DisplayObject::InfoTree& tr,
+            DisplayObject::InfoTree::iterator it)
         :
         _tr(tr),
         _it(it)

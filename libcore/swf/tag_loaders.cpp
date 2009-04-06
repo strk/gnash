@@ -753,7 +753,7 @@ void define_shape_morph_loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("  shape_morph_loader: id = %d"), DisplayObject_id);
     );
 
-    morph2_character_def* morph = new morph2_character_def;
+    morph_character_def* morph = new morph_character_def;
     morph->read(in, tag, m);
     m.addDisplayObject(DisplayObject_id, morph);
 }

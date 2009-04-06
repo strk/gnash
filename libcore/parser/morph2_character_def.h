@@ -7,21 +7,27 @@
 #define GNASH_MORPH2_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "shape_character_def.h" // for inheritance of morph2_character_def
+#include "shape_character_def.h" 
 #include "swf.h"
+
+// Forward declarations.
+namespace gnash {
+    class SWFStream;
+    class MorphShape;
+}
 
 namespace gnash {
 
-class SWFStream;
-
 /// DefineMorphShape tag
 //
-class morph2_character_def : public shape_character_def
+class morph_character_def : public character_def
 {
 public:
-    morph2_character_def();
-    virtual ~morph2_character_def();
 
+    morph_character_def();
+
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+    
     /// Read a DefineMorphShape tag from stream
     //
     /// Throw ParserException if the tag is malformed
@@ -41,16 +47,18 @@ public:
     ///
     void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
-    virtual void display(DisplayObject* inst);
+    virtual void display(const MorphShape& inst);
 
-    // Question: What is the bound of a morph? Is this conceptually correct?
-    /// TODO: optimize this by take ratio into consideration, to decrease some
-    /// invalidated area when rendering morphs
-    virtual const rect&	get_bound() const 
-    { 
-        _bound.expand_to_rect(m_shape1->get_bound());
-        _bound.expand_to_rect(m_shape2->get_bound());
-        return _bound;
+    const shape_character_def& shape1() const { 
+        return *_shape1;
+    }
+    
+    const shape_character_def& shape2() const { 
+        return *_shape2;
+    }
+
+    virtual const rect& get_bound() const {
+        return _bounds;
     }
 
 protected:
@@ -60,22 +68,23 @@ protected:
     ///	- The start and end shapes (m_shape1, m_shape2)
     virtual void markReachableResources() const
     {
-        if (m_shape1) m_shape1->setReachable();
-        if (m_shape2) m_shape2->setReachable();
+        if (_shape1) _shape1->setReachable();
+        if (_shape2) _shape2->setReachable();
     }
 #endif 
 
 private:
-    boost::intrusive_ptr<shape_character_def> m_shape1;
-    boost::intrusive_ptr<shape_character_def> m_shape2;
+
+    boost::intrusive_ptr<shape_character_def> _shape1;
+    boost::intrusive_ptr<shape_character_def> _shape2;
     
-    mutable rect _bound;
-    
+    rect _bounds;
+
 };
 } // namespace gnash
 
 
-#endif // GNASH_MORPH2_H
+#endif 
 
 // Local Variables:
 // mode: C++

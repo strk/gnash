@@ -41,7 +41,7 @@ public:
     typedef std::vector<path> Paths;
 
     shape_character_def();
-    virtual ~shape_character_def();
+    virtual ~shape_character_def() {};
 
     virtual void display(DisplayObject* inst);
 
@@ -104,6 +104,9 @@ public:
         _line_styles.push_back(fs);
     }
 
+    /// morph class presently has two shape_character_defs
+    friend class morph2_character_def;
+
 protected:
 
 #ifdef GNASH_USE_GC
@@ -116,14 +119,14 @@ protected:
     virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
 
-    // derived morph classes changes these
+    /// Copy a shape DisplayObject definition
+    shape_character_def(const shape_character_def& o);
+    
+    /// Used by DynamicShape
     FillStyles _fill_styles;
     LineStyles _line_styles;
     Paths _paths;
     rect _bound;
-
-    /// Copy a shape DisplayObject definition
-    shape_character_def(const shape_character_def& o);
 
 private:
 
@@ -142,10 +145,10 @@ private:
 
 };
 
-}	// end namespace gnash
+} // namespace gnash
 
 
-#endif // GNASH_SHAPE_CHARACTER_DEF_H
+#endif 
 
 
 // Local Variables:

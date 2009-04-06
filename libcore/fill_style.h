@@ -253,7 +253,7 @@ private:
 	///
 	rgba sample_gradient(boost::uint8_t ratio) const;
 
-	friend class morph2_character_def;
+	friend class MorphShape;
 
 	// For BITMAP or GRADIENT types 
 	SWFMatrix	_matrix;

@@ -158,7 +158,11 @@ namespace gnash {
     class SWFMatrix;
     class cxform;
 
+    class morph_character_def;
     class shape_character_def;
+
+    class Shape;
+    class MorphShape;
 
     class GnashImage;
 }
@@ -315,7 +319,13 @@ public:
     /// styles. 
     virtual void drawShape(shape_character_def *def, 
         const SWFMatrix& mat, const cxform& cx) = 0;
-        
+ 
+    //virtual void drawShape(const shape_character_def& def,
+    //        const Shape& inst);
+    
+    virtual void drawMorph(const morph_character_def& def,
+            const MorphShape& inst) = 0;
+
     /// \brief
     /// Draws a glyph (font character).
     //

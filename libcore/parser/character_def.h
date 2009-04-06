@@ -60,10 +60,6 @@ public:
 	
 	virtual ~character_def();
 	
-	virtual void display(DisplayObject* /*instance_info*/)
-	{
-	}
-
    	/// Return true if the specified point is on the interior of our shape.
 	//
 	/// Point coordinates are local coords (TWIPS)

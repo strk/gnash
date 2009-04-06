@@ -64,6 +64,7 @@ libgnashcore_la_SOURCES = \
 	DynamicShape.cpp	\
 	Bitmap.cpp \
 	Shape.cpp \
+	MorphShape.cpp \
 	StaticText.cpp \
 	TextField.cpp \
         BlurFilter.cpp \
@@ -163,6 +164,7 @@ noinst_HEADERS = \
 	Font.h \
 	fontlib.h \
 	Shape.h \
+	MorphShape.h \
 	StaticText.h \
 	InteractiveObject.h \
 	gnash.h	\

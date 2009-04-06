@@ -126,10 +126,6 @@ shape_character_def::shape_character_def(const shape_character_def& o)
     {
     }
 
-shape_character_def::~shape_character_def()
-{
-}
-
 void
 shape_character_def::read(SWFStream& in, SWF::TagType tag, bool with_style,
                           movie_definition& m)
