@@ -41,7 +41,12 @@ import sys
 # Functions are accessed through the Player() class
 player = gnash.Player()
 
-input = open("../../testsuite/movies.all/gravity.swf")
+uri = "../../testsuite/movies.all/gravity.swf"
+
+if len(sys.argv) > 1:
+	uri = sys.argv[1]
+
+input = open(uri)
 
 # The initialization of the player is split into two stages.
 # First, load the movie from the URL (currently only local files):
@@ -58,14 +63,6 @@ print "Loaded " +  str(player.swfBytesLoaded()) + " of " + str(player.swfBytesTo
 print "It is version " + str(player.swfVersion()) +"."
 print "It is " + str(player.swfWidth()) + "x" + str(player.swfWidth()) + " pixels."
 print "URL: " + player.swfURL() + "."
-
-
-# The second stage completes loading and initialization.
-if player.initVM():
-    print "VM initialized."
-else:
-    print "VM initialization failed."
-    sys.exit()
 
 
 print "Loaded " +  str(player.swfBytesLoaded()) + " of " + str(player.swfBytesTotal()) + " bytes reported."
