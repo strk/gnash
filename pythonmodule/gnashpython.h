@@ -69,8 +69,9 @@ public:
     GnashPlayer();
     ~GnashPlayer();
 
-    // This seems required by BOOST_PYTHON_MODULE ?
-    GnashPlayer(const GnashPlayer&) {};
+    // This seems required by BOOST_PYTHON_MODULE, we'll just
+    // construct a new instance here
+    GnashPlayer(const GnashPlayer&);
 
     // For exiting
     void close();
@@ -96,6 +97,9 @@ public:
     // Player state
     int getCurrentFrame() const;
     
+    // Display Objects
+    GnashCharacter* getCharacterByTarget(const std::string& tgt);
+
     // Sprites
     GnashCharacter* getCharacterById(int id);    
     GnashCharacter* getTopmostMouseEntity();
@@ -163,7 +167,7 @@ public:
     // The only constant aspect of a character?
     int id() { return _character->get_id(); }
 
-    const std::string& name() { return _character->get_name(); }
+    std::string name() { return _character->get_name(); }
 
     //const char* textName() { return _character->get_text_name(); }
 

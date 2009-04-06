@@ -63,6 +63,18 @@ GnashPlayer::GnashPlayer()
 {
 }
 
+GnashPlayer::GnashPlayer(const GnashPlayer& o)
+	:
+    _movieDef(NULL),
+    _movieRoot(NULL),
+    _renderer(NULL),
+    _logFile(gnash::LogFile::getDefaultInstance()),
+    _xpos(0),
+    _ypos(0),
+    _url("")
+{
+}
+
 GnashPlayer::~GnashPlayer()
 {
     close();
@@ -246,7 +258,7 @@ void
 GnashPlayer::restart()
 {
     REQUIRE_VM_STARTED;
-    _movieRoot->getRootMovie()->restart();
+    _movieRoot->reset();
 }
 
 // The number of bytes already loaded.
@@ -420,6 +432,20 @@ GnashPlayer::render(bool forceRedraw)
 //
 // Wrapper class for characters (doesn't work)
 //
+
+GnashCharacter*
+GnashPlayer::getCharacterByTarget(const std::string& tgt)
+{
+    REQUIRE_VM_STARTED;
+
+    gnash::DisplayObject* c = _movieRoot->findCharacterByTarget(tgt);
+    
+    if (!c) return NULL;
+    
+    GnashCharacter* chr(new GnashCharacter(c));
+
+    return chr;
+}
 
 GnashCharacter*
 GnashPlayer::getCharacterById(int id)

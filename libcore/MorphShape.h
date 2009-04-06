@@ -42,16 +42,11 @@ public:
 
     MorphShape(morph_character_def* def, DisplayObject* parent, int id);
 
-    virtual void stagePlacementCallback(as_object* initObj);
-
 	virtual void display();
 
     virtual rect getBounds() const;
     
     virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
-    
-    /// Advances the morphing process.
-    virtual void advance();
     
     const FillStyles& fillStyles() const {
         return _fillStyles;

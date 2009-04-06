@@ -134,14 +134,6 @@ MorphShape::MorphShape(morph_character_def* def, DisplayObject* parent, int id)
 {
 }
 
-void
-MorphShape::stagePlacementCallback(as_object* initObj)
-{
-    assert(!initObj);
-    if (get_ratio()) morph();
-    _vm.getRoot().addLiveChar(this);
-}
-
 bool
 MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
@@ -168,6 +160,7 @@ MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 void  
 MorphShape::display()
 {
+    morph();
     _def->display(*this); 
     clear_invalidated();
 }
@@ -182,6 +175,8 @@ MorphShape::morph()
 {
     
     const double ratio = get_ratio() / 65535.0;
+
+    log_debug("ratio: %s", ratio);
 
     const shape_character_def& shape1 = _def->shape1();
     const shape_character_def& shape2 = _def->shape2();
@@ -249,12 +244,6 @@ MorphShape::morph()
     }
 }
 
-void
-MorphShape::advance()
-{
-    set_invalidated();
-    morph();
-}
 
 } // namespace gnash
 
