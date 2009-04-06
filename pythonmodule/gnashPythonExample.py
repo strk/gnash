@@ -41,9 +41,11 @@ import sys
 # Functions are accessed through the Player() class
 player = gnash.Player()
 
+input = open("../../testsuite/movies.all/gravity.swf")
+
 # The initialization of the player is split into two stages.
 # First, load the movie from the URL (currently only local files):
-if player.loadMovie("../../testsuite/movies.all/gravity.swf"):
+if player.loadMovie(input):
     print "Movie successfully created."
 else:
     print "Load of movie failed."
