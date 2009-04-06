@@ -52,10 +52,10 @@ sprite_definition::createDisplayObject(DisplayObject* parent, int id)
 sprite_definition::~sprite_definition()
 {
 	// Release our playlist data.
-	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end(); i!=e; ++i)
+	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end();
+            i != e; ++i)
 	{
 		PlayList& pl = i->second;
-
         deleteAllChecked(pl);
     }
 }

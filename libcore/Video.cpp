@@ -263,8 +263,6 @@ void
 Video::advance()
 {
 	if (_ns) {
-		//_ns->advance();
-        
         // NOTE: only needed for gstreamer:
 		if (_ns->newFrameReady()) set_invalidated();
 	}

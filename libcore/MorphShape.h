@@ -42,6 +42,8 @@ public:
 
     MorphShape(morph_character_def* def, DisplayObject* parent, int id);
 
+    virtual void stagePlacementCallback(as_object* initObj);
+
 	virtual void display();
 
     virtual rect getBounds() const {

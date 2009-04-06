@@ -19,6 +19,7 @@
 
 #include "MorphShape.h"
 #include "GnashNumeric.h"
+#include "VM.h"
 #include "fill_style.h"
 #include "Geometry.h"
 
@@ -146,6 +147,13 @@ MorphShape::MorphShape(morph_character_def* def, DisplayObject* parent, int id)
 
 }
 
+void
+MorphShape::stagePlacementCallback(as_object* initObj)
+{
+    assert(!initObj);
+    _vm.getRoot().addLiveChar(this);
+}
+
 bool
 MorphShape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 {
@@ -179,6 +187,7 @@ MorphShape::display()
 void
 MorphShape::advance()
 {
+    set_invalidated();
     
     const double ratio = get_ratio() / 65535.0;
 
@@ -246,7 +255,6 @@ MorphShape::advance()
             }
         }
     }
-
 }
 
 } // namespace gnash
