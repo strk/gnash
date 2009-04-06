@@ -88,6 +88,10 @@ BOOST_PYTHON_MODULE(gnash) {
         .def("getTopmostMouseEntity", &pythonwrapper::GnashPlayer::getTopmostMouseEntity,
         		return_value_policy<manage_new_object>(),
         			"The active gnash.Character() under the pointer.")
+
+        .def("getCharacterByTarget", &pythonwrapper::GnashPlayer::getCharacterByTarget,
+        		return_value_policy<manage_new_object>(),
+        			"The gnash.Character() having given target.")
         			
         // Log messages
         .def("logSize", &pythonwrapper::GnashPlayer::logSize,

@@ -97,6 +97,9 @@ public:
     // Player state
     int getCurrentFrame() const;
     
+    // Display Objects
+    GnashCharacter* getCharacterByTarget(const std::string& tgt);
+
     // Sprites
     GnashCharacter* getCharacterById(int id);    
     GnashCharacter* getTopmostMouseEntity();

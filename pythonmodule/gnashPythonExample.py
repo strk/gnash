@@ -112,4 +112,7 @@ if player.mouseClick():
     player.render(False)
 
 
+char = player.getCharacterByTarget('_root')
+print "_root has depth: "
+print char.depth()
 

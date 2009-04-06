@@ -434,6 +434,20 @@ GnashPlayer::render(bool forceRedraw)
 //
 
 GnashCharacter*
+GnashPlayer::getCharacterByTarget(const std::string& tgt)
+{
+    REQUIRE_VM_STARTED;
+
+    gnash::DisplayObject* c = _movieRoot->findCharacterByTarget(tgt);
+    
+    if (!c) return NULL;
+    
+    GnashCharacter* chr(new GnashCharacter(c));
+
+    return chr;
+}
+
+GnashCharacter*
 GnashPlayer::getCharacterById(int id)
 {
     REQUIRE_VM_STARTED;
