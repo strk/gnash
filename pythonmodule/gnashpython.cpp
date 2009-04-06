@@ -63,6 +63,18 @@ GnashPlayer::GnashPlayer()
 {
 }
 
+GnashPlayer::GnashPlayer(const GnashPlayer& o)
+	:
+    _movieDef(NULL),
+    _movieRoot(NULL),
+    _renderer(NULL),
+    _logFile(gnash::LogFile::getDefaultInstance()),
+    _xpos(0),
+    _ypos(0),
+    _url("")
+{
+}
+
 GnashPlayer::~GnashPlayer()
 {
     close();
