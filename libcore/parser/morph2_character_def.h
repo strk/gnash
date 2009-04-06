@@ -24,28 +24,9 @@ class morph_character_def : public character_def
 {
 public:
 
-    morph_character_def();
+    morph_character_def(SWFStream& in, SWF::TagType tag, movie_definition& md);
 
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
-    
-    /// Read a DefineMorphShape tag from stream
-    //
-    /// Throw ParserException if the tag is malformed
-    ///
-    /// @param in
-    ///	The stream to read the definition from.
-    ///	Tag type is assumed to have been read already
-    ///
-    /// @param TagType
-    ///	Type of the tag.
-    ///	Need be SWF::DEFINEMORPHSHAPE or an assertion would fail.
-    ///	TODO: drop ?
-    ///
-    /// @param md
-    ///	Movie definition. Used to resolv DisplayObject ids for fill styles.
-    ///	Must be not-null or would segfault. 
-    ///
-    void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
     virtual void display(const MorphShape& inst);
 
@@ -74,6 +55,25 @@ protected:
 #endif 
 
 private:
+    
+    /// Read a DefineMorphShape tag from stream
+    //
+    /// Throw ParserException if the tag is malformed
+    ///
+    /// @param in
+    ///	The stream to read the definition from.
+    ///	Tag type is assumed to have been read already
+    ///
+    /// @param TagType
+    ///	Type of the tag.
+    ///	Need be SWF::DEFINEMORPHSHAPE or an assertion would fail.
+    ///	TODO: drop ?
+    ///
+    /// @param md
+    ///	Movie definition. Used to resolv DisplayObject ids for fill styles.
+    ///	Must be not-null or would segfault. 
+    ///
+    void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
     boost::intrusive_ptr<shape_character_def> _shape1;
     boost::intrusive_ptr<shape_character_def> _shape2;
@@ -81,6 +81,7 @@ private:
     rect _bounds;
 
 };
+
 } // namespace gnash
 
 

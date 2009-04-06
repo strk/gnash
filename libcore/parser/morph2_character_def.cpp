@@ -33,11 +33,13 @@
 namespace gnash {
 
 /// Functors for path and style manipulation.
-morph_character_def::morph_character_def()
+morph_character_def::morph_character_def(SWFStream& in, SWF::TagType tag,
+        movie_definition& md)
     :
     _shape1(new shape_character_def),
     _shape2(new shape_character_def)
 {
+    read (in, tag, md);
 }
 
 DisplayObject*
@@ -49,12 +51,12 @@ morph_character_def::createDisplayObject(DisplayObject* parent, int id)
 void
 morph_character_def::display(const MorphShape& inst)
 {
-    // display
     render::drawMorph(*this, inst);
 }
 
 
-void morph_character_def::read(SWFStream& in, SWF::TagType tag,
+void
+morph_character_def::read(SWFStream& in, SWF::TagType tag,
         movie_definition& md)
 {
     assert(tag == SWF::DEFINEMORPHSHAPE
@@ -117,6 +119,7 @@ void morph_character_def::read(SWFStream& in, SWF::TagType tag,
     assert(_shape1->lineStyles().size() == _shape2->lineStyles().size());
 
 #if 0
+
     const unsigned edges1 = PathList::computeNumberOfEdges(_shape1->paths());
     const unsigned edges2 = PathList::computeNumberOfEdges(_shape2->paths());
 
@@ -139,6 +142,7 @@ void morph_character_def::read(SWFStream& in, SWF::TagType tag,
 
     );
 #endif
+
 }
 
 } // namespace gnash
