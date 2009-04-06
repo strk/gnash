@@ -95,7 +95,7 @@ player.render(True)
 # calculated by Gnash.
 
 # Turn verbosity on to send debug messages to stdout and the logfile.
-player.setVerbose(True)
+player.setVerbosity(2)
 # This can't be turned off at the moment.
 
 # You can also make time pass in an instant:
@@ -106,12 +106,12 @@ player.pressKey(65)
 
 # Move the pointer to the specified co-ordinates. Returns true if the
 # action requires a redraw.
-if player.movePointer(x,y):
+if player.movePointer(10,20):
     render(False)
 
 # Click the mouse at the current pointer position. True if the action
 # requires a redraw.
-if player.clickMouse():
+if player.mouseClick():
     render(False)
 
 
