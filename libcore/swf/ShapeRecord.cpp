@@ -29,7 +29,11 @@ void
 ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
 {
 
-    const bool styleInfo = (tag != SWF::DEFINEFONT && tag != SWF::DEFINEFONT2);
+    /// What should this be?
+    //
+    // False: DEFINEFONT DEFINEFONT2, DEFINEMORPHSHAPE DEFINEMORPHSHAPE2
+    const bool styleInfo = 
+        (tag == SWF::DEFINESHAPE || tag == SWF::DEFINESHAPE2);
 
     if (styleInfo)
     {

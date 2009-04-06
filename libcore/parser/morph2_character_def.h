@@ -7,11 +7,13 @@
 #define GNASH_MORPH2_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "shape_character_def.h" 
 #include "swf.h"
+#include "swf/ShapeRecord.h"
+#include "character_def.h"
 
 // Forward declarations.
 namespace gnash {
+    class movie_definition;
     class SWFStream;
     class MorphShape;
 }
@@ -26,33 +28,23 @@ public:
 
     morph_character_def(SWFStream& in, SWF::TagType tag, movie_definition& md);
 
+    virtual ~morph_character_def() {}
+
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
     virtual void display(const MorphShape& inst);
 
-    const shape_character_def& shape1() const { 
-        return *_shape1;
+    const SWF::ShapeRecord& shape1() const { 
+        return _shape1;
     }
     
-    const shape_character_def& shape2() const { 
-        return *_shape2;
+    const SWF::ShapeRecord& shape2() const { 
+        return _shape2;
     }
 
     virtual const rect& get_bound() const {
         return _bounds;
     }
-
-protected:
-
-#ifdef GNASH_USE_GC
-    /// Reachable resources are:
-    ///	- The start and end shapes (m_shape1, m_shape2)
-    virtual void markReachableResources() const
-    {
-        if (_shape1) _shape1->setReachable();
-        if (_shape2) _shape2->setReachable();
-    }
-#endif 
 
 private:
     
@@ -75,8 +67,8 @@ private:
     ///
     void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
-    boost::intrusive_ptr<shape_character_def> _shape1;
-    boost::intrusive_ptr<shape_character_def> _shape2;
+    SWF::ShapeRecord _shape1;
+    SWF::ShapeRecord _shape2;
     
     rect _bounds;
 

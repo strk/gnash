@@ -55,7 +55,7 @@ public:
         return _paths;
     }
 
-    const rect& bounds() const {
+    const rect& getBounds() const {
         return _bounds;
     }
 

@@ -35,11 +35,8 @@ namespace gnash {
 /// Functors for path and style manipulation.
 morph_character_def::morph_character_def(SWFStream& in, SWF::TagType tag,
         movie_definition& md)
-    :
-    _shape1(new shape_character_def),
-    _shape2(new shape_character_def)
 {
-    read (in, tag, md);
+    read(in, tag, md);
 }
 
 DisplayObject*
@@ -63,9 +60,9 @@ morph_character_def::read(SWFStream& in, SWF::TagType tag,
         || tag == SWF::DEFINEMORPHSHAPE2
         || tag == SWF::DEFINEMORPHSHAPE2_);
 
-    rect bound1, bound2;
-    bound1.read(in);
-    bound2.read(in);
+    rect bounds1, bounds2;
+    bounds1.read(in);
+    bounds2.read(in);
 
     if (tag == SWF::DEFINEMORPHSHAPE2 || tag == SWF::DEFINEMORPHSHAPE2_) {
         // TODO: Use these values.
@@ -90,45 +87,45 @@ morph_character_def::read(SWFStream& in, SWF::TagType tag,
     fill_style fs1, fs2;
     for (size_t i = 0; i < fillCount; ++i) {
         fs1.read(in, tag, md, &fs2);
-        _shape1->addFillStyle(fs1);
-        _shape2->addFillStyle(fs2);
+        _shape1.addFillStyle(fs1);
+        _shape2.addFillStyle(fs2);
     }
 
     const boost::uint16_t lineCount = in.read_variable_count();
     line_style ls1, ls2;
     for (size_t i = 0; i < lineCount; ++i) {
         ls1.read_morph(in, tag, md, &ls2);
-        _shape1->addLineStyle(ls1);
-        _shape2->addLineStyle(ls2);
+        _shape1.addLineStyle(ls1);
+        _shape2.addLineStyle(ls2);
     }
 
-    _shape1->read(in, tag, false, md);
+    _shape1.read(in, tag, md);
     in.align();
-    _shape2->read(in, tag, false, md);
+    _shape2.read(in, tag, md);
 
     // Set bounds as read in *this* tags rather then
     // the one computed from shape_character_def parser
     // (does it make sense ?)
-    _shape1->set_bound(bound1);
-    _shape2->set_bound(bound2);
+    _shape1.setBounds(bounds1);
+    _shape2.setBounds(bounds2);
     
     // Starting bounds are the same as shape1
-    _bounds = _shape1->get_bound();
+    _bounds = bounds1;
 
-    assert(_shape1->fillStyles().size() == _shape2->fillStyles().size());
-    assert(_shape1->lineStyles().size() == _shape2->lineStyles().size());
+    assert(_shape1.fillStyles().size() == _shape2.fillStyles().size());
+    assert(_shape1.lineStyles().size() == _shape2.lineStyles().size());
 
 #if 0
 
-    const unsigned edges1 = PathList::computeNumberOfEdges(_shape1->paths());
-    const unsigned edges2 = PathList::computeNumberOfEdges(_shape2->paths());
+    const unsigned edges1 = PathList::computeNumberOfEdges(_shape1.paths());
+    const unsigned edges2 = PathList::computeNumberOfEdges(_shape2.paths());
 
     IF_VERBOSE_PARSE(
       log_parse("morph: "
           "startShape(paths:%d, edges:%u), "
           "endShape(paths:%d, edges:%u)",
-          _shape1->paths().size(), edges1,
-          _shape2->paths().size(), edges2);
+          _shape1.paths().size(), edges1,
+          _shape2.paths().size(), edges2);
     );
 
     IF_VERBOSE_MALFORMED_SWF(

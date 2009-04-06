@@ -16,6 +16,7 @@
 #include "fill_style.h" // for fill style
 #include "styles.h"     // for line style
 #include "swf.h"
+#include "ShapeRecord.h"
 
 #include <vector> // for composition
 
@@ -42,6 +43,8 @@ public:
     typedef std::vector<Path> Paths;
 
     shape_character_def();
+    shape_character_def(SWFStream& in, SWF::TagType tag, movie_definition& m);
+
     virtual ~shape_character_def() {};
 
     // This is currently used for non-Shape objects (e.g. Bitmap)
@@ -77,6 +80,8 @@ public:
     /// Get cached bounds of this shape.
     const rect&	get_bound() const { return _bound; }
 
+    void set_bound(const rect& r) { _bound = r; }
+
     /// Compute bounds by looking at the component paths
     void compute_bound(rect& r, int swfVersion) const;
 
@@ -84,10 +89,6 @@ public:
     const LineStyles& lineStyles() const { return _line_styles; }
 
     const Paths& paths() const { return _paths; }
-
-    // morph uses this
-    // Should this be verified?
-    void set_bound(const rect& r) { _bound = r; }
 
     // Morph uses this.
     void addFillStyle(const fill_style& fs) {
@@ -139,6 +140,8 @@ private:
     
     // Don't assign to a shape DisplayObject definition
     shape_character_def& operator= (const shape_character_def&);
+
+    const SWF::ShapeRecord _shapeRecord;
 
 };
 

@@ -21,6 +21,7 @@
 #include "GnashNumeric.h"
 #include "VM.h"
 #include "fill_style.h"
+#include "swf/ShapeRecord.h"
 #include "Geometry.h"
 
 namespace gnash
@@ -56,7 +57,7 @@ private:
 // Facilities for working with list of paths.
 class PathList
 {
-    typedef shape_character_def::Paths Paths;
+    typedef SWF::ShapeRecord::Paths Paths;
 public:
 
     PathList(const Paths& paths)
@@ -130,7 +131,7 @@ MorphShape::MorphShape(morph_character_def* def, DisplayObject* parent, int id)
     _fillStyles(_def->shape1().fillStyles()),
     _lineStyles(_def->shape1().lineStyles()),
     _paths(_def->shape1().paths()),
-    _bounds(def->shape1().get_bound())
+    _bounds(def->shape1().getBounds())
 {
 }
 
@@ -178,11 +179,13 @@ MorphShape::morph()
 
     log_debug("ratio: %s", ratio);
 
-    const shape_character_def& shape1 = _def->shape1();
-    const shape_character_def& shape2 = _def->shape2();
+    const SWF::ShapeRecord& shape1 = _def->shape1();
+    const SWF::ShapeRecord& shape2 = _def->shape2();
 
     // bounds
-    _bounds.set_lerp(shape1.get_bound(), shape2.get_bound(), ratio);
+    _bounds.set_lerp(shape1.getBounds(), shape2.getBounds(), ratio);
+
+    log_debug("Bounds: %s", _bounds);
 
     // fill styles
     const FillStyles::const_iterator fs1 = shape1.fillStyles().begin();

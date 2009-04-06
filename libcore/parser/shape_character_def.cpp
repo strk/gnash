@@ -115,6 +115,14 @@ read_line_styles(std::vector<line_style>& styles, SWFStream& in,
     }
 }
 
+shape_character_def::shape_character_def(SWFStream& in, SWF::TagType tag,
+        movie_definition& m)
+    :
+    character_def(),
+    _shapeRecord(in, tag, m)
+{
+}
+
 shape_character_def::shape_character_def()
     :
     character_def(),
