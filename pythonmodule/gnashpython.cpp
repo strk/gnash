@@ -258,7 +258,7 @@ void
 GnashPlayer::restart()
 {
     REQUIRE_VM_STARTED;
-    _movieRoot->getRootMovie()->restart();
+    _movieRoot->reset();
 }
 
 // The number of bytes already loaded.
