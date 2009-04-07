@@ -150,14 +150,6 @@ void  draw_poly(const point* corners, int corner_count, const rgba& fill,
     fill, outline, mat, masked);
 }
 
-void
-drawMorph(const SWF::DefineMorphShapeTag& def, const MorphShape& inst) 
-{
-#ifdef DEBUG_RENDER_CALLS
-		GNASH_REPORT_FUNCTION;
-#endif
-		if (s_render_handler) s_render_handler->drawMorph(def, inst);
-}
 
 void
 drawShape(const SWF::ShapeRecord& shape, const cxform& cx,

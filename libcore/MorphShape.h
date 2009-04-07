@@ -36,10 +36,6 @@ class MorphShape : public DisplayObject
 {
 
 public:
-    
-    typedef std::vector<fill_style> FillStyles;
-    typedef std::vector<line_style> LineStyles;
-    typedef std::vector<Path> Paths;
 
     MorphShape(const SWF::DefineMorphShapeTag* const def, 
             DisplayObject* parent, int id);
@@ -49,17 +45,9 @@ public:
     virtual rect getBounds() const;
     
     virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
-    
-    const FillStyles& fillStyles() const {
-        return _fillStyles;
-    }
-    
-    const LineStyles& lineStyles() const {
-        return _lineStyles;
-    }
-
-    const Paths& paths() const {
-        return _paths;
+ 
+    const SWF::ShapeRecord& shape() const {
+        return _shape;
     }
 
 protected:
@@ -82,10 +70,7 @@ private:
 
     const boost::intrusive_ptr<const SWF::DefineMorphShapeTag> _def;
 	
-    FillStyles _fillStyles;
-    LineStyles _lineStyles;
-    Paths _paths;
-    rect _bounds;
+    SWF::ShapeRecord _shape;
 
 };
 

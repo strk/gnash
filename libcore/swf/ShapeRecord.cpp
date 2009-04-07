@@ -20,6 +20,7 @@
 #include "SWFStream.h"
 #include "movie_definition.h"
 #include "Geometry.h"
+#include "GnashNumeric.h"
 
 #include <vector>
 
@@ -36,9 +37,175 @@ namespace {
         const ShapeRecord::LineStyles& lineStyles, int swfVersion);
 }
 
+// Functors for path and style manipulation.
+namespace {
+
+template<typename T>
+class Lerp
+{
+public:
+    Lerp(typename T::const_iterator style1, typename T::const_iterator style2,
+            const double ratio)
+        :
+        _style1(style1),
+        _style2(style2),
+        _ratio(ratio)
+    {}
+
+    void operator()(typename T::value_type& st)
+    {
+        st.set_lerp(*_style1, *_style2, _ratio);
+        ++_style1, ++_style2;
+    }
+
+private:
+    typename T::const_iterator _style1;
+    typename T::const_iterator _style2;
+    const double _ratio;
+};
+
+// Facilities for working with list of paths.
+class PathList
+{
+    typedef SWF::ShapeRecord::Paths Paths;
+public:
+
+    PathList(const Paths& paths)
+        :
+        _paths(paths),
+        _currpath(0),
+        _curredge(0),
+        _nedges(computeNumberOfEdges(_paths))
+    {}
+
+    /// Return number of edges in the path list
+    size_t size() const
+    {
+        return _nedges;
+    }
+
+    /// Get next edge in the path list.
+    //
+    /// After last edge in the list has been fetched,
+    /// next call to this function will return first
+    /// edge again.
+    ///
+    const Edge& getNextEdge()
+    {
+        const Edge& ret = _paths[_currpath][_curredge];
+        if ( ++_curredge >= _paths[_currpath].size() )
+        {
+            if ( ++_currpath >= _paths.size() )
+            {
+                // this is not really needed,
+                // but it's simpler to do so that
+                // to make next call fail or abort..
+                _currpath = 0;
+                _curredge = 0;
+            }
+        }
+        return ret;
+    }
+
+    /// Compute total number of edges
+    static size_t computeNumberOfEdges(const Paths& paths)
+    {
+        size_t count=0;
+        for (Paths::const_iterator i = paths.begin(), e = paths.end();
+                i != e; ++i) {
+
+            count += i->size();
+        }
+        return count;
+    }
+
+private:
+
+    const Paths& _paths;
+
+    size_t _currpath;
+
+    size_t _curredge;
+
+    size_t _nedges;
+
+};
+
+} // anonymous namespace
+
+
 ShapeRecord::ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m)
 {
     read(in, tag, m);
+}
+
+void
+ShapeRecord::setLerp(const ShapeRecord& a, const ShapeRecord& b,
+        const double ratio)
+{
+
+    // Update current bounds.
+    _bounds.set_lerp(a.getBounds(), b.getBounds(), ratio);
+
+    // fill styles
+    const FillStyles::const_iterator fs1 = a.fillStyles().begin();
+    const FillStyles::const_iterator fs2 = b.fillStyles().begin();
+
+    std::for_each(_fillStyles.begin(), _fillStyles.end(),
+            Lerp<FillStyles>(fs1, fs2, ratio));
+
+    // line styles
+    const LineStyles::const_iterator ls1 = a.lineStyles().begin();
+    const LineStyles::const_iterator ls2 = b.lineStyles().begin();
+
+    std::for_each(_lineStyles.begin(), _lineStyles.end(),
+            Lerp<LineStyles>(ls1, ls2, ratio));
+
+    // This is used for cases in which number
+    // of paths in start shape and end shape are not
+    // the same.
+    const Path empty_path;
+    const Edge empty_edge;
+
+    // shape
+    const Paths& paths1 = a.paths();
+    const Paths& paths2 = b.paths();
+    for (size_t i = 0, k = 0, n = 0; i < _paths.size(); i++)
+    {
+        Path& p = _paths[i];
+        const Path& p1 = i < paths1.size() ? paths1[i] : empty_path;
+        const Path& p2 = n < paths2.size() ? paths2[n] : empty_path;
+
+        const float new_ax = flerp(p1.ap.x, p2.ap.x, ratio);
+        const float new_ay = flerp(p1.ap.y, p2.ap.y, ratio);
+
+        p.reset(new_ax, new_ay, p1.getLeftFill(),
+                p2.getRightFill(), p1.getLineStyle());
+
+        //  edges;
+        const size_t len = p1.size();
+        p.m_edges.resize(len);
+
+        for (size_t j=0; j < p.size(); j++)
+        {
+            Edge& e = p[j];
+            const Edge& e1 = j < p1.size() ? p1[j] : empty_edge;
+
+            const Edge& e2 = k < p2.size() ? p2[k] : empty_edge;
+
+            e.cp.x = static_cast<int>(flerp(e1.cp.x, e2.cp.x, ratio));
+            e.cp.y = static_cast<int>(flerp(e1.cp.y, e2.cp.y, ratio));
+            e.ap.x = static_cast<int>(flerp(e1.ap.x, e2.ap.x, ratio));
+            e.ap.y = static_cast<int>(flerp(e1.ap.y, e2.ap.y, ratio));
+            ++k;
+
+            if (p2.size() <= k) {
+                k = 0;
+                ++n;
+            }
+        }
+    }
+
 }
 
 void

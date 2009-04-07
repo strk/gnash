@@ -293,9 +293,6 @@ public:
     virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
             const SWFMatrix& worldMat) = 0;
         
-    virtual void drawMorph(const SWF::DefineMorphShapeTag& def,
-            const MorphShape& inst) = 0;
-
     /// \brief
     /// Draws a glyph (font character).
     //

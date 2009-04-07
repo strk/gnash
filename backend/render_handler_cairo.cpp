@@ -934,51 +934,6 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     std::for_each(paths.begin(), paths.end(),
                   boost::bind(&Path::transform, _1, boost::ref(mat)));
   }
-                  
-  // TODO: drop this by using a ShapeRecord inside MorphShape and passing
-  // that to drawShape()
-  virtual void drawMorph(const SWF::DefineMorphShapeTag& /*shape*/,
-          const MorphShape& inst)
-  {
-    const PathVec& path_vec = inst.paths();
-    
-    if (!path_vec.size()) {
-      return;    
-    }
-    
-    cairo_set_fill_rule(_cr, CAIRO_FILL_RULE_EVEN_ODD); // TODO: Move to init
-    
-    const SWFMatrix& mat = inst.getWorldMatrix();    
-
-    if (_drawing_mask) {      
-      PathVec scaled_path_vec = path_vec;
-      
-      apply_matrix_to_paths(scaled_path_vec, mat);
-      draw_mask(scaled_path_vec); 
-      return;
-    }
-    
-    CairoScopeMatrix mat_transformer(_cr, inst.getWorldMatrix());
-
-    std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
-    
-    const std::vector<fill_style>& fill_styles = inst.fillStyles();
-    const std::vector<line_style>& line_styles = inst.lineStyles();
-
-    for (size_t i = 0; i < subshapes.size()-1; ++i) {
-      PathVec subshape_paths;
-      
-      if (subshapes[i] != subshapes[i+1]) {
-        subshape_paths = PathVec(subshapes[i], subshapes[i+1]);
-      } else {
-        subshape_paths.push_back(*subshapes[i]);
-      }
-      
-      draw_subshape(subshape_paths, mat, inst.get_world_cxform(), fill_styles,
-                    line_styles);
-    }
-    
-  }
   
   virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
         const SWFMatrix& mat)

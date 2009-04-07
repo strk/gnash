@@ -63,7 +63,8 @@ DefineMorphShapeTag::createDisplayObject(DisplayObject* parent, int id)
 void
 DefineMorphShapeTag::display(const MorphShape& inst) const
 {
-    render::drawMorph(*this, inst);
+    render::drawShape(inst.shape(), inst.get_world_cxform(),
+            inst.getWorldMatrix());
 }
 
 

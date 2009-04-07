@@ -49,6 +49,7 @@ namespace SWF {
 class ShapeRecord
 {
 public:
+
     typedef std::vector<fill_style> FillStyles;
     typedef std::vector<line_style> LineStyles;
     typedef std::vector<Path> Paths;
@@ -63,6 +64,14 @@ public:
     //
     /// This is useful for constructing immutable tags.
     ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m);
+
+    ShapeRecord(const ShapeRecord& other)
+        :
+        _fillStyles(other._fillStyles),
+        _lineStyles(other._lineStyles),
+        _paths(other._paths),
+        _bounds(other._bounds)
+    {}
 
     /// Parse path data from a SWFStream.
     //
@@ -93,6 +102,12 @@ public:
     Path& currentPath() {
         return _paths.back();
     }
+
+    /// Set to the lerp of two ShapeRecords.
+    //
+    /// Used in shape morphing.
+    void setLerp(const ShapeRecord& a, const ShapeRecord& b,
+            const double ratio);
 
     /// Reset all shape data.
     void clear() {

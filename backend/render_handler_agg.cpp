@@ -987,22 +987,6 @@ public:
         drawShape(fillStyles, lineStyles, paths, worldMat, cx);
     }
 
-
-    void drawMorph(const SWF::DefineMorphShapeTag& def, const MorphShape& inst)
-    {
-        const std::vector<fill_style>& fill_styles = inst.fillStyles();
-        const std::vector<line_style>& line_styles = inst.lineStyles();
-        const SWFMatrix& mat = inst.getWorldMatrix();
-        const cxform& cx = inst.get_world_cxform();
-        const std::vector<Path>& paths = inst.paths();
-
-        // select ranges
-        select_clipbounds(inst.getBounds(), mat);
-
-        // Render the morph's current shape.
-        drawShape(fill_styles, line_styles, paths, mat, cx);
-    }
-
     void drawShape(const std::vector<fill_style>& fill_styles,
         const std::vector<line_style>& line_styles,
         const std::vector<Path>& objpaths, const SWFMatrix& mat,
