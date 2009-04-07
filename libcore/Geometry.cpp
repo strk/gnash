@@ -125,8 +125,6 @@ pointTest(const std::vector<Path>& paths,
         boost::int32_t y, const SWFMatrix& wm)
 {
 
-    std::cerr << x << ", " << y << ", " << wm << std::endl;
-
     /*
     Principle:
     For the fill of the shape, we project a ray from the test point to the left
