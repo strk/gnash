@@ -1,4 +1,4 @@
-// Shape.cpp:  Mouse/Character handling, for Gnash.
+// MorphShape.cpp:  MorphShape handling for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
