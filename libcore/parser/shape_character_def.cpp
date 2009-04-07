@@ -63,11 +63,6 @@ shape_character_def::shape_character_def(SWFStream& in, SWF::TagType tag,
 {
 }
 
-shape_character_def::shape_character_def()
-    :
-    character_def()
-{  }
-
 void
 shape_character_def::display(const DisplayObject& inst)
 {

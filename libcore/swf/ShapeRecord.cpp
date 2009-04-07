@@ -29,11 +29,12 @@ void
 ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
 {
 
-    /// What should this be?
-    //
-    // False: DEFINEFONT DEFINEFONT2, DEFINEMORPHSHAPE DEFINEMORPHSHAPE2
-    const bool styleInfo = 
-        (tag == SWF::DEFINESHAPE || tag == SWF::DEFINESHAPE2);
+    /// TODO: is this correct?
+    const bool styleInfo = (tag == SWF::DEFINESHAPE ||
+                            tag == SWF::DEFINESHAPE2 ||
+                            tag == SWF::DEFINESHAPE3 ||
+                            tag == SWF::DEFINESHAPE4 ||
+                            tag == SWF::DEFINESHAPE4_);
 
     if (styleInfo)
     {
@@ -70,8 +71,8 @@ ShapeRecord::read(SWFStream& in, SWF::TagType tag, movie_definition& m)
     int num_line_bits = (num_bits & 0x0F);
     
     IF_VERBOSE_PARSE(
-        log_parse(_("  shape_character_def read: nfillbits = %d, "
-                "nlinebits = %d"), num_fill_bits, num_line_bits);
+        log_parse(_("  ShapeRecord(%s): fillbits = %d, nlinebits = %d"),
+            tag, num_fill_bits, num_line_bits);
     );
     
     if ( !num_fill_bits && !num_line_bits )

@@ -11,15 +11,8 @@
 
 #include "character_def.h" // for inheritance of shape_character_def
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "Geometry.h"     // for path
-#include "rect.h"      // for composition
-#include "fill_style.h" // for fill style
-#include "styles.h"     // for line style
 #include "swf.h"
 #include "ShapeRecord.h"
-
-#include <vector> // for composition
-
 
 namespace gnash {
 	class SWFStream;
@@ -38,52 +31,19 @@ class shape_character_def : public character_def
 {
 public:
 
-    typedef std::vector<fill_style> FillStyles;
-    typedef std::vector<line_style> LineStyles;
-    typedef std::vector<Path> Paths;
-
-    shape_character_def();
     shape_character_def(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
     virtual ~shape_character_def() {};
 
-    // This is currently used for non-Shape objects (e.g. Bitmap)
+    // Display a Shape character.
     virtual void display(const DisplayObject& inst);
 
+    // Create a Shape DisplayObject.
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 	
-    /// \brief
-    /// Read a shape definition as included in DEFINEFONT*,
-    /// DEFINESHAPE* or DEFINEMORPH* tag
-    //
-    /// @param in
-    ///	The stream to read the shape from
-    ///
-    /// @param TagType
-    ///	The SWF::TagType this shape definition is read for.
-    ///	TODO: change to an actual SWF::TagType type
-    ///
-    /// @param with_style
-    ///	If true, this definition includes bounds, fill styles and line styles.
-    ///	Tipically, this is only false for DEFINEFONT* tags.
-    ///	NOTE: if with_style is false, bounds of the shape will be computed
-    ///	      rather then read.
-    ///	TODO: drop this function, set based on TagType ?
-    ///
-    /// @param m
-    ///	The movie definition corresponding to the SWF we/re parsing.
-    ///	This is used to resolve bitmap DisplayObjects for fill styles, never
-    ///	used if with_style is false.
-    void read(SWFStream& in, SWF::TagType tag, bool with_style,
-            movie_definition& m);
-
     /// Get cached bounds of this shape.
     const rect&	get_bound() const { return _shape.getBounds(); }
 
-    /// Compute bounds by looking at the component paths
-    void compute_bound(rect& r, int swfVersion) const;
-
-    /// morph class presently has two shape_character_defs
     virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
             const SWFMatrix& wm);
 
@@ -97,19 +57,9 @@ protected:
     ///	  These are not actual resources, but may contain some.
     ///
     virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
+#endif 
 
 private:
-
-    /// Shape record flags
-    enum ShapeRecordFlags {
-        flagEnd = 0x00,
-        flagMove = 0x01,
-        flagFillStyle0Change = 0x02,
-        flagFillStyle1Change = 0x04,
-        flagLineStyleChange = 0x08,
-        flagHasNewStyles = 0x10
-    };
 
     const SWF::ShapeRecord _shape;
 

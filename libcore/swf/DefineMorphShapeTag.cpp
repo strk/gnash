@@ -119,7 +119,7 @@ DefineMorphShapeTag::read(SWFStream& in, TagType tag,
     _shape2.read(in, tag, md);
 
     // Set bounds as read in *this* tags rather then
-    // the one computed from shape_character_def parser
+    // the one computed from ShapeRecord parser
     // (does it make sense ?)
     _shape1.setBounds(bounds1);
     _shape2.setBounds(bounds2);
