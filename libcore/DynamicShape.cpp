@@ -15,9 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-
-
 #include "DynamicShape.h"
 
 #include <algorithm>
@@ -39,23 +36,17 @@ DynamicShape::DynamicShape()
 void
 DynamicShape::clear()
 {
-	//clear_meshes();
-	_paths.clear();
-	_fill_styles.clear();
-	_line_styles.clear();
-	_bound.set_null();
-	_currpath=0; // or would point to invalid memory
-	_currfill = _currline = 0; // or would point to cleared m_fill_style and m_line_styles respectively
-
+	_shape.clear();
+	_currpath = 0; 
+	_currfill = _currline = 0; 
 	// TODO: worth setting _changed=true ? 
 }
 
 void
 DynamicShape::add_path(const Path& pth)
 {
-	_paths.push_back(pth);
-	_currpath = &(_paths.back());
-	//compute_bound(&m_bound);
+	_shape.addPath(pth);
+	_currpath = &(_shape.currentPath());
 }
 
 void
@@ -147,8 +138,8 @@ DynamicShape::finalize()
 	// Close any pending filled path (_currpath should be last path)
 	if ( _currpath && _currfill)
 	{
-		assert(!_paths.empty());
-		assert(_currpath == &(_paths.back()));
+		assert(!_shape.paths().empty());
+		assert(_currpath == &(_shape.paths().back()));
 		_currpath->close();
 	}
 
@@ -200,7 +191,8 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 	_currpath->drawLineTo(x, y);
 
 	// Update bounds 
-	unsigned thickness = _currline ? _line_styles[_currline-1].getThickness() : 0;
+	unsigned thickness = _currline ? 
+        _shape.lineStyles()[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
 		_currpath->expandBounds(_bound, thickness, swfVersion);
 	} else {
@@ -225,7 +217,8 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 	_currpath->drawCurveTo(cx, cy, ax, ay);
 
 	// Update bounds 
-	unsigned thickness = _currline ? _line_styles[_currline-1].getThickness() : 0;
+	unsigned thickness = _currline ? 
+        _shape.lineStyles()[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
 		_currpath->expandBounds(_bound, thickness, swfVersion);
 	}
@@ -247,23 +240,15 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 size_t
 DynamicShape::add_fill_style(const fill_style& stl)
 {
-	FillStyles& v = _fill_styles;
-
-	// TODO: check if the style is already in our list
-	//       (needs operator== defined for fill_style)
-	v.push_back(stl);
-	return v.size(); // 1-based !
+    _shape.addFillStyle(stl);
+    return _shape.fillStyles().size();
 }
 
 size_t
 DynamicShape::add_line_style(const line_style& stl)
 {
-	LineStyles& v = _line_styles;
-
-	// TODO: check if the style is already in our list
-	//       (needs operator== defined for line_style)
-	v.push_back(stl);
-	return v.size(); // 1-based !
+    _shape.addLineStyle(stl);
+    return _shape.lineStyles().size();
 }
 	
 }	// end namespace gnash

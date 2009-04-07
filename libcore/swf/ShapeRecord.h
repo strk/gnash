@@ -73,6 +73,14 @@ public:
         return _bounds;
     }
 
+    /// For DynamicShape
+    //
+    /// TODO: rewrite DynamicShape to push paths when they're
+    /// finished and drop this.
+    Path& currentPath() {
+        return _paths.back();
+    }
+
     void addFillStyle(const fill_style& fs) {
         _fillStyles.push_back(fs);
     }
