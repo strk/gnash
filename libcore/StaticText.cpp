@@ -50,7 +50,7 @@ StaticText::pointInShape(boost::int32_t /*x*/, boost::int32_t /*y*/) const
 void  
 StaticText::display()
 {
-    _def->display(this); // pass in transform info
+    _def->display(*this);
     clear_invalidated();
 }
 

@@ -1,4 +1,4 @@
-// DefineTextTag.cpp:  Read text DisplayObject definitions, for Gnash.
+// DefineTextTag.cpp:  Read StaticText definitions, for Gnash.
 
 // Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -33,7 +33,7 @@ DefineTextTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     std::auto_ptr<DefineTextTag> t(new DefineTextTag(in, m, tag));
     IF_VERBOSE_PARSE(
-        log_parse(_("Text DisplayObject, id = %d"), id);
+        log_parse(_("DefineTextTag, id = %d"), id);
     );
 
     m.addDisplayObject(id, t.release());
@@ -45,10 +45,9 @@ DefineTextTag::createDisplayObject(DisplayObject* parent, int id)
     return new StaticText(this, parent, id);
 }
 
-
 bool
 DefineTextTag::extractStaticText(std::vector<const TextRecord*>& to,
-        size_t& numChars)
+        size_t& numChars) const
 {
     if (_textRecords.empty()) return false;
 
@@ -107,7 +106,7 @@ DefineTextTag::read(SWFStream& in, movie_definition&m, TagType tag)
 }
 
 void
-DefineTextTag::display(DisplayObject* inst)
+DefineTextTag::display(const StaticText& inst) const
 {
 
 	const bool useEmbeddedGlyphs = true;

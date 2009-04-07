@@ -403,9 +403,10 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 #endif // ndef USE_FREETYPE 
 
 #ifdef USE_FREETYPE
-SWF::ShapeRecord*
+std::auto_ptr<SWF::ShapeRecord>
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 {
+    std::auto_ptr<SWF::ShapeRecord> glyph;
 
 	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP | 
                                                 FT_LOAD_NO_SCALE);
@@ -413,7 +414,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 	if (error) {
 		log_error("Error loading freetype outline glyph for char '%c' "
                 "(error: %d)", code, error);
-		return 0;
+		return glyph;
 	}
 
 	// Scale advance by current scale, to match expected output coordinate space
@@ -433,7 +434,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 			static_cast<char>((gf>>16)&0xff),
 			static_cast<char>((gf>>8)&0xff),
 			static_cast<char>(gf&0xff));
-		return 0;
+		return glyph;
 	}
 	//assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
 
@@ -464,8 +465,8 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 #endif
 
     // TODO: do this without copying!
-    SWF::ShapeRecord* s = new SWF::ShapeRecord(sh->shapeRecord());
-	return s;
+    glyph.reset(new SWF::ShapeRecord(sh->shapeRecord()));
+	return glyph;
 }
 #else // ndef(USE_FREETYPE)
 SWF::ShapeRecord*

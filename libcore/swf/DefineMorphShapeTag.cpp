@@ -35,7 +35,7 @@ namespace SWF {
 
 void
 DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
-        const RunInfo& r)
+        const RunInfo& /*r*/)
 {
     in.ensureBytes(2);
     boost::uint16_t id = in.read_u16();

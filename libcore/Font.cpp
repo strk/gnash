@@ -28,6 +28,7 @@
 #include "FreetypeGlyphsProvider.h"
 
 #include <utility> // for std::make_pair
+#include <memory>
 
 namespace gnash {
 
@@ -54,14 +55,13 @@ private:
 
 Font::GlyphInfo::GlyphInfo()
 	:
-	glyph(),
 	advance(0)
 {}
 
-Font::GlyphInfo::GlyphInfo(SWF::ShapeRecord* glyph,
+Font::GlyphInfo::GlyphInfo(std::auto_ptr<SWF::ShapeRecord> glyph,
         float advance)
 	:
-	glyph(glyph),
+	glyph(glyph.release()),
 	advance(advance)
 {}
 
@@ -70,6 +70,7 @@ Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 	glyph(o.glyph),
 	advance(o.advance)
 {}
+
 
 #ifdef GNASH_USE_GC
 void
@@ -117,7 +118,7 @@ Font::get_glyph(int index, bool embedded) const
             _fontTag->glyphTable() : _deviceGlyphTable;
 
     if (index >= 0 && (size_t)index < lookup.size()) {
-        return lookup[index].glyph;
+        return lookup[index].glyph.get();
     }
 
     // TODO: should we log an error here ?
@@ -295,9 +296,9 @@ Font::add_os_glyph(boost::uint16_t code)
     float advance;
 
     // Get the vectorial glyph
-    SWF::ShapeRecord* sh = _ftProvider->getGlyph(code, advance);
+    std::auto_ptr<SWF::ShapeRecord> sh = _ftProvider->getGlyph(code, advance);
 
-    if (!sh) {
+    if (!sh.get()) {
         log_error("Could not create shape "
                 "glyph for DisplayObject code %u (%c) with "
                 "device font %s (%p)", code, code, _name,

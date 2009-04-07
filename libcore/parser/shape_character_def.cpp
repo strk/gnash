@@ -49,7 +49,7 @@ shape_character_def::createDisplayObject(DisplayObject* parent, int id)
     
 bool
 shape_character_def::pointTestLocal(boost::int32_t x, boost::int32_t y, 
-     const SWFMatrix& wm)
+     const SWFMatrix& wm) const
 {
     return geometry::pointTest(_shape.paths(), _shape.lineStyles(), x, y, wm);
 }
@@ -64,7 +64,7 @@ shape_character_def::shape_character_def(SWFStream& in, SWF::TagType tag,
 }
 
 void
-shape_character_def::display(const DisplayObject& inst)
+shape_character_def::display(const DisplayObject& inst) const
 {
     render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }

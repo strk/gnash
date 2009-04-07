@@ -22,12 +22,15 @@ namespace SWF {
 //
 /// This does not correspond exactly to parsed record in a SWF file, but
 /// is used to create both mutable and immutable shapes.
-///
+//
 /// A ShapeRecord should have enough methods to implement the AS3 Graphics
 /// object (the drawing API of Shape and Sprite). This is restricted to
 /// adding fills, paths and line styles (which must be constructed outside
 /// this ShapeRecord before being added) and clearing everything. There
 /// is no support for removing single elements.
+//
+/// ShapeRecord objects are not ref-counted, so they may be stack-allocated
+/// or used in smart pointers.
 class ShapeRecord
 {
 public:
@@ -47,15 +50,10 @@ public:
     ShapeRecord(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
     /// Parse path data from a SWFStream.
+    //
+    /// This is used by DefineMorphShapeTag as part of parsing its
+    /// more complex ShapeRecords.
     void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
-
-    /// Reset all shape data.
-    void clear() {
-        _fillStyles.clear();
-        _lineStyles.clear();
-        _paths.clear();
-        _bounds.set_null();
-    }
 
     const FillStyles& fillStyles() const {
         return _fillStyles;
@@ -81,6 +79,14 @@ public:
         return _paths.back();
     }
 
+    /// Reset all shape data.
+    void clear() {
+        _fillStyles.clear();
+        _lineStyles.clear();
+        _paths.clear();
+        _bounds.set_null();
+    }
+
     void addFillStyle(const fill_style& fs) {
         _fillStyles.push_back(fs);
     }
@@ -99,7 +105,7 @@ public:
 
 private:
     
-    /// Shape record flags
+    /// Shape record flags for use in parsing.
     enum ShapeRecordFlags {
         SHAPE_END = 0x00,
         SHAPE_MOVE = 0x01,
@@ -109,7 +115,6 @@ private:
         SHAPE_HAS_NEW_STYLES = 0x10
     };
     
-
     FillStyles _fillStyles;
     LineStyles _lineStyles;
     Paths _paths;

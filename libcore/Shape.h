@@ -34,6 +34,10 @@ namespace gnash {
 namespace gnash {
 
 /// For DisplayObjects that don't store unusual state in their instances.
+//
+/// A Shape may be either statically constructed during parsing or,
+/// in AS3, dynamically constructed. A SWF-parsed Shape has an immutable
+/// SWF::DefinitionTag. A dynamic Shape object has a DynamicShape.
 class Shape : public DisplayObject
 {
 
@@ -47,7 +51,7 @@ public:
         assert(_shape.get());
     }
 
-	Shape(shape_character_def* def, DisplayObject* parent, int id)
+	Shape(const shape_character_def* const def, DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id),
 		_def(def)
@@ -77,7 +81,7 @@ protected:
 
 private:
 	
-    const boost::intrusive_ptr<shape_character_def> _def;
+    const boost::intrusive_ptr<const shape_character_def> _def;
 
     boost::shared_ptr<DynamicShape> _shape;
 

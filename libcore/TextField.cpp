@@ -343,7 +343,7 @@ TextField::display()
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
     
-    SWF::TextRecord::displayRecords(m, this, _textRecords, _embedFonts);
+    SWF::TextRecord::displayRecords(m, *this, _textRecords, _embedFonts);
 
     if (m_has_focus) show_cursor(wmat);
     

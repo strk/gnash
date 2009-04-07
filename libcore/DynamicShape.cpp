@@ -29,7 +29,7 @@ DynamicShape::DynamicShape()
 	_currline(0),
 	_x(0),
 	_y(0),
-	_changed(0)
+	_changed(false)
 {}
 
 void
@@ -115,7 +115,7 @@ DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); 
 	add_path(newPath);
 }
 
@@ -125,9 +125,8 @@ DynamicShape::startNewPath(bool newShape)
 	// Close any pending filled path
 	if ( _currpath && _currfill) _currpath->close();
 
-	// The DrawingApiTest.swf file shows we should NOT
-	// necessarely end the current fill when starting a new one.
-	//endFill();
+	// The DrawingApiTest.swf file shows we should not
+	// end the current fill when starting a new one.
 
 	// A quick test shows that *left* always work fine !
 	// More than that, using a *right* fill seems to break the tests !
@@ -136,7 +135,7 @@ DynamicShape::startNewPath(bool newShape)
 }
 
 void
-DynamicShape::finalize()
+DynamicShape::finalize() const
 {
 	// Nothing to do if not changed
 	if ( ! _changed ) return;
@@ -214,7 +213,7 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 	_y = y;
 
 	// Mark as changed
-	changed();
+	_changed = true;
 }
 
 void
@@ -247,7 +246,7 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 	_y = ay;
 
 	// Mark as changed
-	changed();
+	_changed = true;
 }
 
 size_t

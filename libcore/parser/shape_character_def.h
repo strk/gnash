@@ -36,7 +36,7 @@ public:
     virtual ~shape_character_def() {};
 
     // Display a Shape character.
-    virtual void display(const DisplayObject& inst);
+    virtual void display(const DisplayObject& inst) const;
 
     // Create a Shape DisplayObject.
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
@@ -45,7 +45,7 @@ public:
     const rect&	get_bound() const { return _shape.getBounds(); }
 
     virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
-            const SWFMatrix& wm);
+            const SWFMatrix& wm) const;
 
 protected:
 

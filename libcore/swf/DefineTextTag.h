@@ -30,13 +30,14 @@ namespace gnash {
     class movie_definition;
     class SWFStream;
     class RunInfo;
+    class StaticText;
 }
 
 namespace gnash {
 namespace SWF {
 
 
-/// Text DisplayObject 
+/// StaticText DisplayObject 
 //
 /// This is either read from SWF stream 
 /// or (hopefully) created with scripting
@@ -49,7 +50,7 @@ public:
             const RunInfo& r);
 
 	/// Draw the string.
-	void display(DisplayObject* inst);
+	void display(const StaticText& inst) const;
 	
 	const rect&	get_bound() const {
         // TODO: There is a _matrix field in the definition(!) that's
@@ -63,7 +64,8 @@ public:
     ///             if any are present
     /// @param size Will contain the number of DisplayObjects in this
     ///             StaticText definition.
-    bool extractStaticText(std::vector<const TextRecord*>& to, size_t& size);
+    bool extractStaticText(std::vector<const TextRecord*>& to, size_t& size)
+        const;
 
     virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 

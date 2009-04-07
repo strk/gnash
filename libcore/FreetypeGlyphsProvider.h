@@ -102,7 +102,8 @@ public:
 	///         or a NULL pointer if the given DisplayObject code
 	///         doesn't exist in this font.
 	///
-    SWF::ShapeRecord* getGlyph(boost::uint16_t code, float& advance);
+    std::auto_ptr<SWF::ShapeRecord> getGlyph(boost::uint16_t code,
+            float& advance);
 
 	/// Return the number of units of glyphs EM
 	//

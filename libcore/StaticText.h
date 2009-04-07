@@ -43,7 +43,8 @@ class StaticText : public DisplayObject
 {
 public:
 
-	StaticText(SWF::DefineTextTag* def, DisplayObject* parent, int id)
+	StaticText(const SWF::DefineTextTag* const def, DisplayObject* parent,
+            int id)
 		:
         DisplayObject(parent, id),
         _def(def)
@@ -104,7 +105,7 @@ protected:
 
 private:
 
-    const boost::intrusive_ptr<SWF::DefineTextTag> _def;
+    const boost::intrusive_ptr<const SWF::DefineTextTag> _def;
 
     /// A bitmask indicating which static text DisplayObjects are selected
     //

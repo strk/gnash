@@ -29,6 +29,7 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/cstdint.hpp>
+#include <memory>
 #include <vector>
 #include <map>
 
@@ -93,7 +94,6 @@ public:
 	///
 	/// @param italic
 	///	Whether to use the italic variant of the font.
-	///
 	Font(const std::string& name, bool bold=false, bool italic=false);
 
 	~Font();
@@ -110,7 +110,6 @@ public:
 	///
 	/// @param italic
 	///	Italic flag
-	///
 	bool matches(const std::string& name, bool bold, bool italic) const;
 
 	void testInvariant()
@@ -120,23 +119,22 @@ public:
 	/// Get glyph by index.
 	//
 	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by DisplayObject code.
+	///	Index of the glyph. See get_glyph_index() to obtain by character code.
 	///
 	/// @param embedded
 	///	If true, queries the 'embedded' glyphs table, 
 	///	otherwise, looks in the 'device' font table.
 	///
 	/// @return
-	///	The glyph outline, or NULL if out of range.
-	///	(would be a programming error most likely)
-	///
-	///
+	///	The glyph outline, or NULL if out of range. (would be a
+    /// programming error most likely). The ShapeRecord is owned by
+    /// the Font class.
     SWF::ShapeRecord* get_glyph(int glyph_index, bool embedded) const;
 
 	/// Get name of this font. 
 	const std::string& name() const { return _name; }
 
-	/// Return the glyph index for a given DisplayObject code
+	/// Return the glyph index for a given character code
 	//
 	/// @param code
 	///	Character code to fetch the corresponding glyph index of.
@@ -158,7 +156,7 @@ public:
 	/// Return the advance value for the given glyph index
 	//
 	/// @param glyph_index
-	///	Index of the glyph. See get_glyph_index() to obtain by DisplayObject code.
+	///	Index of the glyph. See get_glyph_index() to obtain by character code.
 	///
 	/// @param embedded
 	///	If true, queries the 'embedded' glyphs table, 
@@ -215,17 +213,19 @@ public:
         // no glyph, default textured glyph, 0 advance
         GlyphInfo();
 
-        // given glyph and advance, default textured glyph
-        GlyphInfo(SWF::ShapeRecord* glyph, float advance);
+        /// Construct default textured glyph
+        //
+        /// Takes ownership of the SWF::ShapeRecord.
+        GlyphInfo(std::auto_ptr<SWF::ShapeRecord> glyph, float advance);
 
-        GlyphInfo(const GlyphInfo&);
+        GlyphInfo(const GlyphInfo& o);
 
 #ifdef GNASH_USE_GC
         /// Mark any glyph and texture glyph resources as reachable
         void markReachableResources() const;
 #endif
 
-        SWF::ShapeRecord* glyph;
+        boost::shared_ptr<SWF::ShapeRecord> glyph;
 
         float advance;
     };
