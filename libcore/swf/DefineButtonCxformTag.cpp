@@ -40,7 +40,7 @@ DefineButtonCxformTag::loader(SWFStream& in, TagType tag, movie_definition& m,
         log_debug("DefineButtonCxformTag: ButtonId=%d", buttonID);
     );
     
-    DefinitionTag* chdef = m.get_DefinitionTag(buttonID);
+    DefinitionTag* chdef = m.getDefinitionTag(buttonID);
     if (!chdef)
     {
         IF_VERBOSE_MALFORMED_SWF(

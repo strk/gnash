@@ -159,7 +159,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
 	_id = in.read_u16();
 
 	// Get DisplayObject definition now (safer)
-	m_DefinitionTag = m.get_DefinitionTag(_id);
+	m_DefinitionTag = m.getDefinitionTag(_id);
 
 	// If no DisplayObject with given ID is found in the movie
 	// definition, we print an error, but keep parsing.

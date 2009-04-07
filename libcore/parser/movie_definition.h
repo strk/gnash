@@ -195,7 +195,7 @@ public:
 	/// @return NULL if no DisplayObject with the given ID is found
 	///         (this is the default)
 	///
-	virtual DefinitionTag*	get_DefinitionTag(int /*id*/)
+	virtual DefinitionTag*	getDefinitionTag(int /*id*/)
 	{
 		return NULL;
 	}

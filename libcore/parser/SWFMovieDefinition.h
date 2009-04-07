@@ -253,7 +253,7 @@ public:
 	/// NOTE: call add_ref() on the return or put in a boost::intrusive_ptr<>
 	/// TODO: return a boost::intrusive_ptr<> directly...
 	///
-    SWF::DefinitionTag* get_DefinitionTag(int DisplayObject_id);
+    SWF::DefinitionTag* getDefinitionTag(int DisplayObject_id);
 
 	// See dox in movie_definition
 	//

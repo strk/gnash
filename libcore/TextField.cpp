@@ -987,7 +987,7 @@ TextField::format_text()
     int    last_space_glyph = -1;
     int    last_line_start_record = 0;
 
-    unsigned int DisplayObject_idx = 0;
+    unsigned int idx = 0;
     m_xcursor = x;
     m_ycursor = y;
 
@@ -1286,12 +1286,12 @@ TextField::format_text()
         }
 
 
-        if (m_cursor > DisplayObject_idx)
+        if (m_cursor > idx)
         {
             m_xcursor = x;
             m_ycursor = y;
         }
-        DisplayObject_idx++;
+        idx++;
 
         // TODO: HTML markup
     }
