@@ -31,6 +31,7 @@
 #include "Shape.h"
 #include "SWFStream.h"
 #include "MovieClip.h"
+#include "swf.h"
 
 #include <algorithm>
 
@@ -38,8 +39,8 @@
 // and compare them with the bounds encoded in the SWF
 //#define GNASH_DEBUG_SHAPE_BOUNDS 1
 
-namespace gnash
-{
+namespace gnash {
+namespace SWF {
 
 void
 DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
@@ -94,7 +95,8 @@ void
 DefineShapeTag::markReachableResources() const
 {}
 
-} // end namespace gnash
+} // namespace SWF
+} // namespace gnash
 
 // Local Variables:
 // mode: C++
