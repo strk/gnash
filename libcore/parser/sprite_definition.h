@@ -227,9 +227,9 @@ public:
 	/// Get a SWF::DefinitionTag from this Sprite's root movie
 	/// CharacterDictionary.
 	///
-	virtual SWF::DefinitionTag*	get_SWF::DefinitionTag(int id)
+	virtual SWF::DefinitionTag*	getDefinitionTag(int id)
 	{
-	    return m_movie_def.get_SWF::DefinitionTag(id);
+	    return m_movie_def.getDefinitionTag(id);
 	}
 
 	/// Delegate call to associated root movie
