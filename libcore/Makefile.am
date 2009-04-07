@@ -99,7 +99,6 @@ libgnashcore_la_SOURCES = \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
 	swf/DefineShapeTag.cpp \
-	swf/DefinitionTag.cpp \
 	swf/DefineEditTextTag.cpp \
 	swf/DefineMorphShapeTag.cpp \
 	swf/CSMTextSettingsTag.cpp \

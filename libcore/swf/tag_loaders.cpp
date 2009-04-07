@@ -718,24 +718,6 @@ fixme_loader(SWFStream& /*in*/, TagType tag, movie_definition& /*m*/,
     }
 }
 
-void define_shape_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINESHAPE
-       || tag == SWF::DEFINESHAPE2
-       || tag == SWF::DEFINESHAPE3
-       || tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_);
-
-    in.ensureBytes(2);
-    boost::uint16_t    DisplayObject_id = in.read_u16();
-    IF_VERBOSE_PARSE(
-        log_parse(_("  shape_loader: id = %d"), DisplayObject_id);
-    );
-
-    DefineShapeTag* ch = new DefineShapeTag(in, tag, m);
-    m.addDisplayObject(DisplayObject_id, ch);
-}
-
 // Create and initialize a sprite, and add it to the movie.
 void
 sprite_loader(SWFStream& in, TagType tag, movie_definition& m,

@@ -48,13 +48,7 @@ class DefinitionTag : public ExportableResource, boost::noncopyable
 {
 public:
 
-    DefinitionTag()
-		:
-		_id(-1)
-    {
-    }
-	
-	virtual ~DefinitionTag();
+	virtual ~DefinitionTag() {};
 	
 	/// Should stick the result in a boost::intrusive_ptr immediately.
 	//
@@ -65,10 +59,6 @@ public:
 	
 	// Declared as virtual here because DisplayObject needs access to it
 	virtual const rect&	get_bound() const = 0;
-	
-private:
-
-    int	_id;
 	
 };
 

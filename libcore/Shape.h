@@ -52,7 +52,7 @@ public:
         assert(_shape.get());
     }
 
-	Shape(const DefineShapeTag* const def, DisplayObject* parent, int id)
+	Shape(const SWF::DefineShapeTag* const def, DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id),
 		_def(def)
@@ -82,7 +82,7 @@ protected:
 
 private:
 	
-    const boost::intrusive_ptr<const DefineShapeTag> _def;
+    const boost::intrusive_ptr<const SWF::DefineShapeTag> _def;
 
     boost::shared_ptr<DynamicShape> _shape;
 

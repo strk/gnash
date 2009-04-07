@@ -93,7 +93,7 @@ namespace gnash
 /// instances to have an associated DefinitionTag. I'll work on this
 /// --strk 2006-12-05.
 ///
-class movie_definition : public DefinitionTag
+class movie_definition : public SWF::DefinitionTag
 {
 public:
 	typedef std::vector<ControlTag*> PlayList;

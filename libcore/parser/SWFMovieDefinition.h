@@ -119,7 +119,7 @@ public:
 	//
 	/// It contains pairs of 'int' and 'boost::intrusive_ptr<DefinitionTag>'
 	///
-	typedef std::map<int, boost::intrusive_ptr<DefinitionTag> >
+	typedef std::map<int, boost::intrusive_ptr<SWF::DefinitionTag> >
         CharacterContainer;
 
 	typedef CharacterContainer::iterator CharacterIterator;
@@ -130,13 +130,13 @@ public:
 	//
 	/// returns a NULL if the id is unknown.
 	///
-	boost::intrusive_ptr<DefinitionTag> getDisplayObject(int id);
+	boost::intrusive_ptr<SWF::DefinitionTag> getDisplayObject(int id);
 
 	/// Add a Character assigning it the given id
 	//
 	/// replaces any existing DisplayObject with the same id
 	///
-	void addDisplayObject(int id, boost::intrusive_ptr<DefinitionTag> c);
+	void addDisplayObject(int id, boost::intrusive_ptr<SWF::DefinitionTag> c);
 
 	/// Return an iterator to the first dictionary element
 	CharacterIterator begin() { return _map.begin(); }
@@ -246,14 +246,14 @@ public:
 	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             Imports& imports);
 
-	void addDisplayObject(int DisplayObject_id, DefinitionTag* c);
+	void addDisplayObject(int DisplayObject_id, SWF::DefinitionTag* c);
 
 	/// \brief
 	/// Return a DisplayObject from the dictionary
 	/// NOTE: call add_ref() on the return or put in a boost::intrusive_ptr<>
 	/// TODO: return a boost::intrusive_ptr<> directly...
 	///
-	DefinitionTag*	get_DefinitionTag(int DisplayObject_id);
+    SWF::DefinitionTag* get_DefinitionTag(int DisplayObject_id);
 
 	// See dox in movie_definition
 	//

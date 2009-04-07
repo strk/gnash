@@ -22,16 +22,17 @@ namespace gnash {
 }
 
 namespace gnash {
+namespace SWF {
 
 /// \brief
 /// Represents the outline of one or more shapes, along with
 /// information on fill and line styles.
-//
 class DefineShapeTag : public DefinitionTag
 {
 public:
 
-    DefineShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& m);
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
+            const RunInfo& r);
 
     virtual ~DefineShapeTag() {};
 
@@ -61,10 +62,14 @@ protected:
 
 private:
 
-    const SWF::ShapeRecord _shape;
+    DefineShapeTag(SWFStream& in, TagType tag, movie_definition& m);
+
+    /// The actual shape data is stored in this record.
+    const ShapeRecord _shape;
 
 };
 
+} // namespace SWF
 } // namespace gnash
 
 

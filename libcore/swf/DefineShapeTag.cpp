@@ -41,6 +41,27 @@
 namespace gnash
 {
 
+void
+DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
+        const RunInfo& /*r*/)
+{
+    assert(tag == DEFINESHAPE ||
+           tag == DEFINESHAPE2 ||
+           tag == DEFINESHAPE3 ||
+           tag == DEFINESHAPE4 ||
+           tag == DEFINESHAPE4_);
+
+    in.ensureBytes(2);
+    boost::uint16_t id = in.read_u16();
+    IF_VERBOSE_PARSE(
+        log_parse(_("DefineShapeTag(%s): id = %d"), tag, id);
+    );
+
+    DefineShapeTag* ch = new DefineShapeTag(in, tag, m);
+    m.addDisplayObject(id, ch);
+
+}
+
 DisplayObject*
 DefineShapeTag::createDisplayObject(DisplayObject* parent, int id)
 {
@@ -55,7 +76,7 @@ DefineShapeTag::pointTestLocal(boost::int32_t x, boost::int32_t y,
 }
 
 
-DefineShapeTag::DefineShapeTag(SWFStream& in, SWF::TagType tag,
+DefineShapeTag::DefineShapeTag(SWFStream& in, TagType tag,
         movie_definition& m)
     :
     DefinitionTag(),

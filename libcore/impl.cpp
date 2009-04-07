@@ -36,6 +36,7 @@
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "DefineShapeTag.h"
 #include "DefineButtonCxformTag.h"
 #include "CSMTextSettingsTag.h"
 #include "DefineFontTag.h"
@@ -108,7 +109,7 @@ static void ensure_loaders_registered()
     // TODO: use null_loader here ?
     register_tag_loader(SWF::END, end_loader);
 
-    register_tag_loader(SWF::DEFINESHAPE, define_shape_loader);
+    register_tag_loader(SWF::DEFINESHAPE, DefineShapeTag::loader);
     register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
     register_tag_loader(SWF::PLACEOBJECT, PlaceObject2Tag::loader);
     register_tag_loader(SWF::REMOVEOBJECT,  RemoveObjectTag::loader); // 05
@@ -137,7 +138,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::SOUNDSTREAMBLOCK, StreamSoundBlockTag::loader);
     register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
     register_tag_loader(SWF::DEFINEBITSJPEG2, define_bits_jpeg2_loader);
-    register_tag_loader(SWF::DEFINESHAPE2,  define_shape_loader);
+    register_tag_loader(SWF::DEFINESHAPE2,  DefineShapeTag::loader);
     register_tag_loader(SWF::DEFINEBUTTONCXFORM, DefineButtonCxformTag::loader); // 23
     // "protect" tag; we're not an authoring tool so we don't care.
     // (might be nice to dump the password instead..)
@@ -149,7 +150,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::SYNCFRAME, fixme_loader); // 29
     // 30 - _UNKNOWN_ unimplemented
     register_tag_loader(SWF::FREEALL, fixme_loader); // 31
-    register_tag_loader(SWF::DEFINESHAPE3,  define_shape_loader);
+    register_tag_loader(SWF::DEFINESHAPE3,  DefineShapeTag::loader);
     register_tag_loader(SWF::DEFINETEXT2, DefineText2Tag::loader);
     // 37
     register_tag_loader(SWF::DEFINEBUTTON2, DefineButton2Tag::loader);
@@ -210,7 +211,7 @@ static void ensure_loaders_registered()
 
     // TODO: Alexis reference says these are 83, 84. The 67,68 comes from Tamarin.
     // Figure out which one is correct (possibly both are).
-    register_tag_loader(SWF::DEFINESHAPE4_, define_shape_loader); // 67
+    register_tag_loader(SWF::DEFINESHAPE4_, DefineShapeTag::loader); // 67
     // 68
     register_tag_loader(SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader);
     // 69
@@ -228,7 +229,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::METADATA, metadata_loader); // 77
     register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
     register_tag_loader(SWF::DOABCDEFINE, abc_loader); // 82 -- AS3 codeblock.
-    register_tag_loader(SWF::DEFINESHAPE4, define_shape_loader); // 83
+    register_tag_loader(SWF::DEFINESHAPE4, DefineShapeTag::loader); // 83
     // 84
     register_tag_loader(SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader);
     register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,define_scene_frame_label_loader); //86
