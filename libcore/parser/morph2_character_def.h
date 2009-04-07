@@ -32,7 +32,7 @@ public:
 
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
-    virtual void display(const MorphShape& inst);
+    virtual void display(const MorphShape& inst) const;
 
     const SWF::ShapeRecord& shape1() const { 
         return _shape1;

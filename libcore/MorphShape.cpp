@@ -166,26 +166,29 @@ MorphShape::display()
     clear_invalidated();
 }
 
+inline double
+MorphShape::currentRatio() const
+{
+    return get_ratio() / 65535.0;
+}
+
 rect
-MorphShape::getBounds() const {
-    return _bounds;
+MorphShape::getBounds() const
+{
+    rect bounds;
+    bounds.set_lerp(_def->shape1().getBounds(), _def->shape2().getBounds(),
+            currentRatio());
+    return bounds;
 }
 
 void
 MorphShape::morph()
 {
     
-    const double ratio = get_ratio() / 65535.0;
-
-    log_debug("ratio: %s", ratio);
+    const double ratio = currentRatio();
 
     const SWF::ShapeRecord& shape1 = _def->shape1();
     const SWF::ShapeRecord& shape2 = _def->shape2();
-
-    // bounds
-    _bounds.set_lerp(shape1.getBounds(), shape2.getBounds(), ratio);
-
-    log_debug("Bounds: %s", _bounds);
 
     // fill styles
     const FillStyles::const_iterator fs1 = shape1.fillStyles().begin();

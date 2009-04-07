@@ -100,8 +100,6 @@ public:
     }
 
     /// morph class presently has two shape_character_defs
-    friend class morph2_character_def;
-
     virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
             const SWFMatrix& wm);
 

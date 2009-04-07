@@ -76,7 +76,9 @@ private:
     
     void morph();
 
-    const boost::intrusive_ptr<morph_character_def> _def;
+    double currentRatio() const;
+
+    const boost::intrusive_ptr<const morph_character_def> _def;
 	
     FillStyles _fillStyles;
     LineStyles _lineStyles;

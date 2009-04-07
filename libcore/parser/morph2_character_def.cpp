@@ -46,7 +46,7 @@ morph_character_def::createDisplayObject(DisplayObject* parent, int id)
 }
 
 void
-morph_character_def::display(const MorphShape& inst)
+morph_character_def::display(const MorphShape& inst) const
 {
     render::drawMorph(*this, inst);
 }
