@@ -18,7 +18,7 @@
 #ifndef GNASH_SWF_DEFINETEXTTAG_H
 #define GNASH_SWF_DEFINETEXTTAG_H
 
-#include "character_def.h" // for inheritance
+#include "DefinitionTag.h" // for inheritance
 #include "styles.h" 
 #include "rect.h" // for composition
 #include "swf.h"
@@ -42,7 +42,7 @@ namespace SWF {
 /// This is either read from SWF stream 
 /// or (hopefully) created with scripting
 ///
-class DefineTextTag : public character_def
+class DefineTextTag : public DefinitionTag
 {
 public:
 

@@ -15,8 +15,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_CHARACTER_DEF_H
-#define GNASH_CHARACTER_DEF_H
+#ifndef GNASH_DEFINITION_TAG_H
+#define GNASH_DEFINITION_TAG_H
 
 #include "ExportableResource.h"
 
@@ -36,10 +36,7 @@ namespace gnash {
 }
 
 namespace gnash {
-
-
-class render_cache_manager; 
-
+namespace SWF {
 
 /// Immutable data representing the template of a movie element.
 //
@@ -47,45 +44,36 @@ class render_cache_manager;
 /// can be mixed into movie_definition and sprite_definition,
 /// without using multiple inheritance.
 ///
-class character_def : public ExportableResource, boost::noncopyable
+class DefinitionTag : public ExportableResource, boost::noncopyable
 {
 public:
 
-    character_def()
+    DefinitionTag()
 		:
-		m_render_cache(0),
 		_id(-1)
     {
     }
-
 	
-	virtual ~character_def();
+	virtual ~DefinitionTag();
 	
 	/// Should stick the result in a boost::intrusive_ptr immediately.
 	//
 	/// default is to make a DisplayObject
 	///
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id) = 0;
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent,
+            int id) = 0;
 	
 	// Declared as virtual here because DisplayObject needs access to it
 	virtual const rect&	get_bound() const = 0;
 	
-    /// Cache holder for renderer (contents depend on renderer handler)
-    /// Will be deleted by destructor of the character_def.
-    /// We could store by auto_ptr, but I'm afraid that would mean
-    /// including render_handler.h in this header, which I don't like.
-    /// (REF: PIMPL)
-    ///
-    render_cache_manager* m_render_cache;
-
 private:
 
     int	_id;
 	
 };
 
-
-}	// namespace gnash
+} // namespace SWF
+} // namespace gnash
 
 #endif 
 

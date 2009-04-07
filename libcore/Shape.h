@@ -21,7 +21,7 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
-#include "shape_character_def.h"
+#include "DefineShapeTag.h"
 #include "DynamicShape.h"
 
 #include <cassert>
@@ -29,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-    class character_def;
+    class DefinitionTag;
 }
 
 namespace gnash {
@@ -52,7 +52,7 @@ public:
         assert(_shape.get());
     }
 
-	Shape(const shape_character_def* const def, DisplayObject* parent, int id)
+	Shape(const DefineShapeTag* const def, DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id),
 		_def(def)
@@ -82,7 +82,7 @@ protected:
 
 private:
 	
-    const boost::intrusive_ptr<const shape_character_def> _def;
+    const boost::intrusive_ptr<const DefineShapeTag> _def;
 
     boost::shared_ptr<DynamicShape> _shape;
 

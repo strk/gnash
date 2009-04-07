@@ -20,16 +20,9 @@
 #include "gnashconfig.h"
 #endif
 
-#include "character_def.h"
-#include "render_handler.h" // for destruction of render_cache_manager
 
 namespace gnash
 {
-
-character_def::~character_def()
-{
-	delete m_render_cache;
-}
 
 } // end of namespace gnash
 

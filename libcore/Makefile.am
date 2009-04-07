@@ -98,6 +98,8 @@ libgnashcore_la_SOURCES = \
 	swf/TextRecord.cpp \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
+	swf/DefineShapeTag.cpp \
+	swf/DefinitionTag.cpp \
 	swf/DefineEditTextTag.cpp \
 	swf/DefineMorphShapeTag.cpp \
 	swf/CSMTextSettingsTag.cpp \
@@ -194,6 +196,8 @@ noinst_HEADERS = \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
+	swf/DefineShapeTag.h \
+	swf/DefinitionTag.h \
 	swf/DefineMorphShapeTag.h \
 	swf/ShapeRecord.h \
 	swf/SoundInfoRecord.h \

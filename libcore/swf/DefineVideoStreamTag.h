@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "character_def.h"
+#include "DefinitionTag.h"
 #include "swf.h"
 #include "rect.h" // for composition
 #include "MediaParser.h" // for videoFrameType and videoCodecType enums
@@ -69,7 +69,7 @@ public:
 
 namespace SWF {
 
-class DefineVideoStreamTag : public character_def
+class DefineVideoStreamTag : public DefinitionTag
 {
 public:
 	
@@ -146,7 +146,7 @@ private:
 	/// Construct a video stream definition with given ID
 	//
 	/// NOTE: for dynamically created definitions (ActionScript Video class
-    ///       instances) you can use an id of -1. See character_def
+    ///       instances) you can use an id of -1. See DefinitionTag
     ///       constructor, as that's the one which will eventually get passed
     ///       the id.
     /// NOTE: What dynamically created definitions?

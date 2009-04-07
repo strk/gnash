@@ -932,7 +932,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
                   boost::bind(&path::transform, _1, boost::ref(mat)));
   }
                   
-  virtual void drawShape(shape_character_def *def, 
+  virtual void drawShape(DefineShapeTag *def, 
     const SWFMatrix& mat,
     const cxform& cx)
   {
@@ -975,7 +975,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     
   }
   
-  virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
+  virtual void draw_glyph(DefineShapeTag *def, const SWFMatrix& mat,
     const rgba& color)
   {
   

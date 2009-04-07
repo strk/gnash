@@ -1514,7 +1514,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     assert(m_def);
     assert(tag);
 
-    character_def* cdef = m_def->get_character_def(tag->getID());
+    DefinitionTag* cdef = m_def->get_DefinitionTag(tag->getID());
     if (!cdef)
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -1579,7 +1579,7 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
     assert(m_def != NULL);
     assert(tag != NULL);
 
-    character_def*    cdef = m_def->get_character_def(tag->getID());
+    DefinitionTag*    cdef = m_def->get_DefinitionTag(tag->getID());
     if (cdef == NULL)
     {
         log_error(_("movieclip::replace_display_object(): "
@@ -1977,7 +1977,7 @@ MovieClip::mouseEnabled() const
 DisplayObject*
 MovieClip::getDisplayObject(int /* DisplayObject_id */)
 {
-    //return m_def->get_character_def(DisplayObject_id);
+    //return m_def->get_DefinitionTag(DisplayObject_id);
     // @@ TODO -- look through our dlist for a match
     log_unimpl(_("%s doesn't even check for a char"),
         __PRETTY_FUNCTION__);
@@ -3157,8 +3157,8 @@ movieclip_attachMovie(const fn_call& fn)
         return as_value(); 
     }
     
-    character_def* exported_movie =
-        dynamic_cast<character_def*>(exported.get());
+    DefinitionTag* exported_movie =
+        dynamic_cast<DefinitionTag*>(exported.get());
 
     if (!exported_movie)
     {

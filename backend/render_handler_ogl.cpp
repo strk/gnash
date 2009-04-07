@@ -1607,7 +1607,7 @@ public:
 // 5. Profit!
 
   virtual void
-  drawShape(shape_character_def *def, const SWFMatrix& mat,
+  drawShape(DefineShapeTag *def, const SWFMatrix& mat,
     const cxform& cx)
   {
   
@@ -1655,7 +1655,7 @@ public:
     }
   }
 
-  virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
+  virtual void draw_glyph(DefineShapeTag *def, const SWFMatrix& mat,
     const rgba& c)
   {
     if (_drawing_mask) abort();

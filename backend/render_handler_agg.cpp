@@ -122,7 +122,7 @@ AGG resources
 #include "Range2d.h"
 #include "swf/DefineMorphShapeTag.h" 
 #include "swf/ShapeRecord.h" 
-#include "shape_character_def.h" 
+#include "DefineShapeTag.h" 
 #include "DisplayObject.h"
 #include "MorphShape.h"
 #include "Shape.h"
@@ -988,7 +988,7 @@ public:
     }
 
 
-    void drawShape(const shape_character_def& def, const DisplayObject& inst)
+    void drawShape(const DefineShapeTag& def, const DisplayObject& inst)
     {
     }
     

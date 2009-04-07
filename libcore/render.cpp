@@ -171,7 +171,7 @@ drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
 
 
 void
-drawShape(const shape_character_def& def, const DisplayObject& inst) 
+drawShape(const DefineShapeTag& def, const DisplayObject& inst) 
 {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;

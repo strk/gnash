@@ -226,20 +226,20 @@ SWFMovieDefinition::~SWFMovieDefinition()
 	//assert(m_jpeg_in->get() == NULL);
 }
 
-void SWFMovieDefinition::addDisplayObject(int DisplayObject_id, character_def* c)
+void SWFMovieDefinition::addDisplayObject(int DisplayObject_id, DefinitionTag* c)
 {
 	assert(c);
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 	_dictionary.addDisplayObject(DisplayObject_id, c);
 }
 
-character_def*
-SWFMovieDefinition::get_character_def(int DisplayObject_id)
+DefinitionTag*
+SWFMovieDefinition::get_DefinitionTag(int DisplayObject_id)
 {
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 
-	boost::intrusive_ptr<character_def> ch = 
+	boost::intrusive_ptr<DefinitionTag> ch = 
         _dictionary.getDisplayObject(DisplayObject_id);
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
@@ -510,7 +510,7 @@ operator<<(std::ostream& o, const CharacterDictionary& cd)
    	return o;
 }
 
-boost::intrusive_ptr<character_def>
+boost::intrusive_ptr<DefinitionTag>
 CharacterDictionary::getDisplayObject(int id)
 {
 	CharacterIterator it = _map.find(id);
@@ -519,7 +519,7 @@ CharacterDictionary::getDisplayObject(int id)
 		IF_VERBOSE_PARSE(
             log_parse(_("Could not find char %d, dump is: %s"), id, *this);
 		);
-		return boost::intrusive_ptr<character_def>();
+		return boost::intrusive_ptr<DefinitionTag>();
 	}
 	
     return it->second;
@@ -527,7 +527,7 @@ CharacterDictionary::getDisplayObject(int id)
 
 void
 CharacterDictionary::addDisplayObject(int id,
-        boost::intrusive_ptr<character_def> c)
+        boost::intrusive_ptr<DefinitionTag> c)
 {
 	//log_debug(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
@@ -927,7 +927,7 @@ SWFMovieDefinition::importResources(
 			add_font(id, f);
 			++importedSyms;
         }
-        else if (character_def* ch = dynamic_cast<character_def*>(res.get()))
+        else if (DefinitionTag* ch = dynamic_cast<DefinitionTag*>(res.get()))
         {
             // Add this DisplayObject to the loading movie.
             addDisplayObject(id, ch);

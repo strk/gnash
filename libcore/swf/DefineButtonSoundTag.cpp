@@ -43,7 +43,7 @@ DefineButtonSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     in.ensureBytes(2);
     int id = in.read_u16();
-    character_def* chdef = m.get_character_def(id);
+    DefinitionTag* chdef = m.get_DefinitionTag(id);
     if (!chdef)
     {
         IF_VERBOSE_MALFORMED_SWF(

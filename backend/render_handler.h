@@ -146,7 +146,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include "gnash.h" // Quality
-#include "shape_character_def.h"    
+#include "DefineShapeTag.h"    
 #include "DisplayObject.h"
 #include "Range2d.h"
 
@@ -162,7 +162,7 @@ namespace gnash {
         class DefineMorphShapeTag;
         class ShapeRecord;
     }
-    class shape_character_def;
+    class DefineShapeTag;
 
     class Shape;
     class MorphShape;
@@ -293,7 +293,7 @@ public:
     virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
             const SWFMatrix& worldMat) = 0;
         
-    virtual void drawShape(const shape_character_def& def,
+    virtual void drawShape(const DefineShapeTag& def,
             const DisplayObject& inst) = 0;
     
     virtual void drawMorph(const SWF::DefineMorphShapeTag& def,

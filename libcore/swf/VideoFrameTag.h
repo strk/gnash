@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "character_def.h"
+#include "DefinitionTag.h"
 #include "movie_definition.h"
 #include "swf.h"
 #include "rect.h" // for composition

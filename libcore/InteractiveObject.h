@@ -20,12 +20,12 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h" // for inheritance
-#include "character_def.h"
+#include "DefinitionTag.h"
 
 #include <cassert>
 
 namespace gnash {
-    class character_def;
+    class DefinitionTag;
     class StaticText;
     namespace SWF {
         class TextRecord;

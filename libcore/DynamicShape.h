@@ -139,7 +139,7 @@ public:
 	///
 	size_t add_line_style(const line_style& stl);
 
-	// Override from shape_character_def to call ::finalize
+	// Override from DefineShapeTag to call ::finalize
 	// NOTE: this is not correct in that a call to hitTest should
 	//       not force closing the path being drawn.
 	//       Instead, the closeup should be "temporary" and in

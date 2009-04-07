@@ -732,7 +732,7 @@ void define_shape_loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("  shape_loader: id = %d"), DisplayObject_id);
     );
 
-    shape_character_def* ch = new shape_character_def(in, tag, m);
+    DefineShapeTag* ch = new DefineShapeTag(in, tag, m);
     m.addDisplayObject(DisplayObject_id, ch);
 }
 
@@ -825,7 +825,7 @@ void export_loader(SWFStream& in, TagType tag, movie_definition& m,
         // Fonts, DisplayObjects and sounds can be exported.
         ExportableResource* f;
         if ((f = m.get_font(id)) ||
-            (f = m.get_character_def(id)) ||
+            (f = m.get_DefinitionTag(id)) ||
             (f = m.get_sound_sample(id))) {
             
             m.export_resource(symbolName, f);

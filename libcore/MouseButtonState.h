@@ -8,7 +8,7 @@
 #define GNASH_MOUSE_BUTTON_STATE_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "character_def.h"
+#include "DefinitionTag.h"
 #include "smart_ptr.h" // for composition and inlines
 #include "InteractiveObject.h" // for use in intrusive_ptr
 

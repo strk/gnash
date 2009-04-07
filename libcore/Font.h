@@ -321,7 +321,7 @@ protected:
 	/// Mark reachable resources (for the GC)
 	//
 	/// Reachable resources are:
-	///	- shape_character_defs (vector glyphs)
+	///	- DefineShapeTags (vector glyphs)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC

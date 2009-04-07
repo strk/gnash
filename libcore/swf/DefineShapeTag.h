@@ -9,7 +9,7 @@
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
 
-#include "character_def.h" // for inheritance of shape_character_def
+#include "DefinitionTag.h" // for inheritance of DefineShapeTag
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "swf.h"
 #include "ShapeRecord.h"
@@ -27,13 +27,13 @@ namespace gnash {
 /// Represents the outline of one or more shapes, along with
 /// information on fill and line styles.
 //
-class shape_character_def : public character_def
+class DefineShapeTag : public DefinitionTag
 {
 public:
 
-    shape_character_def(SWFStream& in, SWF::TagType tag, movie_definition& m);
+    DefineShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& m);
 
-    virtual ~shape_character_def() {};
+    virtual ~DefineShapeTag() {};
 
     // Display a Shape character.
     virtual void display(const DisplayObject& inst) const;

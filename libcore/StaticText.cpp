@@ -41,7 +41,7 @@ bool
 StaticText::pointInShape(boost::int32_t /*x*/, boost::int32_t /*y*/) const
 {
     // TODO: this has never worked as it relied on the default
-    // pointTestLocal in character_def, which returned false. There are
+    // pointTestLocal in DefinitionTag, which returned false. There are
     // no tests for whether StaticText has a proper hit test.
     return false;
 }

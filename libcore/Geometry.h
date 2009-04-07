@@ -486,7 +486,7 @@ public:
     //
     /// @param f
     ///    The fill index (1-based).
-    ///    When this path is added to a shape_character_def,
+    ///    When this path is added to a DefineShapeTag,
     ///    the index (decremented by 1) will reference an element
     ///    in the fill_style vector defined for that shape.
     ///    If zero, no fill will be active.
@@ -505,7 +505,7 @@ public:
     //
     /// @param f
     ///    The fill index (1-based).
-    ///    When this path is added to a shape_character_def,
+    ///    When this path is added to a DefineShapeTag,
     ///    the index (decremented by 1) will reference an element
     ///    in the fill_style vector defined for that shape.
     ///    If zero, no fill will be active.
@@ -524,7 +524,7 @@ public:
     //
     /// @param f
     ///    The line_style index (1-based).
-    ///    When this path is added to a shape_character_def,
+    ///    When this path is added to a DefineShapeTag,
     ///    the index (decremented by 1) will reference an element
     ///    in the line_style vector defined for that shape.
     ///    If zero, no fill will be active.

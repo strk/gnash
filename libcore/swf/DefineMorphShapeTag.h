@@ -25,7 +25,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "swf.h"
 #include "ShapeRecord.h"
-#include "character_def.h"
+#include "DefinitionTag.h"
 
 // Forward declarations.
 namespace gnash {
@@ -39,7 +39,7 @@ namespace SWF {
 
 /// DefineMorphShape tag
 //
-class DefineMorphShapeTag : public character_def
+class DefineMorphShapeTag : public DefinitionTag
 {
 public:
 

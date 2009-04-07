@@ -899,7 +899,7 @@ private:
     boost::shared_ptr<DynamicShape> _drawable;
 
     /// The need of an instance here is due to the renderer
-    /// insising on availability a shape_character_def instance
+    /// insising on availability a DefineShapeTag instance
     /// that has a parent (why?)
     ///
     boost::intrusive_ptr<DisplayObject> _drawable_inst;

@@ -29,7 +29,7 @@ namespace gnash {
 
 /// A class for SWF resources that may be exported
 //
-/// They are: character_def, sound_sample, and font.
+/// They are: DefinitionTag, sound_sample, and font.
 /// These may be held in the export map of a SWFMovieDefinition.
 class ExportableResource : public ref_counted
 {

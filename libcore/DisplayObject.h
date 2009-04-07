@@ -23,7 +23,7 @@
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "character_def.h"
+#include "DefinitionTag.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance

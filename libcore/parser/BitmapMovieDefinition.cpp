@@ -86,7 +86,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 	_bytesTotal(image->size()),
 	_bitmap(render::createBitmapInfo(image))
 {
-	// Do not create shape_character_def now (why?)
+	// Do not create DefineShapeTag now (why?)
 }
 
 #ifdef GNASH_USE_GC

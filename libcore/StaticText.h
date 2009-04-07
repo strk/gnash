@@ -29,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-    class character_def;
+    class DefinitionTag;
     namespace SWF {
         class TextRecord;
     }
