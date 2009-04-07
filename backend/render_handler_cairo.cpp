@@ -40,8 +40,6 @@
 #include "GnashImage.h"
 #include <cmath>
 #include "PathParser.h"
-#include "MorphShape.h"
-#include "swf/DefineMorphShapeTag.h"
 #include "swf/ShapeRecord.h"
 
 namespace gnash {
