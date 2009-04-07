@@ -46,7 +46,7 @@ Shape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
     }
     assert(_shape.get());
     
-    //if (!_shape->getBounds().point_test(lp.x, lp.y)) return false;
+    if (!_shape->getBounds().point_test(lp.x, lp.y)) return false;
     return _shape->pointTestLocal(lp.x, lp.y, wm);
 
 }
