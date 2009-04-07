@@ -226,20 +226,20 @@ SWFMovieDefinition::~SWFMovieDefinition()
 	//assert(m_jpeg_in->get() == NULL);
 }
 
-void SWFMovieDefinition::addDisplayObject(int id, DefinitionTag* c)
+void SWFMovieDefinition::addDisplayObject(int id, SWF::DefinitionTag* c)
 {
 	assert(c);
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 	_dictionary.addDisplayObject(id, c);
 }
 
-DefinitionTag*
+SWF::DefinitionTag*
 SWFMovieDefinition::getDefinitionTag(int id)
 {
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 
-	boost::intrusive_ptr<DefinitionTag> ch = 
+	boost::intrusive_ptr<SWF::DefinitionTag> ch = 
         _dictionary.getDisplayObject(id);
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
@@ -510,7 +510,7 @@ operator<<(std::ostream& o, const CharacterDictionary& cd)
    	return o;
 }
 
-boost::intrusive_ptr<DefinitionTag>
+boost::intrusive_ptr<SWF::DefinitionTag>
 CharacterDictionary::getDisplayObject(int id)
 {
 	CharacterIterator it = _map.find(id);
@@ -519,7 +519,7 @@ CharacterDictionary::getDisplayObject(int id)
 		IF_VERBOSE_PARSE(
             log_parse(_("Could not find char %d, dump is: %s"), id, *this);
 		);
-		return boost::intrusive_ptr<DefinitionTag>();
+		return boost::intrusive_ptr<SWF::DefinitionTag>();
 	}
 	
     return it->second;
@@ -527,7 +527,7 @@ CharacterDictionary::getDisplayObject(int id)
 
 void
 CharacterDictionary::addDisplayObject(int id,
-        boost::intrusive_ptr<DefinitionTag> c)
+        boost::intrusive_ptr<SWF::DefinitionTag> c)
 {
 	//log_debug(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
@@ -927,7 +927,7 @@ SWFMovieDefinition::importResources(
 			add_font(id, f);
 			++importedSyms;
         }
-        else if (DefinitionTag* ch = dynamic_cast<DefinitionTag*>(res.get()))
+        else if (SWF::DefinitionTag* ch = dynamic_cast<SWF::DefinitionTag*>(res.get()))
         {
             // Add this DisplayObject to the loading movie.
             addDisplayObject(id, ch);
