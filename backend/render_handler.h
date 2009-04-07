@@ -160,6 +160,7 @@ namespace gnash {
 
     namespace SWF {
         class DefineMorphShapeTag;
+        class ShapeRecord;
     }
     class shape_character_def;
 
@@ -289,6 +290,8 @@ public:
         const rgba& fill, const rgba& outline, const SWFMatrix& mat,
         bool masked) = 0;
         
+    virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+            const SWFMatrix& worldMat) = 0;
         
     virtual void drawShape(const shape_character_def& def,
             const DisplayObject& inst) = 0;
@@ -310,8 +313,8 @@ public:
     /// @param mat
     ///
     /// @param color
-    virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
-        const rgba& color) = 0;
+    virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
+           const SWFMatrix& mat) = 0;
 
 
     /// ==================================================================

@@ -20,12 +20,12 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
-#include "shape_character_def.h"  // for inheritance
-#include "styles.h" // for cap_style_e and join_style_e enums
+#include "fill_style.h"
+#include "styles.h" 
 #include "swf/ShapeRecord.h"
 
 namespace gnash {
-    class fill_style;
+    class DisplayObject;
 }
 
 namespace gnash {
@@ -33,13 +33,13 @@ namespace gnash {
 /// \brief
 /// Represents the outline of one or more shapes, along with
 /// information on fill and line styles.
-class DynamicShape : public shape_character_def
+class DynamicShape
 {
 public:
 
 	DynamicShape();
 
-	virtual ~DynamicShape() {}
+	~DynamicShape() {}
 
 	/// Remove all paths and style informations
 	void clear();
@@ -67,6 +67,16 @@ public:
 
 	/// Close an existing filled path, if any.
 	void endFill();
+
+    const rect& getBounds() const {
+        return _shape.getBounds();
+    }
+
+    void setBounds(const rect& bounds) {
+        _shape.setBounds(bounds);
+    }
+
+    void display(const DisplayObject& inst);
 
 	/// Set current line style and start a new path.
 	//
@@ -139,12 +149,17 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y,
+	bool pointTestLocal(boost::int32_t x, boost::int32_t y,
             const SWFMatrix& wm)
 	{
 		finalize();
-		return geometry::pointTest(_paths, _line_styles, x, y, wm);
+		return geometry::pointTest(_shape.paths(), _shape.lineStyles(), x, y,
+                wm);
 	}
+
+    const SWF::ShapeRecord& shapeRecord() const {
+        return _shape;
+    }
 
 	/// Add a path, updating _currpath and recomputing bounds
 	//
@@ -172,7 +187,6 @@ private:
 	/// for origin, fill and line styles.
 	///
 	/// If newShape is true the new shape will start a new subshape.
-	///
 	void startNewPath(bool newShape);
 
 	Path* _currpath;

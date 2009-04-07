@@ -23,7 +23,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "Font.h"
 #include "log.h"
-#include "shape_character_def.h"
+#include "ShapeRecord.h"
 #include "DefineFontTag.h"
 #include "FreetypeGlyphsProvider.h"
 
@@ -58,16 +58,16 @@ Font::GlyphInfo::GlyphInfo()
 	advance(0)
 {}
 
-Font::GlyphInfo::GlyphInfo(boost::intrusive_ptr<shape_character_def> glyph,
+Font::GlyphInfo::GlyphInfo(SWF::ShapeRecord* glyph,
         float advance)
 	:
-	glyph(glyph.get()),
+	glyph(glyph),
 	advance(advance)
 {}
 
 Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 	:
-	glyph(o.glyph.get()),
+	glyph(o.glyph),
 	advance(o.advance)
 {}
 
@@ -75,7 +75,6 @@ Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 void
 Font::GlyphInfo::markReachableResources() const
 {
-	if ( glyph ) glyph->setReachable();
 }
 #endif
 
@@ -109,7 +108,7 @@ Font::~Font()
 {
 }
 
-shape_character_def*
+SWF::ShapeRecord*
 Font::get_glyph(int index, bool embedded) const
 {
     // What to do if embedded is true and this is a
@@ -118,7 +117,7 @@ Font::get_glyph(int index, bool embedded) const
             _fontTag->glyphTable() : _deviceGlyphTable;
 
     if (index >= 0 && (size_t)index < lookup.size()) {
-        return lookup[index].glyph.get();
+        return lookup[index].glyph;
     }
 
     // TODO: should we log an error here ?
@@ -296,8 +295,7 @@ Font::add_os_glyph(boost::uint16_t code)
     float advance;
 
     // Get the vectorial glyph
-    boost::intrusive_ptr<shape_character_def> sh = 
-        _ftProvider->getGlyph(code, advance);
+    SWF::ShapeRecord* sh = _ftProvider->getGlyph(code, advance);
 
     if (!sh) {
         log_error("Could not create shape "
@@ -371,8 +369,6 @@ Font::is_subpixel_font() const {
 /// Mark reachable resources (for the GC)
 //
 /// Reachable resources are:
-///	- shape_character_defs (vector glyphs, devide and embeded)
-///
 void
 Font::markReachableResources() const
 {

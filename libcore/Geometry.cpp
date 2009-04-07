@@ -108,8 +108,6 @@ pointTest(const std::vector<Path>& paths,
         const std::vector<line_style>& lineStyles, boost::int32_t x,
         boost::int32_t y, const SWFMatrix& wm)
 {
-    log_debug("x: %s, y: %s, mat %s", x, y, wm);
-
     /*
     Principle:
     For the fill of the shape, we project a ray from the test point to the left

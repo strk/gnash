@@ -25,29 +25,28 @@
 #include "render.h" // for ::display
 #include "GnashImage.h"
 #include "log.h"
+#include "Shape.h"
 
 namespace gnash {
 
-shape_character_def*
-BitmapMovieDefinition::getShapeDef()
+DisplayObject*
+BitmapMovieDefinition::createDisplayObject(DisplayObject* parent, int id)
 {
-	if ( _shapedef ) return _shapedef.get();
 
     // It's possible for this to fail.
     if (!_bitmap.get()) return 0;
 
-	// Create the shape definition
-	_shapedef = new DynamicShape();
+    if (!_shape.get()) _shape.reset(new DynamicShape);
 
 	// Set its boundaries
-	_shapedef->set_bound(_framesize);
+	_shape->setBounds(_framesize);
 
 	// Add the bitmap fill style (fill style 0)
 
 	SWFMatrix mat;
 	mat.set_scale(1.0/20, 1.0/20); // bitmap fills get SWFMatrix reversed
 	fill_style bmFill(_bitmap.get(), mat);
-	const size_t fillLeft = _shapedef->add_fill_style(bmFill);
+	const size_t fillLeft = _shape->add_fill_style(bmFill);
 
 	// Define a rectangle filled with the bitmap style
 
@@ -69,9 +68,9 @@ BitmapMovieDefinition::getShapeDef()
 
 	// Add the path 
 
-	_shapedef->add_path(bmPath);
+	_shape->add_path(bmPath);
 
-	return _shapedef.get();
+	return new Shape(_shape, parent, id);
 }
 
 BitmapMovieDefinition::BitmapMovieDefinition(
@@ -94,8 +93,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 void
 BitmapMovieDefinition::markReachableResources() const
 {
-	if ( _shapedef.get() ) _shapedef->setReachable();
-	if ( _bitmap.get() ) _bitmap->setReachable();
+	if (_bitmap.get()) _bitmap->setReachable();
 }
 #endif // GNASH_USE_GC
 

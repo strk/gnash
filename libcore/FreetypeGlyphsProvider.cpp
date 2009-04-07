@@ -26,6 +26,7 @@
 #include "GnashException.h"
 #include "render.h"
 #include "DynamicShape.h"
+#include "ShapeRecord.h"
 #include "log.h"
 
 #ifdef USE_FREETYPE 
@@ -77,7 +78,7 @@ public:
 	/// Create an outline walker drawing to the given DynamiShape
 	//
 	/// @param sh
-	///	The DynamiShape to draw to. Externally owned.
+	///	The DynamicShape to draw to. Externally owned.
 	///
 	/// @param scale
 	///	The scale to apply to coordinates.
@@ -402,16 +403,17 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 #endif // ndef USE_FREETYPE 
 
 #ifdef USE_FREETYPE
-boost::intrusive_ptr<shape_character_def>
+SWF::ShapeRecord*
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 {
-	boost::intrusive_ptr<DynamicShape> sh;
 
-	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP|FT_LOAD_NO_SCALE);
-	if ( error != 0 )
-	{
-		log_error("Error loading freetype outline glyph for char '%c' (error: %d)", code, error);
-		return sh.get();
+	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP | 
+                                                FT_LOAD_NO_SCALE);
+
+	if (error) {
+		log_error("Error loading freetype outline glyph for char '%c' "
+                "(error: %d)", code, error);
+		return 0;
 	}
 
 	// Scale advance by current scale, to match expected output coordinate space
@@ -437,16 +439,11 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 
 	FT_Outline* outline = &(m_face->glyph->outline);
 
-	//FT_BBox	glyphBox;
-	//FT_Outline_Get_BBox(outline, &glyphBox);
-	//rect r(glyphBox.xMin, glyphBox.yMin, glyphBox.xMax, glyphBox.yMax);
-	//log_debug("Glyph for DisplayObject '%c' has computed bounds %s", code, r.toString().c_str());
-
-	sh = new DynamicShape();
+	DynamicShape* sh = new DynamicShape();
 	sh->beginFill(rgba(255, 255, 255, 255));
 
 	FT_Outline_Funcs walk;
-       	walk.move_to = OutlineWalker::walkMoveTo;
+    walk.move_to = OutlineWalker::walkMoveTo;
 	walk.line_to = OutlineWalker::walkLineTo;
 	walk.conic_to = OutlineWalker::walkConicTo;
 	walk.cubic_to = OutlineWalker::walkCubicTo;
@@ -466,10 +463,12 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 			code, bound.toString());
 #endif
 
-	return sh.get();
+    // TODO: do this without copying!
+    SWF::ShapeRecord* s = new SWF::ShapeRecord(sh->shapeRecord());
+	return s;
 }
 #else // ndef(USE_FREETYPE)
-boost::intrusive_ptr<shape_character_def>
+SWF::ShapeRecord*
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
 {
 	abort(); // should never be called... 

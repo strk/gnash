@@ -78,26 +78,10 @@ public:
             movie_definition& m);
 
     /// Get cached bounds of this shape.
-    const rect&	get_bound() const { return _bound; }
-
-    void set_bound(const rect& r) { _bound = r; }
+    const rect&	get_bound() const { return _shape.getBounds(); }
 
     /// Compute bounds by looking at the component paths
     void compute_bound(rect& r, int swfVersion) const;
-
-    const FillStyles& fillStyles() const { return _fill_styles; }
-    const LineStyles& lineStyles() const { return _line_styles; }
-
-    const Paths& paths() const { return _paths; }
-
-    // Morph uses this.
-    void addFillStyle(const fill_style& fs) {
-        _fill_styles.push_back(fs);
-    }
-
-    void addLineStyle(const line_style& fs) {
-        _line_styles.push_back(fs);
-    }
 
     /// morph class presently has two shape_character_defs
     virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
@@ -115,15 +99,6 @@ protected:
     virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
 
-    /// Copy a shape DisplayObject definition
-    shape_character_def(const shape_character_def& o);
-    
-    /// Used by DynamicShape
-    FillStyles _fill_styles;
-    LineStyles _line_styles;
-    Paths _paths;
-    rect _bound;
-
 private:
 
     /// Shape record flags
@@ -135,11 +110,8 @@ private:
         flagLineStyleChange = 0x08,
         flagHasNewStyles = 0x10
     };
-    
-    // Don't assign to a shape DisplayObject definition
-    shape_character_def& operator= (const shape_character_def&);
 
-    const SWF::ShapeRecord _shapeRecord;
+    const SWF::ShapeRecord _shape;
 
 };
 

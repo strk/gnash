@@ -121,6 +121,7 @@ AGG resources
 #include "render_handler_agg.h" 
 #include "Range2d.h"
 #include "swf/DefineMorphShapeTag.h" 
+#include "swf/ShapeRecord.h" 
 #include "shape_character_def.h" 
 #include "DisplayObject.h"
 #include "MorphShape.h"
@@ -862,22 +863,20 @@ public:
     }
   
 
-  void draw_glyph(shape_character_def *def,
-      const SWFMatrix& mat, const rgba& color) 
+  void drawGlyph(const SWF::ShapeRecord& shape, const rgba& color,
+          const SWFMatrix& mat) 
   {
     
     // select relevant clipping bounds
-    if (def->get_bound().is_null()) {
+    if (shape.getBounds().is_null()) {
         return;
-        // Why would we want to do this?
-        //select_all_clipbounds();  
     } 
-    else select_clipbounds(def->get_bound(), mat);
+    select_clipbounds(shape.getBounds(), mat);
     
     if (_clipbounds_selected.empty()) return; 
       
     GnashPaths paths;
-    apply_matrix_to_path(def->paths(), paths, mat);
+    apply_matrix_to_path(shape.paths(), paths, mat);
 
     // If it's a mask, we don't need the rest.
     if (m_drawing_mask) {
@@ -964,30 +963,33 @@ public:
     }
   }
 
-    void drawShape(const shape_character_def& def, const DisplayObject& inst)
+    void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+            const SWFMatrix& worldMat)
     {
         // check if the character needs to be rendered at all
         rect cur_bounds;
 
-        cur_bounds.expand_to_transformed_rect(inst.getWorldMatrix(), 
-                def.get_bound());
+        cur_bounds.expand_to_transformed_rect(worldMat, shape.getBounds());
                 
         if (!render_handler::bounds_in_clipping_area(cur_bounds))
         {
-            return; // no need to draw
+            //return; // no need to draw
         }        
         
-        const std::vector<fill_style>& fill_styles = def.fillStyles();
-        const std::vector<line_style>& line_styles = def.lineStyles();
-        const SWFMatrix& mat = inst.getWorldMatrix();
-        const cxform& cx = inst.get_world_cxform();
-        const std::vector<Path>& paths = def.paths();
+        const SWF::ShapeRecord::FillStyles& fillStyles = shape.fillStyles();
+        const SWF::ShapeRecord::LineStyles& lineStyles = shape.lineStyles();
+        const SWF::ShapeRecord::Paths& paths = shape.paths();
         
         // select ranges
-        select_clipbounds(def.get_bound(), mat);
+        select_clipbounds(shape.getBounds(), worldMat);
 
         // render the DisplayObject's shape.
-        drawShape(fill_styles, line_styles, paths, mat, cx);
+        drawShape(fillStyles, lineStyles, paths, worldMat, cx);
+    }
+
+
+    void drawShape(const shape_character_def& def, const DisplayObject& inst)
+    {
     }
     
     void drawMorph(const SWF::DefineMorphShapeTag& def, const MorphShape& inst)

@@ -60,6 +60,7 @@
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
 #include "GnashNumeric.h"
+#include "Shape.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -484,7 +485,7 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
     InteractiveObject(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
-    _drawable_inst(_drawable->createDisplayObject(this, 0)),
+    _drawable_inst(new Shape(_drawable, this, 0)),
     m_play_state(PLAY),
     m_current_frame(0),
     m_has_looped(false),
@@ -828,7 +829,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_event_handlers(get_event_handlers());
 
     // Copy drawable
-    newmovieclip->_drawable = new DynamicShape(*_drawable);
+    newmovieclip->_drawable.reset(new DynamicShape(*_drawable));
     
     newmovieclip->set_cxform(get_cxform());    
     newmovieclip->copyMatrix(*this); // copy SWFMatrix and caches
@@ -2561,7 +2562,7 @@ MovieClip::getBounds() const
     rect bounds;
     BoundsFinder f(bounds);
     const_cast<DisplayList&>(m_display_list).visitAll(f);
-    rect drawableBounds = _drawable->get_bound();
+    rect drawableBounds = _drawable->getBounds();
     bounds.expand_to_rect(drawableBounds);
     
     return bounds;
@@ -2645,8 +2646,6 @@ MovieClip::markReachableResources() const
     ReachableMarker marker;
 
     m_display_list.visitAll(marker);
-
-    _drawable->setReachable();
 
     _drawable_inst->setReachable();
 

@@ -33,9 +33,9 @@
 #include <map>
 
 namespace gnash {
-    class shape_character_def;
     class FreetypeGlyphsProvider;
     namespace SWF {
+        class ShapeRecord;
         class DefineFontTag;
     }
 }
@@ -131,7 +131,7 @@ public:
 	///	(would be a programming error most likely)
 	///
 	///
-	shape_character_def* get_glyph(int glyph_index, bool embedded) const;
+    SWF::ShapeRecord* get_glyph(int glyph_index, bool embedded) const;
 
 	/// Get name of this font. 
 	const std::string& name() const { return _name; }
@@ -216,8 +216,7 @@ public:
         GlyphInfo();
 
         // given glyph and advance, default textured glyph
-        GlyphInfo(boost::intrusive_ptr<shape_character_def> glyph,
-                float advance);
+        GlyphInfo(SWF::ShapeRecord* glyph, float advance);
 
         GlyphInfo(const GlyphInfo&);
 
@@ -226,7 +225,7 @@ public:
         void markReachableResources() const;
 #endif
 
-        boost::intrusive_ptr<shape_character_def> glyph;
+        SWF::ShapeRecord* glyph;
 
         float advance;
     };

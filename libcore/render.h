@@ -30,6 +30,9 @@
 namespace gnash {
     class rgba;
     class GnashImage;
+    namespace SWF {
+        class ShapeRecord;
+    }
 }
 
 namespace gnash {
@@ -78,6 +81,9 @@ namespace gnash {
 		DSOEXPORT void  draw_poly(const point* corners, int corner_count,
 				const rgba& fill, const rgba& outline, const SWFMatrix& mat,
 				bool masked);
+        
+        void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+                const SWFMatrix& worldMat);
       
 		void drawShape(const shape_character_def& def,
                 const DisplayObject& inst);
@@ -86,8 +92,8 @@ namespace gnash {
                 const MorphShape& inst);
       
 		/// See render_handler::draw_glyph (in backend/render_handler.h)
-		void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
-				const rgba& color);
+		void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
+                const SWFMatrix& mat);
 
 		/// See render_handler::bounds_in_clipping_area (in backend/render_handler.h)
 		bool bounds_in_clipping_area(const rect& bounds);

@@ -21,7 +21,10 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
 #include "shape_character_def.h"
+#include "DynamicShape.h"
+
 #include <cassert>
+#include <boost/shared_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -36,6 +39,14 @@ class Shape : public DisplayObject
 
 public:
 
+    Shape(boost::shared_ptr<DynamicShape> sh, DisplayObject* parent, int id)
+        :
+        DisplayObject(parent, id),
+        _shape(sh)
+    {
+        assert(_shape.get());
+    }
+
 	Shape(shape_character_def* def, DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id),
@@ -47,7 +58,7 @@ public:
 	virtual void display();
 
     virtual rect getBounds() const {
-        return _def->get_bound();
+        return _def ? _def->get_bound() : _shape->getBounds();
     }
     
     virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
@@ -59,7 +70,7 @@ protected:
 	void markReachableResources() const
 	{
 		assert(isReachable());
-        _def->setReachable();
+        if (_def) _def->setReachable();
 		markDisplayObjectReachable();
 	}
 #endif
@@ -67,6 +78,8 @@ protected:
 private:
 	
     const boost::intrusive_ptr<shape_character_def> _def;
+
+    boost::shared_ptr<DynamicShape> _shape;
 
 };
 

@@ -732,9 +732,7 @@ void define_shape_loader(SWFStream& in, TagType tag, movie_definition& m,
         log_parse(_("  shape_loader: id = %d"), DisplayObject_id);
     );
 
-    shape_character_def* ch = new shape_character_def;
-    ch->read(in, tag, true, m);
-
+    shape_character_def* ch = new shape_character_def(in, tag, m);
     m.addDisplayObject(DisplayObject_id, ch);
 }
 

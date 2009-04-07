@@ -16,15 +16,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "DynamicShape.h"
+#include "render.h"
 
-#include <algorithm>
-
+#include <vector>
 
 namespace gnash {
 
 DynamicShape::DynamicShape()
 	:
-	shape_character_def(),
 	_currpath(0),
 	_currfill(0),
 	_currline(0),
@@ -40,6 +39,13 @@ DynamicShape::clear()
 	_currpath = 0; 
 	_currfill = _currline = 0; 
 	// TODO: worth setting _changed=true ? 
+}
+
+void
+DynamicShape::display(const DisplayObject& inst)
+{
+    GNASH_REPORT_FUNCTION;
+    render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }
 
 void
@@ -191,14 +197,18 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 	_currpath->drawLineTo(x, y);
 
 	// Update bounds 
+    rect bounds = _shape.getBounds();
+
 	unsigned thickness = _currline ? 
         _shape.lineStyles()[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(_bound, thickness, swfVersion);
+		_currpath->expandBounds(bounds, thickness, swfVersion);
 	} else {
-		_bound.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
+		bounds.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
 	}
     
+    _shape.setBounds(bounds);
+
 	// Update current pen position
 	_x = x;
 	_y = y;
@@ -216,18 +226,21 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 
 	_currpath->drawCurveTo(cx, cy, ax, ay);
 
-	// Update bounds 
+    rect bounds = _shape.getBounds();
+
 	unsigned thickness = _currline ? 
         _shape.lineStyles()[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(_bound, thickness, swfVersion);
+		_currpath->expandBounds(bounds, thickness, swfVersion);
 	}
     else {
-		_bound.expand_to_circle(ax, ay, 
+		bounds.expand_to_circle(ax, ay, 
                 swfVersion < 8 ? thickness : thickness/2.0);
-		_bound.expand_to_circle(cx, cy,
+		bounds.expand_to_circle(cx, cy,
                 swfVersion < 8 ? thickness : thickness/2.0);
     }
+
+    _shape.setBounds(bounds);
 
 	// Update current pen position
 	_x = ax;

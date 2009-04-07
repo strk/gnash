@@ -47,7 +47,7 @@ class render_cache_manager;
 /// can be mixed into movie_definition and sprite_definition,
 /// without using multiple inheritance.
 ///
-class character_def : public ExportableResource
+class character_def : public ExportableResource, boost::noncopyable
 {
 public:
 
@@ -78,42 +78,9 @@ public:
     ///
     render_cache_manager* m_render_cache;
 
-protected:
-
-	/// Copy a DisplayObject definition
-	//
-	/// The copy will have a NULL render cache object.
-	/// The only known use of copy constructor is from
-	/// duplicateMovieClip, in particular during copy
-	/// of the drawable object, which is a subclass
-	/// of a shape_character_def
-	///
-	/// The choice of NOT copying the cache manager
-	/// is a choice of simplicity. We can't copy the
-	/// pointer as the character_def destructor will
-	/// destroy it, and we don't want to destroy it twice.
-	/// We don't want to make a copy of the whole cache
-	/// as it might be a waste of resource, we don't want
-	/// to share ownership as some character_def ended up
-	/// NOT being immutable any more !! :(
-	///
-	/// By setting the cache to NULL we'll leave reconstruction
-	/// of a cache to the renderers.
-	///
-	/// TODO: improve by implementing copy on write for the cache ?
-	///
-    character_def(const character_def& o)
-		:
-        ExportableResource(),
-		m_render_cache(0),
-		_id(o._id)
-	{}
 private:
 
     int	_id;
-		
-	// don't assign-to
-	character_def& operator= (const character_def&);
 	
 };
 

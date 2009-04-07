@@ -35,7 +35,9 @@
 
 // Forward declarations
 namespace gnash {
-	class shape_character_def;
+    namespace SWF {
+        class ShapeRecord;
+    }
 }
 
 
@@ -100,7 +102,7 @@ public:
 	///         or a NULL pointer if the given DisplayObject code
 	///         doesn't exist in this font.
 	///
-	boost::intrusive_ptr<shape_character_def> getGlyph(boost::uint16_t code, float& advance);
+    SWF::ShapeRecord* getGlyph(boost::uint16_t code, float& advance);
 
 	/// Return the number of units of glyphs EM
 	//
