@@ -52,7 +52,7 @@ void
 DynamicShape::add_path(const Path& pth)
 {
 	_shape.addPath(pth);
-	_currpath = &(_shape.currentPath());
+	_currpath = &_shape.currentPath();
 }
 
 void
