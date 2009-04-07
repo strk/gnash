@@ -103,7 +103,7 @@ ButtonAction::triggeredBy(const event_id& ev) const
 bool
 ButtonRecord::is_valid()
 {
-	return (m_character_def != NULL);
+	return (m_DefinitionTag != NULL);
 }
 
 static std::string
@@ -159,11 +159,11 @@ ButtonRecord::read(SWFStream& in, TagType t,
 	_id = in.read_u16();
 
 	// Get DisplayObject definition now (safer)
-	m_character_def = m.get_character_def(_id);
+	m_DefinitionTag = m.getDefinitionTag(_id);
 
 	// If no DisplayObject with given ID is found in the movie
 	// definition, we print an error, but keep parsing.
-	if (!m_character_def)
+	if (!m_DefinitionTag)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror(_("   button record for states [%s] refer to "
@@ -176,7 +176,7 @@ ButtonRecord::read(SWFStream& in, TagType t,
 		IF_VERBOSE_PARSE(
 		log_parse(_("   button record for states [%s] contain "
 			"DisplayObject %d (%s)"), computeButtonStatesString(flags),
-            _id, typeName(*m_character_def));
+            _id, typeName(*m_DefinitionTag));
 		);
 	}
 

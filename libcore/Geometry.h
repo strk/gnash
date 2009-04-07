@@ -15,12 +15,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-
 #ifndef GNASH_GEOMETRY_H
 #define GNASH_GEOMETRY_H
 
 #include "dsodefs.h"
 #include "SWFMatrix.h" 
+#include "styles.h"
+#include "log.h"
 
 #include <vector> // for path composition
 #include <cmath> // sqrt
@@ -28,54 +29,56 @@
 
 // Forward declarations
 namespace gnash {
-  class rect; 
+    class rect; 
 }
 
 namespace gnash { 
 
-  /// \brief
-  /// Defines an edge with a control point and an anchor point.
-  /// 
-  /// Could be a quadratic bezier curve, or a straight line(degenerated curve).
-  ///
-  class Edge
-  {
-  public:
-  	
+/// \brief
+/// Defines an edge with a control point and an anchor point.
+/// 
+/// Could be a quadratic bezier curve, or a straight line(degenerated curve).
+///
+class Edge
+{
+public:
+    
     // Quadratic bezier: point = p0 * t^2 + p1 * 2t(1-t) + p2 * (1-t)^2
     point cp; // control point, TWIPS
-    point ap; // anchor  point, TWIPS
+    point ap; // anchor    point, TWIPS
 
     Edge() 
         :
-    cp(0, 0), ap(0, 0)
-    {  };
+        cp(0, 0),
+        ap(0, 0)
+    {}
     
-    Edge(boost::int32_t cx, boost::int32_t cy, boost::int32_t ax, boost::int32_t ay)
-      :
-      cp(cx, cy), ap(ax, ay)
-    {  }
+    Edge(boost::int32_t cx, boost::int32_t cy, boost::int32_t ax,
+            boost::int32_t ay)
+        :
+        cp(cx, cy),
+        ap(ax, ay)
+    {}
 
     Edge(const Edge& from)
-      : 
-      cp(from.cp), ap(from.ap)
-    {  }
+        : 
+        cp(from.cp),
+        ap(from.ap)
+    {}
 
     Edge(const point& ncp, const point& nap)
-      :
-      cp(ncp), ap(nap)
-    {  }
+        :
+        cp(ncp),
+        ap(nap)
+    {}
 
-    bool isStraight() const
+    bool straight() const
     {
         return cp == ap;
     }
-
-    // TODO: drop this!
-    bool is_straight() const { return isStraight(); }
     
     /// Transform the edge according to the given SWFMatrix.
-    void  transform(const SWFMatrix& mat)
+    void transform(const SWFMatrix& mat)
     {
         mat.transform(ap);
         mat.transform(cp);
@@ -96,7 +99,8 @@ namespace gnash {
         boost::int32_t pdx = p.x - A.x;
         boost::int32_t pdy = p.y - A.y;
 
-        double u = ( (double)(pdx) * dx + (double)(pdy) * dy ) / ( (double)(dx)*dx + (double)(dy)*dy );
+        double u = ( (double)(pdx) * dx + (double)(pdy) * dy ) /
+            ( (double)(dx)*dx + (double)(dy)*dy );
 
         if (u <= 0)
         {
@@ -130,9 +134,7 @@ namespace gnash {
     ///
 
     static point
-    pointOnCurve(const point& A, 
-        const point& C, 
-        const point& B, float t)
+    pointOnCurve(const point& A, const point& C, const point& B, float t)
     {
         point Q1(A, C, t);
         point Q2(C, B, t);
@@ -151,20 +153,19 @@ namespace gnash {
     /// @param t the step factor between 0 and 1
     ///
     static boost::int64_t squareDistancePtCurve(const point& A,
-               const point& C,
-               const point& B,
-               const point& p, float t)
+                         const point& C,
+                         const point& B,
+                         const point& p, float t)
     {
-      return p.squareDistance( pointOnCurve(A, C, B, t) );
+        return p.squareDistance( pointOnCurve(A, C, B, t) );
     }
-  };
+};
 
 
-  ///\brief
-  /// A subset of a shape, a series of edges sharing a single set of styles. 
-  class DSOEXPORT Path
-  {
-  public:
+/// A subset of a shape, a series of edges sharing a single set of styles. 
+class DSOEXPORT Path
+{
+public:
     /// Left fill style index (1-based)
     unsigned m_fill0;
 
@@ -189,53 +190,53 @@ namespace gnash {
     /// Default constructor
     //
     /// @param newShape
-    ///  True if this path starts a new subshape
+    ///    True if this path starts a new subshape
     ///
     Path(bool newShape = false)
-      : 
-    m_new_shape(newShape)
+        : 
+        m_new_shape(newShape)
     {
-      reset(0, 0, 0, 0, 0);
+        reset(0, 0, 0, 0, 0);
     }
 
     Path(const Path& from)
-      : 
-      m_fill0(from.m_fill0),
-      m_fill1(from.m_fill1),
-      m_line(from.m_line),
-      ap(from.ap),
-      m_edges(from.m_edges),
-      m_new_shape(from.m_new_shape)        
+        : 
+        m_fill0(from.m_fill0),
+        m_fill1(from.m_fill1),
+        m_line(from.m_line),
+        ap(from.ap),
+        m_edges(from.m_edges),
+        m_new_shape(from.m_new_shape)                
     {
     }
     
     /// Initialize a path 
     //
     /// @param ax
-    ///  X coordinate of path origin in TWIPS
+    ///    X coordinate of path origin in TWIPS
     ///
     /// @param ay
-    ///  Y coordinate in path origin in TWIPS
+    ///    Y coordinate in path origin in TWIPS
     ///
     /// @param fill0
-    ///  Fill style index for left fill (1-based).
-    ///  Zero means NO style.
+    ///    Fill style index for left fill (1-based).
+    ///    Zero means NO style.
     ///
     /// @param fill1
-    ///  Fill style index for right fill (1-based)
-    ///  Zero means NO style.
+    ///    Fill style index for right fill (1-based)
+    ///    Zero means NO style.
     ///
     /// @param line
-    ///  Line style index for right fill (1-based).
-    ///  Zero means NO style.
+    ///    Line style index for right fill (1-based).
+    ///    Zero means NO style.
     ///
     /// @param newShape
-    ///  True if this path starts a new subshape
+    ///    True if this path starts a new subshape
     Path(boost::int32_t ax, boost::int32_t ay, 
-        unsigned fill0, unsigned fill1, unsigned line, 
-        bool newShape)
-      :
-      m_new_shape(newShape)
+            unsigned fill0, unsigned fill1, unsigned line, 
+            bool newShape)
+        :
+        m_new_shape(newShape)
     {
         reset(ax, ay, fill0, fill1, line);
     }
@@ -243,22 +244,22 @@ namespace gnash {
     /// Re-initialize a path, maintaining the "new shape" flag untouched
     //
     /// @param ax
-    ///  X coordinate of path origin in TWIPS
+    ///    X coordinate of path origin in TWIPS
     ///
     /// @param ay
-    ///  Y coordinate in path origin in TWIPS
+    ///    Y coordinate in path origin in TWIPS
     ///
     /// @param fill0
-    ///  Fill style index for left fill
+    ///    Fill style index for left fill
     ///
     /// @param fill1
-    ///  Fill style index for right fill
+    ///    Fill style index for right fill
     //
     /// @param line
-    ///  Line style index for right fill
+    ///    Line style index for right fill
     ///
-    void  reset(boost::int32_t ax, boost::int32_t ay, 
-        unsigned fill0, unsigned fill1, unsigned line)
+    void reset(boost::int32_t ax, boost::int32_t ay, 
+            unsigned fill0, unsigned fill1, unsigned line)
     // Reset all our members to the given values, and clear our edge list.
     {
         ap.x = ax;
@@ -268,32 +269,26 @@ namespace gnash {
         m_line = line;
 
         m_edges.resize(0);
-        assert(is_empty());
-    }
-
-    /// Return true if we have no edges.
-    bool  is_empty() const
-    {
-        return m_edges.empty();
+        assert(empty());
     }
 
     /// Expand given rect to include bounds of this path
     //
     /// @param r
-    ///  The rectangle to expand with our own bounds
+    ///    The rectangle to expand with our own bounds
     ///
     /// @param thickness
-    ///  The thickess of our lines, half the thickness will
-    ///  be added in all directions in swf8+, all of it will
-    ///  in swf7-
+    ///    The thickess of our lines, half the thickness will
+    ///    be added in all directions in swf8+, all of it will
+    ///    in swf7-
     ///
     /// @param swfVersion
-    ///  SWF version to use.
+    ///    SWF version to use.
     ///
     void
     expandBounds(rect& r, unsigned int thickness, int swfVersion) const
     {
-        const Path&  p = *this;
+        const Path&    p = *this;
         size_t nedges = m_edges.size();
         
         if ( ! nedges ) return; // this path adds nothing
@@ -302,7 +297,7 @@ namespace gnash {
         {
             // NOTE: Half of thickness would be enough (and correct) for
             // radius, but that would not match how Flash calculates the
-            // bounds using the drawing API.                        
+            // bounds using the drawing API.                                                
             unsigned int radius = swfVersion < 8 ? thickness : thickness/2;
 
             r.expand_to_circle(ap.x, ap.y, radius);
@@ -334,10 +329,10 @@ namespace gnash {
     /// and expressed in TWIPS.
     ///
     /// @param x
-    ///  X coordinate in TWIPS
+    ///    X coordinate in TWIPS
     ///
     /// @param y
-    ///  Y coordinate in TWIPS
+    ///    Y coordinate in TWIPS
     ///
     void 
     drawLineTo(boost::int32_t dx, boost::int32_t dy)
@@ -351,16 +346,16 @@ namespace gnash {
     /// expressed in TWIPS.
     ///
     /// @param cx
-    ///  Control point's X coordinate.
+    ///    Control point's X coordinate.
     ///
     /// @param cy
-    ///  Control point's Y coordinate.
+    ///    Control point's Y coordinate.
     ///
     /// @param ax
-    ///  Anchor point's X ordinate.
+    ///    Anchor point's X ordinate.
     ///
     /// @param ay
-    ///  Anchor point's Y ordinate.
+    ///    Anchor point's Y ordinate.
     ///
     void 
     drawCurveTo(boost::int32_t cdx, boost::int32_t cdy, boost::int32_t adx, boost::int32_t ady)
@@ -379,20 +374,14 @@ namespace gnash {
 
 
     /// Returns true if the last and the first point of the path match
-    bool  isClosed() const 
+    bool isClosed() const 
     {
-        if ( m_edges.empty() ) 
-        {
-            return true;  
-        }
-        else
-        {
-            return m_edges.back().ap == ap; 
-        }
+        if (m_edges.empty()) return true;
+        return m_edges.back().ap == ap; 
     }
 
     /// Close this path with a straight line, if not already closed
-    void  close()
+    void close()
     {
         if ( m_edges.empty() ) return;
 
@@ -414,94 +403,93 @@ namespace gnash {
     bool
     withinSquareDistance(const point& p, double dist) const
     {
-      size_t nedges = m_edges.size();
+        size_t nedges = m_edges.size();
 
-      if ( ! nedges ) return false;
+        if ( ! nedges ) return false;
 
-      point px(ap);
-      for (size_t i=0; i<nedges; ++i)
-      {
-        const Edge& e = m_edges[i];
-        point np(e.ap);
-
-        if ( e.isStraight() )
+        point px(ap);
+        for (size_t i=0; i<nedges; ++i)
         {
-          double d = Edge::squareDistancePtSeg(p, px, np);
+            const Edge& e = m_edges[i];
+            point np(e.ap);
 
-          if ( d <= dist ) return true;
+            if (e.straight())
+            {
+                double d = Edge::squareDistancePtSeg(p, px, np);
+                if ( d <= dist ) return true;
+            }
+            else
+            {
+
+                const point& A = px;
+                const point& C = e.cp;
+                const point& B = e.ap;
+
+                // Approximate the curve to segCount segments
+                // and compute distance of query point from each
+                // segment.
+                //
+                // TODO: find an apprpriate value for segCount based
+                //             on rendering scale ?
+                //
+                int segCount = 10; 
+                point p0(A.x, A.y);
+                for (int i=1; i<=segCount; ++i)
+                {
+                    float t1 = (float)(i) / segCount;
+                    point p1 = Edge::pointOnCurve(A, C, B, t1);
+
+                    // distance from point and segment being an approximation 
+                    // of the curve 
+                    double d = Edge::squareDistancePtSeg(p, p0, p1);
+                    if ( d <= dist ) return true;
+
+                    p0.setTo(p1.x, p1.y);
+                }
+            }
+            px = np;
         }
-        else
-        {
 
-          const point& A = px;
-          const point& C = e.cp;
-          const point& B = e.ap;
-
-          // Approximate the curve to segCount segments
-          // and compute distance of query point from each
-          // segment.
-          //
-          // TODO: find an apprpriate value for segCount based
-          //       on rendering scale ?
-          //
-          int segCount = 10; 
-          point p0(A.x, A.y);
-          for (int i=1; i<=segCount; ++i)
-          {
-            float t1 = (float)(i) / segCount;
-            point p1 = Edge::pointOnCurve(A, C, B, t1);
-
-            // distance from point and segment being an approximation 
-            // of the curve 
-            double d = Edge::squareDistancePtSeg(p, p0, p1);
-            if ( d <= dist ) return true;
-
-            p0.setTo(p1.x, p1.y);
-          }
-        }
-        px = np;
-      }
-
-      return false;
+        return false;
     }
 
     /// Transform all path coordinates according to the given SWFMatrix.
-    void  transform(const SWFMatrix& mat)
+    void transform(const SWFMatrix& mat)
     {
-		mat.transform(ap);
-		std::vector<Edge>::iterator it = m_edges.begin(), ie = m_edges.end();
-		for(; it != ie; it++)
-		{
-			(*it).transform(mat);
-		}
-    }    
+        mat.transform(ap);
+        std::vector<Edge>::iterator it = m_edges.begin(), ie = m_edges.end();
+        for(; it != ie; it++)
+        {
+            (*it).transform(mat);
+        }
+    }        
 
     /// Set this path as the start of a new (sub)shape
-    void  setNewShape() 
+    void setNewShape() 
     { 
-        m_new_shape=true; 
+            m_new_shape=true; 
     }
 
     /// Return true if this path starts a new (sub)shape
-    bool  getNewShape() const 
+    bool getNewShape() const 
     { 
         return m_new_shape; 
     }
 
     /// Return true if this path contains no edges
-    bool  empty() const
+    bool empty() const
     {
-        return is_empty();
+        return m_edges.empty();
     }
 
     /// Set the fill to use on the left side
     //
     /// @param f
-    ///  The fill index (1-based).
-    ///  When this path is added to a shape_character_def,
-    ///  the index (decremented by 1) will reference an element
-    ///  in the fill_style vector defined for that shape.
-    ///  If zero, no fill will be active.
+    ///    The fill index (1-based).
+    ///    When this path is added to a DefineShapeTag,
+    ///    the index (decremented by 1) will reference an element
+    ///    in the fill_style vector defined for that shape.
+    ///    If zero, no fill will be active.
     ///
     void setLeftFill(unsigned f)
     {
@@ -516,11 +504,11 @@ namespace gnash {
     /// Set the fill to use on the left side
     //
     /// @param f
-    ///  The fill index (1-based).
-    ///  When this path is added to a shape_character_def,
-    ///  the index (decremented by 1) will reference an element
-    ///  in the fill_style vector defined for that shape.
-    ///  If zero, no fill will be active.
+    ///    The fill index (1-based).
+    ///    When this path is added to a DefineShapeTag,
+    ///    the index (decremented by 1) will reference an element
+    ///    in the fill_style vector defined for that shape.
+    ///    If zero, no fill will be active.
     ///
     void setRightFill(unsigned f)
     {
@@ -535,11 +523,11 @@ namespace gnash {
     /// Set the line style to use for this path
     //
     /// @param f
-    ///  The line_style index (1-based).
-    ///  When this path is added to a shape_character_def,
-    ///  the index (decremented by 1) will reference an element
-    ///  in the line_style vector defined for that shape.
-    ///  If zero, no fill will be active.
+    ///    The line_style index (1-based).
+    ///    When this path is added to a DefineShapeTag,
+    ///    the index (decremented by 1) will reference an element
+    ///    in the line_style vector defined for that shape.
+    ///    If zero, no fill will be active.
     ///
     void setLineStyle(unsigned i)
     {
@@ -574,16 +562,22 @@ namespace gnash {
     {
         return m_new_shape;
     }
- 
-  }; // end of class Path
+
+}; // end of class Path
+
+namespace geometry
+{
+
+bool pointTest(const std::vector<Path>& paths,
+    const std::vector<line_style>& lineStyles, boost::int32_t x,
+    boost::int32_t y, const SWFMatrix& wm);
+
+} // namespace geometry
 
 
-  typedef Edge  edge;
-  typedef Path  path;
+} // namespace gnash
 
-}  // end namespace gnash
-
-#endif // GNASH_SHAPE_H
+#endif // GNASH_GEOMETRY_H
 
 
 // Local Variables:

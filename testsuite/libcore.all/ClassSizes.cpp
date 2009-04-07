@@ -27,6 +27,11 @@
 #include "DisplayObject.h"
 #include "RGBA.h"
 #include "movie_root.h"
+#include "swf/ShapeRecord.h"
+#include "StaticText.h"
+#include "Button.h"
+#include "MorphShape.h"
+#include "Shape.h"
 
 #include <iostream>
 #include <sstream>
@@ -69,5 +74,11 @@ main(int /*argc*/, char** /*argv*/)
 	std::cout << "sizeof(fill_style): " << (sizeof(fill_style)) << std::endl;
 	std::cout << "sizeof(SWFMatrix): " << (sizeof(SWFMatrix)) << std::endl;
 	std::cout << "sizeof(movie_root): " << (sizeof(movie_root)) << std::endl;
+	
+    std::cout << "sizeof(ShapeRecord): " << (sizeof(SWF::ShapeRecord)) << std::endl;
+	std::cout << "sizeof(StaticText): " << (sizeof(StaticText)) << std::endl;
+	std::cout << "sizeof(MorphShape): " << (sizeof(MorphShape)) << std::endl;
+	std::cout << "sizeof(Shape): " << (sizeof(Shape)) << std::endl;
+	std::cout << "sizeof(Button): " << (sizeof(Button)) << std::endl;
 }
 

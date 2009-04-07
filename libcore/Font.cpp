@@ -23,11 +23,12 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "Font.h"
 #include "log.h"
-#include "shape_character_def.h"
+#include "ShapeRecord.h"
 #include "DefineFontTag.h"
 #include "FreetypeGlyphsProvider.h"
 
 #include <utility> // for std::make_pair
+#include <memory>
 
 namespace gnash {
 
@@ -54,28 +55,27 @@ private:
 
 Font::GlyphInfo::GlyphInfo()
 	:
-	glyph(),
 	advance(0)
 {}
 
-Font::GlyphInfo::GlyphInfo(boost::intrusive_ptr<shape_character_def> glyph,
+Font::GlyphInfo::GlyphInfo(std::auto_ptr<SWF::ShapeRecord> glyph,
         float advance)
 	:
-	glyph(glyph.get()),
+	glyph(glyph.release()),
 	advance(advance)
 {}
 
 Font::GlyphInfo::GlyphInfo(const GlyphInfo& o)
 	:
-	glyph(o.glyph.get()),
+	glyph(o.glyph),
 	advance(o.advance)
 {}
+
 
 #ifdef GNASH_USE_GC
 void
 Font::GlyphInfo::markReachableResources() const
 {
-	if ( glyph ) glyph->setReachable();
 }
 #endif
 
@@ -109,7 +109,7 @@ Font::~Font()
 {
 }
 
-shape_character_def*
+SWF::ShapeRecord*
 Font::get_glyph(int index, bool embedded) const
 {
     // What to do if embedded is true and this is a
@@ -296,10 +296,9 @@ Font::add_os_glyph(boost::uint16_t code)
     float advance;
 
     // Get the vectorial glyph
-    boost::intrusive_ptr<shape_character_def> sh = 
-        _ftProvider->getGlyph(code, advance);
+    std::auto_ptr<SWF::ShapeRecord> sh = _ftProvider->getGlyph(code, advance);
 
-    if (!sh) {
+    if (!sh.get()) {
         log_error("Could not create shape "
                 "glyph for DisplayObject code %u (%c) with "
                 "device font %s (%p)", code, code, _name,
@@ -371,8 +370,6 @@ Font::is_subpixel_font() const {
 /// Mark reachable resources (for the GC)
 //
 /// Reachable resources are:
-///	- shape_character_defs (vector glyphs, devide and embeded)
-///
 void
 Font::markReachableResources() const
 {

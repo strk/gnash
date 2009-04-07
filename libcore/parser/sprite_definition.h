@@ -169,7 +169,7 @@ public:
 	virtual void addBitmap(int /*id*/, boost::intrusive_ptr<BitmapInfo> /*im*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror(_("add_bitmap_character_def appears in sprite tags"));
+		log_swferror(_("add_bitmap_SWF::DefinitionTag appears in sprite tags"));
 		);
 	}
 
@@ -224,16 +224,16 @@ public:
 	}
 
 	/// \brief
-	/// Get a character_def from this Sprite's root movie
+	/// Get a SWF::DefinitionTag from this Sprite's root movie
 	/// CharacterDictionary.
 	///
-	virtual character_def*	get_character_def(int id)
+	virtual SWF::DefinitionTag*	getDefinitionTag(int id)
 	{
-	    return m_movie_def.get_character_def(id);
+	    return m_movie_def.getDefinitionTag(id);
 	}
 
 	/// Delegate call to associated root movie
-	virtual void addDisplayObject(int id, character_def* ch)
+	virtual void addDisplayObject(int id, SWF::DefinitionTag* ch)
 	{
 		m_movie_def.addDisplayObject(id, ch);
 	}
@@ -242,7 +242,7 @@ public:
 	// instance is created to live (temporarily) on some level on
 	// the parent movie's display list.
 	//
-	// overloads from character_def
+	// overloads from SWF::DefinitionTag
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
 
@@ -326,7 +326,7 @@ private:
     // It is required that get_bound() is implemented in DisplayObject definition
     // classes. However, it makes no sense to call it for sprite definitions.
     // get_bound() is currently only used by DisplayObject which normally
-    // is used only shape DisplayObject definitions. See character_def.h to learn
+    // is used only shape DisplayObject definitions. See SWF::DefinitionTag.h to learn
     // why it is virtual anyway.
     abort(); // should not be called
 		static rect unused;

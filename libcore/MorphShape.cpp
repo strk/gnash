@@ -1,4 +1,4 @@
-// Shape.cpp: Shape DisplayObject implementation for Gnash.
+// MorphShape.cpp:  MorphShape handling for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -17,13 +17,28 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "Shape.h"
+#include "MorphShape.h"
+#include "VM.h"
+#include "fill_style.h"
+#include "swf/ShapeRecord.h"
+#include "Geometry.h"
+#include "SWFMatrix.h"
 
 namespace gnash
 {
 
+
+MorphShape::MorphShape(const SWF::DefineMorphShapeTag* const def,
+        DisplayObject* parent, int id)
+    :
+    DisplayObject(parent, id),
+    _def(def),
+    _shape(_def->shape1())
+{
+}
+
 bool
-Shape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
+MorphShape::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
     SWFMatrix wm = getWorldMatrix();
     SWFMatrix wm_inverse = wm.invert();
@@ -40,24 +55,41 @@ Shape::pointInShape(boost::int32_t  x, boost::int32_t  y) const
     //       in DrawingApiTest (kind of a fill-leakage making
     //       the collision detection find you inside a self-crossing
     //       shape).
-    if (_def) {
-        if (!_def->get_bound().point_test(lp.x, lp.y)) return false;
-        return _def->pointTestLocal(lp.x, lp.y, wm);
-    }
-    assert(_shape.get());
-    
-    if (!_shape->getBounds().point_test(lp.x, lp.y)) return false;
-    return _shape->pointTestLocal(lp.x, lp.y, wm);
+    if (!_shape.getBounds().point_test(lp.x, lp.y)) return false;
 
+    return geometry::pointTest(_shape.paths(), _shape.lineStyles(),
+            lp.x, lp.y, wm);
 }
 
 void  
-Shape::display()
+MorphShape::display()
 {
-    if (_def) _def->display(*this);
-    else _shape->display(*this);
+    morph();
+    _def->display(*this); 
     clear_invalidated();
 }
+
+inline double
+MorphShape::currentRatio() const
+{
+    return get_ratio() / 65535.0;
+}
+
+rect
+MorphShape::getBounds() const
+{
+    // TODO: optimize this more.
+    rect bounds = _shape.getBounds();
+    bounds.expand_to_rect(_def->shape2().getBounds());
+    return bounds;
+}
+
+void
+MorphShape::morph()
+{
+    _shape.setLerp(_def->shape1(), _def->shape2(), currentRatio());
+}
+
 
 } // namespace gnash
 

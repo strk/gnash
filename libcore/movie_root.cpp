@@ -2037,8 +2037,7 @@ movie_root::cleanupDisplayList()
 void
 movie_root::advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch)
 {
-
-	if ( ! ch->isUnloaded() )
+	if (!ch->isUnloaded())
 	{
 #ifdef GNASH_DEBUG
 		log_debug("    advancing DisplayObject %s", ch->getTarget());

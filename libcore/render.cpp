@@ -151,22 +151,23 @@ void  draw_poly(const point* corners, int corner_count, const rgba& fill,
 }
 
 
-void drawShape(shape_character_def *def, DisplayObject *inst) 
+void
+drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+        const SWFMatrix& worldMat)
 {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->drawShape(def, inst);
+		if (s_render_handler) s_render_handler->drawShape(shape, cx, worldMat);
 }
 
-void draw_glyph(shape_character_def *def,
-  const SWFMatrix& mat,
-  const rgba& color)
+void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color, 
+      const SWFMatrix& mat)
 {
 #ifdef DEBUG_RENDER_CALLS
 		GNASH_REPORT_FUNCTION;
 #endif
-		if (s_render_handler) s_render_handler->draw_glyph(def, mat, color);
+		if (s_render_handler) s_render_handler->drawGlyph(rec, color, mat);
 }
 
 bool bounds_in_clipping_area(const rect& bounds) {

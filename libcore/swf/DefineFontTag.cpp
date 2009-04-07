@@ -23,7 +23,7 @@
 #include "RunInfo.h"
 #include "swf.h"
 #include "movie_definition.h"
-#include "shape_character_def.h"
+#include "ShapeRecord.h"
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -175,10 +175,7 @@ DefineFontTag::readDefineFont(SWFStream& in, movie_definition& m)
         }
 
         // Create & read the shape.
-        shape_character_def* s = new shape_character_def;
-        s->read(in, SWF::DEFINEFONT, false, m); 
-
-        _glyphTable[i].glyph = s;
+        _glyphTable[i].glyph.reset(new ShapeRecord(in, SWF::DEFINEFONT, m)); 
     }
 }
 
@@ -280,14 +277,12 @@ DefineFontTag::readDefineFont2Or3(SWFStream& in, movie_definition& m)
 
         if ( ! in.seek(new_pos) )
         {
-            throw ParserException(_("Glyphs offset table corrupted in DefineFont2/3 tag"));
+            throw ParserException(_("Glyphs offset table corrupted in "
+                        "DefineFont2/3 tag"));
         }
 
         // Create & read the shape.
-        shape_character_def* s = new shape_character_def;
-        s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
-
-        _glyphTable[i].glyph = s;
+        _glyphTable[i].glyph.reset(new ShapeRecord(in, SWF::DEFINEFONT2, m));
     }
 
     unsigned long current_position = in.tell();

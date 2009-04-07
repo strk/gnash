@@ -64,13 +64,13 @@ main(int /*argc*/, char** /*argv*/)
 	// Test distance
 	//
 
-	check_equals(edge::distancePtSeg(point(0,0), point(9, 0), point(9, 0)), 9);
-	check_equals(edge::distancePtSeg(point(0,0), point(0, 0), point(3, 0)), 0);
-	check_equals(edge::distancePtSeg(point(-5,0), point(0, 0), point(3, 0)), 5);
-	check_equals(edge::distancePtSeg(point(5,0), point(0, 0), point(3, 0)), 2);
-	check_equals(D(edge::distancePtSeg(point(0,0), point(-10, 0), point(3, 0))), 0);
-	check_equals(edge::distancePtSeg(point(0,0), point(-10, 0), point(-10, 30)), 10);
-	check_equals(edge::distancePtSeg(point(5,5), point(-10, 0), point(10, 0)), 5);
+	check_equals(Edge::distancePtSeg(point(0,0), point(9, 0), point(9, 0)), 9);
+	check_equals(Edge::distancePtSeg(point(0,0), point(0, 0), point(3, 0)), 0);
+	check_equals(Edge::distancePtSeg(point(-5,0), point(0, 0), point(3, 0)), 5);
+	check_equals(Edge::distancePtSeg(point(5,0), point(0, 0), point(3, 0)), 2);
+	check_equals(D(Edge::distancePtSeg(point(0,0), point(-10, 0), point(3, 0))), 0);
+	check_equals(Edge::distancePtSeg(point(0,0), point(-10, 0), point(-10, 30)), 10);
+	check_equals(Edge::distancePtSeg(point(5,5), point(-10, 0), point(10, 0)), 5);
 
 	//
 	// Test pointOnCurve
@@ -84,11 +84,11 @@ main(int /*argc*/, char** /*argv*/)
 	point A(10, 10);
 	point C(20, 10);
 	point B(20, 20);
-	check_equals(edge::pointOnCurve(A, C, B, 0), A);
-	check_equals(edge::pointOnCurve(A, C, B, 1), B);
-	check_equals(edge::pointOnCurve(A, C, B, 0.5), point(17.5, 12.5));
-	check_equals(sqrt((float)edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
-	check_equals(sqrt((float)edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
+	check_equals(Edge::pointOnCurve(A, C, B, 0), A);
+	check_equals(Edge::pointOnCurve(A, C, B, 1), B);
+	check_equals(Edge::pointOnCurve(A, C, B, 0.5), point(17.5, 12.5));
+	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
+	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
 
 	//
 	// A----B---C
@@ -96,10 +96,10 @@ main(int /*argc*/, char** /*argv*/)
 	A.setTo(10, 10);
 	C.setTo(40, 10);
 	B.setTo(20, 10);
-	check_equals(edge::pointOnCurve(A, C, B, 0), A);
-	check_equals(edge::pointOnCurve(A, C, B, 1), B);
-	check_equals(edge::pointOnCurve(A, C, B, 0.5), point(27.5, 10));
-	check_equals(sqrt((float)edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
-	check_equals(sqrt((float)edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
+	check_equals(Edge::pointOnCurve(A, C, B, 0), A);
+	check_equals(Edge::pointOnCurve(A, C, B, 1), B);
+	check_equals(Edge::pointOnCurve(A, C, B, 0.5), point(27.5, 10));
+	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, B, 1)), 0);
+	check_equals(sqrt((float)Edge::squareDistancePtCurve(A, C, B, A, 0)), 0);
 }
 

@@ -1,3 +1,4 @@
+// StaticText.h:  StaticText DisplayObject implementation for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -28,7 +29,7 @@
 
 // Forward declarations
 namespace gnash {
-    class character_def;
+    class DefinitionTag;
     namespace SWF {
         class TextRecord;
     }
@@ -43,7 +44,8 @@ class StaticText : public DisplayObject
 {
 public:
 
-	StaticText(SWF::DefineTextTag* def, DisplayObject* parent, int id)
+	StaticText(const SWF::DefineTextTag* const def, DisplayObject* parent,
+            int id)
 		:
         DisplayObject(parent, id),
         _def(def)
@@ -104,7 +106,7 @@ protected:
 
 private:
 
-    const boost::intrusive_ptr<SWF::DefineTextTag> _def;
+    const boost::intrusive_ptr<const SWF::DefineTextTag> _def;
 
     /// A bitmask indicating which static text DisplayObjects are selected
     //
@@ -123,7 +125,7 @@ private:
 }	// end namespace gnash
 
 
-#endif // GNASH_GENERIC_CHARACTER_H
+#endif 
 
 
 // Local Variables:

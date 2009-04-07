@@ -1,4 +1,4 @@
-// Shape.h: Shape DisplayObject implementation for Gnash.
+// MorphShape.h: the MorphShape DisplayObject implementation for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -16,57 +16,39 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef GNASH_SHAPE_H
-#define GNASH_SHAPE_H
+#ifndef GNASH_MORPH_SHAPE_H
+#define GNASH_MORPH_SHAPE_H
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
-#include "DefineShapeTag.h"
-#include "DynamicShape.h"
-
+#include "Geometry.h"
+#include "swf/DefineMorphShapeTag.h"
 #include <cassert>
-#include <boost/shared_ptr.hpp>
-
-// Forward declarations
-namespace gnash {
-    class DefinitionTag;
-}
 
 namespace gnash {
 
-/// For DisplayObjects that don't store unusual state in their instances.
+/// A DisplayObject that tweens between two shapes.
 //
-/// A Shape may be either statically constructed during parsing or,
-/// in AS3, dynamically constructed. A SWF-parsed Shape has an immutable
-/// SWF::DefinitionTag. A dynamic Shape object has a DynamicShape.
-class Shape : public DisplayObject
+/// A MorphShape has no properties of its own, but its inherited properties
+/// may be read in AS3 using a reference to the object created with
+/// getChildAt().
+class MorphShape : public DisplayObject
 {
 
 public:
 
-    Shape(boost::shared_ptr<DynamicShape> sh, DisplayObject* parent, int id)
-        :
-        DisplayObject(parent, id),
-        _shape(sh)
-    {
-        assert(_shape.get());
-    }
-
-	Shape(const SWF::DefineShapeTag* const def, DisplayObject* parent, int id)
-		:
-		DisplayObject(parent, id),
-		_def(def)
-	{
-	    assert(_def);
-	}
+    MorphShape(const SWF::DefineMorphShapeTag* const def, 
+            DisplayObject* parent, int id);
 
 	virtual void display();
 
-    virtual rect getBounds() const {
-        return _def ? _def->get_bound() : _shape->getBounds();
-    }
+    virtual rect getBounds() const;
     
     virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+ 
+    const SWF::ShapeRecord& shape() const {
+        return _shape;
+    }
 
 protected:
 
@@ -75,16 +57,20 @@ protected:
 	void markReachableResources() const
 	{
 		assert(isReachable());
-        if (_def) _def->setReachable();
+        _def->setReachable();
 		markDisplayObjectReachable();
 	}
 #endif
 
 private:
-	
-    const boost::intrusive_ptr<const SWF::DefineShapeTag> _def;
+    
+    void morph();
 
-    boost::shared_ptr<DynamicShape> _shape;
+    double currentRatio() const;
+
+    const boost::intrusive_ptr<const SWF::DefineMorphShapeTag> _def;
+	
+    SWF::ShapeRecord _shape;
 
 };
 

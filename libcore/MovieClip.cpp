@@ -60,6 +60,7 @@
 #include "flash/geom/Matrix_as.h"
 #include "ExportableResource.h"
 #include "GnashNumeric.h"
+#include "Shape.h"
 
 #ifdef USE_SWFTREE
 # include "tree.hh"
@@ -484,7 +485,7 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
     InteractiveObject(parent, id),
     m_root(r),
     _drawable(new DynamicShape()),
-    _drawable_inst(_drawable->createDisplayObject(this, 0)),
+    _drawable_inst(new Shape(_drawable, this, 0)),
     m_play_state(PLAY),
     m_current_frame(0),
     m_has_looped(false),
@@ -828,7 +829,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_event_handlers(get_event_handlers());
 
     // Copy drawable
-    newmovieclip->_drawable = new DynamicShape(*_drawable);
+    newmovieclip->_drawable.reset(new DynamicShape(*_drawable));
     
     newmovieclip->set_cxform(get_cxform());    
     newmovieclip->copyMatrix(*this); // copy SWFMatrix and caches
@@ -1163,6 +1164,7 @@ MovieClip::advance_sprite()
                         TAG_DLIST|TAG_ACTION);
             }
         }
+
     }
 #ifdef GNASH_DEBUG
     else
@@ -1512,7 +1514,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     assert(m_def);
     assert(tag);
 
-    character_def* cdef = m_def->get_character_def(tag->getID());
+    SWF::DefinitionTag* cdef = m_def->getDefinitionTag(tag->getID());
     if (!cdef)
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -1577,7 +1579,7 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
     assert(m_def != NULL);
     assert(tag != NULL);
 
-    character_def*    cdef = m_def->get_character_def(tag->getID());
+    SWF::DefinitionTag* cdef = m_def->getDefinitionTag(tag->getID());
     if (cdef == NULL)
     {
         log_error(_("movieclip::replace_display_object(): "
@@ -1973,9 +1975,9 @@ MovieClip::mouseEnabled() const
 }
 
 DisplayObject*
-MovieClip::getDisplayObject(int /* DisplayObject_id */)
+MovieClip::getDisplayObject(int /* id */)
 {
-    //return m_def->get_character_def(DisplayObject_id);
+    //return m_def->getDefinitionTag(id);
     // @@ TODO -- look through our dlist for a match
     log_unimpl(_("%s doesn't even check for a char"),
         __PRETTY_FUNCTION__);
@@ -2560,7 +2562,7 @@ MovieClip::getBounds() const
     rect bounds;
     BoundsFinder f(bounds);
     const_cast<DisplayList&>(m_display_list).visitAll(f);
-    rect drawableBounds = _drawable->get_bound();
+    rect drawableBounds = _drawable->getBounds();
     bounds.expand_to_rect(drawableBounds);
     
     return bounds;
@@ -2644,8 +2646,6 @@ MovieClip::markReachableResources() const
     ReachableMarker marker;
 
     m_display_list.visitAll(marker);
-
-    _drawable->setReachable();
 
     _drawable_inst->setReachable();
 
@@ -2813,13 +2813,15 @@ MovieClip::set_play_state(play_state s)
 
 #ifdef USE_SWFTREE
 
-class MovieInfoVisitor {
+class MovieInfoVisitor
+{
 
     DisplayObject::InfoTree& _tr;
     DisplayObject::InfoTree::iterator _it;
 
 public:
-    MovieInfoVisitor(DisplayObject::InfoTree& tr, DisplayObject::InfoTree::iterator it)
+    MovieInfoVisitor(DisplayObject::InfoTree& tr,
+            DisplayObject::InfoTree::iterator it)
         :
         _tr(tr),
         _it(it)
@@ -3155,8 +3157,8 @@ movieclip_attachMovie(const fn_call& fn)
         return as_value(); 
     }
     
-    character_def* exported_movie =
-        dynamic_cast<character_def*>(exported.get());
+    SWF::DefinitionTag* exported_movie =
+        dynamic_cast<SWF::DefinitionTag*>(exported.get());
 
     if (!exported_movie)
     {

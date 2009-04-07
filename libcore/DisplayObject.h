@@ -16,14 +16,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef GNASH_CHARACTER_H
-#define GNASH_CHARACTER_H
+#ifndef GNASH_DISPLAY_OBJECT_H
+#define GNASH_DISPLAY_OBJECT_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h" // USE_SWFTREE
 #endif
 
-#include "character_def.h"
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "event_id.h" // for inlines
 #include "as_object.h" // for inheritance
@@ -67,9 +66,21 @@ namespace gnash {
 //
 /// Derived classes include InteractiveObject, StaticText, Bitmap,
 /// Video, and Shape.
+//
+/// All DisplayObjects may be constructed during SWF parsing. In this case
+/// they are constructed using an immutable, non-copyable SWF::DefinitionTag. 
+/// This tag should never be changed!
+//
+/// Most DisplayObjects may also be constructed dynamically. In AS3, Bitmaps
+/// and Shapes can be dynamically created. Dynamically-created DisplayObjects
+/// must not have a SWF::DefinitionTag!
+//
+/// The presence of a definition tag may be used to distinguish static from
+/// dynamic DisplayObjects, but tags are not always stored. They are not
+/// stored in most InteractiveObjects because most properties can be
+/// overridden during SWF execution.
 class DisplayObject : public as_object
 {
-
 public:
 
     DisplayObject(DisplayObject* parent, int id);

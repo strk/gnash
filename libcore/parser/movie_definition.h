@@ -51,7 +51,7 @@
 #include "gnashconfig.h" // for USE_SWFTREE
 #endif
 
-#include "character_def.h" // for inheritance
+#include "swf/DefinitionTag.h"
 #include "GnashImageJpeg.h"
 
 #include <string>
@@ -78,7 +78,7 @@ namespace gnash
 /// This is the shared constant source info, the one that cannot
 /// be changed by ActionScript code.
 ///
-/// The class derives from character_def to allow a movie
+/// The class derives from DefinitionTag to allow a movie
 /// to be put in the CharacterDictionary. This is probably
 /// unneeded for top-level movies, because they don't need
 /// to be put in any CharacterDictionary... anyway the
@@ -90,10 +90,10 @@ namespace gnash
 /// This design is uncomfortable when it comes to programmatically
 /// created DisplayObjects, in that they do NOT have any *fixed* definition.
 /// A possible workaround to this would be not *requiring* DisplayObject
-/// instances to have an associated character_def. I'll work on this
+/// instances to have an associated DefinitionTag. I'll work on this
 /// --strk 2006-12-05.
 ///
-class movie_definition : public character_def
+class movie_definition : public SWF::DefinitionTag
 {
 public:
 	typedef std::vector<ControlTag*> PlayList;
@@ -195,7 +195,7 @@ public:
 	/// @return NULL if no DisplayObject with the given ID is found
 	///         (this is the default)
 	///
-	virtual character_def*	get_character_def(int /*id*/)
+	virtual DefinitionTag*	getDefinitionTag(int /*id*/)
 	{
 		return NULL;
 	}
@@ -232,7 +232,7 @@ public:
 	/// This method is here to be called by DEFINE tags loaders.
 	/// The default implementation does nothing.
 	///
-	virtual void addDisplayObject(int /*id*/, character_def* /*ch*/)
+	virtual void addDisplayObject(int /*id*/, DefinitionTag* /*ch*/)
 	{
 	}
 
@@ -445,7 +445,7 @@ public:
 
 	virtual const std::string& getDescriptiveMetadata() const
 	{
-	    static const std::string s("");
+	    static const std::string s;
 	    return s;
 	}	
 

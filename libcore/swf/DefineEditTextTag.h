@@ -23,7 +23,7 @@
 #endif
 
 #include "rect.h"
-#include "character_def.h"
+#include "DefinitionTag.h"
 #include "swf.h" // for TagType definition
 #include "RGBA.h"
 #include "TextField.h"
@@ -54,7 +54,7 @@ namespace SWF {
 /// The tag will then be used to start playing the specific block
 /// in sync with the frame playhead.
 ///
-class DefineEditTextTag : public character_def
+class DefineEditTextTag : public DefinitionTag
 {
 
 public:

@@ -54,15 +54,9 @@ public:
 
 protected:
 
-    /// This should really have an optional definition.
-    virtual character_def* getDefinition() const {
-        return _shapeDef.get();
-    }
-
     void markReachableObjects() const {
         if (_bitmapData) _bitmapData->setReachable();
         if (_bitmapInfo) _bitmapInfo->setReachable();
-        if (_shapeDef) _shapeDef->setReachable();
     }
 
 private:
@@ -80,8 +74,8 @@ private:
     /// The current bitmap information is stored here.
     boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
 
-    /// FIXME: using shape_character_def is unpleasant.
-    boost::intrusive_ptr<DynamicShape> _shapeDef;
+    /// FIXME: using DefineShapeTag is unpleasant.
+    DynamicShape _shape;
 
     /// This is cached to save querying the BitmapData often
     size_t _width;

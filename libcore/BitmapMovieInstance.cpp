@@ -31,10 +31,8 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
 	// We need to assign a DisplayObject id to the instance, or an assertion
 	// will fail in DisplayObject.cpp (parent==NULL || id != -1)
 
-	character_def* chdef = def->get_character_def(1); 
-	assert(chdef);
-	boost::intrusive_ptr<DisplayObject> ch = 
-        chdef->createDisplayObject(this, 1);
+	assert(def);
+	boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this, 1);
 	
 	const int depth = 1 + DisplayObject::staticDepthOffset;
 	placeDisplayObject(ch.get(), depth);

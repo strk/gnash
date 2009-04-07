@@ -1,4 +1,4 @@
-// Shape.cpp:  Mouse/Character handling, for Gnash.
+// StaticText.cpp:  StaticText DisplayObject implementation for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -38,20 +38,19 @@ StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,
 }
 
 bool
-StaticText::pointInShape(boost::int32_t  x, boost::int32_t  y) const
+StaticText::pointInShape(boost::int32_t /*x*/, boost::int32_t /*y*/) const
 {
-    SWFMatrix wm = getWorldMatrix();
-    SWFMatrix wm_inverse = wm.invert();
-    point lp(x, y);
-    wm_inverse.transform(lp);
-    return _def->point_test_local(lp.x, lp.y, wm);
+    // TODO: this has never worked as it relied on the default
+    // pointTestLocal in DefinitionTag, which returned false. There are
+    // no tests for whether StaticText has a proper hit test.
+    return false;
 }
 
 
 void  
 StaticText::display()
 {
-    _def->display(this); // pass in transform info
+    _def->display(*this);
     clear_invalidated();
 }
 

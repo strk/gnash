@@ -144,14 +144,15 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 
 // Render the given glyph records.
 void
-TextRecord::displayRecords(const SWFMatrix& this_mat, DisplayObject* inst,
-    const std::vector<SWF::TextRecord>& records, bool embedded)
+TextRecord::displayRecords(const SWFMatrix& this_mat,
+        const DisplayObject& inst, const std::vector<SWF::TextRecord>& records,
+        bool embedded)
 {
 
-    SWFMatrix mat = inst->getWorldMatrix();
+    SWFMatrix mat = inst.getWorldMatrix();
     mat.concatenate(this_mat);
 
-    cxform cx = inst->get_world_cxform();
+    cxform cx = inst.get_world_cxform();
     const SWFMatrix base_matrix = mat;
 
     // Starting positions.
@@ -230,12 +231,12 @@ TextRecord::displayRecords(const SWFMatrix& this_mat, DisplayObject* inst,
             }
             else
             {
-                shape_character_def* glyph = fnt->get_glyph(index, embedded);
+                ShapeRecord* glyph = fnt->get_glyph(index, embedded);
 
                 // Draw the DisplayObject using the filled outline.
                 if (glyph)
                 {
-                    render::draw_glyph(glyph, mat, textColor);
+                    render::drawGlyph(*glyph, textColor, mat);
                 }
             }
             x += ge.advance;

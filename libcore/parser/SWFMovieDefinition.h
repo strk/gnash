@@ -31,7 +31,7 @@
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance
-#include "character_def.h" // for boost::intrusive_ptr visibility of dtor
+#include "DefinitionTag.h" // for boost::intrusive_ptr visibility of dtor
 #include "StringPredicates.h" 
 #include "rect.h"
 #include "GnashNumeric.h"
@@ -117,9 +117,9 @@ public:
 
 	/// The container used by this dictionary
 	//
-	/// It contains pairs of 'int' and 'boost::intrusive_ptr<character_def>'
+	/// It contains pairs of 'int' and 'boost::intrusive_ptr<DefinitionTag>'
 	///
-	typedef std::map<int, boost::intrusive_ptr<character_def> >
+	typedef std::map<int, boost::intrusive_ptr<SWF::DefinitionTag> >
         CharacterContainer;
 
 	typedef CharacterContainer::iterator CharacterIterator;
@@ -130,13 +130,13 @@ public:
 	//
 	/// returns a NULL if the id is unknown.
 	///
-	boost::intrusive_ptr<character_def> getDisplayObject(int id);
+	boost::intrusive_ptr<SWF::DefinitionTag> getDisplayObject(int id);
 
 	/// Add a Character assigning it the given id
 	//
 	/// replaces any existing DisplayObject with the same id
 	///
-	void addDisplayObject(int id, boost::intrusive_ptr<character_def> c);
+	void addDisplayObject(int id, boost::intrusive_ptr<SWF::DefinitionTag> c);
 
 	/// Return an iterator to the first dictionary element
 	CharacterIterator begin() { return _map.begin(); }
@@ -246,14 +246,14 @@ public:
 	virtual void importResources(boost::intrusive_ptr<movie_definition> source,
             Imports& imports);
 
-	void addDisplayObject(int DisplayObject_id, character_def* c);
+	void addDisplayObject(int DisplayObject_id, SWF::DefinitionTag* c);
 
 	/// \brief
 	/// Return a DisplayObject from the dictionary
 	/// NOTE: call add_ref() on the return or put in a boost::intrusive_ptr<>
 	/// TODO: return a boost::intrusive_ptr<> directly...
 	///
-	character_def*	get_character_def(int DisplayObject_id);
+    SWF::DefinitionTag* getDefinitionTag(int DisplayObject_id);
 
 	// See dox in movie_definition
 	//
@@ -395,7 +395,7 @@ public:
     // It is required that get_bound() is implemented in DisplayObject definition
     // classes. However, it makes no sense to call it for movie interfaces.
     // get_bound() is currently only used by DisplayObject which normally
-    // is used only shape DisplayObject definitions. See character_def.h to learn
+    // is used only shape DisplayObject definitions. See DefinitionTag.h to learn
     // why it is virtual anyway.
     abort(); // should not be called  
 		static rect unused;

@@ -896,18 +896,10 @@ private:
 
     /// The canvas for dynamic drawing
     //
-    /// WARNING: since DynamicShape is a character_def, which is
-    ///          in turn a ref_counted, we'd better keep
-    ///          this by intrusive_ptr, even if we're the sole
-    ///          owners. The problem is in case a pointer to this
-    ///      instance ever gets passed to some function wrapping
-    ///      it into an intrusive_ptr, in which case the stack
-    ///          object will be destroyed, with horrible consequences ...
-    ///
-    boost::intrusive_ptr<DynamicShape> _drawable;
+    boost::shared_ptr<DynamicShape> _drawable;
 
     /// The need of an instance here is due to the renderer
-    /// insising on availability a shape_character_def instance
+    /// insising on availability a DefineShapeTag instance
     /// that has a parent (why?)
     ///
     boost::intrusive_ptr<DisplayObject> _drawable_inst;

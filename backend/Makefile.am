@@ -36,6 +36,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/parser \
+        -I$(top_srcdir)/libcore/swf \
         -I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/backend \
 	$(PTHREAD_CFLAGS) \
