@@ -22,6 +22,7 @@
 
 #include <boost/cstdint.hpp>
 #include <vector>
+#include <boost/noncopyable.hpp>
 
 // Forward declarations
 
@@ -101,13 +102,12 @@ protected:
 	///
 	/// TODO: improve by implementing copy on write for the cache ?
 	///
-	character_def(const character_def& o)
+    character_def(const character_def& o)
 		:
         ExportableResource(),
 		m_render_cache(0),
 		_id(o._id)
 	{}
-
 private:
 
     int	_id;

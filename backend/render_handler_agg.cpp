@@ -120,7 +120,7 @@ AGG resources
 #include "render_handler.h"
 #include "render_handler_agg.h" 
 #include "Range2d.h"
-#include "morph2_character_def.h" 
+#include "swf/DefineMorphShapeTag.h" 
 #include "shape_character_def.h" 
 #include "DisplayObject.h"
 #include "MorphShape.h"
@@ -990,7 +990,7 @@ public:
         drawShape(fill_styles, line_styles, paths, mat, cx);
     }
     
-    void drawMorph(const morph_character_def& def, const MorphShape& inst)
+    void drawMorph(const SWF::DefineMorphShapeTag& def, const MorphShape& inst)
     {
         const std::vector<fill_style>& fill_styles = inst.fillStyles();
         const std::vector<line_style>& line_styles = inst.lineStyles();

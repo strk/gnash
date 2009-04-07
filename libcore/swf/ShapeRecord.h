@@ -22,6 +22,12 @@ namespace SWF {
 //
 /// This does not correspond exactly to parsed record in a SWF file, but
 /// is used to create both mutable and immutable shapes.
+///
+/// A ShapeRecord should have enough methods to implement the AS3 Graphics
+/// object (the drawing API of Shape and Sprite). This is restricted to
+/// adding fills, paths and line styles (which must be constructed outside
+/// this ShapeRecord before being added) and clearing everything. There
+/// is no support for removing single elements.
 class ShapeRecord
 {
 public:
@@ -42,6 +48,14 @@ public:
 
     /// Parse path data from a SWFStream.
     void read(SWFStream& in, SWF::TagType tag, movie_definition& m);
+
+    /// Reset all shape data.
+    void clear() {
+        _fillStyles.clear();
+        _lineStyles.clear();
+        _paths.clear();
+        _bounds.set_null();
+    }
 
     const FillStyles& fillStyles() const {
         return _fillStyles;

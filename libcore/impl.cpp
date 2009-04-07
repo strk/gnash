@@ -50,6 +50,7 @@
 #include "StartSoundTag.h"
 #include "StreamSoundBlockTag.h"
 #include "DefineButtonSoundTag.h"
+#include "DefineMorphShapeTag.h"
 #include "DefineVideoStreamTag.h"
 #include "DefineFontNameTag.h"
 #include "VideoFrameTag.h"
@@ -166,7 +167,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINEBEHAVIOR, fixme_loader); // 44
 
     register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
-    register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
+    // 46
+    register_tag_loader(SWF::DEFINEMORPHSHAPE, DefineMorphShapeTag::loader);
     register_tag_loader(SWF::FRAMETAG,  fixme_loader); // 47
     // 48
     register_tag_loader(SWF::DEFINEFONT2, DefineFontTag::loader);
@@ -209,9 +211,10 @@ static void ensure_loaders_registered()
     // TODO: Alexis reference says these are 83, 84. The 67,68 comes from Tamarin.
     // Figure out which one is correct (possibly both are).
     register_tag_loader(SWF::DEFINESHAPE4_, define_shape_loader); // 67
-    register_tag_loader(SWF::DEFINEMORPHSHAPE2_, define_shape_morph_loader); // 68
-
-    register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader); // 69
+    // 68
+    register_tag_loader(SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader);
+    // 69
+    register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader);
     register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader); // 70
     register_tag_loader(SWF::IMPORTASSETS2, import_loader); // 71
 
@@ -226,7 +229,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
     register_tag_loader(SWF::DOABCDEFINE, abc_loader); // 82 -- AS3 codeblock.
     register_tag_loader(SWF::DEFINESHAPE4, define_shape_loader); // 83
-    register_tag_loader(SWF::DEFINEMORPHSHAPE2, define_shape_morph_loader); // 84
+    // 84
+    register_tag_loader(SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader);
     register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,define_scene_frame_label_loader); //86
     // 88
     register_tag_loader(SWF::DEFINEFONTNAME, DefineFontNameTag::loader);

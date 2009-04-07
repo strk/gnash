@@ -124,7 +124,8 @@ private:
 } // anonymous namespace
 
 
-MorphShape::MorphShape(morph_character_def* def, DisplayObject* parent, int id)
+MorphShape::MorphShape(const SWF::DefineMorphShapeTag* const def,
+        DisplayObject* parent, int id)
     :
     DisplayObject(parent, id),
     _def(def),

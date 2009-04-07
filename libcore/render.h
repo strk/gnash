@@ -82,7 +82,8 @@ namespace gnash {
 		void drawShape(const shape_character_def& def,
                 const DisplayObject& inst);
 		
-        void drawMorph(const morph_character_def& def, const MorphShape& inst);
+        void drawMorph(const SWF::DefineMorphShapeTag& def,
+                const MorphShape& inst);
       
 		/// See render_handler::draw_glyph (in backend/render_handler.h)
 		void draw_glyph(shape_character_def *def, const SWFMatrix& mat,

@@ -29,7 +29,6 @@
 #include "Font.h"
 #include "fontlib.h"
 #include "log.h"
-#include "morph2_character_def.h"
 #include "Geometry.h"
 #include "SWFStream.h"
 #include "styles.h"
@@ -737,24 +736,6 @@ void define_shape_loader(SWFStream& in, TagType tag, movie_definition& m,
     ch->read(in, tag, true, m);
 
     m.addDisplayObject(DisplayObject_id, ch);
-}
-
-void define_shape_morph_loader(SWFStream& in, TagType tag, movie_definition& m,
-		const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINEMORPHSHAPE
-        || tag == SWF::DEFINEMORPHSHAPE2
-        || tag == SWF::DEFINEMORPHSHAPE2_); 
-
-    in.ensureBytes(2);
-    boost::uint16_t DisplayObject_id = in.read_u16();
-
-    IF_VERBOSE_PARSE(
-        log_parse(_("  shape_morph_loader: id = %d"), DisplayObject_id);
-    );
-
-    morph_character_def* morph = new morph_character_def(in, tag, m);
-    m.addDisplayObject(DisplayObject_id, morph);
 }
 
 // Create and initialize a sprite, and add it to the movie.

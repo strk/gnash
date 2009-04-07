@@ -1,4 +1,4 @@
-// morph_character_def.cpp:   Load and render morphing shapes, for Gnash.
+// DefineMorphShapeTag.cpp:   Load and parse morphing shapes, for Gnash.
 //
 //   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
@@ -22,7 +22,7 @@
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
 // Vitalij Alexeev <tishka92@mail.ru> 2004.
 
-#include "morph2_character_def.h"
+#include "DefineMorphShapeTag.h"
 #include "MorphShape.h"
 #include "SWFStream.h"
 #include "render.h"
@@ -31,48 +31,63 @@
 #include "GnashNumeric.h"
 
 namespace gnash {
+namespace SWF {
 
-/// Functors for path and style manipulation.
-morph_character_def::morph_character_def(SWFStream& in, SWF::TagType tag,
+void
+DefineMorphShapeTag::loader(SWFStream& in, TagType tag, movie_definition& md,
+        const RunInfo& r)
+{
+    in.ensureBytes(2);
+    boost::uint16_t id = in.read_u16();
+
+    IF_VERBOSE_PARSE(
+            log_parse("DefineMorphShapeTag: id = %d", id);
+    );
+
+    DefineMorphShapeTag* morph = new DefineMorphShapeTag(in, tag, md);
+    md.addDisplayObject(id, morph);
+}
+
+DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
         movie_definition& md)
 {
     read(in, tag, md);
 }
 
 DisplayObject*
-morph_character_def::createDisplayObject(DisplayObject* parent, int id)
+DefineMorphShapeTag::createDisplayObject(DisplayObject* parent, int id)
 {
     return new MorphShape(this, parent, id);
 }
 
 void
-morph_character_def::display(const MorphShape& inst) const
+DefineMorphShapeTag::display(const MorphShape& inst) const
 {
     render::drawMorph(*this, inst);
 }
 
 
 void
-morph_character_def::read(SWFStream& in, SWF::TagType tag,
+DefineMorphShapeTag::read(SWFStream& in, TagType tag,
         movie_definition& md)
 {
-    assert(tag == SWF::DEFINEMORPHSHAPE
-        || tag == SWF::DEFINEMORPHSHAPE2
-        || tag == SWF::DEFINEMORPHSHAPE2_);
+    assert(tag == DEFINEMORPHSHAPE
+        || tag == DEFINEMORPHSHAPE2
+        || tag == DEFINEMORPHSHAPE2_);
 
     rect bounds1, bounds2;
     bounds1.read(in);
     bounds2.read(in);
 
-    if (tag == SWF::DEFINEMORPHSHAPE2 || tag == SWF::DEFINEMORPHSHAPE2_) {
+    if (tag == DEFINEMORPHSHAPE2 || tag == DEFINEMORPHSHAPE2_) {
         // TODO: Use these values.
-        rect inner_bound1, inner_bound2;
-        inner_bound1.read(in);
-        inner_bound2.read(in);
+        rect innerBound1, innerBound2;
+        innerBound1.read(in);
+        innerBound2.read(in);
+
         // This should be used -- first 6 bits reserved, then
         // 'non-scaling' stroke, then 'scaling' stroke -- these can be
         // used to optimize morphing.
-        
         in.ensureBytes(1);
         static_cast<void>(in.read_u8());
     }
@@ -142,6 +157,7 @@ morph_character_def::read(SWFStream& in, SWF::TagType tag,
 
 }
 
+} // namespace SWF
 } // namespace gnash
 
 // Local Variables:

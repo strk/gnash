@@ -21,7 +21,7 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
 #include "Geometry.h"
-#include "morph2_character_def.h"
+#include "swf/DefineMorphShapeTag.h"
 #include <cassert>
 
 namespace gnash {
@@ -40,7 +40,8 @@ public:
     typedef std::vector<line_style> LineStyles;
     typedef std::vector<Path> Paths;
 
-    MorphShape(morph_character_def* def, DisplayObject* parent, int id);
+    MorphShape(const SWF::DefineMorphShapeTag* const def, 
+            DisplayObject* parent, int id);
 
 	virtual void display();
 
@@ -78,7 +79,7 @@ private:
 
     double currentRatio() const;
 
-    const boost::intrusive_ptr<const morph_character_def> _def;
+    const boost::intrusive_ptr<const SWF::DefineMorphShapeTag> _def;
 	
     FillStyles _fillStyles;
     LineStyles _lineStyles;

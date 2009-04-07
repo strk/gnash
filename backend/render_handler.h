@@ -158,7 +158,9 @@ namespace gnash {
     class SWFMatrix;
     class cxform;
 
-    class morph_character_def;
+    namespace SWF {
+        class DefineMorphShapeTag;
+    }
     class shape_character_def;
 
     class Shape;
@@ -291,7 +293,7 @@ public:
     virtual void drawShape(const shape_character_def& def,
             const DisplayObject& inst) = 0;
     
-    virtual void drawMorph(const morph_character_def& def,
+    virtual void drawMorph(const SWF::DefineMorphShapeTag& def,
             const MorphShape& inst) = 0;
 
     /// \brief
