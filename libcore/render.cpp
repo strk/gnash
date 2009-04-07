@@ -169,16 +169,6 @@ drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
 		if (s_render_handler) s_render_handler->drawShape(shape, cx, worldMat);
 }
 
-
-void
-drawShape(const DefineShapeTag& def, const DisplayObject& inst) 
-{
-#ifdef DEBUG_RENDER_CALLS
-		GNASH_REPORT_FUNCTION;
-#endif
-		if (s_render_handler) s_render_handler->drawShape(def, inst);
-}
-
 void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color, 
       const SWFMatrix& mat)
 {

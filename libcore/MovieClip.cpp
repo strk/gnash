@@ -1514,7 +1514,7 @@ MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
     assert(m_def);
     assert(tag);
 
-    DefinitionTag* cdef = m_def->getDefinitionTag(tag->getID());
+    SWF::DefinitionTag* cdef = m_def->getDefinitionTag(tag->getID());
     if (!cdef)
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -1579,7 +1579,7 @@ void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayL
     assert(m_def != NULL);
     assert(tag != NULL);
 
-    DefinitionTag*    cdef = m_def->getDefinitionTag(tag->getID());
+    SWF::DefinitionTag* cdef = m_def->getDefinitionTag(tag->getID());
     if (cdef == NULL)
     {
         log_error(_("movieclip::replace_display_object(): "
@@ -3157,8 +3157,8 @@ movieclip_attachMovie(const fn_call& fn)
         return as_value(); 
     }
     
-    DefinitionTag* exported_movie =
-        dynamic_cast<DefinitionTag*>(exported.get());
+    SWF::DefinitionTag* exported_movie =
+        dynamic_cast<SWF::DefinitionTag*>(exported.get());
 
     if (!exported_movie)
     {

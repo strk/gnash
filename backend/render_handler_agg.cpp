@@ -988,10 +988,6 @@ public:
     }
 
 
-    void drawShape(const DefineShapeTag& def, const DisplayObject& inst)
-    {
-    }
-    
     void drawMorph(const SWF::DefineMorphShapeTag& def, const MorphShape& inst)
     {
         const std::vector<fill_style>& fill_styles = inst.fillStyles();

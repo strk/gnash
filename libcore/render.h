@@ -85,9 +85,6 @@ namespace gnash {
         void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
                 const SWFMatrix& worldMat);
       
-		void drawShape(const DefineShapeTag& def,
-                const DisplayObject& inst);
-		
         void drawMorph(const SWF::DefineMorphShapeTag& def,
                 const MorphShape& inst);
       
