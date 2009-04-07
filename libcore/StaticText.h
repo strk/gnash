@@ -48,7 +48,8 @@ public:
             int id)
 		:
         DisplayObject(parent, id),
-        _def(def)
+        _def(def),
+        _selectionColor(0, 255, 255, 255)
 	{
         assert(_def);
 	}
@@ -90,7 +91,11 @@ public:
         return _def->get_bound();
     }
 
-    virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+
+    const rgba& selectionColor() const {
+        return _selectionColor;
+    }
 
 protected:
 
