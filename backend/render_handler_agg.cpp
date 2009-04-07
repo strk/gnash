@@ -973,7 +973,7 @@ public:
                 
         if (!render_handler::bounds_in_clipping_area(cur_bounds))
         {
-            //return; // no need to draw
+            return; // no need to draw
         }        
         
         const SWF::ShapeRecord::FillStyles& fillStyles = shape.fillStyles();

@@ -44,7 +44,6 @@ DynamicShape::clear()
 void
 DynamicShape::display(const DisplayObject& inst)
 {
-    GNASH_REPORT_FUNCTION;
     render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
 }
 
