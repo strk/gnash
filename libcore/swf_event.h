@@ -72,7 +72,7 @@ private:
 	/// (by PlaceObject tag in this design)
 	/// and may be shared between multiple swf_events
 	///
-	action_buffer& m_action_buffer;
+	const action_buffer& m_action_buffer;
 
 	/// Can't assign to an swf_event
 	void operator=(const swf_event& /*s*/);
