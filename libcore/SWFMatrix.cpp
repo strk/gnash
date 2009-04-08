@@ -300,9 +300,9 @@ SWFMatrix::transform(rect& r) const
     r.expand_to_point(p3.x, p3.y);
 }
 
-const SWFMatrix&
-SWFMatrix::invert()
 // invert this SWFMatrix and return the result.
+SWFMatrix&
+SWFMatrix::invert()
 {
     boost::int64_t det = determinant();
     if(det == 0)
