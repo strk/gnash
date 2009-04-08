@@ -32,6 +32,15 @@ namespace gnash {
 /// A MorphShape has no properties of its own, but its inherited properties
 /// may be read in AS3 using a reference to the object created with
 /// getChildAt().
+//
+/// Morphing is controlled using a SWF::PlaceObject2 tag with a ratio flag.
+/// The most common and efficient way is to combine this with a move flag,
+/// so that this object is moved to the position specified by the ratio.
+/// However, it is also possible to remove and replace, in which case a 
+/// new MorphShape is created.
+//
+/// The starting position is not necessarily identical with shape1, though in
+/// practice it often is.
 class MorphShape : public DisplayObject
 {
 
