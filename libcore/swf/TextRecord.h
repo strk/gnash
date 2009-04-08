@@ -43,6 +43,8 @@ class TextRecord
 {
 public:
 
+    typedef std::vector<TextRecord> TextRecords;
+
     struct GlyphEntry
     {
         int index;
@@ -87,9 +89,8 @@ public:
             int advanceBits, TagType tag);
 
     static void displayRecords(const SWFMatrix& this_mat,
-            const DisplayObject& inst,
-            const std::vector<SWF::TextRecord>& records,
-            bool useEmbeddedGlyphs);
+            const DisplayObject& inst, const TextRecords& records,
+            bool embedded);
 
     const Glyphs& glyphs() const {
         return _glyphs;
