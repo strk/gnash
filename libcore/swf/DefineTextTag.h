@@ -88,7 +88,7 @@ private:
 
 	void read(SWFStream& in, movie_definition& m, TagType tag);
 	
-    std::vector<TextRecord> _textRecords;
+    TextRecord::TextRecords _textRecords;
 };
 
 /// Parse a DefineText2Tag.
