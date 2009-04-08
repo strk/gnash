@@ -38,7 +38,7 @@
  * Tests are triggered by events, in particular:
  * - Test for _target and _name referring to button's parent.
  * - Test for bounds of buttons being the union of all active state
- *   characters' bounds.
+ *   DisplayObjects' bounds.
  *
  * Note that you need to play with your mouse on the button for the tests
  * to be run, and that there's currently no END OF TEST condition.
@@ -154,47 +154,47 @@ add_button(SWFMovie mo)
 	sh4 = make_fill_square(0, 0, 40, 40, 255, 255, 0, 255, 255, 0);
 	sh4a = make_fill_square(30, 30, 5, 5, 128, 128, 0, 128, 128, 0);
 
-	/* Higher depth character is intentionally added before lower depth one */
+	/* Higher depth DisplayObject is intentionally added before lower depth one */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh1a, SWFBUTTON_HIT);
 	SWFButtonRecord_setDepth(br, 2);
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh1, SWFBUTTON_HIT);
 	SWFButtonRecord_setDepth(br, 1);
 
-	/* Higher depth character is intentionally added before lower depth one */
+	/* Higher depth DisplayObject is intentionally added before lower depth one */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh2a, SWFBUTTON_UP );
 	SWFButtonRecord_setDepth(br, 2);
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh2, SWFBUTTON_UP );
 	SWFButtonRecord_setDepth(br, 1);
 
-	/* Higher depth character is intentionally added before lower depth one */
+	/* Higher depth DisplayObject is intentionally added before lower depth one */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh3a, SWFBUTTON_DOWN );
 	SWFButtonRecord_setDepth(br, 2);
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh3, SWFBUTTON_DOWN );
 	SWFButtonRecord_setDepth(br, 1);
 
-	/* Higher depth character is intentionally added before lower depth one */
+	/* Higher depth DisplayObject is intentionally added before lower depth one */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh4a, SWFBUTTON_OVER );
 	SWFButtonRecord_setDepth(br, 2);
 	br = SWFButton_addCharacter(bu, (SWFCharacter)sh4, SWFBUTTON_OVER );
 	SWFButtonRecord_setDepth(br, 1);
 
-	/* Add events reported character in all states at depth 10 */
+	/* Add events reported DisplayObject in all states at depth 10 */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_HIT|SWFBUTTON_DOWN|SWFBUTTON_OVER|SWFBUTTON_UP);
 	SWFButtonRecord_setDepth(br, 10);
 
-	/* Add events reported character just HIT state at depth 11 */
+	/* Add events reported DisplayObject just HIT state at depth 11 */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_HIT);
 	SWFButtonRecord_setDepth(br, 11);
 
-	/* Add events reported character just UP state at depth 12 */
+	/* Add events reported DisplayObject just UP state at depth 12 */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_UP);
 	SWFButtonRecord_setDepth(br, 12);
 
-	/* Add events reported character just OVER state at depth 13 */
+	/* Add events reported DisplayObject just OVER state at depth 13 */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_OVER);
 	SWFButtonRecord_setDepth(br, 13);
 
-	/* Add events reported character just DOWN state at depth 14 */
+	/* Add events reported DisplayObject just DOWN state at depth 14 */
 	br = SWFButton_addCharacter(bu, (SWFCharacter)ermc, SWFBUTTON_DOWN);
 	SWFButtonRecord_setDepth(br, 14);
 
@@ -541,7 +541,7 @@ main(int argc, char **argv)
 	/*****************************************************
 	 *
 	 * On second frame, check construction of the button
-	 * character states and give instructions to proceed
+	 * DisplayObject states and give instructions to proceed
 	 *
 	 *
 	 *****************************************************/

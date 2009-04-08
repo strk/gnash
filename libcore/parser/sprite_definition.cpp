@@ -39,8 +39,8 @@
 
 namespace gnash {
 
-character*
-sprite_definition::createDisplayObject(character* parent, int id)
+DisplayObject*
+sprite_definition::createDisplayObject(DisplayObject* parent, int id)
 {
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);
@@ -52,10 +52,10 @@ sprite_definition::createDisplayObject(character* parent, int id)
 sprite_definition::~sprite_definition()
 {
 	// Release our playlist data.
-	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end(); i!=e; ++i)
+	for (PlayListMap::iterator i=m_playlist.begin(), e=m_playlist.end();
+            i != e; ++i)
 	{
 		PlayList& pl = i->second;
-
         deleteAllChecked(pl);
     }
 }
@@ -127,7 +127,7 @@ sprite_definition::read(SWFStream& in, const RunInfo& runInfo)
 		}
 		else if (_tag_loaders.get(tag, &lf)) {
 		    // call the tag loader.  The tag loader should add
-		    // characters or tags to the movie data structure.
+		    // DisplayObjects or tags to the movie data structure.
 		    (*lf)(in, tag, *this, runInfo);
 		}
 		else {

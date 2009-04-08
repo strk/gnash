@@ -97,7 +97,7 @@ void
 BitmapData_as::markReachableResources() const
 {
     std::for_each(_attachedBitmaps.begin(), _attachedBitmaps.end(),
-            std::mem_fun(&character::setReachable));
+            std::mem_fun(&DisplayObject::setReachable));
     markAsObjectReachable();
 }
 

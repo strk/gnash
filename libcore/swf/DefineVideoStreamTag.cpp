@@ -80,7 +80,7 @@ DefineVideoStreamTag::loader(SWFStream& in, SWF::TagType tag,
 
     std::auto_ptr<DefineVideoStreamTag> vs(new DefineVideoStreamTag(in, id));
 
-    m.add_character(id, vs.release());
+    m.addDisplayObject(id, vs.release());
 
 }
 
@@ -132,10 +132,10 @@ DefineVideoStreamTag::addVideoFrameTag(
     _video_frames.push_back(frame.release());
 }
 
-character*
-DefineVideoStreamTag::createDisplayObject(character* parent, int id)
+DisplayObject*
+DefineVideoStreamTag::createDisplayObject(DisplayObject* parent, int id)
 {
-	character* ch = new Video(this, parent, id);
+	DisplayObject* ch = new Video(this, parent, id);
 	return ch;
 }
 

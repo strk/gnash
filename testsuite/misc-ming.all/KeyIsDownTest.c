@@ -67,7 +67,7 @@ main(int argc, char** argv)
     in multiple keycodes being marked as down, but we can't tell which keys
     or keycodes without knowing the keyboard layout. My Essszet (ß) should have
     codes 223 ('ß'), 220 ('\'), and 191 ('?').
-    So the test is good for checking isDown for the main characters, but the passes
+    So the test is good for checking isDown for the main DisplayObjects, but the passes
     for !isDown can be bogus, depending on keyboard.    
      */
     "keys[2] = array (223, 228);"
@@ -79,34 +79,34 @@ main(int argc, char** argv)
     "keys[3] = array (16, 34, 222);"
     "keynames[3] = ('shift, page-down, doublequote');" 
 
-    /* Test indifference to shift for alphabetic characters ... */
+    /* Test indifference to shift for alphabetic DisplayObjects ... */
     "keys[4] = array (16, 65, 70);"
     "keynames[4] = ('keypress order: press shift, A, F');"
 
-    /* ... Releasing shift before the character keys should still remove A
+    /* ... Releasing shift before the DisplayObject keys should still remove A
     from the isDown array. Good for testrunner. */
     "keys[5] = array (70, 74);"
     "keynames[5] = ('key order: release shift, release A, press j');"
 
-    /* Test indifference to shift for non-alphabetic characters ... */    
+    /* Test indifference to shift for non-alphabetic DisplayObjects ... */    
     "keys[6] = array (16, 49, 222);"
     "keynames[6] = ('keypress order: shift, !, doublequote');"
 
-    /* ... Releasing shift before the character keys should remove ! and " from the
+    /* ... Releasing shift before the DisplayObject keys should remove ! and " from the
     isDown array. This will not work on non-US keyboards, where " and 2 are on the
     same key. But testing this automatically is not possible in this framework. */
     "keys[7] = array ();"
     "keynames[7] = ('key release order: release shift, release !, release doublequote.\n"
     "Will fail manual test on non-US keyboards');"
 
-    /* Test indifference to shift for extended-ascii alphabetic characters ... */    
+    /* Test indifference to shift for extended-ascii alphabetic DisplayObjects ... */    
     "keys[8] = array (228, 246);"
     "keynames[8] = ('(no shift: a-umlaut, o-umlaut');"
 
     /* ... ä and Ä have different keycodes, but releasing one should mean the other
     is removed from the isDown array when they are on the same key. In fact,
     pressing either on a German keyboard means that codes for both are marked
-    as down. Is this true when the characters are not on the same key? Probably not. So
+    as down. Is this true when the DisplayObjects are not on the same key? Probably not. So
     this test might only be possible manually. */
     "keys[9] = array ();"
     "keynames[9] = ('key order: press shift, release A-Umlaut, release O-umlaut, release shift.\n"

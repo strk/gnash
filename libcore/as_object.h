@@ -41,7 +41,7 @@
 namespace gnash {
 	class as_function;
 	class MovieClip;
-	class character;
+	class DisplayObject;
 	class as_environment;
 	class VM;
 	class Machine;
@@ -852,11 +852,11 @@ public:
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
 
-	/// Cast to a character, or return NULL
-	virtual character* to_character() { return NULL; }
+	/// Cast to a DisplayObject, or return NULL
+	virtual DisplayObject* toDisplayObject() { return NULL; }
 
-	const character* to_character() const {
-        return const_cast<as_object*>(this)->to_character();
+	const DisplayObject* toDisplayObject() const {
+        return const_cast<as_object*>(this)->toDisplayObject();
     }
 
 	/// Return true if this is a Date object.
@@ -1031,7 +1031,7 @@ public:
 	void set_prototype(boost::intrusive_ptr<as_object> proto,
             int flags=as_prop_flags::dontDelete | as_prop_flags::dontEnum);
 
-	/// @{ Common ActionScript methods for characters
+	/// @{ Common ActionScript methods for DisplayObjects
 	/// TODO: make protected
 
 	static as_value tostring_method(const fn_call& fn);

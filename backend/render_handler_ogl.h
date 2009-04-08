@@ -56,7 +56,7 @@ namespace gnash {
 
 
 
-typedef std::vector<const path*> PathRefs;
+typedef std::vector<const Path*> PathRefs;
 
 
 
@@ -76,7 +76,7 @@ struct oglVertex {
   GLdouble _z;
 };
 
-typedef std::map< const path*, std::vector<oglVertex> > PathPointMap;
+typedef std::map<const Path*, std::vector<oglVertex> > PathPointMap;
 
 class Tesselator
 {
@@ -111,7 +111,7 @@ private:
 class WholeShape
 {
 public:
-  void newPath(const path& new_path)
+  void newPath(const Path& new_path)
   {
     PathRefs refs;
     refs.push_back(&new_path);
@@ -119,7 +119,7 @@ public:
     shape.push_back(refs);
   }
   
-  void addPath(const path& add_path)
+  void addPath(const Path& add_path)
   {
     PathRefs& refs = shape.back();
     refs.push_back(&add_path);

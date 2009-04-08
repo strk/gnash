@@ -37,7 +37,7 @@
  * Description:
  * 
  *  frame2: movieclip 1 placed at depth -16381 and position 100,300
- *  frame3: instance at depth -16381 replaced by character 2 at position 130,330
+ *  frame3: instance at depth -16381 replaced by DisplayObject 2 at position 130,330
  *  frame4: jump back to frame 2 and stop
  * 
  * Expected behaviour:
@@ -131,7 +131,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: place character at depth 3 (-16381)
+  // Frame 2: place DisplayObject at depth 3 (-16381)
   it1 = SWFMovie_add(mo, (SWFBlock)static1);
   SWFDisplayItem_setDepth(it1, 3);
   SWFDisplayItem_moveTo(it1, 100, 300);
@@ -165,7 +165,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo); 
 
-  // Frame 3: replace instance at depth -16381 with character 2
+  // Frame 3: replace instance at depth -16381 with DisplayObject 2
   if ( SWFMovie_replace(mo, it1, (SWFBlock)static2) )
   {
 	  abort(); // grace and beauty...
@@ -193,7 +193,7 @@ main(int argc, char** argv)
 			), SWFACTION_UNLOAD);
 
 
-  // Can still reference the old character and it's variables, after replace
+  // Can still reference the old DisplayObject and it's variables, after replace
   check_equals(mo, "typeof(static1)", "'movieclip'"); 
   check_equals(mo, "static1.name", "'static1'");
   check_equals(mo, "static1._target", "'/static1'");
@@ -205,7 +205,7 @@ main(int argc, char** argv)
   // Everything suggests that a new instance is NOT created on replace !!!
   // Gnash here fails because it creates a NEW instance
 
-  // Anyway, the old character matrix changed to 130,330 !
+  // Anyway, the old DisplayObject matrix changed to 130,330 !
   check_equals(mo, "static1._x", "130");
 
   // We can't check the color in a self-contained testcase unfortunately,
@@ -224,7 +224,7 @@ main(int argc, char** argv)
     // A single instance has been constructed !!
     "check_equals(_root.depth3Constructed, '1');"
 
-    // Original character name is still referenceable
+    // Original DisplayObject name is still referenceable
     "check_equals(typeof(static1), 'movieclip');"
 
     // And it still has it's user-provided property

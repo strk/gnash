@@ -19,7 +19,7 @@
 /*
  * Sandro Santilli, strk@keybit.net
  *
- * Test "Jumping backward to the start of a character's lifetime after static transformation"
+ * Test "Jumping backward to the start of a DisplayObject's lifetime after static transformation"
  *
  * run as ./displaylist_depths_test5
  *
@@ -36,7 +36,7 @@
  * 
  * Description:
  * 
- *  frame2: character placed at depth -16381 at position (10,200)
+ *  frame2: DisplayObject placed at depth -16381 at position (10,200)
  *  frame4: position of instance at depth -16381 shifted to the right (50,200)
  *  frame7: jump back to frame 2
  * 
@@ -134,7 +134,7 @@ main(int argc, char** argv)
 	// Frame 3: nothing new
 	SWFMovie_nextFrame(mo); 
 
-	// Frame 4: move character at depth 3 to position 50,200
+	// Frame 4: move DisplayObject at depth 3 to position 50,200
 	SWFDisplayItem_moveTo(it1, 50, 200); 
 	add_actions(mo,
 		"check_equals(static3._x, 50);"

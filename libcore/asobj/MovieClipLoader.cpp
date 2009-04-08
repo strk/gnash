@@ -28,7 +28,7 @@
 #include "fn_call.h"
 #include "as_function.h"
 #include "MovieClip.h"
-#include "character.h" // for loadClip (get_parent)
+#include "DisplayObject.h" // for loadClip (get_parent)
 #include "log.h"
 #include "URL.h" // for url parsing
 #include "VM.h" // for the string table.
@@ -292,7 +292,7 @@ moviecliploader_loadclip(const fn_call& fn)
 
 	as_value tgt_arg = fn.arg(1);
 	std::string tgt_str = tgt_arg.to_string();
-	character* target = fn.env().find_target(tgt_str);
+	DisplayObject* target = fn.env().find_target(tgt_str);
 	if ( ! target )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(

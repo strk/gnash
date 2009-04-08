@@ -120,8 +120,12 @@ AGG resources
 #include "render_handler.h"
 #include "render_handler_agg.h" 
 #include "Range2d.h"
-#include "shape_character_def.h" 
+#include "swf/DefineMorphShapeTag.h" 
+#include "swf/ShapeRecord.h" 
+#include "DefineShapeTag.h" 
 #include "DisplayObject.h"
+#include "MorphShape.h"
+#include "Shape.h"
 #include "GnashNumeric.h"
 
 #include <agg_rendering_buffer.h>
@@ -181,7 +185,7 @@ class AlphaMask;
 typedef std::vector<agg::path_storage> AggPaths;
 typedef std::vector<geometry::Range2d<int> > ClipBounds;
 typedef std::vector<AlphaMask*> AlphaMasks;
-typedef std::vector<path> GnashPaths;
+typedef std::vector<Path> GnashPaths;
 
 template <class Rasterizer>
 inline void applyClipBox(Rasterizer& ras, const geometry::Range2d<int>& bounds)
@@ -209,7 +213,7 @@ analyzePaths(const GnashPaths &paths, bool& have_shape,
 
     for (int pno=0; pno<pcount; ++pno) {
 
-        const path &the_path = paths[pno];
+        const Path &the_path = paths[pno];
 
         if ((the_path.m_fill0 > 0) || (the_path.m_fill1 > 0)) {
             have_shape = true;
@@ -233,9 +237,9 @@ public:
         _shift(shift)
     {}
 
-    void operator()(const edge& edge)
+    void operator()(const Edge& edge)
     {
-        if (edge.is_straight()) {
+        if (edge.straight()) {
             _path.line_to(twipsToPixels(edge.ap.x) + _shift, 
                           twipsToPixels(edge.ap.y) + _shift);
         }
@@ -265,7 +269,7 @@ public:
     {
     }
 
-    void operator()(const path& in)
+    void operator()(const Path& in)
     {
         agg::path_storage& p = *_it;
 
@@ -859,22 +863,20 @@ public:
     }
   
 
-  void draw_glyph(shape_character_def *def,
-      const SWFMatrix& mat, const rgba& color) 
+  void drawGlyph(const SWF::ShapeRecord& shape, const rgba& color,
+          const SWFMatrix& mat) 
   {
     
     // select relevant clipping bounds
-    if (def->get_bound().is_null()) {
+    if (shape.getBounds().is_null()) {
         return;
-        // Why would we want to do this?
-        //select_all_clipbounds();  
     } 
-    else select_clipbounds(def, mat);
+    select_clipbounds(shape.getBounds(), mat);
     
     if (_clipbounds_selected.empty()) return; 
       
     GnashPaths paths;
-    apply_matrix_to_path(def->paths(), paths, mat);
+    apply_matrix_to_path(shape.paths(), paths, mat);
 
     // If it's a mask, we don't need the rest.
     if (m_drawing_mask) {
@@ -907,18 +909,16 @@ public:
   /// rendering of characters outside a particular clipping range.
   /// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
   /// *must* be initialized prior to using those function.
-  void select_clipbounds(const shape_character_def *def, 
-    const SWFMatrix& source_mat) {
+  void select_clipbounds(const rect& objectBounds, const SWFMatrix& source_mat)
+  {
     
     SWFMatrix mat = stage_matrix;
     mat.concatenate(source_mat);
   
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
-    
-    const rect& ch_bounds = def->get_bound();
 
-    if (ch_bounds.is_null()) {
+    if (objectBounds.is_null()) {
       log_debug(_("Warning: select_clipbounds encountered a character "
                   "definition with null bounds"));
       return;
@@ -926,7 +926,7 @@ public:
 
     rect bounds;    
     bounds.set_null();
-    bounds.expand_to_transformed_rect(mat, ch_bounds);
+    bounds.expand_to_transformed_rect(mat, objectBounds);
     
     const geometry::Range2d<float>& range_float = bounds.getRange();
     
@@ -956,30 +956,54 @@ public:
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
     
-    for (ClipBounds::const_iterator i = _clipbounds.begin(),
+    for (ClipBounds::iterator i = _clipbounds.begin(),
             e = _clipbounds.end(); i != e; ++i)
     {
       _clipbounds_selected.push_back(&(*i));
     }
   }
 
-    void draw_shape_character(shape_character_def *def, 
-    const SWFMatrix& mat, const cxform& cx)
+    void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+            const SWFMatrix& worldMat)
     {
-    
-        const std::vector<fill_style>& fill_styles = def->fillStyles();
-        const std::vector<line_style>& line_styles = def->lineStyles();
+        // check if the character needs to be rendered at all
+        rect cur_bounds;
+
+        cur_bounds.expand_to_transformed_rect(worldMat, shape.getBounds());
+                
+        if (!render_handler::bounds_in_clipping_area(cur_bounds))
+        {
+            return; // no need to draw
+        }        
+        
+        const SWF::ShapeRecord::FillStyles& fillStyles = shape.fillStyles();
+        const SWF::ShapeRecord::LineStyles& lineStyles = shape.lineStyles();
+        const SWF::ShapeRecord::Paths& paths = shape.paths();
+        
+        // select ranges
+        select_clipbounds(shape.getBounds(), worldMat);
+
+        // render the DisplayObject's shape.
+        drawShape(fillStyles, lineStyles, paths, worldMat, cx);
+    }
+
+    void drawShape(const std::vector<fill_style>& fill_styles,
+        const std::vector<line_style>& line_styles,
+        const std::vector<Path>& objpaths, const SWFMatrix& mat,
+        const cxform& cx)
+    {
+
         bool have_shape, have_outline;
 
-        analyzePaths(def->paths(), have_shape, have_outline);
+        analyzePaths(objpaths, have_shape, have_outline);
 
         if (!have_shape && !have_outline) {
             // Early return for invisible character.
             return; 
-        }    
+        }        
 
         GnashPaths paths;
-        apply_matrix_to_path(def->paths(), paths, mat);
+        apply_matrix_to_path(objpaths, paths, mat);
 
         // Masks apparently do not use agg_paths, so return
         // early
@@ -991,21 +1015,19 @@ public:
             return;
         }
 
-        AggPaths agg_paths;  
-        AggPaths agg_paths_rounded;  
+        AggPaths agg_paths;    
+        AggPaths agg_paths_rounded;    
 
         // Flash only aligns outlines. Probably this is done at rendering
         // level.
         if (have_outline) {
-            buildPaths_rounded(agg_paths_rounded, paths, line_styles);   
+            buildPaths_rounded(agg_paths_rounded, paths, line_styles);     
         }
 
         if (have_shape) {
             buildPaths(agg_paths, paths);
         }
         
-        // select ranges
-        select_clipbounds(def, mat);
 
         if (_clipbounds_selected.empty()) {
             log_debug(_("Warning: AGG renderer skipping a whole character"));
@@ -1022,9 +1044,9 @@ public:
         for (unsigned int subshape=0; subshape<subshape_count; ++subshape)
         {
             if (have_shape) {
-                draw_shape(subshape, paths, agg_paths, sh, true);    
+                draw_shape(subshape, paths, agg_paths, sh, true);        
             }
-            if (have_outline)      {
+            if (have_outline)            {
                 draw_outlines(subshape, paths, agg_paths_rounded,
                         line_styles, cx, mat);
             }
@@ -1032,10 +1054,8 @@ public:
 
         // Clear selected clipbounds to ease debugging 
         _clipbounds_selected.clear();
+    }
 
-    } // draw_shape_character
-  
-  
     /// Takes a path and translates it using the given SWFMatrix. The new path
     /// is stored in paths_out. Both paths_in and paths_out are expected to
     /// be in TWIPS.
@@ -1054,7 +1074,7 @@ public:
 
         /// Transform all the paths using the matrix.
         std::for_each(paths_out.begin(), paths_out.end(), 
-                boost::bind(&path::transform, _1, mat));
+                boost::bind(&Path::transform, _1, mat));
     } 
 
 
@@ -1068,7 +1088,7 @@ public:
     const size_t pcnt = path_in.size();
     
     for (size_t pno=0; pno<pcnt; ++pno) {
-      const path& this_path = path_in[pno];
+      const Path& this_path = path_in[pno];
       
       if (this_path.m_new_shape)
         sscount++;
@@ -1106,7 +1126,7 @@ public:
     
     for (size_t pno=0; pno<pcount; ++pno) {
       
-      const path& this_path = paths[pno];
+      const Path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
       bool hinting=false, closed=false, hairline=false;
@@ -1133,16 +1153,16 @@ public:
 
       // avoid extra edge when doing implicit close later
       if (closed && ecount && 
-        this_path.m_edges.back().is_straight()) --ecount;  
+        this_path.m_edges.back().straight()) --ecount;  
       
       for (size_t eno=0; eno<ecount; ++eno) {
         
-        const edge& this_edge = this_path.m_edges[eno];
+        const Edge& this_edge = this_path.m_edges[eno];
         
         float this_ax = twipsToPixels(this_edge.ap.x);  
         float this_ay = twipsToPixels(this_edge.ap.y);  
         
-        if (hinting || this_edge.is_straight()) {
+        if (hinting || this_edge.straight()) {
         
           // candidate for alignment?
           bool align_x = hinting || (hairline && (prev_ax == this_ax));
@@ -1450,7 +1470,7 @@ public:
   
       for (size_t pno=0; pno<pcount; ++pno) {
           
-        const path &this_path_gnash = paths[pno];
+        const Path &this_path_gnash = paths[pno];
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);
         
@@ -1490,7 +1510,7 @@ public:
 
   // very similar to draw_shape but used for generating masks. There are no
   // fill styles nor subshapes and such. Just render plain solid shapes.
-  void draw_mask_shape(const GnashPaths &paths, bool even_odd)
+  void draw_mask_shape(const GnashPaths& paths, bool even_odd)
   {
 
     const AlphaMasks::size_type mask_count = _alphaMasks.size();
@@ -1523,7 +1543,7 @@ public:
   
   
   template <class scanline_type>
-  void draw_mask_shape_impl(const GnashPaths &paths, bool even_odd,
+  void draw_mask_shape_impl(const GnashPaths& paths, bool even_odd,
     scanline_type& sl) {
     
     typedef agg::pixfmt_gray8 pixfmt;
@@ -1665,7 +1685,7 @@ public:
 
       for (size_t pno=0, pcount=paths.size(); pno<pcount; ++pno) {
 
-        const path& this_path_gnash = paths[pno];
+        const Path& this_path_gnash = paths[pno];
 
         agg::path_storage &this_path_agg = 
           const_cast<agg::path_storage&>(agg_paths[pno]);

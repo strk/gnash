@@ -90,7 +90,7 @@ public:
 /// StartSound2Tag (SWF9)
 //
 /// Very similar to StartSoundTag, but uses a SoundClassName instead of
-/// character ID. This is not implemented.
+/// DisplayObject ID. This is not implemented.
 class StartSound2Tag
 {
 public:

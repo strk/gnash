@@ -1,4 +1,4 @@
-// DefineButtonSoundTag.cpp: sounds for Button characters.
+// DefineButtonSoundTag.cpp: sounds for Button DisplayObjects.
 //
 //   Copyright (C) 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 //
@@ -43,12 +43,12 @@ DefineButtonSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 
     in.ensureBytes(2);
     int id = in.read_u16();
-    character_def* chdef = m.get_character_def(id);
+    DefinitionTag* chdef = m.getDefinitionTag(id);
     if (!chdef)
     {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("DEFINEBUTTONSOUND refers to an unknown "
-                "character def %d"), id);
+                "DisplayObject def %d"), id);
         );
         return;
     }
@@ -58,8 +58,8 @@ DefineButtonSoundTag::loader(SWFStream& in, TagType tag, movie_definition& m,
     if (!button)
     {
         IF_VERBOSE_MALFORMED_SWF(
-            log_swferror(_("DEFINEBUTTONSOUND refers to character id "
-                "%d, a %s (expected a button character)"),
+            log_swferror(_("DEFINEBUTTONSOUND refers to DisplayObject id "
+                "%d, a %s (expected a button DisplayObject)"),
                 id, typeName(*chdef));
         );
         return;

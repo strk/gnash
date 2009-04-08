@@ -42,14 +42,14 @@ RemoveObjectTag::read(SWFStream& in, TagType tag)
 	}
 
     in.ensureBytes(2);
-	m_depth = in.read_u16() + character::staticDepthOffset;
+	m_depth = in.read_u16() + DisplayObject::staticDepthOffset;
 }
 
 void
 RemoveObjectTag::execute(MovieClip* m, DisplayList& dlist) const
 {
     m->set_invalidated();
-	dlist.remove_character(m_depth);
+	dlist.removeDisplayObject(m_depth);
 }
 
 /* public static */

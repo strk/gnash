@@ -22,7 +22,7 @@
 
 #include "impl.h"
 #include "snappingrange.h"
-#include "character.h"
+#include "DisplayObject.h"
 
 #include <list>
 #include <iosfwd>
@@ -46,14 +46,14 @@ namespace gnash {
 
 namespace gnash {
 
-/// A DisplayItem is simply a character object 
-typedef boost::intrusive_ptr<character> DisplayItem;
+/// A DisplayItem is simply a DisplayObject object 
+typedef boost::intrusive_ptr<DisplayObject> DisplayItem;
 
-/// A list of on-stage characters, ordered by depth
+/// A list of on-stage DisplayObjects, ordered by depth
 //
 /// Any MovieClip has an associated DisplayList
 /// that may change from frame to frame due to control
-/// tags instructing when to add or remove characters
+/// tags instructing when to add or remove DisplayObjects
 /// from the stage.
 ///
 class DisplayList
@@ -75,105 +75,105 @@ public:
 
 
 	/// \brief
-	/// Place a new character at the specified depth,
-	/// replacing any existing character at the same depth.
+	/// Place a new DisplayObject at the specified depth,
+	/// replacing any existing DisplayObject at the same depth.
 	//
-	/// If a character is replaced, it's unload() method
+	/// If a DisplayObject is replaced, it's unload() method
 	/// is invoked.
 	///
 	/// If applicable, the event_id::LOAD event
-	/// associated with the given character
+	/// associated with the given DisplayObject
 	/// is called as last step of addition. 
 	///
 	/// @param ch 
-	///	the new character to be added into the list.
+	///	the new DisplayObject to be added into the list.
 	///
 	/// @param depth 
-	///	depth at which the new character is placed.
+	///	depth at which the new DisplayObject is placed.
 	///
     /// @param initObj
-    /// an object to initialize the new character's properties with.
-	void place_character(character* ch, int depth, as_object* initObj = 0);
+    /// an object to initialize the new DisplayObject's properties with.
+	void placeDisplayObject(DisplayObject* ch, int depth, as_object* initObj = 0);
 
 	/// \brief
-	/// Replace the old character at the specified depth with
-	/// the given new character.
+	/// Replace the old DisplayObject at the specified depth with
+	/// the given new DisplayObject.
 	//
-	/// Calls unload on the removed character.
+	/// Calls unload on the removed DisplayObject.
 	///
 	/// @param ch 
-	///	the new character to be put
+	///	the new DisplayObject to be put
 	///
 	/// @param depth 
 	///	depth to be replaced
 	///
 	/// @param use_old_cxform
-	/// true:  set the new character's cxform to the old one.
-	/// false: keep the new character's cxform.
+	/// true:  set the new DisplayObject's cxform to the old one.
+	/// false: keep the new DisplayObject's cxform.
 	///
 	/// @param use_old_matrix
-	/// true:  set the new character's transformation SWFMatrix to the old one.
-	/// false: keep the new character's transformation SWFMatrix.
-	void replace_character(character* ch, int depth, bool use_old_cxform,
+	/// true:  set the new DisplayObject's transformation SWFMatrix to the old one.
+	/// false: keep the new DisplayObject's transformation SWFMatrix.
+	void replaceDisplayObject(DisplayObject* ch, int depth, bool use_old_cxform,
 		bool use_old_matrix);
 
 	/// \brief
-	/// Change depth of the given characters in the list,
-	/// swapping with any existing character at target depth.
+	/// Change depth of the given DisplayObjects in the list,
+	/// swapping with any existing DisplayObject at target depth.
 	//
 	/// List ordering will be maintained by this function.
 	///
-	/// Any character affected by this operation (none on invalid call,
+	/// Any DisplayObject affected by this operation (none on invalid call,
 	/// 1 if new depth is not occupied, 2 otherwise) will be:
-	///	- bounds invalidated (see character::set_invalidated)
-	///	- marked as script-transformed (see character::transformedByScript)
+	///	- bounds invalidated (see DisplayObject::set_invalidated)
+	///	- marked as script-transformed (see DisplayObject::transformedByScript)
 	/// 
 	/// @param ch
-	///	The character to apply depth swapping to.
+	///	The DisplayObject to apply depth swapping to.
 	///	If not found in the list, an error is raised
 	///	and no other action is taken.
 	///
 	/// @param depth
-	///	The new depth to assign to the given character.
-	///	If occupied by another character, the target character
+	///	The new depth to assign to the given DisplayObject.
+	///	If occupied by another DisplayObject, the target DisplayObject
 	///	will get the current depth of the first.
-	///	If target depth equals the current depth of character, an
+	///	If target depth equals the current depth of DisplayObject, an
 	///	assertion fails, as I think the caller should check this instead.
 	///
-	void swapDepths(character* ch, int depth);
+	void swapDepths(DisplayObject* ch, int depth);
 
 	/// \brief
 	/// Updates the transform properties of the object at the
 	/// specified depth, unless its get_accept_anim_moves() returns false.
 	//
-	///  See character::get_accept_anim_moves()
+	///  See DisplayObject::get_accept_anim_moves()
 	///
 	/// @param color_xform
-	///	The color tranform to assign to the character at the given depth.
+	///	The color tranform to assign to the DisplayObject at the given depth.
 	///	If NULL the orignial color transform will be kept.
 	//
 	/// @param mat
-	///	The SWFMatrix tranform to assign to the character at the given depth.
+	///	The SWFMatrix tranform to assign to the DisplayObject at the given depth.
 	///	If NULL the orignial SWFMatrix will be kept.
 	///
 	/// @param ratio
-	/// The new ratio value to assign to the character at the given depth.
+	/// The new ratio value to assign to the DisplayObject at the given depth.
 	/// If NULL the original ratio will be kept.
 	///
 	/// @clip_depth
 	/// Not used at the moment.
 	/// 
-	void move_character( int depth, const cxform* color_xform,
+	void moveDisplayObject( int depth, const cxform* color_xform,
             const SWFMatrix* mat, int* ratio, int* clip_depth);
 
 	/// Removes the object at the specified depth.
 	//
-	/// Calls unload on the removed character.
-	void remove_character(int depth);
+	/// Calls unload on the removed DisplayObject.
+	void removeDisplayObject(int depth);
 
-	/// Remove all unloaded character from the list
+	/// Remove all unloaded DisplayObject from the list
 	//
-	/// Removed characters still in the list are those
+	/// Removed DisplayObjects still in the list are those
 	/// on which onUnload event handlers were defined..
 	///
 	/// NOTE: we don't call the function recursively in the 
@@ -181,7 +181,7 @@ public:
 	///	  (ie: any inned thing will not be accessible anyway)
 	void removeUnloaded();
 
-	/// Unload the characters in this DisplayList removing
+	/// Unload the DisplayObjects in this DisplayList removing
 	/// all but the ones with on onUnload event defined
 	/// (checked by calling ::unload on them) and keeping
 	/// the others, w/out depth-shifting them.
@@ -189,54 +189,54 @@ public:
 	/// Return true if any child was kept (as they had onUnload defined)
 	bool unload();
 
-	/// destroy all characters in this DisplayList
+	/// destroy all DisplayObjects in this DisplayList
 	void destroy();
 
-	/// Add a character in the list, maintaining depth-order
+	/// Add a DisplayObject in the list, maintaining depth-order
 	//
 	///
 	/// @param ch
-	///	The character to add
+	///	The DisplayObject to add
 	///
 	/// @param replace
-	///	If true the given character would replace any
-	///	pre-existing character at the same depth.
-	void add(character* ch, bool replace);
+	///	If true the given DisplayObject would replace any
+	///	pre-existing DisplayObject at the same depth.
+	void add(DisplayObject* ch, bool replace);
 
 	/// \brief
-	/// Display the referenced characters.
+	/// Display the referenced DisplayObjects.
 	/// Lower depths are obscured by higher depths.
 	void display();
 	
 	void omit_display();
 
 	/// May return NULL.
-	character* get_character_at_depth(int depth);
+	DisplayObject* getDisplayObjectAtDepth(int depth);
 
-	const character* get_character_at_depth(int depth) const {
-		return const_cast<DisplayList*>(this)->get_character_at_depth(depth);
+	const DisplayObject* getDisplayObjectAtDepth(int depth) const {
+		return const_cast<DisplayList*>(this)->getDisplayObjectAtDepth(depth);
 	}
 
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
-	character* get_character_by_name(const std::string& name);
+	DisplayObject* getDisplayObjectByName(const std::string& name);
 
-	const character* get_character_by_name(const std::string& name) const {
-		return const_cast<DisplayList*>(this)->get_character_by_name(name);
+	const DisplayObject* getDisplayObjectByName(const std::string& name) const {
+		return const_cast<DisplayList*>(this)->getDisplayObjectByName(name);
 	}
 
 	/// \brief
 	/// May return NULL.
 	/// If there are multiples, returns the *first* match only!
-	character* get_character_by_name_i(const std::string& name);
+	DisplayObject* getDisplayObjectByName_i(const std::string& name);
 
 	/// \brief 
-	/// Visit each character in the list in depth order
+	/// Visit each DisplayObject in the list in depth order
 	/// (lower depth first).
 	//
 	/// The visitor functor will 
-	/// receive a character pointer; must return true if
+	/// receive a DisplayObject pointer; must return true if
 	/// it wants next item or false to exit the loop.
 	///
 	/// NOTE: all elements in the list are visited, even
@@ -245,11 +245,11 @@ public:
 	template <class V> inline void visitForward(V& visitor);
 
 	/// \brief 
-	/// Visit each character in the list in reverse depth
+	/// Visit each DisplayObject in the list in reverse depth
 	/// order (higher depth first).
 	//
 	/// The visitor functor
-	/// will receive a character pointer; must return true if
+	/// will receive a DisplayObject pointer; must return true if
 	/// it wants next item or false
 	/// to exit the loop.
 	///
@@ -260,12 +260,12 @@ public:
     template <class V> inline void visitBackward(V& visitor) const;
 
 	/// \brief 
-	/// Visit each and all character in the list.
+	/// Visit each and all DisplayObject in the list.
 	//
 	/// Scan happens in arbitrary order, if order is
 	/// important use visitBackward or visitForward
 	///
-	/// The visitor functor will receive a character pointer,
+	/// The visitor functor will receive a DisplayObject pointer,
 	/// it's return value is not used so can return void.
 	///
 	/// NOTE: all elements in the list are visited, even
@@ -277,7 +277,7 @@ public:
 	/// dump list to logfile/stderr
 	void dump() const;
 
-    /// Like character_instance::add_invalidated_bounds() this method calls the
+    /// Like DisplayObject_instance::add_invalidated_bounds() this method calls the
     /// method with the same name of all childs.	
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);	
 	
@@ -294,7 +294,7 @@ public:
 	/// Return the next highest available depth
 	//
 	/// Placing an object at the depth returned by
-	/// this function should result in a character
+	/// this function should result in a DisplayObject
 	/// that is displayd above all others
 	///
 	int getNextHighestDepth() const;
@@ -302,7 +302,7 @@ public:
 	/// Sort list by depth (lower depths first)
 	//
 	/// You only need calling this method if depth
-	/// of characters on the list has been externally
+	/// of DisplayObjects on the list has been externally
 	/// changed. Usually it is DisplayList itself
 	/// assigning depths, so won't need to call it.
 	///
@@ -335,7 +335,7 @@ public:
 		for (const_iterator it = nonRemoved(),
                 itEnd = _charsByDepth.end(); it != itEnd; ++it) {
 
-			boost::intrusive_ptr<character> ch = *it;
+			boost::intrusive_ptr<DisplayObject> ch = *it;
 			int depth = ch->get_depth();
 			if (!depths.insert(depth).second) {
 				log_debug("Depth %d is duplicated in DisplayList %p",
@@ -351,8 +351,8 @@ public:
 
 private:
 
-	/// Re-insert a removed-from-stage character after appropriately
-	/// shifting its depth based on the character::removedDepthOffset
+	/// Re-insert a removed-from-stage DisplayObject after appropriately
+	/// shifting its depth based on the DisplayObject::removedDepthOffset
 	/// value.
 	//
 	/// PRE-CONDITIONS 
@@ -361,7 +361,7 @@ private:
 	///
 	/// TODO: inspect what should happen if the target depth is already
     /// occupied
-	void reinsertRemovedCharacter(boost::intrusive_ptr<character> ch);
+	void reinsertRemovedCharacter(boost::intrusive_ptr<DisplayObject> ch);
 
 	container_type _charsByDepth;
 

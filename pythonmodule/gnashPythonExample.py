@@ -41,9 +41,16 @@ import sys
 # Functions are accessed through the Player() class
 player = gnash.Player()
 
+uri = "../../testsuite/movies.all/gravity.swf"
+
+if len(sys.argv) > 1:
+	uri = sys.argv[1]
+
+input = open(uri)
+
 # The initialization of the player is split into two stages.
 # First, load the movie from the URL (currently only local files):
-if player.loadMovie("../../testsuite/movies.all/gravity.swf"):
+if player.loadMovie(input):
     print "Movie successfully created."
 else:
     print "Load of movie failed."
@@ -56,14 +63,6 @@ print "Loaded " +  str(player.swfBytesLoaded()) + " of " + str(player.swfBytesTo
 print "It is version " + str(player.swfVersion()) +"."
 print "It is " + str(player.swfWidth()) + "x" + str(player.swfWidth()) + " pixels."
 print "URL: " + player.swfURL() + "."
-
-
-# The second stage completes loading and initialization.
-if player.initVM():
-    print "VM initialized."
-else:
-    print "VM initialization failed."
-    sys.exit()
 
 
 print "Loaded " +  str(player.swfBytesLoaded()) + " of " + str(player.swfBytesTotal()) + " bytes reported."
@@ -93,7 +92,7 @@ player.render(True)
 # calculated by Gnash.
 
 # Turn verbosity on to send debug messages to stdout and the logfile.
-player.setVerbose(True)
+player.setVerbosity(2)
 # This can't be turned off at the moment.
 
 # You can also make time pass in an instant:
@@ -104,13 +103,16 @@ player.pressKey(65)
 
 # Move the pointer to the specified co-ordinates. Returns true if the
 # action requires a redraw.
-if player.movePointer(x,y):
-    render(False)
+if player.movePointer(10,20):
+    player.render(False)
 
 # Click the mouse at the current pointer position. True if the action
 # requires a redraw.
-if player.clickMouse():
-    render(False)
+if player.mouseClick():
+    player.render(False)
 
 
+char = player.getCharacterByTarget('_root')
+print "_root has depth: "
+print char.depth()
 

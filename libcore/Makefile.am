@@ -59,12 +59,14 @@ libgnashcore_la_SOURCES = \
 	as_object.cpp \
 	as_value.cpp \
 	asClass.cpp \
-	character.cpp \
+	DisplayObject.cpp \
 	CharacterProxy.cpp \
 	cxform.cpp \
+	Geometry.cpp \
 	DynamicShape.cpp	\
 	Bitmap.cpp \
 	Shape.cpp \
+	MorphShape.cpp \
 	StaticText.cpp \
 	TextField.cpp \
         BlurFilter.cpp \
@@ -76,7 +78,7 @@ libgnashcore_la_SOURCES = \
         BevelFilter.cpp \
         GradientBevelFilter.cpp \
         parser/filter_factory.cpp \
-	DisplayObject.cpp \
+	InteractiveObject.cpp \
 	SWFMatrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
@@ -92,11 +94,14 @@ libgnashcore_la_SOURCES = \
 	swf/DefineButtonTag.cpp \
 	swf/DefineFontTag.cpp \
 	swf/VideoFrameTag.cpp \
+	swf/ShapeRecord.cpp \
 	swf/SoundInfoRecord.cpp \
 	swf/TextRecord.cpp \
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
+	swf/DefineShapeTag.cpp \
 	swf/DefineEditTextTag.cpp \
+	swf/DefineMorphShapeTag.cpp \
 	swf/CSMTextSettingsTag.cpp \
 	swf/PlaceObject2Tag.cpp \
 	swf/RemoveObjectTag.cpp \
@@ -123,7 +128,6 @@ libgnashcore_la_SOURCES = \
 noinst_HEADERS = \
 	Property.h \
 	PropertyList.h \
-	Sprite.h \
 	StreamProvider.h \
 	StringPredicates.h \
 	URLAccessManager.h \
@@ -143,7 +147,7 @@ noinst_HEADERS = \
 	BitmapMovieInstance.h \
 	builtin_function.h \
 	Button.h \
-	character.h \
+	DisplayObject.h \
 	CharacterProxy.h \
 	cxform.h \
 	debugger.h \
@@ -166,8 +170,9 @@ noinst_HEADERS = \
 	Font.h \
 	fontlib.h \
 	Shape.h \
+	MorphShape.h \
 	StaticText.h \
-	DisplayObject.h \
+	InteractiveObject.h \
 	gnash.h	\
 	GnashKey.h \
 	impl.h \
@@ -192,6 +197,10 @@ noinst_HEADERS = \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
+	swf/DefineShapeTag.h \
+	swf/DefinitionTag.h \
+	swf/DefineMorphShapeTag.h \
+	swf/ShapeRecord.h \
 	swf/SoundInfoRecord.h \
 	swf/TextRecord.h \
 	swf/DefineButtonSoundTag.h \

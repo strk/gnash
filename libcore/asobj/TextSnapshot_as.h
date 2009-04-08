@@ -83,10 +83,10 @@ private:
     /// @param to           The string to write to
     /// @param newline      If true, newlines are written after every
     ///                     StaticText in this TextSnapshot
-    /// @param selectedOnly Only write character that are selected to.
+    /// @param selectedOnly Only write DisplayObject that are selected to.
     /// @param start        The start index
-    /// @param len          The number of StaticText characters to traverse.
-    ///                     This includes non-selected characters.
+    /// @param len          The number of StaticText DisplayObjects to traverse.
+    ///                     This includes non-selected DisplayObjects.
     void makeString(std::string& to, bool newline = false,
             bool selectedOnly = false,
             std::string::size_type start = 0,
@@ -100,7 +100,7 @@ private:
     /// to be no point in storing the MovieClip this bool will do instead.
     const bool _valid;
 
-    /// The number of characters
+    /// The number of DisplayObjects
     //
     /// There is no need to store this, but it is quicker than counting
     /// afresh every time.

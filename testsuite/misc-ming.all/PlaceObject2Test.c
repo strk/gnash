@@ -40,7 +40,7 @@
  *  frame6: replace shape1 with shape2
  *
  * Expected behaviour:
- *  DLIST tags manipulate characters in dynamic zone as in static zone in this test.
+ *  DLIST tags manipulate DisplayObjects in dynamic zone as in static zone in this test.
  *
  * run as ./PlaceObject2Test
  */
@@ -89,7 +89,7 @@ main(int argc, char** argv)
   it2 = SWFMovie_add(mo, (SWFBlock)mc2);  //add movieClip2 to _root
   SWFDisplayItem_setName(it1, "Mc1");
   SWFDisplayItem_setName(it2, "Mc2");
-  // place 2 sprites characters at dynamic zone
+  // place 2 sprites DisplayObjects at dynamic zone
   SWFDisplayItem_setDepth(it1, 16384);
   SWFDisplayItem_setDepth(it2, 65535);
   

@@ -24,7 +24,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "character_def.h"
+#include "DefinitionTag.h"
 #include "swf.h"
 #include "rect.h" // for composition
 #include "MediaParser.h" // for videoFrameType and videoCodecType enums
@@ -46,7 +46,8 @@ namespace gnash {
 
 /// Class used to store data for the undecoded embedded video frames.
 /// Contains the data, the data size and the type of the frame
-class VideoData {
+class VideoData
+{
 public:
 	VideoData(boost::shared_array<boost::uint8_t> data, boost::uint32_t size,
             media::videoFrameType ft)
@@ -68,7 +69,7 @@ public:
 
 namespace SWF {
 
-class DefineVideoStreamTag : public character_def
+class DefineVideoStreamTag : public DefinitionTag
 {
 public:
 	
@@ -79,15 +80,14 @@ public:
 	/// at instance destruction time.
 	///
 	typedef std::vector<media::EncodedVideoFrame*> EmbeddedFrames;
-	
 
 	~DefineVideoStreamTag();
 
-	character* createDisplayObject(character* parent, int id);
+	DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
 	/// Read tag SWF::DEFINEVIDEOSTREAM 
 	//
-	/// The character_id is assumed to have been already read by caller.
+	/// The DisplayObject_id is assumed to have been already read by caller.
 	///
 	/// This function is allowed to be called only *once* for each
 	/// instance of this class.
@@ -98,7 +98,7 @@ public:
 
 	/// Read tag SWF::VIDEOFRAME
 	//
-	/// The character_id (used to find this instance in the character's
+	/// The DisplayObject_id (used to find this instance in the DisplayObject's
     /// dictionary) is assumed to have been already read.
 	///
 	/// This function is allowed to be called zero or more times, as long
@@ -146,7 +146,7 @@ private:
 	/// Construct a video stream definition with given ID
 	//
 	/// NOTE: for dynamically created definitions (ActionScript Video class
-    ///       instances) you can use an id of -1. See character_def
+    ///       instances) you can use an id of -1. See DefinitionTag
     ///       constructor, as that's the one which will eventually get passed
     ///       the id.
     /// NOTE: What dynamically created definitions?
@@ -154,7 +154,7 @@ private:
 
 	void read(SWFStream& in);
 
-	/// Id of this character definition, set by constructor.
+	/// Id of this DisplayObject definition, set by constructor.
 	///
 	/// The id is currently set to -1 when the definition is actually
 	/// created dynamically (instantiating the ActionScript Video class)

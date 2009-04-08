@@ -146,7 +146,7 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include "gnash.h" // Quality
-#include "shape_character_def.h"    
+#include "DefineShapeTag.h"    
 #include "DisplayObject.h"
 #include "Range2d.h"
 
@@ -158,7 +158,14 @@ namespace gnash {
     class SWFMatrix;
     class cxform;
 
-    class shape_character_def;
+    namespace SWF {
+        class DefineMorphShapeTag;
+        class ShapeRecord;
+    }
+    class DefineShapeTag;
+
+    class Shape;
+    class MorphShape;
 
     class GnashImage;
 }
@@ -283,39 +290,8 @@ public:
         const rgba& fill, const rgba& outline, const SWFMatrix& mat,
         bool masked) = 0;
         
-        
-    /// \brief
-    /// Draws the given character definition with the stateful properties
-    /// of the given instance.
-    //
-    /// Normally this does not need to be re-implemented in 
-    /// render handler implementations. Instead, see the version without
-    /// character instance.
-    ///
-    virtual void draw_shape_character(shape_character_def *def, 
-        character *inst)
-    {
-        // check if the character needs to be rendered at all
-        rect cur_bounds;
-
-        cur_bounds.expand_to_transformed_rect(inst->getWorldMatrix(), 
-                def->get_bound());
-                
-        if (!bounds_in_clipping_area(cur_bounds))
-        {
-                return; // no need to draw
-        }        
-
-        // render the character
-        draw_shape_character(def, inst->getWorldMatrix(),
-                inst->get_world_cxform());
-    }
-    
-    /// \brief
-    /// Draws the given character definition with the given transformations and
-    /// styles. 
-    virtual void draw_shape_character(shape_character_def *def, 
-        const SWFMatrix& mat, const cxform& cx) = 0;
+    virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+            const SWFMatrix& worldMat) = 0;
         
     /// \brief
     /// Draws a glyph (font character).
@@ -331,8 +307,8 @@ public:
     /// @param mat
     ///
     /// @param color
-    virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
-        const rgba& color) = 0;
+    virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
+           const SWFMatrix& mat) = 0;
 
 
     /// ==================================================================

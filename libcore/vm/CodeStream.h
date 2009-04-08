@@ -30,10 +30,10 @@ namespace gnash {
 /// violations.
 class CodeStreamException { };
 
-/// A checked read character array
+/// A checked read DisplayObject array
 ///
 /// CodeStream provides a safe interface to read various things from a
-/// character array of known size.  Any attempt to access memory outside
+/// DisplayObject array of known size.  Any attempt to access memory outside
 /// of the given array will throw an exception of type CodeStreamException
 class CodeStream : public std::istream, private boost::noncopyable
 {
@@ -70,4 +70,4 @@ void skip_V32();
 };
 
 } // namespace gnash
-#endif /* GNASH_CODESTREAM_H */
+#endif 

@@ -40,6 +40,7 @@
 #include "GnashImage.h"
 #include <cmath>
 #include "PathParser.h"
+#include "swf/ShapeRecord.h"
 
 namespace gnash {
 
@@ -286,7 +287,7 @@ get_cairo_pattern(const fill_style& style, const cxform& cx)
 class CairoPathRunner : public PathParser
 {
 public:
-  CairoPathRunner(const std::vector<path>& paths,
+  CairoPathRunner(const std::vector<Path>& paths,
                   const std::vector<fill_style>& fill_styles, cairo_t* context)
   : PathParser(paths, fill_styles.size()),
     _cr(context),
@@ -329,7 +330,7 @@ public:
       cairo_move_to(_cr, x, y);
   }
 
-  virtual void curveTo(const edge& cur_edge)
+  virtual void curveTo(const Edge& cur_edge)
   {
     const float two_thirds = 2.0/3.0;
     const float one_third = 1 - two_thirds;
@@ -403,8 +404,8 @@ private:
 
 class DSOEXPORT render_handler_cairo: public render_handler
 {
-  typedef std::vector<path> PathVec;
-  typedef std::vector<const path*> PathPtrVec;
+  typedef std::vector<Path> PathVec;
+  typedef std::vector<const Path*> PathPtrVec;
 public:
 
   render_handler_cairo()
@@ -740,7 +741,7 @@ public:
     _masks.pop_back();
   }
 
-  void add_path(cairo_t* cr, const path& cur_path)
+  void add_path(cairo_t* cr, const Path& cur_path)
   {  
     double x = cur_path.ap.x;
     double y = cur_path.ap.y;
@@ -748,11 +749,11 @@ public:
     snap_to_half_pixel(cr, x, y);
     cairo_move_to(cr, x, y);
     
-    for (std::vector<edge>::const_iterator it = cur_path.m_edges.begin(),
+    for (std::vector<Edge>::const_iterator it = cur_path.m_edges.begin(),
          end = cur_path.m_edges.end(); it != end; ++it) {
-      const edge& cur_edge = *it;
+      const Edge& cur_edge = *it;
       
-      if (cur_edge.is_straight()) {
+      if (cur_edge.straight()) {
         x = cur_edge.ap.x;
         y = cur_edge.ap.y;
         snap_to_half_pixel(cr, x, y);
@@ -852,7 +853,7 @@ public:
   {  
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
       if (!cur_path.m_line) {
         continue;
       }
@@ -889,7 +890,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     ++it;
 
     for (;it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
 	  
 	    if (cur_path.m_new_shape) {
 	      subshapes.push_back(it); 
@@ -905,7 +906,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
   {    
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
       
       if (cur_path.m_fill0 || cur_path.m_fill1) {
         _masks.back().push_back(cur_path);     
@@ -918,7 +919,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
   {
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
       
       add_path(_cr, cur_path);
     }  
@@ -926,18 +927,17 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
 
   /// Takes a path and translates it using the given SWFMatrix.
   void
-  apply_matrix_to_paths(std::vector<path>& paths, const SWFMatrix& mat)
+  apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
   {  
     std::for_each(paths.begin(), paths.end(),
-                  boost::bind(&path::transform, _1, boost::ref(mat)));
+                  boost::bind(&Path::transform, _1, boost::ref(mat)));
   }
-                  
-  virtual void draw_shape_character(shape_character_def *def, 
-    const SWFMatrix& mat,
-    const cxform& cx)
+  
+  virtual void drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+        const SWFMatrix& mat)
   {
         
-    const PathVec& path_vec = def->paths();
+    const PathVec& path_vec = shape.paths();
     
     if (!path_vec.size()) {
       return;    
@@ -957,8 +957,8 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-    const std::vector<fill_style>& fill_styles = def->fillStyles();
-    const std::vector<line_style>& line_styles = def->lineStyles();
+    const std::vector<fill_style>& fill_styles = shape.fillStyles();
+    const std::vector<line_style>& line_styles = shape.lineStyles();
 
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;
@@ -975,8 +975,8 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     
   }
   
-  virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
-    const rgba& color)
+  virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& color,
+         const SWFMatrix& mat)
   {
   
     cxform dummy_cx;
@@ -987,7 +987,7 @@ draw_subshape(const PathVec& path_vec, const SWFMatrix& mat, const cxform& cx,
     
     glyph_fs.push_back(coloring);
     
-    const PathVec& path_vec = def->paths();
+    const PathVec& path_vec = rec.paths();
     
     std::vector<line_style> dummy_ls;
     

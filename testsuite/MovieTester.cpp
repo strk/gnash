@@ -26,19 +26,23 @@
 #include "movie_instance.h"
 #include "movie_root.h"
 #include "MovieClip.h"
-#include "as_environment.h"
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
-#include "VM.h" // for initialization
 #include "sound_handler.h" // for creating the "test" sound handlers
 #include "NullSoundHandler.h"
-#include "RGBA.h" // for rgba class
-#include "FuzzyPixel.h"
+#include "RGBA.h" // for rgba class (pixel checking)
+#include "FuzzyPixel.h" // for pixel checking
 #include "render.h"
 #include "render_handler.h"
-#include "render_handler_agg.h"
-#include "SystemClock.h"
+#include "ManualClock.h" // for use by advance
+#include "StreamProvider.h" // for passing to RunInfo
 #ifdef RENDERER_CAIRO
-#include "render_handler_cairo.h"
+# include "render_handler_cairo.h"
+#endif
+#ifdef RENDERER_OPENGL
+# include "render_handler_ogl.h"
+#endif
+#ifdef RENDERER_AGG
+# include "render_handler_agg.h"
 #endif
 
 #include "MediaHandler.h"
@@ -165,7 +169,7 @@ MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions)
 	// What we're particularly interested about is 
 	// proper computation of invalidated bounds, which
 	// needs clear_invalidated() to be called.
-	// display() will call clear_invalidated() on characters
+	// display() will call clear_invalidated() on DisplayObjects
 	// actually modified so we're fine with that.
 	//
 	// Directly calling _movie->clear_invalidated() here
@@ -219,7 +223,7 @@ MovieTester::render()
 		// What we're particularly interested about is 
 		// proper computation of invalidated bounds, which
 		// needs clear_invalidated() to be called.
-		// display() will call clear_invalidated() on characters
+		// display() will call clear_invalidated() on DisplayObjects
 		// actually modified so we're fine with that.
 		//
 		// Directly calling _movie->clear_invalidated() here
@@ -313,20 +317,20 @@ MovieTester::resizeStage(int x, int y)
 
 }
 
-const character*
+const DisplayObject*
 MovieTester::findDisplayItemByName(const MovieClip& mc,
 		const std::string& name) 
 {
 	const DisplayList& dlist = mc.getDisplayList();
-	return dlist.get_character_by_name(name);
+	return dlist.getDisplayObjectByName(name);
 }
 
-const character*
+const DisplayObject*
 MovieTester::findDisplayItemByDepth(const MovieClip& mc,
 		int depth)
 {
 	const DisplayList& dlist = mc.getDisplayList();
-	return dlist.get_character_at_depth(depth);
+	return dlist.getDisplayObjectAtDepth(depth);
 }
 
 void

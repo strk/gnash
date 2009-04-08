@@ -42,7 +42,7 @@ namespace SWF {
 
 /// SWF Tag RemoveObject (5) or RemoveObject2 (28)
 //
-/// The RemoveObject tag removes the character instance at the specified depth.
+/// The RemoveObject tag removes the DisplayObject instance at the specified depth.
 ///
 /// TODO: make this and PlaceObject2Tag subclasses of DisplayListTag (subclass of ControlTag)
 ///

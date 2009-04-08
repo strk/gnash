@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -56,11 +56,11 @@ main(int /*argc*/, char** /*argv*/)
 	Range2d<int> blackRange(330,270,450,390);
 
 	// Coordinates we'll use during testing
-	int x_left = 270; // on the left of any character
+	int x_left = 270; // on the left of any DisplayObject
 	int x_red = 310; // on the red square
 	int x_int = 340; // on the intersection between the red and black squares
 	int x_black = 370; // on black square
-	int x_right = 460; // on the right of any character
+	int x_right = 460; // on the right of any DisplayObject
 	int y = 330;
 
 	Ranges invalidated;
@@ -76,7 +76,7 @@ main(int /*argc*/, char** /*argv*/)
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(76, 4) ); // the "-xtrace enabled-" label...
 
-	tester.advance(); // FRAME 2, place characters (black on top)
+	tester.advance(); // FRAME 2, place DisplayObjects (black on top)
 	invalidated = tester.getInvalidatedRanges();
 	
 	check_equals(root->get_play_state(), MovieClip::PLAY);
@@ -94,7 +94,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(x_black, y, 2, black, 2);  
 	check_pixel(x_right, y, 2, white, 2);  
 
-	tester.advance(); // FRAME 3, depth-swap the two characters
+	tester.advance(); // FRAME 3, depth-swap the two DisplayObjects
 	invalidated = tester.getInvalidatedRanges();
 	
 	check_equals(root->get_play_state(), MovieClip::PLAY);
@@ -102,7 +102,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->getDisplayList().size(), 3); // dejagnu + red square + black square
 
 	// check invalidated bounds to contain the intersection
-	// between the two characters.
+	// between the two DisplayObjects.
 	//
 	check( invalidated.contains(Intersection(redRange,blackRange)) );
 	

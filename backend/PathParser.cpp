@@ -36,7 +36,7 @@ UnivocalPath::endPoint() const
   return _fill_type == FILL_LEFT ? _path->m_edges.back().ap : _path->ap;
 }
 
-PathParser::PathParser(const std::vector<path>& paths, size_t numstyles)
+PathParser::PathParser(const std::vector<Path>& paths, size_t numstyles)
 : _paths(paths),
   _num_styles(numstyles),
   _shape_origin(0, 0),
@@ -54,7 +54,7 @@ PathParser::run(const cxform& cx, const SWFMatrix& mat)
 
   for (size_t i = 0; i < _paths.size(); ++i) {
   
-    if (_paths[i].is_empty()) {
+    if (_paths[i].empty()) {
       continue;
     }
 
@@ -129,9 +129,9 @@ PathParser::append(const UnivocalPath& append_path)
                                                           this, _1));
   } else {
 
-    for (std::vector<edge>::const_reverse_iterator prev = edges.rbegin(),
+    for (std::vector<Edge>::const_reverse_iterator prev = edges.rbegin(),
          it = boost::next(prev), end = edges.rend(); it != end; ++it, ++prev) {
-      if ((*prev).isStraight()) {
+      if ((*prev).straight()) {
         lineTo((*it).ap);
       } else {
         line_to(Edge((*prev).cp, (*it).ap));
@@ -145,9 +145,9 @@ PathParser::append(const UnivocalPath& append_path)
 }
 
 void
-PathParser::line_to(const edge& curve)
+PathParser::line_to(const Edge& curve)
 {
-  if (curve.isStraight()) {
+  if (curve.straight()) {
     lineTo(curve.ap);
   } else {
     curveTo(curve);

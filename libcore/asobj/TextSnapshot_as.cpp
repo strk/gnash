@@ -69,10 +69,10 @@ namespace {
 
 namespace {
 
-/// Locate static text in a character.
+/// Locate static text in a DisplayObject.
 //
 /// Static text (TextRecords) are added to a vector, which should 
-/// correspond to a single character. Also keeps count of the total number
+/// correspond to a single DisplayObject. Also keeps count of the total number
 /// of glyphs.
 class TextFinder
 {
@@ -83,7 +83,7 @@ public:
         _count(0)
     {}
 
-    void operator()(character* ch) {
+    void operator()(DisplayObject* ch) {
 
         /// This is not tested.
         if (ch->isUnloaded()) return;

@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 #include "GnashKey.h" // for gnash::key::code
@@ -124,7 +124,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Inside cyan clockwise fill
 	tester.movePointerTo(190, 112);
-	// this fails since Udo's rewrite of shape_character_def::point_test
+	// this fails since Udo's rewrite of Shape_def::point_test
 	// won't turn it into an 'expected' change as reverting the point_test 
 	// would fix it.
 	check(tester.isMouseOverMouseEntity());

@@ -373,7 +373,7 @@ color_ctor(const fn_call& fn)
 		if ( ! sp )
 		{
 			// must be a target..
-			character* ch = fn.env().find_target(arg.to_string());
+			DisplayObject* ch = fn.env().find_target(arg.to_string());
 			if ( ch )
 			{
 				sp = ch->to_movie();
@@ -382,7 +382,7 @@ color_ctor(const fn_call& fn)
 				{
 				std::stringstream ss; fn.dump_args(ss);
 				log_aserror(_("new Color(%s) : first argument evaluates "
-                                "to character %s which is a %s (not a sprite)"),
+                                "to DisplayObject %s which is a %s (not a sprite)"),
 					            ss.str(), ch->getTarget(), typeName(*ch));
 				}
 				);
@@ -391,7 +391,7 @@ color_ctor(const fn_call& fn)
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				std::stringstream ss; fn.dump_args(ss);
-				log_aserror(_("new Color(%s) : first argument doesn't evaluate or point to a character"),
+				log_aserror(_("new Color(%s) : first argument doesn't evaluate or point to a DisplayObject"),
 					ss.str());
 				)
 			}

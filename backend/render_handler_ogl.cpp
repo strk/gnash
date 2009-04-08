@@ -24,7 +24,7 @@
 #include <cmath>
 
 #include "render_handler.h"
-
+#include "swf/ShapeRecord.h"
 #include "gnash.h"
 #include "RGBA.h"
 #include "GnashImage.h"
@@ -168,7 +168,7 @@ private:
 #endif // OSMESA_TESTING
 
 
-typedef std::vector<path> PathVec;
+typedef std::vector<Path> PathVec;
 
 class oglScopeEnable : public boost::noncopyable
 {
@@ -290,21 +290,21 @@ void trace_curve(const point& startP, const point& controlP,
 
 
 
-std::vector<oglVertex> interpolate(const std::vector<edge>& edges, const float& anchor_x,
-                                   const float& anchor_y)
+std::vector<oglVertex> interpolate(const std::vector<Edge>& edges,
+        const float& anchor_x, const float& anchor_y)
 {
   point anchor(anchor_x, anchor_y);
   
   std::vector<oglVertex> shape_points;
   shape_points.push_back(oglVertex(anchor));
   
-  for (std::vector<edge>::const_iterator it = edges.begin(), end = edges.end();
+  for (std::vector<Edge>::const_iterator it = edges.begin(), end = edges.end();
         it != end; ++it) {
-      const edge& the_edge = *it;
+      const Edge& the_edge = *it;
       
       point target(the_edge.ap.x, the_edge.ap.y);
 
-      if (the_edge.is_straight()) {
+      if (the_edge.straight()) {
         shape_points.push_back(oglVertex(target));
       } else {
         point control(the_edge.cp.x, the_edge.cp.y);
@@ -1032,7 +1032,7 @@ public:
   }
 
 #if 0
-  void print_path(const path& path)
+  void print_path(const Path& path)
   {
     std::cout << "Origin: ("
               << path.ap.x
@@ -1064,28 +1064,28 @@ public:
 #endif
   
   
-  path reverse_path(const path& cur_path)
+  Path reverse_path(const Path& cur_path)
   {
-    const edge& cur_end = cur_path.m_edges.back();    
+    const Edge& cur_end = cur_path.m_edges.back();    
         
     float prev_cx = cur_end.cp.x;
     float prev_cy = cur_end.cp.y;        
                 
-    path newpath(cur_end.ap.x, cur_end.ap.y, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line, cur_path.m_new_shape);
+    Path newpath(cur_end.ap.x, cur_end.ap.y, cur_path.m_fill1, cur_path.m_fill0, cur_path.m_line, cur_path.m_new_shape);
     
     float prev_ax = cur_end.ap.x;
     float prev_ay = cur_end.ap.y; 
 
-    for (std::vector<edge>::const_reverse_iterator it = cur_path.m_edges.rbegin()+1, end = cur_path.m_edges.rend();
+    for (std::vector<Edge>::const_reverse_iterator it = cur_path.m_edges.rbegin()+1, end = cur_path.m_edges.rend();
          it != end; ++it) {
-      const edge& cur_edge = *it;
+      const Edge& cur_edge = *it;
 
       if (prev_ax == prev_cx && prev_ay == prev_cy) {
         prev_cx = cur_edge.ap.x;
         prev_cy = cur_edge.ap.y;      
       }
 
-      edge newedge(prev_cx, prev_cy, cur_edge.ap.x, cur_edge.ap.y); 
+      Edge newedge(prev_cx, prev_cy, cur_edge.ap.x, cur_edge.ap.y); 
           
       newpath.m_edges.push_back(newedge);
           
@@ -1096,14 +1096,14 @@ public:
            
     }
         
-    edge newlastedge(prev_cx, prev_cy, cur_path.ap.x, cur_path.ap.y);    
+    Edge newlastedge(prev_cx, prev_cy, cur_path.ap.x, cur_path.ap.y);    
     newpath.m_edges.push_back(newlastedge);
         
     return newpath;
   }
   
-  const path* find_connecting_path(const path& to_connect,
-                                   std::list<const path*> path_refs)
+  const Path* find_connecting_path(const Path& to_connect,
+                                   std::list<const Path*> path_refs)
   {
         
     float target_x = to_connect.m_edges.back().ap.x;
@@ -1114,9 +1114,9 @@ public:
       return NULL;
     }
   
-    for (std::list<const path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
+    for (std::list<const Path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
          it != end; ++it) {
-      const path* cur_path = *it;
+      const Path* cur_path = *it;
       
       if (cur_path == &to_connect) {
       
@@ -1144,7 +1144,7 @@ public:
   
     for (PathVec::const_iterator it = paths.begin(), end = paths.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
       
       if (cur_path.m_edges.empty()) {
         continue;
@@ -1155,14 +1155,14 @@ public:
         normalized.push_back(cur_path);
         normalized.back().m_fill0 = 0; 
      
-        path newpath = reverse_path(cur_path);
+        Path newpath = reverse_path(cur_path);
         newpath.m_fill0 = 0;        
            
         normalized.push_back(newpath);       
 
       } else if (cur_path.m_fill0) {
         // Left fill style.
-        path newpath = reverse_path(cur_path);
+        Path newpath = reverse_path(cur_path);
         newpath.m_fill0 = 0;
            
         normalized.push_back(newpath);
@@ -1198,7 +1198,7 @@ public:
     
     for (int pno=0; pno<pcount; pno++) {
     
-      const path &the_path = paths[pno];
+      const Path &the_path = paths[pno];
     
       if ((the_path.m_fill0>0) || (the_path.m_fill1>0)) {
         have_shape=true;
@@ -1347,7 +1347,7 @@ public:
     
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
 
       if (!cur_path.m_edges.size()) {
         continue;
@@ -1361,10 +1361,10 @@ public:
     return pathpoints;
   } 
   
-  typedef std::vector<const path*> PathPtrVec;
+  typedef std::vector<const Path*> PathPtrVec;
   
   static void
-  draw_point(const edge& point_edge)
+  draw_point(const Edge& point_edge)
   {  
     glVertex2d(point_edge.ap.x, point_edge.ap.y);  
   }
@@ -1377,7 +1377,7 @@ public:
   
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
       
       if (!cur_path.m_line) {
         continue;
@@ -1415,19 +1415,19 @@ public:
 
   std::list<PathPtrVec> get_contours(const PathPtrVec &paths)
   {
-    std::list<const path*> path_refs;
+    std::list<const Path*> path_refs;
     std::list<PathPtrVec> contours;
     
     
     for (PathPtrVec::const_iterator it = paths.begin(), end = paths.end();
          it != end; ++it) {
-      const path* cur_path = *it;
+      const Path* cur_path = *it;
       path_refs.push_back(cur_path);
     }
         
-    for (std::list<const path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
+    for (std::list<const Path*>::const_iterator it = path_refs.begin(), end = path_refs.end();
          it != end; ++it) {
-      const path* cur_path = *it;
+      const Path* cur_path = *it;
       
       if (cur_path->m_edges.empty()) {
         continue;
@@ -1441,13 +1441,13 @@ public:
             
       contour.push_back(cur_path);
         
-      const path* connector = find_connecting_path(*cur_path, path_refs);
+      const Path* connector = find_connecting_path(*cur_path, path_refs);
 
       while (connector) {       
         contour.push_back(connector);
 
-        const path* tmp = connector;
-        connector = find_connecting_path(*connector, std::list<const path*>(boost::next(it), end));
+        const Path* tmp = connector;
+        connector = find_connecting_path(*connector, std::list<const Path*>(boost::next(it), end));
   
         // make sure we don't iterate over the connecting path in the for loop.
         path_refs.remove(tmp);
@@ -1465,7 +1465,7 @@ public:
   {    
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
       
       if (cur_path.m_fill0 || cur_path.m_fill1) {
         _masks.back().push_back(cur_path);
@@ -1480,7 +1480,7 @@ public:
     PathPtrVec paths;
     for (PathVec::const_iterator it = path_vec.begin(), end = path_vec.end();
          it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
       
       if (cur_path.m_fill0 == style) {
         paths.push_back(&cur_path);
@@ -1507,7 +1507,7 @@ public:
     ++it;
 
     for (;it != end; ++it) {
-      const path& cur_path = *it;
+      const Path& cur_path = *it;
     
       if (cur_path.m_new_shape) {
         subshapes.push_back(it); 
@@ -1523,10 +1523,10 @@ public:
   
   /// Takes a path and translates it using the given SWFMatrix.
   void
-  apply_matrix_to_paths(std::vector<path>& paths, const SWFMatrix& mat)
+  apply_matrix_to_paths(std::vector<Path>& paths, const SWFMatrix& mat)
   {  
     std::for_each(paths.begin(), paths.end(),
-                  boost::bind(&path::transform, _1, boost::ref(mat)));
+                  boost::bind(&Path::transform, _1, boost::ref(mat)));
                   
     //for_each(paths, &path::transform, mat);
   }  
@@ -1560,7 +1560,7 @@ public:
                    
         for (PathPtrVec::const_iterator it = refs.begin(), end = refs.end();
              it != end; ++it) {
-          const path& cur_path = *(*it);          
+          const Path& cur_path = *(*it);          
           
           assert(pathpoints.find(&cur_path) != pathpoints.end());
 
@@ -1607,11 +1607,11 @@ public:
 // 5. Profit!
 
   virtual void
-  draw_shape_character(shape_character_def *def, const SWFMatrix& mat,
-    const cxform& cx)
+  drawShape(const SWF::ShapeRecord& shape, const cxform& cx,
+          const SWFMatrix& mat)
   {
   
-    const PathVec& path_vec = def->paths();
+    const PathVec& path_vec = shape.paths();
 
     if (!path_vec.size()) {
       // No paths. Nothing to draw...
@@ -1638,8 +1638,8 @@ public:
 
     std::vector<PathVec::const_iterator> subshapes = find_subshapes(path_vec);
     
-    const std::vector<fill_style>& fill_styles = def->fillStyles();
-    const std::vector<line_style>& line_styles = def->lineStyles();
+    const std::vector<fill_style>& fill_styles = shape.fillStyles();
+    const std::vector<line_style>& line_styles = shape.lineStyles();
     
     for (size_t i = 0; i < subshapes.size()-1; ++i) {
       PathVec subshape_paths;
@@ -1655,8 +1655,8 @@ public:
     }
   }
 
-  virtual void draw_glyph(shape_character_def *def, const SWFMatrix& mat,
-    const rgba& c)
+  virtual void drawGlyph(const SWF::ShapeRecord& rec, const rgba& c,
+         const SWFMatrix& mat)
   {
     if (_drawing_mask) abort();
     cxform dummy_cx;
@@ -1671,7 +1671,7 @@ public:
     
     oglScopeMatrix scope_mat(mat);
     
-    draw_subshape(def->paths(), mat, dummy_cx, glyph_fs, dummy_ls);
+    draw_subshape(rec.paths(), mat, dummy_cx, glyph_fs, dummy_ls);
   }
 
   virtual void set_scale(float xscale, float yscale) {

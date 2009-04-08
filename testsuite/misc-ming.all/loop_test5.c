@@ -17,7 +17,7 @@
  */ 
 
 /*
- * Test "Jumping backward to the middle of a character's lifetime after removal and replacement(2)"
+ * Test "Jumping backward to the middle of a DisplayObject's lifetime after removal and replacement(2)"
  *
  * Timeline:
  * 
@@ -34,22 +34,22 @@
  * Description:
  *
  *  frame2: 
- *    a static characters is placed at depth 3 (-16381) [ a red square ]
- *    a static character is placed at depth 4 (-16380) [ a black square ]
+ *    a static DisplayObjects is placed at depth 3 (-16381) [ a red square ]
+ *    a static DisplayObject is placed at depth 4 (-16380) [ a black square ]
  *  frame3: nothing new.
  *  frame4: 
- *    character at depth 3 is removed;
- *    character at depth 4 is removed;
+ *    DisplayObject at depth 3 is removed;
+ *    DisplayObject at depth 4 is removed;
  *  frame5:
- *    a static character is placed at depth 3 (-16381) with ratio set to 2.0
- *    a static character is placed at depth 4 (-16380) with ratio set to 0.0
+ *    a static DisplayObject is placed at depth 3 (-16381) with ratio set to 2.0
+ *    a static DisplayObject is placed at depth 4 (-16380) with ratio set to 0.0
  *          
  *  frame6: jump to frame 3 and stop.
  *
  * Expected behaviour:
  *
- *   After jump back, characters in depth 3 placed at frame5 get destroyed, 
- *   characters in depth 4 placed in frame 5 keeps alive. Their ratio values are different.
+ *   After jump back, DisplayObjects in depth 3 placed at frame5 get destroyed, 
+ *   DisplayObjects in depth 4 placed in frame 5 keeps alive. Their ratio values are different.
  *
  * run as ./loop_test5
  */
@@ -100,8 +100,8 @@ main(int argc, char** argv)
   
   //
   // Frame 2: 
-  //   Place red static movieClip1 character at depth 3 (-16381)
-  //   Place black static movieClip1 character at depth 4 (-16380)
+  //   Place red static movieClip1 DisplayObject at depth 3 (-16381)
+  //   Place black static movieClip1 DisplayObject at depth 4 (-16380)
   //
   sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();
@@ -143,8 +143,8 @@ main(int argc, char** argv)
   
   //
   // Frame5: 
-  //   Place red static movieClip3 character at depth 3 (-16381) with ratio set to 2.0
-  //   Place black static movieClip4 character at depth4 (-16380) with ratio set to 0.0
+  //   Place red static movieClip3 DisplayObject at depth 3 (-16381) with ratio set to 2.0
+  //   Place black static movieClip4 DisplayObject at depth4 (-16380) with ratio set to 0.0
   //
 
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  //add movieClip3 to the _root

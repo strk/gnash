@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 #include "VM.h"
@@ -61,7 +61,7 @@ main(int /*argc*/, char** /*argv*/)
 	// used to get members
 	as_value tmp;
 
-	const character* loaded = tester.findDisplayItemByDepth(*root, 0); // depends on getNextHighestDepth
+	const DisplayObject* loaded = tester.findDisplayItemByDepth(*root, 0); // depends on getNextHighestDepth
 	check(loaded);
 	check_equals(loaded->get_parent(), root);
 
@@ -69,14 +69,14 @@ main(int /*argc*/, char** /*argv*/)
 	string_table::key xscale = st.find("_xscale");
 	string_table::key yscale = st.find("_yscale");
 	// we need a const_cast as get_member *might* eventually
-	// change the character (fetching _x shouldn't change it though)
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	// change the DisplayObject (fetching _x shouldn't change it though)
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(tmp, as_value(50));
 
 	check_equals(loaded->get_height(), 2056);
 	check_equals(loaded->get_width(), 2056);
 
-	const character* text = tester.findDisplayItemByDepth(*root, 7+character::staticDepthOffset);
+	const DisplayObject* text = tester.findDisplayItemByDepth(*root, 7+DisplayObject::staticDepthOffset);
 	check(text);
 	
 	check_equals(string(text->get_text_value()), "50");
@@ -89,25 +89,25 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text->get_text_value()), "50");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
-	check(const_cast<character*>(loaded)->get_member(yscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
-	check(const_cast<character*>(loaded)->get_member(yscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "44");
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 44);
-	check(const_cast<character*>(loaded)->get_member(yscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 44);
 
 	// click some on the "larger" button
@@ -117,33 +117,33 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text->get_text_value()), "44");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
-	check(const_cast<character*>(loaded)->get_member(yscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 46);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "46");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
-	check(const_cast<character*>(loaded)->get_member(yscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 48);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "48");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "50");
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 50);
-	check(const_cast<character*>(loaded)->get_member(yscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 50);
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), "50");
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), "52");
-	check(const_cast<character*>(loaded)->get_member(xscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(xscale, &tmp));
 	check_equals(round(tmp.to_number()), 52);
-	check(const_cast<character*>(loaded)->get_member(yscale, &tmp));
+	check(const_cast<DisplayObject*>(loaded)->get_member(yscale, &tmp));
 	check_equals(round(tmp.to_number()), 52);
 
 

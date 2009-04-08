@@ -381,7 +381,7 @@ Transform_ctor(const fn_call& fn)
 		LOG_ONCE( log_unimpl("Transform(%s): %s", ss.str(), _("arguments discarded")) );
 	}
 
-    // TODO: does this have to be a MovieClip or can it be any character?
+    // TODO: does this have to be a MovieClip or can it be any DisplayObject?
     boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.arg(0).to_object());
 
 	boost::intrusive_ptr<as_object> obj = new Transform_as(*mc);

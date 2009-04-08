@@ -18,7 +18,7 @@
 #ifndef GNASH_DUMMYCHARACTER_H
 #define GNASH_DUMMYCHARACTER_H
 
-#include "character.h" // for inheritance
+#include "InteractiveObject.h" // for inheritance
 #include "rect.h" // for composition
 #include "movie_instance.h" // for create_movie_instance
 #include "snappingrange.h" // for InvalidatedRanges typedef (don't like it)
@@ -40,16 +40,27 @@ namespace gnash
 /// values for XXXXXXXXXXXXXXXXXXXXXXXXXX etc..
 ///
 ///
-class DummyCharacter : public character
+class DummyCharacter : public InteractiveObject
 {
 
 public:
 
-	DummyCharacter(character* parent)
+	DummyCharacter(DisplayObject* parent)
 		:
-		character(parent, parent ? 0 : -1)
+		InteractiveObject(parent, parent ? 0 : -1)
 	{
 	}
+
+    virtual void display() {}
+
+    virtual rect getBounds() const { return rect(); }
+
+    virtual bool mouseEnabled() const { return true; }
+
+    InteractiveObject* topmostMouseEntity(boost::int32_t, boost::int32_t)
+    {
+        return 0;
+    }
 
 	void add_invalidated_bounds(InvalidatedRanges& /*bounds*/, bool /*force*/) {}
 
