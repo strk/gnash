@@ -29,7 +29,7 @@
 
 namespace gnash {
 
-movie_instance::movie_instance(movie_definition* def, character* parent)
+movie_instance::movie_instance(movie_definition* def, DisplayObject* parent)
 	:
 	MovieClip(def, this, parent, parent ? 0 : -1),
 	_def(def)

@@ -22,7 +22,7 @@
 
 #include "MovieTester.h"
 #include "MovieClip.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "DisplayList.h"
 #include "log.h"
 
@@ -67,7 +67,7 @@ main(int /*argc*/, char** /*argv*/)
 	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(76, 4) ); // the "-xtrace enabled-" label...
 
-	tester.advance(); // FRAME 2, place character
+	tester.advance(); // FRAME 2, place DisplayObject
 	invalidated = tester.getInvalidatedRanges();
 	
 	check_equals(root->get_play_state(), MovieClip::PLAY);
@@ -89,7 +89,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(130, 296, 2, white, 2); // Top
 	check_pixel(130, 364, 2, white, 2); // Bottom
 
-	tester.advance(); // FRAME 3, replace character
+	tester.advance(); // FRAME 3, replace DisplayObject
 	invalidated = tester.getInvalidatedRanges();
 	
 	check_equals(root->get_play_state(), MovieClip::PLAY);

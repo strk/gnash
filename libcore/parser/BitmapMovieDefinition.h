@@ -58,15 +58,7 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
             const std::string& url);
 
-    virtual character* createDisplayObject(character*, int) {
-        return 0;
-    }
-
-	// Discard id, always return the only shape character we have 
-	virtual character_def* get_character_def(int /*id*/)
-	{
-		return getShapeDef();
-	}
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int);
 
 	virtual int	get_version() const {
 		return _version;
@@ -114,7 +106,7 @@ public:
 	}
 	
 	/// Create a playable movie_instance from this def.
-	virtual movie_instance* create_movie_instance(character* parent=0)
+	virtual movie_instance* create_movie_instance(DisplayObject* parent=0)
 	{
 		return new BitmapMovieInstance(this, parent);
 	}
@@ -160,13 +152,7 @@ private:
 
     boost::intrusive_ptr<BitmapInfo> _bitmap;
 
-	boost::intrusive_ptr<DynamicShape> _shapedef;
-
-	/// Get the shape character definition for this bitmap movie
-	//
-	/// It will create the definition the first time it's called
-	///
-	shape_character_def* getShapeDef();
+    boost::shared_ptr<DynamicShape> _shape;
 
 };
 

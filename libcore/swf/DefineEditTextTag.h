@@ -23,7 +23,7 @@
 #endif
 
 #include "rect.h"
-#include "character_def.h"
+#include "DefinitionTag.h"
 #include "swf.h" // for TagType definition
 #include "RGBA.h"
 #include "TextField.h"
@@ -54,7 +54,7 @@ namespace SWF {
 /// The tag will then be used to start playing the specific block
 /// in sync with the frame playhead.
 ///
-class DefineEditTextTag : public character_def
+class DefineEditTextTag : public DefinitionTag
 {
 
 public:
@@ -67,7 +67,7 @@ public:
 
     const rect& get_bound() const { return _rect; }
 
-    character* createDisplayObject(character* parent, int id);
+    DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.
@@ -190,7 +190,7 @@ public:
 	/// Return true if HTML was allowed by definition
 	bool html() const { return _html; }
 
-	/// Return true if this character definition requested use of device fonts
+	/// Return true if this DisplayObject definition requested use of device fonts
 	// 
 	/// Used by TextFielf constructor to set its default.
 	///
@@ -234,7 +234,7 @@ private:
 	bool _wordWrap;
 	bool _multiline;
 
-    /// show asterisks instead of actual characters
+    /// show asterisks instead of actual DisplayObjects
 	bool _password;
 	bool _readOnly;
 	/// resize our bound to fit the text

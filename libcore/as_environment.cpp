@@ -20,7 +20,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "as_environment.h"
 #include "MovieClip.h"
-#include "shape_character_def.h"
 #include "as_value.h"
 #include "VM.h"
 #include "log.h"
@@ -525,7 +524,7 @@ as_environment::parse_path(const std::string& var_path, as_object** target,
     return true;
 }
 
-// Search for next '.' or '/' character in this word.  Return
+// Search for next '.' or '/' DisplayObject in this word.  Return
 // a pointer to it, or to NULL if it wasn't found.
 static const char*
 next_slash_or_dot(const char* word)
@@ -545,11 +544,11 @@ next_slash_or_dot(const char* word)
 //
 // Supports both /slash/syntax and dot.syntax
 //
-character*
+DisplayObject*
 as_environment::find_target(const std::string& path_in) const
 {
     as_object* o = find_object(path_in);
-    if ( o ) return o->to_character(); // can be NULL (not a character)...
+    if ( o ) return o->toDisplayObject(); // can be NULL (not a DisplayObject)...
     else return NULL;
 }
 
@@ -968,7 +967,7 @@ as_environment::popCallFrame()
 }
     
 void
-as_environment::set_target(character* target)
+as_environment::set_target(DisplayObject* target)
 {
     //assert(target);
     if ( ! _original_target )

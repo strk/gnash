@@ -54,7 +54,7 @@ class GlobalCode: public ExecutableCode {
 
 public:
 
-    GlobalCode(const action_buffer& nBuffer, boost::intrusive_ptr<character> nTarget)
+    GlobalCode(const action_buffer& nBuffer, boost::intrusive_ptr<DisplayObject> nTarget)
         :
         buffer(nBuffer),
         target(nTarget)
@@ -94,7 +94,7 @@ private:
 
     const action_buffer& buffer;
 
-    boost::intrusive_ptr<character> target;
+    boost::intrusive_ptr<DisplayObject> target;
 };
 
 /// Event code 
@@ -104,12 +104,12 @@ public:
 
     typedef std::vector<const action_buffer*> BufferList;
 
-    EventCode(boost::intrusive_ptr<character> nTarget)
+    EventCode(boost::intrusive_ptr<DisplayObject> nTarget)
         :
         _target(nTarget)
     {}
 
-    EventCode(boost::intrusive_ptr<character> nTarget, const BufferList& buffers)
+    EventCode(boost::intrusive_ptr<DisplayObject> nTarget, const BufferList& buffers)
         :
         _target(nTarget),
         _buffers(buffers)
@@ -130,7 +130,7 @@ public:
     ///
     void addAction(const action_buffer& buffer)
     {
-        // don't push actions for destroyed characters, 
+        // don't push actions for destroyed DisplayObjects, 
         // our opcode guard is bogus at the moment.
         if( ! _target->isDestroyed() )
         {
@@ -165,7 +165,7 @@ public:
 
 private:
 
-    boost::intrusive_ptr<character> _target;
+    boost::intrusive_ptr<DisplayObject> _target;
 
     BufferList _buffers;
 
@@ -176,7 +176,7 @@ class QueuedEvent: public ExecutableCode {
 
 public:
 
-    QueuedEvent(boost::intrusive_ptr<character> nTarget, const event_id& id)
+    QueuedEvent(boost::intrusive_ptr<DisplayObject> nTarget, const event_id& id)
         :
         _target(nTarget),
         _eventId(id)
@@ -190,7 +190,7 @@ public:
 
     virtual void execute()
     {
-        // don't execute any events for destroyed character.
+        // don't execute any events for destroyed DisplayObject.
         if( !_target->isDestroyed() )
         {
             _target->on_event(_eventId);
@@ -211,7 +211,7 @@ public:
 
 private:
 
-    boost::intrusive_ptr<character> _target;
+    boost::intrusive_ptr<DisplayObject> _target;
 
     const event_id _eventId;
 
@@ -222,7 +222,7 @@ class FunctionCode: public ExecutableCode {
 
 public:
 
-    FunctionCode(boost::intrusive_ptr<as_function> nFunc, boost::intrusive_ptr<character> nTarget)
+    FunctionCode(boost::intrusive_ptr<as_function> nFunc, boost::intrusive_ptr<DisplayObject> nTarget)
         :
         func(nFunc),
         target(nTarget)
@@ -257,7 +257,7 @@ private:
 
     boost::intrusive_ptr<as_function> func;
 
-    boost::intrusive_ptr<character> target;
+    boost::intrusive_ptr<DisplayObject> target;
 };
 
 

@@ -19,7 +19,7 @@
 #ifndef GNASH_BITMAP_H
 #define GNASH_BITMAP_H
 
-#include "character.h" 
+#include "DisplayObject.h" 
 #include "BitmapInfo.h"
 #include "flash/display/BitmapData_as.h"
 #include "render.h"
@@ -31,12 +31,12 @@ namespace gnash {
 
 
 /// A Dynamic Bitmap DisplayObject. This is not AS-referencable, but can be
-/// removed and placed using depths like normal characters (DisplayObjects).
-class Bitmap : public character
+/// removed and placed using depths like normal DisplayObjects (DisplayObjects).
+class Bitmap : public DisplayObject
 {
 public:
 
-	Bitmap(boost::intrusive_ptr<BitmapData_as> bd, character* parent, int id);
+	Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent, int id);
 
     ~Bitmap();
 
@@ -57,7 +57,6 @@ protected:
     void markReachableObjects() const {
         if (_bitmapData) _bitmapData->setReachable();
         if (_bitmapInfo) _bitmapInfo->setReachable();
-        if (_shapeDef) _shapeDef->setReachable();
     }
 
 private:
@@ -75,8 +74,8 @@ private:
     /// The current bitmap information is stored here.
     boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
 
-    /// FIXME: using shape_character_def is unpleasant.
-    boost::intrusive_ptr<DynamicShape> _shapeDef;
+    /// A shape to hold the bitmap fill.
+    DynamicShape _shape;
 
     /// This is cached to save querying the BitmapData often
     size_t _width;

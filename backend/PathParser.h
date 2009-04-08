@@ -39,7 +39,7 @@ struct UnivocalPath
   
   UnivocalPath() : _path(NULL), _fill_type(FILL_LEFT) {}
 
-  UnivocalPath(const path* path, fill_type filltype)
+  UnivocalPath(const Path* path, fill_type filltype)
     : _path(path),
       _fill_type(filltype)
   {
@@ -48,7 +48,7 @@ struct UnivocalPath
   const point& startPoint() const;
   const point& endPoint() const;
 
-  const path* _path;
+  const Path* _path;
   fill_type   _fill_type;
 };
 
@@ -62,7 +62,7 @@ class PathParser : boost::noncopyable
 public:
   /// @param paths list of Flash paths to be 'parsed'.
   /// @param num_styles count of fill styles pointed to by the first argument.
-  PathParser(const std::vector<path>& paths, size_t num_styles);
+  PathParser(const std::vector<Path>& paths, size_t num_styles);
 
   virtual ~PathParser() { }
 
@@ -95,7 +95,7 @@ public:
   virtual void moveTo(const point& p) = 0;
   
   /// Draw the given curve using the path pencil.
-  virtual void curveTo(const edge& curve) = 0;
+  virtual void curveTo(const Edge& curve) = 0;
 
   /// Draw a straight line to the given point.
   virtual void lineTo(const point& p) = 0;
@@ -113,9 +113,9 @@ private:
   
   bool closed_shape();
 
-  void line_to(const edge& curve);
+  void line_to(const Edge& curve);
 
-  const std::vector<path>& _paths;
+  const std::vector<Path>& _paths;
   const size_t             _num_styles;
   point       _shape_origin;
   point       _cur_endpoint;

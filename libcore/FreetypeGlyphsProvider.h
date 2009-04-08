@@ -35,7 +35,9 @@
 
 // Forward declarations
 namespace gnash {
-	class shape_character_def;
+    namespace SWF {
+        class ShapeRecord;
+    }
 }
 
 
@@ -50,7 +52,7 @@ namespace gnash {
 /// but I think the actual size could change between glyphs (see the 'box'
 /// parameter of getRenderedGlyph() method).
 ///
-/// Vectorial glyphs are instances of a shape_character_def, same class
+/// Vectorial glyphs are instances of a SWF::ShapeRecord, same class
 /// resulting from parsing of embedded fonts.
 ///
 class FreetypeGlyphsProvider 
@@ -83,7 +85,7 @@ public:
 
 
 	/// \brief
-	/// Return the given character glyph as a shape character definition
+	/// Return the given DisplayObject glyph as a shape DisplayObject definition
 	/// in unitsPerEM() coordinates.
 	//
 	///
@@ -96,11 +98,12 @@ public:
 	///	Output parameter... units to advance horizontally from this
 	///     glyph to the next, in unitsPerEM() units.
 	///
-	/// @return A shape_character_def in unitsPerEM() coordinates,
-	///         or a NULL pointer if the given character code
+	/// @return A DefineShapeTag in unitsPerEM() coordinates,
+	///         or a NULL pointer if the given DisplayObject code
 	///         doesn't exist in this font.
 	///
-	boost::intrusive_ptr<shape_character_def> getGlyph(boost::uint16_t code, float& advance);
+    std::auto_ptr<SWF::ShapeRecord> getGlyph(boost::uint16_t code,
+            float& advance);
 
 	/// Return the number of units of glyphs EM
 	//

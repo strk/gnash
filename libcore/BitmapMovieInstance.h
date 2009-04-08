@@ -38,7 +38,7 @@ class BitmapMovieInstance : public movie_instance
 
 public:
 
-	BitmapMovieInstance(BitmapMovieDefinition* def, character* parent=0); 
+	BitmapMovieInstance(BitmapMovieDefinition* def, DisplayObject* parent=0); 
 
 	virtual ~BitmapMovieInstance() {}
 
@@ -48,7 +48,7 @@ public:
     virtual std::auto_ptr<GnashImage> drawToBitmap(
             const SWFMatrix& mat = SWFMatrix(), 
             const cxform& cx = cxform(),
-            character::BlendMode bm = character::BLENDMODE_NORMAL,
+            DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
             const rect& clipRect = rect(),
             bool smooth = false);
 

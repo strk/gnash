@@ -97,7 +97,7 @@ public:
         void markReachableResources() const;
 #endif
 
-    /// Read Font::CodeTable, which maps glyph indices to character codes.
+    /// Read Font::CodeTable, which maps glyph indices to DisplayObject codes.
 	static void readCodeTable(SWFStream& in, Font::CodeTable& table,
             bool wideCodes, size_t glyphCount);
 

@@ -1,3 +1,4 @@
+// Shape.h: Shape DisplayObject implementation for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -20,23 +21,38 @@
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DisplayObject.h"
-#include "shape_character_def.h"
+#include "DefineShapeTag.h"
+#include "DynamicShape.h"
+
 #include <cassert>
+#include <boost/shared_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
-    class character_def;
+    class DefinitionTag;
 }
 
 namespace gnash {
 
-/// For characters that don't store unusual state in their instances.
+/// For DisplayObjects that don't store unusual state in their instances.
+//
+/// A Shape may be either statically constructed during parsing or,
+/// in AS3, dynamically constructed. A SWF-parsed Shape has an immutable
+/// SWF::DefinitionTag. A dynamic Shape object has a DynamicShape.
 class Shape : public DisplayObject
 {
 
 public:
 
-	Shape(shape_character_def* def, character* parent, int id)
+    Shape(boost::shared_ptr<DynamicShape> sh, DisplayObject* parent, int id)
+        :
+        DisplayObject(parent, id),
+        _shape(sh)
+    {
+        assert(_shape.get());
+    }
+
+	Shape(const SWF::DefineShapeTag* const def, DisplayObject* parent, int id)
 		:
 		DisplayObject(parent, id),
 		_def(def)
@@ -46,26 +62,29 @@ public:
 
 	virtual void display();
 
-protected:
-
-    character_def* getDefinition() const
-    {
-        return _def.get();
+    virtual rect getBounds() const {
+        return _def ? _def->get_bound() : _shape->getBounds();
     }
+    
+    virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;
+
+protected:
 
 #ifdef GNASH_USE_GC
 	/// Mark reachable resources (for the GC)
 	void markReachableResources() const
 	{
 		assert(isReachable());
-        _def->setReachable();
-		markCharacterReachable();
+        if (_def) _def->setReachable();
+		markDisplayObjectReachable();
 	}
 #endif
 
 private:
 	
-    const boost::intrusive_ptr<shape_character_def> _def;
+    const boost::intrusive_ptr<const SWF::DefineShapeTag> _def;
+
+    boost::shared_ptr<DynamicShape> _shape;
 
 };
 

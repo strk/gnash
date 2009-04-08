@@ -47,23 +47,17 @@ libgnashparser_la_SOURCES = \
 	abc_block.cpp \
 	action_buffer.cpp \
 	BitmapMovieDefinition.cpp \
-	character_def.cpp \
 	SWFMovieDefinition.cpp \
-        morph2_character_def.cpp \
-	shape_character_def.cpp	\
 	sound_definition.cpp \
 	sprite_definition.cpp
 
 noinst_HEADERS = \
 	abc_block.h \
 	action_buffer.h \
-	character_def.h	\
 	BitmapMovieDefinition.h \
-	morph2_character_def.h \
 	movie_definition.h \
 	SWFMovieDefinition.h \
 	Namespace.h \
-	shape_character_def.h \
 	sound_definition.h \
 	sprite_definition.h
 

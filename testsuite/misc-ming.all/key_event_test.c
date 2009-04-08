@@ -240,9 +240,9 @@ main(int argc, char** argv)
   // test5:
   //   test key listeners invoking order.
   //   expected behaviour:
-  //   (1)for character key listeners, first added last called
+  //   (1)for DisplayObject key listeners, first added last called
   //   (2)for general object listeners, first added first called
-  //   (3)for character listeners, user defined onKeyDown/Up won't be called
+  //   (3)for DisplayObject listeners, user defined onKeyDown/Up won't be called
   //      if not registered to the global Key object.
   it1 = add_static_mc(mo, "ls1", 30);
   SWFDisplayItem_addAction(it1,

@@ -13,7 +13,7 @@
 #include "impl.h"
 #include "log.h"
 #include "render.h"
-#include "shape_character_def.h"
+#include "DefineShapeTag.h"
 #include "styles.h"
 #include "movie_definition.h"
 

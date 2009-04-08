@@ -24,17 +24,16 @@
 
 namespace gnash {
 
-Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, character* parent,
+Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
         int id)
     :
-    character(parent, id),
+    DisplayObject(parent, id),
     _bitmapData(bd),
     _bitmapInfo(0),
-    _shapeDef(new DynamicShape),
     _width(_bitmapData->getWidth()),
     _height(_bitmapData->getHeight())
 {
-    _shapeDef->set_bound(rect(0, 0, _width * 20, _height * 20));
+    _shape.setBounds(rect(0, 0, _width * 20, _height * 20));
 }
 
 
@@ -61,9 +60,7 @@ Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 void
 Bitmap::display()
 {
-    assert(_shapeDef);
-
-    _shapeDef->display(this);
+    _shape.display(*this);
 
     clear_invalidated();
 }
@@ -84,7 +81,7 @@ Bitmap::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 rect
 Bitmap::getBounds() const
 {
-    return _shapeDef->get_bound();
+    return _shape.getBounds();
 }
 
 void
@@ -126,7 +123,7 @@ Bitmap::finalize()
     /// set _bitmapData to 0 to avoid any further interaction.
     if (data.empty()) {
         _bitmapData = 0;
-        _shapeDef->set_bound(rect());
+        _shape.clear();
         return;
     }
 
@@ -137,24 +134,21 @@ Bitmap::finalize()
     const int w = _width * 20;
     const int h = _height * 20;
 
-    if (!_shapeDef) {
-    }
-
     SWFMatrix mat;
     mat.set_scale(1.0 / 20, 1.0 / 20);
     fill_style fill(_bitmapInfo.get(), mat);
-    const size_t fillLeft = _shapeDef->add_fill_style(fill);
+    const size_t fillLeft = _shape.add_fill_style(fill);
 
 
-    path bmpath(w, h, fillLeft, 0, 0, false);
+    Path bmpath(w, h, fillLeft, 0, 0, false);
     bmpath.drawLineTo(w, 0);
     bmpath.drawLineTo(0, 0);
     bmpath.drawLineTo(0, h);
     bmpath.drawLineTo(w, h);
 
-    _shapeDef->add_path(bmpath);
+    _shape.add_path(bmpath);
 
-    _shapeDef->finalize();
+    _shape.finalize();
 
 }
 

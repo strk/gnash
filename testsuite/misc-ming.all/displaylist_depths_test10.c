@@ -36,8 +36,8 @@
  * 
  * Description:
  * 
- *  frame3: character placed at depth -16381 
- *  frame4: character at depth -16381 removed
+ *  frame3: DisplayObject placed at depth -16381 
+ *  frame4: DisplayObject at depth -16381 removed
  *  frame7: jump back to frame 2 and stop
  * 
  * Expected behaviour:
@@ -108,7 +108,7 @@ main(int argc, char** argv)
   // Frame 2: nothing to do
   SWFMovie_nextFrame(mo); 
 
-  // Frame 3: place a static character at depth 3 (-16381)
+  // Frame 3: place a static DisplayObject at depth 3 (-16381)
   it1 = add_static_mc(mo, "static3", 3, 10, 200, 20, 20);
   SWFDisplayItem_addAction(it1, newSWFAction(
 			"_root.note(this+' onClipConstruct');"
@@ -123,7 +123,7 @@ main(int argc, char** argv)
   add_actions(mo, "check_equals(static3.getDepth(), -16381);");
   SWFMovie_nextFrame(mo); 
  
-  // Frame 4: remove character at depth 3 (-16381)
+  // Frame 4: remove DisplayObject at depth 3 (-16381)
   SWFDisplayItem_remove(it1);
   add_actions(mo, "check_equals(typeof(static3), 'undefined');");
   SWFMovie_nextFrame(mo); 

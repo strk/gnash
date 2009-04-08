@@ -36,14 +36,14 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
     assert(tag == SWF::VIDEOFRAME);
 
     in.ensureBytes(2);
-    boost::uint16_t character_id = in.read_u16();
-    character_def* chdef = m.get_character_def(character_id);
+    boost::uint16_t id = in.read_u16();
+    DefinitionTag* chdef = m.getDefinitionTag(id);
 
     if (!chdef)
     {
         IF_VERBOSE_MALFORMED_SWF(
             log_swferror(_("VideoFrame tag refers to unknown video "
-                    "stream id %d"), character_id);
+                    "stream id %d"), id);
         );
         return;
     }
@@ -52,8 +52,8 @@ VideoFrameTag::loader(SWFStream& in, SWF::TagType tag, movie_definition& m,
     if (!vs)
     {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("VideoFrame tag refers to a non-video character "
-                "%d (%s)"), character_id, typeName(*chdef));
+        log_swferror(_("VideoFrame tag refers to a non-video DisplayObject "
+                "%d (%s)"), id, typeName(*chdef));
         );
         return;
     }

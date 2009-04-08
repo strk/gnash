@@ -1,4 +1,4 @@
-// Shape.cpp:  Mouse/Character handling, for Gnash.
+// Shape.cpp: Shape DisplayObject implementation for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -22,10 +22,40 @@
 namespace gnash
 {
 
+bool
+Shape::pointInShape(boost::int32_t x, boost::int32_t y) const
+{
+    SWFMatrix wm = getWorldMatrix();
+    wm.invert();
+    point lp(x, y);
+    wm.transform(lp);
+    
+    // FIXME: if the shape contains non-scaled strokes
+    //        we can't rely on boundary itself for a quick
+    //        way out. Bounds supposedly already include
+    //        thickness, so we might keep a flag telling us
+    //        whether *non_scaled* strokes are present
+    //        and if not still use the boundary check.
+    // NOTE: just skipping this test breaks a corner-case
+    //       in DrawingApiTest (kind of a fill-leakage making
+    //       the collision detection find you inside a self-crossing
+    //       shape).
+    if (_def) {
+        if (!_def->get_bound().point_test(lp.x, lp.y)) return false;
+        return _def->pointTestLocal(lp.x, lp.y, wm);
+    }
+    assert(_shape.get());
+    
+    if (!_shape->getBounds().point_test(lp.x, lp.y)) return false;
+    return _shape->pointTestLocal(lp.x, lp.y, wm);
+
+}
+
 void  
 Shape::display()
 {
-    _def->display(this); // pass in transform info
+    if (_def) _def->display(*this);
+    else _shape->display(*this);
     clear_invalidated();
 }
 

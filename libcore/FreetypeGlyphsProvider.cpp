@@ -25,7 +25,7 @@
 #include "GnashImage.h" // for create_alpha
 #include "GnashException.h"
 #include "render.h"
-#include "DynamicShape.h"
+#include "ShapeRecord.h"
 #include "log.h"
 
 #ifdef USE_FREETYPE 
@@ -70,24 +70,39 @@ namespace gnash {
 //
 /// See  FT_Outline_Decompose function of freetype2 lib
 ///
-class OutlineWalker {
+class OutlineWalker
+{
 
 public:
 
 	/// Create an outline walker drawing to the given DynamiShape
 	//
 	/// @param sh
-	///	The DynamiShape to draw to. Externally owned.
+	///	The DynamicShape to draw to. Externally owned.
 	///
 	/// @param scale
 	///	The scale to apply to coordinates.
 	///	This is to match an arbitrary EM 
 	///
-	OutlineWalker(DynamicShape& sh, float scale)
+	OutlineWalker(SWF::ShapeRecord& sh, float scale)
 		:
-		_sh(sh),
-		_scale(scale)
-	{}
+		_shape(sh),
+		_scale(scale),
+        _currPath(0),
+        _x(0),
+        _y(0)
+	{
+        fill_style f;
+        f.setSolid(rgba(255, 255, 255, 255));
+        _shape.addFillStyle(f);
+        _shape.addPath(Path(_x, _y, 1, 0, 0, true));
+        _currPath = &_shape.currentPath();
+    }
+
+    void finish() 
+    {
+        _currPath->close();
+    }
 
 	~OutlineWalker() {}
 
@@ -121,26 +136,25 @@ public:
 	/// falling in the middle of the two control points.
 	///
 	static int
-	walkCubicTo(FT_CONST FT_Vector* ctrl1, FT_CONST FT_Vector* ctrl2, FT_CONST FT_Vector* to, void* ptr)
+	walkCubicTo(FT_CONST FT_Vector* ctrl1, FT_CONST FT_Vector* ctrl2,
+            FT_CONST FT_Vector* to, void* ptr)
 	{
 		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
 		return walker->cubicTo(ctrl1, ctrl2, to);
 	}
 
 private:
-
-	DynamicShape& _sh;
-
-	float _scale;
-
-	int moveTo(const FT_Vector* to)
+	
+    int moveTo(const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("moveTo: %ld,%ld", to->x, to->y);
 #endif
-        boost::int32_t  x = static_cast<boost::int32_t>(to->x * _scale);
-        boost::int32_t  y = static_cast<boost::int32_t>(to->y * _scale);
-		_sh.moveTo(x, -y);
+        _x = static_cast<boost::int32_t>(to->x * _scale);
+        _y = - static_cast<boost::int32_t>(to->y * _scale);
+        _currPath->close();
+        _shape.addPath(Path(_x, _y, 1, 0, 0, false));
+        _currPath = &_shape.currentPath();
 		return 0;
 	}
 
@@ -149,10 +163,10 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("lineTo: %ld,%ld", to->x, to->y);
 #endif
-		static const int swfVersion = 6; // we have no thickness, so 6 is fine
-        boost::int32_t  x = static_cast<boost::int32_t>(to->x * _scale);
-        boost::int32_t  y = static_cast<boost::int32_t>(to->y * _scale);
-		_sh.lineTo(x, -y, swfVersion);
+        _x = static_cast<boost::int32_t>(to->x * _scale);
+        _y = - static_cast<boost::int32_t>(to->y * _scale);
+		_currPath->drawLineTo(_x, _y);
+        expandBounds(_x, _y);
 		return 0;
 	}
 
@@ -161,12 +175,12 @@ private:
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
 #endif
-        boost::int32_t  x1 = static_cast<boost::int32_t>(ctrl->x * _scale);
-        boost::int32_t  y1 = static_cast<boost::int32_t>(ctrl->y * _scale);
-        boost::int32_t  x2 = static_cast<boost::int32_t>(to->x * _scale);
-        boost::int32_t  y2 = static_cast<boost::int32_t>(to->y * _scale);
-        static const int swfVersion = 6; // we have no thickness, so 6 is fine
-		_sh.curveTo(x1, -y1, x2, -y2, swfVersion);
+        boost::int32_t x1 = static_cast<boost::int32_t>(ctrl->x * _scale);
+        boost::int32_t y1 = static_cast<boost::int32_t>(ctrl->y * _scale);
+        _x = static_cast<boost::int32_t>(to->x * _scale);
+        _y = - static_cast<boost::int32_t>(to->y * _scale);
+		_currPath->drawCurveTo(x1, -y1, _x, _y);
+		expandBounds(x1, -y1, _x, _y);
 		return 0;
 	}
 
@@ -174,21 +188,47 @@ private:
 	cubicTo(const FT_Vector* ctrl1, const FT_Vector* ctrl2, const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-		log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x, ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
+		log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x,
+                ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
 #endif
-
 		float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
 		float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
         boost::int32_t x1 = static_cast<boost::int32_t>(x * _scale);
         boost::int32_t y1 = static_cast<boost::int32_t>(y * _scale);
-        boost::int32_t x2 = static_cast<boost::int32_t>(to->x * _scale);
-        boost::int32_t y2 = static_cast<boost::int32_t>(to->y * _scale);
+        _x = static_cast<boost::int32_t>(to->x * _scale);
+        _y = - static_cast<boost::int32_t>(to->y * _scale);
         
-		static const int swfVersion = 6; // we have no thickness, so 6 is fine
-		_sh.curveTo(x1, -y1, x2, -y2, swfVersion);
-		return 0;
+		_currPath->drawCurveTo(x1, -y1, _x, _y);
+		expandBounds(x1, -y1, _x, _y);
+        return 0;
 	}
+    
+    void expandBounds(int x, int y) {
+        rect bounds = _shape.getBounds();
+        if (_currPath->size() == 1) _currPath->expandBounds(bounds, 0, 6);
+        else {
+            bounds.expand_to_circle(x, y, 0);
+        }
+        _shape.setBounds(bounds);
+    }
 
+    void expandBounds(int ax, int ay, int cx, int cy) {
+        rect bounds = _shape.getBounds();
+        if (_currPath->size() == 1) _currPath->expandBounds(bounds, 0, 6);
+        else {
+            bounds.expand_to_circle(ax, ay, 0);
+            bounds.expand_to_circle(cx, cy, 0);
+        }
+        _shape.setBounds(bounds);
+    }
+
+    SWF::ShapeRecord& _shape;
+
+	const float _scale;
+
+    Path* _currPath;
+
+    boost::int32_t _x, _y;
 
 };
 
@@ -402,16 +442,18 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 #endif // ndef USE_FREETYPE 
 
 #ifdef USE_FREETYPE
-boost::intrusive_ptr<shape_character_def>
+std::auto_ptr<SWF::ShapeRecord>
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 {
-	boost::intrusive_ptr<DynamicShape> sh;
+    std::auto_ptr<SWF::ShapeRecord> glyph;
 
-	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP|FT_LOAD_NO_SCALE);
-	if ( error != 0 )
-	{
-		log_error("Error loading freetype outline glyph for char '%c' (error: %d)", code, error);
-		return sh.get();
+	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP | 
+                                                FT_LOAD_NO_SCALE);
+
+	if (error) {
+		log_error("Error loading freetype outline glyph for char '%c' "
+                "(error: %d)", code, error);
+		return glyph;
 	}
 
 	// Scale advance by current scale, to match expected output coordinate space
@@ -431,22 +473,13 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 			static_cast<char>((gf>>16)&0xff),
 			static_cast<char>((gf>>8)&0xff),
 			static_cast<char>(gf&0xff));
-		return 0;
+		return glyph;
 	}
-	//assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
 
 	FT_Outline* outline = &(m_face->glyph->outline);
 
-	//FT_BBox	glyphBox;
-	//FT_Outline_Get_BBox(outline, &glyphBox);
-	//rect r(glyphBox.xMin, glyphBox.yMin, glyphBox.xMax, glyphBox.yMax);
-	//log_debug("Glyph for character '%c' has computed bounds %s", code, r.toString().c_str());
-
-	sh = new DynamicShape();
-	sh->beginFill(rgba(255, 255, 255, 255));
-
 	FT_Outline_Funcs walk;
-       	walk.move_to = OutlineWalker::walkMoveTo;
+    walk.move_to = OutlineWalker::walkMoveTo;
 	walk.line_to = OutlineWalker::walkLineTo;
 	walk.conic_to = OutlineWalker::walkConicTo;
 	walk.cubic_to = OutlineWalker::walkCubicTo;
@@ -454,22 +487,27 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 	walk.delta = 0; // ?
 
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_debug("Decomposing glyph outline for character %u", code);
+	log_debug("Decomposing glyph outline for DisplayObject %u", code);
 #endif
+    
+    glyph.reset(new SWF::ShapeRecord);
 
-	OutlineWalker walker(*sh, scale);
+	OutlineWalker walker(*glyph, scale);
 
 	FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 	rect bound; sh->compute_bound(&bound, VM::get().getSWFVersion());
-	log_debug("Decomposed glyph for character '%c' has bounds %s",
+	log_debug("Decomposed glyph for DisplayObject '%c' has bounds %s",
 			code, bound.toString());
 #endif
 
-	return sh.get();
+    walker.finish();
+
+	return glyph;
 }
 #else // ndef(USE_FREETYPE)
-boost::intrusive_ptr<shape_character_def>
+
+std::auto_ptr<SWF::ShapeRecord>
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
 {
 	abort(); // should never be called... 

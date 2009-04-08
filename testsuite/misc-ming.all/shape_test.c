@@ -67,11 +67,11 @@ main(int argc, char** argv)
   
   it = SWFMovie_add(mo, (SWFBlock)sh1);  
   SWFDisplayItem_setName(it, "sh1"); 
-  SWFDisplayItem_setDepth(it, 3); //place the sh1 character at depth 3;
+  SWFDisplayItem_setDepth(it, 3); //place the sh1 DisplayObject at depth 3;
   
   it = SWFMovie_add(mo, (SWFBlock)sh2);  
   SWFDisplayItem_setName(it, "sh2"); 
-  SWFDisplayItem_setDepth(it, 4); //place the sh2 character at depth 4;
+  SWFDisplayItem_setDepth(it, 4); //place the sh2 DisplayObject at depth 4;
 
   check(mo, "sh1 != undefined");
   check(mo, "sh2 != undefined");

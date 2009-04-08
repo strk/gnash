@@ -59,7 +59,7 @@ public:
 	string_table::key getPrefix() const { return mPrefix; }
 
 	/// \brief
-	/// Create a namespace with the given characteristics. Such a namespace
+	/// Create a namespace with the given DisplayObjectistics. Such a namespace
 	/// will be empty upon creation.
 	Namespace(string_table::key uri, string_table::key prefix, kinds kind) :
 		mUri(uri), mPrefix(prefix), mKind(kind), mMembers()

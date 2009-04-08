@@ -905,7 +905,7 @@ sharedobject_ctor(const fn_call& /* fn */)
 
 /// Return true if the name is a valid SOL name.
 //
-/// The official docs claim that '%' is also an invalid character,
+/// The official docs claim that '%' is also an invalid DisplayObject,
 /// but that is incorrect (see actionscript.all/SharedObject.as)
 bool
 validateName(const std::string& solName)
@@ -914,7 +914,7 @@ validateName(const std::string& solName)
     std::string::size_type pos = solName.find("//");
     if (pos != std::string::npos) return false;
 
-    // These characters are also illegal
+    // These DisplayObjects are also illegal
     pos = solName.find_first_of(",~;\"'<&>?#:\\ ");
 
     return (pos == std::string::npos);

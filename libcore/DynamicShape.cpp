@@ -15,47 +15,43 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-
-
-
 #include "DynamicShape.h"
+#include "render.h"
 
-#include <algorithm>
-
+#include <vector>
 
 namespace gnash {
 
 DynamicShape::DynamicShape()
 	:
-	shape_character_def(),
 	_currpath(0),
 	_currfill(0),
 	_currline(0),
 	_x(0),
 	_y(0),
-	_changed(0)
+	_changed(false)
 {}
 
 void
 DynamicShape::clear()
 {
-	//clear_meshes();
-	_paths.clear();
-	_fill_styles.clear();
-	_line_styles.clear();
-	_bound.set_null();
-	_currpath=0; // or would point to invalid memory
-	_currfill = _currline = 0; // or would point to cleared m_fill_style and m_line_styles respectively
-
+	_shape.clear();
+	_currpath = 0; 
+	_currfill = _currline = 0; 
 	// TODO: worth setting _changed=true ? 
 }
 
 void
-DynamicShape::add_path(const path& pth)
+DynamicShape::display(const DisplayObject& inst)
 {
-	_paths.push_back(pth);
-	_currpath = &(_paths.back());
-	//compute_bound(&m_bound);
+    render::drawShape(_shape, inst.get_world_cxform(), inst.getWorldMatrix());
+}
+
+void
+DynamicShape::add_path(const Path& pth)
+{
+	_shape.addPath(pth);
+	_currpath = &_shape.currentPath();
 }
 
 void
@@ -86,7 +82,7 @@ DynamicShape::beginFill(const rgba& color)
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
 	add_path(newPath);
 }
 
@@ -102,7 +98,7 @@ DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
 	add_path(newPath);
 }
 
@@ -118,7 +114,7 @@ DynamicShape::beginRadialGradientFill(const std::vector<gradient_record>& grad, 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); 
 	add_path(newPath);
 }
 
@@ -128,18 +124,17 @@ DynamicShape::startNewPath(bool newShape)
 	// Close any pending filled path
 	if ( _currpath && _currfill) _currpath->close();
 
-	// The DrawingApiTest.swf file shows we should NOT
-	// necessarely end the current fill when starting a new one.
-	//endFill();
+	// The DrawingApiTest.swf file shows we should not
+	// end the current fill when starting a new one.
 
 	// A quick test shows that *left* always work fine !
 	// More than that, using a *right* fill seems to break the tests !
-	path newPath(_x, _y, _currfill, 0, _currline, newShape);
+	Path newPath(_x, _y, _currfill, 0, _currline, newShape);
 	add_path(newPath);
 }
 
 void
-DynamicShape::finalize()
+DynamicShape::finalize() const
 {
 	// Nothing to do if not changed
 	if ( ! _changed ) return;
@@ -147,8 +142,8 @@ DynamicShape::finalize()
 	// Close any pending filled path (_currpath should be last path)
 	if ( _currpath && _currfill)
 	{
-		assert(!_paths.empty());
-		assert(_currpath == &(_paths.back()));
+		assert(!_shape.paths().empty());
+		assert(_currpath == &(_shape.paths().back()));
 		_currpath->close();
 	}
 
@@ -200,19 +195,24 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 	_currpath->drawLineTo(x, y);
 
 	// Update bounds 
-	unsigned thickness = _currline ? _line_styles[_currline-1].getThickness() : 0;
+    rect bounds = _shape.getBounds();
+
+	unsigned thickness = _currline ? 
+        _shape.lineStyles()[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(_bound, thickness, swfVersion);
+		_currpath->expandBounds(bounds, thickness, swfVersion);
 	} else {
-		_bound.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
+		bounds.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
 	}
     
+    _shape.setBounds(bounds);
+
 	// Update current pen position
 	_x = x;
 	_y = y;
 
 	// Mark as changed
-	changed();
+	_changed = true;
 }
 
 void
@@ -224,46 +224,42 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
 
 	_currpath->drawCurveTo(cx, cy, ax, ay);
 
-	// Update bounds 
-	unsigned thickness = _currline ? _line_styles[_currline-1].getThickness() : 0;
+    rect bounds = _shape.getBounds();
+
+	unsigned thickness = _currline ? 
+        _shape.lineStyles()[_currline-1].getThickness() : 0;
 	if ( _currpath->size() == 1 ) {
-		_currpath->expandBounds(_bound, thickness, swfVersion);
+		_currpath->expandBounds(bounds, thickness, swfVersion);
 	}
     else {
-		_bound.expand_to_circle(ax, ay, 
+		bounds.expand_to_circle(ax, ay, 
                 swfVersion < 8 ? thickness : thickness/2.0);
-		_bound.expand_to_circle(cx, cy,
+		bounds.expand_to_circle(cx, cy,
                 swfVersion < 8 ? thickness : thickness/2.0);
     }
+
+    _shape.setBounds(bounds);
 
 	// Update current pen position
 	_x = ax;
 	_y = ay;
 
 	// Mark as changed
-	changed();
+	_changed = true;
 }
 
 size_t
 DynamicShape::add_fill_style(const fill_style& stl)
 {
-	FillStyles& v = _fill_styles;
-
-	// TODO: check if the style is already in our list
-	//       (needs operator== defined for fill_style)
-	v.push_back(stl);
-	return v.size(); // 1-based !
+    _shape.addFillStyle(stl);
+    return _shape.fillStyles().size();
 }
 
 size_t
 DynamicShape::add_line_style(const line_style& stl)
 {
-	LineStyles& v = _line_styles;
-
-	// TODO: check if the style is already in our list
-	//       (needs operator== defined for line_style)
-	v.push_back(stl);
-	return v.size(); // 1-based !
+    _shape.addLineStyle(stl);
+    return _shape.lineStyles().size();
 }
 	
 }	// end namespace gnash

@@ -17,7 +17,7 @@
  */ 
 
 /*
- * Test "Jumping backward to the start of two character's lifetime after depth swap"
+ * Test "Jumping backward to the start of two DisplayObject's lifetime after depth swap"
  *
  * Timeline:
  * 
@@ -32,13 +32,13 @@
  *
  * Description:
  *
- *  frame2: two static characters are placed, both by PlaceObject2,
+ *  frame2: two static DisplayObjects are placed, both by PlaceObject2,
  *          one in the static zone, one in the dynamic zone
  *  frame4: jump to frame 1 and stop.
  *
  * Expected behaviour:
  *
- * The static characters placed out of the static depth zone
+ * The static DisplayObjects placed out of the static depth zone
  * get NOT removed on jump back. 
  *
  * run as ./loop_test9
@@ -87,7 +87,7 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: Place two static characters
+  // Frame 2: Place two static DisplayObjects
 
   sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   mc1 = newSWFMovieClip();

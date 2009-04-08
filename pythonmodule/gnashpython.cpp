@@ -32,6 +32,8 @@
 #include "SystemClock.h"
 #include "log.h"
 #include "rc.h"
+#include "StreamProvider.h" // for passing to RunInfo
+#include "RunInfo.h" // for initialization
 
 #include <string>
 #include <memory>
@@ -50,6 +52,18 @@ namespace pythonwrapper {
 std::deque<std::string> GnashPlayer::_logMessages;
 
 GnashPlayer::GnashPlayer()
+	:
+    _movieDef(NULL),
+    _movieRoot(NULL),
+    _renderer(NULL),
+    _logFile(gnash::LogFile::getDefaultInstance()),
+    _xpos(0),
+    _ypos(0),
+    _url("")
+{
+}
+
+GnashPlayer::GnashPlayer(const GnashPlayer& o)
 	:
     _movieDef(NULL),
     _movieRoot(NULL),
@@ -117,7 +131,7 @@ GnashPlayer::close()
 
 // Set our _url member and pass this to the core.
 void
-GnashPlayer::setBaseURL(std::string url)
+GnashPlayer::setBaseURL(const std::string& url)
 {
 
     // Don't allow empty urls
@@ -125,10 +139,11 @@ GnashPlayer::setBaseURL(std::string url)
 
     _url = url;
 
-    // Pass the base URL to the core libs. We can only do this
-    // once! Checking if it's been set when it hasn't trigger
-    // an assertion failure...
-    gnash::set_base_url( (gnash::URL)_url );
+
+    /// The RunInfo should be populated before parsing.
+    _runInfo.reset(new RunInfo(url));
+    _runInfo->setStreamProvider(boost::shared_ptr<StreamProvider>(
+                new StreamProvider));
 }
 
 
@@ -158,42 +173,25 @@ GnashPlayer::loadMovie(PyObject& pf)
     // Fail if base URL not set
     if (_url == "") return false;
 
-    std::auto_ptr<tu_file> in(noseek_fd_adapter::make_stream(fileno(file)));
+    std::auto_ptr<IOChannel> in(noseek_fd_adapter::make_stream(fileno(file)));
       
-    _movieDef = gnash::create_movie(in, _url, false);
+    _movieDef = gnash::create_movie(in, _url, *_runInfo, false);
     
     if (!_movieDef) {
         return false;
     }
+
+	_movieRoot = new movie_root(*_movieDef, _manualClock, *_runInfo);
+
+	_movieDef->completeLoad();
+	_movieDef->ensure_frame_loaded(_movieDef->get_frame_count());
+
+	std::auto_ptr<movie_instance> mi ( _movieDef->create_movie_instance() );
+
+	// Finally, place the root movie on the stage ...
+    _movieRoot->setRootMovie( mi.release() );
     
     return true;
-}
-
-
-bool
-GnashPlayer::initVM()
-{
-
-    if (!_movieDef || _movieRoot ) return false;
-
-    // Initialize the VM with a manual clock
-    _movieRoot = &(gnash::VM::init(*_movieDef, _manualClock).getRoot());
-
-    if (!_movieRoot) {
-        // Something didn't work
-        return false;
-    }
-    
-    _movieDef->completeLoad();
-    _movieDef->ensure_frame_loaded(getSWFFrameCount());
-
-    // I don't know why it's done like this.
-    std::auto_ptr<movie_instance> mi (_movieDef->create_movie_instance());
-
-    // Put the instance on stage.
-    _movieRoot->setRootMovie( mi.release() ); 
-   
-    return true; 
 }
 
 
@@ -260,7 +258,7 @@ void
 GnashPlayer::restart()
 {
     REQUIRE_VM_STARTED;
-    _movieRoot->getRootMovie()->restart();
+    _movieRoot->reset();
 }
 
 // The number of bytes already loaded.
@@ -436,11 +434,25 @@ GnashPlayer::render(bool forceRedraw)
 //
 
 GnashCharacter*
+GnashPlayer::getCharacterByTarget(const std::string& tgt)
+{
+    REQUIRE_VM_STARTED;
+
+    gnash::DisplayObject* c = _movieRoot->findCharacterByTarget(tgt);
+    
+    if (!c) return NULL;
+    
+    GnashCharacter* chr(new GnashCharacter(c));
+
+    return chr;
+}
+
+GnashCharacter*
 GnashPlayer::getCharacterById(int id)
 {
     REQUIRE_VM_STARTED;
 
-    gnash::character* c = _movieRoot->getRootMovie()->get_character(id);
+    gnash::DisplayObject* c = _movieRoot->getRootMovie()->getDisplayObject(id);
     
     if (!c) return NULL;
     
@@ -454,7 +466,7 @@ GnashPlayer::getTopmostMouseEntity()
 {
     REQUIRE_VM_STARTED;
 
-    gnash::character* c = _movieRoot->getActiveEntityUnderPointer();
+    gnash::DisplayObject* c = _movieRoot->getActiveEntityUnderPointer();
     
     if (!c) return NULL;
     
@@ -463,7 +475,7 @@ GnashPlayer::getTopmostMouseEntity()
     return chr;
 }
 
-GnashCharacter::GnashCharacter(gnash::character* c)
+GnashCharacter::GnashCharacter(gnash::DisplayObject* c)
     :
     _character(c)
 {
@@ -484,7 +496,7 @@ GnashCharacter::~GnashCharacter()
 GnashCharacter*
 GnashCharacter::getParent()
 {
-    gnash::character* c = _character->get_parent();
+    gnash::DisplayObject* c = _character->get_parent();
 
     if (!c) return NULL;
     

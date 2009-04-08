@@ -20,26 +20,30 @@
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
 
-#include "shape_character_def.h"  // for inheritance
-#include "styles.h" // for cap_style_e and join_style_e enums
-
+#include "fill_style.h"
+#include "styles.h" 
+#include "swf/ShapeRecord.h"
 
 namespace gnash {
-    class fill_style;
+    class DisplayObject;
 }
 
 namespace gnash {
 
-/// \brief
-/// Represents the outline of one or more shapes, along with
-/// information on fill and line styles.
-class DynamicShape : public shape_character_def
+/// The DynamicShape class represents a mutable shape.
+//
+/// It is provides mutating functions for the SWF::ShapeRecord class that
+/// are used in the Flash drawing API.
+//
+/// DynamicShape objects are not refcounted, so must be stack-allocated or
+/// wrapped in smart pointers.
+class DynamicShape
 {
 public:
 
 	DynamicShape();
 
-	virtual ~DynamicShape() {}
+	~DynamicShape() {}
 
 	/// Remove all paths and style informations
 	void clear();
@@ -60,13 +64,26 @@ public:
 	void beginFill(const rgba& color);
 
 	/// Start drawing with a linear gradient fill
-	void beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat);
+	void beginLinearGradientFill(const std::vector<gradient_record>& grad,
+            const SWFMatrix& mat);
 
 	/// Start drawing with a radial gradient fill
-	void beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat);
+	void beginRadialGradientFill(const std::vector<gradient_record>& grad,
+            const SWFMatrix& mat);
 
 	/// Close an existing filled path, if any.
 	void endFill();
+
+    const rect& getBounds() const {
+        return _shape.getBounds();
+    }
+
+    void setBounds(const rect& bounds) {
+        _shape.setBounds(bounds);
+    }
+
+    /// Display a DynamicShape object.
+    void display(const DisplayObject& inst);
 
 	/// Set current line style and start a new path.
 	//
@@ -122,11 +139,11 @@ public:
 	///
 	size_t add_line_style(const line_style& stl);
 
-	// Override from shape_character_def to call ::finalize
+	// Override from DefineShapeTag to call ::finalize
 	// NOTE: this is not correct in that a call to hitTest should
 	//       not force closing the path being drawn.
-	//       Instead, the closeup should be "temporary" and int
-	//       the point_test_local itself (but only for dynamic drawing).
+	//       Instead, the closeup should be "temporary" and in
+	//       the pointTestLocal itself (but only for dynamic drawing).
 	//       We need to add a testcase for this as we currently have none.
 	//       The testcase would look like this:
 	//
@@ -139,12 +156,17 @@ public:
 	//       would result in a triangle and a stroke, which should fail the last hitTest(2,8).
 	//
 	//
-	bool point_test_local(boost::int32_t x, boost::int32_t y,
-            const SWFMatrix& wm)
+	bool pointTestLocal(boost::int32_t x, boost::int32_t y,
+            const SWFMatrix& wm) const
 	{
 		finalize();
-		return shape_character_def::point_test_local(x, y, wm);
+		return geometry::pointTest(_shape.paths(), _shape.lineStyles(), x, y,
+                wm);
 	}
+
+    const SWF::ShapeRecord& shapeRecord() const {
+        return _shape;
+    }
 
 	/// Add a path, updating _currpath and recomputing bounds
 	//
@@ -152,13 +174,13 @@ public:
 	///       It needs this function unless we provide a mean to add a
 	///	  Bitmap-Filled path	
 	///
-	void add_path(const path& pth);
+	void add_path(const Path& pth);
 
 	/// Always call this function before displaying !
 	//
 	/// It will take care of cleaning up the drawing
 	/// and setting up correct fill styles
-	void finalize();
+	void finalize() const;
 
 private:
 
@@ -170,10 +192,9 @@ private:
 	/// for origin, fill and line styles.
 	///
 	/// If newShape is true the new shape will start a new subshape.
-	///
 	void startNewPath(bool newShape);
 
-	path* _currpath;
+	Path* _currpath;
 
 	size_t _currfill;
 
@@ -185,10 +206,12 @@ private:
 	// Current pen Y position
 	boost::int32_t  _y;
 
-	// Call this function when the drawing changes !
-	void changed() { _changed = true; }
+	mutable bool _changed;
 
-	bool _changed;
+    /// The actual SWF::ShapeRecord wrapped by this class.
+    //
+    /// Mutable for lazy finalization.
+    mutable SWF::ShapeRecord _shape;
 };
 
 }	// end namespace gnash

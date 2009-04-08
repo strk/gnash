@@ -56,6 +56,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/asobj \
+        -I$(top_srcdir)/libcore/swf \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/vm \
         -DLOCALEDIR=\"$(localedir)\" \

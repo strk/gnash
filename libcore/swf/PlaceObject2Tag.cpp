@@ -22,7 +22,7 @@
 #endif
 
 #include "PlaceObject2Tag.h"
-#include "character.h"
+#include "DisplayObject.h"
 #include "MovieClip.h"
 #include "swf_event.h"
 #include "log.h"
@@ -38,11 +38,11 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
 {
     // Original place_object tag; very simple.
     in.ensureBytes(2 + 2);
-    m_character_id = in.read_u16();
-    m_depth = in.read_u16() + character::staticDepthOffset;
+    _id = in.read_u16();
+    m_depth = in.read_u16() + DisplayObject::staticDepthOffset;
 
     // PlaceObject doesn't know about masks.
-    m_clip_depth = character::noClipDepthValue;
+    m_clip_depth = DisplayObject::noClipDepthValue;
 
     // If these flags2 values aren't set here, nothing will
     // ever be displayed.
@@ -62,8 +62,8 @@ PlaceObject2Tag::readPlaceObject(SWFStream& in)
     IF_VERBOSE_PARSE
     (
             log_parse(_("  PLACEOBJECT: depth=%d(%d) char=%d"),
-            	m_depth, m_depth - character::staticDepthOffset,
-            	m_character_id);
+            	m_depth, m_depth - DisplayObject::staticDepthOffset,
+            	_id);
             if (hasMatrix()) log_parse("  SWFMatrix: %s", m_matrix);
             if (hasCxform()) log_parse(_("  cxform: %s"), m_color_transform);
     );
@@ -258,12 +258,12 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
     // PlaceObject2 specific flags
     m_has_flags2 = in.read_u8();
 
-    m_depth = in.read_u16()+character::staticDepthOffset;
+    m_depth = in.read_u16()+DisplayObject::staticDepthOffset;
 
     if ( hasCharacter( ))
     {
         in.ensureBytes(2);
-        m_character_id = in.read_u16();
+        _id = in.read_u16();
     }
 
     if ( hasMatrix() )
@@ -290,11 +290,11 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
     if ( hasClipDepth() )
     {
         in.ensureBytes(2);
-        m_clip_depth = in.read_u16() + character::staticDepthOffset;
+        m_clip_depth = in.read_u16() + DisplayObject::staticDepthOffset;
     }
     else
     {
-        m_clip_depth = character::noClipDepthValue;
+        m_clip_depth = DisplayObject::noClipDepthValue;
     }
 
     if ( hasClipActions() )
@@ -304,8 +304,8 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
 
     IF_VERBOSE_PARSE (
         log_parse(_("  PLACEOBJECT2: depth = %d (%d)"),
-            m_depth, m_depth-character::staticDepthOffset);
-        if ( hasCharacter() ) log_parse(_("  char id = %d"), m_character_id);
+            m_depth, m_depth-DisplayObject::staticDepthOffset);
+        if ( hasCharacter() ) log_parse(_("  char id = %d"), _id);
         if ( hasMatrix() )
         {
             log_parse(_("  SWFMatrix: %s"), m_matrix);
@@ -316,7 +316,7 @@ PlaceObject2Tag::readPlaceObject2(SWFStream& in)
         }
         if ( hasRatio() ) log_parse(_("  ratio: %d"), m_ratio);
         if ( hasName() ) log_parse(_("  name = %s"), m_name.c_str());
-        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
+        if ( hasClipDepth() ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-DisplayObject::staticDepthOffset);
         log_parse(_(" m_place_type: %d"), getPlaceType() );
     );
 
@@ -339,7 +339,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     boost::uint8_t bitmask = 0;
     std::string className;
 
-    m_depth = in.read_u16() + character::staticDepthOffset;
+    m_depth = in.read_u16() + DisplayObject::staticDepthOffset;
 
     // This is documented to be here, but real instances of 
     // tags with either className or hasImage defined are rare to
@@ -352,7 +352,7 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 
     if (hasCharacter()) {
         in.ensureBytes(2);
-        m_character_id = in.read_u16();
+        _id = in.read_u16();
     }
 
     if (hasMatrix()) {
@@ -374,10 +374,10 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
 
     if (hasClipDepth()) {
         in.ensureBytes(2);
-        m_clip_depth = in.read_u16()+character::staticDepthOffset;
+        m_clip_depth = in.read_u16()+DisplayObject::staticDepthOffset;
     }
     else {
-        m_clip_depth = character::noClipDepthValue;
+        m_clip_depth = DisplayObject::noClipDepthValue;
     }
 
     if ( hasFilters() )
@@ -417,15 +417,15 @@ PlaceObject2Tag::readPlaceObject3(SWFStream& in)
     IF_VERBOSE_PARSE (
 
         log_parse(_("  PLACEOBJECT3: depth = %d (%d)"), m_depth,
-            m_depth - character::staticDepthOffset);
-        if (hasCharacter()) log_parse(_("  char id = %d"), m_character_id);
+            m_depth - DisplayObject::staticDepthOffset);
+        if (hasCharacter()) log_parse(_("  char id = %d"), _id);
         if (hasMatrix()) log_parse(_("  SWFMatrix: %s"), m_matrix);
         if (hasCxform()) log_parse(_("  cxform: %d"), m_color_transform);
         if (hasRatio()) log_parse(_("  ratio: %d"), m_ratio);
         if (hasName()) log_parse(_("  name = %s"), m_name);
         if (hasClassName()) log_parse(_("  class name = %s"), className);
         if (hasClipDepth()) log_parse(_("  clip_depth = %d (%d)"),
-                    m_clip_depth, m_clip_depth-character::staticDepthOffset);
+                    m_clip_depth, m_clip_depth-DisplayObject::staticDepthOffset);
         if (hasBitmapCaching()) log_parse(_("   bitmapCaching enabled"));
         log_parse(_(" m_place_type: %d"), getPlaceType());
     );

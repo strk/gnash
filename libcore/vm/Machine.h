@@ -32,7 +32,7 @@
 
 namespace gnash {
 
-class character;
+class DisplayObject;
 class as_object;
 class abc_block;
 class asName;
@@ -58,12 +58,12 @@ class Machine
 {
 public:
 	// Flash specific members.
-	/// The character which initiated these actions.
-	character *getTarget();
+	/// The DisplayObject which initiated these actions.
+	DisplayObject *getTarget();
 
-	/// Set the character which initiated the actions.
+	/// Set the DisplayObject which initiated the actions.
 	/// Not null.
-	void setTarget(character* target);
+	void setTarget(DisplayObject* target);
 
 	/// This will complete a name in AS3, where a part of the name
 	/// is stored in the stream and another part may be stored on

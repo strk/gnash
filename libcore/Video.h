@@ -17,10 +17,11 @@
 
 // 
 
-#ifndef GNASH_VIDEO_STREAM_INSTANCE_H
-#define GNASH_VIDEO_STREAM_INSTANCE_H
+#ifndef GNASH_VIDEO_H
+#define GNASH_VIDEO_H
 
-#include "character.h" // for inheritance
+#include "DisplayObject.h" // for inheritance
+#include "swf/DefineVideoStreamTag.h"
 
 // Forward declarations
 namespace gnash {
@@ -42,30 +43,28 @@ namespace gnash {
 /// embedded into the SWF itself or loaded from the
 /// network using an associated NetStream object.
 ///
-class Video : public character
+class Video : public DisplayObject
 {
 
 public:
-
-	boost::intrusive_ptr<SWF::DefineVideoStreamTag> m_def;
 	
-	Video(SWF::DefineVideoStreamTag* def, character* parent,
+	Video(SWF::DefineVideoStreamTag* def, DisplayObject* parent,
             int id);
 
 	~Video();
 
 	virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const
 	{
-		// video character shape is always a rectangle..
+		// video DisplayObject shape is always a rectangle..
 		return pointInBounds(x, y);
 	}
 
-	rect getBounds() const;
+	virtual rect getBounds() const;
 
 	/// We use the call to ::advance to properly set invalidated status
 	virtual void advance();
 
-	/// Register this video instance as a live character
+	/// Register this video instance as a live DisplayObject
 	virtual void stagePlacementCallback(as_object* initObj = 0);
 
 	void display();
@@ -106,10 +105,10 @@ public:
     void setSmoothing(bool b) { _smoothing = b; }
 
 protected:
-
+    
 #ifdef GNASH_USE_GC
 	/// Mark video-specific reachable resources and invoke
-	/// the parent's class version (markCharacterReachable)
+	/// the parent's class version (markDisplayObjectReachable)
 	//
 	/// video-specific reachable resources are:
 	///	- Associated NetStream if any (_ns) 
@@ -128,7 +127,9 @@ private:
 	/// Get video frame to be displayed
 	GnashImage* getVideoFrame();
 
-	// Who owns this ? Should it be an intrusive ptr ?
+	const boost::intrusive_ptr<SWF::DefineVideoStreamTag> m_def;
+
+    // Who owns this ? Should it be an intrusive ptr ?
 	boost::intrusive_ptr<NetStream_as> _ns;
 
 	/// Playing an embbeded video stream ?

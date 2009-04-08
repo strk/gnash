@@ -62,7 +62,7 @@ public:
 
 	/// \brief
 	/// Return an integer that indicates the indentation from the left
-    /// margin to the first character in the paragraph
+    /// margin to the first DisplayObject in the paragraph
 	boost::uint16_t indent() const { return _indent; }
 	bool indentDefined() const { return _flags&DEFindent; }
 
@@ -208,7 +208,7 @@ private:
 	std::string _font;	
 
 	/// An integer that indicates the indentation from the left
-    /// margin to the first character in the paragraph (twips)
+    /// margin to the first DisplayObject in the paragraph (twips)
 	boost::uint16_t _indent;
 
 	/// A number that indicates the amount of leading vertical

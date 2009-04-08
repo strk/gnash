@@ -102,6 +102,7 @@ public:
     void read_rgba(SWFStream& in);
 
     friend bool operator== (const cxform&, const cxform&);
+    friend bool operator!= (const cxform&, const cxform&);
 	
     friend std::ostream& operator<< (std::ostream& os, const cxform& cx);
 
@@ -110,17 +111,23 @@ public:
 };
 
 
-inline bool operator== (const cxform& a, const cxform& b)
+inline bool
+operator== (const cxform& a, const cxform& b)
 {
-	return	
-		a.ra == b.ra &&
-		a.rb == b.rb &&
-		a.ga == b.ga &&
-		a.gb == b.gb &&
-		a.ba == b.ba &&
-		a.bb == b.bb &&
-		a.aa == b.aa &&
-		a.ab == b.ab;
+	return	a.ra == b.ra &&
+            a.rb == b.rb &&
+            a.ga == b.ga &&
+            a.gb == b.gb &&
+            a.ba == b.ba &&
+            a.bb == b.bb &&
+            a.aa == b.aa &&
+            a.ab == b.ab;
+}
+
+inline bool
+operator!=(const cxform& a, const cxform& b)
+{
+    return !(a == b);
 }
 
 }	// namespace gnash

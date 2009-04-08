@@ -63,18 +63,9 @@ void define_bits_jpeg2_loader(SWFStream&, TagType, movie_definition&,
 void define_bits_jpeg3_loader(SWFStream&, TagType, movie_definition&,
 		const RunInfo&);
 
-void define_shape_loader(SWFStream&, TagType, movie_definition&,
-		const RunInfo&);
-
-void define_shape_morph_loader(SWFStream&, TagType, movie_definition&,
-		const RunInfo&);
-
 /// SWF Tags Reflex (777)
 //
 void reflex_loader(SWFStream&, TagType, movie_definition&,
-		const RunInfo&);
-
-void place_object_2_loader(SWFStream&, TagType, movie_definition&,
 		const RunInfo&);
 
 void define_bits_lossless_2_loader(SWFStream&, TagType, movie_definition&,
