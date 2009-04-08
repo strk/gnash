@@ -1464,7 +1464,7 @@ void MovieClip::display()
     //             be NULL and gnash will segfault
     //             Thus, this drawable_instance is basically just
     //             a container for a parent :(
-    _drawable_inst->display();
+    _drawable->display(*this);
     
     
     // descend the display list
