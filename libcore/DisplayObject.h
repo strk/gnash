@@ -460,6 +460,11 @@ public:
         return bounds.point_test(x, y);
     }
 
+    /// Return true if the given point falls in this DisplayObject's shape
+    //
+    /// @param x        Point x coordinate in world space
+    /// @param y        Point y coordinate in world space
+    /// @return         Whether (x, y) is within the DisplayObject's bounds.
 	virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const = 0;
 
     /// true if the given point falls in this DisplayObject's visible shape

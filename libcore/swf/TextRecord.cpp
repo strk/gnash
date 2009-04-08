@@ -145,7 +145,7 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 // Render the given glyph records.
 void
 TextRecord::displayRecords(const SWFMatrix& this_mat,
-        const DisplayObject& inst, const std::vector<SWF::TextRecord>& records,
+        const DisplayObject& inst, const std::vector<TextRecord>& records,
         bool embedded)
 {
 
@@ -195,7 +195,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
                 je = rec.glyphs().end(); j != je; ++j)
         {
             // the glyph entry
-            const SWF::TextRecord::GlyphEntry& ge = *j;
+            const TextRecord::GlyphEntry& ge = *j;
 
             const int index = ge.index;
                 

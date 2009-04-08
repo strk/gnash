@@ -164,7 +164,7 @@ public:
     void    transform(rect& r) const;
     
     /// Invert this SWFMatrix and return the result.
-    const SWFMatrix& invert();
+    SWFMatrix& invert();
     
     /// return the magnitude scale of our x coord output
     double   get_x_scale() const;

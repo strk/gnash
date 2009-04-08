@@ -37,6 +37,13 @@ StaticText::getStaticText(std::vector<const SWF::TextRecord*>& to,
     return 0;
 }
 
+void
+StaticText::setSelectionColor(boost::uint32_t color)
+{
+    // Drop any alpha value
+    _selectionColor.parseRGB(color & 0xffffff);
+}
+
 bool
 StaticText::pointInShape(boost::int32_t /*x*/, boost::int32_t /*y*/) const
 {

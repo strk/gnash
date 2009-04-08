@@ -74,7 +74,7 @@ private:
     /// The current bitmap information is stored here.
     boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
 
-    /// FIXME: using DefineShapeTag is unpleasant.
+    /// A shape to hold the bitmap fill.
     DynamicShape _shape;
 
     /// This is cached to save querying the BitmapData often

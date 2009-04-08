@@ -484,8 +484,6 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
     :
     InteractiveObject(parent, id),
     m_root(r),
-    _drawable(new DynamicShape()),
-    _drawable_inst(new Shape(_drawable, this, 0)),
     m_play_state(PLAY),
     m_current_frame(0),
     m_has_looped(false),
@@ -774,7 +772,6 @@ MovieClip::add_empty_movieclip(const std::string& name, int depth)
 boost::intrusive_ptr<DisplayObject>
 MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float width, float height)
 {
-    // Create a definition (TODO: cleanup this thing, definitions should be immutable!)
     
     // Set textfield bounds
     rect bounds(0, 0, pixelsToTwips(width), pixelsToTwips(height));
@@ -829,7 +826,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_event_handlers(get_event_handlers());
 
     // Copy drawable
-    newmovieclip->_drawable.reset(new DynamicShape(*_drawable));
+    newmovieclip->_drawable = _drawable;
     
     newmovieclip->set_cxform(get_cxform());    
     newmovieclip->copyMatrix(*this); // copy SWFMatrix and caches
@@ -1442,29 +1439,17 @@ bool MovieClip::goto_labeled_frame(const std::string& label)
 
 void MovieClip::display()
 {
-    //GNASH_REPORT_FUNCTION;
 
     // Note: 
     // DisplayList::Display() will take care of the visibility checking.
     //
-    // Whether a DisplayObject should be rendered or not is dependent on its parent.
-    // i.e. if its parent is a mask, this DisplayObject should be rendered to the mask
-    // buffer even it is invisible.
-    //
-
+    // Whether a DisplayObject should be rendered or not is dependent
+    // on its parent: i.e. if its parent is a mask, this DisplayObject
+    // should be rendered to the mask buffer even it is invisible.
     
     // render drawable (ActionScript generated graphics)
-    
-    _drawable->finalize();
-    // TODO: I'd like to draw the definition directly..
-    //             but it seems that the backend insists in
-    //             accessing the *parent* of the DisplayObject
-    //             passed as "instance" for the drawing.
-    //             When displaying top-level movie this will
-    //             be NULL and gnash will segfault
-    //             Thus, this drawable_instance is basically just
-    //             a container for a parent :(
-    _drawable_inst->display();
+    _drawable.finalize();
+    _drawable.display(*this);
     
     
     // descend the display list
@@ -1696,7 +1681,7 @@ MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
     ShapeContainerFinder finder(x, y);
     const_cast<DisplayList&>(m_display_list).visitBackward(finder);
     if ( finder.hitFound() ) return true;
-    return _drawable_inst->pointInShape(x, y); 
+    return hitTestDrawable(x, y);
 }
 
 bool
@@ -1724,35 +1709,34 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
     }
     VisibleShapeContainerFinder finder(x, y);
     const_cast<DisplayList&>(m_display_list).visitBackward(finder);
-    if ( finder.hitFound() ) return true;
-    return _drawable_inst->pointInVisibleShape(x, y); 
+    if (finder.hitFound()) return true;
+    return hitTestDrawable(x, y);
+}
+
+inline bool
+MovieClip::hitTestDrawable(boost::int32_t x, boost::int32_t y) const
+{
+    SWFMatrix wm = getWorldMatrix();
+    wm.invert();
+    point lp(x, y);
+    wm.transform(lp);
+    if (!_drawable.getBounds().point_test(lp.x, lp.y)) return false;
+    return _drawable.pointTestLocal(lp.x, lp.y, wm);
 }
 
 bool
 MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
 {
-    if ( isDynamicMask() && !mouseEnabled() )
-    {
-        return false;
-    }
+    if (isDynamicMask() && !mouseEnabled()) return false;
 
-    DisplayObject* mask = getMask(); 
-    if ( mask && ! mask->pointInShape(x, y) )
-    {
-        return false;
-    }
+    const DisplayObject* mask = getMask(); 
+    if (mask && !mask->pointInShape(x, y)) return false;
             
     HitableShapeContainerFinder finder(x, y);
     m_display_list.visitBackward(finder);
-
-    if ( finder.hitFound() )
-    {
-        return true;
-    } 
-    else
-    {
-        return _drawable_inst->pointInShape(x, y); 
-    }
+    if (finder.hitFound()) return true; 
+    
+    return hitTestDrawable(x, y); 
 }
 
 InteractiveObject*
@@ -1789,9 +1773,8 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     m_display_list.visitAll(finder);
     InteractiveObject* ch = finder.getEntity();
 
-    // It doesn't make any sense to query _drawable_inst, as it's
-    // a generic DisplayObject and not a referencable DisplayObject.
-
+    // It doesn't make any sense to query _drawable, as it's
+    // not an InteractiveObject.
     return ch; 
 }
 
@@ -1927,12 +1910,9 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
     }
 
     // does it hit us ?
-    if ( _drawable_inst->pointInVisibleShape(x, y) )
-    {
-        return this;
-    }
+    if (hitTestDrawable(x, y)) return this;
 
-    return NULL;
+    return 0;
 }
 
 bool
@@ -2097,7 +2077,10 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
     
     m_display_list.add_invalidated_bounds(ranges, force||m_invalidated);
 
-    _drawable_inst->add_invalidated_bounds(ranges, force||m_invalidated);
+    /// Add drawable.
+    rect bounds;
+    bounds.expand_to_transformed_rect(getWorldMatrix(), _drawable.getBounds());
+    ranges.add(bounds.getRange());
 
 }
 
@@ -2323,10 +2306,7 @@ MovieClip::unload()
     // We won't be displayed again, so worth releasing
     // some memory. The drawable might take a lot of memory
     // on itself.
-    _drawable->clear();
-    // TODO: drop the _drawable_inst too ?
-    //             it would require _drawable_inst to possibly be NULL,
-    //             which wouldn't be bad at all actually...
+    _drawable.clear();
 
     bool selfHaveUnloadHandler = DisplayObject::unload();
 
@@ -2562,7 +2542,7 @@ MovieClip::getBounds() const
     rect bounds;
     BoundsFinder f(bounds);
     const_cast<DisplayList&>(m_display_list).visitAll(f);
-    rect drawableBounds = _drawable->getBounds();
+    rect drawableBounds = _drawable.getBounds();
     bounds.expand_to_rect(drawableBounds);
     
     return bounds;
@@ -2646,8 +2626,6 @@ MovieClip::markReachableResources() const
     ReachableMarker marker;
 
     m_display_list.visitAll(marker);
-
-    _drawable_inst->setReachable();
 
     m_as_environment.markReachableResources();
 

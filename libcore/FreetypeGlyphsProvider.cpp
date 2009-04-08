@@ -507,7 +507,7 @@ FreetypeGlyphsProvider::getGlyph(boost::uint16_t code, float& advance)
 }
 #else // ndef(USE_FREETYPE)
 
-SWF::ShapeRecord*
+std::auto_ptr<SWF::ShapeRecord>
 FreetypeGlyphsProvider::getGlyph(boost::uint16_t, float& advance)
 {
 	abort(); // should never be called... 

@@ -696,7 +696,7 @@ public:
         join_style_e joinStyle=JOIN_ROUND,
         float miterLimitFactor=1.0f)
     {
-        _drawable->lineStyle(thickness, color, vScale, hScale,
+        _drawable.lineStyle(thickness, color, vScale, hScale,
             pixelHinting, noClose,
             startCapStyle, endCapStyle, joinStyle,
             miterLimitFactor);
@@ -704,51 +704,51 @@ public:
 
     void resetLineStyle()
     {
-        _drawable->resetLineStyle();
+        _drawable.resetLineStyle();
     }
 
     void beginFill(const rgba& color)
     {
-        _drawable->beginFill(color);
+        _drawable.beginFill(color);
     }
 
     void beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
     {
-        _drawable->beginLinearGradientFill(grad, mat);
+        _drawable.beginLinearGradientFill(grad, mat);
     }
 
     void beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
     {
-        _drawable->beginRadialGradientFill(grad, mat);
+        _drawable.beginRadialGradientFill(grad, mat);
     }
 
     void endFill()
     {
-        _drawable->endFill();
+        _drawable.endFill();
     }
 
     void moveTo(boost::int32_t x, boost::int32_t y)
     {
-        _drawable->moveTo(x, y);
+        _drawable.moveTo(x, y);
     }
 
     void lineTo(boost::int32_t x, boost::int32_t y)
     {
         set_invalidated();
-        _drawable->lineTo(x, y, getSWFVersion());
+        _drawable.lineTo(x, y, getSWFVersion());
     }
 
     void curveTo(boost::int32_t cx, boost::int32_t cy, 
                  boost::int32_t ax, boost::int32_t ay)
     {
         set_invalidated();
-        _drawable->curveTo(cx, cy, ax, ay, getSWFVersion());
+        _drawable.curveTo(cx, cy, ax, ay, getSWFVersion());
     }
 
     void clear()
     {
         set_invalidated();
-        _drawable->clear();
+        _drawable.clear();
     }
 
     /// Set focus to this MovieClip
@@ -820,19 +820,23 @@ private:
     ///
     void registerAsListener();
 
-    /// \brief
-    /// Return value of the 'enabled' property, casted to a boolean value.
-    /// True if not found (undefined to bool evaluates to false).
+    /// Return value of the 'enabled' property cast to a boolean value.
+    //
+    /// This is true if not found (undefined to bool evaluates to false).
     //
     /// When a MovieClip is "disabled", its handlers of button-like events 
     /// are disabled, and automatic tab ordering won't include it.
-    ///
-    /// See event_id::is_button_event().
-    ///
     bool isEnabled() const;
 
     // See dox in DisplayObject.h
     bool allowHandCursor() const;
+
+    /// Check whether a point hits our drawable shape.
+    //
+    /// This is possible because the drawable does not have its own
+    /// transform, so we can use our own. The points are expressed in
+    /// world space.
+    bool hitTestDrawable(boost::int32_t x, boost::int32_t y) const;
 
     /// Advance to a previous frame.
     //
@@ -895,14 +899,7 @@ private:
     DisplayList m_display_list;
 
     /// The canvas for dynamic drawing
-    //
-    boost::shared_ptr<DynamicShape> _drawable;
-
-    /// The need of an instance here is due to the renderer
-    /// insising on availability a DefineShapeTag instance
-    /// that has a parent (why?)
-    ///
-    boost::intrusive_ptr<DisplayObject> _drawable_inst;
+    DynamicShape _drawable;
 
     // this is deprecated, we'll be pushing gotoframe target
     // actions to the global action queue
@@ -1019,7 +1016,6 @@ protected:
     /// sprite-specific reachable resources are:
     ///     - DisplayList items (current, backup and frame0 ones)
     /// - Canvas for dynamic drawing (_drawable)
-    /// - Drawable instance (_drawable_inst)
     /// - sprite environment
     /// - definition the sprite has been instantiated from
     /// - Textfields having an associated variable registered in this instance.

@@ -52,7 +52,7 @@ namespace gnash {
 /// but I think the actual size could change between glyphs (see the 'box'
 /// parameter of getRenderedGlyph() method).
 ///
-/// Vectorial glyphs are instances of a DefineShapeTag, same class
+/// Vectorial glyphs are instances of a SWF::ShapeRecord, same class
 /// resulting from parsing of embedded fonts.
 ///
 class FreetypeGlyphsProvider 
