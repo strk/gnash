@@ -144,16 +144,11 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 
 // Render the given glyph records.
 void
-TextRecord::displayRecords(const SWFMatrix& this_mat,
-        const DisplayObject& inst, const TextRecords& records,
-        bool embedded)
+TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
+        const TextRecords& records, bool embedded)
 {
 
-    SWFMatrix mat = inst.getWorldMatrix();
-    mat.concatenate(this_mat);
-
-    cxform cx = inst.get_world_cxform();
-    const SWFMatrix base_matrix = mat;
+    SWFMatrix m = mat;
 
     // Starting positions.
     float x = 0.0f;
@@ -199,9 +194,9 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
 
             const int index = ge.index;
                 
-            mat = base_matrix;
-            mat.concatenate_translation(x, y);
-            mat.concatenate_scale(scale, scale);
+            m = mat;
+            m.concatenate_translation(x, y);
+            m.concatenate_scale(scale, scale);
 
             if (index == -1)
             {
@@ -225,7 +220,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
                      (point(480, -656))
                      (point(32, -656))
                      (point(32,32));
-                render::drawLine(emptyCharBox, textColor, mat);  
+                render::drawLine(emptyCharBox, textColor, m);
 #endif
 
             }
@@ -236,7 +231,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
                 // Draw the DisplayObject using the filled outline.
                 if (glyph)
                 {
-                    render::drawGlyph(*glyph, textColor, mat);
+                    render::drawGlyph(*glyph, textColor, m);
                 }
             }
             x += ge.advance;
@@ -264,7 +259,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
                 (point(startX, posY))
                 (point(endX, posY));
 
-            render::drawLine(underline, textColor, base_matrix);
+            render::drawLine(underline, textColor, mat);
         }
     }
 }

@@ -336,14 +336,15 @@ TextField::display()
     // A cleaner implementation is likely correctly setting the
     // _xOffset and _yOffset memebers in glyph records.
     // Anyway, see bug #17954 for a testcase.
-    SWFMatrix m;
+    SWFMatrix m = getWorldMatrix();
 
     if (!_bounds.is_null()) 
     {
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
     
-    SWF::TextRecord::displayRecords(m, *this, _textRecords, _embedFonts);
+    SWF::TextRecord::displayRecords(m, get_world_cxform(), _textRecords,
+            _embedFonts);
 
     if (m_has_focus) show_cursor(wmat);
     

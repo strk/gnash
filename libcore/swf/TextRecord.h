@@ -23,10 +23,10 @@
 #include <vector>
 
 namespace gnash {
-    class DisplayObject;
     class movie_definition;
     class SWFStream;
     class SWFMatrix;
+    class cxform;
     class Font;
 }
 
@@ -88,9 +88,8 @@ public:
     bool read(SWFStream& in, movie_definition& m, int glyphBits,
             int advanceBits, TagType tag);
 
-    static void displayRecords(const SWFMatrix& this_mat,
-            const DisplayObject& inst, const TextRecords& records,
-            bool embedded);
+    static void displayRecords(const SWFMatrix& mat, const cxform& cx,
+            const TextRecords& records, bool embedded = true);
 
     const Glyphs& glyphs() const {
         return _glyphs;

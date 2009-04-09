@@ -109,10 +109,10 @@ void
 DefineTextTag::display(const StaticText& inst) const
 {
 
-	const bool useEmbeddedGlyphs = true;
+    SWFMatrix mat = inst.getWorldMatrix();
+    mat.concatenate(_matrix);
 
-    TextRecord::displayRecords(_matrix, inst, _textRecords,
-            useEmbeddedGlyphs); 
+    TextRecord::displayRecords(mat, inst.get_world_cxform(), _textRecords);
 }
 
 
