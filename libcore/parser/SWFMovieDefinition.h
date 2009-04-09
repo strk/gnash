@@ -27,7 +27,6 @@
 #endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "fontlib.h"
 #include "GnashImageJpeg.h"
 #include "IOChannel.h"
 #include "movie_definition.h" // for inheritance

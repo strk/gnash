@@ -27,11 +27,6 @@
 #include <cassert>
 #include <boost/shared_ptr.hpp>
 
-// Forward declarations
-namespace gnash {
-    class DefinitionTag;
-}
-
 namespace gnash {
 
 /// For DisplayObjects that don't store unusual state in their instances.

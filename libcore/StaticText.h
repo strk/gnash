@@ -29,7 +29,6 @@
 
 // Forward declarations
 namespace gnash {
-    class DefinitionTag;
     namespace SWF {
         class TextRecord;
     }

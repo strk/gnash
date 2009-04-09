@@ -2382,7 +2382,6 @@ textfield_getTextFormat(const fn_call& fn)
 as_value
 textfield_setTextFormat(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 
