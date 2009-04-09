@@ -36,6 +36,13 @@ namespace SWF {
 class ControlTag
 {
 public:
+    
+    /// Type of ControlTag
+    enum Type
+    {
+        TAG_ACTION = 1 << 0,
+        TAG_DLIST  = 1 << 1
+    };
 
 	virtual ~ControlTag()
 	{

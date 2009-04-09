@@ -506,7 +506,7 @@ SWFHandlers::ActionPlay(ActionExec& thread)
 
     DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
-    if ( tgt ) tgt->set_play_state(MovieClip::PLAY);
+    if ( tgt ) tgt->setPlayState(MovieClip::PLAYSTATE_PLAY);
     else log_debug(_("ActionPlay: as_environment target is null or not a sprite"));
 }
 
@@ -522,7 +522,7 @@ SWFHandlers::ActionStop(ActionExec& thread)
 
     DisplayObject* tgtch = env.get_target();
     MovieClip* tgt = tgtch ? tgtch->to_movie() : 0;
-    if ( tgt ) tgt->set_play_state(MovieClip::STOP);
+    if ( tgt ) tgt->setPlayState(MovieClip::PLAYSTATE_STOP);
     else log_debug(_("ActionStop: as_environment target is null or not a sprite"));
 }
 
@@ -2555,7 +2555,8 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
     // frame is shown in stop mode.
 
     unsigned char play_flag = code[pc + 3];
-    MovieClip::play_state state = play_flag ? MovieClip::PLAY : MovieClip::STOP;
+    const MovieClip::PlayState state = 
+        play_flag ? MovieClip::PLAYSTATE_PLAY : MovieClip::PLAYSTATE_STOP;
 
     std::string target_frame = env.pop().to_string();
     std::string target_path;
@@ -2590,7 +2591,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
             return;
         }
         target_sprite->goto_frame(frame_number);
-        target_sprite->set_play_state(state);
+        target_sprite->setPlayState(state);
     }
     else
     {

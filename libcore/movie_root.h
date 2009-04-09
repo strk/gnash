@@ -392,9 +392,9 @@ public:
     /// Delegate to originating root movie
     //
     /// TODO: drop ?
-    void set_play_state(MovieClip::play_state s)
+    void set_play_state(MovieClip::PlayState s)
     {
-        getRootMovie()->set_play_state(s);
+        getRootMovie()->setPlayState(s);
     }
 
     /// Notify still loaded DisplayObject listeners for key events
