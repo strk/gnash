@@ -51,13 +51,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
-	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advanceClock(50); // "sleep" 50 milliseconds
 	tester.advance(); // execute actions in second frame frame
 
 	check_equals(root->get_current_frame(), 1);
-	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 
 	// Now timers are set and counters initialized
 

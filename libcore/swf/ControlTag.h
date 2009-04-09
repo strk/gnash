@@ -20,19 +20,29 @@
 
 #include <cassert>
 
-namespace gnash {
-
 // Forward declarations
-class MovieClip;
-class DisplayList;
+namespace gnash {
+    class MovieClip;
+    class DisplayList;
+}
+
+namespace gnash {
+namespace SWF {
 
 /// Control tags are swf tags that control the operation of the movie. 
 //
-/// Essentially, these are the events associated with a frame.
+/// These are the events associated with a frame.
 ///
 class ControlTag
 {
 public:
+    
+    /// Type of ControlTag
+    enum Type
+    {
+        TAG_ACTION = 1 << 0,
+        TAG_DLIST  = 1 << 1
+    };
 
 	virtual ~ControlTag()
 	{
@@ -63,10 +73,10 @@ public:
 };
 
 
+} // namespace SWF
 } // namespace gnash
 
-
-#endif // GNASH_EXECUTE_TAG_H
+#endif 
 
 
 // Local Variables:

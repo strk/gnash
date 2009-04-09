@@ -51,6 +51,7 @@
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/bind.hpp>
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40 
@@ -336,14 +337,14 @@ TextField::display()
     // A cleaner implementation is likely correctly setting the
     // _xOffset and _yOffset memebers in glyph records.
     // Anyway, see bug #17954 for a testcase.
-    SWFMatrix m;
+    SWFMatrix m = getWorldMatrix();
 
-    if (!_bounds.is_null()) 
-    {
+    if (!_bounds.is_null()) {
         m.concatenate_translation(_bounds.get_x_min(), _bounds.get_y_min()); 
     }
     
-    SWF::TextRecord::displayRecords(m, *this, _textRecords, _embedFonts);
+    SWF::TextRecord::displayRecords(m, get_world_cxform(), _textRecords,
+            _embedFonts);
 
     if (m_has_focus) show_cursor(wmat);
     
@@ -1285,7 +1286,6 @@ TextField::format_text()
             break;
         }
 
-
         if (m_cursor > idx)
         {
             m_xcursor = x;
@@ -1638,20 +1638,12 @@ TextField::setBackgroundColor(const rgba& col)
 void
 TextField::setTextColor(const rgba& col)
 {
-    if ( _textColor != col )
-    {
+    if (_textColor != col) {
+
         set_invalidated();
-
         _textColor = col;
-
-        // Change color of all current glyph records
-        for (TextRecords::iterator i=_textRecords.begin(),
-            e = _textRecords.end(); i!=e; ++i)
-        {
-            SWF::TextRecord& rec = *i;
-            rec.setColor(_textColor);
-        }
-
+        std::for_each(_textRecords.begin(), _textRecords.end(),
+                boost::bind(&SWF::TextRecord::setColor, _1, _textColor));
     }
 }
 
@@ -2390,7 +2382,6 @@ textfield_getTextFormat(const fn_call& fn)
 as_value
 textfield_setTextFormat(const fn_call& fn)
 {
-    //GNASH_REPORT_FUNCTION;
 
     boost::intrusive_ptr<TextField> text = ensureType<TextField>(fn.this_ptr);
 

@@ -104,7 +104,7 @@ main(int /*argc*/, char** /*argv*/)
 
 		// Let's break if we stopped, as we'll print totals() thus
 		// enlarging invalidated bounds too ...
-		if (root->get_play_state() == MovieClip::STOP) break;
+		if (root->getPlayState() == MovieClip::PLAYSTATE_STOP) break;
 
 		// Compute 1-based currentFrame
 		size_t currentFrame = root->get_current_frame()+1;

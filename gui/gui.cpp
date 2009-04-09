@@ -950,7 +950,7 @@ Gui::advanceMovie()
 	bool advanced = m->advance();
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
-    	m->set_play_state(gnash::MovieClip::PLAY);
+    m->set_play_state(gnash::MovieClip::PLAYSTATE_PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
 #endif
 

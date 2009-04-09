@@ -32,6 +32,20 @@
 #include "Button.h"
 #include "MorphShape.h"
 #include "Shape.h"
+#include "TextField.h"
+#include "SWFStream.h"
+#include "swf/DefineFontAlignZonesTag.h"
+#include "swf/DefineShapeTag.h"
+#include "swf/DefineButtonCxformTag.h"
+#include "swf/CSMTextSettingsTag.h"
+#include "swf/DefineFontTag.h"
+#include "swf/DefineTextTag.h"
+#include "swf/PlaceObject2Tag.h"
+#include "swf/RemoveObjectTag.h"
+#include "swf/DoActionTag.h"
+#include "swf/DoInitActionTag.h"
+#include "swf/DefineEditTextTag.h"
+#include "swf/SetBackgroundColorTag.h"
 
 #include <iostream>
 #include <sstream>
@@ -43,42 +57,35 @@
 
 #include "check.h"
 
+#include <boost/preprocessor/seq/for_each.hpp>
+
 using namespace gnash;
 using namespace std;
 using namespace boost;
+using namespace gnash::SWF;
+
+#define SIZE(x, _, t) \
+    std::cout << BOOST_PP_STRINGIZE(t)": " << (sizeof(t)) << "\n";
+
+// Add types in brackets to this macro to have their size printed.
+#define TYPES \
+(int) (float) (long) (double) \
+(Property*) (auto_ptr<Property>) (scoped_ptr<Property>) \
+(shared_ptr<Property>) (intrusive_ptr<as_object>) (GcResource) \
+(rgba) (SWFMatrix) (rect) (line_style) (fill_style) (cxform) \
+(as_value) \
+(DynamicShape)(ShapeRecord)(TextRecord) \
+(Property) (PropertyList) \
+(DefinitionTag) (DefineTextTag) (DefineFontTag) (DefineMorphShapeTag) \
+(as_object) \
+(DisplayObject) (StaticText) (MorphShape) (Shape) \
+(InteractiveObject) (MovieClip) (TextField) (Button) (movie_instance) \
+(movie_root) 
 
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	std::cout << "sizeof(int): " << (sizeof(int)) << std::endl;
-	std::cout << "sizeof(float): " << (sizeof(float)) << std::endl;
-
-	std::cout << "sizeof(long): " << (sizeof(long)) << std::endl;
-	std::cout << "sizeof(double): " << (sizeof(double)) << std::endl;
-
-	std::cout << "sizeof(as_value): " << (sizeof(as_value)) << std::endl;
-
-	std::cout << "sizeof(Property): " << (sizeof(Property)) << std::endl;
-	std::cout << "sizeof(Property*): " << (sizeof(Property*)) << std::endl;
-	std::cout << "sizeof(PropertyList): " << (sizeof(PropertyList)) << std::endl;
-	std::cout << "sizeof(auto_ptr<PropertyList>): " << (sizeof(auto_ptr<PropertyList>)) << std::endl;
-	std::cout << "sizeof(scoped_ptr<PropertyList>): " << (sizeof(scoped_ptr<PropertyList>)) << std::endl;
-
-	std::cout << "sizeof(GcResource): " << (sizeof(GcResource)) << std::endl;
-	std::cout << "sizeof(as_object): " << (sizeof(as_object)) << std::endl;
-	std::cout << "sizeof(DisplayObject): " << (sizeof(DisplayObject)) << std::endl;
-	std::cout << "sizeof(MovieClip): " << (sizeof(MovieClip)) << std::endl;
-
-	std::cout << "sizeof(rgba): " << (sizeof(rgba)) << std::endl;
-	std::cout << "sizeof(line_style): " << (sizeof(line_style)) << std::endl;
-	std::cout << "sizeof(fill_style): " << (sizeof(fill_style)) << std::endl;
-	std::cout << "sizeof(SWFMatrix): " << (sizeof(SWFMatrix)) << std::endl;
-	std::cout << "sizeof(movie_root): " << (sizeof(movie_root)) << std::endl;
-	
-    std::cout << "sizeof(ShapeRecord): " << (sizeof(SWF::ShapeRecord)) << std::endl;
-	std::cout << "sizeof(StaticText): " << (sizeof(StaticText)) << std::endl;
-	std::cout << "sizeof(MorphShape): " << (sizeof(MorphShape)) << std::endl;
-	std::cout << "sizeof(Shape): " << (sizeof(Shape)) << std::endl;
-	std::cout << "sizeof(Button): " << (sizeof(Button)) << std::endl;
+    std::cout << "Gnash class sizes:\n";
+    BOOST_PP_SEQ_FOR_EACH(SIZE, _, TYPES)
 }
 

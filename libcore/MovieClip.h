@@ -25,6 +25,7 @@
 #include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
+#include "swf/ControlTag.h"
 #include "movie_definition.h" // for inlines
 #include "DisplayList.h" // DisplayList 
 #include "InteractiveObject.h"
@@ -42,7 +43,6 @@
 #include <list>
 #include <map>
 #include <string>
-#include <boost/noncopyable.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -68,7 +68,7 @@ namespace gnash
 /// This means that they define a variable scope (see
 /// the as_environment member) and are divided into "frames"
 ///
-class MovieClip : public InteractiveObject, boost::noncopyable
+class MovieClip : public InteractiveObject 
 {
 
 public:
@@ -108,24 +108,12 @@ public:
 
     virtual ~MovieClip();
 
-    enum play_state
+    enum PlayState
     {
-        PLAY,
-        STOP
+        PLAYSTATE_PLAY,
+        PLAYSTATE_STOP
     };
 
-    /// Type of execute tags
-    //
-    /// TODO: move to ControlTag.h ?
-    ///
-    enum control_tag_type
-    {
-        /// Action tag
-        TAG_ACTION = 1<<0,
-
-        /// DisplayList tag
-        TAG_DLIST  = 1<<1
-    };
 
     // Overridden to use the m_root member
     virtual movie_instance* get_root() const;
@@ -142,7 +130,7 @@ public:
     /// Return the sprite_definition (or movie_definition)
     /// from which this MovieClip has been created
     movie_definition* get_movie_definition() {
-        return m_def.get();
+        return _def.get();
     }
 
     /// \brief
@@ -151,7 +139,7 @@ public:
     //
     int getSWFVersion() const
     {
-        return m_def->get_version();
+        return _def->get_version();
     }
 
     /// Get the composite bounds of all component drawing elements
@@ -173,12 +161,12 @@ public:
     /// Return 0-based index to current frame
     size_t get_current_frame() const
     {
-        return m_current_frame;
+        return _currentFrame;
     }
 
     size_t get_frame_count() const
     {
-        return m_def->get_frame_count();
+        return _def->get_frame_count();
     }
 
     /// Return number of completely loaded frames of this sprite/movie
@@ -188,26 +176,26 @@ public:
     ///
     size_t get_loaded_frames() const
     {
-        return m_def->get_loading_frame();
+        return _def->get_loading_frame();
     }
 
     /// Return total number of bytes in the movie
     /// (not sprite!)
     size_t get_bytes_total() const
     {
-        return isDynamic() ? 0 : m_def->get_bytes_total();
+        return isDynamic() ? 0 : _def->get_bytes_total();
     }
 
     /// Return number of loaded bytes in the movie
     /// (not sprite!)
     size_t get_bytes_loaded() const
     {
-        return isDynamic() ? 0 : m_def->get_bytes_loaded();
+        return isDynamic() ? 0 : _def->get_bytes_loaded();
     }
 
     const rect& get_frame_size() const
     {
-        return m_def->get_frame_size();
+        return _def->get_frame_size();
     }
 
     /// Stop or play the sprite.
@@ -215,9 +203,9 @@ public:
     /// If stopped, any stream sound associated with this sprite
     /// will also be stopped.
     ///
-    DSOEXPORT void set_play_state(play_state s);
+    DSOEXPORT void setPlayState(PlayState s);
 
-    play_state get_play_state() const { return m_play_state; }
+    PlayState getPlayState() const { return _playState; }
 
     DisplayObject* getDisplayObject(int DisplayObject_id);
 
@@ -229,7 +217,7 @@ public:
 
     bool has_looped() const
     {
-        return m_has_looped;
+        return _hasLooped;
     }
 
     /// Return true if we have any mouse event handlers.
@@ -331,7 +319,7 @@ public:
     ///
     void swapDepths(DisplayObject* ch1, int newdepth)
     {
-        m_display_list.swapDepths(ch1, newdepth);
+        _displayList.swapDepths(ch1, newdepth);
     }
 
     /// Return the DisplayObject at given depth in our DisplayList.
@@ -416,7 +404,7 @@ public:
     void remove_display_object(int depth, int /* id */)
     {
         set_invalidated();
-        m_display_list.removeDisplayObject(depth);
+        _displayList.removeDisplayObject(depth);
     }
 
     void unloadMovie();
@@ -601,7 +589,7 @@ public:
 
     // inherited from DisplayObject class, see dox in DisplayObject.h
     as_environment& get_environment() {
-        return m_as_environment;
+        return _environment;
     }
 
     /// \brief
@@ -615,7 +603,7 @@ public:
     void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
     const DisplayList& getDisplayList() const {
-            return m_display_list;
+            return _displayList;
     }
 
     /// Return the next highest available depth
@@ -625,16 +613,14 @@ public:
     /// that is displayd above all others
     ///
     int getNextHighestDepth() const {
-        return m_display_list.getNextHighestDepth();
+        return _displayList.getNextHighestDepth();
     }
 
     void testInvariant() const {
-        assert(m_play_state == PLAY || m_play_state == STOP);
-
-        // m_current_frame may be 0, since this is our initial
+        // _currentFrame may be 0, since this is our initial
         // condition. Still, frame count might be 0 as well, and
         // loaded frames too !
-        //assert(m_current_frame < m_def->get_frame_count());
+        //assert(_currentFrame < _def->get_frame_count());
 #ifndef GNASH_USE_GC 
         assert(get_ref_count() > 0); // or we're constructed but
                                      // not stored in a boost::intrusive_ptr
@@ -712,12 +698,14 @@ public:
         _drawable.beginFill(color);
     }
 
-    void beginLinearGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
+    void beginLinearGradientFill(const std::vector<gradient_record>& grad,
+            const SWFMatrix& mat)
     {
         _drawable.beginLinearGradientFill(grad, mat);
     }
 
-    void beginRadialGradientFill(const std::vector<gradient_record>& grad, const SWFMatrix& mat)
+    void beginRadialGradientFill(const std::vector<gradient_record>& grad,
+            const SWFMatrix& mat)
     {
         _drawable.beginRadialGradientFill(grad, mat);
     }
@@ -757,7 +745,6 @@ public:
     virtual bool handleFocus();
 
     /// @} Drawing API
-    
 
     typedef std::map<std::string, std::string> VariableMap;
 
@@ -774,12 +761,12 @@ public:
     /// from the display lists
     void cleanupDisplayList();
 
-        /// Queue the given action buffer
-        //
-        /// The action will be pushed on the current
-        /// global list (see movie_root).
-        ///
-        void queueAction(const action_buffer& buf);
+    /// Queue the given action buffer
+    //
+    /// The action will be pushed on the current
+    /// global list (see movie_root).
+    ///
+    void queueAction(const action_buffer& buf);
 
     /// Construct this instance as an ActionScript object
     //
@@ -805,10 +792,60 @@ public:
 
 #ifdef USE_SWFTREE
     // Override to append display list info, see dox in DisplayObject.h
-    virtual InfoTree::iterator getMovieInfo(InfoTree& tr, InfoTree::iterator it);
+    virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
+            InfoTree::iterator it);
 #endif
 
+protected:
+
+    /// Used both by this class and movie_instance.
+    //
+    /// TODO: do this with proper Sprite -> MovieClip inheritance.
+    void advance_sprite();
+
+#ifdef GNASH_USE_GC
+    /// Mark sprite-specific reachable resources and invoke
+    /// the parent's class version (markDisplayObjectReachable)
+    //
+    /// sprite-specific reachable resources are:
+    ///     - DisplayList items (current, backup and frame0 ones)
+    /// - Canvas for dynamic drawing (_drawable)
+    /// - sprite environment
+    /// - definition the sprite has been instantiated from
+    /// - Textfields having an associated variable registered in this instance.
+    /// - Relative root of this instance (m_root)
+    ///
+    virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
+    
+    // Used by BitmapMovieInstance.
+    void placeDisplayObject(DisplayObject* ch, int depth) {       
+        _displayList.placeDisplayObject(ch, depth);  
+    }
+
 private:
+
+
+    /// Process any completed loadVariables request
+    void processCompletedLoadVariableRequests();
+
+    /// Process a completed loadVariables request
+    void processCompletedLoadVariableRequest(LoadVariablesThread& request);
+
+    
+    /// Execute the tags associated with the specified frame.
+    //
+    /// @param frame
+    ///     Frame number. 0-based
+    ///
+    /// @param dlist
+    ///     The display list to have control tags act upon.
+    ///
+    /// @param typeflags
+    ///     Which kind of control tags we want to execute. 
+    void executeFrameTags(size_t frame, DisplayList& dlist,
+            int typeflags = SWF::ControlTag::TAG_DLIST |
+                            SWF::ControlTag::TAG_ACTION);
 
     void stopStreamSound();
 
@@ -852,7 +889,7 @@ private:
     ///   more at the original depth
     /// - Dynamic instances found in the static depth zone
     /// - Execute all displaylist tags from first to one-before target frame,
-    ///   appropriately setting m_current_frame as it goes, finally execute
+    ///   appropriately setting _currentFrame as it goes, finally execute
     ///   both displaylist and action
     ///   tags for target frame.
     ///
@@ -871,7 +908,7 @@ private:
     //
     /// POSTCONDITIONS:
     ///
-    /// - m_current_frame == targetFrame
+    /// - _currentFrame == targetFrame
     ///
     /// TODO: consider using this same function for jump-forward too,
     ///       with some modifications...
@@ -892,11 +929,28 @@ private:
     ///
     void execute_actions(ActionList& action_list);
 
-    // TODO: shouldn't we keep this by intrusive_ptr ?
+    /// Increment _currentFrame, and take care of looping.
+    void increment_frame_and_check_for_loop();
+    
+    /// List of loadVariables requests
+    typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
+
+    /// This is either sprite_definition (for sprites defined by
+    /// DefineSprite tag) or movie_def_impl (for the top-level movie).
+    boost::intrusive_ptr<movie_definition>  _def;
+
+    /// List of active loadVariable requests 
+    //
+    /// At ::advance_sprite time, all completed requests will
+    /// be processed (variables imported in this timeline scope)
+    /// and removed from the list.
+    LoadVariablesThreads _loadVariableRequests;
+
+    /// The SWF that this MovieClip belongs to.
     movie_instance* m_root;
 
     /// Current Display List contents.
-    DisplayList m_display_list;
+    DisplayList _displayList;
 
     /// The canvas for dynamic drawing
     DynamicShape _drawable;
@@ -905,22 +959,19 @@ private:
     // actions to the global action queue
     //ActionList    m_goto_frame_action_list;
 
-    play_state  m_play_state;
+    PlayState _playState;
 
     // 0-based index to current frame
-    size_t      m_current_frame;
+    size_t _currentFrame;
 
     // true if this sprite reached the last frame and restarted
-    bool        m_has_looped;
+    bool _hasLooped;
 
     // true is we're calling frame actions
     bool _callingFrameActions;
 
     /// This timeline's variable scope
-    as_environment  m_as_environment;
-
-    /// Increment m_current_frame, and take care of looping.
-    void increment_frame_and_check_for_loop();
+    as_environment _environment;
 
     typedef boost::intrusive_ptr<TextField> TextFieldPtr;
     typedef std::vector<TextFieldPtr> TextFieldPtrVect;
@@ -960,69 +1011,6 @@ private:
     std::string _droptarget;
 
     bool _lockroot;
-
-protected:
-
-    /// Used both by this class and movie_instance.
-    //
-    /// TODO: do this with proper Sprite -> MovieClip inheritance.
-    void advance_sprite();
-
-    void placeDisplayObject(DisplayObject* ch, int depth)  
-    {       
-        m_display_list.placeDisplayObject(ch, depth);  
-    }
-
-    /// Execute the tags associated with the specified frame.
-    //
-    /// @param frame
-    ///     Frame number. 0-based
-    ///
-    /// @param dlist
-    ///     The display list to have control tags act upon.
-    ///
-    /// @param typeflags
-    ///     Which kind of control tags we want to execute. 
-    ///     See control_tag_type enum. TODO: *take* a control_tag_type ?
-    ///
-    void execute_frame_tags(size_t frame, DisplayList& dlist,
-            int typeflags = TAG_DLIST | TAG_ACTION);
-
-    /// \brief
-    /// This is either sprite_definition (for sprites defined by
-    /// DefineSprite tag) or movie_def_impl (for the top-level movie).
-    boost::intrusive_ptr<movie_definition>  m_def;
-
-    /// List of loadVariables requests
-    typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
-
-    /// List of active loadVariable requests 
-    //
-    /// At ::advance_sprite time, all completed requests will
-    /// be processed (variables imported in this timeline scope)
-    /// and removed from the list.
-    LoadVariablesThreads _loadVariableRequests;
-
-    /// Process any completed loadVariables request
-    void processCompletedLoadVariableRequests();
-
-    /// Process a completed loadVariables request
-    void processCompletedLoadVariableRequest(LoadVariablesThread& request);
-
-#ifdef GNASH_USE_GC
-    /// Mark sprite-specific reachable resources and invoke
-    /// the parent's class version (markDisplayObjectReachable)
-    //
-    /// sprite-specific reachable resources are:
-    ///     - DisplayList items (current, backup and frame0 ones)
-    /// - Canvas for dynamic drawing (_drawable)
-    /// - sprite environment
-    /// - definition the sprite has been instantiated from
-    /// - Textfields having an associated variable registered in this instance.
-    /// - Relative root of this instance (m_root)
-    ///
-    virtual void markReachableResources() const;
-#endif // GNASH_USE_GC
 };
 
 /// Initialize the global MovieClip class

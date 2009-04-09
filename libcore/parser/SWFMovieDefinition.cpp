@@ -234,7 +234,7 @@ void SWFMovieDefinition::addDisplayObject(int id, SWF::DefinitionTag* c)
 }
 
 SWF::DefinitionTag*
-SWFMovieDefinition::getDefinitionTag(int id)
+SWFMovieDefinition::getDefinitionTag(int id) const
 {
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
@@ -277,9 +277,9 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
 }
 
 BitmapInfo*
-SWFMovieDefinition::getBitmap(int id)
+SWFMovieDefinition::getBitmap(int id) const
 {
-    Bitmaps::iterator it = _bitmaps.find(id);
+    Bitmaps::const_iterator it = _bitmaps.find(id);
     if (it == _bitmaps.end()) return 0;
     
     return it->second.get();
@@ -293,10 +293,11 @@ SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<BitmapInfo> im)
 
 }
 
-sound_sample* SWFMovieDefinition::get_sound_sample(int id)
+sound_sample*
+SWFMovieDefinition::get_sound_sample(int id) const
 {
-    SoundSampleMap::iterator it = m_sound_samples.find(id);
-    if ( it == m_sound_samples.end() ) return NULL;
+    SoundSampleMap::const_iterator it = m_sound_samples.find(id);
+    if ( it == m_sound_samples.end() ) return 0;
 
     boost::intrusive_ptr<sound_sample> ch = it->second;
 #ifndef GNASH_USE_GC
@@ -511,9 +512,9 @@ operator<<(std::ostream& o, const CharacterDictionary& cd)
 }
 
 boost::intrusive_ptr<SWF::DefinitionTag>
-CharacterDictionary::getDisplayObject(int id)
+CharacterDictionary::getDisplayObject(int id) const
 {
-	CharacterIterator it = _map.find(id);
+    CharacterConstIterator it = _map.find(id);
 	if ( it == _map.end() )
 	{
 		IF_VERBOSE_PARSE(
@@ -529,7 +530,6 @@ void
 CharacterDictionary::addDisplayObject(int id,
         boost::intrusive_ptr<SWF::DefinitionTag> c)
 {
-	//log_debug(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
 }
 
@@ -851,7 +851,8 @@ SWFMovieDefinition::add_frame_name(const std::string& n)
 }
 
 bool
-SWFMovieDefinition::get_labeled_frame(const std::string& label, size_t& frame_number)
+SWFMovieDefinition::get_labeled_frame(const std::string& label,
+        size_t& frame_number)
 {
     boost::mutex::scoped_lock lock(_namedFramesMutex);
     NamedFrameMap::const_iterator it = _namedFrames.find(label);

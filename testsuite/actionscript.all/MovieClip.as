@@ -115,15 +115,15 @@ endOfTest = function()
 #endif
 
 #if OUTPUT_VERSION == 6
-	check_totals(891); // SWF6
+	check_totals(894); // SWF6
 #endif
 
 #if OUTPUT_VERSION == 7
-	check_totals(908); // SWF7
+	check_totals(911); // SWF7
 #endif
 
 #if OUTPUT_VERSION >= 8
-	check_totals(1000); // SWF8+
+	check_totals(1003); // SWF8+
 #endif
 
 	play();
@@ -131,7 +131,7 @@ endOfTest = function()
 
 #if OUTPUT_VERSION < 6
 note("WARNING: it has been reported that adobe flash player version 9 fails a few tests here.");
-note("         We belive those are actually adobe player bugs since older versions ");
+note("         We believe those are actually adobe player bugs since older versions ");
 note("         of the player are reported to pass all tests. If you have another idea ");
 note("         we'd be glad to hear from you, just check the testcase source code.");
 note();
@@ -516,6 +516,7 @@ check_equals(mc2_mc.getBytesLoaded(), 0);
 check_equals(mc2_mc.getBytesTotal(), 0);
 check_equals(mc2.getBytesLoaded(), 0);
 check_equals(mc2.getBytesTotal(), 0);
+check_equals(mc2._url, _root._url);
 
 xcheck(!mc2.hasOwnProperty('_parent'));
 
@@ -928,6 +929,10 @@ check_equals(typeof(_root.copy1.onEnterFrame), 'undefined');
 check_equals(typeof(_root.copy1.onRollOver), 'undefined');
 check_equals(_root.copy1.getDepth(), 63);
 check_equals(_root.copy1._x, 100);
+
+duplicateMovieClip(_root, "copy88", -1000);
+check_equals(typeof(_root.getBytesLoaded()), "number");
+check_equals(copy88.getBytesLoaded(), undefined);
 
 #if OUTPUT_VERSION == 6
 // SWF7 and higher removed duplicateMovieClip method of MovieClip class

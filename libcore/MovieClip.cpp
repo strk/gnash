@@ -483,26 +483,25 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
         DisplayObject* parent, int id)
     :
     InteractiveObject(parent, id),
+    _def(def),
     m_root(r),
-    m_play_state(PLAY),
-    m_current_frame(0),
-    m_has_looped(false),
+    _playState(PLAYSTATE_PLAY),
+    _currentFrame(0),
+    _hasLooped(false),
     _callingFrameActions(false),
-    m_as_environment(_vm),
-    _text_variables(),
+    _environment(_vm),
     m_sound_stream_id(-1),
     _userCxform(),
     _droptarget(),
-    _lockroot(false),
-    m_def(def)
+    _lockroot(false)
 {
-    assert(m_def != NULL);
+    assert(_def != NULL);
     assert(m_root != NULL);
 
     set_prototype(getMovieClipInterface());
             
     //m_root->add_ref();    // @@ circular!
-    m_as_environment.set_target(this);
+    _environment.set_target(this);
 
     // TODO: have the 'MovieClip' constructor take care of this !
     attachMovieClipProperties(*this);
@@ -546,7 +545,7 @@ MovieClip::execute_actions(MovieClip::ActionList& action_list)
 DisplayObject*
 MovieClip::getDisplayObjectAtDepth(int depth)
 {
-    return m_display_list.getDisplayObjectAtDepth(depth);
+    return _displayList.getDisplayObjectAtDepth(depth);
 }
 
 // Set *val to the value of the named member and
@@ -617,9 +616,9 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     // Try items on our display list.
     DisplayObject* ch;
     if ( _vm.getSWFVersion() >= 7 ) {
-        ch = m_display_list.getDisplayObjectByName(name);
+        ch = _displayList.getDisplayObjectByName(name);
     }
-    else ch = m_display_list.getDisplayObjectByName_i(name);
+    else ch = _displayList.getDisplayObjectByName_i(name);
     if (ch) {
             // Found object.
 
@@ -688,7 +687,7 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 
     if (!isFinite(num) || int(num) != num || num == 0)
     {
-        bool ret = m_def->get_labeled_frame(fspecStr, frameno);
+        bool ret = _def->get_labeled_frame(fspecStr, frameno);
         //log_debug("get_labeled_frame(%s) returned %d, frameno is %d", fspecStr, ret, frameno);
         return ret;
     }
@@ -735,14 +734,14 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
     //             to properly queue actions back on the global queue.
     //
     _callingFrameActions=true;
-    const PlayList* playlist = m_def->getPlaylist(frame_number);
+    const PlayList* playlist = _def->getPlaylist(frame_number);
     if ( playlist )
     {
     PlayList::const_iterator it = playlist->begin();
         const PlayList::const_iterator e = playlist->end();
     for(; it != e; it++)
     {
-        (*it)->execute_action(this, m_display_list);
+        (*it)->execute_action(this, _displayList);
     }
     }
     _callingFrameActions=false;
@@ -764,7 +763,7 @@ MovieClip::add_empty_movieclip(const std::string& name, int depth)
     //             an existing one !
     set_invalidated(); 
 
-    m_display_list.placeDisplayObject(movieclip, depth);     
+    _displayList.placeDisplayObject(movieclip, depth);     
 
     return movieclip;
 }
@@ -789,7 +788,7 @@ MovieClip::add_textfield(const std::string& name, int depth, int x, int y, float
     txt_char->setMatrix(txt_matrix, true); // update caches (altought shouldn't be needed as we only set translation)
 
     // Here we add the DisplayObject to the displayList.    
-    m_display_list.placeDisplayObject(txt_char.get(), depth); 
+    _displayList.placeDisplayObject(txt_char.get(), depth); 
 
     return txt_char;
 }
@@ -811,7 +810,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
         return NULL;
     }
 
-    boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(m_def.get(),
+    boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(_def.get(),
             m_root, parent, get_id());
     newmovieclip->set_name(newname);
 
@@ -833,7 +832,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     newmovieclip->set_ratio(get_ratio());    
     newmovieclip->set_clip_depth(get_clip_depth());    
     
-    parent->m_display_list.placeDisplayObject(newmovieclip.get(), depth, 
+    parent->_displayList.placeDisplayObject(newmovieclip.get(), depth, 
             initObject);
     
     return newmovieclip; 
@@ -939,7 +938,7 @@ MovieClip::on_event(const event_id& id)
             if ( isDynamic() ) break;
 
             sprite_definition* def =
-                dynamic_cast<sprite_definition*>(m_def.get());
+                dynamic_cast<sprite_definition*>(_def.get());
 
             // must be a loaded movie (loadMovie doesn't mark it as 
             // "dynamic" - should it? no, or getBytesLoaded will always
@@ -970,7 +969,7 @@ MovieClip::on_event(const event_id& id)
 
         if ( method )
         {
-            call_method0(as_value(method.get()), m_as_environment, this);
+            call_method0(as_value(method.get()), _environment, this);
             called = true;
         }
     }
@@ -1000,9 +999,9 @@ MovieClip::get_path_element(string_table::key key)
     // See if we have a match on the display list.
     DisplayObject* ch;
     if ( _vm.getSWFVersion() >= 7 ) ch = 
-        m_display_list.getDisplayObjectByName(name);
+        _displayList.getDisplayObjectByName(name);
 
-    else ch = m_display_list.getDisplayObjectByName_i(name);
+    else ch = _displayList.getDisplayObjectByName_i(name);
 
             // TODO: should we check for isActionScriptReferenceable here ?
     if ( ch )
@@ -1111,10 +1110,10 @@ MovieClip::advance_sprite()
     processCompletedLoadVariableRequests();
 
 #ifdef GNASH_DEBUG
-    size_t frame_count = m_def->get_frame_count();
+    size_t frame_count = _def->get_frame_count();
 
     log_debug(_("Advance_movieclip for movieclip '%s' - frame %u/%u "),
-        getTarget(), m_current_frame,
+        getTarget(), _currentFrame,
         frame_count);
 #endif
 
@@ -1122,27 +1121,27 @@ MovieClip::advance_sprite()
     queueEvent(event_id::ENTER_FRAME, movie_root::apDOACTION);
 
     // Update current and next frames.
-    if (m_play_state == PLAY)
+    if (_playState == PLAYSTATE_PLAY)
     {
 #ifdef GNASH_DEBUG
-        log_debug(_("MovieClip::advance_movieclip we're in PLAY mode"));
+        log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_PLAY mode"));
 #endif
 
-        int prev_frame = m_current_frame;
+        int prev_frame = _currentFrame;
 
 #ifdef GNASH_DEBUG
         log_debug(_("on_event_load called, incrementing"));
 #endif
         increment_frame_and_check_for_loop();
 #ifdef GNASH_DEBUG
-        log_debug(_("after increment we are at frame %u/%u"), m_current_frame, frame_count);
+        log_debug(_("after increment we are at frame %u/%u"), _currentFrame, frame_count);
 #endif
 
         // Execute the current frame's tags.
-        // First time execute_frame_tags(0) executed in dlist.cpp(child) or SWFMovieDefinition(root)
-        if (m_current_frame != (size_t)prev_frame)
+        // First time executeFrameTags(0) executed in dlist.cpp(child) or SWFMovieDefinition(root)
+        if (_currentFrame != (size_t)prev_frame)
         {
-            if ( m_current_frame == 0 && has_looped() )
+            if ( _currentFrame == 0 && has_looped() )
             {
 #ifdef GNASH_DEBUG
                 log_debug(_("Jumping back to frame 0 of movieclip %s"),
@@ -1154,11 +1153,12 @@ MovieClip::advance_sprite()
             {
 #ifdef GNASH_DEBUG
                 log_debug(_("Executing frame%d (0-based) tags of movieclip "
-                            "%s"), m_current_frame, getTarget());
+                            "%s"), _currentFrame, getTarget());
 #endif
-                // Make sure m_current_frame is 0-based during execution of DLIST tags
-                execute_frame_tags(m_current_frame, m_display_list,
-                        TAG_DLIST|TAG_ACTION);
+                // Make sure _currentFrame is 0-based during execution of DLIST tags
+                executeFrameTags(_currentFrame, _displayList,
+                        SWF::ControlTag::TAG_DLIST |
+                        SWF::ControlTag::TAG_ACTION);
             }
         }
 
@@ -1166,9 +1166,9 @@ MovieClip::advance_sprite()
 #ifdef GNASH_DEBUG
     else
     {
-        log_debug(_("MovieClip::advance_movieclip we're in STOP mode"));
-        // shouldn't we execute frame tags anyway when in STOP mode ?
-        //execute_frame_tags(m_current_frame);
+        log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_STOP mode"));
+        // shouldn't we execute frame tags anyway when in PLAYSTATE_STOP mode ?
+        //executeFrameTags(_currentFrame);
     }
 #endif
 }
@@ -1181,7 +1181,7 @@ MovieClip::advance()
 
 #ifdef GNASH_DEBUG
     log_debug(_("Advance movieclip '%s' at frame %u/%u"),
-        getTargetPath(), m_current_frame,
+        getTargetPath(), _currentFrame,
         get_frame_count());
 #endif
 
@@ -1201,7 +1201,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),
-                m_current_frame, getTarget());
+                _currentFrame, getTarget());
 #endif
         std::auto_ptr<ExecutableCode> code ( 
                 new GlobalCode(a, boost::intrusive_ptr<MovieClip>(this)) );
@@ -1220,7 +1220,7 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 void
 MovieClip::execute_action(const action_buffer& ab)
 {
-    as_environment& env = m_as_environment; // just type less
+    as_environment& env = _environment; // just type less
 
     ActionExec exec(ab, env);
     exec();
@@ -1233,36 +1233,37 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
     // This is not tested as usable for jump-forwards (yet)...
     // TODO: I guess just moving here the code currently in goto_frame
     //             for jump-forwards would do
-    assert(tgtFrame <= m_current_frame);
+    assert(tgtFrame <= _currentFrame);
 
     // Just invalidate this DisplayObject before jumping back.
     // Should be optimized, but the invalidating model is not clear enough,
     // and there are some old questions spreading the source files.
     set_invalidated();
 
-    DisplayList m_tmp_display_list;
+    DisplayList tmplist;
     for (size_t f = 0; f<tgtFrame; ++f)
     {
-        m_current_frame = f;
-        execute_frame_tags(f, m_tmp_display_list, TAG_DLIST);
+        _currentFrame = f;
+        executeFrameTags(f, tmplist, SWF::ControlTag::TAG_DLIST);
     }
 
     // Execute both action tags and DLIST tags of the target frame
-    m_current_frame = tgtFrame;
-    execute_frame_tags(tgtFrame, m_tmp_display_list, TAG_DLIST|TAG_ACTION);
+    _currentFrame = tgtFrame;
+    executeFrameTags(tgtFrame, tmplist, SWF::ControlTag::TAG_DLIST |
+                                        SWF::ControlTag::TAG_ACTION);
 
-    m_display_list.mergeDisplayList(m_tmp_display_list);
+    _displayList.mergeDisplayList(tmplist);
 }
 
 // 0-based frame number !
 void
-MovieClip::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
+MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
 {
     testInvariant();
 
     assert(typeflags);
 
-    const PlayList* playlist = m_def->getPlaylist(frame);
+    const PlayList* playlist = _def->getPlaylist(frame);
     if ( playlist )
     {
         PlayList::const_iterator it = playlist->begin();
@@ -1275,14 +1276,15 @@ MovieClip::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
                 getTargetPath());
         );
 
-        if ( (typeflags&TAG_DLIST) && (typeflags&TAG_ACTION) )
+        if ((typeflags & SWF::ControlTag::TAG_DLIST) && 
+                (typeflags & SWF::ControlTag::TAG_ACTION) )
         {
             for( ; it != e; it++)
             {
                 (*it)->execute(this, dlist);
             }
         }
-        else if ( typeflags & TAG_DLIST )
+        else if ( typeflags & SWF::ControlTag::TAG_DLIST )
         {
             for( ; it != e; it++)
             {
@@ -1291,7 +1293,7 @@ MovieClip::execute_frame_tags(size_t frame, DisplayList& dlist, int typeflags)
         }
         else
         {
-            assert(typeflags & TAG_ACTION);
+            assert(typeflags & SWF::ControlTag::TAG_ACTION);
             for( ; it != e; it++)
             {
                 (*it)->execute_action(this, dlist);
@@ -1307,42 +1309,42 @@ MovieClip::goto_frame(size_t target_frame_number)
 {
 #if defined(DEBUG_GOTOFRAME) || defined(GNASH_DEBUG_TIMELINE)
     log_debug(_("movieclip %s ::goto_frame(%d) - current frame is %d"),
-        getTargetPath(), target_frame_number, m_current_frame);
+        getTargetPath(), target_frame_number, _currentFrame);
 #endif
 
     // goto_frame stops by default.
     // ActionGotoFrame tells the movieClip to go to the target frame 
     // and stop at that frame. 
-    set_play_state(STOP);
+    setPlayState(PLAYSTATE_STOP);
 
-    if ( target_frame_number > m_def->get_frame_count() - 1)
+    if ( target_frame_number > _def->get_frame_count() - 1)
     {
-        target_frame_number = m_def->get_frame_count() - 1;
+        target_frame_number = _def->get_frame_count() - 1;
 
-        if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+        if ( ! _def->ensure_frame_loaded(target_frame_number+1) )
         {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded,"
                         "although frame count in header (%d) said we "
                         "should have found it"),
-                        target_frame_number+1, m_def->get_frame_count());
+                        target_frame_number+1, _def->get_frame_count());
             return; // ... I guess, or not ?
         }
 
         // Just set _currentframe and return.
-        m_current_frame = target_frame_number;
+        _currentFrame = target_frame_number;
 
         // don't push actions, already tested.
         return;
     }
 
-    if (target_frame_number == m_current_frame)
+    if (target_frame_number == _currentFrame)
     {
         // don't push actions
         return;
     }
 
     // Unless the target frame is the next one, stop playback of soundstream
-    if (target_frame_number != m_current_frame+1 )
+    if (target_frame_number != _currentFrame+1 )
     {
         stopStreamSound();
     }
@@ -1363,12 +1365,12 @@ MovieClip::goto_frame(size_t target_frame_number)
             loaded_frames);
 
         );
-        if ( ! m_def->ensure_frame_loaded(target_frame_number+1) )
+        if ( ! _def->ensure_frame_loaded(target_frame_number+1) )
         {
             log_error(_("Target frame of a gotoFrame(%d) was never loaded, "
                         "although frame count in header (%d) said we should"
                         " have found it"),
-                        target_frame_number+1, m_def->get_frame_count());
+                        target_frame_number+1, _def->get_frame_count());
             return; // ... I guess, or not ?
         }
     }
@@ -1378,7 +1380,7 @@ MovieClip::goto_frame(size_t target_frame_number)
     // Construct the DisplayList of the target frame
     //
 
-    if (target_frame_number < m_current_frame)
+    if (target_frame_number < _currentFrame)
     {
         // Go backward to a previous frame
         // NOTE: just in case we're being called by code in a called frame
@@ -1387,25 +1389,26 @@ MovieClip::goto_frame(size_t target_frame_number)
         _callingFrameActions = false;
 
         // restoreDisplayList takes care of properly setting the 
-        // m_current_frame variable
+        // _currentFrame variable
         restoreDisplayList(target_frame_number);
-        assert(m_current_frame == target_frame_number);
+        assert(_currentFrame == target_frame_number);
         _callingFrameActions = callingFrameActionsBackup;
     }
     else
     // Go forward to a later frame
     {
-        // We'd immediately return if target_frame_number == m_current_frame
-        assert(target_frame_number > m_current_frame);
-        while (++m_current_frame < target_frame_number)
+        // We'd immediately return if target_frame_number == _currentFrame
+        assert(target_frame_number > _currentFrame);
+        while (++_currentFrame < target_frame_number)
         {
-            //for (size_t f = m_current_frame+1; f<target_frame_number; ++f) 
+            //for (size_t f = _currentFrame+1; f<target_frame_number; ++f) 
             // Second argument requests that only "DisplayList" tags
             // are executed. This means NO actions will be
             // pushed on m_action_list.
-            execute_frame_tags(m_current_frame, m_display_list, TAG_DLIST);
+            executeFrameTags(_currentFrame, _displayList,
+                   SWF::ControlTag::TAG_DLIST);
         }
-        assert(m_current_frame == target_frame_number);
+        assert(_currentFrame == target_frame_number);
 
 
         // Now execute target frame tags (queuing actions)
@@ -1413,18 +1416,19 @@ MovieClip::goto_frame(size_t target_frame_number)
         //             we'll backup and resume the _callingFrameActions flag
         bool callingFrameActionsBackup = _callingFrameActions;
         _callingFrameActions = false;
-        execute_frame_tags(target_frame_number, m_display_list,
-                TAG_DLIST|TAG_ACTION);
+        executeFrameTags(target_frame_number, _displayList,
+                SWF::ControlTag::TAG_DLIST |
+                SWF::ControlTag::TAG_ACTION);
         _callingFrameActions = callingFrameActionsBackup;
     }
 
-    assert(m_current_frame == target_frame_number);
+    assert(_currentFrame == target_frame_number);
 }
 
 bool MovieClip::goto_labeled_frame(const std::string& label)
 {
     size_t target_frame;
-    if (m_def->get_labeled_frame(label, target_frame))
+    if (_def->get_labeled_frame(label, target_frame))
     {
         goto_frame(target_frame);
         return true;
@@ -1453,7 +1457,7 @@ void MovieClip::display()
     
     
     // descend the display list
-    m_display_list.display();
+    _displayList.display();
      
     clear_invalidated();
 }
@@ -1461,7 +1465,7 @@ void MovieClip::display()
 void MovieClip::omit_display()
 {
     if (m_child_invalidated)
-        m_display_list.omit_display();
+        _displayList.omit_display();
         
     clear_invalidated();
 }
@@ -1469,7 +1473,7 @@ void MovieClip::omit_display()
 bool
 MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObject)
 { 
-    m_display_list.placeDisplayObject(&newch, depth, initObject);    
+    _displayList.placeDisplayObject(&newch, depth, initObject);    
 
     // FIXME: check return from placeDisplayObject above ?
     return true; 
@@ -1496,10 +1500,10 @@ DisplayObject*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
 {
-    assert(m_def);
+    assert(_def);
     assert(tag);
 
-    SWF::DefinitionTag* cdef = m_def->getDefinitionTag(tag->getID());
+    SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
     if (!cdef)
     {
         IF_VERBOSE_MALFORMED_SWF(
@@ -1561,10 +1565,10 @@ MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dli
 
 void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
 {
-    assert(m_def != NULL);
+    assert(_def != NULL);
     assert(tag != NULL);
 
-    SWF::DefinitionTag* cdef = m_def->getDefinitionTag(tag->getID());
+    SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
     if (cdef == NULL)
     {
         log_error(_("movieclip::replace_display_object(): "
@@ -1628,14 +1632,14 @@ MovieClip::replace_display_object(DisplayObject* ch, int depth,
         bool use_old_cxform, bool use_old_matrix)
 {
     assert(ch);
-    m_display_list.replaceDisplayObject(ch, depth,
+    _displayList.replaceDisplayObject(ch, depth,
             use_old_cxform, use_old_matrix);
 }
 
 int
 MovieClip::get_id_at_depth(int depth)
 {
-    DisplayObject* ch = m_display_list.getDisplayObjectAtDepth(depth);
+    DisplayObject* ch = _displayList.getDisplayObjectAtDepth(depth);
     if ( ! ch ) return -1;
     return ch->get_id();
 }
@@ -1644,14 +1648,14 @@ void
 MovieClip::increment_frame_and_check_for_loop()
 {
     size_t frame_count = get_loaded_frames(); 
-    if ( ++m_current_frame >= frame_count )
+    if ( ++_currentFrame >= frame_count )
     {
         // Loop.
-        m_current_frame = 0;
-        m_has_looped = true;
+        _currentFrame = 0;
+        _hasLooped = true;
         if (frame_count > 1)
         {
-            //m_display_list.reset();
+            //_displayList.reset();
         }
     }
 
@@ -1679,7 +1683,7 @@ bool
 MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 {
     ShapeContainerFinder finder(x, y);
-    const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+    const_cast<DisplayList&>(_displayList).visitBackward(finder);
     if ( finder.hitFound() ) return true;
     return hitTestDrawable(x, y);
 }
@@ -1708,7 +1712,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
         return false;
     }
     VisibleShapeContainerFinder finder(x, y);
-    const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+    const_cast<DisplayList&>(_displayList).visitBackward(finder);
     if (finder.hitFound()) return true;
     return hitTestDrawable(x, y);
 }
@@ -1733,7 +1737,7 @@ MovieClip::pointInHitableShape(boost::int32_t x, boost::int32_t y) const
     if (mask && !mask->pointInShape(x, y)) return false;
             
     HitableShapeContainerFinder finder(x, y);
-    m_display_list.visitBackward(finder);
+    _displayList.visitBackward(finder);
     if (finder.hitFound()) return true; 
     
     return hitTestDrawable(x, y); 
@@ -1770,7 +1774,7 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     m.invert().transform(pp);
 
     MouseEntityFinder finder(wp, pp);
-    m_display_list.visitAll(finder);
+    _displayList.visitAll(finder);
     InteractiveObject* ch = finder.getEntity();
 
     // It doesn't make any sense to query _drawable, as it's
@@ -1898,7 +1902,7 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
     if ( ! isVisible() ) return 0; // isn't me !
 
     DropTargetFinder finder(x, y, dragging);
-    m_display_list.visitAll(finder);
+    _displayList.visitAll(finder);
 
     // does it hit any child ?
     const DisplayObject* ch = finder.getDropChar();
@@ -1957,7 +1961,7 @@ MovieClip::mouseEnabled() const
 DisplayObject*
 MovieClip::getDisplayObject(int /* id */)
 {
-    //return m_def->getDefinitionTag(id);
+    //return _def->getDefinitionTag(id);
     // @@ TODO -- look through our dlist for a match
     log_unimpl(_("%s doesn't even check for a char"),
         __PRETTY_FUNCTION__);
@@ -2075,7 +2079,7 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
     }
     
     
-    m_display_list.add_invalidated_bounds(ranges, force||m_invalidated);
+    _displayList.add_invalidated_bounds(ranges, force||m_invalidated);
 
     /// Add drawable.
     rect bounds;
@@ -2134,7 +2138,8 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
-        execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
+        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
+                                          SWF::ControlTag::TAG_ACTION);
 
         if (_vm.getSWFVersion() > 5)
         {
@@ -2155,7 +2160,8 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
-        execute_frame_tags(0, m_display_list, TAG_DLIST|TAG_ACTION);
+        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST | 
+                                          SWF::ControlTag::TAG_ACTION);
     }
 
     // We execute events immediately when the stage-placed DisplayObject 
@@ -2224,7 +2230,7 @@ MovieClip::constructAsScriptObject()
             break;
         }
 
-        sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
+        sprite_definition* def = dynamic_cast<sprite_definition*>(_def.get());
 
         // We won't "construct" top-level movies
         if ( ! def ) break;
@@ -2301,7 +2307,7 @@ MovieClip::unload()
     // stop any pending streaming sounds
     stopStreamSound();
 
-    bool childHaveUnloadHandler = m_display_list.unload();
+    bool childHaveUnloadHandler = _displayList.unload();
 
     // We won't be displayed again, so worth releasing
     // some memory. The drawable might take a lot of memory
@@ -2541,7 +2547,7 @@ MovieClip::getBounds() const
 {
     rect bounds;
     BoundsFinder f(bounds);
-    const_cast<DisplayList&>(m_display_list).visitAll(f);
+    const_cast<DisplayList&>(_displayList).visitAll(f);
     rect drawableBounds = _drawable.getBounds();
     bounds.expand_to_rect(drawableBounds);
     
@@ -2600,15 +2606,15 @@ void
 MovieClip::enumerateNonProperties(as_environment& env) const
 {
     EnumerateVisitor visitor(env);
-    m_display_list.visitAll(visitor);
+    _displayList.visitAll(visitor);
 }
 
 void
 MovieClip::cleanupDisplayList()
 {
     //log_debug("%s.cleanDisplayList() called, current dlist is %p", 
-    //getTarget(), (void*)&m_display_list);
-    m_display_list.removeUnloaded();
+    //getTarget(), (void*)&_displayList);
+    _displayList.removeUnloaded();
 
     cleanup_textfield_variables();
 }
@@ -2625,12 +2631,12 @@ MovieClip::markReachableResources() const
 {
     ReachableMarker marker;
 
-    m_display_list.visitAll(marker);
+    _displayList.visitAll(marker);
 
-    m_as_environment.markReachableResources();
+    _environment.markReachableResources();
 
     // Mark our own definition
-    if ( m_def.get() ) m_def->setReachable();
+    if ( _def.get() ) _def->setReachable();
 
     // Mark textfields in the TextFieldMap
     if ( _text_variables.get() )
@@ -2678,7 +2684,7 @@ MovieClip::destroy()
 {
     stopStreamSound();
 
-    m_display_list.destroy();
+    _displayList.destroy();
 
     /// We don't need these anymore
     clearProperties();
@@ -2782,11 +2788,11 @@ MovieClip::stopStreamSound()
 }
 
 void
-MovieClip::set_play_state(play_state s)
+MovieClip::setPlayState(PlayState s)
 {
-    if ( s == m_play_state ) return; // nothing to do
-    if ( s == MovieClip::STOP ) stopStreamSound();
-    m_play_state = s;
+    if (s == _playState) return; // nothing to do
+    if (s == PLAYSTATE_STOP) stopStreamSound();
+    _playState = s;
 }
 
 #ifdef USE_SWFTREE
@@ -2819,14 +2825,14 @@ MovieClip::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 {
     InfoTree::iterator selfIt = DisplayObject::getMovieInfo(tr, it);
     std::ostringstream os;
-    os << m_display_list.size();
+    os << _displayList.size();
     InfoTree::iterator localIter = tr.append_child(selfIt,
             StringPair(_("Children"), os.str()));            
     //localIter = tr.append_child(localIter, StringPair("child1", "fake"));
     //localIter = tr.append_child(localIter, StringPair("child2", "fake"));
 
     MovieInfoVisitor v(tr, localIter);
-    m_display_list.visitAll(v);
+    _displayList.visitAll(v);
 
     return selfIt;
 
@@ -2999,7 +3005,7 @@ movieclip_play(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
 
-    movieclip->set_play_state(MovieClip::PLAY);
+    movieclip->setPlayState(MovieClip::PLAYSTATE_PLAY);
     return as_value();
 }
 
@@ -3009,7 +3015,7 @@ movieclip_stop(const fn_call& fn)
     boost::intrusive_ptr<MovieClip> movieclip =
         ensureType<MovieClip>(fn.this_ptr);
 
-    movieclip->set_play_state(MovieClip::STOP);
+    movieclip->setPlayState(MovieClip::PLAYSTATE_STOP);
 
     return as_value();
 }
@@ -3534,7 +3540,7 @@ movieclip_gotoAndPlay(const fn_call& fn)
 
     // Convert to 0-based
     movieclip->goto_frame(frame_number);
-    movieclip->set_play_state(MovieClip::PLAY);
+    movieclip->setPlayState(MovieClip::PLAYSTATE_PLAY);
     return as_value();
 }
 
@@ -3564,7 +3570,7 @@ as_value movieclip_gotoAndStop(const fn_call& fn)
 
     // Convert to 0-based
     movieclip->goto_frame(frame_number);
-    movieclip->set_play_state(MovieClip::STOP);
+    movieclip->setPlayState(MovieClip::PLAYSTATE_STOP);
     return as_value();
 }
 
@@ -3579,7 +3585,7 @@ as_value movieclip_nextFrame(const fn_call& fn)
     {
         movieclip->goto_frame(current_frame + 1);
     }
-    movieclip->set_play_state(MovieClip::STOP);
+    movieclip->setPlayState(MovieClip::PLAYSTATE_STOP);
     return as_value();
 }
 
@@ -3594,7 +3600,7 @@ movieclip_prevFrame(const fn_call& fn)
     {
         movieclip->goto_frame(current_frame - 1);
     }
-    movieclip->set_play_state(MovieClip::STOP);
+    movieclip->setPlayState(MovieClip::PLAYSTATE_STOP);
     return as_value();
 }
 

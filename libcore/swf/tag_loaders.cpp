@@ -27,7 +27,6 @@
 #include "action.h"
 #include "action_buffer.h"
 #include "Font.h"
-#include "fontlib.h"
 #include "log.h"
 #include "Geometry.h"
 #include "SWFStream.h"

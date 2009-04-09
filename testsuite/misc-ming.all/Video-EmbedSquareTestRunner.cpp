@@ -89,7 +89,7 @@ main(int /*argc*/, char** /*argv*/)
 			// Frame X
 			tester.advance();
 			int framenum = root->get_current_frame();
-			cout << "---- Pixel checking in frame " << framenum+1 << " play state " << root->get_play_state() << endl;
+			cout << "---- Pixel checking in frame " << framenum+1 << " play state " << root->getPlayState() << endl;
 			
 			int i = (framenum-1)*10;
 
@@ -111,7 +111,7 @@ main(int /*argc*/, char** /*argv*/)
 			if ( framenum == framecount-2 )
 			{
 				// check we're playing, or we'll never get to next loop...
-				check_equals(root->get_play_state(), MovieClip::PLAY);
+				check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 				break;
 			}
 
@@ -123,11 +123,11 @@ main(int /*argc*/, char** /*argv*/)
 		// Check the color in (5,5) - should be yellow. Well, anything
 		// but white or transparent.
 		check_pixel(5, 5, 2, yellow, 5);
-		check_equals(root->get_play_state(), MovieClip::STOP);
+		check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 		tester.click();
 
 		// Sanity check
-		check_equals(root->get_play_state(), MovieClip::PLAY);
+		check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 		tester.advance();
 

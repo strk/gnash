@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	check_equals(root->get_frame_count(), 4);
-	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	tester.advance();  // advance to the second frame.
@@ -58,7 +58,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(mc1->isVisible(), true);
 	check_equals(mc2->isVisible(), false);
-	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), 1);
 
 	// we're in stop mode, so advance should not advance anything
@@ -73,7 +73,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(60, 60);
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
-	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	tester.advance();
 	check_equals(root->get_current_frame(), 2);
 

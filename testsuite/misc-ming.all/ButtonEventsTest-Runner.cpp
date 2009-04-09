@@ -306,7 +306,7 @@ main(int /*argc*/, char** /*argv*/)
 	}
 
 	// last advance should not restart the loop (it's in STOP mode)
-        check_equals(root->get_play_state(), MovieClip::STOP);
+        check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), 6);
 
 }

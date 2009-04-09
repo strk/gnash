@@ -348,8 +348,7 @@ create_movie(const URL& url, const RunInfo& runInfo, const char* reset_url,
       return NULL;
   }
 
-  std::string urlstr = url.str();
-  const char* movie_url = reset_url ? reset_url : urlstr.c_str();
+  std::string movie_url = reset_url ? reset_url : url.str();
   movie_definition* ret = create_movie(in, movie_url, runInfo,
           startLoaderThread);
 
@@ -557,7 +556,8 @@ public:
     /// Mark all library elements as reachable (for GC)
     void markReachableResources() const
     {
-        for ( LibraryContainer::const_iterator i=_map.begin(), e=_map.end(); i!=e; ++i)
+        for (LibraryContainer::const_iterator i=_map.begin(), e=_map.end();
+                i!=e; ++i)
         {
             i->second.def->setReachable();
         }

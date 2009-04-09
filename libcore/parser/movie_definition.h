@@ -64,7 +64,9 @@ namespace gnash {
 	class BitmapInfo;
 	class movie_instance;
 	class MovieClip;
-	class ControlTag;
+	namespace SWF {
+        class ControlTag;
+    }
     class Font;
     class ExportableResource;
     class sound_sample;
@@ -96,7 +98,7 @@ namespace gnash
 class movie_definition : public SWF::DefinitionTag
 {
 public:
-	typedef std::vector<ControlTag*> PlayList;
+	typedef std::vector<SWF::ControlTag*> PlayList;
 
 	virtual int	get_version() const = 0;
 	virtual float	get_width_pixels() const = 0;
@@ -195,7 +197,7 @@ public:
 	/// @return NULL if no DisplayObject with the given ID is found
 	///         (this is the default)
 	///
-	virtual DefinitionTag*	getDefinitionTag(int /*id*/)
+	virtual DefinitionTag* getDefinitionTag(int /*id*/) const
 	{
 		return NULL;
 	}
@@ -276,7 +278,7 @@ public:
 	/// TODO: take an auto_ptr.
 	/// NOTE: the default implementation just let the ControlTag leak.
 	///
-	virtual void	addControlTag(ControlTag* /*c*/)
+	virtual void addControlTag(SWF::ControlTag* /*c*/)
 	{
 	}
 
@@ -314,7 +316,7 @@ public:
 	///
 	/// NOTE: ownership of the returned object is NOT transferred
 	///
-	virtual JpegImageInput* get_jpeg_loader()
+	virtual JpegImageInput* get_jpeg_loader() const
 	{
 		return NULL;
 	}
@@ -332,7 +334,7 @@ public:
 	///
 	/// The default implementation returns 0.
 	///
-	virtual BitmapInfo* getBitmap(int /*DisplayObject_id*/)
+	virtual BitmapInfo* getBitmap(int /*DisplayObject_id*/) const
 	{
 		return 0;
 	}
@@ -354,7 +356,7 @@ public:
 	///
 	/// The default implementation always returns NULL
 	///
-	virtual sound_sample* get_sound_sample(int /*DisplayObject_id*/)
+	virtual sound_sample* get_sound_sample(int /*DisplayObject_id*/) const
 	{
 		return NULL;
 	}
@@ -385,7 +387,7 @@ public:
 	///
 	/// @returns -1 if no sound stream is being currently loading
 	///
-	virtual int get_loading_sound_stream_id()
+	virtual int get_loading_sound_stream_id() const
 	{
 		return -1;
 	}

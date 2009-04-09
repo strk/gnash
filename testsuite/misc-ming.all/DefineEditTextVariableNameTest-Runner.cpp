@@ -43,7 +43,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	check_equals(root->get_frame_count(), 14);
-	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	const DisplayObject* mc1 = tester.findDisplayItemByName(*root, "mc1");
@@ -59,12 +59,12 @@ main(int /*argc*/, char** /*argv*/)
 	for (unsigned f=root->get_current_frame(); f<root->get_frame_count()-1; ++f)
 	{
 		check_equals(root->get_current_frame(), f);
-		check_equals(root->get_play_state(), MovieClip::PLAY);
+		check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 		tester.advance();
 	}
 
 	// does stop() on last frame
-	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), root->get_frame_count()-1);
 
 }

@@ -144,22 +144,15 @@ TextRecord::read(SWFStream& in, movie_definition& m, int glyphBits,
 
 // Render the given glyph records.
 void
-TextRecord::displayRecords(const SWFMatrix& this_mat,
-        const DisplayObject& inst, const std::vector<TextRecord>& records,
-        bool embedded)
+TextRecord::displayRecords(const SWFMatrix& mat, const cxform& cx,
+        const TextRecords& records, bool embedded)
 {
-
-    SWFMatrix mat = inst.getWorldMatrix();
-    mat.concatenate(this_mat);
-
-    cxform cx = inst.get_world_cxform();
-    const SWFMatrix base_matrix = mat;
 
     // Starting positions.
     float x = 0.0f;
     float y = 0.0f;
 
-    for (std::vector<TextRecord>::const_iterator i = records.begin(),
+    for (TextRecords::const_iterator i = records.begin(),
             e = records.end(); i !=e; ++i)
     {
 
@@ -189,7 +182,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
 
         boost::int16_t startX = x; // for the underline, if any
 
-        rgba textColor = cx.transform(rec.color());
+        const rgba textColor = cx.transform(rec.color());
 
         for (Glyphs::const_iterator j = rec.glyphs().begin(),
                 je = rec.glyphs().end(); j != je; ++j)
@@ -199,15 +192,11 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
 
             const int index = ge.index;
                 
-            mat = base_matrix;
-            mat.concatenate_translation(x, y);
-            mat.concatenate_scale(scale, scale);
+            SWFMatrix m = mat;
+            m.concatenate_translation(x, y);
+            m.concatenate_scale(scale, scale);
 
-            if (index == -1)
-            {
-#ifdef GNASH_DEBUG_TEXT_RENDERING
-    log_error(_("invalid glyph (-1)"));
-#endif
+            if (index == -1) {
 
 #ifdef DRAW_INVALID_GLYPHS_AS_EMPTY_BOXES
                 // The EM square is 1024x1024, but usually isn't filled up.
@@ -219,25 +208,21 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
                 //       square is not hard-coded anymore but can be
                 //       queried from the font class
                 //
-                static const std::vector<point> emptyCharBox = boost::assign::list_of
-                     (point(32, 32))
-                     (point(480, 32))
-                     (point(480, -656))
-                     (point(32, -656))
-                     (point(32,32));
-                render::drawLine(emptyCharBox, textColor, mat);  
+                static const std::vector<point> emptyCharBox =
+                    boost::assign::list_of (point(32, 32))
+                                           (point(480, 32))
+                                           (point(480, -656))
+                                           (point(32, -656))
+                                           (point(32,32));
+                render::drawLine(emptyCharBox, textColor, m);
 #endif
 
             }
-            else
-            {
+            else {
                 ShapeRecord* glyph = fnt->get_glyph(index, embedded);
 
                 // Draw the DisplayObject using the filled outline.
-                if (glyph)
-                {
-                    render::drawGlyph(*glyph, textColor, mat);
-                }
+                if (glyph) render::drawGlyph(*glyph, textColor, m);
             }
             x += ge.advance;
         }
@@ -252,7 +237,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
             // This will only be known if a glyph was actually found,
             // or would be the size of the empty box (arbitrary size)
             //
-            boost::int16_t endX = (int)x; // - rec.m_glyphs.back().m_glyph_advance + (480.0*scale);
+            boost::int16_t endX = static_cast<boost::int16_t>(x); 
 
             // The underline is made to be some pixels below the baseline (0)
             // and scaled so it's further as font size increases.
@@ -264,7 +249,7 @@ TextRecord::displayRecords(const SWFMatrix& this_mat,
                 (point(startX, posY))
                 (point(endX, posY));
 
-            render::drawLine(underline, textColor, base_matrix);
+            render::drawLine(underline, textColor, mat);
         }
     }
 }
