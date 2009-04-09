@@ -160,7 +160,7 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual BitmapInfo* getBitmap(int id)
+	virtual BitmapInfo* getBitmap(int id) const
 	{
 		return m_movie_def.getBitmap(id);
 	}
@@ -174,7 +174,7 @@ public:
 	}
 
 	/// Delegate call to associated root movie
-	virtual sound_sample* get_sound_sample(int id)
+	virtual sound_sample* get_sound_sample(int id) const
 	{
 		return m_movie_def.get_sound_sample(id);
 	}
@@ -195,7 +195,7 @@ public:
 	}
 
 	// See dox in movie_definition.h
-	virtual int get_loading_sound_stream_id()
+	virtual int get_loading_sound_stream_id() const
 	{
 		return _loadingSoundStream;
 	}
@@ -227,7 +227,7 @@ public:
 	/// Get a SWF::DefinitionTag from this Sprite's root movie
 	/// CharacterDictionary.
 	///
-	virtual SWF::DefinitionTag*	getDefinitionTag(int id)
+	virtual SWF::DefinitionTag*	getDefinitionTag(int id) const
 	{
 	    return m_movie_def.getDefinitionTag(id);
 	}
@@ -275,7 +275,7 @@ private:
 
 
 	// See dox in movie_definition.h
-	virtual void	addControlTag(ControlTag* c)
+	virtual void addControlTag(SWF::ControlTag* c)
 	{
 		m_playlist[m_loading_frame].push_back(c);
 	}

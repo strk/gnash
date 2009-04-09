@@ -130,7 +130,7 @@ public:
 	//
 	/// returns a NULL if the id is unknown.
 	///
-	boost::intrusive_ptr<SWF::DefinitionTag> getDisplayObject(int id);
+	boost::intrusive_ptr<SWF::DefinitionTag> getDisplayObject(int id) const;
 
 	/// Add a Character assigning it the given id
 	//
@@ -250,10 +250,7 @@ public:
 
 	/// \brief
 	/// Return a DisplayObject from the dictionary
-	/// NOTE: call add_ref() on the return or put in a boost::intrusive_ptr<>
-	/// TODO: return a boost::intrusive_ptr<> directly...
-	///
-    SWF::DefinitionTag* getDefinitionTag(int DisplayObject_id);
+    SWF::DefinitionTag* getDefinitionTag(int DisplayObject_id) const;
 
 	// See dox in movie_definition
 	//
@@ -263,30 +260,30 @@ public:
 
 	void	add_font(int font_id, Font* f);
 
-	Font*	get_font(int font_id) const;
+	Font* get_font(int font_id) const;
 
 	Font* get_font(const std::string& name, bool bold, bool italic) const;
 
 	// See dox in movie_definition.h
-	BitmapInfo* getBitmap(int DisplayObject_id);
+	BitmapInfo* getBitmap(int DisplayObject_id) const;
 
 	// See dox in movie_definition.h
 	void addBitmap(int DisplayObject_id, boost::intrusive_ptr<BitmapInfo> im);
 
 	// See dox in movie_definition.h
-	sound_sample*	get_sound_sample(int DisplayObject_id);
+	sound_sample* get_sound_sample(int DisplayObject_id) const;
 
 	// See dox in movie_definition.h
-	virtual void	add_sound_sample(int DisplayObject_id, sound_sample* sam);
+	virtual void add_sound_sample(int DisplayObject_id, sound_sample* sam);
 
 	// See dox in movie_definition.h
-	virtual void	set_loading_sound_stream_id(int id) { m_loading_sound_stream = id; }
+	virtual void set_loading_sound_stream_id(int id) { m_loading_sound_stream = id; }
 
 	// See dox in movie_definition.h
-	int get_loading_sound_stream_id() { return m_loading_sound_stream; }
+	int get_loading_sound_stream_id() const { return m_loading_sound_stream; }
 
 	// See dox in movie_definition.h
-	void	addControlTag(ControlTag* tag)
+	void addControlTag(SWF::ControlTag* tag)
 	{
 	    assert(tag);
 	    boost::mutex::scoped_lock lock(_frames_loaded_mutex);
@@ -318,7 +315,7 @@ public:
 	}
 
 	// See dox in movie_definition.h
-	JpegImageInput* get_jpeg_loader()
+	JpegImageInput* get_jpeg_loader() const
 	{
 	    return m_jpeg_in.get();
 	}
