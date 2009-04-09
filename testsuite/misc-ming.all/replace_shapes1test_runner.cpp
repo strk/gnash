@@ -62,7 +62,7 @@ main(int /*argc*/, char** /*argv*/)
 	// FRAME 1 (start)
 
 	check_equals(root->get_frame_count(), 4);
-	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 1);  // dejagnu clip
 	invalidated = tester.getInvalidatedRanges();
@@ -71,7 +71,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 2, place DisplayObject
 	invalidated = tester.getInvalidatedRanges();
 	
-	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 2); // dejagnu + red char
 
@@ -93,7 +93,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 3, replace DisplayObject
 	invalidated = tester.getInvalidatedRanges();
 	
-	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 	check_equals(root->get_current_frame(), 2);
 	check_equals(root->getDisplayList().size(), 2); // dejagnu + green char 
 
@@ -119,7 +119,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.advance(); // FRAME 4, jump to frame 2 and stop
 	invalidated = tester.getInvalidatedRanges();
 
-	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 2); // dejagnu + red char 
 

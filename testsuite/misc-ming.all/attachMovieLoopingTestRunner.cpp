@@ -46,7 +46,7 @@ main(int /*argc*/, char** /*argv*/)
 	assert(root);
 
 	check_equals(root->get_frame_count(), 2);
-	check_equals(root->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 	check_equals(root->get_current_frame(), 0);
 
 	check(! tester.findDisplayItemByDepth(*root, 70) );

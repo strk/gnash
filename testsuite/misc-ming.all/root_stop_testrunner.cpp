@@ -46,56 +46,56 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_frame_count(), 2);
 	check_equals(root->get_current_frame(), 0);
-	check_equals(root->get_play_state(), MovieClip::STOP);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 
 	const DisplayObject* ch = tester.findDisplayItemByName(*root, "mc_in_root");
 	check(ch);
 	const MovieClip* mc = dynamic_cast<const MovieClip*>(ch);
 	check(mc);
 	check_equals(mc->get_current_frame(), 0);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0);  // we were in stop mode
 	check_equals(mc->get_current_frame(), 1); 
-	check_equals(root->get_play_state(), MovieClip::STOP);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0); // we were in stop mode
 	check_equals(mc->get_current_frame(), 2);  
-	check_equals(root->get_play_state(), MovieClip::STOP);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0); // we were in stop mode
 	check_equals(mc->get_current_frame(), 0); 
-	check_equals(root->get_play_state(), MovieClip::PLAY);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 1); 
 	check_equals(mc->get_current_frame(), 1); 
-	check_equals(root->get_play_state(), MovieClip::PLAY);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0);  // looped
 	check_equals(mc->get_current_frame(), 2); 
-	check_equals(root->get_play_state(), MovieClip::PLAY);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 1); 
 	check_equals(mc->get_current_frame(), 0); 
-	check_equals(root->get_play_state(), MovieClip::PLAY);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 0); // looped again
 	check_equals(mc->get_current_frame(), 1); 
-	check_equals(root->get_play_state(), MovieClip::PLAY);
-	check_equals(mc->get_play_state(), MovieClip::PLAY);
+	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_PLAY);
+	check_equals(mc->getPlayState(), MovieClip::PLAYSTATE_PLAY);
   	
 	return 0;
 }
