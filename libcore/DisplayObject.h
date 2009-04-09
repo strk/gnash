@@ -40,6 +40,7 @@
 #include <string>
 #include <cassert>
 #include <boost/cstdint.hpp> // For C99 int types
+#include <boost/noncopyable.hpp>
 
 //#define DEBUG_SET_INVALIDATED 1
 
@@ -79,7 +80,7 @@ namespace gnash {
 /// dynamic DisplayObjects, but tags are not always stored. They are not
 /// stored in most InteractiveObjects because most properties can be
 /// overridden during SWF execution.
-class DisplayObject : public as_object
+class DisplayObject : public as_object, boost::noncopyable
 {
 public:
 
