@@ -112,8 +112,8 @@ NetConnection_as::init(as_object& global)
 // here to have HTTPRemotingHandler definition available
 NetConnection_as::~NetConnection_as()
 {
-    _http_client->close();
-    _rtmp_client->close(); 
+    _http_client->closeNet();
+    _rtmp_client->closeNet(); 
 }
 
 void
