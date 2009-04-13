@@ -4517,7 +4517,19 @@ movieclip_lineStyle(const fn_call& fn)
         case 2:
         {
             boost::uint32_t rgbval = boost::uint32_t(
-                clamp<float>(fn.arg(1).to_number(), 0, 16777216));
+                // See pollock.swf:
+                // it gets too many black colors with the clamp;
+                // it sets color to a random number from
+                // 0 to 160000000 (about 10 times more then the max).
+                // I guess the correct behaviour is a different handling
+                // of the overflow. Letting the compiler decide on that
+                // gives better results. None of the existing testcases
+                // change results based on this, which calls to adding
+                // a new test. Probably DrawingApiTest.as would be a good
+                // place for that.
+                fn.arg(1).to_number()
+                //clamp<float>(fn.arg(1).to_number(), 0, 16777216)
+            );
             r = boost::uint8_t((rgbval & 0xFF0000) >> 16);
             g = boost::uint8_t((rgbval & 0x00FF00) >> 8);
             b = boost::uint8_t((rgbval & 0x0000FF) );
