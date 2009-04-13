@@ -180,7 +180,8 @@ ConnectionHandler::getStream(const std::string&)
 /// script specified a callback function, use the optional parameters to specify
 /// the identifier (which must be unique) and the callback object as an as_value
 ///
-class HTTPRemotingHandler : public ConnectionHandler {
+class HTTPRemotingHandler : public ConnectionHandler
+{
 
 public:
 
@@ -268,12 +269,12 @@ private:
     {
         push_amf(amf);
         push_callback(identifier, callback);
-    };
+    }
 
     void enqueue(const SimpleBuffer &amf)
     {
         push_amf(amf);
-    };
+    }
     
 };
 
