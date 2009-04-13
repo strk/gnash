@@ -95,7 +95,8 @@ Kde4Gui::init(int argc, char **argv[])
 
     _application.reset(new QApplication(*i, r));
     _window.reset(new QMainWindow());
-    _drawingWidget = new DrawingWidget(*this);
+    _embedWidget = new EmbedWidget(*this);
+    _drawingWidget = _embedWidget->drawingWidget();
 
     _glue.init (argc, argv);
 
@@ -137,17 +138,16 @@ Kde4Gui::createWindow(const char* windowtitle, int width, int height)
     _window->setWindowIcon(QIcon(PKGDATADIR"/GnashG.png"));
     
     if(_xid) {
-        _drawingWidget->embedInto(_xid);
-        _drawingWidget->show();
+        _embedWidget->embedInto(_xid);
+        _embedWidget->show();
         // Adjust width and height to the window we're being embedded into...
         XWindowAttributes winAttributes;
         XGetWindowAttributes(QX11Info::display(), _xid, &winAttributes);
         _width=winAttributes.width;
         _height=winAttributes.height;
-        _drawingWidget->resize(_width, _height);
     } else {
-        // The QMainWindow takes ownership of the DrawingWidget.
-        _window->setCentralWidget(_drawingWidget);
+        // The QMainWindow takes ownership of the widgets.
+        _window->setCentralWidget(_embedWidget);
         _window->show();
     }
 
@@ -287,9 +287,8 @@ Kde4Gui::setFullscreen()
     _fullscreen = true;
     fullscreenAction->setChecked(_fullscreen);
 
-    // Make the widget a top level window so it can be fullscreen
-    _drawingWidget->setWindowFlags(Qt::Window);
-    _drawingWidget->showFullScreen();
+    _embedWidget->setWindowFlags(Qt::Window);
+    _embedWidget->showFullScreen();
 }
 
 void
@@ -298,18 +297,13 @@ Kde4Gui::unsetFullscreen()
     _fullscreen = false;
     fullscreenAction->setChecked(_fullscreen);
 
-    if (_drawingWidget->isFullScreen()) {
-        // Re-embed the drawing wiget into the browser
+    if (_embedWidget->isFullScreen()) {
+        _embedWidget->setWindowFlags(Qt::Widget);
+        _embedWidget->showNormal();
         if (_xid) {
-            _drawingWidget->showNormal();
-            _drawingWidget->embedInto(_xid);
-        }
-        else {
-            _drawingWidget->setWindowFlags(Qt::Widget);
-            _drawingWidget->showNormal();
+            _embedWidget->embedInto(_xid);
         }
     }
-
 }
 
 gnash::key::code
@@ -636,8 +630,53 @@ Kde4Gui::setupKeyMap()
     (Qt::Key_QuoteDbl, gnash::key::DOUBLE_QUOTE);
 }
 
+void
+Kde4Gui::playHook()
+{
+    _embedWidget->hidePlayButton();
+}
+
+void
+Kde4Gui::stopHook()
+{
+    _embedWidget->showPlayButton();
+}
+
+/// EmbedWidget implementation
+
+EmbedWidget::EmbedWidget(Kde4Gui& gui)
+  : QX11EmbedWidget()
+{
+    _drawingWidget = new DrawingWidget(gui);
+    _playButton = new QPushButton(_q("Click to Play"), this);
+
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
+    layout->addWidget(_playButton);
+    layout->addWidget(_drawingWidget);
+    _playButton->hide();
+
+    connect(_playButton, SIGNAL(clicked()), this, SLOT(hidePlayButton()));
+    connect(_playButton, SIGNAL(clicked()), _drawingWidget, SLOT(play()));
+}
+
+void EmbedWidget::hidePlayButton()
+{
+    _playButton->hide();
+}
+
+void EmbedWidget::showPlayButton()
+{
+    _playButton->show();
+}
 
 /// DrawingWidget implementation
+
+DrawingWidget::DrawingWidget(Kde4Gui& gui)
+ : _gui(gui)
+{
+}
 
 void 
 DrawingWidget::paintEvent(QPaintEvent *event)

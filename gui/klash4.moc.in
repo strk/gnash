@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'Kde4Gui.h'
 **
-** Created: Mon Feb 9 08:36:10 2009
+** Created: Sun Apr 12 21:07:39 2009
 **      by: The Qt Meta Object Compiler version 59 (Qt 4.4.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -47,7 +47,7 @@ static const char qt_meta_stringdata_gnash__DrawingWidget[] = {
 };
 
 const QMetaObject gnash::DrawingWidget::staticMetaObject = {
-    { &QX11EmbedWidget::staticMetaObject, qt_meta_stringdata_gnash__DrawingWidget,
+    { &QWidget::staticMetaObject, qt_meta_stringdata_gnash__DrawingWidget,
       qt_meta_data_gnash__DrawingWidget, 0 }
 };
 
@@ -61,12 +61,12 @@ void *gnash::DrawingWidget::qt_metacast(const char *_clname)
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_gnash__DrawingWidget))
         return static_cast<void*>(const_cast< DrawingWidget*>(this));
-    return QX11EmbedWidget::qt_metacast(_clname);
+    return QWidget::qt_metacast(_clname);
 }
 
 int gnash::DrawingWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QX11EmbedWidget::qt_metacall(_c, _id, _a);
+    _id = QWidget::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
@@ -81,6 +81,60 @@ int gnash::DrawingWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 7: fullscreen((*reinterpret_cast< bool(*)>(_a[1]))); break;
         }
         _id -= 8;
+    }
+    return _id;
+}
+static const uint qt_meta_data_gnash__EmbedWidget[] = {
+
+ // content:
+       1,       // revision
+       0,       // classname
+       0,    0, // classinfo
+       2,   10, // methods
+       0,    0, // properties
+       0,    0, // enums/sets
+
+ // slots: signature, parameters, type, tag, flags
+      20,   19,   19,   19, 0x0a,
+      37,   19,   19,   19, 0x0a,
+
+       0        // eod
+};
+
+static const char qt_meta_stringdata_gnash__EmbedWidget[] = {
+    "gnash::EmbedWidget\0\0hidePlayButton()\0"
+    "showPlayButton()\0"
+};
+
+const QMetaObject gnash::EmbedWidget::staticMetaObject = {
+    { &QX11EmbedWidget::staticMetaObject, qt_meta_stringdata_gnash__EmbedWidget,
+      qt_meta_data_gnash__EmbedWidget, 0 }
+};
+
+const QMetaObject *gnash::EmbedWidget::metaObject() const
+{
+    return &staticMetaObject;
+}
+
+void *gnash::EmbedWidget::qt_metacast(const char *_clname)
+{
+    if (!_clname) return 0;
+    if (!strcmp(_clname, qt_meta_stringdata_gnash__EmbedWidget))
+        return static_cast<void*>(const_cast< EmbedWidget*>(this));
+    return QX11EmbedWidget::qt_metacast(_clname);
+}
+
+int gnash::EmbedWidget::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
+    _id = QX11EmbedWidget::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: hidePlayButton(); break;
+        case 1: showPlayButton(); break;
+        }
+        _id -= 2;
     }
     return _id;
 }

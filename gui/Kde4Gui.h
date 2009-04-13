@@ -45,6 +45,7 @@ class QCheckBox;
 class QSlider;
 class QLineEdit;
 class QSpinBox;
+class QStackedWidget;
 
 namespace gnash {
     class Kde4Gui;
@@ -53,17 +54,12 @@ namespace gnash {
 namespace gnash
 {
 
-class DrawingWidget : public QX11EmbedWidget
+class DrawingWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    DrawingWidget(Kde4Gui& gui)
-        :
-        QX11EmbedWidget(),
-        _gui(gui)
-    {}
-
+    DrawingWidget(Kde4Gui& gui);
     ~DrawingWidget() {}
 
 public slots:
@@ -92,6 +88,26 @@ private:
 
     Kde4Gui& _gui;
 
+};
+
+
+class EmbedWidget : public QX11EmbedWidget
+{
+    Q_OBJECT
+
+public:
+    EmbedWidget(Kde4Gui& gui);
+    ~EmbedWidget() {};
+
+    DrawingWidget* drawingWidget() { return _drawingWidget; }
+
+public slots:
+    void hidePlayButton();
+    void showPlayButton();
+
+private:
+    QPushButton* _playButton;
+    DrawingWidget* _drawingWidget;
 };
 
 
@@ -136,12 +152,23 @@ private:
     /// Set up the map of Qt to Gnash keys.
     void setupKeyMap();
 
+    /// Called when the movie is stopped. Also called at startup if
+    /// start stopped is configured.
+    void stopHook();
+
+    /// Called when the movie is played.
+    void playHook();
+
+
     DrawBounds _drawbounds;
  
     /// The main application, which should destroy everything
     /// left on closing.
     std::auto_ptr<QApplication>  _application;
     
+    /// The widget that is used for embedding between processes.
+    EmbedWidget* _embedWidget;
+
     /// The widget for rendering and handling user events.
     //
     /// Ownership is transferred to the main window, which
