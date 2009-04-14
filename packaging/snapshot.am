@@ -16,59 +16,67 @@
 # 
 
 NOW = `date "+%Y%m%d"`
+
 # for snapshots, this should always be something like trunk or head
 # for an official release, it should be unset
-RELEASE = trunk_
+
+#bzr version-info --custom --template='#define BRANCH_REVNO {revno}\n#define BRANCH_NICK {branch_nick}\n'
 
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
-SNAPSHOT_DIR = gnash-${RELEASE}${NOW}
-SNAPSHOT_BUILD = gnash-${RELEASE}${NOW}/_build
-SNAPSHOT_TMP = /tmp/gnash-${RELEASE}$(NOW)
+SNAPSHOT_DIR = gnash-${BRANCH_REVNO}_$(BRANCH_NICK)
+SNAPSHOT_BUILD = gnash-${BRANCH_REVNO}_$(BRANCH_NICK)/_build
+SNAPSHOT_NAME = $(SNAPSHOT_DIR)
+# this is the name of the actual tarball
+SNAPSHOT_TAR = gnash-$(BRANCH_REVNO)_$(BRANCH_NICK).tar.gz
+# this is the temporary directory used for DESTDIR
+SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)_$(BRANCH_NICK)
+
+# extract info from bazar
 
 #
 # build a binary snapshot from of Gnash for systems we don't have
 # packaging support for.
 #
 
+# Do the entire process to build a binary tarball
+snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapshot-bundle
+
 # start by creating the initial tarball using the dist-bzip2 target.
 # This uses the default version for Gnash. which is 'trunk'. So we
 # rename it to the dir we want to stay clear. Then we change the default
-# version from 'trunk' to a date stamped version of trunk, like
-# '20080202trunk'
-snapshot: distdir
+# version from 'trunk' to a date stamped version of trunk.
+snapshot-src: distdir
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-${RELEASE}$${now}"; \
-	snapshot_dir="gnash-${RELEASE}$${now}"; \
-	snapshot_tar="$${pkgname}.tar.gz"; \
-	if test -d $${snapshot_dir}; then \
-	  rm -fr $${snapshot_dir}; \
+	snapshot_tar="$(SNAPSHOT_NAME).tar.gz"; \
+	if test -d $(SNAPSHOT_DIR); then \
+	  rm -fr $(SNAPSHOT_DIR); \
 	fi; \
-	mv -f gnash-trunk $${snapshot_dir}; \
-	if test ! -f $${snapshot_dir}/configure.ac.orig; then \
-	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
-	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, trunk-$${now})/" \
-	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
-	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;\
+	mv -f gnash-trunk $(SNAPSHOT_DIR); \
+	if test ! -f $(SNAPSHOT_DIR)/configure.ac.orig; then \
+	  mv -f $(SNAPSHOT_DIR)/configure.ac $(SNAPSHOT_DIR)/configure.ac.orig; \
+	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BRANCH_REVNO)-$(BRANCH_NICK))/" \
+	    $(SNAPSHOT_DIR)/configure.ac.orig > $(SNAPSHOT_DIR)/configure.ac; \
+	  cd $(SNAPSHOT_DIR) ; ./autogen.sh; cd .. ;\
 	fi; \
-	tar zcvf $${snapshot_tar} --exclude=$${snapshot_dir}/autom4te.cache \
-	  --exclude=$${snapshot_dir}/configure.ac.orig $${snapshot_dir}
-#	$(RM) -fr $${snapshot_dir}
+	tar zcvf $${snapshot_tar} --exclude=$(SNAPSHOT_DIR)/autom4te.cache \
+	  --exclude=$(SNAPSHOT_DIR)/configure.ac.orig $(SNAPSHOT_DIR)
+#	$(RM) -fr $(SNAPSHOT_DIR)
 
-snapshot-configure: snapshot
+snapshot-configure: 
 	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-${RELEASE}$${now}"; \
-	snapshot_dir="$${pkgname}"; \
-	snapshot_build="$${snapshot_dir}/_build"; \
-	if test ! -d $${snapshot_build}; then \
-	  $(MKINSTALLDIRS) $${snapshot_build}; \
+	pkgname="gnash-${BRANCH_REVNO}-$(BRANCH_NICK)"; \
+	snapshot_dir=$(SNAPSHOT_DIR); \
+	snapshot_build="$(SNAPSHOT_DIR)/_build"; \
+	if test ! -d $(SNAPSHOT_BUILD); then \
+	  $(MKINSTALLDIRS) $(SNAPSHOT_BUILD); \
 	fi; \
 	if test -d /usr/local/mozilla-firefox/plugins; then \
           plugindir=/usr/local/mozilla-firefox/plugins; \
 	else \
 	  plugindir=/usr/lib/mozilla/plugins; \
         fi; \
-	cd $${snapshot_build}; ../configure \
+	cd $(SNAPSHOT_BUILD); ../configure \
 	$(SNAPSHOT_CONFIGURE_FLAGS) \
 	  --disable-dependency-tracking\
 	  --disable-rpath \
@@ -81,31 +89,19 @@ snapshot-configure: snapshot
 #	  --with-extensions=all 
 #	  --enable-gui=all 
 
-snapshot-build: # snapshot-configure
-	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-${RELEASE}$${now}"; \
-	snapshot_dir="$${pkgname}"; \
-	snapshot_build="$${snapshot_dir}/_build"; \
-	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build}; \
-	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build}/doc/C info man html
+snapshot-build:
+	$(MAKE) $(AM_MAKEFLAGS) -C $(SNAPSHOT_BUILD)
+	$(MAKE) $(AM_MAKEFLAGS) -C $(SNAPSHOT_BUILD)/doc/C info man html
 
 # Install a package. Afterwards we link to the prebuilt man pages incase
 # DocBook and DocBook2X aren't installed on this machine.
-snapshot-install: #snapshot-build
-	now=`date "+%Y%m%d"`; \
-	snapshot_dir="gnash-${RELEASE}$${now}"; \
-	snapshot_build="$${snapshot_dir}/_build"; \
-	snapshot_dest="/tmp/gnash_${RELEASE}$${now}-tmp"; \
-	$(MAKE) $(AM_MAKEFLAGS) -C $${snapshot_build} install DESTDIR=$${snapshot_dest}
+snapshot-install:
+	$(MAKE) $(AM_MAKEFLAGS) -C $(SNAPSHOT_BUILD) install DESTDIR=$(SNAPSHOT_TMP)
 
 # We only want to bundle an installed gnash, so all the linker paths are
 # correct
-snapshot-bundle: snapshot snapshot-build snapshot-install
-	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-trunk_$${now}"; \
-	snapshot_dest="/tmp/$${pkgname}"; \
-	snapshot_tmp="/tmp/$${pkgname}-tmp"; \
-	snapshot_tar="$${snapshot_tmp}-$(host_cpu)-$(host_os).tar.gz"; \
+snapshot-bundle: 
+	snapshot_tar="$(SNAPSHOT_TMP)-$(host_cpu)-$(host_os).tar.gz"; \
 	if test ! -d $${snapshot_tmp}; then \
 	  $(mkinstalldirs) $${snapshot_tmp}; \
 	fi; \
@@ -123,7 +119,7 @@ snapshot-bundle: snapshot snapshot-build snapshot-install
 	strip $${snapshot_tmp}/bin/dumpshm; \
 	strip $${snapshot_tmp}/bin/flvdumper; \
 	strip $${snapshot_tmp}/bin/rtmpget; \
-	tar zcvCf /tmp $${snapshot_tar} $${pkgname}
+	tar zcvCf /tmp $${snapshot_tar} $(SNAPSHOT_NAME)
 
 
 snapshot-clean:
