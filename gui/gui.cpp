@@ -592,7 +592,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				{
 					if ( _stage )
 					{
-						float fps = _stage->get_movie_definition()->get_frame_rate();
+						float fps = _stage->frameRate();
 						// Min interval allowed: 1/100 second (100FPS)
 						unsigned int ni = 1000.0/fps;
 						setInterval(ni);
@@ -1004,8 +1004,8 @@ Gui::advanceMovie()
 	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
-		gnash::MovieClip* si = m->getRootMovie();
-		if (curframe + 1 >= si->get_frame_count())
+		const gnash::MovieClip& si = m->getRootMovie();
+		if (curframe + 1 >= si.get_frame_count())
 		{
 			quit(); 
 		}

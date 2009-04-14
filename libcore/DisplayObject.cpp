@@ -1240,7 +1240,7 @@ DisplayObject::computeTargetPath() const
 
 	if ( path.empty() )
 	{
-		if ( _vm.getRoot().getRootMovie() == this ) return "/";
+		if (&_vm.getRoot().getRootMovie() == this) return "/";
 		std::stringstream ss;
 		ss << "_level" << m_depth-DisplayObject::staticDepthOffset;
 		return ss.str();
@@ -1248,7 +1248,7 @@ DisplayObject::computeTargetPath() const
 
 	// Build the target string from the parents stack
 	std::string target;
-	if ( topLevel != _vm.getRoot().getRootMovie() )
+	if (topLevel != &_vm.getRoot().getRootMovie() )
 	{
 		std::stringstream ss;
 		ss << "_level" << topLevel->get_depth()-DisplayObject::staticDepthOffset;

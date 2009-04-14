@@ -406,7 +406,7 @@ movie_root::dropLevel(int depth)
 	}
 
 	MovieClip* mo = it->second.get();
-	if ( mo == getRootMovie() )
+	if (mo == _rootMovie)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Original root movie can't be removed"));
@@ -1092,7 +1092,7 @@ movie_root::display()
 	clearInvalidated();
 
 	// TODO: should we consider the union of all levels bounds ?
-	const rect& frame_size = getRootMovie()->get_frame_size();
+	const rect& frame_size = _rootMovie->get_frame_size();
 	if ( frame_size.is_null() )
 	{
 		// TODO: check what we should do if other levels
@@ -1311,7 +1311,7 @@ movie_root::setFocus(boost::intrusive_ptr<DisplayObject> to)
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
     if (to == _currentFocus ||
-            to == static_cast<DisplayObject*>(getRootMovie())) {
+            to == static_cast<DisplayObject*>(_rootMovie.get())) {
         return false;
     }
 
@@ -1426,7 +1426,7 @@ movie_root::getStageWidth() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<unsigned int>(get_movie_definition()->get_width_pixels());
+    return static_cast<unsigned int>(_rootMovie->widthPixels());
 }
 
 /// Get actionscript height of stage, in pixels. The height
@@ -1440,7 +1440,7 @@ movie_root::getStageHeight() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<unsigned int>(get_movie_definition()->get_height_pixels());
+    return static_cast<unsigned int>(_rootMovie->heightPixels());
 }
 
 /// Takes a short int bitfield: the four bits correspond
@@ -2365,7 +2365,7 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     //
     /// Stage
     //
-    const movie_definition* def = get_movie_definition();
+    const movie_definition* def = _rootMovie->definition();
     assert(def);
 
     it = tr.insert(it, StringPair("Stage Properties", ""));

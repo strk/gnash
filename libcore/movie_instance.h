@@ -51,6 +51,22 @@ public:
 
 	virtual void advance();
 
+    virtual float frameRate() const {
+        return _def->get_frame_rate();
+    }
+
+    virtual float widthPixels() const {
+        return _def->get_width_pixels();
+    }
+
+    virtual float heightPixels() const {
+        return _def->get_height_pixels();
+    }
+
+    virtual bool ensureFrameLoaded(size_t frameNo) const {
+        return _def->ensure_frame_loaded(frameNo);
+    }
+
 	/// Handle a top-level movie on stage placement.
 	//
 	/// This method will just ensure first frame is loaded

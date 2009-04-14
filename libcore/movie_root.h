@@ -303,13 +303,16 @@ public:
     void set_drag_state(const drag_state& st);
 
     /// @return the originating root movie (not necessarely _level0)
-    movie_instance* getRootMovie() const
+    const movie_instance& getRootMovie() const
     {
-        return _rootMovie.get();
+        return *_rootMovie;
     }
 
-    const movie_definition* get_movie_definition() const {
-        return _rootMovie->definition();
+    /// Return the current nominal frame rate for the Stage.
+    //
+    /// This is dependent on the movie_instance set as root movie.
+    float frameRate() const {
+        return _rootMovie->frameRate();
     }
 
     void stop_drag()
@@ -348,7 +351,7 @@ public:
     ///
     size_t get_current_frame() const
     {
-        return getRootMovie()->get_current_frame();
+        return _rootMovie->get_current_frame();
     }
 
     void set_background_color(const rgba& color);
@@ -384,7 +387,7 @@ public:
     /// TODO: drop this method. currently used by gprocessor.
     void goto_frame(size_t target_frame_number)
     {
-        getRootMovie()->goto_frame(target_frame_number);
+        _rootMovie->goto_frame(target_frame_number);
     }
 
     void display();
@@ -394,7 +397,7 @@ public:
     /// TODO: drop ?
     void set_play_state(MovieClip::PlayState s)
     {
-        getRootMovie()->setPlayState(s);
+        _rootMovie->setPlayState(s);
     }
 
     /// Notify still loaded DisplayObject listeners for key events

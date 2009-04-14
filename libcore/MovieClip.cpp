@@ -2663,7 +2663,7 @@ MovieClip::getAsRoot() const
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    int topSWFVersion = getVM().getRoot().get_movie_definition()->get_version();
+    int topSWFVersion = getVM().getRoot().getRootMovie().version();
 
     if (getSWFVersion() > 6 || topSWFVersion > 6) {
         if (getLockRoot()) return this;

@@ -75,13 +75,6 @@ static gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 #endif
 }
 
-// Define this to have WaitForFrame actions really
-// wait for target frame (and never skip actions)
-// See:
-//  http://sswf.sourceforge.net/SWFalexref.html#action_wait_for_frame
-//
-#undef REALLY_WAIT_ON_WAIT_FOR_FRAME
-
 namespace gnash {
 
 namespace SWF { // gnash::SWF
@@ -662,10 +655,6 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
     }
 
     // Actually *wait* for target frame, and never skip any action
-#ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
-    target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
-    assert(target_sprite->get_loaded_frames() >= framenum);
-#endif
 
     size_t lastloaded = target_sprite->get_loaded_frames();
     if ( lastloaded < framenum )
@@ -1984,11 +1973,6 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
         );
         return;
     }
-
-#ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
-    target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
-    assert(target_sprite->get_loaded_frames() >= framenum);
-#endif
 
     size_t lastloaded = target_sprite->get_loaded_frames();
     if ( lastloaded < framenum )
