@@ -71,11 +71,11 @@ public:
 		return std::ceil(twipsToPixels(_framesize.height()));
 	}
 
-	virtual size_t	get_frame_count() const {
+	virtual size_t get_frame_count() const {
 		return _framecount;
 	}
 
-	virtual float	get_frame_rate() const {
+	virtual float get_frame_rate() const {
 		return _framerate;
 	}
 
@@ -120,6 +120,10 @@ public:
         return _bitmap.get();
     }
 
+    const DynamicShape& shape() const {
+        return _shape;
+    }
+
 protected:
 
 #ifdef GNASH_USE_GC
@@ -144,7 +148,7 @@ private:
 
     boost::intrusive_ptr<BitmapInfo> _bitmap;
 
-    boost::shared_ptr<DynamicShape> _shape;
+    DynamicShape _shape;
 
 };
 

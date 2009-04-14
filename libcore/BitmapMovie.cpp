@@ -27,21 +27,20 @@ BitmapMovie::BitmapMovie(BitmapMovieDefinition* def, DisplayObject* parent)
 	:
 	Movie(def, parent),
     _def(def)
-{  
-	// We need to assign a DisplayObject id to the instance, or an assertion
-	// will fail in DisplayObject.cpp (parent==NULL || id != -1)
+{
+}
 
-	assert(def);
-	boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this, 1);
-	
-	const int depth = 1 + DisplayObject::staticDepthOffset;
-	placeDisplayObject(ch.get(), depth);
+void
+BitmapMovie::display()
+{
+    _def->shape().display(*this);
+    GNASH_REPORT_FUNCTION;
 }
 
 std::auto_ptr<GnashImage>
 BitmapMovie::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-                                  DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
-                                  bool /* smooth */)
+             DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
+             bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }

@@ -41,13 +41,17 @@ public:
 
 	BitmapMovie(BitmapMovieDefinition* def, DisplayObject* parent=0); 
 
+    virtual rect getBounds() const { return _def->get_frame_size(); }
+
 	virtual ~BitmapMovie() {}
 
-	virtual void advance() {};
+	virtual void advance() { }
+
+    virtual void display();
 
     virtual float frameRate() const {
         return _def->get_frame_rate();
-    };
+    }
 
     virtual float widthPixels() const {
         return _def->get_width_pixels();
@@ -70,13 +74,6 @@ public:
         return _def;
     }
 	
-    /// Set a DisplayObject in the dictionary as initialized, returning
-	/// true if not already initialized.
-	bool setCharacterInitialized(int cid)
-	{
-		return _initializedCharacters.insert(cid).second;
-	}
-
     /// Render this MovieClip to a GnashImage using the passed transform
     //
     /// @return     The GnashImage with the MovieClip drawn onto it.
@@ -88,13 +85,6 @@ public:
             bool smooth = false);
 private:
 	
-    /// A map to track execution of init actions
-	//
-	/// Elements of this set are ids of DisplayObjects
-	/// in our definition's CharacterDictionary.
-	///
-	std::set<int> _initializedCharacters;
-
     const BitmapMovieDefinition* const _def;
 
 };
