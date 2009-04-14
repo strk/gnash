@@ -187,16 +187,11 @@ static void	dumpTagBytes(SWFStream& in, std::ostream& os)
 SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
 	:
 	// FIXME: use a class-static TagLoadersTable for SWFMovieDefinition
-#ifdef USE_SWFTREE
-    _metadata(),
-#endif
 	_tag_loaders(SWF::TagLoadersTable::getInstance()),
 	m_frame_rate(30.0f),
 	m_frame_count(0u),
 	m_version(0),
 	_frames_loaded(0u),
-	_frames_loaded_mutex(),
-	_frame_reached_condition(),
 	_waiting_for_frame(0),
 	m_loading_sound_stream(-1),
 	m_file_length(0),
@@ -467,7 +462,7 @@ SWFMovieDefinition::completeLoad()
 
 // 1-based frame number
 bool
-SWFMovieDefinition::ensure_frame_loaded(size_t framenum)
+SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 {
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
@@ -852,7 +847,7 @@ SWFMovieDefinition::add_frame_name(const std::string& n)
 
 bool
 SWFMovieDefinition::get_labeled_frame(const std::string& label,
-        size_t& frame_number)
+        size_t& frame_number) const
 {
     boost::mutex::scoped_lock lock(_namedFramesMutex);
     NamedFrameMap::const_iterator it = _namedFrames.find(label);

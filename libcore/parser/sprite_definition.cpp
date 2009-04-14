@@ -167,7 +167,7 @@ sprite_definition::add_frame_name(const std::string& name)
 
 bool
 sprite_definition::get_labeled_frame(const std::string& label,
-        size_t& frame_number)
+        size_t& frame_number) const
 {
     NamedFrameMap::const_iterator it = _namedFrames.find(label);
     if ( it == _namedFrames.end() ) return false;

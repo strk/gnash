@@ -308,18 +308,13 @@ public:
         return _rootMovie.get();
     }
 
+    const movie_definition* get_movie_definition() const {
+        return _rootMovie->get_movie_definition();
+    }
+
     void stop_drag()
     {
         m_drag_state.reset();
-    }
-
-    /// Return definition of originating root movie 
-    //
-    /// TODO: rename to getOriginatingDefinition ?
-    ///
-    movie_definition* get_movie_definition() const
-    {
-        return getRootMovie()->get_movie_definition();
     }
 
     /// Add an interval timer

@@ -217,7 +217,8 @@ public:
 	///
 	/// @return true if a frame with that label was found, false otherwise
 	///
-	virtual bool get_labeled_frame(const std::string& /*label*/, size_t& /*frame_number*/)
+	virtual bool get_labeled_frame(const std::string& /*label*/,
+            size_t& /*frame_number*/) const
 	{
 		return false;
 	}
@@ -430,7 +431,7 @@ public:
 	///
 	/// The default implementation is to always return true.
 	///
-	virtual bool ensure_frame_loaded(size_t /*framenum*/) {
+	virtual bool ensure_frame_loaded(size_t /*framenum*/) const {
 		return true;
 	}
 

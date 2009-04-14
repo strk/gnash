@@ -103,7 +103,7 @@ public:
     ///     to be deprecated if every instance has a reference to its
     ///     definition, which should know its id...
     ///
-    MovieClip(movie_definition* def, movie_instance* root,
+    MovieClip(const movie_definition* const def, movie_instance* root,
             DisplayObject* parent, int id);
 
     virtual ~MovieClip();
@@ -129,15 +129,9 @@ public:
     /// \brief
     /// Return the sprite_definition (or movie_definition)
     /// from which this MovieClip has been created
-    movie_definition* get_movie_definition() {
+    const movie_definition* get_movie_definition() {
         return _def.get();
     }
-
-    /// \brief
-    /// Return version of the SWF definition of this instance
-    /// as been parsed from.
-    //
-    int getSWFVersion() const;
 
     /// Get the composite bounds of all component drawing elements
     virtual rect getBounds() const;
@@ -793,6 +787,12 @@ public:
     virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
             InfoTree::iterator it);
 #endif
+    
+    /// \brief
+    /// Return version of the SWF definition of this instance
+    /// as been parsed from.
+    //
+    int getSWFVersion() const;
 
 protected:
 
@@ -935,7 +935,7 @@ private:
 
     /// This is either sprite_definition (for sprites defined by
     /// DefineSprite tag) or movie_def_impl (for the top-level movie).
-    boost::intrusive_ptr<movie_definition> _def;
+    const boost::intrusive_ptr<const movie_definition> _def;
 
     /// List of active loadVariable requests 
     //

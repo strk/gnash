@@ -640,7 +640,8 @@ sound_stop(const fn_call& fn)
         const std::string& name = fn.arg(0).to_string();
 
         // check the import.
-        movie_definition* def = so->getVM().getRoot().get_movie_definition();
+        const movie_definition* def =
+            so->getVM().getRoot().get_movie_definition();
         assert(def);
         boost::intrusive_ptr<ExportableResource> res = 
             def->get_exported_resource(name);

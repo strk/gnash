@@ -288,11 +288,6 @@ object_registerClass(const fn_call& fn)
 
 	// Find the exported resource
 
-	// TODO: check to *which* definition should we ask the export
-	//       this code uses the *relative* root of current environment's target
-#if 0
-	movie_definition* def = _vm.getRoot().get_movie_definition();
-#else
 	// Using definition of current target fixes the youtube beta case
 	// https://savannah.gnu.org/bugs/index.php?23130
 	DisplayObject* tgt = fn.env().get_target();
@@ -302,9 +297,9 @@ object_registerClass(const fn_call& fn)
 	}
 	movie_instance* relRoot = tgt->get_root();
 	assert(relRoot);
-	movie_definition* def = relRoot->get_movie_definition();
-#endif
-	boost::intrusive_ptr<ExportableResource> exp_res =
+	const movie_definition* def = relRoot->get_movie_definition();
+	
+    boost::intrusive_ptr<ExportableResource> exp_res =
         def->get_exported_resource(symbolid);
 	if ( ! exp_res )
 	{

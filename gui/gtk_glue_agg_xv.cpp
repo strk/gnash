@@ -116,7 +116,8 @@ GtkAggXvGlue::setupRendering()
     if (first && VM::isInitialized()) {
         first = false;
         
-        movie_definition* def = VM::get().getRoot().get_movie_definition();
+        const movie_definition* def = 
+            VM::get().getRoot().get_movie_definition();
         assert(def);
     
         _movie_width = def->get_width_pixels();

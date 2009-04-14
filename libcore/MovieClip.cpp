@@ -479,7 +479,7 @@ private:
 } // anonymous namespace
 
 
-MovieClip::MovieClip(movie_definition* def, movie_instance* r,
+MovieClip::MovieClip(const movie_definition* const def, movie_instance* r,
         DisplayObject* parent, int id)
     :
     InteractiveObject(parent, id),
@@ -523,7 +523,7 @@ MovieClip::~MovieClip()
 int
 MovieClip::getSWFVersion() const
 {
-    return m_root->get_movie_definition()->get_version();
+    return m_root->version();
 }
 
 // Execute the actions in the action list, in the given
@@ -941,8 +941,8 @@ MovieClip::on_event(const event_id& id)
             // nor if it's dynamic  
             if ( isDynamic() ) break;
 
-            sprite_definition* def =
-                dynamic_cast<sprite_definition*>(_def.get());
+            const sprite_definition* def =
+                dynamic_cast<const sprite_definition*>(_def.get());
 
             // must be a loaded movie (loadMovie doesn't mark it as 
             // "dynamic" - should it? no, or getBytesLoaded will always
@@ -2237,7 +2237,8 @@ MovieClip::constructAsScriptObject()
             break;
         }
 
-        sprite_definition* def = dynamic_cast<sprite_definition*>(_def.get());
+        const sprite_definition* def = 
+            dynamic_cast<const sprite_definition*>(_def.get());
 
         // We won't "construct" top-level movies
         if (!def) break;
@@ -5159,7 +5160,7 @@ movieclip_url_getset(const fn_call& fn)
 {
     boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
-    return as_value(ptr->get_root()->get_movie_definition()->get_url());
+    return as_value(ptr->get_root()->url());
 }
 
 // TODO: move this to DisplayObject class, _focusrect seems a generic property

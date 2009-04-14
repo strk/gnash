@@ -255,7 +255,8 @@ public:
 	//
 	// locks _namedFramesMutex
 	//
-	bool get_labeled_frame(const std::string& label, size_t& frame_number);
+	bool get_labeled_frame(const std::string& label, size_t& frame_number)
+        const;
 
 	void	add_font(int font_id, Font* f);
 
@@ -358,7 +359,7 @@ public:
 	/// Ensure that frame number 'framenum' (1-based offset)
 	/// has been loaded (load on demand).
 	///
-	bool ensure_frame_loaded(size_t framenum);
+	bool ensure_frame_loaded(size_t framenum) const;
 
 	/// Read and parse all the SWF stream (blocking until load is finished)
 	//
@@ -469,14 +470,14 @@ private:
 	mutable boost::mutex _frames_loaded_mutex;
 
 	/// A semaphore to signal load of a specific frame
-	boost::condition _frame_reached_condition;
+	mutable boost::condition _frame_reached_condition;
 
 	/// Set this to trigger signaling of loaded frame
 	//
 	/// Make sure you _frames_loaded_mutex is locked
 	/// when accessing this member !
 	///
-	size_t _waiting_for_frame;
+	mutable size_t _waiting_for_frame;
 
 	/// Number bytes loaded / parsed
 	unsigned long _bytes_loaded;

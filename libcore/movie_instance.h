@@ -60,6 +60,14 @@ public:
 	///
 	void stagePlacementCallback(as_object* initObj = 0);
 
+    const std::string& url() const {
+        return _def->get_url();
+    }
+
+    int version() const {
+        return _def->get_version();
+    }
+
 	/// Set a DisplayObject in the dictionary as initialized, returning
 	/// true if not already initialized.
 	bool setCharacterInitialized(int cid)
@@ -76,7 +84,8 @@ private:
 	///
 	std::set<int> _initializedCharacters;
 
-	boost::intrusive_ptr<movie_definition> _def;
+    /// This should only be a top-level movie, not a sprite_definition.
+	const boost::intrusive_ptr<const movie_definition> _def;
 };
 
 
