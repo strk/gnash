@@ -137,10 +137,7 @@ public:
     /// Return version of the SWF definition of this instance
     /// as been parsed from.
     //
-    int getSWFVersion() const
-    {
-        return _def->get_version();
-    }
+    int getSWFVersion() const;
 
     /// Get the composite bounds of all component drawing elements
     virtual rect getBounds() const;
@@ -166,7 +163,7 @@ public:
 
     size_t get_frame_count() const
     {
-        return _def->get_frame_count();
+        return _def ? _def->get_frame_count() : 1;
     }
 
     /// Return number of completely loaded frames of this sprite/movie
@@ -176,7 +173,7 @@ public:
     ///
     size_t get_loaded_frames() const
     {
-        return _def->get_loading_frame();
+        return _def ? _def->get_loading_frame() : 1;
     }
 
     /// Return total number of bytes in the movie
@@ -195,7 +192,8 @@ public:
 
     const rect& get_frame_size() const
     {
-        return _def->get_frame_size();
+        static const rect r;
+        return _def ? _def->get_frame_size() : r;
     }
 
     /// Stop or play the sprite.
@@ -937,7 +935,7 @@ private:
 
     /// This is either sprite_definition (for sprites defined by
     /// DefineSprite tag) or movie_def_impl (for the top-level movie).
-    boost::intrusive_ptr<movie_definition>  _def;
+    boost::intrusive_ptr<movie_definition> _def;
 
     /// List of active loadVariable requests 
     //

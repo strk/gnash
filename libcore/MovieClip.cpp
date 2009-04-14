@@ -495,7 +495,6 @@ MovieClip::MovieClip(movie_definition* def, movie_instance* r,
     _droptarget(),
     _lockroot(false)
 {
-    assert(_def != NULL);
     assert(m_root != NULL);
 
     set_prototype(getMovieClipInterface());
@@ -519,6 +518,12 @@ MovieClip::~MovieClip()
     _vm.getRoot().remove_mouse_listener(this);
 
     deleteAllChecked(_loadVariableRequests);
+}
+
+int
+MovieClip::getSWFVersion() const
+{
+    return m_root->get_movie_definition()->get_version();
 }
 
 // Execute the actions in the action list, in the given
@@ -675,7 +680,8 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
 bool
 MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
-    //GNASH_REPORT_FUNCTION;
+
+    if (!_def) return false;
 
     std::string fspecStr = frame_spec.to_string();
 
@@ -708,6 +714,8 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 void
 MovieClip::call_frame_actions(const as_value& frame_spec)
 {
+    if (!_def) return;
+
     size_t frame_number;
     if ( ! get_frame_number(frame_spec, frame_number) )
     {
@@ -751,11 +759,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 DisplayObject*
 MovieClip::add_empty_movieclip(const std::string& name, int depth)
 {
-    // empty_movieclip_def will be deleted during deleting movieclip
-    sprite_definition* empty_sprite_def =
-        new sprite_definition(*get_movie_definition());
-
-    MovieClip* movieclip = new MovieClip(empty_sprite_def, m_root, this, 0);
+    MovieClip* movieclip = new MovieClip(0, m_root, this, 0);
     movieclip->set_name(name);
     movieclip->setDynamic();
 
@@ -1261,6 +1265,8 @@ MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
 {
     testInvariant();
 
+    if (!_def) return;
+
     assert(typeflags);
 
     const PlayList* playlist = _def->getPlaylist(frame);
@@ -1500,7 +1506,8 @@ DisplayObject*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
 {
-    assert(_def);
+    if (!_def) return 0;
+
     assert(tag);
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
@@ -2233,7 +2240,7 @@ MovieClip::constructAsScriptObject()
         sprite_definition* def = dynamic_cast<sprite_definition*>(_def.get());
 
         // We won't "construct" top-level movies
-        if ( ! def ) break;
+        if (!def) break;
 
         as_function* ctor = def->getRegisteredClass();
 #ifdef GNASH_DEBUG
@@ -3129,8 +3136,9 @@ movieclip_attachMovie(const fn_call& fn)
     // Get exported resource 
     const std::string& id_name = fn.arg(0).to_string();
 
-    boost::intrusive_ptr<ExportableResource> exported = 
-        movieclip->get_movie_definition()->get_exported_resource(id_name);
+    boost::intrusive_ptr<ExportableResource> exported =
+        movieclip->get_root()->get_movie_definition()->get_exported_resource(
+                id_name);
 
     if (!exported)
     {
@@ -5149,18 +5157,16 @@ movieclip_droptarget_getset(const fn_call& fn)
 as_value
 movieclip_url_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
-    return as_value(ptr->get_movie_definition()->get_url());
+    return as_value(ptr->get_root()->get_movie_definition()->get_url());
 }
 
 // TODO: move this to DisplayObject class, _focusrect seems a generic property
 as_value
 movieclip_focusrect_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
 
     if ( fn.nargs == 0 ) // getter
