@@ -23,7 +23,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "DefinitionTag.h"
 #include "sound_definition.h"
-#include "rect.h" // for get_bound
 #include "SWFMatrix.h" // for composition
 #include "cxform.h" // for composition
 #include "action_buffer.h" // for composition of ButtonAction
@@ -195,19 +194,6 @@ public:
 	/// Create a mutable instance of our definition.
 	DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
-	const rect&	get_bound() const {
-		// It is required that get_bound() is implemented in DisplayObject
-        // definition classes. However, button DisplayObject definitions do
-        // not have shape definitions themselves. Instead, they hold a list
-        // of DefineShapeTag. get_bound() is currently only used
-        // by DisplayObject which normally is used only shape DisplayObject
-        // definitions. See DefinitionTag.h to learn why it is virtual anyway.
-		// get_button_bound() is used for buttons.
-		abort(); // should not be called  
-		static rect unused;
-		return unused;
-	}
-  
     /// Access the ButtonRecords directly. Used for modifying the
     /// Cxform by a DefineButtonCxform tag.
     ButtonRecords& buttonRecords() { return _buttonRecords; }
