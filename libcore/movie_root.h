@@ -123,13 +123,22 @@ struct DepthComparator
     }
 };
 
-/// The movie stage (absolute top level node in the DisplayObjects hierarchy)
+/// This class represents the 'Stage' and top-level movie.
 //
-/// This is a wrapper around the set of loaded levels being played.
-///
-/// There is a *single* instance of this class for each run;
-/// loading external movies will *not* create a new instance of it.
-///
+/// It is a wrapper around the set of loaded levels being played. Each 
+/// 'run' of a SWF movie, including all further movies loaded during the
+/// run, has exactly one movie_root, which is kept for the entire run.
+/// Loading a new top-level movie does not create a new movie_root.
+//
+/// The 'Stage' part of movie_root is accessible through the ActionScript
+/// Stage object, implemented in Stage_as.
+//
+/// The movie_root class is responsible for accepting and passing on
+/// user events (mouse or key events), for maintaining the heart-beat
+/// mechanism, and for advancing all MovieClips on request from the
+/// hosting application.
+//
+/// The _root object is provided by getAsRoot().
 class DSOEXPORT movie_root : boost::noncopyable
 {
 
@@ -199,14 +208,14 @@ public:
     /// Character's depths are updated.
     ///
     /// @param sp
-    ///        The level to change depth/level of. A pointer to it is expected
-    ///        to be found in the _level# container, or an error will be printed
-    ///        and the call would result in a no-op.
+    ///    The level to change depth/level of. A pointer to it is expected
+    ///    to be found in the _level# container, or an error will be printed
+    ///    and the call would result in a no-op.
     ///
     /// @param depth
-    ///        New depth to assign to the DisplayObject. If another level exists at 
-    ///        the target depth the latter is moved in place of the former, with
-    ///        its depth also updated.
+    ///    New depth to assign to the DisplayObject. If another level
+    ///    exists at the target depth the latter is moved in place of
+    ///    the former, with its depth also updated.
     ///
     void swapLevels(boost::intrusive_ptr<MovieClip> sp, int depth);
 
@@ -370,13 +379,14 @@ public:
     /// Entry point for movie advancement
     //
     /// This function does:
-    ///     - Execute all timers
-    ///     - Reset the next Random number
-    ///     - Advance all advanceable DisplayObjects in reverse-placement order
-    ///     - Cleanup key listeners
-    ///     - Process all queued actions
-    ///     - Remove unloaded DisplayObjects from the advanceable DisplayObjects list.
-    ///     - Run the GC collector
+    ///   - Execute all timers
+    ///   - Reset the next Random number
+    ///   - Advance all advanceable DisplayObjects in reverse-placement order
+    ///   - Cleanup key listeners
+    ///   - Process all queued actions
+    ///   - Remove unloaded DisplayObjects from the advanceable
+    ///     DisplayObjects list.
+    ///   - Run the GC collector
     void advanceMovie();
 
     /// 0-based!! delegates to originating root movie
