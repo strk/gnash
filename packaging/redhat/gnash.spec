@@ -139,7 +139,7 @@ RPM_TARGET=%{_target}
 	$SOUND $GUI \
 	$RENDERER \
 	--disable-dependency-tracking \
-	--disable-testsuites \
+	--disable-testsuite \
 	--disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
@@ -167,7 +167,7 @@ make $(MAKEFLAGS) dumpconfig all
 
 %install
 strip gui/.libs/*-gnash
-strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper  utilities/.libs/rtmpget cygnal/.libs/cygnal
+strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
 make install install-plugins DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
@@ -208,7 +208,6 @@ scrollkeeper-update -q || :
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
 %{_bindir}/dumpshm
-%{_bindir}/rtmpget
 %{_bindir}/cygnal
 %{_libdir}/gnash/*.so*
 %{_libdir}/mozilla/plugins/*.so
