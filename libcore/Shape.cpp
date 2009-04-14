@@ -41,7 +41,7 @@ Shape::pointInShape(boost::int32_t x, boost::int32_t y) const
     //       the collision detection find you inside a self-crossing
     //       shape).
     if (_def) {
-        if (!_def->get_bound().point_test(lp.x, lp.y)) return false;
+        if (!_def->bounds().point_test(lp.x, lp.y)) return false;
         return _def->pointTestLocal(lp.x, lp.y, wm);
     }
     assert(_shape.get());

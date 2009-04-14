@@ -58,7 +58,7 @@ public:
 	virtual void display();
 
     virtual rect getBounds() const {
-        return _def ? _def->get_bound() : _shape->getBounds();
+        return _def ? _def->bounds() : _shape->getBounds();
     }
     
     virtual bool pointInShape(boost::int32_t  x, boost::int32_t  y) const;

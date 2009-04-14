@@ -65,7 +65,7 @@ public:
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
-    const rect& get_bound() const { return _rect; }
+    const rect& bounds() const { return _rect; }
 
     DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 

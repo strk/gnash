@@ -87,7 +87,7 @@ public:
     void setSelectionColor(boost::uint32_t color);
 
     virtual rect getBounds() const {
-        return _def->get_bound();
+        return _def->bounds();
     }
 
     virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
