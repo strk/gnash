@@ -355,11 +355,6 @@ public:
 
     void set_background_alpha(float alpha);
 
-    float get_background_alpha() const
-    {
-        return m_background_color.m_a / 255.0f;
-    }
-
     /// Return the VM used by this movie_root
     VM& getVM() { return _vm; }
  

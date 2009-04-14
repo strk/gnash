@@ -79,10 +79,10 @@ namespace gnash
 /// constructed using duplicateMovieClip() have the same definition as the
 /// duplicated clip. They are "dynamic", but may have a definition!
 //
-/// A MovieClip always has an m_root member. This is the top-level SWF 
+/// A MovieClip always has an _swf member. This is the top-level SWF 
 /// (movie_instance) containing either the definition or the code from
 /// which the MovieClip was created. The _url member and SWF version are
-/// dependent on the m_root. Exports are also sought in this movie_instance.
+/// dependent on the _swf. Exports are also sought in this movie_instance.
 class MovieClip : public InteractiveObject 
 {
 
@@ -106,7 +106,7 @@ public:
     ///     This may be 0 if there is no immutable definition.
     ///
     /// @param root
-    /// The "relative" _root of this sprite, which is the 
+    /// The "relative" _swf of this sprite, which is the 
     /// instance of top-level sprite defined by the same
     /// SWF that also contained *this* sprite definition.
     /// Note that this can be *different* from the top-level
@@ -128,10 +128,10 @@ public:
 
     virtual ~MovieClip();
 
-    // Overridden to use the m_root member
+    // Return the originating SWF
     virtual movie_instance* get_root() const;
 
-    /// Return the _root ActionScript property of this sprite.
+    /// Return the _swf ActionScript property of this sprite.
     //
     /// Relative or absolute is determined by
     /// the _lockroot property, see getLockRoot
@@ -204,11 +204,6 @@ public:
     DSOEXPORT void setPlayState(PlayState s);
 
     PlayState getPlayState() const { return _playState; }
-
-    DisplayObject* getDisplayObject(int DisplayObject_id);
-
-    // delegates to movie_root (possibly wrong)
-    virtual float get_background_alpha() const;
 
     // delegates to movie_root (possibly wrong)
     void set_background_color(const rgba& color);
@@ -780,9 +775,8 @@ public:
     /// false otherwise.
     bool getLockRoot() const { return _lockroot; }
 
-    /// Set whether get_root() should return the *relative* root,
+    /// Set whether getAsRoot() should return the *relative* root,
     /// false otherwise. True for relative root.
-    ///
     void setLockRoot(bool lr) { _lockroot=lr; }
 
     /// Getter-setter for MovieClip._lockroot
@@ -817,7 +811,7 @@ protected:
     /// - sprite environment
     /// - definition the sprite has been instantiated from
     /// - Textfields having an associated variable registered in this instance.
-    /// - Relative root of this instance (m_root)
+    /// - Relative root of this instance (_swf)
     ///
     virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
@@ -829,6 +823,10 @@ protected:
 
 private:
 
+    typedef std::vector<boost::intrusive_ptr<TextField> > TextFields;
+
+    /// A container for textfields, indexed by their variable name
+    typedef std::map<std::string, TextFields> TextFieldIndex;
 
     /// Process any completed loadVariables request
     void processCompletedLoadVariableRequests();
@@ -936,13 +934,32 @@ private:
     /// Increment _currentFrame, and take care of looping.
     void increment_frame_and_check_for_loop();
     
-    /// List of loadVariables requests
-    typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
+    /// \brief
+    /// Returns a vector of TextField associated with the given variable name,
+    /// or NULL if no such variable name is known.
+    //
+    /// A TextField variable is a variable that acts
+    /// as a setter/getter for a TextField 'text' member.
+    ///
+    /// Search is case-sensitive.
+    ///
+    /// @todo find out wheter we should be case sensitive or not
+    ///
+    /// @return a pointer inside a vector, will be invalidated by modifications
+    ///         of the vector (set_textfield_variable)
+    ///
+    TextFields* get_textfield_variable(const std::string& name);
+
+    /// Unregister textfield variables bound to unloaded TextFields
+    void cleanup_textfield_variables();
 
     /// This is either sprite_definition (for sprites defined by
     /// DefineSprite tag) or movie_def_impl (for the top-level movie).
     const boost::intrusive_ptr<const movie_definition> _def;
 
+    /// List of loadVariables requests
+    typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
+    
     /// List of active loadVariable requests 
     //
     /// At ::advance_sprite time, all completed requests will
@@ -951,17 +968,13 @@ private:
     LoadVariablesThreads _loadVariableRequests;
 
     /// The SWF that this MovieClip belongs to.
-    movie_instance* m_root;
+    movie_instance* _swf;
 
     /// Current Display List contents.
     DisplayList _displayList;
 
     /// The canvas for dynamic drawing
     DynamicShape _drawable;
-
-    // this is deprecated, we'll be pushing gotoframe target
-    // actions to the global action queue
-    //ActionList    m_goto_frame_action_list;
 
     PlayState _playState;
 
@@ -977,35 +990,10 @@ private:
     /// This timeline's variable scope
     as_environment _environment;
 
-    typedef boost::intrusive_ptr<TextField> TextFieldPtr;
-    typedef std::vector<TextFieldPtr> TextFieldPtrVect;
-
-    /// A container for textfields, indexed by their variable name
-    typedef std::map< std::string, TextFieldPtrVect > TextFieldMap;
-
-    /// We'll only allocate Textfield variables map if
+   /// We'll only allocate Textfield variables map if
     /// we need them (ie: anyone calls set_textfield_variable)
     ///
-    std::auto_ptr<TextFieldMap> _text_variables;
-
-    /// \brief
-    /// Returns a vector of TextField associated with the given variable name,
-    /// or NULL if no such variable name is known.
-    //
-    /// A TextField variable is a variable that acts
-    /// as a setter/getter for a TextField 'text' member.
-    ///
-    /// Search is case-sensitive.
-    ///
-    /// @todo find out wheter we should be case sensitive or not
-    ///
-    /// @return a pointer inside a vector, will be invalidated by modifications
-    ///         of the vector (set_textfield_variable)
-    ///
-    TextFieldPtrVect* get_textfield_variable(const std::string& name);
-
-    /// Unregister textfield variables bound to unloaded TextFields
-    void cleanup_textfield_variables();
+    std::auto_ptr<TextFieldIndex> _text_variables;
 
     /// soundid for current playing stream. If no stream set to -1
     int m_sound_stream_id;

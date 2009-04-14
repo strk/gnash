@@ -34,8 +34,6 @@
 #include "Object.h" // for AS inheritance
 #include "VM.h" // for addStatics
 
-#include "BitmapMovieInstance.h"
-
 #include <vector>
 #include <sstream>
 #include <algorithm>

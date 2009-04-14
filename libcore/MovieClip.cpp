@@ -484,22 +484,20 @@ MovieClip::MovieClip(const movie_definition* const def, movie_instance* r,
     :
     InteractiveObject(parent, id),
     _def(def),
-    m_root(r),
+    _swf(r),
     _playState(PLAYSTATE_PLAY),
     _currentFrame(0),
     _hasLooped(false),
     _callingFrameActions(false),
     _environment(_vm),
     m_sound_stream_id(-1),
-    _userCxform(),
     _droptarget(),
     _lockroot(false)
 {
-    assert(m_root != NULL);
+    assert(_swf);
 
     set_prototype(getMovieClipInterface());
             
-    //m_root->add_ref();    // @@ circular!
     _environment.set_target(this);
 
     // TODO: have the 'MovieClip' constructor take care of this !
@@ -511,9 +509,6 @@ MovieClip::~MovieClip()
 {
     stopStreamSound();
 
-    // We might have been deleted by Quit... 
-    //assert(isDestroyed());
-
     _vm.getRoot().remove_key_listener(this);
     _vm.getRoot().remove_mouse_listener(this);
 
@@ -523,7 +518,7 @@ MovieClip::~MovieClip()
 int
 MovieClip::getSWFVersion() const
 {
-    return m_root->version();
+    return _swf->version();
 }
 
 // Execute the actions in the action list, in the given
@@ -642,13 +637,13 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     }
 
     // Try textfield variables
-    TextFieldPtrVect* etc = get_textfield_variable(name);
+    TextFields* etc = get_textfield_variable(name);
     if ( etc )
     {
-        for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end();
+        for (TextFields::const_iterator i=etc->begin(), e=etc->end();
                 i!=e; ++i)
         {
-            TextFieldPtr tf = *i;
+            boost::intrusive_ptr<TextField> tf = i->get();
             if ( tf->getTextDefined() )
             {
                 val->set_string(tf->get_text_value());
@@ -756,7 +751,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 DisplayObject*
 MovieClip::add_empty_movieclip(const std::string& name, int depth)
 {
-    MovieClip* movieclip = new MovieClip(0, m_root, this, 0);
+    MovieClip* movieclip = new MovieClip(0, _swf, this, 0);
     movieclip->set_name(name);
     movieclip->setDynamic();
 
@@ -812,7 +807,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     }
 
     boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(_def.get(),
-            m_root, parent, get_id());
+            _swf, parent, get_id());
     newmovieclip->set_name(newname);
 
     newmovieclip->setDynamic();
@@ -980,12 +975,8 @@ MovieClip::on_event(const event_id& id)
 as_object*
 MovieClip::get_path_element(string_table::key key)
 {
-    //log_debug("%s.get_path_element(%s) called", getTarget(), _vm.getStringTable().value(key));
     as_object* obj = getPathElementSeparator(key);
-    if ( obj )
-    {
-        return obj;
-    }
+    if (obj) return obj;
 
     std::string name = _vm.getStringTable().value(key);
 
@@ -1045,16 +1036,15 @@ MovieClip::set_member(string_table::key name,
     //                property (ie: have a textfield use _x as variable name and
     //                be scared)
     //
-    TextFieldPtrVect* etc = get_textfield_variable(_vm.getStringTable().value(name));
+    TextFields* etc = get_textfield_variable(_vm.getStringTable().value(name));
     if ( etc )
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("it's a Text Variable, associated with %d TextFields"), etc->size());
 #endif
-        for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
+        for (TextFields::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
         {
-            TextFieldPtr tf = *i;
-            tf->updateText(val.to_string());
+            (*i)->updateText(val.to_string());
         }
         found = true;
     }
@@ -1189,7 +1179,7 @@ void
 MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
     // WARNING! get_root() would depend on _lockroot !!
-    movie_instance* mi = m_root; 
+    movie_instance* mi = _swf; 
     if ( mi->setCharacterInitialized(cid) )
     {
 #ifdef GNASH_DEBUG
@@ -1946,7 +1936,7 @@ MovieClip::mouseEnabled() const
 
     static const size_t size = sizeof(EH) / sizeof(EH[0]);
 
-    for (size_t i = 0; i < size; i++)
+    for (size_t i = 0; i < size; ++i)
     {
         const event_id &event = EH[i];
 
@@ -1966,28 +1956,10 @@ MovieClip::mouseEnabled() const
     return false;
 }
 
-DisplayObject*
-MovieClip::getDisplayObject(int /* id */)
-{
-    // @@ TODO -- look through our dlist for a match
-    log_unimpl(_("%s doesn't even check for a char"),
-        __PRETTY_FUNCTION__);
-    return NULL;
-}
-
-
 void
 MovieClip::stop_drag()
 {
-    //assert(m_parent == NULL); // why should we care ?
     _vm.getRoot().stop_drag();
-}
-
-float
-MovieClip::get_background_alpha() const
-{
-    // @@ this doesn't seem right...
-    return _vm.getRoot().get_background_alpha();
 }
 
 void
@@ -1996,36 +1968,24 @@ MovieClip::set_background_color(const rgba& color)
     _vm.getRoot().set_background_color(color);
 }
 
-static bool isTextFieldUnloaded(boost::intrusive_ptr<TextField>& p)
-{
-    return p->isUnloaded();
-}
-
-/*private*/
 void
 MovieClip::cleanup_textfield_variables()
 {
     // nothing to do
-    if ( ! _text_variables.get() ) return;
+    if (!_text_variables.get()) return;
 
-    TextFieldMap& m = *_text_variables;
+    TextFieldIndex& m = *_text_variables;
 
-    for (TextFieldMap::iterator i=m.begin(), ie=m.end(); i!=ie; ++i)
+    for (TextFieldIndex::iterator i=m.begin(), ie=m.end(); i!=ie; ++i)
     {
-        TextFieldPtrVect& v=i->second;
-        TextFieldPtrVect::iterator lastValid = 
-            std::remove_if(v.begin(), v.end(),
-                    boost::bind(isTextFieldUnloaded, _1));
+        TextFields& v=i->second;
+        TextFields::iterator lastValid = std::remove_if(v.begin(), v.end(),
+                    boost::mem_fn(&DisplayObject::isUnloaded));
         v.erase(lastValid, v.end());
-        // TODO: remove the map element if vector is empty
-        //if ( v.empty() )
-        //{
-        //}
     }
 }
 
 
-/* public */
 void
 MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
 {
@@ -2034,29 +1994,22 @@ MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
     // lazy allocation
     if ( ! _text_variables.get() )
     {
-        _text_variables.reset(new TextFieldMap);
+        _text_variables.reset(new TextFieldIndex);
     }
     
     (*_text_variables)[name].push_back(ch);
 }
 
-/* private */
-MovieClip::TextFieldPtrVect*
+MovieClip::TextFields*
 MovieClip::get_textfield_variable(const std::string& name)
 {
     // nothing allocated yet...
     if ( ! _text_variables.get() ) return NULL;
 
     // TODO: should variable name be considered case-insensitive ?
-    TextFieldMap::iterator it = _text_variables->find(name);
-    if ( it == _text_variables->end() )
-    {
-        return 0;
-    }
-    else
-    {
-        return &(it->second);
-    }
+    TextFieldIndex::iterator it = _text_variables->find(name);
+    if (it == _text_variables->end()) return 0;
+    else return &(it->second);
 } 
 
 
@@ -2213,7 +2166,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 
 }
 
-/*private*/
+
 void
 MovieClip::constructAsScriptObject()
 {
@@ -2542,9 +2495,7 @@ MovieClip::removeMovieClip()
         // removing _level#
         _vm.getRoot().dropLevel(depth);
         // I guess this can only happen if someone uses 
-        // _root.swapDepth([0..1048575])
-        //log_error(_("Can't remove movieclip %s as it has no parent"),
-        //getTarget());
+        // _swf.swapDepth([0..1048575])
     }
 
 }
@@ -2645,41 +2596,21 @@ MovieClip::markReachableResources() const
     // Mark our own definition
     if (_def.get()) _def->setReachable();
 
-    // Mark textfields in the TextFieldMap
+    // Mark textfields in the TextFieldIndex
     if ( _text_variables.get() )
     {
-        for(TextFieldMap::const_iterator i=_text_variables->begin(),
+        for (TextFieldIndex::const_iterator i=_text_variables->begin(),
                     e=_text_variables->end();
                 i!=e; ++i)
         {
-            const TextFieldPtrVect& tfs=i->second;
-            for (TextFieldPtrVect::const_iterator j=tfs.begin(), je=tfs.end(); j!=je; ++j)
-            {
-                if ( (*j)->isUnloaded() )
-                {
-                    // NOTE: cleanup_display_list should have cleared 
-                    // these up on ::cleanupDisplayList.
-                    // I guess if we get more might be due to ::destroy 
-                    // calls happening after our own ::cleanupDisplayList
-                    // call. Should be ok to postpone cleanup on next 
-                    // ::advance, or we should cleanup here (locally) 
-                    // although we're a 'const' method...
-                    // Yet another approach would be for TextField::unload
-                    // to unregister self from our map, but TextField 
-                    // doesn't really store a pointer to the movieclip
-                    // it's registered against.
-                    //
-                    //log_debug("Unloaded TextField in registered textfield "
-                    //"variables container on ::markReachableResources");
-                }
-                (*j)->setReachable();
-            }
+            const TextFields& tfs=i->second;
+            std::for_each(tfs.begin(), tfs.end(), 
+                        boost::mem_fn(&DisplayObject::setReachable));
         }
     }
 
     // Mark our relative root
-    assert(m_root != NULL);
-    m_root->setReachable();
+    _swf->setReachable();
 
     markDisplayObjectReachable();
 
@@ -2710,7 +2641,7 @@ MovieClip::get_world_cxform() const
 movie_instance*
 MovieClip::get_root() const
 {
-    return m_root;
+    return _swf;
 }
 
 const MovieClip*
@@ -2718,9 +2649,9 @@ MovieClip::getAsRoot() const
 {
 
     // TODO1: as an optimization, if swf version < 7 
-    //                we might as well just return m_root, 
+    //                we might as well just return _swf, 
     //                the whole chain from this movieclip to it's
-    //                m_root should have the same version...
+    //                _swf should have the same version...
     //
     // TODO2: implement this with iteration rather
     //                then recursion.

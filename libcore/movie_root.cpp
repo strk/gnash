@@ -2068,11 +2068,13 @@ movie_root::advanceLiveChars()
 void
 movie_root::set_background_color(const rgba& color)
 {
-
-	if ( m_background_color_set ) return;
+	if (m_background_color_set) return;
 	m_background_color_set = true;
+    
+    rgba newcolor = color;
+    newcolor.m_a = m_background_color.m_a;
 
-    if ( m_background_color != color ) {
+    if (m_background_color != color) {
 		setInvalidated();
         m_background_color = color;
 	}
@@ -2081,7 +2083,6 @@ movie_root::set_background_color(const rgba& color)
 void
 movie_root::set_background_alpha(float alpha)
 {
-	//GNASH_REPORT_FUNCTION;
 
 	boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
 
