@@ -681,6 +681,8 @@ bool
 MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
 
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames.
     if (!_def) return false;
 
     std::string fspecStr = frame_spec.to_string();
@@ -714,6 +716,8 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 void
 MovieClip::call_frame_actions(const as_value& frame_spec)
 {
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames.
     if (!_def) return;
 
     size_t frame_number;
@@ -726,13 +730,6 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
         );
         return;
     }
-
-#if 0 // why would we want to do this ?
-    // Set the current sound_stream_id to -1, meaning that no stream are
-    // active. If there are an active stream it will be updated while
-    // executing the ControlTags.
-    set_sound_stream_id(-1);
-#endif
 
     // Execute the ControlTag actions
     // We set _callingFrameActions to true so that add_action_buffer
@@ -889,32 +886,24 @@ MovieClip::on_event(const event_id& id)
 
     bool called = false;
             
-    // First, check for clip event handler.
+    std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
+    if ( code.get() )
     {
-        std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
-        if ( code.get() )
-        {
-            // Dispatch.
-            code->execute();
+        // Dispatch.
+        code->execute();
 
-            called = true;
-        }
+        called = true;
     }
-
-    // Fall through and call the function also, if it's defined!
-
 
     // user-defined onInitialize is never called
-    if ( id.id() == event_id::INITIALIZE )
-    {
-            testInvariant();
-            return called;
+    if ( id.id() == event_id::INITIALIZE ) {
+        testInvariant();
+        return called;
     }
 
-
     // NOTE: user-defined onLoad is not invoked for static
-    //             clips on which no clip-events are defined.
-    //             see testsuite/misc-ming.all/action_execution_order_extend_test.swf
+    //     clips on which no clip-events are defined.
+    //     see testsuite/misc-ming.all/action_execution_order_extend_test.swf
     //
     //     Note that this can't be true for movieclips
     //     not placed by PlaceObject, see
@@ -924,8 +913,8 @@ MovieClip::on_event(const event_id& id)
     //     a registered class on them, see
     //     testsuite/misc-ming.all/registerClassTest2.swf
     //
-    //     TODO: test the case in which it's MovieClip.prototype.onLoad defined !
-    //
+    //     TODO: test the case in which it's MovieClip.prototype.onLoad
+    //     defined !
     if ( id.id() == event_id::LOAD )
     {
         // TODO: we're likely making too much noise for nothing here,
@@ -1263,10 +1252,11 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
 void
 MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
 {
-    testInvariant();
-
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames.
     if (!_def) return;
 
+    testInvariant();
     assert(typeflags);
 
     const PlayList* playlist = _def->getPlaylist(frame);
@@ -1412,7 +1402,7 @@ MovieClip::goto_frame(size_t target_frame_number)
             // are executed. This means NO actions will be
             // pushed on m_action_list.
             executeFrameTags(_currentFrame, _displayList,
-                   SWF::ControlTag::TAG_DLIST);
+                    SWF::ControlTag::TAG_DLIST);
         }
         assert(_currentFrame == target_frame_number);
 
@@ -1423,16 +1413,21 @@ MovieClip::goto_frame(size_t target_frame_number)
         bool callingFrameActionsBackup = _callingFrameActions;
         _callingFrameActions = false;
         executeFrameTags(target_frame_number, _displayList,
-                SWF::ControlTag::TAG_DLIST |
-                SWF::ControlTag::TAG_ACTION);
+                SWF::ControlTag::TAG_DLIST | SWF::ControlTag::TAG_ACTION);
         _callingFrameActions = callingFrameActionsBackup;
     }
 
     assert(_currentFrame == target_frame_number);
 }
 
-bool MovieClip::goto_labeled_frame(const std::string& label)
+bool
+MovieClip::goto_labeled_frame(const std::string& label)
 {
+
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames. (We are also probably not called in this case).
+    if (!_def) return false;
+
     size_t target_frame;
     if (_def->get_labeled_frame(label, target_frame))
     {
@@ -1506,8 +1501,10 @@ DisplayObject*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
 {
-    if (!_def) return 0;
 
+    // If this MovieClip has no definition, it should also have no ControlTags,
+    // and this shouldn't be called.
+    assert(_def);
     assert(tag);
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
@@ -1570,9 +1567,13 @@ MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dli
         NULL);
 }
 
-void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+void
+MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
+        DisplayList& dlist)
 {
-    assert(_def != NULL);
+    // A MovieClip without a definition cannot have any ControlTags, so this
+    // should not be called.
+    assert(_def);
     assert(tag != NULL);
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
@@ -1968,7 +1969,6 @@ MovieClip::mouseEnabled() const
 DisplayObject*
 MovieClip::getDisplayObject(int /* id */)
 {
-    //return _def->getDefinitionTag(id);
     // @@ TODO -- look through our dlist for a match
     log_unimpl(_("%s doesn't even check for a char"),
         __PRETTY_FUNCTION__);
@@ -2131,7 +2131,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // It seems it's legal to place 0-framed movieclips on stage.
     // See testsuite/misc-swfmill.all/zeroframe_definemovieclip.swf
 
-
     // Now execute frame tags and take care of queuing the LOAD event.
     //
     // DLIST tags are executed immediately while ACTION tags are queued.
@@ -2146,7 +2145,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
-                                          SWF::ControlTag::TAG_ACTION);
+                SWF::ControlTag::TAG_ACTION);
 
         if (_vm.getSWFVersion() > 5)
         {
@@ -2167,8 +2166,8 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
-        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST | 
-                                          SWF::ControlTag::TAG_ACTION);
+        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
+                SWF::ControlTag::TAG_ACTION);
     }
 
     // We execute events immediately when the stage-placed DisplayObject 
@@ -2343,7 +2342,7 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         
         const movie_root& mr = _vm.getRoot();
 
-        boost::intrusive_ptr<movie_definition> md (
+        boost::intrusive_ptr<movie_definition> md(
                 create_library_movie(url, mr.runInfo(), NULL, true, postdata));
 
         if (!md)
@@ -2644,7 +2643,7 @@ MovieClip::markReachableResources() const
     _environment.markReachableResources();
 
     // Mark our own definition
-    if ( _def.get() ) _def->setReachable();
+    if (_def.get()) _def->setReachable();
 
     // Mark textfields in the TextFieldMap
     if ( _text_variables.get() )
