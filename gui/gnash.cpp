@@ -27,6 +27,7 @@
 #include "debugger.h"
 #include "arg_parser.h"
 #include "GnashNumeric.h" // for clamp
+#include "bzrversion.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
@@ -172,7 +173,8 @@ build_options()
         << _(" - Media handler: ") << MEDIA_CONFIG << endl
         
         << _("   Configured with: ") << CONFIG_CONFIG << endl
-        << _("   CXXFLAGS: ") << CXXFLAGS << endl;
+        << _("   CXXFLAGS: ") << CXXFLAGS << endl
+        << "   Version: "  << BRANCH_NICK << ":" << BRANCH_REVNO << endl;
 
 #ifdef USE_FFMPEG
     cout << _("Built against ffmpeg version: ") << LIBAVCODEC_IDENT << endl;
