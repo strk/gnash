@@ -20,7 +20,7 @@
 
 #include "movie_definition.h" // for inheritance
 #include "rect.h" // for composition
-#include "Movie.h" // for create_Movie
+#include "SWFMovie.h" // for create_Movie
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -127,7 +127,7 @@ public:
 	/// Create a playable movie instance from a def.
 	virtual Movie* create_Movie(DisplayObject* parent=NULL)
 	{
-		return new Movie(this, parent);
+		return new SWFMovie(this, parent);
 	}
 	
 	virtual const PlayList& get_playlist(size_t frame_number) const
