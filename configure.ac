@@ -1969,19 +1969,6 @@ fi
 
 
 GNASH_PATH_PTHREADS
-if test x"$pthreads" = x"yes"; then
-  if test x"$PTHREAD_CFLAGS" != x; then
-    CXXFLAGS="$CXXFLAGS $PTHREAD_CFLAGS"
-  fi
-  if test "$CC" != "$PTHREAD_CC"; then
-    AC_MSG_WARN([Replacing compiler $CC with compiler $PTHREAD_CC to support pthreads.])
-    CC="$PTHREAD_CC"
-  fi
-  if test "$CXX" != "$PTHREAD_CXX"; then
-    AC_MSG_WARN([Replacing compiler $CXX with compiler $PTHREAD_CXX to support pthreads.])
-    CXX="$PTHREAD_CXX"
-  fi
-fi
 
 GNASH_PATH_BOOST
 dnl AX_GCC_ARCHFLAG(no)
@@ -2821,7 +2808,9 @@ if test x"$pthreads" = x"yes"; then
   if test x"$PTHREAD_LIBS" != x; then
     echo "        POSIX Threads lib is: $PTHREAD_LIBS"
   else
-    echo "ERROR: No pthread development package installed!" >&3
+    if test x$cross_compiling = xno; then
+      echo "ERROR: No pthread development package installed!" >&3
+    fi
   fi
 fi
 
@@ -2966,90 +2955,93 @@ else
 fi
 
 dnl don't look for the flash compilers when cross compiling.
-if test x$cross_compiling = xno; then
-  if test x"$MING_LIBS" != x; then
-    echo "        MING flags are $MING_CFLAGS"
-    echo "        MING libs are $MING_LIBS"
-  else
-    echo "        WARNING: You need to have the Ming development package" >&4
-    echo "                 installed to run most of the tests in Gnash testsuite." >&4
-    echo "                 Install it from http://www.libming.org/" >&4
-    echo "                 or .deb users: apt-get install libming-dev" >&4
-  fi
+if test x"$testsuite" = x"yes"; then
+  if test x$cross_compiling = xno; then
+    if test x"$MING_LIBS" != x; then
+      echo "        MING flags are $MING_CFLAGS"
+      echo "        MING libs are $MING_LIBS"
+    else
+      echo "        WARNING: You need to have the Ming development package" >&4
+      echo "                 installed to run most of the tests in Gnash testsuite." >&4
+      echo "                 Install it from http://www.libming.org/" >&4
+      echo "                 or .deb users: apt-get install libming-dev" >&4
+    fi
 
-  if test x"$MAKESWF" != x; then
-    echo "        MING version code is $MING_VERSION_CODE"
-    echo "        MAKESWF is $MAKESWF"
-  else
-    echo "        WARNING: You need to have the Ming utilities package" >&4
-    echo "                 installed to run most of the tests in Gnash testsuite." >&4
-    echo "                 Install it from http://www.libming.org" >&4
-    echo "                 or .deb users: apt-get install libming-util" >&4
-  fi
+    if test x"$MAKESWF" != x; then
+      echo "        MING version code is $MING_VERSION_CODE"
+      echo "        MAKESWF is $MAKESWF"
+    else
+      echo "        WARNING: You need to have the Ming utilities package" >&4
+      echo "                 installed to run most of the tests in Gnash testsuite." >&4
+      echo "                 Install it from http://www.libming.org" >&4
+      echo "                 or .deb users: apt-get install libming-util" >&4
+    fi
 
-  if test x"$MAKESWF" != x && test $MING_VERSION_CODE -lt 00040006; then
-    echo "        WARNING: You have an older version of Ming installed and will not" >&4
-    echo "                 be able to run all of the tests in Gnash testsuite." >&4
-    echo "                 Install the latest version from http://www.libming.org" >&4
-  fi
+    if test x"$MAKESWF" != x && test $MING_VERSION_CODE -lt 00040006; then
+      echo "        WARNING: You have an older version of Ming installed and will not" >&4
+      echo "                 be able to run all of the tests in Gnash testsuite." >&4
+      echo "                 Install the latest version from http://www.libming.org" >&4
+    fi
 
-  if test x"$SWFDEC_TESTSUITE" != x; then
-    echo "        SWFDEC testsuite dir is $SWFDEC_TESTSUITE"
-  fi
+    if test x"$SWFDEC_TESTSUITE" != x; then
+      echo "        SWFDEC testsuite dir is $SWFDEC_TESTSUITE"
+    fi
 
-  if test x"$MTASC" != x; then
-    echo "        MTASC is $MTASC"
-    echo "        MTASC CLASSPATH is $MTASC_CLASSPATH"
-  else
-    echo "        WARNING: You need to have the MTASC compiler packages installed" >&4
-    echo "                 to run some of the tests in Gnash testsuite." >&4
-    echo "                 You can install it from http://mtasc.org" >&4
-    echo "                 or .deb users: apt-get install mtasc" >&4
-  fi
+    if test x"$MTASC" != x; then
+      echo "        MTASC is $MTASC"
+      echo "        MTASC CLASSPATH is $MTASC_CLASSPATH"
+    else
+      echo "        WARNING: You need to have the MTASC compiler packages installed" >&4
+      echo "                 to run some of the tests in Gnash testsuite." >&4
+      echo "                 You can install it from http://mtasc.org" >&4
+      echo "                 or .deb users: apt-get install mtasc" >&4
+    fi
 
-  if test x"$HAXE" != x; then
-    echo "        HAXE is $HAXE"
-    echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
-  else
-    echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
-    echo "                 to run some of the tests in Gnash testsuite." >&4
-    echo "                 You can install it from http://haxe.org" >&4
-    echo "                 or .deb users: apt-get install haxe" >&4
-  fi
+    if test x"$HAXE" != x; then
+      echo "        HAXE is $HAXE"
+      echo "        HAXE CLASSPATH is $HAXE_CLASSPATH"
+    else
+      echo "        WARNING: You need to have the HAXE compiler packages installed" >&4
+      echo "                 to run some of the tests in Gnash testsuite." >&4
+      echo "                 You can install it from http://haxe.org" >&4
+      echo "                 or .deb users: apt-get install haxe" >&4
+    fi
 
-  if test x"$SWFMILL" != x; then
-    echo "        SWFMILL is $SWFMILL"
-  else
-    echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
-    echo "                 to run some of the tests in Gnash testsuite." >&4
-    echo "                 You can install it from http://swfmill.org/" >&4
-    echo "                 or .deb users: apt-get install swfmill" >&4
-  fi
+    if test x"$SWFMILL" != x; then
+      echo "        SWFMILL is $SWFMILL"
+    else
+      echo "        WARNING: You need to have the 'swfmill' tool installed" >&4
+      echo "                 to run some of the tests in Gnash testsuite." >&4
+      echo "                 You can install it from http://swfmill.org/" >&4
+      echo "                 or .deb users: apt-get install swfmill" >&4
+    fi
 
-  if test x"$SWFC" != x; then
-    echo "        SWFC is $SWFC"
-  else
-    echo "        WARNING: You need to have 'swfc' from SWFTools installed" >&4
-    echo "                 to run some of the tests in Gnash testsuite." >&4
-    echo "                 You can install it from http://www.swftools.org/" >&4
-    echo "                 or .deb users: apt-get install swftools" >&4
-  fi
+    if test x"$SWFC" != x; then
+      echo "        SWFC is $SWFC"
+    else
+      echo "        WARNING: You need to have 'swfc' from SWFTools installed" >&4
+      echo "                 to run some of the tests in Gnash testsuite." >&4
+      echo "                 You can install it from http://www.swftools.org/" >&4
+      echo "                 or .deb users: apt-get install swftools" >&4
+    fi
 
-  if test x"$AS3COMPILE" != x; then
+    if test x"$AS3COMPILE" != x; then
       echo "        AS3COMPILE is $AS3COMPILE"
-  else
-    echo "        WARNING: you need as3compile from SWFTools" >&4
-    echo "                 to run some of the tests in Gnash testsuite." >&4
-    echo "                 You can install it from http://www.swftools.org/" >&4
-  fi
+    else
+      echo "        WARNING: you need as3compile from SWFTools" >&4
+      echo "                 to run some of the tests in Gnash testsuite." >&4
+      echo "                 You can install it from http://www.swftools.org/" >&4
+    fi
 
-  if test x"$HTTP_TESTSUITE" != x; then
-    echo "        HTTP testsuite dir is $HTTP_TESTSUITE"
-  fi
+    if test x"$HTTP_TESTSUITE" != x; then
+      echo "        HTTP testsuite dir is $HTTP_TESTSUITE"
+    fi
 
-  if test x"$RED5_HOST" != x; then
-    echo "        RED5 testing host is $RED5_HOST"
+    if test x"$RED5_HOST" != x; then
+      echo "        RED5 testing host is $RED5_HOST"
+    fi
   fi
+fi
 
   if test x"$PYTHON" != x; then
     echo "        PYTHON is $PYTHON"
@@ -3065,6 +3057,7 @@ if test x$cross_compiling = xno; then
     echo "                 to run some of the tests in Gnash testsuite." >&4
   fi
 
+if test x"$testsuite" = x"yes"; then
   if test x"$CSOUND" != x; then
     echo "        CSOUND is $CSOUND"
   else
@@ -3074,7 +3067,6 @@ if test x$cross_compiling = xno; then
     echo "                 or .deb users: apt-get install csound" >&4
     echo "                 or .rpm users: yum install csound" >&4
   fi
-
 fi
 
 if test x"$Z_LIBS" != x; then
