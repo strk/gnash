@@ -84,10 +84,6 @@ public:
 		return _framesize;
 	}
 
-	virtual const rect& get_bound() const {
-		return _framesize;
-	}
-
 	/// Return number of bytes loaded
 	//
 	/// Since no progressive load is implemented yet
