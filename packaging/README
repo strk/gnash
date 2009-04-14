@@ -5,6 +5,9 @@ that does the entire process, which can be time consuming. Each of the
 other targets break the entire process into stages which make it much
 easier to debug, or redo only one stage of the entire process.
 
+For these targets to work correct, your build must be able to survive
+"make distcheck".
+
 xpi      - Build a binary XPI package for Mozilla/Firefox
 snapshot - Build a binary tarball package for any distribution
 deb      - Build a binary Debian/Ubuntu package
@@ -30,10 +33,7 @@ snapshot-src: is the primary target used to build the source directory
 	     although some options are common, like setting --prefix=/usr.
 
 -build:	     this target builds the package in the _build sub
-	     directory. If MAKEFLAGS is set in your environment, it is
-	     appended to the default flags used when running make. I
-	     often set MAKEFLAGS to "-O0 -j6" when testing the
-	     packaging Makefile support to speed things up.
+	     directory.
 
 -install:    this target installs the fresh build and sets DESTDIR so
 	     all the files get installed in temporary directory as we
@@ -46,3 +46,14 @@ snapshot-src: is the primary target used to build the source directory
 	     the source packaging directories, and other tweaks to
 	     create the package correctly.
 
+RPM
+	All RPMs are built using rpmbuild. Although rpmbuild is
+	primarily used to build packages in one pass via "-ba", it is
+	possible to run the different phases seperately, which makes
+	debugging easier.
+
+	The version in the gnash.spec is editied to be consistant.
+
+DEB
+	All DEBs are built using dpkg-buildpackage. The version in the
+	changelog is editied to be consistant.

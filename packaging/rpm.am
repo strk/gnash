@@ -37,7 +37,11 @@ gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 # instead, so now you don't have to be root to build rpm packages.
 
 # Do the entire process to build an RPM package
-rpm: spec snapshot-src rpm-setup rpm-configure rpm-build rpm-install rpm-bundle
+rpm: spec snapshot-src rpm-setup rpm-gnash
+
+# build everything in one pass using rpmbuild
+rpm-gnash: 
+	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
 
 # configure the build directory, which we do by executing only the %prep stage,
 # which doesn't actually run configure
@@ -56,10 +60,6 @@ rpm-install:
 
 rpm-setup: 
 	cp $(SNAPSHOT_TAR) $${HOME}/rpmbuild/SOURCES/
-
-# build everything in one pass using rpmbuild
-rpm-gnash: 
-	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
 
 # build klash and the konqueror plugin as a sepaate step.
 rpm-klash:

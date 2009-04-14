@@ -47,7 +47,6 @@ snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapsh
 # rename it to the dir we want to stay clear. Then we change the default
 # version from 'trunk' to a date stamped version of trunk.
 snapshot-src: distdir
-	-@now=`date "+%Y%m%d"`; \
 	snapshot_tar="$(SNAPSHOT_NAME).tar.gz"; \
 	if test -d $(SNAPSHOT_DIR); then \
 	  rm -fr $(SNAPSHOT_DIR); \
