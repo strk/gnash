@@ -184,7 +184,7 @@ movie_root::setRootMovie(movie_instance* movie)
 
 	m_viewport_x0 = 0;
 	m_viewport_y0 = 0;
-	const movie_definition* md = movie->get_movie_definition();
+	const movie_definition* md = movie->definition();
 	float fps = md->get_frame_rate();
 	_movieAdvancementDelay = static_cast<int>(1000/fps);
 
@@ -1496,7 +1496,7 @@ movie_root::setStageScaleMode(ScaleMode sm)
         // If we go from or to noScale, we notify a resize
         // if and only if display viewport is != then actual
         // movie size
-        const movie_definition* md = _rootMovie->get_movie_definition();
+        const movie_definition* md = _rootMovie->definition();
 
         log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d "
                 "Def:%dx%d", m_viewport_width, m_viewport_height,

@@ -297,7 +297,7 @@ object_registerClass(const fn_call& fn)
 	}
 	movie_instance* relRoot = tgt->get_root();
 	assert(relRoot);
-	const movie_definition* def = relRoot->get_movie_definition();
+	const movie_definition* def = relRoot->definition();
 	
     boost::intrusive_ptr<ExportableResource> exp_res =
         def->get_exported_resource(symbolid);

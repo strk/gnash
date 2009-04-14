@@ -114,7 +114,6 @@ public:
         PLAYSTATE_STOP
     };
 
-
     // Overridden to use the m_root member
     virtual movie_instance* get_root() const;
 
@@ -125,13 +124,6 @@ public:
     /// and setLockRoot.
     ///
     virtual const MovieClip* getAsRoot() const;
-
-    /// \brief
-    /// Return the sprite_definition (or movie_definition)
-    /// from which this MovieClip has been created
-    const movie_definition* get_movie_definition() {
-        return _def.get();
-    }
 
     /// Get the composite bounds of all component drawing elements
     virtual rect getBounds() const;

@@ -2737,7 +2737,6 @@ MovieClip::getAsRoot() const
     // SWF version is > 6
     //
     int topSWFVersion = getVM().getRoot().get_movie_definition()->get_version();
-    //int topSWFVersion = getVM().getSWFVersion() > 6;
 
     if ( getSWFVersion() > 6 || topSWFVersion > 6 )
     {
@@ -3138,8 +3137,7 @@ movieclip_attachMovie(const fn_call& fn)
     const std::string& id_name = fn.arg(0).to_string();
 
     boost::intrusive_ptr<ExportableResource> exported =
-        movieclip->get_root()->get_movie_definition()->get_exported_resource(
-                id_name);
+        movieclip->get_root()->definition()->get_exported_resource(id_name);
 
     if (!exported)
     {

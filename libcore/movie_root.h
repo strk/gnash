@@ -309,7 +309,7 @@ public:
     }
 
     const movie_definition* get_movie_definition() const {
-        return _rootMovie->get_movie_definition();
+        return _rootMovie->definition();
     }
 
     void stop_drag()

@@ -75,6 +75,10 @@ public:
 		return _initializedCharacters.insert(cid).second;
 	}
 
+    const movie_definition* definition() const {
+        return _def.get();
+    }
+
 private:
 
 	/// A map to track execution of init actions
