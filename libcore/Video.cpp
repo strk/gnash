@@ -140,7 +140,7 @@ Video::display()
 	assert(m_def);
 
 	SWFMatrix m = getWorldMatrix();
-	const rect& bounds = m_def->get_bound();
+	const rect& bounds = m_def->bounds();
 
 	GnashImage* img = getVideoFrame();
 	if (img)
@@ -275,14 +275,14 @@ Video::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     
 	ranges.add(m_old_invalidated_ranges);
 	
-	// NOTE: do not use m_def->get_bounds()
+	// NOTE: do not use m_def->boundss()
 
 	// if m_def is NULL we've been constructed by 'new Video', in this
 	// case I think add_invalidated_bouns would never be invoked on us...
 	assert ( m_def );
 
 	rect bounds;	
-	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->get_bound());
+	bounds.expand_to_transformed_rect(getWorldMatrix(), m_def->bounds());
 	
 	ranges.add(bounds.getRange());            
 }
@@ -314,7 +314,7 @@ video_class_init(as_object& global)
 rect
 Video::getBounds() const
 {
-	if (_embeddedStream) return m_def->get_bound();
+	if (_embeddedStream) return m_def->bounds();
 
 	// TODO: return the bounds of the dynamically
 	//       loaded video if not embedded ?

@@ -322,17 +322,6 @@ private:
 		return true;
 	}
 
-	const rect&	get_bound() const {
-    // It is required that get_bound() is implemented in DisplayObject definition
-    // classes. However, it makes no sense to call it for sprite definitions.
-    // get_bound() is currently only used by DisplayObject which normally
-    // is used only shape DisplayObject definitions. See SWF::DefinitionTag.h to learn
-    // why it is virtual anyway.
-    abort(); // should not be called
-		static rect unused;
-		return unused;
-  }
-
 	/// \brief
 	/// The constructor to use for setting up the interface
 	/// for new instances of this sprite

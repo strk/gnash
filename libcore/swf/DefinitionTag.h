@@ -38,27 +38,20 @@ namespace gnash {
 namespace gnash {
 namespace SWF {
 
-/// Immutable data representing the template of a movie element.
-//
-/// This is not really a public interface.  It's here so it
-/// can be mixed into movie_definition and sprite_definition,
-/// without using multiple inheritance.
-///
+/// Immutable data representing the definition of a movie display element.
 class DefinitionTag : public ExportableResource, boost::noncopyable
 {
 public:
 
 	virtual ~DefinitionTag() {};
 	
-	/// Should stick the result in a boost::intrusive_ptr immediately.
+	/// Create a DisplayObject with the given parent and id
 	//
-	/// default is to make a DisplayObject
-	///
+    /// Calling this function creates a new DisplayObject from the
+    /// DefinitionTag and adds it as a child of the specified parent
+    /// DisplayObject.
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent,
             int id) = 0;
-	
-	// Declared as virtual here because DisplayObject needs access to it
-	virtual const rect&	get_bound() const = 0;
 	
 };
 

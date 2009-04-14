@@ -43,7 +43,7 @@ public:
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 	
     /// Get cached bounds of this shape.
-    const rect&	get_bound() const { return _shape.getBounds(); }
+    const rect& bounds() const { return _shape.getBounds(); }
 
     virtual bool pointTestLocal(boost::int32_t x, boost::int32_t y, 
             const SWFMatrix& wm) const;

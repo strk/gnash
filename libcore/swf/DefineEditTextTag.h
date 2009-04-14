@@ -65,7 +65,7 @@ public:
 	static void loader(SWFStream& in, TagType tag, movie_definition& m,
             const RunInfo& r);
 
-    const rect& get_bound() const { return _rect; }
+    const rect& bounds() const { return _rect; }
 
     DisplayObject* createDisplayObject(DisplayObject* parent, int id);
 
@@ -92,16 +92,6 @@ public:
 		return _maxChars;
 	}
 
-	/// Set boundaries of this textfield
-	//
-	/// This method is used for dynamic textfields
-	/// (actionscript created)
-	///
-	void set_bounds(const rect& bounds)
-	{
-		_rect = bounds;
-	}
-
 	/// Get right margin in twips
 	boost::uint16_t rightMargin() const {
 		return _rightMargin;
@@ -123,22 +113,9 @@ public:
 		return _textHeight;
 	}
 
-	/// Set height of font  in twips.
-	// 
-	/// Used by dynamically created textfields.
-	///
-	void setFontHeight(boost::uint16_t h) {
-		_textHeight = h;
-	}
-
 	/// Get color of the text
 	const rgba& color() const {
 		return _color;
-	}
-
-	/// Set color of the text
-	void setTextColor(const rgba& col) {
-		_color = col;
 	}
 
 	/// \brief
@@ -184,7 +161,7 @@ public:
 
 	bool noSelect() const 
 	{
-	  return _noSelect;
+	     return _noSelect;
 	}
 	
 	/// Return true if HTML was allowed by definition

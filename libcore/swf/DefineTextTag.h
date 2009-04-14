@@ -52,7 +52,7 @@ public:
 	/// Draw the string.
 	void display(const StaticText& inst) const;
 	
-	const rect&	get_bound() const {
+	const rect& bounds() const {
         // TODO: There is a _matrix field in the definition(!) that's
         // currently ignored. Don't know if it needs to be transformed... 
         return _rect; 

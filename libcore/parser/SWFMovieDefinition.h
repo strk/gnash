@@ -387,17 +387,6 @@ public:
 
 	virtual const std::string& get_url() const { return _url; }
 	
-	const rect&	get_bound() const {
-    // It is required that get_bound() is implemented in DisplayObject definition
-    // classes. However, it makes no sense to call it for movie interfaces.
-    // get_bound() is currently only used by DisplayObject which normally
-    // is used only shape DisplayObject definitions. See DefinitionTag.h to learn
-    // why it is virtual anyway.
-    abort(); // should not be called  
-		static rect unused;
-		return unused;
-	}
-
 #ifdef USE_SWFTREE
 
 	// These methods attach the contents of the METADATA tag

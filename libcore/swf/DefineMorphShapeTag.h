@@ -60,10 +60,6 @@ public:
         return _shape2;
     }
 
-    virtual const rect& get_bound() const {
-        return _bounds;
-    }
-
 private:
 
     DefineMorphShapeTag(SWFStream& in, SWF::TagType tag, movie_definition& md);

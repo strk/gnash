@@ -116,10 +116,6 @@ public:
 		return _framesize;
 	}
 
-	virtual const rect& get_bound() const {
-		return _framesize;
-	}
-
 	virtual size_t get_bytes_loaded() const {
 		return 0;
 	}

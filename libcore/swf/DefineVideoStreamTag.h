@@ -107,7 +107,7 @@ public:
             movie_definition& m);
 
 	/// Return local video bounds in twips
-	const rect&	get_bound() const
+	const rect&	bounds() const
 	{
 		return m_bound;
 	}
