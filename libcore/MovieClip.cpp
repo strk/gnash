@@ -2716,8 +2716,6 @@ MovieClip::get_root() const
 const MovieClip*
 MovieClip::getAsRoot() const
 {
-    //log_debug("getAsRoot called for movieclip %s, with _lockroot "
-    //"%d and version %d", getTarget(), getLockRoot(), getSWFVersion());
 
     // TODO1: as an optimization, if swf version < 7 
     //                we might as well just return m_root, 
@@ -2734,15 +2732,10 @@ MovieClip::getAsRoot() const
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    //
     int topSWFVersion = getVM().getRoot().get_movie_definition()->get_version();
 
-    if ( getSWFVersion() > 6 || topSWFVersion > 6 )
-    {
-        if ( getLockRoot() )
-        {
-            return this; // locked
-        }
+    if (getSWFVersion() > 6 || topSWFVersion > 6) {
+        if (getLockRoot()) return this;
     }
 
     return parent->getAsRoot();

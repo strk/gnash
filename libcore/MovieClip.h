@@ -62,12 +62,27 @@ namespace gnash {
 namespace gnash
 {
 
-/// Stateful Sprite object. Also known as a MovieClip.
+/// A MovieClip is a container for DisplayObjects.
 //
-/// Instance of this class are also known as "timelines".
-/// This means that they define a variable scope (see
-/// the as_environment member) and are divided into "frames"
-///
+/// In AS3 is it distinguished from a Sprite by having a timeline, i.e.
+/// more than one frame. In AS2, there is no Sprite class.
+//
+/// There are basically two types of MovieClip: dynamic and non-dynamic.
+/// Dynamic clips are created using createEmptyMovieClip() or 
+/// duplicateMovieClip(). Non-dynamic MovieClips are parsed from a SWF file.
+/// The isDynamic() member function is the only way to tell the difference
+/// (see following paragraph).
+//
+/// The presence of a definition (the _def member) reveals whether the
+/// MovieClip was constructed with an immutable definition or not. MovieClips
+/// created using createEmptyMovieClip() have no definition. MovieClips
+/// constructed using duplicateMovieClip() have the same definition as the
+/// duplicated clip. They are "dynamic", but may have a definition!
+//
+/// A MovieClip always has an m_root member. This is the top-level SWF 
+/// (movie_instance) containing either the definition or the code from
+/// which the MovieClip was created. The _url member and SWF version are
+/// dependent on the m_root. Exports are also sought in this movie_instance.
 class MovieClip : public InteractiveObject 
 {
 
@@ -77,20 +92,25 @@ public:
 
     typedef movie_definition::PlayList PlayList;
 
-    typedef std::vector<swf_event*> SWFEventsVector;
+    enum PlayState
+    {
+        PLAYSTATE_PLAY,
+        PLAYSTATE_STOP
+    };
 
     /// Construct a MovieClip instance
     //
     /// @param def
     ///     Pointer to the movie_definition this object is an
     ///     instance of (may be a top-level movie or a sprite).
+    ///     This may be 0 if there is no immutable definition.
     ///
     /// @param root
     /// The "relative" _root of this sprite, which is the 
     /// instance of top-level sprite defined by the same
     /// SWF that also contained *this* sprite definition.
     /// Note that this can be *different* from the top-level
-    /// movie accessible trought the VM, in case this sprite
+    /// movie accessible through the VM, in case this sprite
     /// was defined in an externally loaded movie.
     ///
     /// @param parent
@@ -107,12 +127,6 @@ public:
             DisplayObject* parent, int id);
 
     virtual ~MovieClip();
-
-    enum PlayState
-    {
-        PLAYSTATE_PLAY,
-        PLAYSTATE_STOP
-    };
 
     // Overridden to use the m_root member
     virtual movie_instance* get_root() const;
@@ -762,7 +776,7 @@ public:
     void constructAsScriptObject();
 
 
-    /// Return true if get_root() should return the *relative* root,
+    /// Return true if getAsRoot() should return the *relative* root,
     /// false otherwise.
     bool getLockRoot() const { return _lockroot; }
 
