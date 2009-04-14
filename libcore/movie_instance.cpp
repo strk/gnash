@@ -44,10 +44,6 @@ movie_instance::stagePlacementCallback(as_object* initObj)
 
 	saveOriginalTarget();
 
-	//GNASH_REPORT_FUNCTION;
-
-	//_def->stopLoader();
-
 	// Load first frame  (1-based index)
 	size_t nextframe = 1;
 	if ( !_def->ensure_frame_loaded(nextframe) )
@@ -66,16 +62,13 @@ movie_instance::stagePlacementCallback(as_object* initObj)
 void
 movie_instance::advance()
 {
-	//GNASH_REPORT_FUNCTION;
-
-	//_def->stopLoader();
-
 	// Load next frame if available (+2 as m_current_frame is 0-based)
 	//
 	// We do this inside advance_root to make sure
 	// it's only for a root sprite (not a sprite defined
 	// by DefineSprite!)
-	size_t nextframe = std::min<size_t>(get_current_frame()+2, get_frame_count());
+	size_t nextframe = std::min<size_t>(get_current_frame() + 2,
+            get_frame_count());
 	if ( !_def->ensure_frame_loaded(nextframe) )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
@@ -85,8 +78,6 @@ movie_instance::advance()
 	}
 
 	advance_sprite(); 
-
-	//_def->resumeLoader();
 }
 
 } // namespace gnash
