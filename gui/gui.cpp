@@ -899,7 +899,7 @@ Gui::start()
         return;
     }
 
-    std::auto_ptr<movie_instance> mr ( _movieDef->create_movie_instance() );
+    std::auto_ptr<Movie> mr ( _movieDef->create_Movie() );
     mr->setVariables(_flashVars);
 
     _stage->setRootMovie( mr.release() ); // will construct the instance

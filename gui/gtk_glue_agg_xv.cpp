@@ -116,7 +116,7 @@ GtkAggXvGlue::setupRendering()
     if (first && VM::isInitialized()) {
         first = false;
         
-        const movie_instance& mi = VM::get().getRoot().getRootMovie();
+        const Movie& mi = VM::get().getRoot().getRootMovie();
     
         _movie_width = mi.widthPixels();
         _movie_height = mi.heightPixels();        

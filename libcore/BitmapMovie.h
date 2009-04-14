@@ -19,13 +19,14 @@
 #ifndef GNASH_BITMAPMOVIEINSTANCE_H
 #define GNASH_BITMAPMOVIEINSTANCE_H
 
-#include "movie_instance.h" // for inheritance
+#include "BitmapMovieDefinition.h"
+#include "Movie.h" // for inheritance
 
 // Forward declarations
 namespace gnash
 {
-	class BitmapMovieDefinition;
     class GnashImage;
+    class DisplayObject;
 }
 
 namespace gnash
@@ -33,14 +34,48 @@ namespace gnash
 
 
 /// Instance of a BitmapMovieDefinition
-class BitmapMovieInstance : public movie_instance
+class BitmapMovie : public Movie
 {
 
 public:
 
-	BitmapMovieInstance(BitmapMovieDefinition* def, DisplayObject* parent=0); 
+	BitmapMovie(BitmapMovieDefinition* def, DisplayObject* parent=0); 
 
-	virtual ~BitmapMovieInstance() {}
+	virtual ~BitmapMovie() {}
+
+	virtual void advance() {};
+
+    virtual float frameRate() const {
+        return _def->get_frame_rate();
+    };
+
+    virtual float widthPixels() const {
+        return _def->get_width_pixels();
+    }
+
+    virtual float heightPixels() const {
+        return _def->get_height_pixels();
+    }
+
+    virtual const std::string& url() const {
+        return _def->get_url();
+    }
+
+    /// The SWF version of a loaded BitmapMovie is -1
+    virtual int version() const {
+        return -1;
+    }
+
+    virtual const movie_definition* definition() const {
+        return _def;
+    }
+	
+    /// Set a DisplayObject in the dictionary as initialized, returning
+	/// true if not already initialized.
+	bool setCharacterInitialized(int cid)
+	{
+		return _initializedCharacters.insert(cid).second;
+	}
 
     /// Render this MovieClip to a GnashImage using the passed transform
     //
@@ -51,16 +86,16 @@ public:
             DisplayObject::BlendMode bm = DisplayObject::BLENDMODE_NORMAL,
             const rect& clipRect = rect(),
             bool smooth = false);
-
-	/// Do nothing on restart. Especially don't trash the DisplayList 
+private:
+	
+    /// A map to track execution of init actions
 	//
-	/// TODO: this is needed due to the implementation detail of 
-	///       using the DisplayList to store our bitmap-filled
-	///       shape. Using the _drawable instead, or overriding
-	///       ::display to simply display our definition is likely
-	///	  the best way to go instead (we'd also reuse the same
-	///       bitmap info rather then creating new instances..)
-	void restart() {}
+	/// Elements of this set are ids of DisplayObjects
+	/// in our definition's CharacterDictionary.
+	///
+	std::set<int> _initializedCharacters;
+
+    const BitmapMovieDefinition* const _def;
 
 };
 

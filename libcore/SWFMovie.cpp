@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "movie_instance.h"
+#include "SWFMovie.h"
 #include "movie_definition.h"
 #include "movie_root.h"
 #include "log.h"
@@ -29,15 +29,15 @@
 
 namespace gnash {
 
-movie_instance::movie_instance(movie_definition* def, DisplayObject* parent)
+SWFMovie::SWFMovie(movie_definition* def, DisplayObject* parent)
 	:
-	MovieClip(def, this, parent, parent ? 0 : -1),
+	Movie(def, parent),
 	_def(def)
 {
 }
 
 void
-movie_instance::stagePlacementCallback(as_object* initObj)
+SWFMovie::stagePlacementCallback(as_object* initObj)
 {
 
     assert (!initObj);
@@ -60,7 +60,7 @@ movie_instance::stagePlacementCallback(as_object* initObj)
 
 // Advance of an SWF-defined movie instance
 void
-movie_instance::advance()
+SWFMovie::advance()
 {
 	// Load next frame if available (+2 as m_current_frame is 0-based)
 	//

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "BitmapMovieInstance.h"
+#include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
 #include "fill_style.h"
 #include "Geometry.h" // for class path and class edge
@@ -23,10 +23,10 @@
 
 namespace gnash {
 
-BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
-        DisplayObject* parent)
+BitmapMovie::BitmapMovie(BitmapMovieDefinition* def, DisplayObject* parent)
 	:
-	movie_instance(def, parent)
+	Movie(def, parent),
+    _def(def)
 {  
 	// We need to assign a DisplayObject id to the instance, or an assertion
 	// will fail in DisplayObject.cpp (parent==NULL || id != -1)
@@ -39,7 +39,7 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
 }
 
 std::auto_ptr<GnashImage>
-BitmapMovieInstance::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
+BitmapMovie::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
                                   DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
                                   bool /* smooth */)
 {

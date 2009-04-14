@@ -1070,7 +1070,7 @@ Button::get_member(string_table::key name_key, as_value* val,
     movie_root& mr = _vm.getRoot();
     unsigned int levelno;
     if ( mr.isLevelTarget(name, levelno) ) {
-        movie_instance* mo = mr.getLevel(levelno).get();
+        Movie* mo = mr.getLevel(levelno).get();
         if ( mo ) {
             val->set_as_object(mo);
             return true;

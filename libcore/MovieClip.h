@@ -46,7 +46,7 @@
 
 // Forward declarations
 namespace gnash {
-    class movie_instance;
+    class Movie;
     class swf_event;
     class drag_state;
     class LoadVariablesThread;
@@ -80,9 +80,9 @@ namespace gnash
 /// duplicated clip. They are "dynamic", but may have a definition!
 //
 /// A MovieClip always has an _swf member. This is the top-level SWF 
-/// (movie_instance) containing either the definition or the code from
+/// (Movie) containing either the definition or the code from
 /// which the MovieClip was created. The _url member and SWF version are
-/// dependent on the _swf. Exports are also sought in this movie_instance.
+/// dependent on the _swf. Exports are also sought in this Movie.
 class MovieClip : public InteractiveObject 
 {
 
@@ -123,13 +123,13 @@ public:
     ///     to be deprecated if every instance has a reference to its
     ///     definition, which should know its id...
     ///
-    MovieClip(const movie_definition* const def, movie_instance* root,
+    MovieClip(const movie_definition* const def, Movie* root,
             DisplayObject* parent, int id);
 
     virtual ~MovieClip();
 
     // Return the originating SWF
-    virtual movie_instance* get_root() const;
+    virtual Movie* get_root() const;
 
     /// Return the _swf ActionScript property of this sprite.
     //
@@ -796,7 +796,7 @@ public:
 
 protected:
 
-    /// Used both by this class and movie_instance.
+    /// Used both by this class and Movie.
     //
     /// TODO: do this with proper Sprite -> MovieClip inheritance.
     void advance_sprite();
@@ -816,7 +816,7 @@ protected:
     virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
     
-    // Used by BitmapMovieInstance.
+    // Used by BitmapMovie.
     void placeDisplayObject(DisplayObject* ch, int depth) {       
         _displayList.placeDisplayObject(ch, depth);  
     }
@@ -968,7 +968,7 @@ private:
     LoadVariablesThreads _loadVariableRequests;
 
     /// The SWF that this MovieClip belongs to.
-    movie_instance* _swf;
+    Movie* _swf;
 
     /// Current Display List contents.
     DisplayList _displayList;

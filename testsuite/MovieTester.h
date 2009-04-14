@@ -29,7 +29,7 @@
 #include "GnashKey.h"
 #include "sound_handler.h" // for creating the "test" sound handlers
 #include "render_handler.h" // for dtor visibility by auto_ptr
-#include "movie_instance.h" 
+#include "Movie.h" 
 #include "ManualClock.h" // for composition
 #include "RunInfo.h" // For initialization.
 
@@ -317,7 +317,7 @@ private:
 
 	gnash::movie_definition* _movie_def;
 
-	gnash::movie_instance* _movie;
+	gnash::Movie* _movie;
 
     boost::shared_ptr<sound::sound_handler> _sound_handler;
 

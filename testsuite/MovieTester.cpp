@@ -23,7 +23,7 @@
 #include "URL.h"
 #include "noseek_fd_adapter.h"
 #include "movie_definition.h"
-#include "movie_instance.h"
+#include "Movie.h"
 #include "movie_root.h"
 #include "MovieClip.h"
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
@@ -143,7 +143,7 @@ MovieTester::MovieTester(const std::string& url)
 	dbglogfile.setVerbosity(1);
 
 	
-	std::auto_ptr<movie_instance> mi ( _movie_def->create_movie_instance() );
+	std::auto_ptr<Movie> mi ( _movie_def->create_Movie() );
 
 	// Set _movie before calling ::render
 	_movie = mi.get();
@@ -613,7 +613,7 @@ void
 MovieTester::restart() 
 {
 	_movie_root->clear(); // restart();
-	_movie = _movie_def->create_movie_instance();
+	_movie = _movie_def->create_Movie();
 	_movie_root->setRootMovie(_movie);
 
 	// Set _movie before calling ::render

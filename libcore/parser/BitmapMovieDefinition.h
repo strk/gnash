@@ -21,7 +21,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance
 #include "rect.h" // for composition
-#include "BitmapMovieInstance.h" // for create_movie_instance
 #include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
@@ -37,7 +36,7 @@ namespace gnash
 
 /// A "movie" definition for a bitmap file
 //
-/// The create_movie_instance function will return a BitmapMovieInstance
+/// The create_Movie function will return a BitmapMovie
 ///
 class BitmapMovieDefinition : public movie_definition
 {
@@ -101,11 +100,8 @@ public:
 		return _bytesTotal;
 	}
 	
-	/// Create a playable movie_instance from this def.
-	virtual movie_instance* create_movie_instance(DisplayObject* parent=0)
-	{
-		return new BitmapMovieInstance(this, parent);
-	}
+	/// Create a playable Movie from this def.
+	virtual Movie* create_Movie(DisplayObject* parent=0);
 
 	virtual const std::string& get_url() const {
 		return _url;

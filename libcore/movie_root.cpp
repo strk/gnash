@@ -23,7 +23,7 @@
 #include "movie_root.h"
 #include "log.h"
 #include "MovieClip.h"
-#include "movie_instance.h" // for implicit upcast to MovieClip
+#include "Movie.h" // for implicit upcast to MovieClip
 #include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
@@ -178,7 +178,7 @@ movie_root::~movie_root()
 }
 
 void
-movie_root::setRootMovie(movie_instance* movie)
+movie_root::setRootMovie(Movie* movie)
 {
 	_rootMovie = movie;
 
@@ -248,7 +248,7 @@ movie_root::cleanupAndCollect()
 
 /* private */
 void
-movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie)
+movie_root::setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie)
 {
 	assert(movie != NULL);
 	assert(static_cast<unsigned int>(movie->get_depth()) ==
@@ -433,11 +433,11 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 		return false;
 	}
 
-	boost::intrusive_ptr<movie_instance> extern_movie;
-	extern_movie = md->create_movie_instance();
+	boost::intrusive_ptr<Movie> extern_movie;
+	extern_movie = md->create_Movie();
 	if (extern_movie == NULL)
 	{
-		log_error(_("can't create extern movie_instance for %s"),
+		log_error(_("can't create extern Movie for %s"),
                 url.str());
 		return false;
 	}
@@ -455,14 +455,14 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	return true;
 }
 
-boost::intrusive_ptr<movie_instance>
+boost::intrusive_ptr<Movie>
 movie_root::getLevel(unsigned int num) const
 {
 	Levels::const_iterator i = _movies.find(num+DisplayObject::staticDepthOffset);
 	if ( i == _movies.end() ) return 0;
 
-	assert(boost::dynamic_pointer_cast<movie_instance>(i->second));
-	return boost::static_pointer_cast<movie_instance>(i->second);
+	assert(boost::dynamic_pointer_cast<Movie>(i->second));
+	return boost::static_pointer_cast<Movie>(i->second);
 }
 
 void

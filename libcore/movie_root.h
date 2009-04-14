@@ -77,7 +77,7 @@
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
-#include "movie_instance.h"
+#include "Movie.h"
 #include "RunInfo.h" // for initialization
 #include "gnash.h" // Quality
 
@@ -166,7 +166,7 @@ public:
     ///
     /// Make sure to call this method before using the movie_root,
     /// as most operations are delegated to the associated/wrapped
-    /// movie_instance.
+    /// Movie.
     ///
     /// Note that the display viewport will be updated to match
     /// the size of given movie.
@@ -174,18 +174,18 @@ public:
     /// A call to this method is equivalent to a call to setLevel(0, movie).
     ///
     /// @param movie
-    /// The movie_instance to wrap.
+    /// The Movie to wrap.
     /// Will be stored in an intrusive_ptr.
     /// Must have a depth of 0.
     ///
-    void setRootMovie(movie_instance* movie);
+    void setRootMovie(Movie* movie);
 
     /// Return the movie at the given level (0 if unloaded level).
     //
     /// POST CONDITIONS:
     /// - The returned DisplayObject has a depth equal to 'num'
     ///
-    boost::intrusive_ptr<movie_instance> getLevel(unsigned int num) const;
+    boost::intrusive_ptr<Movie> getLevel(unsigned int num) const;
 
     /// Load movie at the specified URL in the given level 
     //
@@ -303,14 +303,14 @@ public:
     void set_drag_state(const drag_state& st);
 
     /// @return the originating root movie (not necessarely _level0)
-    const movie_instance& getRootMovie() const
+    const Movie& getRootMovie() const
     {
         return *_rootMovie;
     }
 
     /// Return the current nominal frame rate for the Stage.
     //
-    /// This is dependent on the movie_instance set as root movie.
+    /// This is dependent on the Movie set as root movie.
     float frameRate() const {
         return _rootMovie->frameRate();
     }
@@ -1031,7 +1031,7 @@ private:
     //
     /// We keep a pointer to the base MovieClip class
     /// to avoid having to replicate all of the base class
-    /// interface to the movie_instance class definition
+    /// interface to the Movie class definition
     Levels _movies;
 
     typedef std::map<int, DisplayObject*> Childs;
@@ -1042,7 +1042,7 @@ private:
     /// The root movie. This is initially the same as getLevel(0) but might
     /// change during the run. It will be used to setup and retrive initial
     /// stage size
-    boost::intrusive_ptr<movie_instance> _rootMovie;
+    boost::intrusive_ptr<Movie> _rootMovie;
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
@@ -1086,11 +1086,11 @@ private:
     /// Put the given movie at the given level 
     //
     /// @param movie
-    /// The movie_instance to store at the given level.
+    /// The Movie to store at the given level.
     /// Will be stored in an intrusive_ptr.
     /// Its depth will be set to <num>+DisplayObject::staticDepthOffset and
     /// its name to _level<num>
-    void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
+    void setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie);
 
     /// Return the global Key object 
     //

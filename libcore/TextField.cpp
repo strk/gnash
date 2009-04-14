@@ -2434,7 +2434,7 @@ textfield_setTextFormat(const fn_call& fn)
             bool italic = tf->italiced();
 
             // NOTE: should query movie-private font lib, not global-shared one
-            movie_instance* mi = text->get_root();
+            Movie* mi = text->get_root();
             assert(mi);
             const movie_definition* md = mi->definition();
             assert(md);

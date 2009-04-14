@@ -1210,7 +1210,7 @@ DisplayObject::computeTargetPath() const
 {
 
 	// TODO: check what happens when this DisplayObject
-	//       is a movie_instance loaded into another
+	//       is a Movie loaded into another
 	//       running movie.
 	
 	typedef std::vector<std::string> Path;
@@ -1282,7 +1282,7 @@ DisplayObject::getTarget() const
 {
 
 	// TODO: check what happens when this DisplayObject
-	//       is a movie_instance loaded into another
+	//       is a Movie loaded into another
 	//       running movie.
 	
 	typedef std::vector<std::string> Path;
@@ -1298,14 +1298,14 @@ DisplayObject::getTarget() const
 		if ( ! parent )
 		{
 			std::stringstream ss;
-			if (!dynamic_cast<const movie_instance*>(ch))
+			if (!dynamic_cast<const Movie*>(ch))
 			{
 				// must be an as-referenceable
 				// DisplayObject created using 'new'
 				// like, new MovieClip, new Video, new TextField...
 				// 
 				log_debug("DisplayObject %p (%s) doesn't have a parent and "
-                        "is not a movie_instance", ch, typeName(*ch));
+                        "is not a Movie", ch, typeName(*ch));
 				ss << "<no parent, depth" << ch->get_depth() << ">";
 				path.push_back(ss.str());
 			}

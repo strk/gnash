@@ -56,7 +56,7 @@ main(int /*argc*/, char** /*argv*/)
     RunInfo ri("");
     movie_root stage(*md5, clock, ri);
 
-	movie_instance* root = md5->create_movie_instance();
+	Movie* root = md5->create_Movie();
     stage.setRootMovie( root );
 
 	DisplayList dlist1;

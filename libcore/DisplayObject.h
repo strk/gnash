@@ -47,7 +47,7 @@
 // Forward declarations
 namespace gnash {
     class MovieClip;
-    class movie_instance;
+    class Movie;
     class ExecutableCode;
     class action_buffer;
     class movie_definition;
@@ -489,14 +489,14 @@ public:
 
     /// Return the relative root of this DisplayObject
     //
-    /// The "relative" is the movie_instance created by
+    /// The "relative" is the Movie created by
     /// the same SWF definition that contained the
     /// definition of this DisplayObject.
     ///
     /// The default implementation is to invoke get_root
     /// against this DisplayObject's parent.
     ///
-    virtual movie_instance* get_root() const {
+    virtual Movie* get_root() const {
         return get_parent()->get_root();
     }
 

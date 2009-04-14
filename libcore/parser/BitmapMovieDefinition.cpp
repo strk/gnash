@@ -18,7 +18,7 @@
 //
 
 #include "smart_ptr.h" // GNASH_USE_GC
-#include "BitmapMovieInstance.h"
+#include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
 #include "fill_style.h"
 #include "Geometry.h" // for class path and class edge
@@ -28,6 +28,12 @@
 #include "Shape.h"
 
 namespace gnash {
+
+Movie*
+BitmapMovieDefinition::create_Movie(DisplayObject* parent)
+{
+    return new BitmapMovie(this, parent);
+}
 
 DisplayObject*
 BitmapMovieDefinition::createDisplayObject(DisplayObject* parent, int id)
@@ -52,7 +58,7 @@ BitmapMovieDefinition::createDisplayObject(DisplayObject* parent, int id)
 
 	// We use one twip for each pixel in the image
 	// The DisplayObject will be scaled * 20
-	// when placed in BitmapMovieInstance's DisplayList
+	// when placed in BitmapMovie's DisplayList
 	boost::int32_t w = _framesize.width(); 
 	boost::int32_t h = _framesize.height(); 
 

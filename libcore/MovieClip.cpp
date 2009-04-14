@@ -33,7 +33,7 @@
 #include "fn_call.h"
 #include "Key_as.h"
 #include "movie_root.h"
-#include "movie_instance.h"
+#include "Movie.h"
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
@@ -479,7 +479,7 @@ private:
 } // anonymous namespace
 
 
-MovieClip::MovieClip(const movie_definition* const def, movie_instance* r,
+MovieClip::MovieClip(const movie_definition* const def, Movie* r,
         DisplayObject* parent, int id)
     :
     InteractiveObject(parent, id),
@@ -586,7 +586,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     unsigned int levelno;
     if ( mr.isLevelTarget(name, levelno) )
     {
-        movie_instance* mo = _vm.getRoot().getLevel(levelno).get();
+        Movie* mo = _vm.getRoot().getLevel(levelno).get();
         if ( mo )
         {
             val->set_as_object(mo);
@@ -1178,8 +1178,7 @@ MovieClip::advance()
 void
 MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-    // WARNING! get_root() would depend on _lockroot !!
-    movie_instance* mi = _swf; 
+    Movie* mi = _swf; 
     if ( mi->setCharacterInitialized(cid) )
     {
 #ifdef GNASH_DEBUG
@@ -2305,11 +2304,11 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
             return false;
         }
 
-        boost::intrusive_ptr<movie_instance> extern_movie;
-        extern_movie = md->create_movie_instance(parent);
+        boost::intrusive_ptr<Movie> extern_movie;
+        extern_movie = md->create_Movie(parent);
         if (extern_movie == NULL)
         {
-            log_error(_("can't create extern movie_instance "
+            log_error(_("can't create extern Movie "
                 "for %s"), url.str());
             return false;
         }
@@ -2638,7 +2637,7 @@ MovieClip::get_world_cxform() const
     return cf;
 }
 
-movie_instance*
+Movie*
 MovieClip::get_root() const
 {
     return _swf;

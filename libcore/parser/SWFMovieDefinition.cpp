@@ -25,19 +25,16 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "SWFMovieDefinition.h"
 #include "movie_definition.h" // for inheritance
-#include "MovieClip.h" // for ??
 #include "zlib_adapter.h"
 #include "IOChannel.h" // for use
 #include "SWFStream.h"
 #include "GnashImageJpeg.h"
 #include "RunInfo.h"
 #include "Font.h"
+#include "VM.h"
 #include "log.h"
-#include "MovieClip.h"
-#include "movie_instance.h"
+#include "SWFMovie.h"
 #include "swf/TagLoadersTable.h"
-#include "movie_root.h"
-#include "VM.h" // for assertions
 #include "GnashException.h" // for parser exception
 #include "ControlTag.h"
 #include "sound_definition.h" // for sound_sample
@@ -221,7 +218,8 @@ SWFMovieDefinition::~SWFMovieDefinition()
 	//assert(m_jpeg_in->get() == NULL);
 }
 
-void SWFMovieDefinition::addDisplayObject(int id, SWF::DefinitionTag* c)
+void
+SWFMovieDefinition::addDisplayObject(int id, SWF::DefinitionTag* c)
 {
 	assert(c);
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
@@ -242,13 +240,15 @@ SWFMovieDefinition::getDefinitionTag(int id) const
 	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
 }
 
-void SWFMovieDefinition::add_font(int font_id, Font* f)
+void
+SWFMovieDefinition::add_font(int font_id, Font* f)
 {
     assert(f);
     m_fonts.insert(std::make_pair(font_id, boost::intrusive_ptr<Font>(f)));
 }
 
-Font* SWFMovieDefinition::get_font(int font_id) const
+Font*
+SWFMovieDefinition::get_font(int font_id) const
 {
 
     FontMap::const_iterator it = m_fonts.find(font_id);
@@ -427,10 +427,6 @@ SWFMovieDefinition::completeLoad()
 	// should call this only once
 	assert( ! _loader.started() );
 
-	// The VM is needed by the parser
-	// to allocate swf_function objects !
-	assert ( VM::isInitialized() );
-
 	// should call readHeader before this
 	assert(_str.get());
 
@@ -480,10 +476,10 @@ SWFMovieDefinition::ensure_frame_loaded(size_t framenum) const
 	return ( framenum <= _frames_loaded );
 }
 
-movie_instance*
-SWFMovieDefinition::create_movie_instance(DisplayObject* parent)
+Movie*
+SWFMovieDefinition::create_Movie(DisplayObject* parent)
 {
-	return new movie_instance(this, parent);
+	return new SWFMovie(this, parent);
 }
 
 

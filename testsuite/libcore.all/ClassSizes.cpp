@@ -79,7 +79,7 @@ using namespace gnash::SWF;
 (DefinitionTag) (DefineTextTag) (DefineFontTag) (DefineMorphShapeTag) \
 (as_object) \
 (DisplayObject) (StaticText) (MorphShape) (Shape) \
-(InteractiveObject) (MovieClip) (TextField) (Button) (movie_instance) \
+(InteractiveObject) (MovieClip) (TextField) (Button) (Movie) \
 (movie_root) 
 
 int

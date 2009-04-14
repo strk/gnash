@@ -113,7 +113,7 @@ main(int argc, char *argv[])
     RunInfo runInfo("");
     movie_root stage(*md, clock, runInfo);
 
-    movie_instance* root = md->create_movie_instance();
+    Movie* root = md->create_Movie();
     stage.setRootMovie(root);
 
     // run the tests

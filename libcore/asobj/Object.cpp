@@ -295,7 +295,7 @@ object_registerClass(const fn_call& fn)
 		log_error("current environment has no target, wouldn't know where to look for symbol required for registerClass"); 
 		return as_value(false);
 	}
-	movie_instance* relRoot = tgt->get_root();
+	Movie* relRoot = tgt->get_root();
 	assert(relRoot);
 	const movie_definition* def = relRoot->definition();
 	

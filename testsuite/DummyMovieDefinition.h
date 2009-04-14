@@ -20,7 +20,7 @@
 
 #include "movie_definition.h" // for inheritance
 #include "rect.h" // for composition
-#include "movie_instance.h" // for create_movie_instance
+#include "Movie.h" // for create_Movie
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -35,7 +35,7 @@ namespace gnash
 /// methods of movie_definition by returning user-defined
 /// values for version/size/frame rate etc..
 ///
-/// The create_movie_instance function will return the same
+/// The create_Movie function will return the same
 /// object created by createEmptyMovieClip() calls
 /// (an empty movieclip... still to be designed)
 ///
@@ -125,9 +125,9 @@ public:
 	}
 	
 	/// Create a playable movie instance from a def.
-	virtual movie_instance* create_movie_instance(DisplayObject* parent=NULL)
+	virtual Movie* create_Movie(DisplayObject* parent=NULL)
 	{
-		return new movie_instance(this, parent);
+		return new Movie(this, parent);
 	}
 	
 	virtual const PlayList& get_playlist(size_t frame_number) const
