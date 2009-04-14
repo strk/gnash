@@ -232,8 +232,6 @@ TextField::init()
     
     registerTextVariable();
 
-    m_dummy_style.push_back(fill_style());
-
     reset_bounding_box(0, 0);
 }
 
@@ -1815,16 +1813,10 @@ TextField::autoSizeValueName(AutoSizeValue val)
 TextField::TypeValue
 TextField::parseTypeValue(const std::string& val)
 {
-    StringNoCaseLessThan cmp;
+    StringNoCaseEqual cmp;
 
-    if ( ! cmp(val, "input") )
-    {
-        return typeInput;
-    }
-    if ( ! cmp(val, "dynamic") )
-    {
-        return typeDynamic;
-    }
+    if (cmp(val, "input")) return typeInput;
+    if (cmp(val, "dynamic")) return typeDynamic;
     return typeInvalid;
 
 }

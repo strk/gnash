@@ -96,7 +96,10 @@ public:
 	InteractiveObject* topmostMouseEntity(boost::int32_t x,
             boost::int32_t y);
 
-	bool wantsInstanceName() const
+	// Text fields need to handle cxform specially 
+	virtual cxform get_world_cxform() const;
+	
+    bool wantsInstanceName() const
 	{
 		return true; // text fields can be referenced 
 	}	
@@ -460,15 +463,20 @@ public:
 	///
 	void setTextValue(const std::wstring& wstr);
 
+protected:
+
+	/// Mark reachable reosurces (for GC)
+	//
+	/// Reachable resources are:
+	///  - The font being used (m_font) 
+	///  - Our definition
+	///  - Common DisplayObject resources
+	///
+	void markReachableResources() const;
 
 private:
 
     void init();
-
-    /// The immutable definition of our TextField
-    //
-    /// This is NULL for dynamic TextFields.
-    boost::intrusive_ptr<const SWF::DefineEditTextTag> _tag;
 
 	/// \brief Set our text to the given string by effect of an update of a
     /// registered variable name
@@ -492,36 +500,11 @@ private:
 	/// Call this function when willing to invoke the onChanged event handler
 	void onChanged();
 
-	/// The actual text.
-    //
-    /// Because we have to deal with non-ascii DisplayObjects (129-255), this
-    /// is a wide string; the cursor position and the position within the
-    /// string are then the same, which makes manipulating the string much
-    /// easier.
-	std::wstring _text;
-
-	/// This flag will be true as soon as the TextField
-	/// is assigned a text value. Only way to be false is
-	/// when definition has the hasText flag set to false
-	/// and no actionscript added text.
-	bool _textDefined;
-
-	/// bounds of dynamic text, as laid out
-	rect m_text_bounding_box;
-
 	/// Reset our text bounding box to the given point.
 	void reset_bounding_box(boost::int32_t x, boost::int32_t y)
 	{
 		m_text_bounding_box.set_to_point(x, y);
 	}
-
-	typedef std::vector<SWF::TextRecord> TextRecords;
-	TextRecords _textRecords;
-
-	/// used to pass a color on to Shape::display()
-	std::vector<fill_style>	m_dummy_style;
-
-	std::vector<line_style>	m_dummy_line_style;
 
 	/// Convert the DisplayObjects in _text into a series of
 	/// text_glyph_records to be rendered.
@@ -545,6 +528,57 @@ private:
 	/// m_text_glyph_records.
 	float align_line(TextAlignment align, int last_line_start_record, float x);
 
+	/// Associate a variable to the text of this DisplayObject
+	//
+	/// Setting the associated variable actually changes the
+	/// displayed text. Getting the variable would return the
+	/// displayed text.
+	///
+	/// If the given variable already exist use it to set
+	/// current text before overriding it.
+	///
+	/// Since the variable target may be undefined at time
+	/// of instantiation of this EditText DisplayObject, the
+	/// class keeps track of wheter it succeeded registering
+	/// the variable and this function will do nothing in this
+	/// case. Thus it is safe to call it multiple time, using
+	/// an as-needed policy (will be called from get_text_value and
+	/// display)
+	///
+	void registerTextVariable();
+
+	typedef std::pair<as_object*, string_table::key> VariableRef;
+
+	/// \brief
+	/// Parse the given variable name
+	/// into sprite and a string_table::key components
+	///
+	VariableRef parseTextVariableRef(const std::string& variableName) const;
+
+    /// The immutable definition of our TextField
+    //
+    /// This is NULL for dynamic TextFields.
+    boost::intrusive_ptr<const SWF::DefineEditTextTag> _tag;
+
+	/// The actual text.
+    //
+    /// Because we have to deal with non-ascii DisplayObjects (129-255), this
+    /// is a wide string; the cursor position and the position within the
+    /// string are then the same, which makes manipulating the string much
+    /// easier.
+	std::wstring _text;
+
+	/// This flag will be true as soon as the TextField
+	/// is assigned a text value. Only way to be false is
+	/// when definition has the hasText flag set to false
+	/// and no actionscript added text.
+	bool _textDefined;
+
+	/// bounds of dynamic text, as laid out
+	rect m_text_bounding_box;
+
+	typedef std::vector<SWF::TextRecord> TextRecords;
+	TextRecords _textRecords;
 	bool _underlined;
 
 	boost::uint16_t _leading;
@@ -579,37 +613,6 @@ private:
 
     /// Corresponds to the maxChars property.
     boost::int32_t _maxChars;
-
-	/// Associate a variable to the text of this DisplayObject
-	//
-	/// Setting the associated variable actually changes the
-	/// displayed text. Getting the variable would return the
-	/// displayed text.
-	///
-	/// If the given variable already exist use it to set
-	/// current text before overriding it.
-	///
-	/// Since the variable target may be undefined at time
-	/// of instantiation of this EditText DisplayObject, the
-	/// class keeps track of wheter it succeeded registering
-	/// the variable and this function will do nothing in this
-	/// case. Thus it is safe to call it multiple time, using
-	/// an as-needed policy (will be called from get_text_value and
-	/// display)
-	///
-	void registerTextVariable();
-
-	typedef std::pair<as_object*, string_table::key> VariableRef;
-
-	/// \brief
-	/// Parse the given variable name
-	/// into sprite and a string_table::key components
-	///
-	VariableRef parseTextVariableRef(const std::string& variableName) const;
-	
-	// Text fields need to handle cxform specially 
-	virtual cxform get_world_cxform() const;
-
 	/// The flag keeping status of TextVariable registration
 	//
 	/// It will be set to true if there's no need to register
@@ -657,17 +660,6 @@ private:
     /// Represents the selected part of the text. The second element must
     /// never be less than the first.
     std::pair<size_t, size_t> _selection;
-
-protected:
-
-	/// Mark reachable reosurces (for GC)
-	//
-	/// Reachable resources are:
-	///  - The font being used (m_font) 
-	///  - Our definition
-	///  - Common DisplayObject resources
-	///
-	void markReachableResources() const;
 };
 
 /// Initialize the global TextField class
