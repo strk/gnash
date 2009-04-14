@@ -49,7 +49,7 @@ class Movie : public MovieClip
 
 public:
 
-	Movie(movie_definition* def, DisplayObject* parent)
+	Movie(const movie_definition* const def, DisplayObject* parent)
         :
         MovieClip(def, this, parent, parent ? 0 : -1)
     {}
@@ -75,7 +75,7 @@ public:
 	/// Set a DisplayObject in the dictionary as initialized, returning
 	/// true if not already initialized.
 	virtual bool setCharacterInitialized(int /*cid*/) {
-        return false;
+        return true;
     }
 
     virtual const movie_definition* definition() const = 0;

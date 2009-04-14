@@ -105,12 +105,15 @@ main(int argc, char *argv[])
 
     // Initialize gnash lib
     gnashInit();
+    
+    RunInfo runInfo("");
 
     // Create a bogus movie with swf version 7 support
-    boost::intrusive_ptr<movie_definition> md ( new DummyMovieDefinition(7) );
+    boost::intrusive_ptr<movie_definition> md(
+            new DummyMovieDefinition(runInfo, 7));
+
     ManualClock clock;
 
-    RunInfo runInfo("");
     movie_root stage(*md, clock, runInfo);
 
     Movie* root = md->create_Movie();

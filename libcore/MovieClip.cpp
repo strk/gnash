@@ -1748,7 +1748,7 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
     if (!isVisible()) return 0;
 
     // point is in parent's space, we need to convert it in world space
-    point    wp(x, y);
+    point wp(x, y);
     DisplayObject* parent = get_parent();
     if ( parent ) 
     {
@@ -1760,9 +1760,9 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         parent->getWorldMatrix().transform(wp);
     }
 
-    if ( mouseEnabled() )
+    if (mouseEnabled())
     {
-        if ( pointInVisibleShape(wp.x, wp.y) ) return this;
+        if (pointInVisibleShape(wp.x, wp.y)) return this;
         else return NULL;
     }
 
@@ -2674,8 +2674,7 @@ MovieClip::getAsRoot() const
 as_value
 MovieClip::lockroot_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
     as_value rv;
     if ( fn.nargs == 0 ) // getter

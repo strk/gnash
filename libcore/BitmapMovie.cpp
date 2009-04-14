@@ -23,7 +23,8 @@
 
 namespace gnash {
 
-BitmapMovie::BitmapMovie(BitmapMovieDefinition* def, DisplayObject* parent)
+BitmapMovie::BitmapMovie(const BitmapMovieDefinition* const def,
+        DisplayObject* parent)
 	:
 	Movie(def, parent),
     _def(def)
@@ -34,7 +35,6 @@ void
 BitmapMovie::display()
 {
     _def->shape().display(*this);
-    GNASH_REPORT_FUNCTION;
 }
 
 std::auto_ptr<GnashImage>

@@ -39,14 +39,24 @@ class BitmapMovie : public Movie
 
 public:
 
-	BitmapMovie(BitmapMovieDefinition* def, DisplayObject* parent=0); 
-
-    virtual rect getBounds() const { return _def->get_frame_size(); }
+	BitmapMovie(const BitmapMovieDefinition* const def,
+            DisplayObject* parent=0); 
+    
+    bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const {
+        return pointInBounds(x, y);
+    }
 
 	virtual ~BitmapMovie() {}
 
 	virtual void advance() { }
 
+    virtual rect getBounds() const {
+        return _def->get_frame_size();
+    }
+ 
+    /// Render the BitmapMovie.
+    //
+    /// This draws the bitmap directly using the BitmapMovie's matrix.
     virtual void display();
 
     virtual float frameRate() const {
@@ -65,9 +75,8 @@ public:
         return _def->get_url();
     }
 
-    /// The SWF version of a loaded BitmapMovie is -1
     virtual int version() const {
-        return -1;
+        return _def->get_version();
     }
 
     virtual const movie_definition* definition() const {

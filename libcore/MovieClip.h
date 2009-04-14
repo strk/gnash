@@ -143,17 +143,17 @@ public:
     virtual rect getBounds() const;
 
     // See dox in DisplayObject.h
-    bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
     // See dox in DisplayObject.h
-    bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const;
 
     /// return true if the given point is located in a(this) hitable sprite.
     ///
     /// all sprites except mouse-insensitive dynamic masks are hitable.
     /// _visible property is ignored for hitable DisplayObjects.
     ///
-    bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
 
     /// Return 0-based index to current frame
     size_t get_current_frame() const

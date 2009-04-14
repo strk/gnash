@@ -25,7 +25,7 @@
 
 #include "Movie.h" // for inheritance
 #include "smart_ptr.h" // for composition
-#include "movie_definition.h" // for dtor visibility by smart ptr
+#include "SWFMovieDefinition.h" // for dtor visibility by smart ptr
 
 // Forward declarations
 namespace gnash {
@@ -44,7 +44,7 @@ public:
 
 	// We take a generic movie_definition to allow
 	// for subclasses for other then SWF movies
-	SWFMovie(movie_definition* def, DisplayObject* parent);
+	SWFMovie(const SWFMovieDefinition* const def, DisplayObject* parent);
 
 	virtual ~SWFMovie() {}
 
@@ -104,7 +104,7 @@ private:
 	std::set<int> _initializedCharacters;
 
     /// This should only be a top-level movie, not a sprite_definition.
-	const boost::intrusive_ptr<const movie_definition> _def;
+	const boost::intrusive_ptr<const SWFMovieDefinition> _def;
 };
 
 

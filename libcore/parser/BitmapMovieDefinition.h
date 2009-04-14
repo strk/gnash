@@ -57,7 +57,10 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
             const std::string& url);
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int);
+    /// This isn't used, suggesting that this shouldn't be a DefinitionTag.
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
+        return 0;
+    }
 
 	virtual int	get_version() const {
 		return _version;

@@ -71,18 +71,10 @@ BitmapMovieDefinition::create_Movie(DisplayObject* parent)
     return new BitmapMovie(this, parent);
 }
 
-DisplayObject*
-BitmapMovieDefinition::createDisplayObject(DisplayObject* /*parent*/,
-        int /*id*/)
-{
-    return 0;
-}
-
 BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 		const std::string& url)
 	:
 	_version(6),
-	// GnashImage size is in pixels
 	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
 	_framerate(12),

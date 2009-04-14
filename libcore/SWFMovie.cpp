@@ -29,7 +29,7 @@
 
 namespace gnash {
 
-SWFMovie::SWFMovie(movie_definition* def, DisplayObject* parent)
+SWFMovie::SWFMovie(const SWFMovieDefinition* const def, DisplayObject* parent)
 	:
 	Movie(def, parent),
 	_def(def)
