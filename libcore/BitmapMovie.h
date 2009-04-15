@@ -33,23 +33,42 @@ namespace gnash
 {
 
 
-/// Instance of a BitmapMovieDefinition
+/// A top-level movie displaying a still bitmap.
+//
+/// It is uncomfortable that this inherits from MovieClip, as it
+/// has no DisplayList, no actions, and no frames. But its sister class
+/// SWFMovie is a kind of MovieClip (or Sprite), so this arrangement
+/// is necessary for now.
+//
+/// It is a mouse entity, so can receive mouse events, and should also be
+/// draggable.
+//
+/// The class should override all MovieClip methods that rely on the
+/// DisplayList: currently point tests and display().
 class BitmapMovie : public Movie
 {
 
 public:
 
-	BitmapMovie(const BitmapMovieDefinition* const def,
-            DisplayObject* parent=0); 
+	BitmapMovie(const BitmapMovieDefinition* const def, DisplayObject* parent); 
+
+	virtual ~BitmapMovie() {}
     
+    /// Return true if the point is within our bounds
+    //
+    /// MovieClip traverses the DisplayList for this.
     bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const {
+        if (!isVisible()) return false;
         return pointInBounds(x, y);
     }
 
-	virtual ~BitmapMovie() {}
-
+    /// This is a no-op for a BitmapMovie, as it never changes.
 	virtual void advance() { }
 
+    /// Return the bounds of this BitmapMovie.
+    //
+    /// MovieClip uses the DisplayList to calculate this. For us it is
+    /// simpler.
     virtual rect getBounds() const {
         return _def->get_frame_size();
     }

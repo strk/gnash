@@ -119,10 +119,6 @@ public:
 		return 1;
 	}
 
-    BitmapInfo* getBitmap() const {
-        return _bitmap.get();
-    }
-
     const DynamicShape& shape() const {
         return _shape;
     }
@@ -137,7 +133,7 @@ protected:
 	///	- bitmap (_bitmap)
 	///
 	void markReachableResources() const;
-#endif // GNASH_USE_GC
+#endif 
 
 private:
 

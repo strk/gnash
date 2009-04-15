@@ -75,7 +75,7 @@ public:
 	/// Set a DisplayObject in the dictionary as initialized, returning
 	/// true if not already initialized.
 	virtual bool setCharacterInitialized(int /*cid*/) {
-        return true;
+        return false;
     }
 
     virtual const movie_definition* definition() const = 0;
