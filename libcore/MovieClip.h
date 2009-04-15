@@ -796,11 +796,6 @@ public:
 
 protected:
 
-    /// Used both by this class and Movie.
-    //
-    /// TODO: do this with proper Sprite -> MovieClip inheritance.
-    void advance_sprite();
-
 #ifdef GNASH_USE_GC
     /// Mark sprite-specific reachable resources and invoke
     /// the parent's class version (markDisplayObjectReachable)

@@ -1069,9 +1069,16 @@ MovieClip::unloadMovie()
     LOG_ONCE(log_unimpl("MovieClip.unloadMovie()"));
 }
 
+// child movieclip advance
 void
-MovieClip::advance_sprite()
+MovieClip::advance()
 {
+
+#ifdef GNASH_DEBUG
+    log_debug(_("Advance movieclip '%s' at frame %u/%u"),
+        getTargetPath(), _currentFrame,
+        get_frame_count());
+#endif
 
     assert(!isUnloaded());
 
@@ -1079,15 +1086,13 @@ MovieClip::advance_sprite()
     assert(!_callingFrameActions);
 
     // We might have loaded NO frames !
-    if ( get_loaded_frames() == 0 )
-    {
+    if (get_loaded_frames() == 0) {
         IF_VERBOSE_MALFORMED_SWF(
         LOG_ONCE( log_swferror(_("advance_movieclip: no frames loaded "
                     "for movieclip/movie %s"), getTarget()) );
         );
         return;
     }
-
 
     // Process any pending loadVariables request
     processCompletedLoadVariableRequests();
@@ -1121,7 +1126,8 @@ MovieClip::advance_sprite()
 #endif
 
         // Execute the current frame's tags.
-        // First time executeFrameTags(0) executed in dlist.cpp(child) or SWFMovieDefinition(root)
+        // First time executeFrameTags(0) executed in dlist.cpp(child) or
+        // SWFMovieDefinition(root)
         if (_currentFrame != (size_t)prev_frame)
         {
             if ( _currentFrame == 0 && has_looped() )
@@ -1138,7 +1144,8 @@ MovieClip::advance_sprite()
                 log_debug(_("Executing frame%d (0-based) tags of movieclip "
                             "%s"), _currentFrame, getTarget());
 #endif
-                // Make sure _currentFrame is 0-based during execution of DLIST tags
+                // Make sure _currentFrame is 0-based during execution of
+                // DLIST tags
                 executeFrameTags(_currentFrame, _displayList,
                         SWF::ControlTag::TAG_DLIST |
                         SWF::ControlTag::TAG_ACTION);
@@ -1149,29 +1156,9 @@ MovieClip::advance_sprite()
 #ifdef GNASH_DEBUG
     else
     {
-        log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_STOP mode"));
-        // shouldn't we execute frame tags anyway when in PLAYSTATE_STOP mode ?
-        //executeFrameTags(_currentFrame);
+        log_debug(_("MovieClip::advance_movieclip we're in STOP mode"));
     }
 #endif
-}
-
-// child movieclip advance
-void
-MovieClip::advance()
-{
-//    GNASH_REPORT_FUNCTION;
-
-#ifdef GNASH_DEBUG
-    log_debug(_("Advance movieclip '%s' at frame %u/%u"),
-        getTargetPath(), _currentFrame,
-        get_frame_count());
-#endif
-
-    // child movieclip frame rate is the same the root movieclip frame rate
-    // that's why it is not needed to analyze 'm_time_remainder'
-
-    advance_sprite();
 
 }
 

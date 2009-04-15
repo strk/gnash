@@ -77,7 +77,7 @@ SWFMovie::advance()
 		);
 	}
 
-	advance_sprite(); 
+    MovieClip::advance(); 
 }
 
 } // namespace gnash
