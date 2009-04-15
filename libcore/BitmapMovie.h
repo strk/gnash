@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-#ifndef GNASH_BITMAPMOVIEINSTANCE_H
-#define GNASH_BITMAPMOVIEINSTANCE_H
+#ifndef GNASH_BITMAP_MOVIE_H
+#define GNASH_BITMAP_MOVIE_H
 
 #include "BitmapMovieDefinition.h"
 #include "Movie.h" // for inheritance

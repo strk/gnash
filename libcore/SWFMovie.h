@@ -21,15 +21,14 @@
 #ifndef GNASH_SWF_MOVIE_H
 #define GNASH_SWF_MOVIE_H
 
-#include <set>
-
 #include "Movie.h" // for inheritance
 #include "smart_ptr.h" // for composition
 #include "SWFMovieDefinition.h" // for dtor visibility by smart ptr
 
+#include <set>
+
 // Forward declarations
 namespace gnash {
-	class movie_root; 
 	class DisplayObject; 
 }
 

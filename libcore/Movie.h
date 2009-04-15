@@ -18,8 +18,8 @@
 // Stateful live Movie instance 
 
 
-#ifndef GNASH_MOVIE_INSTANCE_H
-#define GNASH_MOVIE_INSTANCE_H
+#ifndef GNASH_MOVIE_H
+#define GNASH_MOVIE_H
 
 #include <vector>
 #include <set>
@@ -85,4 +85,4 @@ public:
 
 } // end of namespace gnash
 
-#endif // GNASH_MOVIE_INSTANCE_H
+#endif 

@@ -569,4 +569,4 @@ private:
 
 } // namespace gnash
 
-#endif // GNASH_MOVIE_DEF_IMPL_H
+#endif 
