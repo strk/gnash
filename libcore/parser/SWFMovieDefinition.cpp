@@ -852,27 +852,29 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
     return true;
 }
 
+template<typename T>
+void markMappedResources(const T& t)
+{
+    typedef typename
+        RemovePointer<typename T::value_type::second_type>::value_type
+        contained_type;
+
+    std::for_each(t.begin(), t.end(),
+            boost::bind(&contained_type::setReachable,
+                boost::bind(SecondElement<typename T::value_type>(), _1)));
+}
+
 #ifdef GNASH_USE_GC
 void
 SWFMovieDefinition::markReachableResources() const
 {
-    std::for_each(m_fonts.begin(), m_fonts.end(),
-            boost::bind(&Font::setReachable,
-                boost::bind(SecondElement<FontMap::value_type>(), _1)));
-
-    std::for_each(_bitmaps.begin(), _bitmaps.end(),
-            boost::bind(&BitmapInfo::setReachable,
-                boost::bind(SecondElement<Bitmaps::value_type>(), _1)));
-	
-    std::for_each(m_sound_samples.begin(), m_sound_samples.end(),
-            boost::bind(&sound_sample::setReachable,
-                boost::bind(SecondElement<SoundSampleMap::value_type>(), _1)));
+    markMappedResources(m_fonts);
+    markMappedResources(_bitmaps);
+    markMappedResources(m_sound_samples);
 
 	{
 		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-        std::for_each(_exportedResources.begin(), _exportedResources.end(),
-                boost::bind(&ExportableResource::setReachable,
-                    boost::bind(SecondElement<ExportMap::value_type>(), _1)));
+        markMappedResources(_exportedResources);
 	}
 
     std::for_each(m_import_source_movies.begin(), m_import_source_movies.end(),
