@@ -856,37 +856,27 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
 void
 SWFMovieDefinition::markReachableResources() const
 {
-	for (FontMap::const_iterator i=m_fonts.begin(), e=m_fonts.end(); i!=e; ++i)
-	{
-		i->second->setReachable();
-	}
+    std::for_each(m_fonts.begin(), m_fonts.end(),
+            boost::bind(&Font::setReachable,
+                boost::bind(SecondElement<FontMap::value_type>(), _1)));
 
-	for (Bitmaps::const_iterator i = _bitmaps.begin(), e = _bitmaps.end();
-            i != e; ++i)
-	{
-		i->second->setReachable();
-	}
+    std::for_each(_bitmaps.begin(), _bitmaps.end(),
+            boost::bind(&BitmapInfo::setReachable,
+                boost::bind(SecondElement<Bitmaps::value_type>(), _1)));
+	
+    std::for_each(m_sound_samples.begin(), m_sound_samples.end(),
+            boost::bind(&sound_sample::setReachable,
+                boost::bind(SecondElement<SoundSampleMap::value_type>(), _1)));
 
-	for (SoundSampleMap::const_iterator i=m_sound_samples.begin(), e=m_sound_samples.end(); i!=e; ++i)
-	{
-		i->second->setReachable();
-	}
-
-	// TODO: turn this into a markExportedResources()
 	{
 		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-		for (ExportMap::const_iterator i=_exportedResources.begin(),
-                e=_exportedResources.end(); i!=e; ++i)
-		{
-			i->second->setReachable();
-		}
+        std::for_each(_exportedResources.begin(), _exportedResources.end(),
+                boost::bind(&ExportableResource::setReachable,
+                    boost::bind(SecondElement<ExportMap::value_type>(), _1)));
 	}
 
-	for (ImportVect::const_iterator i=m_import_source_movies.begin(),
-            e=m_import_source_movies.end(); i!=e; ++i)
-	{
-		(*i)->setReachable();
-	}
+    std::for_each(m_import_source_movies.begin(), m_import_source_movies.end(),
+           boost::mem_fn(&movie_definition::setReachable));
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 	_dictionary.markReachableResources();
