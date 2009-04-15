@@ -320,7 +320,7 @@ fill_style::read(SWFStream& in, SWF::TagType t, movie_definition& md,
 }
 
 
-BitmapInfo* 
+const BitmapInfo* 
 fill_style::get_bitmap_info() const 
 {    
     assert(m_type != SWF::FILL_SOLID);
@@ -432,7 +432,7 @@ fill_style::sample_gradient(boost::uint8_t ratio) const
     return m_gradients.back().m_color;
 }
 
-BitmapInfo*
+const BitmapInfo*
 fill_style::create_gradient_bitmap() const
 {
     assert(m_type == SWF::FILL_LINEAR_GRADIENT
@@ -499,14 +499,14 @@ fill_style::create_gradient_bitmap() const
             break;
     }
 
-    BitmapInfo* bi = render::createBitmapInfo(
+    const BitmapInfo* bi = render::createBitmapInfo(
                     static_cast<std::auto_ptr<GnashImage> >(im));
 
     return bi;
 }
 
 
-BitmapInfo*
+const BitmapInfo*
 fill_style::need_gradient_bitmap() const 
 {
 
@@ -593,7 +593,7 @@ fill_style::get_color_stop(int index) const
   return m_gradients[index];
 }
 
-fill_style::fill_style(BitmapInfo* bitmap, const SWFMatrix& mat)
+fill_style::fill_style(const BitmapInfo* const bitmap, const SWFMatrix& mat)
     :
     _matrix(mat),
     _bitmapInfo(bitmap),

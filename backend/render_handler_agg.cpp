@@ -1345,7 +1345,7 @@ public:
              }
           }
 
-          sh.add_bitmap(dynamic_cast<agg_bitmap_info*> 
+          sh.add_bitmap(dynamic_cast<const agg_bitmap_info*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
             (fill_type==SWF::FILL_TILED_BITMAP) ||
             (fill_type==SWF::FILL_TILED_BITMAP_HARD),

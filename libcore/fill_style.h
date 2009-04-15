@@ -115,7 +115,7 @@ public:
 	/// @param mat
 	///	The SWFMatrix to apply to the bitmap.
 	///
-	fill_style(BitmapInfo* bitmap, const SWFMatrix& mat);
+	fill_style(const BitmapInfo* const bitmap, const SWFMatrix& mat);
 
 	void setSolid(const rgba& color);
 
@@ -176,12 +176,12 @@ public:
 	/// \brief
 	/// Make a BitmapInfo* corresponding to our gradient.
 	/// We can use this to set the gradient fill style.
-	BitmapInfo* create_gradient_bitmap() const;
+	const BitmapInfo* create_gradient_bitmap() const;
 	
 	/// \brief
 	/// Makes sure that _gradientBitmapInfo is not NULL. Calls 
 	/// create_gradient_bitmap() if necessary and returns _gradientBitmapInfo.
-	BitmapInfo* need_gradient_bitmap() const; 
+	const BitmapInfo* need_gradient_bitmap() const; 
 	
 	rgba	get_color() const { return m_color; }
 
@@ -209,7 +209,7 @@ public:
 	///        to a DisplayObject defined in the DisplayObjects dictionary.
 	///        (it happens..)
 	///
-	BitmapInfo* get_bitmap_info() const;
+	const BitmapInfo* get_bitmap_info() const;
 
     BitmapSmoothingPolicy getBitmapSmoothingPolicy() const {
         return _bitmapSmoothingPolicy;
@@ -257,7 +257,7 @@ private:
 	SWFMatrix	_matrix;
 
 	// For BITMAP or GRADIENT types
-	boost::intrusive_ptr<BitmapInfo> _bitmapInfo;
+	boost::intrusive_ptr<const BitmapInfo> _bitmapInfo;
 
 	// For SOLID type (and arguably GRADIENT too)
 	rgba	m_color;

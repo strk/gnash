@@ -116,6 +116,10 @@ public:
 		return 1;
 	}
 
+    const BitmapInfo* bitmap() const {
+        return _bitmap.get();
+    }
+
 protected:
 
 #ifdef GNASH_USE_GC
@@ -139,9 +143,6 @@ private:
 	size_t _bytesTotal;
 
     boost::intrusive_ptr<BitmapInfo> _bitmap;
-
-    boost::shared_ptr<DynamicShape> _shape;
-
 };
 
 } // namespace gnash

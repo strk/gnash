@@ -33,21 +33,37 @@ Bitmap::Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
     _width(_bitmapData->getWidth()),
     _height(_bitmapData->getHeight())
 {
-    _shape.setBounds(rect(0, 0, _width * 20, _height * 20));
+    _shape.setBounds(rect(0, 0, pixelsToTwips(_width), pixelsToTwips(_height)));
 }
 
+Bitmap::Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent,
+        int id)
+    :
+    DisplayObject(parent, id),
+    _def(def),
+    _bitmapInfo(0),
+    _width(twipsToPixels(def->get_frame_size().width())),
+    _height(twipsToPixels(def->get_frame_size().height()))
+{
+    _shape.setBounds(def->get_frame_size());
+}
 
 Bitmap::~Bitmap()
 {
 }
 
+const BitmapInfo*
+Bitmap::bitmap() const
+{
+    if (_def) return _def->bitmap();
+    return _bitmapInfo.get();
+}
 
 void
 Bitmap::stagePlacementCallback(as_object* initObj)
 {
     assert(!initObj);
-
-    _bitmapData->registerBitmap(this);
+    if (_bitmapData) _bitmapData->registerBitmap(this);
     update();
 }
 
@@ -60,8 +76,10 @@ Bitmap::pointInShape(boost::int32_t  x, boost::int32_t  y) const
 void
 Bitmap::display()
 {
-    _shape.display(*this);
+    /// Don't display cleared Bitmaps.
+    if (!_def && !_bitmapData) return;
 
+    _shape.display(*this);
     clear_invalidated();
 }
 
@@ -85,7 +103,7 @@ Bitmap::getBounds() const
 }
 
 void
-Bitmap::drawBitmap()
+Bitmap::makeBitmap()
 {
 
     const BitmapData_as::BitmapArray& data = _bitmapData->getBitmapData();
@@ -112,10 +130,11 @@ Bitmap::drawBitmap()
 
 
 void
-Bitmap::finalize()
+Bitmap::checkBitmapData()
 {
 
-    if (!_bitmapData) return;
+    /// Nothing to do for disposed bitmaps.
+    if (_def && !_bitmapData) return;
 
     const BitmapData_as::BitmapArray& data = _bitmapData->getBitmapData();
 
@@ -126,19 +145,25 @@ Bitmap::finalize()
         _shape.clear();
         return;
     }
+}
 
-    drawBitmap();
+void
+Bitmap::makeBitmapShape()
+{
+
+    if (!_def && !_bitmapData) return;
+
+    if (_bitmapData) makeBitmap();
 
     // Width and height are a maximum of 2880, so there is no risk of 
     // overflow 
-    const int w = _width * 20;
-    const int h = _height * 20;
+    const int w = pixelsToTwips(_width);
+    const int h = pixelsToTwips(_height);
 
     SWFMatrix mat;
     mat.set_scale(1.0 / 20, 1.0 / 20);
-    fill_style fill(_bitmapInfo.get(), mat);
+    fill_style fill(bitmap(), mat);
     const size_t fillLeft = _shape.add_fill_style(fill);
-
 
     Path bmpath(w, h, fillLeft, 0, 0, false);
     bmpath.drawLineTo(w, 0);
@@ -155,11 +180,9 @@ Bitmap::finalize()
 void
 Bitmap::update()
 {
-
     set_invalidated();
-
-    finalize();
-
+    checkBitmapData();
+    makeBitmapShape();
 }
 
 }

@@ -309,7 +309,7 @@ public:
     }
     
     /// Adds a new bitmap fill style
-    void add_bitmap(agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
+    void add_bitmap(const agg_bitmap_info* bi, const gnash::SWFMatrix& mat,
         const gnash::cxform& cx, bool repeat, bool smooth)
     {
 
@@ -382,7 +382,7 @@ public:
     // === RGB24 ===
     
 
-    void add_bitmap_repeat_nn_rgb24(agg_bitmap_info* bi,
+    void add_bitmap_repeat_nn_rgb24(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
 
@@ -407,7 +407,7 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgb24(agg_bitmap_info* bi,
+    void add_bitmap_clip_nn_rgb24(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
 
@@ -430,7 +430,7 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgb24(agg_bitmap_info* bi,
+    void add_bitmap_repeat_aa_rgb24(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
 
@@ -453,7 +453,7 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgb24(agg_bitmap_info* bi,
+    void add_bitmap_clip_aa_rgb24(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
 
@@ -478,7 +478,7 @@ public:
     
     // === RGBA32 ===    
 
-    void add_bitmap_repeat_nn_rgba32(agg_bitmap_info* bi,
+    void add_bitmap_repeat_nn_rgba32(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
     
@@ -503,7 +503,7 @@ public:
         
     
     
-    void add_bitmap_clip_nn_rgba32(agg_bitmap_info* bi,
+    void add_bitmap_clip_nn_rgba32(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
 
@@ -526,7 +526,7 @@ public:
     
     
     
-    void add_bitmap_repeat_aa_rgba32(agg_bitmap_info* bi,
+    void add_bitmap_repeat_aa_rgba32(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
 
@@ -549,7 +549,7 @@ public:
     }
         
     
-    void add_bitmap_clip_aa_rgba32(agg_bitmap_info* bi,
+    void add_bitmap_clip_aa_rgba32(const agg_bitmap_info* bi,
         const gnash::SWFMatrix& mat, const gnash::cxform& cx)
     {
 

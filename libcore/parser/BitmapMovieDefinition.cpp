@@ -25,7 +25,7 @@
 #include "render.h" // for ::display
 #include "GnashImage.h"
 #include "log.h"
-#include "Shape.h"
+#include "Bitmap.h"
 
 namespace gnash {
 
@@ -46,51 +46,14 @@ BitmapMovieDefinition::BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
 	_bytesTotal(image->size()),
 	_bitmap(render::createBitmapInfo(image))
 {
-
-    if (!_bitmap.get()) return;
-
-    _shape.reset(new DynamicShape);
-
-	// Set its boundaries
-	_shape->setBounds(_framesize);
-
-	// Add the bitmap fill style (fill style 0)
-	SWFMatrix mat;
-	mat.set_scale(1.0/20, 1.0/20); // bitmap fills get SWFMatrix reversed
-	fill_style bmFill(_bitmap.get(), mat);
-	const size_t fillLeft = _shape->add_fill_style(bmFill);
-
-	// Define a rectangle filled with the bitmap style
-
-	// We use one twip for each pixel in the image
-	// The DisplayObject will be scaled * 20
-	// when placed in BitmapMovie's DisplayList
-	boost::int32_t w = _framesize.width(); 
-	boost::int32_t h = _framesize.height(); 
-
-	IF_VERBOSE_PARSE(
-	    log_parse(_("Creating a shape_definition wrapping a %g x %g bitmap"),
-            w, h);
-	);
-
-	Path bmPath(w, h, fillLeft, 0, 0, false);
-	bmPath.drawLineTo(w, 0);
-	bmPath.drawLineTo(0, 0);
-	bmPath.drawLineTo(0, h);
-	bmPath.drawLineTo(w, h);
-
-	// Add the path 
-	_shape->add_path(bmPath);
-
 }
 
 DisplayObject*
 BitmapMovieDefinition::createDisplayObject(DisplayObject* parent, int id) const
 {
-    // It's possible for this to fail.
-    if (!_shape.get()) return 0;
-    
-    return new Shape(_shape, parent, id);
+    /// What should we do if construction of the bitmap fails?
+    if (!_bitmap.get()) return 0;
+    return new Bitmap(this, parent, id);
 }
 
 #ifdef GNASH_USE_GC
