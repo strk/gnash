@@ -17,9 +17,6 @@
 
 #include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
-#include "fill_style.h"
-#include "Geometry.h" // for class path and class edge
-#include "render.h" // for ::display
 
 namespace gnash {
 
@@ -29,12 +26,11 @@ BitmapMovie::BitmapMovie(const BitmapMovieDefinition* const def,
 	Movie(def, parent),
     _def(def)
 {
-}
+    assert(def);
+    boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this, 1);
 
-void
-BitmapMovie::display()
-{
-    _def->shape().display(*this);
+    const int depth = 1 + DisplayObject::staticDepthOffset;
+    placeDisplayObject(ch.get(), depth);
 }
 
 std::auto_ptr<GnashImage>

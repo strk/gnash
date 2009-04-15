@@ -40,7 +40,8 @@ public:
     virtual void display(const DisplayObject& inst) const;
 
     // Create a Shape DisplayObject.
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
+        const;
 	
     /// Get cached bounds of this shape.
     const rect& bounds() const { return _shape.getBounds(); }

@@ -57,13 +57,7 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
             const std::string& url);
 
-    /// This is currently useless
-    //
-    /// TODO: For AVM2, it may be used to create a Bitmap DisplayObject
-    /// instead of a Movie when used from the Loader class.
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
-        return 0;
-    }
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int) const;
 
 	virtual int	get_version() const {
 		return _version;
@@ -122,10 +116,6 @@ public:
 		return 1;
 	}
 
-    const DynamicShape& shape() const {
-        return _shape;
-    }
-
 protected:
 
 #ifdef GNASH_USE_GC
@@ -150,7 +140,7 @@ private:
 
     boost::intrusive_ptr<BitmapInfo> _bitmap;
 
-    DynamicShape _shape;
+    boost::shared_ptr<DynamicShape> _shape;
 
 };
 

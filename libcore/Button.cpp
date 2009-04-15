@@ -294,7 +294,8 @@ attachButtonInterface(as_object& o)
 
 }
 
-Button::Button(SWF::DefineButtonTag& def, DisplayObject* parent, int id)
+Button::Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
+        int id)
     :
     InteractiveObject(parent, id),
     m_last_mouse_flags(IDLE),
@@ -306,7 +307,7 @@ Button::Button(SWF::DefineButtonTag& def, DisplayObject* parent, int id)
     set_prototype(getButtonInterface());
 
     // check up presence Key events
-    if ( _def.hasKeyPressHandler() )
+    if ( _def->hasKeyPressHandler() )
     {
         _vm.getRoot().add_key_listener(this);
     }
@@ -352,7 +353,7 @@ Button::on_event(const event_id& id)
     if ( id.keyCode() == key::INVALID ) return false;
 
     ButtonActionPusher xec(getVM().getRoot(), this); 
-    _def.forEachTrigger(id, xec);
+    _def->forEachTrigger(id, xec);
 
     return xec.called;
 }
@@ -492,7 +493,7 @@ Button::mouseEvent(const event_id& event)
     // Button transition sounds.
     do {
 
-        if (!_def.hasSound()) break;
+        if (!_def->hasSound()) break;
 
         // Check if there is a sound handler
         sound::sound_handler* s = _vm.getRoot().runInfo().soundHandler();
@@ -523,7 +524,7 @@ Button::mouseEvent(const event_id& event)
         if (bi < 0) break;
 
         const SWF::DefineButtonSoundTag::ButtonSound& bs = 
-            _def.buttonSound(bi);
+            _def->buttonSound(bi);
 
         // DisplayObject zero is considered as null DisplayObject
         if (!bs.soundID) break;
@@ -566,7 +567,7 @@ Button::mouseEvent(const event_id& event)
     movie_root& mr = getVM().getRoot();
 
     ButtonActionPusher xec(mr, this); 
-    _def.forEachTrigger(event, xec);
+    _def->forEachTrigger(event, xec);
 
     // check for built-in event handler.
     std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
@@ -621,7 +622,7 @@ Button::get_active_records(ActiveRecords& list, MouseState state)
     list.clear();
     
     using namespace SWF;
-    const DefineButtonTag::ButtonRecords& br = _def.buttonRecords();
+    const DefineButtonTag::ButtonRecords& br = _def->buttonRecords();
     size_t index = 0;
 
     for (DefineButtonTag::ButtonRecords::const_iterator i = br.begin(),
@@ -727,7 +728,7 @@ Button::set_current_state(MouseState new_state)
             if ( ! oldch )
             {
                 // Not there, instantiate
-                SWF::ButtonRecord& bdef = _def.buttonRecords()[i];
+                const SWF::ButtonRecord& bdef = _def->buttonRecords()[i];
 
                 const SWFMatrix& mat = bdef.m_button_matrix;
                 const cxform& cx = bdef.m_button_cxform;
@@ -890,7 +891,7 @@ Button::stagePlacementCallback(as_object* initObj)
     get_active_records(hitChars, HIT);
     for (ActiveRecords::iterator i=hitChars.begin(),e=hitChars.end(); i!=e; ++i)
     {
-        SWF::ButtonRecord& bdef = _def.buttonRecords()[*i];
+        const SWF::ButtonRecord& bdef = _def->buttonRecords()[*i];
 
         const SWFMatrix& mat = bdef.m_button_matrix;
         const cxform& cx = bdef.m_button_cxform;
@@ -915,7 +916,7 @@ Button::stagePlacementCallback(as_object* initObj)
     // Some slots will probably be never used (consider HIT-only records)
     // but for now this direct corrispondence between record number
     // and active DisplayObject will be handy.
-    _stateCharacters.resize(_def.buttonRecords().size());
+    _stateCharacters.resize(_def->buttonRecords().size());
 
     // Instantiate the default state DisplayObjects 
     ActiveRecords upChars;
@@ -924,7 +925,7 @@ Button::stagePlacementCallback(as_object* initObj)
     for (ActiveRecords::iterator i=upChars.begin(),e=upChars.end(); i!=e; ++i)
     {
         int rno = *i;
-        SWF::ButtonRecord& bdef = _def.buttonRecords()[rno];
+        const SWF::ButtonRecord& bdef = _def->buttonRecords()[rno];
 
         const SWFMatrix& mat = bdef.m_button_matrix;
         const cxform& cx = bdef.m_button_cxform;
@@ -959,7 +960,7 @@ Button::markReachableResources() const
 {
     assert(isReachable());
 
-    _def.setReachable();
+    _def->setReachable();
 
     // Mark state DisplayObjects as reachable
     for (DisplayObjects::const_iterator i=_stateCharacters.begin(), e=_stateCharacters.end();
@@ -1132,7 +1133,7 @@ Button::get_member(string_table::key name_key, as_value* val,
 int
 Button::getSWFVersion() const
 {
-    return _def.getSWFVersion();
+    return _def->getSWFVersion();
 }
 
 static as_object*

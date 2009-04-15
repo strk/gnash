@@ -51,7 +51,7 @@ public:
     /// DefinitionTag and adds it as a child of the specified parent
     /// DisplayObject.
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent,
-            int id) = 0;
+            int id) const = 0;
 	
 };
 

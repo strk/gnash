@@ -48,7 +48,8 @@ public:
 
     virtual ~DefineMorphShapeTag() {}
 
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
+        const;
 
     virtual void display(const MorphShape& inst) const;
 

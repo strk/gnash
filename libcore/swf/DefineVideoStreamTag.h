@@ -83,7 +83,7 @@ public:
 
 	~DefineVideoStreamTag();
 
-	DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+	DisplayObject* createDisplayObject(DisplayObject* parent, int id) const;
 
 	/// Read tag SWF::DEFINEVIDEOSTREAM 
 	//
@@ -117,7 +117,7 @@ public:
 	/// May return NULL if there's no embedded video
 	/// (ActionScript created definition - new Video)
 	///
-	media::VideoInfo* getVideoInfo() { return _videoInfo.get(); }
+	media::VideoInfo* getVideoInfo() const { return _videoInfo.get(); }
 
 	/// Get a slice of encoded video frames
 	//
@@ -136,7 +136,7 @@ public:
 	///	  are 0,3,6
 	///
 	void getEncodedFrameSlice(boost::uint32_t from, boost::uint32_t to,
-		std::vector<media::EncodedVideoFrame*>& ret);
+		std::vector<media::EncodedVideoFrame*>& ret) const;
 
     
     void addVideoFrameTag(std::auto_ptr<media::EncodedVideoFrame> frame);
@@ -191,7 +191,8 @@ private:
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
 	rect m_bound;
 
-	boost::mutex _video_mutex;
+    // Mutable for locking in const member functions.
+	mutable boost::mutex _video_mutex;
 	
 	EmbeddedFrames _video_frames;
 

@@ -64,7 +64,7 @@ DefineShapeTag::loader(SWFStream& in, TagType tag, movie_definition& m,
 }
 
 DisplayObject*
-DefineShapeTag::createDisplayObject(DisplayObject* parent, int id)
+DefineShapeTag::createDisplayObject(DisplayObject* parent, int id) const
 {
 	return new Shape(this, parent, id);
 }

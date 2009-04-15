@@ -192,11 +192,14 @@ public:
 	virtual ~DefineButtonTag();
 
 	/// Create a mutable instance of our definition.
-	DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+	DisplayObject* createDisplayObject(DisplayObject* parent, int id) const;
 
     /// Access the ButtonRecords directly. Used for modifying the
     /// Cxform by a DefineButtonCxform tag.
     ButtonRecords& buttonRecords() { return _buttonRecords; }
+    
+    /// Read-only access to the ButtonRecords directly. 
+    const ButtonRecords& buttonRecords() const { return _buttonRecords; }
 
     /// Does this button have an associated DefineButtonSoundTag?
     bool hasSound() const { return (_soundTag.get()); }

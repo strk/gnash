@@ -48,7 +48,7 @@ class Video : public DisplayObject
 
 public:
 	
-	Video(SWF::DefineVideoStreamTag* def, DisplayObject* parent,
+	Video(const SWF::DefineVideoStreamTag* const def, DisplayObject* parent,
             int id);
 
 	~Video();
@@ -127,7 +127,7 @@ private:
 	/// Get video frame to be displayed
 	GnashImage* getVideoFrame();
 
-	const boost::intrusive_ptr<SWF::DefineVideoStreamTag> m_def;
+	const boost::intrusive_ptr<const SWF::DefineVideoStreamTag> m_def;
 
     // Who owns this ? Should it be an intrusive ptr ?
 	boost::intrusive_ptr<NetStream_as> _ns;

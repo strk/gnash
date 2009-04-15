@@ -232,7 +232,8 @@ public:
 	// the parent movie's display list.
 	//
 	// overloads from SWF::DefinitionTag
-	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
+        const;
 
 
 private:
