@@ -57,7 +57,10 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
             const std::string& url);
 
-    /// This isn't used, suggesting that this shouldn't be a DefinitionTag.
+    /// This is currently useless
+    //
+    /// TODO: For AVM2, it may be used to create a Bitmap DisplayObject
+    /// instead of a Movie when used from the Loader class.
     virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
         return 0;
     }
