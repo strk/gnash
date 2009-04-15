@@ -456,7 +456,7 @@ bitmap_info_ogl::~bitmap_info_ogl()
 }
 
 void
-bitmap_info_ogl::setup()
+bitmap_info_ogl::setup() const
 {      
   oglScopeEnable enabler(_ogl_img_type);
   
@@ -505,7 +505,7 @@ bitmap_info_ogl::setup()
 }
 
 void
-bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height)
+bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height) const
 {
   glTexParameteri(_ogl_img_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   
@@ -524,7 +524,7 @@ bitmap_info_ogl::upload(boost::uint8_t* data, size_t width, size_t height)
 
 void
 bitmap_info_ogl::apply(const gnash::SWFMatrix& bitmap_matrix,
-                       bitmap_wrap_mode wrap_mode)
+                       bitmap_wrap_mode wrap_mode) const
 {
   glEnable(_ogl_img_type);
 
@@ -1229,7 +1229,8 @@ public:
         case SWF::FILL_FOCAL_GRADIENT:
         {
                     
-          bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.need_gradient_bitmap());       
+          const bitmap_info_ogl* binfo =
+              static_cast<const bitmap_info_ogl*>(style.need_gradient_bitmap());       
           SWFMatrix m = style.getGradientMatrix();
           
           binfo->apply(m, bitmap_info_ogl::WRAP_CLAMP); 
@@ -1239,7 +1240,8 @@ public:
         case SWF::FILL_TILED_BITMAP_HARD:
         case SWF::FILL_TILED_BITMAP:
         {
-          bitmap_info_ogl* binfo = static_cast<bitmap_info_ogl*>(style.get_bitmap_info());
+            const bitmap_info_ogl* binfo =
+                static_cast<const bitmap_info_ogl*>(style.get_bitmap_info());
 
           binfo->apply(style.getBitmapMatrix(), bitmap_info_ogl::WRAP_REPEAT);
           break;
@@ -1249,7 +1251,8 @@ public:
         // smooth=true;
         case SWF::FILL_CLIPPED_BITMAP_HARD:
         {     
-          bitmap_info_ogl* binfo = dynamic_cast<bitmap_info_ogl*>(style.get_bitmap_info());
+          const bitmap_info_ogl* binfo =
+              dynamic_cast<const bitmap_info_ogl*>(style.get_bitmap_info());
           
           assert(binfo);
 

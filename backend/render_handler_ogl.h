@@ -161,17 +161,17 @@ class bitmap_info_ogl : public BitmapInfo
     ~bitmap_info_ogl();
 
     void apply(const gnash::SWFMatrix& bitmap_matrix,
-               bitmap_wrap_mode wrap_mode);
+               bitmap_wrap_mode wrap_mode) const;
   private:
     inline bool ogl_accessible() const;
-    void setup();    
-    void upload(boost::uint8_t* data, size_t width, size_t height);
+    void setup() const;    
+    void upload(boost::uint8_t* data, size_t width, size_t height) const;
     
-    std::auto_ptr<GnashImage> _img;
+    mutable std::auto_ptr<GnashImage> _img;
     GLenum _pixel_format;
     GLenum _ogl_img_type;
-    bool _ogl_accessible;  
-    GLuint _texture_id;
+    mutable bool _ogl_accessible;  
+    mutable GLuint _texture_id;
     size_t _orig_width;
     size_t _orig_height;
 };

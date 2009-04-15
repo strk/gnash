@@ -23,7 +23,7 @@
 #include "BitmapInfo.h"
 #include "flash/display/BitmapData_as.h"
 #include "render.h"
-
+#include "BitmapMovieDefinition.h"
 #include "DynamicShape.h"
 
 
@@ -32,15 +32,32 @@ namespace gnash {
 
 /// A Bitmap DisplayObject. This is not AS-referencable, but can be
 /// removed and placed using depths like normal DisplayObjects.
+//
+/// This can be constructed dynamically from a BitmapData, or non-dynamically
+/// as part of a BitmapMovie.
+//
+/// For non-dynamic Bitmap DisplayObjects, the bitmap data never changes. The
+/// update() function is called once on stage placement.
+//
+/// For dynamic Bitmap DisplayObjects, the attached BitmapData_as should call
+/// update() whenever the data changes. This Bitmap registers itself with
+/// the BitmapData_as on stage placement.
 class Bitmap : public DisplayObject
 {
 public:
 
 	Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
             int id);
+	
+    Bitmap(const BitmapMovieDefinition* const def, DisplayObject* parent,
+            int id);
 
     ~Bitmap();
 
+    /// Called to update the Bitmap's DynamicShape for display.
+    //
+    /// For non-dynamic bitmaps, this should only be called once (for
+    /// efficiency - there are no harmful side-effects)
     void update();
 
     virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
@@ -58,17 +75,32 @@ protected:
     void markReachableObjects() const {
         if (_bitmapData) _bitmapData->setReachable();
         if (_bitmapInfo) _bitmapInfo->setReachable();
+        if (_def) _def->setReachable();
     }
 
 private:
 
-    /// This must convert the BitmapData to a BitmapInfo.
+    /// Return the bitmap used for this Bitmap DisplayObject.
     //
-    /// The result must be stored in _bitmapInfo.
-    void drawBitmap();
+    /// It comes either from the definition or the BitmapData_as.
+    const BitmapInfo* bitmap() const;
 
-    /// Call this before rendering to make sure the BitmapInfo is updated.
-    void finalize();
+    /// This updates _bitmapInfo from the BitmapData_as
+    void makeBitmap();
+
+    /// Checks whether an attached BitmapData_as is disposed.
+    //
+    /// If the BitmapData_as has been disposed, deletes _bitmapData.
+    /// and clears the DynamicShape.
+    void checkBitmapData();
+
+    /// This creates the DynamicShape for rendering.
+    //
+    /// It should be called every time the underlying bitmap changes; for
+    /// non-dynamic Bitmaps, this is only on construction.
+    void makeBitmapShape();
+
+    const boost::intrusive_ptr<const BitmapMovieDefinition> _def;
 
     boost::intrusive_ptr<BitmapData_as> _bitmapData;
 

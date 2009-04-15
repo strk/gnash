@@ -164,7 +164,7 @@ class bitmap_info_cairo : public BitmapInfo, boost::noncopyable
       cairo_pattern_destroy(_pattern);
     }
     
-    cairo_pattern_t* apply(const cairo_matrix_t* mat, int fill_type)
+    cairo_pattern_t* apply(const cairo_matrix_t* mat, int fill_type) const
     {
       assert(mat);
       assert(_pattern);
@@ -255,8 +255,8 @@ get_cairo_pattern(const fill_style& style, const cxform& cx)
     {
       SWFMatrix m = style.getBitmapMatrix();        
       
-      bitmap_info_cairo* binfo
-        = dynamic_cast<bitmap_info_cairo*>(style.get_bitmap_info());
+      const bitmap_info_cairo* binfo
+        = dynamic_cast<const bitmap_info_cairo*>(style.get_bitmap_info());
 
       if (!binfo) {
         return NULL;
@@ -315,7 +315,7 @@ public:
     
     cairo_fill(_cr);
 
-    // Surfaces are owned by bitmap_info_cairo
+    // Surfaces are owned by const bitmap_info_cairo
     if (cairo_pattern_get_type(_pattern) != CAIRO_PATTERN_TYPE_SURFACE) {
       cairo_pattern_destroy(_pattern);
       _pattern = 0;
