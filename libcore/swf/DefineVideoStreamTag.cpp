@@ -133,7 +133,7 @@ DefineVideoStreamTag::addVideoFrameTag(
 }
 
 DisplayObject*
-DefineVideoStreamTag::createDisplayObject(DisplayObject* parent, int id)
+DefineVideoStreamTag::createDisplayObject(DisplayObject* parent, int id) const
 {
 	DisplayObject* ch = new Video(this, parent, id);
 	return ch;
@@ -148,17 +148,17 @@ has_frame_number(media::EncodedVideoFrame* frame, boost::uint32_t frameNumber)
 
 void
 DefineVideoStreamTag::getEncodedFrameSlice(boost::uint32_t from,
-        boost::uint32_t to, EmbeddedFrames& ret)
+        boost::uint32_t to, EmbeddedFrames& ret) const
 {
 	assert(from<=to);
 
 	boost::mutex::scoped_lock lock(_video_mutex);
 
     // It's assumed that frame numbers are in order.
-    EmbeddedFrames::iterator lower = std::lower_bound(
+    EmbeddedFrames::const_iterator lower = std::lower_bound(
             _video_frames.begin(), _video_frames.end(), from, FrameFinder());
 
-    EmbeddedFrames::iterator upper = std::upper_bound(
+    EmbeddedFrames::const_iterator upper = std::upper_bound(
             lower, _video_frames.end(), to, FrameFinder());
 
     // This copies a pointer to the encoded video frames; the actual

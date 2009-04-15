@@ -55,7 +55,7 @@ DefineMorphShapeTag::DefineMorphShapeTag(SWFStream& in, TagType tag,
 }
 
 DisplayObject*
-DefineMorphShapeTag::createDisplayObject(DisplayObject* parent, int id)
+DefineMorphShapeTag::createDisplayObject(DisplayObject* parent, int id) const
 {
     return new MorphShape(this, parent, id);
 }

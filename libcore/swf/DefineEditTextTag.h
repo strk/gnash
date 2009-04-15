@@ -67,7 +67,7 @@ public:
 
     const rect& bounds() const { return _rect; }
 
-    DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+    DisplayObject* createDisplayObject(DisplayObject* parent, int id) const;
 
 	/// Return a reference to the default text associated
 	/// with this EditText definition.

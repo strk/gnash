@@ -382,7 +382,7 @@ public:
 	///
 	Movie* createMovie(DisplayObject* parent=0);
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int) const {
         return 0;
     }
 

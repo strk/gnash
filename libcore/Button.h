@@ -70,7 +70,8 @@ public:
 		HIT
 	};
 
-	Button(SWF::DefineButtonTag& def, DisplayObject* parent, int id);
+	Button(const SWF::DefineButtonTag* const def, DisplayObject* parent,
+            int id);
 
 	~Button();
 	
@@ -165,7 +166,7 @@ private:
 
 	MouseState m_mouse_state;
     
-    SWF::DefineButtonTag& _def;
+    const boost::intrusive_ptr<const SWF::DefineButtonTag> _def;
 
 	DisplayObjects _stateCharacters;
 

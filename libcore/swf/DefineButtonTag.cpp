@@ -415,9 +415,9 @@ DefineButtonTag::readDefineButton2Tag(SWFStream& in, movie_definition& m)
 
 
 DisplayObject*
-DefineButtonTag::createDisplayObject(DisplayObject* parent, int id)
+DefineButtonTag::createDisplayObject(DisplayObject* parent, int id) const
 {
-	DisplayObject* ch = new Button(*this, parent, id);
+	DisplayObject* ch = new Button(this, parent, id);
 	return ch;
 }
 

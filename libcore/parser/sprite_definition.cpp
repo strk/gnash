@@ -40,7 +40,7 @@
 namespace gnash {
 
 DisplayObject*
-sprite_definition::createDisplayObject(DisplayObject* parent, int id)
+sprite_definition::createDisplayObject(DisplayObject* parent, int id) const
 {
 #ifdef DEBUG_REGISTER_CLASS
 	log_debug(_("Instantiating sprite_def %p"), (void*)this);

@@ -67,7 +67,8 @@ public:
     bool extractStaticText(std::vector<const TextRecord*>& to, size_t& size)
         const;
 
-    virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id);
+    virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
+        const;
 
 private:
 
