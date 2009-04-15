@@ -1188,13 +1188,10 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 void
 MovieClip::execute_action(const action_buffer& ab)
 {
-    as_environment& env = _environment; // just type less
-
-    ActionExec exec(ab, env);
+    ActionExec exec(ab, _environment);
     exec();
 }
 
-/*private*/
 void
 MovieClip::restoreDisplayList(size_t tgtFrame)
 {
@@ -1440,14 +1437,14 @@ void MovieClip::display()
 
 void MovieClip::omit_display()
 {
-    if (m_child_invalidated)
-        _displayList.omit_display();
+    if (m_child_invalidated) _displayList.omit_display();
         
     clear_invalidated();
 }
 
 bool
-MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObject)
+MovieClip::attachCharacter(DisplayObject& newch, int depth,
+        as_object* initObject)
 { 
     _displayList.placeDisplayObject(&newch, depth, initObject);    
 
@@ -1457,8 +1454,8 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObjec
 
 std::auto_ptr<GnashImage>
 MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-                        DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
-                        bool /* smooth */)
+            DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
+            bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }
@@ -1467,9 +1464,7 @@ void
 MovieClip::attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth)
 {
     DisplayObject* ch = new Bitmap(bd, this, 0);
-
     attachCharacter(*ch, depth, 0);
-
 }
 
 DisplayObject*
