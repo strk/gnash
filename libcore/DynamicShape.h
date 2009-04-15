@@ -83,7 +83,7 @@ public:
     }
 
     /// Display a DynamicShape object.
-    void display(const DisplayObject& inst);
+    void display(const DisplayObject& inst) const;
 
 	/// Set current line style and start a new path.
 	//

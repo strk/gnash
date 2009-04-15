@@ -21,7 +21,6 @@
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "movie_definition.h" // for inheritance
 #include "rect.h" // for composition
-#include "BitmapMovieInstance.h" // for create_movie_instance
 #include "BitmapInfo.h" // for destructor visibility by intrusive_ptr
 #include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 #include "GnashImage.h"
@@ -37,7 +36,7 @@ namespace gnash
 
 /// A "movie" definition for a bitmap file
 //
-/// The create_movie_instance function will return a BitmapMovieInstance
+/// The createMovie function will return a BitmapMovie
 ///
 class BitmapMovieDefinition : public movie_definition
 {
@@ -58,7 +57,13 @@ public:
 	BitmapMovieDefinition(std::auto_ptr<GnashImage> image,
             const std::string& url);
 
-    virtual DisplayObject* createDisplayObject(DisplayObject*, int);
+    /// This is currently useless
+    //
+    /// TODO: For AVM2, it may be used to create a Bitmap DisplayObject
+    /// instead of a Movie when used from the Loader class.
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
+        return 0;
+    }
 
 	virtual int	get_version() const {
 		return _version;
@@ -72,11 +77,11 @@ public:
 		return std::ceil(twipsToPixels(_framesize.height()));
 	}
 
-	virtual size_t	get_frame_count() const {
+	virtual size_t get_frame_count() const {
 		return _framecount;
 	}
 
-	virtual float	get_frame_rate() const {
+	virtual float get_frame_rate() const {
 		return _framerate;
 	}
 
@@ -101,11 +106,8 @@ public:
 		return _bytesTotal;
 	}
 	
-	/// Create a playable movie_instance from this def.
-	virtual movie_instance* create_movie_instance(DisplayObject* parent=0)
-	{
-		return new BitmapMovieInstance(this, parent);
-	}
+	/// Create a playable Movie from this def.
+	virtual Movie* createMovie(DisplayObject* parent=0);
 
 	virtual const std::string& get_url() const {
 		return _url;
@@ -120,8 +122,8 @@ public:
 		return 1;
 	}
 
-    BitmapInfo* getBitmap() const {
-        return _bitmap.get();
+    const DynamicShape& shape() const {
+        return _shape;
     }
 
 protected:
@@ -134,7 +136,7 @@ protected:
 	///	- bitmap (_bitmap)
 	///
 	void markReachableResources() const;
-#endif // GNASH_USE_GC
+#endif 
 
 private:
 
@@ -148,7 +150,7 @@ private:
 
     boost::intrusive_ptr<BitmapInfo> _bitmap;
 
-    boost::shared_ptr<DynamicShape> _shape;
+    DynamicShape _shape;
 
 };
 

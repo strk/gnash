@@ -106,8 +106,8 @@ main(int /*argc*/, char** /*argv*/)
 	DisplayObject* coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	MovieClip* coverart = coverartch->to_movie();
 	check(coverart);
-	url = coverart->get_movie_definition()->get_url();
-	check_equals(coverart->get_movie_definition()->get_url(), baseURL.str());
+	url = coverart->get_root()->url();
+	check_equals(coverart->get_root()->url(), baseURL.str());
 
 	// Check scribbling on the empty canvas
 	checkScribbling();
@@ -121,7 +121,7 @@ main(int /*argc*/, char** /*argv*/)
 	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	check(coverart != coverartch->to_movie());
 	coverart = coverartch->to_movie();
-	check_equals(coverart->get_movie_definition()->get_url(), lynchURL.str());
+	check_equals(coverart->get_root()->url(), lynchURL.str());
 	tester->depressMouseButton();
 
 	// Check scribbling on the lynch
@@ -139,7 +139,7 @@ main(int /*argc*/, char** /*argv*/)
 	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
 	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
-	check_equals(coverart->get_movie_definition()->get_url(), greenURL.str());
+	check_equals(coverart->get_root()->url(), greenURL.str());
 	// TODO: find a way to test if the jpeg is really displayed
 	//       (like turn it into a mouse-event-handling char and use isMouseOverActiveEntity ?)
 
@@ -158,7 +158,7 @@ main(int /*argc*/, char** /*argv*/)
 	usleep(500); // give it some time... TODO: drop this test and use a self-containment instead
 	coverartch = const_cast<DisplayObject*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
-	check_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
+	check_equals(coverart->get_root()->url(), offspringURL.str());
 
 	// Check scribbling on the offspring
 	checkScribbling();

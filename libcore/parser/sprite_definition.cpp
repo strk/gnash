@@ -167,7 +167,7 @@ sprite_definition::add_frame_name(const std::string& name)
 
 bool
 sprite_definition::get_labeled_frame(const std::string& label,
-        size_t& frame_number)
+        size_t& frame_number) const
 {
     NamedFrameMap::const_iterator it = _namedFrames.find(label);
     if ( it == _namedFrames.end() ) return false;
@@ -188,19 +188,6 @@ sprite_definition::sprite_definition(movie_definition& m, SWFStream& in,
 {
 	read(in, runInfo);
 }
-
-sprite_definition::sprite_definition(movie_definition& m)
-	:
-	// FIXME: use a class-static TagLoadersTable for sprite_definition
-	_tag_loaders(SWF::TagLoadersTable::getInstance()),
-	m_movie_def(m),
-	m_frame_count(1),
-	m_loading_frame(1),
-	registeredClass(0),
-	_loadingSoundStream(-1)
-{
-}
-
 
 /*
  * This function is not inlined to avoid having to include as_function.h

@@ -242,7 +242,7 @@ void
 DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
     ranges.add(m_old_invalidated_ranges);
-    if (isVisible() && (m_invalidated||force))
+    if (visible() && (m_invalidated||force))
     {
         rect bounds;        
         bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
@@ -733,7 +733,7 @@ DisplayObject::visible_getset(const fn_call& fn)
 	as_value rv;
 	if (!fn.nargs) // getter
 	{
-		rv = as_value(ptr->isVisible());
+		rv = as_value(ptr->visible());
 	}
 	else // setter
 	{
@@ -1210,7 +1210,7 @@ DisplayObject::computeTargetPath() const
 {
 
 	// TODO: check what happens when this DisplayObject
-	//       is a movie_instance loaded into another
+	//       is a Movie loaded into another
 	//       running movie.
 	
 	typedef std::vector<std::string> Path;
@@ -1240,7 +1240,7 @@ DisplayObject::computeTargetPath() const
 
 	if ( path.empty() )
 	{
-		if ( _vm.getRoot().getRootMovie() == this ) return "/";
+		if (&_vm.getRoot().getRootMovie() == this) return "/";
 		std::stringstream ss;
 		ss << "_level" << m_depth-DisplayObject::staticDepthOffset;
 		return ss.str();
@@ -1248,7 +1248,7 @@ DisplayObject::computeTargetPath() const
 
 	// Build the target string from the parents stack
 	std::string target;
-	if ( topLevel != _vm.getRoot().getRootMovie() )
+	if (topLevel != &_vm.getRoot().getRootMovie() )
 	{
 		std::stringstream ss;
 		ss << "_level" << topLevel->get_depth()-DisplayObject::staticDepthOffset;
@@ -1282,7 +1282,7 @@ DisplayObject::getTarget() const
 {
 
 	// TODO: check what happens when this DisplayObject
-	//       is a movie_instance loaded into another
+	//       is a Movie loaded into another
 	//       running movie.
 	
 	typedef std::vector<std::string> Path;
@@ -1298,14 +1298,14 @@ DisplayObject::getTarget() const
 		if ( ! parent )
 		{
 			std::stringstream ss;
-			if (!dynamic_cast<const movie_instance*>(ch))
+			if (!dynamic_cast<const Movie*>(ch))
 			{
 				// must be an as-referenceable
 				// DisplayObject created using 'new'
 				// like, new MovieClip, new Video, new TextField...
 				// 
 				log_debug("DisplayObject %p (%s) doesn't have a parent and "
-                        "is not a movie_instance", ch, typeName(*ch));
+                        "is not a Movie", ch, typeName(*ch));
 				ss << "<no parent, depth" << ch->get_depth() << ">";
 				path.push_back(ss.str());
 			}

@@ -21,7 +21,7 @@
 #include "URL.h"
 #include "noseek_fd_adapter.h"
 #include "movie_definition.h"
-#include "movie_instance.h"
+#include "Movie.h"
 #include "movie_root.h"
 #include "MovieClip.h"
 #include "gnash.h"
@@ -186,7 +186,7 @@ GnashPlayer::loadMovie(PyObject& pf)
 	_movieDef->completeLoad();
 	_movieDef->ensure_frame_loaded(_movieDef->get_frame_count());
 
-	std::auto_ptr<movie_instance> mi ( _movieDef->create_movie_instance() );
+	std::auto_ptr<Movie> mi ( _movieDef->createMovie() );
 
 	// Finally, place the root movie on the stage ...
     _movieRoot->setRootMovie( mi.release() );

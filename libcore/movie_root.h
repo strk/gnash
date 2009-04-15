@@ -77,7 +77,7 @@
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code
-#include "movie_instance.h"
+#include "Movie.h"
 #include "RunInfo.h" // for initialization
 #include "gnash.h" // Quality
 
@@ -123,13 +123,22 @@ struct DepthComparator
     }
 };
 
-/// The movie stage (absolute top level node in the DisplayObjects hierarchy)
+/// This class represents the 'Stage' and top-level movie.
 //
-/// This is a wrapper around the set of loaded levels being played.
-///
-/// There is a *single* instance of this class for each run;
-/// loading external movies will *not* create a new instance of it.
-///
+/// It is a wrapper around the set of loaded levels being played. Each 
+/// 'run' of a SWF movie, including all further movies loaded during the
+/// run, has exactly one movie_root, which is kept for the entire run.
+/// Loading a new top-level movie does not create a new movie_root.
+//
+/// The 'Stage' part of movie_root is accessible through the ActionScript
+/// Stage object, implemented in Stage_as.
+//
+/// The movie_root class is responsible for accepting and passing on
+/// user events (mouse or key events), for maintaining the heart-beat
+/// mechanism, and for advancing all MovieClips on request from the
+/// hosting application.
+//
+/// The _root object is provided by getAsRoot().
 class DSOEXPORT movie_root : boost::noncopyable
 {
 
@@ -157,7 +166,7 @@ public:
     ///
     /// Make sure to call this method before using the movie_root,
     /// as most operations are delegated to the associated/wrapped
-    /// movie_instance.
+    /// Movie.
     ///
     /// Note that the display viewport will be updated to match
     /// the size of given movie.
@@ -165,18 +174,18 @@ public:
     /// A call to this method is equivalent to a call to setLevel(0, movie).
     ///
     /// @param movie
-    /// The movie_instance to wrap.
+    /// The Movie to wrap.
     /// Will be stored in an intrusive_ptr.
     /// Must have a depth of 0.
     ///
-    void setRootMovie(movie_instance* movie);
+    void setRootMovie(Movie* movie);
 
     /// Return the movie at the given level (0 if unloaded level).
     //
     /// POST CONDITIONS:
     /// - The returned DisplayObject has a depth equal to 'num'
     ///
-    boost::intrusive_ptr<movie_instance> getLevel(unsigned int num) const;
+    boost::intrusive_ptr<Movie> getLevel(unsigned int num) const;
 
     /// Load movie at the specified URL in the given level 
     //
@@ -199,14 +208,14 @@ public:
     /// Character's depths are updated.
     ///
     /// @param sp
-    ///        The level to change depth/level of. A pointer to it is expected
-    ///        to be found in the _level# container, or an error will be printed
-    ///        and the call would result in a no-op.
+    ///    The level to change depth/level of. A pointer to it is expected
+    ///    to be found in the _level# container, or an error will be printed
+    ///    and the call would result in a no-op.
     ///
     /// @param depth
-    ///        New depth to assign to the DisplayObject. If another level exists at 
-    ///        the target depth the latter is moved in place of the former, with
-    ///        its depth also updated.
+    ///    New depth to assign to the DisplayObject. If another level
+    ///    exists at the target depth the latter is moved in place of
+    ///    the former, with its depth also updated.
     ///
     void swapLevels(boost::intrusive_ptr<MovieClip> sp, int depth);
 
@@ -294,23 +303,21 @@ public:
     void set_drag_state(const drag_state& st);
 
     /// @return the originating root movie (not necessarely _level0)
-    movie_instance* getRootMovie() const
+    const Movie& getRootMovie() const
     {
-        return _rootMovie.get();
+        return *_rootMovie;
+    }
+
+    /// Return the current nominal frame rate for the Stage.
+    //
+    /// This is dependent on the Movie set as root movie.
+    float frameRate() const {
+        return _rootMovie->frameRate();
     }
 
     void stop_drag()
     {
         m_drag_state.reset();
-    }
-
-    /// Return definition of originating root movie 
-    //
-    /// TODO: rename to getOriginatingDefinition ?
-    ///
-    movie_definition* get_movie_definition() const
-    {
-        return getRootMovie()->get_movie_definition();
     }
 
     /// Add an interval timer
@@ -344,17 +351,12 @@ public:
     ///
     size_t get_current_frame() const
     {
-        return getRootMovie()->get_current_frame();
+        return _rootMovie->get_current_frame();
     }
 
     void set_background_color(const rgba& color);
 
     void set_background_alpha(float alpha);
-
-    float get_background_alpha() const
-    {
-        return m_background_color.m_a / 255.0f;
-    }
 
     /// Return the VM used by this movie_root
     VM& getVM() { return _vm; }
@@ -370,13 +372,14 @@ public:
     /// Entry point for movie advancement
     //
     /// This function does:
-    ///     - Execute all timers
-    ///     - Reset the next Random number
-    ///     - Advance all advanceable DisplayObjects in reverse-placement order
-    ///     - Cleanup key listeners
-    ///     - Process all queued actions
-    ///     - Remove unloaded DisplayObjects from the advanceable DisplayObjects list.
-    ///     - Run the GC collector
+    ///   - Execute all timers
+    ///   - Reset the next Random number
+    ///   - Advance all advanceable DisplayObjects in reverse-placement order
+    ///   - Cleanup key listeners
+    ///   - Process all queued actions
+    ///   - Remove unloaded DisplayObjects from the advanceable
+    ///     DisplayObjects list.
+    ///   - Run the GC collector
     void advanceMovie();
 
     /// 0-based!! delegates to originating root movie
@@ -384,7 +387,7 @@ public:
     /// TODO: drop this method. currently used by gprocessor.
     void goto_frame(size_t target_frame_number)
     {
-        getRootMovie()->goto_frame(target_frame_number);
+        _rootMovie->goto_frame(target_frame_number);
     }
 
     void display();
@@ -394,7 +397,7 @@ public:
     /// TODO: drop ?
     void set_play_state(MovieClip::PlayState s)
     {
-        getRootMovie()->setPlayState(s);
+        _rootMovie->setPlayState(s);
     }
 
     /// Notify still loaded DisplayObject listeners for key events
@@ -1028,7 +1031,7 @@ private:
     //
     /// We keep a pointer to the base MovieClip class
     /// to avoid having to replicate all of the base class
-    /// interface to the movie_instance class definition
+    /// interface to the Movie class definition
     Levels _movies;
 
     typedef std::map<int, DisplayObject*> Childs;
@@ -1039,7 +1042,7 @@ private:
     /// The root movie. This is initially the same as getLevel(0) but might
     /// change during the run. It will be used to setup and retrive initial
     /// stage size
-    boost::intrusive_ptr<movie_instance> _rootMovie;
+    boost::intrusive_ptr<Movie> _rootMovie;
 
     /// This function should return TRUE iff any action triggered
     /// by the event requires redraw, see \ref events_handling for
@@ -1083,11 +1086,11 @@ private:
     /// Put the given movie at the given level 
     //
     /// @param movie
-    /// The movie_instance to store at the given level.
+    /// The Movie to store at the given level.
     /// Will be stored in an intrusive_ptr.
     /// Its depth will be set to <num>+DisplayObject::staticDepthOffset and
     /// its name to _level<num>
-    void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
+    void setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie);
 
     /// Return the global Key object 
     //

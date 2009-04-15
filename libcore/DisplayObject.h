@@ -47,7 +47,7 @@
 // Forward declarations
 namespace gnash {
     class MovieClip;
-    class movie_instance;
+    class Movie;
     class ExecutableCode;
     class action_buffer;
     class movie_definition;
@@ -482,21 +482,21 @@ public:
     ///
     virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
     {
-        if ( ! isVisible() ) return false;
+        if ( ! visible() ) return false;
         if ( isMask() ) return false;
         return pointInShape(x, y);
     }
 
     /// Return the relative root of this DisplayObject
     //
-    /// The "relative" is the movie_instance created by
+    /// The "relative" is the Movie created by
     /// the same SWF definition that contained the
     /// definition of this DisplayObject.
     ///
     /// The default implementation is to invoke get_root
     /// against this DisplayObject's parent.
     ///
-    virtual movie_instance* get_root() const {
+    virtual Movie* get_root() const {
         return get_parent()->get_root();
     }
 
@@ -602,7 +602,7 @@ public:
     void set_visible(bool visible);
 
     // Return true if this DisplayObject should be rendered
-    bool isVisible() const { return _visible; }
+    bool visible() const { return _visible; }
 
     /// ActionScript event handler.    Returns true if a handler was called.
     //
@@ -646,7 +646,7 @@ public:
     virtual const DisplayObject* findDropTarget(boost::int32_t x, 
             boost::int32_t y, DisplayObject* dragging) const
     {
-        if (this != dragging && isVisible() && pointInVisibleShape(x, y)) {
+        if (this != dragging && visible() && pointInVisibleShape(x, y)) {
             return this;
         }
         

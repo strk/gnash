@@ -48,7 +48,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 libgnashcore_la_SOURCES = \
-	BitmapMovieInstance.cpp \
+	BitmapMovie.cpp \
 	Property.cpp \
 	PropertyList.cpp \
 	URLAccessManager.cpp \
@@ -79,7 +79,7 @@ libgnashcore_la_SOURCES = \
         parser/filter_factory.cpp \
 	InteractiveObject.cpp \
 	SWFMatrix.cpp \
-	movie_instance.cpp \
+	SWFMovie.cpp \
 	movie_root.cpp \
 	namedStrings.cpp \
 	rect.cpp \
@@ -142,7 +142,7 @@ noinst_HEADERS = \
 	asClass.h \
 	Bitmap.h \
 	BitmapInfo.h \
-	BitmapMovieInstance.h \
+	BitmapMovie.h \
 	builtin_function.h \
 	Button.h \
 	DisplayObject.h \
@@ -177,7 +177,8 @@ noinst_HEADERS = \
 	LoadVariablesThread.h \
 	SWFMatrix.h \
 	MouseButtonState.h \
-	movie_instance.h \
+	SWFMovie.h \
+	Movie.h \
 	movie_root.h \
 	namedStrings.h \
 	rect.h \

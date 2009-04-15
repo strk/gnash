@@ -18,9 +18,9 @@
 #ifndef GNASH_DUMMYMOVIEDEFINITION_H
 #define GNASH_DUMMYMOVIEDEFINITION_H
 
-#include "movie_definition.h" // for inheritance
+#include "SWFMovieDefinition.h" // for inheritance
 #include "rect.h" // for composition
-#include "movie_instance.h" // for create_movie_instance
+#include "SWFMovie.h" // for createMovie
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -35,11 +35,11 @@ namespace gnash
 /// methods of movie_definition by returning user-defined
 /// values for version/size/frame rate etc..
 ///
-/// The create_movie_instance function will return the same
+/// The createMovie function will return the same
 /// object created by createEmptyMovieClip() calls
 /// (an empty movieclip... still to be designed)
 ///
-class DummyMovieDefinition : public movie_definition
+class DummyMovieDefinition : public SWFMovieDefinition
 {
 	int _version;
 	rect _framesize;
@@ -50,7 +50,7 @@ class DummyMovieDefinition : public movie_definition
 
 public:
 
-        virtual DisplayObject* createDisplayObject(DisplayObject*, int /* id */) { return 0; }
+    virtual DisplayObject* createDisplayObject(DisplayObject*, int /* id */) { return 0; }
 
 
 	/// Default constructor
@@ -64,8 +64,9 @@ public:
 	///  - 0 bytes (for get_bytes_loaded()/get_bytes_total())
 	///  - empty url
 	///
-	DummyMovieDefinition()
+	DummyMovieDefinition(const RunInfo& ri)
 		:
+        SWFMovieDefinition(ri),
 		_version(6),
 		_framesize(0, 0, 640*20, 480*20),
 		_framecount(1),
@@ -81,8 +82,9 @@ public:
 	/// All but the target version will be initialized
 	/// exactly as with the default constructor.
 	///
-	DummyMovieDefinition(int version)
+	DummyMovieDefinition(const RunInfo& ri, int version)
 		:
+        SWFMovieDefinition(ri),
 		_version(version),
 		_framesize(0, 0, 640*20, 480*20),
 		_framecount(1),
@@ -91,6 +93,10 @@ public:
 		_url("http://www.gnu.org/software/gnash")
 	{
 	}
+
+    virtual bool ensure_frame_loaded(size_t) const {
+        return true;
+    }
 
 	virtual int	get_version() const {
 		return _version;
@@ -125,9 +131,9 @@ public:
 	}
 	
 	/// Create a playable movie instance from a def.
-	virtual movie_instance* create_movie_instance(DisplayObject* parent=NULL)
+	virtual Movie* createMovie(DisplayObject* parent=NULL)
 	{
-		return new movie_instance(this, parent);
+		return new SWFMovie(this, parent);
 	}
 	
 	virtual const PlayList& get_playlist(size_t frame_number) const

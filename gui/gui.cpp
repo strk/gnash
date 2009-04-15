@@ -592,7 +592,7 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				{
 					if ( _stage )
 					{
-						float fps = _stage->get_movie_definition()->get_frame_rate();
+						float fps = _stage->frameRate();
 						// Min interval allowed: 1/100 second (100FPS)
 						unsigned int ni = 1000.0/fps;
 						setInterval(ni);
@@ -899,7 +899,7 @@ Gui::start()
         return;
     }
 
-    std::auto_ptr<movie_instance> mr ( _movieDef->create_movie_instance() );
+    std::auto_ptr<Movie> mr ( _movieDef->createMovie() );
     mr->setVariables(_flashVars);
 
     _stage->setRootMovie( mr.release() ); // will construct the instance
@@ -948,7 +948,7 @@ Gui::advanceMovie()
 	size_t cur_frame = m->getRootMovie()->get_current_frame();
 	size_t tot_frames = m->getRootMovie()->get_frame_count();
 	bool advanced = m->advance();
-	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
+	m->getRootMovie.ensureFrameLoaded(tot_frames);
 	m->goto_frame(cur_frame+1);
     m->set_play_state(gnash::MovieClip::PLAYSTATE_PLAY);
 	log_debug(_("Frame %d"), m->get_current_frame());
@@ -1004,8 +1004,8 @@ Gui::advanceMovie()
 	if ( ! loops() )
 	{
 		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
-		gnash::MovieClip* si = m->getRootMovie();
-		if (curframe + 1 >= si->get_frame_count())
+		const gnash::MovieClip& si = m->getRootMovie();
+		if (curframe + 1 >= si.get_frame_count())
 		{
 			quit(); 
 		}

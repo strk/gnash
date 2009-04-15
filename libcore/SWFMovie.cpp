@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "movie_instance.h"
+#include "SWFMovie.h"
 #include "movie_definition.h"
 #include "movie_root.h"
 #include "log.h"
@@ -29,24 +29,20 @@
 
 namespace gnash {
 
-movie_instance::movie_instance(movie_definition* def, DisplayObject* parent)
+SWFMovie::SWFMovie(const SWFMovieDefinition* const def, DisplayObject* parent)
 	:
-	MovieClip(def, this, parent, parent ? 0 : -1),
+	Movie(def, parent),
 	_def(def)
 {
 }
 
 void
-movie_instance::stagePlacementCallback(as_object* initObj)
+SWFMovie::stagePlacementCallback(as_object* initObj)
 {
 
     assert (!initObj);
 
 	saveOriginalTarget();
-
-	//GNASH_REPORT_FUNCTION;
-
-	//_def->stopLoader();
 
 	// Load first frame  (1-based index)
 	size_t nextframe = 1;
@@ -64,18 +60,15 @@ movie_instance::stagePlacementCallback(as_object* initObj)
 
 // Advance of an SWF-defined movie instance
 void
-movie_instance::advance()
+SWFMovie::advance()
 {
-	//GNASH_REPORT_FUNCTION;
-
-	//_def->stopLoader();
-
 	// Load next frame if available (+2 as m_current_frame is 0-based)
 	//
 	// We do this inside advance_root to make sure
 	// it's only for a root sprite (not a sprite defined
 	// by DefineSprite!)
-	size_t nextframe = std::min<size_t>(get_current_frame()+2, get_frame_count());
+	size_t nextframe = std::min<size_t>(get_current_frame() + 2,
+            get_frame_count());
 	if ( !_def->ensure_frame_loaded(nextframe) )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
@@ -84,9 +77,7 @@ movie_instance::advance()
 		);
 	}
 
-	advance_sprite(); 
-
-	//_def->resumeLoader();
+    MovieClip::advance(); 
 }
 
 } // namespace gnash

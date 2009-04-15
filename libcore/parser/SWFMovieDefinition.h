@@ -51,7 +51,7 @@ namespace gnash {
 	class SWFStream;
     class movie_root;
 	class MovieClip;
-	class movie_instance;
+	class SWFMovie;
 	namespace SWF {
 		class TagLoadersTable;
 	}
@@ -172,7 +172,7 @@ private:
 /// Immutable definition of a SWF movie's contents.
 //
 /// It cannot be played directly, and does not hold
-/// current state; for that you need to call create_movie_instance()
+/// current state; for that you need to call createMovie()
 /// to get a movie instance 
 ///
 class SWFMovieDefinition : public movie_definition
@@ -255,7 +255,8 @@ public:
 	//
 	// locks _namedFramesMutex
 	//
-	bool get_labeled_frame(const std::string& label, size_t& frame_number);
+	bool get_labeled_frame(const std::string& label, size_t& frame_number)
+        const;
 
 	void	add_font(int font_id, Font* f);
 
@@ -358,7 +359,7 @@ public:
 	/// Ensure that frame number 'framenum' (1-based offset)
 	/// has been loaded (load on demand).
 	///
-	bool ensure_frame_loaded(size_t framenum);
+	bool ensure_frame_loaded(size_t framenum) const;
 
 	/// Read and parse all the SWF stream (blocking until load is finished)
 	//
@@ -377,9 +378,9 @@ public:
 	///
 	/// TOCHECK:
 	/// The _root reference of the newly created movie_root
-	/// will be set to a newly created movie_instance.
+	/// will be set to a newly created Movie.
 	///
-	movie_instance* create_movie_instance(DisplayObject* parent=0);
+	Movie* createMovie(DisplayObject* parent=0);
 
     virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
         return 0;
@@ -469,14 +470,14 @@ private:
 	mutable boost::mutex _frames_loaded_mutex;
 
 	/// A semaphore to signal load of a specific frame
-	boost::condition _frame_reached_condition;
+	mutable boost::condition _frame_reached_condition;
 
 	/// Set this to trigger signaling of loaded frame
 	//
 	/// Make sure you _frames_loaded_mutex is locked
 	/// when accessing this member !
 	///
-	size_t _waiting_for_frame;
+	mutable size_t _waiting_for_frame;
 
 	/// Number bytes loaded / parsed
 	unsigned long _bytes_loaded;
@@ -568,4 +569,4 @@ private:
 
 } // namespace gnash
 
-#endif // GNASH_MOVIE_DEF_IMPL_H
+#endif 

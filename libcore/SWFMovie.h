@@ -18,19 +18,17 @@
 // Stateful live Movie instance 
 
 
-#ifndef GNASH_MOVIE_INSTANCE_H
-#define GNASH_MOVIE_INSTANCE_H
+#ifndef GNASH_SWF_MOVIE_H
+#define GNASH_SWF_MOVIE_H
 
-#include <vector>
-#include <set>
-
-#include "MovieClip.h" // for inheritance
+#include "Movie.h" // for inheritance
 #include "smart_ptr.h" // for composition
-#include "movie_definition.h" // for dtor visibility by smart ptr
+#include "SWFMovieDefinition.h" // for dtor visibility by smart ptr
+
+#include <set>
 
 // Forward declarations
 namespace gnash {
-	class movie_root; 
 	class DisplayObject; 
 }
 
@@ -38,18 +36,32 @@ namespace gnash
 {
 
 /// Stateful Movie object (a special kind of sprite)
-class movie_instance : public MovieClip
+class SWFMovie : public Movie
 {
 
 public:
 
-	// We take a generic movie_definition to allow
-	// for subclasses for other then SWF movies
-	movie_instance(movie_definition* def, DisplayObject* parent);
+	SWFMovie(const SWFMovieDefinition* const def, DisplayObject* parent);
 
-	virtual ~movie_instance() {}
+	virtual ~SWFMovie() {}
 
 	virtual void advance();
+
+    virtual float frameRate() const {
+        return _def->get_frame_rate();
+    }
+
+    virtual float widthPixels() const {
+        return _def->get_width_pixels();
+    }
+
+    virtual float heightPixels() const {
+        return _def->get_height_pixels();
+    }
+
+    virtual bool ensureFrameLoaded(size_t frameNo) const {
+        return _def->ensure_frame_loaded(frameNo);
+    }
 
 	/// Handle a top-level movie on stage placement.
 	//
@@ -60,12 +72,24 @@ public:
 	///
 	void stagePlacementCallback(as_object* initObj = 0);
 
+    const std::string& url() const {
+        return _def->get_url();
+    }
+
+    int version() const {
+        return _def->get_version();
+    }
+
 	/// Set a DisplayObject in the dictionary as initialized, returning
 	/// true if not already initialized.
 	bool setCharacterInitialized(int cid)
 	{
 		return _initializedCharacters.insert(cid).second;
 	}
+
+    const movie_definition* definition() const {
+        return _def.get();
+    }
 
 private:
 
@@ -76,7 +100,8 @@ private:
 	///
 	std::set<int> _initializedCharacters;
 
-	boost::intrusive_ptr<movie_definition> _def;
+    /// This should only be a top-level movie, not a sprite_definition.
+	const boost::intrusive_ptr<const SWFMovieDefinition> _def;
 };
 
 

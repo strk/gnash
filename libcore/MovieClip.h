@@ -46,7 +46,7 @@
 
 // Forward declarations
 namespace gnash {
-    class movie_instance;
+    class Movie;
     class swf_event;
     class drag_state;
     class LoadVariablesThread;
@@ -62,12 +62,27 @@ namespace gnash {
 namespace gnash
 {
 
-/// Stateful Sprite object. Also known as a MovieClip.
+/// A MovieClip is a container for DisplayObjects.
 //
-/// Instance of this class are also known as "timelines".
-/// This means that they define a variable scope (see
-/// the as_environment member) and are divided into "frames"
-///
+/// In AS3 is it distinguished from a Sprite by having a timeline, i.e.
+/// more than one frame. In AS2, there is no Sprite class.
+//
+/// There are basically two types of MovieClip: dynamic and non-dynamic.
+/// Dynamic clips are created using createEmptyMovieClip() or 
+/// duplicateMovieClip(). Non-dynamic MovieClips are parsed from a SWF file.
+/// The isDynamic() member function is the only way to tell the difference
+/// (see following paragraph).
+//
+/// The presence of a definition (the _def member) reveals whether the
+/// MovieClip was constructed with an immutable definition or not. MovieClips
+/// created using createEmptyMovieClip() have no definition. MovieClips
+/// constructed using duplicateMovieClip() have the same definition as the
+/// duplicated clip. They are "dynamic", but may have a definition!
+//
+/// A MovieClip always has an _swf member. This is the top-level SWF 
+/// (Movie) containing either the definition or the code from
+/// which the MovieClip was created. The _url member and SWF version are
+/// dependent on the _swf. Exports are also sought in this Movie.
 class MovieClip : public InteractiveObject 
 {
 
@@ -77,20 +92,25 @@ public:
 
     typedef movie_definition::PlayList PlayList;
 
-    typedef std::vector<swf_event*> SWFEventsVector;
+    enum PlayState
+    {
+        PLAYSTATE_PLAY,
+        PLAYSTATE_STOP
+    };
 
     /// Construct a MovieClip instance
     //
     /// @param def
     ///     Pointer to the movie_definition this object is an
     ///     instance of (may be a top-level movie or a sprite).
+    ///     This may be 0 if there is no immutable definition.
     ///
     /// @param root
-    /// The "relative" _root of this sprite, which is the 
+    /// The "relative" _swf of this sprite, which is the 
     /// instance of top-level sprite defined by the same
     /// SWF that also contained *this* sprite definition.
     /// Note that this can be *different* from the top-level
-    /// movie accessible trought the VM, in case this sprite
+    /// movie accessible through the VM, in case this sprite
     /// was defined in an externally loaded movie.
     ///
     /// @param parent
@@ -103,22 +123,15 @@ public:
     ///     to be deprecated if every instance has a reference to its
     ///     definition, which should know its id...
     ///
-    MovieClip(movie_definition* def, movie_instance* root,
+    MovieClip(const movie_definition* const def, Movie* root,
             DisplayObject* parent, int id);
 
     virtual ~MovieClip();
 
-    enum PlayState
-    {
-        PLAYSTATE_PLAY,
-        PLAYSTATE_STOP
-    };
+    // Return the originating SWF
+    virtual Movie* get_root() const;
 
-
-    // Overridden to use the m_root member
-    virtual movie_instance* get_root() const;
-
-    /// Return the _root ActionScript property of this sprite.
+    /// Return the _swf ActionScript property of this sprite.
     //
     /// Relative or absolute is determined by
     /// the _lockroot property, see getLockRoot
@@ -126,37 +139,21 @@ public:
     ///
     virtual const MovieClip* getAsRoot() const;
 
-    /// \brief
-    /// Return the sprite_definition (or movie_definition)
-    /// from which this MovieClip has been created
-    movie_definition* get_movie_definition() {
-        return _def.get();
-    }
-
-    /// \brief
-    /// Return version of the SWF definition of this instance
-    /// as been parsed from.
-    //
-    int getSWFVersion() const
-    {
-        return _def->get_version();
-    }
-
     /// Get the composite bounds of all component drawing elements
     virtual rect getBounds() const;
 
     // See dox in DisplayObject.h
-    bool pointInShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInShape(boost::int32_t x, boost::int32_t y) const;
 
     // See dox in DisplayObject.h
-    bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const;
 
     /// return true if the given point is located in a(this) hitable sprite.
     ///
     /// all sprites except mouse-insensitive dynamic masks are hitable.
     /// _visible property is ignored for hitable DisplayObjects.
     ///
-    bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
+    virtual bool pointInHitableShape(boost::int32_t x, boost::int32_t y) const;
 
     /// Return 0-based index to current frame
     size_t get_current_frame() const
@@ -166,7 +163,7 @@ public:
 
     size_t get_frame_count() const
     {
-        return _def->get_frame_count();
+        return _def ? _def->get_frame_count() : 1;
     }
 
     /// Return number of completely loaded frames of this sprite/movie
@@ -176,7 +173,7 @@ public:
     ///
     size_t get_loaded_frames() const
     {
-        return _def->get_loading_frame();
+        return _def ? _def->get_loading_frame() : 1;
     }
 
     /// Return total number of bytes in the movie
@@ -195,7 +192,8 @@ public:
 
     const rect& get_frame_size() const
     {
-        return _def->get_frame_size();
+        static const rect r;
+        return _def ? _def->get_frame_size() : r;
     }
 
     /// Stop or play the sprite.
@@ -206,11 +204,6 @@ public:
     DSOEXPORT void setPlayState(PlayState s);
 
     PlayState getPlayState() const { return _playState; }
-
-    DisplayObject* getDisplayObject(int DisplayObject_id);
-
-    // delegates to movie_root (possibly wrong)
-    virtual float get_background_alpha() const;
 
     // delegates to movie_root (possibly wrong)
     void set_background_color(const rgba& color);
@@ -778,13 +771,12 @@ public:
     void constructAsScriptObject();
 
 
-    /// Return true if get_root() should return the *relative* root,
+    /// Return true if getAsRoot() should return the *relative* root,
     /// false otherwise.
     bool getLockRoot() const { return _lockroot; }
 
-    /// Set whether get_root() should return the *relative* root,
+    /// Set whether getAsRoot() should return the *relative* root,
     /// false otherwise. True for relative root.
-    ///
     void setLockRoot(bool lr) { _lockroot=lr; }
 
     /// Getter-setter for MovieClip._lockroot
@@ -795,13 +787,14 @@ public:
     virtual InfoTree::iterator getMovieInfo(InfoTree& tr,
             InfoTree::iterator it);
 #endif
+    
+    /// \brief
+    /// Return version of the SWF definition of this instance
+    /// as been parsed from.
+    //
+    int getSWFVersion() const;
 
 protected:
-
-    /// Used both by this class and movie_instance.
-    //
-    /// TODO: do this with proper Sprite -> MovieClip inheritance.
-    void advance_sprite();
 
 #ifdef GNASH_USE_GC
     /// Mark sprite-specific reachable resources and invoke
@@ -813,18 +806,22 @@ protected:
     /// - sprite environment
     /// - definition the sprite has been instantiated from
     /// - Textfields having an associated variable registered in this instance.
-    /// - Relative root of this instance (m_root)
+    /// - Relative root of this instance (_swf)
     ///
     virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
     
-    // Used by BitmapMovieInstance.
+    // Used by BitmapMovie.
     void placeDisplayObject(DisplayObject* ch, int depth) {       
         _displayList.placeDisplayObject(ch, depth);  
     }
 
 private:
 
+    typedef std::vector<boost::intrusive_ptr<TextField> > TextFields;
+
+    /// A container for textfields, indexed by their variable name
+    typedef std::map<std::string, TextFields> TextFieldIndex;
 
     /// Process any completed loadVariables request
     void processCompletedLoadVariableRequests();
@@ -932,13 +929,32 @@ private:
     /// Increment _currentFrame, and take care of looping.
     void increment_frame_and_check_for_loop();
     
-    /// List of loadVariables requests
-    typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
+    /// \brief
+    /// Returns a vector of TextField associated with the given variable name,
+    /// or NULL if no such variable name is known.
+    //
+    /// A TextField variable is a variable that acts
+    /// as a setter/getter for a TextField 'text' member.
+    ///
+    /// Search is case-sensitive.
+    ///
+    /// @todo find out wheter we should be case sensitive or not
+    ///
+    /// @return a pointer inside a vector, will be invalidated by modifications
+    ///         of the vector (set_textfield_variable)
+    ///
+    TextFields* get_textfield_variable(const std::string& name);
+
+    /// Unregister textfield variables bound to unloaded TextFields
+    void cleanup_textfield_variables();
 
     /// This is either sprite_definition (for sprites defined by
     /// DefineSprite tag) or movie_def_impl (for the top-level movie).
-    boost::intrusive_ptr<movie_definition>  _def;
+    const boost::intrusive_ptr<const movie_definition> _def;
 
+    /// List of loadVariables requests
+    typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
+    
     /// List of active loadVariable requests 
     //
     /// At ::advance_sprite time, all completed requests will
@@ -947,17 +963,13 @@ private:
     LoadVariablesThreads _loadVariableRequests;
 
     /// The SWF that this MovieClip belongs to.
-    movie_instance* m_root;
+    Movie* _swf;
 
     /// Current Display List contents.
     DisplayList _displayList;
 
     /// The canvas for dynamic drawing
     DynamicShape _drawable;
-
-    // this is deprecated, we'll be pushing gotoframe target
-    // actions to the global action queue
-    //ActionList    m_goto_frame_action_list;
 
     PlayState _playState;
 
@@ -973,35 +985,10 @@ private:
     /// This timeline's variable scope
     as_environment _environment;
 
-    typedef boost::intrusive_ptr<TextField> TextFieldPtr;
-    typedef std::vector<TextFieldPtr> TextFieldPtrVect;
-
-    /// A container for textfields, indexed by their variable name
-    typedef std::map< std::string, TextFieldPtrVect > TextFieldMap;
-
-    /// We'll only allocate Textfield variables map if
+   /// We'll only allocate Textfield variables map if
     /// we need them (ie: anyone calls set_textfield_variable)
     ///
-    std::auto_ptr<TextFieldMap> _text_variables;
-
-    /// \brief
-    /// Returns a vector of TextField associated with the given variable name,
-    /// or NULL if no such variable name is known.
-    //
-    /// A TextField variable is a variable that acts
-    /// as a setter/getter for a TextField 'text' member.
-    ///
-    /// Search is case-sensitive.
-    ///
-    /// @todo find out wheter we should be case sensitive or not
-    ///
-    /// @return a pointer inside a vector, will be invalidated by modifications
-    ///         of the vector (set_textfield_variable)
-    ///
-    TextFieldPtrVect* get_textfield_variable(const std::string& name);
-
-    /// Unregister textfield variables bound to unloaded TextFields
-    void cleanup_textfield_variables();
+    std::auto_ptr<TextFieldIndex> _text_variables;
 
     /// soundid for current playing stream. If no stream set to -1
     int m_sound_stream_id;

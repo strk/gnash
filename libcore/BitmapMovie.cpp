@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#include "BitmapMovieInstance.h"
+#include "BitmapMovie.h"
 #include "BitmapMovieDefinition.h"
 #include "fill_style.h"
 #include "Geometry.h" // for class path and class edge
@@ -23,25 +23,24 @@
 
 namespace gnash {
 
-BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
+BitmapMovie::BitmapMovie(const BitmapMovieDefinition* const def,
         DisplayObject* parent)
 	:
-	movie_instance(def, parent)
-{  
-	// We need to assign a DisplayObject id to the instance, or an assertion
-	// will fail in DisplayObject.cpp (parent==NULL || id != -1)
+	Movie(def, parent),
+    _def(def)
+{
+}
 
-	assert(def);
-	boost::intrusive_ptr<DisplayObject> ch = def->createDisplayObject(this, 1);
-	
-	const int depth = 1 + DisplayObject::staticDepthOffset;
-	placeDisplayObject(ch.get(), depth);
+void
+BitmapMovie::display()
+{
+    _def->shape().display(*this);
 }
 
 std::auto_ptr<GnashImage>
-BitmapMovieInstance::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-                                  DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
-                                  bool /* smooth */)
+BitmapMovie::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
+             DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
+             bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }

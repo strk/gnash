@@ -116,11 +116,10 @@ GtkAggXvGlue::setupRendering()
     if (first && VM::isInitialized()) {
         first = false;
         
-        movie_definition* def = VM::get().getRoot().get_movie_definition();
-        assert(def);
+        const Movie& mi = VM::get().getRoot().getRootMovie();
     
-        _movie_width = def->get_width_pixels();
-        _movie_height = def->get_height_pixels();        
+        _movie_width = mi.widthPixels();
+        _movie_height = mi.heightPixels();        
     
         if (!create_xv_shmimage(_movie_width, _movie_height)) {
             if (!create_xv_image(_movie_width, _movie_height)) {

@@ -66,17 +66,6 @@ public:
 	sprite_definition(movie_definition& m, SWFStream& in,
             const RunInfo& runInfo);
 
-	/// \brief
-	/// Create an empty sprite
-	//
-	/// A sprite definition consists of a series control tags.
-	///
-	/// @param m
-	///	the Top-Level movie_definition this sprite is read
-	///	from (not a sprite_definition!)
-	sprite_definition(movie_definition& m);
-
-
 	/// Destructor, releases playlist data
 	~sprite_definition();
 
@@ -93,7 +82,7 @@ public:
 	void registerClass(as_function* the_class);
 
 	/// Get the Class registered to this definition.
-	as_function* getRegisteredClass()
+	as_function* getRegisteredClass() const
 	{
 		return registeredClass.get();
 	}
@@ -284,7 +273,8 @@ private:
 	virtual void add_frame_name(const std::string& name);
 
 	// See dox in movie_definition
-	bool get_labeled_frame(const std::string& label, size_t& frame_number);
+	bool get_labeled_frame(const std::string& label, size_t& frame_number)
+        const;
 
 	/// frame_number is 0-based
 	const PlayList* getPlaylist(size_t frame_number) const
@@ -307,7 +297,7 @@ private:
 	/// Ensure framenum frames of this sprite
 	/// have been loaded.
 	///
-	virtual bool ensure_frame_loaded(size_t framenum)
+	virtual bool ensure_frame_loaded(size_t framenum) const
 	{
 		// TODO: return false on timeout
 		while ( m_loading_frame < framenum )

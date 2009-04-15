@@ -459,7 +459,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 		Property* prop = _members.getProperty(key, nsname);
 		// TODO: add ignoreVisibility parameter to allow using 
         // __proto__ even when not visible ?
-		if (prop && prop->isVisible(swfVersion))
+		if (prop && prop->visible(swfVersion))
 		{
 			if (owner != NULL)
 				*owner = this;
@@ -485,7 +485,7 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
 			throw ActionLimitException("Lookup depth exceeded.");
 
 		Property* prop = obj->_members.getProperty(key);
-		if (prop && prop->isVisible(swfVersion) )
+		if (prop && prop->visible(swfVersion) )
 		{
 			if (owner != NULL)
 				*owner = obj.get();
@@ -509,7 +509,7 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 	// We won't scan the inheritance chain if we find a member,
 	// even if invisible.
 	// 
-	if ( prop )	return prop;  // TODO: what about isVisible ?
+	if ( prop )	return prop;  // TODO: what about visible ?
 
 	// don't enter an infinite loop looking for __proto__ ...
 	if (key == NSV::PROP_uuPROTOuu) return NULL;
@@ -529,7 +529,7 @@ as_object::findUpdatableProperty(string_table::key key, string_table::key nsname
 			throw ActionLimitException("Property lookup depth exceeded.");
 
 		Property* p = obj->_members.getProperty(key, nsname);
-		if (p && (p->isGetterSetter() | p->isStatic()) && p->isVisible(swfVersion))
+		if (p && (p->isGetterSetter() | p->isStatic()) && p->visible(swfVersion))
 		{
 			return p; // What should we do if this is not a getter/setter ?
 		}
@@ -1140,7 +1140,7 @@ as_object::get_prototype()
 
 	Property* prop = _members.getProperty(NSV::PROP_uuPROTOuu);
 	if ( ! prop ) return 0;
-	if ( ! prop->isVisible(swfVersion) ) return 0;
+	if ( ! prop->visible(swfVersion) ) return 0;
 
 	as_value tmp = prop->getValue(*this);
 

@@ -47,16 +47,17 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Initialize gnash lib
 	gnashInit();
+    
+    RunInfo ri("");
 
 	// Initialize a VM
-	boost::intrusive_ptr<movie_definition> md5 ( new DummyMovieDefinition(5) );
-	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
+	boost::intrusive_ptr<movie_definition> md5(new DummyMovieDefinition(ri, 5));
+	boost::intrusive_ptr<movie_definition> md6(new DummyMovieDefinition(ri, 6));
 
 	ManualClock clock;
-    RunInfo ri("");
     movie_root stage(*md5, clock, ri);
 
-	movie_instance* root = md5->create_movie_instance();
+	Movie* root = md5->createMovie();
     stage.setRootMovie( root );
 
 	DisplayList dlist1;

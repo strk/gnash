@@ -33,7 +33,7 @@
 #include "fn_call.h"
 #include "Key_as.h"
 #include "movie_root.h"
-#include "movie_instance.h"
+#include "Movie.h"
 #include "swf_event.h"
 #include "sprite_definition.h"
 #include "ActionExec.h"
@@ -267,7 +267,7 @@ public:
             }
             return;
         }
-        if (! ch->isVisible()) return;
+        if (! ch->visible()) return;
 
         _candidates.push_back(ch);
     }
@@ -479,28 +479,25 @@ private:
 } // anonymous namespace
 
 
-MovieClip::MovieClip(movie_definition* def, movie_instance* r,
+MovieClip::MovieClip(const movie_definition* const def, Movie* r,
         DisplayObject* parent, int id)
     :
     InteractiveObject(parent, id),
     _def(def),
-    m_root(r),
+    _swf(r),
     _playState(PLAYSTATE_PLAY),
     _currentFrame(0),
     _hasLooped(false),
     _callingFrameActions(false),
     _environment(_vm),
     m_sound_stream_id(-1),
-    _userCxform(),
     _droptarget(),
     _lockroot(false)
 {
-    assert(_def != NULL);
-    assert(m_root != NULL);
+    assert(_swf);
 
     set_prototype(getMovieClipInterface());
             
-    //m_root->add_ref();    // @@ circular!
     _environment.set_target(this);
 
     // TODO: have the 'MovieClip' constructor take care of this !
@@ -512,13 +509,16 @@ MovieClip::~MovieClip()
 {
     stopStreamSound();
 
-    // We might have been deleted by Quit... 
-    //assert(isDestroyed());
-
     _vm.getRoot().remove_key_listener(this);
     _vm.getRoot().remove_mouse_listener(this);
 
     deleteAllChecked(_loadVariableRequests);
+}
+
+int
+MovieClip::getSWFVersion() const
+{
+    return _swf->version();
 }
 
 // Execute the actions in the action list, in the given
@@ -586,7 +586,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     unsigned int levelno;
     if ( mr.isLevelTarget(name, levelno) )
     {
-        movie_instance* mo = _vm.getRoot().getLevel(levelno).get();
+        Movie* mo = _vm.getRoot().getLevel(levelno).get();
         if ( mo )
         {
             val->set_as_object(mo);
@@ -637,13 +637,13 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     }
 
     // Try textfield variables
-    TextFieldPtrVect* etc = get_textfield_variable(name);
+    TextFields* etc = get_textfield_variable(name);
     if ( etc )
     {
-        for (TextFieldPtrVect::const_iterator i=etc->begin(), e=etc->end();
+        for (TextFields::const_iterator i=etc->begin(), e=etc->end();
                 i!=e; ++i)
         {
-            TextFieldPtr tf = *i;
+            boost::intrusive_ptr<TextField> tf = i->get();
             if ( tf->getTextDefined() )
             {
                 val->set_string(tf->get_text_value());
@@ -675,7 +675,10 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
 bool
 MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
-    //GNASH_REPORT_FUNCTION;
+
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames.
+    if (!_def) return false;
 
     std::string fspecStr = frame_spec.to_string();
 
@@ -708,6 +711,10 @@ MovieClip::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 void
 MovieClip::call_frame_actions(const as_value& frame_spec)
 {
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames.
+    if (!_def) return;
+
     size_t frame_number;
     if ( ! get_frame_number(frame_spec, frame_number) )
     {
@@ -718,13 +725,6 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
         );
         return;
     }
-
-#if 0 // why would we want to do this ?
-    // Set the current sound_stream_id to -1, meaning that no stream are
-    // active. If there are an active stream it will be updated while
-    // executing the ControlTags.
-    set_sound_stream_id(-1);
-#endif
 
     // Execute the ControlTag actions
     // We set _callingFrameActions to true so that add_action_buffer
@@ -751,11 +751,7 @@ MovieClip::call_frame_actions(const as_value& frame_spec)
 DisplayObject*
 MovieClip::add_empty_movieclip(const std::string& name, int depth)
 {
-    // empty_movieclip_def will be deleted during deleting movieclip
-    sprite_definition* empty_sprite_def =
-        new sprite_definition(*get_movie_definition());
-
-    MovieClip* movieclip = new MovieClip(empty_sprite_def, m_root, this, 0);
+    MovieClip* movieclip = new MovieClip(0, _swf, this, 0);
     movieclip->set_name(name);
     movieclip->setDynamic();
 
@@ -811,7 +807,7 @@ MovieClip::duplicateMovieClip(const std::string& newname, int depth,
     }
 
     boost::intrusive_ptr<MovieClip> newmovieclip = new MovieClip(_def.get(),
-            m_root, parent, get_id());
+            _swf, parent, get_id());
     newmovieclip->set_name(newname);
 
     newmovieclip->setDynamic();
@@ -885,32 +881,24 @@ MovieClip::on_event(const event_id& id)
 
     bool called = false;
             
-    // First, check for clip event handler.
+    std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
+    if ( code.get() )
     {
-        std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
-        if ( code.get() )
-        {
-            // Dispatch.
-            code->execute();
+        // Dispatch.
+        code->execute();
 
-            called = true;
-        }
+        called = true;
     }
-
-    // Fall through and call the function also, if it's defined!
-
 
     // user-defined onInitialize is never called
-    if ( id.id() == event_id::INITIALIZE )
-    {
-            testInvariant();
-            return called;
+    if ( id.id() == event_id::INITIALIZE ) {
+        testInvariant();
+        return called;
     }
 
-
     // NOTE: user-defined onLoad is not invoked for static
-    //             clips on which no clip-events are defined.
-    //             see testsuite/misc-ming.all/action_execution_order_extend_test.swf
+    //     clips on which no clip-events are defined.
+    //     see testsuite/misc-ming.all/action_execution_order_extend_test.swf
     //
     //     Note that this can't be true for movieclips
     //     not placed by PlaceObject, see
@@ -920,8 +908,8 @@ MovieClip::on_event(const event_id& id)
     //     a registered class on them, see
     //     testsuite/misc-ming.all/registerClassTest2.swf
     //
-    //     TODO: test the case in which it's MovieClip.prototype.onLoad defined !
-    //
+    //     TODO: test the case in which it's MovieClip.prototype.onLoad
+    //     defined !
     if ( id.id() == event_id::LOAD )
     {
         // TODO: we're likely making too much noise for nothing here,
@@ -937,8 +925,8 @@ MovieClip::on_event(const event_id& id)
             // nor if it's dynamic  
             if ( isDynamic() ) break;
 
-            sprite_definition* def =
-                dynamic_cast<sprite_definition*>(_def.get());
+            const sprite_definition* def =
+                dynamic_cast<const sprite_definition*>(_def.get());
 
             // must be a loaded movie (loadMovie doesn't mark it as 
             // "dynamic" - should it? no, or getBytesLoaded will always
@@ -987,12 +975,8 @@ MovieClip::on_event(const event_id& id)
 as_object*
 MovieClip::get_path_element(string_table::key key)
 {
-    //log_debug("%s.get_path_element(%s) called", getTarget(), _vm.getStringTable().value(key));
     as_object* obj = getPathElementSeparator(key);
-    if ( obj )
-    {
-        return obj;
-    }
+    if (obj) return obj;
 
     std::string name = _vm.getStringTable().value(key);
 
@@ -1052,16 +1036,15 @@ MovieClip::set_member(string_table::key name,
     //                property (ie: have a textfield use _x as variable name and
     //                be scared)
     //
-    TextFieldPtrVect* etc = get_textfield_variable(_vm.getStringTable().value(name));
+    TextFields* etc = get_textfield_variable(_vm.getStringTable().value(name));
     if ( etc )
     {
 #ifdef DEBUG_DYNTEXT_VARIABLES
         log_debug(_("it's a Text Variable, associated with %d TextFields"), etc->size());
 #endif
-        for (TextFieldPtrVect::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
+        for (TextFields::iterator i=etc->begin(), e=etc->end(); i!=e; ++i)
         {
-            TextFieldPtr tf = *i;
-            tf->updateText(val.to_string());
+            (*i)->updateText(val.to_string());
         }
         found = true;
     }
@@ -1086,9 +1069,16 @@ MovieClip::unloadMovie()
     LOG_ONCE(log_unimpl("MovieClip.unloadMovie()"));
 }
 
+// child movieclip advance
 void
-MovieClip::advance_sprite()
+MovieClip::advance()
 {
+
+#ifdef GNASH_DEBUG
+    log_debug(_("Advance movieclip '%s' at frame %u/%u"),
+        getTargetPath(), _currentFrame,
+        get_frame_count());
+#endif
 
     assert(!isUnloaded());
 
@@ -1096,15 +1086,13 @@ MovieClip::advance_sprite()
     assert(!_callingFrameActions);
 
     // We might have loaded NO frames !
-    if ( get_loaded_frames() == 0 )
-    {
+    if (get_loaded_frames() == 0) {
         IF_VERBOSE_MALFORMED_SWF(
         LOG_ONCE( log_swferror(_("advance_movieclip: no frames loaded "
                     "for movieclip/movie %s"), getTarget()) );
         );
         return;
     }
-
 
     // Process any pending loadVariables request
     processCompletedLoadVariableRequests();
@@ -1138,7 +1126,8 @@ MovieClip::advance_sprite()
 #endif
 
         // Execute the current frame's tags.
-        // First time executeFrameTags(0) executed in dlist.cpp(child) or SWFMovieDefinition(root)
+        // First time executeFrameTags(0) executed in dlist.cpp(child) or
+        // SWFMovieDefinition(root)
         if (_currentFrame != (size_t)prev_frame)
         {
             if ( _currentFrame == 0 && has_looped() )
@@ -1155,7 +1144,8 @@ MovieClip::advance_sprite()
                 log_debug(_("Executing frame%d (0-based) tags of movieclip "
                             "%s"), _currentFrame, getTarget());
 #endif
-                // Make sure _currentFrame is 0-based during execution of DLIST tags
+                // Make sure _currentFrame is 0-based during execution of
+                // DLIST tags
                 executeFrameTags(_currentFrame, _displayList,
                         SWF::ControlTag::TAG_DLIST |
                         SWF::ControlTag::TAG_ACTION);
@@ -1166,38 +1156,16 @@ MovieClip::advance_sprite()
 #ifdef GNASH_DEBUG
     else
     {
-        log_debug(_("MovieClip::advance_movieclip we're in PLAYSTATE_STOP mode"));
-        // shouldn't we execute frame tags anyway when in PLAYSTATE_STOP mode ?
-        //executeFrameTags(_currentFrame);
+        log_debug(_("MovieClip::advance_movieclip we're in STOP mode"));
     }
 #endif
-}
-
-// child movieclip advance
-void
-MovieClip::advance()
-{
-//    GNASH_REPORT_FUNCTION;
-
-#ifdef GNASH_DEBUG
-    log_debug(_("Advance movieclip '%s' at frame %u/%u"),
-        getTargetPath(), _currentFrame,
-        get_frame_count());
-#endif
-
-    // child movieclip frame rate is the same the root movieclip frame rate
-    // that's why it is not needed to analyze 'm_time_remainder'
-
-    advance_sprite();
 
 }
 
 void
 MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-    // WARNING! get_root() would depend on _lockroot !!
-    movie_instance* mi = m_root; 
-    if ( mi->setCharacterInitialized(cid) )
+    if ( _swf->setCharacterInitialized(cid) )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),
@@ -1220,13 +1188,10 @@ MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 void
 MovieClip::execute_action(const action_buffer& ab)
 {
-    as_environment& env = _environment; // just type less
-
-    ActionExec exec(ab, env);
+    ActionExec exec(ab, _environment);
     exec();
 }
 
-/*private*/
 void
 MovieClip::restoreDisplayList(size_t tgtFrame)
 {
@@ -1259,8 +1224,11 @@ MovieClip::restoreDisplayList(size_t tgtFrame)
 void
 MovieClip::executeFrameTags(size_t frame, DisplayList& dlist, int typeflags)
 {
-    testInvariant();
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames.
+    if (!_def) return;
 
+    testInvariant();
     assert(typeflags);
 
     const PlayList* playlist = _def->getPlaylist(frame);
@@ -1406,7 +1374,7 @@ MovieClip::goto_frame(size_t target_frame_number)
             // are executed. This means NO actions will be
             // pushed on m_action_list.
             executeFrameTags(_currentFrame, _displayList,
-                   SWF::ControlTag::TAG_DLIST);
+                    SWF::ControlTag::TAG_DLIST);
         }
         assert(_currentFrame == target_frame_number);
 
@@ -1417,16 +1385,21 @@ MovieClip::goto_frame(size_t target_frame_number)
         bool callingFrameActionsBackup = _callingFrameActions;
         _callingFrameActions = false;
         executeFrameTags(target_frame_number, _displayList,
-                SWF::ControlTag::TAG_DLIST |
-                SWF::ControlTag::TAG_ACTION);
+                SWF::ControlTag::TAG_DLIST | SWF::ControlTag::TAG_ACTION);
         _callingFrameActions = callingFrameActionsBackup;
     }
 
     assert(_currentFrame == target_frame_number);
 }
 
-bool MovieClip::goto_labeled_frame(const std::string& label)
+bool
+MovieClip::goto_labeled_frame(const std::string& label)
 {
+
+    // If there is no definition, this is a dynamically-created MovieClip
+    // and has no frames. (We are also probably not called in this case).
+    if (!_def) return false;
+
     size_t target_frame;
     if (_def->get_labeled_frame(label, target_frame))
     {
@@ -1464,14 +1437,14 @@ void MovieClip::display()
 
 void MovieClip::omit_display()
 {
-    if (m_child_invalidated)
-        _displayList.omit_display();
+    if (m_child_invalidated) _displayList.omit_display();
         
     clear_invalidated();
 }
 
 bool
-MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObject)
+MovieClip::attachCharacter(DisplayObject& newch, int depth,
+        as_object* initObject)
 { 
     _displayList.placeDisplayObject(&newch, depth, initObject);    
 
@@ -1481,8 +1454,8 @@ MovieClip::attachCharacter(DisplayObject& newch, int depth, as_object* initObjec
 
 std::auto_ptr<GnashImage>
 MovieClip::drawToBitmap(const SWFMatrix& /* mat */, const cxform& /* cx */,
-                        DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
-                        bool /* smooth */)
+            DisplayObject::BlendMode /* bm */, const rect& /* clipRect */,
+            bool /* smooth */)
 {
     return std::auto_ptr<GnashImage>();
 }
@@ -1491,15 +1464,16 @@ void
 MovieClip::attachBitmap(boost::intrusive_ptr<BitmapData_as> bd, int depth)
 {
     DisplayObject* ch = new Bitmap(bd, this, 0);
-
     attachCharacter(*ch, depth, 0);
-
 }
 
 DisplayObject*
 MovieClip::add_display_object(const SWF::PlaceObject2Tag* tag,
         DisplayList& dlist)
 {
+
+    // If this MovieClip has no definition, it should also have no ControlTags,
+    // and this shouldn't be called.
     assert(_def);
     assert(tag);
 
@@ -1563,9 +1537,13 @@ MovieClip::move_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dli
         NULL);
 }
 
-void MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag, DisplayList& dlist)
+void
+MovieClip::replace_display_object(const SWF::PlaceObject2Tag* tag,
+        DisplayList& dlist)
 {
-    assert(_def != NULL);
+    // A MovieClip without a definition cannot have any ControlTags, so this
+    // should not be called.
+    assert(_def);
     assert(tag != NULL);
 
     SWF::DefinitionTag* cdef = _def->getDefinitionTag(tag->getID());
@@ -1691,7 +1669,7 @@ MovieClip::pointInShape(boost::int32_t x, boost::int32_t y) const
 bool
 MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 {
-    if ( ! isVisible() ) return false;
+    if ( ! visible() ) return false;
     if ( isDynamicMask() && ! mouseEnabled() )
     {
         // see testsuite/misc-ming.all/masks_test.swf
@@ -1702,7 +1680,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
         return false;
     }
     DisplayObject* mask = getMask(); // dynamic one
-    if ( mask && mask->isVisible() && ! mask->pointInShape(x, y) )
+    if ( mask && mask->visible() && ! mask->pointInShape(x, y) )
     {
 #ifdef GNASH_DEBUG_HITTEST
         log_debug(_("%s is dynamically masked by %s, which "
@@ -1748,10 +1726,10 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
     //GNASH_REPORT_FUNCTION;
 
-    if (!isVisible()) return 0;
+    if (!visible()) return 0;
 
     // point is in parent's space, we need to convert it in world space
-    point    wp(x, y);
+    point wp(x, y);
     DisplayObject* parent = get_parent();
     if ( parent ) 
     {
@@ -1763,9 +1741,9 @@ MovieClip::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
         parent->getWorldMatrix().transform(wp);
     }
 
-    if ( mouseEnabled() )
+    if (mouseEnabled())
     {
-        if ( pointInVisibleShape(wp.x, wp.y) ) return this;
+        if (pointInVisibleShape(wp.x, wp.y)) return this;
         else return NULL;
     }
 
@@ -1839,7 +1817,7 @@ public:
 
         if ( ch->isMaskLayer() )
         {
-            if ( ! ch->isVisible() )
+            if ( ! ch->visible() )
             {
                 log_debug(_("FIXME: invisible mask in MouseEntityFinder."));
             }
@@ -1899,7 +1877,7 @@ MovieClip::findDropTarget(boost::int32_t x, boost::int32_t y,
 {
     if ( this == dragging ) return 0; // not here...
 
-    if ( ! isVisible() ) return 0; // isn't me !
+    if ( ! visible() ) return 0; // isn't me !
 
     DropTargetFinder finder(x, y, dragging);
     _displayList.visitAll(finder);
@@ -1938,7 +1916,7 @@ MovieClip::mouseEnabled() const
 
     static const size_t size = sizeof(EH) / sizeof(EH[0]);
 
-    for (size_t i = 0; i < size; i++)
+    for (size_t i = 0; i < size; ++i)
     {
         const event_id &event = EH[i];
 
@@ -1958,29 +1936,10 @@ MovieClip::mouseEnabled() const
     return false;
 }
 
-DisplayObject*
-MovieClip::getDisplayObject(int /* id */)
-{
-    //return _def->getDefinitionTag(id);
-    // @@ TODO -- look through our dlist for a match
-    log_unimpl(_("%s doesn't even check for a char"),
-        __PRETTY_FUNCTION__);
-    return NULL;
-}
-
-
 void
 MovieClip::stop_drag()
 {
-    //assert(m_parent == NULL); // why should we care ?
     _vm.getRoot().stop_drag();
-}
-
-float
-MovieClip::get_background_alpha() const
-{
-    // @@ this doesn't seem right...
-    return _vm.getRoot().get_background_alpha();
 }
 
 void
@@ -1989,36 +1948,24 @@ MovieClip::set_background_color(const rgba& color)
     _vm.getRoot().set_background_color(color);
 }
 
-static bool isTextFieldUnloaded(boost::intrusive_ptr<TextField>& p)
-{
-    return p->isUnloaded();
-}
-
-/*private*/
 void
 MovieClip::cleanup_textfield_variables()
 {
     // nothing to do
-    if ( ! _text_variables.get() ) return;
+    if (!_text_variables.get()) return;
 
-    TextFieldMap& m = *_text_variables;
+    TextFieldIndex& m = *_text_variables;
 
-    for (TextFieldMap::iterator i=m.begin(), ie=m.end(); i!=ie; ++i)
+    for (TextFieldIndex::iterator i=m.begin(), ie=m.end(); i!=ie; ++i)
     {
-        TextFieldPtrVect& v=i->second;
-        TextFieldPtrVect::iterator lastValid = 
-            std::remove_if(v.begin(), v.end(),
-                    boost::bind(isTextFieldUnloaded, _1));
+        TextFields& v=i->second;
+        TextFields::iterator lastValid = std::remove_if(v.begin(), v.end(),
+                    boost::mem_fn(&DisplayObject::isUnloaded));
         v.erase(lastValid, v.end());
-        // TODO: remove the map element if vector is empty
-        //if ( v.empty() )
-        //{
-        //}
     }
 }
 
 
-/* public */
 void
 MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
 {
@@ -2027,29 +1974,22 @@ MovieClip::set_textfield_variable(const std::string& name, TextField* ch)
     // lazy allocation
     if ( ! _text_variables.get() )
     {
-        _text_variables.reset(new TextFieldMap);
+        _text_variables.reset(new TextFieldIndex);
     }
     
     (*_text_variables)[name].push_back(ch);
 }
 
-/* private */
-MovieClip::TextFieldPtrVect*
+MovieClip::TextFields*
 MovieClip::get_textfield_variable(const std::string& name)
 {
     // nothing allocated yet...
     if ( ! _text_variables.get() ) return NULL;
 
     // TODO: should variable name be considered case-insensitive ?
-    TextFieldMap::iterator it = _text_variables->find(name);
-    if ( it == _text_variables->end() )
-    {
-        return 0;
-    }
-    else
-    {
-        return &(it->second);
-    }
+    TextFieldIndex::iterator it = _text_variables->find(name);
+    if (it == _text_variables->end()) return 0;
+    else return &(it->second);
 } 
 
 
@@ -2059,7 +1999,7 @@ MovieClip::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
     // nothing to do if this movieclip is not visible
-    if (!isVisible() || get_cxform().is_invisible() )
+    if (!visible() || get_cxform().is_invisible() )
     {
         ranges.add(m_old_invalidated_ranges); // (in case we just hided)
         return;
@@ -2124,7 +2064,6 @@ MovieClip::stagePlacementCallback(as_object* initObj)
     // It seems it's legal to place 0-framed movieclips on stage.
     // See testsuite/misc-swfmill.all/zeroframe_definemovieclip.swf
 
-
     // Now execute frame tags and take care of queuing the LOAD event.
     //
     // DLIST tags are executed immediately while ACTION tags are queued.
@@ -2139,7 +2078,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
         executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
-                                          SWF::ControlTag::TAG_ACTION);
+                SWF::ControlTag::TAG_ACTION);
 
         if (_vm.getSWFVersion() > 5)
         {
@@ -2160,8 +2099,8 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 #ifdef GNASH_DEBUG
         log_debug(_("Executing tags of frame0 in movieclip %s"), getTarget());
 #endif
-        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST | 
-                                          SWF::ControlTag::TAG_ACTION);
+        executeFrameTags(0, _displayList, SWF::ControlTag::TAG_DLIST |
+                SWF::ControlTag::TAG_ACTION);
     }
 
     // We execute events immediately when the stage-placed DisplayObject 
@@ -2207,7 +2146,7 @@ MovieClip::stagePlacementCallback(as_object* initObj)
 
 }
 
-/*private*/
+
 void
 MovieClip::constructAsScriptObject()
 {
@@ -2230,10 +2169,11 @@ MovieClip::constructAsScriptObject()
             break;
         }
 
-        sprite_definition* def = dynamic_cast<sprite_definition*>(_def.get());
+        const sprite_definition* def = 
+            dynamic_cast<const sprite_definition*>(_def.get());
 
         // We won't "construct" top-level movies
-        if ( ! def ) break;
+        if (!def) break;
 
         as_function* ctor = def->getRegisteredClass();
 #ifdef GNASH_DEBUG
@@ -2335,7 +2275,7 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
         
         const movie_root& mr = _vm.getRoot();
 
-        boost::intrusive_ptr<movie_definition> md (
+        boost::intrusive_ptr<movie_definition> md(
                 create_library_movie(url, mr.runInfo(), NULL, true, postdata));
 
         if (!md)
@@ -2345,11 +2285,11 @@ MovieClip::loadMovie(const URL& url, const std::string* postdata)
             return false;
         }
 
-        boost::intrusive_ptr<movie_instance> extern_movie;
-        extern_movie = md->create_movie_instance(parent);
+        boost::intrusive_ptr<Movie> extern_movie;
+        extern_movie = md->createMovie(parent);
         if (extern_movie == NULL)
         {
-            log_error(_("can't create extern movie_instance "
+            log_error(_("can't create extern Movie "
                 "for %s"), url.str());
             return false;
         }
@@ -2535,9 +2475,7 @@ MovieClip::removeMovieClip()
         // removing _level#
         _vm.getRoot().dropLevel(depth);
         // I guess this can only happen if someone uses 
-        // _root.swapDepth([0..1048575])
-        //log_error(_("Can't remove movieclip %s as it has no parent"),
-        //getTarget());
+        // _swf.swapDepth([0..1048575])
     }
 
 }
@@ -2636,43 +2574,23 @@ MovieClip::markReachableResources() const
     _environment.markReachableResources();
 
     // Mark our own definition
-    if ( _def.get() ) _def->setReachable();
+    if (_def.get()) _def->setReachable();
 
-    // Mark textfields in the TextFieldMap
+    // Mark textfields in the TextFieldIndex
     if ( _text_variables.get() )
     {
-        for(TextFieldMap::const_iterator i=_text_variables->begin(),
+        for (TextFieldIndex::const_iterator i=_text_variables->begin(),
                     e=_text_variables->end();
                 i!=e; ++i)
         {
-            const TextFieldPtrVect& tfs=i->second;
-            for (TextFieldPtrVect::const_iterator j=tfs.begin(), je=tfs.end(); j!=je; ++j)
-            {
-                if ( (*j)->isUnloaded() )
-                {
-                    // NOTE: cleanup_display_list should have cleared 
-                    // these up on ::cleanupDisplayList.
-                    // I guess if we get more might be due to ::destroy 
-                    // calls happening after our own ::cleanupDisplayList
-                    // call. Should be ok to postpone cleanup on next 
-                    // ::advance, or we should cleanup here (locally) 
-                    // although we're a 'const' method...
-                    // Yet another approach would be for TextField::unload
-                    // to unregister self from our map, but TextField 
-                    // doesn't really store a pointer to the movieclip
-                    // it's registered against.
-                    //
-                    //log_debug("Unloaded TextField in registered textfield "
-                    //"variables container on ::markReachableResources");
-                }
-                (*j)->setReachable();
-            }
+            const TextFields& tfs=i->second;
+            std::for_each(tfs.begin(), tfs.end(), 
+                        boost::mem_fn(&DisplayObject::setReachable));
         }
     }
 
     // Mark our relative root
-    assert(m_root != NULL);
-    m_root->setReachable();
+    _swf->setReachable();
 
     markDisplayObjectReachable();
 
@@ -2700,22 +2618,20 @@ MovieClip::get_world_cxform() const
     return cf;
 }
 
-movie_instance*
+Movie*
 MovieClip::get_root() const
 {
-    return m_root;
+    return _swf;
 }
 
 const MovieClip*
 MovieClip::getAsRoot() const
 {
-    //log_debug("getAsRoot called for movieclip %s, with _lockroot "
-    //"%d and version %d", getTarget(), getLockRoot(), getSWFVersion());
 
     // TODO1: as an optimization, if swf version < 7 
-    //                we might as well just return m_root, 
+    //                we might as well just return _swf, 
     //                the whole chain from this movieclip to it's
-    //                m_root should have the same version...
+    //                _swf should have the same version...
     //
     // TODO2: implement this with iteration rather
     //                then recursion.
@@ -2727,16 +2643,10 @@ MovieClip::getAsRoot() const
     // If we have a parent, we descend to it unless 
     // our _lockroot is true AND our or the VM's
     // SWF version is > 6
-    //
-    int topSWFVersion = getVM().getRoot().get_movie_definition()->get_version();
-    //int topSWFVersion = getVM().getSWFVersion() > 6;
+    int topSWFVersion = getVM().getRoot().getRootMovie().version();
 
-    if ( getSWFVersion() > 6 || topSWFVersion > 6 )
-    {
-        if ( getLockRoot() )
-        {
-            return this; // locked
-        }
+    if (getSWFVersion() > 6 || topSWFVersion > 6) {
+        if (getLockRoot()) return this;
     }
 
     return parent->getAsRoot();
@@ -2745,8 +2655,7 @@ MovieClip::getAsRoot() const
 as_value
 MovieClip::lockroot_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
     as_value rv;
     if ( fn.nargs == 0 ) // getter
@@ -3129,8 +3038,8 @@ movieclip_attachMovie(const fn_call& fn)
     // Get exported resource 
     const std::string& id_name = fn.arg(0).to_string();
 
-    boost::intrusive_ptr<ExportableResource> exported = 
-        movieclip->get_movie_definition()->get_exported_resource(id_name);
+    boost::intrusive_ptr<ExportableResource> exported =
+        movieclip->get_root()->definition()->get_exported_resource(id_name);
 
     if (!exported)
     {
@@ -5149,18 +5058,16 @@ movieclip_droptarget_getset(const fn_call& fn)
 as_value
 movieclip_url_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
 
-    return as_value(ptr->get_movie_definition()->get_url());
+    return as_value(ptr->get_root()->url());
 }
 
 // TODO: move this to DisplayObject class, _focusrect seems a generic property
 as_value
 movieclip_focusrect_getset(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> ptr = 
-        ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> ptr = ensureType<MovieClip>(fn.this_ptr);
     UNUSED(ptr);
 
     if ( fn.nargs == 0 ) // getter

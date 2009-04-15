@@ -23,7 +23,7 @@
 #include "movie_root.h"
 #include "log.h"
 #include "MovieClip.h"
-#include "movie_instance.h" // for implicit upcast to MovieClip
+#include "Movie.h" // for implicit upcast to MovieClip
 #include "render.h"
 #include "VM.h"
 #include "ExecutableCode.h"
@@ -178,13 +178,13 @@ movie_root::~movie_root()
 }
 
 void
-movie_root::setRootMovie(movie_instance* movie)
+movie_root::setRootMovie(Movie* movie)
 {
 	_rootMovie = movie;
 
 	m_viewport_x0 = 0;
 	m_viewport_y0 = 0;
-	movie_definition* md = movie->get_movie_definition();
+	const movie_definition* md = movie->definition();
 	float fps = md->get_frame_rate();
 	_movieAdvancementDelay = static_cast<int>(1000/fps);
 
@@ -248,7 +248,7 @@ movie_root::cleanupAndCollect()
 
 /* private */
 void
-movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie)
+movie_root::setLevel(unsigned int num, boost::intrusive_ptr<Movie> movie)
 {
 	assert(movie != NULL);
 	assert(static_cast<unsigned int>(movie->get_depth()) ==
@@ -406,7 +406,7 @@ movie_root::dropLevel(int depth)
 	}
 
 	MovieClip* mo = it->second.get();
-	if ( mo == getRootMovie() )
+	if (mo == _rootMovie)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Original root movie can't be removed"));
@@ -433,11 +433,11 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 		return false;
 	}
 
-	boost::intrusive_ptr<movie_instance> extern_movie;
-	extern_movie = md->create_movie_instance();
+	boost::intrusive_ptr<Movie> extern_movie;
+	extern_movie = md->createMovie();
 	if (extern_movie == NULL)
 	{
-		log_error(_("can't create extern movie_instance for %s"),
+		log_error(_("can't create extern Movie for %s"),
                 url.str());
 		return false;
 	}
@@ -455,14 +455,14 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	return true;
 }
 
-boost::intrusive_ptr<movie_instance>
+boost::intrusive_ptr<Movie>
 movie_root::getLevel(unsigned int num) const
 {
 	Levels::const_iterator i = _movies.find(num+DisplayObject::staticDepthOffset);
 	if ( i == _movies.end() ) return 0;
 
-	assert(boost::dynamic_pointer_cast<movie_instance>(i->second));
-	return boost::static_pointer_cast<movie_instance>(i->second);
+	assert(boost::dynamic_pointer_cast<Movie>(i->second));
+	return boost::static_pointer_cast<Movie>(i->second);
 }
 
 void
@@ -1092,7 +1092,7 @@ movie_root::display()
 	clearInvalidated();
 
 	// TODO: should we consider the union of all levels bounds ?
-	const rect& frame_size = getRootMovie()->get_frame_size();
+	const rect& frame_size = _rootMovie->get_frame_size();
 	if ( frame_size.is_null() )
 	{
 		// TODO: check what we should do if other levels
@@ -1115,7 +1115,7 @@ movie_root::display()
 
 		movie->clear_invalidated();
 
-		if (movie->isVisible() == false) continue;
+		if (movie->visible() == false) continue;
 
 		// null frame size ? don't display !
 		const rect& sub_frame_size = movie->get_frame_size();
@@ -1136,7 +1136,7 @@ movie_root::display()
 
 		ch->clear_invalidated();
 
-		if (ch->isVisible() == false) continue;
+		if (ch->visible() == false) continue;
 
 		ch->display();
 
@@ -1311,7 +1311,7 @@ movie_root::setFocus(boost::intrusive_ptr<DisplayObject> to)
     // _level0 also seems unable to receive focus under any circumstances
     // TODO: what about _level1 etc ?
     if (to == _currentFocus ||
-            to == static_cast<DisplayObject*>(getRootMovie())) {
+            to == static_cast<DisplayObject*>(_rootMovie.get())) {
         return false;
     }
 
@@ -1426,7 +1426,7 @@ movie_root::getStageWidth() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<unsigned int>(get_movie_definition()->get_width_pixels());
+    return static_cast<unsigned int>(_rootMovie->widthPixels());
 }
 
 /// Get actionscript height of stage, in pixels. The height
@@ -1440,7 +1440,7 @@ movie_root::getStageHeight() const
     }
 
     // If scaling is allowed, always return the original movie size.
-    return static_cast<unsigned int>(get_movie_definition()->get_height_pixels());
+    return static_cast<unsigned int>(_rootMovie->heightPixels());
 }
 
 /// Takes a short int bitfield: the four bits correspond
@@ -1496,11 +1496,11 @@ movie_root::setStageScaleMode(ScaleMode sm)
         // If we go from or to noScale, we notify a resize
         // if and only if display viewport is != then actual
         // movie size
-        movie_definition* md = _rootMovie->get_movie_definition();
+        const movie_definition* md = _rootMovie->definition();
 
-        log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d Def:%dx%d",
-                    m_viewport_width, m_viewport_height,
-                    md->get_width_pixels(), md->get_height_pixels());
+        log_debug("Going to or from scaleMode=noScale. Viewport:%dx%d "
+                "Def:%dx%d", m_viewport_width, m_viewport_height,
+                md->get_width_pixels(), md->get_height_pixels());
 
         if ( m_viewport_width != md->get_width_pixels()
              || m_viewport_height != md->get_height_pixels() )
@@ -2068,11 +2068,13 @@ movie_root::advanceLiveChars()
 void
 movie_root::set_background_color(const rgba& color)
 {
-
-	if ( m_background_color_set ) return;
+	if (m_background_color_set) return;
 	m_background_color_set = true;
+    
+    rgba newcolor = color;
+    newcolor.m_a = m_background_color.m_a;
 
-    if ( m_background_color != color ) {
+    if (m_background_color != color) {
 		setInvalidated();
         m_background_color = color;
 	}
@@ -2081,7 +2083,6 @@ movie_root::set_background_color(const rgba& color)
 void
 movie_root::set_background_alpha(float alpha)
 {
-	//GNASH_REPORT_FUNCTION;
 
 	boost::uint8_t newAlpha = clamp<int>(frnd(alpha * 255.0f), 0, 255);
 
@@ -2364,7 +2365,7 @@ movie_root::getMovieInfo(tree<StringPair>& tr, tree<StringPair>::iterator it)
     //
     /// Stage
     //
-    movie_definition* def = get_movie_definition();
+    const movie_definition* def = _rootMovie->definition();
     assert(def);
 
     it = tr.insert(it, StringPair("Stage Properties", ""));

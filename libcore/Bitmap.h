@@ -30,13 +30,14 @@
 namespace gnash {
 
 
-/// A Dynamic Bitmap DisplayObject. This is not AS-referencable, but can be
-/// removed and placed using depths like normal DisplayObjects (DisplayObjects).
+/// A Bitmap DisplayObject. This is not AS-referencable, but can be
+/// removed and placed using depths like normal DisplayObjects.
 class Bitmap : public DisplayObject
 {
 public:
 
-	Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent, int id);
+	Bitmap(boost::intrusive_ptr<BitmapData_as> bd, DisplayObject* parent,
+            int id);
 
     ~Bitmap();
 

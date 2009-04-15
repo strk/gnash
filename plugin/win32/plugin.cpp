@@ -480,12 +480,12 @@ nsPluginInstance::threadMain(void)
     md->completeLoad();
     DBG("Movie loaded.\n");
 
-    std::auto_ptr<gnash::movie_instance> mr(md->create_movie_instance());
+    std::auto_ptr<gnash::Movie> mr(md->createMovie());
     mr->setVariables(_flashVars);
     root.setRootMovie(mr.release());
     root.set_display_viewport(0, 0, _width, _height);
     root.set_background_alpha(1.0f);
-    gnash::movie_instance* mi = root.getRootMovie();
+    gnash::Movie* mi = root.getRootMovie();
     DBG("Movie instance created.\n");
 
     ShowWindow(_window, SW_SHOW);

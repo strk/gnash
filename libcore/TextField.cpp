@@ -232,8 +232,6 @@ TextField::init()
     
     registerTextVariable();
 
-    m_dummy_style.push_back(fill_style());
-
     reset_bounding_box(0, 0);
 }
 
@@ -505,7 +503,7 @@ InteractiveObject*
 TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
 
-    if (!isVisible()) return 0;
+    if (!visible()) return 0;
     
     // shouldn't this be !can_handle_mouse_event() instead ?
     // not selectable, so don't catch mouse events!
@@ -773,7 +771,7 @@ TextField::get_member(string_table::key name, as_value* val,
         break;
     case NSV::PROP_uVISIBLE:
     {
-        val->set_bool(isVisible());
+        val->set_bool(visible());
         return true;
     }
     case NSV::PROP_uALPHA:
@@ -1815,16 +1813,10 @@ TextField::autoSizeValueName(AutoSizeValue val)
 TextField::TypeValue
 TextField::parseTypeValue(const std::string& val)
 {
-    StringNoCaseLessThan cmp;
+    StringNoCaseEqual cmp;
 
-    if ( ! cmp(val, "input") )
-    {
-        return typeInput;
-    }
-    if ( ! cmp(val, "dynamic") )
-    {
-        return typeDynamic;
-    }
+    if (cmp(val, "input")) return typeInput;
+    if (cmp(val, "dynamic")) return typeDynamic;
     return typeInvalid;
 
 }
@@ -2442,9 +2434,9 @@ textfield_setTextFormat(const fn_call& fn)
             bool italic = tf->italiced();
 
             // NOTE: should query movie-private font lib, not global-shared one
-            movie_instance* mi = text->get_root();
+            Movie* mi = text->get_root();
             assert(mi);
-            movie_definition* md = mi->get_movie_definition();
+            const movie_definition* md = mi->definition();
             assert(md);
             Font* f = md->get_font(fontName, bold, italic);
             if ( ! f ) f = fontlib::get_font(fontName, bold, italic);

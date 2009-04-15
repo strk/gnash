@@ -183,7 +183,7 @@ public:
     
     boost::uint32_t width() { return _character->get_width(); }
 
-    bool visible() { return _character->isVisible(); }
+    bool visible() { return _character->visible(); }
     
     void advance() { _character->advance(); }
     

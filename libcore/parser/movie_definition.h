@@ -23,7 +23,7 @@
 /// multiple instances.
 ///
 /// A Movie definition is defined by the gnash::movie_definition class.
-/// A Movie instance is defined by the gnash::movie_instance class.
+/// A Movie instance is defined by the gnash::Movie class.
 /// 
 /// A Movie instance exposes the ActionScript
 /// Object base interface (gnash::as_object),
@@ -38,7 +38,7 @@
 /// SWFMovieDefinition class, being the top-level definition of
 /// a movie (the one with a CharacterDictionary in it).
 ///
-/// Also note that gnash::movie_instance is a subclass of gnash::MovieClip,
+/// Also note that gnash::Movie is a subclass of gnash::MovieClip,
 /// being the instance of a gnash::sprite_definition.
 ///
 ///
@@ -62,7 +62,7 @@
 // Forward declarations
 namespace gnash {
 	class BitmapInfo;
-	class movie_instance;
+	class Movie;
 	class MovieClip;
 	namespace SWF {
         class ControlTag;
@@ -123,18 +123,18 @@ public:
 	/// Create a movie instance from a def.
 	//
 	/// Not all movie definitions allow creation of
-	/// movie_instance. In particular, sprite_definition
+	/// Movie. In particular, sprite_definition
 	/// can only create MovieClip, so will return NULL
 	/// from this method.
 	///
 	/// The default implementation returns NULL.
 	///
 	/// Override this method for any definition that is
-	/// able to be instanciated as a movie_instance.
+	/// able to be instanciated as a Movie.
 	/// SWFMovieDefinition is one such example, future examples
 	/// should include jpeg_movie_def and similar..
 	///
-	virtual movie_instance* create_movie_instance(DisplayObject* /*parent*/=0)
+	virtual Movie* createMovie(DisplayObject* /*parent*/=0)
 	{
 		return NULL;
 	}
@@ -217,7 +217,8 @@ public:
 	///
 	/// @return true if a frame with that label was found, false otherwise
 	///
-	virtual bool get_labeled_frame(const std::string& /*label*/, size_t& /*frame_number*/)
+	virtual bool get_labeled_frame(const std::string& /*label*/,
+            size_t& /*frame_number*/) const
 	{
 		return false;
 	}
@@ -430,7 +431,7 @@ public:
 	///
 	/// The default implementation is to always return true.
 	///
-	virtual bool ensure_frame_loaded(size_t /*framenum*/) {
+	virtual bool ensure_frame_loaded(size_t /*framenum*/) const {
 		return true;
 	}
 
