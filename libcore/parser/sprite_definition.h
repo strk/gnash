@@ -66,17 +66,6 @@ public:
 	sprite_definition(movie_definition& m, SWFStream& in,
             const RunInfo& runInfo);
 
-	/// \brief
-	/// Create an empty sprite
-	//
-	/// A sprite definition consists of a series control tags.
-	///
-	/// @param m
-	///	the Top-Level movie_definition this sprite is read
-	///	from (not a sprite_definition!)
-	sprite_definition(movie_definition& m);
-
-
 	/// Destructor, releases playlist data
 	~sprite_definition();
 
