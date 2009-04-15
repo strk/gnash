@@ -148,7 +148,7 @@ add_coverart(SWFMovie mo, int x, int y)
 		"  if ( Key.isDown(Key.SHIFT) ) { "
 		"	trace('SHIFT-click on coverart...');"
 		//"	_root.note('SHIFT-click on coverart...');"
-		"	_root.totals(18, '"__FILE__"');"
+		"	_root.totals(26, '"__FILE__"');"
 		"	_root.END_OF_TEST = true;"
 		" }"
 		"  else _root.note('2 tests run');"
