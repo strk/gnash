@@ -1165,8 +1165,7 @@ MovieClip::advance()
 void
 MovieClip::execute_init_action_buffer(const action_buffer& a, int cid)
 {
-    Movie* mi = _swf; 
-    if ( mi->setCharacterInitialized(cid) )
+    if ( _swf->setCharacterInitialized(cid) )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Queuing init actions in frame %d of movieclip %s"),

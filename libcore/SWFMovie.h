@@ -41,8 +41,6 @@ class SWFMovie : public Movie
 
 public:
 
-	// We take a generic movie_definition to allow
-	// for subclasses for other then SWF movies
 	SWFMovie(const SWFMovieDefinition* const def, DisplayObject* parent);
 
 	virtual ~SWFMovie() {}

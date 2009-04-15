@@ -41,9 +41,9 @@ class DoInitActionTag : public ControlTag
 public:
 
     DoInitActionTag(SWFStream& in, movie_definition& md, int cid)
-	:
-	_buf(md),
-	_cid(cid)
+        :
+        _buf(md),
+        _cid(cid)
     {
         read(in);
     }
