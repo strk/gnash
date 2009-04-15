@@ -64,6 +64,10 @@
 namespace gnash
 {
 
+namespace {
+    template<typename T> void markMappedResources(const T& t);
+}
+
 MovieLoader::MovieLoader(SWFMovieDefinition& md)
 	:
 	_movie_def(md),
@@ -852,18 +856,6 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
     return true;
 }
 
-template<typename T>
-void markMappedResources(const T& t)
-{
-    typedef typename
-        RemovePointer<typename T::value_type::second_type>::value_type
-        contained_type;
-
-    std::for_each(t.begin(), t.end(),
-            boost::bind(&contained_type::setReachable,
-                boost::bind(SecondElement<typename T::value_type>(), _1)));
-}
-
 #ifdef GNASH_USE_GC
 void
 SWFMovieDefinition::markReachableResources() const
@@ -929,6 +921,22 @@ SWFMovieDefinition::importResources(
 	{
 		_importSources.insert(source);
 	}
+}
+
+namespace {
+
+template<typename T>
+void markMappedResources(const T& t)
+{
+    typedef typename
+        RemovePointer<typename T::value_type::second_type>::value_type
+        contained_type;
+
+    std::for_each(t.begin(), t.end(),
+            boost::bind(&contained_type::setReachable,
+                boost::bind(SecondElement<typename T::value_type>(), _1)));
+}
+
 }
 
 } // namespace gnash
