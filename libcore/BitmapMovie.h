@@ -58,7 +58,7 @@ public:
     //
     /// MovieClip traverses the DisplayList for this.
     bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const {
-        if (!isVisible()) return false;
+        if (!visible()) return false;
         return pointInBounds(x, y);
     }
 

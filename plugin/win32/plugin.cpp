@@ -480,7 +480,7 @@ nsPluginInstance::threadMain(void)
     md->completeLoad();
     DBG("Movie loaded.\n");
 
-    std::auto_ptr<gnash::Movie> mr(md->create_Movie());
+    std::auto_ptr<gnash::Movie> mr(md->createMovie());
     mr->setVariables(_flashVars);
     root.setRootMovie(mr.release());
     root.set_display_viewport(0, 0, _width, _height);

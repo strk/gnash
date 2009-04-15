@@ -579,7 +579,7 @@ DisplayList::display()
         DisplayObject* ch = it->get();
 
         DisplayObject* mask = ch->getMask();
-        if (mask && ch->isVisible() && ! mask->isUnloaded())
+        if (mask && ch->visible() && ! mask->isUnloaded())
         {
             render::begin_submit_mask();
             
@@ -614,7 +614,7 @@ DisplayList::display()
         }
         
         // check for non-mask hiden DisplayObjects
-        if (!renderAsMask && (!ch->isVisible())) {
+        if (!renderAsMask && (!ch->visible())) {
             ch->omit_display();
             // Don't display non-mask hidden DisplayObjects
             continue;

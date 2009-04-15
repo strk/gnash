@@ -36,7 +36,7 @@ namespace gnash
 
 /// A "movie" definition for a bitmap file
 //
-/// The create_Movie function will return a BitmapMovie
+/// The createMovie function will return a BitmapMovie
 ///
 class BitmapMovieDefinition : public movie_definition
 {
@@ -104,7 +104,7 @@ public:
 	}
 	
 	/// Create a playable Movie from this def.
-	virtual Movie* create_Movie(DisplayObject* parent=0);
+	virtual Movie* createMovie(DisplayObject* parent=0);
 
 	virtual const std::string& get_url() const {
 		return _url;

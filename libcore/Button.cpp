@@ -386,7 +386,7 @@ Button::display()
 InteractiveObject*
 Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
-    if (!isVisible() || !isEnabled())
+    if (!visible() || !isEnabled())
     {
         return 0;
     }
@@ -411,7 +411,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
                 it!=itE; ++it)
         {
             DisplayObject* ch = *it;
-            if ( ! ch->isVisible() ) continue;
+            if ( ! ch->visible() ) continue;
             InteractiveObject *hit = ch->topmostMouseEntity(p.x, p.y);
             if ( hit ) return hit;
         }
@@ -784,7 +784,7 @@ Button::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
     // Not visible anyway
-    if (!isVisible()) return;
+    if (!visible()) return;
 
     ranges.add(m_old_invalidated_ranges);  
 

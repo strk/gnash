@@ -56,8 +56,8 @@ main(int /*argc*/, char** /*argv*/)
 	const DisplayObject* mc2 = tester.findDisplayItemByName(*root, "square2");
 	check(mc2);
 
-	check_equals(mc1->isVisible(), true);
-	check_equals(mc2->isVisible(), false);
+	check_equals(mc1->visible(), true);
+	check_equals(mc2->visible(), false);
 	check_equals(root->getPlayState(), MovieClip::PLAYSTATE_STOP);
 	check_equals(root->get_current_frame(), 1);
 

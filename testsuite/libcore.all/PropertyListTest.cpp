@@ -67,7 +67,7 @@ main(int /*argc*/, char** /*argv*/)
 
     movie_root root(*md5, clock, runInfo);
 
-    root.setRootMovie( md5->create_Movie() );
+    root.setRootMovie( md5->createMovie() );
 
     VM& vm = root.getVM();
 

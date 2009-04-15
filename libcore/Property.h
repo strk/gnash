@@ -454,7 +454,7 @@ public:
 	bool isStatic() const { return _flags.get_static(); }
 
 	/// Is this member supposed to be visible by a VM of given version ?
-	bool isVisible(int swfVersion) const {
+	bool visible(int swfVersion) const {
         return _flags.get_visible(swfVersion);
     }
 

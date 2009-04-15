@@ -242,7 +242,7 @@ void
 DisplayObject::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
     ranges.add(m_old_invalidated_ranges);
-    if (isVisible() && (m_invalidated||force))
+    if (visible() && (m_invalidated||force))
     {
         rect bounds;        
         bounds.expand_to_transformed_rect(getWorldMatrix(), getBounds());
@@ -733,7 +733,7 @@ DisplayObject::visible_getset(const fn_call& fn)
 	as_value rv;
 	if (!fn.nargs) // getter
 	{
-		rv = as_value(ptr->isVisible());
+		rv = as_value(ptr->visible());
 	}
 	else // setter
 	{

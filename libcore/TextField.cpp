@@ -503,7 +503,7 @@ InteractiveObject*
 TextField::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 {
 
-    if (!isVisible()) return 0;
+    if (!visible()) return 0;
     
     // shouldn't this be !can_handle_mouse_event() instead ?
     // not selectable, so don't catch mouse events!
@@ -771,7 +771,7 @@ TextField::get_member(string_table::key name, as_value* val,
         break;
     case NSV::PROP_uVISIBLE:
     {
-        val->set_bool(isVisible());
+        val->set_bool(visible());
         return true;
     }
     case NSV::PROP_uALPHA:

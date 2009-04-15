@@ -143,7 +143,7 @@ MovieTester::MovieTester(const std::string& url)
 	dbglogfile.setVerbosity(1);
 
 	
-	std::auto_ptr<Movie> mi ( _movie_def->create_Movie() );
+	std::auto_ptr<Movie> mi ( _movie_def->createMovie() );
 
 	// Set _movie before calling ::render
 	_movie = mi.get();
@@ -613,7 +613,7 @@ void
 MovieTester::restart() 
 {
 	_movie_root->clear(); // restart();
-	_movie = _movie_def->create_Movie();
+	_movie = _movie_def->createMovie();
 	_movie_root->setRootMovie(_movie);
 
 	// Set _movie before calling ::render

@@ -434,7 +434,7 @@ movie_root::loadLevel(unsigned int num, const URL& url)
 	}
 
 	boost::intrusive_ptr<Movie> extern_movie;
-	extern_movie = md->create_Movie();
+	extern_movie = md->createMovie();
 	if (extern_movie == NULL)
 	{
 		log_error(_("can't create extern Movie for %s"),
@@ -1115,7 +1115,7 @@ movie_root::display()
 
 		movie->clear_invalidated();
 
-		if (movie->isVisible() == false) continue;
+		if (movie->visible() == false) continue;
 
 		// null frame size ? don't display !
 		const rect& sub_frame_size = movie->get_frame_size();
@@ -1136,7 +1136,7 @@ movie_root::display()
 
 		ch->clear_invalidated();
 
-		if (ch->isVisible() == false) continue;
+		if (ch->visible() == false) continue;
 
 		ch->display();
 

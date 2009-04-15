@@ -482,7 +482,7 @@ public:
     ///
     virtual bool pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
     {
-        if ( ! isVisible() ) return false;
+        if ( ! visible() ) return false;
         if ( isMask() ) return false;
         return pointInShape(x, y);
     }
@@ -602,7 +602,7 @@ public:
     void set_visible(bool visible);
 
     // Return true if this DisplayObject should be rendered
-    bool isVisible() const { return _visible; }
+    bool visible() const { return _visible; }
 
     /// ActionScript event handler.    Returns true if a handler was called.
     //
@@ -646,7 +646,7 @@ public:
     virtual const DisplayObject* findDropTarget(boost::int32_t x, 
             boost::int32_t y, DisplayObject* dragging) const
     {
-        if (this != dragging && isVisible() && pointInVisibleShape(x, y)) {
+        if (this != dragging && visible() && pointInVisibleShape(x, y)) {
             return this;
         }
         

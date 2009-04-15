@@ -172,7 +172,7 @@ private:
 /// Immutable definition of a SWF movie's contents.
 //
 /// It cannot be played directly, and does not hold
-/// current state; for that you need to call create_Movie()
+/// current state; for that you need to call createMovie()
 /// to get a movie instance 
 ///
 class SWFMovieDefinition : public movie_definition
@@ -380,7 +380,7 @@ public:
 	/// The _root reference of the newly created movie_root
 	/// will be set to a newly created Movie.
 	///
-	Movie* create_Movie(DisplayObject* parent=0);
+	Movie* createMovie(DisplayObject* parent=0);
 
     virtual DisplayObject* createDisplayObject(DisplayObject*, int) {
         return 0;

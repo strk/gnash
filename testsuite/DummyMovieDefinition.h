@@ -20,7 +20,7 @@
 
 #include "SWFMovieDefinition.h" // for inheritance
 #include "rect.h" // for composition
-#include "SWFMovie.h" // for create_Movie
+#include "SWFMovie.h" // for createMovie
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -35,7 +35,7 @@ namespace gnash
 /// methods of movie_definition by returning user-defined
 /// values for version/size/frame rate etc..
 ///
-/// The create_Movie function will return the same
+/// The createMovie function will return the same
 /// object created by createEmptyMovieClip() calls
 /// (an empty movieclip... still to be designed)
 ///
@@ -131,7 +131,7 @@ public:
 	}
 	
 	/// Create a playable movie instance from a def.
-	virtual Movie* create_Movie(DisplayObject* parent=NULL)
+	virtual Movie* createMovie(DisplayObject* parent=NULL)
 	{
 		return new SWFMovie(this, parent);
 	}

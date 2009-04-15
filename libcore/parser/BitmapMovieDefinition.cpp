@@ -30,7 +30,7 @@
 namespace gnash {
 
 Movie*
-BitmapMovieDefinition::create_Movie(DisplayObject* parent)
+BitmapMovieDefinition::createMovie(DisplayObject* parent)
 {
     // It's possible for this to fail.
     if (!_bitmap.get()) return 0;

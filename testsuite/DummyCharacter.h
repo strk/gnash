@@ -20,7 +20,7 @@
 
 #include "InteractiveObject.h" // for inheritance
 #include "rect.h" // for composition
-#include "Movie.h" // for create_Movie
+#include "Movie.h" // for createMovie
 #include "snappingrange.h" // for InvalidatedRanges typedef (don't like it)
 
 #include <string>

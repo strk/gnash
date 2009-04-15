@@ -57,7 +57,7 @@ main(int /*argc*/, char** /*argv*/)
 	ManualClock clock;
     movie_root stage(*md5, clock, ri);
 
-	Movie* root = md5->create_Movie();
+	Movie* root = md5->createMovie();
     stage.setRootMovie( root );
 
 	DisplayList dlist1;

@@ -116,7 +116,7 @@ main(int argc, char *argv[])
 
     movie_root stage(*md, clock, runInfo);
 
-    Movie* root = md->create_Movie();
+    Movie* root = md->createMovie();
     stage.setRootMovie(root);
 
     // run the tests

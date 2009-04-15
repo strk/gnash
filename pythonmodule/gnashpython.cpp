@@ -186,7 +186,7 @@ GnashPlayer::loadMovie(PyObject& pf)
 	_movieDef->completeLoad();
 	_movieDef->ensure_frame_loaded(_movieDef->get_frame_count());
 
-	std::auto_ptr<Movie> mi ( _movieDef->create_Movie() );
+	std::auto_ptr<Movie> mi ( _movieDef->createMovie() );
 
 	// Finally, place the root movie on the stage ...
     _movieRoot->setRootMovie( mi.release() );
