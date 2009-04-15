@@ -22,8 +22,8 @@ BuildRequires:  SDL-devel
 %if %{distribution} != "ydl6"
 BuildRequires:  ffmpeg-devel
 %endif
-# Mandriva uses differ names for the X11 library packages
-%if %{distribution} != "mnb"
+# Mandriva uses different names for the X11 library packages
+%if %{distribution} != "fc10"
 BuildRequires:  libx11_6-devel libxt_6-devel
 %else
 BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel 
@@ -32,10 +32,10 @@ BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel
 # Installation requirements
 Requires: libpng libjpeg libogg gtk2 glib2 atk pango
 # Mandriva uses differ names for the X11 library packages
-%if %{distribution} != "mnb"
-Requires: libX11 libXt 
-%else
+%if %{distribution} != "fc10"
 Requires: libx11_6 libxt_6
+%else
+Requires: libX11 libXt 
 %endif
 Requires: agg boost libcurl SDL
 # YellowDog doesn't ship ffmpeg
