@@ -22,37 +22,48 @@
 # 	rpmbuild -rcfile=$(srcdir)/packaging/redhat/rpmrc:/usr/lib/rpm/rpmrc \
 # 	         -ba --target=geode-olpc /usr/src/redhat/SPECS/gnash.spec
 
-RPMBUILD_FLAGS = --clean --rmsource --rmspec
+RPMBUILD_FLAGS = # --clean --rmsource --rmspec
 
-spec: $(srcdir)/packaging/redhat/gnash.spec $(srcdir)/packaging/redhat/klash.spec
+gnash.spec spec: $(srcdir)/packaging/redhat/gnash.spec
 	@echo "Editing the version in the spec file ..."
-	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-trunk_$${now}"; \
-	snapshot_tar="$${pkgname}.tar.gz"; \
-	sed -e "s/Version.*/Version:	$(RELEASE)$${now}/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec; \
-	sed -e "s/Version.*/Version:	$(RELEASE)$${now}/" $(srcdir)/packaging/redhat/klash.spec > klash.spec;
+	sed -e "s/Version.*/Version:	$(BRANCH_REVNO)_$(BRANCH_NICK)/" $(srcdir)/packaging/redhat/gnash.spec > gnash.spec;
 
 # Build an Redhat/Fedora .rpm package
 # We do this by using the source snapshot that we know is 'distclean'.
 # After copying the source tarball to where rpmbuild expects it,
 # we can then build the binary package.
 # older versions of Fedora used /usr/src/redhat/{SOURCES, BUILD} for
-# everything, but the newer version appears to use one's hone directory
+# everything, but the newer version appears to use one's home directory
 # instead, so now you don't have to be root to build rpm packages.
-rpm redhat rpm-gnash: snapshot spec
-	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-trunk_$${now}"; \
-	snapshot_tar="$${pkgname}.tar.gz"; \
-	cp $${snapshot_tar} $${HOME}/rpmbuild/SOURCES/
+
+# Do the entire process to build an RPM package
+rpm: spec snapshot-src rpm-setup rpm-gnash
+
+# build everything in one pass using rpmbuild
+rpm-gnash: 
 	rpmbuild -ba $(RPMBUILD_FLAGS) gnash.spec
 
+# configure the build directory, which we do by executing only the %prep stage,
+# which doesn't actually run configure
+rpm-configure: 
+	rpmbuild -bp $(RPMBUILD_FLAGS) gnash.spec
+
+# compile the build, which we do by executing only the %build stage, which
+# runs configure as the first step.
+rpm-build:
+	rpmbuild -bc --short-circuit $(RPMBUILD_FLAGS) gnash.spec
+
+# install the build, which we do by executing only the %install stage, which
+# also builds the actual rpms
+rpm-install: 
+	rpmbuild -bi --short-circuit $(RPMBUILD_FLAGS) gnash.spec
+
+rpm-setup: 
+	cp $(SNAPSHOT_TAR) $${HOME}/rpmbuild/SOURCES/
+
 # build klash and the konqueror plugin as a sepaate step.
-rpm-klash: snapshot spec
-	-@now=`date "+%Y%m%d"`; \
-	pkgname="gnash-trunk_$${now}"; \
-	snapshot_tar="$${pkgname}.tar.gz"; \
-	cp $${snapshot_tar} $${HOME}/rpmbuild/SOURCES/
-	rpmbuild -ba $(RPMBUILD_FLAGS) klash.spec
+rpm-klash:
+	rpmbuild -ba $(RPMBUILD_FLAGS) glash.spec
 
 .PHONY : rpm redhat rpm-klash
 

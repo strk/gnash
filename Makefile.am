@@ -41,6 +41,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--disable-testsuite
 #--enable-cygnal
 
+
 STD_DIRS = \
 	libbase \
 	libamf \
@@ -79,7 +80,8 @@ endif
 
 DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite
 
-EXTRA_DIST =  autogen.sh \
+EXTRA_DIST =  \
+	autogen.sh \
 	config.rpath \
 	macros/incllist macros/libslist \
 	ChangeLog-0.8.0 ChangeLog-0.8.1 ChangeLog-0.8.2 ChangeLog-0.8.3 \
@@ -91,7 +93,9 @@ EXTRA_DIST =  autogen.sh \
 	packaging/bsd.am \
 	packaging/rpm.am \
 	packaging/gnash.xpm \
-	packaging/klash.xpm
+	packaging/klash.xpm \
+	bzrversion.h
+
 
 # dist-hook:
 # 	@test -d "$(distdir)/packaging" || $(mkinstalldirs) "$(distdir)/packaging"
@@ -125,6 +129,41 @@ include $(srcdir)/packaging/bsd.am
 # Mozille/Firefox XPI support
 #
 include $(srcdir)/packaging/xpi.am
+
+#
+# Extract info from the repository to include in the build. If
+# bazar (bzr) isn't installed, just print stubs, as this is only
+# used for display purposes. It's primarily used by the testsuites
+# and when building binary packages from multiple branches.
+# Note that this is only rebuilt after "make clean", if the Makefile
+# has changed, or the source tree gets reconfigured. So unless you do
+# a make clean, or nuke the bzrversion.h file, this can get slightly
+# behind the current version. Currently Gnash doesn't have this info
+# so it'll be an improvement anyway. Bzr is amazing slow producing
+# the info, which is why we don't want to do it all the time.
+#
+CLEANFILES += bzrversion.h
+BUILT_SOURCES = bzrversion.h
+bzrversion.h: Makefile.in
+	@status=`cd $(srcdir) && bzr version-info --custom --template={revno}`; \
+	if test $${status} -gt 0; then \
+	   echo "Generating bzrversion.h"; \
+	   $(RM) -f bzrversion.h; \
+	   (cd $(srcdir) && bzr version-info --custom --template='static const char *BRANCH_REVNO  = "{revno}";\nstatic const char *BRANCH_NICK = "{branch_nick}";\n') > bzrversion.h; \
+	else \
+	  if test -e bzrversion.h; then \
+	    echo "Using existing bzrversion.h"; \
+	else \
+	    echo "Generating bzrversion.h"; \
+	    echo "static const char *BRANCH_REVNO  = "none";\nstatic const char *BRANCH_NICK = "none";\n" > bzrversion.h; \
+	  fi; \
+	fi
+
+BRANCH_REVNO  = `grep "REVNO" bzrversion.h | cut -d '"' -f 2`
+BRANCH_NICK   = `grep "NICK" bzrversion.h | cut -d '"' -f 2`
+
+test:
+	echo $(SNAPSHOT_NAME)
 
 #
 # Binary tarball packaging

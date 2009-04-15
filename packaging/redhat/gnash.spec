@@ -14,18 +14,31 @@ Source0:        http://www.getgnash.org/packages/snapshots/fedora/%{name}-%{vers
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
 BuildRequires:  libpng-devel libjpeg-devel libogg-devel
-BuildRequires:  gtk2-devel libX11-devel libXt-devel glib2-devel
+BuildRequires:  gtk2-devel glib2-devel
 BuildRequires:  atk-devel pango-devel
 BuildRequires:  agg-devel boost-devel curl-devel libXt-devel
-BuildRequires:  xorg-x11-proto-devel SDL-devel
+BuildRequires:  SDL-devel
+# YellowDog doesn't ship ffmpeg
 %if %{distribution} != "ydl6"
 BuildRequires:  ffmpeg-devel
 %endif
+# Mandriva uses differ names for the X11 library packages
+%if %{distribution} != "mnb"
+BuildRequires:  libx11_6-devel libxt_6-devel
+%else
+BuildRequires:  libX11-devel libXt-devel xorg-x11-proto-devel 
+%endif
 
 # Installation requirements
-Requires: libpng libjpeg libogg
-Requires: gtk2 libX11 libXt glib2 atk pango
-Requires: agg boost libcurl libXt SDL
+Requires: libpng libjpeg libogg gtk2 glib2 atk pango
+# Mandriva uses differ names for the X11 library packages
+%if %{distribution} != "mnb"
+Requires: libX11 libXt 
+%else
+Requires: libx11_6 libxt_6
+%endif
+Requires: agg boost libcurl SDL
+# YellowDog doesn't ship ffmpeg
 %if %{distribution} != "ydl6"
 Requires: ffmpeg
 %endif
@@ -139,7 +152,7 @@ RPM_TARGET=%{_target}
 	$SOUND $GUI \
 	$RENDERER \
 	--disable-dependency-tracking \
-	--disable-testsuites \
+	--disable-testsuite \
 	--disable-rpath \
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
@@ -167,7 +180,7 @@ make $(MAKEFLAGS) dumpconfig all
 
 %install
 strip gui/.libs/*-gnash
-strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper  utilities/.libs/rtmpget cygnal/.libs/cygnal
+strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
 make install install-plugins DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
@@ -208,7 +221,6 @@ scrollkeeper-update -q || :
 %{_bindir}/soldumper
 %{_bindir}/flvdumper
 %{_bindir}/dumpshm
-%{_bindir}/rtmpget
 %{_bindir}/cygnal
 %{_libdir}/gnash/*.so*
 %{_libdir}/mozilla/plugins/*.so

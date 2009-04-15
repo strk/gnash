@@ -1,0 +1,59 @@
+Packaging is relatively complex, especially when supporting multiple
+packaging systems. Each platform works the same, only the names are
+changed. Each packaging system has a single top level Makefile target
+that does the entire process, which can be time consuming. Each of the
+other targets break the entire process into stages which make it much
+easier to debug, or redo only one stage of the entire process.
+
+For these targets to work correct, your build must be able to survive
+"make distcheck".
+
+xpi      - Build a binary XPI package for Mozilla/Firefox
+snapshot - Build a binary tarball package for any distribution
+deb      - Build a binary Debian/Ubuntu package
+rpm      - Build a binary Redhat/Mandriva package
+ipkg     - Build a binary IKG package
+alp	 - Build a binary package for the Access Linux Platform
+
+snapshot-src: is the primary target used to build the source directory
+	      with the correct name. This target uses the internal
+	      Automake target "distdir" to make the distribution
+	      directory. This always names the sub directory created
+	      to hold the distribution files "gnash-trunk". Snapshot-src
+	      then renames the sub directory to be gnash-revno, and
+	      modifies the configure.ac file in the subdirectory to
+	      have the correct version number. All packaging targets
+	      start by calling snapshot-src.
+
+
+-configure:  this target configures the package with the appropriate flags
+	     in a _build subdirectory in the snapshot distribution sub
+	     directory created by snapshot-src. Each package format
+	     often requires a different set of configure options,
+	     although some options are common, like setting --prefix=/usr.
+
+-build:	     this target builds the package in the _build sub
+	     directory.
+
+-install:    this target installs the fresh build and sets DESTDIR so
+	     all the files get installed in temporary directory as we
+	     don't want to stomp on any preinstalled Gnash on our
+	     build machine.
+
+-bundle:     this target uses the files from the temporary
+	     installation directory to make the actual package in the
+	     correct format. This often involves copying files from
+	     the source packaging directories, and other tweaks to
+	     create the package correctly.
+
+RPM
+	All RPMs are built using rpmbuild. Although rpmbuild is
+	primarily used to build packages in one pass via "-ba", it is
+	possible to run the different phases seperately, which makes
+	debugging easier.
+
+	The version in the gnash.spec is editied to be consistant.
+
+DEB
+	All DEBs are built using dpkg-buildpackage. The version in the
+	changelog is editied to be consistant.
