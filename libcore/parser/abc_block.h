@@ -35,16 +35,12 @@ namespace gnash {
 
 namespace gnash {
 
-typedef std::vector<asNamespace *> abcNamespaceSet;
-
 class abc_block;
 class ClassHierarchy;
 class asMethod;
 class asClass;
 
 namespace abc {
-
-class Trait;
 
 class Trait
 {
@@ -122,11 +118,12 @@ public:
 
 } // namespace abc
 
-typedef std::vector<asNamespace*> NamespaceSet;
 			
 class abc_block
 {
 public:
+    
+    typedef std::vector<asNamespace*> NamespaceSet;
 
 	abc_block();
 
