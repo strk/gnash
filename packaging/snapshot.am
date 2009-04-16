@@ -124,5 +124,5 @@ snapshot-bundle:
 snapshot-clean:
 	-@rm -fr snapshot-* $(SNAPSHOT_BUILD) $(SNAPSHOT_TMP) gnash*$(VERSION)*.ipk
 
-.PHONY : snapshot snapshot-build snapshot-install snapshot-clean
+.PHONY : snapshot snapshot-build snapshot-install snapshot-clean snapshot-src
 

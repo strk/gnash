@@ -219,6 +219,14 @@ fi
 LC_KEY=${lckey}
 AC_SUBST(LC_KEY)
 
+AC_ARG_ENABLE(python,
+  AC_HELP_STRING([--enable-python],[Enable python for the python wrapper]),
+[case "${enableval}" in
+  yes) python=yes ;;
+  no)  python=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-python option]) ;;
+esac],python=no)
+
 # Maybe use jemalloc, which handles memory fragmentation for
 # ECAMscript languages better than the regular system malloc.
 # This seems like a good idea, as both the other player and
@@ -1100,8 +1108,11 @@ AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
 dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
-AC_PATH_PROG(PYTHON, python, ,[${pathlist}])
-AM_CONDITIONAL([ENABLE_GNASH_PYTHON_MODULE], false)
+dnl If python support is enabled, look for the flags and libs
+if test x"$python" = xyes; then
+  GNASH_PATH_PYTHON
+fi
+AM_CONDITIONAL([USE_PYTHON], test x"$python" != xno)
 
 AC_PATH_PROG(PERL, perl)
 AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
@@ -3043,13 +3054,6 @@ if test x"$testsuite" = x"yes"; then
   fi
 fi
 
-  if test x"$PYTHON" != x; then
-    echo "        PYTHON is $PYTHON"
-  else
-    echo "        WARNING: You need to have python installed" >&4
-    echo "                 to run some of the tests in Gnash testsuite." >&4
-  fi
-
   if test x"$PERL" != x; then
     echo "        PERL is $PERL"
   else
@@ -3181,6 +3185,15 @@ if test x"$nspr4" = x"yes"; then
     echo "        NSPR libs are: $NSPR_LIBS"
   else
     echo "        ERROR: No NSPR development package is installed." >&3
+  fi
+fi
+if test x"$python" = x"yes"; then
+  if test x"$has_python" = x"yes"; then
+    echo "        PYTHON flags are: $PYTHON_CFLAGS"
+    echo "        PYTHON libs are: $PYTHON_LIBS"
+    echo "        PYTHON executable is are: $PYTHON"
+  else
+    echo "        ERROR: No Python development package is installed, but it's enabled." >&3
   fi
 fi
 

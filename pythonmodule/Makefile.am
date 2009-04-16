@@ -17,14 +17,14 @@
 
 AUTOMAKE_OPTIONS = 
 
-if ENABLE_GNASH_PYTHON_MODULE
+if USE_PYTHON
 
 pkglib_LTLIBRARIES = libgnashpython.la gnash.la
 
 EXTRA_DIST = gnashPythonExample.py
 
-BOOSTPYTHON_LIBS = -lboost_python 
-BOOSTPYTHON_CFLAGS = -I/usr/include/python2.5
+BOOSTPYTHON_LIBS = -lboost_python  $(PYTHON_LIBS)
+BOOSTPYTHON_CFLAGS = $(PYTHON_CFLAGS)
 
 libgnashpython_la_SOURCES = \
 	gnashpython.cpp \
@@ -40,7 +40,7 @@ libgnashpython_la_LDFLAGS = \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
-		
+
 libgnashpython_la_CPPFLAGS = \
         -I$(top_srcdir)/libcore \
         -I$(top_srcdir)/libcore/parser \

@@ -53,7 +53,6 @@ STD_DIRS = \
 	utilities \
 	gui \
 	plugin \
-	pythonmodule \
 	doc \
 	po \
 	$(NULL)
@@ -74,6 +73,10 @@ endif
 
 if BUILD_EXTENSIONS
 SUBDIRS += extensions
+endif
+
+if USE_PYTHON
+SUBDIRS += pythonmodule
 endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
@@ -155,7 +158,7 @@ bzrversion.h: Makefile.in
 	    echo "Using existing bzrversion.h"; \
 	else \
 	    echo "Generating bzrversion.h"; \
-	    echo 'static const char *BRANCH_REVNO  = "none";\nstatic const char *BRANCH_NICK = "none";\n' > bzrversion.h; \
+	    echo "static const char *BRANCH_REVNO  = "none";\nstatic const char *BRANCH_NICK = "none";\n" > bzrversion.h; \
 	  fi; \
 	fi
 
@@ -432,6 +435,11 @@ if NPAPI
 	@echo "	  NPAPI plugin install dir: $(FIREFOX_PLUGINS)"
 else
 	@echo "	NPAPI (Mozilla) plugin disabled"
+endif
+if USE_PYTHON
+	@echo "	PYTHON support enabled"
+else
+	@echo "	PYTHON support disabled"
 endif
 
 if TESTSUITE
