@@ -25,8 +25,9 @@ NOW = `date "+%Y%m%d"`
 # these is the directories where the snapshot gets built. Sources are
 # in the top level, the build goes in a _build subdirectory
 SNAPSHOT_DIR = gnash-${BRANCH_REVNO}_$(BRANCH_NICK)
-SNAPSHOT_BUILD = gnash-${BRANCH_REVNO}_$(BRANCH_NICK)/_build
+SNAPSHOT_BUILD = $(SNAPSHOT_DIR)/_build
 SNAPSHOT_NAME = $(SNAPSHOT_DIR)
+
 # this is the name of the actual tarball
 SNAPSHOT_TAR = gnash-$(BRANCH_REVNO)_$(BRANCH_NICK).tar.gz
 # this is the temporary directory used for DESTDIR
@@ -46,36 +47,37 @@ snapshot: snapshot-src snapshot-configure snapshot-build snapshot-install snapsh
 # This uses the default version for Gnash. which is 'trunk'. So we
 # rename it to the dir we want to stay clear. Then we change the default
 # version from 'trunk' to a date stamped version of trunk.
-snapshot-src: distdir
+snapshot-src: distdir  force
 	snapshot_tar="$(SNAPSHOT_NAME).tar.gz"; \
-	if test -d $(SNAPSHOT_DIR); then \
-	  rm -fr $(SNAPSHOT_DIR); \
+	snapshot_dir=$(SNAPSHOT_DIR); \
+	if test -d $${snapshot_dir}; then \
+	  rm -fr $${snapshot_dir}; \
 	fi; \
-	mv -f gnash-trunk $(SNAPSHOT_DIR); \
-	if test ! -f $(SNAPSHOT_DIR)/configure.ac.orig; then \
-	  mv -f $(SNAPSHOT_DIR)/configure.ac $(SNAPSHOT_DIR)/configure.ac.orig; \
+	mv -f gnash-trunk $${snapshot_dir}; \
+	if test ! -f $${snapshot_dir}/configure.ac.orig; then \
+	  mv -f $${snapshot_dir}/configure.ac $${snapshot_dir}/configure.ac.orig; \
 	  sed -e "s/AC_INIT(gnash, trunk)/AC_INIT(gnash, $(BRANCH_REVNO)-$(BRANCH_NICK))/" \
-	    $(SNAPSHOT_DIR)/configure.ac.orig > $(SNAPSHOT_DIR)/configure.ac; \
-	  cd $(SNAPSHOT_DIR) ; ./autogen.sh; cd .. ;\
+	    $${snapshot_dir}/configure.ac.orig > $${snapshot_dir}/configure.ac; \
+	  cd $${snapshot_dir} ; ./autogen.sh; cd .. ;\
 	fi; \
-	tar zcvf $${snapshot_tar} --exclude=$(SNAPSHOT_DIR)/autom4te.cache \
-	  --exclude=$(SNAPSHOT_DIR)/configure.ac.orig $(SNAPSHOT_DIR)
-#	$(RM) -fr $(SNAPSHOT_DIR)
+	tar zcvf $${snapshot_tar} --exclude=$${snapshot_dir}/autom4te.cache \
+	  --exclude=$${snapshot_dir}/configure.ac.orig $${snapshot_dir}
+#	$(RM) -fr $${snapshot_dir}
 
-snapshot-configure: 
+snapshot-configure: force
 	-@now=`date "+%Y%m%d"`; \
 	pkgname="gnash-${BRANCH_REVNO}-$(BRANCH_NICK)"; \
 	snapshot_dir=$(SNAPSHOT_DIR); \
-	snapshot_build="$(SNAPSHOT_DIR)/_build"; \
-	if test ! -d $(SNAPSHOT_BUILD); then \
-	  $(MKINSTALLDIRS) $(SNAPSHOT_BUILD); \
+	snapshot_build="$(SNAPSHOT_BUILD)"; \
+	if test ! -d $(snapshot_build); then \
+	  $(MKINSTALLDIRS) $${snapshot_build}; \
 	fi; \
 	if test -d /usr/local/mozilla-firefox/plugins; then \
           plugindir=/usr/local/mozilla-firefox/plugins; \
 	else \
 	  plugindir=/usr/lib/mozilla/plugins; \
         fi; \
-	cd $(SNAPSHOT_BUILD); ../configure \
+	cd $${snapshot_build}; ../configure \
 	$(SNAPSHOT_CONFIGURE_FLAGS) \
 	  --disable-dependency-tracking\
 	  --disable-rpath \
@@ -88,13 +90,13 @@ snapshot-configure:
 #	  --with-extensions=all 
 #	  --enable-gui=all 
 
-snapshot-build:
+snapshot-build: force
 	$(MAKE) $(AM_MAKEFLAGS) -C $(SNAPSHOT_BUILD)
 	$(MAKE) $(AM_MAKEFLAGS) -C $(SNAPSHOT_BUILD)/doc/C info man html
 
 # Install a package. Afterwards we link to the prebuilt man pages incase
 # DocBook and DocBook2X aren't installed on this machine.
-snapshot-install:
+snapshot-install: force
 	$(MAKE) $(AM_MAKEFLAGS) -C $(SNAPSHOT_BUILD) install DESTDIR=$(SNAPSHOT_TMP)
 
 # We only want to bundle an installed gnash, so all the linker paths are

@@ -65,7 +65,7 @@
 	<!-- Front End Integration Hooks (used by Extension Manager)-->
         <em:updateURL>"http://www.getgnash.org/updates/update.rdf"</em:updateURL>
         <em:homepageURL>"http://www.gnu.org/software/gnash"<em:homepageURL>
-        <em:targetPlatform>Linux_x86-gcc3</em:targetPlatform>
+        <em:targetPlatform>Linux_x86-gcc4</em:targetPlatform>
 
 	</Description>  
 </RDF>

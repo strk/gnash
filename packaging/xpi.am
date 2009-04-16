@@ -51,15 +51,16 @@ xpi-install: snapshot-install
 # executable so the executables don't have to find any of the gnash libraries at
 # runtime. This way you can have multiple versions of Gnash installed, and they all
 # use the appropriate libraries for each build.
-xpi-configure:
-	if test ! -d $(SNAPSHOT_BUILD); then \
-	  $(MKINSTALLDIRS) $(SNAPSHOT_BUILD); \
+xpi-configure: force
+	snapshot_build="$(SNAPSHOT_BUILD)"; \
+	if test ! -d $${snapshot_build}; then \
+	  $(MKINSTALLDIRS) $${snapshot_build}; \
 	fi; \
-	(cd $(SNAPSHOT_BUILD); ../configure \
+	(cd $${snapshot_build}; ../configure \
 	  --enable-static \
 	  --disable-shared \
-	  $(CONFIG_OPTS))
-	cp bzrversion.h $(SNAPSHOT_BUILD)
+	  $(CONFIG_OPTS));
+	-cp bzrversion.h $(SNAPSHOT_BUILD)
 
 # build the xpi package bundle. snapshot-build and snapshot-install need to
 # have been run already. If you wish the automatic dependency checking, use
@@ -71,7 +72,7 @@ xpi-configure:
 # Anyway, so after installing the statically linked gnash into the bundle, we then
 # have to reconfigure to enable shared libraries to be built, and then rebuild
 # the plugins and the xpcom support as dynamically loadable modules.
-xpi-bundle:
+xpi-bundle:  force
 	snapshot_dest="/tmp/$(SNAPSHOT_NAME)"; \
 	snapshot_dir="/tmp/$(SNAPSHOT_DIR)"; \
 	snapshot_xpi="/tmp/$(SNAPSHOT_NAME)-tmp"; \
@@ -80,8 +81,8 @@ xpi-bundle:
 	  cp -fr $(srcdir)/packaging/xpi/$$i $${snapshot_xpi}; \
 	done; \
 	strip  $${snapshot_dest}/usr/bin/gtk-gnash; \
-	cd $(SNAPSHOT_BUILD); ../configure --enable-shared $(CONFIG_OPTS); \
-	$(MAKE) $(AM_MAKEFLAGS) -C plugin clean install-plugin DESTDIR=$${snapshot_dest}; \
+	cd $(SNAPSHOT_BUILD); ../configure --disable-static --enable-shared $(CONFIG_OPTS); \
+	$(MAKE) $(AM_MAKEFLAGS) -C plugin install-plugin DESTDIR=$${snapshot_dest}; \
 	$(MAKE) $(AM_MAKEFLAGS) -C plugin/xpcom all install-pkglib DESTDIR=$${snapshot_dest}; \
 	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/libgnashplugin.so $${snapshot_xpi}/plugins; \
 	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.xpt $${snapshot_xpi}/plugins; \
@@ -90,7 +91,9 @@ xpi-bundle:
 	(cd $${snapshot_xpi}; $(ZIP) -r $${snapshot_dir}.xpi *);
 
 # remove files left from package building
-xpi-clean:
+xpi-clean:  force
 	rm -fr xpi-* gnash-$(RELEASE)*.xpi
 
-.PHONY : xpi xpi-bundle xpi-configure
+.PHONY : xpi xpi-bundle xpi-configure xpi-install xpi-build snapshot-src
+
+force:

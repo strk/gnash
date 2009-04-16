@@ -61,7 +61,7 @@ SUFFIXES = idl xpt
 
 EXT_DIR = "`dirname $(FIREFOX_PLUGINS)/extensions/{2b70f2b1-fc72-4734-bb81-4eb2a7713e49}`"
 
-install-plugin install-pkglib: $(pkglib_LTLIBRARIES)
+install-pkglib: iGnashComponent.h $(pkglib_LTLIBRARIES)
 	@test -d "$(DESTDIR)$(EXT_DIR)" || $(mkinstalldirs) "$(DESTDIR)$(EXT_DIR)"
 	@if test -d .libs; then \
 	  cp -f .libs/libgnashcomponent.so* $(DESTDIR)$(EXT_DIR)/libgnashcomponent.so; \
