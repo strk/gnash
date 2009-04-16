@@ -79,7 +79,7 @@ xpi-bundle:
 	for i in install.rdf; do \
 	  cp -fr $(srcdir)/packaging/xpi/$$i $${snapshot_xpi}; \
 	done; \
-	strip  $${snapshot_dest}/$(bindir)/gtk-gnash; \
+	strip  $${snapshot_dest}/usr/bin/gtk-gnash; \
 	cd $(SNAPSHOT_BUILD); ../configure --enable-shared $(CONFIG_OPTS); \
 	$(MAKE) $(AM_MAKEFLAGS) -C plugin clean install-plugin DESTDIR=$${snapshot_dest}; \
 	$(MAKE) $(AM_MAKEFLAGS) -C plugin/xpcom all install-pkglib DESTDIR=$${snapshot_dest}; \
