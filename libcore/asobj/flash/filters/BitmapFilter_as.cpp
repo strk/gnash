@@ -21,30 +21,64 @@
 #include "VM.h"
 #include "builtin_function.h"
 
-#define phelp_helper BitmapFilter_as
-#define phelp_class BitmapFilter
-#include "prophelper.h"
-
 namespace gnash {
 
 class BitmapFilter_as : public as_object, public BitmapFilter
 {
 public:
-    phelp_i(bitmap_clone);
+    static as_value bitmap_clone(const fn_call& fn);
 
     virtual boost::intrusive_ptr<as_object> clone();
 
+    BitmapFilter_as(as_object *obj)
+	    :
+        as_object(obj)
+    {}
+    static as_object* Interface();
+    static void attachInterface(as_object& o);
+    static void attachProperties(as_object& o);
+    static void registerCtor(as_object& global);
+    static as_value ctor(const fn_call& fn);
 private:
-    phelp_base_def;
+    static boost::intrusive_ptr<as_object> s_interface;
+    static boost::intrusive_ptr<builtin_function> s_ctor;
 };
 
-phelp_base_imp( , BitmapFilter)
+boost::intrusive_ptr<as_object> BitmapFilter_as::s_interface;
+boost:: intrusive_ptr<builtin_function> BitmapFilter_as::s_ctor;
 
-phelp_i_attach_begin
-phelp_i_attach(clone, bitmap_clone);
-phelp_i_attach_end
+as_object*
+BitmapFilter_as::Interface() {
+    if (BitmapFilter_as::s_interface == NULL) {
+        BitmapFilter_as::s_interface = new as_object;
+        VM::get().addStatic(BitmapFilter_as::s_interface.get());
+        BitmapFilter_as::attachInterface(*BitmapFilter_as::s_interface);
+    }
+    return BitmapFilter_as::s_interface.get();
+}
 
-// Clone this object.
+void
+BitmapFilter_as::registerCtor(as_object& global) {
+    if (BitmapFilter_as::s_ctor != NULL) return;
+    BitmapFilter_as::s_ctor = new builtin_function(&BitmapFilter_as::ctor, BitmapFilter_as::Interface());
+    VM::get().addStatic(BitmapFilter_as::s_ctor.get());
+    BitmapFilter_as::attachInterface(*BitmapFilter_as::s_ctor);
+    global.init_member("BitmapFilter" , BitmapFilter_as::s_ctor.get());
+}
+
+void
+BitmapFilter_class_init(as_object& global) {
+    BitmapFilter_as::registerCtor(global);
+}
+
+void
+BitmapFilter_as::attachInterface(as_object& o)
+{
+    boost::intrusive_ptr<builtin_function> gs;
+    o.init_member("clone" , new builtin_function(bitmap_clone));
+}
+
+
 boost::intrusive_ptr<as_object> BitmapFilter_as::clone()
 {
     boost::intrusive_ptr<as_object> o = new BitmapFilter_as(BitmapFilter_as::Interface());
@@ -52,13 +86,14 @@ boost::intrusive_ptr<as_object> BitmapFilter_as::clone()
 }
 
 as_value
-BitmapFilter_as::ctor(const fn_call& /*fn*/)
+BitmapFilter_as::ctor(const fn_call& )
 {
     boost::intrusive_ptr<as_object> obj = new BitmapFilter_as(BitmapFilter_as::Interface());
     return as_value(obj);
 }
 
-as_value BitmapFilter_as::bitmap_clone(const fn_call& fn)
+as_value
+BitmapFilter_as::bitmap_clone(const fn_call& fn)
 {
     boost::intrusive_ptr<BitmapFilter_as> to_copy = ensureType<BitmapFilter_as> (fn.this_ptr);
     boost::intrusive_ptr<BitmapFilter_as> filter = new BitmapFilter_as(*to_copy);
@@ -75,5 +110,4 @@ bitmapFilter_interface()
     return BitmapFilter_as::Interface();
 }
 
-} // Namespace gnash
-
+}
