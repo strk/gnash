@@ -47,11 +47,11 @@ class asName;
 class Machine;
 class abc_function;
 
-namespace abc_parsing {
-class abc_Trait;
+namespace abc {
+class Trait;
 }
 
-using namespace abc_parsing;
+using namespace abc;
 class asException
 {
 public:
@@ -681,7 +681,7 @@ public:
 	asBinding* getGetBinding(as_value& v, asName& n);
 	asBinding* getSetBinding(as_value& v, asName& n);
 
-	std::vector<abc_Trait> _traits;
+	std::vector<Trait> _traits;
 
 private:
 

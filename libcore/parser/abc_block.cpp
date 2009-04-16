@@ -31,10 +31,10 @@
 
 namespace gnash {
 
-namespace abc_parsing {
+namespace abc {
 
 bool
-abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
+Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 {
 	log_abc("In finalize class name=%s trait kind=0x%X", 
             pBlock->_stringPool[pClass->getName()], _kind | 0x0);
@@ -111,7 +111,7 @@ abc_Trait::finalize(abc_block *pBlock, asClass *pClass, bool do_static)
 }
 
 bool
-abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
+Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 {
 	log_abc("Finalizing method");
 	switch (_kind)
@@ -186,7 +186,7 @@ abc_Trait::finalize_mbody(abc_block *pBlock, asMethod *pMethod)
 
 /// Read an AS3 'trait'
 bool
-abc_Trait::read(SWFStream* in, abc_block *pBlock)
+Trait::read(SWFStream* in, abc_block *pBlock)
 {
 	boost::uint32_t name = in->read_V32();
 	if (name >= pBlock->_multinamePool.size())
@@ -290,9 +290,9 @@ abc_Trait::read(SWFStream* in, abc_block *pBlock)
 	return true;
 }
 
-} // abc_parsing
+} // abc
 
-using namespace abc_parsing;
+using namespace abc;
 
 abc_block::abc_block()
     :
@@ -317,7 +317,7 @@ abc_block::prepare(Machine* mach)
             boost::bind(&asMethod::initPrototype, _1, mach));
 
     std::for_each(_traits.begin(), _traits.end(),
-            boost::bind(&abc_Trait::finalize, _1, this));
+            boost::bind(&Trait::finalize, _1, this));
 
     _traits.clear();
 
@@ -1022,7 +1022,7 @@ abc_block::read_instances()
 		log_abc("Trait count: %u", tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
-			abc_Trait &aTrait = newTrait();
+			Trait &aTrait = newTrait();
 			aTrait.set_target(pClass, false);
 			if (!aTrait.read(mS, this))
 				return false;
@@ -1061,7 +1061,7 @@ abc_block::read_classes()
 		log_abc("This class has %u traits.", tcount);
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
-			abc_Trait &aTrait = newTrait();
+			Trait &aTrait = newTrait();
 			aTrait.set_target(pClass, true);
 			if (!(aTrait.read(mS, this)))
 				return false;
@@ -1105,7 +1105,7 @@ abc_block::read_scripts()
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
 			
-			abc_Trait &aTrait = newTrait();
+			Trait &aTrait = newTrait();
 			aTrait.set_target(pScript, false);
 			if (!(aTrait.read(mS, this))) {
 				return false;
@@ -1218,7 +1218,7 @@ abc_block::read_method_bodies()
 		boost::uint32_t tcount = mS->read_V32();
 		for (unsigned int j = 0; j < tcount; ++j)
 		{
-			abc_Trait &aTrait = newTrait();
+			Trait &aTrait = newTrait();
 			aTrait.set_target(_methods[offset]);
 			if (!aTrait.read(mS, this)) {
                 // TODO: 'method body activation traits'
@@ -1273,7 +1273,7 @@ abc_block::read(SWFStream& in)
 /*	The loop below causes a segmentation fault, because it tries to modify 
 	asMethod.mPrototype, which is never initialized.  The parser seems 
 	to work ok without this call.*/
-/*	std::vector<abc_Trait*>::iterator i = mTraits.begin();
+/*	std::vector<Trait*>::iterator i = mTraits.begin();
 	for ( ; i != mTraits.end(); ++i)
 	{
 		if (!(*i)->finalize(this))

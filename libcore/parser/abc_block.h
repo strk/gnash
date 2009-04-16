@@ -42,11 +42,11 @@ class ClassHierarchy;
 class asMethod;
 class asClass;
 
-namespace abc_parsing {
+namespace abc {
 
-class abc_Trait;
+class Trait;
 
-class abc_Trait
+class Trait
 {
 public:
 
@@ -77,7 +77,7 @@ public:
 	asMethod* _methodTarget;
 	bool _static;
 
-	abc_Trait()
+	Trait()
         :
         _hasValue(false),
         _kind(KIND_SLOT),
@@ -120,7 +120,7 @@ public:
 	}
 };
 
-} // namespace abc_parsing
+} // namespace abc
 
 typedef std::vector<asNamespace*> NamespaceSet;
 			
@@ -134,9 +134,9 @@ public:
 
 	asClass* locateClass(const std::string& className);
 
-	abc_parsing::abc_Trait &newTrait()
+	abc::Trait &newTrait()
 	{
-		abc_parsing::abc_Trait *p = new abc_parsing::abc_Trait;
+		abc::Trait *p = new abc::Trait;
 		_traits.push_back(p);
 		return *p;
 	}
@@ -195,7 +195,7 @@ public:
 
 private:
 
-    friend class abc_parsing::abc_Trait;
+    friend class abc::Trait;
 
 	bool read_version();
 	bool read_integer_constants();
@@ -260,7 +260,7 @@ private:
 	std::vector<asName> _multinamePool;
 	std::vector<asClass*> _classes; 
 	std::vector<asClass*> _scripts;
-	std::vector<abc_parsing::abc_Trait*> _traits;
+	std::vector<abc::Trait*> _traits;
 
 	string_table* _stringTable;
 	SWFStream* mS; // Not stored beyond one read.
