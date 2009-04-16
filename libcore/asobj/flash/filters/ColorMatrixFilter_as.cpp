@@ -20,9 +20,6 @@
 #include "ColorMatrixFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
-
-#define phelp_helper ColorMatrixFilter_as
-#include "prophelper.h"
 #include "BitmapFilter_as.h"
 
 namespace gnash {
@@ -30,37 +27,98 @@ namespace gnash {
 class ColorMatrixFilter_as : public as_object, public ColorMatrixFilter
 {
 public:
-    phelp_gs(matrix);
+    static as_value matrix_gs(const fn_call& fn);
+    static as_value bitmap_clone(const fn_call& fn);
 
-    phelp_i(bitmap_clone);
-
+    ColorMatrixFilter_as(as_object *obj)
+        :
+        as_object(obj)
+    {}
+    static as_object* Interface();
+    static void attachInterface(as_object& o);
+    static void attachProperties(as_object& o);
+    static void registerCtor(as_object& global);
+    static as_value ctor(const fn_call& fn);
 private:
-    phelp_base_def;
+    static boost::intrusive_ptr<as_object> s_interface;
+    static boost::intrusive_ptr<builtin_function> s_ctor;
+
 };
 
-phelp_base_imp((bitmapFilter_interface()), ColorMatrixFilter)
 
-// Filters are purely property based.
-phelp_i_attach_begin
-phelp_i_replace(clone, bitmap_clone);
-phelp_i_attach_end
+boost::intrusive_ptr<as_object> ColorMatrixFilter_as::s_interface;
+boost:: intrusive_ptr<builtin_function> ColorMatrixFilter_as::s_ctor;
 
-phelp_gs_attach_begin
-phelp_gs_attach(matrix);
-phelp_gs_attach_end
-
-phelp_array_property(matrix)
-
-easy_clone(ColorMatrixFilter_as)
-
-as_value
-ColorMatrixFilter_as::ctor(const fn_call& /*fn*/)
-{
-    boost::intrusive_ptr<as_object> obj = new ColorMatrixFilter_as(ColorMatrixFilter_as::Interface());
-    ColorMatrixFilter_as::attachProperties(*obj);
-
-    return as_value(obj.get());
+as_object* ColorMatrixFilter_as::Interface() {
+    if (ColorMatrixFilter_as::s_interface == NULL) {
+        ColorMatrixFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        VM::get().addStatic(ColorMatrixFilter_as::s_interface.get());
+        ColorMatrixFilter_as::attachInterface(*ColorMatrixFilter_as::s_interface);
+    }
+    return ColorMatrixFilter_as::s_interface.get();
 }
 
-} // Namespace gnash
+void
+ColorMatrixFilter_as::registerCtor(as_object& global)
+{
+    if (ColorMatrixFilter_as::s_ctor != NULL) return;
+    ColorMatrixFilter_as::s_ctor = new builtin_function(&ColorMatrixFilter_as::ctor, ColorMatrixFilter_as::Interface());
+    VM::get().addStatic(ColorMatrixFilter_as::s_ctor.get());
+    ColorMatrixFilter_as::attachInterface(*ColorMatrixFilter_as::s_ctor);
+    global.init_member("ColorMatrixFilter" , ColorMatrixFilter_as::s_ctor.get());
+}
 
+void
+ColorMatrixFilter_class_init(as_object& global)
+{
+    ColorMatrixFilter_as::registerCtor(global);
+}
+
+
+void
+ColorMatrixFilter_as::attachInterface(as_object& o)
+{
+	boost::intrusive_ptr<builtin_function> gs;
+
+    o.set_member(VM::get().getStringTable().find("clone"), new builtin_function(bitmap_clone));
+
+}
+
+void
+ColorMatrixFilter_as::attachProperties(as_object& o)
+{
+	boost::intrusive_ptr<builtin_function> gs;
+
+    gs = new builtin_function(ColorMatrixFilter_as::matrix_gs, NULL);
+    o.init_property("matrix" , *gs, *gs);
+}
+
+as_value
+ColorMatrixFilter_as::matrix_gs(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorMatrixFilter_as> ptr = ensureType<ColorMatrixFilter_as>(fn.this_ptr);
+    return as_value();
+}
+
+as_value
+ColorMatrixFilter_as::bitmap_clone(const fn_call& fn)
+{
+	boost::intrusive_ptr<ColorMatrixFilter_as> ptr = ensureType<ColorMatrixFilter_as>(fn.this_ptr);
+    boost::intrusive_ptr<ColorMatrixFilter_as> obj = new ColorMatrixFilter_as(*ptr);
+    boost::intrusive_ptr<as_object> r = obj;
+    r->set_prototype(ptr->get_prototype());
+    r->copyProperties(*ptr);
+    return as_value(r);
+}
+
+as_value
+ColorMatrixFilter_as::ctor(const fn_call& )
+{
+    boost::intrusive_ptr<as_object> obj = new ColorMatrixFilter_as(ColorMatrixFilter_as::Interface());
+
+    ColorMatrixFilter_as::attachProperties(*obj);
+    return as_value(obj.get());
+
+}
+
+}
