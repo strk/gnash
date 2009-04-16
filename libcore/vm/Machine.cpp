@@ -2775,22 +2775,22 @@ Machine::instantiateClass(std::string className, as_object* global)
 
     log_debug("instantiateClass: class name %s", className);
 
-	asClass* theClass = mPoolObject->locateClass(className);
-    if ( ! theClass )
+	asClass* cl = mPoolObject->locateClass(className);
+    if (!cl)
     {
-        // TODO: check how the pp would handle this
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("Could not locate class '%s' for instantiation", className);
-        );
+        /// This seems like a big error.
+        log_error("Could not locate class '%s' for instantiation", className);
         return;
     }
 	
-	clearRegisters(theClass->getConstructor()->getMaxRegisters());
-	mCurrentFunction = theClass->getConstructor()->getPrototype();
+    asMethod* ctor = cl->getConstructor();
+
+	clearRegisters(ctor->getMaxRegisters());
+	mCurrentFunction = ctor->getPrototype();
 	mStack.clear();
 	mScopeStack.clear();
 	mRegisters[0] = as_value(global);
-	executeCodeblock(theClass->getConstructor()->getBody());
+	executeCodeblock(ctor->getBody());
 }
 
 Machine::Machine(VM& vm)

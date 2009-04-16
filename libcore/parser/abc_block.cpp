@@ -207,8 +207,10 @@ Trait::read(SWFStream* in, abc_block *pBlock)
 	boost::uint8_t kind = in->read_u8();
 	_kind = static_cast<Kind>(kind & 0x0F);
 
-	log_abc("Trai name=%s Trait kind is 0x%X", pBlock->_stringPool[multiname.getABCName()], kind | 0x0);
-	switch (_kind)
+	log_abc("Trait name: %s, Trait kind: 0x%X",
+            pBlock->_stringPool[multiname.getABCName()], kind | 0x0);
+
+    switch (_kind)
 	{
 	case KIND_SLOT:
 	case KIND_CONST:
@@ -362,7 +364,8 @@ abc_block::setMultinameNames(asName *n, string_table::key ABCName)
 	string_table::key global_key = _stringTable->find(name, true);
 	log_abc("Global key %u", global_key);
 	n->setGlobalName(global_key);
-	log_abc("Multiname: %s ABCName set to %u global name set to %u", name, n->getABCName(), n->getGlobalName());
+	log_abc("Multiname: %s ABCName set to %u, global name set to %u",
+            name, n->getABCName(), n->getGlobalName());
 }
 
 void
@@ -1288,14 +1291,38 @@ abc_block::read(SWFStream& in)
 asClass*
 abc_block::locateClass(const std::string& className)
 {
-	
-	std::vector<asClass*>::iterator i = _classes.begin();
-	for( ; i!=_classes.end(); ++i) {
-		if (_stringPool[(*i)->getName()] == className) {
-			return *i;
-		}
-	}	
-	return NULL;
+
+    const std::string::size_type pos = className.rfind(".");
+    
+    if (pos == std::string::npos) {
+        for (std::vector<asClass*>::iterator i = _classes.begin();
+                i != _classes.end(); ++i) {
+            if (_stringPool[(*i)->getName()] == className) {
+                return *i;
+            }
+        }	
+        return 0;
+    }
+    
+    const std::string& nsstr = className.substr(0, pos);
+    const std::string& clstr = className.substr(pos + 1);
+    
+    for (std::vector<asNamespace*>::iterator i = _namespacePool.begin();
+            i != _namespacePool.end(); ++i) {
+        if (_stringPool[(*i)->getAbcURI()] == nsstr) {
+
+            for (std::vector<asClass*>::iterator j = _classes.begin();
+                    j != _classes.end(); ++j) {
+                if (_stringPool[(*j)->getName()] == clstr) {
+                    return (*i)->getClass((*j)->getName());
+                }
+            }	
+        return 0;
+        
+        }
+    }	
+	return 0;
+
 }
 
 void
