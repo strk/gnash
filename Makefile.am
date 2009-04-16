@@ -81,7 +81,7 @@ endif
 
 # man_MANS = doc/gnash.1 doc/gprocessor.1 doc/dumpshm.1 soldumper.1
 
-DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite
+DIST_SUBDIRS = $(LIBLTDLDIR) $(STD_DIRS) cygnal extensions testsuite pythonmodule
 
 EXTRA_DIST =  \
 	autogen.sh \
