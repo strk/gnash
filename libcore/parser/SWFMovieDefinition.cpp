@@ -64,6 +64,10 @@
 namespace gnash
 {
 
+namespace {
+    template<typename T> void markMappedResources(const T& t);
+}
+
 MovieLoader::MovieLoader(SWFMovieDefinition& md)
 	:
 	_movie_def(md),
@@ -856,37 +860,17 @@ SWFMovieDefinition::get_labeled_frame(const std::string& label,
 void
 SWFMovieDefinition::markReachableResources() const
 {
-	for (FontMap::const_iterator i=m_fonts.begin(), e=m_fonts.end(); i!=e; ++i)
-	{
-		i->second->setReachable();
-	}
+    markMappedResources(m_fonts);
+    markMappedResources(_bitmaps);
+    markMappedResources(m_sound_samples);
 
-	for (Bitmaps::const_iterator i = _bitmaps.begin(), e = _bitmaps.end();
-            i != e; ++i)
-	{
-		i->second->setReachable();
-	}
-
-	for (SoundSampleMap::const_iterator i=m_sound_samples.begin(), e=m_sound_samples.end(); i!=e; ++i)
-	{
-		i->second->setReachable();
-	}
-
-	// TODO: turn this into a markExportedResources()
 	{
 		boost::mutex::scoped_lock lock(_exportedResourcesMutex);
-		for (ExportMap::const_iterator i=_exportedResources.begin(),
-                e=_exportedResources.end(); i!=e; ++i)
-		{
-			i->second->setReachable();
-		}
+        markMappedResources(_exportedResources);
 	}
 
-	for (ImportVect::const_iterator i=m_import_source_movies.begin(),
-            e=m_import_source_movies.end(); i!=e; ++i)
-	{
-		(*i)->setReachable();
-	}
+    std::for_each(m_import_source_movies.begin(), m_import_source_movies.end(),
+           boost::mem_fn(&movie_definition::setReachable));
 
 	boost::mutex::scoped_lock lock(_dictionaryMutex);
 	_dictionary.markReachableResources();
@@ -937,6 +921,22 @@ SWFMovieDefinition::importResources(
 	{
 		_importSources.insert(source);
 	}
+}
+
+namespace {
+
+template<typename T>
+void markMappedResources(const T& t)
+{
+    typedef typename
+        RemovePointer<typename T::value_type::second_type>::value_type
+        contained_type;
+
+    std::for_each(t.begin(), t.end(),
+            boost::bind(&contained_type::setReachable,
+                boost::bind(SecondElement<typename T::value_type>(), _1)));
+}
+
 }
 
 } // namespace gnash

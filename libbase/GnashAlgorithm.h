@@ -22,6 +22,8 @@
 
 #include <algorithm>
 #include <boost/checked_delete.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace gnash {
 
@@ -57,6 +59,20 @@ struct RemovePointer<T*>
 {
     typedef typename RemovePointer<T>::value_type value_type;
 };
+
+template<typename T>
+struct RemovePointer<boost::intrusive_ptr<T> >
+{
+    typedef typename RemovePointer<T>::value_type value_type;
+};
+
+template<typename T>
+struct RemovePointer<boost::shared_ptr<T> >
+{
+    typedef typename RemovePointer<T>::value_type value_type;
+};
+
+
 
 /// Delete a pointer safely
 //
