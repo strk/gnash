@@ -102,7 +102,8 @@ as_environment::get_variable(const std::string& varname,
     else
     {
     // TODO: have this checked by parse_path as an optimization 
-    if ( varname.find_first_of('/') != std::string::npos && varname.find_first_of(':') == std::string::npos )
+    if (varname.find('/') != std::string::npos &&
+            varname.find(':') == std::string::npos)
     {
         // Consider it all a path ...
             as_object* target = find_object(varname, &scopeStack); 

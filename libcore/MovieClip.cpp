@@ -3786,10 +3786,9 @@ movieclip_getNextHighestDepth(const fn_call& fn)
 as_value
 movieclip_getInstanceAtDepth(const fn_call& fn)
 {
-    boost::intrusive_ptr<MovieClip> movieclip = 
-        ensureType<MovieClip>(fn.this_ptr);
+    boost::intrusive_ptr<MovieClip> mc = ensureType<MovieClip>(fn.this_ptr);
 
-    if ( fn.nargs < 1 )
+    if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("MovieClip.getInstanceAtDepth(): missing depth argument");
@@ -3798,8 +3797,10 @@ movieclip_getInstanceAtDepth(const fn_call& fn)
     }
 
     int depth = fn.arg(0).to_int();
-    boost::intrusive_ptr<DisplayObject> ch = movieclip->getDisplayObjectAtDepth(depth);
-    if ( ! ch ) return as_value(); // we want 'undefined', not 'null'
+    boost::intrusive_ptr<DisplayObject> ch = mc->getDisplayObjectAtDepth(depth);
+ 
+    // we want 'undefined', not 'null'
+    if (!ch) return as_value();
     return as_value(ch.get());
 }
 

@@ -3359,19 +3359,18 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
 
     IF_VERBOSE_ACTION (
-    log_action(_(" method name: %s"), method_name);
-    log_action(_(" method object/func: %s"), obj_value);
-    log_action(_(" method nargs: %d"), nargs);
+        log_action(_(" method name: %s"), method_name);
+        log_action(_(" method object/func: %s"), obj_value);
+        log_action(_(" method nargs: %d"), nargs);
     );
 
     std::string method_string = method_name.to_string();
-    as_value method_val;
+
+    bool hasMethodName = ((!method_name.is_undefined()) &&
+            (!method_string.empty()) );
+
     boost::intrusive_ptr<as_object> obj = obj_value.to_object();
-
-    bool hasMethodName = ( (!method_name.is_undefined()) && (!method_string.empty()) );
-
-    if ( ! obj )
-    {
+    if (!obj) {
         // SWF integrity check
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("ActionCallMethod invoked with "
@@ -3390,39 +3389,41 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     }
     as_object* super = obj->get_super(hasMethodName ? method_string.c_str() : 0);
 
-    if ( ! hasMethodName )
-    {
+    as_value method_val;
+
+    if (!hasMethodName) {
         // We'll be calling the super constructor here
         method_val = obj_value;
 
-        if ( ! method_val.is_function() )
+        if (!method_val.is_function())
         {
 
-//#ifdef GNASH_DEBUG
             log_debug(_("Function object given to ActionCallMethod"
                        " is not a function (%s), will try to use"
-                       " its 'constructor' member (but should instead invoke it's [[Call]] method"),
-                    obj_value);
-//#endif
+                       " its 'constructor' member (but should instead "
+                       "invoke its [[Call]] method"), obj_value);
 
-            // TODO: all this crap should go into an as_object::getConstructor instead
+            // TODO: all this crap should go into an
+            // as_object::getConstructor instead
             as_value ctor;
             if (!obj->get_member(NSV::PROP_CONSTRUCTOR, &ctor) )
             {
                 IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("ActionCallMethod: object has no constructor"));
+                    log_aserror(_("ActionCallMethod: object has no "
+                            "constructor"));
                 );
                 env.drop(nargs);
-        	env.push(as_value());
+                env.push(as_value());
                 return;
             }
-            if ( ! ctor.is_function() )
+            if (!ctor.is_function())
             {
                 IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror(_("ActionCallMethod: object constructor is not a function"));
+                log_aserror(_("ActionCallMethod: object constructor "
+                        "is not a function"));
                 );
                 env.drop(nargs);
-        	env.push(as_value());
+                env.push(as_value());
                 return;
             }
             method_val = ctor;
@@ -3430,6 +3431,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     }
     else
     {
+
         if ( ! thread.getObjectMember(*obj, method_string, method_val) )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -3468,12 +3470,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     env.push(result);
 
     // Now, if there was an exception, proceed to the end of the block.
-    if (result.is_exception())
-    {
-        thread.skipRemainingBuffer();
-    }
-    // This is to check stack status after call method
-    //log_debug(_("at doActionCallMethod() end, stack: ")); env.dump_stack();
+    if (result.is_exception()) thread.skipRemainingBuffer();
 
 }
 

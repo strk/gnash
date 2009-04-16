@@ -275,33 +275,34 @@ bool GradientGlowFilter::read(SWFStream& in)
     return true;
 }
 
-bool ConvolutionFilter::read(SWFStream& in)
+bool
+ConvolutionFilter::read(SWFStream& in)
 {
     in.ensureBytes(2 + 8);
 
-    m_matrixX = in.read_u8(); // 1 byte
-    m_matrixY = in.read_u8(); // 1 byte
+    _matrixX = in.read_u8(); // 1 byte
+    _matrixY = in.read_u8(); // 1 byte
 
-    m_divisor = in.read_long_float(); // 4 bytes
-    m_bias = in.read_long_float(); // 4 bytes
+    _divisor = in.read_long_float(); // 4 bytes
+    _bias = in.read_long_float(); // 4 bytes
 
-    size_t SWFMatrixCount = m_matrixX * m_matrixY;
+    size_t SWFMatrixCount = _matrixX * _matrixY;
 
     in.ensureBytes(SWFMatrixCount*4 + 4 + 1);
 
-    m_matrix.reserve(SWFMatrixCount);
+    _matrix.reserve(SWFMatrixCount);
     for (size_t i = 0; i < SWFMatrixCount; ++i)
     {
-        m_matrix.push_back(in.read_long_float());
+        _matrix.push_back(in.read_long_float());
     }
 
-    m_color = in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8());
-    m_alpha = in.read_u8();
+    _color = in.read_u8() << (16 + in.read_u8()) << (8 + in.read_u8());
+    _alpha = in.read_u8();
 
     static_cast<void> (in.read_uint(6)); // Throw away.
 
-    m_clamp = in.read_bit(); 
-    m_preserveAlpha = in.read_bit(); 
+    _clamp = in.read_bit(); 
+    _preserveAlpha = in.read_bit(); 
 
     IF_VERBOSE_PARSE(
     log_parse("   ConvolutionFilter ");

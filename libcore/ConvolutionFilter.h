@@ -30,35 +30,51 @@ namespace gnash {
 class ConvolutionFilter : public BitmapFilter
 {
 public:
-    // Fill from a SWFStream. See parser/filter_factory.cpp for the implementations.
+    // Fill from a SWFStream. See parser/filter_factory.cpp for
+    // the implementations.
     virtual bool read(SWFStream& in);
 
-    virtual ~ConvolutionFilter() { return; }
+    virtual ~ConvolutionFilter() {}
 
-    ConvolutionFilter() : 
-        m_matrixX(), m_matrixY(), m_matrix(), m_divisor(), m_bias(),
-        m_preserveAlpha(false), m_clamp(false), m_color(), m_alpha()
-    { return; }
+    ConvolutionFilter()
+        :
+        _matrixX(),
+        _matrixY(),
+        _matrix(),
+        _divisor(),
+        _bias(),
+        _preserveAlpha(false),
+        _clamp(false),
+        _color(),
+        _alpha()
+    {}
 
     ConvolutionFilter(boost::uint8_t matrixX, boost::uint8_t matrixY, 
-        std::vector<float> a_matrix,
-        float divisor, float bias, bool preserveAlpha, bool clamp, boost::uint32_t color,
-        boost::uint8_t alpha) :
-        m_matrixX(matrixX), m_matrixY(matrixY), m_matrix(a_matrix),
-        m_divisor(divisor), m_bias(bias), m_preserveAlpha(preserveAlpha),
-        m_clamp(clamp), m_color(color), m_alpha(alpha)
-    { return; }
+        const std::vector<float>& _matrix, float divisor, float bias,
+        bool preserveAlpha, bool clamp, boost::uint32_t color,
+        boost::uint8_t alpha)
+        :
+        _matrixX(matrixX),
+        _matrixY(matrixY),
+        _matrix(_matrix),
+        _divisor(divisor),
+        _bias(bias),
+        _preserveAlpha(preserveAlpha),
+        _clamp(clamp),
+        _color(color),
+        _alpha(alpha)
+    {}
 
 protected:
-    boost::uint8_t m_matrixX; // Number of columns
-    boost::uint8_t m_matrixY; // Number of rows
-    std::vector<float> m_matrix; // The convolution matrix
-    float m_divisor;
-    float m_bias;
-    bool m_preserveAlpha; // If true, don't convolute the alpha channel
-    bool m_clamp; // Whether or not to clamp
-    boost::uint32_t m_color; // For off-image pixels
-    boost::uint8_t m_alpha; // For off-image pixels
+    boost::uint8_t _matrixX; // Number of columns
+    boost::uint8_t _matrixY; // Number of rows
+    std::vector<float> _matrix; // The convolution matrix
+    float _divisor;
+    float _bias;
+    bool _preserveAlpha; // If true, don't convolute the alpha channel
+    bool _clamp; // Whether or not to clamp
+    boost::uint32_t _color; // For off-image pixels
+    boost::uint8_t _alpha; // For off-image pixels
 };
 
 } // Namespace gnash

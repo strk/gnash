@@ -1224,10 +1224,7 @@ DisplayObject::computeTargetPath() const
 		const DisplayObject* parent = ch->get_parent();
 
 		// Don't push the _root name on the stack
-		if ( ! parent )
-		{
-			// it is completely legal to set root's _name
-			//assert(ch->get_name().empty());
+		if (!parent) {
 			topLevel = ch;
 			break;
 		}
@@ -1238,8 +1235,7 @@ DisplayObject::computeTargetPath() const
 
 	assert(topLevel);
 
-	if ( path.empty() )
-	{
+	if (path.empty()) {
 		if (&_vm.getRoot().getRootMovie() == this) return "/";
 		std::stringstream ss;
 		ss << "_level" << m_depth-DisplayObject::staticDepthOffset;
@@ -1248,20 +1244,16 @@ DisplayObject::computeTargetPath() const
 
 	// Build the target string from the parents stack
 	std::string target;
-	if (topLevel != &_vm.getRoot().getRootMovie() )
-	{
+	if (topLevel != &_vm.getRoot().getRootMovie()) {
 		std::stringstream ss;
-		ss << "_level" << topLevel->get_depth()-DisplayObject::staticDepthOffset;
+		ss << "_level" << 
+            topLevel->get_depth() - DisplayObject::staticDepthOffset;
 		target = ss.str();
 	}
-	for ( Path::reverse_iterator
-			it=path.rbegin(), itEnd=path.rend();
-			it != itEnd;
-			++it )
-	{
+	for (Path::reverse_iterator it=path.rbegin(), itEnd=path.rend();
+			it != itEnd; ++it) {
 		target += "/" + *it; 
 	}
-
 	return target;
 }
 
@@ -1269,9 +1261,6 @@ DisplayObject::computeTargetPath() const
 std::string
 DisplayObject::getTargetPath() const
 {
-
-  // TODO: maybe cache computed target?
-
 	return computeTargetPath();
 }
 
@@ -1295,23 +1284,21 @@ DisplayObject::getTarget() const
 		const DisplayObject* parent = ch->get_parent();
 
 		// Don't push the _root name on the stack
-		if ( ! parent )
-		{
+		if (!parent) {
+
 			std::stringstream ss;
-			if (!dynamic_cast<const Movie*>(ch))
-			{
+			if (!dynamic_cast<const Movie*>(ch)) {
 				// must be an as-referenceable
 				// DisplayObject created using 'new'
 				// like, new MovieClip, new Video, new TextField...
-				// 
 				log_debug("DisplayObject %p (%s) doesn't have a parent and "
                         "is not a Movie", ch, typeName(*ch));
 				ss << "<no parent, depth" << ch->get_depth() << ">";
 				path.push_back(ss.str());
 			}
-			else
-			{
-				ss << "_level" << ch->get_depth()-DisplayObject::staticDepthOffset;
+			else {
+				ss << "_level" <<
+                    ch->get_depth() - DisplayObject::staticDepthOffset;
 				path.push_back(ss.str());
 			}
 			break;
@@ -1321,16 +1308,14 @@ DisplayObject::getTarget() const
 		ch = parent;
 	} 
 
-	assert ( ! path.empty() );
+	assert (!path.empty());
 
 	// Build the target string from the parents stack
 	std::string target;
-	for ( Path::const_reverse_iterator
-			it=path.rbegin(), itEnd=path.rend();
-			it != itEnd;
-			++it )
-	{
-		if ( ! target.empty() ) target += ".";
+	for (Path::const_reverse_iterator it=path.rbegin(), itEnd=path.rend();
+			it != itEnd; ++it) {
+
+		if (!target.empty()) target += ".";
 		target += *it; 
 	}
 

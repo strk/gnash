@@ -98,8 +98,7 @@ public:
 
 	void setTransform(const cxform& newTrans) 
 	{
-		if ( ! checkSprite() ) return;
-        
+		if (!checkSprite()) return;
 		_sprite->set_user_cxform(newTrans);
 	}
 
@@ -343,14 +342,14 @@ color_settransform(const fn_call& fn)
 #ifdef GNASH_DEBUG_COLOR 
 	std::stringstream ss; 
 	as_value tmp;
-	if ( trans->get_member(st.find("ra"), &tmp) ) ss << " ra:" << tmp.to_number();
-	if ( trans->get_member(st.find("ga"), &tmp) ) ss << " ga:" << tmp.to_number();
-	if ( trans->get_member(st.find("ba"), &tmp) ) ss << " ba:" << tmp.to_number();
-	if ( trans->get_member(st.find("aa"), &tmp) ) ss << " aa:" << tmp.to_number();
-	if ( trans->get_member(st.find("rb"), &tmp) ) ss << " rb:" << tmp.to_number();
-	if ( trans->get_member(st.find("gb"), &tmp) ) ss << " gb:" << tmp.to_number();
-	if ( trans->get_member(st.find("bb"), &tmp) ) ss << " bb:" << tmp.to_number();
-	if ( trans->get_member(st.find("ab"), &tmp) ) ss << " ab:" << tmp.to_number();
+	if (trans->get_member(st.find("ra"), &tmp)) ss << " ra:" << tmp.to_number();
+	if (trans->get_member(st.find("ga"), &tmp)) ss << " ga:" << tmp.to_number();
+	if (trans->get_member(st.find("ba"), &tmp)) ss << " ba:" << tmp.to_number();
+	if (trans->get_member(st.find("aa"), &tmp)) ss << " aa:" << tmp.to_number();
+	if (trans->get_member(st.find("rb"), &tmp)) ss << " rb:" << tmp.to_number();
+	if (trans->get_member(st.find("gb"), &tmp)) ss << " gb:" << tmp.to_number();
+	if (trans->get_member(st.find("bb"), &tmp)) ss << " bb:" << tmp.to_number();
+	if (trans->get_member(st.find("ab"), &tmp)) ss << " ab:" << tmp.to_number();
 	log_debug("Color.setTransform(%s) : TESTING", ss.str());
 #endif
 
