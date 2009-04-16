@@ -135,7 +135,6 @@ noinst_HEADERS = \
 	Number_as.h \
 	Object.h \
 	PlayHead.h \
-	prophelper.h \
 	Selection_as.h \
 	SharedObject_as.h \
 	Sound_as.h \
