@@ -217,9 +217,6 @@ SWFMovieDefinition::~SWFMovieDefinition()
         deleteAllChecked(pl);
     }
 
-	// It's supposed to be cleaned up in read()
-	// TODO: join with loader thread instead ?
-	//assert(m_jpeg_in->get() == NULL);
 }
 
 void
@@ -241,7 +238,7 @@ SWFMovieDefinition::getDefinitionTag(int id) const
 #ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
 #endif 
-	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
+	return ch.get(); 
 }
 
 void
@@ -278,9 +275,8 @@ SWFMovieDefinition::get_font(const std::string& name, bool bold, bool italic)
 BitmapInfo*
 SWFMovieDefinition::getBitmap(int id) const
 {
-    Bitmaps::const_iterator it = _bitmaps.find(id);
+    const Bitmaps::const_iterator it = _bitmaps.find(id);
     if (it == _bitmaps.end()) return 0;
-    
     return it->second.get();
 }
 
@@ -289,7 +285,6 @@ SWFMovieDefinition::addBitmap(int id, boost::intrusive_ptr<BitmapInfo> im)
 {
     assert(im);
     _bitmaps.insert(std::make_pair(id, im));
-
 }
 
 sound_sample*
@@ -608,7 +603,7 @@ parse_tag:
             else if (_tag_loaders.get(tag, &lf)) {
                 // call the tag loader.  The tag loader should add
                 // DisplayObjects or tags to the movie data structure.
-                (*lf)(str, tag, *this, _runInfo);
+                lf(str, tag, *this, _runInfo);
             }
             else {
                 // no tag loader for this tag type.
