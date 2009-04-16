@@ -72,7 +72,7 @@ xpi-configure:
 # have to reconfigure to enable shared libraries to be built, and then rebuild
 # the plugins and the xpcom support as dynamically loadable modules.
 xpi-bundle:
-	snapshot_dest="/tmp/$(SNAPSHOT_NAME)-tmp"; \
+	snapshot_dest="/tmp/$(SNAPSHOT_NAME)"; \
 	snapshot_xpi="/tmp/$(SNAPSHOT_NAME)-tmp"; \
 	mkdir -p $${snapshot_xpi}/plugins; \
 	for i in install.rdf; do \

@@ -30,7 +30,7 @@ SNAPSHOT_NAME = $(SNAPSHOT_DIR)
 # this is the name of the actual tarball
 SNAPSHOT_TAR = gnash-$(BRANCH_REVNO)_$(BRANCH_NICK).tar.gz
 # this is the temporary directory used for DESTDIR
-SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)_$(BRANCH_NICK)
+SNAPSHOT_TMP = /tmp/$(SNAPSHOT_DIR)
 
 # extract info from bazar
 

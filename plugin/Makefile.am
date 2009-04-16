@@ -123,6 +123,11 @@ endif
 endif # NPAPI
 endif # WIN32
 
+if XPCOM
+  PKGLIB = install-pkglib
+else
+  PKGLIB = 
+endif
 test_perms:
 	@if test ! -w $(DESTDIR)$(plugindir); then \
 	  echo "WARNING: Improper permissions for $(DESTDIR)$(plugindir)!"; \
@@ -137,7 +142,7 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 
 if !WIN32
 if NPAPI
-install-plugin: $(plugin_LTLIBRARIES)
+install-plugin: $(plugin_LTLIBRARIES) $(PKGLIB) install-plugins
 	@test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 	@echo "Installing plugin to $(DESTDIR)$(plugindir)"
 	@if test -d .libs; then \
@@ -154,7 +159,7 @@ install-plugin:
 	: # do nothing
 endif # WIN32
 
-install-plugins: install-plugin
+install-plugins: install-plugin $(PKGLIB)
 	$(MAKE) -C klash install-plugins
 	$(MAKE) -C klash4 install-plugins
 	$(MAKE) -C win32 install-plugins
