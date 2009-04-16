@@ -73,6 +73,7 @@ xpi-configure:
 # the plugins and the xpcom support as dynamically loadable modules.
 xpi-bundle:
 	snapshot_dest="/tmp/$(SNAPSHOT_NAME)"; \
+	snapshot_dir="/tmp/$(SNAPSHOT_DIR)"; \
 	snapshot_xpi="/tmp/$(SNAPSHOT_NAME)-tmp"; \
 	mkdir -p $${snapshot_xpi}/plugins; \
 	for i in install.rdf; do \
@@ -86,7 +87,7 @@ xpi-bundle:
 	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.xpt $${snapshot_xpi}/plugins; \
 	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.so $${snapshot_xpi}/plugins; \
 	cp -fr $${snapshot_dest}/usr/bin/gtk-gnash $${snapshot_xpi}; \
-	(cd $${snapshot_xpi}; $(ZIP) -r /tmp/$(SNAPSHOT_DIR).xpi *);
+	(cd $${snapshot_xpi}; $(ZIP) -r $${snapshot_dir}.xpi *);
 
 # remove files left from package building
 xpi-clean:
