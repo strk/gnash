@@ -21,7 +21,6 @@
 #ifndef BITSREADER_H
 #define BITSREADER_H
 
-#include "swf.h"
 #include "dsodefs.h"
 #include "GnashException.h"
 #include "log.h"
