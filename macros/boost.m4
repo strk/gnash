@@ -37,6 +37,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl this is a list of *required* libraries. If any of these are missing, this
   dnl test will return a failure, and Gnash won't build.
   boost_libs="thread date_time"
+  if test x"${has_python}" = xyes; then
+    boost_libs="${boost_libs} python"
+  fi
+
   dnl this is a list of *recommended* libraries. If any of these are missing, this
   dnl test will return a warning, and Gnash will build, but testing won't work.
   extra_boost_libs="serialization"
