@@ -40,22 +40,17 @@ asMethod::asMethod()
 void
 asMethod::print_body()
 {
-		if(!_body){
+		if (!_body) {
 			log_parse("Method has no body.");
 			return;
 		}
-		boost::uint8_t opcode;
-		std::stringstream ss;
-		ss << "Method Body: ";
-//		ss.setf(std::ios::hex, std::ios::basefield);
-//		ss.setf (std::ios::showbase);
-		boost::uint32_t i;
-		for(i=0;i<_bodyLength;i++){
-			opcode = _body->read_as3op();
+		std::stringstream ss("Method Body:");
+		for(boost::uint32_t i = 0; i < _bodyLength ; ++i) {
+			const boost::uint8_t opcode = _body->read_as3op();
 			ss << "0x" << std::uppercase << std::hex << (opcode | 0x0) << " ";
 		}
 		_body->seekTo(0);
-		log_parse("%s",ss.str());
+		log_parse("%s", ss.str());
 }
 
 void
@@ -70,43 +65,44 @@ asMethod::setOwner(asClass *pOwner)
 }
 
 void
-asMethod::setReturnType(asClass */*type*/)
+asMethod::setReturnType(asClass* /*type*/)
 {
 	/* No-op */
 }
 
 bool
-asMethod::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
-	asClass *type, as_value& val, bool isconst)
+asMethod::addValue(string_table::key name, asNamespace *ns,
+        boost::uint32_t slotId, asClass *type, as_value& val, bool isconst)
 {
-	if (val.is_object())
-		val.to_object()->set_member(string_table::key(NSV::INTERNAL_TYPE), 
-			std::size_t(type->getName()));
+	if (val.is_object()) {
+		val.to_object()->set_member(NSV::INTERNAL_TYPE,
+                size_t(type->getName()));
+    }
 
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 
 	int flags = as_prop_flags::dontDelete;
 
-	if (isconst)
-		flags |= as_prop_flags::readOnly;
+	if (isconst) flags |= as_prop_flags::readOnly;
 
-
-	if(slotId == 0){
+	if (slotId == 0) {
 		_prototype->init_member(name, val, flags, nsname);
 	}
-	else{
+	else {
 		_prototype->init_member(name, val, flags, nsname, slotId);
 	}
 	return true;
 }
 
 bool
-asClass::addValue(string_table::key name, asNamespace *ns, boost::uint32_t slotId,
-	asClass *type, as_value& val, bool isconst, bool isstatic)
+asClass::addValue(string_table::key name, asNamespace *ns,
+        boost::uint32_t slotId, asClass *type, as_value& val, bool isconst,
+        bool isstatic)
 {
-	if (val.is_object())
+	if (val.is_object()) {
 		val.to_object()->set_member(NSV::INTERNAL_TYPE, 
 			std::size_t(type->getName()));
+    }
 
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 

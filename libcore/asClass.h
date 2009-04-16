@@ -38,7 +38,6 @@ class asMethod;
 class asClass;
 class asException;
 typedef Property asBinding;
-//class asBinding;
 class asBoundValue;
 class asBoundAccessor;
 class ClassHierarchy;
@@ -48,10 +47,9 @@ class Machine;
 class abc_function;
 
 namespace abc {
-class Trait;
+    class Trait;
 }
 
-using namespace abc;
 class asException
 {
 public:
@@ -681,7 +679,7 @@ public:
 	asBinding* getGetBinding(as_value& v, asName& n);
 	asBinding* getSetBinding(as_value& v, asName& n);
 
-	std::vector<Trait> _traits;
+	std::vector<abc::Trait> _traits;
 
 private:
 
