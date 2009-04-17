@@ -82,7 +82,7 @@ xpi-bundle:  force
 	done; \
 	strip  $${snapshot_dest}/usr/bin/gtk-gnash; \
 	cd $(SNAPSHOT_BUILD); ../configure --disable-static --enable-shared $(CONFIG_OPTS); \
-	$(MAKE) $(AM_MAKEFLAGS) -C plugin install-plugin DESTDIR=$${snapshot_dest}; \
+	$(MAKE) $(AM_MAKEFLAGS) -C plugin clean all install-plugin DESTDIR=$${snapshot_dest}; \
 	$(MAKE) $(AM_MAKEFLAGS) -C plugin/xpcom all install-pkglib DESTDIR=$${snapshot_dest}; \
 	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/libgnashplugin.so $${snapshot_xpi}/plugins; \
 	cp -fr $${snapshot_dest}/usr/lib/mozilla/plugins/extensions/*.xpt $${snapshot_xpi}/plugins; \
