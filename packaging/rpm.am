@@ -65,6 +65,6 @@ rpm-setup:
 rpm-klash:
 	rpmbuild -ba $(RPMBUILD_FLAGS) glash.spec
 
-.PHONY : rpm redhat rpm-klash
+.PHONY : rpm redhat rpm-klash spec rpm-configure rpm-install rpm-build rpm-setup
 
 

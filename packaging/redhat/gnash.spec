@@ -182,7 +182,8 @@ make $(MAKEFLAGS) dumpconfig all
 strip gui/.libs/*-gnash
 strip utilities/.libs/dumpshm  utilities/.libs/g*  utilities/.libs/soldumper utilities/.libs/flvdumper cygnal/.libs/cygnal
 rm -rf $RPM_BUILD_ROOT
-make install install-plugins DESTDIR=$RPM_BUILD_ROOT
+make $(MAKEFLAGS) install DESTDIR=$RPM_BUILD_ROOT
+make $(MAKEFLAGS) install-plugin DESTDIR=$RPM_BUILD_ROOT
 rm $RPM_BUILD_ROOT%{_libdir}/gnash/*.*a
 %if !%{cross_compile}
 
