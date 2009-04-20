@@ -40,6 +40,10 @@ check_totals(2);
 
 check_equals(typeof(LoadVars), 'function');
 
+// Can only be instantiated with "new"
+lv = LoadVars();
+check_equals(lv, undefined);
+
 var loadvarsObj = new LoadVars;
 
 // test the LoadVars constuctor
@@ -252,6 +256,15 @@ xcheck_equals(lv2.toString(), "a=%5Btype%20Object%5D");
 check_equals(tsc, 1);
 xcheck_equals(voc, 0);
 
+// Check override of _global.escape
+
+bu = _global.escape;
+_global.escape = function(str) { return "FAKED!"; };
+lv = new LoadVars();
+lv.a = "&";
+check_equals(lv.toString(), "FAKED!=FAKED!");
+_global.escape = bu;
+check_equals(lv.toString(), "a=%26");
 
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
