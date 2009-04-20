@@ -146,9 +146,9 @@
 #include "dsodefs.h" // for DSOEXPORT
 
 #include "gnash.h" // Quality
-#include "DefineShapeTag.h"    
 #include "DisplayObject.h"
 #include "Range2d.h"
+#include "RGBA.h"
 
 // Forward declarations.
 namespace gnash {
@@ -157,12 +157,12 @@ namespace gnash {
     class rgba;
     class SWFMatrix;
     class cxform;
+    class fill_style;
+    class line_style;
 
     namespace SWF {
-        class DefineMorphShapeTag;
         class ShapeRecord;
     }
-    class DefineShapeTag;
 
     class Shape;
     class MorphShape;
@@ -559,28 +559,9 @@ public:
 
 protected:
 
-    /// Cached fill style list with just one entry used for font rendering
-    std::vector<fill_style> m_single_fill_styles;
-
-    /// Dummy line styles list without entries (do not add anything!!)
-    std::vector<line_style> m_dummy_line_styles;
 
     /// Dummy, neutral color transformation (do not change!!)
-    cxform m_neutral_cxform;
-
-    /// Sets m_single_fill_styles to one solid fill with the given color 
-    void need_single_fill_style(const rgba& color)
-    {
-
-        if (m_single_fill_styles.size() == 0)
-        { 
-            fill_style dummy;
-            m_single_fill_styles.push_back(dummy);
-        }
-
-        m_single_fill_styles[0].set_color(color);
-
-    } 
+    const cxform m_neutral_cxform;
 
     /// Kept in parallel with movie_root's setting.
     Quality _quality;

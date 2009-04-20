@@ -347,7 +347,7 @@ int
 GnashPlayer::getCurrentFrame() const
 {
     REQUIRE_VM_STARTED;
-    return _movieRoot->getRootMovie()->get_current_frame();
+    return _movieRoot->getRootMovie().get_current_frame();
 }
 
 //
@@ -447,19 +447,6 @@ GnashPlayer::getCharacterByTarget(const std::string& tgt)
     return chr;
 }
 
-GnashCharacter*
-GnashPlayer::getCharacterById(int id)
-{
-    REQUIRE_VM_STARTED;
-
-    gnash::DisplayObject* c = _movieRoot->getRootMovie()->getDisplayObject(id);
-    
-    if (!c) return NULL;
-    
-    GnashCharacter* chr(new GnashCharacter(c));
-
-    return chr;
-}
 
 GnashCharacter*
 GnashPlayer::getTopmostMouseEntity()

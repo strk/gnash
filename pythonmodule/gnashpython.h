@@ -99,9 +99,6 @@ public:
     
     // Display Objects
     GnashCharacter* getCharacterByTarget(const std::string& tgt);
-
-    // Sprites
-    GnashCharacter* getCharacterById(int id);    
     GnashCharacter* getTopmostMouseEntity();
 
     // Interaction

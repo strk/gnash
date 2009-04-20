@@ -2019,6 +2019,20 @@ public:
   }  
   
 private:  // private variables
+    
+  /// Sets m_single_fill_styles to one solid fill with the given color 
+    void need_single_fill_style(const rgba& color)
+    {
+
+        if (m_single_fill_styles.size() == 0)
+        { 
+            fill_style dummy;
+            m_single_fill_styles.push_back(dummy);
+        }
+
+        m_single_fill_styles[0].set_color(color);
+
+    } 
 
     typedef agg::renderer_base<PixelFormat> renderer_base;
 
@@ -2048,6 +2062,11 @@ private:  // private variables
 
     // Alpha mask stack
     AlphaMasks _alphaMasks;
+    
+    /// Cached fill style list with just one entry used for font rendering
+    std::vector<fill_style> m_single_fill_styles;
+
+
 };
 
 

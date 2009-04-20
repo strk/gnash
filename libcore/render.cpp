@@ -20,6 +20,7 @@
 
 #include "render.h"
 #include "GnashImage.h"
+#include "BitmapInfo.h"
 
 // Define this to have all renderer calls print a message (with -vv)
 #undef DEBUG_RENDER_CALLS 

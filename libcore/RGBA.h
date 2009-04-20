@@ -8,9 +8,10 @@
 #ifndef GNASH_TYPES_H
 #define GNASH_TYPES_H
 
+#include "swf.h"
+
 #include <string>
 #include <boost/cstdint.hpp> // for boost::?int??_t 
-#include "swf.h"
 
 namespace gnash {
 	class SWFStream;	// forward declaration

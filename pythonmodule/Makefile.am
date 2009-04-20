@@ -43,6 +43,7 @@ libgnashpython_la_LDFLAGS = \
 
 libgnashpython_la_CPPFLAGS = \
         -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/swf \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libltdl \
@@ -73,6 +74,7 @@ gnash_la_LDFLAGS += -module -lgnashpython
 gnash_la_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
         -I$(top_srcdir)/libcore \
+        -I$(top_srcdir)/libcore/swf \
         -I$(top_srcdir)/libcore/parser \
         -I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libltdl \
