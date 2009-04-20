@@ -27,9 +27,13 @@
 #include <iostream>
 #include <string>
 #include <cerrno>
+#ifndef _WIN32
 #include <sys/mman.h>
-#include "GnashSystemIOHeaders.h"
+#else
+#include <windows.h>
+#endif
 
+#include "GnashSystemIOHeaders.h"
 #include "network.h"
 #include "buffer.h"
 #include "amf.h"
@@ -63,6 +67,10 @@ static Cache& cache = Cache::getDefaultInstance();
 ///	This is the maximum number of pages that we load into memory from a file.
 const size_t MAX_PAGES = 2560;
 
+#ifndef MAP_FAILED
+#define MAP_FAILED 0
+#endif
+
 DiskStream::DiskStream()
     : _state(DiskStream::NO_STATE),
       _filefd(0),
@@ -79,7 +87,14 @@ DiskStream::DiskStream()
     _pagesize = sysconf(_SC_PAGESIZE);
     _max_memload = _pagesize * MAX_PAGES;    
 #else
+#if _WIN32
+    // The default page size for Win32 is 4k
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    _pagesize = si.dwPageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 
 #ifdef USE_STATS_CACHE
@@ -104,7 +119,13 @@ DiskStream::DiskStream(const string &str)
     _pagesize = sysconf(_SC_PAGESIZE);
     _max_memload = _pagesize * MAX_PAGES;    
 #else
+#ifdef _WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    _pagesize = si.dwPageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 
     _filespec = str;
@@ -130,7 +151,13 @@ DiskStream::DiskStream(const string &str, boost::uint8_t *data, size_t size)
     _pagesize = sysconf(_SC_PAGESIZE);
     _max_memload = _pagesize * MAX_PAGES;    
 #else
+#ifdef _WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    _pagesize = si.dwPageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 
     _dataptr = new boost::uint8_t[size];
@@ -163,7 +190,13 @@ DiskStream::DiskStream(const string &str, amf::Buffer &buf)
     _pagesize = sysconf(_SC_PAGESIZE);
     _max_memload = _pagesize * MAX_PAGES;    
 #else
+#ifdef _WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    _pagesize = si.dwPageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 
     _dataptr = new boost::uint8_t[buf.size()];
@@ -196,7 +229,13 @@ DiskStream::DiskStream(const string &str, int netfd)
     _pagesize = sysconf(_SC_PAGESIZE);
     _max_memload = _pagesize * MAX_PAGES;    
 #else
+#ifdef _WIN32
+    SYSTEM_INFO si;
+    GetSystemInfo(&si);
+    _pagesize = si.dwPageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 
     _netfd = netfd;
@@ -233,12 +272,16 @@ DiskStream::close()
     _filesize = 0;
     _offset = 0;
     
+#ifdef _WIN32
+    UnmapViewOfFile(_dataptr);
+#else
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
 //  	delete[] _dataptr;
-	_dataptr = 0;
     }
-     
+#endif
+    
+    _dataptr = 0; 
     _filefd = 0;
     _state = CLOSED;
 //    _filespec.clear();
@@ -314,7 +357,11 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	/// to mmap() a new one. If we're still in the current mapped
 	/// page, then just return the existing data pointer.
 	if (dataptr != 0) {
+#ifdef _WIN32
+	    UnmapViewOfFile(_dataptr);
+#else
 	    munmap(_dataptr, _pagesize);
+#endif
 	}
 #if 0
 	// See if the page has already been mapped in;
@@ -328,8 +375,19 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 // 	    size = _filesize;
 // 	}
 
-	dataptr = static_cast<unsigned char *>(mmap(0, loadsize,
-						     PROT_READ, MAP_SHARED, _filefd, page));
+#ifdef _WIN32
+	HANDLE handle = CreateFileMapping((HANDLE)_get_osfhandle(_filefd), NULL,
+					  PAGE_WRITECOPY, 0, 0, NULL);
+	if (handle != NULL) {
+	    dataptr = static_cast<boost::uint8_t *>(MapViewOfFile(handle, FILE_MAP_COPY, 0, offset, page));
+	    CloseHandle(handle);
+
+	}
+#else
+	dataptr = static_cast<boost::uint8_t *>(mmap(0, loadsize,
+						     PROT_READ, MAP_SHARED,
+						     _filefd, page));
+#endif
     } else {
 	log_error (_("Couldn't load file %s"), _filespec);
 	return 0;
@@ -545,7 +603,12 @@ DiskStream::play(int netfd)
     
     log_debug("Done...");
 	   
+#ifdef _WIN32
+    UnmapViewOfFile(_dataptr);
+#else
     munmap(_dataptr, _filesize);
+#endif
+    
     _seekptr = 0;
 
     return true;
