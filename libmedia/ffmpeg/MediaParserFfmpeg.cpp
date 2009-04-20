@@ -525,7 +525,7 @@ MediaParserFfmpeg::seekMedia(boost::int64_t offset, int whence)
 	}
 	else if (whence == SEEK_CUR)
 	{
-		_stream->seek(_stream->tell() + offset);
+		_stream->seek(_stream->tell() + static_cast<std::streamoff>(offset));
 		// New position is offset + end of file
 	}
 	else if (whence == SEEK_END)
