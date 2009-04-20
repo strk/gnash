@@ -469,12 +469,13 @@ FLVParser::parseNextTag(bool index_only)
 }
 
 // would be called by MAIN thread
-bool FLVParser::parseHeader()
+bool
+FLVParser::parseHeader()
 {
 	assert(_stream->tell() == static_cast<std::streampos>(0));
 
 	// We only use 5 bytes of the header, because the last 4 bytes represent
-        // an integer which is always 1.
+    // an integer which is always 1.
 	boost::uint8_t header[9];
 	if ( _stream->read(header, 9) != 9 )
 	{
@@ -488,7 +489,7 @@ bool FLVParser::parseHeader()
 		return false;
 	}
 
-	const boost::uint8_t& version = header[3];
+	const boost::uint8_t version = header[3];
 
 	// Parse the audio+video bitmask
 	_audio = header[4]&(1<<2);

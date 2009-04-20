@@ -80,19 +80,21 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Make sure you adjust this with the test!
 	cerr << "Total frames: " <<  totalFrames;
-	assert (totalFrames == 14);
+	assert (totalFrames == 20);
 
 	int numSoundsStarted[] = {
 		0,
 		4,
-		6
+		6,
+        12
 	};
 
     /// Expected success for each test
 	bool testPasses[] = {
 		true,
 		true,
-		true
+		true,
+        true
 	};
 
 	// Advance and check...
