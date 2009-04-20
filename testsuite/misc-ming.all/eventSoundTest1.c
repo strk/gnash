@@ -71,7 +71,7 @@ void setupMovie(SWFMovie mo, const char* srcdir)
   font = loadSWFFontFromFile(font_file);
 
   /* Add output textfield and DejaGnu stuff */
-  dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 800, 400);
+  dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 800, 800);
   it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFDisplayItem_setDepth(it, 200); 
 
