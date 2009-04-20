@@ -51,6 +51,12 @@
 # include <boost/preprocessor/repetition/repeat_from_to.hpp>
 # include <boost/preprocessor/seq/for_each.hpp>
 
+// Mingw32 (win32 console) doesn't use the standard GCC defines that
+// Gnash used for debug messages, so make it so...
+#ifndef __FUNCDNAME__
+#define __FUNCDNAME__ __FUNCTION__
+#endif
+
 namespace gnash {
 
 // This is a basic file logging class

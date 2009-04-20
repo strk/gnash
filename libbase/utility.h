@@ -100,7 +100,11 @@ inline unsigned long int /* pthread_t */ get_thread_id(void)
     // static_cast for this as pthread_self() returns a pointer. We can
     // use that too, this ID is only used for the log file to keep output
     // from seperare threads clear.
+# ifdef _WIN32
+    return GetCurrentThreadId();
+#else
     return (unsigned long int)pthread_self();
+#endif
 # endif 
 #else
 # ifdef _WIN32

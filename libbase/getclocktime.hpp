@@ -30,7 +30,11 @@
 
 #include <sys/time.h>
 
-#ifdef _WIN32
+#ifdef HAVE_PTHREADS
+#include <pthread.h>
+#endif
+
+#if defined WIN32 && !defined(HAVE_STRUCT_TIMESPEC)
 struct timespec {
 	time_t	tv_sec; 	/* seconds */
 	long	tv_nsec;	/* nanoseconds */
