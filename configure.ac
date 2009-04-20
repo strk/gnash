@@ -460,6 +460,7 @@ AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
+build_aos4=no                   dnl AmigaOS4 GUI
 build_kde3=no
 build_kde4=no
 build_qtopia3=no
@@ -467,13 +468,13 @@ build_qtopia4=no
 build_gtk=no
 build_qt3=no
 build_qt4=no
-build_fb=no
+build_fb=no                     dnl Raw framebuffer
 build_fltk=no
 build_sdl=no
-build_riscos=no
-build_aqua=no
-build_hildon=no
-build_alp=no
+build_riscos=no                 dnl Native OS2 GUI
+build_aqua=no                   dnl Native MacOSX
+build_hildon=no                 dnl Native LIMO
+build_alp=no                    dnl Acess Linux Platform using Hiker
 build_dump=no
 AC_ARG_ENABLE(gui,
   AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde3)]),
@@ -535,6 +536,9 @@ dnl        AC_DEFINE(USE_GTK, [1], [Use the GTK GUI])
       fb|FB)
         build_fb=yes
         ;;
+      aos4|AOS4)
+        build_aos4=yes
+        ;;
       dump|DUMP)
         build_dump=yes
         ;;
@@ -552,7 +556,7 @@ dnl        build_hildon=yes
 dnl        build_alp=yes
 dnl        build_riscos=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde3|kde4|fltk|sdl|riscos|aqua|fb|hildon|alp|qtopia3|qtopia4|dump|aos4)])
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
@@ -1736,22 +1740,23 @@ if test x$build_kde4 = xno -a x$kparts4 = xyes; then
   AC_MSG_WARN(["Enabled KPARTS 4.x plugin, but you aren't building a KDE 4.x based GUI!"])
 fi
 
-AM_CONDITIONAL(BUILD_QTOPIA3_GUI, [ test x$build_qtopia3 = xyes ])
-AM_CONDITIONAL(BUILD_QTOPIA4_GUI, [ test x$build_qtopia4 = xyes ])
-AM_CONDITIONAL(BUILD_QT3_GUI,     [ test x$build_qt3 = xyes ])
-AM_CONDITIONAL(BUILD_QT4_GUI,     [ test x$build_qt4 = xyes ])
-AM_CONDITIONAL(BUILD_KDE3_GUI,    [ test x$build_kde3 = xyes ])
-AM_CONDITIONAL(BUILD_KDE4_GUI,    [ test x$build_kde4 = xyes ])
+AM_CONDITIONAL(BUILD_QTOPIA3_GUI,  [ test x$build_qtopia3 = xyes ])
+AM_CONDITIONAL(BUILD_QTOPIA4_GUI,  [ test x$build_qtopia4 = xyes ])
+AM_CONDITIONAL(BUILD_QT3_GUI,      [ test x$build_qt3 = xyes ])
+AM_CONDITIONAL(BUILD_QT4_GUI,      [ test x$build_qt4 = xyes ])
+AM_CONDITIONAL(BUILD_KDE3_GUI,     [ test x$build_kde3 = xyes ])
+AM_CONDITIONAL(BUILD_KDE4_GUI,     [ test x$build_kde4 = xyes ])
 
-AM_CONDITIONAL(BUILD_ALP_GUI,     [ test x$build_alp = xyes ])
-AM_CONDITIONAL(BUILD_HILDON_GUI,  [ test x$build_hildon = xyes ])
-AM_CONDITIONAL(BUILD_GTK_GUI,     [ test x$build_gtk = xyes ])
-AM_CONDITIONAL(BUILD_FLTK_GUI,    [ test x$build_fltk = xyes ])
-AM_CONDITIONAL(BUILD_SDL_GUI,     [ test x$build_sdl = xyes ])
-AM_CONDITIONAL(BUILD_FB_GUI,      [ test x$build_fb = xyes ])
-AM_CONDITIONAL(BUILD_AQUA_GUI,    [ test x$build_aqua = xyes ])
-AM_CONDITIONAL(BUILD_RISCOS_GUI,  [ test x$build_riscos = xyes ])
-AM_CONDITIONAL(BUILD_DUMP_GUI,    [ test x$build_dump = xyes ])
+AM_CONDITIONAL(BUILD_ALP_GUI,      [ test x$build_alp = xyes ])
+AM_CONDITIONAL(BUILD_HILDON_GUI,   [ test x$build_hildon = xyes ])
+AM_CONDITIONAL(BUILD_GTK_GUI,      [ test x$build_gtk = xyes ])
+AM_CONDITIONAL(BUILD_FLTK_GUI,     [ test x$build_fltk = xyes ])
+AM_CONDITIONAL(BUILD_SDL_GUI,      [ test x$build_sdl = xyes ])
+AM_CONDITIONAL(BUILD_FB_GUI,       [ test x$build_fb = xyes ])
+AM_CONDITIONAL(BUILD_AQUA_GUI,     [ test x$build_aqua = xyes ])
+AM_CONDITIONAL(BUILD_RISCOS_GUI,   [ test x$build_riscos = xyes ])
+AM_CONDITIONAL(BUILD_DUMP_GUI,     [ test x$build_dump = xyes ])
+AM_CONDITIONAL(BUILD_AMIGAOS4_GUI, [ test x$build_aos4 = xyes ])
 
 # plugin building flags
 AM_CONDITIONAL(NPAPI, [test x$npapi = xyes])

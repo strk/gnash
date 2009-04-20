@@ -52,6 +52,7 @@ AM_CPPFLAGS = \
 	-DLIBAVCODEC_IDENT=\"$(LIBAVCODEC_IDENT)\" \
 	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(PYTHON_LIBS) \
 	$(PTHREAD_CFLAGS) \
 	$(NULL)
 
@@ -198,6 +199,11 @@ endif
 # Build the SDL gui
 if BUILD_SDL_GUI
 include $(srcdir)/am-frag/sdl.am
+endif
+
+# Build the AmigaOS4 gui
+if BUILD_AMIGAOS4_GUI
+include $(srcdir)/am-frag/aos4.am
 endif
 
 # Build the FLTK gui

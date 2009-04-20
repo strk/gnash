@@ -40,6 +40,7 @@ AM_LDFLAGS = \
 	$(MYSQL_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
+	$(PYTHON_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(LIBINTL) \
 	$(NULL)
