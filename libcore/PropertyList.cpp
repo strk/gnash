@@ -229,7 +229,8 @@ PropertyList::setFlagsAll(int setFlags, int clearFlags)
 	string_table& st = _vm.getStringTable();
 #endif
 
-	for (container::iterator it=_props.begin(), far=_props.end(); it != far; ++it)
+        PropertyList::container::iterator it;
+        for (it=_props.begin(); it != _props.end(); ++it)
 	{
 #ifdef GNASH_DEBUG_PROPERTY
 		as_prop_flags oldFlags = it->getFlags();
