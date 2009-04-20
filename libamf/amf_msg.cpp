@@ -28,7 +28,10 @@
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include <boost/cstdint.hpp> // For C99 int types
+
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 #include <arpa/inet.h> // for htons
+#endif
 
 using namespace std;
 using namespace gnash;
