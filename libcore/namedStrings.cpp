@@ -54,6 +54,7 @@ static string_table::svt preload_names[] =
 	string_table::svt( "data", NSV::PROP_DATA ),
 	string_table::svt( "decode", NSV::PROP_DECODE ),
 	string_table::svt( "e", NSV::PROP_E ),	
+	string_table::svt( "escape", NSV::PROP_ESCAPE ),	
 	string_table::svt( "_droptarget", NSV::PROP_uDROPTARGET ),
 	string_table::svt( "enabled", NSV::PROP_ENABLED ),
 	string_table::svt( "useHandCursor", NSV::PROP_USEHANDCURSOR ),

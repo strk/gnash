@@ -40,6 +40,11 @@ check_totals(2);
 
 check_equals(typeof(LoadVars), 'function');
 
+// Can only be instantiated with "new"
+lv = LoadVars();
+check_equals(lv, undefined);
+check_equals(typeof(lv), "undefined");
+
 var loadvarsObj = new LoadVars;
 
 // test the LoadVars constuctor
@@ -175,7 +180,7 @@ check_equals(r.loaded, false);
 // For checking that the data were loaded with XML.prototype.load.
 x.onLoad = function(success) {
     check_equals(x['var2'], 'val2');
-    check_totals(136);
+    check_totals(140);
     play();
 };
 
@@ -252,6 +257,15 @@ xcheck_equals(lv2.toString(), "a=%5Btype%20Object%5D");
 check_equals(tsc, 1);
 xcheck_equals(voc, 0);
 
+// Check override of _global.escape
+
+bu = _global.escape;
+_global.escape = function(str) { return "FAKED!"; };
+lv = new LoadVars();
+lv.a = "&";
+check_equals(lv.toString(), "FAKED!=FAKED!");
+_global.escape = bu;
+check_equals(lv.toString(), "a=%26");
 
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
