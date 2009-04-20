@@ -70,12 +70,10 @@ void setupMovie(SWFMovie mo, const char* srcdir)
 
   font = loadSWFFontFromFile(font_file);
 
-
   /* Add output textfield and DejaGnu stuff */
   dejagnuclip = get_dejagnu_clip((SWFBlock)font, 10, 0, 0, 800, 400);
   it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFDisplayItem_setDepth(it, 200); 
-  //SWFDisplayItem_move(it, 0, 0); 
 
 }
 
@@ -98,7 +96,7 @@ SWFSound setupSounds(const char* filename)
      SWF_SOUND_22KHZ |
      SWF_SOUND_16BITS |
      SWF_SOUND_STEREO);
-     
+  
   return so;
 }
 
@@ -117,6 +115,71 @@ printFrameInfo(SWFMovie mo, int i, const char* desc)
     add_actions(mo, frameBuf);
     add_actions(mo, descBuf);
 }
+
+void
+runAttachedSoundsTest(SWFMovie mo, SWFSound so, int* frame)
+{
+    const char* frameDesc[5];
+    int i;
+
+    SWFMovie_nextFrame(mo);
+    add_actions(mo,
+              "note('Attached Embedded Sound Test.\n"
+              "The notes should start exactly at the beginning of a frame "
+              "(to coincide with the appearance of the description text).\n"
+              "Test should start in two seconds.');");
+
+    /* This is what is supposed to happen in each frame */
+    frameDesc[0] = "Two notes (C, E)";
+    frameDesc[1] = "Two notes (G-C, E)";
+    frameDesc[2] = "Two notes (G-C, E)";
+    frameDesc[3] = "Two notes (G-C, E)";
+    frameDesc[4] = "Nothing";
+
+    add_actions(mo, "t = _root.createEmptyMovieClip('mc', 9);"
+            "cs = 0; cs2 = 0;"
+            "s = new Sound(mc);"
+            "s2 = new Sound(mc);"
+            "s.attachSound('es');"
+            "s2.attachSound('es');"
+            "s.onSoundComplete = function() { cs++; };"
+            "s2.onSoundComplete = function() { cs2++; };"
+            );
+    
+    /// Start an embedded sound using a tag to make sure onSoundComplete
+    /// isn't called for Sound s.
+    SWFMovie_startSound(mo, so);
+    
+    /// Start the same embedded sound from another Sound object also to
+    /// make sure the correct object is notified.
+    add_actions(mo, "s2.start(); delete s2;");
+
+    for (i = 0; i < 4; i++)
+    {
+        SWFMovie_nextFrame(mo);
+        
+        (*frame)++;
+
+        printFrameInfo(mo, i, frameDesc[i]);
+        add_actions(mo, "s.start();");
+    }
+
+    add_actions(mo, "xcheck_equals(cs, 2);");
+
+    SWFMovie_nextFrame(mo);
+    
+    add_actions(mo, "xcheck_equals(cs, 3);");
+    
+    // Check that Sound.onSoundComplete isn't executed if the Sound is
+    // deleted. This only passes currently because onSoundComplete is never
+    // called under any circumstances for embedded sounds.
+    add_actions(mo, "check_equals(cs2, 0);");
+    add_actions(mo, "s.stop();");
+
+    printFrameInfo(mo, i, frameDesc[i]);
+
+}
+
 
 void
 runMultipleSoundsTest(SWFMovie mo, SWFSound so, int* frame)
@@ -230,16 +293,20 @@ main(int argc, char** argv)
 
   setupMovie(mo, srcdir);
   so = setupSounds(soundFile);
+  
+  /// Add as an export so we can attach it.
+  SWFMovie_addExport(mo, (SWFBlock)so, "es");
+  SWFMovie_writeExports(mo);
 
   add_actions(mo, "c = 0;");
 
   SWFMovie_nextFrame(mo);
 
   add_actions(mo,
-          "note('You will hear several short tests with a succession of sounds.\n"
-		  "Each frame is two seconds long.\n"
-          "The movie will describe what you should hear at the beginning of the frame.');"
-		  );
+       "note('You will hear several short tests with a succession of sounds. "
+       "Each frame is two seconds long.\n"
+       "The movie will describe what you should hear at the beginning of "
+       "the frame.');");
 		  
   frame = 0;
 
@@ -248,6 +315,9 @@ main(int argc, char** argv)
   
   pauseForNextTest(mo);
   runNoMultipleSoundsTest(mo, so, &frame);
+
+  pauseForNextTest(mo);
+  runAttachedSoundsTest(mo, so, &frame);
 
   pauseForNextTest(mo);
   //Output movie
