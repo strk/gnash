@@ -36,7 +36,6 @@
 #include <sstream>
 #include <csetjmp>
 
-
 // jpeglib.h is included in the namespace jpeg because otherwise it
 // causes horrible conflicts with qt includes. How do C coders sustain
 // the will to live?
@@ -99,7 +98,7 @@ public:
 
 	// Read data into our input buffer.  Client calls this
 	// when it needs more data from the file.
-	static boolean fill_input_buffer(j_decompress_ptr cinfo)
+	static jpeg::boolean fill_input_buffer(j_decompress_ptr cinfo)
 	{
 		rw_source_IOChannel*	src = (rw_source_IOChannel*) cinfo->src;
 
@@ -509,7 +508,7 @@ public:
 	}
 
 	/// Write the output buffer into the stream.
-	static boolean empty_output_buffer(j_compress_ptr cinfo)
+	static jpeg::boolean empty_output_buffer(j_compress_ptr cinfo)
 	{
 		rw_dest_IOChannel*	dest = (rw_dest_IOChannel*) cinfo->dest;
 		assert(dest);
