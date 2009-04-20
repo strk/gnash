@@ -43,6 +43,7 @@ check_equals(typeof(LoadVars), 'function');
 // Can only be instantiated with "new"
 lv = LoadVars();
 check_equals(lv, undefined);
+check_equals(typeof(lv), "undefined");
 
 var loadvarsObj = new LoadVars;
 
@@ -179,7 +180,7 @@ check_equals(r.loaded, false);
 // For checking that the data were loaded with XML.prototype.load.
 x.onLoad = function(success) {
     check_equals(x['var2'], 'val2');
-    check_totals(136);
+    check_totals(140);
     play();
 };
 

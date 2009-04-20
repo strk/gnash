@@ -377,12 +377,17 @@ XMLNode_as::stringify(const XMLNode_as& xml, std::ostream& xmlout, bool encode)
     // Node as_value first, then children
     if (type == Text)
     {
+        as_object* global = xml.getVM().getGlobal();
+        assert(global);
+
         // Insert entities.
         std::string escaped(nodeValue);
         XML_as::escape(escaped);
-        if (encode) URL::encode(escaped);
+        const std::string& val = encode ? 
+            global->callMethod(NSV::PROP_ESCAPE, escaped).to_string() :
+            escaped;
 
-	    xmlout << escaped;
+	    xmlout << val;
     }
 
     // Childs, after node as_value.

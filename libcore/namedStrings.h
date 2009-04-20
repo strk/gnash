@@ -119,6 +119,7 @@ enum NamedStrings {
         PROP_DECODE,
 		PROP_E,
 		PROP_ENABLED,
+        PROP_ESCAPE,
         PROP_FOCUS_ENABLED,
         PROP_G,
 		PROP_H,

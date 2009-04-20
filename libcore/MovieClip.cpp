@@ -3543,8 +3543,7 @@ movieclip_loadMovie(const fn_call& fn)
         ensureType<MovieClip>(fn.this_ptr);
 
     as_value val;
-    if (fn.nargs > 1)
-    {
+    if (fn.nargs > 1) {
         val = movieclip->callMethod(NSV::PROP_METH, fn.arg(1));
     }
     else val = movieclip->callMethod(NSV::PROP_METH);

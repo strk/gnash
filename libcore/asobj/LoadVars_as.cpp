@@ -112,12 +112,19 @@ LoadVars_as::toString(std::ostream& o, bool /*post*/) const
 
 	enumerateProperties(vars);
 
+    as_object* global = _vm.getGlobal();
+    assert(global);
+
+    // LoadVars.toString() calls _global.escape().
 	for (VarMap::const_iterator it=vars.begin(), itEnd=vars.end();
-			it != itEnd; ++it)
-	{
+			it != itEnd; ++it) {
+
         if (it != vars.begin()) o << "&";
-        const std::string& val = it->second;
-        o << URL::encode(it->first) << "=" << URL::encode(val);
+        const std::string& var = 
+            global->callMethod(NSV::PROP_ESCAPE, it->first).to_string();
+        const std::string& val = 
+            global->callMethod(NSV::PROP_ESCAPE, it->second).to_string();
+        o << var << "=" << val;
 	}
 
 }
@@ -227,9 +234,12 @@ loadvars_tostring(const fn_call& fn)
     return as_value(data.str()); 
 }
 
-static as_value
+as_value
 loadvars_ctor(const fn_call& fn)
 {
+
+    if (!fn.isInstantiation()) return as_value();
+
 	boost::intrusive_ptr<as_object> obj = new LoadVars_as;
 
 	if ( fn.nargs )
