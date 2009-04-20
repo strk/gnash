@@ -1209,6 +1209,10 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	return hits;
     }
     
+    int timeout = _timeout;
+    if (timeout <= 0) {
+	timeout = 5;
+    }
 #ifdef HAVE_PPOLL
 	struct timespec tval;
 	sigset_t pending, blockset;
@@ -1227,7 +1231,15 @@ Network::waitForNetData(int limit, struct pollfd *fds)
 	    sigwait(&blockset, &sig);
 	}
 #else
+#ifdef HAVE_POLL_H
 	int ret = poll(fds, limit, _timeout);
+#else
+	fd_set fdset;
+	struct timeval        tval;
+	tval.tv_sec = timeout;
+	tval.tv_usec = 0;
+	int ret = select(limit+1, &fdset, NULL, NULL, &tval);
+#endif
 #endif
 
     log_debug("Poll returned: %d, timeout is: %d", ret, _timeout);
@@ -1350,18 +1362,19 @@ Network::waitForNetData(int limit, fd_set files)
     tval.tv_sec = timeout;
     tval.tv_usec = 0;
     int ret = select(limit+1, &fdset, NULL, NULL, &tval);
+    FD_ZERO(&fdset);
 #endif
     // If interupted by a system call, try again
     if (ret == -1 && errno == EINTR) {
-	log_error (_("Waiting for data for fdset 0x%x was interupted by a system call"), reinterpret_cast<long>(fdset.fds_bits));
+	log_error (_("Waiting for data was interupted by a system call"));
     }
     
     if (ret == -1) {
-	log_error (_("Waiting for data for fdset  0x%x was never available for reading"), reinterpret_cast<long>(fdset.fds_bits));
+	log_error (_("Waiting for data for fdset, was never available for reading"));
     }
     
     if (ret == 0) {
-	log_debug (_("Waiting for data for fdset  0x%x timed out waiting for data"), reinterpret_cast<long>(fdset.fds_bits));
+	log_debug (_("Waiting for data for fdset, timed out waiting for data"));
 	FD_ZERO(&fdset);
     }
 

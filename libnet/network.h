@@ -78,6 +78,15 @@ const short RTMPTS_PORT = 443;
   typedef int    socklen_t;
 #endif
 
+#if defined(HAVE_POLL_H) || defined(HAVE_PPOLL)
+#include <poll.h>
+#else
+struct pollfd {
+    int   fd; 
+    short events;
+    short revents;
+};
+#endif
 
 /// \class Network
 ///	This is a low level network class for Gnash and Cygnal. This
@@ -191,9 +200,7 @@ public:
     /// @param limit The max number of file descriptors to wait for.
     ///
     /// @return A vector of the file descriptors that have activity.
-#ifdef HAVE_POLL_H
     boost::shared_ptr<std::vector<struct pollfd> > waitForNetData(int limit, struct pollfd *fds);
-#endif
     fd_set waitForNetData(int limit, fd_set data);
     fd_set waitForNetData(std::vector<int> &data);
 	
@@ -273,11 +280,9 @@ public:
     /// \var Handler::_handlers
     ///		Keep a list of all active network connections
     std::map<int, entry_t *> _handlers;
-#ifdef HAVE_POLL_H
     std::vector<struct pollfd> _pollfds;
     // This is the mutex that controls access to the que.
     boost::mutex	_poll_mutex;
-#endif
 };
 
 } // end of gnash namespace
