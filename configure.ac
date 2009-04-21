@@ -98,6 +98,10 @@ case "${host}" in
     DEFAULT_FLASH_PLATFORM_ID="HPX"
     DEFAULT_FLASH_SYSTEM_OS="HPUX"
     ;;    
+  *-amigaos*)
+    DEFAULT_FLASH_PLATFORM_ID="OS4"
+    DEFAULT_FLASH_SYSTEM_OS="AmigaOS4"
+    ;;    
   *)
     DEFAULT_FLASH_PLATFORM_ID="UNK"
     DEFAULT_FLASH_SYSTEM_OS="Unknown"
@@ -124,10 +128,11 @@ case "${host}" in
   powerpc-apple-darwin*)
     AC_DEFINE([__powerpc64__], [1], [this is a 64 bit powerpc])
     darwin=yes
+    AC_DEFINE([DARWIN_HOST], [1], [this is a Darwin platform])
     ;;
   *-apple-darwin*)
     darwin=yes
-    AC_DEFINE([DARWIN], [1], [this is a Darwin platform])
+    AC_DEFINE([DARWIN_HOST], [1], [this is a Darwin platform])
     ;;
     dnl Unfortunately, all BSD distributions are not identical, so 
     dnl as tacky as it is to look for the distribution name, we don't
@@ -135,33 +140,37 @@ case "${host}" in
   *-openbsd*)
     bsd=yes
     openbsd=yes
-    AC_DEFINE([OPENBSD], [1], [this is an OpenBSD platform])
+    AC_DEFINE([OPENBSD_HOST], [1], [this is an OpenBSD platform])
     ;;
   *-freebsd*)
     bsd=yes
     freebsd=yes
-    AC_DEFINE([FREEBSD], [1], [this is a FreeBSD platform])
+    AC_DEFINE([FREEBSD_HOST], [1], [this is a FreeBSD platform])
     ;;
   *-netbsd*)
     bsd=yes
     netbsd=yes
-    AC_DEFINE([NETBSD], [1], [this is a NetBSD platform])
+    AC_DEFINE([NETBSD_HOST], [1], [this is a NetBSD platform])
     ;;
   *-*solaris*)
     solaris=yes
-    AC_DEFINE([SOLARIS], [1], [this is a Solaris platform])
+    AC_DEFINE([SOLARIS_HOST], [1], [this is a Solaris platform])
     ;;
   *-*linux*)
     linux=yes
-    AC_DEFINE([LINUX], [1], [this is a Linux platform])
+    AC_DEFINE([LINUX_HOST], [1], [this is a Linux platform])
     ;;
   *-cygwin* | *-mingw* | *-pw32*)
     windows=yes
-    AC_DEFINE([WIN32], [1], [this is a Win32 platform])
+    AC_DEFINE([WIN32_HOST], [1], [this is a Win32 platform])
     ;;
   *64-*-*bsd*)
     bsd_os=bsd 
     AC_DEFINE([WORDSIZE], [64], [this is a 64 platform])
+    ;;
+  *-*amigaos*)
+    amigaos4=yes
+    AC_DEFINE([AMIGAOS4_HOST], [1], [this is an AmigaOS4 platform])
     ;;
 esac
 
