@@ -187,7 +187,13 @@ if test x"${PTHREAD_LIBS}" = "x"; then
         AC_MSG_RESULT([using $PTHREAD_LIBS])
         break
       else
-        PTHREAD_LIBS="-lpthread"
+        dnl If using Mingw, we have to use the pthreadGCE2 library,as it has
+        dnl has exception handling support for C++.
+        if test x"${host_os}" = x"mingw32"; then
+          PTHREAD_LIBS="-lpthreadGCE2"
+        else
+          PTHREAD_LIBS="-lpthread"
+        fi
         AC_MSG_RESULT([using $PTHREAD_LIBS])
         break
       fi
