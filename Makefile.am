@@ -395,6 +395,9 @@ endif
 if BUILD_FB_GUI
 	@echo "	Supported GUI: FB"
 endif
+if BUILD_AMIGAOS4_GUI
+       @echo " Supported GUI: AMIGAOS4"
+endif
 if XPCOM
 	@echo "	XPCOM support for Mozilla/Firefox"
 endif
