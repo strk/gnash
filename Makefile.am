@@ -158,8 +158,7 @@ bzrversion.h: Makefile.in
 	    echo "Using existing bzrversion.h"; \
 	else \
 	    echo "Generating bzrversion.h"; \
-	    now=`date "+%Y%m%d"`; \
-	    echo 'static const char *BRANCH_REVNO  = "$${now}";\nstatic const char *BRANCH_NICK = "none";\n' > bzrversion.h; \
+	    echo -e 'static const char *BRANCH_REVNO  = '\"${NOW}\"';\nstatic const char *BRANCH_NICK = "none";\n' > bzrversion.h; \
 	  fi; \
 	fi
 
