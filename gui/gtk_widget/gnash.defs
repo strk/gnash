@@ -1,0 +1,22 @@
+(define-object View
+  (in-module "Gnash")
+  (parent "GtkBin")
+  (c-name "GnashView")
+  (gtype-id "GNASH_TYPE_VIEW")
+)
+
+(define-method start
+  (of-object "GnashView")
+  (c-name "gnash_view_start")
+  (return-type "none")
+)
+
+(define-method load_movie
+  (of-object "GnashView")
+  (c-name "gnash_view_load_movie")
+  (parameters
+    '("gchar*" "path")
+  )
+  (return-type "none")
+)
+

@@ -370,12 +370,12 @@ GnashPlayer::setRenderer(const std::string& r)
     }
 #endif
 #ifdef RENDERER_CAIRO
-    else if (r == "Cairo") {
+    if (r == "Cairo") {
         _renderer = (gnash::renderer::cairo::create_renderer(); 
     }
 #endif 
 #ifdef RENDERER_OPENGL
-    else if (r == "OpenGL") {
+    if (r == "OpenGL") {
         _renderer = gnash::create_render_handler_ogl(false);
     }
 #endif

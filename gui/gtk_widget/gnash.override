@@ -1,0 +1,17 @@
+/* -*- Mode: C; c-basic-offset: 4 -*- */
+%%
+headers
+#include <Python.h>
+#include <pygtk/pygtk.h>
+
+#include "gnash-view.h"
+
+%%
+modulename gnash
+%%
+import gtk.Bin as PyGtkBin_Type
+%%
+ignore-glob
+  *_get_type
+  _*
+

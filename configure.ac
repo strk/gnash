@@ -2230,6 +2230,7 @@ testsuite/libamf.all/Makefile
 testsuite/libnet.all/Makefile
 gui/Makefile
 gui/Info.plist
+gui/gtk_widget/Makefile
 extensions/Makefile
 extensions/dejagnu/Makefile
 extensions/mysql/Makefile

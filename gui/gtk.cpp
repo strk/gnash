@@ -42,6 +42,8 @@
 #include <gdk/gdkkeysyms.h>
 #include <string>
 
+#include "gnash-canvas.h"
+
 #ifdef HAVE_FFMPEG_AVCODEC_H
 extern "C" {
 # include "ffmpeg/avcodec.h" // Only for the version number
@@ -56,21 +58,6 @@ extern "C" {
 
 #ifdef HAVE_GST_GST_H
 # include "gst/gstversion.h" // Only for the version number
-#endif
-
-#ifdef RENDERER_OPENGL
-#include "gtk_glue_gtkglext.h"
-#endif
-
-#ifdef RENDERER_CAIRO
-#include "gtk_glue_cairo.h"
-#endif
-
-#ifdef RENDERER_AGG
-#include "gtk_glue_agg.h"
-#ifdef HAVE_XV
-#include "gtk_glue_agg_xv.h"
-#endif // HAVE_XV
 #endif
 
 #ifdef GUI_HILDON
@@ -102,8 +89,6 @@ namespace {
     // Event handlers
     gboolean realizeEvent(GtkWidget *widget, GdkEvent *event, gpointer data);
     gboolean deleteEvent(GtkWidget *widget, GdkEvent *event, gpointer data);
-    gboolean exposeEvent(GtkWidget *widget, GdkEventExpose *event,
-                                 gpointer data);
     gboolean configureEvent(GtkWidget *widget, GdkEventConfigure *event,
                                     gpointer data);
     gboolean keyPressEvent(GtkWidget *widget, GdkEventKey *event,
@@ -152,11 +137,10 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	,_window(0)
 	,_resumeButton(0)
 	,_overlay(0)
-	,_drawingArea(0)
+	,_canvas(0)
 	,_popup_menu(0)
 	,_menubar(0)
 	,_vbox(0)
-	,_glue()
 	,_advanceSourceTimer(0)
 {
 }
@@ -169,34 +153,6 @@ GtkGui::init(int argc, char **argv[])
 
 #ifdef GUI_HILDON
     _hildon_program = hildon_program_get_instance();
-#endif
-    
-    // TODO: don't rely on a macro to select renderer
-#ifdef RENDERER_CAIRO
-    _glue.reset(new GtkCairoGlue);
-#elif defined(RENDERER_OPENGL)
-    _glue.reset(new GtkGlExtGlue);
-#elif defined(RENDERER_AGG) && !defined(HAVE_XV)
-    _glue.reset(new GtkAggGlue);
-#elif defined(RENDERER_AGG) && defined(HAVE_XV)
-    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
-
-    if (rcfile.useXv()) {
-        _glue.reset(new GtkAggXvGlue);
-        if (!_glue->init (argc, argv)) {
-            _glue.reset(new GtkAggGlue);
-            _glue->init(argc, argv);
-        }
-    } else {
-        _glue.reset(new GtkAggGlue);
-        _glue->init(argc, argv);
-    }
-#endif
-
-#if ! (defined(HAVE_XV) && defined(RENDERER_AGG))
-    if (!_glue->init (argc, argv)) {
-        return false;
-    }
 #endif
 
     addPixmapDirectory (PKGDATADIR);
@@ -216,11 +172,13 @@ GtkGui::init(int argc, char **argv[])
     
     addGnashIcon(GTK_WINDOW(_window));
 
-    _drawingArea = gtk_drawing_area_new();
+    _canvas = gnash_canvas_new();
+    gnash_canvas_setup(GNASH_CANVAS(_canvas), argc, argv);
+    _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
 
     // Increase reference count to prevent its destruction (which could happen
     // later if we remove it from its container).
-    g_object_ref(G_OBJECT(_drawingArea));
+    g_object_ref(G_OBJECT(_canvas));
 
     _resumeButton = gtk_button_new();
     gtk_container_add(GTK_CONTAINER(_resumeButton),
@@ -233,18 +191,7 @@ GtkGui::init(int argc, char **argv[])
     // This callback indirectly results in playHook() being called.
     g_signal_connect(_resumeButton, "clicked", G_CALLBACK(menuPlay), this);
 
-    // If we don't set this flag we won't be able to grab focus
-    // ( grabFocus() would be a no-op )
-    GTK_WIDGET_SET_FLAGS (GTK_WIDGET(_drawingArea), GTK_CAN_FOCUS);
-
     createMenu();
-
-#ifdef RENDERER_OPENGL
-    // OpenGL _glue needs to prepare the drawing area for OpenGL rendering before
-    // widgets are realized and before the configure event is fired.
-    // TODO: find a way to make '_glue' use independent from actual renderer in use
-    _glue->prepDrawingArea(_drawingArea);
-#endif
 
     // A vertical box is used to allow display of the menu bar and paused widget
     _vbox = gtk_vbox_new(FALSE, 0);
@@ -257,19 +204,13 @@ GtkGui::init(int argc, char **argv[])
     }
 #endif
 
-    gtk_box_pack_start(GTK_BOX(_vbox), _drawingArea, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(_vbox), _canvas, TRUE, TRUE, 0);
 
     setupEvents();
 
     gtk_widget_realize(_window);
-    gtk_widget_show(_drawingArea);
+    gtk_widget_show(_canvas);
     gtk_widget_show(_window);
-
-#if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
-    // cairo needs the _drawingArea.window to prepare it ..
-    // TODO: find a way to make '_glue' use independent from actual renderer in use
-    _glue->prepDrawingArea(_drawingArea);
-#endif
     
 #ifdef USE_LIRC
     lirc = new Lirc();
@@ -280,10 +221,6 @@ GtkGui::init(int argc, char **argv[])
         log_debug(_("LIRC daemon not running"));
     }
 #endif
-    
-    _renderer = _glue->createRenderHandler();
-    if ( ! _renderer ) return false;
-    set_render_handler(_renderer);
 
     // The first time stop() was called, stopHook() might not have had a chance
     // to do anything, because GTK+ wasn't garanteed to be initialised.
@@ -396,7 +333,7 @@ GtkGui::setFullscreen()
         // It could be a good hack if it were done earlier.
         // There really doesn't seem to be a proper way of setting the
         // starting size of a widget but allowing it to be shrunk.
-        gtk_widget_set_size_request(_drawingArea, -1, -1);
+        gtk_widget_set_size_request(_canvas, -1, -1);
     	gtk_window_fullscreen(GTK_WINDOW(_window));
 
         showMenu(false);
@@ -467,7 +404,7 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
     }
 
     // The parent of _drawingArea is different for the plugin in fullscreen
-    gdk_window_set_cursor(_drawingArea->window, gdkcursor);
+    gdk_window_set_cursor(_canvas->window, gdkcursor);
   
     if (gdkcursor) {
         gdk_cursor_unref(gdkcursor);
@@ -493,7 +430,7 @@ GtkGui::showMouse(bool show)
         GdkCursor* cursor = gdk_cursor_new_from_pixmap(pixmap, pixmap,
                                                     color, color, 0, 0);
 
-        gdk_window_set_cursor (_drawingArea->window, cursor);
+        gdk_window_set_cursor (_canvas->window, cursor);
 
         g_free(color);
         g_object_unref(pixmap);	
@@ -558,11 +495,11 @@ GtkGui::getScreenDPI()
 void
 GtkGui::setupWindowEvents()
 {
-    g_signal_connect(gtk_widget_get_toplevel(_drawingArea),
+    g_signal_connect(gtk_widget_get_toplevel(_canvas),
             "delete_event", G_CALLBACK(deleteEvent), this);
-    g_signal_connect(gtk_widget_get_toplevel(_drawingArea),
+    g_signal_connect(gtk_widget_get_toplevel(_canvas),
             "key_press_event", G_CALLBACK(keyPressEvent), this);
-    g_signal_connect(gtk_widget_get_toplevel(_drawingArea),
+    g_signal_connect(gtk_widget_get_toplevel(_canvas),
             "key_release_event", G_CALLBACK(keyReleaseEvent), this);
 }
 
@@ -573,29 +510,30 @@ GtkGui::setupEvents()
 
     setupWindowEvents();
 
-    gtk_widget_add_events(_drawingArea, GDK_EXPOSURE_MASK
+    gtk_widget_add_events(_canvas, GDK_EXPOSURE_MASK
                         | GDK_BUTTON_PRESS_MASK
                         | GDK_BUTTON_RELEASE_MASK
                         | GDK_KEY_RELEASE_MASK
                         | GDK_KEY_PRESS_MASK        
                         | GDK_POINTER_MOTION_MASK);
   
-    g_signal_connect_swapped(_drawingArea, "button_press_event",
+    g_signal_connect_swapped(_canvas, "button_press_event",
                             G_CALLBACK(popupHandler), _popup_menu);
   
-    g_signal_connect(_drawingArea, "button_press_event",
+    g_signal_connect(_canvas, "button_press_event",
                    G_CALLBACK(buttonPressEvent), this);
-    g_signal_connect(_drawingArea, "button_release_event",
+    g_signal_connect(_canvas, "button_release_event",
                    G_CALLBACK(buttonReleaseEvent), this);
-    g_signal_connect(_drawingArea, "motion_notify_event",
+    g_signal_connect(_canvas, "motion_notify_event",
                    G_CALLBACK(motionNotifyEvent), this);
   
-    g_signal_connect_after(_drawingArea, "realize",
+    g_signal_connect_after(_canvas, "realize",
                          G_CALLBACK (realizeEvent), NULL);
-    g_signal_connect(_drawingArea, "configure_event",
+
+    // connect_after because we are going to cause a rendering and the canvas
+    // widget should have had a chance to update the size of the render area
+    g_signal_connect_after(_canvas, "configure_event",
                    G_CALLBACK (configureEvent), this);
-    g_signal_connect(_drawingArea, "expose_event",
-                    G_CALLBACK (exposeEvent), this);
 
     return true;
 }
@@ -603,7 +541,7 @@ GtkGui::setupEvents()
 void
 GtkGui::grabFocus()
 {
-    gtk_widget_grab_focus(GTK_WIDGET(_drawingArea));
+    gtk_widget_grab_focus(GTK_WIDGET(_canvas));
 }
 
 void
@@ -722,7 +660,7 @@ GtkGui::createWindow(const char *title, int width, int height)
         // Advantage: The window is sized correctly, no matter what other
         // widgets are visible
         // Disadvantage: The window cannot be shrinked, which is bad.   
-        gtk_widget_set_size_request(_drawingArea, width, height);
+        gtk_widget_set_size_request(_canvas, width, height);
 
     }
     return ret;
@@ -819,7 +757,6 @@ GtkGui::createWindow(int width, int height)
     _height = height;
     
     _validbounds.setTo(0, 0, _width, _height);
-    _glue->setRenderHandlerSize(_width, _height);
     
     return true;
 }
@@ -827,34 +764,13 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::beforeRendering()
 {
-    _glue->beforeRendering();
+    gnash_canvas_before_rendering(GNASH_CANVAS(_canvas));
 }
 
 void
 GtkGui::renderBuffer()
 {
-    gdk_window_process_updates(_drawingArea->window, false);
-}
-
-void
-GtkGui::expose(const GdkRegion *region) 
-{
-    gint num_rects;
-    GdkRectangle* rects;
-
-    // In some versions of GTK this can't be const...
-    GdkRegion* nonconst_region = const_cast<GdkRegion*>(region);
-
-    gdk_region_get_rectangles (nonconst_region, &rects, &num_rects);
-    assert(num_rects);
-
-    for (int i=0; i<num_rects; ++i) {
-      const GdkRectangle& cur_rect = rects[i];
-      _glue->render(cur_rect.x, cur_rect.y, cur_rect.x + cur_rect.width,
-                    cur_rect.y + cur_rect.height);
-    }
-
-    g_free(rects);
+    gdk_window_process_updates(_canvas->window, false);
 }
 
 void
@@ -897,7 +813,7 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
         // We add the rectangle to the part of the window to be redrawn
         // (also known as the "clipping" or "damaged" area). in renderBuffer(),
         // we force a redraw.
-        gdk_window_invalidate_rect(_drawingArea->window, &rect, false);
+        gdk_window_invalidate_rect(_canvas->window, &rect, false);
     }
 
 }
@@ -2291,31 +2207,14 @@ findPixmapFile(const gchar* filename)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-
 gboolean
-exposeEvent(GtkWidget *const /*widget*/, GdkEventExpose *const event,
-        const gpointer data)
-{
-
-    GtkGui* gui = static_cast<GtkGui*>(data);
-
-    gui->expose(event->region);
-
-    return TRUE;
-}
-
-gboolean
-configureEvent(GtkWidget *const widget, GdkEventConfigure *const event,
+configureEvent(GtkWidget *const /*widget*/, GdkEventConfigure *const event,
         const gpointer data)
 {
     GtkGui* obj = static_cast<GtkGui*>(data);
-
-    GtkGlue& glue = obj->rendererGlue();
-
-    glue.configure(widget, event);
     obj->resize_view(event->width, event->height);
 
-    return TRUE;
+    return FALSE;
 }
 
 gboolean

@@ -22,6 +22,14 @@
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
+
+# Build the current directory first. It's hard to see, but there is a '.' dot here.
+SUBDIRS = .
+# If python support is enabled, built that too
+if USE_PYTHON
+SUBDIRS += gtk_widget
+endif
+
 localedir = $(datadir)/locale
 
 # this is where Gnash plugins get installed
@@ -32,7 +40,7 @@ BUILT_SOURCES = .configline
 
 EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in
 
-noinst_LTLIBRARIES = 
+noinst_LTLIBRARIES = #libgnashgui.la
 AM_CPPFLAGS = \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libnet \

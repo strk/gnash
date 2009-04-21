@@ -28,6 +28,8 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
+#include "gnash-canvas.h"
+
 #ifdef GUI_HILDON
 extern "C" {
 # include <hildon/hildon.h>
@@ -139,8 +141,6 @@ public:
 
     virtual void error(const std::string& msg);
 
-    GtkGlue& rendererGlue() { return *_glue; }
-
 private:
 
 #ifdef GUI_HILDON
@@ -154,7 +154,7 @@ private:
     GtkWidget* _overlay;
     
     // The area rendered into by Gnash
-    GtkWidget* _drawingArea;    
+    GtkWidget* _canvas;
 
     GtkMenu* _popup_menu;
     GtkWidget* _menubar;
@@ -171,8 +171,6 @@ private:
     // Create a tree model for displaying movie info
     GtkTreeModel* makeTreeModel (std::auto_ptr<InfoTree> treepointer);
 #endif
-
-    std::auto_ptr<GtkGlue> _glue;
 
     void stopHook();
     void playHook();

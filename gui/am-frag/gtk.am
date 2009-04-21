@@ -32,14 +32,14 @@ gtk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
 if BUILD_OGL_RENDERER
 gtk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 gtk_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
-		gtk.cpp gtksup.h gtk_glue.h
+		gtk.cpp gtksup.h gtk_glue.h gnash-canvas.cpp
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS)
 endif				# BUILD_OGL_RENDERER
 if BUILD_AGG_RENDERER
 gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
-		gtk.cpp gtksup.h gtk_glue.h
+		gtk.cpp gtksup.h gtk_glue.h gnash-canvas.cpp
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
 if HAVE_XV
@@ -50,7 +50,7 @@ endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 gtk_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
-		gtk.cpp gtksup.h gtk_glue.h
+		gtk.cpp gtksup.h gtk_glue.h gnash-canvas.cpp
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS)
 endif				# BUILD_CAIRO_RENDERER
