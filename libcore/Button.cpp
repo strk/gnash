@@ -1050,7 +1050,7 @@ Button::get_member(string_table::key name_key, as_value* val,
     //
     if (name_key == NSV::PROP_uROOT) {
         // getAsRoot() will take care of _lockroot
-        val->set_as_object( const_cast<MovieClip*>( getAsRoot() )    );
+        val->set_as_object(getAsRoot());
         return true;
     }
 
