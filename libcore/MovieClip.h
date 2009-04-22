@@ -131,13 +131,11 @@ public:
     // Return the originating SWF
     virtual Movie* get_root() const;
 
-    /// Return the _swf ActionScript property of this sprite.
+    /// Return the _root ActionScript property of this sprite.
     //
-    /// Relative or absolute is determined by
-    /// the _lockroot property, see getLockRoot
-    /// and setLockRoot.
-    ///
-    virtual const MovieClip* getAsRoot() const;
+    /// Relative or absolute is determined by the _lockroot property,
+    /// see getLockRoot and setLockRoot. May return this.
+    virtual MovieClip* getAsRoot();
 
     /// Get the composite bounds of all component drawing elements
     virtual rect getBounds() const;

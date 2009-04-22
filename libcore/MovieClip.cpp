@@ -556,15 +556,13 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     string_table::key nsname)
 {
     // FIXME: use addProperty interface for these !!
-    // TODO: or at least have a DisplayObject:: protected method take
-    //             care of these ?
-    //             Duplicates code in DisplayObject::getPathElementSeparator too..
-    //
+    // TODO: or at least have a DisplayObject protected method take
+    //       care of these ?
+    //       Duplicates code in DisplayObject::getPathElementSeparator too.
     if (getSWFVersion() > 4 && name_key == NSV::PROP_uROOT)
     {
-
         // getAsRoot() will take care of _lockroot
-        val->set_as_object( const_cast<MovieClip*>( getAsRoot() )    );
+        val->set_as_object(getAsRoot());
         return true;
     }
 
@@ -573,7 +571,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     //             an SWF6 (to, say, _level2), _global will be unavailable
     //             to the SWF4 code but available to the SWF6 one.
     //
-    if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) // see MovieClip.as
+    if (getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL) 
     {
         // The "_global" ref was added in SWF6
         val->set_as_object( _vm.getGlobal() );
@@ -2619,8 +2617,8 @@ MovieClip::get_root() const
     return _swf;
 }
 
-const MovieClip*
-MovieClip::getAsRoot() const
+MovieClip*
+MovieClip::getAsRoot()
 {
 
     // TODO1: as an optimization, if swf version < 7 

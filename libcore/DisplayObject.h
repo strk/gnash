@@ -502,9 +502,10 @@ public:
 
     /// Return the _root ActionScript property of this DisplayObject.
     //
-    /// By default calls get_root().
-    ///
-    virtual const MovieClip* getAsRoot() const;
+    /// By default calls get_root(). The resulting MovieClip may be passed
+    /// to actionscript methods, so it is not const. As the override in
+    /// MovieClip may return this, the method cannot be const either.
+    virtual MovieClip* getAsRoot();
 
     /// Find the object which is one degree removed from us,
     /// given the relative pathname.

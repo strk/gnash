@@ -149,7 +149,7 @@ DisplayObject::getPathElementSeparator(string_table::key key)
 	if (_vm.getSWFVersion() > 4 && key == NSV::PROP_uROOT)
 	{
 		// getAsRoot() will handle _lockroot 
-		return const_cast<MovieClip*>(getAsRoot());
+		return getAsRoot();
 	}
 
 	const std::string& name = _vm.getStringTable().value(key);
@@ -593,7 +593,8 @@ DisplayObject::ymouse_get(const fn_call& fn)
 as_value
 DisplayObject::alpha_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+	boost::intrusive_ptr<DisplayObject> ptr =
+        ensureType<DisplayObject>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -728,7 +729,8 @@ DisplayObject::blendMode(const fn_call& fn)
 as_value
 DisplayObject::visible_getset(const fn_call& fn)
 {
-	boost::intrusive_ptr<DisplayObject> ptr = ensureType<DisplayObject>(fn.this_ptr);
+	boost::intrusive_ptr<DisplayObject> ptr =
+        ensureType<DisplayObject>(fn.this_ptr);
 
 	as_value rv;
 	if (!fn.nargs) // getter
@@ -1481,8 +1483,8 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 }
 #endif
 
-const MovieClip*
-DisplayObject::getAsRoot() const
+MovieClip*
+DisplayObject::getAsRoot()
 {
     return get_root();
 }
