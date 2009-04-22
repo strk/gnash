@@ -297,9 +297,9 @@ public:
         m_clip_depth = d;
     }
         
-    /// Returns true when the DisplayObject (and it's childs) is used as a mask
+    /// Returns true when the DisplayObject (and its childs) is used as a mask
     /// for other DisplayObjects at higher depth (up to get_clip_depth).
-    /// isMaskLayer() does *not* return true when one of it's
+    /// isMaskLayer() does not return true when one of its
     /// parents is a mask and the DisplayObject itself is not.
     ///
     /// See also isDynamicMask() and isMask()
@@ -309,9 +309,9 @@ public:
         return (m_clip_depth != noClipDepthValue && !_maskee);
     }
 
-    /// Returns true when the DisplayObject (and it's childs) is used as a mask
+    /// Returns true when the DisplayObject (and its childs) is used as a mask
     /// for another DisplayObject.
-    /// isDynamicMask() does *not* return true when one of it's
+    /// isDynamicMask() does not return true when one of its
     /// parents is a mask and the DisplayObject itself is not.
     ///
     /// NOTE: there's no way to obtain the maskee from a dynamic mask
@@ -797,7 +797,7 @@ public:
     virtual bool unload();
 
     /// Return true if this DisplayObject was unloaded from the stage
-    bool isUnloaded() { return _unloaded; }
+    bool unloaded() const { return _unloaded; }
 
     /// Mark this DisplayObject as destroyed
     //

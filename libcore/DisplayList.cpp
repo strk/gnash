@@ -208,7 +208,7 @@ DisplayList::getDisplayObjectByName_i(const std::string& name)
 void
 DisplayList::placeDisplayObject(DisplayObject* ch, int depth, as_object* initObj)
 {
-    assert(!ch->isUnloaded());
+    assert(!ch->unloaded());
     ch->set_invalidated();
     ch->set_depth(depth);
 
@@ -271,7 +271,7 @@ DisplayList::replaceDisplayObject(DisplayObject* ch, int depth, bool use_old_cxf
     testInvariant();
 
     //GNASH_REPORT_FUNCTION;
-    assert(!ch->isUnloaded());
+    assert(!ch->unloaded());
 
     ch->set_invalidated();
     ch->set_depth(depth);
@@ -356,9 +356,9 @@ DisplayList::moveDisplayObject( int depth, const cxform* color_xform,
         return;
     }
 
-    if (ch->isUnloaded()) {
+    if (ch->unloaded()) {
         log_error("Request to move an unloaded DisplayObject");
-        assert(!ch->isUnloaded());
+        assert(!ch->unloaded());
     }
 
     // TODO: is sign of depth related to accepting anim moves ?
@@ -515,7 +515,7 @@ DisplayList::unload()
         DisplayItem di = *it;
 
         // skip if already unloaded
-        if (di->isUnloaded()) {
+        if (di->unloaded()) {
             // TODO: call di->destroy(); ?
             ++it;
             continue;
@@ -572,14 +572,14 @@ DisplayList::display()
     std::stack<int> clipDepthStack;
     
     // We only display DisplayObjects which are out of the "removed" zone
-    // (or should we check isUnloaded?)
+    // (or should we check unloaded?)
     iterator it = beginNonRemoved(_charsByDepth);
     for (iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
         DisplayObject* ch = it->get();
 
         DisplayObject* mask = ch->getMask();
-        if (mask && ch->visible() && ! mask->isUnloaded())
+        if (mask && ch->visible() && ! mask->unloaded())
         {
             render::begin_submit_mask();
             
@@ -599,7 +599,7 @@ DisplayList::display()
         // Don't display dynamic masks
         if (ch->isDynamicMask()) continue;
 
-        assert(! ch->isUnloaded() ); // we don't advance unloaded chars
+        assert(! ch->unloaded() ); // we don't advance unloaded chars
 
         // Check if this charater or any of its parents is a mask.
         // Characters acting as masks should always be rendered to the
@@ -924,7 +924,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
         boost::intrusive_ptr<DisplayObject> chNew = itNew->get();
         int depthNew = chNew->get_depth();
 
-        if (chNew->isUnloaded()) {
+        if (chNew->unloaded()) {
             iterator it =
                 std::find_if(_charsByDepth.begin(), _charsByDepth.end(),
                     DepthGreaterOrEqual(depthNew));
@@ -942,7 +942,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
             e = newList._charsByDepth.end(); i != e; ++i) {
 
         DisplayObject* ch = (*i).get();
-        if (!ch->isUnloaded()) {
+        if (!ch->unloaded()) {
 
             iterator found =
                 std::find(_charsByDepth.begin(), _charsByDepth.end(), ch);
@@ -969,7 +969,7 @@ DisplayList::mergeDisplayList(DisplayList & newList)
 void
 DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<DisplayObject> ch)
 {
-    assert(ch->isUnloaded());
+    assert(ch->unloaded());
     testInvariant();
 
     // TODO: have this done by DisplayObject::unload() instead ?
@@ -992,7 +992,7 @@ DisplayList::removeUnloaded()
 {
     testInvariant();
 
-    _charsByDepth.remove_if(boost::mem_fn(&DisplayObject::isUnloaded));
+    _charsByDepth.remove_if(boost::mem_fn(&DisplayObject::unloaded));
 
     testInvariant();
 }

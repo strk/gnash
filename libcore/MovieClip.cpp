@@ -431,7 +431,7 @@ public:
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
-        if ( ch->isUnloaded() ) return;
+        if ( ch->unloaded() ) return;
         rect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
@@ -458,7 +458,7 @@ public:
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
-        if ( ch->isUnloaded() ) return;
+        if ( ch->unloaded() ) return;
 
         // TODO: Are script-transformed object to be kept ?
         //             Need a testcase for this
@@ -862,7 +862,7 @@ MovieClip::on_event(const event_id& id)
 #endif
 
     // We do not execute ENTER_FRAME if unloaded
-    if ( id.id() == event_id::ENTER_FRAME && isUnloaded() )
+    if ( id.id() == event_id::ENTER_FRAME && unloaded() )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"), getTarget());
@@ -1080,7 +1080,7 @@ MovieClip::advance()
         get_frame_count());
 #endif
 
-    assert(!isUnloaded());
+    assert(!unloaded());
 
     // call_frame should never trigger advance_movieclip
     assert(!_callingFrameActions);
@@ -1679,7 +1679,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 #endif
         return false;
     }
-    DisplayObject* mask = getMask(); // dynamic one
+    const DisplayObject* mask = getMask(); // dynamic one
     if ( mask && mask->visible() && ! mask->pointInShape(x, y) )
     {
 #ifdef GNASH_DEBUG_HITTEST
@@ -1960,7 +1960,7 @@ MovieClip::cleanup_textfield_variables()
     {
         TextFields& v=i->second;
         TextFields::iterator lastValid = std::remove_if(v.begin(), v.end(),
-                    boost::mem_fn(&DisplayObject::isUnloaded));
+                    boost::mem_fn(&DisplayObject::unloaded));
         v.erase(lastValid, v.end());
     }
 }
@@ -2046,7 +2046,7 @@ MovieClip::registerAsListener()
 void
 MovieClip::stagePlacementCallback(as_object* initObj)
 {
-    assert(!isUnloaded());
+    assert(!unloaded());
 
     saveOriginalTarget();
 
@@ -2534,7 +2534,7 @@ public:
     void operator() (DisplayObject* ch)
     {
         // don't enumerate unloaded DisplayObjects
-        if ( ch->isUnloaded() ) return;
+        if ( ch->unloaded() ) return;
 
         _env.push(ch->get_name());
     }
@@ -2601,12 +2601,7 @@ void
 MovieClip::destroy()
 {
     stopStreamSound();
-
     _displayList.destroy();
-
-    /// We don't need these anymore
-    clearProperties();
-
     DisplayObject::destroy();
 }
 
@@ -2723,7 +2718,7 @@ public:
     void operator() (DisplayObject* ch)
     {
         // Should we still print these?
-        //if ( ch->isUnloaded() ) return; 
+        //if ( ch->unloaded() ) return; 
 
         ch->getMovieInfo(_tr, _it);
     }

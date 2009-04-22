@@ -298,7 +298,7 @@ ActionExec::operator() ()
             DisplayObject* guardedChar = env.get_target();
 #endif
 
-            if ( _abortOnUnload && guardedChar && guardedChar->isUnloaded() )
+            if ( _abortOnUnload && guardedChar && guardedChar->unloaded() )
             // action_execution_order_test8.c shows that the opcode guard is not SWF version based (TODO: automate it!)
             {
                 std::stringstream ss;

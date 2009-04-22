@@ -1070,10 +1070,13 @@ bool
 DisplayObject::unload()
 {
 
-	if ( ! _unloaded )
-	{
+	if (!_unloaded) {
 		queueEvent(event_id::UNLOAD, movie_root::apDOACTION);
 	}
+
+    // Unregister this DisplayObject as mask and/or maskee.
+    if (_maskee) _maskee->setMask(0);
+    if (_mask) _mask->setMaskee(0);
 
 	bool hasEvent = hasEventHandler(event_id::UNLOAD);
 
@@ -1096,7 +1099,7 @@ bool
 DisplayObject::hasEventHandler(const event_id& id) const
 {
 	Events::const_iterator it = _event_handlers.find(id);
-	if ( it != _event_handlers.end() ) return true;
+	if (it != _event_handlers.end()) return true;
 
 	boost::intrusive_ptr<as_function> method = 
         getUserDefinedEventHandler(id.functionKey());
@@ -1326,13 +1329,17 @@ DisplayObject::getTarget() const
 void
 DisplayObject::destroy()
 {
-	// in case we are destroyed w/out being unloaded first
+	// in case we are destroyed without being unloaded first
 	// see bug #21842
 	_unloaded = true;
 
 	/// we may destory a DisplayObject that's not unloaded.
-	///(we don't have chance to unload it in current model, see new_child_in_unload_test.c)
+	///(we don't have chance to unload it in current model,
+    /// see new_child_in_unload_test.c)
 	/// We don't destroy ourself twice, right ?
+
+    clearProperties();
+
 	assert(!_destroyed);
 	_destroyed = true;
 }
@@ -1341,34 +1348,17 @@ void
 DisplayObject::markDisplayObjectReachable() const
 {
 	if ( m_parent ) m_parent->setReachable();
-	if ( _mask )
-	{
-		// Stop being masked if the mask was unloaded
-		if ( _mask->isUnloaded() )
-		{
-			const_cast<DisplayObject*>(this)->setMask(0);
-		}
-		else _mask->setReachable();
-	}
-	if ( _maskee )
-	{
-		// Stop masking if the masked DisplayObject was unloaded
-		if ( _maskee->isUnloaded() )
-		{
-			const_cast<DisplayObject*>(this)->setMaskee(0);
-		}
-		else _maskee->setReachable();
-	}
+	if (_mask) _mask->setReachable();
+	if (_maskee) _maskee->setReachable();
 	markAsObjectReachable();
 }
 
 void
 DisplayObject::setMask(DisplayObject* mask)
 {
-	if ( _mask != mask )
-	{
-		set_invalidated();
-	}
+	if ( _mask == mask ) return;
+
+    set_invalidated();
 
 	// Backup this before setMaskee has a chance to change it..
 	DisplayObject* prevMaskee = _maskee;
@@ -1385,36 +1375,29 @@ DisplayObject::setMask(DisplayObject* mask)
 
 	// if we had a maskee, notify it to stop using
 	// us as a mask
-	if ( prevMaskee )
-	{
-		prevMaskee->setMask(0); 
-	}
+	if (prevMaskee) prevMaskee->setMask(0);
 
 	// TODO: should we reset any original clip depth
 	//       specified by PlaceObject tag ?
-	set_clip_depth(noClipDepthValue); // this will set _mask !!
+	set_clip_depth(noClipDepthValue); 
 	_mask = mask;
 	_maskee = 0;
 
 	if ( _mask )
 	{
 		log_debug(" %s.setMask(%s): registering with new mask %s",
-			getTarget(),
-			mask ? mask->getTarget() : "null",
+			getTarget(), mask ? mask->getTarget() : "null",
 			_mask->getTarget());
 		/// Register as as masked by the mask
 		_mask->setMaskee(this);
 	}
 }
 
-/*private*/
 void
 DisplayObject::setMaskee(DisplayObject* maskee)
 {
-	if ( _maskee == maskee )
-	{
-		return;
-	}
+	if ( _maskee == maskee ) { return; }
+
 	if ( _maskee )
 	{
 		// We don't want the maskee to call setMaskee(null)
@@ -1483,7 +1466,7 @@ DisplayObject::getMovieInfo(InfoTree& tr, InfoTree::iterator it)
 	tr.append_child(it, StringPair(_("Dynamic"), isDynamic() ? yes : no));	
 	tr.append_child(it, StringPair(_("Mask"), isMaskLayer() ? yes : no));	    
 	tr.append_child(it, StringPair(_("Destroyed"), isDestroyed() ? yes : no));
-	tr.append_child(it, StringPair(_("Unloaded"), isUnloaded() ? yes : no));
+	tr.append_child(it, StringPair(_("Unloaded"), unloaded() ? yes : no));
 	
     os.str("");
     os << _blendMode;
