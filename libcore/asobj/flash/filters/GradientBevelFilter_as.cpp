@@ -64,7 +64,7 @@ boost::intrusive_ptr<builtin_function> GradientBevelFilter_as::s_ctor;
 as_object*
 GradientBevelFilter_as::Interface() {
     if (GradientBevelFilter_as::s_interface == NULL) {
-        GradientBevelFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        GradientBevelFilter_as::s_interface = new as_object (getBitmapFilterInterface());
         VM::get().addStatic(GradientBevelFilter_as::s_interface.get());
         GradientBevelFilter_as::attachInterface(*GradientBevelFilter_as::s_interface);
     }

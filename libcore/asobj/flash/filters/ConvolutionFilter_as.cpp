@@ -64,7 +64,7 @@ as_object*
 ConvolutionFilter_as::Interface()
 {
     if (ConvolutionFilter_as::s_interface == NULL) {
-        ConvolutionFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        ConvolutionFilter_as::s_interface = new as_object (getBitmapFilterInterface());
          VM::get().addStatic(ConvolutionFilter_as::s_interface.get());
          ConvolutionFilter_as::attachInterface(*ConvolutionFilter_as::s_interface);
     }

@@ -69,7 +69,7 @@ boost:: intrusive_ptr<builtin_function> GlowFilter_as::s_ctor;
 as_object*
 GlowFilter_as::Interface() {
     if (GlowFilter_as::s_interface == NULL) {
-        GlowFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        GlowFilter_as::s_interface = new as_object (getBitmapFilterInterface());
         VM::get().addStatic(GlowFilter_as::s_interface.get());
         GlowFilter_as::attachInterface(*GlowFilter_as::s_interface);
     }

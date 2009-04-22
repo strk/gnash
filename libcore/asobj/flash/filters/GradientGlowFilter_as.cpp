@@ -66,7 +66,7 @@ as_object*
 GradientGlowFilter_as::Interface()
 {
     if (GradientGlowFilter_as::s_interface == NULL) {
-        GradientGlowFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        GradientGlowFilter_as::s_interface = new as_object (getBitmapFilterInterface());
         VM::get().addStatic(GradientGlowFilter_as::s_interface.get());
         GradientGlowFilter_as::attachInterface(*GradientGlowFilter_as::s_interface);
     }

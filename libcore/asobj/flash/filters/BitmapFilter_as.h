@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_BITMAPFILTER_H__
-#define __GNASH_ASOBJ_BITMAPFILTER_H__
+#ifndef GNASH_ASOBJ_BITMAPFILTER_H
+#define GNASH_ASOBJ_BITMAPFILTER_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
@@ -31,26 +31,9 @@ class as_object;
 void BitmapFilter_class_init(as_object& global);
 
 /// Get the interface, for inheritance.
-as_object *bitmapFilter_interface();
+as_object *getBitmapFilterInterface();
 
 } // end of gnash namespace
 
-// __GNASH_ASOBJ_BITMAPFILTER_H__
 #endif
 
-#ifdef phelp_helper
-#ifndef easy_clone
-#define easy_clone(sp_name) \
-as_value \
-sp_name::bitmap_clone(const fn_call& fn) \
-{ \
-    boost::intrusive_ptr<sp_name> ptr = ensureType<sp_name>(fn.this_ptr); \
-    boost::intrusive_ptr<sp_name> obj = new sp_name(*ptr); \
-    boost::intrusive_ptr<as_object> r = obj; \
-    r->set_prototype(ptr->get_prototype()); \
-    r->copyProperties(*ptr); \
-\
-    return as_value(r); \
-}
-#endif /* easy_clone */
-#endif /* phelp_helper */

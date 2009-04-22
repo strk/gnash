@@ -66,7 +66,7 @@ boost:: intrusive_ptr<builtin_function> DropShadowFilter_as::s_ctor;
 as_object*
 DropShadowFilter_as::Interface() {
     if (DropShadowFilter_as::s_interface == NULL) {
-        DropShadowFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        DropShadowFilter_as::s_interface = new as_object (getBitmapFilterInterface());
     VM::get().addStatic(DropShadowFilter_as::s_interface.get());
     DropShadowFilter_as::attachInterface(*DropShadowFilter_as::s_interface);
     }
