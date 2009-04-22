@@ -584,13 +584,13 @@ as_environment::find_object(const std::string& path,
     {
         // Absolute path.  Start at the (AS) root (handle _lockroot)
         MovieClip* root = 0;
-        if ( m_target ) root = const_cast<MovieClip*>(m_target->getAsRoot());
+        if ( m_target ) root = m_target->getAsRoot();
         else {
             if ( _original_target )
             {
                 log_debug("current target is undefined on "
                         "as_environment::find_object, we'll use original");
-                root = const_cast<MovieClip*>(_original_target->getAsRoot());
+                root = _original_target->getAsRoot();
             }
             else
             {
