@@ -27,7 +27,7 @@ AUTOMAKE_OPTIONS = -Wno-portability
 SUBDIRS = .
 # If python support is enabled, built that too
 if USE_PYTHON
-SUBDIRS += gtk_widget
+SUBDIRS += pythonmod
 endif
 
 localedir = $(datadir)/locale

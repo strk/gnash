@@ -17,7 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#include "gnash-canvas.h"
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#include "gtk_canvas.h"
 
 #include "rc.h"
 #include "log.h"

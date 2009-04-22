@@ -41,7 +41,7 @@ gnash_la_SOURCES = \
 	gnash.c	\
 	gnashmodule.c \
 	gnash-view.cpp\
-	$(top_srcdir)/gui/gnash-canvas.cpp \
+	$(top_srcdir)/gui/gtk_canvas.cpp \
 	$(top_srcdir)/gui/gtk_glue_cairo.cpp
 
 gnash.c: gnash.defs gnash.override

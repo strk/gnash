@@ -28,7 +28,9 @@
 #include <gdk/gdk.h>
 #include <gtk/gtk.h>
 
-#include "gnash-canvas.h"
+#ifdef BUILD_CANVAS
+#include "gtk_canvas.h"
+#endif
 
 #ifdef GUI_HILDON
 extern "C" {
@@ -154,7 +156,11 @@ private:
     GtkWidget* _overlay;
     
     // The area rendered into by Gnash
+#ifdef BUILD_CANVAS
     GtkWidget* _canvas;
+#else
+    GtkWidget* _drawingArea;
+#endif
 
     GtkMenu* _popup_menu;
     GtkWidget* _menubar;
