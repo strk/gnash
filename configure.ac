@@ -228,6 +228,18 @@ fi
 LC_KEY=${lckey}
 AC_SUBST(LC_KEY)
 
+AC_ARG_ENABLE(gtk-widget,
+  AC_HELP_STRING([--enable-gtk-widget],[Enable building the GTK Widget]),
+[case "${enableval}" in
+  yes) gtkwidget=yes ;;
+  no)  gtkwidget=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-gtk-widget option]) ;;
+esac],gtkwidget=yes)
+AM_CONDITIONAL([BUILD_GTK_WIDGET], test x$gtkwidget = xyes)
+if test x$gtkwidget = xyes; then
+  AC_DEFINE([BUILD_CANVAS], [], [Build GTK Canvas support for the GTK Widget ])
+fi
+
 AC_ARG_ENABLE(python,
   AC_HELP_STRING([--enable-python],[Enable python for the python wrapper]),
 [case "${enableval}" in
@@ -2239,7 +2251,7 @@ testsuite/libamf.all/Makefile
 testsuite/libnet.all/Makefile
 gui/Makefile
 gui/Info.plist
-gui/gtk_widget/Makefile
+gui/pythonmod/Makefile
 extensions/Makefile
 extensions/dejagnu/Makefile
 extensions/mysql/Makefile
