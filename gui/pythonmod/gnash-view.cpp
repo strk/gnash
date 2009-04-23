@@ -18,7 +18,7 @@
 //
 
 #include "gnash-view.h"
-#include "gnash-canvas.h"
+#include "gtk_canvas.h"
 
 #include <gdk/gdk.h>
 #include <gdk/gdkkeysyms.h>

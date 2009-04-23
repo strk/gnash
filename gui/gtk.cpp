@@ -177,7 +177,6 @@ GtkGui::init(int argc, char **argv[])
 #ifdef BUILD_CANVAS
     _canvas = gnash_canvas_new();
     gnash_canvas_setup(GNASH_CANVAS(_canvas), argc, argv);
-    _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
     // Increase reference count to prevent its destruction (which could happen
     // later if we remove it from its container).
     g_object_ref(G_OBJECT(_canvas));
@@ -236,6 +235,14 @@ GtkGui::init(int argc, char **argv[])
     } else {
         log_debug(_("LIRC daemon not running"));
     }
+#endif
+
+#ifdef BUILD_CANVAS
+    _renderer = gnash_canvas_get_renderer(GNASH_CANVAS(_canvas));
+#else
+    _renderer = _glue->createRenderHandler();
+    if ( ! _renderer ) return false;
+    set_render_handler(_renderer);
 #endif
 
     // The first time stop() was called, stopHook() might not have had a chance

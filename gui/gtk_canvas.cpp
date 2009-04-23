@@ -60,6 +60,7 @@ static void gnash_canvas_init(GnashCanvas *canvas);
 static void gnash_canvas_size_allocate(GtkWidget *widget, GtkAllocation *allocation);
 static gboolean gnash_canvas_expose_event(GtkWidget *widget, GdkEventExpose *event);
 static gboolean gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event);
+static void gnash_canvas_realize(GtkWidget *widget);
 
 GtkWidget *
 gnash_canvas_new (void)
@@ -79,12 +80,17 @@ gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class)
     widget_class->size_allocate = gnash_canvas_size_allocate;
     widget_class->expose_event = gnash_canvas_expose_event;
     widget_class->configure_event = gnash_canvas_configure_event;
+    widget_class->configure_event = gnash_canvas_configure_event;
+    widget_class->realize = gnash_canvas_realize;
 }
 
 static void
 gnash_canvas_init(GnashCanvas *canvas)
 {
     GNASH_REPORT_FUNCTION;
+
+    canvas->renderer = NULL;
+
     gtk_widget_set_double_buffered(GTK_WIDGET(canvas), FALSE);
 
     // If we don't set this flag we won't be able to grab focus
@@ -100,7 +106,9 @@ gnash_canvas_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
 
     gnash::log_debug("gnash_canvas_size_allocate %d %d", allocation->width, allocation->height);
 
-    canvas->glue->setRenderHandlerSize(allocation->width, allocation->height);
+    if (canvas->renderer != NULL)
+        canvas->glue->setRenderHandlerSize(allocation->width, allocation->height);
+    
     GTK_WIDGET_CLASS (parent_class)->size_allocate (widget, allocation);
 }
 
@@ -133,9 +141,49 @@ gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event)
 {
     GNASH_REPORT_FUNCTION;
     GnashCanvas *canvas = GNASH_CANVAS(widget);
+
     canvas->glue->configure(widget, event);
 
     return FALSE;
+}
+
+static void 
+gnash_canvas_realize(GtkWidget *widget)
+{
+    GNASH_REPORT_FUNCTION;
+    GnashCanvas *canvas = GNASH_CANVAS(widget);
+    GdkWindowAttr attributes;
+    gint attributes_mask;
+
+    GTK_WIDGET_SET_FLAGS (widget, GTK_REALIZED);
+
+    attributes.window_type = GDK_WINDOW_CHILD;
+    attributes.x = widget->allocation.x;
+    attributes.y = widget->allocation.y;
+    attributes.width = widget->allocation.width;
+    attributes.height = widget->allocation.height;
+    attributes.wclass = GDK_INPUT_OUTPUT;
+    attributes.visual = gtk_widget_get_visual (widget);
+    attributes.colormap = gtk_widget_get_colormap (widget);
+    attributes.event_mask = gtk_widget_get_events (widget) | GDK_EXPOSURE_MASK;
+
+    attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
+
+    widget->window = gdk_window_new (gtk_widget_get_parent_window (widget),
+                                    &attributes, attributes_mask);
+    gdk_window_set_user_data (widget->window, widget);
+
+#if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
+    // cairo needs the _drawingArea.window to prepare it ..
+    // TODO: find a way to make 'glue' use independent from actual renderer in use
+    canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
+#endif
+
+    canvas->renderer = canvas->glue->createRenderHandler();
+    set_render_handler(canvas->renderer);
+
+    canvas->glue->setRenderHandlerSize(widget->allocation.width,
+                                       widget->allocation.height);
 }
 
 void
@@ -174,15 +222,6 @@ gnash_canvas_setup(GnashCanvas *canvas, int argc, char **argv[])
     // TODO: find a way to make '_glue' use independent from actual renderer in use
     canvas->glue->prepDrawingArea(canvas);
 #endif
-
-#if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
-    // cairo needs the _drawingArea.window to prepare it ..
-    // TODO: find a way to make 'glue' use independent from actual renderer in use
-    canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
-#endif
-
-    canvas->renderer = canvas->glue->createRenderHandler();
-    set_render_handler(canvas->renderer);
 }
 
 void

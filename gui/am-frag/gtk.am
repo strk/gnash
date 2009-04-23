@@ -19,11 +19,9 @@
 # Build the GTK gui
 #
 
-# Build the optional GTK Widget, which currently only works with Cairo
+# Build the optional GTK Widget
 if BUILD_GTK_WIDGET
-if BUILD_CAIRO_RENDERER
 GTK_CANVAS = gtk_canvas.cpp gtk_canvas.h
-endif
 endif
 
 if BUILD_GTK_GUI
@@ -47,7 +45,7 @@ endif				# BUILD_OGL_RENDERER
 if BUILD_AGG_RENDERER
 gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
 gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
-		gtk.cpp gtksup.h gtk_glue.h $(GTK_WIDGET)
+		gtk.cpp gtksup.h gtk_glue.h $(GTK_CANVAS)
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS) $(CAIRO_LIBS)
 if HAVE_XV
