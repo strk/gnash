@@ -19,18 +19,8 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
-#include <cerrno>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <cassert>
-
-//#include "network.h"
+#include "GnashSystemNetHeaders.h"
+#include "GnashFileUtilities.h"
 #include "element.h"
 #include "amf.h"
 #include "buffer.h"
@@ -38,17 +28,16 @@
 #include "log.h"
 #include "GnashException.h"
 
-#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
-# include <winsock2.h>
-# include <windows.h>
-# include <sys/stat.h>
-# include <io.h>
-# include <ws2tcpip.h>
-#else
-#include <arpa/inet.h>
-#endif
-
 #include <boost/scoped_array.hpp>
+#include <boost/cstdint.hpp>
+#include <boost/shared_ptr.hpp>
+#include <cerrno>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <cassert>
+
 
 using namespace std;
 using namespace amf;

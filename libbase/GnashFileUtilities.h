@@ -23,6 +23,7 @@
 /// fstat()
 /// lstat()
 /// dup()
+/// readdir()
 #ifndef GNASH_FILE_UTILITIES_H
 #define GNASH_FILE_UTILITIES_H
 
@@ -33,6 +34,7 @@
 # include <unistd.h>
 # include <sys/stat.h>
 # include <sys/types.h>
+# include <dirent.h>
 #else
 #include <io.h>
 #define dup _dup

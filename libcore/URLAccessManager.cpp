@@ -22,23 +22,14 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 #include "log.h"
-#include "StringPredicates.h" // for case-insensitive host match
-#include "VM.h" // for getRoot().getRootMovie()
-
+#include "StringPredicates.h" 
+#include "VM.h" 
 #include "rc.h" // for rcfile
-#include <cerrno> // for errno :)
+#include "GnashSystemIOHeaders.h"
 
-// temporary use of console for confirm load of network urls
-#include <iconv.h>
+#include <cerrno> 
 #include <iostream>
 #include <algorithm> // for find / find_if
-
-#ifdef WIN32
-# include <winsock2.h>
-#else
-# include "GnashSystemIOHeaders.h"
-#endif
-
 #include <cstring> // for strerror
 #include <cstdio>
 #include <map>

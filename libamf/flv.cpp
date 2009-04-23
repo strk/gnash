@@ -21,20 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/detail/endian.hpp>
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <climits>
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-# include <sys/types.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <io.h>
-#endif
-
+#include "GnashSystemNetHeaders.h"
 #include "buffer.h"
 #include "log.h"
 #include "amf.h"
@@ -42,9 +29,13 @@
 #include "utility.h"
 #include "flv.h"
 
-//#include <boost/detail/endian.hpp>
-
-#include <boost/cstdint.hpp> // for boost::?int??_t
+#include <boost/detail/endian.hpp>
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <vector>
+#include <cmath>
+#include <climits>
+#include <boost/cstdint.hpp> 
 
 using namespace std;
 using namespace gnash;

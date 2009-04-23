@@ -157,6 +157,7 @@ noinst_HEADERS = \
 	tu_file.h \
 	IOChannel.h \
 	tu_opengl_includes.h \
+	GnashSystemNetHeaders.h \
 	GnashSystemIOHeaders.h \
 	GnashFileUtilities.h \
 	NamingPolicy.h \

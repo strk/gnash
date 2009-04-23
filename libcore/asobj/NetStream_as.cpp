@@ -24,10 +24,8 @@
 
 #include "NetStream_as.h"
 #include "CharacterProxy.h"
-
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "log.h"
-
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "GnashException.h"
@@ -38,20 +36,10 @@
 #include "movie_root.h"
 #include "GnashAlgorithm.h"
 #include "VirtualClock.h" // for PlayHead
-
 #include "MediaHandler.h"
 #include "StreamProvider.h"
 #include "sound_handler.h"
-
-// For ntohs in amf conversion. FIXME: do this somewhere
-// more appropriate. There's AMF code scattered all over the place.
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-# include <sys/types.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <io.h>
-#endif
+#include "GnashSystemNetHeaders.h"
 
 // Define the following macro to have status notification handling debugged
 //#define GNASH_DEBUG_STATUS

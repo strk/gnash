@@ -22,17 +22,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include <iostream>
-#include <string>
-#include <boost/scoped_ptr.hpp>
-
-// FIXME: Get rid of this crap.
-#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
-# include <winsock.h>
-#else
-#include <arpa/inet.h> // for htons
-#endif
-
+#include "GnashSystemNetHeaders.h"
 #include "NetConnection_as.h"
 #include "log.h"
 #include "GnashException.h"
@@ -47,6 +37,10 @@
 #include "SimpleBuffer.h"
 #include "namedStrings.h"
 #include "GnashAlgorithm.h"
+
+#include <iostream>
+#include <string>
+#include <boost/scoped_ptr.hpp>
 
 //#define GNASH_DEBUG_REMOTING
 

@@ -21,8 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "GnashSystemIOHeaders.h" // read
-
+#include "GnashSystemFDHeaders.h"
 #include "network.h"
 #include "utility.h"
 #include "XML_as.h"
@@ -33,17 +32,7 @@
 #include "builtin_function.h" // for setting timer, should likely avoid that..
 #include "URLAccessManager.h"
 #include "Object.h" // for getObjectInterface
-
 #include "log.h"
-
-// For select() 
-#ifdef HAVE_WINSOCK2_H
-# include <winsock2.h>
-#else
-# include <sys/types.h>
-# include <sys/stat.h>
-#endif
-
 #include <boost/scoped_array.hpp>
 #include <string>
 
@@ -493,8 +482,6 @@ XMLSocket_as::checkForIncomingData()
 			fn_call call(this, env, args);
 
 			onDataHandler->call(call);
-
-			// TODO: clear the stack ?
         }
     }
 

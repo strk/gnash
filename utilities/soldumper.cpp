@@ -19,11 +19,10 @@
 #include "gnashconfig.h"
 #endif
 
-#include <dirent.h>
+#include "GnashFileUtilities.h"
 #include <iostream>
-#include <stdarg.h>
+#include <cstdarg>
 #include <cstring>
-#include <sys/stat.h>
 
 #ifdef ENABLE_NLS
 # include <locale>

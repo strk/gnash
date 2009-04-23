@@ -21,17 +21,7 @@
 #include "gnashconfig.h" // USE_SOL_READ_ONLY
 #endif
 
-#include <boost/tokenizer.hpp>
-#include <boost/scoped_array.hpp>
-#include <boost/shared_ptr.hpp>
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-# include <sys/types.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <io.h>
-#endif
-
+#include "GnashSystemNetHeaders.h"
 #include "GnashFileUtilities.h" // stat
 #include "SimpleBuffer.h"
 #include "as_value.h"
@@ -51,6 +41,10 @@
 #include "URLAccessManager.h"
 #include "URL.h"
 #include "rc.h" // for use of rcfile
+
+#include <boost/tokenizer.hpp>
+#include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
 
 // Undefine this to use the Element-based AMF0 decoder/encoder.
 // May be useful to test libamf.

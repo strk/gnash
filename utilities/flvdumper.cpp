@@ -19,6 +19,9 @@
 #include "gnashconfig.h"
 #endif
 
+#include "GnashFileUtilities.h"
+#include "GnashSystemNetHeaders.h"
+
 #include <boost/shared_ptr.hpp>
 #include <dirent.h>
 #include <iostream>
@@ -26,14 +29,6 @@
 #include <cstring>
 #include <string>
 #include <vector>
-#include <sys/stat.h>
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-# include <sys/types.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <io.h>
-#endif
 
 #ifdef ENABLE_NLS
 # include <locale>

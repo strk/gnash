@@ -74,6 +74,7 @@ NetworkAdapter::makeStream(const std::string& url,
 #include "utility.h"
 #include "GnashException.h"
 #include "rc.h"
+#include "GnashSystemFDHeaders.h"
 
 #include <map>
 #include <string>
@@ -81,15 +82,6 @@ NetworkAdapter::makeStream(const std::string& url,
 #include <cerrno>
 #include <cstdio> // cached data uses a *FILE
 #include <cstdlib> // std::getenv
-
-// For select()
-#ifdef HAVE_WINSOCK2_H
-# include <winsock2.h>
-#else
-# include <sys/types.h>
-# include <sys/stat.h>
-# include <unistd.h>
-#endif
 
 //#define GNASH_CURL_VERBOSE 1
 

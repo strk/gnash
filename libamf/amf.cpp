@@ -21,26 +21,18 @@
 #include "gnashconfig.h"
 #endif
 
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
-
+#include "GnashSystemNetHeaders.h"
 #include "log.h"
 #include "GnashException.h"
 #include "buffer.h"
 #include "amf.h"
-//#include "network.h"
 #include "element.h"
 #include "amfutf8.h"
-#include <boost/cstdint.hpp> // for boost::?int??_t
 
-#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
-# include <sys/types.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <io.h>
-#endif
+#include <boost/shared_ptr.hpp>
+#include <string>
+#include <vector>
+#include <boost/cstdint.hpp>
 
 using namespace std;
 using namespace gnash;

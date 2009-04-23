@@ -24,7 +24,7 @@
 // Flash player handles a huge range of dates, including
 // thousands of years BC. The timestamp value is correspondingly
 // large: it is a double, which has a minimum size of 8 bytes
-// in the C++ standard. Methods provided by ctime and sys/time.h
+// in the C++ standard. Methods provided by <ctime>
 // generally rely on time_t whose size varies according to platform.
 // It is not big enough to deal with all valid SWF timestamps,
 // so this class uses its own methods to convert to and from 
