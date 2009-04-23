@@ -20,232 +20,204 @@
 #include "ConvolutionFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
-
+#include "Object.h"
 #include "BitmapFilter_as.h"
 
 namespace gnash {
 
+namespace {
+    
+    as_value convolutionfilter_ctor(const fn_call& fn);
+    as_value convolutionfilter_clone(const fn_call& fn);
+    as_value getConvolutionFilterConstructor(const fn_call& fn);
+    as_value convolutionfilter_matrixX(const fn_call& fn);
+    as_value convolutionfilter_matrixY(const fn_call& fn);
+    as_value convolutionfilter_matrix(const fn_call& fn);
+    as_value convolutionfilter_divisor(const fn_call& fn);
+    as_value convolutionfilter_bias(const fn_call& fn);
+    as_value convolutionfilter_preserveAlpha(const fn_call& fn);
+    as_value convolutionfilter_clamp(const fn_call& fn);
+    as_value convolutionfilter_color(const fn_call& fn);
+    as_value convolutionfilter_alpha(const fn_call& fn);
+
+    void attachConvolutionFilterInterface(as_object& o);
+}
+ 
+// TODO: Use composition, not inheritance.
 class ConvolutionFilter_as : public as_object, public ConvolutionFilter
 {
 public:
-    static as_value matrixX_gs(const fn_call& fn);
-    static as_value matrixY_gs(const fn_call& fn);
-    static as_value matrix_gs(const fn_call& fn);
-    static as_value divisor_gs(const fn_call& fn);
-    static as_value bias_gs(const fn_call& fn);
-    static as_value preserveAlpha_gs(const fn_call& fn);
-    static as_value clamp_gs(const fn_call& fn);
-    static as_value color_gs(const fn_call& fn);
-    static as_value alpha_gs(const fn_call& fn);
-    static as_value bitmap_clone(const fn_call& fn);
-
     ConvolutionFilter_as(as_object *obj)
-        :
+	    :
         as_object(obj)
-    {
-    }
-
-    static as_object* Interface();
-    static void attachInterface(as_object& o);
-    static void attachProperties(as_object& o);
-    static void registerCtor(as_object& global);
-    static as_value ctor(const fn_call& fn);
-private:
-static boost::intrusive_ptr<as_object> s_interface;
-static boost::intrusive_ptr<builtin_function> s_ctor;
+    {}
 
 };
 
-boost::intrusive_ptr<as_object> ConvolutionFilter_as::s_interface;
-
-boost::intrusive_ptr<builtin_function> ConvolutionFilter_as::s_ctor;
-
-as_object*
-ConvolutionFilter_as::Interface()
-{
-    if (ConvolutionFilter_as::s_interface == NULL) {
-        ConvolutionFilter_as::s_interface = new as_object (bitmapFilter_interface());
-         VM::get().addStatic(ConvolutionFilter_as::s_interface.get());
-         ConvolutionFilter_as::attachInterface(*ConvolutionFilter_as::s_interface);
-    }
-    return ConvolutionFilter_as::s_interface.get();
-}
-
-void
-ConvolutionFilter_as::registerCtor(as_object& global)
-{
-    if (ConvolutionFilter_as::s_ctor != NULL) return;
-    ConvolutionFilter_as::s_ctor = new builtin_function(&ConvolutionFilter_as::ctor, ConvolutionFilter_as::Interface());
-    VM::get().addStatic(ConvolutionFilter_as::s_ctor.get());
-    ConvolutionFilter_as::attachInterface(*ConvolutionFilter_as::s_ctor);
-    global.init_member("ConvolutionFilter" , ConvolutionFilter_as::s_ctor.get());
-}
 
 void
 ConvolutionFilter_class_init(as_object& global)
 {
-    ConvolutionFilter_as::registerCtor(global);
+    string_table& st = global.getVM().getStringTable();
+    global.init_destructive_property(st.find("ConvolutionFilter"),
+            getConvolutionFilterConstructor);
 }
+
+as_object*
+getConvolutionFilterInterface()
+{
+    static as_object* o;
+    if (!o) {
+        o = new as_object(getBitmapFilterInterface());
+        VM::get().addStatic(o);
+        attachConvolutionFilterInterface(*o);
+    }
+    return o;
+}
+
+namespace {
 
 void
-ConvolutionFilter_as::attachInterface(as_object& o)
+attachConvolutionFilterInterface(as_object& o)
 {
-    boost::intrusive_ptr<builtin_function> gs;
-    o.set_member(VM::get().getStringTable().find("clone"), new builtin_function(bitmap_clone));
-}
-
-void
-ConvolutionFilter_as::attachProperties(as_object& o) {
-    boost::intrusive_ptr<builtin_function> gs;
-
-    gs = new builtin_function(ConvolutionFilter_as::matrixX_gs, NULL);
-    o.init_property("matrixX" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::matrixY_gs, NULL);
-    o.init_property("matrixY" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::matrix_gs, NULL);
-    o.init_property("matrix" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::divisor_gs, NULL);
-    o.init_property("divisor" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::bias_gs, NULL);
-    o.init_property("bias" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::preserveAlpha_gs, NULL);
-    o.init_property("preserveAlpha" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::clamp_gs, NULL);
-    o.init_property("clamp" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::color_gs, NULL);
-    o.init_property("color" , *gs, *gs);
-
-    gs = new builtin_function(ConvolutionFilter_as::alpha_gs, NULL);
-    o.init_property("alpha" , *gs, *gs);
-
+    const int flags = 0;
+    o.init_property("matrixX" , convolutionfilter_matrixX,
+            convolutionfilter_matrixX, flags);
+    o.init_property("divisor" , convolutionfilter_divisor,
+            convolutionfilter_divisor, flags);
+    o.init_property("matrix" , convolutionfilter_matrix,
+            convolutionfilter_matrix, flags);
+    o.init_property("matrixY" , convolutionfilter_matrixY,
+            convolutionfilter_matrixY, flags);
+    o.init_property("alpha" , convolutionfilter_alpha,
+            convolutionfilter_alpha, flags);
+    o.init_property("clamp" , convolutionfilter_clamp,
+            convolutionfilter_clamp, flags);
+    o.init_property("preserveAlpha" , convolutionfilter_preserveAlpha,
+            convolutionfilter_preserveAlpha, flags);
+    o.init_property("bias" , convolutionfilter_bias,
+            convolutionfilter_bias, flags);
+    o.init_property("color" , convolutionfilter_color,
+            convolutionfilter_color, flags);
 }
 
 as_value
-ConvolutionFilter_as::matrixX_gs(const fn_call& fn)
+getConvolutionFilterConstructor(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) {
-        return as_value(ptr->_matrixX );
+    static builtin_function* cl;
+    if (!cl) {
+        cl = new builtin_function(&convolutionfilter_ctor,
+                getConvolutionFilterInterface());
+        fn.getVM().addStatic(cl);
     }
-    boost::uint8_t sp_matrixX = fn.arg(0).to_number<boost::uint8_t> ();
-    ptr->_matrixX = sp_matrixX;
+    return cl;
+}
+
+as_value
+convolutionfilter_ctor(const fn_call& /*fn*/)
+{
+    boost::intrusive_ptr<as_object> obj =
+        new ConvolutionFilter_as(getConvolutionFilterInterface());
+    return as_value(obj);
+}
+
+as_value
+convolutionfilter_matrixX(const fn_call& fn)
+{
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::matrixY_gs(const fn_call& fn)
+convolutionfilter_matrixY(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) {
-        return as_value(ptr->_matrixY );
-    }
-    boost::uint8_t sp_matrixY = fn.arg(0).to_number<boost::uint8_t> ();
-    ptr->_matrixY = sp_matrixY;
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::divisor_gs(const fn_call& fn)
+convolutionfilter_divisor(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) {
-        return as_value(ptr->_divisor );
-    }
-    float sp_divisor = fn.arg(0).to_number<float> ();
-    ptr->_divisor = sp_divisor;
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::bias_gs(const fn_call& fn)
+convolutionfilter_bias(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) { return as_value(ptr->_bias );
-    }
-    float sp_bias = fn.arg(0).to_number<float> ();
-    ptr->_bias = sp_bias;
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::preserveAlpha_gs(const fn_call& fn)
+convolutionfilter_preserveAlpha(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) {
-        return as_value(ptr->_preserveAlpha);
-    }
-    bool sp_preserveAlpha = fn.arg(0).to_bool();
-    ptr->_preserveAlpha = sp_preserveAlpha;
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::clamp_gs(const fn_call& fn)
+convolutionfilter_clamp(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) {
-        return as_value(ptr->_clamp );
-    }
-    bool sp_clamp = fn.arg(0).to_bool ();
-    ptr->_clamp = sp_clamp;
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::color_gs(const fn_call& fn)
+convolutionfilter_color(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) {
-        return as_value(ptr->_color );
-    } 
-    boost::uint32_t sp_color = fn.arg(0).to_number<boost::uint32_t> ();
-    ptr->_color = sp_color;
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::alpha_gs(const fn_call& fn)
+convolutionfilter_alpha(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    if (fn.nargs == 0) {
-        return as_value(ptr->_alpha );
-    }
-    boost::uint8_t sp_alpha = fn.arg(0).to_number<boost::uint8_t> ();
-    ptr->_alpha = sp_alpha;
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value
-ConvolutionFilter_as::matrix_gs(const fn_call& fn)
+convolutionfilter_matrix(const fn_call& fn)
 {
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    // TODO: check whether this is necessary (probably is).
+	boost::intrusive_ptr<ConvolutionFilter_as> ptr =
+        ensureType<ConvolutionFilter_as>(fn.this_ptr);
+    UNUSED(ptr);
+    log_unimpl(__PRETTY_FUNCTION__);
     return as_value();
 }
 
-as_value
-ConvolutionFilter_as::bitmap_clone(const fn_call& fn)
-{
-	boost::intrusive_ptr<ConvolutionFilter_as> ptr = ensureType<ConvolutionFilter_as>(fn.this_ptr);
-    boost::intrusive_ptr<ConvolutionFilter_as> obj = new ConvolutionFilter_as(*ptr);
-    boost::intrusive_ptr<as_object> r = obj;
-    r->set_prototype(ptr->get_prototype());
-    r->copyProperties(*ptr);
-    return as_value(r);
-}
-
-as_value
-ConvolutionFilter_as::ctor(const fn_call& )
-{
-    boost::intrusive_ptr<as_object> obj = new ConvolutionFilter_as(ConvolutionFilter_as::Interface());
-    ConvolutionFilter_as::attachProperties(*obj);
-    return as_value(obj.get());
-}
-
-}
+} // anonymous namespace
+} // namespace gnash

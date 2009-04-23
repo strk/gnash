@@ -65,7 +65,7 @@ boost:: intrusive_ptr<builtin_function> BevelFilter_as::s_ctor;
 as_object*
 BevelFilter_as::Interface() {
     if (BevelFilter_as::s_interface == NULL) {
-        BevelFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        BevelFilter_as::s_interface = new as_object (getBitmapFilterInterface());
         VM::get().addStatic(BevelFilter_as::s_interface.get());
         BevelFilter_as::attachInterface(*BevelFilter_as::s_interface);
     }

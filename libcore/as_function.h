@@ -33,11 +33,11 @@ namespace gnash {
 //
 /// In ActionScript, every Function is also a class.
 /// The *exported interface* of the class is defined
-/// as an 'prototype' member of the function object.
+/// as a 'prototype' member of the function object.
 ///
 /// Any instance of the class defined by this function will
 /// inherit any member of the class 'prototype'.
-/// To have an object inherit from a class you can set it's
+/// To have an object inherit from a class you can set its
 /// __proto__ member so to point to the class prototype, ie:
 ///
 ///   function MyClass() {}
@@ -56,9 +56,6 @@ namespace gnash {
 /// This class will automatically setup the 'prototype' member
 /// if not explicitly provided (ie: will set 'constructor' so
 /// that it points to the instance).
-/// 
-///
-///
 class as_function : public as_object
 {
 public:
@@ -70,7 +67,7 @@ public:
 	as_function* to_function() { return this; }
 
 	/// Dispatch.
-	virtual as_value operator()(const fn_call& fn)=0;
+	virtual as_value operator()(const fn_call& fn) = 0;
 
 	/// Alias for operator()
 	as_value call(const fn_call& fn) { return operator()(fn); }
@@ -89,7 +86,7 @@ public:
 	///	Arguments for the constructor invocation
 	///
 	boost::intrusive_ptr<as_object> constructInstance(const as_environment& env,
-			std::auto_ptr< std::vector<as_value> > args);
+			std::auto_ptr<std::vector<as_value> > args);
 
 	/// Get this function's "prototype" member (exported interface).
 	///
@@ -99,7 +96,7 @@ public:
 	void extends(as_function& superclass);
 
 	/// Return true if this is a built-in class.
-	virtual bool isBuiltin()  { return false; }
+	virtual bool isBuiltin() { return false; }
 
 	/// TODO: check if a user-defined 'toString'
 	///       will be used when available.
@@ -177,13 +174,7 @@ private:
 /// Initialize the global Function constructor
 void function_class_init(as_object& global);
 
-// To be made statics instead
-as_value function_apply(const fn_call& fn);
-as_value function_call(const fn_call& fn);
+} // gnash namespace
 
-
-} // end of gnash namespace
-
-// _GNASH_AS_FUNCTION_H_
 #endif
 

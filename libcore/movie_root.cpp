@@ -932,7 +932,7 @@ movie_root::doMouseDrag()
 	DisplayObject* dragChar = getDraggingCharacter(); 
 	if ( ! dragChar ) return; // nothing to do
 
-	if ( dragChar->isUnloaded() )
+	if ( dragChar->unloaded() )
 	{
 		// Reset drag state if dragging char was unloaded
 		m_drag_state.reset();
@@ -1169,7 +1169,7 @@ void movie_root::cleanupUnloadedListeners(CharacterList& ll)
       for (CharacterList::iterator iter = ll.begin(); iter != ll.end(); )
       {
           DisplayObject* const ch = *iter;
-          if ( ch->isUnloaded() )
+          if ( ch->unloaded() )
           {
             if ( ! ch->isDestroyed() )
             {
@@ -1206,7 +1206,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 	{
 		// sprite, button & input_edit_text DisplayObjects
 		DisplayObject* const ch = *iter;
-		if ( ! ch->isUnloaded() )
+		if ( ! ch->unloaded() )
 		{
 			if(down)
 			{
@@ -1259,7 +1259,7 @@ movie_root::notify_mouse_listeners(const event_id& event)
 			iter != itEnd; ++iter)
 	{
 		DisplayObject* const ch = *iter;
-		if (!ch->isUnloaded())
+		if (!ch->unloaded())
 		{
 			ch->on_event(event);
 		}
@@ -1986,7 +1986,7 @@ movie_root::cleanupDisplayList()
 		for (LiveChars::iterator i=_liveChars.begin(), e=_liveChars.end(); i!=e;)
 		{
 			DisplayObject* ch = *i;
-			if ( ch->isUnloaded() )
+			if ( ch->unloaded() )
 			{
 				// the sprite might have been destroyed already
 				// by effect of an unload() call with no onUnload
@@ -2037,7 +2037,7 @@ movie_root::cleanupDisplayList()
 void
 movie_root::advanceLiveChar(boost::intrusive_ptr<DisplayObject> ch)
 {
-	if (!ch->isUnloaded())
+	if (!ch->unloaded())
 	{
 #ifdef GNASH_DEBUG
 		log_debug("    advancing DisplayObject %s", ch->getTarget());

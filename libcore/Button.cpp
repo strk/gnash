@@ -232,7 +232,7 @@ static bool charDepthLessThen(const DisplayObject* ch1, const DisplayObject* ch2
 /// 2) if we don't want unloaded DisplayObjects and the DisplayObject is unloaded.
 static bool isCharacterNull(DisplayObject* ch, bool includeUnloaded)
 {
-    return (!ch || (!includeUnloaded && ch->isUnloaded()));
+    return (!ch || (!includeUnloaded && ch->unloaded()));
 }
 
 static void
@@ -335,7 +335,7 @@ Button::isEnabled()
 bool
 Button::on_event(const event_id& id)
 {
-    if ( isUnloaded() )
+    if ( unloaded() )
     {
         // We dont' respond to events while unloaded
         // See bug #22982
@@ -451,7 +451,7 @@ Button::topmostMouseEntity(boost::int32_t x, boost::int32_t y)
 void
 Button::mouseEvent(const event_id& event)
 {
-    if ( isUnloaded() )
+    if ( unloaded() )
     {
         // We don't respond to events while unloaded. See bug #22982.
         log_debug("Button %s received %s button event while unloaded: ignored",
@@ -652,7 +652,7 @@ static void dump(std::vector< DisplayObject* >& chars, std::stringstream& ss)
         {
             ss << ch->getTarget() << " (depth:" << 
                 ch->get_depth()-DisplayObject::staticDepthOffset-1
-                << " unloaded:" << ch->isUnloaded() <<
+                << " unloaded:" << ch->unloaded() <<
                 " destroyed:" << ch->isDestroyed() << ")";
         }
         ss << std::endl;
@@ -686,7 +686,7 @@ Button::set_current_state(MouseState new_state)
         if ( ! shouldBeThere )
         {
             // is there, but is unloaded: destroy, clear slot and go on
-            if ( oldch && oldch->isUnloaded() )
+            if ( oldch && oldch->unloaded() )
             {
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
                 _stateCharacters[i] = NULL;
@@ -718,7 +718,7 @@ Button::set_current_state(MouseState new_state)
         else // should be there
         {
             // Is there already, but is unloaded: destroy and consider as gone
-            if ( oldch && oldch->isUnloaded() )
+            if ( oldch && oldch->unloaded() )
             {
                 if ( ! oldch->isDestroyed() ) oldch->destroy();
                 _stateCharacters[i] = NULL;
@@ -997,7 +997,7 @@ Button::unload()
     {
         DisplayObject* ch = *i;
         if ( ! ch ) continue;
-        if ( ch->isUnloaded() ) continue;
+        if ( ch->unloaded() ) continue;
         if ( ch->unload() ) childsHaveUnload = true;
     }
 
@@ -1050,7 +1050,7 @@ Button::get_member(string_table::key name_key, as_value* val,
     //
     if (name_key == NSV::PROP_uROOT) {
         // getAsRoot() will take care of _lockroot
-        val->set_as_object( const_cast<MovieClip*>( getAsRoot() )    );
+        val->set_as_object(getAsRoot());
         return true;
     }
 

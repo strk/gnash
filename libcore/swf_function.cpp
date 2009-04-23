@@ -291,7 +291,7 @@ swf_function::operator()(const fn_call& fn)
 			if ( tgtch )
 			{
 				// NOTE: _lockroot will be hanlded by getAsRoot()
-				as_object* r = const_cast<MovieClip*>(tgtch->getAsRoot());
+				as_object* r = tgtch->getAsRoot();
 				our_env->setRegister(current_reg, as_value(r));
 				current_reg++;
 			}

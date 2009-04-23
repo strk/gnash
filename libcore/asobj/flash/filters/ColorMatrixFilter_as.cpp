@@ -51,7 +51,7 @@ boost:: intrusive_ptr<builtin_function> ColorMatrixFilter_as::s_ctor;
 
 as_object* ColorMatrixFilter_as::Interface() {
     if (ColorMatrixFilter_as::s_interface == NULL) {
-        ColorMatrixFilter_as::s_interface = new as_object (bitmapFilter_interface());
+        ColorMatrixFilter_as::s_interface = new as_object (getBitmapFilterInterface());
         VM::get().addStatic(ColorMatrixFilter_as::s_interface.get());
         ColorMatrixFilter_as::attachInterface(*ColorMatrixFilter_as::s_interface);
     }

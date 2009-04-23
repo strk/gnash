@@ -86,7 +86,7 @@ public:
     void operator()(DisplayObject* ch) {
 
         /// This is not tested.
-        if (ch->isUnloaded()) return;
+        if (ch->unloaded()) return;
 
         TextSnapshot_as::Records text;
         StaticText* tf;

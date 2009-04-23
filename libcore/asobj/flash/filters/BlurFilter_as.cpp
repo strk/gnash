@@ -57,7 +57,7 @@ boost:: intrusive_ptr<builtin_function> BlurFilter_as::s_ctor;
 as_object*
 BlurFilter_as::Interface() {
     if (BlurFilter_as::s_interface == NULL) {
-        BlurFilter_as::s_interface = new as_object(bitmapFilter_interface());
+        BlurFilter_as::s_interface = new as_object(getBitmapFilterInterface());
         VM::get().addStatic(BlurFilter_as::s_interface.get());
         BlurFilter_as::attachInterface(*BlurFilter_as::s_interface);
     }

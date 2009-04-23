@@ -77,7 +77,7 @@ public:
 	{
 		if ( checkSprite() )
 		{
-			assert ( ! _sprite->isUnloaded() );
+			assert ( ! _sprite->unloaded() );
 			_sprite->setReachable();
 		}
 		markAsObjectReachable();
@@ -111,7 +111,7 @@ private:
 	bool checkSprite() const
 	{
 		if ( ! _sprite ) return false;
-		if ( _sprite->isUnloaded() )
+		if ( _sprite->unloaded() )
 		{
 			_sprite = 0;
 			return false;

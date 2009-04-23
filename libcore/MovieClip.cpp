@@ -431,7 +431,7 @@ public:
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
-        if ( ch->isUnloaded() ) return;
+        if ( ch->unloaded() ) return;
         rect chb = ch->getBounds();
         SWFMatrix m = ch->getMatrix();
         _bounds.expand_to_transformed_rect(m, chb);
@@ -458,7 +458,7 @@ public:
 
     void operator() (DisplayObject* ch) {
         // don't include bounds of unloaded DisplayObjects
-        if ( ch->isUnloaded() ) return;
+        if ( ch->unloaded() ) return;
 
         // TODO: Are script-transformed object to be kept ?
         //             Need a testcase for this
@@ -556,15 +556,13 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     string_table::key nsname)
 {
     // FIXME: use addProperty interface for these !!
-    // TODO: or at least have a DisplayObject:: protected method take
-    //             care of these ?
-    //             Duplicates code in DisplayObject::getPathElementSeparator too..
-    //
+    // TODO: or at least have a DisplayObject protected method take
+    //       care of these ?
+    //       Duplicates code in DisplayObject::getPathElementSeparator too.
     if (getSWFVersion() > 4 && name_key == NSV::PROP_uROOT)
     {
-
         // getAsRoot() will take care of _lockroot
-        val->set_as_object( const_cast<MovieClip*>( getAsRoot() )    );
+        val->set_as_object(getAsRoot());
         return true;
     }
 
@@ -573,7 +571,7 @@ MovieClip::get_member(string_table::key name_key, as_value* val,
     //             an SWF6 (to, say, _level2), _global will be unavailable
     //             to the SWF4 code but available to the SWF6 one.
     //
-    if ( getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL ) // see MovieClip.as
+    if (getSWFVersion() > 5 && name_key == NSV::PROP_uGLOBAL) 
     {
         // The "_global" ref was added in SWF6
         val->set_as_object( _vm.getGlobal() );
@@ -862,7 +860,7 @@ MovieClip::on_event(const event_id& id)
 #endif
 
     // We do not execute ENTER_FRAME if unloaded
-    if ( id.id() == event_id::ENTER_FRAME && isUnloaded() )
+    if ( id.id() == event_id::ENTER_FRAME && unloaded() )
     {
 #ifdef GNASH_DEBUG
         log_debug(_("Sprite %s ignored ENTER_FRAME event (is unloaded)"), getTarget());
@@ -1080,7 +1078,7 @@ MovieClip::advance()
         get_frame_count());
 #endif
 
-    assert(!isUnloaded());
+    assert(!unloaded());
 
     // call_frame should never trigger advance_movieclip
     assert(!_callingFrameActions);
@@ -1679,7 +1677,7 @@ MovieClip::pointInVisibleShape(boost::int32_t x, boost::int32_t y) const
 #endif
         return false;
     }
-    DisplayObject* mask = getMask(); // dynamic one
+    const DisplayObject* mask = getMask(); // dynamic one
     if ( mask && mask->visible() && ! mask->pointInShape(x, y) )
     {
 #ifdef GNASH_DEBUG_HITTEST
@@ -1960,7 +1958,7 @@ MovieClip::cleanup_textfield_variables()
     {
         TextFields& v=i->second;
         TextFields::iterator lastValid = std::remove_if(v.begin(), v.end(),
-                    boost::mem_fn(&DisplayObject::isUnloaded));
+                    boost::mem_fn(&DisplayObject::unloaded));
         v.erase(lastValid, v.end());
     }
 }
@@ -2046,7 +2044,7 @@ MovieClip::registerAsListener()
 void
 MovieClip::stagePlacementCallback(as_object* initObj)
 {
-    assert(!isUnloaded());
+    assert(!unloaded());
 
     saveOriginalTarget();
 
@@ -2534,7 +2532,7 @@ public:
     void operator() (DisplayObject* ch)
     {
         // don't enumerate unloaded DisplayObjects
-        if ( ch->isUnloaded() ) return;
+        if ( ch->unloaded() ) return;
 
         _env.push(ch->get_name());
     }
@@ -2601,12 +2599,7 @@ void
 MovieClip::destroy()
 {
     stopStreamSound();
-
     _displayList.destroy();
-
-    /// We don't need these anymore
-    clearProperties();
-
     DisplayObject::destroy();
 }
 
@@ -2624,8 +2617,8 @@ MovieClip::get_root() const
     return _swf;
 }
 
-const MovieClip*
-MovieClip::getAsRoot() const
+MovieClip*
+MovieClip::getAsRoot()
 {
 
     // TODO1: as an optimization, if swf version < 7 
@@ -2723,7 +2716,7 @@ public:
     void operator() (DisplayObject* ch)
     {
         // Should we still print these?
-        //if ( ch->isUnloaded() ) return; 
+        //if ( ch->unloaded() ) return; 
 
         ch->getMovieInfo(_tr, _it);
     }

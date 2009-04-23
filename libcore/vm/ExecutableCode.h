@@ -67,7 +67,7 @@ public:
 
     virtual void execute()
     {
-        if ( ! target->isUnloaded() )
+        if ( ! target->unloaded() )
         {
             ActionExec exec(buffer, target->get_environment());
             exec();
@@ -143,7 +143,8 @@ public:
         for (BufferList::iterator it=_buffers.begin(), itEnd=_buffers.end();
                 it != itEnd; ++it)
         {
-            // onClipEvents code are guarded by isDestroyed(), still might be also guarded by isUnloaded()
+            // onClipEvents code are guarded by isDestroyed(),
+            // still might be also guarded by unloaded()
             if( _target->isDestroyed() )  break;
 
             ActionExec exec(*(*it), _target->get_environment(), false);
