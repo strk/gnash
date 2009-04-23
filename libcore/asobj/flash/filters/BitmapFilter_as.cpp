@@ -28,36 +28,27 @@ namespace {
     
     as_value bitmapfilter_ctor(const fn_call& fn);
     as_value bitmapfilter_clone(const fn_call& fn);
-
+    as_value getBitmapFilterConstructor(const fn_call& fn);
     void attachBitmapFilterInterface(as_object& o);
-    as_function* getBitmapFilterConstructor();
 }
  
 // TODO: Use composition, not inheritance.
 class BitmapFilter_as : public as_object, public BitmapFilter
 {
 public:
-
     BitmapFilter_as(as_object *obj)
 	    :
         as_object(obj)
     {}
-
-    static void registerCtor(as_object& global);
 };
 
-
-as_value
-bitmapFilterCtor(const fn_call& /*fn*/)
-{
-    return getBitmapFilterConstructor();
-}
 
 void
 BitmapFilter_class_init(as_object& global)
 {
     string_table& st = global.getVM().getStringTable();
-    global.init_destructive_property(st.find("BitmapFilter"), bitmapFilterCtor);
+    global.init_destructive_property(st.find("BitmapFilter"),
+            getBitmapFilterConstructor);
 }
 
 as_object*
@@ -81,14 +72,14 @@ attachBitmapFilterInterface(as_object& o)
     o.init_member("clone", new builtin_function(bitmapfilter_clone), flags);
 }
 
-as_function*
-getBitmapFilterConstructor()
+as_value
+getBitmapFilterConstructor(const fn_call& fn)
 {
     static builtin_function* cl;
     if (!cl) {
         cl = new builtin_function(&bitmapfilter_ctor,
                 getBitmapFilterInterface());
-        VM::get().addStatic(cl);
+        fn.getVM().addStatic(cl);
     }
     return cl;
 }
