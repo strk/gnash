@@ -2204,6 +2204,9 @@ fi
 if test x$build_dump = xyes; then
   SUPPORTED_GUIS="${SUPPORTED_GUIS},dump"
 fi
+if test x$build_aos4 = xyes; then
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},aos4"
+fi
 SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(SUPPORTED_GUIS)
 
