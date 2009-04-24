@@ -62,12 +62,9 @@ DynamicShape::endFill()
 
 	// Remove reference to the "current" path, as
 	// next drawing will happen on a different one
-	_currpath = NULL;
-
+	_currpath = 0;
 	// Remove fill information
 	_currfill = 0;
-
-	// TODO: should I also clear _currline ?
 }
 
 void
@@ -82,7 +79,7 @@ DynamicShape::beginFill(const rgba& color)
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true); 
 	add_path(newPath);
 }
 
@@ -98,7 +95,7 @@ DynamicShape::beginLinearGradientFill(const std::vector<gradient_record>& grad, 
 	// TODO: how to know wheter the fill should be set
 	//       as *left* or *right* fill ?
 	//       A quick test shows that *left* always work fine !
-	Path newPath(_x, _y, _currfill, 0, _currline, true); // new fill start new subshapes
+	Path newPath(_x, _y, _currfill, 0, _currline, true);
 	add_path(newPath);
 }
 
@@ -163,14 +160,14 @@ DynamicShape::lineStyle(boost::uint16_t thickness, const rgba& color,
 		miterLimitFactor);
 
 	_currline = add_line_style(style);
-	startNewPath(false); // don't make this the start of a new subshape (to verify)
+	startNewPath(false); 
 }
 
 void
 DynamicShape::resetLineStyle()
 {
 	_currline = 0;
-	startNewPath(false); // don't make this the start of a new subshape (to verify)
+	startNewPath(false);
 }
 
 void
@@ -180,16 +177,14 @@ DynamicShape::moveTo(boost::int32_t x, boost::int32_t y)
 	{
 		_x = x;
 		_y = y;
-
-		// TODO: close previous path if any and filled ?
-		startNewPath(false); // don't make this the start of a new subshape (to verify)
+		startNewPath(false);
 	}
 }
 
 void
 DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
 {
-	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
+	if (!_currpath) startNewPath(true); 
 	assert(_currpath);
 
 	_currpath->drawLineTo(x, y);
@@ -198,11 +193,13 @@ DynamicShape::lineTo(boost::int32_t x, boost::int32_t y, int swfVersion)
     rect bounds = _shape.getBounds();
 
 	unsigned thickness = _currline ? 
-        _shape.lineStyles()[_currline-1].getThickness() : 0;
-	if ( _currpath->size() == 1 ) {
+        _shape.lineStyles().back().getThickness() : 0;
+
+	if (_currpath->size() == 1) {
 		_currpath->expandBounds(bounds, thickness, swfVersion);
 	} else {
-		bounds.expand_to_circle(x, y, swfVersion < 8 ? thickness : thickness/2.0);
+		bounds.expand_to_circle(x, y, swfVersion < 8 ? thickness :
+                thickness / 2.0);
 	}
     
     _shape.setBounds(bounds);
@@ -219,7 +216,7 @@ void
 DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy, 
                       boost::int32_t ax, boost::int32_t ay, int swfVersion)
 {
-	if ( ! _currpath ) startNewPath(true); // first shape is always new (I hope this doesn't break anything)
+	if (!_currpath) startNewPath(true); 
 	assert(_currpath);
 
 	_currpath->drawCurveTo(cx, cy, ax, ay);
@@ -227,15 +224,16 @@ DynamicShape::curveTo(boost::int32_t cx, boost::int32_t cy,
     rect bounds = _shape.getBounds();
 
 	unsigned thickness = _currline ? 
-        _shape.lineStyles()[_currline-1].getThickness() : 0;
-	if ( _currpath->size() == 1 ) {
+        _shape.lineStyles().back().getThickness() : 0;
+
+	if (_currpath->size() == 1) {
 		_currpath->expandBounds(bounds, thickness, swfVersion);
 	}
     else {
 		bounds.expand_to_circle(ax, ay, 
-                swfVersion < 8 ? thickness : thickness/2.0);
+                swfVersion < 8 ? thickness : thickness / 2.0);
 		bounds.expand_to_circle(cx, cy,
-                swfVersion < 8 ? thickness : thickness/2.0);
+                swfVersion < 8 ? thickness : thickness / 2.0);
     }
 
     _shape.setBounds(bounds);
