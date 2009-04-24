@@ -42,8 +42,6 @@
 #endif // HAVE_XV
 #endif
 
-using namespace gnash;
-
 struct _GnashCanvas {
 	GtkDrawingArea base_instance;
 
@@ -63,7 +61,7 @@ static gboolean gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigur
 static void gnash_canvas_realize(GtkWidget *widget);
 
 GtkWidget *
-gnash_canvas_new (void)
+gnash_canvas_new ()
 {
     GNASH_REPORT_FUNCTION;
     return GTK_WIDGET(g_object_new (GNASH_TYPE_CANVAS, NULL));
@@ -189,6 +187,7 @@ gnash_canvas_realize(GtkWidget *widget)
 void
 gnash_canvas_setup(GnashCanvas *canvas, int argc, char **argv[])
 {
+
     GNASH_REPORT_FUNCTION;
     // TODO: don't rely on a macro to select renderer
 #ifdef RENDERER_CAIRO
@@ -198,7 +197,7 @@ gnash_canvas_setup(GnashCanvas *canvas, int argc, char **argv[])
 #elif defined(RENDERER_AGG) && !defined(HAVE_XV)
     canvas->glue.reset(new gnash::GtkAggGlue);
 #elif defined(RENDERER_AGG) && defined(HAVE_XV)
-    RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+    gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
     if (rcfile.useXv()) {
         canvas->glue.reset(new gnash::GtkAggXvGlue);

@@ -17,11 +17,15 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_CANVAS_H__
-#define __GNASH_CANVAS_H__
+#ifndef GNASH_GTK_CANVAS_H
+#define GNASH_GTK_CANVAS_H
 
 #include <gtk/gtkdrawingarea.h>
-#include "render_handler.h"
+
+// Forward declarations.
+namespace gnash {
+    class render_handler;
+}
 
 G_BEGIN_DECLS
 
@@ -39,8 +43,8 @@ struct _GnashCanvasClass {
     GtkDrawingAreaClass base_class;
 };
 
-GType            gnash_canvas_get_type              (void);
-GtkWidget       *gnash_canvas_new                   (void);
+GType            gnash_canvas_get_type              ();
+GtkWidget       *gnash_canvas_new                   ();
 
 void             gnash_canvas_setup                 (GnashCanvas *canvas, int argc, char **argv[]);
 void             gnash_canvas_before_rendering      (GnashCanvas *canvas);
