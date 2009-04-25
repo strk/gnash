@@ -28,8 +28,8 @@ GNASH_LIBS = \
 	$(top_builddir)/libmedia/libgnashmedia.la \
 	$(top_builddir)/libsound/libgnashsound.la \
 	$(top_builddir)/libcore/libgnashcore.la \
-	$(top_builddir)/backend/libgnashcairo.la \
-	$(top_builddir)/libbase/libgnashbase.la
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(RENDERER_LIBS)
 
 gnash_la_LDFLAGS = -module -avoid-version initgnash -export-dynamic #-no-undefined
 gnash_la_LIBADD = \
@@ -37,12 +37,22 @@ gnash_la_LIBADD = \
 	$(GTK2_LIBS) \
 	$(DEPS_LIBS)
 
+if BUILD_OGL_RENDERER
+RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_gtkglext.cpp
+endif
+if BUILD_AGG_RENDERER
+RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_agg.cpp
+endif
+if BUILD_CAIRO_RENDERER
+RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_cairo.cpp
+endif
+
 gnash_la_SOURCES = \
 	gnash.c	\
 	gnashmodule.c \
 	gnash-view.cpp\
 	$(top_srcdir)/gui/gtk_canvas.cpp \
-	$(top_srcdir)/gui/gtk_glue_cairo.cpp
+	$(RENDERER_GLUE)
 
 gnash.c: gnash.defs gnash.override
 

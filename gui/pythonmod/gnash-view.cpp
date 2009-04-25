@@ -29,6 +29,7 @@
 #include "VM.h"
 #include "movie_definition.h"
 #include "movie_root.h" // for Abstract callbacks
+#include "render_handler.h"
 #include "sound_handler.h"
 #include "MediaHandler.h"
 #include "RunInfo.h" // for passing handlers and other data to the core.
