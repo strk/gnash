@@ -28,6 +28,8 @@ SUBDIRS = .
 # If python support is enabled, built that too
 if USE_PYTHON
 SUBDIRS += pythonmod
+else
+DIST_SUBDIRS = pythonmod
 endif
 
 localedir = $(datadir)/locale
@@ -211,7 +213,7 @@ endif
 
 # Build the AmigaOS4 gui
 if BUILD_AMIGAOS4_GUI
-include $(srcdir)/am-frag/aos4.am
+#include $(srcdir)/am-frag/aos4.am
 endif
 
 # Build the FLTK gui
