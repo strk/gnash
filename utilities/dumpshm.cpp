@@ -37,11 +37,11 @@ extern char *optarg;
 }
 #include <dirent.h>
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__) && !defined(__amigaos4__)
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
-#elif !defined(__riscos__) && !defined(__OS2__)
+#elif !defined(__riscos__) && !defined(__OS2__) && !defined(__amigaos4__)
 #include <windows.h>
 #include <process.h>
 #include <io.h>
@@ -72,6 +72,17 @@ extern char *optarg;
 
 using namespace std;
 using namespace gnash;
+
+#ifdef BOOST_NO_EXCEPTIONS
+namespace boost
+{
+
+	void throw_exception(std::exception const & e)
+	{
+		std::abort();
+	}
+}
+#endif
 
 // #error "No supported shared memory type for this platform"
 

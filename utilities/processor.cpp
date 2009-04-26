@@ -69,6 +69,17 @@ extern "C"{
 #endif
 }
 
+#ifdef BOOST_NO_EXCEPTIONS
+
+namespace boost
+{
+	void throw_exception(std::exception const & e)
+	{
+		std::abort();
+	}
+}
+#endif
+
 // How many seconds to wait for a frame advancement 
 // before kicking the movie (forcing it to next frame)
 static const double waitforadvance = 5;

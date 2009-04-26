@@ -51,6 +51,17 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
+#ifdef BOOST_NO_EXCEPTIONS
+namespace boost
+{
+
+	void throw_exception(std::exception const & e)
+	{
+		std::abort();
+	}
+}
+#endif
+
 const char *SOLDUMPER_VERSION = "0.5";
 static void usage ();
 
