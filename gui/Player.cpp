@@ -724,6 +724,10 @@ Player::getGui()
     return createFBGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif
 
+#ifdef GUI_AOS4
+    return createAOS4Gui(_windowID, _scale, _doLoop, _bitDepth);
+#endif
+
 #ifdef GUI_DUMP
     return createDumpGui(_windowID, _scale, _doLoop, _bitDepth);
 #endif

@@ -36,6 +36,7 @@
 #include "VirtualClock.h"
 #include "SystemClock.h"
 #include "smart_ptr.h"
+#include "DisplayObject.h"
 
 #ifdef USE_FFMPEG
 # include "MediaHandlerFfmpeg.h"
@@ -82,7 +83,12 @@ static void gnash_view_size_request (GtkWidget *widget, GtkRequisition *requisit
 static void gnash_view_set_property (GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec);
 static void gnash_view_get_property (GObject *object, guint prop_id, GValue *value, GParamSpec *pspec);
 static void gnash_view_realize_cb(GtkWidget *widget, gpointer user_data);
-static gboolean gnash_view_key_press_event(GtkWidget *widget, GdkEventKey *event);
+
+static gboolean key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data);
+static gboolean key_release_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data);
+static gboolean button_press_event_cb(GtkWidget *widget, GdkEventButton *event, gpointer data);
+static gboolean button_release_event_cb(GtkWidget *widget, GdkEventButton *event, gpointer data);
+static gboolean motion_notify_event_cb(GtkWidget *widget, GdkEventMotion *event, gpointer data);
 
 static gnash::key::code gdk_to_gnash_key(guint key);
 static int gdk_to_gnash_modifier(int state);
@@ -108,7 +114,6 @@ gnash_view_class_init(GnashViewClass *gnash_view_class)
 
     widget_class->size_allocate = gnash_view_size_allocate;
     widget_class->size_request = gnash_view_size_request;
-    widget_class->key_press_event = gnash_view_key_press_event;
 
 	g_object_class->get_property = gnash_view_get_property;
 	g_object_class->set_property = gnash_view_set_property;
@@ -174,7 +179,7 @@ gnash_view_init(GnashView *view)
 	                  G_CALLBACK (gnash_view_realize_cb), NULL);
 
     // Initializations that can happen before realization come here. The rest
-    // come after realize.
+    // come after realize, in gnash_view_realize_cb.
     gnash::gnashInit();
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity(3);
@@ -208,6 +213,23 @@ gnash_view_init(GnashView *view)
     gnash_canvas_setup(view->canvas, 0, NULL);
     gtk_container_add (GTK_CONTAINER (view), GTK_WIDGET(view->canvas));
     gtk_widget_show (GTK_WIDGET(view->canvas));
+
+    gtk_widget_add_events(GTK_WIDGET(view->canvas), GDK_BUTTON_PRESS_MASK
+                        | GDK_BUTTON_RELEASE_MASK
+                        | GDK_KEY_RELEASE_MASK
+                        | GDK_KEY_PRESS_MASK        
+                        | GDK_POINTER_MOTION_MASK);
+
+    g_signal_connect_object(GTK_WIDGET(view->canvas), "key-press-event",
+                   G_CALLBACK(key_press_event_cb), view, (GConnectFlags)0);
+    g_signal_connect_object(GTK_WIDGET(view->canvas), "key-release-event",
+                   G_CALLBACK(key_release_event_cb), view, (GConnectFlags)0);
+    g_signal_connect_object(GTK_WIDGET(view->canvas), "button-press-event",
+                   G_CALLBACK(button_press_event_cb), view, (GConnectFlags)0);
+    g_signal_connect_object(GTK_WIDGET(view->canvas), "button-release-event",
+                   G_CALLBACK(button_release_event_cb), view, (GConnectFlags)0);
+    g_signal_connect_object(GTK_WIDGET(view->canvas), "motion-notify-event",
+                   G_CALLBACK(motion_notify_event_cb), view, (GConnectFlags)0);
 }
 
 static void
@@ -245,6 +267,8 @@ gnash_view_realize_cb(GtkWidget *widget, gpointer /*user_data*/)
 {
     GNASH_REPORT_FUNCTION;
     GnashView *view = GNASH_VIEW(widget);
+
+    // Some initializations need to happen after the widget has been realized.
     if(view->movie_definition.get() == NULL) {
         gtk_widget_realize(GTK_WIDGET(view->canvas));
         gnash_view_load_movie(view, view->uri);
@@ -252,21 +276,126 @@ gnash_view_realize_cb(GtkWidget *widget, gpointer /*user_data*/)
 }
 
 static gboolean
-gnash_view_key_press_event(GtkWidget *widget, GdkEventKey *event)
+key_press_event_cb(GtkWidget */*widget*/, GdkEventKey *event, gpointer data)
 {
-    if (GNASH_VIEW(widget)->stage.get() == NULL)
+    GNASH_REPORT_FUNCTION;
+    GnashView *view = GNASH_VIEW(data);
+    if (view->stage.get() == NULL)
         return FALSE;
 
     gnash::key::code c = gdk_to_gnash_key(event->keyval);
-    //int mod = gdk_to_gnash_modifier(event->state);
     
     if (c != gnash::key::INVALID) {
-        if( GNASH_VIEW(widget)->stage->notify_key_event(c, true) )
-            gnash_view_display(GNASH_VIEW(widget));
+        if( view->stage->notify_key_event(c, true) )
+            gnash_view_display(view);
         return TRUE;
     }
     
     return FALSE;
+}
+
+static gboolean
+key_release_event_cb(GtkWidget */*widget*/, GdkEventKey *event, gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+    GnashView *view = GNASH_VIEW(data);
+    if (view->stage.get() == NULL)
+        return FALSE;
+
+    gnash::key::code c = gdk_to_gnash_key(event->keyval);
+    
+    if (c != gnash::key::INVALID) {
+        if( view->stage->notify_key_event(c, false) )
+            gnash_view_display(view);
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+static gboolean
+button_press_event_cb(GtkWidget */*widget*/, GdkEventButton *event, gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+    GnashView *view = GNASH_VIEW(data);
+    if (view->stage.get() == NULL)
+        return FALSE;
+
+    /// Double- and triple-clicks should not send an extra event!
+    /// Flash has no built-in double click.
+    if (event->type != GDK_BUTTON_PRESS) return FALSE;
+
+    gtk_widget_grab_focus(GTK_WIDGET(view->canvas));
+
+    int	mask = 1 << (event->button - 1);
+    view->stage->notify_mouse_clicked(true, mask);
+
+    return TRUE;
+}
+
+static gboolean
+button_release_event_cb(GtkWidget */*widget*/, GdkEventButton *event, gpointer data)
+{
+    GNASH_REPORT_FUNCTION;
+    GnashView *view = GNASH_VIEW(data);
+    if (view->stage.get() == NULL)
+        return FALSE;
+
+    int	mask = 1 << (event->button - 1);
+    view->stage->notify_mouse_clicked(false, mask);
+
+    return TRUE;
+}
+
+static gboolean
+motion_notify_event_cb(GtkWidget */*widget*/, GdkEventMotion *event, gpointer data)
+{
+    //GNASH_REPORT_FUNCTION;
+
+    GtkWidget *widget = GTK_WIDGET(data);
+    GnashView *view = GNASH_VIEW(data);
+    float xscale = widget->allocation.width / view->movie_definition->get_width_pixels();
+    float yscale = widget->allocation.height / view->movie_definition->get_height_pixels();
+
+	// A stage pseudopixel is user pixel / _xscale wide
+	boost::int32_t x = event->x / xscale;
+
+	// A stage pseudopixel is user pixel / _yscale high
+	boost::int32_t y = event->y / yscale;
+
+	if ( view->stage->notify_mouse_moved(x, y) )
+	{
+		// any action triggered by the
+		// event required screen refresh
+        gnash_view_display(view);
+	}
+
+	gnash::DisplayObject* activeEntity = view->stage->getActiveEntityUnderPointer();
+	if ( activeEntity )
+	{
+		if ( activeEntity->isSelectableTextField() )
+		{
+		    GdkCursor *gdkcursor = gdk_cursor_new(GDK_XTERM);
+		    gdk_window_set_cursor (widget->window, NULL);
+            gdk_cursor_unref(gdkcursor);
+		}
+		else if ( activeEntity->allowHandCursor() )
+		{
+		    GdkCursor *gdkcursor = gdk_cursor_new(GDK_HAND2);
+		    gdk_window_set_cursor (widget->window, NULL);
+            gdk_cursor_unref(gdkcursor);
+		}
+		else
+		{
+		    gdk_window_set_cursor (widget->window, NULL);
+		}
+	}
+	else
+	{
+	    gdk_window_set_cursor (widget->window, NULL);
+	}
+
+    return TRUE;
 }
 
 static void
