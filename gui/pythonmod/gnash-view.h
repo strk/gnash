@@ -41,9 +41,6 @@ struct _GnashViewClass {
 GType        gnash_view_get_type    (void);
 GtkWidget   *gnash_view_new         (void);
 
-void         gnash_view_start       (GnashView *view);
-void         gnash_view_load_movie  (GnashView *view, gchar *path);
-
 G_END_DECLS
 
 #endif

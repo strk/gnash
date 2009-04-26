@@ -43,10 +43,18 @@
 # include "MediaHandlerGst.h"
 #endif
 
+enum
+{
+	PROP_0,
+	PROP_URI
+};
+
 struct _GnashView {
 	GtkBin base_instance;
 
     GnashCanvas *canvas;
+    const gchar *uri;
+    guint advance_timer;
 
 	std::auto_ptr<gnash::media::MediaHandler> media_handler;
     boost::shared_ptr<gnash::sound::sound_handler> sound_handler;
@@ -61,7 +69,6 @@ struct _GnashView {
     std::auto_ptr<gnash::movie_root> stage;
     std::auto_ptr<gnash::SystemClock> system_clock;
     std::auto_ptr<gnash::InterruptableVirtualClock> virtual_clock;
-    guint advance_timer;
 };
 
 G_DEFINE_TYPE(GnashView, gnash_view, GTK_TYPE_BIN)
@@ -72,11 +79,16 @@ static void gnash_view_class_init(GnashViewClass *gnash_view_class);
 static void gnash_view_init(GnashView *view);
 static void gnash_view_size_allocate (GtkWidget *widget, GtkAllocation *allocation);
 static void gnash_view_size_request (GtkWidget *widget, GtkRequisition *requisition);
+static void gnash_view_set_property (GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec);
+static void gnash_view_get_property (GObject *object, guint prop_id, GValue *value, GParamSpec *pspec);
+static void gnash_view_realize_cb(GtkWidget *widget, gpointer user_data);
 static gboolean gnash_view_key_press_event(GtkWidget *widget, GdkEventKey *event);
+
 static gnash::key::code gdk_to_gnash_key(guint key);
 static int gdk_to_gnash_modifier(int state);
 static gboolean gnash_view_advance_movie(GnashView *view);
 static void gnash_view_display(GnashView *view);
+static void gnash_view_load_movie(GnashView *view, const gchar *path);
 
 GtkWidget *
 gnash_view_new (void)
@@ -88,12 +100,66 @@ static void
 gnash_view_class_init(GnashViewClass *gnash_view_class)
 {
     GNASH_REPORT_FUNCTION;
+
     parent_class = (GObjectClass *) g_type_class_peek_parent(gnash_view_class);
 
+	GObjectClass *g_object_class = G_OBJECT_CLASS (gnash_view_class);
     GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (gnash_view_class);
+
     widget_class->size_allocate = gnash_view_size_allocate;
     widget_class->size_request = gnash_view_size_request;
     widget_class->key_press_event = gnash_view_key_press_event;
+
+	g_object_class->get_property = gnash_view_get_property;
+	g_object_class->set_property = gnash_view_set_property;
+
+	g_object_class_install_property (g_object_class,
+					 PROP_URI,
+					 g_param_spec_string ("uri",
+							      "URI to movie",
+							      "URI to the SWF movie to display",
+							      NULL,
+							      (GParamFlags)G_PARAM_READWRITE));
+}
+
+static void
+gnash_view_set_property (GObject      *object,
+		         guint         prop_id,
+		         const GValue *value,
+		         GParamSpec   *pspec)
+{
+    GnashView *view = GNASH_VIEW (object);
+
+    switch (prop_id)
+    {
+    case PROP_URI:
+        if(view->movie_definition.get() != NULL) {
+            g_warning("Cannot change the movie URI once the view has been initialized.");
+            return;
+        }
+        view->uri = g_strdup(g_value_get_string (value));
+        break;
+    default:
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+    }
+}
+
+static void
+gnash_view_get_property (GObject *object,
+		         guint prop_id,
+		         GValue *value,
+		         GParamSpec *pspec)
+{
+    GnashView *view = GNASH_VIEW (object);
+
+	switch (prop_id)
+	{
+	case PROP_URI:
+		g_value_set_string (value, view->uri);
+		break;
+	default:
+		G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+	}
 }
 
 static void
@@ -101,11 +167,17 @@ gnash_view_init(GnashView *view)
 {
     GNASH_REPORT_FUNCTION;
 
+    view->uri = NULL;
+    view->advance_timer = 0;
+
+	g_signal_connect (GTK_WIDGET(view), "realize",
+	                  G_CALLBACK (gnash_view_realize_cb), NULL);
+
+    // Initializations that can happen before realization come here. The rest
+    // come after realize.
     gnash::gnashInit();
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-    dbglogfile.setVerbosity();
-    dbglogfile.setVerbosity();
-    dbglogfile.setVerbosity();
+    dbglogfile.setVerbosity(3);
 
     // Init media
 #ifdef USE_FFMPEG
@@ -168,6 +240,17 @@ gnash_view_size_request (GtkWidget *widget, GtkRequisition *requisition)
     }
 }
 
+static void
+gnash_view_realize_cb(GtkWidget *widget, gpointer /*user_data*/)
+{
+    GNASH_REPORT_FUNCTION;
+    GnashView *view = GNASH_VIEW(widget);
+    if(view->movie_definition.get() == NULL) {
+        gtk_widget_realize(GTK_WIDGET(view->canvas));
+        gnash_view_load_movie(view, view->uri);
+    }
+}
+
 static gboolean
 gnash_view_key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
@@ -186,8 +269,8 @@ gnash_view_key_press_event(GtkWidget *widget, GdkEventKey *event)
     return FALSE;
 }
 
-void
-gnash_view_load_movie(GnashView *view, gchar *path)
+static void
+gnash_view_load_movie(GnashView *view, const gchar *path)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -214,6 +297,8 @@ gnash_view_load_movie(GnashView *view, gchar *path)
     view->movie_definition.reset(gnash::create_library_movie(gnash::URL(path),
             *view->run_info, path, false));
 
+    g_return_if_fail(view->movie_definition.get() != NULL);
+
     // NOTE: it's important that _systemClock is constructed
     //       before and destroyed after _virtualClock !
     view->system_clock.reset(new gnash::SystemClock());
@@ -225,19 +310,12 @@ gnash_view_load_movie(GnashView *view, gchar *path)
             (GSourceFunc)gnash_view_advance_movie, view, NULL);
 
     gtk_widget_queue_resize (GTK_WIDGET(view));
-}
-
-void
-gnash_view_start(GnashView *view)
-{
-    GNASH_REPORT_FUNCTION;
 
     std::auto_ptr<gnash::Movie> mr ( view->movie_definition->createMovie() );
 
     view->stage->setRootMovie( mr.release() ); // will construct the instance
 
-    bool background = true; // ??
-    view->stage->set_background_alpha(background ? 1.0f : 0.05f);
+    view->stage->set_background_alpha(1.0f);
 
     // @todo since we registered the sound handler, shouldn't we know
     //       already what it is ?!

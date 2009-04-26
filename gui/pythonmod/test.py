@@ -1,14 +1,14 @@
 import gtk
 import gnash
 
+gtk.gdk.threads_init
+
 w = gtk.Window()
 
 v = gnash.View()
+v.props.uri = '/home/tomeu/Desktop/EatBoom.swf'
 w.add(v)
 v.show()
-
-v.load_movie('http://shell.sugarlabs.org/~tomeu/EatBoom.swf')
-v.start()
 
 w.show()
 

@@ -78,7 +78,6 @@ gnash_canvas_class_init(GnashCanvasClass *gnash_canvas_class)
     widget_class->size_allocate = gnash_canvas_size_allocate;
     widget_class->expose_event = gnash_canvas_expose_event;
     widget_class->configure_event = gnash_canvas_configure_event;
-    widget_class->configure_event = gnash_canvas_configure_event;
     widget_class->realize = gnash_canvas_realize;
 }
 
@@ -145,7 +144,7 @@ gnash_canvas_configure_event(GtkWidget *widget, GdkEventConfigure *event)
     return FALSE;
 }
 
-static void 
+static void
 gnash_canvas_realize(GtkWidget *widget)
 {
     GNASH_REPORT_FUNCTION;
