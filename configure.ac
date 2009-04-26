@@ -228,17 +228,8 @@ fi
 LC_KEY=${lckey}
 AC_SUBST(LC_KEY)
 
-AC_ARG_ENABLE(gtk-widget,
-  AC_HELP_STRING([--enable-gtk-widget],[Enable building the GTK Widget]),
-[case "${enableval}" in
-  yes) gtkwidget=yes ;;
-  no)  gtkwidget=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-gtk-widget option]) ;;
-esac],gtkwidget=yes)
-AM_CONDITIONAL([BUILD_GTK_WIDGET], test x$gtkwidget = xyes)
-if test x$gtkwidget = xyes; then
-  AC_DEFINE([BUILD_CANVAS], [], [Build GTK Canvas support for the GTK Widget ])
-fi
+dnl FIXME: this should go away when gtk.cpp is cleaned up..
+AC_DEFINE([BUILD_CANVAS], [], [Build GTK Canvas support for the GTK Widget ])
 
 AC_ARG_ENABLE(python,
   AC_HELP_STRING([--enable-python],[Enable python for the python wrapper]),
@@ -1133,11 +1124,11 @@ AM_CONDITIONAL(CROSS_COMPILING, [ test x$cross_compiling = xyes ])
 dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
-dnl If python support is enabled, look for the flags and libs
-dnl if test x"$python" = xyes; then
-  GNASH_PATH_PYTHON
-dnl fi
+dnl Look for python, which is optional. If enabled, a python loadable
+dnl module of Gnash is created.
+GNASH_PATH_PYTHON
 AM_CONDITIONAL([USE_PYTHON], test x"$python" = xyes)
+AM_CONDITIONAL([HAS_PYTHON], test x"$has_python" = xyes)
 
 AC_PATH_PROG(PERL, perl)
 AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
