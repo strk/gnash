@@ -36,7 +36,7 @@ BUILT_SOURCES = .configline
 EXTRA_DIST = gnash.in klash3.moc.in klash4.moc.in
 
 # If python support is enabled, built that too
-if HAS_PYTHON
+if USE_PYTHON
 SUBDIRS += pythonmod
 endif
 DIST_SUBDIRS = pythonmod
