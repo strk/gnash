@@ -65,7 +65,7 @@ RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_cairo.cpp
 endif
 
 gnash_la_SOURCES = \
-	gnash.c	\
+	gen-gnash.c	\
 	gnashmodule.c \
 	gnash-view.cpp\
 	$(top_srcdir)/gui/gtk_canvas.cpp \
@@ -73,15 +73,15 @@ gnash_la_SOURCES = \
 
 gnash.c: gnash.defs gnash.override
 
-CLEANFILES = gnash.c
+CLEANFILES = gen-gnash.c
 EXTRA_DIST = gnash.override gnash.defs
+BUILT_SOURCES = gen-gnash.c
 
-.defs.c:
-	(cd $(srcdir)\
-	 && $(PYGOBJECT_CODEGEN) \
+gen-gnash.c:   gnash.override gnash.defs
+	if test x"$(PYGOBJECT_CODEGEN)" != x; then \
+	  $(PYGOBJECT_CODEGEN) \
 	    --register $(PYGTK_DEFSDIR)/gdk-types.defs \
 	    --register $(PYGTK_DEFSDIR)/gtk-types.defs \
-	    --override $*.override \
-	    --prefix py$* $*.defs) > gen-$*.c \
-	&& cp gen-$*.c $*.c \
-	&& rm -f gen-$*.c
+	    --override $(srcdir)/gnash.override \
+	    --prefix pygnash $(srcdir)/gnash.defs > gen-gnash.c; \
+	 fi
