@@ -1134,10 +1134,10 @@ dnl Check for PKG_CONFIG before any GNASH_PATH call
 PKG_PROG_PKG_CONFIG
 
 dnl If python support is enabled, look for the flags and libs
-if test x"$python" = xyes; then
+dnl if test x"$python" = xyes; then
   GNASH_PATH_PYTHON
-fi
-AM_CONDITIONAL([USE_PYTHON], test x"$python" != xno)
+dnl fi
+AM_CONDITIONAL([USE_PYTHON], test x"$python" = xyes)
 
 AC_PATH_PROG(PERL, perl)
 AM_CONDITIONAL(HAVE_PERL, test x"$PERL" != x)
