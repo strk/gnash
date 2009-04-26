@@ -28,9 +28,8 @@ SUBDIRS = .
 # If python support is enabled, built that too
 if USE_PYTHON
 SUBDIRS += pythonmod
-else
-DIST_SUBDIRS = pythonmod
 endif
+DIST_SUBDIRS = pythonmod
 
 localedir = $(datadir)/locale
 
