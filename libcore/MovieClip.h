@@ -250,7 +250,7 @@ public:
     /// 0-based frame numbers!! 
     ///(in contrast to ActionScript and Flash MX)
     ///
-    void goto_frame(size_t target_frame_number);
+    DSOEXPORT void goto_frame(size_t target_frame_number);
 
     /// Parse frame spec and return a 0-based frame number.
     //
