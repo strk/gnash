@@ -43,6 +43,7 @@ DIST_SUBDIRS = pythonmod
 
 noinst_LTLIBRARIES = #libgnashgui.la
 AM_CPPFLAGS = \
+        -I../.. \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libnet \
         -I$(top_srcdir)/libcore \
