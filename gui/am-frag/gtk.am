@@ -19,10 +19,7 @@
 # Build the GTK gui
 #
 
-# Build the optional GTK Widget
-if BUILD_GTK_WIDGET
 GTK_CANVAS = gtk_canvas.cpp gtk_canvas.h
-endif
 
 if BUILD_GTK_GUI
 bin_PROGRAMS += gtk-gnash
