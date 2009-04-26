@@ -218,7 +218,7 @@ gnash_canvas_setup(GnashCanvas *canvas, int argc, char **argv[])
     // OpenGL glue needs to prepare the drawing area for OpenGL rendering before
     // widgets are realized and before the configure event is fired.
     // TODO: find a way to make '_glue' use independent from actual renderer in use
-    canvas->glue->prepDrawingArea(canvas);
+    canvas->glue->prepDrawingArea(GTK_WIDGET(canvas));
 #endif
 }
 
