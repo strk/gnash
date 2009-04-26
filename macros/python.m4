@@ -128,10 +128,10 @@ AC_DEFUN([GNASH_PATH_PYTHON],
 
     AM_PATH_PYTHON
     AC_PATH_PROG(PYGOBJECT_CODEGEN, pygobject-codegen-2.0, no)
-    if test "x$PYGOBJECT_CODEGEN" = xno; then
+    if test x"${PYGOBJECT_CODEGEN}" = x; then
       AC_MSG_WARN(could not find pygobject-codegen-2.0 script)
-      AC_PATH_PROG(PYGOBJECT_CODEGEN, pygtk-codegen-2.0, no)
-      if test "x$PYGOBJECT_CODEGEN" = xno; then
+      AC_PATH_PROG(PYGTK_CODEGEN, pygtk-codegen-2.0, no)
+      if test x"${PYGTK_CODEGEN}" = xno; then
         AC_MSG_ERROR(could not find pygtk-codegen-2.0 script)
        fi
      fi
@@ -141,8 +141,9 @@ AC_DEFUN([GNASH_PATH_PYTHON],
     PYGTK_DEFSDIR=`$PKG_CONFIG --variable=defsdir pygtk-2.0`
   fi
 
+  AC_SUBST(PYGOBJECT_CODEGEN)
+  AC_SUBST(PYGTK_CODEGEN)
   AC_SUBST(PYGTK_DEFSDIR)
-
   AC_SUBST(PYTHON_CFLAGS)  
   AC_SUBST(PYTHON_LIBS)
 ])
