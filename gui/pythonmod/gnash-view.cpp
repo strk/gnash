@@ -399,32 +399,37 @@ motion_notify_event_cb(GtkWidget */*widget*/, GdkEventMotion *event, gpointer da
 }
 
 static void
-gnash_view_load_movie(GnashView *view, const gchar *path)
+gnash_view_load_movie(GnashView *view, const gchar *uri)
 {
     GNASH_REPORT_FUNCTION;
 
+    gnash::URL url(uri);
+
     // The RunInfo should be populated before parsing.
-    view->run_info.reset(new gnash::RunInfo(path));
+    view->run_info.reset(new gnash::RunInfo(url.str()));
     view->run_info->setSoundHandler(view->sound_handler);
 
-    std::auto_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(gnash::URL(path)));
+    std::auto_ptr<gnash::NamingPolicy> np(new gnash::IncrementalRename(url));
     boost::shared_ptr<gnash::StreamProvider> sp(new gnash::StreamProvider(np));
     view->run_info->setStreamProvider(sp);
 
-    // Load the actual movie.
     gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 
-    const std::string& str_path(path);
-    size_t lastSlash = str_path.find_last_of('/');
-    std::string dir = str_path.substr(0, lastSlash+1);
-    rcfile.addLocalSandboxPath(dir);
-    gnash::log_debug(_("%s appended to local sandboxes"), dir.c_str());
+    if ( url.protocol() == "file" ) {
+        const std::string& str_path(url.path());
 
-    rcfile.addLocalSandboxPath(str_path);
-    gnash::log_debug(_("%s appended to local sandboxes"), path);
+        size_t lastSlash = str_path.find_last_of('/');
+        std::string dir = str_path.substr(0, lastSlash + 1);
+        rcfile.addLocalSandboxPath(dir);
+        gnash::log_debug(_("%s appended to local sandboxes"), dir.c_str());
 
-    view->movie_definition.reset(gnash::create_library_movie(gnash::URL(path),
-            *view->run_info, path, false));
+        rcfile.addLocalSandboxPath(str_path);
+        gnash::log_debug(_("%s appended to local sandboxes"), str_path.c_str());
+    }
+
+    // Load the actual movie.
+    view->movie_definition.reset(gnash::create_library_movie(url,
+            *view->run_info, url.str().c_str(), false));
 
     g_return_if_fail(view->movie_definition.get() != NULL);
 
