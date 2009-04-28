@@ -446,6 +446,10 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
     gtk_widget_queue_resize (GTK_WIDGET(view));
 
     std::auto_ptr<gnash::Movie> mr ( view->movie_definition->createMovie() );
+    
+    std::map<std::string, std::string> variables;
+    gnash::URL::parse_querystring(url.querystring(), variables);
+    mr->setVariables(variables);
 
     view->stage->setRootMovie( mr.release() ); // will construct the instance
 
