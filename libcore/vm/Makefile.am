@@ -54,7 +54,6 @@ noinst_HEADERS =		\
 	asName.h			\
 	ActionExec.h		\
 	ExecutableCode.h	\
-	VM.h			\
 	action.h		\
 	with_stack_entry.h 	\
 	$(NULL)
@@ -63,6 +62,7 @@ EXTENSIONS_API = \
 	fn_call.h		\
 	CallStack.h \
 	SafeStack.h			\
+	VM.h			\
 	$(NULL)
 
 if SDKINSTALL

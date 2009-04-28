@@ -51,7 +51,7 @@
 #include "gnashconfig.h" // for USE_SWFTREE
 #endif
 
-#include "swf/DefinitionTag.h"
+#include "DefinitionTag.h"
 #include "GnashImageJpeg.h"
 
 #include <string>

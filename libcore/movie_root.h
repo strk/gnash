@@ -73,7 +73,7 @@
 #include "dsodefs.h" // DSOEXPORT
 #include "MouseButtonState.h" // for composition
 #include "drag_state.h" // for composition
-#include "asobj/Key_as.h"
+#include "Key_as.h"
 #include "smart_ptr.h" // for memory management
 #include "URL.h" // for loadMovie
 #include "GnashKey.h" // key::code

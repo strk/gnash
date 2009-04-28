@@ -25,7 +25,7 @@
 #include "gnashconfig.h" // GNASH_USE_GC, USE_SWFTREE
 #endif
 
-#include "swf/ControlTag.h"
+#include "ControlTag.h"
 #include "movie_definition.h" // for inlines
 #include "DisplayList.h" // DisplayList 
 #include "InteractiveObject.h"

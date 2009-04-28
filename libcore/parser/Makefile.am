@@ -61,6 +61,17 @@ noinst_HEADERS = \
 	sound_definition.h \
 	sprite_definition.h
 
+EXTENSIONS_API = \
+	movie_definition.h \
+	$(NULL)
+
+if SDKINSTALL
+noinst_HEADERS += $(EXTENSIONS_API)
+else
+instdir = $(includedir)/gnash
+inst_HEADERS = $(EXTENSIONS_API)
+endif
+
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/libbase/libgnashbase.la

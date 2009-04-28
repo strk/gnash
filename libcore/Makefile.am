@@ -125,26 +125,16 @@ libgnashcore_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	StreamProvider.h \
 	URLAccessManager.h \
 	VirtualClock.h \
 	SystemClock.h \
 	ManualClock.h \
-	RunInfo.h \
 	asClass.h \
 	Bitmap.h \
-	BitmapInfo.h \
 	BitmapMovie.h \
 	Button.h \
-	DisplayObject.h \
-	cxform.h \
 	debugger.h \
-	DynamicShape.h	\
-	DisplayList.h	\
-	drag_state.h \
 	TextField.h \
-	event_id.h \
-	fill_style.h \
         BitmapFilter.h \
         BlurFilter.h \
         BevelFilter.h \
@@ -160,35 +150,17 @@ noinst_HEADERS = \
 	Shape.h \
 	MorphShape.h \
 	StaticText.h \
-	InteractiveObject.h \
-	gnash.h	\
-	GnashKey.h \
-	impl.h \
 	LoadVariablesThread.h \
-	SWFMatrix.h \
-	MouseButtonState.h \
 	SWFMovie.h \
-	Movie.h \
-	movie_root.h \
-	rect.h \
 	render.h \
-	ExportableResource.h \
-	Geometry.h	\
-	MovieClip.h \
 	SWFStream.h \
-	styles.h \
-	swf/swf.h \
-	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
 	swf/VideoFrameTag.h \
 	swf/DefineVideoStreamTag.h \
-	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/CSMTextSettingsTag.h \
 	swf/DefineShapeTag.h \
-	swf/DefinitionTag.h \
 	swf/DefineMorphShapeTag.h \
-	swf/ShapeRecord.h \
 	swf/SoundInfoRecord.h \
 	swf/TextRecord.h \
 	swf/DefineButtonSoundTag.h \
@@ -210,7 +182,6 @@ noinst_HEADERS = \
 	swf_event.h \
 	swf_function.h \
 	Timers.h \
-	RGBA.h	\
 	Video.h \
 	$(NULL)
 
@@ -226,6 +197,35 @@ EXTENSIONS_API = \
 	as_function.h \
 	namedStrings.h \
 	as_environment.h \
+	movie_root.h \
+	MouseButtonState.h \
+	drag_state.h \
+	InteractiveObject.h \
+	rect.h \
+	GnashKey.h \
+	Movie.h \
+	RunInfo.h \
+	gnash.h	\
+	DisplayObject.h \
+	MovieClip.h \
+	StreamProvider.h \
+	event_id.h \
+	SWFMatrix.h \
+	cxform.h \
+	DisplayList.h	\
+	DynamicShape.h	\
+	swf/ControlTag.h \
+	swf/DefinitionTag.h \
+	swf/ShapeRecord.h \
+	swf/TagLoadersTable.h \
+	swf/swf.h \
+	impl.h \
+	fill_style.h \
+	styles.h \
+	ExportableResource.h \
+	BitmapInfo.h \
+	RGBA.h	\
+	Geometry.h	\
 	$(NULL)
 
 if SDKINSTALL

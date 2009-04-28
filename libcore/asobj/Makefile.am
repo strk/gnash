@@ -113,7 +113,6 @@ libgnashasobjs_la_SOURCES = \
 noinst_HEADERS = \
 	AsBroadcaster.h \
 	Accessibility_as.h \
-	Array_as.h \
 	Boolean_as.h \
 	Camera.h \
 	ClassHierarchy.h \
@@ -124,7 +123,6 @@ noinst_HEADERS = \
 	Error_as.h	\
 	Math_as.h	\
 	Global.h\
-	Key_as.h \
 	LoadVars_as.h \
 	LocalConnection_as.h\
 	Microphone.h \
@@ -175,6 +173,18 @@ noinst_HEADERS = \
 	flash/text/TextRenderer_as.h \
 	LoadableObject.h \
 	$(NULL)
+
+EXTENSIONS_API = \
+	Array_as.h \
+	Key_as.h \
+	$(NULL)
+
+if SDKINSTALL
+noinst_HEADERS += $(EXTENSIONS_API)
+else
+instdir = $(includedir)/gnash
+inst_HEADERS = $(EXTENSIONS_API)
+endif
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \

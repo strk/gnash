@@ -22,7 +22,7 @@
 
 #include "fill_style.h"
 #include "styles.h" 
-#include "swf/ShapeRecord.h"
+#include "ShapeRecord.h"
 
 namespace gnash {
     class DisplayObject;

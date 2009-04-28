@@ -138,8 +138,6 @@ noinst_HEADERS = \
 	extension.h \
 	GnashNumeric.h \
 	jemtree.h \
-	GnashImage.h \
-	GnashImageJpeg.h \
 	GnashSleep.h \
 	gmemory.h \
 	ogl.h \
@@ -153,22 +151,16 @@ noinst_HEADERS = \
 	GnashSystemNetHeaders.h \
 	GnashSystemIOHeaders.h \
 	GnashFileUtilities.h \
-	NamingPolicy.h \
 	ClockTime.h \
 	WallClockTimer.h \
 	utf8.h \
-	NetworkAdapter.h \
 	noseek_fd_adapter.h \
 	zlib_adapter.h \
-	URL.h \
 	LoadThread.h \
 	BitsReader.h \
 	arg_parser.h \
 	getclocktime.hpp \
-	Point2d.h \
-	Range2d.h \
 	GnashAlgorithm.h \
-	snappingrange.h \
 	$(NULL)
 
 if USE_PNG
@@ -189,6 +181,14 @@ EXTENSIONS_API = \
 	log.h \
 	rc.h \
 	gettext.h \
+	URL.h \
+	Point2d.h \
+	Range2d.h \
+	snappingrange.h \
+	NetworkAdapter.h \
+	NamingPolicy.h \
+	GnashImageJpeg.h \
+	GnashImage.h \
 	$(NULL)
 
 if SDKINSTALL

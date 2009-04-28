@@ -22,7 +22,7 @@
 #include "dsodefs.h"
 
 #include "smart_ptr.h"
-#include "swf/TagLoadersTable.h"
+#include "TagLoadersTable.h"
 
 namespace gnash {
 
