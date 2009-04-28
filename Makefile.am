@@ -471,3 +471,8 @@ install-plugins install-plugin uninstall-plugins install-pkglib:
 apidoc:
 	$(MAKE) -C doc $@
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = \
+	gnash.pc \
+	$(NULL)
+

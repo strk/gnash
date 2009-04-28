@@ -148,12 +148,7 @@ Global::Global(VM& vm, ClassHierarchy *ch)
     init_member("clearTimeout", new builtin_function(global_clearInterval));
 
     ch->setGlobal(this);
-
-// If extensions aren't used, then no extensions will be loaded.
-#ifdef USE_EXTENSIONS
     ch->setExtension(&_et);
-#endif
-
     ch->massDeclare();
 
     object_class_init(*this); 
@@ -209,13 +204,8 @@ Global::Global(VM& vm, ClassHierarchy *ch)
             break;
     }
 
-#ifdef USE_EXTENSIONS
     loadExtensions();
-#endif
-
 }
-
-#ifdef USE_EXTENSIONS
 
 //-----------------------
 // Extensions
@@ -239,8 +229,6 @@ Global::loadExtensions()
     }
 
 }
-
-#endif
 
 
 namespace {

@@ -125,28 +125,18 @@ libgnashcore_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	Property.h \
-	PropertyList.h \
 	StreamProvider.h \
-	StringPredicates.h \
 	URLAccessManager.h \
 	VirtualClock.h \
 	SystemClock.h \
 	ManualClock.h \
 	RunInfo.h \
-	as_environment.h \
-	as_function.h \
-	as_object.h \
-	as_prop_flags.h	\
-	as_value.h \
 	asClass.h \
 	Bitmap.h \
 	BitmapInfo.h \
 	BitmapMovie.h \
-	builtin_function.h \
 	Button.h \
 	DisplayObject.h \
-	CharacterProxy.h \
 	cxform.h \
 	debugger.h \
 	DynamicShape.h	\
@@ -180,7 +170,6 @@ noinst_HEADERS = \
 	SWFMovie.h \
 	Movie.h \
 	movie_root.h \
-	namedStrings.h \
 	rect.h \
 	render.h \
 	ExportableResource.h \
@@ -224,6 +213,27 @@ noinst_HEADERS = \
 	RGBA.h	\
 	Video.h \
 	$(NULL)
+
+EXTENSIONS_API = \
+	as_object.h \
+	Property.h \
+	PropertyList.h \
+	as_value.h \
+	as_prop_flags.h	\
+	CharacterProxy.h \
+	StringPredicates.h \
+	builtin_function.h \
+	as_function.h \
+	namedStrings.h \
+	as_environment.h \
+	$(NULL)
+
+if SDKINSTALL
+noinst_HEADERS += $(EXTENSIONS_API)
+else
+instdir = $(includedir)/gnash
+inst_HEADERS = $(EXTENSIONS_API)
+endif
 
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \

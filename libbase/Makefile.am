@@ -137,23 +137,15 @@ noinst_HEADERS = \
 	SimpleBuffer.h \
 	extension.h \
 	GnashNumeric.h \
-	GnashException.h \
-	gettext.h \
 	jemtree.h \
 	GnashImage.h \
 	GnashImageJpeg.h \
 	GnashSleep.h \
 	gmemory.h \
-	log.h \
 	ogl.h \
-	rc.h \
-	ref_counted.h \
 	shm.h \
-	smart_ptr.h \
 	sharedlib.h \
-	string_table.h \
 	tree.hh \
-	dsodefs.h \
 	tu_file.h \
 	IOChannel.h \
 	tu_opengl_includes.h \
@@ -165,13 +157,11 @@ noinst_HEADERS = \
 	ClockTime.h \
 	WallClockTimer.h \
 	utf8.h \
-	utility.h \
 	NetworkAdapter.h \
 	noseek_fd_adapter.h \
 	zlib_adapter.h \
 	URL.h \
 	LoadThread.h \
-	GC.h \
 	BitsReader.h \
 	arg_parser.h \
 	getclocktime.hpp \
@@ -188,6 +178,25 @@ if USE_GIF
 noinst_HEADERS += GnashImageGif.h
 endif
 
+EXTENSIONS_API = \
+	smart_ptr.h \
+	string_table.h \
+	ref_counted.h \
+	GC.h \
+	GnashException.h \
+	dsodefs.h \
+	utility.h \
+	log.h \
+	rc.h \
+	gettext.h \
+	$(NULL)
+
+if SDKINSTALL
+noinst_HEADERS += $(EXTENSIONS_API)
+else
+instdir = $(includedir)/gnash
+inst_HEADERS = $(EXTENSIONS_API)
+endif
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
 

@@ -22,10 +22,7 @@
 #define GNASH_GLOBAL_H
 
 #include "as_object.h" // for inheritance
-
-#ifdef USE_EXTENSIONS
-# include "extension.h" // for composition
-#endif
+#include "extension.h" // for composition
 
 // Forward declarations
 namespace gnash {
@@ -45,10 +42,8 @@ public:
 
 private:
 
-#ifdef USE_EXTENSIONS
     void loadExtensions();
 	Extension _et;
-#endif
 
 };
 

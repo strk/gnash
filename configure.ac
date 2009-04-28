@@ -824,9 +824,6 @@ AC_ARG_ENABLE(extensions,
       break;
     fi
   done
-  if test "${nextensions}" -gt 0; then
-        AC_DEFINE(USE_EXTENSIONS, [1], [Use extensions])
-  fi
   EXTENSIONS_LIST="$extensions_list"
   AC_SUBST(EXTENSIONS_LIST)
 )
@@ -2209,6 +2206,8 @@ dnl AC_CONFIG_LINKS(gnashconfig.h,libltdl/config.h)
 AC_CONFIG_LINKS(cygnal/testsuite/cygnal.all/cygnalrc:cygnal/testsuite/cygnal.all/cygnalrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc-local:testsuite/libbase/gnashrc-local.in)
+
+AC_CONFIG_FILES(gnash.pc:gnash.pc.in)
 
 AC_OUTPUT(Makefile
 po/Makefile

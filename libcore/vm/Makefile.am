@@ -50,17 +50,27 @@ libgnashvm_la_SOURCES = \
 noinst_HEADERS =		\
 	ASHandlers.h		\
 	CodeStream.h		\
-	SafeStack.h			\
 	Machine.h			\
 	asName.h			\
 	ActionExec.h		\
 	ExecutableCode.h	\
 	VM.h			\
 	action.h		\
-	fn_call.h		\
-	CallStack.h \
 	with_stack_entry.h 	\
 	$(NULL)
+
+EXTENSIONS_API = \
+	fn_call.h		\
+	CallStack.h \
+	SafeStack.h			\
+	$(NULL)
+
+if SDKINSTALL
+noinst_HEADERS += $(EXTENSIONS_API)
+else
+instdir = $(includedir)/gnash
+inst_HEADERS = $(EXTENSIONS_API)
+endif
 
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
