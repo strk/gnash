@@ -216,17 +216,11 @@ Extension::scanDir(const std::string& dirlist)
             return false;
         }   
         
-        struct dirent *entry = readdir(libdir);
+        struct dirent *entry;
 
-        for (int i = 0; entry > 0; ++i) {
+        while ((entry = readdir(libdir)) != NULL) {
             // We only want shared libraries that end with the suffix, otherwise
             // we get all the duplicates.
-            entry = readdir(libdir);
-
-            if (entry <= 0) { // All done
-                continue;
-            }
-
             std::string name(entry->d_name);
 
             // Hidden files.
