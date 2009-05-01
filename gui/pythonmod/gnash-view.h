@@ -40,6 +40,7 @@ struct _GnashViewClass {
 
 GType        gnash_view_get_type    (void);
 GtkWidget   *gnash_view_new         (void);
+const gchar *gnash_view_call        (GnashView *view, const gchar *func_name, const gchar *input_data);
 
 G_END_DECLS
 

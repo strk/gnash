@@ -67,6 +67,7 @@ struct _GnashView {
     std::auto_ptr<gnash::RunInfo> run_info;
 
     std::auto_ptr<gnash::movie_definition> movie_definition;
+    boost::intrusive_ptr<gnash::Movie> movie;
     std::auto_ptr<gnash::movie_root> stage;
     std::auto_ptr<gnash::SystemClock> system_clock;
     std::auto_ptr<gnash::InterruptableVirtualClock> virtual_clock;
@@ -100,6 +101,32 @@ GtkWidget *
 gnash_view_new (void)
 {
     return GTK_WIDGET(g_object_new (GNASH_TYPE_VIEW, NULL));
+}
+
+const gchar *
+gnash_view_call (GnashView *view, const gchar *func_name, const gchar *input_data)
+{
+    gnash::VM& vm = view->stage->getVM();
+    gnash::string_table& st = vm.getStringTable();
+	gnash::as_value obj;
+
+    gnash::as_value func = view->movie->getMember(st.find(func_name));
+    if( !func.is_function() ) {
+        return NULL;
+    }
+
+    gnash::as_value result;
+    if( input_data ) {
+        result = view->movie->callMethod(st.find(func_name),
+                                         gnash::as_value(input_data));
+    } else {
+        result = view->movie->callMethod(st.find(func_name));
+    }
+    if( !result.is_string() ) {
+        return NULL;
+    }
+
+    return result.to_string().c_str();
 }
 
 static void
@@ -445,13 +472,13 @@ gnash_view_load_movie(GnashView *view, const gchar *uri)
 
     gtk_widget_queue_resize (GTK_WIDGET(view));
 
-    std::auto_ptr<gnash::Movie> mr ( view->movie_definition->createMovie() );
+    view->movie.reset ( view->movie_definition->createMovie() );
     
     std::map<std::string, std::string> variables;
     gnash::URL::parse_querystring(url.querystring(), variables);
-    mr->setVariables(variables);
+    view->movie->setVariables(variables);
 
-    view->stage->setRootMovie( mr.release() ); // will construct the instance
+    view->stage->setRootMovie( view->movie.get() ); // will construct the instance
 
     view->stage->set_background_alpha(1.0f);
 

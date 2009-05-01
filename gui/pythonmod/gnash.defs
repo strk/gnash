@@ -5,3 +5,13 @@
   (gtype-id "GNASH_TYPE_VIEW")
 )
 
+(define-method call
+  (of-object "GnashView")
+  (c-name "gnash_view_call")
+  (return-type "const-char*")
+  (parameters
+    '("const-char*" "func_name")
+    '("const-char*" "input_data" (null-ok) (default "NULL"))
+  )
+)
+
