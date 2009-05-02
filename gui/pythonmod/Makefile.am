@@ -65,20 +65,26 @@ if BUILD_CAIRO_RENDERER
 RENDERER_GLUE = $(top_srcdir)/gui/gtk_glue_cairo.cpp
 endif
 
+if USE_PYTHON
+BUILT_SOURCES = gen-gnash.c
+else
+BUILT_SOURCES = 
+endif
+
+nodist_gnash_la_SOURCES = $(BUILT_SOURCES)
 gnash_la_SOURCES = \
-	gen-gnash.c	\
 	gnashmodule.c \
-	gnash-view.cpp\
+	gnash-view.cpp \
 	$(top_srcdir)/gui/gtk_canvas.cpp \
 	$(RENDERER_GLUE)
 
 gnash.c: gnash.defs gnash.override
 
-CLEANFILES = gen-gnash.c
+CLEANFILES = 
 EXTRA_DIST = gnash.override gnash.defs
-BUILT_SOURCES = gen-gnash.c
 
 gen-gnash.c:   gnash.override gnash.defs
+if HAS_PYTHON
 	if test x"$(PYGOBJECT_CODEGEN)" != x; then \
 	  $(PYGOBJECT_CODEGEN) \
 	    --register $(PYGTK_DEFSDIR)/gdk-types.defs \
@@ -86,3 +92,4 @@ gen-gnash.c:   gnash.override gnash.defs
 	    --override $(srcdir)/gnash.override \
 	    --prefix pygnash $(srcdir)/gnash.defs > gen-gnash.c; \
 	 fi
+endif
