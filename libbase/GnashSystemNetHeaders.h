@@ -33,6 +33,8 @@
 # include <windows.h>
 # include <io.h>
 # include <ws2tcpip.h>
+#elif defined(__amigaos4__) //maybe HAVE_NETINET_IN_H
+# include <netinet/in.h>
 #else
 # include <arpa/inet.h>
 #endif

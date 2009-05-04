@@ -26,6 +26,13 @@
 #include <boost/cstdint.hpp> // for C99 int types
 #include <limits>
 
+#ifdef __amigaos4__
+namespace std
+{
+	typedef std::basic_string<wchar_t> wstring;
+};
+#endif
+
 /// Utilities to convert between std::string and std::wstring.
 //
 /// Strings in Gnash are generally stored as std::strings.
