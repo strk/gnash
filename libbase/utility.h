@@ -53,6 +53,15 @@
 #endif // not NDEBUG
 #endif // _WIN32
 
+#ifdef __amigaos4__
+#undef UNUSED //to avoid "already defined" messages
+#define SHUT_RDWR 0
+
+namespace std
+{
+	typedef std::basic_string<wchar_t> wstring;
+};
+#endif
 
 namespace gnash {
 

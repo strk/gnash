@@ -22,16 +22,10 @@
 #define UTF8_H
 
 #include "dsodefs.h" // For DSOEXPORT
+#include "utility.h"
 #include <string>
 #include <boost/cstdint.hpp> // for C99 int types
 #include <limits>
-
-#ifdef __amigaos4__
-namespace std
-{
-	typedef std::basic_string<wchar_t> wstring;
-};
-#endif
 
 /// Utilities to convert between std::string and std::wstring.
 //
