@@ -27,8 +27,11 @@
 #include <iostream>
 #include <string>
 #include <cerrno>
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__amigaos4__)
 #include <sys/mman.h>
+#elif defined(__amigaos4__)
+#include <proto/exec.h>
+#include <stdlib.h> //for malloc/free
 #else
 #include <windows.h>
 #endif
@@ -93,10 +96,18 @@ DiskStream::DiskStream()
     GetSystemInfo(&si);
     _pagesize = si.dwPageSize;
 #else
+#ifdef __amigaos4__
+	uint32 PageSize;
+
+	IExec->GetCPUInfoTags(
+               GCIT_ExecPageSize, &PageSize, 
+               TAG_DONE);
+    _pagesize = PageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
 #endif
 #endif
-
+#endif
 #ifdef USE_STATS_CACHE
     clock_gettime (CLOCK_REALTIME, &_last_access);
     _accesses = 1;
@@ -124,7 +135,16 @@ DiskStream::DiskStream(const string &str)
     GetSystemInfo(&si);
     _pagesize = si.dwPageSize;
 #else
+#ifdef __amigaos4__
+	uint32 PageSize;
+
+	IExec->GetCPUInfoTags(
+               GCIT_ExecPageSize, &PageSize, 
+               TAG_DONE);
+    _pagesize = PageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 #endif
 
@@ -156,7 +176,16 @@ DiskStream::DiskStream(const string &str, boost::uint8_t *data, size_t size)
     GetSystemInfo(&si);
     _pagesize = si.dwPageSize;
 #else
+#ifdef __amigaos4__
+	uint32 PageSize;
+
+	IExec->GetCPUInfoTags(
+               GCIT_ExecPageSize, &PageSize, 
+               TAG_DONE);
+    _pagesize = PageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 #endif
 
@@ -195,7 +224,16 @@ DiskStream::DiskStream(const string &str, amf::Buffer &buf)
     GetSystemInfo(&si);
     _pagesize = si.dwPageSize;
 #else
+#ifdef __amigaos4__
+	uint32 PageSize;
+
+	IExec->GetCPUInfoTags(
+               GCIT_ExecPageSize, &PageSize, 
+               TAG_DONE);
+    _pagesize = PageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 #endif
 
@@ -234,7 +272,16 @@ DiskStream::DiskStream(const string &str, int netfd)
     GetSystemInfo(&si);
     _pagesize = si.dwPageSize;
 #else
+#ifdef __amigaos4__
+	uint32 PageSize;
+
+	IExec->GetCPUInfoTags(
+               GCIT_ExecPageSize, &PageSize, 
+               TAG_DONE);
+    _pagesize = PageSize;
+#else
 #error "Need to define the memory page size without sysconf()!"
+#endif
 #endif
 #endif
 
@@ -274,6 +321,8 @@ DiskStream::close()
     
 #ifdef _WIN32
     UnmapViewOfFile(_dataptr);
+#elif defined(__amigaos4__)
+	if (_dataptr) free(_dataptr);
 #else
     if ((_dataptr != MAP_FAILED) && (_dataptr != 0)) {
 	munmap(_dataptr, _pagesize);
@@ -359,6 +408,8 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	if (dataptr != 0) {
 #ifdef _WIN32
 	    UnmapViewOfFile(_dataptr);
+#elif defined(__amigaos4__)
+	if (_dataptr) free(_dataptr);
 #else
 	    munmap(_dataptr, _pagesize);
 #endif
@@ -383,6 +434,8 @@ DiskStream::loadToMem(size_t filesize, off_t offset)
 	    CloseHandle(handle);
 
 	}
+#elif defined(__amigaos4__)
+	dataptr = static_cast<boost::uint8_t *>(malloc(loadsize));
 #else
 	dataptr = static_cast<boost::uint8_t *>(mmap(0, loadsize,
 						     PROT_READ, MAP_SHARED,
@@ -605,6 +658,8 @@ DiskStream::play(int netfd)
 	   
 #ifdef _WIN32
     UnmapViewOfFile(_dataptr);
+#elif defined(__amigaos4__)
+	if (_dataptr) free(_dataptr);
 #else
     munmap(_dataptr, _filesize);
 #endif

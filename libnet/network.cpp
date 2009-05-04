@@ -377,7 +377,7 @@ Network::newConnection(bool block, int fd)
     return _sockfd;
 }
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__amigaos4__)
 /* from sys/socket.h */
 typedef unsigned short      sa_family_t;
 
