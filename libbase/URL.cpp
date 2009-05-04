@@ -54,7 +54,7 @@ void
 URL::normalize_path(std::string& path)
 {
 
-#if defined(_WIN32) || defined(WIN32) || defined(__OS2__)
+#if defined(_WIN32) || defined(WIN32) || defined(__OS2__) || defined(__amigaos4__)
 	return;
 #endif
 
@@ -153,9 +153,11 @@ URL::URL(const std::string& absolute_url)
 	//cerr << "URL(" << absolute_url << ")" << endl;
 	if ( ( absolute_url.size() && absolute_url[0] == '/' )
 		|| absolute_url.find("://") != std::string::npos 
-		|| ( absolute_url.size() > 1 && absolute_url[1] == ':' ))	//for win32
+		|| ( absolute_url.size() > 1 && absolute_url[1] == ':' )	//for win32
+		|| ( absolute_url.size() > 2 && absolute_url.find(':',2) != std::string::npos ) //for aos4
+		)
 	{
-		//cerr << "It's absolute" << endl;
+		//std::cerr << "It's absolute" << std::endl;
 		init_absolute(absolute_url);
 
 	}

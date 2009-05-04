@@ -667,9 +667,9 @@ CurlStreamFile::fillCache(std::streamsize size)
 		// in gnashrc.
 		int ret = select(maxfd + 1, &readfd, &writefd, &exceptfd, &tv);
 
-// select() will always fail on OS/2 as we can't select
+// select() will always fail on OS/2 and AmigaOS4 as we can't select
 // on file descriptors, only on sockets
-#ifndef __OS2__ 
+#if !defined(__OS2__) && !defined(__amigaos4__)
 		if ( ret == -1 )
 		{
             if ( errno == EINTR )
