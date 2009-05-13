@@ -29,7 +29,7 @@
 #include "GnashSystemIOHeaders.h" // used by unlink()
 #include <fcntl.h>  // used by asyncmode()
 
-#include "VM.h"
+//#include "VM.h"
 #include "log.h"
 #include "fn_call.h"
 #include "as_object.h"
