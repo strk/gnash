@@ -27,6 +27,7 @@ INCLUDES = \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/libcore \
+    -I$(top_srcdir)/libcore/swf \
 	-I$(top_srcdir)/libcore/vm \
 	-I$(top_srcdir)/libcore/parser \
 	-I$(top_srcdir)/libcore/asobj \
