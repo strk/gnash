@@ -30,7 +30,7 @@
 #define OUTPUT_VERSION  7
 #define OUTPUT_FILENAME "opcode_guard_test.swf"
 
-void
+static void
 my_error(const char *msg, ...)
 {
         va_list args;
@@ -45,8 +45,8 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc1, mc11, mc2, mc3, dejagnuclip;
-  SWFDisplayItem it1, it11, it2, it3;
+  SWFMovieClip  mc1, mc11, mc2, dejagnuclip;
+  SWFDisplayItem it1, it11, it2;
 
   const char *srcdir=".";
   if ( argc>1 ) 
