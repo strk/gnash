@@ -406,7 +406,7 @@ movie_root::dropLevel(int depth)
 	}
 
 	MovieClip* mo = it->second.get();
-	if (mo == _rootMovie)
+	if (mo == _rootMovie.get())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Original root movie can't be removed"));
