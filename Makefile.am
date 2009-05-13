@@ -446,7 +446,7 @@ else
 endif
 
 if TESTSUITE
-check: check-recursive 
+check-local:
 	$(MAKE) anal
 
 anal testreport checksum:
