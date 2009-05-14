@@ -168,8 +168,10 @@ public:
 	/// Get a reference to the string table used by the VM.
 	string_table& getStringTable() const { return mStringTable; }
 
+#ifdef ENABLE_AVM2
 	/// Get a pointer to the machine, if it exists.
 	Machine* getMachine() const { return mMachine; }
+#endif
 
 	/// Get version of the player, in a compatible representation
 	//
@@ -312,8 +314,10 @@ private:
 	/// Not mutable since changing this changes behavior of the VM.
 	std::auto_ptr<ClassHierarchy> mClassHierarchy;
 
+#ifdef ENABLE_AVM2
 	/// A running execution thread.
 	Machine *mMachine;
+#endif
 
 	VirtualClock& _clock;
 

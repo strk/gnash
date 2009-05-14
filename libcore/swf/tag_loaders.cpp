@@ -45,16 +45,12 @@
 #include "GnashException.h"
 #include "swf/DefineVideoStreamTag.h"
 #include "sound_definition.h"
-#include "abc_block.h"
 #include "SoundInfo.h"
-#include "Machine.h"
-#include "gnash.h" // FileType enum
+#include "gnash.h" 
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
 #include "ExportableResource.h"
-
-// TODO: pass the render handler with RunInfo and use that.
 #include "render.h"
 
 #ifdef HAVE_ZLIB_H
@@ -1322,49 +1318,6 @@ reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
     log_unimpl(_("REFLEX tag parsed (\"%c%c%c\") but unused"),
             first, second, third);
 
-}
-
-void
-abc_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
-        const RunInfo& /*r*/)
-{
-	assert(tag == SWF::DOABC
-		|| tag == SWF::DOABCDEFINE); // 72 or 82
-
-	abc_block a;
-
-	if (tag == SWF::DOABCDEFINE)
-	{
-
-		// Skip the 'flags' until they are actually used.
-		in.ensureBytes(4);
-		static_cast<void> (in.read_u32());
-		std::string name;
-		in.read_string(name);
-		log_debug("Name is %s",name);
-        log_debug("Initializing block...\n");
-        a = abc_block();
-		log_debug("Done Initializing block.\n");
-		log_debug("Begin read...\n");
-		a.read(in);
-		log_debug("Done with read...\n");
-		VM& vm = VM::get();
-		log_debug("getting machine.");
-		Machine *mach = vm.getMachine();
-		as_object* global = vm.getGlobal();
-//		log_debug("Getting entry script.");
-//		asClass* start_script = a.mScripts.back();
-//		log_debug("Getting constructor.");
-//		asMethod* method = start_script->getConstructor();
-//		log_debug("Loding code stream.");
-		mach->initMachine(&a,global);
-		log_debug("Executing machine...");
-		mach->execute();
-	}
-
-	//TODO: Move this to execution time so that as_object can be used. bool success = a.read(in);
-
-	log_unimpl(_("%s tag parsed but not yet used"), tag == SWF::DOABC ? "DOABC" : "DOABCDEFINE");
 }
 
 void

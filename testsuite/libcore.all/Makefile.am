@@ -44,8 +44,12 @@ check_PROGRAMS = \
 	AsValueTest \
 	ClassSizes \
 	SafeStackTest \
-	CodeStreamTest \
 	$(NULL)
+
+if ENABLE_AVM2
+check_PROGRAMS += \
+	CodeStreamTest
+endif
 
 CLEANFILES = \
 	testrun.sum \

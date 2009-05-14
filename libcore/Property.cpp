@@ -18,7 +18,6 @@
 #include "Property.h"
 #include "VM.h"
 #include "as_function.h"
-#include "Machine.h"
 
 namespace gnash {
 

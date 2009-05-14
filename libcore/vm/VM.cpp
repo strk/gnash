@@ -33,7 +33,10 @@
 #include "namedStrings.h"
 #include "ClassHierarchy.h"
 #include "VirtualClock.h" // for getTime()
-#include "Machine.h"
+
+#ifdef ENABLE_AVM2
+# include "Machine.h"
+#endif
 
 #ifdef HAVE_SYS_UTSNAME_H
 # include <sys/utsname.h> // For system information
@@ -65,10 +68,12 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 
 	_singleton->mClassHierarchy.reset(new ClassHierarchy);
 	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy.get()));
-/*?Ask someone if this is correct.*/
+
+#ifdef ENABLE_AVM2
 	_singleton->mMachine = new Machine(*_singleton);
 	assert(_singleton->getGlobal());
-/*ASK*/
+#endif
+
 	return *_singleton;
 }
 
@@ -90,7 +95,9 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 	:
 	_rootMovie(root),
 	_swfversion(version),
-	mMachine(0),
+#ifdef ENABLE_AVM2
+    mMachine(0),
+#endif
 	_clock(clock),
 	_stack(),
     _shLib(new SharedObjectLibrary(*this))

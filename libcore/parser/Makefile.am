@@ -39,27 +39,35 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/libamf \
 	$(GLIB_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
-        $(BOOST_CFLAGS) \
+	$(BOOST_CFLAGS) \
 	$(FREETYPE2_CFLAGS) \
 	$(NULL)
 
 libgnashparser_la_SOURCES = \
-	abc_block.cpp \
 	action_buffer.cpp \
 	BitmapMovieDefinition.cpp \
 	SWFMovieDefinition.cpp \
 	sound_definition.cpp \
 	sprite_definition.cpp
 
+if ENABLE_AVM2
+libgnashparser_la_SOURCES += \
+	abc_block.cpp
+endif
+
 noinst_HEADERS = \
-	abc_block.h \
 	action_buffer.h \
 	BitmapMovieDefinition.h \
 	movie_definition.h \
 	SWFMovieDefinition.h \
-	Namespace.h \
 	sound_definition.h \
 	sprite_definition.h
+
+if ENABLE_AVM2
+noinst_HEADERS += \
+	Namespace.h \
+	abc_block.h
+endif
 
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \

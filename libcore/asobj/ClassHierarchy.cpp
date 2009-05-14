@@ -69,7 +69,8 @@
 
 namespace gnash {
 
-namespace { // anonymous namespace
+// anonymous namespace
+namespace { 
 
 void
 addVisibilityFlag(int& flags, int version)
@@ -243,7 +244,7 @@ ClassHierarchy::~ClassHierarchy()
 bool
 ClassHierarchy::declareClass(extensionClass& c)
 {
-	if (mExtension == NULL) return false; 
+	if (!mExtension) return false; 
 
 	mGlobalNamespace->stubPrototype(c.name);
 	mGlobalNamespace->getClass(c.name)->setDeclared();

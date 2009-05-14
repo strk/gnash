@@ -29,10 +29,10 @@
 #include "SafeStack.h"
 #include "as_object.h"
 #include "as_environment.h"
+#include "asMethod.h"
 
 namespace gnash {
 
-class asMethod;
 class Machine;
 
 /// ABC-defined Function 
