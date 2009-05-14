@@ -19,6 +19,7 @@
 #define GNASH_AS_NAMESPACE_H
 
 #include "string_table.h"
+#include <map>
 
 // Forward declarations
 namespace gnash {
