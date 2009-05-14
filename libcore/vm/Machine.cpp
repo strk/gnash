@@ -29,7 +29,6 @@
 #include "Object.h"
 #include "VM.h"
 
-//#define PRETEND
 namespace gnash {
 /// The type of exceptions thrown by ActionScript.
 class ASException
@@ -81,7 +80,7 @@ static inline double
 pool_double(boost::uint32_t index, abc_block *pool)
 {
 	if (!pool) throw ASException();
-	LOG_DEBUG_AVM("Getting double from pool at index %u",index);
+	log_abc("Getting double from pool at index %u",index);
 	return pool->doublePoolAt(index);
 }
 
@@ -113,7 +112,7 @@ pool_name(boost::uint32_t index, abc_block* pool)
 	if (!pool) throw ASException();
 	asName multiname = pool->multinamePoolAt(index);
 #if 0
-    LOG_DEBUG_AVM("Searching multiname pool for property id=%u abc name=%u "
+    log_abc("Searching multiname pool for property id=%u abc name=%u "
             "global name = %u abc string=%s flags=0x%X name_space=%u",
             index, multiname.getABCName(), multiname.getGlobalName(),
             pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,
@@ -254,7 +253,7 @@ Machine::execute()
 	{
     SWF::abc_action_type opcode = (SWF::abc_action_type)mStream->read_as3op();
 	
-	LOG_DEBUG_AVM("** Executing opcode: %s (%d) **", opcode, (int)opcode);
+	log_abc("** Executing opcode: %s (%d) **", opcode, (int)opcode);
 //	continue;
 	switch ((opcode /*= mStream->read_as3op()*/)) // Assignment intentional
 	{
@@ -460,7 +459,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_JUMP:
 	{
 		boost::int32_t bytes = mStream->read_S24();
-		LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+		log_abc("Jumping %d bytes.",bytes);
 		mStream->seekBy(bytes);
 
 		break;
@@ -477,11 +476,11 @@ Machine::execute()
 	{
 		boost::int32_t bytes = mStream->read_S24();
 		if (pop_stack().to_bool()) {
-			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+			log_abc("Jumping %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
 		else{
-			LOG_DEBUG_AVM("Would have jumpied %d bytes.", bytes);
+			log_abc("Would have jumpied %d bytes.", bytes);
 		}
 		break;
 	}
@@ -497,8 +496,8 @@ Machine::execute()
 		boost::int32_t bytes = mStream->read_S24();
 		bool truth = pop_stack().to_bool();
 		if (!truth) {
-			LOG_DEBUG_AVM("Jumping...");
-			LOG_DEBUG_AVM("%d bytes.",bytes);
+			log_abc("Jumping...");
+			log_abc("%d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
 		break;
@@ -517,11 +516,11 @@ Machine::execute()
 		as_value b = pop_stack();
 		as_value a = pop_stack();
 		if (a.equals(b)) {
-			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+			log_abc("Jumping %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
 		else{
-			LOG_DEBUG_AVM("Would have jumped %d bytes", bytes);
+			log_abc("Would have jumped %d bytes", bytes);
 		}
 		break;
 	}
@@ -539,11 +538,11 @@ Machine::execute()
 		as_value b = pop_stack();
 		boost::int32_t bytes = mStream->read_S24();
 		if (!a.equals(b)) {
-			LOG_DEBUG_AVM("Jumping... %d bytes.",bytes);
+			log_abc("Jumping... %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
 		else{
-			LOG_DEBUG_AVM("Would have jumped %d bytes",bytes);
+			log_abc("Would have jumped %d bytes",bytes);
 		}
 		break;
 	}
@@ -562,11 +561,11 @@ Machine::execute()
 		boost::int32_t bytes = mStream->read_S24();
 		bool jump = a.newLessThan(b).to_bool();
 		if (jump) {
-			LOG_DEBUG_AVM("Jumping... %d bytes.",bytes);
+			log_abc("Jumping... %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
 		else{
-			LOG_DEBUG_AVM("Would have jumped %d bytes",bytes);
+			log_abc("Would have jumped %d bytes",bytes);
 		}
 		break;
 	}
@@ -602,11 +601,11 @@ Machine::execute()
 		ABSTRACT_COMPARE(truth, mStack.top(0), mStack.top(1), false);
 		mStack.drop(2);
 		if (truth) {
-			LOG_DEBUG_AVM("Jumping %d bytes.",bytes);
+			log_abc("Jumping %d bytes.",bytes);
 			mStream->seekBy(bytes);
 		}
 		else{
-			LOG_DEBUG_AVM("Would have jumped %d bytes.",bytes);
+			log_abc("Would have jumped %d bytes.",bytes);
 		}
 		break;
 	}
@@ -977,15 +976,15 @@ Machine::execute()
 		boost::int32_t iindex = mStream->read_V32();
 		as_value &objv = mRegisters[oindex];
 		as_value &indexv = mRegisters[iindex];
-		LOG_DEBUG_AVM("Index is %u",indexv.to_number());
+		log_abc("Index is %u",indexv.to_number());
 //		ENSURE_OBJECT(objv);
 //		ENSURE_NUMBER(indexv);
 		as_object *obj = objv.to_object().get();
 		boost::uint32_t index = indexv.to_number<boost::uint32_t>();
-		LOG_DEBUG_AVM("Object is %s index is %u",objv.toDebugString(),index);
+		log_abc("Object is %s index is %u",objv.toDebugString(),index);
 		as_object *owner = NULL;
 		int next = obj->nextIndex(index, &owner);
-		LOG_DEBUG_AVM("Next index is %d",next);
+		log_abc("Next index is %d",next);
 //		mStack.grow(1);
 		if (next)
 		{
@@ -1014,7 +1013,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWFUNCTION:
 	{
 		boost::int32_t method_index = mStream->read_V32();
-		LOG_DEBUG_AVM("Creating new abc_function: method index=%u",method_index);
+		log_abc("Creating new abc_function: method index=%u",method_index);
 		asMethod *m = pool_method(method_index, mPoolObject);
 		abc_function* new_function = m->getPrototype();
 		// TODO: SafeStack contains all the scope objects
@@ -1175,31 +1174,33 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		//TODO: If multiname is runtime also pop namespace and/or name values.
-        if ( a.isRuntime() )
-        {
+        
+        if (a.isRuntime()) {
             log_unimpl("ABC_ACTION_CALL* with runtime multiname");
         }
+
 		as_value object_val = pop_stack();
 
 		as_object *object = object_val.to_object().get();
 		if (!object) {
             IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Can't call a method of a value that doesn't cast to an object (%s)."),
+			log_aserror(_("Can't call a method of a value that doesn't "
+                    "cast to an object (%s)."),
                 object_val);
             )
 		}
-		else{
+		else {
 
-			as_value property = object->getMember(a.getGlobalName(),0);
+			as_value property = object->getMember(a.getGlobalName(), 0);
 		
 			if (!property.is_undefined() && !property.is_null()) {
-				LOG_DEBUG_AVM("Calling method %s on object %s",
+				log_abc("Calling method %s on object %s",
                         property.toDebugString(),object_val.toDebugString());
 				as_environment env = as_environment(_vm);
 				result = call_method(property,env,object,args);
 
 			}
-			else{
+			else {
                 IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Property '%s' of object '%s' is '%s', "
                         "cannot call as method"),
@@ -1209,9 +1210,10 @@ Machine::execute()
 			}
 
 		}
-			if (opcode == SWF::ABC_ACTION_CALLPROPERTY) {
-				push_stack(result);
-			}
+        
+        if (opcode == SWF::ABC_ACTION_CALLPROPERTY) {
+            push_stack(result);
+        }
 
 /*		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
@@ -1292,35 +1294,37 @@ Machine::execute()
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
 		boost::uint32_t argc = mStream->read_V32();
-		LOG_DEBUG_AVM("There are %u arguments.",argc);
+		log_abc("There are %u arguments.",argc);
 		get_args(argc);
-//		ENSURE_OBJECT(mStack.top(argc));
 		//as_object *super = pop_stack().to_object().get()->get_super();
 		//TODO: Actually construct the super.
-//		as_object *super = mStack.top(argc).to_object()->get_super();
-// 		if (!super)
-// 		{
-// 			throw ASException();
-// 			break;
-// 		}
-// 		as_function *func = super->get_constructor();
+		as_object* super = mStack.top(argc).to_object()->get_super();
+ 		if (!super) {
+            log_error("No super found in CONSTRUCTSUPER!");
+            throw ASException();
+        }
+ 		as_function *func = super->get_constructor();
+ 		if (!func) {
+            log_abc("Super(%s) has no constructor in CONSTRUCTSUPER!");
+        }
 		// 'obj' is the 'this' for the call, we ignore the return, there are
 		// argc arguments, and we drop all of the arguments plus 'obj' from
 		// the stack.
-//		pushCall(func, obj, mIgnoreReturn, argc, -1);
+		pushCall(func, super, mIgnoreReturn, argc, -1);
 
-        LOG_ONCE( log_unimpl("ABC_ACTION_CONSTRUCTSUPER") );
+        LOG_ONCE(log_unimpl("ABC_ACTION_CONSTRUCTSUPER") );
 		break;
 	}
-/// 0x4A ABC_ACTION_CONSTRUCTPROP
-/// Stream: V32 'name_offset' | V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  [ns [n]] -- Namespace stuff
-///  obj -- the object whose property should be constructed
-/// Stack Out:
-///  value -- the newly constructed prop from obj::(resolve)
-///   'name_offset'(arg1, ..., argN)
+    
+    /// 0x4A ABC_ACTION_CONSTRUCTPROP
+    /// Stream: V32 'name_offset' | V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  [ns [n]] -- Namespace stuff
+    ///  obj -- the object whose property should be constructed
+    /// Stack Out:
+    ///  value -- the newly constructed prop from obj::(resolve)
+    ///   'name_offset'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCTPROP:
 	{
 		as_environment env = as_environment(_vm);
@@ -1330,7 +1334,7 @@ Machine::execute()
 		as_object* object = pop_stack().to_object().get();
 		if (!object) {
 			//TODO: Should this result in an exeception or an actionscript error?
-			LOG_DEBUG_AVM("Can't constructor property on a null object.  Property not constructed.");
+			log_abc("Can't constructor property on a null object.  Property not constructed.");
 			push_stack(as_value());
 			break;
 		}
@@ -1346,9 +1350,9 @@ Machine::execute()
 		// I don't think this is correct, and I think the problem might be how AVM2 adds
 		// new objects to the Global object.
 		else{
- 			LOG_DEBUG_AVM("Object %s is not a constructor",constructor_val.toDebugString());
+ 			log_abc("Object %s is not a constructor",constructor_val.toDebugString());
 			if (constructor_val.is_null() || constructor_val.is_undefined()) {
-				LOG_DEBUG_AVM("Constructor is undefined, will not construct property.");
+				log_abc("Constructor is undefined, will not construct property.");
 				push_stack(as_value());
 			}
 			else{
@@ -1400,7 +1404,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWARRAY:
 	{
 		boost::uint32_t asize = mStream->read_V32();
-		LOG_DEBUG_AVM("Creating array of size %u",asize);
+		log_abc("Creating array of size %u",asize);
 		Array_as *arr = new Array_as;
 		arr->resize(asize);
 		boost::uint32_t i = asize;
@@ -1433,7 +1437,7 @@ Machine::execute()
 	{
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
-		LOG_DEBUG_AVM("Creating new class id=%u name=%s", c->getName(),
+		log_abc("Creating new class id=%u name=%s", c->getName(),
                 mPoolObject->stringPoolAt(c->getName()));
 		
 		as_object* base_class = pop_stack().to_object().get();
@@ -1610,7 +1614,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_SETLOCAL:
 	{
 		boost::uint32_t index = mStream->read_V32();
-		LOG_DEBUG_AVM("Register index: %u",index);
+		log_abc("Register index: %u",index);
 		mRegisters[index] = pop_stack();
 		break;
 	}
@@ -1735,7 +1739,7 @@ Machine::execute()
 
 		object->get_member_slot(sindex + 1, &val);
 
-		LOG_DEBUG_AVM("object has value %s at real_slot=%u abc_slot=%u",val.toDebugString(),sindex + 1, sindex);
+		log_abc("object has value %s at real_slot=%u abc_slot=%u",val.toDebugString(),sindex + 1, sindex);
 		push_stack(val);
 		
 		break;
@@ -1756,10 +1760,10 @@ Machine::execute()
 		//We use sindex + 1, because currently as_object sets a property at a slot index
 		//1 higher than the index the abc_block thinks the property is at.
 		if (!object.to_object().get()->set_member_slot(sindex+1,value)) {
-			LOG_DEBUG_AVM("Failed to set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+			log_abc("Failed to set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
 		}
 		else{
-			LOG_DEBUG_AVM("Set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+			log_abc("Set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
 		}
 		//TODO: Actually set the object's value.
 		break;
@@ -2485,7 +2489,7 @@ Machine::execute()
 		break;
 	}
 	} // end of switch statement
-		LOG_DEBUG_AVM("* DONE *");
+		log_abc("* DONE *");
 		IF_VERBOSE_ACTION(print_stack());
 	} // end of AS3 conditional
 	else // beginning of !AS3 (this code is AS2)
@@ -2552,15 +2556,16 @@ UNUSED(newvalue);
 }
 
 int
-Machine::completeName(asName &name, int offset)
+Machine::completeName(asName& name, int offset)
 {
 	int size = 0;
 
 	if (name.isRuntime())
 	{
 		as_value obj = mStack.top(offset);
-		if (obj.is_object() && obj.to_object()->isQName())
+		if (obj.is_object() && obj.to_object()->isQName()) {
 			name.fill(obj.to_object().get());
+        }
 		++size;
 
 		if (name.isRtns())
@@ -2671,7 +2676,7 @@ Machine::pushCall(as_function *func, as_object *pthis, as_value& return_slot,
 void
 Machine::restoreState()
 {
-	LOG_DEBUG_AVM("Restoring state.");
+	log_abc("Restoring state.");
 	State &s = mStateStack.top(0);
 	s.to_debug_string();
 //	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
@@ -2692,7 +2697,7 @@ Machine::restoreState()
 void
 Machine::saveState()
 {
-	LOG_DEBUG_AVM("Saving state.");
+	log_abc("Saving state.");
 	mStateStack.grow(1);
 	State &s = mStateStack.top(0);
 	s.mStackDepth = mStack.getDownstop();
@@ -2831,7 +2836,7 @@ Machine::find_prop_strict(asName multiname) {
     {
 		as_object* scope_object = mScopeStack.top(i).get();
 		if (!scope_object) {
-			LOG_DEBUG_AVM("Scope object is NULL.");
+			log_abc("Scope object is NULL.");
 			continue;
 		}
 		val = scope_object->getMember(multiname.getGlobalName(),
@@ -2844,7 +2849,7 @@ Machine::find_prop_strict(asName multiname) {
 		}
 	}
 
-	LOG_DEBUG_AVM("Cannot find property in scope stack.  Trying again using as_environment.");
+	log_abc("Cannot find property in scope stack.  Trying again using as_environment.");
 	as_object *target = NULL;
 	as_environment env = as_environment(_vm);
 	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
@@ -2903,7 +2908,7 @@ Machine::print_stack()
 		if (i!=0) ss << " | ";
 		ss << mStack.value(i).toDebugString();
 	}
-	LOG_DEBUG_AVM("%s", ss.str());
+	log_abc("%s", ss.str());
 }
 
 void
@@ -2915,13 +2920,13 @@ Machine::print_scope_stack()
 	for (unsigned int i=0;i<mScopeStack.size();++i) {
 		ss << as_value(mScopeStack.top(i).get()).toDebugString();
 	}
-	LOG_DEBUG_AVM("%s", ss.str());
+	log_abc("%s", ss.str());
 }	
 
 std::auto_ptr<std::vector<as_value> >
 Machine::get_args(unsigned int argc)
 {
-	LOG_DEBUG_AVM("There are %u args",argc);
+	log_abc("There are %u args",argc);
 	std::auto_ptr<std::vector<as_value> > args = 
         std::auto_ptr<std::vector<as_value> >(new std::vector<as_value>);
 	args->resize(argc);

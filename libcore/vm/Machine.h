@@ -28,8 +28,6 @@
 #include "as_environment.h"
 #include "VM.h"
 
-#define LOG_DEBUG_AVM(fmt,...) IF_VERBOSE_ACTION(log_action("AVM2: " fmt, ## __VA_ARGS__));
-
 namespace gnash {
 
 class DisplayObject;
@@ -231,7 +229,7 @@ private:
 		std::vector<as_value> mRegisters;
 		abc_function* mFunction;
 	void to_debug_string(){
-		LOG_DEBUG_AVM("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
+		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
 
 	}
 	};
@@ -274,35 +272,35 @@ private:
 	void clearRegisters(boost::uint32_t maxRegsiters);
 
 	as_value get_register(int index){
-		LOG_DEBUG_AVM("Getting value at a register %d ",index);
+		log_abc("Getting value at a register %d ",index);
 		return mRegisters[index];
 	}
 
 	void push_stack(as_value object){
-		LOG_DEBUG_AVM("Pushing value %s onto stack.",object.toDebugString());
+		log_abc("Pushing value %s onto stack.",object.toDebugString());
 		mStack.push(object);
 	}
 
 	as_value pop_stack(){
 		as_value value = mStack.pop();
-		LOG_DEBUG_AVM("Poping value %s off the stack.",value.toDebugString());
+		log_abc("Poping value %s off the stack.",value.toDebugString());
 		return value;
 	}
 
 	void push_scope_stack(as_value object){
 		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
 		assert(scopeObj.get());
-		LOG_DEBUG_AVM("Pushing value %s onto scope stack.",object.toDebugString());
+		log_abc("Pushing value %s onto scope stack.",object.toDebugString());
 		mScopeStack.push(scopeObj);
 		print_scope_stack();
 	}
 
 	boost::intrusive_ptr<as_object> pop_scope_stack(){
-		LOG_DEBUG_AVM("Poping value off the scope stack.  There will be %u items left.",mScopeStack.size()-1);
+		log_abc("Poping value off the scope stack.  There will be %u items left.",mScopeStack.size()-1);
 		return mScopeStack.pop();
 	}
 	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth){
-		LOG_DEBUG_AVM("Geting value from scope stack %u from the bottom.",depth | 0x0);
+		log_abc("Geting value from scope stack %u from the bottom.",depth | 0x0);
 		return mScopeStack.value(depth);
 	}
 
@@ -337,4 +335,4 @@ private:
 };
 
 } // namespace gnash
-#endif /* GNASH_MACHINE_H */
+#endif 

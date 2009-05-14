@@ -36,10 +36,10 @@ abc_function::abc_function(asMethod *methodInfo, Machine* machine)
 as_value
 abc_function::operator()(const fn_call& fn)
 {
-	LOG_DEBUG_AVM("Calling an abc_function id=%u.",
+	log_abc("Calling an abc_function id=%u.",
             mMethodInfo->methodID());
 	as_value val = mMachine->executeFunction(mMethodInfo,fn);
-	LOG_DEBUG_AVM("Done calling abc_function id=%u value=%s",
+	log_abc("Done calling abc_function id=%u value=%s",
             mMethodInfo->methodID(),val.toDebugString());
 	return val;
 
