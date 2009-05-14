@@ -65,7 +65,6 @@ noinst_HEADERS = \
 
 if ENABLE_AVM2
 noinst_HEADERS += \
-	Namespace.h \
 	abc_block.h
 endif
 
