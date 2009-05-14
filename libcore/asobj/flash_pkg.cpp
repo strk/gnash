@@ -28,6 +28,8 @@
 #include "flash/geom_pkg.h"
 #include "flash/net_pkg.h"
 #include "flash/text_pkg.h"
+#include "flash/utils_pkg.h"
+#include "flash/events_pkg.h"
 
 namespace gnash {
 
@@ -46,7 +48,8 @@ get_flash_package(const fn_call& /*fn*/)
 	flash_geom_package_init(*pkg);
 	flash_net_package_init(*pkg);
 	flash_text_package_init(*pkg);
-
+	flash_utils_package_init(*pkg);
+	flash_events_package_init(*pkg);
 	return pkg;
 }
 

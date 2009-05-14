@@ -233,6 +233,7 @@ DSOEXPORT void processLog_security(const boost::format& fmt);
 DSOEXPORT void processLog_swferror(const boost::format& fmt);
 DSOEXPORT void processLog_amferror(const boost::format& fmt);
 DSOEXPORT void processLog_aserror(const boost::format& fmt);
+DSOEXPORT void processLog_abc(const boost::format& fmt);
 
 /// This heap of steaming preprocessor code magically converts
 /// printf-style statements into boost::format messages using templates.
@@ -250,7 +251,7 @@ DSOEXPORT void processLog_aserror(const boost::format& fmt);
 /// the code. Append the name to log_ to call the function, e.g. 
 /// log_error, log_unimpl.
 #define LOG_TYPES (error) (debug) (unimpl) (aserror) (swferror) \
-    (amferror) (security) (action) (parse) (trace)
+    (amferror) (security) (action) (parse) (trace) (abc)
 
 /// This actually creates the template functions using the TOKENIZE
 /// functions above. The templates look like this:

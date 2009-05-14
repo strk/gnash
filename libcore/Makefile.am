@@ -47,6 +47,7 @@ AM_CPPFLAGS = \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
 
+
 libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \
 	Property.cpp \
@@ -57,7 +58,6 @@ libgnashcore_la_SOURCES = \
 	as_function.cpp	\
 	as_object.cpp \
 	as_value.cpp \
-	asClass.cpp \
 	DisplayObject.cpp \
 	CharacterProxy.cpp \
 	cxform.cpp \
@@ -121,8 +121,17 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	Timers.cpp \
 	RGBA.cpp 	\
+	asClass.cpp \
+	asNamespace.cpp \
 	$(FREETYPE_SOURCES) \
 	$(NULL)
+
+if ENABLE_AVM2
+libgnashcore_la_SOURCES += \
+	abc_function.cpp \
+	asMethod.cpp
+	$(NULL)
+endif
 
 noinst_HEADERS = \
 	Property.h \
@@ -139,7 +148,6 @@ noinst_HEADERS = \
 	as_object.h \
 	as_prop_flags.h	\
 	as_value.h \
-	asClass.h \
 	Bitmap.h \
 	BitmapInfo.h \
 	BitmapMovie.h \
@@ -223,7 +231,18 @@ noinst_HEADERS = \
 	Timers.h \
 	RGBA.h	\
 	Video.h \
+	asClass.h \
+	asNamespace.h \
 	$(NULL)
+
+if ENABLE_AVM2
+noinst_HEADERS += \
+	swf/DoABCTag.h \
+	abc_function.h \
+	asMethod.h \
+	asException.h \
+	asBoundValues.h
+endif
 
 libgnashcore_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \

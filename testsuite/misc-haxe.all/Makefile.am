@@ -20,10 +20,12 @@ AUTOMAKE_OPTIONS = dejagnu
 
 # These will get executed and parsed for test output
 SANE_ASTESTS = \
+	Hello.hx \
+	AddChild.hx \
 	$(NULL)
+
 # These ones are the ones for which consistency check fail 
 BOGUS_ASTESTS = \
-	Hello.hx \
 	$(NULL)
 
 ASTESTS = $(SANE_ASTESTS) $(BOGUS_ASTESTS)
@@ -42,10 +44,15 @@ $(ASTESTS_OUT) : Dejagnu.hx check.as
 
 
 TEST_DRIVERS = ../simple.exp
+
 TEST_CASES = \
-	sanetests-runner \
-	bogustests-runner \
 	$(NULL)
+
+if ENABLE_AVM2
+TEST_CASES += \
+	sanetests-runner \
+	bogustests-runner
+endif
 
 sanetests-runner: $(srcdir)/../generic-testrunner.sh $(SANE_ASTESTS_OUT) Makefile
 	sh $< -c __END_OF_TEST__ -r 50 $(top_builddir) $(SANE_ASTESTS_OUT) > $@

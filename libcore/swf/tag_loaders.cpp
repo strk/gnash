@@ -44,15 +44,12 @@
 #include "GnashException.h"
 #include "swf/DefineVideoStreamTag.h"
 #include "sound_definition.h"
-#include "abc_block.h"
 #include "SoundInfo.h"
-#include "gnash.h" // FileType enum
+#include "gnash.h" 
 #include "MediaHandler.h"
 #include "SimpleBuffer.h"
 #include "sound_handler.h"
 #include "ExportableResource.h"
-
-// TODO: pass the render handler with RunInfo and use that.
 #include "render.h"
 
 #ifdef HAVE_ZLIB_H
@@ -1323,40 +1320,22 @@ reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 }
 
 void
-abc_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
-        const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DOABC
-        || tag == SWF::DOABCDEFINE); // 72 or 82
-
-    abc_block a;
-
-    if (tag == SWF::DOABCDEFINE)
-    {
-
-        // Skip the 'flags' until they are actually used.
-        in.ensureBytes(4);
-        static_cast<void> (in.read_u32());
-        std::string name;
-        in.read_string(name);
-    }
-
-    //TODO: Move this to execution time so that as_object can be used.
-    // bool success = a.read(in);
-
-    log_unimpl(_("%s tag parsed but not yet used"),
-            tag == SWF::DOABC ? "DOABC" : "DOABCDEFINE");
-}
-
-void
-define_scene_frame_label_loader(SWFStream& /*in*/, TagType tag,
+define_scene_frame_label_loader(SWFStream& in, TagType tag,
         movie_definition& /*m*/, const RunInfo& /*r*/)
 {
     assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
 
-    log_unimpl(_("%s tag parsed but not yet used"), 
-            "DEFINESCENEANDFRAMELABELDATA");
+    in.ensureBytes(4);
+
+    boost::uint32_t scene_count = in.read_u32();
+    std::stringstream ss;
+    ss << "Scene count is " << scene_count << ".\n";
+
+    log_debug("%s", ss.str());
+
+    log_unimpl(_("%s tag parsed but not yet used"), "DEFINESCENEANDFRAMELABELDATA");
 }
+
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF

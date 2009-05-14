@@ -57,6 +57,7 @@ libgnashasobjs_la_SOURCES = \
 	Date_as.cpp \
 	Error_as.cpp \
 	Global.cpp \
+	int_as.cpp \
 	Key_as.cpp	\
 	LoadVars_as.cpp \
 	LocalConnection_as.cpp\
@@ -82,6 +83,8 @@ libgnashasobjs_la_SOURCES = \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
 	flash/display_pkg.cpp \
+	flash/events/EventDispatcher_as.cpp \
+	flash/events_pkg.cpp \
 	flash/external/ExternalInterface_as.cpp \
 	flash/external_pkg.cpp \
         flash/filters/BevelFilter_as.cpp \
@@ -106,7 +109,9 @@ libgnashasobjs_la_SOURCES = \
 	flash/net_pkg.cpp \
 	flash_pkg.cpp \
 	flash/text_pkg.cpp \
+	flash/text/TextFieldAutoSize_as.cpp \
 	flash/text/TextRenderer_as.cpp \
+	flash/utils_pkg.cpp \
 	LoadableObject.cpp \
 	$(NULL)
 
@@ -124,6 +129,7 @@ noinst_HEADERS = \
 	Error_as.h	\
 	Math_as.h	\
 	Global.h\
+	int_as.h \
 	Key_as.h \
 	LoadVars_as.h \
 	LocalConnection_as.h\
@@ -148,6 +154,8 @@ noinst_HEADERS = \
 	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
 	flash/display_pkg.h \
+	flash/events/EventDispatcher_as.h \
+	flash/events_pkg.h \
 	flash/external/ExternalInterface_as.h \
 	flash/external_pkg.h \
         flash/filters/BevelFilter_as.h \
@@ -172,7 +180,9 @@ noinst_HEADERS = \
 	flash/net_pkg.h \
 	flash_pkg.h \
 	flash/text_pkg.h \
+	flash/text/TextFieldAutoSize_as.h \
 	flash/text/TextRenderer_as.h \
+	flash/utils_pkg.h \
 	LoadableObject.h \
 	$(NULL)
 

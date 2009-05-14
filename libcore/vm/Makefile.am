@@ -40,19 +40,22 @@ AM_CPPFLAGS = \
 
 libgnashvm_la_SOURCES = \
 	ASHandlers.cpp \
-	Machine.cpp \
 	ActionExec.cpp \
 	VM.cpp		\
 	action.cpp \
 	CallStack.cpp \
 	$(NULL)
 
+if ENABLE_AVM2
+libgnashvm_la_SOURCES += \
+	CodeStream.cpp \
+	Machine.cpp
+	$(NULL)
+endif
+
 noinst_HEADERS =		\
 	ASHandlers.h		\
-	CodeStream.h		\
 	SafeStack.h			\
-	Machine.h			\
-	asName.h			\
 	ActionExec.h		\
 	ExecutableCode.h	\
 	VM.h			\
@@ -61,6 +64,14 @@ noinst_HEADERS =		\
 	CallStack.h \
 	with_stack_entry.h 	\
 	$(NULL)
+	
+if ENABLE_AVM2
+noinst_HEADERS += \
+	asName.h			\
+	CodeStream.h		\
+	Machine.h \
+	$(NULL)
+endif
 
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 

@@ -166,6 +166,8 @@ public:
 	Property* findProperty(string_table::key name, string_table::key nsname,
 		as_object **owner = NULL);
 
+//	Property* findProperty(
+
 	/// \brief
 	/// Return a reference to the Virtual Machine that created
 	/// this object. 
@@ -1048,6 +1050,40 @@ protected:
 	///
 	virtual void enumerateNonProperties(as_environment&) const {}
 
+	///Get a member value at a given slot.
+	//
+	///This is a wrapper around get_member_default.
+	/// @param order
+	/// The slot index of the property.
+	///
+	/// @param val
+	/// The as_value to store a found variable's value in.
+	///
+	/// @return true if a member exists at the given slot, 
+	/// and the member's value is successfully retrieved,
+	/// false otherwise.
+	bool get_member_slot(int order, as_value* val);
+
+	///Set a member value at a given slot.
+	//
+	///This is a wrapper around set_member_default.
+	/// @param order
+	///
+	/// The slot index of the property.
+	/// @param val
+	///	Value to assign to the named property.
+	///
+	/// @param ifFound
+	///	If true, don't create a new member, but only update
+	///	an existing one.
+	///
+	/// @return true if the member exists at the given slot, 
+	/// false otherwise.
+	///	NOTE: the return doesn't tell if the member exists after
+	///	      the call, as watch triggers might have deleted it
+	///	      after setting.
+	///
+	bool set_member_slot(int order, const as_value& val, bool ifFound = false);
 
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, override from GcResource.

@@ -46,6 +46,11 @@ check_PROGRAMS = \
 	SafeStackTest \
 	$(NULL)
 
+if ENABLE_AVM2
+check_PROGRAMS += \
+	CodeStreamTest
+endif
+
 CLEANFILES = \
 	testrun.sum \
 	testrun.log \
@@ -116,6 +121,11 @@ ClassSizes_LDADD = \
 
 SafeStackTest_SOURCES = SafeStackTest.cpp
 SafeStackTest_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+
+CodeStreamTest_SOURCES = CodeStreamTest.cpp
+CodeStreamTest_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 

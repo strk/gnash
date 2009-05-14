@@ -637,6 +637,7 @@ as_environment::find_object(const std::string& path,
 #ifdef DEBUG_TARGET_FINDING 
             log_debug(_("Path is %s, returning whatever we were up to"), path);
 #endif
+
             return env;
         }
 

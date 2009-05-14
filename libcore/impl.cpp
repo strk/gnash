@@ -61,6 +61,11 @@
 #include "GC.h"
 #endif
 
+#ifdef ENABLE_AVM2
+# include "SymbolClassTag.h"
+# include "DoABCTag.h"
+#endif
+
 #include <string>
 #include <map>
 #include <memory> // for auto_ptr
@@ -209,34 +214,50 @@ static void ensure_loaders_registered()
     // TODO: Fix this, but probably not critical.
     register_tag_loader(SWF::SETTABINDEX, fixme_loader); //66 
 
-    // TODO: Alexis reference says these are 83, 84. The 67,68 comes from Tamarin.
-    // Figure out which one is correct (possibly both are).
-    register_tag_loader(SWF::DEFINESHAPE4_, DefineShapeTag::loader); // 67
+    // TODO: Alexis reference says these are 83, 84. The 67, 68 comes from
+    // Tamarin. Figure out which one is correct (possibly both are).
+    // 67
+    register_tag_loader(SWF::DEFINESHAPE4_, DefineShapeTag::loader);
     // 68
     register_tag_loader(SWF::DEFINEMORPHSHAPE2_, DefineMorphShapeTag::loader);
     // 69
     register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader);
-    register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader); // 70
-    register_tag_loader(SWF::IMPORTASSETS2, import_loader); // 71
-
-    register_tag_loader(SWF::DOABC, abc_loader); // 72 -- AS3 codeblock.
-    register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
-
-    register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader); // 74
+    // 70
+    register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader);
+    // 71
+    register_tag_loader(SWF::IMPORTASSETS2, import_loader);
+    // 73
+    register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader);
+    // 74
+    register_tag_loader(SWF::CSMTEXTSETTINGS, CSMTextSettingsTag::loader);
     // 75
     register_tag_loader(SWF::DEFINEFONT3, DefineFontTag::loader);
-    register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 
-    register_tag_loader(SWF::METADATA, metadata_loader); // 77
-    register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
-    register_tag_loader(SWF::DOABCDEFINE, abc_loader); // 82 -- AS3 codeblock.
-    register_tag_loader(SWF::DEFINESHAPE4, DefineShapeTag::loader); // 83
+    // 77
+    register_tag_loader(SWF::METADATA, metadata_loader);
+    // 78
+    register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader);
+    // 83
+    register_tag_loader(SWF::DEFINESHAPE4, DefineShapeTag::loader);
     // 84
     register_tag_loader(SWF::DEFINEMORPHSHAPE2, DefineMorphShapeTag::loader);
-    register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,define_scene_frame_label_loader); //86
     // 88
     register_tag_loader(SWF::DEFINEFONTNAME, DefineFontNameTag::loader);
+    // 777
+    register_tag_loader(SWF::REFLEX, reflex_loader);
+    
+    // The following tags are AVM2 only.
 
-    register_tag_loader(SWF::REFLEX, reflex_loader); // 777
+#ifdef ENABLE_AVM2
+    // 72 -- AS3 codeblock.
+    register_tag_loader(SWF::DOABC, DoABCTag::doABCLoader); 
+    // 76
+    register_tag_loader(SWF::SYMBOLCLASS, SymbolClassTag::loader);
+    // 82
+    register_tag_loader(SWF::DOABCDEFINE, DoABCTag::doABCLoader);
+    // 86
+    register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,
+            define_scene_frame_label_loader);
+#endif
 }
 
 // Create a movie_definition from an image format stream

@@ -24,9 +24,12 @@
 #include "Array_as.h"
 #include "abc_block.h"
 #include "fn_call.h"
+#include "abc_function.h"
+#include "action.h"
+#include "Object.h"
+#include "VM.h"
 
 namespace gnash {
-
 /// The type of exceptions thrown by ActionScript.
 class ASException
 {
@@ -48,65 +51,74 @@ class ASTypeError : public ASException
 {
 public:
 	ASTypeError() : ASException()
-	{/**/}
+	{}
 };
 
 // Functions for getting pool constants.
-static inline std::string& pool_string(boost::uint32_t index, abc_block *pool)
+static inline const std::string&
+pool_string(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mStringPool.at(index);
+	if (!pool) throw ASException();
+	return pool->stringPoolAt(index);
 }
 
-static inline int pool_int(boost::uint32_t index, abc_block *pool)
+static inline int
+pool_int(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mIntegerPool.at(index);
+	if (!pool) throw ASException();
+	return pool->integerPoolAt(index);
 }
 
-static inline unsigned int pool_uint(boost::uint32_t index, abc_block *pool)
+static inline unsigned int
+pool_uint(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mUIntegerPool.at(index);
+	if (!pool) throw ASException();
+	return pool->uIntegerPoolAt(index);
 }
 
-static inline double pool_double(boost::uint32_t index, abc_block *pool)
+static inline double
+pool_double(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mDoublePool.at(index);
+	if (!pool) throw ASException();
+	log_abc("Getting double from pool at index %u",index);
+	return pool->doublePoolAt(index);
 }
 
-static inline asNamespace* pool_namespace(boost::uint32_t index, abc_block *pool)
+static inline asNamespace*
+pool_namespace(boost::uint32_t index, abc_block *pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mNamespacePool.at(index);
+	if (!pool) throw ASException();
+	return pool->namespacePoolAt(index);
 }
 
-static inline asMethod* pool_method(boost::uint32_t index, abc_block* pool)
+static inline asMethod*
+pool_method(boost::uint32_t index, abc_block* pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mMethods.at(index);
+	if (!pool) throw ASException();
+	return pool->methodPoolAt(index);
 }
 
-static inline asClass* pool_class(boost::uint32_t index, abc_block* pool)
+static inline asClass*
+pool_class(boost::uint32_t index, abc_block* pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mClasses.at(index);
+	if (!pool) throw ASException();
+	return pool->classPoolAt(index);
 }
 
 // Don't make this a reference or you'll taint the pool.
-static inline asName pool_name(boost::uint32_t index, abc_block* pool)
+static inline asName
+pool_name(boost::uint32_t index, abc_block* pool)
 {
-	if (!pool)
-		throw ASException();
-	return pool->mMultinamePool.at(index);
+	if (!pool) throw ASException();
+	asName multiname = pool->multinamePoolAt(index);
+#if 0
+    log_abc("Searching multiname pool for property id=%u abc name=%u "
+            "global name = %u abc string=%s flags=0x%X name_space=%u",
+            index, multiname.getABCName(), multiname.getGlobalName(),
+            pool->mStringPool[multiname.getABCName()],multiname.mFlags | 0x0,
+            multiname.getNamespace()->getURI());
+#endif
+	return multiname;
 }
 
 /// ENSURE_NUMBER makes sure that the given argument is a number,
@@ -130,11 +142,15 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 
 /// ENSURE_OBJECT will throw an exception if the argument isn't an
 /// object. It's a macro to match with the other ENSURE_ macros.
+#ifdef PRETEND
 #define ENSURE_OBJECT(vte)													\
 {																			\
 	if (!vte.is_object())													\
 		throw ASException();												\
 }												   /* end of ENSURE_OBJECT */
+#else
+#define ENSURE_OBJECT(vte)
+#endif
 
 /// ENSURE_STRING makes sure that the given argument is a string,
 /// calling the toString method if necessary -- it's a macro so that
@@ -189,40 +205,12 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 	} 																		\
 }												/* end of ABSTRACT_COMPARE */
 
-#define ABSTRACT_EQUALITY(st, ev1, ev2, strictness_on)						\
-{																			\
-	bool *store = &st;														\
-	as_value &a = ev1; /* Don't call ev1 multiple times */					\
-	as_value &b = ev2; /* Don't call ev2 multiple times */					\
-	if (a.is_object() && b.is_object())										\
-		*store = a.to_object() == b.to_object();							\
-	else if (a.is_object() || b.is_object())								\
-		*store = false;														\
-	else if (a.ptype() != b.ptype())										\
-	{																		\
-		if (!strictness_on && (a.is_undefined() || b.is_undefined()) && 	\
-			(a.is_null() || b.is_null()))									\
-			*store = true;													\
-		else																\
-			*store = false;													\
-	}																		\
-	else if (a.is_number())													\
-	{																		\
-		double ad = a.to_number(); double bd = b.to_number();				\
-		if (isNaN(ad) || isNaN(bd))											\
-			*store = false;													\
-		else if (isInf(ad) && ad > 0)										\
-			*store = (isInf(bd) && bd > 0);									\
-		else if (isInf(ad) && ad < 0)										\
-			*store = (isInf(bd) && bd < 0);									\
-		else																\
-			*store = (ad == bd);											\
-	}																		\
-	else if (a.is_bool() && b.is_bool())									\
-		*store = a.to_bool() == b.to_bool();								\
-	else																	\
-		*store = false;														\
-}											   /* end of ABSTRACT_EQUALITY */
+inline bool abstractEquality(const as_value& a, const as_value& b,
+       bool strictness_on)
+{
+    if ( strictness_on ) return a.strictly_equals(b);
+    else return a.equals(b);
+}								
 
 #define ABSTRACT_TYPELATE(st, checkval, matchval)							\
 {																			\
@@ -257,23 +245,27 @@ static inline asName pool_name(boost::uint32_t index, abc_block* pool)
 void
 Machine::execute()
 {
-	boost::uint8_t opcode;
-
 	for ( ; ; )
 	{
-		std::size_t opStart = mStream->tell();
-
-	if (mIsAS3)
+		std::size_t opStart = mStream->tellg();
+//		std::size_t opStart = mStreamStack.top(0)->tell();
+	if (1/*mIsAS3*/)
 	{
-	switch ((opcode = mStream->read_as3op())) // Assignment intentional
+    SWF::abc_action_type opcode = (SWF::abc_action_type)mStream->read_as3op();
+	
+	log_abc("** Executing opcode: %s (%d) **", opcode, (int)opcode);
+//	continue;
+	switch ((opcode /*= mStream->read_as3op()*/)) // Assignment intentional
 	{
 	default:
 		throw ASException();
-	case 0:
+		break;
+	case SWF::ABC_ACTION_END:
 	{
 // This is not actually an opcode -- it occurs when the stream is
 // empty. We may need to return from a function, or we may be done.
-		break;
+//		break;
+		return;
 	}
 /// 0x01 ABC_ACTION_BKPT
 /// Do: Enter the debugger if one has been invoked.
@@ -320,7 +312,7 @@ Machine::execute()
 		// If we don't have a super, throw.
 		if (!super)
 			throw ASReferenceError();
-		Property *b = super->findProperty(a.getName(), 
+		Property *b = super->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		// The object is on the top already.
 		pushGet(super, mStack.top(0), b);
@@ -347,7 +339,7 @@ Machine::execute()
 		as_object* super = mStack.pop().to_object()->get_prototype().get();
 		if (!super)
 			throw ASReferenceError();
-		Property* b = super->findProperty(a.getName(), 
+		Property* b = super->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		mStack.push(vobj);
 		pushSet(super, vobj, b);
@@ -361,7 +353,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_DXNS:
 	{
 		boost::uint32_t soffset = mStream->read_V32();
-		std::string& uri = pool_string(soffset, mPoolObject);
+		const std::string& uri = pool_string(soffset, mPoolObject);
 		mDefaultXMLNamespace = mCH->anonNamespace(mST.find(uri));
 		break;
 	}
@@ -387,7 +379,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_KILL:
 	{
 		boost::uint32_t regNum = mStream->read_V32();
-		mFrame.value(regNum).set_undefined();
+		mRegisters[regNum].set_undefined();
 		break;
 	}
 /// 0x09 ABC_ACTION_LABEL
@@ -466,7 +458,10 @@ Machine::execute()
 /// Equivalent: ACTION_BRANCHALWAYS
 	case SWF::ABC_ACTION_JUMP:
 	{
-		JUMPIF(true);
+		boost::int32_t bytes = mStream->read_S24();
+		log_abc("Jumping %d bytes.",bytes);
+		mStream->seekBy(bytes);
+
 		break;
 	}
 /// 0x11 ABC_ACTION_IFTRUE
@@ -479,9 +474,14 @@ Machine::execute()
 /// Equivalent: ACTION_BRANCHIFTRUE
 	case SWF::ABC_ACTION_IFTRUE:
 	{
-		bool truth = mStack.top(0).to_bool();
-		mStack.drop(1);
-		JUMPIF(truth);
+		boost::int32_t bytes = mStream->read_S24();
+		if (pop_stack().to_bool()) {
+			log_abc("Jumping %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			log_abc("Would have jumpied %d bytes.", bytes);
+		}
 		break;
 	}
 /// 0x12 ABC_ACTION_IFFALSE
@@ -493,9 +493,13 @@ Machine::execute()
 /// Do: If a is 'false', move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFFALSE:
 	{
-		bool truth = mStack.top(0).to_bool();
-		mStack.drop(1);
-		JUMPIF(!truth);
+		boost::int32_t bytes = mStream->read_S24();
+		bool truth = pop_stack().to_bool();
+		if (!truth) {
+			log_abc("Jumping...");
+			log_abc("%d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
 		break;
 	}
 /// 0x13 ABC_ACTION_IFEQ
@@ -508,10 +512,16 @@ Machine::execute()
 /// Do: If a == b (weakly), move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFEQ:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), false);
-		mStack.drop(2);
-		JUMPIF(truth);
+		boost::int32_t bytes = mStream->read_S24();
+		as_value b = pop_stack();
+		as_value a = pop_stack();
+		if (a.equals(b)) {
+			log_abc("Jumping %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			log_abc("Would have jumped %d bytes", bytes);
+		}
 		break;
 	}
 /// 0x14 ABC_ACTION_IFNE
@@ -524,10 +534,16 @@ Machine::execute()
 /// Do: If a != b (weakly), move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFNE:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), false);
-		mStack.drop(2);
-		JUMPIF(!truth);
+		as_value a = pop_stack();
+		as_value b = pop_stack();
+		boost::int32_t bytes = mStream->read_S24();
+		if (!a.equals(b)) {
+			log_abc("Jumping... %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			log_abc("Would have jumped %d bytes",bytes);
+		}
 		break;
 	}
 /// 0x15 ABC_ACTION_IFLT
@@ -540,10 +556,17 @@ Machine::execute()
 /// Do: If a < b move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFLT:
 	{
-		bool truth;
-		ABSTRACT_COMPARE(truth, mStack.top(1), mStack.top(0), false);
-		mStack.drop(2);
-		JUMPIF(truth); // truth is: a < b
+		as_value b = pop_stack();
+		as_value a = pop_stack();
+		boost::int32_t bytes = mStream->read_S24();
+		bool jump = a.newLessThan(b).to_bool();
+		if (jump) {
+			log_abc("Jumping... %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			log_abc("Would have jumped %d bytes",bytes);
+		}
 		break;
 	}
 /// 0x16 ABC_ACTION_IFLE
@@ -572,11 +595,18 @@ Machine::execute()
 /// Do: If a > b move by jump in stream, as ABC_ACTION_JUMP does.
 	case SWF::ABC_ACTION_IFGT:
 	{
+		boost::int32_t bytes = mStream->read_S24();
 		bool truth;
 		// If b < a, then a > b, with undefined as false
 		ABSTRACT_COMPARE(truth, mStack.top(0), mStack.top(1), false);
 		mStack.drop(2);
-		JUMPIF(truth); // truth is: b < a
+		if (truth) {
+			log_abc("Jumping %d bytes.",bytes);
+			mStream->seekBy(bytes);
+		}
+		else{
+			log_abc("Would have jumped %d bytes.",bytes);
+		}
 		break;
 	}
 /// 0x18 ABC_ACTION_IFGE
@@ -605,8 +635,7 @@ Machine::execute()
 /// Do: If a == b (strictly), move by jump in stream, as ABC_ACTION_JUMP
 	case SWF::ABC_ACTION_IFSTRICTEQ:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), true);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), true);
 		mStack.drop(2);
 		JUMPIF(truth);
 		break;
@@ -621,8 +650,7 @@ Machine::execute()
 /// Do: If a != b (strongly), move by jump in stream, as ABC_ACTION_JUMP
 	case SWF::ABC_ACTION_IFSTRICTNE:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), true);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), true);
 		mStack.drop(2);
 		JUMPIF(!truth);
 		break;
@@ -638,7 +666,7 @@ Machine::execute()
 ///  Otherwise, move by cases[index] - 1 from stream position on op entry.
 	case SWF::ABC_ACTION_LOOKUPSWITCH:
 	{
-		std::size_t npos = mStream->tell();
+		std::size_t npos = mStream->tellg();
 		if (!mStack.top(0).is_number())
 			throw ASException();
 
@@ -662,8 +690,20 @@ Machine::execute()
 		}
 		break;
 	}
-/// 0x1C ABC_ACTION_PUSHWITH
 /// 0x30 ABC_ACTION_PUSHSCOPE
+	case SWF::ABC_ACTION_PUSHSCOPE:
+	{
+		as_value scope_value = pop_stack();
+		if (!scope_value.to_object().get()) {
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't push a null value onto the scope stack (%s)."), scope_value);
+			);
+			scope_value = as_value(new as_object());
+		}	
+		push_scope_stack(scope_value);
+		break;
+	}
+/// 0x1C ABC_ACTION_PUSHWITH
 /// Stack In:
 ///  scope -- a scope
 /// Stack Out:
@@ -673,25 +713,25 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHWITH:
 	{
 		// A scope object is just a regular object.
-		ENSURE_OBJECT(mStack.top(0));
-		as_object *a = mStack.top(0).to_object().get();
-
-		if (!mScopeStack.empty())
-			a->set_prototype(mScopeStack.top(0).mScope);
-		else
-			a->set_prototype(NULL);
-
-		if (opcode == SWF::ABC_ACTION_PUSHWITH &&
-				mScopeStack.totalSize() == mScopeStack.size())
-		{
-			mScopeStack.push(Scope(0, a));
-		}
-		else
-		{
-			mScopeStack.push(Scope(mScopeStack.size(), a));
-		}
-		mCurrentScope = a;
-		mStack.drop(1);
+// 		ENSURE_OBJECT(mStack.top(0));
+// 		as_object *a = mStack.top(0).to_object().get();
+// 
+// 		if (!mScopeStack.empty())
+// 			a->set_prototype(mScopeStack.top(0).mScope);
+// 		else
+// 			a->set_prototype(NULL);
+// 
+// 		if (opcode == SWF::ABC_ACTION_PUSHWITH &&
+// 				mScopeStack.totalSize() == mScopeStack.size())
+// 		{
+// 			mScopeStack.push(Scope(0, a));
+// 		}
+// 		else
+// 		{
+// 			mScopeStack.push(Scope(mScopeStack.size(), a));
+// 		}
+// 		mCurrentScope = a;
+// 		mStack.drop(1);
 		break;
 	}
 /// 0x1D ABC_ACTION_POPSCOPE
@@ -699,12 +739,14 @@ Machine::execute()
 ///  shallower than the base's depth.
 	case SWF::ABC_ACTION_POPSCOPE:
 	{
-		Scope &s = mScopeStack.pop();
-		mScopeStack.setDownstop(s.mHeightAfterPop);
-		if (mScopeStack.empty())
-			mCurrentScope = NULL;
-		else
-			mCurrentScope = mScopeStack.top(0).mScope;
+//		LOG_AVM_UNIMPLEMENTED();
+		pop_scope_stack();
+// 		Scope &s = mScopeStack.pop();
+// 		mScopeStack.setDownstop(s.mHeightAfterPop);
+// 		if (mScopeStack.empty())
+// 			mCurrentScope = NULL;
+// 		else
+// 			mCurrentScope = mScopeStack.top(0).mScope;
 		break;
 	}
 /// 0x1E ABC_ACTION_NEXTNAME
@@ -751,8 +793,9 @@ Machine::execute()
 ///  n -- a Null object.
 	case SWF::ABC_ACTION_PUSHNULL:
 	{
-		mStack.grow(1);
-		mStack.top(0).set_null();
+		as_value value = as_value();
+		value.set_null();
+		push_stack(value);
 		break;
 	}
 /// 0x21 ABC_ACTION_PUSHUNDEFINED
@@ -793,9 +836,8 @@ Machine::execute()
 ///  byte -- as a raw byte
 	case SWF::ABC_ACTION_PUSHBYTE:
 	{
-        boost::int8_t b = mStream->read_s8();
-		mStack.grow(1);
-		mStack.top(0) = b;
+		int8_t b = mStream->read_s8();
+		push_stack(as_value(b));
 		break;
 	}
 /// 0x25 ABC_ACTION_PUSHSHORT
@@ -805,8 +847,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_PUSHSHORT:
 	{
 		signed short s = static_cast<signed short>(mStream->read_V32());
-		mStack.grow(1);
-		mStack.top(0) = s;
+		push_stack(as_value(s));
 		break;
 	}
 /// 0x26 ABC_ACTION_PUSHTRUE
@@ -823,8 +864,7 @@ Machine::execute()
 ///  false -- the False object
 	case SWF::ABC_ACTION_PUSHFALSE:
 	{
-		mStack.grow(1);
-		mStack.top(0).set_bool(false);
+		push_stack(as_value(false));
 		break;
 	}
 /// 0x28 ABC_ACTION_PUSHNAN
@@ -843,7 +883,7 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_POP:
 	{
-		mStack.drop(1);
+		pop_stack();
 		break;
 	}
 /// 0x2A ABC_ACTION_DUP
@@ -878,8 +918,7 @@ Machine::execute()
 ///  value -- String object from string_pool[index]
 	case SWF::ABC_ACTION_PUSHSTRING:
 	{
-		mStack.grow(1);
-		mStack.top(0) = pool_string(mStream->read_V32(), mPoolObject);
+		push_stack(as_value(pool_string(mStream->read_V32(), mPoolObject)));
 		break;
 	}
 /// 0x2D ABC_ACTION_PUSHINT
@@ -888,8 +927,7 @@ Machine::execute()
 ///  value -- Integer object from integer_pool[index]
 	case SWF::ABC_ACTION_PUSHINT:
 	{
-		mStack.grow(1);
-		mStack.top(0) = pool_int(mStream->read_V32(), mPoolObject);
+		push_stack(pool_int(mStream->read_V32(), mPoolObject));
 		break;
 	}
 /// 0x2E ABC_ACTION_PUSHUINT
@@ -908,8 +946,7 @@ Machine::execute()
 ///  value -- Double object from double_pool[index]
 	case SWF::ABC_ACTION_PUSHDOUBLE:
 	{
-		mStack.grow(1);
-		mStack.top(0) = pool_double(mStream->read_V32(), mPoolObject);
+		push_stack(as_value(pool_double(mStream->read_V32(), mPoolObject)));
 		break;
 	}
 /// 0x31 ABC_ACTION_PUSHNAMESPACE
@@ -937,29 +974,33 @@ Machine::execute()
 	{
 		boost::int32_t oindex = mStream->read_V32();
 		boost::int32_t iindex = mStream->read_V32();
-		as_value &objv = mFrame.value(oindex);
-		as_value &indexv = mFrame.value(iindex);
-		ENSURE_OBJECT(objv);
-		ENSURE_NUMBER(indexv);
+		as_value &objv = mRegisters[oindex];
+		as_value &indexv = mRegisters[iindex];
+		log_abc("Index is %u",indexv.to_number());
+//		ENSURE_OBJECT(objv);
+//		ENSURE_NUMBER(indexv);
 		as_object *obj = objv.to_object().get();
 		boost::uint32_t index = indexv.to_number<boost::uint32_t>();
+		log_abc("Object is %s index is %u",objv.toDebugString(),index);
 		as_object *owner = NULL;
 		int next = obj->nextIndex(index, &owner);
-		mStack.grow(1);
+		log_abc("Next index is %d",next);
+//		mStack.grow(1);
 		if (next)
 		{
-			mStack.top(0).set_bool(true);
+//			mStack.top(0).set_bool(true);
+			push_stack(as_value(true));
 			if (owner)
-				mFrame.value(oindex) = owner;
+				mRegisters[oindex] = owner;
 			else
-				mFrame.value(oindex).set_null();
-			mFrame.value(iindex) = next;
+				mRegisters[oindex].set_null();
+			mRegisters[iindex] = next;
 		}
 		else
 		{
-			mStack.top(0).set_bool(false);
-			mFrame.value(oindex).set_null();
-			mFrame.value(iindex) = 0.0;
+			push_stack(as_value(false));
+			mRegisters[oindex].set_null();
+			mRegisters[iindex] = 0.0;
 		}
 		break;
 	}
@@ -971,9 +1012,18 @@ Machine::execute()
 ///  function from this information and bind the current scope.
 	case SWF::ABC_ACTION_NEWFUNCTION:
 	{
-		mStack.grow(1);
-		asMethod *m = pool_method(mStream->read_V32(), mPoolObject);
-		mStack.top(0) = m->construct(mCurrentScope);
+		boost::int32_t method_index = mStream->read_V32();
+		log_abc("Creating new abc_function: method index=%u",method_index);
+		asMethod *m = pool_method(method_index, mPoolObject);
+		abc_function* new_function = m->getPrototype();
+		// TODO: SafeStack contains all the scope objects
+        // in for all functions in the call stack.
+		// We should only copy the relevent scope objects
+        // to the function's scope stacks.
+        // Note: this doesn't copy any values, but rather assigns a pointer
+        // value.
+		new_function->setScopeStack(getScopeStack());
+		push_stack(as_value(new_function));
 		break;
 	}
 /// 0x41 ABC_ACTION_CALL
@@ -1089,7 +1139,7 @@ Machine::execute()
 		as_object *super = mStack.top(argc).to_object()->get_super();
 		if (!super)
 			throw ASReferenceError();
-		Property *b = super->findProperty(a.getName(), 
+		Property *b = super->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		if (!b)
 			throw ASReferenceError();
@@ -1119,13 +1169,56 @@ Machine::execute()
 	case SWF::ABC_ACTION_CALLPROPLEX:
 	case SWF::ABC_ACTION_CALLPROPVOID:
 	{
-		bool lex_only = (opcode == SWF::ABC_ACTION_CALLPROPLEX);
+		as_value result;
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
-		int shift = completeName(a, argc);
+		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
+		//TODO: If multiname is runtime also pop namespace and/or name values.
+        
+        if (a.isRuntime()) {
+            log_unimpl("ABC_ACTION_CALL* with runtime multiname");
+        }
+
+		as_value object_val = pop_stack();
+
+		as_object *object = object_val.to_object().get();
+		if (!object) {
+            IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't call a method of a value that doesn't "
+                    "cast to an object (%s)."),
+                object_val);
+            )
+		}
+		else {
+
+			as_value property = object->getMember(a.getGlobalName(), 0);
+		
+			if (!property.is_undefined() && !property.is_null()) {
+				log_abc("Calling method %s on object %s",
+                        property.toDebugString(),object_val.toDebugString());
+				as_environment env = as_environment(_vm);
+				result = call_method(property,env,object,args);
+
+			}
+			else {
+                IF_VERBOSE_ASCODING_ERRORS(
+				log_aserror(_("Property '%s' of object '%s' is '%s', "
+                        "cannot call as method"),
+                        mPoolObject->stringPoolAt(a.getABCName()),
+                        object_val, property);
+                )
+			}
+
+		}
+        
+        if (opcode == SWF::ABC_ACTION_CALLPROPERTY) {
+            push_stack(result);
+        }
+
+/*		int shift = completeName(a, argc);
 		ENSURE_OBJECT(mStack.top(shift + argc));
 		as_object *obj = mStack.top(argc + shift).to_object().get();
-		Property *b = obj->findProperty(a.getName(), 
+		Property *b = obj->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI());
 		if (!b)
 			throw ASReferenceError();
@@ -1154,17 +1247,27 @@ Machine::execute()
 		if (opcode == SWF::ABC_ACTION_CALLPROPVOID)
 			pushCall(func, obj, mIgnoreReturn, argc, -shift - 1);
 		else
-			pushCall(func, obj, mStack.top(argc + shift), argc, -shift);
+			pushCall(func, obj, mStack.top(argc + shift), argc, -shift);*/
 		break;
 	}
 /// 0x47 ABC_ACTION_RETURNVOID
 /// Do: Return an undefined object up the callstack.
 	case SWF::ABC_ACTION_RETURNVOID:
 	{
+		mStream->seekTo(0);
+		if (mStateStack.size() == 0) {
+			return;
+		}
+		else{
+			restoreState();
+			if (mExitWithReturn) {
+				return;
+			}
+		}
 		// Slot the return.
-		*mGlobalReturn = as_value();
+//		*mGlobalReturn = as_value();
 		// And restore the previous state.
-		restoreState();
+//		restoreState();
 		break;
 	}
 /// 0x48 ABC_ACTION_RETURNVALUE
@@ -1176,10 +1279,10 @@ Machine::execute()
 	case SWF::ABC_ACTION_RETURNVALUE:
 	{
 		// Slot the return.
-		*mGlobalReturn = mStack.top(0);
+		mGlobalReturn = pop_stack();
 		// And restore the previous state.
 		restoreState();
-		break;
+		return;
 	}
 /// 0x49 ABC_ACTION_CONSTRUCTSUPER
 /// Stream: V32 'arg_count'
@@ -1190,48 +1293,75 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
-		// TODO
 		boost::uint32_t argc = mStream->read_V32();
-		ENSURE_OBJECT(mStack.top(argc));
-		as_object *obj = mStack.top(argc).to_object().get();
-		as_object *super = mStack.top(argc).to_object()->get_super();
-		if (!super)
-		{
-			throw ASException();
-			break;
-		}
-		as_function *func = super->get_constructor();
+		log_abc("There are %u arguments.",argc);
+		get_args(argc);
+		//as_object *super = pop_stack().to_object().get()->get_super();
+		//TODO: Actually construct the super.
+		as_object* super = mStack.top(argc).to_object()->get_super();
+ 		if (!super) {
+            log_error("No super found in CONSTRUCTSUPER!");
+            throw ASException();
+        }
+ 		as_function *func = super->get_constructor();
+ 		if (!func) {
+            log_abc("Super(%s) has no constructor in CONSTRUCTSUPER!");
+        }
 		// 'obj' is the 'this' for the call, we ignore the return, there are
 		// argc arguments, and we drop all of the arguments plus 'obj' from
 		// the stack.
-		pushCall(func, obj, mIgnoreReturn, argc, -1);
+		pushCall(func, super, mIgnoreReturn, argc, -1);
+
+        LOG_ONCE(log_unimpl("ABC_ACTION_CONSTRUCTSUPER") );
 		break;
 	}
-/// 0x4A ABC_ACTION_CONSTRUCTPROP
-/// Stream: V32 'name_offset' | V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  [ns [n]] -- Namespace stuff
-///  obj -- the object whose property should be constructed
-/// Stack Out:
-///  value -- the newly constructed prop from obj::(resolve)
-///   'name_offset'(arg1, ..., argN)
+    
+    /// 0x4A ABC_ACTION_CONSTRUCTPROP
+    /// Stream: V32 'name_offset' | V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  [ns [n]] -- Namespace stuff
+    ///  obj -- the object whose property should be constructed
+    /// Stack Out:
+    ///  value -- the newly constructed prop from obj::(resolve)
+    ///   'name_offset'(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCTPROP:
 	{
-		// TODO
+		as_environment env = as_environment(_vm);
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		boost::uint32_t argc = mStream->read_V32();
-		int shift = completeName(a, argc);
-		ENSURE_OBJECT(mStack.top(argc + shift));
-		// We have to move the stack if there was a shift.
-		if (shift)
-		{
-			boost::uint32_t i = argc;
-			while (i--)
-				mStack.top(i + shift) = mStack.top(i);
-			mStack.drop(shift);
+		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
+		as_object* object = pop_stack().to_object().get();
+		if (!object) {
+			//TODO: Should this result in an exeception or an actionscript error?
+			log_abc("Can't constructor property on a null object.  Property not constructed.");
+			push_stack(as_value());
+			break;
 		}
-		// TODO: Finish this (See ECMA spec)
+		//std::string& classname = mPoolObject->mStringPool[a.getABCName()];
+		
+		as_value constructor_val = object->getMember(a.getGlobalName());
+		boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
+		if (constructor) {
+			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
+			push_stack(as_value(newobj));
+		}
+		//TODO: This else clause is needed to construct classes that aren't builtin into gnash.
+		// I don't think this is correct, and I think the problem might be how AVM2 adds
+		// new objects to the Global object.
+		else{
+ 			log_abc("Object %s is not a constructor",constructor_val.toDebugString());
+			if (constructor_val.is_null() || constructor_val.is_undefined()) {
+				log_abc("Constructor is undefined, will not construct property.");
+				push_stack(as_value());
+			}
+			else{
+				as_value val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
+				as_value result = call_method(val,env,constructor_val.to_object().get(),args);
+				push_stack(result);
+			}
+		}
+		
 		break;
 	}
 /// 0x55 ABC_ACTION_NEWOBJECT
@@ -1249,16 +1379,16 @@ Machine::execute()
 /// NB: This builds an object from its properties, it's not a constructor.
 	case SWF::ABC_ACTION_NEWOBJECT:
 	{
-		as_object *obj = new as_object;
+		as_object *obj = new as_object(getObjectInterface());
 		boost::uint32_t argc = mStream->read_V32();
 		int i = argc;
 		while (i--)
 		{
-			obj->set_member(mST.find(mStack.top(i * 2 + 1).to_string()),
-				mStack.top(i * 2));
+			as_value val = pop_stack();
+			as_value name = pop_stack();
+			obj->init_member(name.to_string(),val,0,0);
 		}
-		mStack.drop(argc * 2 - 1);
-		mStack.top(0) = obj;
+		push_stack(as_value(obj));
 		break;
 	}
 /// 0x56 ABC_ACTION_NEWARRAY
@@ -1274,13 +1404,14 @@ Machine::execute()
 	case SWF::ABC_ACTION_NEWARRAY:
 	{
 		boost::uint32_t asize = mStream->read_V32();
+		log_abc("Creating array of size %u",asize);
 		Array_as *arr = new Array_as;
 		arr->resize(asize);
 		boost::uint32_t i = asize;
-		while (i--)
-			arr->set_indexed(i, mStack.value(i));
-		mStack.drop(asize - 1);
-		mStack.top(0) = arr;
+		while (i--) {
+			arr->set_indexed(i, pop_stack());
+		}
+		push_stack(as_value(arr));
 		break;
 	}
 /// 0x57 ABC_ACTION_NEWACTIVATION
@@ -1288,7 +1419,10 @@ Machine::execute()
 ///  vtable -- A new virtual table, which has the previous one as a parent.
 	case SWF::ABC_ACTION_NEWACTIVATION:
 	{
-		// TODO
+		// TODO:  The function contains traits that need to be included in the activation object.
+		//For now we are using the function object as the activation object.  There is probably
+		//a better way.
+		push_stack(as_value(mCurrentFunction));
 		break;
 	}
 /// 0x58 ABC_ACTION_NEWCLASS
@@ -1303,12 +1437,25 @@ Machine::execute()
 	{
 		boost::uint32_t cid = mStream->read_V32();
 		asClass *c = pool_class(cid, mPoolObject);
-		ENSURE_OBJECT(mStack.top(0));
-		as_object *obj = mStack.top(0).to_object().get();
-		as_function *func = c->getConstructor()->getPrototype();
-		// func is the constructor, obj is 'this' and also the return
-		// value, no arguments, no change in stack.
-		pushCall(func, obj, mStack.top(0), 0, 0);
+		log_abc("Creating new class id=%u name=%s", c->getName(),
+                mPoolObject->stringPoolAt(c->getName()));
+		
+		as_object* base_class = pop_stack().to_object().get();
+		as_object* new_class = c->getPrototype();
+		
+		new_class->set_prototype(base_class);
+		//Create the class.
+		as_function* static_constructor = c->getStaticConstructor()->getPrototype();
+		as_function* constructor = c->getConstructor()->getPrototype();
+		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(static_constructor),0);
+		new_class->init_member(NSV::PROP_CONSTRUCTOR,as_value(constructor),0);
+		push_stack(as_value(new_class));
+
+		//Call the class's static constructor.
+		as_environment env = as_environment(_vm);
+		as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu,0);
+		as_value value = call_method(property,env,new_class,get_args(0));
+
 		break;
 	}
 /// 0x59 ABC_ACTION_GETDESCENDANTS
@@ -1324,11 +1471,12 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETDESCENDANTS:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		as_value &v = mStack.top(0);
+		//as_value &v = mStack.top(0);
 		ENSURE_OBJECT(v);
 		mStack.drop(1);
 		mStack.drop(completeName(a));
 		// TODO: Decide or discover what to do with this.
+        LOG_ONCE( log_unimpl("ABC_ACTION_GETDESCENDANTS") );
 		break;
 	}
 /// 0x5A ABC_ACTION_NEWCATCH
@@ -1353,10 +1501,12 @@ Machine::execute()
 	case SWF::ABC_ACTION_FINDPROPSTRICT:
 	case SWF::ABC_ACTION_FINDPROPERTY:
 	{
+//		boost::uint32_t property_name = mStream->read_V32();
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		mStack.drop(completeName(a));
+		find_prop_strict(a);
+/*		mStack.drop(completeName(a));
 		as_object *owner;
-		Property *b = mCurrentScope->findProperty(a.getName(), 
+		Property *b = mCurrentScope->findProperty(a.getABCName(), 
 			a.getNamespace()->getURI(), &owner);
 		if (!b)
 		{
@@ -1368,7 +1518,7 @@ Machine::execute()
 		else
 		{
 			mStack.push(owner);
-		}
+		}*/
 		break;
 	}
 /// 0x5F ABC_ACTION_FINDDEF
@@ -1390,17 +1540,16 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETLEX:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		as_object *owner;
-		Property *b = mCurrentScope->findProperty(a.getName(),
-			a.getNamespace()->getURI(), &owner);
-		if (!b)
-			throw ASException();
+	
+		as_value val = find_prop_strict(a);
 
-		mStack.grow(1);
-		pushGet(owner, mStack.top(0), b);
+		pop_stack();
+
+		push_stack(val);
+
 		break;
 	}
-/// 0x61 ABC_ACTION_SETPROPERTY
+///  ABC_ACTION_SETPROPERTY
 /// Stream: V32 'name_id'
 /// Stack In:
 ///  value -- The value to be used
@@ -1417,27 +1566,31 @@ Machine::execute()
 /// key/value is set in the dictionary obj instead.
 	case SWF::ABC_ACTION_SETPROPERTY:
 	{
+		as_value value = pop_stack();
+		string_table::key ns = 0;
+		string_table::key name = 0;
+
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		//as_value &v = mStack.pop();
-		if (!a.isRuntime())
-		{
-			//TODO: Set the property of mStack.top(0) v,a
+		// TODO: If multiname is runtime we need to also pop namespace
+        // and name values of the stack.
+		if (a.flags() == asName::KIND_MultinameL) {
+			as_value nameValue = pop_stack();
+			name = mST.find(nameValue.to_string());
 		}
-		else
-		{
-			if (a.isRtns() || !(mStack.top(0).is_object()
-				&& mStack.top(1).to_object()->isDictionary()))
-			{
-				mStack.drop(completeName(a));
-				//TODO: mStack.top(0).setProperty(a, v);
-				mStack.drop(1);
-			}
-			else
-			{
-				//TODO: mStack.top(1).setDictProperty(mStack.top(0), v);
-				mStack.drop(2);
-			}
+		else{
+			name = a.getGlobalName();
 		}
+
+        as_value val = pop_stack();
+		as_object *object = val.to_object().get();
+
+        if (!object) {
+            log_error("Expected object on stack, but none found (%s)!",
+                    val);
+            break;
+        }
+
+		object->set_member(name, value, ns, false);
 		break;
 	}
 /// 0x62 ABC_ACTION_GETLOCAL
@@ -1447,8 +1600,8 @@ Machine::execute()
 ///  value
 	case SWF::ABC_ACTION_GETLOCAL:
 	{
-		mStack.grow(1);
-		mStack.top(0) = mFrame.value(mStream->read_V32());
+		boost::uint32_t index = mStream->read_V32();
+		push_stack(get_register(index));
 		break;
 	}
 /// 0x63 ABC_ACTION_SETLOCAL
@@ -1460,8 +1613,9 @@ Machine::execute()
 ///  .
 	case SWF::ABC_ACTION_SETLOCAL:
 	{
-		mFrame.value(mStream->read_V32()) = mStack.top(0);
-		mStack.drop(1);
+		boost::uint32_t index = mStream->read_V32();
+		log_abc("Register index: %u",index);
+		mRegisters[index] = pop_stack();
 		break;
 	}
 /// 0x64 ABC_ACTION_GETGLOBALSCOPE
@@ -1469,8 +1623,9 @@ Machine::execute()
 ///  global -- The global scope object
 	case SWF::ABC_ACTION_GETGLOBALSCOPE:
 	{
-		mStack.grow(1);
-		mStack.top(0) = mGlobalScope;
+		//TODO: Use get_scope_stack here.
+		push_stack(as_value(mScopeStack.value(0).get()));
+//		print_stack();
 		break;
 	}
 /// 0x65 ABC_ACTION_GETSCOPEOBJECT
@@ -1480,8 +1635,8 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETSCOPEOBJECT:
 	{
 		boost::uint8_t depth = mStream->read_u8();
-		mStack.grow(1);
-		mStack.top(0) = mScopeStack.top(depth).mScope;
+		push_stack(get_scope_stack(depth));
+		print_scope_stack();
 		break;
 	}
 /// 0x66 ABC_ACTION_GETPROPERTY
@@ -1496,25 +1651,34 @@ Machine::execute()
 /// NB: See 0x61 (ABC_ACTION_SETPROPETY) for the decision of ns/key.
 	case SWF::ABC_ACTION_GETPROPERTY:
 	{
+		as_value prop;
+		string_table::key ns = 0;
+		string_table::key name = 0;
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		if (!a.isRuntime())
-		{
-			//TODO: mStack.top(0) = mStack.top(0).getProperty(a, v);
+		//TODO: If multiname is runtime we need to also pop namespace and name values of the stack.
+		if (a.flags() == asName::KIND_MultinameL) {
+			as_value nameValue = pop_stack();
+			name = mST.find(nameValue.to_string());
 		}
-		else
-		{
-			if (a.isRtns() || !(mStack.top(0).is_object()
-				&& mStack.top(1).to_object()->isDictionary()))
-			{
-				mStack.drop(completeName(a));
-				//TODO: mStack.top(0) = mStack.top(0).getProperty(a);
-			}
-			else
-			{
-				//TODO: mStack.top(1) = mStack.top(1).getDictProperty(mStack.top(0));
-				mStack.drop(1);
-			}
+		else{
+			name = a.getGlobalName();
 		}
+
+		as_value object_val = pop_stack();
+
+		as_object* object = object_val.to_object().get();
+		if (!object) {
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't get a property of a value that doesn't cast to an object (%s)."),
+				object_val);
+			)
+		}
+		else{
+			object->get_member(name, &prop, ns);
+		}
+
+		push_stack(prop);
+
 		break;
 	}
 /// 0x68 ABC_ACTION_INITPROPERTY
@@ -1529,10 +1693,22 @@ Machine::execute()
 ///  Set obj::(resolve)'name_id' to value, set bindings from the context.
 	case SWF::ABC_ACTION_INITPROPERTY:
 	{
-		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		//as_value& v = mStack.pop();
-		mStack.drop(completeName(a));
-		//TODO: mStack.pop().to_object().setProperty(a, v, true); // true for init
+		boost::uint32_t index = mStream->read_V32();
+		asName a = pool_name(index, mPoolObject);
+		as_value v = pop_stack();
+		//TODO: If multiname is a runtime mutiname we need to also pop name and namespace values.
+		as_value object_val = pop_stack();
+
+		as_object* object = object_val.to_object().get();
+		if (!object) {
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror(_("Can't initialize a property of a value that doesn't cast to an object (%s)."),
+				object_val);
+			)		
+		}
+		else{
+			object->set_member(a.getGlobalName(),v,false);
+		}
 		break;
 	}
 /// 0x6A ABC_ACTION_DELETEPROPERTY
@@ -1557,11 +1733,15 @@ Machine::execute()
 ///  slot -- obj.slots[slot_index]
 	case SWF::ABC_ACTION_GETSLOT:
 	{
+		as_value val;
 		boost::uint32_t sindex = mStream->read_V32();
-		if (!sindex)
-			throw ASException();
-		--sindex;
-		//TODO: mStack.top(0) = mStack.top(0).getSlot(sindex);
+		as_object* object = pop_stack().to_object().get();
+
+		object->get_member_slot(sindex + 1, &val);
+
+		log_abc("object has value %s at real_slot=%u abc_slot=%u",val.toDebugString(),sindex + 1, sindex);
+		push_stack(val);
+		
 		break;
 	}
 /// 0x6D ABC_ACTION_SETSLOT
@@ -1575,11 +1755,17 @@ Machine::execute()
 	case SWF::ABC_ACTION_SETSLOT:
 	{
 		boost::uint32_t sindex = mStream->read_V32();
-		if (!sindex)
-			throw ASException();
-		--sindex;
-		//TODO: mStack.top(0).setSlot(sindex, mStack.top(1));
-		mStack.drop(2);
+		as_value value = pop_stack();
+		as_value object = pop_stack();
+		//We use sindex + 1, because currently as_object sets a property at a slot index
+		//1 higher than the index the abc_block thinks the property is at.
+		if (!object.to_object().get()->set_member_slot(sindex+1,value)) {
+			log_abc("Failed to set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+		}
+		else{
+			log_abc("Set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+		}
+		//TODO: Actually set the object's value.
 		break;
 	}
 /// 0x6E ABC_ACTION_GETGLOBALSLOT
@@ -1655,7 +1841,9 @@ Machine::execute()
 	case SWF::ABC_ACTION_CONVERT_I:
 	case SWF::ABC_ACTION_COERCE_I:
 	{
-		mStack.top(0) = mStack.top(0).to_int();
+		as_value val = pop_stack();
+		val.to_int();
+		push_stack(val);
 		break;
 	}
 /// 0x74 ABC_ACTION_CONVERT_U
@@ -1679,7 +1867,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_CONVERT_D:
 	case SWF::ABC_ACTION_COERCE_D:
 	{
-		mStack.top(0) = mStack.top(0).to_number();
+		push_stack(pop_stack().to_number());
 		break;
 	}
 /// 0x76 ABC_ACTION_CONVERT_B
@@ -1729,8 +1917,17 @@ Machine::execute()
 	case SWF::ABC_ACTION_COERCE:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		mStack.drop(completeName(a));
-		//TODO: mStack.top(0) = mStack.top(0).coerce(a);
+		as_value value = pop_stack();
+
+		//TODO: Actually coerce the value.
+//		if (value.is_null()) {
+//			as_value new_type = get_property_value(a);
+//			value->
+//			push_stack(new_type);
+//		}
+//		else{
+			push_stack(value);
+//		}
 		break;
 	}
 /// 0x82 ABC_ACTION_COERCE_A
@@ -1766,10 +1963,9 @@ Machine::execute()
 	case SWF::ABC_ACTION_ASTYPE:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
-		mStack.drop(completeName(a));
-		// TODO: Might need some namespace stuff.
-		if (!mStack.top(0).conforms_to(a.getName()))
-			mStack.top(0).set_null();
+		as_value value = pop_stack();
+		//TODO: Make sure the value is of the correct type;
+		push_stack(value);
 		break;
 	}
 /// 0x87 ABC_ACTION_ASTYPELATE
@@ -1780,11 +1976,10 @@ Machine::execute()
 ///  cobj -- obj if type of obj conforms to valid, otherwise Null
 	case SWF::ABC_ACTION_ASTYPELATE:
 	{
-		bool truth;
-		ABSTRACT_TYPELATE(truth, mStack.top(1), mStack.top(0));
-		if (!truth)
-			mStack.top(1).set_null();
-		mStack.drop(1);
+		as_value type = pop_stack();
+		as_value value = pop_stack();
+		//TODO: If value is not the type defined by type, then push null.
+		push_stack(value);
 		break;
 	}
 /// 0x89 ABC_ACTION_COERCE_O
@@ -1817,7 +2012,8 @@ Machine::execute()
 ///  num + 1
 	case SWF::ABC_ACTION_INCREMENT:
 	{
-		mStack.top(0) = mStack.top(0).to_number() + 1;
+		as_value val = pop_stack();
+		push_stack(as_value(val.to_number() + 1));
 		break;
 	}
 /// 0x92 ABC_ACTION_INCLOCAL
@@ -1826,7 +2022,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_INCLOCAL:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_number() + 1;
+		mRegisters[foff] = mRegisters[foff].to_number() + 1;
 		break;
 	}
 /// 0x93 ABC_ACTION_DECREMENT
@@ -1845,7 +2041,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_DECLOCAL:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_number() - 1;
+		mRegisters[foff] = mRegisters[foff].to_number() - 1;
 		break;
 	}
 /// 0x95 ABC_ACTION_ABC_TYPEOF
@@ -1854,8 +2050,8 @@ Machine::execute()
 /// Stack Out:
 ///  type -- typeof(obj) as a string
 	case SWF::ABC_ACTION_ABC_TYPEOF:
-	{
-		mStack.top(0) = mStack.top(0).typeOf();
+	{	
+		push_stack(pop_stack().typeOf());
 		break;
 	}
 /// 0x96 ABC_ACTION_NOT
@@ -1886,20 +2082,24 @@ Machine::execute()
 /// a + b (double if numeric)
 	case SWF::ABC_ACTION_ADD:
 	{
-		//TODO: mStack.top(1) = mStack.top(1).add(mStack.top(0));
-		mStack.drop(1);
+		as_value b = pop_stack();
+		as_value a = pop_stack();
+		a.newAdd(b);
+		push_stack(a);
 		break;
 	}
 /// 0xA1 ABC_ACTION_SUBTRACT
 /// Stack In:
-///  a
 ///  b
+///  a
 /// Stack Out:
 ///  a - b (double)
 	case SWF::ABC_ACTION_SUBTRACT:
 	{
-		mStack.top(1) = mStack.top(1).to_number() - mStack.top(1).to_number();
-		mStack.drop(1);
+		as_value b = pop_stack();
+		as_value a = pop_stack();
+		a.subtract(b);
+		push_stack(a);
 		break;
 	}
 /// 0xA2 ABC_ACTION_MULTIPLY
@@ -2021,10 +2221,12 @@ Machine::execute()
 ///  truth -- Truth of (a == b) (weakly)
 	case SWF::ABC_ACTION_EQUALS:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), false);
-		mStack.drop(1);
-		mStack.top(0).set_bool(truth);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), false);
+		pop_stack();
+		pop_stack();
+		as_value result = as_value();
+		result.set_bool(truth);
+		push_stack(result);
 		break;
 	}
 /// 0xAC ABC_ACTION_STRICTEQUALS
@@ -2036,8 +2238,7 @@ Machine::execute()
 ///   0x19 (ABC_ACTION_IFSTRICTEQ))
 	case SWF::ABC_ACTION_STRICTEQUALS:
 	{
-		bool truth;
-		ABSTRACT_EQUALITY(truth, mStack.top(1), mStack.top(0), true);
+		bool truth = abstractEquality(mStack.top(1), mStack.top(0), true);
 		mStack.drop(1);
 		mStack.top(0).set_bool(truth);
 		break;
@@ -2124,7 +2325,7 @@ Machine::execute()
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
 		mStack.drop(completeName(a));
 		// TODO: Namespace stuff?
-		mStack.top(0).set_bool(mStack.top(0).conforms_to(a.getName()));
+		mStack.top(0).set_bool(mStack.top(0).conforms_to(a.getABCName()));
 	}
 /// 0xB3 ABC_ACTION_ISTYPELATE
 /// Stack In:
@@ -2134,10 +2335,10 @@ Machine::execute()
 ///  truth -- Truth of "obj is of type"
 	case SWF::ABC_ACTION_ISTYPELATE:
 	{
-		bool truth;
-		ABSTRACT_TYPELATE(truth, mStack.top(1), mStack.top(0));
-		mStack.top(1).set_bool(truth);
-		mStack.drop(1);
+		as_value type = pop_stack();
+		as_value value = pop_stack();
+		bool truth = value.to_object().get()->instanceOf(type.to_object().get());
+		push_stack(as_value(truth));
 		break;
 	}
 /// 0xB4 ABC_ACTION_IN
@@ -2174,7 +2375,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_INCLOCAL_I:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_int() + 1;
+		mRegisters[foff] = mRegisters[foff].to_int() + 1;
 		break;
 	}
 /// 0xC3 ABC_ACTION_DECLOCAL_I
@@ -2182,7 +2383,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_DECLOCAL_I:
 	{
 		boost::uint32_t foff = mStream->read_V32();
-		mFrame.value(foff) = mFrame.value(foff).to_int() - 1;
+		mRegisters[foff] = mRegisters[foff].to_int() - 1;
 		break;
 	}
 /// 0xC4 ABC_ACTION_NEGATE_I
@@ -2228,8 +2429,13 @@ Machine::execute()
 	case SWF::ABC_ACTION_GETLOCAL2:
 	case SWF::ABC_ACTION_GETLOCAL3:
 	{
-		mStack.grow(1);
-		mStack.top(0) = mFrame.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
+		//We shouldn't need to a call grow stack, because each function should now how big the stack will need to be and should allocate all the space, when it is loaded into the vm.
+//		GROW_STACK();
+//		mStack.grow(1);
+//		mStack.push() instead?
+
+		push_stack(get_register(opcode- SWF::ABC_ACTION_GETLOCAL0));
+//		mStack.top(0) = mRegisters.value(opcode - SWF::ABC_ACTION_GETLOCAL0);
 		break;
 	}
 /// 0xD4 ABC_ACTION_SETLOCAL0
@@ -2246,8 +2452,7 @@ Machine::execute()
 	case SWF::ABC_ACTION_SETLOCAL2:
 	case SWF::ABC_ACTION_SETLOCAL3:
 	{
-		mFrame.value(opcode - SWF::ABC_ACTION_SETLOCAL0) = mStack.top(0);
-		mStack.drop(1);
+		mRegisters[opcode - SWF::ABC_ACTION_SETLOCAL0] = pop_stack();
 		break;
 	}
 
@@ -2284,12 +2489,12 @@ Machine::execute()
 		break;
 	}
 	} // end of switch statement
+		log_abc("* DONE *");
+		IF_VERBOSE_ACTION(print_stack());
 	} // end of AS3 conditional
 	else // beginning of !AS3 (this code is AS2)
 	{
-	switch (opcode)
-	{
-	} // end of switch statement
+        // not using Machine for AS2 yet
 	} // end of AS2 conditional (!AS3)
 	} // end of main loop
 } // end of execute function
@@ -2328,7 +2533,7 @@ Machine::setMember(asClass *pDefinition, asName& name, as_value& instance,
 	return;
 	// TODO:
 #if 0
-	asBinding *pBinding = pDefinition->getBinding(name.getName());
+	asBinding *pBinding = pDefinition->getBinding(name.getABCName());
 
 	if (pBinding->isReadOnly())
 		throw ASReferenceError();
@@ -2351,15 +2556,16 @@ UNUSED(newvalue);
 }
 
 int
-Machine::completeName(asName &name, int offset)
+Machine::completeName(asName& name, int offset)
 {
 	int size = 0;
 
 	if (name.isRuntime())
 	{
 		as_value obj = mStack.top(offset);
-		if (obj.is_object() && obj.to_object()->isQName())
+		if (obj.is_object() && obj.to_object()->isQName()) {
 			name.fill(obj.to_object().get());
+        }
 		++size;
 
 		if (name.isRtns())
@@ -2376,26 +2582,22 @@ Machine::completeName(asName &name, int offset)
 asClass *
 Machine::findSuper(as_value &v, bool find_for_primitive)
 {
-	if (v.is_undefined() || v.is_null())
-		return NULL;
+	if (v.is_undefined() || v.is_null()) return NULL;
 
-	if (v.is_object())
-	{
+	if (v.is_object()) {
 		asClass *pProto = NULL; // TODO: v.to_object()->getClass();
 		return pProto ? pProto->getSuper() : NULL;
 	}
 
-	if (!find_for_primitive)
-		return NULL;
+	if (!find_for_primitive) return 0;
 
-	if (v.is_number())
-	{
+	if (v.is_number()) {
 		return NULL; // TODO: mCH->getClass(NSV::CLASS_NUMBER);
 	}
 
 	// And so on...
 	// TODO: Other primitives
-	return NULL;
+	return 0;
 }
 
 void
@@ -2420,11 +2622,9 @@ Machine::immediateFunction(const as_function * /*to_call*/,
 void
 Machine::pushGet(as_object *this_obj, as_value &return_slot, Property *prop)
 {
-	if (!prop)
-		return;
+	if (!prop) return;
 
-	if (prop->isGetterSetter())
-	{
+	if (prop->isGetterSetter()) {
 		//TODO pushCall(prop->getGetter(), this_obj, return_slot, 0);
 		return;
 	}
@@ -2435,11 +2635,9 @@ Machine::pushGet(as_object *this_obj, as_value &return_slot, Property *prop)
 void
 Machine::pushSet(as_object *this_obj, as_value &value, Property *prop)
 {
-	if (!prop)
-		return;
+	if (!prop) return;
 
-	if (prop->isGetterSetter())
-	{
+	if (prop->isGetterSetter()) {
 		mStack.push(value);
 		//TODO pushCall(prop->getSetter(), this_obj, mIgnoreReturn, 1);
 		return;
@@ -2478,30 +2676,294 @@ Machine::pushCall(as_function *func, as_object *pthis, as_value& return_slot,
 void
 Machine::restoreState()
 {
+	log_abc("Restoring state.");
 	State &s = mStateStack.top(0);
-	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
+	s.to_debug_string();
+//	mStack.setAllSizes(s.mStackTotalSize, s.mStackDepth);
+//	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mScopeStack.setAllSizes(s.mScopeTotalSize, s.mScopeStackDepth);
 	mStream = s.mStream;
-	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
-	mCurrentScope = s.mCurrentScope;
-	mGlobalReturn = s.mGlobalReturn;
-	mThis = s.mThis;
-	mStateStack.drop(1);
+	mRegisters = s.mRegisters;
+	mCurrentFunction = s.mFunction;
+//	mExitWithReturn = s.mReturn;
+//	mDefaultXMLNamespace = s.mDefaultXMLNamespace;
+//	mCurrentScope = s.mCurrentScope;
+//	mGlobalReturn = s.mGlobalReturn;
+//	mThis = s.mThis;
+//	mStateStack.drop(1);
+	mStateStack.pop();
 }
 
 void
 Machine::saveState()
 {
+	log_abc("Saving state.");
 	mStateStack.grow(1);
 	State &s = mStateStack.top(0);
 	s.mStackDepth = mStack.getDownstop();
 	s.mStackTotalSize = mStack.totalSize();
 	s.mScopeStackDepth = mScopeStack.getDownstop();
 	s.mScopeTotalSize = mScopeStack.totalSize();
+//	s.mScopeStackDepth = mScopeStack.getDownstop();
+//	s.mScopeTotalSize = mScopeStack.totalSize();
 	s.mStream = mStream;
-	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
-	s.mCurrentScope = mCurrentScope;
-	s.mGlobalReturn = mGlobalReturn;
-	s.mThis = mThis;
+	s.to_debug_string();
+	s.mRegisters = mRegisters;
+	s.mFunction = mCurrentFunction;
+//	s.mReturn = mExitWithReturn;
+//	s.mDefaultXMLNamespace = mDefaultXMLNamespace;
+//	s.mCurrentScope = mCurrentScope;
+//	s.mGlobalReturn = mGlobalReturn;
+//	s.mThis = mThis;
 }
+
+void
+Machine::initMachine(abc_block* pool_block, as_object* global)
+{
+	mPoolObject = pool_block;
+	log_debug("Getting entry script.");
+	asClass* start_script = pool_block->scripts().back();
+	log_debug("Getting constructor.");
+	asMethod* constructor = start_script->getConstructor();
+	clearRegisters(constructor->getMaxRegisters());
+	log_debug("Loding code stream.");
+	mStream = constructor->getBody();
+	mCurrentFunction = constructor->getPrototype();
+	mRegisters[0] = as_value(global);
+	mGlobalObject = global;
+}
+
+//This is called by abc_functions to execute their code stream.
+//TODO: There is probably a better way to do this, once we understand what the VM is supposed
+//todo, this should be fixed.
+as_value
+Machine::executeFunction(asMethod* function, const fn_call& fn)
+{
+	
+    //TODO: Figure out a good way to use the State object to handle
+    //returning values.
+	mCurrentFunction = function->getPrototype();
+	bool prev_ext = mExitWithReturn;
+	CodeStream *stream = function->getBody();
+	load_function(stream, function->getMaxRegisters());
+	mExitWithReturn = true;
+	mRegisters[0] = as_value(fn.this_ptr);
+	for (unsigned int i=0;i<fn.nargs;i++) {
+		mRegisters[i+1] = fn.arg(i);
+	}
+	//TODO:  There is probably a better way to do this.
+    //
+    const as_environment::ScopeStack* const ss = mCurrentFunction->scopeStack();
+
+	if (ss) {
+		for (unsigned int i=0; i < ss->size(); ++i) {
+			push_scope_stack(as_value(ss->at(i)));
+		}
+	}
+	execute();
+	mExitWithReturn = prev_ext;
+	stream->seekTo(0);
+
+	return mGlobalReturn;
+}
+
+void
+Machine::executeCodeblock(CodeStream* stream)
+{
+	mStream = stream;
+	execute();
+}
+
+void
+Machine::instantiateClass(std::string className, as_object* global)
+{
+
+    log_debug("instantiateClass: class name %s", className);
+
+	asClass* cl = mPoolObject->locateClass(className);
+    if (!cl)
+    {
+        /// This seems like a big error.
+        log_error("Could not locate class '%s' for instantiation", className);
+        return;
+    }
+	
+    asMethod* ctor = cl->getConstructor();
+
+	clearRegisters(ctor->getMaxRegisters());
+	mCurrentFunction = ctor->getPrototype();
+	mStack.clear();
+	mScopeStack.clear();
+	mRegisters[0] = as_value(global);
+	executeCodeblock(ctor->getBody());
+}
+
+Machine::Machine(VM& vm)
+        :
+        mStack(),
+        mRegisters(),
+        mScopeStack(),
+        mStream(0),
+        mST(vm.getStringTable()),
+        mDefaultXMLNamespace(0),
+        mCurrentScope(0),
+        mGlobalScope(0),
+        mDefaultThis(0),
+        mThis(0),
+        mGlobalObject(0),
+        mGlobalReturn(),
+        mIgnoreReturn(),
+        mIsAS3(false),
+        mExitWithReturn(false),
+        mPoolObject(0),
+        mCurrentFunction(0),
+        _vm(vm),
+        mCH(_vm.getClassHierarchy())
+{
+	//Local registers should be initialized at the beginning of each function call, but
+	//we don't currently parse the number of local registers for each function.
+//	mRegisters.resize(16);
+//	mST = new string_table();
+//	mST = ST;
+}
+
+as_value
+Machine::find_prop_strict(asName multiname) {
+	
+	as_value val;
+	mScopeStack.push(mGlobalObject);
+	for (size_t i = 0; i < mScopeStack.size(); ++i)
+    {
+		as_object* scope_object = mScopeStack.top(i).get();
+		if (!scope_object) {
+			log_abc("Scope object is NULL.");
+			continue;
+		}
+		val = scope_object->getMember(multiname.getGlobalName(),
+                multiname.getNamespace()->getURI());
+
+		if (!val.is_undefined()) {
+			push_stack(mScopeStack.top(i));
+			mScopeStack.pop();
+			return val;
+		}
+	}
+
+	log_abc("Cannot find property in scope stack.  Trying again using as_environment.");
+	as_object *target = NULL;
+	as_environment env = as_environment(_vm);
+	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
+	std::string ns = mPoolObject->stringPoolAt(
+            multiname.getNamespace()->getAbcURI());
+	std::string path = ns.size() == 0 ? name : ns + "." + name;
+	val = env.get_variable(path,*getScopeStack(),&target);
+	push_stack(as_value(target));	
+	mScopeStack.pop();
+	return val;
+}
+
+as_value
+Machine::get_property_value(asName multiname)
+{
+	return get_property_value(0, multiname);
+}
+
+as_value
+Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
+        asName multiname)
+{
+
+	std::string ns = 
+        mPoolObject->stringPoolAt(multiname.getNamespace()->getAbcURI());
+	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());
+	return get_property_value(obj, name, ns);
+}
+
+as_value
+Machine::get_property_value(boost::intrusive_ptr<as_object> obj,
+        std::string name, std::string ns)
+{
+
+    as_environment::ScopeStack stack;
+	as_environment env = as_environment(_vm);
+	
+    if (!obj) stack = *getScopeStack();
+	else stack.push_back(obj);
+
+	std::string path;
+
+	if (ns.empty()) path = name;
+	else path = ns + "." + name;
+
+	return env.get_variable(path, stack, 0);
+}
+
+void
+Machine::print_stack()
+{
+
+	std::stringstream ss;
+	ss << "Stack: ";
+	for (unsigned int i = 0; i < mStack.size(); ++i) {
+		if (i!=0) ss << " | ";
+		ss << mStack.value(i).toDebugString();
+	}
+	log_abc("%s", ss.str());
+}
+
+void
+Machine::print_scope_stack()
+{
+
+	std::stringstream ss;
+	ss << "ScopeStack: ";
+	for (unsigned int i=0;i<mScopeStack.size();++i) {
+		ss << as_value(mScopeStack.top(i).get()).toDebugString();
+	}
+	log_abc("%s", ss.str());
+}	
+
+std::auto_ptr<std::vector<as_value> >
+Machine::get_args(unsigned int argc)
+{
+	log_abc("There are %u args",argc);
+	std::auto_ptr<std::vector<as_value> > args = 
+        std::auto_ptr<std::vector<as_value> >(new std::vector<as_value>);
+	args->resize(argc);
+	for (unsigned int i = argc; i > 0; --i) {
+		args->at(i-1) = pop_stack();
+	}
+	return args;
+}
+
+void
+Machine::load_function(CodeStream* stream, boost::uint32_t maxRegisters)
+{
+	saveState();
+	//TODO: Maybe this call should be part of saveState(), it
+    //returns the old downstop.
+	mScopeStack.fixDownstop();
+	mStream = stream;
+	clearRegisters(maxRegisters);
+}
+
+as_environment::ScopeStack*
+Machine::getScopeStack()
+{
+	as_environment::ScopeStack *stack = new as_environment::ScopeStack();
+	for (size_t i = 0; i < mScopeStack.size(); ++i) {
+		stack->push_back(mScopeStack.top(i));
+	}
+	return stack;
+}
+
+void
+Machine::clearRegisters(boost::uint32_t maxRegisters)
+{
+	mRegisters.clear();
+	mRegisters.resize(maxRegisters);
+}
+
+
+
 } // end of namespace gnash
