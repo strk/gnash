@@ -694,6 +694,7 @@ getXMLInterface()
     if ( o == NULL )
     {
         o = new as_object(XMLNode_as::getXMLNodeInterface());
+        VM::get().addStatic(o.get());
         attachXMLInterface(*o);
     }
     return o.get();
