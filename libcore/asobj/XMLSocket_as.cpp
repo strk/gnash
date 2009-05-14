@@ -198,12 +198,12 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
             // incomplete. Store it and continue. The buffer is 
             // NULL-terminated, so this cannot read past the end.
             if (static_cast<size_t>(
-                ptr + std::strlen(ptr) - buf.get()) == bytesRead)
-            {
+                ptr + std::strlen(ptr) - buf.get()) == bytesRead) {
                 log_debug ("Setting remainder");
                 _remainder += std::string(ptr);
                 break;
             }
+
             if (!_remainder.empty())
             {
                 log_debug ("Adding and clearing remainder");
@@ -213,7 +213,9 @@ XMLSocket_as::fillMessageList(MessageList& msgs)
                 continue;
             }
             
-            msgs.push_back(ptr);
+            // Don't do anything if nothing is received.
+            if (std::strlen(ptr)) msgs.push_back(ptr);
+            
             ptr += std::strlen(ptr) + 1;
         }
         
@@ -269,7 +271,7 @@ xmlsocket_connect(const fn_call& fn)
     
     if (!ptr->connect(host, port))
     {
-        // onConnect(false) should not be called here, but rather
+        // TODO: onConnect(false) should not be called here, but rather
         // only if a failure occurs after the initial connection.
         log_error(_("XMLSocket.connect(): connection failed"));
         return as_value(false);
@@ -352,11 +354,11 @@ as_value
 xmlsocket_onData(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-
    
-    boost::intrusive_ptr<XMLSocket_as> ptr = ensureType<XMLSocket_as>(fn.this_ptr);
+    boost::intrusive_ptr<XMLSocket_as> ptr = 
+        ensureType<XMLSocket_as>(fn.this_ptr);
 
-    if ( fn.nargs < 1 )
+    if (fn.nargs < 1)
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror(_("Builtin XMLSocket.onData() needs an argument"));
@@ -366,11 +368,13 @@ xmlsocket_onData(const fn_call& fn)
 
     const std::string& xmlin = fn.arg(0).to_string();
 
-    if ( xmlin.empty() )
+    log_debug("Arg: %s, val: %s", xmlin, fn.arg(0));
+
+    if (xmlin.empty())
     {
-            log_error(_("Builtin XMLSocket.onData() called with an argument "
-                        "that resolves to the empty string: %s"), fn.arg(0));
-            return as_value();
+        log_error(_("Builtin XMLSocket.onData() called with an argument "
+                        "that resolves to an empty string: %s"), fn.arg(0));
+        return as_value();
     }
 
     boost::intrusive_ptr<as_object> xml = new XML_as(xmlin);
@@ -404,9 +408,10 @@ attachXMLSocketInterface(as_object& o)
 
     // all this crap to satisfy swfdec testsuite... (xml-socket-properties*)
     as_object* onDataIface = new as_object(getObjectInterface());
-    as_function* onDataFun = new builtin_function(xmlsocket_onData, onDataIface);
+    as_function* onDataFun = new builtin_function(xmlsocket_onData,
+            onDataIface);
     o.init_member("onData", onDataFun);
-    onDataIface->init_member(NSV::PROP_CONSTRUCTOR, as_value(onDataFun));
+    onDataIface->init_member(NSV::PROP_CONSTRUCTOR, onDataFun);
 }
 
 void
@@ -439,7 +444,7 @@ XMLSocket_as::getEventHandler(const std::string& name)
 
 	as_value tmp;
 	string_table& st = getVM().getStringTable();
-	if (!get_member(st.find(PROPNAME(name)), &tmp) ) return ret;
+	if (!get_member(st.find(name), &tmp) ) return ret;
 	ret = tmp.to_as_function();
 	return ret;
 }
@@ -463,26 +468,28 @@ XMLSocket_as::checkForIncomingData()
     }
 #endif
 
-    boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
-    if ( onDataHandler )
-    {
-	as_environment env(_vm); // TODO: set target !
+    as_environment env(_vm); 
 
-        for (XMLSocket_as::MessageList::iterator it=msgs.begin(),
-						itEnd=msgs.end();
-		    it != itEnd; ++it)
-        {
-			std::string& s = *it;
-			as_value datain( s );
+    for (XMLSocket_as::MessageList::const_iterator it=msgs.begin(),
+                    itEnd=msgs.end(); it != itEnd; ++it) {
+ 
+        // This should be checked on every iteration in case one call
+        // changes the handler.       
+        boost::intrusive_ptr<as_function> onDataHandler =
+            getEventHandler("onData");
 
-			std::auto_ptr<std::vector<as_value> > args(
-                    new std::vector<as_value>);
-			args->push_back(datain);
-			
-			fn_call call(this, env, args);
+        if (!onDataHandler) break;
 
-			onDataHandler->call(call);
-        }
+        const std::string& s = *it;
+
+        std::auto_ptr<std::vector<as_value> > args(
+                new std::vector<as_value>);
+
+        args->push_back(s);
+        
+        fn_call call(this, env, args);
+
+        onDataHandler->call(call);
     }
 
 }
