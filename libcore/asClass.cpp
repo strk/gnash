@@ -114,8 +114,8 @@ asClass::addSlotFunction(string_table::key name, asNamespace *ns,
 }
 
 bool
-asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId,
-	asClass */*type*/, bool isstatic)
+asClass::addSlot(string_table::key name, asNamespace* ns,
+        boost::uint32_t slotId, asClass* /*type*/, bool /*isstatic*/)
 {
 	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 //	int flags = as_prop_flags::dontDelete;
@@ -133,7 +133,8 @@ asClass::addSlot(string_table::key name, asNamespace* ns, boost::uint32_t slotId
 }
 
 bool
-asMethod::addMethod(string_table::key name, asNamespace* ns, asMethod* method)
+asMethod::addMethod(string_table::key /*name*/, asNamespace* /*ns*/, asMethod*
+        /*method*/)
 {
 //	string_table::key nsname = ns ? ns->getURI() : string_table::key(0);
 //	as_value val(method->getPrototype());
@@ -145,8 +146,8 @@ return false;
 }
 
 bool
-asClass::addMethod(string_table::key name, asNamespace* ns, asMethod* method,
-	bool isstatic)
+asClass::addMethod(string_table::key name, asNamespace* /*ns*/,
+        asMethod* method, bool /*isstatic*/)
 {
 	as_value val = as_value(new abc_function(method,_prototype->getVM().getMachine()));
 	_prototype->init_member(name, val);

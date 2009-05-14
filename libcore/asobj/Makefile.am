@@ -83,8 +83,6 @@ libgnashasobjs_la_SOURCES = \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
 	flash/display_pkg.cpp \
-	flash/events/EventDispatcher_as.cpp \
-	flash/events_pkg.cpp \
 	flash/external/ExternalInterface_as.cpp \
 	flash/external_pkg.cpp \
         flash/filters/BevelFilter_as.cpp \
@@ -154,8 +152,6 @@ noinst_HEADERS = \
 	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
 	flash/display_pkg.h \
-	flash/events/EventDispatcher_as.h \
-	flash/events_pkg.h \
 	flash/external/ExternalInterface_as.h \
 	flash/external_pkg.h \
         flash/filters/BevelFilter_as.h \

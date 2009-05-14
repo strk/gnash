@@ -44,14 +44,6 @@ public:
 
 };
 
-static as_value
-text_field_auto_size_ctor(const fn_call& fn)
-{
-	boost::intrusive_ptr<as_object> obj = new text_field_auto_size_as_object();
-	
-	return as_value(obj.get()); // will keep alive
-}
-
 as_object*
 getTextFieldAutoSizeInterface()
 {
