@@ -19,10 +19,20 @@
 #ifndef GNASH_CLASS_HIERARCHY_H
 #define GNASH_CLASS_HIERARCHY_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "as_object.h"
 #include "SafeStack.h"
 #include "asClass.h"
 #include "asNamespace.h"
+
+#ifdef ENABLE_AVM2
+# include "asBoundValues.h"
+# include "asException.h"
+# include "asMethod.h"
+#endif
 
 #include <list>
 #include <vector>
@@ -31,11 +41,6 @@
 namespace gnash {
 
 class Extension;
-class asClass;
-class asMethod;
-class asException;
-class asBoundValue;
-class asBoundAccessor;
 class as_object;
 
 /// Register all of the ActionScript classes, with their dependencies.

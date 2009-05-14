@@ -201,14 +201,12 @@ public:
 
 	asBinding* getGetBinding(as_value& v, asName& n);
 	asBinding* getSetBinding(as_value& v, asName& n);
+    std::vector<abc::Trait> _traits;
 
 #endif
 
 private:
 	
-#ifdef ENABLE_AVM2
-    std::vector<abc::Trait> _traits;
-#endif
 	typedef std::map<string_table::key, asBinding> BindingContainer;
 
     as_object *_prototype;

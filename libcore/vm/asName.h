@@ -22,6 +22,8 @@
 namespace gnash {
 
 class as_object;
+class asNamespace;
+class Property;
 
 class asName
 {

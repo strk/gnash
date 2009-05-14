@@ -21,13 +21,14 @@
 #ifndef GNASH_ABC_BLOCK_H
 #define GNASH_ABC_BLOCK_H
 
+#include "string_table.h"
+#include "asName.h"
+#include "asNamespace.h"
+#include "as_value.h"
+
 #include <vector>
 #include <string>
 #include <boost/scoped_array.hpp>
-
-#include "string_table.h"
-#include "asClass.h"
-#include "asName.h"
 
 namespace gnash {
 	class SWFStream; // for read signature
@@ -39,6 +40,7 @@ class abc_block;
 class ClassHierarchy;
 class asMethod;
 class asClass;
+class Machine;
 
 namespace abc {
 
