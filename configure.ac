@@ -223,7 +223,9 @@ AC_ARG_ENABLE(avm2,
   esac], avm2=no
 )
 AM_CONDITIONAL(ENABLE_AVM2, [test x"$avm2" = xyes])
-AC_DEFINE(ENABLE_AVM2, [test x"$avm2" = xyes], [Enable AVM2 code])
+if test x$avm2 = xyes; then
+    AC_DEFINE(ENABLE_AVM2, [1], [Enable AVM2 code])
+fi
 
 dnl lckey=0xdd3adabd
 AC_ARG_WITH(lckey,

@@ -203,6 +203,7 @@ noinst_HEADERS = \
 	swf/DefineVideoStreamTag.h \
 	swf/ControlTag.h \
 	swf/DefineFontAlignZonesTag.h \
+	swf/SymbolClassTag.h \
 	swf/CSMTextSettingsTag.h \
 	swf/DefineShapeTag.h \
 	swf/DefinitionTag.h \

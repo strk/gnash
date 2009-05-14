@@ -109,7 +109,6 @@ libgnashasobjs_la_SOURCES = \
 	flash/text_pkg.cpp \
 	flash/text/TextFieldAutoSize_as.cpp \
 	flash/text/TextRenderer_as.cpp \
-	flash/utils_pkg.cpp \
 	LoadableObject.cpp \
 	$(NULL)
 
@@ -178,7 +177,6 @@ noinst_HEADERS = \
 	flash/text_pkg.h \
 	flash/text/TextFieldAutoSize_as.h \
 	flash/text/TextRenderer_as.h \
-	flash/utils_pkg.h \
 	LoadableObject.h \
 	$(NULL)
 

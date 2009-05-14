@@ -17,6 +17,9 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
+#ifdef HAVE_CONFIG_H
+# include "gnashconfig.h"
+#endif
 
 #include "smart_ptr.h" // GNASH_USE_GC
 #include "IOChannel.h"
