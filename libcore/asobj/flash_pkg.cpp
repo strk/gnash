@@ -46,7 +46,6 @@ get_flash_package(const fn_call& /*fn*/)
 	flash_geom_package_init(*pkg);
 	flash_net_package_init(*pkg);
 	flash_text_package_init(*pkg);
-
 	return pkg;
 }
 

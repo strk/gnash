@@ -114,8 +114,6 @@ void sound_stream_head_loader(SWFStream&, TagType, movie_definition&,
 void sound_stream_block_loader(SWFStream&, TagType, movie_definition&,
 		const RunInfo&);
 
-void abc_loader(SWFStream&, TagType, movie_definition&, const RunInfo&);
-
 void
 define_video_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& r);

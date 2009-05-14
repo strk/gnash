@@ -23,6 +23,7 @@
 #include "IOChannel.h"
 #include "swf.h"
 #include "Property.h"
+#include "action_buffer.h"
 
 #include <cstring>
 #include <climits>
@@ -302,7 +303,7 @@ float    SWFStream::read_long_float()
 }
 
 // Read a 64-bit double value
-long double SWFStream::read_d64()
+double SWFStream::read_d64()
 {
 #ifdef USE_TU_FILE_BYTESWAPPING 
     align();

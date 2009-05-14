@@ -24,6 +24,8 @@
 #include "VM.h"
 
 #include "flash/text/TextRenderer_as.h"
+#include "flash/text/TextFieldAutoSize_as.h"
+#include "TextField.h"
 
 namespace gnash {
 
@@ -35,6 +37,8 @@ get_flash_text_package(const fn_call& /*fn*/)
 	as_object* pkg = new as_object(getObjectInterface());
 
 	TextRenderer_class_init(*pkg);
+	TextFieldAutoSize_class_init(*pkg);
+	textfield_class_init(*pkg);
 
 	return pkg;
 }

@@ -42,7 +42,6 @@ namespace gnash {
 
 // Forward declarations
 static float convert_float_little(const void *p);
-static double convert_double_wacky(const void *p);
 
 action_buffer::action_buffer(const movie_definition& md)
     :
@@ -531,7 +530,7 @@ convert_float_little(const void *p)
 // Read a 64-bit double from memory, stored in word-swapped little-endian
 // format and return it as a host-endian double.
 // "Wacky format" is 45670123.
-static double
+double
 convert_double_wacky(const void *p)
 {
     const boost::uint8_t *cp = (const boost::uint8_t *)p;    // Handy uchar version

@@ -214,6 +214,19 @@ fi
 SOLDIR=${soldir}
 AC_SUBST(SOLDIR)
 
+AC_ARG_ENABLE(avm2,
+  AC_HELP_STRING([--enable-avm2], [Enable support for AS3]),
+  [case "${enableval}" in
+    yes) avm2=yes ;;
+    no)  avm2=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-avm2 option]) ;;
+  esac], avm2=no
+)
+AM_CONDITIONAL(ENABLE_AVM2, [test x"$avm2" = xyes])
+if test x$avm2 = xyes; then
+    AC_DEFINE(ENABLE_AVM2, [1], [Enable AVM2 code])
+fi
+
 dnl lckey=0xdd3adabd
 AC_ARG_WITH(lckey,
  AC_HELP_STRING([--with-lckey],

@@ -19,22 +19,28 @@
 #ifndef GNASH_CLASS_HIERARCHY_H
 #define GNASH_CLASS_HIERARCHY_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
+#include "as_object.h"
+#include "SafeStack.h"
+#include "asClass.h"
+#include "asNamespace.h"
+
+#ifdef ENABLE_AVM2
+# include "asBoundValues.h"
+# include "asException.h"
+# include "asMethod.h"
+#endif
+
 #include <list>
 #include <vector>
 #include <ostream>
 
-#include "as_object.h"
-#include "asClass.h"
-#include "SafeStack.h"
-
 namespace gnash {
 
 class Extension;
-class asClass;
-class asMethod;
-class asException;
-class asBoundValue;
-class asBoundAccessor;
 class as_object;
 
 /// Register all of the ActionScript classes, with their dependencies.
@@ -129,6 +135,7 @@ public:
 	///
 	void massDeclare();
 
+
 	/// The global namespace
 	///
 	/// Get the global namespace.  This is not the Global object -- it only
@@ -143,7 +150,7 @@ public:
 	///
 	/// @return 
 	/// The namespace with the given uri or NULL if it doesn't exist.
-	asNamespace *findNamespace(string_table::key uri)
+	asNamespace* findNamespace(string_table::key uri)
 	{
 		namespacesContainer::iterator i;
 		if (mNamespaces.empty())
@@ -175,12 +182,42 @@ public:
 	asNamespace* addNamespace(string_table::key uri)
 	{
 		asNamespace *n = findNamespace(uri);
-		if (n)
-			return n;
+		if (n) return n;
 		// The set should create it automatically here. TODO: Make sure
 		mNamespaces[uri].setURI(uri);
 		return &mNamespaces[uri];
 	}
+	
+    /// Create a new asClass object for use.
+	asClass* newClass() {
+        mClassMemory.grow(1);
+        return &mClassMemory.top(0);
+    }
+
+#ifdef ENABLE_AVM2
+
+	asException* newException() {
+        mExceptionMemory.grow(1);
+        return &mExceptionMemory.top(0);
+    }
+
+	/// Create a new asMethod object for use.
+	asMethod* newMethod() {
+        mMethodMemory.grow(1);
+        return &mMethodMemory.top(0);
+    }
+
+	asBoundValue* newBoundValue() {
+        mBoundValueMemory.grow(1);
+        return &mBoundValueMemory.top(0);
+    }
+
+	asBoundAccessor* newBoundAccessor() {
+        mBoundAccessorMemory.grow(1);
+        return &mBoundAccessorMemory.top(0);
+    }
+
+#endif
 
 	/// Set the extension object, since it wasn't set on construction.
 	void setExtension(Extension *e) { mExtension = e; }
@@ -191,56 +228,52 @@ public:
 	/// Mark objects for garbage collector.
 	void markReachableResources() const;
 
-	/// Create a new asClass object for use.
-	asClass *newClass()
-	{ mClassMemory.grow(1); return &mClassMemory.top(0); }
-
-	asException *newException()
-	{ mExceptionMemory.grow(1); return &mExceptionMemory.top(0); }
-
-	/// Create a new asMethod object for use.
-	asMethod *newMethod()
-	{ mMethodMemory.grow(1); return &mMethodMemory.top(0); }
-
-	asBoundValue *newBoundValue()
-	{ mBoundValueMemory.grow(1); return &mBoundValueMemory.top(0); }
-
-	asBoundAccessor *newBoundAccessor()
-	{ mBoundAccessorMemory.grow(1); return &mBoundAccessorMemory.top(0); }
-
 	/// \brief
 	/// Construct the declaration object. Later set the global and
 	/// extension objects using setGlobal and setExtension
-	ClassHierarchy() :
-		mGlobal(NULL), mGlobalNamespace(NULL), mExtension(NULL),
+	ClassHierarchy()
+        :
+		mGlobal(0),
+        mExtension(0) ,
 		mAnonNamespaces(),
-		mClassMemory(), mExceptionMemory(),
+        mGlobalNamespace(anonNamespace(0)),
+		mClassMemory()
+#ifdef ENABLE_AVM2
+        ,
+        mExceptionMemory(),
 		mMethodMemory(),
-		mBoundValueMemory(), mBoundAccessorMemory()
-	{ mGlobalNamespace = anonNamespace(0); }
+		mBoundValueMemory(),
+        mBoundAccessorMemory()
+#endif
+	{}
 
 	/// \brief
 	/// Delete our private namespaces.
 	~ClassHierarchy();
 
 private:
-	as_object *mGlobal;
-	asNamespace *mGlobalNamespace;
-	Extension *mExtension;
+	as_object* mGlobal;
+	Extension* mExtension;
 
 	typedef std::map<string_table::key, asNamespace> namespacesContainer;
 	namespacesContainer mNamespaces;
 	SafeStack<asNamespace> mAnonNamespaces;
+	asNamespace* mGlobalNamespace;
 	SafeStack<asClass> mClassMemory;
+
+#ifdef ENABLE_AVM2
 	SafeStack<asException> mExceptionMemory;
 	SafeStack<asMethod> mMethodMemory;
 	SafeStack<asBoundValue> mBoundValueMemory;
 	SafeStack<asBoundAccessor> mBoundAccessorMemory;
+#endif
 };
 
-std::ostream& operator << (std::ostream& os, const ClassHierarchy::nativeClass& c);
-std::ostream& operator << (std::ostream& os, const ClassHierarchy::extensionClass& c);
+std::ostream&
+operator<< (std::ostream& os, const ClassHierarchy::nativeClass& c);
+std::ostream&
+operator<< (std::ostream& os, const ClassHierarchy::extensionClass& c);
 
-} /* namespace gnash */
-#endif /* GNASH_CLASS_HIERARCHY_H */
+} 
+#endif 
 

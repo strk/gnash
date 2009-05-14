@@ -18,7 +18,12 @@
 
 
 rcsid="$Id: String.as,v 1.56 2008/04/25 11:11:08 bwy Exp $";
+
+#ifdef HAXE
+#include "haxe-swf9/check.as"
+#else
 #include "check.as"
+#endif
 
 check_equals(typeof(String), 'function');
 check_equals(typeof(String.prototype), 'object');
@@ -1292,7 +1297,6 @@ check(String.prototype.hasOwnProperty('substr'));
 check(!String.prototype.hasOwnProperty('length'));
 
 #endif
-
 
 //----- END OF TESTS
 

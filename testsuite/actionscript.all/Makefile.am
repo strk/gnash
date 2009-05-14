@@ -34,11 +34,13 @@ quickcheck_RUNNERS = \
 	alltests-v7-Runner \
 	alltests-v8-Runner
 
+
 base_RUNNERS = \
 	astests-v5-Runner \
 	astests-v6-Runner \
 	astests-v7-Runner \
-	astests-v8-Runner 
+	astests-v8-Runner
+#	astests-v9-Runner
 
 check_SCRIPTS = \
 	$(base_RUNNERS) \
@@ -131,18 +133,33 @@ ASTESTS =			\
 	Rectangle.as		\
 	$(NULL)
 
+if HAVE_PERL
+if ENABLE_HAXE
+HAXETESTS = \
+	String.as \
+	$(NULL)
+endif
+endif
+
+HAXE_DIR = $(srcdir)/haxe-swf9
+HAXE_CPP = $(CPP) -DHAXE -DOUTPUT_VERSION=9 -x c -P -I$(HAXE_DIR)
+HAXE_FLAGS = -cp $(HAXE_DIR) -cp $(HAXE_CLASSPATH)
+
+
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 
 ASTESTS_V5_OUT = $(ASTESTS:.as=-v5.swf)
 ASTESTS_V6_OUT = $(ASTESTS:.as=-v6.swf)
 ASTESTS_V7_OUT = $(ASTESTS:.as=-v7.swf)
 ASTESTS_V8_OUT = $(ASTESTS:.as=-v8.swf)
+ASTESTS_V9_OUT = $(HAXETESTS:.as=-v9.swf)
 
 ASTESTS_VERSIONED_OUT = \
 	$(ASTESTS_V5_OUT) \
 	$(ASTESTS_V6_OUT) \
 	$(ASTESTS_V7_OUT) \
 	$(ASTESTS_V8_OUT) \
+	$(ASTESTS_V9_OUT) \
 	$(NULL)
 
 ALLTESTS_VERSIONED_OUT = \
@@ -306,6 +323,10 @@ astests-v8-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V8_OUT)
 	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(ASTESTS_V8_OUT) > $@
 	chmod 755 $@
 
+astests-v9-Runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_V9_OUT)
+	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) $(HAXE_DIR)/$(ASTESTS_V9_OUT) > $@
+	chmod 755 $@
+
 # This version runs all testcases in a single SWF targetted at player 5
 alltests-v5-Runner: $(srcdir)/../generic-testrunner.sh alltests-v5.swf
 	GNASHRC="$(top_builddir)/testsuite/gnashrc" sh $< $(top_builddir) alltests-v5.swf > $@
@@ -341,6 +362,12 @@ $(ASTESTS_V7_OUT) : $(ASTESTS) Dejagnu.swf
 $(ASTESTS_V8_OUT) : $(ASTESTS) Dejagnu.swf
 	@$(MAKE) ${@:-v8.swf=.swf} SWFVERSION="8"
 	@mv ${@:-v8.swf=.swf} $@
+
+$(ASTESTS_V9_OUT) : $(ASTESTS) Dejagnu.swf
+	$(HAXE_CPP) $(srcdir)/${@:-v9.swf=.as} | $(PERL) $(HAXE_DIR)/as_to_hx.pl ${@:-v9.swf=} > $(HAXE_DIR)/${@:-v9.swf=_as.hx}
+	$(HAXE) $(HAXE_FLAGS) -main $(@:-v9.swf=_as) -swf-version 9 -swf $(HAXE_DIR)/$@
+#	@$(MAKE) ${@:-v9.swf=.swf} SWFVERSION="9"
+#	@mv ${@:-v9.swf=.swf} $@
 
 $(DEJAGNU_SO_PATH):
 	$(MAKE) -C ../misc-ming.all Dejagnu.swf

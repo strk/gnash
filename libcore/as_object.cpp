@@ -94,6 +94,7 @@ public:
 	virtual void set_member(string_table::key /*key*/, const as_value& /*val*/,
 		string_table::key /*nsname*/ = 0)
 	{
+		log_debug("set_member.");
 		// can't assign to super
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Can't set members on the 'super' object");
@@ -554,6 +555,31 @@ as_object::reserveSlot(string_table::key name, string_table::key nsId,
 	unsigned short slotId)
 {
 	_members.reserveSlot(name, nsId, slotId);
+}
+
+bool
+as_object::get_member_slot(int order, as_value* val){
+	
+	const Property* prop = _members.getPropertyByOrder(order);
+	if(prop){
+		return get_member(prop->getName(), val, prop->getNamespace());
+	}
+	else{
+		return false;
+	}
+}
+
+
+bool
+as_object::set_member_slot(int order, const as_value& val, bool ifFound)
+{
+	const Property* prop = _members.getPropertyByOrder(order);
+	if(prop){
+		return set_member(prop->getName(), val, prop->getNamespace(), ifFound);
+	}
+	else{
+		return false;
+	}
 }
 
 // Handles read_only and static properties properly.

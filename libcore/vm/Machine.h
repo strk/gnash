@@ -20,11 +20,13 @@
 #define GNASH_MACHINE_H
 
 #include <vector>
-
+#include <sstream>
 #include "SafeStack.h"
 #include "as_value.h"
 #include "asClass.h"
 #include "swf.h"
+#include "as_environment.h"
+#include "VM.h"
 
 namespace gnash {
 
@@ -201,7 +203,13 @@ public:
 		unsigned char stack_in, short stack_out)
 	{ immediateFunction(to_call, pthis, mIgnoreReturn, stack_in, stack_out); }
 
-	Machine(string_table &ST, ClassHierarchy *CH);
+	void initMachine(abc_block* pool_block,as_object* global);
+
+	as_value executeFunction(asMethod* function, const fn_call& fn);
+
+	void instantiateClass(std::string className, as_object* global);
+
+	Machine(VM& vm);
 
 private:
 	/// The state of the machine.
@@ -212,11 +220,18 @@ private:
 		unsigned int mStackTotalSize;
 		unsigned int mScopeStackDepth;
 		unsigned int mScopeTotalSize;
+		bool mReturn;
 		CodeStream *mStream;
 		asNamespace *mDefaultXMLNamespace;
 		as_object *mCurrentScope;
 		as_value *mGlobalReturn;
 		as_object *mThis;
+		std::vector<as_value> mRegisters;
+		abc_function* mFunction;
+	void to_debug_string(){
+		log_abc("StackDepth=%u StackTotalSize=%u ScopeStackDepth=%u ScopeTotalSize=%u",mStackDepth,mStackTotalSize,mScopeStackDepth,mScopeTotalSize);
+
+	}
 	};
 
 	class Scope
@@ -234,13 +249,67 @@ private:
 	void saveState();
 	void restoreState();
 
+	as_value find_prop_strict(asName multiname);
+
+	as_value get_property_value(asName multiname);
+
+	as_value get_property_value(boost::intrusive_ptr<as_object> obj, asName multiname);
+
+	as_value get_property_value(boost::intrusive_ptr<as_object> obj, std::string name, std::string ns);
+
+	void print_stack();
+
+	void print_scope_stack();
+
+	std::auto_ptr< std::vector<as_value> > get_args(unsigned int argc);
+	
+	void load_function(CodeStream* stream, boost::uint32_t maxRegisters);
+
+	as_environment::ScopeStack* getScopeStack();
+
+	void executeCodeblock(CodeStream* stream);
+
+	void clearRegisters(boost::uint32_t maxRegsiters);
+
+	as_value get_register(int index){
+		log_abc("Getting value at a register %d ",index);
+		return mRegisters[index];
+	}
+
+	void push_stack(as_value object){
+		log_abc("Pushing value %s onto stack.",object.toDebugString());
+		mStack.push(object);
+	}
+
+	as_value pop_stack(){
+		as_value value = mStack.pop();
+		log_abc("Poping value %s off the stack.",value.toDebugString());
+		return value;
+	}
+
+	void push_scope_stack(as_value object){
+		boost::intrusive_ptr<as_object> scopeObj = object.to_object();
+		assert(scopeObj.get());
+		log_abc("Pushing value %s onto scope stack.",object.toDebugString());
+		mScopeStack.push(scopeObj);
+		print_scope_stack();
+	}
+
+	boost::intrusive_ptr<as_object> pop_scope_stack(){
+		log_abc("Poping value off the scope stack.  There will be %u items left.",mScopeStack.size()-1);
+		return mScopeStack.pop();
+	}
+	boost::intrusive_ptr<as_object> get_scope_stack(boost::uint8_t depth){
+		log_abc("Geting value from scope stack %u from the bottom.",depth | 0x0);
+		return mScopeStack.value(depth);
+	}
+
 	SafeStack<as_value> mStack;
 	SafeStack<State> mStateStack;
-	SafeStack<Scope> mScopeStack;
-	SafeStack<as_value> mFrame;
+	std::vector<as_value> mRegisters;
+	SafeStack<boost::intrusive_ptr<as_object> > mScopeStack;
 	CodeStream *mStream;
 
-	ClassHierarchy *mCH;
 	string_table& mST;
 
 	asNamespace* mDefaultXMLNamespace;
@@ -249,12 +318,21 @@ private:
 	as_object* mDefaultThis;
 	as_object* mThis;
 
-	as_value *mGlobalReturn;
+	as_object* mGlobalObject;
+
+	as_value mGlobalReturn;
 	as_value mIgnoreReturn; // Throw away returns go here.
 
 	bool mIsAS3; // Is the stream an AS3 stream.
+	bool mExitWithReturn;
 	abc_block* mPoolObject; // Where all of the pools are stored.
+
+	abc_function* mCurrentFunction;
+
+	VM& _vm;
+	
+    ClassHierarchy *mCH;
 };
 
 } // namespace gnash
-#endif /* GNASH_MACHINE_H */
+#endif 

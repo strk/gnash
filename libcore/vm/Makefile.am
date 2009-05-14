@@ -40,17 +40,22 @@ AM_CPPFLAGS = \
 
 libgnashvm_la_SOURCES = \
 	ASHandlers.cpp \
-	Machine.cpp \
 	ActionExec.cpp \
 	VM.cpp		\
 	action.cpp \
 	CallStack.cpp \
 	$(NULL)
 
+if ENABLE_AVM2
+libgnashvm_la_SOURCES += \
+	CodeStream.cpp \
+	Machine.cpp
+	$(NULL)
+endif
+
 noinst_HEADERS =		\
 	ASHandlers.h		\
 	CodeStream.h		\
-	Machine.h			\
 	asName.h			\
 	ActionExec.h		\
 	ExecutableCode.h	\
@@ -63,7 +68,16 @@ EXTENSIONS_API = \
 	CallStack.h \
 	SafeStack.h			\
 	VM.h			\
+	Machine.h			\
 	$(NULL)
+	
+if ENABLE_AVM2
+noinst_HEADERS += \
+	asName.h			\
+	CodeStream.h		\
+	Machine.h \
+	$(NULL)
+endif
 
 if SDKINSTALL
 noinst_HEADERS += $(EXTENSIONS_API)

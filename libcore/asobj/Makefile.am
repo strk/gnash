@@ -57,6 +57,7 @@ libgnashasobjs_la_SOURCES = \
 	Date_as.cpp \
 	Error_as.cpp \
 	Global.cpp \
+	int_as.cpp \
 	Key_as.cpp	\
 	LoadVars_as.cpp \
 	LocalConnection_as.cpp\
@@ -106,6 +107,7 @@ libgnashasobjs_la_SOURCES = \
 	flash/net_pkg.cpp \
 	flash_pkg.cpp \
 	flash/text_pkg.cpp \
+	flash/text/TextFieldAutoSize_as.cpp \
 	flash/text/TextRenderer_as.cpp \
 	LoadableObject.cpp \
 	$(NULL)
@@ -123,6 +125,8 @@ noinst_HEADERS = \
 	Error_as.h	\
 	Math_as.h	\
 	Global.h\
+	int_as.h \
+	Key_as.h \
 	LoadVars_as.h \
 	LocalConnection_as.h\
 	Microphone.h \
@@ -170,6 +174,7 @@ noinst_HEADERS = \
 	flash/net_pkg.h \
 	flash_pkg.h \
 	flash/text_pkg.h \
+	flash/text/TextFieldAutoSize_as.h \
 	flash/text/TextRenderer_as.h \
 	LoadableObject.h \
 	$(NULL)

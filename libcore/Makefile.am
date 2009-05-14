@@ -47,6 +47,7 @@ AM_CPPFLAGS = \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
 
+
 libgnashcore_la_SOURCES = \
 	BitmapMovie.cpp \
 	Property.cpp \
@@ -57,7 +58,6 @@ libgnashcore_la_SOURCES = \
 	as_function.cpp	\
 	as_object.cpp \
 	as_value.cpp \
-	asClass.cpp \
 	DisplayObject.cpp \
 	CharacterProxy.cpp \
 	cxform.cpp \
@@ -121,15 +121,23 @@ libgnashcore_la_SOURCES = \
 	styles.cpp \
 	Timers.cpp \
 	RGBA.cpp 	\
+	asClass.cpp \
+	asNamespace.cpp \
 	$(FREETYPE_SOURCES) \
 	$(NULL)
+
+if ENABLE_AVM2
+libgnashcore_la_SOURCES += \
+	abc_function.cpp \
+	asMethod.cpp
+	$(NULL)
+endif
 
 noinst_HEADERS = \
 	URLAccessManager.h \
 	VirtualClock.h \
 	SystemClock.h \
 	ManualClock.h \
-	asClass.h \
 	Bitmap.h \
 	BitmapMovie.h \
 	Button.h \
@@ -158,6 +166,7 @@ noinst_HEADERS = \
 	swf/VideoFrameTag.h \
 	swf/DefineVideoStreamTag.h \
 	swf/DefineFontAlignZonesTag.h \
+	swf/SymbolClassTag.h \
 	swf/CSMTextSettingsTag.h \
 	swf/DefineShapeTag.h \
 	swf/DefineMorphShapeTag.h \
@@ -184,6 +193,16 @@ noinst_HEADERS = \
 	Timers.h \
 	Video.h \
 	$(NULL)
+
+if ENABLE_AVM2
+noinst_HEADERS += \
+	swf/DoABCTag.h \
+	abc_function.h \
+	asMethod.h \
+	asException.h \
+	asBoundValues.h \
+	$(NULL)
+endif
 
 EXTENSIONS_API = \
 	as_object.h \
@@ -226,6 +245,9 @@ EXTENSIONS_API = \
 	BitmapInfo.h \
 	RGBA.h	\
 	Geometry.h	\
+	Video.h \
+	asClass.h \
+	asNamespace.h \
 	$(NULL)
 
 if SDKINSTALL
