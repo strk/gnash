@@ -82,10 +82,6 @@ libgnashasobjs_la_SOURCES = \
 	XMLNode_as.cpp \
 	XMLSocket_as.cpp \
 	flash/display/BitmapData_as.cpp \
-	flash/display/DisplayObject_as.cpp \
-	flash/display/DisplayObjectContainer_as.cpp \
-	flash/display/InteractiveObject_as.cpp \
-	flash/display/Sprite_as.cpp \
 	flash/display_pkg.cpp \
 	flash/events/EventDispatcher_as.cpp \
 	flash/events_pkg.cpp \
@@ -158,10 +154,6 @@ noinst_HEADERS = \
 	XMLSocket_as.h \
 	XMLNode_as.h \
 	flash/display/BitmapData_as.h \
-	flash/display/DisplayObject_as.h \
-	flash/display/DisplayObjectContainer_as.h \
-	flash/display/InteractiveObject_as.h \
-	flash/display/Sprite_as.h \
 	flash/display_pkg.h \
 	flash/events/EventDispatcher_as.h \
 	flash/events_pkg.h \

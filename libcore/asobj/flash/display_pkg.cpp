@@ -25,10 +25,6 @@
 
 #include "flash/display/BitmapData_as.h"
 #include "Stage_as.h"
-#include "flash/display/DisplayObject_as.h"
-#include "flash/display/InteractiveObject_as.h"
-#include "flash/display/DisplayObjectContainer_as.h"
-#include "flash/display/Sprite_as.h"
 #include "MovieClip.h"
 
 namespace gnash {
@@ -42,10 +38,6 @@ get_flash_display_package(const fn_call& /*fn*/)
 
 	BitmapData_class_init(*pkg);
 	stage_class_init(*pkg);
-	display_object_class_init(*pkg);
-	interactive_object_class_init(*pkg);
-	display_object_container_class_init(*pkg);
-	sprite_as_class_init(*pkg);
 	movieclip_class_init(*pkg);
 
 	return pkg;
@@ -55,7 +47,8 @@ void
 flash_display_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("display"), get_flash_display_package);
+	where.init_destructive_property(st.find("display"),
+			get_flash_display_package);
 }
 
 
