@@ -23,6 +23,8 @@
 #include "action_buffer.h" // for composition
 #include "MovieClip.h" // for inlines
 #include "SWFStream.h" // for inlines
+#include "Machine.h"
+#include "VM.h"
 
 // Forward declarations
 namespace gnash {
