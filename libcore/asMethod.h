@@ -18,6 +18,10 @@
 #ifndef GNASH_AS_METHOD_H
 #define GNASH_AS_METHOD_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include "log.h"
 #include "string_table.h"
 #include "Property.h"

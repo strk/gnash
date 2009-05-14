@@ -18,6 +18,10 @@
 #ifndef GNASH_AS_CLASS_H
 #define GNASH_AS_CLASS_H
 
+#ifdef HAVE_CONFIG_H
+#include "gnashconfig.h"
+#endif
+
 #include <list>
 #include <map>
 #include <vector>
