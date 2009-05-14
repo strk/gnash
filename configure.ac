@@ -205,6 +205,17 @@ fi
 SOLDIR=${soldir}
 AC_SUBST(SOLDIR)
 
+AC_ARG_ENABLE(avm2,
+  AC_HELP_STRING([--enable-avm2], [Enable support for AS3]),
+  [case "${enableval}" in
+    yes) avm2=yes ;;
+    no)  avm2=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for enable-avm2 option]) ;;
+  esac], avm2=no
+)
+AM_CONDITIONAL(ENABLE_AVM2, [test x"$avm2" = xyes])
+AC_DEFINE(ENABLE_AVM2, [test x"$avm2" = xyes], [Enable AVM2 code])
+
 dnl lckey=0xdd3adabd
 AC_ARG_WITH(lckey,
  AC_HELP_STRING([--with-lckey],
@@ -1587,17 +1598,6 @@ AM_CONDITIONAL(MING_SUPPORTS_SWFBUTTON_SET_DEPTH,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040006 ])
 AM_CONDITIONAL(MING_VERSION_0_4_3,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040300 ])
-
-
-AC_ARG_ENABLE(avm2,
-  AC_HELP_STRING([--enable-avm2], [Enable support for AS3]),
-  [case "${enableval}" in
-    yes) avm2=yes ;;
-    no)  avm2=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-avm2 option]) ;;
-  esac], avm2=no
-)
-AM_CONDITIONAL(ENABLE_AVM2, [ test x$avm2 != xno ])
 
 if test x$cross_compiling = xno; then
   AC_ARG_WITH([swfdec_testsuite],
