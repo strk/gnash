@@ -1292,6 +1292,10 @@ asClass*
 abc_block::locateClass(const std::string& className)
 {
 
+    // TODO: this is rubbish and should be done properly. Machine.cpp also
+    // has completeName for runtime names, so should probably use common
+    // code (construction of asName?).
+
     const std::string::size_type pos = className.rfind(".");
     
     if (pos == std::string::npos) {
