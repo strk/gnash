@@ -31,7 +31,21 @@ namespace gnash {
 class asNamespace
 {
 public:
-	void markReachableResources() const { /* TODO */ }
+
+	/// Create an empty namespace
+	asNamespace()
+        :
+        _parent(0),
+        mUri(0),
+        _prefix(0),
+        _abcURI(0),
+        mClasses(),
+		mRecursePrevent(false),
+        _private(false),
+        _protected(false)
+	{}
+
+    void markReachableResources() const { /* TODO */ }
 
 	/// Our parent (for protected)
 	void setParent(asNamespace* p) { _parent = p; }
@@ -50,25 +64,11 @@ public:
 	/// What is the XML prefix?
 	string_table::key getPrefix() const { return _prefix; }
 
-	/// Create an empty namespace
-	asNamespace()
-        :
-        _parent(0),
-        mUri(0),
-        _prefix(0),
-        _abcURI(0),
-        mClasses(),
-		mRecursePrevent(false),
-        _private(false),
-        _protected(false)
-	{/**/}
-
 	/// Add a class to the namespace. The namespace stores this, but
 	/// does not take ownership. (So don't delete it.)
 	bool addClass(string_table::key name, asClass *a)
 	{
-		if (getClassInternal(name))
-			return false;
+		if (getClassInternal(name)) return false;
 		mClasses[static_cast<std::size_t>(name)] = a;
 		return true;
 	}
@@ -77,14 +77,13 @@ public:
 
 	/// Get the named class. Returns NULL if information is not known
 	/// about the class. (Stubbed classes still return NULL here.)
-	asClass *getClass(string_table::key name) 
+	asClass* getClass(string_table::key name) 
 	{
-		if (mRecursePrevent)
-			return NULL;
+		if (mRecursePrevent) return NULL;
 
-		asClass *found = getClassInternal(name);
-		if (found || !getParent())
-			return found;
+		asClass* found = getClassInternal(name);
+
+		if (found || !getParent()) return found;
 
 		mRecursePrevent = true;
 		found = getParent()->getClass(name);
@@ -101,7 +100,8 @@ public:
 	bool isProtected() { return _protected; }
 	
 private:
-	asNamespace *_parent;
+
+	asNamespace* _parent;
 	string_table::key mUri;
 	string_table::key _prefix;
 
@@ -117,12 +117,12 @@ private:
 	asClass* getClassInternal(string_table::key name) const
 	{
 		container::const_iterator i;
-		if (mClasses.empty())
-			return NULL;
+		
+        if (mClasses.empty()) return NULL;
 
 		i = mClasses.find(name);
-		if (i == mClasses.end())
-			return NULL;
+
+		if (i == mClasses.end()) return NULL;
 		return i->second;
 	}
 };
