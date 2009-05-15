@@ -61,6 +61,9 @@ public:
 
     void key_event(SDL_KeyboardEvent * key, bool down);
 
+    // See gui.h for documentation
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
+
 private:
     unsigned int _timeout;
     bool         _core_trap;

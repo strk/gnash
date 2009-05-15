@@ -38,6 +38,8 @@ extern "C"{
 #include "gnash.h"
 #include "log.h"
 #include "sdlsup.h"
+#include "Range2d.h" // for Intersection of inv bounds
+#include "render_handler.h" // for setInvalidatedRegions
 
 using namespace std;
 
@@ -331,6 +333,17 @@ SDLGui::expose_event()
 {
     // TODO: implement and use setInvalidatedRegion instead?
     renderBuffer();
+}
+
+/* public, overridden */
+void
+SDLGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+    // forward to renderer
+    _renderer->set_invalidated_regions(ranges);
+    
+    // TODO: mark regions to be redrawn on next ::renderBuffer call ?
+
 }
 
 
