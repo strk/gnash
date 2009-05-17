@@ -75,8 +75,8 @@ Cygnal is a streaming media server that's Flash aware.
 Summary:   Gnash header files
 Group:     Applications/Multimedia
 
-%description gnash-devel
-Cygnal is a streaming media server that's Flash aware.
+%description devel
+Gnash header files can be used to write external Gnash extensions.
 
 %prep
 %setup -q
