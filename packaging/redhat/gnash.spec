@@ -58,7 +58,6 @@ Gnash is a GNU SWF movie player that supports many SWF v7 features, with growing
 %package plugin
 Summary:   Web-client SWF player plugin 
 Requires:  %{name} = %{version}-%{release}
-Requires: gstreamer >= 0.10 gnash
 Group:     Applications/Internet
 
 %description plugin
@@ -70,6 +69,13 @@ Requires:  %{name} = %{version}-%{release}
 Group:     Applications/Multimedia
 
 %description cygnal
+Cygnal is a streaming media server that's Flash aware.
+
+%package devel
+Summary:   Gnash header files
+Group:     Applications/Multimedia
+
+%description gnash-devel
 Cygnal is a streaming media server that's Flash aware.
 
 %prep
@@ -250,6 +256,10 @@ scrollkeeper-update -q || :
 %files cygnal
 %defattr(-,root,root,-)
 %{_bindir}/cygnal
+
+%files devel
+%{_prefix}/include/gnash/*.h
+%{_prefix}/lib/pkgconfig/gnash.pc
 
 %changelog
 * Sat Feb 13 2009 Rob Savoye <rob@welcomehome.org> - trunk
