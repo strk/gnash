@@ -1660,7 +1660,7 @@ Machine::execute()
 			as_value nameValue = pop_stack();
 			name = mST.find(nameValue.to_string());
 		}
-		else{
+		else {
 			name = a.getGlobalName();
 		}
 
@@ -1669,8 +1669,8 @@ Machine::execute()
 		as_object* object = object_val.to_object().get();
 		if (!object) {
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Can't get a property of a value that doesn't cast to an object (%s)."),
-				object_val);
+			log_aserror(_("Can't get a property of a value that doesn't "
+                    "cast to an object (%s)."), object_val);
 			)
 		}
 		else{
@@ -2849,7 +2849,8 @@ Machine::find_prop_strict(asName multiname) {
 		}
 	}
 
-	log_abc("Cannot find property in scope stack.  Trying again using as_environment.");
+	log_abc("Cannot find property in scope stack.  Trying again using "
+            "as_environment.");
 	as_object *target = NULL;
 	as_environment env = as_environment(_vm);
 	std::string name = mPoolObject->stringPoolAt(multiname.getABCName());

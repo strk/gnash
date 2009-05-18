@@ -283,7 +283,7 @@ private:
 
 	as_value pop_stack(){
 		as_value value = mStack.pop();
-		log_abc("Poping value %s off the stack.",value.toDebugString());
+		log_abc("Popping value %s off the stack.",value.toDebugString());
 		return value;
 	}
 
