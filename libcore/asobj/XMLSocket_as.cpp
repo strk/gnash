@@ -36,6 +36,7 @@
 
 #include <boost/thread.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/scoped_ptr.hpp>
 #include <string>
 
 #undef GNASH_XMLSOCKET_DEBUG
@@ -72,8 +73,8 @@ public:
 
     /// Initiate a connection.
     void connect(const std::string& host, boost::uint16_t port) {
-        _start = boost::thread(
-            boost::bind(&SocketConnection::makeConnection, this, host, port));
+        _start.reset(new boost::thread(
+            boost::bind(&SocketConnection::makeConnection, this, host, port)));
     }
 
     /// The state of the connection.
@@ -188,7 +189,7 @@ public:
     //
     /// This also cancels any connection attempt in progress.
     void close() {
-        _start.join();
+        if (_start) _start.reset();
         _socket.closeNet();
         
         // Reset for next connection.
@@ -211,7 +212,7 @@ private:
 
     std::string _remainder;
 
-    boost::thread _start;
+    boost::scoped_ptr<boost::thread> _start;
 
 };
 
