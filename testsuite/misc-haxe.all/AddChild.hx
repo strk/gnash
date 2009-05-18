@@ -5,6 +5,9 @@
 class PP_AddChild {
     static function main()
     {
+
+        var thisObject = flash.Lib.current;
+
         var tf = new flash.text.TextField();
         var tf2 = flash.Lib.current.addChild(tf);
         check_equals(tf, tf2);
@@ -29,12 +32,17 @@ class PP_AddChild {
         check_equals(tf7, tf6);
         check_equals(tf7, tf5);
 
-        // TODO: check depths, add a MovieClip child,
-        //       find a way to do some checks on the
-        //       actual stage content !
+        // Check that this MovieClip has 2 children.
+        xcheck_equals(thisObject.numChildren, 2);
+
+        // Check that the parent of both children is this MovieClip.
+        xcheck_equals(thisObject.getChildAt(1).parent, thisObject);
+        xcheck_equals(thisObject.getChildAt(0).parent, thisObject);
+        
+        // TODO: check depths, add a MovieClip child.
 
         // Check number of tests run (for consistency)
-        check_totals(13);
+        check_totals(16);
 
         // Call this after finishing all tests. It prints out the totals.
         Dejagnu.done();
