@@ -221,7 +221,7 @@ public:
     bool send(const char *str);
 
     // Accessors for testing
-    bool connected()           
+    bool connected() const
     {
         assert ( ( _connected && _sockfd > 0 ) || ( ! _connected && _sockfd <= 0 ) );
         return _connected;
