@@ -407,6 +407,19 @@ public:
 	{
 	}
 
+    /// Set whether the SWFMovie should use AVM2 or AVM1.
+    //
+    /// This is only sensible for SWFMovieDefinitions, so is a no-op here.
+    virtual void setAS3() {
+    }
+
+    /// True if the SWFMovie should use AVM2.
+    //
+    /// This is only sensible for SWFMovieDefinitions, and shouldn't be
+    /// here once this inheritance mess is cleaned up.
+    virtual bool isAS3() const {
+        return false;
+    }
 
 	/// \brief
 	/// Return the URL of the SWF stream this definition has been read

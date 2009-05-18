@@ -75,9 +75,18 @@ public:
     {
     }
 	
-	static void doABCLoader(SWFStream& in, TagType tag,
-			movie_definition& m, const gnash::RunInfo&)
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
+            const gnash::RunInfo&)
 	{
+
+        if (!m.isAS3()) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror("SWF contains ABC tag, but is not an "
+                    "AS3 SWF!");
+            );
+            throw ParserException("ABC tag found in non-AS3 SWF!");
+        }
+
 		if (tag == SWF::DOABCDEFINE) {
 			in.ensureBytes(4);
 			static_cast<void> (in.read_u32());
@@ -87,14 +96,13 @@ public:
 
 		abc_block* block = new abc_block();
 		block->read(in);
-//		mABC = block;
-		DoABCTag *ABCtag = new DoABCTag(block);
+        // mABC = block;
+		DoABCTag* ABCtag = new DoABCTag(block);
 		
-/*
 		IF_VERBOSE_PARSE (
-		log_parse(_("tag %d: do_action_loader"), tag);
-		log_parse(_("-- actions in frame %d"), m->get_loading_frame());
-		);*/
+            log_parse(_("tag %d: DoABCDefine"), tag);
+            log_parse(_("-- actions in frame %d"), m.get_loading_frame());
+		);
 
 		m.addControlTag(ABCtag); // ownership transferred
 	}

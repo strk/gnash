@@ -199,7 +199,8 @@ SWFMovieDefinition::SWFMovieDefinition(const RunInfo& runInfo)
 	m_jpeg_in(0),
 	_loader(*this),
 	_loadingCanceled(false),
-    _runInfo(runInfo)
+    _runInfo(runInfo),
+    _as3(false)
 {
 }
 

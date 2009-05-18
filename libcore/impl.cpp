@@ -127,7 +127,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
     register_tag_loader(SWF::DEFINEFONT, DefineFontTag::loader);
     register_tag_loader(SWF::DEFINETEXT, DefineTextTag::loader);
-    register_tag_loader(SWF::DOACTION,  DoActionTag::doActionLoader);
+    register_tag_loader(SWF::DOACTION,  DoActionTag::loader);
     register_tag_loader(SWF::DEFINEFONTINFO, DefineFontInfoTag::loader);
     // 62
     register_tag_loader(SWF::DEFINEFONTINFO2, DefineFontInfoTag::loader);
@@ -198,8 +198,8 @@ static void ensure_loaders_registered()
     // (might be nice to dump the password instead..)
     register_tag_loader(SWF::ENABLEDEBUGGER, null_loader);    // 58
 
-    register_tag_loader(SWF::INITACTION, DoInitActionTag::doInitActionLoader);  // 59  
-
+    // 59
+    register_tag_loader(SWF::INITACTION, DoInitActionTag::loader); 
     // 60
     register_tag_loader(SWF::DEFINEVIDEOSTREAM, DefineVideoStreamTag::loader);
     // 61
@@ -252,11 +252,11 @@ static void ensure_loaders_registered()
 
 #ifdef ENABLE_AVM2
     // 72 -- AS3 codeblock.
-    register_tag_loader(SWF::DOABC, DoABCTag::doABCLoader); 
+    register_tag_loader(SWF::DOABC, DoABCTag::loader); 
     // 76
     register_tag_loader(SWF::SYMBOLCLASS, SymbolClassTag::loader);
     // 82
-    register_tag_loader(SWF::DOABCDEFINE, DoABCTag::doABCLoader);
+    register_tag_loader(SWF::DOABCDEFINE, DoABCTag::loader);
     // 86
     register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,
             define_scene_frame_label_loader);

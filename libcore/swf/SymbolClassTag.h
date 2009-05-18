@@ -59,25 +59,30 @@ public:
 	{
 	    return true;
 	}
-	static void loader(SWFStream& in, TagType tag,
-			movie_definition& m, const RunInfo& /*r*/)
-	{
-		assert(tag == SYMBOLCLASS); //76
 
-		log_unimpl(_("%s tag parsed but not yet used"), "SYMBOLCLASS");
+	static void loader(SWFStream& in, TagType tag, movie_definition& m,
+            const RunInfo& /*r*/)
+	{
+		assert(tag == SYMBOLCLASS); 
+
 		in.ensureBytes(2);
 		boost::uint16_t num_symbols = in.read_u16();
 		log_debug("There are %u symbols.", num_symbols);
 		for (unsigned int i = 0; i < num_symbols; ++i) {
 			in.ensureBytes(2);
-			boost::uint16_t character = in.read_u16();
+			boost::uint16_t id = in.read_u16();
 			std::string name;
 			in.read_string(name);
-			log_debug("Symbol %u name=%s tag=%u", i, name, character);
-			if (character == 0) {
-				SymbolClassTag *symbolClassTag = new SymbolClassTag(name);
-				m.addControlTag(symbolClassTag);
-			}
+			log_parse("Symbol %u name=%s tag=%u", i, name, id);
+            
+            SymbolClassTag* st = new SymbolClassTag(name);
+			
+            if (id == 0) m.addControlTag(st);
+            else {
+                sprite_definition* s =
+                    dynamic_cast<sprite_definition*>(m.getDefinitionTag(id));
+                if (s) s->addControlTag(st);
+            }
 		}
 	}
 

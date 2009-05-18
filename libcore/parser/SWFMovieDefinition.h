@@ -149,7 +149,8 @@ public:
 	/// Return a const_iterator to one-past last dictionary element
 	CharacterConstIterator end() const { return _map.end(); }
 
-    friend std::ostream& operator<<(std::ostream& o, const CharacterDictionary& cd);
+    friend std::ostream& operator<<(std::ostream& o,
+            const CharacterDictionary& cd);
 
 #ifdef GNASH_USE_GC
 	/// Mark all dictionary items to be reachable (for GC)
@@ -202,6 +203,16 @@ public:
 		return std::ceil(twipsToPixels(m_frame_size.height()));
 	}
 
+    /// Call this to inform callers that tags should be executed using AVM2
+    void setAS3() {
+        _as3 = true;
+    }
+    
+    /// Check whether tags should be executed using AVM2
+    bool isAS3() const {
+        return _as3;
+    }
+
 	virtual int	get_version() const { return m_version; }
 
 	/// Get the number of fully loaded frames
@@ -249,7 +260,7 @@ public:
 
 	/// \brief
 	/// Return a DisplayObject from the dictionary
-    SWF::DefinitionTag* getDefinitionTag(int DisplayObject_id) const;
+    SWF::DefinitionTag* getDefinitionTag(int id) const;
 
 	// See dox in movie_definition
 	//
@@ -564,6 +575,8 @@ private:
     ///         kinds of movies (e.g. FLV) and make it easier to initialize
     ///         movie_root with the same RunInfo as its first definition.
     const RunInfo& _runInfo;
+
+    bool _as3;
 
 };
 

@@ -64,13 +64,13 @@ VM::init(int version, movie_root& root, VirtualClock& clock)
 	_singleton.reset(new VM(version, root, clock));
 
 	assert(_singleton.get());
-	NSV::loadStrings(_singleton->mStringTable, _singleton->getSWFVersion());
+	NSV::loadStrings(_singleton->_stringTable, _singleton->getSWFVersion());
 
-	_singleton->mClassHierarchy.reset(new ClassHierarchy);
-	_singleton->setGlobal(new Global(*_singleton, _singleton->mClassHierarchy.get()));
+	_singleton->_classHierarchy.reset(new ClassHierarchy);
+	_singleton->setGlobal(new Global(*_singleton, _singleton->_classHierarchy.get()));
 
 #ifdef ENABLE_AVM2
-	_singleton->mMachine = new Machine(*_singleton);
+	_singleton->_machine = new Machine(*_singleton);
 	assert(_singleton->getGlobal());
 #endif
 
@@ -96,7 +96,7 @@ VM::VM(int version, movie_root& root, VirtualClock& clock)
 	_rootMovie(root),
 	_swfversion(version),
 #ifdef ENABLE_AVM2
-    mMachine(0),
+    _machine(0),
 #endif
 	_clock(clock),
 	_stack(),
@@ -245,7 +245,7 @@ VM::markReachableResources() const
 		(*i)->setReachable();
 	}
 
-	mClassHierarchy->markReachableResources();
+	_classHierarchy->markReachableResources();
 
     if (_shLib.get()) _shLib->markReachableResources();
 #endif

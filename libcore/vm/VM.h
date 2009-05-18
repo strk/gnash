@@ -166,11 +166,11 @@ public:
 	unsigned long int getTime() const;
 
 	/// Get a reference to the string table used by the VM.
-	string_table& getStringTable() const { return mStringTable; }
+	string_table& getStringTable() const { return _stringTable; }
 
 #ifdef ENABLE_AVM2
 	/// Get a pointer to the machine, if it exists.
-	Machine* getMachine() const { return mMachine; }
+	Machine* getMachine() const { return _machine; }
 #endif
 
 	/// Get version of the player, in a compatible representation
@@ -233,7 +233,7 @@ public:
 	as_object* getGlobal() const;
 
 	/// Get a pointer to this VM's global ClassHierarchy object.
-	ClassHierarchy* getClassHierarchy() const { return mClassHierarchy.get(); }
+	ClassHierarchy* getClassHierarchy() const { return _classHierarchy.get(); }
 	
 	/// Mark all reachable resources (for GC)
 	//
@@ -296,7 +296,8 @@ private:
 	void setGlobal(as_object*);
 
 #ifdef GNASH_USE_GC
-	/// A vector of static GcResources (tipically used for built-in class constructors)
+	/// A vector of static GcResources (typically used for built-in
+    /// class constructors)
 	//
 	/// The resources in this list will always be marked as reachable
 	///
@@ -309,14 +310,14 @@ private:
 	AsNativeTable _asNativeTable;
 
 	/// Mutable since it should not affect how the VM runs.
-	mutable string_table mStringTable;
+	mutable string_table _stringTable;
 
 	/// Not mutable since changing this changes behavior of the VM.
-	std::auto_ptr<ClassHierarchy> mClassHierarchy;
+	std::auto_ptr<ClassHierarchy> _classHierarchy;
 
 #ifdef ENABLE_AVM2
 	/// A running execution thread.
-	Machine *mMachine;
+	Machine *_machine;
 #endif
 
 	VirtualClock& _clock;

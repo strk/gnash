@@ -1178,16 +1178,17 @@ sound_stream_head_loader(SWFStream& in, TagType tag, movie_definition& m,
 
 
 void
-file_attributes_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
+file_attributes_loader(SWFStream& in, TagType tag, movie_definition& m,
         const RunInfo& /*r*/)
 {
     assert(tag == SWF::FILEATTRIBUTES); // 69
 
     struct file_attrs_flags {
         unsigned reserved1;
-        unsigned has_metadata;
+        bool metadata;
+        bool as3;
         unsigned reserved2;
-        unsigned use_network;
+        bool network;
         unsigned reserved3;
     };
 
@@ -1195,32 +1196,42 @@ file_attributes_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
 
     in.ensureBytes(1 + 3);
     flags.reserved1 = in.read_uint(3);
-    flags.has_metadata = in.read_bit(); 
-    flags.reserved2 = in.read_uint(3);
-    flags.use_network = in.read_bit(); 
+    flags.metadata = in.read_bit(); 
+    flags.as3 = in.read_bit();
+    flags.reserved2 = in.read_uint(2);
+    flags.network = in.read_bit(); 
     flags.reserved3 = in.read_uint(24);
 
     IF_VERBOSE_PARSE
     (
-    log_parse(_("  file attributes: has_metadata=%s use_network=%s"),
-          flags.has_metadata ? _("true") : _("false"),
-          flags.use_network ? _("true") : _("false"))
+        log_parse(_("File attributes: metadata=%s network=%s"),
+              flags.metadata ? _("true") : _("false"),
+              flags.network ? _("true") : _("false"))
     );
 
-    if ( ! flags.use_network )
-    {
-    log_unimpl(_("FileAttributes tag in the SWF requests that "
-            "network access is not granted to this movie "
-            "(or application?) when loaded from the filesystem. "
-                "Anyway Gnash won't care; "
-            "use white/black listing in your .gnashrc instead"));
+    if (!flags.network) {
+        log_unimpl(_("FileAttributes tag in the SWF requests that "
+                "network access is not granted to this movie "
+                "(or application?) when loaded from the filesystem. "
+                    "Anyway Gnash won't care; "
+                "use white/black listing in your .gnashrc instead"));
     }
 
-    // TODO:
-    //     - attach info to movie_definition.
-    //     - don't allow later FileAttributes tags in the same movie
-    //       to override the first one used.
-    //     - only use if it is the *first* tag in the SWFStream.
+    if (flags.as3) {
+        log_debug("This SWF uses AVM2 / AS3");
+#ifndef ENABLE_AVM2
+    /// Log an error if this build can't interpret AS3.
+        log_error(_("This SWF file requires AVM2, which was not enabled at "
+                    "compile time."));
+#endif
+    }
+
+    // TODO: - don't allow later FileAttributes tags in the same movie
+    //         to override the first one used.
+    //       - only use if it is the *first* tag in the SWFStream.
+
+    if (flags.as3) m.setAS3();
+
 }
 
 

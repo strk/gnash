@@ -64,9 +64,17 @@ public:
         return true;
     }
 
-    static void doInitActionLoader(SWFStream& in, TagType tag,
-            movie_definition& m, const RunInfo& /*r*/)
+    static void loader(SWFStream& in, TagType tag, movie_definition& m,
+            const RunInfo& /*r*/)
     {
+        if (m.isAS3()) {
+            IF_VERBOSE_MALFORMED_SWF(
+                log_swferror("SWF contains DoInitAction tag, but is an "
+                    "AS3 SWF!");
+            );
+            throw ParserException("DoInitAction tag found in AS3 SWF!");
+        }
+        
         in.ensureBytes(2);
         int cid = in.read_u16();
         DoInitActionTag* da = new DoInitActionTag(in, m, cid);

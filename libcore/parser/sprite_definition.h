@@ -235,6 +235,11 @@ public:
 	virtual DisplayObject* createDisplayObject(DisplayObject* parent, int id)
         const;
 
+	// See dox in movie_definition.h
+	virtual void addControlTag(SWF::ControlTag* c)
+	{
+		m_playlist[m_loading_frame].push_back(c);
+	}
 
 private:
 
@@ -264,11 +269,6 @@ private:
 	size_t m_loading_frame;
 
 
-	// See dox in movie_definition.h
-	virtual void addControlTag(SWF::ControlTag* c)
-	{
-		m_playlist[m_loading_frame].push_back(c);
-	}
 
 	// See dox in movie_definition.h
 	virtual void add_frame_name(const std::string& name);
