@@ -1,4 +1,4 @@
-// xmlsocket.cpp:  Network socket for XML-encoded information, for Gnash.
+// XMLSocket_as.cpp:  Network socket for data (usually XML) transfer for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
 // 
@@ -33,10 +33,12 @@
 #include "URLAccessManager.h"
 #include "Object.h" // for getObjectInterface
 #include "log.h"
+
+#include <boost/thread.hpp>
 #include <boost/scoped_array.hpp>
 #include <string>
 
-#define GNASH_XMLSOCKET_DEBUG
+#undef GNASH_XMLSOCKET_DEBUG
 
 namespace gnash {
 
@@ -55,11 +57,9 @@ namespace {
 
 /// Connection object
 //
-/// connect()
-/// connected() - connected or not
-/// finished connection - connection either successful or not.
-/// read.
-/// close.
+/// A wrapper round a Network object that adds specific functions needed
+/// by XMLSocket.
+namespace {
 
 class SocketConnection
 {
@@ -71,8 +71,9 @@ public:
     {}
 
     /// Initiate a connection.
-    void connect(const std::string& host, short port) {
-        makeConnection(host, port);
+    void connect(const std::string& host, boost::uint16_t port) {
+        _start = boost::thread(
+            boost::bind(&SocketConnection::makeConnection, this, host, port));
     }
 
     /// The state of the connection.
@@ -96,7 +97,7 @@ public:
     }
 
     size_t writeMessage(const std::string& str) {
-        // We have to write the NULL terminator as well.
+        // We have to write the null terminator as well.
         return write(_socket.getFileFd(), str.c_str(), str.size() + 1);
     }
 
@@ -106,10 +107,7 @@ public:
         assert(_socket.connected());
     
         const int fd = _socket.getFileFd();
-   
-        if (fd <= 0) {
-            return;
-        }
+        assert(fd > 0);
 
         fd_set fdset;
         struct timeval tval;
@@ -147,31 +145,31 @@ public:
             // Return if there's no data.
             if (!bytesRead) return;
 
-            if (buf[bytesRead - 1] != 0)
-            {
+            if (buf[bytesRead - 1] != 0) {
                 // We received a partial message, so bung
                 // a null-terminator on the end.
                 buf[bytesRead] = 0;
             }
 
             char* ptr = buf.get();
-            while (static_cast<size_t>(ptr - buf.get()) < bytesRead - 1)
-            {
-                log_debug ("read: %d, this string ends: %d",
-                    bytesRead, ptr + std::strlen(ptr) - buf.get());
+            while (static_cast<size_t>(ptr - buf.get()) < bytesRead - 1) {
+
+#ifdef GNASH_XMLSOCKET_DEBUG
+                log_debug ("read: %d, this string ends: %d", bytesRead,
+                        ptr + std::strlen(ptr) - buf.get());
+#endif
+
                 // If the string reaches to the final byte read, it's
                 // incomplete. Store it and continue. The buffer is 
                 // NULL-terminated, so this cannot read past the end.
                 if (static_cast<size_t>(
                     ptr + std::strlen(ptr) - buf.get()) == bytesRead) {
-                    log_debug ("Setting remainder");
+
                     _remainder += std::string(ptr);
                     break;
                 }
 
-                if (!_remainder.empty())
-                {
-                    log_debug ("Adding and clearing remainder");
+                if (!_remainder.empty()) {
                     msgs.push_back(_remainder + std::string(ptr));
                     ptr += std::strlen(ptr) + 1;
                     _remainder.clear();
@@ -187,18 +185,22 @@ public:
     }
     
     /// Close the connection.
+    //
+    /// This also cancels any connection attempt in progress.
     void close() {
+        _start.join();
         _socket.closeNet();
-        assert(!_socket.getFileFd());
-        assert(!_socket.connected());
-
+        
         // Reset for next connection.
         _complete = false;
+
+        assert(_socket.getFileFd() <= 0);
+        assert(!_socket.connected());
     }
 
 private:
 
-    void makeConnection(const std::string& host, short port) {
+    void makeConnection(const std::string& host, boost::uint16_t port) {
         _socket.createClient(host, port);
         _complete = true;
     }
@@ -209,8 +211,11 @@ private:
 
     std::string _remainder;
 
+    boost::thread _start;
+
 };
 
+}
 
 class XMLSocket_as : public as_object {
 
@@ -221,47 +226,64 @@ public:
     XMLSocket_as();
     ~XMLSocket_as();
     
-    /// Is this XMLSocket connected()
+    /// True when the XMLSocket is not trying to connect.
     //
-    /// This may not correspond to the real status.
-    bool connected() const {
-        return _connected;
+    /// If this is true but the socket is not connected, the connection
+    /// has failed.
+    bool ready() const {
+        return _ready;
     }
 
-    bool connect(const std::string& host, short port);
+    /// Whether a connection exists.
+    //
+    /// This is not final until ready() is true.
+    bool connected() const {
+        return _connection.connected();
+    }
 
-    // Actionscript doesn't care about the result.
+    bool connect(const std::string& host, boost::uint16_t port);
+
+    /// Send a string with a null-terminator to the socket.
+    //
+    /// Actionscript doesn't care about the result.
     void send(std::string str);
 
-    // Actionscript doesn't care about the result.
+    /// Close the socket
+    //
+    /// Actionscript doesn't care about the result.
     void close();
 
+    /// Called on advance() when socket is connected
     virtual void advanceState();
 
 private:
 
 	void checkForIncomingData();
     
-	/// Return the as_function with given name, converting case if needed
-	boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
+	/// Return the as_function with given name.
+	boost::intrusive_ptr<as_function> getEventHandler(
+            const std::string& name);
 
+    /// The connection
     SocketConnection _connection;
 
-    bool _connected;
+    bool _ready;
 
 };
 
   
 XMLSocket_as::XMLSocket_as()
     :
-    as_object(getXMLSocketInterface())
+    as_object(getXMLSocketInterface()),
+    _ready(false)
 {
 }
 
 
 XMLSocket_as::~XMLSocket_as()
 {
-    getVM().getRoot().removeAdvanceCallback(this);
+    // Remove advance callback and close network connections.
+    close();
 }
 
 void
@@ -270,12 +292,15 @@ XMLSocket_as::advanceState()
     // Wait until something has happened with the connection
     if (!_connection.complete()) return;
     
-    // If this XMLSocket hadn't established a connection handle onConnect()
-    if (!connected()) {
+    // If this XMLSocket hadn't finished a connection, check whether it
+    // has now.
+    if (!ready()) {
 
-        if (!_connection.connected()) {
+        if (!connected()) {
 
-            /// If connection failed, notify onConnect and stop callback
+            // If connection failed, notify onConnect and stop callback.
+            // This means advanceState() will not be called again until
+            // XMLSocket.connect() is invoked.
             callMethod(NSV::PROP_ON_CONNECT, false);
             _vm.getRoot().removeAdvanceCallback(this);
             return;    
@@ -283,7 +308,7 @@ XMLSocket_as::advanceState()
 
         // Connection succeeded.
         callMethod(NSV::PROP_ON_CONNECT, true);
-        _connected = true;
+        _ready = true;
     }
 
     // Now the connection is established we can receive data.
@@ -292,7 +317,7 @@ XMLSocket_as::advanceState()
 
 
 bool
-XMLSocket_as::connect(const std::string& host, short port)
+XMLSocket_as::connect(const std::string& host, boost::uint16_t port)
 {
 
     if (!URLAccessManager::allowXMLSocket(host, port)) {
@@ -310,9 +335,9 @@ XMLSocket_as::connect(const std::string& host, short port)
 void
 XMLSocket_as::close()
 {
-    assert(connected());
+    _vm.getRoot().removeAdvanceCallback(this);
     _connection.close();
-    _connected = false;
+    _ready = false;
 }
 
 
@@ -331,7 +356,7 @@ XMLSocket_as::getEventHandler(const std::string& name)
 void
 XMLSocket_as::checkForIncomingData()
 {
-    assert(connected());
+    assert(ready() && connected());
     
     std::vector<std::string> msgs;
     _connection.readMessages(msgs);
@@ -340,9 +365,8 @@ XMLSocket_as::checkForIncomingData()
     
     log_debug(_("Got %d messages: "), msgs.size());
 
-#ifdef GNASH_DEBUG
-    for (size_t i = 0, e = msgs.size(); i != e; ++i)
-    {
+#ifdef GNASH_XMLSOCKET_DEBUG
+    for (size_t i = 0, e = msgs.size(); i != e; ++i) {
         log_debug(_(" Message %d: %s "), i, msgs[i]);
     }
 #endif
@@ -379,16 +403,13 @@ XMLSocket_as::checkForIncomingData()
 void
 XMLSocket_as::send(std::string str)
 {
-    if (!connected())
-    {
+    if (!ready() || !connected()) {
         log_error(_("XMLSocket.send(): socket not initialized"));
-	    //assert(_sockfd <= 0);
 	    return;
     }
     
-    size_t ret = _connection.writeMessage(str);
+    _connection.writeMessage(str);
     
-    log_debug(_("XMLSocket.send(): sent %d bytes, data was %s"), ret, str);
     return;
 }
 
@@ -400,13 +421,11 @@ xmlsocket_class_init(as_object& global)
     // This is the global XMLSocket class
     static boost::intrusive_ptr<builtin_function> cl;
 
-    if ( cl == NULL )
-    {
-        cl=new builtin_function(&xmlsocket_new, getXMLSocketInterface());
-        // Do not replicate all interface to class!
+    if (!cl) {
+        cl = new builtin_function(&xmlsocket_new, getXMLSocketInterface());
     }
     
-    // Register _global.String
+    // Register _global.XMLSocket
     global.init_member("XMLSocket", cl.get());
 
 }
@@ -429,35 +448,35 @@ xmlsocket_connect(const fn_call& fn)
     boost::intrusive_ptr<XMLSocket_as> ptr =
         ensureType<XMLSocket_as>(fn.this_ptr);
 
-    if (ptr->connected())
-    {
+    if (ptr->ready()) {
         log_error(_("XMLSocket.connect() called while already "
                     "connected, ignored"));
+        return as_value(false);
     }
     
     as_value hostval = fn.arg(0);
     const std::string& host = hostval.to_string();
-    int port = int(fn.arg(1).to_number());
+    const double port = fn.arg(1).to_number();
     
+    // Port numbers above 65535 are rejected always, but not port numbers below
+    // 0. It's not clear what happens with them.
+    // TODO: find out.
+    // Other ports and hosts are checked against security policy before
+    // acceptance or rejection.
+    if (port > std::numeric_limits<boost::uint16_t>::max()) {
+        return as_value(false);
+    }
+    
+    // XMLSocket.connect() returns false only if the connection is
+    // forbidden. The result of the real connection attempt is
+    // notified via onConnect().
     const bool ret = ptr->connect(host, port);
 
     if (!ret) {
         log_error(_("XMLSocket.connect(): connection failed"));
     }
 
-    // Actually, if first-stage connection was successful, we
-    // should NOT invoke onConnect(true) here, but postpone
-    // that event call to a second-stage connection checking,
-    // to be done in a separate thread. The visible effect to
-    // confirm this is that onConnect is invoked *after* 
-    // XMLSocket.connect() returned in these cases.
-    // The same applies to onConnect(false), which will never
-    // be called at the moment.
-    //
-    log_debug(_("XMLSocket.connect(): trying to call onConnect"));
-	    
-
-    return as_value(true);
+    return as_value(ret);
 }
 
 
@@ -467,8 +486,6 @@ xmlsocket_connect(const fn_call& fn)
 as_value
 xmlsocket_send(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-    
     boost::intrusive_ptr<XMLSocket_as> ptr =
         ensureType<XMLSocket_as>(fn.this_ptr);
 
@@ -489,28 +506,15 @@ xmlsocket_close(const fn_call& fn)
     boost::intrusive_ptr<XMLSocket_as> ptr =
         ensureType<XMLSocket_as>(fn.this_ptr);
 
-    // If we're not connected, there's nothing to do
-    if (!ptr->connected()) return as_value();
-
     ptr->close();
     return as_value();
 }
 
 as_value
-xmlsocket_new(const fn_call& fn)
+xmlsocket_new(const fn_call& /*fn*/)
 {
 
     boost::intrusive_ptr<as_object> xmlsock_obj = new XMLSocket_as;
-
-#ifdef GNASH_XMLSOCKET_DEBUG
-    std::stringstream ss;
-    fn.dump_args(ss);
-    log_debug(_("new XMLSocket(%s) called - created object at "
-            "%p"), ss.str(), static_cast<void*>(xmlsock_obj.get()));
-#else
-    UNUSED(fn);
-#endif
-
     return as_value(xmlsock_obj);
 }
 
@@ -522,20 +526,20 @@ xmlsocket_onData(const fn_call& fn)
     boost::intrusive_ptr<XMLSocket_as> ptr = 
         ensureType<XMLSocket_as>(fn.this_ptr);
 
-    if (fn.nargs < 1)
-    {
+    if (!fn.nargs) {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror(_("Builtin XMLSocket.onData() needs an argument"));
+            log_aserror(_("Builtin XMLSocket.onData() needs an argument"));
         );
         return as_value();
     }
 
     const std::string& xmlin = fn.arg(0).to_string();
 
+#ifdef GNASH_XMLSOCKET_DEBUG
     log_debug("Arg: %s, val: %s", xmlin, fn.arg(0));
+#endif
 
-    if (xmlin.empty())
-    {
+    if (xmlin.empty()) {
         log_error(_("Builtin XMLSocket.onData() called with an argument "
                         "that resolves to an empty string: %s"), fn.arg(0));
         return as_value();
@@ -547,15 +551,13 @@ xmlsocket_onData(const fn_call& fn)
     ptr->callMethod(NSV::PROP_ON_XML, arg);
 
     return as_value();
-
 }
 
 as_object*
 getXMLSocketInterface()
 {
     static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL )
-    {
+    if (!o) {
         o = new as_object(getObjectInterface());
         attachXMLSocketInterface(*o);
     }
