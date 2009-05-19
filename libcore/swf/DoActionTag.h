@@ -40,11 +40,6 @@ class DoActionTag : public ControlTag
 {
 public:
 
-	DoActionTag(movie_definition& md)
-		:
-		m_buf(md)
-	{}
-
 	/// Read a DoAction block from the stream
 	//
 	void read(SWFStream& in)
@@ -86,6 +81,11 @@ public:
 	}
 
 private:
+
+	DoActionTag(movie_definition& md)
+		:
+		m_buf(md)
+	{}
 
 	action_buffer m_buf;
 };

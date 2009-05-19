@@ -41,11 +41,7 @@ class DoABCTag : public ControlTag
 {
 public:
 
-	DoABCTag(abc_block *block) : mABC(block)
-
-	{}
-
-	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
+    virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
 	{
 		VM& vm = VM::get();
 		log_debug("getting machine.");
@@ -108,6 +104,8 @@ public:
 	}
 
 private:
+
+	DoABCTag(abc_block *block) : mABC(block) {}
 
 	abc_block *mABC;
 	

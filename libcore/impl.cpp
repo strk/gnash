@@ -32,10 +32,13 @@
 #include "SWFMovieDefinition.h"
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
+#include "RunInfo.h"
 #include "URL.h"
 #include "StreamProvider.h"
 #include "MovieClip.h"
 #include "VM.h"
+
+#include "swf/tag_loaders.h" 
 #include "ScriptLimitsTag.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
@@ -58,15 +61,15 @@
 #include "DefineVideoStreamTag.h"
 #include "DefineFontNameTag.h"
 #include "VideoFrameTag.h"
-#include "swf/tag_loaders.h" // for all tag loaders..
-#include "RunInfo.h"
-#ifdef GNASH_USE_GC
-#include "GC.h"
-#endif
-
 #ifdef ENABLE_AVM2
 # include "SymbolClassTag.h"
 # include "DoABCTag.h"
+# include "DefineSceneAndFrameLabelDataTag.h"
+#endif
+
+
+#ifdef GNASH_USE_GC
+#include "GC.h"
 #endif
 
 #include <string>
@@ -120,8 +123,8 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DEFINESHAPE, DefineShapeTag::loader);
     register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
     register_tag_loader(SWF::PLACEOBJECT, PlaceObject2Tag::loader);
-    register_tag_loader(SWF::REMOVEOBJECT,  RemoveObjectTag::loader); // 05
-    register_tag_loader(SWF::DEFINEBITS,  define_bits_jpeg_loader);
+    register_tag_loader(SWF::REMOVEOBJECT, RemoveObjectTag::loader); // 05
+    register_tag_loader(SWF::DEFINEBITS, define_bits_jpeg_loader);
     register_tag_loader(SWF::DEFINEBUTTON, DefineButtonTag::loader);
     register_tag_loader(SWF::JPEGTABLES, jpeg_tables_loader);
     register_tag_loader(SWF::SETBACKGROUNDCOLOR, SetBackgroundColorTag::loader);
@@ -259,7 +262,7 @@ static void ensure_loaders_registered()
     register_tag_loader(SWF::DOABCDEFINE, DoABCTag::loader);
     // 86
     register_tag_loader(SWF::DEFINESCENEANDFRAMELABELDATA,
-            define_scene_frame_label_loader);
+            DefineSceneAndFrameLabelDataTag::loader);
 #endif
 }
 

@@ -167,6 +167,7 @@ noinst_HEADERS = \
 	swf/DefineVideoStreamTag.h \
 	swf/DefineFontAlignZonesTag.h \
 	swf/SymbolClassTag.h \
+	swf/DefineSceneAndFrameLabelDataTag.h \
 	swf/CSMTextSettingsTag.h \
 	swf/DefineShapeTag.h \
 	swf/DefineMorphShapeTag.h \
