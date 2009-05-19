@@ -49,14 +49,15 @@ public:
 	}
 
 	/// Execute this tag, whatever it is.
-	virtual void execute(MovieClip* /*m*/, DisplayList& /*dlist*/) const
+	//
+    /// The default does nothing.
+    virtual void execute(MovieClip* /*m*/, DisplayList& /*dlist*/) const
 	{
 	}
 
 	/// Execute this tag but only if it's a "state" tag.
 	//
 	/// State tags include all tags except action tags.
-	///
 	virtual void execute_state(MovieClip* /*m*/,  DisplayList& /*dlist*/) const
 	{
 	}
@@ -64,11 +65,13 @@ public:
 	/// Execute this tag but only if it is an action tag
 	void execute_action(MovieClip* m, DisplayList& dlist) const
 	{
-		if ( is_action_tag() ) execute(m, dlist);
+		if (is_action_tag()) execute(m, dlist);
 	}
 
 	/// Return true if this is an action tag.
-	virtual bool	is_action_tag() const { return false; }
+    //
+    /// The default returns false.
+	virtual bool is_action_tag() const { return false; }
 
 };
 

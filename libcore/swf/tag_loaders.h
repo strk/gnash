@@ -19,7 +19,8 @@
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
 
-#include "swf.h" // for SWF::TagType
+#include "swf.h" 
+#include "SWFStream.h"
 
 #include <cassert>
 
@@ -81,8 +82,8 @@ void sprite_loader(SWFStream&, TagType, movie_definition&, const RunInfo&);
 // TODO: drop this loader ?
 void end_loader(SWFStream& in, TagType tag, movie_definition&, const RunInfo&)
 {
- assert(tag == SWF::END); // 0
- assert(in.tell() == in.get_tag_end_position());
+    assert(tag == SWF::END); // 0
+    assert(in.tell() == in.get_tag_end_position());
 }
 
 void remove_object_2_loader(SWFStream&, TagType, movie_definition&,
@@ -135,10 +136,6 @@ void
 serialnumber_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
         const RunInfo& /*r*/);
 
-/// Load a SWF::DEFINESCENEANDFRAMELABELDATA tag.
-void
-define_scene_frame_label_loader(SWFStream& in, TagType tag,
-        movie_definition& /*m*/, const RunInfo& /*r*/);
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF

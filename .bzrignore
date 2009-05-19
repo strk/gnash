@@ -30,6 +30,9 @@ utilities/dumpshm
 utilities/gprocessor
 utilities/soldumper
 testsuite/gnashrc
+macros/lt*.m4
+macros/libtool.m4
+macros/argz.m4
 gui/gnash
 gui/gtk-gnash
 gui/kde-gnash

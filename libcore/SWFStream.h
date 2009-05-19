@@ -195,18 +195,23 @@ public:
 	///
 	boost::uint32_t read_V32()
 	{
+        ensureBytes(1);
 		boost::uint32_t res = read_u8();
-		if (!(res & 0x00000080))
-			return res;
+		if (!(res & 0x00000080)) return res;
+        
+        ensureBytes(1);
 		res = (res & 0x0000007F) | read_u8() << 7;
-		if (!(res & 0x00004000))
-			return res;
+		if (!(res & 0x00004000)) return res;
+        
+        ensureBytes(1);
 		res = (res & 0x00003FFF) | read_u8() << 14;
-		if (!(res & 0x00200000))
-			return res;
+		if (!(res & 0x00200000)) return res;
+        
+        ensureBytes(1);
 		res = (res & 0x001FFFFF) | read_u8() << 21;
-		if (!(res & 0x10000000))
-			return res;
+		if (!(res & 0x10000000)) return res;
+        
+        ensureBytes(1);
 		res = (res & 0x0FFFFFFF) | read_u8() << 28;
 		return res;
 	}
@@ -219,14 +224,15 @@ public:
 	///
 	void skip_V32()
 	{
-		if (!(read_u8() & 0x80))
-			return;
-		if (!(read_u8() & 0x80))
-			return;
-		if (!(read_u8() & 0x80))
-			return;
-		if (!(read_u8() & 0x80))
-			return;
+        ensureBytes(1);
+		if (!(read_u8() & 0x80)) return;
+        ensureBytes(1);
+		if (!(read_u8() & 0x80)) return;
+        ensureBytes(1);
+		if (!(read_u8() & 0x80)) return;
+        ensureBytes(1);
+		if (!(read_u8() & 0x80)) return;
+        ensureBytes(1);
 		static_cast<void> (read_u8());
 	}
 
@@ -259,9 +265,9 @@ public:
 	///
 	/// aligned read
 	///
-	/// Will throw ParserException if no terminating null is found within tag boundaries
-	///
-	void	read_string(std::string& to);
+	/// Will throw ParserException if no terminating null is found within
+    /// tag boundaries
+	void read_string(std::string& to);
 
 	/// Reads a sized string into a provided std::string.
 	//

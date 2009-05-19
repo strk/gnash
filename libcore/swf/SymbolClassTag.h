@@ -40,12 +40,6 @@ class SymbolClassTag : public ControlTag
 {
 public:
 
-	SymbolClassTag(std::string name) 
-        :
-        _rootClass(name)
-
-	{}
-
 	virtual void execute(MovieClip* /*m*/, DisplayList& /* dlist */) const
 	{
 		VM& vm = VM::get();
@@ -87,6 +81,11 @@ public:
 	}
 
 private:
+	
+    SymbolClassTag(std::string name) 
+        :
+        _rootClass(name)
+	{}
 
     const std::string _rootClass;
 };

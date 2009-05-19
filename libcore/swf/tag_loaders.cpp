@@ -1218,13 +1218,14 @@ file_attributes_loader(SWFStream& in, TagType tag, movie_definition& m,
     }
 
     if (flags.as3) {
-        log_debug("This SWF uses AVM2 / AS3");
+        log_debug("This SWF uses AVM2");
 #ifndef ENABLE_AVM2
-    /// Log an error if this build can't interpret AS3.
+        /// Log an error if this build can't interpret AS3.
         log_error(_("This SWF file requires AVM2, which was not enabled at "
                     "compile time."));
 #endif
     }
+    else log_debug("This SWF uses AVM1");
 
     // TODO: - don't allow later FileAttributes tags in the same movie
     //         to override the first one used.
@@ -1239,14 +1240,15 @@ void
 metadata_loader(SWFStream& in, TagType tag, movie_definition& m,
 		const RunInfo& /*r*/)
 {
-    assert(tag == SWF::METADATA); // 77
+    assert(tag == SWF::METADATA); 
 
     // this is supposed to be an XML string
     std::string metadata;
     in.read_string(metadata);
 
     IF_VERBOSE_PARSE (
-    log_parse(_("  RDF metadata (information only): [[\n%s\n]]"), metadata);
+        log_parse(_("  RDF metadata (information only): [[\n%s\n]]"),
+            metadata);
     );
 
     // The metadata tag exists exclusively for external
@@ -1329,24 +1331,6 @@ reflex_loader(SWFStream& in, TagType tag, movie_definition& /*m*/,
             first, second, third);
 
 }
-
-void
-define_scene_frame_label_loader(SWFStream& in, TagType tag,
-        movie_definition& /*m*/, const RunInfo& /*r*/)
-{
-    assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
-
-    in.ensureBytes(4);
-
-    boost::uint32_t scene_count = in.read_u32();
-    std::stringstream ss;
-    ss << "Scene count is " << scene_count << ".\n";
-
-    log_debug("%s", ss.str());
-
-    log_unimpl(_("%s tag parsed but not yet used"), "DEFINESCENEANDFRAMELABELDATA");
-}
-
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
