@@ -574,6 +574,10 @@ Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed)
 				case gnash::key::F:
 					toggleFullscreen();
 					break;
+				case gnash::key::h:
+				case gnash::key::H:
+					showUpdatedRegions(!showUpdatedRegions());
+					break;
 				case gnash::key::MINUS:
 				{
 					// Max interval allowed: 1 second (1FPS)
