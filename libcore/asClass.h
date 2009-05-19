@@ -182,7 +182,11 @@ public:
 	asMethod *getConstructor() { return _constructor; }
 
 	void setStaticConstructor(asMethod *m) { _staticConstructor = m; }
-	asMethod *getStaticConstructor(){return _staticConstructor;}
+	
+    asMethod* getStaticConstructor() const { 
+        return _staticConstructor;
+    }
+
 	void setSuper(asClass *p) { _super = p; }
 
 	/// Try to build an asClass object from just a prototype.

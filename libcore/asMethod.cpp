@@ -28,9 +28,16 @@ namespace gnash {
 
 asMethod::asMethod()
     :
+    _methodID(0),
+    _prototype(0),
+    _bodyLength(0),
+    _isNative(false),
 	_minArguments(0),
 	_maxArguments(0),
-    _body(0)
+    _implementation(0),
+    _flags(0),
+    _body(0),
+    _maxRegisters(0)
 {
 }
 
@@ -54,7 +61,7 @@ void
 asMethod::setOwner(asClass *pOwner)
 {
 	log_debug("asMethod::setOwner");
-	if(!_prototype){
+	if (!_prototype) {
 		log_debug("ERROR _prototype is null.");
 	}
 	log_debug("Prototype text value: %s",_prototype->get_text_value());

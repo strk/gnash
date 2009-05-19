@@ -1265,32 +1265,32 @@ Machine::execute()
 			}
 		}
 		// Slot the return.
-//		*mGlobalReturn = as_value();
+        //*mGlobalReturn = as_value();
 		// And restore the previous state.
-//		restoreState();
+        //restoreState();
 		break;
 	}
-/// 0x48 ABC_ACTION_RETURNVALUE
-/// Stack In:
-///  value -- value to be returned
-/// Stack Out:
-///  .
-/// Do: Return value up the callstack.
+    
+    /// 0x48 ABC_ACTION_RETURNVALUE
+    /// Stack In:
+    ///  value -- value to be returned
+    /// Stack Out:
+    ///  .
+    /// Do: Return value up the callstack.
 	case SWF::ABC_ACTION_RETURNVALUE:
-	{
 		// Slot the return.
 		mGlobalReturn = pop_stack();
 		// And restore the previous state.
 		restoreState();
 		return;
-	}
-/// 0x49 ABC_ACTION_CONSTRUCTSUPER
-/// Stream: V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments
-///  obj -- the object whose super's constructor should be invoked
-/// Stack Out:
-///  .
+    
+    /// 0x49 ABC_ACTION_CONSTRUCTSUPER
+    /// Stream: V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments
+    ///  obj -- the object whose super's constructor should be invoked
+    /// Stack Out:
+    ///  .
 	case SWF::ABC_ACTION_CONSTRUCTSUPER:
 	{
 		boost::uint32_t argc = mStream->read_V32();
@@ -1444,30 +1444,39 @@ Machine::execute()
 		as_object* new_class = c->getPrototype();
 		
 		new_class->set_prototype(base_class);
-		//Create the class.
-		as_function* static_constructor = c->getStaticConstructor()->getPrototype();
-		as_function* constructor = c->getConstructor()->getPrototype();
-		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,as_value(static_constructor),0);
-		new_class->init_member(NSV::PROP_CONSTRUCTOR,as_value(constructor),0);
+		
+        //Create the class.
+		asMethod* scmethod = c->getStaticConstructor();
+        // What if there isn't one?
+        assert(scmethod);
+        
+        /// This can be null.
+        as_function* static_constructor = scmethod->getPrototype();
+		new_class->init_member(NSV::PROP_uuCONSTRUCTORuu,
+                as_value(static_constructor), 0);
+		
+        as_function* constructor = c->getConstructor()->getPrototype();
+        new_class->init_member(NSV::PROP_CONSTRUCTOR, as_value(constructor), 0);
 		push_stack(as_value(new_class));
 
-		//Call the class's static constructor.
+		// Call the class's static constructor (which may be undefined).
 		as_environment env = as_environment(_vm);
-		as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu,0);
-		as_value value = call_method(property,env,new_class,get_args(0));
+		as_value property = new_class->getMember(NSV::PROP_uuCONSTRUCTORuu, 0);
+		as_value value = call_method(property, env, new_class, get_args(0));
 
 		break;
 	}
-/// 0x59 ABC_ACTION_GETDESCENDANTS
-/// Stream: V32 'name_id'
-/// Stack In:
-///  value -- Whose descendants to get
-///  [ns [n]] -- Namespace stuff
-/// Stack Out:
-///  ?
-/// NB: This op seems to always throw a TypeError in Tamarin, though I
-/// assume that it ought to do something to yield a list of
-/// descendants of a class.
+    
+    /// 0x59 ABC_ACTION_GETDESCENDANTS
+    /// Stream: V32 'name_id'
+    /// Stack In:
+    ///  value -- Whose descendants to get
+    ///  [ns [n]] -- Namespace stuff
+    /// Stack Out:
+    ///  ?
+    /// NB: This op seems to always throw a TypeError in Tamarin, though I
+    /// assume that it ought to do something to yield a list of
+    /// descendants of a class.
 	case SWF::ABC_ACTION_GETDESCENDANTS:
 	{
 		asName a = pool_name(mStream->read_V32(), mPoolObject);
@@ -2088,12 +2097,13 @@ Machine::execute()
 		push_stack(a);
 		break;
 	}
-/// 0xA1 ABC_ACTION_SUBTRACT
-/// Stack In:
-///  b
-///  a
-/// Stack Out:
-///  a - b (double)
+    
+    /// 0xA1 ABC_ACTION_SUBTRACT
+    /// Stack In:
+    ///  b
+    ///  a
+    /// Stack Out:
+    ///  a - b (double)
 	case SWF::ABC_ACTION_SUBTRACT:
 	{
 		as_value b = pop_stack();
