@@ -143,21 +143,42 @@ SdlAggGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
     _sdl_surface = SDL_CreateRGBSurfaceFrom((void *) _offscreenbuf, width, height,
                                            _bpp, stride, rmask, gmask, bmask, amask);
     assert(_sdl_surface);
-
+    
+    _validbounds.setTo(0, 0, width-1, height-1);
+    
     return true;
+}
+
+/// Modified from fb_gui
+void
+SdlAggGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+    _agg_renderer->set_invalidated_regions(ranges);
+    _drawbounds.clear();
+    
+    for (unsigned int rno=0; rno<ranges.size(); rno++) {
+        geometry::Range2d<int> bounds = Intersection(
+            // twips changed to pixels here
+            _agg_renderer->world_to_pixel(ranges.getRange(rno)),
+            _validbounds);
+            
+        // it may happen that a particular range is out of the screen, which
+        // will lead to bounds==null.
+        if (bounds.isNull()) continue;
+        _drawbounds.push_back(bounds);
+    }
 }
 
 void
 SdlAggGlue::render()
 {
-    rect bounds;
-    bounds.set_world();
+    if ( _drawbounds.size() == 0 ) return; // nothing to do..
     
-    _agg_renderer->set_invalidated_region(bounds);
-
-	// Update the entire screen
-	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
-	SDL_UpdateRect(_screen, 0, 0, 0, 0);
+    for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {
+        geometry::Range2d<int>& bounds = _drawbounds[bno];
+        render(bounds.getMinX(), bounds.getMinY(),
+            bounds.getMaxX(), bounds.getMaxY() );
+    }
 }
 
 void
@@ -167,7 +188,7 @@ SdlAggGlue::render(int minx, int miny, int maxx, int maxy)
 	SDL_Rect clip = { minx, miny, maxx - minx, maxy - miny };
 	SDL_SetClipRect(_screen, &clip);
 	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
-	SDL_UpdateRect(_sdl_surface, clip.x, clip.y, clip.w, clip.h);
+	SDL_UpdateRect(_screen, clip.x, clip.y, clip.w, clip.h);
 }
 
 } // namespace gnash

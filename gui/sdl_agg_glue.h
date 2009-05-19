@@ -31,6 +31,7 @@ class SdlAggGlue : public SdlGlue
 
     bool init(int argc, char **argv[]);
     render_handler* createRenderHandler(int depth);
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
     bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
     boost::uint32_t maskFlags(boost::uint32_t sdl_flags);
     void render();
@@ -40,6 +41,9 @@ class SdlAggGlue : public SdlGlue
     unsigned char   *_offscreenbuf;
     SDL_Surface     *_screen;
     render_handler  *_agg_renderer;
+    
+    geometry::Range2d<int> _validbounds;
+    std::vector< geometry::Range2d<int> > _drawbounds;
 };
 
 }

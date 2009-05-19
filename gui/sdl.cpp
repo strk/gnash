@@ -225,6 +225,12 @@ SDLGui::disableCoreTrap()
 }
 
 void
+SDLGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+    _glue.setInvalidatedRegions(ranges);
+}
+
+void
 SDLGui::renderBuffer()
 {
     //GNASH_REPORT_FUNCTION;

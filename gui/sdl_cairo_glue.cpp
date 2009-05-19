@@ -58,6 +58,11 @@ SdlCairoGlue::createRenderHandler(int depth)
 
 }
 
+/// Not implemented, Fixme
+void
+SdlCairoGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+}
 
 bool
 SdlCairoGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)

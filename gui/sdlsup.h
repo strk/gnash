@@ -54,6 +54,7 @@ public:
     virtual bool run();
     virtual bool createMenu();
     virtual bool setupEvents();
+    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void disableCoreTrap();

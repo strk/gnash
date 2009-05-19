@@ -16,6 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "gnash.h"
+#include "gui.h"
 
 #include <boost/cstdint.hpp> // for boost::?int??_t 
 
@@ -27,7 +28,8 @@ class SdlGlue
   public:
     virtual ~SdlGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
-
+    
+    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges) = 0;
     virtual bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags) = 0;
     virtual render_handler* createRenderHandler(int depth) = 0;
     virtual void render() = 0;

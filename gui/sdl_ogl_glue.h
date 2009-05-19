@@ -30,6 +30,7 @@ class SdlOglGlue : public SdlGlue
 
     bool init(int argc, char ***argv);
     render_handler* createRenderHandler( int depth);
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
     bool prepDrawingArea(int width, int height, boost::uint32_t sdl_flags);
     void render();
   private:

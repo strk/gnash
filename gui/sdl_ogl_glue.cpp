@@ -78,6 +78,12 @@ SdlOglGlue::createRenderHandler(int depth)
     return renderer;
 }
 
+/// Not implemented, Fixme
+void
+SdlOglGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+}
+
 bool
 SdlOglGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 {
