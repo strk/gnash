@@ -33,10 +33,10 @@ SdlCairoGlue::SdlCairoGlue()
 SdlCairoGlue::~SdlCairoGlue()
 {
 //    GNASH_REPORT_FUNCTION;
-    cairo_surface_destroy(_cairo_surface);
-    cairo_destroy (_cairo_handle);
-    SDL_FreeSurface(_sdl_surface);
-    SDL_FreeSurface(_screen);
+    if ( _cairo_surface ) cairo_surface_destroy(_cairo_surface);
+    if ( _cairo_handle ) cairo_destroy (_cairo_handle);
+    if ( _sdl_surface ) SDL_FreeSurface(_sdl_surface);
+    if ( _screen ) SDL_FreeSurface(_screen);
     delete [] _render_image;
 }
 
@@ -54,8 +54,9 @@ SdlCairoGlue::createRenderHandler(int depth)
 //    GNASH_REPORT_FUNCTION;
     _bpp = depth;
 
-    return renderer::cairo::create_handler();
+    _renderer = renderer::cairo::create_handler();
 
+    return _renderer;
 }
 
 /// Not implemented, Fixme
@@ -85,7 +86,7 @@ SdlCairoGlue::prepDrawingArea(int width, int height, boost::uint32_t sdl_flags)
 
     _cairo_handle = cairo_create(_cairo_surface);
 
-    renderer::cairo::set_handle(_cairo_handle);
+    renderer::cairo::set_context(_renderer, _cairo_handle);
 
     boost::uint32_t rmask, gmask, bmask, amask;
 
@@ -105,7 +106,14 @@ void
 SdlCairoGlue::render()
 {
 //    GNASH_REPORT_FUNCTION;
+
+    /*Fill the background in purple so we can see the alpha blend */
+    //SDL_FillRect (_screen, NULL, SDL_MapRGB(_screen->format,255,0,255));
+
     SDL_BlitSurface(_sdl_surface, NULL, _screen, NULL);
+
+    //cairo_surface_write_to_png (_cairo_surface, "/tmp/gnash.png");
+
     SDL_UpdateRect (_screen, 0, 0, 0, 0);
 }
 

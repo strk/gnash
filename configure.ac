@@ -1910,9 +1910,9 @@ dnl   fi
   if test x$build_fb = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi
-  if test x$build_sdl = xyes; then
-    AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
-  fi
+dnl   if test x$build_sdl = xyes; then
+dnl     AC_MSG_ERROR([Cairo renderer is not supported by SDL gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
+dnl   fi
   if test x$build_fltk = xyes; then
     AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG or --enable-gui=gtk]);
   fi

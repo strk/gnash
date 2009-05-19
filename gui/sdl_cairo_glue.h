@@ -20,6 +20,11 @@
 #include <SDL.h>
 
 
+// Forward declarations
+namespace gnash {
+    class render_handler;
+}
+
 namespace gnash
 {
 
@@ -41,6 +46,7 @@ class SdlCairoGlue : public SdlGlue
     SDL_Surface     *_sdl_surface;
     unsigned char   *_render_image;
     SDL_Surface     *_screen;
+    render_handler  *_renderer;
 };
 
 }
