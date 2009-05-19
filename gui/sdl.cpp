@@ -224,6 +224,7 @@ SDLGui::disableCoreTrap()
     _core_trap = false;
 }
 
+/* public, overridden */
 void
 SDLGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
@@ -340,18 +341,6 @@ SDLGui::expose_event()
     // TODO: implement and use setInvalidatedRegion instead?
     renderBuffer();
 }
-
-/* public, overridden */
-void
-SDLGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
-{
-    // forward to renderer
-    _renderer->set_invalidated_regions(ranges);
-    
-    // TODO: mark regions to be redrawn on next ::renderBuffer call ?
-
-}
-
 
 } // namespace gnash
 
