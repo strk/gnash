@@ -1336,15 +1336,29 @@ void
 define_scene_frame_label_loader(SWFStream& in, TagType tag,
         movie_definition& /*m*/, const RunInfo& /*r*/)
 {
-    assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); //86
+    assert(tag == SWF::DEFINESCENEANDFRAMELABELDATA); 
 
     in.ensureBytes(4);
 
-    boost::uint32_t scene_count = in.read_u32();
-    std::stringstream ss;
-    ss << "Scene count is " << scene_count << ".\n";
+    boost::uint32_t scenes = in.read_V32();
 
-    log_debug("%s", ss.str());
+    log_debug("Scene count: %d", scenes);
+
+    for (size_t i = 0; i < scenes; ++i) {
+        boost::uint32_t offset = in.read_V32();
+        std::string name;
+        in.read_string(name);
+        log_debug("Offset %d name: %s", offset, name);
+    }
+
+    boost::uint32_t labels = in.read_V32();
+
+    for (size_t i = 0; i < labels; ++i) {
+        boost::uint32_t num = in.read_V32();
+        std::string label;
+        in.read_string(label);
+        log_debug("Frame %d label: %s", num, label);
+    }
 
     log_unimpl(_("%s tag parsed but not yet used"),
             "DEFINESCENEANDFRAMELABELDATA");
