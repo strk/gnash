@@ -322,10 +322,11 @@ void SDLGui::key_event(SDL_KeyboardEvent* key, bool down)
 {
     gnash::key::code c = sdl_to_gnash_key(key);  
 
-    if (c != gnash::key::INVALID) {
-        // 0 should be any modifier instead..
-        // see Gui::notify_key_event in gui.h
-        notify_key_event(c, 0, down);
+    if (c != gnash::key::INVALID)
+    {
+        int mod = sdl_to_gnash_modifier(key->keysym.mod);
+
+        notify_key_event(c, mod, down);
     }
 }
 
