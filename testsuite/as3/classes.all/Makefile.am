@@ -1,0 +1,100 @@
+## Process this fill with automake to generate Makefile.in
+# 
+# Copyright (C) 2009 Free Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+AUTOMAKE_OPTIONS = dejagnu
+
+EXTRA_DIST = Dejagnu.hx
+
+SWF_VERSION = 9
+
+HAXE_FLAGS = -swf-version $(SWF_VERSION) -cp $(srcdir) 
+
+# hopefully preprocessor is builtin in this case
+HAXE_CPP = $(CPP) -x c -P -I$(srcdir)
+
+TEST_DRIVERS = classes.exp
+
+# This gets it's values from the Makefile fragments.
+check_SCRIPTS =
+
+#include $(srcdir)/fl/accessibility/accessibility.am
+# include $(srcdir)/fl/containers/containers.am
+# include $(srcdir)/fl/controls/controls.am
+# include $(srcdir)/fl/core/core.am
+# include $(srcdir)/fl/managers/managers.am
+# include $(srcdir)/fl/motion/motion.am
+# include $(srcdir)/fl/transitions/transitions.am
+# include $(srcdir)/fl/video/video.am
+
+# These classes are in the flash namespace
+include $(srcdir)/accessibility/accessibility.am
+
+# These classes are for AIR only, not flash
+#include $(srcdir)/data/data.am
+# include $(srcdir)/desktop/desktop.am
+
+include $(srcdir)/display/display.am
+include $(srcdir)/errors/errors.am
+# include $(srcdir)/events/events.am
+include $(srcdir)/external/external.am
+# include $(srcdir)/filesystem/filesystem.am
+# include $(srcdir)/filters/filters.am
+include $(srcdir)/geom/geom.am
+# HAXE doesn't appear to support the HTML classes
+# include $(srcdir)/html/html.am
+include $(srcdir)/media/media.am
+include $(srcdir)/net/net.am
+include $(srcdir)/printing/printing.am
+# include $(srcdir)/sampler/sampler.am
+# HAXE doesn't appear to support the Security classes
+# include $(srcdir)/security/security.am
+include $(srcdir)/system/system.am
+# include $(srcdir)/text/text.am
+# include $(srcdir)/ui/ui.am
+# include $(srcdir)/utils/utils.am
+include $(srcdir)/xml/xml.am
+
+#/usr/bin/haxe -swf-version 9 -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all/media -swf Sound_as3.swf -main Sound_as3.hx
+SUFFIXES = hx swf
+
+.hx.swf: 
+	@echo $(@F)
+	foo=$(@F); \
+	$(HAXE) $(HAXE_FLAGS) -swf $(@F) -main $(@F:%.swf=%.hx)
+
+CLEANFILES =  \
+	gnash-dbg.log \
+	site.exp.bak \
+	*-runner \
+	testrun.* \
+	*.swf \
+	PP_*.hx \
+	*_testrunner \
+	*_Runner
+
+check-DEJAGNU: $(check_SCRIPTS)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); true; \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(TEST_CASES)"; do \
+	    GNASH_GC_TRIGGER_THRESHOLD=0 GNASHRC=../gnashrc $(SHELL) $$i; \
+	  done; \
+	fi
+

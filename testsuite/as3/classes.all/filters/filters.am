@@ -1,0 +1,75 @@
+## Process this file with automake to generate Makefile.in
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+FILTERSdir = $(srcdir)/filters
+
+FILTERS_TESTS = 
+
+if BUILD_BEVELFILTER_AS3
+FILTERS_TESTS += filters/BevelFilter_as3.swf
+endif
+
+if BUILD_BITMAPFILTERQUALITY_AS3
+FILTERS_TESTS += filters/BitmapFilterQuality_as3.swf
+endif
+
+if BUILD_BITMAPFILTERTYPE_AS3
+FILTERS_TESTS += filters/BitmapFilterType_as3.swf
+endif
+
+if BUILD_BITMAPFILTER_AS3
+FILTERS_TESTS += filters/BitmapFilter_as3.swf
+endif
+
+if BUILD_BLURFILTER_AS3
+FILTERS_TESTS += filters/BlurFilter_as3.swf
+endif
+
+if BUILD_COLORMATRIXFILTER_AS3
+FILTERS_TESTS += filters/ColorMatrixFilter_as3.swf
+endif
+
+if BUILD_CONVOLUTIONFILTER_AS3
+FILTERS_TESTS += filters/ConvolutionFilter_as3.swf
+endif
+
+if BUILD_DISPLACEMENTMAPFILTERMODE_AS3
+FILTERS_TESTS += filters/DisplacementMapFilterMode_as3.swf
+endif
+
+if BUILD_DISPLACEMENTMAPFILTER_AS3
+FILTERS_TESTS += filters/DisplacementMapFilter_as3.swf
+endif
+
+if BUILD_DROPSHADOWFILTER_AS3
+FILTERS_TESTS += filters/DropShadowFilter_as3.swf
+endif
+
+if BUILD_GLOWFILTER_AS3
+FILTERS_TESTS += filters/GlowFilter_as3.swf
+endif
+
+if BUILD_GRADIENTBEVELFILTER_AS3
+FILTERS_TESTS += filters/GradientBevelFilter_as3.swf
+endif
+
+if BUILD_GRADIENTGLOWFILTER_AS3
+FILTERS_TESTS += filters/GradientGlowFilter_as3.swf
+endif
+
+check_SCRIPTS += $(FILTERS_TESTS)
+HAXE_FLAGS += -cp $(FILTERSdir)

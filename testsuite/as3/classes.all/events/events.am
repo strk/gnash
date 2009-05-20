@@ -1,0 +1,175 @@
+## Process this file with automake to generate Makefile.in
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+EVENTSdir = $(srcdir)/events
+
+EVENTS_TESTS = 
+
+if BUILD_ACTIVITYEVENT_AS3
+EVENTS_TESTS += events/ActivityEvent_as3.swf
+endif
+
+if BUILD_ASYNCERROREVENT_AS3
+EVENTS_TESTS += events/AsyncErrorEvent_as3.swf
+endif
+
+if BUILD_BROWSERINVOKEEVENT_AS3
+EVENTS_TESTS += events/BrowserInvokeEvent_as3.swf
+endif
+
+if BUILD_CONTEXTMENUEVENT_AS3
+EVENTS_TESTS += events/ContextMenuEvent_as3.swf
+endif
+
+if BUILD_DRMAUTHENTICATEEVENT_AS3
+EVENTS_TESTS += events/DRMAuthenticateEvent_as3.swf
+endif
+
+if BUILD_DRMERROREVENT_AS3
+EVENTS_TESTS += events/DRMErrorEvent_as3.swf
+endif
+
+if BUILD_DRMSTATUSEVENT_AS3
+EVENTS_TESTS += events/DRMStatusEvent_as3.swf
+endif
+
+if BUILD_DATAEVENT_AS3
+EVENTS_TESTS += events/DataEvent_as3.swf
+endif
+
+if BUILD_ERROREVENT_AS3
+EVENTS_TESTS += events/ErrorEvent_as3.swf
+endif
+
+if BUILD_EVENTDISPATCHER_AS3
+EVENTS_TESTS += events/EventDispatcher_as3.swf
+endif
+
+if BUILD_EVENTPHASE_AS3
+EVENTS_TESTS += events/EventPhase_as3.swf
+endif
+
+if BUILD_EVENT_AS3
+EVENTS_TESTS += events/Event_as3.swf
+endif
+
+if BUILD_FILELISTEVENT_AS3
+EVENTS_TESTS += events/FileListEvent_as3.swf
+endif
+
+if BUILD_FOCUSEVENT_AS3
+EVENTS_TESTS += events/FocusEvent_as3.swf
+endif
+
+if BUILD_FULLSCREENEVENT_AS3
+EVENTS_TESTS += events/FullScreenEvent_as3.swf
+endif
+
+if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
+EVENTS_TESTS += events/HTMLUncaughtScriptExceptionEvent_as3.swf
+endif
+
+if BUILD_HTTPSTATUSEVENT_AS3
+EVENTS_TESTS += events/HTTPStatusEvent_as3.swf
+endif
+
+if BUILD_IEVENTDISPATCHER_AS3
+EVENTS_TESTS += events/IEventDispatcher_as3.swf
+endif
+
+if BUILD_IMEEVENT_AS3
+EVENTS_TESTS += events/IMEEvent_as3.swf
+endif
+
+if BUILD_IOERROREVENT_AS3
+EVENTS_TESTS += events/IOErrorEvent_as3.swf
+endif
+
+if BUILD_INVOKEEVENT_AS3
+EVENTS_TESTS += events/InvokeEvent_as3.swf
+endif
+
+if BUILD_KEYBOARDEVENT_AS3
+EVENTS_TESTS += events/KeyboardEvent_as3.swf
+endif
+
+if BUILD_MOUSEEVENT_AS3
+EVENTS_TESTS += events/MouseEvent_as3.swf
+endif
+
+if BUILD_NATIVEDRAGEVENT_AS3
+EVENTS_TESTS += events/NativeDragEvent_as3.swf
+endif
+
+if BUILD_NATIVEWINDOWBOUNDSEVENT_AS3
+EVENTS_TESTS += events/NativeWindowBoundsEvent_as3.swf
+endif
+
+if BUILD_NATIVEWINDOWDISPLAYSTATEEVENT_AS3
+EVENTS_TESTS += events/NativeWindowDisplayStateEvent_as3.swf
+endif
+
+if BUILD_NETSTATUSEVENT_AS3
+EVENTS_TESTS += events/NetStatusEvent_as3.swf
+endif
+
+if BUILD_OUTPUTPROGRESSEVENT_AS3
+EVENTS_TESTS += events/OutputProgressEvent_as3.swf
+endif
+
+if BUILD_PROGRESSEVENT_AS3
+EVENTS_TESTS += events/ProgressEvent_as3.swf
+endif
+
+if BUILD_SQLERROREVENT_AS3
+EVENTS_TESTS += events/SQLErrorEvent_as3.swf
+endif
+
+if BUILD_SQLEVENT_AS3
+EVENTS_TESTS += events/SQLEvent_as3.swf
+endif
+
+if BUILD_SQLUPDATEEVENT_AS3
+EVENTS_TESTS += events/SQLUpdateEvent_as3.swf
+endif
+
+if BUILD_SCREENMOUSEEVENT_AS3
+EVENTS_TESTS += events/ScreenMouseEvent_as3.swf
+endif
+
+if BUILD_SECURITYERROREVENT_AS3
+EVENTS_TESTS += events/SecurityErrorEvent_as3.swf
+endif
+
+if BUILD_STATUSEVENT_AS3
+EVENTS_TESTS += events/StatusEvent_as3.swf
+endif
+
+if BUILD_SYNCEVENT_AS3
+EVENTS_TESTS += events/SyncEvent_as3.swf
+endif
+
+if BUILD_TEXTEVENT_AS3
+EVENTS_TESTS += events/TextEvent_as3.swf
+endif
+
+if BUILD_TIMEREVENT_AS3
+EVENTS_TESTS += events/TimerEvent_as3.swf
+endif
+
+check_SCRIPTS += $(EVENTS_TESTS)
+HAXE_FLAGS += -cp $(EVENTSdir)
