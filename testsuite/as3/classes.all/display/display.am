@@ -1,0 +1,197 @@
+## Process this file with automake to generate Makefile.in
+# 
+#   Copyright (C) 2009 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+DISPLAYdir = $(srcdir)/display
+
+#AM_CPPFLAGS += 
+
+DISPLAY_TESTS = 
+
+if BUILD_AVM1MOVIE_AS3
+DISPLAY_TESTS += display/AVM1Movie_as3.swf
+endif
+
+# if BUILD_ACTIONSCRIPTVERSION_AS3
+# DISPLAY_TESTS += display/ActionScriptVersion_as3.swf
+# endif
+
+if BUILD_BITMAPDATACHANNEL_AS3
+DISPLAY_TESTS += display/BitmapDataChannel_as3.swf
+endif
+
+if BUILD_BITMAPDATA_AS3
+DISPLAY_TESTS += display/BitmapData_as3.swf
+endif
+
+if BUILD_BITMAP_AS3
+DISPLAY_TESTS += display/Bitmap_as3.swf
+endif
+
+if BUILD_BLENDMODE_AS3
+DISPLAY_TESTS += display/BlendMode_as3.swf
+endif
+
+if BUILD_CAPSSTYLE_AS3
+DISPLAY_TESTS += display/CapsStyle_as3.swf
+endif
+
+if BUILD_DISPLAYOBJECTCONTAINER_AS3
+DISPLAY_TESTS += display/DisplayObjectContainer_as3.swf
+endif
+
+if BUILD_DISPLAYOBJECT_AS3
+DISPLAY_TESTS += display/DisplayObject_as3.swf
+endif
+
+# this class is AIR only
+# if BUILD_FOCUSDIRECTION_AS3
+# DISPLAY_TESTS += display/FocusDirection_as3.swf
+# endif
+
+if BUILD_FRAMELABEL_AS3
+DISPLAY_TESTS += display/FrameLabel_as3.swf
+endif
+
+if BUILD_GRADIENTTYPE_AS3
+DISPLAY_TESTS += display/GradientType_as3.swf
+endif
+
+if BUILD_GRAPHICS_AS3
+DISPLAY_TESTS += display/Graphics_as3.swf
+endif
+
+# FIXME: this in an interface, not a class
+# if BUILD_IBITMAPDRAWABLE_AS3
+# DISPLAY_TESTS += display/IBitmapDrawable_as3.swf
+# endif
+
+if BUILD_INTERACTIVEOBJECT_AS3
+DISPLAY_TESTS += display/InteractiveObject_as3.swf
+endif
+
+if BUILD_INTERPOLATIONMETHOD_AS3
+DISPLAY_TESTS += display/InterpolationMethod_as3.swf
+endif
+
+if BUILD_JOINTSTYLE_AS3
+DISPLAY_TESTS += display/JointStyle_as3.swf
+endif
+
+if BUILD_LINESCALEMODE_AS3
+DISPLAY_TESTS += display/LineScaleMode_as3.swf
+endif
+
+if BUILD_LOADERINFO_AS3
+DISPLAY_TESTS += display/LoaderInfo_as3.swf
+endif
+
+if BUILD_LOADER_AS3
+DISPLAY_TESTS += display/Loader_as3.swf
+endif
+
+if BUILD_MORPHSHAPE_AS3
+DISPLAY_TESTS += display/MorphShape_as3.swf
+endif
+
+if BUILD_MOVIECLIP_AS3
+DISPLAY_TESTS += display/MovieClip_as3.swf
+endif
+
+# These Native* classes are AIR only
+# if BUILD_NATIVEMENUITEM_AS3
+# DISPLAY_TESTS += display/NativeMenuItem_as3.swf
+# endif
+
+# if BUILD_NATIVEMENU_AS3
+# DISPLAY_TESTS += display/NativeMenu_as3.swf
+# endif
+
+# if BUILD_NATIVEWINDOWDISPLAYSTATE_AS3
+# DISPLAY_TESTS += display/NativeWindowDisplayState_as3.swf
+# endif
+
+# if BUILD_NATIVEWINDOWINITOPTIONS_AS3
+# DISPLAY_TESTS += display/NativeWindowInitOptions_as3.swf
+# endif
+
+# if BUILD_NATIVEWINDOWRESIZE_AS3
+# DISPLAY_TESTS += display/NativeWindowResize_as3.swf
+# endif
+
+# if BUILD_NATIVEWINDOWTYPE_AS3
+# DISPLAY_TESTS += display/NativeWindowType_as3.swf
+# endif
+
+# if BUILD_NATIVEWINDOW_AS3
+# DISPLAY_TESTS += display/NativeWindow_as3.swf
+# endif
+
+if BUILD_PIXELSNAPPING_AS3
+DISPLAY_TESTS += display/PixelSnapping_as3.swf
+endif
+
+if BUILD_SWFVERSION_AS3
+DISPLAY_TESTS += display/SWFVersion_as3.swf
+endif
+
+if BUILD_SCENE_AS3
+DISPLAY_TESTS += display/Scene_as3.swf
+endif
+
+# This class is AIR only
+# if BUILD_SCREEN_AS3
+# DISPLAY_TESTS += display/Screen_as3.swf
+# endif
+
+if BUILD_SHAPE_AS3
+DISPLAY_TESTS += display/Shape_as3.swf
+endif
+
+if BUILD_SIMPLEBUTTON_AS3
+DISPLAY_TESTS += display/SimpleButton_as3.swf
+endif
+
+if BUILD_SPREADMETHOD_AS3
+DISPLAY_TESTS += display/SpreadMethod_as3.swf
+endif
+
+if BUILD_SPRITE_AS3
+DISPLAY_TESTS += display/Sprite_as3.swf
+endif
+
+if BUILD_STAGEALIGN_AS3
+DISPLAY_TESTS += display/StageAlign_as3.swf
+endif
+
+if BUILD_STAGEDISPLAYSTATE_AS3
+DISPLAY_TESTS += display/StageDisplayState_as3.swf
+endif
+
+if BUILD_STAGEQUALITY_AS3
+DISPLAY_TESTS += display/StageQuality_as3.swf
+endif
+
+if BUILD_STAGESCALEMODE_AS3
+DISPLAY_TESTS += display/StageScaleMode_as3.swf
+endif
+
+if BUILD_STAGE_AS3
+DISPLAY_TESTS += display/Stage_as3.swf
+endif
+
+check_SCRIPTS += $(DISPLAY_TESTS)
+HAXE_FLAGS += -cp $(DISPLAYdir)

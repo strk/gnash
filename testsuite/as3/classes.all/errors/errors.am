@@ -1,0 +1,60 @@
+## Process this file with automake to generate Makefile.in
+# 
+#   Copyright (C) 2009 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+ERRORSdir = $(srcdir)/errors
+
+ERRORS_TESTS = 
+
+if BUILD_EOFERROR_AS3
+ERRORS_TESTS += errors/EOFError_as3.swf
+endif
+
+if BUILD_IOERROR_AS3
+ERRORS_TESTS += errors/IOError_as3.swf
+endif
+
+if BUILD_ILLEGALOPERATIONERROR_AS3
+ERRORS_TESTS += errors/IllegalOperationError_as3.swf
+endif
+
+if BUILD_INVALIDSWFERROR_AS3
+ERRORS_TESTS += errors/InvalidSWFError_as3.swf
+endif
+
+if BUILD_MEMORYERROR_AS3
+ERRORS_TESTS += errors/MemoryError_as3.swf
+endif
+
+# AIR only
+# if BUILD_SQLERROROPERATION_AS3
+# ERRORS_TESTS += errors/SQLErrorOperation_as3.swf
+# endif
+
+# if BUILD_SQLERROR_AS3
+# ERRORS_TESTS += errors/SQLError_as3.swf
+# endif
+
+if BUILD_SCRIPTTIMEOUTERROR_AS3
+ERRORS_TESTS += errors/ScriptTimeoutError_as3.swf
+endif
+
+if BUILD_STACKOVERFLOWERROR_AS3
+ERRORS_TESTS += errors/StackOverflowError_as3.swf
+endif
+
+check_SCRIPTS += $(ERRORS_TESTS)
+HAXE_FLAGS += -cp $(ERRORSdir)

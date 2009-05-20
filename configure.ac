@@ -227,6 +227,8 @@ if test x$avm2 = xyes; then
     AC_DEFINE(ENABLE_AVM2, [1], [Enable AVM2 code])
 fi
 
+dnl This option is only used if you want Gnash to interwork with 
+dnl the Adobe player using the LocalConnection class.
 dnl lckey=0xdd3adabd
 AC_ARG_WITH(lckey,
  AC_HELP_STRING([--with-lckey],
@@ -482,6 +484,13 @@ AC_ARG_ENABLE(sdkinstall,
 esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
+
+dnl The class file is an optional file that if it is specified at configure time
+dnl with --with-classfile=, then only those classes are compiled and built into the
+dnl class library used for Gnash. THis is designed for small systems that execute the
+dnl same swf file over and over, and don't need the same level of functionality that
+dnl a browser plugin does.
+GNASH_PKG_CLASSFILE
 
 has_gtk2=no                     dnl FIXME: has_* shouldn't be in configure but in a macro
 
@@ -2243,6 +2252,7 @@ testsuite/Makefile
 testsuite/media/Makefile
 testsuite/libbase/Makefile
 testsuite/as3/Makefile
+testsuite/as3/classes.all/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/swfdec/Makefile
@@ -3228,6 +3238,13 @@ if test x"$python" = x"yes"; then
   else
     echo "        ERROR: No Python development package is installed, but it's enabled." >&3
   fi
+fi
+
+if test x"${build_all_as3}" = x"yes"; then
+  echo "        Building the entire ActionScript class libary"
+else
+  echo "        Only building these ActionScript classes into the library:"
+  echo "     ${classlist}"
 fi
 
 if test x$cross_compiling = xyes; then
