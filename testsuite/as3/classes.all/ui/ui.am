@@ -19,28 +19,28 @@ UIdir = $(srcdir)/ui
 
 UI_TESTS = 
 
-if BUILD_CONTEXTMENUBUILTINITEMS_AS3
-UI_TESTS += ui/ContextMenuBuiltInItems_as3.swf
-endif
+# if BUILD_CONTEXTMENUBUILTINITEMS_AS3
+# UI_TESTS += ui/ContextMenuBuiltInItems_as.swf
+# endif
 
-if BUILD_CONTEXTMENUITEM_AS3
-UI_TESTS += ui/ContextMenuItem_as3.swf
-endif
+# if BUILD_CONTEXTMENUITEM_AS3
+# UI_TESTS += ui/ContextMenuItem_as.swf
+# endif
 
-if BUILD_CONTEXTMENU_AS3
-UI_TESTS += ui/ContextMenu_as3.swf
-endif
+# if BUILD_CONTEXTMENU_AS3
+# UI_TESTS += ui/ContextMenu_as.swf
+# endif
 
 if BUILD_KEYLOCATION_AS3
-UI_TESTS += ui/KeyLocation_as3.swf
+UI_TESTS += ui/KeyLocation_as.swf
 endif
 
 if BUILD_KEYBOARD_AS3
-UI_TESTS += ui/Keyboard_as3.swf
+UI_TESTS += ui/Keyboard_as.swf
 endif
 
 if BUILD_MOUSE_AS3
-UI_TESTS += ui/Mouse_as3.swf
+UI_TESTS += ui/Mouse_as.swf
 endif
 
 check_SCRIPTS += $(UI_TESTS)
