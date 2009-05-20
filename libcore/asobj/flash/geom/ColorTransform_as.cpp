@@ -395,7 +395,11 @@ void ColorTransform_class_init(as_object& where)
     // This is the ColorTransform "class"/"function"
     // in the 'where' package
     string_table& st = where.getVM().getStringTable();
-    where.init_destructive_property(st.find("ColorTransform"), get_flash_geom_color_transform_constructor);
+
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+    where.init_destructive_property(st.find("ColorTransform"),
+            get_flash_geom_color_transform_constructor, flags);
 }
 
 } // end of gnash namespace

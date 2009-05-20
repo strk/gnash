@@ -681,7 +681,11 @@ void Point_class_init(as_object& where)
 {
 	// Register _global.Point
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("Point"), get_flash_geom_point_constructor);
+    
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+	where.init_destructive_property(st.find("Point"),
+            get_flash_geom_point_constructor, flags);
 }
 
 } // end of gnash namespace

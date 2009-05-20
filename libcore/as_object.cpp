@@ -311,10 +311,10 @@ as_object::get_member(string_table::key name, as_value* val,
 	string_table::key nsname)
 {
 	assert(val);
-
 	Property* prop = findProperty(name, nsname);
-	if (!prop)
-    {
+	
+    if (!prop) {
+
         /// If the property isn't found, try the __resolve property.
         prop = findProperty(NSV::PROP_uuRESOLVE, nsname);
         if (!prop) return false;
@@ -329,18 +329,15 @@ as_object::get_member(string_table::key name, as_value* val,
         return true;
     }
 
-	try 
-	{
+	try {
 		*val = prop->getValue(*this);
 		return true;
 	}
-	catch (ActionLimitException& exc)
-	{
+	catch (ActionLimitException& exc) {
 		// will be logged by outer catcher
 		throw;
 	}
-	catch (ActionTypeError& exc)
-	{
+	catch (ActionTypeError& exc) {
 		// TODO: check if this should be an 'as' error.. (log_aserror)
 		log_error(_("Caught exception: %s"), exc.what());
 		return false;
@@ -462,11 +459,10 @@ as_object::findProperty(string_table::key key, string_table::key nsname,
         // __proto__ even when not visible ?
 		if (prop && prop->visible(swfVersion))
 		{
-			if (owner != NULL)
-				*owner = this;
+			if (owner) *owner = this;
 			return prop;
 		}
-		return NULL;
+		return 0;
 	}
 
 	// keep track of visited objects, avoid infinite loops.
@@ -1042,7 +1038,7 @@ as_object::copyProperties(const as_object& o)
 void
 as_object::enumerateProperties(as_environment& env) const
 {
-	assert( env.top(0).is_null() );
+	assert(env.top(0).is_undefined());
 
 	enumerateNonProperties(env);
 

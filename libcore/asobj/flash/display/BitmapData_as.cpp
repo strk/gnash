@@ -241,9 +241,11 @@ void BitmapData_class_init(as_object& where)
 {
 
     string_table& st = where.getVM().getStringTable();
-	// Register _global.BitmapData
+    
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
 	where.init_destructive_property(st.find("BitmapData"),
-	                get_flash_display_bitmap_data_constructor);
+                get_flash_display_bitmap_data_constructor, flags);
 }
 
 
