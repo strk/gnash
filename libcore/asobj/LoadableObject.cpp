@@ -80,8 +80,8 @@ LoadableObject::send(const std::string& urlstr, const std::string& target,
 
 
 void
-LoadableObject::sendAndLoad(const std::string& urlstr,
-                            as_object& target, bool post)
+LoadableObject::sendAndLoad(const std::string& urlstr, as_object& target,
+        bool post)
 {
 
     /// All objects get a loaded member, set to false.
@@ -471,9 +471,16 @@ loadableobject_sendAndLoad(const fn_call& fn)
 
 	boost::intrusive_ptr<as_object> target = fn.arg(1).to_object();
 
-	// Post by default, override by ActionScript third argument
-	bool post = true;
-	if ( fn.nargs > 2 && fn.arg(2).to_string() == "GET" ) post = false;
+    // According to the Flash 8 Cookbook (Joey Lott, Jeffrey Bardzell), p 427,
+    // this method sends by GET unless overridden, and always by GET in the
+    // standalone player. We have no tests for this, but a Twitter widget
+    // gets Bad Request from the server if we send via POST.
+	bool post = false;
+	if (fn.nargs > 2) {
+        const std::string& method = fn.arg(2).to_string();
+        StringNoCaseEqual nc;
+        post = nc(method, "post");
+    }      
 
 	ptr->sendAndLoad(urlstr, *target, post);
 	return as_value(true);
