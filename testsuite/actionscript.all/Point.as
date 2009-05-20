@@ -94,6 +94,9 @@ check_equals(p0.length, Infinity);
 p0 = new Point(0, 0);
 check_equals(p0.length, 0);
 
+p0 = new Point(undef, undef);
+check_equals(''+p0, '(x=undefined, y=undefined)');
+
 //-------------------------------------------------------------
 // Test Point.add
 //-------------------------------------------------------------
@@ -508,6 +511,6 @@ check_equals(ret.toString(), '(x=1, y=2)');
 // END OF TEST
 //-------------------------------------------------------------
 
-check_totals(186);
+check_totals(187);
 
 #endif // OUTPUT_VERSION >= 8

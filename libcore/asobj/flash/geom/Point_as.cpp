@@ -381,9 +381,11 @@ Point_toString(const fn_call& fn)
 	ptr->get_member(NSV::PROP_X, &x);
 	ptr->get_member(NSV::PROP_Y, &y);
 
+    int version = ptr->getVM().getSWFVersion();
+
 	std::stringstream ss;
-	ss << "(x=" << x.to_string()
-		<< ", y=" << y.to_string()
+	ss << "(x=" << x.to_string_versioned(version)
+		<< ", y=" << y.to_string_versioned(version)
 		<< ")";
 
 	return as_value(ss.str());
