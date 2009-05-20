@@ -47,8 +47,11 @@ void
 BitmapFilter_class_init(as_object& global)
 {
     string_table& st = global.getVM().getStringTable();
+    
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
     global.init_destructive_property(st.find("BitmapFilter"),
-            getBitmapFilterConstructor);
+            getBitmapFilterConstructor, flags);
 }
 
 as_object*

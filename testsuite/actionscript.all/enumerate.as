@@ -152,7 +152,108 @@ enumerateObj = function(object) {
     check_equals(enumerateObj(o), "6,9,c,[object Object],b,el,a,");
 
 }
-totals(31);
+
+extras = 0;
+
+#ifdef MING_SUPPORTS_ASM
+ extras += 6;
+
+// The first test (enumerate) is possible with any asm-supporting ming, 
+// the second only with version from 2009-05-20 or later.
+ a = new Object();
+ a.a = 1;
+ a.b = "string";
+ 
+ var r0, r1, r2, r3, r4;
+ 
+ 
+ // We make sure the stack is clear, then push 'stackfirst', then enumerate
+ // and see what all the stack values are.
+ asm {
+    pop
+    pop
+    push 'stackfirst'
+    push 'a'
+    enumerate
+    setregister r:0
+    push 'r0', r:0
+    setvariable
+    pop
+    setregister r:1
+    push 'r1', r:1
+    setvariable
+    pop
+    setregister r:2
+    push 'r2', r:2
+    setvariable
+    pop
+    setregister r:3
+    push 'r3', r:3
+    setvariable
+    pop
+    setregister r:4
+    push 'r4', r:4
+    setvariable
+    pop
+ };
+ 
+ check_equals(r0, "b");
+ check_equals(r1, "a");
+ check_equals(r2, undefined);
+
+ // Use strictly equals to check that it isn't "null"
+ check(r2 === undefined);
+ 
+ check_equals(r3, "stackfirst");
+ check_equals(r4, undefined);
+#endif
+
+#if MING_VERSION_CODE >= 00040004 
+ extras += 6;
+ 
+ // Do the same for enum2
+ asm {
+    pop
+    pop
+    push 'stackfirst'
+    push 'a'
+    getvariable
+    enumerate2
+    setregister r:0
+    push 'r0', r:0
+    setvariable
+    pop
+    setregister r:1
+    push 'r1', r:1
+    setvariable
+    pop
+    setregister r:2
+    push 'r2', r:2
+    setvariable
+    pop
+    setregister r:3
+    push 'r3', r:3
+    setvariable
+    pop
+    setregister r:4
+    push 'r4', r:4
+    setvariable
+    pop
+ };
+ 
+ check_equals(r0, "b");
+ check_equals(r1, "a");
+ check_equals(r2, undefined);
+
+ // Use strictly equals to check that it isn't "null"
+ check(r2 === undefined);
+ 
+ check_equals(r3, "stackfirst");
+ check_equals(r4, undefined);
+#endif
+
+totals(31 + extras);
+
 #else
 totals(0);
 #endif  // OUTPUT_VERSION > 5

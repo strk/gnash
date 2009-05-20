@@ -663,7 +663,11 @@ void Rectangle_class_init(as_object& where)
 {
 	// Register _global.Rectangle
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("Rectangle"), get_flash_geom_rectangle_constructor);
+    
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
+	where.init_destructive_property(st.find("Rectangle"),
+            get_flash_geom_rectangle_constructor, flags);
 }
 
 } // end of gnash namespace

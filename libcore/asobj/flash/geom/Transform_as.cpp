@@ -422,8 +422,11 @@ void Transform_class_init(as_object& where)
 
 	// Register _global.Transform
     string_table& st = where.getVM().getStringTable();
+    
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
     where.init_destructive_property(st.find("Transform"), 
-		    get_flash_geom_transform_constructor);
+		    get_flash_geom_transform_constructor, flags);
 
 }
 

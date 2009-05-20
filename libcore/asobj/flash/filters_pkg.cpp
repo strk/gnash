@@ -61,8 +61,11 @@ void
 flash_filters_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
+    
+    // TODO: this may not be correct, but it should be enumerable.
+    const int flags = 0;
 	where.init_destructive_property(st.find("filters"),
-            get_flash_filters_package, 0);
+            get_flash_filters_package, flags);
 }
 
 
