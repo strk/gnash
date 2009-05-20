@@ -1766,15 +1766,31 @@ Machine::execute()
 		boost::uint32_t sindex = mStream->read_V32();
 		as_value value = pop_stack();
 		as_value object = pop_stack();
-		//We use sindex + 1, because currently as_object sets a property at a slot index
-		//1 higher than the index the abc_block thinks the property is at.
-		if (!object.to_object().get()->set_member_slot(sindex+1,value)) {
-			log_abc("Failed to set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+
+        as_object* obj = object.to_object().get();
+        if ( ! obj )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("ABC_ACTION_SETSLOT: "
+                "unexpected non-object stack value %s"), object);
+            );
+            break;
+        }
+
+		// We use sindex + 1, because currently as_object sets a property
+        // at a slot index 1 higher than the index the abc_block thinks the
+        // property is at.
+		if ( ! obj->set_member_slot(sindex+1, value) )
+        {
+			log_abc("Failed to set property at "
+                    "real_slot=%u abc_slot=%u", sindex+1, sindex);
 		}
-		else{
-			log_abc("Set property at real_slot=%u abc_slot=%u",sindex+1,sindex);
+		else
+        {
+			log_abc("Set property at real_slot=%u abc_slot=%u",
+                    sindex+1, sindex);
 		}
-		//TODO: Actually set the object's value.
+
 		break;
 	}
 /// 0x6E ABC_ACTION_GETGLOBALSLOT
