@@ -44,12 +44,12 @@ SoundInfoRecord::read(SWFStream& in)
     in.ensureBytes(hasInPoint * 4 + hasOutPoint * 4 + hasLoops * 2);
 
 	if (hasInPoint) {
-		log_unimpl(_("SoundInfo record with in point"));
+		LOG_ONCE( log_unimpl(_("SoundInfo record with in point")) );
 		inPoint = in.read_u32();
 	}
 
 	if (hasOutPoint) {
-		log_unimpl(_("SoundInfo record with out point"));
+		LOG_ONCE( log_unimpl(_("SoundInfo record with out point")) );
 		outPoint = in.read_u32();
 	}
 
