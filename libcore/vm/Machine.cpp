@@ -1296,9 +1296,14 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		log_abc("There are %u arguments.",argc);
 		get_args(argc);
-		//as_object *super = pop_stack().to_object().get()->get_super();
-		//TODO: Actually construct the super.
-		as_object* super = mStack.top(argc).to_object()->get_super();
+		
+        // TODO: Is the object really after the args? Doesn't seem likely,
+        // but haven't found a case with any arguments yet.
+        as_object* obj = mStack.top(argc).to_object().get();
+        as_object* super = obj ? obj->get_super() : 0;
+        log_abc("CONSTRUCTSUPER: object is: %s, args: %s", mStack.top(argc),
+                argc);
+
  		if (!super) {
             log_error("No super found in CONSTRUCTSUPER!");
             throw ASException();
@@ -1312,7 +1317,6 @@ Machine::execute()
 		// the stack.
 		pushCall(func, super, mIgnoreReturn, argc, -1);
 
-        LOG_ONCE(log_unimpl("ABC_ACTION_CONSTRUCTSUPER") );
 		break;
 	}
     
@@ -1333,31 +1337,41 @@ Machine::execute()
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		as_object* object = pop_stack().to_object().get();
 		if (!object) {
-			//TODO: Should this result in an exeception or an actionscript error?
-			log_abc("Can't constructor property on a null object.  Property not constructed.");
+			//TODO: Should this result in an exeception or an 
+            // actionscript error?
+			log_abc("Can't construct property on a null object. "
+                    "Property not constructed.");
 			push_stack(as_value());
 			break;
 		}
 		//std::string& classname = mPoolObject->mStringPool[a.getABCName()];
 		
 		as_value constructor_val = object->getMember(a.getGlobalName());
-		boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
-		if (constructor) {
-			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
+		boost::intrusive_ptr<as_function> constructor =
+            constructor_val.to_as_function();
+		
+        if (constructor) {
+			boost::intrusive_ptr<as_object> newobj =
+                constructor->constructInstance(env, args);
 			push_stack(as_value(newobj));
 		}
-		//TODO: This else clause is needed to construct classes that aren't builtin into gnash.
-		// I don't think this is correct, and I think the problem might be how AVM2 adds
+		// TODO: This else clause is needed to construct classes that
+        // aren't builtin into gnash. I don't think this is correct,
+        // and I think the problem might be how AVM2 adds
 		// new objects to the Global object.
-		else{
- 			log_abc("Object %s is not a constructor",constructor_val.toDebugString());
+		else {
+ 			log_abc("Object %s is not a constructor", 
+                    constructor_val.toDebugString());
 			if (constructor_val.is_null() || constructor_val.is_undefined()) {
-				log_abc("Constructor is undefined, will not construct property.");
+				log_abc("Constructor is undefined, will not construct "
+                        "property.");
 				push_stack(as_value());
 			}
-			else{
-				as_value val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
-				as_value result = call_method(val,env,constructor_val.to_object().get(),args);
+			else {
+				as_value val = constructor_val.to_object().get()->getMember(
+                        NSV::PROP_CONSTRUCTOR, 0);
+				as_value result = call_method(val, env,
+                        constructor_val.to_object().get(),args);
 				push_stack(result);
 			}
 		}
