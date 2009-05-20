@@ -25,6 +25,7 @@
 #include <cctype> // for std::isprint
 #include <cstring> // std::memset
 
+#include <map>
 #include <sstream>
 #include <fstream>
 #include <iomanip> // for std::setfill
@@ -90,7 +91,16 @@ timestamp(std::ostream& o)
 	std::time(&t);
 	std::strftime(buf, sizeof(buf), fmt, std::localtime(&t));
 
-	o << getpid() << ":" << get_thread_id() << "] " << buf;
+    static std::map<int, int> threadMap;
+    int tid = get_thread_id();
+    int& htid = threadMap[tid];
+    if ( ! htid )
+    {
+        htid = threadMap.size();
+        // TODO: notify actual thread id for index
+    }
+
+	o << getpid() << ":" << htid << "] " << buf;
 	return o;
 
 }
