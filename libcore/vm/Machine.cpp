@@ -2883,7 +2883,10 @@ Machine::find_prop_strict(asName multiname) {
 	std::string ns = mPoolObject->stringPoolAt(
             multiname.getNamespace()->getAbcURI());
 	std::string path = ns.size() == 0 ? name : ns + "." + name;
-	val = env.get_variable(path,*getScopeStack(),&target);
+
+    std::auto_ptr<as_environment::ScopeStack> envStack ( getScopeStack() );
+	val = env.get_variable(path, *envStack, &target);
+
 	push_stack(as_value(target));	
 	mScopeStack.pop();
 	return val;
