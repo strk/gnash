@@ -59,7 +59,7 @@ HAXE_FLAGS = -cp $(srcdir)
 # # include $(srcdir)/sampler/sampler.am
 # # HAXE doesn't appear to support the Security classes
 # # include $(srcdir)/security/security.am
-# include $(srcdir)/system/system.am
+include $(srcdir)/system/system.am
 # # include $(srcdir)/text/text.am
 include $(srcdir)/ui/ui.am
 # # include $(srcdir)/utils/utils.am
@@ -69,13 +69,13 @@ include $(srcdir)/ui/ui.am
 SUFFIXES = hx swf
 
 .hx.swf:
-	-newname=`echo $(@F) | sed -e 's:_as:_asv9:'`; \
+	-@newname=`echo $(@F) | sed -e 's:_as:_asv9:'`; \
 	$(HAXE) -swf-version 9 $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
-	-newname=`echo $(@F) | sed -e 's:_as:_asv8:'`; \
+	-@newname=`echo $(@F) | sed -e 's:_as:_asv8:'`; \
 	$(HAXE) -swf-version 8  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
-	-newname=`echo $(@F) | sed -e 's:_as:_asv7:'`; \
+	-@newname=`echo $(@F) | sed -e 's:_as:_asv7:'`; \
 	$(HAXE) -swf-version 7  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
-	-newname=`echo $(@F) | sed -e 's:_as:_asv6:'`; \
+	-@newname=`echo $(@F) | sed -e 's:_as:_asv6:'`; \
 	$(HAXE) -swf-version 6  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
 
 CLEANFILES =  \
