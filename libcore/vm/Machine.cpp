@@ -1117,17 +1117,17 @@ Machine::execute()
 		pushCall(func, obj, mStack.top(argc), argc, 0);
 		break;
 	}
-/// 0x45 ABC_ACTION_CALLSUPER
-/// 0x4E ABC_ACTION_CALLSUPERVOID
-/// Stream: V32 'name_offset' | V32 'arg_count'
-/// Stack In:
-///  [ns [n]] -- Namespace stuff
-///  argN ... arg1 -- the arg_count arguments to pass
-///  obj -- the object whose super is to be called
-/// Stack Out:
-///  0x45: value -- the value returned by obj::(resolve)'name_offset'::super(arg1,
-///   ..., argN)
-///  0x4E: .
+    /// 0x45 ABC_ACTION_CALLSUPER
+    /// 0x4E ABC_ACTION_CALLSUPERVOID
+    /// Stream: V32 'name_offset' | V32 'arg_count'
+    /// Stack In:
+    ///  [ns [n]] -- Namespace stuff
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  obj -- the object whose super is to be called
+    /// Stack Out:
+    ///  0x45: value -- the value returned by obj::(resolve)'name_offset'::
+    ///        super(arg1, ..., argN)
+    ///  0x4E: .
 	case SWF::ABC_ACTION_CALLSUPER:
 	case SWF::ABC_ACTION_CALLSUPERVOID:
 	{
@@ -1136,35 +1136,41 @@ Machine::execute()
 		int dropsize = completeName(a);
 		ENSURE_OBJECT(mStack.top(argc + dropsize));
 		mStack.drop(dropsize);
-		as_object *super = mStack.top(argc).to_object()->get_super();
-		if (!super)
-			throw ASReferenceError();
-		Property *b = super->findProperty(a.getABCName(), 
-			a.getNamespace()->getURI());
-		if (!b)
-			throw ASReferenceError();
-		as_function *f = // b->isGetterSetter() ? b->getGetter() :
+		as_object* super = mStack.top(argc).to_object()->get_super();
+		if (!super) throw ASReferenceError();
+		
+        Property* b = super->findProperty(a.getABCName(),
+                a.getNamespace()->getURI());
+		
+        if (!b) throw ASReferenceError();
+		
+        as_function *f = // b->isGetterSetter() ? b->getGetter() :
 			b->getValue(super).to_as_function();
 
-		if (opcode == SWF::ABC_ACTION_CALLSUPER)
-			pushCall(f, super, mStack.top(argc), argc, 0);
-		else // Void call
+		if (opcode == SWF::ABC_ACTION_CALLSUPER) {
+            pushCall(f, super, mStack.top(argc), argc, 0);
+        }
+		else {
+            // Void call
 			pushCall(f, super, mIgnoreReturn, argc, -1); // drop obj too.
+        }
 		break;
 	}
-/// 0x46 ABC_ACTION_CALLPROPERTY
-/// 0x4C ABC_ACTION_CALLPROPLEX
-/// 0x4F ABC_ACTION_CALLPROPVOID
-/// Stream: V32 'name_offset' | V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  [ns [n]] -- Namespace stuff
-///  obj -- The object whose property is to be accessed.
-/// Stack Out:
-///  value -- the value from obj::(resolve)'name_offset'(arg1, ..., argN)
-///  (unless ABC_ACTION_CALL_PROPVOID, then: . )
-/// NB: Calls getter/setter if they exist.
-/// If the opcode is ABC_ACTION_CALLPROPLEX, obj is not altered by getter/setters
+    
+    /// 0x46 ABC_ACTION_CALLPROPERTY
+    /// 0x4C ABC_ACTION_CALLPROPLEX
+    /// 0x4F ABC_ACTION_CALLPROPVOID
+    /// Stream: V32 'name_offset' | V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  [ns [n]] -- Namespace stuff
+    ///  obj -- The object whose property is to be accessed.
+    /// Stack Out:
+    ///  value -- the value from obj::(resolve)'name_offset'(arg1, ..., argN)
+    ///  (unless ABC_ACTION_CALL_PROPVOID, then: . )
+    /// NB: Calls getter/setter if they exist.
+    /// If the opcode is ABC_ACTION_CALLPROPLEX, obj is not altered by
+    /// getter/setters
 	case SWF::ABC_ACTION_CALLPROPERTY:
 	case SWF::ABC_ACTION_CALLPROPLEX:
 	case SWF::ABC_ACTION_CALLPROPVOID:
@@ -1250,26 +1256,20 @@ Machine::execute()
 			pushCall(func, obj, mStack.top(argc + shift), argc, -shift);*/
 		break;
 	}
-/// 0x47 ABC_ACTION_RETURNVOID
-/// Do: Return an undefined object up the callstack.
+    
+    /// 0x47 ABC_ACTION_RETURNVOID
+    /// Do: Return an undefined object up the callstack.
 	case SWF::ABC_ACTION_RETURNVOID:
-	{
 		mStream->seekTo(0);
-		if (mStateStack.size() == 0) {
-			return;
-		}
-		else{
-			restoreState();
-			if (mExitWithReturn) {
-				return;
-			}
-		}
+		if (!mStateStack.size()) return;
+        
+        restoreState();
+        if (mExitWithReturn) return;
 		// Slot the return.
         //*mGlobalReturn = as_value();
 		// And restore the previous state.
         //restoreState();
 		break;
-	}
     
     /// 0x48 ABC_ACTION_RETURNVALUE
     /// Stack In:
@@ -1297,8 +1297,6 @@ Machine::execute()
 		log_abc("There are %u arguments.",argc);
 		get_args(argc);
 		
-        // TODO: Is the object really after the args? Doesn't seem likely,
-        // but haven't found a case with any arguments yet.
         as_object* obj = mStack.top(argc).to_object().get();
         as_object* super = obj ? obj->get_super() : 0;
         log_abc("CONSTRUCTSUPER: object is: %s, args: %s", mStack.top(argc),
