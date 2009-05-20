@@ -48,7 +48,7 @@ flash_display_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
 	where.init_destructive_property(st.find("display"),
-			get_flash_display_package);
+			get_flash_display_package, 0);
 }
 
 

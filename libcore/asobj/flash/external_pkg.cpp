@@ -43,7 +43,8 @@ void
 flash_external_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("external"), get_flash_external_package);
+	where.init_destructive_property(st.find("external"),
+            get_flash_external_package, 0);
 }
 
 

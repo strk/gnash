@@ -40,12 +40,12 @@ get_flash_package(const fn_call& /*fn*/)
 
 	// sub-packages:
 	// TODO: use a destructive getter-setter for these 
+	flash_text_package_init(*pkg);
 	flash_display_package_init(*pkg);
-	flash_external_package_init(*pkg);
 	flash_filters_package_init(*pkg);
 	flash_geom_package_init(*pkg);
 	flash_net_package_init(*pkg);
-	flash_text_package_init(*pkg);
+	flash_external_package_init(*pkg);
 	return pkg;
 }
 

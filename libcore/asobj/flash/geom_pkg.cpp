@@ -51,7 +51,7 @@ void
 flash_geom_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("geom"), get_flash_geom_package);
+	where.init_destructive_property(st.find("geom"), get_flash_geom_package, 0);
 }
 
 

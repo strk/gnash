@@ -61,7 +61,8 @@ void
 flash_filters_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("filters"), get_flash_filters_package);
+	where.init_destructive_property(st.find("filters"),
+            get_flash_filters_package, 0);
 }
 
 

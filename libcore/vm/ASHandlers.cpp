@@ -2996,11 +2996,11 @@ SWFHandlers::ActionTargetPath(ActionExec& thread)
 // Push a each object's member value on the stack
 // This is an utility function for use by ActionEnumerate
 // and ActionEnum2. The caller is expected to have
-// already set the top-of-stack to the NULL value (as an optimization)
+// already set the top-of-stack to undefined (as an optimization)
 static void
 enumerateObject(as_environment& env, const as_object& obj)
 {
-    assert( env.top(0).is_null() );
+    assert(env.top(0).is_undefined());
     obj.enumerateProperties(env);
 }
 
@@ -3016,7 +3016,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
     as_value variable = thread.getVariable(var_string);
 
-    env.top(0).set_null();
+    env.top(0).set_undefined();
 
     const boost::intrusive_ptr<as_object> obj = variable.to_object();
     if ( !obj || !variable.is_object() )
@@ -3490,8 +3490,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
     // Get number of args, modifying it if not enough values are on the stack.
     unsigned nargs = unsigned(env.pop().to_number());
     unsigned available_args = env.stack_size(); // previous 3 entries popped
-    if ( available_args < nargs )
-    {
+    if (available_args < nargs) {
         IF_VERBOSE_MALFORMED_SWF(
         log_swferror(_("Attempt to call a constructor with %u arguments "
             "while only %u are available on the stack."),
@@ -3501,12 +3500,13 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
     }
 
     boost::intrusive_ptr<as_object> obj = obj_val.to_object();
-    if ( ! obj )
-    {
+    if (!obj) {
         // SWF integrity check
         // FIXME, should this be log_swferror?  Or log_aserror?
-        log_error(_("On ActionNewMethod: "
-            "no object found on stack on ActionMethod"));
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("On ActionNewMethod: "
+                "no object found on stack on ActionMethod"));
+        );
         env.drop(nargs);
         env.push(as_value());
         return;
@@ -3514,35 +3514,29 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 
     std::string method_string = method_name.to_string();
     as_value method_val;
-    if ( method_name.is_undefined() || method_string.empty() )
-    {
+    if (method_name.is_undefined() || method_string.empty()) {
         method_val = obj_val;
     }
-    else
-    {
-        if ( ! thread.getObjectMember(*obj, method_string, method_val) )
-        {
+    else {
+        if (!thread.getObjectMember(*obj, method_string, method_val)) {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror(_("ActionNewMethod: "
-                "can't find method %s of object %s"),
-                method_string, obj_val);
+                log_aserror(_("ActionNewMethod: can't find method %s of "
+                        "object %s"), method_string, obj_val);
             );
             env.drop(nargs);
-            env.push(as_value()); // should we push an object anyway ?
+            env.push(as_value()); 
             return;
         }
     }
 
     boost::intrusive_ptr<as_function> method = method_val.to_as_function();
-    if ( ! method )
-    {
+    if (!method) {
         IF_VERBOSE_MALFORMED_SWF(
-        log_swferror(_("ActionNewMethod: "
-            "method name is undefined, "
-            "and object is not a function"));
+            log_swferror(_("ActionNewMethod: method name is undefined "
+                "and object is not a function"));
         );
         env.drop(nargs);
-        env.push(as_value()); // should we push an object anyway ?
+        env.push(as_value()); 
         return;
     }
 
@@ -3595,7 +3589,7 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 
     // End of the enumeration. Won't override the object
     // as we copied that as_value.
-    env.top(0).set_null();
+    env.top(0).set_undefined();
 
     const boost::intrusive_ptr<as_object> obj = obj_val.to_object();
     if ( !obj || !obj_val.is_object() )

@@ -47,7 +47,7 @@ void
 flash_text_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("text"), get_flash_text_package);
+	where.init_destructive_property(st.find("text"), get_flash_text_package, 0);
 }
 
 

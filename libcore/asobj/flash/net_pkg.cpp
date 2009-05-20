@@ -45,7 +45,7 @@ void
 flash_net_package_init(as_object& where)
 {
 	string_table& st = where.getVM().getStringTable();
-	where.init_destructive_property(st.find("net"), get_flash_net_package);
+	where.init_destructive_property(st.find("net"), get_flash_net_package, 0);
 }
 
 
