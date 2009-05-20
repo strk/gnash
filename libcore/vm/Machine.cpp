@@ -1026,14 +1026,15 @@ Machine::execute()
 		push_stack(as_value(new_function));
 		break;
 	}
-/// 0x41 ABC_ACTION_CALL
-/// Stream: V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  obj -- the object to which the function belongs
-///  func -- the function to be called
-/// Stack Out:
-///  value -- the value returned by obj->func(arg1, ...., argN)
+    
+    /// 0x41 ABC_ACTION_CALL
+    /// Stream: V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  obj -- the object to which the function belongs
+    ///  func -- the function to be called
+    /// Stack Out:
+    ///  value -- the value returned by obj->func(arg1, ...., argN)
 	case SWF::ABC_ACTION_CALL:
 	{
 		boost::uint32_t argc = mStream->read_V32();
@@ -1052,13 +1053,14 @@ Machine::execute()
 		pushCall(f, obj, mStack.top(argc + 1), argc, -1);
 		break;
 	}
-/// 0x42 ABC_ACTION_CONSTRUCT
-/// Stream: V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  function -- constructor for the object to be constructed
-/// Stack Out:
-///  value -- obj after it has been constructed as obj(arg1, ..., argN)
+
+    /// 0x42 ABC_ACTION_CONSTRUCT
+    /// Stream: V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  function -- constructor for the object to be constructed
+    /// Stack Out:
+    ///  value -- obj after it has been constructed as obj(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCT:
 	{
 		boost::uint32_t argc = mStream->read_V32();
@@ -2365,18 +2367,29 @@ Machine::execute()
 		// TODO: Namespace stuff?
 		mStack.top(0).set_bool(mStack.top(0).conforms_to(a.getABCName()));
 	}
-/// 0xB3 ABC_ACTION_ISTYPELATE
-/// Stack In:
-///  type -- A type to match
-///  obj -- An object
-/// Stack Out:
-///  truth -- Truth of "obj is of type"
+
+    /// 0xB3 ABC_ACTION_ISTYPELATE
+    /// Stack In:
+    ///  type -- A type to match
+    ///  obj -- An object
+    /// Stack Out:
+    ///  truth -- Truth of "obj is of type"
 	case SWF::ABC_ACTION_ISTYPELATE:
 	{
 		as_value type = pop_stack();
 		as_value value = pop_stack();
-		bool truth = value.to_object().get()->instanceOf(type.to_object().get());
-		push_stack(as_value(truth));
+        as_object* const valueObject = value.to_object().get();
+        as_object* const typeObject = type.to_object().get();
+
+        if (!valueObject || !typeObject) {
+            // TODO: what here!?
+            // This should eventually be a malformed SWF error.
+            log_error("ACTION_ISTYPELATE: require two objects on stack, got "
+                   "obj: %s, type: %s.", value, type);
+            return;
+        }
+		const bool truth = valueObject->instanceOf(typeObject);
+		push_stack(truth);
 		break;
 	}
 /// 0xB4 ABC_ACTION_IN
