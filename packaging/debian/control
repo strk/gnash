@@ -2,7 +2,7 @@ Source: gnash
 Priority: optional
 Maintainer: Rob Savoye <rob@welcomehome.org>
 XSBC-Original-Maintainer: Miriam Ruiz <little_miry@yahoo.es>, Alexander Sack <asac@jwsdot.com>
-Build-Depends: dpkg-dev (>= 1.13.19), debhelper (>= 4.0.0), autoconf, automake1.9 | automake, libtool, libltdl3-dev, libxmu-dev, dejagnu, autotools-dev, libboost-dev, libboost-thread-dev, libjpeg-dev, libpng12-dev | libpng-dev, libagg-dev, libpango1.0-dev | pango-devel, libgtkglext1-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev | libcurl4-openssl-dev | libcurl3-openssl-dev, libboost-date-time-dev, libavcodec-dev, libavformat-dev
+Build-Depends: dpkg-dev (>= 1.13.19), debhelper (>= 4.0.0), autoconf, automake1.9 | automake, libtool, libltdl3-dev, libxmu-dev, dejagnu, autotools-dev, libboost1.35-dev, libboost-thread1.35-dev, libjpeg-dev, libpng12-dev | libpng-dev, libagg-dev, libpango1.0-dev | pango-devel, libgtkglext1-dev, libcurl4-gnutls-dev | libcurl3-gnutls-dev | libcurl4-openssl-dev | libcurl3-openssl-dev, libboost-date-time1.35-dev, libavcodec-dev, libavformat-dev
 Standards-Version: 3.7.2
 Section: utils
 
