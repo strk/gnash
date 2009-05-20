@@ -20,17 +20,13 @@ AUTOMAKE_OPTIONS = dejagnu
 
 EXTRA_DIST = Dejagnu.hx
 
-SWF_VERSION = 9
-
-HAXE_FLAGS = -swf-version $(SWF_VERSION) -cp $(srcdir) 
-
-# hopefully preprocessor is builtin in this case
-HAXE_CPP = $(CPP) -x c -P -I$(srcdir)
-
 TEST_DRIVERS = classes.exp
 
-# This gets it's values from the Makefile fragments.
+# These get there values from the Makefile fragments. Each fragment
+# appends to these.
 check_SCRIPTS =
+HAXE_FLAGS = -cp $(srcdir) 
+
 
 #include $(srcdir)/fl/accessibility/accessibility.am
 # include $(srcdir)/fl/containers/containers.am
@@ -42,40 +38,45 @@ check_SCRIPTS =
 # include $(srcdir)/fl/video/video.am
 
 # These classes are in the flash namespace
-include $(srcdir)/accessibility/accessibility.am
+# #include $(srcdir)/accessibility/accessibility.am
 
 # These classes are for AIR only, not flash
 #include $(srcdir)/data/data.am
 # include $(srcdir)/desktop/desktop.am
 
-include $(srcdir)/display/display.am
-include $(srcdir)/errors/errors.am
-# include $(srcdir)/events/events.am
-include $(srcdir)/external/external.am
-# include $(srcdir)/filesystem/filesystem.am
-# include $(srcdir)/filters/filters.am
-include $(srcdir)/geom/geom.am
-# HAXE doesn't appear to support the HTML classes
-# include $(srcdir)/html/html.am
-include $(srcdir)/media/media.am
-include $(srcdir)/net/net.am
-include $(srcdir)/printing/printing.am
-# include $(srcdir)/sampler/sampler.am
-# HAXE doesn't appear to support the Security classes
-# include $(srcdir)/security/security.am
-include $(srcdir)/system/system.am
-# include $(srcdir)/text/text.am
-# include $(srcdir)/ui/ui.am
-# include $(srcdir)/utils/utils.am
-include $(srcdir)/xml/xml.am
+# include $(srcdir)/display/display.am
+# include $(srcdir)/errors/errors.am
+# # include $(srcdir)/events/events.am
+# include $(srcdir)/external/external.am
+# # include $(srcdir)/filesystem/filesystem.am
+# # include $(srcdir)/filters/filters.am
+# include $(srcdir)/geom/geom.am
+# # HAXE doesn't appear to support the HTML classes
+# # include $(srcdir)/html/html.am
+# include $(srcdir)/media/media.am
+# include $(srcdir)/net/net.am
+# include $(srcdir)/printing/printing.am
+# # include $(srcdir)/sampler/sampler.am
+# # HAXE doesn't appear to support the Security classes
+# # include $(srcdir)/security/security.am
+# include $(srcdir)/system/system.am
+# # include $(srcdir)/text/text.am
+include $(srcdir)/ui/ui.am
+# # include $(srcdir)/utils/utils.am
+# include $(srcdir)/xml/xml.am
 
 #/usr/bin/haxe -swf-version 9 -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all/media -swf Sound_as3.swf -main Sound_as3.hx
 SUFFIXES = hx swf
 
-.hx.swf: 
-	@echo $(@F)
-	foo=$(@F); \
-	$(HAXE) $(HAXE_FLAGS) -swf $(@F) -main $(@F:%.swf=%.hx)
+.hx.swf:
+	-newname=`echo $(@F) | sed -e 's:_as:_asv9:'`; \
+	$(HAXE) -swf-version 9 $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
+	-newname=`echo $(@F) | sed -e 's:_as:_asv8:'`; \
+	$(HAXE) -swf-version 8  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
+	-newname=`echo $(@F) | sed -e 's:_as:_asv7:'`; \
+	$(HAXE) -swf-version 7  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
+	-newname=`echo $(@F) | sed -e 's:_as:_asv6:'`; \
+	$(HAXE) -swf-version 6  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
 
 CLEANFILES =  \
 	gnash-dbg.log \
