@@ -20,19 +20,19 @@ SAMPLERdir = $(srcdir)/sampler
 SAMPLER_TESTS = 
 
 if BUILD_DELETEOBJECTSAMPLE_AS3
-SAMPLER_TESTS += sampler/DeleteObjectSample_as3.swf
+SAMPLER_TESTS += sampler/DeleteObjectSample_as.swf
 endif
 
 if BUILD_NEWOBJECTSAMPLE_AS3
-SAMPLER_TESTS += sampler/NewObjectSample_as3.swf
+SAMPLER_TESTS += sampler/NewObjectSample_as.swf
 endif
 
 if BUILD_SAMPLE_AS3
-SAMPLER_TESTS += sampler/Sample_as3.swf
+SAMPLER_TESTS += sampler/Sample_as.swf
 endif
 
 if BUILD_STACKFRAME_AS3
-SAMPLER_TESTS += sampler/StackFrame_as3.swf
+SAMPLER_TESTS += sampler/StackFrame_as.swf
 endif
 
 check_SCRIPTS += $(SAMPLER_TESTS)

@@ -20,15 +20,15 @@ PRINTINGdir = $(srcdir)/printing
 PRINTING_TESTS = 
 
 if BUILD_PRINTJOBOPTIONS_AS3
-PRINTING_TESTS += printing/PrintJobOptions_as3.swf
+PRINTING_TESTS += printing/PrintJobOptions_as.swf
 endif
 
 if BUILD_PRINTJOBORIENTATION_AS3
-PRINTING_TESTS += printing/PrintJobOrientation_as3.swf
+PRINTING_TESTS += printing/PrintJobOrientation_as.swf
 endif
 
 if BUILD_PRINTJOB_AS3
-PRINTING_TESTS += printing/PrintJob_as3.swf
+PRINTING_TESTS += printing/PrintJob_as.swf
 endif
 
 check_SCRIPTS += $(PRINTING_TESTS)

@@ -22,39 +22,39 @@ UTILSdir = $(srcdir)/utils
 UTILS_TESTS =
 
 if BUILD_BYTEARRAY_AS3
-UTILS_TESTS += utils/ByteArray_as3.swf
+UTILS_TESTS += utils/ByteArray_as.swf
 endif
 
 if BUILD_COMPRESSIONALGORITHM_AS3
-UTILS_TESTS += utils/CompressionAlgorithm_as3.swf
+UTILS_TESTS += utils/CompressionAlgorithm_as.swf
 endif
 
 if BUILD_DICTIONARY_AS3
-UTILS_TESTS += utils/Dictionary_as3.swf
+UTILS_TESTS += utils/Dictionary_as.swf
 endif
 
 if BUILD_ENDIAN_AS3
-UTILS_TESTS += utils/Endian_as3.swf
+UTILS_TESTS += utils/Endian_as.swf
 endif
 
 if BUILD_IDATAINPUT_AS3
-UTILS_TESTS += utils/IDataInput_as3.swf
+UTILS_TESTS += utils/IDataInput_as.swf
 endif
 
 if BUILD_IDATAOUTPUT_AS3
-UTILS_TESTS += utils/IDataOutput_as3.swf
+UTILS_TESTS += utils/IDataOutput_as.swf
 endif
 
 if BUILD_IEXTERNALIZABLE_AS3
-UTILS_TESTS += utils/IExternalizable_as3.swf
+UTILS_TESTS += utils/IExternalizable_as.swf
 endif
 
 if BUILD_PROXY_AS3
-UTILS_TESTS += utils/Proxy_as3.swf
+UTILS_TESTS += utils/Proxy_as.swf
 endif
 
 if BUILD_TIMER_AS3
-UTILS_TESTS += utils/Timer_as3.swf
+UTILS_TESTS += utils/Timer_as.swf
 endif
 
 check_SCRIPTS += $(UTILS_TESTS)

@@ -19,64 +19,64 @@ DATAdir = $(srcdir)/data
 
 DATA_TESTS = 
 
-if BUILD_ENCRYPTEDLOCALSTORE_AS3
-DATA_TESTS += data/EncryptedLocalStore_as3.swf
-endif
+# if BUILD_ENCRYPTEDLOCALSTORE_AS3
+# DATA_TESTS += data/EncryptedLocalStore_as.swf
+# endif
 
 if BUILD_SQLCOLLATIONTYPE_AS3
-DATA_TESTS += data/SQLCollationType_as3.swf
+DATA_TESTS += data/SQLCollationType_as.swf
 endif
 
 if BUILD_SQLCOLUMNNAMESTYLE_AS3
-DATA_TESTS += data/SQLColumnNameStyle_as3.swf
+DATA_TESTS += data/SQLColumnNameStyle_as.swf
 endif
 
 if BUILD_SQLCOLUMNSCHEMA_AS3
-DATA_TESTS += data/SQLColumnSchema_as3.swf
+DATA_TESTS += data/SQLColumnSchema_as.swf
 endif
 
 if BUILD_SQLCONNECTION_AS3
-DATA_TESTS += data/SQLConnection_as3.swf
+DATA_TESTS += data/SQLConnection_as.swf
 endif
 
 if BUILD_SQLINDEXSCHEMA_AS3
-DATA_TESTS += data/SQLIndexSchema_as3.swf
+DATA_TESTS += data/SQLIndexSchema_as.swf
 endif
 
 if BUILD_SQLMODE_AS3
-DATA_TESTS += data/SQLMode_as3.swf
+DATA_TESTS += data/SQLMode_as.swf
 endif
 
 if BUILD_SQLRESULT_AS3
-DATA_TESTS += data/SQLResult_as3.swf
+DATA_TESTS += data/SQLResult_as.swf
 endif
 
 if BUILD_SQLSCHEMARESULT_AS3
-DATA_TESTS += data/SQLSchemaResult_as3.swf
+DATA_TESTS += data/SQLSchemaResult_as.swf
 endif
 
 if BUILD_SQLSCHEMA_AS3
-DATA_TESTS += data/SQLSchema_as3.swf
+DATA_TESTS += data/SQLSchema_as.swf
 endif
 
 if BUILD_SQLSTATEMENT_AS3
-DATA_TESTS += data/SQLStatement_as3.swf
+DATA_TESTS += data/SQLStatement_as.swf
 endif
 
 if BUILD_SQLTABLESCHEMA_AS3
-DATA_TESTS += data/SQLTableSchema_as3.swf
+DATA_TESTS += data/SQLTableSchema_as.swf
 endif
 
 if BUILD_SQLTRANSACTIONLOCKTYPE_AS3
-DATA_TESTS += data/SQLTransactionLockType_as3.swf
+DATA_TESTS += data/SQLTransactionLockType_as.swf
 endif
 
 if BUILD_SQLTRIGGERSCHEMA_AS3
-DATA_TESTS += data/SQLTriggerSchema_as3.swf
+DATA_TESTS += data/SQLTriggerSchema_as.swf
 endif
 
 if BUILD_SQLVIEWSCHEMA_AS3
-DATA_TESTS += data/SQLViewSchema_as3.swf
+DATA_TESTS += data/SQLViewSchema_as.swf
 endif
 
 check_SCRIPTS += $(DATA_TESTS)

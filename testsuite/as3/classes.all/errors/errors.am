@@ -20,40 +20,40 @@ ERRORSdir = $(srcdir)/errors
 ERRORS_TESTS = 
 
 if BUILD_EOFERROR_AS3
-ERRORS_TESTS += errors/EOFError_as3.swf
+ERRORS_TESTS += errors/EOFError_as.swf
 endif
 
 if BUILD_IOERROR_AS3
-ERRORS_TESTS += errors/IOError_as3.swf
+ERRORS_TESTS += errors/IOError_as.swf
 endif
 
 if BUILD_ILLEGALOPERATIONERROR_AS3
-ERRORS_TESTS += errors/IllegalOperationError_as3.swf
+ERRORS_TESTS += errors/IllegalOperationError_as.swf
 endif
 
 if BUILD_INVALIDSWFERROR_AS3
-ERRORS_TESTS += errors/InvalidSWFError_as3.swf
+ERRORS_TESTS += errors/InvalidSWFError_as.swf
 endif
 
 if BUILD_MEMORYERROR_AS3
-ERRORS_TESTS += errors/MemoryError_as3.swf
+ERRORS_TESTS += errors/MemoryError_as.swf
 endif
 
 # AIR only
 # if BUILD_SQLERROROPERATION_AS3
-# ERRORS_TESTS += errors/SQLErrorOperation_as3.swf
+# ERRORS_TESTS += errors/SQLErrorOperation_as.swf
 # endif
 
 # if BUILD_SQLERROR_AS3
-# ERRORS_TESTS += errors/SQLError_as3.swf
+# ERRORS_TESTS += errors/SQLError_as.swf
 # endif
 
 if BUILD_SCRIPTTIMEOUTERROR_AS3
-ERRORS_TESTS += errors/ScriptTimeoutError_as3.swf
+ERRORS_TESTS += errors/ScriptTimeoutError_as.swf
 endif
 
 if BUILD_STACKOVERFLOWERROR_AS3
-ERRORS_TESTS += errors/StackOverflowError_as3.swf
+ERRORS_TESTS += errors/StackOverflowError_as.swf
 endif
 
 check_SCRIPTS += $(ERRORS_TESTS)

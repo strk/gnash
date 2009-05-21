@@ -20,75 +20,75 @@ TEXTdir = $(srcdir)/text
 TEXT_TESTS = text/text_pkg.swf
 
 if BUILD_ANTIALIASTYPE_AS3
-TEXT_TESTS += text/AntiAliasType_as3.swf
+TEXT_TESTS += text/AntiAliasType_as.swf
 endif
 
 if BUILD_CSMSETTINGS_AS3
-TEXT_TESTS += text/CSMSettings_as3.swf
+TEXT_TESTS += text/CSMSettings_as.swf
 endif
 
 if BUILD_FONTSTYLE_AS3
-TEXT_TESTS += text/FontStyle_as3.swf
+TEXT_TESTS += text/FontStyle_as.swf
 endif
 
 if BUILD_FONTTYPE_AS3
-TEXT_TESTS += text/FontType_as3.swf
+TEXT_TESTS += text/FontType_as.swf
 endif
 
 if BUILD_FONT_AS3
-TEXT_TESTS += text/Font_as3.swf
+TEXT_TESTS += text/Font_as.swf
 endif
 
 if BUILD_GRIDFITTYPE_AS3
-TEXT_TESTS += text/GridFitType_as3.swf
+TEXT_TESTS += text/GridFitType_as.swf
 endif
 
 if BUILD_STATICTEXT_AS3
-TEXT_TESTS += text/StaticText_as3.swf
+TEXT_TESTS += text/StaticText_as.swf
 endif
 
 if BUILD_STYLESHEET_AS3
-TEXT_TESTS += text/StyleSheet_as3.swf
+TEXT_TESTS += text/StyleSheet_as.swf
 endif
 
 if BUILD_TEXTCOLORTYPE_AS3
-TEXT_TESTS += text/TextColorType_as3.swf
+TEXT_TESTS += text/TextColorType_as.swf
 endif
 
 if BUILD_TEXTDISPLAYMODE_AS3
-TEXT_TESTS += text/TextDisplayMode_as3.swf
+TEXT_TESTS += text/TextDisplayMode_as.swf
 endif
 
 if BUILD_TEXTFIELDAUTOSIZE_AS3
-TEXT_TESTS += text/TextFieldAutoSize_as3.swf
+TEXT_TESTS += text/TextFieldAutoSize_as.swf
 endif
 
 if BUILD_TEXTFIELDTYPE_AS3
-TEXT_TESTS += text/TextFieldType_as3.swf
+TEXT_TESTS += text/TextFieldType_as.swf
 endif
 
 if BUILD_TEXTFIELD_AS3
-TEXT_TESTS += text/TextField_as3.swf
+TEXT_TESTS += text/TextField_as.swf
 endif
 
 if BUILD_TEXTFORMATALIGN_AS3
-TEXT_TESTS += text/TextFormatAlign_as3.swf
+TEXT_TESTS += text/TextFormatAlign_as.swf
 endif
 
 if BUILD_TEXTFORMAT_AS3
-TEXT_TESTS += text/TextFormat_as3.swf
+TEXT_TESTS += text/TextFormat_as.swf
 endif
 
 if BUILD_TEXTLINEMETRICS_AS3
-TEXT_TESTS += text/TextLineMetrics_as3.swf
+TEXT_TESTS += text/TextLineMetrics_as.swf
 endif
 
 if BUILD_TEXTRENDERER_AS3
-TEXT_TESTS += text/TextRenderer_as3.swf
+TEXT_TESTS += text/TextRenderer_as.swf
 endif
 
 if BUILD_TEXTSNAPSHOT_AS3
-TEXT_TESTS += text/TextSnapshot_as3.swf
+TEXT_TESTS += text/TextSnapshot_as.swf
 endif
 
 check_SCRIPTS += $(TEXT_TESTS)
