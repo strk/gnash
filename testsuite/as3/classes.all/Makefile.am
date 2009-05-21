@@ -44,8 +44,8 @@ HAXE_FLAGS = -cp $(srcdir)
 # include $(srcdir)/data/data.am
 # include $(srcdir)/desktop/desktop.am
 
-# include $(srcdir)/display/display.am
-# include $(srcdir)/errors/errors.am
+include $(srcdir)/display/display.am
+include $(srcdir)/errors/errors.am
 # # include $(srcdir)/events/events.am
 include $(srcdir)/external/external.am
 # # include $(srcdir)/filesystem/filesystem.am
