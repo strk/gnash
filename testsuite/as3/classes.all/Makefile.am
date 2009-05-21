@@ -18,7 +18,7 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-EXTRA_DIST = Dejagnu.hx
+EXTRA_DIST = DejaGnu.hx
 
 TEST_DRIVERS = classes.exp
 
