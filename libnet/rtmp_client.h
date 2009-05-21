@@ -68,7 +68,7 @@ public:
     DSOEXPORT boost::shared_ptr<amf::Buffer> encodeEchoRequest(const std::string &method, double id, amf::Element &el);
 
     typedef std::deque<boost::shared_ptr<RTMPMsg> > msgque_t;
-    msgque_t recvResponse();
+    DSOEXPORT msgque_t recvResponse();
 
     void dump();
   private:
