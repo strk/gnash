@@ -20,23 +20,23 @@ GEOMdir = $(srcdir)/geom
 GEOM_TESTS = 
 
 if BUILD_COLORTRANSFORM_AS3
-GEOM_TESTS += geom/ColorTransform_as3.swf
+GEOM_TESTS += geom/ColorTransform_as.swf
 endif
 
 if BUILD_MATRIX_AS3
-GEOM_TESTS += geom/Matrix_as3.swf
+GEOM_TESTS += geom/Matrix_as.swf
 endif
 
 if BUILD_POINT_AS3
-GEOM_TESTS += geom/Point_as3.swf
+GEOM_TESTS += geom/Point_as.swf
 endif
 
 if BUILD_RECTANGLE_AS3
-GEOM_TESTS += geom/Rectangle_as3.swf
+GEOM_TESTS += geom/Rectangle_as.swf
 endif
 
 if BUILD_TRANSFORM_AS3
-GEOM_TESTS += geom/Transform_as3.swf
+GEOM_TESTS += geom/Transform_as.swf
 endif
 
 check_SCRIPTS += $(GEOM_TESTS)

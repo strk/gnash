@@ -20,7 +20,7 @@ EXTERNALdir = $(srcdir)/external
 EXTERNAL_TESTS = 
 
 if BUILD_EXTERNALINTERFACE_AS3
-EXTERNAL_TESTS += external/ExternalInterface_as3.swf
+EXTERNAL_TESTS += external/ExternalInterface_as.swf
 endif
 
 check_SCRIPTS += $(EXTERNAL_TESTS)

@@ -22,39 +22,39 @@ MEDIAdir = $(srcdir)/media
 MEDIA_TESTS = 
 
 if BUILD_CAMERA_AS3
-MEDIA_TESTS += media/Camera_as3.swf
+MEDIA_TESTS += media/Camera_as.swf
 endif
 
 if BUILD_ID3INFO_AS3
-MEDIA_TESTS += media/ID3Info_as3.swf
+MEDIA_TESTS += media/ID3Info_as.swf
 endif
 
 if BUILD_MICROPHONE_AS3
-MEDIA_TESTS += media/Microphone_as3.swf
+MEDIA_TESTS += media/Microphone_as.swf
 endif
 
 if BUILD_SOUNDCHANNEL_AS3
-MEDIA_TESTS += media/SoundChannel_as3.swf
+MEDIA_TESTS += media/SoundChannel_as.swf
 endif
 
 if BUILD_SOUNDLOADERCONTEXT_AS3
-MEDIA_TESTS += media/SoundLoaderContext_as3.swf
+MEDIA_TESTS += media/SoundLoaderContext_as.swf
 endif
 
 if BUILD_SOUNDMIXER_AS3
-MEDIA_TESTS += media/SoundMixer_as3.swf
+MEDIA_TESTS += media/SoundMixer_as.swf
 endif
 
 if BUILD_SOUNDTRANSFORM_AS3
-MEDIA_TESTS += media/SoundTransform_as3.swf
+MEDIA_TESTS += media/SoundTransform_as.swf
 endif
 
 if BUILD_SOUND_AS3
-MEDIA_TESTS += media/Sound_as3.swf
+MEDIA_TESTS += media/Sound_as.swf
 endif
 
 if BUILD_VIDEO_AS3
-MEDIA_TESTS += media/Video_as3.swf
+MEDIA_TESTS += media/Video_as.swf
 endif
 
 check_SCRIPTS += $(MEDIA_TESTS)

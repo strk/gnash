@@ -20,23 +20,23 @@ SECURITYdir = $(srcdir)/security
 SECURITY_TESTS = 
 
 if BUILD_IURIDEREFERENCER_AS3
-SECURITY_TESTS += security/IURIDereferencer_as3.swf
+SECURITY_TESTS += security/IURIDereferencer_as.swf
 endif
 
 if BUILD_REVOCATIONCHECKSETTINGS_AS3
-SECURITY_TESTS += security/RevocationCheckSettings_as3.swf
+SECURITY_TESTS += security/RevocationCheckSettings_as.swf
 endif
 
 if BUILD_SIGNATURESTATUS_AS3
-SECURITY_TESTS += security/SignatureStatus_as3.swf
+SECURITY_TESTS += security/SignatureStatus_as.swf
 endif
 
 if BUILD_SIGNERTRUSTSETTINGS_AS3
-SECURITY_TESTS += security/SignerTrustSettings_as3.swf
+SECURITY_TESTS += security/SignerTrustSettings_as.swf
 endif
 
 if BUILD_XMLSIGNATUREVALIDATOR_AS3
-SECURITY_TESTS += security/XMLSignatureValidator_as3.swf
+SECURITY_TESTS += security/XMLSignatureValidator_as.swf
 endif
 
 check_SCRIPTS += $(SECURITY_TESTS)

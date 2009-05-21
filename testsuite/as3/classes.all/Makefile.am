@@ -41,21 +41,21 @@ HAXE_FLAGS = -cp $(srcdir)
 # #include $(srcdir)/accessibility/accessibility.am
 
 # These classes are for AIR only, not flash
-#include $(srcdir)/data/data.am
-# include $(srcdir)/desktop/desktop.am
+include $(srcdir)/data/data.am
+include $(srcdir)/desktop/desktop.am
 
-# include $(srcdir)/display/display.am
-# include $(srcdir)/errors/errors.am
+include $(srcdir)/display/display.am
+include $(srcdir)/errors/errors.am
 # # include $(srcdir)/events/events.am
-# include $(srcdir)/external/external.am
+include $(srcdir)/external/external.am
 # # include $(srcdir)/filesystem/filesystem.am
 # # include $(srcdir)/filters/filters.am
-# include $(srcdir)/geom/geom.am
+include $(srcdir)/geom/geom.am
 # # HAXE doesn't appear to support the HTML classes
 # # include $(srcdir)/html/html.am
-# include $(srcdir)/media/media.am
-# include $(srcdir)/net/net.am
-# include $(srcdir)/printing/printing.am
+include $(srcdir)/media/media.am
+include $(srcdir)/net/net.am
+include $(srcdir)/printing/printing.am
 # # include $(srcdir)/sampler/sampler.am
 # # HAXE doesn't appear to support the Security classes
 # # include $(srcdir)/security/security.am
@@ -63,11 +63,15 @@ include $(srcdir)/system/system.am
 # # include $(srcdir)/text/text.am
 include $(srcdir)/ui/ui.am
 # # include $(srcdir)/utils/utils.am
-# include $(srcdir)/xml/xml.am
+include $(srcdir)/xml/xml.am
 
 #/usr/bin/haxe -swf-version 9 -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all -cp /home/rob/projects/gnu/gnash-bzr/avm2/testsuite/as3/classes.all/media -swf Sound_as3.swf -main Sound_as3.hx
 SUFFIXES = hx swf
 
+# build multiple output formats from the same test case. exit with failure if
+# the test case doesn't compile for v9, it's a test cases bug. Not all classes
+# support all versions, so in those cases justy ignore the errors as it's less
+# messy than testing for each test case to see if it supports that version.
 .hx.swf:
 	-@newname=`echo $(@F) | sed -e 's:_as:_asv9:'`; \
 	$(HAXE) -swf-version 9 $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
