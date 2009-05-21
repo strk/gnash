@@ -73,7 +73,7 @@ SUFFIXES = hx swf
 # support all versions, so in those cases justy ignore the errors as it's less
 # messy than testing for each test case to see if it supports that version.
 .hx.swf:
-	-@newname=`echo $(@F) | sed -e 's:_as:_asv9:'`; \
+	@newname=`echo $(@F) | sed -e 's:_as:_asv9:'`; \
 	$(HAXE) -swf-version 9 $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
 	-@newname=`echo $(@F) | sed -e 's:_as:_asv8:'`; \
 	$(HAXE) -swf-version 8  $(HAXE_FLAGS) -swf $${newname} -main $(@F:%.swf=%.hx)
