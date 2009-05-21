@@ -21,17 +21,17 @@ DISPLAYdir = $(srcdir)/display
 
 DISPLAY_TESTS = 
 
-if BUILD_AVM1MOVIE_AS3
-DISPLAY_TESTS += display/AVM1Movie_as.swf
-endif
+# if BUILD_AVM1MOVIE_AS3
+# DISPLAY_TESTS += display/AVM1Movie_as.swf
+# endif
 
 # if BUILD_ACTIONSCRIPTVERSION_AS3
 # DISPLAY_TESTS += display/ActionScriptVersion_as.swf
 # endif
 
-if BUILD_BITMAPDATACHANNEL_AS3
-DISPLAY_TESTS += display/BitmapDataChannel_as.swf
-endif
+# if BUILD_BITMAPDATACHANNEL_AS3
+# DISPLAY_TESTS += display/BitmapDataChannel_as.swf
+# endif
 
 if BUILD_BITMAPDATA_AS3
 DISPLAY_TESTS += display/BitmapData_as.swf
