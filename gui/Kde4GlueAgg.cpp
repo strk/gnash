@@ -33,7 +33,7 @@ Kde4AggGlue::Kde4AggGlue()
 :
   _width(0),
   _height(0),
-   _renderer(0)
+  _renderer(0)
 {
 }
 

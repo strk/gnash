@@ -29,11 +29,16 @@
 #include <QDialog>
 
 #ifdef RENDERER_OPENGL
-# error "OGL not supported yet for KDE4!"
+# include "Kde4GlueOgl.h"
+# include <QGLWidget>
+# define BaseWidget QGLWidget
+# define GlueClass Kde4OglGlue
 #elif defined(RENDERER_CAIRO)
 # error "Cairo not supported yet for KDE4!"
 #elif defined(RENDERER_AGG)
 # include "Kde4GlueAgg.h"
+# define BaseWidget QWidget
+# define GlueClass Kde4AggGlue
 #endif
 
 
@@ -54,7 +59,7 @@ namespace gnash {
 namespace gnash
 {
 
-class DrawingWidget : public QWidget
+class DrawingWidget : public BaseWidget
 {
     Q_OBJECT
 
@@ -176,7 +181,7 @@ private:
     DrawingWidget* _drawingWidget;
     
     /// Takes care of painting onto the widget.
-    Kde4AggGlue _glue;
+    GlueClass _glue;
     
     /// The main application window.
     std::auto_ptr<QMainWindow> _window;
