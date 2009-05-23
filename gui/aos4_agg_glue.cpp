@@ -35,7 +35,9 @@ AOS4AggGlue::AOS4AggGlue()
 	:
 _offscreenbuf(NULL),
 _window(NULL),
-_agg_renderer(NULL)
+_screen(NULL),
+_agg_renderer(NULL),
+_fullscreen(FALSE)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -44,7 +46,13 @@ AOS4AggGlue::~AOS4AggGlue()
 {
 //    GNASH_REPORT_FUNCTION;
     delete [] _offscreenbuf;
-	if (_window) IIntuition->CloseWindow(_window);
+	if (_window) 
+	{
+		IIntuition->CloseWindow(_window);
+		_window = NULL;
+	}
+	
+	_screen = NULL;
 }
 
 bool
@@ -98,6 +106,44 @@ AOS4AggGlue::createRenderHandler()
     return _agg_renderer;
 }
 
+void
+AOS4AggGlue::setFullscreen()
+{
+
+	saveOrigiginalDimension(_width,_height);
+
+	_screen = IIntuition->LockPubScreen("Workbench");
+	int new_width   = _screen->Width;
+	int new_height  = _screen->Height;
+	IIntuition->UnlockPubScreen(NULL,_screen);
+	if (_window) 
+		IIntuition->CloseWindow(_window);
+	_window = NULL;
+
+    _fullscreen = true;
+	
+	resize(new_width, new_height);
+
+}
+
+void 
+AOS4AggGlue::saveOrigiginalDimension(int width, int height)
+{
+	_orig_width  = width;
+	_orig_height = height;
+}
+
+void
+AOS4AggGlue::unsetFullscreen()
+{
+	if (_window) 
+		IIntuition->CloseWindow(_window);
+	_window = NULL;
+	
+    _fullscreen = false;
+
+    resize(_orig_width, _orig_height);
+}
 
 bool
 AOS4AggGlue::prepDrawingArea(int width, int height)
@@ -106,14 +152,16 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 
     assert(_bpp % 8 == 0);
 
-	if (!_window)
+	_width = width;
+	_height = height;
+
+	if (NULL == _window)
 	{
 		_window = IIntuition->OpenWindowTags (NULL,
 			WA_Activate, 		TRUE,
 			WA_InnerWidth,  	width,
 			WA_InnerHeight,		height,
-			WA_SimpleRefresh, 	TRUE,
-			WA_NoCareRefresh, 	TRUE,
+			WA_SmartRefresh, 	TRUE,
 			WA_RMBTrap, 		FALSE,
 			WA_ReportMouse, 	TRUE,
 			WA_MaxWidth,		~0,
@@ -124,25 +172,22 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 								IDCMP_CLOSEWINDOW|
 								IDCMP_NEWSIZE|
 								IDCMP_SIZEVERIFY,
-			WA_Borderless,		FALSE,
-			WA_DepthGadget, 	TRUE,
-			WA_DragBar, 		TRUE,
-			WA_SizeGadget,		TRUE,
+			WA_Borderless,		(_fullscreen==false) ? FALSE : TRUE,
+			WA_DepthGadget, 	(_fullscreen==false) ? TRUE : FALSE,
+			WA_DragBar, 		(_fullscreen==false) ? TRUE : FALSE,
+			WA_SizeGadget,		(_fullscreen==false) ? TRUE : FALSE,
+			WA_SizeBBottom,		(_fullscreen==false) ? TRUE : FALSE,
+			WA_CloseGadget, 	(_fullscreen==false) ? TRUE : FALSE,
 			WA_NewLookMenus,    TRUE,
-			WA_SizeBBottom,		TRUE,
-			WA_CloseGadget, 	TRUE,
 		TAG_DONE);
 	}
-	
-	_width = width;
-	_height = height;
 
     if (!_window) 
     {
         log_error (_("prepDrawingArea() failed.\n"));
         exit(1);
     }
-
+	
     _stride = width * depth_bytes;
 
 #define CHUNK_SIZE (100 * 100 * depth_bytes)
@@ -158,7 +203,7 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
     // Only the AGG renderer has the function init_buffer, which is *not* part of
     // the renderer api. It allows us to change the renderers movie size (and buffer
     // address) during run-time.
-    render_handler_agg_base * renderer = static_cast<render_handler_agg_base *>(_agg_renderer);
+    render_handler_agg_base *renderer = static_cast<render_handler_agg_base *>(_agg_renderer);
     renderer->init_buffer(_offscreenbuf, bufsize, width, height, width*((_bpp+7)/8));
 
 	struct RenderInfo ri;
@@ -166,7 +211,8 @@ AOS4AggGlue::prepDrawingArea(int width, int height)
 	ri.BytesPerRow  = _stride;
 	ri.RGBFormat 	= _ftype;
 
-	IP96->p96WritePixelArray(&ri,0,0,_window->RPort,_window->BorderLeft,_window->BorderTop,_width,_height);
+	if (_window)
+		IP96->p96WritePixelArray(&ri,0,0,_window->RPort,_window->BorderLeft,_window->BorderTop,_width,_height);
 
     _validbounds.setTo(0, 0, width, height);
 
@@ -180,6 +226,7 @@ AOS4AggGlue::getWindow(void)
 }
 
 void
+
 AOS4AggGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
     _agg_renderer->set_invalidated_regions(ranges);

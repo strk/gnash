@@ -1,16 +1,16 @@
-// 
+//
 //   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -48,7 +48,7 @@ namespace boost
 }
 #endif
 
-namespace gnash 
+namespace gnash
 {
 
 AOS4Gui::AOS4Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
@@ -61,15 +61,19 @@ AOS4Gui::AOS4Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
 
 AOS4Gui::~AOS4Gui()
 {
-    GNASH_REPORT_FUNCTION;
 	TimerExit();
-	IExec->DropInterface((struct Interface *)ITimer);
 }
 
 
-void 
+void
 AOS4Gui::TimerExit(void)
 {
+	if (_port)
+	{
+		IExec->FreeSysObject(ASOT_PORT, _port);
+		_port = 0;
+	}
+
 	if (_timerio)
 	{
 		if (!IExec->CheckIO((struct IORequest *)_timerio))
@@ -79,12 +83,6 @@ AOS4Gui::TimerExit(void)
 		}
 	}
 
-	if (ITimer)
-	{
-		IExec->DropInterface((struct Interface *)ITimer);
-		ITimer = 0;
-	}
-
 	if (_timerio && _timerio->Request.io_Device)
 	{
 		IExec->CloseDevice((struct IORequest *)_timerio);
@@ -92,14 +90,14 @@ AOS4Gui::TimerExit(void)
 		_timerio = 0;
 	}
 
-	if (_port)
+	if (ITimer)
 	{
-		IExec->FreeSysObject(ASOT_PORT, _port);
-		_port = 0;
+		IExec->DropInterface((struct Interface *)ITimer);
+		ITimer = 0;
 	}
 }
 
-bool 
+bool
 AOS4Gui::TimerInit(void)
 {
 	_port = (struct MsgPort *)IExec->AllocSysObject(ASOT_PORT, NULL);
@@ -125,7 +123,7 @@ AOS4Gui::TimerInit(void)
 	return FALSE;
 }
 
-void 
+void
 AOS4Gui::TimerReset(uint32 microDelay)
 {
 	_timerio->Request.io_Command = TR_ADDREQUEST;
@@ -149,15 +147,15 @@ AOS4Gui::run()
 	int mod = 0;
 	key::code code;
 	uint32 new_width = _width, new_height = _height;
-	
-	struct Window *_window = _glue.getWindow();
-	if (!_window)
-		return false;
 
 	TimerReset(10 * 100);
-		
+
     while (true)
     {
+		struct Window *_window = _glue.getWindow();
+		if (!_window)
+			return false;
+			
 	    if (_timeout && OS4_GetTicks() >= _timeout)
     	{
         	break;
@@ -182,6 +180,10 @@ AOS4Gui::run()
 			movie_time += _interval;        // Time next frame should be displayed
 			TimerReset(10 * 100);
 	    }
+	    else if (sigGot & SIGBREAKF_CTRL_C)
+	    {
+    	    return true;
+		}
 		else
 		if (sigGot)
   		{
@@ -190,55 +192,71 @@ AOS4Gui::run()
 				switch(imsg->Class)
 				{
 					case IDCMP_CLOSEWINDOW:
-						IExec->ReplyMsg ((struct Message *)imsg);
+						if (imsg->IDCMPWindow == _window) IExec->ReplyMsg ((struct Message *)imsg);
         	    	    return true;
 					break;
 					case IDCMP_MOUSEMOVE:
-       	        		if ( _window->GZZMouseX == x_old && _window->GZZMouseY == y_old) { break; }
-						x_old = _window->GZZMouseX;
-						y_old = _window->GZZMouseY;
-   		            	notify_mouse_moved(x_old, y_old);
+						if (imsg->IDCMPWindow == _window)
+						{
+							IExec->ReplyMsg ((struct Message *)imsg);
+    	   	        		if ( _window->GZZMouseX == x_old && _window->GZZMouseY == y_old) { break; }
+							x_old = _window->GZZMouseX;
+							y_old = _window->GZZMouseY;
+   		        	    	notify_mouse_moved(x_old, y_old);
+   		        	    }
 		            break;
 		            case IDCMP_MOUSEBUTTONS:
-						switch (imsg->Code)
-   						{
-						    case SELECTDOWN:
-		                	    if (imsg->Code == button_state_old) { break; }
-   	    		            	notify_mouse_clicked(true, 1);
-	                		    button_state_old = imsg->Code;
-					    	break;
-						    case SELECTUP:
-	    	    	            notify_mouse_clicked(false, 1);
-       				            button_state_old = -1;
-						    break;
+						if (imsg->IDCMPWindow == _window)
+						{
+							IExec->ReplyMsg ((struct Message *)imsg);
+							switch (imsg->Code)
+   							{
+							    case SELECTDOWN:
+		        	        	    if (imsg->Code == button_state_old) { break; }
+   	    		    	        	notify_mouse_clicked(true, 1);
+	                			    button_state_old = imsg->Code;
+					    		break;
+							    case SELECTUP:
+		    	    	            notify_mouse_clicked(false, 1);
+       					            button_state_old = -1;
+							    break;
+							}
 						}
 					break;
 					case IDCMP_RAWKEY:
-						if ( (imsg->Code  & ~IECODE_UP_PREFIX) == RAWKEY_ESC) //ESC
+						if (imsg->IDCMPWindow == _window) 
 						{
 							IExec->ReplyMsg ((struct Message *)imsg);
-    	    	    	    return true;
-    	    	    	}
-						code = os4_to_gnash_key(imsg);
-					    mod  = os4_to_gnash_modifier(imsg->Qualifier);
-					   	key_event(code, mod, true);
+							if ( (imsg->Code  & ~IECODE_UP_PREFIX) == RAWKEY_ESC) //ESC
+    	    		    	    return true;
+							code = os4_to_gnash_key(imsg);
+					    	mod  = os4_to_gnash_modifier(imsg->Qualifier);
+						   	key_event(code, mod, true);
+						}
 	    			break;
 					case IDCMP_SIZEVERIFY:
+						if (imsg->IDCMPWindow == _window) IExec->ReplyMsg ((struct Message *)imsg);
 						IGraphics->WaitBlit();
 					break;
 					case IDCMP_NEWSIZE:
-						IIntuition->GetWindowAttr(_window, WA_InnerWidth,  &new_width,  sizeof(new_width));
-						IIntuition->GetWindowAttr(_window, WA_InnerHeight, &new_height, sizeof(new_height));
-						
-		                _glue.resize(new_width, new_height);
-						resize_view(new_width, new_height);
+						if (imsg->IDCMPWindow == _window)
+						{
+							IExec->ReplyMsg ((struct Message *)imsg);
+							if (_window)
+							{
+								IIntuition->GetWindowAttr(_window, WA_InnerWidth,  &new_width,  sizeof(new_width));
+								IIntuition->GetWindowAttr(_window, WA_InnerHeight, &new_height, sizeof(new_height));
+
+			        	        _glue.resize(new_width, new_height);
+								resize_view(new_width, new_height);
+							}
+						}
 					break;
 				}
-				IExec->ReplyMsg ((struct Message *)imsg);
 			}
 		}
 	}
-			
+
     return false;
 }
 
@@ -273,7 +291,7 @@ AOS4Gui::init(int argc, char **argv[])
     _glue.init(argc, argv);
 
     _renderer = _glue.createRenderHandler(_depth);
-    if ( ! _renderer ) 
+    if ( ! _renderer )
 	{
 		log_error (_("error creating RenderHandler!\n"));
     	return false;
@@ -290,15 +308,23 @@ AOS4Gui::createWindow(const char *title, int width, int height)
     _width = width;
     _height = height;
 
+    //_glue.saveOrigiginalDimension(width,height);
+	_orig_width  = width;
+	_orig_height = height;
+
     _glue.prepDrawingArea(_width, _height);
 
     set_render_handler(_renderer);
 
 	struct Window *_window = _glue.getWindow();
 
+	_window_title = (char*)malloc(strlen(title)+1);
+	memset(_window_title,0x0,strlen(title)+1);
+	strcpy(_window_title,title);
+	
 	IIntuition->SetWindowTitles(_window,title,title);
 
-    return false;
+    return true;
 }
 
 void
@@ -341,6 +367,57 @@ AOS4Gui::setupEvents()
     return false;
 }
 
+void
+AOS4Gui::setFullscreen()
+{
+    if (_fullscreen) return;
+
+	_glue.setFullscreen();
+	struct Window *_window = _glue.getWindow();
+	resize_view(_window->Width, _window->Height);
+
+    _fullscreen = true;
+}
+
+void
+AOS4Gui::unsetFullscreen()
+{
+    if (!_fullscreen) return;
+
+	_glue.unsetFullscreen();
+	struct Window *_window = _glue.getWindow();
+	resize_view(_window->Width, _window->Height);
+	IIntuition->SetWindowTitles(_window,_window_title,_window_title);
+
+    _fullscreen = false;
+}
+
+bool 
+AOS4Gui::showMouse(bool show)
+{
+    bool state = _mouseShown;
+	struct Window *_window = _glue.getWindow();
+
+    if (show == _mouseShown) return state;
+
+    if (!show)
+    {
+		UWORD *EmptyPointer = NULL;
+
+		EmptyPointer = (UWORD *)IExec->AllocVec(16, MEMF_PUBLIC | MEMF_CLEAR);
+		IIntuition->SetPointer(_window, EmptyPointer, 1, 16, 0, 0);
+		_mouseShown = false;
+	}
+	else
+    {
+		_mouseShown = true;
+		IIntuition->ClearPointer(_window);
+	}
+
+    return state;
+	
+}
+
 key::code
 AOS4Gui::os4_to_gnash_key(struct IntuiMessage *imsg)
 {
@@ -353,7 +430,7 @@ AOS4Gui::os4_to_gnash_key(struct IntuiMessage *imsg)
 	// int mod = key->keysym.mod;
 	//int code = key & ~IECODE_UP_PREFIX;
 
-	switch(imsg->Code & ~IECODE_UP_PREFIX) 
+	switch(imsg->Code & ~IECODE_UP_PREFIX)
 	{
 		case RAWKEY_CRSRUP:		c = gnash::key::UP;       	break;
   		case RAWKEY_CRSRDOWN:	c = gnash::key::DOWN;     	break;
@@ -403,11 +480,11 @@ AOS4Gui::os4_to_gnash_key(struct IntuiMessage *imsg)
 	return c;
 }
 
-int 
+int
 AOS4Gui::os4_to_gnash_modifier(int state)
 {
   int modifier = gnash::key::GNASH_MOD_NONE;
-  
+
   if (state & IEQUALIFIER_LSHIFT) {
       modifier = modifier | gnash::key::GNASH_MOD_SHIFT;
     }
@@ -421,10 +498,10 @@ AOS4Gui::os4_to_gnash_modifier(int state)
     return modifier;
 }
 
-void 
+void
 AOS4Gui::key_event(gnash::key::code key, int state, bool down)
 {
-    if (key != gnash::key::INVALID) 
+    if (key != gnash::key::INVALID)
     {
         // 0 should be any modifier instead..
         // see Gui::notify_key_event in gui.h

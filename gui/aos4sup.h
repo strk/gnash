@@ -78,24 +78,30 @@ public:
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void key_event(gnash::key::code key, int state, bool down);
 	void resize(int width, int height);
+	virtual bool showMouse(bool show);
+	virtual void setFullscreen();
+	virtual void unsetFullscreen();
 private:
-    unsigned int _timeout;
-    bool         _core_trap;
-
    	geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
 
-	struct MsgPort *_port;
-	uint32 _timerSig;
-	struct TimeRequest *_timerio;
-	struct TimerIFace *ITimer;
-
+    unsigned int 		 _timeout;
+    bool         		 _core_trap;
+	struct MsgPort 		*_port;
+	uint32 				 _timerSig;
+	struct TimeRequest 	*_timerio;
+	struct TimerIFace 	*ITimer;
+	char 				*_window_title;
+	
     static key::code os4_to_gnash_key(struct IntuiMessage *imsg);
     static int os4_to_gnash_modifier(int state);
 	double OS4_GetTicks();
 	void TimerExit(void);
 	bool TimerInit(void);
 	void TimerReset(uint32 microDelay);
+
+   	int	 _orig_width;
+    int	 _orig_height;
 	
 #ifdef RENDERER_AGG
     AOS4AggGlue      _glue;
