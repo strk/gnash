@@ -208,7 +208,7 @@ LocalConnection_as::init(as_object& glob)
                     as_prop_flags::dontDelete | 
                     as_prop_flags::onlySWF6Up;
 
-    glob.init_member(NSV::CLASS_LOCAL_CONNECTION, ctor, swf6flags);
+    glob.init_member(NSV::CLASS_LOCALCONNECTION, ctor, swf6flags);
 }
 
 

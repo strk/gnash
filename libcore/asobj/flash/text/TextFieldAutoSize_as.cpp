@@ -57,7 +57,7 @@ getTextFieldAutoSizeInterface()
 }
 
 // extern
-void TextFieldAutoSize_class_init(as_object& where)
+void textfieldautosize_class_init(as_object& where)
 {
 	where.init_member("TextFieldAutoSize", getTextFieldAutoSizeInterface());
 }

@@ -1,0 +1,241 @@
+## Process this file with automake to generate Makefile.in
+# 
+#   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+EVENTSdir = $(srcdir)/flash/events
+
+#AM_CPPFLAGS += -I$(EVENTSdir)
+
+EVENTS_SOURCES = $(EVENTSdir)/events_pkg.cpp
+EVENTS_HEADERS = $(EVENTSdir)/events_pkg.h
+
+if BUILD_ACTIVITYEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/ActivityEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ActivityEvent_as3.h
+endif
+
+if BUILD_ASYNCERROREVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/AsyncErrorEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/AsyncErrorEvent_as3.h
+endif
+
+if BUILD_BROWSERINVOKEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/BrowserInvokeEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/BrowserInvokeEvent_as3.h
+endif
+
+if BUILD_CONTEXTMENUEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/ContextMenuEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ContextMenuEvent_as3.h
+endif
+
+if BUILD_DRMAUTHENTICATEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/DRMAuthenticateEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DRMAuthenticateEvent_as3.h
+endif
+
+if BUILD_DRMERROREVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/DRMErrorEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DRMErrorEvent_as3.h
+endif
+
+if BUILD_DRMSTATUSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/DRMStatusEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DRMStatusEvent_as3.h
+endif
+
+if BUILD_DATAEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/DataEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DataEvent_as3.h
+endif
+
+if BUILD_ERROREVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/ErrorEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ErrorEvent_as3.h
+endif
+
+if BUILD_EVENTDISPATCHER_AS3
+EVENTS_SOURCES += $(EVENTSdir)/EventDispatcher_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/EventDispatcher_as3.h
+endif
+
+if BUILD_EVENTPHASE_AS3
+EVENTS_SOURCES += $(EVENTSdir)/EventPhase_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/EventPhase_as3.h
+endif
+
+if BUILD_EVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/Event_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/Event_as3.h
+endif
+
+if BUILD_FILELISTEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/FileListEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/FileListEvent_as3.h
+endif
+
+if BUILD_FOCUSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/FocusEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/FocusEvent_as3.h
+endif
+
+if BUILD_FULLSCREENEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/FullScreenEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/FullScreenEvent_as3.h
+endif
+
+if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/HTMLUncaughtScriptExceptionEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/HTMLUncaughtScriptExceptionEvent_as3.h
+endif
+
+if BUILD_HTTPSTATUSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/HTTPStatusEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/HTTPStatusEvent_as3.h
+endif
+
+if BUILD_IEVENTDISPATCHER_AS3
+EVENTS_SOURCES += $(EVENTSdir)/IEventDispatcher_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/IEventDispatcher_as3.h
+endif
+
+if BUILD_IMEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/IMEEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/IMEEvent_as3.h
+endif
+
+if BUILD_IOERROREVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/IOErrorEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/IOErrorEvent_as3.h
+endif
+
+if BUILD_INVOKEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/InvokeEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/InvokeEvent_as3.h
+endif
+
+if BUILD_KEYBOARDEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/KeyboardEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/KeyboardEvent_as3.h
+endif
+
+if BUILD_MOUSEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/MouseEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/MouseEvent_as3.h
+endif
+
+if BUILD_NATIVEDRAGEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/NativeDragEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NativeDragEvent_as3.h
+endif
+
+if BUILD_NATIVEWINDOWBOUNDSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/NativeWindowBoundsEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NativeWindowBoundsEvent_as3.h
+endif
+
+if BUILD_NATIVEWINDOWDISPLAYSTATEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/NativeWindowDisplayStateEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NativeWindowDisplayStateEvent_as3.h
+endif
+
+if BUILD_NETSTATUSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/NetStatusEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NetStatusEvent_as3.h
+endif
+
+if BUILD_OUTPUTPROGRESSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/OutputProgressEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/OutputProgressEvent_as3.h
+endif
+
+if BUILD_PROGRESSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/ProgressEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ProgressEvent_as3.h
+endif
+
+if BUILD_SQLERROREVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/SQLErrorEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SQLErrorEvent_as3.h
+endif
+
+if BUILD_SQLEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/SQLEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SQLEvent_as3.h
+endif
+
+if BUILD_SQLUPDATEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/SQLUpdateEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SQLUpdateEvent_as3.h
+endif
+
+if BUILD_SCREENMOUSEEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/ScreenMouseEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ScreenMouseEvent_as3.h
+endif
+
+if BUILD_SECURITYERROREVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/SecurityErrorEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SecurityErrorEvent_as3.h
+endif
+
+if BUILD_STATUSEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/StatusEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/StatusEvent_as3.h
+endif
+
+if BUILD_SYNCEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/SyncEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SyncEvent_as3.h
+endif
+
+if BUILD_TEXTEVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/TextEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/TextEvent_as3.h
+endif
+
+if BUILD_TIMEREVENT_AS3
+EVENTS_SOURCES += $(EVENTSdir)/TimerEvent_as3.cpp
+EVENTS_HEADERS += $(EVENTSdir)/TimerEvent_as3.h
+endif
+
+libgnashasobjs_la_SOURCES += $(EVENTS_SOURCES)
+noinst_HEADERS +=  $(EVENTS_HEADERS) eventsclasses.h
+
+# Build a header file that contains a generated array of *_init()
+# functions for the classes that are configured for this build, as
+# that could be a subset of the entire class library for this namespace.
+eventsclasses.h: Makefile
+	-@echo "Generating header file for events classes..."
+	-@header=eventsclasses.h; \
+	$(RM) $${header}; \
+	echo "// Generated by Makefile, don't hand edit!" > $${header}; \
+	echo "#ifndef GNASH_ASOBJ3_EVENTS_H" >> $${header}; \
+	echo "#define GNASH_ASOBJ3_EVENTS_H 1" >> $${header}; \
+	echo "#include <sharedlib.h>" >> $${header}; \
+	echo "static gnash::SharedLib::initentry *asclasses[] = {" >> $${header}; \
+	# drop the first node, which is always the top level package ;\
+	sources="`echo $(EVENTS_SOURCES) | cut -d ' ' -f 2-`"; \
+	for i in $${sources}; do \
+	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
+	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
+	done; \
+	echo '	0' >> $${header}; \
+	echo '};' >> $${header}; \
+	echo "#endif // end of GNASH_ASOBJ3_EVENTS_H" >> $${header};
+
+BUILT_SOURCES += eventsclasses.h

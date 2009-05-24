@@ -1026,14 +1026,15 @@ Machine::execute()
 		push_stack(as_value(new_function));
 		break;
 	}
-/// 0x41 ABC_ACTION_CALL
-/// Stream: V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  obj -- the object to which the function belongs
-///  func -- the function to be called
-/// Stack Out:
-///  value -- the value returned by obj->func(arg1, ...., argN)
+    
+    /// 0x41 ABC_ACTION_CALL
+    /// Stream: V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  obj -- the object to which the function belongs
+    ///  func -- the function to be called
+    /// Stack Out:
+    ///  value -- the value returned by obj->func(arg1, ...., argN)
 	case SWF::ABC_ACTION_CALL:
 	{
 		boost::uint32_t argc = mStream->read_V32();
@@ -1052,13 +1053,14 @@ Machine::execute()
 		pushCall(f, obj, mStack.top(argc + 1), argc, -1);
 		break;
 	}
-/// 0x42 ABC_ACTION_CONSTRUCT
-/// Stream: V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  function -- constructor for the object to be constructed
-/// Stack Out:
-///  value -- obj after it has been constructed as obj(arg1, ..., argN)
+
+    /// 0x42 ABC_ACTION_CONSTRUCT
+    /// Stream: V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  function -- constructor for the object to be constructed
+    /// Stack Out:
+    ///  value -- obj after it has been constructed as obj(arg1, ..., argN)
 	case SWF::ABC_ACTION_CONSTRUCT:
 	{
 		boost::uint32_t argc = mStream->read_V32();
@@ -1117,17 +1119,17 @@ Machine::execute()
 		pushCall(func, obj, mStack.top(argc), argc, 0);
 		break;
 	}
-/// 0x45 ABC_ACTION_CALLSUPER
-/// 0x4E ABC_ACTION_CALLSUPERVOID
-/// Stream: V32 'name_offset' | V32 'arg_count'
-/// Stack In:
-///  [ns [n]] -- Namespace stuff
-///  argN ... arg1 -- the arg_count arguments to pass
-///  obj -- the object whose super is to be called
-/// Stack Out:
-///  0x45: value -- the value returned by obj::(resolve)'name_offset'::super(arg1,
-///   ..., argN)
-///  0x4E: .
+    /// 0x45 ABC_ACTION_CALLSUPER
+    /// 0x4E ABC_ACTION_CALLSUPERVOID
+    /// Stream: V32 'name_offset' | V32 'arg_count'
+    /// Stack In:
+    ///  [ns [n]] -- Namespace stuff
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  obj -- the object whose super is to be called
+    /// Stack Out:
+    ///  0x45: value -- the value returned by obj::(resolve)'name_offset'::
+    ///        super(arg1, ..., argN)
+    ///  0x4E: .
 	case SWF::ABC_ACTION_CALLSUPER:
 	case SWF::ABC_ACTION_CALLSUPERVOID:
 	{
@@ -1136,35 +1138,41 @@ Machine::execute()
 		int dropsize = completeName(a);
 		ENSURE_OBJECT(mStack.top(argc + dropsize));
 		mStack.drop(dropsize);
-		as_object *super = mStack.top(argc).to_object()->get_super();
-		if (!super)
-			throw ASReferenceError();
-		Property *b = super->findProperty(a.getABCName(), 
-			a.getNamespace()->getURI());
-		if (!b)
-			throw ASReferenceError();
-		as_function *f = // b->isGetterSetter() ? b->getGetter() :
+		as_object* super = mStack.top(argc).to_object()->get_super();
+		if (!super) throw ASReferenceError();
+		
+        Property* b = super->findProperty(a.getABCName(),
+                a.getNamespace()->getURI());
+		
+        if (!b) throw ASReferenceError();
+		
+        as_function *f = // b->isGetterSetter() ? b->getGetter() :
 			b->getValue(super).to_as_function();
 
-		if (opcode == SWF::ABC_ACTION_CALLSUPER)
-			pushCall(f, super, mStack.top(argc), argc, 0);
-		else // Void call
+		if (opcode == SWF::ABC_ACTION_CALLSUPER) {
+            pushCall(f, super, mStack.top(argc), argc, 0);
+        }
+		else {
+            // Void call
 			pushCall(f, super, mIgnoreReturn, argc, -1); // drop obj too.
+        }
 		break;
 	}
-/// 0x46 ABC_ACTION_CALLPROPERTY
-/// 0x4C ABC_ACTION_CALLPROPLEX
-/// 0x4F ABC_ACTION_CALLPROPVOID
-/// Stream: V32 'name_offset' | V32 'arg_count'
-/// Stack In:
-///  argN ... arg1 -- the arg_count arguments to pass
-///  [ns [n]] -- Namespace stuff
-///  obj -- The object whose property is to be accessed.
-/// Stack Out:
-///  value -- the value from obj::(resolve)'name_offset'(arg1, ..., argN)
-///  (unless ABC_ACTION_CALL_PROPVOID, then: . )
-/// NB: Calls getter/setter if they exist.
-/// If the opcode is ABC_ACTION_CALLPROPLEX, obj is not altered by getter/setters
+    
+    /// 0x46 ABC_ACTION_CALLPROPERTY
+    /// 0x4C ABC_ACTION_CALLPROPLEX
+    /// 0x4F ABC_ACTION_CALLPROPVOID
+    /// Stream: V32 'name_offset' | V32 'arg_count'
+    /// Stack In:
+    ///  argN ... arg1 -- the arg_count arguments to pass
+    ///  [ns [n]] -- Namespace stuff
+    ///  obj -- The object whose property is to be accessed.
+    /// Stack Out:
+    ///  value -- the value from obj::(resolve)'name_offset'(arg1, ..., argN)
+    ///  (unless ABC_ACTION_CALL_PROPVOID, then: . )
+    /// NB: Calls getter/setter if they exist.
+    /// If the opcode is ABC_ACTION_CALLPROPLEX, obj is not altered by
+    /// getter/setters
 	case SWF::ABC_ACTION_CALLPROPERTY:
 	case SWF::ABC_ACTION_CALLPROPLEX:
 	case SWF::ABC_ACTION_CALLPROPVOID:
@@ -1250,26 +1258,20 @@ Machine::execute()
 			pushCall(func, obj, mStack.top(argc + shift), argc, -shift);*/
 		break;
 	}
-/// 0x47 ABC_ACTION_RETURNVOID
-/// Do: Return an undefined object up the callstack.
+    
+    /// 0x47 ABC_ACTION_RETURNVOID
+    /// Do: Return an undefined object up the callstack.
 	case SWF::ABC_ACTION_RETURNVOID:
-	{
 		mStream->seekTo(0);
-		if (mStateStack.size() == 0) {
-			return;
-		}
-		else{
-			restoreState();
-			if (mExitWithReturn) {
-				return;
-			}
-		}
+		if (!mStateStack.size()) return;
+        
+        restoreState();
+        if (mExitWithReturn) return;
 		// Slot the return.
         //*mGlobalReturn = as_value();
 		// And restore the previous state.
         //restoreState();
 		break;
-	}
     
     /// 0x48 ABC_ACTION_RETURNVALUE
     /// Stack In:
@@ -1296,9 +1298,12 @@ Machine::execute()
 		boost::uint32_t argc = mStream->read_V32();
 		log_abc("There are %u arguments.",argc);
 		get_args(argc);
-		//as_object *super = pop_stack().to_object().get()->get_super();
-		//TODO: Actually construct the super.
-		as_object* super = mStack.top(argc).to_object()->get_super();
+		
+        as_object* obj = mStack.top(argc).to_object().get();
+        as_object* super = obj ? obj->get_super() : 0;
+        log_abc("CONSTRUCTSUPER: object is: %s, args: %s", mStack.top(argc),
+                argc);
+
  		if (!super) {
             log_error("No super found in CONSTRUCTSUPER!");
             throw ASException();
@@ -1312,7 +1317,6 @@ Machine::execute()
 		// the stack.
 		pushCall(func, super, mIgnoreReturn, argc, -1);
 
-        LOG_ONCE(log_unimpl("ABC_ACTION_CONSTRUCTSUPER") );
 		break;
 	}
     
@@ -1333,31 +1337,41 @@ Machine::execute()
 		std::auto_ptr< std::vector<as_value> > args = get_args(argc);
 		as_object* object = pop_stack().to_object().get();
 		if (!object) {
-			//TODO: Should this result in an exeception or an actionscript error?
-			log_abc("Can't constructor property on a null object.  Property not constructed.");
+			//TODO: Should this result in an exeception or an 
+            // actionscript error?
+			log_abc("Can't construct property on a null object. "
+                    "Property not constructed.");
 			push_stack(as_value());
 			break;
 		}
 		//std::string& classname = mPoolObject->mStringPool[a.getABCName()];
 		
 		as_value constructor_val = object->getMember(a.getGlobalName());
-		boost::intrusive_ptr<as_function> constructor = constructor_val.to_as_function();
-		if (constructor) {
-			boost::intrusive_ptr<as_object> newobj = constructor->constructInstance(env, args);
+		boost::intrusive_ptr<as_function> constructor =
+            constructor_val.to_as_function();
+		
+        if (constructor) {
+			boost::intrusive_ptr<as_object> newobj =
+                constructor->constructInstance(env, args);
 			push_stack(as_value(newobj));
 		}
-		//TODO: This else clause is needed to construct classes that aren't builtin into gnash.
-		// I don't think this is correct, and I think the problem might be how AVM2 adds
+		// TODO: This else clause is needed to construct classes that
+        // aren't builtin into gnash. I don't think this is correct,
+        // and I think the problem might be how AVM2 adds
 		// new objects to the Global object.
-		else{
- 			log_abc("Object %s is not a constructor",constructor_val.toDebugString());
+		else {
+ 			log_abc("Object %s is not a constructor", 
+                    constructor_val.toDebugString());
 			if (constructor_val.is_null() || constructor_val.is_undefined()) {
-				log_abc("Constructor is undefined, will not construct property.");
+				log_abc("Constructor is undefined, will not construct "
+                        "property.");
 				push_stack(as_value());
 			}
-			else{
-				as_value val = constructor_val.to_object().get()->getMember(NSV::PROP_CONSTRUCTOR,0);
-				as_value result = call_method(val,env,constructor_val.to_object().get(),args);
+			else {
+				as_value val = constructor_val.to_object().get()->getMember(
+                        NSV::PROP_CONSTRUCTOR, 0);
+				as_value result = call_method(val, env,
+                        constructor_val.to_object().get(),args);
 				push_stack(result);
 			}
 		}
@@ -2353,18 +2367,29 @@ Machine::execute()
 		// TODO: Namespace stuff?
 		mStack.top(0).set_bool(mStack.top(0).conforms_to(a.getABCName()));
 	}
-/// 0xB3 ABC_ACTION_ISTYPELATE
-/// Stack In:
-///  type -- A type to match
-///  obj -- An object
-/// Stack Out:
-///  truth -- Truth of "obj is of type"
+
+    /// 0xB3 ABC_ACTION_ISTYPELATE
+    /// Stack In:
+    ///  type -- A type to match
+    ///  obj -- An object
+    /// Stack Out:
+    ///  truth -- Truth of "obj is of type"
 	case SWF::ABC_ACTION_ISTYPELATE:
 	{
 		as_value type = pop_stack();
 		as_value value = pop_stack();
-		bool truth = value.to_object().get()->instanceOf(type.to_object().get());
-		push_stack(as_value(truth));
+        as_object* const valueObject = value.to_object().get();
+        as_object* const typeObject = type.to_object().get();
+
+        if (!valueObject || !typeObject) {
+            // TODO: what here!?
+            // This should eventually be a malformed SWF error.
+            log_error("ACTION_ISTYPELATE: require two objects on stack, got "
+                   "obj: %s, type: %s.", value, type);
+            return;
+        }
+		const bool truth = valueObject->instanceOf(typeObject);
+		push_stack(truth);
 		break;
 	}
 /// 0xB4 ABC_ACTION_IN

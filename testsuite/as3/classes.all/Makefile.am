@@ -18,7 +18,7 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-EXTRA_DIST = Dejagnu.hx
+EXTRA_DIST = DejaGnu.hx
 
 TEST_DRIVERS = classes.exp
 
@@ -41,8 +41,8 @@ HAXE_FLAGS = -cp $(srcdir)
 # #include $(srcdir)/accessibility/accessibility.am
 
 # These classes are for AIR only, not flash
-include $(srcdir)/data/data.am
-include $(srcdir)/desktop/desktop.am
+# include $(srcdir)/data/data.am
+# include $(srcdir)/desktop/desktop.am
 
 include $(srcdir)/display/display.am
 include $(srcdir)/errors/errors.am

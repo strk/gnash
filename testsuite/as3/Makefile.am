@@ -18,6 +18,10 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
+if ENABLE_HAXE
+SUBDIRS = classes.all
+endif
+
 # These will get executed and parsed for test output
 SANE_AS3TESTS = \
 	$(NULL)
