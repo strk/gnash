@@ -15,34 +15,34 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-SECURITYdir = $(srcdir)/flash/security
+SECURITYdir = $(includedir)/gnash
 
-SECURITY_SOURCES = $(SECURITYdir)/security_pkg.cpp
-SECURITY_HEADERS = $(SECURITYdir)/security_pkg.h
+SECURITY_SOURCES = flash/security/security_pkg.cpp
+SECURITY_HEADERS = flash/security/security_pkg.h
 
 if BUILD_IURIDEREFERENCER_AS3
-SECURITY_SOURCES += $(SECURITYdir)/IURIDereferencer_as.cpp
-SECURITY_HEADERS += $(SECURITYdir)/IURIDereferencer_as.h
+SECURITY_SOURCES += flash/security/IURIDereferencer_as.cpp
+SECURITY_HEADERS += flash/security/IURIDereferencer_as.h
 endif
 
 if BUILD_REVOCATIONCHECKSETTINGS_AS3
-SECURITY_SOURCES += $(SECURITYdir)/RevocationCheckSettings_as.cpp
-SECURITY_HEADERS += $(SECURITYdir)/RevocationCheckSettings_as.h
+SECURITY_SOURCES += flash/security/RevocationCheckSettings_as.cpp
+SECURITY_HEADERS += flash/security/RevocationCheckSettings_as.h
 endif
 
 if BUILD_SIGNATURESTATUS_AS3
-SECURITY_SOURCES += $(SECURITYdir)/SignatureStatus_as.cpp
-SECURITY_HEADERS += $(SECURITYdir)/SignatureStatus_as.h
+SECURITY_SOURCES += flash/security/SignatureStatus_as.cpp
+SECURITY_HEADERS += flash/security/SignatureStatus_as.h
 endif
 
 if BUILD_SIGNERTRUSTSETTINGS_AS3
-SECURITY_SOURCES += $(SECURITYdir)/SignerTrustSettings_as.cpp
-SECURITY_HEADERS += $(SECURITYdir)/SignerTrustSettings_as.h
+SECURITY_SOURCES += flash/security/SignerTrustSettings_as.cpp
+SECURITY_HEADERS += flash/security/SignerTrustSettings_as.h
 endif
 
 if BUILD_XMLSIGNATUREVALIDATOR_AS3
-SECURITY_SOURCES += $(SECURITYdir)/XMLSignatureValidator_as.cpp
-SECURITY_HEADERS += $(SECURITYdir)/XMLSignatureValidator_as.h
+SECURITY_SOURCES += flash/security/XMLSignatureValidator_as.cpp
+SECURITY_HEADERS += flash/security/XMLSignatureValidator_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SECURITY_SOURCES)

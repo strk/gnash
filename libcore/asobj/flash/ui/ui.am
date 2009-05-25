@@ -15,40 +15,40 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-UIdir = $(srcdir)/flash/ui
+UIdir = $(includedir)/gnash
 
-UI_SOURCES = $(UIdir)/ui_pkg.cpp
-UI_HEADERS = $(UIdir)/ui_pkg.h
+UI_SOURCES = flash/ui/ui_pkg.cpp
+UI_HEADERS = flash/ui/ui_pkg.h
 
 if BUILD_CONTEXTMENUBUILTINITEMS_AS3
-UI_SOURCES += $(UIdir)/ContextMenuBuiltInItems_as.cpp
-UI_HEADERS += $(UIdir)/ContextMenuBuiltInItems_as.h
+UI_SOURCES += flash/ui/ContextMenuBuiltInItems_as.cpp
+UI_HEADERS += flash/ui/ContextMenuBuiltInItems_as.h
 endif
 
 if BUILD_CONTEXTMENUITEM_AS3
-UI_SOURCES += $(UIdir)/ContextMenuItem_as.cpp
-UI_HEADERS += $(UIdir)/ContextMenuItem_as.h
+UI_SOURCES += flash/ui/ContextMenuItem_as.cpp
+UI_HEADERS += flash/ui/ContextMenuItem_as.h
 endif
 
 # FIXME: already exists
 # if BUILD_CONTEXTMENU_AS3
-# UI_SOURCES += $(UIdir)/ContextMenu_as.cpp
-# UI_HEADERS += $(UIdir)/ContextMenu_as.h
+# UI_SOURCES += flash/ui/ContextMenu_as.cpp
+# UI_HEADERS += flash/ui/ContextMenu_as.h
 # endif
 
 if BUILD_KEYLOCATION_AS3
-UI_SOURCES += $(UIdir)/KeyLocation_as.cpp
-UI_HEADERS += $(UIdir)/KeyLocation_as.h
+UI_SOURCES += flash/ui/KeyLocation_as.cpp
+UI_HEADERS += flash/ui/KeyLocation_as.h
 endif
 
 if BUILD_KEYBOARD_AS3
-UI_SOURCES += $(UIdir)/Keyboard_as.cpp
-UI_HEADERS += $(UIdir)/Keyboard_as.h
+UI_SOURCES += flash/ui/Keyboard_as.cpp
+UI_HEADERS += flash/ui/Keyboard_as.h
 endif
 
 # if BUILD_MOUSE_AS3
-# UI_SOURCES += $(UIdir)/Mouse_as.cpp
-# UI_HEADERS += $(UIdir)/Mouse_as.h
+# UI_SOURCES += flash/ui/Mouse_as.cpp
+# UI_HEADERS += flash/ui/Mouse_as.h
 # endif
 
 libgnashasobjs_la_SOURCES += $(UI_SOURCES)

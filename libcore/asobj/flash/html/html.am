@@ -15,34 +15,34 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-HTMLdir = $(srcdir)/flash/html
+HTMLdir = $(includedir)/gnash
 
-HTML_SOURCES = $(HTMLdir)/html_pkg.cpp
-HTML_HEADERS = $(HTMLdir)/html_pkg.h
+HTML_SOURCES = flash/html/html_pkg.cpp
+HTML_HEADERS = flash/html/html_pkg.h
 
 if BUILD_HTMLHISTORYITEM_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLHistoryItem_as.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLHistoryItem_as.h
+HTML_SOURCES += flash/html/HTMLHistoryItem_as.cpp
+HTML_HEADERS += flash/html/HTMLHistoryItem_as.h
 endif
 
 if BUILD_HTMLHOST_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLHost_as.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLHost_as.h
+HTML_SOURCES += flash/html/HTMLHost_as.cpp
+HTML_HEADERS += flash/html/HTMLHost_as.h
 endif
 
 if BUILD_HTMLLOADER_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLLoader_as.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLLoader_as.h
+HTML_SOURCES += flash/html/HTMLLoader_as.cpp
+HTML_HEADERS += flash/html/HTMLLoader_as.h
 endif
 
 if BUILD_HTMLPDFCAPABILITY_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLPDFCapability_as.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLPDFCapability_as.h
+HTML_SOURCES += flash/html/HTMLPDFCapability_as.cpp
+HTML_HEADERS += flash/html/HTMLPDFCapability_as.h
 endif
 
 if BUILD_HTMLWINDOWCREATEOPTIONS_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLWindowCreateOptions_as.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLWindowCreateOptions_as.h
+HTML_SOURCES += flash/html/HTMLWindowCreateOptions_as.cpp
+HTML_HEADERS += flash/html/HTMLWindowCreateOptions_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(HTML_SOURCES)

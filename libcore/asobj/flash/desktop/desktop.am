@@ -17,72 +17,72 @@
 
 DESKTOPdir = $(srcdir)/flash/desktop
 
-DESKTOP_SOURCES = $(DESKTOPdir)/desktop_pkg.cpp
-DESKTOP_HEADERS = $(DESKTOPdir)/desktop_pkg.h
+DESKTOP_SOURCES = flash/desktop/desktop_pkg.cpp
+DESKTOP_HEADERS = flash/desktop/desktop_pkg.h
 
 if BUILD_CLIPBOARDFORMATS_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/ClipboardFormats_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/ClipboardFormats_as.h
+DESKTOP_SOURCES += flash/desktop/ClipboardFormats_as.cpp
+DESKTOP_HEADERS += flash/desktop/ClipboardFormats_as.h
 endif
 
 if BUILD_CLIPBOARDTRANSFERMODE_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/ClipboardTransferMode_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/ClipboardTransferMode_as.h
+DESKTOP_SOURCES += flash/desktop/ClipboardTransferMode_as.cpp
+DESKTOP_HEADERS += flash/desktop/ClipboardTransferMode_as.h
 endif
 
 if BUILD_CLIPBOARD_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/Clipboard_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/Clipboard_as.h
+DESKTOP_SOURCES += flash/desktop/Clipboard_as.cpp
+DESKTOP_HEADERS += flash/desktop/Clipboard_as.h
 endif
 
 if BUILD_DOCKICON_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/DockIcon_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/DockIcon_as.h
+DESKTOP_SOURCES += flash/desktop/DockIcon_as.cpp
+DESKTOP_HEADERS += flash/desktop/DockIcon_as.h
 endif
 
 if BUILD_ICON_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/Icon_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/Icon_as.h
+DESKTOP_SOURCES += flash/desktop/Icon_as.cpp
+DESKTOP_HEADERS += flash/desktop/Icon_as.h
 endif
 
 if BUILD_INTERACTIVEICON_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/InteractiveIcon_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/InteractiveIcon_as.h
+DESKTOP_SOURCES += flash/desktop/InteractiveIcon_as.cpp
+DESKTOP_HEADERS += flash/desktop/InteractiveIcon_as.h
 endif
 
 if BUILD_NATIVEAPPLICATION_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/NativeApplication_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/NativeApplication_as.h
+DESKTOP_SOURCES += flash/desktop/NativeApplication_as.cpp
+DESKTOP_HEADERS += flash/desktop/NativeApplication_as.h
 endif
 
 if BUILD_NATIVEDRAGACTIONS_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/NativeDragActions_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/NativeDragActions_as.h
+DESKTOP_SOURCES += flash/desktop/NativeDragActions_as.cpp
+DESKTOP_HEADERS += flash/desktop/NativeDragActions_as.h
 endif
 
 if BUILD_NATIVEDRAGMANAGER_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/NativeDragManager_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/NativeDragManager_as.h
+DESKTOP_SOURCES += flash/desktop/NativeDragManager_as.cpp
+DESKTOP_HEADERS += flash/desktop/NativeDragManager_as.h
 endif
 
 if BUILD_NATIVEDRAGOPTIONS_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/NativeDragOptions_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/NativeDragOptions_as.h
+DESKTOP_SOURCES += flash/desktop/NativeDragOptions_as.cpp
+DESKTOP_HEADERS += flash/desktop/NativeDragOptions_as.h
 endif
 
 if BUILD_NOTIFICATIONTYPE_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/NotificationType_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/NotificationType_as.h
+DESKTOP_SOURCES += flash/desktop/NotificationType_as.cpp
+DESKTOP_HEADERS += flash/desktop/NotificationType_as.h
 endif
 
 if BUILD_SYSTEMTRAYICON_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/SystemTrayIcon_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/SystemTrayIcon_as.h
+DESKTOP_SOURCES += flash/desktop/SystemTrayIcon_as.cpp
+DESKTOP_HEADERS += flash/desktop/SystemTrayIcon_as.h
 endif
 
 if BUILD_UPDATER_AS3
-DESKTOP_SOURCES += $(DESKTOPdir)/Updater_as.cpp
-DESKTOP_HEADERS += $(DESKTOPdir)/Updater_as.h
+DESKTOP_SOURCES += flash/desktop/Updater_as.cpp
+DESKTOP_HEADERS += flash/desktop/Updater_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(DESKTOP_SOURCES)

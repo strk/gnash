@@ -15,74 +15,74 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-FILTERSdir = $(srcdir)/flash/filters
+FILTERSdir = $(includedir)/gnash
 
-FILTERS_SOURCES = $(FILTERSdir)/filters_pkg.cpp
-FILTERS_HEADERS = $(FILTERSdir)/filters_pkg.h
+FILTERS_SOURCES = flash/filters/filters_pkg.cpp
+FILTERS_HEADERS = flash/filters/filters_pkg.h
 
 if BUILD_BEVELFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/BevelFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/BevelFilter_as.h
+FILTERS_SOURCES += flash/filters/BevelFilter_as.cpp
+FILTERS_HEADERS += flash/filters/BevelFilter_as.h
 endif
 
 if BUILD_BITMAPFILTERQUALITY_AS3
-FILTERS_SOURCES += $(FILTERSdir)/BitmapFilterQuality_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/BitmapFilterQuality_as.h
+FILTERS_SOURCES += flash/filters/BitmapFilterQuality_as.cpp
+FILTERS_HEADERS += flash/filters/BitmapFilterQuality_as.h
 endif
 
 if BUILD_BITMAPFILTERTYPE_AS3
-FILTERS_SOURCES += $(FILTERSdir)/BitmapFilterType_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/BitmapFilterType_as.h
+FILTERS_SOURCES += flash/filters/BitmapFilterType_as.cpp
+FILTERS_HEADERS += flash/filters/BitmapFilterType_as.h
 endif
 
 if BUILD_BITMAPFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/BitmapFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/BitmapFilter_as.h
+FILTERS_SOURCES += flash/filters/BitmapFilter_as.cpp
+FILTERS_HEADERS += flash/filters/BitmapFilter_as.h
 endif
 
 if BUILD_BLURFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/BlurFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/BlurFilter_as.h
+FILTERS_SOURCES += flash/filters/BlurFilter_as.cpp
+FILTERS_HEADERS += flash/filters/BlurFilter_as.h
 endif
 
 if BUILD_COLORMATRIXFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/ColorMatrixFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/ColorMatrixFilter_as.h
+FILTERS_SOURCES += flash/filters/ColorMatrixFilter_as.cpp
+FILTERS_HEADERS += flash/filters/ColorMatrixFilter_as.h
 endif
 
 if BUILD_CONVOLUTIONFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/ConvolutionFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/ConvolutionFilter_as.h
+FILTERS_SOURCES += flash/filters/ConvolutionFilter_as.cpp
+FILTERS_HEADERS += flash/filters/ConvolutionFilter_as.h
 endif
 
 if BUILD_DISPLACEMENTMAPFILTERMODE_AS3
-FILTERS_SOURCES += $(FILTERSdir)/DisplacementMapFilterMode_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/DisplacementMapFilterMode_as.h
+FILTERS_SOURCES += flash/filters/DisplacementMapFilterMode_as.cpp
+FILTERS_HEADERS += flash/filters/DisplacementMapFilterMode_as.h
 endif
 
 if BUILD_DISPLACEMENTMAPFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/DisplacementMapFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/DisplacementMapFilter_as.h
+FILTERS_SOURCES += flash/filters/DisplacementMapFilter_as.cpp
+FILTERS_HEADERS += flash/filters/DisplacementMapFilter_as.h
 endif
 
 if BUILD_DROPSHADOWFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/DropShadowFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/DropShadowFilter_as.h
+FILTERS_SOURCES += flash/filters/DropShadowFilter_as.cpp
+FILTERS_HEADERS += flash/filters/DropShadowFilter_as.h
 endif
 
 if BUILD_GLOWFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/GlowFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/GlowFilter_as.h
+FILTERS_SOURCES += flash/filters/GlowFilter_as.cpp
+FILTERS_HEADERS += flash/filters/GlowFilter_as.h
 endif
 
 if BUILD_GRADIENTBEVELFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/GradientBevelFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/GradientBevelFilter_as.h
+FILTERS_SOURCES += flash/filters/GradientBevelFilter_as.cpp
+FILTERS_HEADERS += flash/filters/GradientBevelFilter_as.h
 endif
 
 if BUILD_GRADIENTGLOWFILTER_AS3
-FILTERS_SOURCES += $(FILTERSdir)/GradientGlowFilter_as.cpp
-FILTERS_HEADERS += $(FILTERSdir)/GradientGlowFilter_as.h
+FILTERS_SOURCES += flash/filters/GradientGlowFilter_as.cpp
+FILTERS_HEADERS += flash/filters/GradientGlowFilter_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(FILTERS_SOURCES)

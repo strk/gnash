@@ -15,29 +15,29 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-SAMPLERdir = $(srcdir)/flash/sampler
+SAMPLERdir = $(includedir)/gnash
 
-SAMPLER_SOURCES = $(SAMPLERdir)/sampler_pkg.cpp
-SAMPLER_HEADERS = $(SAMPLERdir)/sampler_pkg.h
+SAMPLER_SOURCES = flash/sampler/sampler_pkg.cpp
+SAMPLER_HEADERS = flash/sampler/sampler_pkg.h
 
 if BUILD_DELETEOBJECTSAMPLE_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/DeleteObjectSample_as.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/DeleteObjectSample_as.h
+SAMPLER_SOURCES += flash/sampler/DeleteObjectSample_as.cpp
+SAMPLER_HEADERS += flash/sampler/DeleteObjectSample_as.h
 endif
 
 if BUILD_NEWOBJECTSAMPLE_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/NewObjectSample_as.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/NewObjectSample_as.h
+SAMPLER_SOURCES += flash/sampler/NewObjectSample_as.cpp
+SAMPLER_HEADERS += flash/sampler/NewObjectSample_as.h
 endif
 
 if BUILD_SAMPLE_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/Sample_as.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/Sample_as.h
+SAMPLER_SOURCES += flash/sampler/Sample_as.cpp
+SAMPLER_HEADERS += flash/sampler/Sample_as.h
 endif
 
 if BUILD_STACKFRAME_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/StackFrame_as.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/StackFrame_as.h
+SAMPLER_SOURCES += flash/sampler/StackFrame_as.cpp
+SAMPLER_HEADERS += flash/sampler/StackFrame_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SAMPLER_SOURCES)

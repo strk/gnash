@@ -15,56 +15,56 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-ERRORSdir = $(srcdir)/flash/errors
+ERRORSdir = $(includedir)/gnash
 
 #AM_CPPFLAGS += -I$(ERRORSdir)
 
-ERRORS_SOURCES = $(ERRORSdir)/errors_pkg.cpp
-ERRORS_HEADERS = $(ERRORSdir)/errors_pkg.h
+ERRORS_SOURCES = flash/errors/errors_pkg.cpp
+ERRORS_HEADERS = flash/errors/errors_pkg.h
 
 if BUILD_EOFERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/EOFError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/EOFError_as.h
+ERRORS_SOURCES += flash/errors/EOFError_as.cpp
+ERRORS_HEADERS += flash/errors/EOFError_as.h
 endif
 
 if BUILD_IOERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/IOError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/IOError_as.h
+ERRORS_SOURCES += flash/errors/IOError_as.cpp
+ERRORS_HEADERS += flash/errors/IOError_as.h
 endif
 
 if BUILD_ILLEGALOPERATIONERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/IllegalOperationError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/IllegalOperationError_as.h
+ERRORS_SOURCES += flash/errors/IllegalOperationError_as.cpp
+ERRORS_HEADERS += flash/errors/IllegalOperationError_as.h
 endif
 
 if BUILD_INVALIDSWFERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/InvalidSWFError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/InvalidSWFError_as.h
+ERRORS_SOURCES += flash/errors/InvalidSWFError_as.cpp
+ERRORS_HEADERS += flash/errors/InvalidSWFError_as.h
 endif
 
 if BUILD_MEMORYERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/MemoryError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/MemoryError_as.h
+ERRORS_SOURCES += flash/errors/MemoryError_as.cpp
+ERRORS_HEADERS += flash/errors/MemoryError_as.h
 endif
 
 if BUILD_SQLERROROPERATION_AS3
-ERRORS_SOURCES += $(ERRORSdir)/SQLErrorOperation_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/SQLErrorOperation_as.h
+ERRORS_SOURCES += flash/errors/SQLErrorOperation_as.cpp
+ERRORS_HEADERS += flash/errors/SQLErrorOperation_as.h
 endif
 
 if BUILD_SQLERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/SQLError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/SQLError_as.h
+ERRORS_SOURCES += flash/errors/SQLError_as.cpp
+ERRORS_HEADERS += flash/errors/SQLError_as.h
 endif
 
 if BUILD_SCRIPTTIMEOUTERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/ScriptTimeoutError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/ScriptTimeoutError_as.h
+ERRORS_SOURCES += flash/errors/ScriptTimeoutError_as.cpp
+ERRORS_HEADERS += flash/errors/ScriptTimeoutError_as.h
 endif
 
 if BUILD_STACKOVERFLOWERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/StackOverflowError_as.cpp
-ERRORS_HEADERS += $(ERRORSdir)/StackOverflowError_as.h
+ERRORS_SOURCES += flash/errors/StackOverflowError_as.cpp
+ERRORS_HEADERS += flash/errors/StackOverflowError_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(ERRORS_SOURCES)

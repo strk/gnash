@@ -15,54 +15,54 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-UTILSdir = $(srcdir)/flash/utils
+UTILSdir = $(includedir)/gnash
 
-UTILS_SOURCES = $(UTILSdir)/utils_pkg.cpp
-UTILS_HEADERS = $(UTILSdir)/utils_pkg.h
+UTILS_SOURCES = flash/utils/utils_pkg.cpp
+UTILS_HEADERS = flash/utils/utils_pkg.h
 
 if BUILD_BYTEARRAY_AS3
-UTILS_SOURCES += $(UTILSdir)/ByteArray_as.cpp
-UTILS_HEADERS += $(UTILSdir)/ByteArray_as.h
+UTILS_SOURCES += flash/utils/ByteArray_as.cpp
+UTILS_HEADERS += flash/utils/ByteArray_as.h
 endif
 
 if BUILD_COMPRESSIONALGORITHM_AS3
-UTILS_SOURCES += $(UTILSdir)/CompressionAlgorithm_as.cpp
-UTILS_HEADERS += $(UTILSdir)/CompressionAlgorithm_as.h
+UTILS_SOURCES += flash/utils/CompressionAlgorithm_as.cpp
+UTILS_HEADERS += flash/utils/CompressionAlgorithm_as.h
 endif
 
 if BUILD_DICTIONARY_AS3
-UTILS_SOURCES += $(UTILSdir)/Dictionary_as.cpp
-UTILS_HEADERS += $(UTILSdir)/Dictionary_as.h
+UTILS_SOURCES += flash/utils/Dictionary_as.cpp
+UTILS_HEADERS += flash/utils/Dictionary_as.h
 endif
 
 if BUILD_ENDIAN_AS3
-UTILS_SOURCES += $(UTILSdir)/Endian_as.cpp
-UTILS_HEADERS += $(UTILSdir)/Endian_as.h
+UTILS_SOURCES += flash/utils/Endian_as.cpp
+UTILS_HEADERS += flash/utils/Endian_as.h
 endif
 
 if BUILD_IDATAINPUT_AS3
-UTILS_SOURCES += $(UTILSdir)/IDataInput_as.cpp
-UTILS_HEADERS += $(UTILSdir)/IDataInput_as.h
+UTILS_SOURCES += flash/utils/IDataInput_as.cpp
+UTILS_HEADERS += flash/utils/IDataInput_as.h
 endif
 
 if BUILD_IDATAOUTPUT_AS3
-UTILS_SOURCES += $(UTILSdir)/IDataOutput_as.cpp
-UTILS_HEADERS += $(UTILSdir)/IDataOutput_as.h
+UTILS_SOURCES += flash/utils/IDataOutput_as.cpp
+UTILS_HEADERS += flash/utils/IDataOutput_as.h
 endif
 
 if BUILD_IEXTERNALIZABLE_AS3
-UTILS_SOURCES += $(UTILSdir)/IExternalizable_as.cpp
-UTILS_HEADERS += $(UTILSdir)/IExternalizable_as.h
+UTILS_SOURCES += flash/utils/IExternalizable_as.cpp
+UTILS_HEADERS += flash/utils/IExternalizable_as.h
 endif
 
 if BUILD_PROXY_AS3
-UTILS_SOURCES += $(UTILSdir)/Proxy_as.cpp
-UTILS_HEADERS += $(UTILSdir)/Proxy_as.h
+UTILS_SOURCES += flash/utils/Proxy_as.cpp
+UTILS_HEADERS += flash/utils/Proxy_as.h
 endif
 
 if BUILD_TIMER_AS3
-UTILS_SOURCES += $(UTILSdir)/Timer_as.cpp
-UTILS_HEADERS += $(UTILSdir)/Timer_as.h
+UTILS_SOURCES += flash/utils/Timer_as.cpp
+UTILS_HEADERS += flash/utils/Timer_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(UTILS_SOURCES)

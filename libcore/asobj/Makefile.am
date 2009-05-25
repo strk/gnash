@@ -18,7 +18,9 @@
 
 AUTOMAKE_OPTIONS = 
 
-# if the compiler has broken flaot support when optimized
+VPATH += $(srcdir)/flash
+
+# if the compiler has broken float support when optimized
 if BROKEN_FLOAT
 AM_CXXFLAGS = -ffloat-store
 endif
@@ -143,6 +145,7 @@ endif
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libnet/libgnashnet.la \
 	$(top_builddir)/libbase/libgnashbase.la
 
 if USE_FFMPEG_ENGINE
@@ -186,12 +189,12 @@ include $(srcdir)/flash/ui/ui.am
 include $(srcdir)/flash/xml/xml.am
 
 libgnashasobjs_la_SOURCES += \
-	$(srcdir)/flash/flash_pkg.cpp \
+	flash/flash_pkg.cpp \
 	$(NULL)
 
 noinst_HEADERS += \
-	$(srcdir)/flash/flash_pkg.h \
-	$(srcdir)/flash/flashclasses.h \
+	flash/flash_pkg.h \
+	flash/flashclasses.h \
 	$(NULL)
 
 endif

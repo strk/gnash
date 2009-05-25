@@ -15,57 +15,57 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-MEDIAdir = $(srcdir)/flash/media
+MEDIAdir = $(includedir)/gnash
 
-MEDIA_SOURCES = $(MEDIAdir)/media_pkg.cpp
-MEDIA_HEADERS = $(MEDIAdir)/media_pkg.h
+MEDIA_SOURCES = flash/media/media_pkg.cpp
+MEDIA_HEADERS = flash/media/media_pkg.h
 
 # FIXME: already exists
 # if BUILD_CAMERA_AS3
-# MEDIA_SOURCES += $(MEDIAdir)/Camera_as.cpp
-# MEDIA_HEADERS += $(MEDIAdir)/Camera_as.h
+# MEDIA_SOURCES += flash/media/Camera_as.cpp
+# MEDIA_HEADERS += flash/media/Camera_as.h
 # endif
 
 if BUILD_ID3INFO_AS3
-MEDIA_SOURCES += $(MEDIAdir)/ID3Info_as.cpp
-MEDIA_HEADERS += $(MEDIAdir)/ID3Info_as.h
+MEDIA_SOURCES += flash/media/ID3Info_as.cpp
+MEDIA_HEADERS += flash/media/ID3Info_as.h
 endif
 
 # FIXME: already exists
 # if BUILD_MICROPHONE_AS3
-# MEDIA_SOURCES += $(MEDIAdir)/Microphone_as.cpp
-# MEDIA_HEADERS += $(MEDIAdir)/Microphone_as.h
+# MEDIA_SOURCES += flash/media/Microphone_as.cpp
+# MEDIA_HEADERS += flash/media/Microphone_as.h
 # endif
 
 if BUILD_SOUNDCHANNEL_AS3
-MEDIA_SOURCES += $(MEDIAdir)/SoundChannel_as.cpp
-MEDIA_HEADERS += $(MEDIAdir)/SoundChannel_as.h
+MEDIA_SOURCES += flash/media/SoundChannel_as.cpp
+MEDIA_HEADERS += flash/media/SoundChannel_as.h
 endif
 
 if BUILD_SOUNDLOADERCONTEXT_AS3
-MEDIA_SOURCES += $(MEDIAdir)/SoundLoaderContext_as.cpp
-MEDIA_HEADERS += $(MEDIAdir)/SoundLoaderContext_as.h
+MEDIA_SOURCES += flash/media/SoundLoaderContext_as.cpp
+MEDIA_HEADERS += flash/media/SoundLoaderContext_as.h
 endif
 
 if BUILD_SOUNDMIXER_AS3
-MEDIA_SOURCES += $(MEDIAdir)/SoundMixer_as.cpp
-MEDIA_HEADERS += $(MEDIAdir)/SoundMixer_as.h
+MEDIA_SOURCES += flash/media/SoundMixer_as.cpp
+MEDIA_HEADERS += flash/media/SoundMixer_as.h
 endif
 
 if BUILD_SOUNDTRANSFORM_AS3
-MEDIA_SOURCES += $(MEDIAdir)/SoundTransform_as.cpp
-MEDIA_HEADERS += $(MEDIAdir)/SoundTransform_as.h
+MEDIA_SOURCES += flash/media/SoundTransform_as.cpp
+MEDIA_HEADERS += flash/media/SoundTransform_as.h
 endif
 
 # if BUILD_SOUND_AS3
-# MEDIA_SOURCES += $(MEDIAdir)/Sound_as.cpp
-# MEDIA_HEADERS += $(MEDIAdir)/Sound_as.h
+# MEDIA_SOURCES += flash/media/Sound_as.cpp
+# MEDIA_HEADERS += flash/media/Sound_as.h
 # endif
 
 # FIXME: already exists
 # if BUILD_VIDEO_AS3
-# MEDIA_SOURCES += $(MEDIAdir)/Video_as.cpp
-# MEDIA_HEADERS += $(MEDIAdir)/Video_as.h
+# MEDIA_SOURCES += flash/media/Video_as.cpp
+# MEDIA_HEADERS += flash/media/Video_as.h
 # endif
 
 libgnashasobjs_la_SOURCES += $(MEDIA_SOURCES)

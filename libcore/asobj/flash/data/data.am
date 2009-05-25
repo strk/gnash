@@ -15,84 +15,84 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-DATAdir = $(srcdir)/flash/data
+DATAdir = $(includedir)/gnash
 
-DATA_SOURCES = $(DATAdir)/data_pkg.cpp
-DATA_HEADERS = $(DATAdir)/data_pkg.h
+DATA_SOURCES = flash/data/data_pkg.cpp
+DATA_HEADERS = flash/data/data_pkg.h
 
 if BUILD_ENCRYPTEDLOCALSTORE_AS3
-DATA_SOURCES += $(DATAdir)/EncryptedLocalStore_as.cpp
-DATA_HEADERS += $(DATAdir)/EncryptedLocalStore_as.h
+DATA_SOURCES += flash/data/EncryptedLocalStore_as.cpp
+DATA_HEADERS += flash/data/EncryptedLocalStore_as.h
 endif
 
 if BUILD_SQLCOLLATIONTYPE_AS3
-DATA_SOURCES += $(DATAdir)/SQLCollationType_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLCollationType_as.h
+DATA_SOURCES += flash/data/SQLCollationType_as.cpp
+DATA_HEADERS += flash/data/SQLCollationType_as.h
 endif
 
 if BUILD_SQLCOLUMNNAMESTYLE_AS3
-DATA_SOURCES += $(DATAdir)/SQLColumnNameStyle_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLColumnNameStyle_as.h
+DATA_SOURCES += flash/data/SQLColumnNameStyle_as.cpp
+DATA_HEADERS += flash/data/SQLColumnNameStyle_as.h
 endif
 
 if BUILD_SQLCOLUMNSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLColumnSchema_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLColumnSchema_as.h
+DATA_SOURCES += flash/data/SQLColumnSchema_as.cpp
+DATA_HEADERS += flash/data/SQLColumnSchema_as.h
 endif
 
 if BUILD_SQLCONNECTION_AS3
-DATA_SOURCES += $(DATAdir)/SQLConnection_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLConnection_as.h
+DATA_SOURCES += flash/data/SQLConnection_as.cpp
+DATA_HEADERS += flash/data/SQLConnection_as.h
 endif
 
 if BUILD_SQLINDEXSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLIndexSchema_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLIndexSchema_as.h
+DATA_SOURCES += flash/data/SQLIndexSchema_as.cpp
+DATA_HEADERS += flash/data/SQLIndexSchema_as.h
 endif
 
 if BUILD_SQLMODE_AS3
-DATA_SOURCES += $(DATAdir)/SQLMode_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLMode_as.h
+DATA_SOURCES += flash/data/SQLMode_as.cpp
+DATA_HEADERS += flash/data/SQLMode_as.h
 endif
 
 if BUILD_SQLRESULT_AS3
-DATA_SOURCES += $(DATAdir)/SQLResult_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLResult_as.h
+DATA_SOURCES += flash/data/SQLResult_as.cpp
+DATA_HEADERS += flash/data/SQLResult_as.h
 endif
 
 if BUILD_SQLSCHEMARESULT_AS3
-DATA_SOURCES += $(DATAdir)/SQLSchemaResult_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLSchemaResult_as.h
+DATA_SOURCES += flash/data/SQLSchemaResult_as.cpp
+DATA_HEADERS += flash/data/SQLSchemaResult_as.h
 endif
 
 if BUILD_SQLSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLSchema_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLSchema_as.h
+DATA_SOURCES += flash/data/SQLSchema_as.cpp
+DATA_HEADERS += flash/data/SQLSchema_as.h
 endif
 
 if BUILD_SQLSTATEMENT_AS3
-DATA_SOURCES += $(DATAdir)/SQLStatement_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLStatement_as.h
+DATA_SOURCES += flash/data/SQLStatement_as.cpp
+DATA_HEADERS += flash/data/SQLStatement_as.h
 endif
 
 if BUILD_SQLTABLESCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLTableSchema_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLTableSchema_as.h
+DATA_SOURCES += flash/data/SQLTableSchema_as.cpp
+DATA_HEADERS += flash/data/SQLTableSchema_as.h
 endif
 
 if BUILD_SQLTRANSACTIONLOCKTYPE_AS3
-DATA_SOURCES += $(DATAdir)/SQLTransactionLockType_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLTransactionLockType_as.h
+DATA_SOURCES += flash/data/SQLTransactionLockType_as.cpp
+DATA_HEADERS += flash/data/SQLTransactionLockType_as.h
 endif
 
 if BUILD_SQLTRIGGERSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLTriggerSchema_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLTriggerSchema_as.h
+DATA_SOURCES += flash/data/SQLTriggerSchema_as.cpp
+DATA_HEADERS += flash/data/SQLTriggerSchema_as.h
 endif
 
 if BUILD_SQLVIEWSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLViewSchema_as.cpp
-DATA_HEADERS += $(DATAdir)/SQLViewSchema_as.h
+DATA_SOURCES += flash/data/SQLViewSchema_as.cpp
+DATA_HEADERS += flash/data/SQLViewSchema_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(DATA_SOURCES)

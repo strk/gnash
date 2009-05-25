@@ -15,24 +15,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-FILESYSTEMdir = $(srcdir)/flash/filesystem
+FILESYSTEMdir = $(includedir)/gnash
 
-FILESYSTEM_SOURCES = $(FILESYSTEMdir)/filesystem_pkg.cpp
-FILESYSTEM_HEADERS = $(FILESYSTEMdir)/filesystem_pkg.h
+FILESYSTEM_SOURCES = flash/filesystem/filesystem_pkg.cpp
+FILESYSTEM_HEADERS = flash/filesystem/filesystem_pkg.h
 
 if BUILD_FILEMODE_AS3
-FILESYSTEM_SOURCES += $(FILESYSTEMdir)/FileMode_as.cpp
-FILESYSTEM_HEADERS += $(FILESYSTEMdir)/FileMode_as.h
+FILESYSTEM_SOURCES += flash/filesystem/FileMode_as.cpp
+FILESYSTEM_HEADERS += flash/filesystem/FileMode_as.h
 endif
 
 if BUILD_FILESTREAM_AS3
-FILESYSTEM_SOURCES += 	$(FILESYSTEMdir)/FileStream_as.cpp
-FILESYSTEM_HEADERS += $(FILESYSTEMdir)/FileStream_as.h
+FILESYSTEM_SOURCES += 	flash/filesystem/FileStream_as.cpp
+FILESYSTEM_HEADERS += flash/filesystem/FileStream_as.h
 endif
 
 if BUILD_FILE_AS3
-FILESYSTEM_SOURCES += $(FILESYSTEMdir)/File_as.cpp
-FILESYSTEM_HEADERS += $(FILESYSTEMdir)/File_as.h
+FILESYSTEM_SOURCES += flash/filesystem/File_as.cpp
+FILESYSTEM_HEADERS += flash/filesystem/File_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(FILESYSTEM_SOURCES)

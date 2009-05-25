@@ -15,24 +15,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-ACCESSIBILITYdir = $(srcdir)/flash/accessibility
+ACCESSIBILITYdir = $(includedir)/gnash
 
-ACCESSIBILITY_SOURCES = $(ACCESSIBILITYdir)/accessibility_pkg.cpp
-ACCESSIBILITY_HEADERS = $(ACCESSIBILITYdir)/accessibility_pkg.h
+ACCESSIBILITY_SOURCES = flash/accessibility/accessibility_pkg.cpp
+ACCESSIBILITY_HEADERS = flash/accessibility/accessibility_pkg.h
 
 # if BUILD_ACCIMPL_AS3
-# ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/AccImpl_as.cpp
-# ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/AccImpl_as.h
+# ACCESSIBILITY_SOURCES += flash/accessibility/AccImpl_as.cpp
+# ACCESSIBILITY_HEADERS += flash/accessibility/AccImpl_as.h
 # endif
 
 if BUILD_ACCESSIBILITY_PROPERTIES_AS3
-ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/AccessibilityProperties_as.cpp
-ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/AccessibilityProperties_as.h
+ACCESSIBILITY_SOURCES += flash/accessibility/AccessibilityProperties_as.cpp
+ACCESSIBILITY_HEADERS += flash/accessibility/AccessibilityProperties_as.h
 endif
 
 # if BUILD_ACCESSIBILITY_AS3
-# ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/Accessibility_as.cpp
-# ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/Accessibility_as.h
+# ACCESSIBILITY_SOURCES += flash/accessibility/Accessibility_as.cpp
+# ACCESSIBILITY_HEADERS += flash/accessibility/Accessibility_as.h
 # endif
 
 libgnashasobjs_la_SOURCES += $(ACCESSIBILITY_SOURCES)
