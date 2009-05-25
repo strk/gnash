@@ -319,6 +319,13 @@ Button::~Button()
     _vm.getRoot().remove_key_listener(this);
 }
 
+bool
+Button::trackAsMenu()
+{
+    as_value track;
+    string_table& st = _vm.getStringTable();
+    return (get_member(st.find("trackAsMenu"), &track) && track.to_bool());
+}
 
 bool 
 Button::isEnabled()
