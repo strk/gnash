@@ -24,7 +24,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global BlurFilter class
-void BlurFilter_class_init(as_object& global);
+void blurfilter_class_init(as_object& global);
 
 } // end of gnash namespace
 

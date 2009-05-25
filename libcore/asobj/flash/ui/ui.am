@@ -21,35 +21,35 @@ UI_SOURCES = $(UIdir)/ui_pkg.cpp
 UI_HEADERS = $(UIdir)/ui_pkg.h
 
 if BUILD_CONTEXTMENUBUILTINITEMS_AS3
-UI_SOURCES += $(UIdir)/ContextMenuBuiltInItems_as3.cpp
-UI_HEADERS += $(UIdir)/ContextMenuBuiltInItems_as3.h
+UI_SOURCES += $(UIdir)/ContextMenuBuiltInItems_as.cpp
+UI_HEADERS += $(UIdir)/ContextMenuBuiltInItems_as.h
 endif
 
 if BUILD_CONTEXTMENUITEM_AS3
-UI_SOURCES += $(UIdir)/ContextMenuItem_as3.cpp
-UI_HEADERS += $(UIdir)/ContextMenuItem_as3.h
+UI_SOURCES += $(UIdir)/ContextMenuItem_as.cpp
+UI_HEADERS += $(UIdir)/ContextMenuItem_as.h
 endif
 
 # FIXME: already exists
 # if BUILD_CONTEXTMENU_AS3
-# UI_SOURCES += $(UIdir)/ContextMenu_as3.cpp
-# UI_HEADERS += $(UIdir)/ContextMenu_as3.h
+# UI_SOURCES += $(UIdir)/ContextMenu_as.cpp
+# UI_HEADERS += $(UIdir)/ContextMenu_as.h
 # endif
 
 if BUILD_KEYLOCATION_AS3
-UI_SOURCES += $(UIdir)/KeyLocation_as3.cpp
-UI_HEADERS += $(UIdir)/KeyLocation_as3.h
+UI_SOURCES += $(UIdir)/KeyLocation_as.cpp
+UI_HEADERS += $(UIdir)/KeyLocation_as.h
 endif
 
 if BUILD_KEYBOARD_AS3
-UI_SOURCES += $(UIdir)/Keyboard_as3.cpp
-UI_HEADERS += $(UIdir)/Keyboard_as3.h
+UI_SOURCES += $(UIdir)/Keyboard_as.cpp
+UI_HEADERS += $(UIdir)/Keyboard_as.h
 endif
 
-if BUILD_MOUSE_AS3
-UI_SOURCES += $(UIdir)/Mouse_as3.cpp
-UI_HEADERS += $(UIdir)/Mouse_as3.h
-endif
+# if BUILD_MOUSE_AS3
+# UI_SOURCES += $(UIdir)/Mouse_as.cpp
+# UI_HEADERS += $(UIdir)/Mouse_as.h
+# endif
 
 libgnashasobjs_la_SOURCES += $(UI_SOURCES)
 noinst_HEADERS +=  $(UI_HEADERS) uiclasses.h
@@ -69,7 +69,7 @@ uiclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(UI_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

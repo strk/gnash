@@ -56,7 +56,7 @@ public:
 
 
 void
-ConvolutionFilter_class_init(as_object& global)
+convolutionfilter_class_init(as_object& global)
 {
     string_table& st = global.getVM().getStringTable();
     

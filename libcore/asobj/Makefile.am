@@ -124,6 +124,9 @@ noinst_HEADERS = \
 	XMLNode_as.h \
 	LoadableObject.h
 
+libgnashasobjs_la_SOURCES += $(srcdir)/flash/Object.cpp
+noinst_HEADERS += $(srcdir)/flash/Object.h
+
 EXTENSIONS_API = \
 	Array_as.h \
 	Key_as.h \
@@ -184,12 +187,12 @@ include $(srcdir)/flash/xml/xml.am
 
 libgnashasobjs_la_SOURCES += \
 	$(srcdir)/flash/flash_pkg.cpp \
-	$(srcdir)/flash/Object.cpp
+	$(NULL)
 
 noinst_HEADERS += \
 	$(srcdir)/flash/flash_pkg.h \
 	$(srcdir)/flash/flashclasses.h \
-	$(srcdir)/flash/Object.h
+	$(NULL)
 
 endif
 

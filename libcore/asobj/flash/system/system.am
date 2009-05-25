@@ -21,49 +21,49 @@ SYSTEM_SOURCES = $(SYSTEMdir)/system_pkg.cpp
 SYSTEM_HEADERS = $(SYSTEMdir)/system_pkg.h
 
 if BUILD_APPLICATIONDOMAIN_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/ApplicationDomain_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/ApplicationDomain_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/ApplicationDomain_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/ApplicationDomain_as.h
 endif
 
 if BUILD_CAPABILITIES_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/Capabilities_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/Capabilities_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/Capabilities_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/Capabilities_as.h
 endif
 
 if BUILD_IMECONVERSIONMODE_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/IMEConversionMode_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/IMEConversionMode_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/IMEConversionMode_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/IMEConversionMode_as.h
 endif
 
 if BUILD_IME_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/IME_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/IME_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/IME_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/IME_as.h
 endif
 
 if BUILD_LOADERCONTEXT_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/LoaderContext_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/LoaderContext_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/LoaderContext_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/LoaderContext_as.h
 endif
 
 if BUILD_SECURITYDOMAIN_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/SecurityDomain_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/SecurityDomain_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/SecurityDomain_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/SecurityDomain_as.h
 endif
 
 if BUILD_SECURITYPANEL_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/SecurityPanel_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/SecurityPanel_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/SecurityPanel_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/SecurityPanel_as.h
 endif
 
 if BUILD_SECURITY_AS3
-SYSTEM_SOURCES += $(SYSTEMdir)/Security_as3.cpp
-SYSTEM_HEADERS += $(SYSTEMdir)/Security_as3.h
+SYSTEM_SOURCES += $(SYSTEMdir)/Security_as.cpp
+SYSTEM_HEADERS += $(SYSTEMdir)/Security_as.h
 endif
 
 # FIXME: already exists
 # if BUILD_SYSTEM_AS3
-# SYSTEM_SOURCES += $(SYSTEMdir)/System_as3.cpp
-# SYSTEM_HEADERS += $(SYSTEMdir)/System_as3.h
+# SYSTEM_SOURCES += $(SYSTEMdir)/System_as.cpp
+# SYSTEM_HEADERS += $(SYSTEMdir)/System_as.h
 # endif
 
 libgnashasobjs_la_SOURCES += $(SYSTEM_SOURCES)
@@ -84,7 +84,7 @@ systemclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(SYSTEM_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

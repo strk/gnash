@@ -24,8 +24,8 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "AccessibilityProperties_as3.h"
-#include "Accessibility_as3.h"
+#include "AccessibilityProperties_as.h"
+#include "Accessibility_as.h"
 
 #include "accessibility_pkg.h"
 #include "accessibilityclasses.h"

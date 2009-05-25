@@ -23,9 +23,9 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "PrintJobOptions_as3.h"
-#include "PrintJobOrientation_as3.h"
-#include "PrintJob_as3.h"
+#include "PrintJobOptions_as.h"
+#include "PrintJobOrientation_as.h"
+#include "PrintJob_as.h"
 
 #include "printing_pkg.h"
 #include "printingclasses.h"

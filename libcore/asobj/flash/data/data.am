@@ -21,78 +21,78 @@ DATA_SOURCES = $(DATAdir)/data_pkg.cpp
 DATA_HEADERS = $(DATAdir)/data_pkg.h
 
 if BUILD_ENCRYPTEDLOCALSTORE_AS3
-DATA_SOURCES += $(DATAdir)/EncryptedLocalStore_as3.cpp
-DATA_HEADERS += $(DATAdir)/EncryptedLocalStore_as3.h
+DATA_SOURCES += $(DATAdir)/EncryptedLocalStore_as.cpp
+DATA_HEADERS += $(DATAdir)/EncryptedLocalStore_as.h
 endif
 
 if BUILD_SQLCOLLATIONTYPE_AS3
-DATA_SOURCES += $(DATAdir)/SQLCollationType_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLCollationType_as3.h
+DATA_SOURCES += $(DATAdir)/SQLCollationType_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLCollationType_as.h
 endif
 
 if BUILD_SQLCOLUMNNAMESTYLE_AS3
-DATA_SOURCES += $(DATAdir)/SQLColumnNameStyle_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLColumnNameStyle_as3.h
+DATA_SOURCES += $(DATAdir)/SQLColumnNameStyle_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLColumnNameStyle_as.h
 endif
 
 if BUILD_SQLCOLUMNSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLColumnSchema_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLColumnSchema_as3.h
+DATA_SOURCES += $(DATAdir)/SQLColumnSchema_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLColumnSchema_as.h
 endif
 
 if BUILD_SQLCONNECTION_AS3
-DATA_SOURCES += $(DATAdir)/SQLConnection_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLConnection_as3.h
+DATA_SOURCES += $(DATAdir)/SQLConnection_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLConnection_as.h
 endif
 
 if BUILD_SQLINDEXSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLIndexSchema_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLIndexSchema_as3.h
+DATA_SOURCES += $(DATAdir)/SQLIndexSchema_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLIndexSchema_as.h
 endif
 
 if BUILD_SQLMODE_AS3
-DATA_SOURCES += $(DATAdir)/SQLMode_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLMode_as3.h
+DATA_SOURCES += $(DATAdir)/SQLMode_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLMode_as.h
 endif
 
 if BUILD_SQLRESULT_AS3
-DATA_SOURCES += $(DATAdir)/SQLResult_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLResult_as3.h
+DATA_SOURCES += $(DATAdir)/SQLResult_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLResult_as.h
 endif
 
 if BUILD_SQLSCHEMARESULT_AS3
-DATA_SOURCES += $(DATAdir)/SQLSchemaResult_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLSchemaResult_as3.h
+DATA_SOURCES += $(DATAdir)/SQLSchemaResult_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLSchemaResult_as.h
 endif
 
 if BUILD_SQLSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLSchema_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLSchema_as3.h
+DATA_SOURCES += $(DATAdir)/SQLSchema_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLSchema_as.h
 endif
 
 if BUILD_SQLSTATEMENT_AS3
-DATA_SOURCES += $(DATAdir)/SQLStatement_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLStatement_as3.h
+DATA_SOURCES += $(DATAdir)/SQLStatement_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLStatement_as.h
 endif
 
 if BUILD_SQLTABLESCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLTableSchema_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLTableSchema_as3.h
+DATA_SOURCES += $(DATAdir)/SQLTableSchema_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLTableSchema_as.h
 endif
 
 if BUILD_SQLTRANSACTIONLOCKTYPE_AS3
-DATA_SOURCES += $(DATAdir)/SQLTransactionLockType_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLTransactionLockType_as3.h
+DATA_SOURCES += $(DATAdir)/SQLTransactionLockType_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLTransactionLockType_as.h
 endif
 
 if BUILD_SQLTRIGGERSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLTriggerSchema_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLTriggerSchema_as3.h
+DATA_SOURCES += $(DATAdir)/SQLTriggerSchema_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLTriggerSchema_as.h
 endif
 
 if BUILD_SQLVIEWSCHEMA_AS3
-DATA_SOURCES += $(DATAdir)/SQLViewSchema_as3.cpp
-DATA_HEADERS += $(DATAdir)/SQLViewSchema_as3.h
+DATA_SOURCES += $(DATAdir)/SQLViewSchema_as.cpp
+DATA_HEADERS += $(DATAdir)/SQLViewSchema_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(DATA_SOURCES)
@@ -113,7 +113,7 @@ dataclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(DATA_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

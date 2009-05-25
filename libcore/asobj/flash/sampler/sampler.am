@@ -21,23 +21,23 @@ SAMPLER_SOURCES = $(SAMPLERdir)/sampler_pkg.cpp
 SAMPLER_HEADERS = $(SAMPLERdir)/sampler_pkg.h
 
 if BUILD_DELETEOBJECTSAMPLE_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/DeleteObjectSample_as3.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/DeleteObjectSample_as3.h
+SAMPLER_SOURCES += $(SAMPLERdir)/DeleteObjectSample_as.cpp
+SAMPLER_HEADERS += $(SAMPLERdir)/DeleteObjectSample_as.h
 endif
 
 if BUILD_NEWOBJECTSAMPLE_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/NewObjectSample_as3.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/NewObjectSample_as3.h
+SAMPLER_SOURCES += $(SAMPLERdir)/NewObjectSample_as.cpp
+SAMPLER_HEADERS += $(SAMPLERdir)/NewObjectSample_as.h
 endif
 
 if BUILD_SAMPLE_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/Sample_as3.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/Sample_as3.h
+SAMPLER_SOURCES += $(SAMPLERdir)/Sample_as.cpp
+SAMPLER_HEADERS += $(SAMPLERdir)/Sample_as.h
 endif
 
 if BUILD_STACKFRAME_AS3
-SAMPLER_SOURCES += $(SAMPLERdir)/StackFrame_as3.cpp
-SAMPLER_HEADERS += $(SAMPLERdir)/StackFrame_as3.h
+SAMPLER_SOURCES += $(SAMPLERdir)/StackFrame_as.cpp
+SAMPLER_HEADERS += $(SAMPLERdir)/StackFrame_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(SAMPLER_SOURCES)
@@ -58,7 +58,7 @@ samplarclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(SAMPLAR_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

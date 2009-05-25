@@ -21,18 +21,18 @@ PRINTING_SOURCES = $(PRINTINGdir)/printing_pkg.cpp
 PRINTING_HEADERS = $(PRINTINGdir)/printing_pkg.h
 
 if BUILD_PRINTJOBOPTIONS_AS3
-PRINTING_SOURCES += $(PRINTINGdir)/PrintJobOptions_as3.cpp
-PRINTING_HEADERS += $(PRINTINGdir)/PrintJobOptions_as3.h
+PRINTING_SOURCES += $(PRINTINGdir)/PrintJobOptions_as.cpp
+PRINTING_HEADERS += $(PRINTINGdir)/PrintJobOptions_as.h
 endif
 
 if BUILD_PRINTJOBORIENTATION_AS3
-PRINTING_SOURCES += $(PRINTINGdir)/PrintJobOrientation_as3.cpp
-PRINTING_HEADERS += $(PRINTINGdir)/PrintJobOrientation_as3.h
+PRINTING_SOURCES += $(PRINTINGdir)/PrintJobOrientation_as.cpp
+PRINTING_HEADERS += $(PRINTINGdir)/PrintJobOrientation_as.h
 endif
 
 if BUILD_PRINTJOB_AS3
-PRINTING_SOURCES += $(PRINTINGdir)/PrintJob_as3.cpp
-PRINTING_HEADERS += $(PRINTINGdir)/PrintJob_as3.h
+PRINTING_SOURCES += $(PRINTINGdir)/PrintJob_as.cpp
+PRINTING_HEADERS += $(PRINTINGdir)/PrintJob_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(PRINTING_SOURCES)
@@ -53,7 +53,7 @@ printingclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(PRINTING_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

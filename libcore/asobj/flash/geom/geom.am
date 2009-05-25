@@ -21,28 +21,28 @@ GEOM_SOURCES = $(GEOMdir)/geom_pkg.cpp
 GEOM_HEADERS = $(GEOMdir)/geom_pkg.h
 
 if BUILD_COLORTRANSFORM_AS3
-GEOM_SOURCES += $(GEOMdir)/ColorTransform_as3.cpp
-GEOM_HEADERS += $(GEOMdir)/ColorTransform_as3.h
+GEOM_SOURCES += $(GEOMdir)/ColorTransform_as.cpp
+GEOM_HEADERS += $(GEOMdir)/ColorTransform_as.h
 endif
 
 if BUILD_MATRIX_AS3
-GEOM_SOURCES += $(GEOMdir)/Matrix_as3.cpp
-GEOM_HEADERS += $(GEOMdir)/Matrix_as3.h
+GEOM_SOURCES += $(GEOMdir)/Matrix_as.cpp
+GEOM_HEADERS += $(GEOMdir)/Matrix_as.h
 endif
 
 if BUILD_POINT_AS3
-GEOM_SOURCES += $(GEOMdir)/Point_as3.cpp
-GEOM_HEADERS += $(GEOMdir)/Point_as3.h
+GEOM_SOURCES += $(GEOMdir)/Point_as.cpp
+GEOM_HEADERS += $(GEOMdir)/Point_as.h
 endif
 
 if BUILD_RECTANGLE_AS3
-GEOM_SOURCES += $(GEOMdir)/Rectangle_as3.cpp
-GEOM_HEADERS += $(GEOMdir)/Rectangle_as3.h
+GEOM_SOURCES += $(GEOMdir)/Rectangle_as.cpp
+GEOM_HEADERS += $(GEOMdir)/Rectangle_as.h
 endif
 
 if BUILD_TRANSFORM_AS3
-GEOM_SOURCES += $(GEOMdir)/Transform_as3.cpp
-GEOM_HEADERS += $(GEOMdir)/Transform_as3.h
+GEOM_SOURCES += $(GEOMdir)/Transform_as.cpp
+GEOM_HEADERS += $(GEOMdir)/Transform_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(GEOM_SOURCES)
@@ -63,7 +63,7 @@ geomclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(GEOM_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

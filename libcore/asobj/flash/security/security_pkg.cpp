@@ -24,11 +24,11 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "IURIDereferencer_as3.h"
-#include "RevocationCheckSettings_as3.h"
-#include "SignatureStatus_as3.h"
-#include "SignerTrustSettings_as3.h"
-#include "XMLSignatureValidator_as3.h"
+#include "IURIDereferencer_as.h"
+#include "RevocationCheckSettings_as.h"
+#include "SignatureStatus_as.h"
+#include "SignerTrustSettings_as.h"
+#include "XMLSignatureValidator_as.h"
 
 #include "security_pkg.h"
 #include "securityclasses.h"

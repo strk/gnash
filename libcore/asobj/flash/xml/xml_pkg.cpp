@@ -24,9 +24,9 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "XMLDocument_as3.h"
-#include "XMLNodeType_as3.h"
-#include "XMLNode_as3.h"
+#include "XMLDocument_as.h"
+#include "XMLNodeType_as.h"
+#include "XMLNode_as.h"
 
 #include "xml_pkg.h"
 #include "xmlclasses.h"

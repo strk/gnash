@@ -23,48 +23,48 @@ ERRORS_SOURCES = $(ERRORSdir)/errors_pkg.cpp
 ERRORS_HEADERS = $(ERRORSdir)/errors_pkg.h
 
 if BUILD_EOFERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/EOFError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/EOFError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/EOFError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/EOFError_as.h
 endif
 
 if BUILD_IOERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/IOError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/IOError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/IOError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/IOError_as.h
 endif
 
 if BUILD_ILLEGALOPERATIONERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/IllegalOperationError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/IllegalOperationError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/IllegalOperationError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/IllegalOperationError_as.h
 endif
 
 if BUILD_INVALIDSWFERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/InvalidSWFError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/InvalidSWFError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/InvalidSWFError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/InvalidSWFError_as.h
 endif
 
 if BUILD_MEMORYERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/MemoryError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/MemoryError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/MemoryError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/MemoryError_as.h
 endif
 
 if BUILD_SQLERROROPERATION_AS3
-ERRORS_SOURCES += $(ERRORSdir)/SQLErrorOperation_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/SQLErrorOperation_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/SQLErrorOperation_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/SQLErrorOperation_as.h
 endif
 
 if BUILD_SQLERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/SQLError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/SQLError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/SQLError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/SQLError_as.h
 endif
 
 if BUILD_SCRIPTTIMEOUTERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/ScriptTimeoutError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/ScriptTimeoutError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/ScriptTimeoutError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/ScriptTimeoutError_as.h
 endif
 
 if BUILD_STACKOVERFLOWERROR_AS3
-ERRORS_SOURCES += $(ERRORSdir)/StackOverflowError_as3.cpp
-ERRORS_HEADERS += $(ERRORSdir)/StackOverflowError_as3.h
+ERRORS_SOURCES += $(ERRORSdir)/StackOverflowError_as.cpp
+ERRORS_HEADERS += $(ERRORSdir)/StackOverflowError_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(ERRORS_SOURCES)
@@ -85,7 +85,7 @@ errorsclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(ERRORS_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

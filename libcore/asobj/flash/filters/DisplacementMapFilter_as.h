@@ -31,7 +31,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global DisplacementMapFilter class
-void DisplacementMapFilter_class_init(as_object& global);
+void displacementmapfilter_class_init(as_object& global);
 
 /// Return a DisplacementMapFilter instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_DisplacementMapFilter_instance();

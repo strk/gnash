@@ -24,11 +24,11 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "HTMLHistoryItem_as3.h"
-#include "HTMLHost_as3.h"
-#include "HTMLLoader_as3.h"
-#include "HTMLPDFCapability_as3.h"
-#include "HTMLWindowCreateOptions_as3.h"
+#include "HTMLHistoryItem_as.h"
+#include "HTMLHost_as.h"
+#include "HTMLLoader_as.h"
+#include "HTMLPDFCapability_as.h"
+#include "HTMLWindowCreateOptions_as.h"
 
 #include "html_pkg.h"
 #include "htmlclasses.h"

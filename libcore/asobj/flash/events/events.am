@@ -23,193 +23,193 @@ EVENTS_SOURCES = $(EVENTSdir)/events_pkg.cpp
 EVENTS_HEADERS = $(EVENTSdir)/events_pkg.h
 
 if BUILD_ACTIVITYEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/ActivityEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/ActivityEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/ActivityEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ActivityEvent_as.h
 endif
 
 if BUILD_ASYNCERROREVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/AsyncErrorEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/AsyncErrorEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/AsyncErrorEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/AsyncErrorEvent_as.h
 endif
 
 if BUILD_BROWSERINVOKEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/BrowserInvokeEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/BrowserInvokeEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/BrowserInvokeEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/BrowserInvokeEvent_as.h
 endif
 
 if BUILD_CONTEXTMENUEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/ContextMenuEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/ContextMenuEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/ContextMenuEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ContextMenuEvent_as.h
 endif
 
 if BUILD_DRMAUTHENTICATEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/DRMAuthenticateEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/DRMAuthenticateEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/DRMAuthenticateEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DRMAuthenticateEvent_as.h
 endif
 
 if BUILD_DRMERROREVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/DRMErrorEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/DRMErrorEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/DRMErrorEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DRMErrorEvent_as.h
 endif
 
 if BUILD_DRMSTATUSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/DRMStatusEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/DRMStatusEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/DRMStatusEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DRMStatusEvent_as.h
 endif
 
 if BUILD_DATAEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/DataEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/DataEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/DataEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/DataEvent_as.h
 endif
 
 if BUILD_ERROREVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/ErrorEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/ErrorEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/ErrorEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ErrorEvent_as.h
 endif
 
 if BUILD_EVENTDISPATCHER_AS3
-EVENTS_SOURCES += $(EVENTSdir)/EventDispatcher_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/EventDispatcher_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/EventDispatcher_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/EventDispatcher_as.h
 endif
 
 if BUILD_EVENTPHASE_AS3
-EVENTS_SOURCES += $(EVENTSdir)/EventPhase_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/EventPhase_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/EventPhase_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/EventPhase_as.h
 endif
 
 if BUILD_EVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/Event_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/Event_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/Event_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/Event_as.h
 endif
 
 if BUILD_FILELISTEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/FileListEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/FileListEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/FileListEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/FileListEvent_as.h
 endif
 
 if BUILD_FOCUSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/FocusEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/FocusEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/FocusEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/FocusEvent_as.h
 endif
 
 if BUILD_FULLSCREENEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/FullScreenEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/FullScreenEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/FullScreenEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/FullScreenEvent_as.h
 endif
 
 if BUILD_HTMLUNCAUGHTSCRIPTEXCEPTIONEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/HTMLUncaughtScriptExceptionEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/HTMLUncaughtScriptExceptionEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/HTMLUncaughtScriptExceptionEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/HTMLUncaughtScriptExceptionEvent_as.h
 endif
 
 if BUILD_HTTPSTATUSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/HTTPStatusEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/HTTPStatusEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/HTTPStatusEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/HTTPStatusEvent_as.h
 endif
 
 if BUILD_IEVENTDISPATCHER_AS3
-EVENTS_SOURCES += $(EVENTSdir)/IEventDispatcher_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/IEventDispatcher_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/IEventDispatcher_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/IEventDispatcher_as.h
 endif
 
 if BUILD_IMEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/IMEEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/IMEEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/IMEEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/IMEEvent_as.h
 endif
 
 if BUILD_IOERROREVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/IOErrorEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/IOErrorEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/IOErrorEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/IOErrorEvent_as.h
 endif
 
 if BUILD_INVOKEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/InvokeEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/InvokeEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/InvokeEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/InvokeEvent_as.h
 endif
 
 if BUILD_KEYBOARDEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/KeyboardEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/KeyboardEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/KeyboardEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/KeyboardEvent_as.h
 endif
 
 if BUILD_MOUSEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/MouseEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/MouseEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/MouseEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/MouseEvent_as.h
 endif
 
 if BUILD_NATIVEDRAGEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/NativeDragEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/NativeDragEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/NativeDragEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NativeDragEvent_as.h
 endif
 
 if BUILD_NATIVEWINDOWBOUNDSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/NativeWindowBoundsEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/NativeWindowBoundsEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/NativeWindowBoundsEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NativeWindowBoundsEvent_as.h
 endif
 
 if BUILD_NATIVEWINDOWDISPLAYSTATEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/NativeWindowDisplayStateEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/NativeWindowDisplayStateEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/NativeWindowDisplayStateEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NativeWindowDisplayStateEvent_as.h
 endif
 
 if BUILD_NETSTATUSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/NetStatusEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/NetStatusEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/NetStatusEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/NetStatusEvent_as.h
 endif
 
 if BUILD_OUTPUTPROGRESSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/OutputProgressEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/OutputProgressEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/OutputProgressEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/OutputProgressEvent_as.h
 endif
 
 if BUILD_PROGRESSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/ProgressEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/ProgressEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/ProgressEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ProgressEvent_as.h
 endif
 
 if BUILD_SQLERROREVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/SQLErrorEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/SQLErrorEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/SQLErrorEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SQLErrorEvent_as.h
 endif
 
 if BUILD_SQLEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/SQLEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/SQLEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/SQLEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SQLEvent_as.h
 endif
 
 if BUILD_SQLUPDATEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/SQLUpdateEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/SQLUpdateEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/SQLUpdateEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SQLUpdateEvent_as.h
 endif
 
 if BUILD_SCREENMOUSEEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/ScreenMouseEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/ScreenMouseEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/ScreenMouseEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/ScreenMouseEvent_as.h
 endif
 
 if BUILD_SECURITYERROREVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/SecurityErrorEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/SecurityErrorEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/SecurityErrorEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SecurityErrorEvent_as.h
 endif
 
 if BUILD_STATUSEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/StatusEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/StatusEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/StatusEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/StatusEvent_as.h
 endif
 
 if BUILD_SYNCEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/SyncEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/SyncEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/SyncEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/SyncEvent_as.h
 endif
 
 if BUILD_TEXTEVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/TextEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/TextEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/TextEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/TextEvent_as.h
 endif
 
 if BUILD_TIMEREVENT_AS3
-EVENTS_SOURCES += $(EVENTSdir)/TimerEvent_as3.cpp
-EVENTS_HEADERS += $(EVENTSdir)/TimerEvent_as3.h
+EVENTS_SOURCES += $(EVENTSdir)/TimerEvent_as.cpp
+EVENTS_HEADERS += $(EVENTSdir)/TimerEvent_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(EVENTS_SOURCES)
@@ -230,7 +230,7 @@ eventsclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(EVENTS_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

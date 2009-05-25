@@ -23,10 +23,10 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "DeleteObjectSample_as3.h"
-#include "NewObjectSample_as3.h"
-#include "Sample_as3.h"
-#include "StackFrame_as3.h"
+#include "DeleteObjectSample_as.h"
+#include "NewObjectSample_as.h"
+#include "Sample_as.h"
+#include "StackFrame_as.h"
 
 #include "sampler_pkg.h"
 #include "samplarclasses.h"

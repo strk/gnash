@@ -21,28 +21,28 @@ HTML_SOURCES = $(HTMLdir)/html_pkg.cpp
 HTML_HEADERS = $(HTMLdir)/html_pkg.h
 
 if BUILD_HTMLHISTORYITEM_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLHistoryItem_as3.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLHistoryItem_as3.h
+HTML_SOURCES += $(HTMLdir)/HTMLHistoryItem_as.cpp
+HTML_HEADERS += $(HTMLdir)/HTMLHistoryItem_as.h
 endif
 
 if BUILD_HTMLHOST_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLHost_as3.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLHost_as3.h
+HTML_SOURCES += $(HTMLdir)/HTMLHost_as.cpp
+HTML_HEADERS += $(HTMLdir)/HTMLHost_as.h
 endif
 
 if BUILD_HTMLLOADER_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLLoader_as3.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLLoader_as3.h
+HTML_SOURCES += $(HTMLdir)/HTMLLoader_as.cpp
+HTML_HEADERS += $(HTMLdir)/HTMLLoader_as.h
 endif
 
 if BUILD_HTMLPDFCAPABILITY_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLPDFCapability_as3.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLPDFCapability_as3.h
+HTML_SOURCES += $(HTMLdir)/HTMLPDFCapability_as.cpp
+HTML_HEADERS += $(HTMLdir)/HTMLPDFCapability_as.h
 endif
 
 if BUILD_HTMLWINDOWCREATEOPTIONS_AS3
-HTML_SOURCES += $(HTMLdir)/HTMLWindowCreateOptions_as3.cpp
-HTML_HEADERS += $(HTMLdir)/HTMLWindowCreateOptions_as3.h
+HTML_SOURCES += $(HTMLdir)/HTMLWindowCreateOptions_as.cpp
+HTML_HEADERS += $(HTMLdir)/HTMLWindowCreateOptions_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(HTML_SOURCES)
@@ -63,7 +63,7 @@ htmlclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(HTML_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

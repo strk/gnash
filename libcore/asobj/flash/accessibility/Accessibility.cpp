@@ -1,4 +1,4 @@
-// Accessibility_as3.cpp:  ActionScript "Accessibility" class, for Gnash.
+// Accessibility_as.cpp:  ActionScript "Accessibility" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //
@@ -21,7 +21,7 @@
 #include "gnashconfig.h"
 #endif
 
-#include "accessibility/Accessibility_as3.h"
+#include "accessibility/Accessibility_as.h"
 #include "log.h"
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
@@ -84,7 +84,7 @@ as_value
 accessibility_ctor(const fn_call& /* fn */)
 {
     GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<as_object> obj = new Accessibility_as3;
+    boost::intrusive_ptr<as_object> obj = new Accessibility_as;
 
     return as_value(obj.get()); // will keep alive
 }

@@ -24,11 +24,11 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "ColorTransform_as3.h"
-#include "Matrix_as3.h"
-#include "Point_as3.h"
-#include "Rectangle_as3.h"
-#include "Transform_as3.h"
+#include "ColorTransform_as.h"
+#include "Matrix_as.h"
+#include "Point_as.h"
+#include "Rectangle_as.h"
+#include "Transform_as.h"
 
 #include "geom_pkg.h"
 #include "geomclasses.h"

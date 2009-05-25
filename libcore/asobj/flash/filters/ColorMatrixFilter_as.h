@@ -24,7 +24,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global ColorMatrixFilter class
-void ColorMatrixFilter_class_init(as_object& global);
+void colormatrixfilter_class_init(as_object& global);
 
 } // end of gnash namespace
 

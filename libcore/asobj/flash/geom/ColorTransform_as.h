@@ -1,6 +1,6 @@
-// ColorTransform_as.h:  ActionScript "ColorTransform" class, for Gnash.
+// ColorTransform_as.h:  ActionScript 3 "ColorTransform" class, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,74 +17,45 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef GNASH_ASOBJ_COLORTRANSFORM_H
-#define GNASH_ASOBJ_COLORTRANSFORM_H
+#ifndef GNASH_ASOBJ3_COLORTRANSFORM_H
+#define GNASH_ASOBJ3_COLORTRANSFORM_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-#include "as_object.h"
+#include "fn_call.h"
 
 namespace gnash {
 
-// This is used directly by flash.geom.Transform, as it is
-// much more efficient than a pseudo-ActionScript implementation.
+// Forward declarations
+class as_object;
+namespace {
+    as_object* getColorTransformInterface();
+}
+
 class ColorTransform_as: public as_object
 {
 
 public:
 
-	ColorTransform_as(double rm, double gm, double bm, double am,
-	                  double ro, double go, double bo, double ao);
-
-    // TODO: is all this really necessary? Tests show that the ColorTransform
-    // object has its own properties on initialization, so they have
-    // getter-setters and are *not* simple properties. Storing and
-    // manipulating as doubles (they cannot be anything else - see ctor) is
-    // better for speed and memory than using as_value.
-    void setAlphaMultiplier(double am) { _alphaMultiplier = am; }
-    void setRedMultiplier(double rm) { _redMultiplier = rm; }
-    void setBlueMultiplier(double bm) { _blueMultiplier = bm; }
-    void setGreenMultiplier(double gm) { _greenMultiplier = gm; }
-
-    void setAlphaOffset(double ao) { _alphaOffset = ao; }
-    void setRedOffset(double ro) { _redOffset = ro; }
-    void setBlueOffset(double bo) { _blueOffset = bo; }
-    void setGreenOffset(double go) { _greenOffset = go; }
-
-    double getAlphaMultiplier() const { return _alphaMultiplier; }
-    double getRedMultiplier() const { return _redMultiplier; }
-    double getBlueMultiplier() const { return _blueMultiplier; }
-    double getGreenMultiplier() const { return _greenMultiplier; }
-
-    double getAlphaOffset() const { return _alphaOffset; }
-    double getRedOffset() const { return _redOffset; }
-    double getBlueOffset() const { return _blueOffset; }
-    double getGreenOffset() const { return _greenOffset; }
-
-
-private:
-
-    double _alphaMultiplier;
-    double _alphaOffset;
-    double _blueMultiplier;
-    double _blueOffset;
-    double _greenMultiplier;
-    double _greenOffset;
-    double _redMultiplier;
-    double _redOffset;
+    ColorTransform_as()
+        :
+        as_object(getColorTransformInterface())
+    {}
 
 };
 
-
 /// Initialize the global ColorTransform class
-void ColorTransform_class_init(as_object& global);
+void colortransform_class_init(as_object& global);
 
-/// Return a ColorTransform instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_ColorTransform_instance();
+} // gnash namespace
 
-} // end of gnash namespace
-
-// __GNASH_ASOBJ_COLORTRANSFORM_H__
+// GNASH_ASOBJ3_COLORTRANSFORM_H
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+

@@ -23,9 +23,9 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "FileMode_as3.h"
-#include "FileStream_as3.h"
-#include "File_as3.h"
+#include "FileMode_as.h"
+#include "FileStream_as.h"
+#include "File_as.h"
 
 #include "filesystem_pkg.h"
 #include "filesystemclasses.h"

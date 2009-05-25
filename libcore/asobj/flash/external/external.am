@@ -23,8 +23,8 @@ EXTERNAL_SOURCES = $(EXTERNALdir)/external_pkg.cpp
 EXTERNAL_HEADERS = $(EXTERNALdir)/external_pkg.h
 
 if BUILD_EXTERNALINTERFACE_AS3
-EXTERNAL_SOURCES += $(EXTERNALdir)/ExternalInterface_as3.cpp
-EXTERNAL_HEADERS += $(EXTERNALdir)/ExternalInterface_as3.h
+EXTERNAL_SOURCES += $(EXTERNALdir)/ExternalInterface_as.cpp
+EXTERNAL_HEADERS += $(EXTERNALdir)/ExternalInterface_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(EXTERNAL_SOURCES)
@@ -45,7 +45,7 @@ externalclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(EXTERNAL_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

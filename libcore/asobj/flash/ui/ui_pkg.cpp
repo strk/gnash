@@ -23,12 +23,12 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "ContextMenuBuiltInItems_as3.h"
-#include "ContextMenuItem_as3.h"
-#include "ContextMenu_as3.h"
-#include "KeyLocation_as3.h"
-#include "Keyboard_as3.h"
-#include "Mouse_as3.h"
+#include "ContextMenuBuiltInItems_as.h"
+#include "ContextMenuItem_as.h"
+#include "ContextMenu_as.h"
+#include "KeyLocation_as.h"
+#include "Keyboard_as.h"
+#include "Mouse_as.h"
 
 #include "ui_pkg.h"
 #include "uiclasses.h"

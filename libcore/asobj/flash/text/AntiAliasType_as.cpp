@@ -1,4 +1,4 @@
-// AntiAliasType_as3.cpp:  ActionScript "AntiAliasType" class, for Gnash.
+// AntiAliasType_as.cpp:  ActionScript "AntiAliasType" class, for Gnash.
 //
 //   Copyright (C) 2009 Free Software Foundation, Inc.
 //

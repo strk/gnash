@@ -21,19 +21,19 @@ ACCESSIBILITY_SOURCES = $(ACCESSIBILITYdir)/accessibility_pkg.cpp
 ACCESSIBILITY_HEADERS = $(ACCESSIBILITYdir)/accessibility_pkg.h
 
 # if BUILD_ACCIMPL_AS3
-# ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/AccImpl_as3.cpp
-# ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/AccImpl_as3.h
+# ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/AccImpl_as.cpp
+# ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/AccImpl_as.h
 # endif
 
 if BUILD_ACCESSIBILITY_PROPERTIES_AS3
-ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/AccessibilityProperties_as3.cpp
-ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/AccessibilityProperties_as3.h
+ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/AccessibilityProperties_as.cpp
+ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/AccessibilityProperties_as.h
 endif
 
-if BUILD_ACCESSIBILITY_AS3
-ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/Accessibility_as3.cpp
-ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/Accessibility_as3.h
-endif
+# if BUILD_ACCESSIBILITY_AS3
+# ACCESSIBILITY_SOURCES += $(ACCESSIBILITYdir)/Accessibility_as.cpp
+# ACCESSIBILITY_HEADERS += $(ACCESSIBILITYdir)/Accessibility_as.h
+# endif
 
 libgnashasobjs_la_SOURCES += $(ACCESSIBILITY_SOURCES)
 noinst_HEADERS +=  $(ACCESSIBILITY_HEADERS) accessibilityclasses.h
@@ -53,7 +53,7 @@ accessibilityclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(ACCESSIBILITY_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

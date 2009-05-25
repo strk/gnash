@@ -24,7 +24,7 @@
 #include "VM.h"
 #include "MovieClip.h"
 
-#include "ExternalInterface_as3.h"
+#include "ExternalInterface_as.h"
 
 #include "external_pkg.h"
 #include "externalclasses.h"

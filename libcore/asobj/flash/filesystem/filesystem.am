@@ -21,18 +21,18 @@ FILESYSTEM_SOURCES = $(FILESYSTEMdir)/filesystem_pkg.cpp
 FILESYSTEM_HEADERS = $(FILESYSTEMdir)/filesystem_pkg.h
 
 if BUILD_FILEMODE_AS3
-FILESYSTEM_SOURCES += $(FILESYSTEMdir)/FileMode_as3.cpp
-FILESYSTEM_HEADERS += $(FILESYSTEMdir)/FileMode_as3.h
+FILESYSTEM_SOURCES += $(FILESYSTEMdir)/FileMode_as.cpp
+FILESYSTEM_HEADERS += $(FILESYSTEMdir)/FileMode_as.h
 endif
 
 if BUILD_FILESTREAM_AS3
-FILESYSTEM_SOURCES += 	$(FILESYSTEMdir)/FileStream_as3.cpp
-FILESYSTEM_HEADERS += $(FILESYSTEMdir)/FileStream_as3.h
+FILESYSTEM_SOURCES += 	$(FILESYSTEMdir)/FileStream_as.cpp
+FILESYSTEM_HEADERS += $(FILESYSTEMdir)/FileStream_as.h
 endif
 
 if BUILD_FILE_AS3
-FILESYSTEM_SOURCES += $(FILESYSTEMdir)/File_as3.cpp
-FILESYSTEM_HEADERS += $(FILESYSTEMdir)/File_as3.h
+FILESYSTEM_SOURCES += $(FILESYSTEMdir)/File_as.cpp
+FILESYSTEM_HEADERS += $(FILESYSTEMdir)/File_as.h
 endif
 
 libgnashasobjs_la_SOURCES += $(FILESYSTEM_SOURCES)
@@ -53,7 +53,7 @@ filesystemclasses.h: Makefile
 	# drop the first node, which is always the top level package ;\
 	sources="`echo $(FILESYSTEM_SOURCES) | cut -d ' ' -f 2-`"; \
 	for i in $${sources}; do \
-	  item=`basename $$i | sed -e 's:\_as3.cpp::'`; \
+	  item=`basename $$i | sed -e 's:\_as.cpp::'`; \
 	  lowname="`echo $${item} | tr '[A-Z]' '[a-z]'`"; \
 	  echo "	gnash::$${lowname}_class_init,"  >> $${header}; \
 	done; \

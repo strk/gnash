@@ -69,7 +69,7 @@ ColorMatrixFilter_as::registerCtor(as_object& global)
 }
 
 void
-ColorMatrixFilter_class_init(as_object& global)
+colormatrixfilter_class_init(as_object& global)
 {
     ColorMatrixFilter_as::registerCtor(global);
 }

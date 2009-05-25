@@ -1,6 +1,6 @@
-// Transform_as.h:  ActionScript "Transform" class, for Gnash.
+// Transform_as.h:  ActionScript 3 "Transform" class, for Gnash.
 //
-//   Copyright (C) 2005, 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
+//   Copyright (C) 2009 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,26 +17,45 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __GNASH_ASOBJ_TRANSFORM_H__
-#define __GNASH_ASOBJ_TRANSFORM_H__
+#ifndef GNASH_ASOBJ3_TRANSFORM_H
+#define GNASH_ASOBJ3_TRANSFORM_H
 
 #ifdef HAVE_CONFIG_H
 #include "gnashconfig.h"
 #endif
 
-//#include <memory> // for auto_ptr
+#include "fn_call.h"
 
 namespace gnash {
 
+// Forward declarations
 class as_object;
+namespace {
+    as_object* getTransformInterface();
+}
+
+class Transform_as: public as_object
+{
+
+public:
+
+    Transform_as()
+        :
+        as_object(getTransformInterface())
+    {}
+
+};
 
 /// Initialize the global Transform class
-void Transform_class_init(as_object& global);
+void transform_class_init(as_object& global);
 
-/// Return a Transform instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_Transform_instance();
+} // gnash namespace
 
-} // end of gnash namespace
-
-// __GNASH_ASOBJ_TRANSFORM_H__
+// GNASH_ASOBJ3_TRANSFORM_H
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+
